@@ -571,7 +571,8 @@ void KmflInstance::erase_char()
 #ifdef SCIM_0_8_0
     forward_keypress(backspacekey);
 #else
-    forward_key_event(backspacekey);
+    if (!delete_surrounding_text(-1, 1)) 
+	forward_key_event(backspacekey);
 #endif
 }
 
