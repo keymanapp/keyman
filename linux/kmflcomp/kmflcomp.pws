@@ -1,0 +1,48 @@
+
+[filenumbers]
+0=1279
+1=42
+2=5
+3=1
+4=297
+5=1
+6=149
+
+[filemarkers]
+0=1279,
+1=
+2=
+3=
+4=
+5=
+6=
+
+[File View]
+filter.file.unmatch=*.so *.o *.a *.la
+filter.file.ignore.hidden=0
+filter.dir.ignore.hidden=0
+
+[executer]
+RunInTerminal=true
+
+[Project State]
+clean before build=false
+
+[filelist]
+0=/home/doug/Projects/kmflcomp-0.3/src/kmfl_compiler.c
+1=/home/doug/Projects/kmflcomp-0.3/src/ConvertUTF.c
+2=/home/doug/Projects/kmflcomp-0.3/src/main.c
+3=/home/doug/Projects/kmflcomp-0.3/src/yacc.y
+4=/home/doug/Projects/kmflcomp-0.3/src/lex.l
+5=/home/doug/Projects/kmflcomp-0.3/src/lex.c
+6=/home/doug/Projects/kmflcomp-0.3/src/compiler.h
+
+[Project Tree]
+0=0
+1=0:0
+
+[Symbol Tree]
+0=3
+
+[File Tree]
+0=0
