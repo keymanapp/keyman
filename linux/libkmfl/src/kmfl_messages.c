@@ -20,8 +20,8 @@ void DBGMSG(int debug,char *fmt,...)
 	
 	if((debug<0) || ((kmfl_debug&debug)!=0))
 	{
-		debugfile=fopen("/tmp/libkmfldebug.log", "a");
-//		debugfile=stderr;
+//		debugfile=fopen("/tmp/libkmfldebug.log", "a");
+		debugfile=stderr;
 		fprintf(debugfile,"debug: ");
 		va_start(args,fmt);
 		vfprintf(debugfile,fmt,args);

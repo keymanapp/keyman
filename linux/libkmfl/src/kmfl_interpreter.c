@@ -424,23 +424,27 @@ int process_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 		// Then output the output string (excepting deadkeys), and add it to the history
 		for(n=0, p=output; n<nout; n++, p++) 
 		{	
-			if(ITEM_TYPE(*p) != ITEM_DEADKEY) 
+			if(ITEM_TYPE(*p) == ITEM_DEADKEY) 
 			{
-                                if (ITEM_TYPE(*p) == ITEM_KEYSYM)
-                                {
+                add_to_history(p_kmsi,*p);
+			}
+			else
+			{
+	            if (ITEM_TYPE(*p) == ITEM_KEYSYM)
+                {
 					unsigned int key, state;
 					key = (*p) & 0xFFFF;
 					state = ((*p) >> 16) & 0xFF;
 					DBGMSG(1, "DAR - libkmfl - ITEM_KEYSYM key:%x, state: %x\n", key, state);
-                                        forward_keyevent(p_kmsi->connection, key, state);
-                                        clear_history(p_kmsi);
-                                } 
-                                else
-                                {
-                                        output_item(p_kmsi->connection,*p);
-                			add_to_history(p_kmsi,*p);
-                		}
-                	}
+                    forward_keyevent(p_kmsi->connection, key, state);
+                    clear_history(p_kmsi);
+                } 
+                else
+                {
+                	output_item(p_kmsi->connection,*p);
+                	add_to_history(p_kmsi,*p);
+               	}
+            }
 		}
 
 		// Reset pointer and continue
