@@ -613,9 +613,6 @@ void check_rhs(ITEM *rhs, unsigned int olen, GROUP *gp, int line)
 	{
 		switch(ITEM_TYPE(*p))
 		{
-		case ITEM_KEYSYM:
-			error(line,fmt,"non-character keys");
-			break;
 		case ITEM_MATCH:
 			error(line,fmt,"'match'");
 			break;
@@ -639,8 +636,6 @@ void check_rhs(ITEM *rhs, unsigned int olen, GROUP *gp, int line)
 // Check that the match and output strings only contain legal items
 void check_rule(RULE *rp, GROUP *gp)
 {
-	unsigned int goodplus=0, badplus=0;
-
 	if((rp->ilen != count_items(rp->lhs)) || (rp->olen != count_items(rp->rhs))) 
 		fail(1,"fatal compiler error");
 
@@ -1007,28 +1002,28 @@ char *items_to_string(ITEM *p)
 		{
 		case ITEM_CHAR:
 			if(*p&0xffff80)
-				sp += sprintf(sp,"[0x%x]",(*p&0xffffff));
+				sp += sprintf(sp,"[0x%lx]",(*p&0xffffff));
 			else
 				*sp++ = (char)*p; 
 			break;
 		case ITEM_KEYSYM:
-			sp += sprintf(sp,"[key %x,0x%x]",(*p&0xff0000)>>16,(*p&0xff));
+			sp += sprintf(sp,"[key %lx,0x%lx]",(*p&0xff0000)>>16,(*p&0xff));
 			break;
 		case ITEM_ANY:
 			sp += sprintf(sp,"[any %u]",(unsigned)(*p&0xffff));
 			break;
 		case ITEM_INDEX:
-			sp += sprintf(sp,"[index %d,%u]",(*p&0xff0000)>>16,(*p&0xffff));
+			sp += sprintf(sp,"[index %ld,%lu]",(*p&0xff0000)>>16,(*p&0xffff));
 			break;
 		case ITEM_OUTS:
-			sp += sprintf(sp,"[outs %u]",(*p&0xffff));
+			sp += sprintf(sp,"[outs %lu]",(*p&0xffff));
 			break;
 		case ITEM_DEADKEY:
-			sp += sprintf(sp,"[dk %u]",(*p&0xffff));
+			sp += sprintf(sp,"[dk %lu]",(*p&0xffff));
 			break;
 		case ITEM_CONTEXT:
 			if(*p & 0xff)
-				sp += sprintf(sp,"[context %u]",(*p&0xff));
+				sp += sprintf(sp,"[context %lu]",(*p&0xff));
 			else
 				sp += sprintf(sp,"[context]");
 			break;
@@ -1042,7 +1037,7 @@ char *items_to_string(ITEM *p)
 			sp += sprintf(sp,"[beep]");
 			break;
 		case ITEM_USE:
-			sp += sprintf(sp,"[use %u]",(*p&0xffff));
+			sp += sprintf(sp,"[use %lu]",(*p&0xffff));
 			break;
 		case ITEM_MATCH:
 			sp += sprintf(sp,"[match]");
@@ -1054,7 +1049,7 @@ char *items_to_string(ITEM *p)
 			sp += sprintf(sp,"[+]");
 			break;
 		case ITEM_CALL:
-			sp += sprintf(sp,"[use %u]",(*p&0xffff));
+			sp += sprintf(sp,"[use %lu]",(*p&0xffff));
 			break;
 		}
 	}
@@ -1373,7 +1368,7 @@ FILE *UTF16toUTF8(FILE *fp)
 	FILE *fp8;
 	unsigned short t16[512];
 	unsigned char t8[2048];
-	UTF16 *p16,*p16a;
+	const UTF16 *p16,*p16a;
 	UTF8 *p8;
 
 	if((fp8=tmpfile()) == NULL) return NULL;

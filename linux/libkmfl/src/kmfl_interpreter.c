@@ -60,6 +60,8 @@ UINT store_length(KMSI *p_kmsi, UINT nstore);
 void output_string(void *connection, char *p);
 void output_char(void *connection, BYTE q);
 void output_beep(void *connection);
+void forward_keyevent(void *connection, UINT key, UINT state);
+
 void erase_char(void *connection);
 
 int kmfl_interpret(KMSI *p_kmsi, UINT key, UINT state) 
@@ -403,8 +405,11 @@ int process_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 		case ITEM_CALL:		// not implemented, but not illegal
 			break;
 
-//		case ITEM_KEYSYM:	// should be prevented by compiler
-//		case ITEM_ANY:
+		case ITEM_KEYSYM:	
+			*p++ = *pr;
+			break;
+
+//		case ITEM_ANY: // should be prevented by compiler
 //		case ITEM_MATCH:
 //		case ITEM_NOMATCH:
 //			return (-1);		
@@ -419,8 +424,23 @@ int process_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 		// Then output the output string (excepting deadkeys), and add it to the history
 		for(n=0, p=output; n<nout; n++, p++) 
 		{	
-			if(ITEM_TYPE(*p) != ITEM_DEADKEY) output_item(p_kmsi->connection,*p);
-			add_to_history(p_kmsi,*p);
+			if(ITEM_TYPE(*p) != ITEM_DEADKEY) 
+			{
+                                if (ITEM_TYPE(*p) == ITEM_KEYSYM)
+                                {
+					unsigned int key, state;
+					key = (*p) & 0xFFFF;
+					state = ((*p) >> 16) & 0xFF;
+					DBGMSG(1, "DAR - libkmfl - ITEM_KEYSYM key:%x, state: %x\n", key, state);
+                                        forward_keyevent(p_kmsi->connection, key, state);
+                                        clear_history(p_kmsi);
+                                } 
+                                else
+                                {
+                                        output_item(p_kmsi->connection,*p);
+                			add_to_history(p_kmsi,*p);
+                		}
+                	}
 		}
 
 		// Reset pointer and continue
