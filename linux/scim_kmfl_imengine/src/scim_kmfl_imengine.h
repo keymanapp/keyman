@@ -76,6 +76,8 @@ class KmflInstance : public IMEngineInstanceBase
     bool m_forward;
     bool m_focused;
     bool m_unicode;
+	int m_backspacesforwarded;
+	bool using_xim;
     bool m_changelayout;
 	
     IConvert m_iconv;
@@ -85,6 +87,7 @@ class KmflInstance : public IMEngineInstanceBase
     String m_currentsymbols;
     String m_keyboardlayout;
     bool m_keyboardlayoutactive;
+    std::queue < String > m_commit_queue;
 
 public:
     KmflInstance (KmflFactory *factory,
