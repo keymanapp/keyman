@@ -111,6 +111,7 @@ public:
     virtual void toggle_input_status ();
     void output_string(const String&str);
     void erase_char ();
+    void forward_keyevent(unsigned int key, unsigned int state);
 
 private:
     int create_lookup_table (int start = 0);

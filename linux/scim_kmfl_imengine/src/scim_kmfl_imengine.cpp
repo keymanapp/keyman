@@ -562,6 +562,19 @@ void KmflInstance::refresh_status_property()
 	
 }
 
+void KmflInstance::forward_keyevent(unsigned int key, unsigned int state)
+{
+    KeyEvent fkey(key, state);
+    
+    DBGMSG(1, "DAR: kmfl - forward key event key=%x, state=%x\n", key,state);
+
+#ifdef SCIM_0_8_0
+    forward_keypress(fkey);
+#else
+    forward_key_event(fkey);
+#endif
+}
+
 void KmflInstance::erase_char()
 {
     KeyEvent backspacekey(SCIM_KEY_BackSpace, 0);
@@ -571,8 +584,7 @@ void KmflInstance::erase_char()
 #ifdef SCIM_0_8_0
     forward_keypress(backspacekey);
 #else
-    if (!delete_surrounding_text(-1, 1)) 
-	forward_key_event(backspacekey);
+    forward_key_event(backspacekey);
 #endif
 }
 
@@ -605,6 +617,11 @@ extern "C" {
 	    s[1] = '\0';
 	    output_string(contrack, s);
 	}
+    }
+    
+    void forward_keyevent(void *contrack, unsigned int key, unsigned int state)
+    {
+	    ((KmflInstance *) contrack)->forward_keyevent(key, state);
     }
 
     void output_beep(void *contrack) {
