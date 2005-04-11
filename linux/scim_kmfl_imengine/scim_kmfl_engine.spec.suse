@@ -16,7 +16,7 @@ License:         GPL
 Source0:         %{name}-%{version}.suse.tar.gz
 # Url:             (none)
 BuildRoot:       /var/tmp/scim_kmfl_imengine
-BuildArch:       i386
+BuildArch:       i586
 Requires:        libkmfl
 Buildrequires:   libkmfl-devel
 # Conflicts:       (none)

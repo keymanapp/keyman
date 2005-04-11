@@ -27,7 +27,7 @@ kmfl_imengine_setup_la_CXXFLAGS =\
 	 -Wall\
 	 -g
 
-moduledir		= $(libdir)/scim-1.0/1.0.0/SetupUI
+moduledir		= $(libdir)/scim-1.0/$(SCIM_BINARY_VERSION)/SetupUI
 module_LTLIBRARIES	= kmfl_imengine_setup.la
 
 kmfl_imengine_setup_la_SOURCES = \
