@@ -350,7 +350,7 @@ IMEngineInstancePointer
 KmflInstance::KmflInstance(KmflFactory * factory,
                            const String & encoding, int id)
 : IMEngineInstanceBase(factory, encoding, id), m_factory(factory),
-  m_forward(false), m_focused(false), m_unicode(false), m_backspacesforwarded(0), using_xim(false),
+  m_forward(false), m_focused(false), m_unicode(false), 
   m_changelayout(false), m_iconv(encoding), p_kmsi(NULL), m_currentsymbols(""), m_keyboardlayout(""), m_keyboardlayoutactive(false)
 {
     m_display = XOpenDisplay(NULL);
@@ -427,42 +427,6 @@ int KmflInstance::is_key_pressed(char *key_vec, KeySym keysym)
 bool KmflInstance::process_key_event(const KeyEvent & key)
 {
     int mask;
-
-    DBGMSG(1, "DAR: kmfl - commit queue size: %d, backspaces forwarded: %d, using xim: %d\n", m_commit_queue.size(), m_backspacesforwarded, using_xim);
-    if (key.code == 0) {
-        // assume XIM
-        using_xim = true;
-        DBGMSG(1, "DAR: kmfl - commit keycode received\n");
-        return true;
-    }
-
-    if (!using_xim) {
-        if (m_backspacesforwarded > 0 && key.code == SCIM_KEY_BackSpace && key.is_key_press())  {
-            DBGMSG(1, "DAR: kmfl - forwarded backspace\n");
-            m_backspacesforwarded--;
-            return false;
-        }
-
-        if (key.code == COMMIT_KEYCODE && key.mask == COMMIT_KEYMASK) {
-            DBGMSG(1, "DAR: kmfl - commit keycode received\n");
-            commit_string(utf8_mbstowcs(m_commit_queue.front()));
-            m_commit_queue.pop();
-            return true;
-        }
-        while (!m_commit_queue.empty())
-        {
-            // if we get here then assume XIM
-            using_xim = true;
-            commit_string(utf8_mbstowcs(m_commit_queue.front()));
-            m_commit_queue.pop();
-        }        
-
-        if (m_backspacesforwarded > 0) {
-            m_backspacesforwarded = 0;
-            using_xim = true;
-        }
-    }
-        
 
     if (!m_focused) {
         return false;
@@ -615,11 +579,6 @@ void KmflInstance::erase_char()
     if (!delete_surrounding_text(-1, 1)) {
         DBGMSG(1, "DAR: kmfl -  delete_surrounding_text failed...forwarding key event\n");
 
-        if (!using_xim) {
-            // increment forwarded backspaces because these events get forwarded back to engine
-            // and we need to keep track so we do not reprocess the events
-            m_backspacesforwarded++;
-        }
         forward_key_event(backspacekey);
         DBGMSG(1, "DAR: kmfl -  key event forwarded\n");
     }
@@ -630,13 +589,7 @@ void KmflInstance::output_string(const String & str)
     if (str.length() > 0) {
         DBGMSG(1, "DAR: kmfl - committing string %s\n", str.c_str());
 
-        if (!using_xim) {
-            m_commit_queue.push(str);
-            KeyEvent commitkey(COMMIT_KEYCODE, COMMIT_KEYMASK);
-            forward_key_event(commitkey);
-        } else {
-            commit_string(utf8_mbstowcs(str));
-        }
+        commit_string(utf8_mbstowcs(str));
     }
 }
 
