@@ -3,7 +3,7 @@
 ## If you don't want it to overwrite it,
 ## 	Please disable it in the Anjuta project configuration
 
-SUBDIRS = intl po src scim_kmfl_imengine_setup im-xim-kmfl
+SUBDIRS = intl po src scim_kmfl_imengine_setup
 
 libkmfldocdir = ${prefix}/doc/scim_kmfl_imengine
 libkmfldoc_DATA = \

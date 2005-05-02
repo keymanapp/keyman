@@ -6,7 +6,7 @@
 
 Summary:         %{name}
 Name:            libkmfl
-Version:         0.3
+Version:         0.5
 Release:         1suse
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>
@@ -15,7 +15,7 @@ License:         GPL
 Source0:         %{name}-%{version}.suse.tar.gz
 # Url:             (none)
 BuildRoot:       /var/tmp/libkmfl
-BuildArch:       i386
+BuildArch:       i586
 # Requires:        (none)
 # Buildrequires:   (none)
 # Conflicts:       (none)

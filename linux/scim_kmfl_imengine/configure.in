@@ -129,6 +129,5 @@ intl/Makefile
 po/Makefile.in
 src/Makefile
 scim_kmfl_imengine_setup/Makefile
-im-xim-kmfl/Makefile
 ])
 

@@ -7,7 +7,7 @@
 
 Summary:         %{name}
 Name:            scim_kmfl_imengine
-Version:         0.3
+Version:         0.5
 Release:         1fc2
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>
@@ -16,7 +16,7 @@ License:         GPL
 Source0:         %{name}-%{version}.fc2.tar.gz
 # Url:             (none)
 BuildRoot:       /var/tmp/scim_kmfl_imengine
-BuildArch:       i386
+BuildArch:       i586
 Requires:        libkmfl
 Buildrequires:   libkmfl-devel
 # Conflicts:       (none)
@@ -60,24 +60,21 @@ make DESTDIR=${RPM_BUILD_ROOT} install-strip
 
 %post
 /sbin/ldconfig
-gtk-query-immodules-2.0 > %{_sysconfdir}/gtk-2.0/gtk.immodules
 
 %postun
 /sbin/ldconfig
-gtk-query-immodules-2.0 > %{_sysconfdir}/gtk-2.0/gtk.immodules
 
 %files 
 %defattr(-,root,root)
-%{_libdir}/scim-1.0/1.0.0/IMEngine/kmfl.so
-%{_libdir}/scim-1.0/1.0.0/SetupUI/kmfl_imengine_setup.so
-%{_libdir}/gtk-2.0/immodules/im-xim-kmfl.so
+%{_libdir}/scim-1.0/1.2.0/IMEngine/kmfl.so
+%{_libdir}/scim-1.0/1.2.0/SetupUI/kmfl_imengine_setup.so
 
 %doc AUTHORS COPYING ChangeLog README INSTALL NEWS TODO
 
 %files devel
 %defattr(-,root,root)
-%{_libdir}/scim-1.0/1.0.0/IMEngine/kmfl.la
-%{_libdir}/scim-1.0/1.0.0/IMEngine/kmfl.a
-%{_libdir}/scim-1.0/1.0.0/SetupUI/kmfl_imengine_setup.a
-%{_libdir}/scim-1.0/1.0.0/SetupUI/kmfl_imengine_setup.la
+%{_libdir}/scim-1.0/1.2.0/IMEngine/kmfl.la
+%{_libdir}/scim-1.0/1.2.0/IMEngine/kmfl.a
+%{_libdir}/scim-1.0/1.2.0/SetupUI/kmfl_imengine_setup.a
+%{_libdir}/scim-1.0/1.2.0/SetupUI/kmfl_imengine_setup.la
 
