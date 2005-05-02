@@ -6,7 +6,7 @@
 
 Summary:         %{name}
 Name:            kmflcomp
-Version:         0.3
+Version:         0.5
 Release:         1mdk
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>
@@ -15,7 +15,7 @@ License:         GPL
 Source0:         %{name}-%{version}.mdk.tar.gz
 # Url:             (none)
 BuildRoot:       /var/tmp/kmflcomp
-BuildArch:       i386
+BuildArch:       i586
 # Requires:        (none)
 Buildrequires:   libkmfl-devel
 # Conflicts:       (none)
