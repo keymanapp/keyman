@@ -17,8 +17,8 @@ Source0:         %{name}-%{version}.fc2.tar.gz
 # Url:             (none)
 BuildRoot:       /var/tmp/scim_kmfl_imengine
 BuildArch:       i586
-Requires:        libkmfl
-Buildrequires:   libkmfl-devel
+Requires:        libkmfl scim >= 1.2.2
+Buildrequires:   libkmfl-devel scim-devel
 # Conflicts:       (none)
 # Provides:        (none)
 # Obsoletes:       (none)

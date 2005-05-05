@@ -17,8 +17,8 @@ Source0:         %{name}-%{version}.suse.tar.gz
 # Url:             (none)
 BuildRoot:       /var/tmp/scim_kmfl_imengine
 BuildArch:       i586
-Requires:        libkmfl
-Buildrequires:   libkmfl-devel
+Requires:        libkmfl scim >= 1.2.2
+Buildrequires:   libkmfl-devel scim-devel
 # Conflicts:       (none)
 # Provides:        (none)
 # Obsoletes:       (none)
@@ -49,7 +49,8 @@ make
 %install
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
-%makeinstall
+make DESTDIR=${RPM_BUILD_ROOT} install-strip
+
 for doc in ABOUT-NLS AUTHORS README COPYING INSTALL NEWS TODO ChangeLog; do
 	rm -f $RPM_BUILD_ROOT%{_prefix}/doc/scim_kmfl_imengine/$doc;
 done;
