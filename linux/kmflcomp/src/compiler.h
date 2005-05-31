@@ -2,7 +2,7 @@
 
 // Include constants, structures, types and prototypes used by both compiler and interpreter
 
-#include <libkmfl/kmfl.h>
+#include <kmfl.h>
 
 #define BUFSIZE		256			// output buffer limit for converting from UTF16
 
