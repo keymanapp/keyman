@@ -30,7 +30,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "kmfl.h"
+#include <kmfl/kmfl.h>
+#include "libkmfl.h"
 #include "ConvertUTF.h"
 
 // Macros to find index offsets and referenced stores or groups

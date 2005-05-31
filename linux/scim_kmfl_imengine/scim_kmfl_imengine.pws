@@ -1,6 +1,6 @@
 
 [filenumbers]
-0=284
+0=541
 1=441
 2=133
 3=617
@@ -49,10 +49,7 @@ clean before build=false
 4=0_8_0
 
 [filelist]
-0=/home/doug/Projects/scim_kmfl_imengine-0.3/scim_kmfl_server_setup/scim_kmfl_server_setup.cpp
-1=/home/doug/Projects/scim_kmfl_imengine-0.3/src/xkbmap.cpp
-2=/home/doug/Projects/scim_kmfl_imengine-0.3/src/scim_kmfl_server.h
-3=/home/doug/Projects/scim_kmfl_imengine-0.3/src/scim_kmfl_server.cpp
+0=/home/doug/Projects/kmflcvs/scim_kmfl_imengine-working/src/scim_kmfl_imengine.cpp
 
 [Project Tree]
 0=0

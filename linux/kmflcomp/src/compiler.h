@@ -126,12 +126,11 @@ void check_keyboard(KEYBOARD *kbp);
 int check_bitmap_file(STORE *sp, int line);
 
 void *checked_alloc(size_t n, size_t sz);
-long save_keyboard(char *file);
 void sort_rules(GROUP *gp);
 
 void debug(int line, char *s, ...);
-void warn(int line, char *s, ...);
-void error(int line, char *s, ...);
+void kmflcomp_warn(int line, char *s, ...);
+void kmflcomp_error(int line, char *s, ...);
 void fail(int errcode, char *s, ...);
 
 // External references used while parsing
@@ -142,6 +141,8 @@ extern int errcount, warnings;
 int yylex(void);
 int yyparse(void);
 void yyerror(char *);
+void yyrestart( FILE *input_file );
+void yycleanup(void);
 
 extern FILE *yyin, *yyout;
 extern int yydebug;

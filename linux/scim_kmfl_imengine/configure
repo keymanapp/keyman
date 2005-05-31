@@ -21324,7 +21324,7 @@ SCIM_MINOR=`pkg-config --modversion scim | \
            sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
 
 
-SCIM_BINARY_VERSION=${SCIM_MAJOR}.${SCIM_MINOR}.0
+SCIM_BINARY_VERSION=`pkg-config --variable=scim_binary_version scim`
 
 
 
@@ -25469,7 +25469,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-                                                            ac_config_files="$ac_config_files Makefile intl/Makefile po/Makefile.in src/Makefile scim_kmfl_imengine_setup/Makefile im-xim-kmfl/Makefile"
+                                                  ac_config_files="$ac_config_files Makefile intl/Makefile po/Makefile.in src/Makefile scim_kmfl_imengine_setup/Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -26055,7 +26055,6 @@ do
   "po/Makefile.in" ) CONFIG_FILES="$CONFIG_FILES po/Makefile.in" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "scim_kmfl_imengine_setup/Makefile" ) CONFIG_FILES="$CONFIG_FILES scim_kmfl_imengine_setup/Makefile" ;;
-  "im-xim-kmfl/Makefile" ) CONFIG_FILES="$CONFIG_FILES im-xim-kmfl/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "default-1" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
   "default-2" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default-2" ;;

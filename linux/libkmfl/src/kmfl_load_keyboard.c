@@ -13,13 +13,16 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <setjmp.h>
 
 #ifndef _WIN32
 	#include <unistd.h>
 #endif
 
-#include "kmfl.h"
+#include <kmfl/kmfl.h>
+#include "libkmfl.h"
 #include "ConvertUTF.h"
+#include <kmfl/kmflcomp.h>
 
 // Globally loaded keyboards and instances
 XKEYBOARD *p_installed_kbd[MAX_KEYBOARDS]={NULL};
@@ -163,6 +166,8 @@ int kmfl_load_keyboard(const char *file)
 	unsigned int filelen, kbver=0;
 	struct stat fstat;
 	int keyboard_number;
+	const char * extension;
+    int errcode;
 	
 	// Check number of installed keyboards
 	if(n_keyboards >= MAX_KEYBOARDS) return -1;
@@ -171,28 +176,50 @@ int kmfl_load_keyboard(const char *file)
 	if(n_keyboards == 0)
 		memset(p_installed_kbd, 0, sizeof(XKEYBOARD *) * MAX_KEYBOARDS);
 	
-	// Get the file size
-	if(stat(file,&fstat) != 0) return -1;
-	filelen = fstat.st_size;
+    extension = strrchr(file, '.');
+    
+    if (extension && (strcmp(extension, ".kmn") == 0))
+    {
+        
+     	errcode = setjmp(fatal_error_buf);
+    	
+        if (errcode == 0)
+        {       
+            compile_keyboard_to_buffer(file, (void *) &p_kbd);
+    		memcpy(version_string,p_kbd->version,3); // Copy to ensure terminated
+    		kbver = (unsigned)atoi(version_string);
+        } 
+        else
+        {
+            return -1;
+        } 
+    } 
+    else
+    {    
+    	// Get the file size
+    	if(stat(file,&fstat) != 0) 
+    	   return -1;
+    	filelen = fstat.st_size;
 
-	// Allocate memory for the installed keyboard
-	if((p_kbd=(XKEYBOARD *)malloc(filelen)) == NULL) return -1;
+    	// Allocate memory for the installed keyboard
+    	if((p_kbd=(XKEYBOARD *)malloc(filelen)) == NULL) return -1;
 
-	// Open the file
-	if((fp=fopen(file,"rb")) != NULL) 
-	{
-		fread(p_kbd, 1, filelen, fp);
-		fclose(fp);
-		memcpy(version_string,p_kbd->version,3); // Copy to ensure terminated
-		kbver = (unsigned)atoi(version_string);
-	}
-
+    	// Open the file
+    	if((fp=fopen(file,"rb")) != NULL) 
+    	{
+    		fread(p_kbd, 1, filelen, fp);
+    		fclose(fp);
+    		memcpy(version_string,p_kbd->version,3); // Copy to ensure terminated
+    		kbver = (unsigned)atoi(version_string);
+    	}
+    }
 	// Check the loaded file is valid and has the correct version
 	if((memcmp(p_kbd->id,"KMFL",4) != 0) 
 		|| (p_kbd->version[3] != *FILE_VERSION)
 		|| (kbver < (unsigned)atoi(BASE_VERSION))
 		|| (kbver > (unsigned)atoi(LAST_VERSION)))
 	{
+		DBGMSG(1, "Invalid version\n");
 		free(p_kbd); return -1;
 	}
 
@@ -339,7 +366,7 @@ const char *kmfl_icon_file(int keyboard_number)
 		{
 			p32 = strings + stores[SS_BITMAP].items;
 			p8 = icon_name;
-			ConvertUTF32toUTF8(&p32,p32+stores[SS_BITMAP].len,&p8,p8+255,0);
+			ConvertUTF32toUTF8((const UTF32**)&p32,p32+stores[SS_BITMAP].len,&p8,p8+255,0);
 			*p8 = 0;
 		}
 	}

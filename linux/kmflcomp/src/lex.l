@@ -17,10 +17,15 @@ extern int lineno;
 extern int errcount;
 int done=0;
 
+void yycleanup(void)
+{
+    yy_delete_buffer(yy_current_buffer);
+}
+
 int yyterminate(void)
 {
 	yyerror("END\n");
-	fflush(stderr);
+	fflush(stderr); 
 	return YY_NULL;
 }
 

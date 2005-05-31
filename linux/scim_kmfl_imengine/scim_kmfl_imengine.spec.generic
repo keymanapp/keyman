@@ -7,7 +7,7 @@
 
 Summary:         %{name}
 Name:            scim_kmfl_imengine
-Version:         0.5
+Version:         0.6
 Release:         1
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>
@@ -68,15 +68,15 @@ gtk-query-immodules-2.0 > %{_sysconfdir}/gtk-2.0/gtk.immodules
 
 %files 
 %defattr(-,root,root)
-%{_libdir}/scim-1.0/1.2.0/IMEngine/kmfl.so
-%{_libdir}/scim-1.0/1.2.0/SetupUI/kmfl_imengine_setup.so
+%{_libdir}/scim-1.0/*/IMEngine/kmfl.so
+%{_libdir}/scim-1.0/*/SetupUI/kmfl_imengine_setup.so
 
 %doc AUTHORS COPYING ChangeLog README INSTALL NEWS TODO
 
 %files devel
 %defattr(-,root,root)
-%{_libdir}/scim-1.0/1.2.0/IMEngine/kmfl.la
-%{_libdir}/scim-1.0/1.2.0/IMEngine/kmfl.a
-%{_libdir}/scim-1.0/1.2.0/SetupUI/kmfl_imengine_setup.a
-%{_libdir}/scim-1.0/1.2.0/SetupUI/kmfl_imengine_setup.la
+%{_libdir}/scim-1.0/*/IMEngine/kmfl.la
+%{_libdir}/scim-1.0/*/IMEngine/kmfl.a
+%{_libdir}/scim-1.0/*/SetupUI/kmfl_imengine_setup.a
+%{_libdir}/scim-1.0/*/SetupUI/kmfl_imengine_setup.la
 

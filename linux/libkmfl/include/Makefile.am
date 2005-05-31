@@ -4,9 +4,9 @@
 ## If you don't want it to overwrite it,
 ## 	Please disable it in the Anjuta project configuration
 
-libkmfl_includedir = $(pkgincludedir)
+libkmfl_includedir = $(includedir)/kmfl
 
 libkmfl_include_DATA = \
-	kmfl.h
+	libkmfl.h
 
 EXTRA_DIST = $(libkmfl_include_DATA)

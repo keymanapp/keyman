@@ -5,22 +5,23 @@
 ## 	Please disable it in the Anjuta project configuration
 
 INCLUDES =\
-    -I$(top_srcdir)/include -I/usr/local/include/libkmfl
+    -I$(top_srcdir)/include
 
-kmflcomp_CFLAGS =\
+libkmflcomp_la_CFLAGS =\
 	 -Wall\
 	 -g
 
-bin_PROGRAMS = kmflcomp
+lib_LTLIBRARIES = libkmflcomp.la
 
-kmflcomp_SOURCES = \
+libkmflcomp_la_SOURCES = \
 	yacc.y\
 	lex.l\
-	kmfl_compiler.c\
+	kmflcomp.c\
+	memman.c\
 	ConvertUTF.c
 
-kmflcomp_LDFLAGS = 
+libkmflcomp_la_LDFLAGS = 
 
-kmflcomp_LDADD = 
+libkmflcomp_la_LIBADD = 
 
 YFLAGS = -d

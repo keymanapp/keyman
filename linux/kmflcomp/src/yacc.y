@@ -195,7 +195,7 @@ T_HEADLINE :
 	}
 	| TOK_ANSI TOK_GT TOK_USE T_PARAMETER TOK_USE T_PARAMETER TOK_NL
 	{
-		error(lineno,"alternate starting groups not supported");
+		kmflcomp_error(lineno,"alternate starting groups not supported");
 		fail(11,"obsolete syntax");
 	}
 	| TOK_AUTHOR T_STRING TOK_NL
@@ -231,7 +231,7 @@ T_GROUP :
 		$$ = $1;
 		($$)->rules = NULL;
 		($$)->nrules = 0;
-		warn(0,"group(%s) is empty!",($1)->name);
+		kmflcomp_warn(0,"group(%s) is empty!",($1)->name);
 	}
     | T_GHEADER T_RULES 
 	{
@@ -239,7 +239,7 @@ T_GROUP :
 		($$)->rules = $2;
 		($$)->nrules = count_rules($2);
 		if(($$)->nrules == 0) 
-			warn(0,"group(%s) is empty!",($1)->name); 
+			kmflcomp_warn(0,"group(%s) is empty!",($1)->name); 
 	}
 	;
 
@@ -323,7 +323,7 @@ T_ITEM :
 		}
 		else
 		{
-			warn(lineno,"store (%s) is undefined!",$2);
+			kmflcomp_warn(lineno,"store (%s) is undefined!",$2);
 			$$ = 0;
 		}
 	}
@@ -335,7 +335,7 @@ T_ITEM :
 		}
 		else
 		{
-			warn(lineno,"store (%s) is undefined!",$2);
+			kmflcomp_warn(lineno,"store (%s) is undefined!",$2);
 			$$ = 0;
 		}
 	}
@@ -355,13 +355,13 @@ T_ITEM :
 		}
 		else
 		{
-			warn(lineno,"store (%s) is undefined!",$3);
+			kmflcomp_warn(lineno,"store (%s) is undefined!",$3);
 			$$ = 0;
 		}
 	}
 	| TOK_INDEX TOK_BRKT T_BYTES TOK_BRKT
 	{
-		warn(lineno,"index(%s) must have TWO parameters!",$3);
+		kmflcomp_warn(lineno,"index(%s) must have TWO parameters!",$3);
 		$$ = 0;
 	}
 	| TOK_RTN
@@ -394,12 +394,12 @@ T_ITEM :
 	}
 	| TOK_CALL T_PARAMETER
 	{
-		error(lineno,"call keyword not implemented");
+		kmflcomp_error(lineno,"call keyword not implemented");
 		fail(12,"unsupported keyword");
 	}
 	| TOK_SWITCH T_PARAMETER
 	{
-		error(lineno,"switch keyword not implemented");
+		kmflcomp_error(lineno,"switch keyword not implemented");
 		fail(11,"obsolete syntax");
 	}
 	| TOK_DOLLAR T_BYTES
@@ -413,12 +413,12 @@ T_ITEM :
 		else
 		{
 			$$ = 0;
-			error(lineno,"undefined constant");
+			kmflcomp_error(lineno,"undefined constant");
 		}
 	}
 	| TOK_ERROR
 	{
-		error(lineno,"illegal or unrecognized item in rule or store");
+		kmflcomp_error(lineno,"illegal or unrecognized item in rule or store");
 	}
 	;
 
@@ -430,7 +430,7 @@ T_STRING :
 	|
 	TOK_QM TOK_QM
 	{
-		$$ = new_string(0);	/* allow for empty strings */
+		$$ = new_string(0); /* allow for empty strings */
 	}
 	;
 

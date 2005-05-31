@@ -6,7 +6,7 @@
 
 Summary:         %{name}
 Name:            libkmfl
-Version:         0.5
+Version:         0.6
 Release:         1mdk
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>
@@ -16,8 +16,8 @@ Source0:         %{name}-%{version}.mdk.tar.gz
 # Url:             (none)
 BuildRoot:       /var/tmp/libkmfl
 BuildArch:       i586
-# Requires:        (none)
-# Buildrequires:   (none)
+Requires:        kmflcomp
+Buildrequires:   kmflcomp-devel
 # Conflicts:       (none)
 # Provides:        (none)
 # Obsoletes:       (none)
@@ -28,8 +28,8 @@ Keystroke interpreter for KMFL
 %package devel
 Summary:         Development libraries and headers to use %{name} in an application
 Group:           Development/Libraries
-# Requires:        (none)
-# Buildrequires:   (none)
+Requires:        kmflcomp
+Buildrequires:   kmflcomp-devel
 # Conflicts:       (none)
 # Provides:        (none)
 # Obsoletes:       (none)
@@ -65,7 +65,7 @@ done;
 
 %files devel
 %defattr(-,root,root)
-%{_includedir}/libkmfl/kmfl.h
+%{_includedir}/kmfl/libkmfl.h
 %{_libdir}/libkmfl.la
 %{_libdir}/libkmfl.a
 %{_libdir}/libkmfl.so

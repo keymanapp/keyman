@@ -21363,7 +21363,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-                              ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile"
+                                        ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile kmfl_compiler/Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -21937,6 +21937,7 @@ do
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "include/Makefile" ) CONFIG_FILES="$CONFIG_FILES include/Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+  "kmfl_compiler/Makefile" ) CONFIG_FILES="$CONFIG_FILES kmfl_compiler/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5

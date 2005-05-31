@@ -33,7 +33,8 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
-#include <libkmfl/kmfl.h>
+#include <kmfl/kmfl.h>
+#include <kmfl/libkmfl.h>
 #include "xkbmap.h"
 
 
@@ -113,10 +114,11 @@ _get_keyboard_list(std::vector < String > &keyboard_list,
             stat(absfn.c_str(), &filestat);
 
 
-            // Only .kmfl extensions are valid keyboard files
+            // Only .kmfl and .kmn extensions are valid keyboard files
             if (S_ISREG(filestat.st_mode)
-                && absfn.substr(absfn.length() - 5, 5) == ".kmfl"
-                && kmfl_check_keyboard(absfn.c_str()) == 0) {
+                && ((absfn.substr(absfn.length() - 5, 5) == ".kmfl" 
+				     && kmfl_check_keyboard(absfn.c_str()) == 0) 
+					|| absfn.substr(absfn.length() - 4, 4) == ".kmn")) {
                 DBGMSG(1, "DAR: kmfl - found keyboard: %s\n",
                        absfn.c_str());
 
@@ -182,15 +184,17 @@ extern "C" {
             _scim_kmfl_imengine_factories[imengine] = new KmflFactory();
 
             if (imengine < _scim_system_keyboard_list.size()) {
-                _scim_kmfl_imengine_factories[imengine]->
+                if (!_scim_kmfl_imengine_factories[imengine]->
                     load_keyboard(_scim_system_keyboard_list[imengine],
-                                  false);
+                                  false))
+					return 0;
             } else {
-                _scim_kmfl_imengine_factories[imengine]->
+                if (!_scim_kmfl_imengine_factories[imengine]->
                     load_keyboard(_scim_user_keyboard_list
                                   [imengine -
                                    _scim_system_keyboard_list.size()],
-                                  true);
+                                  true))
+					return 0;
             }
 
             if (!_scim_kmfl_imengine_factories[imengine]->valid()) {

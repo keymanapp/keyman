@@ -5,7 +5,7 @@
 ## 	Please disable it in the Anjuta project configuration
 
 INCLUDES =\
-	 -I$(top_srcdir)/include
+	 -I$(top_srcdir)/include 
 
 libkmfl_la_CFLAGS =\
 	 -Wall\
@@ -14,14 +14,12 @@ libkmfl_la_CFLAGS =\
 lib_LTLIBRARIES = libkmfl.la
 
 libkmfl_la_SOURCES = \
-	main.c\
 	ConvertUTF.c\
 	kmfl_interpreter.c\
 	kmfl_load_keyboard.c\
 	kmfl_messages.c\
 	ConvertUTF.h
 
-libkmfl_la_LDFLAGS = 
+libkmfl_la_LDFLAGS = -lkmflcomp
 
 libkmfl_la_LIBADD = 
-

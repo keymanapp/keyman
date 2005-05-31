@@ -26,7 +26,7 @@ void DBGMSG(int debug,char *fmt,...)
 		va_start(args,fmt);
 		vfprintf(debugfile,fmt,args);
 		va_end(args);
-		fclose(debugfile);
+//		fclose(debugfile);
 	}
 }
 

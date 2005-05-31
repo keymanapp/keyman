@@ -139,8 +139,8 @@ typedef union YYSTYPE {
 	RULE *rule;
 	GROUP *group;
 	} YYSTYPE;
-/* Line 1240 of yacc.c.  */
-#line 143 "y.tab.h"
+/* Line 1249 of yacc.c.  */
+#line 143 "yacc.h"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1

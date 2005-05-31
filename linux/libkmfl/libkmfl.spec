@@ -6,18 +6,18 @@
 
 Summary:         %{name}
 Name:            libkmfl
-Version:         0.3
-Release:         1
+Version:         0.6
+Release:         1suse
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>
 Group:           User Interface/X
 License:         GPL
-Source0:         %{name}-%{version}.tar.gz
+Source0:         %{name}-%{version}.suse.tar.gz
 # Url:             (none)
 BuildRoot:       /var/tmp/libkmfl
-BuildArch:       i386
-# Requires:        (none)
-# Buildrequires:   (none)
+BuildArch:       i586
+Requires:        kmflcomp
+Buildrequires:   kmflcomp-devel
 # Conflicts:       (none)
 # Provides:        (none)
 # Obsoletes:       (none)
@@ -28,8 +28,8 @@ Keystroke interpreter for KMFL
 %package devel
 Summary:         Development libraries and headers to use %{name} in an application
 Group:           Development/Libraries
-# Requires:        (none)
-# Buildrequires:   (none)
+Requires:        kmflcomp
+Buildrequires:   kmflcomp-devel
 # Conflicts:       (none)
 # Provides:        (none)
 # Obsoletes:       (none)
@@ -65,7 +65,7 @@ done;
 
 %files devel
 %defattr(-,root,root)
-%{_includedir}/libkmfl/kmfl.h
+%{_includedir}/kmfl/libkmfl.h
 %{_libdir}/libkmfl.la
 %{_libdir}/libkmfl.a
 %{_libdir}/libkmfl.so

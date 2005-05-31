@@ -661,7 +661,6 @@ static const unsigned char yystos[] =
 #define YYABORT		goto yyabortlab
 #define YYERROR		goto yyerrlab1
 
-
 /* Like YYERROR except do call yyerror.  This remains here temporarily
    to ease the transition to the new meaning of YYERROR, for GCC.
    Once GCC version 2 has supplanted version 1, this can go.  */
@@ -1397,7 +1396,7 @@ yyreduce:
   case 25:
 #line 197 "yacc.y"
     {
-		error(lineno,"alternate starting groups not supported");
+		kmflcomp_error(lineno,"alternate starting groups not supported");
 		fail(11,"obsolete syntax");
 	}
     break;
@@ -1443,7 +1442,7 @@ yyreduce:
 		yyval.group = yyvsp[0].group;
 		(yyval.group)->rules = NULL;
 		(yyval.group)->nrules = 0;
-		warn(0,"group(%s) is empty!",(yyvsp[0].group)->name);
+		kmflcomp_warn(0,"group(%s) is empty!",(yyvsp[0].group)->name);
 	}
     break;
 
@@ -1454,7 +1453,7 @@ yyreduce:
 		(yyval.group)->rules = yyvsp[0].rule;
 		(yyval.group)->nrules = count_rules(yyvsp[0].rule);
 		if((yyval.group)->nrules == 0) 
-			warn(0,"group(%s) is empty!",(yyvsp[-1].group)->name); 
+			kmflcomp_warn(0,"group(%s) is empty!",(yyvsp[-1].group)->name); 
 	}
     break;
 
@@ -1567,7 +1566,7 @@ yyreduce:
 		}
 		else
 		{
-			warn(lineno,"store (%s) is undefined!",yyvsp[0].string);
+			kmflcomp_warn(lineno,"store (%s) is undefined!",yyvsp[0].string);
 			yyval.number = 0;
 		}
 	}
@@ -1582,7 +1581,7 @@ yyreduce:
 		}
 		else
 		{
-			warn(lineno,"store (%s) is undefined!",yyvsp[0].string);
+			kmflcomp_warn(lineno,"store (%s) is undefined!",yyvsp[0].string);
 			yyval.number = 0;
 		}
 	}
@@ -1611,7 +1610,7 @@ yyreduce:
 		}
 		else
 		{
-			warn(lineno,"store (%s) is undefined!",yyvsp[-3].string);
+			kmflcomp_warn(lineno,"store (%s) is undefined!",yyvsp[-3].string);
 			yyval.number = 0;
 		}
 	}
@@ -1620,7 +1619,7 @@ yyreduce:
   case 54:
 #line 363 "yacc.y"
     {
-		warn(lineno,"index(%s) must have TWO parameters!",yyvsp[-1].string);
+		kmflcomp_warn(lineno,"index(%s) must have TWO parameters!",yyvsp[-1].string);
 		yyval.number = 0;
 	}
     break;
@@ -1677,7 +1676,7 @@ yyreduce:
   case 62:
 #line 396 "yacc.y"
     {
-		error(lineno,"call keyword not implemented");
+		kmflcomp_error(lineno,"call keyword not implemented");
 		fail(12,"unsupported keyword");
 	}
     break;
@@ -1685,7 +1684,7 @@ yyreduce:
   case 63:
 #line 401 "yacc.y"
     {
-		error(lineno,"switch keyword not implemented");
+		kmflcomp_error(lineno,"switch keyword not implemented");
 		fail(11,"obsolete syntax");
 	}
     break;
@@ -1702,7 +1701,7 @@ yyreduce:
 		else
 		{
 			yyval.number = 0;
-			error(lineno,"undefined constant");
+			kmflcomp_error(lineno,"undefined constant");
 		}
 	}
     break;
@@ -1710,7 +1709,7 @@ yyreduce:
   case 65:
 #line 420 "yacc.y"
     {
-		error(lineno,"illegal or unrecognized item in rule or store");
+		kmflcomp_error(lineno,"illegal or unrecognized item in rule or store");
 	}
     break;
 
@@ -1724,7 +1723,7 @@ yyreduce:
   case 67:
 #line 432 "yacc.y"
     {
-		yyval.string = new_string(0);	/* allow for empty strings */
+		yyval.string = new_string(0); /* allow for empty strings */
 	}
     break;
 
@@ -1794,8 +1793,8 @@ yyreduce:
 
     }
 
-/* Line 999 of yacc.c.  */
-#line 1798 "yacc.c"
+/* Line 991 of yacc.c.  */
+#line 1797 "yacc.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1909,13 +1908,29 @@ yyerrlab:
 
   /* Else will try to reuse lookahead token after shifting the error
      token.  */
-  goto yyerrlab1;
+  goto yyerrlab2;
 
 
 /*----------------------------------------------------.
 | yyerrlab1 -- error raised explicitly by an action.  |
 `----------------------------------------------------*/
 yyerrlab1:
+
+  /* Suppress GCC warning that yyerrlab1 is unused when no action
+     invokes YYERROR.  */
+#if defined (__GNUC_MINOR__) && 2093 <= (__GNUC__ * 1000 + __GNUC_MINOR__) \
+    && !defined __cplusplus
+  __attribute__ ((__unused__))
+#endif
+
+
+  goto yyerrlab2;
+
+
+/*---------------------------------------------------------------.
+| yyerrlab2 -- pop states until the error token can be shifted.  |
+`---------------------------------------------------------------*/
+yyerrlab2:
   yyerrstatus = 3;	/* Each real token shifted decrements this.  */
 
   for (;;)

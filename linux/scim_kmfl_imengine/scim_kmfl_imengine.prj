@@ -41,7 +41,7 @@ anjuta.compatibility.level=1
 project.name=scim_kmfl_imengine
 project.type=GENERIC
 project.target.type=DYNAMIC_LIB
-project.version=0.3
+project.version=0.6
 project.author=User
 project.source.target=libkmfl
 project.has.gettext=1
@@ -54,9 +54,9 @@ project.config.extra.modules.after=scim_kmfl_imengine_setup im-xim-kmfl
 project.config.blocked=0
 project.config.disable.overwriting=0 0 1 0 0 0 0 0 0 
 
-project.menu.entry=scim_kmfl_imengine Version 0.3
+project.menu.entry=scim_kmfl_imengine Version CVS
 project.menu.group=Applications
-project.menu.comment=scim_kmfl_imengine Version 0.3
+project.menu.comment=scim_kmfl_imengine Version 0.6
 project.menu.icon=
 project.menu.need.terminal=0
 

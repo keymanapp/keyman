@@ -917,10 +917,15 @@ extern int lineno;
 extern int errcount;
 int done=0;
 
+void yycleanup(void)
+{
+    yy_delete_buffer(yy_current_buffer);
+}
+
 int yyterminate(void)
 {
 	yyerror("END\n");
-	fflush(stderr);
+	fflush(stderr); 
 	return YY_NULL;
 }
 
@@ -944,7 +949,7 @@ int yyterminate(void)
 
 #define NAME 10
 
-#line 948 "lex.c"
+#line 953 "lex.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -1098,10 +1103,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 43 "lex.l"
+#line 48 "lex.l"
 
 
-#line 1105 "lex.c"
+#line 1110 "lex.c"
 
 	if ( yy_init )
 		{
@@ -1187,12 +1192,12 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 45 "lex.l"
+#line 50 "lex.l"
 {lineno++;caller=INITIAL;BEGIN(INITIAL);return(TOK_NL);}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 46 "lex.l"
+#line 51 "lex.l"
 {/* just ignore carriage returns */};
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
@@ -1206,7 +1211,7 @@ case YY_STATE_EOF(BITMAP):
 case YY_STATE_EOF(LNGCODE):
 case YY_STATE_EOF(SKIP):
 case YY_STATE_EOF(NAME):
-#line 48 "lex.l"
+#line 53 "lex.l"
 {
 				if(done){yyterminate();}
 				else    {done=1;lineno++;caller=INITIAL;BEGIN(INITIAL);return(TOK_NL);}
@@ -1214,182 +1219,182 @@ case YY_STATE_EOF(NAME):
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 53 "lex.l"
+#line 58 "lex.l"
 {return TOK_NAME;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 54 "lex.l"
+#line 59 "lex.l"
 {BEGIN(BITMAP);return TOK_BITMAP;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 55 "lex.l"
+#line 60 "lex.l"
 {caller=STOR;BEGIN(STOR);return TOK_HOTKEY;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 56 "lex.l"
+#line 61 "lex.l"
 {BEGIN(KBDVER);return TOK_VERSION;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 57 "lex.l"
+#line 62 "lex.l"
 {BEGIN(LNGCODE);return TOK_LANGUAGE;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 58 "lex.l"
+#line 63 "lex.l"
 {return TOK_LAYOUT;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 59 "lex.l"
+#line 64 "lex.l"
 {return TOK_CAPSOFF;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 60 "lex.l"
+#line 65 "lex.l"
 {return TOK_CAPSON;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 61 "lex.l"
+#line 66 "lex.l"
 {return TOK_CAPSFREE;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 62 "lex.l"
+#line 67 "lex.l"
 {return TOK_COPYRIGHT;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 63 "lex.l"
+#line 68 "lex.l"
 {return TOK_MESSAGE;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 64 "lex.l"
+#line 69 "lex.l"
 {return TOK_MNEMONIC;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 65 "lex.l"
+#line 70 "lex.l"
 {return TOK_ETHNOLOGUE;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 66 "lex.l"
+#line 71 "lex.l"
 {return TOK_AUTHOR;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 67 "lex.l"
+#line 72 "lex.l"
 {return TOK_ANSI;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 68 "lex.l"
+#line 73 "lex.l"
 {return TOK_UNICODE;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 69 "lex.l"
+#line 74 "lex.l"
 {return TOK_ANSI;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 70 "lex.l"
+#line 75 "lex.l"
 {caller=STOR;BEGIN(STOR);return TOK_STORE;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 71 "lex.l"
+#line 76 "lex.l"
 {return TOK_OUTS;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 72 "lex.l"
+#line 77 "lex.l"
 {return TOK_GROUP;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 73 "lex.l"
+#line 78 "lex.l"
 {return TOK_USINGKEYS;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 74 "lex.l"
+#line 79 "lex.l"
 {return TOK_USE;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 75 "lex.l"
+#line 80 "lex.l"
 {return TOK_CONTEXT;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 76 "lex.l"
+#line 81 "lex.l"
 {return TOK_ANY;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 77 "lex.l"
+#line 82 "lex.l"
 {return TOK_BEEP;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 78 "lex.l"
+#line 83 "lex.l"
 {BEGIN(PLIST);return TOK_INDEX;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 79 "lex.l"
+#line 84 "lex.l"
 {return TOK_NOMATCH;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 80 "lex.l"
+#line 85 "lex.l"
 {return TOK_MATCH;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 81 "lex.l"
+#line 86 "lex.l"
 {return TOK_NUL;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 82 "lex.l"
+#line 87 "lex.l"
 {return TOK_DEADKEY;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 83 "lex.l"
+#line 88 "lex.l"
 {return TOK_DEADKEY;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 84 "lex.l"
+#line 89 "lex.l"
 {return TOK_RTN;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 85 "lex.l"
+#line 90 "lex.l"
 {return TOK_CALL;  /* not implemented */}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 86 "lex.l"
+#line 91 "lex.l"
 {return TOK_SWITCH;/*  (obsolete) */}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 87 "lex.l"
+#line 92 "lex.l"
 {return TOK_GT;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 88 "lex.l"
+#line 93 "lex.l"
 {return TOK_PLUS;}
 	YY_BREAK
 case 39:
@@ -1397,18 +1402,18 @@ case 39:
 yy_c_buf_p = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 89 "lex.l"
+#line 94 "lex.l"
 {BEGIN(NAME);return TOK_DOLLAR;}
 	YY_BREAK
 
 case 40:
 YY_RULE_SETUP
-#line 92 "lex.l"
+#line 97 "lex.l"
 {/* ignore spaces */} 
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 93 "lex.l"
+#line 98 "lex.l"
 {BEGIN(SKIP);}
 	YY_BREAK
 case 42:
@@ -1416,7 +1421,7 @@ case 42:
 yy_c_buf_p = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 94 "lex.l"
+#line 99 "lex.l"
 {BEGIN(PARENS);return(TOK_BRKT);}
 	YY_BREAK
 case 43:
@@ -1424,7 +1429,7 @@ case 43:
 yy_c_buf_p = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 95 "lex.l"
+#line 100 "lex.l"
 {qchar='\'';BEGIN(QUOTE);return(TOK_QM);}
 	YY_BREAK
 case 44:
@@ -1432,71 +1437,71 @@ case 44:
 yy_c_buf_p = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 96 "lex.l"
+#line 101 "lex.l"
 {qchar='"';BEGIN(QUOTE);return(TOK_QM);}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 97 "lex.l"
+#line 102 "lex.l"
 {yylval.number=strtol(yytext,NULL,8);return(TOK_NUMBER);}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 98 "lex.l"
+#line 103 "lex.l"
 {yylval.number=atoi(yytext+1);return(TOK_NUMBER);}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 99 "lex.l"
+#line 104 "lex.l"
 {yylval.number=strtol(yytext+1,NULL,16);return(TOK_NUMBER);}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 100 "lex.l"
+#line 105 "lex.l"
 {yylval.number=strtol(yytext+2,NULL,16);return(TOK_NUMBER);}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 101 "lex.l"
+#line 106 "lex.l"
 {BEGIN(KEYNAME);return(TOK_SB);}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 102 "lex.l"
+#line 107 "lex.l"
 {return(TOK_BEEP);}
 	YY_BREAK
 
 
 case 51:
 YY_RULE_SETUP
-#line 106 "lex.l"
+#line 111 "lex.l"
 {return(TOK_DEADKEY);}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 107 "lex.l"
+#line 112 "lex.l"
 {return(TOK_DEADKEY);}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 108 "lex.l"
+#line 113 "lex.l"
 {return(TOK_OUTS);}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 109 "lex.l"
+#line 114 "lex.l"
 {return(TOK_NUL);}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 110 "lex.l"
+#line 115 "lex.l"
 {return(TOK_ERROR);}
 	YY_BREAK
 
 
 case 56:
 YY_RULE_SETUP
-#line 114 "lex.l"
+#line 119 "lex.l"
 {/* ignore spaces */}
 	YY_BREAK
 case 57:
@@ -1504,7 +1509,7 @@ case 57:
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 115 "lex.l"
+#line 120 "lex.l"
 {/* ignore comments */}
 	YY_BREAK
 case 58:
@@ -1512,27 +1517,27 @@ case 58:
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 116 "lex.l"
+#line 121 "lex.l"
 {/* before either EOL */}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 117 "lex.l"
+#line 122 "lex.l"
 {return TOK_QM;}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 118 "lex.l"
+#line 123 "lex.l"
 {yylval.number=*yytext;return TOK_CHAR;}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 119 "lex.l"
+#line 124 "lex.l"
 {yylval.number=*yytext;return TOK_CHAR;}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 120 "lex.l"
+#line 125 "lex.l"
 {BEGIN(SKIP);}
 	YY_BREAK
 
@@ -1542,7 +1547,7 @@ case 63:
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 124 "lex.l"
+#line 129 "lex.l"
 {/* ignore anything after a space */}
 	YY_BREAK
 case 64:
@@ -1550,7 +1555,7 @@ case 64:
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 125 "lex.l"
+#line 130 "lex.l"
 {/* including comments */}
 	YY_BREAK
 case 65:
@@ -1558,7 +1563,7 @@ case 65:
 yy_c_buf_p = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 126 "lex.l"
+#line 131 "lex.l"
 {qchar='\'';BEGIN(QUOTE);return(TOK_QM);}
 	YY_BREAK
 case 66:
@@ -1566,12 +1571,12 @@ case 66:
 yy_c_buf_p = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 127 "lex.l"
+#line 132 "lex.l"
 {qchar='"';BEGIN(QUOTE);return(TOK_QM);}
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 128 "lex.l"
+#line 133 "lex.l"
 {yylval.number=*yytext;return TOK_CHAR;}
 	YY_BREAK
 case 68:
@@ -1579,7 +1584,7 @@ case 68:
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 129 "lex.l"
+#line 134 "lex.l"
 {/* also ignore anything after a comma */}
 	YY_BREAK
 case 69:
@@ -1587,14 +1592,14 @@ case 69:
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 130 "lex.l"
+#line 135 "lex.l"
 {/* before either EOL */}
 	YY_BREAK
 
 
 case 70:
 YY_RULE_SETUP
-#line 134 "lex.l"
+#line 139 "lex.l"
 {/* ignore spaces */}
 	YY_BREAK
 case 71:
@@ -1602,7 +1607,7 @@ case 71:
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 135 "lex.l"
+#line 140 "lex.l"
 {/* ignore comments */}
 	YY_BREAK
 case 72:
@@ -1610,34 +1615,34 @@ case 72:
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 136 "lex.l"
+#line 141 "lex.l"
 {/* before either EOL */}
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 137 "lex.l"
+#line 142 "lex.l"
 {yylval.number=strtoul(yytext,NULL,8);return(TOK_NUMBER);}
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 138 "lex.l"
+#line 143 "lex.l"
 {yylval.number=strtoul(yytext+1,NULL,10);return(TOK_NUMBER);}
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 139 "lex.l"
+#line 144 "lex.l"
 {yylval.number=strtoul(yytext+1,NULL,16);return(TOK_NUMBER);}
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 140 "lex.l"
+#line 145 "lex.l"
 {/* ignore comma separator */}
 	YY_BREAK
 
 
 case 77:
 YY_RULE_SETUP
-#line 144 "lex.l"
+#line 149 "lex.l"
 {if (*yytext==qchar) 
 					{BEGIN(caller);return(TOK_QM);} 
 				else 
@@ -1648,683 +1653,683 @@ YY_RULE_SETUP
 
 case 78:
 YY_RULE_SETUP
-#line 152 "lex.l"
+#line 157 "lex.l"
 
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 153 "lex.l"
+#line 158 "lex.l"
 {BEGIN(caller);return(TOK_BRKT);} 
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 154 "lex.l"
+#line 159 "lex.l"
 {yylval.number=*yytext;return(TOK_CHAR);}
 	YY_BREAK
 
 
 case 81:
 YY_RULE_SETUP
-#line 158 "lex.l"
+#line 163 "lex.l"
 {/* ignore */}
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 159 "lex.l"
+#line 164 "lex.l"
 { return(TOK_COMMA);}
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 160 "lex.l"
+#line 165 "lex.l"
 { return(TOK_BRKT);}
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 161 "lex.l"
+#line 166 "lex.l"
 {BEGIN(caller);return(TOK_BRKT);}
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 162 "lex.l"
+#line 167 "lex.l"
 {yylval.number=*yytext;return(TOK_CHAR);}
 	YY_BREAK
 
 
 case 86:
 YY_RULE_SETUP
-#line 166 "lex.l"
+#line 171 "lex.l"
 {yylval.number=*yytext;return(TOK_CHAR);}
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 167 "lex.l"
+#line 172 "lex.l"
 {BEGIN(caller);}
 	YY_BREAK
 
 
 case 88:
 YY_RULE_SETUP
-#line 171 "lex.l"
+#line 176 "lex.l"
 {/* ignore */}
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 172 "lex.l"
+#line 177 "lex.l"
 {yylval.number=KS_LSHIFT;return(TOK_SHIFT);}
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 173 "lex.l"
+#line 178 "lex.l"
 {yylval.number=KS_CAPS;return(TOK_SHIFT);}
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 174 "lex.l"
+#line 179 "lex.l"
 {yylval.number=KS_LCTRL;return(TOK_SHIFT);}
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 175 "lex.l"
+#line 180 "lex.l"
 {yylval.number=KS_LALT;return(TOK_SHIFT);}
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 176 "lex.l"
+#line 181 "lex.l"
 {yylval.number=KS_RSHIFT;return(TOK_SHIFT);}
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 177 "lex.l"
+#line 182 "lex.l"
 {yylval.number=KS_NCAPS;return(TOK_SHIFT);}
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 178 "lex.l"
+#line 183 "lex.l"
 {yylval.number=KS_RCTRL;return(TOK_SHIFT);}
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 179 "lex.l"
+#line 184 "lex.l"
 {yylval.number=KS_RALT;return(TOK_SHIFT);}
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 180 "lex.l"
+#line 185 "lex.l"
 {yylval.number=KS_SHIFT;return(TOK_SHIFT);}
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 181 "lex.l"
+#line 186 "lex.l"
 {yylval.number=KS_CTRL;return(TOK_SHIFT);}
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 182 "lex.l"
+#line 187 "lex.l"
 {yylval.number=KS_ALT;return(TOK_SHIFT);}
 	YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 184 "lex.l"
+#line 189 "lex.l"
 {yylval.number=0x20;return(TOK_RAWKEY);}
 	YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 185 "lex.l"
+#line 190 "lex.l"
 {yylval.number=0x27;return(TOK_RAWKEY);}
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 186 "lex.l"
+#line 191 "lex.l"
 {yylval.number=0x30;return(TOK_RAWKEY);}
 	YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 187 "lex.l"
+#line 192 "lex.l"
 {yylval.number=0x31;return(TOK_RAWKEY);}
 	YY_BREAK
 case 104:
 YY_RULE_SETUP
-#line 188 "lex.l"
+#line 193 "lex.l"
 {yylval.number=0x32;return(TOK_RAWKEY);}
 	YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 189 "lex.l"
+#line 194 "lex.l"
 {yylval.number=0x33;return(TOK_RAWKEY);}
 	YY_BREAK
 case 106:
 YY_RULE_SETUP
-#line 190 "lex.l"
+#line 195 "lex.l"
 {yylval.number=0x34;return(TOK_RAWKEY);}
 	YY_BREAK
 case 107:
 YY_RULE_SETUP
-#line 191 "lex.l"
+#line 196 "lex.l"
 {yylval.number=0x35;return(TOK_RAWKEY);}
 	YY_BREAK
 case 108:
 YY_RULE_SETUP
-#line 192 "lex.l"
+#line 197 "lex.l"
 {yylval.number=0x36;return(TOK_RAWKEY);}
 	YY_BREAK
 case 109:
 YY_RULE_SETUP
-#line 193 "lex.l"
+#line 198 "lex.l"
 {yylval.number=0x37;return(TOK_RAWKEY);}
 	YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 194 "lex.l"
+#line 199 "lex.l"
 {yylval.number=0x38;return(TOK_RAWKEY);}
 	YY_BREAK
 case 111:
 YY_RULE_SETUP
-#line 195 "lex.l"
+#line 200 "lex.l"
 {yylval.number=0x39;return(TOK_RAWKEY);}
 	YY_BREAK
 case 112:
 YY_RULE_SETUP
-#line 196 "lex.l"
+#line 201 "lex.l"
 {yylval.number=0x41;return(TOK_RAWKEY);}
 	YY_BREAK
 case 113:
 YY_RULE_SETUP
-#line 197 "lex.l"
+#line 202 "lex.l"
 {yylval.number=0x42;return(TOK_RAWKEY);}
 	YY_BREAK
 case 114:
 YY_RULE_SETUP
-#line 198 "lex.l"
+#line 203 "lex.l"
 {yylval.number=0x43;return(TOK_RAWKEY);}
 	YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 199 "lex.l"
+#line 204 "lex.l"
 {yylval.number=0x44;return(TOK_RAWKEY);}
 	YY_BREAK
 case 116:
 YY_RULE_SETUP
-#line 200 "lex.l"
+#line 205 "lex.l"
 {yylval.number=0x45;return(TOK_RAWKEY);}
 	YY_BREAK
 case 117:
 YY_RULE_SETUP
-#line 201 "lex.l"
+#line 206 "lex.l"
 {yylval.number=0x46;return(TOK_RAWKEY);}
 	YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 202 "lex.l"
+#line 207 "lex.l"
 {yylval.number=0x47;return(TOK_RAWKEY);}
 	YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 203 "lex.l"
+#line 208 "lex.l"
 {yylval.number=0x48;return(TOK_RAWKEY);}
 	YY_BREAK
 case 120:
 YY_RULE_SETUP
-#line 204 "lex.l"
+#line 209 "lex.l"
 {yylval.number=0x49;return(TOK_RAWKEY);}
 	YY_BREAK
 case 121:
 YY_RULE_SETUP
-#line 205 "lex.l"
+#line 210 "lex.l"
 {yylval.number=0x4a;return(TOK_RAWKEY);}
 	YY_BREAK
 case 122:
 YY_RULE_SETUP
-#line 206 "lex.l"
+#line 211 "lex.l"
 {yylval.number=0x4b;return(TOK_RAWKEY);}
 	YY_BREAK
 case 123:
 YY_RULE_SETUP
-#line 207 "lex.l"
+#line 212 "lex.l"
 {yylval.number=0x4c;return(TOK_RAWKEY);}
 	YY_BREAK
 case 124:
 YY_RULE_SETUP
-#line 208 "lex.l"
+#line 213 "lex.l"
 {yylval.number=0x4d;return(TOK_RAWKEY);}
 	YY_BREAK
 case 125:
 YY_RULE_SETUP
-#line 209 "lex.l"
+#line 214 "lex.l"
 {yylval.number=0x4e;return(TOK_RAWKEY);}
 	YY_BREAK
 case 126:
 YY_RULE_SETUP
-#line 210 "lex.l"
+#line 215 "lex.l"
 {yylval.number=0x4f;return(TOK_RAWKEY);}
 	YY_BREAK
 case 127:
 YY_RULE_SETUP
-#line 211 "lex.l"
+#line 216 "lex.l"
 {yylval.number=0x50;return(TOK_RAWKEY);}
 	YY_BREAK
 case 128:
 YY_RULE_SETUP
-#line 212 "lex.l"
+#line 217 "lex.l"
 {yylval.number=0x51;return(TOK_RAWKEY);}
 	YY_BREAK
 case 129:
 YY_RULE_SETUP
-#line 213 "lex.l"
+#line 218 "lex.l"
 {yylval.number=0x52;return(TOK_RAWKEY);}
 	YY_BREAK
 case 130:
 YY_RULE_SETUP
-#line 214 "lex.l"
+#line 219 "lex.l"
 {yylval.number=0x53;return(TOK_RAWKEY);}
 	YY_BREAK
 case 131:
 YY_RULE_SETUP
-#line 215 "lex.l"
+#line 220 "lex.l"
 {yylval.number=0x54;return(TOK_RAWKEY);}
 	YY_BREAK
 case 132:
 YY_RULE_SETUP
-#line 216 "lex.l"
+#line 221 "lex.l"
 {yylval.number=0x55;return(TOK_RAWKEY);}
 	YY_BREAK
 case 133:
 YY_RULE_SETUP
-#line 217 "lex.l"
+#line 222 "lex.l"
 {yylval.number=0x56;return(TOK_RAWKEY);}
 	YY_BREAK
 case 134:
 YY_RULE_SETUP
-#line 218 "lex.l"
+#line 223 "lex.l"
 {yylval.number=0x57;return(TOK_RAWKEY);}
 	YY_BREAK
 case 135:
 YY_RULE_SETUP
-#line 219 "lex.l"
+#line 224 "lex.l"
 {yylval.number=0x58;return(TOK_RAWKEY);}
 	YY_BREAK
 case 136:
 YY_RULE_SETUP
-#line 220 "lex.l"
+#line 225 "lex.l"
 {yylval.number=0x59;return(TOK_RAWKEY);}
 	YY_BREAK
 case 137:
 YY_RULE_SETUP
-#line 221 "lex.l"
+#line 226 "lex.l"
 {yylval.number=0x5a;return(TOK_RAWKEY);}
 	YY_BREAK
 case 138:
 YY_RULE_SETUP
-#line 222 "lex.l"
+#line 227 "lex.l"
 {yylval.number=0x60;return(TOK_RAWKEY);}
 	YY_BREAK
 case 139:
 YY_RULE_SETUP
-#line 223 "lex.l"
+#line 228 "lex.l"
 {yylval.number=0x2c;return(TOK_RAWKEY);}
 	YY_BREAK
 case 140:
 YY_RULE_SETUP
-#line 224 "lex.l"
+#line 229 "lex.l"
 {yylval.number=0x2d;return(TOK_RAWKEY);}
 	YY_BREAK
 case 141:
 YY_RULE_SETUP
-#line 225 "lex.l"
+#line 230 "lex.l"
 {yylval.number=0x2e;return(TOK_RAWKEY);}
 	YY_BREAK
 case 142:
 YY_RULE_SETUP
-#line 226 "lex.l"
+#line 231 "lex.l"
 {yylval.number=0x2f;return(TOK_RAWKEY);}
 	YY_BREAK
 case 143:
 YY_RULE_SETUP
-#line 227 "lex.l"
+#line 232 "lex.l"
 {yylval.number=0x3a;return(TOK_RAWKEY);}
 	YY_BREAK
 case 144:
 YY_RULE_SETUP
-#line 228 "lex.l"
+#line 233 "lex.l"
 {yylval.number=0x3d;return(TOK_RAWKEY);}
 	YY_BREAK
 case 145:
 YY_RULE_SETUP
-#line 229 "lex.l"
+#line 234 "lex.l"
 {yylval.number=0x5b;return(TOK_RAWKEY);}
 	YY_BREAK
 case 146:
 YY_RULE_SETUP
-#line 230 "lex.l"
+#line 235 "lex.l"
 {yylval.number=0x5c;return(TOK_RAWKEY);}
 	YY_BREAK
 case 147:
 YY_RULE_SETUP
-#line 231 "lex.l"
+#line 236 "lex.l"
 {yylval.number=0x5d;return(TOK_RAWKEY);}
 	YY_BREAK
 case 148:
 YY_RULE_SETUP
-#line 232 "lex.l"
+#line 237 "lex.l"
 {yylval.number=0xff08;return(TOK_RAWKEY);}
 	YY_BREAK
 case 149:
 YY_RULE_SETUP
-#line 233 "lex.l"
+#line 238 "lex.l"
 {yylval.number=0xff09;return(TOK_RAWKEY);}
 	YY_BREAK
 case 150:
 YY_RULE_SETUP
-#line 234 "lex.l"
+#line 239 "lex.l"
 {yylval.number=0xff0d;return(TOK_RAWKEY);}
 	YY_BREAK
 case 151:
 YY_RULE_SETUP
-#line 235 "lex.l"
+#line 240 "lex.l"
 {yylval.number=0xff13;return(TOK_RAWKEY);}
 	YY_BREAK
 case 152:
 YY_RULE_SETUP
-#line 236 "lex.l"
+#line 241 "lex.l"
 {yylval.number=0xff14;return(TOK_RAWKEY);}
 	YY_BREAK
 case 153:
 YY_RULE_SETUP
-#line 237 "lex.l"
+#line 242 "lex.l"
 {yylval.number=0xff1b;return(TOK_RAWKEY);}
 	YY_BREAK
 case 154:
 YY_RULE_SETUP
-#line 238 "lex.l"
+#line 243 "lex.l"
 {yylval.number=0xff50;return(TOK_RAWKEY);}
 	YY_BREAK
 case 155:
 YY_RULE_SETUP
-#line 239 "lex.l"
+#line 244 "lex.l"
 {yylval.number=0xff51;return(TOK_RAWKEY);}
 	YY_BREAK
 case 156:
 YY_RULE_SETUP
-#line 240 "lex.l"
+#line 245 "lex.l"
 {yylval.number=0xff52;return(TOK_RAWKEY);}
 	YY_BREAK
 case 157:
 YY_RULE_SETUP
-#line 241 "lex.l"
+#line 246 "lex.l"
 {yylval.number=0xff53;return(TOK_RAWKEY);}
 	YY_BREAK
 case 158:
 YY_RULE_SETUP
-#line 242 "lex.l"
+#line 247 "lex.l"
 {yylval.number=0xff54;return(TOK_RAWKEY);}
 	YY_BREAK
 case 159:
 YY_RULE_SETUP
-#line 243 "lex.l"
+#line 248 "lex.l"
 {yylval.number=0xff55;return(TOK_RAWKEY);}
 	YY_BREAK
 case 160:
 YY_RULE_SETUP
-#line 244 "lex.l"
+#line 249 "lex.l"
 {yylval.number=0xff56;return(TOK_RAWKEY);}
 	YY_BREAK
 case 161:
 YY_RULE_SETUP
-#line 245 "lex.l"
+#line 250 "lex.l"
 {yylval.number=0xff57;return(TOK_RAWKEY);}
 	YY_BREAK
 case 162:
 YY_RULE_SETUP
-#line 246 "lex.l"
+#line 251 "lex.l"
 {yylval.number=0xff63;return(TOK_RAWKEY);}
 	YY_BREAK
 case 163:
 YY_RULE_SETUP
-#line 247 "lex.l"
+#line 252 "lex.l"
 {yylval.number=0xff7f;return(TOK_RAWKEY);}
 	YY_BREAK
 case 164:
 YY_RULE_SETUP
-#line 248 "lex.l"
+#line 253 "lex.l"
 {yylval.number=0xffaa;return(TOK_RAWKEY);}
 	YY_BREAK
 case 165:
 YY_RULE_SETUP
-#line 249 "lex.l"
+#line 254 "lex.l"
 {yylval.number=0xffab;return(TOK_RAWKEY);}
 	YY_BREAK
 case 166:
 YY_RULE_SETUP
-#line 250 "lex.l"
+#line 255 "lex.l"
 {yylval.number=0xffad;return(TOK_RAWKEY);}
 	YY_BREAK
 case 167:
 YY_RULE_SETUP
-#line 251 "lex.l"
+#line 256 "lex.l"
 {yylval.number=0xffae;return(TOK_RAWKEY);}
 	YY_BREAK
 case 168:
 YY_RULE_SETUP
-#line 252 "lex.l"
+#line 257 "lex.l"
 {yylval.number=0xffaf;return(TOK_RAWKEY);}
 	YY_BREAK
 case 169:
 YY_RULE_SETUP
-#line 253 "lex.l"
+#line 258 "lex.l"
 {yylval.number=0xffb0;return(TOK_RAWKEY);}
 	YY_BREAK
 case 170:
 YY_RULE_SETUP
-#line 254 "lex.l"
+#line 259 "lex.l"
 {yylval.number=0xffb1;return(TOK_RAWKEY);}
 	YY_BREAK
 case 171:
 YY_RULE_SETUP
-#line 255 "lex.l"
+#line 260 "lex.l"
 {yylval.number=0xffb2;return(TOK_RAWKEY);}
 	YY_BREAK
 case 172:
 YY_RULE_SETUP
-#line 256 "lex.l"
+#line 261 "lex.l"
 {yylval.number=0xffb3;return(TOK_RAWKEY);}
 	YY_BREAK
 case 173:
 YY_RULE_SETUP
-#line 257 "lex.l"
+#line 262 "lex.l"
 {yylval.number=0xffb4;return(TOK_RAWKEY);}
 	YY_BREAK
 case 174:
 YY_RULE_SETUP
-#line 258 "lex.l"
+#line 263 "lex.l"
 {yylval.number=0xffb5;return(TOK_RAWKEY);}
 	YY_BREAK
 case 175:
 YY_RULE_SETUP
-#line 259 "lex.l"
+#line 264 "lex.l"
 {yylval.number=0xffb6;return(TOK_RAWKEY);}
 	YY_BREAK
 case 176:
 YY_RULE_SETUP
-#line 260 "lex.l"
+#line 265 "lex.l"
 {yylval.number=0xffb7;return(TOK_RAWKEY);}
 	YY_BREAK
 case 177:
 YY_RULE_SETUP
-#line 261 "lex.l"
+#line 266 "lex.l"
 {yylval.number=0xffb8;return(TOK_RAWKEY);}
 	YY_BREAK
 case 178:
 YY_RULE_SETUP
-#line 262 "lex.l"
+#line 267 "lex.l"
 {yylval.number=0xffb9;return(TOK_RAWKEY);}
 	YY_BREAK
 case 179:
 YY_RULE_SETUP
-#line 263 "lex.l"
+#line 268 "lex.l"
 {yylval.number=0xffbe;return(TOK_RAWKEY);}
 	YY_BREAK
 case 180:
 YY_RULE_SETUP
-#line 264 "lex.l"
+#line 269 "lex.l"
 {yylval.number=0xffbf;return(TOK_RAWKEY);}
 	YY_BREAK
 case 181:
 YY_RULE_SETUP
-#line 265 "lex.l"
+#line 270 "lex.l"
 {yylval.number=0xffc0;return(TOK_RAWKEY);}
 	YY_BREAK
 case 182:
 YY_RULE_SETUP
-#line 266 "lex.l"
+#line 271 "lex.l"
 {yylval.number=0xffc1;return(TOK_RAWKEY);}
 	YY_BREAK
 case 183:
 YY_RULE_SETUP
-#line 267 "lex.l"
+#line 272 "lex.l"
 {yylval.number=0xffc2;return(TOK_RAWKEY);}
 	YY_BREAK
 case 184:
 YY_RULE_SETUP
-#line 268 "lex.l"
+#line 273 "lex.l"
 {yylval.number=0xffc3;return(TOK_RAWKEY);}
 	YY_BREAK
 case 185:
 YY_RULE_SETUP
-#line 269 "lex.l"
+#line 274 "lex.l"
 {yylval.number=0xffc4;return(TOK_RAWKEY);}
 	YY_BREAK
 case 186:
 YY_RULE_SETUP
-#line 270 "lex.l"
+#line 275 "lex.l"
 {yylval.number=0xffc5;return(TOK_RAWKEY);}
 	YY_BREAK
 case 187:
 YY_RULE_SETUP
-#line 271 "lex.l"
+#line 276 "lex.l"
 {yylval.number=0xffc6;return(TOK_RAWKEY);}
 	YY_BREAK
 case 188:
 YY_RULE_SETUP
-#line 272 "lex.l"
+#line 277 "lex.l"
 {yylval.number=0xffc7;return(TOK_RAWKEY);}
 	YY_BREAK
 case 189:
 YY_RULE_SETUP
-#line 273 "lex.l"
+#line 278 "lex.l"
 {yylval.number=0xffc8;return(TOK_RAWKEY);}
 	YY_BREAK
 case 190:
 YY_RULE_SETUP
-#line 274 "lex.l"
+#line 279 "lex.l"
 {yylval.number=0xffc9;return(TOK_RAWKEY);}
 	YY_BREAK
 case 191:
 YY_RULE_SETUP
-#line 275 "lex.l"
+#line 280 "lex.l"
 {yylval.number=0xffca;return(TOK_RAWKEY);}
 	YY_BREAK
 case 192:
 YY_RULE_SETUP
-#line 276 "lex.l"
+#line 281 "lex.l"
 {yylval.number=0xffcb;return(TOK_RAWKEY);}
 	YY_BREAK
 case 193:
 YY_RULE_SETUP
-#line 277 "lex.l"
+#line 282 "lex.l"
 {yylval.number=0xffcc;return(TOK_RAWKEY);}
 	YY_BREAK
 case 194:
 YY_RULE_SETUP
-#line 278 "lex.l"
+#line 283 "lex.l"
 {yylval.number=0xffcd;return(TOK_RAWKEY);}
 	YY_BREAK
 case 195:
 YY_RULE_SETUP
-#line 279 "lex.l"
+#line 284 "lex.l"
 {yylval.number=0xffce;return(TOK_RAWKEY);}
 	YY_BREAK
 case 196:
 YY_RULE_SETUP
-#line 280 "lex.l"
+#line 285 "lex.l"
 {yylval.number=0xffcf;return(TOK_RAWKEY);}
 	YY_BREAK
 case 197:
 YY_RULE_SETUP
-#line 281 "lex.l"
+#line 286 "lex.l"
 {yylval.number=0xffd0;return(TOK_RAWKEY);}
 	YY_BREAK
 case 198:
 YY_RULE_SETUP
-#line 282 "lex.l"
+#line 287 "lex.l"
 {yylval.number=0xffd1;return(TOK_RAWKEY);}
 	YY_BREAK
 case 199:
 YY_RULE_SETUP
-#line 283 "lex.l"
+#line 288 "lex.l"
 {yylval.number=0xffd2;return(TOK_RAWKEY);}
 	YY_BREAK
 case 200:
 YY_RULE_SETUP
-#line 284 "lex.l"
+#line 289 "lex.l"
 {yylval.number=0xffd3;return(TOK_RAWKEY);}
 	YY_BREAK
 case 201:
 YY_RULE_SETUP
-#line 285 "lex.l"
+#line 290 "lex.l"
 {yylval.number=0xffd4;return(TOK_RAWKEY);}
 	YY_BREAK
 case 202:
 YY_RULE_SETUP
-#line 286 "lex.l"
+#line 291 "lex.l"
 {yylval.number=0xffd5;return(TOK_RAWKEY);}
 	YY_BREAK
 case 203:
 YY_RULE_SETUP
-#line 287 "lex.l"
+#line 292 "lex.l"
 {yylval.number=0xffe1;return(TOK_RAWKEY);}
 	YY_BREAK
 case 204:
 YY_RULE_SETUP
-#line 288 "lex.l"
+#line 293 "lex.l"
 {yylval.number=0xffe3;return(TOK_RAWKEY);}
 	YY_BREAK
 case 205:
 YY_RULE_SETUP
-#line 289 "lex.l"
+#line 294 "lex.l"
 {yylval.number=0xffe5;return(TOK_RAWKEY);}
 	YY_BREAK
 case 206:
 YY_RULE_SETUP
-#line 290 "lex.l"
+#line 295 "lex.l"
 {yylval.number=0xffe9;return(TOK_RAWKEY);}
 	YY_BREAK
 case 207:
 YY_RULE_SETUP
-#line 291 "lex.l"
+#line 296 "lex.l"
 {yylval.number=0xffff;return(TOK_RAWKEY);}
 	YY_BREAK
 case 208:
 YY_RULE_SETUP
-#line 292 "lex.l"
+#line 297 "lex.l"
 {yylval.number=0x3c;return(TOK_RAWKEY); /* on German kbds only!*/}
 	YY_BREAK
 case 209:
 YY_RULE_SETUP
-#line 294 "lex.l"
+#line 299 "lex.l"
 { yyerror("unrecognised raw key");}
 	YY_BREAK
 case 210:
 YY_RULE_SETUP
-#line 296 "lex.l"
+#line 301 "lex.l"
 {caller0=caller;caller=KEYNAME;qchar='\'';BEGIN(QUOTE);return(TOK_QM);}
 	YY_BREAK
 case 211:
 YY_RULE_SETUP
-#line 297 "lex.l"
+#line 302 "lex.l"
 {caller0=caller;caller=KEYNAME;qchar='\"';BEGIN(QUOTE);return(TOK_QM);}
 	YY_BREAK
 case 212:
 YY_RULE_SETUP
-#line 299 "lex.l"
+#line 304 "lex.l"
 {
 					if(caller==KEYNAME) caller=caller0;
 					BEGIN(caller);return(TOK_SB);
@@ -2333,22 +2338,22 @@ YY_RULE_SETUP
 
 case 213:
 YY_RULE_SETUP
-#line 305 "lex.l"
+#line 310 "lex.l"
 {lineno++;	/* Join lines */}
 	YY_BREAK
 case 214:
 YY_RULE_SETUP
-#line 306 "lex.l"
+#line 311 "lex.l"
 {lineno++;	/* Join lines */}
 	YY_BREAK
 case 215:
 YY_RULE_SETUP
-#line 307 "lex.l"
+#line 312 "lex.l"
 {lineno++;	/* Join lines */}
 	YY_BREAK
 case 216:
 YY_RULE_SETUP
-#line 308 "lex.l"
+#line 313 "lex.l"
 {lineno++;	/* Join lines */}
 	YY_BREAK
 case 217:
@@ -2356,7 +2361,7 @@ case 217:
 yy_c_buf_p = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 310 "lex.l"
+#line 315 "lex.l"
 {/* ignore, use both /\r and /\n, not to work $ */}
 	YY_BREAK
 case 218:
@@ -2364,7 +2369,7 @@ case 218:
 yy_c_buf_p = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 311 "lex.l"
+#line 316 "lex.l"
 {/*   with either CR or CR/LF line ending */}
 	YY_BREAK
 case 219:
@@ -2372,7 +2377,7 @@ case 219:
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 312 "lex.l"
+#line 317 "lex.l"
 {/* ignore */}
 	YY_BREAK
 case 220:
@@ -2380,7 +2385,7 @@ case 220:
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 313 "lex.l"
+#line 318 "lex.l"
 {/* ignore */}
 	YY_BREAK
 case 221:
@@ -2388,7 +2393,7 @@ case 221:
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 314 "lex.l"
+#line 319 "lex.l"
 {/* ignore */}
 	YY_BREAK
 case 222:
@@ -2396,54 +2401,54 @@ case 222:
 yy_c_buf_p = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 315 "lex.l"
+#line 320 "lex.l"
 {/* ignore */}
 	YY_BREAK
 case 223:
 YY_RULE_SETUP
-#line 317 "lex.l"
+#line 322 "lex.l"
 {BEGIN(SKIP);}
 	YY_BREAK
 case 224:
 YY_RULE_SETUP
-#line 319 "lex.l"
+#line 324 "lex.l"
 {BEGIN(SKIP); /*Mac compatibility line: must treat entire line as a comment*/}
 	YY_BREAK
 case 225:
 YY_RULE_SETUP
-#line 320 "lex.l"
+#line 325 "lex.l"
 {/* Keyman/Mac compatibility - just drop marker */}
 	YY_BREAK
 
 case 226:
 YY_RULE_SETUP
-#line 323 "lex.l"
+#line 328 "lex.l"
 {/* ignore everything until nl or EOF */}
 	YY_BREAK
 
 case 227:
 YY_RULE_SETUP
-#line 326 "lex.l"
+#line 331 "lex.l"
 {fprintf(stderr,"Line %d: Unmatched closing parenthesis\n",lineno);return(TOK_BRKT);}
 	YY_BREAK
 case 228:
 YY_RULE_SETUP
-#line 327 "lex.l"
+#line 332 "lex.l"
 {yylval.number=yytext[0];fprintf(stderr,"Line %d: Unrecognized keyword '%s'\n", 
 					(int)lineno, yytext);errcount++;return(TOK_ERROR);}
 	YY_BREAK
 case 229:
 YY_RULE_SETUP
-#line 329 "lex.l"
+#line 334 "lex.l"
 {yylval.number=yytext[0];fprintf(stderr,"Line %d: Unexpected char (%d) `%c'\n", 
 					(int)lineno, (int) yytext[0],(char) yytext[0]);errcount++;return(TOK_CHAR);}
 	YY_BREAK
 case 230:
 YY_RULE_SETUP
-#line 331 "lex.l"
+#line 336 "lex.l"
 ECHO;
 	YY_BREAK
-#line 2447 "lex.c"
+#line 2452 "lex.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -3329,4 +3334,4 @@ int main()
 	return 0;
 	}
 #endif
-#line 331 "lex.l"
+#line 336 "lex.l"

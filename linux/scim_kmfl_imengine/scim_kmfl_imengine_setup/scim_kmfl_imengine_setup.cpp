@@ -33,7 +33,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <gtk/gtk.h>
-#include <libkmfl/kmfl.h>
+#include <kmfl/kmfl.h>
+#include <kmfl/libkmfl.h>
 #include <fstream>
 #include <errno.h>
 #include "scim_private.h"
