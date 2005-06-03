@@ -6,7 +6,7 @@
 
 Summary:         %{name}
 Name:            libkmfl
-Version:         0.6
+Version:         0.7
 Release:         1suse
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>

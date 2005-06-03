@@ -41,10 +41,10 @@
 
 // Various constants
 #define UNDEFINED		(-1)	// redefine this value for our own use
-#define NAMELEN 		31		// maximum length of names for stores, groups or deadkeys
+#define NAMELEN 		64	    // maximum length of names for stores, groups or deadkeys
 #define MAX_HISTORY 	128 	// number of output (32-bit) characters remembered
 #define MAX_OUTPUT		128 	// maximum length of output allowed from any one key event
-#define MAX_KEYBOARDS	31		// maximum number of keyboards that can be loaded
+#define MAX_KEYBOARDS	64		// maximum number of keyboards that can be loaded
 #define MAX_INSTANCES	255 	// maximum number of keyboard instances that can be supported
 #define VERSION_ZERO	1000	// lowest valid version
 

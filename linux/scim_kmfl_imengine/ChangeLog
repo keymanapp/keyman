@@ -1,0 +1,8 @@
+0.7             2-Jun-2005
+                Fix bug when keyboard name was greater than 31 characters.
+				Increase maximum size of names to 64 characters and add warnings when names exceed this amount
+				Allow stores to be used before they are defined
+0.6             31-May-2005
+                Add the ability to load uncompiled keyboards on the fly
+
+

@@ -57,6 +57,7 @@ static int firstkeyboard = 1;
 
 // forward function declarations
 unsigned long create_keyboard_buffer(const char *infile, void ** kb_buf);
+char * checked_strcpy(char * dst, char * src, int len, char * type, int line);
 
 
 // Write the compiled keyboard to the output file
@@ -226,7 +227,7 @@ void check_keyboard(KEYBOARD *kbp)
 		for(n=0,p=sp->items; n<sp->len && *p!=0; n++,p++) *p &= 0xffffff;
 		
 		p1 = (UTF32 *)sp->items; p2 = (UTF8 *)kbp->name;
-		ConvertUTF32toUTF8((const UTF32 **)&p1,(sp->items+sp->len),&p2,(UTF8 *)(kbp->name+NAMELEN+1),0);
+		ConvertUTF32toUTF8((const UTF32 **)&p1,(sp->items+sp->len),&p2,(UTF8 *)(kbp->name+NAMELEN),0);
 		*p2 = 0;
 	}
 }
@@ -355,9 +356,13 @@ unsigned long create_keyboard_buffer(const char *infile, void ** kb_buf)
 
 	kbp->deadkeys = NULL;
 
-	// Free stores memory
+	// Check and free stores
 	for(sp=kbp->stores; sp!=NULL; sp=sp1)
 	{
+		// only warn for undefined user stores
+		if (sp->len == 0 && sp->name[0] != '&')
+			kmflcomp_warn(sp->lineno,"store (%s) is undefined!",sp->name);
+
 		sp1=sp->next; mem_free(sp);
 	}
 	
@@ -379,14 +384,14 @@ unsigned long create_keyboard_buffer(const char *infile, void ** kb_buf)
 // Routines for manipulating rule groups 
 
 // Create a new group
-GROUP *new_group(char *name)
+GROUP *new_group(char *name, int line)
 {  
 	GROUP *gp, *gp1;
 
 	if((gp=find_group(name)) == NULL)
 	{
 		gp = (GROUP *)checked_alloc(sizeof(GROUP),1);
-		strncpy(gp->name,name,NAMELEN);
+		checked_strcpy(gp->name,name,NAMELEN, "group", line);
 
 		// and add it to the linked list of groups
 		if(kbp->groups)
@@ -417,7 +422,7 @@ GROUP *find_group(char *name)
 }
 
 // Find the group number of a named group, and create a new group if necessary
-int group_number(char *name)
+int group_number(char *name, int line)
 {
 	GROUP *gp;
 	int n;
@@ -428,7 +433,7 @@ int group_number(char *name)
 	}
 	
 	// Create a new group and save the name	
-	gp = new_group(name);
+	gp = new_group(name, line);
 
 	return n;
 }
@@ -444,9 +449,9 @@ int count_groups(GROUP *gp)
 }
 
 // Save the name of the starting group and set the mode flag
-void set_start_group(char *name, int mode)
+void set_start_group(char *name, int mode, int line)
 {
-	kbp->group1 = group_number(name);
+	kbp->group1 = group_number(name, line);
 	kbp->mode = mode;
 }
 
@@ -647,7 +652,7 @@ void check_rhs(ITEM *rhs, unsigned int olen, GROUP *gp, int line)
 			kmflcomp_error(line,"call() keyword is not implemented");
 			break;
 		case ITEM_USE:	// test for and warn if group used recursively
-			if((unsigned)group_number(gp->name) == (*p & 0xffff))
+			if((unsigned)group_number(gp->name, line) == (*p & 0xffff))
 				kmflcomp_warn(line,"rule group used recursively (use() refers to the containing group)");
 			break;
 		}
@@ -715,7 +720,7 @@ void sort_rules(GROUP *gp)
 // Routines for manipulating deadkeys
 
 // Create a deadkey (I don't think this is ever needed - see deadkey_number)
-DEADKEY *new_deadkey(char *name)
+DEADKEY *new_deadkey(char *name, int line)
 {  
 	DEADKEY *dp;
 
@@ -726,7 +731,7 @@ DEADKEY *new_deadkey(char *name)
 		last_deadkey = dp;
 		if(kbp->deadkeys == NULL) kbp->deadkeys = dp;	// initialize pointer to list of deadkeys
 	}
-	strncpy(dp->name,name,NAMELEN);
+	checked_strcpy(dp->name,name,NAMELEN, "deadkey", line);
 
 	return dp;
 }
@@ -743,7 +748,7 @@ DEADKEY *find_deadkey(char *name)
 }
 
 // Find a deadkey number
-int deadkey_number(char *name)
+int deadkey_number(char *name, int line)
 {
 	DEADKEY *dp, *dp0=NULL, *dp1;
 	int n;
@@ -756,7 +761,7 @@ int deadkey_number(char *name)
 	if(dp0) dp0->next = dp1; else kbp->deadkeys = dp1;
 	
 	kbp->ndeadkeys++;	
-	strncpy(dp1->name,name,NAMELEN);
+	checked_strcpy(dp1->name,name,NAMELEN, "deadkey", line);
 
 	return n;
 }
@@ -784,7 +789,8 @@ STORE *new_store(char *name, ITEM *ip0, int line)
 	{
 		sp = (STORE *)checked_alloc(sizeof(STORE), 1);
 		if(kbp->stores == NULL) kbp->stores = sp;	// initialize pointer to list of stores
-		strncpy(sp->name,name,NAMELEN);
+		checked_strcpy(sp->name,name,NAMELEN, "store", line);
+		sp->lineno=line;
 		if(last_store != NULL) last_store->next = sp;
 		last_store = sp;
 		sp->next = NULL;
@@ -872,7 +878,7 @@ STORE *find_store(char *name)
 }
 
 // Find a store number
-int store_number(char *name)
+int store_number(char *name, int line)
 {
 	STORE *p;
 	int n;
@@ -880,6 +886,11 @@ int store_number(char *name)
 	{
 		if(strcasecmp(name,p->name) == 0) return n;
 	}
+
+	// create the store
+	if (new_store(name, NULL, line) != NULL)
+		return n;
+
 	return UNDEFINED;
 }
 
@@ -1239,6 +1250,18 @@ void *checked_alloc(size_t n, size_t sz)
 	if(!(p=mem_calloc(n+1,sz))) fail(4,"out of memory!");
 	
 	return p;
+}
+
+char * checked_strcpy(char * dst, char * src, int len, char * type, int line)
+{
+	strncpy(dst, src, len);
+
+	dst[len]='\0';
+
+	if (strlen(src) > len)
+		kmflcomp_warn(line,"%s name %s exceeds %d characters, truncating to %s", type, src, len, dst);
+
+	return dst;		
 }
 
 // Convert the first (Unicode) character of a UTF-8 (or ANSI) text string to a keysym

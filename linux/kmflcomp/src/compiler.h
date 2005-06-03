@@ -22,6 +22,7 @@ typedef struct _deadkey DEADKEY;
 struct _store {
 	char name[NAMELEN+1];		// name of store
 	unsigned long len;			// number of items in store
+	int lineno;             // first definition
 	ITEM *items;				// store text (item list)
 	struct _store *next;		// pointer to next store
 };
@@ -42,7 +43,7 @@ typedef struct _rule RULE;
 
 // Named rule-groups
 struct _group {
-	char name[32];				// name of group
+	char name[NAMELEN+1];				// name of group
 	unsigned long flags;		// group flags
 	unsigned long nrules;		// number of rules in group
 	unsigned long mrlen;		// length of match rule (rhs)
@@ -87,9 +88,9 @@ void check_rule(RULE *rp, GROUP *gp);
 ITEM *check_lhs(ITEM *lhs, unsigned int ilen, GROUP *gp, int line);
 void check_rhs(ITEM *rhs, unsigned int olen, GROUP *gp, int line);
 
-int store_number(char *name);
-int group_number(char *name);
-int deadkey_number(char *name);
+int store_number(char *name, int line);
+int group_number(char *name, int line);
+int deadkey_number(char *name, int line);
 int items_in_string(char *p);
 int count_groups(GROUP *gp);
 int count_rules(RULE *rp);
@@ -99,10 +100,10 @@ char *add_char(char *sp, int q);
 
 STORE *new_store_from_string(char *name, char *string, int line);
 STORE *new_store(char *name, ITEM *ip, int line);
-GROUP *new_group(char *name);
-void set_start_group(char *groupname, int mode);
+GROUP *new_group(char *name, int line);
+void set_start_group(char *groupname, int mode, int line);
 
-DEADKEY *new_deadkey(char *name);
+DEADKEY *new_deadkey(char *name, int line);
 ITEM *new_list(ITEM q);
 ITEM *add_lists(ITEM *s1, ITEM *s2);
 ITEM *add_item_to_list(ITEM *s1, ITEM q);

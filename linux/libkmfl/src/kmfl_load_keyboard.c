@@ -134,10 +134,12 @@ int kmfl_attach_keyboard(KMSI *p_kmsi, int keyboard_number)
 	// Initialize history unless keyboard hasn't changed
 	if(strcmp(p_kbd->name,p_kmsi->kbd_name) != 0)
 	{
-		strcpy(p_kmsi->kbd_name,p_kbd->name);
+		strncpy(p_kmsi->kbd_name,p_kbd->name, NAMELEN);
+		p_kmsi->kbd_name[NAMELEN]=0;
 		*p_kmsi->history = 0;
 		p_kmsi->nhistory = 0;
 	}
+	
 	DBGMSG(1,"Keyboard %s attached\n",p_kbd->name);
 	return 0;
 }

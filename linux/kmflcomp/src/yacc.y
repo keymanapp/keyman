@@ -187,11 +187,11 @@ T_HEADLINE :
 	}
 	| TOK_ANSI TOK_GT TOK_USE T_PARAMETER TOK_NL
 	{
-		set_start_group($4,KF_ANSI);
+		set_start_group($4,KF_ANSI, lineno);
 	}
 	| TOK_UNICODE TOK_GT TOK_USE T_PARAMETER TOK_NL
 	{
-		set_start_group($4,KF_UNICODE);
+		set_start_group($4,KF_UNICODE, lineno);
 	}
 	| TOK_ANSI TOK_GT TOK_USE T_PARAMETER TOK_USE T_PARAMETER TOK_NL
 	{
@@ -246,13 +246,13 @@ T_GROUP :
 T_GHEADER :
 	TOK_GROUP T_PARAMETER TOK_NL
 	{
-		$$ = gp = new_group($2);
+		$$ = gp = new_group($2, lineno);
 		if(gp) gp->flags = 0;
 	}
 	|
 	TOK_GROUP T_PARAMETER TOK_USINGKEYS TOK_NL
 	{
-		$$ = gp = new_group($2);
+		$$ = gp = new_group($2, lineno);
 		if(gp) gp->flags = GF_USEKEYS;
 	}
 	;
@@ -317,7 +317,7 @@ T_ITEM :
 	}
 	| TOK_ANY T_PARAMETER 
 	{
-		if((n=store_number($2)) != UNDEFINED)
+		if((n=store_number($2,lineno)) != UNDEFINED)
 		{
 			$$ = MAKE_ITEM(ITEM_ANY,n);
 		}
@@ -329,7 +329,7 @@ T_ITEM :
 	}
 	| TOK_OUTS T_PARAMETER 
 	{
-		if((n=store_number($2)) != UNDEFINED)
+		if((n=store_number($2,lineno)) != UNDEFINED)
 		{
 			$$ = MAKE_ITEM(ITEM_OUTS,n);
 		}
@@ -341,7 +341,7 @@ T_ITEM :
 	}
 	| TOK_DEADKEY T_PARAMETER 
 	{
-		$$ = MAKE_ITEM(ITEM_DEADKEY,deadkey_number($2));
+		$$ = MAKE_ITEM(ITEM_DEADKEY,deadkey_number($2, lineno));
 	}
 	| TOK_NUL
 	{
@@ -349,7 +349,7 @@ T_ITEM :
 	}
 	| TOK_INDEX TOK_BRKT T_BYTES TOK_COMMA T_BYTES TOK_BRKT
 	{
-		if((n=store_number($3)) != UNDEFINED)
+		if((n=store_number($3,lineno)) != UNDEFINED)
 		{
 			$$ = MAKE_PARAMETER_ITEM(ITEM_INDEX,atoi($5),n);
 		}
@@ -382,7 +382,7 @@ T_ITEM :
 	}
 	| TOK_USE T_PARAMETER 
 	{
-		$$ = MAKE_ITEM(ITEM_USE,group_number($2));
+		$$ = MAKE_ITEM(ITEM_USE,group_number($2, lineno));
 	}
 	| TOK_MATCH
 	{

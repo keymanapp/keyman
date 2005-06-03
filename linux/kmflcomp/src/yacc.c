@@ -1382,14 +1382,14 @@ yyreduce:
   case 23:
 #line 189 "yacc.y"
     {
-		set_start_group(yyvsp[-1].string,KF_ANSI);
+		set_start_group(yyvsp[-1].string,KF_ANSI, lineno);
 	}
     break;
 
   case 24:
 #line 193 "yacc.y"
     {
-		set_start_group(yyvsp[-1].string,KF_UNICODE);
+		set_start_group(yyvsp[-1].string,KF_UNICODE, lineno);
 	}
     break;
 
@@ -1460,7 +1460,7 @@ yyreduce:
   case 35:
 #line 248 "yacc.y"
     {
-		yyval.group = gp = new_group(yyvsp[-1].string);
+		yyval.group = gp = new_group(yyvsp[-1].string, lineno);
 		if(gp) gp->flags = 0;
 	}
     break;
@@ -1468,7 +1468,7 @@ yyreduce:
   case 36:
 #line 254 "yacc.y"
     {
-		yyval.group = gp = new_group(yyvsp[-2].string);
+		yyval.group = gp = new_group(yyvsp[-2].string, lineno);
 		if(gp) gp->flags = GF_USEKEYS;
 	}
     break;
@@ -1560,7 +1560,7 @@ yyreduce:
   case 49:
 #line 319 "yacc.y"
     {
-		if((n=store_number(yyvsp[0].string)) != UNDEFINED)
+		if((n=store_number(yyvsp[0].string,lineno)) != UNDEFINED)
 		{
 			yyval.number = MAKE_ITEM(ITEM_ANY,n);
 		}
@@ -1575,7 +1575,7 @@ yyreduce:
   case 50:
 #line 331 "yacc.y"
     {
-		if((n=store_number(yyvsp[0].string)) != UNDEFINED)
+		if((n=store_number(yyvsp[0].string,lineno)) != UNDEFINED)
 		{
 			yyval.number = MAKE_ITEM(ITEM_OUTS,n);
 		}
@@ -1590,7 +1590,7 @@ yyreduce:
   case 51:
 #line 343 "yacc.y"
     {
-		yyval.number = MAKE_ITEM(ITEM_DEADKEY,deadkey_number(yyvsp[0].string));
+		yyval.number = MAKE_ITEM(ITEM_DEADKEY,deadkey_number(yyvsp[0].string, lineno));
 	}
     break;
 
@@ -1604,7 +1604,7 @@ yyreduce:
   case 53:
 #line 351 "yacc.y"
     {
-		if((n=store_number(yyvsp[-3].string)) != UNDEFINED)
+		if((n=store_number(yyvsp[-3].string,lineno)) != UNDEFINED)
 		{
 			yyval.number = MAKE_PARAMETER_ITEM(ITEM_INDEX,atoi(yyvsp[-1].string),n);
 		}
@@ -1655,7 +1655,7 @@ yyreduce:
   case 59:
 #line 384 "yacc.y"
     {
-		yyval.number = MAKE_ITEM(ITEM_USE,group_number(yyvsp[0].string));
+		yyval.number = MAKE_ITEM(ITEM_USE,group_number(yyvsp[0].string, lineno));
 	}
     break;
 

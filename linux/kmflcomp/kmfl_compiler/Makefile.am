@@ -16,6 +16,6 @@ bin_PROGRAMS = kmflcomp
 kmflcomp_SOURCES = \
 	kmfl_compiler.c
 
-kmflcomp_LDFLAGS = -lefence
+kmflcomp_LDFLAGS = 
 
 kmflcomp_LDADD = ../src/.libs/libkmflcomp.a
