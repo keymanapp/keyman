@@ -1,3 +1,5 @@
+0.8             4-Jul-2005
+				Add full support for virtual keys.
 0.7             2-Jun-2005
                 Fix bug when keyboard name was greater than 31 characters.
 				Increase maximum size of names to 64 characters and add warnings when names exceed this amount
