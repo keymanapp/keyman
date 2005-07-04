@@ -435,7 +435,7 @@ bool KmflInstance::process_key_event(const KeyEvent & key)
     if (!m_focused) {
         return false;
     }
-
+#if 0
     // Capture the state switch key events
     if (((key.code == SCIM_KEY_Alt_L || key.code == SCIM_KEY_Alt_R) &&
          key.is_shift_down()) ||
@@ -447,6 +447,7 @@ bool KmflInstance::process_key_event(const KeyEvent & key)
         reset();
         return true;
     }
+#endif
 
     DBGMSG(1, "DAR: kmfl - Keyevent, code: %x, mask: %x\n", key.code,
            key.mask);
@@ -597,6 +598,11 @@ void KmflInstance::output_string(const String & str)
     }
 }
 
+void KmflInstance::output_beep()
+{
+	beep();
+}
+
 extern "C" {
 
     void output_string(void *contrack, char *ptr) {
@@ -627,7 +633,8 @@ extern "C" {
 
     void output_beep(void *contrack) {
         DBGMSG(1, "DAR: kmfl - beep\n");
-        fputc(7, stdout);
+        ((KmflInstance *) contrack)->output_beep();
+        
     }
 }                                /* extern "c" */
 

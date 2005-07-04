@@ -94,12 +94,6 @@ int kmfl_interpret(KMSI *p_kmsi, UINT key, UINT state)
 	// Pack the state bits into a single byte
 	state = modified_state(state);
 
-	// For ANSI characters, clear Shift flag unless control or alt is set (already encoded in keysym)
-	if(((key&0xff00) == 0) && (key > 0x20) && ((state & 0xcc) == 0)) state &= ~0x11;
-	// Note that this prevents LShift/RShift from being correctly processed.
-	// In order to handle that distinction, it will be necessary to add full treatment
-	// of locale-dependent input. To be done later.
-
 	// Get the memory address of the keyboard header
 	p_kbd = p_kmsi->keyboard;
 	p_group1 = p_kmsi->groups+p_kbd->group1;
@@ -135,9 +129,9 @@ int kmfl_interpret(KMSI *p_kmsi, UINT key, UINT state)
 	case 0xff0d:		// return - clear history, let app handle key
 		clear_history(p_kmsi);
 		return 0;
-	case 0xff1b:		// escape - add to history, and output ANSI Escape
+	case 0xff1b:		// escape - add to history, let app handle key
 		add_to_history(p_kmsi,(ITEM)0x1b);
-		output_char(p_kmsi->connection,(ITEM)0x1b);
+		forward_keyevent(p_kmsi->connection, key, state);
 		return 1;
 	default:
 		clear_history(p_kmsi);
@@ -433,7 +427,7 @@ int process_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 			{
 	            if (ITEM_TYPE(*p) == ITEM_KEYSYM)
                 {
-					unsigned int key, state;
+					UINT key, state;
 					key = (*p) & 0xFFFF;
 					state = ((*p) >> 16) & 0xFF;
 					DBGMSG(1, "DAR - libkmfl - ITEM_KEYSYM key:%x, state: %x\n", key, state);

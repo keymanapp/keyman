@@ -112,6 +112,7 @@ public:
     void output_string(const String&str);
     void erase_char ();
     void forward_keyevent(unsigned int key, unsigned int state);
+    void output_beep ();
 
 private:
     int create_lookup_table (int start = 0);

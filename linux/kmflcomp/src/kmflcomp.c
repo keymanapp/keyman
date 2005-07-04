@@ -24,6 +24,7 @@
 	#define DIRDELIM	'\\'
 	char *GetInputFile(void);
 #else
+	#include <X11/Xlib.h>
 	#include <getopt.h>
 	#include <sys/types.h>
 	#include <unistd.h>
@@ -58,6 +59,7 @@ static int firstkeyboard = 1;
 // forward function declarations
 unsigned long create_keyboard_buffer(const char *infile, void ** kb_buf);
 char * checked_strcpy(char * dst, char * src, int len, char * type, int line);
+int get_char_shift_state(ITEM q);
 
 
 // Write the compiled keyboard to the output file
@@ -575,7 +577,10 @@ ITEM *check_lhs(ITEM *lhs, unsigned int ilen, GROUP *gp, int line)
 	if((gp->flags & GF_USEKEYS) == GF_USEKEYS)
 	{
 		p = lhs+ilen-1;
-		if(ITEM_TYPE(*p) == ITEM_CHAR) *p = MAKE_ITEM(ITEM_KEYSYM,*p);
+		if(ITEM_TYPE(*p) == ITEM_CHAR) 
+		{
+			*p = make_keysym(0, get_char_shift_state(*p), *p);
+		}
 	}
 
 	if(ilen != count_items(lhs)) fail(1,"fatal compiler error");
@@ -1283,19 +1288,73 @@ ITEM string_to_keysym(char *sp, int line)
 	return keysym;
 }
 
+int get_char_shift_state(ITEM q)
+{
+#ifndef _WIN32
+	Display * display;
+#endif
+	int keycode;
+	int result=0;
+	
+	q&=0x7F;
+	
+	if (isalpha(q) && isupper(q))
+		result = KS_SHIFT;
+#ifndef _WIN32
+	else
+	{
+		display = XOpenDisplay(NULL);
+
+		if (display)
+		{
+			keycode = XKeysymToKeycode (display, q & 0x7F);
+		
+			if (XKeycodeToKeysym(display, keycode, 1) == (q & 0x7F))
+				result = KS_SHIFT;
+			XCloseDisplay(display);
+		}
+	}
+#endif
+	return result;
+}
+
 // Combine shift state and key code as required for Linux
-ITEM make_keysym(ITEM state, ITEM q)
+ITEM make_keysym(int lineno, ITEM state, ITEM q)
 {
 	// Mask character and state
 
 	q &= 0xffff; state &= 0xff;
 
-	if(((q & 0xff00) == 0) && isalpha(q)) 
+	if ((q & 0xff00) == 0)
 	{
-		if(((state & KS_SHIFT) == 0) && ((state & KS_CAPS) == 0)) q += 0x20;
-		else if(((state & KS_SHIFT) != 0) && ((state & KS_CAPS) != 0)) q += 0x20;
-	}
+		int keycode;
+		int shifted=((state & KS_SHIFT) == 0) ^ ((state & KS_CAPS) == 0);
+#ifndef _WIN32
+		Display * display;
+		display = XOpenDisplay(NULL);
 
+		if (display)
+		{
+			keycode = XKeysymToKeycode (display, q & 0x7F);
+			q=XKeycodeToKeysym(display, keycode, !shifted ? 0 : 1);
+			XCloseDisplay(display);
+		}
+		else 
+#endif
+		if (isalpha(q))
+		{
+			if (!shifted)
+			{
+				q += 0x20;
+			}
+		} 
+		else if (((state & KS_SHIFT) == 0) || ((state & KS_CAPS) == 0))
+		{
+			kmflcomp_warn(lineno, "Non-alphabetic virtual key sequence used with K_SHIFT or K_CAPS outside of the X environment.\n"
+			"   KMFLCOMP cannot determined correct shifted keysym");
+		}
+		state &= ~KS_CAPS;
+	}
 	return q | (state<<16) | (ITEM_KEYSYM<<24);
 }
 
