@@ -113,7 +113,7 @@ char *items_to_string(ITEM *p);
 ITEM *items_from_string(char *sp, int line);
 
 ITEM string_to_keysym(char *sp, int line);
-ITEM make_keysym(ITEM shift, ITEM q);
+ITEM make_keysym(int lineno, ITEM shift, ITEM q);
 
 STORE *find_store(char *name);
 char *store_name(int number);

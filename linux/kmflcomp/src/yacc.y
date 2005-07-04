@@ -444,21 +444,21 @@ T_PARAMETER:
 T_KEYDEF : 
 	T_STRING 
 	{	
-		$$ = make_keysym(0,string_to_keysym($1,lineno));
+		$$ = make_keysym(lineno, 0,string_to_keysym($1,lineno));
 	}
 	|
 	T_KEYMODS T_STRING 
 	{	
-		$$ = make_keysym(0,string_to_keysym($2,lineno));
+		$$ = make_keysym(lineno, 0,string_to_keysym($2,lineno));
 	}
 	|
 	T_KEYMODS TOK_RAWKEY 
 	{
-		$$ = make_keysym($1,$2);
+		$$ = make_keysym(lineno, $1,$2);
 	}
 	| TOK_RAWKEY 
 	{
-		$$ = make_keysym(0,$1);
+		$$ = make_keysym(lineno, 0,$1);
 	}
 	;
 
