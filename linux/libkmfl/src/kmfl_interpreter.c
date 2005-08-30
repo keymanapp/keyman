@@ -104,7 +104,17 @@ int kmfl_interpret(KMSI *p_kmsi, UINT key, UINT state)
 	p_kmsi->history[0] = keysym;
 
 	// Pass control to the first group for processing, and return if key was matched
-	if((matched=process_group(p_kmsi, p_group1)) > 0) return 1;
+	if((matched=process_group(p_kmsi, p_group1)) > 0) 
+		return 1;
+
+	// Now try without shift state
+	if (state & KS_SHIFT != 0) 
+	{
+		keysym &= ~((unsigned long)KS_SHIFT<<16);
+		p_kmsi->history[0] = keysym;
+		if((matched=process_group(p_kmsi, p_group1)) > 0) 
+			return 1;
+	}
 
 	/* need some kind of error notification if error value returned */
 
