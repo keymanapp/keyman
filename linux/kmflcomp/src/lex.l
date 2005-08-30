@@ -296,8 +296,8 @@ switch					{return TOK_SWITCH;/*  (obsolete) */}
 	K_DEL		{yylval.number=0xffff;return(TOK_RAWKEY);}
 	K_oE2		{yylval.number=0x3c;return(TOK_RAWKEY); /* on German kbds only!*/}
 
-	K_[A-Z0-9]+	{ yyerror("unrecognised raw key");}
-
+	XK_[a-zA-Z0-9]+ {yylval.number=text_to_keysym(yytext); if (yylval.number == -1) yyerror("unrecognised raw key"); else return(TOK_XKEYSYM);}
+	K_[A-Z0-9]+	{ yyerror("unrecognised raw key");} 
 	\'			{caller0=caller;caller=KEYNAME;qchar='\'';BEGIN(QUOTE);return(TOK_QM);}
 	\"			{caller0=caller;caller=KEYNAME;qchar='\"';BEGIN(QUOTE);return(TOK_QM);}
 

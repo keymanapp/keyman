@@ -94,6 +94,7 @@ GROUP *gp = NULL;			/* Temporary group pointer */
 %token <simple> TOK_USINGKEYS
 %token <number> TOK_UTF
 %token <simple> TOK_VERSION
+%token <number> TOK_XKEYSYM
 
 %%
 T_FILE :
@@ -459,6 +460,14 @@ T_KEYDEF :
 	| TOK_RAWKEY 
 	{
 		$$ = make_keysym(lineno, 0,$1);
+	}
+	| T_KEYMODS TOK_XKEYSYM
+	{
+		$$ = make_xkeysym(lineno, $1, $2);
+	}
+	| TOK_XKEYSYM
+	{
+		$$ = make_xkeysym(lineno, 0, $1);
 	}
 	;
 

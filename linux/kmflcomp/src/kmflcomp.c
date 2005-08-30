@@ -579,7 +579,7 @@ ITEM *check_lhs(ITEM *lhs, unsigned int ilen, GROUP *gp, int line)
 		p = lhs+ilen-1;
 		if(ITEM_TYPE(*p) == ITEM_CHAR) 
 		{
-			*p = make_keysym(0, get_char_shift_state(*p), *p);
+			*p = MAKE_ITEM(ITEM_KEYSYM,*p);
 		}
 	}
 
@@ -1288,73 +1288,65 @@ ITEM string_to_keysym(char *sp, int line)
 	return keysym;
 }
 
-int get_char_shift_state(ITEM q)
+// Convert an virtual keysym string to an actual keysym (XK_HYPHEN, etc)
+ITEM text_to_keysym(char * str)
 {
+	ITEM keysym = -1;
 #ifndef _WIN32
-	Display * display;
-#endif
-	int keycode;
-	int result=0;
-	
-	q&=0x7F;
-	
-	if (isalpha(q) && isupper(q))
-		result = KS_SHIFT;
-#ifndef _WIN32
-	else
+	if (strlen(str) > 3)
 	{
-		display = XOpenDisplay(NULL);
-
-		if (display)
-		{
-			keycode = XKeysymToKeycode (display, q & 0x7F);
-		
-			if (XKeycodeToKeysym(display, keycode, 1) == (q & 0x7F))
-				result = KS_SHIFT;
-			XCloseDisplay(display);
-		}
-	}
+		keysym = XStringToKeysym(str+3);
+	
+		if (keysym == NoSymbol)
+			keysym = -1;
+	}		
 #endif
-	return result;
+	return keysym;
 }
-
 // Combine shift state and key code as required for Linux
 ITEM make_keysym(int lineno, ITEM state, ITEM q)
 {
-	// Mask character and state
+    // Mask character and state
 
-	q &= 0xffff; state &= 0xff;
+    q &= 0xffff; state &= 0xff;
 
-	if ((q & 0xff00) == 0)
-	{
-		int keycode;
-		int shifted=((state & KS_SHIFT) == 0) ^ ((state & KS_CAPS) == 0);
+    if ((q & 0xff00) == 0)
+    {
+        int keycode;
+        int shifted=((state & KS_SHIFT) == 0) ^ ((state & KS_CAPS) == 0);
 #ifndef _WIN32
-		Display * display;
-		display = XOpenDisplay(NULL);
+        Display * display;
+        display = XOpenDisplay(NULL);
 
-		if (display)
-		{
-			keycode = XKeysymToKeycode (display, q & 0x7F);
-			q=XKeycodeToKeysym(display, keycode, !shifted ? 0 : 1);
-			XCloseDisplay(display);
-		}
-		else 
+        if (display)
+        {
+            keycode = XKeysymToKeycode (display, q & 0x7F);
+            q=XKeycodeToKeysym(display, keycode, !shifted ? 0 : 1);
+            XCloseDisplay(display);
+        }
+        else
 #endif
-		if (isalpha(q))
-		{
-			if (!shifted)
-			{
-				q += 0x20;
-			}
-		} 
-		else if (((state & KS_SHIFT) == 0) || ((state & KS_CAPS) == 0))
-		{
-			kmflcomp_warn(lineno, "Non-alphabetic virtual key sequence used with K_SHIFT or K_CAPS outside of the X environment.\n"
-			"   KMFLCOMP cannot determined correct shifted keysym");
-		}
-		state &= ~KS_CAPS;
-	}
+        if (isalpha(q))
+        {
+            if (!shifted)
+            {
+                q += 0x20;
+            }
+        }
+        else if (((state & KS_SHIFT) == 0) || ((state & KS_CAPS) == 0))
+        {
+            kmflcomp_warn(lineno, "Non-alphabetic virtual key sequence used with K_SHIFT or K_CAPS outside of the X environment.\n"
+            "   KMFLCOMP cannot determined correct shifted keysym");
+        }
+        state &= ~KS_CAPS;
+    }
+    return q | (state<<16) | (ITEM_KEYSYM<<24);
+}
+
+ITEM make_xkeysym(int lineno, ITEM state, ITEM q)
+{
+	// Mask character and state
+	q &= 0xffff; state &= 0xff;
 	return q | (state<<16) | (ITEM_KEYSYM<<24);
 }
 

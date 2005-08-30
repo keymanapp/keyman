@@ -5,6 +5,7 @@
 #include <kmfl.h>
 
 #define BUFSIZE		256			// output buffer limit for converting from UTF16
+#define NOSHIFTPROCESSING 0x8000 // For XKEY Symbols, don't process shift state
 
 //	The types KEYBOARD, GROUP, RULE, STORE and DEADKEY are used only by the compiler,
 //  and are defined in this header.  The types XKEYBOARD, XGROUP, XSTORE and XRULE are 
@@ -113,8 +114,9 @@ char *items_to_string(ITEM *p);
 ITEM *items_from_string(char *sp, int line);
 
 ITEM string_to_keysym(char *sp, int line);
+ITEM make_xkeysym(int lineno, ITEM shift, ITEM q);
 ITEM make_keysym(int lineno, ITEM shift, ITEM q);
-
+ITEM text_to_keysym(char * str);
 STORE *find_store(char *name);
 char *store_name(int number);
 

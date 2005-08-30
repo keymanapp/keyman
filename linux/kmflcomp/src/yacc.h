@@ -75,7 +75,8 @@
      TOK_USE = 301,
      TOK_USINGKEYS = 302,
      TOK_UTF = 303,
-     TOK_VERSION = 304
+     TOK_VERSION = 304,
+     TOK_XKEYSYM = 305
    };
 #endif
 #define TOK_ANY 258
@@ -125,6 +126,7 @@
 #define TOK_USINGKEYS 302
 #define TOK_UTF 303
 #define TOK_VERSION 304
+#define TOK_XKEYSYM 305
 
 
 
@@ -140,7 +142,7 @@ typedef union YYSTYPE {
 	GROUP *group;
 	} YYSTYPE;
 /* Line 1249 of yacc.c.  */
-#line 143 "yacc.h"
+#line 145 "yacc.h"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
