@@ -108,7 +108,7 @@ int kmfl_interpret(KMSI *p_kmsi, UINT key, UINT state)
 		return 1;
 
 	// Now try without shift state
-	if (state & KS_SHIFT != 0) 
+	if ((state & KS_SHIFT) != 0) 
 	{
 		keysym &= ~((unsigned long)KS_SHIFT<<16);
 		p_kmsi->history[0] = keysym;
