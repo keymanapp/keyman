@@ -25,6 +25,11 @@
 
 #define KMFL_H
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
+
 #define FILE_VERSION	"1"
 #define BASE_VERSION	"320"
 #define LAST_VERSION	"600"
@@ -165,5 +170,8 @@ struct _kmsi {
 
 typedef struct _kmsi KMSI;
 
+#ifdef  __cplusplus
+}
+#endif
 
 #endif /* *** end of KMFL.H *** */

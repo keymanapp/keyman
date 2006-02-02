@@ -19,6 +19,11 @@
  *
  */
 
+#ifndef KMFLCOMP_H
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
 extern int opt_debug;
 extern int opt_force;
 extern int opt_verbose;
@@ -28,3 +33,9 @@ extern jmp_buf fatal_error_buf;
 
 unsigned long compile_keyboard_to_buffer(const char * infile, void ** keyboard_buffer);
 void write_keyboard(char * fname, void *keyboard_buffer, int keyboard_buffer_size);
+
+#ifdef  __cplusplus
+}
+#endif
+
+#endif /* KMFLCOMP_H */
