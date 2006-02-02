@@ -28,6 +28,7 @@
  
 #define Uses_SCIM_CONFIG_BASE
 
+#include <string.h>
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -37,6 +38,8 @@
 #include <kmfl/libkmfl.h>
 #include <fstream>
 #include <errno.h>
+#include <setjmp.h>
+#include <kmfl/kmflcomp.h>
 #include "scim_private.h"
 #include "scim.h"
 #include "gtk/scimkeyselection.h"
@@ -759,9 +762,10 @@ get_keyboard_list(std::vector < String > &keyboard_list,
 	    stat(absfn.c_str(), &filestat);
 
 	    if (S_ISREG(filestat.st_mode)
-		&& absfn.substr(absfn.length() - 5,
+		&& ((absfn.substr(absfn.length() - 5,
 				5) == ".kmfl"
-		&& kmfl_check_keyboard(absfn.c_str()) == 0) {
+		&& kmfl_check_keyboard(absfn.c_str()) == 0)
+		|| absfn.substr(absfn.length() - 4, 4) == ".kmn")) {
 		keyboard_list.push_back(absfn);
             }
 
@@ -815,34 +819,57 @@ load_kmfl_file(const String & file)
     char version_string[6] = { 0 };
     struct stat fstat;
     FILE *fp;
+    const char * extension;
+    int errcode;
+    
+    extension = strrchr(file.c_str(), '.');
+   
+    if (extension && (strcmp(extension, ".kmn") == 0))
+    {
 
-    if (file.length()) {
-	// Get the file size
-	if (stat(file.c_str(), &fstat) != 0) {
-	    return NULL;
-        }
-        
-	filelen = fstat.st_size;
+       errcode = setjmp(fatal_error_buf);
 
-	// Allocate memory for the installed keyboard
-	if ((keyboard = (XKEYBOARD *) malloc(filelen)) == NULL) {
-	    return NULL;
-        }
-
-	// Open the file
-	if ((fp = fopen(file.c_str(), "rb")) != NULL) {
-	    fread(keyboard, 1, filelen, fp);
-	    fclose(fp);
-	    memcpy(version_string, keyboard->version, 3);	// Copy to ensure terminated
-	    kbver = (unsigned) atoi(version_string);
+        if (errcode == 0)
+        {
+	    compile_keyboard_to_buffer(file.c_str(), (void **) &keyboard);
+	    memcpy(version_string,keyboard->version,3); // Copy to ensure terminated
+            kbver = (unsigned)atoi(version_string);
 	}
-	// Check the loaded file is valid and has the correct version
-	if ((memcmp(keyboard->id, "KMFL", 4) != 0)
-	    || (keyboard->version[3] != *FILE_VERSION)
-	    || (kbver < (unsigned) atoi(BASE_VERSION))
-	    || (kbver > (unsigned) atoi(LAST_VERSION))) {
-	    free(keyboard);
-	    return 0;
+	else
+	{
+	    return NULL;
+	}
+    }
+    else
+    {
+	if (file.length()) {
+	    // Get the file size
+	    if (stat(file.c_str(), &fstat) != 0) {
+		return NULL;
+	    }
+	    
+	    filelen = fstat.st_size;
+    
+	    // Allocate memory for the installed keyboard
+	    if ((keyboard = (XKEYBOARD *) malloc(filelen)) == NULL) {
+		return NULL;
+	    }
+    
+	    // Open the file
+	    if ((fp = fopen(file.c_str(), "rb")) != NULL) {
+		fread(keyboard, 1, filelen, fp);
+		fclose(fp);
+		memcpy(version_string, keyboard->version, 3);	// Copy to ensure terminated
+		kbver = (unsigned) atoi(version_string);
+	    }
+	    // Check the loaded file is valid and has the correct version
+	    if ((memcmp(keyboard->id, "KMFL", 4) != 0)
+		|| (keyboard->version[3] != *FILE_VERSION)
+		|| (kbver < (unsigned) atoi(BASE_VERSION))
+		|| (kbver > (unsigned) atoi(LAST_VERSION))) {
+		free(keyboard);
+		return NULL;
+	    }
 	}
     }
     return keyboard;
