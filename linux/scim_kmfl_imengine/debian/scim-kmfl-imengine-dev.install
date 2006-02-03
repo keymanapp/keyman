@@ -1,0 +1,4 @@
+usr/lib/scim-1.0/1.2.0/IMEngine/*.a
+usr/lib/scim-1.0/1.2.0/SetupUI/*.a
+usr/lib/scim-1.0/1.2.0/IMEngine/*.la
+usr/lib/scim-1.0/1.2.0/SetupUI/*.la

@@ -1,0 +1,23 @@
+kmflcomp (0.9.1-1) unstable; urgency=low
+
+  * fix headers for C++ inclusion
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Tue, 02 Feb 2006 11:40:00 +0800
+
+kmflcomp (0.9-1) unstable; urgency=low
+
+  * fix shift key problem
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Tue, 30 Aug 2005 11:20:00 +0800
+
+kmflcomp (0.8-1) unstable; urgency=low
+
+  * Add full virtual key support
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Mon, 04 Jul 2005 11:20:00 +0800
+
+kmflcomp (0.7-1) unstable; urgency=low
+
+  * first debian release
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Mon, 21 Jun 2005 19:57:17 +0800

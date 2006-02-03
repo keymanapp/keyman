@@ -1,0 +1,20 @@
+Source: libkmfl
+Priority: optional
+Maintainer: Doug Rintoul <doug_rintoul@sil.org>
+Build-Depends: automake1.6 | automake1.7 | automake1.9, libtool, debhelper (>= 4.0.0), libkmflcomp-dev
+Standards-Version: 3.6.1
+
+Package: libkmfl-dev
+Section: libdevel
+Architecture: i386
+Depends: libkmfl (= ${Source-Version})
+Description: A Library for providing Keyman(C) services to Linux - development
+ This package contains the header and development files needed to build
+ programs and packages using libkmfl.
+
+Package: libkmfl
+Section: libs
+Architecture: i386
+Depends: ${shlibs:Depends}, libkmflcomp
+Description: A Library for providing Keyman(C) services to Linux - runtime
+ This package contains the runtime part of libkmfl.

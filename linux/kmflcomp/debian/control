@@ -1,0 +1,25 @@
+Source: kmflcomp
+Priority: optional
+Maintainer: Doug Rintoul <doug_rintoul@sil.org>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.6.1
+
+Package: libkmflcomp-dev
+Section: libdev
+Architecture: any
+Depends: libkmflcomp (= ${Source-Version})
+Description: Development libraries and headers to use libkmflcomp in an application
+ Development libraries and headers to use libkmflcomp in an application
+
+Package: kmflcomp
+Section: utils
+Architecture: i386
+Depends: libkmflcomp (= ${Source-Version})
+Description: KMFL Compiler
+ Compile Keyman-style keyboard layout files to a binary format for use by the KMFL keystroke interpreter.
+
+Package: libkmflcomp
+Section: libs
+Architecture: i386
+Description: KMFL compiler library
+ Library to compile Keyman layout files to a binary format for use by the KMFL keystroke interpreter.
