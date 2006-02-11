@@ -1018,6 +1018,7 @@ ITEM *items_from_string(char *sp, int line)
 {
 	ITEM *p, *p0;
 	int i, n;
+	char * s0;
 	ConversionResult result;
 	
 	n = strlen(sp);
@@ -1027,12 +1028,14 @@ ITEM *items_from_string(char *sp, int line)
 	// released again as soon as the string is copied to a store or rule
 	if(file_format == KF_UNICODE)
 	{
+		s0=sp;
 		result = ConvertUTF8toUTF32((const UTF8 **)&sp,(sp+n),(UTF32 **)&p,(UTF32 *)(p0+n+1),0);
 		// Use ANSI conversion if UTF-8 conversion failed (for compatibility with old source files)
 		if(result != 0)
 		{
+			p=p0;
 			kmflcomp_warn(line,"file format is UTF-8, but non-UTF-8 characters found and converted as ANSI");
-			for(i=0; i<n; i++) *p++ = *(sp+i);
+			for(i=0; i<n; i++) *p++ = (*(s0+i))&255;
 		}
 	}
 	else
