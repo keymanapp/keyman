@@ -1,3 +1,10 @@
+kmflcomp (0.9.1-1)
+
+  * fix headers for C++ inclusion
+  * fix bug when compile a keyboard with Non UTF upper ANSI characters
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Tue, 02 Feb 2006 11:40:00 +0800
+
 0.9             30-Aug-2005
 				Fix Shift key problem
 0.8             4-Jul-2005

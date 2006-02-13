@@ -1,3 +1,11 @@
+0.9.1
+
+  * fix enumeration of uncompiled keyboards in scim kmfl setup
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Mon, 02 Feb 2006 11:00:00 +0800
+
+0.9             30-Aug-2005
+				Fix shift key problem
 0.8             4-Jul-2005
 				Add full support for virtual keys.
 0.7             2-Jun-2005
