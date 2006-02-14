@@ -79,13 +79,28 @@ extern "C" {
 #ifdef _WIN32
 	typedef unsigned int UINT; 	// 32-bit unsigned integer (general purpose)
 #else
+#include <stdint.h>
+#ifdef __uint32_t_defined
+	typedef uint32_t UINT;
+#else
 	typedef unsigned long UINT;	// 32-bit unsigned integer (general purpose)
 #endif
+#endif
 
+#ifdef __int32_t_defined
+	typedef int32_t INT;
+#else
+	typedef long INT;	// 32-bit unsigned integer (general purpose)
+#endif
+
+#ifdef __uint8_t_defined
+typedef uint8_t BYTE;
+#else
 typedef unsigned char BYTE; 	// 8-bit unsigned integer
-typedef unsigned long ITEM; 	// 32-bit unsigned integer for UTF-32 or control values
-typedef unsigned long OFFSET;	// 32-bit unsigned integer used as table offsets
- 
+#endif
+typedef UINT ITEM; 	// 32-bit unsigned integer for UTF-32 or control values
+typedef UINT OFFSET;	// 32-bit unsigned integer used as table offsets
+
 #define ITEMSIZE	(sizeof(ITEM))
 
 // Rule (and store) item types (high-order byte of ITEMs)
@@ -106,7 +121,7 @@ enum TAG_SS {SS_UNDEFINED=-1,SS_NAME,SS_VERSION,SS_HOTKEY,SS_LANGUAGE,SS_LAYOUT,
 
 // Unnamed stores
 struct _xstore {
-	unsigned long len;		// number of items in store
+	UINT len;		// number of items in store
 	OFFSET items;			// offset to store text (from start of string table)
 };
 
@@ -114,8 +129,8 @@ typedef struct _xstore XSTORE;
 
 // Interpreter rule structure
 struct _xrule {
-	unsigned long ilen; 		// input rule length (items)
-	unsigned long olen; 		// output rule length (items)
+	UINT ilen; 		// input rule length (items)
+	UINT olen; 		// output rule length (items)
 	OFFSET lhs; 				// offset to input (match) rule (from start of string table)
 	OFFSET rhs; 				// offset to output (process) rule (from start of string table)
 };
@@ -124,11 +139,11 @@ typedef struct _xrule XRULE;
 
 // Unnamed groups (each group header is followed by its rules, so the rules are not included) 
 struct _xgroup {
-	unsigned long flags;	// group flags
-	unsigned long nrules;	// number of rules in group
-	unsigned long rule1;	// (absolute) rule number of first rule of group
-	unsigned long mrlen;	// length of match rule (rhs)
-	unsigned long nmrlen;	// length of nomatch rule (rhs)
+	UINT flags;	// group flags
+	UINT nrules;	// number of rules in group
+	UINT rule1;	// (absolute) rule number of first rule of group
+	UINT mrlen;	// length of match rule (rhs)
+	UINT nmrlen;	// length of nomatch rule (rhs)
 	OFFSET match;			// offset to match (rhs) rule (from start of string table)
 	OFFSET nomatch; 		// offset to nomatch (rhs) rule (from start of string table)
 };
@@ -140,16 +155,16 @@ struct _xkeyboard {
 	char id[4]; 						// always KMFL
 	char version[4];				// keyboard version(3) and file version(1)
 	char name[NAMELEN+1];			// utf8 version of keyboard name
-	unsigned long mode:1;			// Keyboard Flags:	Unicode (0) or ANSI (1)
-	unsigned long layout:1; 		//					positional(0) or mnemonic(1)
-	unsigned long capson:1; 		//					caps on only
-	unsigned long capsoff:1;		//					caps always off
-	unsigned long capsfree:1;		//					shift frees caps
-	unsigned long usedll:1; 		//					use external library (to be implemented)
-	unsigned long hotkey;			// shift state + keysym for hotkey	
-	unsigned long group1;			// index of first group used 
-	unsigned long nstores;			// number of defined stores 
-	unsigned long ngroups;			// number of groups 
+	UINT mode:1;			// Keyboard Flags:	Unicode (0) or ANSI (1)
+	UINT layout:1; 		//					positional(0) or mnemonic(1)
+	UINT capson:1; 		//					caps on only
+	UINT capsoff:1;		//					caps always off
+	UINT capsfree:1;		//					shift frees caps
+	UINT usedll:1; 		//					use external library (to be implemented)
+	UINT hotkey;			// shift state + keysym for hotkey	
+	UINT group1;			// index of first group used 
+	UINT nstores;			// number of defined stores 
+	UINT ngroups;			// number of groups 
 };
 
 typedef struct _xkeyboard XKEYBOARD;

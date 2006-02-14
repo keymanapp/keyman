@@ -87,9 +87,18 @@
     bit mask & shift operations.
 ------------------------------------------------------------------------ */
 
+#ifndef _WIN32
+#include <stdint.h>
+#endif
+#ifdef __uint32_t_defined
+typedef uint32_t	UTF32;	/* at least 32 bits */
+typedef uint16_t	UTF16;	/* at least 16 bits */
+typedef uint8_t	UTF8;	/* typically 8 bits */
+#else
 typedef unsigned long	UTF32;	/* at least 32 bits */
 typedef unsigned short	UTF16;	/* at least 16 bits */
 typedef unsigned char	UTF8;	/* typically 8 bits */
+#endif
 typedef unsigned char	Boolean; /* 0 or 1 */
 
 /* Some fundamental constants */

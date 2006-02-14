@@ -24,4 +24,4 @@ libkmflcomp_la_LDFLAGS =
 
 libkmflcomp_la_LIBADD = 
 
-YFLAGS = -d
+AM_YFLAGS = -d

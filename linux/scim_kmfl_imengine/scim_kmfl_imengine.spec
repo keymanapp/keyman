@@ -5,10 +5,30 @@
 %define _prefix	/usr
 %define _unpackaged_files_terminate_build 0
 
+%define is_mandrake %(test -e /etc/mandrake-release && echo 1 || echo 0)
+%define is_suse %(test -e /etc/SuSE-release && echo 1 || echo 0)
+%define is_fedora %(test -e /etc/fedora-release && echo 1 || echo 0)
+
+%if %is_mandrake
+%define dist mandrake
+%define disttag mdk
+%endif
+%if %is_suse
+%define dist suse
+%define disttag suse
+%define kde_path /opt/kde3
+%endif
+%if %is_fedora
+%define dist fedora
+%define disttag rhfc
+%endif
+
+%define distver %(release="`rpm -q --queryformat='%{VERSION}' %{dist}-release 2> /dev/null | tr . : | sed s/://g`" ; if test $? != 0 ; then release="" ; fi ; echo "$release")
+
 Summary:         %{name}
 Name:            scim_kmfl_imengine
-Version:         0.9
-Release:         1mdk
+Version:         0.9.1
+Release:         1%{disttag}%{distver}
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>
 Group:           Applications/System

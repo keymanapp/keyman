@@ -2,6 +2,7 @@ kmflcomp (0.9.1-1) unstable; urgency=low
 
   * fix headers for C++ inclusion
   * fix bug when compile a keyboard with Non UTF upper ANSI characters
+  * AMD64 fixes
 
  -- Doug Rintoul <doug_rintoulsil.org>  Tue, 02 Feb 2006 11:40:00 +0800
 

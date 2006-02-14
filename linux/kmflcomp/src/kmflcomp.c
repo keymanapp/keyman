@@ -1062,28 +1062,28 @@ char *items_to_string(ITEM *p)
 		{
 		case ITEM_CHAR:
 			if(*p&0xffff80)
-				sp += sprintf(sp,"[0x%lx]",(*p&0xffffff));
+				sp += sprintf(sp,"[0x%x]",(*p&0xffffff));
 			else
 				*sp++ = (char)*p; 
 			break;
 		case ITEM_KEYSYM:
-			sp += sprintf(sp,"[key %lx,0x%lx]",(*p&0xff0000)>>16,(*p&0xff));
+			sp += sprintf(sp,"[key %x,0x%x]",(*p&0xff0000)>>16,(*p&0xff));
 			break;
 		case ITEM_ANY:
 			sp += sprintf(sp,"[any %u]",(unsigned)(*p&0xffff));
 			break;
 		case ITEM_INDEX:
-			sp += sprintf(sp,"[index %ld,%lu]",(*p&0xff0000)>>16,(*p&0xffff));
+			sp += sprintf(sp,"[index %d,%u]",(*p&0xff0000)>>16,(*p&0xffff));
 			break;
 		case ITEM_OUTS:
-			sp += sprintf(sp,"[outs %lu]",(*p&0xffff));
+			sp += sprintf(sp,"[outs %u]",(*p&0xffff));
 			break;
 		case ITEM_DEADKEY:
-			sp += sprintf(sp,"[dk %lu]",(*p&0xffff));
+			sp += sprintf(sp,"[dk %u]",(*p&0xffff));
 			break;
 		case ITEM_CONTEXT:
 			if(*p & 0xff)
-				sp += sprintf(sp,"[context %lu]",(*p&0xff));
+				sp += sprintf(sp,"[context %u]",(*p&0xff));
 			else
 				sp += sprintf(sp,"[context]");
 			break;
@@ -1097,7 +1097,7 @@ char *items_to_string(ITEM *p)
 			sp += sprintf(sp,"[beep]");
 			break;
 		case ITEM_USE:
-			sp += sprintf(sp,"[use %lu]",(*p&0xffff));
+			sp += sprintf(sp,"[use %u]",(*p&0xffff));
 			break;
 		case ITEM_MATCH:
 			sp += sprintf(sp,"[match]");
@@ -1109,7 +1109,7 @@ char *items_to_string(ITEM *p)
 			sp += sprintf(sp,"[+]");
 			break;
 		case ITEM_CALL:
-			sp += sprintf(sp,"[use %lu]",(*p&0xffff));
+			sp += sprintf(sp,"[use %u]",(*p&0xffff));
 			break;
 		}
 	}
@@ -1421,7 +1421,7 @@ int check_bitmap_file(STORE *sp, int line)
 	UTF32 *p1,*titems=NULL;
 	UTF8 *p2;
 
-	p1 = sp->items; p2 = tname;
+	p1 = sp->items; p2 = (UTF8*)tname;
 	ConvertUTF32toUTF8((const UTF32 **)&p1,(sp->items+sp->len),&p2,(UTF8 *)(tname+63),0);
 	*p2 = 0;
 
@@ -1477,8 +1477,8 @@ int check_bitmap_file(STORE *sp, int line)
 		if(sp->len)mem_free(sp->items);
 		// First allocate more than will be needed
 		titems = (UTF32 *)checked_alloc(strlen(p)+1,sizeof(UTF32));
-		p2 = p; p1 = titems;					
-		ConvertUTF8toUTF32((const UTF8 **)&p2,(p+strlen(p)),(UTF32 **)&p1,p1+strlen(p),0);
+		p2 = (UTF8*)p; p1 = titems;					
+		ConvertUTF8toUTF32((const UTF8 **)&p2,(UTF8*)(p+strlen(p)),(UTF32 **)&p1,p1+strlen(p),0);
 		sp->len = (UINT)(p1 - titems);	// Then reallocate to exact length
 		sp->items = (ITEM *)checked_alloc(sp->len,sizeof(ITEM));
 		for(i=0; i<sp->len; i++) *(sp->items+i) = *(titems+i);

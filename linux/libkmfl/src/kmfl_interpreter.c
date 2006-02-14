@@ -528,7 +528,7 @@ void output_item(void *connection, ITEM x)
 
 	result = ConvertUTF32toUTF8((const UTF32 **)&pin,utfin+1,&pout,utfout+15, 0);
 	*pout = 0;
-	output_string(connection, utfout);
+	output_string(connection, (char *)utfout);
 }
 
 // Return the address of the referenced store
@@ -626,6 +626,6 @@ int kmfl_get_header(KMSI *p_kmsi,int hdrID,char *buf,int buflen)
 	if(nitems == 0) return -4;
 	
 	memset(buf,0,buflen);
-	return ConvertUTF32toUTF8(&p32,p32+nitems,&p8,p8+buflen-1,0);
+	return ConvertUTF32toUTF8((const UTF32**)&p32,p32+nitems,&p8,p8+buflen-1,0);
 }
 

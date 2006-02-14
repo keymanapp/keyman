@@ -1,6 +1,7 @@
 scim-kmfl-imengine (0.9.1-1) unstable; urgency=low
 
   * fix enumeration of uncompiled keyboards in scim kmfl setup
+  * AMD64 fixes
 
  -- Doug Rintoul <doug_rintoulsil.org>  Mon, 02 Feb 2006 11:00:00 +0800
 

@@ -43,8 +43,8 @@ typedef struct _deadkey DEADKEY;
 // Named stores
 struct _store {
 	char name[NAMELEN+1];		// name of store
-	unsigned long len;			// number of items in store
-	int lineno;             // first definition
+	UINT len;			// number of items in store
+	INT lineno;             // first definition
 	ITEM *items;				// store text (item list)
 	struct _store *next;		// pointer to next store
 };
@@ -53,11 +53,11 @@ typedef struct _store STORE;
 
 // Processing rules
 struct _rule {
-	unsigned long ilen; 		// input rule length (items)
-	unsigned long olen; 		// output rule length (items)
+	UINT ilen; 		// input rule length (items)
+	UINT olen; 		// output rule length (items)
 	ITEM *lhs;					// input (match) rule
 	ITEM *rhs;					// output (process) rule 
-	int line;					// source code line number
+	INT line;					// source code line number
 	struct _rule *next; 		// pointer to next rule
 };
 
@@ -66,10 +66,10 @@ typedef struct _rule RULE;
 // Named rule-groups
 struct _group {
 	char name[NAMELEN+1];				// name of group
-	unsigned long flags;		// group flags
-	unsigned long nrules;		// number of rules in group
-	unsigned long mrlen;		// length of match rule (rhs)
-	unsigned long nmrlen;		// length of nomatch rule (rhs)
+	UINT flags;		// group flags
+	UINT nrules;		// number of rules in group
+	UINT mrlen;		// length of match rule (rhs)
+	UINT nmrlen;		// length of nomatch rule (rhs)
 	ITEM *match;				// match rule (rhs)
 	ITEM *nomatch;				// nomatch rule (rhs)
 	RULE *rules;				// linked list of rules
@@ -83,17 +83,17 @@ struct _keyboard {
 	char id[4]; 					// always KMFL
 	char version[4];			// initially 1000
 	char name[NAMELEN+1];		// utf8 version of keyboard name
-	unsigned long mode:1;		// Keyboard Flags:	Unicode (0) or ANSI (1)
-	unsigned long layout:1; 	//					positional(0) or mnemonic(1)
-	unsigned long capson:1; 	//					caps on only
-	unsigned long capsoff:1;	//					caps always off
-	unsigned long capsfree:1;	//					shift frees caps
-	unsigned long usedll:1; 	//					use external library (to be implemented)
-	unsigned long hotkey;		// shift state + keysym for hotkey	
-	unsigned long group1;		// index of first group used
-	unsigned long nstores;		// number of defined stores 
-	unsigned long ngroups;		// number of groups 
-	unsigned long ndeadkeys;	// number of deadkeys
+	UINT mode:1;		// Keyboard Flags:	Unicode (0) or ANSI (1)
+	UINT layout:1; 	//					positional(0) or mnemonic(1)
+	UINT capson:1; 	//					caps on only
+	UINT capsoff:1;	//					caps always off
+	UINT capsfree:1;	//					shift frees caps
+	UINT usedll:1; 	//					use external library (to be implemented)
+	UINT hotkey;		// shift state + keysym for hotkey	
+	UINT group1;		// index of first group used
+	UINT nstores;		// number of defined stores 
+	UINT ngroups;		// number of groups 
+	UINT ndeadkeys;	// number of deadkeys
 	GROUP *groups;				// address of linked list of groups
 	STORE *stores;				// address of linked list of stores
 	DEADKEY *deadkeys;			// address of linked list of deadkeys

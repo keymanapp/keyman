@@ -1,6 +1,7 @@
 libkmfl (0.9.1-1) unstable; urgency=low
 
   * further fix for the shift key problem
+  * AMD64 fixes
 
  -- Doug Rintoul <doug_rintoulsil.org>  Wed, 12 Oct 2005 09:45:00 +0800
 
