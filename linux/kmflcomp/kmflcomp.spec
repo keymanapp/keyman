@@ -1,11 +1,16 @@
 %define _prefix	/usr
 
 %define is_mandrake %(test -e /etc/mandrake-release && echo 1 || echo 0)
+%define is_mandriva %(test -e /etc/mandriva-release && echo 1 || echo 0)
 %define is_suse %(test -e /etc/SuSE-release && echo 1 || echo 0)
 %define is_fedora %(test -e /etc/fedora-release && echo 1 || echo 0)
 
 %if %is_mandrake
 %define dist mandrake
+%define disttag mdk
+%endif
+%if %is_mandriva
+%define dist mandriva
 %define disttag mdk
 %endif
 %if %is_suse
