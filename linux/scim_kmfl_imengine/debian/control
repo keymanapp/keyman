@@ -1,13 +1,13 @@
 Source: scim-kmfl-imengine
 Priority: optional
 Maintainer: Doug Rintoul <doug_rintoul@sil.org>
-Build-Depends: debhelper (>= 4.0.0), libkmfl-dev, libscim-dev (>=1.4.1)
+Build-Depends: debhelper (>= 4.0.0), libkmfl-dev, libscim-dev (>=1.4.1), libxkbfile-dev
 Standards-Version: 3.6.1
 
 Package: scim-kmfl-imengine
 Section: utils
 Architecture: i386
-Depends: libkmflcomp, libkmfl, libscim8c2a (>=1.4.1), scim (>=1.4.1)
+Depends: libkmflcomp, libkmfl, scim (>=1.4.1)
 Description: KMFL imengine for SCIM
  KMFL imengine for SCIM
 
