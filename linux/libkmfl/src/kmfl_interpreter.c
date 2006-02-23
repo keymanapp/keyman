@@ -236,7 +236,7 @@ int process_group(KMSI *p_kmsi, XGROUP *gp)
 int match_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys) 
 {
 	
-	UINT k, m, n, nmax, rulelen, nhistory;
+	UINT k, m, n, nmax, rulelen, nhistory, index;
 	ITEM *pr, *ph, *ps, mask;
 
 	rulelen = rp->ilen;
@@ -277,8 +277,15 @@ int match_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 			break;				// matched - continue matching string
 
 		case ITEM_INDEX:		// indexes start from 1, not 0
-			ps = store_content(p_kmsi,STORE_NUMBER(*pr));
-			if(*pr != *(ps + any_index[INDEX_OFFSET(*pr)-1])) return 0;	
+			index= any_index[INDEX_OFFSET(*pr)-1];
+			if (index >= store_length(p_kmsi,STORE_NUMBER(*pr)))
+			{
+				ERRMSG("\"any index\" out of range\n");
+				return 0;
+			} else {
+				ps = store_content(p_kmsi,STORE_NUMBER(*pr));
+				if(*pr != *(ps + any_index[INDEX_OFFSET(*pr)-1])) return 0;	
+			}
 			break;				// matched - continue matching string
 
 
@@ -319,7 +326,7 @@ int match_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 int process_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys) 
 {
 	XGROUP *gp;
-	UINT i, k, m, n, nout, itp;
+	UINT i, k, m, n, nout, itp, index;
 	ITEM *p, *pr, *ps, output[MAX_OUTPUT+1], history[MAX_HISTORY], *it;
 	int erase, result, retCode=1, nhistory;
 
@@ -363,14 +370,21 @@ int process_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 			break;
 
 		case ITEM_INDEX:	// note that indexes start from 1, not 0
-			ps = store_content(p_kmsi,STORE_NUMBER(*pr));
-			it=ps + any_index[INDEX_OFFSET(*pr)-1];
-			if (ITEM_TYPE(*it) == ITEM_BEEP)
+			index= any_index[INDEX_OFFSET(*pr)-1];
+			if (index >= store_length(p_kmsi,STORE_NUMBER(*pr)))
 			{
-	                        DBGMSG(1, "DAR -libkmfl - *** index beep*** \n");
-        	                output_beep(p_kmsi->connection);
+				ERRMSG("\"any index\" out of range\n");
+				return -1;
 			} else {
-				*p++ = *it;
+				ps = store_content(p_kmsi,STORE_NUMBER(*pr));
+				it=ps + index;
+				if (ITEM_TYPE(*it) == ITEM_BEEP)
+				{
+	                        	DBGMSG(1, "DAR -libkmfl - *** index beep*** \n");
+        	                	output_beep(p_kmsi->connection);
+				} else {
+					*p++ = *it;
+				}
 			}
 			
 			break;
