@@ -159,7 +159,7 @@ void fail(int errcode, char *s, ...);
 
 // External references used while parsing
 extern KEYBOARD *kbp;
-extern int errcount, warnings;
+extern int errcount, lineno, done;
 
 // Prototypes and references used by yacc/lex
 int yylex(void);
