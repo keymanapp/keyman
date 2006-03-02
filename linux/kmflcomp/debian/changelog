@@ -1,4 +1,4 @@
-libkmfl (0.9.2-1) unstable; urgency=low
+kmflcomp (0.9.2-1) unstable; urgency=low
 
   * Replace UTF Conversion library with a GPLed implementation
   * add version and usage message to kmflcomp
