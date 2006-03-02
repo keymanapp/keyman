@@ -56,7 +56,7 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libkmfl_la_DEPENDENCIES =
-am_libkmfl_la_OBJECTS = libkmfl_la-ConvertUTF.lo \
+am_libkmfl_la_OBJECTS = libkmfl_la-utfconv.lo \
 	libkmfl_la-kmfl_interpreter.lo \
 	libkmfl_la-kmfl_load_keyboard.lo libkmfl_la-kmfl_messages.lo
 libkmfl_la_OBJECTS = $(am_libkmfl_la_OBJECTS)
@@ -191,11 +191,10 @@ libkmfl_la_CFLAGS = \
 
 lib_LTLIBRARIES = libkmfl.la
 libkmfl_la_SOURCES = \
-	ConvertUTF.c\
+	utfconv.c\
 	kmfl_interpreter.c\
 	kmfl_load_keyboard.c\
-	kmfl_messages.c\
-	ConvertUTF.h
+	kmfl_messages.c
 
 libkmfl_la_LDFLAGS = -lkmflcomp
 libkmfl_la_LIBADD = 
@@ -268,10 +267,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkmfl_la-ConvertUTF.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkmfl_la-kmfl_interpreter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkmfl_la-kmfl_load_keyboard.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkmfl_la-kmfl_messages.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkmfl_la-utfconv.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -294,12 +293,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-libkmfl_la-ConvertUTF.lo: ConvertUTF.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkmfl_la_CFLAGS) $(CFLAGS) -MT libkmfl_la-ConvertUTF.lo -MD -MP -MF "$(DEPDIR)/libkmfl_la-ConvertUTF.Tpo" -c -o libkmfl_la-ConvertUTF.lo `test -f 'ConvertUTF.c' || echo '$(srcdir)/'`ConvertUTF.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkmfl_la-ConvertUTF.Tpo" "$(DEPDIR)/libkmfl_la-ConvertUTF.Plo"; else rm -f "$(DEPDIR)/libkmfl_la-ConvertUTF.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ConvertUTF.c' object='libkmfl_la-ConvertUTF.lo' libtool=yes @AMDEPBACKSLASH@
+libkmfl_la-utfconv.lo: utfconv.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkmfl_la_CFLAGS) $(CFLAGS) -MT libkmfl_la-utfconv.lo -MD -MP -MF "$(DEPDIR)/libkmfl_la-utfconv.Tpo" -c -o libkmfl_la-utfconv.lo `test -f 'utfconv.c' || echo '$(srcdir)/'`utfconv.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkmfl_la-utfconv.Tpo" "$(DEPDIR)/libkmfl_la-utfconv.Plo"; else rm -f "$(DEPDIR)/libkmfl_la-utfconv.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utfconv.c' object='libkmfl_la-utfconv.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkmfl_la_CFLAGS) $(CFLAGS) -c -o libkmfl_la-ConvertUTF.lo `test -f 'ConvertUTF.c' || echo '$(srcdir)/'`ConvertUTF.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkmfl_la_CFLAGS) $(CFLAGS) -c -o libkmfl_la-utfconv.lo `test -f 'utfconv.c' || echo '$(srcdir)/'`utfconv.c
 
 libkmfl_la-kmfl_interpreter.lo: kmfl_interpreter.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkmfl_la_CFLAGS) $(CFLAGS) -MT libkmfl_la-kmfl_interpreter.lo -MD -MP -MF "$(DEPDIR)/libkmfl_la-kmfl_interpreter.Tpo" -c -o libkmfl_la-kmfl_interpreter.lo `test -f 'kmfl_interpreter.c' || echo '$(srcdir)/'`kmfl_interpreter.c; \

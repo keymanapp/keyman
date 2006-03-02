@@ -42,7 +42,7 @@
 
 #include <kmfl/kmfl.h>
 #include "libkmfl.h"
-#include "ConvertUTF.h"
+#include "utfconv.h"
 #include <kmfl/kmflcomp.h>
 
 // Globally loaded keyboards and instances
@@ -389,7 +389,7 @@ const char *kmfl_icon_file(int keyboard_number)
 		{
 			p32 = strings + stores[SS_BITMAP].items;
 			p8 = icon_name;
-			ConvertUTF32toUTF8((const UTF32**)&p32,p32+stores[SS_BITMAP].len,&p8,p8+255,0);
+			IConvertUTF32toUTF8((const UTF32**)&p32,p32+stores[SS_BITMAP].len,&p8,p8+255);
 			*p8 = 0;
 		}
 	}

@@ -28,7 +28,7 @@
 #include <sys/stat.h>
 #include <setjmp.h>
 
-#include "ConvertUTF.h"
+#include "utfconv.h"
 #include "compiler.h"
 #include "yacc.h"
 #include <kmflcomp.h>
@@ -252,7 +252,7 @@ void check_keyboard(KEYBOARD *kbp)
 		for(n=0,p=sp->items; n<sp->len && *p!=0; n++,p++) *p &= 0xffffff;
 		
 		p1 = (UTF32 *)sp->items; p2 = (UTF8 *)kbp->name;
-		ConvertUTF32toUTF8((const UTF32 **)&p1,(sp->items+sp->len),&p2,(UTF8 *)(kbp->name+NAMELEN),0);
+		IConvertUTF32toUTF8((const UTF32 **)&p1,(const UTF32 *)(sp->items+sp->len),&p2,(UTF8 *)(kbp->name+NAMELEN));
 		*p2 = 0;
 	}
 }
@@ -1022,7 +1022,7 @@ ITEM *items_from_string(char *sp, int line)
 	ITEM *p, *p0;
 	int i, n;
 	char * s0;
-	ConversionResult result;
+	size_t result;
 	
 	n = strlen(sp);
 	p = p0 = (ITEM *)checked_alloc(n+1,sizeof(ITEM));	
@@ -1032,7 +1032,7 @@ ITEM *items_from_string(char *sp, int line)
 	if(file_format == KF_UNICODE)
 	{
 		s0=sp;
-		result = ConvertUTF8toUTF32((const UTF8 **)&sp,(sp+n),(UTF32 **)&p,(UTF32 *)(p0+n+1),0);
+		result = IConvertUTF8toUTF32((const UTF8 **)&sp,(const UTF8 *)(sp+n),(UTF32 **)&p,(UTF32 *)(p0+n+1));
 		// Use ANSI conversion if UTF-8 conversion failed (for compatibility with old source files)
 		if(result != 0)
 		{
@@ -1424,8 +1424,9 @@ int check_bitmap_file(STORE *sp, int line)
 	UTF32 *p1,*titems=NULL;
 	UTF8 *p2;
 
-	p1 = sp->items; p2 = (UTF8*)tname;
-	ConvertUTF32toUTF8((const UTF32 **)&p1,(sp->items+sp->len),&p2,(UTF8 *)(tname+63),0);
+	p1 = (UTF32*)sp->items; 
+	p2 = (UTF8*)tname;
+	IConvertUTF32toUTF8((const UTF32 **)&p1,(const UTF32 *)(sp->items+sp->len),&p2,(UTF8 *)(tname+63));
 	*p2 = 0;
 
 	if((p=rindex(fname,DIRDELIM)) != NULL) 
@@ -1481,7 +1482,7 @@ int check_bitmap_file(STORE *sp, int line)
 		// First allocate more than will be needed
 		titems = (UTF32 *)checked_alloc(strlen(p)+1,sizeof(UTF32));
 		p2 = (UTF8*)p; p1 = titems;					
-		ConvertUTF8toUTF32((const UTF8 **)&p2,(UTF8*)(p+strlen(p)),(UTF32 **)&p1,p1+strlen(p),0);
+		IConvertUTF8toUTF32((const UTF8 **)&p2,(UTF8*)(p+strlen(p)),(UTF32 **)&p1,p1+strlen(p));
 		sp->len = (UINT)(p1 - titems);	// Then reallocate to exact length
 		sp->items = (ITEM *)checked_alloc(sp->len,sizeof(ITEM));
 		for(i=0; i<sp->len; i++) *(sp->items+i) = *(titems+i);
@@ -1511,7 +1512,7 @@ FILE *UTF16toUTF8(FILE *fp)
 	while(fread(t16,2,1,fp))
 	{
 		p16 = t16; p8 = t8; p16a = p16+1;
-		if(ConvertUTF16toUTF8(&p16,p16a,&p8,t8+2047,0) == 0)
+		if(IConvertUTF16toUTF8(&p16,p16a,&p8,t8+2047) == 0)
 			fwrite(t8,1,(size_t)(p8-t8),fp8);
 		else 
 			fail(1,"unable to convert Unicode file, illegal or malformed UTF16 sequence");		

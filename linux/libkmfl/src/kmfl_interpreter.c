@@ -53,7 +53,7 @@
 
 #include <kmfl/kmfl.h>
 #include "libkmfl.h"
-#include "ConvertUTF.h"
+#include "utfconv.h"
 
 // Macros to find index offsets and referenced stores or groups
 #define INDEX_OFFSET(x)		(((x)>>16)&0xff)
@@ -537,12 +537,16 @@ void output_item(void *connection, ITEM x)
 {
 	UTF32 utfin[2]={0}, *pin;
 	UTF8 utfout[16]={0}, *pout;
-	ConversionResult result;
+	size_t result;
 	utfin[0] = x; pin = &utfin[0]; pout = &utfout[0];
 
-	result = ConvertUTF32toUTF8((const UTF32 **)&pin,utfin+1,&pout,utfout+15, 0);
-	*pout = 0;
-	output_string(connection, (char *)utfout);
+	result = IConvertUTF32toUTF8((const UTF32 **)&pin,utfin+1,&pout,utfout+15);
+	
+	if (result != (size_t)-1)
+	{
+		*pout = 0;
+		output_string(connection, (char *)utfout);
+	}
 }
 
 // Return the address of the referenced store
@@ -640,6 +644,6 @@ int kmfl_get_header(KMSI *p_kmsi,int hdrID,char *buf,int buflen)
 	if(nitems == 0) return -4;
 	
 	memset(buf,0,buflen);
-	return ConvertUTF32toUTF8((const UTF32**)&p32,p32+nitems,&p8,p8+buflen-1,0);
+	return IConvertUTF32toUTF8((const UTF32**)&p32,p32+nitems,&p8,p8+buflen-1);
 }
 

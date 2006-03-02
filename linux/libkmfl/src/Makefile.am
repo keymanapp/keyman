@@ -14,11 +14,10 @@ libkmfl_la_CFLAGS =\
 lib_LTLIBRARIES = libkmfl.la
 
 libkmfl_la_SOURCES = \
-	ConvertUTF.c\
+	utfconv.c\
 	kmfl_interpreter.c\
 	kmfl_load_keyboard.c\
-	kmfl_messages.c\
-	ConvertUTF.h
+	kmfl_messages.c
 
 libkmfl_la_LDFLAGS = -lkmflcomp
 
