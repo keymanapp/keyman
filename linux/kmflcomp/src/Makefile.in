@@ -59,8 +59,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libkmflcomp_la_DEPENDENCIES =
 am_libkmflcomp_la_OBJECTS = libkmflcomp_la-yacc.lo \
 	libkmflcomp_la-lex.lo libkmflcomp_la-kmflcomp.lo \
-	libkmflcomp_la-memman.lo libkmflcomp_la-utfconv.lo \
-	libkmflcomp_la-ConvertUTF.lo
+	libkmflcomp_la-memman.lo libkmflcomp_la-utfconv.lo
 libkmflcomp_la_OBJECTS = $(am_libkmflcomp_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -210,8 +209,7 @@ libkmflcomp_la_SOURCES = \
 	lex.l\
 	kmflcomp.c\
 	memman.c\
-	utfconv.c \
-	ConvertUTF.c
+	utfconv.c 
 
 libkmflcomp_la_LDFLAGS = 
 libkmflcomp_la_LIBADD = 
@@ -290,7 +288,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkmflcomp_la-ConvertUTF.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkmflcomp_la-kmflcomp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkmflcomp_la-lex.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkmflcomp_la-memman.Plo@am__quote@
@@ -352,13 +349,6 @@ libkmflcomp_la-utfconv.lo: utfconv.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utfconv.c' object='libkmflcomp_la-utfconv.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkmflcomp_la_CFLAGS) $(CFLAGS) -c -o libkmflcomp_la-utfconv.lo `test -f 'utfconv.c' || echo '$(srcdir)/'`utfconv.c
-
-libkmflcomp_la-ConvertUTF.lo: ConvertUTF.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkmflcomp_la_CFLAGS) $(CFLAGS) -MT libkmflcomp_la-ConvertUTF.lo -MD -MP -MF "$(DEPDIR)/libkmflcomp_la-ConvertUTF.Tpo" -c -o libkmflcomp_la-ConvertUTF.lo `test -f 'ConvertUTF.c' || echo '$(srcdir)/'`ConvertUTF.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libkmflcomp_la-ConvertUTF.Tpo" "$(DEPDIR)/libkmflcomp_la-ConvertUTF.Plo"; else rm -f "$(DEPDIR)/libkmflcomp_la-ConvertUTF.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ConvertUTF.c' object='libkmflcomp_la-ConvertUTF.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libkmflcomp_la_CFLAGS) $(CFLAGS) -c -o libkmflcomp_la-ConvertUTF.lo `test -f 'ConvertUTF.c' || echo '$(srcdir)/'`ConvertUTF.c
 
 .l.c:
 	$(LEXCOMPILE) $<

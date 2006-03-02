@@ -18,8 +18,7 @@ libkmflcomp_la_SOURCES = \
 	lex.l\
 	kmflcomp.c\
 	memman.c\
-	utfconv.c \
-	ConvertUTF.c
+	utfconv.c
 
 libkmflcomp_la_LDFLAGS = 
 
