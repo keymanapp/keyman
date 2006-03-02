@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  *
  */
-
+const char * VERSION= "0.9.2";
 
 #include <stdlib.h>
 #include <stddef.h>
@@ -48,6 +48,21 @@
 
 #include <fcntl.h>
 #include <kmflcomp.h>
+const char * usagemsg=
+"usage: kmflcomp [OPTION...] file\n" \
+" -d     debug\n" \
+" -f     force compilation\n" \
+" -h     print this help message\n" \
+" -V     verbose\n" \
+" -v     print program version\n" \
+" -y     yydebug\n";
+
+void usage(void)
+{
+	fprintf(stderr, "kmflcomp version %s\n", VERSION);
+	fprintf(stderr, "%s", usagemsg);
+	exit(1);
+}
 
 int main(int argc, char *argv[]) 
 {
@@ -57,7 +72,7 @@ int main(int argc, char *argv[])
 	int errcode;
     char *fname="(stdin)";
 
-	while((opt=getopt(argc,argv,"dfvy"))!=EOF) 
+	while((opt=getopt(argc,argv,"dfhVvy"))!=EOF) 
 	{
 		switch (opt) 
 		{
@@ -67,9 +82,15 @@ int main(int argc, char *argv[])
 		case 'f':
 			opt_force=1;
 			break;
-		case 'v':
+		case 'h':
+			usage();
+			break;
+		case 'V':
 			opt_verbose = 1;
 			break;
+		case 'v':
+			fprintf(stderr, "kmflcomp version %s\n", VERSION);
+			exit(0);
 		case 'y':
 			yydebug = 1;
 			break;
@@ -77,7 +98,10 @@ int main(int argc, char *argv[])
 		nopt++;
 	}
 
-	if(argc > nopt+1) fname=argv[argc-1];
+	if(argc > nopt+1)
+		fname=argv[argc-1];
+	else
+		usage();
 
 #ifdef _WIN32
 	else if(!(fname=GetInputFile())) exit(0);
