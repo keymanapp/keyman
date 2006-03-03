@@ -1,3 +1,17 @@
+libkmfl (0.9.2-1)
+
+  * Replace UTF Conversion library with a GPLed implementation
+  * fix any/index bug
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Thu, 02 Mar 2006 11:10:00 +0800
+
+libkmfl (0.9.1-1)
+
+  * further fix for the shift key problem
+  * AMD64 fixes
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Wed, 12 Oct 2005 09:45:00 +0800
+
 0.9             30-Aug-2005
 				Fix shift key problem
 0.8             4-Jul-2005
