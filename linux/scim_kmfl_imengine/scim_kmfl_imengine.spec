@@ -32,7 +32,7 @@
 
 Summary:         %{name}
 Name:            scim_kmfl_imengine
-Version:         0.9.1
+Version:         0.9.2
 Release:         1%{disttag}%{distver}
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>

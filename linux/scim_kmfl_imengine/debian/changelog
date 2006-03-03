@@ -1,3 +1,10 @@
+scim-kmfl-imengine (0.9.2-1) unstable; urgency=low
+
+  * disable scim restart when installing keyboards with scim_kmfl_setup
+    causes apps to crash
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Mon, 02 Mar 2006 16:33:00 +0800
+
 scim-kmfl-imengine (0.9.1-1) unstable; urgency=low
 
   * fix enumeration of uncompiled keyboards in scim kmfl setup
