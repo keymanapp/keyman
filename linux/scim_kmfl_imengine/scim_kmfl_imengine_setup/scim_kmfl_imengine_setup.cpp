@@ -253,8 +253,10 @@ static bool test_file_unlink(const String & file);
 
 static void restart_scim()
 {
+#if 0
     system("killall scim-launcher");
     system("scim -d");
+#endif
 }
 
 // from scim_utility.cpp since scim-0.8.0 does not have scim_make_dir
