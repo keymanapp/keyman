@@ -62,7 +62,7 @@ am__DEPENDENCIES_1 =
 kmfl_imengine_setup_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_kmfl_imengine_setup_la_OBJECTS =  \
 	kmfl_imengine_setup_la-scim_kmfl_imengine_setup.lo \
-	kmfl_imengine_setup_la-ConvertUTF.lo
+	kmfl_imengine_setup_la-utfconv.lo
 kmfl_imengine_setup_la_OBJECTS = $(am_kmfl_imengine_setup_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -154,6 +154,7 @@ INTLTOOL_PONG_RULE = @INTLTOOL_PONG_RULE@
 INTLTOOL_PROP_RULE = @INTLTOOL_PROP_RULE@
 INTLTOOL_SCHEMAS_RULE = @INTLTOOL_SCHEMAS_RULE@
 INTLTOOL_SERVER_RULE = @INTLTOOL_SERVER_RULE@
+INTLTOOL_SERVICE_RULE = @INTLTOOL_SERVICE_RULE@
 INTLTOOL_SHEET_RULE = @INTLTOOL_SHEET_RULE@
 INTLTOOL_SOUNDLIST_RULE = @INTLTOOL_SOUNDLIST_RULE@
 INTLTOOL_THEME_RULE = @INTLTOOL_THEME_RULE@
@@ -274,7 +275,7 @@ moduledir = $(libdir)/scim-1.0/$(SCIM_BINARY_VERSION)/SetupUI
 module_LTLIBRARIES = kmfl_imengine_setup.la
 kmfl_imengine_setup_la_SOURCES = \
 	scim_kmfl_imengine_setup.cpp \
-	ConvertUTF.c
+	utfconv.c
 
 kmfl_imengine_setup_la_LDFLAGS = \
 	-avoid-version -module
@@ -283,6 +284,7 @@ kmfl_imengine_setup_la_LIBADD = \
 	$(GTK_LIBS) \
 	-lkmfl
 
+EXTRA_DIST = utfconv.h
 all: all-am
 
 .SUFFIXES:
@@ -352,8 +354,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kmfl_imengine_setup_la-ConvertUTF.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kmfl_imengine_setup_la-scim_kmfl_imengine_setup.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kmfl_imengine_setup_la-utfconv.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -376,12 +378,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-kmfl_imengine_setup_la-ConvertUTF.lo: ConvertUTF.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kmfl_imengine_setup_la_CFLAGS) $(CFLAGS) -MT kmfl_imengine_setup_la-ConvertUTF.lo -MD -MP -MF "$(DEPDIR)/kmfl_imengine_setup_la-ConvertUTF.Tpo" -c -o kmfl_imengine_setup_la-ConvertUTF.lo `test -f 'ConvertUTF.c' || echo '$(srcdir)/'`ConvertUTF.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/kmfl_imengine_setup_la-ConvertUTF.Tpo" "$(DEPDIR)/kmfl_imengine_setup_la-ConvertUTF.Plo"; else rm -f "$(DEPDIR)/kmfl_imengine_setup_la-ConvertUTF.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ConvertUTF.c' object='kmfl_imengine_setup_la-ConvertUTF.lo' libtool=yes @AMDEPBACKSLASH@
+kmfl_imengine_setup_la-utfconv.lo: utfconv.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kmfl_imengine_setup_la_CFLAGS) $(CFLAGS) -MT kmfl_imengine_setup_la-utfconv.lo -MD -MP -MF "$(DEPDIR)/kmfl_imengine_setup_la-utfconv.Tpo" -c -o kmfl_imengine_setup_la-utfconv.lo `test -f 'utfconv.c' || echo '$(srcdir)/'`utfconv.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/kmfl_imengine_setup_la-utfconv.Tpo" "$(DEPDIR)/kmfl_imengine_setup_la-utfconv.Plo"; else rm -f "$(DEPDIR)/kmfl_imengine_setup_la-utfconv.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utfconv.c' object='kmfl_imengine_setup_la-utfconv.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kmfl_imengine_setup_la_CFLAGS) $(CFLAGS) -c -o kmfl_imengine_setup_la-ConvertUTF.lo `test -f 'ConvertUTF.c' || echo '$(srcdir)/'`ConvertUTF.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kmfl_imengine_setup_la_CFLAGS) $(CFLAGS) -c -o kmfl_imengine_setup_la-utfconv.lo `test -f 'utfconv.c' || echo '$(srcdir)/'`utfconv.c
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

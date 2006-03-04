@@ -32,7 +32,7 @@ module_LTLIBRARIES	= kmfl_imengine_setup.la
 
 kmfl_imengine_setup_la_SOURCES = \
 	scim_kmfl_imengine_setup.cpp \
-	ConvertUTF.c
+	utfconv.c
 
 kmfl_imengine_setup_la_LDFLAGS = \
 	-avoid-version -module
@@ -40,3 +40,5 @@ kmfl_imengine_setup_la_LDFLAGS = \
 kmfl_imengine_setup_la_LIBADD =  \
 	$(GTK_LIBS) \
 	-lkmfl
+
+EXTRA_DIST = utfconv.h

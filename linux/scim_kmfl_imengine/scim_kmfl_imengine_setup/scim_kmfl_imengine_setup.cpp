@@ -40,7 +40,7 @@
 #include "scim_private.h"
 #include "scim.h"
 #include "gtk/scimkeyselection.h"
-#include "ConvertUTF.h"
+#include "utfconv.h"
 
 using namespace scim;
 
@@ -901,9 +901,9 @@ get_icon_name(XKEYBOARD * p_kbd)
 	if (stores[SS_BITMAP].len >= 0) {
 	    p32 = strings + stores[SS_BITMAP].items;
 	    p8 = (UTF8 *) icon_name;
-	    ConvertUTF32toUTF8((const UTF32 **) &p32,
+	    IConvertUTF32toUTF8((const UTF32 **) &p32,
 			       p32 + stores[SS_BITMAP].len, &p8,
-			       p8 + 255, strictConversion);
+			       p8 + 255);
 	    *p8 = 0;
 	}
     }
