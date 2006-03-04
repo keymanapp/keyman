@@ -1,8 +1,9 @@
 Source: kmflcomp
 Priority: optional
+Section: utils
 Maintainer: Doug Rintoul <doug_rintoul@sil.org>
 Uploaders: Daniel Glassey <wdg@debian.org>
-Build-Depends: cdbs (>= 0.4.27-1), debhelper (>= 4.1.0)
+Build-Depends: cdbs (>= 0.4.27-1), debhelper (>= 4.1.0), libx11-dev
 Standards-Version: 3.6.2
 
 Package: libkmflcomp-dev
