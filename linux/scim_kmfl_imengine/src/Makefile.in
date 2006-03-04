@@ -143,6 +143,7 @@ INTLTOOL_PONG_RULE = @INTLTOOL_PONG_RULE@
 INTLTOOL_PROP_RULE = @INTLTOOL_PROP_RULE@
 INTLTOOL_SCHEMAS_RULE = @INTLTOOL_SCHEMAS_RULE@
 INTLTOOL_SERVER_RULE = @INTLTOOL_SERVER_RULE@
+INTLTOOL_SERVICE_RULE = @INTLTOOL_SERVICE_RULE@
 INTLTOOL_SHEET_RULE = @INTLTOOL_SHEET_RULE@
 INTLTOOL_SOUNDLIST_RULE = @INTLTOOL_SOUNDLIST_RULE@
 INTLTOOL_THEME_RULE = @INTLTOOL_THEME_RULE@
@@ -188,6 +189,8 @@ PO_IN_DATADIR_FALSE = @PO_IN_DATADIR_FALSE@
 PO_IN_DATADIR_TRUE = @PO_IN_DATADIR_TRUE@
 RANLIB = @RANLIB@
 SCIM_BINARY_VERSION = @SCIM_BINARY_VERSION@
+SCIM_CFLAGS = @SCIM_CFLAGS@
+SCIM_LIBS = @SCIM_LIBS@
 SCIM_MAJOR = @SCIM_MAJOR@
 SCIM_MINOR = @SCIM_MINOR@
 SET_MAKE = @SET_MAKE@
@@ -241,10 +244,8 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-INCLUDES = \
-	 -I$(includedir)/scim-1.0
-
 kmfl_la_CFLAGS = \
+	$(SCIM_CFLAGS)\
 	-DSCIM_ICONDIR=\"$(datadir)/scim/icons\"\
 	-DSCIM_$(SCIM_MAJOR)_$(SCIM_MINOR)_0\
 	-DSCIM_KMFL_IMENGINE_MODULE_DATADIR=\"$(datadir)/scim/kmfl\" \
@@ -253,6 +254,7 @@ kmfl_la_CFLAGS = \
 	 -g
 
 kmfl_la_CXXFLAGS = \
+	$(SCIM_CFLAGS)\
 	-DSCIM_ICONDIR=\"$(datadir)/scim/icons\"\
 	-DSCIM_$(SCIM_MAJOR)_$(SCIM_MINOR)_0\
 	-DSCIM_KMFL_IMENGINE_MODULE_DATADIR=\"$(datadir)/scim/kmfl\" \
@@ -260,6 +262,7 @@ kmfl_la_CXXFLAGS = \
 	 -O1\
 	 -g
 
+EXTRA_DIST = xkbmap.h scim_kmfl_imengine.h stringtok.h scim_kmfl_imengine_private.h
 moduledir = $(libdir)/scim-1.0/$(SCIM_BINARY_VERSION)/IMEngine
 module_LTLIBRARIES = kmfl.la
 kmfl_la_SOURCES = \

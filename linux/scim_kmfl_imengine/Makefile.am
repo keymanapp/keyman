@@ -16,8 +16,8 @@ libkmfldoc_DATA = \
 	TODO\
 	ABOUT-NLS
 
-EXTRA_DIST = $(libkmfldoc_DATA)
-
+EXTRA_DIST = $(libkmfldoc_DATA) intltool-extract.in intltool-merge.in intltool-update.in
+DISTCLEANFILES = intltool-extract intltool-merge intltool-update
 
 
 # Copy all the spec files. Of cource, only one is actually used.

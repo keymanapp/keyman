@@ -10,7 +10,7 @@ SCIM_MINOR=@SCIM_MINOR@
 SCIM_BINARY_VERSION=@SCIM_BINARY_VERSION@
 
 INCLUDES =\
-	 -I$(includedir)/scim-1.0 \
+	 $(SCIM_CFLAGS)\
 	 $(GTK_CFLAGS)
 
 kmfl_imengine_setup_la_CFLAGS =\
@@ -41,4 +41,4 @@ kmfl_imengine_setup_la_LIBADD =  \
 	$(GTK_LIBS) \
 	-lkmfl
 
-EXTRA_DIST = utfconv.h
+EXTRA_DIST = utfconv.h scim_private.h
