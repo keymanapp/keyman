@@ -7,7 +7,6 @@ Standards-Version: 3.6.2
 
 Package: libkmfl-dev
 Section: libdevel
-Architecture: i386
 Depends: libkmfl0 (= ${Source-Version})
 Description: A Library for providing Keyman(C) services to Linux - development
  This package contains the header and development files needed to build
@@ -15,7 +14,6 @@ Description: A Library for providing Keyman(C) services to Linux - development
 
 Package: libkmfl0
 Section: libs
-Architecture: i386
 Depends: ${shlibs:Depends}
 Description: A Library for providing Keyman(C) services to Linux - runtime
  This package contains the runtime part of libkmfl.
