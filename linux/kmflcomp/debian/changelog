@@ -1,3 +1,9 @@
+kmflcomp (0.9.3-1) unstable; urgency=low
+
+  * Fix some packaging issues
+
+ -- Daniel Glassey <wdg@debian.org>  Sat,  4 Mar 2006 10:28:51 +0000
+
 kmflcomp (0.9.2-1) unstable; urgency=low
 
   * Replace UTF Conversion library with a GPLed implementation
