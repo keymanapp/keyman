@@ -1,1 +1,0 @@
-shlibs:Depends=libatk1.0-0 (>= 1.9.0), libc6 (>= 2.3.4-1), libcairo2 (>= 1.0.2-2), libfontconfig1 (>= 2.3.0), libgcc1 (>= 1:4.0.2), libglib2.0-0 (>= 2.9.3), libgtk2.0-0 (>= 2.8.0), libkmfl, libpango1.0-0 (>= 1.11.3), libstdc++6 (>= 4.0.2-4), libx11-6, libxcursor1 (>> 1.1.2), libxext6, libxfixes3, libxi6, libxinerama1, libxkbfile1, libxrandr2
