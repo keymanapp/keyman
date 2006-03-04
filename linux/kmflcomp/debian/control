@@ -3,7 +3,7 @@ Priority: optional
 Maintainer: Doug Rintoul <doug_rintoul@sil.org>
 Uploaders: Daniel Glassey <wdg@debian.org>
 Build-Depends: debhelper (>= 4.0.0)
-Standards-Version: 3.6.1
+Standards-Version: 3.6.2
 
 Package: libkmflcomp-dev
 Section: libdevel
