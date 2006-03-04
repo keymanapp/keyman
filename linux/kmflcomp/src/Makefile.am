@@ -20,6 +20,8 @@ libkmflcomp_la_SOURCES = \
 	memman.c\
 	utfconv.c
 
+EXTRA_DIST = compiler.h utfconv.h memman.h
+
 libkmflcomp_la_LDFLAGS = 
 
 libkmflcomp_la_LIBADD = 
