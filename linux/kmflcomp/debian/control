@@ -8,20 +8,21 @@ Standards-Version: 3.6.2
 Package: libkmflcomp-dev
 Section: libdevel
 Architecture: any
-Depends: libkmflcomp (= ${Source-Version})
+Depends: libkmflcomp0 (= ${Source-Version})
 Description: Development files for libkmflcomp
  Development libraries and headers to use libkmflcomp in an application
 
 Package: kmflcomp
 Section: utils
 Architecture: i386
-Depends: libkmflcomp (= ${Source-Version})
+Depends: libkmflcomp0 (= ${Source-Version})
 Description: KMFL Compiler
  Compile Keyman-style keyboard layout files to a binary format for use by the 
  KMFL keystroke interpreter.
 
-Package: libkmflcomp
+Package: libkmflcomp0
 Section: libs
+Depends: ${shlibs:Depends}
 Architecture: i386
 Description: KMFL compiler library
  Library to compile Keyman layout files to a binary format for use by the 
