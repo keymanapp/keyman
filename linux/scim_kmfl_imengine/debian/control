@@ -8,12 +8,14 @@ Standards-Version: 3.6.2
 
 Package: scim-kmfl-imengine
 Section: utils
+Architecture: any
 Depends: libkmflcomp, libkmfl, scim (>=1.4.1)
 Description: KMFL imengine for SCIM
  KMFL imengine for SCIM
 
 Package: scim-kmfl-imengine-dev
 Section: libdevel
+Architecture: any
 Depends: scim-kmfl-imengine
 Description: KMFL imengine for SCIM
  KMFL imengine for SCIM
