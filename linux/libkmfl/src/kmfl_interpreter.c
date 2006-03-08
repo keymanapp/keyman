@@ -52,8 +52,8 @@
 #include <string.h>
 
 #include <kmfl/kmfl.h>
+#include <kmfl/kmflutfconv.h>
 #include "libkmfl.h"
-#include "utfconv.h"
 
 // Macros to find index offsets and referenced stores or groups
 #define INDEX_OFFSET(x)		(((x)>>16)&0xff)

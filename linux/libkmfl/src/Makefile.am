@@ -14,7 +14,6 @@ libkmfl_la_CFLAGS =\
 lib_LTLIBRARIES = libkmfl.la
 
 libkmfl_la_SOURCES = \
-	utfconv.c\
 	kmfl_interpreter.c\
 	kmfl_load_keyboard.c\
 	kmfl_messages.c

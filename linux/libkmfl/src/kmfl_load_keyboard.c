@@ -41,9 +41,9 @@
 #endif
 
 #include <kmfl/kmfl.h>
-#include "libkmfl.h"
-#include "utfconv.h"
 #include <kmfl/kmflcomp.h>
+#include <kmfl/kmflutfconv.h>
+#include "libkmfl.h"
 
 // Globally loaded keyboards and instances
 XKEYBOARD *p_installed_kbd[MAX_KEYBOARDS]={NULL};

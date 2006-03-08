@@ -61,20 +61,11 @@ LTLIBRARIES = $(module_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 kmfl_imengine_setup_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_kmfl_imengine_setup_la_OBJECTS =  \
-	kmfl_imengine_setup_la-scim_kmfl_imengine_setup.lo \
-	kmfl_imengine_setup_la-utfconv.lo
+	kmfl_imengine_setup_la-scim_kmfl_imengine_setup.lo
 kmfl_imengine_setup_la_OBJECTS = $(am_kmfl_imengine_setup_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
@@ -154,7 +145,6 @@ INTLTOOL_PONG_RULE = @INTLTOOL_PONG_RULE@
 INTLTOOL_PROP_RULE = @INTLTOOL_PROP_RULE@
 INTLTOOL_SCHEMAS_RULE = @INTLTOOL_SCHEMAS_RULE@
 INTLTOOL_SERVER_RULE = @INTLTOOL_SERVER_RULE@
-INTLTOOL_SERVICE_RULE = @INTLTOOL_SERVICE_RULE@
 INTLTOOL_SHEET_RULE = @INTLTOOL_SHEET_RULE@
 INTLTOOL_SOUNDLIST_RULE = @INTLTOOL_SOUNDLIST_RULE@
 INTLTOOL_THEME_RULE = @INTLTOOL_THEME_RULE@
@@ -276,8 +266,7 @@ kmfl_imengine_setup_la_CXXFLAGS = \
 moduledir = $(libdir)/scim-1.0/$(SCIM_BINARY_VERSION)/SetupUI
 module_LTLIBRARIES = kmfl_imengine_setup.la
 kmfl_imengine_setup_la_SOURCES = \
-	scim_kmfl_imengine_setup.cpp \
-	utfconv.c
+	scim_kmfl_imengine_setup.cpp 
 
 kmfl_imengine_setup_la_LDFLAGS = \
 	-avoid-version -module
@@ -290,7 +279,7 @@ EXTRA_DIST = utfconv.h scim_private.h
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .cpp .lo .o .obj
+.SUFFIXES: .cpp .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -357,35 +346,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kmfl_imengine_setup_la-scim_kmfl_imengine_setup.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kmfl_imengine_setup_la-utfconv.Plo@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ `$(CYGPATH_W) '$<'`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-.c.lo:
-@am__fastdepCC_TRUE@	if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-
-kmfl_imengine_setup_la-utfconv.lo: utfconv.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kmfl_imengine_setup_la_CFLAGS) $(CFLAGS) -MT kmfl_imengine_setup_la-utfconv.lo -MD -MP -MF "$(DEPDIR)/kmfl_imengine_setup_la-utfconv.Tpo" -c -o kmfl_imengine_setup_la-utfconv.lo `test -f 'utfconv.c' || echo '$(srcdir)/'`utfconv.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/kmfl_imengine_setup_la-utfconv.Tpo" "$(DEPDIR)/kmfl_imengine_setup_la-utfconv.Plo"; else rm -f "$(DEPDIR)/kmfl_imengine_setup_la-utfconv.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utfconv.c' object='kmfl_imengine_setup_la-utfconv.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kmfl_imengine_setup_la_CFLAGS) $(CFLAGS) -c -o kmfl_imengine_setup_la-utfconv.lo `test -f 'utfconv.c' || echo '$(srcdir)/'`utfconv.c
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

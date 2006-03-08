@@ -1,4 +1,4 @@
-/* utfconv.h
+/* kmflutfconv.h
  * Copyright (C) 2006 SIL International
  *
  * This file is part of the KMFL library.
@@ -19,8 +19,8 @@
  *
  */
 
-#if !defined(UTFCONV_H)
-#define UTFCONV_H
+#if !defined(KMFLUTFCONV_H)
+#define KMFLUTFCONV_H
 
 #ifdef __uint32_t_defined
 typedef uint32_t        UTF32;

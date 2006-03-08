@@ -20,7 +20,7 @@
  */
 
 #include <iconv.h>
-#include "utfconv.h"
+#include "kmflutfconv.h"
 
 
 #define UTF8MODE "UTF8"

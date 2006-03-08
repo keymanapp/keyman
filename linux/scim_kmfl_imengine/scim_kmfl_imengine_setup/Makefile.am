@@ -31,8 +31,7 @@ moduledir		= $(libdir)/scim-1.0/$(SCIM_BINARY_VERSION)/SetupUI
 module_LTLIBRARIES	= kmfl_imengine_setup.la
 
 kmfl_imengine_setup_la_SOURCES = \
-	scim_kmfl_imengine_setup.cpp \
-	utfconv.c
+	scim_kmfl_imengine_setup.cpp 
 
 kmfl_imengine_setup_la_LDFLAGS = \
 	-avoid-version -module

@@ -27,7 +27,7 @@
 
 Summary:         %{name}
 Name:            kmflcomp
-Version:         0.9.2
+Version:         0.9.3
 Release:         1%{disttag}%{distver}
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>
@@ -90,6 +90,7 @@ done;
 %defattr(-,root,root)
 %{_includedir}/kmfl/kmfl.h
 %{_includedir}/kmfl/kmflcomp.h
+%{_includedir}/kmfl/kmflutfconv.h
 %{_libdir}/libkmflcomp.la
 %{_libdir}/libkmflcomp.a
 %{_libdir}/libkmflcomp.so

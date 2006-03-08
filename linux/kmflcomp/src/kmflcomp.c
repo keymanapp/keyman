@@ -28,7 +28,7 @@
 #include <sys/stat.h>
 #include <setjmp.h>
 
-#include "utfconv.h"
+#include "kmflutfconv.h"
 #include "compiler.h"
 #include "yacc.h"
 #include <kmflcomp.h>

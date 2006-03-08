@@ -8,6 +8,7 @@ kmflcomp_includedir = $(includedir)/kmfl
 
 kmflcomp_include_DATA =\
 	kmfl.h \
-	kmflcomp.h
+	kmflcomp.h \
+	kmflutfconv.h
 
 EXTRA_DIST = $(kmflcomp_include_DATA)

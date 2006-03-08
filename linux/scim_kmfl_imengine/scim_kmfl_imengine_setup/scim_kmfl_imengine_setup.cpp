@@ -37,10 +37,10 @@
 #include <errno.h>
 #include <setjmp.h>
 #include <kmfl/kmflcomp.h>
+#include <kmfl/kmflutfconv.h>
 #include "scim_private.h"
 #include "scim.h"
 #include "gtk/scimkeyselection.h"
-#include "utfconv.h"
 
 using namespace scim;
 

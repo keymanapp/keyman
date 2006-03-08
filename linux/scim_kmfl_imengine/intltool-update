@@ -557,7 +557,7 @@ sub Console_WriteError_InvalidOption
 
 sub GenerateHeaders
 {
-    my $EXTRACT = "/shared/cvs/SIL/kmfl/scim_kmfl_imengine/intltool-extract";
+    my $EXTRACT = "/home/doug/Projects/kmfl-0.9.3/scim_kmfl_imengine-0.9.3/intltool-extract";
     chomp $EXTRACT;
 
     $EXTRACT = $ENV{"INTLTOOL_EXTRACT"} if $ENV{"INTLTOOL_EXTRACT"};
@@ -611,7 +611,7 @@ sub GenerateHeaders
 #
 sub GeneratePOTemplate
 {
-    my $XGETTEXT = $ENV{"XGETTEXT"} || "/usr/bin/xgettext";
+    my $XGETTEXT = $ENV{"XGETTEXT"} || "";
     my $XGETTEXT_ARGS = $ENV{"XGETTEXT_ARGS"} || '';
     chomp $XGETTEXT;
 
@@ -782,7 +782,7 @@ sub POFile_Update
 {
     -f "$MODULE.pot" or die "$PROGRAM: $MODULE.pot does not exist.\n";
 
-    my $MSGMERGE = $ENV{"MSGMERGE"} || "/usr/bin/msgmerge";
+    my $MSGMERGE = $ENV{"MSGMERGE"} || "";
     my ($lang, $outfile) = @_;
 
     print "Merging $SRCDIR/$lang.po with $MODULE.pot..." if $VERBOSE;
@@ -825,7 +825,7 @@ sub POFile_GetLanguage ($)
 sub Console_Write_TranslationStatus
 {
     my ($lang, $output_file) = @_;
-    my $MSGFMT = $ENV{"MSGFMT"} || "/usr/bin/msgfmt";
+    my $MSGFMT = $ENV{"MSGFMT"} || "";
 
     $output_file = "$SRCDIR/$lang.po" if ($output_file eq "");
 
@@ -834,7 +834,7 @@ sub Console_Write_TranslationStatus
 
 sub Console_Write_CoverageReport
 {
-    my $MSGFMT = $ENV{"MSGFMT"} || "/usr/bin/msgfmt";
+    my $MSGFMT = $ENV{"MSGFMT"} || "";
 
     &GatherPOFiles;
 
