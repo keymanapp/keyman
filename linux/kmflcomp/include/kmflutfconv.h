@@ -22,6 +22,11 @@
 #if !defined(KMFLUTFCONV_H)
 #define KMFLUTFCONV_H
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
+
 #ifdef __uint32_t_defined
 typedef uint32_t        UTF32;
 typedef uint16_t        UTF16;
@@ -55,4 +60,7 @@ size_t IConvertUTF16toUTF32 (
 size_t IConvertUTF32toUTF16 (
 		const UTF32** sourceStart, const UTF32* sourceEnd, 
 		UTF16** targetStart, UTF16* targetEnd);
+#ifdef  __cplusplus
+}
+#endif
 #endif
