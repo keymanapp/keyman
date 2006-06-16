@@ -25,14 +25,20 @@
 %endif
 %if %is_fedora
 %define dist fedora
-%define disttag rhfc
+%define disttag fc
 %endif
 
 %define distver %(release="`rpm -q --queryformat='%{VERSION}' %{dist}-release 2> /dev/null | tr . : | sed s/://g`" ; if test $? != 0 ; then release="" ; fi ; echo "$release")
+ 
+%if %is_fedora && %{distver} == 5
+%define with_libstdc_preview 1 
+%else
+%define with_libstdc_preview 0 
+%endif
 
 Summary:         %{name}
-Name:            scim_kmfl_imengine
-Version:         0.9.3
+Name:            scim-kmfl-imengine
+Version:         0.9.4
 Release:         1%{disttag}%{distver}
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>
@@ -44,6 +50,9 @@ BuildRoot:       /var/tmp/scim_kmfl_imengine
 BuildArch:       i586
 Requires:        libkmfl scim >= 1.2.2
 Buildrequires:   libkmfl-devel scim-devel
+%if %{with_libstdc_preview}
+Buildrequires: libstdc++so7-devel
+%endif
 # Conflicts:       (none)
 # Provides:        (none)
 # Obsoletes:       (none)
@@ -68,11 +77,27 @@ KMFL imengine for SCIM
 
 %build
 [ ! -f Makefile ] || make distclean
-%configure
+%if %{with_libstdc_preview}
+export CXX=%{_bindir}/g++-libstdc++-so_7
+%endif
+%configure \
+%if !%{with_libstdc_preview}
+   --enable-ld-version-script
+%else
+%{nil}
+%endif
+%if %{with_libstdc_preview}
+# tweak libtool for libstdc++-so7
+sed -i -e "s/4.1.0 /4.2.0-`grep datestamp= %{_bindir}/g++-libstdc++-so_7 | sed -e "s/datestamp=//"` /" libtool
+%endif
 make
 
 %install
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+
+%if %{with_libstdc_preview}
+export CXX=%{_bindir}/g++-libstdc++-so_7
+%endif
 
 for doc in ABOUT-NLS AUTHORS README COPYING INSTALL NEWS TODO ChangeLog; do
 	rm -f $RPM_BUILD_ROOT%{_prefix}/doc/scim_kmfl_imengine/$doc;

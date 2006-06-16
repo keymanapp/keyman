@@ -1,4 +1,4 @@
-0.9.3
+0.9.4
 
   * Use UTF conversion routines in kmflcomp rather than a local copy
 

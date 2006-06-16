@@ -1,3 +1,11 @@
+kmflcomp (0.9.4-1)
+
+  * Consolidate utfconv to kmflcomp
+  * fix reinitialization bug when using kmflcomp to load multiple keyboards
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Fri, 16 Jun 2006 11:10:00 +0800
+
+
 kmflcomp (0.9.2-1)
 
   * Replace UTF Conversion library with a GPLed implementation

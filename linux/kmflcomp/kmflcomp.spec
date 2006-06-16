@@ -20,14 +20,14 @@
 %endif
 %if %is_fedora
 %define dist fedora
-%define disttag rhfc
+%define disttag fc
 %endif
 
 %define distver %(release="`rpm -q --queryformat='%{VERSION}' %{dist}-release 2> /dev/null | tr . : | sed s/://g`" ; if test $? != 0 ; then release="" ; fi ; echo "$release")
 
 Summary:         %{name}
 Name:            kmflcomp
-Version:         0.9.3
+Version:         0.9.4
 Release:         1%{disttag}%{distver}
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>
