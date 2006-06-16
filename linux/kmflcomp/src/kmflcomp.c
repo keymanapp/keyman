@@ -165,6 +165,8 @@ unsigned long compile_keyboard_to_buffer(const char * infile, void ** keyboard_b
 	warncount=0;
 	lineno=0;
 	done=0;
+	last_deadkey=NULL;
+	last_store=NULL;
 	kbp->deadkeys = NULL;
 	kbp->mode = KF_ANSI;		// Must be ANSI if not specified
 
