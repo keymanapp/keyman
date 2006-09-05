@@ -250,6 +250,8 @@ KmflFactory::~KmflFactory()
 bool KmflFactory::load_keyboard(const String & keyboard_file,
                                       bool user_keyboard)
 {
+    char buf[256];
+    KMSI * p_kmsi;
     m_keyboard_file = keyboard_file;
     DBGMSG(1, "DAR/jd: kmfl loading %s\n", keyboard_file.c_str());
     if (keyboard_file.length()) {
@@ -259,7 +261,26 @@ bool KmflFactory::load_keyboard(const String & keyboard_file,
             m_name = WideString(utf8_mbstowcs(kmfl_keyboard_name(m_keyboard_number)));
             DBGMSG(1, "DAR/jd: kmfl - Keyboard %s loaded\n",
                    kmfl_keyboard_name(m_keyboard_number));
-            set_languages(String(_("en_US")));
+            
+    		p_kmsi = kmfl_make_keyboard_instance(NULL);
+    		
+		    if (p_kmsi) {
+        		kmfl_attach_keyboard(p_kmsi, m_keyboard_number);
+		        *buf='\0';
+		        kmfl_get_header(p_kmsi,SS_AUTHOR,buf,sizeof(buf) - 1);
+		    	m_Author=String(buf);
+		        *buf='\0';
+		        kmfl_get_header(p_kmsi,SS_COPYRIGHT,buf,sizeof(buf) - 1);
+		    	m_Copyright=String(buf);
+		        *buf='\0';
+		        kmfl_get_header(p_kmsi,SS_LANGUAGE,buf,sizeof(buf) - 1);
+		    	m_Language=String(buf);
+		        kmfl_detach_keyboard(p_kmsi);
+		        kmfl_delete_keyboard_instance(p_kmsi);
+
+		    }
+		    if (m_Language.length() != 0)
+	            set_languages(m_Language);
             return valid();
         }
         return false;
@@ -274,12 +295,17 @@ WideString KmflFactory::get_name() const
 
 WideString KmflFactory::get_authors() const
 {
-    return utf8_mbstowcs(get_header(SS_AUTHOR));
+    return utf8_mbstowcs(m_Author);
 }
 
 WideString KmflFactory::get_credits() const
 {
-    return utf8_mbstowcs(get_header(SS_COPYRIGHT));
+    return utf8_mbstowcs(m_Copyright);
+}
+
+String KmflFactory::get_language () const
+{
+    return scim_validate_language(m_Language);
 }
 
 WideString KmflFactory::get_help() const
@@ -322,25 +348,6 @@ String KmflFactory::get_icon_file() const
             return String("");
         }
     }
-}
-
-String KmflFactory::get_header(int hdrID) const
-{
-    char buf[256];
-    KMSI * p_kmsi = kmfl_make_keyboard_instance(NULL);
-    if (p_kmsi) {
-        kmfl_attach_keyboard(p_kmsi, m_keyboard_number);
-        *buf='\0';
-        kmfl_get_header(p_kmsi,hdrID,buf,sizeof(buf) - 1);
-        kmfl_detach_keyboard(p_kmsi);
-        kmfl_delete_keyboard_instance(p_kmsi);
-    }
-    DBGMSG(1, "DAR: header is %s\n", buf);
-    return String(buf);
-}
-String KmflFactory::get_language () const
-{
-    return scim_validate_language (get_header(SS_LANGUAGE));
 }
 
 IMEngineInstancePointer

@@ -64,7 +64,9 @@ private:
     int m_keyboard_number; 	
     String m_keyboard_file;				
     String uuid;
-    String get_header(int hdrID) const;
+    String m_Language;
+    String m_Author;
+    String m_Copyright;
 
 };
 
