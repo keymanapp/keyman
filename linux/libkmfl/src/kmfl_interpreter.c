@@ -353,8 +353,10 @@ int process_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 		case ITEM_NOMATCH:
 			break;
 		default:
-			if(itp != ITEM_DEADKEY) erase_char(p_kmsi->connection);	
-			for(i=1; i<p_kmsi->nhistory; i++) p_kmsi->history[i] = p_kmsi->history[i+1];
+			if(ITEM_TYPE(p_kmsi->history[1]) != ITEM_DEADKEY) 
+				erase_char(p_kmsi->connection);	
+			for(i=1; i<p_kmsi->nhistory; i++) 
+				p_kmsi->history[i] = p_kmsi->history[i+1];
 			p_kmsi->nhistory--;
 			break;
 		}
