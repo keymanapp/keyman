@@ -70,6 +70,9 @@ int process_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys);
 UINT modified_state(UINT state);
 UINT compare_state(ITEM rule_key, ITEM keystroke);
 
+void erase_char_int(KMSI *p_kmsi);
+void queue_item_for_output(KMSI *p_kmsi, ITEM item);
+void process_output_queue(KMSI *p_kmsi);
 void output_item(void *connection, ITEM x);
 void add_to_history(KMSI *p_kmsi,ITEM key);
 void delete_from_history(KMSI *p_kmsi,UINT nchars);
@@ -93,6 +96,8 @@ int kmfl_interpret(KMSI *p_kmsi, UINT key, UINT state)
 	ITEM keysym;
 	int matched;
 
+	p_kmsi->noutput_queue=0;
+	
 	// Test first for modifier key keystrokes and do nothing
 	switch(key) 
 	{
@@ -126,15 +131,21 @@ int kmfl_interpret(KMSI *p_kmsi, UINT key, UINT state)
 
 	// Pass control to the first group for processing, and return if key was matched
 	if((matched=process_group(p_kmsi, p_group1)) > 0) 
+	{
+		process_output_queue(p_kmsi);
 		return 1;
-
+	}
+	
 	// Now try without shift state
 	if ((state & KS_SHIFT) != 0) 
 	{
 		keysym &= ~((unsigned long)KS_SHIFT<<16);
 		p_kmsi->history[0] = keysym;
 		if((matched=process_group(p_kmsi, p_group1)) > 0) 
+		{
+			process_output_queue(p_kmsi);
 			return 1;
+		}
 	}
 
 	/* need some kind of error notification if error value returned */
@@ -144,7 +155,8 @@ int kmfl_interpret(KMSI *p_kmsi, UINT key, UINT state)
 	if(((key & 0xff00) == 0) && ((state & 0xcc) == 0))
 	{
 		add_to_history(p_kmsi,(ITEM)key);
-		output_item(p_kmsi->connection,(ITEM)key);
+		queue_item_for_output(p_kmsi,(ITEM)key);
+		process_output_queue(p_kmsi);
 		return 1;
 	}
 
@@ -154,7 +166,7 @@ int kmfl_interpret(KMSI *p_kmsi, UINT key, UINT state)
 
 	case 0xff08:		// backspace - erase last character from history
 		delete_from_history(p_kmsi,1);
-		erase_char(p_kmsi->connection);
+		erase_char_int(p_kmsi);
 		return 1;
 	case 0xff09:		// tab - clear history, let app handle key
 	case 0xff0d:		// return - clear history, let app handle key
@@ -354,7 +366,7 @@ int process_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 			break;
 		default:
 			if(ITEM_TYPE(p_kmsi->history[1]) != ITEM_DEADKEY) 
-				erase_char(p_kmsi->connection);	
+				erase_char_int(p_kmsi);	
 			for(i=1; i<p_kmsi->nhistory; i++) 
 				p_kmsi->history[i] = p_kmsi->history[i+1];
 			p_kmsi->nhistory--;
@@ -483,7 +495,7 @@ int process_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
                 } 
                 else
                 {
-                	output_item(p_kmsi->connection,*p);
+                	queue_item_for_output(p_kmsi,*p);
                 	add_to_history(p_kmsi,*p);
                	}
             }
@@ -516,9 +528,11 @@ void delete_from_history(KMSI *p_kmsi,UINT nitems)
 {
 	UINT nleft;
 
-	if(p_kmsi->nhistory > MAX_HISTORY) p_kmsi->nhistory = MAX_HISTORY;
+	if(p_kmsi->nhistory > MAX_HISTORY) 
+		p_kmsi->nhistory = MAX_HISTORY;
 
-	if(nitems > p_kmsi->nhistory) nitems = p_kmsi->nhistory;
+	if(nitems > p_kmsi->nhistory) 
+		nitems = p_kmsi->nhistory;
 	nleft = p_kmsi->nhistory - nitems;
 	if(nleft > 0 && nitems > 0)
 	{
@@ -534,6 +548,39 @@ void clear_history(KMSI *p_kmsi)
 	p_kmsi->nhistory = 0;
 }
 
+// a single key event we queue items for output. If the keyboard needs to delete a 
+// character, this queue is checked first and characters are deleted first from
+// here. If this queue is empty, then characters are delete from the application
+// This avoids cases such <BS><BS><C1><BS><C2><C3> where <C1> <C2> and <C3> are
+// characters and <BS> is a backspace. What the application will see is 
+// OB<BS><BS><C2><C3>
+void queue_item_for_output(KMSI *p_kmsi, ITEM item)
+{
+	if (p_kmsi->noutput_queue < MAX_OUTPUT) 
+	{
+		p_kmsi->output_queue[p_kmsi->noutput_queue]= item;
+		(p_kmsi->noutput_queue)++;
+	} else {
+		ERRMSG("Exceeded maximum length of output allowed from any one key event.\n");
+	}
+}
+
+void process_output_queue(KMSI *p_kmsi)
+{
+	int i;
+	for (i=0; i < p_kmsi->noutput_queue; i++)
+		output_item(p_kmsi->connection, p_kmsi->output_queue[i]);
+}
+
+void erase_char_int(KMSI *p_kmsi)
+{
+	if (p_kmsi->noutput_queue > 0)
+		(p_kmsi->noutput_queue)--;
+	else
+		erase_char(p_kmsi->connection);
+}
+
+// Because some apps cannot handle a mixture of erases and commits when processing
 // Output a Unicode character (as a multi-byte string)
 void output_item(void *connection, ITEM x)
 {

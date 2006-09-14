@@ -180,6 +180,8 @@ struct _kmsi {
 	ITEM *strings;					// pointer to (32-bit) string table in loaded keyboard
 	ITEM *history;					// (32-bit) character output history
 	UINT nhistory;					// valid history count
+	ITEM output_queue[MAX_OUTPUT];
+	UINT noutput_queue;
 	struct _kmsi *next; 				// link to next instance
 	struct _kmsi *last; 				// link to previous instance
 };
