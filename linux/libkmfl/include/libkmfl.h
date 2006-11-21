@@ -31,6 +31,8 @@ int kmfl_interpret(KMSI *p_kmsi, UINT key, UINT state);
 
 int kmfl_load_keyboard(const char *file);
 int kmfl_check_keyboard(const char *file);
+int kmfl_reload_keyboard(int keyboard_number);
+int kmfl_reload_all_keyboards(void);
 int kmfl_unload_keyboard(int keyboard_number);
 int kmfl_unload_all_keyboards(void);
 
@@ -50,6 +52,8 @@ int kmfl_get_header(KMSI *p_kmsi,int hdrID,char *buf,int buflen);
 void DBGMSG(int debug,char *fmt,...);
 void *ERRMSG(char *fmt,...);
 void clear_history(KMSI *p_kmsi);
+int deadkey_in_history(KMSI *p_kmsi);
+void set_history(KMSI *p_kmsi, ITEM * items, UINT nitems);
 
 extern int kmfl_debug;
 

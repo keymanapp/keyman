@@ -508,6 +508,33 @@ int process_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 	return retCode;	// Return 1 (or 2) to indicate that the keystroke has been matched and processed
 }
 
+// Check to see if there are deadkeys in the current history
+int deadkey_in_history(KMSI *p_kmsi)
+{
+	ITEM * pitem =p_kmsi->history+1;
+	UINT nitems= p_kmsi->nhistory;
+	UINT iitem;
+
+	for (iitem=0; iitem < nitems; iitem++, pitem++) {
+		if(ITEM_TYPE(*pitem) == ITEM_DEADKEY) {
+			return 1; 
+		}
+	}
+
+	return 0;
+}
+
+// Sets the history to the surrounding context 
+void set_history(KMSI *p_kmsi, ITEM * items, UINT nitems)
+{
+
+	if (nitems > MAX_HISTORY)
+		nitems = MAX_HISTORY;
+
+	memcpy(p_kmsi->history+1, items, nitems * sizeof(ITEM));
+	p_kmsi->nhistory=nitems;
+}
+
 // Add a character item (or deadkey) to the start of the history stack (to item 1)
 void add_to_history(KMSI *p_kmsi,ITEM item) 
 {

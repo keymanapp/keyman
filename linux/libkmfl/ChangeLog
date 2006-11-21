@@ -1,3 +1,11 @@
+libkmfl (0.9.6)
+
+  * add support for get_surrounding_text to provide context sensitive input
+    methods
+  * add the ability to reload keyboards on the fly
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Tue,  7 Nov 2006 15:08:24 -0800
+
 libkmfl (0.9.5-1) 
 
   * Fix deadkeys in "any" statement problem

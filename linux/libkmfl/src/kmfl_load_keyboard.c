@@ -47,6 +47,8 @@
 
 // Globally loaded keyboards and instances
 XKEYBOARD *p_installed_kbd[MAX_KEYBOARDS]={NULL};
+char * keyboard_filename[MAX_KEYBOARDS];
+
 KMSI *p_first_instance={NULL};
 unsigned int n_keyboards=0;
 
@@ -139,6 +141,7 @@ int kmfl_attach_keyboard(KMSI *p_kmsi, int keyboard_number)
 
 	p_kbd=p_installed_kbd[keyboard_number];
 	p_kmsi->keyboard = p_kbd;
+	p_kmsi->keyboard_number = keyboard_number;
 
 	// Fill group, rule, store and string pointers
 	p_kmsi->stores = (XSTORE *)(p_kbd+1);
@@ -180,26 +183,19 @@ int kmfl_detach_keyboard(KMSI *p_kmsi)
 	return 0;
 }
 
-// Load the keyboard table into memory
-int kmfl_load_keyboard(const char *file) 
+XKEYBOARD * kmfl_load_keyboard_from_file(const char *filename)
 {
 	XKEYBOARD *p_kbd;
 	FILE *fp;
 	char version_string[6]={0};
 	unsigned int filelen, kbver=0;
 	struct stat fstat;
-	int keyboard_number;
 	const char * extension;
     int errcode;
-	
-	// Check number of installed keyboards
-	if(n_keyboards >= MAX_KEYBOARDS) return -1;
-	
-	// initialize the installed keyboards array
-	if(n_keyboards == 0)
-		memset(p_installed_kbd, 0, sizeof(XKEYBOARD *) * MAX_KEYBOARDS);
-	
-    extension = strrchr(file, '.');
+
+	DBGMSG(1,"DAR: kmfl_load_keyboard_from_file %s\n",filename);
+
+    extension = strrchr(filename, '.');
     
     if (extension && (strcmp(extension, ".kmn") == 0))
     {
@@ -208,27 +204,28 @@ int kmfl_load_keyboard(const char *file)
     	
         if (errcode == 0)
         {       
-            compile_keyboard_to_buffer(file, (void *) &p_kbd);
+            compile_keyboard_to_buffer(filename, (void *) &p_kbd);
     		memcpy(version_string,p_kbd->version,3); // Copy to ensure terminated
     		kbver = (unsigned)atoi(version_string);
         } 
         else
         {
-            return -1;
+            return NULL;
         } 
     } 
     else
     {    
     	// Get the file size
-    	if(stat(file,&fstat) != 0) 
-    	   return -1;
+    	if(stat(filename,&fstat) != 0) 
+    	   return NULL;
     	filelen = fstat.st_size;
 
     	// Allocate memory for the installed keyboard
-    	if((p_kbd=(XKEYBOARD *)malloc(filelen)) == NULL) return -1;
+    	if((p_kbd=(XKEYBOARD *)malloc(filelen)) == NULL) 
+			return NULL;
 
     	// Open the file
-    	if((fp=fopen(file,"rb")) != NULL) 
+    	if((fp=fopen(filename,"rb")) != NULL) 
     	{
     		fread(p_kbd, 1, filelen, fp);
     		fclose(fp);
@@ -243,8 +240,32 @@ int kmfl_load_keyboard(const char *file)
 		|| (kbver > (unsigned)atoi(LAST_VERSION)))
 	{
 		DBGMSG(1, "Invalid version\n");
-		free(p_kbd); return -1;
+		free(p_kbd); 
+		return NULL;
 	}
+
+	DBGMSG(1,"DAR: kmfl_load_keyboard_from_file - %s loaded\n",filename);
+	
+	return p_kbd;
+}
+
+// Load the keyboard table into memory and assign it to an empty keyboard slot
+int kmfl_load_keyboard(const char *file) 
+{
+	XKEYBOARD *p_kbd;
+	int keyboard_number;
+	
+	// Check number of installed keyboards
+	if(n_keyboards >= MAX_KEYBOARDS) return -1;
+	
+	// initialize the installed keyboards array
+	if(n_keyboards == 0)
+		memset(p_installed_kbd, 0, sizeof(XKEYBOARD *) * MAX_KEYBOARDS);
+	
+	p_kbd = kmfl_load_keyboard_from_file(file);
+
+	if (p_kbd == NULL)
+		return -1;
 
 	// Find an empty slot
 	for (keyboard_number=0;keyboard_number < MAX_KEYBOARDS; keyboard_number++)
@@ -260,9 +281,9 @@ int kmfl_load_keyboard(const char *file)
 	
 	// Copy pointer and increment number of installed keyboards
 	p_installed_kbd[keyboard_number] = p_kbd;
+	keyboard_filename[keyboard_number]=strdup(file);
 	
 	n_keyboards++;
-	
 	DBGMSG(1,"Keyboard %s loaded\n",p_kbd->name);
 
 	return keyboard_number;	
@@ -277,7 +298,8 @@ int kmfl_check_keyboard(const char *file)
 	unsigned int kbver=0;
 
 	// Open the file
-	if((fp=fopen(file,"rb")) == NULL) return(-1);
+	if((fp=fopen(file,"rb")) == NULL) 
+		return(-1);
 	
 	fread(&xkb, 1, sizeof(XKEYBOARD), fp);
 	fclose(fp);
@@ -286,12 +308,68 @@ int kmfl_check_keyboard(const char *file)
 	kbver = (unsigned)atoi(version_string);
 
 	// Check the loaded file is valid and has the correct version
-	if(memcmp(xkb.id,"KMFL",4) != 0) return(-2);
-	if(xkb.version[3] != *FILE_VERSION) return(-2);
-	if(kbver < (unsigned)atoi(BASE_VERSION)) return(-3);
-	if(kbver > (unsigned)atoi(LAST_VERSION)) return(-4);
+	if(memcmp(xkb.id,"KMFL",4) != 0) 
+		return(-2);
+	if(xkb.version[3] != *FILE_VERSION) 
+		return(-2);
+	if(kbver < (unsigned)atoi(BASE_VERSION)) 
+		return(-3);
+	if(kbver > (unsigned)atoi(LAST_VERSION)) 
+		return(-4);
 	
 	return 0;	// file appears to be valid
+}
+
+// Reload a keyboard from a file
+int kmfl_reload_keyboard(int keyboard_number)
+{
+	KMSI *p;
+	XKEYBOARD *p_kbd;
+	XKEYBOARD *p_newkbd;
+	char * keyboard_file;
+	
+	p_kbd =p_installed_kbd[keyboard_number];
+
+	if (p_kbd == NULL) 
+		return -1;
+	
+	// Detach any instances of this keyboard
+	for(p=p_first_instance; p; p=p->next)
+	{
+		if(p->keyboard_number == keyboard_number) 
+			kmfl_detach_keyboard(p);
+	}
+
+	p_newkbd=kmfl_load_keyboard_from_file(keyboard_filename[keyboard_number]);
+
+	if (p_newkbd == NULL)
+		return -1;
+	
+	p_installed_kbd[keyboard_number]=p_newkbd;
+
+	free(p_kbd);
+
+	// reattach this keyboard to instances using this keyboard
+	for(p=p_first_instance; p; p=p->next)
+	{
+		if(p->keyboard_number == keyboard_number) 
+			kmfl_attach_keyboard(p, keyboard_number);
+	}
+	
+	return 0;	
+}
+
+// Reload all keyboards
+int kmfl_reload_all_keyboards(void)
+{
+	int n;
+
+	for(n=0; n < MAX_KEYBOARDS; n++) 
+	{
+		if(p_installed_kbd[n] != NULL)
+			kmfl_reload_keyboard(n);
+	}
+	return 0;
 }
 
 // Unload a keyboard that has been installed
@@ -300,18 +378,19 @@ int kmfl_unload_keyboard(int keyboard_number)
 	KMSI *p;
 	XKEYBOARD *p_kbd=p_installed_kbd[keyboard_number];
 	
-	if (p_kbd == NULL) return -1;
+	if (p_kbd == NULL) 
+		return -1;
 	
 	// Enumerate instances and ensure that no instances are using this keyboard
 	for(p=p_first_instance; p; p=p->next)
 	{
-		if(p->keyboard == p_kbd) return 1;
+		if(p->keyboard_number == keyboard_number) return 1;
 	}
 
 		
 	// Remove keyboard from list and free memory
 	DBGMSG(1,"Keyboard %s unloaded\n",p_kbd->name);
-	
+	free(keyboard_filename[keyboard_number]);
 	free(p_kbd);
 	
 	p_installed_kbd[keyboard_number]=NULL;
