@@ -172,7 +172,8 @@ typedef struct _xkeyboard XKEYBOARD;
 // Keyboard mapping server instance
 struct _kmsi {
 	void *connection;				// instance identification passed by server
-	char kbd_name[NAMELEN+1];		// name of currently attached keyboard 
+	char kbd_name[NAMELEN+1];		// name of currently attached keyboard
+	int keyboard_number;			// the keyboard slot 
 	XKEYBOARD *keyboard;			// pointer to valid keyboard structure
 	XGROUP *groups; 				// pointer to list of groups in loaded keyboard
 	XRULE *rules;					// pointer to list of rules in loaded keyboard

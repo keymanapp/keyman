@@ -1,3 +1,12 @@
+kmflcomp (0.9.6)
+
+  * add support for get_surrounding_text to provide context sensitive input
+    methods
+  * add the ability to reload keyboards on the fly
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Tue,  7 Nov 2006 14:57:53 -0800
+                                                                                                                       
+ 
 kmflcomp (0.9.4-1)
 
   * Consolidate utfconv to kmflcomp
