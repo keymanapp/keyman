@@ -1,3 +1,21 @@
+scim-kmfl-imengine (0.9.6-2) edgy; urgency=low
+
+  * fix up postins to survive a reinstall of scim
+  * add prerm
+  * add properties dialog to kmfl section in scim-setup
+  * add a default icon for keyboards with no icon specified
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Tue, 14 Nov 2006 11:17:14 -0800
+
+scim-kmfl-imengine (0.9.6-1) edgy; urgency=low
+
+  * add support for get_surrounding_text to provide context sensitive input
+    methods
+  * add the ability to reload keyboards on the fly
+  * restart scim when a keyboard is installed or removed
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Tue,  7 Nov 2006 15:09:53 -0800
+
 scim-kmfl-imengine (0.9.3-1) unstable; urgency=low
 
   * Use UTF conversion routines in kmflcomp rather than a local copy

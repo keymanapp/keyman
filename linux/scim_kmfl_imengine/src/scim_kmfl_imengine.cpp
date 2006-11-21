@@ -36,12 +36,12 @@
 #include <kmfl/libkmfl.h>
 #include "xkbmap.h"
 
-
 #define Uses_SCIM_IMENGINE
 #define Uses_SCIM_ICONV
 #define Uses_SCIM_CONFIG_BASE
 #define Uses_SCIM_CONFIG_PATH
 #include "scim_kmfl_imengine_private.h"
+
 #include <scim.h>
 #include <queue>
 #include "scim_kmfl_imengine.h"
@@ -438,23 +438,12 @@ int KmflInstance::is_key_pressed(char *key_vec, KeySym keysym)
 bool KmflInstance::process_key_event(const KeyEvent & key)
 {
     int mask;
+    WideString context;
+    int cursor;
 
     if (!m_focused) {
         return false;
     }
-#if 0
-    // Capture the state switch key events
-    if (((key.code == SCIM_KEY_Alt_L || key.code == SCIM_KEY_Alt_R) &&
-         key.is_shift_down()) ||
-         ((key.code == SCIM_KEY_Shift_L || key.code == SCIM_KEY_Shift_R) &&
-         (key.is_alt_down() || key.is_control_down())) &&
-         key.is_key_press()) {
-        m_forward = !m_forward;
-        refresh_status_property();
-        reset();
-        return true;
-    }
-#endif
 
     DBGMSG(1, "DAR: kmfl - Keyevent, code: %x, mask: %x\n", key.code,
            key.mask);
@@ -464,6 +453,17 @@ bool KmflInstance::process_key_event(const KeyEvent & key)
         return true;
     }
 
+    if (key.code == SCIM_KEY_Sys_Req && (key.mask & SCIM_KEY_ControlMask) && (key.mask & SCIM_KEY_AltMask)){
+        DBGMSG(1, "DAR: kmfl -Reloading all keyboards\n");
+        kmfl_reload_all_keyboards();
+        return true;
+    }
+
+    if (key.code == SCIM_KEY_Print && (key.mask & SCIM_KEY_ControlMask)) {
+        DBGMSG(1, "DAR: kmfl -Reloading keyboard %s\n", p_kmsi->kbd_name);
+        kmfl_reload_keyboard(p_kmsi->keyboard_number);
+        return true;
+    }
 
     if (!m_forward) {
         // If a modifier key is pressed, check to see if it is a right modifier key
@@ -495,7 +495,22 @@ bool KmflInstance::process_key_event(const KeyEvent & key)
             reset();
             return true;
         }
+
         DBGMSG(1, "DAR: kmfl - Checking sequences for %d\n", key.code);
+
+    	if (!deadkey_in_history(p_kmsi)) {
+            if (get_surrounding_text (context, cursor, MAX_HISTORY, 0)) {
+                UINT nItems= context.size ();
+                ITEM items[MAX_HISTORY];
+
+                DBGMSG(1, "DAR: kmfl -  get_surround_text: cursor at %d, length = %d, string %s\n", cursor, nItems, utf8_wcstombs(context).c_str());
+                for (unsigned int i=0; i< nItems; ++i) {                                                                        
+                    items[nItems - i - 1] =  MAKE_ITEM(ITEM_CHAR,context [i]);
+                }
+                set_history(p_kmsi, items, nItems);
+            }
+        }
+
         if (kmfl_interpret(p_kmsi, key.code, mask) == 1) {           
             return true;        
             // Not a modifier key, ie shift, ctrl, alt, etc
@@ -541,10 +556,12 @@ void KmflInstance::focus_out()
 
 void KmflInstance::toggle_input_status()
 {
+    DBGMSG(1, "DAR: kmfl - toggle_input_status\n");
 }
 
 void KmflInstance::trigger_property(const String &property)
 {
+    DBGMSG(1, "DAR: kmfl - trigger_property\n");
 }
 
 void KmflInstance::initialize_properties ()
@@ -585,12 +602,21 @@ void KmflInstance::forward_keyevent(unsigned int key, unsigned int state)
 void KmflInstance::erase_char()
 {
     KeyEvent backspacekey(SCIM_KEY_BackSpace, 0);
+
+    WideString text;
+    int cursor;
+    bool result;
     
     DBGMSG(1, "DAR: kmfl - backspace\n");
 
-    if (!delete_surrounding_text(-1, 1)) {
-        DBGMSG(1, "DAR: kmfl -  delete_surrounding_text failed...forwarding key event\n");
+    if (get_surrounding_text (text, cursor, 1, 0)) {
+        if (!delete_surrounding_text(-1, 1)) {
+            DBGMSG(1, "DAR: delete_surrounding_text failed...forwarding key event\n");
 
+            forward_key_event(backspacekey);
+            DBGMSG(1, "DAR: kmfl -  key event forwarded\n");
+        }
+    } else {
         forward_key_event(backspacekey);
         DBGMSG(1, "DAR: kmfl -  key event forwarded\n");
     }
