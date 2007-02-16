@@ -37,7 +37,6 @@
 #include <fstream>
 #include <errno.h>
 #include <setjmp.h>
-#include <pstreams/pstream.h>
 #include <kmfl/kmflcomp.h>
 #include <kmfl/kmflutfconv.h>
 #include "scim_private.h"
@@ -256,12 +255,24 @@ static void show_restart_hint()
 
 static void restart_scim()
 {
-	redi::ipstream in("scim-config-agent -c global -g /DefaultConfigModule");
-	String DefaultConfigModule;
+    FILE *in;
+    char buff[512];
 
-	in >> DefaultConfigModule;
+    if (!(in = popen("scim-config-agent -c global -g /DefaultConfigModule", "r"))) 
+    {
+        return;
+    }
 
-	String command("/usr/lib/scim-1.0/scim-launcher -d -c " + DefaultConfigModule + " -e all -f socket --no-stay");
+    /* read the output get the default config module */
+    fgets(buff, sizeof(buff), in);
+
+    pclose(in);
+    
+    String defaultconfigmodule(buff);
+    
+	defaultconfigmodule=defaultconfigmodule.substr(0, defaultconfigmodule.length()-1);
+	
+	String command("/usr/lib/scim-1.0/scim-launcher -d -c " + defaultconfigmodule + " -e all -f socket --no-stay");
 	
 	String pkill("pkill -f \""+command+"\"");
 
