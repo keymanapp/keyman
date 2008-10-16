@@ -5,17 +5,25 @@
 ## 	Please disable it in the Anjuta project configuration
 
 INCLUDES =\
-    -I$(top_srcdir)/include 
+    -I$(top_srcdir)/include
 
-kmflcomp_CFLAGS =\
+libkmflcomp_la_CFLAGS =\
 	 -Wall\
 	 -g
 
-bin_PROGRAMS = kmflcomp
+lib_LTLIBRARIES = libkmflcomp.la
 
-kmflcomp_SOURCES = \
-	kmfl_compiler.c
+libkmflcomp_la_SOURCES = \
+	yacc.y\
+	lex.l\
+	kmflcomp.c\
+	memman.c\
+	utfconv.c
 
-kmflcomp_LDFLAGS = -lX11 -L/usr/X11R6/lib
+EXTRA_DIST = compiler.h memman.h
 
-kmflcomp_LDADD = ../src/.libs/libkmflcomp.a
+libkmflcomp_la_LDFLAGS = -lX11 -L/usr/X11R6/lib
+
+libkmflcomp_la_LIBADD = 
+
+AM_YFLAGS = -d
