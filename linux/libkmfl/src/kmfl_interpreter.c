@@ -595,8 +595,29 @@ void queue_item_for_output(KMSI *p_kmsi, ITEM item)
 void process_output_queue(KMSI *p_kmsi)
 {
 	int i;
-	for (i=0; i < p_kmsi->noutput_queue; i++)
+	
+	UTF32 utfin[2]={0};
+	UTF32 *pin;
+	UTF8 utfout[MAX_OUTPUT*4+1]={0};
+	UTF8 *pout;
+	size_t result;
+	
+	pout = &utfout[0];
+	for (i=0; i < p_kmsi->noutput_queue; i++) {
+#if 0
 		output_item(p_kmsi->connection, p_kmsi->output_queue[i]);
+#else
+		pin = &utfin[0]; 
+		utfin[0] = p_kmsi->output_queue[i]; 
+		result = IConvertUTF32toUTF8((const UTF32 **)&pin,utfin+1,&pout,utfout+MAX_OUTPUT*4);
+		if (result == (size_t)-1) {
+			ERRMSG("Exceeded maximum length of output allowed from any one key event.\n");
+			return;
+		}
+	}
+	*pout = 0;
+	output_string(p_kmsi->connection, (char *)utfout);
+#endif
 }
 
 void erase_char_int(KMSI *p_kmsi)
@@ -614,7 +635,9 @@ void output_item(void *connection, ITEM x)
 	UTF32 utfin[2]={0}, *pin;
 	UTF8 utfout[16]={0}, *pout;
 	size_t result;
-	utfin[0] = x; pin = &utfin[0]; pout = &utfout[0];
+	utfin[0] = x; 
+	pin = &utfin[0]; 
+	pout = &utfout[0];
 
 	result = IConvertUTF32toUTF8((const UTF32 **)&pin,utfin+1,&pout,utfout+15);
 	
