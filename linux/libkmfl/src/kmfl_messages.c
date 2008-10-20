@@ -34,7 +34,7 @@
 
 int kmfl_debug=0;
 
-void DBGMSG(int debug,char *fmt,...) 
+void DBGMSG(int debug,const char *fmt,...) 
 {
 	FILE * debugfile;
 	va_list args;
@@ -51,7 +51,7 @@ void DBGMSG(int debug,char *fmt,...)
 	}
 }
 
-void *ERRMSG(char *fmt,...) 
+void *ERRMSG(const char *fmt,...) 
 {
 	va_list args;
 	fprintf(stderr,"error: ");

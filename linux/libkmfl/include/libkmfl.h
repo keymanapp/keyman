@@ -49,8 +49,8 @@ const char *kmfl_icon_file(int keyboard_number);
 
 int kmfl_get_header(KMSI *p_kmsi,int hdrID,char *buf,int buflen);
 
-void DBGMSG(int debug,char *fmt,...);
-void *ERRMSG(char *fmt,...);
+void DBGMSG(int debug,const char *fmt,...);
+void *ERRMSG(const char *fmt,...);
 void clear_history(KMSI *p_kmsi);
 int deadkey_in_history(KMSI *p_kmsi);
 void set_history(KMSI *p_kmsi, ITEM * items, UINT nitems);
