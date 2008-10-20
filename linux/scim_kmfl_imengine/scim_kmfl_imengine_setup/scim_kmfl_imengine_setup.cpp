@@ -263,22 +263,25 @@ static void restart_scim()
         return;
     }
 
-    /* read the output get the default config module */
-    fgets(buff, sizeof(buff), in);
+    /* read the output to get the default config module */
+    if (fgets(buff, sizeof(buff), in) != NULL) 
+    {
+    		int result;
 
-    pclose(in);
-    
-    String defaultconfigmodule(buff);
-    
-	defaultconfigmodule=defaultconfigmodule.substr(0, defaultconfigmodule.length()-1);
-	
-	String command("/usr/lib/scim-1.0/scim-launcher -d -c " + defaultconfigmodule + " -e all -f socket --no-stay");
-	
-	String pkill("pkill -f \""+command+"\"");
+		String defaultconfigmodule(buff);
+		
+		defaultconfigmodule=defaultconfigmodule.substr(0, defaultconfigmodule.length()-1);
+		
+		String command("/usr/lib/scim-1.0/scim-launcher -d -c " + defaultconfigmodule + " -e all -f socket --no-stay");
+		
+		String pkill("pkill -f \""+command+"\"");
 
-	system(pkill.c_str());
-	system(command.c_str());	
-    show_restart_hint();
+		result=system(pkill.c_str());
+		result=system(command.c_str());	
+		show_restart_hint();
+	}
+	
+    pclose(in);    
 }
 
 // from scim_utility.cpp since scim-0.8.0 does not have scim_make_dir
@@ -302,68 +305,6 @@ make_dir (const String &dir)
         }
     }
     return true;
-}
-
-static GtkWidget *create_keyboard_page()
-{
-    GtkWidget *table;
-    GtkWidget *label;
-
-    int i;
-
-    table = gtk_table_new(3, 3, FALSE);
-    gtk_widget_show(table);
-
-    // Create keyboard setting.
-    for (i = 0; __config_keyboards[i].key; ++i) {
-	label = gtk_label_new(NULL);
-	gtk_label_set_text_with_mnemonic(GTK_LABEL(label),
-					 _(__config_keyboards[i].label));
-	gtk_widget_show(label);
-	gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
-	gtk_misc_set_padding(GTK_MISC(label), 4, 0);
-	gtk_table_attach(GTK_TABLE(table), label, 0, 1, i, i + 1,
-			 (GtkAttachOptions) (GTK_FILL),
-			 (GtkAttachOptions) (GTK_FILL), 4, 4);
-
-	__config_keyboards[i].entry = gtk_entry_new();
-	gtk_widget_show(__config_keyboards[i].entry);
-	gtk_table_attach(GTK_TABLE(table),
-			 __config_keyboards[i].entry, 1, 2, i, i + 1,
-			 (GtkAttachOptions) (GTK_FILL | GTK_EXPAND),
-			 (GtkAttachOptions) (GTK_FILL), 4, 4);
-	gtk_entry_set_editable(GTK_ENTRY
-			       (__config_keyboards[i].entry), FALSE);
-
-	__config_keyboards[i].button = gtk_button_new_with_label("...");
-	gtk_widget_show(__config_keyboards[i].button);
-	gtk_table_attach(GTK_TABLE(table),
-			 __config_keyboards[i].button, 2, 3, i,
-			 i + 1, (GtkAttachOptions) (GTK_FILL),
-			 (GtkAttachOptions) (GTK_FILL), 4, 4);
-	gtk_label_set_mnemonic_widget(GTK_LABEL(label),
-				      __config_keyboards[i].button);
-    }
-
-    for (i = 0; __config_keyboards[i].key; ++i) {
-	g_signal_connect((gpointer) __config_keyboards[i].button,
-			 "clicked",
-			 G_CALLBACK
-			 (on_default_key_selection_clicked),
-			 &(__config_keyboards[i]));
-	g_signal_connect((gpointer) __config_keyboards[i].entry,
-			 "changed",
-			 G_CALLBACK(on_default_editable_changed),
-			 &(__config_keyboards[i].data));
-    }
-
-    for (i = 0; __config_keyboards[i].key; ++i) {
-	gtk_tooltips_set_tip(__widget_tooltips,
-			     __config_keyboards[i].entry,
-			     _(__config_keyboards[i].tooltip), NULL);
-    }
-
-    return table;
 }
 
 static GtkListStore *create_kmfl_list_model()
@@ -843,10 +784,15 @@ load_kmfl_file(const String & file)
     
 	    // Open the file
 	    if ((fp = fopen(file.c_str(), "rb")) != NULL) {
-		fread(keyboard, 1, filelen, fp);
-		fclose(fp);
-		memcpy(version_string, keyboard->version, 3);	// Copy to ensure terminated
-		kbver = (unsigned) atoi(version_string);
+		if (fread(keyboard, 1, filelen, fp)> 0) {
+			memcpy(version_string, keyboard->version, 3);	// Copy to ensure terminated
+			kbver = (unsigned) atoi(version_string);
+			fclose(fp);
+		} else {
+			fclose(fp);
+			free(keyboard);
+			return NULL;
+		}
 	    }
 	    // Check the loaded file is valid and has the correct version
 	    if ((memcmp(keyboard->id, "KMFL", 4) != 0)

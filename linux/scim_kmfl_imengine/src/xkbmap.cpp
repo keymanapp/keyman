@@ -181,8 +181,10 @@ char * Xkbmap::stringFromOptions(char *orig)
 		newoptions+= *i;
 	}
 	if (orig) {
-		realloc(orig, newoptions.length() + 1);
-		strcpy(orig, newoptions.c_str());
+		orig= (char*)realloc(orig, newoptions.length() + 1);
+		
+		if (orig)
+			strcpy(orig, newoptions.c_str());
 	} else {
 		orig=strdup(newoptions.c_str());
 	}
@@ -281,7 +283,7 @@ Bool Xkbmap::applyRules(void)
 
 /* Primitive sanity check - filter out 'map names' (inside parenthesis) */
 /* that can confuse xkbcomp parser */
-Bool Xkbmap::checkName(char *name, char* str)
+Bool Xkbmap::checkName(char *name, const char* str)
 {
    char *i = name, *opar = NULL;
    Bool ret = True;

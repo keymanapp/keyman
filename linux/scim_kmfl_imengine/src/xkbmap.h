@@ -54,7 +54,7 @@ private:
 	void addStringToOptions(char *opt_str);
 	char * stringFromOptions(char *orig);
 	Bool applyRules(void);
-	Bool checkName(char *name, char* string);
+	Bool checkName(char *name, const char* string);
 	Bool applyComponentNames(void);
 
 public:
