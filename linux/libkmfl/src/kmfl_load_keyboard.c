@@ -227,7 +227,11 @@ XKEYBOARD * kmfl_load_keyboard_from_file(const char *filename)
     	// Open the file
     	if((fp=fopen(filename,"rb")) != NULL) 
     	{
-    		fread(p_kbd, 1, filelen, fp);
+    		if (fread(p_kbd, 1, filelen, fp) != filelen)
+    		{
+	    		fclose(fp);
+	    		return NULL;
+	    	}
     		fclose(fp);
     		memcpy(version_string,p_kbd->version,3); // Copy to ensure terminated
     		kbver = (unsigned)atoi(version_string);
@@ -301,7 +305,12 @@ int kmfl_check_keyboard(const char *file)
 	if((fp=fopen(file,"rb")) == NULL) 
 		return(-1);
 	
-	fread(&xkb, 1, sizeof(XKEYBOARD), fp);
+	if (fread(&xkb, 1, sizeof(XKEYBOARD), fp) != sizeof(XKEYBOARD))
+	{
+		fclose(fp);
+		return(-1);
+	}
+	
 	fclose(fp);
 	
 	memcpy(version_string,xkb.version,3);	// Copy to ensure terminated
@@ -326,7 +335,6 @@ int kmfl_reload_keyboard(int keyboard_number)
 	KMSI *p;
 	XKEYBOARD *p_kbd;
 	XKEYBOARD *p_newkbd;
-	char * keyboard_file;
 	
 	p_kbd =p_installed_kbd[keyboard_number];
 

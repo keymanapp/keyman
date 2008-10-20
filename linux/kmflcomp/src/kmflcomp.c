@@ -101,7 +101,8 @@ long save_keyboard(const char *infile, void * keyboard_buffer, unsigned long siz
 	if((out=open(outfile,O_WRONLY|O_BINARY|O_CREAT|O_TRUNC,00666)) < 0) return(-2);
 
     
-    write(out, keyboard_buffer, size);
+    	if (write(out, keyboard_buffer, size) < 0)
+    		fail(1, "cannot write compiled keyboard file %s", outfile);
     
 	close(out);
      
@@ -171,7 +172,9 @@ unsigned long compile_keyboard_to_buffer(const char * infile, void ** keyboard_b
 	kbp->mode = KF_ANSI;		// Must be ANSI if not specified
 
 	// Check for BOM at start of file 
-	fread(BOM,3,1,yyin);
+	if (fread(BOM,3,1,yyin) != 1)
+		fail(1, "Cannot read byte order mark");
+		
 	if(BOM[0] == 0xEF && BOM[1] == 0xBB && BOM[2] == 0xBF)
 	{
 		file_format = KF_UNICODE;	// Set file format to Unicode if file is UTF-8 or UTF-16 
@@ -1515,7 +1518,10 @@ FILE *UTF16toUTF8(FILE *fp)
 	{
 		p16 = t16; p8 = t8; p16a = p16+1;
 		if(IConvertUTF16toUTF8(&p16,p16a,&p8,t8+2047) == 0)
-			fwrite(t8,1,(size_t)(p8-t8),fp8);
+		{
+			if (fwrite(t8,1,(size_t)(p8-t8),fp8) == 0)
+				fail(1, "unable to write to temporary file %s", fp8);
+		}
 		else 
 			fail(1,"unable to convert Unicode file, illegal or malformed UTF16 sequence");		
 	}

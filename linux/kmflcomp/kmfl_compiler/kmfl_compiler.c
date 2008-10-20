@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  *
  */
-const char * VERSION= "0.9.2";
+const char * VERSION= "0.9.7";
 
 #include <stdlib.h>
 #include <stddef.h>
