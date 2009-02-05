@@ -3,7 +3,7 @@
  */
 
 /*
- * KMFL Input Method
+ * KMFL Input Method for SCIM (Smart Common Input Method)
  *
  * Copyright (C) 2005 SIL International
  * based on source from SCIM Copyright (c) 2004 James Su <suzhe@tsinghua.org.cn>

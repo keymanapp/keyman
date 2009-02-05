@@ -40,4 +40,4 @@ kmfl_imengine_setup_la_LIBADD =  \
 	$(GTK_LIBS) \
 	-lkmfl
 
-EXTRA_DIST = scim_private.h
+EXTRA_DIST = kmfl_private.h
