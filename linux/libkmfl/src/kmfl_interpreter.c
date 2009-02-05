@@ -258,7 +258,9 @@ int match_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 	
 	for(m=0; m<rp->ilen; pr++,ph--,m++) 
 	{
-		switch(ITEM_TYPE(*pr)) 
+		unsigned char item_type;
+		item_type=ITEM_TYPE(*pr);
+		switch(item_type) 
 		{
 		case ITEM_CHAR:
 			if(*pr != *ph) return 0;
@@ -274,6 +276,7 @@ int match_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 			break;				// matched - continue matching string
 
 		case ITEM_ANY:	// will need to allow for matching keysyms in any()
+		case ITEM_NOTANY: 
 			ps = store_content(p_kmsi,STORE_NUMBER(*pr));
 			nmax = store_length(p_kmsi,STORE_NUMBER(*pr));
 			if(m == rp->ilen-1) mask = 0xffffff; else mask = 0xffffffff;
@@ -285,7 +288,11 @@ int match_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 					break;
 				}
 			}
-			if(n == nmax) return 0;		// no match
+			if (item_type == ITEM_ANY) {
+				if(n == nmax) return 0;		// no match
+			} else {
+				if(n != nmax) return 0;		// no match
+			}
 			break;				// matched - continue matching string
 
 		case ITEM_INDEX:		// indexes start from 1, not 0

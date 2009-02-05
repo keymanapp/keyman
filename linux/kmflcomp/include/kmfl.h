@@ -33,7 +33,7 @@ extern "C" {
 
 #define FILE_VERSION	"1"
 #define BASE_VERSION	"320"
-#define LAST_VERSION	"600"
+#define LAST_VERSION	"700"
 
 // Undefine some Windows constants so we can use them (even on Windows)
 #ifdef UNDEFINED
@@ -105,7 +105,7 @@ typedef UINT OFFSET;	// 32-bit unsigned integer used as table offsets
 
 // Rule (and store) item types (high-order byte of ITEMs)
 enum {ITEM_CHAR=0,ITEM_KEYSYM,ITEM_ANY,ITEM_INDEX,ITEM_OUTS,ITEM_DEADKEY,ITEM_CONTEXT,ITEM_NUL,ITEM_RETURN,
-	ITEM_BEEP,ITEM_USE,ITEM_MATCH,ITEM_NOMATCH,ITEM_PLUS,ITEM_CALL};
+	ITEM_BEEP,ITEM_USE,ITEM_MATCH,ITEM_NOMATCH,ITEM_PLUS,ITEM_CALL, ITEM_NOTANY};
 
 // Macros to determine an item type and build an item from item type and value
 #define ITEM_TYPE(x)				(((x)>>24)&0xff)

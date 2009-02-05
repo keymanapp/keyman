@@ -1,3 +1,16 @@
+kmflcomp (0.9.8)
+
+  * add Platform conditionals
+  * add support for Keyman 7
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Mon, 26 Jan 2009 12:54:38 -0800
+
+kmflcomp (0.9.7)
+
+  * Add libx11 to link
+
+ -- Doug Rintoul <doug@intrepid>  Thu, 16 Oct 2008 16:41:09 -0700
+
 kmflcomp (0.9.6)
 
   * add support for get_surrounding_text to provide context sensitive input

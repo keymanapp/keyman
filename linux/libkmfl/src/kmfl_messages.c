@@ -41,13 +41,12 @@ void DBGMSG(int debug,const char *fmt,...)
 	
 	if((debug<0) || ((kmfl_debug&debug)!=0))
 	{
-//		debugfile=fopen("/tmp/libkmfldebug.log", "a");
-		debugfile=stderr;
+		debugfile=fopen("/tmp/libkmfldebug.log", "a");
 		fprintf(debugfile,"debug: ");
 		va_start(args,fmt);
 		vfprintf(debugfile,fmt,args);
 		va_end(args);
-//		fclose(debugfile);
+		fclose(debugfile);
 	}
 }
 

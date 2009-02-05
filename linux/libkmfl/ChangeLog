@@ -1,3 +1,16 @@
+libkmfl (0.9.8)
+
+  * add support for the notany key.
+  * Keyman version 7 support
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Mon, 26 Jan 2009 15:59:54 -0800
+
+libkmfl (0.9.7)
+
+  * Commit a complete string in one go instead of a single character at a time
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Thu, 16 Oct 2008 16:51:57 -0700
+
 libkmfl (0.9.6)
 
   * add support for get_surrounding_text to provide context sensitive input

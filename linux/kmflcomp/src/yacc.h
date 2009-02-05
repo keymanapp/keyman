@@ -1,7 +1,9 @@
-/* A Bison parser, made by GNU Bison 1.875.  */
+/* A Bison parser, made by GNU Bison 2.3.  */
 
-/* Skeleton parser for Yacc-like parsing with Bison,
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
+/* Skeleton interface for Bison's Yacc-like parsers in C
+
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,13 +17,21 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
-/* As a special exception, when this file is copied by Bison into a
-   Bison output file, you may use that output file without restriction.
-   This special exception was added by the Free Software Foundation
-   in version 1.24 of Bison.  */
+/* As a special exception, you may create a larger work that contains
+   part or all of the Bison parser skeleton and distribute that work
+   under terms of your choice, so long as that work isn't itself a
+   parser generator using the skeleton or a modified version thereof
+   as a parser skeleton.  Alternatively, if you modify or redistribute
+   the parser skeleton itself, you may (at your option) remove this
+   special exception, which will cause the skeleton and the resulting
+   Bison output files to be licensed under the GNU General Public
+   License without this special exception.
+
+   This special exception was added by the Free Software Foundation in
+   version 2.2 of Bison.  */
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -58,27 +68,29 @@
      TOK_MNEMONIC = 284,
      TOK_NOMATCH = 285,
      TOK_NAME = 286,
-     TOK_NUL = 287,
-     TOK_NUMBER = 288,
-     TOK_NL = 289,
-     TOK_OUTS = 290,
-     TOK_RAWKEY = 291,
-     TOK_PLUS = 292,
-     TOK_QM = 293,
-     TOK_RTN = 294,
-     TOK_SB = 295,
-     TOK_SHIFT = 296,
-     TOK_STORE = 297,
-     TOK_STOREINSTORE = 298,
-     TOK_SWITCH = 299,
-     TOK_UNICODE = 300,
-     TOK_USE = 301,
-     TOK_USINGKEYS = 302,
-     TOK_UTF = 303,
-     TOK_VERSION = 304,
-     TOK_XKEYSYM = 305
+     TOK_NOTANY = 287,
+     TOK_NUL = 288,
+     TOK_NUMBER = 289,
+     TOK_NL = 290,
+     TOK_OUTS = 291,
+     TOK_RAWKEY = 292,
+     TOK_PLUS = 293,
+     TOK_QM = 294,
+     TOK_RTN = 295,
+     TOK_SB = 296,
+     TOK_SHIFT = 297,
+     TOK_STORE = 298,
+     TOK_STOREINSTORE = 299,
+     TOK_SWITCH = 300,
+     TOK_UNICODE = 301,
+     TOK_USE = 302,
+     TOK_USINGKEYS = 303,
+     TOK_UTF = 304,
+     TOK_VERSION = 305,
+     TOK_XKEYSYM = 306
    };
 #endif
+/* Tokens.  */
 #define TOK_ANY 258
 #define TOK_ANSI 259
 #define TOK_AUTHOR 260
@@ -108,47 +120,48 @@
 #define TOK_MNEMONIC 284
 #define TOK_NOMATCH 285
 #define TOK_NAME 286
-#define TOK_NUL 287
-#define TOK_NUMBER 288
-#define TOK_NL 289
-#define TOK_OUTS 290
-#define TOK_RAWKEY 291
-#define TOK_PLUS 292
-#define TOK_QM 293
-#define TOK_RTN 294
-#define TOK_SB 295
-#define TOK_SHIFT 296
-#define TOK_STORE 297
-#define TOK_STOREINSTORE 298
-#define TOK_SWITCH 299
-#define TOK_UNICODE 300
-#define TOK_USE 301
-#define TOK_USINGKEYS 302
-#define TOK_UTF 303
-#define TOK_VERSION 304
-#define TOK_XKEYSYM 305
+#define TOK_NOTANY 287
+#define TOK_NUL 288
+#define TOK_NUMBER 289
+#define TOK_NL 290
+#define TOK_OUTS 291
+#define TOK_RAWKEY 292
+#define TOK_PLUS 293
+#define TOK_QM 294
+#define TOK_RTN 295
+#define TOK_SB 296
+#define TOK_SHIFT 297
+#define TOK_STORE 298
+#define TOK_STOREINSTORE 299
+#define TOK_SWITCH 300
+#define TOK_UNICODE 301
+#define TOK_USE 302
+#define TOK_USINGKEYS 303
+#define TOK_UTF 304
+#define TOK_VERSION 305
+#define TOK_XKEYSYM 306
 
 
 
 
-#if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+typedef union YYSTYPE
 #line 25 "yacc.y"
-typedef union YYSTYPE {
+{
 	int simple;
 	ITEM number;
 	char *string;
 	ITEM *items;
 	RULE *rule;
 	GROUP *group;
-	} YYSTYPE;
-/* Line 1249 of yacc.c.  */
-#line 145 "yacc.h"
+	}
+/* Line 1489 of yacc.c.  */
+#line 160 "yacc.h"
+	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
 #endif
 
 extern YYSTYPE yylval;
-
-
 

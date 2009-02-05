@@ -76,6 +76,7 @@ GROUP *gp = NULL;			/* Temporary group pointer */
 %token <simple> TOK_MNEMONIC
 %token <simple> TOK_NOMATCH
 %token <simple> TOK_NAME
+%token <simple> TOK_NOTANY
 %token <simple> TOK_NUL
 %token <number> TOK_NUMBER
 %token <simple> TOK_NL
@@ -321,6 +322,18 @@ T_ITEM :
 		if((n=store_number($2,lineno)) != UNDEFINED)
 		{
 			$$ = MAKE_ITEM(ITEM_ANY,n);
+		}
+		else
+		{
+			kmflcomp_warn(lineno,"store (%s) is undefined!",$2);
+			$$ = 0;
+		}
+	}
+	| TOK_NOTANY T_PARAMETER 
+	{
+		if((n=store_number($2,lineno)) != UNDEFINED)
+		{
+			$$ = MAKE_ITEM(ITEM_NOTANY,n);
 		}
 		else
 		{

@@ -11,7 +11,12 @@
 
 void yyerror(char *);
 
-int caller=INITIAL,caller0=INITIAL;
+#if defined(FLEX_SCANNER) && ! defined(INITIAL)
+int caller=0,caller0=0;
+#else
+int caller= INITIAL,caller0=INITIAL;
+#endif
+
 char qchar;
 extern int lineno;
 extern int errcount;
@@ -19,7 +24,7 @@ int done=0;
 
 void yycleanup(void)
 {
-    yy_delete_buffer(yy_current_buffer);
+    yy_delete_buffer(YY_CURRENT_BUFFER);
 }
 
 int yyterminate(void)
@@ -79,6 +84,7 @@ using{SPACES}+keys		{return TOK_USINGKEYS;}
 use 					{return TOK_USE;}
 context					{return TOK_CONTEXT;}
 any 					{return TOK_ANY;}
+notany 					{return TOK_NOTANY;}
 beep					{return TOK_BEEP;}
 index 					{BEGIN(PLIST);return TOK_INDEX;}
 nomatch					{return TOK_NOMATCH;}
@@ -321,8 +327,9 @@ switch					{return TOK_SWITCH;/*  (obsolete) */}
 
 ^[ ]*c{SPACES}	{BEGIN(SKIP);}
 
-^$weaver:?		{BEGIN(SKIP); /*Mac compatibility line: must treat entire line as a comment*/}
-^$keyman:?		{/* Keyman/Mac compatibility - just drop marker */}
+^$keyman:?		{/* Keyman platform conditional - just drop marker */}
+^$kmfl:?		{/* Kmfl platform conditional - just drop marker */}
+^$[a-zA-Z0-9]*:?	{BEGIN(SKIP);} /* Platform Conditional */
 
 <SKIP>{
 	.			{/* ignore everything until nl or EOF */}

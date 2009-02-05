@@ -22,7 +22,7 @@ libkmflcomp_la_SOURCES = \
 
 EXTRA_DIST = compiler.h memman.h
 
-libkmflcomp_la_LDFLAGS = 
+libkmflcomp_la_LDFLAGS = -lX11 -L/usr/X11R6/lib
 
 libkmflcomp_la_LIBADD = 
 
