@@ -46,8 +46,6 @@
 #include <queue>
 #include "scim_kmfl_imengine.h"
 
-#define DEBUGGING
-
 #define scim_module_init kmfl_LTX_scim_module_init
 #define scim_module_exit kmfl_LTX_scim_module_exit
 #define scim_imengine_module_init kmfl_LTX_scim_imengine_module_init

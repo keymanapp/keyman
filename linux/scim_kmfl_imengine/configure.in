@@ -4,9 +4,10 @@ dnl If you don't want it to overwrite it,
 dnl 	Please disable it in the Anjuta project configuration
 
 AC_INIT(configure.in)
-AM_INIT_AUTOMAKE(scim-kmfl-imengine, 0.9.7)
+AM_INIT_AUTOMAKE(scim-kmfl-imengine, 0.9.8)
 AM_CONFIG_HEADER(config.h)
 
+AC_USE_SYSTEM_EXTENSIONS
 AC_ISC_POSIX
 AC_SUBST(CFLAGS,$CFLAGS)
 AC_SUBST(CXXFLAGS,$CXXFLAGS)
@@ -64,6 +65,7 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Package name for gettex
 
 dnl Languages which your application supports
 ALL_LINGUAS=""
+AM_GNU_GETTEXT_VERSION
 AM_GNU_GETTEXT
 
 dnl Set PACKAGE_LOCALE_DIR in config.h.

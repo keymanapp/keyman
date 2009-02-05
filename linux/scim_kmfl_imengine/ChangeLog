@@ -1,3 +1,23 @@
+scim-kmfl-imengine (0.9.8)
+
+  * remove debugging output
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Wed, 04 Feb 2009 10:35:59 -0800
+
+scim-kmfl-imengine (0.9.7)
+
+  * sync version number with libkmfl
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Thu, 16 Oct 2008 17:01:12 -0700
+
+scim-kmfl-imengine (0.9.6)
+
+  * add support for get_surrounding_text to provide context sensitive input
+    methods
+  * add the ability to reload keyboards on the fly
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Tue,  7 Nov 2006 15:09:53 -0800
+
 0.9.5
 
   * Make loading of keyboards more efficient

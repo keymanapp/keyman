@@ -3,10 +3,9 @@
  */
 
 /*
- * KMFL Input Method for SCIM (Smart Common Input Method)
+ * KMFL Input Method
  *
  * Copyright (C) 2005 SIL International
- * based on source from SCIM Copyright (c) 2004 James Su <suzhe@tsinghua.org.cn>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,7 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  *
  */
-
  
 #define Uses_SCIM_CONFIG_BASE
 
@@ -41,9 +39,9 @@
 #include <setjmp.h>
 #include <kmfl/kmflcomp.h>
 #include <kmfl/kmflutfconv.h>
-#include "kmfl_private.h"
-#include <scim.h>
-#include <gtk/scimkeyselection.h>
+#include "scim_private.h"
+#include "scim.h"
+#include "gtk/scimkeyselection.h"
 
 using namespace scim;
 
