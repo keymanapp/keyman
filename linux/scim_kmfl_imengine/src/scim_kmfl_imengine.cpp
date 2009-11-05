@@ -3,7 +3,7 @@
  */
 
 /*
- * KMFL Input Method
+ * KMFL Input Method for SCIM (Smart Common Input Method)
  *
  * Copyright (C) 2005 SIL International
  * based on source from SCIM Copyright (c) 2004 James Su <suzhe@tsinghua.org.cn>
@@ -326,7 +326,7 @@ String KmflFactory::get_uuid() const
 String KmflFactory::get_icon_file() const
 {
     String icon_file = kmfl_icon_file(m_keyboard_number);
-    String valid_extensions[3]= {"", ".png", ".bmp"};
+    String valid_extensions[3]= {"", ".bmp", ".png"};
     String test_path;
     if (icon_file.length() == 0) {
         return String(SCIM_KMFL_IMENGINE_MODULE_DATADIR
@@ -607,7 +607,6 @@ void KmflInstance::erase_char()
 
     WideString text;
     int cursor;
-    bool result;
     
     DBGMSG(1, "DAR: kmfl - backspace\n");
 

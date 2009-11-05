@@ -156,7 +156,6 @@ static GtkListStore *__widget_keyboard_list_model = 0;
 static GtkWidget *__widget_keyboard_install_button = 0;
 static GtkWidget *__widget_keyboard_delete_button = 0;
 static GtkWidget *__widget_keyboard_properties_button = 0;
-static String valid_extensions[5]= {"", ".bmp", ".png",  ".jpg", ".ico"};
 
 static KeyboardConfigData __config_keyboards[] = {
     {
@@ -856,11 +855,11 @@ get_icon_name(XKEYBOARD * p_kbd)
 static String
 find_real_icon_file(String icon_file_template)
 {
-    static String valid_extensions[5]= {"", ".bmp", ".png",  ".jpg", ".ico"};
+    static String valid_extensions[3]= {"", ".bmp", ".png"};
     String test_path;
     struct stat filestat;
     
-    for (int i=0; i < 5; i++)
+    for (int i=0; i < 3; i++)
     {
         test_path=icon_file_template+valid_extensions[i];
         stat(test_path.c_str(), &filestat);
@@ -871,6 +870,7 @@ find_real_icon_file(String icon_file_template)
      
     return String("");        
 }
+
 static String
 get_icon_file(String icon_name, bool user)
 {
@@ -1311,8 +1311,9 @@ on_keyboard_install_clicked(GtkButton * button, gpointer user_data)
             gtk_dialog_run(GTK_DIALOG(msg));
             gtk_widget_destroy(msg);
         } else {
-            filecopy(full_icon_path, 
-                     get_icon_file(icon_name, user_keyboard));
+            String destdir = scim_get_home_dir() + SCIM_KMFL_USER_KEYBOARDS_DIR + SCIM_PATH_DELIM_STRING + "icons" + SCIM_PATH_DELIM_STRING;
+            String cmd = "cp " + full_icon_path + " " + destdir;
+            system(cmd.c_str());
         }
         add_keyboard_to_list(keyboard, path, new_file, user_keyboard);
         restart_scim();
