@@ -1,3 +1,11 @@
+scim-kmfl-imengine (0.9.9)
+
+  * Fix icon folder creation in scim_kmfl_imengine_setup. 
+  * Add displaying keyman message store when displaying keyboard properties. 
+  * Fix loading of icon file when keyboards are loaded by the engine.
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Wed, 04 Nov 2009 09:42:12 -0800
+
 scim-kmfl-imengine (0.9.8)
 
   * remove debugging output
