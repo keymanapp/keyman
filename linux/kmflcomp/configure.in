@@ -4,13 +4,14 @@ dnl If you don't want it to overwrite it,
 dnl 	Please disable it in the Anjuta project configuration
 
 AC_INIT(configure.in)
-AM_INIT_AUTOMAKE(kmflcomp, 0.9.8)
+AM_INIT_AUTOMAKE(kmflcomp, 0.9.9)
 AM_CONFIG_HEADER(config.h)
 
 AC_ISC_POSIX
 AC_SUBST(CFLAGS,$CFLAGS)
 AC_PROG_CC
 AM_PROG_CC_STDC
+AM_PROG_CC_C_O
 AC_HEADER_STDC
 AM_PROG_LIBTOOL
 AM_PROG_LEX

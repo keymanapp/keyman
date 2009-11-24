@@ -23,9 +23,9 @@
 #include "kmflutfconv.h"
 
 
-#define UTF8MODE "UTF8"
-#define UTF16MODE "UTF16LE"
-#define UTF32MODE "UTF32LE"
+#define UTF8MODE "UTF-8"
+#define UTF16MODE "UTF-16LE"
+#define UTF32MODE "UTF-32LE"
 
 size_t UTFConvert (
 		char * sourceCode, char * targetCode,
