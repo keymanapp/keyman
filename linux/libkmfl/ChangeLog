@@ -1,3 +1,21 @@
+libkmfl (0.9.11)
+
+  * fix bug when nomatch is used with "use" keyword 
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Mon, 08 Nov 2010 09:39:31 -0800
+
+libkmfl (0.9.10)
+
+  * fix support for differentiating between right and left ctrl, alt, and shift states when matching "any" statements
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Wed, 03 Nov 2010 14:25:45 -0700
+
+libkmfl (0.9.9)
+
+  * change handling of escape character
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Mon, 19 Jul 2010 15:37:32 -0700
+
 libkmfl (0.9.8)
 
   * add support for the notany key.

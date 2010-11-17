@@ -130,24 +130,12 @@ int kmfl_interpret(KMSI *p_kmsi, UINT key, UINT state)
 	p_kmsi->history[0] = keysym;
 
 	// Pass control to the first group for processing, and return if key was matched
-	if((matched=process_group(p_kmsi, p_group1)) > 0) 
+	if(process_group(p_kmsi, p_group1) > 0) 
 	{
 		process_output_queue(p_kmsi);
 		return 1;
 	}
 	
-	// Now try without shift state
-	if ((state & KS_SHIFT) != 0) 
-	{
-		keysym &= ~((unsigned long)KS_SHIFT<<16);
-		p_kmsi->history[0] = keysym;
-		if((matched=process_group(p_kmsi, p_group1)) > 0) 
-		{
-			process_output_queue(p_kmsi);
-			return 1;
-		}
-	}
-
 	/* need some kind of error notification if error value returned */
 
 	// If the keystroke is a valid Unicode character, and not a control or alt combination, 
@@ -174,55 +162,83 @@ int kmfl_interpret(KMSI *p_kmsi, UINT key, UINT state)
 		return 0;
 	case 0xff1b:		// escape - add to history, let app handle key
 		add_to_history(p_kmsi,(ITEM)0x1b);
-		forward_keyevent(p_kmsi->connection, key, state);
-		return 1;
+		return 0;
 	default:
 		clear_history(p_kmsi);
 		return 0;		// let application handle key, but erase history 
 	}
 }
 
-// Process a keystroke with a given group of rules
-int process_group(KMSI *p_kmsi, XGROUP *gp) 
+int search_for_match(KMSI *p_kmsi, XGROUP *gp, XRULE **rp, ITEM * any_index, int usekeys)
 {
 	UINT nrules, n, nhistory;
-	XRULE *rp, trule;
-	ITEM any_index[MAX_HISTORY+2];
-	int matched, result=0, usekeys, enable_global_matching;
-
-	if(p_kmsi->nhistory > MAX_HISTORY) p_kmsi->nhistory = MAX_HISTORY;
-	usekeys = ((gp->flags & GF_USEKEYS) != 0);
+	int matched=0;
+	printf("DAR: search_for_match\n");
+	
+	if(p_kmsi->nhistory > MAX_HISTORY) 
+		p_kmsi->nhistory = MAX_HISTORY;
+	
 	nhistory = p_kmsi->nhistory;
-	if(usekeys) nhistory++;
+	
+	if(usekeys) 
+		nhistory++;
+		
 	p_kmsi->history[nhistory+1-usekeys] = 0;
 
 	nrules = gp->nrules;
 
 	// Match rules until either a match is found or all rules have been tried
-	for(n=0,rp=p_kmsi->rules+gp->rule1; n<nrules; n++,rp++) 
+	for(n=0,*rp=p_kmsi->rules+gp->rule1; n<nrules; n++,(*rp)++) 
 	{
 		// Check rule length before matching
-		if((rp->ilen > nhistory+1) || ((rp->ilen == nhistory+1)
-			&& (ITEM_TYPE(*(p_kmsi->strings+rp->lhs)) != ITEM_NUL))) continue;
+		if(((*rp)->ilen > nhistory+1) || (((*rp)->ilen == nhistory+1)
+			&& (ITEM_TYPE(*(p_kmsi->strings+(*rp)->lhs)) != ITEM_NUL))) continue;
 
 		// Compare the current rule with the history
-		if((matched=match_rule(p_kmsi,rp,any_index,usekeys)))
-		{			
-			// Then determine the output for this rule
-			result = process_rule(p_kmsi,rp,any_index,usekeys);
+		if((matched=match_rule(p_kmsi,*rp,any_index,usekeys)))
 			break;
+	}
+	
+	return matched;
+}
+
+// Process a keystroke with a given group of rules
+int process_group(KMSI *p_kmsi, XGROUP *gp) 
+{
+	XRULE *rp, trule;
+	ITEM any_index[MAX_HISTORY+2];
+	int matched, result=0, usekeys, enable_global_matching;
+	
+	printf("DAR: process_group\n");
+
+	usekeys = ((gp->flags & GF_USEKEYS) != 0);
+	
+	matched=search_for_match(p_kmsi, gp, &rp, any_index, usekeys);
+	
+	if (!matched)
+	{
+		printf("DAR: process_group not matched\n");
+		// Now try without shift state
+		if ((p_kmsi->history[0] & (KS_SHIFT<<16)) != 0) 
+		{
+			p_kmsi->history[0] &= ~((unsigned long)KS_SHIFT<<16);
+			matched=search_for_match(p_kmsi, gp, &rp, any_index, usekeys);
 		}
 	}
+	
+	printf("DAR: process_group 2\n");
+
+	if (matched)
+		// Then determine the output for this rule
+		result = process_rule(p_kmsi,rp,any_index,usekeys);
+
+	printf("DAR: process_group 3\n");
 
 	// Determine if we need to consider processing match or nomatch rules
 	if((gp->flags & GF_USEKEYS) != 0)
-	{
 		enable_global_matching = ((*p_kmsi->history & 0xff00) != 0xff00);
-	}
 	else
-	{
 		enable_global_matching = 1;
-	}
 
 	// Conditionally process nomatch and match rules here, if result = 0 or 1 respectively
 	if((result == 0) && (gp->nmrlen > 0) && enable_global_matching)
@@ -237,8 +253,7 @@ int process_group(KMSI *p_kmsi, XGROUP *gp)
 		trule.ilen = 0;
 		trule.olen = gp->mrlen;
 		trule.rhs = gp->match;
-		result = process_rule(p_kmsi,&trule,any_index,usekeys);
-		if(result == 0) result = 1;		// matched already, do not return 0 
+		process_rule(p_kmsi,&trule,any_index,usekeys);
 	}
 
 	return result;
@@ -279,13 +294,16 @@ int match_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 		case ITEM_NOTANY: 
 			ps = store_content(p_kmsi,STORE_NUMBER(*pr));
 			nmax = store_length(p_kmsi,STORE_NUMBER(*pr));
-			if(m == rp->ilen-1) mask = 0xffffff; else mask = 0xffffffff;
+
 			for(n=0; n<nmax; ps++,n++) 
 			{
-				if(((*ps) & mask) == ((*ph) & mask)) // ignore keysym id
+				if(((*ps)  & 0xffff) == ((*ph)& 0xffff)) 
 				{
-					any_index[m] = n;	// save offset for use with index
-					break;
+					if (compare_state(*ps,*ph) == 0)
+					{
+						any_index[m] = n;	// save offset for use with index
+						break;
+					}
 				}
 			}
 			if (item_type == ITEM_ANY) {
@@ -453,13 +471,9 @@ int process_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 			if(retCode == 2) break;	// do not process subgroup rules if return encountered
 			
 			gp = p_kmsi->groups+GROUP_NUMBER(*pr);
-			if((result=process_group(p_kmsi,gp)) < 0) 
+			if((retCode=process_group(p_kmsi,gp)) < 0) 
 			{
 				return -1;	// error processing subgroup rules
-			}
-			else if(result == 2)
-			{
-				retCode = 2;// return in subgroup: finish this rule, then exit
 			}
 			break;			
 

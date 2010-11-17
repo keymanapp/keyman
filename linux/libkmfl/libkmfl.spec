@@ -37,7 +37,7 @@
 
 Summary:         %{name}
 Name:            libkmfl
-Version:         0.9.8
+Version:         0.9.11
 Release:         1%{disttag}%{distver}
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>
@@ -46,7 +46,6 @@ License:         GPL
 Source0:         %{name}-%{version}.tar.gz
 # Url:             (none)
 BuildRoot:       /var/tmp/libkmfl
-BuildArch:       i586
 Requires:        kmflcomp
 Buildrequires:   kmflcomp-devel
 # Conflicts:       (none)
