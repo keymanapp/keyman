@@ -173,7 +173,7 @@ int search_for_match(KMSI *p_kmsi, XGROUP *gp, XRULE **rp, ITEM * any_index, int
 {
 	UINT nrules, n, nhistory;
 	int matched=0;
-	printf("DAR: search_for_match\n");
+	DBGMSG(1, "DAR: search_for_match\n");
 	
 	if(p_kmsi->nhistory > MAX_HISTORY) 
 		p_kmsi->nhistory = MAX_HISTORY;
@@ -209,7 +209,7 @@ int process_group(KMSI *p_kmsi, XGROUP *gp)
 	ITEM any_index[MAX_HISTORY+2];
 	int matched, result=0, usekeys, enable_global_matching;
 	
-	printf("DAR: process_group\n");
+	DBGMSG(1, "DAR: process_group\n");
 
 	usekeys = ((gp->flags & GF_USEKEYS) != 0);
 	
@@ -217,7 +217,7 @@ int process_group(KMSI *p_kmsi, XGROUP *gp)
 	
 	if (!matched)
 	{
-		printf("DAR: process_group not matched\n");
+		DBGMSG(1, "DAR: process_group not matched\n");
 		// Now try without shift state
 		if ((p_kmsi->history[0] & (KS_SHIFT<<16)) != 0) 
 		{
@@ -226,13 +226,13 @@ int process_group(KMSI *p_kmsi, XGROUP *gp)
 		}
 	}
 	
-	printf("DAR: process_group 2\n");
+	DBGMSG(1, "DAR: process_group 2\n");
 
 	if (matched)
 		// Then determine the output for this rule
 		result = process_rule(p_kmsi,rp,any_index,usekeys);
 
-	printf("DAR: process_group 3\n");
+	DBGMSG(1, "DAR: process_group 3\n");
 
 	// Determine if we need to consider processing match or nomatch rules
 	if((gp->flags & GF_USEKEYS) != 0)

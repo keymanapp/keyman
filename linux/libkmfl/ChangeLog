@@ -1,3 +1,9 @@
+libkmfl (0.9.12)
+
+  * fix debug messages
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Wed, 17 Nov 2010 13:27:38 -0800
+
 libkmfl (0.9.11)
 
   * fix bug when nomatch is used with "use" keyword 
