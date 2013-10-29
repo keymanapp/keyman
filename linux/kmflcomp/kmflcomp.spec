@@ -33,7 +33,7 @@
 
 Summary:         %{name}
 Name:            kmflcomp
-Version:         0.9.8
+Version:         0.9.10
 Release:         2%{disttag}%{distver}
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>
@@ -42,7 +42,9 @@ License:         GPL
 Source0:         %{name}-%{version}.tar.gz
 # Url:             (none)
 BuildRoot:       /var/tmp/kmflcomp
-BuildArch:       i586
+%if %is_opensuse
+Buildrequires:	xorg-x11-devel
+%endif
 # Requires:        (none)
 # Conflicts:       (none)
 # Provides:        (none)

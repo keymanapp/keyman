@@ -1148,7 +1148,7 @@ void process_special_store(char *name, STORE *sp, int line)
 	int n, kbver;
 	
 	// Identify store by name
-	for(n=0;special_stores[n];n++)
+	for(n=0; n<sizeof(special_stores)/sizeof(char *); n++)
 	{
 		if(strcasecmp(name,special_stores[n]) == 0 ) break;
 	}

@@ -1,3 +1,15 @@
+kmflcomp (0.9.10)
+
+  * fix bug in processing special stores when special store name is invalid
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Thu, 24 Oct 2013 14:13:31 -0700
+
+kmflcomp (0.9.9)
+
+  * bugfix for FreeBSD amd64
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Fri, 23 Jul 2010 09:49:20 -0700
+
 kmflcomp (0.9.8)
 
   * add Platform conditionals
