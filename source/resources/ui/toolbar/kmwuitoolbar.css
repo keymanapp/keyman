@@ -1,0 +1,521 @@
+/* Button and image styles for KeymanWeb Toolbar UI */
+
+#KeymanWebControl
+{
+  height: 35px;
+  position: relative;
+}
+
+#KeymanWebControl #kmw_map_preload
+{
+  width: 1px;
+  height: 1px;
+  position: relative;
+  left: -2000px;
+  top: 0px;
+  background: url('world.png') no-repeat;
+}
+
+#KeymanWebControl #kmw_controls
+{
+  z-index: 20;
+  position: absolute;
+  display: block;
+  font: bold 10pt Tahoma, sans-serif !important;
+  width:100%;
+  max-height: 35px;
+  background: url('toolbar.gif') repeat-x 0 -35px;
+}
+
+#KeymanWebControl .kmw_button, 
+#KeymanWebControl .kmw_button_disabled,
+#KeymanWebControl .kmw_button_selected
+{
+  background: url('toolbar.gif') repeat-x 0 -35px;
+  display: block;
+  height: 35px;
+  float: left;
+  position: relative;
+  padding: 0 2px 0 0;
+}
+
+#KeymanWebControl #kmw_controls_start
+{
+  float: left;
+  width: 31px;
+  height: 35px;
+  background: url('toolbar.gif') no-repeat 0 0;
+}
+
+#KeymanWebControl #kmw_btn_osk 
+{
+  float:right !important;
+}
+#KeymanWebControl #kmw_bar_osk
+{
+  display: none !important;
+}
+
+#KeymanWebControl #kmw_controls_end
+{
+  float: right;
+  width: 1px;
+  height: 35px;
+  background: url('toolbar.gif') no-repeat -47px 0;
+}
+
+#KeymanWebControl .kmw_bar
+{
+  float: left;
+  width: 16px;
+  height: 35px;
+  background: url('toolbar.gif') no-repeat -31px 0;
+}
+
+#KeymanWebControl .kmw_controls_disabled
+{
+  cursor: default;
+}
+
+#KeymanWebControl .kmw_controls_disabled a.kmw_button_a, 
+#KeymanWebControl .kmw_controls_disabled a.kmw_button_a:visited,
+#KeymanWebControl .kmw_controls_disabled a.kmw_button_a:hover
+{
+  color: #c0c0c0;
+  background: transparent;
+  cursor: default;
+}
+
+#KeymanWebControl .kmw_button_selected a.kmw_button_a,
+#KeymanWebControl .kmw_button_selected a.kmw_button_a:visited
+{
+  vertical-align: middle;
+  padding: 1px 3px;
+  height: 24px;
+  background: #F1ECDD;
+  border: solid 1px #303030;
+}
+
+#KeymanWebControl .kmw_button_disabled a.kmw_button_a, 
+#KeymanWebControl .kmw_button_disabled a.kmw_button_a:visited, 
+#KeymanWebControl .kmw_button_disabled a.kmw_button_a:hover
+{
+  background: transparent;
+  color: #c0c0c0;
+  cursor: default;
+}
+
+#KeymanWebControl a.kmw_button_a, 
+#KeymanWebControl a.kmw_button_a:visited
+{
+  vertical-align: middle;
+  color: black;
+  text-decoration: none;
+  margin: 4px 2px 0px 2px;
+  height: 24px;
+  padding: 2px 4px;
+  vertical-align: middle;
+  display: block;
+  float: left;
+}
+
+
+#KeymanWebControl a.kmw_norightgap,
+#KeymanWebControl a.kmw_norightgap:hover
+{
+  margin-right: 0px !important;
+}
+
+#KeymanWebControl a.kmw_noleftgap,
+#KeymanWebControl a.kmw_noleftgap:hover
+{
+  margin-left: 0px !important;
+}
+
+#KeymanWebControl .kmw_button_a .kmw_kbd
+{
+  font-weight: normal !important;
+}
+
+#KeymanWebControl a.kmw_button_a:hover,
+#KeymanWebControl .kmw_button_selected a.kmw_button_a:hover
+{
+  vertical-align: middle;
+  padding: 1px 3px;
+  height: 24px;
+}
+
+#KeymanWebControl a.kmw_button_a:hover
+{
+  padding: 2px 4px;
+  background: #FFECB1;
+}
+
+#KeymanWebControl .kmw_controls_disabled .kmw_button_selected a.kmw_button_a:hover
+{
+  background: #F1ECDD;
+}
+
+#KeymanWebControl .kmw_button_selected a.kmw_button_a:hover
+{
+  border: solid 1px #303030;
+  padding: 1px 3px;
+  background: #FFDCA1;
+}
+
+#kmw_control_keyboards
+{
+  min-width:240px ;
+}
+
+#kmw_control_keyboards .kmw_button_selected a div, #kmw_control_keyboards .kmw_button a div
+{
+  max-width:200px;
+  overflow:hidden;
+}
+#KeymanWebControl .kmw_selector_kbd
+{
+  top: 30px;
+  clear: both;
+  margin: 4px 0px 0px 0;
+  padding: 4px 0 0 0;
+  list-style: none;
+  position: absolute;
+  display: none;
+  border: solid 1px #ad4a28;
+  background: white;
+  right: 4px;
+  z-index: 200; /* above the osk */
+}
+
+#KeymanWebControl .kmw_selector_kbd a
+{
+  display: block;
+  padding: 0px 4px;
+  color: #2993ad !important;
+  font: 10pt Tahoma !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+}
+
+#KeymanWebControl .kmw_selector_kbd a:hover
+{
+  background: #2993ad !important;
+  color: white !important;
+}
+
+#KeymanWebControl #kmw_selector
+{
+  margin: 0px 0px 0px 0;
+  padding: 0;
+  list-style: none;
+  position: absolute;
+  width: auto;
+  display: none;
+  border: solid 1px #ad4a28;
+  background: white;
+  z-index: 200; /* above the osk */
+}
+
+#KeymanWebControl .kmw_controls_disabled #kmw_btn_keyboards.kmw_over #kmw_selector
+{
+  display: none;
+}
+
+#KeymanWebControl .kmw_keyboard_selected
+{
+  position: relative;
+}
+
+#KeymanWebControl #kmw_selector.kmw_over
+{
+  display: block;
+  clear: both;
+  left: 1px;
+  top: 35px;
+}
+
+/* Regions */
+
+#KeymanWebControl #kmw_browsemap
+{
+  width: 375px;
+  height: 150px;
+  margin: 2px auto;
+  background: url('world.png') no-repeat;
+}
+
+#KeymanWebControl #kmw_region_browsemap
+{
+  border: none;
+  width: 375px;
+  height: 150px;
+  display: block;
+  left: 0;
+  top: 0;
+  position: relative;
+  margin: 0;
+}
+
+#KeymanWebControl .kmw_browsemap_ca_sel#kmw_browsemap
+{
+  background-position: 0 -150px;
+}
+#KeymanWebControl .kmw_browsemap_ca#kmw_browsemap
+{
+  background-position: 0 -300px;
+}
+#KeymanWebControl .kmw_browsemap_sa_sel#kmw_browsemap
+{
+  background-position: 0 -450px;
+}
+#KeymanWebControl .kmw_browsemap_sa#kmw_browsemap
+{
+  background-position: 0 -600px;
+}
+#KeymanWebControl .kmw_browsemap_na_sel#kmw_browsemap
+{
+  background-position: 0 -750px;
+}
+#KeymanWebControl .kmw_browsemap_na#kmw_browsemap
+{
+  background-position: 0 -900px;
+}
+#KeymanWebControl .kmw_browsemap_eu_sel#kmw_browsemap
+{
+  background-position: 0 -1050px;
+}
+#KeymanWebControl .kmw_browsemap_eu#kmw_browsemap
+{
+  background-position: 0 -1200px;
+}
+#KeymanWebControl .kmw_browsemap_af_sel#kmw_browsemap
+{
+  background-position: 0 -1350px;
+}
+#KeymanWebControl .kmw_browsemap_af#kmw_browsemap
+{
+  background-position: 0 -1500px;
+}
+#KeymanWebControl .kmw_browsemap_me_sel#kmw_browsemap
+{
+  background-position: 0 -1650px;
+}
+#KeymanWebControl .kmw_browsemap_me#kmw_browsemap
+{
+  background-position: 0 -1800px;
+}
+#KeymanWebControl .kmw_browsemap_as_sel#kmw_browsemap
+{
+  background-position: 0 -1950px;
+}
+#KeymanWebControl .kmw_browsemap_as#kmw_browsemap
+{
+  background-position: 0 -2100px;
+}
+#KeymanWebControl .kmw_browsemap_oc_sel#kmw_browsemap
+{
+  background-position: 0 -2250px;
+}
+#KeymanWebControl .kmw_browsemap_oc#kmw_browsemap
+{
+  background-position: 0 -2400px;
+}
+
+#KeymanWebControl #kmw_selector_regions
+{
+  margin-bottom: 2px;
+}
+
+#KeymanWebControl #kmw_selector_regions ul
+{
+  list-style: none;
+  padding: 0px;
+  margin: 0;
+}
+
+#KeymanWebControl #kmw_selector_regions ul li
+{
+  display: inline; /*float: left;*/
+  padding: 2px 1px 1px 2px;
+  margin-bottom: 1px;
+  white-space: nowrap;
+}
+
+#KeymanWebControl #kmw_selector_regions ul li a
+{
+  color: #ad4a28;
+  padding: 0 2px 2px 2px;
+  margin: 0;
+  border: none;
+  background: white;
+  display: inline;
+  font-weight: normal !important;
+  font-size: 7pt !important;
+  text-decoration: none;
+}
+
+#KeymanWebControl #kmw_selector_regions ul li a.selected
+{
+  background: #ad4a28;
+  color: white;
+}
+
+#KeymanWebControl #kmw_selector_regions ul li a.hover
+{
+  background: #2993ad;
+  color: white;
+}
+
+/* Languages and keyboards in a region */
+
+#KeymanWebControl .kmw_language
+{
+  display: block;
+  font-size: 8pt !important;
+  font-weight: normal !important;
+}
+
+#KeymanWebControl .kmw_language a
+{
+  display: block;
+  padding: 2px 2px;
+  border: none;
+  color: #2993ad !important;
+  text-decoration: none;
+  background: white !important;
+}
+
+#KeymanWebControl .kmw_language a:hover
+{
+  color: white !important;
+  background: #2993AD !important;
+}
+
+#KeymanWebControl .kmw_selector_region
+{
+  border-top: solid 1px #ad4a28;
+  clear: both;
+  display: none;
+  margin-top: 2px;
+}
+
+#KeymanWebControl .kmw_keyboard_col_right
+{
+  float: left;
+  display: block;
+  width: 24%; /* ick */
+  border-right:none;
+}
+  
+#KeymanWebControl .kmw_keyboard_col
+{
+  float: left;
+  display: block;
+  width: 25%;
+  border-right: solid 1px #f3e5de;
+}
+
+#KeymanWebControl .kmw_img
+{
+  display: block;
+  float: left;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+#KeymanWebControl #kmw_img_keyboards
+{
+  background: url('toolbar.gif') no-repeat 0 -70px;
+  margin-right: 4px;
+}
+
+#KeymanWebControl #kmw_img_off
+{
+  background: url('toolbar.gif') no-repeat 0 -118px;
+  margin-right: 4px;
+}
+
+#KeymanWebControl #kmw_img_kbd
+{
+  background: url('toolbar.gif') no-repeat -24px -70px;
+  margin-right: 4px;
+}
+
+#KeymanWebControl .kmw_button_disabled #kmw_img_osk
+{
+  background: url('toolbar.gif') no-repeat 0 -142px;
+}
+
+#KeymanWebControl #kmw_img_osk
+{
+  background: url('toolbar.gif') no-repeat 0 -94px;
+}
+
+#KeymanWebControl .kmw_drop
+{
+  display: block;
+  float: left;
+  height: 24px;
+  cursor: pointer;
+  width: 11px;
+  margin-left: 4px;
+  background: url('toolbar.gif') no-repeat -24px -94px;
+}
+
+
+#KeymanWebControl .kmw_button_disabled .kmw_a,
+#KeymanWebControl .kmw_button_disabled .kmw_drop,
+#KeymanWebControl .kmw_button_disabled .kmw_img,
+#KeymanWebControl .kmw_controls_disabled .kmw_a,
+#KeymanWebControl .kmw_controls_disabled .kmw_drop,
+#KeymanWebControl .kmw_controls_disabled .kmw_img
+{
+  cursor: default;
+}
+
+#KeymanWebControl div.kmw_a
+{
+  padding-top: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+  float: left;
+}
+
+#KeymanWebControl .kmw_clear
+{
+  clear: both;
+}
+
+#KeymanWebControl #kmw_balloon
+{
+  visibility: hidden;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  display: block;
+  padding: 6px;
+  font: 10pt Tahoma !important;
+  position: absolute;
+  left: 32px;
+  top: 46px;
+  background: #FFFFC0;
+  z-index: 21;
+  cursor: default;
+  border: solid 1px black;
+}
+
+#KeymanWebControl #kmw_arrowhead
+{
+  visibility: hidden;
+  display: block;
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  z-index: 22;
+  cursor: default;
+  left: 48px;
+  top: 24px;
+  background: url('toolbar.gif') no-repeat -24px -118px;
+}
