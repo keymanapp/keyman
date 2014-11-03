@@ -2348,7 +2348,7 @@
     if('font' in layout) osk.fontFamily=layout['font']; else osk.fontFamily='';
 
     // Set flag to add default (US English) key label if specified by keyboard
-    layout.keyLabels=((typeof(keymanweb._ActiveKeyboard['KDU']) != 'undefined') && keymanweb._ActiveKeyboard['KDU']);
+    layout.keyLabels=keymanweb._ActiveKeyboard && ((typeof(keymanweb._ActiveKeyboard['KDU']) != 'undefined') && keymanweb._ActiveKeyboard['KDU']);
     LdivC=osk.deviceDependentLayout(layout,device.formFactor);    
     
     osk.ddOSK = true;
