@@ -1,27 +1,19 @@
-/**
-  @preserve (C) 2012 Tavultesoft Pty Ltd
-  
-  Adds functions to treat supplementary plane characters in the same 
-  way as basic multilingual plane characters in JavaScript.
-  
-  Version 0.1
-  
-  License
-  
-  The contents of this file are subject to the Mozilla Public License
-  Version 1.1 (the "License"); you may not use this file except in
-  compliance with the License. You may obtain a copy of the License at
-  http://www.mozilla.org/MPL/
+/***
+   KeymanWeb 2.0
+   Copyright 2014 Tavultesoft Pty Ltd
 
-  Software distributed under the License is distributed on an "AS IS"
-  basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-  License for the specific language governing rights and limitations
-  under the License.
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
 
-  The Original Code is (C) 2012 Tavultesoft Pty Ltd.
+       http://www.apache.org/licenses/LICENSE-2.0
 
-  The Initial Developer of the Original Code is Tavultesoft.
-*/
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+***/
 
 /**
  * Constructs a string from one or more Unicode character codepoint values 
