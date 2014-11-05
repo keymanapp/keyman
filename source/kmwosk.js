@@ -3333,7 +3333,10 @@
       if(osk.loadRetry >= 99) return; // fail silently, but should not happen
       window.setTimeout(osk._Load,100);
       osk.loadRetry++;
+      return;
     }  
+  
+    osk.loadRetry = 0;
   
     if(keymanweb._TitleElement) keymanweb._TitleElement.innerHTML = 'Tavultesoft KeymanWeb'; // I1972
 

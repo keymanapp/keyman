@@ -1494,7 +1494,7 @@
     keymanweb.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC']);
 
     // If the first stub, must load (and optionally display) the keyboard
-    if(keymanweb._KeyboardStubs.length == 1) keymanweb._SetActiveKeyboard(sp['KI'], sp['KLC']);     
+    if(keymanweb._KeyboardStubs.length == 1 && document.readyState=='complete') keymanweb._SetActiveKeyboard(sp['KI'], sp['KLC']);     
   }
   
   /** 
