@@ -1,27 +1,3 @@
-/*
- (C) 2012 Tavultesoft Pty Ltd
-
-  Adds functions to treat supplementary plane characters in the same 
-  way as basic multilingual plane characters in JavaScript.
-
-  Version 0.1
-
-  License
-
-  The contents of this file are subject to the Mozilla Public License
-  Version 1.1 (the "License"); you may not use this file except in
-  compliance with the License. You may obtain a copy of the License at
-  http://www.mozilla.org/MPL/
-
-  Software distributed under the License is distributed on an "AS IS"
-  basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-  License for the specific language governing rights and limitations
-  under the License.
-
-  The Original Code is (C) 2012 Tavultesoft Pty Ltd.
-
-  The Initial Developer of the Original Code is Tavultesoft.
-*/
 String.kmwFromCharCode=function(a){var b=[],c;for(c=0;c<arguments.length;c++){var d=Number(arguments[c]);if(!isFinite(d)||0>d||1114111<d||Math.floor(d)!==d)throw new RangeError("Invalid code point "+d);65536>d?b.push(d):(d-=65536,b.push((d>>10)+55296),b.push(d%1024+56320))}return String.fromCharCode.apply(void 0,b)};
 String.prototype.kmwCharCodeAt=function(a){var b=""+this,c=0;if(0>a||a>=b.length)return NaN;for(var d=0;d<a;d++)if(c=b.kmwNextChar(c),null===c)return NaN;a=b.charCodeAt(c);return 55296<=a&&(56319>=a&&b.length>c+1)&&(b=b.charCodeAt(c+1),56320<=b&&57343>=b)?(a-55296<<10)+(b-56320)+65536:a};String.prototype.kmwIndexOf=function(a,b){var c=""+this,d=c.indexOf(a,b);if(0>d)return d;for(var e=0,f=0;null!==f&&f<d;f=c.kmwNextChar(f))e++;return e};
 String.prototype.kmwLastIndexOf=function(a,b){var c=""+this,d=c.lastIndexOf(a,b);if(0>d)return d;for(var e=0,f=0;null!==f&&f<d;f=c.kmwNextChar(f))e++;return e};String.prototype.kmwLength=function(){var a=""+this;if(0==a.length)return 0;for(var b=0,c=0;null!==c;b++)c=a.kmwNextChar(c);return b};String.prototype.kmwSlice=function(a,b){var c=""+this,d=c.kmwCodePointToCodeUnit(a),e=c.kmwCodePointToCodeUnit(b);return null===d||null===e?"":c.slice(d,e)};
