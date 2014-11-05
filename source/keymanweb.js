@@ -1,5 +1,20 @@
-// KeymanWeb 2.0
-// Copyright 2010 Tavultesoft Pty Ltd
+/***
+   KeymanWeb 2.0
+   Copyright 2014 Tavultesoft Pty Ltd
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+***/
+
 
 /******************************************************************
  *  Main Keyman Web Module    
@@ -916,9 +931,18 @@
       // On touch event, reposition the text caret and prepare for OSK input
       // Removed 'onfocus=' as that resulted in handling the event twice (on iOS, anyway) 
       // Handle mousedown, mouseup, mousemove events to allow desktop simulation (Build 360) 
-      x.onmspointerdown=x.ontouchstart=x.onmousedown=keymanweb.setFocus;
+      
+      x.addEventListener('touchstart', keymanweb.setFocus); // Chrome emulation does not support ontouchstart :(
+      x.onmspointerdown=x.onmousedown=function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        return keymanweb.setFocus(e);
+      };
 
-      x.onmspointerup=x.ontouchend=x.onmouseup=function(e){e.stopPropagation();}
+      x.addEventListener('touchend', function(e) {e.stopPropagation();});
+      x.onmspointerup=x.onmouseup=function(e) {
+        e.stopPropagation();
+      };
       
       // Disable internal scroll when input element in focus 
       x.onmspointermove=x.ontouchmove=x.onmousemove=keymanweb.dragInput;
