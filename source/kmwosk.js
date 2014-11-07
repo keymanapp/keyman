@@ -1145,6 +1145,7 @@
   
     // Add index selection (for a large menu)
     mx.addEventListener('touchstart',function(e){osk.scrollToLanguage(e,m2,m3);},false);
+    mx.addEventListener('touchend',function(e){e.stopPropagation();e.preventDefault();},false);
     menu.appendChild(mx);
         
  //TODO: not sure if either of these two handlers ar actually needed.  touchmove handler may be doing all that is necessary.   
@@ -1285,7 +1286,7 @@
    */             
   osk.scrollToLanguage = function(e,m2,menu)
   {
-    e.stopImmediatePropagation();e.preventDefault();
+    e.stopImmediatePropagation();e.stopPropagation();e.preventDefault();
     if(e.touches[0].target.nodeName != 'P') return;    
     var i,t,top=0,initial=e.touches[0].target.innerHTML.charCodeAt(0),nn=menu.childNodes;
     try {
