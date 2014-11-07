@@ -1144,7 +1144,7 @@
     } 
   
     // Add index selection (for a large menu)
-    mx.ontouchstart=function(e){osk.scrollToLanguage(e,m2,m3);}
+    mx.addEventListener('touchstart',function(e){osk.scrollToLanguage(e,m2,m3);},false);
     menu.appendChild(mx);
         
  //TODO: not sure if either of these two handlers ar actually needed.  touchmove handler may be doing all that is necessary.   
@@ -1371,8 +1371,8 @@
           // Adjust top of menu to allow for expanded list
           osk.adjustLanguageMenu(this.parentNode.className=='kbd-list-closed'?0:this.kList.length);            
         }
-        lgBar.ontouchstart=function(e){e.stopPropagation();}
-        lgBar.ontouchmove=function(e){e.target.scrolled=true;e.stopPropagation();}
+        lgBar.addEventListener('touchstart',function(e){e.stopPropagation();},false);
+        lgBar.addEventListener('touchmove',function(e){e.target.scrolled=true;e.stopPropagation();},false);
        
         for(i=0; i<lgBar.kList.length; i++)
         {
@@ -1395,7 +1395,10 @@
     
     // Add a non-selectable bottom bar so to allow scrolling to the last language
     var padLast=util._CreateElement('DIV'); padLast.id='kmw-menu-footer';
-    padLast.ontouchstart=padLast.ontouchmove=padLast.ontouchend=function(e){e.preventDefault();e.stopPropagation();}
+    var cancelTouch=function(e){e.preventDefault();e.stopPropagation();};
+    padLast.addEventListener('touchstart',cancelTouch,false);
+    padLast.addEventListener('touchmove',cancelTouch,false);
+    padLast.addEventListener('touchend',cancelTouch,false);
     menu.appendChild(padLast);
     
     return activeLanguageIndex;
@@ -1415,17 +1418,17 @@
     kb.innerHTML=unique?kbd['KL']:kbd['KN'].replace(' Keyboard',''); // Name    
 
     // Touchstart (or mspointerdown) event highlights the touched list item  
-    kb.onmspointerdown=kb.ontouchstart=function(e)
+    var touchStart=function(e)
     {
       e.stopPropagation(); 
       if(this.className.indexOf('selected') <= 0) this.className=this.className+' selected';
       osk.lgList.scrolling=false;
       osk.lgList.y0=e.touches[0].pageY;//osk.lgList.childNodes[0].scrollTop;
       return true;
-    }
+    },
 //TODO: Still drags Android background sometimes (not consistently)
     // Touchmove drags the list and prevents release from selecting the language
-    kb.onmspointermove=kb.ontouchmove=function(e)
+    touchMove=function(e)
     { 
       e.stopImmediatePropagation();
       var scroller=osk.lgList.childNodes[0],
@@ -1460,10 +1463,10 @@
         osk.lgList.y0=y;
       }
       return true;
-    }
+    },
 
     // Touch release (click) event selects touched list item   
-    kb.onmspointerout=kb.ontouchend=function(e)
+    touchEnd=function(e)
     { 
       e.preventDefault();
       if(typeof(e.stopImmediatePropagation) != 'undefined') e.stopImmediatePropagation();else e.stopPropagation();
@@ -1487,7 +1490,14 @@
         osk._Show(); 
       }
       return true;
-    }    
+    };
+    
+    kb.onmspointerdown=touchStart;
+    kb.addEventListener('touchstart',touchStart,false);
+    kb.onmspointermove=touchMove;
+    kb.addEventListener('touchmove',touchMove,false);
+    kb.onmspointerout=touchEnd;
+    kb.addEventListener('touchend',touchEnd,false);
   }
   
   /**

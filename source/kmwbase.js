@@ -1126,7 +1126,7 @@ var __BUILD__ = 300;
     lt.className='kmw-wait-text'; gr.className='kmw-wait-graphic';
     bx.className='kmw-alert-close';
     // Close alert if anywhere in box is touched, since close box is too small on mobiles 
-    lb.ontouchstart=lb.onmousedown=lb.onclick=function(e)
+    lb.onmousedown=lb.onclick=function(e)
     {
       // Ignore if waiting, only handle for alert
       if(bx.style.display == 'block')
@@ -1134,8 +1134,10 @@ var __BUILD__ = 300;
         bg.style.display='none';
         if(bg.dismiss)bg.dismiss();
       }
-    }  
-    bg.ontouchstart=bg.onmousedown=bg.onclick=function(e){e.preventDefault();e.stopPropagation();}
+    };
+    lb.addEventListener('touchstart', lb.onclick, false);
+    bg.onmousedown=bg.onclick=function(e){e.preventDefault();e.stopPropagation();}
+    bg.addEventListener('touchstart', bg.onclick, false);
     lb.appendChild(bx); lb.appendChild(lt); lb.appendChild(gr);
     bg.appendChild(lb); document.body.appendChild(bg);
     keymanweb.waiting=bg;    

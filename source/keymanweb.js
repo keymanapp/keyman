@@ -945,7 +945,8 @@
       };
       
       // Disable internal scroll when input element in focus 
-      x.onmspointermove=x.ontouchmove=x.onmousemove=keymanweb.dragInput;
+      x.addEventListener('touchmove', keymanweb.dragInput, false);
+      x.onmspointermove=x.onmousemove=keymanweb.dragInput;
       
       // Hide keyboard and caret when losing focus from simulated input field
       x.onblur=keymanweb.setBlur;
@@ -3445,7 +3446,7 @@
     if(device.touchable)
     {
       // Handle OSK touchend events (prevent propagation)
-      osk._Box.ontouchend=function(e){e.stopPropagation();}
+      osk._Box.addEventListener('touchend',function(e){e.stopPropagation();},false);
 
       // Add a blank DIV to the bottom of the page to allow the bottom of the page to be shown
       dTrailer=document.createElement('DIV'); ds=dTrailer.style;
