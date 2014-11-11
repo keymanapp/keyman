@@ -3502,14 +3502,14 @@
     //       so must apply style before testing for font availability 
     // Extended to allow keyboard-specific custom styles for Build 360 
     var customStyle=osk.addFontStyle(kfd,ofd);
-    if(typeof(keymanweb._ActiveKeyboard['KCSS']) == 'string')
+    if( keymanweb._ActiveKeyboard != null && typeof(keymanweb._ActiveKeyboard['KCSS']) == 'string')  // KMEW-129
       customStyle=customStyle+keymanweb._ActiveKeyboard['KCSS'];
  
     osk.styleSheet = util.addStyleSheet(customStyle); //Build 360  
   
     // Wait until font is loaded then align duplicated input elements with page elements
     if(osk.waitForFonts(kfd,ofd)) keymanweb.alignInputs(true);
-          }    
+  }    
           
   /**
    *  Add or replace the style sheet used to set the font for input elements and OSK

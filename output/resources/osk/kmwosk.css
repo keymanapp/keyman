@@ -43,7 +43,7 @@
 .phone .kmw-5rows {padding-top:0;}
 .phone .kmw-key-shift,.phone .kmw-key-shift-on {padding-top:0.5em;} 
 .phone .kmw-key-shift.kmw-5rows,.phone .kmw-key-shift-on {padding-top:0.4em;} 
-.phone .kmw-key-label{position:absolute;left:2px;top:0px;font:0.5em Arial;color:#aaa;background-color:transparent;z-index:10000;}
+.phone .kmw-key-label{position:absolute;left:20%;top:2%;font:0.5em Arial;color:#aaa;background-color:transparent;z-index:10000;}
 .phone .kmw-key-text{position:relative;left:0;top:0;}
  
 .phone .kmw-key-row {-webkit-touch-callout:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
@@ -61,7 +61,7 @@
         box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;
  }
 
-.tablet .kmw-key-label{position:absolute;left:2px;top:2px;font:0.5em Arial;color:#aaa;background-color:transparent;z-index:10000;}
+.tablet .kmw-key-label{position:absolute;left:8%;top:3%;font:0.5em Arial;color:#aaa;background-color:transparent;z-index:10000;}
 .tablet .kmw-key-text{position:relative;left:0;top:0;}
         
 .desktop .kmw-osk-frame{position:absolute;width:auto;height:auto;left:0;top:0;display:none;margin:0;padding:0;
@@ -174,7 +174,11 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
 /*#kmw-popup-key .kmw-key {        border:solid 2px #999999;        box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;}*/
 
 /* Popup icon style (and content)*/
-.kmw-key-popup-icon{position:absolute;display:block;visibility:visible;right:0;top:0;width:8px;height:8px;
+.tablet .kmw-key-popup-icon{position:absolute;display:block;visibility:visible;right:4%;top:0;width:8px;height:8px;
+      font:bold 0.5em Arial;color:#aaa;}
+.phone .kmw-key-popup-icon{position:absolute;display:block;visibility:visible;right:6%;top:0;width:8px;height:8px;text-align:right;
+      font:bold 0.5em Arial;color:#aaa;}
+.desktop .kmw-key-popup-icon{position:absolute;display:block;visibility:visible;right:4%;top:0;width:8px;height:8px;
       font:bold 0.5em Arial;color:#aaa;}
 .kmw-key-popup-icon:before{content:'\2022';}
 
