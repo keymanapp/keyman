@@ -36,9 +36,10 @@
 .phone .kmw-key-row {position:fixed;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}
 .phone .kmw-key-square {position:fixed;display:inline-block;height:100%;max-height:100%;overflow:hidden;margin:0 0 0 0;z-index: 10000;padding:0 0 0 0;background-color:transparent;cursor:default; border:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}
 .phone .kmw-key-square-ex {display:inline-block;box-sizing:border-box;margin:0 0 0 5px;z-index:10001;padding:0;background-color:transparent;cursor:default;}
-.phone .kmw-key {display:block;position:fixed;margin:2px;border-radius:6px;text-align:center;padding-top:0.2em;box-sizing:border-box;overflow:hidden;
+.phone .kmw-key {display:block;position:fixed;margin:0px;border-radius:6px;text-align:center;padding-top:0.2em;box-sizing:border-box;overflow:hidden;
         border:solid 2px #999999;
         box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;
+        min-height: 22px;
  }
 .phone .kmw-5rows {padding-top:0;}
 .phone .kmw-key-shift,.phone .kmw-key-shift-on {padding-top:0.5em;} 
