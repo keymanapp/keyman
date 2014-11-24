@@ -208,6 +208,8 @@
         target.focus();  //Android native browsers may not like this, but it is needed for Chrome, Safari
       }  
       
+      // Correct element directionality if required
+      keymanweb._SetTargDir(target);  
       // What we really want to do is to blur any active element that is not a KMW input, 
       // but the following line does not work as might be expected, even though the correct element is referenced.
       // It is as though blur is ignored if focus is supposed to have been moved, even if it has not in fact been moved?
