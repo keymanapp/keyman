@@ -3602,6 +3602,16 @@
     else
       window.setTimeout(keymanweb.initializeUI,1000);
   }      
+  /**
+   * Test if caret position is determined from the active element, or 
+   * from the synthesized overlay element (touch devices)
+   * 
+   * @return  {boolean}
+   **/          
+  keymanweb.isPositionSynthesized = function()
+  {
+    return device.touchable;
+  }
   
   /**
    * Function     _SelPos
@@ -3614,7 +3624,7 @@
   {
     var Ldoc, Ldv, isMSIE=(util._GetIEVersion()<999); // I3363 (Build 301)
 
-    if(device.touchable)
+    if(keymanweb.isPositionSynthesized())
       return keymanweb.getTextCaret(Pelem);
 
     if(Pelem._KeymanWebSelectionStart) 
