@@ -87,7 +87,7 @@
     {
       case 1:
         sKbd=document.getElementById('kbd_id1').value;
-        kmw.addKeyboards(sKbd);  
+        kmw.addKeyboards(sKbd);
         break;
       case 2:
         sKbd=document.getElementById('kbd_id2').value.toLowerCase();

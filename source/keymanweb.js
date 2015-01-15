@@ -1486,13 +1486,14 @@
       fp['files']=fp['source'];                  
       fp['path']=fontPath;                     
     }     
-    if(typeof(sp['OskFont']) == 'undefined' && typeof(lp['font']) != 'undefined') 
+    // Fixed OSK font issue Github #7 (9/1/2015)     
+    if(typeof(sp['KOskFont']) == 'undefined' && typeof(lp['oskFont']) != 'undefined') 
     {
-      fp=sp['OskFont']=lp['font'];
+      fp=sp['KOskFont']=lp['oskFont'];   
       fp['files']=fp['source'];
-      fp['path']=fontPath;
+      fp['path']=fontPath;            
     }           
- 
+
     // Update the UI 
     keymanweb.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC']);
 
@@ -3081,7 +3082,7 @@
     Lr['CountryCode'] = Lkbd['KCC'];
     Lr['KeyboardID'] = Lkbd['KD'];
     Lr['Font'] = Lkbd['KFont'];
-    Lr['OskFont'] = Lkbd['KOskFont'];
+    Lr['OskFont'] = Lkbd['KOskFont'];  
     return Lr;
   }
   
