@@ -1960,29 +1960,28 @@
             kDiv.keyId=key['id'];           
             kDiv.className='kmw-key-square';
             ks=kDiv.style;
-            if(formFactor != 'desktop')
-            { 
-              ks.left=objectUnits(totalPercent+keys[j]['padpc']);
-            }
-            totalPercent=totalPercent+keys[j]['padpc']+keys[j]['widthpc'];
+
             kDiv.width=ks.width=objectUnits(key['widthpc']);
 
             if(formFactor != 'desktop')
             {
+              ks.left=objectUnits(totalPercent+keys[j]['padpc']);
               ks.bottom=rs.bottom; ks.height=rs.height;  //these must be specified in px for rest of layout to work correctly
             }
             else 
             {
               ks.marginLeft=objectUnits(key['padpc']); 
             }
+
+            totalPercent=totalPercent+keys[j]['padpc']+keys[j]['widthpc'];
             
             btn=util._CreateElement('DIV');
 
             // Set button class
-            osk.setButtonClass(key,btn);
+            osk.setButtonClass(key,btn,layout);
                         
             // Set distinct phone and tablet button position properties
-            if(device.touchable)
+            if(formFactor != 'desktop')
             {
               btn.style.left=ks.left;
               btn.style.width=ks.width;       
@@ -2157,16 +2156,18 @@
    * 
    * @param       {Object}    key     key object
    * @param       {Object}    btn     button object
+   * @param       {Object}    layout  source layout description (optional, sometimes)
    */    
-  osk.setButtonClass = function(key,btn)
+  osk.setButtonClass = function(key,btn,layout)
   {
     var n=0,keyTypes=['default','shift','shift-on','special','special-on','','','','deadkey','blank','hidden'];
     if(typeof key['dk'] == 'string' && key['dk'] == '1') n=8;
     if(typeof key['sp'] == 'string') n=parseInt(key['sp'],10);
     if(n < 0 || n > 10) n=0;       
+    layout=layout||osk.layout;
                              
     // Apply an overriding class for 5-row layouts
-    var nRows=osk.layout.layer[0].row.length;          
+    var nRows=layout.layer[0].row.length;          
     if(nRows > 4 && util.device.formFactor == 'phone') 
       btn.className='kmw-key kmw-5rows kmw-key-'+keyTypes[n];
     else           
@@ -2456,7 +2457,7 @@
       layout.keyLabels=((typeof(PKbd['KDU']) != 'undefined') && PKbd['KDU']);
     
     kbd=osk.deviceDependentLayout(layout,formFactor);
-    kbd.className='desktop kmw-osk-inner-frame';
+    kbd.className=formFactor+'-static kmw-osk-inner-frame';
 
     // Select the layer to display, and adjust sizes 
     if(layout != null)
@@ -2465,7 +2466,6 @@
       for(Ln=0; Ln<layout.layer.length; Ln++) 
       {             
         layer=kbd.childNodes[Ln];
-        layer.style.height='100%';
         for(Lr=0; Lr<layer.childNodes.length; Lr++)
         {
           row=layer.childNodes[Lr];
@@ -2473,8 +2473,6 @@
           {
             key=row.childNodes[Lk];
             key.style.height='100%';
-            key.style.left='auto';
-            key.style.padding='0%';
           }
         }      
         if(typeof(layerId) == 'number')
