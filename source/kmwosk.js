@@ -3725,21 +3725,6 @@
               
       return true;       
   }
-
- /**
-   *  Return position of language menu key to KeymanTouch
-   *  
-   *  @return  {string}      comma-separated x,y position of language menu key
-   *  
-   **/            
-  keymanweb['touchMenuPos'] = function()
-  {
-    if(osk.lgKey == null) return '';
-      
-    var x=util._GetAbsoluteX(osk.lgKey)-util._GetAbsoluteX(osk._DivVKbd)+osk.lgKey.offsetWidth/2,
-        y=util._GetAbsoluteY(osk.lgKey)-util._GetAbsoluteY(osk._DivVKbd);
-    return x+','+y;
-  }
   
 })();
 
