@@ -22,7 +22,7 @@
 
 /** @define {number} */
 var __BUILD__ = 300;
-
+                       
 (function() 
 {
   // Define exposed base object
@@ -530,8 +530,9 @@ var __BUILD__ = 300;
         device.version=agent.match(rx)[1];
       } catch(ex){}
       
-    }  
-    if(agent.indexOf('Windows NT') >= 0)
+    }
+    // Added 'Windows Phone' for build 378  
+    if(agent.indexOf('Windows NT') >= 0 || agent.indexOf('Windows Phone') >= 0)
     {
       device.OS='Windows';
       if(agent.indexOf('Touch') >= 0) device.formFactor='phone';   // will be redefined as tablet if resolution high enough
@@ -539,7 +540,7 @@ var __BUILD__ = 300;
       // Windows Phone and Tablet PC
       if(typeof navigator.msMaxTouchPoints == 'number' && navigator.msMaxTouchPoints > 0) device.touchable=true; 
     } 
-  }  
+  }                                
   // var sxx=device.formFactor;
   // Check and possibly revise form factor according to actual screen size (adjusted for Galaxy S, maybe OK generally?)
   if(device.formFactor == 'tablet' && Math.min(screen.width,screen.height) < 400) device.formFactor='phone';
@@ -565,7 +566,7 @@ var __BUILD__ = 300;
         device.browser='chrome';
     } 
   }
- 
+                                   
   /* DEBUG: Force touch device   (Build 360)
   
   device.touchable = true;
@@ -574,8 +575,8 @@ var __BUILD__ = 300;
   device.OS = 'iOS';
   
    END DEBUG */
-                       
- 
+
+
                        
   /**
    * Expose the touchable state for UIs - will disable external UIs entirely
@@ -884,7 +885,7 @@ var __BUILD__ = 300;
     // but return without adding the style sheet if the required font type is unavailable
     
     // Non-IE browsers: use TTF if possible, otherwise use WOFF and TTF
-    if(IE >= 999)
+    if(IE >= 10)      // TTF is OK for IE10 or later 
     {
       if(device.OS == 'iOS')
       {

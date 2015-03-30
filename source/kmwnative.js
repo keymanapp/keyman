@@ -342,30 +342,60 @@
    */     
   keymanweb.handleRotationEvents=function() 
   {
-    if(device.OS == 'iOS')
-      util.attachDOMEvent(window,'orientationchange',keymanweb.rotateDevice);
-    
-    // Also manage viewport rescaling after rotation on Android
-    if(device.OS == 'Android') 
+    switch(device.OS)
     {
-      osk.wasVisible=osk.isVisible;
+      case 'iOS':
+        util.attachDOMEvent(window,'orientationchange',keymanweb.rotateDevice);
+        break;
+        
+      // Must also manage viewport rescaling after rotation on Android
+      case 'Android':   
+        osk.wasVisible=osk.isVisible;
       
-      // Hide OSK at start of rotation
-      if('onmozorientationchange' in screen)
-        util.attachDOMEvent(screen,'mozorientationchange',osk.hideNow);
-      else
-        util.attachDOMEvent(window,'orientationchange',osk.hideNow);
-
-      // Then align inputs and redisplay the OSK on resize event following rotation
-      util.attachDOMEvent(window,'resize',
-        function(){
-          keymanweb.alignInputs(true);
-          osk.hideLanguageList();
-          osk._Load();
-          if(osk.wasVisible)osk._Show();
-          }
-        );
-     } 
+        // Hide OSK at start of rotation
+        if('onmozorientationchange' in screen)
+          util.attachDOMEvent(screen,'mozorientationchange',osk.hideNow);
+        else
+          util.attachDOMEvent(window,'orientationchange',osk.hideNow);
+  
+        // Then align inputs and redisplay the OSK on resize event following rotation
+        util.attachDOMEvent(window,'resize',
+          function(){     
+            keymanweb.alignInputs(true);
+            osk.hideLanguageList();
+            osk._Load();
+            if(osk.wasVisible) osk._Show();
+            }
+          );
+        break;
+      case 'Windows':
+      
+        // Hide OSK at start of rotation, then regenerate keyboard with new scaling
+        // *** This needs to be changed to simply rescale the keyboard ***
+        // *** Need to support other browsers as well as IE10 ***
+        // *** Doesn't usually redisplay keyboard, but is so slow anyway, maybe not important ***
+        // *** Element focus is not maintained after a rotation and is not easily restored ***
+  
+        screen.addEventListener('MSOrientationChange',
+          function()
+          {
+            osk.wasVisible=osk._Enabled;          
+            osk.hideNow();
+            osk.hideLanguageList();
+            window.setTimeout(
+              function()
+              {                      
+                keymanweb.alignInputs(true); 
+                if(osk.wasVisible) osk._Enabled = 1;                
+                osk._Load();
+                window.setTimeout(keymanweb._FocusLastActiveElement,1000);
+                // Focus is normally handled by Pointer event, but must be 
+                // handled explicitly following a rotation
+                keymanweb.setFocus(keymanweb.lastFocusEvent);
+              },0);
+          },false); 
+        break;      
+      } 
 
     //TODO: may be able to recognize start of rotation using accelerometer call...
     //util.attachDOMEvent(window,'devicemotion',keymanweb.testRotation);
@@ -380,14 +410,13 @@
   keymanweb.rotateDevice = function(e)  // Rewritten for I3363 (Build 301)
   {                    
     osk.hideLanguageList();  
-     
     if(!osk._Visible) return;
     // Always re-adjust OSK rows for rounding to nearest pixel
-//    if(osk.ready) 
-//    {
-      //nLayer=osk.resetRowLengths();  // clear aligned flag for all layers     
+    if(osk.ready && device.OS == 'Windows') 
+    {
+      nLayer=osk.resetRowLengths();  // clear aligned flag for all layers     
       //osk.adjustRowLengths(nLayer);  // adjust lengths in visible layer      
-//    }
+    }
            
     osk.adjustHeights();       
      
