@@ -1434,7 +1434,13 @@
       e.stopImmediatePropagation();
       var scroller=osk.lgList.childNodes[0],
           yMax=scroller.scrollHeight-scroller.offsetHeight,
-          y=e.touches[0].pageY, dy=y-osk.lgList.y0;
+		  y, dy;
+		  
+      if("undefined" != typeof e.pageY) y = e.pageY;
+      else if("undefined" != typeof e.touches) y = e.touches[0].pageY;
+      else return;
+
+      dy=y-osk.lgList.y0;
       
       // Scroll up (show later listed languages)
       if(dy < 0)
@@ -1511,8 +1517,10 @@
       osk.highlightKey(osk.lgKey.firstChild,false);
       osk.lgList.style.visibility='hidden';
       window.setTimeout(function(){
-        document.body.removeChild(osk.lgList.shim);
-        document.body.removeChild(osk.lgList);
+	    if(osk.lgList != null && typeof osk.lgList != 'undefined') {
+          document.body.removeChild(osk.lgList.shim);
+          document.body.removeChild(osk.lgList);
+		}
         osk.lgList=null;
         },500);
     }
@@ -2497,7 +2505,8 @@
    *    
    **/      
   osk.adjustHeights=function()
-  {        
+  { 
+	if(!osk._Box || !osk._Box.firstChild || !osk._Box.firstChild.firstChild || !osk._Box.firstChild.firstChild.childNodes) return;
     var layers=osk._Box.firstChild.firstChild.childNodes,
         nRows=layers[0].childNodes.length,
         oskHeight=osk.getHeight(),
@@ -3723,21 +3732,6 @@
               
       return true;       
   }
-
- /**
-   *  Return position of language menu key to KeymanTouch
-   *  
-   *  @return  {string}      comma-separated x,y position of language menu key
-   *  
-   **/            
-  keymanweb['touchMenuPos'] = function()
-  {
-    if(osk.lgKey == null) return '';
-      
-    var x=util._GetAbsoluteX(osk.lgKey)-util._GetAbsoluteX(osk._DivVKbd)+osk.lgKey.offsetWidth/2,
-        y=util._GetAbsoluteY(osk.lgKey)-util._GetAbsoluteY(osk._DivVKbd);
-    return x+','+y;
-  }
-  
+ 
 })();
 
