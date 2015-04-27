@@ -851,7 +851,7 @@ var __BUILD__ = 300;
     if(typeof(fd['files']) == 'undefined') fd['files']=fd['source'];                                       
     if(typeof(fd['files']) == 'undefined') return;
 
-    var i,ttf='',woff='',eot='',fList=[];
+    var i,ttf='',woff='',eot='',svg='',fList=[];
     
 // TODO: 22 Aug 2014: check that font path passed from cloud is actually used!
      
@@ -866,12 +866,14 @@ var __BUILD__ = 300;
       if(fList[i].indexOf('.ttf') > 0) ttf=fList[i];
       if(fList[i].indexOf('.woff') > 0) woff=fList[i];
       if(fList[i].indexOf('.eot') > 0) eot=fList[i];
+      if(fList[i].indexOf('.svg') > 0) svg=fList[i];
     }
 
     // Font path qualified to support page-relative fonts (build 347)
     if(ttf != '' && (ttf.indexOf('/') < 0))  ttf=keymanweb.options['fonts']+ttf;
     if(woff != '' && (woff.indexOf('/') < 0)) woff=keymanweb.options['fonts']+woff;
     if(eot != '' && (eot.indexOf('/') < 0))  eot=keymanweb.options['fonts']+eot;   
+    if(svg != '' && (svg.indexOf('/') < 0))  svg=keymanweb.options['fonts']+svg;
 
     // Build the font-face definition according to the browser being used
     var s='@font-face {\nfont-family:'
@@ -883,34 +885,41 @@ var __BUILD__ = 300;
     // Build the font source string according to the browser, 
     // but return without adding the style sheet if the required font type is unavailable
     
-    // Non-IE browsers: use TTF if possible, otherwise use WOFF and TTF
-    if(IE >= 999)
+    // Modern browsers: use WOFF, TTF and fallback finally to SVG. Don't provide EOT
+    if(IE >= 9)
     {
       if(device.OS == 'iOS')
       {
+        // TODO: Investigate why this is here. May no longer be necessary.
         if(ttf != '') 
           s=s+'src:url(\''+ttf+'\') format(\'truetype\');';
         else return; 
       }
       else 
       {
-        if(ttf != '' && woff != '')
-          s=s+'src:url(\''+woff+'\') format(\'woff\'),url(\''+ttf+'\') format(\'truetype\');';
-          // TODO: The following may be better but needs more testing to be sure
-          //s=s+'src:url(\''+ttf+'\') format(\'truetype\'),url(\''+woff+'\') format(\'woff\');';
-        else if(woff != '')
-          s=s+'src:url(\''+woff+'\') format(\'woff\');';
-        else if(ttf != '')
-          s=s+'src:url(\''+ttf+'\') format(\'truetype\');';
-        else return;
+        var s0 = [];
+        
+        if(device.OS == 'Android') {
+          // Android 4.2 and 4.3 have bugs in their rendering for some scripts 
+          // with embedded ttf or woff.  svg mostly works so is a better initial
+          // choice on the Android browser.
+          if(svg != '') s0.push("url('"+svg+"') format('svg')");
+          if(woff != '') s0.push("url('"+woff+"') format('woff')");
+          if(ttf != '') s0.push("url('"+ttf+"') format('truetype')");
+        } else {
+          if(woff != '') s0.push("url('"+woff+"') format('woff')");
+          if(ttf != '') s0.push("url('"+ttf+"') format('truetype')");
+          if(svg != '') s0.push("url('"+svg+"') format('svg')");
+        }        
+        if(s0.length == 0) return;
+        
+        s += 'src:'+s0.join(',')+';';
       }
     }    
-    // IE
+    // IE 6-8
     else
     {
-      if(eot != '' && IE < 9) // IE6 - IE8
-        s=s+'src:url(\''+eot+'?#iefix\') format(\'embedded-opentype\');';
-      else if(eot != '')      // IE9 compatibility mode(?)
+      if(eot != '') 
         s=s+'src:url(\''+eot+'\');';
       else return;  
     }
