@@ -932,23 +932,22 @@
 
       // On touch event, reposition the text caret and prepare for OSK input
       // Removed 'onfocus=' as that resulted in handling the event twice (on iOS, anyway) 
-      // Handle mousedown, mouseup, mousemove events to allow desktop simulation (Build 360) 
       
-      x.addEventListener('touchstart', keymanweb.setFocus); // Chrome emulation does not support ontouchstart :(
-      x.onmspointerdown=x.onmousedown=function(e) {
+      x.addEventListener('touchstart', keymanweb.setFocus);
+      x.onmspointerdown=function(e) {
         e.preventDefault();
         e.stopPropagation();
         return keymanweb.setFocus(e);
       };
 
       x.addEventListener('touchend', function(e) {e.stopPropagation();});
-      x.onmspointerup=x.onmouseup=function(e) {
+      x.onmspointerup=function(e) {
         e.stopPropagation();
       };
       
       // Disable internal scroll when input element in focus 
       x.addEventListener('touchmove', keymanweb.dragInput, false);
-      x.onmspointermove=x.onmousemove=keymanweb.dragInput;
+      x.onmspointermove=keymanweb.dragInput;
       
       // Hide keyboard and caret when losing focus from simulated input field
       x.onblur=keymanweb.setBlur;
