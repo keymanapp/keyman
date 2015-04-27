@@ -2164,7 +2164,7 @@
    * 
    * @param       {Object}    key     key object
    * @param       {Object}    btn     button object
-   * @param       {Object}    layout  source layout description (optional, sometimes)
+   * @param       {Object=}   layout  source layout description (optional, sometimes)
    */    
   osk.setButtonClass = function(key,btn,layout)
   {
