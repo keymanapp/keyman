@@ -1864,7 +1864,7 @@
             osk.setButtonClass(key,btn,layout);
                         
             // Set distinct phone and tablet button position properties
-            if(device.touchable)
+            if(formFactor != 'desktop')
             {
               btn.style.left=ks.left;
               btn.style.width=ks.width;       
