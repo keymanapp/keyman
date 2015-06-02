@@ -23,11 +23,12 @@
 
 (function()
 {
-  // Declare KeymanWeb object
-  var keymanweb=window['tavultesoft']['keymanweb'];
-  
-  // Define standard keycode numbers  
-  var keyCodes={
+  // Declare KeymanWeb and member objects
+  var keymanweb=window['tavultesoft']['keymanweb'], osk=keymanweb['osk'],
+      util=keymanweb['util'],device=util.device,dbg=keymanweb.debug;
+
+  // Define standard keycode numbers (exposed for use by other modules)  
+  osk.keyCodes={
   	"K_BKSP":8,"K_TAB":9,"K_ENTER":13,
   	"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18,"K_PAUSE":19,"K_CAPS":20,
   	"K_ESC":27,"K_SPACE":32,"K_PGUP":33,
@@ -71,66 +72,71 @@
   
   var dfltText='`1234567890-=\xA7~~qwertyuiop[]\\~~~asdfghjkl;\'~~~~~?zxcvbnm,./~~~~~ '
               +'~!@#$%^&*()_+\xA7~~QWERTYUIOP{}\\~~~ASDFGHJKL:"~~~~~?ZXCVBNM<>?~~~~~ ';
-    
-  // Declare keymanweb osk, util and device objects
-  var osk=keymanweb['osk'],util=keymanweb['util'],device=util.device,dbg=keymanweb.debug;
-  
-  osk._Box=null;              // Main DIV for OSK
-	osk._DivVKbd=null;
-  osk._DivVKbdHelp=null;
-  osk._Visible=0;             // Whether or not actually visible
-  osk._Enabled=1;             // Whether or not enabled by UI
-  osk._VShift=[];
-  osk._VKeySpans=[];
-  osk._VKeyDown=null;
-	osk._VKbdContainer=null;
-	osk._VOriginalWidth=1;      // Non-zero default value needed
-  osk._BaseLayout='us';       // default BaseLayout
-  osk._BaseLayoutEuro={};     // I1299 (not currently exposed, but may need to be e.g. for external users)
+      
+  osk._Box = null;              // Main DIV for OSK
+	osk._DivVKbd = null;
+  osk._DivVKbdHelp = null;
+  osk._Visible = 0;             // Whether or not actually visible
+  osk._Enabled = 1;             // Whether or not enabled by UI
+  osk._VShift = [];
+  osk._VKeySpans = [];
+  osk._VKeyDown = null;
+	osk._VKbdContainer = null;
+	osk._VOriginalWidth = 1;      // Non-zero default value needed
+  osk._BaseLayout = 'us';       // default BaseLayout
+  osk._BaseLayoutEuro = {};     // I1299 (not currently exposed, but may need to be e.g. for external users)
   osk._BaseLayoutEuro['se'] = '\u00a71234567890+´~~~QWERTYUIOP\u00c5\u00a8\'~~~ASDFGHJKL\u00d6\u00c4~~~~~<ZXCVBNM,.-~~~~~ ';  // Swedish
-  osk._BaseLayoutEuro['uk'] = '`1234567890-=~~~QWERTYUIOP[]#~~~ASDFGHJKL;\'~~~~~\\ZXCVBNM,./~~~~~ '; // UK
+  osk._BaseLayoutEuro['uk'] = '`1234567890- = ~~~QWERTYUIOP[]#~~~ASDFGHJKL;\'~~~~~\\ZXCVBNM,./~~~~~ '; // UK
   
   // Additional members (mainly for touch input devices)
-  osk.lgTimer=null;           // language switching timer
-  osk.lgKey=null;             // language menu key element
-  osk.hkKey=null;             // OSK hide key element
-  osk.spaceBar=null;          // space bar key element
-  osk.lgList=null;            // language menu list
-  osk.frameColor='#ad4a28';   // KeymanWeb standard frame color
-  osk.keyPending=null;        // currently depressed key (if any)
-  osk.fontFamily='';          // layout-specified font for keyboard
-  osk.fontSize='1em';         // layout-specified fontsize for keyboard
-  osk.layout=null;            // reference to complete layout
-  osk.layers=null;            // reference to layout (layers array for this device)
-  osk.layerId='default';      // currently active OSK layer (if any)
-  osk.nextLayer='default';    // layer to be activated after pressing key in current layer  
-  osk.layerIndex=0;           // currently displayed layer index
-  osk.currentKey='';          // id of currently pressed key (desktop OSK only)
-  osk.subkeyDelayTimer=null;  // id for touch-hold delay timer
-  osk.popupPending=false;     // KMTouch popup flag 
-  osk.styleSheet=null;        // current OSK style sheet object, if any
-  osk.loadRetry=0;            // counter for delayed loading, if keyboard loading prevents OSK being ready at start
-  osk.popupDelay=500;         // Delay must be less than native touch-hold delay (build 352)
+  osk.lgTimer = null;           // language switching timer
+  osk.lgKey = null;             // language menu key element
+  osk.hkKey = null;             // OSK hide key element
+  osk.spaceBar = null;          // space bar key element
+  osk.lgList = null;            // language menu list
+  osk.frameColor = '#ad4a28';   // KeymanWeb standard frame color
+  osk.keyPending = null;        // currently depressed key (if any)
+  osk.fontFamily = '';          // layout-specified font for keyboard
+  osk.fontSize = '1em';         // layout-specified fontsize for keyboard
+  osk.layout = null;            // reference to complete layout
+  osk.layers = null;            // reference to layout (layers array for this device)
+  osk.layerId = 'default';      // currently active OSK layer (if any)
+  osk.nextLayer = 'default';    // layer to be activated after pressing key in current layer  
+  osk.layerIndex = 0;           // currently displayed layer index
+  osk.currentKey = '';          // id of currently pressed key (desktop OSK only)
+  osk.subkeyDelayTimer = null;  // id for touch-hold delay timer
+  osk.popupPending = false;     // Device popup pending flag 
+  osk.popupVisible = false;     // Device popup displayed
+  osk.popupCallout = null;      // OSK popup callout element
+  osk.styleSheet = null;        // current OSK style sheet object, if any
+  osk.loadRetry = 0;            // counter for delayed loading, if keyboard loading prevents OSK being ready at start
+  osk.popupDelay = 500;         // Delay must be less than native touch-hold delay (build 352)
+  osk.currentTarget = null;     // Keep track of currently touched key when moving over keyboard
+  osk.touchCount = 0;           // Number of active (unreleased) touch points
+  osk.touchX = 0;               // First touch point x (to check for sliding off screen)
   
   // Additional members for desktop OSK
-  osk.x=99;                    // last visible offset left
-  osk.y=0;                    // last visible offset top
-  osk.width=1;                // Saved width of OSK (since actual width only available if visible)
-  osk.height=1;               // Saved height of OSK
-  osk.rowHeight=1;            // Current row height in px
-  osk.nRows=1;                // Number of rows in each layer of current layout
-  osk.vpScale=1;              // Current viewport scale factor  (not valid until initialized)
-  osk.closeButton=null;       // icon to hide OSK
-  osk.resizeIcon=null;        // resizing icon 
-  osk.resizing=0;             // resizing flag
-  osk.pinImg=null;            // icon to restore OSK to default position
-  osk.userPositioned=0;       // Set to true(<>0) if dragged by user
-  osk.dfltX='';               // Left position set by page code
-  osk.dfltY='';               // Top position set by page code
-  osk.noDrag=false;           // allow page to override user OSK dragging
-  osk.shim=null;              // Shim DIV for OSK
-  osk.keytip=null;            // Key hint (phones)
-  osk.touchY=0;               // First y position of touched key
+  osk.x = 99;                   // last visible offset left
+  osk.y = 0;                    // last visible offset top
+  osk.width = 1;                // Saved width of OSK (since actual width only available if visible)
+  osk.height = 1;               // Saved height of OSK
+  osk.rowHeight = 1;            // Current row height in px
+  osk.nRows = 1;                // Number of rows in each layer of current layout
+  osk.vpScale = 1;              // Current viewport scale factor  (not valid until initialized)
+  osk.closeButton = null;       // icon to hide OSK
+  osk.resizeIcon = null;        // resizing icon 
+  osk.resizing = 0;             // resizing flag
+  osk.pinImg = null;            // icon to restore OSK to default position
+  osk.userPositioned = 0;       // Set to true(<>0) if dragged by user
+  osk.dfltX = '';               // Left position set by page code
+  osk.dfltY = '';               // Top position set by page code
+  osk.noDrag = false;           // allow page to override user OSK dragging
+  osk.shim = null;              // Shim DIV for OSK
+  osk.keytip = null;            // Key preview (phones)
+  osk.touchY = 0;               // First y position of touched key
+  
+  // Placeholder functions
+  osk.addCallout = function(e){};
 
   /**
    * Function     addEventListener
@@ -392,129 +398,46 @@
     return Ltarg;
   }
    
-   /**
-   * Handle button touch event 
-   * 
-   * @param       {Object}    k      element touched
-   * @param       {Object}    e      OSK event   
-   */    
-  osk.touchKey = function(k,e)
-  {
-    e.preventDefault(); e.cancelBubble=true;
-    if(typeof e.stopImmediatePropagation == 'function') e.stopImmediatePropagation();
-    else if(typeof e.stopPropagation == 'function') e.stopPropagation();
-
-    // Ignore multi-touch events
-    if(typeof e.touches == 'object' && e.touches.length > 1) return;
-
-    osk.touchY=(typeof(e.touches) == 'object' ? e.touches[0].clientY : e.clientY);
-         
-    // Get key name (K_...) from element ID
-    var keyName=k.id.split('-')[1];
-
-    // Special function keys need immediate action
-    if(keyName == 'K_LOPT' || keyName == 'K_ROPT')
-    {
-      // TODO: using deferred action helps to prevent unwanted selection of background element 
-      // on Android, but still doesn't do it properly
-      osk.highlightKey(k,true);
-      window.setTimeout(function(){osk.clickKey(k);},0);
-    }
-    // Also backspace, to allow delete to repeat while key held
-    else if(keyName == 'K_BKSP')
-    {
-      osk.highlightKey(k,true);
-      keymanweb.KO(1,keymanweb._LastActiveElement,"");
-      osk.deleting=true;
-      window.setTimeout(osk.repeatDelete,500);
-    }
-    // Otherwise enable keystroke on release
-    else if(osk.keyPending == null) 
-    {
-      // Save active key to enable correct touch-move and release behaviour
-      osk.keyPending=k; 
-    
-      // Highlight key when touched pending action or release 
-      osk.highlightKey(k,true);
-      
-      // If this key has subkey, start timer to display subkeys after delay, set up release
-      if(k.subKeys != null) osk.subkeyDelayTimer=window.setTimeout(function(){osk.showSubKeys(k);},osk.popupDelay);  
-    }
-  } 
-
-  /**
-   *  Repeat backspace as long as the backspace key is held down
-   **/      
-  osk.repeatDelete = function()
-  {
-    if(osk.deleting)
-    {
-      keymanweb.KO(1,keymanweb._LastActiveElement,"");
-      window.setTimeout(osk.repeatDelete,200);
-    }
-  }
-  
   /**
    *  Add or remove a class from a keyboard key (when touched or clicked)
-   *  and add a key tip for phone devices   
-   *  (Assumes that there is a default class name as well.)   
+   *  or add a key preview for phone devices   
    *  
    *  @param    {Object}    key   key affected
    *  @param    {boolean}   on    add or remove highlighting
-   *  @param    {string=}   name  name of class to append, defaulting to kmw-key-touched     
    **/                  
-  osk.highlightKey = function(key,on,name)
-  {
-    var classes=key.className,
-        cs=arguments.length>2?' '+arguments[2]:' kmw-key-touched';
-    if(classes != '')
-    {  
-      if(classes.indexOf(cs) >= 0)
+  osk.highlightKey = function(key,on)
+  {            
+    // Do not change element class unless a key
+    if(!key || (key.className == '') || (key.className.indexOf('kmw-key-row') >= 0)) return;
+   
+    var classes=key.className, cs = ' kmw-key-touched';
+        
+    // For phones, use key preview rather than highlighting the key, 
+    // except for space, bksp, enter, shift and popup keys  
+    var usePreview = ((osk.keytip != null) 
+      && (classes.indexOf('kmw-key-shift') < 0)
+      && (classes.indexOf('kmw-spacebar') < 0)
+      && (key.id.indexOf('popup') < 0 ));
+   
+    if(usePreview)
+    {                  
+      osk.showKeyTip(key,on);
+    }
+    else
+    {
+      if(on && classes.indexOf(cs) < 0)
       {
-        if(!on) key.className=classes.replace(cs,'');
+        key.className=classes+cs;
+        osk.showKeyTip(null,false);     // Moved here by Serkan 
       }
       else
-      {
-        if(on) key.className=classes+cs;
-      }
-    }
-    
-    // Add (or remove) the keytip preview (if KeymanWeb on a phone device) 
-    osk.showKeyTip(key,on);
+      {   
+        key.className=classes.replace(cs,'');
+      }    
+    }          
   }
-
       
   /**
-  * Highlight active keyboard button when moving pointer over key
-  * 
-  * @param       {Object}      k      element touched
-  * @param       {Object}      e      OSK event   
-  */    
-  osk.moveOverKeys = function(k,e)
-  { 
-    e.preventDefault(); e.cancelBubble=true;
-    if(typeof e.stopImmediatePropagation == 'function') e.stopImmediatePropagation();
-    else if(typeof e.stopPropagation == 'function') e.stopPropagation();
-    
-    // Don't change highlighting unless a key is pressed
-    if(osk.keyPending == null) return;
-    
-    // Get touch position, active key element coordinates, and active key name
-    var x=typeof e.touches == 'object' ? e.touches[0].clientX : e.clientX,
-        y=typeof e.touches == 'object' ? e.touches[0].clientY : e.clientY;
-    var x0=util._GetAbsoluteX(k),y0=util._GetAbsoluteY(k),//-document.body.scrollTop,
-      x1=x0+k.offsetWidth,y1=y0+k.offsetHeight,
-      keyName=k.id.split('-')[1],
-      onKey=(x > x0 && x < x1 && y > y0 && y < y1);
-    
-      // Highlight key at touch position (except for special control keys, for which separate timing is needed)
-      if(keyName != 'K_LOPT' && keyName != 'K_ROPT') osk.highlightKey(k,onKey);  
-  
-    // And handle popup key highlighting (if applicable)
-    osk.highlightSubKeys(k,x,y);     
-  } 
- 
-   /**
    * Display touch-hold array of 'sub-keys' above the currently touched key
    * @param       {Object}    e      primary key element 
    */    
@@ -533,10 +456,23 @@
       t,ts,t1,ts1,kDiv,ks,btn,bs;
     
     subKeys.id='kmw-popup-keys';
-    
+    osk.popupBaseKey = e;
+  
+    // Does the popup array include the base key?   *** condition for phone only ***
+    var idx = e.id.split('-'), baseId = idx[idx.length-1];
+
+    // If not, insert at start
+    if(device.formFactor == 'phone' && e.subKeys[0].id != baseId) 
+    { 
+      var eCopy={'id':baseId,'layer':''};
+      if(idx.length > 1) eCopy['layer'] = idx[0];                         
+      eCopy['text'] = e.firstChild.textContent;      
+      e.subKeys.splice(0,0,eCopy);
+    }
+
     // Must set position dynamically, not in CSS
     var ss=subKeys.style;
-    ss.bottom=(parseInt(e.style.bottom,10)+parseInt(e.style.height,10)+10)+'px';
+    ss.bottom=(parseInt(e.style.bottom,10)+parseInt(e.style.height,10)+4)+'px';
 
     // Set key font according to layout, or defaulting to OSK font
     // (copied, not inherited, since OSK is not a parent of popup keys)
@@ -608,10 +544,13 @@
       kDiv.appendChild(btn);
       subKeys.appendChild(kDiv);      
     }
-                                                                                   
+    
     // Register the popup key array, return if registration succeeds
     if(osk.registerPopup(e)) return;
-      
+    
+    // Clear key preview if any
+    osk.showKeyTip(null,false);            
+  
     // Otherwise append the touch-hold (subkey) array to the OSK    
     osk._Box.appendChild(subKeys);
 
@@ -621,24 +560,30 @@
       xMax=(util.landscapeView()?screen.height:screen.width)-subKeys.offsetWidth;
     
     if(x > xMax) x=xMax; if(x < 0) x=0; ss.left=x+'px';   
+
+    // Add the callout
+    osk.popupCallout = osk.addCallout(e);
     
-    // Then add the callout DIV triangle (with a border, by superposing a second DIV triangle)
-    t=document.createElement('DIV'); t.className='arrow-border'; ts=t.style;
-    x=util._GetAbsoluteX(e)+0.5*e.offsetWidth-16;
-    y=subKeys.offsetTop+subKeys.offsetHeight-1;
-    ts.left=x+'px'; ts.top=y+'px';
+    // Make the popup keys visible
+    ss.visibility='visible';
     
-    t1=document.createElement('DIV'); t1.className='arrow-content'; 
-    ts=t1.style;
-    ts.left=(x+1)+'px'; ts.top=(y-1)+'px';
-    t.appendChild(t1);
-    
-    subKeys.appendChild(t);  
-    
-    // Finally make it visible
-    ss.visibility='visible'; 
+    // And fade main keyboard
+    ss.zIndex='10000';                                                         
+    subKeys.shim=document.createElement('DIV'), ss=subKeys.shim.style;    
+    ss.position = 'fixed'; ss.width='100%'; ss.height = '100%';//osk._Box.offsetHeight+'px';
+    ss.display = 'block'; ss.bottom = '0'; ss.left = '0'; ss.opacity = '0.1';
+    ss.backgroundColor = '#000'; ss.pointerEvents = 'none';     
+    osk._Box.appendChild(subKeys.shim); 
+
+    // Highlight the duplicated base key (if a phone)
+    if(device.formFactor == 'phone')
+    { 
+      var bk = subKeys.childNodes[0].firstChild;
+      osk.keyPending = bk; 
+      osk.highlightKey(bk,true);//bk.className = bk.className+' kmw-key-touched';
+    }
   }
-         
+  
   /**
    * Function     getVKDictionaryCode
    * Scope        Private
@@ -665,6 +610,80 @@
     var res=keymanweb._ActiveKeyboard['VKDictionary'][keyName];
     return res ? res : 0;
   }
+  /**
+   * Select the next keyboard layer for layer switching keys
+   * The next layer will be detgermined from the key name unless otherwise specifed    
+   * 
+   *  @param  {string}            keyName     key identifier
+   *  @param  {string|undefined}  nextLayerIn optional next layer identifier           
+   *  @return {boolean}                       return true if keyboard layer changed
+   */        
+  osk.selectLayer = function(keyName,nextLayerIn)
+  {
+    var nextLayer = arguments.length < 2 ? null : nextLayerIn;
+      
+    // Identify next layer, if required by key
+    if(!nextLayer) switch(keyName)
+    {
+      case 'K_LSHIFT':
+      case 'K_RSHIFT':
+      case 'K_SHIFT':
+        nextLayer = 'shift'; break;
+      case 'K_LCONTROL':
+      case 'K_RCONTROL':
+      case 'K_LCTRL':
+      case 'K_RCTRL':
+      case 'K_CTRL':        
+        nextLayer = 'ctrl'; break;
+      case 'K_LMENU':
+      case 'K_RMENU':
+      case 'K_LALT':
+      case 'K_RALT':
+      case 'K_ALT':
+        nextLayer = 'alt'; break;
+      case 'K_ALTGR':
+        nextLayer = 'ctrlalt'; break;
+      case 'K_CURRENCIES':
+      case 'K_NUMERALS':
+      case 'K_SHIFTED': 
+      case 'K_UPPER':
+      case 'K_LOWER':
+      case 'K_SYMBOLS':
+        nextLayer = 'default'; break;
+    }
+
+    if(!nextLayer) return false;
+    
+    osk.updateLayer(nextLayer); 
+    osk._Show();
+    return true;        
+  }
+
+  /**
+   * Get the default key code from the virtual key code (physical keyboard mapping)
+   * 
+   * @param   {string}  keyName
+   * @param   {number}  n
+   * @param   {number}  keyShiftState
+   * @return  {number}
+   */                     
+  osk.defaultKeyOutput = function(keyName,n,keyShiftState)
+  {
+    var ch = 0;
+    
+    // Test for fall back to U_xxxx key id           
+    if((keyName.substr(0,2) == 'U_') && (n > 32) && !(n>127 && n<!160))  
+      ch=String.fromCharCode(n);
+    else if(n >= 48 && n <= 57)
+      ch = codesUS[keyShiftState][0][n-48];
+    else if(n >=65 && n <= 90)
+      ch = String.fromCharCode(n+(keyShiftState?0:32));
+    else if(n >= 186 && n <= 192)
+      ch = codesUS[keyShiftState][1][n-186];
+    else if(n >= 219 && n <= 222)
+      ch = codesUS[keyShiftState][2][n-219];
+    return ch;
+  }
   
   /**
    * Simulate a keystroke according to the touched keyboard button element
@@ -679,9 +698,6 @@
     var t=e.id.split('-');
     if(t.length < 2) return true; //shouldn't happen, but...
  
-    // Test of code used for callback from KMEI, KMEA   (Build 353)
-    //if(t[0] == 'popup') {keymanweb['executePopupKey'](e.id.replace('popup-','')); return true;}
-
     // Remove popup prefix before processing keystroke (KMEW-93)
     if(t[0] == 'popup') t.splice(0,1);
         
@@ -691,59 +707,19 @@
       var layer=t[0],keyName=t[1], keyShiftState=osk.getModifierState(osk.layerId),nextLayer=keyShiftState;
 
       if(typeof(e.key) != 'undefined') nextLayer=e.key['nextlayer']; 
-      if(keymanweb._ActiveElement == null) keymanweb._ActiveElement=Lelem;    
-      switch(keyName)
+      if(keymanweb._ActiveElement == null) keymanweb._ActiveElement=Lelem; 
+      
+      // Exclude menu and OSK hide keys from normal click processing
+      if(keyName == 'K_LOPT' || keyName == 'K_ROPT')
       {
-        case 'K_LSHIFT':
-        case 'K_RSHIFT':
-        case 'K_SHIFT':
-          osk.highlightKey(e,false);
-          osk.updateLayer(nextLayer ? nextLayer : 'shift');
-          osk._Show();
-          return true;
-        case 'K_LCONTROL':
-        case 'K_RCONTROL':
-        case 'K_LCTRL':
-        case 'K_RCTRL':
-        case 'K_CTRL':        
-          osk.highlightKey(e,false);
-          osk.updateLayer(nextLayer ? nextLayer : 'ctrl');
-          osk._Show();
-          return true;
-        case 'K_LALT':
-        case 'K_RALT':
-        case 'K_ALT':
-          osk.highlightKey(e,false);
-          osk.updateLayer(nextLayer ? nextLayer : 'alt');
-          osk._Show();
-          return true;
-        case 'K_ALTGR':
-          osk.highlightKey(e,false);
-          osk.updateLayer(nextLayer ? nextLayer : 'ctrlalt');
-          osk._Show();
-          return true;
-
-        case 'K_LOPT':
-        case 'K_ROPT':
-          osk.optionKey(e,keyName,true);
-          return true;
-          
-        case 'K_CURRENCIES':
-        case 'K_NUMERALS':
-        case 'K_SHIFTED': 
-        case 'K_UPPER':
-        case 'K_LOWER':
-        case 'K_SYMBOLS':
-          osk.highlightKey(e,false);
-          osk.updateLayer(nextLayer ? nextLayer : 'default');
-          osk._Show();        
-          return true;         
-          
-        default:
-      }        
-
-      // Restore default key color
+          osk.optionKey(e,keyName,true); return true;      
+      }   
+      
+      // Turn off key highlighting (or preview)
       osk.highlightKey(e,false);
+
+      // Process modifier key action
+      if(osk.selectLayer(keyName,nextLayer)) return true;
 
       // Prevent any output from 'ghost' (unmapped) keys
       if(keyName != 'K_SPACE')
@@ -770,8 +746,10 @@
       keymanweb._DeadkeyDeleteMatched();      // Delete any matched deadkeys before continuing
       //keymanweb._DeadkeyResetMatched();       // I3318   (Not needed if deleted first?)
 
+
+
       // First check the virtual key, and process shift, control, alt or function keys 
-      Lkc = {Ltarg:Lelem,Lmodifiers:0,Lcode:keyCodes[keyName],LisVirtualKey:true}; 
+      Lkc = {Ltarg:Lelem,Lmodifiers:0,Lcode:osk.keyCodes[keyName],LisVirtualKey:true}; 
 
       // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
       if(keyName.substr(0,2) == 'U_') Lkc.LisVirtualKey=false;
@@ -868,20 +846,8 @@
             keymanweb.KO(0, Lelem, ' ');
             break;
           default:
-          // All of the following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
-            var ch=0,n=Lkc.Lcode;
-            // Test for fall back to U_xxxx key id (Build 350)            
-            if((keyName.substr(0,2) == 'U_') && (n > 32) && !(n>127 && n<!160))  
-              ch=String.fromCharCode(n);
-            else if(n >= 48 && n <= 57)
-              ch = codesUS[keyShiftState][0][n-48];
-            else if(n >=65 && n <= 90)
-              ch = String.fromCharCode(n+(keyShiftState?0:32));
-            else if(n >= 186 && n <= 192)
-              ch = codesUS[keyShiftState][1][n-186];
-            else if(n >= 219 && n <= 222)
-              ch = codesUS[keyShiftState][2][n-219];
-
+            // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
+            var ch = osk.defaultKeyOutput(keyName,Lkc.Lcode,keyShiftState);          
             if(ch)keymanweb.KO(0, Lelem, ch);           
         }        
       }
@@ -1030,66 +996,7 @@
     }
     catch(ex){}    
   }
-      
-  /**
-   * Cancel any pending (timed) keystroke touch events 
-   * 
-   * @param       {Object}      Ltarg     touched element
-   * @param       {Object}      e         touchend event
-   */    
-  osk.releaseKey = function(Ltarg,e)
-  { 
-    e.preventDefault(); e.cancelBubble=true;
-    if(typeof e.stopImmediatePropagation == 'function') e.stopImmediatePropagation(); 
-    else if(typeof e.stopPropagation == 'function') e.stopPropagation(); 
-      
-    // Cancel the subkey display timer event if pending
-    if(osk.subkeyDelayTimer) window.clearTimeout(osk.subkeyDelayTimer);
-    if(osk.lgTimer) window.clearTimeout(osk.lgTimer);
-    osk.subkeyDelayTimer=osk.lgTimer=null; 
- 
-    // Remove highlighting from backspace key 
-    if(e.target.id && e.target.id.indexOf('K_BKSP') >= 0)
-      osk.highlightKey(e.target,false);
-    else if(e.target.parentNode.id && e.target.parentNode.id.indexOf('K_BKSP') >= 0)
-      osk.highlightKey(e.target.parentNode,false); 
-    osk.deleting=false;
-
-    // Handle menu key release event 
-    osk.optionKey(e,Ltarg.id,false);
-
-    if(osk.keyPending !== null)
-    {   
-      var lastKey=null;    
-      if(typeof e.changedTouches != 'undefined' && e.changedTouches.length > 0)
-        lastKey=document.elementFromPoint(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
-      else if(typeof e.target != 'undefined') 
-        lastKey=e.target;
-
-      if(lastKey != null) 
-      {
-        if(lastKey.id == '') lastKey=lastKey.parentNode;
-        {          
-
-          // Check that still in subkey array or on original target, then execute keystroke if so
-          if(lastKey == osk.keyPending || lastKey.parentNode.parentNode.id == 'kmw-popup-keys') 
-          {             
-            osk.clickKey(lastKey); osk.keyPending=null; 
-          }
-          else
-          {
-            osk.highlightKey(osk.keyPending,false);
-          }
-        }          
-      }
-      osk.keyPending=null; 
-    }    
     
-    // Remove the subkey array, if any
-    var sk=document.getElementById('kmw-popup-keys');
-    if(sk != null) sk.parentNode.removeChild(sk);
-  }
-  
   /**
    * Display list of installed keyboards in pop-up menu
    **/    
@@ -1108,7 +1015,7 @@
     menu.shim.id='kmw-language-menu-background';
     menu.shim.addEventListener('touchstart',
       function(e)
-      {
+      {                   
         e.preventDefault(); osk.hideLanguageList();
         
         // Display build only if touching menu, space *and* one other point on screen (build 369)
@@ -1434,7 +1341,13 @@
       e.stopImmediatePropagation();
       var scroller=osk.lgList.childNodes[0],
           yMax=scroller.scrollHeight-scroller.offsetHeight,
-          y=e.touches[0].pageY, dy=y-osk.lgList.y0;
+		  y, dy;
+		  
+      if("undefined" != typeof e.pageY) y = e.pageY;
+      else if("undefined" != typeof e.touches) y = e.touches[0].pageY;
+      else return;
+
+      dy=y-osk.lgList.y0;
       
       // Scroll up (show later listed languages)
       if(dy < 0)
@@ -1511,37 +1424,15 @@
       osk.highlightKey(osk.lgKey.firstChild,false);
       osk.lgList.style.visibility='hidden';
       window.setTimeout(function(){
-        document.body.removeChild(osk.lgList.shim);
-        document.body.removeChild(osk.lgList);
+	    if(osk.lgList != null && typeof osk.lgList != 'undefined') {
+          document.body.removeChild(osk.lgList.shim);
+          document.body.removeChild(osk.lgList);
+		}
         osk.lgList=null;
         },500);
     }
   }
   
-  /**
-   * Highlight active language button when moving pointer it
-   *  
-   * @param       {Object}      k      element touched
-   * @param       {Object}      e      OSK event   
-       
-  osk.moveOverMenu = function(k,e)
-  { 
-    e.preventDefault(); e.cancelBubble=true;
-    if(typeof e.stopImmediatePropagation == 'function') e.stopImmediatePropagation();
-    else if(typeof e.stopPropagation == 'function') e.stopPropagation();
-    
-    // Don't change highlighting unless a key is pressed
-    //if(osk.keyPending == null) return;
-    
-    // Get touch position, active key element coordinates, and active key name
-    var x=typeof e.touches == 'object' ? e.touches[0].clientX : e.clientX,
-        y=typeof e.touches == 'object' ? e.touches[0].clientY : e.clientY;
-    var x0=util._GetAbsoluteX(k),y0=util._GetAbsoluteY(k),//-document.body.scrollTop,
-      x1=x0+k.offsetWidth,y1=y0+k.offsetHeight;
-      
-    osk.highlightKey(k,(x > x0 && x < x1 && y > y0 && y < y1),); 
-    }
-   */         
   /**
    * Function     _UpdateVKShift
    * Scope        Private
@@ -1675,37 +1566,36 @@
   }        
 
   /**
-   * Mouse event handler for desktop simulation of touch devices (Build 360)
+   * Mouse down/mouse over event handler (desktop only)
    * 
    * @param   {Event}  e  mouse over/mouse down event object      
    */      
   osk.mouseOverMouseDownHandler = function(e)
-  {
+  {            
     var t=util.eventTarget(e);
-    if(t === null) return; 
+    if(t === null || device.formFactor != 'desktop') return;
+     
     if(t.nodeName == 'SPAN') t=t.parentNode;
     if(util.eventType(e) == 'mousedown')
     {
       osk.currentKey=t.id; osk._CancelMouse(e);
       osk.highlightKey(t,true);
-      //t.style.backgroundColor='rgb(128,128,255)';
-    }
+    }    
     else if(t.id == osk.currentKey) 
     {
       osk.highlightKey(t,true);
-      //t.style.backgroundColor='rgb(128,128,255)';
-    }
+    }    
   } 
   
   /**
-   * Mouse event handlers for desktop simulation of touch devices (Build 360)
+   * Mouse up/mouse out event handler (desktop only)
    * 
    * @param   {Event}  e  mouse up/out event object      
    */      
   osk.mouseUpMouseOutHandler = function(e)
   {
     var t=util.eventTarget(e);
-    if(t === null) return; 
+    if(t === null || device.formFactor != 'desktop') return;
     
     if(t.nodeName == 'SPAN') t=t.parentNode;                
     osk.highlightKey(t,false);
@@ -1718,24 +1608,7 @@
     }
   }
 
-  /**
-   * mspointer down event handlers for desktop simulation of touch devices (Build 360)
-   * @param   {Event}  e  mspointerdown event object      
-   */      
-  osk.mspointerdownHandler = function(e){osk.touchKey(this,e);};
-   
-  /**
-   * mspointer up event handlers for desktop simulation of touch devices (Build 360)
-   * @param   {Event}  e  mspointerup event object      
-   */      
-  osk.mspointerupHandler = function(e){osk.releaseKey(this,e);};
-  
-  /**
-   * mspointer move event handlers for desktop simulation of touch devices (Build 360)
-   * @param   {Event}  e  mspointermove event object      
-   */      
-  osk.mspointermoveHandler = function(e){osk.moveOverKeys(this,e);};
-  
+
   /**
    * Create the OSK for a particular keyboard and device
    * 
@@ -1818,13 +1691,23 @@
         objectWidth = osk.getWidth();     
       }
 
+      if(true)  //singleEventModel
+      {       
+        if(device.touchable && ('ontouchstart' in window))
+        {       
+          lDiv.addEventListener('touchstart', osk.touch,true);
+          lDiv.addEventListener('touchend', osk.release,false);
+          lDiv.addEventListener('touchmove', osk.moveOver,false);
+          //lDiv.addEventListener('touchcancel', osk.cancel,false); //event never generated by iOS
+        }
+      }
       for(n=0; n<layers.length; n++)
       {
         layer=layers[n]; 
         layer.aligned=false;
         gDiv=util._CreateElement('DIV'),gs=gDiv.style; 
         gDiv.className='kmw-key-layer';
-
+  
         // Always make the first layer visible 
         gs.display=(n==0?'block':'none');
         gs.height=ls.height;
@@ -1882,7 +1765,7 @@
         for(i=0; i<rows.length; i++)
         {
           rDiv=util._CreateElement('DIV');
-          rDiv.className='kmw-key-row';
+          rDiv.className='kmw-key-row';         
           // The following event trap is needed to prevent loss of focus in IE9 when clicking on a key gap.
           // Unclear why normal _CreateElement prevention of loss of focus does not seem to work here.
           // Appending handler to event handler chain does not work (other event handling remains active).
@@ -1960,26 +1843,25 @@
             kDiv.keyId=key['id'];           
             kDiv.className='kmw-key-square';
             ks=kDiv.style;
-            if(formFactor != 'desktop')
-            { 
-              ks.left=objectUnits(totalPercent+keys[j]['padpc']);
-            }
-            totalPercent=totalPercent+keys[j]['padpc']+keys[j]['widthpc'];
+
             kDiv.width=ks.width=objectUnits(key['widthpc']);
 
             if(formFactor != 'desktop')
             {
+              ks.left=objectUnits(totalPercent+keys[j]['padpc']);
               ks.bottom=rs.bottom; ks.height=rs.height;  //these must be specified in px for rest of layout to work correctly
             }
             else 
             {
               ks.marginLeft=objectUnits(key['padpc']); 
             }
+
+            totalPercent=totalPercent+keys[j]['padpc']+keys[j]['widthpc'];
             
             btn=util._CreateElement('DIV');
 
             // Set button class
-            osk.setButtonClass(key,btn);
+            osk.setButtonClass(key,btn,layout);
                         
             // Set distinct phone and tablet button position properties
             if(device.touchable)
@@ -1993,7 +1875,7 @@
             if(layout.keyLabels || (formFactor == 'desktop')) //desktop or KDU flag set
             {
               // Create the default key cap labels (letter keys, etc.)
-              var x=keyCodes[key.id];         
+              var x=osk.keyCodes[key.id];         
               switch(x)
               {
                 case 186: x=59; break; 
@@ -2039,51 +1921,37 @@
                        
             // Define callbacks to handle key touches: iOS and Android tablets and phones
             // TODO: replace inline function calls??
-            if("ontouchstart" in window)
+            //if("ontouchstart" in window)
+            if(device.touchable)
             {
-              util.attachDOMEvent(btn,'touchstart',
-              function(e){
-                osk.touchKey(this,e);
-              }); 
-              util.attachDOMEvent(btn,'touchend',
-              function(e){
-                osk.releaseKey(this,e);
-              });
-              util.attachDOMEvent(btn,'touchmove',
-              function(e){
-                osk.moveOverKeys(this,e);
-              });
-              // The following handler is also needed on Android to prevent spurious background element selection
-              // It should not be necessary, and is not needed on iOS.
-             
-              btn.onclick=function(e){e.preventDefault(); e.stopPropagation();};
+/*            
+              if(false && "ontouchstart" in window)      //separate key event model
+              {
+                util.attachDOMEvent(btn,'touchstart',
+                function(e){
+                  osk.touchKey(this,e);
+                }); 
+                util.attachDOMEvent(btn,'touchend',
+                function(e){
+                  osk.releaseKey(this,e);
+                });
+                util.attachDOMEvent(btn,'touchmove',
+                function(e){
+                  osk.moveOverKeys(this,e);
+                });
+              }            
+*/
             }
-            // Windows tablets and phones(?)
-            else if(device.touchable && device.OS == 'Windows')
-            {
-              btn.style.msTouchAction='none'; //prevent default touch action on OSK keys
-              //btn.onmspointerdown=function(e){osk.touchKey(this,e);}; 
-              //btn.onmspointerup=function(e){osk.releaseKey(this,e);};
-              //btn.onmspointermove=function(e){osk.moveOverKeys(this,e);};
-              btn.onmspointerdown=osk.mspointerdownHandler; // Build 360 
-              btn.onmspointerup=osk.mspointerupHandler;     // Build 360
-              btn.onmspointermove=osk.mspointermoveHandler; // Build 360
-              
-              // The following handler is also needed on Android to prevent spurious background element selection
-              // It should not be necessary, and is not needed on iOS.
-              //btn.onclick=function(e){e.preventDefault(); e.stopPropagation();};
-            
-            }
-            // Handle mouse button events for browsers on desktop devices
             else
-            {              
+            {
               // Highlight key while mouse down or if moving back over originally selected key
               btn.onmouseover=btn.onmousedown=osk.mouseOverMouseDownHandler; // Build 360
               
               // Remove highlighting when key released or moving off selected element         
-              btn.onmouseup=btn.onmouseout=osk.mouseUpMouseOutHandler; //Build 360
-            }  
-             
+              btn.onmouseup=btn.onmouseout=osk.mouseUpMouseOutHandler; //Build 360            
+            }
+            
+            // Add OSK key labels
             var t=util._CreateElement('SPAN'),ts=t.style;
             if(key['text'] == null || key['text'] == '') 
             { 
@@ -2152,21 +2020,370 @@
     return oldText;                    
   }
           
+  osk.clearPopup = function()
+  {
+    // Remove the displayed subkey array, if any, and cancel popup request
+    var sk=document.getElementById('kmw-popup-keys');
+    if(sk != null) 
+    {
+      if(sk.shim) osk._Box.removeChild(sk.shim);
+      sk.parentNode.removeChild(sk);
+    }
+    
+    if(osk.popupCallout) osk._Box.removeChild(osk.popupCallout);
+    osk.popupCallout = null;
+    
+    if(osk.subkeyDelayTimer) 
+    {
+        window.clearTimeout(osk.subkeyDelayTimer);
+        osk.subkeyDelayTimer = null;
+    } 
+    osk.popupBaseKey = null;   
+  }
+  
+  /**
+   * OSK touch start event handler
+   * 
+   *  @param  {Event} e   touch start event object
+   *
+   */                 
+  osk.touch = function(e)
+  {             
+    // Identify the key touched
+    var t = e.changedTouches[0].target, key = osk.keyTarget(t);
+
+    // Save the touch point  
+    osk.touchX = e.changedTouches[0].pageX; 
+
+    // Set the key for the new touch point to be current target, if defined
+    osk.currentTarget = key;
+
+    // Prevent multi-touch if popup displayed
+    var sk = document.getElementById('kmw-popup-keys');
+    if((sk && sk.style.visibility == 'visible') || osk.popupVisible) return; 
+    
+    // Keep track of number of active (unreleased) touch points
+    osk.touchCount = e.touches.length;
+    
+    // Get nearest key if touching a hidden key or the end of a key row
+    if((key && (key.className.indexOf('key-hidden') >= 0)) 
+      || t.className.indexOf('kmw-key-row') >= 0)
+    {           
+      key = osk.findNearestKey(e,t);   
+    }
+    // Do not do anything if no key identified!
+    if(key == null) return; 
+  
+    // Get key name (K_...) from element ID
+    var keyName=key.id.split('-')[1];
+ 
+    // Highlight the touched key
+    osk.highlightKey(key,true);
+             
+    // Special function keys need immediate action    
+    if(keyName == 'K_LOPT' || keyName == 'K_ROPT')
+    {
+      window.setTimeout(function(){osk.clickKey(key);},0);
+      osk.keyPending = null;
+    }
+    // Also backspace, to allow delete to repeat while key held
+    else if(keyName == 'K_BKSP')
+    {                                       
+      keymanweb.KO(1,keymanweb._LastActiveElement,"");
+      osk.deleting=true;
+      window.setTimeout(osk.repeatDelete,500);
+      osk.keyPending = null;
+    }
+    else
+    {
+      if(osk.keyPending) 
+      {
+        osk.highlightKey(osk.keyPending,false);       
+        osk.clickKey(osk.keyPending); 
+        osk.clearPopup();
+        // Decrement the number of unreleased touch points to prevent 
+        // sending the keystroke again when the key is actually released
+        osk.touchCount--;
+      }
+      else
+      {
+        // If this key has subkey, start timer to display subkeys after delay, set up release
+        if(key.subKeys != null) osk.subkeyDelayTimer=window.setTimeout(function(){osk.showSubKeys(key);},osk.popupDelay);  
+      }
+      osk.keyPending = key;    
+    }
+  }  
+   
+  /**
+   * OSK touch release event handler
+   * 
+   *  @param  {Event} e   touch release event object
+   *
+   **/                
+  osk.release = function(e)
+  {                     
+    // Prevent incorrect multi-touch behaviour if native or device popup visible
+    var sk = document.getElementById('kmw-popup-keys'), t = osk.currentTarget;
+    if((sk && sk.style.visibility == 'visible') || osk.popupVisible)  
+    {                   
+      // Ignore release if a multiple touch
+      if(e.touches.length > 0) return;
+          
+      // Cancel (but do not execute) pending key if neither a popup key or the base key
+      if((t == null) || ((t.id.indexOf('popup') < 0) && (t.id != osk.popupBaseKey.id)))
+      {    
+        osk.highlightKey(osk.keyPending,false);
+        osk.clearPopup();      
+        osk.keyPending = null;        
+      }                                           
+    }
+
+    // Handle menu key release event 
+    if(t && t.id) osk.optionKey(e,t.id,false);
+
+    // Test if moved off screen (effective release point must be corrected for touch point horizontal speed)
+    // This is not completely effective and needs some tweaking, especially on Android   
+    var x = e.changedTouches[0].pageX, 
+        beyondEdge = ((x < 2 && osk.touchX > 5) ||
+          (x > window.innerWidth - 2 && osk.touchX < window.innerWidth - 5));
+
+    // Save then decrement current touch count
+    var tc=osk.touchCount;
+    if(osk.touchCount > 0) osk.touchCount--;
+
+    // Process and clear highlighting of pending target
+    if(osk.keyPending)
+    {               
+      osk.highlightKey(osk.keyPending,false);     
+
+      // Output character unless moved off key
+      if(osk.keyPending.className.indexOf('hidden') < 0 && 
+          tc > 0 && !beyondEdge) osk.clickKey(osk.keyPending); 
+      osk.clearPopup();      
+      osk.keyPending = null;
+    }
+    // Always clear highlighting of current target on release (multi-touch)
+    else 
+    {  
+      var tt = e.changedTouches[0];
+      t = osk.keyTarget(tt.target);          
+      if(!t)
+      {
+        var t1 = document.elementFromPoint(tt.clientX,tt.clientY);
+        t = osk.findNearestKey(e,t1);   
+      }          
+      osk.highlightKey(t,false);      
+    }
+
+    // Clear repeated backspace if active
+    osk.deleting = false;     
+  }
+  
+  /**
+   * OSK touch move event handler
+   * 
+   *  @param  {Event} e   touch move event object
+   *
+   **/                
+  osk.moveOver = function(e)
+  { 
+    e.preventDefault(); e.cancelBubble=true;
+    if(typeof e.stopImmediatePropagation == 'function') e.stopImmediatePropagation();
+    else if(typeof e.stopPropagation == 'function') e.stopPropagation();
+    
+    // Do not move over keys if device popup visible 
+    if(osk.popupVisible) return;
+                             
+    // Do not attempt to support reselection of target key for overlapped keystrokes
+    if(e.touches.length > 1 || osk.touchCount == 0) return;
+
+    // Get touch position
+    var x=typeof e.touches == 'object' ? e.touches[0].clientX : e.clientX,
+        y=typeof e.touches == 'object' ? e.touches[0].clientY : e.clientY;
+
+    // Move target key and highlighting
+    var t = e.changedTouches[0],    
+        t1 = document.elementFromPoint(x,y),
+        key0 = osk.keyPending,
+        key1 = osk.keyTarget(t1);
+
+    // Find the nearest key to the touch point if not on a visible key
+    if((key1 && key1.className.indexOf('key-hidden') >= 0) ||
+      (t1 && (!key1) && t1.className.indexOf('key-row') >= 0))
+    {
+        key1 = osk.findNearestKey(e,t1);
+    }
+    
+    // Stop repeat if no longer on BKSP key
+    if(key1 && (typeof key1.id == 'string') && (key1.id.indexOf('BKSP') < 0)) 
+      osk.deleting = false;
+    
+    // Use the popup duplicate of the base key if a phone with a visible popup array
+    var sk=document.getElementById('kmw-popup-keys');
+    if(sk && sk.style.visibility == 'visible' 
+      && device.formFactor == 'phone' && key1 == osk.popupBaseKey)
+    { 
+      key1 = sk.childNodes[0].firstChild; 
+    }
+    
+    // Identify current touch position (to manage off-key release)
+    osk.currentTarget = key1;  
+                                          
+    // Clear previous key highlighting
+    if(key0 && key1 && (key1.id != key0.id)) osk.highlightKey(key0,false);
+                                    
+    // If popup is visible, need to move over popup, not over main keyboard
+    osk.highlightSubKeys(key1,x,y);
+    
+    if(sk && sk.style.visibility == 'visible')
+    {          
+      if(key1 && key1.id.indexOf('popup') < 0 && key1 != osk.popupBaseKey) return;
+      if(key1 && key1 == osk.popupBaseKey && key1.className.indexOf('kmw-key-touched') < 0) osk.highlightKey(key1,true);    
+    }
+    // Cancel touch if moved up and off keyboard, unless popup keys visible
+    else 
+    {
+      var yMin = Math.max(5,osk._Box.offsetTop - 0.25*osk._Box.offsetHeight);
+      if(key0 && e.touches[0].pageY < Math.max(5,osk._Box.offsetTop - 0.25*osk._Box.offsetHeight))
+      {
+        osk.highlightKey(key0,false); osk.showKeyTip(null,false); osk.keyPending = null;
+      }
+    }         
+
+    // Replace the target key, if any, by the new target key
+    // Do not replace a null target, as that indicates the key has already been released
+    if(key1 && osk.keyPending) osk.keyPending = key1;
+    
+    if(osk.keyPending)
+    { 
+      if(key0 != key1 || key1.className.indexOf('kmw-key-touched') < 0) osk.highlightKey(key1,true); 
+    }
+    
+    if(key0 && key1 && (key1 != key0) && (key1.id != ''))
+    {
+     // Clear and restart the popup timer
+      if(osk.subkeyDelayTimer) 
+      {
+        window.clearTimeout(osk.subkeyDelayTimer);
+        osk.subkeyDelayTimer = null;
+      }    
+      if(key1.subKeys != null) 
+      {
+        osk.subkeyDelayTimer = window.setTimeout(
+          function()
+          {
+            osk.clearPopup();
+            osk.showSubKeys(key1);
+          }, 
+          osk.popupDelay);
+      }  
+    }
+  }
+
+  // osk.cancel = function(e) {} //cancel event is never generated by iOS
+
+  /**
+   * Get the current key target from the touch point element within the key
+   *    
+   * @param   {Object}  t   element at touch point
+   * @return  {Object}      the key element (or null)
+   **/    
+  osk.keyTarget = function(t)
+  {      
+    try {
+      if(t)
+      {
+        if(t.className.indexOf('kmw-key ') >= 0) return t;    
+        if(t.parentNode && t.parentNode.className.indexOf('kmw-key ') >= 0) return t.parentNode;
+        if(t.firstChild && t.firstChild.className.indexOf('kmw-key ') >= 0) return t.firstChild;
+      }      
+    } catch(ex){}
+    return null;
+  }        
+ 
+  /**
+   * Identify the key nearest to the touch point if at the end of a key row,
+   * but return null more than about 0.6 key width from the nearest key.
+   * 
+   *  @param  {Event}   e   touch event
+   *  @param  {Object}  t   HTML object at touch point  
+   *  @return {Object}      nearest key to touch point
+   *          
+   **/      
+  osk.findNearestKey = function(e,t)
+  {                 
+    if((!e) || (typeof e.changedTouches == 'undefined') 
+      || (e.changedTouches.length == 0)) return null;
+    
+    // Get touch point on screen
+    var x = e.changedTouches[0].pageX;
+ 
+    // Get key-row beneath touch point    
+    while(t && t.className.indexOf('key-row') < 0) t = t.parentNode;
+    if(!t) return null;
+ 
+    // Find minimum distance from any key
+    var k, k0=0, dx, dxMax=24, dxMin=100000, x1, x2;
+    for(k = 0; k < t.childNodes.length; k++)
+    {
+      if(t.childNodes[k].firstChild.className.indexOf('key-hidden') >= 0) continue;
+      x1 = t.childNodes[k].firstChild.offsetLeft;
+      x2 = x1 + t.childNodes[k].firstChild.offsetWidth;
+      dx =x1 - x;
+      if(dx >= 0 && dx < dxMin)
+      {
+        k0 = k; dxMin = dx;
+      }
+      dx = x - x2;
+      if(dx >= 0 && dx < dxMin)
+      {
+        k0 = k; dxMin = dx;
+      }      
+    }     
+    if(dxMin < 100000)
+    {
+      t = t.childNodes[k0].firstChild;    
+      x1 = t.offsetLeft;
+      x2 = x1 + t.offsetWidth;  
+                 
+      // Limit extended touch area to the larger of 0.6 of key width and 24 px
+      if(t.offsetWidth > 40) dxMax = 0.6 * t.offsetWidth; 
+      if(((x1 - x) >= 0 && (x1 - x) < dxMax) || 
+          ((x - x2) >= 0 && (x - x2) < dxMax)) 
+        return t;
+    }   
+    return null;
+  } 
+
+  /**
+   *  Repeat backspace as long as the backspace key is held down
+   **/      
+  osk.repeatDelete = function()
+  {             
+    if(osk.deleting)
+    {
+      keymanweb.KO(1,keymanweb._LastActiveElement,"");
+      window.setTimeout(osk.repeatDelete,100);
+    }
+  }
+
   /**
    * Attach appropriate class to each key button, according to the layout 
    * 
    * @param       {Object}    key     key object
    * @param       {Object}    btn     button object
+   * @param       {Object=}   layout  source layout description (optional, sometimes)
    */    
-  osk.setButtonClass = function(key,btn)
+  osk.setButtonClass = function(key,btn,layout)
   {
     var n=0,keyTypes=['default','shift','shift-on','special','special-on','','','','deadkey','blank','hidden'];
     if(typeof key['dk'] == 'string' && key['dk'] == '1') n=8;
     if(typeof key['sp'] == 'string') n=parseInt(key['sp'],10);
     if(n < 0 || n > 10) n=0;       
+    layout=layout||osk.layout;
                              
     // Apply an overriding class for 5-row layouts
-    var nRows=osk.layout.layer[0].row.length;          
+    var nRows=layout.layer[0].row.length;          
     if(nRows > 4 && util.device.formFactor == 'phone') 
       btn.className='kmw-key kmw-5rows kmw-key-'+keyTypes[n];
     else           
@@ -2456,7 +2673,7 @@
       layout.keyLabels=((typeof(PKbd['KDU']) != 'undefined') && PKbd['KDU']);
     
     kbd=osk.deviceDependentLayout(layout,formFactor);
-    kbd.className='desktop kmw-osk-inner-frame';
+    kbd.className=formFactor+'-static kmw-osk-inner-frame';
 
     // Select the layer to display, and adjust sizes 
     if(layout != null)
@@ -2465,7 +2682,6 @@
       for(Ln=0; Ln<layout.layer.length; Ln++) 
       {             
         layer=kbd.childNodes[Ln];
-        layer.style.height='100%';
         for(Lr=0; Lr<layer.childNodes.length; Lr++)
         {
           row=layer.childNodes[Lr];
@@ -2473,8 +2689,6 @@
           {
             key=row.childNodes[Lk];
             key.style.height='100%';
-            key.style.left='auto';
-            key.style.padding='0%';
           }
         }      
         if(typeof(layerId) == 'number')
@@ -2499,7 +2713,8 @@
    *    
    **/      
   osk.adjustHeights=function()
-  {        
+  { 
+	if(!osk._Box || !osk._Box.firstChild || !osk._Box.firstChild.firstChild || !osk._Box.firstChild.firstChild.childNodes) return;
     var layers=osk._Box.firstChild.firstChild.childNodes,
         nRows=layers[0].childNodes.length,
         oskHeight=osk.getHeight(),
@@ -2670,7 +2885,7 @@
    * Description  Activate the KMW UI on mouse over 
    */    
   osk._VKbdMouseOver = function(e)
-  {
+  {       
     keymanweb._IsActivatingKeymanWebUI = 1;
   }
 
@@ -2980,7 +3195,7 @@
    * @param       {number=}     Py      y-coordinate for OSK rectangle 
    */  
   osk._Show = function(Px, Py)
-  {      
+  {        
     // Do not try to display OSK if undefined, or no active element  
     if(osk._Box == null || keymanweb._ActiveElement == null) return;
         
@@ -3251,7 +3466,7 @@
         {
           // Set opacity to zero, should decrease smoothly 
           os.opacity='0';
-  
+
           // Actually hide the OSK at the end of the transition  
           osk._Box.addEventListener('transitionend',osk.hideNow,false);
           osk._Box.addEventListener('webkitTransitionEnd',osk.hideNow,false);
@@ -3282,7 +3497,7 @@
   {   
     osk._Box.removeEventListener('transitionend',osk.hideNow,false);
     osk._Box.removeEventListener('webkitTransitionEnd',osk.hideNow,false);
-
+    
     var os=osk._Box.style;
     os.display='none';
     os.opacity='1';
@@ -3318,7 +3533,7 @@
       // And to prevent touch event default behaviour on mobile devices 
       // TODO: are these needed, or do they interfere with other OSK event handling ????
       if(device.touchable) // I3363 (Build 301)
-      {
+      {                                                        
         util.attachDOMEvent(osk._Box,'touchstart',function(e){keymanweb._IsActivatingKeymanWebUI=1; e.preventDefault();e.stopPropagation();});
         util.attachDOMEvent(osk._Box,'touchend',function(e){e.preventDefault(); e.stopPropagation();});
         util.attachDOMEvent(osk._Box,'touchmove',function(e){e.preventDefault();e.stopPropagation();});
@@ -3459,11 +3674,10 @@
         keymanweb._TitleElement.className=''; keymanweb._TitleElement.style.color='#fff';
       }
     }
-
-    // Create a keytip DIV if a phone device (Build 349)
+ 
+    // Create the key preview (for phones)
     osk.createKeyTip();
         
-
     // Correct the classname for the (inner) OSK frame (Build 360)
     var innerFrame=osk._Box.firstChild,
       kbdClass=' kmw-keyboard-'+(keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'].replace('Keyboard_','') : '');
@@ -3622,109 +3836,6 @@
     
     return true;
   } 
-
- /**
-   *  Accept an external key ID (from KeymanTouch) and pass to the keyboard mapping
-   *  
-   *  @param  {string}  keyName   key identifier
-   **/            
-  keymanweb['executePopupKey'] = function(keyName)
-  {              
-      if(!keymanweb._ActiveKeyboard) return false;
-
-      // Changes for Build 353 to resolve KMEI popup key issues      
-      keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)      
-      
-      var t=keyName.split('-'),layer=(t.length>1?t[0]:osk.layerId);
-      keyName=t[t.length-1];       
-      if(layer == 'undefined') layer=osk.layerId;
-              
-      var Lelem=keymanweb._LastActiveElement,Lkc,keyShiftState=osk.getModifierState(layer);
-      
-      if(keymanweb._ActiveElement == null) keymanweb._ActiveElement=Lelem;    
-      
-      switch(keyName)
-      {
-        case 'K_LSHIFT':
-        case 'K_RSHIFT':
-        case 'K_SHIFT':
-          osk.updateLayer('shift');
-          osk._Show();
-          return true;
-        case 'K_LCONTROL':  
-        case 'K_RCONTROL':  
-        case 'K_LCTRL':
-        case 'K_RCTRL':
-        case 'K_CTRL':
-          osk.updateLayer('ctrl');
-          osk._Show();
-          return true;
-        case 'K_LMENU':
-        case 'K_RMENU':
-        case 'K_LALT':
-        case 'K_RALT':
-        case 'K_ALT':
-          osk.updateLayer('alt');
-          osk._Show();
-          return true;
-        case 'K_ALTGR':
-          osk.updateLayer('ctrlalt');
-          osk._Show();
-          return true;
-        default:
-      }        
-      
-      
-      // First check the virtual key 
-      Lkc = {Ltarg:Lelem,Lmodifiers:0,Lcode:keyCodes[keyName],LisVirtualKey:true}; 
-
-      if(typeof Lkc.Lcode == 'undefined')
-        Lkc.Lcode = osk.getVKDictionaryCode(keyName);
-
-      if(!Lkc.Lcode)
-      {
-        // Key code will be Unicode value for U_xxxx keys
-        if(keyName.substr(0,2) == 'U_')
-        {                 
-          var tUnicode=parseInt(keyName.substr(2),16);
-          if(!isNaN(tUnicode)) Lkc.Lcode=tUnicode;  
-        }
-      }
-     
-      //if(!Lkc.Lcode) return false;  // Value is now zero if not known (Build 347)
-      //Build 353: revert to prior test to try to fix lack of KMEI output, May 1, 2014      
-      if(isNaN(Lkc.Lcode) || !Lkc.Lcode) return false;  
-            
-      Lkc.vkCode=Lkc.Lcode;
-
-      // Ensure that KIK returns true for U_xxxx keys to avoid firing nomatch
-      if(keyName.substr(0,2) == 'U_') Lkc.isVirtualKey=false;
-      
-      // Define modifiers value for sending to keyboard mapping function
-      Lkc.Lmodifiers = keyShiftState*0x10; 
-
-      // Pass this key code and state to the keyboard program
-      if(!keymanweb._ActiveKeyboard) return false;
-      if(Lkc.Lcode == 0 ) return false;
-      if(keymanweb._ActiveKeyboard['gs'](Lelem, Lkc)) return true;
-
-      var ch=0,n=Lkc.Lcode;
-      // Test for fall back to U_xxxx key id (Build 350, added here for 355)            
-      if((keyName.substr(0,2) == 'U_') && (n > 32) && !(n>127 && n<!160))  
-        ch=String.fromCharCode(n);
-      else if(n >= 48 && n <= 57)
-        ch = codesUS[keyShiftState][0][n-48];
-      else if(n >=65 && n <= 90)
-        ch = String.fromCharCode(n+(keyShiftState?0:32));
-      else if(n >= 186 && n <= 192)
-        ch = codesUS[keyShiftState][1][n-186];
-      else if(n >= 219 && n <= 222)
-        ch = codesUS[keyShiftState][2][n-219];
-
-      if(ch) keymanweb.KO(0, Lelem, ch);           
-              
-      return true;       
-  }
-  
+ 
 })();
 
