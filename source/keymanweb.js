@@ -33,9 +33,10 @@
    * Scope        Private
    * @param       {(string|Object)}     s   string (or object) to print
    * Description  Simple debug display (upper right of screen)
+   *              Extended to support multiple arguments May 2015   
    */       
   keymanweb['debug']=keymanweb.debug=function(s){
-    var p;//=document.getElementById('debug_output'); 
+    var p;
     if(keymanweb.debugElement == null)
     {
       var d=document.createElement('DIV'),ds=d.style;
@@ -52,38 +53,53 @@
       if(typeof p.textContent != 'undefined') p.textContent=''; else p.innerHTML='';
     else
     {
-      var ts=new Date().toTimeString().substr(3,5),t=s,m;
-      if(typeof s == 'object')
+      var ts=new Date().toTimeString().substr(3,5),t=ts+' ',t1,k,m,sx;
+      for(k=0; k<arguments.length; k++)
       {
-        if(s == null)
+        if(k > 0) t = t + '; ';
+        sx = arguments[k];
+        if(typeof sx == 'object')
         {
-          t='null';
+          if(sx == null)
+          {
+            t = t + 'null';
+          }
+          else
+          {
+            t1 = '';
+            for(m in sx) 
+            {
+              if(t1.length > 0) t1 = t1 + ', ';
+              t1 = t1 + m + ':';              
+              switch(typeof sx[m])
+              {
+                case 'string':
+                case 'number':
+                case 'boolean':
+                  t1 = t1 + sx[m]; break;
+                default:
+                  t1 = t1 + typeof sx[m]; break;
+              }
+              if(t1.length > 1024) 
+              {
+                t1 = t1.substr(0,1000)+'...'; break;
+              }
+            }
+            if(t1.length > 0) t = t + '{' + t1 + '}';
+          }
         }
         else
         {
-          t='{';
-          for(m in s) 
-          {
-            t=t+m+':';
-            switch(typeof s[m])
-            {
-              case 'string':
-              case 'number':
-              case 'boolean':
-                t=t+s[m]; break;
-              default:
-                t=t+typeof s[m]; break;
-            }
-            t=t+'; ';
-          }
-          if(t.length > 2) t=t.substr(0,t.length-2); //drop final semi-colon
-          t+='}';
-         } 
+          t = t + sx;
+        }
       } 
+      // Truncate if necessary to avoid memory problems
+      if(t.length > 1500) t = t.substr(0,1500) + ' (more)';  
+      
       if(typeof p.textContent != 'undefined')
-        p.textContent=ts+' '+t+'\n'+p.textContent;
+        p.textContent=t+'\n'+p.textContent;
       else
-        p.innerHTML=ts+' '+t+'<br />'+p.innerHTML;
+        p.innerHTML=t+'<br />'+p.innerHTML;
       
     }
   }
@@ -1761,7 +1777,7 @@
     var ro=Pelem.attributes['readonly'],cn=Pelem.className;
     if(typeof ro == 'object' && ro.value != 'false' ) return; 
     if(typeof cn == 'string' && cn.indexOf('kmw-disabled') >= 0) return; 
-    
+  
     if(Pelem.tagName.toLowerCase() == 'iframe') 
       keymanweb._AttachToIframe(Pelem);
     else
@@ -1783,7 +1799,7 @@
    * Description  Attaches KeymanWeb to IFrame 
    */  
   keymanweb._AttachToIframe = function(Pelem)
-  {
+  {      
     try
     {
       var Lelem=Pelem.contentWindow.document;
@@ -2080,7 +2096,7 @@
 
     //Execute external (UI) code needed on focus if required
     keymanweb.doControlFocused(LfocusTarg,keymanweb._ActiveControl);
-
+  
     // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
     if(device.touchable)
     {
@@ -3491,7 +3507,8 @@
       {          
         keymanweb.conditionallyHideOsk = function()
         {
-          if(keymanweb.hideOnRelease) osk.hideNow();
+          // Should not hide OSK if simply closing the language menu (30/4/15)
+          if(keymanweb.hideOnRelease && !osk.lgList) osk.hideNow();
           keymanweb.hideOnRelease=false;
         }
         keymanweb.hideOskIfOnBody = function(e)
