@@ -238,15 +238,14 @@
     }
   }    
 
-    // Manage popup key highlighting 
+  // Manage popup key highlighting 
   osk.highlightSubKeys=function(k,x,y)
   {      
     // Test for subkey array, return if none
-    if(k.subKeys == null) return;
+    if(k == null || k.subKeys == null) return;
 
     // Highlight key at touch position (and clear other highlighting) 
-    var i,sk,skBox,x0,y0,x1,y1,onKey;
-    skBox=document.getElementById('kmw-popup-keys');
+    var i,sk,x0,y0,x1,y1,onKey,skBox=document.getElementById('kmw-popup-keys');
 
     // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
     if((osk.touchY-y > 5) && skBox == null)
@@ -254,7 +253,7 @@
       if(osk.subkeyDelayTimer) window.clearTimeout(osk.subkeyDelayTimer);
       osk.showSubKeys(k); skBox=document.getElementById('kmw-popup-keys');
     } 
-
+        
     for(i=0; i<k.subKeys.length; i++)
     {
       try 
@@ -268,22 +267,7 @@
       } catch(ex){}           
     }    
   }
-
-  // Create a keytip DIV if a phone device (Build 349)
-  osk.createKeyTip=function()
-  {
-    if(device.formFactor == 'phone')
-    {
-      if(osk.keytip == null)
-      {  
-        osk.keytip=util._CreateElement('DIV'); 
-        osk.keytip.className='kmw-keytip';
-      }
-      // Always append to _Box (since cleared during OSK Load) 
-      osk._Box.appendChild(osk.keytip);
-    }
-  }
-
+  
   osk.optionKey=function(e,keyName,keyDown)
   {       
     if(keyDown) 
@@ -297,46 +281,194 @@
     }
   }
 
-  // Add (or remove) the keytip preview (if KeymanWeb on a phone device) 
-  osk.showKeyTip=function(key,on) 
-  {
-    if(osk.keytip == null) return;
-
-    if(on)
-    {      
-      if(key.className.indexOf('kmw-key-default') > 0 
-        && key.id.indexOf('K_SPACE') < 0
-        && key.id.indexOf('popup') < 0)
-      {                        
-        var kc=key.firstChild,kcs=kc.style,kt=osk.keytip,kts=kt.style;
-        kt.textContent=kc.textContent;     
-        kts.fontFamily=util.getStyleValue(kc,'font-family');
-        var px=util.getStyleInt(kc,'font-size');
-        if(px != 0) kts.fontSize=(1.5*px)+'px';
-        var xLeft=util._GetAbsoluteX(key),
-          xTop=util._GetAbsoluteY(key),
-          xWidth=key.offsetWidth;
-        
-        // Cannot read height or width of tip, calculate from size of text and padding
-        var tWidth=(1.5*kc.offsetWidth)+
-            util.getStyleInt(kt,'padding-left')+
-            util.getStyleInt(kt,'padding-right'),
-          kmRight=util.getStyleInt(key,'margin-right'),
-          tHeight=(1.5*kc.offsetHeight)+
-            util.getStyleInt(kt,'padding-top')+
-            util.getStyleInt(kt,'padding-bottom'),
-          kmTop=util.getStyleInt(key,'margin-top');
-        kts.left=(xLeft-kmRight+(xWidth-tWidth)/2)+'px';
-        kts.top=(util._GetAbsoluteY(key)-kmTop-osk._Box.offsetTop-tHeight)+'px';
-        kts.display='block'; 
-      }
-    }
-    else
+  /** 
+   *  Create a key preview element for phone devices
+   */    
+  osk.createKeyTip=function()
+  { 
+    if(device.formFactor == 'phone')
     {
-      osk.keytip.style.display='none';
+      if(osk.keytip == null)
+      {  
+        osk.keytip=util._CreateElement('DIV'); 
+        osk.keytip.className='kmw-keytip';
+        osk.keytip.id = 'kmw-keytip';
+        
+        // The following style is critical, so do not rely on external CSS
+        osk.keytip.style.pointerEvents='none'; 
+        
+        // Add CANVAS element for outline and SPAN for key label
+        osk.keytip.appendChild(util._CreateElement('CANVAS'));
+        osk.keytip.appendChild(util._CreateElement('SPAN'));   
+        osk.keytip.key = null;
+        osk.keytip.state = false;     
+      }
+      
+      // Always append to _Box (since cleared during OSK Load) 
+      osk._Box.appendChild(osk.keytip);
     }
   }
 
+  /**
+   * Add (or remove) the keytip preview (if KeymanWeb on a phone device)
+   * 
+   * @param   {Object}  key   HTML key element
+   * @param   {boolean} on    show or hide
+   */              
+  osk.showKeyTip=function(key,on) 
+  { 
+    var tip=osk.keytip;
+
+    // Do not change the key preview unless key or state has changed
+    if(tip == null || (key == tip.key && on == tip.state)) return;  
+
+    var sk=document.getElementById('kmw-popup-keys'),
+        popup = (sk && sk.style.visibility == 'visible')
+
+    // Create and display the preview
+    if(on && !popup)
+    {                                                       
+      var y0 = util._GetAbsoluteY(osk._Box),
+          h0 = osk._Box.offsetHeight,  
+          xLeft = util._GetAbsoluteX(key),
+          xTop = util._GetAbsoluteY(key),
+          xWidth = key.offsetWidth,
+          xHeight = key.offsetHeight,
+          kc = key.firstChild,
+          kcs = kc.style, 
+          kts = tip.style, 
+          ktLabel = tip.childNodes[1],
+          ktls = ktLabel.style,
+          edge = 0,
+          canvas = tip.firstChild, 
+          previewFontScale = 1.8; 
+
+      // Canvas dimensions must be set explicitly to prevent clipping
+      canvas.width = 1.6 * xWidth;
+      canvas.height = 2.3 * xHeight;
+ 
+      kts.top = 'auto';
+      kts.bottom = (y0 + h0 - xTop - xHeight)+'px';
+      kts.textAlign = 'center';   kts.overflow = 'visible';
+      kts.fontFamily = util.getStyleValue(kc,'font-family');
+      kts.width = canvas.width+'px';
+      kts.height = canvas.height+'px';
+
+      var px=util.getStyleInt(kc,'font-size');
+      if(px != 0) kts.fontSize = (previewFontScale * px)+'px';
+      
+      ktLabel.textContent = kc.textContent;
+      ktls.display = 'block';
+      ktls.position = 'absolute';
+      ktls.textAlign = 'center';
+      ktls.width='100%';
+      ktls.top = '2%';
+      ktls.bottom = 'auto';
+      
+      // Adjust canvas shape if at edges
+      var xOverflow = (canvas.width - xWidth) / 2;
+      if(xLeft < xOverflow)
+      {
+        edge = -1; xLeft += xOverflow;
+      }
+      else if(xLeft > window.innerWidth - xWidth - xOverflow)
+      {
+        edge = 1; xLeft -= xOverflow 
+      }
+
+      osk.drawPreview(canvas, xWidth, xHeight, edge);
+                
+      kts.left=(xLeft - xOverflow)+'px';
+      kts.display = 'block';        
+    }
+    
+    // Hide the key preview
+    else
+    {        
+      tip.style.display = 'none';
+    }
+    
+    // Save the key preview state
+    tip.key = key; tip.state = on;
+  }
+
+  /**
+   * Draw key preview in element using CANVAS
+   *  @param  {Object}  canvas CANVAS element 
+   *  @param  {number}  w width of touched key, px
+   *  @param  {number}  h height of touched key, px      
+   *  @param  {number}  edge  -1 left edge, 1 right edge, else 0     
+   */
+  osk.drawPreview = function(canvas,w,h,edge)
+  {
+    var ctx = canvas.getContext('2d'), dx = (canvas.width - w)/2, hMax = canvas.height,
+        w0 = 0, w1 = dx, w2 = w + dx, w3 = w + 2 * dx, 
+        h1 = 0.5 * hMax, h2 = 0.6 * hMax, h3 = hMax, r = 8; 
+    
+    // Adjust the preview shape at the edge of the keyboard
+    switch(edge)
+    {
+      case -1:
+        w1 -= dx; w2 -= dx; w3 -= dx;
+        break;
+      case 1:
+        w0 += dx; w1 += dx; w2 += dx;
+        break;
+    }
+    
+    // Clear the canvas
+    ctx.clearRect(0,0,canvas.width,canvas.height);     
+    
+    // Define appearance of preview (cannot be done directly in CSS)
+    ctx.fillStyle = '#ffffff';  
+    ctx.lineWidth = '1';
+    ctx.strokeStyle = '#cccccc';
+    
+    // Draw outline
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(w0+r,0);
+    ctx.arcTo(w3,0,w3,r,r);
+    ctx.arcTo(w3,h1,w2,h2,r);
+    ctx.arcTo(w2,h2,w2-r,h3,r);
+    ctx.arcTo(w2,h3,w1,h3,r);
+    ctx.arcTo(w1,h3,w1,h2-r,r);
+    ctx.arcTo(w1,h2,w0,h1-r,r);
+    ctx.arcTo(w0,h1,w0,r,r);
+    ctx.arcTo(w0,0,w0+r,0,r);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();  
+  }
+  
+  /**
+   * Add a callout for popup keys (if KeymanWeb on a phone device)
+   * 
+   * @param   {Object}  key   HTML key element
+   * @return  {Object}        callout object   
+   */              
+  osk.addCallout = function(key) 
+  {   
+    if(device.formFactor != 'phone') return null;
+      
+    var cc = util._CreateElement('DIV'),ccs = cc.style;
+    cc.id = 'kmw-popup-callout';
+    osk._Box.appendChild(cc);
+    
+    // Create the callout
+    var xLeft = key.offsetLeft,
+        xTop = key.offsetTop,
+        xWidth = key.offsetWidth,
+        xHeight = key.offsetHeight;
+
+    // Set position and style 
+    ccs.top = (xTop-6)+'px'; ccs.left = xLeft+'px'; 
+    ccs.width = xWidth+'px'; ccs.height = (xHeight+6)+'px';
+    
+    // Return callout element, to allow removal later
+    return cc;  
+  }
+     
   /**
    * Use rotation events to adjust OSK and input element positions and scaling as necessary
    */     
