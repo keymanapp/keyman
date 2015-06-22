@@ -47,7 +47,7 @@
 .phone.windows .kmw-key {position:static;}
 
 .phone .kmw-5rows {padding-top: 0;}
-.phone .kmw-key-label{position:absolute;left:20%;top:2%;font:0.5em Arial;color:#aaa; background-color:transparent;z-index:10000;}
+.phone .kmw-key-label{position:absolute;left:5%;top:1%;font:0.5em Arial;color:#aaa; background-color:transparent;z-index:10000;}
  
 .phone .kmw-key-row {-webkit-touch-callout:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}  
 
@@ -72,7 +72,7 @@
         box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;
  }
 
-.tablet .kmw-key-label{position:absolute;left:8%;top:3%;font:0.5em Arial;color:#aaa;background-color:transparent;z-index:10000;}
+.tablet .kmw-key-label{position:absolute;left:7%;top:2%;font:0.5em Arial;color:#aaa;background-color:transparent;z-index:10000;}
 .tablet .kmw-key-text{position:relative;left:0;top:0;-webkit-user-select:none;} 
 
 .tablet.ios .kmw-key-layer-group {background-color: #cfd3d9}
@@ -102,7 +102,21 @@
 .desktop .kmw-key {display:block;margin:0;border-radius:6px;text-align:center;box-sizing:border-box;-moz-box-sizing:border-box;
           overflow:hidden;width:100%;height:100%;}
 .desktop .kmw-key-label{position:absolute;left:2px;top:2px;font:0.5em Arial;color:#888;background-color:transparent;}
- 
+
+/* Popup icon style (and content)*/
+.kmw-key-popup-icon:before{content:'\2022';}
+
+.kmw-key-popup-icon{position:absolute;display:block;visibility:visible;right:4%;top:1%;/*width:8px;height:8px;*/
+      font:bold 0.5em Arial;color:#aaa;}
+/*.phone .kmw-key-popup-icon{right:6%;top:-2px;width:8px;height:8px;text-align:right;}
+.desktop .kmw-key-popup-icon{right:4%;top:0;width:8px;height:8px;} */
+
+.phone.android .kmw-key-popup-icon {top:1px;right:8%;}
+.phone.android .kmw-key-label {left:10%;top:4%;}
+
+.tablet.android .kmw-key-popup-icon {top:5px;right:8%;}
+.tablet.android .kmw-key-label {left:10%;top:3%;}
+
 /*  Additional desktop element styles */
 .kmw-footer{height:16px;width:auto;margin:0;padding:0;padding-top:2px;background-color:#ad4a28;border-radius:0 0 6px 6px;}
 .kmw-title-bar{height:20px; width:auto; margin:0; background-color:#ad4a28; padding:0;border-radius:6px 6px 0 0;}
@@ -198,16 +212,6 @@ div.kmw-keytip {
  
 .tablet.ios #kmw-popup-keys .kmw-key{border:none;}
 .phone.ios  #kmw-popup-keys .kmw-key{border:none;}
-
-
-/* Popup icon style (and content)*/
-.tablet .kmw-key-popup-icon{position:absolute;display:block;visibility:visible;right:4%;top:0;width:8px;height:8px;
-      font:bold 0.5em Arial;color:#aaa;}
-.phone .kmw-key-popup-icon{position:absolute;display:block;visibility:visible;right:6%;top:0;width:8px;height:8px;text-align:right;
-      font:bold 0.5em Arial;color:#aaa;}
-.desktop .kmw-key-popup-icon{position:absolute;display:block;visibility:visible;right:4%;top:0;width:8px;height:8px;
-      font:bold 0.5em Arial;color:#aaa;}
-.kmw-key-popup-icon:before{content:'\2022';}
 
 /* Styles for other KMW elements (keyboard loading wait notification, etc.) */
 .kmw-wait-background{display:none;position:absolute;left:0;top:0;width:100%;height:100%;
