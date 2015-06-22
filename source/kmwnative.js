@@ -341,8 +341,15 @@
           ktls = ktLabel.style,
           edge = 0,
           canvas = tip.firstChild, 
-          previewFontScale = 1.8; 
-
+          previewFontScale = 1.8;
+           
+      // Find key text element
+      for(var i=0; i<key.childNodes.length; i++)
+      {
+        kc = key.childNodes[i];
+        if(osk.hasClass(kc,'kmw-key-text')) break;    
+      }
+      
       // Canvas dimensions must be set explicitly to prevent clipping
       canvas.width = 1.6 * xWidth;
       canvas.height = 2.3 * xHeight;

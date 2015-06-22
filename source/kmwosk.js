@@ -465,8 +465,10 @@
     if(device.formFactor == 'phone' && e.subKeys[0].id != baseId) 
     { 
       var eCopy={'id':baseId,'layer':''};
-      if(idx.length > 1) eCopy['layer'] = idx[0];                         
-      eCopy['text'] = e.firstChild.textContent;      
+      if(idx.length > 1) eCopy['layer'] = idx[0];
+      for(i=0; i<e.childNodes.length; i++)
+        if(osk.hasClass(e.childNodes[i],'kmw-key-text')) break;
+      if(i < e.childNodes.length) eCopy['text'] = e.childNodes[i].textContent;      
       e.subKeys.splice(0,0,eCopy);
     }
 
@@ -1652,7 +1654,7 @@
       // Set key default attributes (must use exportable names!)
       var tKey={};
       tKey['text']=''; tKey['fontsize']=ls.fontSize; 
-      tKey['width']='100'; tKey['pad']='5'; tKey['sp']='0';
+      tKey['width']='100'; tKey['pad']='15'; tKey['sp']='0';
       tKey['layer']=null; tKey['nextlayer']=null;
 
       // Identify key labels (e.g. *Shift*) that require the special OSK font 
@@ -1740,8 +1742,8 @@
               kw = (typeof key['width'] == 'string' && key['width'] != '') ? parseInt(key['width'],10) : 100;
               if(isNaN(kw) || kw == 0) kw = 100;
               key['width'] = kw.toString();
-              kp = (typeof key['pad'] == 'string' && key['pad'] != '') ? parseInt(key['pad'],10) : 5;
-              if(isNaN(kp) || kp == 0) kp = 5;  // KMEW-119
+              kp = (typeof key['pad'] == 'string' && key['pad'] != '') ? parseInt(key['pad'],10) : 15;
+              if(isNaN(kp) || kp == 0) kp = 15;  // KMEW-119
               key['pad'] = kp.toString();
               width += kw + kp;
               //if(typeof key['width'] == 'string' && key['width'] != '') width += parseInt(key['width'],10); else width += 100;
@@ -1801,24 +1803,26 @@
            
           // Calculate actual key widths by summing defined widths and scaling each key to %,
           // adjusting the width of the last key to make the total exactly 100%
-          // Save each percentage key width as a separate member (do *not* overwrite layout specified width!)              
+          // Save each percentage key width as a separate member (do *not* overwrite layout specified width!) 
+          // NB: the 'percent' suffix is historical, units are percent on desktop devices, but pixels on touch devices
+          // All key widths and paddings are rounded for uniformity              
           var keyPercent,padPercent,totalPercent=0;        
           for(j=0; j<keys.length-1; j++)
           {
-            keyPercent=parseInt(keys[j]['width'],10)*objectWidth/totalWidth;            
-            keys[j]['widthpc']=keyPercent; 
-            padPercent=parseInt(keys[j]['pad'],10)*objectWidth/totalWidth;
+            keyPercent=Math.round(parseInt(keys[j]['width'],10)*objectWidth/totalWidth);            
+            keys[j]['widthpc']=keyPercent;    
+            padPercent=Math.round(parseInt(keys[j]['pad'],10)*objectWidth/totalWidth);
             keys[j]['padpc']=padPercent;
             totalPercent += padPercent+keyPercent;
           }  
                     
-          // Allow for right OSK margin  
-          totalPercent += 15*objectWidth/totalWidth;                   
+          // Allow for right OSK margin (15 layout units)  
+          totalPercent += Math.round(15*objectWidth/totalWidth);                   
 
           // If a single key, and padding is negative, add padding to right align the key  
           if(keys.length == 1 && parseInt(keys[0]['pad'],10) < 0)
           {
-            keyPercent=parseInt(keys[0]['width'],10)*objectWidth/totalWidth;            
+            keyPercent=Math.round(parseInt(keys[0]['width'],10)*objectWidth/totalWidth);  
             keys[0]['widthpc']=keyPercent;
             totalPercent += keyPercent;
             keys[0]['padpc']=(objectWidth-totalPercent);
@@ -1826,9 +1830,9 @@
           else if(keys.length > 0)           
           { 
             j=keys.length-1;
-            padPercent=parseInt(keys[j]['pad'],10)*objectWidth/totalWidth;
+            padPercent=Math.round(parseInt(keys[j]['pad'],10)*objectWidth/totalWidth);
             keys[j]['padpc']=padPercent;
-            totalPercent += padPercent;
+            totalPercent += padPercent;                 
             keys[j]['widthpc']=(objectWidth-totalPercent); 
           }
    
@@ -1846,12 +1850,16 @@
 
             if(formFactor != 'desktop')
             {
-              ks.left=objectUnits(totalPercent+keys[j]['padpc']);
-              ks.bottom=rs.bottom; ks.height=rs.height;  //these must be specified in px for rest of layout to work correctly
+              // Regularize interkey spacing by rounding key width and padding (Build 390) 
+              //keys[j]['padpc']=Math.round(keys[j]['padpc']);
+              //keys[j]['widthpc']=Math.round(keys[j]['widthpc']);
+              ks.left=objectUnits(totalPercent+keys[j]['padpc']);                              
+              ks.bottom=rs.bottom;                     
+              ks.height=rs.height;  //must be specified in px for rest of layout to work correctly
             }
             else 
             {
-              ks.marginLeft=objectUnits(key['padpc']); 
+              ks.marginLeft=objectUnits(key['padpc']);  
             }
 
             totalPercent=totalPercent+keys[j]['padpc']+keys[j]['widthpc'];
@@ -1865,7 +1873,7 @@
             if(formFactor != 'desktop')
             {
               btn.style.left=ks.left;
-              btn.style.width=ks.width;       
+              btn.style.width=ks.width;  
             } 
             
             // Add the (US English) keycap label for desktop OSK or if KDU flag is non-zero
@@ -1896,7 +1904,8 @@
                 q=util._CreateElement('DIV');
                 q.className='kmw-key-label'; 
                 q.innerHTML=String.fromCharCode(x);
-                kDiv.appendChild(q);
+                //kDiv.appendChild(q);                  
+                btn.appendChild(q);
               }
             }
             
@@ -1954,7 +1963,7 @@
             if('fontsize' in key) ts.fontSize=key['fontsize'];
                                     
             // Add text to button and button to placeholder div
-            btn.appendChild(t);                          
+            btn.appendChild(t);      
             kDiv.appendChild(btn);
 
             // Prevent user selection of key captions
@@ -1965,7 +1974,8 @@
             {
               var skIcon=util._CreateElement('DIV');
               skIcon.className='kmw-key-popup-icon';
-              kDiv.appendChild(skIcon);
+              //kDiv.appendChild(skIcon);
+              btn.appendChild(skIcon);              
             }
             // Add key to row
             rDiv.appendChild(kDiv);
@@ -2168,9 +2178,6 @@
     if(typeof e.stopImmediatePropagation == 'function') e.stopImmediatePropagation();
     else if(typeof e.stopPropagation == 'function') e.stopPropagation();
     
-    // Do not move over keys if device popup visible 
-    if(osk.popupVisible) return;
-                             
     // Do not attempt to support reselection of target key for overlapped keystrokes
     if(e.touches.length > 1 || osk.touchCount == 0) return;
 
@@ -2195,6 +2202,30 @@
     if(key1 && (typeof key1.id == 'string') && (key1.id.indexOf('BKSP') < 0)) 
       osk.deleting = false;
     
+    // Do not move over keys if device popup visible 
+    if(osk.popupVisible)
+    {
+      if(key1 == null) 
+      {
+        if(key0) osk.highlightKey(key0,false);
+        osk.keyPending=null;
+      }
+      else 
+      {
+        if(key1 == osk.popupBaseKey)
+        {
+          if(!osk.hasClass(key1,'kmw-key-touched')) osk.highlightKey(key1,true);
+          osk.keyPending = key1;
+        }
+        else 
+        {
+          if(key0) osk.highlightKey(key0,false);
+          osk.keyPending = null;
+        }
+      }
+      return;
+    }
+
     // Use the popup duplicate of the base key if a phone with a visible popup array
     var sk=document.getElementById('kmw-popup-keys');
     if(sk && sk.style.visibility == 'visible' 
@@ -2258,6 +2289,18 @@
   }
 
   // osk.cancel = function(e) {} //cancel event is never generated by iOS
+  
+  /**
+   * More reliable way of identifying  element class
+   * @param   {Object}  e HTML element
+   * @param   {string}  name  class name
+   * @return  {boolean}
+   */               
+  osk.hasClass = function(e, name) 
+  {
+    var className = " " + name + " ";
+    return (" " + e.className + " ").replace(/[\n\t\r\f]/g, " ").indexOf(className) >= 0;
+  }
 
   /**
    * Get the current key target from the touch point element within the key
@@ -2267,17 +2310,12 @@
    **/    
   osk.keyTarget = function(t)
   {      
-    var hasClass = function(e, name) {
-      // can't use jQuery or classlist (or polyfill)
-      var className = " " + name + " ";
-      return (" " + e.className + " ").replace(/[\n\t\r\f]/g, " ").indexOf(className) >= 0;
-    }
     try {
       if(t)
       {
-        if(hasClass(t,'kmw-key')) return t;
-        if(t.parentNode && hasClass(t.parentNode,'kmw-key')) return t.parentNode;
-        if(t.firstChild && hasClass(t.firstChild,'kmw-key')) return t.firstChild;
+        if(osk.hasClass(t,'kmw-key')) return t;
+        if(t.parentNode && osk.hasClass(t.parentNode,'kmw-key')) return t.parentNode;
+        if(t.firstChild && osk.hasClass(t.firstChild,'kmw-key')) return t.firstChild;
       }      
     } catch(ex){}
     return null;
@@ -2701,7 +2739,7 @@
         nRows=layers[0].childNodes.length,
         oskHeight=osk.getHeight(),
         rowHeight=Math.floor(oskHeight/nRows),
-        nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
+        nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad,fs=1.0;
         
     if(device.OS == 'Android' && 'devicePixelRatio' in window) 
       rowHeight = rowHeight/window.devicePixelRatio;
@@ -2712,37 +2750,39 @@
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
     b=b.firstChild.firstChild; bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
-    if(device.formFactor == 'phone')
-    {
-      pad=2;fs=0.6;
-    }
+    if(device.formFactor == 'phone') fs=0.6;
+    pad = Math.round(0.15*rowHeight);
+          
     // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!
     if(device.OS == 'iOS') 
       fs=fs/util.getViewportScale();
 
     bs.fontSize=fs+'em';  
     var resizeLabels=(device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
- 
+    
     for(nLayer=0;nLayer<layers.length; nLayer++)
     {
       layers[nLayer].style.height=(oskHeight+3)+'px';       
       for(nRow=0; nRow<nRows; nRow++)
       {                                  
         rs=layers[nLayer].childNodes[nRow].style;
-        rs.bottom=(nRows-nRow-1)*rowHeight+'px';       
+        rs.bottom=(nRows-nRow-1)*rowHeight+1+'px';            
         rs.maxHeight=rs.height=rowHeight+'px';      
         keys=layers[nLayer].childNodes[nRow].childNodes;
         nKeys=keys.length;     
         for(nKey=0;nKey<nKeys;nKey++)
         {                      
-          key=keys[nKey];
-          // Must set the height of the text DIV, not the label (if any)
-          for(j=0;j<key.childNodes.length;j++)
-            if(key.childNodes[j].className.indexOf('key-label') < 0) break;
+          key=keys[nKey];   
+          //key.style.marginTop = (device.formFactor == 'phone' ? pad : 4)+'px';
+          //**no longer needed if base key label and popup icon are within btn, not container**
+             
+          // Must set the height of the btn DIV, not the label (if any)
+          for(j=0; j<key.childNodes.length; j++)
+            if(osk.hasClass(key.childNodes[j],'kmw-key')) break;
           ks=key.childNodes[j].style;
           ks.bottom=rs.bottom; 
-          ks.height=(rowHeight-pad)+'px'; 
-                          
+          ks.height=ks.minHeight=(rowHeight-pad)+'px'; 
+          
           // Rescale keycap labels on iPhone (iOS 7)
           if(resizeLabels && (j > 0)) key.childNodes[0].style.fontSize='6px'; 
         }
@@ -3301,7 +3341,7 @@
       Lpos['y']=osk._Box.offsetTop; 
       Lpos['userLocated']=osk.userPositioned;      
       osk.doShow(Lpos);
-    }   
+    }
   }
 
   /**
@@ -3311,7 +3351,7 @@
    *  @param  {number}  nLayer    Index of currently visible layer               
    */    
   osk.adjustRowLengths = function(nLayer)
-  {
+  {        
     if(nLayer >= 0) return;   //TODO: TEST ONLY - remove code if not needed
     
     var maxWidth,layers=osk._DivVKbd.childNodes[0].childNodes;
@@ -3342,7 +3382,7 @@
   }
 
   /**
-   *  Clear the row alignement flag for each layer
+   *  Clear the row alignment flag for each layer
    *  @return   {number}    number of currently active layer
    *                 
    */    
