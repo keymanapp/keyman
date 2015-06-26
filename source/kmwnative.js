@@ -412,6 +412,11 @@
         w0 = 0, w1 = dx, w2 = w + dx, w3 = w + 2 * dx, 
         h1 = 0.5 * hMax, h2 = 0.6 * hMax, h3 = hMax, r = 8; 
     
+    if(device.OS == 'Android') 
+    {
+      r = 3;
+    }
+    
     // Adjust the preview shape at the edge of the keyboard
     switch(edge)
     {
@@ -425,22 +430,40 @@
     
     // Clear the canvas
     ctx.clearRect(0,0,canvas.width,canvas.height);     
-    
+
     // Define appearance of preview (cannot be done directly in CSS)
-    ctx.fillStyle = '#ffffff';  
+    if(device.OS == 'Android') 
+    {
+      var wx=(w1+w2)/2; 
+      w1 = w2 = wx;    
+      ctx.fillStyle = '#999';
+    }
+    else
+    {
+      ctx.fillStyle = '#ffffff';
+    }  
     ctx.lineWidth = '1';
     ctx.strokeStyle = '#cccccc';
-    
+
     // Draw outline
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(w0+r,0);
     ctx.arcTo(w3,0,w3,r,r);
-    ctx.arcTo(w3,h1,w2,h2,r);
-    ctx.arcTo(w2,h2,w2-r,h3,r);
-    ctx.arcTo(w2,h3,w1,h3,r);
-    ctx.arcTo(w1,h3,w1,h2-r,r);
-    ctx.arcTo(w1,h2,w0,h1-r,r);
+    if(device.OS == 'Android')
+    {    
+      ctx.arcTo(w3,h1,w2,h2,r);
+      ctx.arcTo(w2,h2,w1,h2,r);
+      ctx.arcTo(w1,h2,w0,h1-r,r);
+    }
+    else
+    {
+      ctx.arcTo(w3,h1,w2,h2,r);
+      ctx.arcTo(w2,h2,w2-r,h3,r);
+      ctx.arcTo(w2,h3,w1,h3,r);
+      ctx.arcTo(w1,h3,w1,h2-r,r);
+      ctx.arcTo(w1,h2,w0,h1-r,r);
+    }
     ctx.arcTo(w0,h1,w0,r,r);
     ctx.arcTo(w0,0,w0+r,0,r);
     ctx.fill();
@@ -456,7 +479,7 @@
    */              
   osk.addCallout = function(key) 
   {   
-    if(device.formFactor != 'phone') return null;
+    if(device.formFactor != 'phone' || device.OS != 'iOS') return null;
       
     var cc = util._CreateElement('DIV'),ccs = cc.style;
     cc.id = 'kmw-popup-callout';

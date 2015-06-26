@@ -569,12 +569,9 @@
     // Make the popup keys visible
     ss.visibility='visible';
     
-    // And fade main keyboard
-    ss.zIndex='10000';                                                         
-    subKeys.shim=document.createElement('DIV'), ss=subKeys.shim.style;    
-    ss.position = 'fixed'; ss.width='100%'; ss.height = '100%';//osk._Box.offsetHeight+'px';
-    ss.display = 'block'; ss.bottom = '0'; ss.left = '0'; ss.opacity = '0.1';
-    ss.backgroundColor = '#000'; ss.pointerEvents = 'none';     
+    // And add a filter to fade main keyboard
+    subKeys.shim = document.createElement('DIV');
+    subKeys.shim.id = 'kmw-popup-shim'; 
     osk._Box.appendChild(subKeys.shim); 
 
     // Highlight the duplicated base key (if a phone)
@@ -2035,7 +2032,7 @@
    *
    */                 
   osk.touch = function(e)
-  {             
+  {          
     // Identify the key touched
     var t = e.changedTouches[0].target, key = osk.keyTarget(t);
 
@@ -2173,11 +2170,11 @@
    *
    **/                
   osk.moveOver = function(e)
-  { 
+  {                            
     e.preventDefault(); e.cancelBubble=true;
     if(typeof e.stopImmediatePropagation == 'function') e.stopImmediatePropagation();
     else if(typeof e.stopPropagation == 'function') e.stopPropagation();
-    
+  
     // Do not attempt to support reselection of target key for overlapped keystrokes
     if(e.touches.length > 1 || osk.touchCount == 0) return;
 
