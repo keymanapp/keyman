@@ -58,7 +58,18 @@
 .phone.ios .kmw-key.kmw-key-shift {color:#fff;background-color:#b2b9c5;} 
 .phone.ios .kmw-key.kmw-key-shift-on {color:#000;background-color:#fdfdfe;} 
 .phone.ios .kmw-key.kmw-key-touched {background-color:#88f;}
-        
+ 
+.phone.android .kmw-key-layer-group {background-color: #333;}  
+.phone.android .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 3px;}
+.phone.android .kmw-key-square {position:static;} /* 4.3 needs static, not fixed */
+.phone.android .kmw-key.kmw-key-default {color:#fff;background-color:#777;} 
+.phone.android .kmw-key.kmw-key-shift {color:#fff;background-color:#555;} 
+.phone.android .kmw-key.kmw-key-shift-on {color:#000;background-color:#ddd;} 
+.phone.android .kmw-key.kmw-key-touched {background-color:#bbb;}
+.phone.android .kmw-key.kmw-spacebar {background-color: #555;}
+.phone.android .kmw-key.kmw-spacebar.kmw-key-touched {background-color: #bbb;}
+.phone.android .kmw-spacebar-caption {color: #aaa;}
+
 .tablet .kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
         background-color:rgba(0,0,0,0.8);-webkit-user-select:none;}
 .tablet .kmw-osk-inner-frame{margin:0;background:transparent;}
@@ -84,6 +95,17 @@
 .tablet.ios .kmw-key.kmw-key-touched {background-color:#88f;}
 
 .tablet .kmw-key-row {-webkit-touch-callout:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+
+.tablet.android .kmw-key-layer-group {background-color: #b4b4b8; border-top: 1px solid #666;}
+.tablet.android .kmw-key-square {overflow:visible;}
+.tablet.android .kmw-key {border: none; border: solid 1px #111; box-shadow:0px 2px 5px #888; border-radius: 3px;}
+.tablet.android .kmw-key.kmw-key-default {color:#000;background-color:#ddd;} 
+.tablet.android .kmw-key.kmw-key-shift {color:#77f;background-color:#a8a8a8;} 
+.tablet.android .kmw-key.kmw-key-shift-on {color:#000;background-color:#77f;} 
+.tablet.android .kmw-key.kmw-key-touched {background-color:#777;}
+.tablet.android .kmw-key.kmw-spacebar {background-color: #d8d8d8;}
+.tablet.android .kmw-key.kmw-spacebar.kmw-key-touched {background-color: #777;}
+.tablet.android .kmw-spacebar-caption {color: #888;}         
  
 /* Vertical centering of text labels on keys */ 
 .kmw-key {text-align:center; white-space:nowrap;}
@@ -114,8 +136,8 @@
 .phone.android .kmw-key-popup-icon {top:1px;right:8%;}
 .phone.android .kmw-key-label {left:10%;top:4%;}
 
-.tablet.android .kmw-key-popup-icon {top:5px;right:8%;}
-.tablet.android .kmw-key-label {left:10%;top:3%;}
+.tablet.android .kmw-key-popup-icon {top:0px;right:5%;}
+.tablet.android .kmw-key-label {left:6%;top:3%;}
 
 /*  Additional desktop element styles */
 .kmw-footer{height:16px;width:auto;margin:0;padding:0;padding-top:2px;background-color:#ad4a28;border-radius:0 0 6px 6px;}
@@ -162,10 +184,19 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   }
 
 /* Key preview styles */
-div.kmw-keytip {
+div.ios div.kmw-keytip {
   position:fixed; left:0; top:0; width:3em; height:3em; background-color:rgb(0,0,0,0);overflow:visible;
   }
-   
+
+div.android div.kmw-keytip {
+  position:fixed; left:0; top:0; width:3em; height:3em; 
+  color:#fff;
+  background-color: rgb(0,0,0,0);
+  overflow:visible;
+  }
+
+div.android #keytip {background-color:#f00;}
+
 /* Box styles for keyboard-specific OSK (e.g. EuroLatin) and if no keyboard active (desktop only) */
 .kmw-osk-static, .kmw-osk-none{text-align:left;font:12px sans-serif;border:solid 1px #ad4a28;color:blue;background-color:white;}
 .kmw-osk-none{padding:4px 6px 6px}
@@ -207,11 +238,23 @@ div.kmw-keytip {
 
 /* Popup key styles */
 #kmw-popup-keys {position:fixed;display:block;width:auto;height:auto;overflow-y:visible;
-        padding: 0; border: 1px solid #ddd; border-radius:8px;
-        background-color:#fdfdfe; border:none;}
+        padding: 4px; border: 1px solid #ddd; border-radius:8px;
+        background-color:#fdfdfe; border:none; z-index:10000;}
+ 
+.tablet.ios #kmw-popup-keys {padding: 4px 7px 0px 0px;}
+.phone.ios #kmw-popup-keys {padding: 4px 5px 0px 0px;}
  
 .tablet.ios #kmw-popup-keys .kmw-key{border:none;}
 .phone.ios  #kmw-popup-keys .kmw-key{border:none;}
+
+.phone.android #kmw-popup-keys {border:none; border-radius: 2px; background-color:#ccc; padding:5px 5px 0 0;} 
+.tablet.android #kmw-popup-keys {border:1px solid #eee; border-radius: 3px; background-color:#888; padding:8px 12px 4px 4px;} 
+
+/* Filter (shim) to darken screen and highlight popup keys */
+#kmw-popup-shim { 
+    position: fixed; width: 100%; height: 100%; bottom: 0; left: 0;
+    display: block; ; opacity: 0.15; background-color: #000; pointer-events: none;  
+    }
 
 /* Styles for other KMW elements (keyboard loading wait notification, etc.) */
 .kmw-wait-background{display:none;position:absolute;left:0;top:0;width:100%;height:100%;
