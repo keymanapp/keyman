@@ -97,7 +97,7 @@
 .tablet .kmw-key-row {-webkit-touch-callout:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
 
 .tablet.android .kmw-key-layer-group {background-color: #b4b4b8; border-top: 1px solid #666;}
-.tablet.android .kmw-key-square {overflow:visible;}
+.tablet.android .kmw-key-square {overflow:visible; position:static;} /* 4.3 needs static, not fixed */
 .tablet.android .kmw-key {border: none; border: solid 1px #111; box-shadow:0px 2px 5px #888; border-radius: 3px;}
 .tablet.android .kmw-key.kmw-key-default {color:#000;background-color:#ddd;} 
 .tablet.android .kmw-key.kmw-key-shift {color:#77f;background-color:#a8a8a8;} 
