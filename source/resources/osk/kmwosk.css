@@ -59,13 +59,15 @@
 .phone.ios .kmw-key.kmw-key-shift-on {color:#000;background-color:#fdfdfe;} 
 .phone.ios .kmw-key.kmw-key-touched {background-color:#88f;}
  
-.phone.android .kmw-key-layer-group {background-color: #333;}
+.phone.android .kmw-key-layer-group {background-color: #333;}  
 .phone.android .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 3px;}
+.phone.android .kmw-key-square {position:static;} /* 4.3 needs static, not fixed */
 .phone.android .kmw-key.kmw-key-default {color:#fff;background-color:#777;} 
 .phone.android .kmw-key.kmw-key-shift {color:#fff;background-color:#555;} 
 .phone.android .kmw-key.kmw-key-shift-on {color:#000;background-color:#ddd;} 
 .phone.android .kmw-key.kmw-key-touched {background-color:#bbb;}
 .phone.android .kmw-key.kmw-spacebar {background-color: #555;}
+.phone.android .kmw-key.kmw-spacebar.kmw-key-touched {background-color: #bbb;}
 .phone.android .kmw-spacebar-caption {color: #aaa;}
 
 .tablet .kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
@@ -102,7 +104,8 @@
 .tablet.android .kmw-key.kmw-key-shift-on {color:#000;background-color:#77f;} 
 .tablet.android .kmw-key.kmw-key-touched {background-color:#777;}
 .tablet.android .kmw-key.kmw-spacebar {background-color: #d8d8d8;}
-.tablet.android .kmw-spacebar-caption {color: #888;}
+.tablet.android .kmw-key.kmw-spacebar.kmw-key-touched {background-color: #777;}
+.tablet.android .kmw-spacebar-caption {color: #888;}         
  
 /* Vertical centering of text labels on keys */ 
 .kmw-key {text-align:center; white-space:nowrap;}
