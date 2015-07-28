@@ -187,8 +187,9 @@
       }
       if(LselectionStart < n)
       {
-//dbg(n+' '+ln+' '+Pelem.value._kmwSubstring(0,LselectionStart));
-        return Pelem.value._kmwSubstr(0,LselectionStart); //I3319, KMW-1
+        // Looking for context before start of text buffer so return non-characters to pad result
+        var tempContext = Array(n-LselectionStart+1).join("\uFFFE") + Pelem.value._kmwSubstr(0,LselectionStart);
+        return tempContext._kmwSubstr(0,ln);
       }
 //dbg(n+' '+ln+' '+Pelem.value._kmwSubstring(LselectionStart-n,LselectionStart-n+ln));
       return Pelem.value._kmwSubstring(LselectionStart-n,LselectionStart-n+ln); //I3319, KMW-1
