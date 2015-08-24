@@ -134,50 +134,33 @@
    * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
    *             KC(2,1,Pelem) == "e"
    *             KC(3,3,Pelem) == "def"
-   *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
+   *             KC(10,10,Pelem) == "XXXXabcdef"  i.e. return as much as possible of the requested string, where X = \uFFFE
    */    
-   keymanweb.KC_ = function(n, ln, Pelem) 
-  {
-    var Ldv;
+   keymanweb.KC_ = function(n, ln, Pelem) {
+    var Ldv, tempContext = '';
     if(Pelem.body) var Ldoc=Pelem; else var Ldoc=Pelem.ownerDocument; // I1481 - use Ldoc to get the ownerDocument when no selection is found
 
-    if(device.touchable)
-      return keymanweb.getTextBeforeCaret(Pelem)._kmwSubstr(-n)._kmwSubstr(0,ln);
-   
-    if(keymanweb.legacy)
-    {
-      return Pelem.value._kmwSubstr(Pelem.length-n, ln); //I3319
-    }
-    else if(Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&
-      (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')) //  &&  Pelem.tagName == 'HTML')  &&  Pelem.tagName == 'HTML')
+    if(device.touchable) {
+      tempContext = keymanweb.getTextBeforeCaret(Pelem);
+    } else if(keymanweb.legacy) {
+      tempContext = Pelem.value;
+    } else if(Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&
+      (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')) {
 		  // I2457 - support contentEditable elements in mozilla, webkit
-    {
       /* Mozilla midas html editor and editable elements */
       var Lsel = Ldv.getSelection();
-      if(Lsel.focusNode.nodeType == 3)
-      {
-        if(Lsel.focusOffset > 2*n)  // I3319 SMP extension
-          return Lsel.focusNode.substringData(Lsel.focusOffset - 2*n, 2*n)._kmwSubstr(-n)._kmwSubstr(0,ln); // I3319
-        else
-          return Lsel.focusNode.substringData(0, Lsel.focusOffset)._kmwSubstr(-n)._kmwSubstr(0,ln);         // I3319
+      if(Lsel.focusNode.nodeType == 3) {
+        tempContext = Lsel.focusNode.substringData(0, Lsel.focusOffset);
       }
-      else
-        return "";
-    }
-    else if (Pelem.setSelectionRange)
-    {
+    } else if (Pelem.setSelectionRange) {
       /* Mozilla other controls */
       var LselectionStart, LselectionEnd;
-      if(Pelem._KeymanWebSelectionStart) 
-      {
+      if(Pelem._KeymanWebSelectionStart) {
         LselectionStart = Pelem._KeymanWebSelectionStart;
         LselectionEnd = Pelem._KeymanWebSelectionEnd;
         //KeymanWeb._Debug('KeymanWeb.KC: _KeymanWebSelectionStart=TRUE LselectionStart='+LselectionStart+'; LselectionEnd='+LselectionEnd);
-      }
-      else
-      {
-        if(keymanweb._CachedSelectionStart === null || Pelem.selectionStart !== keymanweb._LastCachedSelection) // I3319, KMW-1
-        {
+      } else {
+        if(keymanweb._CachedSelectionStart === null || Pelem.selectionStart !== keymanweb._LastCachedSelection) { // I3319, KMW-1
           keymanweb._LastCachedSelection = Pelem.selectionStart; // KMW-1
           keymanweb._CachedSelectionStart = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionStart); // I3319
           keymanweb._CachedSelectionEnd = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionEnd);     // I3319
@@ -185,29 +168,21 @@
         LselectionStart = keymanweb._CachedSelectionStart; // I3319
         LselectionEnd = keymanweb._CachedSelectionEnd;     // I3319           
       }
-      if(LselectionStart < n)
-      {
-        // Looking for context before start of text buffer so return non-characters to pad result
-        var tempContext = Array(n-LselectionStart+1).join("\uFFFE") + Pelem.value._kmwSubstr(0,LselectionStart);
-        return tempContext._kmwSubstr(0,ln);
-      }
-//dbg(n+' '+ln+' '+Pelem.value._kmwSubstring(LselectionStart-n,LselectionStart-n+ln));
-      return Pelem.value._kmwSubstring(LselectionStart-n,LselectionStart-n+ln); //I3319, KMW-1
-    }
-    
-    else if(Ldoc  &&  (Ldv=Ldoc.selection)) // build 77 - use elem.ownerDocument instead of document
+      tempContext = Pelem.value._kmwSubstr(0, LselectionStart);
+    } else if(Ldoc  &&  (Ldv=Ldoc.selection)) { // build 77 - use elem.ownerDocument instead of document
                                             // I1481 - use Ldoc to get the ownerDocument when no selection is found
-    {  
       /* IE */
       var Lrange = Ldv.createRange();
       //if (Lrange.parentElement() == Pelem) {  // build 77 - ignore parent of selection
-      Lrange.moveStart('character',-2*n);                     //I3319
-
-      return Lrange.text._kmwSubstr(-n)._kmwSubstring(0,ln);  //I3319
-      //}
+      Lrange.moveStart('character',-2*n); // allows for supp chars        //I3319
+      tempContext = Lrange.text;
     }
 
-    return "";
+    if(tempContext._kmwLength() < n) {
+      tempContext = Array(n-tempContext._kmwLength()+1).join("\uFFFE") + tempContext;
+    }
+    
+    return tempContext._kmwSubstr(-n)._kmwSubstr(0,ln);
   }      
 
   /**
