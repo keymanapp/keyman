@@ -282,8 +282,15 @@
    */    
   keymanweb['KN'] = keymanweb.KN = function(n, Ptarg)    // KeyboardNul
   {
-    var cx=this.KC(n+1, n+1, Ptarg);
-    if(cx === false) return true; else return (cx._kmwLength() < n+1); // I2243 - support nul in context; I3319
+    var cx=this.KC(n+1, 1, Ptarg);
+    if(cx === false) {
+      // It appears that this can no longer be returned with KMW so probably should be removed
+      // after testing
+      return true;
+    }
+    
+    // With #31, the result will be a replacement character if context is empty.
+    return cx === "\uFFFE";
   }
 
   /**
