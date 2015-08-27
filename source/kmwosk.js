@@ -611,7 +611,7 @@
   }
   /**
    * Select the next keyboard layer for layer switching keys
-   * The next layer will be detgermined from the key name unless otherwise specifed    
+   * The next layer will be determined from the key name unless otherwise specifed    
    * 
    *  @param  {string}            keyName     key identifier
    *  @param  {string|undefined}  nextLayerIn optional next layer identifier           
@@ -620,7 +620,10 @@
   osk.selectLayer = function(keyName,nextLayerIn)
   {
     var nextLayer = arguments.length < 2 ? null : nextLayerIn;
-      
+
+    // Layer must be identified by name, not number (27/08/2015)
+    if(typeof nextLayer == 'number') nextLayer = osk.getLayerId(nextLayer);
+    
     // Identify next layer, if required by key
     if(!nextLayer) switch(keyName)
     {
@@ -653,8 +656,13 @@
 
     if(!nextLayer) return false;
     
+    // Do not change layer unless needed (27/08/2015)
+    if(nextLayer == osk.layerId && device.formFactor != 'desktop') return false;
+
+    // Change layer and refresh OSK
     osk.updateLayer(nextLayer); 
     osk._Show();
+    
     return true;        
   }
 
@@ -703,8 +711,9 @@
     if(Lelem != null)
     {
       // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling) 
-      var layer=t[0],keyName=t[1], keyShiftState=osk.getModifierState(osk.layerId),nextLayer=keyShiftState;
-
+      var layer=t[0],keyName=t[1], keyShiftState=osk.getModifierState(osk.layerId),
+        nextLayer = keyShiftState;
+       
       if(typeof(e.key) != 'undefined') nextLayer=e.key['nextlayer']; 
       if(keymanweb._ActiveElement == null) keymanweb._ActiveElement=Lelem; 
       
@@ -912,14 +921,16 @@
   osk.updateLayer = function(id)
   {
     var s=osk.layerId,idx=id;
+    
     // Need to test if target layer is a standard layer
     idx=idx.replace('shift','');
     idx=idx.replace('ctrl','');
     idx=idx.replace('alt','');
+
     // If default or a non-standard layer, select it
     if(osk.layerId == 'default' || osk.layerId == 'numeric' || osk.layerId == 'symbol' || osk.layerId == 'currency' || idx != '')
     {
-      s = id; 
+      s = id;
     }
     // Otherwise modify the layer according to the current state and key pressed
     else
@@ -953,7 +964,7 @@
     osk.layerId = s.replace('altctrl','ctrlalt');
  
     // Check that requested layer is defined   (KMEA-1, but does not resolve issue)
-    for(var i=0; i<osk.layers.length; i++)
+    for(var i=0; i<osk.layers.length; i++)  
       if(osk.layerId == osk.layers[i].id) return;
 
     // Show default layer if an undefined layer has been requested
@@ -1003,7 +1014,7 @@
   {
     var n=0,kbdList=keymanweb._KeyboardStubs,nKbds=kbdList.length;  
     if(nKbds < 1) return;
-            
+         
     // Create the menu list container element 
     var menu=osk.lgList=util._CreateElement('DIV'),ss;
     osk.lgList.id='kmw-language-menu';
@@ -3765,14 +3776,15 @@
     // Then replace it at the head of the chain
     if(ff == '') ff=fn; else ff=fn+','+ff;     
 
+    // Added quotes to delimit font names 27/08/2015 
     // Add to the stylesheet, with !important to override any explicit style   
-    var s='.keymanweb-font{\nfont-family:'+ff+' !important;\n}\n';
+    var s='.keymanweb-font{\nfont-family:"'+ff+'" !important;\n}\n';
     
     // Set font family for OSK text
     if(typeof(ofd) != 'undefined')
-      s=s+'.kmw-key-text{\nfont-family:'+ofd['family']+';\n}\n';  
+      s=s+'.kmw-key-text{\nfont-family:"'+ofd['family']+'";\n}\n';  
     else if(typeof(kfd) != 'undefined')
-      s=s+'.kmw-key-text{\nfont-family:'+kfd['family']+';\n}\n';
+      s=s+'.kmw-key-text{\nfont-family:"'+kfd['family']+'";\n}\n';
     
     // Store the current font chain
     keymanweb.appliedFont=ff;
