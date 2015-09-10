@@ -3769,25 +3769,32 @@
     var fn=keymanweb.baseFont;
     if(typeof(kfd) != 'undefined' && typeof(kfd['family']) != 'undefined') fn=kfd['family'];
 
-    // Set font family chain for mapped elements: remove name from chain if present
-    var rx=new RegExp('\s?'+fn+',?'),ff=keymanweb.appliedFont;
-    ff=ff.replace(rx,''); ff=ff.replace(/,$/,'');
+    // Unquote font name in base font (if quoted)
+    fn = fn.replace(/\u0022/g,'');
+    
+    // Set font family chain for mapped elements and remove any double quotes
+    var rx=new RegExp('\s?'+fn+',?'), ff=keymanweb.appliedFont.replace(/\u0022/g,'');
+    
+    // Remove base font name from chain if present
+    ff = ff.replace(rx,''); ff = ff.replace(/,$/,'');
 
     // Then replace it at the head of the chain
     if(ff == '') ff=fn; else ff=fn+','+ff;     
-
-    // Added quotes to delimit font names 27/08/2015 
-    // Add to the stylesheet, with !important to override any explicit style   
-    var s='.keymanweb-font{\nfont-family:"'+ff+'" !important;\n}\n';
+    
+    // Re-insert quotes around individual font names
+    ff = '"' + ff.replace(/\,/g,'","') + '"';
+      
+    // Add to the stylesheet, quoted, and with !important to override any explicit style   
+    var s='.keymanweb-font{\nfont-family:' + ff + ' !important;\n}\n';
     
     // Set font family for OSK text
     if(typeof(ofd) != 'undefined')
-      s=s+'.kmw-key-text{\nfont-family:"'+ofd['family']+'";\n}\n';  
+      s=s+'.kmw-key-text{\nfont-family:"'+ofd['family'].replace(/\u0022/g,'').replace(/,/g,'","')+'";\n}\n';  
     else if(typeof(kfd) != 'undefined')
-      s=s+'.kmw-key-text{\nfont-family:"'+kfd['family']+'";\n}\n';
+      s=s+'.kmw-key-text{\nfont-family:"'+kfd['family'].replace(/\u0022/g,'').replace(/,/g,'","')+'";\n}\n';
     
-    // Store the current font chain
-    keymanweb.appliedFont=ff;
+    // Store the current font chain (with quote-delimited font names)
+    keymanweb.appliedFont = ff;
 
     // Return the style string   
     return s;
