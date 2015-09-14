@@ -474,7 +474,33 @@
     // Return callout element, to allow removal later
     return cc;  
   }
-     
+  
+  /**
+   * Touch hold key display management
+   * 
+   * @param   {Object}  key   base key object
+   */
+  osk.touchHold = function(key)
+  {
+   // Clear and restart the popup timer
+    if(osk.subkeyDelayTimer) 
+    {
+      window.clearTimeout(osk.subkeyDelayTimer);
+      osk.subkeyDelayTimer = null;
+    }    
+    if(typeof key.subKeys != 'undefined' && key.subKeys != null) 
+    {
+      osk.subkeyDelayTimer = window.setTimeout(
+        function()
+        {
+          osk.clearPopup();
+          osk.showSubKeys(key);
+        }, 
+        osk.popupDelay
+      );
+    }                                            
+  }
+                  
   /**
    * Use rotation events to adjust OSK and input element positions and scaling as necessary
    */     

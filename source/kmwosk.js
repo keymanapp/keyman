@@ -114,7 +114,8 @@
   osk.currentTarget = null;     // Keep track of currently touched key when moving over keyboard
   osk.touchCount = 0;           // Number of active (unreleased) touch points
   osk.touchX = 0;               // First touch point x (to check for sliding off screen)
-  
+  osk.deleting = 0;             // Backspace repeat timer
+    
   // Additional members for desktop OSK
   osk.x = 99;                   // last visible offset left
   osk.y = 0;                    // last visible offset top
@@ -445,7 +446,7 @@
   {
     // Do not show subkeys if key already released
     if(osk.keyPending == null) return;    
-    
+   
     // Create holder DIV for subkey array, and set styles.
     // A subkey array for Shift will only appear if extra layers exist    
     
@@ -459,6 +460,7 @@
     osk.popupBaseKey = e;
   
     // Does the popup array include the base key?   *** condition for phone only ***
+    if(device.formFactor == 'phone') osk.prependBaseKey(e);
     var idx = e.id.split('-'), baseId = idx[idx.length-1];
 
     // If not, insert at start
@@ -547,9 +549,6 @@
       subKeys.appendChild(kDiv);      
     }
     
-    // Register the popup key array, return if registration succeeds
-    if(osk.registerPopup(e)) return;
-    
     // Clear key preview if any
     osk.showKeyTip(null,false);            
   
@@ -582,6 +581,30 @@
       osk.highlightKey(bk,true);//bk.className = bk.className+' kmw-key-touched';
     }
   }
+ 
+  /**
+   * Prepend the base key to the touch-hold key array (for phones)
+   * 
+   * @param {Object}  e   base key object
+   */ 
+  osk.prependBaseKey = function(e)
+  {
+    if(e && typeof(e.id) != 'undefined')
+    {
+      var i, idx = e.id.split('-'), baseId = idx[idx.length-1];
+      if(typeof e.subKeys != 'undefined' && e.subKeys.length > 0 && e.subKeys[0].id != baseId) 
+      { 
+        var eCopy={'id':baseId,'layer':''};
+        if(idx.length > 1) eCopy['layer'] = idx[0];
+        for(i = 0; i < e.childNodes.length; i++)
+        {
+          if(osk.hasClass(e.childNodes[i],'kmw-key-text')) break;
+        }
+        if(i < e.childNodes.length) eCopy['text'] = e.childNodes[i].textContent;      
+        e.subKeys.splice(0,0,eCopy);
+      }
+    } 
+  } 
   
   /**
    * Function     getVKDictionaryCode
@@ -613,17 +636,17 @@
    * Select the next keyboard layer for layer switching keys
    * The next layer will be determined from the key name unless otherwise specifed    
    * 
-   *  @param  {string}            keyName     key identifier
-   *  @param  {string|undefined}  nextLayerIn optional next layer identifier           
-   *  @return {boolean}                       return true if keyboard layer changed
+   *  @param  {string}                    keyName     key identifier
+   *  @param  {number|string|undefined}   nextLayerIn optional next layer identifier           
+   *  @return {boolean}                               return true if keyboard layer changed
    */        
   osk.selectLayer = function(keyName,nextLayerIn)
   {
     var nextLayer = arguments.length < 2 ? null : nextLayerIn;
 
-    // Layer must be identified by name, not number (27/08/2015)
-    if(typeof nextLayer == 'number') nextLayer = osk.getLayerId(nextLayer);
-    
+    // Layer must be identified by name, not number (27/08/2015)        
+    if(typeof nextLayer == 'number')  nextLayer = osk.getLayerId(nextLayer);
+     
     // Identify next layer, if required by key
     if(!nextLayer) switch(keyName)
     {
@@ -1798,13 +1821,14 @@
                         
             // Modify the key type for special keys with non-standard labels
             // to allow the keyboard font to ovveride the SpecialOSK font.
+            // Blank keys are no longer reclassed - can use before/after CSS to add text
             switch(key['sp'])
             {
               case '1':
-                if(!specialLabel.test(key['text'])) key['sp']='3';  
+                if(!specialLabel.test(key['text']) && key['text'] != '') key['sp']='3';  
                 break;
               case '2':
-                if(!specialLabel.test(key['text'])) key['sp']='4';
+                if(!specialLabel.test(key['text']) && key['text'] != '') key['sp']='4';
                 break;
             } 
           }
@@ -2085,8 +2109,7 @@
     else if(keyName == 'K_BKSP')
     {                                       
       keymanweb.KO(1,keymanweb._LastActiveElement,"");
-      osk.deleting=true;
-      window.setTimeout(osk.repeatDelete,500);
+      osk.deleting = window.setTimeout(osk.repeatDelete,500);
       osk.keyPending = null;
     }
     else
@@ -2103,7 +2126,8 @@
       else
       {
         // If this key has subkey, start timer to display subkeys after delay, set up release
-        if(key.subKeys != null) osk.subkeyDelayTimer=window.setTimeout(function(){osk.showSubKeys(key);},osk.popupDelay);  
+        osk.touchHold(key);
+        //if(key.subKeys != null) osk.subkeyDelayTimer=window.setTimeout(function(){osk.showSubKeys(key);},osk.popupDelay);  
       }
       osk.keyPending = key;    
     }
@@ -2171,7 +2195,8 @@
     }
 
     // Clear repeated backspace if active
-    osk.deleting = false;     
+    if(osk.deleting) window.clearTimeout(osk.deleting);
+    osk.deleting = 0;     
   }
   
   /**
@@ -2208,7 +2233,10 @@
     
     // Stop repeat if no longer on BKSP key
     if(key1 && (typeof key1.id == 'string') && (key1.id.indexOf('BKSP') < 0)) 
-      osk.deleting = false;
+    {
+      if(osk.deleting) window.clearTimeout(osk.deleting);
+      osk.deleting = 0;
+    }
     
     // Do not move over keys if device popup visible 
     if(osk.popupVisible)
@@ -2277,6 +2305,9 @@
     
     if(key0 && key1 && (key1 != key0) && (key1.id != ''))
     {
+      //  Display the touch-hold keys (after a pause)
+      osk.touchHold(key1);
+      /*
      // Clear and restart the popup timer
       if(osk.subkeyDelayTimer) 
       {
@@ -2292,7 +2323,8 @@
             osk.showSubKeys(key1);
           }, 
           osk.popupDelay);
-      }  
+      } 
+      */ 
     }
   }
 
@@ -2391,7 +2423,7 @@
     if(osk.deleting)
     {
       keymanweb.KO(1,keymanweb._LastActiveElement,"");
-      window.setTimeout(osk.repeatDelete,100);
+      osk.deleting = window.setTimeout(osk.repeatDelete,100);
     }
   }
 
@@ -2409,7 +2441,7 @@
     if(typeof key['sp'] == 'string') n=parseInt(key['sp'],10);
     if(n < 0 || n > 10) n=0;       
     layout=layout||osk.layout;
-                             
+    
     // Apply an overriding class for 5-row layouts
     var nRows=layout.layer[0].row.length;          
     if(nRows > 4 && util.device.formFactor == 'phone') 

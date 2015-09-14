@@ -103,7 +103,6 @@ var __BUILD__ = 300;
   osk.createKeyTip = function(){}
   osk.optionKey = function(e,keyName,keyDown){}
   osk.showKeyTip = function(key,on){}  
-  osk.registerPopup = function(e){return false;}
   osk.waitForFonts = function(kfd,ofd){return true;}
  
   // Define private options object with empty members
@@ -889,10 +888,13 @@ var __BUILD__ = 300;
     if(IE >= 9)
     {
       if(device.OS == 'iOS')
-      {
-        // TODO: Investigate why this is here. May no longer be necessary.
-        if(ttf != '') 
+      {       
+        if(ttf != '')
+        { 
+          // Modify the url if required to prevent caching  
+          ttf = util.unCached(ttf);  
           s=s+'src:url(\''+ttf+'\') format(\'truetype\');';
+        }
         else return; 
       }
       else 
@@ -929,6 +931,19 @@ var __BUILD__ = 300;
     keymanweb.embeddedFonts.push(fd['family']);
   }     
 
+  /**
+   * Allow forced reload if necessary (stub only here)
+   *    
+   *  @param  {string}  s unmodified URL
+   *  @return             modified URL         
+   */
+  util.unCached = function(s)
+  {
+    // var t=(new Date().getTime());
+    // s = s + '?v=' + t;
+    return s;
+  }       
+  
   /**
    * Document cookie parsing for use by kernel, OSK, UI etc.
    * 
