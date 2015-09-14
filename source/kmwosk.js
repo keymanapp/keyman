@@ -3814,7 +3814,7 @@
     if(ff == '') ff=fn; else ff=fn+','+ff;     
     
     // Re-insert quotes around individual font names
-    ff = '"' + ff.replace(/\,/g,'","') + '"';
+    ff = '"' + ff.replace(/\,\s?/g,'","') + '"';
       
     // Add to the stylesheet, quoted, and with !important to override any explicit style   
     var s='.keymanweb-font{\nfont-family:' + ff + ' !important;\n}\n';
