@@ -67,7 +67,7 @@ echo KeymanWeb 2 build %BUILD% compiled and saved.
 echo.
 rem echo %BUILD% >version.txt
 
-goto done
+exit /B 0
 
 rem Compile UI code modules (TODO: add date testing, only recompile if needed)
 
@@ -94,12 +94,12 @@ del ..\output\kmuibutton.js 2>nul
 if not exist ..\output\kmwuibutton.js goto fail
 
 echo User interface modules compiled and saved.
-goto done
+exit /B 0
 
 :fail
 echo.
 echo Build failed
-goto done
+exit /B 2
 
 :help
 echo.
@@ -107,6 +107,8 @@ echo Usage: build       to compile keymanweb application code to output folder
 echo        build -ui   to compile desktop user interface modules to output folder
 echo        build -test to compile for testing without copying resources or
 echo                    updating the saved version number.
+exit /B 1
 
 :done
 echo.
+exit /B 0
