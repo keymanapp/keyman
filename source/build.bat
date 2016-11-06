@@ -22,9 +22,10 @@ rem Check dependencies before build
 rem
 
 if "%CLOSURECOMPILERPATH%"=="" set CLOSURECOMPILERPATH=..\tools
+if "%JAVA%"=="" set JAVA=java
 
 set compiler=%CLOSURECOMPILERPATH%\compiler.jar
-set compilecmd=java -jar %compiler%
+set compilecmd=%JAVA% -jar %compiler%
 
 if not exist %compiler% (
   echo File %compiler% does not exist: have you set the environment variable CLOSURECOMPILERPATH?
