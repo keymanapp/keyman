@@ -36,6 +36,7 @@ echo Compiling build %BUILD%
 echo.
 
 if not exist ..\output mkdir ..\output
+if not exist ..\output\resources mkdir ..\output\resources
 
 rem Compile supplementary plane string handing extensions
 echo Compile SMP string extensions
