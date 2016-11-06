@@ -1,12 +1,15 @@
-@echo off
+rem @echo off
 rem 
 rem Compile keymanweb and copy compiled javascript and resources to output folder
 rem
 
-rem Get last build number
+rem Get build version -- if not building in TeamCity, then always use 300
 
-set BUILD=300
-set /p BUILD=<version.txt
+if "%BUILD_NUMBER%"=="" (
+  set BUILD=300
+) else (
+  set BUILD=%BUILD_NUMBER%
+)
 
 if "%1" == "-ui"   goto ui
 if "%1" == "-test" goto web
@@ -14,23 +17,34 @@ if not "%1" == "" goto help
 
 :web
 
-rem Increment build number
-set /a BUILD=%BUILD%+1
-echo.
+rem
+rem Check dependencies before build
+rem
+
+if "%CLOSURECOMPILERPATH%"=="" set CLOSURECOMPILERPATH=..\tools
+
+set compiler=%CLOSURECOMPILERPATH%\compiler.jar
+set compilecmd=java -jar %compiler%
+
+if not exist %compiler% (
+  echo File %compiler% does not exist: have you set the environment variable CLOSURECOMPILERPATH?
+  exit /B 1
+)
+
 echo Compiling build %BUILD%
 echo.
 
 rem Compile supplementary plane string handing extensions
 echo Compile SMP string extensions
 del ..\output\kmw-smpstring.js 2>nul
-java -jar ..\tools\compiler.jar --js kmwstring.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file ..\output\kmw-smpstring.js --warning_level VERBOSE
+%compilecmd% --js kmwstring.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file ..\output\kmw-smpstring.js --warning_level VERBOSE
 if not exist ..\output\kmw-smpstring.js goto fail
 
 rem Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
 echo Compile Keymanweb    
 
 del ..\output\kmwtemp.js 2>nul
-java -jar ..\tools\compiler.jar --define __BUILD__=%BUILD% --externs kmwreleasestub.js --js kmwbase.js --js keymanweb.js --js kmwosk.js --js kmwnative.js --js kmwcallback.js --js kmwkeymaps.js --js kmwlayout.js --js kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file ..\output\kmwtemp.js --warning_level VERBOSE
+%compilecmd% --define __BUILD__=%BUILD% --externs kmwreleasestub.js --js kmwbase.js --js keymanweb.js --js kmwosk.js --js kmwnative.js --js kmwcallback.js --js kmwkeymaps.js --js kmwlayout.js --js kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file ..\output\kmwtemp.js --warning_level VERBOSE
 if not exist ..\output\kmwtemp.js goto fail
 
 echo Append SMP string extensions to Keymanweb
@@ -48,7 +62,7 @@ rem Update build number if successful
 echo.
 echo KeymanWeb 2 build %BUILD% compiled and saved.
 echo.
-echo %BUILD% >version.txt
+rem echo %BUILD% >version.txt
 
 goto done
 
@@ -58,22 +72,22 @@ rem Compile UI code modules (TODO: add date testing, only recompile if needed)
 
 echo Compile ToolBar UI
 del ..\output\kmuitoolbar.js 2>nul
-java -jar ..\tools\compiler.jar --js kmwuitoolbar.js --externs kmwreleasestub.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file ..\output\kmwuitoolbar.js --warning_level VERBOSE --output_wrapper "(function() {%%output%%}());"
+%compilecmd% --js kmwuitoolbar.js --externs kmwreleasestub.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file ..\output\kmwuitoolbar.js --warning_level VERBOSE --output_wrapper "(function() {%%output%%}());"
 if not exist ..\output\kmwuitoolbar.js goto fail
 
 echo Compile Toggle UI
 del ..\output\kmuitoggle.js 2>nul
-java -jar ..\tools\compiler.jar --js kmwuitoggle.js --externs kmwreleasestub.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file ..\output\kmwuitoggle.js --warning_level VERBOSE --output_wrapper "(function() {%%output%%}());"
+%compilecmd% --js kmwuitoggle.js --externs kmwreleasestub.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file ..\output\kmwuitoggle.js --warning_level VERBOSE --output_wrapper "(function() {%%output%%}());"
 if not exist ..\output\kmwuitoggle.js goto fail
 
 echo Compile Float UI
 del ..\output\kmuifloat.js 2>nul
-java -jar ..\tools\compiler.jar --js kmwuifloat.js --externs kmwreleasestub.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file ..\output\kmwuifloat.js --warning_level VERBOSE --output_wrapper "(function() {%%output%%}());"
+%compilecmd% --js kmwuifloat.js --externs kmwreleasestub.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file ..\output\kmwuifloat.js --warning_level VERBOSE --output_wrapper "(function() {%%output%%}());"
 if not exist ..\output\kmwuifloat.js goto fail
 
 echo Compile Button UI
 del ..\output\kmuibutton.js 2>nul
-java -jar ..\tools\compiler.jar --js kmwuibutton.js --externs kmwreleasestub.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file ..\output\kmwuibutton.js --warning_level VERBOSE --output_wrapper "(function() {%%output%%}());"
+%compilecmd% --js kmwuibutton.js --externs kmwreleasestub.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file ..\output\kmwuibutton.js --warning_level VERBOSE --output_wrapper "(function() {%%output%%}());"
 if not exist ..\output\kmwuibutton.js goto fail
 
 echo User interface modules compiled and saved.
