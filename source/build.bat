@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 rem 
 rem Compile keymanweb and copy compiled javascript and resources to output folder
 rem
@@ -34,6 +34,8 @@ if not exist %compiler% (
 
 echo Compiling build %BUILD%
 echo.
+
+if not exist ..\output mkdir ..\output
 
 rem Compile supplementary plane string handing extensions
 echo Compile SMP string extensions
