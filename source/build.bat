@@ -68,8 +68,7 @@ echo KeymanWeb 2 build %BUILD% compiled and saved.
 echo.
 rem echo %BUILD% >version.txt
 
-exit /B 0
-
+rem exit /B 0
 rem Compile UI code modules (TODO: add date testing, only recompile if needed)
 
 :ui
