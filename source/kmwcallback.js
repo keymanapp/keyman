@@ -794,8 +794,10 @@
         }
         switch(constraint)
         {
-          case 'native':
           case 'web':
+            if(device.browser == 'native') result=false; // web matches anything other than 'native'
+            break;
+          case 'native':
           case 'ie':
           case 'chrome':
           case 'firefox':
