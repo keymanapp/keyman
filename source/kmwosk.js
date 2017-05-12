@@ -1028,11 +1028,15 @@
       
       // We use a separate variable here to keep down on MutationObserver messages in keymanweb.js code.
       var keyboardName = "";
-      if(kbdName == lgName) keyboardName=lgName; else keyboardName=lgName+' ('+kbdName+')';
-
+      if(kbdName == lgName) {
+        keyboardName=lgName;
+      } else {
+        keyboardName=lgName+' ('+kbdName+')';
+      }
       // It sounds redundant, but this dramatically cuts down on browser DOM processing.
-      if(t.innerHTML != keyboardName)
+      if(t.innerHTML != keyboardName) {
         t.innerHTML = keyboardName;
+      }
     }
     catch(ex){}    
   }
