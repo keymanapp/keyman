@@ -1040,17 +1040,36 @@
       var ipList=document.getElementsByTagName(k==0?'INPUT':'TEXTAREA');
       for(var n=0;n<ipList.length;n++) 
       {      
-        if(ipList[n].className.indexOf('kmw-disabled') < 0 && !ipList[n].readOnly )
-          keymanweb.inputList.push(ipList[n]);
-        if(ipList[n].className) 
-          ipList[n].className=ipList[n].className+' keymanweb-font';
-        else
-          ipList[n].className='keymanweb-font';
+        keymanweb.setupDesktopElement(ipList[n]);
+        // if(ipList[n].className.indexOf('kmw-disabled') < 0 && !ipList[n].readOnly )
+        //   keymanweb.inputList.push(ipList[n]);
+        // if(ipList[n].className) 
+        //   ipList[n].className=ipList[n].className+' keymanweb-font';
+        // else
+        //   ipList[n].className='keymanweb-font';
       }
     }
-    //TODO: sort list by y, x position on page
-    
   }  
+
+  /**
+   * Function     setupDesktopElement
+   * Scope        Private
+   * Description  Setup one element for non-touch devices and add it to the inputList if it is an input element (desktop browsers)
+   * @return   {boolean}
+   */       
+  keymanweb.setupDesktopElement = function(Pelem)
+  { 
+      // If it's not one of these, we don't need to hook the OSK into it.
+      if(!(Pelem.tagName == "INPUT" || Pelem.tagName == "TEXTAREA")) return false;
+
+      // TODO:  Fix potential issue - We might have an issue if, for some reason, an element is re-added later.
+      if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly)
+        keymanweb.inputList.push(Pelem);
+      if(Pelem.className) 
+        Pelem.className=Pelem.className+' keymanweb-font';
+      else
+        Pelem.className='keymanweb-font';
+  } 
 
   /**
    * Get the user-specified (or default) font for the first mapped input or textarea element
@@ -1777,7 +1796,7 @@
     var ro=Pelem.attributes['readonly'],cn=Pelem.className;
     if(typeof ro == 'object' && ro.value != 'false' ) return; 
     if(typeof cn == 'string' && cn.indexOf('kmw-disabled') >= 0) return; 
-  
+
     if(Pelem.tagName.toLowerCase() == 'iframe') 
       keymanweb._AttachToIframe(Pelem);
     else
@@ -3167,6 +3186,8 @@
      * Description  Local function to get list of editable controls
      */    
     var LiTmp = function(_colon){return Pelem.getElementsByTagName(_colon);};
+
+    // If the element Pelem has any child elements, we wish to analyze those.
     var Linputs = LiTmp('INPUT'), 
       Ltextareas = LiTmp('TEXTAREA'), 
       Lframes = LiTmp('IFRAME'),
