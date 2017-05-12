@@ -494,11 +494,23 @@ try {
   	// Single keyboard
   	else if(_kbds.length == 1)
     {
+      var _kmw_ctrl_img=document.getElementById('KMW_Controller_Img')
+      _kmw_ctrl_img.src = imgPath+'kmw_logo_16.gif';
+      
+      ui.kbdButton.getElem().id = 'kmwico';
+      ui.kbdButton.getElem().style.width = '24px';
+
       var Lki=_kbds[0]['InternalName'];    
       var Lklc=_kbds[0]['LanguageCode'];  
       ui.controller.style.background = 'url('+imgPath+'kmwcontroller2.gif)';
       ui.keyboards.push({_InternalName: Lki, _LanguageCode: Lklc, _Index: 0});
       ui.kbdButton._onclick = ui.switchSingleKbd;
+      ui.kbdButton._onmouseover = function() { };
+      ui.kbdButton._onmouseout = function() { };
+
+      // We must reconstruct the ui.keyboards array, and this done by ui.createMenu.
+      ui.createMenu();
+
       // Must remove menu if keyboards have been removed leaving only a single keyboard
       if(typeof(ui.keyboardMenu) != 'undefined') delete ui.keyboardMenu;
   	}
