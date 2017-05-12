@@ -1663,7 +1663,7 @@
   keymanweb["removeKeyboards"] = function(x)
   {
     if(arguments.length == 0) return;
-      
+
     var i,j,ss=keymanweb._KeyboardStubs; 
     for(i=0; i<arguments.length; i++)
     {           
@@ -2733,6 +2733,8 @@
     var i,t=keymanweb.sortedInputs,
       activeBase=keymanweb._ActiveElement;
     
+    if(t.length == 0) return;
+
     // For touchable devices, get the base element of the DIV
     if(device.touchable) activeBase=activeBase.base;
 
