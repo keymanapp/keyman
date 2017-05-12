@@ -108,9 +108,9 @@
 	  // keymanweb._AttachToControls(newTextArea);
 	  // keymanweb._AttachToControls(newInput);
 	  
-	  keymanweb.setupDesktopElement(newTextArea);
-	  keymanweb.setupDesktopElement(newInput);
-	  keymanweb.attachToControl(newTextArea);
-	  keymanweb.attachToControl(newInput);
-	  keymanweb.listInputs();
+	  // keymanweb.setupDesktopElement(newTextArea);
+	  // keymanweb.setupDesktopElement(newInput);
+	  // keymanweb.attachToControl(newTextArea);
+	  // keymanweb.attachToControl(newInput);
+	  // keymanweb.listInputs();
   }
