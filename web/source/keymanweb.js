@@ -809,53 +809,100 @@
     }
 
     /**
-     * Create a simulated input element for each INPUT or TEXTAREA on the page, comprising:
-     *    an outer DIV, matching the position, size and style of the base element
-     *    a scrollable DIV within that outer element
-     *    two SPAN elements within the scrollable DIV, to hold the text before and after the caret
-     *    
-     *    The left border of the second SPAN is flashed on and off as a visible caret                    
+     * Function     isKMWInput
+     * Scope        Private
+     * Description  Examines potential input elements to determine their classification re: touch handling.
      */ 
-                    
-    // Superimpose custom input fields for each input or textarea, unless readonly or disabled
-    for(var k=0; k<2; k++)
+    keymanweb.isKMWInput = function(x)
     {
-      var ipList=document.getElementsByTagName(k==0?'INPUT':'TEXTAREA');  
-      for(var n=0;n<ipList.length;n++) 
-      { 
-        if(ipList[n].kmwInput)
-        {        
-          var x=document.createElement('DIV'); 
-          x['base']=x.base=ipList[n];
-          
-          // Set font for base element
-          if(x.base.className) 
-            x.base.className=x.base.className+' keymanweb-font';
-          else
-            x.base.className='keymanweb-font';
-  
-          // Add the exposed member 'kmw_ip' to allow page to refer to duplicated element
-          ipList[n]['kmw_ip']=x;
-          keymanweb.inputList.push(x);
+      var lcTagName = x.tagName.toLowerCase();
+
+      if(lcTagName == 'textarea')
+      {
+        c = x.className;
+        x.kmwInput=false;
+        if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly)  
+        { 
+          x.disabled=true; x.kmwInput=true; 
         }
-        // Always hide the OSK for non-mapped inputs
-        else
+      }
+      else if(lcTagName == 'input')
+      {
+        c=x.className;
+        x.kmwInput=false;                
+        if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly)
         {
-          ipList[n].addEventListener('touchstart',function()
-            {
-              keymanweb.focusing=false;
-              clearTimeout(keymanweb.focusTimer);
-              osk.hideNow();
-            },false);
+          if(x.type == 'text' || x.type == 'search') 
+          {
+            x.disabled=true; x.kmwInput=true;       
+          } 
+        }
+      } 
+
+      return x.kmwInput;     
+    }
+
+    /**
+     * Function     setupTouchPage
+     * Scope        Private
+     * Description  Saves the list of inputs for touch devices (touch-based browsers, mobile) and
+     *              and completes their setup.
+     */  
+    keymanweb.setupTouchPage = function()
+    {
+      // Initialize and protect input elements for touch-screen devices (but never for apps)
+      // NB: now set disabled=true rather than readonly, since readonly does not always 
+      // prevent element from getting focus, e.g. within a LABEL element.
+      // c.f. http://kreotekdev.wordpress.com/2007/11/08/disabled-vs-readonly-form-fields/ 
+
+      for(var k=0; k<2; k++)
+      {
+        var ipList=document.getElementsByTagName(k==0?'INPUT':'TEXTAREA');  
+
+        for(var n=0;n<ipList.length;n++) 
+        { 
+          if(keymanweb.isKMWInput(ipList[n]))
+          {        
+            var x=document.createElement('DIV'); 
+            x['base']=x.base=ipList[n];
+            
+            // Set font for base element
+            if(x.base.className) 
+              x.base.className=x.base.className+' keymanweb-font';
+            else
+              x.base.className='keymanweb-font';
+    
+            // Add the exposed member 'kmw_ip' to allow page to refer to duplicated element
+            ipList[n]['kmw_ip']=x;
+            keymanweb.inputList.push(x);
+            keymanweb.setupTouchElement(x);
+          }
+          // Always hide the OSK for non-mapped inputs
+          else
+          {
+            keymanweb.setupNontouchElement(ipList[n]);
+          }
         }
       }
     }
- 
-    // Copy essential styles from each base element to the new DIV      
-    var d,s1,s2,s3,bs,xs,ds,ss1,ss2,ss3,x1,y1;
-    for(var n=0;n<keymanweb.inputList.length;n++)
+
+    /**
+     * Function     setupTouchElement
+     * Scope        Private
+     * Description  Creates a simulated input element for the specified INPUT or TEXTAREA, comprising:
+     *              an outer DIV, matching the position, size and style of the base element
+     *              a scrollable DIV within that outer element
+     *              two SPAN elements within the scrollable DIV, to hold the text before and after the caret
+     *    
+     *              The left border of the second SPAN is flashed on and off as a visible caret   
+     */
+    keymanweb.setupTouchElement = function(x)
     {
-      var x=keymanweb.inputList[n];
+      // Superimpose custom input fields for each input or textarea, unless readonly or disabled 
+
+      // Copy essential styles from each base element to the new DIV      
+      var d,s1,s2,s3,bs,xs,ds,ss1,ss2,ss3,x1,y1;
+
       x.className='keymanweb-input';
       x.dir=x.base.dir;
       
@@ -1006,8 +1053,25 @@
       (function(xx){xx.base.addEventListener('resize',function(e){keymanweb.updateInput(xx);},false);})(x);
         
       // And copy the text content
-      keymanweb.setText(x,x.base.value,null);
-    }  
+      keymanweb.setText(x,x.base.value,null);  
+    }
+
+    /**
+     * Function     setupNontouchElement
+     * Scope        Private
+     * Description  Performs handling for the specified disabled input element on touch-based systems.
+     */
+    keymanweb.setupNontouchElement = function(x)
+    {
+      x.addEventListener('touchstart',function()
+        {
+          keymanweb.focusing=false;
+          clearTimeout(keymanweb.focusTimer);
+          osk.hideNow();
+        },false);
+    }
+
+    keymanweb.setupTouchPage();
   }
   
   /*********************************************************
@@ -3354,38 +3418,6 @@
 
     keymanweb._MasterDocument = window.document;
 
-    // Initialize and protect input elements for touch-screen devices (but never for apps)
-    // NB: now set disabled=true rather than readonly, since readonly does not always 
-    // prevent element from getting focus, e.g. within a LABEL element.
-    // c.f. http://kreotekdev.wordpress.com/2007/11/08/disabled-vs-readonly-form-fields/ 
-    if(device.touchable)
-    { 
-      eTextArea=document.getElementsByTagName("textarea");
-      eInput=document.getElementsByTagName("input");
-      for(i=0; i<eTextArea.length; i++) 
-      {
-        e = eTextArea[i];
-        c = e.className;
-        e.kmwInput=false;
-        if((!c || c.indexOf('kmw-disabled') < 0) && !e.readOnly)  
-        { 
-          e.disabled=true; e.kmwInput=true; 
-        }
-      }
-      for(i=0; i<eInput.length; i++) 
-      {
-        e=eInput[i];
-        c=e.className;
-        e.kmwInput=false;                
-        if((!c || c.indexOf('kmw-disabled') < 0) && !e.readOnly)
-        {
-          if(e.type == 'text' || e.type == 'search') 
-          {
-            e.disabled=true; e.kmwInput=true;       
-          } 
-        }
-      }      
-    }
     /**
      * Initialization of touch devices and browser interfaces must be done 
      * after all resources are loaded, during final stage of initialization
@@ -3445,7 +3477,7 @@
     if(device.touchable) keymanweb.handleRotationEvents();
     
     // Initialize touch-screen device interface  I3363 (Build 301)
-    if(device.touchable) 
+    if(device.touchable)
       keymanweb.setupTouchDevice();
 
     // Initialize desktop browser interface
