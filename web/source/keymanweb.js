@@ -1028,17 +1028,36 @@
       var ipList=document.getElementsByTagName(k==0?'INPUT':'TEXTAREA');
       for(var n=0;n<ipList.length;n++) 
       {      
-        if(ipList[n].className.indexOf('kmw-disabled') < 0 && !ipList[n].readOnly )
-          keymanweb.inputList.push(ipList[n]);
-        if(ipList[n].className) 
-          ipList[n].className=ipList[n].className+' keymanweb-font';
-        else
-          ipList[n].className='keymanweb-font';
+        keymanweb.setupDesktopElement(ipList[n]);
+        // if(ipList[n].className.indexOf('kmw-disabled') < 0 && !ipList[n].readOnly )
+        //   keymanweb.inputList.push(ipList[n]);
+        // if(ipList[n].className) 
+        //   ipList[n].className=ipList[n].className+' keymanweb-font';
+        // else
+        //   ipList[n].className='keymanweb-font';
       }
     }
-    //TODO: sort list by y, x position on page
-    
   }  
+
+  /**
+   * Function     setupDesktopElement
+   * Scope        Private
+   * Description  Setup one element for non-touch devices and add it to the inputList if it is an input element (desktop browsers)
+   * @return   {boolean}
+   */       
+  keymanweb.setupDesktopElement = function(Pelem)
+  { 
+      // If it's not one of these, we don't need to hook the OSK into it.
+      if(!(Pelem.tagName == "INPUT" || Pelem.tagName == "TEXTAREA")) return false;
+
+      // TODO:  Fix potential issue - We might have an issue if, for some reason, an element is re-added later.
+      if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly)
+        keymanweb.inputList.push(Pelem);
+      if(Pelem.className) 
+        Pelem.className=Pelem.className+' keymanweb-font';
+      else
+        Pelem.className='keymanweb-font';
+  } 
 
   /**
    * Get the user-specified (or default) font for the first mapped input or textarea element
@@ -1765,7 +1784,7 @@
     var ro=Pelem.attributes['readonly'],cn=Pelem.className;
     if(typeof ro == 'object' && ro.value != 'false' ) return; 
     if(typeof cn == 'string' && cn.indexOf('kmw-disabled') >= 0) return; 
-  
+
     if(Pelem.tagName.toLowerCase() == 'iframe') 
       keymanweb._AttachToIframe(Pelem);
     else
@@ -3155,6 +3174,8 @@
      * Description  Local function to get list of editable controls
      */    
     var LiTmp = function(_colon){return Pelem.getElementsByTagName(_colon);};
+
+    // If the element Pelem has any child elements, we wish to analyze those.
     var Linputs = LiTmp('INPUT'), 
       Ltextareas = LiTmp('TEXTAREA'), 
       Lframes = LiTmp('IFRAME'),
@@ -3536,6 +3557,49 @@
    
     // Restore and reload the currently selected keyboard 
     keymanweb.restoreCurrentKeyboard(); 
+
+      /* Setup of handlers for dynamically-added and (eventually) dynamically-removed elements.
+       * Reference: https://developer.mozilla.org/en/docs/Web/API/MutationObserver
+       * 
+       * We place it here so that it loads after most of the other UI loads, reducing the MutationObserver's overhead.
+       */
+
+      keymanweb.observationTarget = document.querySelector('body');
+      keymanweb.mutationObserver = new MutationObserver(function(mutations) 
+        {
+          var dirtyFlag = false; // Notes if we need to recompute our .sortedInputs array.
+          //console.log(mutations);
+          
+          console.log(mutations.length);
+
+          for(i=0; i < mutations.length; i++)
+          {
+            mutation = mutations[i];
+            
+            for(j = 0; j < mutation.addedNodes.length; j++)
+            {
+              var addedNode = mutation.addedNodes[j];
+              
+              // Will need to handle this in case of child elements in a newly-added element with child elements.
+              // if(mutation.addedNode.getElementsByTagName) console.log(mutation.target.getElementsByTagName('INPUT'));
+
+              if(addedNode.tagName == 'INPUT' || addedNode.tagName == 'TEXTAREA')
+              {
+                dirtyFlag = true;
+                //TODO:  Make this a function call that does the real work!
+                //console.log(addedNode, " - ", mutation);
+              }
+            }
+
+            // There also exists a 'mutation.removedNodes' array.  We'll need to address that for issue #63.
+
+            // After all mutations have been handled, we need to recompile our .sortedInputs array.
+            if(dirtyFlag) keymanweb.listInputs();
+          }
+        });
+
+      keymanweb.observationConfig = { childList: true, subtree: true };
+      keymanweb.mutationObserver.observe(keymanweb.observationTarget, keymanweb.observationConfig);
 
     // Set exposed initialization flag to 2 to indicate deferred initialization also complete
     keymanweb['initialized']=2;
