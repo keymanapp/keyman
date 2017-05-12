@@ -3570,6 +3570,49 @@
     // Restore and reload the currently selected keyboard 
     keymanweb.restoreCurrentKeyboard(); 
 
+      /* Setup of handlers for dynamically-added and (eventually) dynamically-removed elements.
+       * Reference: https://developer.mozilla.org/en/docs/Web/API/MutationObserver
+       * 
+       * We place it here so that it loads after most of the other UI loads, reducing the MutationObserver's overhead.
+       */
+
+      keymanweb.observationTarget = document.querySelector('body');
+      keymanweb.mutationObserver = new MutationObserver(function(mutations) 
+        {
+          var dirtyFlag = false; // Notes if we need to recompute our .sortedInputs array.
+          //console.log(mutations);
+          
+          console.log(mutations.length);
+
+          for(i=0; i < mutations.length; i++)
+          {
+            mutation = mutations[i];
+            
+            for(j = 0; j < mutation.addedNodes.length; j++)
+            {
+              var addedNode = mutation.addedNodes[j];
+              
+              // Will need to handle this in case of child elements in a newly-added element with child elements.
+              // if(mutation.addedNode.getElementsByTagName) console.log(mutation.target.getElementsByTagName('INPUT'));
+
+              if(addedNode.tagName == 'INPUT' || addedNode.tagName == 'TEXTAREA')
+              {
+                dirtyFlag = true;
+                //TODO:  Make this a function call that does the real work!
+                //console.log(addedNode, " - ", mutation);
+              }
+            }
+
+            // There also exists a 'mutation.removedNodes' array.  We'll need to address that for issue #63.
+
+            // After all mutations have been handled, we need to recompile our .sortedInputs array.
+            if(dirtyFlag) keymanweb.listInputs();
+          }
+        });
+
+      keymanweb.observationConfig = { childList: true, subtree: true };
+      keymanweb.mutationObserver.observe(keymanweb.observationTarget, keymanweb.observationConfig);
+
     // Set exposed initialization flag to 2 to indicate deferred initialization also complete
     keymanweb['initialized']=2;
   }  

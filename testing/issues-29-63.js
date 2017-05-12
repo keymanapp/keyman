@@ -79,17 +79,24 @@
     // keyboards alphabetically by language.
   }
   
+  {
+	var inputCounter = 1;
+  }
+  
   function addInputs()
   {
 	  var masterDiv = document.getElementById('DynamicTextboxes');
 	  
 	  var newTextArea = document.createElement("textarea");
-	  newTextArea.id = 'ta2';
+	  
+	  var i = inputCounter++;
+	  
+	  newTextArea.id = 'ta' + i;
 	  newTextArea.className = 'test';
 	  newTextArea.placeholder = "Dynamic area!";
 	  
 	  var newInput = document.createElement("input");
-	  newInput.id = 'in2';
+	  newInput.id = 'in' + i;
 	  newInput.className = 'test';
 	  newInput.placeholder = "Dynamic area!";
 	  
