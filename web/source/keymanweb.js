@@ -1028,13 +1028,8 @@
       var ipList=document.getElementsByTagName(k==0?'INPUT':'TEXTAREA');
       for(var n=0;n<ipList.length;n++) 
       {      
+        // Registers all relevant static elements on the page.
         keymanweb.setupDesktopElement(ipList[n]);
-        // if(ipList[n].className.indexOf('kmw-disabled') < 0 && !ipList[n].readOnly )
-        //   keymanweb.inputList.push(ipList[n]);
-        // if(ipList[n].className) 
-        //   ipList[n].className=ipList[n].className+' keymanweb-font';
-        // else
-        //   ipList[n].className='keymanweb-font';
       }
     }
   }  
@@ -1050,21 +1045,25 @@
   { 
       var lcTagName = Pelem.tagName.toLowerCase();
       // If it's not one of these, we don't need to hook the OSK into it.
-      if(!(lcTagName == "input" || lcTagName == "textarea")) return false;
+      if(!(lcTagName == "input" || lcTagName == "textarea")) {
+        return false;
+      }
 
       // TODO:  Fix potential issue - We might have an issue if, for some reason, an element is re-added later.
+      // (We may need to ensure we don't re-add an element to keymanweb.inputList that isn't already on it!)
+
       if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly)
       {
-        for(i = 0; i < keymanweb.inputList.length; i++)
-          if(keymanweb.inputList[i] == Pelem) return false;
+        var index = keymanweb.inputList.indexOf(Pelem);
+        if(index != -1) {
+          return false;
+        }
         keymanweb.inputList.push(Pelem);
       }
-      if(Pelem.className) 
-        Pelem.className=Pelem.className+' keymanweb-font';
-      else
-        Pelem.className='keymanweb-font';
 
-        return true;
+      Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
+
+      return true;
   } 
 
   /**
@@ -1839,6 +1838,10 @@
               util.attachDOMEvent(Lelem, 'selectionchange', keymanweb._SelectionChange);
               keymanweb._SelectionChange();
             }
+          }
+          else
+          {
+            keymanweb._AttachToControls(Lelem);
           }
         }
         else
@@ -3559,8 +3562,6 @@
     {
       if(document.attachEvent)
         document.attachEvent('onfocusin', keymanweb._IEFocusIn);
-      // else if(document.addEventListener)
-      //   document.addEventListener('DOMNodeInserted', keymanweb._DOMNodeInserted, true);
     }
    
     // Restore and reload the currently selected keyboard 
@@ -3572,40 +3573,41 @@
        * We place it here so that it loads after most of the other UI loads, reducing the MutationObserver's overhead.
        */
 
-      keymanweb.observationTarget = document.querySelector('body');
+      var observationTarget = document.querySelector('body');
+      var k; // our other iteration variables have already been declared previously.
+
       keymanweb.mutationObserver = new MutationObserver(function(mutations) 
         {
           var dirtyFlag = false; // Notes if we need to recompute our .sortedInputs array.
 
-          for(i=0; i < mutations.length; i++)
-          {
+          for(var i=0; i < mutations.length; i++) {
             mutation = mutations[i];
             
-            for(j = 0; j < mutation.addedNodes.length; j++)
-            {
+            for(var j=0; j < mutation.addedNodes.length; j++) {
               var addedNode = mutation.addedNodes[j];
-              var lcTagName = ""
+              var lcTagName = "";
               
               if(addedNode.tagName) {
                 lcTagName = addedNode.tagName.toLowerCase();
               }
               
               var childAdditions = [];
+              var arrayFromNodeList = function(nl) {
+                var res = [];
+                for(var i=0; i < nl.length; i++) {
+                  res.push(nl[i]);
+                }
+                return res;
+              }
 
               // Will need to handle this in case of child elements in a newly-added element with child elements.
               if(addedNode.getElementsByTagName) 
               {
-                var arr = addedNode.getElementsByTagName('input');
-                for(k = 0; k < arr.length; k++)
-                  childAdditions.push(arr[k]);
-
-                arr = addedNode.getElementsByTagName('textarea');
-                for(k = 0; k < arr.length; k++)
-                  childAdditions.push(arr[k]);
-
-                arr = addedNode.getElementsByTagName('iframe');
-                for(k = 0; k < arr.length; k++)
-                  childAdditions.push(arr[k]);
+                childAdditions = childAdditions.concat(
+                  arrayFromNodeList(addedNode.getElementsByTagName('input')),
+                  arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
+                  arrayFromNodeList(addedNode.getElementsByTagName('iframe'))
+                );
               }
 
               if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe')
@@ -3624,12 +3626,14 @@
             // There also exists a 'mutation.removedNodes' array.  We'll need to address that for issue #63.
 
             // After all mutations have been handled, we need to recompile our .sortedInputs array.
-            if(dirtyFlag) keymanweb.listInputs();
+            if(dirtyFlag) {
+              keymanweb.listInputs();
+            }
           }
         });
 
-      keymanweb.observationConfig = { childList: true, subtree: true };
-      keymanweb.mutationObserver.observe(keymanweb.observationTarget, keymanweb.observationConfig);
+      var observationConfig = { childList: true, subtree: true };
+      keymanweb.mutationObserver.observe(observationTarget, observationConfig);
 
     // Set exposed initialization flag to 2 to indicate deferred initialization also complete
     keymanweb['initialized']=2;
@@ -3643,18 +3647,17 @@
       // keymanweb.attachToControl is written to handle iframes, but setupDesktopElement is not.
       if(keymanweb.setupDesktopElement(Pelem)) {
         keymanweb.attachToControl(Pelem);
-      }
-      else if(Pelem.tagName.toLowerCase() == 'iframe') {
+      } else if(Pelem.tagName.toLowerCase() == 'iframe') {
         //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
-        // util.attachDOMEvent(Pelem, 'load', new function()
-        // {
-        //   console.log("Loaded: ", Pelem.contentWindow.document);
-        //   keymanweb.attachToControl(Pelem);
-        // });
-        Pelem.onload = function() {
-          console.log("Loaded: ", Pelem.contentWindow.document);
-          keymanweb.attachToControl(Pelem);
-        }
+          Pelem.addEventListener('load', function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
+            keymanweb.attachToControl(Pelem);
+          });
+
+        /* If the iframe has somehow already loaded, we can't expect the onload event to be raised.  We ought just
+         * go ahead and perform our callback's contents.
+         */
+
+         // TODO:  Implement... that.
       }
     }
     // else do touch-based setup stuffs.

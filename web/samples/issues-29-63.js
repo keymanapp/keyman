@@ -118,14 +118,11 @@
 	  var frame = document.createElement("iframe");
 	  frame.height = "100";
 	  frame.src = "issue-29-iframe.html";
+	  frame.onload = function() {console.log('Original onload!');};
 	  
 	  //masterDiv.appendChild(frame);
 	  
 	  var newDiv = document.createElement("div");
-	  
 	  newDiv.appendChild(frame);
-	  
 	  masterDiv.appendChild(newDiv);
-	  
-	  
   }
