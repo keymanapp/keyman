@@ -1852,6 +1852,10 @@
               keymanweb._SelectionChange();
             }
           }
+          else
+          {
+            keymanweb._AttachToControls(Lelem);
+          }
         }
         else
         {
@@ -3660,7 +3664,6 @@
         //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
         var callback = Pelem.onload;
         Pelem.onload = function() {
-          //console.log("Loaded: ", Pelem.contentWindow.document);
           keymanweb.attachToControl(Pelem);
           if(callback && callback) {
             callback();

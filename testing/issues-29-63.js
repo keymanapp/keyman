@@ -123,10 +123,6 @@
 	  //masterDiv.appendChild(frame);
 	  
 	  var newDiv = document.createElement("div");
-	  
 	  newDiv.appendChild(frame);
-	  
 	  masterDiv.appendChild(newDiv);
-	  
-	  
   }
