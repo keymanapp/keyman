@@ -3572,8 +3572,6 @@
     {
       if(document.attachEvent)
         document.attachEvent('onfocusin', keymanweb._IEFocusIn);
-      // else if(document.addEventListener)
-      //   document.addEventListener('DOMNodeInserted', keymanweb._DOMNodeInserted, true);
     }
    
     // Restore and reload the currently selected keyboard 
