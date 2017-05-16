@@ -3658,14 +3658,13 @@
       }
       else if(Pelem.tagName.toLowerCase() == 'iframe') {
         //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
-        // util.attachDOMEvent(Pelem, 'load', new function()
-        // {
-        //   console.log("Loaded: ", Pelem.contentWindow.document);
-        //   keymanweb.attachToControl(Pelem);
-        // });
+        var callback = Pelem.onload;
         Pelem.onload = function() {
-          console.log("Loaded: ", Pelem.contentWindow.document);
+          //console.log("Loaded: ", Pelem.contentWindow.document);
           keymanweb.attachToControl(Pelem);
+          if(callback && callback) {
+            callback();
+          }
         }
       }
     }
