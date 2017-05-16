@@ -1040,13 +1040,8 @@
       var ipList=document.getElementsByTagName(k==0?'INPUT':'TEXTAREA');
       for(var n=0;n<ipList.length;n++) 
       {      
+        // Registers all relevant static elements on the page.
         keymanweb.setupDesktopElement(ipList[n]);
-        // if(ipList[n].className.indexOf('kmw-disabled') < 0 && !ipList[n].readOnly )
-        //   keymanweb.inputList.push(ipList[n]);
-        // if(ipList[n].className) 
-        //   ipList[n].className=ipList[n].className+' keymanweb-font';
-        // else
-        //   ipList[n].className='keymanweb-font';
       }
     }
   }  
@@ -1065,6 +1060,8 @@
       if(!(lcTagName == "input" || lcTagName == "textarea")) return false;
 
       // TODO:  Fix potential issue - We might have an issue if, for some reason, an element is re-added later.
+      // (We may need to ensure we don't re-add an element to keymanweb.inputList that isn't already on it!)
+
       if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly)
       {
         for(i = 0; i < keymanweb.inputList.length; i++)
@@ -3665,7 +3662,7 @@
         var callback = Pelem.onload;
         Pelem.onload = function() {
           keymanweb.attachToControl(Pelem);
-          if(callback && callback) {
+          if(callback) {
             callback();
           }
         }
