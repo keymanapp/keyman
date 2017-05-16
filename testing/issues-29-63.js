@@ -100,17 +100,32 @@
 	  newInput.className = 'test';
 	  newInput.placeholder = "Dynamic area!";
 	  
-	  masterDiv.appendChild(newTextArea);
-	  masterDiv.appendChild(newInput);
+	  //masterDiv.appendChild(newTextArea);
+	  //masterDiv.appendChild(newInput);
 	  
-	  // keymanweb.inputList = [];
-	  // keymanweb.setupDesktopPage();
-	  // keymanweb._AttachToControls(newTextArea);
-	  // keymanweb._AttachToControls(newInput);
+	  var newDiv = document.createElement("div");
 	  
-	  // keymanweb.setupDesktopElement(newTextArea);
-	  // keymanweb.setupDesktopElement(newInput);
-	  // keymanweb.attachToControl(newTextArea);
-	  // keymanweb.attachToControl(newInput);
-	  // keymanweb.listInputs();
+	  newDiv.appendChild(newTextArea);
+	  newDiv.appendChild(newInput);
+	  
+	  masterDiv.appendChild(newDiv);
+  }
+  
+  function addIFrame()
+  {
+	  var masterDiv = document.getElementById('DynamicTextboxes');
+	  
+	  var frame = document.createElement("iframe");
+	  frame.height = "100";
+	  frame.src = "issue-29-iframe.html";
+	  
+	  //masterDiv.appendChild(frame);
+	  
+	  var newDiv = document.createElement("div");
+	  
+	  newDiv.appendChild(frame);
+	  
+	  masterDiv.appendChild(newDiv);
+	  
+	  
   }

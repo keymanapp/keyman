@@ -1060,8 +1060,9 @@
    */       
   keymanweb.setupDesktopElement = function(Pelem)
   { 
+      var lcTagName = Pelem.tagName.toLowerCase();
       // If it's not one of these, we don't need to hook the OSK into it.
-      if(!(Pelem.tagName == "INPUT" || Pelem.tagName == "TEXTAREA")) return false;
+      if(!(lcTagName == "input" || lcTagName == "textarea")) return false;
 
       // TODO:  Fix potential issue - We might have an issue if, for some reason, an element is re-added later.
       if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly)
@@ -3595,22 +3596,31 @@
             for(j = 0; j < mutation.addedNodes.length; j++)
             {
               var addedNode = mutation.addedNodes[j];
+              var lcTagName = ""
+              
+              if(addedNode.tagName) {
+                lcTagName = addedNode.tagName.toLowerCase();
+              }
               
               var childAdditions = [];
 
               // Will need to handle this in case of child elements in a newly-added element with child elements.
               if(addedNode.getElementsByTagName) 
               {
-                var arr = mutation.target.getElementsByTagName('input');
+                var arr = addedNode.getElementsByTagName('input');
                 for(k = 0; k < arr.length; k++)
                   childAdditions.push(arr[k]);
 
-                arr = mutation.target.getElementsByTagName('textarea');
+                arr = addedNode.getElementsByTagName('textarea');
+                for(k = 0; k < arr.length; k++)
+                  childAdditions.push(arr[k]);
+
+                arr = addedNode.getElementsByTagName('iframe');
                 for(k = 0; k < arr.length; k++)
                   childAdditions.push(arr[k]);
               }
 
-              if(addedNode.tagName == 'input' || addedNode.tagName == 'textarea')
+              if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe')
               {
                 dirtyFlag = true;
                 keymanweb._MutationAdditionObserved(addedNode);
@@ -3640,8 +3650,26 @@
   // Used by the MutationObserver event handler to properly setup any elements dynamically added to the document post-initialization.
   keymanweb._MutationAdditionObserved = function(Pelem)
   {
-    if(keymanweb.setupDesktopElement(Pelem))
-      keymanweb.attachToControl(Pelem);
+    if(!device.touchable)
+    {
+      // keymanweb.attachToControl is written to handle iframes, but setupDesktopElement is not.
+      if(keymanweb.setupDesktopElement(Pelem)) {
+        keymanweb.attachToControl(Pelem);
+      }
+      else if(Pelem.tagName.toLowerCase() == 'iframe') {
+        //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
+        // util.attachDOMEvent(Pelem, 'load', new function()
+        // {
+        //   console.log("Loaded: ", Pelem.contentWindow.document);
+        //   keymanweb.attachToControl(Pelem);
+        // });
+        Pelem.onload = function() {
+          console.log("Loaded: ", Pelem.contentWindow.document);
+          keymanweb.attachToControl(Pelem);
+        }
+      }
+    }
+    // else do touch-based setup stuffs.
   }
 
   // Create an ordered list of all text and search input elements and textarea elements
@@ -3918,21 +3946,6 @@
       if((Pelem.tagName.toLowerCase() == 'input' && Pelem.type.toLowerCase() == 'text') || Pelem.tagName.toLowerCase() == 'textarea' || Pelem.tagName.toLowerCase() == 'iframe')
         keymanweb.attachToControl(Pelem);
   }
-
-  // /**
-  //  *  Callback used by non-IE browsers to attach KMW objects to elements  
-  //  *  Actions to execute if new elements are added to page
-  //  * 
-  //  * @param       {Event}      e      event object
-  //  **/       
-  // keymanweb._DOMNodeInserted = function(e)
-  // {
-  //   var Pelem=e.target; 
-  //   if(Pelem != null && Pelem.nodeType == 1) // I1703 - crash when nodeType != 1
-  //   { //TODO: Should this really be used for touch devices???
-  //     keymanweb._AttachToControls(Pelem); // I1961, I1976
-  //   }
-  // }
    
   /**
    * Reset OSK shift states when entering or exiting the active element
