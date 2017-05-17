@@ -817,6 +817,9 @@
     {
       var lcTagName = x.tagName.toLowerCase();
 
+      // In case this function is called more than once on the same element, we need a quick out.
+      if(x.kmwInput) return x.kmwInput;
+
       if(lcTagName == 'textarea')
       {
         c = x.className;
@@ -845,7 +848,7 @@
     /**
      * Function     setupTouchPage
      * Scope        Private
-     * Description  Saves the list of inputs for touch devices (touch-based browsers, mobile) and
+     * Description  Saves the list of static inputs for touch devices (touch-based browsers, mobile) and
      *              and completes their setup.
      */  
     keymanweb.setupTouchPage = function()
@@ -863,19 +866,7 @@
         { 
           if(keymanweb.isKMWInput(ipList[n]))
           {        
-            var x=document.createElement('DIV'); 
-            x['base']=x.base=ipList[n];
-            
-            // Set font for base element
-            if(x.base.className) 
-              x.base.className=x.base.className+' keymanweb-font';
-            else
-              x.base.className='keymanweb-font';
-    
-            // Add the exposed member 'kmw_ip' to allow page to refer to duplicated element
-            ipList[n]['kmw_ip']=x;
-            keymanweb.inputList.push(x);
-            keymanweb.setupTouchElement(x);
+            keymanweb.setupTouchElement(ipList[n]);
           }
           // Always hide the OSK for non-mapped inputs
           else
@@ -894,10 +885,39 @@
      *              a scrollable DIV within that outer element
      *              two SPAN elements within the scrollable DIV, to hold the text before and after the caret
      *    
-     *              The left border of the second SPAN is flashed on and off as a visible caret   
+     *              The left border of the second SPAN is flashed on and off as a visible caret  
+     * 
+     *              Also ensures the element is registered on keymanweb's internal input list.
      */
-    keymanweb.setupTouchElement = function(x)
+    keymanweb.setupTouchElement = function(Pelem)
     {
+      // The specified element must be validated as a touch element to proceed.
+      if(!keymanweb.isKMWInput(Pelem)) return;
+
+      var x=document.createElement('DIV'); 
+      x['base']=x.base=Pelem;
+      
+      // Set font for base element
+      if(x.base.className) 
+        x.base.className=x.base.className+' keymanweb-font';
+      else
+        x.base.className='keymanweb-font';
+
+      // Add the exposed member 'kmw_ip' to allow page to refer to duplicated element
+      if(Pelem['kmw_ip']) {
+        // Wait, we've already established a member for this one before!  Just reuse that one!
+        for(var i=0; i < keymanweb.inputList.length; i++)
+          if(keymanweb.inputList[i] == Pelem['kmw_ip']) return;
+
+        // OK, we'd removed the element from our input list at some time in the past.  Safe to re-add.  
+        keymanweb.inputList.push(Pelem['kmw_ip']);
+        return;
+      }
+      Pelem['kmw_ip']=x;
+
+      // Make sure the element's on the list of registered inputs.  It can't NOT be, so we're fine.
+      keymanweb.inputList.push(x);
+
       // Superimpose custom input fields for each input or textarea, unless readonly or disabled 
 
       // Copy essential styles from each base element to the new DIV      
@@ -1112,9 +1132,6 @@
       if(!(lcTagName == "input" || lcTagName == "textarea")) {
         return false;
       }
-
-      // TODO:  Fix potential issue - We might have an issue if, for some reason, an element is re-added later.
-      // (We may need to ensure we don't re-add an element to keymanweb.inputList that isn't already on it!)
 
       if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly)
       {
@@ -3675,6 +3692,19 @@
            attachFunctor();
          }
       }
+    }
+    else
+    {
+      if(Pelem.tagName.toLowerCase() != 'iframe') {
+        if(keymanweb.isKMWInput(Pelem))
+        {
+          keymanweb.setupTouchElement(Pelem);
+        }
+        else
+        {
+          keymanweb.setupNontouchElement(Pelem);
+        }
+      } // no 'else' - touch never handled iframes.
     }
     // else do touch-based setup stuffs.
   }
