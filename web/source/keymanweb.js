@@ -1074,6 +1074,8 @@
         
       // And copy the text content
       keymanweb.setText(x,x.base.value,null);  
+
+      return x;
     }
 
     /**
@@ -3698,15 +3700,20 @@
       if(Pelem.tagName.toLowerCase() != 'iframe') {
         if(keymanweb.isKMWInput(Pelem))
         {
-          keymanweb.setupTouchElement(Pelem);
+          var x = keymanweb.setupTouchElement(Pelem);
+
+          if(x)
+          {
+            // if needed, let the timeout variable be: keymanweb.touchInputAddedTimer
+            window.setTimeout(function() {keymanweb.updateInput(x);}, 1);
+          }
         }
         else
         {
           keymanweb.setupNontouchElement(Pelem);
         }
-      } // no 'else' - touch never handled iframes.
+      } // no 'else' - the touch-device implementation never handled iframes.
     }
-    // else do touch-based setup stuffs.
   }
 
   // Create an ordered list of all text and search input elements and textarea elements
