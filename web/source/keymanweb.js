@@ -894,6 +894,18 @@
       // The specified element must be validated as a touch element to proceed.
       if(!keymanweb.isKMWInput(Pelem)) return;
 
+      // Add the exposed member 'kmw_ip' to allow page to refer to duplicated element
+      if(Pelem['kmw_ip']) {
+
+        // Wait, we've already established a member for this one before!  Just reuse that one!
+        for(var i=0; i < keymanweb.inputList.length; i++)
+          if(keymanweb.inputList[i] == Pelem['kmw_ip']) return;  // Actually, it's even on our list already!  Don't touch it!
+
+        // OK, we'd removed the element from our input list at some time in the past.  Safe to re-add.  
+        keymanweb.inputList.push(Pelem['kmw_ip']);
+        return;
+      }
+
       var x=document.createElement('DIV'); 
       x['base']=x.base=Pelem;
       
@@ -903,16 +915,6 @@
       else
         x.base.className='keymanweb-font';
 
-      // Add the exposed member 'kmw_ip' to allow page to refer to duplicated element
-      if(Pelem['kmw_ip']) {
-        // Wait, we've already established a member for this one before!  Just reuse that one!
-        for(var i=0; i < keymanweb.inputList.length; i++)
-          if(keymanweb.inputList[i] == Pelem['kmw_ip']) return;
-
-        // OK, we'd removed the element from our input list at some time in the past.  Safe to re-add.  
-        keymanweb.inputList.push(Pelem['kmw_ip']);
-        return;
-      }
       Pelem['kmw_ip']=x;
 
       // Make sure the element's on the list of registered inputs.  It can't NOT be, so we're fine.
@@ -2828,7 +2830,7 @@
     {          
       if(t[i] == activeBase) break;
     }   
-    
+
     // Find the next (or previous) element in the list
     if(bBack) i=i-1; else i=i+1; 
     if(i >= t.length) i=i-t.length;
@@ -2840,7 +2842,7 @@
       // Set focusing flag to prevent OSK disappearing 
       keymanweb.focusing=true;
       var target=t[i]['kmw_ip'];
-      
+
       // Focus if next element is non-mapped
       if(typeof(target) == 'undefined')
       {
@@ -3652,7 +3654,58 @@
             }
 
             // There also exists a 'mutation.removedNodes' array.  We'll need to address that for issue #63.
+            for(j = 0; j < mutation.removedNodes.length; j++)
+            {
+              var removedNode = mutation.removedNodes[j];
+              var lcTagName = ""
+              
+              if(removedNode.tagName) {
+                lcTagName = removedNode.tagName.toLowerCase();
+              }
+              
+              var childRemovals = [];
 
+              // Will need to handle this in case of child elements in a newly-added element with child elements.
+              if(removedNode.getElementsByTagName) 
+              {
+                var arr = removedNode.getElementsByTagName('input');
+                for(k = 0; k < arr.length; k++)
+                  childRemovals.push(arr[k]);
+
+                arr = removedNode.getElementsByTagName('textarea');
+                for(k = 0; k < arr.length; k++)
+                  childRemovals.push(arr[k]);
+
+                arr = removedNode.getElementsByTagName('iframe');
+                for(k = 0; k < arr.length; k++)
+                  childRemovals.push(arr[k]);
+              }
+
+              if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe')
+              {
+                dirtyFlag = true;
+                keymanweb._MutationRemovalObserved(addedNode);
+              }
+
+              for(k = 0; k < childRemovals.length; k++)
+              {
+                dirtyFlag = true;
+                keymanweb._MutationRemovalObserved(childRemovals[k]);
+              }
+
+              // if something was removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
+              if(dirtyFlag && device.touchable)
+              {
+                window.setTimeout(function() {
+                  for(k = 0; k < keymanweb.sortedInputs.length; k++)
+                  {
+                    if(keymanweb.sortedInputs[k]['kmw_ip']) {
+                      keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
+                    }
+                  }
+                }, 1);
+              }
+            }
             // After all mutations have been handled, we need to recompile our .sortedInputs array.
             if(dirtyFlag) {
               keymanweb.listInputs();
@@ -3713,6 +3766,19 @@
           keymanweb.setupNontouchElement(Pelem);
         }
       } // no 'else' - the touch-device implementation never handled iframes.
+    }
+  }
+
+  // Used by the mutation event handler to properly decouple any elements dynamically removed from the document.
+  keymanweb._MutationRemovalObserved = function(Pelem)
+  {
+    var element = Pelem;
+    if(device.touchable) {
+      element = Pelem['kmw_ip'];
+    }
+    var index = keymanweb.inputList.indexOf(Pelem);
+      if(index != -1) {
+      keymanweb.inputList.splice(index, 1);
     }
   }
 
