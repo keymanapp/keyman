@@ -903,7 +903,7 @@
 
         // OK, we'd removed the element from our input list at some time in the past.  Safe to re-add.  
         keymanweb.inputList.push(Pelem['kmw_ip']);
-        return;
+        return Pelem['kmw_ip'];
       }
 
       var x=document.createElement('DIV'); 
@@ -3707,8 +3707,20 @@
               }
             }
             // After all mutations have been handled, we need to recompile our .sortedInputs array.
+
             if(dirtyFlag) {
-              keymanweb.listInputs();
+			  keymanweb.listInputs();
+
+              if(dirtyFlag & device.touchable) {
+                window.setTimeout(function() {
+                    for(k = 0; k < keymanweb.sortedInputs.length; k++)
+                    {
+                      if(keymanweb.sortedInputs[k]['kmw_ip']) {
+                        keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
+                      }
+                    }
+                  }, 1);
+			  }
             }
           }
         });
@@ -3753,13 +3765,7 @@
       if(Pelem.tagName.toLowerCase() != 'iframe') {
         if(keymanweb.isKMWInput(Pelem))
         {
-          var x = keymanweb.setupTouchElement(Pelem);
-
-          if(x)
-          {
-            // if needed, let the timeout variable be: keymanweb.touchInputAddedTimer
-            window.setTimeout(function() {keymanweb.updateInput(x);}, 1);
-          }
+          keymanweb.setupTouchElement(Pelem);
         }
         else
         {
