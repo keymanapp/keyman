@@ -3586,16 +3586,16 @@
        */
 
       var observationTarget = document.querySelector('body');
+      var k; // our other iteration variables have already been declared previously.
+
       keymanweb.mutationObserver = new MutationObserver(function(mutations) 
         {
           var dirtyFlag = false; // Notes if we need to recompute our .sortedInputs array.
 
-          for(var i=0; i < mutations.length; i++)
-          {
+          for(var i=0; i < mutations.length; i++) {
             mutation = mutations[i];
             
-            for(var j = 0; j < mutation.addedNodes.length; j++)
-            {
+            for(var j=0; j < mutation.addedNodes.length; j++) {
               var addedNode = mutation.addedNodes[j];
               var lcTagName = "";
               
@@ -3604,14 +3604,21 @@
               }
               
               var childAdditions = [];
+              var arrayFromNodeList = function(nl) {
+                var res = [];
+                for(var i=0; i < nl.length; i++) {
+                  res.push(nl[i]);
+                }
+                return res;
+              }
 
               // Will need to handle this in case of child elements in a newly-added element with child elements.
               if(addedNode.getElementsByTagName) 
               {
                 childAdditions = childAdditions.concat(
-                  addedNode.getElementsByTagName('input'),
-                  addedNode.getElementsByTagName('textarea'),
-                  addedNode.getElementsByTagName('iframe'),
+                  arrayFromNodeList(addedNode.getElementsByTagName('input')),
+                  arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
+                  arrayFromNodeList(addedNode.getElementsByTagName('iframe')),
                 );
               }
 
@@ -3654,13 +3661,15 @@
         keymanweb.attachToControl(Pelem);
       } else if(Pelem.tagName.toLowerCase() == 'iframe') {
         //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
-        var callback = Pelem.onload;
-        Pelem.onload = function() {
-          keymanweb.attachToControl(Pelem);
-          if(callback) {
-            callback();
-          }
-        }
+          Pelem.addEventListener('load', function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
+            keymanweb.attachToControl(Pelem);
+          });
+
+        /* If the iframe has somehow already loaded, we can't expect the onload event to be raised.  We ought just
+         * go ahead and perform our callback's contents.
+         */
+
+         // TODO:  Implement... that.
       }
     }
     // else do touch-based setup stuffs.
