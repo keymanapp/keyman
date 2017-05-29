@@ -3606,7 +3606,7 @@
                 childAdditions = childAdditions.concat(
                   arrayFromNodeList(addedNode.getElementsByTagName('input')),
                   arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
-                  arrayFromNodeList(addedNode.getElementsByTagName('iframe')),
+                  arrayFromNodeList(addedNode.getElementsByTagName('iframe'))
                 );
               }
 
