@@ -1764,20 +1764,6 @@
     else Parray=Parray.concat(Pval);
     return Parray;
   }
-
-  /**
-   * Function     _IsAttached
-   * Scope        Private   
-   * @param       {Object}  Pelem     Element to be tested
-   * @return      {number}            Returns 1 if attached, else 0
-   * Description  Tests whether or not KeymanWeb is attached to element 
-   */  
-  keymanweb._IsAttached = function(Pelem)
-  {
-    for(var i = 0; i < keymanweb._AttachedElements.length; i++)
-      if(keymanweb._AttachedElements[i] == Pelem) return 1;
-    return 0;
-  }
   
   /**
    * Function     attachToControl
@@ -1802,8 +1788,6 @@
       Pelem.onkeydown = keymanweb._KeyDown;
       Pelem.onkeyup = keymanweb._KeyUp;      
     }
-    // I1596 - attach to controls dynamically
-    if(!keymanweb._IsAttached(Pelem)) keymanweb._AttachedElements.push(Pelem);
   }
        
   /**
@@ -3556,13 +3540,6 @@
     // IE: call _SelectionChange when the user changes the selection 
     if(document.selection  &&  !keymanweb.legacy)
       util.attachDOMEvent(document, 'selectionchange', keymanweb._SelectionChange);
-       
-    // Add event listeners and attach manually-positioned KMW objects
-    if(keymanweb.options['attachType'] != 'manual')  // I1961
-    {
-      if(document.attachEvent)
-        document.attachEvent('onfocusin', keymanweb._IEFocusIn);
-    }
    
     // Restore and reload the currently selected keyboard 
     keymanweb.restoreCurrentKeyboard(); 
@@ -3649,15 +3626,22 @@
         keymanweb.attachToControl(Pelem);
       } else if(Pelem.tagName.toLowerCase() == 'iframe') {
         //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
-          Pelem.addEventListener('load', function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
-            keymanweb.attachToControl(Pelem);
-          });
+
+        var attachFunctor = function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
+          keymanweb.attachToControl(Pelem);
+        }
+
+        Pelem.addEventListener('load', attachFunctor);
 
         /* If the iframe has somehow already loaded, we can't expect the onload event to be raised.  We ought just
          * go ahead and perform our callback's contents.
+         * 
+         * keymanweb.attachToControl() is now idempotent, so even if our call 'whiffs', it won't cause long-lasting
+         * problems.
          */
-
-         // TODO:  Implement... that.
+         if(Pelem.contentDocument.readyState == 'complete') {
+           attachFunctor();
+         }
       }
     }
     // else do touch-based setup stuffs.
@@ -3922,20 +3906,6 @@
         if(Ptarg.value.length == 0) Ptarg.dir=elDir;
       }
     }
-  }
-
-//TODO: check use of following function, what value should it return??
-  /**
-   * Callback used by IE/non-IE browsers to attach KMW objects to elements 
-   **/    
-  keymanweb._IEFocusIn = function()        // I1596 - attach to controls dynamically 
-  {
-    var e = keymanweb._GetEventObject(null);   // I2404 - Support for IE events in IFRAMEs
-    if(!e) return;
-    var Pelem=e.srcElement;
-    if(Pelem != null && !keymanweb._IsAttached(Pelem))
-      if((Pelem.tagName.toLowerCase() == 'input' && Pelem.type.toLowerCase() == 'text') || Pelem.tagName.toLowerCase() == 'textarea' || Pelem.tagName.toLowerCase() == 'iframe')
-        keymanweb.attachToControl(Pelem);
   }
    
   /**
