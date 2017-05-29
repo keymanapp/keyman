@@ -3553,12 +3553,11 @@
       var observationTarget = document.querySelector('body');
       var k; // our other iteration variables have already been declared previously.
 
-      keymanweb.mutationObserver = new MutationObserver(function(mutations) 
-        {
+      keymanweb.mutationObserver = new MutationObserver(function(mutations) {
           var dirtyFlag = false; // Notes if we need to recompute our .sortedInputs array.
 
           for(var i=0; i < mutations.length; i++) {
-            mutation = mutations[i];
+            var mutation = mutations[i];
             
             for(var j=0; j < mutation.addedNodes.length; j++) {
               var addedNode = mutation.addedNodes[j];
@@ -3578,8 +3577,7 @@
               }
 
               // Will need to handle this in case of child elements in a newly-added element with child elements.
-              if(addedNode.getElementsByTagName) 
-              {
+              if(addedNode.getElementsByTagName) {
                 childAdditions = childAdditions.concat(
                   arrayFromNodeList(addedNode.getElementsByTagName('input')),
                   arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
@@ -3587,14 +3585,12 @@
                 );
               }
 
-              if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe')
-              {
+              if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe') {
                 dirtyFlag = true;
                 keymanweb._MutationAdditionObserved(addedNode);
               }
 
-              for(k = 0; k < childAdditions.length; k++)
-              {
+              for(k = 0; k < childAdditions.length; k++) {
                 dirtyFlag = true;
                 keymanweb._MutationAdditionObserved(childAdditions[k]);
               }
@@ -3619,8 +3615,7 @@
   // Used by the MutationObserver event handler to properly setup any elements dynamically added to the document post-initialization.
   keymanweb._MutationAdditionObserved = function(Pelem)
   {
-    if(!device.touchable)
-    {
+    if(!device.touchable) {
       // keymanweb.attachToControl is written to handle iframes, but setupDesktopElement is not.
       if(keymanweb.setupDesktopElement(Pelem)) {
         keymanweb.attachToControl(Pelem);
