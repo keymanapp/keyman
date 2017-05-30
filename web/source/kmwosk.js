@@ -1013,7 +1013,7 @@
       
       t.className='kmw-spacebar-caption';
       kbdName=kbdName.replace(/\s*keyboard\s*/i,'');
-      
+   
       // We use a separate variable here to keep down on MutationObserver messages in keymanweb.js code.
       var keyboardName = "";
       if(kbdName == lgName) {
