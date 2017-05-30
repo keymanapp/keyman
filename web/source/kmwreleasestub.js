@@ -109,7 +109,7 @@ String.prototype._kmwCharCodeAt = function(codePointIndex) {};
 
 /**
  * @param   {string}  searchValue
- * @param   {number}  fromIndex
+ * @param   {number}  [fromIndex]
  * @return  {number}
  **/   
 String.prototype._kmwIndexOf = function(searchValue, fromIndex) {};

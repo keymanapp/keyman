@@ -104,8 +104,8 @@ var __BUILD__ = 300;
     };
 
   // Generalized component event registration
-  util.events = [];  
-  util.currentEvents = [];
+  util.events = {};  // An object mapping event names to individual event lists.  Maps strings to arrays.
+  util.currentEvents = [];  // The event messaging call stack.
 
   /**
    * Determine path and protocol of executing script
@@ -194,7 +194,7 @@ var __BUILD__ = 300;
   util.callEvent = function(event,params)
   {
     if(typeof util.events[event] == 'undefined') return true;
-    if(typeof util.currentEvents[event] != 'undefined') return false;
+    if(util.currentEvents.indexOf(event) != -1) return false;  // Avoid event messaging recursion!
     util.currentEvents.push(event);    
     for(var i=0; i<util.events[event].length; i++)
     {
@@ -247,7 +247,7 @@ var __BUILD__ = 300;
   /**
    * Function     getOption
    * Scope        Public
-   * @param       {string}    option      Name of option
+   * @param       {string}    optionName  Name of option
    * @param       {*=}        dflt        Default value of option
    * @return      {*}               
    * Description  Returns value of named option
@@ -262,7 +262,7 @@ var __BUILD__ = 300;
   /**
    * Function     setOption
    * Scope        Public
-   * @param       {string}    option      Name of option
+   * @param       {string}    optionName  Name of option
    * @param       {*=}        value       Value of option
    * Description  Sets value of named option
    */  
@@ -993,7 +993,7 @@ var __BUILD__ = 300;
    * Function     toNumber
    * Scope        Public
    * @param       {string}      s            numeric string
-   * @param       {number}      v            default value
+   * @param       {number}      dflt         default value
    * @return      {number}               
    * Description  Return string converted to integer or default value
    */       
@@ -1007,7 +1007,7 @@ var __BUILD__ = 300;
    * Function     toNumber
    * Scope        Public
    * @param       {string}      s            numeric string
-   * @param       {number}      v            default value
+   * @param       {number}      dflt         default value
    * @return      {number}               
    * Description  Return string converted to real value or default value
    */       
