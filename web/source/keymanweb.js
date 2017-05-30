@@ -358,7 +358,7 @@
     cs.width='2px';
     cs.backgroundColor='blue';
     cs.border='none';
-    cs.left=cs.top=0;           // actual position set relative to parent when displayed
+    cs.left=cs.top='0px';           // actual position set relative to parent when displayed
     cs.display='block';         
     cs.visibility='hidden';
     cs.zIndex='9998';           // immediately below the OSK
@@ -1711,13 +1711,13 @@
       e = window.event;
       if(!e)
       {
-        e = keymanweb._GetLastActiveElement();
-        if(e)
+        var e2 = keymanweb._GetLastActiveElement();
+        if(e2)
         {
-          e = e.ownerDocument;
-          if(e) e = e.parentWindow;
-          if(!e) return null;
-          e = e.event;
+          e2 = e2.ownerDocument;
+          if(e2) e2 = e2.parentWindow;
+          if(!e2) return null;
+          e = e2.event;
         }
       }
     }
@@ -3071,12 +3071,12 @@
    *   Javascript treats it as an object anyway 
    *    
    * @param       {Object}    Lkbd       Keyboard object
-   * @return      {Array}                Copy of keyboard identification strings
+   * @return      {Object}               Copy of keyboard identification strings
    * 
    */    
   keymanweb._GetKeyboardDetail = function(Lkbd)   // I2078 - Full keyboard detail
   {
-    var Lr=[];  
+    var Lr={};  
     Lr['Name'] = Lkbd['KN'];
     Lr['InternalName'] =  Lkbd['KI'];
     Lr['LanguageName'] = Lkbd['KL'];  // I1300 - Add support for language names
@@ -3867,7 +3867,7 @@
   /**
    * Function     removeHotKey
    * Scope        Public
-   * @param       {number}        keycode
+   * @param       {number}        keyCode
    * @param       {number}        shiftState
    * Description  Remove a hot key handler from array of document-level hotkeys triggered by key up event
    */
