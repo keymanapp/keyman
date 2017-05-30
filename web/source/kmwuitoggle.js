@@ -237,7 +237,11 @@ try {
    * @param       {string}    _src
    * @param       {string}    _caption
    * @param       {boolean}   _selected
-   * @return      {Object}              
+   * @return      {Object}    
+   * 
+   * @suppress {suspiciousCode}  // Closure isn't smart enough to realize that _onmouseover
+   *                             // and the like are defined on individual instances later.
+   *                             // It thinks they're always null.        
    **/
   ui.button = function(_src, _caption, _selected)
   {
