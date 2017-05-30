@@ -1706,18 +1706,19 @@
    */     
   keymanweb._GetEventObject=function(e)   // I2404 - Attach to controls in IFRAMEs
   {
-    if (!e)
-    {
+    if (!e) {
       e = window.event;
-      if(!e)
-      {
-        var e2 = keymanweb._GetLastActiveElement();
-        if(e2)
-        {
-          e2 = e2.ownerDocument;
-          if(e2) e2 = e2.parentWindow;
-          if(!e2) return null;
-          e = e2.event;
+      if(!e) {
+        var elem = keymanweb._GetLastActiveElement();
+        if(elem) {
+          elem = elem.ownerDocument;
+          if(elem) {
+            elem = elem.parentWindow;
+          }
+          if(!elem) {
+            return null;
+          }
+          e = elem.event;
         }
       }
     }

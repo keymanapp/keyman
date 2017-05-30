@@ -447,8 +447,10 @@
    */    
   keymanweb['KA'] = keymanweb.KA = function(n,ch,s)  // Keyboard_Any()
   {   
-    if(ch == '') return false;
-    var Lix = s._kmwIndexOf(ch,0); //I3319
+    if(ch == '') {
+      return false;
+    }
+    var Lix = s._kmwIndexOf(ch); //I3319
     keymanweb._AnyIndices[n] = Lix;
     return Lix >= 0;
   }
