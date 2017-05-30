@@ -1021,13 +1021,10 @@
    * Scope        Private
    * Description  Save list of inputs for non-touch devices (desktop browsers)
    */       
-  keymanweb.setupDesktopPage = function()
-  { 
-    for(var k=0; k<2; k++)
-    {
+  keymanweb.setupDesktopPage = function() { 
+    for(var k=0; k<2; k++) {
       var ipList=document.getElementsByTagName(k==0?'INPUT':'TEXTAREA');
-      for(var n=0;n<ipList.length;n++) 
-      {      
+      for(var n=0;n<ipList.length;n++) {      
         // Registers all relevant static elements on the page.
         keymanweb.setupDesktopElement(ipList[n]);
       }
@@ -1041,8 +1038,7 @@
    *              Only returns true if the element is a valid input for keymanweb and it is not presently tracked as an input element.
    * @return   {boolean}
    */       
-  keymanweb.setupDesktopElement = function(Pelem)
-  { 
+  keymanweb.setupDesktopElement = function(Pelem) { 
       var lcTagName = Pelem.tagName.toLowerCase();
       // If it's not one of these, we don't need to hook the OSK into it.
       if(!(lcTagName == "input" || lcTagName == "textarea")) {
@@ -1052,8 +1048,7 @@
       // TODO:  Fix potential issue - We might have an issue if, for some reason, an element is re-added later.
       // (We may need to ensure we don't re-add an element to keymanweb.inputList that isn't already on it!)
 
-      if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly)
-      {
+      if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly) {
         var index = keymanweb.inputList.indexOf(Pelem);
         if(index != -1) {
           return false;
@@ -1824,8 +1819,7 @@
               keymanweb._SelectionChange();
             }
           }
-          else
-          {
+          else {
             keymanweb._AttachToControls(Lelem);
           }
         }
@@ -3614,8 +3608,7 @@
   }
 
   // Used by the MutationObserver event handler to properly setup any elements dynamically added to the document post-initialization.
-  keymanweb._MutationAdditionObserved = function(Pelem)
-  {
+  keymanweb._MutationAdditionObserved = function(Pelem) {
     if(!device.touchable) {
       // keymanweb.attachToControl is written to handle iframes, but setupDesktopElement is not.
       if(keymanweb.setupDesktopElement(Pelem)) {
