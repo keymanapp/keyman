@@ -206,7 +206,7 @@ try {
     mapNode.appendChild(areaNode);
     ui.browseMapNode.appendChild(mapNode);
     ui.regionsNode.appendChild(ui.browseMapNode);
-    ui.regionNodes = [];
+    ui.regionNodes = {};
 
     var listNode = ui.createNode('ul');
     for(i in ui.regions)
@@ -291,7 +291,7 @@ try {
     if(ui.updateMap) ui.updateMap=false; else return;
 
     var n = 0;  
-    ui.regionLanguageListNodes = [];
+    ui.regionLanguageListNodes = {};
   
     // Build list of keyboards by region and language       
     var Keyboards = keymanweb['getKeyboards']();
