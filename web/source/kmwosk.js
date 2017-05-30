@@ -211,7 +211,7 @@
   /**
    * Function     enabled
    * Scope        Public   
-   * @return      {boolean|integer}    True if KMW OSK enabled
+   * @return      {boolean|number}    True if KMW OSK enabled
    * Description  Test if KMW OSK is enabled
    */    
   osk['isEnabled'] = osk.isEnabled = function()
@@ -222,7 +222,7 @@
   /**
    * Function     isVisible
    * Scope        Public   
-   * @return      {boolean|integer}    True if KMW OSK visible
+   * @return      {boolean|number}    True if KMW OSK visible
    * Description  Test if KMW OSK is actually visible
    * Note that this will usually return false after any UI event that results in (temporary) loss of input focus    
    */    
@@ -1644,7 +1644,7 @@
   /**
    * Create the OSK for a particular keyboard and device
    * 
-   * @param       {Array.<Object>}      layout      Array of OSK layout objects
+   * @param       {Object}              layout      OSK layout definition
    * @param       {string}              formFactor  layout form factor
    * @return      {Object}                          fully formatted OSK object
    */

@@ -54,7 +54,7 @@
         Lelem._KeymanWebSelectionEnd=Le;
         keymanweb._IgnoreNextSelChange = 0;
         if(Ptext!=null)keymanweb.KO(0, Lelem, Ptext);
-        if(typeof(PdeadKey)!='undefined') keymanweb.KDO(0, Lelem, PdeadKey);
+        if((typeof(PdeadKey)!=='undefined') && (PdeadKey !== null)) keymanweb.KDO(0, Lelem, PdeadKey);
         Lelem._KeymanWebSelectionStart=null;
         Lelem._KeymanWebSelectionEnd=null;
         Lv=true;
@@ -177,7 +177,7 @@
     if(!keymanweb['initialized'])
     {
       keymanweb.deferredKRS.push(Pstub); 
-      return;
+      return null;
     }
 
     // The default stub is always the first keyboard stub loaded [and will be ignored by desktop browsers - not for beta, anyway]
@@ -229,6 +229,8 @@
     // make any changes needed by UI for new keyboard stub
     // (Uncommented for Build 360)
     keymanweb.doKeyboardRegistered(Pstub['KI'],Pstub['KL'],Pstub['KN'],Pstub['KLC']);
+
+    return null;
   }
 
   /**
@@ -259,7 +261,7 @@
    * Function     KN    
    * Scope        Public
    * @param       {number}      n       Length of context to check
-   * @param       {Object}      Pelem   Element to work with (must be currently focused element)
+   * @param       {Object}      Ptarg   Element to work with (must be currently focused element)
    * @return      {boolean}             True if length of context is less than or equal to n
    * Description  Test length of context, return true if the length of the context is less than or equal to n
    * 
@@ -346,16 +348,13 @@
       retVal = (keyCode == Lrulekey);         // I3318, I3555
     }
     if(!retVal) this._DeadkeyResetMatched();  // I3318
-    return retVal;                            // I3318
+    return retVal != 0;                            // I3318
   };
   
   /**
    * Function     KKI      
    * Scope        Public
-   * @param       {number}      n
-   * @param       {Object}      Ptarg
-   * @param       {string}      val
-   * @param       {number}      ln
+   * @param       {Object}      e
    * @return      {Object}              Object with event's virtual key flag, key code, and modifiers
    * Description  Get object with extended key event information
    */    
@@ -383,7 +382,7 @@
     n = sp - n;   
     for(var i = 0; i < keymanweb._DeadKeys.length; i++)
       if(keymanweb._DeadKeys[i].p == n  &&  keymanweb._DeadKeys[i].d == d) {
-        keymanweb._DeadKeys[i].matched = 1; return 1; // I3318        
+        keymanweb._DeadKeys[i].matched = 1; return true; // I3318        
       }
     this._DeadkeyResetMatched();                      // I3318
 
@@ -448,7 +447,9 @@
    */    
   keymanweb['KA'] = keymanweb.KA = function(n,ch,s)  // Keyboard_Any()
   {   
-    if(ch == '') return 0;
+    if(ch == '') {
+      return false;
+    }
     var Lix = s._kmwIndexOf(ch); //I3319
     keymanweb._AnyIndices[n] = Lix;
     return Lix >= 0;
@@ -677,7 +678,7 @@
    * Scope        Public
    * @param       {number}      Pdn     no of character to overwrite (delete) 
    * @param       {string}      Ps      string
-   * @param       {numebr}      Pn      index
+   * @param       {number}      Pn      index
    * @param       {Object}      Pelem   element to output to 
    * Description  Output a character selected from the string according to the offset in the index array
    */    
