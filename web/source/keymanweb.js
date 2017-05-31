@@ -1027,7 +1027,7 @@
       util.arrayFromNodeList(document.getElementsByTagName('textarea'))
     );
     ipList.forEach(keymanweb.setupDesktopElement);
-  }  
+  };  
 
   /**
    * Function     setupDesktopElement
@@ -1037,27 +1037,27 @@
    * @return   {boolean}
    */       
   keymanweb.setupDesktopElement = function(Pelem) { 
-      var lcTagName = Pelem.tagName.toLowerCase();
-      // If it's not one of these, we don't need to hook the OSK into it.
-      if(!(lcTagName == "input" || lcTagName == "textarea")) {
+    var lcTagName = Pelem.tagName.toLowerCase();
+    // If it's not one of these, we don't need to hook the OSK into it.
+    if(!(lcTagName == "input" || lcTagName == "textarea")) {
+      return false;
+    }
+
+    // TODO:  Fix potential issue - We might have an issue if, for some reason, an element is re-added later.
+    // (We may need to ensure we don't re-add an element to keymanweb.inputList that isn't already on it!)
+
+    if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly) {
+      var index = keymanweb.inputList.indexOf(Pelem);
+      if(index != -1) {
         return false;
       }
+      keymanweb.inputList.push(Pelem);
+    }
 
-      // TODO:  Fix potential issue - We might have an issue if, for some reason, an element is re-added later.
-      // (We may need to ensure we don't re-add an element to keymanweb.inputList that isn't already on it!)
+    Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
 
-      if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly) {
-        var index = keymanweb.inputList.indexOf(Pelem);
-        if(index != -1) {
-          return false;
-        }
-        keymanweb.inputList.push(Pelem);
-      }
-
-      Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
-
-      return true;
-  } 
+    return true;
+  }; 
 
   /**
    * Get the user-specified (or default) font for the first mapped input or textarea element
@@ -3612,7 +3612,7 @@
 
         var attachFunctor = function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
           keymanweb.attachToControl(Pelem);
-        }
+        };
 
         Pelem.addEventListener('load', attachFunctor);
 
