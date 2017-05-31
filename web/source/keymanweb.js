@@ -1021,24 +1021,43 @@
    * Scope        Private
    * Description  Save list of inputs for non-touch devices (desktop browsers)
    */       
-  keymanweb.setupDesktopPage = function()
-  { 
-    for(var k=0; k<2; k++)
-    {
-      var ipList=document.getElementsByTagName(k==0?'INPUT':'TEXTAREA');
-      for(var n=0;n<ipList.length;n++) 
-      {      
-        if(ipList[n].className.indexOf('kmw-disabled') < 0 && !ipList[n].readOnly )
-          keymanweb.inputList.push(ipList[n]);
-        if(ipList[n].className) 
-          ipList[n].className=ipList[n].className+' keymanweb-font';
-        else
-          ipList[n].className='keymanweb-font';
-      }
+  keymanweb.setupDesktopPage = function() { 
+    var ipList = [].concat(
+      util.arrayFromNodeList(document.getElementsByTagName('input')),
+      util.arrayFromNodeList(document.getElementsByTagName('textarea'))
+    );
+    ipList.forEach(keymanweb.setupDesktopElement);
+  };  
+
+  /**
+   * Function     setupDesktopElement
+   * Scope        Private
+   * Description  Setup one element for non-touch devices and add it to the inputList if it is an input element (desktop browsers).
+   *              Only returns true if the element is a valid input for keymanweb and it is not presently tracked as an input element.
+   * @return   {boolean}
+   */       
+  keymanweb.setupDesktopElement = function(Pelem) { 
+    var lcTagName = Pelem.tagName.toLowerCase();
+    // If it's not one of these, we don't need to hook the OSK into it.
+    if(!(lcTagName == "input" || lcTagName == "textarea")) {
+      return false;
     }
-    //TODO: sort list by y, x position on page
-    
-  }  
+
+    // TODO:  Fix potential issue - We might have an issue if, for some reason, an element is re-added later.
+    // (We may need to ensure we don't re-add an element to keymanweb.inputList that isn't already on it!)
+
+    if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly) {
+      var index = keymanweb.inputList.indexOf(Pelem);
+      if(index != -1) {
+        return false;
+      }
+      keymanweb.inputList.push(Pelem);
+    }
+
+    Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
+
+    return true;
+  }; 
 
   /**
    * Get the user-specified (or default) font for the first mapped input or textarea element
@@ -1739,20 +1758,6 @@
     else Parray=Parray.concat(Pval);
     return Parray;
   }
-
-  /**
-   * Function     _IsAttached
-   * Scope        Private   
-   * @param       {Object}  Pelem     Element to be tested
-   * @return      {number}            Returns 1 if attached, else 0
-   * Description  Tests whether or not KeymanWeb is attached to element 
-   */  
-  keymanweb._IsAttached = function(Pelem)
-  {
-    for(var i = 0; i < keymanweb._AttachedElements.length; i++)
-      if(keymanweb._AttachedElements[i] == Pelem) return 1;
-    return 0;
-  }
   
   /**
    * Function     attachToControl
@@ -1766,7 +1771,7 @@
     var ro=Pelem.attributes['readonly'],cn=Pelem.className;
     if(typeof ro == 'object' && ro.value != 'false' ) return; 
     if(typeof cn == 'string' && cn.indexOf('kmw-disabled') >= 0) return; 
-  
+
     if(Pelem.tagName.toLowerCase() == 'iframe') 
       keymanweb._AttachToIframe(Pelem);
     else
@@ -1777,8 +1782,6 @@
       Pelem.onkeydown = keymanweb._KeyDown;
       Pelem.onkeyup = keymanweb._KeyUp;      
     }
-    // I1596 - attach to controls dynamically
-    if(!keymanweb._IsAttached(Pelem)) keymanweb._AttachedElements.push(Pelem);
   }
        
   /**
@@ -1813,6 +1816,9 @@
               util.attachDOMEvent(Lelem, 'selectionchange', keymanweb._SelectionChange);
               keymanweb._SelectionChange();
             }
+          }
+          else {
+            keymanweb._AttachToControls(Lelem);
           }
         }
         else
@@ -3156,6 +3162,8 @@
      * Description  Local function to get list of editable controls
      */    
     var LiTmp = function(_colon){return Pelem.getElementsByTagName(_colon);};
+
+    // If the element Pelem has any child elements, we wish to analyze those.
     var Linputs = LiTmp('INPUT'), 
       Ltextareas = LiTmp('TEXTAREA'), 
       Lframes = LiTmp('IFRAME'),
@@ -3525,22 +3533,102 @@
     // IE: call _SelectionChange when the user changes the selection 
     if(document.selection  &&  !keymanweb.legacy)
       util.attachDOMEvent(document, 'selectionchange', keymanweb._SelectionChange);
-       
-    // Add event listeners and attach manually-positioned KMW objects
-    if(keymanweb.options['attachType'] != 'manual')  // I1961
-    {
-      if(document.attachEvent)
-        document.attachEvent('onfocusin', keymanweb._IEFocusIn);
-      else if(document.addEventListener)
-        document.addEventListener('DOMNodeInserted', keymanweb._DOMNodeInserted, true);
-    }
    
     // Restore and reload the currently selected keyboard 
     keymanweb.restoreCurrentKeyboard(); 
 
+    /* Setup of handlers for dynamically-added and (eventually) dynamically-removed elements.
+      * Reference: https://developer.mozilla.org/en/docs/Web/API/MutationObserver
+      * 
+      * We place it here so that it loads after most of the other UI loads, reducing the MutationObserver's overhead.
+      * Of course, we only want to dynamically add elements if the user hasn't enabled the manual attachment option.
+      */
+
+    if(keymanweb.options['attachType'] != 'manual') { //I1961
+      var observationTarget = document.querySelector('body');
+
+      keymanweb.mutationObserver = new MutationObserver(function(mutations) {
+        var inputElementAdditions = [];
+
+        for(var i=0; i < mutations.length; i++) {
+          var mutation = mutations[i];
+          
+          for(var j=0; j < mutation.addedNodes.length; j++) {
+            var addedNode = mutation.addedNodes[j];
+            var lcTagName = addedNode.tagName ? addedNode.tagName.toLowerCase() : "";
+
+            // Will need to handle this in case of child elements in a newly-added element with child elements.
+            if(addedNode.getElementsByTagName) {
+              inputElementAdditions = inputElementAdditions.concat(
+                util.arrayFromNodeList(addedNode.getElementsByTagName('input')),
+                util.arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
+                util.arrayFromNodeList(addedNode.getElementsByTagName('iframe'))
+              );
+            }
+
+            if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe') {
+              inputElementAdditions.push(addedNode);
+            }
+          }          
+        }
+
+        for(var k = 0; k < inputElementAdditions.length; k++) {
+          keymanweb._MutationAdditionObserved(inputElementAdditions[k]);
+        }
+
+        // There also exists a 'mutation.removedNodes' array.  We'll need to address that for issue #63, and its
+        // respective _MutationRemovalObserved should be called here.
+
+        /* After all mutations have been handled, we need to recompile our .sortedInputs array, but only.
+          * if any have actually occurred.
+          */
+        if(inputElementAdditions.length) {
+          keymanweb.listInputs();
+        }
+      });
+
+      var observationConfig = { childList: true, subtree: true };
+      keymanweb.mutationObserver.observe(observationTarget, observationConfig);
+    }
+
     // Set exposed initialization flag to 2 to indicate deferred initialization also complete
     keymanweb['initialized']=2;
-  }  
+  }
+
+  /** 
+   * Function     _MutationAdditionObserved
+   * Scope        Private
+   * @param       {Object}  Pelem     A page input, textarea, or iframe element.
+   * Description  Used by the MutationObserver event handler to properly setup any elements dynamically added to the document post-initialization.
+   * 
+   */
+  keymanweb._MutationAdditionObserved = function(Pelem) {
+    if(!device.touchable) {
+      // keymanweb.attachToControl is written to handle iframes, but setupDesktopElement is not.
+      if(keymanweb.setupDesktopElement(Pelem)) {
+        keymanweb.attachToControl(Pelem);
+      } else if(Pelem.tagName.toLowerCase() == 'iframe') {
+        //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
+
+        var attachFunctor = function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
+          keymanweb.attachToControl(Pelem);
+        };
+
+        Pelem.addEventListener('load', attachFunctor);
+
+        /* If the iframe has somehow already loaded, we can't expect the onload event to be raised.  We ought just
+         * go ahead and perform our callback's contents.
+         * 
+         * keymanweb.attachToControl() is now idempotent, so even if our call 'whiffs', it won't cause long-lasting
+         * problems.
+         */
+         if(Pelem.contentDocument.readyState == 'complete') {
+           attachFunctor();
+         }
+      }
+    }
+    // else do touch-based setup stuffs.
+  }
 
   // Create an ordered list of all text and search input elements and textarea elements
   // except any tagged with class 'kmw-disabled'
@@ -3800,35 +3888,6 @@
       {
         if(Ptarg.value.length == 0) Ptarg.dir=elDir;
       }
-    }
-  }
-
-//TODO: check use of following function, what value should it return??
-  /**
-   * Callback used by IE/non-IE browsers to attach KMW objects to elements 
-   **/    
-  keymanweb._IEFocusIn = function()        // I1596 - attach to controls dynamically 
-  {
-    var e = keymanweb._GetEventObject(null);   // I2404 - Support for IE events in IFRAMEs
-    if(!e) return;
-    var Pelem=e.srcElement;
-    if(Pelem != null && !keymanweb._IsAttached(Pelem))
-      if((Pelem.tagName.toLowerCase() == 'input' && Pelem.type.toLowerCase() == 'text') || Pelem.tagName.toLowerCase() == 'textarea' || Pelem.tagName.toLowerCase() == 'iframe')
-        keymanweb.attachToControl(Pelem);
-  }
-
-  /**
-   *  Callback used by non-IE browsers to attach KMW objects to elements  
-   *  Actions to execute if new elements are added to page
-   * 
-   * @param       {Event}      e      event object
-   **/       
-  keymanweb._DOMNodeInserted = function(e)
-  {
-    var Pelem=e.target; 
-    if(Pelem != null && Pelem.nodeType == 1) // I1703 - crash when nodeType != 1
-    { //TODO: Should this really be used for touch devices???
-      keymanweb._AttachToControls(Pelem); // I1961, I1976
     }
   }
    

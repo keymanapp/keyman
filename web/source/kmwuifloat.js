@@ -487,13 +487,6 @@ try {
       return true;
     });               
 
-  /**
-   * Function     oncontrolblurred
-   * Scope        Public
-   * @param       {Object}  params  event object
-   * @return      {boolean}   
-   * Description  UI code to be executed on losing focus
-   */
   keymanweb['addEventListener']('controlblurred',
     function(params)
     {  
