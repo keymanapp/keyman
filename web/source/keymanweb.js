@@ -1022,13 +1022,11 @@
    * Description  Save list of inputs for non-touch devices (desktop browsers)
    */       
   keymanweb.setupDesktopPage = function() { 
-    for(var k=0; k<2; k++) {
-      var ipList=document.getElementsByTagName(k==0?'INPUT':'TEXTAREA');
-      for(var n=0;n<ipList.length;n++) {      
-        // Registers all relevant static elements on the page.
-        keymanweb.setupDesktopElement(ipList[n]);
-      }
-    }
+    var ipList = [].concat(
+      util.arrayFromNodeList(document.getElementsByTagName('input')),
+      util.arrayFromNodeList(document.getElementsByTagName('textarea'))
+    );
+    ipList.forEach(keymanweb.setupDesktopElement);
   }  
 
   /**
@@ -3539,75 +3537,71 @@
     // Restore and reload the currently selected keyboard 
     keymanweb.restoreCurrentKeyboard(); 
 
-      /* Setup of handlers for dynamically-added and (eventually) dynamically-removed elements.
-       * Reference: https://developer.mozilla.org/en/docs/Web/API/MutationObserver
-       * 
-       * We place it here so that it loads after most of the other UI loads, reducing the MutationObserver's overhead.
-       */
+    /* Setup of handlers for dynamically-added and (eventually) dynamically-removed elements.
+      * Reference: https://developer.mozilla.org/en/docs/Web/API/MutationObserver
+      * 
+      * We place it here so that it loads after most of the other UI loads, reducing the MutationObserver's overhead.
+      * Of course, we only want to dynamically add elements if the user hasn't enabled the manual attachment option.
+      */
 
+    if(keymanweb.options['attachType'] != 'manual') { //I1961
       var observationTarget = document.querySelector('body');
-      var k; // our other iteration variables have already been declared previously.
 
       keymanweb.mutationObserver = new MutationObserver(function(mutations) {
-          var dirtyFlag = false; // Notes if we need to recompute our .sortedInputs array.
+        var inputElementAdditions = [];
 
-          for(var i=0; i < mutations.length; i++) {
-            var mutation = mutations[i];
-            
-            for(var j=0; j < mutation.addedNodes.length; j++) {
-              var addedNode = mutation.addedNodes[j];
-              var lcTagName = "";
-              
-              if(addedNode.tagName) {
-                lcTagName = addedNode.tagName.toLowerCase();
-              }
-              
-              var childAdditions = [];
-              var arrayFromNodeList = function(nl) {
-                var res = [];
-                for(var i=0; i < nl.length; i++) {
-                  res.push(nl[i]);
-                }
-                return res;
-              }
+        for(var i=0; i < mutations.length; i++) {
+          var mutation = mutations[i];
+          
+          for(var j=0; j < mutation.addedNodes.length; j++) {
+            var addedNode = mutation.addedNodes[j];
+            var lcTagName = addedNode.tagName ? addedNode.tagName.toLowerCase() : "";
 
-              // Will need to handle this in case of child elements in a newly-added element with child elements.
-              if(addedNode.getElementsByTagName) {
-                childAdditions = childAdditions.concat(
-                  arrayFromNodeList(addedNode.getElementsByTagName('input')),
-                  arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
-                  arrayFromNodeList(addedNode.getElementsByTagName('iframe'))
-                );
-              }
-
-              if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe') {
-                dirtyFlag = true;
-                keymanweb._MutationAdditionObserved(addedNode);
-              }
-
-              for(k = 0; k < childAdditions.length; k++) {
-                dirtyFlag = true;
-                keymanweb._MutationAdditionObserved(childAdditions[k]);
-              }
+            // Will need to handle this in case of child elements in a newly-added element with child elements.
+            if(addedNode.getElementsByTagName) {
+              inputElementAdditions = inputElementAdditions.concat(
+                util.arrayFromNodeList(addedNode.getElementsByTagName('input')),
+                util.arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
+                util.arrayFromNodeList(addedNode.getElementsByTagName('iframe'))
+              );
             }
 
-            // There also exists a 'mutation.removedNodes' array.  We'll need to address that for issue #63.
-
-            // After all mutations have been handled, we need to recompile our .sortedInputs array.
-            if(dirtyFlag) {
-              keymanweb.listInputs();
+            if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe') {
+              inputElementAdditions.push(addedNode);
             }
           }
-        });
+
+          // There also exists a 'mutation.removedNodes' array.  We'll need to address that for issue #63.
+          
+          /* After all mutations have been handled, we need to recompile our .sortedInputs array, but only.
+          * if any have actually occurred.
+          */
+          if(inputElementAdditions.length) {
+            keymanweb.listInputs();
+          }
+
+        }
+
+        for(var k = 0; k < inputElementAdditions.length; k++) {
+          keymanweb._MutationAdditionObserved(inputElementAdditions[k]);
+        }
+      });
 
       var observationConfig = { childList: true, subtree: true };
       keymanweb.mutationObserver.observe(observationTarget, observationConfig);
+    }
 
     // Set exposed initialization flag to 2 to indicate deferred initialization also complete
     keymanweb['initialized']=2;
   }
 
-  // Used by the MutationObserver event handler to properly setup any elements dynamically added to the document post-initialization.
+  /** 
+   * Function     _MutationAdditionObserved
+   * Scope        Private
+   * @param       {Object}  Pelem     A page input, textarea, or iframe element.
+   * Description  Used by the MutationObserver event handler to properly setup any elements dynamically added to the document post-initialization.
+   * 
+   */
   keymanweb._MutationAdditionObserved = function(Pelem) {
     if(!device.touchable) {
       // keymanweb.attachToControl is written to handle iframes, but setupDesktopElement is not.

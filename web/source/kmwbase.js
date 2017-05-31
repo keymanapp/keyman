@@ -142,9 +142,21 @@ var __BUILD__ = 300;
   {
     osk.addEventListener('positionChanged', ui.oskPositionChanged);
   }
+  */
   
-
-*/
+  /**
+   * Function     arrayFromNodeList
+   * Scope        Public
+   * @param       {Object}    nl a node list, as returned from getElementsBy_____ methods.
+   * Description  Transforms a node list into an array.   * 
+   */
+  util.arrayFromNodeList = function(nl) {
+    var res = [];
+    for(var i=0; i < nl.length; i++) {
+      res.push(nl[i]);
+    }
+    return res;
+  }
 
   /**
    * Function    addEventListener
