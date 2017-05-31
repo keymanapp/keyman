@@ -870,6 +870,7 @@
      * Function     setupTouchElement
      * Scope        Private
      * @param       {Element}  Pelem   An input or textarea element from the page.
+     * @return      {Element|null}
      * Description  Creates a simulated input element for the specified INPUT or TEXTAREA, comprising:
      *              an outer DIV, matching the position, size and style of the base element
      *              a scrollable DIV within that outer element
@@ -883,7 +884,7 @@
     {
       // The specified element must be validated as a touch element to proceed.
       if(!keymanweb.isKMWInput(Pelem)) {
-        return;
+        return null;
       }
 
       /*
@@ -893,11 +894,11 @@
       if(Pelem['kmw_ip']) {
 
         if(keymanweb.inputList.indexOf(Pelem['kmw_ip']) != -1) {
-          return;
+          return null;
         }
 
-        keymanweb.inputList.push(Pelem['kmw_ip']);
-        return;
+        keymanweb.inputList.push(Pelem['kmw_ip']); 
+        return Pelem['kmw_ip'];   // May need setup elsewhere since it's just been re-added!
       }
 
       // The simulated touch element doesn't already exist?  Time to initialize it.
@@ -1090,7 +1091,7 @@
           osk.hideNow();
         },false);
     }
-
+    
     keymanweb.setupTouchPage();
   }
   
@@ -3684,7 +3685,9 @@
 
           if(x) {
             // if needed, let the timeout variable be: keymanweb.touchInputAddedTimer
-            window.setTimeout(function() {keymanweb.updateInput(x);}, 1);
+            window.setTimeout(function() {
+              keymanweb.updateInput(x);
+            }, 1);
           }
         } else {
           keymanweb.setupNontouchElement(Pelem);
