@@ -64,7 +64,7 @@ String.prototype.kmwCharCodeAt = function(codePointIndex) {
  * of the specified value, or -1 if not found.
  * 
  * @param  {string}  searchValue    The value to search for
- * @param  {number}  fromIndex      Optional code point index to start searching from
+ * @param  {number}  [fromIndex]    Optional code point index to start searching from
  * @return {number}                 The code point index of the specified search value
  */
 String.prototype.kmwIndexOf = function(searchValue, fromIndex) {

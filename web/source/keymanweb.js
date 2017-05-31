@@ -358,7 +358,7 @@
     cs.width='2px';
     cs.backgroundColor='blue';
     cs.border='none';
-    cs.left=cs.top=0;           // actual position set relative to parent when displayed
+    cs.left=cs.top='0px';           // actual position set relative to parent when displayed
     cs.display='block';         
     cs.visibility='hidden';
     cs.zIndex='9998';           // immediately below the OSK
@@ -1107,18 +1107,13 @@
    * Scope        Private
    * Description  Save list of inputs for non-touch devices (desktop browsers)
    */       
-  keymanweb.setupDesktopPage = function()
-  { 
-    for(var k=0; k<2; k++)
-    {
-      var ipList=document.getElementsByTagName(k==0?'INPUT':'TEXTAREA');
-      for(var n=0;n<ipList.length;n++) 
-      {      
-        // Registers all relevant static elements on the page.
-        keymanweb.setupDesktopElement(ipList[n]);
-      }
-    }
-  }  
+  keymanweb.setupDesktopPage = function() { 
+    var ipList = [].concat(
+      util.arrayFromNodeList(document.getElementsByTagName('input')),
+      util.arrayFromNodeList(document.getElementsByTagName('textarea'))
+    );
+    ipList.forEach(keymanweb.setupDesktopElement);
+  };  
 
   /**
    * Function     setupDesktopElement
@@ -1127,27 +1122,26 @@
    *              Only returns true if the element is a valid input for keymanweb and it is not presently tracked as an input element.
    * @return   {boolean}
    */       
-  keymanweb.setupDesktopElement = function(Pelem)
-  { 
-      var lcTagName = Pelem.tagName.toLowerCase();
-      // If it's not one of these, we don't need to hook the OSK into it.
-      if(!(lcTagName == "input" || lcTagName == "textarea")) {
+  keymanweb.setupDesktopElement = function(Pelem) { 
+    var lcTagName = Pelem.tagName.toLowerCase();
+    // If it's not one of these, we don't need to hook the OSK into it.
+    if(!(lcTagName == "input" || lcTagName == "textarea")) {
+      return false;
+    }
+
+    if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly)
+    {
+      var index = keymanweb.inputList.indexOf(Pelem);
+      if(index != -1) {
         return false;
       }
+      keymanweb.inputList.push(Pelem);
+    }
 
-      if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly)
-      {
-        var index = keymanweb.inputList.indexOf(Pelem);
-        if(index != -1) {
-          return false;
-        }
-        keymanweb.inputList.push(Pelem);
-      }
+    Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
 
-      Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
-
-      return true;
-  } 
+    return true;
+  }; 
 
   /**
    * Get the user-specified (or default) font for the first mapped input or textarea element
@@ -1815,18 +1809,19 @@
    */     
   keymanweb._GetEventObject=function(e)   // I2404 - Attach to controls in IFRAMEs
   {
-    if (!e)
-    {
+    if (!e) {
       e = window.event;
-      if(!e)
-      {
-        e = keymanweb._GetLastActiveElement();
-        if(e)
-        {
-          e = e.ownerDocument;
-          if(e) e = e.parentWindow;
-          if(!e) return null;
-          e = e.event;
+      if(!e) {
+        var elem = keymanweb._GetLastActiveElement();
+        if(elem) {
+          elem = elem.ownerDocument;
+          if(elem) {
+            elem = elem.parentWindow;
+          }
+          if(!elem) {
+            return null;
+          }
+          e = elem.event;
         }
       }
     }
@@ -1906,8 +1901,7 @@
               keymanweb._SelectionChange();
             }
           }
-          else
-          {
+          else {
             keymanweb._AttachToControls(Lelem);
           }
         }
@@ -3168,12 +3162,12 @@
    *   Javascript treats it as an object anyway 
    *    
    * @param       {Object}    Lkbd       Keyboard object
-   * @return      {Array}                Copy of keyboard identification strings
+   * @return      {Object}               Copy of keyboard identification strings
    * 
    */    
   keymanweb._GetKeyboardDetail = function(Lkbd)   // I2078 - Full keyboard detail
   {
-    var Lr=[];  
+    var Lr={};  
     Lr['Name'] = Lkbd['KN'];
     Lr['InternalName'] =  Lkbd['KI'];
     Lr['LanguageName'] = Lkbd['KL'];  // I1300 - Add support for language names
@@ -3595,83 +3589,73 @@
     // Restore and reload the currently selected keyboard 
     keymanweb.restoreCurrentKeyboard(); 
 
-      /* Setup of handlers for dynamically-added and (eventually) dynamically-removed elements.
-       * Reference: https://developer.mozilla.org/en/docs/Web/API/MutationObserver
-       * 
-       * We place it here so that it loads after most of the other UI loads, reducing the MutationObserver's overhead.
-       */
+    /* Setup of handlers for dynamically-added and (eventually) dynamically-removed elements.
+      * Reference: https://developer.mozilla.org/en/docs/Web/API/MutationObserver
+      * 
+      * We place it here so that it loads after most of the other UI loads, reducing the MutationObserver's overhead.
+      * Of course, we only want to dynamically add elements if the user hasn't enabled the manual attachment option.
+      */
 
+    if(keymanweb.options['attachType'] != 'manual') { //I1961
       var observationTarget = document.querySelector('body');
-      var k; // our other iteration variables have already been declared previously.
 
-      keymanweb.mutationObserver = new MutationObserver(function(mutations) 
-        {
-          var dirtyFlag = false; // Notes if we need to recompute our .sortedInputs array.
+      keymanweb.mutationObserver = new MutationObserver(function(mutations) {
+        var inputElementAdditions = [];
 
-          for(var i=0; i < mutations.length; i++) {
-            mutation = mutations[i];
-            
-            for(var j=0; j < mutation.addedNodes.length; j++) {
-              var addedNode = mutation.addedNodes[j];
-              var lcTagName = "";
-              
-              if(addedNode.tagName) {
-                lcTagName = addedNode.tagName.toLowerCase();
-              }
-              
-              var childAdditions = [];
-              var arrayFromNodeList = function(nl) {
-                var res = [];
-                for(var i=0; i < nl.length; i++) {
-                  res.push(nl[i]);
-                }
-                return res;
-              }
+        for(var i=0; i < mutations.length; i++) {
+          var mutation = mutations[i];
+          
+          for(var j=0; j < mutation.addedNodes.length; j++) {
+            var addedNode = mutation.addedNodes[j];
+            var lcTagName = addedNode.tagName ? addedNode.tagName.toLowerCase() : "";
 
-              // Will need to handle this in case of child elements in a newly-added element with child elements.
-              if(addedNode.getElementsByTagName) 
-              {
-                childAdditions = childAdditions.concat(
-                  arrayFromNodeList(addedNode.getElementsByTagName('input')),
-                  arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
-                  arrayFromNodeList(addedNode.getElementsByTagName('iframe'))
-                );
-              }
-
-              if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe')
-              {
-                dirtyFlag = true;
-                keymanweb._MutationAdditionObserved(addedNode);
-              }
-
-              for(k = 0; k < childAdditions.length; k++)
-              {
-                dirtyFlag = true;
-                keymanweb._MutationAdditionObserved(childAdditions[k]);
-              }
+            // Will need to handle this in case of child elements in a newly-added element with child elements.
+            if(addedNode.getElementsByTagName) {
+              inputElementAdditions = inputElementAdditions.concat(
+                util.arrayFromNodeList(addedNode.getElementsByTagName('input')),
+                util.arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
+                util.arrayFromNodeList(addedNode.getElementsByTagName('iframe'))
+              );
             }
 
-            // There also exists a 'mutation.removedNodes' array.  We'll need to address that for issue #63.
-
-            // After all mutations have been handled, we need to recompile our .sortedInputs array.
-            if(dirtyFlag) {
-              keymanweb.listInputs();
+            if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe') {
+              inputElementAdditions.push(addedNode);
             }
-          }
-        });
+          }          
+        }
+
+        for(var k = 0; k < inputElementAdditions.length; k++) {
+          keymanweb._MutationAdditionObserved(inputElementAdditions[k]);
+        }
+
+        // There also exists a 'mutation.removedNodes' array.  We'll need to address that for issue #63, and its
+        // respective _MutationRemovalObserved should be called here.
+
+        /* After all mutations have been handled, we need to recompile our .sortedInputs array, but only.
+          * if any have actually occurred.
+          */
+        if(inputElementAdditions.length) {
+          keymanweb.listInputs();
+        }
+      });
 
       var observationConfig = { childList: true, subtree: true };
       keymanweb.mutationObserver.observe(observationTarget, observationConfig);
+    }
 
     // Set exposed initialization flag to 2 to indicate deferred initialization also complete
     keymanweb['initialized']=2;
   }
 
-  // Used by the MutationObserver event handler to properly setup any elements dynamically added to the document post-initialization.
-  keymanweb._MutationAdditionObserved = function(Pelem)
-  {
-    if(!device.touchable)
-    {
+  /** 
+   * Function     _MutationAdditionObserved
+   * Scope        Private
+   * @param       {Object}  Pelem     A page input, textarea, or iframe element.
+   * Description  Used by the MutationObserver event handler to properly setup any elements dynamically added to the document post-initialization.
+   * 
+   */
+  keymanweb._MutationAdditionObserved = function(Pelem) {
+    if(!device.touchable) {
       // keymanweb.attachToControl is written to handle iframes, but setupDesktopElement is not.
       if(keymanweb.setupDesktopElement(Pelem)) {
         keymanweb.attachToControl(Pelem);
@@ -3680,7 +3664,7 @@
 
         var attachFunctor = function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
           keymanweb.attachToControl(Pelem);
-        }
+        };
 
         Pelem.addEventListener('load', attachFunctor);
 
@@ -4013,7 +3997,7 @@
   /**
    * Function     removeHotKey
    * Scope        Public
-   * @param       {number}        keycode
+   * @param       {number}        keyCode
    * @param       {number}        shiftState
    * Description  Remove a hot key handler from array of document-level hotkeys triggered by key up event
    */
