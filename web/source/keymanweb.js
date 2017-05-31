@@ -3569,21 +3569,21 @@
             if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe') {
               inputElementAdditions.push(addedNode);
             }
-          }
-
-          // There also exists a 'mutation.removedNodes' array.  We'll need to address that for issue #63.
-          
-          /* After all mutations have been handled, we need to recompile our .sortedInputs array, but only.
-          * if any have actually occurred.
-          */
-          if(inputElementAdditions.length) {
-            keymanweb.listInputs();
-          }
-
+          }          
         }
 
         for(var k = 0; k < inputElementAdditions.length; k++) {
           keymanweb._MutationAdditionObserved(inputElementAdditions[k]);
+        }
+
+        // There also exists a 'mutation.removedNodes' array.  We'll need to address that for issue #63, and its
+        // respective _MutationRemovalObserved should be called here.
+
+        /* After all mutations have been handled, we need to recompile our .sortedInputs array, but only.
+          * if any have actually occurred.
+          */
+        if(inputElementAdditions.length) {
+          keymanweb.listInputs();
         }
       });
 
