@@ -51,7 +51,8 @@
     </script> 
     
     <!-- Add keyboard management script for local selection of keyboards to use -->
-    <script src="./issues-63.js"></script> 
+    <script src="./issue-53.js"></script> 
+	<script src="./issue53/layered_debug_keyboard-1.0_load.js"></script>
   
   </head>
 
@@ -59,27 +60,37 @@
   <body onload='loadKeyboards();'> 
     <h2>KeymanWeb Sample Page - Uncompiled Source</h2>
 
-    <div id='DynamicTextboxes'>
+    <div>
     <!-- 
       The following DIV is used to position the Button or Toolbar User Interfaces on the page.
       If omitted, those User Interfaces will appear at the top of the document body.
       (It is ignored by other User Interfaces.)
     -->
     <div id='KeymanWebControl'></div>                                                                                   
-	<h3>This version is used to test KeymanWeb's ability to cope with page mutations.</h3>
-	<!--<iframe src="hello-world.html" height=100></iframe>-->
-	<!-- The following is very useful for testing automatic touch input layouts. -->
-	<!--<input id="plaininput" placeholder="Temporary input for testing touch init." />-->
-	<input type='button' id='btn1' onclick='addInputs();' value='Create Inputs!' />
-	<input type='button' id='btn2' onclick='addIFrame();' value='Insert an iframe.' />
-	<input type='button' id='btn3' onclick="removeInputs();" value="Remove inputs!" />
-	<input type='button' id='btn4' onclick="restoreInputs();" value="Restore removed inputs!" />
-	<hr>
-  </div> 	
-   <h3><a href="../samples/index.html">Return to testing home page</a></h3>
 
+    <h3>Type in your language in this text area:</h3>
+    <textarea id='ta1' class='test' placeholder='Type here'></textarea>
   
+    <h3>or in this input field:</h3>
+    <input class='test' value='' placeholder='or here'/>
+    
+    <!--  The following elements show how the language menu can be dynamically extended at any time -->
+    <h3>Add a keyboard by keyboard name:</h3>
+    <input type='input' id='kbd_id1' class='kmw-disabled' onkeypress="clickOnEnter(event,1);"/>
+    <input type='button' id='btn1' onclick='addKeyboard(1);' value='Add' />
  
+    <h3>Add a keyboard by ISO 639 language code:</h3>
+    <input type='input' id='kbd_id2' class='kmw-disabled' onkeypress="clickOnEnter(event,2);"/>
+    <input type='button' id='btn2' onclick='addKeyboard(2);' value='Add' />
+
+    <h3>Add a keyboard by language name:</h3>
+    <input type='input' id='kbd_id3' class='kmw-disabled' onkeypress="clickOnEnter(event,3);"/>
+    <input type='button' id='btn3' onclick='addKeyboard(3);' value='Add' />   
+
+
+    <h3><a href="../samples/index.html">Return to testing home page</a></h3>
+  </div>
+
   </body>
   
   <!-- 
