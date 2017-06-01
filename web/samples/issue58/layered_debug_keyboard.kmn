@@ -1,0 +1,14 @@
+﻿c Please, do not use this in any serious production setting.
+store(&VERSION) '9.0'
+store(&TARGETS) 'web'
+store(&COPYRIGHT) 'SIL International'
+store(&MESSAGE) 'This keyboard exists to test KeymanWeb' U+0027 's keyboard layout engine.'
+store(&ETHNOLOGUECODE) 'eng'
+store(&NAME) 'Web_Layer_Debugging'
+store(&LAYOUTFILE) 'layered_debug_keyboard-layout.js'
+store(&BITMAP) 'layered_debug_keyboard.ico'
+begin Unicode > use(main)
+
+
+group(main) using keys
++ [K_D] > 'd'
