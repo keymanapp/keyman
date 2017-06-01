@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_86d67861e0823d17548e7041cc8ec6af</ID>
+      <Filename>layered_debug_keyboard.kmn</Filename>
+      <Filepath>layered_debug_keyboard.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Web_Layer_Debugging</Name>
+        <Copyright>SIL International</Copyright>
+        <Message>This keyboard exists to test KeymanWeb's keyboard layout engine.</Message>
+      </Details>
+    </File>
+    <File>
+      <ID>id_012aa4616ca6991538834220c27931ec</ID>
+      <Filename>layered_debug_keyboard.ico</Filename>
+      <Filepath>layered_debug_keyboard.ico</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.ico</FileType>
+      <ParentFileID>id_86d67861e0823d17548e7041cc8ec6af</ParentFileID>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

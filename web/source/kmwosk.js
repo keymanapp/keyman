@@ -211,7 +211,7 @@
   /**
    * Function     enabled
    * Scope        Public   
-   * @return      {boolean|integer}    True if KMW OSK enabled
+   * @return      {boolean|number}    True if KMW OSK enabled
    * Description  Test if KMW OSK is enabled
    */    
   osk['isEnabled'] = osk.isEnabled = function()
@@ -222,7 +222,7 @@
   /**
    * Function     isVisible
    * Scope        Public   
-   * @return      {boolean|integer}    True if KMW OSK visible
+   * @return      {boolean|number}    True if KMW OSK visible
    * Description  Test if KMW OSK is actually visible
    * Note that this will usually return false after any UI event that results in (temporary) loss of input focus    
    */    
@@ -1644,7 +1644,7 @@
   /**
    * Create the OSK for a particular keyboard and device
    * 
-   * @param       {Array.<Object>}      layout      Array of OSK layout objects
+   * @param       {Object}              layout      OSK layout definition
    * @param       {string}              formFactor  layout form factor
    * @return      {Object}                          fully formatted OSK object
    */
@@ -2777,7 +2777,7 @@
     var layers=osk._Box.firstChild.firstChild.childNodes,
         nRows=layers[0].childNodes.length,
         oskHeight=osk.getHeight(),
-        rowHeight=Math.floor(oskHeight/nRows),
+        rowHeight=Math.floor(oskHeight/(nRows == 0 ? 1 : nRows)),
         nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad,fs=1.0;
         
     if(device.OS == 'Android' && 'devicePixelRatio' in window) 
@@ -2790,7 +2790,6 @@
     b=b.firstChild.firstChild; bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
     if(device.formFactor == 'phone') fs=0.6;
-    pad = Math.round(0.15*rowHeight);
           
     // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!
     if(device.OS == 'iOS') 
@@ -2801,6 +2800,11 @@
     
     for(nLayer=0;nLayer<layers.length; nLayer++)
     {
+      // Check the heights of each row, in case different layers have different row counts.
+      nRows=layers[nLayer].childNodes.length;
+      rowHeight=Math.floor(oskHeight/(nRows == 0 ? 1 : nRows));
+
+      pad = Math.round(0.15*rowHeight);
       layers[nLayer].style.height=(oskHeight+3)+'px';       
       for(nRow=0; nRow<nRows; nRow++)
       {                                  

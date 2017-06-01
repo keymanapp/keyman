@@ -358,7 +358,7 @@
     cs.width='2px';
     cs.backgroundColor='blue';
     cs.border='none';
-    cs.left=cs.top=0;           // actual position set relative to parent when displayed
+    cs.left=cs.top='0px';           // actual position set relative to parent when displayed
     cs.display='block';         
     cs.visibility='hidden';
     cs.zIndex='9998';           // immediately below the OSK
@@ -741,7 +741,7 @@
 
     /**
      *  Correct the position and size of a duplicated input element
-     *  @param  {Object}  x   simulated input element
+     *  @param  {Element}  x   simulated input element
      **/              
     keymanweb.updateInput = function(x)
     {
@@ -811,32 +811,27 @@
     /**
      * Function     isKMWInput
      * Scope        Private
+     * @param       {Element}   x   An element from the page.
+     * @return      {boolean}      true if the element accepts touch input.
      * Description  Examines potential input elements to determine their classification re: touch handling.
      */ 
-    keymanweb.isKMWInput = function(x)
-    {
-      var lcTagName = x.tagName.toLowerCase();
+    keymanweb.isKMWInput = function(x) {
+      var c, lcTagName = x.tagName.toLowerCase();
 
       // In case this function is called more than once on the same element, we need a quick out.
       if(x.kmwInput) return x.kmwInput;
 
-      if(lcTagName == 'textarea')
-      {
+      if(lcTagName == 'textarea') {
         c = x.className;
         x.kmwInput=false;
-        if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly)  
-        { 
+        if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) { 
           x.disabled=true; x.kmwInput=true; 
         }
-      }
-      else if(lcTagName == 'input')
-      {
+      } else if(lcTagName == 'input') {
         c=x.className;
         x.kmwInput=false;                
-        if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly)
-        {
-          if(x.type == 'text' || x.type == 'search') 
-          {
+        if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) {
+          if(x.type == 'text' || x.type == 'search') {
             x.disabled=true; x.kmwInput=true;       
           } 
         }
@@ -851,28 +846,22 @@
      * Description  Saves the list of static inputs for touch devices (touch-based browsers, mobile) and
      *              and completes their setup.
      */  
-    keymanweb.setupTouchPage = function()
-    {
+    keymanweb.setupTouchPage = function() {
       // Initialize and protect input elements for touch-screen devices (but never for apps)
       // NB: now set disabled=true rather than readonly, since readonly does not always 
       // prevent element from getting focus, e.g. within a LABEL element.
       // c.f. http://kreotekdev.wordpress.com/2007/11/08/disabled-vs-readonly-form-fields/ 
 
-      for(var k=0; k<2; k++)
-      {
-        var ipList=document.getElementsByTagName(k==0?'INPUT':'TEXTAREA');  
-
-        for(var n=0;n<ipList.length;n++) 
-        { 
-          if(keymanweb.isKMWInput(ipList[n]))
-          {        
-            keymanweb.setupTouchElement(ipList[n]);
-          }
-          // Always hide the OSK for non-mapped inputs
-          else
-          {
-            keymanweb.setupNontouchElement(ipList[n]);
-          }
+      var ipList = [].concat(
+        util.arrayFromNodeList(document.getElementsByTagName('input')),
+        util.arrayFromNodeList(document.getElementsByTagName('textarea'))
+      );
+  
+      for(var n=0;n<ipList.length;n++) { 
+        if(keymanweb.isKMWInput(ipList[n])) {        
+          keymanweb.setupTouchElement(ipList[n]);
+        } else {        // Always hide the OSK for non-mapped inputs
+          keymanweb.setupNontouchElement(ipList[n]);
         }
       }
     }
@@ -880,6 +869,8 @@
     /**
      * Function     setupTouchElement
      * Scope        Private
+     * @param       {Element}  Pelem   An input or textarea element from the page.
+     * @return      {Element|null}
      * Description  Creates a simulated input element for the specified INPUT or TEXTAREA, comprising:
      *              an outer DIV, matching the position, size and style of the base element
      *              a scrollable DIV within that outer element
@@ -892,29 +883,32 @@
     keymanweb.setupTouchElement = function(Pelem)
     {
       // The specified element must be validated as a touch element to proceed.
-      if(!keymanweb.isKMWInput(Pelem)) return;
-
-      // Add the exposed member 'kmw_ip' to allow page to refer to duplicated element
-      if(Pelem['kmw_ip']) {
-
-        // Wait, we've already established a member for this one before!  Just reuse that one!
-        for(var i=0; i < keymanweb.inputList.length; i++)
-          if(keymanweb.inputList[i] == Pelem['kmw_ip']) return;  // Actually, it's even on our list already!  Don't touch it!
-
-        // OK, we'd removed the element from our input list at some time in the past.  Safe to re-add.  
-        keymanweb.inputList.push(Pelem['kmw_ip']);
-        return Pelem['kmw_ip'];
+      if(!keymanweb.isKMWInput(Pelem)) {
+        return null;
       }
 
+      /*
+       *  Does this element already have a simulated touch element established?  If so,
+       *  just reuse it - if it isn't still in the input list!
+       */
+      if(Pelem['kmw_ip']) {
+
+        if(keymanweb.inputList.indexOf(Pelem['kmw_ip']) != -1) {
+          return null;
+        }
+
+        keymanweb.inputList.push(Pelem['kmw_ip']); 
+        return Pelem['kmw_ip'];   // May need setup elsewhere since it's just been re-added!
+      }
+
+      // The simulated touch element doesn't already exist?  Time to initialize it.
       var x=document.createElement('DIV'); 
       x['base']=x.base=Pelem;
       
       // Set font for base element
-      if(x.base.className) 
-        x.base.className=x.base.className+' keymanweb-font';
-      else
-        x.base.className='keymanweb-font';
+      x.base.className = x.base.className ? x.base.className + ' keymanweb-font' : 'keymanweb-font';
 
+      // Add the exposed member 'kmw_ip' to allow page to refer to duplicated element
       Pelem['kmw_ip']=x;
 
       // Make sure the element's on the list of registered inputs.  It can't NOT be, so we're fine.
@@ -967,10 +961,10 @@
       ss1.fontFamily=ss2.fontFamily=ds.fontFamily=bs.fontFamily;
  
       // Set vertical centering for input elements
-      if(x.base.nodeName == 'INPUT')
-      {
-        if(!isNaN(parseInt(bs.height,10)))  
+      if(x.base.nodeName.toLowerCase() == 'input') {
+        if(!isNaN(parseInt(bs.height,10))) {
           ss1.lineHeight=ss2.lineHeight=bs.height;      
+        }
       }
       
       // The invisible caret-positioning span must have a border to ensure that 
@@ -987,15 +981,12 @@
       // Set internal padding to match the TEXTAREA and INPUT elements
       ds.padding='0px 2px'; // OK for iPad, possibly device-dependent
   
-      if(device.OS == 'Android' && bs.backgroundColor == 'transparent')
+      if(device.OS == 'Android' && bs.backgroundColor == 'transparent') {
         ds.backgroundColor='#fff';
-      else  
+      } else {
         ds.backgroundColor=bs.backgroundColor;
-
+      }
       
-      //if(bs.backgroundColor == 'transparent') ds.backgroundColor='#fff';
-      //ds.backgroundColor='red';     //helpful for debugging
-
       // Set the tabindex to 0 to allow a DIV to accept focus and keyboard input 
       // c.f. http://www.w3.org/WAI/GL/WCAG20/WD-WCAG20-TECHS/SCR29.html
       x.tabIndex='0'; 
@@ -1013,7 +1004,10 @@
         return keymanweb.setFocus(e);
       };
 
-      x.addEventListener('touchend', function(e) {e.stopPropagation();});
+      x.addEventListener('touchend', function(e) {
+        e.stopPropagation();
+      });
+
       x.onmspointerup=function(e) {
         e.stopPropagation();
       };
@@ -1028,10 +1022,11 @@
       // Note that touchend event propagates and is processed by body touchend handler
       // re-setting the first touch point for a drag
 
-      if(x.base.nodeName == 'TEXTAREA')
+      if(x.base.nodeName.toLowerCase() == 'textarea') {
         s1.style.whiteSpace=s2.style.whiteSpace='pre-wrap'; //scroll vertically
-      else
+      } else {
         s1.style.whiteSpace=s2.style.whiteSpace='pre';      //scroll horizontally
+      }
       
       x.base.parentNode.appendChild(x);
      
@@ -1047,23 +1042,22 @@
       //xs.color='red';  //use only for checking alignment
   
       // Prevent highlighting of underlying element (Android)
-      if('webkitTapHighlightColor' in xs)
+      if('webkitTapHighlightColor' in xs) {
         xs.webkitTapHighlightColor='rgba(0,0,0,0)';
+      }
       
-      if(x.base.nodeName == 'TEXTAREA')
-      {
+      if(x.base.nodeName.toLowerCase() == 'textarea') {
         // Correct rows value if defaulted and box height set by CSS
         // The rows value is used when setting the caret vertically
-        if(x.base.rows == 2)  // 2 is default value
-        {
+        if(x.base.rows == 2) { // 2 is default value
           var h=parseInt(bs.height,10)-parseInt(bs.paddingTop,10)-parseInt(bs.paddingBottom,10),
             dh=parseInt(bs.fontSize,10),calcRows=Math.round(h/dh);
-          if(calcRows > x.base.rows+1) x.base.rows=calcRows;
+          if(calcRows > x.base.rows+1) {
+            x.base.rows=calcRows;
+          }
         }
         ds.width=xs.width; ds.minHeight=xs.height;
-      }
-      else
-      {
+      } else {
         ds.minWidth=xs.width; ds.height=xs.height;
       }
       x.base.style.visibility='hidden'; // hide by default: KMW-3
@@ -1072,7 +1066,11 @@
       // to be adjusted for any changes in base element location or size
       // This will be called for each element after any rotation, as well as after user-initiated changes
       // It has to be wrapped in an anonymous function to preserve scope and be applied to each element.
-      (function(xx){xx.base.addEventListener('resize',function(e){keymanweb.updateInput(xx);},false);})(x);
+      (function(xx){
+        xx.base.addEventListener('resize',function(e){
+          keymanweb.updateInput(xx);
+        },false);
+      })(x);
         
       // And copy the text content
       keymanweb.setText(x,x.base.value,null);  
@@ -1083,18 +1081,17 @@
     /**
      * Function     setupNontouchElement
      * Scope        Private
+     * @param       {Object}    x  A child element of document.
      * Description  Performs handling for the specified disabled input element on touch-based systems.
      */
-    keymanweb.setupNontouchElement = function(x)
-    {
-      x.addEventListener('touchstart',function()
-        {
+    keymanweb.setupNontouchElement = function(x) {
+      x.addEventListener('touchstart',function() {
           keymanweb.focusing=false;
           clearTimeout(keymanweb.focusTimer);
           osk.hideNow();
         },false);
     }
-
+    
     keymanweb.setupTouchPage();
   }
   
@@ -1108,48 +1105,45 @@
    * Function     setupDesktopPage
    * Scope        Private
    * Description  Save list of inputs for non-touch devices (desktop browsers)
+   * 
+   * @suppress    {checkTypes}
    */       
-  keymanweb.setupDesktopPage = function()
-  { 
-    for(var k=0; k<2; k++)
-    {
-      var ipList=document.getElementsByTagName(k==0?'INPUT':'TEXTAREA');
-      for(var n=0;n<ipList.length;n++) 
-      {      
-        // Registers all relevant static elements on the page.
-        keymanweb.setupDesktopElement(ipList[n]);
-      }
-    }
-  }  
+  keymanweb.setupDesktopPage = function() { 
+    var ipList = [].concat(
+      util.arrayFromNodeList(document.getElementsByTagName('input')),
+      util.arrayFromNodeList(document.getElementsByTagName('textarea'))
+    );
+    ipList.forEach(keymanweb.setupDesktopElement);
+  };  
 
   /**
    * Function     setupDesktopElement
    * Scope        Private
+   * @param       {Element}   Pelem  An element from the document to be touch-enabled.
    * Description  Setup one element for non-touch devices and add it to the inputList if it is an input element (desktop browsers).
    *              Only returns true if the element is a valid input for keymanweb and it is not presently tracked as an input element.
    * @return   {boolean}
    */       
-  keymanweb.setupDesktopElement = function(Pelem)
-  { 
-      var lcTagName = Pelem.tagName.toLowerCase();
-      // If it's not one of these, we don't need to hook the OSK into it.
-      if(!(lcTagName == "input" || lcTagName == "textarea")) {
+  keymanweb.setupDesktopElement = function(Pelem) { 
+    var lcTagName = Pelem.tagName.toLowerCase();
+    // If it's not one of these, we don't need to hook the OSK into it.
+    if(!(lcTagName == "input" || lcTagName == "textarea")) {
+      return false;
+    }
+
+    if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly)
+    {
+      var index = keymanweb.inputList.indexOf(Pelem);
+      if(index != -1) {
         return false;
       }
+      keymanweb.inputList.push(Pelem);
+    }
 
-      if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly)
-      {
-        var index = keymanweb.inputList.indexOf(Pelem);
-        if(index != -1) {
-          return false;
-        }
-        keymanweb.inputList.push(Pelem);
-      }
+    Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
 
-      Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
-
-      return true;
-  } 
+    return true;
+  }; 
 
   /**
    * Get the user-specified (or default) font for the first mapped input or textarea element
@@ -1817,18 +1811,19 @@
    */     
   keymanweb._GetEventObject=function(e)   // I2404 - Attach to controls in IFRAMEs
   {
-    if (!e)
-    {
+    if (!e) {
       e = window.event;
-      if(!e)
-      {
-        e = keymanweb._GetLastActiveElement();
-        if(e)
-        {
-          e = e.ownerDocument;
-          if(e) e = e.parentWindow;
-          if(!e) return null;
-          e = e.event;
+      if(!e) {
+        var elem = keymanweb._GetLastActiveElement();
+        if(elem) {
+          elem = elem.ownerDocument;
+          if(elem) {
+            elem = elem.parentWindow;
+          }
+          if(!elem) {
+            return null;
+          }
+          e = elem.event;
         }
       }
     }
@@ -1908,8 +1903,7 @@
               keymanweb._SelectionChange();
             }
           }
-          else
-          {
+          else {
             keymanweb._AttachToControls(Lelem);
           }
         }
@@ -3170,12 +3164,12 @@
    *   Javascript treats it as an object anyway 
    *    
    * @param       {Object}    Lkbd       Keyboard object
-   * @return      {Array}                Copy of keyboard identification strings
+   * @return      {Object}               Copy of keyboard identification strings
    * 
    */    
   keymanweb._GetKeyboardDetail = function(Lkbd)   // I2078 - Full keyboard detail
   {
-    var Lr=[];  
+    var Lr={};  
     Lr['Name'] = Lkbd['KN'];
     Lr['InternalName'] =  Lkbd['KI'];
     Lr['LanguageName'] = Lkbd['KL'];  // I1300 - Add support for language names
@@ -3442,9 +3436,7 @@
     /**
      * Initialization of touch devices and browser interfaces must be done 
      * after all resources are loaded, during final stage of initialization
-     *      
-     * if(device.touchable) keymanweb.setupTouchDevice(); else keymanweb.setupDesktopPage();
-     *      
+     *        
      */            
     
     // Treat Android devices as phones if either (reported) screen dimension is less than 4" 
@@ -3495,11 +3487,11 @@
     keymanweb.listInputs();
     
     // Add orientationchange event handler to manage orientation changes on mobile devices
-    if(device.touchable) keymanweb.handleRotationEvents();
-    
     // Initialize touch-screen device interface  I3363 (Build 301)
-    if(device.touchable)
+    if(device.touchable) {
+      keymanweb.handleRotationEvents();
       keymanweb.setupTouchDevice();
+    }    
 
     // Initialize desktop browser interface
     else 
@@ -3597,146 +3589,103 @@
     // Restore and reload the currently selected keyboard 
     keymanweb.restoreCurrentKeyboard(); 
 
-      /* Setup of handlers for dynamically-added and (eventually) dynamically-removed elements.
-       * Reference: https://developer.mozilla.org/en/docs/Web/API/MutationObserver
-       * 
-       * We place it here so that it loads after most of the other UI loads, reducing the MutationObserver's overhead.
-       */
+    /* Setup of handlers for dynamically-added and (eventually) dynamically-removed elements.
+      * Reference: https://developer.mozilla.org/en/docs/Web/API/MutationObserver
+      * 
+      * We place it here so that it loads after most of the other UI loads, reducing the MutationObserver's overhead.
+      * Of course, we only want to dynamically add elements if the user hasn't enabled the manual attachment option.
+      */
 
+    if(keymanweb.options['attachType'] != 'manual') { //I1961
       var observationTarget = document.querySelector('body');
-      var k; // our other iteration variables have already been declared previously.
 
-      keymanweb.mutationObserver = new MutationObserver(function(mutations) 
-        {
-          var dirtyFlag = false; // Notes if we need to recompute our .sortedInputs array.
+      keymanweb.mutationObserver = new MutationObserver(function(mutations) {
+        var inputElementAdditions = [];
 
-          for(var i=0; i < mutations.length; i++) {
-            mutation = mutations[i];
-            
-            for(var j=0; j < mutation.addedNodes.length; j++) {
-              var addedNode = mutation.addedNodes[j];
-              var lcTagName = "";
-              
-              if(addedNode.tagName) {
-                lcTagName = addedNode.tagName.toLowerCase();
-              }
-              
-              var childAdditions = [];
-              var arrayFromNodeList = function(nl) {
-                var res = [];
-                for(var i=0; i < nl.length; i++) {
-                  res.push(nl[i]);
-                }
-                return res;
-              }
+        for(var i=0; i < mutations.length; i++) {
+          var mutation = mutations[i];
+          
+          for(var j=0; j < mutation.addedNodes.length; j++) {
+            var addedNode = mutation.addedNodes[j];
+            var lcTagName = addedNode.tagName ? addedNode.tagName.toLowerCase() : "";
 
-              // Will need to handle this in case of child elements in a newly-added element with child elements.
-              if(addedNode.getElementsByTagName) 
-              {
-                childAdditions = childAdditions.concat(
-                  arrayFromNodeList(addedNode.getElementsByTagName('input')),
-                  arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
-                  arrayFromNodeList(addedNode.getElementsByTagName('iframe'))
-                );
-              }
-
-              if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe')
-              {
-                dirtyFlag = true;
-                keymanweb._MutationAdditionObserved(addedNode);
-              }
-
-              for(k = 0; k < childAdditions.length; k++)
-              {
-                dirtyFlag = true;
-                keymanweb._MutationAdditionObserved(childAdditions[k]);
-              }
+            // Will need to handle this in case of child elements in a newly-added element with child elements.
+            if(addedNode.getElementsByTagName) {
+              inputElementAdditions = inputElementAdditions.concat(
+                util.arrayFromNodeList(addedNode.getElementsByTagName('input')),
+                util.arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
+                util.arrayFromNodeList(addedNode.getElementsByTagName('iframe'))
+              );
             }
 
-            // There also exists a 'mutation.removedNodes' array.  We'll need to address that for issue #63.
-            for(j = 0; j < mutation.removedNodes.length; j++)
-            {
-              var removedNode = mutation.removedNodes[j];
-              var lcTagName = ""
-              
-              if(removedNode.tagName) {
-                lcTagName = removedNode.tagName.toLowerCase();
-              }
-              
-              var childRemovals = [];
+            if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe') {
+              inputElementAdditions.push(addedNode);
+            }
+          }          
 
-              // Will need to handle this in case of child elements in a newly-added element with child elements.
-              if(removedNode.getElementsByTagName) 
-              {
-                var arr = removedNode.getElementsByTagName('input');
-                for(k = 0; k < arr.length; k++)
-                  childRemovals.push(arr[k]);
+          for(j = 0; j < mutation.removedNodes.length; j++) {
+            var removedNode = mutation.removedNodes[j];
+            var lcTagName = removedNode.tagName ? removedNode.tagName.toLowerCase() : "";
+            
+            var inputElementRemovals = [];
 
-                arr = removedNode.getElementsByTagName('textarea');
-                for(k = 0; k < arr.length; k++)
-                  childRemovals.push(arr[k]);
-
-                arr = removedNode.getElementsByTagName('iframe');
-                for(k = 0; k < arr.length; k++)
-                  childRemovals.push(arr[k]);
-              }
-
-              if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe')
-              {
-                dirtyFlag = true;
-                keymanweb._MutationRemovalObserved(addedNode);
-              }
-
-              for(k = 0; k < childRemovals.length; k++)
-              {
-                dirtyFlag = true;
-                keymanweb._MutationRemovalObserved(childRemovals[k]);
-              }
-
-              // if something was removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
-              if(dirtyFlag && device.touchable)
-              {
-                window.setTimeout(function() {
-                  for(k = 0; k < keymanweb.sortedInputs.length; k++)
-                  {
-                    if(keymanweb.sortedInputs[k]['kmw_ip']) {
-                      keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
-                    }
-                  }
-                }, 1);
-              }
+            // Will need to handle this in case of child elements in a newly-added element with child elements.
+            if(removedNode.getElementsByTagName) {
+              inputElementRemovals = inputElementRemovals.concat(
+                util.arrayFromNodeList(addedNode.getElementsByTagName('input')),
+                util.arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
+                util.arrayFromNodeList(addedNode.getElementsByTagName('iframe'))
+              );
             }
             // After all mutations have been handled, we need to recompile our .sortedInputs array.
-
-            if(dirtyFlag) {
-			  keymanweb.listInputs();
-
-              if(dirtyFlag & device.touchable) {
-                window.setTimeout(function() {
-                    for(k = 0; k < keymanweb.sortedInputs.length; k++)
-                    {
-                      if(keymanweb.sortedInputs[k]['kmw_ip']) {
-                        keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
-                      }
-                    }
-                  }, 1);
-			  }
-            }
           }
-        });
+        };
+
+        for(var k = 0; k < inputElementAdditions.length; k++) {
+          keymanweb._MutationAdditionObserved(inputElementAdditions[k]);
+        }
+
+        for(k = 0; k < childRemovals.length; k++) {
+          keymanweb._MutationRemovalObserved(childRemovals[k]);
+        }
+
+        /* After all mutations have been handled, we need to recompile our .sortedInputs array, but only.
+          * if any have actually occurred.
+          */
+        if(inputElementAdditions.length || inputElementRemovals.length) {
+          keymanweb.listInputs();
+
+          // if something was removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
+          if(device.touchable)
+          {
+            window.setTimeout(function() {
+              for(k = 0; k < keymanweb.sortedInputs.length; k++) {
+                if(keymanweb.sortedInputs[k]['kmw_ip']) {
+                  keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
+                }
+              }
+            }, 1);
+          }
+        }
+      });
 
       var observationConfig = { childList: true, subtree: true };
       keymanweb.mutationObserver.observe(observationTarget, observationConfig);
+    }
 
     // Set exposed initialization flag to 2 to indicate deferred initialization also complete
     keymanweb['initialized']=2;
   }
 
-  // Used by the MutationObserver event handler to properly setup any elements dynamically added to the document post-initialization.
-  keymanweb._MutationAdditionObserved = function(Pelem)
-  {
-    if(!device.touchable)
-    {
+  /** 
+   * Function     _MutationAdditionObserved
+   * Scope        Private
+   * @param       {Element}  Pelem     A page input, textarea, or iframe element.
+   * Description  Used by the MutationObserver event handler to properly setup any elements dynamically added to the document post-initialization.
+   * 
+   */
+  keymanweb._MutationAdditionObserved = function(Pelem) {
+    if(!device.touchable) {
       // keymanweb.attachToControl is written to handle iframes, but setupDesktopElement is not.
       if(keymanweb.setupDesktopElement(Pelem)) {
         keymanweb.attachToControl(Pelem);
@@ -3745,7 +3694,7 @@
 
         var attachFunctor = function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
           keymanweb.attachToControl(Pelem);
-        }
+        };
 
         Pelem.addEventListener('load', attachFunctor);
 
@@ -3759,16 +3708,17 @@
            attachFunctor();
          }
       }
-    }
-    else
-    {
+    } else {
       if(Pelem.tagName.toLowerCase() != 'iframe') {
-        if(keymanweb.isKMWInput(Pelem))
-        {
-          keymanweb.setupTouchElement(Pelem);
-        }
-        else
-        {
+        if(keymanweb.isKMWInput(Pelem)) {
+          var x = keymanweb.setupTouchElement(Pelem);
+
+          if(x) {       
+            window.setTimeout(function() {
+              keymanweb.updateInput(x);
+            }, 1);
+          }
+        } else {
           keymanweb.setupNontouchElement(Pelem);
         }
       } // no 'else' - the touch-device implementation never handled iframes.
@@ -4085,7 +4035,7 @@
   /**
    * Function     removeHotKey
    * Scope        Public
-   * @param       {number}        keycode
+   * @param       {number}        keyCode
    * @param       {number}        shiftState
    * Description  Remove a hot key handler from array of document-level hotkeys triggered by key up event
    */
