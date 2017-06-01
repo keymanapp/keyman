@@ -3656,8 +3656,7 @@
           keymanweb.listInputs();
 
           // if something was removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
-          if(device.touchable)
-          {
+          if(device.touchable) {
             window.setTimeout(function() {
               for(k = 0; k < keymanweb.sortedInputs.length; k++) {
                 if(keymanweb.sortedInputs[k]['kmw_ip']) {
@@ -3726,8 +3725,7 @@
   }
 
   // Used by the mutation event handler to properly decouple any elements dynamically removed from the document.
-  keymanweb._MutationRemovalObserved = function(Pelem)
-  {
+  keymanweb._MutationRemovalObserved = function(Pelem) {
     var element = Pelem;
     if(device.touchable) {
       element = Pelem['kmw_ip'];
