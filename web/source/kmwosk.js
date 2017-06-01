@@ -2777,7 +2777,7 @@
     var layers=osk._Box.firstChild.firstChild.childNodes,
         nRows=layers[0].childNodes.length,
         oskHeight=osk.getHeight(),
-        rowHeight=Math.floor(oskHeight/nRows),
+        rowHeight=Math.floor(oskHeight/(nRows == 0 ? 1 : nRows)),
         nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad,fs=1.0;
         
     if(device.OS == 'Android' && 'devicePixelRatio' in window) 
@@ -2802,7 +2802,7 @@
     {
       // Check the heights of each row, in case different layers have different row counts.
       nRows=layers[nLayer].childNodes.length;
-      rowHeight=Math.floor(oskHeight/nRows);
+      rowHeight=Math.floor(oskHeight/(nRows == 0 ? 1 : nRows));
 
       pad = Math.round(0.15*rowHeight);
       layers[nLayer].style.height=(oskHeight+3)+'px';       
