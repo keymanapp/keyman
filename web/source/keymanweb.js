@@ -3632,9 +3632,9 @@
             // Will need to handle this in case of child elements in a newly-added element with child elements.
             if(removedNode.getElementsByTagName) {
               inputElementRemovals = inputElementRemovals.concat(
-                util.arrayFromNodeList(addedNode.getElementsByTagName('input')),
-                util.arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
-                util.arrayFromNodeList(addedNode.getElementsByTagName('iframe'))
+                util.arrayFromNodeList(removedNode.getElementsByTagName('input')),
+                util.arrayFromNodeList(removedNode.getElementsByTagName('textarea')),
+                util.arrayFromNodeList(removedNode.getElementsByTagName('iframe'))
               );
             }
             // After all mutations have been handled, we need to recompile our .sortedInputs array.
@@ -3646,7 +3646,7 @@
         }
 
         for(k = 0; k < childRemovals.length; k++) {
-          keymanweb._MutationRemovalObserved(childRemovals[k]);
+          keymanweb._MutationRemovalObserved(inputElementRemovals[k]);
         }
 
         /* After all mutations have been handled, we need to recompile our .sortedInputs array, but only.
