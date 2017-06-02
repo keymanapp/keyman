@@ -10,8 +10,9 @@
 The following folders contain the distribution for KeymanWeb 2.0:
 
 	source			Source code
-	output			Fully-compiled modules for testing
-	samples			Sample web-pages
+	output			Fully-compiled KeymanWeb modules for testing
+	embedded		Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
+	samples			Sample and test-case web-pages
 
 
 Google Closures Compiler is used to compile the javascript modules
