@@ -13,12 +13,45 @@ if "%BUILD_NUMBER%"=="" (
 
 if "%1" == "-ui"   goto ui
 if "%1" == "-test" goto web
+if "%1" == "-embed" goto embed
+if "%1" == "-web"  goto web
+if "%1" == "-debug_embedded" goto debug_embedded
 if not "%1" == "" goto help
+
+:embed
+
+echo Compile KMEI/KMEA build %BUILD%
+
+if not exist ..\embedded mkdir ..\embedded
+if not exist ..\embedded\resources mkdir ..\embedded\resources
+
+rem Compile supplementary plane string handing extensions
+echo Compile SMP string extensions
+del ..\embedded\kmw-smpstring.js 2>nul
+%compilecmd% --js kmwstring.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file ..\embedded\kmw-smpstring.js --warning_level VERBOSE
+if not exist ..\embedded\kmw-smpstring.js goto fail
+
+del kmwtemp.js 2>nul
+java -jar ..\tools\compiler.jar --define __BUILD__=%BUILD% --externs ..\source\kmwreleasestub.js --js ..\source\kmwbase.js --js ..\source\keymanweb.js --js ..\source\kmwosk.js --js kmwembedded.js --js ..\source\kmwcallback.js --js ..\source\kmwkeymaps.js --js ..\source\kmwlayout.js --js ..\source\kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file kmwtemp.js --warning_level VERBOSE
+if not exist kmwtemp.js goto fail
+
+echo Append SMP extensions
+copy /B ..\embedded\kmw-smpstring.js+kmwtemp.js ..\embedded\keymanweb-%BUILD%.js >nul
+del kmwtemp.js
+
+echo Compiled embedded application saved as keymanweb-%BUILD%.js
+
+rem Update any changed resources
+
+echo Copy or update resources
+xcopy ..\source\resources\*.* ..\embedded\resources /D /E /Y  >nul
+
+if "%1" == "-embed" goto done
 
 :web
 
 rem
-rem Check dependencies before build
+rem Check KeymanWeb dependencies before build
 rem
 
 if "%CLOSURECOMPILERPATH%"=="" set CLOSURECOMPILERPATH=..\tools
@@ -100,6 +133,12 @@ exit /B 0
 echo.
 echo Build failed
 exit /B 2
+
+:debug_embedded
+copy /B /Y ..\source\kmwstring.js+..\source\kmwbase.js+..\source\keymanweb.js+..\source\kmwcallback.js+..\source\kmwosk.js+kmwembedded.js+..\source\kmwkeymaps.js+..\source\kmwlayout.js+..\source\kmwinit.js keymanios.js
+echo Uncompiled embedded application saved as keymanios.js
+
+goto done
 
 :help
 echo.
