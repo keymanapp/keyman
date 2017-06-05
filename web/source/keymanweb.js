@@ -858,11 +858,7 @@
       );
   
       for(var n=0;n<ipList.length;n++) { 
-        if(keymanweb.isKMWInput(ipList[n])) {        
-          keymanweb.setupTouchElement(ipList[n]);
-        } else {        // Always hide the OSK for non-mapped inputs
-          keymanweb.setupNontouchElement(ipList[n]);
-        }
+        keymanweb.setupTouchElement(ipList[n]);
       }
     }
 
@@ -870,7 +866,7 @@
      * Function     setupTouchElement
      * Scope        Private
      * @param       {Element}  Pelem   An input or textarea element from the page.
-     * @return      {Element|null}
+     * @return      {boolean}  Returns true if it creates a simulated input element for Pelem; false if not.
      * Description  Creates a simulated input element for the specified INPUT or TEXTAREA, comprising:
      *              an outer DIV, matching the position, size and style of the base element
      *              a scrollable DIV within that outer element
@@ -882,9 +878,14 @@
      */
     keymanweb.setupTouchElement = function(Pelem)
     {
-      // The specified element must be validated as a touch element to proceed.
+      // Touch doesn't worry about iframes.
+      if(Pelem.tagName.toLowerCase() == 'iframe') {
+        return false;
+      }
+
       if(!keymanweb.isKMWInput(Pelem)) {
-        return null;
+          keymanweb.setupNonKMWTouchElement(Pelem);
+          return false;
       }
 
       /*
@@ -894,11 +895,14 @@
       if(Pelem['kmw_ip']) {
 
         if(keymanweb.inputList.indexOf(Pelem['kmw_ip']) != -1) {
-          return null;
+          return false;
         }
 
-        keymanweb.inputList.push(Pelem['kmw_ip']); 
-        return Pelem['kmw_ip'];   // May need setup elsewhere since it's just been re-added!
+        keymanweb.inputList.push(Pelem['kmw_ip']);
+        
+        console.log("Unexpected state - this element's simulated input DIV should have been removed from the page!");
+
+        return true;   // May need setup elsewhere since it's just been re-added!
       }
 
       // The simulated touch element doesn't already exist?  Time to initialize it.
@@ -1068,23 +1072,31 @@
       // It has to be wrapped in an anonymous function to preserve scope and be applied to each element.
       (function(xx){
         xx.base.addEventListener('resize',function(e){
-          keymanweb.updateInput(xx);
+          /* A timeout is needed to let the base element complete its resizing before our 
+           * simulated element can properly resize itself.
+           * 
+           * Not doing this causes errors if the input elements are resized for whatever reason, such as
+           * changing languages to a text with greater height.
+           */
+          window.setTimeout(function (){
+            keymanweb.updateInput(xx);
+          }, 1);
         },false);
       })(x);
         
       // And copy the text content
       keymanweb.setText(x,x.base.value,null);  
 
-      return x;
+      return true;
     }
 
     /**
-     * Function     setupNontouchElement
+     * Function     setupNonKMWTouchElement
      * Scope        Private
      * @param       {Object}    x  A child element of document.
      * Description  Performs handling for the specified disabled input element on touch-based systems.
      */
-    keymanweb.setupNontouchElement = function(x) {
+    keymanweb.setupNonKMWTouchElement = function(x) {
       x.addEventListener('touchstart',function() {
           keymanweb.focusing=false;
           clearTimeout(keymanweb.focusTimer);
@@ -2824,7 +2836,7 @@
     {          
       if(t[i] == activeBase) break;
     }   
-    
+
     // Find the next (or previous) element in the list
     if(bBack) i=i-1; else i=i+1; 
     if(i >= t.length) i=i-t.length;
@@ -2836,7 +2848,7 @@
       // Set focusing flag to prevent OSK disappearing 
       keymanweb.focusing=true;
       var target=t[i]['kmw_ip'];
-      
+
       // Focus if next element is non-mapped
       if(typeof(target) == 'undefined')
       {
@@ -3622,20 +3634,50 @@
               inputElementAdditions.push(addedNode);
             }
           }          
+
+          for(j = 0; j < mutation.removedNodes.length; j++) {
+            var removedNode = mutation.removedNodes[j];
+            var lcTagName = removedNode.tagName ? removedNode.tagName.toLowerCase() : "";
+            
+            var inputElementRemovals = [];
+
+            // Will need to handle this in case of child elements in a newly-added element with child elements.
+            if(removedNode.getElementsByTagName) {
+              inputElementRemovals = inputElementRemovals.concat(
+                util.arrayFromNodeList(removedNode.getElementsByTagName('input')),
+                util.arrayFromNodeList(removedNode.getElementsByTagName('textarea')),
+                util.arrayFromNodeList(removedNode.getElementsByTagName('iframe'))
+              );
+            }
+            // After all mutations have been handled, we need to recompile our .sortedInputs array.
+          }
         }
 
         for(var k = 0; k < inputElementAdditions.length; k++) {
           keymanweb._MutationAdditionObserved(inputElementAdditions[k]);
         }
 
-        // There also exists a 'mutation.removedNodes' array.  We'll need to address that for issue #63, and its
-        // respective _MutationRemovalObserved should be called here.
+        for(k = 0; k < inputElementRemovals.length; k++) {
+          keymanweb._MutationRemovalObserved(inputElementRemovals[k]);
+        }
 
         /* After all mutations have been handled, we need to recompile our .sortedInputs array, but only.
           * if any have actually occurred.
           */
-        if(inputElementAdditions.length) {
-          keymanweb.listInputs();
+        if(inputElementAdditions.length || inputElementRemovals.length) {
+          if(!device.touchable) {
+            keymanweb.listInputs();
+          } else if(device.touchable) {   // If something was added or removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
+            window.setTimeout(function() {
+              keymanweb.listInputs();
+
+              for(var k = 0; k < keymanweb.sortedInputs.length; k++) {
+                if(keymanweb.sortedInputs[k]['kmw_ip']) {
+                  keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
+                }
+              }
+            }, 1);
+          }
         }
       });
 
@@ -3679,20 +3721,24 @@
          }
       }
     } else {
-      if(Pelem.tagName.toLowerCase() != 'iframe') {
-        if(keymanweb.isKMWInput(Pelem)) {
-          var x = keymanweb.setupTouchElement(Pelem);
+      keymanweb.setupTouchElement(Pelem);
+    }
+  }
 
-          if(x) {
-            // if needed, let the timeout variable be: keymanweb.touchInputAddedTimer
-            window.setTimeout(function() {
-              keymanweb.updateInput(x);
-            }, 1);
-          }
-        } else {
-          keymanweb.setupNontouchElement(Pelem);
-        }
-      } // no 'else' - the touch-device implementation never handled iframes.
+  // Used by the mutation event handler to properly decouple any elements dynamically removed from the document.
+  keymanweb._MutationRemovalObserved = function(Pelem) {
+    var element = Pelem;
+    if(device.touchable) {
+      element = Pelem['kmw_ip'];
+      
+      // We get weird repositioning errors if we don't remove our simulated input element - and permanently.
+      Pelem.parentNode.removeChild(element);
+      delete Pelem['kmw_ip'];
+    }
+
+    var index = keymanweb.inputList.indexOf(Pelem);
+      if(index != -1) {
+      keymanweb.inputList.splice(index, 1);
     }
   }
 

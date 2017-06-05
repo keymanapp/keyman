@@ -52,7 +52,7 @@
     </script> 
     
     <!-- Add keyboard management script for local selection of keyboards to use -->
-    <script src="./issue-62.js"></script> 
+    <script src="./issue-63.js"></script> 
   
   </head>
 
@@ -69,10 +69,14 @@
     <div id='KeymanWebControl'></div>                                                                                   
 	<h3>This version is used to test KeymanWeb's ability to cope with page mutations.</h3>
 	<!--<iframe src="hello-world.html" height=100></iframe>-->
-	<input id="plaininput" placeholder="Temporary input for testing touch init." />
+	<!-- The following is very useful for testing automatic touch input layouts. -->
+	<!--<input id="plaininput" placeholder="Temporary input for testing touch init." />-->
+	<input type='button' id='btn1' onclick='addInputs();' value='Create Inputs!' />
+	<input type='button' id='btn2' onclick='addIFrame();' value='Insert an iframe.' />
+	<input type='button' id='btn3' onclick="removeInputs();" value="Remove inputs!" />
+	<input type='button' id='btn4' onclick="restoreInputs();" value="Restore removed inputs!" />
 	<hr>
   </div> 	
-	<input type='button' id='btn1' onclick='addInputs();' value='More Inputs!' />
    <h3><a href="../samples/index.html">Return to testing home page</a></h3>
 
   
