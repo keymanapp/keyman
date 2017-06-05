@@ -3613,6 +3613,7 @@
 
       keymanweb.mutationObserver = new MutationObserver(function(mutations) {
         var inputElementAdditions = [];
+        var inputElementRemovals = [];
 
         for(var i=0; i < mutations.length; i++) {
           var mutation = mutations[i];
@@ -3638,8 +3639,6 @@
           for(j = 0; j < mutation.removedNodes.length; j++) {
             var removedNode = mutation.removedNodes[j];
             var lcTagName = removedNode.tagName ? removedNode.tagName.toLowerCase() : "";
-            
-            var inputElementRemovals = [];
 
             // Will need to handle this in case of child elements in a newly-added element with child elements.
             if(removedNode.getElementsByTagName) {
