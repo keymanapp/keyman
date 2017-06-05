@@ -3645,7 +3645,7 @@
           keymanweb._MutationAdditionObserved(inputElementAdditions[k]);
         }
 
-        for(k = 0; k < childRemovals.length; k++) {
+        for(k = 0; k < inputElementRemovals.length; k++) {
           keymanweb._MutationRemovalObserved(inputElementRemovals[k]);
         }
 
@@ -3653,11 +3653,12 @@
           * if any have actually occurred.
           */
         if(inputElementAdditions.length || inputElementRemovals.length) {
-          keymanweb.listInputs();
-
-          // if something was removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
-          if(device.touchable) {
+          if(!device.touchable) {
+            keymanweb.listInputs();
+          } else if(device.touchable) {   // If something was added or removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
             window.setTimeout(function() {
+              keymanweb.listInputs();
+
               for(k = 0; k < keymanweb.sortedInputs.length; k++) {
                 if(keymanweb.sortedInputs[k]['kmw_ip']) {
                   keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
@@ -3711,12 +3712,6 @@
       if(Pelem.tagName.toLowerCase() != 'iframe') {
         if(keymanweb.isKMWInput(Pelem)) {
           var x = keymanweb.setupTouchElement(Pelem);
-
-          if(x) {       
-            window.setTimeout(function() {
-              keymanweb.updateInput(x);
-            }, 1);
-          }
         } else {
           keymanweb.setupNontouchElement(Pelem);
         }
@@ -3729,6 +3724,7 @@
     var element = Pelem;
     if(device.touchable) {
       element = Pelem['kmw_ip'];
+      // Remove our touch-based element somehow?
     }
     var index = keymanweb.inputList.indexOf(Pelem);
       if(index != -1) {
