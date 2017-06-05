@@ -858,11 +858,7 @@
       );
   
       for(var n=0;n<ipList.length;n++) { 
-        if(keymanweb.isKMWInput(ipList[n])) {        
-          keymanweb.setupTouchElement(ipList[n]);
-        } else {        // Always hide the OSK for non-mapped inputs
-          keymanweb.setupNontouchElement(ipList[n]);
-        }
+        keymanweb.setupTouchElement(ipList[n]);
       }
     }
 
@@ -870,7 +866,7 @@
      * Function     setupTouchElement
      * Scope        Private
      * @param       {Element}  Pelem   An input or textarea element from the page.
-     * @return      {Element|null}
+     * @return      {boolean}  Returns true if it creates a simulated input element for Pelem; false if not.
      * Description  Creates a simulated input element for the specified INPUT or TEXTAREA, comprising:
      *              an outer DIV, matching the position, size and style of the base element
      *              a scrollable DIV within that outer element
@@ -882,9 +878,14 @@
      */
     keymanweb.setupTouchElement = function(Pelem)
     {
-      // The specified element must be validated as a touch element to proceed.
+      // Touch doesn't worry about iframes.
+      if(Pelem.tagName.toLowerCase() == 'iframe') {
+        return false;
+      }
+
       if(!keymanweb.isKMWInput(Pelem)) {
-        return null;
+          keymanweb.setupNonKMWTouchElement(Pelem);
+          return false;
       }
 
       /*
@@ -894,14 +895,14 @@
       if(Pelem['kmw_ip']) {
 
         if(keymanweb.inputList.indexOf(Pelem['kmw_ip']) != -1) {
-          return null;
+          return false;
         }
 
         keymanweb.inputList.push(Pelem['kmw_ip']);
         
         console.log("Unexpected state - this element's simulated input DIV should have been removed from the page!");
 
-        return Pelem['kmw_ip'];   // May need setup elsewhere since it's just been re-added!
+        return true;   // May need setup elsewhere since it's just been re-added!
       }
 
       // The simulated touch element doesn't already exist?  Time to initialize it.
@@ -1086,16 +1087,16 @@
       // And copy the text content
       keymanweb.setText(x,x.base.value,null);  
 
-      return x;
+      return true;
     }
 
     /**
-     * Function     setupNontouchElement
+     * Function     setupNonKMWTouchElement
      * Scope        Private
      * @param       {Object}    x  A child element of document.
      * Description  Performs handling for the specified disabled input element on touch-based systems.
      */
-    keymanweb.setupNontouchElement = function(x) {
+    keymanweb.setupNonKMWTouchElement = function(x) {
       x.addEventListener('touchstart',function() {
           keymanweb.focusing=false;
           clearTimeout(keymanweb.focusTimer);
@@ -3650,7 +3651,7 @@
             }
             // After all mutations have been handled, we need to recompile our .sortedInputs array.
           }
-        };
+        }
 
         for(var k = 0; k < inputElementAdditions.length; k++) {
           keymanweb._MutationAdditionObserved(inputElementAdditions[k]);
@@ -3670,7 +3671,7 @@
             window.setTimeout(function() {
               keymanweb.listInputs();
 
-              for(k = 0; k < keymanweb.sortedInputs.length; k++) {
+              for(var k = 0; k < keymanweb.sortedInputs.length; k++) {
                 if(keymanweb.sortedInputs[k]['kmw_ip']) {
                   keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
                 }
@@ -3720,13 +3721,7 @@
          }
       }
     } else {
-      if(Pelem.tagName.toLowerCase() != 'iframe') {
-        if(keymanweb.isKMWInput(Pelem)) {
-          keymanweb.setupTouchElement(Pelem);
-        } else {
-          keymanweb.setupNontouchElement(Pelem);
-        }
-      } // no 'else' - the touch-device implementation never handled iframes.
+      keymanweb.setupTouchElement(Pelem);
     }
   }
 
@@ -3738,8 +3733,9 @@
       
       // We get weird repositioning errors if we don't remove our simulated input element - and permanently.
       Pelem.parentNode.removeChild(element);
-      Pelem['kmw_ip'] = null;  // Erase the evidence that this was ever here.
+      delete Pelem['kmw_ip'];
     }
+
     var index = keymanweb.inputList.indexOf(Pelem);
       if(index != -1) {
       keymanweb.inputList.splice(index, 1);
