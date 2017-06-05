@@ -897,7 +897,10 @@
           return null;
         }
 
-        keymanweb.inputList.push(Pelem['kmw_ip']); 
+        keymanweb.inputList.push(Pelem['kmw_ip']);
+        
+        console.log("Unexpected state - this element's simulated input DIV should have been removed from the page!");
+
         return Pelem['kmw_ip'];   // May need setup elsewhere since it's just been re-added!
       }
 
@@ -3711,7 +3714,7 @@
     } else {
       if(Pelem.tagName.toLowerCase() != 'iframe') {
         if(keymanweb.isKMWInput(Pelem)) {
-          var x = keymanweb.setupTouchElement(Pelem);
+          keymanweb.setupTouchElement(Pelem);
         } else {
           keymanweb.setupNontouchElement(Pelem);
         }
@@ -3724,7 +3727,10 @@
     var element = Pelem;
     if(device.touchable) {
       element = Pelem['kmw_ip'];
-      // Remove our touch-based element somehow?
+      
+      // We get weird repositioning errors if we don't remove our simulated input element - and permanently.
+      Pelem.parentNode.removeChild(element);
+      Pelem['kmw_ip'] = null;  // Erase the evidence that this was ever here.
     }
     var index = keymanweb.inputList.indexOf(Pelem);
       if(index != -1) {
