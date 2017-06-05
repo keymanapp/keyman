@@ -1071,7 +1071,15 @@
       // It has to be wrapped in an anonymous function to preserve scope and be applied to each element.
       (function(xx){
         xx.base.addEventListener('resize',function(e){
-          keymanweb.updateInput(xx);
+          /* A timeout is needed to let the base element complete its resizing before our 
+           * simulated element can properly resize itself.
+           * 
+           * Not doing this causes errors if the input elements are resized for whatever reason, such as
+           * changing languages to a text with greater height.
+           */
+          window.setTimeout(function (){
+            keymanweb.updateInput(xx);
+          }, 1);
         },false);
       })(x);
         
