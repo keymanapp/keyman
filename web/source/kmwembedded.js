@@ -498,12 +498,21 @@
         return true;
       }
       
-      // Use default mapping only if necessary (last resort) 
+      // Use default mapping only if necessary (last resort)
+      if (Lkc.Lcode == osk.keyCodes.K_SPACE) {
+        keymanweb.KO(0, Lelem, ' ');
+        return true;
+      }
+      else if (Lkc.Lcode == osk.keyCodes.K_ENTER) {
+        keymanweb.KO(0, Lelem, '\n');
+        return true;
+      }
       var ch = osk.defaultKeyOutput('', Lkc.Lcode, shift);
       if(ch) {
         keymanweb.KO(0, Lelem, ch);                     
         return true;
-      } 
+      }
+
       return false;
   };
 
