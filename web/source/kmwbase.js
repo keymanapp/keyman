@@ -573,8 +573,13 @@ var __BUILD__ = 300;
   device.OS = 'iOS';
   
    END DEBUG */
-                       
- 
+
+ /* If we've made it to this point of initialization, KeymanWeb assumes we're a desktop.  Since 
+  * we don't yet support desktops with touch-based input, we disable it here.
+  */                     
+ if(device.formFactor == 'desktop') {
+   device.touchable = false;
+ }
                        
   /**
    * Expose the touchable state for UIs - will disable external UIs entirely
