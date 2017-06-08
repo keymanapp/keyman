@@ -574,8 +574,8 @@ var __BUILD__ = 300;
   
    END DEBUG */
 
- /* If we've made it to this point of initialization, KeymanWeb assumes we're a desktop.  Since 
-  * we don't yet support desktops with touch-based input, we disable it here.
+ /* If we've made it to this point of initialization and aren't anything else, KeymanWeb assumes 
+  * we're a desktop.  Since we don't yet support desktops with touch-based input, we disable it here.
   */                     
  if(device.formFactor == 'desktop') {
    device.touchable = false;
