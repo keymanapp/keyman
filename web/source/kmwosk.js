@@ -687,10 +687,13 @@
    */                     
   osk.defaultKeyOutput = function(keyName,n,keyShiftState) {
     var ch = 0;
+
+    // TODO:  Refactor the overloading of the 'n' parameter here into separate methods.
     
-    // Test for fall back to U_xxxx key id           
-    if((keyName.substr(0,2) == 'U_') && (n > osk.keyCodes['K_SPACE'])) { 
+    // Test for fall back to U_xxxx key id - For this first test, we refer to Unicode values.          
+    if((keyName.substr(0,2) == 'U_') && (n > osk.keyCodes['K_SPACE']) &&  !(n>127 && n<160)) { // 127 - 160 refer to Unicode control codes.
       ch=String.fromCharCode(n);
+      // Hereafter, we refer to keycodes.
     } else if(n >= osk.keyCodes['K_0'] && n <= osk.keyCodes['K_9']) { // The number keys.
       ch = codesUS[keyShiftState][0][n-osk.keyCodes['K_0']];
     } else if(n >=osk.keyCodes['K_A'] && n <= osk.keyCodes['K_Z']) { // The base letter keys
