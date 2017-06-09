@@ -685,21 +685,24 @@
    * @param   {number}  keyShiftState
    * @return  {number}
    */                     
-  osk.defaultKeyOutput = function(keyName,n,keyShiftState)
-  {
+  osk.defaultKeyOutput = function(keyName,n,keyShiftState) {
     var ch = 0;
+
+    // TODO:  Refactor the overloading of the 'n' parameter here into separate methods.
     
-    // Test for fall back to U_xxxx key id           
-    if((keyName.substr(0,2) == 'U_') && (n > 32) && !(n>127 && n<!160))  
+    // Test for fall back to U_xxxx key id - For this first test, we refer to Unicode values.          
+    if((keyName.substr(0,2) == 'U_') && (n > osk.keyCodes['K_SPACE']) &&  !(n>127 && n<160)) { // 127 - 160 refer to Unicode control codes.
       ch=String.fromCharCode(n);
-    else if(n >= 48 && n <= 57)
-      ch = codesUS[keyShiftState][0][n-48];
-    else if(n >=65 && n <= 90)
-      ch = String.fromCharCode(n+(keyShiftState?0:32));
-    else if(n >= 186 && n <= 192)
-      ch = codesUS[keyShiftState][1][n-186];
-    else if(n >= 219 && n <= 222)
-      ch = codesUS[keyShiftState][2][n-219];
+      // Hereafter, we refer to keycodes.
+    } else if(n >= osk.keyCodes['K_0'] && n <= osk.keyCodes['K_9']) { // The number keys.
+      ch = codesUS[keyShiftState][0][n-osk.keyCodes['K_0']];
+    } else if(n >=osk.keyCodes['K_A'] && n <= osk.keyCodes['K_Z']) { // The base letter keys
+      ch = String.fromCharCode(n+(keyShiftState?0:32));  // 32 is the offset from uppercase to lowercase.
+    } else if(n >= osk.keyCodes['K_COLON'] && n <= osk.keyCodes['K_BKQUOTE']) {
+      ch = codesUS[keyShiftState][1][n-osk.keyCodes['K_COLON']];
+    } else if(n >= osk.keyCodes['K_LBRKT'] && n <= osk.keyCodes['K_QUOTE']) {
+      ch = codesUS[keyShiftState][2][n-osk.keyCodes['K_LBRKT']];
+    }
     return ch;
   }
   
@@ -804,7 +807,7 @@
         var keyText=e.firstChild.firstChild.wholeText;
         Lkc.LisVirtualKey=false; Lkc.LisVirtualKeyCode=false;
         Lkc.vkCode=Lkc.Lcode;      
-        if(Lkc.Lcode != 32) // exception required, March 2013
+        if(Lkc.Lcode != osk.keyCodes['K_SPACE']) // exception required, March 2013
         {
           if(typeof keyText == 'string' && keyText != '')
             Lkc.Lcode=keyText.charCodeAt(0);
