@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem Compile keymanweb and copy compiled javascript and resources to output folder
+rem Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 rem
 
 rem Definition of global compile constants
@@ -65,10 +65,10 @@ del kmwtemp.js 2>nul
 if not exist kmwtemp.js goto fail
 
 echo Append SMP extensions
-copy /B %EMBED_OUTPUT%\kmw-smpstring.js+kmwtemp.js %EMBED_OUTPUT%\keymanweb-%BUILD%.js >nul
+copy /B %EMBED_OUTPUT%\kmw-smpstring.js+kmwtemp.js %EMBED_OUTPUT%\keymanweb.js >nul
 del kmwtemp.js
 
-echo Compiled embedded application saved as keymanweb-%BUILD%.js
+echo Compiled embedded application saved as keymanweb.js
 
 rem Update any changed resources
 
