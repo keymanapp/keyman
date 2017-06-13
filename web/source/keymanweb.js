@@ -1149,12 +1149,14 @@
       if(index != -1) {
         return false;
       }
+
+      Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
+
       keymanweb.inputList.push(Pelem);
+      return true;
     }
 
-    Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
-
-    return true;
+    return false;
   }; 
 
   /**
