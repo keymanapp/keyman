@@ -2955,9 +2955,20 @@
     keymanweb._ActiveKeyboard = null; keymanweb._ActiveStub = null;
 
     // Hide OSK and do not update keyboard list if using internal keyboard (desktops)
-    if(PInternalName == '') 
-    {
-      osk._Hide(false); return;
+    if(PInternalName == '') {
+      if(keymanweb.loadTimer) {
+        window.clearTimeout(keymanweb.loadTimer);
+      }
+      keymanweb.loadTimer = null;
+      osk._Hide(false); 
+
+      util.wait(false);
+
+      // We must clear keymanweb._LoadingInternalName here, as we no lnoger wish for it to be the active keyboard.
+   
+      keymanweb._LoadingInternalName = undefined;
+
+      return;
     }
 
     for(Ln=0; Ln<keymanweb._Keyboards.length; Ln++)  // I1511 - array prototype extended
@@ -2997,6 +3008,7 @@
             // Always (temporarily) hide the OSK when loading a new keyboard, to ensure that a failure to load doesn't leave the current OSK displayed
             if(osk.ready) osk._Hide(false);
  
+            // Indicates that this will become the active keyboard once it is loaded.  (Completes in KeymanWeb.KR)
             keymanweb._LoadingInternalName = PInternalName;
             
             // Must kill existing timer before starting another (KMW-101)
@@ -3060,8 +3072,7 @@
   **/
   keymanweb.setDfltKeyboard=function()
   {
-    keymanweb._SetActiveKeyboard('Keyboard_us','eng',true);
-    keymanweb.doKeyboardChange('Keyboard_us','eng',true);
+    keymanweb.setActiveKeyboard(''); // This line is used in all the UI elements to set the default keyboard, so we should follow suit here.
   }
 
   /**
