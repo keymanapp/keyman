@@ -65,10 +65,10 @@ del kmwtemp.js 2>nul
 if not exist kmwtemp.js goto fail
 
 echo Append SMP extensions
-copy /B %EMBED_OUTPUT%\kmw-smpstring.js+kmwtemp.js %EMBED_OUTPUT%\keymanweb.js >nul
+copy /B %EMBED_OUTPUT%\kmw-smpstring.js+kmwtemp.js %EMBED_OUTPUT%\keyman.js >nul
 del kmwtemp.js
 
-echo Compiled embedded application saved as keymanweb.js
+echo Compiled embedded application saved as keyman.js
 
 rem Update any changed resources
 
