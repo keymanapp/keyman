@@ -2904,14 +2904,14 @@
     var n,Ln,lgCode;
 
     // Set default language code
-    if(arguments.length < 2 || (!PLgCode)) lgCode='---'; else lgCode=PLgCode;
+    if(arguments.length < 2 || (!PLgCode)) {
+      PLgCode='---'; 
+    }
 
     // Check that the saved keyboard is currently registered
-    for(n=0; n<keymanweb._KeyboardStubs.length; n++)
-    {
-      if(PInternalName == keymanweb._KeyboardStubs[n]['KI'])
-      {
-        if(lgCode == keymanweb._KeyboardStubs[n]['KLC'] || lgCode == '---') break;
+    for(n=0; n<keymanweb._KeyboardStubs.length; n++) {
+      if(PInternalName == keymanweb._KeyboardStubs[n]['KI']) {
+        if(PLgCode == keymanweb._KeyboardStubs[n]['KLC'] || PLgCode == '---') break;
       }
     }
 
@@ -2979,7 +2979,7 @@
       }
     }
 
-    if(PLgCode == 'undefined' || PLgCode == '') PLgCode = '---';
+    //if(typeof PLgCode == 'undefined' || PLgCode == '') PLgCode = '---';
     if(keymanweb._ActiveKeyboard == null)
     {
       for(Ln=0; Ln<keymanweb._KeyboardStubs.length; Ln++)  // I1511 - array prototype extended
