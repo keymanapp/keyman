@@ -3068,14 +3068,6 @@
   }
 
   /**
-   * Set the default keyboard
-  **/
-  keymanweb.setDfltKeyboard=function()
-  {
-    keymanweb.setActiveKeyboard(''); // This line is used in all the UI elements to set the default keyboard, so we should follow suit here.
-  }
-
-  /**
    * Function    isCJK
    * Scope       Public
    * @param      {Object=}  k0 
