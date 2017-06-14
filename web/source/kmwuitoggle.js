@@ -52,9 +52,20 @@ try {
   ui.doFocus = function(someElement,focusing)
   {
     // This callback must be ignored until UI is initialized, or for touch devices (which can never initialize the UI)
-    if(!ui.initialized) return;
+    if(!ui.initialized) {
+      return;
+    }
     
-    if(window.event) someElement=window.event.srcElement;
+    if(window.event) {
+      someElement=window.event.srcElement;
+    }
+
+    // Hides the Toggle interface if a control has KeymanWeb disabled by API calls.
+    if(keymanweb._ActiveControl != null){
+      if(!keymanweb._ActiveControl.LEnabled) {
+        focusing = false;
+      }
+    }
 
     if(focusing)
     {

@@ -2105,7 +2105,7 @@
    * @return      {boolean}             always true  (?) 
    */    
   keymanweb._ControlFocus = function(e)
-  {                     
+  {                   
     var Ltarg, Ln; 
     if(!keymanweb._Enabled) return true;
     e = keymanweb._GetEventObject(e);     // I2404 - Manage IE events in IFRAMEs
@@ -2161,7 +2161,7 @@
       else
         keymanweb._ActiveControl.LDefaultInternalName = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
     }
-    
+
     //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
     //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
     if(!keymanweb._IsIEEditableIframe(Ltarg,1) || !keymanweb._IsMozillaEditableIframe(Ltarg,1))
@@ -2289,12 +2289,18 @@
     ////keymanweb._SelectionControl = null;
     
     keymanweb._LastActiveElement = Ltarg;
-    
+   
     if(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null)
       if(keymanweb._ActiveKeyboard == null)
         keymanweb._ActiveControl.LDefaultInternalName = '';
       else
         keymanweb._ActiveControl.LDefaultInternalName = keymanweb._ActiveKeyboard['KI'];
+
+    /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects should be restrained to this control in case
+     * the user is manually specifying languages on a per-control basis.
+     */
+    
+    keymanweb._JustActivatedKeymanWebUI = 0;
 
     keymanweb._ActiveControl = null;
     
