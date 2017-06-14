@@ -2990,7 +2990,6 @@
       }
     }
 
-    //if(typeof PLgCode == 'undefined' || PLgCode == '') PLgCode = '---';
     if(keymanweb._ActiveKeyboard == null)
     {
       for(Ln=0; Ln<keymanweb._KeyboardStubs.length; Ln++)  // I1511 - array prototype extended
