@@ -2107,7 +2107,7 @@
    * @return      {boolean}             always true  (?) 
    */    
   keymanweb._ControlFocus = function(e)
-  {                     
+  {                   
     var Ltarg, Ln; 
     if(!keymanweb._Enabled) return true;
     e = keymanweb._GetEventObject(e);     // I2404 - Manage IE events in IFRAMEs
@@ -2163,7 +2163,7 @@
       else
         keymanweb._ActiveControl.LDefaultInternalName = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
     }
-    
+
     //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
     //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
     if(!keymanweb._IsIEEditableIframe(Ltarg,1) || !keymanweb._IsMozillaEditableIframe(Ltarg,1))
@@ -2291,12 +2291,18 @@
     ////keymanweb._SelectionControl = null;
     
     keymanweb._LastActiveElement = Ltarg;
-    
+   
     if(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null)
       if(keymanweb._ActiveKeyboard == null)
         keymanweb._ActiveControl.LDefaultInternalName = '';
       else
         keymanweb._ActiveControl.LDefaultInternalName = keymanweb._ActiveKeyboard['KI'];
+
+    /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects should be restrained to this control in case
+     * the user is manually specifying languages on a per-control basis.
+     */
+    
+    keymanweb._JustActivatedKeymanWebUI = 0;
 
     keymanweb._ActiveControl = null;
     
@@ -2903,28 +2909,28 @@
    */    
   keymanweb._SetActiveKeyboard = function(PInternalName,PLgCode,saveCookie)
   {
-    var n,Ln,lgCode;
+    var n,Ln;
 
     // Set default language code
-    if(arguments.length < 2 || (!PLgCode)) lgCode='---'; else lgCode=PLgCode;
+    if(arguments.length < 2 || (!PLgCode)) {
+      PLgCode='---'; 
+    }
 
     // Check that the saved keyboard is currently registered
-    for(n=0; n<keymanweb._KeyboardStubs.length; n++)
-    {
-      if(PInternalName == keymanweb._KeyboardStubs[n]['KI'])
-      {
-        if(lgCode == keymanweb._KeyboardStubs[n]['KLC'] || lgCode == '---') break;
+    for(n=0; n<keymanweb._KeyboardStubs.length; n++) {
+      if(PInternalName == keymanweb._KeyboardStubs[n]['KI']) {
+        if(PLgCode == keymanweb._KeyboardStubs[n]['KLC'] || PLgCode == '---') break;
       }
     }
 
     // Mobile device addition: force selection of the first keyboard if none set
     if(device.touchable && (PInternalName == '' || PInternalName == null || n >= keymanweb._KeyboardStubs.length))
     {
-      PInternalName=keymanweb._KeyboardStubs[0]['KI']; lgCode=keymanweb._KeyboardStubs[0]['KLC'];   
+      PInternalName=keymanweb._KeyboardStubs[0]['KI']; PLgCode=keymanweb._KeyboardStubs[0]['KLC'];   
     }
 
     // Save name of keyboard (with language code) as a cookie
-    if(arguments.length > 2 && saveCookie) keymanweb.saveCurrentKeyboard(PInternalName,lgCode);
+    if(arguments.length > 2 && saveCookie) keymanweb.saveCurrentKeyboard(PInternalName,PLgCode);
 
     // Check if requested keyboard and stub are currently active
     if(keymanweb._ActiveStub && keymanweb._ActiveKeyboard 
@@ -2957,9 +2963,21 @@
     keymanweb._ActiveKeyboard = null; keymanweb._ActiveStub = null;
 
     // Hide OSK and do not update keyboard list if using internal keyboard (desktops)
-    if(PInternalName == '') 
-    {
-      osk._Hide(false); return;
+    if(PInternalName == '') {
+      if(keymanweb.loadTimer) {
+        window.clearTimeout(keymanweb.loadTimer);
+      }
+      keymanweb.loadTimer = null;
+      osk._Hide(false); 
+
+      if(typeof(util.wait) == 'function') {
+        util.wait(false);
+      }
+
+      // We must clear keymanweb._LoadingInternalName here, as we no lnoger wish for it to be the active keyboard.
+      keymanweb._LoadingInternalName = undefined;
+
+      return;
     }
 
     for(Ln=0; Ln<keymanweb._Keyboards.length; Ln++)  // I1511 - array prototype extended
@@ -2981,7 +2999,6 @@
       }
     }
 
-    if(PLgCode == 'undefined' || PLgCode == '') PLgCode = '---';
     if(keymanweb._ActiveKeyboard == null)
     {
       for(Ln=0; Ln<keymanweb._KeyboardStubs.length; Ln++)  // I1511 - array prototype extended
@@ -2999,6 +3016,7 @@
             // Always (temporarily) hide the OSK when loading a new keyboard, to ensure that a failure to load doesn't leave the current OSK displayed
             if(osk.ready) osk._Hide(false);
  
+            // Indicates that this will become the active keyboard once it is loaded.  (Completes in KeymanWeb.KR)
             keymanweb._LoadingInternalName = PInternalName;
             
             // Must kill existing timer before starting another (KMW-101)
@@ -3055,15 +3073,6 @@
     catch(ex) {                                                     
       document.getElementsByTagName('head')[0].appendChild(Lscript);
       }            
-  }
-
-  /**
-   * Set the default keyboard
-  **/
-  keymanweb.setDfltKeyboard=function()
-  {
-    keymanweb._SetActiveKeyboard('Keyboard_us','eng',true);
-    keymanweb.doKeyboardChange('Keyboard_us','eng',true);
   }
 
   /**

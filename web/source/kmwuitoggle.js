@@ -48,13 +48,24 @@ try {
    * 
    * @param       {Object}            someElement     focused element
    * @param       {(boolean|number)}  focusing        true if focusing
+   * @param       {Object}            activeControl   Object representing API specs for the control, if it exists and is now focused.
    */    
-  ui.doFocus = function(someElement,focusing)
-  {
+  ui.doFocus = function(someElement,focusing, activeControl) {
     // This callback must be ignored until UI is initialized, or for touch devices (which can never initialize the UI)
-    if(!ui.initialized) return;
+    if(!ui.initialized) {
+      return;
+    }
     
-    if(window.event) someElement=window.event.srcElement;
+    if(window.event) {
+      someElement=window.event.srcElement;
+    }
+
+    // Hides the Toggle interface if a control has KeymanWeb disabled by API calls.
+    if(activeControl){
+      if(!activeControl['LEnabled']) {
+        focusing = false;
+      }
+    }
 
     if(focusing)
     {
@@ -102,8 +113,8 @@ try {
     ui.controller.style.top = y + 'px';    
   }
 
-  keymanweb['addEventListener']('controlfocused',function(params){ui.doFocus(params.target,true);});
-  keymanweb['addEventListener']('controlblurred',function(params){ui.doFocus(params.target,false);});
+  keymanweb['addEventListener']('controlfocused',function(params){ui.doFocus(params.target,true, params['activeControl']);});
+  keymanweb['addEventListener']('controlblurred',function(params){ui.doFocus(params.target,false, null);});
 
   osk['addEventListener']('show',
     function(oskPosition)
