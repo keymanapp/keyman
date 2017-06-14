@@ -155,8 +155,7 @@ try {
     ui.toolbarNode.style.display='block';
     
     var tbNode = ui.createNode('a', 'kmw_controls_start', null, ' '); 
-    //tbNode.href = "http://keyman.com/web/"; 
-    tbNode.href = "http://tavultesoft.com/keymanweb/"; // TODO: change link URL to keyman.com/web as soon as page is ready
+    tbNode.href = "https://keyman.com/developer/keymanweb/";
     tbNode.target="_blank";
     ui.toolbarNode.appendChild(tbNode);
     

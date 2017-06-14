@@ -1,5 +1,5 @@
 // KeymanWeb 2.0
-// Copyright 2014 Tavultesoft Pty Ltd
+// Copyright 2017 SIL International
 
 /*****************************************/
 /*                                       */
