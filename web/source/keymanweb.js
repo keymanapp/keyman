@@ -2901,7 +2901,7 @@
    */    
   keymanweb._SetActiveKeyboard = function(PInternalName,PLgCode,saveCookie)
   {
-    var n,Ln,lgCode;
+    var n,Ln;
 
     // Set default language code
     if(arguments.length < 2 || (!PLgCode)) {
@@ -2918,11 +2918,11 @@
     // Mobile device addition: force selection of the first keyboard if none set
     if(device.touchable && (PInternalName == '' || PInternalName == null || n >= keymanweb._KeyboardStubs.length))
     {
-      PInternalName=keymanweb._KeyboardStubs[0]['KI']; lgCode=keymanweb._KeyboardStubs[0]['KLC'];   
+      PInternalName=keymanweb._KeyboardStubs[0]['KI']; PLgCode=keymanweb._KeyboardStubs[0]['KLC'];   
     }
 
     // Save name of keyboard (with language code) as a cookie
-    if(arguments.length > 2 && saveCookie) keymanweb.saveCurrentKeyboard(PInternalName,lgCode);
+    if(arguments.length > 2 && saveCookie) keymanweb.saveCurrentKeyboard(PInternalName,PLgCode);
 
     // Check if requested keyboard and stub are currently active
     if(keymanweb._ActiveStub && keymanweb._ActiveKeyboard 
