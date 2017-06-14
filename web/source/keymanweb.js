@@ -2968,10 +2968,11 @@
       keymanweb.loadTimer = null;
       osk._Hide(false); 
 
-      util.wait(false);
+      if(typeof(util.wait) == 'function') {
+        util.wait(false);
+      }
 
       // We must clear keymanweb._LoadingInternalName here, as we no lnoger wish for it to be the active keyboard.
-   
       keymanweb._LoadingInternalName = undefined;
 
       return;
