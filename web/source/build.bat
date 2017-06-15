@@ -73,7 +73,7 @@ echo Compiled embedded application saved as keyman.js
 rem Update any changed resources
 
 echo Copy or update resources
-xcopy %SOURCE%\resources\*.* %EMBED_OUTPUT%\resources /D /E /Y  >nul
+xcopy %SOURCE%\resources\*.* %EMBED_OUTPUT%\resources /E /Y  >nul
 
 rem Update build number if successful
 echo.
@@ -89,7 +89,11 @@ rem They usually are, but... just in case.
 @echo off
 setlocal enableextensions
 if not exist %WEB_OUTPUT% mkdir %WEB_OUTPUT%
-if not exist %WEB_OUTPUT%\resources mkdir %WEB_OUTPUT%\resources
+if not exist %WEB_OUTPUT%\ui mkdir %WEB_OUTPUT%\ui
+if not exist %WEB_OUTPUT%\osk mkdir %WEB_OUTPUT%\osk
+if not exist %WEB_OUTPUT%\src mkdir %WEB_OUTPUT%\src
+if not exist %WEB_OUTPUT%\src\ui mkdir %WEB_OUTPUT%\src\ui
+if not exist %WEB_OUTPUT%\src\osk mkdir %WEB_OUTPUT%\src\osk
 endlocal
 
 rem Compile supplementary plane string handing extensions
@@ -113,8 +117,15 @@ if "%1" == "-test" goto done
 
 rem Update any changed resources
 
-echo Copy or update resources
-xcopy %SOURCE%\resources\*.* %WEB_OUTPUT%\resources /D /E /Y  >nul
+echo Copy resources to %WEB_OUTPUT%\ui, ...\osk
+xcopy %SOURCE%\resources\ui\* %WEB_OUTPUT%\ui /E /Y  >nul
+xcopy %SOURCE%\resources\osk\* %WEB_OUTPUT%\osk /E /Y  >nul
+
+echo Copy source to %WEB_OUTPUT%\src
+xcopy %SOURCE%\*.js %WEB_OUTPUT%\src /Y 
+echo %BUILD% > %WEB_OUTPUT%\src\version.txt
+xcopy %SOURCE%\resources\ui\* %WEB_OUTPUT%\src\ui /E /Y  >nul
+xcopy %SOURCE%\resources\osk\* %WEB_OUTPUT%\src\osk /E /Y  >nul
 
 rem Update build number if successful
 echo.
