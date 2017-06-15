@@ -200,7 +200,7 @@
     // Add title bar caption
     Limg=keymanweb._TitleElement=util._CreateElement('SPAN');  // I1972
     Limg.className='kmw-title-bar-caption';
-    Limg.innerHTML='Tavultesoft KeymanWeb';
+    Limg.innerHTML='KeymanWeb';
     Ldiv.appendChild(Limg);
     
     return Ldiv;
@@ -2910,7 +2910,7 @@
   osk.showBuild = function()
   {
     util.alert('KeymanWeb Build '+keymanweb['build']+'<br /><br />'
-      +'<span style="font-size:0.8em">Copyright &copy; 2013 Tavultesoft Pty Ltd</span>');
+      +'<span style="font-size:0.8em">Copyright &copy; 2017 SIL International</span>');
   } 
         
   /**
@@ -2925,7 +2925,7 @@
     // Add caption
     var Ltitle=util._CreateElement('DIV');
     Ltitle.className='kmw-footer-caption';
-    Ltitle.innerHTML='Keyboard &copy; 2013 Tavultesoft Pty Ltd';
+    Ltitle.innerHTML='<a href="https://keyman.com/developer/keymanweb/">KeymanWeb</a>';
     Ltitle.id='keymanweb-osk-footer-caption';
     
     // Display build number on shift+double click
@@ -3632,7 +3632,7 @@
   
     osk.loadRetry = 0;
   
-    if(keymanweb._TitleElement) keymanweb._TitleElement.innerHTML = 'Tavultesoft KeymanWeb'; // I1972
+    if(keymanweb._TitleElement) keymanweb._TitleElement.innerHTML = 'KeymanWeb'; // I1972
 
    
     osk._Visible=0;  // I3363 (Build 301)
