@@ -1160,6 +1160,19 @@
   }; 
 
   /**
+   * Function     setupElement
+   * Scope        Public
+   * @param       {Element}   Pelem  A newly-added element to be handled by the KeymanWeb engine.
+   * Description  Sets up one element (regardless of device/environment) and performs all handling necessary
+   *              to treat it as an equal with elements already on the page.
+   * @return      {boolean}  Returns true if the element is a valid input for KeymanWeb that was not previously tracked,
+   *                         otherwise false.
+   */
+  keymanweb['setupElement'] = keymanweb.setupElement = function(Pelem) {
+    return keymanweb._MutationAdditionObserved(Pelem);
+  }
+
+  /**
    * Get the user-specified (or default) font for the first mapped input or textarea element
    * before applying any keymanweb styles or classes
    * 
@@ -1273,7 +1286,8 @@
   // End of I3363 (Build 301) additions
   
   /**
-   * Exposed function to load keyboards by name. One or more arguments may be used
+   * Exposed function to load keyboards by name. One or more arguments may be used.
+   * See online documentation for further details.
    * 
    * @param {string|Object} x keyboard name string or keyboard metadata JSON object
    * 
@@ -1287,7 +1301,8 @@
   }
   
   /**
-   * Build 362: addKeyboardArray() link to Cloud. One or more arguments may be used
+   * Build 362: addKeyboardArray() link to Cloud. One or more arguments may be used.
+   * See online documentation for the addKeyboards() function for further details.
    * 
    * @param {string|Object} x keyboard name string or keyboard metadata JSON object
    * 
@@ -2090,6 +2105,8 @@
 
   /**
    * Set or clear the IsActivatingKeymanWebUI flag (exposed function)
+   * This function is called by the various desktop UI implementations to aid
+   * in KeymanWeb engine internal bookkeeping.
    * 
    * @param       {(boolean|number)}  state  Activate (true,false)
    */
@@ -3704,13 +3721,14 @@
    * Scope        Private
    * @param       {Element}  Pelem     A page input, textarea, or iframe element.
    * Description  Used by the MutationObserver event handler to properly setup any elements dynamically added to the document post-initialization.
-   * 
+   * @return      {boolean}
    */
   keymanweb._MutationAdditionObserved = function(Pelem) {
     if(!device.touchable) {
       // keymanweb.attachToControl is written to handle iframes, but setupDesktopElement is not.
       if(keymanweb.setupDesktopElement(Pelem)) {
         keymanweb.attachToControl(Pelem);
+        return true;
       } else if(Pelem.tagName.toLowerCase() == 'iframe') {
         //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
 
@@ -3729,9 +3747,14 @@
          if(Pelem.contentDocument.readyState == 'complete') {
            attachFunctor();
          }
+         // TODO:  Is this the best option?  This probably needs refinement.
+         // Presently returns false since it is not tracked on the internal keymanweb.inputList array.
+         return false;
+      } else {
+        return false;
       }
     } else {
-      keymanweb.setupTouchElement(Pelem);
+      return keymanweb.setupTouchElement(Pelem);
     }
   }
 
