@@ -864,7 +864,7 @@
 
     /**
      * Function     setupTouchElement
-     * Scope        Public
+     * Scope        Private
      * @param       {Element}  Pelem   An input or textarea element from the page.
      * @return      {boolean}  Returns true if it creates a simulated input element for Pelem; false if not.
      * Description  Creates a simulated input element for the specified INPUT or TEXTAREA, comprising:
@@ -876,7 +876,7 @@
      * 
      *              Also ensures the element is registered on keymanweb's internal input list.
      */
-    keymanweb['setupTouchElement'] = keymanweb.setupTouchElement = function(Pelem)
+    keymanweb.setupTouchElement = function(Pelem)
     {
       // Touch doesn't worry about iframes.
       if(Pelem.tagName.toLowerCase() == 'iframe') {
@@ -1130,13 +1130,13 @@
 
   /**
    * Function     setupDesktopElement
-   * Scope        Public
+   * Scope        Private
    * @param       {Element}   Pelem  An element from the document to be touch-enabled.
    * Description  Setup one element for non-touch devices and add it to the inputList if it is an input element (desktop browsers).
    *              Only returns true if the element is a valid input for keymanweb and it is not presently tracked as an input element.
    * @return   {boolean}
    */       
-  keymanweb['setupDesktopElement'] = keymanweb.setupDesktopElement = function(Pelem) { 
+  keymanweb.setupDesktopElement = function(Pelem) { 
     var lcTagName = Pelem.tagName.toLowerCase();
     // If it's not one of these, we don't need to hook the OSK into it.
     if(!(lcTagName == "input" || lcTagName == "textarea")) {
@@ -1158,6 +1158,19 @@
 
     return false;
   }; 
+
+  /**
+   * Function     setupElement
+   * Scope        Public
+   * @param       {Element}   Pelem  A newly-added element to be handled by the KeymanWeb engine.
+   * Description  Sets up one element (regardless of device/environment) and performs all handling necessary
+   *              to treat it as an equal with elements already on the page.
+   * @return      {boolean}  Returns true if the element is a valid input for KeymanWeb that was not previously tracked,
+   *                         otherwise false.
+   */
+  keymanweb['setupElement'] = keymanweb.setupElement = function(Pelem) {
+    return keymanweb._MutationAdditionObserved(Pelem);
+  }
 
   /**
    * Get the user-specified (or default) font for the first mapped input or textarea element
@@ -3708,13 +3721,14 @@
    * Scope        Private
    * @param       {Element}  Pelem     A page input, textarea, or iframe element.
    * Description  Used by the MutationObserver event handler to properly setup any elements dynamically added to the document post-initialization.
-   * 
+   * @return      {boolean}
    */
   keymanweb._MutationAdditionObserved = function(Pelem) {
     if(!device.touchable) {
       // keymanweb.attachToControl is written to handle iframes, but setupDesktopElement is not.
       if(keymanweb.setupDesktopElement(Pelem)) {
         keymanweb.attachToControl(Pelem);
+        return true;
       } else if(Pelem.tagName.toLowerCase() == 'iframe') {
         //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
 
@@ -3733,9 +3747,14 @@
          if(Pelem.contentDocument.readyState == 'complete') {
            attachFunctor();
          }
+         // TODO:  Is this the best option?  This probably needs refinement.
+         // Presently returns false since it is not tracked on the internal keymanweb.inputList array.
+         return false;
+      } else {
+        return false;
       }
     } else {
-      keymanweb.setupTouchElement(Pelem);
+      return keymanweb.setupTouchElement(Pelem);
     }
   }
 
