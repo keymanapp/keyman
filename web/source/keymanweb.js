@@ -864,7 +864,7 @@
 
     /**
      * Function     setupTouchElement
-     * Scope        Private
+     * Scope        Public
      * @param       {Element}  Pelem   An input or textarea element from the page.
      * @return      {boolean}  Returns true if it creates a simulated input element for Pelem; false if not.
      * Description  Creates a simulated input element for the specified INPUT or TEXTAREA, comprising:
@@ -876,7 +876,7 @@
      * 
      *              Also ensures the element is registered on keymanweb's internal input list.
      */
-    keymanweb.setupTouchElement = function(Pelem)
+    keymanweb['setupTouchElement'] = keymanweb.setupTouchElement = function(Pelem)
     {
       // Touch doesn't worry about iframes.
       if(Pelem.tagName.toLowerCase() == 'iframe') {
@@ -1130,13 +1130,13 @@
 
   /**
    * Function     setupDesktopElement
-   * Scope        Private
+   * Scope        Public
    * @param       {Element}   Pelem  An element from the document to be touch-enabled.
    * Description  Setup one element for non-touch devices and add it to the inputList if it is an input element (desktop browsers).
    *              Only returns true if the element is a valid input for keymanweb and it is not presently tracked as an input element.
    * @return   {boolean}
    */       
-  keymanweb.setupDesktopElement = function(Pelem) { 
+  keymanweb['setupDesktopElement'] = keymanweb.setupDesktopElement = function(Pelem) { 
     var lcTagName = Pelem.tagName.toLowerCase();
     // If it's not one of these, we don't need to hook the OSK into it.
     if(!(lcTagName == "input" || lcTagName == "textarea")) {
@@ -1273,7 +1273,8 @@
   // End of I3363 (Build 301) additions
   
   /**
-   * Exposed function to load keyboards by name. One or more arguments may be used
+   * Exposed function to load keyboards by name. One or more arguments may be used.
+   * See online documentation for further details.
    * 
    * @param {string|Object} x keyboard name string or keyboard metadata JSON object
    * 
@@ -1287,7 +1288,8 @@
   }
   
   /**
-   * Build 362: addKeyboardArray() link to Cloud. One or more arguments may be used
+   * Build 362: addKeyboardArray() link to Cloud. One or more arguments may be used.
+   * See online documentation for the addKeyboards() function for further details.
    * 
    * @param {string|Object} x keyboard name string or keyboard metadata JSON object
    * 
@@ -2090,6 +2092,8 @@
 
   /**
    * Set or clear the IsActivatingKeymanWebUI flag (exposed function)
+   * This function is called by the various desktop UI implementations to aid
+   * in KeymanWeb engine internal bookkeeping.
    * 
    * @param       {(boolean|number)}  state  Activate (true,false)
    */
