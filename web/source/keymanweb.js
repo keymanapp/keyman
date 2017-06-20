@@ -3061,12 +3061,38 @@
  *  @param  {string}  kbdFile   keyboard filename
  *    
  **/      
-  keymanweb.installKeyboard = function(kbdFile)
-  {
+  keymanweb.installKeyboard = function(kbdFile) {
     var Lscript = util._CreateElement('SCRIPT');
-    Lscript.charset="UTF-8";        // KMEW-89
-    Lscript.src = keymanweb.getKeyboardPath(kbdFile);       
+    Lscript.charset="UTF-8";        // KMEW-89       
     Lscript.type = 'text/javascript';
+
+    // Add a handler for cases where the new <script> block fails to load.
+    Lscript.addEventListener('error', function() {
+      window.clearTimeout(keymanweb.loadTimer);
+      keymanweb.loadTimer = null;
+
+      // We already know the load has failed... why wait?
+      keymanweb.loadFailureHandler();
+    }, true);
+
+    // Add a handler for cases where the new <script> block loads, but fails to process.
+    Lscript.addEventListener('load', function() {
+      window.clearTimeout(keymanweb.loadTimer);
+      keymanweb.loadTimer = null;
+
+      // Did we load successfully?  Remember, the keyboard will directly call KeymanWeb!
+      if(keymanweb._LoadingInternalName != null) {  // Is cleared upon a successful load.
+        keymanweb.loadFailureHandler();
+      }
+      //util.wait(false);
+      //util.alert("Keyboard loaded.");
+    }, true);
+
+    // Set here because IE likes to instantly start loading the script when this is set,
+    // even before it's formally added to the document.
+    Lscript.src = keymanweb.getKeyboardPath(kbdFile);
+
+    // Append our SCRIPT block; let's get loading!
     try {                                  
       document.body.appendChild(Lscript);  
       }
