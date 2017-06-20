@@ -94,15 +94,21 @@
   * 
   * @param  {Object}  Ln  keyboard stub object    
   */    
-  keymanweb.keyboardUnavailable = function(Ln)
-  {
-    keymanweb.loadFailureHandler = function() {
+  keymanweb.keyboardUnavailable = function(Ln) {
+    keymanweb.loadFailureHandler = function(altString) {
       util.wait(false);
       var Ps=keymanweb._KeyboardStubs[Ln],kbdName=Ps['KN'],lgName=Ps['KL'];
       kbdName=kbdName.replace(/\s*keyboard\s*/i,'');
-      util.alert('Sorry, the '+kbdName+' keyboard for '+lgName+' is not currently available!', function() { 
-        keymanweb['setActiveKeyboard']('');
-      });
+
+      if(altString) {
+        util.alert(altString, function() {
+          keymanweb['setActiveKeyboard']('');
+        });
+      } else {
+        util.alert('Sorry, the '+kbdName+' keyboard for '+lgName+' is not currently available!', function() { 
+          keymanweb['setActiveKeyboard']('');
+        });
+      }
 
       // Restore base keyboard if requested keyboard doesn't load
       if(Ln > 0) {         
