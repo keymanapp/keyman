@@ -10,10 +10,10 @@ set SOURCE="."
 
 rem Get build version -- if not building in TeamCity, then always use 300
 
-if "%BUILD_NUMBER%"=="" (
+if "%BUILD_COUNTER%"=="" (
   set BUILD=300
 ) else (
-  set BUILD=%BUILD_NUMBER%
+  set BUILD=%BUILD_COUNTER%
 )
 
 if "%CLOSURECOMPILERPATH%"=="" set CLOSURECOMPILERPATH=..\tools
