@@ -3066,9 +3066,9 @@
     Lscript.charset="UTF-8";        // KMEW-89       
     Lscript.type = 'text/javascript';
 
-    kbdFile = kbdStub['KF'];
-    kbdLang = kbdStub['KL'];
-    kbdName = kbdStub['KN'];
+    var kbdFile = kbdStub['KF'];
+    var kbdLang = kbdStub['KL'];
+    var kbdName = kbdStub['KN'];
 
     // Add a handler for cases where the new <script> block fails to load.
     Lscript.addEventListener('error', function() {
