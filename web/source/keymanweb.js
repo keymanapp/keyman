@@ -3070,29 +3070,31 @@
     var kbdLang = kbdStub['KL'];
     var kbdName = kbdStub['KN'];
 
-    // Add a handler for cases where the new <script> block fails to load.
-    Lscript.addEventListener('error', function() {
-      // Clear the timeout timer.
-      window.clearTimeout(keymanweb.loadTimer);
-      keymanweb.loadTimer = null;
+    if(keymanweb.loadFailureHandler) {
+      // Add a handler for cases where the new <script> block fails to load.
+      Lscript.addEventListener('error', function() {
+        // Clear the timeout timer.
+        window.clearTimeout(keymanweb.loadTimer);
+        keymanweb.loadTimer = null;
 
-      // We already know the load has failed... why wait?
-      keymanweb.loadFailureHandler('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '!');
-      console.log('Error:  cannot find the', kbdName, 'keyboard for', kbdLang, 'at', kbdFile + '!');
-    }, true);
+        // We already know the load has failed... why wait?
+        keymanweb.loadFailureHandler('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '!');
+        console.log('Error:  cannot find the', kbdName, 'keyboard for', kbdLang, 'at', kbdFile + '!');
+      }, true);
 
-    // Add a handler for cases where the new <script> block loads, but fails to process.
-    Lscript.addEventListener('load', function() {
-      // Clear the timeout timer.
-      window.clearTimeout(keymanweb.loadTimer);
-      keymanweb.loadTimer = null;
+      // Add a handler for cases where the new <script> block loads, but fails to process.
+      Lscript.addEventListener('load', function() {
+        // Clear the timeout timer.
+        window.clearTimeout(keymanweb.loadTimer);
+        keymanweb.loadTimer = null;
 
-      // Since the keyboard will directly call KeymanWeb, we only need to check if the registration succeeded.
-      if(keymanweb._LoadingInternalName != null) {  // Is cleared upon a successful load.
-        keymanweb.loadFailureHandler('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '!');
-        console.log('Error registering the', kbdName, 'keyboard for', kbdLang + '!');
-      }
-    }, true);
+        // Since the keyboard will directly call KeymanWeb, we only need to check if the registration succeeded.
+        if(keymanweb._LoadingInternalName != null) {  // Is cleared upon a successful load.
+          keymanweb.loadFailureHandler('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '!');
+          console.log('Error registering the', kbdName, 'keyboard for', kbdLang + '!');
+        }
+      }, true);
+    }
 
     // Set here because IE likes to instantly start loading the script when this is set, even before it's formally added to the document.  
     // We want it to trigger after we've set handlers.
