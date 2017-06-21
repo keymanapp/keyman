@@ -62,7 +62,9 @@ var __BUILD__ = 300;
     srcPath: '',              // Path to folder containing executing keymanweb script
     rootPath: '',             // Path to server root
     mustReloadKeyboard: false,// Force keyboard refreshing even if already loaded
-    fullInitialization: true  // Force full page initialization unless overridden
+    fullInitialization: true, // Force full page initialization unless overridden
+    loadFailureHandler: function() {}   // A error-reporting callback function; is set by keymanweb.keyboardUnavailable 
+                                        // when attempting to load keyboards.
   };
 
   keymanweb['initialized'] = 0;

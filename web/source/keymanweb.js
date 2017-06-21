@@ -3058,7 +3058,7 @@
 /**
  * Install a keyboard script that has been downloaded from a keyboard server
  * 
- *  @param  {object}  kbdStub   keyboard filename
+ *  @param  {Object}  kbdStub   keyboard filename
  *    
  **/      
   keymanweb.installKeyboard = function(kbdStub) {
