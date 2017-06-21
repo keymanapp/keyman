@@ -3038,7 +3038,7 @@
             // It works much more reliably if deferred (KMEW-101, build 356)
             // The effect of a delay can also be tested, for example, by setting the timeout to 5000
             //keymanweb.installKeyboard(keymanweb._KeyboardStubs[Ln]);
-            window.setTimeout(function(){keymanweb.installKeyboard(keymanweb._KeyboardStubs[Ln]['KF']);},0);
+            window.setTimeout(function(){keymanweb.installKeyboard(keymanweb._KeyboardStubs[Ln]);},0);
           }          
           keymanweb._ActiveStub=keymanweb._KeyboardStubs[Ln];
           return;
@@ -3058,15 +3058,49 @@
 /**
  * Install a keyboard script that has been downloaded from a keyboard server
  * 
- *  @param  {string}  kbdFile   keyboard filename
+ *  @param  {Object}  kbdStub   keyboard filename
  *    
  **/      
-  keymanweb.installKeyboard = function(kbdFile)
-  {
+  keymanweb.installKeyboard = function(kbdStub) {
     var Lscript = util._CreateElement('SCRIPT');
-    Lscript.charset="UTF-8";        // KMEW-89
-    Lscript.src = keymanweb.getKeyboardPath(kbdFile);       
+    Lscript.charset="UTF-8";        // KMEW-89       
     Lscript.type = 'text/javascript';
+
+    var kbdFile = kbdStub['KF'];
+    var kbdLang = kbdStub['KL'];
+    var kbdName = kbdStub['KN'];
+
+    if(keymanweb.loadFailureHandler) {
+      // Add a handler for cases where the new <script> block fails to load.
+      Lscript.addEventListener('error', function() {
+        // Clear the timeout timer.
+        window.clearTimeout(keymanweb.loadTimer);
+        keymanweb.loadTimer = null;
+
+        // We already know the load has failed... why wait?
+        keymanweb.loadFailureHandler('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '!');
+        console.log('Error:  cannot find the', kbdName, 'keyboard for', kbdLang, 'at', kbdFile + '!');
+      }, true);
+
+      // Add a handler for cases where the new <script> block loads, but fails to process.
+      Lscript.addEventListener('load', function() {
+        // Clear the timeout timer.
+        window.clearTimeout(keymanweb.loadTimer);
+        keymanweb.loadTimer = null;
+
+        // Since the keyboard will directly call KeymanWeb, we only need to check if the registration succeeded.
+        if(keymanweb._LoadingInternalName != null) {  // Is cleared upon a successful load.
+          keymanweb.loadFailureHandler('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '!');
+          console.log('Error registering the', kbdName, 'keyboard for', kbdLang + '!');
+        }
+      }, true);
+    }
+
+    // Set here because IE likes to instantly start loading the script when this is set, even before it's formally added to the document.  
+    // We want it to trigger after we've set handlers.
+    Lscript.src = keymanweb.getKeyboardPath(kbdFile);
+
+    // Append our SCRIPT block; let's get loading!
     try {                                  
       document.body.appendChild(Lscript);  
       }

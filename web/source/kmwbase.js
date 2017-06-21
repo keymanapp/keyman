@@ -62,7 +62,7 @@ var __BUILD__ = 300;
     srcPath: '',              // Path to folder containing executing keymanweb script
     rootPath: '',             // Path to server root
     mustReloadKeyboard: false,// Force keyboard refreshing even if already loaded
-    fullInitialization: true  // Force full page initialization unless overridden
+    fullInitialization: true, // Force full page initialization unless overridden
   };
 
   keymanweb['initialized'] = 0;
@@ -86,6 +86,8 @@ var __BUILD__ = 300;
   keymanweb.handleRotationEvents = function(){}
   keymanweb.alignInputs = function(b){}
   keymanweb.refreshElementContent = null; 
+  keymanweb.loadFailureHandler = null;  // A error-reporting callback function; is set by keymanweb.keyboardUnavailable 
+                                        // when attempting to load keyboards.  Leave this null for embedded applications.
   
   osk.highlightSubKeys = function(k,x,y){}
   osk.createKeyTip = function(){}
