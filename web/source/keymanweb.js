@@ -2964,18 +2964,11 @@
 
     // Hide OSK and do not update keyboard list if using internal keyboard (desktops)
     if(PInternalName == '') {
-      if(keymanweb.loadTimer) {
-        window.clearTimeout(keymanweb.loadTimer);
-      }
-      keymanweb.loadTimer = null;
       osk._Hide(false); 
 
       if(typeof(util.wait) == 'function') {
         util.wait(false);
       }
-
-      // We must clear keymanweb._LoadingInternalName here, as we no lnoger wish for it to be the active keyboard.
-      keymanweb._LoadingInternalName = undefined;
 
       return;
     }

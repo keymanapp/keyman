@@ -31,7 +31,6 @@ var __BUILD__ = 300;
     _Keyboards: [],           // Keyboards - array of loaded keyboards
     _ActiveKeyboard: null,    // ActiveKeyboard - points to active keyboard in Keyboards array
     _ActiveStub: null,        // ActiveStub - points to active stub in KeyboardStubs  
-    _LoadingInternalName: null,
     _AnyIndices: [],          // AnyIndex - array of any/index match indices
     _DeadKeys: [],            // DeadKeys - array of matched deadkeys
     _ActiveControl: null,     // Currently active control in _Controls array
@@ -52,7 +51,6 @@ var __BUILD__ = 300;
     deferredStubs: [],        // Array of pending keyboard stubs from addKeyboard(), to register after initialization
     deferredKRS: [],          // Array of pending keyboard stubs from KRS, to register afterf initialization
     deferredKR: [],           // Array of pending keyboards, to be installed at end of initialization
-    loadTimer:null,           // Keyboard loading timer, to manage load failure
     waiting:null,             // Element displayed during keyboard load time
     warned: false,            // Warning flag (to prevent multiple warnings)
     baseFont: 'sans-serif',   // Default font for mapped input elements
