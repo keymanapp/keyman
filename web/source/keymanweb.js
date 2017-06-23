@@ -3025,7 +3025,11 @@
             // Setup our default error-messaging callback if it should be implemented.
             if(typeof(util.wait) == 'function') {  // No error messaging if this function doesn't exist.
               loadingStub.asyncLoader.callback = function(altString) {
-                util.wait(false);
+                
+                // Thanks, Closure errors.  
+                if(typeof(util.wait) == 'function') {
+                  util.wait(false);
+                }
                 var kbdName = loadingStub['KN'];
                 var lngName = loadingStub['KL'];
                 kbdName = kbdName.replace(/\s*keyboard\s*/i, '');
@@ -3035,22 +3039,24 @@
                     keymanweb['setActiveKeyboard']('');
                   });
                 } else {
-                  util.alert('Sorry, the '+kbdName+' keyboard for '+lgName+' is not currently available!', function() { 
+                  util.alert('Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available!', function() { 
                     keymanweb['setActiveKeyboard']('');
                   });
                 }
 
                 if(Ln > 0) {
-                  Ps = keymanweb._KeyboardStubs[0];
+                  var Ps = keymanweb._KeyboardStubs[0];
                   keymanweb._SetActiveKeyboard(Ps['KI'], Ps['KLC'], true);
                 }
               }
-              loadingStub.asyncLoader.timer = window.setTimeout(loadingStub.asyncLoader, 10000);
+              loadingStub.asyncLoader.timer = window.setTimeout(loadingStub.asyncLoader.callback, 10000);
             }
 
             //Display the loading delay bar (Note: only append 'keyboard' if not included in name.) 
             var wText='Installing keyboard<br/>'+keymanweb._KeyboardStubs[Ln]['KN'].replace(/\s*keyboard\s*/i,'');
-            if(typeof(util.wait) == 'function') util.wait(wText);
+            if(typeof(util.wait) == 'function') {
+              util.wait(wText);
+            }
             
             // Installing the script immediately does not work reliably if two keyboards are
             // loaded in succession if there is any delay in downloading the script.
