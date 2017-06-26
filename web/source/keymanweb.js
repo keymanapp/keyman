@@ -3028,11 +3028,7 @@
                   util.wait(false);
                 }
 
-                if(!altString) {
-                  altString = 'Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available.';
-                }
-
-                util.alert(altString, function() {
+                util.alert(altString || 'Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available.', function() {
                   keymanweb['setActiveKeyboard']('');
                 });
 
@@ -3045,9 +3041,8 @@
             }
 
             //Display the loading delay bar (Note: only append 'keyboard' if not included in name.) 
-            var wText='Installing keyboard<br/>' + kbdName;
             if(typeof(util.wait) == 'function') {
-              util.wait(wText);
+              util.wait('Installing keyboard<br/>' + kbdName);
             }
             
             // Installing the script immediately does not work reliably if two keyboards are
@@ -3116,8 +3111,8 @@
 
       // To determine if the load was successful, we'll need to check the keyboard array for our desired keyboard.
       // Test if keyboard already loaded
-      var kbd = keymanweb._getKeyboardInternal(kbdStub['KI']), Li;
-      if(kbd != undefined) {  // Is cleared upon a successful load.
+      var kbd = keymanweb._getKeyboardByID(kbdStub['KI']), Li;
+      if(kbd) {  // Is cleared upon a successful load.
         
         //Activate keyboard, if it's still the active stub.
         if(kbdStub == keymanweb._ActiveStub) {
@@ -3161,13 +3156,13 @@
   }
 
   /**
-   * Function     _getKeyboardInternal
+   * Function     _getKeyboardByID
    * Scope        Private
    * @param       {string}  keyboardID
    * @return      {Object|null}
    * Description  Returns the internal, registered keyboard object - not the stub, but the keyboard itself.
    */
-  keymanweb._getKeyboardInternal = function(keyboardID) {
+  keymanweb._getKeyboardByID = function(keyboardID) {
     var Li;
     for(Li=0; Li<keymanweb._Keyboards.length; Li++) {
       if(keyboardID == keymanweb._Keyboards[Li]['KI']) {
