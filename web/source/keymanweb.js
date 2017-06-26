@@ -3087,20 +3087,24 @@
     var kbdLang = kbdStub['KL'];
     var kbdName = kbdStub['KN'];
 
-    if(typeof(kbdStub.asyncLoader.callback) == "function") {
-      // Add a handler for cases where the new <script> block fails to load.
-      Lscript.addEventListener('error', function() {
+
+    // Add a handler for cases where the new <script> block fails to load.
+    Lscript.addEventListener('error', function() {
+      if(kbdStub.asyncLoader.timer !== null) {
         // Clear the timeout timer.
         window.clearTimeout(kbdStub.asyncLoader.timer);
         kbdStub.asyncLoader.timer = null;
+      }
 
+      // Do not output error messages when embedded.  (KMEA/KMEI)
+      if(!keymanweb.embedded) {
         // We already know the load has failed... why wait?
         kbdStub.asyncLoader.callback('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '.');
         console.log('Error:  cannot find the', kbdName, 'keyboard for', kbdLang, 'at', kbdFile + '.');
+      }
+      kbdStub.asyncLoader = null;
+    }, true);
 
-        kbdStub.asyncLoader = null;
-      }, true);
-    }
     
     // The load event will activate a newly-loaded keyboard if successful and report an error if it is not.
     Lscript.addEventListener('load', function() {
@@ -3137,7 +3141,7 @@
             util.wait(false);
           }
         } // A handler portion for cases where the new <script> block loads, but fails to process.
-      } else if(typeof(kbdStub.asyncLoader.callback) == "function") {
+      } else if(!keymanweb.embedded) {  // Do not output error messages when embedded.  (KMEA/KMEI)
           kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.');
           console.log('Error registering the', kbdName, 'keyboard for', kbdLang + '.');
       }

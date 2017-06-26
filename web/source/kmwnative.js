@@ -17,6 +17,9 @@
   // Force full initialization
   keymanweb.fullInitialization = true;  
 
+  // Explicitly marks that KeymanWeb is in native mode.
+  keymanweb.embedded = false;  
+
   /**
    * Set default device options
    * @param {Object}  opt device options object
