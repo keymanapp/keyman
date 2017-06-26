@@ -72,13 +72,6 @@
    */    
   keymanweb['KR'] = keymanweb.KR = function(Pk)
   {
-    // Clear the load failure timer, but only if this is the keyboard
-    // that is currently pending (KMEW-101)
-    if(keymanweb.loadTimer && (Pk['KI'] == keymanweb._LoadingInternalName))
-    {
-        window.clearTimeout(keymanweb.loadTimer); keymanweb.loadTimer=null;
-    }
-
     // If initialization not yet complete, list the keyboard to be registered on completion of initialization
     if(!keymanweb['initialized'])
     {          
@@ -117,10 +110,6 @@
 
     // Execute any external (UI) code needed after loading keyboard
     keymanweb.doKeyboardLoaded(Pk['KI']);
-    
-    // Should not pending keyboard name here, as that prevents a subsequently 
-    // selected keyboard from loading (KMW-101)
-    //keymanweb._LoadingInternalName = null;
   }
 
   /**

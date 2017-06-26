@@ -3015,6 +3015,10 @@
             // Tag the stub so that we don't double-load the keyboard!
             loadingStub.asyncLoader = {};
 
+            var kbdName = loadingStub['KN'];
+            var lngName = loadingStub['KL'];
+            kbdName = kbdName.replace(/\s*keyboard\s*/i, '');
+
             // Setup our default error-messaging callback if it should be implemented.
             if(typeof(util.wait) == 'function') {  // No error messaging if this function doesn't exist.
               loadingStub.asyncLoader.callback = function(altString) {
@@ -3023,19 +3027,14 @@
                 if(typeof(util.wait) == 'function') {
                   util.wait(false);
                 }
-                var kbdName = loadingStub['KN'];
-                var lngName = loadingStub['KL'];
-                kbdName = kbdName.replace(/\s*keyboard\s*/i, '');
 
-                if(typeof(altString) == "string") {
-                  util.alert(altString, function() {
-                    keymanweb['setActiveKeyboard']('');
-                  });
-                } else {
-                  util.alert('Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available!', function() { 
-                    keymanweb['setActiveKeyboard']('');
-                  });
+                if(!altString) {
+                  altString = 'Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available.';
                 }
+
+                util.alert(altString, function() {
+                  keymanweb['setActiveKeyboard']('');
+                });
 
                 if(Ln > 0) {
                   var Ps = keymanweb._KeyboardStubs[0];
@@ -3046,7 +3045,7 @@
             }
 
             //Display the loading delay bar (Note: only append 'keyboard' if not included in name.) 
-            var wText='Installing keyboard<br/>'+keymanweb._KeyboardStubs[Ln]['KN'].replace(/\s*keyboard\s*/i,'');
+            var wText='Installing keyboard<br/>' + kbdName;
             if(typeof(util.wait) == 'function') {
               util.wait(wText);
             }
@@ -3055,8 +3054,7 @@
             // loaded in succession if there is any delay in downloading the script.
             // It works much more reliably if deferred (KMEW-101, build 356)
             // The effect of a delay can also be tested, for example, by setting the timeout to 5000
-            //keymanweb.installKeyboard(keymanweb._KeyboardStubs[Ln]);
-            window.setTimeout(function(){keymanweb.installKeyboard(keymanweb._KeyboardStubs[Ln]);},0);
+            window.setTimeout(function(){keymanweb.installKeyboard(loadingStub);},0);
           }          
           keymanweb._ActiveStub=keymanweb._KeyboardStubs[Ln];
           return;
@@ -3076,7 +3074,7 @@
 /**
  * Install a keyboard script that has been downloaded from a keyboard server
  * 
- *  @param  {Object}  kbdStub   keyboard filename
+ *  @param  {Object}  kbdStub   keyboard stub to be loaded.
  *    
  **/      
   keymanweb.installKeyboard = function(kbdStub)
@@ -3097,8 +3095,8 @@
         kbdStub.asyncLoader.timer = null;
 
         // We already know the load has failed... why wait?
-        kbdStub.asyncLoader.callback('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '!');
-        console.log('Error:  cannot find the', kbdName, 'keyboard for', kbdLang, 'at', kbdFile + '!');
+        kbdStub.asyncLoader.callback('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '.');
+        console.log('Error:  cannot find the', kbdName, 'keyboard for', kbdLang, 'at', kbdFile + '.');
 
         kbdStub.asyncLoader = null;
       }, true);
@@ -3106,22 +3104,15 @@
     
     // The load event will activate a newly-loaded keyboard if successful and report an error if it is not.
     Lscript.addEventListener('load', function() {
-      if(typeof(kbdStub.asyncLoader.callback) == "function") {
+      if(kbdStub.asyncLoader.timer !== null) {
         // Clear the timeout timer.
         window.clearTimeout(kbdStub.asyncLoader.timer);
         kbdStub.asyncLoader.timer = null;
       }
 
       // To determine if the load was successful, we'll need to check the keyboard array for our desired keyboard.
-      //FIXME:
       // Test if keyboard already loaded
-      var kbd, Li;
-      for(Li=0; Li<keymanweb._Keyboards.length; Li++) {
-        if(kbdStub['KI'] == keymanweb._Keyboards[Li]['KI']) {
-          kbd = keymanweb._Keyboards[Li];
-        } 
-      }
-
+      var kbd = keymanweb._getKeyboardInternal(kbdStub['KI']), Li;
       if(kbd != undefined) {  // Is cleared upon a successful load.
         
         //Activate keyboard, if it's still the active stub.
@@ -3145,14 +3136,10 @@
           if(typeof (util.wait) == 'function') {
             util.wait(false);
           }
-        }
-      } else {
-        // A handler portion for cases where the new <script> block loads, but fails to process.
-        if(typeof(kbdStub.asyncLoader.callback) == "function") {
-
-          kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '!');
-          console.log('Error registering the', kbdName, 'keyboard for', kbdLang + '!');
-        }
+        } // A handler portion for cases where the new <script> block loads, but fails to process.
+      } else if(typeof(kbdStub.asyncLoader.callback) == "function") {
+          kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.');
+          console.log('Error registering the', kbdName, 'keyboard for', kbdLang + '.');
       }
       kbdStub.asyncLoader = null; 
     }, true);
@@ -3167,6 +3154,24 @@
     catch(ex) {                                                     
       document.getElementsByTagName('head')[0].appendChild(Lscript);
       }            
+  }
+
+  /**
+   * Function     _getKeyboardInternal
+   * Scope        Private
+   * @param       {string}  keyboardID
+   * @return      {Object|null}
+   * Description  Returns the internal, registered keyboard object - not the stub, but the keyboard itself.
+   */
+  keymanweb._getKeyboardInternal = function(keyboardID) {
+    var Li;
+    for(Li=0; Li<keymanweb._Keyboards.length; Li++) {
+      if(keyboardID == keymanweb._Keyboards[Li]['KI']) {
+        return keymanweb._Keyboards[Li];
+      }
+    }
+
+    return null;
   }
 
   /**
