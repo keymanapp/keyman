@@ -2964,22 +2964,16 @@
 
     // Hide OSK and do not update keyboard list if using internal keyboard (desktops)
     if(PInternalName == '') {
-      if(keymanweb.loadTimer) {
-        window.clearTimeout(keymanweb.loadTimer);
-      }
-      keymanweb.loadTimer = null;
       osk._Hide(false); 
 
       if(typeof(util.wait) == 'function') {
         util.wait(false);
       }
 
-      // We must clear keymanweb._LoadingInternalName here, as we no lnoger wish for it to be the active keyboard.
-      keymanweb._LoadingInternalName = undefined;
-
       return;
     }
 
+    // Determine if the keyboard was previously loaded but is not active and use the prior load if so.
     for(Ln=0; Ln<keymanweb._Keyboards.length; Ln++)  // I1511 - array prototype extended
     {
       if(keymanweb._Keyboards[Ln]['KI'] == PInternalName)
@@ -3011,34 +3005,51 @@
  
           // Create a script to load from the server - when it finishes loading, it will register itself, 
           //  detect that it is active, and focus as appropriate. The second test is needed to allow recovery from a failed script load
-          if(keymanweb._LoadingInternalName == null || keymanweb._LoadingInternalName != PInternalName)
-          { 
+
+          // Ensure we're not already loading the keyboard.
+          if(!keymanweb._KeyboardStubs[Ln].asyncLoader) {   
             // Always (temporarily) hide the OSK when loading a new keyboard, to ensure that a failure to load doesn't leave the current OSK displayed
             if(osk.ready) osk._Hide(false);
  
-            // Indicates that this will become the active keyboard once it is loaded.  (Completes in KeymanWeb.KR)
-            keymanweb._LoadingInternalName = PInternalName;
-            
-            // Must kill existing timer before starting another (KMW-101)
-            if(keymanweb.loadTimer != null) window.clearTimeout(keymanweb.loadTimer);
-            keymanweb.loadTimer = null;
-            
-            //Start a keyboard loading timer to allow fall back to the default if the keyboard cannot be found
-            if(typeof(keymanweb.keyboardUnavailable) == 'function') 
-              keymanweb.loadTimer=keymanweb.keyboardUnavailable(Ln);
-            else
-              keymanweb.loadTimer=null;
+            var loadingStub = keymanweb._KeyboardStubs[Ln];
+            // Tag the stub so that we don't double-load the keyboard!
+            loadingStub.asyncLoader = {};
+
+            var kbdName = loadingStub['KN'];
+            var lngName = loadingStub['KL'];
+            kbdName = kbdName.replace(/\s*keyboard\s*/i, '');
+
+            // Setup our default error-messaging callback if it should be implemented.
+            if(typeof(util.wait) == 'function') {  // No error messaging if this function doesn't exist.
+              loadingStub.asyncLoader.callback = function(altString) {
+                
+                // Thanks, Closure errors.  
+                if(typeof(util.wait) == 'function') {
+                  util.wait(false);
+                }
+
+                util.alert(altString || 'Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available.', function() {
+                  keymanweb['setActiveKeyboard']('');
+                });
+
+                if(Ln > 0) {
+                  var Ps = keymanweb._KeyboardStubs[0];
+                  keymanweb._SetActiveKeyboard(Ps['KI'], Ps['KLC'], true);
+                }
+              }
+              loadingStub.asyncLoader.timer = window.setTimeout(loadingStub.asyncLoader.callback, 10000);
+            }
 
             //Display the loading delay bar (Note: only append 'keyboard' if not included in name.) 
-            var wText='Installing keyboard<br/>'+keymanweb._KeyboardStubs[Ln]['KN'].replace(/\s*keyboard\s*/i,'');
-            if(typeof(util.wait) == 'function') util.wait(wText);
+            if(typeof(util.wait) == 'function') {
+              util.wait('Installing keyboard<br/>' + kbdName);
+            }
             
             // Installing the script immediately does not work reliably if two keyboards are
             // loaded in succession if there is any delay in downloading the script.
             // It works much more reliably if deferred (KMEW-101, build 356)
             // The effect of a delay can also be tested, for example, by setting the timeout to 5000
-            //keymanweb.installKeyboard(keymanweb._KeyboardStubs[Ln]);
-            window.setTimeout(function(){keymanweb.installKeyboard(keymanweb._KeyboardStubs[Ln]['KF']);},0);
+            window.setTimeout(function(){keymanweb.installKeyboard(loadingStub);},0);
           }          
           keymanweb._ActiveStub=keymanweb._KeyboardStubs[Ln];
           return;
@@ -3058,21 +3069,108 @@
 /**
  * Install a keyboard script that has been downloaded from a keyboard server
  * 
- *  @param  {string}  kbdFile   keyboard filename
+ *  @param  {Object}  kbdStub   keyboard stub to be loaded.
  *    
  **/      
-  keymanweb.installKeyboard = function(kbdFile)
+  keymanweb.installKeyboard = function(kbdStub)
   {
     var Lscript = util._CreateElement('SCRIPT');
     Lscript.charset="UTF-8";        // KMEW-89
-    Lscript.src = keymanweb.getKeyboardPath(kbdFile);       
     Lscript.type = 'text/javascript';
+
+    var kbdFile = kbdStub['KF'];
+    var kbdLang = kbdStub['KL'];
+    var kbdName = kbdStub['KN'];
+
+
+    // Add a handler for cases where the new <script> block fails to load.
+    Lscript.addEventListener('error', function() {
+      if(kbdStub.asyncLoader.timer !== null) {
+        // Clear the timeout timer.
+        window.clearTimeout(kbdStub.asyncLoader.timer);
+        kbdStub.asyncLoader.timer = null;
+      }
+
+      // Do not output error messages when embedded.  (KMEA/KMEI)
+      if(!keymanweb.embedded) {
+        // We already know the load has failed... why wait?
+        kbdStub.asyncLoader.callback('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '.');
+        console.log('Error:  cannot find the', kbdName, 'keyboard for', kbdLang, 'at', kbdFile + '.');
+      }
+      kbdStub.asyncLoader = null;
+    }, false);
+
+    
+    // The load event will activate a newly-loaded keyboard if successful and report an error if it is not.
+    Lscript.addEventListener('load', function() {
+      if(kbdStub.asyncLoader.timer !== null) {
+        // Clear the timeout timer.
+        window.clearTimeout(kbdStub.asyncLoader.timer);
+        kbdStub.asyncLoader.timer = null;
+      }
+
+      // To determine if the load was successful, we'll need to check the keyboard array for our desired keyboard.
+      // Test if keyboard already loaded
+      var kbd = keymanweb._getKeyboardByID(kbdStub['KI']), Li;
+      if(kbd) {  // Is cleared upon a successful load.
+        
+        //Activate keyboard, if it's still the active stub.
+        if(kbdStub == keymanweb._ActiveStub) {
+          keymanweb.doBeforeKeyboardChange(kbd['KI'],kbdStub['KLC']);
+          keymanweb._ActiveKeyboard=kbd;
+
+          if(keymanweb._LastActiveElement != null) 
+          {
+            keymanweb._JustActivatedKeymanWebUI = 1;
+            keymanweb._SetTargDir(keymanweb._LastActiveElement);            
+          }
+
+          String.kmwEnableSupplementaryPlane(kbdStub && ((kbdStub['KS'] && (kbdStub['KS'] == 1)) || (kbd['KN'] == 'Hieroglyphic'))); // I3319 - SMP extension, I3363 (Build 301)
+          keymanweb.saveCurrentKeyboard(kbd['KI'],kbdStub['KLC']);
+        
+          // Prepare and show the OSK for this keyboard
+          osk._Load();
+
+          // Remove the wait message, if defined
+          if(typeof (util.wait) == 'function') {
+            util.wait(false);
+          }
+        } // A handler portion for cases where the new <script> block loads, but fails to process.
+      } else if(!keymanweb.embedded) {  // Do not output error messages when embedded.  (KMEA/KMEI)
+          kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.');
+          console.log('Error registering the', kbdName, 'keyboard for', kbdLang + '.');
+      }
+      kbdStub.asyncLoader = null; 
+    }, false);
+
+    // IE likes to instantly start loading the file when assigned to an element, so we do this after the rest
+    // of our setup.
+    Lscript.src = keymanweb.getKeyboardPath(kbdFile);  
+
     try {                                  
       document.body.appendChild(Lscript);  
       }
     catch(ex) {                                                     
       document.getElementsByTagName('head')[0].appendChild(Lscript);
       }            
+  }
+
+  /**
+   * Function     _getKeyboardByID
+   * Scope        Private
+   * @param       {string}  keyboardID
+   * @return      {Object|null}
+   * Description  Returns the internal, registered keyboard object - not the stub, but the keyboard itself.
+   */
+  keymanweb._getKeyboardByID = function(keyboardID) {
+    var Li;
+    for(Li=0; Li<keymanweb._Keyboards.length; Li++) {
+      if(keyboardID == keymanweb._Keyboards[Li]['KI']) {
+        return keymanweb._Keyboards[Li];
+      }
+    }
+
+    return null;
   }
 
   /**

@@ -17,6 +17,9 @@
   // Force full initialization
   keymanweb.fullInitialization = true;  
 
+  // Explicitly marks that KeymanWeb is in native mode.
+  keymanweb.embedded = false;  
+
   /**
    * Set default device options
    * @param {Object}  opt device options object
@@ -87,29 +90,6 @@
   {           
     var rx=RegExp('^(([\.]/)|([\.][\.]/)|(/))|(:)');   
     return (rx.test(Lfilename) ? '' : keymanweb.options['keyboards']) + Lfilename;
-  }
-   
- /**
-  * Notify the user if a requested keyboard fails to load
-  * 
-  * @param  {Object}  Ln  keyboard stub object    
-  */    
-  keymanweb.keyboardUnavailable = function(Ln)
-  {
-    return window.setTimeout(function() {
-        util.wait(false);
-        var Ps=keymanweb._KeyboardStubs[Ln],kbdName=Ps['KN'],lgName=Ps['KL'];
-        kbdName=kbdName.replace(/\s*keyboard\s*/i,'');
-        util.alert('Sorry, the '+kbdName+' keyboard for '+lgName+' is not currently available!', function() { 
-          keymanweb['setActiveKeyboard']('');
-        });
-
-        // Restore base keyboard if requested keyboard doesn't load
-        if(Ln > 0) {         
-          Ps=keymanweb._KeyboardStubs[0];
-          keymanweb._SetActiveKeyboard(Ps['KI'],Ps['KLC'],true);
-        }
-      }, 10000);
   }
   
   /**

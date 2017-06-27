@@ -72,13 +72,6 @@
    */    
   keymanweb['KR'] = keymanweb.KR = function(Pk)
   {
-    // Clear the load failure timer, but only if this is the keyboard
-    // that is currently pending (KMEW-101)
-    if(keymanweb.loadTimer && (Pk['KI'] == keymanweb._LoadingInternalName))
-    {
-        window.clearTimeout(keymanweb.loadTimer); keymanweb.loadTimer=null;
-    }
-
     // If initialization not yet complete, list the keyboard to be registered on completion of initialization
     if(!keymanweb['initialized'])
     {          
@@ -103,10 +96,6 @@
     // Build 369: ensure active stub defined when loading local keyboards 
     if(keymanweb._ActiveStub == null && Ps != null) keymanweb._ActiveStub = Ps;  
     
-    // The following should never be needed or even appropriate - the keyboard object does not
-    // override stub information, but simply adds to it.  The stub contains meta-data which either
-    // overriddes or extends the keyboard object data.  (Sept 2014)
-    
     // Register the stub for this language (unless it is already registered)
     // keymanweb.KRS(Ps?Ps:Pk); 
 
@@ -119,44 +108,8 @@
     // Append to keyboards array
     keymanweb._Keyboards=keymanweb._push(keymanweb._Keyboards,Pk);
 
-    if(keymanweb._LoadingInternalName == Pk['KI']) 
-    {   
-      keymanweb.doBeforeKeyboardChange(Pk['KI'],Ps['KLC']);
-      keymanweb._ActiveKeyboard=Pk;
-
-      if(keymanweb._LastActiveElement != null) 
-      {
-        keymanweb._JustActivatedKeymanWebUI = 1;
-        keymanweb._SetTargDir(keymanweb._LastActiveElement);            
-      }
-      keymanweb._LoadingInternalName = null;
-      
-      // Copy remaining properties from stub --TODO: this is not right, the keyboard does NOT have these properties
-      Pk['KL'] = typeof Ps['KL'] != 'undefined' ? Ps['KL'] : '';  // I1300 - Language support, I2309 - errors loading keyboards without all K?? properties defined
-      Pk['KLC'] = typeof Ps['KLC'] != 'undefined' ? Ps['KLC'] : '';
-      Pk['KR'] = typeof Ps['KR'] != 'undefined' ? Ps['KR'] : '';
-      Pk['KRC'] = typeof Ps['KRC'] != 'undefined' ? Ps['KRC'] : '';
-      Pk['KC'] = typeof Ps['KC'] != 'undefined' ? Ps['KC'] : '';
-      Pk['KCC'] = typeof Ps['KCC'] != 'undefined' ? Ps['KCC'] : '';
-      Pk['KD'] = typeof Ps['KD'] != 'undefined' ? Ps['KD'] : '';  
-      Pk['KS'] = typeof Ps['KS'] != 'undefined' ? Ps['KS'] : 0; //I3319     
-    
-      String.kmwEnableSupplementaryPlane(Ps && ((Ps['KS'] && (Ps['KS'] == 1)) || (Pk['KN'] == 'Hieroglyphic'))); // I3319 - SMP extension, I3363 (Build 301)
-      keymanweb.saveCurrentKeyboard(Pk['KI'],Ps['KLC']);
-    
-      // Prepare and show the OSK for this keyboard
-      osk._Load();
-
-      // Remove the wait message, if defined
-      if(typeof (util.wait) == 'function') util.wait(false);
-    }
-   
     // Execute any external (UI) code needed after loading keyboard
     keymanweb.doKeyboardLoaded(Pk['KI']);
-    
-    // Should not pending keyboard name here, as that prevents a subsequently 
-    // selected keyboard from loading (KMW-101)
-    //keymanweb._LoadingInternalName = null;
   }
 
   /**
