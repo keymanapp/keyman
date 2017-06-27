@@ -3098,7 +3098,7 @@
         console.log('Error:  cannot find the', kbdName, 'keyboard for', kbdLang, 'at', kbdFile + '.');
       }
       kbdStub.asyncLoader = null;
-    }, true);
+    }, false);
 
     
     // The load event will activate a newly-loaded keyboard if successful and report an error if it is not.
@@ -3141,7 +3141,7 @@
           console.log('Error registering the', kbdName, 'keyboard for', kbdLang + '.');
       }
       kbdStub.asyncLoader = null; 
-    }, true);
+    }, false);
 
     // IE likes to instantly start loading the file when assigned to an element, so we do this after the rest
     // of our setup.
