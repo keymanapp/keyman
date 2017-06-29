@@ -454,18 +454,22 @@
    *  @param  {number}  code   key identifier
    *  @param  {number}  shift  shift state (0x10=shift 0x20=ctrl 0x40=alt)
    **/            
-  keymanweb['executeHardwareKeystroke'] = function(code, shift)
-  {              
-      if(!keymanweb._ActiveKeyboard || code == 0) {
-        return false;
-      }
-      var cachedTouchable = device.touchable, cachedFormFactor = device.formFactor;
-      device.touchable = false;
-      device.formFactor = 'desktop'; 
-      var result = keymanweb.executeHardwareKeystrokeInternal(code, shift);
-      device.touchable = cachedTouchable; 
-      device.formFactor = cachedFormFactor;
-      return result;
+  keymanweb['executeHardwareKeystroke'] = function(code, shift) {              
+    if(!keymanweb._ActiveKeyboard || code == 0) {
+      return false;
+    }
+    var cachedTouchable = device.touchable, cachedFormFactor = device.formFactor;
+    var result = false; // Signals if we successfully handled the keystroke.
+    device.touchable = false;
+    device.formFactor = 'desktop'; 
+    try {
+      result = keymanweb.executeHardwareKeystrokeInternal(code, shift);
+    } catch (err) {
+      console.error(err.message, err);
+    }
+    device.touchable = cachedTouchable; 
+    device.formFactor = cachedFormFactor;
+    return result;
   };
   
   /**
@@ -510,7 +514,7 @@
         keymanweb.KO(0, Lelem, '\n');
         return true;
       }
-      var ch = osk.defaultKeyOutput('', Lkc.Lcode, shift);
+      var ch = osk.defaultKeyOutput('', Lkc.Lcode, shift / 0x10);
       if(ch) {
         keymanweb.KO(0, Lelem, ch);                     
         return true;
