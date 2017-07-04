@@ -6,7 +6,7 @@
 // If a UI module has been loaded, we can rely on the publically-published 'name' property
 // having been set as a way to short-out a UI reload.  Its parent object always exists by
 // this point in the build process.
-if(!window['tavultesoft']['keymanweb']['util']['name']) { 
+if(!window['tavultesoft']['keymanweb']['ui']['name']) { 
   /********************************/
   /*                              */
   /* Toggle User Interface Code   */
