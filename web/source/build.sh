@@ -1,3 +1,4 @@
+#! /bin/bash
 # 
 # Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 #
