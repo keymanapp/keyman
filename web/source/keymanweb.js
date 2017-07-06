@@ -813,60 +813,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
 
       /**
-       * Function     isKMWInput
-       * Scope        Private
-       * @param       {Element}   x   An element from the page.
-       * @return      {boolean}      true if the element accepts touch input.
-       * Description  Examines potential input elements to determine their classification re: touch handling.
-       */ 
-      keymanweb.isKMWInput = function(x) {
-        var c, lcTagName = x.tagName.toLowerCase();
-
-        // In case this function is called more than once on the same element, we need a quick out.
-        if(x.kmwInput) return x.kmwInput;
-
-        if(lcTagName == 'textarea') {
-          c = x.className;
-          x.kmwInput=false;
-          if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) { 
-            x.disabled=true; x.kmwInput=true; 
-          }
-        } else if(lcTagName == 'input') {
-          c=x.className;
-          x.kmwInput=false;                
-          if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) {
-            if(x.type == 'text' || x.type == 'search') {
-              x.disabled=true; x.kmwInput=true;       
-            } 
-          }
-        } 
-
-        return x.kmwInput;     
-      }
-
-      /**
-       * Function     setupTouchPage
-       * Scope        Private
-       * Description  Saves the list of static inputs for touch devices (touch-based browsers, mobile) and
-       *              and completes their setup.
-       */  
-      keymanweb.setupTouchPage = function() {
-        // Initialize and protect input elements for touch-screen devices (but never for apps)
-        // NB: now set disabled=true rather than readonly, since readonly does not always 
-        // prevent element from getting focus, e.g. within a LABEL element.
-        // c.f. http://kreotekdev.wordpress.com/2007/11/08/disabled-vs-readonly-form-fields/ 
-
-        var ipList = [].concat(
-          util.arrayFromNodeList(document.getElementsByTagName('input')),
-          util.arrayFromNodeList(document.getElementsByTagName('textarea'))
-        );
-    
-        for(var n=0;n<ipList.length;n++) { 
-          keymanweb.setupTouchElement(ipList[n]);
-        }
-      }
-
-      /**
        * Function     setupTouchElement
        * Scope        Private
        * @param       {Element}  Pelem   An input or textarea element from the page.
@@ -888,8 +834,16 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         }
 
         if(!keymanweb.isKMWInput(Pelem)) {
-            keymanweb.setupNonKMWTouchElement(Pelem);
-            return false;
+          Pelem.kmwInput = false;
+          keymanweb.setupNonKMWTouchElement(Pelem);
+          return false;
+        } else {
+          // Initialize and protect input elements for touch-screen devices (but never for apps)
+          // NB: now set disabled=true rather than readonly, since readonly does not always 
+          // prevent element from getting focus, e.g. within a LABEL element.
+          // c.f. http://kreotekdev.wordpress.com/2007/11/08/disabled-vs-readonly-form-fields/ 
+          Pelem.disabled = true;
+          Pelem.kmwInput = true;
         }
 
         /*
@@ -1107,8 +1061,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             osk.hideNow();
           },false);
       }
-      
-      keymanweb.setupTouchPage();
     }
     
     /*********************************************************
@@ -1118,21 +1070,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *********************************************************/
     
     /**
-     * Function     setupDesktopPage
-     * Scope        Private
-     * Description  Save list of inputs for non-touch devices (desktop browsers)
-     * 
-     * @suppress    {checkTypes}
-     */       
-    keymanweb.setupDesktopPage = function() { 
-      var ipList = [].concat(
-        util.arrayFromNodeList(document.getElementsByTagName('input')),
-        util.arrayFromNodeList(document.getElementsByTagName('textarea'))
-      );
-      ipList.forEach(keymanweb.setupDesktopElement);
-    };  
-
-    /**
      * Function     setupDesktopElement
      * Scope        Private
      * @param       {Element}   Pelem  An element from the document to be touch-enabled.
@@ -1141,26 +1078,13 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return   {boolean}
      */       
     keymanweb.setupDesktopElement = function(Pelem) { 
-      var lcTagName = Pelem.tagName.toLowerCase();
-      // If it's not one of these, we don't need to hook the OSK into it.
-      if(!(lcTagName == "input" || lcTagName == "textarea")) {
-        return false;
-      }
-
-      if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly)
-      {
-        var index = keymanweb.inputList.indexOf(Pelem);
-        if(index != -1) {
-          return false;
-        }
-
+      if(keymanweb.isKMWInput(Pelem)) {
         Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
-
         keymanweb.inputList.push(Pelem);
         return true;
+      } else {
+        return false;
       }
-
-      return false;
     }; 
 
     /**
@@ -1922,7 +1846,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
               }
             }
             else {
-              keymanweb._AttachToControls(Lelem);
+              // Lelem is the IFrame's internal document; set 'er up!
+              keymanweb._SetupDocument(Lelem);
             }
           }
           else
@@ -1938,7 +1863,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             }
             else
             {
-              keymanweb._AttachToControls(Lelem);	   // I2404 - Manage IE events in IFRAMEs
+              // Lelem is the IFrame's internal document; set 'er up!
+              keymanweb._SetupDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
             }
           }
         }
@@ -3356,15 +3282,66 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     
     // Attach this handler to window unload event  
     util.attachDOMEvent(window, 'unload', keymanweb._WindowUnload,false);  // added fourth argument (default value)
-                
+
     /**
-     * Function     _AttachToControls
+     * Function     isKMWInput
      * Scope        Private
-     * Parameters   {Object}    Pelem    element  
-     * Description  Attach KMW to editable controls
-     */    
-    keymanweb._AttachToControls = function(Pelem)    // I1961
-    {
+     * @param       {Element}   x   An element from the page.
+     * @return      {boolean}      true if the element accepts touch input.
+     * Description  Examines potential input elements to determine whether or not they are viable for KMW attachment.
+     *              Also filters elements not supported for touch devices when device.touchable == true.
+     */ 
+    keymanweb.isKMWInput = function(x) {
+      var c, lcTagName = x.tagName.toLowerCase();
+
+      // In case this function is called more than once on the same element, we need a quick out.
+      if("kmwInput" in x) {
+        return x.kmwInput;
+      }
+
+      if(lcTagName == 'textarea') {
+        c = x.className;
+        x.kmwInput=false;
+        if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) { 
+          return x.kmwInput = true;
+        }
+      } else if(lcTagName == 'input' && x.type.toLowerCase() == 'text') {
+        c=x.className;
+        x.kmwInput=false;                
+        if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) {
+          if(x.type == 'text' || x.type == 'search') {
+            return x.kmwInput = true;  
+          } 
+        }
+      } else if(lcTagName == 'iframe' && !device.touchable) {
+        c = x.className;
+        x.kmwInput=false;
+        if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) { 
+          try {
+            if(x.contentWindow.document) {
+              return x.kmwInput = true;
+            }
+          }
+          catch(err) { /* Do not attempt to access iframes outside this site */ }
+        }
+      } else if(x.isContentEditable && !device.touchable) {
+        c = x.className;
+        x.kmwInput=false;
+        if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) { 
+          return x.kmwInput = true;
+        }
+      }
+
+      return x.kmwInput;     
+    }
+
+    /**
+     * Function     _SetupDocument
+     * Scope        Private
+     * Parameters   {Element}     Pelem - the root element of a document, including IFrame documents.
+     * Description  Used to automatically attach KMW to editable controls, regardless of control path.
+     */
+    keymanweb._SetupDocument = function(Pelem) { // I1961
       /**
        * Function     LiTmp
        * Scope        Private
@@ -3372,39 +3349,55 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
        * @return      {Array}               array of elements of specified type                       
        * Description  Local function to get list of editable controls
        */    
-      var LiTmp = function(_colon){return Pelem.getElementsByTagName(_colon);};
+      var LiTmp = function(_colon){
+        return Pelem.getElementsByTagName(_colon);
+      };
 
-      // If the element Pelem has any child elements, we wish to analyze those.
-      var Linputs = LiTmp('INPUT'), 
-        Ltextareas = LiTmp('TEXTAREA'), 
-        Lframes = LiTmp('IFRAME'),
-        Lce = document.evaluate ? document.evaluate('//*[@contenteditable and @contenteditable != "false"]', document, null, XPathResult.ANY_TYPE, null) : null;	// I2457 - support contentEditable elements in mozilla, webkit
+      var possibleInputs = [].concat(
+        util.arrayFromNodeList(LiTmp('INPUT')),
+        util.arrayFromNodeList(LiTmp('TEXTAREA')),
+        util.arrayFromNodeList(LiTmp('IFRAME'))  // Note that isKMWInput() will block these for touch-based devices.
+      );
+      
+      // These are unfortunately accessed via iterator, not array.  Also blocked for touch by isKMWInput().
+      var Lce = util.arrayFromNodeList(document.evaluate 
+          ? document.evaluate('//*[@contenteditable and @contenteditable != "false"]', document, null, XPathResult.ANY_TYPE, null) 
+          : null) // I2457 - support contentEditable elements in mozilla, webkit
 
-      for(var Li = 0; Li < Linputs.length; Li++)
-        if(Linputs[Li].type.toLowerCase() == 'text') keymanweb.attachToControl(Linputs[Li]);        
-      
-      for(Li = 0; Li < Ltextareas.length; Li++)
-        keymanweb.attachToControl(Ltextareas[Li]);
-      
-      for(Li = 0; Li < Lframes.length; Li++)
-        try {
-          if(Lframes[Li].contentWindow.document)
-            keymanweb._AttachToIframe(Lframes[Li]);
-        }
-        catch(err) { /* Do not attempt to access iframes outside this site */ }
-        
-      if(Lce)  // I2457 - support contentEditable elements in mozilla, webkit
-      {
-        for (var Lc = Lce.iterateNext(); Lc; Lc = Lce.iterateNext())
-        {
-          keymanweb.attachToControl(Lc);
+      if(Lce) { // I2457 - support contentEditable elements in mozilla, webkit
+        if("iterateNext" in Lce) { // Is sometimes not on mobile solutions.
+          for (var Lc = Lce.iterateNext(); Lc; Lc = Lce.iterateNext()) {
+            possibleInputs.push(Lc);
+          }
+        } else if(Array.isArray(Lce)) { // happens in Chrome mobile emulation.
+          possibleInputs.concat(Lce);
         }
       }
 
-      // Attach keymanweb-input DIV elements  I3363 (Build 301)
-      for(Li = 0; Li<keymanweb.inputList.length; Li++)
-      {
-        keymanweb.attachToControl(keymanweb.inputList[Li]);
+      var editableControls = [];
+
+      for(var Li = 0; Li < possibleInputs.length; Li++) {
+        if(keymanweb.isKMWInput(possibleInputs[Li])) {
+          editableControls.push(possibleInputs[Li]);
+        }
+      }
+
+      // Okay, all we're left with are editable controls!  Time to set 'em up!
+      for(Li = 0; Li < editableControls.length; Li++) {
+        // IFrames require special, additional setup.
+        if(editableControls[Li].tagName.toLowerCase == 'iframe') {
+          keymanweb._AttachToIframe(editableControls[Li]);
+        } else {
+          // TODO:  Actually set 'em up!
+          if(device.touchable) {
+            // Setup via touch-based route.
+            keymanweb.setupTouchElement(editableControls[Li]);
+          } else {
+            // Setup via desktop route.
+            keymanweb.setupDesktopElement(editableControls[Li]);
+            keymanweb.attachToControl(editableControls[Li]);
+          }
+        }
       }
     }
     
@@ -3576,9 +3569,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if (window.removeEventListener)
         window.removeEventListener('focus', keymanweb._BubbledFocus, true);
     
-      if(keymanweb.options['attachType'] != 'manual')
-        keymanweb._AttachToControls(document);  // I1961
-
       // Set exposed initialization flag member for UI (and other) code to use 
       keymanweb['initialized'] = 1;
   
@@ -3608,19 +3598,20 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       // Determine the default font for mapped elements
       keymanweb.appliedFont=keymanweb.baseFont=keymanweb.getBaseFont();
 
-      // Create an ordered list of all input and textarea fields
-      keymanweb.listInputs();
-      
       // Add orientationchange event handler to manage orientation changes on mobile devices
       // Initialize touch-screen device interface  I3363 (Build 301)
       if(device.touchable) {
         keymanweb.handleRotationEvents();
         keymanweb.setupTouchDevice();
       }    
+      // Initialize browser interface
 
-      // Initialize desktop browser interface
-      else 
-        keymanweb.setupDesktopPage();
+      if(keymanweb.options['attachType'] != 'manual') {
+        keymanweb._SetupDocument(document);
+      }
+
+      // Create an ordered list of all input and textarea fields
+      keymanweb.listInputs();
     
       // Initialize the OSK and set default OSK styles
       // Note that this should *never* be called before the OSK has been initialized.
@@ -3811,9 +3802,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     keymanweb._MutationAdditionObserved = function(Pelem) {
       if(!device.touchable) {
         // keymanweb.attachToControl is written to handle iframes, but setupDesktopElement is not.
-        if(keymanweb.setupDesktopElement(Pelem)) {
-          keymanweb.attachToControl(Pelem);
-        } else if(Pelem.tagName.toLowerCase() == 'iframe') {
+        if(Pelem.tagName.toLowerCase() == 'iframe') {
           //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
 
           var attachFunctor = function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
@@ -3831,7 +3820,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           if(Pelem.contentDocument.readyState == 'complete') {
             attachFunctor();
           }
-        }
+        } else if(keymanweb.setupDesktopElement(Pelem)) {
+          keymanweb.attachToControl(Pelem);
+        }  
       } else {
         keymanweb.setupTouchElement(Pelem);
       }
