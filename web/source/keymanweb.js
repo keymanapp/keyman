@@ -1089,8 +1089,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         if(Pelem.tagName.toLowerCase() == 'iframe') 
           keymanweb._AttachToIframe(Pelem);
         else
-        {     
-          Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
+        { 
+          if(isAlias) {
+            Pelem['base'].className = Pelem['base'].className ? Pelem['base'].className + ' keymanweb-font' : 'keymanweb-font';
+          } else {
+            Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
+          }
           keymanweb.inputList.push(Pelem);
 
           util.attachDOMEvent(Pelem,'focus', keymanweb._ControlFocus);
