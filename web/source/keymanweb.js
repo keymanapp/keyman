@@ -834,7 +834,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         }
 
         if(!keymanweb.isKMWInput(Pelem)) {
-          Pelem.kmwInput = false;
           keymanweb.setupNonKMWTouchElement(Pelem);
           return false;
         } else {
@@ -868,13 +867,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         x['base']=x.base=Pelem;
         
         // Set font for base element
-        x.base.className = x.base.className ? x.base.className + ' keymanweb-font' : 'keymanweb-font';
+        keymanweb.setupInputElement(x, true);
 
         // Add the exposed member 'kmw_ip' to allow page to refer to duplicated element
         Pelem['kmw_ip']=x;
-
-        // Make sure the element's on the list of registered inputs.  It can't NOT be, so we're fine.
-        keymanweb.inputList.push(x);
 
         // Superimpose custom input fields for each input or textarea, unless readonly or disabled 
 
@@ -1070,17 +1066,40 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *********************************************************/
     
     /**
-     * Function     setupDesktopElement
+     * Function     setupInputElement
      * Scope        Private
-     * @param       {Element}   Pelem  An element from the document to be touch-enabled.
-     * Description  Setup one element for non-touch devices and add it to the inputList if it is an input element (desktop browsers).
+     * @param       {Element}   Pelem   An element from the document to be setup for attachment.
+     * @param       {boolean}   isAlias A flag that indicates if the element is a simulated input element for touch.
+     * Description  Performs the basic attachment setup for one element and adds it to the inputList if it is an input element.
      *              Only returns true if the element is a valid input for keymanweb and it is not presently tracked as an input element.
-     * @return   {boolean}
+     *              Note that this method is called for both desktop and touch control routes; the touch route calls it from within
+     *              setupTouchElement as it must first establish the simulated touch element to serve as the alias "input element" here.
      */       
-    keymanweb.setupDesktopElement = function(Pelem) { 
-      if(keymanweb.isKMWInput(Pelem)) {
-        Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
-        keymanweb.inputList.push(Pelem);
+    keymanweb.setupInputElement = function(Pelem, isAlias) { 
+      if(keymanweb.isKMWInput(isAlias ? Pelem['base'] : Pelem)) {
+        // Check that the element is neither readonly nor disabled for KeymanWeb
+        var ro=Pelem.attributes['readonly'], cn=Pelem.className;
+        if(typeof ro == 'object' && ro.value != 'false' ) {
+          return; // Don't attach our hooks if we're read-only!
+        }
+        if(typeof cn == 'string' && cn.indexOf('kmw-disabled') >= 0) {
+          return; // Don't attach our hooks if we're disabled!
+        }
+          
+        if(Pelem.tagName.toLowerCase() == 'iframe') 
+          keymanweb._AttachToIframe(Pelem);
+        else
+        {     
+          Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
+          keymanweb.inputList.push(Pelem);
+
+          util.attachDOMEvent(Pelem,'focus', keymanweb._ControlFocus);
+          util.attachDOMEvent(Pelem,'blur', keymanweb._ControlBlur);
+          Pelem.onkeypress = keymanweb._KeyPress;
+          Pelem.onkeydown = keymanweb._KeyDown;
+          Pelem.onkeyup = keymanweb._KeyUp;      
+        }
+
         return true;
       } else {
         return false;
@@ -1795,21 +1814,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */  
     keymanweb['attachToControl'] = keymanweb.attachToControl = function(Pelem)
     {
-      // Check that the element is neither readonly nor disabled for KeymanWeb
-      var ro=Pelem.attributes['readonly'],cn=Pelem.className;
-      if(typeof ro == 'object' && ro.value != 'false' ) return; 
-      if(typeof cn == 'string' && cn.indexOf('kmw-disabled') >= 0) return; 
-
-      if(Pelem.tagName.toLowerCase() == 'iframe') 
-        keymanweb._AttachToIframe(Pelem);
-      else
-      {     
-        util.attachDOMEvent(Pelem,'focus', keymanweb._ControlFocus);
-        util.attachDOMEvent(Pelem,'blur', keymanweb._ControlBlur);
-        Pelem.onkeypress = keymanweb._KeyPress;
-        Pelem.onkeydown = keymanweb._KeyDown;
-        Pelem.onkeyup = keymanweb._KeyUp;      
-      }
+      /* This commit's edit is solely to refactor the old version of 'attachToControl' somewhere safe
+       * (i.e., setupInputElement) so that the new version can be implemented without worry.                                
+       */
+      keymanweb.setupInputElement(Pelem);
     }
         
     /**
@@ -3394,8 +3402,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             keymanweb.setupTouchElement(editableControls[Li]);
           } else {
             // Setup via desktop route.
-            keymanweb.setupDesktopElement(editableControls[Li]);
-            keymanweb.attachToControl(editableControls[Li]);
+            keymanweb.setupInputElement(editableControls[Li]);
           }
         }
       }
@@ -3757,14 +3764,18 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           }
 
           for(var k = 0; k < inputElementAdditions.length; k++) {
-            keymanweb._MutationAdditionObserved(inputElementAdditions[k]);
+            if(keymanweb.isKMWInput(inputElementAdditions[k])) { // Apply standard element filtering!
+              keymanweb._MutationAdditionObserved(inputElementAdditions[k]);
+            }
           }
 
           for(k = 0; k < inputElementRemovals.length; k++) {
-            keymanweb._MutationRemovalObserved(inputElementRemovals[k]);
+            if(keymanweb.isKMWInput(inputElementAdditions[k])) { // Apply standard element filtering!
+              keymanweb._MutationRemovalObserved(inputElementRemovals[k]);
+            }
           }
 
-          /* After all mutations have been handled, we need to recompile our .sortedInputs array, but only.
+          /* After all mutations have been handled, we need to recompile our .sortedInputs array, but only
             * if any have actually occurred.
             */
           if(inputElementAdditions.length || inputElementRemovals.length) {
@@ -3801,7 +3812,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */
     keymanweb._MutationAdditionObserved = function(Pelem) {
       if(!device.touchable) {
-        // keymanweb.attachToControl is written to handle iframes, but setupDesktopElement is not.
         if(Pelem.tagName.toLowerCase() == 'iframe') {
           //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
 
@@ -3820,8 +3830,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           if(Pelem.contentDocument.readyState == 'complete') {
             attachFunctor();
           }
-        } else if(keymanweb.setupDesktopElement(Pelem)) {
-          keymanweb.attachToControl(Pelem);
+        } else {
+          keymanweb.setupInputElement(Pelem);
         }  
       } else {
         keymanweb.setupTouchElement(Pelem);
