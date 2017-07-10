@@ -28,16 +28,15 @@ WEB_OUTPUT="../output"
 EMBED_OUTPUT="../embedded"
 SOURCE="."
 
-# If we're on Windows/msys, like with the Windows-based git shell, the `cp` command nests the copied
-# folder within the full path specified, rather than inserting the contents into the destination folder
-# as if renaming the original.
+# If we're on Mac OS X, the `cp` command doesn't like to create a new folder mirroring the original of a
+# cp -R command, dumping its contents into the destination folder rather than a new, copied subfolder.
 #
-# The RESOURCES variable is used to conditionally remove the nesting behavior if on Windows.
+# The RESOURCES variable is used to compensate for this behavior when necessary.
 # Expand this section if necessary for other shells.
-if [ $OSTYPE = "msys" ]; then
-    resources=""
-else
+if [ $OSTYPE = "darwin16" ]; then
     resources="resources/"
+else
+    resources=""
 fi
 
 readonly WEB_OUTPUT
