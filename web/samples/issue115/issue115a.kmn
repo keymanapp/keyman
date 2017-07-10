@@ -1,0 +1,12 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'Issue 115 - test default keyboard construction'
+store(&TARGETS) 'windows web'
+store(&VISUALKEYBOARD) 'issue115a.kvks'
+store(&LAYOUTFILE) 'issue115a-layout.js'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ [K_A] > 'a-key'
++ [SHIFT K_B] > 'shift b-key'
