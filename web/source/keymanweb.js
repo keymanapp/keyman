@@ -1819,6 +1819,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             keymanweb.setupNonKMWTouchElement(Pelem);
           }
         }
+      } else if(device.touchable) {
+        keymanweb.setupNonKMWTouchElement(Pelem);
       }
     }
         
@@ -3412,38 +3414,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         }
       }
 
-      var attachableControls = [];
 
       for(var Li = 0; Li < possibleInputs.length; Li++) {
         var input = possibleInputs[Li];
 
-        if(keymanweb.isKMWInput(input)) {
-          attachableControls.push(input);
-        } else if(device.touchable) {
-          keymanweb.setupNonKMWTouchElement(input);
-        }
-      }
-
-      // Okay, all we're left with are editable controls!  Time to set 'em up!
-      for(Li = 0; Li < attachableControls.length; Li++) {
-        var control = attachableControls[Li];
-        keymanweb.setupElementAttachment(control);
-        // IFrames require special, additional setup.
-        if(control.tagName.toLowerCase == 'iframe') {
-          keymanweb._AttachToIframe(control);
-        } else if(!keymanweb.isKMWDisabled(control)) { // Enable what ought be enabled.
-          if(device.touchable) {
-            // Enable via touch-based route.
-            keymanweb.enableTouchElement(control);
-          } else {
-            // Enable via desktop route.
-            keymanweb.enableInputElement(control);
-          } 
-        } else { // Do any attached-but-disabled handling necessary.
-          if(device.touchable) {
-            keymanweb.setupNonKMWTouchElement(control);
-          }
-        }
+        // It knows how to handle pre-loaded iframes appropriately.
+        keymanweb.attachToControl(possibleInputs[Li]);
       }
     }
     
