@@ -3306,45 +3306,36 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     keymanweb.isKMWInput = function(x) {
       var c, lcTagName = x.tagName.toLowerCase();
 
-      // In case this function is called more than once on the same element, we need a quick out.
-      if("kmwInput" in x) {
-        return x.kmwInput;
-      }
-
       if(lcTagName == 'textarea') {
         c = x.className;
-        x.kmwInput=false;
         if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) { 
-          return x.kmwInput = true;
+          return true;
         }
       } else if(lcTagName == 'input' && x.type.toLowerCase() == 'text') {
-        c=x.className;
-        x.kmwInput=false;                
+        c=x.className;              
         if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) {
           if(x.type == 'text' || x.type == 'search') {
-            return x.kmwInput = true;  
+            return true;  
           } 
         }
       } else if(lcTagName == 'iframe' && !device.touchable) {
         c = x.className;
-        x.kmwInput=false;
         if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) { 
           try {
             if(x.contentWindow.document) {
-              return x.kmwInput = true;
+              return true;
             }
           }
           catch(err) { /* Do not attempt to access iframes outside this site */ }
         }
       } else if(x.isContentEditable && !device.touchable) {
         c = x.className;
-        x.kmwInput=false;
         if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) { 
-          return x.kmwInput = true;
+          return true;
         }
       }
 
-      return x.kmwInput;     
+      return false;     
     }
 
     /**
@@ -3391,6 +3382,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       for(var Li = 0; Li < possibleInputs.length; Li++) {
         if(keymanweb.isKMWInput(possibleInputs[Li])) {
           editableControls.push(possibleInputs[Li]);
+        }
+        else if(device.touchable) {
+          keymanweb.setupNonKMWTouchElement(possibleInputs[Li]);
         }
       }
 
