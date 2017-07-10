@@ -116,7 +116,15 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */    
     legacy['DisableControl'] = function(Pelem)
     {
-      keymanweb.DisableControl(Pelem);
+      if(!Pelem._kmwAttachment || !Pelem._kmwAttachment.legacy) {
+        var Lc = {LControl:Pelem, LEnabled:0, LDefaultInternalName:'-'};
+        keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+        if(Pelem._kmwAttachment) {
+          Pelem._kmwAttachment.legacy = Lc;
+        }
+      } else {
+        Pelem._kmwAttachment.legacy.LEnabled = 0;
+      }
     }
 
     /**
@@ -128,7 +136,15 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */    
     legacy['EnableControl'] = function(Pelem)
     {
-      keymanweb.EnableControl(Pelem);
+      if(!Pelem._kmwAttachment || !Pelem._kmwAttachment.legacy) {
+        var Lc = {LControl:Pelem, LEnabled:1, LDefaultInternalName:'-'};
+        keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+        if(Pelem._kmwAttachment) {
+          Pelem._kmwAttachment.legacy = Lc;
+        }
+      } else {
+        Pelem._kmwAttachment.legacy.LEnabled = 1;
+      }
     }
     
     /**
