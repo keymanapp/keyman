@@ -28,9 +28,22 @@ WEB_OUTPUT="../output"
 EMBED_OUTPUT="../embedded"
 SOURCE="."
 
+# If we're on Windows/msys, like with the Windows-based git shell, the `cp` command nests the copied
+# folder within the full path specified, rather than inserting the contents into the destination folder
+# as if renaming the original.
+#
+# The RESOURCES variable is used to conditionally remove the nesting behavior if on Windows.
+# Expand this section if necessary for other shells.
+if [ $OSTYPE = "msys" ]; then
+    resources=""
+else
+    resources="resources/"
+fi
+
 readonly WEB_OUTPUT
 readonly EMBED_OUTPUT
 readonly SOURCE
+readonly resources
 
 # Get build version -- if not building in TeamCity, then always use 300
 : ${BUILD_COUNTER:=300}
@@ -142,7 +155,7 @@ if [ $BUILD_EMBED = true ]; then
     # Update any changed resources
 
     # echo Copy or update resources
-    cp -R $SOURCE/resources/ $EMBED_OUTPUT/ >/dev/null
+    cp -R $SOURCE/resources/ $EMBED_OUTPUT/$resources >/dev/null
 
     # Update build number if successful
     echo
@@ -187,14 +200,23 @@ fi
 if [ $BUILD_FULLWEB = true ]; then
     echo 
     echo Copy resources to $WEB_OUTPUT/ui, .../osk
-    cp -R $SOURCE/resources/ui/  $WEB_OUTPUT/  >/dev/null
-    cp -R $SOURCE/resources/osk/ $WEB_OUTPUT/ >/dev/null
+
+    if [ -z $resources ]; then  #if the string is empty.
+        ui=""
+        osk=""
+    else
+        ui=ui/
+        osk=osk/
+    fi
+
+    cp -R $SOURCE/resources/ui/  $WEB_OUTPUT/$ui  >/dev/null
+    cp -R $SOURCE/resources/osk/ $WEB_OUTPUT/$osk  >/dev/null
 
     echo Copy source to $WEB_OUTPUT/src
     cp -R $SOURCE/*.js $WEB_OUTPUT/src
     echo $BUILD > $WEB_OUTPUT/src/version.txt
-    cp -R $SOURCE/resources/ui/  $WEB_OUTPUT/src/ >/dev/null
-    cp -R $SOURCE/resources/osk/ $WEB_OUTPUT/src/ >/dev/null
+    cp -R $SOURCE/resources/ui/  $WEB_OUTPUT/src/$ui >/dev/null
+    cp -R $SOURCE/resources/osk/ $WEB_OUTPUT/src/$osk >/dev/null
 
     # Update build number if successful
     echo
