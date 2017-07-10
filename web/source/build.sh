@@ -60,6 +60,7 @@ compilecmd="$JAVA -jar $compiler"
 if ! [ -f $compiler ];
 then
     echo File $compiler does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?
+    exit 1
 fi
 
 readonly compiler
@@ -155,7 +156,8 @@ if [ $BUILD_EMBED = true ]; then
     # Update any changed resources
 
     # echo Copy or update resources
-    cp -R $SOURCE/resources/ $EMBED_OUTPUT/$resources >/dev/null
+
+    cp -Rf $SOURCE/resources/ $EMBED_OUTPUT/$resources >/dev/null
 
     # Update build number if successful
     echo
@@ -209,14 +211,15 @@ if [ $BUILD_FULLWEB = true ]; then
         osk=osk/
     fi
 
-    cp -R $SOURCE/resources/ui/  $WEB_OUTPUT/$ui  >/dev/null
-    cp -R $SOURCE/resources/osk/ $WEB_OUTPUT/$osk  >/dev/null
+    cp -Rf $SOURCE/resources/ui/  $WEB_OUTPUT/$ui  >/dev/null
+    cp -Rf $SOURCE/resources/osk/ $WEB_OUTPUT/$osk  >/dev/null
 
     echo Copy source to $WEB_OUTPUT/src
-    cp -R $SOURCE/*.js $WEB_OUTPUT/src
+    cp -Rf $SOURCE/*.js $WEB_OUTPUT/src
     echo $BUILD > $WEB_OUTPUT/src/version.txt
-    cp -R $SOURCE/resources/ui/  $WEB_OUTPUT/src/$ui >/dev/null
-    cp -R $SOURCE/resources/osk/ $WEB_OUTPUT/src/$osk >/dev/null
+
+    cp -Rf $SOURCE/resources/ui/  $WEB_OUTPUT/src/$ui >/dev/null
+    cp -Rf $SOURCE/resources/osk/ $WEB_OUTPUT/src/$osk >/dev/null
 
     # Update build number if successful
     echo
