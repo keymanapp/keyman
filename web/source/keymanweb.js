@@ -1911,15 +1911,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Description  Disable KMW control element 
      */    
     keymanweb.DisableControl = function(Pelem) {
-      if(!Pelem._kmwAttachment) {
-        return; // We're not attached, so we can't work with this control.
-      } else {
-        if(!Pelem._kmwAttachment.legacy) {
-          Pelem._kmwAttachment.legacy = {LControl:Pelem, LEnabled:0, LDefaultInternalName:'-'};
-          keymanweb._Controls=keymanweb._push(keymanweb._Controls,Pelem._kmwAttachment.legacy);
-        } else {
-          Pelem._kmwAttachment.legacy.LEnabled = 0;
+      if(!Pelem._kmwAttachment || !Pelem._kmwAttachment.legacy) {
+        var Lc = {LControl:Pelem, LEnabled:0, LDefaultInternalName:'-'};
+        keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+        if(Pelem._kmwAttachment) {
+          Pelem._kmwAttachment.legacy = Lc;
         }
+      } else {
+        Pelem._kmwAttachment.legacy.LEnabled = 0;
       }
     }
 
@@ -1929,17 +1928,15 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {Object}    Pelem   Element to be enabled
      * Description  Enable KMW control element 
      */    
-    keymanweb.EnableControl = function(Pelem)
-    {
-      if(!Pelem._kmwAttachment) {
-        return; // We're not attached, so we can't work with this control.
-      } else {
-        if(!Pelem._kmwAttachment.legacy) {
-          Pelem._kmwAttachment.legacy = {LControl:Pelem, LEnabled:1, LDefaultInternalName:'-'};
-          keymanweb._Controls=keymanweb._push(keymanweb._Controls,Pelem._kmwAttachment.legacy);
-        } else {
-          Pelem._kmwAttachment.legacy.LEnabled = 1;
+    keymanweb.EnableControl = function(Pelem) {
+      if(!Pelem._kmwAttachment || !Pelem._kmwAttachment.legacy) {
+        var Lc = {LControl:Pelem, LEnabled:1, LDefaultInternalName:'-'};
+        keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+        if(Pelem._kmwAttachment) {
+          Pelem._kmwAttachment.legacy = Lc;
         }
+      } else {
+        Pelem._kmwAttachment.legacy.LEnabled = 1;
       }
     }
     
@@ -1950,18 +1947,16 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {string}      Pkbd     Keyboard   
      * Description  Set default keyboard for control 
      */    
-    keymanweb.SetDefaultKeyboardForControl = function(Pelem, Pkbd)
-    {
+    keymanweb.SetDefaultKeyboardForControl = function(Pelem, Pkbd) {
       /* pass null for kbd to specify no default, or '' to specify English */
-      if(!Pelem._kmwAttachment) {
-        return; // We're not attached, so we can't work with this control.
-      } else {
-        if(!Pelem._kmwAttachment.legacy) {
-          Pelem._kmwAttachment.legacy = {LControl:Pelem, LEnabled:1, LDefaultInternalName:Pkbd};
-          keymanweb._Controls=keymanweb._push(keymanweb._Controls,Pelem._kmwAttachment.legacy);
-        } else {
-          Pelem._kmwAttachment.legacy.LDefaultInternalName = Pkbd;
+      if(!Pelem._kmwAttachment || !Pelem._kmwAttachment.legacy) {
+        var Lc = {LControl:Pelem, LEnabled:1, LDefaultInternalName:Pkbd};
+        keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+        if(Pelem._kmwAttachment) {
+          Pelem._kmwAttachment.legacy = Lc;
         }
+      } else {
+        Pelem._kmwAttachment.legacy.LEnabled = Pkbd;
       }
     }
       
