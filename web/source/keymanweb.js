@@ -306,16 +306,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           }
         }
         
-      // TODO: The following is copied from old control focus... not sure how much is needed  
-        
-        keymanweb._ActiveControl = null;
+        // With the attachment API update, we now directly track the old legacy control behavior.
+        keymanweb._ActiveControl = target._kmwAttachment.legacy;
         keymanweb._LastActiveElement = target;
-        for(var Ln=0; Ln < keymanweb._Controls.length; Ln++) // I1511 - array prototype extended
-          if(keymanweb._Controls[Ln].LControl == target)
-          {
-            keymanweb._ActiveControl = keymanweb._Controls[Ln];
-            break;
-          }
     
         if(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null)
         {
@@ -813,7 +806,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
 
       /**
-       * Function     setupTouchElement
+       * Function     enableTouchElement
        * Scope        Private
        * @param       {Element}  Pelem   An input or textarea element from the page.
        * @return      {boolean}  Returns true if it creates a simulated input element for Pelem; false if not.
@@ -826,14 +819,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
        * 
        *              Also ensures the element is registered on keymanweb's internal input list.
        */
-      keymanweb.setupTouchElement = function(Pelem)
+      keymanweb.enableTouchElement = function(Pelem)
       {
         // Touch doesn't worry about iframes.
         if(Pelem.tagName.toLowerCase() == 'iframe') {
           return false;
         }
 
-        if(!keymanweb.isKMWInput(Pelem)) {
+        if(keymanweb.isKMWDisabled(Pelem)) {
           keymanweb.setupNonKMWTouchElement(Pelem);
           return false;
         } else {
@@ -865,9 +858,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         // The simulated touch element doesn't already exist?  Time to initialize it.
         var x=document.createElement('DIV'); 
         x['base']=x.base=Pelem;
+        x._kmwAttachment = Pelem._kmwAttachment; // It's an object reference we need to alias.
         
         // Set font for base element
-        keymanweb.setupInputElement(x, true);
+        keymanweb.enableInputElement(x, true);
 
         // Add the exposed member 'kmw_ip' to allow page to refer to duplicated element
         Pelem['kmw_ip']=x;
@@ -1056,6 +1050,11 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             clearTimeout(keymanweb.focusTimer);
             osk.hideNow();
           },false);
+
+        // Signify that touch isn't enabled on the control.
+        if(x._kmwAttachment) {
+          x._kmwAttachment.touchEnabled = false;
+        }
       }
     }
     
@@ -1066,26 +1065,17 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *********************************************************/
     
     /**
-     * Function     setupInputElement
+     * Function     enableInputElement
      * Scope        Private
-     * @param       {Element}   Pelem   An element from the document to be setup for attachment.
+     * @param       {Element}   Pelem   An element from the document to be enabled with full KMW handling.
      * @param       {boolean}   isAlias A flag that indicates if the element is a simulated input element for touch.
-     * Description  Performs the basic attachment setup for one element and adds it to the inputList if it is an input element.
+     * Description  Performs the basic enabling setup for one element and adds it to the inputList if it is an input element.
      *              Only returns true if the element is a valid input for keymanweb and it is not presently tracked as an input element.
      *              Note that this method is called for both desktop and touch control routes; the touch route calls it from within
-     *              setupTouchElement as it must first establish the simulated touch element to serve as the alias "input element" here.
+     *              enableTouchElement as it must first establish the simulated touch element to serve as the alias "input element" here.
      */       
-    keymanweb.setupInputElement = function(Pelem, isAlias) { 
-      if(keymanweb.isKMWInput(isAlias ? Pelem['base'] : Pelem)) {
-        // Check that the element is neither readonly nor disabled for KeymanWeb
-        var ro=Pelem.attributes['readonly'], cn=Pelem.className;
-        if(typeof ro == 'object' && ro.value != 'false' ) {
-          return; // Don't attach our hooks if we're read-only!
-        }
-        if(typeof cn == 'string' && cn.indexOf('kmw-disabled') >= 0) {
-          return; // Don't attach our hooks if we're disabled!
-        }
-          
+    keymanweb.enableInputElement = function(Pelem, isAlias) { 
+      if(!keymanweb.isKMWDisabled(isAlias ? Pelem['base'] : Pelem)) {
         if(Pelem.tagName.toLowerCase() == 'iframe') 
           keymanweb._AttachToIframe(Pelem);
         else
@@ -1104,9 +1094,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           Pelem.onkeyup = keymanweb._KeyUp;      
         }
 
-        return true;
+        return;
       } else {
-        return false;
+        return;
       }
     }; 
 
@@ -1819,9 +1809,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     keymanweb['attachToControl'] = keymanweb.attachToControl = function(Pelem)
     {
       /* This commit's edit is solely to refactor the old version of 'attachToControl' somewhere safe
-       * (i.e., setupInputElement) so that the new version can be implemented without worry.                                
+       * (i.e., enableInputElement) so that the new version can be implemented without worry.                                
        */
-      keymanweb.setupInputElement(Pelem);
+      keymanweb.enableInputElement(Pelem);
     }
         
     /**
@@ -1920,17 +1910,17 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {Object}      Pelem       Element to be disabled
      * Description  Disable KMW control element 
      */    
-    keymanweb.DisableControl = function(Pelem)
-    {
-      var Ln, Lc;
-      for(Ln=0; Ln<keymanweb._Controls.length; Ln++)  // I1511 - array prototype extended
-        if(keymanweb._Controls[Ln].LControl == Pelem)
-        {
-          keymanweb._Controls[Ln].LEnabled = 0;
-          return;
+    keymanweb.DisableControl = function(Pelem) {
+      if(!Pelem._kmwAttachment) {
+        return; // We're not attached, so we can't work with this control.
+      } else {
+        if(!Pelem._kmwAttachment.legacy) {
+          Pelem._kmwAttachment.legacy = {LControl:Pelem, LEnabled:0, LDefaultInternalName:'-'};
+          keymanweb._Controls=keymanweb._push(keymanweb._Controls,Pelem._kmwAttachment.legacy);
+        } else {
+          Pelem._kmwAttachment.legacy.LEnabled = 0;
         }
-      Lc = {LControl:Pelem, LEnabled:0, LDefaultInternalName:'-'};
-      keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+      }
     }
 
     /**
@@ -1941,15 +1931,16 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */    
     keymanweb.EnableControl = function(Pelem)
     {
-      var Ln, Lc;
-      for(Ln=0; Ln<keymanweb._Controls.length; Ln++) // I1511 - array prototype extended
-        if(keymanweb._Controls[Ln].LControl == Pelem)
-        {
-          keymanweb._Controls[Ln].LEnabled = 1;
-          return;
+      if(!Pelem._kmwAttachment) {
+        return; // We're not attached, so we can't work with this control.
+      } else {
+        if(!Pelem._kmwAttachment.legacy) {
+          Pelem._kmwAttachment.legacy = {LControl:Pelem, LEnabled:1, LDefaultInternalName:'-'};
+          keymanweb._Controls=keymanweb._push(keymanweb._Controls,Pelem._kmwAttachment.legacy);
+        } else {
+          Pelem._kmwAttachment.legacy.LEnabled = 1;
         }
-      Lc = {LControl:Pelem, LEnabled:1, LDefaultInternalName:'-'};
-      keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+      }
     }
     
     /**
@@ -1961,16 +1952,17 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */    
     keymanweb.SetDefaultKeyboardForControl = function(Pelem, Pkbd)
     {
-      var Ln, Lc;
       /* pass null for kbd to specify no default, or '' to specify English */
-      for(Ln=0; Ln< keymanweb._Controls.length; Ln++) // I1511 - array prototype extended
-        if(keymanweb._Controls[Ln].LControl == Pelem)
-        {
-          keymanweb._Controls[Ln].LDefaultInternalName = Pkbd;
-          return;
+      if(!Pelem._kmwAttachment) {
+        return; // We're not attached, so we can't work with this control.
+      } else {
+        if(!Pelem._kmwAttachment.legacy) {
+          Pelem._kmwAttachment.legacy = {LControl:Pelem, LEnabled:1, LDefaultInternalName:Pkbd};
+          keymanweb._Controls=keymanweb._push(keymanweb._Controls,Pelem._kmwAttachment.legacy);
+        } else {
+          Pelem._kmwAttachment.legacy.LDefaultInternalName = Pkbd;
         }
-      Lc = {LControl:Pelem, LEnabled:1, LDefaultInternalName:Pkbd};
-      keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+      }
     }
       
     /**
@@ -2087,14 +2079,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
           
       //??keymanweb._Selection = null;
-      keymanweb._ActiveControl = null;
+      keymanweb._ActiveControl = Ltarg._kmwAttachment.legacy;  // Gets legacy-maintained control information
       keymanweb._LastActiveElement = Ltarg;
-      for(Ln=0; Ln < keymanweb._Controls.length; Ln++) // I1511 - array prototype extended
-        if(keymanweb._Controls[Ln].LControl == Ltarg)
-        {
-          keymanweb._ActiveControl = keymanweb._Controls[Ln];
-          break;
-        }
 
       if(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null)
       {
@@ -3299,7 +3285,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Function     isKMWInput
      * Scope        Private
      * @param       {Element}   x   An element from the page.
-     * @return      {boolean}      true if the element accepts touch input.
+     * @return      {boolean}      true if the element is viable for KMW attachment.
      * Description  Examines potential input elements to determine whether or not they are viable for KMW attachment.
      *              Also filters elements not supported for touch devices when device.touchable == true.
      */ 
@@ -3307,36 +3293,82 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var c, lcTagName = x.tagName.toLowerCase();
 
       if(lcTagName == 'textarea') {
-        c = x.className;
-        if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) { 
           return true;
-        }
       } else if(lcTagName == 'input' && x.type.toLowerCase() == 'text') {
-        c=x.className;              
-        if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) {
-          if(x.type == 'text' || x.type == 'search') {
-            return true;  
-          } 
-        }
-      } else if(lcTagName == 'iframe' && !device.touchable) {
-        c = x.className;
-        if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) { 
-          try {
-            if(x.contentWindow.document) {
-              return true;
-            }
+        if(x.type == 'text' || x.type == 'search') {
+          return true;  
+        } 
+      } else if(lcTagName == 'iframe' && !device.touchable) { // Do not allow iframe attachment if in 'touch' mode.
+        try {
+          if(x.contentWindow.document) {  // Only allow attachment if the iframe's internal document is valid.
+            return true;
           }
-          catch(err) { /* Do not attempt to access iframes outside this site */ }
         }
-      } else if(x.isContentEditable && !device.touchable) {
-        c = x.className;
-        if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) { 
-          return true;
-        }
+        catch(err) { /* Do not attempt to access iframes outside this site */ }
+      } else if(x.isContentEditable && !device.touchable) { // Only allow contentEditable attachment outside of 'touch' mode.
+        return true;
       }
 
       return false;     
     }
+
+    /**
+     * Function     isKMWInput
+     * Scope        Private
+     * @param       {Element}   x   An element from the page.
+     * @return      {boolean}      true if the element's properties indicate a 'disabled' state.
+     * Description  Examines attachable elements to determine their default enablement state.
+     */ 
+    keymanweb.isKMWDisabled = function(x) {
+      var c = x.className, lcTagName = x.tagName.toLowerCase();
+
+      if(x.readOnly) {
+        return true;
+      } else if(c && c.indexOf('kmw-disabled') >= 0) {
+        return true;
+      }
+
+      return false;     
+    }
+
+    /**
+     * Function     setupElementAttachment
+     * Scope        Private
+     * @param       {Element}   x   An element from the page valid for KMW attachment
+     * Description  Establishes the base KeymanWeb data for newly-attached elements.
+     *              Does not establish input hooks, which are instead handled during enablement.  
+     */
+    keymanweb.setupElementAttachment = function(x) {
+      // The `_kmwAttachment` property tag maintains all relevant KMW-maintained data regarding the element.
+      // It is disgarded upon de-attachment.
+      x._kmwAttachment = {
+        //legacy:       undefined,          // Tracks the legacy equivalent of attachment data, when appropriate.
+        keyboard:       null,               // Tracks the control's independent keyboard selection, when applicable.
+        touchEnabled:   device.touchable    // Tracks if the control has an aliased control for touch functionality.
+                                            // (Necessary for managing the touch/non-touch event handlers.)
+      };
+
+      // Does an old set of legacy data exist for the control? (e.g: if it were removed and readded to the page)
+      for(var Ln=0; Ln<keymanweb._Controls.length; Ln++) { // I1511 - array prototype extended
+        if(keymanweb._Controls[Ln].LControl == Pelem)
+        {
+          x._kmwAttachment.legacy = keymanweb._Controls[Ln];
+        }
+      }
+    }
+
+    /**
+     * Function     clearElementAttachment
+     * Scope        Private
+     * @param       {Element}   x   An element from the page valid for KMW attachment
+     * Description  Establishes the base KeymanWeb data for newly-attached elements.
+     *              Does not establish input hooks, which are instead handled during enablement.  
+     */
+    keymanweb.clearElementAttachment = function(x) {
+      // We need to clear the object when de-attaching; helps prevent memory leaks.
+      x._kmwAttachment = null;
+    }
+
 
     /**
      * Function     _SetupDocument
@@ -3377,30 +3409,36 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         }
       }
 
-      var editableControls = [];
+      var attachableControls = [];
 
       for(var Li = 0; Li < possibleInputs.length; Li++) {
-        if(keymanweb.isKMWInput(possibleInputs[Li])) {
-          editableControls.push(possibleInputs[Li]);
-        }
-        else if(device.touchable) {
-          keymanweb.setupNonKMWTouchElement(possibleInputs[Li]);
+        var input = possibleInputs[Li];
+
+        if(keymanweb.isKMWInput(input)) {
+          attachableControls.push(input);
+        } else if(device.touchable) {
+          keymanweb.setupNonKMWTouchElement(input);
         }
       }
 
       // Okay, all we're left with are editable controls!  Time to set 'em up!
-      for(Li = 0; Li < editableControls.length; Li++) {
+      for(Li = 0; Li < attachableControls.length; Li++) {
+        var control = attachableControls[Li];
+        keymanweb.setupElementAttachment(control);
         // IFrames require special, additional setup.
-        if(editableControls[Li].tagName.toLowerCase == 'iframe') {
-          keymanweb._AttachToIframe(editableControls[Li]);
-        } else {
-          // TODO:  Actually set 'em up!
+        if(control.tagName.toLowerCase == 'iframe') {
+          keymanweb._AttachToIframe(control);
+        } else if(!keymanweb.isKMWDisabled(control)) { // Enable what ought be enabled.
           if(device.touchable) {
-            // Setup via touch-based route.
-            keymanweb.setupTouchElement(editableControls[Li]);
+            // Enable via touch-based route.
+            keymanweb.enableTouchElement(control);
           } else {
-            // Setup via desktop route.
-            keymanweb.setupInputElement(editableControls[Li]);
+            // Enable via desktop route.
+            keymanweb.enableInputElement(control);
+          } 
+        } else { // Do any attached-but-disabled handling necessary.
+          if(device.touchable) {
+            keymanweb.setupNonKMWTouchElement(control);
           }
         }
       }
@@ -3829,10 +3867,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             attachFunctor();
           }
         } else {
-          keymanweb.setupInputElement(Pelem);
+          keymanweb.enableInputElement(Pelem);
         }  
       } else {
-        keymanweb.setupTouchElement(Pelem);
+        keymanweb.enableTouchElement(Pelem);
       }
     }
 
@@ -3851,6 +3889,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         if(index != -1) {
         keymanweb.inputList.splice(index, 1);
       }
+
+      keymanweb.clearElementAttachment(element);  // Memory management & auto de-attachment upon removal.
     }
 
     // Create an ordered list of all text and search input elements and textarea elements
