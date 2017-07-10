@@ -1075,20 +1075,18 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *              enableTouchElement as it must first establish the simulated touch element to serve as the alias "input element" here.
      */       
     keymanweb.enableInputElement = function(Pelem, isAlias) { 
-      if(!keymanweb.isKMWDisabled(isAlias ? Pelem['base'] : Pelem)) {
+      var baseElement = isAlias ? Pelem['base'] : Pelem;
+      if(!keymanweb.isKMWDisabled(baseElement)) {
         if(Pelem.tagName.toLowerCase() == 'iframe') 
           keymanweb._AttachToIframe(Pelem);
         else
         { 
-          if(isAlias) {
-            Pelem['base'].className = Pelem['base'].className ? Pelem['base'].className + ' keymanweb-font' : 'keymanweb-font';
-          } else {
-            Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
-          }
+          baseElement.className = baseElement.className ? baseElement.className + ' keymanweb-font' : 'keymanweb-font';
           keymanweb.inputList.push(Pelem);
 
-          util.attachDOMEvent(Pelem,'focus', keymanweb._ControlFocus);
-          util.attachDOMEvent(Pelem,'blur', keymanweb._ControlBlur);
+          util.attachDOMEvent(baseElement,'focus', keymanweb._ControlFocus);
+          util.attachDOMEvent(baseElement,'blur', keymanweb._ControlBlur);
+          // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
           Pelem.onkeypress = keymanweb._KeyPress;
           Pelem.onkeydown = keymanweb._KeyDown;
           Pelem.onkeyup = keymanweb._KeyUp;      
@@ -1808,10 +1806,20 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */  
     keymanweb['attachToControl'] = keymanweb.attachToControl = function(Pelem)
     {
-      /* This commit's edit is solely to refactor the old version of 'attachToControl' somewhere safe
-       * (i.e., enableInputElement) so that the new version can be implemented without worry.                                
-       */
-      keymanweb.enableInputElement(Pelem);
+      if(keymanweb.isKMWInput(Pelem)) {
+        keymanweb.setupElementAttachment(Pelem);
+        if(!keymanweb.isKMWDisabled(Pelem)) {
+          if(device.touchable) {
+            keymanweb.enableTouchElement(Pelem);
+          } else {
+            keymanweb.enableInputElement(Pelem);
+          }
+        } else {
+          if(device.touchable) {
+            keymanweb.setupNonKMWTouchElement(Pelem);
+          }
+        }
+      }
     }
         
     /**
@@ -3801,7 +3809,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           }
 
           for(k = 0; k < inputElementRemovals.length; k++) {
-            if(keymanweb.isKMWInput(inputElementAdditions[k])) { // Apply standard element filtering!
+            if(keymanweb.isKMWInput(inputElementRemovals[k])) { // Apply standard element filtering!
               keymanweb._MutationRemovalObserved(inputElementRemovals[k]);
             }
           }
@@ -3842,31 +3850,27 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * 
      */
     keymanweb._MutationAdditionObserved = function(Pelem) {
-      if(!device.touchable) {
-        if(Pelem.tagName.toLowerCase() == 'iframe') {
-          //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
+      if(Pelem.tagName.toLowerCase() == 'iframe' && !device.touchable) {
+        //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
 
-          var attachFunctor = function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
-            keymanweb.attachToControl(Pelem);
-          };
+        var attachFunctor = function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
+          keymanweb.attachToControl(Pelem);
+        };
 
-          Pelem.addEventListener('load', attachFunctor);
+        Pelem.addEventListener('load', attachFunctor);
 
-          /* If the iframe has somehow already loaded, we can't expect the onload event to be raised.  We ought just
-          * go ahead and perform our callback's contents.
-          * 
-          * keymanweb.attachToControl() is now idempotent, so even if our call 'whiffs', it won't cause long-lasting
-          * problems.
-          */
-          if(Pelem.contentDocument.readyState == 'complete') {
-            attachFunctor();
-          }
-        } else {
-          keymanweb.enableInputElement(Pelem);
-        }  
+        /* If the iframe has somehow already loaded, we can't expect the onload event to be raised.  We ought just
+        * go ahead and perform our callback's contents.
+        * 
+        * keymanweb.attachToControl() is now idempotent, so even if our call 'whiffs', it won't cause long-lasting
+        * problems.
+        */
+        if(Pelem.contentDocument.readyState == 'complete') {
+          attachFunctor();
+        }
       } else {
-        keymanweb.enableTouchElement(Pelem);
-      }
+        keymanweb.attachToControl(Pelem);
+      }  
     }
 
     // Used by the mutation event handler to properly decouple any elements dynamically removed from the document.
