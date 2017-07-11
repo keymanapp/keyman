@@ -65,7 +65,9 @@ if(!tavultesoft['keymanweb']) {
       srcPath: '',              // Path to folder containing executing keymanweb script
       rootPath: '',             // Path to server root
       mustReloadKeyboard: false,// Force keyboard refreshing even if already loaded
-      fullInitialization: true  // Force full page initialization unless overridden
+      fullInitialization: true, // Force full page initialization unless overridden
+      globalKeyboard: null,     // Indicates the currently-active keyboard for controls without independent keyboard settings.
+      globalLanguageCode: null  // Indicates the language code corresponding to `globalKeyboard`.
     };
 
     keymanweb['initialized'] = 0;
