@@ -1163,7 +1163,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           if(cnIndex > 0 && !isAlias) { // See note about the alias below.
             baseElement.className = baseElement.className.replace('keymanweb-font', '').trim();
           }
-          keymanweb.inputList.push(Pelem);
+
+          // Remove the element from our internal input tracking.
+          var index = keymanweb.inputList.indexOf(Pelem);
+          if(index > -1) {
+            keymanweb.inputList.splice(index, 1);
+          }
 
           if(!isAlias) { // See note about the alias below.
             util.detachDOMEvent(baseElement,'focus', keymanweb._ControlFocus);
@@ -1895,6 +1900,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */  
     keymanweb['attachToControl'] = keymanweb.attachToControl = function(Pelem)
     {
+      if(Pelem._kmwAttachment) {
+        return; // We're already attached.
+      }
+
       if(keymanweb.isKMWInput(Pelem)) {
         keymanweb.setupElementAttachment(Pelem);
         if(!keymanweb.isKMWDisabled(Pelem)) {
@@ -2103,12 +2112,18 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Description  Disables a KMW control element 
      */    
     keymanweb['disableControl'] = keymanweb.disableControl = function(Pelem) {
+      if(!Pelem._kmwAttachment) {
+        console.warn("KeymanWeb is not attached to element " + Pelem);
+        return;
+      }
+
       var cn = Pelem.className;
       if(cn.indexOf('kmw-disabled') < 0) { // if not already explicitly disabled...
         Pelem.className = cn ? cn + ' kmw-disabled' : 'kmw-disabled';
       }
 
       // The rest is triggered within MutationObserver code.
+      // See keymanweb._EnablementMutationObserverCore.
     }
 
     /**
@@ -2118,6 +2133,11 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Description  Disables a KMW control element 
      */    
     keymanweb['enableControl'] = keymanweb.enableControl = function(Pelem) {
+      if(!Pelem._kmwAttachment) {
+        console.error("KeymanWeb is not attached to element " + Pelem);
+        return;
+      }
+
       var cn = Pelem.className;
       var tagIndex = cn.indexOf('kmw-disabled');
       if(tagIndex >= 0) { // if already explicitly disabled...
@@ -2125,6 +2145,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
 
       // The rest is triggered within MutationObserver code.
+      // See keymanweb._EnablementMutationObserverCore.
     }
 
     /**
