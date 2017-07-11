@@ -852,7 +852,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           // NB: now set disabled=true rather than readonly, since readonly does not always 
           // prevent element from getting focus, e.g. within a LABEL element.
           // c.f. http://kreotekdev.wordpress.com/2007/11/08/disabled-vs-readonly-form-fields/ 
-          Pelem.disabled = true;
           Pelem.kmwInput = true;
         }
 
@@ -886,6 +885,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
         // Add the exposed member 'kmw_ip' to allow page to refer to duplicated element
         Pelem['kmw_ip']=x;
+        Pelem.disabled = true;
 
         // Superimpose custom input fields for each input or textarea, unless readonly or disabled 
 
@@ -1040,7 +1040,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         // This will be called for each element after any rotation, as well as after user-initiated changes
         // It has to be wrapped in an anonymous function to preserve scope and be applied to each element.
         (function(xx){
-          xx.base.addEventListener('resize',function(e){
+          xx._kmwResizeHandler = function(e){
             /* A timeout is needed to let the base element complete its resizing before our 
             * simulated element can properly resize itself.
             * 
@@ -1050,7 +1050,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             window.setTimeout(function (){
               keymanweb.updateInput(xx);
             }, 1);
-          },false);
+          };
+
+          xx.base.addEventListener('resize', xx._kmwResizeHandler, false);
         })(x);
           
         // And copy the text content
@@ -1068,6 +1070,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
        */
       keymanweb.disableTouchElement = function(Pelem)
       {
+        console.log("Hello.");
         if(!keymanweb.isKMWDisabled(Pelem)) {
           // If we're not marked as disabled, we shouldn't proceed.
           return;
@@ -1084,7 +1087,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             keymanweb.inputList.splice(index, 1);
           }
 
-          x.base.style.visibility='visible'; // hide by default: KMW-3
+          Pelem.style.visibility='visible'; // hide by default: KMW-3
+          Pelem.disabled = false;
+          Pelem.removeEventListener('resize', Pelem['kmw_ip']._kmwResizeHandler);
 
           // Disable touch-related handling code.
           keymanweb.disableInputElement(Pelem['kmw_ip']);
