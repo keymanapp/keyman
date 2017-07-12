@@ -324,7 +324,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           }
         } else if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
           if(!keymanweb._JustActivatedKeymanWebUI) {         
-            keymanweb.setActiveKeyboard(target._kmwAttachment.keyboard, target._kmwAttachment.languageCode); 
+            keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
+              keymanweb._LastActiveElement._kmwAttachment.languageCode); 
           } else {
             keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
             keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
@@ -1070,11 +1071,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
        */
       keymanweb.disableTouchElement = function(Pelem)
       {
-        console.log("Hello.");
-        if(!keymanweb.isKMWDisabled(Pelem)) {
-          // If we're not marked as disabled, we shouldn't proceed.
-          return;
-        }
+        // Do not check for the element being officially disabled - it's also used for detachment.
 
         // Touch doesn't worry about iframes.
         if(Pelem.tagName.toLowerCase() == 'iframe') {
@@ -1177,44 +1174,40 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */       
     keymanweb.disableInputElement = function(Pelem, isAlias) { 
       var baseElement = isAlias ? Pelem['base'] : Pelem;
-      if(!keymanweb.isKMWDisabled(baseElement)) {
-        return;  // If we're not already marked as disabled, don't proceed.
-      }
-      else {
-        if(Pelem.tagName.toLowerCase() == 'iframe') {
-          keymanweb._DetachFromIframe(Pelem);
-        } else { 
-          var cnIndex = baseElement.className.indexOf('keymanweb-font');
-          if(cnIndex > 0 && !isAlias) { // See note about the alias below.
-            baseElement.className = baseElement.className.replace('keymanweb-font', '').trim();
-          }
-
-          // Remove the element from our internal input tracking.
-          var index = keymanweb.inputList.indexOf(Pelem);
-          if(index > -1) {
-            keymanweb.inputList.splice(index, 1);
-          }
-
-          if(!isAlias) { // See note about the alias below.
-            util.detachDOMEvent(baseElement,'focus', keymanweb._ControlFocus);
-            util.detachDOMEvent(baseElement,'blur', keymanweb._ControlBlur);
-          }
-          // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
-          Pelem.onkeypress = null;
-          Pelem.onkeydown = null;
-          Pelem.onkeyup = null;      
+      // Do NOT test for pre-disabledness - we also use this to fully detach without officially 'disabling' via kmw-disabled.
+      if(Pelem.tagName.toLowerCase() == 'iframe') {
+        keymanweb._DetachFromIframe(Pelem);
+      } else { 
+        var cnIndex = baseElement.className.indexOf('keymanweb-font');
+        if(cnIndex > 0 && !isAlias) { // See note about the alias below.
+          baseElement.className = baseElement.className.replace('keymanweb-font', '').trim();
         }
 
-        // If we're disabling an alias, we should fully enable the base version.  (Thinking ahead to toggleable-touch mode.)
-        if(isAlias) {
-          keymanweb.inputList.push(baseElement);
-
-          baseElement.onkeypress = keymanweb._KeyPress;
-          baseElement.onkeydown = keymanweb._KeyDown;
-          baseElement.onkeyup = keymanweb._KeyUp;  
+        // Remove the element from our internal input tracking.
+        var index = keymanweb.inputList.indexOf(Pelem);
+        if(index > -1) {
+          keymanweb.inputList.splice(index, 1);
         }
-        return;
+
+        if(!isAlias) { // See note about the alias below.
+          util.detachDOMEvent(baseElement,'focus', keymanweb._ControlFocus);
+          util.detachDOMEvent(baseElement,'blur', keymanweb._ControlBlur);
+        }
+        // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
+        Pelem.onkeypress = null;
+        Pelem.onkeydown = null;
+        Pelem.onkeyup = null;      
       }
+
+      // If we're disabling an alias, we should fully enable the base version.  (Thinking ahead to toggleable-touch mode.)
+      if(isAlias) {
+        keymanweb.inputList.push(baseElement);
+
+        baseElement.onkeypress = keymanweb._KeyPress;
+        baseElement.onkeydown = keymanweb._KeyDown;
+        baseElement.onkeyup = keymanweb._KeyUp;  
+      }
+      return;
     };
 
     /**
@@ -1967,13 +1960,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(keymanweb.isKMWInput(Pelem)) {
         // Is it already disabled?
         if(!keymanweb.isKMWDisabled(Pelem)) {
-          if(device.touchable) {
-            //Revert touch-aliased elements to non-touch elements.
-            keymanweb.disableTouchElement(Pelem);
-          }
-
-          //Disables non-touch elements.
-          keymanweb.disableInputElement(Pelem);
+          keymanweb._DisableControl(Pelem);
         } 
       }
 
@@ -2143,7 +2130,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     keymanweb['disableControl'] = keymanweb.disableControl = function(Pelem) {
       if(!Pelem._kmwAttachment) {
         console.warn("KeymanWeb is not attached to element " + Pelem);
-        return;
       } else if(Pelem._kmwAttachment.legacy) {
         console.warning("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
         keymanweb.legacy.DisableControl(Pelem);
@@ -2166,8 +2152,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */    
     keymanweb['enableControl'] = keymanweb.enableControl = function(Pelem) {
       if(!Pelem._kmwAttachment) {
-        console.error("KeymanWeb is not attached to element " + Pelem);
-        return;
+        console.warn("KeymanWeb is not attached to element " + Pelem);
       } else if(Pelem._kmwAttachment.legacy) {
         console.warning("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
         keymanweb.legacy.EnableControl(Pelem);
