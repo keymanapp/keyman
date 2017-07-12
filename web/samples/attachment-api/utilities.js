@@ -45,6 +45,7 @@ function loadKeyboards()
 		div.appendChild(document.createElement("p"));
 		
 		var elemId = elem.id;
+		var attached;
 		
 		// Attachment button
 		var attachBtn = document.createElement("input");
@@ -64,6 +65,7 @@ function loadKeyboards()
 		detachBtn.onclick = function() {
 			kmw.detachFromControl(document.getElementById(elemId));
 			document.getElementById('attachment_' + elemId).textContent = " Currently detached.";
+			document.getElementById('independence_' + elemId).textContent = "";
 		}; 
 		detachBtn.value   = 'Detach';
 		div.appendChild(detachBtn);
@@ -72,6 +74,7 @@ function loadKeyboards()
 		attachLabel.id	= 'attachment_' + elemId;
 		if(attachText) {
 			attachLabel.textContent = " Currently " + (attachText == "auto" ? "attached." : "detached.");
+			attached = (attachText == "auto" ? true : false);
 		}
 		div.appendChild(attachLabel);
 		
@@ -102,7 +105,7 @@ function loadKeyboards()
 		enabledLabel.textContent = " Currently enabled.";
 		
 		// We must rely on MutationObservers to stay current about enablement.
-		var observationTarget = elem.tagName.toLowerCase == "iframe" ? elem.contentWindow.document : elem;
+		var observationTarget = elem;
 		var observationConfig = {attributes: true, attributeFilter: ['class']};
 		
 		var enablementObserver = new MutationObserver(function(mutations) {
@@ -112,6 +115,36 @@ function loadKeyboards()
 		enablementObserver.observe(observationTarget, observationConfig);
 		
 		div.appendChild(enabledLabel);
+		div.appendChild(document.createElement("p"));
+		
+		if(elem.tagName.toLowerCase() != "iframe") { 
+			// Set Keyboard button
+			var setBtn = document.createElement("input");
+			setBtn.type 		= 'button';
+			setBtn.id   		= 'set_' + elemId;
+			setBtn.onclick = function() {
+				kmw.setKeyboardForControl(document.getElementById(elemId), 'dzongkha', 'dzo');
+				kbdLabel.textContent = " Using independently-tracked keyboard.";
+			}; 
+			setBtn.value   = 'Set to Dzongkha';
+			div.appendChild(setBtn);
+			
+			// Clear Keyboard button
+			var clearBtn = document.createElement("input");
+			clearBtn.type 		= 'button';
+			clearBtn.id   		= 'clear_' + elemId;
+			clearBtn.onclick = function() {
+				kmw.clearKeyboardForControl(document.getElementById(elemId));
+				kbdLabel.textContent = " Using globally-selected keyboard.";
+			}; 
+			clearBtn.value   = 'Clear Keyboard';
+			div.appendChild(clearBtn);
+			
+			var kbdLabel = document.createElement("a");
+			kbdLabel.id	= 'independence_' + elemId;
+			kbdLabel.textContent = attached ? " Using globally-selected keyboard." : '';
+			div.appendChild(kbdLabel);
+		}
 		
 		return div;
 	}

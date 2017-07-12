@@ -305,7 +305,26 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             while(util._GetAbsoluteX(caret) < touchX && cp < cpMax) keymanweb.setTextCaret(target,++cp);
           }
         }
-        
+
+        /**
+         * This event will trigger before keymanweb.setBlur is triggered.  Now that we're allowing independent keyboard settings
+         * for controls, we have to act here to preserve the outgoing control's keyboard settings.
+         *
+         * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
+         */  
+        var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
+
+        // Filter out the legacy cases.  If legacy isn't active, then we do our thing.
+        if(!(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null)) {
+          if(keymanweb._LastActiveElement && keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
+            keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
+            keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
+          } else if(keymanweb._Controls.length == 0) { // Legacy kill-switch.
+            keymanweb.globalKeyboard = keyboardID;
+            keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
+          }
+        }
+
         // With the attachment API update, we now directly track the old legacy control behavior.
         keymanweb._ActiveControl = target._kmwAttachment.legacy;
         keymanweb._LastActiveElement = target;
@@ -322,21 +341,11 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           } else {
             keymanweb._ActiveControl.LDefaultInternalName = keyboardID;
           }
-        } else if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
-          if(!keymanweb._JustActivatedKeymanWebUI) {         
-            keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
-              keymanweb._LastActiveElement._kmwAttachment.languageCode); 
-          } else {
-            keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
-            keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
-          }
+        } else if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
+          keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
+            keymanweb._LastActiveElement._kmwAttachment.languageCode); 
         } else if(keymanweb._Controls.length == 0) {  // If legacy is in use, we need to kill-switch this behavior.
-          if(!keymanweb._JustActivatedKeymanWebUI) {  // Otherwise, legacy behavior is modified from its original state.
-            keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
-          } else {
-            keymanweb.globalKeyboard = keyboardID;
-            keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
-          }
+          keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
         }
         
         //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
@@ -2175,12 +2184,31 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Description  Disable KMW control element 
      */    
     keymanweb._DisableControl = function(Pelem) {
-      if(Pelem._kmwAttachment) { // Only operate on attached elements!
+      if(Pelem._kmwAttachment) { // Only operate on attached elements!  
+        if(keymanweb._LastActiveElement == Pelem || keymanweb._LastActiveElement == Pelem['kmw_ip']) {
+          keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
+          keymanweb._LastActiveElement = null;
+          keymanweb.osk._Hide();
+        }
+        
         if(device.touchable) {
           keymanweb.disableTouchElement(Pelem);
           keymanweb.setupNonKMWTouchElement(Pelem);
-        }
+        
+          // If a touch alias was removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
+          window.setTimeout(function() {
+            keymanweb.listInputs();
 
+            for(var k = 0; k < keymanweb.sortedInputs.length; k++) {
+              if(keymanweb.sortedInputs[k]['kmw_ip']) {
+                keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
+              }
+            }
+          }, 1);
+        } else {
+          keymanweb.listInputs(); // Fix up our internal input ordering scheme.
+        }
+        
         keymanweb.disableInputElement(Pelem);
       }
     }
@@ -2195,6 +2223,18 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(Pelem._kmwAttachment) { // Only operate on attached elements!
         if(device.touchable) {
           keymanweb.enableTouchElement(Pelem);
+
+          // If we just added a new input alias, some languages will mess up our touch-based layout scheme
+          // if we don't update the touch elements.
+          window.setTimeout(function() {
+            keymanweb.listInputs();
+
+            for(var k = 0; k < keymanweb.sortedInputs.length; k++) {
+              if(keymanweb.sortedInputs[k]['kmw_ip']) {
+                keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
+              }
+            }
+          }, 1);
         } else {
           keymanweb.enableInputElement(Pelem);
         }
@@ -2206,10 +2246,21 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Scope        Public   
      * @param       {Element}     Pelem    Control element 
      * @param       {string}      Pkbd     Keyboard   
+     * @param       {string}     Plc      Language Code
      * Description  Set default keyboard for the control 
      */    
-    keymanweb['setKeyboardForControl'] = keymanweb.setKeyboardForControl = function(Pelem, Pkbd) {
+    keymanweb['setKeyboardForControl'] = keymanweb.setKeyboardForControl = function(Pelem, Pkbd, Plc) {
       /* pass null for kbd to specify no default, or '' to specify English */
+      var index = Pkbd.indexOf("Keyboard_");
+      if(index < 0 && Pkbd != '') {
+        Pkbd = "Keyboard_" + Pkbd;
+      }
+
+      if(Pelem.tagName.toLowerCase() == "iframe") {
+        console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
+        return;
+      }
+
       if(!Pelem._kmwAttachment) {
         console.error("KeymanWeb is not attached to element " + Pelem);
         return;
@@ -2219,10 +2270,13 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         return;
       } else {
         Pelem._kmwAttachment.keyboard = Pkbd;
+        Pelem._kmwAttachment.languageCode = Plc;
 
         // If Pelem is the focused element/active control, we should set the keyboard in place now.
-        if(keymanweb._LastActiveElement != null) {
-          keymanweb.setActiveKeyboard(Pkbd);
+        // 'kmw_ip' is the touch-alias for the original page's control.
+        if((keymanweb._LastActiveElement == Pelem || keymanweb._LastActiveElement == Pelem['kmw_ip']) 
+            && keymanweb._LastActiveElement) {
+          keymanweb.setActiveKeyboard(Pkbd, Plc);
         }
       }
     }
@@ -3241,7 +3295,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           // and update the active stub
           for(var Ls=0; Ls<keymanweb._KeyboardStubs.length; Ls++)
           {
-            if((keymanweb._KeyboardStubs[Ls]['KI'] == PInternalName) && (keymanweb._KeyboardStubs[Ls]['KLC'] == PLgCode))
+            if((keymanweb._KeyboardStubs[Ls]['KI'] == PInternalName) && 
+              (keymanweb._KeyboardStubs[Ls]['KLC'] == PLgCode || PLgCode == '---'))
             {
               keymanweb._ActiveStub = keymanweb._KeyboardStubs[Ls]; break;
             }
@@ -3460,14 +3515,18 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {string}    PInternalName   Internal name
      * @param       {string}    PLgCode         Language code
      */    
-    keymanweb['setActiveKeyboard'] = function(PInternalName,PLgCode)
-    {
+    keymanweb['setActiveKeyboard'] = function(PInternalName,PLgCode) {
       //TODO: This does not make sense: the callbacks should be in _SetActiveKeyboard, not here,
       //      since this is always called FROM the UI, which should not need notification.
       //      If UI callbacks are needed at all, they should be within _SetActiveKeyboard  
       keymanweb.doBeforeKeyboardChange(PInternalName,PLgCode);     
       keymanweb._SetActiveKeyboard(PInternalName,PLgCode,true);    
       if(keymanweb._LastActiveElement != null) keymanweb._FocusLastActiveElement();
+      // If we ever allow PLgCode to be set by default, we can auto-detect the language code
+      // after the _SetActiveKeyboard call.
+      // if(!PLgCode && keymanweb._ActiveStub) {
+      //   PLgCode = keymanweb._ActiveStub['KLC'];
+      // }
       keymanweb.doKeyboardChange(PInternalName,PLgCode);
     }
     
