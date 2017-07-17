@@ -2141,7 +2141,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         console.warn("KeymanWeb is not attached to element " + Pelem);
       } else if(Pelem._kmwAttachment.legacy) {
         console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
-        keymanweb.legacy['DisableControl'](Pelem);
+        keymanweb.DisableControl(Pelem);
       }
 
       var cn = Pelem.className;
@@ -2164,7 +2164,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         console.warn("KeymanWeb is not attached to element " + Pelem);
       } else if(Pelem._kmwAttachment.legacy) {
         console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
-        keymanweb.legacy['EnableControl'](Pelem);
+        keymanweb.EnableControl(Pelem);
       }
 
       var cn = Pelem.className;
