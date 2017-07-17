@@ -333,7 +333,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
          * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
          * If not, we need to activate the control's preferred keyboard.
          */
-        var keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI']
+        keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI']
     
         if(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null) {
           if(!keymanweb._JustActivatedKeymanWebUI) {         
@@ -2140,8 +2140,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(!Pelem._kmwAttachment) {
         console.warn("KeymanWeb is not attached to element " + Pelem);
       } else if(Pelem._kmwAttachment.legacy) {
-        console.warning("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
-        keymanweb.legacy.DisableControl(Pelem);
+        console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
+        keymanweb.legacy['DisableControl'](Pelem);
       }
 
       var cn = Pelem.className;
@@ -2163,8 +2163,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(!Pelem._kmwAttachment) {
         console.warn("KeymanWeb is not attached to element " + Pelem);
       } else if(Pelem._kmwAttachment.legacy) {
-        console.warning("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
-        keymanweb.legacy.EnableControl(Pelem);
+        console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
+        keymanweb.legacy['EnableControl'](Pelem);
       }
 
       var cn = Pelem.className;
@@ -2188,7 +2188,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         if(keymanweb._LastActiveElement == Pelem || keymanweb._LastActiveElement == Pelem['kmw_ip']) {
           keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
           keymanweb._LastActiveElement = null;
-          keymanweb.osk._Hide();
+          keymanweb['osk']._Hide();
         }
         
         if(device.touchable) {
@@ -2265,8 +2265,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         console.error("KeymanWeb is not attached to element " + Pelem);
         return;
       } else if(Pelem._kmwAttachment.legacy) {
-        console.warning("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
-        keymanweb.legacy.SetDefaultKeyboardForControl(Pelem, Pkbd);
+        console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
+        keymanweb.legacy['SetDefaultKeyboardForControl'](Pelem, Pkbd);
         return;
       } else {
         Pelem._kmwAttachment.keyboard = Pkbd;
@@ -2285,7 +2285,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Function     clearKeyboardForControl
      * Scope        Public   
      * @param       {Element}     Pelem    Control element 
-     * @param       {string}      Pkbd     Keyboard   
      * Description  Set default keyboard for the control 
      */    
     keymanweb['clearKeyboardForControl'] = keymanweb.clearKeyboardForControl = function(Pelem) {
@@ -2294,7 +2293,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         console.error("KeymanWeb is not attached to element " + Pelem);
         return;
       } else if(Pelem._kmwAttachment.legacy) {
-        console.warning("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
+        console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
         Pelem._kmwAttachment.legacy.LDefaultInternalName = null;
       } else {
         Pelem._kmwAttachment.keyboard = null;
@@ -3515,7 +3514,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {string}    PInternalName   Internal name
      * @param       {string}    PLgCode         Language code
      */    
-    keymanweb['setActiveKeyboard'] = function(PInternalName,PLgCode) {
+    keymanweb['setActiveKeyboard'] = keymanweb.setActiveKeyboard = function(PInternalName,PLgCode) {
       //TODO: This does not make sense: the callbacks should be in _SetActiveKeyboard, not here,
       //      since this is always called FROM the UI, which should not need notification.
       //      If UI callbacks are needed at all, they should be within _SetActiveKeyboard  
@@ -3548,7 +3547,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return     {string}         language code
      * Description Return language code for currently selected language
      */    
-    keymanweb['getActiveLanguage'] = function()
+    keymanweb['getActiveLanguage'] = keymanweb.getActiveLanguage = function()
     {
       if(keymanweb._ActiveStub == null) return '';
       return keymanweb._ActiveStub['KLC'];
