@@ -1,0 +1,5 @@
+[Directories]
+SearchPath=..\..\..\visual\source;..\..\..\tools;..\..\source
+Packages=rtl;rai6;MyLabelPackage
+UsePackages=1
+

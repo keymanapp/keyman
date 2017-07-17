@@ -1,0 +1,670 @@
+##Package: StdCtrls
+##Status: Completed, Incomplete
+----------------------------------------------------------------------------------------------------
+@@JvCombobox.pas
+Summary
+    Contains the TJvComboBox component.
+Author
+  Sébastien Buysse
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.SearchPrefix
+Summary
+  \Returns the position of a string in the list.
+Description
+  Call SearchPrefix to obtain the position of the first occurrence of a string that has a prefix that
+  matches Value. A prefix matches Value if it is identical to Value or, if CaseSensitive is False, if
+  it differs only in case.
+Parameters
+  Value         - The prefix to search for.
+  CaseSensitive - Indicates whether the match must be case\-sensitive.
+See Also
+  TJvCustomComboBox.SearchExactString, TJvCustomComboBox.SearchSubString
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.SearchExactString
+Summary
+  \Returns the position of a string in the list.
+Description
+  Call SearchExactString to obtain the position of the first occurrence of a string that matches
+  Value.
+  A string matches Value if it is identical to Value or, if CaseSensitive is False, if it differs
+  only in case.
+Parameters
+  Value         - The string to search for.
+  CaseSensitive - Indicates whether the match must be case\-sensitive.
+See Also
+  TJvCustomComboBox.SearchPrefix, TJvCustomComboBox.SearchSubString
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.ReadOnly
+Summary
+  Specifies whether the combo box value can be changed.
+Description
+  ReadOnly specifies whether the value of the combo box can be changed. Read ReadOnly to determine the
+  read only state or set it to a new value.
+  
+  Set ReadOnly to True to prevent the user from changing the value of the combo box (either by typing
+  into the editor box directly or by selecting a value from the list).
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.Provider
+Summary
+  Used to select a provider as the control's source of data.
+Description
+  The Provider property is used to link a <LINK IJvDataProvider, data provider> to the
+  control.
+
+  Although you can select a provider directly in the Object Inspector, in code you should use the
+  methods and/or properties provided by the <LINK TJvDataConsumer, consumer service> the Provider
+  property actually refers to.
+
+  If the selected provider (in combination with the attributes that apply for control) generates
+  consumer services extensions (such as the IJvDataConsumerViewList but also provider specific
+  settings for the control), any published properties for those will be added as sub properties of
+  the Provider property in the Object Inspector. In code you should query for the extensions
+  interface:
+  <AUTOLINK OFF>
+  <CODE>
+  <B>if</B> Supports(Provider <B>as</B> IJvDataConsumer, <I><interface GUID or type></I>, <I><variable></I>) <B>then</B>
+  <B>begin</B>
+    ...
+  <B>end</B>;
+  </CODE>
+  <AUTOLINK ON>
+  or:
+  <AUTOLINK OFF>
+  <CODE>
+  <B>if</B> Provider.GetInterface(<I><interface GUID or type></I>, <I><variable></I>) <B>then</B>
+  <B>begin</B>
+    ...
+  <B>end</B>;
+  </CODE>
+  <AUTOLINK ON>
+  You should first declare a variable of the type of interface you will request. Within the
+  begin/end block you can then use that variable which will contain a reference to the interface
+  requested.
+  
+  When a provider has been selected, the Items property will retain its list of strings. Once you
+  manipulate them (i.e. add or delete strings) the provider will be deselected automatically. Note
+  that the Items property is also manipulated when you use DeleteExactString. You can read the Items
+  property without the provider being deselected.
+  
+  To retrieve the number of items you can use the GetItemCount function which will retrieve the
+  correct number regardless whether a Provider is selected or not. Likewise, you can use GetItemText
+  to retrieve the (display) text of an item from the Provider or the Items property.
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.IsFixedHeight
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.MaxPixel
+Summary
+  Limits the text of the edit control to a specific size in pixels.
+Description
+  Use MaxPixel to limit the text of the edit control to a specific size in pixels.
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.MeasureStyle
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.ParentFlat
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.Flat
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.GetItemText
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Index - Description for this parameter
+Return value
+  Describe here what the function returns
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.EmptyValue
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.EmptyFontColor
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.DeleteExactString
+Summary
+  Deletes the specified string from the Items property array.
+Description
+  Use DeleteExactString to delete the specified value from the Items property array. You can specify
+  whether or not to compare case-sensitive and whether or not all occurrences of the string should be
+  removed.
+  
+  The result value indicates the number of strings actually removed.
+  
+  Note that if a match is indeed found in the Items property array, any provider selected will be
+  deselected.
+Parameters
+  Value         - String to remove
+  All           - Flag indicating if all occurrences of the string should be removed. If set to False
+                   only the first occurrence is removed.
+  CaseSensitive - Flag indicating if a match should be exact in casing. If set to False, casing of
+  the                  specified string and the strings in the Items property does not influence the 
+                match.
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox
+Summary
+  Base class for provider aware combo boxes.
+Description
+  Use TJvCustomComboBox as a base class when defining new controls that represent a combo box and
+  should use some of the new features introduced in this class. It is a direct descendant of
+  TCustomComboBox.
+  
+  TJvCustomComboBox provides the following additional features compared to the Borland
+  TCustomComboBox:
+  
+  * <LINK TJvCustomComboBox.AutoComplete, Automatic completion> of entered text (only for Delphi 5,
+    Delphi 6 and above already provides this feature).
+  * Making the control <LINK TJvCustomComboBox.ReadOnly, read-only>.
+  * Searching for items by <LINK TJvCustomComboBox.SearchPrefix, prefix>,
+    <LINK TJvCustomComboBox.SearchSubString, sub-string> or by
+    <LINK TJvCustomComboBox.SearchExactString, exact match>, optionally case-sensitive.
+  * <LINK TJvCustomComboBox.MeasureStyle, Delayed OnMeasureItem calling> (see below).
+  * <LINK TJvCustomComboBox.HintColor, Hint color> can be specified.
+  * Additional events added to react to mouse
+    <LINK TJvCustomComboBox.OnMouseEnter, enter>/<LINK TJvCustomComboBox.OnMouseLeave, leave>,
+    <LINK TJvCustomComboBox.OnParentColorChange, parent color changes> or
+    <LINK TJvCustomComboBox.OnCtl3DChanged, Ctl3D changes>.
+  * <LINK TJvCustomComboBox.Provider, \Provider-aware>.
+
+* Item measuring *
+  The way TComboBox handles item measuring for owner-draw combo boxes is nearly useless: the
+  OnMeasureItem event is called <B>before</B> the Canvas of the combo box can be used. As a result
+  you can not really measure an item based on the Font of the control.
+
+  TJvComboBox publishes a new property <LINK TJvCustomComboBox.MeasureStyle, MeasureStyle> that can
+  be used to specify the timing of the event. Using this event you can choose if the OnMeasureItem
+  should be triggered as usual (cmsStandard), after the control is created (cmsAfterCreate) or
+  before each item is rendered (cmsBeforeDraw).
+
+* \Provider awareness *
+  \Provider-awareness for this control is done in the same way as for other provider-aware controls:
+  a <LINK TJvCustomComboBox.Provider, Provider> property is added.
+
+  When a provider is selected, the component behaves slightly different from the normal case:
+
+  * Item measuring will never occur before the Canvas is usable (i.e. \MeasureStyle set to
+    \cmsStandard behaves the same as \cmsAfterCreate).
+  * If the \Style property is not set to an owner draw style, the combo box is created as a
+    variable height combo box (i.e. only csOwnerDrawFixed results in a fixed height combo box).
+  * If the \Style property is set to an owner draw style and the \OnMeasureItem or \OnDrawItem events
+    are assigned, these events will execute in favor of the provider based measuring/rendering. In
+    all other cases, the provider based measuring/rendering will be used.
+  
+  Do not create instances of TJvCustomComboBox. To put a combo box in a form, use a descendant of
+  TJvCustomComboBox, such as TJvComboBox.
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.State
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Index - Description for this parameter
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.Sorted
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.SetUnCheckedAll
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Sender - Description for this parameter
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.SetCheckedAll
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Sender - Description for this parameter
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.QuoteStyle
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.Items
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.NoFocusColor
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.ItemEnabled
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Index - Description for this parameter
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.IsChecked
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Index - Description for this parameter
+Return value
+  Describe here what the function returns
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.GetText
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Return value
+  Describe here what the function returns
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.DropDownLines
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.Delimiter
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.Columns
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.CheckedCount
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.Checked
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Index - Description for this parameter
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.CapSelectAll
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox.CapDeSelectAll
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvComboBoxMeasureStyle
+<TITLE TJvComboBoxMeasureStyle type>
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvComboBoxMeasureStyle.cmsStandard
+Description for cmsStandard
+
+----------------------------------------------------------------------------------------------------
+@@TJvComboBoxMeasureStyle.cmsAfterCreate
+Description for cmsAfterCreate
+
+----------------------------------------------------------------------------------------------------
+@@TJvComboBoxMeasureStyle.cmsBeforeDraw
+Description for cmsBeforeDraw
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomCheckedComboBox
+<TITLE TJvCheckListBox type>
+Summary
+  Write here a summary (1 line)
+Description
+  You don't have to document already described items such as sets, pointers to records etc. (Value =
+  TCheckListBox; - for reference)
+
+----------------------------------------------------------------------------------------------------
+@@TJvComboBox
+<TITLEIMG TJvComboBox>
+#JVCLInfo
+<GROUP JVCL.EditsMemosAndCombos.Combos>
+<FLAG Component>
+Summary
+  \Provider-aware TComboBox.
+Description
+  TJvComboBox is a provider-aware TComboBox descendant. TJvComboBox provides the following additional
+  features compared to the standard TComboBox:
+  
+  * <LINK TJvCustomComboBox.AutoComplete, Automatic completion> of entered text (only for Delphi 5,
+    Delphi 6 and above already provides this feature).
+  * Making the control <LINK TJvCustomComboBox.ReadOnly, read-only>.
+  * Searching for items by <LINK TJvCustomComboBox.SearchPrefix, prefix>,
+    <LINK TJvCustomComboBox.SearchSubString, sub-string> or by
+    <LINK TJvCustomComboBox.SearchExactString, exact match>, optionally case-sensitive.
+  * <LINK TJvCustomComboBox.MeasureStyle, Delayed OnMeasureItem calling> (see below).
+  * <LINK TJvCustomComboBox.HintColor, Hint color> can be specified.
+  * Additional events added to react to mouse
+    <LINK TJvCustomComboBox.OnMouseEnter, enter>/<LINK TJvCustomComboBox.OnMouseLeave, leave>,
+    <LINK TJvCustomComboBox.OnParentColorChange, parent color changes> or
+    <LINK TJvCustomComboBox.OnCtl3DChanged, Ctl3D changes>.
+  * <LINK TJvCustomComboBox.Provider, \Provider-aware>.
+
+* Item measuring *
+  The way TComboBox handles item measuring for owner-draw combo boxes is nearly useless: the
+  OnMeasureItem event is called <B>before</B> the Canvas of the combo box can be used. As a result
+  you can not really measure an item based on the Font of the control.
+
+  TJvComboBox publishes a new property <LINK TJvCustomComboBox.MeasureStyle, MeasureStyle> that can
+  be used to specify the timing of the event. Using this event you can choose if the OnMeasureItem
+  should be triggered as usual (cmsStandard), after the control is created (cmsAfterCreate) or
+  before each item is rendered (cmsBeforeDraw).
+
+* \Provider awareness *
+  \Provider-awareness for this control is done in the same way as for other provider-aware controls:
+  a <LINK TJvCustomComboBox.Provider, Provider> property is added.
+
+  When a provider is selected, the component behaves slightly different from the normal case:
+
+  * Item measuring will never occur before the Canvas is usable (i.e. \MeasureStyle set to
+    \cmsStandard behaves the same as \cmsAfterCreate).
+  * If the \Style property is not set to an owner draw style, the combo box is created as a
+    variable height combo box (i.e. only csOwnerDrawFixed results in a fixed height combo box).
+  * If the \Style property is set to an owner draw style and the \OnMeasureItem or \OnDrawItem events
+    are assigned, these events will execute in favor of the provider based measuring/rendering. In
+    all other cases, the provider based measuring/rendering will be used.
+  
+  TJvComboBox publishes most of the protected properties and events of both TCustomComboBox as well as
+  TJvCustomComboBox.
+
+----------------------------------------------------------------------------------------------------
+@@TJvCheckedComboBox.Sorted
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCheckedComboBox.QuoteStyle
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCheckedComboBox.NoFocusColor
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCheckedComboBox.Items
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCheckedComboBox.DropDownLines
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCheckedComboBox.Delimiter
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCheckedComboBox.Columns
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCheckedComboBox.CapSelectAll
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCHBQuoteStyle.qsNone
+Description for qsNone
+
+----------------------------------------------------------------------------------------------------
+@@TJvCHBQuoteStyle.qsSingle
+Description for qsSingle
+
+----------------------------------------------------------------------------------------------------
+@@TJvCHBQuoteStyle.qsDouble
+Description for qsDouble
+
+----------------------------------------------------------------------------------------------------
+@@TJvCheckedComboBox
+<TITLEIMG TJvCheckedComboBox>
+#JVCLInfo
+<GROUP JVCL.EditsMemosAndCombos.Combos>
+<FLAG Component>
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+
+----------------------------------------------------------------------------------------------------
+@@TJvCheckedComboBox.CapDeSelectAll
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCHBQuoteStyle
+<TITLE TJvCHBQuoteStyle type>
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.SearchSubString
+Summary
+  \Returns the position of a string in the list.
+Description
+  Call SearchSubString to obtain the position of the first occurrence of a string that has a
+  substring that matches Value. A substring matches Value if it is identical to Value or, if
+  CaseSensitive is
+  False, if it differs only in case.
+Parameters
+  Value         - The substring to search for.
+  CaseSensitive - Indicates whether the match must be case\-sensitive.
+See Also
+  TJvCustomComboBox.SearchExactString, TJvCustomComboBox.SearchPrefix
+
+----------------------------------------------------------------------------------------------------
+@@TJvCustomComboBox.Text
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+

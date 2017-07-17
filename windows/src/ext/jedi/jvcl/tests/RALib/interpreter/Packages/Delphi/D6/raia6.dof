@@ -1,0 +1,4 @@
+[Directories]
+UnitOutputDir=..\..\..\..\Lib6
+SearchPath=..\..\..\source;..\..\..\..\visual\source;..\..\..\..\tools
+
