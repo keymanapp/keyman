@@ -1,0 +1,13 @@
+BitmapEditor_Dot	BITMAP	"bitmapeditor\\dot.bmp"
+BitmapEditor_Line	BITMAP	"bitmapeditor\\line.bmp"
+BitmapEditor_Text	BITMAP	"bitmapeditor\\text.bmp"
+BitmapEditor_Fill	BITMAP	"bitmapeditor\\fill.bmp"
+BitmapEditor_Box	BITMAP	"bitmapeditor\\box.bmp"
+BitmapEditor_FillBox	BITMAP	"bitmapeditor\\fillbox.bmp"
+BitmapEditor_Circle	BITMAP	"bitmapeditor\\circle.bmp"
+BitmapEditor_FillCircle	BITMAP	"bitmapeditor\\fillcircle.bmp"
+
+BitmapEditor_Left	BITMAP	"bitmapeditor\\left.bmp"
+BitmapEditor_Up		BITMAP	"bitmapeditor\\up.bmp"
+BitmapEditor_Right	BITMAP	"bitmapeditor\\right.bmp"
+BitmapEditor_Down	BITMAP	"bitmapeditor\\down.bmp"

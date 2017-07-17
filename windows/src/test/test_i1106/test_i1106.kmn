@@ -1,0 +1,15 @@
+﻿store(&VERSION ) '7.0'
+store(&NAME) 'Alt key test in Excel [I1106]'
+
+c CAPS ALWAYS OFF c probably irrelevant
+
+begin Unicode > use(Start)
+
+group(Start) using keys
+
++ 'a' > 'a-works'
++ [ALT K_A] > 'alt+a'
++ [SHIFT ALT K_A] > 'shift+alt+a'
+'a-works' + [ALT K_A] > context(1) context(2) 'boo!'
+
++ '?' > 'I1106; use a, alt+a, shift+alt+a to test in Excel'

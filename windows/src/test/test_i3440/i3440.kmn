@@ -1,0 +1,45 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I3440'
+begin Unicode > use(main)
+
+store(data) 'abc'    
+
+c just test if the keyboard compiles here.
+
+group(main) using keys
+                
++ 'a' > set(data='a')
++ 'b' > set( data='b')
++ 'c' > set(data ='c')
++ 'd' > set(data= 'd')
++ 'e' > set(data='e' )
++ 'f' > set( data ='f')
++ 'g' > set( data= 'g')
++ 'h' > set( data='h' )
++ 'i' > set(data = 'i')
++ 'j' > set(data ='j' )
++ 'k' > set(data= 'k' )
++ 'l' > set( data = 'l')
++ 'm' > set( data ='m' )
++ 'n' > set(data = 'n' )
++ 'o' > set( data = 'o' )
++ 'p' > set(  data  =  'p'  )
++ 'q' > set(   data   =   'q'   )
++ 'r' > set(    data    =    'r'    )
+
+store(alpha) 'abcdefghijklmnopqrstuvwxyz'
+'a' + any(alpha) > use(a)                
+
+group(a) using keys
+
++ 'a' > set(data=' a')
++ 'b' > set(data='b ')
++ 'c' > set(data=' c ')
++ 'd' > set(data='=d')
++ 'e' > set(data='e=')
++ 'f' > set(data=' =f')
++ 'g' > set(data='= g')
++ 'h' > set(data='=h ' )
++ 'i' > set(data='i= ')
++ 'j' > set(data='j =' )
++ 'k' > set(data=' k=' )

@@ -1,0 +1,240 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{B89BABB2-2C99-494C-AE8C-0450D49BF2B0}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="01 - New_Window_SDI_Demo\prjSDIDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="02 - New_Window_MDI_Demo\prjMDIDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="03 - New_Window_Tabs_Demo_1\prjNewWinTabs1Demo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="04 - New_Window_Tabs_Demo_2\prjNewWinTabs2Demo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="05 - OnEvaluateNewWindow_Demo\prjEvalNewWindowDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="06 - RightClick_Shortcuts_Demo\PrjRightClick_Demo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="07 - DragNDrop_Demo\prjDragDropDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="08 - Elements_Under_Mouse_Demo\prjElementsUnderMouseDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="09 - PrintPreviewFromTemplate_Demo\prjPrintPreviewTemplateDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="10 - PrintingOptions_Demo\prjPrintingOptionsDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="11 - moveto, moveby, resizeto, resizeby_Demo\prjMoveResizeDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="12 - MSHTML_Events_Demo\prjMSHTML_EventsDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="13 - ActiveX_Form_Demo\prjActiveFormDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="14 - ExecScriptEx_Demo\prjExecScriptExDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="15 - THtmlListener_Demo\prjHTMLListenerDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="16 - TEWBControl_Demo\prjEWBControlDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="17 - EWB Events Logger_Demo\prjEventsTestDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="18 - SysListView32 Replacement_Demo\prjSysLV32RepDemo.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="prjSDIDemo">
+			<MSBuild Projects="01 - New_Window_SDI_Demo\prjSDIDemo.dproj"/>
+		</Target>
+		<Target Name="prjSDIDemo:Clean">
+			<MSBuild Targets="Clean" Projects="01 - New_Window_SDI_Demo\prjSDIDemo.dproj"/>
+		</Target>
+		<Target Name="prjSDIDemo:Make">
+			<MSBuild Targets="Make" Projects="01 - New_Window_SDI_Demo\prjSDIDemo.dproj"/>
+		</Target>
+		<Target Name="prjMDIDemo">
+			<MSBuild Projects="02 - New_Window_MDI_Demo\prjMDIDemo.dproj"/>
+		</Target>
+		<Target Name="prjMDIDemo:Clean">
+			<MSBuild Targets="Clean" Projects="02 - New_Window_MDI_Demo\prjMDIDemo.dproj"/>
+		</Target>
+		<Target Name="prjMDIDemo:Make">
+			<MSBuild Targets="Make" Projects="02 - New_Window_MDI_Demo\prjMDIDemo.dproj"/>
+		</Target>
+		<Target Name="prjNewWinTabs1Demo">
+			<MSBuild Projects="03 - New_Window_Tabs_Demo_1\prjNewWinTabs1Demo.dproj"/>
+		</Target>
+		<Target Name="prjNewWinTabs1Demo:Clean">
+			<MSBuild Targets="Clean" Projects="03 - New_Window_Tabs_Demo_1\prjNewWinTabs1Demo.dproj"/>
+		</Target>
+		<Target Name="prjNewWinTabs1Demo:Make">
+			<MSBuild Targets="Make" Projects="03 - New_Window_Tabs_Demo_1\prjNewWinTabs1Demo.dproj"/>
+		</Target>
+		<Target Name="prjNewWinTabs2Demo">
+			<MSBuild Projects="04 - New_Window_Tabs_Demo_2\prjNewWinTabs2Demo.dproj"/>
+		</Target>
+		<Target Name="prjNewWinTabs2Demo:Clean">
+			<MSBuild Targets="Clean" Projects="04 - New_Window_Tabs_Demo_2\prjNewWinTabs2Demo.dproj"/>
+		</Target>
+		<Target Name="prjNewWinTabs2Demo:Make">
+			<MSBuild Targets="Make" Projects="04 - New_Window_Tabs_Demo_2\prjNewWinTabs2Demo.dproj"/>
+		</Target>
+		<Target Name="prjEvalNewWindowDemo">
+			<MSBuild Projects="05 - OnEvaluateNewWindow_Demo\prjEvalNewWindowDemo.dproj"/>
+		</Target>
+		<Target Name="prjEvalNewWindowDemo:Clean">
+			<MSBuild Targets="Clean" Projects="05 - OnEvaluateNewWindow_Demo\prjEvalNewWindowDemo.dproj"/>
+		</Target>
+		<Target Name="prjEvalNewWindowDemo:Make">
+			<MSBuild Targets="Make" Projects="05 - OnEvaluateNewWindow_Demo\prjEvalNewWindowDemo.dproj"/>
+		</Target>
+		<Target Name="PrjRightClick_Demo">
+			<MSBuild Projects="06 - RightClick_Shortcuts_Demo\PrjRightClick_Demo.dproj"/>
+		</Target>
+		<Target Name="PrjRightClick_Demo:Clean">
+			<MSBuild Targets="Clean" Projects="06 - RightClick_Shortcuts_Demo\PrjRightClick_Demo.dproj"/>
+		</Target>
+		<Target Name="PrjRightClick_Demo:Make">
+			<MSBuild Targets="Make" Projects="06 - RightClick_Shortcuts_Demo\PrjRightClick_Demo.dproj"/>
+		</Target>
+		<Target Name="prjDragDropDemo">
+			<MSBuild Projects="07 - DragNDrop_Demo\prjDragDropDemo.dproj"/>
+		</Target>
+		<Target Name="prjDragDropDemo:Clean">
+			<MSBuild Targets="Clean" Projects="07 - DragNDrop_Demo\prjDragDropDemo.dproj"/>
+		</Target>
+		<Target Name="prjDragDropDemo:Make">
+			<MSBuild Targets="Make" Projects="07 - DragNDrop_Demo\prjDragDropDemo.dproj"/>
+		</Target>
+		<Target Name="prjElementsUnderMouseDemo">
+			<MSBuild Projects="08 - Elements_Under_Mouse_Demo\prjElementsUnderMouseDemo.dproj"/>
+		</Target>
+		<Target Name="prjElementsUnderMouseDemo:Clean">
+			<MSBuild Targets="Clean" Projects="08 - Elements_Under_Mouse_Demo\prjElementsUnderMouseDemo.dproj"/>
+		</Target>
+		<Target Name="prjElementsUnderMouseDemo:Make">
+			<MSBuild Targets="Make" Projects="08 - Elements_Under_Mouse_Demo\prjElementsUnderMouseDemo.dproj"/>
+		</Target>
+		<Target Name="prjPrintPreviewTemplateDemo">
+			<MSBuild Projects="09 - PrintPreviewFromTemplate_Demo\prjPrintPreviewTemplateDemo.dproj"/>
+		</Target>
+		<Target Name="prjPrintPreviewTemplateDemo:Clean">
+			<MSBuild Targets="Clean" Projects="09 - PrintPreviewFromTemplate_Demo\prjPrintPreviewTemplateDemo.dproj"/>
+		</Target>
+		<Target Name="prjPrintPreviewTemplateDemo:Make">
+			<MSBuild Targets="Make" Projects="09 - PrintPreviewFromTemplate_Demo\prjPrintPreviewTemplateDemo.dproj"/>
+		</Target>
+		<Target Name="prjPrintingOptionsDemo">
+			<MSBuild Projects="10 - PrintingOptions_Demo\prjPrintingOptionsDemo.dproj"/>
+		</Target>
+		<Target Name="prjPrintingOptionsDemo:Clean">
+			<MSBuild Targets="Clean" Projects="10 - PrintingOptions_Demo\prjPrintingOptionsDemo.dproj"/>
+		</Target>
+		<Target Name="prjPrintingOptionsDemo:Make">
+			<MSBuild Targets="Make" Projects="10 - PrintingOptions_Demo\prjPrintingOptionsDemo.dproj"/>
+		</Target>
+		<Target Name="prjMoveResizeDemo">
+			<MSBuild Projects="11 - moveto, moveby, resizeto, resizeby_Demo\prjMoveResizeDemo.dproj"/>
+		</Target>
+		<Target Name="prjMoveResizeDemo:Clean">
+			<MSBuild Targets="Clean" Projects="11 - moveto, moveby, resizeto, resizeby_Demo\prjMoveResizeDemo.dproj"/>
+		</Target>
+		<Target Name="prjMoveResizeDemo:Make">
+			<MSBuild Targets="Make" Projects="11 - moveto, moveby, resizeto, resizeby_Demo\prjMoveResizeDemo.dproj"/>
+		</Target>
+		<Target Name="prjMSHTML_EventsDemo">
+			<MSBuild Projects="12 - MSHTML_Events_Demo\prjMSHTML_EventsDemo.dproj"/>
+		</Target>
+		<Target Name="prjMSHTML_EventsDemo:Clean">
+			<MSBuild Targets="Clean" Projects="12 - MSHTML_Events_Demo\prjMSHTML_EventsDemo.dproj"/>
+		</Target>
+		<Target Name="prjMSHTML_EventsDemo:Make">
+			<MSBuild Targets="Make" Projects="12 - MSHTML_Events_Demo\prjMSHTML_EventsDemo.dproj"/>
+		</Target>
+		<Target Name="prjActiveFormDemo">
+			<MSBuild Projects="13 - ActiveX_Form_Demo\prjActiveFormDemo.dproj"/>
+		</Target>
+		<Target Name="prjActiveFormDemo:Clean">
+			<MSBuild Targets="Clean" Projects="13 - ActiveX_Form_Demo\prjActiveFormDemo.dproj"/>
+		</Target>
+		<Target Name="prjActiveFormDemo:Make">
+			<MSBuild Targets="Make" Projects="13 - ActiveX_Form_Demo\prjActiveFormDemo.dproj"/>
+		</Target>
+		<Target Name="prjExecScriptExDemo">
+			<MSBuild Projects="14 - ExecScriptEx_Demo\prjExecScriptExDemo.dproj"/>
+		</Target>
+		<Target Name="prjExecScriptExDemo:Clean">
+			<MSBuild Targets="Clean" Projects="14 - ExecScriptEx_Demo\prjExecScriptExDemo.dproj"/>
+		</Target>
+		<Target Name="prjExecScriptExDemo:Make">
+			<MSBuild Targets="Make" Projects="14 - ExecScriptEx_Demo\prjExecScriptExDemo.dproj"/>
+		</Target>
+		<Target Name="prjHTMLListenerDemo">
+			<MSBuild Projects="15 - THtmlListener_Demo\prjHTMLListenerDemo.dproj"/>
+		</Target>
+		<Target Name="prjHTMLListenerDemo:Clean">
+			<MSBuild Targets="Clean" Projects="15 - THtmlListener_Demo\prjHTMLListenerDemo.dproj"/>
+		</Target>
+		<Target Name="prjHTMLListenerDemo:Make">
+			<MSBuild Targets="Make" Projects="15 - THtmlListener_Demo\prjHTMLListenerDemo.dproj"/>
+		</Target>
+		<Target Name="prjEWBControlDemo">
+			<MSBuild Projects="16 - TEWBControl_Demo\prjEWBControlDemo.dproj"/>
+		</Target>
+		<Target Name="prjEWBControlDemo:Clean">
+			<MSBuild Targets="Clean" Projects="16 - TEWBControl_Demo\prjEWBControlDemo.dproj"/>
+		</Target>
+		<Target Name="prjEWBControlDemo:Make">
+			<MSBuild Targets="Make" Projects="16 - TEWBControl_Demo\prjEWBControlDemo.dproj"/>
+		</Target>
+		<Target Name="prjEventsTestDemo">
+			<MSBuild Projects="17 - EWB Events Logger_Demo\prjEventsTestDemo.dproj"/>
+		</Target>
+		<Target Name="prjEventsTestDemo:Clean">
+			<MSBuild Targets="Clean" Projects="17 - EWB Events Logger_Demo\prjEventsTestDemo.dproj"/>
+		</Target>
+		<Target Name="prjEventsTestDemo:Make">
+			<MSBuild Targets="Make" Projects="17 - EWB Events Logger_Demo\prjEventsTestDemo.dproj"/>
+		</Target>
+		<Target Name="prjSysLV32RepDemo">
+			<MSBuild Projects="18 - SysListView32 Replacement_Demo\prjSysLV32RepDemo.dproj"/>
+		</Target>
+		<Target Name="prjSysLV32RepDemo:Clean">
+			<MSBuild Targets="Clean" Projects="18 - SysListView32 Replacement_Demo\prjSysLV32RepDemo.dproj"/>
+		</Target>
+		<Target Name="prjSysLV32RepDemo:Make">
+			<MSBuild Targets="Make" Projects="18 - SysListView32 Replacement_Demo\prjSysLV32RepDemo.dproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="prjSDIDemo;prjMDIDemo;prjNewWinTabs1Demo;prjNewWinTabs2Demo;prjEvalNewWindowDemo;PrjRightClick_Demo;prjDragDropDemo;prjElementsUnderMouseDemo;prjPrintPreviewTemplateDemo;prjPrintingOptionsDemo;prjMoveResizeDemo;prjMSHTML_EventsDemo;prjActiveFormDemo;prjExecScriptExDemo;prjHTMLListenerDemo;prjEWBControlDemo;prjEventsTestDemo;prjSysLV32RepDemo"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="prjSDIDemo:Clean;prjMDIDemo:Clean;prjNewWinTabs1Demo:Clean;prjNewWinTabs2Demo:Clean;prjEvalNewWindowDemo:Clean;PrjRightClick_Demo:Clean;prjDragDropDemo:Clean;prjElementsUnderMouseDemo:Clean;prjPrintPreviewTemplateDemo:Clean;prjPrintingOptionsDemo:Clean;prjMoveResizeDemo:Clean;prjMSHTML_EventsDemo:Clean;prjActiveFormDemo:Clean;prjExecScriptExDemo:Clean;prjHTMLListenerDemo:Clean;prjEWBControlDemo:Clean;prjEventsTestDemo:Clean;prjSysLV32RepDemo:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="prjSDIDemo:Make;prjMDIDemo:Make;prjNewWinTabs1Demo:Make;prjNewWinTabs2Demo:Make;prjEvalNewWindowDemo:Make;PrjRightClick_Demo:Make;prjDragDropDemo:Make;prjElementsUnderMouseDemo:Make;prjPrintPreviewTemplateDemo:Make;prjPrintingOptionsDemo:Make;prjMoveResizeDemo:Make;prjMSHTML_EventsDemo:Make;prjActiveFormDemo:Make;prjExecScriptExDemo:Make;prjHTMLListenerDemo:Make;prjEWBControlDemo:Make;prjEventsTestDemo:Make;prjSysLV32RepDemo:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>

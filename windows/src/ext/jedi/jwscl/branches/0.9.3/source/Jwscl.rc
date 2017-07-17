@@ -1,0 +1,1575 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    50000                   "22,FolderMapping,Neutral"
+    50001                   "STANDARD_RIGHTS_REQUIRED"
+    50002                   "STANDARD_RIGHTS_READ"
+    50003                   "STANDARD_RIGHTS_WRITE"
+    50004                   "STANDARD_RIGHTS_EXECUTE"
+    50005                   "FILE_ALL_ACCESS"
+    50006                   "FILE_READ_DATA"
+    50007                   "FILE_READ_ATTRIBUTES"
+    50008                   "FILE_READ_EA"
+    50009                   "SYNCHRONIZE"
+    50010                   "FILE_WRITE_DATA"
+    50011                   "FILE_WRITE_ATTRIBUTES"
+    50012                   "FILE_WRITE_EA"
+    50013                   "FILE_APPEND_DATA"
+    50014                   "FILE_READ_ATTRIBUTES"
+    50015                   "FILE_EXECUTE"
+END
+
+STRINGTABLE 
+BEGIN
+    50016                   "FILE_APPEND_DATA"
+    50017                   "WRITE_DAC"
+    50018                   "WRITE_OWNER"
+    50019                   "READ_CONTROL"
+    50020                   "DELETE"
+    50021                   "ACCESS_SYSTEM_SECURITY"
+    50022                   "SYNCHRONIZE"
+    50030                   "19,FileFolderMapping"
+    50031                   "STANDARD_RIGHTS_REQUIRED"
+END
+
+STRINGTABLE 
+BEGIN
+    50032                   "STANDARD_RIGHTS_READ"
+    50033                   "STANDARD_RIGHTS_WRITE"
+    50034                   "STANDARD_RIGHTS_EXECUTE"
+    50035                   "FILE_LIST_DIRECTORY"
+    50036                   "FILE_ADD_FILE"
+    50037                   "FILE_ADD_SUBDIRECTORY"
+    50038                   "FILE_READ_EA"
+    50039                   "FILE_WRITE_EA"
+    50040                   "FILE_TRAVERSE"
+    50041                   "FILE_DELETE_CHILD"
+    50042                   "FILE_READ_ATTRIBUTES"
+    50043                   "FILE_WRITE_ATTRIBUTES"
+    50044                   "WRITE_DAC"
+    50045                   "WRITE_OWNER"
+    50046                   "READ_CONTROL"
+    50047                   "DELETE"
+END
+
+STRINGTABLE 
+BEGIN
+    50048                   "ACCESS_SYSTEM_SECURITY"
+    50049                   "SYNCHRONIZE"
+    50060                   "19,FileFolderMapping"
+    50061                   "FILE_ALL_ACCESS"
+    50062                   "FILE_GENERIC_READ or FILE_GENERIC_WRITE or FILE_GENERIC_EXECUTE or Delete"
+    50063                   "FILE_GENERIC_READ or FILE_GENERIC_EXECUTE"
+END
+
+STRINGTABLE 
+BEGIN
+    50064                   "FILE_GENERIC_READ or FILE_GENERIC_EXECUTE"
+    50065                   "FILE_GENERIC_READ"
+    50066                   "FILE_GENERIC_WRITE and not READ_CONTROL"
+    50067                   "FILE_TRAVERSE or FILE_EXECUTE"
+    50068                   "FILE_LIST_DIRECTORY or FILE_READ_DATA"
+    50069                   "FILE_READ_ATTRIBUTES"
+    50070                   "FILE_READ_EA"
+    50071                   "FILE_ADD_FILE or FILE_WRITE_DATA"
+    50072                   "FILE_ADD_SUBDIRECTORY or FILE_APPEND_DATA"
+    50073                   "FILE_WRITE_ATTRIBUTES"
+    50074                   "FILE_WRITE_EA"
+    50075                   "FILE_DELETE_CHILD"
+    50076                   "FILE_DELETE"
+    50077                   "WRITE_DAC"
+    50078                   "WRITE_OWNER"
+    50079                   "READ_CONTROL"
+END
+
+STRINGTABLE 
+BEGIN
+    50090                   "17, WinStationMapping"
+    50091                   "STANDARD_RIGHTS_REQUIRED"
+    50092                   "STANDARD_RIGHTS_READ"
+    50093                   "STANDARD_RIGHTS_WRITE"
+    50094                   "STANDARD_RIGHTS_EXECUTE"
+    50095                   "WINSTA_ACCESSCLIPBOARD"
+END
+
+STRINGTABLE 
+BEGIN
+    50096                   "WINSTA_ACCESSGLOBALATOMS"
+    50097                   "WINSTA_CREATEDESKTOP"
+    50098                   "WINSTA_ENUMDESKTOPS"
+    50099                   "WINSTA_ENUMERATE"
+    50100                   "WINSTA_EXITWINDOWS"
+    50101                   "WINSTA_READATTRIBUTES"
+    50102                   "WINSTA_READSCREEN"
+    50103                   "WINSTA_WRITEATTRIBUTES"
+    50104                   "WRITE_DAC"
+    50105                   "WRITE_OWNER"
+    50106                   "READ_CONTROL"
+    50107                   "DELETE"
+END
+
+STRINGTABLE 
+BEGIN
+    50120                   "19,DesktopMapping"
+    50121                   "STANDARD_RIGHTS_ALL"
+    50122                   "STANDARD_RIGHTS_READ"
+    50123                   "STANDARD_RIGHTS_WRITE"
+    50124                   "STANDARD_RIGHTS_EXECUTE"
+    50125                   "DESKTOP_ENUMERATE"
+    50126                   "DESKTOP_READOBJECTS"
+    50127                   "DESKTOP_CREATEMENU"
+END
+
+STRINGTABLE 
+BEGIN
+    50128                   "DESKTOP_CREATEWINDOW"
+    50129                   "DESKTOP_HOOKCONTROL"
+    50130                   "DESKTOP_JOURNALPLAYBACK"
+    50131                   "DESKTOP_JOURNALRECORD"
+    50132                   "DESKTOP_WRITEOBJECTS"
+    50133                   "DESKTOP_SWITCHDESKTOP"
+    50134                   "WRITE_DAC"
+    50135                   "WRITE_OWNER"
+    50136                   "READ_CONTROL"
+    50137                   "DELETE"
+    50138                   "ACCESS_SYSTEM_SECURITY"
+    50139                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50150                   "16,RegistryMapping"
+    50151                   "STANDARD_RIGHTS_ALL"
+    50152                   "STANDARD_RIGHTS_READ"
+    50153                   "STANDARD_RIGHTS_WRITE"
+    50154                   "STANDARD_RIGHTS_EXECUTE"
+    50155                   "KEY_QUERY_VALUE"
+    50156                   "KEY_ENUMERATE_SUB_KEYS"
+    50157                   "KEY_NOTIFY"
+    50158                   "KEY_CREATE_SUB_KEY"
+    50159                   "KEY_CREATE_LINK"
+END
+
+STRINGTABLE 
+BEGIN
+    50160                   "KEY_SET_VALUE"
+    50161                   "WRITE_DAC"
+    50162                   "WRITE_OWNER"
+    50163                   "READ_CONTROL"
+    50164                   "DELETE"
+    50165                   "ACCESS_SYSTEM_SECURITY"
+    50166                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50180                   "20,ServiceMapping"
+    50181                   "STANDARD_RIGHTS_ALL"
+    50182                   "STANDARD_RIGHTS_READ"
+    50183                   "STANDARD_RIGHTS_WRITE"
+    50184                   "STANDARD_RIGHTS_EXECUTE"
+    50185                   "SERVICE_ALL_ACCESS"
+    50186                   "SERVICE_CHANGE_CONFIG"
+    50187                   "SERVICE_ENUMERATE_DEPENDENTS"
+    50188                   "SERVICE_INTERROGATE"
+    50189                   "SERVICE_PAUSE_CONTINUE"
+    50190                   "SERVICE_QUERY_CONFIG"
+    50191                   "SERVICE_QUERY_STATUS"
+END
+
+STRINGTABLE 
+BEGIN
+    50192                   "SERVICE_START"
+    50193                   "SERVICE_STOP"
+    50194                   "SERVICE_USER_DEFINED_CONTROL"
+    50195                   "WRITE_DAC"
+    50196                   "WRITE_OWNER"
+    50197                   "READ_CONTROL"
+    50198                   "DELETE"
+    50199                   "ACCESS_SYSTEM_SECURITY"
+    50200                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50210                   "17,SCManagerMapping"
+    50211                   "STANDARD_RIGHTS_ALL"
+    50212                   "STANDARD_RIGHTS_READ"
+    50213                   "STANDARD_RIGHTS_WRITE"
+    50214                   "STANDARD_RIGHTS_EXECUTE"
+    50215                   "SC_MANAGER_ALL_ACCESS"
+    50216                   "SC_MANAGER_CREATE_SERVICE"
+    50217                   "SC_MANAGER_CONNECT"
+    50218                   "SC_MANAGER_ENUMERATE_SERVICE"
+    50219                   "SC_MANAGER_LOCK"
+    50220                   "SC_MANAGER_MODIFY_BOOT_CONFIG"
+    50221                   "SC_MANAGER_QUERY_LOCK_STATUS"
+    50222                   "WRITE_DAC"
+    50223                   "WRITE_OWNER"
+END
+
+STRINGTABLE 
+BEGIN
+    50224                   "READ_CONTROL"
+    50225                   "DELETE"
+    50226                   "ACCESS_SYSTEM_SECURITY"
+    50227                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50240                   "16,PrinterMapping"
+    50241                   "PRINTER_ALL_ACCESS"
+    50242                   "PRINTER_READ"
+    50243                   "PRINTER_WRITE"
+    50244                   "PRINTER_EXECUTE"
+    50245                   "PRINTER_ALL_ACCESS"
+    50246                   "SERVER_ACCESS_ADMINISTER"
+    50247                   "SERVER_ACCESS_ENUMERATE"
+    50248                   "PRINTER_ACCESS_ADMINISTER"
+    50249                   "PRINTER_ACCESS_USE"
+    50250                   "JOB_ACCESS_ADMINISTER"
+    50251                   "WRITE_DAC"
+    50252                   "WRITE_OWNER"
+    50253                   "READ_CONTROL"
+    50254                   "DELETE"
+    50255                   "ACCESS_SYSTEM_SECURITY"
+END
+
+STRINGTABLE 
+BEGIN
+    50256                   "SYNCHRONIZE"
+    50270                   "13,ShareMapping"
+    50271                   "STANDARD_RIGHTS_ALL"
+END
+
+STRINGTABLE 
+BEGIN
+    50272                   "STANDARD_RIGHTS_READ"
+    50273                   "STANDARD_RIGHTS_WRITE"
+    50274                   "STANDARD_RIGHTS_EXECUTE"
+    50275                   "PERM_FILE_READ"
+    50276                   "PERM_FILE_WRITE"
+    50277                   "PERM_FILE_CREATE"
+    50278                   "WRITE_DAC"
+    50279                   "WRITE_OWNER"
+    50280                   "READ_CONTROL"
+    50281                   "DELETE"
+    50282                   "ACCESS_SYSTEM_SECURITY"
+    50283                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50290                   "22,ProcessMapping"
+    50291                   "STANDARD_RIGHTS_ALL"
+    50292                   "STANDARD_RIGHTS_READ"
+    50293                   "STANDARD_RIGHTS_WRITE"
+    50294                   "STANDARD_RIGHTS_EXECUTE"
+    50295                   "PROCESS_ALL_ACCESS"
+    50296                   "PROCESS_TERMINATE"
+    50297                   "PROCESS_CREATE_THREAD"
+    50298                   "PROCESS_SET_SESSIONID"
+    50299                   "PROCESS_VM_OPERATION"
+    50300                   "PROCESS_VM_READ"
+    50301                   "PROCESS_VM_WRITE"
+    50302                   "PROCESS_DUP_HANDLE"
+    50303                   "PROCESS_CREATE_PROCESS"
+END
+
+STRINGTABLE 
+BEGIN
+    50304                   "PROCESS_SET_QUOTA"
+    50305                   "PROCESS_SET_INFORMATION"
+    50306                   "PROCESS_QUERY_INFORMATION"
+    50307                   "WRITE_DAC"
+    50308                   "WRITE_OWNER"
+    50309                   "READ_CONTROL"
+    50310                   "DELETE"
+    50311                   "ACCESS_SYSTEM_SECURITY"
+    50312                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50320                   "20,ThreadMapping"
+    50321                   "STANDARD_RIGHTS_ALL"
+    50322                   "STANDARD_RIGHTS_READ"
+    50323                   "STANDARD_RIGHTS_WRITE"
+    50324                   "STANDARD_RIGHTS_EXECUTE"
+    50325                   "THREAD_ALL_ACCESS"
+    50326                   "THREAD_TERMINATE"
+    50327                   "THREAD_SUSPEND_RESUME"
+    50328                   "THREAD_GET_CONTEXT"
+    50329                   "THREAD_SET_CONTEXT"
+    50330                   "THREAD_SET_INFORMATION"
+    50331                   "THREAD_QUERY_INFORMATION"
+    50332                   "THREAD_SET_THREAD_TOKEN"
+    50333                   "THREAD_IMPERSONATE"
+    50334                   "THREAD_DIRECT_IMPERSONATION"
+    50335                   "WRITE_DAC"
+END
+
+STRINGTABLE 
+BEGIN
+    50336                   "WRITE_OWNER"
+    50337                   "READ_CONTROL"
+    50338                   "DELETE"
+    50339                   "ACCESS_SYSTEM_SECURITY"
+    50340                   "SYNCHRONIZE"
+    50350                   "16,JobMapping"
+    50351                   "STANDARD_RIGHTS_ALL"
+END
+
+STRINGTABLE 
+BEGIN
+    50352                   "STANDARD_RIGHTS_READ"
+    50353                   "STANDARD_RIGHTS_WRITE"
+    50354                   "STANDARD_RIGHTS_EXECUTE"
+    50355                   "JOB_OBJECT_ALL_ACCESS"
+    50356                   "JOB_OBJECT_ASSIGN_PROCESS"
+    50357                   "JOB_OBJECT_SET_ATTRIBUTES"
+    50358                   "JOB_OBJECT_QUERY"
+    50359                   "JOB_OBJECT_TERMINATE"
+    50360                   "JOB_OBJECT_SET_SECURITY_ATTRIBUTES"
+    50361                   "WRITE_DAC"
+    50362                   "WRITE_OWNER"
+    50363                   "READ_CONTROL"
+    50364                   "DELETE"
+    50365                   "ACCESS_SYSTEM_SECURITY"
+    50366                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50380                   "12,SemaphoreMapping"
+    50381                   "STANDARD_RIGHTS_ALL"
+    50382                   "STANDARD_RIGHTS_READ"
+    50383                   "STANDARD_RIGHTS_WRITE"
+END
+
+STRINGTABLE 
+BEGIN
+    50384                   "STANDARD_RIGHTS_EXECUTE"
+    50385                   "SEMAPHORE_ALL_ACCESS"
+    50386                   "SEMAPHORE_MODIFY_STATE"
+    50387                   "WRITE_DAC"
+    50388                   "WRITE_OWNER"
+    50389                   "READ_CONTROL"
+    50390                   "DELETE"
+    50391                   "ACCESS_SYSTEM_SECURITY"
+    50392                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50400                   "12,EventMapping"
+    50401                   "STANDARD_RIGHTS_ALL"
+    50402                   "STANDARD_RIGHTS_READ"
+    50403                   "STANDARD_RIGHTS_WRITE"
+    50404                   "STANDARD_RIGHTS_EXECUTE"
+    50405                   "EVENT_ALL_ACCESS"
+    50406                   "EVENT_MODIFY_STATE"
+    50407                   "WRITE_DAC"
+    50408                   "WRITE_OWNER"
+    50409                   "READ_CONTROL"
+    50410                   "DELETE"
+    50411                   "ACCESS_SYSTEM_SECURITY"
+    50412                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50420                   "12,MutexMapping"
+    50421                   "STANDARD_RIGHTS_ALL"
+    50422                   "STANDARD_RIGHTS_READ"
+    50423                   "STANDARD_RIGHTS_WRITE"
+    50424                   "STANDARD_RIGHTS_EXECUTE"
+    50425                   "MUTEX_ALL_ACCESS"
+    50426                   "MUTEX_MODIFY_STATE"
+    50427                   "WRITE_DAC"
+    50428                   "WRITE_OWNER"
+    50429                   "READ_CONTROL"
+    50430                   "DELETE"
+    50431                   "ACCESS_SYSTEM_SECURITY"
+END
+
+STRINGTABLE 
+BEGIN
+    50432                   "SYNCHRONIZE"
+    50440                   "15,FileMapMapping"
+    50441                   "STANDARD_RIGHTS_ALL"
+    50442                   "STANDARD_RIGHTS_READ"
+    50443                   "STANDARD_RIGHTS_WRITE"
+    50444                   "STANDARD_RIGHTS_EXECUTE"
+    50445                   "FILE_MAP_ALL_ACCESS"
+    50446                   "FILE_MAP_COPY"
+    50447                   "FILE_MAP_WRITE"
+END
+
+STRINGTABLE 
+BEGIN
+    50448                   "FILE_MAP_READ"
+    50449                   "SECTION_EXTEND_SIZE"
+    50450                   "WRITE_DAC"
+    50451                   "WRITE_OWNER"
+    50452                   "READ_CONTROL"
+    50453                   "DELETE"
+    50454                   "ACCESS_SYSTEM_SECURITY"
+    50455                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50470                   "13,TimerMapping"
+    50471                   "STANDARD_RIGHTS_ALL"
+    50472                   "STANDARD_RIGHTS_READ"
+    50473                   "STANDARD_RIGHTS_WRITE"
+    50474                   "STANDARD_RIGHTS_EXECUTE"
+    50475                   "TIMER_ALL_ACCESS"
+    50476                   "TIMER_QUERY_STATE"
+    50477                   "TIMER_MODIFY_STATE"
+    50478                   "WRITE_DAC"
+    50479                   "WRITE_OWNER"
+END
+
+STRINGTABLE 
+BEGIN
+    50480                   "READ_CONTROL"
+    50481                   "DELETE"
+    50482                   "ACCESS_SYSTEM_SECURITY"
+    50483                   "SYNCHRONIZE"
+    50490                   "20,TokenMapping"
+    50491                   "STANDARD_RIGHTS_ALL"
+    50492                   "STANDARD_RIGHTS_READ"
+    50493                   "STANDARD_RIGHTS_WRITE"
+    50494                   "STANDARD_RIGHTS_EXECUTE"
+    50495                   "TOKEN_ALL_ACCESS"
+END
+
+STRINGTABLE 
+BEGIN
+    50496                   "TOKEN_ASSIGN_PRIMARY"
+    50497                   "TOKEN_DUPLICATE"
+    50498                   "TOKEN_IMPERSONATE"
+    50499                   "TOKEN_QUERY"
+    50500                   "TOKEN_QUERY_SOURCE"
+    50501                   "TOKEN_ADJUST_PRIVILEGES"
+    50502                   "TOKEN_ADJUST_GROUPS"
+    50503                   "TOKEN_ADJUST_DEFAULT"
+    50504                   "TOKEN_ADJUST_SESSIONID"
+    50505                   "WRITE_DAC"
+    50506                   "WRITE_OWNER"
+    50507                   "READ_CONTROL"
+    50508                   "DELETE"
+    50509                   "ACCESS_SYSTEM_SECURITY"
+    50510                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50520                   "16,PipeMapping"
+    50521                   "STANDARD_RIGHTS_ALL"
+    50522                   "STANDARD_RIGHTS_READ"
+    50523                   "STANDARD_RIGHTS_WRITE"
+    50524                   "STANDARD_RIGHTS_EXECUTE"
+    50525                   "FILE_ALL_ACCESS"
+    50526                   "FILE_READ_DATA"
+    50527                   "FILE_WRITE_DATA"
+END
+
+STRINGTABLE 
+BEGIN
+    50528                   "FILE_CREATE_PIPE_INSTANCE"
+    50529                   "FILE_READ_ATTRIBUTES"
+    50530                   "FILE_WRITE_ATTRIBUTES"
+    50531                   "WRITE_DAC"
+    50532                   "WRITE_OWNER"
+    50533                   "READ_CONTROL"
+    50534                   "DELETE"
+    50535                   "ACCESS_SYSTEM_SECURITY"
+    50536                   "SYNCHRONIZE"
+END
+
+#endif    // Neutral resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.\0"
+END
+
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    50000                   "22,FolderMapping,German"
+    50001                   "STANDARD_RIGHTS_REQUIRED"
+    50002                   "STANDARD_RIGHTS_READ"
+    50003                   "STANDARD_RIGHTS_WRITE"
+    50004                   "STANDARD_RIGHTS_EXECUTE"
+    50005                   "Vollzugriff"
+    50006                   "Dateilesezugriff"
+    50007                   "Dateiattributlesezugriff"
+    50008                   "FILE_READ_EA"
+    50009                   "SYNCHRONIZE"
+    50010                   "FILE_WRITE_DATA"
+    50011                   "FILE_WRITE_ATTRIBUTES"
+    50012                   "FILE_WRITE_EA"
+    50013                   "FILE_APPEND_DATA"
+    50014                   "FILE_READ_ATTRIBUTES"
+    50015                   "FILE_EXECUTE"
+END
+
+STRINGTABLE 
+BEGIN
+    50016                   "FILE_APPEND_DATA"
+    50017                   "WRITE_DAC"
+    50018                   "WRITE_OWNER"
+    50019                   "READ_CONTROL"
+    50020                   "DELETE"
+    50021                   "ACCESS_SYSTEM_SECURITY"
+    50022                   "SYNCHRONIZE"
+    50030                   "19,FileFolderMapping"
+    50031                   "STANDARD_RIGHTS_REQUIRED"
+END
+
+STRINGTABLE 
+BEGIN
+    50032                   "STANDARD_RIGHTS_READ"
+    50033                   "STANDARD_RIGHTS_WRITE"
+    50034                   "STANDARD_RIGHTS_EXECUTE"
+    50035                   "FILE_LIST_DIRECTORY"
+    50036                   "FILE_ADD_FILE"
+    50037                   "FILE_ADD_SUBDIRECTORY"
+    50038                   "FILE_READ_EA"
+    50039                   "FILE_WRITE_EA"
+    50040                   "FILE_TRAVERSE"
+    50041                   "FILE_DELETE_CHILD"
+    50042                   "FILE_READ_ATTRIBUTES"
+    50043                   "FILE_WRITE_ATTRIBUTES"
+    50044                   "WRITE_DAC"
+    50045                   "WRITE_OWNER"
+    50046                   "READ_CONTROL"
+    50047                   "DELETE"
+END
+
+STRINGTABLE 
+BEGIN
+    50048                   "ACCESS_SYSTEM_SECURITY"
+    50049                   "SYNCHRONIZE"
+    50060                   "19,FileFolderMapping"
+    50061                   "FILE_ALL_ACCESS"
+    50062                   "FILE_GENERIC_READ or FILE_GENERIC_WRITE or FILE_GENERIC_EXECUTE or Delete"
+    50063                   "FILE_GENERIC_READ or FILE_GENERIC_EXECUTE"
+END
+
+STRINGTABLE 
+BEGIN
+    50064                   "FILE_GENERIC_READ or FILE_GENERIC_EXECUTE"
+    50065                   "FILE_GENERIC_READ"
+    50066                   "FILE_GENERIC_WRITE and not READ_CONTROL"
+    50067                   "FILE_TRAVERSE or FILE_EXECUTE"
+    50068                   "FILE_LIST_DIRECTORY or FILE_READ_DATA"
+    50069                   "FILE_READ_ATTRIBUTES"
+    50070                   "FILE_READ_EA"
+    50071                   "FILE_ADD_FILE or FILE_WRITE_DATA"
+    50072                   "FILE_ADD_SUBDIRECTORY or FILE_APPEND_DATA"
+    50073                   "FILE_WRITE_ATTRIBUTES"
+    50074                   "FILE_WRITE_EA"
+    50075                   "FILE_DELETE_CHILD"
+    50076                   "FILE_DELETE"
+    50077                   "WRITE_DAC"
+    50078                   "WRITE_OWNER"
+    50079                   "READ_CONTROL"
+END
+
+STRINGTABLE 
+BEGIN
+    50090                   "17, WinStationMapping"
+    50091                   "STANDARD_RIGHTS_REQUIRED"
+    50092                   "STANDARD_RIGHTS_READ"
+    50093                   "STANDARD_RIGHTS_WRITE"
+    50094                   "STANDARD_RIGHTS_EXECUTE"
+    50095                   "WINSTA_ACCESSCLIPBOARD"
+END
+
+STRINGTABLE 
+BEGIN
+    50096                   "WINSTA_ACCESSGLOBALATOMS"
+    50097                   "WINSTA_CREATEDESKTOP"
+    50098                   "WINSTA_ENUMDESKTOPS"
+    50099                   "WINSTA_ENUMERATE"
+    50100                   "WINSTA_EXITWINDOWS"
+    50101                   "WINSTA_READATTRIBUTES"
+    50102                   "WINSTA_READSCREEN"
+    50103                   "WINSTA_WRITEATTRIBUTES"
+    50104                   "WRITE_DAC"
+    50105                   "WRITE_OWNER"
+    50106                   "READ_CONTROL"
+    50107                   "DELETE"
+END
+
+STRINGTABLE 
+BEGIN
+    50120                   "19,DesktopMapping"
+    50121                   "STANDARD_RIGHTS_ALL"
+    50122                   "STANDARD_RIGHTS_READ"
+    50123                   "STANDARD_RIGHTS_WRITE"
+    50124                   "STANDARD_RIGHTS_EXECUTE"
+    50125                   "DESKTOP_ENUMERATE"
+    50126                   "DESKTOP_READOBJECTS"
+    50127                   "DESKTOP_CREATEMENU"
+END
+
+STRINGTABLE 
+BEGIN
+    50128                   "DESKTOP_CREATEWINDOW"
+    50129                   "DESKTOP_HOOKCONTROL"
+    50130                   "DESKTOP_JOURNALPLAYBACK"
+    50131                   "DESKTOP_JOURNALRECORD"
+    50132                   "DESKTOP_WRITEOBJECTS"
+    50133                   "DESKTOP_SWITCHDESKTOP"
+    50134                   "WRITE_DAC"
+    50135                   "WRITE_OWNER"
+    50136                   "READ_CONTROL"
+    50137                   "DELETE"
+    50138                   "ACCESS_SYSTEM_SECURITY"
+    50139                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50150                   "16,RegistryMapping"
+    50151                   "STANDARD_RIGHTS_ALL"
+    50152                   "STANDARD_RIGHTS_READ"
+    50153                   "STANDARD_RIGHTS_WRITE"
+    50154                   "STANDARD_RIGHTS_EXECUTE"
+    50155                   "KEY_QUERY_VALUE"
+    50156                   "KEY_ENUMERATE_SUB_KEYS"
+    50157                   "KEY_NOTIFY"
+    50158                   "KEY_CREATE_SUB_KEY"
+    50159                   "KEY_CREATE_LINK"
+END
+
+STRINGTABLE 
+BEGIN
+    50160                   "KEY_SET_VALUE"
+    50161                   "WRITE_DAC"
+    50162                   "WRITE_OWNER"
+    50163                   "READ_CONTROL"
+    50164                   "DELETE"
+    50165                   "ACCESS_SYSTEM_SECURITY"
+    50166                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50180                   "20,ServiceMapping"
+    50181                   "STANDARD_RIGHTS_ALL"
+    50182                   "STANDARD_RIGHTS_READ"
+    50183                   "STANDARD_RIGHTS_WRITE"
+    50184                   "STANDARD_RIGHTS_EXECUTE"
+    50185                   "SERVICE_ALL_ACCESS"
+    50186                   "SERVICE_CHANGE_CONFIG"
+    50187                   "SERVICE_ENUMERATE_DEPENDENTS"
+    50188                   "SERVICE_INTERROGATE"
+    50189                   "SERVICE_PAUSE_CONTINUE"
+    50190                   "SERVICE_QUERY_CONFIG"
+    50191                   "SERVICE_QUERY_STATUS"
+END
+
+STRINGTABLE 
+BEGIN
+    50192                   "SERVICE_START"
+    50193                   "SERVICE_STOP"
+    50194                   "SERVICE_USER_DEFINED_CONTROL"
+    50195                   "WRITE_DAC"
+    50196                   "WRITE_OWNER"
+    50197                   "READ_CONTROL"
+    50198                   "DELETE"
+    50199                   "ACCESS_SYSTEM_SECURITY"
+    50200                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50210                   "17,SCManagerMapping"
+    50211                   "STANDARD_RIGHTS_ALL"
+    50212                   "STANDARD_RIGHTS_READ"
+    50213                   "STANDARD_RIGHTS_WRITE"
+    50214                   "STANDARD_RIGHTS_EXECUTE"
+    50215                   "SC_MANAGER_ALL_ACCESS"
+    50216                   "SC_MANAGER_CREATE_SERVICE"
+    50217                   "SC_MANAGER_CONNECT"
+    50218                   "SC_MANAGER_ENUMERATE_SERVICE"
+    50219                   "SC_MANAGER_LOCK"
+    50220                   "SC_MANAGER_MODIFY_BOOT_CONFIG"
+    50221                   "SC_MANAGER_QUERY_LOCK_STATUS"
+    50222                   "WRITE_DAC"
+    50223                   "WRITE_OWNER"
+END
+
+STRINGTABLE 
+BEGIN
+    50224                   "READ_CONTROL"
+    50225                   "DELETE"
+    50226                   "ACCESS_SYSTEM_SECURITY"
+    50227                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50240                   "16,PrinterMapping"
+    50241                   "PRINTER_ALL_ACCESS"
+    50242                   "PRINTER_READ"
+    50243                   "PRINTER_WRITE"
+    50244                   "PRINTER_EXECUTE"
+    50245                   "PRINTER_ALL_ACCESS"
+    50246                   "SERVER_ACCESS_ADMINISTER"
+    50247                   "SERVER_ACCESS_ENUMERATE"
+    50248                   "PRINTER_ACCESS_ADMINISTER"
+    50249                   "PRINTER_ACCESS_USE"
+    50250                   "JOB_ACCESS_ADMINISTER"
+    50251                   "WRITE_DAC"
+    50252                   "WRITE_OWNER"
+    50253                   "READ_CONTROL"
+    50254                   "DELETE"
+    50255                   "ACCESS_SYSTEM_SECURITY"
+END
+
+STRINGTABLE 
+BEGIN
+    50256                   "SYNCHRONIZE"
+    50270                   "13,ShareMapping"
+    50271                   "STANDARD_RIGHTS_ALL"
+END
+
+STRINGTABLE 
+BEGIN
+    50272                   "STANDARD_RIGHTS_READ"
+    50273                   "STANDARD_RIGHTS_WRITE"
+    50274                   "STANDARD_RIGHTS_EXECUTE"
+    50275                   "PERM_FILE_READ"
+    50276                   "PERM_FILE_WRITE"
+    50277                   "PERM_FILE_CREATE"
+    50278                   "WRITE_DAC"
+    50279                   "WRITE_OWNER"
+    50280                   "READ_CONTROL"
+    50281                   "DELETE"
+    50282                   "ACCESS_SYSTEM_SECURITY"
+    50283                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50290                   "22,ProcessMapping"
+    50291                   "STANDARD_RIGHTS_ALL"
+    50292                   "STANDARD_RIGHTS_READ"
+    50293                   "STANDARD_RIGHTS_WRITE"
+    50294                   "STANDARD_RIGHTS_EXECUTE"
+    50295                   "PROCESS_ALL_ACCESS"
+    50296                   "PROCESS_TERMINATE"
+    50297                   "PROCESS_CREATE_THREAD"
+    50298                   "PROCESS_SET_SESSIONID"
+    50299                   "PROCESS_VM_OPERATION"
+    50300                   "PROCESS_VM_READ"
+    50301                   "PROCESS_VM_WRITE"
+    50302                   "PROCESS_DUP_HANDLE"
+    50303                   "PROCESS_CREATE_PROCESS"
+END
+
+STRINGTABLE 
+BEGIN
+    50304                   "PROCESS_SET_QUOTA"
+    50305                   "PROCESS_SET_INFORMATION"
+    50306                   "PROCESS_QUERY_INFORMATION"
+    50307                   "WRITE_DAC"
+    50308                   "WRITE_OWNER"
+    50309                   "READ_CONTROL"
+    50310                   "DELETE"
+    50311                   "ACCESS_SYSTEM_SECURITY"
+    50312                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50320                   "20,ThreadMapping"
+    50321                   "STANDARD_RIGHTS_ALL"
+    50322                   "STANDARD_RIGHTS_READ"
+    50323                   "STANDARD_RIGHTS_WRITE"
+    50324                   "STANDARD_RIGHTS_EXECUTE"
+    50325                   "THREAD_ALL_ACCESS"
+    50326                   "THREAD_TERMINATE"
+    50327                   "THREAD_SUSPEND_RESUME"
+    50328                   "THREAD_GET_CONTEXT"
+    50329                   "THREAD_SET_CONTEXT"
+    50330                   "THREAD_SET_INFORMATION"
+    50331                   "THREAD_QUERY_INFORMATION"
+    50332                   "THREAD_SET_THREAD_TOKEN"
+    50333                   "THREAD_IMPERSONATE"
+    50334                   "THREAD_DIRECT_IMPERSONATION"
+    50335                   "WRITE_DAC"
+END
+
+STRINGTABLE 
+BEGIN
+    50336                   "WRITE_OWNER"
+    50337                   "READ_CONTROL"
+    50338                   "DELETE"
+    50339                   "ACCESS_SYSTEM_SECURITY"
+    50340                   "SYNCHRONIZE"
+    50350                   "16,JobMapping"
+    50351                   "STANDARD_RIGHTS_ALL"
+END
+
+STRINGTABLE 
+BEGIN
+    50352                   "STANDARD_RIGHTS_READ"
+    50353                   "STANDARD_RIGHTS_WRITE"
+    50354                   "STANDARD_RIGHTS_EXECUTE"
+    50355                   "JOB_OBJECT_ALL_ACCESS"
+    50356                   "JOB_OBJECT_ASSIGN_PROCESS"
+    50357                   "JOB_OBJECT_SET_ATTRIBUTES"
+    50358                   "JOB_OBJECT_QUERY"
+    50359                   "JOB_OBJECT_TERMINATE"
+    50360                   "JOB_OBJECT_SET_SECURITY_ATTRIBUTES"
+    50361                   "WRITE_DAC"
+    50362                   "WRITE_OWNER"
+    50363                   "READ_CONTROL"
+    50364                   "DELETE"
+    50365                   "ACCESS_SYSTEM_SECURITY"
+    50366                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50380                   "12,SemaphoreMapping"
+    50381                   "STANDARD_RIGHTS_ALL"
+    50382                   "STANDARD_RIGHTS_READ"
+    50383                   "STANDARD_RIGHTS_WRITE"
+END
+
+STRINGTABLE 
+BEGIN
+    50384                   "STANDARD_RIGHTS_EXECUTE"
+    50385                   "SEMAPHORE_ALL_ACCESS"
+    50386                   "SEMAPHORE_MODIFY_STATE"
+    50387                   "WRITE_DAC"
+    50388                   "WRITE_OWNER"
+    50389                   "READ_CONTROL"
+    50390                   "DELETE"
+    50391                   "ACCESS_SYSTEM_SECURITY"
+    50392                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50400                   "12,EventMapping"
+    50401                   "STANDARD_RIGHTS_ALL"
+    50402                   "STANDARD_RIGHTS_READ"
+    50403                   "STANDARD_RIGHTS_WRITE"
+    50404                   "STANDARD_RIGHTS_EXECUTE"
+    50405                   "EVENT_ALL_ACCESS"
+    50406                   "EVENT_MODIFY_STATE"
+    50407                   "WRITE_DAC"
+    50408                   "WRITE_OWNER"
+    50409                   "READ_CONTROL"
+    50410                   "DELETE"
+    50411                   "ACCESS_SYSTEM_SECURITY"
+    50412                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50420                   "12,MutexMapping"
+    50421                   "STANDARD_RIGHTS_ALL"
+    50422                   "STANDARD_RIGHTS_READ"
+    50423                   "STANDARD_RIGHTS_WRITE"
+    50424                   "STANDARD_RIGHTS_EXECUTE"
+    50425                   "MUTEX_ALL_ACCESS"
+    50426                   "MUTEX_MODIFY_STATE"
+    50427                   "WRITE_DAC"
+    50428                   "WRITE_OWNER"
+    50429                   "READ_CONTROL"
+    50430                   "DELETE"
+    50431                   "ACCESS_SYSTEM_SECURITY"
+END
+
+STRINGTABLE 
+BEGIN
+    50432                   "SYNCHRONIZE"
+    50440                   "15,FileMapMapping"
+    50441                   "STANDARD_RIGHTS_ALL"
+    50442                   "STANDARD_RIGHTS_READ"
+    50443                   "STANDARD_RIGHTS_WRITE"
+    50444                   "STANDARD_RIGHTS_EXECUTE"
+    50445                   "FILE_MAP_ALL_ACCESS"
+    50446                   "FILE_MAP_COPY"
+    50447                   "FILE_MAP_WRITE"
+END
+
+STRINGTABLE 
+BEGIN
+    50448                   "FILE_MAP_READ"
+    50449                   "SECTION_EXTEND_SIZE"
+    50450                   "WRITE_DAC"
+    50451                   "WRITE_OWNER"
+    50452                   "READ_CONTROL"
+    50453                   "DELETE"
+    50454                   "ACCESS_SYSTEM_SECURITY"
+    50455                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50470                   "13,TimerMapping"
+    50471                   "STANDARD_RIGHTS_ALL"
+    50472                   "STANDARD_RIGHTS_READ"
+    50473                   "STANDARD_RIGHTS_WRITE"
+    50474                   "STANDARD_RIGHTS_EXECUTE"
+    50475                   "TIMER_ALL_ACCESS"
+    50476                   "TIMER_QUERY_STATE"
+    50477                   "TIMER_MODIFY_STATE"
+    50478                   "WRITE_DAC"
+    50479                   "WRITE_OWNER"
+END
+
+STRINGTABLE 
+BEGIN
+    50480                   "READ_CONTROL"
+    50481                   "DELETE"
+    50482                   "ACCESS_SYSTEM_SECURITY"
+    50483                   "SYNCHRONIZE"
+    50490                   "20,TokenMapping"
+    50491                   "STANDARD_RIGHTS_ALL"
+    50492                   "STANDARD_RIGHTS_READ"
+    50493                   "STANDARD_RIGHTS_WRITE"
+    50494                   "STANDARD_RIGHTS_EXECUTE"
+    50495                   "TOKEN_ALL_ACCESS"
+END
+
+STRINGTABLE 
+BEGIN
+    50496                   "TOKEN_ASSIGN_PRIMARY"
+    50497                   "TOKEN_DUPLICATE"
+    50498                   "TOKEN_IMPERSONATE"
+    50499                   "TOKEN_QUERY"
+    50500                   "TOKEN_QUERY_SOURCE"
+    50501                   "TOKEN_ADJUST_PRIVILEGES"
+    50502                   "TOKEN_ADJUST_GROUPS"
+    50503                   "TOKEN_ADJUST_DEFAULT"
+    50504                   "TOKEN_ADJUST_SESSIONID"
+    50505                   "WRITE_DAC"
+    50506                   "WRITE_OWNER"
+    50507                   "READ_CONTROL"
+    50508                   "DELETE"
+    50509                   "ACCESS_SYSTEM_SECURITY"
+    50510                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50520                   "16,PipeMapping"
+    50521                   "STANDARD_RIGHTS_ALL"
+    50522                   "STANDARD_RIGHTS_READ"
+    50523                   "STANDARD_RIGHTS_WRITE"
+    50524                   "STANDARD_RIGHTS_EXECUTE"
+    50525                   "FILE_ALL_ACCESS"
+    50526                   "FILE_READ_DATA"
+    50527                   "FILE_WRITE_DATA"
+END
+
+STRINGTABLE 
+BEGIN
+    50528                   "FILE_CREATE_PIPE_INSTANCE"
+    50529                   "FILE_READ_ATTRIBUTES"
+    50530                   "FILE_WRITE_ATTRIBUTES"
+    50531                   "WRITE_DAC"
+    50532                   "WRITE_OWNER"
+    50533                   "READ_CONTROL"
+    50534                   "DELETE"
+    50535                   "ACCESS_SYSTEM_SECURITY"
+    50536                   "SYNCHRONIZE"
+END
+
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Englisch (GB) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    50000                   "22,FolderMapping,English"
+    50001                   "STANDARD_RIGHTS_REQUIRED"
+    50002                   "STANDARD_RIGHTS_READ"
+    50003                   "STANDARD_RIGHTS_WRITE"
+    50004                   "STANDARD_RIGHTS_EXECUTE"
+    50005                   "FILE_ALL_ACCESS"
+    50006                   "FILE_READ_DATA"
+    50007                   "FILE_READ_ATTRIBUTES"
+    50008                   "FILE_READ_EA"
+    50009                   "SYNCHRONIZE"
+    50010                   "FILE_WRITE_DATA"
+    50011                   "FILE_WRITE_ATTRIBUTES"
+    50012                   "FILE_WRITE_EA"
+    50013                   "FILE_APPEND_DATA"
+    50014                   "FILE_READ_ATTRIBUTES"
+    50015                   "FILE_EXECUTE"
+END
+
+STRINGTABLE 
+BEGIN
+    50016                   "FILE_APPEND_DATA"
+    50017                   "WRITE_DAC"
+    50018                   "WRITE_OWNER"
+    50019                   "READ_CONTROL"
+    50020                   "DELETE"
+    50021                   "ACCESS_SYSTEM_SECURITY"
+    50022                   "SYNCHRONIZE"
+    50030                   "19,FileFolderMapping"
+    50031                   "STANDARD_RIGHTS_REQUIRED"
+END
+
+STRINGTABLE 
+BEGIN
+    50032                   "STANDARD_RIGHTS_READ"
+    50033                   "STANDARD_RIGHTS_WRITE"
+    50034                   "STANDARD_RIGHTS_EXECUTE"
+    50035                   "FILE_LIST_DIRECTORY"
+    50036                   "FILE_ADD_FILE"
+    50037                   "FILE_ADD_SUBDIRECTORY"
+    50038                   "FILE_READ_EA"
+    50039                   "FILE_WRITE_EA"
+    50040                   "FILE_TRAVERSE"
+    50041                   "FILE_DELETE_CHILD"
+    50042                   "FILE_READ_ATTRIBUTES"
+    50043                   "FILE_WRITE_ATTRIBUTES"
+    50044                   "WRITE_DAC"
+    50045                   "WRITE_OWNER"
+    50046                   "READ_CONTROL"
+    50047                   "DELETE"
+END
+
+STRINGTABLE 
+BEGIN
+    50048                   "ACCESS_SYSTEM_SECURITY"
+    50049                   "SYNCHRONIZE"
+    50060                   "19,FileFolderMapping"
+    50061                   "FILE_ALL_ACCESS"
+    50062                   "FILE_GENERIC_READ or FILE_GENERIC_WRITE or FILE_GENERIC_EXECUTE or Delete"
+    50063                   "FILE_GENERIC_READ or FILE_GENERIC_EXECUTE"
+END
+
+STRINGTABLE 
+BEGIN
+    50064                   "FILE_GENERIC_READ or FILE_GENERIC_EXECUTE"
+    50065                   "FILE_GENERIC_READ"
+    50066                   "FILE_GENERIC_WRITE and not READ_CONTROL"
+    50067                   "FILE_TRAVERSE or FILE_EXECUTE"
+    50068                   "FILE_LIST_DIRECTORY or FILE_READ_DATA"
+    50069                   "FILE_READ_ATTRIBUTES"
+    50070                   "FILE_READ_EA"
+    50071                   "FILE_ADD_FILE or FILE_WRITE_DATA"
+    50072                   "FILE_ADD_SUBDIRECTORY or FILE_APPEND_DATA"
+    50073                   "FILE_WRITE_ATTRIBUTES"
+    50074                   "FILE_WRITE_EA"
+    50075                   "FILE_DELETE_CHILD"
+    50076                   "FILE_DELETE"
+    50077                   "WRITE_DAC"
+    50078                   "WRITE_OWNER"
+    50079                   "READ_CONTROL"
+END
+
+STRINGTABLE 
+BEGIN
+    50090                   "17, WinStationMapping"
+    50091                   "STANDARD_RIGHTS_REQUIRED"
+    50092                   "STANDARD_RIGHTS_READ"
+    50093                   "STANDARD_RIGHTS_WRITE"
+    50094                   "STANDARD_RIGHTS_EXECUTE"
+    50095                   "WINSTA_ACCESSCLIPBOARD"
+END
+
+STRINGTABLE 
+BEGIN
+    50096                   "WINSTA_ACCESSGLOBALATOMS"
+    50097                   "WINSTA_CREATEDESKTOP"
+    50098                   "WINSTA_ENUMDESKTOPS"
+    50099                   "WINSTA_ENUMERATE"
+    50100                   "WINSTA_EXITWINDOWS"
+    50101                   "WINSTA_READATTRIBUTES"
+    50102                   "WINSTA_READSCREEN"
+    50103                   "WINSTA_WRITEATTRIBUTES"
+    50104                   "WRITE_DAC"
+    50105                   "WRITE_OWNER"
+    50106                   "READ_CONTROL"
+    50107                   "DELETE"
+END
+
+STRINGTABLE 
+BEGIN
+    50120                   "19,DesktopMapping"
+    50121                   "STANDARD_RIGHTS_ALL"
+    50122                   "STANDARD_RIGHTS_READ"
+    50123                   "STANDARD_RIGHTS_WRITE"
+    50124                   "STANDARD_RIGHTS_EXECUTE"
+    50125                   "DESKTOP_ENUMERATE"
+    50126                   "DESKTOP_READOBJECTS"
+    50127                   "DESKTOP_CREATEMENU"
+END
+
+STRINGTABLE 
+BEGIN
+    50128                   "DESKTOP_CREATEWINDOW"
+    50129                   "DESKTOP_HOOKCONTROL"
+    50130                   "DESKTOP_JOURNALPLAYBACK"
+    50131                   "DESKTOP_JOURNALRECORD"
+    50132                   "DESKTOP_WRITEOBJECTS"
+    50133                   "DESKTOP_SWITCHDESKTOP"
+    50134                   "WRITE_DAC"
+    50135                   "WRITE_OWNER"
+    50136                   "READ_CONTROL"
+    50137                   "DELETE"
+    50138                   "ACCESS_SYSTEM_SECURITY"
+    50139                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50150                   "16,RegistryMapping"
+    50151                   "STANDARD_RIGHTS_ALL"
+    50152                   "STANDARD_RIGHTS_READ"
+    50153                   "STANDARD_RIGHTS_WRITE"
+    50154                   "STANDARD_RIGHTS_EXECUTE"
+    50155                   "KEY_QUERY_VALUE"
+    50156                   "KEY_ENUMERATE_SUB_KEYS"
+    50157                   "KEY_NOTIFY"
+    50158                   "KEY_CREATE_SUB_KEY"
+    50159                   "KEY_CREATE_LINK"
+END
+
+STRINGTABLE 
+BEGIN
+    50160                   "KEY_SET_VALUE"
+    50161                   "WRITE_DAC"
+    50162                   "WRITE_OWNER"
+    50163                   "READ_CONTROL"
+    50164                   "DELETE"
+    50165                   "ACCESS_SYSTEM_SECURITY"
+    50166                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50180                   "20,ServiceMapping"
+    50181                   "STANDARD_RIGHTS_ALL"
+    50182                   "STANDARD_RIGHTS_READ"
+    50183                   "STANDARD_RIGHTS_WRITE"
+    50184                   "STANDARD_RIGHTS_EXECUTE"
+    50185                   "SERVICE_ALL_ACCESS"
+    50186                   "SERVICE_CHANGE_CONFIG"
+    50187                   "SERVICE_ENUMERATE_DEPENDENTS"
+    50188                   "SERVICE_INTERROGATE"
+    50189                   "SERVICE_PAUSE_CONTINUE"
+    50190                   "SERVICE_QUERY_CONFIG"
+    50191                   "SERVICE_QUERY_STATUS"
+END
+
+STRINGTABLE 
+BEGIN
+    50192                   "SERVICE_START"
+    50193                   "SERVICE_STOP"
+    50194                   "SERVICE_USER_DEFINED_CONTROL"
+    50195                   "WRITE_DAC"
+    50196                   "WRITE_OWNER"
+    50197                   "READ_CONTROL"
+    50198                   "DELETE"
+    50199                   "ACCESS_SYSTEM_SECURITY"
+    50200                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50210                   "17,SCManagerMapping"
+    50211                   "STANDARD_RIGHTS_ALL"
+    50212                   "STANDARD_RIGHTS_READ"
+    50213                   "STANDARD_RIGHTS_WRITE"
+    50214                   "STANDARD_RIGHTS_EXECUTE"
+    50215                   "SC_MANAGER_ALL_ACCESS"
+    50216                   "SC_MANAGER_CREATE_SERVICE"
+    50217                   "SC_MANAGER_CONNECT"
+    50218                   "SC_MANAGER_ENUMERATE_SERVICE"
+    50219                   "SC_MANAGER_LOCK"
+    50220                   "SC_MANAGER_MODIFY_BOOT_CONFIG"
+    50221                   "SC_MANAGER_QUERY_LOCK_STATUS"
+    50222                   "WRITE_DAC"
+    50223                   "WRITE_OWNER"
+END
+
+STRINGTABLE 
+BEGIN
+    50224                   "READ_CONTROL"
+    50225                   "DELETE"
+    50226                   "ACCESS_SYSTEM_SECURITY"
+    50227                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50240                   "16,PrinterMapping"
+    50241                   "PRINTER_ALL_ACCESS"
+    50242                   "PRINTER_READ"
+    50243                   "PRINTER_WRITE"
+    50244                   "PRINTER_EXECUTE"
+    50245                   "PRINTER_ALL_ACCESS"
+    50246                   "SERVER_ACCESS_ADMINISTER"
+    50247                   "SERVER_ACCESS_ENUMERATE"
+    50248                   "PRINTER_ACCESS_ADMINISTER"
+    50249                   "PRINTER_ACCESS_USE"
+    50250                   "JOB_ACCESS_ADMINISTER"
+    50251                   "WRITE_DAC"
+    50252                   "WRITE_OWNER"
+    50253                   "READ_CONTROL"
+    50254                   "DELETE"
+    50255                   "ACCESS_SYSTEM_SECURITY"
+END
+
+STRINGTABLE 
+BEGIN
+    50256                   "SYNCHRONIZE"
+    50270                   "13,ShareMapping"
+    50271                   "STANDARD_RIGHTS_ALL"
+END
+
+STRINGTABLE 
+BEGIN
+    50272                   "STANDARD_RIGHTS_READ"
+    50273                   "STANDARD_RIGHTS_WRITE"
+    50274                   "STANDARD_RIGHTS_EXECUTE"
+    50275                   "PERM_FILE_READ"
+    50276                   "PERM_FILE_WRITE"
+    50277                   "PERM_FILE_CREATE"
+    50278                   "WRITE_DAC"
+    50279                   "WRITE_OWNER"
+    50280                   "READ_CONTROL"
+    50281                   "DELETE"
+    50282                   "ACCESS_SYSTEM_SECURITY"
+    50283                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50290                   "22,ProcessMapping"
+    50291                   "STANDARD_RIGHTS_ALL"
+    50292                   "STANDARD_RIGHTS_READ"
+    50293                   "STANDARD_RIGHTS_WRITE"
+    50294                   "STANDARD_RIGHTS_EXECUTE"
+    50295                   "PROCESS_ALL_ACCESS"
+    50296                   "PROCESS_TERMINATE"
+    50297                   "PROCESS_CREATE_THREAD"
+    50298                   "PROCESS_SET_SESSIONID"
+    50299                   "PROCESS_VM_OPERATION"
+    50300                   "PROCESS_VM_READ"
+    50301                   "PROCESS_VM_WRITE"
+    50302                   "PROCESS_DUP_HANDLE"
+    50303                   "PROCESS_CREATE_PROCESS"
+END
+
+STRINGTABLE 
+BEGIN
+    50304                   "PROCESS_SET_QUOTA"
+    50305                   "PROCESS_SET_INFORMATION"
+    50306                   "PROCESS_QUERY_INFORMATION"
+    50307                   "WRITE_DAC"
+    50308                   "WRITE_OWNER"
+    50309                   "READ_CONTROL"
+    50310                   "DELETE"
+    50311                   "ACCESS_SYSTEM_SECURITY"
+    50312                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50320                   "20,ThreadMapping"
+    50321                   "STANDARD_RIGHTS_ALL"
+    50322                   "STANDARD_RIGHTS_READ"
+    50323                   "STANDARD_RIGHTS_WRITE"
+    50324                   "STANDARD_RIGHTS_EXECUTE"
+    50325                   "THREAD_ALL_ACCESS"
+    50326                   "THREAD_TERMINATE"
+    50327                   "THREAD_SUSPEND_RESUME"
+    50328                   "THREAD_GET_CONTEXT"
+    50329                   "THREAD_SET_CONTEXT"
+    50330                   "THREAD_SET_INFORMATION"
+    50331                   "THREAD_QUERY_INFORMATION"
+    50332                   "THREAD_SET_THREAD_TOKEN"
+    50333                   "THREAD_IMPERSONATE"
+    50334                   "THREAD_DIRECT_IMPERSONATION"
+    50335                   "WRITE_DAC"
+END
+
+STRINGTABLE 
+BEGIN
+    50336                   "WRITE_OWNER"
+    50337                   "READ_CONTROL"
+    50338                   "DELETE"
+    50339                   "ACCESS_SYSTEM_SECURITY"
+    50340                   "SYNCHRONIZE"
+    50350                   "16,JobMapping"
+    50351                   "STANDARD_RIGHTS_ALL"
+END
+
+STRINGTABLE 
+BEGIN
+    50352                   "STANDARD_RIGHTS_READ"
+    50353                   "STANDARD_RIGHTS_WRITE"
+    50354                   "STANDARD_RIGHTS_EXECUTE"
+    50355                   "JOB_OBJECT_ALL_ACCESS"
+    50356                   "JOB_OBJECT_ASSIGN_PROCESS"
+    50357                   "JOB_OBJECT_SET_ATTRIBUTES"
+    50358                   "JOB_OBJECT_QUERY"
+    50359                   "JOB_OBJECT_TERMINATE"
+    50360                   "JOB_OBJECT_SET_SECURITY_ATTRIBUTES"
+    50361                   "WRITE_DAC"
+    50362                   "WRITE_OWNER"
+    50363                   "READ_CONTROL"
+    50364                   "DELETE"
+    50365                   "ACCESS_SYSTEM_SECURITY"
+    50366                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50380                   "12,SemaphoreMapping"
+    50381                   "STANDARD_RIGHTS_ALL"
+    50382                   "STANDARD_RIGHTS_READ"
+    50383                   "STANDARD_RIGHTS_WRITE"
+END
+
+STRINGTABLE 
+BEGIN
+    50384                   "STANDARD_RIGHTS_EXECUTE"
+    50385                   "SEMAPHORE_ALL_ACCESS"
+    50386                   "SEMAPHORE_MODIFY_STATE"
+    50387                   "WRITE_DAC"
+    50388                   "WRITE_OWNER"
+    50389                   "READ_CONTROL"
+    50390                   "DELETE"
+    50391                   "ACCESS_SYSTEM_SECURITY"
+    50392                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50400                   "12,EventMapping"
+    50401                   "STANDARD_RIGHTS_ALL"
+    50402                   "STANDARD_RIGHTS_READ"
+    50403                   "STANDARD_RIGHTS_WRITE"
+    50404                   "STANDARD_RIGHTS_EXECUTE"
+    50405                   "EVENT_ALL_ACCESS"
+    50406                   "EVENT_MODIFY_STATE"
+    50407                   "WRITE_DAC"
+    50408                   "WRITE_OWNER"
+    50409                   "READ_CONTROL"
+    50410                   "DELETE"
+    50411                   "ACCESS_SYSTEM_SECURITY"
+    50412                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50420                   "12,MutexMapping"
+    50421                   "STANDARD_RIGHTS_ALL"
+    50422                   "STANDARD_RIGHTS_READ"
+    50423                   "STANDARD_RIGHTS_WRITE"
+    50424                   "STANDARD_RIGHTS_EXECUTE"
+    50425                   "MUTEX_ALL_ACCESS"
+    50426                   "MUTEX_MODIFY_STATE"
+    50427                   "WRITE_DAC"
+    50428                   "WRITE_OWNER"
+    50429                   "READ_CONTROL"
+    50430                   "DELETE"
+    50431                   "ACCESS_SYSTEM_SECURITY"
+END
+
+STRINGTABLE 
+BEGIN
+    50432                   "SYNCHRONIZE"
+    50440                   "15,FileMapMapping"
+    50441                   "STANDARD_RIGHTS_ALL"
+    50442                   "STANDARD_RIGHTS_READ"
+    50443                   "STANDARD_RIGHTS_WRITE"
+    50444                   "STANDARD_RIGHTS_EXECUTE"
+    50445                   "FILE_MAP_ALL_ACCESS"
+    50446                   "FILE_MAP_COPY"
+    50447                   "FILE_MAP_WRITE"
+END
+
+STRINGTABLE 
+BEGIN
+    50448                   "FILE_MAP_READ"
+    50449                   "SECTION_EXTEND_SIZE"
+    50450                   "WRITE_DAC"
+    50451                   "WRITE_OWNER"
+    50452                   "READ_CONTROL"
+    50453                   "DELETE"
+    50454                   "ACCESS_SYSTEM_SECURITY"
+    50455                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50470                   "13,TimerMapping"
+    50471                   "STANDARD_RIGHTS_ALL"
+    50472                   "STANDARD_RIGHTS_READ"
+    50473                   "STANDARD_RIGHTS_WRITE"
+    50474                   "STANDARD_RIGHTS_EXECUTE"
+    50475                   "TIMER_ALL_ACCESS"
+    50476                   "TIMER_QUERY_STATE"
+    50477                   "TIMER_MODIFY_STATE"
+    50478                   "WRITE_DAC"
+    50479                   "WRITE_OWNER"
+END
+
+STRINGTABLE 
+BEGIN
+    50480                   "READ_CONTROL"
+    50481                   "DELETE"
+    50482                   "ACCESS_SYSTEM_SECURITY"
+    50483                   "SYNCHRONIZE"
+    50490                   "20,TokenMapping"
+    50491                   "STANDARD_RIGHTS_ALL"
+    50492                   "STANDARD_RIGHTS_READ"
+    50493                   "STANDARD_RIGHTS_WRITE"
+    50494                   "STANDARD_RIGHTS_EXECUTE"
+    50495                   "TOKEN_ALL_ACCESS"
+END
+
+STRINGTABLE 
+BEGIN
+    50496                   "TOKEN_ASSIGN_PRIMARY"
+    50497                   "TOKEN_DUPLICATE"
+    50498                   "TOKEN_IMPERSONATE"
+    50499                   "TOKEN_QUERY"
+    50500                   "TOKEN_QUERY_SOURCE"
+    50501                   "TOKEN_ADJUST_PRIVILEGES"
+    50502                   "TOKEN_ADJUST_GROUPS"
+    50503                   "TOKEN_ADJUST_DEFAULT"
+    50504                   "TOKEN_ADJUST_SESSIONID"
+    50505                   "WRITE_DAC"
+    50506                   "WRITE_OWNER"
+    50507                   "READ_CONTROL"
+    50508                   "DELETE"
+    50509                   "ACCESS_SYSTEM_SECURITY"
+    50510                   "SYNCHRONIZE"
+END
+
+STRINGTABLE 
+BEGIN
+    50520                   "16,PipeMapping"
+    50521                   "STANDARD_RIGHTS_ALL"
+    50522                   "STANDARD_RIGHTS_READ"
+    50523                   "STANDARD_RIGHTS_WRITE"
+    50524                   "STANDARD_RIGHTS_EXECUTE"
+    50525                   "FILE_ALL_ACCESS"
+    50526                   "FILE_READ_DATA"
+    50527                   "FILE_WRITE_DATA"
+END
+
+STRINGTABLE 
+BEGIN
+    50528                   "FILE_CREATE_PIPE_INSTANCE"
+    50529                   "FILE_READ_ATTRIBUTES"
+    50530                   "FILE_WRITE_ATTRIBUTES"
+    50531                   "WRITE_DAC"
+    50532                   "WRITE_OWNER"
+    50533                   "READ_CONTROL"
+    50534                   "DELETE"
+    50535                   "ACCESS_SYSTEM_SECURITY"
+    50536                   "SYNCHRONIZE"
+END
+
+#endif    // Englisch (GB) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,9 @@
+﻿store(&VERSION) '8.0'
+store(&NAME) 'Test I2188'
+store(&MESSAGE) 'Adds Albanian, Icelandic and German Office Languages'
+store(&WINDOWSLANGUAGES) 'x041C x0407 x040F'
+store(&LANGUAGE) 'x041C'
+begin Unicode > use(main)
+
+
+group(main) using keys

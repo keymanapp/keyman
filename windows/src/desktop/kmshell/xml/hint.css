@@ -1,0 +1,116 @@
+* { 
+  font-size: 13.3px; 
+}
+
+body {
+  padding: 0px; 
+  margin: 0px; 
+  overflow: hidden; 
+  background: white; 
+  border: none; 
+}
+
+html { 
+  padding: 0px; 
+  margin: 0px; 
+  overflow: hidden;
+}
+
+#container {
+  left: 0;
+  top: 0;
+}
+
+#captionBox {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 8px;
+}
+
+#captionBox div {
+  float: left;
+  position: relative;
+  display: block;
+  height: 6px;
+}
+
+#captionBox #c1 {
+  width: 60%;
+  background: #FC7200;
+}
+
+#captionBox #c2 {
+  width: 22%;
+  background: #B92034;
+}
+
+#captionBox #c3 {
+  width: 18%;
+  background: #69B7D2;
+}
+
+#header {
+  background: white;
+  top: 8px; 
+  left: 0;
+  width: 100%;
+  position: absolute;
+  height: 64px;
+  border-bottom: solid 1px #929396;
+}
+
+#footer {
+  left: 0px;
+  position: absolute;
+  bottom: 0px;
+  height: 40px;
+  width: 100%;
+  background: #79C3DA;
+}
+
+#icon {
+  position: absolute;
+  left: 0; 
+  top: 16px;
+  margin: 0 15px;
+}
+
+#exiticon { 
+  float: left
+}
+
+#title {
+  left: 80px; 
+  top: 20px;
+  position: absolute;
+  font-size: 21.3px;
+  color: #333333;
+  vertical-align: middle;
+}
+
+#hint {
+  position: absolute;
+  left: 0; 
+  top: 64px;
+  font-size: 14.7px;
+  padding: 20px;
+}
+
+#checkbox {
+  float: left;
+  font-size: 13.3px;
+  color: white;
+  padding: 12px 10px;
+}
+
+#buttons {
+  float: right;
+  padding: 10px;
+}
+
+#buttons input {
+  width: 80px; 
+  margin: 0 4px;
+}

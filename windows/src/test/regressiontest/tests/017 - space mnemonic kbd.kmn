@@ -1,0 +1,20 @@
+c RegressionTest: Space with mnemonic keyboards
+c Font: Arial
+c Encoding: Unicode
+c Description: Tests Space handling in mnemonic keyboards (failed with Win 98)
+c Procedure: Press "ab c d de"
+c AutoProc: K_A K_B K_SPACE K_C K_SPACE K_D K_SPACE K_D K_E
+c FinalOutput: "XYZ"
+
+store(&VERSION) '9.0'
+NAME "Alt key tests"
+HOTKEY "[CTRL SHIFT K_A]"
+store(&mnemoniclayout) "1"
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+  'ab'  + ' ' > 'X'  C bug: space ignored
+  'c '  + 'd' > 'Y'  C bug: space ignored
+  ' d'  + 'e' > 'Z'  C works OK

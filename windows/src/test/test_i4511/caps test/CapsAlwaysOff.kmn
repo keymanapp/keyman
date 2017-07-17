@@ -1,0 +1,16 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'Caps Always Off'
+begin Unicode > use(main)
+
+Caps Always Off
+
+group(main) using keys
+
++ [NCAPS K_A] > 'ncaps a '
++ [CAPS K_A] > 'caps a '
++ [NCAPS SHIFT K_A] > 'ncaps shift a '
++ [CAPS SHIFT K_A] > 'caps shift a '
++ [SHIFT K_B] > 'shift b '
++ [K_B] > 'unmodified b '
+
+c test a, b and c

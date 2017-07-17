@@ -1,0 +1,10 @@
+
+#include <windows.h>
+
+WAITFORM DIALOGEX 0, 0, 180, 56
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Tavultesoft Keyman Engine"
+FONT 8, "Tahoma", 400, 0, 0x1
+BEGIN
+    CTEXT           "Please wait while installing...",1,10,24,160,8
+END

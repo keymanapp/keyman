@@ -1,0 +1,19 @@
+﻿store(&VERSION) '9.0'
+store(&TARGETS) 'any windows'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
+baselayout('en-US') + 'a' > 'English (US)'
+baselayout('en-AU') + 'a' > 'English (AU)'
+baselayout('en-UK') + 'a' > 'English (UK)'
+baselayout('fr-FR') + 'a' > 'French (FR)'
+baselayout('fr-CA') + 'a' > 'French (CA)'
+
+baselayout('en') + 'b' > 'English'
+baselayout('fr') + 'b' > 'French'
+
+c 'a' U+1234 U+1235 >
+
+'(US)' + [K_BKSP] > nul

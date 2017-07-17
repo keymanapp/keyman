@@ -1,0 +1,21 @@
+﻿c http://www.tavultesoft.com/forums/topic.php?ForumTopicID=373&ForumPostID=1255#ForumPost_1255
+c 
+c I have a Norwegian physical keyboard and have specified Norwegian as the Base Keyboard under
+c Configuration > Options in Keyman 9.0. But when I use a Keyman keyboard designed for an English
+c keyboard, some keystrokes will not produce the correct characters. These are character
+c combinations with the ~ (tilde) character (a dead key on the Norwegian keyboard) and in many
+c cases also character combinations with the dead keys ` (grave accent) and ^ (circumflex accent).
+c Character combinations with the ~ (tilde) character will even make the keyboard freeze so that
+c you have to log out from your Windows account and log in again to recover.
+
+store(&VERSION) '9.0'
+store(&NAME) 'Stromme Diacritic Test'
+begin Unicode > use(main)
+
+store(&mnemoniclayout) '1'
+
+group(main) using keys
+
++ '~' > U+0303 
++ '`' > U+0300 
++ '^' > U+0302 

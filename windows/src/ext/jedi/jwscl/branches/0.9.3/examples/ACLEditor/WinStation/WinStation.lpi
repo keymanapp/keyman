@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <ProjectOptions>
+    <PathDelim Value="\"/>
+    <Version Value="5"/>
+    <General>
+      <MainUnit Value="0"/>
+      <IconPath Value="./"/>
+      <TargetFileExt Value=".exe"/>
+      <ActiveEditorIndexAtStart Value="4"/>
+    </General>
+    <VersionInfo>
+      <ProjectVersion Value=""/>
+      <Language Value=""/>
+      <CharSet Value=""/>
+    </VersionInfo>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IgnoreBinaries Value="False"/>
+      <IncludeFileFilter Value="*.(pas|pp|inc|lfm|lpr|lrs|lpi|lpk|sh|xml)"/>
+      <ExcludeFileFilter Value="*.(bak|ppu|ppw|o|so);*~;backup"/>
+    </PublishOptions>
+    <RunParams>
+      <local>
+        <FormatVersion Value="1"/>
+        <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T 'Lazarus Run Output' -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+      </local>
+    </RunParams>
+    <RequiredPackages Count="1">
+      <Item1>
+        <PackageName Value="LCL"/>
+      </Item1>
+    </RequiredPackages>
+    <Units Count="7">
+      <Unit0>
+        <Filename Value="WinStation.dpr"/>
+        <IsPartOfProject Value="True"/>
+        <CursorPos X="1" Y="6"/>
+        <TopLine Value="1"/>
+        <EditorIndex Value="0"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="..\..\..\JwsclUtils.pas"/>
+        <UnitName Value="JwsclUtils"/>
+        <CursorPos X="43" Y="231"/>
+        <TopLine Value="222"/>
+        <EditorIndex Value="3"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="MainForm.pas"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceFilename Value="MainForm.lrs"/>
+        <UnitName Value="MainForm"/>
+        <CursorPos X="64" Y="15"/>
+        <TopLine Value="1"/>
+        <EditorIndex Value="4"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="..\..\..\JwsclWinStations.pas"/>
+        <UnitName Value="JwsclWinStations"/>
+        <CursorPos X="50" Y="35"/>
+        <TopLine Value="16"/>
+        <EditorIndex Value="6"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="E:\Proggen\Lazarus\lcl\include\application.inc"/>
+        <CursorPos X="22" Y="330"/>
+        <TopLine Value="310"/>
+        <EditorIndex Value="1"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="E:\Proggen\Lazarus\lcl\include\winapi.inc"/>
+        <CursorPos X="109" Y="285"/>
+        <TopLine Value="271"/>
+        <EditorIndex Value="2"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="MainForm.lrs"/>
+        <CursorPos X="35" Y="13"/>
+        <TopLine Value="1"/>
+        <EditorIndex Value="5"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit6>
+    </Units>
+    <JumpHistory Count="8" HistoryIndex="7">
+      <Position1>
+        <Filename Value="WinStation.dpr"/>
+        <Caret Line="14" Column="56" TopLine="1"/>
+      </Position1>
+      <Position2>
+        <Filename Value="$(LazarusDir)\lcl\include\application.inc"/>
+        <Caret Line="330" Column="22" TopLine="310"/>
+      </Position2>
+      <Position3>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="81" Column="12" TopLine="64"/>
+      </Position3>
+      <Position4>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="85" Column="8" TopLine="58"/>
+      </Position4>
+      <Position5>
+        <Filename Value="MainForm.lrs"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
+      </Position5>
+      <Position6>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="84" Column="12" TopLine="66"/>
+      </Position6>
+      <Position7>
+        <Filename Value="MainForm.lrs"/>
+        <Caret Line="3" Column="1" TopLine="1"/>
+      </Position7>
+      <Position8>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="827" Column="38" TopLine="816"/>
+      </Position8>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="5"/>
+    <PathDelim Value="\"/>
+    <SearchPaths>
+      <Libraries Value="..\..\..\lib\i386-win32\;..\..\..\;..\..\..\..\jwaUnits\Win32API\"/>
+      <OtherUnitFiles Value="..\..\..\lib\i386-win32\;..\..\..\..\jwaUnits\Win32API\lib\i386-win32\;$(LazarusDir)\fpc\2.0.4\units\$(TargetCPU)-$(TargetOS)\*\;$(LazarusDir)\lcl\units\$(TargetCPU)-$(TargetOS)\"/>
+      <SrcPath Value="..\..\..\lib\i386-win32\;..\..\..\;..\..\..\..\jwaUnits\Win32API\"/>
+    </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <DelphiCompat Value="True"/>
+      </SyntaxOptions>
+    </Parsing>
+    <CodeGeneration>
+      <Generate Value="Faster"/>
+    </CodeGeneration>
+    <Linking>
+      <Options>
+        <Win32>
+          <GraphicApplication Value="True"/>
+        </Win32>
+      </Options>
+    </Linking>
+    <Other>
+      <CompilerPath Value="$(CompPath)"/>
+    </Other>
+  </CompilerOptions>
+  <Debugging>
+    <Watches Count="2">
+      <Item1>
+        <Expression Value="Path"/>
+      </Item1>
+      <Item2>
+        <Expression Value="H"/>
+      </Item2>
+    </Watches>
+    <Exceptions Count="3">
+      <Item1>
+        <Name Value="ECodetoolError"/>
+      </Item1>
+      <Item2>
+        <Name Value="EFOpenError"/>
+      </Item2>
+      <Item3>
+        <Name Value="ESMNoThreadTokenAvailable"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

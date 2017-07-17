@@ -1,0 +1,1 @@
+KeymanWeb.KRS(new Stub_Keyboard_i4122()); function Stub_Keyboard_i4122() {this.KF="i4122.js";this.KI="Keyboard_i4122";this.KN="I4122 - Touch Template SEMICOLON and SQUOTE";}

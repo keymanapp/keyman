@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<section id="upload">
+	<title>Upload Process</title>
+
+	<para>The following steps are required for uploading the new version to the server:</para>
+
+	<orderedlist>
+		<listitem>Upload programs: Upload keymandeveloper7-0-x-0.exe, keymandesktoplight7-0-x-0.exe, keymandesktoppro7-0-x-0.exe to s:\tavultesoft\website\dec2004\downloads</listitem>
+		<listitem>run sync_site on fred</listitem>
+		<listitem>on hobarthosting, run \domains\tavultesoft.com\new\dev\importdownloads.php</listitem>
+		<listitem>Edit news items: Edit news items in Corp</listitem>
+		<listitem>Post messages</listitem>
+	</orderedlist>
+</section>

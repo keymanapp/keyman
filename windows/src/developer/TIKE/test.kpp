@@ -1,0 +1,40 @@
+[Package]
+Version=6.0
+ExecuteProgram=
+[Buttons]
+Count=3
+[Button-0]
+ButtonType=install
+Caption=&Install
+URL=
+Left=0
+Top=0
+[Button-1]
+ButtonType=cancel
+Caption=Cancel
+URL=
+Left=0
+Top=0
+[Button-2]
+ButtonType=about
+Caption=&About...
+URL=
+Left=0
+Top=0
+[GUIDs]
+guidUpgradeCode=5E75E163-D813-464E-9ACF-F0753E64E48F
+guidProductCode=C57EA14E-9EC7-4631-A84C-ADECB7FA87E1
+guidPackageCode=5F06A172-2657-4E8D-9D31-2D7C70A9D82D
+guidComponentProduct=3DFA172B-7652-41C5-886E-57A55CFC3A51
+guidPXX=7A722C29-E63D-4E9B-A2F6-8BB16F1BC9CF
+[Product]
+DestinationPath=test
+[StartMenu]
+Path=
+Create=0
+AddUninstallEntry=0
+[Files]
+0="Keyman Main Application","..\..\..\bin\dev\wixtemplates\keyman.exe",0
+1="Keyman Help Files","..\..\..\bin\dev\wixtemplates\keyman.chm",0
+2="Keyman Configuration Application","..\..\..\bin\dev\wixtemplates\kmshell.exe",0
+3="PNG Library for Keyman Configuration","..\..\..\bin\dev\wixtemplates\lpng.dll",0

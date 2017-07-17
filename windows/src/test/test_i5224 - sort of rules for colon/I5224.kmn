@@ -1,0 +1,10 @@
+﻿store(&VERSION) '9.0'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ ';' > '; char' 
+'b' + [K_COLON] > '; vk' 
+
+c Please extend this to ensure that all rules sort as expected

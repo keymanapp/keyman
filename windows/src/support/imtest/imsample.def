@@ -1,0 +1,9 @@
+LIBRARY   IMSAMPLE
+
+EXPORTS
+	DF
+	KeymanIMInit
+	KeymanIMDestroy
+	KeymanIMActivate
+	KeymanIMDeactivate
+	KeymanIMConfigure

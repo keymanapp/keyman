@@ -1,0 +1,1 @@
+﻿KeymanWeb.KRS(new Stub_Keyboard_i2510()); function Stub_Keyboard_i2510() {this.KF="i2510.js";this.KI="Keyboard_i2510";this.KN="I2510 - 't' in KeymanWeb Test Window";}

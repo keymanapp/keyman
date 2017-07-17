@@ -1,0 +1,6 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "version.rc"
+#include "manifest.rc"
+1 ICON  "..\\..\\global\\res\\90\\desktop\\keymandesktop90-64.ico"
+

@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><!-- $Id: team.xml 681330 2008-07-31 10:39:50Z vhennebert $ --><!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V1.3//EN" "http://forrest.apache.org/dtd/document-v13.dtd">
+<document>
+  <header>
+    <title>FOP: Development Team</title>
+    <version>$Revision: 681330 $</version>
+  </header>
+  <body>
+    <p>
+      All lists on this page are in alphabetical order. Some of them may be incomplete.
+      If you know of an error or omission, please send a message to the 
+      <link href="mailto:fop-dev@xmlgraphics.apache.org">fop-dev</link> mailing list.</p>
+    <section id="commit-active">
+      <title>Active Committers</title>
+      <note label="Important">Please don't write to any developer directly if you need help on using FOP. Only if you submit questions to the <link href="maillist.html#fop-user">FOP User Mailing List</link> will other FOP users be able to profit from answers given to your question. Another point is that a developer may have gone inactive or is on holidays in which case you may not get an answer in time.</note>
+      <ul>
+        <li id="mb"><link href="mailto:max AT berger DOT name">Max Berger</link> (MB) is currently a
+          PostDoc pursuing an academic career in computer science. His main interest in FOP is to
+          improve the DocBook to PDF tool-chain to produce high quality output, while still
+          conforming to given style-guides. See his <link href="http://max.berger.name">home
+            page</link> for more information.</li>
+        <li id="cb"><link href="mailto:bowditch_chris@hotmail.com">Chris Bowditch</link> (CB)
+            is a Java/VB Programmer from England.</li>
+        <li id="jb"><link href="mailto:jay@bryantcs.com">Jay Bryant</link> (JB) is a
+            freelance information architect in Austin, TX.</li>
+        <li id="ac"><link href="mailto:acumiskey@apache.org">Adrian Cumiskey</link> (AC),
+          is a Java and Perl Programmer from St Albans, United Kingdom.</li>
+        <li id="ad"><link href="mailto:adelmelle@apache.org">Andreas Delmelle</link> (AD)</li>
+        <!-- Luca prefers the mail address with "AT", to stop spam, etc. -->
+        <li id="lf"><link href="mailto:lfurini AT cs.unibo.it">Luca Furini</link> (LF)
+           is a student of Computer Studies at the University of Bologna (Italy)</li>
+        <li id="cg"><link href="mailto:chrisg@apache.org">Christian Geisert</link> (CG)
+            is a software engineer from Stutensee, Germany. He is working at
+            <fork href="http://www.isu-gmbh.de">ISU GmbH</fork>, a provider of ERP solutions,
+            where amongst lots of other things he is using FOP to produce nice looking
+            business documents like order confirmations, quotes, invoices etc.
+            </li>
+        <li id="vh"><link href="mailto:vhennebert@apache.org">Vincent Hennebert</link>
+          (VH), a Java developer from France; with an interest in typography, and in using
+          Fop as a pdf renderer for book-like documents.</li>
+        <li id="cl"><link href="mailto:clay@apache.org">Clay Leeds</link> (CL)
+          is a web/WAP/Palm developer from Laguna Beach, California, USA. A 
+          recent XML/XSL-FO convert, he has been nit-picking FAQs &amp; assorted web 
+          pages since his first webmaster position @brain.com in 1996. Most 
+          important creation? His li'l Jeremy was born June 18, 2002.</li>
+        <li id="mm"><link href="mailto:manuel@apache.org">Manuel Mall</link> (MM)
+          is an independant software engineer resident in Perth, Australia. Born a long time
+          ago in Germany he has been involved in Software Engineering (Informatik) since the
+          early 70's. Over the last years he has used FOP very successfully in commercial 
+          projects for his customers (currently generating roughly 15000 PDF files each
+          working day through FOP) and has decided to put some effort back into FOP to
+          make it even better.
+        </li>
+        <li id="jm"><link href="mailto:jeremias@apache.org">Jeremias Märki</link> (JM)
+          is an independent software engineer and consultant from Lucerne, Switzerland. He's also
+          the creator of <fork href="http://barcode4j.sourceforge.net">Barcode4J</fork>. 
+          See his <fork href="http://www.jeremias-maerki.ch">home page</fork> for more information
+          about him.
+        </li>
+        <li id="sp"><link href="mailto:spepping@apache.org">Simon Pepping</link> (SP) came to FOP
+            from the TeX/LaTeX world. See his <fork href="http://www.leverkruid.eu">home
+            page</fork> for some of his private projects.</li>
+        <li id="jp"><link href="mailto:pietsch@apache.org">Jörg Pietschmann</link> (JP)</li>
+      </ul>
+    </section>
+    <section id="contribute-active">
+      <title>Active Contributors</title>
+      <ul>
+    <li id="lm">Louis Masters</li>
+    <li id="mn">Manoj Nair, Currently consulting for Sony Pictures Entertainment in Los Angeles, CA USA. Previously he worked with Java &amp; related technologies specializing in developing n-tier Web applications.</li>
+        <li id="rr"><link href="mailto:renaud.richardet AT gmail DOT com">Renaud Richardet</link> (RR)
+            is a Java Programmer interested in XML technologies. See his 
+            <fork href="http://www.oslutions.com">home page</fork> for more information about him.</li>
+          <li id="ps"><link href="mailto:pascal DOT sancho AT takoma DOT fr">Pascal
+              Sancho</link> works on software solutions for rendering various
+            kinds of documents on various output targets. He's more specifically
+            taking care of PDF generation with FOP.</li>
+    <li id="ls">Luke Shannon, Java Programmer, Toronto, Canada</li>
+      </ul>
+    </section>
+    <section id="founder">
+      <title>Founder</title>
+      <p>FOP was originally created and donated to the Apache Software Foundation by <link href="mailto:jtauber@jtauber.com">James Tauber</link>. 
+      Information about him can be found at <fork href="http://www.jtauber.com">his website</fork>.</p>
+    </section>
+    <section id="commit-inactive">
+      <title>Inactive Committers</title>
+      <ul>
+        <li id="fb"><link href="mailto:bckfnn@worldonline.dk">Finn Bock</link> (FB)</li>
+        <li id="kc"><link href="mailto:kellyc@apache.org">Kelly Campbell</link></li>
+        <li id="sc"><link href="mailto:gears@apache.org">Steven Coffman</link></li>
+        <li id="bd"><link href="mailto:bdelacretaz@apache.org">Bertrand Delacretaz</link></li>
+        <li id="te"><link href="mailto:tore@apache.org">Tore Engvig</link></li>
+        <li id="sg"><link href="mailto:stanislav@apache.org">Stanislav Gorkhover</link></li>
+        <li id="ph"><link href="mailto:pherweg@web.de">Peter Herweg</link> (PH)<!-- is helping to 
+          integrate the jfor project's RTF support into the upcoming FOP 1.0 version.
+          Born in 1978, he has been serving as an application developer for a small 
+          industrial company in Germany since 1999.--></li>
+        <li id="fj"><link href="mailto:fotis@apache.org">Fotis Jannidis</link></li>
+        <li id="kl"><link href="mailto:klease@apache.org">Karen Lease</link></li>
+        <li id="kll"><link href="mailto:keiron@apache.org">Keiron Liddle</link></li>
+        <li id="gm"><link href="mailto:gmazza@apache.org">Glen Mazza</link></li>
+        <li id="wvm"><link href="mailto:vmote@apache.org">Victor Mote</link></li>
+        <li id="jn"><link href="mailto:jordan@apache.org">Jordan Naftolin</link></li>
+        <li id="as"><link href="mailto:arved@apache.org">Arved Sandstrom</link></li>
+        <li id="es"><link href="mailto:eschaeffer@apache.org">Eric Schaeffer</link></li>
+        <li id="ot"><link href="mailto:olegt@apache.org">Oleg Tkachenko</link> (OT)</li>
+        <li id="aw"><link href="mailto:artw@apache.org">Art Welch</link></li>
+        <li id="pbw"><link href="mailto:pbwest@apache.org">Peter B. West</link></li>
+      </ul>
+    </section>
+    <section id="expertise">
+      <title>Areas of Expertise</title>
+      <table>
+        <tr>
+          <th colspan="1" rowspan="1"/>
+          <th colspan="1" rowspan="1">CG</th>
+          <th colspan="1" rowspan="1">FB</th>
+          <th colspan="1" rowspan="1">CL</th>
+          <th colspan="1" rowspan="1">JM</th>
+          <th colspan="1" rowspan="1">VH</th>
+          <th colspan="1" rowspan="1">PH</th>
+          <th colspan="1" rowspan="1">JP</th>
+          <th colspan="1" rowspan="1">SP</th>
+          <th colspan="1" rowspan="1">LF</th>
+          <th colspan="1" rowspan="1">JB</th>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">Release manager</td>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">XSL-FO tree</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">Properties</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">Layout</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">Fonts</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">SVG</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">Java2D (AWT)</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">PDF</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">PostScript</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">PCL</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">RTF</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">MIF</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">AFP</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">Forrest</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+      </table>
+    </section>
+  </body>
+</document>

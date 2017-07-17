@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Updates>
+   <Details>
+	<ApplicationName>project1</ApplicationName>
+	<Author>bsalsa</Author>
+	<Company>bsalsa Productions</Company>
+	<MajorVersion>2</MajorVersion>
+	<MinorVersion>2</MinorVersion>
+	<ReleaseVersion>2</ReleaseVersion>
+	<BuildVersion>2</BuildVersion>
+   </Details>
+   <ChangeLog>
+	<Info Text=" *Added new demo for the updater."/>
+	<Info Text=" *Added an option to create XML files."/>
+	<Info Text=" *Cleaned up the code."/>
+	<Info Text=" *Faster update procedures."/>
+	<Info Text=" *Option to add personal details."/>
+	<Info Text=" *Option to match details (application and remote file)."/>
+	<Info Text=" and so on..."/>
+   </ChangeLog>
+   <Instructions>
+	<File Name=" Test.txt" Destination="Application new folder" Terminate="no"/>
+	<File Name=" Credits.txt" Destination="Updater_Test" Terminate="no"/>
+	<File Name=" ReadMe.txt" Destination="Updater_Test" Terminate="yes"/>
+	<File Name=" Project1.exe" Destination="" Terminate="yes"/>
+   </Instructions>
+</Updates>

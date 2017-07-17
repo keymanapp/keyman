@@ -1,0 +1,2 @@
+
+void LogError(PWSTR message, ...);

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><!-- $Id: knownissues_overview.xml 632784 2008-03-02 16:53:24Z jeremias $ --><!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V1.3//EN" "document-v13.dtd">
+<document xmlns:xi="http://www.w3.org/2001/XInclude">
+  <header>
+    <title>Apache FOP: Known Issues</title>
+    <version>$Revision: 632784 $</version>
+  </header>
+<body>
+<section>
+  <title>Known issues</title>
+  <p>
+    This page lists currently known issues in the current release.
+  </p>
+  <note>
+    <p>
+      For additional information on known issues in Apache FOP, please have a look at the following pages, too:
+    </p>
+    <ul>
+      <li><link href="../bugs.html">the bug list in Bugzilla</link></li>
+      <li><link href="http://wiki.apache.org/xmlgraphics-fop/FOPProjectTasks">the task list in the Wiki</link></li>
+    </ul>
+  </note>
+  <p>
+    Apache FOP has an extensive automated testing infrastructure. Parts of this infrastructure are several 
+    sets of test cases. When a test case is listed in disabled-testcases.xml it is disabled in the JUnit 
+    tests during the normal build process. This indicates a problem in the current codebase. When a bug is 
+    fixed or a missing feature is added the entry for the relevant test case(s) are removed.
+  </p>
+  <section>
+    <title>FO Tree</title>
+    <p>
+      This section lists disabled test cases in the test suite for the FO tree tests, at the time
+      of the release.
+    </p>
+    <xi:include href="cocoon://knownissues-raw-fotree_0.95.xml#xpointer(/document/body/*)"/>
+  </section>
+  <section>
+    <title>Layout Engine</title>
+    <p>
+      This section lists disabled test cases in the test suite for the layout engine tests, at the
+      time of the release.
+    </p>
+    <xi:include href="cocoon://knownissues-raw-layoutengine_0.95.xml#xpointer(/document/body/*)"/>
+  </section>
+  <section>
+    <title>Other known issues</title>
+    <p>This section lists other known issues.</p>
+    <xi:include href="cocoon://knownissues-raw-static_0.95.xml#xpointer(/document/body/*)"/>
+  </section>
+</section>
+</body>
+</document>

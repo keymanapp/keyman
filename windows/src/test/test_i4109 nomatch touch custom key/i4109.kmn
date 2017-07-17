@@ -1,0 +1,33 @@
+﻿c 1. Setup a key with a custom name (e.g. T_DOT)
+c 2. Put a character on the key, but don't assign a rule
+c 3. Add a nomatch rule into the code
+c 4. When you run, the nomatch rule is not fired on touch devices; instead the default character appears.
+c 
+c However, if you do this with a standard key name, the nomatch rule *is* fired.
+c 
+c CURRENTLY, T_B has no rule and fails, should get 'nomatch' but instead get key cap.
+c 
+c UPDATE: T_B has no rule, is not a standard key, so should not fire 'nomatch'.  A future 'nomatch(all)' would catch this case, if
+c we ever decide to support it, just like CTRL+A would not fire 'nomatch'.
+c 
+store(&VERSION) '9.0'
+store(&NAME) 'Test I4109'
+store(&LAYOUTFILE) 'i4109-layout.js'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
+c 
+c 4 keys + nomatch rule:
+c K_A -> no rule, 'α' on key cap --> EXPECT 'nomatch'
+c T_B -> no rule, 'β' on key cap --> EXPECT 'nomatch' on touch
+c K_C -> rule, 'γ' on key cap, 'Γ' in rule --> EXPECT 'Γmatch'
+c T_D -> rule, 'δ' on key cap, 'Δ' in rule --> EXPECT 'Δmatch' on touch
+c 
+
++ [K_C] > 'Γ'
++ [T_D] > 'Δ'
+
+nomatch > 'nomatch'
+match > 'match'

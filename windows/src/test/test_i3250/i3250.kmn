@@ -1,0 +1,9 @@
+﻿store(&VERSION) '8.0'
+store(&NAME) 'I3250 Ctrl+G test'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ [CTRL K_G] > 'ooh crash'
++ [ALT K_E] > 'EDIT BLOCK!'

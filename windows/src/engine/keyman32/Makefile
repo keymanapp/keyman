@@ -1,0 +1,30 @@
+#
+# Keyman32 Makefile
+#
+
+!include ..\..\Defines.mak
+
+build: version.res dirs
+    $(MSBUILD) keyman32.vcxproj $(MSBUILD_BUILD)
+    $(COPY) keyman32.dll $(PROGRAM)\engine
+    $(COPY) keyman32.pdb $(DEBUGPATH)\engine
+    $(COPY) keyman32.lib $(OUTLIB)
+
+clean: def-clean
+    $(MSBUILD) $(MSBUILD_CLEAN) keyman32.vcxproj
+    -del x86\release\buildlog.htm
+    -rmdir x86\release
+    -del x86\debug\buildlog.htm
+    -rmdir x86\debug
+    -rmdir x86
+
+signcode:
+    $(SIGNCODE) /d "Keyman Engine" $(PROGRAM)\engine\keyman32.dll
+
+backup:
+    $(WZZIP) $(BUILD)\engine\keyman32.zip  $(BACKUPDEFAULTS) keyman32.dll
+
+install:
+    $(COPY) $(PROGRAM)\engine\keyman32.dll "C:\Program Files (x86)\Common Files\Keyman\Keyman Engine 10.0\keyman32.dll"
+
+!include ..\..\Target.mak

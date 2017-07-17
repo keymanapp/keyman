@@ -1,0 +1,972 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{82E04599-9378-4816-B0AB-8AB58BD307B3}</ProjectGuid>
+        <MainSource>Tike.dpr</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <TargetedPlatforms>1</TargetedPlatforms>
+        <AppType>Application</AppType>
+        <FrameworkType>VCL</FrameworkType>
+        <ProjectVersion>18.2</ProjectVersion>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <Custom_Styles>Amakrits|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Amakrits.vsf;&quot;Amethyst Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AmethystKamri.vsf&quot;;&quot;Aqua Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaGraphite.vsf&quot;;&quot;Aqua Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaLightSlate.vsf&quot;;Auric|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Auric.vsf;Carbon|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Carbon.vsf;&quot;Charcoal Dark Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CharcoalDarkSlate.vsf&quot;;&quot;Cobalt XEMedia|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CobaltXEMedia.vsf&quot;;&quot;Cyan Dusk|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CyanDusk.vsf&quot;;&quot;Cyan Night|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CyanNight.vsf&quot;;&quot;Emerald Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\EmeraldLightSlate.vsf&quot;;&quot;Golden Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\GoldenGraphite.vsf&quot;;&quot;Iceberg Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\IcebergClassico.vsf&quot;;&quot;Lavender Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\LavenderClassico.vsf&quot;;&quot;Ruby Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\RubyGraphite.vsf&quot;;&quot;Sapphire Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SapphireKamri.vsf&quot;;&quot;Slate Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SlateClassico.vsf&quot;;&quot;Smokey Quartz Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SmokeyQuartzKamri.vsf&quot;;&quot;Turquoise Gray|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TurquoiseGray.vsf&quot;;Windows10|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10.vsf</Custom_Styles>
+        <SanitizedProjectName>Tike</SanitizedProjectName>
+        <VCL_Custom_Styles>&quot;Amakrits|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\Amakrits.vsf&quot;;&quot;Amethyst Kamri|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\AmethystKamri.vsf&quot;;&quot;Aqua Graphite|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\AquaGraphite.vsf&quot;;&quot;Aqua Light Slate|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\AquaLightSlate.vsf&quot;;&quot;Auric|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\Auric.vsf&quot;;&quot;Carbon|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\Carbon.vsf&quot;;&quot;Charcoal Dark Slate|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\CharcoalDarkSlate.vsf&quot;;&quot;Cobalt XEMedia|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\CobaltXEMedia.vsf&quot;;&quot;Cyan Dusk|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\CyanDusk.vsf&quot;;&quot;Cyan Night|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\CyanNight.vsf&quot;;&quot;Emerald Light Slate|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\EmeraldLightSlate.vsf&quot;;&quot;Golden Graphite|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\GoldenGraphite.vsf&quot;;&quot;Iceberg Classico|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\IcebergClassico.vsf&quot;;&quot;Lavender Classico|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\LavenderClassico.vsf&quot;;&quot;Metro Black|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\MetroBlack.vsf&quot;;&quot;Metro Blue|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\MetroBlue.vsf&quot;;&quot;Metro Green|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\MetroGreen.vsf&quot;;&quot;Ruby Graphite|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\RubyGraphite.vsf&quot;;&quot;Sapphire Kamri|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\SapphireKamri.vsf&quot;;&quot;Slate Classico|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\SlateClassico.vsf&quot;;&quot;Smokey Quartz Kamri|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\SmokeyQuartzKamri.vsf&quot;;&quot;Turquoise Gray|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\TurquoiseGray.vsf&quot;</VCL_Custom_Styles>
+        <Icon_MainIcon>Tike_Icon.ico</Icon_MainIcon>
+        <Manifest_File>None</Manifest_File>
+        <ImageDebugInfo>true</ImageDebugInfo>
+        <DCC_Define>VERSION_KEYMAN_DEVELOPER;$(DCC_Define)</DCC_Define>
+        <DCC_Optimize>false</DCC_Optimize>
+        <VerInfo_Build>49</VerInfo_Build>
+        <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+        <VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
+        <DCC_RangeChecking>true</DCC_RangeChecking>
+        <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_WriteableConstants>true</DCC_WriteableConstants>
+        <DCC_Alignment>1</DCC_Alignment>
+        <DCC_MapFile>3</DCC_MapFile>
+        <VerInfo_MajorVer>5</VerInfo_MajorVer>
+        <DCC_F>false</DCC_F>
+        <DCC_E>false</DCC_E>
+        <VerInfo_Locale>3081</VerInfo_Locale>
+        <DCC_S>false</DCC_S>
+        <DCC_N>true</DCC_N>
+        <DCC_K>false</DCC_K>
+        <VerInfo_Keys>CompanyName=;FileDescription=Tavultesoft IKE;FileVersion=5.0.0.49;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=5.0.0.0;Comments=</VerInfo_Keys>
+        <DCC_UsePackage>Vcl40;Vclx40;comp51;VCLZipD4;PMemoPack4;dclkmn;vcljpg40;Vcl50;Vclx50;rtl;vcl;xmlrtl;vclactnband;vclx;vclie;dbrtl;vcldb;tb2k_d10;tbx_d10;TMSUnicodeD2006;SpTBXMemoPackage;dsnap;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_ImageBase>00400000</DCC_ImageBase>
+        <DebugSourcePath>C:\keyman\7.0\src\engine\kmcomapi\com\keyboards\;C:\keyman\7.0\src\engine\kmcomapi\util\;C:\keyman\7.0\src\engine\kmcomapi\com\;C:\keyman\7.0\src\engine\kmcomapi\com\packages\;C:\keyman\7.0\src\engine\kmcomapi\processes\package\;$(DebugSourcePath)</DebugSourcePath>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_UsePackage>EmbeddedWebBrowser_XE;SpTBXLib_d16;keyman_components;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <Icon_MainIcon>Tike_Icon.ico</Icon_MainIcon>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_Define>$(USE_PLUSMEMO);$(DCC_Define)</DCC_Define>
+        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <DCC_Define>$(USE_PLUSMEMO);$(DCC_Define)</DCC_Define>
+        <DCC_UnitSearchPath>C:\keyman\10.0\src\ext\jcl\jcl\source\common;C:\keyman\10.0\src\ext\jcl\jcl\source\vcl;C:\keyman\10.0\src\ext\jcl\jcl\source\windows;C:\keyman\10.0\src\ext\jcl\jvcl\run;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <Icon_MainIcon>KeymanDeveloper90.ico</Icon_MainIcon>
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
+        <VerInfo_Keys>CompanyName=;FileVersion=5.0.0.49;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <BT_BuildType>Debug</BT_BuildType>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="..\..\global\delphi\general\kmxfile.pas"/>
+        <DCCReference Include="child\UfrmMDIChild.pas">
+            <Form>frmTikeChild</Form>
+        </DCCReference>
+        <DCCReference Include="dialogs\UfrmNew.pas">
+            <Form>frmNew</Form>
+        </DCCReference>
+        <DCCReference Include="main\UfrmStartup.pas">
+            <Form>frmStartup</Form>
+        </DCCReference>
+        <DCCReference Include="dialogs\UfrmAboutTike.pas">
+            <Form>frmAboutTike</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\compile.pas"/>
+        <DCCReference Include="main\KeymanDeveloperOptions.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\keyman32_int.pas"/>
+        <DCCReference Include="child\UfrmTestKeyboard.pas">
+            <Form>frmTestKeyboard</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\int_kmdebug.pas"/>
+        <DCCReference Include="debug\UfrmKeyTest.pas">
+            <Form>frmKeyTest</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\CompilePackage.pas"/>
+        <DCCReference Include="main\KeymanDeveloperUtils.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\CRC32.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\ResourceStrings.pas"/>
+        <DCCReference Include="child\UfrmEditor.pas">
+            <Form>frmEditor</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\comp\MenuImgList.pas"/>
+        <DCCReference Include="dialogs\UfrmSelectKey.pas">
+            <Form>frmSelectKey</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\comp\keybtn.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\unicodepanel.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\ttinfo.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\KeyNames.pas"/>
+        <DCCReference Include="main\SyntaxHighlight.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\PaintPanel.pas"/>
+        <DCCReference Include="child\UfrmMDIEditor.pas">
+            <Form>frmTikeEditor</Form>
+        </DCCReference>
+        <DCCReference Include="project\ProjectFile.pas"/>
+        <DCCReference Include="project\ProjectFileType.pas"/>
+        <DCCReference Include="project\ProjectFiles.pas"/>
+        <DCCReference Include="project\kpsProjectFile.pas"/>
+        <DCCReference Include="project\kmxProjectFile.pas"/>
+        <DCCReference Include="project\kmnProjectFile.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\VKeys.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="main\debugging.pas"/>
+        <DCCReference Include="rel\keymanstrings.pas"/>
+        <DCCReference Include="help\kwhelp.pas"/>
+        <DCCReference Include="main\UKeyBitmap.pas"/>
+        <DCCReference Include="debug\UfrmSelectSystemKeyboard.pas">
+            <Form>frmSelectSystemKeyboard</Form>
+        </DCCReference>
+        <DCCReference Include="debug\RegressionTest.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\DebugListView.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\DebugBitBtn.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\DebugListBox.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\PackageInfo.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\kmpinffile.pas"/>
+        <DCCReference Include="main\RedistFiles.pas"/>
+        <DCCReference Include="child\UfrmBitmapEditor.pas">
+            <Form>frmBitmapEditor</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\comp\HintLabel.pas"/>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboard.pas"/>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardExportHTML.pas"/>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardImportXML.pas"/>
+        <DCCReference Include="dialogs\UfrmVisualKeyboardImportKMX.pas">
+            <Form>frmVisualKeyboardImportKMX</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\comp\PanelOverlapped.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\SHDocVw_TLB.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\ScanCodeMap.pas"/>
+        <DCCReference Include="dialogs\UfrmRegressionTestFailure.pas">
+            <Form>frmRegressionTestFailure</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\XString.pas"/>
+        <DCCReference Include="debug\debugkeyboard.pas"/>
+        <DCCReference Include="dialogs\UfrmMustIncludeDebug.pas">
+            <Form>frmMustIncludeDebug</Form>
+        </DCCReference>
+        <DCCReference Include="debug\debugdeadkeys.pas"/>
+        <DCCReference Include="main\MessageIdentifiers.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\exceptionw.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\kpsfile.pas"/>
+        <DCCReference Include="project\UfrmProject.pas">
+            <Form>frmProject</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\UnitDrawArrow.pas"/>
+        <DCCReference Include="kct\StockObjects.pas"/>
+        <DCCReference Include="..\..\global\delphi\cust\CustomisationStorage.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
+        <DCCReference Include="..\..\global\delphi\cust\custinterfaces.pas"/>
+        <DCCReference Include="..\..\global\delphi\cust\CustomisationMessages.pas"/>
+        <DCCReference Include="..\..\global\delphi\cust\StockMessages.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\HeadingCheckListBox.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\BitmapEditor.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\StringGridEditControlled.pas"/>
+        <DCCReference Include="main\KMDevResourceStrings.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\httpuploader.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\httpuploader_messageprocessor_forms.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilsystem.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilfiletypes.pas"/>
+        <DCCReference Include="project\Project.pas"/>
+        <DCCReference Include="project\kvkProjectFile.pas"/>
+        <DCCReference Include="dialogs\UfrmNewFileDetails.pas">
+            <Form>frmNewFileDetails</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\cust\CustomisationMenu.pas"/>
+        <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
+        <DCCReference Include="compile\CompileKeymanWeb.pas"/>
+        <DCCReference Include="compile\KeymanWebKeyCodes.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
+        <DCCReference Include="..\..\global\delphi\tlb\MSHTML_TLB.pas"/>
+        <DCCReference Include="..\..\global\delphi\productactivation\OnlineConstants.pas"/>
+        <DCCReference Include="..\..\global\delphi\tlb\ADOX_TLB.pas"/>
+        <DCCReference Include="..\..\global\delphi\tlb\ADODB_TLB.pas"/>
+        <DCCReference Include="project\ProjectLoader.pas"/>
+        <DCCReference Include="project\ProjectSaver.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilhttp.pas"/>
+        <DCCReference Include="main\mrulist.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Upload_Settings.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\MLang.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\FixedTrackbar.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilstr.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilkeyboard.pas"/>
+        <DCCReference Include="main\KeyboardParser.pas"/>
+        <DCCReference Include="main\TextFileFormat.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\KMDActions.pas"/>
+        <DCCReference Include="actions\KMDActionInterfaces.pas"/>
+        <DCCReference Include="main\UfrmHelp.pas">
+            <Form>frmHelp</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\comp\OnScreenKeyboard.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\ExtShiftState.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\CleartypeDrawCharacter.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\webbrowserfocusmonitor.pas"/>
+        <DCCReference Include="main\CharMapDropTool.pas"/>
+        <DCCReference Include="main\CharMapDropTool_PlusMemoU.pas"/>
+        <DCCReference Include="main\CharMapDropTool_EmbeddedWB.pas"/>
+        <DCCReference Include="dialogs\UfrmBitmapEditorText.pas">
+            <Form>frmBitmapEditorText</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\UFixFontDialogBold.pas"/>
+        <DCCReference Include="..\..\global\delphi\charmap\UnicodeData.pas"/>
+        <DCCReference Include="..\..\global\delphi\charmap\CharacterDragObject.pas"/>
+        <DCCReference Include="..\..\global\delphi\charmap\CharacterMapSettings.pas"/>
+        <DCCReference Include="..\..\global\delphi\charmap\CharacterRanges.pas"/>
+        <DCCReference Include="..\..\global\delphi\charmap\CharMapInsertMode.pas"/>
+        <DCCReference Include="..\..\global\delphi\charmap\UfrmCharacterMapFilter.pas">
+            <Form>frmCharacterMapFilter</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\charmap\UfrmUnicodeDataStatus.pas">
+            <Form>frmUnicodeDataStatus</Form>
+        </DCCReference>
+        <DCCReference Include="debug\UfrmDebugStatus_RegTest.pas">
+            <Form>frmDebugStatus_RegTest</Form>
+        </DCCReference>
+        <DCCReference Include="debug\UfrmDebugStatus_CallStack.pas">
+            <Form>frmDebugStatus_CallStack</Form>
+        </DCCReference>
+        <DCCReference Include="debug\UfrmDebugStatus_Deadkeys.pas">
+            <Form>frmDebugStatus_DeadKeys</Form>
+        </DCCReference>
+        <DCCReference Include="debug\UfrmDebugStatus_Elements.pas">
+            <Form>frmDebugStatus_Elements</Form>
+        </DCCReference>
+        <DCCReference Include="child\UfrmDebugStatus.pas">
+            <Form>frmDebugStatus</Form>
+        </DCCReference>
+        <DCCReference Include="debug\UfrmDebugStatus_Key.pas">
+            <Form>frmDebugStatus_Key</Form>
+        </DCCReference>
+        <DCCReference Include="debug\UfrmDebugStatus_Child.pas">
+            <Form>frmDebugStatus_Child</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\debug\DebugManager.pas"/>
+        <DCCReference Include="..\..\global\delphi\online\OnlineUpdateCheck.pas"/>
+        <DCCReference Include="..\..\global\delphi\online\UfrmOnlineUpdateNewVersion.pas">
+            <Form>frmOnlineUpdateNewVersion</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\SystemDebugPath.pas"/>
+        <DCCReference Include="kct\MessageDefaults.pas"/>
+        <DCCReference Include="main\UfrmDownloadProgress.pas">
+            <Form>frmDownloadProgress</Form>
+        </DCCReference>
+        <DCCReference Include="main\UframeOnScreenKeyboardEditor.pas">
+            <Form>frameOnScreenKeyboardEditor</Form>
+        </DCCReference>
+        <DCCReference Include="child\UfrmOSKEditor.pas">
+            <Form>frmOSKEditor</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\utilxml.pas"/>
+        <DCCReference Include="main\UfrmTike.pas">
+            <Form>TikeForm</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\online\UfrmOnlineUpdateSetup.pas">
+            <Form>frmOnlineUpdateSetup</Form>
+        </DCCReference>
+        <DCCReference Include="main\OnlineUpdateCheckMessages.pas"/>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardExportBMP.pas"/>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardExportPNG.pas"/>
+        <DCCReference Include="..\..\global\delphi\tlb\MSXML2_TLB.pas"/>
+        <DCCReference Include="main\CharacterInfo.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\CompilePackageInstaller.pas"/>
+        <DCCReference Include="main\UTikeDebugMode.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\kmxfileutils.pas"/>
+        <DCCReference Include="dialogs\languages\UfrmSelectWindowsLanguages.pas">
+            <Form>frmSelectWindowsLanguages</Form>
+            <DesignClass>TTntForm</DesignClass>
+        </DCCReference>
+        <DCCReference Include="dialogs\languages\UfrmSelectISOLanguages.pas">
+            <Form>frmSelectISOLanguages</Form>
+            <DesignClass>TTntForm</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\WindowsLanguages.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
+        <DCCReference Include="main\TextFileTemplates.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\ExternalExceptionHandler.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\ErrLogPath.pas"/>
+        <DCCReference Include="dialogs\UfrmFontHelper.pas">
+            <Form>Form1</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\WebSoundControl.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\usp10.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilmsxml.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\KeymanEmbeddedWB.pas"/>
+        <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="main\UframeBitmapEditor.pas">
+            <Form>frameBitmapEditor</Form>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="main\UfrmMessages.pas">
+            <Form>frmMessages</Form>
+        </DCCReference>
+        <DCCReference Include="actions\dmActionsKeyboardEditor.pas">
+            <Form>modActionsKeyboardEditor</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="actions\dmActionsMain.pas">
+            <Form>modActionsMain</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="actions\dmActionsTextEditor.pas">
+            <Form>modActionsTextEditor</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\charmap\UfrmCharacterMapNew.pas">
+            <Form>frmCharacterMapNew</Form>
+        </DCCReference>
+        <DCCReference Include="main\UframeTextEditor.pas">
+            <Form>frameTextEditor</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\UfrmVisualKeyboardExportBMPParams.pas">
+            <Form>frmVisualKeyboardExportBMPParams</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\UfrmVisualKeyboardExportHTMLParams.pas">
+            <Form>frmVisualKeyboardExportHTMLParams</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\UfrmVisualKeyboardKeyBitmap.pas">
+            <Form>frmVisualKeyboardKeyBitmap</Form>
+        </DCCReference>
+        <DCCReference Include="dialogs\UfrmOptions.pas">
+            <Form>frmOptions</Form>
+        </DCCReference>
+        <DCCReference Include="child\UfrmDebug.pas">
+            <Form>frmDebug</Form>
+        </DCCReference>
+        <DCCReference Include="child\UfrmPackageEditor.pas">
+            <Form>frmPackageEditor</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\CaptionPanel.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Glossary.pas"/>
+        <DCCReference Include="oskbuilder\UframeTouchLayoutBuilder.pas">
+            <Form>frameTouchLayoutBuilder</Form>
+        </DCCReference>
+        <DCCReference Include="oskbuilder\TouchLayoutUtils.pas">
+            <Form>,
+  UfrmSelectTouchLayoutTemplate in &apos;oskbuilder\UfrmSelectTouchLayoutTemplate.pas&apos; {frmSelectTouchLayoutTemplate</Form>
+        </DCCReference>
+        <DCCReference Include="oskbuilder\UfrmSelectTouchLayoutTemplate.pas">
+            <Form>frmSelectTouchLayoutTemplate</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
+        <DCCReference Include="oskbuilder\TouchLayout.pas"/>
+        <DCCReference Include="oskbuilder\TouchLayoutDefinitions.pas"/>
+        <DCCReference Include="main\CharMapDropTool_TntCustomEdit.pas"/>
+        <DCCReference Include="debug\DebugUtils.pas"/>
+        <DCCReference Include="..\..\global\delphi\winapi\keyman_msctf.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\CheckboxGridHelper.pas"/>
+        <DCCReference Include="dialogs\UfrmAddKeyboardFeature.pas">
+            <Form>frmAddKeyboardFeature</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\comp\LeftTabbedPageControl.pas"/>
+        <DCCReference Include="web\UmodWebHttpServer.pas">
+            <Form>modWebHttpServer</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
+        <DCCReference Include="child\UfrmKeymanWizard.pas">
+            <Form>frmKeymanWizard</Form>
+        </DCCReference>
+        <DCCReference Include="dialogs\UfrmKeyboardFonts.pas">
+            <Form>frmKeyboardFonts</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\CompileErrorCodes.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\KeyboardFonts.pas"/>
+        <DCCReference Include="..\..\global\delphi\vcl\SHDocVw.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utiltsf.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\JsonUtil.pas"/>
+        <DCCReference Include="main\TikeUnicodeData.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\UKeymanTargets.pas"/>
+        <DCCReference Include="dialogs\UfrmSMTPSetup.pas">
+            <Form>frmSMTPSetup</Form>
+        </DCCReference>
+        <DCCReference Include="dialogs\UfrmSendURLsToEmail.pas">
+            <Form>frmSendURLsToEmail</Form>
+        </DCCReference>
+        <DCCReference Include="web\UframeJSONEditor.pas">
+            <Form>frameJSONEditor</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\kmw\JSONKeyboardInfo.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\MSXMLDomCreate.pas"/>
+        <DCCReference Include="help\webhelp.pas"/>
+        <DCCReference Include="project\UfrmProjectSettings.pas">
+            <Form>frmProjectSettings</Form>
+        </DCCReference>
+        <DCCReference Include="project\ProjectFileUI.pas"/>
+        <DCCReference Include="project\ProjectUI.pas"/>
+        <DCCReference Include="project\ProjectUIFileType.pas"/>
+        <DCCReference Include="project\kmnProjectFileUI.pas"/>
+        <DCCReference Include="project\kpsProjectFileUI.pas"/>
+        <DCCReference Include="project\kmxProjectFileUI.pas"/>
+        <DCCReference Include="project\kvkProjectFileUI.pas"/>
+        <DCCReference Include="project\ProjectFilesUI.pas"/>
+        <DCCReference Include="project\ProjectLog.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\UMD5Hash.pas"/>
+        <DCCReference Include="main\UfrmMain.pas">
+            <Form>frmKeymanDeveloper</Form>
+        </DCCReference>
+        <DCCReference Include="main\UfrmCharacterIdentifier.pas">
+            <Form>frmCharacterIdentifier</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\charmap\utilcheckfontchars.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\findfonts.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\KeymanPaths.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utiljclexception.pas"/>
+        <DCCReference Include="..\..\engine\kmcomapi\keymanapi_TLB.pas"/>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardExportXML.pas"/>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\DropTarget.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\CloseButtonPageControl.pas"/>
+        <DCCReference Include="dockforms\UfrmTIKEDock.pas">
+            <Form>TIKEDockForm</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\comp\KeymanDeveloperMemo.pas"/>
+        <DCCReference Include="..\..\global\delphi\comp\KeymanDeveloperDebuggerMemo.pas"/>
+        <DCCReference Include="dockforms\UfrmCharacterMapDock.pas">
+            <Form>frmCharacterMapDock</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <None Include="Profiling\AQtimeModule1.aqt"/>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>VCLApplication</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">Tike.dpr</Source>
+                </Source>
+                <Language>
+                    <Language Name="ProjectLang">$00000C09</Language>
+                </Language>
+                <VersionInfo>
+                    <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+                    <VersionInfo Name="AutoIncBuild">True</VersionInfo>
+                    <VersionInfo Name="MajorVer">5</VersionInfo>
+                    <VersionInfo Name="MinorVer">0</VersionInfo>
+                    <VersionInfo Name="Release">0</VersionInfo>
+                    <VersionInfo Name="Build">83</VersionInfo>
+                    <VersionInfo Name="Debug">False</VersionInfo>
+                    <VersionInfo Name="PreRelease">False</VersionInfo>
+                    <VersionInfo Name="Special">False</VersionInfo>
+                    <VersionInfo Name="Private">False</VersionInfo>
+                    <VersionInfo Name="DLL">False</VersionInfo>
+                    <VersionInfo Name="Locale">3081</VersionInfo>
+                    <VersionInfo Name="CodePage">1252</VersionInfo>
+                </VersionInfo>
+                <VersionInfoKeys>
+                    <VersionInfoKeys Name="CompanyName"/>
+                    <VersionInfoKeys Name="FileDescription">Tavultesoft IKE</VersionInfoKeys>
+                    <VersionInfoKeys Name="FileVersion">5.0.0.83</VersionInfoKeys>
+                    <VersionInfoKeys Name="InternalName"/>
+                    <VersionInfoKeys Name="LegalCopyright"/>
+                    <VersionInfoKeys Name="LegalTrademarks"/>
+                    <VersionInfoKeys Name="OriginalFilename"/>
+                    <VersionInfoKeys Name="ProductName"/>
+                    <VersionInfoKeys Name="ProductVersion">5.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="Comments"/>
+                </VersionInfoKeys>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvAppFrmDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvAppFrmDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvBandsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvBandsDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCmpDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCmpDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCryptDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCryptDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCustomDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCustomDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDotNetCtrlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDotNetCtrlsDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvGlobusDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvGlobusDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvHMIDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvHMIDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvJansDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvJansDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvManagedThreadsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvManagedThreadsDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvMMDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvMMDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvNetDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvNetDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPascalInterpreterDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPascalInterpreterDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPrintPreviewDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPrintPreviewDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvRuntimeDesignDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvRuntimeDesignDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvSystemDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvSystemDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvTimeFrameworkDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvTimeFrameworkDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvWizardsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvWizardsDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvXPCtrlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvXPCtrlsDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="c:\keyman\10.0\lib\DragDropD2011.bpl">File c:\keyman\10.0\lib\DragDropD2011.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="c:\keyman\10.0\lib\tb2kdsgn_d12.bpl">File c:\keyman\10.0\lib\tb2kdsgn_d12.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="c:\keyman\10.0\lib\SpTBXLibDsgn_d16.bpl">File c:\keyman\10.0\lib\SpTBXLibDsgn_d16.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k240.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp240.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvControlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvControlsDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDBDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDBDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDlgsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDlgsDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPageCompsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPageCompsDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPluginSystemDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPluginSystemDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvStdCtrlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvStdCtrlsDesign240.bpl not found</Excluded_Packages>
+                </Excluded_Packages>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+            <Deployment Version="3">
+                <DeployFile LocalName="Tike.rsm" Configuration="Debug" Class="DebugSymbols">
+                    <Platform Name="Win32">
+                        <RemoteName>Tike.rsm</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Tike.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>Tike.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployClass Name="AdditionalDebugSymbols">
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidClassesDexFile">
+                    <Platform Name="Android">
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidGDBServer">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeArmeabiFile">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeMipsFile">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\mips</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidServiceOutput">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashImageDef">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashStyles">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_DefaultAppIcon">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon144">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon36">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-ldpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon48">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon72">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon96">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage426">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-small</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage470">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-normal</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage640">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-large</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage960">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xlarge</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DebugSymbols">
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DependencyFramework">
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                        <Extensions>.framework</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Required="true" Name="DependencyPackage">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.bpl</Extensions>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="File">
+                    <Platform Name="Android">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1024">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1536">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2048">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch768">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch320">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch640">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch640x1136">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectAndroidManifest">
+                    <Platform Name="Android">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceDebug">
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceResourceRules"/>
+                <DeployClass Name="ProjectiOSEntitlements"/>
+                <DeployClass Name="ProjectiOSInfoPList"/>
+                <DeployClass Name="ProjectiOSResource">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXEntitlements"/>
+                <DeployClass Name="ProjectOSXInfoPList"/>
+                <DeployClass Name="ProjectOSXResource">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Required="true" Name="ProjectOutput">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Linux64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectUWPManifest">
+                    <Platform Name="Win32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="UWP_DelphiLogo150">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="UWP_DelphiLogo44">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
+            </Deployment>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+    <Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+    <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
+</Project>

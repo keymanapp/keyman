@@ -1,0 +1,99 @@
+package JvCore;
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $490E0000}
+{$DEFINE RELEASE}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'JVCL Core Components Runtime Package'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  Jcl,
+  JclVcl,
+  vclx,
+  vcl,
+  rtl,
+  dbrtl,
+  vclimg;
+
+contains
+  JvGnugettext in '..\jvcl\jvcl\run\JvGnugettext.pas',
+  JvExButtons in '..\jvcl\jvcl\run\JvExButtons.pas',
+  JvExCheckLst in '..\jvcl\jvcl\run\JvExCheckLst.pas',
+  JvExComCtrls in '..\jvcl\jvcl\run\JvExComCtrls.pas',
+  JvExControls in '..\jvcl\jvcl\run\JvExControls.pas',
+  JvExExtCtrls in '..\jvcl\jvcl\run\JvExExtCtrls.pas',
+  JvExForms in '..\jvcl\jvcl\run\JvExForms.pas',
+  JvExGrids in '..\jvcl\jvcl\run\JvExGrids.pas',
+  JvExMask in '..\jvcl\jvcl\run\JvExMask.pas',
+  JvExStdCtrls in '..\jvcl\jvcl\run\JvExStdCtrls.pas',
+  JvJVCLAboutForm in '..\jvcl\jvcl\run\JvJVCLAboutForm.pas' {JvJVCLAboutForm},
+  JVCLVer in '..\jvcl\jvcl\run\JVCLVer.pas',
+  JvConsts in '..\jvcl\jvcl\run\JvConsts.pas',
+  JvWin32 in '..\jvcl\jvcl\run\JvWin32.pas',
+  JvColorProvider in '..\jvcl\jvcl\run\JvColorProvider.pas',
+  JvComponentBase in '..\jvcl\jvcl\run\JvComponentBase.pas',
+  JvComponent in '..\jvcl\jvcl\run\JvComponent.pas',
+  JvExtComponent in '..\jvcl\jvcl\run\JvExtComponent.pas',
+  JvContextProvider in '..\jvcl\jvcl\run\JvContextProvider.pas',
+  JvDataProvider in '..\jvcl\jvcl\run\JvDataProvider.pas',
+  JvDataProviderIntf in '..\jvcl\jvcl\run\JvDataProviderIntf.pas',
+  JvDynControlEngine in '..\jvcl\jvcl\run\JvDynControlEngine.pas',
+  JvDynControlEngineIntf in '..\jvcl\jvcl\run\JvDynControlEngineIntf.pas',
+  JvDynControlEngineVCL in '..\jvcl\jvcl\run\JvDynControlEngineVCL.pas',
+  JvDynControlEngineTools in '..\jvcl\jvcl\run\JvDynControlEngineTools.pas',
+  JvDsgnIntf in '..\jvcl\jvcl\run\JvDsgnIntf.pas',
+  JvJCLUtils in '..\jvcl\jvcl\run\JvJCLUtils.pas',
+  JvJVCLUtils in '..\jvcl\jvcl\run\JvJVCLUtils.pas',
+  JvMaxPixel in '..\jvcl\jvcl\run\JvMaxPixel.pas',
+  JvMouseTimer in '..\jvcl\jvcl\run\JvMouseTimer.pas',
+  JvPoweredBy in '..\jvcl\jvcl\run\JvPoweredBy.pas',
+  JvProgressUtils in '..\jvcl\jvcl\run\JvProgressUtils.pas',
+  JvPropertyStore in '..\jvcl\jvcl\run\JvPropertyStore.pas',
+  JvPropertyStoreEditorIntf in '..\jvcl\jvcl\run\JvPropertyStoreEditorIntf.pas',
+  JvPropertyStorage in '..\jvcl\jvcl\run\JvPropertyStorage.pas',
+  JvStrings in '..\jvcl\jvcl\run\JvStrings.pas',
+  JvThemes in '..\jvcl\jvcl\run\JvThemes.pas',
+  JvTypes in '..\jvcl\jvcl\run\JvTypes.pas',
+  JvVersionInfo in '..\jvcl\jvcl\run\JvVersionInfo.pas',
+  JvActions in '..\jvcl\jvcl\run\JvActions.pas',
+  JvTranslateString in '..\jvcl\jvcl\run\JvTranslateString.pas',
+  JvAppIniStorage in '..\jvcl\jvcl\run\JvAppIniStorage.pas',
+  JvAppRegistryStorage in '..\jvcl\jvcl\run\JvAppRegistryStorage.pas',
+  JvAppStorage in '..\jvcl\jvcl\run\JvAppStorage.pas',
+  JvAppStorageSelectList in '..\jvcl\jvcl\run\JvAppStorageSelectList.pas',
+  JvBaseDlg in '..\jvcl\jvcl\run\JvBaseDlg.pas',
+  JvCaret in '..\jvcl\jvcl\run\JvCaret.pas',
+  JvResources in '..\jvcl\jvcl\run\JvResources.pas',
+  JvClipbrd in '..\jvcl\jvcl\run\JvClipbrd.pas',
+  JvAutoComplete in '..\jvcl\jvcl\run\JvAutoComplete.pas',
+  JvBackgrounds in '..\jvcl\jvcl\run\JvBackgrounds.pas',
+  JvDataSourceIntf in '..\jvcl\jvcl\run\JvDataSourceIntf.pas',
+  JvOfficeDragBarForm in '..\jvcl\jvcl\run\JvOfficeDragBarForm.pas',
+  JvHotTrackPersistent in '..\jvcl\jvcl\run\JvHotTrackPersistent.pas',
+  JvStdEditActions in '..\jvcl\jvcl\run\JvStdEditActions.pas',
+  JvValidators in '..\jvcl\jvcl\run\JvValidators.pas',
+  JvErrorIndicator in '..\jvcl\jvcl\run\JvErrorIndicator.pas';
+
+end.

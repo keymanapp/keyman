@@ -1,0 +1,263 @@
+#
+# Keyman root Makefile
+#
+
+# ----------------------------------------------------------------------
+
+default:
+    @echo The following make targets are available:
+    @echo     build                 builds everything except help files (-DBUILDHELP to build help)
+    @echo     install               installs packages into Delphi IDE (run after a build)
+    @echo     clean                 removes all temp files
+    @echo     release               make a release
+    @echo     web-install           sends the documentation to the website
+    @echo     test-certificate      create a test certificate + CA (and install test CA)
+    @echo.
+    @echo     Build flags:
+    @echo           DEBUG           Include debug information
+    @echo           SC_TIMESTAMP    Don't timestamp certificates (for internal releases only, offline)
+    @echo           BUILDHELP       Build the helpfiles (implicit when 'make release')
+    @echo           LINT            Turns on $MESSAGE hints and warnings and all extra string warnings
+    @echo           QUIET           Ignore hints and warnings
+    @echo.
+    @echo     To view help on the build process, in /src/inst, run:
+    @echo           make help
+    @echo.
+
+# ----------------------------------------------------------------------
+    
+TARGETS=ext global buildtools developer engine desktop support
+RELEASE_TARGETS=desktop
+CLEANS=test cleanroot
+MANIFESTS=engine desktop developer
+
+EXCLUDEPATHDEFINES=1
+
+!include Header.mak
+
+# ----------------------------------------------------------------------
+
+cleanroot:
+    -del tds.zip
+    -del tds.exe
+    -del PathDefines.mak
+
+global: build-tools
+    cd $(ROOT)\src\global
+    $(MAKE) $(TARGET)
+    cd $(ROOT)\src
+
+ext: build-tools
+    cd $(ROOT)\src\ext
+    $(MAKE) $(TARGET)
+    cd $(ROOT)\src
+
+buildtools: global
+    cd $(ROOT)\src\buildtools
+    $(MAKE) $(TARGET)
+    cd $(ROOT)\src
+
+developer: global
+    cd $(ROOT)\src\developer
+    $(MAKE) $(TARGET)
+    cd $(ROOT)\src
+
+engine: global
+    cd $(ROOT)\src\engine
+    $(MAKE) $(TARGET)
+    cd $(ROOT)\src
+
+desktop: global
+    cd $(ROOT)\src\desktop
+    $(MAKE) $(TARGET)
+    cd $(ROOT)\src
+
+support: global
+    cd $(ROOT)\src\support
+    $(MAKE) $(TARGET)
+    cd $(ROOT)\src
+
+test:
+    cd $(ROOT)\src\test
+    $(MAKE) $(TARGET)
+    cd $(ROOT)\src
+
+# ----------------------------------------------------------------------
+# release
+# ----------------------------------------------------------------------
+
+release: clean-pathdefines build-source-root-path-pas test-releasebuildcheck test-uiaccess test-klog test-releaseexists test-cert clean 
+    cd $(ROOT)\src
+    $(MAKE) disable-search
+    $(MAKE) build-release-wrapper
+    $(MAKE) clean    
+    cd $(ROOT)\src
+    $(MAKE) enable-search 
+
+clean-pathdefines: test-releasebuildcheck
+    # test-releasebuildcheck builds devtools for us
+    $(PROGRAM)\buildtools\devtools -ri
+
+#
+# Test that certificate checking is enabled and that certificate is accessible
+#
+
+test-cert:
+    copy $(SC_PFX_SHA1) $(ROOT)\src\pfx.tmp
+    del $(ROOT)\src\pfx.tmp
+
+#
+# Test that klog is disabled
+#
+
+test-klog: mkver-app
+    cd $(ROOT)\src\buildtools\test-klog
+    $(MAKE) verify
+    cd $(ROOT)\src
+
+#
+# Test that we haven't already built this release
+#
+
+test-releaseexists: mkver-app
+    cd $(ROOT)\src\developer\inst
+    $(MAKE) test-releaseexists
+    cd $(ROOT)\src
+
+#
+# Test various release prerequisites, e.g. Debug reg key not set
+#
+
+test-releasebuildcheck: build-source-root-path-pas
+    cd $(ROOT)\src\buildtools\devtools
+    $(MAKE) test-releasebuildcheck
+    cd $(ROOT)\src
+
+#
+# Test uiaccess property in keyman manifest.xml and keyman64 manifest.xml
+#
+
+test-uiaccess:
+    cd $(ROOT)\src\engine\keyman
+    $(MAKE) test-uiaccess
+    cd $(ROOT)\src\engine\keymanx64
+    $(MAKE) test-uiaccess
+    cd $(ROOT)\src
+
+#
+# Update version numbers for all subfolders
+#
+    
+update-version: build-tools mkver-app
+    $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\buildtools\version.txt $(ROOT)\src\version.txt
+    $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\developer\version.txt $(ROOT)\src\version.txt
+    $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\desktop\version.txt $(ROOT)\src\version.txt
+    $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\engine\version.txt $(ROOT)\src\version.txt
+    $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\support\version.txt $(ROOT)\src\version.txt
+
+# Build a release
+    
+build-release-wrapper: clean-output update-version
+    $(MAKE) dirs
+    $(MAKE) build-tools
+    $(MAKE) build
+    $(MAKE) build-release
+    $(MAKE) signcode
+    $(MAKE) -DTARGET=test test
+    $(MAKE) backup
+
+    cd $(ROOT)\src\engine\inst
+    $(MAKE)
+
+    cd $(ROOT)\src\desktop\inst
+    $(MAKE) setup
+
+    cd $(ROOT)\src\developer\inst
+    $(MAKE)
+
+    cd $(ROOT)\src\buildtools\inst
+    $(MAKE)
+
+#
+# Tools needed to complete a build
+#
+
+build-tools: build-source-root-path-pas
+    cd $(ROOT)\src\buildtools\devtools
+    $(MAKE)
+    
+    # We'll build a default PathDefines.mak if it is missing here so we can
+    # go on and do the rest of the build
+    $(PROGRAM)\buildtools\devtools -ti
+
+#
+# Remove all files from output folders to ensure no legacy files left in a release
+#
+
+clean-output:
+    rd /s/q $(ROOT)\bin
+    rd /s/q $(ROOT)\debug
+    rd /s/q $(ROOT)\build
+    rd /s/q $(ROOT)\lib
+
+# ----------------------------------------------------------------------
+# install
+# ----------------------------------------------------------------------
+
+web-install:
+    cd $(ROOT)\src\desktop\help
+    $(MAKE) html install
+
+    cd $(ROOT)\src\developer\help
+    $(MAKE) html install
+
+# ----------------------------------------------------------------------
+
+disable-search:
+    -net stop wsearch
+    -net stop MsMpSvc
+
+enable-search:
+    -net start wsearch
+    -net start MsMpSvc
+
+# ----------------------------------------------------------------------
+
+test-certificate:
+    cd $(ROOT)\src\buildtools\certificates
+    -del KeymanTestCA-sha1.*
+    -del KeymanTest-sha1.*
+    -del KeymanTest-sha256.*
+    -del KeymanTestCA-sha256.*
+    
+    makecert -r -pe -n "CN=Keyman Test CA SHA1" -ss CA -sr CurrentUser -a sha1 -cy authority -sky signature -sv KeymanTestCA-sha1.pvk KeymanTestCA-sha1.cer
+    certutil -user -addstore Root KeymanTestCA-sha1.cer
+    makecert -pe -n "CN=Keyman Test Certificate SHA1" -a sha1 -cy end -sky signature -ic KeymanTestCA-sha1.cer -iv KeymanTestCA-sha1.pvk -sv KeymanTest-sha1.pvk KeymanTest-sha1.cer
+    pvk2pfx -pvk KeymanTest-sha1.pvk -spc KeymanTest-sha1.cer -pfx KeymanTest-sha1.pfx
+
+    makecert -r -pe -n "CN=Keyman Test CA" -ss CA -sr CurrentUser -a sha256 -cy authority -sky signature -sv KeymanTestCA-sha256.pvk KeymanTestCA-sha256.cer
+    certutil -user -addstore Root KeymanTestCA-sha256.cer
+    makecert -pe -n "CN=Keyman Test Certificate" -a sha256 -cy end -sky signature -ic KeymanTestCA-sha256.cer -iv KeymanTestCA-sha256.pvk -sv KeymanTest-sha256.pvk KeymanTest-sha256.cer
+    pvk2pfx -pvk KeymanTest-sha256.pvk -spc KeymanTest-sha256.cer -pfx KeymanTest-sha256.pfx
+
+#
+# Allow Keyman to be built without being in C:\keyman\10.0 root folder
+#
+
+SOURCEROOTPATH=$(ROOT)\src\global\delphi\general\SourceRootPath.pas
+
+build-source-root-path-pas:
+  echo unit SourceRootPath; > $(SOURCEROOTPATH)
+  echo interface >> $(SOURCEROOTPATH)
+  echo const >> $(SOURCEROOTPATH)
+  echo   CSourceRootPath='$(ROOT)\src'; >> $(SOURCEROOTPATH)
+  echo   CSourceBinRootPath='$(ROOT)\bin'; >> $(SOURCEROOTPATH)
+  echo   CSourceRootLibPath='$(ROOT)\lib'; >> $(SOURCEROOTPATH)
+  echo implementation >> $(SOURCEROOTPATH)
+  echo end. >> $(SOURCEROOTPATH)
+    
+!include Target.mak
+
+# ----------------------------------------------------------------------
+# EOF
+# ----------------------------------------------------------------------

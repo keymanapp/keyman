@@ -1,0 +1,19 @@
+# 
+# File describing header requirements for PAS files
+# This file is in SDF format -- see TStringList.CommaText for details
+#
+# <ItemName>, <Required>, <MultiLineAccepted>, <SpecialField>
+#
+Name,True,False,Name
+Copyright,True,False,Copyright
+Documentation,True,True,Documentation
+Description,True,True,Description
+"Create Date",True,True,CreateDate
+"Modified Date",False,True,ModifiedDate
+Authors,True,True,Authors,Authors
+"Related Files",False,True,RelatedFiles
+Dependencies,False,True,Dependencies
+Bugs,False,True,Bugs
+Todo,False,True,Todo
+Notes,False,True,Notes
+History,True,True,History

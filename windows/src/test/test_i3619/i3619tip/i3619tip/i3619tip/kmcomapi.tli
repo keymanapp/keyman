@@ -1,0 +1,1680 @@
+﻿// Created by Microsoft (R) C/C++ Compiler Version 10.00.30319.01 (e9fde003).
+//
+// c:\keyman\9.0\src\addins\kmtip\kmcomapi.tli
+//
+// Wrapper implementations for Win32 type library c:\\keyman\\9.0\\src\\engine\\kmcomapi\\kmcomapi.tlb
+// compiler-generated file created 11/20/12 at 18:55:37 - DO NOT EDIT!
+
+#pragma once
+
+//
+// interface IKeymanUnicodeBlock wrapper method implementations
+//
+
+inline _bstr_t IKeymanUnicodeBlock::GetName ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Name(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline long IKeymanUnicodeBlock::GetCh1 ( ) {
+    long _result = 0;
+    HRESULT _hr = get_Ch1(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline long IKeymanUnicodeBlock::GetCh2 ( ) {
+    long _result = 0;
+    HRESULT _hr = get_Ch2(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline VARIANT_BOOL IKeymanUnicodeBlock::GetIsComplex ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_IsComplex(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline VARIANT_BOOL IKeymanUnicodeBlock::GetIsRTL ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_IsRTL(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline VARIANT_BOOL IKeymanUnicodeBlock::GetIsFarEast ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_IsFarEast(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline VARIANT_BOOL IKeymanUnicodeBlock::GetIsSupplementary ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_IsSupplementary(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline _bstr_t IKeymanUnicodeBlock::GetUniscribeVersion ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_UniscribeVersion(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanUnicodeBlock::GetCleanName ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_CleanName(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+//
+// interface IKeymanUnicodeBlock2 wrapper method implementations
+//
+
+inline long IKeymanUnicodeBlock2::GetCharacterCount ( ) {
+    long _result = 0;
+    HRESULT _hr = get_CharacterCount(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+//
+// interface IKeymanObject wrapper method implementations
+//
+
+inline HRESULT IKeymanObject::SerializeXML ( BSTR * XML, enum tagKeymanSerializeFlags Flags, _bstr_t ImagePath, VARIANT * References ) {
+    HRESULT _hr = raw_SerializeXML(XML, Flags, ImagePath, References);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline long IKeymanObject::GetUniqueIndex ( ) {
+    long _result = 0;
+    HRESULT _hr = get_UniqueIndex(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+//
+// interface IKeymanCollection wrapper method implementations
+//
+
+inline long IKeymanCollection::GetCount ( ) {
+    long _result = 0;
+    HRESULT _hr = get_Count(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline IUnknownPtr IKeymanCollection::Get_NewEnum ( ) {
+    IUnknown * _result = 0;
+    HRESULT _hr = get__NewEnum(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IUnknownPtr(_result, false);
+}
+
+inline HRESULT IKeymanCollection::Refresh ( ) {
+    HRESULT _hr = raw_Refresh();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanKeyboards wrapper method implementations
+//
+
+inline long IKeymanKeyboards::IndexOf ( _bstr_t Name ) {
+    long _result = 0;
+    HRESULT _hr = raw_IndexOf(Name, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+//
+// interface IKeymanVisualKeyboard wrapper method implementations
+//
+
+inline HRESULT IKeymanVisualKeyboard::Uninstall ( ) {
+    HRESULT _hr = raw_Uninstall();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline _bstr_t IKeymanVisualKeyboard::GetFilename ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Filename(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+//
+// interface IKeymanSystemInfo wrapper method implementations
+//
+
+inline VARIANT_BOOL IKeymanSystemInfo::GetIsAdministrator ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_IsAdministrator(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline HRESULT IKeymanSystemInfo::Refresh ( ) {
+    HRESULT _hr = raw_Refresh();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline _bstr_t IKeymanSystemInfo::GetEngineVersion ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_EngineVersion(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanSystemInfo::GetEngineInstallPath ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_EngineInstallPath(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline HRESULT IKeymanSystemInfo::RunDiagnostics ( ) {
+    HRESULT _hr = raw_RunDiagnostics();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanError wrapper method implementations
+//
+
+inline long IKeymanError::GetErrorCode ( ) {
+    long _result = 0;
+    HRESULT _hr = get_ErrorCode(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline _bstr_t IKeymanError::GetDescription ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Description(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline long IKeymanError::GetParameterCount ( ) {
+    long _result = 0;
+    HRESULT _hr = get_ParameterCount(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline _bstr_t IKeymanError::GetParameter ( long Index ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Parameter(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanError::GetParameterValue ( long Index ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_ParameterValue(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline long IKeymanError::GetSeverity ( ) {
+    long _result = 0;
+    HRESULT _hr = get_Severity(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+//
+// interface IKeymanErrors wrapper method implementations
+//
+
+inline IKeymanErrorPtr IKeymanErrors::GetItems ( long Index ) {
+    struct IKeymanError * _result = 0;
+    HRESULT _hr = get_Items(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanErrorPtr(_result, false);
+}
+
+inline HRESULT IKeymanErrors::SetReboot ( ) {
+    HRESULT _hr = raw_SetReboot();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline VARIANT_BOOL IKeymanErrors::GetRebootRequired ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_RebootRequired(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline HRESULT IKeymanErrors::Clear ( ) {
+    HRESULT _hr = raw_Clear();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanOption wrapper method implementations
+//
+
+inline VARIANT_BOOL IKeymanOption::GetValue ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_Value(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline void IKeymanOption::PutValue ( VARIANT_BOOL Value ) {
+    HRESULT _hr = put_Value(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+}
+
+inline _bstr_t IKeymanOption::GetName ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Name(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline VARIANT_BOOL IKeymanOption::GetDefaultValue ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_DefaultValue(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline VARIANT_BOOL IKeymanOption::GetEnabled ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_Enabled(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline _bstr_t IKeymanOption::GetGroup ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Group(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+//
+// interface IKeymanOptions wrapper method implementations
+//
+
+inline IKeymanOptionPtr IKeymanOptions::GetItems ( const _variant_t & Index ) {
+    struct IKeymanOption * _result = 0;
+    HRESULT _hr = get_Items(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanOptionPtr(_result, false);
+}
+
+inline HRESULT IKeymanOptions::Apply ( ) {
+    HRESULT _hr = raw_Apply();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanHotkey wrapper method implementations
+//
+
+inline long IKeymanHotkey::GetValue ( ) {
+    long _result = 0;
+    HRESULT _hr = get_Value(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline void IKeymanHotkey::PutValue ( long Value ) {
+    HRESULT _hr = put_Value(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+}
+
+inline long IKeymanHotkey::GetTarget ( ) {
+    long _result = 0;
+    HRESULT _hr = get_Target(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline void IKeymanHotkey::PutTarget ( long Value ) {
+    HRESULT _hr = put_Target(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+}
+
+//
+// interface IKeymanHotkeys wrapper method implementations
+//
+
+inline IKeymanHotkeyPtr IKeymanHotkeys::GetItems ( long Index ) {
+    struct IKeymanHotkey * _result = 0;
+    HRESULT _hr = get_Items(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanHotkeyPtr(_result, false);
+}
+
+inline IKeymanHotkeyPtr IKeymanHotkeys::Add ( long Value, long Target ) {
+    struct IKeymanHotkey * _result = 0;
+    HRESULT _hr = raw_Add(Value, Target, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanHotkeyPtr(_result, false);
+}
+
+inline HRESULT IKeymanHotkeys::Delete ( long Index ) {
+    HRESULT _hr = raw_Delete(Index);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanHotkeys::Apply ( ) {
+    HRESULT _hr = raw_Apply();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanHotkeys::Clear ( ) {
+    HRESULT _hr = raw_Clear();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanProduct wrapper method implementations
+//
+
+inline int IKeymanProduct::GetProductID ( ) {
+    int _result = 0;
+    HRESULT _hr = get_ProductID(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline _bstr_t IKeymanProduct::GetFilename ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Filename(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanProduct::GetName ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Name(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanProduct::GetDescription ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Description(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline VARIANT_BOOL IKeymanProduct::GetValid ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_Valid(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline HRESULT IKeymanProduct::Uninstall ( ) {
+    HRESULT _hr = raw_Uninstall();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline VARIANT_BOOL IKeymanProduct::Validate ( long ParentWindow ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = raw_Validate(ParentWindow, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline VARIANT_BOOL IKeymanProduct::GetAllUsers ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_AllUsers(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline HRESULT IKeymanProduct::Start ( ) {
+    HRESULT _hr = raw_Start();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanProduct::Stop ( ) {
+    HRESULT _hr = raw_Stop();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline VARIANT_BOOL IKeymanProduct::GetRunning ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_Running(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline HRESULT IKeymanProduct::GetActivationData ( long * ActivatedState, long * TrialDayCount, long * DaysUsed ) {
+    HRESULT _hr = raw_GetActivationData(ActivatedState, TrialDayCount, DaysUsed);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanProduct::Activate ( _bstr_t ActivationResponseBlob ) {
+    HRESULT _hr = raw_Activate(ActivationResponseBlob);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanProduct::GetActivationRequestCode ( _bstr_t LicenceNumber, BSTR * ActivationRequestBlob ) {
+    HRESULT _hr = raw_GetActivationRequestCode(LicenceNumber, ActivationRequestBlob);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline _bstr_t IKeymanProduct::GetRegistryKey ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_RegistryKey(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline HRESULT IKeymanProduct::OpenConfiguration ( ) {
+    HRESULT _hr = raw_OpenConfiguration();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanProduct::OpenHelp ( _bstr_t topic ) {
+    HRESULT _hr = raw_OpenHelp(topic);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanProduct::OpenAbout ( ) {
+    HRESULT _hr = raw_OpenAbout();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline IKeymanHotkeysPtr IKeymanProduct::GetHotkeys ( ) {
+    struct IKeymanHotkeys * _result = 0;
+    HRESULT _hr = get_Hotkeys(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanHotkeysPtr(_result, false);
+}
+
+inline HRESULT IKeymanProduct::OpenProduct ( ) {
+    HRESULT _hr = raw_OpenProduct();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanProducts wrapper method implementations
+//
+
+inline IKeymanProductPtr IKeymanProducts::GetItems ( const _variant_t & Index ) {
+    struct IKeymanProduct * _result = 0;
+    HRESULT _hr = get_Items(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanProductPtr(_result, false);
+}
+
+inline HRESULT IKeymanProducts::Install ( long ParentWindow, _bstr_t Filename, _bstr_t InstallDir, VARIANT_BOOL AllUsers, VARIANT_BOOL Force ) {
+    HRESULT _hr = raw_Install(ParentWindow, Filename, InstallDir, AllUsers, Force);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline IKeymanProductPtr IKeymanProducts::GetItemsByProductID ( int Index ) {
+    struct IKeymanProduct * _result = 0;
+    HRESULT _hr = get_ItemsByProductID(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanProductPtr(_result, false);
+}
+
+//
+// interface IKeymanProduct2 wrapper method implementations
+//
+
+inline HRESULT IKeymanProduct2::OpenTutorial ( ) {
+    HRESULT _hr = raw_OpenTutorial();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanUnicodeBlocks wrapper method implementations
+//
+
+inline IKeymanUnicodeBlockPtr IKeymanUnicodeBlocks::GetItems ( const _variant_t & Index ) {
+    struct IKeymanUnicodeBlock * _result = 0;
+    HRESULT _hr = get_Items(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanUnicodeBlockPtr(_result, false);
+}
+
+//
+// interface IKeymanSystemConfigItem wrapper method implementations
+//
+
+inline VARIANT_BOOL IKeymanSystemConfigItem::GetEnabled ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_Enabled(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline void IKeymanSystemConfigItem::PutEnabled ( VARIANT_BOOL Value ) {
+    HRESULT _hr = put_Enabled(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+}
+
+inline _bstr_t IKeymanSystemConfigItem::GetDetail ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Detail(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanSystemConfigItem::GetName ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Name(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanSystemConfigItem::GetID ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_ID(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+//
+// interface IKeymanProduct3 wrapper method implementations
+//
+
+inline HRESULT IKeymanProduct3::OpenTextEditor ( ) {
+    HRESULT _hr = raw_OpenTextEditor();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline VARIANT_BOOL IKeymanProduct3::IsTextEditorVisible ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = raw_IsTextEditorVisible(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline HRESULT IKeymanProduct3::CheckForUpdates ( ) {
+    HRESULT _hr = raw_CheckForUpdates();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanPackageFont wrapper method implementations
+//
+
+inline _bstr_t IKeymanPackageFont::GetName ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Name(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanPackageFont::GetFilename ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Filename(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+//
+// interface IKeymanPackageFonts wrapper method implementations
+//
+
+inline IKeymanPackageFontPtr IKeymanPackageFonts::GetItems ( const _variant_t & Index ) {
+    struct IKeymanPackageFont * _result = 0;
+    HRESULT _hr = get_Items(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanPackageFontPtr(_result, false);
+}
+
+//
+// interface IKeymanVisualKeyboard2 wrapper method implementations
+//
+
+inline HRESULT IKeymanVisualKeyboard2::Print ( ) {
+    HRESULT _hr = raw_Print();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanKeyboardLanguage wrapper method implementations
+//
+
+inline long IKeymanKeyboardLanguage::GetLangID ( ) {
+    long _result = 0;
+    HRESULT _hr = get_LangID(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline _bstr_t IKeymanKeyboardLanguage::GetISOCode ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_ISOCode(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+//
+// interface IKeymanKeyboardLanguages wrapper method implementations
+//
+
+inline IKeymanKeyboardLanguagePtr IKeymanKeyboardLanguages::GetItems ( ) {
+    struct IKeymanKeyboardLanguage * _result = 0;
+    HRESULT _hr = get_Items(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanKeyboardLanguagePtr(_result, false);
+}
+
+inline long IKeymanKeyboardLanguages::Add ( long LangID, _bstr_t ISOCode ) {
+    long _result = 0;
+    HRESULT _hr = raw_Add(LangID, ISOCode, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline HRESULT IKeymanKeyboardLanguages::Remove ( long Index ) {
+    HRESULT _hr = raw_Remove(Index);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanPackageSubFile wrapper method implementations
+//
+
+inline _bstr_t IKeymanPackageSubFile::GetFilename ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Filename(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline KeymanFileType IKeymanPackageSubFile::GetFileType ( ) {
+    KeymanFileType _result;
+    HRESULT _hr = get_FileType(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline _bstr_t IKeymanPackageSubFile::GetDescription ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Description(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline KeymanPackageSubFileCopyLocation IKeymanPackageSubFile::GetCopyLocation ( ) {
+    KeymanPackageSubFileCopyLocation _result;
+    HRESULT _hr = get_CopyLocation(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline IUnknownPtr IKeymanPackageSubFile::GetAsStream ( ) {
+    IUnknown * _result = 0;
+    HRESULT _hr = get_AsStream(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IUnknownPtr(_result, false);
+}
+
+//
+// interface IKeymanPackageSubFiles wrapper method implementations
+//
+
+inline IKeymanPackageSubFilePtr IKeymanPackageSubFiles::GetItems ( const _variant_t & Index ) {
+    struct IKeymanPackageSubFile * _result = 0;
+    HRESULT _hr = get_Items(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanPackageSubFilePtr(_result, false);
+}
+
+//
+// interface IKeymanKeyboard wrapper method implementations
+//
+
+inline _bstr_t IKeymanKeyboard::GetName ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Name(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanKeyboard::GetFilename ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Filename(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanKeyboard::GetMessage ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Message(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanKeyboard::GetCopyright ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Copyright(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline long IKeymanKeyboard::GetHotkey ( ) {
+    long _result = 0;
+    HRESULT _hr = get_Hotkey(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline void IKeymanKeyboard::PutHotkey ( long Value ) {
+    HRESULT _hr = put_Hotkey(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+}
+
+inline IPicturePtr IKeymanKeyboard::GetBitmap ( ) {
+    struct IPicture * _result = 0;
+    HRESULT _hr = get_Bitmap(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IPicturePtr(_result, false);
+}
+
+inline _bstr_t IKeymanKeyboard::GetKeyboardName ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_KeyboardName(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline KeymanKeyboardEncodings IKeymanKeyboard::GetEncodings ( ) {
+    KeymanKeyboardEncodings _result;
+    HRESULT _hr = get_Encodings(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline KeymanKeyboardLayoutType IKeymanKeyboard::GetLayoutType ( ) {
+    KeymanKeyboardLayoutType _result;
+    HRESULT _hr = get_LayoutType(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+//
+// interface IKeymanKeyboardFile wrapper method implementations
+//
+
+inline HRESULT IKeymanKeyboardFile::Install ( VARIANT_BOOL AllUsers, VARIANT_BOOL Force ) {
+    HRESULT _hr = raw_Install(AllUsers, Force);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanKeyboardsPackage wrapper method implementations
+//
+
+inline IKeymanKeyboardPtr IKeymanKeyboardsPackage::GetItems ( const _variant_t & Index ) {
+    struct IKeymanKeyboard * _result = 0;
+    HRESULT _hr = get_Items(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanKeyboardPtr(_result, false);
+}
+
+//
+// interface IKeymanPackage wrapper method implementations
+//
+
+inline _bstr_t IKeymanPackage::GetName ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Name(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanPackage::GetDescription ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Description(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline IKeymanKeyboardsPackagePtr IKeymanPackage::GetKeyboards ( ) {
+    struct IKeymanKeyboardsPackage * _result = 0;
+    HRESULT _hr = get_Keyboards(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanKeyboardsPackagePtr(_result, false);
+}
+
+inline _bstr_t IKeymanPackage::GetFilename ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Filename(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+//
+// interface IKeymanPackageInstalled wrapper method implementations
+//
+
+inline HRESULT IKeymanPackageInstalled::Uninstall ( VARIANT_BOOL RemoveFonts ) {
+    HRESULT _hr = raw_Uninstall(RemoveFonts);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline VARIANT_BOOL IKeymanPackageInstalled::GetInstalledByAdmin ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_InstalledByAdmin(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+//
+// interface IKeymanKeyboardInstalled wrapper method implementations
+//
+
+inline HRESULT IKeymanKeyboardInstalled::Uninstall ( ) {
+    HRESULT _hr = raw_Uninstall();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline long IKeymanKeyboardInstalled::GetKeymanID ( ) {
+    long _result = 0;
+    HRESULT _hr = get_KeymanID(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline VARIANT_BOOL IKeymanKeyboardInstalled::GetLoaded ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_Loaded(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline void IKeymanKeyboardInstalled::PutLoaded ( VARIANT_BOOL Value ) {
+    HRESULT _hr = put_Loaded(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+}
+
+inline VARIANT_BOOL IKeymanKeyboardInstalled::GetInstalledByAdmin ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_InstalledByAdmin(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline IKeymanPackageInstalledPtr IKeymanKeyboardInstalled::GetOwnerPackage ( ) {
+    struct IKeymanPackageInstalled * _result = 0;
+    HRESULT _hr = get_OwnerPackage(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanPackageInstalledPtr(_result, false);
+}
+
+inline IKeymanVisualKeyboardPtr IKeymanKeyboardInstalled::GetVisualKeyboard ( ) {
+    struct IKeymanVisualKeyboard * _result = 0;
+    HRESULT _hr = get_VisualKeyboard(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanVisualKeyboardPtr(_result, false);
+}
+
+inline HRESULT IKeymanKeyboardInstalled::InstallVisualKeyboard ( _bstr_t Filename ) {
+    HRESULT _hr = raw_InstallVisualKeyboard(Filename);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline IKeymanProductPtr IKeymanKeyboardInstalled::GetOwnerProduct ( ) {
+    struct IKeymanProduct * _result = 0;
+    HRESULT _hr = get_OwnerProduct(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanProductPtr(_result, false);
+}
+
+//
+// interface IKeymanKeyboardsInstalled wrapper method implementations
+//
+
+inline IKeymanKeyboardFilePtr IKeymanKeyboardsInstalled::GetKeyboardFromFile ( _bstr_t Filename ) {
+    struct IKeymanKeyboardFile * _result = 0;
+    HRESULT _hr = raw_GetKeyboardFromFile(Filename, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanKeyboardFilePtr(_result, false);
+}
+
+inline IKeymanKeyboardInstalledPtr IKeymanKeyboardsInstalled::GetItems ( const _variant_t & Index ) {
+    struct IKeymanKeyboardInstalled * _result = 0;
+    HRESULT _hr = get_Items(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanKeyboardInstalledPtr(_result, false);
+}
+
+inline HRESULT IKeymanKeyboardsInstalled::Install ( _bstr_t Filename, VARIANT_BOOL AllUsers, VARIANT_BOOL Force ) {
+    HRESULT _hr = raw_Install(Filename, AllUsers, Force);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanKeyboardsInstalled::Apply ( ) {
+    HRESULT _hr = raw_Apply();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanAddin wrapper method implementations
+//
+
+inline IKeymanPackagePtr IKeymanAddin::GetOwnerPackage ( ) {
+    struct IKeymanPackage * _result = 0;
+    HRESULT _hr = get_OwnerPackage(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanPackagePtr(_result, false);
+}
+
+inline _bstr_t IKeymanAddin::GetName ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Name(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanAddin::GetFilename ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Filename(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanAddin::GetDescription ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Description(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+//
+// interface IKeymanAddinInstalled wrapper method implementations
+//
+
+inline VARIANT_BOOL IKeymanAddinInstalled::GetInstalledByAdmin ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_InstalledByAdmin(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline HRESULT IKeymanAddinInstalled::Uninstall ( ) {
+    HRESULT _hr = raw_Uninstall();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanAddinsInstalled wrapper method implementations
+//
+
+inline IKeymanAddinInstalledPtr IKeymanAddinsInstalled::GetItems ( const _variant_t & Index ) {
+    struct IKeymanAddinInstalled * _result = 0;
+    HRESULT _hr = get_Items(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanAddinInstalledPtr(_result, false);
+}
+
+inline HRESULT IKeymanAddinsInstalled::Install ( _bstr_t Filename, VARIANT_BOOL Force ) {
+    HRESULT _hr = raw_Install(Filename, Force);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanPackageFile wrapper method implementations
+//
+
+inline HRESULT IKeymanPackageFile::Install ( VARIANT_BOOL AllUsers, VARIANT_BOOL Force, _bstr_t ShortcutRootPath ) {
+    HRESULT _hr = raw_Install(AllUsers, Force, ShortcutRootPath);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline _bstr_t IKeymanPackageFile::GetReadMe ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_ReadMe(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline IPicturePtr IKeymanPackageFile::GetGraphic ( ) {
+    struct IPicture * _result = 0;
+    HRESULT _hr = get_Graphic(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IPicturePtr(_result, false);
+}
+
+inline IKeymanPackageSubFilesPtr IKeymanPackageFile::GetSubFiles ( ) {
+    struct IKeymanPackageSubFiles * _result = 0;
+    HRESULT _hr = get_SubFiles(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanPackageSubFilesPtr(_result, false);
+}
+
+inline HRESULT IKeymanPackageFile::InstallSpecificKeyboards ( VARIANT_BOOL AllUsers, VARIANT_BOOL Force, _bstr_t ShortcutRootPath, _bstr_t KeyboardsToInstall ) {
+    HRESULT _hr = raw_InstallSpecificKeyboards(AllUsers, Force, ShortcutRootPath, KeyboardsToInstall);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanPackagesInstalled wrapper method implementations
+//
+
+inline IKeymanPackageInstalledPtr IKeymanPackagesInstalled::GetItems ( const _variant_t & Index ) {
+    struct IKeymanPackageInstalled * _result = 0;
+    HRESULT _hr = get_Items(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanPackageInstalledPtr(_result, false);
+}
+
+inline IKeymanPackageFilePtr IKeymanPackagesInstalled::GetPackageFromFile ( _bstr_t Filename ) {
+    struct IKeymanPackageFile * _result = 0;
+    HRESULT _hr = raw_GetPackageFromFile(Filename, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanPackageFilePtr(_result, false);
+}
+
+inline HRESULT IKeymanPackagesInstalled::Install ( _bstr_t Filename, VARIANT_BOOL AllUsers, VARIANT_BOOL Force, _bstr_t ShortcutRootPath ) {
+    HRESULT _hr = raw_Install(Filename, AllUsers, Force, ShortcutRootPath);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline long IKeymanPackagesInstalled::IndexOf ( _bstr_t Name ) {
+    long _result = 0;
+    HRESULT _hr = raw_IndexOf(Name, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+//
+// interface IKeymanLanguage wrapper method implementations
+//
+
+inline unsigned long IKeymanLanguage::GetHKL ( ) {
+    unsigned long _result = 0;
+    HRESULT _hr = get_HKL(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline IKeymanKeyboardPtr IKeymanLanguage::GetKeymanKeyboard ( ) {
+    struct IKeymanKeyboard * _result = 0;
+    HRESULT _hr = get_KeymanKeyboard(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanKeyboardPtr(_result, false);
+}
+
+inline void IKeymanLanguage::PutKeymanKeyboard ( struct IKeymanKeyboard * Value ) {
+    HRESULT _hr = put_KeymanKeyboard(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+}
+
+inline _bstr_t IKeymanLanguage::GetLayoutName ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_LayoutName(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanLanguage::GetDescription ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Description(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanLanguage::GetLocaleName ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_LocaleName(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline VARIANT_BOOL IKeymanLanguage::GetIsIME ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_IsIME(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline VARIANT_BOOL IKeymanLanguage::GetIsKeymanLayout ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_IsKeymanLayout(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+//
+// interface IKeymanLanguages wrapper method implementations
+//
+
+inline IKeymanLanguagePtr IKeymanLanguages::GetItems ( long Index ) {
+    struct IKeymanLanguage * _result = 0;
+    HRESULT _hr = get_Items(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanLanguagePtr(_result, false);
+}
+
+inline HRESULT IKeymanLanguages::Apply ( ) {
+    HRESULT _hr = raw_Apply();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanControl wrapper method implementations
+//
+
+inline IKeymanKeyboardInstalledPtr IKeymanControl::GetActiveKeyboard ( ) {
+    struct IKeymanKeyboardInstalled * _result = 0;
+    HRESULT _hr = get_ActiveKeyboard(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanKeyboardInstalledPtr(_result, false);
+}
+
+inline void IKeymanControl::PutActiveKeyboard ( struct IKeymanKeyboardInstalled * Value ) {
+    HRESULT _hr = put_ActiveKeyboard(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+}
+
+inline VARIANT_BOOL IKeymanControl::GetVisualKeyboardVisible ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_VisualKeyboardVisible(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline HRESULT IKeymanControl::StartVisualKeyboard ( ) {
+    HRESULT _hr = raw_StartVisualKeyboard();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanControl::StopVisualKeyboard ( ) {
+    HRESULT _hr = raw_StopVisualKeyboard();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanControl::StartKeyman32Engine ( unsigned long ProductID ) {
+    HRESULT _hr = raw_StartKeyman32Engine(ProductID);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanControl::StopKeyman32Engine ( unsigned long ProductID ) {
+    HRESULT _hr = raw_StopKeyman32Engine(ProductID);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline unsigned long IKeymanControl::GetLastActiveWindow ( ) {
+    unsigned long _result = 0;
+    HRESULT _hr = get_LastActiveWindow(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline unsigned long IKeymanControl::GetLastFocusWindow ( ) {
+    unsigned long _result = 0;
+    HRESULT _hr = get_LastFocusWindow(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline HRESULT IKeymanControl::RegisterControllerWindow ( unsigned long Value ) {
+    HRESULT _hr = raw_RegisterControllerWindow(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanControl::UnregisterControllerWindow ( unsigned long Value ) {
+    HRESULT _hr = raw_UnregisterControllerWindow(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanControl::RefreshKeyman ( ) {
+    HRESULT _hr = raw_RefreshKeyman();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline VARIANT_BOOL IKeymanControl::GetAutoRefresh ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_AutoRefresh(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline void IKeymanControl::PutAutoRefresh ( VARIANT_BOOL Value ) {
+    HRESULT _hr = put_AutoRefresh(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+}
+
+inline HRESULT IKeymanControl::DisableUserInterface ( ) {
+    HRESULT _hr = raw_DisableUserInterface();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanControl::EnableUserInterface ( ) {
+    HRESULT _hr = raw_EnableUserInterface();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanControl::ShutdownKeyman32Engine ( ) {
+    HRESULT _hr = raw_ShutdownKeyman32Engine();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface ITavultesoftKeyman wrapper method implementations
+//
+
+inline HRESULT ITavultesoftKeyman::Refresh ( ) {
+    HRESULT _hr = raw_Refresh();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline VARIANT_BOOL ITavultesoftKeyman::GetBackgroundRefresh ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_BackgroundRefresh(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline void ITavultesoftKeyman::PutBackgroundRefresh ( VARIANT_BOOL Value ) {
+    HRESULT _hr = put_BackgroundRefresh(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+}
+
+inline IKeymanKeyboardsInstalledPtr ITavultesoftKeyman::GetKeyboards ( ) {
+    struct IKeymanKeyboardsInstalled * _result = 0;
+    HRESULT _hr = get_Keyboards(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanKeyboardsInstalledPtr(_result, false);
+}
+
+inline IKeymanAddinsInstalledPtr ITavultesoftKeyman::GetAddins ( ) {
+    struct IKeymanAddinsInstalled * _result = 0;
+    HRESULT _hr = get_Addins(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanAddinsInstalledPtr(_result, false);
+}
+
+inline IKeymanPackagesInstalledPtr ITavultesoftKeyman::GetPackages ( ) {
+    struct IKeymanPackagesInstalled * _result = 0;
+    HRESULT _hr = get_Packages(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanPackagesInstalledPtr(_result, false);
+}
+
+inline IKeymanSystemInfoPtr ITavultesoftKeyman::GetSystemInfo ( ) {
+    struct IKeymanSystemInfo * _result = 0;
+    HRESULT _hr = get_SystemInfo(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanSystemInfoPtr(_result, false);
+}
+
+inline IKeymanErrorsPtr ITavultesoftKeyman::GetErrors ( ) {
+    struct IKeymanErrors * _result = 0;
+    HRESULT _hr = get_Errors(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanErrorsPtr(_result, false);
+}
+
+inline IKeymanOptionsPtr ITavultesoftKeyman::GetOptions ( ) {
+    struct IKeymanOptions * _result = 0;
+    HRESULT _hr = get_Options(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanOptionsPtr(_result, false);
+}
+
+inline IKeymanLanguagesPtr ITavultesoftKeyman::GetLanguages ( ) {
+    struct IKeymanLanguages * _result = 0;
+    HRESULT _hr = get_Languages(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanLanguagesPtr(_result, false);
+}
+
+inline IKeymanProductsPtr ITavultesoftKeyman::GetProducts ( ) {
+    struct IKeymanProducts * _result = 0;
+    HRESULT _hr = get_Products(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanProductsPtr(_result, false);
+}
+
+inline IKeymanControlPtr ITavultesoftKeyman::GetControl ( ) {
+    struct IKeymanControl * _result = 0;
+    HRESULT _hr = get_Control(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanControlPtr(_result, false);
+}
+
+inline IDispatchPtr ITavultesoftKeyman::ObjectByIndex ( long Index ) {
+    IDispatch * _result = 0;
+    HRESULT _hr = raw_ObjectByIndex(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IDispatchPtr(_result, false);
+}
+
+//
+// interface IKeymanAddinFile wrapper method implementations
+//
+
+inline HRESULT IKeymanAddinFile::Install ( ) {
+    HRESULT _hr = raw_Install();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface ITavultesoftKeymanScript wrapper method implementations
+//
+
+inline long ITavultesoftKeymanScript::GetProductActivationInfo ( long ProductID, long InfoType ) {
+    long _result = 0;
+    HRESULT _hr = raw_GetProductActivationInfo(ProductID, InfoType, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline _bstr_t ITavultesoftKeymanScript::GetProductActivationRequest ( long ProductID, _bstr_t LicenceCode ) {
+    BSTR _result = 0;
+    HRESULT _hr = raw_GetProductActivationRequest(ProductID, LicenceCode, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+//
+// interface IKeymanLanguage2 wrapper method implementations
+//
+
+inline long IKeymanLanguage2::GetHotkey ( ) {
+    long _result = 0;
+    HRESULT _hr = get_Hotkey(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline void IKeymanLanguage2::PutHotkey ( long Value ) {
+    HRESULT _hr = put_Hotkey(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+}
+
+//
+// interface IKeymanKeyboard2 wrapper method implementations
+//
+
+inline _bstr_t IKeymanKeyboard2::GetCharsUsed ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = raw_GetCharsUsed(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline IKeymanUnicodeBlocksPtr IKeymanKeyboard2::GetScriptsUsed ( ) {
+    struct IKeymanUnicodeBlocks * _result = 0;
+    HRESULT _hr = raw_GetScriptsUsed(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanUnicodeBlocksPtr(_result, false);
+}
+
+inline _bstr_t IKeymanKeyboard2::GetWindowsLanguages ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_WindowsLanguages(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline long IKeymanKeyboard2::GetPrimaryLanguage ( ) {
+    long _result = 0;
+    HRESULT _hr = get_PrimaryLanguage(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+//
+// interface IKeymanSystemConfigManager wrapper method implementations
+//
+
+inline IKeymanSystemConfigItemPtr IKeymanSystemConfigManager::GetItems ( long Index ) {
+    struct IKeymanSystemConfigItem * _result = 0;
+    HRESULT _hr = get_Items(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanSystemConfigItemPtr(_result, false);
+}
+
+inline HRESULT IKeymanSystemConfigManager::Apply ( ) {
+    HRESULT _hr = raw_Apply();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanSystemConfigManager::GetKeyboardRequirements ( struct IKeymanKeyboard * Keyboard ) {
+    HRESULT _hr = raw_GetKeyboardRequirements(Keyboard);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanSystemConfigManager::GetPackageRequirements ( struct IKeymanPackage * Package ) {
+    HRESULT _hr = raw_GetPackageRequirements(Package);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IKeymanSystemConfigManager::BuildItemList ( ) {
+    HRESULT _hr = raw_BuildItemList();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline _bstr_t IKeymanSystemConfigManager::GetScriptNames ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_ScriptNames(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+//
+// interface ITavultesoftKeymanSystemConfig wrapper method implementations
+//
+
+inline IKeymanSystemConfigManagerPtr ITavultesoftKeymanSystemConfig::CreateSystemConfigManager ( ) {
+    struct IKeymanSystemConfigManager * _result = 0;
+    HRESULT _hr = raw_CreateSystemConfigManager(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanSystemConfigManagerPtr(_result, false);
+}
+
+//
+// interface IKeymanPackage2 wrapper method implementations
+//
+
+inline _bstr_t IKeymanPackage2::GetVersion ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Version(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanPackage2::GetCopyright ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Copyright(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanPackage2::GetWebsite ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Website(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanPackage2::GetAuthor ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Author(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanPackage2::GetAuthorEmail ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_AuthorEmail(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+//
+// interface IKeymanPackage3 wrapper method implementations
+//
+
+inline IKeymanPackageFontsPtr IKeymanPackage3::GetFonts ( ) {
+    struct IKeymanPackageFonts * _result = 0;
+    HRESULT _hr = get_Fonts(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanPackageFontsPtr(_result, false);
+}
+
+//
+// interface IKeymanKeyboardInstalled2 wrapper method implementations
+//
+
+inline _bstr_t IKeymanKeyboardInstalled2::GetOptionNames ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_OptionNames(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline _bstr_t IKeymanKeyboardInstalled2::GetOption ( _bstr_t Index ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_Option(Index, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline void IKeymanKeyboardInstalled2::PutOption ( _bstr_t Index, _bstr_t Value ) {
+    HRESULT _hr = put_Option(Index, Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+}
+
+inline HRESULT IKeymanKeyboardInstalled2::ShowWelcome ( ) {
+    HRESULT _hr = raw_ShowWelcome();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+//
+// interface IKeymanSystemConfigManager2 wrapper method implementations
+//
+
+inline IKeymanProductPtr IKeymanSystemConfigManager2::GetProduct ( ) {
+    struct IKeymanProduct * _result = 0;
+    HRESULT _hr = get_Product(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanProductPtr(_result, false);
+}
+
+inline void IKeymanSystemConfigManager2::PutProduct ( struct IKeymanProduct * Value ) {
+    HRESULT _hr = put_Product(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+}
+
+//
+// interface IKeymanAddinInstalled2 wrapper method implementations
+//
+
+inline VARIANT_BOOL IKeymanAddinInstalled2::GetEnabled ( ) {
+    VARIANT_BOOL _result = 0;
+    HRESULT _hr = get_Enabled(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+inline void IKeymanAddinInstalled2::PutEnabled ( VARIANT_BOOL Value ) {
+    HRESULT _hr = put_Enabled(Value);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+}
+
+inline enum tagKeymanAddinConfigureResult IKeymanAddinInstalled2::Configure ( long ParentWindow ) {
+    enum tagKeymanAddinConfigureResult _result;
+    HRESULT _hr = raw_Configure(ParentWindow, &_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}
+
+//
+// interface IKeymanKeyboardInstalled3 wrapper method implementations
+//
+
+inline _bstr_t IKeymanKeyboardInstalled3::GetIconFilename ( ) {
+    BSTR _result = 0;
+    HRESULT _hr = get_IconFilename(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _bstr_t(_result, false);
+}
+
+inline IKeymanKeyboardLanguagesPtr IKeymanKeyboardInstalled3::GetLanguages ( ) {
+    struct IKeymanKeyboardLanguages * _result = 0;
+    HRESULT _hr = get_Languages(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return IKeymanKeyboardLanguagesPtr(_result, false);
+}
+
+inline GUID IKeymanKeyboardInstalled3::GetProfileGUID ( ) {
+    GUID _result;
+    HRESULT _hr = get_ProfileGUID(&_result);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _result;
+}

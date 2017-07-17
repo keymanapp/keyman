@@ -1,0 +1,12 @@
+tds2dbg 0.2.0
+
+  * Added support for conversion of public and static symbols.
+  * Corrected padding and alignment.
+  * Preliminary support for conversion of types. Still incomplete.
+  * Can now convert a non-PE CodeView NB09 file to a PE CodeView file.
+  * Can now generate bare CodeView files (i.e. no PE header).
+
+tds2dbg 0.1.0
+
+  * Initial version
+

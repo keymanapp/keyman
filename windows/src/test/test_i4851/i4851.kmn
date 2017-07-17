@@ -1,0 +1,6 @@
+﻿store(&VERSION) '9.0'
+store(&BITMAP) 'i4851.ico'
+begin Unicode > use(main)
+
+
+group(main) using keys

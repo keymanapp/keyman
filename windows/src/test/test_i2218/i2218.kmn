@@ -1,0 +1,14 @@
+﻿c To configure for this test, use an XP machine with RTL and complex script support off
+store(&VERSION) '8.0'
+store(&NAME) 'I2218 test - script support'
+store(&MESSAGE) 'Lao yes, Arabic no, Chinese no'
+store(&WINDOWSLANGUAGES) 'x0454'
+store(&LANGUAGE) 'x0454'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ 'a' > U+0E81 U+0E82 U+0E84 U+0E87 U+0E88 
++ 'b' > U+0629 U+062A U+062B 
++ 'c' > U+4E01

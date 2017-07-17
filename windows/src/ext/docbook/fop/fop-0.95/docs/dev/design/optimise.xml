@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><!-- $Id: optimise.xml 627324 2008-02-13 09:35:01Z maxberger $ --><!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V1.1//EN" "http://cvs.apache.org/viewcvs.cgi/*checkout*/xml-forrest/src/core/context/resources/schema/dtd/document-v12.dtd">
+<document>
+  <header>
+    <title>FOP Design: Optimisations</title>
+    <version>$Revision: 627324 $</version>
+    <authors>
+      <person name="Keiron Liddle" email="keiron@aftexsw.com"/>
+    </authors>
+  </header>
+
+    <body>
+<section id="intro">
+  <title>Introduction</title>
+<p>
+FOP should be able to handle very large documents. A document can be
+supplied using SAX and the information should be passed entirely through
+the system, from fo elements to rendered output as soon as possible.
+  </p>
+  <p>
+A top level block area, immediately below the flow, can be added to the
+page layout as soon as the element is complete.
+  </p>
+  <p>
+The fo elements used to construct a page can be discarded as soon as the
+layout for the page is complete. Some information may be stored in the
+area tree of the page in order to handle unresolved page references
+and links.
+  </p>
+  <p>
+Once the layout of a page has been completed, all elements are fully
+resolved, then the page can be rendered. Some renderers may support
+out of order rendering of pages.
+  </p>
+  <p>
+The main problem that will remain is that any page with forward
+references will need to be stored until the refence is resolved.
+This means that the information contained in the page should be
+as minimal as possible.
+  </p>
+  <p>
+Line areas can be optimised once the layout for the line has
+been finalised. Consecutive characters with the same properties
+can be combined into a "word" to hold the information with
+limited overhead.
+  </p>
+  <p>
+If there are a large number of pages where forward references
+cannot be resolved the a method of writing a page onto disk
+could be used to save memory. The easiest way to achieve this
+is to make the page and all children serializable.
+   </p>
+  </section>
+
+    </body>
+</document>

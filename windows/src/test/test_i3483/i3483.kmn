@@ -1,0 +1,15 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I3483 - test inclusion of layout file'
+begin Unicode > use(main)   
+
+c this needs more work on the layout file, to introduce some layers.  But ok for compile-in test.
+c we also need some failure cases, e.g. missing file, bad format, to pressure test the compiler.
+
+store(&layoutfile) 'i3483-layout.js'
+c store(&kmw_embedjs) 'bbbb'
+
+group(main) using keys
+
++ 'a' > set(&layer = 'am')
+
+if(&layer = 'am') + 'b' > 'c'

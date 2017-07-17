@@ -1,0 +1,115 @@
+package Jcl;
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS OFF}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST ON}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $61A80}
+{$DEFINE BCB}
+{$DEFINE BCB}
+{$DEFINE WIN32}
+{$DEFINE CONDITIONALEXPRESSIONS}
+{$DEFINE RELEASE}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'JEDI Code Library RTL package'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl;
+
+contains
+  bzip2 in '..\jcl\jcl\source\common\bzip2.pas',
+  Jcl8087 in '..\jcl\jcl\source\common\Jcl8087.pas',
+  JclAnsiStrings in '..\jcl\jcl\source\common\JclAnsiStrings.pas',
+  JclBase in '..\jcl\jcl\source\common\JclBase.pas',
+  JclCharsets in '..\jcl\jcl\source\common\JclCharsets.pas',
+  JclComplex in '..\jcl\jcl\source\common\JclComplex.pas',
+  JclCompression in '..\jcl\jcl\source\common\JclCompression.pas',
+  JclCounter in '..\jcl\jcl\source\common\JclCounter.pas',
+  JclDateTime in '..\jcl\jcl\source\common\JclDateTime.pas',
+  JclFileUtils in '..\jcl\jcl\source\common\JclFileUtils.pas',
+  JclIniFiles in '..\jcl\jcl\source\common\JclIniFiles.pas',
+  JclLogic in '..\jcl\jcl\source\common\JclLogic.pas',
+  JclMath in '..\jcl\jcl\source\common\JclMath.pas',
+  JclMIDI in '..\jcl\jcl\source\common\JclMIDI.pas',
+  JclMime in '..\jcl\jcl\source\common\JclMime.pas',
+  JclNotify in '..\jcl\jcl\source\common\JclNotify.pas',
+  JclPCRE in '..\jcl\jcl\source\common\JclPCRE.pas',
+  JclResources in '..\jcl\jcl\source\common\JclResources.pas',
+  JclRTTI in '..\jcl\jcl\source\common\JclRTTI.pas',
+  JclSchedule in '..\jcl\jcl\source\common\JclSchedule.pas',
+  JclSimpleXml in '..\jcl\jcl\source\common\JclSimpleXml.pas',
+  JclStatistics in '..\jcl\jcl\source\common\JclStatistics.pas',
+  JclStreams in '..\jcl\jcl\source\common\JclStreams.pas',
+  JclStringConversions in '..\jcl\jcl\source\common\JclStringConversions.pas',
+  JclStringLists in '..\jcl\jcl\source\common\JclStringLists.pas',
+  JclStrings in '..\jcl\jcl\source\common\JclStrings.pas',
+  JclSynch in '..\jcl\jcl\source\common\JclSynch.pas',
+  JclSysInfo in '..\jcl\jcl\source\common\JclSysInfo.pas',
+  JclSysUtils in '..\jcl\jcl\source\common\JclSysUtils.pas',
+  JclUnicode in '..\jcl\jcl\source\common\JclUnicode.pas',
+  JclUnitConv in '..\jcl\jcl\source\common\JclUnitConv.pas',
+  JclUnitVersioning in '..\jcl\jcl\source\common\JclUnitVersioning.pas',
+  JclUnitVersioningProviders in '..\jcl\jcl\source\common\JclUnitVersioningProviders.pas',
+  JclValidation in '..\jcl\jcl\source\common\JclValidation.pas',
+  JclWideStrings in '..\jcl\jcl\source\common\JclWideStrings.pas',
+  pcre in '..\jcl\jcl\source\common\pcre.pas',
+  zlibh in '..\jcl\jcl\source\common\zlibh.pas',
+  Hardlinks in '..\jcl\jcl\source\windows\Hardlinks.pas',
+  JclAppInst in '..\jcl\jcl\source\windows\JclAppInst.pas',
+  JclCIL in '..\jcl\jcl\source\windows\JclCIL.pas',
+  JclCLR in '..\jcl\jcl\source\windows\JclCLR.pas',
+  JclCOM in '..\jcl\jcl\source\windows\JclCOM.pas',
+  JclConsole in '..\jcl\jcl\source\windows\JclConsole.pas',
+  JclCppException in '..\jcl\jcl\source\windows\JclCppException.pas',
+  JclDebug in '..\jcl\jcl\source\windows\JclDebug.pas',
+  JclDebugSerialization in '..\jcl\jcl\source\windows\JclDebugSerialization.pas',
+  JclDebugXMLDeserializer in '..\jcl\jcl\source\windows\JclDebugXMLDeserializer.pas',
+  JclDebugXMLSerializer in '..\jcl\jcl\source\windows\JclDebugXMLSerializer.pas',
+  JclDotNet in '..\jcl\jcl\source\windows\JclDotNet.pas',
+  JclHookExcept in '..\jcl\jcl\source\windows\JclHookExcept.pas',
+  JclLANMan in '..\jcl\jcl\source\windows\JclLANMan.pas',
+  JclLocales in '..\jcl\jcl\source\windows\JclLocales.pas',
+  JclMapi in '..\jcl\jcl\source\windows\JclMapi.pas',
+  JclMetadata in '..\jcl\jcl\source\windows\JclMetadata.pas',
+  JclMiscel in '..\jcl\jcl\source\windows\JclMiscel.pas',
+  JclMsdosSys in '..\jcl\jcl\source\windows\JclMsdosSys.pas',
+  JclMultimedia in '..\jcl\jcl\source\windows\JclMultimedia.pas',
+  JclNTFS in '..\jcl\jcl\source\windows\JclNTFS.pas',
+  JclPeImage in '..\jcl\jcl\source\windows\JclPeImage.pas',
+  JclRegistry in '..\jcl\jcl\source\windows\JclRegistry.pas',
+  JclSecurity in '..\jcl\jcl\source\windows\JclSecurity.pas',
+  JclShell in '..\jcl\jcl\source\windows\JclShell.pas',
+  JclStructStorage in '..\jcl\jcl\source\windows\JclStructStorage.pas',
+  JclSvcCtrl in '..\jcl\jcl\source\windows\JclSvcCtrl.pas',
+  JclTask in '..\jcl\jcl\source\windows\JclTask.pas',
+  JclTD32 in '..\jcl\jcl\source\windows\JclTD32.pas',
+  JclTimeZones in '..\jcl\jcl\source\windows\JclTimeZones.pas',
+  JclWin32 in '..\jcl\jcl\source\windows\JclWin32.pas',
+  JclWin32Ex in '..\jcl\jcl\source\windows\JclWin32Ex.pas',
+  JclWinMIDI in '..\jcl\jcl\source\windows\JclWinMIDI.pas',
+  mscoree_TLB in '..\jcl\jcl\source\windows\mscoree_TLB.pas',
+  mscorlib_TLB in '..\jcl\jcl\source\windows\mscorlib_TLB.pas',
+  MSTask in '..\jcl\jcl\source\windows\MSTask.pas',
+  sevenzip in '..\jcl\jcl\source\windows\sevenzip.pas',
+  Snmp in '..\jcl\jcl\source\windows\Snmp.pas';
+
+end.

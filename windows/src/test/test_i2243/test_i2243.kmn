@@ -1,0 +1,15 @@
+﻿c Type "abc" into an empty box, should give "START"
+c 
+c Type "abc" into a non-empty text box, should give "MIDDLE"
+store(&VERSION) '7.0'
+store(&NAME) 'Test I2243 - nul'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
+nul 'ab' + 'c' > 'START'
+'ab' + 'c' > 'MIDDLE'
+
+nul + 'x' > '>>STARTX'
++ 'x' > '>>MIDDLEX'

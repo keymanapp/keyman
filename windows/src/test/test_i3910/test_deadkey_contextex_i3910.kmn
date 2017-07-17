@@ -1,0 +1,28 @@
+﻿c Tests the context(n) statement in conjunction with deadkeys in KeymanWeb
+c 
+c Expect:
+c 'a -> <α>
+c '[K_SPACE] -> < >
+c .a -> <α>
+c .b -> <b>
+store(&VERSION) '9.0'
+store(&NAME) 'Test deadkey contextex I3910'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ "'" > dk(tonos)
++ "a" > U+03B1         
++ ' ' > ' '
++ 'b' > 'b'
+
+match > use(dk)
+
+group(dk)
+
+store(alpha) " " U+03B1
+
+dk(tonos) any(alpha) > "<" context(2) ">"
+'.' any(alpha) > "<" context(2) ">"
+'.' 'b' > "<" context(2) ">"

@@ -1,0 +1,1 @@
+﻿KeymanWeb.KRS(new Stub_Keyboard_i783()); function Stub_Keyboard_i783() {this.KF="i783.js";this.KI="Keyboard_i783";this.KN="Test I783 - any/index";}

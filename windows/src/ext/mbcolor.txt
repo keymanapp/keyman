@@ -1,0 +1,62 @@
+Keyman Third Party Package Readme: MbColor
+==========================================
+
+Name:              MbColor
+Purpose:           Color picker components
+Source:            ?
+Version:           ?
+License:           Custom
+Updated for:       Delphi 10?
+Documentation:     N/A
+Download location: ?
+Licensed For:      1 Developer?
+Include Paths:     C:\keyman\10.0\src\ext\mbcolor
+
+Installation notes
+------------------
+
+Download from site above. 
+
+Build notes
+-----------
+
+mbColorLibD10.dpk
+
+License - Custom
+----------------
+  
+License
+License is granted to use, modify and redistribute these units in your applications as you see fit. 
+You are given COMPLETE FREEDOM with the sources found in this pack; you're free to use it in ANY kind 
+of app without even mentioning my name, my site or any other stuff, that depends on your good will and
+nothing else. I will accept any modifications and incorporate them in this pack if they'll help make
+it better. You are under NO obligation to pay for these components to neither me nor anyone else 
+trying to sell them in their current form. If you wish to support development of these components
+you can do so by contributing some source or making a donation, again this solely depends on your
+good will.
+
+Ownership
+I don't claim that I made this pack entirely by myself, or that the ideas used in it are my own, I 
+thank everyone who helped making it better. Parts of this code are copyright of their owners who chose 
+to contribute it to this library. Everyone needs help at some point and extent, thus some of the source 
+code in this pack can also be found on the web as well as in other sources; it is provided with this 
+pack, in its current form so the pack can function properly and be useful to its respected users. I 
+will try my best to help any users if they're having problems with this pack (in it's original or 
+modified distribution), so if you've got any questions, problems and/or suggestions don't hesitate 
+to post to one of the support forums or contact me directly.
+
+No warranty
+This source is distributed on an "AS IS" basis in the soul purpose of being useful, WITHOUT WARRANTY 
+OF ANY KIND, either express or implied. I will not be held responsible if this code or its modification 
+causes any damage or unexpected results in your program(s), however I will gladly help if anyone's 
+having problems with these components.
+
+Contact and support info
+To contact me directly send an e-mail to marko_binic@yahoo.com or mbinic@gmail.com. If you’ve got any 
+questions or want to report a bug or request a feature please post to the support forums at 
+http://mxs.bergsoft.net/forums so others can benefit too. If you’d like to support development of 
+these components you’re welcome to do so by donating your code, money or feedback.
+
+I hope you find these components useful. Enjoy!
+
+Marko Binić

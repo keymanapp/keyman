@@ -1,0 +1,809 @@
+object Messages: TStockMessages
+  Sections = <
+    item
+      Name = 'Application Strings'
+      Strings = <
+        item
+          Name = 'SKApplicationTitle'
+          DefStr = 'Keyman Desktop'
+          Comment = 'Used for the title of message boxes and message dialogs'
+          Parameters = <>
+        end
+        item
+          Name = 'SKShortApplicationTitle'
+          DefStr = 'Keyman Desktop'
+          Parameters = <>
+        end
+        item
+          Name = 'SKDialogSelectLanguage'
+          DefStr = 'Select Language'
+          Parameters = <>
+        end
+        item
+          Name = 'SKUILanguageName'
+          DefStr = 'English'
+          Comment = 'The name of the UI language, localized'
+          Parameters = <>
+        end
+        item
+          Name = 'SKUILanguageNameWithEnglish'
+          DefStr = 'English'
+          Comment = 
+            'Show the name of the UI language, localised, with English name i' +
+            'n parentheses (this message is used when the user gets stuck in ' +
+            'a strange UI language)'
+          Parameters = <>
+        end
+        item
+          Name = 'SKLanguageCode'
+          DefStr = 'en'
+          Comment = 'The language code for the current translation'
+          Parameters = <>
+        end
+        item
+          Name = 'SKDefaultLanguageCode'
+          DefStr = 'en'
+          Comment = 
+            'The default language code for this product.  This should be the ' +
+            'language that the product is created in'
+          Parameters = <>
+        end
+        item
+          Name = 'SKButtonUILanguageDownload'
+          DefStr = 'More Languages Online...'
+          Parameters = <>
+        end
+        item
+          Name = 'SKUILanguageHelp'
+          DefStr = 
+            'Choose the language that you want displayed in the $(SKShortAppl' +
+            'icationTitle) interface.'
+          Parameters = <>
+        end
+        item
+          Name = 'SKMenu_NoKeyboardsInstalled'
+          DefStr = 
+            'No keyboard layouts are installed.'#13#10'Choose "Configuration" to in' +
+            'stall'#13#10'a keyboard layout for your language.'
+          Parameters = <>
+        end
+        item
+          Name = 'SKDialogUILanguageCreateTranslation'
+          DefStr = 'Create a new translation online'
+          Parameters = <>
+        end
+        item
+          Name = 'SKBalloonClickToSelectKeyboard'
+          DefStr = 'Click this icon to select a keyboard'
+          Comment = 
+            'Balloon that shows when Keyman Desktop icon is first shown durin' +
+            'g the tutorial'
+          Parameters = <>
+        end
+        item
+          Name = 'SKBalloonOSKClosed'
+          DefStr = 
+            'Keyman Desktop is still running.  Click this icon to use your la' +
+            'nguage keyboard at any time'
+          Comment = 'Balloon that shows when OSK is closed'
+          Parameters = <>
+        end
+        item
+          Name = 'SKTextEditorCaption'
+          DefStr = 'Text Editor - $(SKShortApplicationTitle)'
+          Parameters = <>
+        end
+        item
+          Name = 'SKOnScreenKeyboardCaption'
+          DefStr = 'On Screen Keyboard - $(SKShortApplicationTitle)'
+          Parameters = <>
+        end>
+    end
+    item
+      Name = 'Keyboard Installation/Uninstallation'
+      Strings = <
+        item
+          Name = 'SKPackageAlreadyInstalled'
+          DefStr = 
+            'A package with the name %0:s is already installed.  Do you want ' +
+            'to uninstall it and install the new one?'
+          Comment = 
+            'This message is shown during the package installation process wh' +
+            'en an existingpackage with the same name is already installed.'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Package to be uninstalled'
+            end>
+        end
+        item
+          Name = 'SKKeyboardAlreadyInstalled'
+          DefStr = 
+            'A keyboard with the name '#39'%0:s'#39' is already installed.  If you co' +
+            'ntinue, it will be uninstalled before the new one is installed. ' +
+            ' Continue?'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Keyboard name'
+            end>
+        end
+        item
+          Name = 'SKKeyboardPartOfPackage'
+          DefStr = 
+            'The keyboard '#39'%0:s'#39' is part of package '#39'%1:s'#39'.  You must uninsta' +
+            'll the entire package.  Continue?'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Keyboard name'
+            end
+            item
+              Value = '%1:s'
+              Description = 'Package name'
+            end>
+        end
+        item
+          Name = 'SKInstallOnlyAsAdmin'
+          DefStr = 
+            'You can only install or uninstall keyboards as Administrator.  U' +
+            'se Control Panel to select languages for use as a normal user.'
+          Parameters = <>
+        end
+        item
+          Name = 'SKUninstallOnScreenKeyboard'
+          DefStr = 
+            'Are you sure you want to remove the on screen keyboard installed' +
+            ' for %0:s?'
+          Comment = 
+            'Displayed when the user chooses "Uninstall on screen keyboard" i' +
+            'n the Configuration dialog'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Keyboard name'
+            end>
+        end
+        item
+          Name = 'SKUninstallKeyboard'
+          DefStr = 'Uninstall keyboard %0:s?'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Keyboard Name'
+            end>
+        end
+        item
+          Name = 'SKUninstallPackage'
+          DefStr = 'Uninstall package %0:s?%1:s'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Package name'
+            end
+            item
+              Value = '%1:s'
+              Description = 'Comma-separated list of fonts'
+            end>
+        end
+        item
+          Name = 'SKSelectKeyboardsTitle'
+          DefStr = 'Select Keyboards from Package'
+          Parameters = <>
+        end
+        item
+          Name = 'SKSelectKeyboardsBlurb'
+          DefStr = 
+            'You cannot install all the keyboards in this package.  You can i' +
+            'nstall a maximum of %0:d additional keyboards.  Please select th' +
+            'e keyboards you wish to install from this package.'
+          Parameters = <>
+        end
+        item
+          Name = 'SKUninstallRequireAdmin'
+          DefStr = 
+            'You can only uninstall the keyboard '#39'%0:s'#39' if you are an Adminis' +
+            'trator'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Keyboard or package name'
+            end>
+        end
+        item
+          Name = 'SKUninstallPackageFonts'
+          DefStr = 'The following fonts will also be uninstalled: %0:s.'
+          Comment = 
+            'Text embedded in SKUninstallPackage when fonts are ready for uni' +
+            'nstall.'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'List of fonts'
+            end>
+        end>
+    end
+    item
+      Name = 'Help File'
+      Strings = <
+        item
+          Name = 'SKOnlineHelpFile'
+          DefStr = 'keyman.chm'
+          Parameters = <>
+        end
+        item
+          Name = 'SKCouldNotFindHelp'
+          DefStr = 
+            'The help file $(SKOnlineHelpFile) could not be found in the appl' +
+            'ication folder.  Please Repair or Reinstall $(SKShortApplication' +
+            'Title) to fix this issue.'
+          Parameters = <>
+        end>
+    end
+    item
+      Name = 'Assorted strings'
+      Strings = <
+        item
+          Name = 'SKDamagedKeyboard'
+          DefStr = '<Damaged keyboard>'
+          Parameters = <>
+        end
+        item
+          Name = 'SKANSIEncoding'
+          DefStr = 'Codepage'
+          Parameters = <>
+        end
+        item
+          Name = 'SKUnicodeEncoding'
+          DefStr = 'Unicode'
+          Parameters = <>
+        end
+        item
+          Name = 'SK_UIFontName'
+          DefStr = 'Tahoma'
+          Parameters = <>
+        end
+        item
+          Name = 'SK_UIFontSize'
+          DefStr = '9'
+          Parameters = <>
+        end>
+    end
+    item
+      Name = 'Message boxes'
+      Strings = <
+        item
+          Name = 'SKDebuggingWarning'
+          DefStr = 
+            'Keyman debug information will be stored in a text file called ke' +
+            'ymanlog\system.log on your desktop.  You should exit Keyman befo' +
+            're reading or deleting this file.'#13#10#13#10'WARNING: This file can grow' +
+            ' large very quickly.  Enabling debugging will slow down your sys' +
+            'tem and should only be done if advised by support.'#13#10#13#10'PRIVACY WA' +
+            'RNING: Please note that the debug logfile records all keystrokes' +
+            ' that you type.  You should only turn on the debug log for the d' +
+            'uration of a debugging or diagnostic session, and delete the [de' +
+            'sktop]\keymanlog\system.log file as soon as possible.'
+          Parameters = <>
+        end
+        item
+          Name = 'SKSurrogatesRequiresRestart'
+          DefStr = 
+            'Changing the setting of Surrogates requires Windows to be restar' +
+            'ted.  Do you want to restart Windows now?'
+          Parameters = <>
+        end
+        item
+          Name = 'SKErrorActivatingBrowser'
+          DefStr = 'Cannot activate browser or email program for this URL.'
+          Parameters = <>
+        end
+        item
+          Name = 'SKCouldNotPrintKeyboard'
+          DefStr = 
+            'The keyboard could not be printed successfully.  Please save to ' +
+            'a web page and print manually.'
+          Parameters = <>
+        end
+        item
+          Name = 'SKPackageDoesNotIncludeWelcome'
+          DefStr = 'The package %0:s does not include any introductory help'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Package Name'
+            end>
+        end
+        item
+          Name = 'SKAddinDoesNotHaveConfiguration'
+          DefStr = 'The selected addin does not include any configurable settings.'
+          Parameters = <>
+        end
+        item
+          Name = 'SKHintsReset'
+          DefStr = 'All hint messages have been reset and will be displayed again.'
+          Parameters = <>
+        end>
+    end
+    item
+      Name = 'Program Startup'
+      Strings = <
+        item
+          Name = 'SKOSNotSupported'
+          DefStr = 'This operating system is not supported.'
+          Parameters = <>
+        end
+        item
+          Name = 'SKSplashVersion'
+          DefStr = 'Version %0:s'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Version number string'
+            end>
+        end
+        item
+          Name = 'SKSplashButtonExit'
+          DefStr = 'E&xit'
+          Parameters = <>
+        end
+        item
+          Name = 'SKCannotStartProduct'
+          DefStr = 
+            'Keyman Desktop failed to start.  Please check your security sett' +
+            'ings to make sure that the program keyman.exe is allowed to star' +
+            't before continuing.  The error returned was:'#13#10#13#10'"%0:s"'#13#10#13#10'Do yo' +
+            'u want to try and start Keyman Desktop again now?'
+          Comment = 
+            'This message appears when Keyman Desktop fails to start keyman.e' +
+            'xe due to an access denied or file not found error'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Error message'
+            end>
+        end
+        item
+          Name = 'SKWelcome_PleaseStartKeymanDesktop'
+          DefStr = 
+            'Keyman Desktop is not running.  Please start Keyman Desktop from' +
+            ' the Start Menu, under the Programs/Keyman Desktop sub menu, or ' +
+            'click Cancel to exit the tutorial.'
+          Parameters = <>
+        end>
+    end
+    item
+      Name = 'Character Map'
+      Strings = <
+        item
+          Name = 'SKUnicodeData_DatabaseCouldNotBeDeleted'
+          DefStr = 
+            'The Unicode Character database could not be deleted for a rebuil' +
+            'd.  Error details are: %0:s'
+          Parameters = <
+            item
+              Value = '0'
+              Description = 'Error detail string'
+            end>
+        end
+        item
+          Name = 'SKUnicodeData_CouldNotCreateDatabase'
+          DefStr = 
+            'The Unicode Character database could not be created and has been' +
+            ' disabled.  Error details are: %0:s'
+          Parameters = <
+            item
+              Value = '0'
+              Description = 'Error details'
+            end>
+        end
+        item
+          Name = 'SKUnicodeData_Build'
+          DefStr = 
+            'The Character Map has a database of characters that needs to be ' +
+            'built before it can be used.  Build it now?'
+          Parameters = <>
+        end
+        item
+          Name = 'SKUnicodeData_DatabaseLoadFailedRebuild'
+          DefStr = 
+            'The Unicode character database did not load successfully (%0:s).' +
+            '  Rebuild it now?'
+          Parameters = <
+            item
+              Value = '0'
+              Description = 'Error Message'
+            end>
+        end>
+    end
+    item
+      Name = 'Standard Controls'
+      Strings = <
+        item
+          Name = 'SKButtonOK'
+          DefStr = 'OK'
+          Comment = 'OK button in message boxes'
+          Parameters = <>
+        end
+        item
+          Name = 'SKButtonCancel'
+          DefStr = 'Cancel'
+          Comment = 'Cancel button in message boxes'
+          Parameters = <>
+        end
+        item
+          Name = 'SKButtonYes'
+          DefStr = '&Yes'
+          Comment = 'Yes button in message boxes'
+          Parameters = <>
+        end
+        item
+          Name = 'SKButtonNo'
+          DefStr = '&No'
+          Comment = 'No button in message boxes'
+          Parameters = <>
+        end
+        item
+          Name = 'SKButtonHelp'
+          DefStr = 'Help'
+          Comment = 'Help button in message boxes'
+          Parameters = <>
+        end
+        item
+          Name = 'SKButtonPrint'
+          DefStr = '&Print...'
+          Parameters = <>
+        end
+        item
+          Name = 'SKButtonDownload'
+          DefStr = '&Download...'
+          Comment = 'Download button (currently in locale selection dialog)'
+          Parameters = <>
+        end>
+    end
+    item
+      Name = 'Option Names'
+      Strings = <
+        item
+          Name = 'kogStartup'
+          DefStr = 'Startup'
+          Comment = 'Startup Option Group'
+          Parameters = <>
+        end
+        item
+          Name = 'kogGeneral'
+          DefStr = 'General'
+          Parameters = <>
+        end
+        item
+          Name = 'kogAdvanced'
+          DefStr = 'Advanced'
+          Parameters = <>
+        end
+        item
+          Name = 'koStartWithWindows'
+          DefStr = 'Start when Windows starts'
+          Parameters = <>
+        end
+        item
+          Name = 'koShowStartup'
+          DefStr = 'Show splash screen'
+          Parameters = <>
+        end
+        item
+          Name = 'koShowWelcome'
+          DefStr = 'Show welcome screen'
+          Parameters = <>
+        end
+        item
+          Name = 'koCheckForUpdates'
+          DefStr = 'Automatically check keyman.com weekly for updates'
+          Parameters = <>
+        end
+        item
+          Name = 'koKeyboardHotkeysAreToggle'
+          DefStr = 'Keyboard hotkeys toggle keyboard activation'
+          Parameters = <>
+        end
+        item
+          Name = 'koAltGrCtrlAlt'
+          DefStr = 'Simulate AltGr with Ctrl+Alt'
+          Parameters = <>
+        end
+        item
+          Name = 'koRunElevatedInVista'
+          DefStr = 'Always elevate user permissions when running in Windows Vista'
+          Parameters = <>
+        end
+        item
+          Name = 'koTurnOnSurrogates'
+          DefStr = 
+            'Turn on Unicode supplementary character display (requires restar' +
+            't)'
+          Parameters = <>
+        end
+        item
+          Name = 'koUnknownLanguage'
+          DefStr = 'Turn on '#39'Unknown'#39' language'
+          Parameters = <>
+        end
+        item
+          Name = 'koDebugging'
+          DefStr = 'Debugging'
+          Parameters = <>
+        end>
+    end
+    item
+      Name = 'Hotkey Dialog'
+      Strings = <
+        item
+          Name = 'SKChangeHotkeyTitle'
+          DefStr = 'Change Hotkey'
+          Comment = 'Title of the Change Hotkey dialog box'
+          Parameters = <>
+        end
+        item
+          Name = 'SKButtonClearHotkey'
+          DefStr = '&Clear Hotkey'
+          Comment = 'Button caption for the Clear Hotkey button in the Hotkey dialog'
+          Parameters = <>
+        end
+        item
+          Name = 'SKSetHotkey_Keyboard'
+          DefStr = 'Set hotkey for keyboard %0:s'
+          Comment = 'Message when setting hotkey for a keyboard'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Name of keyboard'
+            end>
+        end
+        item
+          Name = 'SKSetHotkey_Interface'
+          DefStr = 'Set interface hotkey'
+          Comment = 
+            'Message displayed when changing an interface hotkey (e.g. show m' +
+            'enu or show on screen keyboard)'
+          Parameters = <>
+        end
+        item
+          Name = 'SKUnsafeHotkey'
+          DefStr = 
+            'The hotkey %0:s will conflict with normal keyboard use.  You sho' +
+            'uld use at least Ctrl or Alt.  Do you want to change this now?'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Hotkey text'
+            end>
+        end
+        item
+          Name = 'SKHotkeyConflicts_Keyboard'
+          DefStr = 
+            'The hotkey %0:s conflicts with the hotkey selected for keyboard ' +
+            '%1:s.  If you continue, the hotkey for keyboard %1:s will be cle' +
+            'ared.  Continue?'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Hotkey'
+            end
+            item
+              Value = '%1:s'
+              Description = 'Keyboard name with hotkey conflict'
+            end>
+        end
+        item
+          Name = 'SKHotkeyConflicts_Product'
+          DefStr = 
+            'The hotkey %0:s conflicts with a hotkey for the product %1:s.  I' +
+            'f you continue, the conflicting hotkey will be cleared.  Continu' +
+            'e?'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Hotkey'
+            end
+            item
+              Value = '%1:s'
+              Description = 'Conflicting product name'
+            end>
+        end
+        item
+          Name = 'SKSetHotkey_Language'
+          DefStr = 'Set hotkey for language %0:s'
+          Comment = 'Message when setting hotkey for a language'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Language name'
+            end>
+        end>
+    end
+    item
+      Name = 'Online Update Dialog'
+      Strings = <
+        item
+          Name = 'SKUpdate_NewVersionText'
+          DefStr = 'The new version is %0:s (you are currently running version %1:s)'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'New version number'
+            end
+            item
+              Value = '%1:s'
+              Description = 'Current version number'
+            end>
+        end
+        item
+          Name = 'SKUpdate_PatchText'
+          DefStr = 'A %0:dKB patch can be automatically downloaded and installed.'
+          Parameters = <
+            item
+              Value = '%0:d'
+              Description = 'Size of patch in kilobytes'
+            end>
+        end
+        item
+          Name = 'SKUpdate_UnableToContact'
+          DefStr = 
+            'Unable to contact keyman.com - please make sure you have an acti' +
+            've Internet connection and try again.'
+          Parameters = <>
+        end
+        item
+          Name = 'SKUpdate_UnableToContact_Error'
+          DefStr = 
+            'Unable to contact keyman.com - please make sure you have an acti' +
+            've Internet connection and try again.  The error received was: %' +
+            '0:s'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Error Message'
+            end>
+        end
+        item
+          Name = 'SKUpdate_KeymanText'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Keyman current version'
+            end>
+        end
+        item
+          Name = 'SKUpdate_PackageText'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Package description'
+            end
+            item
+              Value = '%1:s'
+              Description = 'Package current version'
+            end>
+        end
+        item
+          Name = 'SKUpdate_IconTitle'
+          DefStr = 'Updates for Keyman Desktop are now available'
+          Parameters = <>
+        end
+        item
+          Name = 'SKUpdate_IconText'
+          DefStr = 'Click here to download and install the updates'
+          Parameters = <>
+        end
+        item
+          Name = 'SKUpdate_IconMenuText'
+          Parameters = <>
+        end
+        item
+          Name = 'SKUpdate_IconMenuExit'
+          Parameters = <>
+        end>
+    end
+    item
+      Name = 'Select Drive Dialog'
+      Strings = <
+        item
+          Name = 'SKSelectDrive_Title'
+          DefStr = 'Select Drive'
+          Comment = 
+            'Title for dialog that displays when selecting a drive for loadin' +
+            'g activation file from'
+          Parameters = <>
+        end>
+    end
+    item
+      Name = 'Download Progress Dialog'
+      Strings = <
+        item
+          Name = 'SKDownloadProgress_Title'
+          DefStr = 'Downloading File'
+          Parameters = <>
+        end>
+    end
+    item
+      Name = 'Diagnostics'
+      Strings = <
+        item
+          Name = 'SKAllLanguageSettingsTestedOK'
+          DefStr = 
+            'All the Windows language settings appear to be correctly configu' +
+            'red for your language(s).'
+          Parameters = <>
+        end
+        item
+          Name = 'SKLangCheck_Office'
+          DefStr = 'Add %0:s editing support to %1:s'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Language name'
+            end
+            item
+              Value = '%1:s'
+              Description = 'Microsoft Office product name'
+            end>
+        end
+        item
+          Name = 'SKLangCheck_Office_Office2000'
+          DefStr = 'Microsoft Office 2000'
+          Parameters = <>
+        end
+        item
+          Name = 'SKLangCheck_Office_OfficeXP'
+          DefStr = 'Microsoft Office XP'
+          Parameters = <>
+        end
+        item
+          Name = 'SKLangCheck_Office_Office2003'
+          DefStr = 'Microsoft Office 2003'
+          Parameters = <>
+        end
+        item
+          Name = 'SKLangCheck_Office_Office2007'
+          DefStr = 'Microsoft Office 2007'
+          Parameters = <>
+        end
+        item
+          Name = 'SKLangCheck_Uniscribe_Install'
+          DefStr = 'Uniscribe is not currently installed on your computer'
+          Parameters = <>
+        end
+        item
+          Name = 'SKLangCheck_Uniscribe_Update'
+          DefStr = 
+            'Keyman Uniscribe Manager is required to enable display of your l' +
+            'anguage'
+          Parameters = <>
+        end
+        item
+          Name = 'SKLangCheck_WindowsLanguage_Link'
+          DefStr = 'Link language %0:s to Keyman keyboard %1:s'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Language name'
+            end
+            item
+              Value = '%1:s'
+              Description = 'Keyboard name'
+            end>
+        end
+        item
+          Name = 'SKLangCheck_WindowsLanguage_Install'
+          DefStr = 'Install language %0:s and link to Keyman keyboard %1:s'
+          Parameters = <
+            item
+              Value = '%0:s'
+              Description = 'Language name'
+            end
+            item
+              Value = '%1:s'
+              Description = 'Keyboard name'
+            end>
+        end>
+    end>
+end

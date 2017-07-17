@@ -1,0 +1,1 @@
+Install Keyman Yahoo Instant Messenger Plugin.  Requires Keyman Desktop 7.0 or Keyman 6.2, and the Keyman Richedit Plugin to be installed.

@@ -1,0 +1,37 @@
+object frmKeyman7Main: TfrmKeyman7Main
+  Left = 313
+  Top = 353
+  Caption = 'frmKeyman7Main'
+  ClientHeight = 197
+  ClientWidth = 571
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  OldCreateOrder = False
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  PixelsPerInch = 96
+  TextHeight = 13
+  object mnu: TPopupMenu
+    OwnerDraw = True
+    Left = 24
+    Top = 4
+  end
+  object tmrTestKeymanFunctioning: TTimer
+    Enabled = False
+    Interval = 500
+    OnTimer = tmrTestKeymanFunctioningTimer
+    Left = 28
+    Top = 40
+  end
+  object tmrOnlineUpdateCheck: TTimer
+    Enabled = False
+    Interval = 300000
+    OnTimer = tmrOnlineUpdateCheckTimer
+    Left = 280
+    Top = 104
+  end
+end

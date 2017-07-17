@@ -1,0 +1,77 @@
+package JvCoreDesign;
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $4A080000}
+{$DEFINE RELEASE}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'JVCL Core Components'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  JvCore,
+  Jcl,
+  JclVcl,
+  designide,
+  dclstd,
+  rtl,
+  vcl,
+  vclx;
+
+contains
+  JvProviderTreeListDsgnFrame in '..\jvcl\jvcl\design\JvProviderTreeListDsgnFrame.pas' {fmeJvProviderTreeListDsgn: TFrame},
+  JvProviderTreeListFrame in '..\jvcl\jvcl\design\JvProviderTreeListFrame.pas' {fmeJvProviderTreeList: TFrame},
+  JvStdToolbarDsgnFrame in '..\jvcl\jvcl\design\JvStdToolbarDsgnFrame.pas' {fmeJvStdToolbarDesign: TFrame},
+  JvStringsForm in '..\jvcl\jvcl\design\JvStringsForm.pas' {JvStrEditDlg},
+  JvBaseDlgEditor in '..\jvcl\jvcl\design\JvBaseDlgEditor.pas',
+  JvBaseDsgnForm in '..\jvcl\jvcl\design\JvBaseDsgnForm.pas' {JvBaseDesign},
+  JvBaseDsgnFrame in '..\jvcl\jvcl\design\JvBaseDsgnFrame.pas' {fmeJvBaseDesign: TFrame},
+  JvBaseDsgnToolbarFrame in '..\jvcl\jvcl\design\JvBaseDsgnToolbarFrame.pas' {fmeJvBaseToolbarDesign: TFrame},
+  JvColorEditor in '..\jvcl\jvcl\design\JvColorEditor.pas',
+  JvColorProviderDesignerForm in '..\jvcl\jvcl\design\JvColorProviderDesignerForm.pas' {frmJvColorProviderDesigner},
+  JvColorProviderEditors in '..\jvcl\jvcl\design\JvColorProviderEditors.pas',
+  JvDsgnConfig in '..\jvcl\jvcl\design\JvDsgnConfig.pas',
+  JvCoreReg in '..\jvcl\jvcl\design\JvCoreReg.pas',
+  JvDataConsumerContextSelectForm in '..\jvcl\jvcl\design\JvDataConsumerContextSelectForm.pas' {frmDataConsumerContextSelect},
+  JvDataConsumerItemSelectForm in '..\jvcl\jvcl\design\JvDataConsumerItemSelectForm.pas' {frmJvDataConsumerItemSelect},
+  JvDataContextManagerForm in '..\jvcl\jvcl\design\JvDataContextManagerForm.pas' {frmJvDataContextManager},
+  JvDataProviderDesignerForm in '..\jvcl\jvcl\design\JvDataProviderDesignerForm.pas' {frmDataProviderDesigner},
+  JvDataProviderEditors in '..\jvcl\jvcl\design\JvDataProviderEditors.pas',
+  JvDataProviderItemDesign in '..\jvcl\jvcl\design\JvDataProviderItemDesign.pas',
+  JvDateTimeForm in '..\jvcl\jvcl\design\JvDateTimeForm.pas' {frmSelectDateTimeDlg},
+  JvDesignerUtils in '..\jvcl\jvcl\design\JvDesignerUtils.pas',
+  JvDsgnConsts in '..\jvcl\jvcl\design\JvDsgnConsts.pas',
+  JvDsgnEditors in '..\jvcl\jvcl\design\JvDsgnEditors.pas',
+  JvIDEZoom in '..\jvcl\jvcl\design\JvIDEZoom.pas',
+  JvJVCLAboutEditor in '..\jvcl\jvcl\design\JvJVCLAboutEditor.pas',
+  JvPaintBoxEditor in '..\jvcl\jvcl\design\JvPaintBoxEditor.pas',
+  JvProviderToolbarFrame in '..\jvcl\jvcl\design\JvProviderToolbarFrame.pas' {fmeJvProviderToolbar: TFrame},
+  JvDsgnTypes in '..\jvcl\jvcl\design\JvDsgnTypes.pas',
+  JvColorProviderDsgnTreeFrame in '..\jvcl\jvcl\design\JvColorProviderDsgnTreeFrame.pas' {fmeJvColorProviderDsgnTree: TFrame},
+  JvColorProviderAddDialogForm in '..\jvcl\jvcl\design\JvColorProviderAddDialogForm.pas' {frmAddColor},
+  JvActnResForm in '..\jvcl\jvcl\design\JvActnResForm.pas' {JvStandardActions: TDataModule},
+  JvBackgroundEditors in '..\jvcl\jvcl\design\JvBackgroundEditors.pas',
+  JvBackgroundEditForm in '..\jvcl\jvcl\design\JvBackgroundEditForm.pas' {JvBackgroundClientsEditor},
+  JvValidatorsEditorForm in '..\jvcl\jvcl\design\JvValidatorsEditorForm.pas' {frmValidatorsEditor};
+
+end.

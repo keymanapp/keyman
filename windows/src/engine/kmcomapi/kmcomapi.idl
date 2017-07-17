@@ -1,0 +1,731 @@
+[
+  uuid(C0578821-7C72-419B-8EF0-55FB7DB3BA6F), 
+  version(1.1), 
+  helpstring("Tavultesoft Keyman Library")
+]
+library kmcomapi
+{
+
+  importlib("stdole2.tlb");
+  importlib("STDVCL40.DLL");
+
+  [
+    uuid(7B095092-9CFF-4349-AF4C-BC0684981682), 
+    version(1.0), 
+    helpstring("Interface for TavultesoftKeyman Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface ITavultesoftKeyman: IDispatch
+  {
+    [propget, id(0x00000005)]
+    HRESULT _stdcall Keyboards([out, retval] IKeymanKeyboards ** Value );
+    [propget, id(0x00000006)]
+    HRESULT _stdcall Addins([out, retval] IKeymanAddins ** Value );
+    [propget, id(0x00000007)]
+    HRESULT _stdcall Packages([out, retval] IKeymanPackages ** Value );
+    [propget, id(0x00000001)]
+    HRESULT _stdcall SystemInfo([out, retval] IKeymanSystemInfo ** Value );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall Errors([out, retval] IKeymanErrors ** Value );
+    [propget, id(0x00000003)]
+    HRESULT _stdcall Options([out, retval] IKeymanOptions ** Value );
+    [id(0x00000004)]
+    HRESULT _stdcall Refresh( void );
+    [propget, id(0x00000008)]
+    HRESULT _stdcall Languages([out, retval] IKeymanLanguages ** Value );
+  };
+
+  [
+    uuid(7D8879C6-D830-4796-8021-7B6FF69558E4), 
+    version(1.0), 
+    helpstring("TavultesoftKeyman Object")
+  ]
+  coclass TavultesoftKeyman
+  {
+    [default] interface ITavultesoftKeyman;
+  };
+
+  [
+    uuid(A4E08956-64AB-41F5-950B-3073F38D32B2), 
+    version(1.0), 
+    helpstring("Interface for KeymanKeyboard Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanKeyboard: IDispatch
+  {
+    [id(0x00000001)]
+    HRESULT _stdcall Uninstall( void );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall Name([out, retval] BSTR * Value );
+    [propget, id(0x00000003)]
+    HRESULT _stdcall Filename([out, retval] BSTR * Value );
+    [propget, id(0x00000004)]
+    HRESULT _stdcall KeymanID([out, retval] long * Value );
+    [propget, id(0x00000005)]
+    HRESULT _stdcall Message([out, retval] BSTR * Value );
+    [propget, id(0x00000006)]
+    HRESULT _stdcall Copyright([out, retval] BSTR * Value );
+    [propget, id(0x00000008)]
+    HRESULT _stdcall Hotkey([out, retval] long * Value );
+    [propput, id(0x00000008)]
+    HRESULT _stdcall Hotkey([in] long Value );
+    [propget, id(0x00000009)]
+    HRESULT _stdcall Bitmap([out, retval] IPicture ** Value );
+    [propget, id(0x0000000A)]
+    HRESULT _stdcall Loaded([out, retval] VARIANT_BOOL * Value );
+    [propput, id(0x0000000A)]
+    HRESULT _stdcall Loaded([in] VARIANT_BOOL Value );
+    [propget, id(0x0000000B)]
+    HRESULT _stdcall InstalledByAdmin([out, retval] VARIANT_BOOL * Value );
+    [propget, id(0x0000000C)]
+    HRESULT _stdcall OwnerPackage([out, retval] IKeymanPackage ** Value );
+    [propget, id(0x0000000D)]
+    HRESULT _stdcall Licence([out, retval] IKeymanLicence ** Value );
+    [propget, id(0x00000007)]
+    HRESULT _stdcall KeyboardName([out, retval] BSTR * Value );
+    [propget, id(0x0000000E)]
+    HRESULT _stdcall Encodings([out, retval] KeymanKeyboardEncodings * Value );
+    [propget, id(0x00000010)]
+    HRESULT _stdcall VisualKeyboard([out, retval] IKeymanVisualKeyboard ** Value );
+    [id(0x00000011)]
+    HRESULT _stdcall InstallVisualKeyboard([in] BSTR Filename );
+  };
+
+  [
+    uuid(FE4782AD-AA02-45AA-A87F-24A2471DDA9B), 
+    version(1.0), 
+    helpstring("KeymanKeyboard Object"), 
+    noncreatable
+  ]
+  coclass KeymanKeyboard
+  {
+    [default] interface IKeymanKeyboard;
+  };
+
+  [
+    uuid(A81A080C-F994-4EAE-A5C4-104C26195B3A), 
+    version(1.0), 
+    helpstring("Interface for KeymanPackage Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanPackage: IDispatch
+  {
+    [id(0x00000001)]
+    HRESULT _stdcall Uninstall([in] VARIANT_BOOL RemoveFonts );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall Name([out, retval] BSTR * Value );
+    [propget, id(0x00000003)]
+    HRESULT _stdcall Description([out, retval] BSTR * Value );
+    [propget, id(0x00000004)]
+    HRESULT _stdcall InstalledByAdmin([out, retval] VARIANT_BOOL * Value );
+    [propget, id(0x00000005)]
+    HRESULT _stdcall Keyboards([out, retval] IKeymanKeyboardsForPackage ** Value );
+    [propget, id(0x00000006)]
+    HRESULT _stdcall Filename([out, retval] BSTR * Value );
+  };
+
+  [
+    uuid(4BDC8DCC-283F-4B72-BBBD-3808E9081E78), 
+    version(1.0), 
+    helpstring("KeymanPackage Object"), 
+    noncreatable
+  ]
+  coclass KeymanPackage
+  {
+    [default] interface IKeymanPackage;
+  };
+
+  [
+    uuid(F0B8E349-CDC4-4138-8B4F-2E8756B83655), 
+    version(1.0), 
+    helpstring("Interface for KeymanAddin Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanAddin: IDispatch
+  {
+    [propget, id(0x00000001)]
+    HRESULT _stdcall OwnerPackage([out, retval] IKeymanPackage ** Value );
+    [propget, id(0x00000003)]
+    HRESULT _stdcall InstalledByAdmin([out, retval] VARIANT_BOOL * Value );
+    [id(0x00000004)]
+    HRESULT _stdcall Uninstall( void );
+    [propget, id(0x00000005)]
+    HRESULT _stdcall Name([out, retval] BSTR * Value );
+    [propget, id(0x00000006)]
+    HRESULT _stdcall Filename([out, retval] BSTR * Value );
+    [propget, id(0x00000007)]
+    HRESULT _stdcall Description([out, retval] BSTR * Value );
+  };
+
+  [
+    uuid(C33AC758-95E9-49C4-B8EB-3A4F6CDE8A01), 
+    version(1.0), 
+    helpstring("KeymanAddin Object"), 
+    noncreatable
+  ]
+  coclass KeymanAddin
+  {
+    [default] interface IKeymanAddin;
+  };
+
+  [
+    uuid(595BD8D3-F5DB-4E7E-812D-B6F1F083633D), 
+    version(1.0), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanKeyboardsForPackage: IDispatch
+  {
+    [propget, id(0x00000001)]
+    HRESULT _stdcall Count([out, retval] long * Value );
+    [propget, id(0x00000000), defaultcollelem, uidefault]
+    HRESULT _stdcall Items([in] VARIANT Index, [out, retval] IKeymanKeyboard ** Value );
+    [propget, id(0xFFFFFFFC), restricted]
+    HRESULT _stdcall _NewEnum([out, retval] IUnknown ** Value );
+  };
+
+  [
+    uuid(A3426A95-4890-4A64-870F-CEE536E91EFE), 
+    version(1.0), 
+    helpstring("Interface for KeymanKeyboards Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanKeyboards: IDispatch
+  {
+    [id(0x00000003)]
+    HRESULT _stdcall Install([in] BSTR Filename, [in] VARIANT_BOOL AllUsers );
+    [id(0x00000004)]
+    HRESULT _stdcall Apply( void );
+    [id(0x00000005)]
+    HRESULT _stdcall Refresh( void );
+    [propget, id(0x00000007)]
+    HRESULT _stdcall Count([out, retval] long * Value );
+    [propget, id(0x00000000), defaultcollelem]
+    HRESULT _stdcall Items([in] VARIANT Index, [out, retval] IKeymanKeyboard ** Value );
+    [propget, id(0xFFFFFFFC), restricted]
+    HRESULT _stdcall _NewEnum([out, retval] IUnknown ** Value );
+    [id(0x00000001)]
+    HRESULT _stdcall IndexOf([in] BSTR Name, [out, retval] long * Index );
+    [id(0x00000002)]
+    HRESULT _stdcall GetKeyboardFromFile([in] BSTR Filename, [out, retval] IKeymanKeyboard ** Keyboard );
+  };
+
+  [
+    uuid(438799C8-F4A0-4838-9D54-17EF1A2FE6AD), 
+    version(1.0), 
+    helpstring("Interface for KeymanPackages Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanPackages: IDispatch
+  {
+    [id(0x00000001)]
+    HRESULT _stdcall Install([in] BSTR Filename, [in] VARIANT_BOOL AllUsers );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall Count([out, retval] long * Value );
+    [propget, id(0x00000000), defaultcollelem]
+    HRESULT _stdcall Items([in] VARIANT Index, [out, retval] IKeymanPackage ** Value );
+    [id(0x00000004)]
+    HRESULT _stdcall Refresh( void );
+    [propget, id(0xFFFFFFFC), restricted]
+    HRESULT _stdcall _NewEnum([out, retval] IUnknown ** Value );
+    [id(0x00000003)]
+    HRESULT _stdcall GetPackageFromFile([in] BSTR Filename, [out, retval] IKeymanPackage ** Package );
+  };
+
+  [
+    uuid(F331F8D8-313F-47A8-A8BF-F136ED1F0399), 
+    version(1.0), 
+    helpstring("Interface for KeymanAddins Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanAddins: IDispatch
+  {
+    [propget, id(0x00000001)]
+    HRESULT _stdcall Count([out, retval] long * Value );
+    [propget, id(0x00000000), defaultcollelem, uidefault]
+    HRESULT _stdcall Items([in] VARIANT Index, [out, retval] IKeymanAddin ** Value );
+    [id(0x00000003)]
+    HRESULT _stdcall Install([in] BSTR Filename );
+    [id(0x00000004)]
+    HRESULT _stdcall Refresh( void );
+    [propget, id(0xFFFFFFFC), restricted]
+    HRESULT _stdcall _NewEnum([out, retval] IUnknown ** Value );
+  };
+
+  [
+    uuid(C6CD3AEC-7489-4242-982F-FEC9DA9213DC), 
+    version(1.0), 
+    helpstring("Dispatch interface for KeymanLicences Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanLicences: IDispatch
+  {
+    [propget, id(0xFFFFFFFC), restricted]
+    HRESULT _stdcall _NewEnum([out, retval] IUnknown ** Value );
+  };
+
+  [
+    uuid(4612D50F-3918-4C92-9A52-203DC774590E), 
+    version(1.0), 
+    helpstring("KeymanLicences Object"), 
+    noncreatable
+  ]
+  coclass KeymanLicences
+  {
+    [default] interface IKeymanLicences;
+  };
+
+  [
+    uuid(A5C3DBE2-B1E2-479A-9C91-1DA7C463184A), 
+    version(1.0), 
+    helpstring("Dispatch interface for KeymanLicence Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanLicence: IDispatch
+  {
+  };
+
+  [
+    uuid(764AB68C-6746-46B2-B175-3DDD95B2BB40), 
+    version(1.0), 
+    helpstring("KeymanLicence Object"), 
+    noncreatable
+  ]
+  coclass KeymanLicence
+  {
+    [default] interface IKeymanLicence;
+  };
+
+  [
+    uuid(48796430-160C-4B93-AB05-10D2548BF4D1), 
+    version(1.0), 
+    helpstring("Dispatch interface for KeymanSystemInfo Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanSystemInfo: IDispatch
+  {
+    [propget, id(0x00000001)]
+    HRESULT _stdcall IsAdministrator([out, retval] VARIANT_BOOL * Value );
+    [id(0x00000002)]
+    HRESULT _stdcall Refresh( void );
+  };
+
+  [
+    uuid(F8EAAEC3-65CF-49CD-BDD6-F43BBCA7F620), 
+    version(1.0), 
+    helpstring("KeymanSystemInfo Object"), 
+    noncreatable
+  ]
+  coclass KeymanSystemInfo
+  {
+    [default] interface IKeymanSystemInfo;
+  };
+
+  [
+    uuid(D3BB819F-66BF-4ADF-B6E8-F1E267095CC9), 
+    version(1.0), 
+    helpstring("Dispatch interface for KeymanErrors Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanErrors: IDispatch
+  {
+    [propget, id(0x00000001)]
+    HRESULT _stdcall Count([out, retval] long * Value );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall Items([in] long Index, [out, retval] IKeymanError ** Value );
+    [id(0x00000003)]
+    HRESULT _stdcall SetReboot( void );
+    [propget, id(0x00000004)]
+    HRESULT _stdcall RebootRequired([out, retval] VARIANT_BOOL * Value );
+    [id(0x00000005)]
+    HRESULT _stdcall Clear( void );
+    [propget, id(0xFFFFFFFC), restricted]
+    HRESULT _stdcall _NewEnum([out, retval] IUnknown ** Value );
+  };
+
+  [
+    uuid(4F04AF8B-6F8F-48A0-B0B4-CA8FD273FB5C), 
+    version(1.0), 
+    helpstring("KeymanErrors Object"), 
+    noncreatable
+  ]
+  coclass KeymanErrors
+  {
+    [default] interface IKeymanErrors;
+  };
+
+  [
+    uuid(0E4963E8-0A3B-4910-BE59-E6A869B34C43), 
+    version(1.0), 
+    helpstring("Dispatch interface for KeymanError Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanError: IDispatch
+  {
+    [propget, id(0x00000001)]
+    HRESULT _stdcall ErrorCode([out, retval] long * Value );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall Description([out, retval] BSTR * Value );
+    [propget, id(0x00000006)]
+    HRESULT _stdcall ParameterCount([out, retval] long * Value );
+    [propget, id(0x00000007)]
+    HRESULT _stdcall Parameter([in] long Index, [out, retval] BSTR * Value );
+    [propget, id(0x00000008)]
+    HRESULT _stdcall ParameterValue([in] long Index, [out, retval] BSTR * Value );
+    [propget, id(0x00000003)]
+    HRESULT _stdcall Severity([out, retval] long * Value );
+  };
+
+  [
+    uuid(CA269001-9A16-4C0B-8029-6DCE1607A6C1), 
+    version(1.0), 
+    helpstring("KeymanError Object"), 
+    noncreatable
+  ]
+  coclass KeymanError
+  {
+    [default] interface IKeymanError;
+  };
+
+  [
+    uuid(A305E96E-5100-4416-9900-110D40E5B0F8), 
+    version(1.0), 
+    helpstring("KeymanKeyboards Object"), 
+    noncreatable
+  ]
+  coclass KeymanKeyboards
+  {
+    [default] interface IKeymanKeyboards;
+  };
+
+  [
+    uuid(07577ED7-908C-4190-B461-555774BB3CEE), 
+    version(1.0), 
+    helpstring("KeymanPackages Object"), 
+    noncreatable
+  ]
+  coclass KeymanPackages
+  {
+    [default] interface IKeymanPackages;
+  };
+
+  [
+    uuid(6395B9FB-B728-4EE7-A481-4E2A650B08A2), 
+    version(1.0), 
+    helpstring("KeymanAddins Object"), 
+    noncreatable
+  ]
+  coclass KeymanAddins
+  {
+    [default] interface IKeymanAddins;
+  };
+
+  [
+    uuid(5BFDE23E-F582-4FAA-8B48-62C76DAECF35), 
+    version(1.0), 
+    helpstring("KeymanKeyboardsForPackage Object"), 
+    hidden
+  ]
+  coclass KeymanKeyboardsForPackage
+  {
+    [default] interface IKeymanKeyboardsForPackage;
+  };
+
+  [
+    uuid(0BD0918F-020B-4F97-BC9C-E24004792FEB), 
+    version(1.0)
+  ]
+  typedef enum tagKeymanErrorSeverity
+  {
+    kesFatal = 0, 
+    kesError = 1, 
+    kesWarning = 2, 
+    kesHint = 3
+  } KeymanErrorSeverity;
+
+  [
+    uuid(6F2CA8EE-FAD1-457D-AA9E-D14AA3321D0E), 
+    version(1.0), 
+    helpstring("Dispatch interface for KeymanOptions Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanOptions: IDispatch
+  {
+    [propget, id(0x00000000), defaultcollelem]
+    HRESULT _stdcall Items([in] VARIANT Index, [out, retval] IKeymanOption ** Value );
+    [id(0x00000003)]
+    HRESULT _stdcall Apply( void );
+    [id(0x00000005)]
+    HRESULT _stdcall Refresh( void );
+    [propget, id(0x00000006)]
+    HRESULT _stdcall Count([out, retval] long * Value );
+    [propget, id(0xFFFFFFFC), restricted]
+    HRESULT _stdcall _NewEnum([out, retval] IUnknown ** Value );
+    [propget, id(0x00000001)]
+    HRESULT _stdcall KeymanOffHotkey([out, retval] long * Value );
+    [propput, id(0x00000001)]
+    HRESULT _stdcall KeymanOffHotkey([in] long Value );
+  };
+
+  [
+    uuid(0D2AF445-8CC4-4883-A300-014BA140543C), 
+    version(1.0), 
+    helpstring("KeymanOptions Object"), 
+    noncreatable, 
+    hidden
+  ]
+  coclass KeymanOptions
+  {
+    [default] interface IKeymanOptions;
+  };
+
+  [
+    uuid(2AF26A27-C1F9-44DA-A628-B460676F3D6D), 
+    version(1.0), 
+    helpstring("Dispatch interface for KeymanOption Object"), 
+    hidden, 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanOption: IDispatch
+  {
+    [propget, id(0x00000001)]
+    HRESULT _stdcall Value([out, retval] VARIANT_BOOL * Value );
+    [propput, id(0x00000001)]
+    HRESULT _stdcall Value([in] VARIANT_BOOL Value );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall Name([out, retval] BSTR * Value );
+    [propget, id(0x00000003)]
+    HRESULT _stdcall Description([out, retval] BSTR * Value );
+    [propget, id(0x00000004)]
+    HRESULT _stdcall DefaultValue([out, retval] VARIANT_BOOL * Value );
+    [propget, id(0x00000005)]
+    HRESULT _stdcall Enabled([out, retval] VARIANT_BOOL * Value );
+    [propget, id(0x00000006)]
+    HRESULT _stdcall Group([out, retval] BSTR * Value );
+  };
+
+  [
+    uuid(3BE0825F-A5AA-4087-A314-BC33FDADA0BE), 
+    version(1.0), 
+    helpstring("KeymanOption Object"), 
+    noncreatable, 
+    hidden
+  ]
+  coclass KeymanOption
+  {
+    [default] interface IKeymanOption;
+  };
+
+  [
+    uuid(4AE5C324-1553-45DA-9A42-CA8790B5DC62), 
+    version(1.0), 
+    helpstring("Dispatch interface for KeymanEditions Object"), 
+    hidden, 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanEditions: IDispatch
+  {
+    [propget, id(0xFFFFFFFC), restricted]
+    HRESULT _stdcall _NewEnum([out, retval] IUnknown ** Value );
+  };
+
+  [
+    uuid(102911CA-2AB7-44AE-B5B0-D9EBDAF550FC), 
+    version(1.0), 
+    helpstring("KeymanEditions Object")
+  ]
+  coclass KeymanEditions
+  {
+    [default] interface IKeymanEditions;
+  };
+
+  [
+    uuid(DE196E97-18DD-42FB-BA6E-93EFF80C0836), 
+    version(1.0), 
+    helpstring("Dispatch interface for KeymanEdition Object"), 
+    hidden, 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanEdition: IDispatch
+  {
+  };
+
+  [
+    uuid(477138A8-E1B1-4CBE-B1C2-5DC44515AB60), 
+    version(1.0), 
+    helpstring("KeymanEdition Object")
+  ]
+  coclass KeymanEdition
+  {
+    [default] interface IKeymanEdition;
+  };
+
+  [
+    uuid(CD7E2FD7-B299-45C9-B9C6-FAC10DBF50FB), 
+    version(1.0), 
+    helpstring("Dispatch interface for KeymanStatus Object"), 
+    hidden, 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanStatus: IDispatch
+  {
+    [id(0x00000001)]
+    HRESULT _stdcall StartKeyman( void );
+    [id(0x00000002)]
+    HRESULT _stdcall StopKeyman( void );
+    [propget, id(0x00000003)]
+    HRESULT _stdcall Running([out, retval] long * Value );
+    [propget, id(0x00000004)]
+    HRESULT _stdcall VisualKeyboardVisible([out, retval] long * Value );
+    [id(0x00000005)]
+    HRESULT _stdcall StartVisualKeyboard( void );
+    [id(0x00000006)]
+    HRESULT _stdcall StopVisualKeyboard( void );
+    [propget, id(0x00000007)]
+    HRESULT _stdcall ActiveKeyboard([out, retval] IKeymanKeyboard ** Value );
+    [id(0x00000008)]
+    HRESULT _stdcall Deactivate( void );
+  };
+
+  [
+    uuid(34148E34-8C89-4FCE-9C32-10DFA743EC52), 
+    version(1.0), 
+    helpstring("KeymanStatus Object")
+  ]
+  coclass KeymanStatus
+  {
+    [default] interface IKeymanStatus;
+  };
+
+  [
+    uuid(193C6F5D-05A6-4A44-A316-636686BBB347), 
+    version(1.0)
+  ]
+  typedef enum tagKeymanKeyboardEncodings
+  {
+    keANSI = 1, 
+    keUnicode = 2
+  } KeymanKeyboardEncodings;
+
+  [
+    uuid(E9ECF9BA-8101-4CF7-AF20-ED325FB0BAE6), 
+    version(1.0)
+  ]
+  typedef enum tagKeymanKeyboardHotkey
+  {
+    HK_ALT = 65536, 
+    HK_CTRL = 131072, 
+    HK_SHIFT = 262144
+  } KeymanKeyboardHotkey;
+
+  [
+    uuid(124FDC59-6194-4232-B54A-F251372D9B81), 
+    version(1.0), 
+    helpstring("Dispatch interface for KeymanLanguages Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanLanguages: IDispatch
+  {
+    [propget, id(0x00000000), defaultcollelem, uidefault]
+    HRESULT _stdcall Items([in] long Index, [out, retval] IKeymanLanguage ** Value );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall Count([out, retval] long * Value );
+    [propget, id(0xFFFFFFFC), restricted]
+    HRESULT _stdcall _NewEnum([out, retval] IUnknown ** Value );
+    [id(0x00000004)]
+    HRESULT _stdcall Refresh( void );
+    [id(0x00000005)]
+    HRESULT _stdcall Apply( void );
+  };
+
+  [
+    uuid(581FB7B4-7341-465A-B9DF-D1CC392108A8), 
+    version(1.0), 
+    helpstring("KeymanLanguages Object")
+  ]
+  coclass KeymanLanguages
+  {
+    [default] interface IKeymanLanguages;
+  };
+
+  [
+    uuid(785DC47F-406F-48B0-90F7-E4670B92BCF4), 
+    version(1.0), 
+    helpstring("Dispatch interface for KeymanLanguage Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanLanguage: IDispatch
+  {
+    [propget, id(0x00000001)]
+    HRESULT _stdcall HKL([out, retval] long * Value );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall KeymanKeyboard([out, retval] IKeymanKeyboard ** Value );
+    [propput, id(0x00000002)]
+    HRESULT _stdcall KeymanKeyboard([in] IKeymanKeyboard * Value );
+    [propget, id(0x00000003)]
+    HRESULT _stdcall LayoutName([out, retval] BSTR * Value );
+    [propget, id(0x00000004)]
+    HRESULT _stdcall Description([out, retval] BSTR * Value );
+    [propget, id(0x00000006)]
+    HRESULT _stdcall LocaleName([out, retval] BSTR * Value );
+    [propget, id(0x00000007)]
+    HRESULT _stdcall IsIME([out, retval] VARIANT_BOOL * Value );
+    [propget, id(0x00000009)]
+    HRESULT _stdcall IsKeymanLayout([out, retval] VARIANT_BOOL * Value );
+  };
+
+  [
+    uuid(EC4051FE-F508-4F89-AAE2-C78EC2355E35), 
+    version(1.0), 
+    helpstring("KeymanLanguage Object")
+  ]
+  coclass KeymanLanguage
+  {
+    [default] interface IKeymanLanguage;
+  };
+
+  [
+    uuid(F8289232-DD0F-4261-BBF3-C72484E61E33), 
+    version(1.0), 
+    helpstring("Dispatch interface for KeymanVisualKeyboard Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanVisualKeyboard: IDispatch
+  {
+    [id(0x00000001)]
+    HRESULT _stdcall Uninstall( void );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall Filename([out, retval] BSTR * Value );
+  };
+
+  [
+    uuid(255CC18B-7F8A-4939-86C2-C05C664B8AFF), 
+    version(1.0), 
+    helpstring("KeymanVisualKeyboard Object")
+  ]
+  coclass KeymanVisualKeyboard
+  {
+    [default] interface IKeymanVisualKeyboard;
+  };
+
+}; 

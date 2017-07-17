@@ -1,0 +1,20 @@
+﻿{
+  "options" : {
+    "device" : "any",
+    "keyboardBaseUri" : "http://your-host-here/keyboard-path/",
+    "fontBaseUri" : "http://your-host-here/font-path/"
+  },
+  "keyboard" : {
+    "id" : "gh_kmw_30",
+    "name" : "GitHub KeymanWeb #30",
+    "filename" : "gh_kmw_30-1.0.js",
+    "version" : "1.0",
+    "lastModified" : "2015-08-24T22:21:58.556+10:00",
+    "languages" : [
+      {
+        "id" : "eng",
+        "name" : "English"
+      }
+      ]
+  }
+}

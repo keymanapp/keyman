@@ -1,0 +1,74 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{9ad2df65-384d-4c9c-9ded-a5f12f34d55f}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="JediApi_DynamicDebug.dproj" />
+    <Projects Include="JediApi_DynamicRelease.dproj" />
+    <Projects Include="JediApi_SingleUnits.dproj" />
+    <Projects Include="JediApi_StaticDebug.dproj" />
+    <Projects Include="JediApi_StaticRelease.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+<BorlandProject xmlns=""><Default.Personality></Default.Personality></BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="JediApi_DynamicDebug">
+    <MSBuild Projects="JediApi_DynamicDebug.dproj" Targets="" />
+  </Target>
+  <Target Name="JediApi_DynamicDebug:Clean">
+    <MSBuild Projects="JediApi_DynamicDebug.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="JediApi_DynamicDebug:Make">
+    <MSBuild Projects="JediApi_DynamicDebug.dproj" Targets="Make" />
+  </Target>
+  <Target Name="JediApi_DynamicRelease">
+    <MSBuild Projects="JediApi_DynamicRelease.dproj" Targets="" />
+  </Target>
+  <Target Name="JediApi_DynamicRelease:Clean">
+    <MSBuild Projects="JediApi_DynamicRelease.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="JediApi_DynamicRelease:Make">
+    <MSBuild Projects="JediApi_DynamicRelease.dproj" Targets="Make" />
+  </Target>
+  <Target Name="JediApi_StaticDebug">
+    <MSBuild Projects="JediApi_StaticDebug.dproj" Targets="" />
+  </Target>
+  <Target Name="JediApi_StaticDebug:Clean">
+    <MSBuild Projects="JediApi_StaticDebug.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="JediApi_StaticDebug:Make">
+    <MSBuild Projects="JediApi_StaticDebug.dproj" Targets="Make" />
+  </Target>
+  <Target Name="JediApi_StaticRelease">
+    <MSBuild Projects="JediApi_StaticRelease.dproj" Targets="" />
+  </Target>
+  <Target Name="JediApi_StaticRelease:Clean">
+    <MSBuild Projects="JediApi_StaticRelease.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="JediApi_StaticRelease:Make">
+    <MSBuild Projects="JediApi_StaticRelease.dproj" Targets="Make" />
+  </Target>
+  <Target Name="JediApi_SingleUnits">
+    <MSBuild Projects="JediApi_SingleUnits.dproj" Targets="" />
+  </Target>
+  <Target Name="JediApi_SingleUnits:Clean">
+    <MSBuild Projects="JediApi_SingleUnits.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="JediApi_SingleUnits:Make">
+    <MSBuild Projects="JediApi_SingleUnits.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="JediApi_DynamicDebug;JediApi_DynamicRelease;JediApi_StaticDebug;JediApi_StaticRelease;JediApi_SingleUnits" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="JediApi_DynamicDebug:Clean;JediApi_DynamicRelease:Clean;JediApi_StaticDebug:Clean;JediApi_StaticRelease:Clean;JediApi_SingleUnits:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="JediApi_DynamicDebug:Make;JediApi_DynamicRelease:Make;JediApi_StaticDebug:Make;JediApi_StaticRelease:Make;JediApi_SingleUnits:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

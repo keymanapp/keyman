@@ -1,0 +1,13 @@
+﻿store(&VERSION) '8.0'
+store(&NAME) 'i764 102Key Mnemonic'
+store(&VISUALKEYBOARD) 'i764_102key_mnemonic.kvk'
+store(&BITMAP) 'i764_102key_mnemonic.ico'
+store(&mnemoniclayout) '1'
+
+begin Unicode > use(main)
+
+
+group(main) using keys
++ 'q' > '102Key Mnemonic'
++ '\' > U+0E09
++ '|' > U+0E01

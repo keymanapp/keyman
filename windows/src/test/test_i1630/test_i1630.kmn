@@ -1,0 +1,10 @@
+﻿store(&VERSION) '7.0'
+store(&NAME) 'Test Pause hotkey [I1630]'
+store(&COPYRIGHT) '© 2008 Tavultesoft'
+store(&MESSAGE) 'Tests the display of the hotkey ' U+0027 'pause' U+0027 ' in the Keyman menu, Configuration, etc'
+begin Unicode > use(main)
+store(&HOTKEY) '[K_PAUSE]'
+
+group(main) using keys
+
++ 'a' > 'Test I1630'

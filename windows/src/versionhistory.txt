@@ -1,0 +1,106 @@
+/6.0.160.0 18 August 2003
+*F Keyman: When taskbar icon cannot be created, message window now waits for confirmation before retry.
+*F Keyman: Further uninstallation bug allowing some files to be left undeleted has been corrected.
+*F Keyman: Left Alt now activates menus when using mnemonic layouts on Windows 9x.
+*F Keyman: When a rule with RALT or RCTRL is matched, automatic backspacing now works correctly.
+*F Keyman: Space bar is now handled correctly with mnemonic layouts on Windows 9x.
+*F Keyman: Keyman now supports FoxPro (cursor keys, etc now passed correctly to application).
+*F Keyman: Nul matching on LHS of rules now works.
+*F Help files: Documentation update: clarification of nomatch rule.
+*F Help files: Documentation update: clarification of nul keyword in context.
+.
+/6.0.159.0 3 July 2003
+*F Keyman: Fixed bug in uninstaller where Keyman Configuration was wrongly deleted.
+*F Keyman Developer: Keyboard wizard now detects modifications when installing keyboards and prompts correctly.
+*F Keyman Developer: Updated pdf help files now included with build
+*F Help files: mnemonic layout availability in KMDev Standard now consistent.
+.
+/6.0.158.0 1 April 2003
+*F Keyman: Visual keyboard now allows European character output, also works better with Right Alt.
+.
+/6.0.157.0 30 March 2003
+*N Keyman: Added option to start Keyman at the end of the Keyman installer - only available for non-silent installs.
+*N Keyman: Added option to start Keyman with Windows at the end of the Keyman installer - only available for non-silent installs.
+*F Keyman: Right Alt now works correctly with mnemonic layouts and European keyboards - see Keyman Developer virtual key documentation for details.
+*F Keyman Developer: Syntax highlighting for virtual character keys (e.g. [CTRL 'a']) now works correctly.
+*F Keyman Developer: Errors in system stores are now displayed in the compilation process.
+*F Keyman Developer: Visual Keyboard Editor context-sensitive help now correct.
+*F Help files: Table of contents has been improved, several errors corrected, and additional help written for visual keyboard editor, and others.
+.
+/6.0.156.0 14 March 2003
+*N Added button to copy layout to Code Page/Unicode in TIKE's Visual Keyboard Editor.
+*F Keyman installer includes more error checking when checking for existing versions of Keyman.
+*F TIKE includes better error handling for database creation issues.
+.
+/6.0.155.0 15 February 2003
+*F Fixed display problems in system store Keyman Developer help files.
+*F Fixed mnemoniclayout reference in Keyman Developer help files.
+*F Virtual Character Keys are now documented.
+*F Virtual Character Keys (used in mnemonic layouts) now only apply to 'white keys'.  See documentation for details.
+*F Keyman file associations now work correctly (problem introduced in 6.0.154.0).
+*F Visual keyboard now displays underlying layout according to currently selected Windows layout.
+*F Keyman splash screen now shows user name, not "registered user" text (problem introduced in 6.0.154.0).
+*F Font now resets correctly to default font when "Reset to Default Font" menu option is chosen in TIKE, and a symbol font was previously selected.
+*F MS Word Save As dialog now does not display each character twice for Unicode keyboards under Windows 98 with the RichEdit addin installed.
+.
+/6.0.154.1 11 January 2003
+*F Problem with Keyman Developer install hanging when upgrading from Keyman Developer 5.0
+.
+/6.0.154.0 9 January 2003
+*F Visual keyboards now install correctly as part of a package.
+*F Error message regarding Internet Explorer 4: Keyman requires IE 5.01 in Windows 95, not IE 4.0 -- this was an error in Microsoft's documentation.
+*F mnemoniclayout flag is now reset when compile starts.
+*F Handled exception when opening a file (that has been deleted) from the recent files list in TIKE.
+*F Num lock now works correctly -- numeric keys now output numbers if numlock is active.
+*F In the help file on the tutorial page "The Finished Keyboard" the keyboard example now works correctly (the line 'store(&mnemonic) "1"' should have been 'store(&mnemoniclayout) "1"').
+*F Removed warnings in the IPAMenu.kmn sample.
+*F Keyman 6.0 API bug: additional field included in structure and not documented or checked for version compatibility in Keyman_BuildKeyboardList function call.
+*N Install log file in Keyman 6 install and uninstall (km60inst.log/km60unin.log).
+*N US English Keyboard layout documented in the Keyman Developer manual, for use with positional layouts.
+.
+/6.0.153.0 4 November 2002
+*F problems with Keyman stopping responding to keyboard input. (reported by Roland Fumey)
+*F problems with shift state being incorrectly managed when switching between applications.
+*F Disabled interaction with console windows (Console window sets focus to NULL so Keyman keyboard hook will be inactive if no window is focused).
+*F Fixed problems with Capslock and Numlock state being incorrectly identified when switching applications.
+*F Creation of links for uninstall of packages and packages with spaces in filename was incorrect -- need quotes around package name.
+*F Install of Start Menu items in packages was missing the pathname in some situations.
+*F Misleading error message when Keyman registry settings missing ("not Administrator" instead of "Keyman not installed correctly")
+*F Keyman 6 startup now shows version number.
+*F Space bar now activates check boxes and buttons when Keyman keyboard is active, but only if space bar is not remapped.
+.
+/6.0.152.0 28 October 2002
+*F When installing a redistributable installer with packages, the sub-packages create Start Menu items with incorrect targets: the targets point to temp directory instead of install directory.  Also, Start menu items requested other than Keyman, Kmshell, and the identified readme file were created but with empty targets (i.e. they were non-functional).
+*F Windows key does not work when keyboard is active on some systems.
+*F Crash in TIKE Projects window when opening/closing tree branches.
+*F After having opened and compiled a keyboard, Package for Distribution resulted in the new window going into background rather than foreground.
+*F In the debugger, deadkeys stopped working after a few lines of input.
+*F Keyman compiler in TIKE will now halt if ESC is pressed.  KMComp will halt on Ctrl+Break.
+*F With ANSI character set, the Character map doesn't do any automatic look-ups on the last line of the character map grid.
+*F Stop button in Debug window
+*F When numlock is on, keyboards do not work correctly.  Caps lock rules are not implemented correctly either; the fixes for this in Keyman 5.0.113.3 have also been applied to KM6.
+*F Keyman Uninstall did not uninstall lpng.dll
+*F Uninstall will now wait 10 seconds before timeout message if kmshell does not exit.
+*F Keyman uninstall did not prompt for reboot when reboot was required.
+*F Added version information to richedit.kma
+*F Added version information to version_upgrade.dll
+*F HOWTO items in PDF help now displayed correctly
+*F Dev help: added "lpng.dll", "keyman.exe" to redistributable installer information
+*F Dev help: deadkeys and virtual keys within stores now documented
+*F Dev help: context(n) history now documented
+*F Keyman help can't find KMSHELL.EXE; Start Menu link needed to have working directory set
+*F Addins only install when they are required; e.g. if Word not installed, WordLink won't install
+*F "Keyman 5.0" title bar in startup of redistributable installer
+.
+/6.0.151.0 20 August 2002
+*F HOWTO topics in help files not displaying (Reported by Manuel Lopez).
+*F Installation of Keyman Developer was aborting in Windows NT 4 (Reported by Manuel Lopez).
+*F Issue in dev/help/ref/index.php where it contradicted usage of index in context (Reported by Doug Higby).
+*F Issue with Save As... in TIKE where the window caption was not updated until the next edit (Reported by Doug Higby).
+*F Issue in TIKE's Insert Header Template dialog where VERSION 5.1 was inserted of 6.0 (Reported by Doug Higby).
+*F Crash in Visual Keyboard (Reported by Manuel Lopez).
+*F Issue in Keyman Configuration where packages were not uninstalling correctly in Control Panel/Add/Remove Programs.
+.
+/6.0.150.0 14 August 2002
+*T Initial release of Keyman 6.
+.

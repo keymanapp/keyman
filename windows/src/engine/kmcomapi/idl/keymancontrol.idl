@@ -1,0 +1,41 @@
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  ITavultesoftKeyman                                                          /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(41D70310-3C7D-4A8E-9403-126342D2DD26),
+    version(1.0),
+    helpstring("Interface for KeymanControl Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanControl: IDispatch
+  {
+    [propget, id(0x00000001)]   HRESULT _stdcall ActiveKeyboard([out, retval] IKeymanKeyboardInstalled ** Value);
+    [propput, id(0x00000001)]   HRESULT _stdcall ActiveKeyboard([in] IKeymanKeyboardInstalled * Value );
+
+    [propget, id(0x00000002)]   HRESULT _stdcall VisualKeyboardVisible([out, retval] VARIANT_BOOL * Value );
+    [id(0x00000003)]            HRESULT _stdcall StartVisualKeyboard( void );
+    [id(0x00000004)]            HRESULT _stdcall StopVisualKeyboard( void );
+
+    [id(0x00000005)]            HRESULT _stdcall StartKeyman32Engine([in] DWORD ProductID );
+    [id(0x00000006)]            HRESULT _stdcall StopKeyman32Engine([in] DWORD ProductID );
+
+    [propget, id(0x00000007)]   HRESULT _stdcall LastActiveWindow([out, retval] DWORD * Value );
+    [propget, id(0x00000008)]   HRESULT _stdcall LastFocusWindow([out, retval] DWORD * Value );
+
+    [id(0x00000009)]            HRESULT _stdcall RegisterControllerWindow([in] DWORD Value );
+    [id(0x0000000A)]            HRESULT _stdcall UnregisterControllerWindow([in] DWORD Value );
+  };
+
+  [
+    uuid(1518AD2B-D900-42E2-B1A1-91078FA9DB21),
+    version(1.0),
+    helpstring("KeymanControl Object")
+  ]
+  coclass KeymanControl
+  {
+    [default] interface IKeymanControl;
+  };

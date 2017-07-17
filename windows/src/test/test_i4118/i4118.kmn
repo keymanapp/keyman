@@ -1,0 +1,17 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I4118 - V9.0 - KMW compiler should warn when extended shift flags are used'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ [K_A] > 'ok'
++ [CTRL K_A] > 'ok'
++ [SHIFT K_A] > 'ok'
++ [ALT K_A] > 'ok'
++ [LCTRL K_A] > 'ok'
++ [RCTRL K_A] > 'ok'
++ [LALT K_A] > 'ok'
++ [RALT K_A] > 'ok'
++ [NCAPS K_A] > 'ok'
++ [CAPS K_A] > 'ok'

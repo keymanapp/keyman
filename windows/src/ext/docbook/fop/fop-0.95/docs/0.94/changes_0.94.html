@@ -1,0 +1,450 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="Apache Forrest" name="Generator">
+<meta name="Forrest-version" content="0.9-dev">
+<meta name="Forrest-skin-name" content="pelt">
+<title>History of Changes 0.94</title>
+<link type="text/css" href="../skin/basic.css" rel="stylesheet">
+<link media="screen" type="text/css" href="../skin/screen.css" rel="stylesheet">
+<link media="print" type="text/css" href="../skin/print.css" rel="stylesheet">
+<link type="text/css" href="../skin/profile.css" rel="stylesheet">
+<script src="../skin/getBlank.js" language="javascript" type="text/javascript"></script><script src="../skin/getMenu.js" language="javascript" type="text/javascript"></script><script src="../skin/fontsize.js" language="javascript" type="text/javascript"></script>
+<link rel="shortcut icon" href="../">
+</head>
+<body onload="init()">
+<script type="text/javascript">ndeSetTextSize();</script>
+<div id="top">
+<!--+
+    |header
+    +-->
+<div class="header">
+<!--+
+    |start group logo
+    +-->
+<div class="grouplogo">
+<a href="http://xmlgraphics.apache.org/"><img class="logoImage" alt="Apache XML Graphics" src="../images/group-logo.gif" title="Apache XML Graphics is responsible for the creation and maintenance of software for managing the conversion of XML formats to graphical output, and the creation and maintenance of related software components, based on software licensed to the Foundation"></a>
+</div>
+<!--+
+    |end group logo
+    +-->
+<!--+
+    |start Project Logo
+    +-->
+<div class="projectlogo">
+<a href="http://xmlgraphics.apache.org/fop/"><img class="logoImage" alt="Apache FOP" src="../images/logo.jpg" title="Apache FOP (Formatting Objects Processor) is the world's first output independent formatter. Output formats currently supported include PDF, PCL, PS, SVG, XML (area tree representation), Print, AWT, MIF and TXT. The primary output target is PDF."></a>
+</div>
+<!--+
+    |end Project Logo
+    +-->
+<!--+
+    |start Search
+    +-->
+<div class="searchbox">
+<form action="http://www.google.com/search" method="get" class="roundtopsmall">
+<input value="xmlgraphics.apache.org" name="sitesearch" type="hidden"><input onFocus="getBlank (this, 'Search the site with google');" size="25" name="q" id="query" type="text" value="Search the site with google">&nbsp; 
+                    <input name="Search" value="Search" type="submit">
+</form>
+</div>
+<!--+
+    |end search
+    +-->
+<!--+
+    |start Tabs
+    +-->
+<ul id="tabs">
+<li>
+<a class="unselected" href="../index.html">Home</a>
+</li>
+<li class="current">
+<a class="selected" href="../0.94/index.html">Version 0.94</a>
+</li>
+<li>
+<a class="unselected" href="../0.95/index.html">Version 0.95</a>
+</li>
+<li>
+<a class="unselected" href="../trunk/index.html">FOP Trunk</a>
+</li>
+<li>
+<a class="unselected" href="../dev/index.html">Development</a>
+</li>
+</ul>
+<!--+
+    |end Tabs
+    +-->
+</div>
+</div>
+<div id="main">
+<div id="publishedStrip">
+<!--+
+    |start Subtabs
+    +-->
+<div id="level2tabs"></div>
+<!--+
+    |end Endtabs
+    +-->
+<script type="text/javascript"><!--
+document.write("Last Published: " + document.lastModified);
+//  --></script>
+</div>
+<!--+
+    |breadtrail
+    +-->
+<div class="breadtrail">
+<a href="http://www.apache.org/">apache.org</a> &gt; <a href="http://xml.apache.org/">XML Federation</a> &gt; <a href="http://xmlgraphics.apache.org/">xmlgraphics.apache.org</a><script src="../skin/breadcrumbs.js" language="JavaScript" type="text/javascript"></script>
+</div>
+<!--+
+    |start Menu, mainarea
+    +-->
+<!--+
+    |start Menu
+    +-->
+<div id="menu">
+<div onclick="SwitchMenu('menu_selected_1.1', '../skin/')" id="menu_selected_1.1Title" class="menutitle" style="background-image: url('../skin/images/chapter_open.gif');">FOP 0.94</div>
+<div id="menu_selected_1.1" class="selectedmenuitemgroup" style="display: block;">
+<div class="menuitem">
+<a href="../0.94/index.html">About</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/releaseNotes_0.94.html">Release Notes</a>
+</div>
+<div class="menupage">
+<div class="menupagetitle">Changes</div>
+</div>
+<div class="menuitem">
+<a href="../0.94/knownissues_overview.html">Known Issues</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/upgrading.html">Upgrading</a>
+</div>
+<div onclick="SwitchMenu('menu_1.1.6', '../skin/')" id="menu_1.1.6Title" class="menutitle">Using FOP</div>
+<div id="menu_1.1.6" class="menuitemgroup">
+<div class="menuitem">
+<a href="../0.94/compiling.html">Build</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/configuration.html">Configure</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/running.html">Run</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/embedding.html">Embed</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/servlets.html">Servlets</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/anttask.html">Ant Task</a>
+</div>
+</div>
+<div onclick="SwitchMenu('menu_1.1.7', '../skin/')" id="menu_1.1.7Title" class="menutitle">Features</div>
+<div id="menu_1.1.7" class="menuitemgroup">
+<div class="menuitem">
+<a href="../0.94/output.html">Output Targets</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/intermediate.html">Intermediate Format</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/pdfencryption.html">PDF Encryption</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/pdfa.html">PDF/A</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/pdfx.html">PDF/X</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/graphics.html">Graphics</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/fonts.html">Fonts</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/hyphenation.html">Hyphenation</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/extensions.html">Extensions</a>
+</div>
+</div>
+</div>
+<div id="credit"></div>
+<div id="roundbottom">
+<img style="display: none" class="corner" height="15" width="15" alt="" src="../skin/images/rc-b-l-15-1body-2menu-3menu.png"></div>
+<!--+
+  |alternative credits
+  +-->
+<div id="credit2"></div>
+</div>
+<!--+
+    |end Menu
+    +-->
+<!--+
+    |start content
+    +-->
+<div id="content">
+<div title="raw XML" class="xmllink">
+<a class="dida" href="changes_0.94.xml"><img alt="XML - icon" src="../skin/images/xmldoc.gif" class="skin"><br>
+        XML</a>
+</div>
+<div title="Portable Document Format" class="pdflink">
+<a class="dida" href="changes_0.94.pdf"><img alt="PDF -icon" src="../skin/images/pdfdoc.gif" class="skin"><br>
+        PDF</a>
+</div>
+<div class="trail">Font size: 
+	          &nbsp;<input value="Reset" class="resetfont" title="Reset text" onclick="ndeSetTextSize('reset'); return false;" type="button">      
+	          &nbsp;<input value="-a" class="smallerfont" title="Shrink text" onclick="ndeSetTextSize('decr'); return false;" type="button">
+	          &nbsp;<input value="+a" class="biggerfont" title="Enlarge text" onclick="ndeSetTextSize('incr'); return false;" type="button">
+</div>
+<h1>History of Changes 0.94</h1>
+<div id="front-matter">
+<div id="minitoc-area">
+<ul class="minitoc">
+<li>
+<a href="#introduction">Introduction and explanation of symbols</a>
+</li>
+<li>
+<a href="#version_0.94">Version 0.94 (24th August 2007)</a>
+<ul class="minitoc">
+<li>
+<a href="#Changes+to+the+Code+Base">Changes to the Code Base</a>
+</li>
+<li>
+<a href="#Contributors+to+this+release">Contributors to this release</a>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<a href="changes_0.94.rss"><img alt="RSS" src="../images/rss.png"></a>
+</p>
+<a name="N1000D"></a><a name="introduction"></a>
+<h2 class="underlined_10">Introduction and explanation of symbols</h2>
+<div class="section">
+<p>Changes are sorted by "type" and then chronologically with the most recent at the top. These symbols denote the various action types:<img class="icon" alt="add" src="../images/add.jpg">=add, <img class="icon" alt="fix" src="../images/fix.jpg">=fix, <img class="icon" alt="remove" src="../images/remove.jpg">=remove, <img class="icon" alt="update" src="../images/update.jpg">=update</p>
+</div>
+<a name="N10023"></a><a name="version_0.94"></a>
+<h2 class="underlined_10">Version 0.94 (24th August 2007)</h2>
+<div class="section">
+<a name="N10027"></a><a name="Changes+to+the+Code+Base"></a>
+<h3 class="underlined_5">Changes to the Code Base</h3>
+<ul>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Support for keep-together.within-line="always".
+       Committed by MM.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Add support for conditional spaces in table-cells.
+       Committed by VH.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Support alignment-adjust for images.
+       Committed by AD. Thanks to Max Berger. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42785">42785</a>.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Partial application of the patch in Bugzilla 41044:
+          * addition of a generic PropertyCache to be used by all Property
+            types that can be safely canonicalized
+          * modified EnumProperty, StringProperty, NumberProperty, EnumNumber
+            and FixedLength to make use of the cache infrastructure
+       Committed by AD. Thanks to Richard Wheeldon. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41044">41044</a>.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Slight improvement of relative font-weight handling in the properties
+        package.
+       Committed by AD.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Add support for font auto-detection (easier font configuration).
+       Committed by JM. Thanks to Adrian Cumiskey. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41831">41831</a>.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Add support for exact positioning of internal PDF links.
+       Committed by JM. Thanks to Paul Vinkenoog. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42067">42067</a>.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Add support for the collapsing-border model in tables.
+       Committed by VH, JM. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=36934">36934</a>.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Add support for named destinations in PDF.
+       Committed by JB.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Add support for a two-pass production for PostScript output to minimize file size. This
+        adds images only once and adds only the fonts that are really used.
+       Committed by JM.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Support for GIF images in RTF output (RTF handler, only. Does not affect the RTF library.)
+       Committed by JM.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Support for soft masks (transparency) with ImageIO image adapter.
+       Committed by JM.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Added support for the soft hyphen (SHY) character.
+       Committed by MM.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Added support for line-height-shift-adjustment property.
+       Committed by MM.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Added support for the system property fop.home to
+        cli.Main.getJARList().
+       Committed by SP.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Added support for display-align for table-cell in RTF output.
+       Committed by JM. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=40930">40930</a>.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Added support for UAX#14 type line breaking. Support does not extend across nested fo:inline elements.
+       Committed by MM.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        AFP Renderer: Bugfix for 1 bit images where the width is not a multiple of 8.
+       Committed by JM.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fixed incomplete support for Unicode Word Joiner characters (U+2060 and U+FEFF).
+       Committed by MM.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fixed the rendering of zero-width spaces for certain fonts by not generating them into
+        the area tree.
+       Committed by JM. Thanks to Paul Vinkenoog. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42109">42109</a>.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fixed a problem with disappearing footnotes inside hyphenated inlines (and footnotes with hyphenated inline child).
+       Committed by LF.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fix PDF Genaration for non-ASCII compatible locales.
+       Committed by JM. Thanks to Martin K&ouml;gler. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41434">41434</a>.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fix several exceptions when break-before/after is set on the first/last row of a table.
+       Committed by VH.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fix extra page break when break-before is set on both a table and its first row.
+       Committed by VH.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Make keep-with-next and keep-with-previous work on fo:table.
+       Committed by VH.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fixed a problem with keep-with-next on table-rows. Once a keep-with-next was set
+        inside a table, the FO following the table would always be glued to the previous table.
+       Committed by JM.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fixed a problem with the auto-rotate-landscape setting in the PostScript renderer.
+        It didn't generate the right setpagedevice command.
+       Committed by JM.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fixed an IllegalArgumentException for absolutely positioned block-containers with a
+        border and no height/bpd set.
+       Committed by JM.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        If a line contained nothing but a linefeed, this didn't produce empty lines.
+        Replaced the auxiliary zero-width box with a glue the width of a line,
+        and shrinkable to zero-width.
+       Committed by AD. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41652">41652</a>.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Stricter FOP user configuration checking
+       Committed by VH. Thanks to Adrian Cumiskey. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=40120">40120</a>.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fix parsing 'url(...)' when the URL itself contains a bracketed part.
+       Committed by AD. Thanks to Erwin Tratar. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41572">41572</a>.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fix for NPE with PNG images for RTF output.
+       Committed by JM.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fix for properly parsing font-family names containing spaces.
+       Committed by AD.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fix incorrect behaviour of the BreakingAlgorithm when some inline content is wider than
+        the available ipd, causing a restart.
+       Committed by LF. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41019">41019</a>.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fix for PDF corruption when a TrueType font with spaces in its name is embedded and no 
+        XML font metrics file for that font is used.
+       Committed by JM.</li>
+<li>
+<img class="icon" alt="fix" src="../images/fix.jpg">
+        Fix for ClassCastException when fo:wrapper was used as direct child of fo:flow.
+        Note: "id" attributes are still not handled properly on fo:wrapper!
+       Committed by JM. Thanks to Adrian Cumiskey. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41426">41426</a>.</li>
+<li>
+<img class="icon" alt="update" src="../images/update.jpg">
+        Refactoring in the fo package:
+        -&gt; removal of the childNodes instance member in fop.fo.FObj
+        -&gt; addition of a firstChild instance member in fop.fo.FObj
+        -&gt; addition of a siblings instance member in fop.fo.FONode
+        -&gt; addition of a FONodeIterator interface in FONode + corresponding implementation in FObj
+        -&gt; changed implementations of FObj.addChildNode(), .removeChild() and .getChildNodes()
+       Committed by AD. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41656">41656</a>.</li>
+<li>
+<img class="icon" alt="update" src="../images/update.jpg">
+        Code cleanup and restructuring: 
+        Refactoring of PageSequenceLayoutManager and provide common FObj id property use
+       Committed by AD. Thanks to Adrian Cumiskey. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42089">42089</a>.</li>
+<li>
+<img class="icon" alt="update" src="../images/update.jpg">
+        Updated PDF/A-1b support according to ISO-19005-1:2005/Cor.1:2007.
+       Committed by JM.</li>
+<li>
+<img class="icon" alt="update" src="../images/update.jpg">
+        Use source resolution setting for bitmap images which don't provide their own
+        resolution.
+       Committed by JM. Thanks to Hussein Shafie. See Issue <a class="external" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42406">42406</a>.</li>
+</ul>
+<a name="N10134"></a><a name="Contributors+to+this+release"></a>
+<h3 class="underlined_5">Contributors to this release</h3>
+<p>We thank the following people for their contributions to this release.</p>
+<p>This is a list of all people who participated as committers:<br>Andreas Delmelle (AD), Jay Bryant (JB), Jeremias M&auml;rki (JM), Luca Furini (LF), Manuel Mall (MM), Simon Pepping (SP), Vincent Hennebert (VH),  (VH, JM).</p>
+<p>This is a list of other contributors:<br>Adrian Cumiskey, Erwin Tratar, Hussein Shafie, Martin K&ouml;gler, Max Berger, Paul Vinkenoog, Richard Wheeldon.</p>
+</div>
+</div>
+<!--+
+    |end content
+    +-->
+<div class="clearboth">&nbsp;</div>
+</div>
+<div id="footer">
+<!--+
+    |start bottomstrip
+    +-->
+<div class="lastmodified">
+<script type="text/javascript"><!--
+document.write("Last Published: " + document.lastModified);
+//  --></script>
+</div>
+<div class="copyright">
+        Copyright &copy;
+         1999-2008 <a href="http://www.apache.org/licenses/">The Apache Software Foundation.</a>
+</div>
+<!--+
+    |end bottomstrip
+    +-->
+</div>
+</body>
+</html>

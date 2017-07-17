@@ -1,0 +1,25 @@
+﻿store(&VERSION) '7.0'
+store(&NAME) 'Test I1513 - OO Compatibility'
+store(&COPYRIGHT) '© 2009 Tavultesoft'
+store(&MESSAGE) 'Test I1513, Ctrl+Alt+A compat'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ [K_A] > 'letter_A'
++ [Shift K_A] > 'shift_A'
++ [Ctrl K_A] > 'ctrl_A'
++ [Ctrl Alt K_A] > 'ctrl_alt_A'
++ [Alt K_A] > 'alt_A'
++ [Alt Shift K_A] > 'alt_shift_a'
++ [Ctrl Shift K_A] > 'ctrl_shift_a'
++ [Ctrl Shift Alt K_A] > 'ctrl_shift_alt_a'
+'letter_A' + [K_B] > context(1) context(2) 'BBB'
+'letter_A' + [Shift K_B] > context(1) context(2) 'SBBB'
+'letter_A' + [Ctrl K_B] > context(1) context(2) 'CBBB'
+'letter_A' + [Ctrl Shift K_B] > context(1) context(2) 'CSBBB'
+'letter_A' + [Ctrl Alt K_B] > context(1) context(2) 'CABBB'
+'letter_A' + [Alt K_B] > context(1) context(2) 'ABBB'
+'letter_A' + [Alt Shift K_B] > context(1) context(2) 'ASBBB'
+'letter_A' + [Alt Ctrl Shift K_B] > context(1) context(2) 'ACSBBB'

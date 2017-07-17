@@ -1,0 +1,3 @@
+S_BETA
+S_HintDialog_DontShowHintAgain
+SKTextEditorCaption

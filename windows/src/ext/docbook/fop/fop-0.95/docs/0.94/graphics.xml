@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><!-- $Id: graphics.xml 627324 2008-02-13 09:35:01Z maxberger $ --><!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V1.3//EN" "document-v13.dtd">
+<document>
+  <header>
+    <title>Apache FOP: Graphics Formats</title>
+    <version>$Revision: 627324 $</version>
+  </header>
+  <body>
+    <section id="support-overview">
+      <title>Overview of Graphics Support</title>
+      <p>
+        The table below summarizes the <em>theoretical</em> support for graphical formats within FOP. In other words, within the constraints of the limitations listed here, these formats <em>should</em> work. However, many of them have not been tested, and there may be limitations that have not yet been discovered or documented. The packages needed to support some formats are not included in the FOP distribution and must be installed separately. Follow the links in the "Support Thru" column for more details.
+      </p>
+      <table>
+        <tr>
+          <th colspan="1" rowspan="1">Format</th>
+          <th colspan="1" rowspan="1">Type</th>
+          <th colspan="1" rowspan="1"><link href="#native">FOP native support</link></th>
+          <th colspan="1" rowspan="1"><link href="#batik">Batik SVG</link></th>
+          <th colspan="1" rowspan="1"><link href="#batik-codecs">Batik codecs</link></th>
+          <th colspan="1" rowspan="1"><link href="#imageio">Image I/O</link></th>
+          <th colspan="1" rowspan="1"><link href="#jai">JAI</link></th>
+          <th colspan="1" rowspan="1"><link href="#jimi">JIMI</link></th>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1"><link href="#bmp">BMP</link> (Microsoft Windows Bitmap)</td>
+          <td colspan="1" rowspan="1">bitmap</td>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1"><link href="#eps">EPS</link> (Encapsulated PostScript)</td>
+          <td colspan="1" rowspan="1">metafile (both bitmap and vector), probably most frequently used for vector drawings</td>
+          <td colspan="1" rowspan="1">(X)</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1">GIF (Graphics Interchange Format)</td>
+          <td colspan="1" rowspan="1">bitmap</td>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1">X</td>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1"><link href="#jpeg">JPEG</link> (Joint Photographic Experts Group)</td>
+          <td colspan="1" rowspan="1">bitmap</td>
+          <td colspan="1" rowspan="1">(X)</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1"><link href="#png">PNG</link> (Portable Network Graphic)</td>
+          <td colspan="1" rowspan="1">bitmap</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1"><link href="#svg">SVG</link> (Scalable Vector Graphics)</td>
+          <td colspan="1" rowspan="1">vector (with embedded bitmaps)</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1"><link href="#tiff">TIFF</link> (Tag Image Format File)</td>
+          <td colspan="1" rowspan="1">bitmap</td>
+          <td colspan="1" rowspan="1">(X)</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1">X</td>
+          <td colspan="1" rowspan="1"/>
+          <!--td><a href="#native">FOP native</a> or <a href="#jai">JAI</a>, depending on the subformat. See <a href="#tiff">TIFF</a> for more details.(JIMI also supports TIFF, but this has not been implemented within FOP).</td-->
+        </tr>
+        <tr>
+          <td colspan="1" rowspan="1"><link href="#emf">EMF</link> (Windows Enhanced Metafile)</td>
+          <td colspan="1" rowspan="1">vector (with embedded bitmaps)</td>
+          <td colspan="1" rowspan="1">(X)</td>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+          <td colspan="1" rowspan="1"/>
+        </tr>
+      </table>
+      <note>"(X)" means restricted support. Please see the details below.</note>
+    </section>
+    <section id="packages">
+      <title>Graphics Packages</title>
+      <section id="native">
+        <title>FOP Native</title>
+        <p>
+          FOP has native ability to handle some graphic file formats.
+        </p>
+      </section>
+      <section id="batik-codecs">
+        <title>"Internal" codecs</title>
+        <p>
+          Apache XML Graphics Commons contains codecs for PNG and TIFF access. FOP can use these.
+        </p>
+      </section>
+      <section id="imageio">
+        <title>Image I/O (JDK 1.4 or higher)</title>
+        <p>
+          For JDKs 1.4 or higher, FOP provides a wrapper to load images through the 
+          <link class="fork" href="http://java.sun.com/j2se/1.4.2/docs/guide/imageio/index.html">JDK's Image I/O API</link> (JSR 015).
+          Image I/O allows to dynamically add additional image codecs. An example of such an add-on library are the
+          <link class="fork" href="http://java.sun.com/products/java-media/jai/">JAI Image I/O Tools</link> available from Sun.
+        </p>
+      </section>
+      <section id="jimi">
+        <title>JIMI</title>
+        <p>
+          Because of licensing issues, the JIMI image library is not included in the FOP distribution. First, <link class="fork" href="http://java.sun.com/products/jimi">download</link> and install it.
+Then, copy the file "JimiProClasses.zip" from the archive to {fop-install-dir}/lib/jimi-1.0.jar. Please note that FOP binary distributions are compiled with JIMI support, so there is no need for you to build FOP to add the support. If jimi-1.0.jar is installed in the right place, it will automatically be used by FOP, otherwise it will not.
+        </p>
+      </section>
+      <section id="jai">
+        <title>JAI (Java Advanced Imaging API)</title>
+        <p>
+          FOP has been compiled with JAI support, but JAI is not included in the FOP distribution.
+To use it, install <link href="http://java.sun.com/products/java-media/jai">JAI</link>, then copy the jai_core.jar and the jai_codec.jar files to {fop-install-dir}/lib.
+JAI is much faster than JIMI, but is not available for all platforms. See <link href="http://java.sun.com/products/java-media/jai/forDevelopers/jaifaq.html#platforms">What platforms are supported?</link> on the JAI FAQ page for more details.
+        </p>
+      </section>
+      <section id="batik">
+        <title>Apache Batik</title>
+        <p>Current FOP distributions include a distribution of the Apache <link class="fork" href="ext:batik">Batik</link> version 1.6.
+It is automatically installed with FOP.
+Because Batik's API changes frequently, it is highly recommended that you use the version that ships with FOP, at least when running FOP.</p>
+        <warning>Batik must be run in a graphical environment.</warning>
+        <p>Batik must be run in a graphical environment.
+It uses AWT classes for rendering SVG, which in turn require an X server on Unixish systems.
+If you run a server without X, or if you can't connect to the X server due to security restrictions or policies (a so-called "headless" environment), SVG rendering will fail.</p>
+        <p>Here are some workarounds:</p>
+        <ul>
+          <li>If you are using JDK 1.4, start it with the <code>-Djava.awt.headless=true</code> command line option.</li>
+          <li>Install an X server which provides an in-memory framebuffer without actually using a screen device or any display hardware. One example is Xvfb.</li>
+          <li>Install a toolkit which emulates AWT without the need for an underlying X server. One example is the <link href="http://www.eteks.com/pja/en">PJA toolkit</link>, which is free and comes with detailed installation instructions.</li>
+        </ul>
+      </section>
+    </section>
+    <section id="bmp">
+      <title>BMP</title>
+      <p>FOP native support for BMP images is limited to the RGB color-space.</p>
+    </section>
+    <section id="eps">
+      <title>EPS</title>
+      <p>FOP provides support for two output targets:</p>
+      <ul>
+        <li>PostScript (full support).</li>
+        <li>
+          PDF (partial support). Due to the lack of a built-in PostScript interpreter, FOP 
+          can only embed the EPS file into the PDF. Acrobat Reader will not currently display 
+          the EPS (it doesn't have a PostScript interpreter, either) but it will be shown 
+          correctly when you print the PDF on a PostScript-capable printer. PostScript devices 
+          (including GhostScript) will render the EPS correctly.
+        </li>
+      </ul>
+      <warning>
+        Please note that the EPS embedding feature has been <strong>deprecated</strong> in the
+        PDF specification version 1.4. You should not use this feature anymore, especially 
+        since newer PDF tools don't support embedded EPS files anymore.
+      </warning>
+      <p>
+        Other output targets can't be supported at the moment because
+        FOP lacks a PostScript interpreter. Furthermore, FOP is not able
+        to parse the preview bitmaps sometimes contained in EPS files.
+      </p>
+    </section>
+    <section id="jpeg">
+      <title>JPEG</title>
+      <p>
+        FOP native support of JPEG does not include all variants, especially those containing 
+        unusual color lookup tables and color profiles.
+        If you have trouble with a JPEG image in FOP, try opening it with an image processing 
+        program (such as Photoshop or Gimp) and then saving it. Specifying 24-bit color output 
+        may also help. For the PDF and PostScript renderers most JPEG images can be passed 
+        through without decompression. User reports indicate that grayscale, RGB, and 
+        CMYK color-spaces are all rendered properly.
+      </p>
+    </section>
+    <section id="png">
+      <title>PNG</title>
+      <p>
+        If using JAI for PNG support, only RGB and RGBA color-spaces are supported for 
+        FOP rendering.
+      </p>
+      <p>
+        Transparency is supported but not guaranteed to work with every output format.
+      </p>
+    </section>
+    <section id="svg">
+      <title>SVG</title>
+      <section id="svg-intro">
+        <title>Introduction</title>
+        <p>FOP uses <link href="#batik"> Apache Batik</link> for SVG support.
+This format can be handled as an <code>fo:instream-foreign-object</code> or in a separate
+file referenced with <code>fo:external-graphic</code>.</p>
+      <note>   
+Batik's SVG Rasterizer utility may also be used to convert standalone SVG
+documents into PDF.  For more information please see the
+<link href="http://xmlgraphics.apache.org/batik/svgrasterizer.html">SVG Rasterizer documentation</link>
+on the Batik site.
+      </note>
+      </section>
+      <section id="svg-pdf-graphics">
+        <title>Placing SVG Graphics into PDF</title>
+        <p>
+The SVG is rendered into PDF by using PDF commands to draw and fill
+lines and curves. This means that the graphical objects created with
+this remain as vector graphics. The same applies to PostScript output.
+For other output formats the SVG graphic will be converted to a bitmap
+image.
+        </p>
+        <p>
+There are a number of SVG things that cannot be converted directly into
+PDF. Parts of the graphic such as effects, patterns and images are inserted
+into the PDF as a raster graphic. The resolution of these raster images can
+          be controlled through the "target resolution" setting in the 
+          <link href="configuration.html">configuration</link>.</p>
+        <p>
+Currently transparency is limited in PDF so many svg images that
+contain effects or graphics with transparent areas may not be displayed
+correctly.
+        </p>
+      </section>
+      <section id="svg-pdf-text">
+        <title>Placing SVG Text into PDF and PostScript</title>
+        <p>If possible, Batik will use normal PDF or PostScript text when inserting text. It does
+this by checking if the text can be drawn normally and the font is
+supported. This example svg <link href="../dev/svg/text.svg">text.svg</link> /
+<!--link href="../dev/svg/text.pdf"-->text.pdf<!--/link-->
+shows how various types and effects with text are handled.
+Note that tspan and outlined text are not yet implemented.</p>
+        <p>
+Otherwise, text is converted and drawn as a set of shapes by Batik, using the stroking text painter.
+This means that a typical character will
+have about 10 curves (each curve consists of at least 20 characters).
+This can make the output files large and when it is viewed the
+viewer may not normally draw those fine curves very well (In Adobe Acrobat, turning on
+"Smooth Line Art" in the preferences will fix this).
+If the text is inserted into the output file using the inbuilt text commands
+it will use a single character.
+        </p>
+        <p>
+          Note that because SVG text can be rendered as either text or a vector graphic, you 
+          may need to consider settings in your viewer for both. The Acrobat viewer has both 
+          "smooth line art" and "smooth text" settings that may need to be set for SVG images 
+          to be displayed nicely on your screen (see Edit / Preferences / Display).
+          This setting will not affect the printing of your document, which should be OK in 
+          any case, but will only affect the quality of the screen display.</p>
+      </section>
+      <section id="svg-scaling">
+        <title>Scaling</title>
+        <p>
+          Currently, SVG images are rendered with the dimensions specified <em>in the SVG 
+          file</em>, within the viewport specified in the fo:external-graphic element.
+          For everything to work properly, the two should be equal. The SVG standard leaves 
+          this issue as an implementation detail. FOP will probably implement a scaling 
+          mechanism in the future. 
+        </p>
+        <p>
+          If you use pixels to specify the size of an SVG graphic the "source resolution" setting
+          in the <link href="configuration.html">configuration</link> will be used to determine the
+          size of a pixel. The use of pixels to specify sizes is discouraged as they may
+          be interpreted differently in different environments.
+        </p>
+      </section>
+      <section id="svg-problems">
+        <title>Known Problems</title>
+        <ul>
+          <li>
+Soft mask transparency is combined with white so that it looks better
+on pdf 1.3 viewers but this causes the soft mask to be slightly lighter
+or darker on pdf 1.4 viewers.
+          </li>
+          <li>
+There is some problem with a gradient inside a pattern causing a PDF
+error when viewed in acrobat 5.
+          </li>
+          <li>
+Text is not always handled correctly, it may select the wrong font
+especially if characters have multiple fonts in the font list.
+          </li>
+          <li>
+More PDF text handling could be implemented.
+It could draw the string using the attributed character iterator
+to handle tspans and other simple changes of text.
+          </li>
+          <li>
+JPEG images are not inserted directly into the pdf document.
+This area has not been implemented yet since the appropriate
+method in batik is static.
+          </li>
+          <li>
+Uniform transparency for images and other svg elements that are converted
+into a raster graphic are not drawn properly in PDF. The image is opaque.
+          </li>
+        </ul>
+      </section>
+    </section>
+    <section id="tiff">
+      <title>TIFF</title>
+      <p>
+        FOP-native TIFF support is limited to PDF and PostScript output only. Also, 
+        according to user reports, FOP's native support for TIFF is limited to images with the 
+        following characteristics (all must be true for successful rendering):
+      </p>
+      <ul>
+        <li>single channel images (i.e., bi-level and grayscale only)</li>
+        <li>uncompressed images, or images using CCITT T.4, CCITT T.6, or JPEG compression</li>
+        <li>images using white-is-zero encoding in the TIFF PhotometricInterpretation tag</li>
+      </ul>
+      <note>
+        Native support in this case means that the images can be embedded into the output format
+        without decoding it.
+      </note>
+      <p><em>JAI:</em> Supports RGB and RGBA only for FOP rendering.</p>
+    </section>
+    <section id="emf">
+      <title>EMF</title>
+      <p>Windows Enhanced Metafiles (EMF) are only supported in RTF output.</p>
+    </section>
+    <section id="resolution">
+      <title>Graphics Resolution</title>
+      <p>
+        Some bitmapped image file formats store a dots-per-inch (dpi) or other resolution 
+        values. FOP tries to use this resolution information whenever possible to determine
+        the image's intrinsic size. This size is used during the layout process when it is not
+        superceeded by an explicit size on fo:external-graphic (content-width and content-height 
+        properties).
+      </p>
+      <p>
+        Please note that not all images contain resolution information. If it's not available
+        72 dpi is assumed (the default resolution of PDF and PostScript).
+      </p>
+      <p>
+        Bitmap images are generally embedded into the output format at their original resolution
+        (as is). No resampling of the image is performed. Explicit resampling is on our wishlist, 
+        but hasn't been implemented, yet. Bitmaps included in SVG graphics may be resampled to 
+        the resolution specified in the "target resolution" setting in the 
+        <link href="configuration.html">configuration</link> if SVG filters are applied. This can be
+        used as a work-around to resample images in FO documents. 
+      </p>
+    </section>
+    <section id="caching">
+      <title>Image caching</title>
+      <p>
+        FOP caches images between runs. There is one cache per FopFactory instance. The URI is 
+        used as a key to identify images which means that when a particular URI appears again, 
+        the image is taken from the cache. If you have a servlet that generates a different 
+        image each time it is called with the same URL you need to use a constantly 
+        changing dummy parameter on the URL to avoid caching.
+      </p>
+      <p>
+        The image cache has been improved considerably in the redesigned code. Therefore, a 
+        resetCache() method like in earlier versions of FOP has become unnecessary. If you 
+        still experience OutOfMemoryErrors, please notify us.
+      </p>
+    </section>
+  </body>
+</document>

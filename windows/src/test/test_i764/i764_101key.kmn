@@ -1,0 +1,9 @@
+﻿store(&VERSION) '8.0'
+store(&NAME) 'i764 101Key Positional'
+store(&VISUALKEYBOARD) 'i764_101key.kvk'
+store(&BITMAP) 'i764_101key.ico'
+begin Unicode > use(main)
+
+
+group(main) using keys
++ [K_Q] > '101Key Positional'

@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN" "http://my.netscape.com/publish/formats/rss-0.91.dtd">
+<rss version="0.91"><channel><title>fop-project (0.95) Changes</title><link>http://xmlgraphics.apache.org/fop/</link><description>fop-project
+              (
+              0.95
+              ) Changes
+            </description><language>en-us</language>
+      
+      <item><title>fop-project Renderers fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed a color selection problem which occurred after an image has been painted
+        through the Graphics2DAdapter in PDF output.
+      </description></item>
+      <item><title>fop-project Renderers fix
+          (bug 41306)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 41306)
+        
+        :
+        
+        Fixed page ordering problem with AWTRenderer.
+      </description></item>
+      <item><title>fop-project Renderers fix
+          (bug 39980)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 39980)
+        
+        :
+        
+        Fixed image scaling for RTF output.
+      </description></item>
+      <item><title>fop-project API fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>API fix
+        by
+        JM
+        :
+        
+        Fixed the -imagein command-line option.
+      </description></item>
+      <item><title>fop-project Renderers add
+          (bug 43825)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers add
+        by
+        JM
+          (fixes bug 43825)
+        
+        :
+        
+        Added support for fo:leader for RTF output (no full support!). Fixes problems with empty leaders
+        being used to force empty lines among other issues.
+       Thanks to Maximilian Aster.</description></item>
+      <item><title>fop-project Renderers add
+          (bug 43824)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers add
+        by
+        JM
+          (fixes bug 43824)
+        
+        :
+        
+        Added support for page-number-citation for RTF output.
+       Thanks to Maximilian Aster.</description></item>
+      <item><title>fop-project Renderers fix
+          (bug 43606)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 43606)
+        
+        :
+        
+        Fixed handling of proportional-column-width() and percentages for table column in RTF
+        output.
+       Thanks to Maximilian Aster.</description></item>
+      <item><title>fop-project Layout fix
+          (bug 45295)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Layout fix
+        by
+        AD
+          (fixes bug 45295)
+        
+        :
+        
+        Fixed NullPointerException when page-number-citations are used inside a marker.
+      </description></item>
+      <item><title>fop-project Images fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Images fix
+        by
+        JM
+        :
+        
+        Fixed two bugs concerning resolution handling with SVG images and their
+        conversion to bitmaps for RTF output.
+      </description></item>
+      <item><title>fop-project Code fix
+          (bug 44887)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Code fix
+        by
+        JM
+          (fixes bug 44887)
+        
+        :
+        
+        Fixed potential multi-threading problem concerning the use of DecimalFormat.
+      </description></item>
+      <item><title>fop-project Layout fix
+          (bug 44412)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Layout fix
+        by
+        JM
+          (fixes bug 44412)
+        
+        :
+        
+        Regression bugfix: Multiple collapsible breaks don't cause empty pages anymore.
+      </description></item>
+      <item><title>fop-project Renderers fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed resolution handling inside AWT preview dialog.
+      </description></item>
+      <item><title>fop-project Renderers fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed positioning of absolutely positioned block-containers in multi-column documents.
+      </description></item>
+      <item><title>fop-project Renderers fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed rendering of fixed block-containers in AFP output.
+      </description></item>
+      <item><title>fop-project Layout fix
+          (bug 44621)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Layout fix
+        by
+        VH
+          (fixes bug 44621)
+        
+        :
+        
+        Various bugfixes for table layout.
+      </description></item>
+      <item><title>fop-project Renderers fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed regression causing bad positioning of block-containers if used as descendant
+        of a table-cell.
+      </description></item>
+      <item><title>fop-project Fonts fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Fonts fix
+        by
+        JM
+        :
+        
+        Fixed text extraction problem with ZapfDingbats and Symbol font in PDF output.
+      </description></item>
+      <item><title>fop-project Images fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Images fix
+        by
+        JM
+        :
+        
+        Fixed a performance problem concerning image serialization.
+      </description></item>
+      <item><title>fop-project Fonts fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Fonts fix
+        by
+        JM
+        :
+        
+        Fixed NullPointerException when loading a TrueType font using XML font metric files.
+      </description></item>
+    <item><title>fop-project Renderers fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed a color selection problem which occurred after an image has been painted
+        through the Graphics2DAdapter in PDF output.
+      </description></item><item><title>fop-project Renderers fix
+          (bug 41306)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 41306)
+        
+        :
+        
+        Fixed page ordering problem with AWTRenderer.
+      </description></item><item><title>fop-project Renderers fix
+          (bug 39980)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 39980)
+        
+        :
+        
+        Fixed image scaling for RTF output.
+      </description></item><item><title>fop-project API fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>API fix
+        by
+        JM
+        :
+        
+        Fixed the -imagein command-line option.
+      </description></item><item><title>fop-project Renderers add
+          (bug 43825)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers add
+        by
+        JM
+          (fixes bug 43825)
+        
+        :
+        
+        Added support for fo:leader for RTF output (no full support!). Fixes problems with empty leaders
+        being used to force empty lines among other issues.
+       Thanks to Maximilian Aster.</description></item><item><title>fop-project Renderers add
+          (bug 43824)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers add
+        by
+        JM
+          (fixes bug 43824)
+        
+        :
+        
+        Added support for page-number-citation for RTF output.
+       Thanks to Maximilian Aster.</description></item><item><title>fop-project Renderers fix
+          (bug 43606)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 43606)
+        
+        :
+        
+        Fixed handling of proportional-column-width() and percentages for table column in RTF
+        output.
+       Thanks to Maximilian Aster.</description></item><item><title>fop-project Layout fix
+          (bug 45295)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Layout fix
+        by
+        AD
+          (fixes bug 45295)
+        
+        :
+        
+        Fixed NullPointerException when page-number-citations are used inside a marker.
+      </description></item><item><title>fop-project Images fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Images fix
+        by
+        JM
+        :
+        
+        Fixed two bugs concerning resolution handling with SVG images and their
+        conversion to bitmaps for RTF output.
+      </description></item><item><title>fop-project Code fix
+          (bug 44887)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Code fix
+        by
+        JM
+          (fixes bug 44887)
+        
+        :
+        
+        Fixed potential multi-threading problem concerning the use of DecimalFormat.
+      </description></item><item><title>fop-project Layout fix
+          (bug 44412)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Layout fix
+        by
+        JM
+          (fixes bug 44412)
+        
+        :
+        
+        Regression bugfix: Multiple collapsible breaks don't cause empty pages anymore.
+      </description></item><item><title>fop-project Renderers fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed resolution handling inside AWT preview dialog.
+      </description></item><item><title>fop-project Renderers fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed positioning of absolutely positioned block-containers in multi-column documents.
+      </description></item><item><title>fop-project Renderers fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed rendering of fixed block-containers in AFP output.
+      </description></item><item><title>fop-project Layout fix
+          (bug 44621)
+        </title><link>http://xmlgraphics.apache.org/fop/</link><description>Layout fix
+        by
+        VH
+          (fixes bug 44621)
+        
+        :
+        
+        Various bugfixes for table layout.
+      </description></item><item><title>fop-project Renderers fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed regression causing bad positioning of block-containers if used as descendant
+        of a table-cell.
+      </description></item><item><title>fop-project Fonts fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Fonts fix
+        by
+        JM
+        :
+        
+        Fixed text extraction problem with ZapfDingbats and Symbol font in PDF output.
+      </description></item><item><title>fop-project Images fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Images fix
+        by
+        JM
+        :
+        
+        Fixed a performance problem concerning image serialization.
+      </description></item><item><title>fop-project Fonts fix</title><link>http://xmlgraphics.apache.org/fop/</link><description>Fonts fix
+        by
+        JM
+        :
+        
+        Fixed NullPointerException when loading a TrueType font using XML font metric files.
+      </description></item></channel></rss>

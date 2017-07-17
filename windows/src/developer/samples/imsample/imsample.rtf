@@ -1,0 +1,41 @@
+{\rtf1\ansi\ansicpg1252\uc1 \deff0\deflang1033\deflangfe1033{\fonttbl{\f0\froman\fcharset0\fprq2{\*\panose 02020603050405020304}Times New Roman;}{\f1\fswiss\fcharset0\fprq2{\*\panose 020b0604020202020204}Arial;}
+{\f16\froman\fcharset238\fprq2 Times New Roman CE;}{\f17\froman\fcharset204\fprq2 Times New Roman Cyr;}{\f19\froman\fcharset161\fprq2 Times New Roman Greek;}{\f20\froman\fcharset162\fprq2 Times New Roman Tur;}
+{\f21\froman\fcharset186\fprq2 Times New Roman Baltic;}{\f22\fswiss\fcharset238\fprq2 Arial CE;}{\f23\fswiss\fcharset204\fprq2 Arial Cyr;}{\f25\fswiss\fcharset161\fprq2 Arial Greek;}{\f26\fswiss\fcharset162\fprq2 Arial Tur;}
+{\f27\fswiss\fcharset186\fprq2 Arial Baltic;}}{\colortbl;\red0\green0\blue0;\red0\green0\blue255;\red0\green255\blue255;\red0\green255\blue0;\red255\green0\blue255;\red255\green0\blue0;\red255\green255\blue0;\red255\green255\blue255;\red0\green0\blue128;
+\red0\green128\blue128;\red0\green128\blue0;\red128\green0\blue128;\red128\green0\blue0;\red128\green128\blue0;\red128\green128\blue128;\red192\green192\blue192;}{\stylesheet{\widctlpar\adjustright \fs20\lang3081\cgrid \snext0 Normal;}{
+\s1\sb240\sa60\keepn\widctlpar\adjustright \b\f1\fs28\lang3081\kerning28\cgrid \sbasedon0 \snext0 heading 1;}{\*\cs10 \additive Default Paragraph Font;}}{\info{\title 4 June 2001}{\author Marc Durdin}{\operator Marc Durdin}
+{\creatim\yr2001\mo6\dy5\hr11\min48}{\revtim\yr2001\mo6\dy12\hr15\min57}{\version3}{\edmins1}{\nofpages1}{\nofwords277}{\nofchars1581}{\*\company Tavultesoft}{\nofcharsws0}{\vern89}}\paperw11906\paperh16838 
+\widowctrl\ftnbj\aenddoc\hyphcaps0\formshade\viewkind1\viewscale100\pgbrdrhead\pgbrdrfoot \fet0\sectd \linex0\headery709\footery709\colsx709\endnhere\sectdefaultcl {\*\pnseclvl1\pnucrm\pnstart1\pnindent720\pnhang{\pntxta .}}{\*\pnseclvl2
+\pnucltr\pnstart1\pnindent720\pnhang{\pntxta .}}{\*\pnseclvl3\pndec\pnstart1\pnindent720\pnhang{\pntxta .}}{\*\pnseclvl4\pnlcltr\pnstart1\pnindent720\pnhang{\pntxta )}}{\*\pnseclvl5\pndec\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}{\*\pnseclvl6
+\pnlcltr\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}{\*\pnseclvl7\pnlcrm\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}{\*\pnseclvl8\pnlcltr\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}{\*\pnseclvl9\pnlcrm\pnstart1\pnindent720\pnhang
+{\pntxtb (}{\pntxta )}}\pard\plain \s1\sb240\sa60\keepn\widctlpar\outlinelevel0\adjustright \b\f1\fs28\lang3081\kerning28\cgrid {4 June 2001
+\par IMSample Current Implementation
+\par }\pard\plain \widctlpar\adjustright \fs20\lang3081\cgrid {The current implementation of IMSample has three modes.  The sample definition file I included (imsample.txt) contains definitions for the letters "a", "e" and "o".
+\par 
+\par This example works only with Unicode and has not been tested on Windows 95/98.  The final solution will be tested.  It may work, but I haven't tried it.
+\par 
+\par 1. Direct input (menu appears in text, similar to Peter Hauer's FCI Chinese keyboard)
+\par 2. Menu displayed on vowels.  The window below is displayed when "a" is pressed.
+\par }{\lang1024     [Image deleted to save space]
+\par 3. Menu always visible, changes when keys pressed or menu clicked.  The initial state of the menu is:}{
+\par }{\lang1024     [Image deleted to save space]
+\par It then changes to the same as the previous window, when "a" is pressed, or the "a" in the window is clicked with the mouse.
+\par 
+\par The window can be dragged around with the title bar, and it will stay where it last was put.  This position is global to all applications.
+\par 
+\par We tried to use the caret (blinking cursor) position, but some apps (e.g. MS Word) create their own caret and don't use the Windows routines, so this wasn't reliable.
+\par 
+\par To change the configuration of the imsample.dll, run the program rconfig.exe.  This will later be integrated into the Keyman shell interface (specifically the Configuration dialog will 
+have a separate configure button that is activated when the appropriate keyboard is selected for configuration). }{
+\par 
+\par If you install this keyboard into Keyman, the imsample.dll and imsample.txt files should be copied into the directory of the keyboard.  In Win2K this will be
+\par }{\f1\fs16   \\documents and settings\\all users\\application data\\tavultesoft\\keyman\\keyboards\\imsample
+\par }{or
+\par }{\f1\fs16   \\documents and settings\\}{\b\i\f1\fs16 yourname}{\f1\fs16 \\local settings\\application data\\tavultesoft\\keyman\\keyboards\\imsample
+\par }{
+\par In Win95/98, it will be:
+\par }{\f1\fs16   \\program files\\tavultesoft\\keyman\\keyboards\\imsample
+\par }{
+\par With only a bit more work, this IME sample could be usable for just about any menu-type keyboard.
+\par 
+\par }}

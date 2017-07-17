@@ -1,0 +1,16 @@
+{
+  "options" : {
+    "device" : "any",
+    "keyboardBaseUri" : "http://your-host-here/keyboard-path/",
+    "fontBaseUri" : "http://your-host-here/font-path/"
+  },
+  "keyboard" : {
+    "id" : "i4278",
+    "name" : "I4278 - Test shift states in TIP",
+    "filename" : "i4278-1.0.js",
+    "version" : "1.0",
+    "lastModified" : "2014-07-01T20:10:20+00:00",
+    "languages" : [
+      ]
+  }
+}

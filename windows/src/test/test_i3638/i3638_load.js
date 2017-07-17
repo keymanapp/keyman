@@ -1,0 +1,1 @@
+KeymanWeb.KRS(new Stub_Keyboard_i3638()); function Stub_Keyboard_i3638() {this.KF="i3638.js";this.KI="Keyboard_i3638";this.KN="I3638 (ሑກअ)";}

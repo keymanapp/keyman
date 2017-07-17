@@ -1,0 +1,10 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I3437'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ 'a' > set(&layer = 'b')
++ 'b' > layer('a')
+if(&layer = 'a') + 'a' > 'zzzooom!'

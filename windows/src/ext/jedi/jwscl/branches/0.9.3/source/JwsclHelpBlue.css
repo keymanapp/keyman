@@ -1,0 +1,463 @@
+/* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+</snip>
+ * ***** END LICENSE BLOCK ***** */
+
+/* Ascanio Pressato pasdoc_v0.7.css compliant with CVS PasDoc 2005-06-26 */
+/* v0.2
+   Modded by Jürgen Faff (juergen.faff at googlemail dot com) 11.02.2008 for Jedi Windows Security Code Library Help */
+/* v0.3
+   Changes by Remko Weijnen 12.02.2008 for Jedi Windows Security Code Library Help */
+ 
+/* pasdoc.css
+   Styles used by PasDoc to generate HTML / Compiled HTML Documentation.*/  
+
+body {
+        font-family: Verdana,Arial;
+        color: black;
+        background-color: White;
+        font-size: 12px;
+}
+body.navigationframe {
+        font-family: Verdana,Arial;
+        font-size: 12px;
+        background-color: #fff;
+        color: Black;
+}
+img {
+        vertical-align: middle;
+        border: none;
+}
+
+pre.longcode {
+	border: 1px solid #C0C0C0;
+	margin-left: 20px;
+	margin-right: 20px;
+	padding: 5px 20px;
+	white-space: pre;
+	background-color: #F5F5F5;
+	font-family: Lucida Console,monospace;
+	color: #000000;
+}
+
+pre.longcode {
+  margin-bottom: -10pt;
+}
+
+pre.longcode EM{
+	white-space: pre;
+	color: #9933CC;
+	font-style: normal;
+}
+
+span.pascal_string {
+        color: #0000FF;
+        font-family: "Courier New", Courier, monospace;
+}
+span.pascal_keyword {
+		color: #000080;
+        font-weight: bold;
+        font-family: "Courier New", Courier, monospace;
+}
+span.pascal_comment {
+        color: #008000;
+        font-style: italic;
+        font-family: "Courier New", Courier, monospace;
+}
+span.pascal_compiler_comment {
+        color: #008000;
+        font-style: italic;
+        font-family: "Courier New", Courier, monospace;
+}
+span.pascal_hex {
+        color: #0000FF;
+        font-family: "Courier New", Courier, monospace;
+}
+span.pascal_numeric {
+        color: #0000FF;
+        font-family: "Courier New", Courier, monospace;
+}
+span.pascal_asm {
+        color: Green;
+        font-family: "Courier New", Courier, monospace;
+}
+span.pascal_float {
+        color: #0000FF;
+        font-family: "Courier New", Courier, monospace;
+}
+
+
+h2 {
+        background-color: #f5f5f5;
+        margin-top: 30px;
+        margin-bottom: 8px;
+        margin-left: 2px;
+        margin-right: 8px;
+        padding-left: 6px;
+        padding-right: 6px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+        color: Black;
+}
+h2.description{;}
+h2.uses{;}
+h2.overview{;}
+h2.authors{;}
+h2.modified{;}
+h2.unit{;}
+h2.declaration{;}
+h2.hierarchy{;}
+body.navigationframe h2 {
+        background-color: #006f9f;
+        margin-top: 30px;
+        margin-bottom: 8px;
+        padding-left: 6px;
+        padding-right: 6px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+        color: #fff;
+}
+h3 { 
+  font-weight:bold; 
+  color: #00008B ; 
+}
+a:link {
+        color: #0000FF;
+        text-decoration: none;
+}
+a:visited {
+        color: #790e11;
+        text-decoration: none;
+}
+a:hover {
+        text-decoration: underline;
+}
+a:active {
+        text-decoration: underline;
+}
+a.navigation:link {
+        color: #0000FF;
+        text-decoration: none;
+        font-size: 12px;
+}
+a.navigation:visited {
+        color: #0000FF;
+        text-decoration: none;
+        font-size: 12px;
+}
+a.navigation:hover {
+        color: #0000FF;
+        font-weight: bold;
+        text-decoration: none;
+        font-size: 12px;
+}
+a.navigation:active {
+        color: #0000FF;
+        text-decoration: none;
+        font-size: 12px;
+}
+a.bold:link {
+        color: #0000FF;
+        text-decoration: none;
+        font-weight: normal;
+}
+a.bold:visited {
+        color: #790e11;
+        text-decoration: none;
+        font-weight: normal;
+}
+a.bold:hover {
+        text-decoration: underline;
+        font-weight: normal;
+}
+a.bold:active {
+        text-decoration: underline;
+        font-weight: normal;
+}
+a.section {
+        color: #fff;
+        text-decoration: underline;
+        font-weight: bold;
+}
+a.section:hover {
+        color: #fff;
+        text-decoration: none;
+        font-weight: bold;
+}
+ul {
+        list-style-type: square;
+}
+ul.useslist a:link {
+        color: #0000FF;
+        text-decoration: none;
+        font-weight: normal;
+}
+ul.useslist a:visited {
+        color: #790e11;
+        text-decoration: none;
+        font-weight: normal;
+}
+ul.useslist a:hover {
+        text-decoration: underline;
+        font-weight: normal;
+}
+ul.useslist a:active {
+        text-decoration: underline;
+        font-weight: normal;
+}
+ul.hierarchy {
+        list-style-type: none;
+}
+ul.hierarchylevel {
+        list-style-type: none;
+}
+ul.authors{
+        font-style: italic;
+}
+li.ancestor{;}
+p.unitlink a:link {
+        color: #0000FF;
+        text-decoration: none;
+        font-weight: bold;
+}
+p.unitlink a:visited {
+        color: #790e11;
+        text-decoration: none;
+        font-weight: bold;
+}
+p.unitlink a:hover {
+        text-decoration: underline;
+        font-weight: bold;
+}
+p.unitlink a:active {
+        text-decoration: underline;
+        font-weight: bold;
+}
+p.hint_directive {
+        color: Red;
+}
+table {		
+        border-spacing: 2px;
+        padding: 4px;
+        width: 100%;
+}
+table.markerlegend {
+        width: 100%;
+}
+table.markerlegend td.legendmarker {
+        text-align: center;
+        width: 5%;
+}
+table.markerlegend td.legenddesc {
+        width: 95%;
+}
+table.sections {
+        background: White;
+}
+table.sections td {
+        background: #67a4d6;
+        text-align: center;
+}
+table.summary td.itemcode {
+        width: 100%;
+}
+table.detail td.itemcode {
+        width: 100%;
+}
+
+table.table_tag { 
+		border-collapse: collapse; 
+}
+table.table_tag td { 
+		background-color: EFEFF7
+}
+
+table.table_tag td { 
+		border: 1pt solid #EFEFF7; 
+		padding: 0.3em; 
+		
+}
+table.table_tag th { 
+		border: 1pt solid #EFEFF7; padding: 0.3em; 
+		/*color: White;*/
+		color:Black
+}
+
+tr.head { 
+		background-color: #67A4D6
+}
+
+
+
+tr.even { 
+		background-color: #F7F7FF
+}
+
+tr.odd { 
+		background-color: #FFFFFF
+		
+}
+
+		
+
+
+tr.list {
+        width: 100%;
+        background-color: #eeeeff;
+        border: 1px solid #b0b0b0;
+        margin: 2px;
+        padding: 4px;
+        line-height: 140%;
+}       
+tr.list2 {
+        width: 100%;
+        background-color: #C7C8F7;
+        border: 1px solid #b0b0b0;
+        margin: 2px;
+        padding: 2px;
+        line-height: 140%;
+}
+tr.listheader {
+        background: #006f9f;
+        color: White;
+}
+td {
+        padding: 4px;
+}
+td.itemname {
+        white-space: nowrap;
+        background-color: #C7C8F7;
+        color: #602020;
+}
+td.itemunit {
+        white-space: nowrap;
+}
+td.itemdesc {
+		background-color: #F4F4FB;
+        width: 100%;
+}
+div.nodescription {
+        color: Red;
+}
+dl.parameters {;}
+dt.parameters {
+        color: Blue;
+}
+dd.parameters {;}
+acronym.mispelling {
+        background-color: transparent;
+        border-bottom: thin dashed;
+        color: Red;
+        font-style: italic;
+        font-weight: normal;
+}
+/* :::: Insert a <kbd> </kbd> in the HTML to view the tag content as a Keyborad Key (like Mozilla Firefox Help) :::: */
+kbd {
+        font-family: "courier new", "courier", monospace;
+        text-align: center;
+        background: #faf6f6;
+        color: #000;
+        border-color: #edd #baa #baa #eed;
+        padding: 0px 1px 0px 1px;
+        border-width: 1px 2px 2px 1px;
+        border-style: solid;
+}
+
+/* :::: Tags used by PasDoc "Created with..." line :::: */
+em{
+        BORDER-RIGHT: #9fabbb 1px solid;
+        PADDING-RIGHT: 10px;
+        BORDER-TOP: #9fabbb 1px solid;
+        PADDING-LEFT: 10px;
+        FONT-WEIGHT: bold;
+        FONT-SIZE: 8pt;
+        MARGIN-BOTTOM: 5px;
+        PADDING-BOTTOM: 1px;
+        BORDER-LEFT: #9fabbb 1px solid;
+        PADDING-TOP: 1px;
+        BORDER-BOTTOM: #9fabbb 1px solid;
+        FONT-FAMILY: arial,verdana,sans-serif;
+        BACKGROUND-COLOR: #bed2fc;
+        width: 100%;
+}
+.appinfo{;}
+
+/* :::: Buttons & Edit :::: */
+input#search_submit_button {
+        background-color: #f5f5f5;
+        color: rgb(0, 0, 0);
+        background-image: none;
+        background-repeat: repeat;
+        background-attachment: scroll;
+        -x-background-x-position: 0%;
+        -x-background-y-position: 0%;
+        -moz-background-clip: initial;
+        -moz-background-origin: initial;
+        -moz-background-inline-policy: initial;
+        border-top-width: 1px;
+        border-right-width: 1px;
+        border-bottom-width: 1px;
+        border-left-width: 1px;
+        border-top-style: solid;
+        border-right-style: solid;
+        border-bottom-style: solid;
+        border-left-style: solid;
+        border-top-color: rgb(34, 102, 170);
+        border-right-color: rgb(34, 102, 170);
+        border-bottom-color: rgb(34, 102, 170);
+        border-left-color: rgb(34, 102, 170);
+        font-family: arial,helvetica,sans-serif;
+        font-style: normal;
+        font-variant: normal;
+        font-weight: normal;
+        font-size: 1em;
+        line-height: normal;
+        font-size-adjust: none;
+        font-stretch: normal;
+/*      cursor: hand; */
+}
+input#search_text
+{
+        color: rgb(0, 0, 0);
+        background-color: rgb(233, 233, 255);
+        background-image: none;
+        background-repeat: repeat;
+        background-attachment: scroll;
+        -x-background-x-position: 0%;
+        -x-background-y-position: 0%;
+        -moz-background-clip: initial;
+        -moz-background-origin: initial;
+        -moz-background-inline-policy: initial;
+        border-top-width: 1px;
+        border-right-width: 1px;
+        border-bottom-width: 1px;
+        border-left-width: 1px;
+        border-top-style: solid;
+        border-right-style: solid;
+        border-bottom-style: solid;
+        border-left-style: solid;
+        border-top-color: rgb(34, 102, 170);
+        border-right-color: rgb(34, 102, 170);
+        border-bottom-color: rgb(34, 102, 170);
+        border-left-color: rgb(34, 102, 170);
+        font-family: arial,helvetica,sans-serif;
+        font-style: normal;
+        font-variant: normal;
+        font-weight: normal;
+        font-size: 1em;
+        line-height: normal;
+        font-size-adjust: none;
+        font-stretch: normal;
+}
+input#search_text:focus   
+{
+    background-color: rgb(255, 255, 255);
+    background-image: none;
+    background-repeat: repeat;
+    background-attachment: scroll;
+    -x-background-x-position: 0%;
+    -x-background-y-position: 0%;
+    -moz-background-clip: initial;
+    -moz-background-origin: initial;
+    -moz-background-inline-policy: initial;
+}
