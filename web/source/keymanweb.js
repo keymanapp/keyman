@@ -2240,6 +2240,46 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         }
       }
     }
+
+    /**
+     * Function    DisableControl
+     * Scope       Private   
+     * Parameters  Pelem   Element to be disabled
+     * Returns     None
+     * Description Legacy:  Disable KMW control element 
+     */    
+    keymanweb.DisableControl = function(Pelem)
+    {
+      if(!Pelem._kmwAttachment || !Pelem._kmwAttachment.legacy) {
+        var Lc = {LControl:Pelem, LEnabled:0, LDefaultInternalName:'-'};
+        keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+        if(Pelem._kmwAttachment) {
+          Pelem._kmwAttachment.legacy = Lc;
+        }
+      } else {
+        Pelem._kmwAttachment.legacy.LEnabled = 0;
+      }
+    }
+
+    /**
+     * Function    EnableControl
+     * Scope       Private   
+     * Parameters  Pelem   Element to be enabled
+     * Returns     None
+     * Description Legacy:  Enable KMW control element 
+     */    
+    keymanweb.EnableControl = function(Pelem)
+    {
+      if(!Pelem._kmwAttachment || !Pelem._kmwAttachment.legacy) {
+        var Lc = {LControl:Pelem, LEnabled:1, LDefaultInternalName:'-'};
+        keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+        if(Pelem._kmwAttachment) {
+          Pelem._kmwAttachment.legacy = Lc;
+        }
+      } else {
+        Pelem._kmwAttachment.legacy.LEnabled = 1;
+      }
+    }
     
     /**
      * Function     setKeyboardForControl
