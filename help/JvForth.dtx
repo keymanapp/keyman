@@ -1,0 +1,742 @@
+##Package: Jans
+##Status: Generated
+----------------------------------------------------------------------------------------------------
+@@JvForth.pas
+Summary
+    Contains the TJvForth component.
+Author
+  Jan Verhoeven
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoLeft
+Description for dfoLeft
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoRight
+Description for dfoRight
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoShellExecute
+Description for dfoShellExecute
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoSqrt
+Description for dfoSqrt
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoArcTan
+Description for dfoArcTan
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoArcTan2
+Description for dfoArcTan2
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoNegate
+Description for dfoNegate
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoSqr
+Description for dfoSqr
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoTan
+Description for dfoTan
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoArcSin
+Description for dfoArcSin
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoArcCos
+Description for dfoArcCos
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoCrLf
+Description for dfoCrLf
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoSin
+Description for dfoSin
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoCos
+Description for dfoCos
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoPi
+Description for dfoPi
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoAbs
+Description for dfoAbs
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoMultiply
+Description for dfoMultiply
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoDivide
+Description for dfoDivide
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoPower
+Description for dfoPower
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoSubtract
+Description for dfoSubtract
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoAdd
+Description for dfoAdd
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoIn
+Description for dfoIn
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoOr
+Description for dfoOr
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoXor
+Description for dfoXor
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoAnd
+Description for dfoAnd
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoNot
+Description for dfoNot
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoUnlike
+Description for dfoUnlike
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoLike
+Description for dfoLike
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoLe
+Description for dfoLe
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoGe
+Description for dfoGe
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoLt
+Description for dfoLt
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoGt
+Description for dfoGt
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoNe
+Description for dfoNe
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoEq
+Description for dfoEq
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoDate
+Description for dfoDate
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoBoolean
+Description for dfoBoolean
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoString
+Description for dfoString
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoSet
+Description for dfoSet
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoFloat
+Description for dfoFloat
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoInteger
+Description for dfoInteger
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoExtVar
+Description for dfoExtVar
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoIntVar
+Description for dfoIntVar
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoSystem
+Description for dfoSystem
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoXML
+Description for dfoXML
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoDSOBase
+Description for dfoDSOBase
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoSelDir
+Description for dfoSelDir
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoDSO
+Description for dfoDSO
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoCstr
+Description for dfoCstr
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoSwap
+Description for dfoSwap
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoDrop
+Description for dfoDrop
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoDup
+Description for dfoDup
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoCall
+Description for dfoCall
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoEndSub
+Description for dfoEndSub
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoSub
+Description for dfoSub
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoUntil
+Description for dfoUntil
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoRepeat
+Description for dfoRepeat
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoEndIf
+Description for dfoEndIf
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoElse
+Description for dfoElse
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoIf
+Description for dfoIf
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoNop
+Description for dfoNop
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoError
+Description for dfoError
+
+----------------------------------------------------------------------------------------------------
+@@TToken
+<TITLE TToken type>
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TProcVar
+<TITLE TProcVar type> <COMBINE TAtom.Proc>
+
+----------------------------------------------------------------------------------------------------
+@@TOnSetVariable
+<TITLE TOnSetVariable type> <COMBINE TJvForthScript.OnSetVariable>
+
+----------------------------------------------------------------------------------------------------
+@@TOnSetSystem
+<TITLE TOnSetSystem type> <COMBINE TJvForthScript.OnSetSystem>
+
+----------------------------------------------------------------------------------------------------
+@@TOnInclude
+<TITLE TOnInclude type> <COMBINE TJvForthScript.OnInclude>
+
+----------------------------------------------------------------------------------------------------
+@@TOnGetVariable
+<TITLE TOnGetVariable type> <COMBINE TJvForthScript.OnGetVariable>
+
+----------------------------------------------------------------------------------------------------
+@@TOnGetSystem
+<TITLE TOnGetSystem type> <COMBINE TJvForthScript.OnGetSystem>
+
+----------------------------------------------------------------------------------------------------
+@@TJvJanXMLList.Xml
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  AName - Description for this parameter
+Return value
+  Describe here what the function returns
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvJanXMLList.ClearXMLS
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvJanXMLList
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+
+----------------------------------------------------------------------------------------------------
+@@TJvJanDSOList.Table
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  AName - Description for this parameter
+Return value
+  Describe here what the function returns
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvJanDSOList.ClearTables
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvJanDSOList
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+
+----------------------------------------------------------------------------------------------------
+@@TJvJanDSO.SetValue
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  AKey   - Description for this parameter
+  AField - Description for this parameter
+  AValue - Description for this parameter
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvJanDSO.GetValue
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  AKey   - Description for this parameter
+  AField - Description for this parameter
+Return value
+  Describe here what the function returns
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvJanDSO
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+
+----------------------------------------------------------------------------------------------------
+@@TJvForthScript.ScriptTimeOut
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvForthScript.Script
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvForthScript.PushValue
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  AValue - Description for this parameter
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvForthScript.PopValue
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Return value
+  Describe here what the function returns
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvForthScript.OnSetVariable
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Sender   - Description for this parameter
+  Symbol   - Description for this parameter
+  Value    - Description for this parameter
+  Handled  - Description for this parameter
+  ErrorStr - Description for this parameter
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvForthScript.OnSetSystem
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Sender   - Description for this parameter
+  Symbol   - Description for this parameter
+  Value    - Description for this parameter
+  Handled  - Description for this parameter
+  ErrorStr - Description for this parameter
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvForthScript.OnInclude
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Sender      - Description for this parameter
+  IncludeFile - Description for this parameter
+  Value       - Description for this parameter
+  Handled     - Description for this parameter
+  ErrorStr    - Description for this parameter
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvForthScript.OnGetVariable
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Sender   - Description for this parameter
+  Symbol   - Description for this parameter
+  Value    - Description for this parameter
+  Handled  - Description for this parameter
+  ErrorStr - Description for this parameter
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvForthScript.OnGetSystem
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Sender   - Description for this parameter
+  Symbol   - Description for this parameter
+  Prompt   - Description for this parameter
+  Value    - Description for this parameter
+  Handled  - Description for this parameter
+  ErrorStr - Description for this parameter
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvForthScript.Execute
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Return value
+  Describe here what the function returns
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvForthScript.CanPushValue
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Return value
+  Describe here what the function returns
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvForthScript.CanPopValue
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Return value
+  Describe here what the function returns
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TJvForthScript
+<TITLEIMG TJvForthScript>
+#JVCLInfo
+<GROUP JVCL.??>
+<FLAG Component>
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+
+----------------------------------------------------------------------------------------------------
+@@TAtomList
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+
+----------------------------------------------------------------------------------------------------
+@@TAtomList.ClearObjects
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TAtom.Value
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TAtom.Token
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TAtom.Symbol
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TAtom.Proc
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TAtom.IsOperand
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TAtom
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+
+----------------------------------------------------------------------------------------------------
+@@Launch
+<TITLE Launch procedure>
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  AFile - Description for this parameter
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@EJvJanScriptError
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoNow
+Description for dfoNow
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoTime
+Description for dfoTime
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoDateStr
+Description for dfoDateStr
+
+----------------------------------------------------------------------------------------------------
+@@TToken.dfoTimeStr
+Description for dfoTimeStr
+
+----------------------------------------------------------------------------------------------------
+@@TVariantList
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+
+----------------------------------------------------------------------------------------------------
+@@TVariantList.ClearObjects
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TVariantList.GetObject
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Symbol - Description for this parameter
+Return value
+  Describe here what the function returns
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TVariantList.GetVariable
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Symbol - Description for this parameter
+Return value
+  Describe here what the function returns
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TVariantList.SetVariable
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+Parameters
+  Symbol - Description for this parameter
+  AValue - Description for this parameter
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
+----------------------------------------------------------------------------------------------------
+@@TVariantObject
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+
+----------------------------------------------------------------------------------------------------
+@@TVariantObject.Value
+Summary
+  Write here a summary (1 line)
+Description
+  Write here a description
+See Also
+  List here other properties, methods (comma seperated)
+  Remove the 'See Also' section if there are no references
+
