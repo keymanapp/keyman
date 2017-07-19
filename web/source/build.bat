@@ -20,7 +20,8 @@ if "%CLOSURECOMPILERPATH%"=="" set CLOSURECOMPILERPATH=..\tools
 if "%JAVA%"=="" set JAVA=java
 
 set compiler=%CLOSURECOMPILERPATH%\compiler.jar
-set compilecmd="%JAVA%" -jar "%compiler%"
+set compiler_warnings=--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables
+set compilecmd="%JAVA%" -jar "%compiler%" %compiler_warnings%
 
 if not exist %compiler% (
   echo File %compiler% does not exist: have you set the environment variable CLOSURECOMPILERPATH?

@@ -54,7 +54,8 @@ readonly BUILD
 : ${JAVA:=java}
 
 compiler=$CLOSURECOMPILERPATH/compiler.jar
-compilecmd="$JAVA -jar $compiler"
+compiler_warnings=--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables
+compilecmd="$JAVA -jar $compiler $compiler_warnings"
 
 if ! [ -f $compiler ];
 then
