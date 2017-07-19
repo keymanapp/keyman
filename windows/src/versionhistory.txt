@@ -1,3 +1,6 @@
+/10.0 19 July 2017
+*This file is deprecated. Pushing for CI purposes.
+
 /6.0.160.0 18 August 2003
 *F Keyman: When taskbar icon cannot be created, message window now waits for confirmation before retry.
 *F Keyman: Further uninstallation bug allowing some files to be left undeleted has been corrected.
