@@ -41,7 +41,7 @@
 /windows/src/**/*.dll
 /windows/src/**/*.exp
 /windows/src/**/*.lib
-/windows/src/**/*.res
+/windows/src/**/version.res
 /windows/src/**/*.pch
 /windows/src/**/*.wixobj
 /windows/src/**/*.sbr
@@ -152,18 +152,6 @@
 
 # /engine/tsysinfox64/
 /windows/src/engine/tsysinfox64/x64
-
-# /ext/
-/windows/src/ext/__HopefullyObsolete
-/windows/src/ext/__Obsolete
-/windows/src/ext/__OldVersions
-/windows/src/ext/__Other
-
-# /ext/sptbxlib/Source/
-/windows/src/ext/sptbxlib/Source/*.dcu
-
-# /ext/tb2k/Source/
-/windows/src/ext/tb2k/Source/*.dcu
 
 # /online/database_unicode_conversion/
 
