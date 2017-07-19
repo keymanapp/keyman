@@ -3,7 +3,7 @@
    Copyright 2017 SIL International
 ***/
 
-this is a failed commit....
+this is a failed commit.....
  
 /**  
  * Base code: Declare tavultesoft, major component namespaces and instances, utility functions 
