@@ -12,11 +12,17 @@ build: version.res manifest.res icons dirs xml
     $(COPY) tike.exe $(PROGRAM)\developer
     if exist tike.dbg $(COPY) tike.dbg $(DEBUGPATH)\developer
 
-xml:
+xml: pull-keymanweb 
     cd $(ROOT)\src\developer\tike\xml
     -del /q $(ROOT)\bin\developer\xml\*
     xcopy /s /y * $(ROOT)\bin\developer\xml
     cd $(ROOT)\src\developer\tike
+
+pull-keymanweb:
+    -rd /s/q $(ROOT)\src\developer\tike\xml\kmw\resource
+    mkdir $(ROOT)\src\developer\tike\xml\kmw\resource
+    xcopy /y $(ROOT)\..\web\source\*.js $(ROOT)\src\developer\tike\xml\kmw\resource\ #
+    xcopy /s /y $(ROOT)\..\web\source\resources\* $(ROOT)\src\developer\tike\xml\kmw\resource\ #
 
 icons:
     rc icons.rc
