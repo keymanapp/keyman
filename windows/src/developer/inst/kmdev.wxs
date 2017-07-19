@@ -157,7 +157,6 @@
                       <Component><File Id='xml_kmw_resource_kmwinit.js' Name='kmwinit.js' KeyPath="yes" /></Component>
                       <Component><File Id='xml_kmw_resource_kmwkeymaps.js' Name='kmwkeymaps.js' KeyPath="yes" /></Component>
                       <Component><File Id='xml_kmw_resource_kmwlayout.js' Name='kmwlayout.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwlegacy.js' Name='kmwlegacy.js' KeyPath="yes" /></Component>
                       <Component><File Id='xml_kmw_resource_kmwnative.js' Name='kmwnative.js' KeyPath="yes" /></Component>
                       <Component><File Id='xml_kmw_resource_kmwosk.js' Name='kmwosk.js' KeyPath="yes" /></Component>
                       <Component><File Id='xml_kmw_resource_kmwreleasestub.js' Name='kmwreleasestub.js' KeyPath="yes" /></Component>
@@ -167,7 +166,7 @@
                       <Component><File Id='xml_kmw_resource_kmwuitoggle.js' Name='kmwuitoggle.js' KeyPath="yes" /></Component>
                       <Component><File Id='xml_kmw_resource_kmwuitoolbar.js' Name='kmwuitoolbar.js' KeyPath="yes" /></Component>
                       <Component><File Id='xml_kmw_resource_license' Name='LICENSE' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_readme' Name='README' KeyPath="yes" /></Component>
+                      <Component><File Id='xml_kmw_resource_readme_md' Name='README.md' KeyPath="yes" /></Component>
                     
                     <Directory Id='xmlkmwresourceosk' Name='osk' FileSource='..\..\developer\tike\xml\kmw\resource\osk\' DiskId='1'>
                         <Component><File Id='xml_kmw_resource_osk_ajax_loader.gif'             Name='ajax-loader.gif'               KeyPath="yes" /></Component>
@@ -411,7 +410,6 @@
       <ComponentRef Id='xml_kmw_resource_kmwinit.js'/>
       <ComponentRef Id='xml_kmw_resource_kmwkeymaps.js'/>
       <ComponentRef Id='xml_kmw_resource_kmwlayout.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwlegacy.js'/>
       <ComponentRef Id='xml_kmw_resource_kmwnative.js'/>
       <ComponentRef Id='xml_kmw_resource_kmwosk.js'/>
       <ComponentRef Id='xml_kmw_resource_kmwreleasestub.js'/>
@@ -421,7 +419,7 @@
       <ComponentRef Id='xml_kmw_resource_kmwuitoggle.js'/>
       <ComponentRef Id='xml_kmw_resource_kmwuitoolbar.js'/>
       <ComponentRef Id='xml_kmw_resource_license'/>
-      <ComponentRef Id='xml_kmw_resource_readme'/>
+      <ComponentRef Id='xml_kmw_resource_readme_md'/>
 
       <ComponentRef Id='xml_kmw_resource_osk_ajax_loader.gif'            />
       <ComponentRef Id='xml_kmw_resource_osk_keymanweb_osk.eot'          />

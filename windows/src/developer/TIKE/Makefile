@@ -22,6 +22,8 @@ pull-keymanweb:
     -rd /s/q $(ROOT)\src\developer\tike\xml\kmw\resource
     mkdir $(ROOT)\src\developer\tike\xml\kmw\resource
     xcopy /y $(ROOT)\..\web\source\*.js $(ROOT)\src\developer\tike\xml\kmw\resource\ #
+    xcopy /y $(ROOT)\..\web\LICENSE $(ROOT)\src\developer\tike\xml\kmw\resource\ #
+    xcopy /y $(ROOT)\..\web\README.md $(ROOT)\src\developer\tike\xml\kmw\resource\ #
     xcopy /s /y $(ROOT)\..\web\source\resources\* $(ROOT)\src\developer\tike\xml\kmw\resource\ #
 
 icons:
