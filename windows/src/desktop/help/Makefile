@@ -40,6 +40,7 @@ clean:
 	-del keymandesktop.hhp
 	-del keymandesktop.log
 	-del toc.hhc
+  -del help.suo
 
 #-------------------------------------------------------
 # CHM build
