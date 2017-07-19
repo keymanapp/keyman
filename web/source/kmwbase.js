@@ -3,7 +3,6 @@
    Copyright 2017 SIL International
 ***/
 
- 
 /**  
  * Base code: Declare tavultesoft, major component namespaces and instances, utility functions 
  */  
