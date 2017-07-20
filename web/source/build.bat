@@ -107,7 +107,7 @@ rem Compile KeymanWeb code modules for native keymanweb use, stubbing out and re
 echo Compile Keymanweb    
 
 del %WEB_OUTPUT%\kmwtemp.js 2>nul
-%compilecmd% --define __BUILD__=%BUILD% --externs %SOURCE%\kmwreleasestub.js --js %SOURCE%\kmwbase.js --js %SOURCE%\keymanweb.js --js %SOURCE%\kmwosk.js --js %SOURCE%\kmwnative.js --js %SOURCE%\kmwcallback.js --js %SOURCE%\kmwkeymaps.js --js %SOURCE%\kmwlayout.js --js %SOURCE%\kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file %WEB_OUTPUT%\kmwtemp.js --warning_level VERBOSE
+%compilecmd% --define tavultesoft.__BUILD__=%BUILD% --externs %SOURCE%\kmwreleasestub.js --js %SOURCE%\kmwbase.js --js %SOURCE%\keymanweb.js --js %SOURCE%\kmwosk.js --js %SOURCE%\kmwnative.js --js %SOURCE%\kmwcallback.js --js %SOURCE%\kmwkeymaps.js --js %SOURCE%\kmwlayout.js --js %SOURCE%\kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file %WEB_OUTPUT%\kmwtemp.js --warning_level VERBOSE
 if not exist %WEB_OUTPUT%\kmwtemp.js goto fail
 
 echo Append SMP string extensions to Keymanweb

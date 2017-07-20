@@ -189,7 +189,7 @@ if [ $BUILD_COREWEB = true ]; then
     # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
     echo Compile Keymanweb    
     rm $WEB_OUTPUT/kmwtemp.js 2>/dev/null
-    $compilecmd --define __BUILD__=$BUILD --externs $SOURCE/kmwreleasestub.js --js $SOURCE/kmwbase.js --js $SOURCE/keymanweb.js --js $SOURCE/kmwosk.js --js $SOURCE/kmwnative.js --js $SOURCE/kmwcallback.js --js $SOURCE/kmwkeymaps.js --js $SOURCE/kmwlayout.js --js $SOURCE/kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file $WEB_OUTPUT/kmwtemp.js --warning_level VERBOSE
+    $compilecmd --define tavultesoft.__BUILD__=$BUILD --externs $SOURCE/kmwreleasestub.js --js $SOURCE/kmwbase.js --js $SOURCE/keymanweb.js --js $SOURCE/kmwosk.js --js $SOURCE/kmwnative.js --js $SOURCE/kmwcallback.js --js $SOURCE/kmwkeymaps.js --js $SOURCE/kmwlayout.js --js $SOURCE/kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file $WEB_OUTPUT/kmwtemp.js --warning_level VERBOSE
     assert $WEB_OUTPUT/kmwtemp.js
 
     echo Append SMP string extensions to Keymanweb
