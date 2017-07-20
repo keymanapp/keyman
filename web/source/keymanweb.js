@@ -2285,18 +2285,18 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Function     setKeyboardForControl
      * Scope        Public   
      * @param       {Element}    Pelem    Control element 
-     * @param       {string=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)  
+     * @param       {string|null=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)  
      * @param       {string|null=}     Plc      Language Code
      * Description  Set default keyboard for the control 
      */    
     keymanweb['setKeyboardForControl'] = keymanweb.setKeyboardForControl = function(Pelem, Pkbd, Plc) {
-      /* pass null for kbd to specify no default, or '' to specify English */
-      var index = Pkbd.indexOf("Keyboard_");
-      if(index < 0 && Pkbd != '') {
-        Pkbd = "Keyboard_" + Pkbd;
-      }
-
-      if(Pkbd == null) {
+      /* pass null for kbd to specify no default, or '' to specify the default system keyboard. */
+      if(Pkbd !== null && Pkbd !== undefined) {
+        var index = Pkbd.indexOf("Keyboard_");
+        if(index < 0 && Pkbd != '') {
+          Pkbd = "Keyboard_" + Pkbd;
+        }
+      } else {
         Plc = null;
       }
 
@@ -2323,9 +2323,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             
           if(Pkbd != null && Plc != null) { // Second part necessary for Closure.
             keymanweb.setActiveKeyboard(Pkbd, Plc);
-          } else {
-            keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
-          }
+          } 
         }
       }
     }
