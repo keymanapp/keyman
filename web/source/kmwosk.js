@@ -2489,7 +2489,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var layout;
 
       // Build a layout using the default for the device
-      var layoutType=formFactor,dfltLayout=window['dfltLayout'];
+      var layoutType=formFactor,dfltLayout=keymanweb['dfltLayout'];
       if(typeof dfltLayout[layoutType] != 'object') layoutType = 'desktop';
 
       // Clone the default layout object for this device
@@ -2934,7 +2934,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */
     osk.showBuild = function()
     {
-      util.alert('KeymanWeb Build '+keymanweb['build']+'<br /><br />'
+      util.alert('KeymanWeb Version '+keymanweb['version']+'.'+keymanweb['build']+'<br /><br />'
         +'<span style="font-size:0.8em">Copyright &copy; 2017 SIL International</span>');
     }
 

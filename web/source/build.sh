@@ -144,7 +144,7 @@ if [ $BUILD_EMBED = true ]; then
     assert $EMBED_OUTPUT/kmw-smpstring.js
 
     rm kmwtemp.js 2>/dev/null
-    $compilecmd --define __BUILD__=$BUILD --externs $SOURCE/kmwreleasestub.js --js $SOURCE/kmwbase.js --js $SOURCE/keymanweb.js --js $SOURCE/kmwosk.js --js $SOURCE/kmwembedded.js --js $SOURCE/kmwcallback.js --js $SOURCE/kmwkeymaps.js --js $SOURCE/kmwlayout.js --js $SOURCE/kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file kmwtemp.js --warning_level VERBOSE
+    $compilecmd --define tavultesoft.__BUILD__=$BUILD --externs $SOURCE/kmwreleasestub.js --js $SOURCE/kmwbase.js --js $SOURCE/keymanweb.js --js $SOURCE/kmwosk.js --js $SOURCE/kmwembedded.js --js $SOURCE/kmwcallback.js --js $SOURCE/kmwkeymaps.js --js $SOURCE/kmwlayout.js --js $SOURCE/kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file kmwtemp.js --warning_level VERBOSE
     assert kmwtemp.js 
 
     echo Append SMP extensions
