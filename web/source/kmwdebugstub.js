@@ -1,5 +1,5 @@
 /***
-   KeymanWeb 2.0
+   KeymanWeb 10.0
    Copyright 2017 SIL International
 ***/
 /**
