@@ -1122,7 +1122,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       /**
        * Function     setupNonKMWTouchElement
        * Scope        Private
-       * @param       {Object}    x  A child element of document.
+       * @param       {Element}    x  A child element of document.
        * Description  Performs handling for the specified disabled input element on touch-based systems.
        */
       keymanweb.setupNonKMWTouchElement = function(x) {
@@ -2133,7 +2133,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     /**
      * Function     disableControl
      * Scope        Public
-     * @param       {Object}      Pelem       Element to be disabled
+     * @param       {Element}      Pelem       Element to be disabled
      * Description  Disables a KMW control element 
      */    
     keymanweb['disableControl'] = keymanweb.disableControl = function(Pelem) {
@@ -2156,7 +2156,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     /**
      * Function     enableControl
      * Scope        Public
-     * @param       {Object}      Pelem       Element to be disabled
+     * @param       {Element}      Pelem       Element to be disabled
      * Description  Disables a KMW control element 
      */    
     keymanweb['enableControl'] = keymanweb.enableControl = function(Pelem) {
@@ -2286,7 +2286,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Scope        Public   
      * @param       {Element}    Pelem    Control element 
      * @param       {string=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)  
-     * @param       {string}     Plc      Language Code
+     * @param       {string|null=}     Plc      Language Code
      * Description  Set default keyboard for the control 
      */    
     keymanweb['setKeyboardForControl'] = keymanweb.setKeyboardForControl = function(Pelem, Pkbd, Plc) {
@@ -2320,7 +2320,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         // 'kmw_ip' is the touch-alias for the original page's control.
         if((keymanweb._LastActiveElement == Pelem || keymanweb._LastActiveElement == Pelem['kmw_ip']) 
             && keymanweb._LastActiveElement) {
-          keymanweb.setActiveKeyboard(Pkbd, Plc);
+            
+          if(Pkbd != null && Plc != null) { // Second part necessary for Closure.
+            keymanweb.setActiveKeyboard(Pkbd, Plc);
+          } else {
+            keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
+          }
         }
       }
     }
@@ -2347,7 +2352,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     /**
      * Function     SetDefaultKeyboardForControl
      * Scope        Private   
-     * @param       {Object}      Pelem    Control element 
+     * @param       {Element}      Pelem    Control element 
      * @param       {string}      Pkbd     Keyboard   
      * Description  Set default keyboard for control 
      */    
