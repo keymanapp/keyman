@@ -1129,7 +1129,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         x.addEventListener('touchstart', keymanweb.nonKMWTouchHandler, false);
 
         // Signify that touch isn't enabled on the control.
-        if(x._kmwAttachment) {
+        if(keymanweb.isAttached(x)) {
           x._kmwAttachment.touchEnabled = false;
         }
       }
@@ -1931,7 +1931,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */  
     keymanweb['attachToControl'] = keymanweb.attachToControl = function(Pelem)
     {
-      if(Pelem._kmwAttachment) {
+      if(keymanweb.isAttached(Pelem)) {
         return; // We're already attached.
       }
 
@@ -1961,7 +1961,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */  
     keymanweb['detachFromControl'] = keymanweb.detachFromControl = function(Pelem)
     {
-      if(!Pelem._kmwAttachment) {
+      if(!keymanweb.isAttached(Pelem)) {
         return;  // We never were attached.
       }
 
@@ -2137,7 +2137,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Description  Disables a KMW control element 
      */    
     keymanweb['disableControl'] = keymanweb.disableControl = function(Pelem) {
-      if(!Pelem._kmwAttachment) {
+      if(!keymanweb.isAttached(Pelem)) {
         console.warn("KeymanWeb is not attached to element " + Pelem);
       } else if(Pelem._kmwAttachment.legacy) {
         console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
@@ -2160,7 +2160,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Description  Disables a KMW control element 
      */    
     keymanweb['enableControl'] = keymanweb.enableControl = function(Pelem) {
-      if(!Pelem._kmwAttachment) {
+      if(!keymanweb.isAttached(Pelem)) {
         console.warn("KeymanWeb is not attached to element " + Pelem);
       } else if(Pelem._kmwAttachment.legacy) {
         console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
@@ -2184,10 +2184,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Description  Disable KMW control element 
      */    
     keymanweb._DisableControl = function(Pelem) {
-      if(Pelem._kmwAttachment) { // Only operate on attached elements!  
+      if(keymanweb.isAttached(Pelem)) { // Only operate on attached elements!  
         if(keymanweb._LastActiveElement == Pelem || keymanweb._LastActiveElement == Pelem['kmw_ip']) {
-          keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
           keymanweb._LastActiveElement = null;
+          keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
           keymanweb['osk']._Hide();
         }
         
@@ -2220,7 +2220,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Description  Enable KMW control element 
      */    
     keymanweb._EnableControl = function(Pelem) {
-      if(Pelem._kmwAttachment) { // Only operate on attached elements!
+      if(keymanweb.isAttached(Pelem)) { // Only operate on attached elements!
         if(device.touchable) {
           keymanweb.enableTouchElement(Pelem);
 
@@ -2250,10 +2250,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */    
     keymanweb.DisableControl = function(Pelem)
     {
-      if(!Pelem._kmwAttachment || !Pelem._kmwAttachment.legacy) {
+      if(!keymanweb.isAttached(Pelem) || !Pelem._kmwAttachment.legacy) {
         var Lc = {LControl:Pelem, LEnabled:0, LDefaultInternalName:'-'};
         keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
-        if(Pelem._kmwAttachment) {
+        if(keymanweb.isAttached(Pelem)) {
           Pelem._kmwAttachment.legacy = Lc;
         }
       } else {
@@ -2270,10 +2270,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */    
     keymanweb.EnableControl = function(Pelem)
     {
-      if(!Pelem._kmwAttachment || !Pelem._kmwAttachment.legacy) {
+      if(!keymanweb.isAttached(Pelem) || !Pelem._kmwAttachment.legacy) {
         var Lc = {LControl:Pelem, LEnabled:1, LDefaultInternalName:'-'};
         keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
-        if(Pelem._kmwAttachment) {
+        if(keymanweb.isAttached(Pelem)) {
           Pelem._kmwAttachment.legacy = Lc;
         }
       } else {
@@ -2284,8 +2284,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     /**
      * Function     setKeyboardForControl
      * Scope        Public   
-     * @param       {Element}     Pelem    Control element 
-     * @param       {string}      Pkbd     Keyboard   
+     * @param       {Element}    Pelem    Control element 
+     * @param       {string=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)  
      * @param       {string}     Plc      Language Code
      * Description  Set default keyboard for the control 
      */    
@@ -2296,12 +2296,16 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         Pkbd = "Keyboard_" + Pkbd;
       }
 
+      if(Pkbd == null) {
+        Plc = null;
+      }
+
       if(Pelem.tagName.toLowerCase() == "iframe") {
         console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
         return;
       }
 
-      if(!Pelem._kmwAttachment) {
+      if(!keymanweb.isAttached(Pelem)) {
         console.error("KeymanWeb is not attached to element " + Pelem);
         return;
       } else if(Pelem._kmwAttachment.legacy) {
@@ -2322,24 +2326,21 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
 
     /**
-     * Function     clearKeyboardForControl
+     * Function     getKeyboardForControl
      * Scope        Public   
-     * @param       {Element}     Pelem    Control element 
-     * Description  Set default keyboard for the control 
-     */    
-    keymanweb['clearKeyboardForControl'] = keymanweb.clearKeyboardForControl = function(Pelem) {
-      /* pass null for kbd to specify no default, or '' to specify English */
-      if(!Pelem._kmwAttachment) {
+     * @param       {Element}    Pelem    Control element 
+     * Description  Returns the keyboard ID of the current independently-managed keyboard for this control.
+     *              If it is currently following the global keyboard setting, returns null instead.
+     */
+    keymanweb['getKeyboardForControl'] = keymanweb.getKeyboardForControl = function(Pelem) {
+      if(!keymanweb.isAttached(Pelem)) {
         console.error("KeymanWeb is not attached to element " + Pelem);
         return;
       } else if(Pelem._kmwAttachment.legacy) {
         console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
-        Pelem._kmwAttachment.legacy.LDefaultInternalName = null;
+        return Pelem._kmwAttachment.legacy.LDefaultInternalName;
       } else {
-        Pelem._kmwAttachment.keyboard = null;
-
-        // If Pelem is the focused element/active control, setting the above to null reverts us to 'global' keyboard selection mode.
-        // We don't need to do anything special.
+        return Pelem._kmwAttachment.languageCode;
       }
     }
 
@@ -2352,10 +2353,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */    
     keymanweb.SetDefaultKeyboardForControl = function(Pelem, Pkbd) {
       /* pass null for kbd to specify no default, or '' to specify English */
-      if(!Pelem._kmwAttachment || !Pelem._kmwAttachment.legacy) {
+      if(!keymanweb.isAttached(Pelem) || !Pelem._kmwAttachment.legacy) {
         var Lc = {LControl:Pelem, LEnabled:1, LDefaultInternalName:Pkbd};
         keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
-        if(Pelem._kmwAttachment) {
+        if(keymanweb.isAttached(Pelem)) {
           Pelem._kmwAttachment.legacy = Lc;
         }
       } else {
@@ -3756,6 +3757,16 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
 
       return false;     
+    }
+
+    /**
+     * Function     isAttached
+     * Scope        Private
+     * @param       {Element}   x   An element from the page.
+     * @return      {boolean}       true if KMW is attached to the element, otherwise false.
+     */
+    keymanweb.isAttached = function(x) {
+      return x._kmwAttachment ? true : false;
     }
 
     /**

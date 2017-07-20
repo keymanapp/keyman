@@ -45,7 +45,6 @@ function loadKeyboards()
 		div.appendChild(document.createElement("p"));
 		
 		var elemId = elem.id;
-		var attached;
 		
 		// Attachment button
 		var attachBtn = document.createElement("input");
@@ -53,7 +52,9 @@ function loadKeyboards()
 		attachBtn.id   		= 'attach_' + elemId;
 		attachBtn.onclick = function() {
 			kmw.attachToControl(document.getElementById(elemId));
-			document.getElementById('attachment_' + elemId).textContent = " Currently attached.";
+			var attached = kmw.isAttached(elem);
+			document.getElementById('attachment_' + elemId).textContent = " Currently " + (attached ? "attached." : "detached.");
+			document.getElementById("independence_" + elemId).textContent = attached ? " Using globally-selected keyboard." : '';
 		}; 
 		attachBtn.value   = 'Attach';
 		div.appendChild(attachBtn);
@@ -64,18 +65,20 @@ function loadKeyboards()
 		detachBtn.id   		= 'detach_' + elemId;
 		detachBtn.onclick = function() {
 			kmw.detachFromControl(document.getElementById(elemId));
-			document.getElementById('attachment_' + elemId).textContent = " Currently detached.";
-			document.getElementById('independence_' + elemId).textContent = "";
+			var attached = kmw.isAttached(elem);
+			document.getElementById('attachment_' + elemId).textContent = " Currently " + (attached ? "attached." : "detached.");
+			if(!attached) {
+				document.getElementById('independence_' + elemId).textContent = "";
+			}
 		}; 
 		detachBtn.value   = 'Detach';
 		div.appendChild(detachBtn);
 		
 		var attachLabel = document.createElement("a");
 		attachLabel.id	= 'attachment_' + elemId;
-		if(attachText) {
-			attachLabel.textContent = " Currently " + (attachText == "auto" ? "attached." : "detached.");
-			attached = (attachText == "auto" ? true : false);
-		}
+		window.setTimeout(function() {
+			attachLabel.textContent = " Currently " + (kmw.isAttached(elem) ? "attached." : "detached.");
+		}, 1);
 		div.appendChild(attachLabel);
 		
 		div.appendChild(document.createElement("p"));
@@ -124,7 +127,10 @@ function loadKeyboards()
 			setBtn.id   		= 'set_' + elemId;
 			setBtn.onclick = function() {
 				kmw.setKeyboardForControl(document.getElementById(elemId), 'dzongkha', 'dzo');
-				kbdLabel.textContent = " Using independently-tracked keyboard.";
+				
+				if(kmw.isAttached(elem)) {
+					kbdLabel.textContent = " Using independently-tracked keyboard.";
+				}
 			}; 
 			setBtn.value   = 'Set to Dzongkha';
 			div.appendChild(setBtn);
@@ -134,15 +140,23 @@ function loadKeyboards()
 			clearBtn.type 		= 'button';
 			clearBtn.id   		= 'clear_' + elemId;
 			clearBtn.onclick = function() {
-				kmw.clearKeyboardForControl(document.getElementById(elemId));
-				kbdLabel.textContent = " Using globally-selected keyboard.";
+				kmw.setKeyboardForControl(document.getElementById(elemId), null, null);
+				
+				if(kmw.isAttached(elem)) {
+					kbdLabel.textContent = " Using globally-selected keyboard.";
+				}
 			}; 
 			clearBtn.value   = 'Clear Keyboard';
 			div.appendChild(clearBtn);
 			
 			var kbdLabel = document.createElement("a");
 			kbdLabel.id	= 'independence_' + elemId;
-			kbdLabel.textContent = attached ? " Using globally-selected keyboard." : '';
+			window.setTimeout(function () {
+				if(kmw.isAttached(elem)) {
+					var attached = kmw.isAttached(elem);
+					kbdLabel.textContent = attached ? " Using globally-selected keyboard." : '';
+				}
+			}, 1);
 			div.appendChild(kbdLabel);
 		}
 		
