@@ -1660,7 +1660,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *
      * @return    {Object}    An object that contains default key properties
      */
-    osk.getDefaultKeyObject = function(fontSize) {
+    osk.getDefaultKeyObject = function() {
       return {
         'text': '',
         'width': '100',

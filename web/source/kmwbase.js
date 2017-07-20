@@ -38,7 +38,7 @@ if(!tavultesoft['keymanweb']) {
       _AnyIndices: [],          // AnyIndex - array of any/index match indices
       _DeadKeys: [],            // DeadKeys - array of matched deadkeys
       _ActiveControl: null,     // Currently active control in _Controls array
-      _Controls: [],            // Array of controls with specific states: .Control, .Enabled, .DefaultInternalName  
+      _Controls: [],            // (Legacy) Array of controls with specific states: .Control, .Enabled, .DefaultInternalName  
       _AttachedElements: [],    // I1596 - attach to controls dynamically
       _ActiveElement: null,     // Currently active (focused) element  I3363 (Build 301)
       _LastActiveElement: null, // LastElem - Last active element
@@ -64,7 +64,9 @@ if(!tavultesoft['keymanweb']) {
       srcPath: '',              // Path to folder containing executing keymanweb script
       rootPath: '',             // Path to server root
       mustReloadKeyboard: false,// Force keyboard refreshing even if already loaded
-      fullInitialization: true  // Force full page initialization unless overridden
+      fullInitialization: true, // Force full page initialization unless overridden
+      globalKeyboard: null,     // Indicates the currently-active keyboard for controls without independent keyboard settings.
+      globalLanguageCode: null  // Indicates the language code corresponding to `globalKeyboard`.
     };
 
     keymanweb['initialized'] = 0;

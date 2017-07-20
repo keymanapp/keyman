@@ -305,26 +305,47 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             while(util._GetAbsoluteX(caret) < touchX && cp < cpMax) keymanweb.setTextCaret(target,++cp);
           }
         }
-        
-      // TODO: The following is copied from old control focus... not sure how much is needed  
-        
-        keymanweb._ActiveControl = null;
+
+        /**
+         * This event will trigger before keymanweb.setBlur is triggered.  Now that we're allowing independent keyboard settings
+         * for controls, we have to act here to preserve the outgoing control's keyboard settings.
+         *
+         * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
+         */  
+        var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
+
+        // Filter out the legacy cases.  If legacy isn't active, then we do our thing.
+        if(!(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null)) {
+          if(keymanweb._LastActiveElement && keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
+            keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
+            keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
+          } else if(keymanweb._Controls.length == 0) { // Legacy kill-switch.
+            keymanweb.globalKeyboard = keyboardID;
+            keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
+          }
+        }
+
+        // With the attachment API update, we now directly track the old legacy control behavior.
+        keymanweb._ActiveControl = target._kmwAttachment.legacy;
         keymanweb._LastActiveElement = target;
-        for(var Ln=0; Ln < keymanweb._Controls.length; Ln++) // I1511 - array prototype extended
-          if(keymanweb._Controls[Ln].LControl == target)
-          {
-            keymanweb._ActiveControl = keymanweb._Controls[Ln];
-            break;
-          }
+
+        /**
+         * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
+         * If not, we need to activate the control's preferred keyboard.
+         */
+        keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI']
     
-        if(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null)
-        {
-          if(!keymanweb._JustActivatedKeymanWebUI)
-          {         
+        if(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null) {
+          if(!keymanweb._JustActivatedKeymanWebUI) {         
             keymanweb._SetActiveKeyboard(keymanweb._ActiveControl.LDefaultInternalName,'',true); 
+          } else {
+            keymanweb._ActiveControl.LDefaultInternalName = keyboardID;
           }
-          else
-            keymanweb._ActiveControl.LDefaultInternalName = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
+        } else if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
+          keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
+            keymanweb._LastActiveElement._kmwAttachment.languageCode); 
+        } else if(keymanweb._Controls.length == 0) {  // If legacy is in use, we need to kill-switch this behavior.
+          keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
         }
         
         //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
@@ -813,61 +834,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
 
       /**
-       * Function     isKMWInput
-       * Scope        Private
-       * @param       {Element}   x   An element from the page.
-       * @return      {boolean}      true if the element accepts touch input.
-       * Description  Examines potential input elements to determine their classification re: touch handling.
-       */ 
-      keymanweb.isKMWInput = function(x) {
-        var c, lcTagName = x.tagName.toLowerCase();
-
-        // In case this function is called more than once on the same element, we need a quick out.
-        if(x.kmwInput) return x.kmwInput;
-
-        if(lcTagName == 'textarea') {
-          c = x.className;
-          x.kmwInput=false;
-          if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) { 
-            x.disabled=true; x.kmwInput=true; 
-          }
-        } else if(lcTagName == 'input') {
-          c=x.className;
-          x.kmwInput=false;                
-          if((!c || c.indexOf('kmw-disabled') < 0) && !x.readOnly) {
-            if(x.type == 'text' || x.type == 'search') {
-              x.disabled=true; x.kmwInput=true;       
-            } 
-          }
-        } 
-
-        return x.kmwInput;     
-      }
-
-      /**
-       * Function     setupTouchPage
-       * Scope        Private
-       * Description  Saves the list of static inputs for touch devices (touch-based browsers, mobile) and
-       *              and completes their setup.
-       */  
-      keymanweb.setupTouchPage = function() {
-        // Initialize and protect input elements for touch-screen devices (but never for apps)
-        // NB: now set disabled=true rather than readonly, since readonly does not always 
-        // prevent element from getting focus, e.g. within a LABEL element.
-        // c.f. http://kreotekdev.wordpress.com/2007/11/08/disabled-vs-readonly-form-fields/ 
-
-        var ipList = [].concat(
-          util.arrayFromNodeList(document.getElementsByTagName('input')),
-          util.arrayFromNodeList(document.getElementsByTagName('textarea'))
-        );
-    
-        for(var n=0;n<ipList.length;n++) { 
-          keymanweb.setupTouchElement(ipList[n]);
-        }
-      }
-
-      /**
-       * Function     setupTouchElement
+       * Function     enableTouchElement
        * Scope        Private
        * @param       {Element}  Pelem   An input or textarea element from the page.
        * @return      {boolean}  Returns true if it creates a simulated input element for Pelem; false if not.
@@ -880,17 +847,26 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
        * 
        *              Also ensures the element is registered on keymanweb's internal input list.
        */
-      keymanweb.setupTouchElement = function(Pelem)
+      keymanweb.enableTouchElement = function(Pelem)
       {
         // Touch doesn't worry about iframes.
         if(Pelem.tagName.toLowerCase() == 'iframe') {
           return false;
         }
 
-        if(!keymanweb.isKMWInput(Pelem)) {
-            keymanweb.setupNonKMWTouchElement(Pelem);
-            return false;
+        if(keymanweb.isKMWDisabled(Pelem)) {
+          keymanweb.setupNonKMWTouchElement(Pelem);
+          return false;
+        } else {
+          // Initialize and protect input elements for touch-screen devices (but never for apps)
+          // NB: now set disabled=true rather than readonly, since readonly does not always 
+          // prevent element from getting focus, e.g. within a LABEL element.
+          // c.f. http://kreotekdev.wordpress.com/2007/11/08/disabled-vs-readonly-form-fields/ 
+          Pelem.kmwInput = true;
         }
+
+        // Remove any handlers for "NonKMWTouch" elements, since we're enabling it here.
+        Pelem.removeEventListener('touchstart', keymanweb.nonKMWTouchHandler);
 
         /*
         *  Does this element already have a simulated touch element established?  If so,
@@ -912,15 +888,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         // The simulated touch element doesn't already exist?  Time to initialize it.
         var x=document.createElement('DIV'); 
         x['base']=x.base=Pelem;
+        x._kmwAttachment = Pelem._kmwAttachment; // It's an object reference we need to alias.
         
         // Set font for base element
-        x.base.className = x.base.className ? x.base.className + ' keymanweb-font' : 'keymanweb-font';
+        keymanweb.enableInputElement(x, true);
 
         // Add the exposed member 'kmw_ip' to allow page to refer to duplicated element
         Pelem['kmw_ip']=x;
-
-        // Make sure the element's on the list of registered inputs.  It can't NOT be, so we're fine.
-        keymanweb.inputList.push(x);
+        Pelem.disabled = true;
 
         // Superimpose custom input fields for each input or textarea, unless readonly or disabled 
 
@@ -1075,7 +1050,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         // This will be called for each element after any rotation, as well as after user-initiated changes
         // It has to be wrapped in an anonymous function to preserve scope and be applied to each element.
         (function(xx){
-          xx.base.addEventListener('resize',function(e){
+          xx._kmwResizeHandler = function(e){
             /* A timeout is needed to let the base element complete its resizing before our 
             * simulated element can properly resize itself.
             * 
@@ -1085,7 +1060,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             window.setTimeout(function (){
               keymanweb.updateInput(xx);
             }, 1);
-          },false);
+          };
+
+          xx.base.addEventListener('resize', xx._kmwResizeHandler, false);
         })(x);
           
         // And copy the text content
@@ -1095,20 +1072,67 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
 
       /**
+       * Function     disableTouchElement
+       * Scope        Private
+       * @param       {Element}  Pelem   An input or textarea element from the page.
+       * Description  Destroys the simulated input element for the specified INPUT or TEXTAREA and reverts
+       *              back to desktop-style 'enablement' for the base control.
+       */
+      keymanweb.disableTouchElement = function(Pelem)
+      {
+        // Do not check for the element being officially disabled - it's also used for detachment.
+
+        // Touch doesn't worry about iframes.
+        if(Pelem.tagName.toLowerCase() == 'iframe') {
+          return; // If/when we do support this, we'll need an iframe-level manager for it.
+        }
+
+        if(Pelem['kmw_ip']) {
+          var index = keymanweb.inputList.indexOf(Pelem['kmw_ip']);
+          if(index != -1) {
+            keymanweb.inputList.splice(index, 1);
+          }
+
+          Pelem.style.visibility='visible'; // hide by default: KMW-3
+          Pelem.disabled = false;
+          Pelem.removeEventListener('resize', Pelem['kmw_ip']._kmwResizeHandler);
+
+          // Disable touch-related handling code.
+          keymanweb.disableInputElement(Pelem['kmw_ip']);
+          
+          // We get weird repositioning errors if we don't remove our simulated input element - and permanently.
+          Pelem.parentNode.removeChild(Pelem['kmw_ip']);
+          delete Pelem['kmw_ip'];
+        }
+
+        keymanweb.setupNonKMWTouchElement(Pelem);
+      }
+
+      /** 
+       * Function     nonKMWTouchHandler
+       * Scope        Private
+       * Description  A handler for KMW-touch-disabled elements when operating on touch devices.
+       */
+      keymanweb.nonKMWTouchHandler = function(x) {
+        keymanweb.focusing=false;
+        clearTimeout(keymanweb.focusTimer);
+        osk.hideNow();
+      }
+
+      /**
        * Function     setupNonKMWTouchElement
        * Scope        Private
-       * @param       {Object}    x  A child element of document.
+       * @param       {Element}    x  A child element of document.
        * Description  Performs handling for the specified disabled input element on touch-based systems.
        */
       keymanweb.setupNonKMWTouchElement = function(x) {
-        x.addEventListener('touchstart',function() {
-            keymanweb.focusing=false;
-            clearTimeout(keymanweb.focusTimer);
-            osk.hideNow();
-          },false);
+        x.addEventListener('touchstart', keymanweb.nonKMWTouchHandler, false);
+
+        // Signify that touch isn't enabled on the control.
+        if(keymanweb.isAttached(x)) {
+          x._kmwAttachment.touchEnabled = false;
+        }
       }
-      
-      keymanweb.setupTouchPage();
     }
     
     /*********************************************************
@@ -1118,50 +1142,82 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *********************************************************/
     
     /**
-     * Function     setupDesktopPage
+     * Function     enableInputElement
      * Scope        Private
-     * Description  Save list of inputs for non-touch devices (desktop browsers)
-     * 
-     * @suppress    {checkTypes}
+     * @param       {Element}   Pelem   An element from the document to be enabled with full KMW handling.
+     * @param       {boolean=}   isAlias A flag that indicates if the element is a simulated input element for touch.
+     * Description  Performs the basic enabling setup for one element and adds it to the inputList if it is an input element.
+     *              Note that this method is called for both desktop and touch control routes; the touch route calls it from within
+     *              enableTouchElement as it must first establish the simulated touch element to serve as the alias "input element" here.
+     *              Note that the 'kmw-disabled' property is managed by the MutationObserver and by the surface API calls.
      */       
-    keymanweb.setupDesktopPage = function() { 
-      var ipList = [].concat(
-        util.arrayFromNodeList(document.getElementsByTagName('input')),
-        util.arrayFromNodeList(document.getElementsByTagName('textarea'))
-      );
-      ipList.forEach(keymanweb.setupDesktopElement);
-    };  
+    keymanweb.enableInputElement = function(Pelem, isAlias) { 
+      var baseElement = isAlias ? Pelem['base'] : Pelem;
+      if(!keymanweb.isKMWDisabled(baseElement)) {
+        if(Pelem.tagName.toLowerCase() == 'iframe') {
+          keymanweb._AttachToIframe(Pelem);
+        } else { 
+          baseElement.className = baseElement.className ? baseElement.className + ' keymanweb-font' : 'keymanweb-font';
+          keymanweb.inputList.push(Pelem);
+
+          util.attachDOMEvent(baseElement,'focus', keymanweb._ControlFocus);
+          util.attachDOMEvent(baseElement,'blur', keymanweb._ControlBlur);
+          // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
+          Pelem.onkeypress = keymanweb._KeyPress;
+          Pelem.onkeydown = keymanweb._KeyDown;
+          Pelem.onkeyup = keymanweb._KeyUp;      
+        }
+        return;
+      } else {
+        return;
+      }
+    }; 
 
     /**
-     * Function     setupDesktopElement
+     * Function     disableInputElement
      * Scope        Private
-     * @param       {Element}   Pelem  An element from the document to be touch-enabled.
-     * Description  Setup one element for non-touch devices and add it to the inputList if it is an input element (desktop browsers).
-     *              Only returns true if the element is a valid input for keymanweb and it is not presently tracked as an input element.
-     * @return   {boolean}
+     * @param       {Element}   Pelem   An element from the document to be enabled with full KMW handling.
+     * @param       {boolean=}   isAlias A flag that indicates if the element is a simulated input element for touch.
+     * Description  Inverts the process of enableInputElement, removing all event-handling from the element.
+     *              Note that the 'kmw-disabled' property is managed by the MutationObserver and by the surface API calls.
      */       
-    keymanweb.setupDesktopElement = function(Pelem) { 
-      var lcTagName = Pelem.tagName.toLowerCase();
-      // If it's not one of these, we don't need to hook the OSK into it.
-      if(!(lcTagName == "input" || lcTagName == "textarea")) {
-        return false;
-      }
-
-      if(Pelem.className.indexOf('kmw-disabled') < 0 && !Pelem.readOnly)
-      {
-        var index = keymanweb.inputList.indexOf(Pelem);
-        if(index != -1) {
-          return false;
+    keymanweb.disableInputElement = function(Pelem, isAlias) { 
+      var baseElement = isAlias ? Pelem['base'] : Pelem;
+      // Do NOT test for pre-disabledness - we also use this to fully detach without officially 'disabling' via kmw-disabled.
+      if(Pelem.tagName.toLowerCase() == 'iframe') {
+        keymanweb._DetachFromIframe(Pelem);
+      } else { 
+        var cnIndex = baseElement.className.indexOf('keymanweb-font');
+        if(cnIndex > 0 && !isAlias) { // See note about the alias below.
+          baseElement.className = baseElement.className.replace('keymanweb-font', '').trim();
         }
 
-        Pelem.className += (Pelem.className ? ' ' : '') + 'keymanweb-font';
+        // Remove the element from our internal input tracking.
+        var index = keymanweb.inputList.indexOf(Pelem);
+        if(index > -1) {
+          keymanweb.inputList.splice(index, 1);
+        }
 
-        keymanweb.inputList.push(Pelem);
-        return true;
+        if(!isAlias) { // See note about the alias below.
+          util.detachDOMEvent(baseElement,'focus', keymanweb._ControlFocus);
+          util.detachDOMEvent(baseElement,'blur', keymanweb._ControlBlur);
+        }
+        // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
+        Pelem.onkeypress = null;
+        Pelem.onkeydown = null;
+        Pelem.onkeyup = null;      
       }
 
-      return false;
-    }; 
+      // If we're disabling an alias, we should fully enable the base version.  (Thinking ahead to toggleable-touch mode.)
+      if(isAlias) {
+        keymanweb.inputList.push(baseElement);
+
+        baseElement.onkeypress = keymanweb._KeyPress;
+        baseElement.onkeydown = keymanweb._KeyDown;
+        baseElement.onkeyup = keymanweb._KeyUp;  
+      }
+      return;
+    };
 
     /**
      * Get the user-specified (or default) font for the first mapped input or textarea element
@@ -1624,7 +1680,11 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       keymanweb.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC']);
 
       // If the first stub, must load (and optionally display) the keyboard
-      if(keymanweb._KeyboardStubs.length == 1 && document.readyState=='complete') keymanweb._SetActiveKeyboard(sp['KI'], sp['KLC']);     
+      if(keymanweb._KeyboardStubs.length == 1 && document.readyState=='complete') {
+        keymanweb._SetActiveKeyboard(sp['KI'], sp['KLC']);     
+        keymanweb.globalKeyboard = sp['KI'];
+        keymanweb.globalLanguageCode = sp['KLC'];
+      }
     }
     
     /** 
@@ -1866,26 +1926,55 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     /**
      * Function     attachToControl
      * Scope        Public
-     * @param       {Object}    Pelem       Element to which KMW will be attached
+     * @param       {Element}    Pelem       Element to which KMW will be attached
      * Description  Attaches KMW to control (or IFrame) 
      */  
     keymanweb['attachToControl'] = keymanweb.attachToControl = function(Pelem)
     {
-      // Check that the element is neither readonly nor disabled for KeymanWeb
-      var ro=Pelem.attributes['readonly'],cn=Pelem.className;
-      if(typeof ro == 'object' && ro.value != 'false' ) return; 
-      if(typeof cn == 'string' && cn.indexOf('kmw-disabled') >= 0) return; 
-
-      if(Pelem.tagName.toLowerCase() == 'iframe') 
-        keymanweb._AttachToIframe(Pelem);
-      else
-      {     
-        util.attachDOMEvent(Pelem,'focus', keymanweb._ControlFocus);
-        util.attachDOMEvent(Pelem,'blur', keymanweb._ControlBlur);
-        Pelem.onkeypress = keymanweb._KeyPress;
-        Pelem.onkeydown = keymanweb._KeyDown;
-        Pelem.onkeyup = keymanweb._KeyUp;      
+      if(keymanweb.isAttached(Pelem)) {
+        return; // We're already attached.
       }
+
+      if(keymanweb.isKMWInput(Pelem)) {
+        keymanweb.setupElementAttachment(Pelem);
+        if(!keymanweb.isKMWDisabled(Pelem)) {
+          if(device.touchable) {
+            keymanweb.enableTouchElement(Pelem);
+          } else {
+            keymanweb.enableInputElement(Pelem);
+          }
+        } else {
+          if(device.touchable) {
+            keymanweb.setupNonKMWTouchElement(Pelem);
+          }
+        }
+      } else if(device.touchable) {
+        keymanweb.setupNonKMWTouchElement(Pelem);
+      }
+    }
+
+    /**
+     * Function     detachFromControl
+     * Scope        Public
+     * @param       {Element}    Pelem       Element from which KMW will detach
+     * Description  Detaches KMW from a control (or IFrame) 
+     */  
+    keymanweb['detachFromControl'] = keymanweb.detachFromControl = function(Pelem)
+    {
+      if(!keymanweb.isAttached(Pelem)) {
+        return;  // We never were attached.
+      }
+
+      // #1 - if element is enabled, disable it.  But don't manipulate the 'kmw-disabled' tag.
+      if(keymanweb.isKMWInput(Pelem)) {
+        // Is it already disabled?
+        if(!keymanweb.isKMWDisabled(Pelem)) {
+          keymanweb._DisableControl(Pelem);
+        } 
+      }
+
+      // #2 - clear attachment data.      
+      keymanweb.clearElementAttachment(Pelem);
     }
         
     /**
@@ -1922,7 +2011,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
               }
             }
             else {
-              keymanweb._AttachToControls(Lelem);
+              // Lelem is the IFrame's internal document; set 'er up!
+              keymanweb._SetupDocument(Lelem);
             }
           }
           else
@@ -1938,7 +2028,71 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             }
             else
             {
-              keymanweb._AttachToControls(Lelem);	   // I2404 - Manage IE events in IFRAMEs
+              // Lelem is the IFrame's internal document; set 'er up!
+              keymanweb._SetupDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
+            }
+          }
+        }
+      }
+      catch(err)
+      {
+        // do not attempt to attach to the iframe as it is from another domain - XSS denied!
+      }  
+    }
+
+        /**
+     * Function     _DetachFromIframe
+     * Scope        Private
+     * @param       {Object}      Pelem       IFrame to which KMW will be attached
+     * Description  Detaches KeymanWeb from an IFrame 
+     */  
+    keymanweb._DetachFromIframe = function(Pelem)
+    {      
+      try
+      {
+        var Lelem=Pelem.contentWindow.document;
+        /* editable Iframe */
+        if(Lelem)
+        {
+          if(Lelem.parentWindow)
+          {
+            // Internet Explorer
+            if(Lelem.designMode.toLowerCase() == 'on' || Lelem.body.isContentEditable)   // I1295 - fix non-attachment for some forms of IFRAMEs
+            {
+              // I1480 - Attach to IFRAME instead of document
+              util.detachDOMEvent(Pelem,'focus', keymanweb._ControlFocus);
+              util.detachDOMEvent(Pelem,'blur', keymanweb._ControlBlur);
+              util.detachDOMEvent(Lelem,'keydown', keymanweb._KeyDown);   // I2404 - Update for attaching to elements within IFRAMEs, don't attach to read-only IFRAMEs
+              util.detachDOMEvent(Lelem,'keypress', keymanweb._KeyPress);
+              util.detachDOMEvent(Lelem,'keyup', keymanweb._KeyUp);
+              
+              if(!keymanweb.legacy)
+              { // I1481 - Attach to the selectionchange in the iframe (and do a selchange to get the new selection)
+                /* IE: call _SelectionChange when the user changes the selection */
+                util.detachDOMEvent(Lelem, 'selectionchange', keymanweb._SelectionChange);
+                keymanweb._SelectionChange();
+              }
+            }
+            else {
+              // Lelem is the IFrame's internal document; set 'er up!
+              keymanweb._ClearDocument(Lelem);
+            }
+          }
+          else
+          {
+            if(Lelem.designMode.toLowerCase() == 'on')
+            {
+              // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
+              util.detachDOMEvent(Lelem,'focus', keymanweb._ControlFocus);
+              util.detachDOMEvent(Lelem,'blur', keymanweb._ControlBlur);
+              util.detachDOMEvent(Lelem,'keydown', keymanweb._KeyDown);
+              util.detachDOMEvent(Lelem,'keypress', keymanweb._KeyPress);
+              util.detachDOMEvent(Lelem,'keyup', keymanweb._KeyUp);
+            }
+            else
+            {
+              // Lelem is the IFrame's internal document; set 'er up!
+              keymanweb._ClearDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
             }
           }
         }
@@ -1977,62 +2131,240 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }  
     
     /**
-     * Function     DisableControl
-     * Scope        Private
-     * @param       {Object}      Pelem       Element to be disabled
-     * Description  Disable KMW control element 
+     * Function     disableControl
+     * Scope        Public
+     * @param       {Element}      Pelem       Element to be disabled
+     * Description  Disables a KMW control element 
      */    
-    keymanweb.DisableControl = function(Pelem)
-    {
-      var Ln, Lc;
-      for(Ln=0; Ln<keymanweb._Controls.length; Ln++)  // I1511 - array prototype extended
-        if(keymanweb._Controls[Ln].LControl == Pelem)
-        {
-          keymanweb._Controls[Ln].LEnabled = 0;
-          return;
-        }
-      Lc = {LControl:Pelem, LEnabled:0, LDefaultInternalName:'-'};
-      keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+    keymanweb['disableControl'] = keymanweb.disableControl = function(Pelem) {
+      if(!keymanweb.isAttached(Pelem)) {
+        console.warn("KeymanWeb is not attached to element " + Pelem);
+      } else if(Pelem._kmwAttachment.legacy) {
+        console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
+        keymanweb.DisableControl(Pelem);
+      }
+
+      var cn = Pelem.className;
+      if(cn.indexOf('kmw-disabled') < 0) { // if not already explicitly disabled...
+        Pelem.className = cn ? cn + ' kmw-disabled' : 'kmw-disabled';
+      }
+
+      // The rest is triggered within MutationObserver code.
+      // See keymanweb._EnablementMutationObserverCore.
     }
 
     /**
-     * Function     EnableControl
+     * Function     enableControl
+     * Scope        Public
+     * @param       {Element}      Pelem       Element to be disabled
+     * Description  Disables a KMW control element 
+     */    
+    keymanweb['enableControl'] = keymanweb.enableControl = function(Pelem) {
+      if(!keymanweb.isAttached(Pelem)) {
+        console.warn("KeymanWeb is not attached to element " + Pelem);
+      } else if(Pelem._kmwAttachment.legacy) {
+        console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
+        keymanweb.EnableControl(Pelem);
+      }
+
+      var cn = Pelem.className;
+      var tagIndex = cn.indexOf('kmw-disabled');
+      if(tagIndex >= 0) { // if already explicitly disabled...
+        Pelem.className = cn.replace('kmw-disabled', '').trim();
+      }
+
+      // The rest is triggered within MutationObserver code.
+      // See keymanweb._EnablementMutationObserverCore.
+    }
+
+    /**
+     * Function     _DisableControl
      * Scope        Private
-     * @param       {Object}    Pelem   Element to be enabled
+     * @param       {Element}      Pelem       Element to be disabled
+     * Description  Disable KMW control element 
+     */    
+    keymanweb._DisableControl = function(Pelem) {
+      if(keymanweb.isAttached(Pelem)) { // Only operate on attached elements!  
+        if(keymanweb._LastActiveElement == Pelem || keymanweb._LastActiveElement == Pelem['kmw_ip']) {
+          keymanweb._LastActiveElement = null;
+          keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
+          keymanweb['osk']._Hide();
+        }
+        
+        if(device.touchable) {
+          keymanweb.disableTouchElement(Pelem);
+          keymanweb.setupNonKMWTouchElement(Pelem);
+        
+          // If a touch alias was removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
+          window.setTimeout(function() {
+            keymanweb.listInputs();
+
+            for(var k = 0; k < keymanweb.sortedInputs.length; k++) {
+              if(keymanweb.sortedInputs[k]['kmw_ip']) {
+                keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
+              }
+            }
+          }, 1);
+        } else {
+          keymanweb.listInputs(); // Fix up our internal input ordering scheme.
+        }
+        
+        keymanweb.disableInputElement(Pelem);
+      }
+    }
+
+    /**
+     * Function     _EnableControl
+     * Scope        Private
+     * @param       {Element}    Pelem   Element to be enabled
      * Description  Enable KMW control element 
+     */    
+    keymanweb._EnableControl = function(Pelem) {
+      if(keymanweb.isAttached(Pelem)) { // Only operate on attached elements!
+        if(device.touchable) {
+          keymanweb.enableTouchElement(Pelem);
+
+          // If we just added a new input alias, some languages will mess up our touch-based layout scheme
+          // if we don't update the touch elements.
+          window.setTimeout(function() {
+            keymanweb.listInputs();
+
+            for(var k = 0; k < keymanweb.sortedInputs.length; k++) {
+              if(keymanweb.sortedInputs[k]['kmw_ip']) {
+                keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
+              }
+            }
+          }, 1);
+        } else {
+          keymanweb.enableInputElement(Pelem);
+        }
+      }
+    }
+
+    /**
+     * Function    DisableControl
+     * Scope       Private   
+     * Parameters  Pelem   Element to be disabled
+     * Returns     None
+     * Description Legacy:  Disable KMW control element 
+     */    
+    keymanweb.DisableControl = function(Pelem)
+    {
+      if(!keymanweb.isAttached(Pelem) || !Pelem._kmwAttachment.legacy) {
+        var Lc = {LControl:Pelem, LEnabled:0, LDefaultInternalName:'-'};
+        keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+        if(keymanweb.isAttached(Pelem)) {
+          Pelem._kmwAttachment.legacy = Lc;
+        }
+      } else {
+        Pelem._kmwAttachment.legacy.LEnabled = 0;
+      }
+    }
+
+    /**
+     * Function    EnableControl
+     * Scope       Private   
+     * Parameters  Pelem   Element to be enabled
+     * Returns     None
+     * Description Legacy:  Enable KMW control element 
      */    
     keymanweb.EnableControl = function(Pelem)
     {
-      var Ln, Lc;
-      for(Ln=0; Ln<keymanweb._Controls.length; Ln++) // I1511 - array prototype extended
-        if(keymanweb._Controls[Ln].LControl == Pelem)
-        {
-          keymanweb._Controls[Ln].LEnabled = 1;
-          return;
+      if(!keymanweb.isAttached(Pelem) || !Pelem._kmwAttachment.legacy) {
+        var Lc = {LControl:Pelem, LEnabled:1, LDefaultInternalName:'-'};
+        keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+        if(keymanweb.isAttached(Pelem)) {
+          Pelem._kmwAttachment.legacy = Lc;
         }
-      Lc = {LControl:Pelem, LEnabled:1, LDefaultInternalName:'-'};
-      keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+      } else {
+        Pelem._kmwAttachment.legacy.LEnabled = 1;
+      }
     }
     
     /**
+     * Function     setKeyboardForControl
+     * Scope        Public   
+     * @param       {Element}    Pelem    Control element 
+     * @param       {string|null=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)  
+     * @param       {string|null=}     Plc      Language Code
+     * Description  Set default keyboard for the control 
+     */    
+    keymanweb['setKeyboardForControl'] = keymanweb.setKeyboardForControl = function(Pelem, Pkbd, Plc) {
+      /* pass null for kbd to specify no default, or '' to specify the default system keyboard. */
+      if(Pkbd !== null && Pkbd !== undefined) {
+        var index = Pkbd.indexOf("Keyboard_");
+        if(index < 0 && Pkbd != '') {
+          Pkbd = "Keyboard_" + Pkbd;
+        }
+      } else {
+        Plc = null;
+      }
+
+      if(Pelem.tagName.toLowerCase() == "iframe") {
+        console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
+        return;
+      }
+
+      if(!keymanweb.isAttached(Pelem)) {
+        console.error("KeymanWeb is not attached to element " + Pelem);
+        return;
+      } else if(Pelem._kmwAttachment.legacy) {
+        console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
+        keymanweb.legacy['SetDefaultKeyboardForControl'](Pelem, Pkbd);
+        return;
+      } else {
+        Pelem._kmwAttachment.keyboard = Pkbd;
+        Pelem._kmwAttachment.languageCode = Plc;
+
+        // If Pelem is the focused element/active control, we should set the keyboard in place now.
+        // 'kmw_ip' is the touch-alias for the original page's control.
+        if((keymanweb._LastActiveElement == Pelem || keymanweb._LastActiveElement == Pelem['kmw_ip']) 
+            && keymanweb._LastActiveElement) {
+            
+          if(Pkbd != null && Plc != null) { // Second part necessary for Closure.
+            keymanweb.setActiveKeyboard(Pkbd, Plc);
+          } 
+        }
+      }
+    }
+
+    /**
+     * Function     getKeyboardForControl
+     * Scope        Public   
+     * @param       {Element}    Pelem    Control element 
+     * Description  Returns the keyboard ID of the current independently-managed keyboard for this control.
+     *              If it is currently following the global keyboard setting, returns null instead.
+     */
+    keymanweb['getKeyboardForControl'] = keymanweb.getKeyboardForControl = function(Pelem) {
+      if(!keymanweb.isAttached(Pelem)) {
+        console.error("KeymanWeb is not attached to element " + Pelem);
+        return;
+      } else if(Pelem._kmwAttachment.legacy) {
+        console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
+        return Pelem._kmwAttachment.legacy.LDefaultInternalName;
+      } else {
+        return Pelem._kmwAttachment.languageCode;
+      }
+    }
+
+    /**
      * Function     SetDefaultKeyboardForControl
      * Scope        Private   
-     * @param       {Object}      Pelem    Control element 
+     * @param       {Element}      Pelem    Control element 
      * @param       {string}      Pkbd     Keyboard   
      * Description  Set default keyboard for control 
      */    
-    keymanweb.SetDefaultKeyboardForControl = function(Pelem, Pkbd)
-    {
-      var Ln, Lc;
+    keymanweb.SetDefaultKeyboardForControl = function(Pelem, Pkbd) {
       /* pass null for kbd to specify no default, or '' to specify English */
-      for(Ln=0; Ln< keymanweb._Controls.length; Ln++) // I1511 - array prototype extended
-        if(keymanweb._Controls[Ln].LControl == Pelem)
-        {
-          keymanweb._Controls[Ln].LDefaultInternalName = Pkbd;
-          return;
+      if(!keymanweb.isAttached(Pelem) || !Pelem._kmwAttachment.legacy) {
+        var Lc = {LControl:Pelem, LEnabled:1, LDefaultInternalName:Pkbd};
+        keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+        if(keymanweb.isAttached(Pelem)) {
+          Pelem._kmwAttachment.legacy = Lc;
         }
-      Lc = {LControl:Pelem, LEnabled:1, LDefaultInternalName:Pkbd};
-      keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
+      } else {
+        Pelem._kmwAttachment.legacy.LEnabled = Pkbd;
+      }
     }
       
     /**
@@ -2149,23 +2481,35 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
           
       //??keymanweb._Selection = null;
-      keymanweb._ActiveControl = null;
-      keymanweb._LastActiveElement = Ltarg;
-      for(Ln=0; Ln < keymanweb._Controls.length; Ln++) // I1511 - array prototype extended
-        if(keymanweb._Controls[Ln].LControl == Ltarg)
-        {
-          keymanweb._ActiveControl = keymanweb._Controls[Ln];
-          break;
-        }
+      keymanweb._ActiveControl = Ltarg._kmwAttachment.legacy;  // Gets legacy-maintained control information
 
-      if(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null)
-      {
-        if(!keymanweb._JustActivatedKeymanWebUI)
-        {
+      // We condition on 'priorElement' below as a check to allow KMW to set a default active keyboard.
+      var priorElement = keymanweb._LastActiveElement;
+      keymanweb._LastActiveElement = Ltarg;
+
+      var keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
+
+      if(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null) {
+        if(!keymanweb._JustActivatedKeymanWebUI) {
           keymanweb._SetActiveKeyboard(keymanweb._ActiveControl.LDefaultInternalName,'',true); 
+        } else {
+          keymanweb._ActiveControl.LDefaultInternalName = keyboardID;
         }
-        else
-          keymanweb._ActiveControl.LDefaultInternalName = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
+      } else if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
+        if(!keymanweb._JustActivatedKeymanWebUI) {
+          keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard,
+            keymanweb._LastActiveElement._kmwAttachment.languageCode); 
+        } else {
+          keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
+          keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
+        }
+      } else if(priorElement && keymanweb._Controls.length == 0) { // Kill-switch to preserve legacy behavior.
+        if(!keymanweb._JustActivatedKeymanWebUI) {
+          keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode); 
+        } else {
+          keymanweb.globalKeyboard = keyboardID;
+          keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
+        }
       }
 
       //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
@@ -2292,15 +2636,21 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         
       }
       
-      ////keymanweb._SelectionControl = null;
-      
+      ////keymanweb._SelectionControl = null;    
+      var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
+
+      if(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null) {
+        keymanweb._ActiveControl.LDefaultInternalName = keyboardID;
+      } else if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
+        keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
+        keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
+      } else if(keymanweb._Controls.length == 0) { // Legacy kill-switch.
+        keymanweb.globalKeyboard = keyboardID;
+        keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
+      }
+
+      // Now that we've handled all prior-element maintenance, update the 'last active element'.
       keymanweb._LastActiveElement = Ltarg;
-    
-      if(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null)
-        if(keymanweb._ActiveKeyboard == null)
-          keymanweb._ActiveControl.LDefaultInternalName = '';
-        else
-          keymanweb._ActiveControl.LDefaultInternalName = keymanweb._ActiveKeyboard['KI'];
 
       /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects should be restrained to this control in case
       * the user is manually specifying languages on a per-control basis.
@@ -2988,7 +3338,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           // and update the active stub
           for(var Ls=0; Ls<keymanweb._KeyboardStubs.length; Ls++)
           {
-            if((keymanweb._KeyboardStubs[Ls]['KI'] == PInternalName) && (keymanweb._KeyboardStubs[Ls]['KLC'] == PLgCode))
+            if((keymanweb._KeyboardStubs[Ls]['KI'] == PInternalName) && 
+              (keymanweb._KeyboardStubs[Ls]['KLC'] == PLgCode || PLgCode == '---'))
             {
               keymanweb._ActiveStub = keymanweb._KeyboardStubs[Ls]; break;
             }
@@ -3207,14 +3558,18 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {string}    PInternalName   Internal name
      * @param       {string}    PLgCode         Language code
      */    
-    keymanweb['setActiveKeyboard'] = function(PInternalName,PLgCode)
-    {
+    keymanweb['setActiveKeyboard'] = keymanweb.setActiveKeyboard = function(PInternalName,PLgCode) {
       //TODO: This does not make sense: the callbacks should be in _SetActiveKeyboard, not here,
       //      since this is always called FROM the UI, which should not need notification.
       //      If UI callbacks are needed at all, they should be within _SetActiveKeyboard  
       keymanweb.doBeforeKeyboardChange(PInternalName,PLgCode);     
       keymanweb._SetActiveKeyboard(PInternalName,PLgCode,true);    
       if(keymanweb._LastActiveElement != null) keymanweb._FocusLastActiveElement();
+      // If we ever allow PLgCode to be set by default, we can auto-detect the language code
+      // after the _SetActiveKeyboard call.
+      // if(!PLgCode && keymanweb._ActiveStub) {
+      //   PLgCode = keymanweb._ActiveStub['KLC'];
+      // }
       keymanweb.doKeyboardChange(PInternalName,PLgCode);
     }
     
@@ -3236,7 +3591,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return     {string}         language code
      * Description Return language code for currently selected language
      */    
-    keymanweb['getActiveLanguage'] = function()
+    keymanweb['getActiveLanguage'] = keymanweb.getActiveLanguage = function()
     {
       if(keymanweb._ActiveStub == null) return '';
       return keymanweb._ActiveStub['KLC'];
@@ -3272,7 +3627,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Scope        Private
      * @param       {string}    PInternalName     Internal name of keyboard
      * @return      {Object}                       Details of named keyboard 
-     *                                            TODO: should it be Array or Object???
+     *
      * Description  Return keyboard details object
      */    
     keymanweb.GetKeyboardDetail = function(PInternalName)  // I2079 - GetKeyboardDetail function
@@ -3356,15 +3711,113 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     
     // Attach this handler to window unload event  
     util.attachDOMEvent(window, 'unload', keymanweb._WindowUnload,false);  // added fourth argument (default value)
-                
+
     /**
-     * Function     _AttachToControls
+     * Function     isKMWInput
      * Scope        Private
-     * Parameters   {Object}    Pelem    element  
-     * Description  Attach KMW to editable controls
-     */    
-    keymanweb._AttachToControls = function(Pelem)    // I1961
-    {
+     * @param       {Element}   x   An element from the page.
+     * @return      {boolean}      true if the element is viable for KMW attachment.
+     * Description  Examines potential input elements to determine whether or not they are viable for KMW attachment.
+     *              Also filters elements not supported for touch devices when device.touchable == true.
+     */ 
+    keymanweb.isKMWInput = function(x) {
+      var c, lcTagName = x.tagName.toLowerCase();
+
+      if(lcTagName == 'textarea') {
+          return true;
+      } else if(lcTagName == 'input' && x.type.toLowerCase() == 'text') {
+        if(x.type == 'text' || x.type == 'search') {
+          return true;  
+        } 
+      } else if(lcTagName == 'iframe' && !device.touchable) { // Do not allow iframe attachment if in 'touch' mode.
+        try {
+          if(x.contentWindow.document) {  // Only allow attachment if the iframe's internal document is valid.
+            return true;
+          }
+        }
+        catch(err) { /* Do not attempt to access iframes outside this site */ }
+      } else if(x.isContentEditable && !device.touchable) { // Only allow contentEditable attachment outside of 'touch' mode.
+        return true;
+      }
+
+      return false;     
+    }
+
+    /**
+     * Function     isKMWInput
+     * Scope        Private
+     * @param       {Element}   x   An element from the page.
+     * @return      {boolean}      true if the element's properties indicate a 'disabled' state.
+     * Description  Examines attachable elements to determine their default enablement state.
+     */ 
+    keymanweb.isKMWDisabled = function(x) {
+      var c = x.className, lcTagName = x.tagName.toLowerCase();
+
+      if(x.readOnly) {
+        return true;
+      } else if(c && c.indexOf('kmw-disabled') >= 0) {
+        return true;
+      }
+
+      return false;     
+    }
+
+    /**
+     * Function     isAttached
+     * Scope        Private
+     * @param       {Element}   x   An element from the page.
+     * @return      {boolean}       true if KMW is attached to the element, otherwise false.
+     */
+    keymanweb.isAttached = function(x) {
+      return x._kmwAttachment ? true : false;
+    }
+
+    /**
+     * Function     setupElementAttachment
+     * Scope        Private
+     * @param       {Element}   x   An element from the page valid for KMW attachment
+     * Description  Establishes the base KeymanWeb data for newly-attached elements.
+     *              Does not establish input hooks, which are instead handled during enablement.  
+     */
+    keymanweb.setupElementAttachment = function(x) {
+      // The `_kmwAttachment` property tag maintains all relevant KMW-maintained data regarding the element.
+      // It is disgarded upon de-attachment.
+      x._kmwAttachment = {
+        //legacy:       undefined,          // Tracks the legacy equivalent of attachment data, when appropriate.
+        keyboard:       null,               // Tracks the control's independent keyboard selection, when applicable.
+        touchEnabled:   device.touchable    // Tracks if the control has an aliased control for touch functionality.
+                                            // (Necessary for managing the touch/non-touch event handlers.)
+      };
+
+      // Does an old set of legacy data exist for the control? (e.g: if it were removed and readded to the page)
+      for(var Ln=0; Ln<keymanweb._Controls.length; Ln++) { // I1511 - array prototype extended
+        if(keymanweb._Controls[Ln].LControl == x)
+        {
+          x._kmwAttachment.legacy = keymanweb._Controls[Ln];
+        }
+      }
+    }
+
+    /**
+     * Function     clearElementAttachment
+     * Scope        Private
+     * @param       {Element}   x   An element from the page valid for KMW attachment
+     * Description  Establishes the base KeymanWeb data for newly-attached elements.
+     *              Does not establish input hooks, which are instead handled during enablement.  
+     */
+    keymanweb.clearElementAttachment = function(x) {
+      // We need to clear the object when de-attaching; helps prevent memory leaks.
+      x._kmwAttachment = null;
+    }
+
+
+    /**
+     * Function     _SetupDocument
+     * Scope        Private
+     * Parameters   {Element}     Pelem - the root element of a document, including IFrame documents.
+     * Description  Used to automatically attach KMW to editable controls, regardless of control path.
+     */
+    keymanweb._SetupDocument = function(Pelem) { // I1961
       /**
        * Function     LiTmp
        * Scope        Private
@@ -3372,39 +3825,86 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
        * @return      {Array}               array of elements of specified type                       
        * Description  Local function to get list of editable controls
        */    
-      var LiTmp = function(_colon){return Pelem.getElementsByTagName(_colon);};
+      var LiTmp = function(_colon){
+        return Pelem.getElementsByTagName(_colon);
+      };
 
-      // If the element Pelem has any child elements, we wish to analyze those.
-      var Linputs = LiTmp('INPUT'), 
-        Ltextareas = LiTmp('TEXTAREA'), 
-        Lframes = LiTmp('IFRAME'),
-        Lce = document.evaluate ? document.evaluate('//*[@contenteditable and @contenteditable != "false"]', document, null, XPathResult.ANY_TYPE, null) : null;	// I2457 - support contentEditable elements in mozilla, webkit
+      var possibleInputs = [].concat(
+        util.arrayFromNodeList(LiTmp('INPUT')),
+        util.arrayFromNodeList(LiTmp('TEXTAREA')),
+        util.arrayFromNodeList(LiTmp('IFRAME'))  // Note that isKMWInput() will block these for touch-based devices.
+      );
+      
+      // These are unfortunately accessed via iterator, not array.  Also blocked for touch by isKMWInput().
+      var Lce = util.arrayFromNodeList(document.evaluate 
+          ? document.evaluate('//*[@contenteditable and @contenteditable != "false"]', document, null, XPathResult.ANY_TYPE, null) 
+          : null) // I2457 - support contentEditable elements in mozilla, webkit
 
-      for(var Li = 0; Li < Linputs.length; Li++)
-        if(Linputs[Li].type.toLowerCase() == 'text') keymanweb.attachToControl(Linputs[Li]);        
-      
-      for(Li = 0; Li < Ltextareas.length; Li++)
-        keymanweb.attachToControl(Ltextareas[Li]);
-      
-      for(Li = 0; Li < Lframes.length; Li++)
-        try {
-          if(Lframes[Li].contentWindow.document)
-            keymanweb._AttachToIframe(Lframes[Li]);
-        }
-        catch(err) { /* Do not attempt to access iframes outside this site */ }
-        
-      if(Lce)  // I2457 - support contentEditable elements in mozilla, webkit
-      {
-        for (var Lc = Lce.iterateNext(); Lc; Lc = Lce.iterateNext())
-        {
-          keymanweb.attachToControl(Lc);
+      if(Lce) { // I2457 - support contentEditable elements in mozilla, webkit
+        if("iterateNext" in Lce) { // Is sometimes not on mobile solutions.
+          for (var Lc = Lce.iterateNext(); Lc; Lc = Lce.iterateNext()) {
+            possibleInputs.push(Lc);
+          }
+        } else if(Array.isArray(Lce)) { // happens in Chrome mobile emulation.
+          possibleInputs.concat(Lce);
         }
       }
 
-      // Attach keymanweb-input DIV elements  I3363 (Build 301)
-      for(Li = 0; Li<keymanweb.inputList.length; Li++)
-      {
-        keymanweb.attachToControl(keymanweb.inputList[Li]);
+
+      for(var Li = 0; Li < possibleInputs.length; Li++) {
+        var input = possibleInputs[Li];
+
+        // It knows how to handle pre-loaded iframes appropriately.
+        keymanweb.attachToControl(possibleInputs[Li]);
+      }
+    }
+
+        /**
+     * Function     _ClearDocument
+     * Scope        Private
+     * Parameters   {Element}     Pelem - the root element of a document, including IFrame documents.
+     * Description  Used to automatically detach KMW from editable controls, regardless of control path.
+     *              Mostly used to clear out all controls of a detached IFrame.
+     */
+    keymanweb._ClearDocument = function(Pelem) { // I1961
+      /**
+       * Function     LiTmp
+       * Scope        Private
+       * @param       {string}    _colon    type of element
+       * @return      {Array}               array of elements of specified type                       
+       * Description  Local function to get list of editable controls
+       */    
+      var LiTmp = function(_colon){
+        return Pelem.getElementsByTagName(_colon);
+      };
+
+      var possibleInputs = [].concat(
+        util.arrayFromNodeList(LiTmp('INPUT')),
+        util.arrayFromNodeList(LiTmp('TEXTAREA')),
+        util.arrayFromNodeList(LiTmp('IFRAME'))  // Note that isKMWInput() will block these for touch-based devices.
+      );
+      
+      // These are unfortunately accessed via iterator, not array.  Also blocked for touch by isKMWInput().
+      var Lce = util.arrayFromNodeList(document.evaluate 
+          ? document.evaluate('//*[@contenteditable and @contenteditable != "false"]', document, null, XPathResult.ANY_TYPE, null) 
+          : null) // I2457 - support contentEditable elements in mozilla, webkit
+
+      if(Lce) { // I2457 - support contentEditable elements in mozilla, webkit
+        if("iterateNext" in Lce) { // Is sometimes not on mobile solutions.
+          for (var Lc = Lce.iterateNext(); Lc; Lc = Lce.iterateNext()) {
+            possibleInputs.push(Lc);
+          }
+        } else if(Array.isArray(Lce)) { // happens in Chrome mobile emulation.
+          possibleInputs.concat(Lce);
+        }
+      }
+
+
+      for(var Li = 0; Li < possibleInputs.length; Li++) {
+        var input = possibleInputs[Li];
+
+        // It knows how to handle pre-loaded iframes appropriately.
+        keymanweb.detachFromControl(possibleInputs[Li]);
       }
     }
     
@@ -3435,8 +3935,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       // Local function to convert relative to absolute URLs
       // with respect to the source path, server root and protocol 
-      var fixPath = function(p)
-    {
+      var fixPath = function(p) {
         if(p.length == 0) return p;
         
         // Add delimiter if missing
@@ -3576,9 +4075,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if (window.removeEventListener)
         window.removeEventListener('focus', keymanweb._BubbledFocus, true);
     
-      if(keymanweb.options['attachType'] != 'manual')
-        keymanweb._AttachToControls(document);  // I1961
-
       // Set exposed initialization flag member for UI (and other) code to use 
       keymanweb['initialized'] = 1;
   
@@ -3608,19 +4104,20 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       // Determine the default font for mapped elements
       keymanweb.appliedFont=keymanweb.baseFont=keymanweb.getBaseFont();
 
-      // Create an ordered list of all input and textarea fields
-      keymanweb.listInputs();
-      
       // Add orientationchange event handler to manage orientation changes on mobile devices
       // Initialize touch-screen device interface  I3363 (Build 301)
       if(device.touchable) {
         keymanweb.handleRotationEvents();
         keymanweb.setupTouchDevice();
       }    
+      // Initialize browser interface
 
-      // Initialize desktop browser interface
-      else 
-        keymanweb.setupDesktopPage();
+      if(keymanweb.options['attachType'] != 'manual') {
+        keymanweb._SetupDocument(document);
+      }
+
+      // Create an ordered list of all input and textarea fields
+      keymanweb.listInputs();
     
       // Initialize the OSK and set default OSK styles
       // Note that this should *never* be called before the OSK has been initialized.
@@ -3721,84 +4218,123 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         * Of course, we only want to dynamically add elements if the user hasn't enabled the manual attachment option.
         */
 
+      var observationTarget = document.querySelector('body'), observationConfig;
       if(keymanweb.options['attachType'] != 'manual') { //I1961
-        var observationTarget = document.querySelector('body');
+        keymanweb.mutationObserver = new MutationObserver(keymanweb._AutoAttachObserverCore);
 
-        keymanweb.mutationObserver = new MutationObserver(function(mutations) {
-          var inputElementAdditions = [];
-          var inputElementRemovals = [];
-
-          for(var i=0; i < mutations.length; i++) {
-            var mutation = mutations[i];
-            
-            for(var j=0; j < mutation.addedNodes.length; j++) {
-              var addedNode = mutation.addedNodes[j];
-              var lcTagName = addedNode.tagName ? addedNode.tagName.toLowerCase() : "";
-
-              // Will need to handle this in case of child elements in a newly-added element with child elements.
-              if(addedNode.getElementsByTagName) {
-                inputElementAdditions = inputElementAdditions.concat(
-                  util.arrayFromNodeList(addedNode.getElementsByTagName('input')),
-                  util.arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
-                  util.arrayFromNodeList(addedNode.getElementsByTagName('iframe'))
-                );
-              }
-
-              if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe') {
-                inputElementAdditions.push(addedNode);
-              }
-            }          
-
-            for(j = 0; j < mutation.removedNodes.length; j++) {
-              var removedNode = mutation.removedNodes[j];
-              var lcTagName = removedNode.tagName ? removedNode.tagName.toLowerCase() : "";
-
-              // Will need to handle this in case of child elements in a newly-added element with child elements.
-              if(removedNode.getElementsByTagName) {
-                inputElementRemovals = inputElementRemovals.concat(
-                  util.arrayFromNodeList(removedNode.getElementsByTagName('input')),
-                  util.arrayFromNodeList(removedNode.getElementsByTagName('textarea')),
-                  util.arrayFromNodeList(removedNode.getElementsByTagName('iframe'))
-                );
-              }
-              // After all mutations have been handled, we need to recompile our .sortedInputs array.
-            }
-          }
-
-          for(var k = 0; k < inputElementAdditions.length; k++) {
-            keymanweb._MutationAdditionObserved(inputElementAdditions[k]);
-          }
-
-          for(k = 0; k < inputElementRemovals.length; k++) {
-            keymanweb._MutationRemovalObserved(inputElementRemovals[k]);
-          }
-
-          /* After all mutations have been handled, we need to recompile our .sortedInputs array, but only.
-            * if any have actually occurred.
-            */
-          if(inputElementAdditions.length || inputElementRemovals.length) {
-            if(!device.touchable) {
-              keymanweb.listInputs();
-            } else if(device.touchable) {   // If something was added or removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
-              window.setTimeout(function() {
-                keymanweb.listInputs();
-
-                for(var k = 0; k < keymanweb.sortedInputs.length; k++) {
-                  if(keymanweb.sortedInputs[k]['kmw_ip']) {
-                    keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
-                  }
-                }
-              }, 1);
-            }
-          }
-        });
-
-        var observationConfig = { childList: true, subtree: true };
+        observationConfig = { childList: true, subtree: true};
         keymanweb.mutationObserver.observe(observationTarget, observationConfig);
       }
 
+      /**
+       * Setup of handlers for dynamic detection of the kmw-disabled class tag that controls enablement.
+       */
+      observationConfig = { subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'readonly']};
+      new MutationObserver(keymanweb._EnablementMutationObserverCore).observe(observationTarget, observationConfig);
+
       // Set exposed initialization flag to 2 to indicate deferred initialization also complete
       keymanweb['initialized']=2;
+    }
+
+    keymanweb._EnablementMutationObserverCore = function(mutations) {
+      for(var i=0; i < mutations.length; i++) {
+        var mutation = mutations[i];
+
+        // ( ? : ) needed as a null check.
+        var disabledBefore = mutation.oldValue ? mutation.oldValue.indexOf('kmw-disabled') >= 0 : false;
+        var disabledAfter = mutation.target.className.indexOf('kmw-disabled') >= 0;
+        
+        if(disabledBefore && !disabledAfter) {
+          keymanweb._EnableControl(mutation.target);
+        } else if(!disabledBefore && disabledAfter) {
+          keymanweb._DisableControl(mutation.target);
+        }
+
+        // 'readonly' triggers on whether or not the attribute exists, not its value.
+        if(!disabledAfter && mutation.attributeName == "readonly") {
+          var readonlyBefore = mutation.oldValue ? mutation.oldValue != null : false;
+          var readonlyAfter = mutation.target.readOnly;
+
+          if(readonlyBefore && !readonlyAfter) {
+            keymanweb._EnableControl(mutation.target);
+          } else if(!readonlyBefore && readonlyAfter) {
+            keymanweb._DisableControl(mutation.target);
+          }
+        }
+      }
+    }
+
+    keymanweb._AutoAttachObserverCore = function(mutations) {
+      var inputElementAdditions = [];
+      var inputElementRemovals = [];
+
+      for(var i=0; i < mutations.length; i++) {
+        var mutation = mutations[i];
+        
+        for(var j=0; j < mutation.addedNodes.length; j++) {
+          var addedNode = mutation.addedNodes[j];
+          var lcTagName = addedNode.tagName ? addedNode.tagName.toLowerCase() : "";
+
+          // Will need to handle this in case of child elements in a newly-added element with child elements.
+          if(addedNode.getElementsByTagName) {
+            inputElementAdditions = inputElementAdditions.concat(
+              util.arrayFromNodeList(addedNode.getElementsByTagName('input')),
+              util.arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
+              util.arrayFromNodeList(addedNode.getElementsByTagName('iframe'))
+            );
+          }
+
+          if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe') {
+            inputElementAdditions.push(addedNode);
+          }
+        }          
+
+        for(j = 0; j < mutation.removedNodes.length; j++) {
+          var removedNode = mutation.removedNodes[j];
+          var lcTagName = removedNode.tagName ? removedNode.tagName.toLowerCase() : "";
+
+          // Will need to handle this in case of child elements in a newly-added element with child elements.
+          if(removedNode.getElementsByTagName) {
+            inputElementRemovals = inputElementRemovals.concat(
+              util.arrayFromNodeList(removedNode.getElementsByTagName('input')),
+              util.arrayFromNodeList(removedNode.getElementsByTagName('textarea')),
+              util.arrayFromNodeList(removedNode.getElementsByTagName('iframe'))
+            );
+          }
+          // After all mutations have been handled, we need to recompile our .sortedInputs array.
+        }
+      }
+
+      for(var k = 0; k < inputElementAdditions.length; k++) {
+        if(keymanweb.isKMWInput(inputElementAdditions[k])) { // Apply standard element filtering!
+          keymanweb._MutationAdditionObserved(inputElementAdditions[k]);
+        }
+      }
+
+      for(k = 0; k < inputElementRemovals.length; k++) {
+        if(keymanweb.isKMWInput(inputElementRemovals[k])) { // Apply standard element filtering!
+          keymanweb._MutationRemovalObserved(inputElementRemovals[k]);
+        }
+      }
+
+      /* After all mutations have been handled, we need to recompile our .sortedInputs array, but only
+        * if any have actually occurred.
+        */
+      if(inputElementAdditions.length || inputElementRemovals.length) {
+        if(!device.touchable) {
+          keymanweb.listInputs();
+        } else if(device.touchable) {   // If something was added or removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
+          window.setTimeout(function() {
+            keymanweb.listInputs();
+
+            for(var k = 0; k < keymanweb.sortedInputs.length; k++) {
+              if(keymanweb.sortedInputs[k]['kmw_ip']) {
+                keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
+              }
+            }
+          }, 1);
+        }
+      }
     }
 
     /** 
@@ -3809,49 +4345,38 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * 
      */
     keymanweb._MutationAdditionObserved = function(Pelem) {
-      if(!device.touchable) {
-        // keymanweb.attachToControl is written to handle iframes, but setupDesktopElement is not.
-        if(keymanweb.setupDesktopElement(Pelem)) {
+      if(Pelem.tagName.toLowerCase() == 'iframe' && !device.touchable) {
+        //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
+
+        var attachFunctor = function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
           keymanweb.attachToControl(Pelem);
-        } else if(Pelem.tagName.toLowerCase() == 'iframe') {
-          //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
+        };
 
-          var attachFunctor = function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
-            keymanweb.attachToControl(Pelem);
-          };
+        Pelem.addEventListener('load', attachFunctor);
 
-          Pelem.addEventListener('load', attachFunctor);
-
-          /* If the iframe has somehow already loaded, we can't expect the onload event to be raised.  We ought just
-          * go ahead and perform our callback's contents.
-          * 
-          * keymanweb.attachToControl() is now idempotent, so even if our call 'whiffs', it won't cause long-lasting
-          * problems.
-          */
-          if(Pelem.contentDocument.readyState == 'complete') {
-            attachFunctor();
-          }
+        /* If the iframe has somehow already loaded, we can't expect the onload event to be raised.  We ought just
+        * go ahead and perform our callback's contents.
+        * 
+        * keymanweb.attachToControl() is now idempotent, so even if our call 'whiffs', it won't cause long-lasting
+        * problems.
+        */
+        if(Pelem.contentDocument.readyState == 'complete') {
+          attachFunctor();
         }
       } else {
-        keymanweb.setupTouchElement(Pelem);
-      }
+        keymanweb.attachToControl(Pelem);
+      }  
     }
 
     // Used by the mutation event handler to properly decouple any elements dynamically removed from the document.
     keymanweb._MutationRemovalObserved = function(Pelem) {
       var element = Pelem;
       if(device.touchable) {
-        element = Pelem['kmw_ip'];
-        
-        // We get weird repositioning errors if we don't remove our simulated input element - and permanently.
-        Pelem.parentNode.removeChild(element);
-        delete Pelem['kmw_ip'];
+        keymanweb.disableTouchElement(Pelem);
       }
 
-      var index = keymanweb.inputList.indexOf(Pelem);
-        if(index != -1) {
-        keymanweb.inputList.splice(index, 1);
-      }
+      keymanweb.disableInputElement(Pelem); // Remove all KMW event hooks, styling.
+      keymanweb.clearElementAttachment(element);  // Memory management & auto de-attachment upon removal.
     }
 
     // Create an ordered list of all text and search input elements and textarea elements
