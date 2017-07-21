@@ -2552,7 +2552,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
         keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
         keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
-      } else {.
+      } else {
         keymanweb.globalKeyboard = keyboardID;
         keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
       }
