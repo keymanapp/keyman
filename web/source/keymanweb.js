@@ -315,18 +315,15 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
 
         // Filter out the legacy cases.  If legacy isn't active, then we do our thing.
-        if(!(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null)) {
-          if(keymanweb._LastActiveElement && keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
-            keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
-            keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
-          } else if(keymanweb._Controls.length == 0) { // Legacy kill-switch.
-            keymanweb.globalKeyboard = keyboardID;
-            keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
-          }
+        if(keymanweb._LastActiveElement && keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
+          keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
+          keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
+        } else { 
+          keymanweb.globalKeyboard = keyboardID;
+          keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
         }
 
         // With the attachment API update, we now directly track the old legacy control behavior.
-        keymanweb._ActiveControl = target._kmwAttachment.legacy;
         keymanweb._LastActiveElement = target;
 
         /**
@@ -335,16 +332,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
          */
         keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI']
     
-        if(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null) {
-          if(!keymanweb._JustActivatedKeymanWebUI) {         
-            keymanweb._SetActiveKeyboard(keymanweb._ActiveControl.LDefaultInternalName,'',true); 
-          } else {
-            keymanweb._ActiveControl.LDefaultInternalName = keyboardID;
-          }
-        } else if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
+        if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
           keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
             keymanweb._LastActiveElement._kmwAttachment.languageCode); 
-        } else if(keymanweb._Controls.length == 0) {  // If legacy is in use, we need to kill-switch this behavior.
+        } else { 
           keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
         }
         
@@ -2139,10 +2130,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     keymanweb['disableControl'] = keymanweb.disableControl = function(Pelem) {
       if(!keymanweb.isAttached(Pelem)) {
         console.warn("KeymanWeb is not attached to element " + Pelem);
-      } else if(Pelem._kmwAttachment.legacy) {
-        console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
-        keymanweb.DisableControl(Pelem);
-      }
+      } 
 
       var cn = Pelem.className;
       if(cn.indexOf('kmw-disabled') < 0) { // if not already explicitly disabled...
@@ -2162,10 +2150,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     keymanweb['enableControl'] = keymanweb.enableControl = function(Pelem) {
       if(!keymanweb.isAttached(Pelem)) {
         console.warn("KeymanWeb is not attached to element " + Pelem);
-      } else if(Pelem._kmwAttachment.legacy) {
-        console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
-        keymanweb.EnableControl(Pelem);
-      }
+      } 
 
       var cn = Pelem.className;
       var tagIndex = cn.indexOf('kmw-disabled');
@@ -2240,46 +2225,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         }
       }
     }
-
-    /**
-     * Function    DisableControl
-     * Scope       Private   
-     * Parameters  Pelem   Element to be disabled
-     * Returns     None
-     * Description Legacy:  Disable KMW control element 
-     */    
-    keymanweb.DisableControl = function(Pelem)
-    {
-      if(!keymanweb.isAttached(Pelem) || !Pelem._kmwAttachment.legacy) {
-        var Lc = {LControl:Pelem, LEnabled:0, LDefaultInternalName:'-'};
-        keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
-        if(keymanweb.isAttached(Pelem)) {
-          Pelem._kmwAttachment.legacy = Lc;
-        }
-      } else {
-        Pelem._kmwAttachment.legacy.LEnabled = 0;
-      }
-    }
-
-    /**
-     * Function    EnableControl
-     * Scope       Private   
-     * Parameters  Pelem   Element to be enabled
-     * Returns     None
-     * Description Legacy:  Enable KMW control element 
-     */    
-    keymanweb.EnableControl = function(Pelem)
-    {
-      if(!keymanweb.isAttached(Pelem) || !Pelem._kmwAttachment.legacy) {
-        var Lc = {LControl:Pelem, LEnabled:1, LDefaultInternalName:'-'};
-        keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
-        if(keymanweb.isAttached(Pelem)) {
-          Pelem._kmwAttachment.legacy = Lc;
-        }
-      } else {
-        Pelem._kmwAttachment.legacy.LEnabled = 1;
-      }
-    }
     
     /**
      * Function     setKeyboardForControl
@@ -2308,10 +2253,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(!keymanweb.isAttached(Pelem)) {
         console.error("KeymanWeb is not attached to element " + Pelem);
         return;
-      } else if(Pelem._kmwAttachment.legacy) {
-        console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
-        keymanweb.legacy['SetDefaultKeyboardForControl'](Pelem, Pkbd);
-        return;
       } else {
         Pelem._kmwAttachment.keyboard = Pkbd;
         Pelem._kmwAttachment.languageCode = Plc;
@@ -2339,31 +2280,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(!keymanweb.isAttached(Pelem)) {
         console.error("KeymanWeb is not attached to element " + Pelem);
         return;
-      } else if(Pelem._kmwAttachment.legacy) {
-        console.warn("Correct behavior of KeymanWeb cannot be guaranteed when used alongside certain legacy functions in use.");
-        return Pelem._kmwAttachment.legacy.LDefaultInternalName;
       } else {
         return Pelem._kmwAttachment.languageCode;
-      }
-    }
-
-    /**
-     * Function     SetDefaultKeyboardForControl
-     * Scope        Private   
-     * @param       {Element}      Pelem    Control element 
-     * @param       {string}      Pkbd     Keyboard   
-     * Description  Set default keyboard for control 
-     */    
-    keymanweb.SetDefaultKeyboardForControl = function(Pelem, Pkbd) {
-      /* pass null for kbd to specify no default, or '' to specify English */
-      if(!keymanweb.isAttached(Pelem) || !Pelem._kmwAttachment.legacy) {
-        var Lc = {LControl:Pelem, LEnabled:1, LDefaultInternalName:Pkbd};
-        keymanweb._Controls=keymanweb._push(keymanweb._Controls,Lc);
-        if(keymanweb.isAttached(Pelem)) {
-          Pelem._kmwAttachment.legacy = Lc;
-        }
-      } else {
-        Pelem._kmwAttachment.legacy.LEnabled = Pkbd;
       }
     }
       
@@ -2481,7 +2399,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
           
       //??keymanweb._Selection = null;
-      keymanweb._ActiveControl = Ltarg._kmwAttachment.legacy;  // Gets legacy-maintained control information
 
       // We condition on 'priorElement' below as a check to allow KMW to set a default active keyboard.
       var priorElement = keymanweb._LastActiveElement;
@@ -2489,13 +2406,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       var keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
 
-      if(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null) {
-        if(!keymanweb._JustActivatedKeymanWebUI) {
-          keymanweb._SetActiveKeyboard(keymanweb._ActiveControl.LDefaultInternalName,'',true); 
-        } else {
-          keymanweb._ActiveControl.LDefaultInternalName = keyboardID;
-        }
-      } else if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
+      if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
         if(!keymanweb._JustActivatedKeymanWebUI) {
           keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard,
             keymanweb._LastActiveElement._kmwAttachment.languageCode); 
@@ -2503,7 +2414,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
           keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
         }
-      } else if(priorElement && keymanweb._Controls.length == 0) { // Kill-switch to preserve legacy behavior.
+      } else if(priorElement) { // Avoids complications with initialization and recent detachments.
         if(!keymanweb._JustActivatedKeymanWebUI) {
           keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode); 
         } else {
@@ -2538,7 +2449,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       keymanweb._SetTargDir(Ltarg); 
 
       //Execute external (UI) code needed on focus if required
-      keymanweb.doControlFocused(LfocusTarg,keymanweb._ActiveControl);
+      keymanweb.doControlFocused(LfocusTarg,keymanweb._LastActiveElement);
     
       // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
       if(device.touchable)
@@ -2639,12 +2550,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       ////keymanweb._SelectionControl = null;    
       var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
 
-      if(keymanweb._ActiveControl != null  &&  keymanweb._ActiveControl.LDefaultInternalName != null) {
-        keymanweb._ActiveControl.LDefaultInternalName = keyboardID;
-      } else if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
+      if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
         keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
         keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
-      } else if(keymanweb._Controls.length == 0) { // Legacy kill-switch.
+      } else { // Legacy kill-switch.
         keymanweb.globalKeyboard = keyboardID;
         keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
       }
@@ -2657,8 +2566,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       */
       
       keymanweb._JustActivatedKeymanWebUI = 0;
-
-      keymanweb._ActiveControl = null;
       
       if(!keymanweb._IsActivatingKeymanWebUI) keymanweb._NotifyKeyboard(0,Ltarg,0);  // I2187
 
@@ -2967,8 +2874,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var Ldv,eClass=''; 
 
       keymanweb._KeyPressToSwallow = 0;
-      if(!keymanweb._Enabled || keymanweb._DisableInput || keymanweb._ActiveKeyboard == null ||
-        (keymanweb._ActiveControl != null  &&  !keymanweb._ActiveControl.LEnabled)) return true;
+      if(!keymanweb._Enabled || keymanweb._DisableInput || keymanweb._ActiveKeyboard == null) return true;
 
       // Prevent mapping element is readonly or tagged as kmw-disabled
       var el=util.eventTarget(e);
@@ -3097,8 +3003,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     keymanweb._KeyPress = function(e)
     {
       var Levent;
-      if(!keymanweb._Enabled || keymanweb._DisableInput || keymanweb._ActiveKeyboard == null ||
-        (keymanweb._ActiveControl != null  &&  !keymanweb._ActiveControl.LEnabled)) return true;
+      if(!keymanweb._Enabled || keymanweb._DisableInput || keymanweb._ActiveKeyboard == null) return true;
 
       Levent = keymanweb._GetKeyEventProperties(e);
       if(Levent == null || Levent.LisVirtualKey) return true;
@@ -3788,14 +3693,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         touchEnabled:   device.touchable    // Tracks if the control has an aliased control for touch functionality.
                                             // (Necessary for managing the touch/non-touch event handlers.)
       };
-
-      // Does an old set of legacy data exist for the control? (e.g: if it were removed and readded to the page)
-      for(var Ln=0; Ln<keymanweb._Controls.length; Ln++) { // I1511 - array prototype extended
-        if(keymanweb._Controls[Ln].LControl == x)
-        {
-          x._kmwAttachment.legacy = keymanweb._Controls[Ln];
-        }
-      }
     }
 
     /**
