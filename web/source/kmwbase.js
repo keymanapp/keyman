@@ -38,8 +38,6 @@ if(!tavultesoft['keymanweb']) {
       _ActiveStub: null,        // ActiveStub - points to active stub in KeyboardStubs  
       _AnyIndices: [],          // AnyIndex - array of any/index match indices
       _DeadKeys: [],            // DeadKeys - array of matched deadkeys
-      _ActiveControl: null,     // Currently active control in _Controls array
-      _Controls: [],            // (Legacy) Array of controls with specific states: .Control, .Enabled, .DefaultInternalName  
       _AttachedElements: [],    // I1596 - attach to controls dynamically
       _ActiveElement: null,     // Currently active (focused) element  I3363 (Build 301)
       _LastActiveElement: null, // LastElem - Last active element

@@ -314,7 +314,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
          */  
         var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
 
-        // Filter out the legacy cases.  If legacy isn't active, then we do our thing.
         if(keymanweb._LastActiveElement && keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
           keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
           keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
@@ -2553,7 +2552,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
         keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
         keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
-      } else { // Legacy kill-switch.
+      } else {.
         keymanweb.globalKeyboard = keyboardID;
         keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
       }
@@ -3688,7 +3687,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       // The `_kmwAttachment` property tag maintains all relevant KMW-maintained data regarding the element.
       // It is disgarded upon de-attachment.
       x._kmwAttachment = {
-        //legacy:       undefined,          // Tracks the legacy equivalent of attachment data, when appropriate.
         keyboard:       null,               // Tracks the control's independent keyboard selection, when applicable.
         touchEnabled:   device.touchable    // Tracks if the control has an aliased control for touch functionality.
                                             // (Necessary for managing the touch/non-touch event handlers.)
