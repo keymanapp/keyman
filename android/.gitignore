@@ -1,0 +1,34 @@
+# Covers JetBrains IDE: Android Studio
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+
+# Built application files
+**/build/
+
+# Local configuration file (sdk path, etc)
+**/local.properties
+
+# User-specific stuff:
+**/.idea/libraries/
+**/.idea/codeStyleSettings.xml
+**/.idea/dictionaries
+**/.idea/workspace.xml
+**/.idea/gradle.xml
+**/.idea/tasks.xml
+**/.idea/misc.xml
+**/.idea/modules.xml
+**/.idea/vcs.xml
+**/*.iml
+
+# Gradle generated files
+**/.gradle/
+
+# OS-specific files
+**/.DS_Store
+
+# This is the file output from KMEA; it's part of our build process.
+**/libs/keyman-engine.aar
+
+# keymanweb dependencies
+KMEA/app/src/main/assets/
+KMAPro/assets/keyman.js
+

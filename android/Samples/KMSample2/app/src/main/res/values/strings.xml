@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">KMSample2</string>
+
+    <string name="description">Go to input method settings and enable KMSample2 then select it from input method picker.</string>
+    <string name="action_settings">Settings</string>
+</resources>
