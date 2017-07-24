@@ -68,6 +68,8 @@ HRESULT CKMTipTextService::CreateInstance(IUnknown *pUnkOuter, REFIID riid, void
 //
 //----------------------------------------------------------------------------
 
+__declspec(thread) CKMTipTextService *CKMTipTextService::ThreadThis;
+
 CKMTipTextService::CKMTipTextService()
 {
     DllAddRef();
@@ -78,6 +80,7 @@ CKMTipTextService::CKMTipTextService()
     _dwThreadMgrEventSinkCookie = TF_INVALID_COOKIE;
 
     _cRef = 1;
+    ThreadThis = this;
 }
 
 //+---------------------------------------------------------------------------
@@ -88,7 +91,8 @@ CKMTipTextService::CKMTipTextService()
 
 CKMTipTextService::~CKMTipTextService()
 {
-    DllRelease();
+  ThreadThis = NULL;
+  DllRelease();
 }
 
 //+---------------------------------------------------------------------------

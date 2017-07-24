@@ -253,3 +253,4 @@ void CKMTipTextService::_UninitThreadMgrSink()
 
     _dwThreadMgrEventSinkCookie = TF_INVALID_COOKIE;
 }
+

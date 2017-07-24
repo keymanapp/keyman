@@ -88,6 +88,10 @@ public:
 
     BOOL TIPNotifyActivate(GUID *guidProfile);
 
+    BOOL DoRefreshPreservedKeys(BOOL Activating);
+
+    static __declspec(thread) CKMTipTextService *ThreadThis;
+
 private:
     // init methods
     BOOL _InitThreadMgrSink();

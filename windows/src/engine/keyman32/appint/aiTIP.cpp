@@ -670,3 +670,19 @@ BOOL AITIP::QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR
 
 	return TRUE;
 }
+
+typedef BOOL(WINAPI *PREFRESHPRESERVEDKEYSFUNC)(BOOL Activating);
+
+void RefreshPreservedKeys(BOOL Activating) {
+#ifdef _WIN64
+  HMODULE hModule = GetModuleHandle("kmtip64");
+#else
+  HMODULE hModule = GetModuleHandle("kmtip");
+#endif
+  if (hModule != NULL) {
+    PREFRESHPRESERVEDKEYSFUNC pRefreshPreservedKeys = (PREFRESHPRESERVEDKEYSFUNC)GetProcAddress(hModule, "RefreshPreservedKeys");
+    if (pRefreshPreservedKeys) {
+      pRefreshPreservedKeys(Activating);
+    }
+  }
+}

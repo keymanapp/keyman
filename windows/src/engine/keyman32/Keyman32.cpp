@@ -518,6 +518,8 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_RestartEngine()
 
 extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_StopForcingKeyboard();
 
+void RefreshPreservedKeys(BOOL Activating);
+
 extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName)
 {
 	SendDebugMessageFormat(0,sdmGlobal,0,"Keyman_ForceKeyboard: ENTER %s", FileName);
@@ -551,6 +553,7 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
 		LoadDLLs(_td->lpActiveKeyboard);
 		ActivateDLLs(_td->lpActiveKeyboard);
     LoadKeyboardOptions(_td->lpActiveKeyboard);   // I2437 - Crash unloading keyboard due to keyboard options not set
+    RefreshPreservedKeys(TRUE);
 		return TRUE;
 	}
 
@@ -586,7 +589,8 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_StopForcingKeyboard()
 		_td->ForceFileName[0] = 0;
     FreeKeyboardOptions(_td->lpActiveKeyboard);
 		ReleaseKeyboardMemory(_td->lpActiveKeyboard->Keyboard);
-		delete _td->lpActiveKeyboard;
+    RefreshPreservedKeys(FALSE);
+    delete _td->lpActiveKeyboard;
 		_td->lpActiveKeyboard = NULL;
 	}
 	return TRUE;
