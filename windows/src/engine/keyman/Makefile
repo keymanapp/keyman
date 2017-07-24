@@ -37,8 +37,8 @@ debug-manifest:
     copy std-manifest.xml manifest.xml
 
 install:
-    $(COPY) $(PROGRAM)\engine\keyman.exe "C:\Program Files (x86)\Common Files\Tavultesoft\Keyman Engine 10.0"
-    $(COPY) keyman.rsm "C:\Program Files (x86)\Common Files\Tavultesoft\Keyman Engine 10.0"
+    $(COPY) $(PROGRAM)\engine\keyman.exe "C:\Program Files (x86)\Common Files\Keyman\Keyman Engine 10.0"
+    $(COPY) keyman.rsm "C:\Program Files (x86)\Common Files\Keyman\Keyman Engine 10.0"
 
 test-uiaccess:
     grep -c "uiAccess=\"true\"" manifest.xml

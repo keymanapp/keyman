@@ -64,7 +64,6 @@
    // I3583   // I4287
 #include "keyman64.h"
 
-char *MessageName(UINT msg);
 void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void GetCapsAndNumlockState();

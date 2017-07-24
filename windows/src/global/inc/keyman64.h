@@ -296,17 +296,19 @@ void InitDebugging();
 void UninitDebugging();
 void ProcessDebugMessage(HWND hwnd, WPARAM wParam, LPARAM lParam);
 
-#define SendDebugMessage(hwnd,state,kmn_lineno,msg) (ShouldDebug((state)) ? SendDebugMessage_1((hwnd),(state),(kmn_lineno),(msg)) : 0)
-#define SendDebugMessageFormat(hwnd,state,kmn_lineno,msg,...) (ShouldDebug((state)) ? SendDebugMessageFormat_1((hwnd),(state),(kmn_lineno),(msg),__VA_ARGS__) : 0)
+#define SendDebugMessage(hwnd,state,kmn_lineno,msg) (ShouldDebug((state)) ? SendDebugMessage_1((hwnd),(state),(kmn_lineno), __FILE__, __LINE__, (msg)) : 0)
+#define SendDebugMessageFormat(hwnd,state,kmn_lineno,msg,...) (ShouldDebug((state)) ? SendDebugMessageFormat_1((hwnd),(state),(kmn_lineno), __FILE__, __LINE__, (msg),__VA_ARGS__) : 0)
 #define ShouldDebug(state) ShouldDebug_1()
 #define DebugLastError() (DebugLastError_1(__FILE__,__LINE__,__FUNCTION__,__DATE__))
 
-int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *msg);
-int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *fmt, ...);
+int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *msg);
+int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *fmt, ...);
 void DebugLastError_1(char *file, int line, char *func, char *date);
 void DebugMessage(LPMSG msg, WPARAM wParam);
 void DebugShift(char *function, char *point);
 BOOL DebugSignalPause(BOOL fIsUp);
+char *Debug_VirtualKey(WORD vk);
+char *Debug_UnicodeString(PWSTR s, int x = 0);
 
 inline BOOL ShouldDebug_1(); // TSDMState state);
 
@@ -334,10 +336,7 @@ extern "C" PWSTR  _declspec(dllexport) WINAPI GetSystemStore(LPKEYBOARD kb, DWOR
 
 DWORD ExceptionMessage(LPSTR Proc, LPEXCEPTION_POINTERS ep);
 
-int Running2KOrLater(void);
-
-BOOL keybd_shift(LPINPUT pInputs, int *n, int AShiftFlags, BOOL FPrefix, BOOL FAsync);
-BOOL keybd_shift_reset(LPINPUT pInputs, int *n);
+BOOL keybd_shift(LPINPUT pInputs, int *n, BOOL FReset);
 
 //#define KEYEVENT_EXTRAINFO_KEYMAN 0xF00F0000   // I4370
 

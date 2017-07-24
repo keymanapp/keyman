@@ -191,7 +191,7 @@ inline BOOL ShouldDebug_1() //TSDMState state)
 	return _td->debug_KeymanLog;
 }
 
-int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *fmt, ...)
+int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *fmt, ...)
 {
 	char fmtbuf[256];
 
@@ -199,7 +199,7 @@ int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *f
 	va_start(vars, fmt);
 	vsnprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars);  // I2248   // I3547
 	fmtbuf[255] = 0;
-	SendDebugMessage(hwnd, state, kmn_lineno, fmtbuf);
+	SendDebugMessage_1(hwnd, state, kmn_lineno, file, line, fmtbuf);
 
   return 0;
 }
@@ -237,7 +237,7 @@ int GetActualShiftState() {   // I4843
   return state;
 }
 
-int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *msg)
+int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *msg)
 {
   UNREFERENCED_PARAMETER(hwnd);
   UNREFERENCED_PARAMETER(state);   // I3569
@@ -303,6 +303,7 @@ int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *msg)
       //  "%d" TAB  //"MessageType" TAB   // I3569
       //  "%d" TAB  //"SourceLine" TAB   // I3569
         "%8x" TAB //"ActiveHKL" TAB
+        "%s:%d" TAB  //"SourceFile" TAB
         "%s",     //"Message"
   			
         sProcessName,                    //"Process" TAB
@@ -330,6 +331,7 @@ int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *msg)
     //    state,                           //"MessageType" TAB   // I3569
     //    kmn_lineno,                      //"SourceLine" TAB   // I3569
         GetKeyboardLayout(0),            //"ActiveHKL" TAB
+        file, line,                      //"SourceFile" TAB
         msg);                            //"Message"
     }                                       
 #ifdef _FILELOG                        
@@ -427,26 +429,6 @@ void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908
 	SendDebugMessage(msg->hwnd, sdmMessage, 0, ds);
 }
 
-//char buf[64] = "A";
-   // I4196
-char *MessageName(UINT msg)
-{
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return "";
-
-	if(msg == wm_keymankeydown) return "wm_keymankeydown";
-	if(msg == wm_keymankeyup) return "wm_keymankeyup";
-	if(msg == wm_keyman) return "wm_keyman";
-
-	switch(msg)
-	{
-	case WM_KEYDOWN: return "WM_KEYDOWN";
-	case WM_KEYUP: return "WM_KEYUP";
-	case WM_CHAR: return "WM_CHAR";
-	}
-	wsprintf(_td->debug_buf, "WM_%x", msg); return _td->debug_buf;
-}
-
 void DebugShift(char *function, char *point)
 {
 	BYTE kbd[256];
@@ -469,7 +451,7 @@ BOOL DebugSignalPause(BOOL fIsUp)
   {
     if(fIsUp)
     {
-      SendDebugMessage_1(NULL, sdmDebug, -1, NULL); // Signals an event to the controller
+      SendDebugMessage_1(NULL, sdmDebug, -1, NULL, 0, NULL); // Signals an event to the controller
     }
     return TRUE;
   }
@@ -485,4 +467,34 @@ void DebugLastError_1(char *file, int line, char *func, char *date)
     FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, err, 0, msg, sizeof(msg), NULL);
     SendDebugMessageFormat_1(NULL, sdmDebug, 0, "ERROR %d in %s [%s:%d]: %s", err, func, file, line, date, msg);
   }
+}
+
+char *Debug_VirtualKey(WORD vk) {
+  __declspec(thread) static char buf[256];
+  if (!ShouldDebug(sdmDebug)) {
+    return "";
+  }
+
+  if (vk < 255) {
+    wsprintf(buf, "['%s' 0x%x]", KeyNames[vk], vk);
+  }
+  else {
+    wsprintf(buf, "[0x%x]", vk);
+  }
+  return buf;
+}
+
+char *Debug_UnicodeString(PWSTR s, int x) {
+  if (!ShouldDebug(sdmDebug)) {
+    return "";
+  }
+  __declspec(thread) static char bufout[2][128 * 7];
+  WCHAR *p;
+  char *q;
+  for (p = s, q = bufout[x]; *p && (p - s < 128); p++)
+  {
+    wsprintf(q, "U+%4.4X ", *p); q = strchr(q, 0);
+  }
+  //WideCharToMultiByte(CP_ACP, 0, buf, -1, bufout, 128, NULL, NULL);
+  return bufout[x];
 }

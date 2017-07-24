@@ -61,7 +61,6 @@
 *	messages that aren't Sent or Posted.
 */
 
-char *MessageName(UINT msg);
 LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 LRESULT CALLBACK kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)

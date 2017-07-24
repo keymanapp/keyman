@@ -81,24 +81,12 @@ BOOL fOutputKeystroke;
 	return bufout;
 }*/
 
-char *format_unicode_debug(WCHAR *buf)
-{
-	WCHAR *p;
-	static char bufout[128*7];
-	char *q;
-	for(p = buf, q = bufout; *p && (p-buf < 128); p++)
-	{
-		wsprintf(q, "U+%4.4X ", *p); q = strchr(q, 0);
-	}
-	//WideCharToMultiByte(CP_ACP, 0, buf, -1, bufout, 128, NULL, NULL);
-	return bufout;
-}
 
 char *getcontext_debug() {
   //return "";
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return "";
-	return format_unicode_debug(_td->app->ContextBufMax(128));
+	return Debug_UnicodeString(_td->app->ContextBufMax(128));
 }
 
 /*
@@ -137,8 +125,8 @@ BOOL ProcessHook()
 
 	if(_td->state.msg.message == wm_keymankeydown) {   // I4827
     if (ShouldDebug(sdmKeyboard)) {
-      SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %d Context '%s'",
-        _td->state.vkey, getcontext_debug());
+      SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %s Context '%s'",
+        Debug_VirtualKey(_td->state.vkey), getcontext_debug());
     }
 	
 		AIDEBUGKEYINFO keyinfo;
@@ -234,8 +222,8 @@ BOOL ProcessGroup(LPGROUP gp)
 	*/
 
   if(ShouldDebug(sdmKeyboard))
-	  SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "state.vkey: %d shiftFlags: %x; charCode: %X", 
-  		_td->state.vkey, Globals::get_ShiftState(), _td->state.charCode);   // I4582
+	  SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "state.vkey: %s shiftFlags: %x; charCode: %X", 
+      Debug_VirtualKey(_td->state.vkey), Globals::get_ShiftState(), _td->state.charCode);   // I4582
 
 	if(gp)
 	{
