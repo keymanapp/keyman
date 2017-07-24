@@ -7,104 +7,112 @@
 package com.tavultesoft.kmea;
 
 public final class R {
-	public static final class anim {
-		public static final int fade_in = 0x7f040000;
-		public static final int fade_out = 0x7f040001;
-		public static final int hold = 0x7f040002;
-		public static final int key_preview_fade_in = 0x7f040003;
-		public static final int key_preview_fade_out = 0x7f040004;
-	}
-	public static final class color {
-		public static final int activated_bg = 0x7f080007;
-		public static final int key_preview_bg = 0x7f08000b;
-		public static final int key_preview_bg2 = 0x7f08000c;
-		public static final int key_preview_border = 0x7f08000d;
-		public static final int popup_bg = 0x7f080008;
-		public static final int popup_bg2 = 0x7f080009;
-		public static final int popup_border = 0x7f08000a;
-	}
-	public static final class dimen {
-		public static final int help_bubble_height = 0x7f070017;
-		public static final int help_bubble_offset_x = 0x7f070018;
-		public static final int help_bubble_offset_y = 0x7f070019;
-		public static final int help_bubble_width = 0x7f070016;
-		public static final int key_height = 0x7f070010;
-		public static final int key_width = 0x7f07000f;
-		public static final int keyboard_height = 0x7f07000e;
-		public static final int popup_arrow_height = 0x7f070012;
-		public static final int popup_arrow_width = 0x7f070011;
-		public static final int popup_margin = 0x7f070013;
-		public static final int popup_offset_y = 0x7f070015;
-		public static final int popup_padding = 0x7f070014;
-	}
-	public static final class drawable {
-		public static final int ic_action_accept = 0x7f020028;
-		public static final int ic_action_back = 0x7f020029;
-		public static final int ic_action_next = 0x7f02002b;
-		public static final int ic_launcher = 0x7f02002f;
-		public static final int list_header = 0x7f020038;
-		public static final int list_item = 0x7f020039;
-		public static final int oval_button = 0x7f02003a;
-		public static final int subkey_phone = 0x7f02003b;
-		public static final int subkey_tablet = 0x7f02003c;
-	}
-	public static final class id {
-		public static final int bar_title = 0x7f060031;
-		public static final int button1 = 0x7f060033;
-		public static final int grid = 0x7f060035;
-		public static final int image1 = 0x7f06002c;
-		public static final int imageButton1 = 0x7f06002f;
-		public static final int kmKeyPreviewView = 0x7f06002a;
-		public static final int kmPopoverView = 0x7f060028;
-		public static final int left_button = 0x7f060030;
-		public static final int linearLayout1 = 0x7f06002e;
-		public static final int listView = 0x7f060022;
-		public static final int popup_delete = 0x7f06003f;
-		public static final int right_button = 0x7f060032;
-		public static final int subkey_button = 0x7f060034;
-		public static final int text1 = 0x7f06002b;
-		public static final int text2 = 0x7f06002d;
-		public static final int textView1 = 0x7f060029;
-	}
-	public static final class layout {
-		public static final int help_bubble_layout = 0x7f030015;
-		public static final int key_preview_layout = 0x7f030016;
-		public static final int list_layout = 0x7f030017;
-		public static final int list_row_layout1 = 0x7f030018;
-		public static final int list_row_layout2 = 0x7f030019;
-		public static final int list_row_layout3 = 0x7f03001a;
-		public static final int list_title_layout1 = 0x7f03001b;
-		public static final int list_title_layout2 = 0x7f03001c;
-		public static final int overlay_layout = 0x7f03001d;
-		public static final int subkey_layout = 0x7f03001e;
-		public static final int subkeys_popup_layout = 0x7f03001f;
-	}
-	public static final class menu {
-		public static final int popup = 0x7f0b0001;
-	}
-	public static final class string {
-		public static final int action_settings = 0x7f09001c;
-		public static final int app_name = 0x7f09001b;
-		public static final int device_type = 0x7f09001a;
-		public static final int help_bubble_text = 0x7f090027;
-		public static final int image_button = 0x7f090023;
-		public static final int image_view = 0x7f090024;
-		public static final int kma_prefs_name = 0x7f090026;
-		public static final int label_action_button = 0x7f09001f;
-		public static final int label_add = 0x7f090021;
-		public static final int label_back = 0x7f090022;
-		public static final int label_done = 0x7f090020;
-		public static final int popup_menu_delete = 0x7f090025;
-		public static final int reactivate = 0x7f090029;
-		public static final int title_add_keyboard = 0x7f09001e;
-		public static final int title_keyboards = 0x7f09001d;
-		public static final int trial_expired = 0x7f090028;
-	}
-	public static final class style {
-		public static final int AppBaseTheme = 0x7f0a0003;
-		public static final int AppTheme = 0x7f0a0004;
-		public static final int KeyPreviewAnim = 0x7f0a0006;
-		public static final int PopupAnim = 0x7f0a0005;
-		public static final int subkey_button = 0x7f0a0007;
-	}
+  public static final class anim {
+    public static final int fade_in = 0x7f040000;
+    public static final int fade_out = 0x7f040001;
+    public static final int hold = 0x7f040002;
+    public static final int key_preview_fade_in = 0x7f040003;
+    public static final int key_preview_fade_out = 0x7f040004;
+  }
+
+  public static final class color {
+    public static final int activated_bg = 0x7f080007;
+    public static final int key_preview_bg = 0x7f08000b;
+    public static final int key_preview_bg2 = 0x7f08000c;
+    public static final int key_preview_border = 0x7f08000d;
+    public static final int popup_bg = 0x7f080008;
+    public static final int popup_bg2 = 0x7f080009;
+    public static final int popup_border = 0x7f08000a;
+  }
+
+  public static final class dimen {
+    public static final int help_bubble_height = 0x7f070017;
+    public static final int help_bubble_offset_x = 0x7f070018;
+    public static final int help_bubble_offset_y = 0x7f070019;
+    public static final int help_bubble_width = 0x7f070016;
+    public static final int key_height = 0x7f070010;
+    public static final int key_width = 0x7f07000f;
+    public static final int keyboard_height = 0x7f07000e;
+    public static final int popup_arrow_height = 0x7f070012;
+    public static final int popup_arrow_width = 0x7f070011;
+    public static final int popup_margin = 0x7f070013;
+    public static final int popup_offset_y = 0x7f070015;
+    public static final int popup_padding = 0x7f070014;
+  }
+
+  public static final class drawable {
+    public static final int ic_action_accept = 0x7f020028;
+    public static final int ic_action_back = 0x7f020029;
+    public static final int ic_action_next = 0x7f02002b;
+    public static final int ic_launcher = 0x7f02002f;
+    public static final int list_header = 0x7f020038;
+    public static final int list_item = 0x7f020039;
+    public static final int oval_button = 0x7f02003a;
+    public static final int subkey_phone = 0x7f02003b;
+    public static final int subkey_tablet = 0x7f02003c;
+  }
+
+  public static final class id {
+    public static final int bar_title = 0x7f060031;
+    public static final int button1 = 0x7f060033;
+    public static final int grid = 0x7f060035;
+    public static final int image1 = 0x7f06002c;
+    public static final int imageButton1 = 0x7f06002f;
+    public static final int kmKeyPreviewView = 0x7f06002a;
+    public static final int kmPopoverView = 0x7f060028;
+    public static final int left_button = 0x7f060030;
+    public static final int linearLayout1 = 0x7f06002e;
+    public static final int listView = 0x7f060022;
+    public static final int popup_delete = 0x7f06003f;
+    public static final int right_button = 0x7f060032;
+    public static final int subkey_button = 0x7f060034;
+    public static final int text1 = 0x7f06002b;
+    public static final int text2 = 0x7f06002d;
+    public static final int textView1 = 0x7f060029;
+  }
+
+  public static final class layout {
+    public static final int help_bubble_layout = 0x7f030015;
+    public static final int key_preview_layout = 0x7f030016;
+    public static final int list_layout = 0x7f030017;
+    public static final int list_row_layout1 = 0x7f030018;
+    public static final int list_row_layout2 = 0x7f030019;
+    public static final int list_row_layout3 = 0x7f03001a;
+    public static final int list_title_layout1 = 0x7f03001b;
+    public static final int list_title_layout2 = 0x7f03001c;
+    public static final int overlay_layout = 0x7f03001d;
+    public static final int subkey_layout = 0x7f03001e;
+    public static final int subkeys_popup_layout = 0x7f03001f;
+  }
+
+  public static final class menu {
+    public static final int popup = 0x7f0b0001;
+  }
+
+  public static final class string {
+    public static final int action_settings = 0x7f09001c;
+    public static final int app_name = 0x7f09001b;
+    public static final int device_type = 0x7f09001a;
+    public static final int help_bubble_text = 0x7f090027;
+    public static final int image_button = 0x7f090023;
+    public static final int image_view = 0x7f090024;
+    public static final int kma_prefs_name = 0x7f090026;
+    public static final int label_action_button = 0x7f09001f;
+    public static final int label_add = 0x7f090021;
+    public static final int label_back = 0x7f090022;
+    public static final int label_done = 0x7f090020;
+    public static final int popup_menu_delete = 0x7f090025;
+    public static final int reactivate = 0x7f090029;
+    public static final int title_add_keyboard = 0x7f09001e;
+    public static final int title_keyboards = 0x7f09001d;
+    public static final int trial_expired = 0x7f090028;
+  }
+
+  public static final class style {
+    public static final int AppBaseTheme = 0x7f0a0003;
+    public static final int AppTheme = 0x7f0a0004;
+    public static final int KeyPreviewAnim = 0x7f0a0006;
+    public static final int PopupAnim = 0x7f0a0005;
+    public static final int subkey_button = 0x7f0a0007;
+  }
 }

@@ -98,7 +98,7 @@ public class ToolTipPopup {
      * Display this tool tip to the user
      */
     @SuppressLint("WrongCall")
-	public void show() {
+    public void show() {
         if (mAnchorViewRef.get() != null) {
             mPopupContent = new PopupContentView(mContext);
             TextView body = (TextView) mPopupContent.findViewById(
