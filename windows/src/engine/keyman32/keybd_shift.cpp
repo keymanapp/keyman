@@ -50,10 +50,10 @@ void do_keybd_event(LPINPUT pInputs, int *n, BYTE vk, BYTE scan, DWORD flags, UL
   input.ki.dwFlags = flags;
   input.ki.time = 0;
   input.ki.dwExtraInfo = extraInfo;
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "do_keybd_event(vk=%x, scan=%x, flags=%x)", vk, scan, flags);
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "do_keybd_event(n=%d, vk=%s, scan=%x, flags=%x)", *n, Debug_VirtualKey(vk), scan, flags);
 
   pInputs[*n] = input;
-  *n++;
+  (*n)++;
   //if(SendInput(1, &input, sizeof(INPUT)) == 0) {
   //  SendDebugMessageFormat(0, sdmAIDefault, 0, "do_keybd_event: SendInput failed = %d", GetLastError());
   //}
@@ -81,7 +81,7 @@ BOOL keybd_sendshift(LPINPUT pInputs, int *n, BYTE *kbd, int AShiftState, BYTE v
 	{
 		if((kbd[vkey] & 0x80) == 0) 
 		{
-			SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendshift: sending keydown - vkey=%x", vkey);
+			SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendshift: sending keydown - vkey=%s", Debug_VirtualKey(vkey));
       keybd_sendprefix(pInputs, n, FPrefix);
 			do_keybd_event(pInputs, n, vkey, 0xFF, eventflags, 0);   // I4548
       return TRUE;
@@ -91,7 +91,7 @@ BOOL keybd_sendshift(LPINPUT pInputs, int *n, BYTE *kbd, int AShiftState, BYTE v
 	{
 		if(kbd[vkey] & 0x80)
 		{
-			SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendshift: sending keyup - vkey=%x", vkey);
+			SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendshift: sending keyup - vkey=%s", Debug_VirtualKey(vkey));
       keybd_sendprefix(pInputs, n, FPrefix);
 			do_keybd_event(pInputs, n, vkey, 0xFF, KEYEVENTF_KEYUP|eventflags, 0);   // I4548
       return TRUE;
@@ -113,15 +113,22 @@ void GetAsyncKeyboardShiftState(BYTE *kbd) {
   }
 }
 
-BOOL keybd_shift(LPINPUT pInputs, int *n, int AShiftFlags, BOOL FPrefix, BOOL FAsync)
+BOOL keybd_shift(LPINPUT pInputs, int *n, BOOL FReset)
 {
 	BYTE kbd[256];
-  if(FAsync) {
-    GetAsyncKeyboardShiftState(kbd);
+  int AShiftFlags;
+
+  if(FReset) {
+    memset(kbd, 0, sizeof(kbd));
+    AShiftFlags = Globals::get_ShiftState();
   } else {
   	GetKeyboardState(kbd);
+    AShiftFlags = 0;
   }
-	
+
+  // We only want to put out a prefix code if we are at the start of the output
+  BOOL FPrefix = !FReset;
+
 	SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_shift: kbd[CAS]: %x %x %x | %x %x %x | %x "
 		"AShiftFlags[CAS]: %d %d %d | %d %d %d | %d",
 		kbd[VK_CONTROL], kbd[VK_LCONTROL], kbd[VK_RCONTROL], kbd[VK_MENU], kbd[VK_LMENU], kbd[VK_RMENU], kbd[VK_SHIFT],
@@ -175,9 +182,4 @@ BOOL keybd_shift(LPINPUT pInputs, int *n, int AShiftFlags, BOOL FPrefix, BOOL FA
   }
 
   return res;
-}
-
-BOOL keybd_shift_reset(LPINPUT pInputs, int *n)
-{
-	return keybd_shift(pInputs, n, Globals::get_ShiftState(), FALSE, TRUE);
 }

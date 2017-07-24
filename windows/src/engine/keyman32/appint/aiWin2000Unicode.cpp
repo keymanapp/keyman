@@ -198,7 +198,7 @@ BOOL AIWin2000Unicode::PostKeys()
      (Queue[0].ItemType != QIT_VSHIFTDOWN && Queue[0].ItemType != QIT_VSHIFTUP))   /* I1813 - need to test queuesize as well */
   {
     /* Fakes a key to block Alt being recognised as a menu key */
-    keybd_shift(pInputs, &n, 0, TRUE, FALSE);
+    keybd_shift(pInputs, &i, FALSE);
   }
 
   for(; n < QueueSize; n++)
@@ -296,13 +296,13 @@ BOOL AIWin2000Unicode::PostKeys()
 	  }
   }
 
-  keybd_shift_reset(pInputs, &i);
+  keybd_shift(pInputs, &i, TRUE);
 
 	QueueSize = 0;
 
   if(ShouldDebug(sdmAIDefault)) {
     for(int j = 0; j < i; j++ ) {   // I4548
-      SendDebugMessageFormat(0, sdmAIDefault, 0, "App::PostKeys: sending input [i=%d, input[%d]=vk:%x scan:%x flags:%x", i, j, pInputs[j].ki.wVk, pInputs[j].ki.wScan, pInputs[j].ki.dwFlags);
+      SendDebugMessageFormat(0, sdmAIDefault, 0, "App::PostKeys: sending input [i=%d, input[%d]=vk:%s scan:%x flags:%x", i, j, Debug_VirtualKey(pInputs[j].ki.wVk), pInputs[j].ki.wScan, pInputs[j].ki.dwFlags);
     }
   }
 
