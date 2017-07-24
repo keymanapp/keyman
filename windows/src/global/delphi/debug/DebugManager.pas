@@ -437,6 +437,7 @@ begin
           //'MessageType' + #9 +
           //'SourceLine' + #9 +
           'ActiveHKL' + #9 +
+          'SourceFile' + #9 +
           'Message');
   WriteString(hLogFile, '---- Log file opened '+FormatDateTime('C', now) + '----');
 end;
@@ -508,6 +509,7 @@ begin
 
       //'' + #9 +
       //'' + #9 +   // I3692
+      '' + #9 +
       '' + #9,
       [GetCurrentProcessId,
       GetCurrentThreadId,
@@ -580,6 +582,7 @@ begin
 
       //'' + #9 +
       //'' + #9 +   // I3692
+      '' + #9 +
       '' + #9,
       [GetCurrentProcessId,
       GetCurrentThreadId,

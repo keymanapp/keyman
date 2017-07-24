@@ -184,7 +184,7 @@ DWORD EthnologueCodeToKeymanID(DWORD EthCode)
 		PWSTR ps = GetSystemStore(_td->lpKeyboards[i].Keyboard, TSS_ETHNOLOGUECODE);
 		if(ps)
 		{
-			SendDebugMessageFormat(0,sdmGlobal,0,"EthCodeToKey: %s %ws %x", _td->lpKeyboards[i].Name, ps, EthnologueStringCodeToDWord(ps));
+			SendDebugMessageFormat(0,sdmGlobal,0,"EthnologueCodeToKeymanID: %s %ws %x", _td->lpKeyboards[i].Name, ps, EthnologueStringCodeToDWord(ps));
 			if(EthnologueStringCodeToDWord(ps) == EthCode) return _td->lpKeyboards[i].KeymanID;
 		}
 	}

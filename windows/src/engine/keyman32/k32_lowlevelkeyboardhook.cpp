@@ -76,7 +76,7 @@ LRESULT _kmnLowLevelKeyboardProc(
   BOOL extended = hs->flags & LLKHF_EXTENDED ? TRUE : FALSE;
   BOOL isUp = hs->flags & LLKHF_UP ? TRUE : FALSE;
 
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: wparam: %x  lparam: %x [vk:%x scan:%x flags:%x extra:%x]", wParam, lParam, hs->vkCode, hs->scanCode, hs->flags, hs->dwExtraInfo);   // I4674
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: wparam: %x  lparam: %x [vk:%s scan:%x flags:%x extra:%x]", wParam, lParam, Debug_VirtualKey((WORD) hs->vkCode), hs->scanCode, hs->flags, hs->dwExtraInfo);   // I4674
 
   /*if(hs->flags & LLKHF_INJECTED) {   // I4674
     // We do not process injected keystrokes

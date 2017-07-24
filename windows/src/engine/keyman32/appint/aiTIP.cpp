@@ -123,7 +123,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
   BOOL extended = keyFlags & KF_EXTENDED ? TRUE : FALSE;
   BYTE scan = keyFlags & 0xFF;
 
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "TIPProcessKey: Enter VirtualKey=%x lParam=%x   IsUp=%d Extended=%d Updateable=%d Preserved=%d", wParam, lParam, isUp, extended, Updateable, Preserved);
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "TIPProcessKey: Enter VirtualKey=%s lParam=%x   IsUp=%d Extended=%d Updateable=%d Preserved=%d", Debug_VirtualKey((WORD) wParam), lParam, isUp, extended, Updateable, Preserved);
 
   if(_td->LastKey == wParam && scan == 0) {   // I4642
     scan = _td->LastScanCode;
@@ -223,7 +223,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 
 	if(!res && Updateable) {   // I4562
     //if(wParam <= 0xFF && VKContextReset[wParam]) _td->app->ResetContext();  // I3438   // I4223
-		SendDebugMessageFormat(0, sdmAIDefault, 0, "TIPProcessKey: key not matched:%d", wParam);
+		SendDebugMessageFormat(0, sdmAIDefault, 0, "TIPProcessKey: key not matched: %s", Debug_VirtualKey((WORD) wParam));
   }
 
   if(Preserved) {
@@ -339,8 +339,6 @@ void AITIP::MergeContextWithCache(PWSTR buf, AppContext *local_context) {   // I
   }
 }
 
-char *format_unicode_debug(WCHAR *buf);
-
 void AITIP::ReadContext() {
   if(DebugControlled()) {
     Debug_FillContextBuffer();
@@ -353,7 +351,7 @@ void AITIP::ReadContext() {
 
 	if(_td->TIPGetContext && (*_td->TIPGetContext)(MAXCONTEXT-1, buf) == S_OK) {   // I3575   // I4262
     if(ShouldDebug(sdmKeyboard)) {
-      SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::ReadContext: full context [Updateable=%d] '%s'", _td->TIPFUpdateable, format_unicode_debug(buf));
+      SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::ReadContext: full context [Updateable=%d] %s", _td->TIPFUpdateable, Debug_UnicodeString(buf));
     }
     useLegacy = FALSE;   // I3575
 		
@@ -363,7 +361,7 @@ void AITIP::ReadContext() {
     MergeContextWithCache(buf, context);
 
     if(ShouldDebug(sdmKeyboard)) {
-      SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::ReadContext: after merge [Updateable=%d] '%s'", _td->TIPFUpdateable, format_unicode_debug(buf));
+      SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::ReadContext: after merge [Updateable=%d] %s", _td->TIPFUpdateable, Debug_UnicodeString(buf));
     }
 
     context->Set(buf);

@@ -50,7 +50,7 @@ void AppContext::Add(WCHAR ch)
 	CurContext[pos++] = ch;
 	CurContext[pos] = 0;
 
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext: Add(%x) [%d]: %ws", ch, pos, CurContext);
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext: Add(%x) [%d]: %s", ch, pos, Debug_UnicodeString(CurContext));
 }
 
 WCHAR *AppContext::Buf(int n)
@@ -116,7 +116,7 @@ void AppContext::Get(WCHAR *buf, int bufsize)
 
 void AppContext::CopyFrom(AppContext *source)   // I3575
 {
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext::CopyFrom source='%ws'; before copy, dest='%ws'", source->CurContext, CurContext);
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext::CopyFrom source=%s; before copy, dest=%s", Debug_UnicodeString(source->CurContext, 0), Debug_UnicodeString(CurContext, 1));
   wcscpy_s(CurContext, _countof(CurContext), source->CurContext);
 	pos = source->pos;
 }
