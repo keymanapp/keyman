@@ -1,0 +1,2340 @@
+﻿// Created by Microsoft (R) C/C++ Compiler Version 10.00.30319.01 (e9fde003).
+//
+// c:\keyman\9.0\src\addins\kmtip\kmcomapi.tlh
+//
+// C++ source equivalent of Win32 type library c:\\keyman\\9.0\\src\\engine\\kmcomapi\\kmcomapi.tlb
+// compiler-generated file created 11/20/12 at 18:55:37 - DO NOT EDIT!
+
+#pragma once
+#pragma pack(push, 8)
+
+#include <comdef.h>
+
+namespace kmcomapi {
+
+//
+// Forward references and typedefs
+//
+
+struct __declspec(uuid("c0578821-7c72-419b-8ef0-55fb7db3ba6f"))
+/* LIBID */ __kmcomapi;
+struct __declspec(uuid("eb557d80-4d59-482f-9616-1629236534b4"))
+/* dual interface */ IKeymanObject;
+struct __declspec(uuid("49c87e53-e98c-4e01-ba36-124a4e6e0f39"))
+/* dual interface */ IKeymanCollection;
+struct __declspec(uuid("a3426a95-4890-4a64-870f-cee536e91efe"))
+/* dual interface */ IKeymanKeyboards;
+struct __declspec(uuid("fdd63849-ed59-4d5c-b690-994a83e044a2"))
+/* dual interface */ IKeymanKeyboardsInstalled;
+struct __declspec(uuid("a4e08956-64ab-41f5-950b-3073f38d32b2"))
+/* dual interface */ IKeymanKeyboard;
+struct __declspec(uuid("0d773297-5efa-40e9-b08a-813958ddcfe3"))
+/* dual interface */ IKeymanKeyboardFile;
+struct __declspec(uuid("2ba44e6e-c3ee-4abe-b1ef-55fc386ddc1b"))
+/* dual interface */ IKeymanKeyboardInstalled;
+struct __declspec(uuid("a81a080c-f994-4eae-a5c4-104c26195b3a"))
+/* dual interface */ IKeymanPackage;
+struct __declspec(uuid("07c9d604-db99-4e61-82ce-310604dc9e72"))
+/* dual interface */ IKeymanPackageInstalled;
+struct __declspec(uuid("f3af4c40-182d-4cae-9be2-207e3a541cb9"))
+/* dual interface */ IKeymanKeyboardsPackage;
+struct __declspec(uuid("f8289232-dd0f-4261-bbf3-c72484e61e33"))
+/* dual interface */ IKeymanVisualKeyboard;
+struct __declspec(uuid("de196e97-18dd-42fb-ba6e-93eff80c0836"))
+/* dual interface */ IKeymanProduct;
+struct __declspec(uuid("f331f8d8-313f-47a8-a8bf-f136ed1f0399"))
+/* dual interface */ IKeymanAddins;
+struct __declspec(uuid("b914334c-84e6-4a22-ba25-72516533cec5"))
+/* dual interface */ IKeymanAddinsInstalled;
+struct __declspec(uuid("f0b8e349-cdc4-4138-8b4f-2e8756b83655"))
+/* dual interface */ IKeymanAddin;
+struct __declspec(uuid("75864af3-55d2-4d9e-9937-a58962ad6d75"))
+/* dual interface */ IKeymanAddinInstalled;
+struct __declspec(uuid("438799c8-f4a0-4838-9d54-17ef1a2fe6ad"))
+/* dual interface */ IKeymanPackages;
+struct __declspec(uuid("3fe3d351-3625-4550-94e9-05d225a4f450"))
+/* dual interface */ IKeymanPackagesInstalled;
+struct __declspec(uuid("e9618611-8434-4072-b803-cae188205d5b"))
+/* dual interface */ IKeymanPackageFile;
+struct __declspec(uuid("81ea70fd-5a0e-46e6-9912-92ecf8098207"))
+/* dual interface */ IKeymanPackageSubFiles;
+struct __declspec(uuid("4267ea59-cf06-4fed-b670-c9fbeafef77f"))
+/* dual interface */ IKeymanPackageSubFile;
+struct __declspec(uuid("48796430-160c-4b93-ab05-10d2548bf4d1"))
+/* dual interface */ IKeymanSystemInfo;
+struct __declspec(uuid("d3bb819f-66bf-4adf-b6e8-f1e267095cc9"))
+/* dual interface */ IKeymanErrors;
+struct __declspec(uuid("0e4963e8-0a3b-4910-be59-e6a869b34c43"))
+/* dual interface */ IKeymanError;
+struct __declspec(uuid("6f2ca8ee-fad1-457d-aa9e-d14aa3321d0e"))
+/* dual interface */ IKeymanOptions;
+struct __declspec(uuid("2af26a27-c1f9-44da-a628-b460676f3d6d"))
+/* dual interface */ IKeymanOption;
+struct __declspec(uuid("124fdc59-6194-4232-b54a-f251372d9b81"))
+/* dual interface */ IKeymanLanguages;
+struct __declspec(uuid("785dc47f-406f-48b0-90f7-e4670b92bcf4"))
+/* dual interface */ IKeymanLanguage;
+struct __declspec(uuid("4ae5c324-1553-45da-9a42-ca8790b5dc62"))
+/* dual interface */ IKeymanProducts;
+struct __declspec(uuid("41d70310-3c7d-4a8e-9403-126342d2dd26"))
+/* dual interface */ IKeymanControl;
+struct __declspec(uuid("7b095092-9cff-4349-af4c-bc0684981682"))
+/* dual interface */ ITavultesoftKeyman;
+struct __declspec(uuid("54d44e7b-31e3-42f6-a0af-fd54e30e0a96"))
+/* dual interface */ IKeymanAddinFile;
+struct /* coclass */ TavultesoftKeyman;
+struct __declspec(uuid("ae08c3b5-3376-4159-a330-c2c7129dcfaa"))
+/* dual interface */ IKeymanHotkey;
+struct __declspec(uuid("0e98e153-f019-4450-8d4c-1ae9a8cee8f3"))
+/* dual interface */ IKeymanHotkeys;
+struct __declspec(uuid("76172863-8ccf-4787-a42a-3e8ab97726e1"))
+/* dual interface */ ITavultesoftKeymanScript;
+struct /* coclass */ TavultesoftKeymanScript;
+struct __declspec(uuid("1726b638-bdda-40b3-9bbd-33bb32602722"))
+/* dual interface */ IKeymanLanguage2;
+struct __declspec(uuid("aab45283-d0b7-43f4-84e4-ec2f1806d9ec"))
+/* dual interface */ IKeymanProduct2;
+struct __declspec(uuid("e9f5a74a-3e3b-4401-b34a-fefdf42340e5"))
+/* dual interface */ IKeymanKeyboard2;
+struct __declspec(uuid("9a0d7c63-6b0a-4ee5-8713-a2ed1734db8c"))
+/* dual interface */ IKeymanUnicodeBlocks;
+struct __declspec(uuid("a89d54b6-0f41-445f-9cbb-3bc8df0367f0"))
+/* dual interface */ IKeymanUnicodeBlock;
+struct __declspec(uuid("e1e488e3-4104-43e8-aab0-d5587618c3fb"))
+/* dual interface */ IKeymanSystemConfigManager;
+struct __declspec(uuid("c812c57c-de50-4a48-866b-d596eae7beee"))
+/* dual interface */ IKeymanSystemConfigItem;
+struct __declspec(uuid("1079d51e-3ab7-4427-b12b-32437f20510d"))
+/* dual interface */ ITavultesoftKeymanSystemConfig;
+struct /* coclass */ TavultesoftKeymanSystemConfig;
+struct __declspec(uuid("6bdd6c6a-a4dd-4884-91f9-39b0987b6d4c"))
+/* dual interface */ IKeymanPackage2;
+struct __declspec(uuid("bdb1f928-fedb-4220-becf-49474f60bc26"))
+/* dual interface */ IKeymanProduct3;
+struct __declspec(uuid("736d462a-eb7c-4c5a-b827-2147c5f69b4c"))
+/* dual interface */ IKeymanPackage3;
+struct __declspec(uuid("d87c29f1-0a84-4580-8408-e34f751fdde0"))
+/* dual interface */ IKeymanPackageFonts;
+struct __declspec(uuid("a9a8bd6a-ff85-4c5a-a8bf-536fb052af95"))
+/* dual interface */ IKeymanPackageFont;
+struct __declspec(uuid("f82a426f-0094-43f7-9e3c-2ff08c63f935"))
+/* dual interface */ IKeymanUnicodeBlock2;
+struct __declspec(uuid("e6006a06-9ffb-43a9-baad-7f23d8547c93"))
+/* dual interface */ IKeymanKeyboardInstalled2;
+struct __declspec(uuid("3d5e3f5a-08d0-454e-bf35-195acbd8d749"))
+/* dual interface */ IKeymanVisualKeyboard2;
+struct __declspec(uuid("fdb3f487-5004-4d74-9a62-03e61047b13a"))
+/* dual interface */ IKeymanSystemConfigManager2;
+struct __declspec(uuid("bea10878-1e01-43bb-9e0d-b72f08695376"))
+/* dual interface */ IKeymanAddinInstalled2;
+struct __declspec(uuid("3ba67abf-cd27-4f58-9b06-0ee5109c1bed"))
+/* dual interface */ IKeymanKeyboardInstalled3;
+struct __declspec(uuid("0e75d573-86d5-46dd-a85b-be3ab1b004b6"))
+/* dual interface */ IKeymanKeyboardLanguages;
+struct __declspec(uuid("023c9417-0776-484e-b0ab-23604e8800f5"))
+/* dual interface */ IKeymanKeyboardLanguage;
+enum tagKeymanKeyboardEncodings;
+enum tagKeymanFileType;
+enum tagKeymanPackageSubFileCopyLocation;
+enum tagKeymanKeyboardHotkey;
+enum tagKeymanErrorSeverity;
+enum tagKeymanSerializeFlags;
+enum tagKeymanKeyboardLayoutType;
+enum tagKeymanAddinConfigureResult;
+typedef enum tagKeymanKeyboardEncodings KeymanKeyboardEncodings;
+typedef enum tagKeymanFileType KeymanFileType;
+typedef enum tagKeymanPackageSubFileCopyLocation KeymanPackageSubFileCopyLocation;
+typedef enum tagKeymanKeyboardHotkey KeymanKeyboardHotkey;
+typedef enum tagKeymanErrorSeverity KeymanErrorSeverity;
+typedef enum tagKeymanKeyboardLayoutType KeymanKeyboardLayoutType;
+
+//
+// Smart pointer typedef declarations
+//
+
+_COM_SMARTPTR_TYPEDEF(IKeymanUnicodeBlock, __uuidof(IKeymanUnicodeBlock));
+_COM_SMARTPTR_TYPEDEF(IKeymanUnicodeBlock2, __uuidof(IKeymanUnicodeBlock2));
+_COM_SMARTPTR_TYPEDEF(IKeymanObject, __uuidof(IKeymanObject));
+_COM_SMARTPTR_TYPEDEF(IKeymanCollection, __uuidof(IKeymanCollection));
+_COM_SMARTPTR_TYPEDEF(IKeymanKeyboards, __uuidof(IKeymanKeyboards));
+_COM_SMARTPTR_TYPEDEF(IKeymanVisualKeyboard, __uuidof(IKeymanVisualKeyboard));
+_COM_SMARTPTR_TYPEDEF(IKeymanAddins, __uuidof(IKeymanAddins));
+_COM_SMARTPTR_TYPEDEF(IKeymanPackages, __uuidof(IKeymanPackages));
+_COM_SMARTPTR_TYPEDEF(IKeymanSystemInfo, __uuidof(IKeymanSystemInfo));
+_COM_SMARTPTR_TYPEDEF(IKeymanError, __uuidof(IKeymanError));
+_COM_SMARTPTR_TYPEDEF(IKeymanErrors, __uuidof(IKeymanErrors));
+_COM_SMARTPTR_TYPEDEF(IKeymanOption, __uuidof(IKeymanOption));
+_COM_SMARTPTR_TYPEDEF(IKeymanOptions, __uuidof(IKeymanOptions));
+_COM_SMARTPTR_TYPEDEF(IKeymanHotkey, __uuidof(IKeymanHotkey));
+_COM_SMARTPTR_TYPEDEF(IKeymanHotkeys, __uuidof(IKeymanHotkeys));
+_COM_SMARTPTR_TYPEDEF(IKeymanProduct, __uuidof(IKeymanProduct));
+_COM_SMARTPTR_TYPEDEF(IKeymanProducts, __uuidof(IKeymanProducts));
+_COM_SMARTPTR_TYPEDEF(IKeymanProduct2, __uuidof(IKeymanProduct2));
+_COM_SMARTPTR_TYPEDEF(IKeymanUnicodeBlocks, __uuidof(IKeymanUnicodeBlocks));
+_COM_SMARTPTR_TYPEDEF(IKeymanSystemConfigItem, __uuidof(IKeymanSystemConfigItem));
+_COM_SMARTPTR_TYPEDEF(IKeymanProduct3, __uuidof(IKeymanProduct3));
+_COM_SMARTPTR_TYPEDEF(IKeymanPackageFont, __uuidof(IKeymanPackageFont));
+_COM_SMARTPTR_TYPEDEF(IKeymanPackageFonts, __uuidof(IKeymanPackageFonts));
+_COM_SMARTPTR_TYPEDEF(IKeymanVisualKeyboard2, __uuidof(IKeymanVisualKeyboard2));
+_COM_SMARTPTR_TYPEDEF(IKeymanKeyboardLanguage, __uuidof(IKeymanKeyboardLanguage));
+_COM_SMARTPTR_TYPEDEF(IKeymanKeyboardLanguages, __uuidof(IKeymanKeyboardLanguages));
+_COM_SMARTPTR_TYPEDEF(IKeymanPackageSubFile, __uuidof(IKeymanPackageSubFile));
+_COM_SMARTPTR_TYPEDEF(IKeymanPackageSubFiles, __uuidof(IKeymanPackageSubFiles));
+_COM_SMARTPTR_TYPEDEF(IKeymanKeyboard, __uuidof(IKeymanKeyboard));
+_COM_SMARTPTR_TYPEDEF(IKeymanKeyboardFile, __uuidof(IKeymanKeyboardFile));
+_COM_SMARTPTR_TYPEDEF(IKeymanKeyboardsPackage, __uuidof(IKeymanKeyboardsPackage));
+_COM_SMARTPTR_TYPEDEF(IKeymanPackage, __uuidof(IKeymanPackage));
+_COM_SMARTPTR_TYPEDEF(IKeymanPackageInstalled, __uuidof(IKeymanPackageInstalled));
+_COM_SMARTPTR_TYPEDEF(IKeymanKeyboardInstalled, __uuidof(IKeymanKeyboardInstalled));
+_COM_SMARTPTR_TYPEDEF(IKeymanKeyboardsInstalled, __uuidof(IKeymanKeyboardsInstalled));
+_COM_SMARTPTR_TYPEDEF(IKeymanAddin, __uuidof(IKeymanAddin));
+_COM_SMARTPTR_TYPEDEF(IKeymanAddinInstalled, __uuidof(IKeymanAddinInstalled));
+_COM_SMARTPTR_TYPEDEF(IKeymanAddinsInstalled, __uuidof(IKeymanAddinsInstalled));
+_COM_SMARTPTR_TYPEDEF(IKeymanPackageFile, __uuidof(IKeymanPackageFile));
+_COM_SMARTPTR_TYPEDEF(IKeymanPackagesInstalled, __uuidof(IKeymanPackagesInstalled));
+_COM_SMARTPTR_TYPEDEF(IKeymanLanguage, __uuidof(IKeymanLanguage));
+_COM_SMARTPTR_TYPEDEF(IKeymanLanguages, __uuidof(IKeymanLanguages));
+_COM_SMARTPTR_TYPEDEF(IKeymanControl, __uuidof(IKeymanControl));
+_COM_SMARTPTR_TYPEDEF(ITavultesoftKeyman, __uuidof(ITavultesoftKeyman));
+_COM_SMARTPTR_TYPEDEF(IKeymanAddinFile, __uuidof(IKeymanAddinFile));
+_COM_SMARTPTR_TYPEDEF(ITavultesoftKeymanScript, __uuidof(ITavultesoftKeymanScript));
+_COM_SMARTPTR_TYPEDEF(IKeymanLanguage2, __uuidof(IKeymanLanguage2));
+_COM_SMARTPTR_TYPEDEF(IKeymanKeyboard2, __uuidof(IKeymanKeyboard2));
+_COM_SMARTPTR_TYPEDEF(IKeymanSystemConfigManager, __uuidof(IKeymanSystemConfigManager));
+_COM_SMARTPTR_TYPEDEF(ITavultesoftKeymanSystemConfig, __uuidof(ITavultesoftKeymanSystemConfig));
+_COM_SMARTPTR_TYPEDEF(IKeymanPackage2, __uuidof(IKeymanPackage2));
+_COM_SMARTPTR_TYPEDEF(IKeymanPackage3, __uuidof(IKeymanPackage3));
+_COM_SMARTPTR_TYPEDEF(IKeymanKeyboardInstalled2, __uuidof(IKeymanKeyboardInstalled2));
+_COM_SMARTPTR_TYPEDEF(IKeymanSystemConfigManager2, __uuidof(IKeymanSystemConfigManager2));
+_COM_SMARTPTR_TYPEDEF(IKeymanAddinInstalled2, __uuidof(IKeymanAddinInstalled2));
+_COM_SMARTPTR_TYPEDEF(IKeymanKeyboardInstalled3, __uuidof(IKeymanKeyboardInstalled3));
+
+//
+// Type library items
+//
+
+struct __declspec(uuid("7d8879c6-d830-4796-8021-7b6ff69558e4"))
+TavultesoftKeyman;
+    // [ default ] interface ITavultesoftKeyman
+
+struct __declspec(uuid("b9ab85f9-5927-48b1-be3c-ec624df95d17"))
+TavultesoftKeymanScript;
+    // [ default ] interface ITavultesoftKeymanScript
+
+struct __declspec(uuid("a89d54b6-0f41-445f-9cbb-3bc8df0367f0"))
+IKeymanUnicodeBlock : IDispatch
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetName))
+    _bstr_t Name;
+    __declspec(property(get=GetCh1))
+    long Ch1;
+    __declspec(property(get=GetCh2))
+    long Ch2;
+    __declspec(property(get=GetIsComplex))
+    VARIANT_BOOL IsComplex;
+    __declspec(property(get=GetIsRTL))
+    VARIANT_BOOL IsRTL;
+    __declspec(property(get=GetIsFarEast))
+    VARIANT_BOOL IsFarEast;
+    __declspec(property(get=GetIsSupplementary))
+    VARIANT_BOOL IsSupplementary;
+    __declspec(property(get=GetUniscribeVersion))
+    _bstr_t UniscribeVersion;
+    __declspec(property(get=GetCleanName))
+    _bstr_t CleanName;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    _bstr_t GetName ( );
+    long GetCh1 ( );
+    long GetCh2 ( );
+    VARIANT_BOOL GetIsComplex ( );
+    VARIANT_BOOL GetIsRTL ( );
+    VARIANT_BOOL GetIsFarEast ( );
+    VARIANT_BOOL GetIsSupplementary ( );
+    _bstr_t GetUniscribeVersion ( );
+    _bstr_t GetCleanName ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Name (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Ch1 (
+        /*[out,retval]*/ long * Value ) = 0;
+      virtual HRESULT __stdcall get_Ch2 (
+        /*[out,retval]*/ long * Value ) = 0;
+      virtual HRESULT __stdcall get_IsComplex (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall get_IsRTL (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall get_IsFarEast (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall get_IsSupplementary (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall get_UniscribeVersion (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_CleanName (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+};
+
+struct __declspec(uuid("2b7919fa-8af0-43cf-b994-5c1fac905ec8"))
+TavultesoftKeymanSystemConfig;
+    // [ default ] interface ITavultesoftKeymanSystemConfig
+
+struct __declspec(uuid("f82a426f-0094-43f7-9e3c-2ff08c63f935"))
+IKeymanUnicodeBlock2 : IKeymanUnicodeBlock
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetCharacterCount))
+    long CharacterCount;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    long GetCharacterCount ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_CharacterCount (
+        /*[out,retval]*/ long * Value ) = 0;
+};
+
+enum tagKeymanKeyboardEncodings
+{
+    keANSI = 1,
+    keUnicode = 2
+};
+
+enum tagKeymanFileType
+{
+    ftKeymanSource = 0,
+    ftPackageSource = 1,
+    ftKeymanFile = 2,
+    ftPackageFile = 3,
+    ftPackageInstallerFile = 4,
+    ftFont = 5,
+    ftReadme = 6,
+    ftTextFile = 7,
+    ftKeymanWizard = 8,
+    ftOther = 9,
+    ftBitmap = 10,
+    ftVisualKeyboard = 11,
+    ftAddinFile = 12,
+    ftCustomisation = 13
+};
+
+enum tagKeymanPackageSubFileCopyLocation
+{
+    pfclPackage = 0,
+    pfclKeymanDir = 1,
+    pfclInstallTemp = 2
+};
+
+enum tagKeymanKeyboardHotkey
+{
+    HK_ALT = 65536,
+    HK_CTRL = 131072,
+    HK_SHIFT = 262144
+};
+
+enum tagKeymanErrorSeverity
+{
+    kesFatal = 0,
+    kesError = 1,
+    kesWarning = 2,
+    kesHint = 3
+};
+
+enum __declspec(uuid("d5286174-749e-433c-9c8a-ec086e5f9efb"))
+tagKeymanSerializeFlags
+{
+    ksfExportImages = 1
+};
+
+struct __declspec(uuid("eb557d80-4d59-482f-9616-1629236534b4"))
+IKeymanObject : IDispatch
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetUniqueIndex))
+    long UniqueIndex;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    HRESULT SerializeXML (
+        BSTR * XML,
+        enum tagKeymanSerializeFlags Flags,
+        _bstr_t ImagePath,
+        VARIANT * References );
+    long GetUniqueIndex ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_SerializeXML (
+        /*[out]*/ BSTR * XML,
+        /*[in]*/ enum tagKeymanSerializeFlags Flags,
+        /*[in]*/ BSTR ImagePath,
+        /*[out]*/ VARIANT * References ) = 0;
+      virtual HRESULT __stdcall get_UniqueIndex (
+        /*[out,retval]*/ long * Value ) = 0;
+};
+
+struct __declspec(uuid("49c87e53-e98c-4e01-ba36-124a4e6e0f39"))
+IKeymanCollection : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetCount))
+    long Count;
+    __declspec(property(get=Get_NewEnum))
+    IUnknownPtr _NewEnum;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    long GetCount ( );
+    IUnknownPtr Get_NewEnum ( );
+    HRESULT Refresh ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Count (
+        /*[out,retval]*/ long * Value ) = 0;
+      virtual HRESULT __stdcall get__NewEnum (
+        /*[out,retval]*/ IUnknown * * Value ) = 0;
+      virtual HRESULT __stdcall raw_Refresh ( ) = 0;
+};
+
+struct __declspec(uuid("a3426a95-4890-4a64-870f-cee536e91efe"))
+IKeymanKeyboards : IKeymanCollection
+{
+    //
+    // Wrapper methods for error-handling
+    //
+
+    long IndexOf (
+        _bstr_t Name );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_IndexOf (
+        /*[in]*/ BSTR Name,
+        /*[out,retval]*/ long * Index ) = 0;
+};
+
+struct __declspec(uuid("f8289232-dd0f-4261-bbf3-c72484e61e33"))
+IKeymanVisualKeyboard : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetFilename))
+    _bstr_t Filename;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    HRESULT Uninstall ( );
+    _bstr_t GetFilename ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_Uninstall ( ) = 0;
+      virtual HRESULT __stdcall get_Filename (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+};
+
+struct __declspec(uuid("f331f8d8-313f-47a8-a8bf-f136ed1f0399"))
+IKeymanAddins : IKeymanCollection
+{};
+
+struct __declspec(uuid("438799c8-f4a0-4838-9d54-17ef1a2fe6ad"))
+IKeymanPackages : IKeymanCollection
+{};
+
+struct __declspec(uuid("48796430-160c-4b93-ab05-10d2548bf4d1"))
+IKeymanSystemInfo : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetIsAdministrator))
+    VARIANT_BOOL IsAdministrator;
+    __declspec(property(get=GetEngineVersion))
+    _bstr_t EngineVersion;
+    __declspec(property(get=GetEngineInstallPath))
+    _bstr_t EngineInstallPath;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    VARIANT_BOOL GetIsAdministrator ( );
+    HRESULT Refresh ( );
+    _bstr_t GetEngineVersion ( );
+    _bstr_t GetEngineInstallPath ( );
+    HRESULT RunDiagnostics ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_IsAdministrator (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall raw_Refresh ( ) = 0;
+      virtual HRESULT __stdcall get_EngineVersion (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_EngineInstallPath (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall raw_RunDiagnostics ( ) = 0;
+};
+
+struct __declspec(uuid("0e4963e8-0a3b-4910-be59-e6a869b34c43"))
+IKeymanError : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetErrorCode))
+    long ErrorCode;
+    __declspec(property(get=GetDescription))
+    _bstr_t Description;
+    __declspec(property(get=GetSeverity))
+    long Severity;
+    __declspec(property(get=GetParameterCount))
+    long ParameterCount;
+    __declspec(property(get=GetParameter))
+    _bstr_t Parameter[];
+    __declspec(property(get=GetParameterValue))
+    _bstr_t ParameterValue[];
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    long GetErrorCode ( );
+    _bstr_t GetDescription ( );
+    long GetParameterCount ( );
+    _bstr_t GetParameter (
+        long Index );
+    _bstr_t GetParameterValue (
+        long Index );
+    long GetSeverity ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_ErrorCode (
+        /*[out,retval]*/ long * Value ) = 0;
+      virtual HRESULT __stdcall get_Description (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_ParameterCount (
+        /*[out,retval]*/ long * Value ) = 0;
+      virtual HRESULT __stdcall get_Parameter (
+        /*[in]*/ long Index,
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_ParameterValue (
+        /*[in]*/ long Index,
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Severity (
+        /*[out,retval]*/ long * Value ) = 0;
+};
+
+struct __declspec(uuid("d3bb819f-66bf-4adf-b6e8-f1e267095cc9"))
+IKeymanErrors : IKeymanCollection
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetItems))
+    IKeymanErrorPtr Items[];
+    __declspec(property(get=GetRebootRequired))
+    VARIANT_BOOL RebootRequired;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanErrorPtr GetItems (
+        long Index );
+    HRESULT SetReboot ( );
+    VARIANT_BOOL GetRebootRequired ( );
+    HRESULT Clear ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Items (
+        /*[in]*/ long Index,
+        /*[out,retval]*/ struct IKeymanError * * Value ) = 0;
+      virtual HRESULT __stdcall raw_SetReboot ( ) = 0;
+      virtual HRESULT __stdcall get_RebootRequired (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall raw_Clear ( ) = 0;
+};
+
+struct __declspec(uuid("2af26a27-c1f9-44da-a628-b460676f3d6d"))
+IKeymanOption : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetValue,put=PutValue))
+    VARIANT_BOOL Value;
+    __declspec(property(get=GetName))
+    _bstr_t Name;
+    __declspec(property(get=GetDefaultValue))
+    VARIANT_BOOL DefaultValue;
+    __declspec(property(get=GetEnabled))
+    VARIANT_BOOL Enabled;
+    __declspec(property(get=GetGroup))
+    _bstr_t Group;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    VARIANT_BOOL GetValue ( );
+    void PutValue (
+        VARIANT_BOOL Value );
+    _bstr_t GetName ( );
+    VARIANT_BOOL GetDefaultValue ( );
+    VARIANT_BOOL GetEnabled ( );
+    _bstr_t GetGroup ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Value (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall put_Value (
+        /*[in]*/ VARIANT_BOOL Value ) = 0;
+      virtual HRESULT __stdcall get_Name (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_DefaultValue (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall get_Enabled (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall get_Group (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+};
+
+struct __declspec(uuid("6f2ca8ee-fad1-457d-aa9e-d14aa3321d0e"))
+IKeymanOptions : IKeymanCollection
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetItems))
+    IKeymanOptionPtr Items[];
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanOptionPtr GetItems (
+        const _variant_t & Index );
+    HRESULT Apply ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Items (
+        /*[in]*/ VARIANT Index,
+        /*[out,retval]*/ struct IKeymanOption * * Value ) = 0;
+      virtual HRESULT __stdcall raw_Apply ( ) = 0;
+};
+
+struct __declspec(uuid("ae08c3b5-3376-4159-a330-c2c7129dcfaa"))
+IKeymanHotkey : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetValue,put=PutValue))
+    long Value;
+    __declspec(property(get=GetTarget,put=PutTarget))
+    long Target;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    long GetValue ( );
+    void PutValue (
+        long Value );
+    long GetTarget ( );
+    void PutTarget (
+        long Value );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Value (
+        /*[out,retval]*/ long * Value ) = 0;
+      virtual HRESULT __stdcall put_Value (
+        /*[in]*/ long Value ) = 0;
+      virtual HRESULT __stdcall get_Target (
+        /*[out,retval]*/ long * Value ) = 0;
+      virtual HRESULT __stdcall put_Target (
+        /*[in]*/ long Value ) = 0;
+};
+
+struct __declspec(uuid("0e98e153-f019-4450-8d4c-1ae9a8cee8f3"))
+IKeymanHotkeys : IKeymanCollection
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetItems))
+    IKeymanHotkeyPtr Items[];
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanHotkeyPtr GetItems (
+        long Index );
+    IKeymanHotkeyPtr Add (
+        long Value,
+        long Target );
+    HRESULT Delete (
+        long Index );
+    HRESULT Apply ( );
+    HRESULT Clear ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Items (
+        /*[in]*/ long Index,
+        /*[out,retval]*/ struct IKeymanHotkey * * Value ) = 0;
+      virtual HRESULT __stdcall raw_Add (
+        /*[in]*/ long Value,
+        /*[in]*/ long Target,
+        /*[out,retval]*/ struct IKeymanHotkey * * Hotkey ) = 0;
+      virtual HRESULT __stdcall raw_Delete (
+        /*[in]*/ long Index ) = 0;
+      virtual HRESULT __stdcall raw_Apply ( ) = 0;
+      virtual HRESULT __stdcall raw_Clear ( ) = 0;
+};
+
+struct __declspec(uuid("de196e97-18dd-42fb-ba6e-93eff80c0836"))
+IKeymanProduct : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetProductID))
+    int ProductID;
+    __declspec(property(get=GetFilename))
+    _bstr_t Filename;
+    __declspec(property(get=GetName))
+    _bstr_t Name;
+    __declspec(property(get=GetDescription))
+    _bstr_t Description;
+    __declspec(property(get=GetValid))
+    VARIANT_BOOL Valid;
+    __declspec(property(get=GetAllUsers))
+    VARIANT_BOOL AllUsers;
+    __declspec(property(get=GetRunning))
+    VARIANT_BOOL Running;
+    __declspec(property(get=GetHotkeys))
+    IKeymanHotkeysPtr Hotkeys;
+    __declspec(property(get=GetRegistryKey))
+    _bstr_t RegistryKey;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    int GetProductID ( );
+    _bstr_t GetFilename ( );
+    _bstr_t GetName ( );
+    _bstr_t GetDescription ( );
+    VARIANT_BOOL GetValid ( );
+    HRESULT Uninstall ( );
+    VARIANT_BOOL Validate (
+        long ParentWindow );
+    VARIANT_BOOL GetAllUsers ( );
+    HRESULT Start ( );
+    HRESULT Stop ( );
+    VARIANT_BOOL GetRunning ( );
+    HRESULT GetActivationData (
+        long * ActivatedState,
+        long * TrialDayCount,
+        long * DaysUsed );
+    HRESULT Activate (
+        _bstr_t ActivationResponseBlob );
+    HRESULT GetActivationRequestCode (
+        _bstr_t LicenceNumber,
+        BSTR * ActivationRequestBlob );
+    _bstr_t GetRegistryKey ( );
+    HRESULT OpenConfiguration ( );
+    HRESULT OpenHelp (
+        _bstr_t topic );
+    HRESULT OpenAbout ( );
+    IKeymanHotkeysPtr GetHotkeys ( );
+    HRESULT OpenProduct ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_ProductID (
+        /*[out,retval]*/ int * Value ) = 0;
+      virtual HRESULT __stdcall get_Filename (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Name (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Description (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Valid (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall raw_Uninstall ( ) = 0;
+      virtual HRESULT __stdcall raw_Validate (
+        /*[in]*/ long ParentWindow,
+        /*[out,retval]*/ VARIANT_BOOL * Success ) = 0;
+      virtual HRESULT __stdcall get_AllUsers (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall raw_Start ( ) = 0;
+      virtual HRESULT __stdcall raw_Stop ( ) = 0;
+      virtual HRESULT __stdcall get_Running (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall raw_GetActivationData (
+        /*[out]*/ long * ActivatedState,
+        /*[out]*/ long * TrialDayCount,
+        /*[out]*/ long * DaysUsed ) = 0;
+      virtual HRESULT __stdcall raw_Activate (
+        /*[in]*/ BSTR ActivationResponseBlob ) = 0;
+      virtual HRESULT __stdcall raw_GetActivationRequestCode (
+        /*[in]*/ BSTR LicenceNumber,
+        /*[out]*/ BSTR * ActivationRequestBlob ) = 0;
+      virtual HRESULT __stdcall get_RegistryKey (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall raw_OpenConfiguration ( ) = 0;
+      virtual HRESULT __stdcall raw_OpenHelp (
+        /*[in]*/ BSTR topic ) = 0;
+      virtual HRESULT __stdcall raw_OpenAbout ( ) = 0;
+      virtual HRESULT __stdcall get_Hotkeys (
+        /*[out,retval]*/ struct IKeymanHotkeys * * Value ) = 0;
+      virtual HRESULT __stdcall raw_OpenProduct ( ) = 0;
+};
+
+struct __declspec(uuid("4ae5c324-1553-45da-9a42-ca8790b5dc62"))
+IKeymanProducts : IKeymanCollection
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetItems))
+    IKeymanProductPtr Items[];
+    __declspec(property(get=GetItemsByProductID))
+    IKeymanProductPtr ItemsByProductID[];
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanProductPtr GetItems (
+        const _variant_t & Index );
+    HRESULT Install (
+        long ParentWindow,
+        _bstr_t Filename,
+        _bstr_t InstallDir,
+        VARIANT_BOOL AllUsers,
+        VARIANT_BOOL Force );
+    IKeymanProductPtr GetItemsByProductID (
+        int Index );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Items (
+        /*[in]*/ VARIANT Index,
+        /*[out,retval]*/ struct IKeymanProduct * * Value ) = 0;
+      virtual HRESULT __stdcall raw_Install (
+        /*[in]*/ long ParentWindow,
+        /*[in]*/ BSTR Filename,
+        /*[in]*/ BSTR InstallDir,
+        /*[in]*/ VARIANT_BOOL AllUsers,
+        /*[in]*/ VARIANT_BOOL Force ) = 0;
+      virtual HRESULT __stdcall get_ItemsByProductID (
+        /*[in]*/ int Index,
+        /*[out,retval]*/ struct IKeymanProduct * * Value ) = 0;
+};
+
+struct __declspec(uuid("aab45283-d0b7-43f4-84e4-ec2f1806d9ec"))
+IKeymanProduct2 : IKeymanProduct
+{
+    //
+    // Wrapper methods for error-handling
+    //
+
+    HRESULT OpenTutorial ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_OpenTutorial ( ) = 0;
+};
+
+struct __declspec(uuid("9a0d7c63-6b0a-4ee5-8713-a2ed1734db8c"))
+IKeymanUnicodeBlocks : IKeymanCollection
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetItems))
+    IKeymanUnicodeBlockPtr Items[];
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanUnicodeBlockPtr GetItems (
+        const _variant_t & Index );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Items (
+        /*[in]*/ VARIANT Index,
+        /*[out,retval]*/ struct IKeymanUnicodeBlock * * Value ) = 0;
+};
+
+struct __declspec(uuid("c812c57c-de50-4a48-866b-d596eae7beee"))
+IKeymanSystemConfigItem : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetDetail))
+    _bstr_t Detail;
+    __declspec(property(get=GetEnabled,put=PutEnabled))
+    VARIANT_BOOL Enabled;
+    __declspec(property(get=GetName))
+    _bstr_t Name;
+    __declspec(property(get=GetID))
+    _bstr_t ID;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    VARIANT_BOOL GetEnabled ( );
+    void PutEnabled (
+        VARIANT_BOOL Value );
+    _bstr_t GetDetail ( );
+    _bstr_t GetName ( );
+    _bstr_t GetID ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Enabled (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall put_Enabled (
+        /*[in]*/ VARIANT_BOOL Value ) = 0;
+      virtual HRESULT __stdcall get_Detail (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Name (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_ID (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+};
+
+struct __declspec(uuid("bdb1f928-fedb-4220-becf-49474f60bc26"))
+IKeymanProduct3 : IKeymanProduct2
+{
+    //
+    // Wrapper methods for error-handling
+    //
+
+    HRESULT OpenTextEditor ( );
+    VARIANT_BOOL IsTextEditorVisible ( );
+    HRESULT CheckForUpdates ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_OpenTextEditor ( ) = 0;
+      virtual HRESULT __stdcall raw_IsTextEditorVisible (
+        /*[out,retval]*/ VARIANT_BOOL * Result ) = 0;
+      virtual HRESULT __stdcall raw_CheckForUpdates ( ) = 0;
+};
+
+struct __declspec(uuid("a9a8bd6a-ff85-4c5a-a8bf-536fb052af95"))
+IKeymanPackageFont : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetName))
+    _bstr_t Name;
+    __declspec(property(get=GetFilename))
+    _bstr_t Filename;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    _bstr_t GetName ( );
+    _bstr_t GetFilename ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Name (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Filename (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+};
+
+struct __declspec(uuid("d87c29f1-0a84-4580-8408-e34f751fdde0"))
+IKeymanPackageFonts : IKeymanCollection
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetItems))
+    IKeymanPackageFontPtr Items[];
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanPackageFontPtr GetItems (
+        const _variant_t & Index );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Items (
+        /*[in]*/ VARIANT Index,
+        /*[out,retval]*/ struct IKeymanPackageFont * * Value ) = 0;
+};
+
+struct __declspec(uuid("3d5e3f5a-08d0-454e-bf35-195acbd8d749"))
+IKeymanVisualKeyboard2 : IKeymanVisualKeyboard
+{
+    //
+    // Wrapper methods for error-handling
+    //
+
+    HRESULT Print ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_Print ( ) = 0;
+};
+
+struct __declspec(uuid("023c9417-0776-484e-b0ab-23604e8800f5"))
+IKeymanKeyboardLanguage : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetLangID))
+    long LangID;
+    __declspec(property(get=GetISOCode))
+    _bstr_t ISOCode;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    long GetLangID ( );
+    _bstr_t GetISOCode ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_LangID (
+        /*[out,retval]*/ long * Value ) = 0;
+      virtual HRESULT __stdcall get_ISOCode (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+};
+
+struct __declspec(uuid("0e75d573-86d5-46dd-a85b-be3ab1b004b6"))
+IKeymanKeyboardLanguages : IKeymanCollection
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetItems))
+    IKeymanKeyboardLanguagePtr Items;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanKeyboardLanguagePtr GetItems ( );
+    long Add (
+        long LangID,
+        _bstr_t ISOCode );
+    HRESULT Remove (
+        long Index );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Items (
+        /*[out,retval]*/ struct IKeymanKeyboardLanguage * * Value ) = 0;
+      virtual HRESULT __stdcall raw_Add (
+        /*[in]*/ long LangID,
+        /*[in]*/ BSTR ISOCode,
+        /*[out,retval]*/ long * Index ) = 0;
+      virtual HRESULT __stdcall raw_Remove (
+        /*[in]*/ long Index ) = 0;
+};
+
+enum __declspec(uuid("5ee3c20c-8956-4c06-93d3-fffad83ffe7c"))
+tagKeymanKeyboardLayoutType
+{
+    kltPositional = 0,
+    kltMnemonic = 1
+};
+
+enum __declspec(uuid("7f760757-778c-4246-890c-89b544182e86"))
+tagKeymanAddinConfigureResult
+{
+    kacrOK = 0,
+    kacrCancel = 1,
+    kacrError = 2,
+    kacrConfigNotSupported = 3
+};
+
+struct __declspec(uuid("4267ea59-cf06-4fed-b670-c9fbeafef77f"))
+IKeymanPackageSubFile : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetFilename))
+    _bstr_t Filename;
+    __declspec(property(get=GetFileType))
+    KeymanFileType FileType;
+    __declspec(property(get=GetDescription))
+    _bstr_t Description;
+    __declspec(property(get=GetCopyLocation))
+    KeymanPackageSubFileCopyLocation CopyLocation;
+    __declspec(property(get=GetAsStream))
+    IUnknownPtr AsStream;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    _bstr_t GetFilename ( );
+    KeymanFileType GetFileType ( );
+    _bstr_t GetDescription ( );
+    KeymanPackageSubFileCopyLocation GetCopyLocation ( );
+    IUnknownPtr GetAsStream ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Filename (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_FileType (
+        /*[out,retval]*/ KeymanFileType * Value ) = 0;
+      virtual HRESULT __stdcall get_Description (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_CopyLocation (
+        /*[out,retval]*/ KeymanPackageSubFileCopyLocation * Value ) = 0;
+      virtual HRESULT __stdcall get_AsStream (
+        /*[out,retval]*/ IUnknown * * Value ) = 0;
+};
+
+struct __declspec(uuid("81ea70fd-5a0e-46e6-9912-92ecf8098207"))
+IKeymanPackageSubFiles : IKeymanCollection
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetItems))
+    IKeymanPackageSubFilePtr Items[];
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanPackageSubFilePtr GetItems (
+        const _variant_t & Index );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Items (
+        /*[in]*/ VARIANT Index,
+        /*[out,retval]*/ struct IKeymanPackageSubFile * * Value ) = 0;
+};
+
+struct __declspec(uuid("a4e08956-64ab-41f5-950b-3073f38d32b2"))
+IKeymanKeyboard : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetName))
+    _bstr_t Name;
+    __declspec(property(get=GetFilename))
+    _bstr_t Filename;
+    __declspec(property(get=GetMessage))
+    _bstr_t Message;
+    __declspec(property(get=GetCopyright))
+    _bstr_t Copyright;
+    __declspec(property(get=GetHotkey,put=PutHotkey))
+    long Hotkey;
+    __declspec(property(get=GetBitmap))
+    IPicturePtr Bitmap;
+    __declspec(property(get=GetKeyboardName))
+    _bstr_t KeyboardName;
+    __declspec(property(get=GetEncodings))
+    KeymanKeyboardEncodings Encodings;
+    __declspec(property(get=GetLayoutType))
+    KeymanKeyboardLayoutType LayoutType;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    _bstr_t GetName ( );
+    _bstr_t GetFilename ( );
+    _bstr_t GetMessage ( );
+    _bstr_t GetCopyright ( );
+    long GetHotkey ( );
+    void PutHotkey (
+        long Value );
+    IPicturePtr GetBitmap ( );
+    _bstr_t GetKeyboardName ( );
+    KeymanKeyboardEncodings GetEncodings ( );
+    KeymanKeyboardLayoutType GetLayoutType ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Name (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Filename (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Message (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Copyright (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Hotkey (
+        /*[out,retval]*/ long * Value ) = 0;
+      virtual HRESULT __stdcall put_Hotkey (
+        /*[in]*/ long Value ) = 0;
+      virtual HRESULT __stdcall get_Bitmap (
+        /*[out,retval]*/ struct IPicture * * Value ) = 0;
+      virtual HRESULT __stdcall get_KeyboardName (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Encodings (
+        /*[out,retval]*/ KeymanKeyboardEncodings * Value ) = 0;
+      virtual HRESULT __stdcall get_LayoutType (
+        /*[out,retval]*/ KeymanKeyboardLayoutType * Value ) = 0;
+};
+
+struct __declspec(uuid("0d773297-5efa-40e9-b08a-813958ddcfe3"))
+IKeymanKeyboardFile : IKeymanKeyboard
+{
+    //
+    // Wrapper methods for error-handling
+    //
+
+    HRESULT Install (
+        VARIANT_BOOL AllUsers,
+        VARIANT_BOOL Force );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_Install (
+        /*[in]*/ VARIANT_BOOL AllUsers,
+        /*[in]*/ VARIANT_BOOL Force ) = 0;
+};
+
+struct __declspec(uuid("f3af4c40-182d-4cae-9be2-207e3a541cb9"))
+IKeymanKeyboardsPackage : IKeymanKeyboards
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetItems))
+    IKeymanKeyboardPtr Items[];
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanKeyboardPtr GetItems (
+        const _variant_t & Index );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Items (
+        /*[in]*/ VARIANT Index,
+        /*[out,retval]*/ struct IKeymanKeyboard * * Value ) = 0;
+};
+
+struct __declspec(uuid("a81a080c-f994-4eae-a5c4-104c26195b3a"))
+IKeymanPackage : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetName))
+    _bstr_t Name;
+    __declspec(property(get=GetDescription))
+    _bstr_t Description;
+    __declspec(property(get=GetKeyboards))
+    IKeymanKeyboardsPackagePtr Keyboards;
+    __declspec(property(get=GetFilename))
+    _bstr_t Filename;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    _bstr_t GetName ( );
+    _bstr_t GetDescription ( );
+    IKeymanKeyboardsPackagePtr GetKeyboards ( );
+    _bstr_t GetFilename ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Name (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Description (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Keyboards (
+        /*[out,retval]*/ struct IKeymanKeyboardsPackage * * Value ) = 0;
+      virtual HRESULT __stdcall get_Filename (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+};
+
+struct __declspec(uuid("07c9d604-db99-4e61-82ce-310604dc9e72"))
+IKeymanPackageInstalled : IKeymanPackage
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetInstalledByAdmin))
+    VARIANT_BOOL InstalledByAdmin;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    HRESULT Uninstall (
+        VARIANT_BOOL RemoveFonts );
+    VARIANT_BOOL GetInstalledByAdmin ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_Uninstall (
+        /*[in]*/ VARIANT_BOOL RemoveFonts ) = 0;
+      virtual HRESULT __stdcall get_InstalledByAdmin (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+};
+
+struct __declspec(uuid("2ba44e6e-c3ee-4abe-b1ef-55fc386ddc1b"))
+IKeymanKeyboardInstalled : IKeymanKeyboard
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetKeymanID))
+    long KeymanID;
+    __declspec(property(get=GetLoaded,put=PutLoaded))
+    VARIANT_BOOL Loaded;
+    __declspec(property(get=GetInstalledByAdmin))
+    VARIANT_BOOL InstalledByAdmin;
+    __declspec(property(get=GetOwnerPackage))
+    IKeymanPackageInstalledPtr OwnerPackage;
+    __declspec(property(get=GetVisualKeyboard))
+    IKeymanVisualKeyboardPtr VisualKeyboard;
+    __declspec(property(get=GetOwnerProduct))
+    IKeymanProductPtr OwnerProduct;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    HRESULT Uninstall ( );
+    long GetKeymanID ( );
+    VARIANT_BOOL GetLoaded ( );
+    void PutLoaded (
+        VARIANT_BOOL Value );
+    VARIANT_BOOL GetInstalledByAdmin ( );
+    IKeymanPackageInstalledPtr GetOwnerPackage ( );
+    IKeymanVisualKeyboardPtr GetVisualKeyboard ( );
+    HRESULT InstallVisualKeyboard (
+        _bstr_t Filename );
+    IKeymanProductPtr GetOwnerProduct ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_Uninstall ( ) = 0;
+      virtual HRESULT __stdcall get_KeymanID (
+        /*[out,retval]*/ long * Value ) = 0;
+      virtual HRESULT __stdcall get_Loaded (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall put_Loaded (
+        /*[in]*/ VARIANT_BOOL Value ) = 0;
+      virtual HRESULT __stdcall get_InstalledByAdmin (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall get_OwnerPackage (
+        /*[out,retval]*/ struct IKeymanPackageInstalled * * Value ) = 0;
+      virtual HRESULT __stdcall get_VisualKeyboard (
+        /*[out,retval]*/ struct IKeymanVisualKeyboard * * Value ) = 0;
+      virtual HRESULT __stdcall raw_InstallVisualKeyboard (
+        /*[in]*/ BSTR Filename ) = 0;
+      virtual HRESULT __stdcall get_OwnerProduct (
+        /*[out,retval]*/ struct IKeymanProduct * * Value ) = 0;
+};
+
+struct __declspec(uuid("fdd63849-ed59-4d5c-b690-994a83e044a2"))
+IKeymanKeyboardsInstalled : IKeymanKeyboards
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetItems))
+    IKeymanKeyboardInstalledPtr Items[];
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanKeyboardFilePtr GetKeyboardFromFile (
+        _bstr_t Filename );
+    IKeymanKeyboardInstalledPtr GetItems (
+        const _variant_t & Index );
+    HRESULT Install (
+        _bstr_t Filename,
+        VARIANT_BOOL AllUsers,
+        VARIANT_BOOL Force );
+    HRESULT Apply ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_GetKeyboardFromFile (
+        /*[in]*/ BSTR Filename,
+        /*[out,retval]*/ struct IKeymanKeyboardFile * * Keyboard ) = 0;
+      virtual HRESULT __stdcall get_Items (
+        /*[in]*/ VARIANT Index,
+        /*[out,retval]*/ struct IKeymanKeyboardInstalled * * Value ) = 0;
+      virtual HRESULT __stdcall raw_Install (
+        /*[in]*/ BSTR Filename,
+        /*[in]*/ VARIANT_BOOL AllUsers,
+        /*[in]*/ VARIANT_BOOL Force ) = 0;
+      virtual HRESULT __stdcall raw_Apply ( ) = 0;
+};
+
+struct __declspec(uuid("f0b8e349-cdc4-4138-8b4f-2e8756b83655"))
+IKeymanAddin : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetOwnerPackage))
+    IKeymanPackagePtr OwnerPackage;
+    __declspec(property(get=GetName))
+    _bstr_t Name;
+    __declspec(property(get=GetFilename))
+    _bstr_t Filename;
+    __declspec(property(get=GetDescription))
+    _bstr_t Description;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanPackagePtr GetOwnerPackage ( );
+    _bstr_t GetName ( );
+    _bstr_t GetFilename ( );
+    _bstr_t GetDescription ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_OwnerPackage (
+        /*[out,retval]*/ struct IKeymanPackage * * Value ) = 0;
+      virtual HRESULT __stdcall get_Name (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Filename (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Description (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+};
+
+struct __declspec(uuid("75864af3-55d2-4d9e-9937-a58962ad6d75"))
+IKeymanAddinInstalled : IKeymanAddin
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetInstalledByAdmin))
+    VARIANT_BOOL InstalledByAdmin;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    VARIANT_BOOL GetInstalledByAdmin ( );
+    HRESULT Uninstall ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_InstalledByAdmin (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall raw_Uninstall ( ) = 0;
+};
+
+struct __declspec(uuid("b914334c-84e6-4a22-ba25-72516533cec5"))
+IKeymanAddinsInstalled : IKeymanAddins
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetItems))
+    IKeymanAddinInstalledPtr Items[];
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanAddinInstalledPtr GetItems (
+        const _variant_t & Index );
+    HRESULT Install (
+        _bstr_t Filename,
+        VARIANT_BOOL Force );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Items (
+        /*[in]*/ VARIANT Index,
+        /*[out,retval]*/ struct IKeymanAddinInstalled * * Value ) = 0;
+      virtual HRESULT __stdcall raw_Install (
+        /*[in]*/ BSTR Filename,
+        /*[in]*/ VARIANT_BOOL Force ) = 0;
+};
+
+struct __declspec(uuid("e9618611-8434-4072-b803-cae188205d5b"))
+IKeymanPackageFile : IKeymanPackage
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetReadMe))
+    _bstr_t ReadMe;
+    __declspec(property(get=GetGraphic))
+    IPicturePtr Graphic;
+    __declspec(property(get=GetSubFiles))
+    IKeymanPackageSubFilesPtr SubFiles;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    HRESULT Install (
+        VARIANT_BOOL AllUsers,
+        VARIANT_BOOL Force,
+        _bstr_t ShortcutRootPath );
+    _bstr_t GetReadMe ( );
+    IPicturePtr GetGraphic ( );
+    IKeymanPackageSubFilesPtr GetSubFiles ( );
+    HRESULT InstallSpecificKeyboards (
+        VARIANT_BOOL AllUsers,
+        VARIANT_BOOL Force,
+        _bstr_t ShortcutRootPath,
+        _bstr_t KeyboardsToInstall );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_Install (
+        /*[in]*/ VARIANT_BOOL AllUsers,
+        /*[in]*/ VARIANT_BOOL Force,
+        /*[in]*/ BSTR ShortcutRootPath ) = 0;
+      virtual HRESULT __stdcall get_ReadMe (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Graphic (
+        /*[out,retval]*/ struct IPicture * * Value ) = 0;
+      virtual HRESULT __stdcall get_SubFiles (
+        /*[out,retval]*/ struct IKeymanPackageSubFiles * * Value ) = 0;
+      virtual HRESULT __stdcall raw_InstallSpecificKeyboards (
+        /*[in]*/ VARIANT_BOOL AllUsers,
+        /*[in]*/ VARIANT_BOOL Force,
+        /*[in]*/ BSTR ShortcutRootPath,
+        /*[in]*/ BSTR KeyboardsToInstall ) = 0;
+};
+
+struct __declspec(uuid("3fe3d351-3625-4550-94e9-05d225a4f450"))
+IKeymanPackagesInstalled : IKeymanPackages
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetItems))
+    IKeymanPackageInstalledPtr Items[];
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanPackageInstalledPtr GetItems (
+        const _variant_t & Index );
+    IKeymanPackageFilePtr GetPackageFromFile (
+        _bstr_t Filename );
+    HRESULT Install (
+        _bstr_t Filename,
+        VARIANT_BOOL AllUsers,
+        VARIANT_BOOL Force,
+        _bstr_t ShortcutRootPath );
+    long IndexOf (
+        _bstr_t Name );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Items (
+        /*[in]*/ VARIANT Index,
+        /*[out,retval]*/ struct IKeymanPackageInstalled * * Value ) = 0;
+      virtual HRESULT __stdcall raw_GetPackageFromFile (
+        /*[in]*/ BSTR Filename,
+        /*[out,retval]*/ struct IKeymanPackageFile * * Package ) = 0;
+      virtual HRESULT __stdcall raw_Install (
+        /*[in]*/ BSTR Filename,
+        /*[in]*/ VARIANT_BOOL AllUsers,
+        /*[in]*/ VARIANT_BOOL Force,
+        /*[in]*/ BSTR ShortcutRootPath ) = 0;
+      virtual HRESULT __stdcall raw_IndexOf (
+        /*[in]*/ BSTR Name,
+        /*[out,retval]*/ long * Index ) = 0;
+};
+
+struct __declspec(uuid("785dc47f-406f-48b0-90f7-e4670b92bcf4"))
+IKeymanLanguage : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetHKL))
+    unsigned long HKL;
+    __declspec(property(get=GetKeymanKeyboard,put=PutKeymanKeyboard))
+    IKeymanKeyboardPtr KeymanKeyboard;
+    __declspec(property(get=GetLayoutName))
+    _bstr_t LayoutName;
+    __declspec(property(get=GetDescription))
+    _bstr_t Description;
+    __declspec(property(get=GetLocaleName))
+    _bstr_t LocaleName;
+    __declspec(property(get=GetIsIME))
+    VARIANT_BOOL IsIME;
+    __declspec(property(get=GetIsKeymanLayout))
+    VARIANT_BOOL IsKeymanLayout;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    unsigned long GetHKL ( );
+    IKeymanKeyboardPtr GetKeymanKeyboard ( );
+    void PutKeymanKeyboard (
+        struct IKeymanKeyboard * Value );
+    _bstr_t GetLayoutName ( );
+    _bstr_t GetDescription ( );
+    _bstr_t GetLocaleName ( );
+    VARIANT_BOOL GetIsIME ( );
+    VARIANT_BOOL GetIsKeymanLayout ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_HKL (
+        /*[out,retval]*/ unsigned long * Value ) = 0;
+      virtual HRESULT __stdcall get_KeymanKeyboard (
+        /*[out,retval]*/ struct IKeymanKeyboard * * Value ) = 0;
+      virtual HRESULT __stdcall put_KeymanKeyboard (
+        /*[in]*/ struct IKeymanKeyboard * Value ) = 0;
+      virtual HRESULT __stdcall get_LayoutName (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Description (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_LocaleName (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_IsIME (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall get_IsKeymanLayout (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+};
+
+struct __declspec(uuid("124fdc59-6194-4232-b54a-f251372d9b81"))
+IKeymanLanguages : IKeymanCollection
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetItems))
+    IKeymanLanguagePtr Items[];
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanLanguagePtr GetItems (
+        long Index );
+    HRESULT Apply ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Items (
+        /*[in]*/ long Index,
+        /*[out,retval]*/ struct IKeymanLanguage * * Value ) = 0;
+      virtual HRESULT __stdcall raw_Apply ( ) = 0;
+};
+
+struct __declspec(uuid("41d70310-3c7d-4a8e-9403-126342d2dd26"))
+IKeymanControl : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetActiveKeyboard,put=PutActiveKeyboard))
+    IKeymanKeyboardInstalledPtr ActiveKeyboard;
+    __declspec(property(get=GetVisualKeyboardVisible))
+    VARIANT_BOOL VisualKeyboardVisible;
+    __declspec(property(get=GetLastActiveWindow))
+    unsigned long LastActiveWindow;
+    __declspec(property(get=GetLastFocusWindow))
+    unsigned long LastFocusWindow;
+    __declspec(property(get=GetAutoRefresh,put=PutAutoRefresh))
+    VARIANT_BOOL AutoRefresh;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanKeyboardInstalledPtr GetActiveKeyboard ( );
+    void PutActiveKeyboard (
+        struct IKeymanKeyboardInstalled * Value );
+    VARIANT_BOOL GetVisualKeyboardVisible ( );
+    HRESULT StartVisualKeyboard ( );
+    HRESULT StopVisualKeyboard ( );
+    HRESULT StartKeyman32Engine (
+        unsigned long ProductID );
+    HRESULT StopKeyman32Engine (
+        unsigned long ProductID );
+    unsigned long GetLastActiveWindow ( );
+    unsigned long GetLastFocusWindow ( );
+    HRESULT RegisterControllerWindow (
+        unsigned long Value );
+    HRESULT UnregisterControllerWindow (
+        unsigned long Value );
+    HRESULT RefreshKeyman ( );
+    VARIANT_BOOL GetAutoRefresh ( );
+    void PutAutoRefresh (
+        VARIANT_BOOL Value );
+    HRESULT DisableUserInterface ( );
+    HRESULT EnableUserInterface ( );
+    HRESULT ShutdownKeyman32Engine ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_ActiveKeyboard (
+        /*[out,retval]*/ struct IKeymanKeyboardInstalled * * Value ) = 0;
+      virtual HRESULT __stdcall put_ActiveKeyboard (
+        /*[in]*/ struct IKeymanKeyboardInstalled * Value ) = 0;
+      virtual HRESULT __stdcall get_VisualKeyboardVisible (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall raw_StartVisualKeyboard ( ) = 0;
+      virtual HRESULT __stdcall raw_StopVisualKeyboard ( ) = 0;
+      virtual HRESULT __stdcall raw_StartKeyman32Engine (
+        /*[in]*/ unsigned long ProductID ) = 0;
+      virtual HRESULT __stdcall raw_StopKeyman32Engine (
+        /*[in]*/ unsigned long ProductID ) = 0;
+      virtual HRESULT __stdcall get_LastActiveWindow (
+        /*[out,retval]*/ unsigned long * Value ) = 0;
+      virtual HRESULT __stdcall get_LastFocusWindow (
+        /*[out,retval]*/ unsigned long * Value ) = 0;
+      virtual HRESULT __stdcall raw_RegisterControllerWindow (
+        /*[in]*/ unsigned long Value ) = 0;
+      virtual HRESULT __stdcall raw_UnregisterControllerWindow (
+        /*[in]*/ unsigned long Value ) = 0;
+      virtual HRESULT __stdcall raw_RefreshKeyman ( ) = 0;
+      virtual HRESULT __stdcall get_AutoRefresh (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall put_AutoRefresh (
+        /*[in]*/ VARIANT_BOOL Value ) = 0;
+      virtual HRESULT __stdcall raw_DisableUserInterface ( ) = 0;
+      virtual HRESULT __stdcall raw_EnableUserInterface ( ) = 0;
+      virtual HRESULT __stdcall raw_ShutdownKeyman32Engine ( ) = 0;
+};
+
+struct __declspec(uuid("7b095092-9cff-4349-af4c-bc0684981682"))
+ITavultesoftKeyman : IKeymanObject
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetBackgroundRefresh,put=PutBackgroundRefresh))
+    VARIANT_BOOL BackgroundRefresh;
+    __declspec(property(get=GetKeyboards))
+    IKeymanKeyboardsInstalledPtr Keyboards;
+    __declspec(property(get=GetAddins))
+    IKeymanAddinsInstalledPtr Addins;
+    __declspec(property(get=GetPackages))
+    IKeymanPackagesInstalledPtr Packages;
+    __declspec(property(get=GetSystemInfo))
+    IKeymanSystemInfoPtr SystemInfo;
+    __declspec(property(get=GetErrors))
+    IKeymanErrorsPtr Errors;
+    __declspec(property(get=GetOptions))
+    IKeymanOptionsPtr Options;
+    __declspec(property(get=GetLanguages))
+    IKeymanLanguagesPtr Languages;
+    __declspec(property(get=GetProducts))
+    IKeymanProductsPtr Products;
+    __declspec(property(get=GetControl))
+    IKeymanControlPtr Control;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    HRESULT Refresh ( );
+    VARIANT_BOOL GetBackgroundRefresh ( );
+    void PutBackgroundRefresh (
+        VARIANT_BOOL Value );
+    IKeymanKeyboardsInstalledPtr GetKeyboards ( );
+    IKeymanAddinsInstalledPtr GetAddins ( );
+    IKeymanPackagesInstalledPtr GetPackages ( );
+    IKeymanSystemInfoPtr GetSystemInfo ( );
+    IKeymanErrorsPtr GetErrors ( );
+    IKeymanOptionsPtr GetOptions ( );
+    IKeymanLanguagesPtr GetLanguages ( );
+    IKeymanProductsPtr GetProducts ( );
+    IKeymanControlPtr GetControl ( );
+    IDispatchPtr ObjectByIndex (
+        long Index );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_Refresh ( ) = 0;
+      virtual HRESULT __stdcall get_BackgroundRefresh (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall put_BackgroundRefresh (
+        /*[in]*/ VARIANT_BOOL Value ) = 0;
+      virtual HRESULT __stdcall get_Keyboards (
+        /*[out,retval]*/ struct IKeymanKeyboardsInstalled * * Value ) = 0;
+      virtual HRESULT __stdcall get_Addins (
+        /*[out,retval]*/ struct IKeymanAddinsInstalled * * Value ) = 0;
+      virtual HRESULT __stdcall get_Packages (
+        /*[out,retval]*/ struct IKeymanPackagesInstalled * * Value ) = 0;
+      virtual HRESULT __stdcall get_SystemInfo (
+        /*[out,retval]*/ struct IKeymanSystemInfo * * Value ) = 0;
+      virtual HRESULT __stdcall get_Errors (
+        /*[out,retval]*/ struct IKeymanErrors * * Value ) = 0;
+      virtual HRESULT __stdcall get_Options (
+        /*[out,retval]*/ struct IKeymanOptions * * Value ) = 0;
+      virtual HRESULT __stdcall get_Languages (
+        /*[out,retval]*/ struct IKeymanLanguages * * Value ) = 0;
+      virtual HRESULT __stdcall get_Products (
+        /*[out,retval]*/ struct IKeymanProducts * * Value ) = 0;
+      virtual HRESULT __stdcall get_Control (
+        /*[out,retval]*/ struct IKeymanControl * * Value ) = 0;
+      virtual HRESULT __stdcall raw_ObjectByIndex (
+        /*[in]*/ long Index,
+        /*[out,retval]*/ IDispatch * * Result ) = 0;
+};
+
+struct __declspec(uuid("54d44e7b-31e3-42f6-a0af-fd54e30e0a96"))
+IKeymanAddinFile : IKeymanAddin
+{
+    //
+    // Wrapper methods for error-handling
+    //
+
+    HRESULT Install ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_Install ( ) = 0;
+};
+
+struct __declspec(uuid("76172863-8ccf-4787-a42a-3e8ab97726e1"))
+ITavultesoftKeymanScript : ITavultesoftKeyman
+{
+    //
+    // Wrapper methods for error-handling
+    //
+
+    long GetProductActivationInfo (
+        long ProductID,
+        long InfoType );
+    _bstr_t GetProductActivationRequest (
+        long ProductID,
+        _bstr_t LicenceCode );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_GetProductActivationInfo (
+        /*[in]*/ long ProductID,
+        /*[in]*/ long InfoType,
+        /*[out,retval]*/ long * RetVal ) = 0;
+      virtual HRESULT __stdcall raw_GetProductActivationRequest (
+        /*[in]*/ long ProductID,
+        /*[in]*/ BSTR LicenceCode,
+        /*[out,retval]*/ BSTR * Result ) = 0;
+};
+
+struct __declspec(uuid("1726b638-bdda-40b3-9bbd-33bb32602722"))
+IKeymanLanguage2 : IKeymanLanguage
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetHotkey,put=PutHotkey))
+    long Hotkey;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    long GetHotkey ( );
+    void PutHotkey (
+        long Value );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Hotkey (
+        /*[out,retval]*/ long * Value ) = 0;
+      virtual HRESULT __stdcall put_Hotkey (
+        /*[in]*/ long Value ) = 0;
+};
+
+struct __declspec(uuid("e9f5a74a-3e3b-4401-b34a-fefdf42340e5"))
+IKeymanKeyboard2 : IKeymanKeyboard
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetWindowsLanguages))
+    _bstr_t WindowsLanguages;
+    __declspec(property(get=GetPrimaryLanguage))
+    long PrimaryLanguage;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    _bstr_t GetCharsUsed ( );
+    IKeymanUnicodeBlocksPtr GetScriptsUsed ( );
+    _bstr_t GetWindowsLanguages ( );
+    long GetPrimaryLanguage ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_GetCharsUsed (
+        /*[out,retval]*/ BSTR * Result ) = 0;
+      virtual HRESULT __stdcall raw_GetScriptsUsed (
+        /*[out,retval]*/ struct IKeymanUnicodeBlocks * * Result ) = 0;
+      virtual HRESULT __stdcall get_WindowsLanguages (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_PrimaryLanguage (
+        /*[out,retval]*/ long * Value ) = 0;
+};
+
+struct __declspec(uuid("e1e488e3-4104-43e8-aab0-d5587618c3fb"))
+IKeymanSystemConfigManager : IKeymanCollection
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetItems))
+    IKeymanSystemConfigItemPtr Items[];
+    __declspec(property(get=GetScriptNames))
+    _bstr_t ScriptNames;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanSystemConfigItemPtr GetItems (
+        long Index );
+    HRESULT Apply ( );
+    HRESULT GetKeyboardRequirements (
+        struct IKeymanKeyboard * Keyboard );
+    HRESULT GetPackageRequirements (
+        struct IKeymanPackage * Package );
+    HRESULT BuildItemList ( );
+    _bstr_t GetScriptNames ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Items (
+        /*[in]*/ long Index,
+        /*[out,retval]*/ struct IKeymanSystemConfigItem * * Value ) = 0;
+      virtual HRESULT __stdcall raw_Apply ( ) = 0;
+      virtual HRESULT __stdcall raw_GetKeyboardRequirements (
+        /*[in]*/ struct IKeymanKeyboard * Keyboard ) = 0;
+      virtual HRESULT __stdcall raw_GetPackageRequirements (
+        /*[in]*/ struct IKeymanPackage * Package ) = 0;
+      virtual HRESULT __stdcall raw_BuildItemList ( ) = 0;
+      virtual HRESULT __stdcall get_ScriptNames (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+};
+
+struct __declspec(uuid("1079d51e-3ab7-4427-b12b-32437f20510d"))
+ITavultesoftKeymanSystemConfig : IDispatch
+{
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanSystemConfigManagerPtr CreateSystemConfigManager ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall raw_CreateSystemConfigManager (
+        /*[out,retval]*/ struct IKeymanSystemConfigManager * * Result ) = 0;
+};
+
+struct __declspec(uuid("6bdd6c6a-a4dd-4884-91f9-39b0987b6d4c"))
+IKeymanPackage2 : IKeymanPackage
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetVersion))
+    _bstr_t Version;
+    __declspec(property(get=GetCopyright))
+    _bstr_t Copyright;
+    __declspec(property(get=GetWebsite))
+    _bstr_t Website;
+    __declspec(property(get=GetAuthor))
+    _bstr_t Author;
+    __declspec(property(get=GetAuthorEmail))
+    _bstr_t AuthorEmail;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    _bstr_t GetVersion ( );
+    _bstr_t GetCopyright ( );
+    _bstr_t GetWebsite ( );
+    _bstr_t GetAuthor ( );
+    _bstr_t GetAuthorEmail ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Version (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Copyright (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Website (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Author (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_AuthorEmail (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+};
+
+struct __declspec(uuid("736d462a-eb7c-4c5a-b827-2147c5f69b4c"))
+IKeymanPackage3 : IKeymanPackage2
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetFonts))
+    IKeymanPackageFontsPtr Fonts;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanPackageFontsPtr GetFonts ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Fonts (
+        /*[out,retval]*/ struct IKeymanPackageFonts * * Value ) = 0;
+};
+
+struct __declspec(uuid("e6006a06-9ffb-43a9-baad-7f23d8547c93"))
+IKeymanKeyboardInstalled2 : IKeymanKeyboardInstalled
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetOptionNames))
+    _bstr_t OptionNames;
+    __declspec(property(get=GetOption,put=PutOption))
+    _bstr_t Option[];
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    _bstr_t GetOptionNames ( );
+    _bstr_t GetOption (
+        _bstr_t Index );
+    void PutOption (
+        _bstr_t Index,
+        _bstr_t Value );
+    HRESULT ShowWelcome ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_OptionNames (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Option (
+        /*[in]*/ BSTR Index,
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall put_Option (
+        /*[in]*/ BSTR Index,
+        /*[in]*/ BSTR Value ) = 0;
+      virtual HRESULT __stdcall raw_ShowWelcome ( ) = 0;
+};
+
+struct __declspec(uuid("fdb3f487-5004-4d74-9a62-03e61047b13a"))
+IKeymanSystemConfigManager2 : IKeymanSystemConfigManager
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetProduct,put=PutProduct))
+    IKeymanProductPtr Product;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    IKeymanProductPtr GetProduct ( );
+    void PutProduct (
+        struct IKeymanProduct * Value );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Product (
+        /*[out,retval]*/ struct IKeymanProduct * * Value ) = 0;
+      virtual HRESULT __stdcall put_Product (
+        /*[in]*/ struct IKeymanProduct * Value ) = 0;
+};
+
+struct __declspec(uuid("bea10878-1e01-43bb-9e0d-b72f08695376"))
+IKeymanAddinInstalled2 : IKeymanAddinInstalled
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetEnabled,put=PutEnabled))
+    VARIANT_BOOL Enabled;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    VARIANT_BOOL GetEnabled ( );
+    void PutEnabled (
+        VARIANT_BOOL Value );
+    enum tagKeymanAddinConfigureResult Configure (
+        long ParentWindow );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_Enabled (
+        /*[out,retval]*/ VARIANT_BOOL * Value ) = 0;
+      virtual HRESULT __stdcall put_Enabled (
+        /*[in]*/ VARIANT_BOOL Value ) = 0;
+      virtual HRESULT __stdcall raw_Configure (
+        /*[in]*/ long ParentWindow,
+        /*[out,retval]*/ enum tagKeymanAddinConfigureResult * Result ) = 0;
+};
+
+struct __declspec(uuid("3ba67abf-cd27-4f58-9b06-0ee5109c1bed"))
+IKeymanKeyboardInstalled3 : IKeymanKeyboardInstalled2
+{
+    //
+    // Property data
+    //
+
+    __declspec(property(get=GetIconFilename))
+    _bstr_t IconFilename;
+    __declspec(property(get=GetLanguages))
+    IKeymanKeyboardLanguagesPtr Languages;
+    __declspec(property(get=GetProfileGUID))
+    GUID ProfileGUID;
+
+    //
+    // Wrapper methods for error-handling
+    //
+
+    _bstr_t GetIconFilename ( );
+    IKeymanKeyboardLanguagesPtr GetLanguages ( );
+    GUID GetProfileGUID ( );
+
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall get_IconFilename (
+        /*[out,retval]*/ BSTR * Value ) = 0;
+      virtual HRESULT __stdcall get_Languages (
+        /*[out,retval]*/ struct IKeymanKeyboardLanguages * * Value ) = 0;
+      virtual HRESULT __stdcall get_ProfileGUID (
+        /*[out,retval]*/ GUID * Value ) = 0;
+};
+
+//
+// Wrapper method implementations
+//
+
+#include "c:\keyman\9.0\src\addins\kmtip\kmcomapi.tli"
+
+} // namespace kmcomapi
+
+#pragma pack(pop)

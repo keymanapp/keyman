@@ -1,0 +1,15 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I4585 - space not adding to context'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
+'a' + 'b' > 'c'  c tests for ignored characters, e.g. type 'a b' should not give 'c'!
+'z' + 'b' > 'q'  c tests for chars not in keyboard being added to context, e.g. 'zb' should give 'q'!
+
+c space should be added to context (but doesn't)
+c NL, TAB should reset context (but don't)
+c Ctrl+Z, Alt+F and also cursor movement should reset context (but don't)
+c correct: focus change, mouse click both reset context
+

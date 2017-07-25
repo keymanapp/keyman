@@ -1,0 +1,264 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{45F7C09F-A0B5-4E82-B687-275E2A4C62B4}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="01 - EditDesigner_Demo\prjEditDDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="02 - ExportFavorites_Demo\prjExportFavoritesDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="03 - FileAssociate_Demo\prjFile_AssDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="04 - GUID_Demo\GUID_Creator\prjGuidCreatorDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="04 - GUID_Demo\IEGuid\prjIEGuidDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="05 - IEAddress_Demo\prjIEAddressDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="06 - IECache_Demo\prjCacheDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="07 - IEDownload_Demo\IEDownload_Creating_Dynamically (at Run-Time)\prjDownloaderDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="07 - IEDownload_Demo\IEDownload_Multiple Files_Simultaneous_Downloading\prjDownloadMgrDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="08 - IEMultiDownload\prjMultiDLDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="09 - IEParser_Demo\prjIEParserDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="10 - IETravellog_Demo\prjTravellogDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="11 - LabelLink_Demo\prjLinksDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="20 - WebUpdater_Demo\Updater_XML_File_Creator\prjProject1Demo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="13 - MimeFilter_Demo\prjMimeDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="15 - Zones_Security_Demo\prjZonesSecurityDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="16 - UI-Less_Demo\prjUIParser_Demo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="17 - URL_Demo\prjMainDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="18 - URL_History_Demo\prjUrlHistoryDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="19 - URLSearchHook\prjSearchhookDemo.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="prjEditDDemo">
+			<MSBuild Projects="01 - EditDesigner_Demo\prjEditDDemo.dproj"/>
+		</Target>
+		<Target Name="prjEditDDemo:Clean">
+			<MSBuild Targets="Clean" Projects="01 - EditDesigner_Demo\prjEditDDemo.dproj"/>
+		</Target>
+		<Target Name="prjEditDDemo:Make">
+			<MSBuild Targets="Make" Projects="01 - EditDesigner_Demo\prjEditDDemo.dproj"/>
+		</Target>
+		<Target Name="prjExportFavoritesDemo">
+			<MSBuild Projects="02 - ExportFavorites_Demo\prjExportFavoritesDemo.dproj"/>
+		</Target>
+		<Target Name="prjExportFavoritesDemo:Clean">
+			<MSBuild Targets="Clean" Projects="02 - ExportFavorites_Demo\prjExportFavoritesDemo.dproj"/>
+		</Target>
+		<Target Name="prjExportFavoritesDemo:Make">
+			<MSBuild Targets="Make" Projects="02 - ExportFavorites_Demo\prjExportFavoritesDemo.dproj"/>
+		</Target>
+		<Target Name="prjFile_AssDemo">
+			<MSBuild Projects="03 - FileAssociate_Demo\prjFile_AssDemo.dproj"/>
+		</Target>
+		<Target Name="prjFile_AssDemo:Clean">
+			<MSBuild Targets="Clean" Projects="03 - FileAssociate_Demo\prjFile_AssDemo.dproj"/>
+		</Target>
+		<Target Name="prjFile_AssDemo:Make">
+			<MSBuild Targets="Make" Projects="03 - FileAssociate_Demo\prjFile_AssDemo.dproj"/>
+		</Target>
+		<Target Name="prjGuidCreatorDemo">
+			<MSBuild Projects="04 - GUID_Demo\GUID_Creator\prjGuidCreatorDemo.dproj"/>
+		</Target>
+		<Target Name="prjGuidCreatorDemo:Clean">
+			<MSBuild Targets="Clean" Projects="04 - GUID_Demo\GUID_Creator\prjGuidCreatorDemo.dproj"/>
+		</Target>
+		<Target Name="prjGuidCreatorDemo:Make">
+			<MSBuild Targets="Make" Projects="04 - GUID_Demo\GUID_Creator\prjGuidCreatorDemo.dproj"/>
+		</Target>
+		<Target Name="prjIEGuidDemo">
+			<MSBuild Projects="04 - GUID_Demo\IEGuid\prjIEGuidDemo.dproj"/>
+		</Target>
+		<Target Name="prjIEGuidDemo:Clean">
+			<MSBuild Targets="Clean" Projects="04 - GUID_Demo\IEGuid\prjIEGuidDemo.dproj"/>
+		</Target>
+		<Target Name="prjIEGuidDemo:Make">
+			<MSBuild Targets="Make" Projects="04 - GUID_Demo\IEGuid\prjIEGuidDemo.dproj"/>
+		</Target>
+		<Target Name="prjIEAddressDemo">
+			<MSBuild Projects="05 - IEAddress_Demo\prjIEAddressDemo.dproj"/>
+		</Target>
+		<Target Name="prjIEAddressDemo:Clean">
+			<MSBuild Targets="Clean" Projects="05 - IEAddress_Demo\prjIEAddressDemo.dproj"/>
+		</Target>
+		<Target Name="prjIEAddressDemo:Make">
+			<MSBuild Targets="Make" Projects="05 - IEAddress_Demo\prjIEAddressDemo.dproj"/>
+		</Target>
+		<Target Name="prjCacheDemo">
+			<MSBuild Projects="06 - IECache_Demo\prjCacheDemo.dproj"/>
+		</Target>
+		<Target Name="prjCacheDemo:Clean">
+			<MSBuild Targets="Clean" Projects="06 - IECache_Demo\prjCacheDemo.dproj"/>
+		</Target>
+		<Target Name="prjCacheDemo:Make">
+			<MSBuild Targets="Make" Projects="06 - IECache_Demo\prjCacheDemo.dproj"/>
+		</Target>
+		<Target Name="prjDownloaderDemo">
+			<MSBuild Projects="07 - IEDownload_Demo\IEDownload_Creating_Dynamically (at Run-Time)\prjDownloaderDemo.dproj"/>
+		</Target>
+		<Target Name="prjDownloaderDemo:Clean">
+			<MSBuild Targets="Clean" Projects="07 - IEDownload_Demo\IEDownload_Creating_Dynamically (at Run-Time)\prjDownloaderDemo.dproj"/>
+		</Target>
+		<Target Name="prjDownloaderDemo:Make">
+			<MSBuild Targets="Make" Projects="07 - IEDownload_Demo\IEDownload_Creating_Dynamically (at Run-Time)\prjDownloaderDemo.dproj"/>
+		</Target>
+		<Target Name="prjDownloadMgrDemo">
+			<MSBuild Projects="07 - IEDownload_Demo\IEDownload_Multiple Files_Simultaneous_Downloading\prjDownloadMgrDemo.dproj"/>
+		</Target>
+		<Target Name="prjDownloadMgrDemo:Clean">
+			<MSBuild Targets="Clean" Projects="07 - IEDownload_Demo\IEDownload_Multiple Files_Simultaneous_Downloading\prjDownloadMgrDemo.dproj"/>
+		</Target>
+		<Target Name="prjDownloadMgrDemo:Make">
+			<MSBuild Targets="Make" Projects="07 - IEDownload_Demo\IEDownload_Multiple Files_Simultaneous_Downloading\prjDownloadMgrDemo.dproj"/>
+		</Target>
+		<Target Name="prjMultiDLDemo">
+			<MSBuild Projects="08 - IEMultiDownload\prjMultiDLDemo.dproj"/>
+		</Target>
+		<Target Name="prjMultiDLDemo:Clean">
+			<MSBuild Targets="Clean" Projects="08 - IEMultiDownload\prjMultiDLDemo.dproj"/>
+		</Target>
+		<Target Name="prjMultiDLDemo:Make">
+			<MSBuild Targets="Make" Projects="08 - IEMultiDownload\prjMultiDLDemo.dproj"/>
+		</Target>
+		<Target Name="prjIEParserDemo">
+			<MSBuild Projects="09 - IEParser_Demo\prjIEParserDemo.dproj"/>
+		</Target>
+		<Target Name="prjIEParserDemo:Clean">
+			<MSBuild Targets="Clean" Projects="09 - IEParser_Demo\prjIEParserDemo.dproj"/>
+		</Target>
+		<Target Name="prjIEParserDemo:Make">
+			<MSBuild Targets="Make" Projects="09 - IEParser_Demo\prjIEParserDemo.dproj"/>
+		</Target>
+		<Target Name="prjTravellogDemo">
+			<MSBuild Projects="10 - IETravellog_Demo\prjTravellogDemo.dproj"/>
+		</Target>
+		<Target Name="prjTravellogDemo:Clean">
+			<MSBuild Targets="Clean" Projects="10 - IETravellog_Demo\prjTravellogDemo.dproj"/>
+		</Target>
+		<Target Name="prjTravellogDemo:Make">
+			<MSBuild Targets="Make" Projects="10 - IETravellog_Demo\prjTravellogDemo.dproj"/>
+		</Target>
+		<Target Name="prjLinksDemo">
+			<MSBuild Projects="11 - LabelLink_Demo\prjLinksDemo.dproj"/>
+		</Target>
+		<Target Name="prjLinksDemo:Clean">
+			<MSBuild Targets="Clean" Projects="11 - LabelLink_Demo\prjLinksDemo.dproj"/>
+		</Target>
+		<Target Name="prjLinksDemo:Make">
+			<MSBuild Targets="Make" Projects="11 - LabelLink_Demo\prjLinksDemo.dproj"/>
+		</Target>
+		<Target Name="prjProject1Demo">
+			<MSBuild Projects="20 - WebUpdater_Demo\Updater_XML_File_Creator\prjProject1Demo.dproj"/>
+		</Target>
+		<Target Name="prjProject1Demo:Clean">
+			<MSBuild Targets="Clean" Projects="20 - WebUpdater_Demo\Updater_XML_File_Creator\prjProject1Demo.dproj"/>
+		</Target>
+		<Target Name="prjProject1Demo:Make">
+			<MSBuild Targets="Make" Projects="20 - WebUpdater_Demo\Updater_XML_File_Creator\prjProject1Demo.dproj"/>
+		</Target>
+		<Target Name="prjMimeDemo">
+			<MSBuild Projects="13 - MimeFilter_Demo\prjMimeDemo.dproj"/>
+		</Target>
+		<Target Name="prjMimeDemo:Clean">
+			<MSBuild Targets="Clean" Projects="13 - MimeFilter_Demo\prjMimeDemo.dproj"/>
+		</Target>
+		<Target Name="prjMimeDemo:Make">
+			<MSBuild Targets="Make" Projects="13 - MimeFilter_Demo\prjMimeDemo.dproj"/>
+		</Target>
+		<Target Name="prjZonesSecurityDemo">
+			<MSBuild Projects="15 - Zones_Security_Demo\prjZonesSecurityDemo.dproj"/>
+		</Target>
+		<Target Name="prjZonesSecurityDemo:Clean">
+			<MSBuild Targets="Clean" Projects="15 - Zones_Security_Demo\prjZonesSecurityDemo.dproj"/>
+		</Target>
+		<Target Name="prjZonesSecurityDemo:Make">
+			<MSBuild Targets="Make" Projects="15 - Zones_Security_Demo\prjZonesSecurityDemo.dproj"/>
+		</Target>
+		<Target Name="prjUIParser_Demo">
+			<MSBuild Projects="16 - UI-Less_Demo\prjUIParser_Demo.dproj"/>
+		</Target>
+		<Target Name="prjUIParser_Demo:Clean">
+			<MSBuild Targets="Clean" Projects="16 - UI-Less_Demo\prjUIParser_Demo.dproj"/>
+		</Target>
+		<Target Name="prjUIParser_Demo:Make">
+			<MSBuild Targets="Make" Projects="16 - UI-Less_Demo\prjUIParser_Demo.dproj"/>
+		</Target>
+		<Target Name="prjMainDemo">
+			<MSBuild Projects="17 - URL_Demo\prjMainDemo.dproj"/>
+		</Target>
+		<Target Name="prjMainDemo:Clean">
+			<MSBuild Targets="Clean" Projects="17 - URL_Demo\prjMainDemo.dproj"/>
+		</Target>
+		<Target Name="prjMainDemo:Make">
+			<MSBuild Targets="Make" Projects="17 - URL_Demo\prjMainDemo.dproj"/>
+		</Target>
+		<Target Name="prjUrlHistoryDemo">
+			<MSBuild Projects="18 - URL_History_Demo\prjUrlHistoryDemo.dproj"/>
+		</Target>
+		<Target Name="prjUrlHistoryDemo:Clean">
+			<MSBuild Targets="Clean" Projects="18 - URL_History_Demo\prjUrlHistoryDemo.dproj"/>
+		</Target>
+		<Target Name="prjUrlHistoryDemo:Make">
+			<MSBuild Targets="Make" Projects="18 - URL_History_Demo\prjUrlHistoryDemo.dproj"/>
+		</Target>
+		<Target Name="prjSearchhookDemo">
+			<MSBuild Projects="19 - URLSearchHook\prjSearchhookDemo.dproj"/>
+		</Target>
+		<Target Name="prjSearchhookDemo:Clean">
+			<MSBuild Targets="Clean" Projects="19 - URLSearchHook\prjSearchhookDemo.dproj"/>
+		</Target>
+		<Target Name="prjSearchhookDemo:Make">
+			<MSBuild Targets="Make" Projects="19 - URLSearchHook\prjSearchhookDemo.dproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="prjEditDDemo;prjExportFavoritesDemo;prjFile_AssDemo;prjGuidCreatorDemo;prjIEGuidDemo;prjIEAddressDemo;prjCacheDemo;prjDownloaderDemo;prjDownloadMgrDemo;prjMultiDLDemo;prjIEParserDemo;prjTravellogDemo;prjLinksDemo;prjProject1Demo;prjMimeDemo;prjZonesSecurityDemo;prjUIParser_Demo;prjMainDemo;prjUrlHistoryDemo;prjSearchhookDemo"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="prjEditDDemo:Clean;prjExportFavoritesDemo:Clean;prjFile_AssDemo:Clean;prjGuidCreatorDemo:Clean;prjIEGuidDemo:Clean;prjIEAddressDemo:Clean;prjCacheDemo:Clean;prjDownloaderDemo:Clean;prjDownloadMgrDemo:Clean;prjMultiDLDemo:Clean;prjIEParserDemo:Clean;prjTravellogDemo:Clean;prjLinksDemo:Clean;prjProject1Demo:Clean;prjMimeDemo:Clean;prjZonesSecurityDemo:Clean;prjUIParser_Demo:Clean;prjMainDemo:Clean;prjUrlHistoryDemo:Clean;prjSearchhookDemo:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="prjEditDDemo:Make;prjExportFavoritesDemo:Make;prjFile_AssDemo:Make;prjGuidCreatorDemo:Make;prjIEGuidDemo:Make;prjIEAddressDemo:Make;prjCacheDemo:Make;prjDownloaderDemo:Make;prjDownloadMgrDemo:Make;prjMultiDLDemo:Make;prjIEParserDemo:Make;prjTravellogDemo:Make;prjLinksDemo:Make;prjProject1Demo:Make;prjMimeDemo:Make;prjZonesSecurityDemo:Make;prjUIParser_Demo:Make;prjMainDemo:Make;prjUrlHistoryDemo:Make;prjSearchhookDemo:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>

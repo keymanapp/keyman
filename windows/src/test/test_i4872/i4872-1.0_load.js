@@ -1,0 +1,1 @@
+KeymanWeb.KRS(new Stub_Keyboard_i4872()); function Stub_Keyboard_i4872() {this.KF="i4872-1.0.js";this.KI="Keyboard_i4872";this.KN="Test font consistency";}

@@ -1,0 +1,1 @@
+KeymanWeb.KRS(new Stub_Keyboard_gh_kmw_30()); function Stub_Keyboard_gh_kmw_30() {this.KF="gh_kmw_30-1.0.js";this.KI="Keyboard_gh_kmw_30";this.KN="GitHub KeymanWeb #30";}

@@ -1,0 +1,288 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{c71976bd-11fa-4ccd-be41-496087ab6800}</ProjectGuid>
+    <MainSource>JediApi_SingleUnits.dpk</MainSource>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+    <DCC_DependencyCheckOutputName>bin\single\JediApi_SingleUnits.bpl</DCC_DependencyCheckOutputName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Version>7.0</Version>
+    <DCC_DebugInformation>False</DCC_DebugInformation>
+    <DCC_WriteableConstants>True</DCC_WriteableConstants>
+    <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
+    <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    <DCC_DcuOutput>bin\single</DCC_DcuOutput>
+    <DCC_ObjOutput>bin\single</DCC_ObjOutput>
+    <DCC_HppOutput>bin\single</DCC_HppOutput>
+    <DCC_BplOutput>bin\single</DCC_BplOutput>
+    <DCC_UnitSearchPath>.;..\;..\..\common;..\..\Win32Api</DCC_UnitSearchPath>
+    <DCC_ResourcePath>.;..\;..\..\common;..\..\Win32Api</DCC_ResourcePath>
+    <DCC_ObjPath>.;..\;..\..\common;..\..\Win32Api</DCC_ObjPath>
+    <DCC_IncludePath>.;..\;..\..\common;..\..\Win32Api</DCC_IncludePath>
+    <DCC_Define>USE_DELPHI_TYPES;RELEASE</DCC_Define>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <Version>7.0</Version>
+    <DCC_WriteableConstants>True</DCC_WriteableConstants>
+    <DCC_DcuOutput>bin\single</DCC_DcuOutput>
+    <DCC_ObjOutput>bin\single</DCC_ObjOutput>
+    <DCC_HppOutput>bin\single</DCC_HppOutput>
+    <DCC_BplOutput>bin\single</DCC_BplOutput>
+    <DCC_UnitSearchPath>..\..\common;..\..\includes;..\..\win32api</DCC_UnitSearchPath>
+    <DCC_ResourcePath>..\..\common;..\..\includes;..\..\win32api</DCC_ResourcePath>
+    <DCC_ObjPath>..\..\common;..\..\includes;..\..\win32api</DCC_ObjPath>
+    <DCC_IncludePath>..\..\common;..\..\includes;..\..\win32api</DCC_IncludePath>
+    <DCC_Define>USE_DELPHI_TYPES;DEBUG</DCC_Define>
+    <DCC_GARBAGE>False</DCC_GARBAGE>
+  </PropertyGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Delphi.Personality</Borland.Personality>
+    <Borland.ProjectType>Package</Borland.ProjectType>
+    <BorlandProject>
+<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><Package_Options><Package_Options Name="ImplicitBuild">False</Package_Options><Package_Options Name="DesigntimeOnly">False</Package_Options><Package_Options Name="RuntimeOnly">False</Package_Options></Package_Options><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1031</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription"></VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="InternalName"></VersionInfoKeys><VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys><VersionInfoKeys Name="ProductName"></VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments"></VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">JediApi_SingleUnits.dpk</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
+  <ItemGroup>
+    <DelphiCompile Include="JediApi_SingleUnits.dpk">
+      <MainSource>MainSource</MainSource>
+    </DelphiCompile>
+    <DCCReference Include="..\..\win32Api\JwaAccCtrl.pas" />
+    <DCCReference Include="..\..\Win32API\JwaAclApi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaAclUI.pas" />
+    <DCCReference Include="..\..\Win32API\JwaActiveDS.pas" />
+    <DCCReference Include="..\..\Win32API\JwaActiveX.pas" />
+    <DCCReference Include="..\..\Win32API\JwaAdsDb.pas" />
+    <DCCReference Include="..\..\Win32API\JwaAdsErr.pas" />
+    <DCCReference Include="..\..\Win32API\JwaAdsHlp.pas" />
+    <DCCReference Include="..\..\Win32API\JwaAdsnms.pas" />
+    <DCCReference Include="..\..\Win32API\JwaAdsProp.pas" />
+    <DCCReference Include="..\..\Win32API\JwaAdssts.pas" />
+    <DCCReference Include="..\..\Win32API\JwaAdsTLB.pas" />
+    <DCCReference Include="..\..\Win32API\JwaAdtGen.pas" />
+    <DCCReference Include="..\..\Win32API\JwaAF_Irda.pas" />
+    <DCCReference Include="..\..\Win32API\JwaAtalkWsh.pas" />
+    <DCCReference Include="..\..\Win32API\JwaAuthif.pas" />
+    <DCCReference Include="..\..\Win32API\JwaAuthz.pas" />
+    <DCCReference Include="..\..\Win32API\JwaBatClass.pas" />
+    <DCCReference Include="..\..\Win32API\JwaBCrypt.pas" />
+    <DCCReference Include="..\..\Win32API\JwaBitFields.pas" />
+    <DCCReference Include="..\..\Win32API\JwaBits.pas" />
+    <DCCReference Include="..\..\Win32API\JwaBits1_5.pas" />
+    <DCCReference Include="..\..\Win32API\JwaBitscfg.pas" />
+    <DCCReference Include="..\..\Win32API\JwaBitsMsg.pas" />
+    <DCCReference Include="..\..\Win32API\JwaBLBErr.pas" />
+    <DCCReference Include="..\..\Win32API\JwaBluetoothAPIs.pas" />
+    <DCCReference Include="..\..\Win32API\JwaBtHDef.pas" />
+    <DCCReference Include="..\..\Win32API\JwaBthSdpDef.pas" />
+    <DCCReference Include="..\..\Win32API\JwaBugCodes.pas" />
+    <DCCReference Include="..\..\Win32API\JwaCardErr.pas" />
+    <DCCReference Include="..\..\Win32API\JwaCdErr.pas" />
+    <DCCReference Include="..\..\Win32API\JwaCmnQuery.pas" />
+    <DCCReference Include="..\..\Win32API\JwaColorDlg.pas" />
+    <DCCReference Include="..\..\Win32API\JwaCpl.pas" />
+    <DCCReference Include="..\..\Win32API\JwaCplext.pas" />
+    <DCCReference Include="..\..\Win32API\JwaCryptUIApi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaDbt.pas" />
+    <DCCReference Include="..\..\Win32API\JwaDde.pas" />
+    <DCCReference Include="..\..\Win32API\JwaDhcpCSdk.pas" />
+    <DCCReference Include="..\..\Win32API\JwaDhcpsApi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaDhcpSSdk.pas" />
+    <DCCReference Include="..\..\Win32API\JwaDlgs.pas" />
+    <DCCReference Include="..\..\Win32API\JwaDSAdmin.pas" />
+    <DCCReference Include="..\..\Win32API\JwaDSClient.pas" />
+    <DCCReference Include="..\..\Win32API\JwaDSGetDc.pas" />
+    <DCCReference Include="..\..\Win32API\JwaDskQuota.pas" />
+    <DCCReference Include="..\..\Win32API\JwaDSQuery.pas" />
+    <DCCReference Include="..\..\Win32API\JwaDSRole.pas" />
+    <DCCReference Include="..\..\Win32API\JwaDsSec.pas" />
+    <DCCReference Include="..\..\Win32API\JwaErrorRep.pas" />
+    <DCCReference Include="..\..\Win32API\JwaExcpt.pas" />
+    <DCCReference Include="..\..\Win32API\JwaFaxDev.pas" />
+    <DCCReference Include="..\..\Win32API\JwaFaxExt.pas" />
+    <DCCReference Include="..\..\Win32API\JwaFaxMmc.pas" />
+    <DCCReference Include="..\..\Win32API\JwaFaxRoute.pas" />
+    <DCCReference Include="..\..\Win32API\JwaGPEdit.pas" />
+    <DCCReference Include="..\..\Win32API\JwaHhError.pas" />
+    <DCCReference Include="..\..\Win32API\JwaHtmlGuid.pas" />
+    <DCCReference Include="..\..\Win32API\JwaHtmlHelp.pas" />
+    <DCCReference Include="..\..\Win32API\JwaIAccess.pas" />
+    <DCCReference Include="..\..\Win32API\JwaIAdmExt.pas" />
+    <DCCReference Include="..\..\Win32API\JwaIcmpApi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaIisCnfg.pas" />
+    <DCCReference Include="..\..\Win32API\JwaImageHlp.pas" />
+    <DCCReference Include="..\..\Win32API\JwaImapi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaImapiError.pas" />
+    <DCCReference Include="..\..\Win32API\JwaIme.pas" />
+    <DCCReference Include="..\..\Win32API\JwaIoEvent.pas" />
+    <DCCReference Include="..\..\Win32API\JwaIpExport.pas" />
+    <DCCReference Include="..\..\Win32API\JwaIpHlpApi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaIpIfCons.pas" />
+    <DCCReference Include="..\..\Win32API\JwaIpInfoId.pas" />
+    <DCCReference Include="..\..\Win32API\JwaIpRtrMib.pas" />
+    <DCCReference Include="..\..\Win32API\JwaIpTypes.pas" />
+    <DCCReference Include="..\..\Win32API\JwaIsGuids.pas" />
+    <DCCReference Include="..\..\Win32API\JwaIssPer16.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmAccess.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmAlert.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmApiBuf.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmAt.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmAudit.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmConfig.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmCons.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmDFS.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmErr.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmErrLog.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmJoin.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmMsg.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmRemUtl.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmRepl.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmServer.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmShare.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmSName.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmStats.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmSvc.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmUse.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmUseFlg.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLmWkSta.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLoadPerf.pas" />
+    <DCCReference Include="..\..\Win32API\JwaLpmApi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaMciAvi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaMprError.pas" />
+    <DCCReference Include="..\..\Win32API\JwaMsi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaMsiDefs.pas" />
+    <DCCReference Include="..\..\Win32API\JwaMsiQuery.pas" />
+    <DCCReference Include="..\..\Win32API\JwaMsTask.pas" />
+    <DCCReference Include="..\..\Win32API\JwaMSTcpIP.pas" />
+    <DCCReference Include="..\..\Win32API\JwaMSWSock.pas" />
+    <DCCReference Include="..\..\Win32API\JwaNative.pas" />
+    <DCCReference Include="..\..\Win32API\JwaNb30.pas" />
+    <DCCReference Include="..\..\Win32API\JwaNCrypt.pas" />
+    <DCCReference Include="..\..\Win32API\JwaNetSh.pas" />
+    <DCCReference Include="..\..\Win32API\JwaNspApi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaNtDdPar.pas" />
+    <DCCReference Include="..\..\Win32API\JwaNtDsApi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaNtDsbCli.pas" />
+    <DCCReference Include="..\..\Win32API\JwaNtDsBMsg.pas" />
+    <DCCReference Include="..\..\Win32API\JwaNtLDAP.pas" />
+    <DCCReference Include="..\..\Win32API\JwaNtQuery.pas" />
+    <DCCReference Include="..\..\win32Api\JwaNtSecApi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaNtStatus.pas" />
+    <DCCReference Include="..\..\Win32API\JwaObjSel.pas" />
+    <DCCReference Include="..\..\Win32API\JwaPatchApi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaPatchWiz.pas" />
+    <DCCReference Include="..\..\Win32API\JwaPbt.pas" />
+    <DCCReference Include="..\..\Win32API\JwaPdh.pas" />
+    <DCCReference Include="..\..\Win32API\JwaPdhMsg.pas" />
+    <DCCReference Include="..\..\Win32API\JwaPowrProf.pas" />
+    <DCCReference Include="..\..\Win32API\JwaProfInfo.pas" />
+    <DCCReference Include="..\..\Win32API\JwaProtocol.pas" />
+    <DCCReference Include="..\..\Win32API\JwaPrSht.pas" />
+    <DCCReference Include="..\..\Win32API\JwaPsApi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaQos.pas" />
+    <DCCReference Include="..\..\Win32API\JwaQosName.pas" />
+    <DCCReference Include="..\..\Win32API\JwaQosPol.pas" />
+    <DCCReference Include="..\..\Win32API\JwaQosSp.pas" />
+    <DCCReference Include="..\..\Win32API\JwaReason.pas" />
+    <DCCReference Include="..\..\Win32API\JwaRegStr.pas" />
+    <DCCReference Include="..\..\Win32API\JwaRpc.pas" />
+    <DCCReference Include="..\..\Win32API\JwaRpcASync.pas" />
+    <DCCReference Include="..\..\Win32API\JwaRpcDce.pas" />
+    <DCCReference Include="..\..\Win32API\JwaRpcNsi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaRpcNtErr.pas" />
+    <DCCReference Include="..\..\Win32API\JwaRpcSsl.pas" />
+    <DCCReference Include="..\..\Win32API\JwaRpcWinsta.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSceSvc.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSchedule.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSchemaDef.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSddl.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSecExt.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSecurity.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSens.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSensAPI.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSensEvts.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSfc.pas" />
+    <DCCReference Include="..\..\Win32API\JwaShAppMgr.pas" />
+    <DCCReference Include="..\..\Win32API\JwaShellAPI.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSHFolder.pas" />
+    <DCCReference Include="..\..\Win32API\JwaShlDisp.pas" />
+    <DCCReference Include="..\..\Win32API\JwaShlGuid.pas" />
+    <DCCReference Include="..\..\Win32API\JwaShlObj.pas" />
+    <DCCReference Include="..\..\Win32API\JwaShLWAPI.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSisBkUp.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSnmp.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSpOrder.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSrRestorePtApi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSspi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaStrSafe.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSubAuth.pas" />
+    <DCCReference Include="..\..\Win32API\JwaSvcGuid.pas" />
+    <DCCReference Include="..\..\Win32API\JwaTlHelp32.pas" />
+    <DCCReference Include="..\..\Win32API\JwaTmSchema.pas" />
+    <DCCReference Include="..\..\Win32API\JwaTraffic.pas" />
+    <DCCReference Include="..\..\Win32API\JwaUrlHist.pas" />
+    <DCCReference Include="..\..\Win32API\JwaUrlMon.pas" />
+    <DCCReference Include="..\..\Win32API\JwaUserEnv.pas" />
+    <DCCReference Include="..\..\Win32API\JwaUxTheme.pas" />
+    <DCCReference Include="..\..\Win32API\JwaVista.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWbemCli.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinAble.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinBase.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinBer.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinCon.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinCpl.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinCred.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinCrypt.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinDLLNames.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinDNS.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinEFS.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinError.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinFax.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinGDI.pas" />
+    <DCCReference Include="..\..\win32api\JwaWinInet.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinIoctl.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinLDAP.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinNetWk.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinNLS.pas" />
+    <DCCReference Include="..\..\win32Api\JwaWinNT.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinPerf.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinReg.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinResrc.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinSafer.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinSock.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinsock2.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinSta.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinSvc.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinternl.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinType.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinUser.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinVer.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWinWlx.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWmiStr.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWowNT16.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWowNT32.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWPApi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWPApiMsg.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWPCrsMsg.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWPFtpMsg.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWPPstMsg.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWPSpiHlp.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWPTypes.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWPWizMsg.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWS2atm.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWs2Bth.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWS2dnet.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWS2spi.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWS2tcpip.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWShisotp.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWSipx.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWSnetbs.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWSNwLink.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWsrm.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWSvns.pas" />
+    <DCCReference Include="..\..\Win32API\JwaWtsApi32.pas" />
+    <DCCReference Include="..\..\Win32API\JwaZMOUSE.pas" />
+  </ItemGroup>
+</Project>

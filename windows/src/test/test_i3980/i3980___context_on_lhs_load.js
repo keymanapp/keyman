@@ -1,0 +1,1 @@
+KeymanWeb.KRS(new Stub_Keyboard_i3980___context_on_lhs()); function Stub_Keyboard_i3980___context_on_lhs() {this.KF="i3980___context_on_lhs.js";this.KI="Keyboard_i3980___context_on_lhs";this.KN="I3980 - Context() on LHS";}

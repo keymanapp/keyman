@@ -1,0 +1,36 @@
+c RegressionTest: Alt key pass thru
+c Font: Arial
+c Encoding: Unicode
+c Description: Tests Alt key processing in mnemonic keyboards.
+c Description: Note: does not currently work in regressiontest due to
+c Description: mnemoniclayout compiler requirements and preserved key limitations.
+c Procedure: Press abc RAlt A
+c AutoProc: K_E A+ K_S A-
+c FinalOutput: "blah->4"
+
+store(&VERSION) '9.0'
+NAME "Alt key tests"
+HOTKEY "[CTRL SHIFT K_A]"
+store(&mnemoniclayout) "1"
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+ + 'e' > 'blah'
+ + [ALT "S"] > "->" use(pass)
+ + [ALT "K"] > "ALT K"
+                              
+group(pass) using keys
+
++ "s" > "1"
++ "S" > "2"
++ [ALT "s"] > "3"
++ [ALT "S"] > "4" use(pass2)
+
+group(pass2) using keys
+
+
+c left empty to see what comes out
+
+c EOF

@@ -1,0 +1,1 @@
+KeymanWeb.KRS(new Stub_Keyboard_i4273()); function Stub_Keyboard_i4273() {this.KF="i4273-1.0.js";this.KI="Keyboard_i4273";this.KN="I4273 - Convert keyboard to Unicode before installing";}

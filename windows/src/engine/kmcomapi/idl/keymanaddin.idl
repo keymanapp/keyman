@@ -1,0 +1,145 @@
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanAddin                                                                /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(F0B8E349-CDC4-4138-8B4F-2E8756B83655),
+    version(1.0),
+    helpstring("Interface for KeymanAddin Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanAddin: IDispatch
+  {
+    [propget, id(0x00000001)]
+    HRESULT _stdcall OwnerPackage([out, retval] IKeymanPackage ** Value );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall Name([out, retval] BSTR * Value );
+    [propget, id(0x00000003)]
+    HRESULT _stdcall Filename([out, retval] BSTR * Value );
+    [propget, id(0x00000004)]
+    HRESULT _stdcall Description([out, retval] BSTR * Value );
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanAddinInstalled : IKeymanAddin                                        /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(75864AF3-55D2-4D9E-9937-A58962AD6D75),
+    version(1.0),
+    helpstring("Interface for KeymanAddinInstalled Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanAddinInstalled: IKeymanAddin
+  {
+    [propget, id(0x00000005)]
+    HRESULT _stdcall InstalledByAdmin([out, retval] VARIANT_BOOL * Value );
+    [id(0x00000006)]
+    HRESULT _stdcall Uninstall( void );
+  };
+
+
+  // KeymanAddinInstalled
+
+  [
+    uuid(C33AC758-95E9-49C4-B8EB-3A4F6CDE8A01),
+    version(1.0),
+    helpstring("KeymanAddinInstalled Object"),
+    noncreatable
+  ]
+  coclass KeymanAddinInstalled
+  {
+    [default] interface IKeymanAddinInstalled;
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanAddinFile : IKeymanAddin                                             /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(54D44E7B-31E3-42F6-A0AF-FD54E30E0A96),
+    version(1.0),
+    helpstring("Interface for KeymanAddinFile Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanAddinFile: IKeymanAddin
+  {
+    [id(0x00000005)]
+    HRESULT _stdcall Install( void );
+  };
+
+
+  // KeymanAddinFile
+
+  [
+    uuid(E6DB0DEC-9C01-4996-8ACE-DFD2CE5FCC00),
+    version(1.0),
+    helpstring("KeymanAddinFile Object"),
+    noncreatable
+  ]
+  coclass KeymanAddinFile
+  {
+    [default] interface IKeymanAddinFile;
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanAddins : IKeymanCollection                                           /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(F331F8D8-313F-47A8-A8BF-F136ED1F0399),
+    version(1.0),
+    helpstring("Interface for KeymanAddins Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanAddins: IKeymanCollection
+  {
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanAddinsInstalled : IKeymanAddins                                      /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(B914334C-84E6-4A22-BA25-72516533CEC5),
+    version(1.0),
+    helpstring("Interface for KeymanAddinsInstalled Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanAddinsInstalled: IKeymanAddins
+  {
+    [propget, id(0x00000000), defaultcollelem, uidefault]
+    HRESULT _stdcall Items([in] VARIANT Index, [out, retval] IKeymanAddinInstalled ** Value );
+    [id(0x00000003)]
+    HRESULT _stdcall Install([in] BSTR Filename );
+  };
+
+  // KeymanAddinsInstalled
+
+  [
+    uuid(6395B9FB-B728-4EE7-A481-4E2A650B08A2),
+    version(1.0),
+    helpstring("KeymanAddinsInstalled Object"),
+    noncreatable
+  ]
+  coclass KeymanAddinsInstalled
+  {
+    [default] interface IKeymanAddinsInstalled;
+  };
+
+

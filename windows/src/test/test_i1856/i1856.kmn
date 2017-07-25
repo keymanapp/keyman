@@ -1,0 +1,11 @@
+﻿store(&VERSION) '8.0'
+store(&NAME) 'I1856 test'
+store(&MESSAGE) 'It just does a ' U+0027 'I1856' U+0027 ' on pressing A'
+store(&VISUALKEYBOARD) 'i1856.kvk'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ 'A' > 'I1856 :-)'
++ 'a' > 'I1856 :-)'

@@ -1,0 +1,37 @@
+This is the preview Version of RunAsSys 1.1 for Windows 200, XP, Vista and Win7 made with the help of JWSCL.
+RunAsSys runs application as SYSTEM user in the current user's session. If you start it without any parameters
+it creates a command prompt with SYSTEM privileges by default. Otherwise you can add an application with parameters to start this process as SYSTEM user. Use quotation marks if necessary for your path.
+On Windows Vista and UAC it should prompt you for elevation. On XP without Admin privileges it should prompt you for Admin credentials.
+
+
+Additional Info:
+There are two version of a reg file: 32bit and 64bit. They allow you to activate the log mechanism. Leave the RegPath empty and the reg files
+will be written where the EXE-files resides.
+
+SuRun Support:
+If SuRun (http://kay-bruns.de/wp/software/surun) is installed on the system, RunAsSys asks SuRun to get Administrator access 
+and falls back if something bad happens.
+If you hold the shift key while you start RunAsSys, SuRun is ignored and the Administrator's password is asked.
+You don't need SuRun to use RunAsSys!
+
+History:
+
+1.2.14
++Fixed a bug on Win2000
+
+1.2
++Fixed a heap buffer overflow bug 
++Added support for SuRun. 
+
+1.1
++Fixed bug that prevented parameters to be recognized
++Fixed several leaks
++Fixed several pointer problems
++Made Windows 64bit compatible
+
+1.0
+Initial preview release
+
+Author: 
+Christian Wimmer
+http://blog.delphi-jedi.net

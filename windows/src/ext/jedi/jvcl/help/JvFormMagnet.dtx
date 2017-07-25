@@ -1,0 +1,73 @@
+##Package: AppFrm
+##Status: Generated
+----------------------------------------------------------------------------------------------------
+@@JvFormMagnet.pas
+Summary
+    Contains the TJvFormMagnet component.
+Author
+  Sébastien Buysse
+----------------------------------------------------------------------------------------------------
+@@TJvFormMagnet.FormGlue
+Summary
+  If set, any other form will be attracted and then glued to the one with the magnet
+Description
+  If set any other form visible in the application will get attracted and then glued to the form with
+  the magnet, provided it is moved close enough to its borders. Once glued, a form will move with the
+  form where the magnet is located. To break the link, the form that does not have the magnet must be
+  moved at a distance outside the magnetism area.
+
+----------------------------------------------------------------------------------------------------
+@@TJvFormMagnet.Area
+Summary
+  Defines the area within which the border of the window must be from the object of interest for the
+  magnet to work
+Description
+  Write here a description
+
+----------------------------------------------------------------------------------------------------
+@@TJvFormMagnet.Active
+Summary
+  If set, the magnet is working and will impact the form movements.
+Description
+  Write here a description
+
+----------------------------------------------------------------------------------------------------
+@@TJvFormMagnet
+<TITLEIMG TJvFormMagnet>
+#JVCLInfo
+<GROUP JVCL.FormsAndApp.Forms.Sizing>
+<FLAG Component>
+Summary
+  A component that allows forms to attract each others
+Description
+  When active, this component will monitor any movement of the form it is placed on and will align it
+  with the screen and/or the main form if its borders are within a distance of the attracting object.
+
+----------------------------------------------------------------------------------------------------
+@@TJvFormMagnet.MainFormMagnet
+Summary
+  If set, the main form is a magnet
+Description
+  If set, and the magnet is not on the main form, the form will be attracted by the main form when in
+  the attraction area from its borders.
+
+----------------------------------------------------------------------------------------------------
+@@TJvFormMagnet.MoveTo
+Summary
+  Returns the rectangle to which the form should be moved.
+Description
+  This method sets Rect to the rectangle the form should be adapted to. It is called internally when
+  Active is set to True but one could also call it to display visual indications to the user for
+  instance.
+Parameters
+  SrcRect - Current rectangle defining the form borders
+  Rect    - Rectangle that should replace the one from the form
+
+----------------------------------------------------------------------------------------------------
+@@TJvFormMagnet.ScreenMagnet
+Summary
+  If set, the screen borders are a magnet
+Description
+  If the borders of the Form are moved within the distance defined by Area of the screen borders, the
+  form will be attracted.
+

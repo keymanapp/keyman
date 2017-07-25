@@ -1,0 +1,1 @@
+﻿KeymanWeb.KR(new Keyboard_i2510()); function Keyboard_i2510() {this.KI="Keyboard_i2510";this.KN="I2510 - 't' in KeymanWeb Test Window";this.KV=null;this.KH='';this.KM=0;this.gs=function(t,e){return this.g0(t,e);};this.g0=function(t,e){var k=KeymanWeb,r=0,m=0;if(k.KKM(e,16384,65)){r=m=1;k.KO(0,t,"Aaah");}else if(k.KKM(e,16384,84)){r=m=1;k.KO(0,t,"The Letter T");}return r;};}

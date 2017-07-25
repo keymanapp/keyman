@@ -1,0 +1,12 @@
+﻿store(&VERSION) '8.0'
+store(&NAME) 'I2559 Test - Surrogate Support'
+begin Unicode > use(main)
+
+
+group(main) using keys
++ [K_G] > U+1105D
++ [K_F] > U+110B9
++ [K_D] > U+12271
++ [K_S] > U+12408
++ [K_A] > U+130B9
+                                           

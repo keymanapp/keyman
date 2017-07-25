@@ -1,0 +1,76 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.01
+#------------------------------------------------------------------------------
+!ifndef ROOT
+ROOT = $(MAKEDIR)\..
+!endif
+#------------------------------------------------------------------------------
+MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
+DCC = $(ROOT)\bin\dcc32.exe $**
+BRCC = $(ROOT)\bin\brcc32.exe $**
+#------------------------------------------------------------------------------
+PROJECTS = prjSDIDemo.exe prjMDIDemo.exe prjNewWinTabs1Demo.exe \
+  prjNewWinTabs2Demo.exe prjEvalNewWindowDemo.exe PrjRightClick_Demo.exe \
+  prjDragDropDemo.exe prjElementsUnderMouseDemo.exe prjPrintPreviewTemplateDemo.exe \
+  prjPrintingOptionsDemo.exe prjMoveResizeDemo.exe prjMSHTML_EventsDemo.exe \
+  prjActiveFormDemo.exe prjExecScriptExDemo.exe prjHTMLListenerDemo.exe \
+  prjEWBControlDemo.exe prjEventsTestDemo.exe prjSysLV32RepDemo.exe
+
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+prjSDIDemo.exe: 01 - New_Window_SDI_Demo\prjSDIDemo.dpr
+  $(DCC)
+
+prjMDIDemo.exe: 02 - New_Window_MDI_Demo\prjMDIDemo.dpr
+  $(DCC)
+
+prjNewWinTabs1Demo.exe: 03 - New_Window_Tabs_Demo_1\prjNewWinTabs1Demo.dpr
+  $(DCC)
+
+prjNewWinTabs2Demo.exe: 04 - New_Window_Tabs_Demo_2\prjNewWinTabs2Demo.dpr
+  $(DCC)
+
+prjEvalNewWindowDemo.exe: 05 - OnEvaluateNewWindow_Demo\prjEvalNewWindowDemo.dpr
+  $(DCC)
+
+PrjRightClick_Demo.exe: 06 - RightClick_Shortcuts_Demo\PrjRightClick_Demo.dpr
+  $(DCC)
+
+prjDragDropDemo.exe: 07 - DragNDrop_Demo\prjDragDropDemo.dpr
+  $(DCC)
+
+prjElementsUnderMouseDemo.exe: 08 - Elements_Under_Mouse_Demo\prjElementsUnderMouseDemo.dpr
+  $(DCC)
+
+prjPrintPreviewTemplateDemo.exe: 09 - PrintPreviewFromTemplate_Demo\prjPrintPreviewTemplateDemo.dpr
+  $(DCC)
+
+prjPrintingOptionsDemo.exe: 10 - PrintingOptions_Demo\prjPrintingOptionsDemo.dpr
+  $(DCC)
+
+prjMoveResizeDemo.exe: 11 - moveto, moveby, resizeto, resizeby_Demo\prjMoveResizeDemo.dpr
+  $(DCC)
+
+prjMSHTML_EventsDemo.exe: 12 - MSHTML_Events_Demo\prjMSHTML_EventsDemo.dpr
+  $(DCC)
+
+prjActiveFormDemo.exe: 13 - ActiveX_Form_Demo\prjActiveFormDemo.dpr
+  $(DCC)
+
+prjExecScriptExDemo.exe: 14 - ExecScriptEx_Demo\prjExecScriptExDemo.dpr
+  $(DCC)
+
+prjHTMLListenerDemo.exe: 15 - THtmlListener_Demo\prjHTMLListenerDemo.dpr
+  $(DCC)
+
+prjEWBControlDemo.exe: 16 - TEWBControl_Demo\prjEWBControlDemo.dpr
+  $(DCC)
+
+prjEventsTestDemo.exe: 17 - EWB Events Logger_Demo\prjEventsTestDemo.dpr
+  $(DCC)
+
+prjSysLV32RepDemo.exe: 18 - SysListView32 Replacement_Demo\prjSysLV32RepDemo.dpr
+  $(DCC)
+

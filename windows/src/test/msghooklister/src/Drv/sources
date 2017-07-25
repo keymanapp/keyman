@@ -1,0 +1,28 @@
+!Include "../sources_inc.txt"
+
+BUILD_ALLOW_COMPILER_WARNINGS=1
+
+TARGETTYPE=DRIVER
+TARGETNAME=MsgLister
+TARGETLIBS = $(DDK_LIB_PATH)\ntoskrnl.lib \
+			 $(DDK_LIB_PATH)\aux_klib.lib
+
+PRECOMPILED_INCLUDE=stdafx.h
+PRECOMPILED_CXX=1
+MSC_WARNING_LEVEL= $(MSC_WARNING_LEVEL) /W4
+
+USE_STL=1
+STL_VER=70
+# requires to compile <limits> without errors
+# it's only set normally if one of USE_MSVCRT or USE_LIBCMT is defined
+# but being a driver, we can't set them
+USER_C_FLAGS = /D_STL70_
+
+SOURCES = main.cpp \
+		  messages.cpp \
+		  dispatch.cpp \
+		  init.cpp \
+		  MsgLister.rc \
+		  globals.cpp \
+		  hooks.cpp \
+		  util.cpp

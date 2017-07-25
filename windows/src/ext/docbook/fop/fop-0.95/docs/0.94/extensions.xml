@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><!-- $Id: extensions.xml 627324 2008-02-13 09:35:01Z maxberger $ --><!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V1.3//EN" "document-v13.dtd">
+<document>
+  <header>
+    <title>Standard FOP Extensions</title>
+    <version>$Revision: 627324 $</version>
+  </header>
+  <body>
+    <p>
+      By "extension", we mean any data that can be placed in the input XML document that 
+      is not addressed by the XSL-FO standard.
+      By having a mechanism for supporting extensions, FOP is able to add features that 
+      are not covered in the specification.
+    </p>
+    <p>
+      The extensions documented here are included with FOP, and are automatically available 
+      to you. If you wish to add an extension of your own to FOP, please see the 
+      <link href="../dev/extensions.html">Developers' Extension Page</link>.
+    </p>
+    <note>All extensions require the correct use of an appropriate namespace in your input document.</note>
+    <section id="svg">
+      <title>SVG</title>
+      <p>
+        Please see the <link href="graphics.html#svg">SVG documentation</link> for more details.
+      </p>
+    </section>
+    <section id="fo-extensions">
+      <title>FO Extensions</title>
+      <section id="fox-namespace">
+        <title>Namespace</title>
+        <p>
+          By convention, FO extensions in FOP use the "fox" namespace prefix.
+          To use any of the FO extensions, add a namespace entry for 
+          <code>http://xml.apache.org/fop/extensions</code> to the root element:
+        </p>
+        <source xml:space="preserve"><![CDATA[<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format"
+               xmlns:fox="http://xmlgraphics.apache.org/fop/extensions">]]></source>
+      </section>
+      <section id="bookmarks">
+        <title>PDF Bookmarks</title>
+        <p>
+          In previous versions of Apache FOP there was a <code>fox:outline</code> element
+          which was used to create outlines in PDF files. The redesigned code makes use
+          of the new <link href="http://www.w3.org/TR/xsl11/#fo_bookmark-tree">bookmark feature defined in the latest XSL 1.1 working draft</link>.
+        </p>
+      </section>
+      <section id="named-destinations">
+        <title>Anchors or Named Destinations</title>
+        <p>This extension element hasn't been reimplemented for the redesigned code, yet.</p>
+        <!--p>Use the fox:destination element to define "named destinations" inside a PDF document.
+These are useful as fragment identifiers, e.g. "http://server/document.pdf#anchor-name".
+fox:destination elements can be placed almost anywhere in the fo document, including a child of
+root, a block-level element, or an inline-level element.
+For the destination to actually work, it must correspond to an "id" attribute on some fo element
+within the document. In other words, the "id" attribute actually creates the "view" within the
+PDF document. The fox:destination simply gives that view an independent name.
+</p>
+        <source><![CDATA[<fox:destination internal-destination="table-of-contents"/>
+...
+<fo:block id="table-of-contents">Table of Contents</fo:block>]]></source>
+        <warning>It is possible that in some future release of FOP, <em>all </em>elements with
+"id" attributes will generate named-destinations, which will eliminate the need for
+fox:destination.</warning-->
+      </section>
+      <section id="table-continue-label">
+        <title>Table Continuation Label</title>
+        <p>This extension element hasn't been reimplemented for the redesigned code, yet.</p>
+        <!--p>Use the fox:continued-label element to create content in table-header and
+table-footer cells that will appear only on pages after the first page that the table
+appears. fox:continued-label is itself inline content, and is a container of fo:inline
+content. This content will be laid out only if the table does not fit on a single page and flows
+to following pages. Here is an example of FO code creating such a table-header:</p>
+<source><![CDATA[<fo:table-header>
+  <fo:table-row>
+    <fo:table-cell>
+      <fo:block>Header column 1 with continued label
+          <fox:continued-label><fo:inline> (cont.)</fo:inline></fox:continued-label>
+      </fo:block>
+    </fo:table-cell>
+    <fo:table-cell>
+      <fo:block>Header column 2 with no continued label</fo:block>
+    </fo:table-cell>
+  </fo:table-row>
+</fo:table-header>]]></source-->
+      </section>
+      <section id="widow-orphan-content-limit">
+        <title>fox:orphan-content-limit and fox:widow-content-limit</title>
+        <p>
+          The two proprietary extension properties, fox:orphan-content-limit and
+          fox:widow-content-limit, are used to improve the layout of list-blocks and tables.
+          If you have a table with many entries, you don't want a single row to be left over
+          on a page. You will want to make sure that at least two or three lines are kept
+          together. The properties take an absolute length which specifies the area at the
+          beginning (fox:widow-content-limit) or at the end (fox:orphan-content-limit) of a
+          table or list-block. The properties are inherited and only have an effect on fo:table
+          and fo:list-block. An example: fox:widow-content-limit="3 * 1.2em" would make sure
+          the you'll have at least three lines (assuming line-height="1.2") together on a table
+          or list-block.
+        </p>
+      </section>
+    </section>
+  </body>
+</document>

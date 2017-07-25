@@ -1,0 +1,17 @@
+c RegressionTest: Right Alt Testing (2)
+c Font: Arial
+c Encoding: Unicode
+c Description: Tests Right Alt processing with non-US kbds.
+c Procedure: Press abc RAlt A
+c AutoProc: K_A K_B K_C AR+ K_A AR-
+c FinalOutput: "abcd"
+
+store(&VERSION) '9.0'
+name "RAlt test2"
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+'c' + [RAlt K_A] > "cd"
+

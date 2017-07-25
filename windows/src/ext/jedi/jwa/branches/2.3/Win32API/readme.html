@@ -1,0 +1,350 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+
+<head>
+  <title>JEDI Windows API Library</title>
+  <style>
+    body
+            {
+            padding: 0px 0px 0px 26px;
+            background: #ffffff;
+            color: #000000;
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+            font-size: 70%;
+            }
+
+    div
+            {
+            width: 90%;
+            border: 2px solid #999999;
+            padding: 4px 8px;
+            background: #cccccc;
+            }
+	
+    h1, h2, h3, h4
+            {
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+            margin-left: -26px;
+            }
+
+    h1
+            {
+            font-size: 145%;
+            margin-top: .5em;
+            margin-bottom: .5em;
+            }
+	
+    h2
+            {
+            font-size: 130%;
+            margin-top: 1em;
+            margin-bottom: .6em; 
+            }
+	
+    h3
+            {
+            font-size: 115%;
+            margin-top: 1em;
+            margin-bottom: .6em;
+            }
+	
+    h4
+            {
+            font-size: 100%;
+            margin-top: 1em;
+            margin-bottom: .6em; 
+            }
+
+    ul p, ol p, dl p
+            {
+            margin-left: 0em;
+            }
+
+    p
+            {
+            margin-top: .6em;
+            margin-bottom: .6em;
+            }
+
+    p.notice {
+            color: #ff0000;
+            }
+
+    dl
+            {
+            margin-top: 0em;
+            }
+
+    dd
+            {
+            margin-bottom: 0em;
+            margin-left: 1.9em;
+            }
+
+    dt
+            {
+            margin-top: .6em;
+            }
+
+    ul, ol
+            {
+            margin-top: .6em;
+            margin-bottom: 0em;
+            }
+
+    ol
+            {
+            margin-left: 1.9em;
+            }
+
+    ul
+            {
+            list-style-type: disc;
+            margin-left: 1.9em;
+            }
+
+    li
+            {
+            margin-bottom: .6em;
+            }
+
+    ul ol, ol ol
+            {
+            list-style-type: lower-alpha;
+            {
+
+    table
+            {
+            width: 90%;
+            background: #999999;
+            margin-top: .6em;
+            margin-bottom: .3em;
+            }
+
+    td
+            { 
+            padding: 4px 8px;
+            background: #ffffff;
+            vertical-align: top;
+            font-size: 70%;
+            }
+
+
+    a:link
+            {
+            color: #0066ff;
+            }
+
+    a:visited
+            {
+            color: #996600;
+            }
+
+    a:hover
+            {
+            color: #cc9900;
+            }
+            
+    pre
+            {
+            margin-top: .6em;
+            margin-bottom: .6em;
+            }
+
+    pre.syntax
+            {
+            background: #dddddd;
+            padding: 2pt,4pt;
+            cursor: text;
+            }
+
+  </style>
+
+</head>
+
+<body>
+
+  <h2>What has changed?</h2>
+
+  <h3>December 2007</h3>
+  <p>Warning: This file is out of date and is not maintained at the moment. Refer to the <a href="http://sourceforge.net/projects/jedi-apilib/">projects website</a>
+    for more information.</p>
+
+  <h3>January 2005</h3>
+  <p>
+  <ul>
+    <li>The Win32 API Conversion was moved to sourceforge.</li>
+    <li>Removed JwaLM, the Lan Manager conversion from Petr. Use the JwaLM*.pas files instead</li>
+    <li>Added externalsym directives where they were missing</li>
+    <li>Added dynamic linking support where it was missing</li>
+    <li>WinDefines.inc was replaced with jedi.inc ad jediapilib.inc. This creates a structuring like in the JCL and JVCL</li>    
+    <li>Many conditional directives have been changed. See ifdef.html for initial documentation</li>
+    <li>Cleanup of source files. Robert has done a lot of work to clean up the conversions, resulting in meaner and cleaner sources</li>
+  </ul>
+  </p>
+
+
+  <h2>Note about dynamic linking</h2>
+  <p>
+  All conversions (except those functions that use the cdecl calling convention
+  support dynamic loading through the DYNAMIC_LINK conditional directive (see ifdef.html).
+  By default this feature is turned off.
+
+  Please note that currently there is no way to find out upfront whether or not a
+  required library is present on the system other than explicitly testing this
+  yourself using LoadLibrary(), a future release might add support for this. In
+  case the required library is not present on the system, an exception is raised.
+  The exception is either EJwaLoadLibraryError or EJwaGetProcAddressError (both
+  defined in JwaWinType and descended from EJwaError) if LoadLibrary() or
+  GetProcAddress() fails respectively. Therefor, you'll need to protect your API
+  calls using a try...except block like this:<br>
+
+  <pre class=syntax>
+  var
+    H: HANDLE;
+  begin
+    try
+      H := CreateFile(...);
+      if H <> INVALID_HANDLE_VALUE then
+      begin
+        ...
+        CloseHandle(H);
+      end;
+    except
+      on EJwaError do
+      begin
+        // Either CreateFile or CloseHandle could not be found, handle that
+        // situation somehow.
+      end;
+    end;
+  end;
+  </pre>
+
+  <h2>Known issues</h2>
+
+  <ul>
+    <li>All functions with the cdecl calling convention do not yet support dynamic 
+        linking. This mostly involves JwaWinBer and JwaWinLdap but there exist a few
+        other instances.</li>
+    <li>There are still plenty of TODO markers :-(</li>
+    <li>The JwaAdsTLB unit has a few errors. This is a type library import and the
+        errors are a result of bugs in the Delphi type library importer, not mine.
+        Thanks to Chris Burr for pointing this out, sorry Chris but I haven't had
+        time to fix it yet.</li>
+    <li>There's a problem using these units in Delphi 4. The problem is that in some places 
+  I use constant declarations like this:<br>
+  RESTORE_LAST_ERROR_NAME_W = WideString('RestoreLastError');<br>
+  which cause access violations at compile time. The work around is to change these
+  constants to:<br>
+  RESTORE_LAST_ERROR_NAME_W : PWideChar = 'RestoreLastError';<br>
+  When I have time I'll change this, until then at least you know...Thanks to 
+  Roman Grycz (Romek?) for reporting this.</li>
+  </ul>
+
+
+  <h2>Installation</h2>
+
+  The Win32 interface units do not need explicit installation but you do need to
+  make sure that Delphi can find them. There are two ways to accomplish this,
+  using Project Options or Environment Options. First you need to extract the zip
+  into a directory of your liking, we'll refer to this directory as $(WIN32API).
+  Now follow either of the steps outlined in the next two sections.
+
+  <h4>Using Project Options</h4>
+
+  From the IDE menu select "Project > Options" and switch to the
+  "Directories/Conditionals" page in the dialog that appears. Find the edit box
+  labelled "Search Path", type in the $(WIN32API) path and select OK. Alternatively
+  you can use the ellipsis button to navigate to the directory in question. You
+  will need to repeat this for every new project you start that uses the Win32 API
+  interface units.
+
+  <h4>Using Environment Options</h4>
+
+  From the IDE menu select "Tools > Environment Options" and switch to the "Library"
+  page in the dialog that appears. Find the edit box labelled "Library Path", it
+  should contain something along the lines of "$(DELPHI)\Lib;$(DELPHI)\Bin;$(DELPHI)\Imports;$(DELPHI)\Projects\Bpl".
+  Change this to include the $(WIN32API) directory. For example, assuming you've
+  unzipped the Win32Api.zip file to "c:\win32api":<br>
+  "$(DELPHI)\Lib;$(DELPHI)\Bin;$(DELPHI)\Imports;$(DELPHI)\Projects\Bpl;c:\win32api".
+  Don't forget to seperate using a semicolon. You don't have to manually edit this
+  string, you can press the ellipsis button to navigate to the $(WIN32API) directory
+  and add it automatically. After pressing OK Delphi will be able to find the units
+  for every new project without the need to specify the directory again.
+
+  <p>
+  If you performed the steps above you can start using the units in your application
+  by including the appropriate ones in your uses clause. I personally prefer to
+  use Project Options instead of Environment Options to avoid problems. One known
+  problem is that when you use the Enironment Options method, you might get compiler
+  errors when trying to build the JEDI Code Library.
+
+  <h2>Using the units</h2>
+
+  When you use these interface units keep in mind that they duplicate a lot of
+  what's in the interface units that ship with Delphi, such as Windows.pas. These
+  units can co-exist but you need to make sure that you do not mix the usage of them
+  too much. For example, either use Windows.pas or the equivalents in this library
+  but not both, otherwise you might run into incompatibilities between them resulting
+  in compile errors. The easiest way is to not include both in the uses clause of
+  your own units. If this is impossible for some reason you're best of using explicit
+  unit qualification when using anything. For example, instead of using "CreateProcess"
+  use either "Windows.CreateProcess" or "JwaWinBase.CreateProcess". If you do not use
+  unit qualification you end up using the one from the unit last mentioned in the
+  uses clause.
+
+  <p>
+  The most common error you're likely to encounter is:
+  "Incompatible types: 'System.WideChar' and 'JwaWinType'.WideChar" where WideChar
+  is only an example. This is due to the fact that the RTL (e.g. System.pas or
+  Windows.pas) defines the type WideChar differently from WinType.pas. To solve
+  this simply change the declaration in JwaWinType.pas to become an alias for the
+  type in System.pas (or Windows.pas). For example
+  Before:
+  <pre class=syntax>
+  <b>type</b>
+    DWORD = Longword;
+  </pre>
+  After:
+  <pre class=syntax>
+  <b>type</b>
+    DWORD = Windows.DWORD;
+  </pre>
+  If you look inside JwaWinType.pas you see that I've already done this for the most
+  common types (using conditional compilation) like this
+  <pre class=syntax>
+  <b>type</b>
+    DWORD = {$IFDEF USE_DELPHI_TYPES}Windows.DWORD{$ELSE}Longword{$ENDIF};
+  </pre>
+  therefore it's unlikely you'll run into this problem. However, if you do please
+  notify me so I can update the interface units.
+
+  <p>
+  Please note that these units heavily use conditional compilation. You can
+  globally change some settings, and thereby determine how they get compiled,
+  through the WinDefines.inc include file. An example of this would be to specify
+  an unicode build. There are a few more directives which cannot be set globally
+  (yet), Initial documentation for the directives can be found in ifdef.html.
+
+  <h2>Copyright</h2>
+
+  These units are distributed under the terms of of the MPL, or optionally the
+  terms of the LGPL. What this means is that they are completely free and can
+  be used in all development, even commercial applications. I have a few requests
+  though:
+  <ul>
+    <li>Please redistribute only using the MPL/LGPL dual license eventhough you
+        are legally allowed to redistribute using only MPL or LGPL.
+    <li>Please read, or have your legal department read, through the text of the
+        <a href="http://www.mozilla.org/MPL/MPL-1.1.html">MPL</a> and/or
+        <a href="http://www.gnu.org/copyleft/lesser.html">LGPL</a> to make sure
+        you understand your rights and obligations.
+  </ul>
+  <p>
+  Please be aware that the WinLDAP unit was created by Luk Vermeulen and can only
+  be used and distributed under the MPL license. It's included because of dependencies
+  on this unit. We may convert the header ourselves one day.
+
+</body>
+
+</html>

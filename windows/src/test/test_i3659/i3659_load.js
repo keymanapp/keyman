@@ -1,0 +1,1 @@
+KeymanWeb.KRS(new Stub_Keyboard_i3659()); function Stub_Keyboard_i3659() {this.KF="i3659.js";this.KI="Keyboard_i3659";this.KN="I3659 - Fixup KSAVE etc with KeymanWeb compiler";}

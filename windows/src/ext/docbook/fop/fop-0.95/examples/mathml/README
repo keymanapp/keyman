@@ -1,0 +1,21 @@
+FOP MathML Readme
+
+This directory contains an extension for MathML that can be used with FOP.
+
+This extension works with JEuclid which is available from:
+http://sourceforge.net/projects/jeuclid/
+
+This simply uses JEuclid to convert the MathML CML into SVG.
+The SVG is then handled as normal.
+
+Building the MathML extension:
+To build the MathML extension, please download JEuclid using the link above.
+Put the jeuclid.jar into the lib directory and run the Ant build script in
+this directory.
+
+Usage:
+When you've built the MathML extension, add jeuclid.jar and 
+build/mathml-fop.jar to the classpath used when running FOP. You can then
+simply use MathML directly in fo:instream-foreign-object elements or 
+reference a MathML file in fo:external-graphic elements as shown in 
+the demo file: docs/mathml.fo

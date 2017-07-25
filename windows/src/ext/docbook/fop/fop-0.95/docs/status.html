@@ -1,0 +1,589 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="Apache Forrest" name="Generator">
+<meta name="Forrest-version" content="0.9-dev">
+<meta name="Forrest-skin-name" content="pelt">
+<title>FOP Status</title>
+<link type="text/css" href="skin/basic.css" rel="stylesheet">
+<link media="screen" type="text/css" href="skin/screen.css" rel="stylesheet">
+<link media="print" type="text/css" href="skin/print.css" rel="stylesheet">
+<link type="text/css" href="skin/profile.css" rel="stylesheet">
+<script src="skin/getBlank.js" language="javascript" type="text/javascript"></script><script src="skin/getMenu.js" language="javascript" type="text/javascript"></script><script src="skin/fontsize.js" language="javascript" type="text/javascript"></script>
+<link rel="shortcut icon" href="">
+</head>
+<body onload="init()">
+<script type="text/javascript">ndeSetTextSize();</script>
+<div id="top">
+<!--+
+    |header
+    +-->
+<div class="header">
+<!--+
+    |start group logo
+    +-->
+<div class="grouplogo">
+<a href="http://xmlgraphics.apache.org/"><img class="logoImage" alt="Apache XML Graphics" src="images/group-logo.gif" title="Apache XML Graphics is responsible for the creation and maintenance of software for managing the conversion of XML formats to graphical output, and the creation and maintenance of related software components, based on software licensed to the Foundation"></a>
+</div>
+<!--+
+    |end group logo
+    +-->
+<!--+
+    |start Project Logo
+    +-->
+<div class="projectlogo">
+<a href="http://xmlgraphics.apache.org/fop/"><img class="logoImage" alt="Apache FOP" src="images/logo.jpg" title="Apache FOP (Formatting Objects Processor) is the world's first output independent formatter. Output formats currently supported include PDF, PCL, PS, SVG, XML (area tree representation), Print, AWT, MIF and TXT. The primary output target is PDF."></a>
+</div>
+<!--+
+    |end Project Logo
+    +-->
+<!--+
+    |start Search
+    +-->
+<div class="searchbox">
+<form action="http://www.google.com/search" method="get" class="roundtopsmall">
+<input value="xmlgraphics.apache.org" name="sitesearch" type="hidden"><input onFocus="getBlank (this, 'Search the site with google');" size="25" name="q" id="query" type="text" value="Search the site with google">&nbsp; 
+                    <input name="Search" value="Search" type="submit">
+</form>
+</div>
+<!--+
+    |end search
+    +-->
+<!--+
+    |start Tabs
+    +-->
+<ul id="tabs">
+<li class="current">
+<a class="selected" href="index.html">Home</a>
+</li>
+<li>
+<a class="unselected" href="0.94/index.html">Version 0.94</a>
+</li>
+<li>
+<a class="unselected" href="0.95/index.html">Version 0.95</a>
+</li>
+<li>
+<a class="unselected" href="trunk/index.html">FOP Trunk</a>
+</li>
+<li>
+<a class="unselected" href="dev/index.html">Development</a>
+</li>
+</ul>
+<!--+
+    |end Tabs
+    +-->
+</div>
+</div>
+<div id="main">
+<div id="publishedStrip">
+<!--+
+    |start Subtabs
+    +-->
+<div id="level2tabs"></div>
+<!--+
+    |end Endtabs
+    +-->
+<script type="text/javascript"><!--
+document.write("Last Published: " + document.lastModified);
+//  --></script>
+</div>
+<!--+
+    |breadtrail
+    +-->
+<div class="breadtrail">
+<a href="http://www.apache.org/">apache.org</a> &gt; <a href="http://xml.apache.org/">XML Federation</a> &gt; <a href="http://xmlgraphics.apache.org/">xmlgraphics.apache.org</a><script src="skin/breadcrumbs.js" language="JavaScript" type="text/javascript"></script>
+</div>
+<!--+
+    |start Menu, mainarea
+    +-->
+<!--+
+    |start Menu
+    +-->
+<div id="menu">
+<div onclick="SwitchMenu('menu_1.1', 'skin/')" id="menu_1.1Title" class="menutitle">About</div>
+<div id="menu_1.1" class="menuitemgroup">
+<div class="menuitem">
+<a href="index.html">Introduction</a>
+</div>
+<div class="menuitem">
+<a href="download.html">Download</a>
+</div>
+<div class="menuitem">
+<a href="quickstartguide.html">Quick Start Guide</a>
+</div>
+<div class="menuitem">
+<a href="compliance.html" title="FOP Compliance">Compliance</a>
+</div>
+<div class="menuitem">
+<a href="gethelp.html">Getting Help</a>
+</div>
+<div class="menuitem">
+<a href="faq.html">FAQs</a>
+</div>
+<div class="menuitem">
+<a href="maillist.html">Mailing Lists</a>
+</div>
+<div class="menuitem">
+<a href="license.html">License</a>
+</div>
+<div class="menuitem">
+<a href="http://www.apache.org/foundation/sponsorship.html">ASF Sponsorship Program</a>
+</div>
+<div class="menuitem">
+<a href="http://www.apache.org/foundation/thanks.html">ASF Thanks</a>
+</div>
+</div>
+<div onclick="SwitchMenu('menu_1.2', 'skin/')" id="menu_1.2Title" class="menutitle">Resources</div>
+<div id="menu_1.2" class="menuitemgroup">
+<div class="menuitem">
+<a href="fo.html">XSL-FO</a>
+</div>
+<div class="menuitem">
+<a href="examples.html">Examples</a>
+</div>
+<div class="menuitem">
+<a href="bugs.html">Bugs</a>
+</div>
+<div class="menuitem">
+<a href="http://wiki.apache.org/xmlgraphics-fop/FrontPage">Wiki</a>
+</div>
+<div class="menuitem">
+<a href="resources.html">Other</a>
+</div>
+</div>
+<div onclick="SwitchMenu('menu_selected_1.3', 'skin/')" id="menu_selected_1.3Title" class="menutitle" style="background-image: url('skin/images/chapter_open.gif');">Project</div>
+<div id="menu_selected_1.3" class="selectedmenuitemgroup" style="display: block;">
+<div class="menuitem">
+<a href="news.html">News</a>
+</div>
+<div class="menuitem">
+<a href="team.html">Who We Are</a>
+</div>
+<div class="menupage">
+<div class="menupagetitle">Status</div>
+</div>
+<div class="menuitem">
+<a href="knownissues.html">Known Issues</a>
+</div>
+<div class="menuitem">
+<a href="changes.html">Changes</a>
+</div>
+</div>
+<div id="credit"></div>
+<div id="roundbottom">
+<img style="display: none" class="corner" height="15" width="15" alt="" src="skin/images/rc-b-l-15-1body-2menu-3menu.png"></div>
+<!--+
+  |alternative credits
+  +-->
+<div id="credit2"></div>
+</div>
+<!--+
+    |end Menu
+    +-->
+<!--+
+    |start content
+    +-->
+<div id="content">
+<div title="raw XML" class="xmllink">
+<a class="dida" href="status.xml"><img alt="XML - icon" src="skin/images/xmldoc.gif" class="skin"><br>
+        XML</a>
+</div>
+<div title="Portable Document Format" class="pdflink">
+<a class="dida" href="status.pdf"><img alt="PDF -icon" src="skin/images/pdfdoc.gif" class="skin"><br>
+        PDF</a>
+</div>
+<div class="trail">Font size: 
+	          &nbsp;<input value="Reset" class="resetfont" title="Reset text" onclick="ndeSetTextSize('reset'); return false;" type="button">      
+	          &nbsp;<input value="-a" class="smallerfont" title="Shrink text" onclick="ndeSetTextSize('decr'); return false;" type="button">
+	          &nbsp;<input value="+a" class="biggerfont" title="Enlarge text" onclick="ndeSetTextSize('incr'); return false;" type="button">
+</div>
+<h1>FOP Status</h1>
+<h3>Current Status of FOP</h3>
+<div id="front-matter">
+<div id="minitoc-area">
+<ul class="minitoc">
+<li>
+<a href="#Status">Status</a>
+</li>
+<li>
+<a href="#Development+Status">Development Status</a>
+<ul class="minitoc">
+<li>
+<a href="#component-status">Status of the individual components</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#Maintenance+Status">Maintenance Status</a>
+</li>
+</ul>
+</div>
+</div>
+    
+<a name="N10015"></a><a name="Status"></a>
+<h2 class="underlined_10">Status</h2>
+<div class="section">
+<p>[last updated 4 March 2008]</p>
+<div id="" style="text-align: center;">
+<img id="" class="figure" alt="Planning and branches of FOP development" src="images/track.png" height="175" width="585"></div>
+<p>
+        This is the development status of Apache FOP. Development on
+        the maintenance branch where FOP 0.20.5 came from has been
+        halted. The code base has been largely redesigned. The new
+        code base has reached release 0.95.
+      </p>
+</div>
+    
+<a name="N10028"></a><a name="Development+Status"></a>
+<h2 class="underlined_10">Development Status</h2>
+<div class="section">
+<p>The FOP code base has been largely rewritten, to address
+        design issues for layout and performance. The new design makes
+        it better possible to be conformant to the spec and be able to
+        handle large documents.</p>
+<p>The redesign of the code base has largely been completed. The
+        new code reached production quality with release 0.93. In the
+        course of 2008 or 2009 we hope to release version 1.0.</p>
+<p>
+        If you're looking for a long-term road-map we have to disappoint you. This is Open
+        Source and we're mostly volunteers working in their free time. What we have
+        is an idea where we want to go. How fast we get there depends on the 
+        available time, on how well our ideas work out while developing and on you!
+        There's a <a class="external" href="http://wiki.apache.org/xmlgraphics-fop/RoadMap">document in the Wiki</a>
+        where you can get a glimpse of what points we're currently focusing on.
+      </p>
+<a name="N1003B"></a><a name="component-status"></a>
+<h3 class="underlined_5">Status of the individual components</h3>
+<p>
+          Not all the components of FOP currently have the same quality. The following
+          table tries to give you an overview:
+        </p>
+<table class="ForrestTable" cellspacing="1" cellpadding="4">
+          
+<tr>
+            
+<th colspan="1" rowspan="1">Component</th>
+            <th colspan="1" rowspan="1">Status</th>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">API</td>
+            <td colspan="1" rowspan="1">stable</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">FO Tree</td>
+            <td colspan="1" rowspan="1">stable</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">Layout Engine</td>
+            <td colspan="1" rowspan="1">stable</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">Area Tree</td>
+            <td colspan="1" rowspan="1">stable</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">Intermediate Format Support</td>
+            <td colspan="1" rowspan="1">stable (could use a speed upgrade)</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">PDF (Library and Renderer)</td>
+            <td colspan="1" rowspan="1">stable (SVG: stable)</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">PostScript</td>
+            <td colspan="1" rowspan="1">stable (SVG: stable with restrictions)</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">Java2D, AWT, Bitmap Renderers</td>
+            <td colspan="1" rowspan="1">stable</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">Text Renderer</td>
+            <td colspan="1" rowspan="1">stable (not much feedback)</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">RTF Handler</td>
+            <td colspan="1" rowspan="1">beta, restricted functionality compared to PDF/PS</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">PCL Renderer</td>
+            <td colspan="1" rowspan="1">stable (not much feedback)</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">AFP Renderer</td>
+            <td colspan="1" rowspan="1">status unknown (not much feedback)</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">SVG Renderer</td>
+            <td colspan="1" rowspan="1">non-functional in sandbox, help needed</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">Font Support</td>
+            <td colspan="1" rowspan="1">stable</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">Image Support</td>
+            <td colspan="1" rowspan="1">beta (recently rewritten)</td>
+          
+</tr>
+          
+<tr>
+            
+<td colspan="1" rowspan="1">Hyphenation Subsystem</td>
+            <td colspan="1" rowspan="1">stable</td>
+          
+</tr>
+        
+</table>
+</div>
+    
+<a name="N10126"></a><a name="Maintenance+Status"></a>
+<h2 class="underlined_10">Maintenance Status</h2>
+<div class="section">
+<p>
+        The latest release of the maintenance branch is FOP 0.20.5, released on July 18th, 2003.
+        The maintenance branch has been frozen in 2004 so the team can concentrate on the new code
+        base.
+      </p>
+</div>
+    <!--section id="stats">
+      <title>Statistics</title>
+      <table>
+        <tr>
+          <th>&#x00A0;</th>
+          <th>0.20.5</th>
+          <th>Development (aka trunk, redesign) as of August 1, 2003</th>
+        </tr>
+        <tr>
+          <td colspan="3">&#x00A0;</td>
+        </tr>
+        <tr>
+          <th colspan="3">Binaries</th>
+        </tr>
+        <tr>
+          <td>fop jar</td>
+          <td>1,485 kb</td>
+          <td>2,132 kb</td>
+        </tr>
+        <tr>
+          <td>hyphenation (in fop.jar)</td>
+          <td>348 kb</td>
+          <td>1,358 kb</td>
+        </tr>
+        <tr>
+          <td>ant jar</td>
+          <td>&#x00A0;</td>
+          <td>707 kb</td>
+        </tr>
+        <tr>
+          <td>avalon-framework jar</td>
+          <td>62 kb</td>
+          <td>72 kb</td>
+        </tr>
+        <tr>
+          <td>batik jar</td>
+          <td>2,063 kb</td>
+          <td>2,213 kb</td>
+        </tr>
+        <tr>
+          <td>commons-io-dev jar</td>
+          <td>&#x00A0;</td>
+          <td>71 kb</td>
+        </tr>
+        <tr>
+          <td>commons-lang jar</td>
+          <td>&#x00A0;</td>
+          <td>190 kb</td>
+        </tr>
+        <tr>
+          <td>servlet jar</td>
+          <td>&#x00A0;</td>
+          <td>39 kb</td>
+        </tr>
+        <tr>
+          <td>xalan jar</td>
+          <td>1,007 kb</td>
+          <td>1,007 kb</td>
+        </tr>
+        <tr>
+          <td>xerces jar</td>
+          <td>816 kb</td>
+          <td>816 kb</td>
+        </tr>
+        <tr>
+          <td>xml-apis jar</td>
+          <td>112 kb</td>
+          <td>112 kb</td>
+        </tr>
+        <tr>
+          <th colspan="3">Lines of Source Code, using "find . -iname "*.java" | xargs cat | wc -l"</th>
+        </tr>
+        <tr>
+          <td>org.apache.fop.fo.*</td>
+          <td>20,297</td>
+          <td>22,306</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.layout.*</td>
+          <td>9,444</td>
+          <td>4,238</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.layoutmgr.*</td>
+          <td>&#x00A0;</td>
+          <td>10,069</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.area.*</td>
+          <td>&#x00A0;</td>
+          <td>5,791</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.render.*</td>
+          <td>18,387</td>
+          <td>11,527</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.pdf.*</td>
+          <td>10,203</td>
+          <td>15,669</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.rtf.*</td>
+          <td>0</td>
+          <td>12,747</td>
+        </tr>
+        <tr>
+          <td>Other</td>
+          <td>29,821</td>
+          <td>32,543</td>
+        </tr>
+        <tr>
+          <td>Total</td>
+          <td>88,152</td>
+          <td>114,890</td>
+        </tr>
+        <tr>
+          <th colspan="3">Files, using "find . -iname "*.java" | wc -l"</th>
+        </tr>
+        <tr>
+          <td>org.apache.fop.fo.*</td>
+          <td>122</td>
+          <td>127</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.layout.*</td>
+          <td>49</td>
+          <td>24</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.layoutmgr.*</td>
+          <td>&#x00A0;</td>
+          <td>38</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.area.*</td>
+          <td>&#x00A0;</td>
+          <td>39</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.render.*</td>
+          <td>48</td>
+          <td>36</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.pdf.*</td>
+          <td>51</td>
+          <td>70</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.rtf.*</td>
+          <td>&#x00A0;</td>
+          <td>80</td>
+        </tr>
+        <tr>
+          <td>Other</td>
+          <td>129</td>
+          <td>140</td>
+        </tr>
+        <tr>
+          <td>Total</td>
+          <td>399</td>
+          <td>554</td>
+        </tr>
+      </table>
+    </section-->
+  
+<span class="version">
+          version 633396</span>
+</div>
+<!--+
+    |end content
+    +-->
+<div class="clearboth">&nbsp;</div>
+</div>
+<div id="footer">
+<!--+
+    |start bottomstrip
+    +-->
+<div class="lastmodified">
+<script type="text/javascript"><!--
+document.write("Last Published: " + document.lastModified);
+//  --></script>
+</div>
+<div class="copyright">
+        Copyright &copy;
+         1999-2008 <a href="http://www.apache.org/licenses/">The Apache Software Foundation.</a>
+</div>
+<!--+
+    |end bottomstrip
+    +-->
+</div>
+</body>
+</html>

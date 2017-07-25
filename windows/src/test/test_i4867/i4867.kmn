@@ -1,0 +1,15 @@
+﻿store(&VERSION) '9.0'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ 'a' > use(sub) 'x'
++ 'b' > use(sub) use(sub) 'x'
++ 'c' > use(sub)
++ 'd' > use(sub) use(sub)
++ 'e' > 'x'              
+
+group(sub)          
+
+'x' 'y' > 'z'

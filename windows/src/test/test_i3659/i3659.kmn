@@ -1,0 +1,37 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I3659 - Fixup KSAVE etc with KeymanWeb compiler'
+begin Unicode > use(main)
+                                
+store(col) 'a'
+
+group(main) using keys
+                 
+c test equality
+if(col = 'a') + 'z' > ' col is <a> '
+if(col = 'b') + 'z' > ' col is <b> '
+
+c test set
++ 'b' > set(col = 'b') ' set to <b> '
++ 'a' > set(col = 'a') ' set to <a> '
+          
+c test reset
++ 'y' > reset(col) ' reset '
+            
+c test save
++ 'x' > save(col) ' saved '
+                   
+c test inequality
+if(col != 'z') + 'Z' > 'boo!'
+
++ 'z' > use(my)      
+
+if(&platform = 'windows') + 'p' > 'win'
+if(&platform != 'vista') + 'q' > 'not vista'
++ 'l' > set(&layer = 'layer')
+
+match > use(my)
+nomatch > use(my)
+
+group(my)
+
+'a' > 'b'

@@ -1,0 +1,11 @@
+﻿store(&VERSION) '7.0'
+store(&NAME) 'Test I1808 - Excel diacritics'
+store(&MESSAGE) 'Type a b c '
+begin Unicode > use(main)
+
+
+group(main) using keys
+                      
++ 'a' > 'g' U+0300
++ 'b' > 'm' U+0302
++ 'c' > 'y' U+0306

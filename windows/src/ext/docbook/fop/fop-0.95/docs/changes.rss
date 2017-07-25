@@ -1,0 +1,2870 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN" "http://my.netscape.com/publish/formats/rss-0.91.dtd">
+<rss version="0.91"><channel><title>Apache FOP (0.95) Changes</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Apache FOP
+              (
+              0.95
+              ) Changes
+            </description><language>en-us</language>
+
+  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  
+
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+  
+  
+    
+      
+    
+    
+      
+      <item><title>Apache FOP Renderers fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed a color selection problem which occurred after an image has been painted
+        through the Graphics2DAdapter in PDF output.
+      </description></item>
+      <item><title>Apache FOP Renderers fix
+          (bug 41306)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 41306)
+        
+        :
+        
+        Fixed page ordering problem with AWTRenderer.
+      </description></item>
+      <item><title>Apache FOP Renderers fix
+          (bug 39980)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 39980)
+        
+        :
+        
+        Fixed image scaling for RTF output.
+      </description></item>
+      <item><title>Apache FOP API fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>API fix
+        by
+        JM
+        :
+        
+        Fixed the -imagein command-line option.
+      </description></item>
+      <item><title>Apache FOP Renderers add
+          (bug 43825)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers add
+        by
+        JM
+          (fixes bug 43825)
+        
+        :
+        
+        Added support for fo:leader for RTF output (no full support!). Fixes problems with empty leaders
+        being used to force empty lines among other issues.
+       Thanks to Maximilian Aster.</description></item>
+      <item><title>Apache FOP Renderers add
+          (bug 43824)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers add
+        by
+        JM
+          (fixes bug 43824)
+        
+        :
+        
+        Added support for page-number-citation for RTF output.
+       Thanks to Maximilian Aster.</description></item>
+      <item><title>Apache FOP Renderers fix
+          (bug 43606)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 43606)
+        
+        :
+        
+        Fixed handling of proportional-column-width() and percentages for table column in RTF
+        output.
+       Thanks to Maximilian Aster.</description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 45295)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        AD
+          (fixes bug 45295)
+        
+        :
+        
+        Fixed NullPointerException when page-number-citations are used inside a marker.
+      </description></item>
+      <item><title>Apache FOP Images fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Images fix
+        by
+        JM
+        :
+        
+        Fixed two bugs concerning resolution handling with SVG images and their
+        conversion to bitmaps for RTF output.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 44887)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 44887)
+        
+        :
+        
+        Fixed potential multi-threading problem concerning the use of DecimalFormat.
+      </description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 44412)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        JM
+          (fixes bug 44412)
+        
+        :
+        
+        Regression bugfix: Multiple collapsible breaks don't cause empty pages anymore.
+      </description></item>
+      <item><title>Apache FOP Renderers fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed resolution handling inside AWT preview dialog.
+      </description></item>
+      <item><title>Apache FOP Renderers fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed positioning of absolutely positioned block-containers in multi-column documents.
+      </description></item>
+      <item><title>Apache FOP Renderers fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed rendering of fixed block-containers in AFP output.
+      </description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 44621)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        VH
+          (fixes bug 44621)
+        
+        :
+        
+        Various bugfixes for table layout.
+      </description></item>
+      <item><title>Apache FOP Renderers fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed regression causing bad positioning of block-containers if used as descendant
+        of a table-cell.
+      </description></item>
+      <item><title>Apache FOP Fonts fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Fonts fix
+        by
+        JM
+        :
+        
+        Fixed text extraction problem with ZapfDingbats and Symbol font in PDF output.
+      </description></item>
+      <item><title>Apache FOP Images fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Images fix
+        by
+        JM
+        :
+        
+        Fixed a performance problem concerning image serialization.
+      </description></item>
+      <item><title>Apache FOP Fonts fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Fonts fix
+        by
+        JM
+        :
+        
+        Fixed NullPointerException when loading a TrueType font using XML font metric files.
+      </description></item>
+    
+    
+      
+      <item><title>Apache FOP Layout fix
+          (bug 44412)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        JM
+          (fixes bug 44412)
+        
+        :
+        
+        Bugfix: The before border of a block is no longer swallowed if its first child issues
+        a break-before.
+      </description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 44412)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        JM
+          (fixes bug 44412)
+        
+        :
+        
+        Bugfix: When there was a forced break after a block with (conditional) borders the
+        border-after wasn't painted.
+      </description></item>
+      <item><title>Apache FOP Layout fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        VH
+        :
+        
+        Bugfix: a forced break inside a cell was ignored when occurring before the minimum height
+        set on the enclosing row was set.
+      </description></item>
+      <item><title>Apache FOP Layout fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        JM
+        :
+        
+        Fixed exceptions when lists, tables or block-container are children of an inline-level
+        FO.
+      </description></item>
+      <item><title>Apache FOP Layout add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout add
+        by
+        VH
+        :
+        
+        Added support for background on fo:table-column and fo:table-header/footer/body elements.
+      </description></item>
+      <item><title>Apache FOP Layout fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        VH
+        :
+        
+        Fixed the rendering of the area of a table corresponding to border-separation, which must
+        be filled with the background of the table, and not the rows.
+      </description></item>
+      <item><title>Apache FOP Layout fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        VH
+        :
+        
+        Improved conformance: even if a table-cell spans several rows its background must
+        correspond to the first row spanned.
+      </description></item>
+      <item><title>Apache FOP Renderers fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Slight improvement for thin lines in Java2D/AWT output.
+       Thanks to Gordon Cooke.</description></item>
+      <item><title>Apache FOP Layout add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout add
+        by
+        VH
+        :
+        
+        Added full support for keep-with-previous on fo:table-row and in fo:table-cell elements.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        MB
+        :
+        
+        Turned on XInclude processing for the main source given on the command line.
+      </description></item>
+      <item><title>Apache FOP Fonts fix
+          (bug 44451)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Fonts fix
+        by
+        JM
+          (fixes bug 44451)
+        
+        :
+        
+        Improved the font auto-detection so fonts accessed using the font-family name are
+        selected with higher accuracy.
+       Thanks to Justus Piater.</description></item>
+      <item><title>Apache FOP API remove</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>API remove
+        by
+        JM
+        :
+        
+        Removed deprecated methods in the "apps" package that were left-overs from the API
+        discussions.
+      </description></item>
+      <item><title>Apache FOP Fonts add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Fonts add
+        by
+        JM
+        :
+        
+        Added support for unusual font encodings (like for Symbol or Cyrillic fonts) of Type 1
+        fonts in PDF and PostScript output.
+      </description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 44321)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        VH
+          (fixes bug 44321)
+        
+        :
+        
+        Moved to the FO tree stage the check for break-before/after on table-row while spanning in
+        progress.
+      </description></item>
+      <item><title>Apache FOP Layout add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout add
+        by
+        VH
+        :
+        
+        Added full support for breaks before and after table cells (that is, break-before/after set
+        on the first/last child of a cell).
+      </description></item>
+      <item><title>Apache FOP Layout add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout add
+        by
+        VH
+        :
+        
+        Added full support for breaks inside the cells of a table.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 41631)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        AD
+          (fixes bug 41631)
+        
+        :
+        
+        Added correct percentage resolution for arguments to the proportional-column-width() function.
+      </description></item>
+      <item><title>Apache FOP Fonts fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Fonts fix
+        by
+        JM
+        :
+        
+        Bugfix for date formatting with negative time zones in the PDF's Info object.
+        This affected PDF/A compliance.
+      </description></item>
+      <item><title>Apache FOP Renderers add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers add
+        by
+        JM
+        :
+        
+        Added an option to disable the default sRGB profile in PDF output for those who
+        don't care about color fidelity, but care about PDF file size.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 43705)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        AD
+          (fixes bug 43705)
+        
+        :
+        
+        Fixed a bug when the rgb-icc() function was used either before the fo:declarations,
+        or in documents without a fo:declarations node. In such cases, the sRGB fallback
+        is now used to avoid an ugly NullPointerException.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        AD
+        :
+        
+        Added very basic parsing for the xml:lang shorthand.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 44343)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        AD
+          (fixes bug 44343)
+        
+        :
+        
+        Fixed a bug when using relative font-size (smaller/larger) in combination
+        with percentages.
+      </description></item>
+      <item><title>Apache FOP Fonts fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Fonts fix
+        by
+        JM
+        :
+        
+        Bugfix for handling of optional tables in subset TrueType fonts. This bug caused errors
+        in various PDF viewers.
+      </description></item>
+      <item><title>Apache FOP Renderers add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers add
+        by
+        JM
+        :
+        
+        Added support for the natural language indentifier ("Lang" in the document catalog)
+        for PDF documents based on the language/country values on fo:page-sequence.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 44286)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        AD
+          (fixes bug 44286)
+        
+        :
+        
+        Fixed a memory-leak in XMLWhiteSpaceHandler.
+       Thanks to Stefan Ziel.</description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 44289)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        VH
+          (fixes bug 44289)
+        
+        :
+        
+        Fixed the resolution of borders when header/footer is omitted at page breaks.
+      </description></item>
+      <item><title>Apache FOP Layout add
+          (bug 43934)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout add
+        by
+        VH
+          (fixes bug 43934)
+        
+        :
+        
+        Added support for conditional borders in tables, for both the separate and the collapsing
+        border model.
+      </description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 44160)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        JM
+          (fixes bug 44160)
+        
+        :
+        
+        Fixed a possible IndexOutOfBoundsException that could happen with certain constellations
+        when footnotes are used.
+      </description></item>
+      <item><title>Apache FOP Layout fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        JM
+        :
+        
+        Compliance fix: for absolutely positioned block-containers, "top" wasn't
+        interpreted correctly.
+      </description></item>
+      <item><title>Apache FOP Extensions add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Extensions add
+        by
+        JM
+        :
+        
+        New extension attribute fox:transform on fo:block-container allows free-form transformation
+        (rotation, scaling etc.) of absolute and fixed block-containers. Supported only
+        for PDF, PS and Java2D-based renderers.
+      </description></item>
+      <item><title>Apache FOP Renderers fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed logic error setting the transformation matrix for block-container viewports
+        (applies to absolute and fixed block-containers only).
+        Important: External renderer implementations need to adjust for the change and implement
+        the new method concatenateTransformationMatrix(AffineTransform) if the renderer is
+        derived from AbstractPathOrientedRenderer.
+      </description></item>
+      <item><title>Apache FOP Images fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Images fix
+        by
+        JM
+        :
+        
+        A new image loading framework has been introduced to fix various problems with external
+        graphics and improve performance.
+      </description></item>
+      <item><title>Apache FOP Renderers fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed generation of named destinations so it works when the PDF document is encrypted.
+      </description></item>
+      <item><title>Apache FOP Renderers add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers add
+        by
+        JM
+        :
+        
+        PostScript output now generates the bounding box DSC comments for the whole document.
+      </description></item>
+      <item><title>Apache FOP Renderers add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers add
+        by
+        JM
+        :
+        
+        Added support for PDF page labels.
+      </description></item>
+      <item><title>Apache FOP Renderers add
+          (bug 44176)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers add
+        by
+        JM
+          (fixes bug 44176)
+        
+        :
+        
+        Added support for custom fonts in Java2DRenderer and derived renderers.
+       Thanks to Patrick Jaromin.</description></item>
+      <item><title>Apache FOP Extensions add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Extensions add
+        by
+        JM
+        :
+        
+        Added new extension element: fox:external-document. It allows to add whole documents
+        such as multi-page TIFF images to be inserted as peers to a page-sequence. Each image
+        will make up an entire page. See the documentation for details.
+      </description></item>
+      <item><title>Apache FOP Layout add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout add
+        by
+        JM
+        :
+        
+        Added minimal support for the .minimum/.maximum components of block/inline-progression-dimension 
+        on fo:external-graphic and fo:instream-foreign-object.
+      </description></item>
+      <item><title>Apache FOP Layout add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout add
+        by
+        JM
+        :
+        
+        Added support for scale-down-to-fit and scale-up-to-fit (introduced in XSL 1.1).
+      </description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 43633)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        VH
+          (fixes bug 43633)
+        
+        :
+        
+        Bugfix: content of a row with zero height overriding the previous row
+      </description></item>
+      <item><title>Apache FOP Renderers fix
+          (bug 37993)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 37993)
+        
+        :
+        
+        Bugfix: allow multiple bookmarks to point at the same destination.
+      </description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 43917)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        JM
+          (fixes bug 43917)
+        
+        :
+        
+        Bugfix for border-after painting and element list generation when a
+        forced break is involved.
+      </description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 40230)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        JM
+          (fixes bug 40230)
+        
+        :
+        
+        Bugfix: no empty page is generated anymore if there's no content
+        after a break-after.
+      </description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 43803)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        VH
+          (fixes bug 43803)
+        
+        :
+        
+        Restored proper handling of fo:table-cell having no children, which is allowed in relaxed
+        validation mode.
+      </description></item>
+      <item><title>Apache FOP Layout fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        JM
+        :
+        
+        Memory Leak fixed in the Property Cache. Fixed by Jeremias Maerki. Reported and Tested By
+        Chris Bowditch.
+      </description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 43712)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        VH
+          (fixes bug 43712)
+        
+        :
+        
+        Bugfix in tables: wrong element generation by the merging algorithm when glues must be
+        produced to cope with conditional spaces. The corresponding length was added twice: one in
+        the glue itself and one in the following box.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix for URI resolution: Make StreamSources without system identifier work again.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 43910)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 43910)
+        
+        :
+        
+        Avoid a NullPointerException in AreaTreeHandler.endDocument().
+       Thanks to David Delbecq.</description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 43766)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        VH
+          (fixes bug 43766)
+        
+        :
+        
+        Bugfix: breaks generated by the merging algorithm for a table-row containing empty cells
+        had always a penalty of 900.
+      </description></item>
+      <item><title>Apache FOP Layout add
+          (bug 43605)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout add
+        by
+        JM
+          (fixes bug 43605)
+        
+        :
+        
+        Added methods for fo:page-number-citation(-last) in FOEventHandler.
+       Thanks to V. Schappert.</description></item>
+      <item><title>Apache FOP Layout add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout add
+        by
+        VH
+        :
+        
+        Step towards performance: the collapsing-border resolution algorithm no longer triggers the
+        retrieving of the whole table, when possible.
+      </description></item>
+      <item><title>Apache FOP Layout fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        VH
+        :
+        
+        In case of missing cells the border-end of the table was applied to an inner cell, instead
+        of the (empty) cell in the last column.
+      </description></item>
+      <item><title>Apache FOP Layout fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        VH
+        :
+        
+        Fixed the resolution of borders with table-columns (border-before/after was wrongly applied
+        to every cell of the column).
+      </description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 42768)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        VH
+          (fixes bug 42768)
+        
+        :
+        
+        Fixed the resolution of border-end on cells spanning several rows.
+      </description></item>
+      <item><title>Apache FOP Fonts fix
+          (bug 43835)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Fonts fix
+        by
+        JM
+          (fixes bug 43835)
+        
+        :
+        
+        Bugfix: Use Font.getName() (logical font name) instead of Font.getFontName()
+        (localized) when registering fonts from AWT.
+       Thanks to David Churavy.</description></item>
+      <item><title>Apache FOP Fonts fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Fonts fix
+        by
+        JM
+        :
+        
+        Made the way TrueType fonts are embedded in PDF compliant to the
+        specification so viewers correctly identify subset fonts.
+      </description></item>
+      <item><title>Apache FOP Fonts fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Fonts fix
+        by
+        JM
+        :
+        
+        Fixed font-autodetection so fonts with uppercase extensions are
+        detected, too.
+      </description></item>
+      <item><title>Apache FOP Fonts update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Fonts update
+        by
+        JM
+        :
+        
+        Improved font auto-detection and handling of AWT-supplied fonts in order
+        to achieve better results when using multiple output formats. Whenever
+        possible, the font names appearing in the operating system can also
+        be used in XSL-FO.
+      </description></item>
+      <item><title>Apache FOP Renderers fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed regression: transparent-page-background was not recognized for PNG output.
+      </description></item>
+      <item><title>Apache FOP Layout add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout add
+        by
+        VH
+        :
+        
+        Added check for table-cells which span more rows than available in their parent element
+        (table-header/footer/body).
+      </description></item>
+      <item><title>Apache FOP Layout add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout add
+        by
+        AD
+        :
+        
+        Added support for fo:markers in fo:inline and fo:basic-link.
+      </description></item>
+      <item><title>Apache FOP Renderers update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers update
+        by
+        JM
+        :
+        
+        PDF Transcoder (SVG) text painting has been completely rewritten.
+        Except for some special cases (with filters for example), all text
+        (including flow text) is now painted using PDF text operators.
+      </description></item>
+      <item><title>Apache FOP Layout add
+          (bug 42748)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout add
+        by
+        AD
+          (fixes bug 42748)
+        
+        :
+        
+        Added support for ids on empty fo:inlines.
+      </description></item>
+      <item><title>Apache FOP Fonts add
+          (bug 42982)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Fonts add
+        by
+        AC
+          (fixes bug 42982)
+        
+        :
+        
+        Add Font support in jar files.
+       Thanks to Max Berger.</description></item>
+      <item><title>Apache FOP Renderers fix
+          (bug 43042)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        AC
+          (fixes bug 43042)
+        
+        :
+        
+        Postscript extension cleanup.
+       Thanks to Andrejus Chaliapinas.</description></item>
+      <item><title>Apache FOP Renderers fix
+          (bug 43587)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        AC
+          (fixes bug 43587)
+        
+        :
+        
+        Fix to avoid ClassCastException where multiple ps:ps-comments are declared within fo:declarations.
+      </description></item>
+      <item><title>Apache FOP Fonts fix
+          (bug 43143)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Fonts fix
+        by
+        AC
+          (fixes bug 43143)
+        
+        :
+        
+        Fix to avoid NullPointerException when parsing ExpertEncoded and ExpertSubsetEncoded Type 1 fonts.
+      </description></item>
+      <item><title>Apache FOP Renderers fix
+          (bug 43439)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        AC
+          (fixes bug 43439)
+        
+        :
+        
+        Fixes missing TLE value attribute when using AreaTree input with the AFP renderer.
+      </description></item>
+      <item><title>Apache FOP Renderers add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers add
+        by
+        JM
+        :
+        
+        Added generic structures to the PDF library in order to support PDF
+        file in fo:external-graphic later.
+      </description></item>
+      <item><title>Apache FOP Code add
+          (bug 43597)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+          (fixes bug 43597)
+        
+        :
+        
+        Added support for SVGZ.
+       Thanks to Max Berger.</description></item>
+      <item><title>Apache FOP Layout fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        JM
+        :
+        
+        Bugfix for NPE with empty table-row (regression from 0.93).
+      </description></item>
+      <item><title>Apache FOP Renderers add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers add
+        by
+        JM
+        :
+        
+        Added a configuration setting to the PCL renderer to disable PJL commands.
+      </description></item>
+      <item><title>Apache FOP Renderers fix
+          (bug 43464)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 43464)
+        
+        :
+        
+        Fix to avoid a ClassCastException in renderer configuration.
+       Thanks to Bruno Feurer.</description></item>
+      <item><title>Apache FOP Renderers fix
+          (bug 43439)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 43439)
+        
+        :
+        
+        Fixed the restoration of the TLE values from the intermediate format 
+        for the AFP extension elements.
+       Thanks to Adrian Cumiskey.</description></item>
+      <item><title>Apache FOP Renderers add
+          (bug 43041)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers add
+        by
+        JM
+          (fixes bug 43041)
+        
+        :
+        
+        Added a configuration setting for the renderer/device resolution to the AFP renderer.
+       Thanks to Adrian Cumiskey.</description></item>
+      <item><title>Apache FOP Layout update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout update
+        by
+        AD
+        :
+        
+        Facilitate the implementation for font-selection-strategy:
+        &#8226; Changed FontInfo.fontLookup to always return an array of FontTriplet.
+        &#8226; Changed CommonFont.getFontState to return an array of FontTriplet.
+        &#8226; Initial modifications to the related LMs: initialized with
+            the font corresponding to the first of the triplets.
+      </description></item>
+      <item><title>Apache FOP Layout update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout update
+        by
+        AD
+        :
+        
+        PropertyCache phase 2:
+        &#8226; improvement of the PropertyCache itself should now guarantee acceptable
+            performance of the static caches in multi-session environments, which is 
+            a possible problem with synchronizedMap.
+        &#8226; changed CommonFont to use the cache: 
+            added CachedCommonFont to contain the properties that are always cacheable
+            CommonFont itself is only cached if the remaining properties are absolutes.
+        &#8226; changed CommonHyphenation, KeepProperty, ColorProperty and FontFamilyProperty to use the cache.
+      </description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 42705)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        AD
+          (fixes bug 42705)
+        
+        :
+        
+        Fixed swallowing PCDATA in text-node children of
+        retrieved markers.
+      </description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 42703)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        AD
+          (fixes bug 42703)
+        
+        :
+        
+        Fixed erroneous white-space removal in retrieved markers.
+      </description></item>
+      <item><title>Apache FOP Layout fix
+          (bug 43274)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        AD
+          (fixes bug 43274)
+        
+        :
+        
+        Fixed erroneous usage of inherited color-values in SVG.
+       Thanks to ckohrn.at.tng.de.</description></item>
+        
+    
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        AFP Renderer: Bugfix for 1 bit images where the width is not a multiple of 8.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        MM
+        :
+        
+        Support for keep-together.within-line="always".
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        MM
+        :
+        
+        Fixed incomplete support for Unicode Word Joiner characters (U+2060 and U+FEFF).
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        VH
+        :
+        
+        Add support for conditional spaces in table-cells.
+      </description></item>
+      <item><title>Apache FOP Code add
+          (bug 42785)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        AD
+          (fixes bug 42785)
+        
+        :
+        
+        Support alignment-adjust for images.
+       Thanks to Max Berger.</description></item>
+      <item><title>Apache FOP Code add
+          (bug 41044)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        AD
+          (fixes bug 41044)
+        
+        :
+        
+        Partial application of the patch in Bugzilla 41044:
+          * addition of a generic PropertyCache to be used by all Property
+            types that can be safely canonicalized
+          * modified EnumProperty, StringProperty, NumberProperty, EnumNumber
+            and FixedLength to make use of the cache infrastructure
+       Thanks to Richard Wheeldon.</description></item>
+      <item><title>Apache FOP Code update
+          (bug 41656)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        AD
+          (fixes bug 41656)
+        
+        :
+        
+        Refactoring in the fo package:
+        -&gt; removal of the childNodes instance member in fop.fo.FObj
+        -&gt; addition of a firstChild instance member in fop.fo.FObj
+        -&gt; addition of a siblings instance member in fop.fo.FONode
+        -&gt; addition of a FONodeIterator interface in FONode + corresponding implementation in FObj
+        -&gt; changed implementations of FObj.addChildNode(), .removeChild() and .getChildNodes()
+      </description></item>
+      <item><title>Apache FOP Code update
+          (bug 42089)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        AD
+          (fixes bug 42089)
+        
+        :
+        
+        Code cleanup and restructuring: 
+        Refactoring of PageSequenceLayoutManager and provide common FObj id property use
+       Thanks to Adrian Cumiskey.</description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        AD
+        :
+        
+        Slight improvement of relative font-weight handling in the properties
+        package.
+      </description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+        :
+        
+        Updated PDF/A-1b support according to ISO-19005-1:2005/Cor.1:2007.
+      </description></item>
+      <item><title>Apache FOP Code add
+          (bug 41831)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+          (fixes bug 41831)
+        
+        :
+        
+        Add support for font auto-detection (easier font configuration).
+       Thanks to Adrian Cumiskey.</description></item>
+      <item><title>Apache FOP Code update
+          (bug 42406)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+          (fixes bug 42406)
+        
+        :
+        
+        Use source resolution setting for bitmap images which don't provide their own
+        resolution.
+       Thanks to Hussein Shafie.</description></item>
+      <item><title>Apache FOP Code fix
+          (bug 42109)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 42109)
+        
+        :
+        
+        Fixed the rendering of zero-width spaces for certain fonts by not generating them into
+        the area tree.
+       Thanks to Paul Vinkenoog.</description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        LF
+        :
+        
+        Fixed a problem with disappearing footnotes inside hyphenated inlines (and footnotes with hyphenated inline child).
+      </description></item>
+      <item><title>Apache FOP Code add
+          (bug 42067)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+          (fixes bug 42067)
+        
+        :
+        
+        Add support for exact positioning of internal PDF links.
+       Thanks to Paul Vinkenoog.</description></item>
+      <item><title>Apache FOP Code fix
+          (bug 41434)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 41434)
+        
+        :
+        
+        Fix PDF Genaration for non-ASCII compatible locales.
+       Thanks to Martin Kögler.</description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        VH
+        :
+        
+        Fix several exceptions when break-before/after is set on the first/last row of a table.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        VH
+        :
+        
+        Fix extra page break when break-before is set on both a table and its first row.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        VH
+        :
+        
+        Make keep-with-next and keep-with-previous work on fo:table.
+      </description></item>
+      <item><title>Apache FOP Code add
+          (bug 36934)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        VH, JM
+          (fixes bug 36934)
+        
+        :
+        
+        Add support for the collapsing-border model in tables.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JB
+        :
+        
+        Add support for named destinations in PDF.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Fixed a problem with keep-with-next on table-rows. Once a keep-with-next was set
+        inside a table, the FO following the table would always be glued to the previous table.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Fixed a problem with the auto-rotate-landscape setting in the PostScript renderer.
+        It didn't generate the right setpagedevice command.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Fixed an IllegalArgumentException for absolutely positioned block-containers with a
+        border and no height/bpd set.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Add support for a two-pass production for PostScript output to minimize file size. This
+        adds images only once and adds only the fonts that are really used.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 41652)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        AD
+          (fixes bug 41652)
+        
+        :
+        
+        If a line contained nothing but a linefeed, this didn't produce empty lines.
+        Replaced the auxiliary zero-width box with a glue the width of a line,
+        and shrinkable to zero-width.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 40120)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        VH
+          (fixes bug 40120)
+        
+        :
+        
+        Stricter FOP user configuration checking
+       Thanks to Adrian Cumiskey.</description></item>
+      <item><title>Apache FOP Code fix
+          (bug 41572)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        AD
+          (fixes bug 41572)
+        
+        :
+        
+        Fix parsing 'url(...)' when the URL itself contains a bracketed part.
+       Thanks to Erwin Tratar.</description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Support for GIF images in RTF output (RTF handler, only. Does not affect the RTF library.)
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Fix for NPE with PNG images for RTF output.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        AD
+        :
+        
+        Fix for properly parsing font-family names containing spaces.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Support for soft masks (transparency) with ImageIO image adapter.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 41019)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        LF
+          (fixes bug 41019)
+        
+        :
+        
+        Fix incorrect behaviour of the BreakingAlgorithm when some inline content is wider than
+        the available ipd, causing a restart.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Fix for PDF corruption when a TrueType font with spaces in its name is embedded and no 
+        XML font metrics file for that font is used.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 41426)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 41426)
+        
+        :
+        
+        Fix for ClassCastException when fo:wrapper was used as direct child of fo:flow.
+        Note: "id" attributes are still not handled properly on fo:wrapper!
+       Thanks to Adrian Cumiskey.</description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        MM
+        :
+        
+        Added support for the soft hyphen (SHY) character.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        MM
+        :
+        
+        Added support for line-height-shift-adjustment property.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        SP
+        :
+        
+        Added support for the system property fop.home to
+        cli.Main.getJARList().
+      </description></item>
+      <item><title>Apache FOP Code add
+          (bug 40930)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+          (fixes bug 40930)
+        
+        :
+        
+        Added support for display-align for table-cell in RTF output.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        MM
+        :
+        
+        Added support for UAX#14 type line breaking. Support does not extend across nested fo:inline elements.
+      </description></item>
+        
+    
+      
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        BD
+        :
+        
+        Added support for the use of Open Type fonts
+      </description></item>
+      <item><title>Apache FOP Code update
+          (bug 5535)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        BD
+          (fixes bug 5535)
+        
+        :
+        
+        Enabled Copy/Paste from PDF content in Acrobat Reader for text using embedded TrueType fonts.
+       Thanks to Adam Strzelecki, Victor Mote.</description></item>
+      <item><title>Apache FOP Code update
+          (bug 41044)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        SP
+          (fixes bug 41044)
+        
+        :
+        
+        Commented out unused properties, in order to minimize memory usage. 
+       Thanks to Richard Wheeldon.</description></item>
+      <item><title>Apache FOP Code update
+          (bug 41009)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        SP
+          (fixes bug 41009)
+        
+        :
+        
+        Removed unused attributes from TableCell. 
+       Thanks to Richard Wheeldon.</description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Added initial support for loading fonts without a pre-created XML font metric
+        file.
+      </description></item>
+      <item><title>Apache FOP Code add
+          (bug 40729)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+          (fixes bug 40729)
+        
+        :
+        
+        Support for the rgb-icc() function and for a proprietary cmyk() function (for device CMYK
+        colors only through the PDF renderer so far). 
+       Thanks to Peter Coppens.</description></item>
+      <item><title>Apache FOP Code update
+          (bug 40813)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+          (fixes bug 40813)
+        
+        :
+        
+        Minor fixes and improvements for the AWT Preview (keyboard shortcuts, scrolling, windows
+        setup).
+       Thanks to Richard Wheeldon.</description></item>
+      <item><title>Apache FOP Code add
+          (bug 40849)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+          (fixes bug 40849)
+        
+        :
+        
+        Added support for SVG in fo:instream-foreign objects for RTF output.
+       Thanks to Dominic Brügger.</description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Fixed bug when the sum of column widths of a table is larger than the
+        specified widths. The table width was not adjusted.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Nested tables with headers and footers were not handled correctly and could
+        overlap with the region-after.
+      </description></item>
+      <item><title>Apache FOP Code add
+          (bug 40519)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+          (fixes bug 40519)
+        
+        :
+        
+        Added support for CCITT compression in the TIFFRenderer by switching to the ImageWriter
+        abstraction from XML Graphics Commons.
+       Thanks to Oliver Hernàndez Valls.</description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Extension properties fox:orphan-content-limit and fox:widow-content-limit which
+        help with list-block and table layout. See the documentation for details.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Configuration option in the Java2D-based renderers that allows to disable the default
+        white background in order to produce bitmap output with transparency.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 39414)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        AD
+          (fixes bug 39414)
+        
+        :
+        
+        Split up FOText instances larger than 32K characters to avoid 
+        integer overflow during layout.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Corrected painting of shading patterns and position of links for SVG images
+        inside FO documents.
+      </description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        AD
+        :
+        
+        Minor fix: correctly set negative values for ipd/bpd to zero.
+      </description></item>
+      <item><title>Apache FOP Code update
+          (bug 35656)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        AD
+          (fixes bug 35656)
+        
+        :
+        
+        Rework of default column-creation / column-width setting from
+        cells in the first row.
+      </description></item>
+      <item><title>Apache FOP Code update
+          (bug 40270)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        AD
+          (fixes bug 40270)
+        
+        :
+        
+        Added relaxed validation for empty list-item-*, as suggested by Gary Reed.
+       Thanks to Gary Reed.</description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        AD
+        :
+        
+        Modified proportional-column-width() function to log an error if used 
+        with table-layout=auto
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        AD
+        :
+        
+        Deferred property resolution for markers until they are actually retrieved,
+        which leads to percentages and relative font-sizes now getting the correct
+        values. Also deferred white-space-handling for markers.
+      </description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+        :
+        
+        Changed the way overflowing pages are handled. The overflow property on region-body
+        is now used to define the behaviour.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Fixed a memory-leak: The FO tree part of a page-sequence was not released when a
+        page-sequence was finished.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Table headers and footers were swallowed when a table was nested in a list-block.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Fixed a bug with indent handling when margins are used on a surrounding block and 
+        not start/end-indent.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 40106)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 40106)
+        
+        :
+        
+        Compatibility fix for GCJ (GNU Classpath): Using "UTF-16BE" instead of "UnicodeBigUnmarked"
+        encoding.
+       Thanks to Jeroen Meijer.</description></item>
+      <item><title>Apache FOP Code fix
+          (bug 40062)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 40062)
+        
+        :
+        
+        Fixed handling for CCITT Group 4 TIFF images with fill order 2.
+       Thanks to Gilles Beaugeais.</description></item>
+      <item><title>Apache FOP Code fix
+          (bug 40048)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 40048)
+        
+        :
+        
+        Fixed setting of page margins in AWT Renderer like it was done in the print renderer.
+       Thanks to Igor Istomin.</description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Fixed two memory-leaks in image handling. The image cache is finally working
+        properly.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 39608)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 39608)
+        
+        :
+        
+        Let numeric property values without a unit be treated as pixels like in HTML.
+        This fixes certain NullPointerException when no units are specified.
+        (Note: the use of pixels in XSL-FO is discouraged!)
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Potential multi-threading issue (ConcurrentModificationException) 
+        eliminated for ElementMapping classes.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        No more System.exit() and look &amp; feel setting calls inside the reusable
+        parts of the AWT viewer.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Proper escaping of characters in list-items labels for RTF output.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        MM
+        :
+        
+        Bugfix: FOUserAgent specific configuration parameters specified in config file
+        were not set when FOP was invoked from command line.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Added support for PDF/A-1b and PDF/X-3:2003. (Note: this may still be a bit
+        incomplete. Feedback is welcome!)
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        The CIDSet object is now generated for CID fonts which are embedded in PDFs.
+        (Required by PDF/A).
+      </description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+        :
+        
+        The Java2DRenderer (and therefore the print and bitmap renderers) is now
+        offering the same quality as the PDF and PS renderers. Note: There can still
+        be little differences between PDF and Print/PNG/TIFF because the latter uses
+        a different font metrics source.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 39712)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        AD
+          (fixes bug 39712)
+        
+        :
+        
+        Bugfix: components of the border-separation property weren't set when
+        in shorthand-mode, leading to a NPE being thrown.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Table headers were omitted when a table is a child of a block-container.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Bookmarks in PDF will be generated even if some bookmarks cannot be
+        resolved.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 39560)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        AD
+          (fixes bug 39560)
+        
+        :
+        
+        Bugfix: the interaction between the table FOs and properties package in
+        determining initial values for column-number should be a one-time process,
+        not repeated when the table is in a marker that is retrieved.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: All fonts names were converted unnecessarily to lower case in RTF output.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: The combination of hyphenation and kerning resulted in slightly ragged 
+        right ends for right-aligned and justified text.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: NullPointerException in AreaAdditionUtil in a table-cell spanning
+        multiple pages and with a marker.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 39533)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 39533)
+        
+        :
+        
+        Bugfix: NullPointerException in RTF output when a table does not contain
+        table-columns.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 39607)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 39607)
+        
+        :
+        
+        Bugfix: NullPointerException in RTF library when there are no borders on 
+        the parent table.
+       Thanks to Julien Aymé.</description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+       Automatic support for all fonts available to the Java2D subsystem for all
+       Java2D-descendant renderers (TIFF, PNG, print, AWT).
+     </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Improved baseline detection in TTFReader for TrueType fonts.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 39443)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 39443)
+        
+        :
+        
+        Bugfix: tables nested in inline elements caused a NullPointerException.
+      </description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+        :
+        
+        The default sRGB color profile provided by the Java class library is no longer
+        embedded if it is encountered. This should reduce the PDF size considerably.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 39443)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 39443)
+        
+        :
+        
+        Bugfix: Sections with span="all" lead to overlapping text if spanning multiple pages.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        MM
+        :
+        
+        Bugfix: Percentages in vertical-align property values were not correctly handled.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 38243)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 38243)
+        
+        :
+        
+        Bugfix: Gaps in table-columns cause a NullPointerException.
+       Thanks to Gerhard Oettl.</description></item>
+      <item><title>Apache FOP Code update
+          (bug 38946)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+          (fixes bug 38946)
+        
+        :
+        
+        Changed the internal representation of colors to use Java's own color infrastructure
+        instead of FOP's home-grown classes.
+       Thanks to Max Berger.</description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        MM
+        :
+        
+        Bugfix: TABs were not correctly replaced by spaces in some circumstances.
+      </description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+        :
+        
+        Content in block-containers makes better use of shrink to fit content vertically
+        into the available area. This can be used indirectly to justify content vertically
+        in a block-container.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: basic-links with internal destinations in documents with multiple 
+        page-sequences sometimes pointed at the wrong page.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Fixed ClassCastException when retrieve-marker is used as a direct child
+        if static-content in which case leading and trailing white space is not properly
+        removed.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 39285)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 39285)
+        
+        :
+        
+        Bugfix: Fixed OutOfMemoryException with long data URLs (RFC 2397).
+      </description></item>
+      <item><title>Apache FOP Code add
+          (bug 39118)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+          (fixes bug 39118)
+        
+        :
+        
+        Initial support for page-number-citation-last (XSL 1.1). Works without problems 
+        only for page-sequence so far.
+       Thanks to Pierre-Henri Kraus.</description></item>
+    
+    
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: The generation of the PDF "d" (setdash) command was assuming that
+        only integer values can be used but that isn't the case. Dash patterns 
+        PDFGraphics2D would be wrong in the process.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Fixed a division by zero problem in TTFReader and improved the detection
+        of the capHeight and xHeight font metric values for TrueType fonts.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Allow URLs in basic-link's external-destination to be wrapped in "url()".
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        MM
+        :
+        
+        Bugfix: Corrected enumerated property value for white-space property
+        from "no-wrap" to "nowrap".
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 38457)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        MM
+          (fixes bug 38457)
+        
+        :
+        
+        Bugfix: Added support for white-space-treatment="preserve" in particular to
+        support the white-space="pre" short hand property.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Corrected expectation and behaviour for the text-indent property to only apply
+        to the first line area generated by a block.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix for invalid handling of ICC color profiles in JPEG images and for
+        dealing with CMYK JPEG images with the Adobe APPE marker.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Initial support for page-position="last" added.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Reenabled loading of user-supplied hyphenation patterns that was available in
+        FOP 0.20.5. (See "hyphenation-base" option in the user configuration)
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Certain filter combinations in PDF could lead to invalid PDFs. 
+        DecodeParams were not properly handled.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: CCITT Group 4 encoded TIFF images with multiple strips are now properly
+        embedded in PDF files.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Added support for fixed-width spaces.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Added support for kerning.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Fixed a copy/paste error in the table layout code that caused wrong page
+        break decisions when table-headers and/or table-footers are used.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Fixed an NPE that was thrown when a table was used inside a footnote-body.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Fixed a problem with certain TrueType fonts which are missing the "PCLT"
+        table, where a baseline-shift="sub" had no effect due to a missing x-height value.
+        (Note: This only affects TTFReader, so the font metric file has to be regenerated.)
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: When the base URL was specified as a file system path, the constructed
+        URL was wrong.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Support for "userconfig" attribute in FOP Ant Task.
+       Thanks to Jirí Mare&#353;.</description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Initial support for XMP metadata (PDF 1.4) under fo:declarations.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        AD
+        :
+        
+        Added support for the background-position shorthand property.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        AD
+        :
+        
+        Added support for the font shorthand property.
+      </description></item>
+      <item><title>Apache FOP Code add
+          (bug 38618)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+          (fixes bug 38618)
+        
+        :
+        
+        Added support for system-color() function.
+       Thanks to Max Berger.</description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Fixed two causes for ClassCastExceptions in BlockContainerLayoutManager.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: padding-top and padding-bottom on list-items could lead to wrong page
+        break decisions and thus to overlapping text.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: break-before and break-after were ignored on list-items.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 38507)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        LF
+          (fixes bug 38507)
+        
+        :
+        
+        Bugfix: The elements representing a non-breaking space weren't always correct.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 38453)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 38453)
+        
+        :
+        
+        Bugfix: Text-decoration was not promoted if no text-decoration attribute was
+        specified on a nested element.
+      </description></item>
+      <item><title>Apache FOP Code add
+          (bug 38282)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        AD
+          (fixes bug 38282)
+        
+        :
+        
+        Added support for the from-table-column() function.
+       Thanks to Gerhard Oettl (gerhard.oettl.at.oesoft.at).</description></item>
+      <item><title>Apache FOP Code fix
+          (bug 38397)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 38397)
+        
+        :
+        
+        Bugfix: Spanned cells could lead to an false error message about overlapping 
+        cells and ultimately a NullPointerException.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Regions with non-standard names got ignored in RTF output leading to 
+        missing headers and footers.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        The RTF output now properly generates the "\landscape" flag for documents in 
+        landscape orientation.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Following a clarification by the XSL FO SG, space traits are only set on the 
+        first and last area generated by an FO, and not on every area anymore.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        New feature: "Intermediate format" (IF). The IF is basically the XML dialect
+        written by the area tree renderer (XMLRenderer). A new parser for this format
+        allows reparsing a serialized and possibly modified area tree and rendering it
+        to the final target format.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Floating point numbers were not properly formatted in the PDF renderer
+        which could lead to error messages while opening a PDF in Acrobat Reader.
+      </description></item>
+      <item><title>Apache FOP Code update
+          (bug 38098)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        SP
+          (fixes bug 38098)
+        
+        :
+        
+        Implement property name as default argument on some xsl-function calls.
+       Thanks to Gerhard Oettl.</description></item>
+      <item><title>Apache FOP Code update
+          (bug 38087)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        SP
+          (fixes bug 38087)
+        
+        :
+        
+        Implement force-page-count property of page-sequence.
+       Thanks to Gerhard Oettl.</description></item>
+      <item><title>Apache FOP Code fix
+          (bug 38054)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 38054)
+        
+        :
+        
+        Bugfix: Spans that end up with a negative height don't get swallowed anymore.
+      </description></item>
+      <item><title>Apache FOP Code add
+          (bug 36729)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        MM
+          (fixes bug 36729)
+        
+        :
+        
+        Relative URLs for the font configuration attributes metrics-url and embed-url
+        are now supported. A new configuration property font-base has been added. It
+        sets the base URL against which relative font URLs are resolved. If font-base is
+        not set base is used.
+      </description></item>
+      <item><title>Apache FOP Code add
+          (bug 38132)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+          (fixes bug 38132)
+        
+        :
+        
+        Added support for RFC2397 "data" URLs.
+       Thanks to Richard Wheeldon.</description></item>
+      <item><title>Apache FOP Code fix
+          (bug 38132)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 38132)
+        
+        :
+        
+        Bugfix: Certain border styles could lead to a NullPointerException.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 38102)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 38102)
+        
+        :
+        
+        Bugfix: Space was not adjusted if the space was on a nested block. This could
+        lead to content overflowing the bottom of a page.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: TableCell did not properly report that it generates reference-areas
+        which could lead to wrong inherited values for start-indent and end-indent.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        The font loading code now reads the encoding value from the XML font metrics file
+        so that fonts like Symbol and ZapfDingbats can be embedded explicitely (Required by PDF/A).
+      </description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        SP
+        :
+        
+        Improvements to the code for inline block content.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 38089)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        MM
+          (fixes bug 38089)
+        
+        :
+        
+        Bugfix: Image height for BMP images was incorrectly calculated
+      </description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        AD
+        :
+        
+        Revision of refinement white-space handling.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        AD
+        :
+        
+        Added feature: support for white-space shorthand
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        AD
+        :
+        
+        Added feature: support for page-break-* shorthands
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 38053)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        MM
+          (fixes bug 38053)
+        
+        :
+        
+        Bugfix: NullPointerException on certain fo:inline within lists.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 37743)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        MM
+          (fixes bug 37743)
+        
+        :
+        
+        Bugfix: ClassCastException on certain fo:inline with border combinations.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        MM
+        :
+        
+        Changed a method name in LineArea from finalize to finalise because it was
+        never intended for the method to be an override of the Java Object finalize
+        method. If invoked by the Java garbage collector it may cause a NPE.
+      </description></item>
+    
+    
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+        :
+        
+        Deprecated Fop constructors that use integer constants to select the
+        output format have been removed in favor or the constructors that use
+        MIME types.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        MM
+        :
+        
+        Fixed a bug where the linefeed-treatment property value "preserve" was not
+        honoured when used in conjunction with text-align="center".
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 37964)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 37964)
+        
+        :
+        
+        Bugfix: hard breaks with even-page or odd-page were not handled correctly
+        when spaces were surrounding the break.
+      </description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+        :
+        
+        Changed the XMLHandler interface so it doesn't report the MIME type it
+        supports but instead can report whether it supports a particular Renderer
+        implementation. XMLHandlers are now configurable.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Fixed a bug where SVG content could be clipped when rendered to PostScript.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Changed the way resolutions are handled. The single resolution in the user
+        agent got split up into source and target resolutions. For more info, see
+        the updated documentation. Note: backwards-incompatible change!
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 37875)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 37875)
+        
+        :
+        
+        Bugfix: Some content inside a table-header may not have been renderered on
+        pages n &gt; 1 in certain conditions.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        MM
+        :
+        
+        Fixed a bug where an empty line, i.e. a block containing only a &amp;nbsp;,
+        was not rendered at all.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Fixed a bug where the area for a finished cell that is broken over pages was 
+        created once for each row it was spanned over instead of only once.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Added checks that warn about tables and block-containers that are wider than
+        the available content area.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 37880)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 37880)
+        
+        :
+        
+        Bugfix: Footnotes were lost if the footnote appeared in centered text.
+      </description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+        :
+        
+        Improved log and error messages in a number of places by adding additional
+        context information that should make it easier to find the location in the
+        source files.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Fix to correct image sizes in RTF output.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        First attempt at SVG support in RTF output. SVG images are converted to 300dpi JPEG
+        images internally.
+      </description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+        :
+        
+        Additional checks to detect text overflows. The overflow property is now properly
+        handled where applicable.
+      </description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+        :
+        
+        Source location information improved. If location information is not available,
+        the context information is provided based on text content.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        The command-line now automatically sets two parameters for any XSLT transformation:
+        "fop-output-format" contains the MIME type of the currently selected output format,
+        "fop-version" contains FOP's version number.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        The output file is now deleted when an exception occurs when calling FOP from
+        the command-line.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Areas for table-cells that are broken over more than one page are now
+        generated even if all its content is already painted on a previous page. This
+        fixes strange effects like a table grid that is not completely painted.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 37828)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 37828)
+        
+        :
+        
+        Bugfix: Column balancing produced strange break decisions in certain multi-column
+        documents with large amounts of text.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Added an alternative set of rules for calculating text indents which tries to mimic
+        the behaviour of many commercial FO implementations that chose to break the rules
+        in the FO specification in order to better meet the natural expectations of 
+        inexperienced FO users.
+      </description></item>
+      <item><title>Apache FOP Code fix
+          (bug 37815)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 37815)
+        
+        :
+        
+        Bugfix: The combination of content-width="scale-to-fit" and content-height="100%"
+        did not work as expected due to a datatype conversion bug.
+       Thanks to Tom Craddock.</description></item>
+      <item><title>Apache FOP Code fix
+          (bug 37813)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 37813)
+        
+        :
+        
+        Bugfix: A span="all" on the first block cause a subsequent page break and the first block
+        didn't span all columns.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Self-created OutputStreams in PNG Renderer were not properly closed.
+      </description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+        :
+        
+        The border-collapse property on fo:table is now forced to the value "separate" until the collapsing
+        border has been implemented.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        font-family list still not fully supported but a comma-separated list is now properly tokenized.
+        FOP will now go through all fonts in the list to find one that is available, but it doesn't 
+        do so per character, yet. 
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Implemented "Overconstrained Geometry" rules (5.3.4, XSL 1.0) for the most important cases.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Relatively positioned BlockViewports (from block-containers) caused the paint 
+        cursor not be be properly advanced when space-before or space-after were present.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix: Space resolution was incomplete for content in table-cells. Conditional elements
+        didn't get removed.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        The validation check for non-zero borders and padding on a region-* and for empty static-content 
+        elements is now turned off when relaxed validation is active to improve compatibility with 
+        FO documents written for other FO implementations.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix for "/ by zero" ArithmeticExceptions when an URL to a non-existing image is used 
+        and content-width and/or content-height is used.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix for a multi-threading problem:
+        propertyListTable initialization moved from the constructor to a static block in FONode.
+        This fixes NullPointerExceptions in PropertyList.
+      </description></item>
+      <item><title>Apache FOP Code fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+        :
+        
+        Bugfix for placement of text inside a text area when borders are present in PostScript output.
+      </description></item>
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        JM
+        :
+        
+        Improvements on leader painting in PDF output.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        JM
+        :
+        
+        Support for leader painting in PostScript output.
+      </description></item>
+      <item><title>Apache FOP Code add</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code add
+        by
+        LF, MM
+        :
+        
+        Support for hyphenation-ladder-count.
+      </description></item>
+    
+    
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        all
+        :
+        
+        Complete redesign of the FOP codebase in the period between Dec 2001 and Nov 2005. 
+        There are just too many changes to list here. If you like to know details, run 
+        "svn log --verbose http://svn.apache.org/repos/asf/xmlgraphics/fop/trunk/".
+      </description></item>
+    
+    
+      <item><title>Apache FOP Code update</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code update
+        by
+        all
+        :
+        
+        For the change log for the maintenance branch 
+        (where FOP 0.20.5 came from), please see the "CHANGES" file in the distribution, or 
+        the CHANGES file in the SVN repository.
+      </description></item>
+    
+  
+
+  
+  
+<item><title>Apache FOP Renderers fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed a color selection problem which occurred after an image has been painted
+        through the Graphics2DAdapter in PDF output.
+      </description></item><item><title>Apache FOP Renderers fix
+          (bug 41306)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 41306)
+        
+        :
+        
+        Fixed page ordering problem with AWTRenderer.
+      </description></item><item><title>Apache FOP Renderers fix
+          (bug 39980)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 39980)
+        
+        :
+        
+        Fixed image scaling for RTF output.
+      </description></item><item><title>Apache FOP API fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>API fix
+        by
+        JM
+        :
+        
+        Fixed the -imagein command-line option.
+      </description></item><item><title>Apache FOP Renderers add
+          (bug 43825)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers add
+        by
+        JM
+          (fixes bug 43825)
+        
+        :
+        
+        Added support for fo:leader for RTF output (no full support!). Fixes problems with empty leaders
+        being used to force empty lines among other issues.
+       Thanks to Maximilian Aster.</description></item><item><title>Apache FOP Renderers add
+          (bug 43824)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers add
+        by
+        JM
+          (fixes bug 43824)
+        
+        :
+        
+        Added support for page-number-citation for RTF output.
+       Thanks to Maximilian Aster.</description></item><item><title>Apache FOP Renderers fix
+          (bug 43606)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+          (fixes bug 43606)
+        
+        :
+        
+        Fixed handling of proportional-column-width() and percentages for table column in RTF
+        output.
+       Thanks to Maximilian Aster.</description></item><item><title>Apache FOP Layout fix
+          (bug 45295)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        AD
+          (fixes bug 45295)
+        
+        :
+        
+        Fixed NullPointerException when page-number-citations are used inside a marker.
+      </description></item><item><title>Apache FOP Images fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Images fix
+        by
+        JM
+        :
+        
+        Fixed two bugs concerning resolution handling with SVG images and their
+        conversion to bitmaps for RTF output.
+      </description></item><item><title>Apache FOP Code fix
+          (bug 44887)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Code fix
+        by
+        JM
+          (fixes bug 44887)
+        
+        :
+        
+        Fixed potential multi-threading problem concerning the use of DecimalFormat.
+      </description></item><item><title>Apache FOP Layout fix
+          (bug 44412)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        JM
+          (fixes bug 44412)
+        
+        :
+        
+        Regression bugfix: Multiple collapsible breaks don't cause empty pages anymore.
+      </description></item><item><title>Apache FOP Renderers fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed resolution handling inside AWT preview dialog.
+      </description></item><item><title>Apache FOP Renderers fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed positioning of absolutely positioned block-containers in multi-column documents.
+      </description></item><item><title>Apache FOP Renderers fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed rendering of fixed block-containers in AFP output.
+      </description></item><item><title>Apache FOP Layout fix
+          (bug 44621)
+        </title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Layout fix
+        by
+        VH
+          (fixes bug 44621)
+        
+        :
+        
+        Various bugfixes for table layout.
+      </description></item><item><title>Apache FOP Renderers fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Renderers fix
+        by
+        JM
+        :
+        
+        Fixed regression causing bad positioning of block-containers if used as descendant
+        of a table-cell.
+      </description></item><item><title>Apache FOP Fonts fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Fonts fix
+        by
+        JM
+        :
+        
+        Fixed text extraction problem with ZapfDingbats and Symbol font in PDF output.
+      </description></item><item><title>Apache FOP Images fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Images fix
+        by
+        JM
+        :
+        
+        Fixed a performance problem concerning image serialization.
+      </description></item><item><title>Apache FOP Fonts fix</title><link>http://xmlgraphics.apache.org/fop//changes.html</link><description>Fonts fix
+        by
+        JM
+        :
+        
+        Fixed NullPointerException when loading a TrueType font using XML font metric files.
+      </description></item></channel></rss>

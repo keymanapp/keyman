@@ -1,0 +1,27 @@
+﻿store(&VERSION) '9.0'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ [RALT K_A] > 'ralt a '
++ [LALT K_A] > 'lalt a '
++ [RCTRL K_B] > 'rctrl b '
++ [LCTRL K_B] > 'lctrl b '
++ [SHIFT K_C] > 'shift c '
++ [K_D] > 'plain old d '
+
++ [RALT RCTRL K_E] > 'ralt rctrl e '
++ [LALT LCTRL K_E] > 'lalt lctrl e '
+
++ [RALT SHIFT K_F] > 'ralt shift f '
++ [LALT SHIFT K_F] > 'lalt shift f '
+
++ [SHIFT RCTRL K_G] > 'shift rctrl g '
++ [SHIFT LCTRL K_G] > 'shift lctrl g '
+                                    
++ [RALT RCTRL SHIFT K_H] > 'ralt rctrl shift h '
++ [LALT LCTRL SHIFT K_H] > 'lalt lctrl shift h '
+
++ [CAPS K_I] > 'caps i '
++ [NCAPS K_I] > 'ncaps i '

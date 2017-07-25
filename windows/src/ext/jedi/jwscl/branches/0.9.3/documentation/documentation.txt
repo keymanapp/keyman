@@ -1,0 +1,6 @@
+JWSCL can be compiled using JwaWindows.pas and the following compiler directives:
+WINVISTA;PACKAGE_CONDITIONS;JWA_INCLUDE_SETUP_API;JWA_INCLUDE_JWAADSTLB;DYNAMIC_LINK;JWA_INCLUDE_SHELLAPI;JWA_WINDOWS
+
+Also add DEBUG or RELEASE.
+
+However you should prefer the package way using the JEDI API packages and generating JwaWindows.dcu

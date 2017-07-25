@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V1.3//EN" "document-v13.dtd">
+<document xmlns:i18n="http://apache.org/cocoon/i18n/2.1"><header><title>Release Notes for Apache FOP 0.94</title></header><body><section id="version_0.94"><title>Major Changes in Version 0.94</title><note>This is not a complete list of changes, just some of the more important ones.
+     A full list of changes in this release <a href="changes_0.94.html">is available</a>.
+      </note><section><title>Changes to the Code Base</title><ul><li><icon alt="add" src="../images/add.jpg"/>
+        Add support for font auto-detection (easier font configuration).
+       Committed by JM. Thanks to Adrian Cumiskey. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41831">41831</link>.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Add support for the collapsing-border model in tables.
+       Committed by VH, JM. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=36934">36934</link>.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Add support for named destinations in PDF.
+       Committed by JB.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Added support for UAX#14 type line breaking. Support does not extend across nested fo:inline elements.
+       Committed by MM.</li></ul></section></section></body></document>

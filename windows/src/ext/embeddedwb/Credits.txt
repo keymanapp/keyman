@@ -1,0 +1,159 @@
+======================================
+EmbeddedWB Component Pack
+======================================
+
+Credits And Contributers:
+
+======================================
+
+* Remember that ALL the stuff here is free and there is no guaranty, what so ever, to any use of the code.
+* Please do not forget to credit the contributors as listed below.
+* Some procedures were found in Delphi web sites and all procedures/ functions /components legal rights are reserved to the components appropriate author. 
+
+======================================
+
+Current developers:
+
+Eran Bodankin - bsalsa - bsalsa@bsalsa.com
+Thomas Stutz - smot - smot777@yahoo.com
+Serge Volosheniuk - SergeV - SergeV@bsalsa.com
+
+======================================
+
+EmbeddedWB Web Site Credits:
+
+* Jason White for donating EmbeddedWB web address.
+* Per Linds? Larsen for donating context..
+* Eran Bodankin : Web site administrator and context.
+* Wimpie: Forum. & a web site administrator.
+
+======================================
+
+Delphi Web Sites with cool code ideas credits:
+A big Thanks you to the following web sites with the wonderful ideas:
+
+http://www.cryer.co.uk/brian/delphi/
+http://www.torry.net/
+http://www.swissdelphicenter.ch/en/
+http://jvcl.sourceforge.net
+http://synedit.sourceforge.net/  
+
+======================================
+
+
+* EmbeddedWB Demo:
+Eran Bodankin (bsalsa)(Demo code).
+smot (Demo Menus and ideas). 
+
+* Favorites Tree:
+Peter Morris (TFavoritesTree , DIRMonitor component).
+Eran Bodankin (bsalsa) - (Bug fix, Updates & Upgrades).
+
+* Extended IEParser 2
+Per Linds? Larsen  (Extended IEParser 2 component).
+Marc Hervais (Modified).
+Eran Bodankin (bsalsa) - (Bug fix, Updates & Upgrades).
+
+* FavoritesMenu:
+PerLinds? Larsen (TFavoritesMenu component).
+Rob Young (Contributions).
+Pete Morris (Contributions).
+Eran Bodankin (bsalsa) - (Bug fix, Updates & Upgrades & new procedures).  
+
+* FavoritesListView:
+Per Lindsi Larsen (TFavoritesListView component).
+Eran Bodankin (bsalsa) (Bug fix, Updates & Upgrades & new procedures). 
+
+* HistoryListView:
+Per Linds? Larsen (THistoryListView component).
+Eran Bodankin (bsalsa) (Bug fix, Updates & Upgrades & new procedures). 
+
+* HistoryMenu:
+Per Linds? Larsen (THistoryMenu component).
+Eran Bodankin (bsalsa) - (Bug fix, Updates & Upgrades & new procedures). 
+
+* IETools:
+Per Linds? Larsen (TIETools unit).
+Eran Bodankin (bsalsa) - (Bug fix, Updates & Upgrades & new procedures).
+
+* IECache:
+PerLinds? Larsen (TIECache component)
+Christian Lovis (lib dynamic linking).  
+
+* IEAddress:
+Peter Morris (Pete@StuckIndoors.com)
+Khalid Almannai (almannai@batelco.com.bh)
+Henri Fournier (hfournier@home.com)
+Per Lindsi Larsen {lindsoe@post.tele.dk)
+Eran Bodankin (bsalsa) (Bug fix, Updates & Upgrades).
+
+* IEConst:
+Was created by : I don't know, found it on the web
+Eran Bodankin (bsalsa) - added some constants  
+
+* IEDownload:
+Per Linds? Larsen (TIEDownload component).
+Eran Bodankin (bsalsa) (Bug fix, Updates & Upgrades).
+
+
+* IeGuid:
+Was created by : I don't know, found it on the web.
+Eran Bodankin (bsalsa) - (Bug fix, Updates & Upgrades).
+
+* IETravelLog:
+Per Linds? Larsen (TIETravelLog Component).
+Eran Bodankin (bsalsa) - (Bug fix, Updates & Upgrades).
+
+* IEUTILS:
+Was created by : I don't know, found it on the web.
+Eran Bodankin (bsalsa) (Bug fix, Updates & Upgrades & added new functions).
+
+* IESecurityManager:
+Per Linds? Larsen (TIESecurityManager component).
+Eran Bodankin (bsalsa) (Bug fix, Updates & Upgrades).  
+
+* UrlHistory:
+Per Linds?i Larsen (TUrlHistory component).
+Eran Bodankin (bsalsa) (Bug fix, Updates & Upgrades).
+
+* SendMail:
+Mike Shkolnik (TMapiMail component).
+Eran Bodankin (bsalsa) (Minor Bug Fix).
+
+* Import Favorite:
+bsalsa (TImport component)
+Troels Jakobsen (Code Ideas).  
+
+* Export Favorite:
+bsalsa (TExport component)
+Troels Jakobsen (Code Ideas).  
+
+* TLinksBar:
+bsalsa Eran Bodankin (TLinkBar component).  
+
+* TRichEditWB:
+bsalsa Eran Bodankin (TRichEditWB component).
+Thanks to Erol S. Uzuner for the best ideas  
+
+* TWebUpdater:
+bsalsa Eran Bodankin (TWebUpdater component).
+Thanks to Snuki for the best idea.  
+
+* XmlScanner:
+Stefan Heymann stefan@destructor.de (TXmlScanner component).stefan@destructor.de  
+
+* EasyXmlScanner:
+Stefan Heymann (TEasyXmlScanner component).stefan@destructor.de 
+
+* Accesories files:
+   RichSyntax files: Serhiy Perevoznyk & Anderson Rodrigues Barbieri.
+   XMLHIghlighter: Ajay Tandon (drajaytandon@hotmail.com)
+   HTLHIghlighter : Serhiy Perevoznyk  based on the SynHighlighter from http://synedit.sourceforge.net/
+   BrowseForFolderU: http://www.cryer.co.uk/brian/delphi/  
+   EWB_jedi.inc from www.delphi-jedi.org/
+
+
+Thanks for AHUser for his Delphi 2009 fixes!
+
+And to all the rest that I did forget and mention here,
+I am sorry, please mail me & I add you in.

@@ -1,0 +1,65 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'Basic Deadkey Compatibility Tests'
+store(&ETHNOLOGUECODE) 'fra'
+store(&WINDOWSLANGUAGES) 'x040C'
+store(&LAYOUTFILE) 'deadkey_basic-layout.js'
+store(&LANGUAGE) 'x040C'
+ 
+begin Unicode > use(main)
+ 
+group(main) using keys
+ 
++ 'a' > deadkey(a)
++ 's' > deadkey(s)
+ 
+deadkey(a) + 'b' > '(a)(b)'
+ 
++ 'b' > '(b)'
+ 
+'(b)' deadkey(a) + 'b' > '(b)+(a)+(b)'
+ 
+deadkey(a) + 'c' > 'x'
+                      
+deadkey(a) 'd' + 'e' > '(a)(d)(e)'
+ 
+'f' deadkey(a) 'd' + 'e' > '(f)-(a)-(d)-(e)'
+ 
+ 
+dk(a) dk(s) + '.' > '(a)-(s)'
+dk(s) dk(a) + '.' > '(s)+(a)'   
+ 
++ 'm' > dk(m) '(m)'
+dk(m) '(m)' + '.' > 'dk(m)'
+ 
++ 'n' > '(n)' dk(m)
+'(n)' dk(m) + '.' > 'dk(n)'
+ 
++ 'o' > '(o)' dk(m) '(o)'
+'(o)' dk(m) '(o)' + '.' > 'dk(o)'
+ 
++ 'p' > dk(p) dk(q) '(p)'
+dk(q) '(p)' + 'q' > '(p)(q)'
+dk(p) '(p)(q)' + 'r' > '(p)(q)(r)'      
+ 
++ 'P' > dk(pp) dk(pp) '(P)'
+dk(pp) '(P)' + 'Q' > '(P)(Q)'
+dk(pp) '(P)(Q)' + 'R' > '(P)(Q)(R)'
+dk(pp) dk(pp) '(P)(Q)' + 'R' > 'ERROR'
+ 
+ + '?' > \
+  'ab   > (a)(b)          tests basic deadkey' d13 \
+  'b    > (b)             only matches if "a" not pressed first' d13 \
+  'bab  > (b)+(a)+(b)     deadkey at end of context' d13 \
+  'ac   > x               tests basic deadkey' d13 \
+  'ade  > (a)(d)(e)       deadkey at start of context' d13 \
+  'fade > (f)-(a)-(d)-(e) deadkey in middle of context' d13 \
+  'as.  > (a)-(s)         defined deadkey order (1/2)' d13 \
+  'sa.  > (s)+(a)         defined deadkey order (2/2)' d13 \
+  'm.   > dk(m)           deadkey output then letters' d13 \
+  'n.   > dk(n)           letters output then deadkey' d13 \
+  'o.   > dk(o)           letters, deadkey, letters' d13 \
+  'atb  > t(b)            deadkey, unmatched, letters' d13 \
+  'aacb > x(b)            deadkey, deadkey, match, match' d13 \
+  'pqr  > (p)(q)(r)       multiple deadkeys, differing' d13 \
+  'PQR  > (P)(Q)(R)       multiple deadkeys, identical' d13 \
+  d13

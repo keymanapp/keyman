@@ -1,0 +1,9 @@
+﻿store(&VERSION) '8.0'
+store(&NAME) 'I2510 - ' U+0027 't' U+0027 ' in KeymanWeb Test Window'
+store(&MESSAGE) 'Press ' U+0027 't' U+0027 ' in KMW Test Window; ' U+0027 'a' U+0027 ' is another test key'
+begin Unicode > use(main)
+
+
+group(main) using keys
++ [K_A] > 'Aaah'
++ [K_T] > 'The Letter T'

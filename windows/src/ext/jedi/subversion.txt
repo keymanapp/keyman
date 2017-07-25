@@ -1,0 +1,3 @@
+The files in
+jwa\branches\2.3 and jwscl\branches\0.9.3
+are subversion aware. You can update them using a Subversion client (like TortoiseSVN).

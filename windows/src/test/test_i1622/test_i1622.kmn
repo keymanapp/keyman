@@ -1,0 +1,16 @@
+﻿store(&VERSION ) '7.0'
+store(&NAME) 'DKTest [I1622]'
+
+c CAPS ALWAYS OFF c probably irrelevant
+
+begin Unicode > use(Start)
+
+store(DKK) dk(1) dk(2) dk(3)
+store(DKX) "123"
+
+group(Start) using keys
+"k" + [K_SPACE] > dk(1) c should output 1 after executing Check
+"kh" + [K_SPACE] > dk(2) c should output 2 after executing Check
+"hk" + [K_SPACE] > dk(3) c should output 3 after executing Check
+
+any(DKK) + "x" > index(DKX, 1)

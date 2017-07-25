@@ -1,0 +1,218 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{CCA5391F-35F6-43D1-AB48-187085D1EF5B}</ProjectGuid>
+        <MainSource>JvCore.dpk</MainSource>
+        <ProjectVersion>18.2</ProjectVersion>
+        <Config Condition="'$(Config)'==''">Release</Config>
+        <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+        <FrameworkType>VCL</FrameworkType>
+        <Base>True</Base>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <AppType>Package</AppType>
+        <TargetedPlatforms>1</TargetedPlatforms>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <SanitizedProjectName>JvCore</SanitizedProjectName>
+        <RuntimeOnlyPackage>true</RuntimeOnlyPackage>
+        <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
+        <DCC_Description>JVCL Core Components Runtime Package</DCC_Description>
+        <DCC_ImageBase>490E0000</DCC_ImageBase>
+        <DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
+        <DCC_Platform>x86</DCC_Platform>
+        <DCC_UnitSearchPath>..\jvcl\jvcl\run;..\jvcl\jvcl\common;..\jvcl\jvcl\resources;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_ResourcePath>..\jvcl\jvcl\resources;$(DCC_ResourcePath)</DCC_ResourcePath>
+        <GenDll>true</GenDll>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <GenPackage>true</GenPackage>
+        <DCC_DependencyCheckOutputName>$(_EnvPackageOutput)\JvCore.bpl</DCC_DependencyCheckOutputName>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <VerInfo_Locale>3081</VerInfo_Locale>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+        <DCC_UnitSearchPath>..\jvcl\jvcl\lib\d25\win32;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_DcuOutput>..\jvcl\jvcl\lib\d25\win32</DCC_DcuOutput>
+        <DCC_Namespace>System;System.Win;WinApi;Vcl;Vcl.Imaging;Data;Data.Win;$(DCC_Namespace)</DCC_Namespace>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <VerInfo_Locale>3081</VerInfo_Locale>
+        <DCC_DcpOutput>..\..\..\..\lib</DCC_DcpOutput>
+        <DCC_BplOutput>..\..\..\..\lib</DCC_BplOutput>
+        <DCC_UnitSearchPath>..\..\..\..\lib;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>2</DCC_SymbolReferenceInfo>
+        <DCC_UnitSearchPath>..\jvcl\jvcl\lib\d25\win32\debug;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_DcuOutput>..\jvcl\jvcl\lib\d25\win32\debug</DCC_DcuOutput>
+        <DCC_Namespace>System;System.Win;WinApi;Vcl;Vcl.Imaging;Data;Data.Win;$(DCC_Namespace)</DCC_Namespace>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <VerInfo_Locale>3081</VerInfo_Locale>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="Jcl.dcp"/>
+        <DCCReference Include="JclVcl.dcp"/>
+        <DCCReference Include="vclx.dcp"/>
+        <DCCReference Include="vcl.dcp"/>
+        <DCCReference Include="rtl.dcp"/>
+        <DCCReference Include="dbrtl.dcp"/>
+        <DCCReference Include="vclimg.dcp"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvGnugettext.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvExButtons.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvExCheckLst.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvExComCtrls.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvExControls.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvExExtCtrls.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvExForms.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvExGrids.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvExMask.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvExStdCtrls.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvJVCLAboutForm.pas">
+            <Form>JvJVCLAboutForm</Form>
+        </DCCReference>
+        <DCCReference Include="..\jvcl\jvcl\run\JVCLVer.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvConsts.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvWin32.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvColorProvider.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvComponentBase.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvComponent.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvExtComponent.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvContextProvider.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvDataProvider.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvDataProviderIntf.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvDynControlEngine.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvDynControlEngineIntf.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvDynControlEngineVCL.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvDynControlEngineTools.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvDsgnIntf.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvJCLUtils.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvJVCLUtils.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvMaxPixel.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvMouseTimer.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvPoweredBy.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvProgressUtils.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvPropertyStore.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvPropertyStoreEditorIntf.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvPropertyStorage.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvStrings.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvThemes.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvTypes.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvVersionInfo.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvActions.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvTranslateString.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvAppIniStorage.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvAppRegistryStorage.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvAppStorage.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvAppStorageSelectList.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvBaseDlg.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvCaret.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvResources.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvClipbrd.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvAutoComplete.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvBackgrounds.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvDataSourceIntf.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvOfficeDragBarForm.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvHotTrackPersistent.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvStdEditActions.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvValidators.pas"/>
+        <DCCReference Include="..\jvcl\jvcl\run\JvErrorIndicator.pas"/>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Package</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Parameters>
+                    <Parameters Name="UseLauncher">False</Parameters>
+                    <Parameters Name="LoadAllSymbols">True</Parameters>
+                    <Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+                </Parameters>
+                <VersionInfo>
+                    <VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+                    <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+                    <VersionInfo Name="MajorVer">3</VersionInfo>
+                    <VersionInfo Name="MinorVer">41</VersionInfo>
+                    <VersionInfo Name="Release">0</VersionInfo>
+                    <VersionInfo Name="Build">0</VersionInfo>
+                    <VersionInfo Name="Debug">False</VersionInfo>
+                    <VersionInfo Name="PreRelease">False</VersionInfo>
+                    <VersionInfo Name="Special">False</VersionInfo>
+                    <VersionInfo Name="Private">False</VersionInfo>
+                    <VersionInfo Name="DLL">False</VersionInfo>
+                    <VersionInfo Name="Locale">1033</VersionInfo>
+                    <VersionInfo Name="CodePage">1252</VersionInfo>
+                </VersionInfo>
+                <VersionInfoKeys>
+                    <VersionInfoKeys Name="CompanyName">Project JEDI</VersionInfoKeys>
+                    <VersionInfoKeys Name="FileDescription">JVCL Core Components Runtime Package</VersionInfoKeys>
+                    <VersionInfoKeys Name="FileVersion">3.41.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="InternalName">JvCore</VersionInfoKeys>
+                    <VersionInfoKeys Name="LegalCopyright">Copyright (C) 1999, 2013 Project JEDI</VersionInfoKeys>
+                    <VersionInfoKeys Name="LegalTrademarks"/>
+                    <VersionInfoKeys Name="OriginalFilename">JvCore.bpl</VersionInfoKeys>
+                    <VersionInfoKeys Name="ProductName">JEDI Visual Component Library</VersionInfoKeys>
+                    <VersionInfoKeys Name="ProductVersion">3.41.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="Comments">3.41 Build 0</VersionInfoKeys>
+                </VersionInfoKeys>
+                <Source>
+                    <Source Name="MainSource">JvCore.dpk</Source>
+                </Source>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+</Project>

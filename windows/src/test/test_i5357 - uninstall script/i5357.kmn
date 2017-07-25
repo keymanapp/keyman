@@ -1,0 +1,7 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I5357 - Uninstall Script'
+begin Unicode > use(main)
+
+
+group(main) using keys
++ [K_U] > 'Uninstall'

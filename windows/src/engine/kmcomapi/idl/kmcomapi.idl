@@ -1,0 +1,29 @@
+[
+  uuid(C0578821-7C72-419B-8EF0-55FB7DB3BA6F),
+  version(1.1),
+  helpstring("Tavultesoft Keyman Library")
+]
+library kmcomapi
+{
+
+  importlib("stdole2.tlb");
+
+  #include "forward.idl"
+
+  #include "base.idl"
+
+  #include "tavultesoftkeyman.idl"
+
+  #include "keymanaddin.idl"
+  #include "keymanproduct.idl"
+  #include "keymanerror.idl"
+  #include "keymankeyboard.idl"
+  #include "keymanlanguage.idl"
+  #include "keymanlicence.idl"
+  #include "keymanoption.idl"
+  #include "keymanpackage.idl"
+  #include "keymansysteminfo.idl"
+  #include "keymanvisualkeyboard.idl"
+
+  #include "keymancontrol.idl"
+};

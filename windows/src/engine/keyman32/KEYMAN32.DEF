@@ -1,0 +1,40 @@
+LIBRARY   KEYMAN32
+
+EXPORTS
+            Keyman_GetInitialised
+			Keyman_Initialise
+			Keyman_Exit
+			Keyman_ForceKeyboard
+			Keyman_StopForcingKeyboard
+			Keyman_BuildKeyboardList
+			Keyman_GetLastActiveWindow
+			Keyman_GetLastFocusWindow
+			GetKeymanKeyboardInfo
+			GetKeymanInfo
+			GetSystemStore
+			KMSetOutput
+			KMGetContext
+			KMQueueAction
+			KMDisplayIM
+			KMHideIM
+			KMGetActiveKeyboard
+			KMGetKeyboardPath
+			
+      TIPActivateEx
+      TIPActivateKeyboard
+			TIPProcessKey
+      GetKeyboardPreservedKeys
+
+			GetActiveKeymanID
+			Keyman_RegisterControllerWindow
+			Keyman_UnregisterControllerWindow
+			Keyman_RestartEngine
+			Keyman_GetAPIVersion
+			
+      Keyman_SendMasterController
+      Keyman_PostControllers
+      Keyman_PostMasterController
+      
+      Keyman_StartExit
+      Keyman_ResetInitialisation
+      

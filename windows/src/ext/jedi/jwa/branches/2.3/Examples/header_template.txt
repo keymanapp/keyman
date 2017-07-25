@@ -1,0 +1,53 @@
+{******************************************************************************}
+{ JEDI example <name> 													   }
+{ http://jedi-apilib.sourceforge.net										   }
+{ 																			   }
+{ Obtained through: Joint Endeavour of Delphi Innovators (Project JEDI)        }
+{ 																			   }
+{ Author(s): <name(s)>														   }
+{ Creation date: <xy> <month name> 2008 					   				   }
+{ Last modification date:													   }
+{ 																			   }
+{ Description: <what does it do?>											   }
+{ 																			   }
+{ 																			   }
+{ Preparations: <what does it need to be usable>							   }
+{ 																			   }
+{ Article link: <link to article on JEDI if any>							   }
+{ 																			   }
+{ Version history: <date : changes>											   }
+{ 																			   }
+{ <licenses here if any. The author can freely decide what and if any license  }
+{ should be used. The license however must comply to the open source thought   }
+{ of the JEDI project. It also must not allo any charge for the example.       }
+{ E.g. use GPL (>= 2) or MPL (1.1)	>  										   }
+{******************************************************************************}
+
+Example:
+
+{******************************************************************************}
+{ JEDI example Example Project											   }
+{ http://jedi-apilib.sourceforge.net										   }
+{ 																			   }
+{ Obtained through: Joint Endeavour of Delphi Innovators (Project JEDI)        }
+{ 																			   }
+{ Author(s): Christian Wimmer												   }
+{ Creation date: 23th May 2008 					   				   			   }
+{ Last modification date: 23th May 2008										   }
+{ 																			   }
+{ Description: Shows how to use the template header in new examples  		   }
+{ 																			   }
+{ 																			   }
+{ Preparations: JWA must be ready to use.       							   }
+{ 																			   }
+{ 																			   }
+{ Version history: 23th May 2008 initial release				     		   }
+{ 																			   }
+{ No license. Use this example with no warranty at all and on your own risk.   }
+{ This example is just for learning purposes and should not be used in 		   }
+{ productive environments.													   }
+{ The code has surely some errors that need to be fixed. In such a case	   	   }
+{ you can contact the author(s) through the JEDI API hompage, the mailinglist  }
+{ or via the article link.													   }
+{ 																			   }	 	 		
+{******************************************************************************}

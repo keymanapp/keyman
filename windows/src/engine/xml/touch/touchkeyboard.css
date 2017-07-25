@@ -1,0 +1,343 @@
+/*
+kmwosk.css: main CSS for keymanweb on-screen keyboard and other objects
+*/
+
+@font-face {
+  font-family: SpecialOSK;
+  font-style: normal;
+  font-weight: normal;
+  src: url('fonts/keymanweb-osk.eot');
+  src: url('fonts/keymanweb-osk.eot?#iefix') format('embedded-opentype'),
+    url('fonts/keymanweb-osk.ttf') format('truetype'),
+    url('fonts/keymanweb-osk.woff') format('woff');
+}
+
+.phone .kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;background-color:rgba(0,0,0,0.8);}
+.phone .kmw-osk-inner-frame{margin:0;background:transparent;}
+.phone .kmw-key-layer-group{position:fixed;left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#666666;}
+.phone .kmw-key-layer{position:fixed;left:0;bottom:0;width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
+.phone .kmw-key-row {position:fixed;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}
+.phone .kmw-key-square {position:fixed;display:inline-block;height:100%;max-height:100%;border:none;margin:0 0 0 5px;z-index: 10000;padding:0 0 0 1px;background-color:transparent;cursor:default;}
+.phone .kmw-key-square-ex {display:inline-block;box-sizing:border-box;margin:0 0 0 5px;z-index:10001;padding:0;background-color:transparent;cursor:default;}
+.phone .kmw-key {display:block;position:fixed;margin:2px;border-radius:6px;text-align:center;padding-top:0.25em;box-sizing:border-box;overflow:hidden;}
+.phone .kmw-key-label{position:absolute;left:2px;top:0px;font:0.5em Arial;color:#aaa;background-color:transparent;z-index:10000;}
+.phone .kmw-key-text{position:relative;left:0;top:0;}
+ 
+.phone .kmw-key-row {-webkit-touch-callout:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+        
+.tablet .kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;background-color:rgba(0,0,0,0.8);}
+.tablet .kmw-osk-inner-frame{margin:0;background:transparent;}
+.tablet .kmw-key-layer-group{position:fixed;left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#666666;}
+.tablet .kmw-key-layer{position:fixed;left:0;bottom:0;width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
+.tablet .kmw-key-row {position:fixed;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}
+.tablet .kmw-key-square {position:fixed;display:inline-block;height:100%;max-height:100%;border:none;margin:0 0 0 5px;z-index: 10000;padding:0 0 0 1px;background-color:transparent;cursor:default;}
+.tablet .kmw-key-square-ex {display:inline-block;box-sizing:border-box;margin:0 0 0 5px;z-index:10001;padding:0;background-color:transparent;cursor:default;}
+.tablet .kmw-key {display:block;position:fixed;margin:2px;border-radius:8px;text-align:center;padding-top:0.4em;box-sizing:border-box;overflow:hidden;}
+.tablet .kmw-key-label{position:absolute;left:2px;top:2px;font:0.5em Arial;color:#aaa;background-color:transparent;z-index:10000;}
+.tablet .kmw-key-text{position:relative;left:0;top:0;}
+        
+.desktop .kmw-osk-frame{position:absolute;width:auto;height:auto;left:0;top:0;display:none;margin:0;padding:0;
+          border:2px solid #ad4a28;border-radius:2px;background-color:#666;box-sizing:border-box;-moz-box-sizing:border-box;}
+.desktop .kmw-osk-inner-frame{margin:0;background-color:#666;border:2px solid #ad4a28;box-sizing:border-box;-moz-box-sizing:border-box;}
+.desktop .kmw-key-layer-group{width:100%;height:100%;margin:0;padding:0;border:none;background:transparent;}
+.desktop .kmw-key-layer{width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
+.desktop .kmw-key-row{position:static;width:100%;height:20%;margin:0;padding:0;border:none;overflow:hidden;}
+.desktop .kmw-key-square{position:relative;height:100%;display:inline-block;float:left;margin:0;z-index:10000; font-size:0.8em;
+          padding:1px 0 1px 0;background-color:transparent;cursor:default;box-sizing:border-box;-moz-box-sizing:border-box;}
+.desktop .kmw-key {display:block;margin:0;border-radius:6px;text-align:center;box-sizing:border-box;-moz-box-sizing:border-box;
+          overflow:hidden;width:100%;height:100%;}
+.desktop .kmw-key-label{position:absolute;left:2px;top:2px;font:0.5em Arial;color:#888;background-color:transparent;}
+.desktop .kmw-key-text{position:relative;left:2px;top:2px;}
+ 
+/* Additional desktop element styles */
+.kmw-footer{height:16px;width:100%;margin:0;padding:0;padding-top:2px;background-color:#ad4a28;border-radius:0 0 6px 6px;}
+.kmw-title-bar{height:20px; width:100%; margin:0; background-color:#ad4a28; padding:0;border-radius:6px 6px 0 0;}
+.kmw-title-bar-caption{color:white;margin:0 20px 0 4px;font:bold 0.8em Arial;}
+.kmw-title-bar-actions{position: absolute; cursor: default; right:2px; top:0; width: 33px; height: 13px;}
+.kmw-footer-caption{color:#fff;font:0.7em Arial;margin:0 0 0 4px;}
+
+.kmw-footer-resize{cursor:se-resize;position:absolute;right:2px;bottom:2px;width:16px;height:16px;overflow:hidden;
+          font-family:SpecialOSK;color:white;}
+.kmw-footer-resize:hover{font-weight:bold;}
+.kmw-footer-resize:before {content:'\e023';}
+
+.kmw-close-button{position: absolute; cursor: default; right:0; top:2px; width:16px; height:16px;
+          font-family:SpecialOSK;color:white;}
+.kmw-close-button:hover{font-weight:bold;}
+.kmw-close-button:before {content:'\e025';}
+
+.kmw-pin-image{display: none; position: absolute; cursor: default; right:18px; top:2px; width:16px; height:16px;
+          font-family:SpecialOSK;color:white;}
+.kmw-pin-image:hover{font-weight:bold;}
+.kmw-pin-image:before{content:'\e024';}
+
+/* Common key appearance styles (can override with form-factor styles if necessary) */
+.kmw-key-default{color:#000;background-color:#eee;}
+.kmw-key-shift{color:#aaa;background-color:#ddd;} /*color was #88f (blue) */
+.kmw-key-shift-on{color:#88f;background-color:#ccf;}
+.kmw-key-deadkey{color:#0d0;background-color:#eee;}
+.kmw-key-blank{color:#000;background-color:rgba(100,100,100,0.5);}
+.kmw-key-hidden{visibility:hidden;}
+.kmw-key-touched{background-color:#88f;}
+
+/* Adjust vertical position of images on special keys */
+.tablet .kmw-key-shift, .tablet .kmw-key-shift-on{padding-top:0.5em; font-size:0.8em !important;}
+
+/* Set special font and style for modifier and special key images */
+body div.kmw-key-shift span.kmw-key-text {font-family:SpecialOSK !important;font-size:1em !important;}
+body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;font-size:1em !important;}
+
+#kmw-popup-keys div.kmw-key-shift span.kmw-key-text {font-family:SpecialOSK !important;}
+
+   
+/* Box styles for keyboard-specific OSK (e.g. EuroLatin) and if no keyboard active (desktop only) */
+.kmw-osk-static, .kmw-osk-none{text-align:left;font:12px sans-serif;border:solid 1px #ad4a28;color:blue;background-color:white;}
+.kmw-osk-none{padding:4px 6px 6px}
+.kmw-osk-none:before{content:'Installing keyboard...';}
+      
+/* OSK language menu styles */
+#kmw-language-menu{position:absolute;left:0;width:232px;max-width:232px;z-index:10004;background-color:rgba(128,128,128,1);
+        border:3px solid #888;padding:0;border-radius:4px;-webkit-border-radius:4px;
+        box-shadow:3px 3px 2px #ccc;-webkit-box-shadow:3px 3px 2px #ccc;
+        overflow:hidden;
+        -ms-touch-action:none;-webkit-user-select:none;
+        }
+        
+#kmw-language-menu *{-ms-touch-action:none;-webkit-user-select:none;}
+    
+#kmw-language-menu p{font-family:Arial,Helvetica,sans-serif; font-size:16px;
+        border-top:1px dotted #989898; border-bottom:1px dotted #989898;
+        margin:0; padding:10px 0px 10px 10px; overflow:hidden;
+        color:#0000ff; background-color:transparent; white-space:nowrap;
+        }
+
+#kmw-language-menu div.kbd-list-open p.kbd-list-entry {display: block;}
+#kmw-language-menu div.kbd-list-closed p.kbd-list-entry {display: none;}
+#kmw-language-menu-background{position:fixed;left:0;top:0;width:100%;height:100%;background-color:transparent;z-index:10003;}
+
+#kmw-menu-scroll-container{position:absolute;left:0;top:0px;width:200px;max-width:200px;overflow:auto;z-index:10005;}
+#kmw-menu-scroller{position:absolute;left:0;top:0;width:200px;max-width:200px;background-color:#e0e0e0;overflow:auto;overflow-x:hidden;}
+
+#kmw-menu-index {position:absolute;right:0;width:32px;font-size:14px;}
+#kmw-menu-index p {text-align:center;border:none;padding:0px 2px;margin:0;color:white;}
+
+#kmw-menu-footer{height:2px;background-color:#808080;}
+
+#kmw-language-menu .kbd-list{position:relative;padding-left:10px;background:transparent;}
+#kmw-language-menu .kbd-single-entry{position:relative;padding-left:10px;background:transparent;}
+#kmw-language-menu .kbd-list-entry{position:relative;padding-left:30px;background:transparent;}
+#kmw-language-menu .selected {color:white; background-color:#c82;}/*#ad4a28;}*/
+#kmw-language-menu .current {font-weight:bold;}
+
+/* Popup key styles */
+#kmw-popup-keys{position:fixed;display:block;width:auto;height:auto;overflow-y:visible;padding:5px 5px 5px 0;border-radius:5px;
+        background-color:#bbb;border:2px solid blue;}
+#kmw-popup-keys .arrow-border{position:fixed;height:0;width:0;z-index:10002;border:15px solid transparent;border-top-color:blue;}
+#kmw-popup-keys .arrow-content{position:fixed;height:0;width:0;border:12px solid transparent;border-top-color:#bbb;}
+
+/* Popup icon style (and content)*/
+.kmw-key-popup-icon{position:absolute;display:block;visibility:visible;right:8%;top:0%;width:8px;height:8px;
+      font:bold 0.5em Arial;color:#aaa;}
+.kmw-key-popup-icon:before{content:'\2022';}
+
+/* Styles for other KMW elements (keyboard loading wait notification, etc.) */
+.kmw-wait-background{display:none;position:absolute;left:0;top:0;width:100%;height:100%;
+        background-color:rgba(0,0,0,0.0);z-index:11000;}
+.kmw-wait-box{width:240px; height:80px;margin-top:20%;margin-left:auto;margin-right:auto;
+        border:3px solid #ad4a28;border-radius:8px;text-align:center;padding:0px;background:white;}
+.kmw-alert-close{float:right;background:url('icons.gif') no-repeat -30px 0; height:13px; width:15px;}
+.kmw-wait-text{clear:both; margin:4px;white-space:nowrap;}
+.kmw-wait-graphic{width:100%;height:75%;background:url('ajax-loader.gif') no-repeat;background-position:center top;}
+.kmw-alert-text{margin:10px;white-space:default;}
+
+.kmw-spacebar-caption{font:0.6em Arial !important;color:rgba(0,0,0,0.15);}
+
+/*
+======================
+==Keyboard Styling==
+======================
+*/
+
+.phone .kmw-osk-frame, .phone .kmw-osk-inner-frame, .phone .kmw-key-layer-group {
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #8E959E), color-stop(50%, #666C75), color-stop(100%, #3D434C)) !important;
+    background-color: #9199A4;
+    border-top: 1px solid #3A3D42 !important;
+    padding-top: 3px !important;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset !important;
+}
+
+.phone .kmw-key-shift {
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #fff), color-stop(100%, #D3D3D9));
+    background-color: #E0E0E4;
+    border-color: rgba(255, 255, 255, 0.45) -moz-use-text-color -moz-use-text-color;
+    border-width: 1px;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px white;
+}
+
+.phone .kmw-key-shift, .tablet .kmw-key-shift-on {
+    border-width: 1px;
+    border-radius: 4px;
+    border-color: #71717A;
+    text-shadow: 0 1px 1px white;
+}
+
+.phone .kmw-key-shift-on {
+    background-image: -webkit-linear-gradient(#B5B5B5, #93969B) !important;
+}
+
+.phone .kmw-key-touched {
+    background-image: -webkit-linear-gradient(#B5B5B5, #93969B) !important;
+}
+
+.phone #kmw-popup-keys{
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #8E959E), color-stop(50%, #666C75), color-stop(100%, #3D434C)) !important;
+    padding-top: 1px !important;
+    border: 2px solid #7D8591 !important;
+}
+
+.phone #kmw-popup-keys .kmw-key-text{
+    top: -10%;
+}
+
+.phone #kmw-popup-keys .arrow-border{
+    border-top-color: #7D8591 !important;
+}
+
+.phone #kmw-popup-keys .arrow-content{
+    border-top-color: #3D434C !important;
+}
+
+.phone .kmw-key-default {
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #fff), color-stop(100%, #D3D3D9));
+    background-color: #E0E0E4;
+    border-color: rgba(255, 255, 255, 0.45) -moz-use-text-color -moz-use-text-color;
+    border-width: 1px;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px white;
+}
+
+.phone .kmw-key-shift .kmw-key-text {
+    color: gray;
+    font-size: 0.9em !important;
+    text-shadow: 0 1px 1px #fff;
+    position: relative;
+    top: 17.5%;
+}
+
+.phone .kmw-key-shift-on .kmw-key-text{
+    color: #fff;
+    font-size: 0.9em !important;
+    text-shadow: 0 1px 1px gray;
+    position: relative;
+    top: 17.5%;
+}
+
+.phone .kmw-key-default .kmw-key-text {
+    top: 10%;
+    text-decoration: none !important;
+    color: #000 !important;
+}
+
+.phone .kmw-spacebar-caption{
+    color: #B2B2B2 !important;
+}
+
+/*
+======================
+==Keyboard Styling==
+======================
+*/
+
+.tablet .kmw-osk-frame, .tablet .kmw-osk-inner-frame, .tablet .kmw-key-layer-group {
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #9199A4), color-stop(50%, #7D8591), color-stop(100%, #535C69)) !important;
+    background-color: #9199A4;
+    border-top: 1px solid #3A3D42 !important;
+    padding-top: 3px !important;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset !important;
+}
+
+.tablet .kmw-key-shift {
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #EEEFF0), color-stop(50%, #E0E0E4), color-stop(100%, #D3D3D9));
+    background-color: #E0E0E4;
+    -webkit-box-shadow: #333 1px 1px 5px 0px;
+    border-color: rgba(255, 255, 255, 0.45) -moz-use-text-color -moz-use-text-color;
+    border-width: 1px;
+    border-radius: 6px;
+    text-shadow: 0 1px 1px white;
+}
+
+.tablet .kmw-key-shift, .tablet .kmw-key-shift-on {
+    border-width: 1px;
+    border-radius: 6px;
+    border-color: #71717A;
+}
+
+.tablet .kmw-key-shift-on {
+    background-image: -webkit-linear-gradient(#B5B5B5, #93969B) !important;
+}
+
+.tablet .kmw-key-touched {
+    background-image: -webkit-linear-gradient(#B5B5B5, #93969B) !important;
+}
+
+.tablet #kmw-popup-keys{
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #9199A4), color-stop(50%, #7D8591), color-stop(100%, #535C69)) !important;
+    padding-top: 1px !important;
+    border: 2px solid #7D8591 !important;
+}
+
+.tablet #kmw-popup-keys .arrow-border{
+    border-top-color: #7D8591 !important;
+}
+
+.tablet #kmw-popup-keys .arrow-content{
+    border-top-color: #535C69 !important;
+}
+
+.tablet .kmw-key-default {
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #EEEFF0), color-stop(50%, #E0E0E4), color-stop(100%, #D3D3D9));
+    background-color: #E0E0E4;
+    -webkit-box-shadow: #333 1px 1px 5px 0px;
+    border-color: rgba(255, 255, 255, 0.45) -moz-use-text-color -moz-use-text-color;
+    border-width: 1px;
+    border-radius: 6px;
+    text-shadow: 0 1px 1px white;
+}
+.tablet .kmw-key-shift .kmw-key-text {
+    color: gray;
+    font-size: 0.9em !important;
+    text-shadow: 0 1px 1px #fff;
+    position: relative;
+    top: 20%;
+}
+
+.tablet .kmw-key-shift-on .kmw-key-text{
+    color: #fff;
+    font-size: 0.9em !important;
+    text-shadow: 0 1px 1px gray;
+    position: relative;
+    top: 20%;
+}
+
+.tablet .kmw-key-default .kmw-key-text {
+    top: 5%;
+    text-decoration: none !important;
+    color: #000 !important;
+}
+
+.tablet .kmw-spacebar-caption{
+    color: #B2B2B2 !important;
+}
+
+.tablet .kmw-key-popup-icon{
+    text-shadow: 0 1px 1px #fff;
+}
+
+
+body {
+  cursor: default;
+  margin: 0;
+  padding: 0;
+  border-top: solid 1px #444444;
+}

@@ -1,0 +1,32 @@
+﻿c https://github.com/tavultesoft/keymanweb/pull/30
+store(&VERSION) '9.0'
+store(&NAME) 'GitHub KeymanWeb #30'
+store(&TARGETS) 'any windows'
+store(&VISUALKEYBOARD) 'gh_kmw_30.kvk'
+store(&LAYOUTFILE) 'gh_kmw_30-layout.js'
+
+begin Unicode > use(main)
+
+
+group(main) using keys
+
+store(s1) "b"
+store(s2) "CDE"
+store(s3) "FGH"
+
++ 'a' > 'b'
+
++ 'x' > "YES"   
+
++ 'z' > 'ZZZ'
++ 'y' > 'y not?'
+
+nul 'ZZZ' + 'z' > 'EMPTY ZZZ'
+
+nul + 'z' > 'empty context'
+
+match > use(combine)
+
+group(combine)
+
+any(s1) any(s1) > index(s2, 1) index(s3, 2) 

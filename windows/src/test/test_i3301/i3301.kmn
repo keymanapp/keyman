@@ -1,0 +1,7 @@
+﻿c See I3250.kmn.
+store(&VERSION) '8.0'
+store(&NAME) 'I3301 - Alt combos'
+begin Unicode > use(main)
+
+
+group(main) using keys

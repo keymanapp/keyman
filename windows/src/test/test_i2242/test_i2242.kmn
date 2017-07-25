@@ -1,0 +1,13 @@
+﻿c Press abc after a CR, LF or TAB
+c Should show "<TAB>abc" or "<CR>abc" etc
+store(&VERSION) '7.0'
+store(&NAME) 'Test I2242 - \r \n etc'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
+xd + 'a' > context '<CR>a'
+xa + 'a' > context '<LF>a'
+x9 + 'a' > context '<TAB>a'
+xd xa + 'a' > context '<CR><LF>a'

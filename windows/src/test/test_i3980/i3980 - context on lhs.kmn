@@ -1,0 +1,15 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I3980 - Context() on LHS'
+begin Unicode > use(main)
+
+
+group(main) using keys   
+
+store(b) 'bB'
+store(c) 'cC' 
+store(d) 'dD'
+
+'a' context(1) + 'a' > 'match(3)'
+any(b) context(1) + 'b' > 'match(3)'
+'c' any(c) context(2) + 'c' > 'match(3)'
+'d' any(d) context(1) context(2) context(3) + 'd' > 'match(5)'

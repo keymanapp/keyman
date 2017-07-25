@@ -1,0 +1,9 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I5261'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ 'a' > U+10054
+U+10054 + 'b' > context(1) U+10055

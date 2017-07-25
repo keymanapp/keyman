@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><!-- $Id: news.xml 681350 2008-07-31 12:09:41Z jeremias $ --><!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V1.1//EN" "http://svn.apache.org/viewvc/forrest/trunk/main/webapp/resources/schema/dtd/document-v12.dtd?view=co">
+<document>
+  <header>
+    <title>News</title>
+    <version>$Revision: 681350 $</version>
+  </header>
+  <body>
+    <section>
+      <title>26th March 2007 - Apache FOP 0.95beta Released</title>
+      <p>The Apache FOP team is delighted to present you a beta version of the
+        next production grade release of the new FOP codebase. This release
+        contains many bug fixes and new features. See the <link href="0.95/releaseNotes_0.95beta.html">Release Notes</link> for a list of
+        the most important changes.</p>
+    </section>
+    <section>
+      <title>30 October 2007 - New Committer</title>
+      <p>Welcome Max Berger!</p>
+    </section>
+    <section>
+      <title>15 October 2007 - New Committer</title>
+      <p>Welcome Adrian Cumiskey!</p>
+    </section>
+    <section>
+      <title>24th August 2007 - Apache FOP 0.94 Released</title>
+      <p>The Apache FOP team is pleased to present you the second production
+        grade release of the new FOP codebase. This release contains many bug
+        fixes and new features. See the <link href="0.94/releaseNotes_0.94.html">Release Notes</link> for a list of
+        the most important changes.</p>
+    </section>
+    <section>
+      <title>26 January 2007 - New Committer</title>
+      <p>Welcome Jay Bryant!</p>
+    </section>
+    <section>
+      <title>9 January 2007 - Apache FOP 0.93 released</title>
+      <p>
+        The Apache FOP team is proud to present to you the first
+        production grade release of the new FOP codebase. This release
+        has the new API first introduced in release 0.92 beta. It
+        contains again many bug fixes and new features.
+      </p>
+    </section>
+    <section>
+      <title>16 October 2006 - New Committer</title>
+      <p>Welcome Vincent Hennebert!</p>
+    </section>
+    <section>
+      <title>18 April 2006 - Apache FOP 0.92 beta released</title>
+      <p>
+        A second "beta" grade release of the new FOP codebase with a modified and
+        now considered stable API. The release contains many bug fixes as well as
+        new features mainly related to even more extensive support of the XSL-FO
+        specification. This is expected to be the last "beta" release before we
+        go to a 1.0 release!
+      </p>
+    </section>
+    <section>
+      <title>23 December 2005 - Apache FOP 0.91 beta released</title>
+      <p>
+        One month after the initial release we're happy present a "beta" grade
+        release of the new FOP codebase. It's mostly a bug fix release but also
+        contains a few new features. Thanks to all those who sent us feedback
+        on the initial release!
+      </p>
+    </section>
+    <section>
+      <title>22 November 2005 - Apache FOP 0.90 alpha 1 released</title>
+      <p>
+        The Apache FOP team is proud to present to you the largely rewritten 
+        codebase which is finally in a state where you can start to use it. 
+        It has taken over three years to get this far and over two years 
+        without a new release from the FOP project.
+      </p>
+      <p>
+        Please see also the 
+        <link href="http://mail-archives.apache.org/mod_mbox/xmlgraphics-fop-users/200511.mbox/%3c20051123002157.0EB0.JEREMIAS@apache.org%3e">announcement</link>.
+        <!-- TODO re-enable and the <link href="relnotes.html#FOP+0.90+alpha+1">release notes</link>.-->
+      </p>
+    </section>
+    <section>
+      <title>8 September 2005 - New Committer</title>
+      <p>Welcome Manuel Mall!</p>
+    </section>
+    <section>
+      <title>20 October 2004 - Creation of the Apache XML Graphics project</title>
+      <p>
+        The Apache Board of Directors agreed to the creation of the 
+        <link href="http://xmlgraphics.apache.org">Apache XML Graphics</link>
+        project which will be comprised of Batik and FOP. Both former 
+        Apache XML subprojects are in this way complying with the Board's desire
+        to improve project oversight. Both project teams also see additional
+        benefits of working more closely together.
+      </p>
+    </section>
+    <section>
+      <title>8 October 2004 - New Committer</title>
+      <p>Welcome Luca Furini!</p>
+    </section>
+    <section>
+      <title>24 April 2004 - New Committer</title>
+      <p>Welcome Simon Pepping!</p>
+    </section>
+    <section>
+      <title>7 March 2004 - New Committer</title>
+      <p>Welcome Web Maestro Clay Leeds!</p>
+    </section>
+    <section>
+      <title>10 January 2004 - New Committers</title>
+      <p>Welcome Chris Bowditch and Andreas Delmelle!</p>
+    </section>
+    <section>
+      <title>4 January 2004 - New Committer</title>
+      <p>Welcome Finn Bock!</p>
+    </section>
+    <section>
+      <title>29 November 2003 - New Committer</title>
+      <p>Welcome Peter Herweg!</p>
+    </section>
+    <section>
+      <title>18 July 2003 FOP 0.20.5 released</title>
+      <p>Changes since 0.20.4 include:</p>
+      <ul>
+        <li>Added support for PDF encryption</li>
+        <li>Perfomance tuning</li>
+        <li>Fixed link hotspot positioning</li>
+        <li>Fixed multi-threading issues</li>
+        <li>Added support for CCITT Group 4 encoded TIFF files</li>
+        <li>Dynamic JAI support</li>
+        <li>Added autoselecting portrait/landscape for PCL and PS Renderer</li>
+        <li>Added continued-label extension for tables</li>
+        <li>Improved AWT Font-measuring/rendering</li>
+        <li>Improved marker handling</li>
+        <li>Fixed problem with jpegs with icc profile and acrobat reader 5</li>
+        <li>Added a fontBaseDir property</li>
+        <li>TXTRenderer output encoding</li>
+        <li>border-spacing support</li>
+        <li>and a lot more bugfixes</li>
+      </ul>
+      <p>
+      See also the full text of the
+      <link href="http://mail-archives.apache.org/eyebrowse/ReadMsg?listName=fop-dev@xml.apache.org&amp;msgNo=6067">
+        announcement</link>.
+      <!-- TODO re-enable  and the <link href="relnotes.html#FOP+0.20.5">release notes</link>.-->
+      </p>
+    </section>
+    <section>
+      <title>29 June 2003 - New Committer</title>
+      <p>Welcome Glen Mazza!</p>
+    </section>
+    <section>
+      <title>23 May 2003 - FOP 0.20.5 Release Candidate 3 available</title>
+      <p>
+      See the full text of the <link href="http://mail-archives.apache.org/eyebrowse/ReadMsg?listName=fop-dev@xml.apache.org&amp;msgNo=5429">announcement</link>.
+      </p>
+    </section>
+    <section>
+      <title>18 February 2003 - FOP 0.20.5 Release Candidate 2 available</title>
+      <p>
+      See the full text of the <link href="http://mail-archives.apache.org/eyebrowse/ReadMsg?listName=fop-dev@xml.apache.org&amp;msgNo=4509">announcement</link>.
+      </p>
+    </section>
+    <section>
+      <title>2 February 2003 - New XML PMC</title>
+      <p>
+      Jeremias Maerki and Peter B. West are now representing FOP on the XML PMC.
+      </p>
+    </section>
+    <section>
+      <title>28 January 2003 - FOP logo contest</title>
+      <p>We are looking for a new logo. FOP logo
+      contest is started!</p>
+    </section>
+    <section>
+      <title>23 December 2002 - Official FOP Wiki</title>
+      <p>
+      See <link href="http://wiki.apache.org/xmlgraphics-fop/FOPProjectPages">FOP project pages</link> at the ApacheWiki.
+      </p>
+    </section>
+    <section>
+      <title>10 December 2002 - FOP 0.20.5 Release Candidate available</title>
+      <p>
+      See the full text of the <link href="http://marc.theaimsgroup.com/?l=fop-user&amp;m=103954279712704&amp;w=2">announcement</link>.
+      </p>
+    </section>
+    <section>
+      <title>23 November 2002 - EXLSFO project has been created</title>
+      <p>
+      The EXSLFO project is a community effort to define functional extensions
+      to thet XSL Formatting Objects specification. See the
+      <link href="http://exslfo.sourceforge.net">EXSLFO website</link> for details.
+      </p>
+    </section>
+    <section>
+      <title>22 November 2002 - New Committer</title>
+  <p>Welcome Victor Mote!</p>
+ </section>
+    <section>
+      <title>9 November 2002 - New Committer</title>
+  <p>Welcome Oleg Tkachenko!</p>
+ </section>
+
+    </body>
+</document>

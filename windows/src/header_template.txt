@@ -1,0 +1,17 @@
+(*
+  Name:             <Name>
+  Copyright:        <Copyright>
+  Documentation:    <Documentation>
+  Description:      <Description>
+  Create Date:      <CreateDate>
+
+  Modified Date:    <ModifiedDate>
+  Authors:          <Authors>
+  Related Files:    <RelatedFiles>
+  Dependencies:     <Dependencies>
+
+  Bugs:             <Bugs>
+  Todo:             <Todo>
+  Notes:            <Notes>
+  History:          <History>
+*)

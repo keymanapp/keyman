@@ -1,0 +1,7 @@
+﻿store(&VERSION) '8.0'
+store(&NAME) 'Test I2576 - OSK characters'
+store(&VISUALKEYBOARD) 'i2576.kvk'
+begin Unicode > use(main)
+
+
+group(main) using keys

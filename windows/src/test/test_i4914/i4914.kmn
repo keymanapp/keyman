@@ -1,0 +1,13 @@
+﻿store(&VERSION) '9.0'
+begin Unicode > use(main)
+
+ store(E) "ເ"
+ store(CLao) "ກຂຄງຈຽຈຊຍດຕຖທນບປຜຝພຟມຢຣລວວສວສຫຮໜໝ" "ອ" U+0EBC
+ store(MaiKan) U+0EB1          
+ store(NY) "ຍ"
+ store(C)  "kKCgjJcxñdtTDnbpPFBfmyrlvwsVSHhNM"
+ store(IA) "ຽ"
+
+group(main) using keys
+
+ $E any(CLao) any(CLao) $MaiKan $NY + any(C) > context(2) context(3) $MaiKan $IA index(CLao,7)

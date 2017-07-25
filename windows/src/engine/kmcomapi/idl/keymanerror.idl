@@ -1,0 +1,95 @@
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  tagKeymanErrorSeverity                                                      /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+
+  [
+    uuid(0BD0918F-020B-4F97-BC9C-E24004792FEB),
+    version(1.0)
+  ]
+  typedef enum tagKeymanErrorSeverity
+  {
+    kesFatal = 0,
+    kesError = 1,
+    kesWarning = 2,
+    kesHint = 3
+  } KeymanErrorSeverity;
+
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanErrors                                                               /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(D3BB819F-66BF-4ADF-B6E8-F1E267095CC9),
+    version(1.0),
+    helpstring("Dispatch interface for KeymanErrors Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanErrors: IKeymanCollection
+  {
+    [propget, id(0x00000000), defaultcollelem]
+    HRESULT _stdcall Items([in] long Index, [out, retval] IKeymanError ** Value );
+    [id(0x00000005)]
+    HRESULT _stdcall SetReboot( void );
+    [propget, id(0x00000006)]
+    HRESULT _stdcall RebootRequired([out, retval] VARIANT_BOOL * Value );
+    [id(0x00000007)]
+    HRESULT _stdcall Clear( void );
+  };
+
+  [
+    uuid(4F04AF8B-6F8F-48A0-B0B4-CA8FD273FB5C),
+    version(1.0),
+    helpstring("KeymanErrors Object"),
+    noncreatable
+  ]
+  coclass KeymanErrors
+  {
+    [default] interface IKeymanErrors;
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanError                                                                /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(0E4963E8-0A3B-4910-BE59-E6A869B34C43),
+    version(1.0),
+    helpstring("Dispatch interface for KeymanError Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanError: IDispatch
+  {
+    [propget, id(0x00000001)]
+    HRESULT _stdcall ErrorCode([out, retval] long * Value );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall Description([out, retval] BSTR * Value );
+    [propget, id(0x00000006)]
+    HRESULT _stdcall ParameterCount([out, retval] long * Value );
+    [propget, id(0x00000007)]
+    HRESULT _stdcall Parameter([in] long Index, [out, retval] BSTR * Value );
+    [propget, id(0x00000008)]
+    HRESULT _stdcall ParameterValue([in] long Index, [out, retval] BSTR * Value );
+    [propget, id(0x00000003)]
+    HRESULT _stdcall Severity([out, retval] long * Value );
+  };
+
+  [
+    uuid(CA269001-9A16-4C0B-8029-6DCE1607A6C1),
+    version(1.0),
+    helpstring("KeymanError Object"),
+    noncreatable
+  ]
+  coclass KeymanError
+  {
+    [default] interface IKeymanError;
+  };

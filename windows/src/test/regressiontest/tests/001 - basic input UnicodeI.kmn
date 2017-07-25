@@ -1,0 +1,20 @@
+c RegressionTest: Basic Input Unicode
+c Font: Arial
+c Encoding: Unicode
+c Description: Tests basic input with simple context rules (ANSI)
+c Procedure: Press "ABC DEF" (no quotes)
+c AutoProc: S+ K_A K_B K_C K_SPACE K_D K_E K_F S-
+c FinalOutput: "abc def"
+
+VERSION 9.0
+NAME "RT Basic Input Unicode"
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ 'A' > 'a'
++ 'B' > 'b'
++ 'C' > 'c'                                
+
+'DE' + 'F' > 'def'

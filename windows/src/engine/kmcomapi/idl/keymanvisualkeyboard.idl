@@ -1,0 +1,32 @@
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanVisualKeyboard                                                       /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(F8289232-DD0F-4261-BBF3-C72484E61E33),
+    version(1.0),
+    helpstring("Dispatch interface for KeymanVisualKeyboard Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanVisualKeyboard: IDispatch
+  {
+    [id(0x00000001)]
+    HRESULT _stdcall Uninstall( void );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall Filename([out, retval] BSTR * Value );
+  };
+
+  // KeymanVisualKeyboard
+
+  [
+    uuid(255CC18B-7F8A-4939-86C2-C05C664B8AFF),
+    version(1.0),
+    helpstring("KeymanVisualKeyboard Object")
+  ]
+  coclass KeymanVisualKeyboard
+  {
+    [default] interface IKeymanVisualKeyboard;
+  };

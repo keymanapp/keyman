@@ -1,0 +1,1 @@
+KeymanWeb.KR(new Keyboard_i3638());function Keyboard_i3638(){this.KI="Keyboard_i3638";this.KN="I3638 (ሑກअ)";this.KV=null;this.KH='';this.KM=0;this.KVER="9.0.420.0";this.gs=function(t,e){return this.g0(t,e);};this.g0=function(t,e){var k=KeymanWeb,r=0,m=0;return r;};}

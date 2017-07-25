@@ -1,0 +1,49 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I3430'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
+if(&platform = 'native windows desktop') + 'a' > 'A:Windows'   c Windows Desktop
+if(&platform = 'native macosx desktop') + 'a' > 'A:MacOS X'
+if(&platform = 'native linux desktop') + 'a' > 'A:Linux/UNIX'
+
+if(&platform = 'ios phone') + 'a' > 'A:iPhone'
+if(&platform = 'iphone') + 'a' > 'A:iPhone'
+if(&platform = 'ios tablet') + 'a' > 'A:iPad'
+if(&platform = 'ipad') + 'a' > 'A:iPad'
+
+if(&platform = 'android phone') + 'a' > 'A:AndroidPhone'
+if(&platform = 'android tablet') + 'a' > 'A:AndroidTablet'
+
+c try and avoid: if(&x-resolution > '800') + 'a' > '...'
+
+c if(&platform = 'windows desktop vista')
+if(&platform = 'windows phone') + 'a' > 'A:Windows Phone'
+if(&platform = 'windows tablet') + 'a' > 'A:Windows Tablet'
+
+c Generic operating systems, either web or native
+
+if(&platform = 'ios') + 'b' > 'B:IOS'
+if(&platform = 'android') + 'b' > 'B:Android'
+if(&platform = 'windows') + 'b' > 'B:Windows'
+if(&platform = 'macosx') + 'b' > 'B:Mac OS X'                 
+
+c Classes of platforms, either web or native
+
+if(&platform = 'desktop') + 'c' > 'C:Desktop'
+if(&platform = 'mobile') + 'c' > 'C:Mobile'
+if(&platform = 'tablet') + 'c' > 'C:Tablet'
+                                              
+c Testing against web or native
+
+if(&platform = 'web') + 'd' > 'D:Web'
+c if(&platform = 'silverlight') + 'd' > 'D:Silverlight'
+if(&platform = 'native') + 'd' > 'D:Native'
+
+c baselayout('kbdus.dll') + 'z' > '...'
+c if(&baselayout = 'kbdus.dll') + 'z' > 'Z ON US QWERTY'  c specific to windows
+c if(&baselayout = 'kbdfr.dll') + 'z' > 'Z ON French AZERTY'
+c if(&baselayout = 'en-US') + 'y' > 'Y ON US'  c generic
+c if(&baselayout = 'fr-FR') + 'y' > 'Y ON French Azerty'

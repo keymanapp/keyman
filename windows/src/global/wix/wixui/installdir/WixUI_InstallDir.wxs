@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+First-time install dialog sequence:      Maintenance dialog sequence:
+ - WixUI_WelcomeDlg                     - WixUI_MaintenanceWelcomeDlg
+ - WixUI_LicenseAgreementDlg            - WixUI_MaintenanceTypeDlg
+ - WixUI_InstallDirDlg                    - WixUI_InstallDirDlg
+   - WixUI_VerifyReadyDlg                 - WixUI_VerifyReadyDlg
+   - WixUI_DiskCostDlg
+-->
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2003/01/wi">
+  <Fragment>
+    <UI Id="WixUI_InstallDir">
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+      <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+      <Property Id="WixUI_Mode" Value="InstallDir" />
+
+      <DialogRef Id="BrowseDlg" />
+      <DialogRef Id="DiskCostDlg" />
+      <DialogRef Id="InstallDirDlg" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="ExitDialog" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="LicenseAgreementDlg" />
+      <DialogRef Id="MaintenanceTypeDlg" />
+      <DialogRef Id="MaintenanceWelcomeDlg" />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg" />
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ResumeDlg" />
+      <DialogRef Id="UserExit" />
+      <DialogRef Id="VerifyReadyDlg" />
+      <DialogRef Id="WelcomeDlg" />
+
+      <Property Id="ARPNOMODIFY" Value="1" />
+
+      <Property Id="WixUI_WelcomeDlg_Next" Value="LicenseAgreementDlg" />
+
+      <Property Id="WixUI_LicenseAgreementDlg_Back" Value="WelcomeDlg" />
+      <Property Id="WixUI_LicenseAgreementDlg_Next" Value="InstallDirDlg" />
+
+      <Property Id="WixUI_InstallDirDlg_Back" Value="LicenseAgreementDlg" />
+      <Property Id="WixUI_InstallDirDlg_Next" Value="VerifyReadyDlg" />
+      <Property Id="WixUI_InstallDirDlg_Browse" Value="BrowseDlg" />
+
+      <Property Id="WixUI_VerifyReadyDlg_BackRepair" Value="MaintenanceTypeDlg" />
+      <Property Id="WixUI_VerifyReadyDlg_BackRemove" Value="MaintenanceTypeDlg" />
+      <Property Id="WixUI_VerifyReadyDlg_BackInstallDir" Value="InstallDirDlg" />
+
+      <Property Id="WixUI_MaintenanceWelcomeDlg_Next" Value="MaintenanceTypeDlg" />
+
+      <Property Id="WixUI_MaintenanceTypeDlg_Repair" Value="VerifyReadyDlg" />
+      <Property Id="WixUI_MaintenanceTypeDlg_Remove" Value="VerifyReadyDlg" />
+      <Property Id="WixUI_MaintenanceTypeDlg_Back" Value="MaintenanceWelcomeDlg" />
+    </UI>
+
+    <UIRef Id="WixUI_Common" />
+  </Fragment>
+</Wix>
