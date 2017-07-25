@@ -2,6 +2,8 @@
 # 
 # Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 #
+# Note: any changes to this script should be replicated in build.bat
+#
 
 display_usage ( ) {
     echo "build.sh [-ui | -test | -embed | -web | -debug_embedded]"

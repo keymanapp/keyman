@@ -2,6 +2,8 @@
 rem 
 rem Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 rem
+rem Note: any changes to this script should be replicated in build.sh
+rem
 
 rem Definition of global compile constants
 set WEB_OUTPUT="..\output"
