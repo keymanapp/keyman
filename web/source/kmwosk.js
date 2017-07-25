@@ -588,8 +588,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     {
       if(e && typeof(e.id) != 'undefined')
       {
-        var i, idx = e.id.split('-'), baseId = idx[idx.length-1];
-        if(typeof e.subKeys != 'undefined' && e.subKeys.length > 0 && e.subKeys[0].id != baseId)
+        var i, idx = e.id.split('-'), baseId = idx[idx.length-1], layer = (idx.length > 1 ? idx[0] : '');
+        if(typeof e.subKeys != 'undefined' && e.subKeys.length > 0 && (e.subKeys[0].id != baseId || e.subKeys[0].layer != layer))
         {
           var eCopy={'id':baseId,'layer':''};
           if(idx.length > 1) eCopy['layer'] = idx[0];
