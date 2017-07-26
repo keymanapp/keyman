@@ -2,6 +2,8 @@
 rem 
 rem Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 rem
+rem Note: any changes to this script should be replicated in build.sh
+rem
 
 rem Definition of global compile constants
 set WEB_OUTPUT="..\output"
@@ -62,7 +64,7 @@ del %EMBED_OUTPUT%\kmw-smpstring.js 2>nul
 if not exist %EMBED_OUTPUT%\kmw-smpstring.js goto fail
 
 del kmwtemp.js 2>nul
-%compilecmd% --define __BUILD__=%BUILD% --externs %SOURCE%\kmwreleasestub.js --js %SOURCE%\kmwbase.js --js %SOURCE%\keymanweb.js --js %SOURCE%\kmwosk.js --js %SOURCE%\kmwembedded.js --js %SOURCE%\kmwcallback.js --js %SOURCE%\kmwkeymaps.js --js %SOURCE%\kmwlayout.js --js %SOURCE%\kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file kmwtemp.js --warning_level VERBOSE
+%compilecmd% --define tavultesoft.__BUILD__=%BUILD% --externs %SOURCE%\kmwreleasestub.js --js %SOURCE%\kmwbase.js --js %SOURCE%\keymanweb.js --js %SOURCE%\kmwosk.js --js %SOURCE%\kmwembedded.js --js %SOURCE%\kmwcallback.js --js %SOURCE%\kmwkeymaps.js --js %SOURCE%\kmwlayout.js --js %SOURCE%\kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file kmwtemp.js --warning_level VERBOSE
 if not exist kmwtemp.js goto fail
 
 echo Append SMP extensions
@@ -107,7 +109,7 @@ rem Compile KeymanWeb code modules for native keymanweb use, stubbing out and re
 echo Compile Keymanweb    
 
 del %WEB_OUTPUT%\kmwtemp.js 2>nul
-%compilecmd% --define __BUILD__=%BUILD% --externs %SOURCE%\kmwreleasestub.js --js %SOURCE%\kmwbase.js --js %SOURCE%\keymanweb.js --js %SOURCE%\kmwosk.js --js %SOURCE%\kmwnative.js --js %SOURCE%\kmwcallback.js --js %SOURCE%\kmwkeymaps.js --js %SOURCE%\kmwlayout.js --js %SOURCE%\kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file %WEB_OUTPUT%\kmwtemp.js --warning_level VERBOSE
+%compilecmd% --define tavultesoft.__BUILD__=%BUILD% --externs %SOURCE%\kmwreleasestub.js --js %SOURCE%\kmwbase.js --js %SOURCE%\keymanweb.js --js %SOURCE%\kmwosk.js --js %SOURCE%\kmwnative.js --js %SOURCE%\kmwcallback.js --js %SOURCE%\kmwkeymaps.js --js %SOURCE%\kmwlayout.js --js %SOURCE%\kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file %WEB_OUTPUT%\kmwtemp.js --warning_level VERBOSE
 if not exist %WEB_OUTPUT%\kmwtemp.js goto fail
 
 echo Append SMP string extensions to Keymanweb
