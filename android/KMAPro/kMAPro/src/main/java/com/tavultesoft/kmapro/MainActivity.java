@@ -80,6 +80,8 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     actionBar.setDisplayShowTitleEnabled(false);
     actionBar.setBackgroundDrawable(getActionBarDrawable(this));
 
+    Log.d("onCreate", "CI build success");
+
     if (BuildConfig.DEBUG) {
       KMManager.setDebugMode(true);
     }
