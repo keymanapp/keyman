@@ -1,0 +1,2 @@
+include ':facebookSDK'
+include ':kMAPro'

@@ -1,0 +1,20 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <com.tavultesoft.kmea.KMTextView
+        android:id="@+id/kmTextView"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_alignParentTop="true"
+        android:ems="10"
+        android:inputType="textMultiLine"
+        android:gravity="top"
+        android:scrollbars="vertical" >
+
+        <requestFocus />
+    </com.tavultesoft.kmea.KMTextView>
+
+</RelativeLayout>

@@ -1,0 +1,104 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.github.triplet.play'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
+    playAccountConfigs {
+        defaultAccountConfig {
+            if (project.hasProperty("keys_json_file")) {
+                jsonFile = file(project.ext.keys_json_file)
+            }
+        }
+    }
+    defaultConfig {
+        applicationId "com.tavultesoft.kmapro"
+        minSdkVersion 15
+        targetSdkVersion 25
+
+        //dumpProperties(project.ext) // Use this to dump all external properties for debugging TeamCity integration
+
+        if (project.hasProperty("build.number")) {
+            versionCode project.ext['build_counter'] as Integer // Because TeamCity does not bubble build.counter into system properties...
+            versionName "${project.ext['build.number']}"
+        } else {
+            versionCode 100
+            versionName '0.0-beta'
+        }
+
+        playAccountConfig = playAccountConfigs.defaultAccountConfig
+    }
+
+    if (project.hasProperty("release_store_file")) {
+        signingConfigs {
+            release {
+                storeFile file(project.ext.release_store_file)
+                storePassword project.ext.release_store_password
+                keyAlias project.ext.release_key_alias
+                keyPassword project.ext.release_key_password
+            }
+        }
+    }
+
+    buildTypes {
+         release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            if (project.hasProperty("release_store_file")) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+    productFlavors {
+    }
+
+    lintOptions {
+        disable 'MissingTranslation'
+    }
+
+    play {
+        // Deactivate lower conflicting version APKs
+        untrackOld = true
+        switch(System.env.TIER) {
+            case 'beta' :
+                track = 'beta'
+                break
+
+            case 'stable' :
+                track = 'production'
+                break
+            
+            default:
+                track = 'alpha'
+        }
+        println "TIER set to $track"
+    }
+}
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    compile project(':facebookSDK')
+    compile 'com.android.support:support-v4:25.4.0'
+    compile(name: 'keyman-engine', ext: 'aar')
+}
+
+/*
+def void dumpProperties(it){
+    //println "Examining $it.name:"
+    //println "Meta:"
+    //println it.metaClass.metaMethods*.name.sort().unique()
+    //println "Methods:"
+    //println it.metaClass.methods*.name.sort().unique()
+    //println "Depends On:"
+    //println it.dependsOn.collect({it*.getName()})
+    println "Properties:"
+    println it.properties.entrySet()*.toString()
+            .sort().toString().replaceAll(", ","\n")
+}
+*/
