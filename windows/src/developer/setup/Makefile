@@ -23,7 +23,7 @@ clean: def-clean
     rem if exist icons\icons.res del icons\icons.res
 
 signcode:
-    rem $(SIGNCODE) /d "Keyman Developer Setup" $(PROGRAM)\developer\setup.exe
+    rem SIGNCODE /d "Keyman Developer Setup" $(PROGRAM)\developer\setup.exe
 
 backup:
     $(WZZIP) $(BUILD)\developer\devsetup.zip  $(BACKUPDEFAULTS) setup.exe
