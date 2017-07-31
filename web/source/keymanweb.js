@@ -2280,7 +2280,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         console.error("KeymanWeb is not attached to element " + Pelem);
         return;
       } else {
-        return Pelem._kmwAttachment.languageCode;
+        return Pelem._kmwAttachment.keyboard;  // Should we have a version for the language code, too?
       }
     }
       
