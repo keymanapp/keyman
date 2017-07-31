@@ -86,7 +86,12 @@ PLATFORM=`uname -s`
 if [ "$DO_BUILD" = true ]; then
     echo "Building keyman web engine"
     cd $KMW_SOURCE
-    ./build.bat -embed
+    # $OS should only be defined on Windows
+    if [ "$OS" = "Windows_NT" ]; then
+        ./build.bat -embed
+    else
+        ./build.sh -embed
+    fi
     if [ $? -ne 0 ]; then
         die "ERROR: keymanweb build failed. Exiting"
     fi
