@@ -21,29 +21,40 @@
 */
 #include "keyman64.h"
 
+/**
+  do_keybd_event adds a keyboard event into the keyboard event queue.
+
+  Parameters: pInputs  array of INPUT structures which we will fill with our key events.
+              n        pointer to current index into pInput, which we increment for each key
+                       event we add
+
+  This function mimics the keybd_event Windows API function, but instead of posting the event
+  to the system keyboard event queue, it appends it to our internal event queue in pInputs.
+  This allows us to send an atomic set of key events with SendInput.
+*/
 void do_keybd_event(LPINPUT pInputs, int *n, BYTE vk, BYTE scan, DWORD flags, ULONG_PTR extraInfo) {   // I4548
   INPUT input;
   input.type = INPUT_KEYBOARD;
 
   switch(vk) {
-  case VK_LCONTROL:
   case VK_RCONTROL:
+    flags |= KEYEVENTF_EXTENDEDKEY;
+  case VK_LCONTROL:
     vk = VK_CONTROL;
     break;
-  case VK_LMENU:
+
   case VK_RMENU:
+    flags |= KEYEVENTF_EXTENDEDKEY;
+  case VK_LMENU:
     vk = VK_MENU;
     break;
-  }
 
-  /*PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return 0;
-  if(!_td->app) return 0;
-  if(flags & KEYEVENTF_KEYUP) {
-    _td->app->QueueAction(QIT_VKEYUP, vk);
-  } else {
-    _td->app->QueueAction(QIT_VKEYDOWN, vk);
-  }*/
+  case VK_RSHIFT:
+    flags |= KEYEVENTF_EXTENDEDKEY;
+  case VK_LSHIFT:
+    vk = VK_SHIFT;
+    break;
+  }
 
   input.ki.wVk = vk;
   input.ki.wScan = scan;
@@ -54,12 +65,19 @@ void do_keybd_event(LPINPUT pInputs, int *n, BYTE vk, BYTE scan, DWORD flags, UL
 
   pInputs[*n] = input;
   (*n)++;
-  //if(SendInput(1, &input, sizeof(INPUT)) == 0) {
-  //  SendDebugMessageFormat(0, sdmAIDefault, 0, "do_keybd_event: SendInput failed = %d", GetLastError());
-  //}
-  //keybd_event(vk, scan, flags, extraInfo);
 }
 
+/**
+  keybd_sendprefix pushes a dummy keystroke into the keyboard event queue.
+
+  Parameters: pInputs  array of INPUT structures which we will fill with our key events.
+              n        pointer to current index into pInput, which we increment for each key
+                       event we add
+
+  The keybd_sendprefix call is needed, for example, if the user presses Alt+F which matches a rule 
+  in the current Keyman keyboard, because without the dummy prefix key, faking the release of the 
+  Alt key will activate the mainmenu of the current application.
+*/
 void keybd_sendprefix(LPINPUT pInputs, int *n, BOOL *FPrefix)
 {
   if(*FPrefix)
@@ -70,116 +88,56 @@ void keybd_sendprefix(LPINPUT pInputs, int *n, BOOL *FPrefix)
   }
 }
 
-BOOL keybd_sendshift(LPINPUT pInputs, int *n, BYTE *kbd, int AShiftState, BYTE vkey, int flags, BOOL *FPrefix)
-{
-	DWORD eventflags = 0;
-
-	/* 29 Jul 2003 - mcdurdin - Handle sending correct Right C/A "extendedkey" bit */
-	if(vkey == VK_RMENU || vkey == VK_RCONTROL) eventflags |= KEYEVENTF_EXTENDEDKEY;
-	
-	if(AShiftState & flags)
-	{
-		if((kbd[vkey] & 0x80) == 0) 
-		{
-			SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendshift: sending keydown - vkey=%s", Debug_VirtualKey(vkey));
-      keybd_sendprefix(pInputs, n, FPrefix);
-			do_keybd_event(pInputs, n, vkey, 0xFF, eventflags, 0);   // I4548
-      return TRUE;
-		}
-	}
-	else
-	{
-		if(kbd[vkey] & 0x80)
-		{
-			SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendshift: sending keyup - vkey=%s", Debug_VirtualKey(vkey));
-      keybd_sendprefix(pInputs, n, FPrefix);
-			do_keybd_event(pInputs, n, vkey, 0xFF, KEYEVENTF_KEYUP|eventflags, 0);   // I4548
-      return TRUE;
-		}
-	}
-  return FALSE;
+void keybd_sendshift(LPINPUT pInputs, int *n, BYTE *kbd, BYTE vkey, BOOL FReset, BOOL *FPrefix) {
+	SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendshift: sending key%s - vkey=%s", FReset ? "down" : "up", Debug_VirtualKey(vkey));
+  keybd_sendprefix(pInputs, n, FPrefix);
+	do_keybd_event(pInputs, n, vkey, 0xFF, FReset ? 0 : KEYEVENTF_KEYUP, 0);   // I4548
 }
 
 BYTE MapGetAsyncKeyStateToByte(WORD vk) {
   SHORT r = GetAsyncKeyState(vk);
-  return (r&1) | ((r&0x8000)>>8);
+  return (r & 1) | ((r & 0x8000) >> 8);
 }
 
 void GetAsyncKeyboardShiftState(BYTE *kbd) {
-  const WORD vks[] = {VK_CONTROL, VK_LCONTROL, VK_RCONTROL, VK_MENU, VK_LMENU, VK_RMENU, VK_SHIFT, 0};
+  const WORD vks[] = { VK_CONTROL, VK_LCONTROL, VK_RCONTROL, VK_MENU, VK_LMENU, VK_RMENU, VK_SHIFT, VK_LSHIFT, VK_RSHIFT, 0 };
   memset(kbd, 0, 256);
-  for(int i = 0; vks[i]; i++) {
+  for (int i = 0; vks[i]; i++) {
     kbd[vks[i]] = MapGetAsyncKeyStateToByte(vks[i]);
   }
 }
 
-BOOL keybd_shift(LPINPUT pInputs, int *n, BOOL FReset, LPBYTE kbd) {
-  //int AShiftFlags;
+/**
+  keybd_shift evaluates the current keyboard modifier state and queues key events in order to
+  initially set modifiers to "up" and, after the output key events are queued, resets the modifiers
+  to their initial state.
+
+  Parameters: pInputs  array of INPUT structures which we will fill with our key events.
+              n        pointer to current index into pInput, which we increment for each key 
+                       event we add
+              FReset   are we clearing or resetting the modifier state?
+              kbd      pointer to keyboard state (256 byte array)
+ 
+  There must be enough space in pInputs to contain 6 x up + 6 x down + 1 prefix-down + 1 prefix-up event = 14 events, 
+  to support both the clear and reset calls.
+
+  There is a potential for a race here because the user may release a modifier
+  key between our test for the key state and when we SendInput, in which case the key will be 
+  incorrectly re-pressed in the reset phase. This window of time is very small; we can improve the
+  odds by using GetAsyncKeyboardShiftState (which reads the key state at the current instant, as 
+  opposed to at the start of the current key event).
+*/
+void keybd_shift(LPINPUT pInputs, int *n, BOOL FReset, LPBYTE kbd) {
+  const BYTE modifiers[6] = { VK_LMENU, VK_RMENU, VK_LCONTROL, VK_RCONTROL, VK_LSHIFT, VK_RSHIFT };
   BOOL FPrefix = !FReset;
-  BOOL res = FALSE;
 
   if (!FReset) {
-    GetKeyboardState(kbd);
-
-    // Clear all modifiers
-
-    if (kbd[VK_LMENU] & 0x80 || kbd[VK_RMENU] & 0x80 || kbd[VK_MENU] & 0x80) {
-      res |= keybd_sendshift(pInputs, n, kbd, 0, VK_LMENU, LALTFLAG | K_ALTFLAG, &FPrefix);
-      res |= keybd_sendshift(pInputs, n, kbd, 0, VK_RMENU, RALTFLAG, &FPrefix);
-    }
-
-    if (kbd[VK_LCONTROL] & 0x80 || kbd[VK_RCONTROL] & 0x80 || kbd[VK_CONTROL] & 0x80) {
-      res |= keybd_sendshift(pInputs, n, kbd, 0, VK_LCONTROL, LCTRLFLAG | K_CTRLFLAG, &FPrefix);
-      res |= keybd_sendshift(pInputs, n, kbd, 0, VK_RCONTROL, RCTRLFLAG, &FPrefix);
-    }
-
-    if (kbd[VK_SHIFT] & 0x80) {
-      res |= keybd_sendshift(pInputs, n, kbd, 0, VK_LSHIFT, K_SHIFTFLAG, &FPrefix);
-      res |= keybd_sendshift(pInputs, n, kbd, 0, VK_RSHIFT, K_SHIFTFLAG, &FPrefix);
-    }
-
-  } else {
-
-    // Reset modifiers to desired output
-
-    if (kbd[VK_RMENU] & 0x80) {
-      kbd[VK_RMENU] = 0;
-      res |= keybd_sendshift(pInputs, n, kbd, RALTFLAG, VK_RMENU, RALTFLAG, &FPrefix);
-    } else if (kbd[VK_LMENU] & 0x80 || kbd[VK_MENU] & 0x80) {
-      kbd[VK_LMENU] = 0;
-      res |= keybd_sendshift(pInputs, n, kbd, LALTFLAG, VK_LMENU, LALTFLAG | K_ALTFLAG, &FPrefix);
-    }
-
-    if (kbd[VK_RCONTROL] & 0x80) {
-      kbd[VK_RCONTROL] = 0;
-      res |= keybd_sendshift(pInputs, n, kbd, RCTRLFLAG, VK_RCONTROL, RCTRLFLAG, &FPrefix);
-    }
-    else if (kbd[VK_LCONTROL] & 0x80 || kbd[VK_CONTROL] & 0x80) {
-      kbd[VK_LCONTROL] = 0;
-      res |= keybd_sendshift(pInputs, n, kbd, LCTRLFLAG, VK_LCONTROL, LCTRLFLAG | K_CTRLFLAG, &FPrefix);
-    }
-
-    if (kbd[VK_RSHIFT] & 0x80) {
-      kbd[VK_RSHIFT] = 0;
-      res |= keybd_sendshift(pInputs, n, kbd, K_SHIFTFLAG, VK_RSHIFT, K_SHIFTFLAG, &FPrefix);
-    }
-    else if (kbd[VK_LSHIFT] & 0x80 || kbd[VK_SHIFT] & 0x80) {
-      kbd[VK_LSHIFT] = 0;
-      res |= keybd_sendshift(pInputs, n, kbd, K_SHIFTFLAG, VK_LSHIFT, K_SHIFTFLAG, &FPrefix);
-    }
+    GetAsyncKeyboardShiftState(kbd);
   }
 
-  // We only want to put out a prefix code if we are at the start of the output
-	/*SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_shift: kbd[CAS]: %x %x %x | %x %x %x | %x %x %x "
-		"AShiftFlags[CAS]: %d %d %d | %d %d %d | %d",
-		kbd[VK_CONTROL], kbd[VK_LCONTROL], kbd[VK_RCONTROL], kbd[VK_MENU], kbd[VK_LMENU], kbd[VK_RMENU], kbd[VK_SHIFT], kbd[VK_LSHIFT], kbd[VK_RSHIFT],
-		AShiftFlags & K_CTRLFLAG ? 1 : 0,
-		AShiftFlags & LCTRLFLAG ? 1 : 0,
-		AShiftFlags & RCTRLFLAG ? 1 : 0,
-		AShiftFlags & K_ALTFLAG ? 1 : 0,
-		AShiftFlags & LALTFLAG ? 1 : 0,
-		AShiftFlags & RALTFLAG ? 1 : 0,
-		AShiftFlags & K_SHIFTFLAG ? 1 : 0);*/
-
-  return res;
+  for (int i = 0; i < _countof(modifiers); i++) {
+    if (kbd[modifiers[i]] & 0x80) {
+      keybd_sendshift(pInputs, n, kbd, modifiers[i], FReset, &FPrefix);
+    }
+  }
 }
