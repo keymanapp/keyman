@@ -49,18 +49,30 @@ uses
   UserMessages;
 
 type
+  TDebugManagerMessageEvent = procedure(Sender: TObject; const Message: string) of object;
+
   TDebugManager = class(TThread)
   private
     FOwner: HWND;
     hLogFile, hMailSlot: THandle;
     hEvent: THandle;
     FDebugLogIndex: Integer;
+    FOnMessage: TDebugManagerMessageEvent;
+
+    const
+      crlf: AnsiString = #13#10;
+
     procedure WriteHeadingString;
     procedure WriteMessage(buf: PAnsiChar; buflen: Integer); overload;  // I3310
     procedure StartNewLogFile;
     procedure FindFirstLogFileName;
   protected
     procedure Execute; override;
+
+    class procedure CloseLogFile(var Handle: THandle);
+    class procedure WriteString(Handle: THandle; const s: string);
+    class procedure WriteMessage(Handle: THandle; buf: PAnsiChar; buflen: Integer); overload;  // I3310
+    class procedure WriteRawString(Handle: THandle; const s: string); static;
   public
     constructor Create(AOwner: HWND); reintroduce;
     destructor Destroy; override;
@@ -68,12 +80,10 @@ type
     class procedure WriteLastError(const ParentMethod, FailingMethod: string; const Message: string = '');
     class procedure WriteMessage(const Format: string; const Args: array of const); overload;
 
-    class procedure CloseLogFile(var Handle: THandle);
-    class procedure WriteString(Handle: THandle; const s: string);
-    class procedure WriteMessage(Handle: THandle; buf: PAnsiChar; buflen: Integer); overload;  // I3310
-    class procedure WriteRawString(Handle: THandle; const s: string); static;
 
     class function DebugLogFileName(n: Integer): WideString;
+
+    property OnMessage: TDebugManagerMessageEvent read FOnMessage write FOnMessage;
   end;
 
 function GetDebugManager(AOwner: HWND): TDebugManager;
@@ -548,6 +558,11 @@ begin
   end
   else
   begin
+    if Assigned(FOnMessage) then
+    begin
+      FOnMessage(Self, string(Copy(buf, 1, buflen) + crlf));
+    end;
+
     WriteMessage(hLogFile, buf, buflen);
   end;
 end;
@@ -603,8 +618,6 @@ end;
 class procedure TDebugManager.WriteMessage(Handle: THandle; buf: PAnsiChar; buflen: Integer);  // I3310
 var
   n: DWord;
-const
-  crlf: AnsiString = #13#10;
 begin
   if Handle = 0 then Exit;
 
