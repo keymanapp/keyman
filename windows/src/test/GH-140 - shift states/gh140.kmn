@@ -1,0 +1,17 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) '#140 - test shift states [not l/r]'
+
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ [K_A] > 'unshifted a '
++ [SHIFT K_B] > 'shift b '
++ [CTRL K_C] > 'ctrl c '
++ [ALT K_D] > 'alt d '
++ [SHIFT CTRL K_E] > 'shift ctrl e '
++ [SHIFT ALT K_F] > 'shift alt f '
++ [CTRL ALT K_G] > 'ctrl alt g '
++ [SHIFT CTRL ALT K_H] > 'shift ctrl alt h '
+

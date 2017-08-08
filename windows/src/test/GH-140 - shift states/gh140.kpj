@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_615be11a96a31f1fc87c8db9ab37f24e</ID>
+      <Filename>gh140.kmn</Filename>
+      <Filepath>gh140.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>#140 - test shift states [not l/r]</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_9d24ff6769b81ed822832109c710d3d5</ID>
+      <Filename>gh140lr.kmn</Filename>
+      <Filepath>gh140lr.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>#140 - test shift states - L/R</Name>
+      </Details>
+    </File>
+  </Files>
+</KeymanDeveloperProject>
