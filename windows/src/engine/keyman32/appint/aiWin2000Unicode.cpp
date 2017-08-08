@@ -177,6 +177,7 @@ BOOL AIWin2000Unicode::QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY 
 
 BOOL AIWin2000Unicode::PostKeys()
 {	
+  BYTE saved_kbd_state[256];
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) {
     return FALSE;
@@ -198,7 +199,7 @@ BOOL AIWin2000Unicode::PostKeys()
      (Queue[0].ItemType != QIT_VSHIFTDOWN && Queue[0].ItemType != QIT_VSHIFTUP))   /* I1813 - need to test queuesize as well */
   {
     /* Fakes a key to block Alt being recognised as a menu key */
-    keybd_shift(pInputs, &i, FALSE);
+    keybd_shift(pInputs, &i, FALSE, saved_kbd_state);
   }
 
   for(; n < QueueSize; n++)
@@ -296,7 +297,7 @@ BOOL AIWin2000Unicode::PostKeys()
 	  }
   }
 
-  keybd_shift(pInputs, &i, TRUE);
+  keybd_shift(pInputs, &i, TRUE, saved_kbd_state);
 
 	QueueSize = 0;
 

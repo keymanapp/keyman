@@ -234,6 +234,10 @@ int GetActualShiftState() {   // I4843
 	if(GetKeyState(VK_LCONTROL) < 0) state |= LCTRLFLAG;
 	if(GetKeyState(VK_LMENU) < 0) state |= LALTFLAG;
 	if(GetKeyState(VK_RMENU) < 0) state |= RALTFLAG;
+
+  if (GetKeyState(VK_LSHIFT) < 0) state |= 0x10000;
+  if (GetKeyState(VK_RSHIFT) < 0) state |= 0x20000;
+
   return state;
 }
 

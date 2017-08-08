@@ -129,16 +129,20 @@ begin
   end;
 end;
 
+type
+  TDebugManagerEx = class(TDebugManager)
+  end;
+
 procedure TfrmDebugNotify.cmdOKClick(Sender: TObject);
 begin
-  TDebugManager.WriteString(FLogFileHandle, memoNotes.Text);
+  TDebugManagerEx.WriteString(FLogFileHandle, memoNotes.Text);
   {
   buf := PChar(memoNotes.Text);
   buflen := Length(buf);
   WriteFile(FLogFileHandle, PChar(buf)^, buflen, n, nil);
   WriteFile(FLogFileHandle, #13#10, 2, n, nil);
   }
-  TDebugManager.CloseLogFile(FLogFileHandle);
+  TDebugManagerEx.CloseLogFile(FLogFileHandle);
 
   if chkNotepad.Checked then
     if not TUtilExecute.Shell(Handle, editLogFileName.Text, GetCurrentDir) then  // I3349
