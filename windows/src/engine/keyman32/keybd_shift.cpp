@@ -113,73 +113,73 @@ void GetAsyncKeyboardShiftState(BYTE *kbd) {
   }
 }
 
-BOOL keybd_shift(LPINPUT pInputs, int *n, BOOL FReset)
-{
-	BYTE kbd[256];
-  int AShiftFlags;
+BOOL keybd_shift(LPINPUT pInputs, int *n, BOOL FReset, LPBYTE kbd) {
+  //int AShiftFlags;
+  BOOL FPrefix = !FReset;
+  BOOL res = FALSE;
 
-  if(FReset) {
-    memset(kbd, 0, sizeof(kbd));
-    AShiftFlags = Globals::get_ShiftState();
+  if (!FReset) {
+    GetKeyboardState(kbd);
+
+    // Clear all modifiers
+
+    if (kbd[VK_LMENU] & 0x80 || kbd[VK_RMENU] & 0x80 || kbd[VK_MENU] & 0x80) {
+      res |= keybd_sendshift(pInputs, n, kbd, 0, VK_LMENU, LALTFLAG | K_ALTFLAG, &FPrefix);
+      res |= keybd_sendshift(pInputs, n, kbd, 0, VK_RMENU, RALTFLAG, &FPrefix);
+    }
+
+    if (kbd[VK_LCONTROL] & 0x80 || kbd[VK_RCONTROL] & 0x80 || kbd[VK_CONTROL] & 0x80) {
+      res |= keybd_sendshift(pInputs, n, kbd, 0, VK_LCONTROL, LCTRLFLAG | K_CTRLFLAG, &FPrefix);
+      res |= keybd_sendshift(pInputs, n, kbd, 0, VK_RCONTROL, RCTRLFLAG, &FPrefix);
+    }
+
+    if (kbd[VK_SHIFT] & 0x80) {
+      res |= keybd_sendshift(pInputs, n, kbd, 0, VK_LSHIFT, K_SHIFTFLAG, &FPrefix);
+      res |= keybd_sendshift(pInputs, n, kbd, 0, VK_RSHIFT, K_SHIFTFLAG, &FPrefix);
+    }
+
   } else {
-  	GetKeyboardState(kbd);
-    AShiftFlags = 0;
+
+    // Reset modifiers to desired output
+
+    if (kbd[VK_RMENU] & 0x80) {
+      kbd[VK_RMENU] = 0;
+      res |= keybd_sendshift(pInputs, n, kbd, RALTFLAG, VK_RMENU, RALTFLAG, &FPrefix);
+    } else if (kbd[VK_LMENU] & 0x80 || kbd[VK_MENU] & 0x80) {
+      kbd[VK_LMENU] = 0;
+      res |= keybd_sendshift(pInputs, n, kbd, LALTFLAG, VK_LMENU, LALTFLAG | K_ALTFLAG, &FPrefix);
+    }
+
+    if (kbd[VK_RCONTROL] & 0x80) {
+      kbd[VK_RCONTROL] = 0;
+      res |= keybd_sendshift(pInputs, n, kbd, RCTRLFLAG, VK_RCONTROL, RCTRLFLAG, &FPrefix);
+    }
+    else if (kbd[VK_LCONTROL] & 0x80 || kbd[VK_CONTROL] & 0x80) {
+      kbd[VK_LCONTROL] = 0;
+      res |= keybd_sendshift(pInputs, n, kbd, LCTRLFLAG, VK_LCONTROL, LCTRLFLAG | K_CTRLFLAG, &FPrefix);
+    }
+
+    if (kbd[VK_RSHIFT] & 0x80) {
+      kbd[VK_RSHIFT] = 0;
+      res |= keybd_sendshift(pInputs, n, kbd, K_SHIFTFLAG, VK_RSHIFT, K_SHIFTFLAG, &FPrefix);
+    }
+    else if (kbd[VK_LSHIFT] & 0x80 || kbd[VK_SHIFT] & 0x80) {
+      kbd[VK_LSHIFT] = 0;
+      res |= keybd_sendshift(pInputs, n, kbd, K_SHIFTFLAG, VK_LSHIFT, K_SHIFTFLAG, &FPrefix);
+    }
   }
 
   // We only want to put out a prefix code if we are at the start of the output
-  BOOL FPrefix = !FReset;
-
-	SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_shift: kbd[CAS]: %x %x %x | %x %x %x | %x "
+	/*SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_shift: kbd[CAS]: %x %x %x | %x %x %x | %x %x %x "
 		"AShiftFlags[CAS]: %d %d %d | %d %d %d | %d",
-		kbd[VK_CONTROL], kbd[VK_LCONTROL], kbd[VK_RCONTROL], kbd[VK_MENU], kbd[VK_LMENU], kbd[VK_RMENU], kbd[VK_SHIFT],
+		kbd[VK_CONTROL], kbd[VK_LCONTROL], kbd[VK_RCONTROL], kbd[VK_MENU], kbd[VK_LMENU], kbd[VK_RMENU], kbd[VK_SHIFT], kbd[VK_LSHIFT], kbd[VK_RSHIFT],
 		AShiftFlags & K_CTRLFLAG ? 1 : 0,
 		AShiftFlags & LCTRLFLAG ? 1 : 0,
 		AShiftFlags & RCTRLFLAG ? 1 : 0,
 		AShiftFlags & K_ALTFLAG ? 1 : 0,
 		AShiftFlags & LALTFLAG ? 1 : 0,
 		AShiftFlags & RALTFLAG ? 1 : 0,
-		AShiftFlags & K_SHIFTFLAG ? 1 : 0);
-
-  BOOL res = FALSE;
-
-	if(AShiftFlags & (LALTFLAG|RALTFLAG|K_ALTFLAG))   // I4548
-	{
-		if(!(kbd[VK_LMENU] & 0x80 || kbd[VK_RMENU] & 0x80 || kbd[VK_MENU] & 0x80))
-		{
-			res |= keybd_sendshift(pInputs, n, kbd, AShiftFlags, VK_LMENU, LALTFLAG|K_ALTFLAG, &FPrefix);
-			res |= keybd_sendshift(pInputs, n, kbd, AShiftFlags, VK_RMENU, RALTFLAG, &FPrefix);
-		}
-	}
-	else
-	{
-		if(kbd[VK_LMENU] & 0x80 || kbd[VK_RMENU] & 0x80 || kbd[VK_MENU] & 0x80)
-    {
-			res |= keybd_sendshift(pInputs, n, kbd, AShiftFlags, VK_LMENU, LALTFLAG|K_ALTFLAG, &FPrefix);
-			res |= keybd_sendshift(pInputs, n, kbd, AShiftFlags, VK_RMENU, RALTFLAG, &FPrefix);
-		}
-	}
-
-  if(AShiftFlags & (LCTRLFLAG|RCTRLFLAG|K_CTRLFLAG))   // I4548
-	{
-		if(!(kbd[VK_LCONTROL] & 0x80 || kbd[VK_RCONTROL] & 0x80 || kbd[VK_CONTROL] & 0x80))
-		{
-			res |= keybd_sendshift(pInputs, n, kbd, AShiftFlags, VK_LCONTROL, LCTRLFLAG|K_CTRLFLAG, &FPrefix);
-			res |= keybd_sendshift(pInputs, n, kbd, AShiftFlags, VK_RCONTROL, RCTRLFLAG, &FPrefix);
-		}
-	}
-	else
-	{
-		if(kbd[VK_LCONTROL] & 0x80 || kbd[VK_RCONTROL] & 0x80 || kbd[VK_CONTROL] & 0x80)
-		{
-			res |= keybd_sendshift(pInputs, n, kbd, AShiftFlags, VK_LCONTROL, LCTRLFLAG|K_CTRLFLAG, &FPrefix);
-			res |= keybd_sendshift(pInputs, n, kbd, AShiftFlags, VK_RCONTROL, RCTRLFLAG, &FPrefix);
-		}
-	}
-  
-  if((!(AShiftFlags & K_SHIFTFLAG) && (kbd[VK_SHIFT] & 0x80)) ||
-     ((AShiftFlags & K_SHIFTFLAG) && !(kbd[VK_SHIFT] & 0x80))) {  // I5394
-	  res |= keybd_sendshift(pInputs, n, kbd, AShiftFlags, VK_SHIFT, K_SHIFTFLAG, &FPrefix);
-  }
+		AShiftFlags & K_SHIFTFLAG ? 1 : 0);*/
 
   return res;
 }
