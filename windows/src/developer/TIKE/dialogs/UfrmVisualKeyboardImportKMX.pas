@@ -38,6 +38,7 @@ const
 type
   TfrmVisualKeyboardImportKMX = class(TTIKEForm)
     Label1: TLabel;
+    lblStatus: TLabel;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -63,6 +64,7 @@ type
     procedure ValidateLeftRightCtrlAlt;
     procedure ReadKeys(kfh: PKeyboardFileHeader; groupindex: Integer);
     procedure Validate102Key;
+    procedure SetStatus(const msg: string);
   protected
     procedure WndProc(var Message: TMessage); override;
   public
@@ -125,6 +127,12 @@ end;
  - Prepare for key processing                                                  -
  ------------------------------------------------------------------------------}
 
+procedure TfrmVisualKeyboardImportKMX.SetStatus(const msg: string);
+begin
+  lblStatus.Caption := msg;
+  lblStatus.Update;
+end;
+
 procedure TfrmVisualKeyboardImportKMX.WMUserFormShown(var Message: TMessage);
 
   procedure DoFail(const msg: string);
@@ -136,12 +144,14 @@ var
   FWasStarted: Boolean;
   hr: HRESULT;
 begin
+  SetStatus('Loading keyboard data');
   if (Message.WParam = 0) and not GetKeyboardKeys then
   begin
     DoFail('Could not load keyboard for import.');
     Exit;
   end;
 
+  SetStatus('Finding debug host keyboard');
   FDebugHostKeyboard := TDebugUtils.GetDebugHostKeyboard;
   if FDebugHostKeyboard = nil then
   begin
@@ -149,6 +159,7 @@ begin
     Exit;
   end;
 
+  SetStatus('Starting Keyman Desktop');
   if not StartKeymanDesktopPro(FWasStarted) then
   begin
     DoFail('Unable to start Keyman Desktop for debugging - please make sure that Keyman Desktop is correctly installed (the error code was '+IntToHex(GetLastError, 8)+').');  // I3173   // I3504
@@ -169,6 +180,7 @@ begin
     ShowMessage('Keyman Engine was reconfigured, please click OK to continue import.');
   end;
 
+  SetStatus('Selecting keyboard');
   if Keyman_ForceKeyboard(FFileName) then
   begin
     nkey := 0;
@@ -204,6 +216,8 @@ var
   vk: TVKKey;
   inputs: array[0..10] of TInput;
   n: Integer;
+  shiftText: string;
+  keyText: string;
     procedure AddInput(vk: WORD; isDown, isExtended: Boolean);   // I4143
     const
       DownFlag: array[Boolean] of DWORD = (KEYEVENTF_KEYUP, 0);
@@ -240,16 +254,37 @@ begin
 //    else lb.items.Add(Format('SendKey: nkey: %d vkey: %s shift: %d ansi', [nkey, VKeyNames[vk.vkey], vk.kmshift]));
 //  ShowMessage(Format('Sending key: %s / %d', [VKeyNames[vk.VKey], vk.shift]));
 
+  n := GetVKLegalShiftStateIndex(vk.shift);
+  if n < 0
+    then shiftText := Format('%x', [vk.shift])
+    else shiftText := VKLegalShiftStates[n].Desc;
+
+  if vk.vkey < 256
+    then keyText := VKeyNames[vk.vkey]
+    else keyText := Format('%x', [vk.vkey]);
+
+  SetStatus(Format('Importing %s %s', [shiftText, keyText]));
+
   n := 0;
 
   if (vk.kmshift and KMX_SHIFTFLAG) = KMX_SHIFTFLAG then AddInput(VK_SHIFT, True, False);   // I4143
   if (vk.kmshift and KMX_RALTFLAG) = KMX_RALTFLAG then AddInput(VK_MENU, True, True);
+  if (vk.kmshift and KMX_LALTFLAG) = KMX_LALTFLAG then AddInput(VK_MENU, True, False);   // I4156
+  if (vk.kmshift and KMX_RCTRLFLAG) = KMX_RCTRLFLAG then AddInput(VK_CONTROL, True, True);
+  if (vk.kmshift and KMX_LCTRLFLAG) = KMX_LCTRLFLAG then AddInput(VK_CONTROL, True, False);   // I4156
+
   if (vk.kmshift and KMX_CTRLFLAG) = KMX_CTRLFLAG then AddInput(VK_CONTROL, True, False);
   if (vk.kmshift and KMX_ALTFLAG) = KMX_ALTFLAG then AddInput(VK_MENU, True, False);   // I4156
+
   AddInput(vk.vkey, True, False);
   AddInput(vk.vkey, False, False);
+
   if (vk.kmshift and KMX_ALTFLAG) = KMX_ALTFLAG then AddInput(VK_MENU, False, False);   // I4156
   if (vk.kmshift and KMX_CTRLFLAG) = KMX_CTRLFLAG then AddInput(VK_CONTROL, False, False);
+
+  if (vk.kmshift and KMX_LCTRLFLAG) = KMX_LCTRLFLAG then AddInput(VK_CONTROL, False, False);   // I4156
+  if (vk.kmshift and KMX_RCTRLFLAG) = KMX_RCTRLFLAG then AddInput(VK_CONTROL, False, True);
+  if (vk.kmshift and KMX_LALTFLAG) = KMX_LALTFLAG then AddInput(VK_MENU, False, False);   // I4156
   if (vk.kmshift and KMX_RALTFLAG) = KMX_RALTFLAG then AddInput(VK_MENU, False, True);
   if (vk.kmshift and KMX_SHIFTFLAG) = KMX_SHIFTFLAG then AddInput(VK_SHIFT, False, False);
 
@@ -407,7 +442,6 @@ procedure TfrmVisualKeyboardImportKMX.ReadKeys(kfh: PKeyboardFileHeader; groupin
 var
   gp: PKeyboardFileGroup;
   kp: PKeyboardFileKey;
-  pw: PWideChar;
   vkey, kmshift, shift, i, j: Integer;
   vk: TVKKey;
   Found: Boolean;
@@ -418,39 +452,42 @@ begin
   kp := PKeyboardFileKey(DWord(kfh)+gp.dpKeyArray);
   for i := 0 to Integer(gp.cxKeyArray) - 1 do
   begin
-    pw := PWideChar(DWord(kfh)+kp.dpContext);
-    if pw^ = #0 then
+    Found := False;
+    if (kp.ShiftFlags and KMX_ISVIRTUALKEY) = 0 then
     begin
-      //
-      Found := False;
-      if (kp.ShiftFlags and KMX_ISVIRTUALKEY) = 0 then
-      begin
-        vkey := CharToVKey(kp.Key, shift, kmshift);
-      end
-      else
-      begin
-        vkey := kp.Key;
-        shift := KMXShiftToVKShift(kp.ShiftFlags);
-        kmshift := KMXShiftToActiveShift(kp.ShiftFlags);
-      end;
-
-      for j := 0 to keys.Count - 1 do
-        if (TVKKey(keys[j]).VKey = vkey) and (TVKKey(keys[j]).Shift = shift) then
-        begin
-          Found := True;
-          Break;
-        end;
-      if Found then
-      begin
-        Inc(kp);
-        Continue;
-      end;
-      vk := TVKKey.Create;
-      vk.VKey := vkey;
-      vk.Shift := shift;
-      vk.kmshift := kmshift;
-      keys.Add(vk);
+      vkey := CharToVKey(kp.Key, shift, kmshift);
+    end
+    else
+    begin
+      vkey := kp.Key;
+      shift := KMXShiftToVKShift(kp.ShiftFlags);
+      kmshift := KMXShiftToActiveShift(kp.ShiftFlags);
     end;
+
+    if vkey > 255 then
+    begin
+      // We don't try and import keys that are T_ touch virtual keys
+      Inc(kp);
+      Continue;
+    end;
+
+    for j := 0 to keys.Count - 1 do
+      if (TVKKey(keys[j]).VKey = vkey) and (TVKKey(keys[j]).Shift = shift) then
+      begin
+        Found := True;
+        Break;
+      end;
+    if Found then
+    begin
+      Inc(kp);
+      Continue;
+    end;
+    vk := TVKKey.Create;
+    vk.VKey := vkey;
+    vk.Shift := shift;
+    vk.kmshift := kmshift;
+    keys.Add(vk);
+
     Inc(kp);
   end;
 
