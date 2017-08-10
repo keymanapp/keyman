@@ -4,13 +4,13 @@ inherited frmVisualKeyboardImportKMX: TfrmVisualKeyboardImportKMX
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Importing Keyboard'
-  ClientHeight = 41
+  ClientHeight = 71
   ClientWidth = 221
   Font.Name = 'MS Sans Serif'
   Position = poScreenCenter
   OnDestroy = FormDestroy
   ExplicitWidth = 227
-  ExplicitHeight = 70
+  ExplicitHeight = 100
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
@@ -24,5 +24,13 @@ inherited frmVisualKeyboardImportKMX: TfrmVisualKeyboardImportKMX
       'Please wait while importing the Keyman keyboard into the visual ' +
       'keyboard.'
     WordWrap = True
+  end
+  object lblStatus: TLabel
+    Left = 8
+    Top = 48
+    Width = 205
+    Height = 13
+    Alignment = taCenter
+    AutoSize = False
   end
 end

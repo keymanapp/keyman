@@ -1004,6 +1004,17 @@ begin
 end;
 
 procedure TframeOnScreenKeyboardEditor.VK_UpdateSelectedKeyDetails;
+  procedure SetKeyText(key: TOnScreenKeyboardKey);
+  begin
+    if key <> nil then
+    begin
+      if (key.ActiveKeyCap = '') or (key.ActiveKeyCap[1] < #32)
+        then VKkeySample.KeyText := key.KeyCaps[0]
+        else VKkeySample.KeyText := key.ActiveKeyCap;
+    end
+    else
+      VKkeySample.KeyText := '';
+  end;
 var
   k: TVisualKeyboardKey;
   osk: TOnScreenKeyboardKey;
@@ -1012,18 +1023,16 @@ begin
   k := VK_GetCurrentKey;
   if not Assigned(k) then
   begin
-    VKkeySample.KeyText := '';
     VKkeySample.KeyData := '';
     VKkeySample.KeyGlyph := nil;
+    SetKeyText(kbdOnScreen.SelectedKey);
   end
   else
   begin
     osk := kbdOnScreen.Keys.ItemsByUSVK[k.VKey];  // I3022
     if Assigned(osk) then
     begin
-      if (osk.ActiveKeyCap = '') or (osk.ActiveKeyCap[1] < #32)
-        then VKkeySample.KeyText := osk.KeyCaps[0]
-        else VKkeySample.KeyText  := osk.ActiveKeyCap;
+      SetKeyText(osk);
       VKkeySample.KeyData  := k.Text;
       VKkeySample.KeyGlyph := k.Bitmap;
       osk.KeyGlyph := k.Bitmap;
@@ -1046,8 +1055,8 @@ begin
 
   if kbdOnScreen.ShiftState * [essCtrl, essLCtrl, essRCtrl] <> [] then
   begin
-    if essLCtrl in kbdOnScreen.ShiftState then VKkeySampleAlt.KeyText := 'L Ctrl'
-    else if essRCtrl in kbdOnScreen.ShiftState then VKkeySampleAlt.KeyText := 'R Ctrl'
+    if essLCtrl in kbdOnScreen.ShiftState then VKkeySampleCtrl.KeyText := 'L Ctrl'
+    else if essRCtrl in kbdOnScreen.ShiftState then VKkeySampleCtrl.KeyText := 'R Ctrl'
     else VKkeySampleCtrl.KeyText := 'Ctrl';
     VKkeySampleCtrl.Left := x - 3 - VKkeySampleCtrl.Width;
     x := VKkeySampleCtrl.Left;
