@@ -76,11 +76,14 @@ function loadKeyboards()
 		detachBtn.value   = 'Detach';
 		div.appendChild(detachBtn);
 		
+		// We need some extra space to properly detect iframe attachment.
+		var attachTimer = elem.tagName.toLowerCase() == "iframe" ? 50 : 1;
+		
 		var attachLabel = document.createElement("a");
 		attachLabel.id	= 'attachment_' + elemId;
 		window.setTimeout(function() {
 			attachLabel.textContent = " Currently " + (kmw.isAttached(elem) ? "attached." : "detached.");
-		}, 1);
+		}, attachTimer);
 		div.appendChild(attachLabel);
 		
 		div.appendChild(document.createElement("p"));
@@ -205,4 +208,18 @@ function loadKeyboards()
 	  var newDiv = generateDiagnosticDiv(frame);
 	  masterDiv.appendChild(newDiv);
   }
+	
+	function addEditable() {
+		var masterDiv = document.getElementById('DynamicEditables');
+		var editable = document.createElement("div");
+		var i = inputCounter++;
+		
+		editable.contentEditable = true;
+		editable.textContent = "Edit me!";
+		editable.id = 'editable' + i;
+		
+		var newDiv = generateDiagnosticDiv(editable);
+		
+		masterDiv.appendChild(newDiv);
+	}
 

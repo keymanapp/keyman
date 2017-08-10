@@ -1967,7 +1967,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     /**
      * Function     _AttachToIframe
      * Scope        Private
-     * @param       {Object}      Pelem       IFrame to which KMW will be attached
+     * @param       {Element}      Pelem       IFrame to which KMW will be attached
      * Description  Attaches KeymanWeb to IFrame 
      */  
     keymanweb._AttachToIframe = function(Pelem)
@@ -2030,7 +2030,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         /**
      * Function     _DetachFromIframe
      * Scope        Private
-     * @param       {Object}      Pelem       IFrame to which KMW will be attached
+     * @param       {Element}      Pelem       IFrame to which KMW will be attached
      * Description  Detaches KeymanWeb from an IFrame 
      */  
     keymanweb._DetachFromIframe = function(Pelem)
@@ -2547,7 +2547,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       ////keymanweb._SelectionControl = null;    
       var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
 
-      if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
+      if(keymanweb._LastActiveElement && keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
         keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
         keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
       } else {
@@ -3711,33 +3711,38 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *                                      isKMWDisabled()] is required.
      */
     keymanweb._GetDocumentEditables = function(Pelem) {
-      /**
-       * Function     LiTmp
-       * Scope        Private
-       * @param       {string}    _colon    type of element
-       * @return      {Array<Element>}  array of elements of specified type                       
-       * Description  Local function to get list of editable controls
-       */    
-      var LiTmp = function(_colon){
-        return util.arrayFromNodeList(Pelem.getElementsByTagName(_colon));
-      };
+      var possibleInputs = [];
 
-      // Note that isKMWInput() will block IFRAME elements as necessary for touch-based devices.
-      var possibleInputs = [].concat(LiTmp('INPUT'), LiTmp('TEXTAREA') ,LiTmp('IFRAME'));
-      
-      // These are unfortunately accessed via iterator, not array.  Also blocked for touch by isKMWInput().
-      var Lce = util.arrayFromNodeList(document.evaluate 
-          ? document.evaluate('//*[@contenteditable and @contenteditable != "false"]', document, null, XPathResult.ANY_TYPE, null) 
-          : null) // I2457 - support contentEditable elements in mozilla, webkit
-
-      if(Lce) { // I2457 - support contentEditable elements in mozilla, webkit
-        if("iterateNext" in Lce) { // Is sometimes not on mobile solutions.
-          for (var Lc = Lce.iterateNext(); Lc; Lc = Lce.iterateNext()) {
-            possibleInputs.push(Lc);
-          }
-        } else if(Array.isArray(Lce)) { // happens in Chrome mobile emulation.
-          possibleInputs.concat(Lce);
+      if(Pelem.tagName) {
+        var tagName = Pelem.tagName.toLowerCase();
+        if(tagName == 'input' || tagName == 'textarea' || tagName == 'iframe') {
+          possibleInputs.concat(Pelem);
         }
+      } else if(Pelem.nodeName == "#text") {
+        return [];
+      }
+
+      // Constructing it like this also allows for individual element filtering for the auto-attach MutationObserver without errors.
+      if(Pelem.getElementsByTagName) {
+        /**
+         * Function     LiTmp
+         * Scope        Private
+         * @param       {string}    _colon    type of element
+         * @return      {Array<Element>}  array of elements of specified type                       
+         * Description  Local function to get list of editable controls
+         */    
+        var LiTmp = function(_colon){
+          return util.arrayFromNodeList(Pelem.getElementsByTagName(_colon));
+        };
+
+        // Note that isKMWInput() will block IFRAME elements as necessary for touch-based devices.
+        possibleInputs = possibleInputs.concat(LiTmp('INPUT'), LiTmp('TEXTAREA'), LiTmp('IFRAME'));
+      }
+      
+      possibleInputs = possibleInputs.concat(util.arrayFromNodeList(Pelem.querySelectorAll('[contenteditable]')));
+      
+      if(Pelem.isContentEditable) {
+        possibleInputs = possibleInputs.concat(Pelem);
       }
 
       return possibleInputs;
@@ -4142,36 +4147,11 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         var mutation = mutations[i];
         
         for(var j=0; j < mutation.addedNodes.length; j++) {
-          var addedNode = mutation.addedNodes[j];
-          var lcTagName = addedNode.tagName ? addedNode.tagName.toLowerCase() : "";
-
-          // Will need to handle this in case of child elements in a newly-added element with child elements.
-          if(addedNode.getElementsByTagName) {
-            inputElementAdditions = inputElementAdditions.concat(
-              util.arrayFromNodeList(addedNode.getElementsByTagName('input')),
-              util.arrayFromNodeList(addedNode.getElementsByTagName('textarea')),
-              util.arrayFromNodeList(addedNode.getElementsByTagName('iframe'))
-            );
-          }
-
-          if(lcTagName == 'input' || lcTagName == 'textarea' || lcTagName == 'iframe') {
-            inputElementAdditions.push(addedNode);
-          }
+          inputElementAdditions = inputElementAdditions.concat(keymanweb._GetDocumentEditables(mutation.addedNodes[j]));
         }          
 
         for(j = 0; j < mutation.removedNodes.length; j++) {
-          var removedNode = mutation.removedNodes[j];
-          var lcTagName = removedNode.tagName ? removedNode.tagName.toLowerCase() : "";
-
-          // Will need to handle this in case of child elements in a newly-added element with child elements.
-          if(removedNode.getElementsByTagName) {
-            inputElementRemovals = inputElementRemovals.concat(
-              util.arrayFromNodeList(removedNode.getElementsByTagName('input')),
-              util.arrayFromNodeList(removedNode.getElementsByTagName('textarea')),
-              util.arrayFromNodeList(removedNode.getElementsByTagName('iframe'))
-            );
-          }
-          // After all mutations have been handled, we need to recompile our .sortedInputs array.
+          inputElementRemovals = inputElementRemovals.concat(keymanweb._GetDocumentEditables(mutation.removedNodes[j]));
         }
       }
 
