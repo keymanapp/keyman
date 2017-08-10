@@ -24,6 +24,8 @@ build: dirs
     # kick things off, then replace it with a new copy once done.
     # What a silly world we live in :)
     copy devtools.bin $(PROGRAM)\buildtools\devtools.exe
+    $(DEVTOOLS) -rp
+    $(DEVTOOLS) -ri
     $(DCC32) devtools.dpr
 !ELSE
     $(MAKEDIR)\dcc32 -Q -B -E. -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win devtools.dpr
