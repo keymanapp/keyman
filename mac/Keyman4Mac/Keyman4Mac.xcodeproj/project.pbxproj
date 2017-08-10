@@ -1,0 +1,593 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9800532D1B37B9490088DDDD /* NKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 9800532C1B37B9490088DDDD /* NKey.m */; };
+		980053301B37C48F0088DDDD /* NFont.m in Sources */ = {isa = PBXBuildFile; fileRef = 9800532F1B37C48F0088DDDD /* NFont.m */; };
+		9818808B1BC2029000A1FBA5 /* KeyLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9818807F1BC2029000A1FBA5 /* KeyLabel.m */; };
+		9818808C1BC2029000A1FBA5 /* KeyLabelCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 981880811BC2029000A1FBA5 /* KeyLabelCell.m */; };
+		9818808D1BC2029000A1FBA5 /* KeyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 981880831BC2029000A1FBA5 /* KeyView.m */; };
+		9818808E1BC2029000A1FBA5 /* OSKKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 981880851BC2029000A1FBA5 /* OSKKey.m */; };
+		9818808F1BC2029000A1FBA5 /* OSKView.m in Sources */ = {isa = PBXBuildFile; fileRef = 981880871BC2029000A1FBA5 /* OSKView.m */; };
+		981880901BC2029000A1FBA5 /* TimerTarget.m in Sources */ = {isa = PBXBuildFile; fileRef = 9818808A1BC2029000A1FBA5 /* TimerTarget.m */; };
+		9854389719DBB27000C7B036 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9854389619DBB27000C7B036 /* main.m */; };
+		9854389A19DBB27000C7B036 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9854389919DBB27000C7B036 /* AppDelegate.m */; };
+		9854389C19DBB27000C7B036 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9854389B19DBB27000C7B036 /* Images.xcassets */; };
+		9854389F19DBB27000C7B036 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9854389D19DBB27000C7B036 /* MainMenu.xib */; };
+		985438AB19DBB27000C7B036 /* Keyman4MacTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 985438AA19DBB27000C7B036 /* Keyman4MacTests.m */; };
+		985438B519DBB9F100C7B036 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 985438B419DBB9F100C7B036 /* Quartz.framework */; };
+		985A1B381B2A8BE3001D7EDD /* NSArray+Action.m in Sources */ = {isa = PBXBuildFile; fileRef = 985A1B271B2A8BE3001D7EDD /* NSArray+Action.m */; };
+		985A1B391B2A8BE3001D7EDD /* NSString+XString.m in Sources */ = {isa = PBXBuildFile; fileRef = 985A1B291B2A8BE3001D7EDD /* NSString+XString.m */; };
+		985A1B3A1B2A8BE3001D7EDD /* KMCompGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 985A1B2C1B2A8BE3001D7EDD /* KMCompGroup.m */; };
+		985A1B3B1B2A8BE3001D7EDD /* KMCompKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 985A1B2E1B2A8BE3001D7EDD /* KMCompKey.m */; };
+		985A1B3C1B2A8BE3001D7EDD /* KMCompStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 985A1B301B2A8BE3001D7EDD /* KMCompStore.m */; };
+		985A1B3D1B2A8BE3001D7EDD /* KMEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 985A1B321B2A8BE3001D7EDD /* KMEngine.m */; };
+		985A1B3E1B2A8BE3001D7EDD /* KMXFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 985A1B341B2A8BE3001D7EDD /* KMXFile.m */; };
+		985A1B3F1B2A8BE3001D7EDD /* KVKFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 985A1B361B2A8BE3001D7EDD /* KVKFile.m */; };
+		98BF924C1BF025B40002126A /* KMBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 98BF924B1BF025B40002126A /* KMBarView.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		985438A519DBB27000C7B036 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9854388919DBB27000C7B036 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9854389019DBB27000C7B036;
+			remoteInfo = Keyman4Mac;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		984C2B1F1A79DD790023F89D /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		9800532B1B37B9490088DDDD /* NKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKey.h; sourceTree = "<group>"; };
+		9800532C1B37B9490088DDDD /* NKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NKey.m; sourceTree = "<group>"; };
+		9800532E1B37C48F0088DDDD /* NFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NFont.h; sourceTree = "<group>"; };
+		9800532F1B37C48F0088DDDD /* NFont.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NFont.m; sourceTree = "<group>"; };
+		9818807E1BC2029000A1FBA5 /* KeyLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyLabel.h; sourceTree = "<group>"; };
+		9818807F1BC2029000A1FBA5 /* KeyLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyLabel.m; sourceTree = "<group>"; };
+		981880801BC2029000A1FBA5 /* KeyLabelCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyLabelCell.h; sourceTree = "<group>"; };
+		981880811BC2029000A1FBA5 /* KeyLabelCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyLabelCell.m; sourceTree = "<group>"; };
+		981880821BC2029000A1FBA5 /* KeyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyView.h; sourceTree = "<group>"; };
+		981880831BC2029000A1FBA5 /* KeyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyView.m; sourceTree = "<group>"; };
+		981880841BC2029000A1FBA5 /* OSKKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSKKey.h; sourceTree = "<group>"; };
+		981880851BC2029000A1FBA5 /* OSKKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSKKey.m; sourceTree = "<group>"; };
+		981880861BC2029000A1FBA5 /* OSKView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSKView.h; sourceTree = "<group>"; };
+		981880871BC2029000A1FBA5 /* OSKView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSKView.m; sourceTree = "<group>"; };
+		981880891BC2029000A1FBA5 /* TimerTarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimerTarget.h; sourceTree = "<group>"; };
+		9818808A1BC2029000A1FBA5 /* TimerTarget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimerTarget.m; sourceTree = "<group>"; };
+		9840F5EB1B43938800410ABA /* MacVKCodes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MacVKCodes.h; sourceTree = "<group>"; };
+		9854389119DBB27000C7B036 /* Keyman4Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Keyman4Mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9854389519DBB27000C7B036 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9854389619DBB27000C7B036 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		9854389819DBB27000C7B036 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		9854389919DBB27000C7B036 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		9854389B19DBB27000C7B036 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		9854389E19DBB27000C7B036 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		985438A419DBB27000C7B036 /* Keyman4MacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Keyman4MacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		985438A919DBB27000C7B036 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		985438AA19DBB27000C7B036 /* Keyman4MacTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Keyman4MacTests.m; sourceTree = "<group>"; };
+		985438B419DBB9F100C7B036 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		985A1B261B2A8BE3001D7EDD /* NSArray+Action.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+Action.h"; sourceTree = "<group>"; };
+		985A1B271B2A8BE3001D7EDD /* NSArray+Action.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+Action.m"; sourceTree = "<group>"; };
+		985A1B281B2A8BE3001D7EDD /* NSString+XString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+XString.h"; sourceTree = "<group>"; };
+		985A1B291B2A8BE3001D7EDD /* NSString+XString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+XString.m"; sourceTree = "<group>"; };
+		985A1B2A1B2A8BE3001D7EDD /* KMBinaryFileFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMBinaryFileFormat.h; sourceTree = "<group>"; };
+		985A1B2B1B2A8BE3001D7EDD /* KMCompGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMCompGroup.h; sourceTree = "<group>"; };
+		985A1B2C1B2A8BE3001D7EDD /* KMCompGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMCompGroup.m; sourceTree = "<group>"; };
+		985A1B2D1B2A8BE3001D7EDD /* KMCompKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMCompKey.h; sourceTree = "<group>"; };
+		985A1B2E1B2A8BE3001D7EDD /* KMCompKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMCompKey.m; sourceTree = "<group>"; };
+		985A1B2F1B2A8BE3001D7EDD /* KMCompStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMCompStore.h; sourceTree = "<group>"; };
+		985A1B301B2A8BE3001D7EDD /* KMCompStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMCompStore.m; sourceTree = "<group>"; };
+		985A1B311B2A8BE3001D7EDD /* KMEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMEngine.h; sourceTree = "<group>"; };
+		985A1B321B2A8BE3001D7EDD /* KMEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMEngine.m; sourceTree = "<group>"; };
+		985A1B331B2A8BE3001D7EDD /* KMXFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMXFile.h; sourceTree = "<group>"; };
+		985A1B341B2A8BE3001D7EDD /* KMXFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMXFile.m; sourceTree = "<group>"; };
+		985A1B351B2A8BE3001D7EDD /* KVKFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KVKFile.h; sourceTree = "<group>"; };
+		985A1B361B2A8BE3001D7EDD /* KVKFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KVKFile.m; sourceTree = "<group>"; };
+		985A1B371B2A8BE3001D7EDD /* WindowsVKCodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowsVKCodes.h; sourceTree = "<group>"; };
+		98BF924A1BF025B40002126A /* KMBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMBarView.h; sourceTree = "<group>"; };
+		98BF924B1BF025B40002126A /* KMBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMBarView.m; sourceTree = "<group>"; };
+		98C559751BE3167900563A12 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9854388E19DBB27000C7B036 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				985438B519DBB9F100C7B036 /* Quartz.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		985438A119DBB27000C7B036 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9818807D1BC2029000A1FBA5 /* OnScreenKeyboard */ = {
+			isa = PBXGroup;
+			children = (
+				9818807E1BC2029000A1FBA5 /* KeyLabel.h */,
+				9818807F1BC2029000A1FBA5 /* KeyLabel.m */,
+				981880801BC2029000A1FBA5 /* KeyLabelCell.h */,
+				981880811BC2029000A1FBA5 /* KeyLabelCell.m */,
+				981880821BC2029000A1FBA5 /* KeyView.h */,
+				981880831BC2029000A1FBA5 /* KeyView.m */,
+				981880841BC2029000A1FBA5 /* OSKKey.h */,
+				981880851BC2029000A1FBA5 /* OSKKey.m */,
+				981880861BC2029000A1FBA5 /* OSKView.h */,
+				981880871BC2029000A1FBA5 /* OSKView.m */,
+			);
+			path = OnScreenKeyboard;
+			sourceTree = "<group>";
+		};
+		981880881BC2029000A1FBA5 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				981880891BC2029000A1FBA5 /* TimerTarget.h */,
+				9818808A1BC2029000A1FBA5 /* TimerTarget.m */,
+			);
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		984C2B1C1A79CCC60023F89D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				98C559751BE3167900563A12 /* libz.tbd */,
+				985438B419DBB9F100C7B036 /* Quartz.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9854388819DBB27000C7B036 = {
+			isa = PBXGroup;
+			children = (
+				985A1B241B2A8BE3001D7EDD /* KME */,
+				984C2B1C1A79CCC60023F89D /* Frameworks */,
+				9854389319DBB27000C7B036 /* Keyman4Mac */,
+				985438A719DBB27000C7B036 /* Keyman4MacTests */,
+				9854389219DBB27000C7B036 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9854389219DBB27000C7B036 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9854389119DBB27000C7B036 /* Keyman4Mac.app */,
+				985438A419DBB27000C7B036 /* Keyman4MacTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9854389319DBB27000C7B036 /* Keyman4Mac */ = {
+			isa = PBXGroup;
+			children = (
+				9854389819DBB27000C7B036 /* AppDelegate.h */,
+				9854389919DBB27000C7B036 /* AppDelegate.m */,
+				9854389B19DBB27000C7B036 /* Images.xcassets */,
+				9854389D19DBB27000C7B036 /* MainMenu.xib */,
+				9854389419DBB27000C7B036 /* Supporting Files */,
+				98BF924A1BF025B40002126A /* KMBarView.h */,
+				98BF924B1BF025B40002126A /* KMBarView.m */,
+			);
+			path = Keyman4Mac;
+			sourceTree = "<group>";
+		};
+		9854389419DBB27000C7B036 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				9854389519DBB27000C7B036 /* Info.plist */,
+				9854389619DBB27000C7B036 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		985438A719DBB27000C7B036 /* Keyman4MacTests */ = {
+			isa = PBXGroup;
+			children = (
+				985438AA19DBB27000C7B036 /* Keyman4MacTests.m */,
+				985438A819DBB27000C7B036 /* Supporting Files */,
+			);
+			path = Keyman4MacTests;
+			sourceTree = "<group>";
+		};
+		985438A819DBB27000C7B036 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				985438A919DBB27000C7B036 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		985A1B241B2A8BE3001D7EDD /* KME */ = {
+			isa = PBXGroup;
+			children = (
+				985A1B251B2A8BE3001D7EDD /* Categories */,
+				985A1B2A1B2A8BE3001D7EDD /* KMBinaryFileFormat.h */,
+				985A1B2B1B2A8BE3001D7EDD /* KMCompGroup.h */,
+				985A1B2C1B2A8BE3001D7EDD /* KMCompGroup.m */,
+				985A1B2D1B2A8BE3001D7EDD /* KMCompKey.h */,
+				985A1B2E1B2A8BE3001D7EDD /* KMCompKey.m */,
+				985A1B2F1B2A8BE3001D7EDD /* KMCompStore.h */,
+				985A1B301B2A8BE3001D7EDD /* KMCompStore.m */,
+				985A1B311B2A8BE3001D7EDD /* KMEngine.h */,
+				985A1B321B2A8BE3001D7EDD /* KMEngine.m */,
+				985A1B331B2A8BE3001D7EDD /* KMXFile.h */,
+				985A1B341B2A8BE3001D7EDD /* KMXFile.m */,
+				985A1B351B2A8BE3001D7EDD /* KVKFile.h */,
+				985A1B361B2A8BE3001D7EDD /* KVKFile.m */,
+				9840F5EB1B43938800410ABA /* MacVKCodes.h */,
+				9800532E1B37C48F0088DDDD /* NFont.h */,
+				9800532F1B37C48F0088DDDD /* NFont.m */,
+				9800532B1B37B9490088DDDD /* NKey.h */,
+				9800532C1B37B9490088DDDD /* NKey.m */,
+				9818807D1BC2029000A1FBA5 /* OnScreenKeyboard */,
+				981880881BC2029000A1FBA5 /* Supporting Files */,
+				985A1B371B2A8BE3001D7EDD /* WindowsVKCodes.h */,
+			);
+			name = KME;
+			path = ../KeymanEngine4Mac/KeymanEngine4Mac/KME;
+			sourceTree = "<group>";
+		};
+		985A1B251B2A8BE3001D7EDD /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				985A1B261B2A8BE3001D7EDD /* NSArray+Action.h */,
+				985A1B271B2A8BE3001D7EDD /* NSArray+Action.m */,
+				985A1B281B2A8BE3001D7EDD /* NSString+XString.h */,
+				985A1B291B2A8BE3001D7EDD /* NSString+XString.m */,
+			);
+			path = Categories;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9854389019DBB27000C7B036 /* Keyman4Mac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 985438AE19DBB27000C7B036 /* Build configuration list for PBXNativeTarget "Keyman4Mac" */;
+			buildPhases = (
+				9854388D19DBB27000C7B036 /* Sources */,
+				9854388E19DBB27000C7B036 /* Frameworks */,
+				9854388F19DBB27000C7B036 /* Resources */,
+				984C2B1F1A79DD790023F89D /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Keyman4Mac;
+			productName = Keyman4Mac;
+			productReference = 9854389119DBB27000C7B036 /* Keyman4Mac.app */;
+			productType = "com.apple.product-type.application";
+		};
+		985438A319DBB27000C7B036 /* Keyman4MacTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 985438B119DBB27000C7B036 /* Build configuration list for PBXNativeTarget "Keyman4MacTests" */;
+			buildPhases = (
+				985438A019DBB27000C7B036 /* Sources */,
+				985438A119DBB27000C7B036 /* Frameworks */,
+				985438A219DBB27000C7B036 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				985438A619DBB27000C7B036 /* PBXTargetDependency */,
+			);
+			name = Keyman4MacTests;
+			productName = Keyman4MacTests;
+			productReference = 985438A419DBB27000C7B036 /* Keyman4MacTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9854388919DBB27000C7B036 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0710;
+				ORGANIZATIONNAME = "SIL International";
+				TargetAttributes = {
+					9854389019DBB27000C7B036 = {
+						CreatedOnToolsVersion = 6.0.1;
+					};
+					985438A319DBB27000C7B036 = {
+						CreatedOnToolsVersion = 6.0.1;
+						TestTargetID = 9854389019DBB27000C7B036;
+					};
+				};
+			};
+			buildConfigurationList = 9854388C19DBB27000C7B036 /* Build configuration list for PBXProject "Keyman4Mac" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 9854388819DBB27000C7B036;
+			productRefGroup = 9854389219DBB27000C7B036 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9854389019DBB27000C7B036 /* Keyman4Mac */,
+				985438A319DBB27000C7B036 /* Keyman4MacTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9854388F19DBB27000C7B036 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9854389C19DBB27000C7B036 /* Images.xcassets in Resources */,
+				9854389F19DBB27000C7B036 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		985438A219DBB27000C7B036 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9854388D19DBB27000C7B036 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9800532D1B37B9490088DDDD /* NKey.m in Sources */,
+				985A1B381B2A8BE3001D7EDD /* NSArray+Action.m in Sources */,
+				9818808C1BC2029000A1FBA5 /* KeyLabelCell.m in Sources */,
+				98BF924C1BF025B40002126A /* KMBarView.m in Sources */,
+				9818808F1BC2029000A1FBA5 /* OSKView.m in Sources */,
+				981880901BC2029000A1FBA5 /* TimerTarget.m in Sources */,
+				985A1B391B2A8BE3001D7EDD /* NSString+XString.m in Sources */,
+				985A1B3E1B2A8BE3001D7EDD /* KMXFile.m in Sources */,
+				985A1B3A1B2A8BE3001D7EDD /* KMCompGroup.m in Sources */,
+				985A1B3D1B2A8BE3001D7EDD /* KMEngine.m in Sources */,
+				9818808D1BC2029000A1FBA5 /* KeyView.m in Sources */,
+				9818808E1BC2029000A1FBA5 /* OSKKey.m in Sources */,
+				9854389A19DBB27000C7B036 /* AppDelegate.m in Sources */,
+				985A1B3F1B2A8BE3001D7EDD /* KVKFile.m in Sources */,
+				985A1B3B1B2A8BE3001D7EDD /* KMCompKey.m in Sources */,
+				980053301B37C48F0088DDDD /* NFont.m in Sources */,
+				9854389719DBB27000C7B036 /* main.m in Sources */,
+				985A1B3C1B2A8BE3001D7EDD /* KMCompStore.m in Sources */,
+				9818808B1BC2029000A1FBA5 /* KeyLabel.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		985438A019DBB27000C7B036 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				985438AB19DBB27000C7B036 /* Keyman4MacTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		985438A619DBB27000C7B036 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9854389019DBB27000C7B036 /* Keyman4Mac */;
+			targetProxy = 985438A519DBB27000C7B036 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		9854389D19DBB27000C7B036 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9854389E19DBB27000C7B036 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		985438AC19DBB27000C7B036 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		985438AD19DBB27000C7B036 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		985438AF19DBB27000C7B036 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Keyman4Mac/Frameworks",
+				);
+				INFOPLIST_FILE = Keyman4Mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman4Mac;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		985438B019DBB27000C7B036 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Keyman4Mac/Frameworks",
+				);
+				INFOPLIST_FILE = Keyman4Mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman4Mac;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		985438B219DBB27000C7B036 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = Keyman4MacTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Keyman4Mac.app/Contents/MacOS/Keyman4Mac";
+			};
+			name = Debug;
+		};
+		985438B319DBB27000C7B036 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = Keyman4MacTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Keyman4Mac.app/Contents/MacOS/Keyman4Mac";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9854388C19DBB27000C7B036 /* Build configuration list for PBXProject "Keyman4Mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				985438AC19DBB27000C7B036 /* Debug */,
+				985438AD19DBB27000C7B036 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		985438AE19DBB27000C7B036 /* Build configuration list for PBXNativeTarget "Keyman4Mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				985438AF19DBB27000C7B036 /* Debug */,
+				985438B019DBB27000C7B036 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		985438B119DBB27000C7B036 /* Build configuration list for PBXNativeTarget "Keyman4MacTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				985438B219DBB27000C7B036 /* Debug */,
+				985438B319DBB27000C7B036 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9854388919DBB27000C7B036 /* Project object */;
+}

@@ -1,0 +1,9 @@
+**/DerivedData
+**/project.xcworkspace
+**/xcuserdata
+**/fastlane/report.xml
+**/fastlane/README.md
+Keyman4MacIM/output/*
+Keyman4MacIM/Keyman4MacIM/Frameworks/**
+**/build
+**/output
