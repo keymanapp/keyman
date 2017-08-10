@@ -86,7 +86,7 @@ test:
 # release
 # ----------------------------------------------------------------------
 
-release: clean-pathdefines build-source-root-path-pas test-releasebuildcheck test-uiaccess test-klog test-releaseexists test-cert clean 
+release: clean-pathdefines test-releasebuildcheck test-uiaccess test-klog test-releaseexists test-cert clean 
     cd $(ROOT)\src
     $(MAKE) disable-search
     $(MAKE) build-release-wrapper
@@ -128,7 +128,7 @@ test-releaseexists: mkver-app
 # Test various release prerequisites, e.g. Debug reg key not set
 #
 
-test-releasebuildcheck: build-source-root-path-pas
+test-releasebuildcheck: 
     cd $(ROOT)\src\buildtools\devtools
     $(MAKE) test-releasebuildcheck
     cd $(ROOT)\src
@@ -182,7 +182,7 @@ build-release-wrapper: clean-output update-version
 # Tools needed to complete a build
 #
 
-build-tools: build-source-root-path-pas
+build-tools: 
     cd $(ROOT)\src\buildtools\devtools
     $(MAKE)
     
@@ -239,22 +239,6 @@ test-certificate:
     certutil -user -addstore Root KeymanTestCA-sha256.cer
     makecert -pe -n "CN=Keyman Test Certificate" -a sha256 -cy end -sky signature -ic KeymanTestCA-sha256.cer -iv KeymanTestCA-sha256.pvk -sv KeymanTest-sha256.pvk KeymanTest-sha256.cer
     pvk2pfx -pvk KeymanTest-sha256.pvk -spc KeymanTest-sha256.cer -pfx KeymanTest-sha256.pfx
-
-#
-# Allow Keyman to be built without being in C:\keyman\10.0 root folder
-#
-
-SOURCEROOTPATH=$(ROOT)\src\global\delphi\general\SourceRootPath.pas
-
-build-source-root-path-pas:
-  echo unit SourceRootPath; > $(SOURCEROOTPATH)
-  echo interface >> $(SOURCEROOTPATH)
-  echo const >> $(SOURCEROOTPATH)
-  echo   CSourceRootPath='$(ROOT)\src'; >> $(SOURCEROOTPATH)
-  echo   CSourceBinRootPath='$(ROOT)\bin'; >> $(SOURCEROOTPATH)
-  echo   CSourceRootLibPath='$(ROOT)\lib'; >> $(SOURCEROOTPATH)
-  echo implementation >> $(SOURCEROOTPATH)
-  echo end. >> $(SOURCEROOTPATH)
     
 !include Target.mak
 

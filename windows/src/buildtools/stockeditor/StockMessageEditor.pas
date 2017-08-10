@@ -106,11 +106,25 @@ uses
 
 { TfrmMessageEditor }
 
-const
-  StockFilePath_Messages = CSourceRootPath+'\desktop\branding\'+StockFileName_Messages;
-  StockFilePath_DesktopPot = CSourceRootPath+'\desktop\branding\desktop.pot';
-  CMessageIdentifierConsts = CSourceRootPath+'\global\delphi\cust\MessageIdentifierConsts.pas';
-  CMessageDefaults = CSourceRootPath+'\global\delphi\cust\MessageDefaults.pas';
+function StockFilePath_Messages: string;
+begin
+  Result := CSourceRootPath+'\desktop\branding\'+StockFileName_Messages;
+end;
+
+function StockFilePath_DesktopPot: string;
+begin
+  Result := CSourceRootPath+'\desktop\branding\desktop.pot';
+end;
+
+function CMessageIdentifierConsts: string;
+begin
+  Result := CSourceRootPath+'\global\delphi\cust\MessageIdentifierConsts.pas';
+end;
+
+function CMessageDefaults: string;
+begin
+  Result := CSourceRootPath+'\global\delphi\cust\MessageDefaults.pas';
+end;
 
 procedure TfrmStockMessageEditor.FormCreate(Sender: TObject);
 var
