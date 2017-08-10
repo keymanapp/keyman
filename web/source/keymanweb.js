@@ -3740,7 +3740,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         possibleInputs = possibleInputs.concat(LiTmp('INPUT'), LiTmp('TEXTAREA'), LiTmp('IFRAME'));
       }
       
-      possibleInputs = possibleInputs.concat(util.arrayFromNodeList(Pelem.querySelectorAll('[contenteditable]')));
+      // Not all active browsers may support the method, but only those that do would work with contenteditables anyway.
+      if(Pelem.querySelectorAll) {
+        possibleInputs = possibleInputs.concat(util.arrayFromNodeList(Pelem.querySelectorAll('[contenteditable]')));
+      }
       
       if(Pelem.isContentEditable) {
         possibleInputs = possibleInputs.concat(Pelem);
