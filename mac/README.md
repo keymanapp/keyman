@@ -5,7 +5,6 @@ Xcode 8.3.3 (it might also work to use an older version)
 
 ## Keyman for macOS Development
 Keyman for macOS can be built from a command line (preferred) or Xcode.
-Before proceeding to the steps below, make sure you can build the [Keyman Engine for Android](#how-to-build-Keyman-Engine-for-Android) first. That will ensure all the needed SDK files are downloaded.
 
 ### Compiling from Command line
 To build Keyman for macOS, do the following:

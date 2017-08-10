@@ -7,17 +7,7 @@
 //
 
 #import "AppDelegate.h"
-#import "OSKView.h"
-#import "KMEngine.h"
-#import "KMXFile.h"
-#import "KVKFile.h"
-#import "MacVKCodes.h"
-#import "KMCompStore.h"
-#import "KMCompGroup.h"
-#import "WindowsVKCodes.h"
-#import "NSString+XString.h"
-
-//#import <KeymanEngine4Mac/KeymanEngine4Mac.h>
+#import <KeymanEngine4Mac/KeymanEngine4Mac.h>
 
 static BOOL debugMode = YES;
 
@@ -306,12 +296,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         self.imgView.image = kmx.bitmap;
         
         int index = 0;
-        for (KMCompStore *kmStore in kmx.store) {
-            NSLog(@"%d: %@[%@]", index, kmStore.systemID, kmStore.string);
+        for (NSObject *kmStore in kmx.store) {
+            NSLog(@"%d: %@", index, kmStore);
             index++;
         }
         
-        for (KMCompGroup *gp in kmx.group) {
+        for (NSObject *gp in kmx.group) {
             if (debugMode) {
                 NSLog(@"Group %@", gp);
                 //NSLog(@"match = %@", gp.match);

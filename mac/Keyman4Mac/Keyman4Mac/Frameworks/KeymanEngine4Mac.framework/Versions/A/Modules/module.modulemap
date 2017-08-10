@@ -1,6 +1,0 @@
-framework module KeymanEngine4Mac {
-  umbrella header "KeymanEngine4Mac.h"
-
-  export *
-  module * { export * }
-}
