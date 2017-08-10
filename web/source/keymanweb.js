@@ -329,7 +329,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
          * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
          * If not, we need to activate the control's preferred keyboard.
          */
-        keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI']
+        keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
     
         if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
           keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
@@ -1157,10 +1157,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           Pelem.onkeydown = keymanweb._KeyDown;
           Pelem.onkeyup = keymanweb._KeyUp;      
         }
-        return;
-      } else {
-        return;
-      }
+      } 
     }; 
 
     /**
@@ -2272,13 +2269,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Function     getKeyboardForControl
      * Scope        Public   
      * @param       {Element}    Pelem    Control element 
+     * @return      {string|null}         The independently-managed keyboard for the control.
      * Description  Returns the keyboard ID of the current independently-managed keyboard for this control.
      *              If it is currently following the global keyboard setting, returns null instead.
      */
     keymanweb['getKeyboardForControl'] = keymanweb.getKeyboardForControl = function(Pelem) {
       if(!keymanweb.isAttached(Pelem)) {
         console.error("KeymanWeb is not attached to element " + Pelem);
-        return;
+        return null;
       } else {
         return Pelem._kmwAttachment.keyboard;  // Should we have a version for the language code, too?
       }
@@ -3648,7 +3646,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
 
     /**
-     * Function     isKMWInput
+     * Function     isKMWDisabled
      * Scope        Private
      * @param       {Element}   x   An element from the page.
      * @return      {boolean}      true if the element's properties indicate a 'disabled' state.
@@ -3705,30 +3703,27 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       x._kmwAttachment = null;
     }
 
-
     /**
-     * Function     _SetupDocument
+     * Function     _GetDocumentEditables
      * Scope        Private
-     * Parameters   {Element}     Pelem - the root element of a document, including IFrame documents.
-     * Description  Used to automatically attach KMW to editable controls, regardless of control path.
+     * @param       {Element}     Pelem     HTML element
+     * @return      {Array<Element>}        A list of potentially-editable controls.  Further filtering [as with isKMWInput() and
+     *                                      isKMWDisabled()] is required.
      */
-    keymanweb._SetupDocument = function(Pelem) { // I1961
+    keymanweb._GetDocumentEditables = function(Pelem) {
       /**
        * Function     LiTmp
        * Scope        Private
        * @param       {string}    _colon    type of element
-       * @return      {Array}               array of elements of specified type                       
+       * @return      {Array<Element>}  array of elements of specified type                       
        * Description  Local function to get list of editable controls
        */    
       var LiTmp = function(_colon){
-        return Pelem.getElementsByTagName(_colon);
+        return util.arrayFromNodeList(Pelem.getElementsByTagName(_colon));
       };
 
-      var possibleInputs = [].concat(
-        util.arrayFromNodeList(LiTmp('INPUT')),
-        util.arrayFromNodeList(LiTmp('TEXTAREA')),
-        util.arrayFromNodeList(LiTmp('IFRAME'))  // Note that isKMWInput() will block these for touch-based devices.
-      );
+      // Note that isKMWInput() will block IFRAME elements as necessary for touch-based devices.
+      var possibleInputs = [].concat(LiTmp('INPUT'), LiTmp('TEXTAREA') ,LiTmp('IFRAME'));
       
       // These are unfortunately accessed via iterator, not array.  Also blocked for touch by isKMWInput().
       var Lce = util.arrayFromNodeList(document.evaluate 
@@ -3745,6 +3740,17 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         }
       }
 
+      return possibleInputs;
+    }
+
+    /**
+     * Function     _SetupDocument
+     * Scope        Private
+     * @param       {Element}     Pelem - the root element of a document, including IFrame documents.
+     * Description  Used to automatically attach KMW to editable controls, regardless of control path.
+     */
+    keymanweb._SetupDocument = function(Pelem) { // I1961
+      var possibleInputs = keymanweb._GetDocumentEditables(Pelem);
 
       for(var Li = 0; Li < possibleInputs.length; Li++) {
         var input = possibleInputs[Li];
@@ -3757,43 +3763,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         /**
      * Function     _ClearDocument
      * Scope        Private
-     * Parameters   {Element}     Pelem - the root element of a document, including IFrame documents.
+     * @param       {Element}     Pelem - the root element of a document, including IFrame documents.
      * Description  Used to automatically detach KMW from editable controls, regardless of control path.
      *              Mostly used to clear out all controls of a detached IFrame.
      */
     keymanweb._ClearDocument = function(Pelem) { // I1961
-      /**
-       * Function     LiTmp
-       * Scope        Private
-       * @param       {string}    _colon    type of element
-       * @return      {Array}               array of elements of specified type                       
-       * Description  Local function to get list of editable controls
-       */    
-      var LiTmp = function(_colon){
-        return Pelem.getElementsByTagName(_colon);
-      };
-
-      var possibleInputs = [].concat(
-        util.arrayFromNodeList(LiTmp('INPUT')),
-        util.arrayFromNodeList(LiTmp('TEXTAREA')),
-        util.arrayFromNodeList(LiTmp('IFRAME'))  // Note that isKMWInput() will block these for touch-based devices.
-      );
-      
-      // These are unfortunately accessed via iterator, not array.  Also blocked for touch by isKMWInput().
-      var Lce = util.arrayFromNodeList(document.evaluate 
-          ? document.evaluate('//*[@contenteditable and @contenteditable != "false"]', document, null, XPathResult.ANY_TYPE, null) 
-          : null) // I2457 - support contentEditable elements in mozilla, webkit
-
-      if(Lce) { // I2457 - support contentEditable elements in mozilla, webkit
-        if("iterateNext" in Lce) { // Is sometimes not on mobile solutions.
-          for (var Lc = Lce.iterateNext(); Lc; Lc = Lce.iterateNext()) {
-            possibleInputs.push(Lc);
-          }
-        } else if(Array.isArray(Lce)) { // happens in Chrome mobile emulation.
-          possibleInputs.concat(Lce);
-        }
-      }
-
+      var possibleInputs = keymanweb._GetDocumentEditables(Pelem);
 
       for(var Li = 0; Li < possibleInputs.length; Li++) {
         var input = possibleInputs[Li];
@@ -4008,7 +3983,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       // Initialize browser interface
 
       if(keymanweb.options['attachType'] != 'manual') {
-        keymanweb._SetupDocument(document);
+        keymanweb._SetupDocument(document.documentElement);
       }
 
       // Create an ordered list of all input and textarea fields

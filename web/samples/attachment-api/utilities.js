@@ -54,7 +54,9 @@ function loadKeyboards()
 			kmw.attachToControl(document.getElementById(elemId));
 			var attached = kmw.isAttached(elem);
 			document.getElementById('attachment_' + elemId).textContent = " Currently " + (attached ? "attached." : "detached.");
-			document.getElementById("independence_" + elemId).textContent = attached ? " Using globally-selected keyboard." : '';
+			if(elem.tagName.toLowerCase() != "iframe") {
+				document.getElementById("independence_" + elemId).textContent = attached ? " Using globally-selected keyboard." : '';
+			}
 		}; 
 		attachBtn.value   = 'Attach';
 		div.appendChild(attachBtn);
