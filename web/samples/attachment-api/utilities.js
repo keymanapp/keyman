@@ -217,6 +217,7 @@ function loadKeyboards()
 		editable.contentEditable = true;
 		editable.textContent = "Edit me!";
 		editable.id = 'editable' + i;
+		editable.style.width="500px";
 		
 		var newDiv = generateDiagnosticDiv(editable);
 		

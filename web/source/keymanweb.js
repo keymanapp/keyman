@@ -2376,8 +2376,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       {
         var et=Ltarg.type.toLowerCase();
         if(!(et == 'text' || et == 'search')) return true;
+      } else if((device.touchable || !Ltarg.isContentEditable) && en != 'textarea') {
+        return true;
       }
-      else if(en != 'textarea') return true;
 
       keymanweb._ActiveElement=Ltarg;  // I3363 (Build 301)  
 
@@ -4470,22 +4471,23 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *    
      * @param       {Object}      Ptarg      Target element
      */    
-    keymanweb._SetTargDir = function(Ptarg)
-    {  
+    keymanweb._SetTargDir = function(Ptarg) {  
       var elDir=((keymanweb._ActiveKeyboard != null) && (keymanweb._ActiveKeyboard['KRTL'])) ? 'rtl' : 'ltr';  
-      if(Ptarg)
-      {
-        if(device.touchable)
-        {
-          if(Ptarg.textContent.length == 0) 
-          {
+      if(Ptarg) {
+        if(device.touchable) {
+          if(Ptarg.textContent.length == 0) {
             Ptarg.base.dir=Ptarg.dir=elDir;
             keymanweb.setTextCaret(Ptarg,10000);
           }
-        }
-        else 
-        {
-          if(Ptarg.value.length == 0) Ptarg.dir=elDir;
+        } else {
+          if(Ptarg.value) {
+            if(Ptarg.value.length == 0) {
+              Ptarg.dir=elDir;
+            } else {
+              // We need to do this for some contenteditable elements.
+              Ptarg.base.dir=Ptarg.dir=elDir;
+            }
+          }
         }
       }
     }

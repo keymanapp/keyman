@@ -64,13 +64,6 @@ if(!window['tavultesoft']['keymanweb']['ui']['name']) {
         someElement=window.event.srcElement;
       }
 
-      // Hides the Toggle interface if a control has KeymanWeb disabled by API calls.
-      if(activeControl){
-        if(!activeControl['LEnabled']) {
-          focusing = false;
-        }
-      }
-
       if(focusing)
       {
         ui.controller.style.display = 'block';
