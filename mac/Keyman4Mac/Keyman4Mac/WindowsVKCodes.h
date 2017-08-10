@@ -3,7 +3,7 @@
 //  Keyman4Mac
 //
 //  Created by Serkan Kurt on 2/12/2014.
-//  Copyright (c) 2014 Tavultesoft Pty Ltd. All rights reserved.
+//  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
 #define VK_BACKSPACE        0x08
