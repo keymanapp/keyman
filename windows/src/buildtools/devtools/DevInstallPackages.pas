@@ -198,7 +198,7 @@ begin
         GetValueNames(FValues);
         for I := 0 to FValues.Count - 1 do
         begin
-          if SameText(Copy(FValues[I], 1, 11), CSourceRootLibPath+'\') then
+          if SameText(Copy(FValues[I], 1, Length(CSourceRootLibPath)+1), CSourceRootLibPath+'\') then
             DeleteValue(FValues[I]);
         end;
       finally
@@ -212,7 +212,7 @@ begin
       try
         GetValueNames(FValues);
         for I := 0 to FValues.Count - 1 do
-          if SameText(Copy(FValues[I], 1, 11), CSourceRootLibPath+'\') then
+          if SameText(Copy(FValues[I], 1, Length(CSourceRootLibPath)+1), CSourceRootLibPath+'\') then
             DeleteValue(FValues[I]);
       finally
         FValues.Free;
