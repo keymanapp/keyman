@@ -1,201 +1,211 @@
 <html>
-    <!--
-     Copyright (C) 2017 SIL International. All rights reserved.
-    -->
+<!--
+ Copyright (C) 2017 SIL International. All rights reserved.
+-->
 
-    <head>
-    	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    	<meta name="viewport" content="width=device-width, user-scalable=no">
-        <title>Keyman</title>
-        <script src="keyman.js"></script>
-        <script type="text/javascript">
-            
-            var device = window.jsInterface.getDeviceType();
-            var oskHeight = window.jsInterface.getKeyboardHeight();
-            var oskWidth = 0;
-            window.addEventListener('load', init, false);
-            
-            function init() {
-            	//document.body.style.backgroundColor="transparent";
-            	window.console.log('Device type = '+device);
-            	window.console.log('Keyboard height = '+oskHeight);
-                var kmw=window['tavultesoft']['keymanweb'];
-                kmw.init({'app':device,'fonts':'fonts/'});
-                kmw['util']['setOption']('attachType','manual');
-                kmw['oninserttext'] = insertText;
-                kmw['showKeyboardList'] = showMenu;
-                kmw['hideKeyboard'] = hideKeyboard;
-                kmw['getOskHeight'] = getOskHeight;
-                kmw['getOskWidth'] = getOskWidth;
-                kmw['setActiveElement']('ta');
-                ta.readOnly = false;
-            }
-            
-            function setOskHeight(h) {
-            	if(h > 0) oskHeight = h;
-            	var kmw=window['tavultesoft']['keymanweb'];
-                kmw['correctOSKTextSize']();
-            }
-            
-            function setOskWidth(w) {
-				if(w > 0) oskWidth = w;
-            }
-            
-            function getOskHeight() {
-                return oskHeight;
-            }
-            
-            function getOskWidth() {
-            	if(oskWidth <= 0)
-            		oskWidth = window.jsInterface.getKeyboardWidth()
-                window.console.log('Keyboard width = '+oskWidth);
-                return oskWidth;
-            }
-            
-            function setKeymanLanguage(keyboardName, internalName, languageName, langId, version, font, oskFont) {
-            	//oskFont.files = ['NotoSansSyriacWestern-Regular.svg#NotoSansSyriacWesternRegular'];
-            	//window.console.log('oskFonts = '+JSON.stringify(oskFont));
-                var kmw=window['tavultesoft']['keymanweb'];
-                // Defaults for mising arguments
-                switch(arguments.length)
-                {
-                    case 1:
-                    internalName=keyboardName;
-                    if(keyboardName == 'English')internalName='us';
-                    case 2:
-                    languageName=keyboardName;
-                    case 3:
-                    langId='';
-                    case 6:
-                    oskFont = font;
-                }
-                
-                kmw['KRS']({KN:keyboardName,KI:'Keyboard_'+internalName,KLC:langId,KL:languageName,KF:internalName+'-'+version+'.js',KFont:font,KOskFont:oskFont});
-                kmw['setActiveKeyboard']('Keyboard_'+internalName,langId);
-                kmw['osk']['show'](true);
-            }
-            
-            function insertText(dn, s) {
-                window.console.log('insertText('+ dn +', ' + s +');');
-            	window.jsInterface.insertText(dn, s);
-            }
-            
-            function updateKMText(text) {
-                if(text == undefined) text = '';
-                var ta = document.getElementById('ta');
-                var kmw = window['tavultesoft']['keymanweb'];
-                ta.value = text;
-                kmw['setActiveElement'](ta);
-            }
-            
-            function updateKMSelectionRange(start, end) {
-                var ta = document.getElementById('ta');
-                var kmw = window['tavultesoft']['keymanweb'];
-                ta.selectionStart = ta._KeymanWebSelectionStart = start;
-                ta.selectionEnd = ta._KeymanWebSelectionEnd = end;
-                kmw['setActiveElement'](ta);
-            }
-            
-            var fragmentToggle = 0;
-            function oskCreateKeyPreview(x,y,w,h,t)
-            {
-                fragmentToggle = (fragmentToggle + 1) % 100;
-                var div = document.createElement('div');
-                div.innerHTML = t;
-                var dt = div.firstChild.nodeValue;
-                window.location.hash = 'showKeyPreview-'+fragmentToggle+'+x='+x+'+y='+y+'+w='+w+'+h='+h+'+t='+toHex(dt);
-            }
-        
-            function oskClearKeyPreview()
-            {
-                fragmentToggle = (fragmentToggle + 1) % 100;
-                window.location.hash = 'dismissKeyPreview-'+fragmentToggle;
-            }
-            
-            oskCreatePopup = function(obj,x,y)
-            {
-                if(obj != null) {
-                    var i;
-                    var s = '';
-                    var shift = false;
-                    var keyPos = x.toString() + ',' + y.toString();
-                    for(i=0; i<obj.length; i++)
-                    {
-                        s=s+obj[i].layer+'-'+obj[i].id;
-                        if(obj[i].sp == 1 || obj[i].sp == 2) shift = true;
-                        if(typeof(obj[i].text) != 'undefined' && obj[i].text != '') s=s+':'+toHex(obj[i].text);
-                        if(i < (obj.length -1)) s=s+';'
-                    }
-                    fragmentToggle=(fragmentToggle+1) % 100;
-                    var hash = 'showMore-' + fragmentToggle + '+keyPos=' + keyPos + '+keys=' + s;
-                    if(shift) {
-                        hash = hash + '+font=' + 'SpecialOSK';
-                    }
-                    window.location.hash = hash;
-                }
-            }
-            
-            function showMenu() {
-                fragmentToggle = (fragmentToggle + 1) % 100;
-                window.location.hash = 'globeKeyAction' + fragmentToggle;
-            }
-            
-            function hideKeyboard() {
-                fragmentToggle = (fragmentToggle + 1) % 100;
-                window.location.hash = 'hideKeyboard' + fragmentToggle;
-            }
-            
-            function showHelpBubble() {
-            	fragmentToggle = (fragmentToggle + 1) % 100;
-                var kmw = window['tavultesoft']['keymanweb'];
-                var pos = kmw['touchMenuPos']();
-                window.console.log('showHelpBubble ' + pos);
-                window.location.hash = 'showHelpBubble-' + fragmentToggle + '+keyPos=' + pos;
-            }
-            
-            function executePopupKey(keyID, keyText) {
-                var kmw=window['tavultesoft']['keymanweb'];
-                window.console.log('executePopupKey('+keyID+', ' + keyText + ');');
-                kmw['executePopupKey'](keyID, keyText);
-            }
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <title>Keyman</title>
+  <script src="keyman.js"></script>
+  <script type="text/javascript">
+    var device = window.jsInterface.getDeviceType();
+    var oskHeight = window.jsInterface.getKeyboardHeight();
+    var oskWidth = 0;
+    window.addEventListener('load', init, false);
 
-            function executeHardwareKeystroke(code, shift) {
-                var kmw=window['tavultesoft']['keymanweb'];
-                window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ');');
-                try {
-                  var r = kmw['executeHardwareKeystroke'](code, shift);
-                  window.console.log('executeHardwareKeystroke completed with '+r);
-                } catch(e) {
-                  window.console.log('oops: '+e);
-                }
-            }
+    function init() {
+      //document.body.style.backgroundColor="transparent";
+      window.console.log('Device type = '+device);
+      window.console.log('Keyboard height = '+oskHeight);
+      var kmw=window['tavultesoft']['keymanweb'];
+      kmw.init({'app':device,'fonts':'fonts/'});
+      kmw['util']['setOption']('attachType','manual');
+      kmw['oninserttext'] = insertText;
+      kmw['showKeyboardList'] = showMenu;
+      kmw['hideKeyboard'] = hideKeyboard;
+      kmw['getOskHeight'] = getOskHeight;
+      kmw['getOskWidth'] = getOskWidth;
+      kmw['setActiveElement']('ta');
+      ta.readOnly = false;
+    }
 
-            function popupVisible(value) {
-                var kmw=window['tavultesoft']['keymanweb'];
-                kmw['popupVisible'](value);
-            }
+    function setOskHeight(h) {
+      if(h > 0) {
+        oskHeight = h;
+      }
+      var kmw=window['tavultesoft']['keymanweb'];
+      kmw['correctOSKTextSize']();
+    }
 
-            function toHex(theString) {
-                var hexString = '';
-                for (var i=0; i < theString.length; i++) {
-                    var theHex = theString.charCodeAt(i).toString(16).toUpperCase();
-                    while (theHex.length < 4) {
-                        theHex = '0' + theHex;
-                    }
-                    theHex = '0x' + theHex;
-                    hexString += theHex + ',';
-                }
-                return hexString.substr(0, hexString.length-1);
-            }
+    function setOskWidth(w) {
+      if(w > 0) {
+        oskWidth = w;
+      }
+    }
 
-        </script>
-    <style type="text/css">
-    	body {background-color:#000000; min-width:2500px;}
-   	</style>
-    </head>
-    <body class="kmw-embedded keyman-app">
-        <center>
-            <textarea id="ta" cols="1" rows="1" style="position:absolute; left:-500px; top:0px;"></textarea>
-        </center>
-    </body>
+    function getOskHeight() {
+      return oskHeight;
+    }
+
+    function getOskWidth() {
+      if(oskWidth <= 0) {
+        oskWidth = window.jsInterface.getKeyboardWidth();
+      }
+      window.console.log('Keyboard width = '+oskWidth);
+      return oskWidth;
+    }
+
+    function setKeymanLanguage(keyboardName, internalName, languageName, langId, version, font, oskFont) {
+      //oskFont.files = ['NotoSansSyriacWestern-Regular.svg#NotoSansSyriacWesternRegular'];
+      //window.console.log('oskFonts = '+JSON.stringify(oskFont));
+      var kmw=window['tavultesoft']['keymanweb'];
+      // Defaults for mising arguments
+      switch (arguments.length) {
+        case 1:
+          internalName = keyboardName;
+          if (keyboardName == 'English') {
+              internalName = 'us';
+          }
+          break;
+        case 2:
+          languageName = keyboardName;
+          break;
+        case 3:
+          langId='';
+          break;
+        case 6:
+          oskFont = font;
+          break;
+      }
+
+      kmw['KRS']({KN:keyboardName,KI:'Keyboard_'+internalName,KLC:langId,KL:languageName,
+        KF:internalName+'-'+version+'.js',KFont:font,KOskFont:oskFont});
+      kmw['setActiveKeyboard']('Keyboard_'+internalName,langId);
+      kmw['osk']['show'](true);
+    }
+
+    function insertText(dn, s) {
+      window.console.log('insertText('+ dn +', ' + s +');');
+      window.jsInterface.insertText(dn, s);
+    }
+
+    function updateKMText(text) {
+      if(text == undefined) {
+          text = '';
+      }
+      var ta = document.getElementById('ta');
+      var kmw = window['tavultesoft']['keymanweb'];
+      ta.value = text;
+      kmw['setActiveElement'](ta);
+    }
+
+    function updateKMSelectionRange(start, end) {
+      var ta = document.getElementById('ta');
+      var kmw = window['tavultesoft']['keymanweb'];
+      ta.selectionStart = ta._KeymanWebSelectionStart = start;
+      ta.selectionEnd = ta._KeymanWebSelectionEnd = end;
+      kmw['setActiveElement'](ta);
+    }
+
+    var fragmentToggle = 0;
+    function oskCreateKeyPreview(x,y,w,h,t) {
+      fragmentToggle = (fragmentToggle + 1) % 100;
+      var div = document.createElement('div');
+      div.innerHTML = t;
+      var dt = div.firstChild.nodeValue;
+      window.location.hash = 'showKeyPreview-'+fragmentToggle+'+x='+x+'+y='+y+'+w='+w+'+h='+h+'+t='+toHex(dt);
+    }
+
+    function oskClearKeyPreview() {
+      fragmentToggle = (fragmentToggle + 1) % 100;
+      window.location.hash = 'dismissKeyPreview-'+fragmentToggle;
+    }
+
+    function oskCreatePopup(obj,x,y) {
+      if(obj != null) {
+        var i;
+        var s = '';
+        var shift = false;
+        var keyPos = x.toString() + ',' + y.toString();
+        for(i=0; i<obj.length; i++)
+        {
+          s=s+obj[i].layer+'-'+obj[i].id;
+          if(obj[i].sp == 1 || obj[i].sp == 2) shift = true;
+          if(typeof(obj[i].text) != 'undefined' && obj[i].text != '') s=s+':'+toHex(obj[i].text);
+          if(i < (obj.length -1)) s=s+';'
+        }
+        fragmentToggle=(fragmentToggle+1) % 100;
+        var hash = 'showMore-' + fragmentToggle + '+keyPos=' + keyPos + '+keys=' + s;
+        if(shift) {
+          hash = hash + '+font=' + 'SpecialOSK';
+        }
+        window.location.hash = hash;
+      }
+    }
+
+    function showMenu() {
+      fragmentToggle = (fragmentToggle + 1) % 100;
+      window.location.hash = 'globeKeyAction' + fragmentToggle;
+    }
+
+    function hideKeyboard() {
+      fragmentToggle = (fragmentToggle + 1) % 100;
+      window.location.hash = 'hideKeyboard' + fragmentToggle;
+    }
+
+    function showHelpBubble() {
+      fragmentToggle = (fragmentToggle + 1) % 100;
+      var kmw = window['tavultesoft']['keymanweb'];
+      var pos = kmw['touchMenuPos']();
+      window.console.log('showHelpBubble ' + pos);
+      window.location.hash = 'showHelpBubble-' + fragmentToggle + '+keyPos=' + pos;
+    }
+
+    function executePopupKey(keyID, keyText) {
+      var kmw=window['tavultesoft']['keymanweb'];
+      window.console.log('executePopupKey('+keyID+', ' + keyText + ');');
+      kmw['executePopupKey'](keyID, keyText);
+    }
+
+    function executeHardwareKeystroke(code, shift) {
+      var kmw=window['tavultesoft']['keymanweb'];
+      window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ');');
+      try {
+        var r = kmw['executeHardwareKeystroke'](code, shift);
+        window.console.log('executeHardwareKeystroke completed with '+r);
+      } catch(e) {
+        window.console.log('oops: '+e);
+      }
+    }
+
+    function popupVisible(value) {
+      var kmw=window['tavultesoft']['keymanweb'];
+      kmw['popupVisible'](value);
+    }
+
+    function toHex(theString) {
+      var hexString = '';
+      for (var i=0; i < theString.length; i++) {
+        var theHex = theString.charCodeAt(i).toString(16).toUpperCase();
+        while (theHex.length < 4) {
+          theHex = '0' + theHex;
+        }
+        theHex = '0x' + theHex;
+        hexString += theHex + ',';
+      }
+      return hexString.substr(0, hexString.length-1);
+    }
+
+  </script>
+  <style type="text/css">
+      body {background-color:#000000; min-width:2500px;}
+     
+  </style>
+</head>
+<body class="kmw-embedded keyman-app">
+<center>
+  <textarea id="ta" cols="1" rows="1" style="position:absolute; left:-500px; top:0px;"></textarea>
+</center>
+</body>
 </html>

@@ -163,8 +163,10 @@ final class KMKeyboard extends WebView {
   public void onResume() {
     DisplayMetrics dms = context.getResources().getDisplayMetrics();
     int kbWidth = (int) (dms.widthPixels / dms.density);
-    loadUrl(String.format("javascript:setOskWidth(%d)", kbWidth));
-    loadUrl("javascript:setOskHeight(0)");
+    // Ensure window is loaded for javascript functions
+    loadUrl(String.format(
+      "javascript:window.onload = function(){ setOskWidth(\"%d\");"+
+      "setOskHeight(\"0\"); };", kbWidth));
     if (ShouldShowHelpBubble) {
       ShouldShowHelpBubble = false;
       Handler handler = new Handler();
