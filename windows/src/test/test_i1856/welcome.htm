@@ -1,0 +1,19 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Test I1856</title>
+</head>
+<body>                                                                                           
+
+<h1>I1856 - Keyboard Welcome Page Problem</h1>
+<p><a href='http://www.tavultesoft.com/'>Tavultesoft.com in this window</a></p>
+<p><a href='http://www.tavultesoft.com/' target='_blank'>Tavultesoft.com in a blank window</a></p>
+<p><a href='http://www.tavultesoft.com/' target='qwoo'>Tavultesoft.com in a window named 'qwoo'</a></p>
+
+<h2>Issue Details</h2>
+
+<p>The welcome.htm page often needs to link to other pages (html or pdf) that are included in a package. If the link uses the same window, there is no way to return to the original welcome page window (unless a specific link is included in each document). But if target='_blank' is used to open a new window, IE crashes if the window is new window is closed before the original window. Also, the new window is not created as a topmost window, so is hard to read anyway without.</p>
+<p>The best solution (IMHO) would be to add a Home (or Back) link on the bottom of the IE window that always either goes back to the previous page or back to the main welcome.htm page.</p>
+
+</body>
+</html>

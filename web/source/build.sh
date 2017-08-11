@@ -2,6 +2,8 @@
 # 
 # Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 #
+# Note: any changes to this script should be replicated in build.bat
+#
 
 display_usage ( ) {
     echo "build.sh [-ui | -test | -embed | -web | -debug_embedded]"
@@ -53,8 +55,9 @@ readonly BUILD
 : ${CLOSURECOMPILERPATH:=../tools}
 : ${JAVA:=java}
 
-compiler=$CLOSURECOMPILERPATH/compiler.jar
-compilecmd="$JAVA -jar $compiler"
+compiler="$CLOSURECOMPILERPATH/compiler.jar"
+compiler_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables"
+compilecmd="$JAVA -jar $compiler $compiler_warnings"
 
 if ! [ -f $compiler ];
 then
@@ -143,7 +146,7 @@ if [ $BUILD_EMBED = true ]; then
     assert $EMBED_OUTPUT/kmw-smpstring.js
 
     rm kmwtemp.js 2>/dev/null
-    $compilecmd --define __BUILD__=$BUILD --externs $SOURCE/kmwreleasestub.js --js $SOURCE/kmwbase.js --js $SOURCE/keymanweb.js --js $SOURCE/kmwosk.js --js $SOURCE/kmwembedded.js --js $SOURCE/kmwcallback.js --js $SOURCE/kmwkeymaps.js --js $SOURCE/kmwlayout.js --js $SOURCE/kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file kmwtemp.js --warning_level VERBOSE
+    $compilecmd --define tavultesoft.__BUILD__=$BUILD --externs $SOURCE/kmwreleasestub.js --js $SOURCE/kmwbase.js --js $SOURCE/keymanweb.js --js $SOURCE/kmwosk.js --js $SOURCE/kmwembedded.js --js $SOURCE/kmwcallback.js --js $SOURCE/kmwkeymaps.js --js $SOURCE/kmwlayout.js --js $SOURCE/kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file kmwtemp.js --warning_level VERBOSE
     assert kmwtemp.js 
 
     echo Append SMP extensions
@@ -188,7 +191,7 @@ if [ $BUILD_COREWEB = true ]; then
     # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
     echo Compile Keymanweb    
     rm $WEB_OUTPUT/kmwtemp.js 2>/dev/null
-    $compilecmd --define __BUILD__=$BUILD --externs $SOURCE/kmwreleasestub.js --js $SOURCE/kmwbase.js --js $SOURCE/keymanweb.js --js $SOURCE/kmwosk.js --js $SOURCE/kmwnative.js --js $SOURCE/kmwcallback.js --js $SOURCE/kmwkeymaps.js --js $SOURCE/kmwlayout.js --js $SOURCE/kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file $WEB_OUTPUT/kmwtemp.js --warning_level VERBOSE
+    $compilecmd --define tavultesoft.__BUILD__=$BUILD --externs $SOURCE/kmwreleasestub.js --js $SOURCE/kmwbase.js --js $SOURCE/keymanweb.js --js $SOURCE/kmwosk.js --js $SOURCE/kmwnative.js --js $SOURCE/kmwcallback.js --js $SOURCE/kmwkeymaps.js --js $SOURCE/kmwlayout.js --js $SOURCE/kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file $WEB_OUTPUT/kmwtemp.js --warning_level VERBOSE
     assert $WEB_OUTPUT/kmwtemp.js
 
     echo Append SMP string extensions to Keymanweb

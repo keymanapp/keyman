@@ -1,0 +1,91 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'Test I3762 - Test positional layout translation'
+store(&MESSAGE) 'A+all key combos; B,C+all combos'
+store(&WINDOWSLANGUAGES) 'x0401'
+begin Unicode > use(main)
+
+
+group(main) using keys
+  
++ [K_A] > 'letter-a '
++ [RALT K_A] > 'RALT-a '
++ [RCTRL K_A] > 'RCTRL-a '
++ [RALT RCTRL K_A] > 'RA/C-a '
++ [SHIFT K_A] > 'SHIFT-a '
++ [RALT SHIFT K_A] > 'RA/S-a '
++ [RCTRL SHIFT K_A] > 'RC/S-a '
++ [RALT RCTRL SHIFT K_A] > 'RC/S/A-a '
+
++ [LALT K_A] > 'LALT-a '
++ [LCTRL K_A] > 'LCTRL-a '
++ [LALT LCTRL K_A] > 'LA/C-a '
++ [SHIFT K_A] > 'SHIFT-a '
++ [LALT SHIFT K_A] > 'LA/S-a '
++ [LCTRL SHIFT K_A] > 'LC/S-a '
++ [LALT LCTRL SHIFT K_A] > 'LC/S/A-a '
+
++ [K_B] > 'btest'
+
+'btest' + [RALT K_C] > context(1) context(2) 'RALT-c '
+'btest' + [RCTRL K_C] > context(1) context(2) 'RCTRL-c '
+'btest' + [RALT RCTRL K_C] > context(1) context(2) 'RA/C-c '
+'btest' + [SHIFT K_C] > context(1) context(2) 'SHIFT-c '
+'btest' + [RALT SHIFT K_C] > context(1) context(2) 'RA/S-c '
+'btest' + [RCTRL SHIFT K_C] > context(1) context(2) 'RC/S-c '
+'btest' + [RALT RCTRL SHIFT K_C] > context(1) context(2) 'RC/S/A-c '
+
+'btest' + [LALT K_C] > context(1) context(2) 'LALT-c '
+'btest' + [LCTRL K_C] > context(1) context(2) 'LCTRL-c '
+'btest' + [LALT LCTRL K_C] > context(1) context(2) 'LA/C-c '
+'btest' + [SHIFT K_C] > context(1) context(2) 'SHIFT-c '
+'btest' + [LALT SHIFT K_C] > context(1) context(2) 'LA/S-c '
+'btest' + [LCTRL SHIFT K_C] > context(1) context(2) 'LC/S-c '
+'btest' + [LALT LCTRL SHIFT K_C] > context(1) context(2) 'LC/S/A-c '
+
++ [NCAPS K_D] > 'ncaps-d '
++ [NCAPS RALT K_D] > 'ncaps-ralt-d '
++ [NCAPS RCTRL K_D] > 'ncaps-rctrl-d '
++ [NCAPS RALT RCTRL K_D] > 'ncaps-ralt-rctrl-d '
++ [NCAPS SHIFT K_D] > 'ncaps-shift-d '
++ [NCAPS RALT SHIFT K_D] > 'ncaps-ralt-shift-d '
++ [NCAPS RCTRL SHIFT K_D] > 'ncaps-rctrl-shift-d '
++ [NCAPS RALT RCTRL SHIFT K_D] > 'ncaps-ralt-rctrl-shift-d '
+
++ [NCAPS LALT K_D] > 'ncaps-lalt-d '
++ [NCAPS lCTRL K_D] > 'ncaps-lctrl-d '
++ [NCAPS lALT lCTRL K_D] > 'ncaps-lalt-lctrl-d '
++ [NCAPS lALT SHIFT K_D] > 'ncaps-lalt-shift-d '
++ [NCAPS LCTRL SHIFT K_D] > 'ncaps-lctrl-shift-d '
++ [NCAPS lALT lCTRL SHIFT K_D] > 'ncaps-lalt-lctrl-shift-d '
+
++ [CAPS K_D] > 'caps-d '
++ [CAPS RALT K_D] > 'caps-ralt-d '
++ [CAPS RCTRL K_D] > 'caps-rctrl-d '
++ [CAPS RALT RCTRL K_D] > 'caps-ralt-rctrl-d '
++ [CAPS SHIFT K_D] > 'caps-shift-d '
++ [CAPS RALT SHIFT K_D] > 'caps-ralt-shift-d '
++ [CAPS RCTRL SHIFT K_D] > 'caps-rctrl-shift-d '
++ [CAPS RALT RCTRL SHIFT K_D] > 'caps-ralt-rctrl-shift-d '
+
++ [CAPS LALT K_D] > 'caps-lalt-d '
++ [CAPS LCTRL K_D] > 'caps-lctrl-d '
++ [CAPS LALT LCTRL K_D] > 'caps-lalt-lctrl-d '
++ [CAPS LALT SHIFT K_D] > 'caps-lalt-shift-d '
++ [CAPS LCTRL SHIFT K_D] > 'caps-lctrl-shift-d '
++ [CAPS LALT LCTRL SHIFT K_D] > 'caps-lalt-lctrl-shift-d '
+                         
++ [RALT K_E] > "ā"
+                       
+c 
+c Test RALT combinations for simulate ctrl+alt
+c - test each of the four possible ctrl+alt combos for F G H, and also RAlt by iteslf
+c - f and h should show a result for everything bar RAlt
+c - g should show a result for everything
+c 
+
++ [LCTRL RALT K_F] > 'lc ra f '
++ [LCTRL LALT K_F] > 'lc la f '
++ [RCTRL RALT K_F] > 'rc ra f '
++ [RCTRL LALT K_F] > 'rc la f '
++ [RALT K_G] > 'ra g '
++ [CTRL ALT K_H] > 'c a h '

@@ -1,0 +1,23 @@
+﻿c Tests the index() statement in conjunction with deadkeys in KeymanWeb
+c 
+c Expect: 'a -> ά, '[K_SPACE] -> '
+store(&VERSION) '9.0'
+store(&NAME) 'Test deadkey index I3910'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ "'" > dk(tonos)
++ "a" > U+03B1 
++ ' ' > ' '
+
+match > use(dk)
+
+
+group(dk)
+
+store(alpha) " " U+03B1
+store(tonos-alpha) "'" U+03AC
+
+dk(tonos) any(alpha) > index(tonos-alpha, 2)

@@ -1,0 +1,1 @@
+KeymanWeb.KRS(new Stub_Keyboard_deadkey_basic()); function Stub_Keyboard_deadkey_basic() {this.KF="deadkey_basic-1.0.js";this.KI="Keyboard_deadkey_basic";this.KN="Basic Deadkey Compatibility Tests";}

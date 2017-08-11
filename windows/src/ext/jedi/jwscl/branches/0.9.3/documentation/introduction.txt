@@ -1,0 +1,49 @@
+@image(..\documentation\JWSCL Logo 1.png)
+
+@title( )
+@bold(JEDI Windows Security Library BETA 0.7 - This is the preliminary version of JWSCL.)
+
+The suite is a bunch of classes that encapsulated MS Windows security functions in object oriented way.
+
+The goal of this project is to make security programming easier to delphi programmers. This includes that
+the programmer must not allocate Windows API memory and also free it. Also she can use simple Delphi String (Ansi- and WideString)
+in all function that needs string manipulation. The memory allocation and deallocation for these things is done internally with a content check.
+Of course it is possible to retrieve winapi structures easily to use in other winapi calls (e.g. TJwSecurityDescriptor.Create_SD). The caller
+also has to free it using a counter part function (e.g. TJwSecurityDescriptor.Free_SD). 
+
+Also api functions are wrapped together in classes to diminish initialization that consumes a great amount of time which (s)he
+could use for better things. All the programmer has to do is to free the class instance after she has used it.
+
+@bold(However it is not the goal to teach delphi programmers how to program in windows security or create secure windows applications).
+The programmer has to understand the security of windows by herself. To use these classes she must know 
+what tokens, principals, secure objects, sessions and so on are. 
+
+On the other hand if you want to test the software by creating good test scenarios (module, function, class, integration testing) you are welcome.
+With good tests I mean tests that are reproducable, have a high function cover and uses @html(<a href="http://dunit.sourceforge.net">DUnit</a>).
+
+@bold(This library has beta status and is surely not bug free. )
+
+For information about @bold(license facts) see @link(Conclusion).
+
+
+Do not forget to send bugs, comments or greets to the author@br
+@bold(Christian Wimmer) – DelphiSecurityLibrary@@teamchris.info@br
+Stuttgart, Germany 5th October 2007
+@br
+
+Contributors (in alphabetical order)
+@html(
+<ul>
+   <li>Philip Dittmann</li>
+   <li>Danila Galimov</li>
+   <li><a href="http://www.techvanguards.com">Binh Ly (ComLib.pas)</a></li>
+   <li><a href="http://www.remkoweijnen.nl">Remko Weijnen</a></li>
+   <li>and in Memory Of
+Robert Marquardt</li>
+</ul>) 
+
+Updated 25.02.2008
+
+@html(
+<a href="http://sf.net/projects/jedi-apilib">Visit Source Forge Project Site</a><br>
+<a href="http://jwscl.delphi-jedi.net/blog/index.html">Visit Webblog</a>)

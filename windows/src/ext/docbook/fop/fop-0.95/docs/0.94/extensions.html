@@ -1,0 +1,325 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="Apache Forrest" name="Generator">
+<meta name="Forrest-version" content="0.9-dev">
+<meta name="Forrest-skin-name" content="pelt">
+<title>Standard FOP Extensions</title>
+<link type="text/css" href="../skin/basic.css" rel="stylesheet">
+<link media="screen" type="text/css" href="../skin/screen.css" rel="stylesheet">
+<link media="print" type="text/css" href="../skin/print.css" rel="stylesheet">
+<link type="text/css" href="../skin/profile.css" rel="stylesheet">
+<script src="../skin/getBlank.js" language="javascript" type="text/javascript"></script><script src="../skin/getMenu.js" language="javascript" type="text/javascript"></script><script src="../skin/fontsize.js" language="javascript" type="text/javascript"></script>
+<link rel="shortcut icon" href="../">
+</head>
+<body onload="init()">
+<script type="text/javascript">ndeSetTextSize();</script>
+<div id="top">
+<!--+
+    |header
+    +-->
+<div class="header">
+<!--+
+    |start group logo
+    +-->
+<div class="grouplogo">
+<a href="http://xmlgraphics.apache.org/"><img class="logoImage" alt="Apache XML Graphics" src="../images/group-logo.gif" title="Apache XML Graphics is responsible for the creation and maintenance of software for managing the conversion of XML formats to graphical output, and the creation and maintenance of related software components, based on software licensed to the Foundation"></a>
+</div>
+<!--+
+    |end group logo
+    +-->
+<!--+
+    |start Project Logo
+    +-->
+<div class="projectlogo">
+<a href="http://xmlgraphics.apache.org/fop/"><img class="logoImage" alt="Apache FOP" src="../images/logo.jpg" title="Apache FOP (Formatting Objects Processor) is the world's first output independent formatter. Output formats currently supported include PDF, PCL, PS, SVG, XML (area tree representation), Print, AWT, MIF and TXT. The primary output target is PDF."></a>
+</div>
+<!--+
+    |end Project Logo
+    +-->
+<!--+
+    |start Search
+    +-->
+<div class="searchbox">
+<form action="http://www.google.com/search" method="get" class="roundtopsmall">
+<input value="xmlgraphics.apache.org" name="sitesearch" type="hidden"><input onFocus="getBlank (this, 'Search the site with google');" size="25" name="q" id="query" type="text" value="Search the site with google">&nbsp; 
+                    <input name="Search" value="Search" type="submit">
+</form>
+</div>
+<!--+
+    |end search
+    +-->
+<!--+
+    |start Tabs
+    +-->
+<ul id="tabs">
+<li>
+<a class="unselected" href="../index.html">Home</a>
+</li>
+<li class="current">
+<a class="selected" href="../0.94/index.html">Version 0.94</a>
+</li>
+<li>
+<a class="unselected" href="../0.95/index.html">Version 0.95</a>
+</li>
+<li>
+<a class="unselected" href="../trunk/index.html">FOP Trunk</a>
+</li>
+<li>
+<a class="unselected" href="../dev/index.html">Development</a>
+</li>
+</ul>
+<!--+
+    |end Tabs
+    +-->
+</div>
+</div>
+<div id="main">
+<div id="publishedStrip">
+<!--+
+    |start Subtabs
+    +-->
+<div id="level2tabs"></div>
+<!--+
+    |end Endtabs
+    +-->
+<script type="text/javascript"><!--
+document.write("Last Published: " + document.lastModified);
+//  --></script>
+</div>
+<!--+
+    |breadtrail
+    +-->
+<div class="breadtrail">
+<a href="http://www.apache.org/">apache.org</a> &gt; <a href="http://xml.apache.org/">XML Federation</a> &gt; <a href="http://xmlgraphics.apache.org/">xmlgraphics.apache.org</a><script src="../skin/breadcrumbs.js" language="JavaScript" type="text/javascript"></script>
+</div>
+<!--+
+    |start Menu, mainarea
+    +-->
+<!--+
+    |start Menu
+    +-->
+<div id="menu">
+<div onclick="SwitchMenu('menu_selected_1.1', '../skin/')" id="menu_selected_1.1Title" class="menutitle" style="background-image: url('../skin/images/chapter_open.gif');">FOP 0.94</div>
+<div id="menu_selected_1.1" class="selectedmenuitemgroup" style="display: block;">
+<div class="menuitem">
+<a href="../0.94/index.html">About</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/releaseNotes_0.94.html">Release Notes</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/changes_0.94.html">Changes</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/knownissues_overview.html">Known Issues</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/upgrading.html">Upgrading</a>
+</div>
+<div onclick="SwitchMenu('menu_1.1.6', '../skin/')" id="menu_1.1.6Title" class="menutitle">Using FOP</div>
+<div id="menu_1.1.6" class="menuitemgroup">
+<div class="menuitem">
+<a href="../0.94/compiling.html">Build</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/configuration.html">Configure</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/running.html">Run</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/embedding.html">Embed</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/servlets.html">Servlets</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/anttask.html">Ant Task</a>
+</div>
+</div>
+<div onclick="SwitchMenu('menu_selected_1.1.7', '../skin/')" id="menu_selected_1.1.7Title" class="menutitle" style="background-image: url('../skin/images/chapter_open.gif');">Features</div>
+<div id="menu_selected_1.1.7" class="selectedmenuitemgroup" style="display: block;">
+<div class="menuitem">
+<a href="../0.94/output.html">Output Targets</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/intermediate.html">Intermediate Format</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/pdfencryption.html">PDF Encryption</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/pdfa.html">PDF/A</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/pdfx.html">PDF/X</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/graphics.html">Graphics</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/fonts.html">Fonts</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/hyphenation.html">Hyphenation</a>
+</div>
+<div class="menupage">
+<div class="menupagetitle">Extensions</div>
+</div>
+</div>
+</div>
+<div id="credit"></div>
+<div id="roundbottom">
+<img style="display: none" class="corner" height="15" width="15" alt="" src="../skin/images/rc-b-l-15-1body-2menu-3menu.png"></div>
+<!--+
+  |alternative credits
+  +-->
+<div id="credit2"></div>
+</div>
+<!--+
+    |end Menu
+    +-->
+<!--+
+    |start content
+    +-->
+<div id="content">
+<div title="raw XML" class="xmllink">
+<a class="dida" href="extensions.xml"><img alt="XML - icon" src="../skin/images/xmldoc.gif" class="skin"><br>
+        XML</a>
+</div>
+<div title="Portable Document Format" class="pdflink">
+<a class="dida" href="extensions.pdf"><img alt="PDF -icon" src="../skin/images/pdfdoc.gif" class="skin"><br>
+        PDF</a>
+</div>
+<div class="trail">Font size: 
+	          &nbsp;<input value="Reset" class="resetfont" title="Reset text" onclick="ndeSetTextSize('reset'); return false;" type="button">      
+	          &nbsp;<input value="-a" class="smallerfont" title="Shrink text" onclick="ndeSetTextSize('decr'); return false;" type="button">
+	          &nbsp;<input value="+a" class="biggerfont" title="Enlarge text" onclick="ndeSetTextSize('incr'); return false;" type="button">
+</div>
+<h1>Standard FOP Extensions</h1>
+<div id="front-matter">
+<div id="minitoc-area">
+<ul class="minitoc">
+<li>
+<a href="#svg">SVG</a>
+</li>
+<li>
+<a href="#fo-extensions">FO Extensions</a>
+<ul class="minitoc">
+<li>
+<a href="#fox-namespace">Namespace</a>
+</li>
+<li>
+<a href="#bookmarks">PDF Bookmarks</a>
+</li>
+<li>
+<a href="#named-destinations">Anchors or Named Destinations</a>
+</li>
+<li>
+<a href="#table-continue-label">Table Continuation Label</a>
+</li>
+<li>
+<a href="#widow-orphan-content-limit">fox:orphan-content-limit and fox:widow-content-limit</a>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+    
+<p>
+      By "extension", we mean any data that can be placed in the input XML document that 
+      is not addressed by the XSL-FO standard.
+      By having a mechanism for supporting extensions, FOP is able to add features that 
+      are not covered in the specification.
+    </p>
+    
+<p>
+      The extensions documented here are included with FOP, and are automatically available 
+      to you. If you wish to add an extension of your own to FOP, please see the 
+      <a href="../dev/extensions.html">Developers' Extension Page</a>.
+    </p>
+    
+<div class="note">
+<div class="label">Note</div>
+<div class="content">All extensions require the correct use of an appropriate namespace in your input document.</div>
+</div>
+    
+<a name="N1001E"></a><a name="svg"></a>
+<h2 class="underlined_10">SVG</h2>
+<div class="section">
+<p>
+        Please see the <a href="graphics.html#svg">SVG documentation</a> for more details.
+      </p>
+</div>
+    
+<a name="N1002C"></a><a name="fo-extensions"></a>
+<h2 class="underlined_10">FO Extensions</h2>
+<div class="section">
+<a name="N10032"></a><a name="fox-namespace"></a>
+<h3 class="underlined_5">Namespace</h3>
+<p>
+          By convention, FO extensions in FOP use the "fox" namespace prefix.
+          To use any of the FO extensions, add a namespace entry for 
+          <span class="codefrag">http://xml.apache.org/fop/extensions</span> to the root element:
+        </p>
+<pre class="code">&lt;fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format"
+               xmlns:fox="http://xmlgraphics.apache.org/fop/extensions"&gt;</pre>
+<a name="N10043"></a><a name="bookmarks"></a>
+<h3 class="underlined_5">PDF Bookmarks</h3>
+<p>
+          In previous versions of Apache FOP there was a <span class="codefrag">fox:outline</span> element
+          which was used to create outlines in PDF files. The redesigned code makes use
+          of the new <a class="external" href="http://www.w3.org/TR/xsl11/#fo_bookmark-tree">bookmark feature defined in the latest XSL 1.1 working draft</a>.
+        </p>
+<a name="N10054"></a><a name="named-destinations"></a>
+<h3 class="underlined_5">Anchors or Named Destinations</h3>
+<p>This extension element hasn't been reimplemented for the redesigned code, yet.</p>
+<a name="N10060"></a><a name="table-continue-label"></a>
+<h3 class="underlined_5">Table Continuation Label</h3>
+<p>This extension element hasn't been reimplemented for the redesigned code, yet.</p>
+<a name="N1006C"></a><a name="widow-orphan-content-limit"></a>
+<h3 class="underlined_5">fox:orphan-content-limit and fox:widow-content-limit</h3>
+<p>
+          The two proprietary extension properties, fox:orphan-content-limit and
+          fox:widow-content-limit, are used to improve the layout of list-blocks and tables.
+          If you have a table with many entries, you don't want a single row to be left over
+          on a page. You will want to make sure that at least two or three lines are kept
+          together. The properties take an absolute length which specifies the area at the
+          beginning (fox:widow-content-limit) or at the end (fox:orphan-content-limit) of a
+          table or list-block. The properties are inherited and only have an effect on fo:table
+          and fo:list-block. An example: fox:widow-content-limit="3 * 1.2em" would make sure
+          the you'll have at least three lines (assuming line-height="1.2") together on a table
+          or list-block.
+        </p>
+</div>
+  
+<span class="version">
+          version 627324</span>
+</div>
+<!--+
+    |end content
+    +-->
+<div class="clearboth">&nbsp;</div>
+</div>
+<div id="footer">
+<!--+
+    |start bottomstrip
+    +-->
+<div class="lastmodified">
+<script type="text/javascript"><!--
+document.write("Last Published: " + document.lastModified);
+//  --></script>
+</div>
+<div class="copyright">
+        Copyright &copy;
+         1999-2008 <a href="http://www.apache.org/licenses/">The Apache Software Foundation.</a>
+</div>
+<!--+
+    |end bottomstrip
+    +-->
+</div>
+</body>
+</html>

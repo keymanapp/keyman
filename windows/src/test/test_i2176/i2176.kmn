@@ -1,0 +1,8 @@
+﻿store(&VERSION) '8.0'
+store(&NAME) 'I2176 - Test uninst.vbs'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ 'a' > 'I2176'

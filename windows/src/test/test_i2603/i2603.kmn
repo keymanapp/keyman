@@ -1,0 +1,11 @@
+﻿store(&VERSION) '8.0'
+store(&NAME) 'Test I2603'
+store(&MESSAGE) 'A key has AltGr, LCtrl+LAlt and Shift/Unshift states in KVK'
+store(&VISUALKEYBOARD) 'i2603.kvk'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ [RALT K_A] > 'RALT K_A pressed'
++ [CTRL ALT K_A] > 'Ctrl Alt K_A pressed'

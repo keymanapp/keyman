@@ -1,0 +1,6 @@
+TIP_ICON_BASE_20        RCDATA  "20-base.png"
+TIP_ICON_BASE_24        RCDATA  "24-base.png"
+TIP_ICON_BASE_32        RCDATA  "32-base.png"
+TIP_ICON_BASE_40        RCDATA  "40-base.png"
+TIP_ICON_BASE_48        RCDATA  "48-base.png"
+

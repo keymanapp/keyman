@@ -1,0 +1,54 @@
+package JvDocking;
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $495A0000}
+{$DEFINE RELEASE}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'JVCL Docking Components Runtime Package'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  JvCore,
+  Jcl,
+  vcl,
+  vclx,
+  rtl;
+
+contains
+  JvDockControlForm in '..\jvcl\jvcl\run\JvDockControlForm.pas',
+  JvDockDelphiStyle in '..\jvcl\jvcl\run\JvDockDelphiStyle.pas',
+  JvDockGlobals in '..\jvcl\jvcl\run\JvDockGlobals.pas',
+  JvDockHashTable in '..\jvcl\jvcl\run\JvDockHashTable.pas',
+  JvDockInfo in '..\jvcl\jvcl\run\JvDockInfo.pas',
+  JvDockSupportClass in '..\jvcl\jvcl\run\JvDockSupportClass.pas',
+  JvDockSupportControl in '..\jvcl\jvcl\run\JvDockSupportControl.pas',
+  JvDockSupportProc in '..\jvcl\jvcl\run\JvDockSupportProc.pas',
+  JvDockTree in '..\jvcl\jvcl\run\JvDockTree.pas',
+  JvDockAdvTree in '..\jvcl\jvcl\run\JvDockAdvTree.pas',
+  JvDockVCStyle in '..\jvcl\jvcl\run\JvDockVCStyle.pas',
+  JvDockVIDStyle in '..\jvcl\jvcl\run\JvDockVIDStyle.pas',
+  JvDockVIDVCStyle in '..\jvcl\jvcl\run\JvDockVIDVCStyle.pas',
+  JvDockVSNetStyle in '..\jvcl\jvcl\run\JvDockVSNetStyle.pas';
+
+end.

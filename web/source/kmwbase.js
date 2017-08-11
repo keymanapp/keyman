@@ -1,18 +1,17 @@
 /***
-   KeymanWeb 2.0
+   KeymanWeb 10.0
    Copyright 2017 SIL International
 ***/
 
- 
 /**  
  * Base code: Declare tavultesoft, major component namespaces and instances, utility functions 
  */  
 
-/** @define {number} */
-var __BUILD__ = 300;
-
 // If a copy of the script is already loaded, detect this and prevent re-initialization / data reset.
 var tavultesoft = window['tavultesoft'] = window['tavultesoft'] || {}; 
+
+/** @define {number} build counter that gets set by the build environment */
+tavultesoft.__BUILD__ = 299;
 
 if(!tavultesoft['keymanweb']) {
 
@@ -69,8 +68,8 @@ if(!tavultesoft['keymanweb']) {
     };
 
     keymanweb['initialized'] = 0;
-    keymanweb['build'] = __BUILD__;
-    keymanweb['version'] = '2.0';
+    keymanweb['build'] = tavultesoft.__BUILD__;
+    keymanweb['version'] = '10.0';
     keymanweb['helpURL'] = 'http://help.keyman.com/go'; 
 
     // Expose (old) KeymanWeb object for use by compiled keyboards (replaces legacy object in earlier versions)

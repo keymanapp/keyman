@@ -1,0 +1,29 @@
+!IF DEFINED(IA64) && ("$(IA64)" == "1")
+!Error IA64 target not supported
+!endif
+
+TARGETPATH=..\Products\$(DDKBUILDENV)
+
+# disable "conditional expression is constant" warning
+# which flags all the asserts and DbgText's due to the do{}while(0)
+MSC_WARNING_LEVEL=/wd4127
+
+!IF (("$(DDKBUILDENV)" == "chk") || ("$(DDKBUILDENV)" == "CHK"))
+
+MSC_OPTIMIZATION=/Od
+
+!ELSE
+
+LINK_TIME_CODE_GENERATION=1
+MSC_OPTIMIZATION=/Oi /Oxt
+
+!ENDIF
+
+USE_PDB_TO_COMPILE=1
+
+# if the output directory doesn't exist create it, or the linker will fail to 
+# create the product
+!if !exist($(MAKEDIR)\$(TARGETPATH))
+!if [mkdir $(MAKEDIR)\$(TARGETPATH)]
+!endif
+!endif

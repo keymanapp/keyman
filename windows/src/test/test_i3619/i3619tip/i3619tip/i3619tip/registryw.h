@@ -1,0 +1,138 @@
+/*
+  Name:             registryw
+  Copyright:        Copyright (C) 2003-2017 SIL International.
+  Documentation:    
+  Description:      
+  Create Date:      1 Dec 2012
+
+  Modified Date:    1 Dec 2012
+  Authors:          mcdurdin
+  Related Files:    
+  Dependencies:     
+
+  Bugs:             
+  Todo:             
+  Notes:            
+  History:          01 Dec 2012 - mcdurdin - I3622 - V9.0 - Add Registry*W classes for Unicode 
+                    
+*/
+#ifndef _REGISTRYW_H   // I3622
+#define _REGISTRYW_H
+
+#include <windows.h>
+
+#define REGSZ_SystemKeyboardLayoutsW	L"system\\currentcontrolset\\control\\keyboard layouts"
+
+#define REGSZ_KeyboardOptionsW L"options" // active keyboards\<keyboardname>\options
+
+
+#define REGSZ_EvaluationW		L"evaluation"
+
+#define REGSZ_ProductIDW			L"product id"
+#define REGSZ_ProductFileNameW	L"product file name"
+
+//#define REGSZ_SystemNLSLocale "system\\currentcontrolset\\control\\Nls\\Locale"
+
+#define REGSZ_UseOldKeyStuffingAlgorithmW L"use old key stuffing algorithm"  // I1797
+
+#define REGSZ_RegistrationKeyW	L"registration key"
+#define REGSZ_ProductStatusW		L"product status"
+
+#define REGSZ_KeymanActiveHotkeyW		L"keyman active hotkey"
+
+#define REGSZ_KeymanFileW		L"keyman file"
+#define REGSZ_KeymanErrorW		L"keyman error"
+#define REGSZ_KeymanKeyboardIDW	L"keyman keyboard id"
+
+#define REGSZ_KeymanNameW		L"keyman name"
+#define REGSZ_LayoutFileW		L"layout file"
+#define REGSZ_LayoutTextW		L"layout text"
+#define REGSZ_LayoutIDW			L"layout id"
+
+#define REGSZ_UnknownKeyboardIDW	L"unknown layout id"
+#define REGSZ_DebugW				L"debug"
+
+#define REGSZ_UnderlyingLayoutW	L"underlying layout"
+
+#define REGSZ_ShowVisualKeyboardW	L"show visual keyboard"
+
+#define REGSZ_SwitchLanguageWithKeyboardW L"switch language with keyboard"
+#define REGSZ_SwitchLanguageForAllApplicationsW L"switch language for all applications"
+
+#define REGSZ_RootPathW			L"root path"
+
+/*
+#define REGSZ_KeymanOffHotkey				"keyman hotkey"
+#define REGSZ_VisualKeyboardHotkey			"visual keyboard hotkey"
+#define REGSZ_KeymanMenuHotkey				"keyman menu hotkey"
+#define REGSZ_KeymanConfigurationHotkey		"keyman configuration hotkey"
+*/
+
+#define REGSZ_SimulateAltGrW     L"simulate altgr"
+#define REGSZ_KeyboardHotkeysAreToggleW L"hotkeys are toggles"
+
+#define REGSZ_ShouldShowStartupW		L"show keyman startup"
+#define REGSZ_ShouldStartInternatW	L"should start internat"
+
+/* Addins */ 
+
+#define REGSZ_AddinNameW			 L"addin name"
+#define REGSZ_AddinFileNameW	 L"addin file name"
+#define REGSZ_AddinEnabledW    L"addin enabled"
+
+/* Registry keys for upgrade purposes only */ 
+
+#define REGSZ_KeymanDeveloper50W	L"software\\tavultesoft\\keyman developer\\5.0"
+#define REGSZ_Keyman50W			L"software\\tavultesoft\\keyman\\5.0"
+
+/* Splitting Registry into ReadOnly and FullAccess makes it much easier to ensure that we are using the registry 
+   correctly -- readonly wherever possible. */
+
+class RegistryReadOnlyW
+{
+protected:
+	HKEY FhRootKey;
+	HKEY FhKey;
+
+	BOOL WrapError(DWORD res);
+	HKEY GetKeyReadOnly(LPCWSTR AKey);
+
+public:
+	RegistryReadOnlyW(HKEY AhRootKey);
+	~RegistryReadOnlyW();
+
+	HKEY hKey() { return FhKey; }
+
+	BOOL CloseKey(void);
+	BOOL GetKeyNames(LPWSTR AKey, int len, int n);
+	BOOL GetValueNames(LPWSTR AName, int len, int n);
+	BOOL KeyExists(LPCWSTR AKey);
+	BOOL OpenKeyReadOnly(LPCWSTR AKey);
+	int ReadInteger(LPCWSTR AName);
+	BOOL ReadString(LPCWSTR AName, LPWSTR AValue, int len);
+	BOOL ValueExists(LPCWSTR AName);
+};
+
+class RegistryFullAccessW: public RegistryReadOnlyW
+{
+protected:	
+	HKEY GetKey(LPCWSTR AKey);
+	BOOL IntRecursiveDeleteKey(HKEY hkey);
+
+public:
+	RegistryFullAccessW(HKEY AhRootKey) : RegistryReadOnlyW(AhRootKey) {};
+	~RegistryFullAccessW() {};
+
+	BOOL RecursiveDeleteKey(LPCWSTR AKey);
+	BOOL CreateKey(LPCWSTR AKey);
+	BOOL DeleteKey(LPCWSTR AKey);
+	BOOL DeleteValue(LPCWSTR AName);
+	BOOL OpenKey(LPCWSTR AKey, BOOL ACreate);
+	BOOL WriteInteger(LPCWSTR AName, int AValue);
+	BOOL WriteString(LPCWSTR AName, LPWSTR AValue);
+};
+
+RegistryReadOnlyW *Reg_GetKeymanActiveKeyboardW(LPWSTR kbname);
+RegistryReadOnlyW *Reg_GetKeymanInstalledKeyboardW(LPWSTR kbname);
+
+#endif

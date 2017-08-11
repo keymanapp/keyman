@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <RegistryValue Root="HKCR" Key=".kmp" Type="string" Value="Keyman.File.Package" />
+  <RegistryValue Root="HKCR" Key=".kmx" Type="string" Value="Keyman.File.Keyboard" />
+  <RegistryValue Root="HKCR" Key=".kvk" Type="string" Value="Keyman.File.OnScreenKeyboard" />
+  
+  <RegistryValue Root="HKCR" Key="Keyman.File.Package" Type="string" Value="Keyman Package File" />
+  <RegistryValue Root="HKCR" Key="Keyman.File.Package\DefaultIcon" Type="string" Value="[#desktop_resources.dll],0" />
+  <RegistryValue Root="HKCR" Key="Keyman.File.Package\Shell" Type="string" Value="install" />
+  <RegistryValue Root="HKCR" Key="Keyman.File.Package\Shell\install" Type="string" Value="&amp;Install" />
+  <RegistryValue Root="HKCR" Key="Keyman.File.Package\Shell\install\Command" Type="string" Value='"[#kmshell.exe]" -i "%1"' />
+
+  <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard" Type="string" Value="Keyman Keyboard File" />
+  <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\DefaultIcon" Type="string" Value="[#desktop_resources.dll],1" />
+  <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\Shell" Type="string" Value="install" />
+  <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\Shell\install" Type="string" Value="&amp;Install" />
+  <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\Shell\install\Command" Type="string" Value='"[#kmshell.exe]" -i "%1"' />
+
+  <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard" Type="string" Value="Keyman On Screen Keyboard File" />
+  <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\DefaultIcon" Type="string" Value="[#desktop_resources.dll],2" />
+  <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell" Type="string" Value="install" />
+  <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\install" Type="string" Value="&amp;Install" />
+  <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\install\Command" Type="string" Value='"[#kmshell.exe]" -i "%1"' />
+</Include>

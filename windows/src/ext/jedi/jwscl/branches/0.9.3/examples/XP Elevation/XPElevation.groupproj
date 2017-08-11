@@ -1,0 +1,44 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{d004bee4-2ba0-41f5-bec3-ca1e8a2ef631}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="Ask Credentials Code\AskCredentials.dproj" />
+    <Projects Include="Service Code\XPElevationService.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="XPElevationService">
+    <MSBuild Projects="Service Code\XPElevationService.dproj" Targets="" />
+  </Target>
+  <Target Name="XPElevationService:Clean">
+    <MSBuild Projects="Service Code\XPElevationService.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="XPElevationService:Make">
+    <MSBuild Projects="Service Code\XPElevationService.dproj" Targets="Make" />
+  </Target>
+  <Target Name="AskCredentials">
+    <MSBuild Projects="Ask Credentials Code\AskCredentials.dproj" Targets="" />
+  </Target>
+  <Target Name="AskCredentials:Clean">
+    <MSBuild Projects="Ask Credentials Code\AskCredentials.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="AskCredentials:Make">
+    <MSBuild Projects="Ask Credentials Code\AskCredentials.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="XPElevationService;AskCredentials" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="XPElevationService:Clean;AskCredentials:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="XPElevationService:Make;AskCredentials:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

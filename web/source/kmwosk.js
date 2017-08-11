@@ -1,5 +1,5 @@
 /***
-   KeymanWeb 2.0
+   KeymanWeb 10.0
    Copyright 2017 SIL International
 ***/
 
@@ -588,8 +588,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     {
       if(e && typeof(e.id) != 'undefined')
       {
-        var i, idx = e.id.split('-'), baseId = idx[idx.length-1];
-        if(typeof e.subKeys != 'undefined' && e.subKeys.length > 0 && e.subKeys[0].id != baseId)
+        var i, idx = e.id.split('-'), baseId = idx[idx.length-1], layer = (idx.length > 1 ? idx[0] : '');
+        if(typeof e.subKeys != 'undefined' && e.subKeys.length > 0 && (e.subKeys[0].id != baseId || e.subKeys[0].layer != layer))
         {
           var eCopy={'id':baseId,'layer':''};
           if(idx.length > 1) eCopy['layer'] = idx[0];
@@ -2489,7 +2489,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var layout;
 
       // Build a layout using the default for the device
-      var layoutType=formFactor,dfltLayout=window['dfltLayout'];
+      var layoutType=formFactor,dfltLayout=keymanweb['dfltLayout'];
       if(typeof dfltLayout[layoutType] != 'object') layoutType = 'desktop';
 
       // Clone the default layout object for this device
@@ -2934,7 +2934,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */
     osk.showBuild = function()
     {
-      util.alert('KeymanWeb Build '+keymanweb['build']+'<br /><br />'
+      util.alert('KeymanWeb Version '+keymanweb['version']+'.'+keymanweb['build']+'<br /><br />'
         +'<span style="font-size:0.8em">Copyright &copy; 2017 SIL International</span>');
     }
 

@@ -1,0 +1,9 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I3511'
+begin Unicode > use(main)
+                            
+store(&includecodes) 'codes.txt'
+
+group(main) using keys
+
++ [CTRL K_A] > 'bang' $MOO

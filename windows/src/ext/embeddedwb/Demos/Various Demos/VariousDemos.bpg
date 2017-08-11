@@ -1,0 +1,102 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.01
+#------------------------------------------------------------------------------
+!ifndef ROOT
+ROOT = $(MAKEDIR)\..
+!endif
+#------------------------------------------------------------------------------
+MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
+DCC = $(ROOT)\bin\dcc32.exe $**
+BRCC = $(ROOT)\bin\brcc32.exe $**
+#------------------------------------------------------------------------------
+PROJECTS = prjEditDDemo.exe prjExportFavoritesDemo.exe prjFile_AssDemo.exe \
+  prjGuidCreatorDemo.exe prjIEGuidDemo.exe prjIEAddressDemo.exe \
+  prjCacheDemo.exe prjDownloaderDemo.exe \
+  prjDownloadMgrDemo.exe prjDownloadMgrDemo.exe \
+  prjMultiDLDemo.exe prjIEParserDemo.exe prjTravellogDemo.exe \
+  prjLinksDemo.exe prjProject1Demo.exe prjMimeDemo.exe prjProject1Demo.exe \
+  prjZonesSecurityDemo.exe prjUIParser_Demo.exe prjMainDemo.exe \
+  prjUrlHistoryDemo.exe prjSearchhookDemo.exe prjProject1Demo.exe \
+  prjProject1Demo.exe
+
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+prjEditDDemo.exe: 01 - EditDesigner_Demo\prjEditDDemo.dpr
+  $(DCC)
+
+prjExportFavoritesDemo.exe: 02 - ExportFavorites_Demo\prjExportFavoritesDemo.dpr
+  $(DCC)
+
+prjFile_AssDemo.exe: 03 - FileAssociate_Demo\prjFile_AssDemo.dpr
+  $(DCC)
+
+prjGuidCreatorDemo.exe: 04 - GUID_Demo\GUID_Creator\prjGuidCreatorDemo.dpr
+  $(DCC)
+
+prjIEGuidDemo.exe: 04 - GUID_Demo\IEGuid\prjIEGuidDemo.dpr
+  $(DCC)
+
+prjIEAddressDemo.exe: 05 - IEAddress_Demo\prjIEAddressDemo.dpr
+  $(DCC)
+
+prjCacheDemo.exe: 06 - IECache_Demo\prjCacheDemo.dpr
+  $(DCC)
+
+prjDownloaderDemo.exe: 07 - IEDownload_Demo\IEDownload_Creating_Dynamically (at Run-Time)\prjDownloaderDemo.dpr
+  $(DCC)
+
+#prjDownloadManagerDemo.dll: 07 - IEDownload_Demo\IEDownload_DownloadManager_Demo\Internet Explorer_OutOfDate\prjDownloadManagerDemo.dpr
+#  $(DCC)
+
+prjDownloadMgrDemo.exe: 07 - IEDownload_Demo\IEDownload_DownloadManager_Demo\Webbrowser\prjDownloadMgrDemo.dpr
+  $(DCC)
+
+#prjDownloadDemo.exe: 07 - IEDownload_Demo\IEDownload_Mega_Demo\prjDownloadDemo.dpr
+#  $(DCC)
+
+prjDownloadMgrDemo.exe: 07 - IEDownload_Demo\IEDownload_Multiple Files_Simultaneous_Downloading\prjDownloadMgrDemo.dpr
+  $(DCC)
+
+prjMultiDLDemo.exe: 08 - IEMultiDownload\prjMultiDLDemo.dpr
+  $(DCC)
+
+prjIEParserDemo.exe: 09 - IEParser_Demo\prjIEParserDemo.dpr
+  $(DCC)
+
+prjTravellogDemo.exe: 10 - IETravellog_Demo\prjTravellogDemo.dpr
+  $(DCC)
+
+prjLinksDemo.exe: 11 - LabelLink_Demo\prjLinksDemo.dpr
+  $(DCC)
+
+prjProject1Demo.exe: 12 - LinksBar_Demo\prjProject1Demo.dpr
+  $(DCC)
+
+prjMimeDemo.exe: 13 - MimeFilter_Demo\prjMimeDemo.dpr
+  $(DCC)
+
+prjProject1Demo.exe: 14 - RichEditWB_Demo\prjProject1Demo.dpr
+  $(DCC)
+
+prjZonesSecurityDemo.exe: 15 - Zones_Security_Demo\prjZonesSecurityDemo.dpr
+  $(DCC)
+
+prjUIParser_Demo.exe: 16 - UI-Less_Demo\prjUIParser_Demo.dpr
+  $(DCC)
+
+prjMainDemo.exe: 17 - URL_Demo\prjMainDemo.dpr
+  $(DCC)
+
+prjUrlHistoryDemo.exe: 18 - URL_History_Demo\prjUrlHistoryDemo.dpr
+  $(DCC)
+
+prjSearchhookDemo.exe: 19 - URLSearchHook\prjSearchhookDemo.dpr
+  $(DCC)
+
+prjProject1Demo.exe: 20 - WebUpdater_Demo\Updater_Demo\prjProject1Demo.dpr
+  $(DCC)
+
+prjProject1Demo.exe: 20 - WebUpdater_Demo\Updater_XML_File_Creator\prjProject1Demo.dpr
+  $(DCC)

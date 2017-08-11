@@ -1,0 +1,18 @@
+﻿c Tests the context(n) statement in conjunction with deadkeys in KeymanWeb
+store(&VERSION) '9.0'
+store(&NAME) 'Test deadkey index I3910'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ "a" > U+03B1         
++ ' ' > ' '
+
+match > use(dk)
+
+group(dk)
+
+store(alpha) " " U+03B1
+
+'.' any(alpha) > "<" context(2) ">"

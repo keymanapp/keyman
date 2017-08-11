@@ -1,0 +1,14 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I5091 Single Group'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
+'O' + '~' > U+00D5 
+'P' + '!' > U+00C4
++ 'z' > 'P'
++ 'x' > 'Q'
+
+
+'ab' + 'c' > 'a'

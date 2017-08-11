@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F3843B8E-EDB6-440C-A6CD-D230FD38E951}"
+	ProjectSection(SolutionItems) = preProject
+		dirs = dirs
+		sources_inc.txt = sources_inc.txt
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MsgLister", "Drv\MsgLister.vcproj", "{E0E0BA4E-4A85-465F-84E7-7DFD68776485}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MsgListerApp", "App\MsgListerApp.vcproj", "{C4B62B1F-9D2F-4660-B5B0-E275C5A281D6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E0E0BA4E-4A85-465F-84E7-7DFD68776485}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E0E0BA4E-4A85-465F-84E7-7DFD68776485}.Debug|Win32.Build.0 = Debug|Win32
+		{E0E0BA4E-4A85-465F-84E7-7DFD68776485}.Release|Win32.ActiveCfg = Release|Win32
+		{E0E0BA4E-4A85-465F-84E7-7DFD68776485}.Release|Win32.Build.0 = Release|Win32
+		{C4B62B1F-9D2F-4660-B5B0-E275C5A281D6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C4B62B1F-9D2F-4660-B5B0-E275C5A281D6}.Debug|Win32.Build.0 = Debug|Win32
+		{C4B62B1F-9D2F-4660-B5B0-E275C5A281D6}.Release|Win32.ActiveCfg = Release|Win32
+		{C4B62B1F-9D2F-4660-B5B0-E275C5A281D6}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,15 @@
+﻿c * With empty context:
+c   * Press 'ABC' and get 'def'
+c   * Press 'Z' to reset option state
+store(&VERSION) '8.0'
+store(&NAME) 'Test I2484 A B C == def'
+store(&VISUALKEYBOARD) 'test_i2484.kvk'
+begin Unicode > use(main)
+           
+store(boo) '0'
+
+group(main) using keys
+           
+nul if(boo='0') 'A' + 'B' > 'X' set(boo='1')
+nul if(boo='1') 'X' + 'C' > 'def'
++ 'Z' > set(boo='0')

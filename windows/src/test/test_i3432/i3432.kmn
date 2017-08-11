@@ -1,0 +1,59 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'Test if(&platform) rules'
+store(&COPYRIGHT) '© 2012 Tavultesoft Pty Ltd'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
+c Various specific platforms, either web or native
+
++ 'a' > 'A, no platform specified'
+
+if(&platform = 'native windows desktop xp') + 'a' > 'A:Windows xp'   c Windows Desktop
+if(&platform = 'native windows desktop j') + 'a' > 'A:Windows J Vista+'   c Windows Desktop should never pass
+if(&platform = 'native windows desktop 6.0+') + 'a' > 'A:Windows Vista+'   c Windows Desktop, Vista or later
+if(&platform = 'windows seven+') + 'e' > 'win7+' c Windows 7 or later, desktop or web
+
+if(&platform = 'macos') + 'a' > 'A:MacOS X'
+if(&platform = 'linux') + 'a' > 'A:Linux/UNIX'
+
+if(&platform = 'ios phone') + 'a' > 'A:iPhone'
+if(&platform = 'iphone') + 'a' > 'A:iPhone'
+if(&platform = 'ios tablet') + 'a' > 'A:iPad'
+if(&platform = 'ipad') + 'a' > 'A:iPad'
+
+if(&platform = 'android phone 2.3 gingerbread') + 'a' > 'A:AndroidPhone'
+if(&platform = 'android tablet honeycomb') + 'a' > 'A:AndroidTablet'
+if(&platform = 'android tablet icecreamsandwich') + 'a' > 'A:AndroidTablet'
+
+c try and avoid: if(&x-resolution > '800') + 'a' > '...'
+
+c if(&platform = 'windows desktop vista')
+if(&platform = 'windows phone') + 'a' > 'A:Windows Phone'
+if(&platform = 'windows tablet') + 'a' > 'A:Windows Tablet'
+
+c Generic operating systems, either web or native
+
+if(&platform = 'ios') + 'b' > 'B:IOS'
+if(&platform = 'android') + 'b' > 'B:Android'
+if(&platform = 'windows') + 'b' > 'B:Windows'
+if(&platform = 'macosx') + 'b' > 'B:Mac OS X'                 
+
+c Classes of platforms, either web or native
+
+if(&platform = 'desktop') + 'c' > 'C:Desktop'
+if(&platform = 'mobile') + 'c' > 'C:Mobile'
+if(&platform = 'tablet') + 'c' > 'C:Tablet'
+                                              
+c Testing against web or native
+
+if(&platform = 'web') + 'd' > 'D:Web'
+c if(&platform = 'silverlight') + 'd' > 'D:Silverlight'
+if(&platform = 'native') + 'd' > 'D:Native'
+
+c baselayout('kbdus.dll') + 'z' > '...'
+if(&baselayout = 'kbdus.dll') + 'z' > 'Z ON US QWERTY'  c specific to windows
+if(&baselayout = 'kbdfr.dll') + 'z' > 'Z ON French AZERTY'
+if(&baselayout = 'en-US') + 'y' > 'Y ON US'  c generic
+if(&baselayout = 'fr-FR') + 'y' > 'Y ON French Azerty'

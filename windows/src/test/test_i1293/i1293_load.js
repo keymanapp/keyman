@@ -1,0 +1,1 @@
+﻿KeymanWeb.KRS(new Stub_Keyboard_i1293()); function Stub_Keyboard_i1293() {this.KF="i1293.js";this.KI="Keyboard_i1293";this.KN="Surrogate Pair Test [I1293]";}

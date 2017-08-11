@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V1.3//EN" "document-v13.dtd">
+<document xmlns:i18n="http://apache.org/cocoon/i18n/2.1"><header><title>History of Changes 0.94</title></header><body><p><link href="changes_0.94.rss"><img alt="RSS" src="../images/rss.png"/></link></p><section id="introduction"><title>Introduction and explanation of symbols</title><p>Changes are sorted by "type" and then chronologically with the most recent at the top. These symbols denote the various action types:<icon alt="add" src="../images/add.jpg"/>=add, <icon alt="fix" src="../images/fix.jpg"/>=fix, <icon alt="remove" src="../images/remove.jpg"/>=remove, <icon alt="update" src="../images/update.jpg"/>=update</p></section><section id="version_0.94"><title>Version 0.94 (24th August 2007)</title><section><title>Changes to the Code Base</title><ul><li><icon alt="add" src="../images/add.jpg"/>
+        Support for keep-together.within-line="always".
+       Committed by MM.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Add support for conditional spaces in table-cells.
+       Committed by VH.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Support alignment-adjust for images.
+       Committed by AD. Thanks to Max Berger. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42785">42785</link>.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Partial application of the patch in Bugzilla 41044:
+          * addition of a generic PropertyCache to be used by all Property
+            types that can be safely canonicalized
+          * modified EnumProperty, StringProperty, NumberProperty, EnumNumber
+            and FixedLength to make use of the cache infrastructure
+       Committed by AD. Thanks to Richard Wheeldon. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41044">41044</link>.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Slight improvement of relative font-weight handling in the properties
+        package.
+       Committed by AD.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Add support for font auto-detection (easier font configuration).
+       Committed by JM. Thanks to Adrian Cumiskey. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41831">41831</link>.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Add support for exact positioning of internal PDF links.
+       Committed by JM. Thanks to Paul Vinkenoog. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42067">42067</link>.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Add support for the collapsing-border model in tables.
+       Committed by VH, JM. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=36934">36934</link>.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Add support for named destinations in PDF.
+       Committed by JB.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Add support for a two-pass production for PostScript output to minimize file size. This
+        adds images only once and adds only the fonts that are really used.
+       Committed by JM.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Support for GIF images in RTF output (RTF handler, only. Does not affect the RTF library.)
+       Committed by JM.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Support for soft masks (transparency) with ImageIO image adapter.
+       Committed by JM.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Added support for the soft hyphen (SHY) character.
+       Committed by MM.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Added support for line-height-shift-adjustment property.
+       Committed by MM.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Added support for the system property fop.home to
+        cli.Main.getJARList().
+       Committed by SP.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Added support for display-align for table-cell in RTF output.
+       Committed by JM. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=40930">40930</link>.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Added support for UAX#14 type line breaking. Support does not extend across nested fo:inline elements.
+       Committed by MM.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        AFP Renderer: Bugfix for 1 bit images where the width is not a multiple of 8.
+       Committed by JM.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fixed incomplete support for Unicode Word Joiner characters (U+2060 and U+FEFF).
+       Committed by MM.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fixed the rendering of zero-width spaces for certain fonts by not generating them into
+        the area tree.
+       Committed by JM. Thanks to Paul Vinkenoog. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42109">42109</link>.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fixed a problem with disappearing footnotes inside hyphenated inlines (and footnotes with hyphenated inline child).
+       Committed by LF.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fix PDF Genaration for non-ASCII compatible locales.
+       Committed by JM. Thanks to Martin Kögler. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41434">41434</link>.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fix several exceptions when break-before/after is set on the first/last row of a table.
+       Committed by VH.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fix extra page break when break-before is set on both a table and its first row.
+       Committed by VH.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Make keep-with-next and keep-with-previous work on fo:table.
+       Committed by VH.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fixed a problem with keep-with-next on table-rows. Once a keep-with-next was set
+        inside a table, the FO following the table would always be glued to the previous table.
+       Committed by JM.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fixed a problem with the auto-rotate-landscape setting in the PostScript renderer.
+        It didn't generate the right setpagedevice command.
+       Committed by JM.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fixed an IllegalArgumentException for absolutely positioned block-containers with a
+        border and no height/bpd set.
+       Committed by JM.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        If a line contained nothing but a linefeed, this didn't produce empty lines.
+        Replaced the auxiliary zero-width box with a glue the width of a line,
+        and shrinkable to zero-width.
+       Committed by AD. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41652">41652</link>.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Stricter FOP user configuration checking
+       Committed by VH. Thanks to Adrian Cumiskey. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=40120">40120</link>.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fix parsing 'url(...)' when the URL itself contains a bracketed part.
+       Committed by AD. Thanks to Erwin Tratar. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41572">41572</link>.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fix for NPE with PNG images for RTF output.
+       Committed by JM.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fix for properly parsing font-family names containing spaces.
+       Committed by AD.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fix incorrect behaviour of the BreakingAlgorithm when some inline content is wider than
+        the available ipd, causing a restart.
+       Committed by LF. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41019">41019</link>.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fix for PDF corruption when a TrueType font with spaces in its name is embedded and no 
+        XML font metrics file for that font is used.
+       Committed by JM.</li><li><icon alt="fix" src="../images/fix.jpg"/>
+        Fix for ClassCastException when fo:wrapper was used as direct child of fo:flow.
+        Note: "id" attributes are still not handled properly on fo:wrapper!
+       Committed by JM. Thanks to Adrian Cumiskey. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41426">41426</link>.</li><li><icon alt="update" src="../images/update.jpg"/>
+        Refactoring in the fo package:
+        -&gt; removal of the childNodes instance member in fop.fo.FObj
+        -&gt; addition of a firstChild instance member in fop.fo.FObj
+        -&gt; addition of a siblings instance member in fop.fo.FONode
+        -&gt; addition of a FONodeIterator interface in FONode + corresponding implementation in FObj
+        -&gt; changed implementations of FObj.addChildNode(), .removeChild() and .getChildNodes()
+       Committed by AD. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41656">41656</link>.</li><li><icon alt="update" src="../images/update.jpg"/>
+        Code cleanup and restructuring: 
+        Refactoring of PageSequenceLayoutManager and provide common FObj id property use
+       Committed by AD. Thanks to Adrian Cumiskey. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42089">42089</link>.</li><li><icon alt="update" src="../images/update.jpg"/>
+        Updated PDF/A-1b support according to ISO-19005-1:2005/Cor.1:2007.
+       Committed by JM.</li><li><icon alt="update" src="../images/update.jpg"/>
+        Use source resolution setting for bitmap images which don't provide their own
+        resolution.
+       Committed by JM. Thanks to Hussein Shafie. See Issue <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42406">42406</link>.</li></ul></section><section><title>Contributors to this release</title><p>We thank the following people for their contributions to this release.</p><p>This is a list of all people who participated as committers:<br/>Andreas Delmelle (AD), Jay Bryant (JB), Jeremias Märki (JM), Luca Furini (LF), Manuel Mall (MM), Simon Pepping (SP), Vincent Hennebert (VH),  (VH, JM).</p><p>This is a list of other contributors:<br/>Adrian Cumiskey, Erwin Tratar, Hussein Shafie, Martin Kögler, Max Berger, Paul Vinkenoog, Richard Wheeldon.</p></section></section></body></document>

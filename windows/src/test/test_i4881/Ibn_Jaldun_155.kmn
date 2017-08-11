@@ -1,0 +1,364 @@
+﻿
+
+store(&VERSION) '9.0'
+store(&NAME) 'Ibn Jaldun 1.55'
+c store(&BITMAP) 'IbnJaldun_w8.bmp'
+store(&COPYRIGHT) '© Miguel Á. Manzano Rodríguez (USAL) - 15/02/2015'
+store(&MnemonicLayout) "1"
+
+
+c ---------------------------------------------------------------------------------------------
+c Vocales
+c ---------------------------------------------------------------------------------------------
+
+store(MayVocs)           "A"      "E"     "I"     "O"     "U"
+store(MayVocsAcEsp)      "Á"      "É"     "Í"     "Ó"     "Ú"
+store(MayVocsAcFr)       "À"      "È"     "Ì"     "Ò"     "Ù"
+store(MayVocsDrs)        "Ä"      "Ë"     "Ï"     "Ö"     "Ü"
+Store(MayVocsCrflj)      "Â"      "Ê"     "Î"     "Ô"     "Û"
+store(MayVocsRaySI)     U+0100   U+0112  U+012A  U+014C  U+016A
+store(MayVocsPSup)      U+0226   U+0116  U+0130  U+022E  nul
+store(MayVocsPInf)      U+1EA0   U+1EB8  U+1ECA  U+1ECC  U+1EE4
+store(MayVocsHacek)     U+01CD   U+011A  U+01CF  U+01D1  U+01D3
+store(MayVocsBrev)      U+0102   U+0114  U+012C  U+014E  U+016C
+store(MayVocsCirc)      U+0202   U+0206  U+020A  U+020E  U+0216
+store(MayVocsVirg)      U+00C3   U+1EBC  U+0128  U+00D5  U+0168
+
+store(MinVocs)          "a"      "e"      "i"     "o"     "u"
+store(MinVocsAcEsp)     "á"      "é"      "í"     "ó"     "ú" 
+store(MinVocsAcFr)      "à"      "è"      "ì"     "ò"     "ù"
+store(MinVocsDrs)       "ä"      "ë"      "ï"     "ö"     "ü"
+store(MinVocsCrflj)     "â"      "ê"      "î"     "ô"     "û"
+store(MinVocsRaySI)     U+0101   U+0113  U+012B  U+014D  U+016B
+store(MinVocsPSup)      U+0227   U+0117  nul     U+022F  nul
+store(MinVocsPInf)      U+1EA1   U+1EB9  U+1ECB  U+1ECD  U+1EE5
+store(MinVocsHacek)     U+01CE   U+011B  U+01D0  U+01D2  U+01D4
+store(MinVocsBrev)      U+0103   U+0115  U+012D  U+014F  U+016D
+store(MinVocsCirc)      U+0203   U+0207  U+020B  U+020F  U+0217
+store(MinVocsVirg)      U+00E3   U+1EBD  U+0129  U+00F5  U+0169
+store(MinVocsDAc)       U+0201   U+0205  U+0209  U+0151  U+0215
+store(MinVocsAbi)       U+0105   U+0119  U+012F  U+01EB  U+0173
+store(MinVocsOtr1)      U+0250   U+0259  U+0131  U+0254  U+026F
+store(MinVocsOtr2)      U+01DF   U+03B5  U+028B  U+00F8  U+028C
+
+                                
+c ---------------------------------------------------------------------------------------------
+c Consonantes
+c ---------------------------------------------------------------------------------------------
+
+store(MayCons)       "B"     "C"      "D"    "F"     "G"     "H"      "J" \
+                     "K"     "L"      "M"    "N"     "P"     "Q"      "R" \ 
+                     "S"     "T"      "V"    "W"     "X"     "Y"      "Z"
+
+store(MayConsRaySI) U+1E06  nul     U+1E0E  nul     U+1E20  nul     nul \
+                    U+1E34  U+1E3A  nul     U+1E48  nul     nul     U+1E5E \
+                    nul     U+1E6E  nul     nul     nul     U+0232  U+1E94  
+                    
+store(MayConsPSup)  U+1E02  U+010A  U+1E0A  U+1E1E  U+0120  U+1E22  nul \
+                    nul     nul     U+1E40  U+1E44  U+1E56  nul     U+1E58 \
+                    U+1E60  U+1E6A  nul     U+1E86  U+1E8A  U+1E8E  U+017B
+
+store(MayConsPInf)  U+1E04  nul     U+1E0C  nul     nul     U+1E24  nul \
+                    U+1E32  U+1E36  U+1E42  U+1E46  nul     nul     U+1E5A \
+                    U+1E62  U+1E6C  U+1E7E  U+1E88  nul     U+1EF4  U+1E92
+
+store(MayConsHacek) nul     U+010C  U+010E  nul     U+01E6  U+021E  nul \
+                    U+01E8  nul     nul     U+0147  nul     nul     U+0158 \
+                    U+0160  U+0164  nul     nul     nul     nul     U+017D
+
+store(MayConsBrev)  nul     nul     nul     nul     U+011E  U+1E2A  nul \
+                    nul     nul     nul     nul     nul     nul     nul \
+                    nul     nul     nul     nul     nul     nul     nul
+
+store(MayConsCirc)  nul     U+0108  nul     nul     U+011C  U+0124  U+0134 \
+                    nul     nul     nul     nul     nul     nul     U+0212 \
+                    U+015C  nul     nul     U+0174  nul     U+0176  U+1E90
+
+store(MayConsAc)    nul     U+0106  nul     nul     U+01F4  nul     nul \
+                    U+1E30  U+0139  U+1E3E  U+0143  U+1E54  nul     U+0154 \
+                    U+015A  nul     nul     U+1E82  nul     nul     U+0179
+                    
+store(MayConsVirg)  nul     nul     nul     nul     nul     nul     nul \
+                    nul     nul     nul     nul     nul     nul     nul \
+                    nul     nul     U+1E7C  nul     nul     U+1EF8  nul     
+                    
+store(MayConsCed)   nul     U+00C7  U+1E10  nul     U+0122  U+1E28  nul \
+                    U+0136  U+013B  nul     U+0145  nul     nul     u+0156 \
+                    u+0218  U+021A  nul     nul     nul     nul     U+0224                  
+
+store(MayConsOtr)   U+00DF  U+1E08  U+0256  U+0191  U+0193  U+0195  U+025F \
+                    U+0198  U+026D  U+019C  U+014A  U+01A2  U+0278  U+0281 \
+                    U+0283  U+01AE  U+01B2  U+028D  U+02A7  U+028E  U+0292
+
+store(MinCons)       "b"     "c"     "d"      "f"     "g"     "h"      "j" \
+                     "k"     "l"      "m"     "n"     "p"     "q"      "r" \ 
+                     "s"     "t"      "v"     "w"     "x"     "y"      "z"
+                     
+store(MinConsRaySI) U+1E07  nul     U+1E0F  nul     U+1E21  U+1E96  nul \
+                    U+1E35  U+1E3B  nul     U+1E49  nul     nul     U+1E5F \
+                    nul     U+1E6F  nul     nul     nul     U+0233  U+1E95
+                    
+store(MinConsPSup)  U+1E03  U+010B  U+1E0B  U+1E1F  U+0121  U+1E23  nul \
+                    nul     nul     U+1E41  U+1E45  U+1E57  nul     U+1E59 \
+                    U+1E61  U+1E6B  nul     U+1E87  U+1E8B  U+1E8F  U+017C
+                                        
+store(MinConsPInf)  U+1E05  nul     U+1E0D  nul     nul     U+1E25  nul \
+                    U+1E33  U+1E37  U+1E43  U+1E47  nul     nul     U+1E5B \
+                    U+1E63  U+1E6D  U+1E7F  U+1E89  nul     U+1EF5  U+1E93
+
+store(MinConsHacek) nul     U+010D  U+010F  nul     U+01E7  U+021F  U+01F0 \
+                    U+01E9  nul     nul     U+0148  nul     nul     U+0159 \
+                    U+0161  U+0165  nul     nul     nul     nul     U+017E
+                    
+store(MinConsBrev)  nul     nul     nul     nul     U+011F  U+1E2B  nul \
+                    nul     nul     nul     nul     nul     nul     nul \
+                    nul     nul     nul     nul     nul     nul     nul
+                      
+store(MinConsCirc)  nul     U+0109  nul     nul     U+011D  U+0125  U+0135 \
+                    nul     nul     nul     nul     nul     nul     U+0213 \
+                    U+015D  nul     nul     U+0175  nul     U+0177  U+1E91
+                    
+store(MinConsAc)    nul     U+0107  nul     nul     U+01F5  nul     nul \
+                    U+1E31  U+013A  U+1E3F  U+0144  U+1E55  nul     U+0155 \
+                    U+015B  nul     nul     U+1E83  nul     U+00FD  U+017A
+                    
+store(MinConsVirg)  nul     nul     nul     nul     nul     nul     nul \
+                    nul     nul     nul     nul     nul     nul     nul \
+                    nul     nul     U+1E7D  nul     nul     U+1EF9  nul 
+
+store(MinConsCed)   nul     U+00E7  U+1E11  nul     U+0123  U+1E29  nul \
+                    U+0137  U+013C  nul     U+0146  nul     nul     u+0157 \
+                    u+0219  U+021B  nul     nul     nul     nul     U+0225
+
+store(MinConsOtr)   U+03B2  U+1E09  U+03B4  U+03C6  U+0264  U+0127  U+029D \
+                    U+029E  U+026C  U+0271  U+014B  U+01A3  U+018D  U+0279 \
+                    U+01A8  U+0287  U+028C  U+02B7  U+03C7  U+02B8  U+03B8
+
+
+c --------------------------------------------------------------------------------------------
+c Teclas
+c --------------------------------------------------------------------------------------------
+store(acc_ag_esp)      "´"
+store(acc_gr_fr)       "`"
+store(acc_drs)         "¨"
+store(acc_crflj)       "^"  
+store(retroceso)       [K_BKSP] 
+store(tc_raya)         [ctrl "_"]
+store(tc_punto_sup)    [shift ctrl "."]
+store(tc_punto_inf)    [ctrl "."]
+store(tc_hacek)        [ctrl alt "<"]
+store(tc_breve)        [shift ctrl "<"]
+store(tc_circ)         [ctrl "<"]
+store(tc_comaced)      [ctrl ","]                                                c    store(tc_dac_sup)      [shift ctrl ","]  
+store(tc_acento)       [shift ctrl ","]
+store(tc_virg)         [ctrl shift "-"]
+store(tc_otro2)        [shift ctrl "\"]
+store(tc_otro1)        [ctrl "\"]
+store(tc_hamza)        [ctrl "9"]
+store(tc_hamza2)       [ctrl alt "9"]
+store(tc_ayn)          [ctrl "8"]
+store(tc_ayn2)         [ctrl alt "8"]
+
+store(&WINDOWSLANGUAGES) 'x040A'
+
+begin Unicode > use(main)
+group(main) using keys                                                             
+
+c --------------------------------------------------------------------------------------------
+c Teclado español
+c --------------------------------------------------------------------------------------------
+
++ U+003C > "<"
++ U+003E > ">"
++ U+0020 > " "
++ [RALT "3"] > U+0023
++ [RALT "2"] > U+0040
++ [RALT "1"] > U+007C
++ [ctrl alt "3"] > U+0023
++ [ctrl alt "2"] > U+0040
++ [ctrl alt "1"] > U+007C
++ [RALT "["] > U+005B
++ [CTRL ALT "["] > U+005B
++ [RALT "+"] > U+005D
++ [CTRL ALT "+"] > U+005D
++ [RALT "\"] > U+005C
++ [CTRL ALT "\"] > U+005C
++ [RALT "{"] > U+007B
++ [CTRL ALT "{"] > U+007B
++ [RALT "}"] > U+007D
++ [CTRL ALT "}"] > U+007D
+
+
+
+c --------------------------------------------------------------------------------------------
+c Pulsaciones Vocales
+c --------------------------------------------------------------------------------------------
+
+any(acc_ag_esp) + any(acc_ag_esp) > index(acc_ag_esp,1)     c prevención de pulsar
+any(acc_gr_fr)  + any(acc_gr_fr)  > index(acc_gr_fr,1)      c varios signos de
+any(acc_drs)    + any(acc_drs)    > index(acc_drs,1)        c acentuación
+any(acc_crflj)  + any(acc_crflj)  > index(acc_crflj,1)
+
+any(acc_ag_esp) + any(MayVocs)    > index(MayVocsAcEsp,1)   c vocales con acento agudo
+any(acc_gr_fr)  + any(MayVocs)    > index(MayVocsAcFr,1)    c grave
+any(acc_drs)    + any(MayVocs)    > index(MayVocsDrs,1)     c diéresis
+any(acc_crflj)  + any(MayVocs)    > index(MayVocsCrflj,1)   c circunflejo
+any(acc_ag_esp) + any(MinVocs)    > index(MinVocsAcEsp,1)
+any(acc_gr_fr)  + any(MinVocs)    > index(MinVocsAcFr,1)
+any(acc_drs)    + any(MinVocs)    > index(MinVocsDrs,1)
+any(acc_crflj)  + any(MinVocs)    > index(MinVocsCrflj,1)
+
+any(MayVocs) + any(tc_raya)      > index(MayVocsRaySI,1)
+any(MayVocs) + any(tc_punto_sup) > index(MayVocsPSup,1)
+any(MayVocs) + any(tc_punto_inf) > index(MayVocsPInf,1)
+any(MayVocs) + any(tc_hacek)     > index(MayVocsHacek,1)
+any(MayVocs) + any(tc_breve)     > index(MayVocsBrev,1)
+any(MayVocs) + any(tc_circ)      > index(MayVocsCirc,1)
+any(MayVocs) + any(tc_virg)      > index(MayVocsVirg,1)
+
+any(MinVocs) + any(tc_raya)      > index(MinVocsRaySI,1)
+any(MinVocs) + any(tc_punto_sup) > index(MinVocsPSup,1)
+any(MinVocs) + any(tc_punto_inf) > index(MinVocsPInf,1)
+any(MinVocs) + any(tc_hacek)     > index(MinVocsHacek,1)
+any(MinVocs) + any(tc_breve)     > index(MinVocsBrev,1)
+any(MinVocs) + any(tc_circ)      > index(MinVocsCirc,1)
+any(MinVocs) + any(tc_virg)      > index(MinVocsVirg,1)
+any(MinVocs) + any(tc_acento)    > index(MinVocsDAc,1)
+any(MinVocs) + any(tc_comaced)   > index(MinVocsAbi,1)
+any(MinVocs) + any(tc_otro1)     > index(MinVocsOtr1,1)
+any(MinVocs) + any(tc_otro2)     > index(MinVocsOtr2,1)
+
+c --------------------------------------------------------------------------------------------
+c Pulsaciones Consonantes
+c --------------------------------------------------------------------------------------------
+
+any(MayCons)        + any(tc_raya)       > index(MayConsRaySI,1)
+any(MayCons)        + any(tc_punto_sup)  > index(MayConsPSup,1)
+any(MayCons)        + any(tc_punto_inf)  > index(MayConsPInf,1)
+any(MayCons)        + any(tc_hacek)      > index(MayConsHacek,1)
+any(MayCons)        + any(tc_breve)      > index(MayConsBrev,1)
+any(MayCons)        + any(tc_circ)       > index(MayConsCirc,1)
+any(MayCons)        + any(tc_acento)     > index(MayConsAc,1)
+any(MayCons)        + any(tc_virg)       > index(MayConsVirg,1)
+any(MayCons)        + any(tc_comaced)    > index(MayConsCed,1)
+any(MayCons)        + any(tc_otro1)      > index(MayConsOtr,1)
+
+any(MinCons)        + any(tc_raya)       > index(MinConsRaySI,1)
+any(MinCons)        + any(tc_punto_sup)  > index(MinConsPSup,1)
+any(MinCons)        + any(tc_punto_inf)  > index(MinConsPInf,1)
+any(MinCons)        + any(tc_hacek)      > index(MinConsHacek,1)
+any(MinCons)        + any(tc_breve)      > index(MinConsBrev,1)
+any(MinCons)        + any(tc_circ)       > index(MinConsCirc,1)
+any(MinCons)        + any(tc_acento)     > index(MinConsAc,1)
+any(MinCons)        + any(tc_virg)       > index(MinConsVirg,1)
+any(MinCons)        + any(tc_comaced)    > index(MinConsCed,1)
+any(MinCons)        + any(tc_otro1)      > index(MinConsOtr,1)
+
++        any(tc_hamza)     > U+02BE
++        any(tc_hamza2)    > U+0294 
++        any(tc_ayn)       > U+02BF
++        any(tc_ayn2)      > U+0295
+
+
+c Retroceso Vocales
+
+c any(MayVocsAcEsp)   + any(retroceso) > index(MayVocs,1) ## Las vocales
+c any(MayVocsAcFr)    + any(retroceso) > index(MayVocs,1) ## acentuadas
+c any(MayVocsDrs)     + any(retroceso) > index(MayVocs,1) ## se tratan
+c any(MayVocsCrflj)   + any(retroceso) > index(MayVocs,1) ## del modo habitual
+
+c any(MinVocsAcEsp)   + any(retroceso) > index(MinVocs,1) ## en cualquier teclado.
+c any(MinVocsAcFr)    + any(retroceso) > index(MinVocs,1) ## Con las demás,
+c any(MinVocsDrs)     + any(retroceso) > index(MinVocs,1) ## al borrar, se borra
+c any(MinVocsCrflj)   + any(retroceso) > index(MinVocs,1) ## solo el signo
+
+any(MayVocsRaySI)   + any(retroceso) > index(MayVocs,1)
+any(MayVocsPSup)    + any(retroceso) > index(MayVocs,1)
+any(MayVocsPInf)    + any(retroceso) > index(MayVocs,1)
+any(MayVocsHacek)   + any(retroceso) > index(MayVocs,1)
+any(MayVocsBrev)    + any(retroceso) > index(MayVocs,1)
+any(MayVocsCirc)    + any(retroceso) > index(MayVocs,1)
+any(MayVocsVirg)    + any(retroceso) > index(MayVocs,1)
+
+any(MinVocsRaySI)   + any(retroceso) > index(MinVocs,1)
+any(MinVocsPSup)    + any(retroceso) > index(MinVocs,1)
+any(MinVocsPInf)    + any(retroceso) > index(MinVocs,1)
+any(MinVocsHacek)   + any(retroceso) > index(MinVocs,1)
+any(MinVocsBrev)    + any(retroceso) > index(MinVocs,1)
+any(MinVocsCirc)    + any(retroceso) > index(MinVocs,1)
+any(MinVocsVirg)    + any(retroceso) > index(MinVocs,1)
+any(MinVocsDAc)     + any(retroceso) > index(MinVocs,1)
+any(MinVocsAbi)     + any(retroceso) > index(MinVocs,1)
+any(MinVocsOtr1)    + any(retroceso) > index(MinVocs,1)
+any(MinVocsOtr2)    + any(retroceso) > index(MinVocs,1)
+
+c Retroceso Consonantes
+
+any(MayConsRaySI)   + any(retroceso)  > index(MayCons,1)
+any(MayConsPSup)    + any(retroceso)  > index(MayCons,1)
+any(MayConsPInf)    + any(retroceso)  > index(MayCons,1)
+any(MayConsHacek)   + any(retroceso)  > index(MayCons,1)
+any(MayConsBrev)    + any(retroceso)  > index(MayCons,1)
+any(MayConsCirc)    + any(retroceso)  > index(MayCons,1)
+any(MayConsAc)      + any(retroceso)  > index(MayCons,1)
+any(MayConsVirg)    + any(retroceso)  > index(MayCons,1)
+any(MayConsCed)     + any(retroceso)  > index(MayCons,1)
+any(MayConsOtr)     + any(retroceso)  > index(MayCons,1)
+
+any(MinConsRaySI)   + any(retroceso)  > index(MinCons,1)
+any(MinConsPSup)    + any(retroceso)  > index(MinCons,1)
+any(MinConsPInf)    + any(retroceso)  > index(MinCons,1)
+any(MinConsHacek)   + any(retroceso)  > index(MinCons,1)
+any(MinConsBrev)    + any(retroceso)  > index(MinCons,1)
+any(MinConsCirc)    + any(retroceso)  > index(MinCons,1) 
+any(MinConsAc)      + any(retroceso)  > index(MinCons,1)
+any(MinConsVirg)    + any(retroceso)  > index(MinCons,1)
+any(MinConsCed)     + any(retroceso)  > index(MinCons,1)
+any(MinConsOtr)     + any(retroceso)  > index(MinCons,1)
+
+
+c --------------------------------- sobreimpresión ------------------------------
+c ---- sólo funciona correctamente si se cumplen dos condiciones: ---
+c ---- 1) se aplica a letras minúsculas                                          ---
+c ---- 2) la fuente utilizada contiene los 14 diacríticos empleados   ---
+ 
+c + [shift ctrl "1"] > U+0300             c    acento agudo
+c + [ctrl "1"]        > U+0301             c    acento grave
+c + [shift ctrl "2"] > U+0307             c    punto superior
+c + [ctrl "2"]       > U+0323             c    punto inferior
+c + [shift ctrl "3"] > U+0304             c    raya superior
+c + [ctrl "3"]       > U+0331             c    raya inferior
+c + [shift ctrl "4"] > U+0302             c    circunflejo superior
+c + [ctrl "4"]       > U+0326             c    coma
+c + [shift ctrl "5"] > U+0306             c    breve superior
+c + [ctrl "5"]       > U+032E             c    breve inferior
+c + [shift ctrl "6"] > U+030C             c    hacek superior
+c + [ctrl "6"]       > U+032C             c    hacek inferior
+c + [shift ctrl "7"] > U+0303             c    virgulilla superior
+c + [ctrl "7"]       > U+0330             c    virgulilla inferior
+
++ [ctrl "4"] > dk(2)
++ [ctrl "5"] > dk(1)        
+
+dk(1) + any(tc_acento)    > context U+0301    c    acento agudo
+dk(2) + any(tc_acento)    > context U+0300    c    acento grave
+dk(2) + any(tc_punto_inf) > context U+0307    c    punto superior
+dk(1) + any(tc_punto_inf) > context U+0323    c    punto inferior
+dk(2) + any(tc_raya)      > context U+0304    c    raya superior
+dk(1) + any(tc_raya)      > context U+0331    c    raya inferior
+dk(2) + any(tc_circ)      > context U+0302    c    circunflejo superior
+dk(1) + any(tc_circ)      > context U+032D    c    circunflejo inferior
+dk(1) + any(tc_comaced)   > context U+0326    c    coma
+dk(2) + any(tc_breve)     > context U+0306    c    breve superior
+dk(1) + any(tc_breve)     > context U+032E    c    breve inferior
+dk(2) + any(tc_hacek)     > context U+030C    c    hacek superior
+dk(1) + any(tc_hacek)     > context U+032C    c    hacek inferior
+dk(2) + any(tc_virg)      > context U+0303    c    virgulilla superior
+dk(1) + any(tc_virg)      > context U+0330    c    virgulilla inferior
+dk(1) + any(tc_otro1)     > context U+032F    c    breve inverso
+dk(2) + any(tc_otro1)     > context U+030A    c    ring above
+dk(1) + any(tc_punto_sup) > context U+0328    c    ogonek
+
+
+c EOF
+

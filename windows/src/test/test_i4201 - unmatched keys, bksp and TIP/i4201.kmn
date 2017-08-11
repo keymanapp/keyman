@@ -1,0 +1,17 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I4201 - unmatched, bksp and TIP'
+store(&LANGUAGE) 'x0407'
+store(&WINDOWSLANGUAGES) 'x0407'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ [K_A] > 'The-A-Key'
+'The-A-Key' + [K_B] > 'The-B-Key (bye bye A Key)'
+'The-A-Key' + [CTRL K_C] > 'The-Ctrl+C-Key (bye bye A Key)'
+'The-A-Key' + [ALT K_D] > 'The-Alt+D-Key (bye bye A Key)'
+'The-A-Key' + [CTRL ALT K_E] > 'The-Ctrl+Alt+E-Key (bye bye A Key)'
+'The-A-Key' + [CTRL SHIFT K_F] > 'The-Ctrl+Shift+F-Key (bye bye A Key)'
+'The-A-Key' + [SHIFT K_G] > 'The-Shift+G-Key (bye bye A Key)'
+'The-A-Key' + [CTRL SHIFT ALT K_H] > 'The-Ctrl+Shift+Alt+H-Key (bye bye A Key)'

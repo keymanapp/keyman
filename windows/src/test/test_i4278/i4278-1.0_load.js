@@ -1,0 +1,1 @@
+KeymanWeb.KRS(new Stub_Keyboard_i4278()); function Stub_Keyboard_i4278() {this.KF="i4278-1.0.js";this.KI="Keyboard_i4278";this.KN="I4278 - Test shift states in TIP";}

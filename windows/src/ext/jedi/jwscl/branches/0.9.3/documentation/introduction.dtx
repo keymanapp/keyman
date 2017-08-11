@@ -1,0 +1,93 @@
+﻿
+@@introduction.txt
+<title Introduction>
+
+<image jwscllogotxtnew01-small>
+
+<b>JEDI Windows Security Library BETA</b>
+
+The JEDI Windows Security Library or JWSCL suite is a collection of classes that
+encapsulates Microsoft Windows security functions in an object oriented way. The
+goal of this project is to make security programming easier to Delphi
+programmers.
+
+This approach includes conveniences such as internal memory management used for
+API calls. The memory allocation and deallocation for these calls is done
+internally by JWSCL with content check. Furthermore, programmers can use Delphi
+Strings (ANSI and WideString) in all function calls that require string
+manipulation.
+
+JWSCL also makes possible to retrieve WinAPI structures easily. Such structures
+can be used in other WinAPI calls (e.g. <link !!MEMBEROVERVIEW_TJwSecurityDescriptor, TJwSecurityDescriptor>.Create_SD).
+In cases like these the caller has to free the memory using a counter part
+function (e.g. <link TJwSecurityDescriptor.Free_SD@PSecurityDescriptor, TJwSecurityDescriptor.Free_SD>).
+
+API functions are wrapped together in classes to diminish initialization that
+consumes a great amount of the programmer's time. All the programmer has to do
+is instantiate the class, use the class and free the class instance after she is
+done using it.
+
+<b>This library has beta status but it does not mean that there are major
+problems to be expected. It means that not all features are tested well and
+radical changes may break source compatibility (e.g. changing names).</b>
+
+It is not the goal of the JWSCL to teach Delphi programmers how to write Windows
+security programs or create secure Windows applications. The programmer has to
+have understanding of the Windows security model to use the JWSCL classes - she
+must know what tokens, principals, secure objects, sessions and so on are.
+
+On the other hand if you want to test the software by creating good test cases
+(module, function, class, integration testing) you are welcome to do so. With
+good tests cases we can improve the overall quality of the JWSCL.
+
+
+
+The following table shows supported Delphi versions:
+<table 79%, 39c%, 71c%>
+Library              Supported Delphi versions
+-------------------  ------------------------------------------------------------
+JEDI Windows API     Delphi 5 to Delphi 2009<p />(We also support ANSI calls in
+ Header Conversions   2009)
+JEDI Windows         Delphi 5 to Delphi 2009 (developer version)<p />Delphi 7 to
+ Security Library     Delphi 2009 (Version \>= 0.9)<p />(We also support ANSI
+                      calls in 2009)
+</table>
+
+For information about <b>license facts</b> see <link conclusion.txt, License page>.
+
+Do not forget to send bugs, comments or greets to the authors.
+
+Christian Wimmer – mail[/at\\]delphi-jedi[/dot\\]net
+
+Stuttgart, Germany
+
+
+
+Contributors (in alphabetical order)
+  * Philip Dittmann
+  * Danila Galimov
+  * Binh Ly (ComLib.pas)
+  * Remko Weijnen
+
+In Memory Of Robert Marquard
+
+
+
+Visit Source Forge Project
+  * <extlink http://sourceforge.net/projects/jedi-apilib>Sourceforge</extlink>
+  * <extlink http://blog.delphi-jedi.net>Webblog</extlink>
+
+* Contact options at a glance *
+<table 50c%>
+Mail contact         mail[at]delphi-jedi[dot]net
+Mailing list         Subscribe to the mailing lists at sourceforge:<p /><extlink http://sourceforge.net/mail/?group_id=121894>http://sourceforge.net/mail/?group_id=121894</extlink>
+Newsgroups           1. <extlink news://forums.talkto.net:119/jedi.apiconversion>news://forums.talkto.net:119/jedi.apiconversion</extlink>
+                      2. <extlink news://forums.talkto.net:119/jedi.general>news://forums.talkto.net:119/jedi.general</extlink>
+JEDI Issue           <extlink http://homepages.codegear.com/jedi/issuetracker>http://homepages.codegear.com/jedi/issuetracker</extlink>
+ Tracker<p />Select   
+ "API &amp; WSC       
+ Library" in the      
+ upper right          
+ corner and           
+ switch.              
+</table>

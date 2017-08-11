@@ -1,0 +1,10 @@
+﻿c Includecodes test.
+store(&VERSION) '8.0'
+store(&NAME) 'Test I3056'
+store(&includecodes) 'codes.txt'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ 'a' > $BOO      

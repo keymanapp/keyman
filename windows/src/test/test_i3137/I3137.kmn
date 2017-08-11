@@ -1,0 +1,16 @@
+﻿c https://secure.tavultesoft.com/corp/issues/view.php?IssueID=3137
+c 
+c Compiler issue
+store(&VERSION) '8.0'
+store(&NAME) 'Testing I3137'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
+'aaa' + '.' > 'a'                            
+'aa' + '.' > 'a'                            
+'a' + '.' > 'a'                            
+[SHIFT CTRL ALT] + ';' > '<'
+[SHIFT CTRL ALT] + '.' > '>'
+'a' + '.' > 'a'

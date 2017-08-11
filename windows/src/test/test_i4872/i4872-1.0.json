@@ -1,0 +1,25 @@
+﻿{
+  "options" : {
+    "device" : "any",
+    "keyboardBaseUri" : "http://your-host-here/keyboard-path/",
+    "fontBaseUri" : "http://your-host-here/font-path/ "
+  },
+  "keyboard" : {
+    "id" : "i4872",
+    "name" : "Test font consistency",
+    "filename" : "i4872-1.0.js",
+    "version" : "1.0",
+    "lastModified" : "2015-08-24T15:53:11.763+10:00",
+    "rtl" : true,
+    "oskFont" : {
+      "family" : "Impact",
+      "source" : "bh93.ttf"
+    },
+    "languages" : [
+      {
+        "id" : "eng",
+        "name" : "English"
+      }
+      ]
+  }
+}

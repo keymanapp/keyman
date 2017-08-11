@@ -1,0 +1,10 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'Test font consistency'
+store(&TARGETS) 'any windows'
+store(&VISUALKEYBOARD) 'i4872.kvk'
+store(&LAYOUTFILE) 'i4872-layout.js'
+store(&KMW_RTL) '1'
+begin Unicode > use(main)
+
+
+group(main) using keys

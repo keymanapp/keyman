@@ -1,0 +1,8 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'Keyman Developer Debug Host Keyboard'
+store(&MESSAGE) 'This keyboard must be installed in order to use the Keyman Developer debugger'
+store(&COPYRIGHT) '© 2013 Tavultesoft Pty Ltd'
+begin Unicode > use(main)
+
+
+group(main) using keys

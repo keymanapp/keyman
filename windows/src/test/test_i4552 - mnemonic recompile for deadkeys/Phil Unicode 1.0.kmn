@@ -1,0 +1,183 @@
+﻿c Phil Unicode 1.0.kmn: SIL Philippines Unicode keyboard mapping file for Keyman 6 and 7
+c For use with the Doulos SIL Philippines, Charis SIL Philippines, and Gentium Plus Philippines Unicode fonts
+c Kåre J. Strømme, May 3, 2011
+
+VERSION 6.0
+NAME "Phil Unicode 1.0"
+BITMAP "Phil Unicode.bmp"
+HOTKEY [ALT SHIFT K_U]
+store(&MnemonicLayout) "1"
+
+begin Unicode > use(main)
+
+group(main) using keys 
+
+c Store plain and accented vowels
+store(plainvowels)     'a'    'e'    'i'    'o'    'u'     'A'    'E'    'I'    'O'    'U'
+store(acutevowels)    U+00E1 U+00E9 U+00ED U+00F3 U+00FA  U+00C1 U+00C9 U+00CD U+00D3 U+00DA
+store(gravevowels)    U+00E0 U+00E8 U+00EC U+00F2 U+00F9  U+00C0 U+00C8 U+00CC U+00D2 U+00D9
+store(circumvowels)   U+00E2 U+00EA U+00EE U+00F4 U+00FB  U+00C2 U+00CA U+00CE U+00D4 U+00DB
+store(dieresisvowels) U+00E4 U+00EB U+00EF U+00F6 U+00FC  U+00C4 U+00CB U+00CF U+00D6 U+00DC
+store(macronvowels)   U+0101 U+0113 U+012B U+014D U+016B  U+0100 U+0112 U+012A U+014C U+016A
+
+c Deadkeys            
++ "'" > dk(apostrophe)  c U+0027 APOSTROPHE
++ "`" > dk(grave)       c U+0060 GRAVE ACCENT
++ "^" > dk(circumflex)  c U+005E CIRCUMFLEX ACCENT
++ '%' > dk(percent)     c U+0025 PERSENT SIGN
++ '~' > dk(tilde)       c U+007E TILDE
++ '&' > dk(ampersand)   c U+0026 AMPERSAND  
++ '_' > dk(underscore)  c U+005F LOW LINE
+
+c Rules for accented vowels
+dk(apostrophe) + any(plainvowels) > index(acutevowels, 2)
+dk(grave)      + any(plainvowels) > index(gravevowels, 2)
+dk(circumflex) + any(plainvowels) > index(circumvowels, 2)
+dk(percent)    + any(plainvowels) > index(dieresisvowels, 2)
+dk(tilde)      + any(plainvowels) > index(macronvowels, 2)
+
+c Rules for the dead key characters themselves
+dk(ampersand)  + "'" > U+0027  c APOSTROPHE
+dk(ampersand)  + "`" > U+0060  c GRAVE ACCENT
+dk(circumflex) + "^" > U+005E  c CIRCUMFLEX ACCENT
+dk(percent)    + '%' > U+0025  c PERSENT SIGN
+dk(tilde)      + '~' > U+007E  c TILDE
+dk(ampersand)  + '&' > U+0026  c AMPERSAND  
+dk(underscore) + '_' > U+005F  c LOW LINE
+
+c Rules for other characters
+
+dk(apostrophe) + "&" > U+0251 U+0301  c LATIN SMALL LETTER ALPHA + COMBINING ACUTE ACCENT
+dk(apostrophe) + '"' > U+0022         c QUOTATION MARK
+dk(apostrophe) + "'" > U+2019         c RIGHT SINGLE QUOTATION MARK
+dk(apostrophe) + "<" > U+201C         c LEFT DOUBLE QUOTATION MARK
+dk(apostrophe) + ">" > U+201D         c RIGHT DOUBLE QUOTATION MARK
+dk(apostrophe) + "=" > U+00B7         c MIDDLE DOT (Replacing Word Separation Symbol (d183) in Phil Ansi SIL)
+dk(apostrophe) + "s" > U+0027 U+0073  c APOSTROPHE + LATIN SMALL LETTER S
+dk(apostrophe) + "S" > U+0027 U+0053  c APOSTROPHE + LATIN CAPITAL LETTER S
+dk(apostrophe) + "t" > U+0027 U+0074  c APOSTROPHE + LATIN SMALL LETTER T
+dk(apostrophe) + "T" > U+0027 U+0054  c APOSTROPHE + LATIN CAPITAL LETTER T
+
+dk(grave) + "&" > U+0251 U+0300       c LATIN SMALL LETTER ALPHA + COMBINING GRAVE ACCENT
+dk(grave) + "`" > U+2018              c LEFT SINGLE QUOTATION MARK
+
+dk(circumflex) + "&" > U+0251 U+0302  c LATIN SMALL LETTER ALPHA + COMBINING CIRCUMFLEX ACCENT 
+dk(circumflex) + "'" > U+00B4         c ACUTE ACCENT 
+dk(circumflex) + "2" > U+00B2         c SUPERSCRIPT TWO 
+dk(circumflex) + "3" > U+00B3         c SUPERSCRIPT THREE 
+dk(circumflex) + "S" > U+0160         c LATIN CAPITAL LETTER S WITH CARON   
+dk(circumflex) + "s" > U+0161         c LATIN SMALL LETTER S WITH CARON   
+
+dk(percent) + "<" > U+2190    c LEFTWARDS ARROW (Replacing Leftwards Bold Arrow (d143) in Phil Ansi SIL)
+dk(percent) + "s" > U+00A5    c YEN SIGN
+dk(percent) + "Y" > U+0178    c LATIN CAPITAL LETTER Y WITH DIAERESIS
+dk(percent) + "y" > U+00FF    c LATIN SMALL LETTER Y WITH DIAERESIS
+
+dk(tilde) + "-" > U+00AD      c SOFT HYPHEN
+dk(tilde) + "N" > U+00D1      c LATIN CAPITAL LETTER N WITH TILDE
+dk(tilde) + "n" > U+00F1      c LATIN SMALL LETTER N WITH TILDE
+dk(tilde) + "Y" > U+024E      c LATIN CAPITAL LETTER Y WITH STROKE
+dk(tilde) + "y" > U+024F      c LATIN SMALL LETTER Y WITH STROKE
+
+dk(ampersand) + "!" > U+00A1  c INVERTED EXCLAMATION MARK
+dk(ampersand) + "$" > U+00A2  c CENT SIGN
+dk(ampersand) + "%" > U+2030  c PER MILLE SIGN
+dk(ampersand) + "(" > U+00AB  c LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
+dk(ampersand) + ")" > U+00BB  c RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
+dk(ampersand) + "-" > U+2013  c EN DASH
+dk(ampersand) + "_" > U+2014  c EM DASH
+dk(ampersand) + "." > U+00AA  c FEMININE ORDINAL INDICATOR
+dk(ampersand) + ":" > U+00F7  c DIVISION SIGN 
+dk(ampersand) + "<" > U+2039  c SINGLE LEFT-POINTING ANGLE QUOTATION MARK 
+dk(ampersand) + ">" > U+203A  c SINGLE RIGHT-POINTING ANGLE QUOTATION MARK 
+dk(ampersand) + "|" > U+00A6  c BROKEN BAR 
+dk(ampersand) + "~" > U+02DC  c SMALL TILDE
+dk(ampersand) + "a" > U+0251  c LATIN SMALL LETTER ALPHA
+dk(ampersand) + "C" > U+00A9  c COPYRIGHT SIGN
+dk(ampersand) + "g" > U+0261  c LATIN SMALL LETTER SCRIPT G
+dk(ampersand) + "i" > U+0268  c LATIN SMALL LETTER I WITH STROKE 
+dk(ampersand) + "L" > U+00AC  c NOT SIGN 
+dk(ampersand) + "O" > U+2022  c BULLET
+dk(ampersand) + "o" > U+00B0  c DEGREE SIGN
+dk(ampersand) + "P" > U+20B1  c PESO SIGN
+dk(ampersand) + "p" > U+00B6  c PILCROW SIGN
+dk(ampersand) + "R" > U+00AE  c REGISTERED SIGN
+dk(ampersand) + "s" > U+00DF  c LATIN SMALL LETTER SHARP S
+dk(ampersand) + "x" > U+25CA  c LOZENGE (Replacing White Square (d135) in Phil Ansi SIL)
+
+"O" dk(ampersand) + "E" > U+0152      c LATIN CAPITAL LIGATURE OE
+"o" dk(ampersand) + "e" > U+0153      c LATIN SMALL LIGATURE OE
+"S" dk(ampersand) + "S" > U+00A7      c SECTION SIGN
+"T" dk(ampersand) + "M" > U+2122      c TRADE MARK SIGN
+"x" dk(ampersand) + "o" > U+00A4      c CURRENCY SIGN
+
+dk(underscore) + " " > U+00A0         c NO-BREAK SPACE 
+dk(underscore) + "%" > U+00A8         c DIAERESIS
+dk(underscore) + "0" > U+00D8         c LATIN CAPITAL LETTER O WITH STROKE
+dk(underscore) + "1" > U+00BC         c VULGAR FRACTION ONE QUARTER
+dk(underscore) + "2" > U+00BD         c VULGAR FRACTION ONE HALF
+dk(underscore) + "3" > U+00BE         c VULGAR FRACTION THREE QUARTERS
+dk(underscore) + "A" > U+00C5         c LATIN CAPITAL LETTER A WITH RING ABOVE
+dk(underscore) + "a" > U+00E5         c LATIN SMALL LETTER A WITH RING ABOVE
+dk(underscore) + "C" > U+00C7         c LATIN CAPITAL LETTER C WITH CEDILLA
+dk(underscore) + "c" > U+00E7         c LATIN SMALL LETTER C WITH CEDILLA
+dk(underscore) + "G" > U+0047 U+0331  c LATIN CAPITAL LETTER G + COMBINING MACRON BELOW
+dk(underscore) + "g" > U+0067 U+0331  c LATIN SMALL LETTER G + COMBINING MACRON BELOW
+dk(underscore) + "i" > U+00AF         c MACRON
+dk(underscore) + "L" > U+1E3A         c LATIN CAPITAL LETTER L WITH LINE BELOW
+dk(underscore) + "l" > U+1E3B         c LATIN SMALL LETTER L WITH LINE BELOW
+dk(underscore) + "n" > U+00B1         c PLUS-MINUS SIGN 
+dk(underscore) + "R" > U+1E5E         c LATIN CAPITAL LETTER R WITH LINE BELOW
+dk(underscore) + "r" > U+1E5F         c LATIN SMALL LETTER R WITH LINE BELOW
+dk(underscore) + "W" > U+0057 U+0331  c LATIN CAPITAL LETTER W + COMBINING MACRON BELOW
+dk(underscore) + "w" > U+0077 U+0331  c LATIN SMALL LETTER W + COMBINING MACRON BELOW
+
+               + '"' > U+A78C         c LATIN SMALL LETTER SALTILLO (Used for lower case glottal)
+
+
+c Rules for other Doulos SIL characters used in the Philippines that are not found in Phil Ansi SIL
+
+dk(apostrophe) + "R" > U+0154  c LATIN CAPITAL LETTER R WITH ACUTE
+dk(apostrophe) + "r" > U+0155  c LATIN SMALL LETTER R WITH ACUTE
+dk(apostrophe) + "W" > U+1E82  c LATIN CAPITAL LETTER W WITH ACUTE
+dk(apostrophe) + "w" > U+1E83  c LATIN SMALL LETTER W WITH ACUTE
+
+dk(grave) + "'" > U+02B9       c MODIFIER LETTER PRIME (Used for syllable primary stress)
+dk(grave) + "," > U+02CC       c MODIFIER LETTER LOW VERTICAL LINE (Used for syllable secondary stress)
+
+dk(circumflex) + "(" > U+0361  c COMBINING DOUBLE INVERTED BREVE (Used for tie bar)
+dk(circumflex) + '"' > U+A78B  c LATIN CAPITAL LETTER SALTILLO (Used for upper case glottal)
+
+dk(percent) + ">" > U+2192    c RIGHTWARDS ARROW
+
+dk(tilde) + "G" > U+01E4       c LATIN CAPITAL LETTER G WITH STROKE 
+dk(tilde) + "g" > U+01E5       c LATIN SMALL LETTER G WITH STROKE
+
+dk(tilde) dk(apostrophe) + "e" > U+1E17    c LATIN SMALL LETTER E WITH MACRON AND ACUTE
+
+dk(tilde) dk(grave) + "A" > U+0100 U+0300  c LATIN CAPITAL LETTER A WITH MACRON + COMBINING GRAVE ACCENT
+dk(tilde) dk(grave) + "a" > U+0101 U+0300  c LATIN SMALL LETTER A WITH MACRON + COMBINING GRAVE ACCENT
+dk(tilde) dk(grave) + "E" > U+1E14         c LATIN CAPITAL LETTER E WITH MACRON AND GRAVE
+dk(tilde) dk(grave) + "e" > U+1E15         c LATIN SMALL LETTER E WITH MACRON AND GRAVE
+dk(tilde) dk(grave) + "I" > U+012A U+0300  c LATIN CAPITAL LETTER I WITH MACRON + COMBINING GRAVE ACCENT
+dk(tilde) dk(grave) + "i" > U+012B U+0300  c LATIN SMALL LETTER I WITH MACRON + COMBINING GRAVE ACCENT
+dk(tilde) dk(grave) + "O" > U+1E50         c LATIN CAPITAL LETTER O WITH MACRON AND GRAVE
+dk(tilde) dk(grave) + "o" > U+1E51         c LATIN SMALL LETTER O WITH MACRON AND GRAVE
+dk(tilde) dk(grave) + "U" > U+016A U+0300  c LATIN CAPITAL LETTER U WITH MACRON + COMBINING GRAVE ACCENT
+dk(tilde) dk(grave) + "u" > U+016B U+0300  c LATIN SMALL LETTER U WITH MACRON + COMBINING GRAVE ACCENT
+
+dk(ampersand) + " " > U+2009   c THIN SPACE
+dk(ampersand) + "?" > U+0294   c LATIN LETTER GLOTTAL STOP
+dk(ampersand) + "0" > U+00F8   c LATIN SMALL LETTER O WITH STROKE
+dk(ampersand) + "A" > U+00C3   c LATIN CAPITAL LETTER A WITH TILDE
+dk(ampersand) + "c" > U+20AC   c EURO SIGN
+dk(ampersand) + "e" > U+0259   c LATIN SMALL LETTER SCHWA
+dk(ampersand) + "n" > U+014B   c LATIN SMALL LETTER ENG
+dk(ampersand) + "u" > U+00B5   c MICRO SIGN
+dk(ampersand) + "X" > U+00D7   c MULTIPLICATION SIGN
+
+dk(underscore) + "-" > U+2011  c NON-BREAKING HYPHEN 
+dk(underscore) + "." > U+2026  c HORIZONTAL ELLIPSIS
+dk(underscore) + "O" > U+00D5  c LATIN CAPITAL LETTER O WITH TILDE 
+dk(underscore) + "o" > U+00F5  c LATIN SMALL LETTER O WITH TILDE 
+dk(underscore) + "u" > U+0289  c LATIN SMALL LETTER U BAR 

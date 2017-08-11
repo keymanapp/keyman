@@ -1,0 +1,9 @@
+﻿store(&VERSION) '8.0'
+store(&NAME) 'I2188 - French and Belgian French'
+store(&MESSAGE) 'Adds Dutch (primary), French and Italian'
+store(&WINDOWSLANGUAGES) 'x0413 x040C x0410'
+store(&LANGUAGE) 'x0413'
+begin Unicode > use(main)
+
+
+group(main) using keys

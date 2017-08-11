@@ -1,0 +1,27 @@
+
+# Copy files to correct names in \release; this file is munged by mkver to download.mak
+#
+
+!include ..\..\defines.mak
+
+default:
+  echo Please don't call this file directly -- used by Makefile
+
+copyredist-desktop:
+  -mkdir $(ROOT)\release\$VERSION
+  copy /Y keymandesktop100.msi $(ROOT)\release\$VERSION\keymandesktop100.msi
+  copy /Y keymandesktop100.exe $(ROOT)\release\$VERSION\keymandesktop-$VERSION.exe
+  copy /Y $(ROOT)\bin\desktop\setup.exe $(ROOT)\release\$VERSION\setup.exe
+
+copydoc:
+  if exist $(ROOT)\src\desktop\help\rtf\desktop.pdf copy /Y $(ROOT)\src\desktop\help\rtf\desktop.pdf $(ROOT)\release\$VERSION\desktop80.pdf
+
+prepareredist:
+  rem prepareredist
+
+clean:
+  rem clean
+
+candle-desktop:
+  $(WIXCANDLE) -dVERSION=$VERSION -dPRODUCTID=$GUID1 keymandesktop.wxs
+

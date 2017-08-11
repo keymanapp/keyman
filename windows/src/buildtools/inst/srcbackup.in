@@ -1,0 +1,10 @@
+#
+# Copy debug information to the RELEASE directory
+#
+
+!include ..\..\Defines.mak
+
+srcbackup:
+    -mkdir $(ROOT)\release\$VERSION
+    cd $(ROOT)\src
+    $(WZZIP) -r -x!*.ipch -x!*.sdf -x!*.db $(ROOT)\release\$VERSION\src-$VERSION.zip *.*

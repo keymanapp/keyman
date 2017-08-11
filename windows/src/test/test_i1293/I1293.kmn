@@ -1,0 +1,12 @@
+﻿store(&VERSION) '7.0'
+store(&NAME) 'Surrogate Pair Test [I1293]'
+store(&COPYRIGHT) '© 2008 Tavultesoft'
+store(&MESSAGE) 'This keyboard tests surrogate pairs on Vista'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
+'a' + 'b' > context U+10000
+U+10000 + 'c' > 'def'
+U+10000 + 'd' > U+10001

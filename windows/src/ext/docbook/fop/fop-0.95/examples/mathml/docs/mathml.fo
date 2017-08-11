@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
+  <fo:layout-master-set>
+    <fo:simple-page-master
+  margin-right="1.5cm"
+  margin-left="1.5cm"
+  margin-bottom="2cm"
+  margin-top="1cm"
+  page-width="21cm"
+  page-height="29.7cm"
+  master-name="first">
+      <fo:region-body margin-top="1cm"/>
+      <fo:region-before extent="1cm"/>
+      <fo:region-after extent="1.5cm"/>
+    </fo:simple-page-master>
+  </fo:layout-master-set>
+
+  <fo:page-sequence master-reference="first">
+    <fo:static-content flow-name="xsl-region-before">
+      <fo:block line-height="14pt" font-size="10pt"
+    text-align="end">MathML Extension</fo:block>
+    </fo:static-content>
+    <fo:static-content flow-name="xsl-region-after">
+      <fo:block line-height="14pt" font-size="10pt"
+    text-align="end">Page <fo:page-number/></fo:block>
+    </fo:static-content>
+
+    <fo:flow flow-name="xsl-region-body">
+
+      <fo:block space-before.optimum="3pt" space-after.optimum="15pt">
+      The MathML Extension
+      </fo:block>
+
+      <fo:block space-before.optimum="3pt" space-after.optimum="15pt">
+The mathml extension is an addition to FOP that can be used to draw mathml
+expressions.
+      </fo:block>
+
+      <fo:block space-before.optimum="3pt" space-after.optimum="15pt">
+      Examples
+      </fo:block>
+
+      <fo:block space-before.optimum="3pt" space-after.optimum="15pt">
+<fo:block space-after.optimum="5pt">
+<fo:instream-foreign-object>
+       <math xmlns="http://www.w3.org/1998/Math/MathML" mode="inline">
+          <mrow>
+            <mi>I</mi>
+            <mrow>
+              <mo>(</mo>
+              <mi>x</mi>
+              <mo>)</mo>
+            </mrow>
+            <mo>=</mo>
+            <mi>F</mi>
+            <mo stretchy="false">(</mo>
+            <mi>x</mi>
+            <mo stretchy="false">)</mo>
+            <mo>+</mo>
+            <mi>C</mi>
+          </mrow>
+        </math>
+</fo:instream-foreign-object>
+</fo:block>
+      </fo:block>
+
+      <fo:block space-before.optimum="3pt" space-after.optimum="15pt">
+<fo:block space-after.optimum="5pt">
+<fo:instream-foreign-object>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" mode="inline">
+      <mrow>
+        <mo>(</mo>
+        <mtable>
+          <mtr>
+            <mtd columnalign="center">
+              <mrow>
+                <mo>(</mo>
+                <mtable>
+                  <mtr>
+                    <mtd columnalign="center">
+                      <mi>a</mi>
+                    </mtd>
+                    <mtd columnalign="center">
+                      <mi>b</mi>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd columnalign="center">
+                      <mi>c</mi>
+                    </mtd>
+                    <mtd columnalign="center">
+                      <mi>d</mi>
+                    </mtd>
+                  </mtr>
+                </mtable>
+                <mo>)</mo>
+              </mrow>
+            </mtd>
+            <mtd columnalign="center">
+              <mrow>
+                <mo>(</mo>
+                <mtable>
+                  <mtr>
+                    <mtd columnalign="center">
+                      <mi>e</mi>
+                    </mtd>
+                    <mtd columnalign="center">
+                      <mi>f</mi>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd columnalign="center">
+                      <mi>g</mi>
+                    </mtd>
+                    <mtd columnalign="center">
+                      <mi>h</mi>
+                    </mtd>
+                  </mtr>
+                </mtable>
+                <mo>)</mo>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd columnalign="center">
+              <mn>0</mn>
+            </mtd>
+            <mtd columnalign="center">
+              <mrow>
+                <mo>(</mo>
+                <mtable>
+                  <mtr>
+                    <mtd columnalign="center">
+                      <mi>i</mi>
+                    </mtd>
+                    <mtd columnalign="center">
+                      <mi>j</mi>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd columnalign="center">
+                      <mi>k</mi>
+                    </mtd>
+                    <mtd columnalign="center">
+                      <mi>l</mi>
+                    </mtd>
+                  </mtr>
+                </mtable>
+                <mo>)</mo>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+        <mo>)</mo>
+      </mrow>
+    </math>
+
+</fo:instream-foreign-object>
+</fo:block>
+</fo:block>
+
+      <fo:block>
+An external mathml document.
+      </fo:block>
+
+      <fo:block>
+<fo:external-graphic src="example.mml"/>
+      </fo:block>
+    </fo:flow>
+  </fo:page-sequence>
+</fo:root>
+

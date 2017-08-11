@@ -1,0 +1,313 @@
+Dukor: 99%
+Robertsport: 99%
+@Arial Unicode MS: -1%
+@Batang: -1%
+@BatangChe: -1%
+@Code2000: -1%
+@DFKai-SB: -1%
+@Dotum: -1%
+@DotumChe: -1%
+@FangSong: -1%
+@Gulim: -1%
+@GulimChe: -1%
+@Gungsuh: -1%
+@GungsuhChe: -1%
+@KaiTi: -1%
+@Malgun Gothic: -1%
+@Meiryo: -1%
+@Microsoft JhengHei: -1%
+@Microsoft YaHei: -1%
+@MingLiU: -1%
+@MingLiU_HKSCS: -1%
+@MingLiU_HKSCS-ExtB: -1%
+@MingLiU-ExtB: -1%
+@MS Gothic: -1%
+@MS Mincho: -1%
+@MS PGothic: -1%
+@MS PMincho: -1%
+@MS UI Gothic: -1%
+@NSimSun: -1%
+@PMingLiU: -1%
+@PMingLiU-ExtB: -1%
+@SimHei: -1%
+@SimSun: -1%
+@SimSun-ExtB: -1%
+Aboriginal Sans: -1%
+Agency FB Bold: -1%
+Aharoni Bold: -1%
+Algerian: -1%
+Andalus: -1%
+Angsana New: -1%
+AngsanaUPC: -1%
+Arabic Typesetting: -1%
+Arial: -1%
+Arial Black: -1%
+Arial Narrow: -1%
+Arial Rounded MT Bold: -1%
+Arial Rvwang: -1%
+Arial Unicode MS: -1%
+Baskerville Old Face: -1%
+Batang: -1%
+BatangChe: -1%
+Bauhaus 93: -1%
+Bell MT: -1%
+Berlin Sans FB Bold: -1%
+Berlin Sans FB Demi Bold: -1%
+Bernard MT Condensed: -1%
+Blackadder ITC: -1%
+Bodoni MT Black Italic: -1%
+Bodoni MT Bold: -1%
+Bodoni MT Condensed Bold: -1%
+Bodoni MT Poster Compressed: -1%
+Book Antiqua Bold: -1%
+Bookman Old Style: -1%
+Bookshelf Symbol 7: -1%
+BPG Glaho Arial: -1%
+Bradley Hand ITC: -1%
+Britannic Bold: -1%
+Broadway: -1%
+Browallia New: -1%
+BrowalliaUPC: -1%
+Brush Script MT Italic: -1%
+Calibri: -1%
+Californian FB Bold: -1%
+Calisto MT: -1%
+Cambria: -1%
+Cambria Math: -1%
+Candara: -1%
+Castellar: -1%
+Centaur: -1%
+Century: -1%
+Century Gothic: -1%
+Century Schoolbook: -1%
+Charis SIL: -1%
+Chiller: -1%
+Cob i Times: -1%
+Cob u Times: -1%
+Cob-i SILCharis Bold: -1%
+Cob-i SILDoulos Bold: -1%
+Cob-i SILManuscript Bold: -1%
+Cob-i SILSophia Bold: -1%
+Cob-i-a SILSophia Bold: -1%
+Cob-u SILCharis Bold: -1%
+Cob-u SILDoulos Bold: -1%
+Cob-u SILManuscript Bold: -1%
+Cob-u SILSophia Bold: -1%
+Cob-u-a SILSophia Bold: -1%
+Code2000: -1%
+Code2001: -1%
+Code2002: -1%
+Colonna MT: -1%
+Comic Sans MS: -1%
+Consolas: -1%
+Constantia: -1%
+Cooper Black: -1%
+Copperplate Gothic Bold: -1%
+Copperplate Gothic Light: -1%
+Corbel: -1%
+Cordia New: -1%
+CordiaUPC: -1%
+Courier New: -1%
+Curlz MT: -1%
+DaunPenh: -1%
+David: -1%
+DFKai-SB: -1%
+DilleniaUPC: -1%
+DokChampa: -1%
+Dotum: -1%
+DotumChe: -1%
+Doulos SIL: -1%
+Edwardian Script ITC: -1%
+Elephant: -1%
+Engravers MT: -1%
+Eras Bold ITC: -1%
+Eras Demi ITC: -1%
+Eras Light ITC: -1%
+Eras Medium ITC: -1%
+Estrangelo Edessa: -1%
+EucrosiaUPC: -1%
+Euphemia: -1%
+Eurostile: -1%
+Ezra SIL: -1%
+Ezra SIL SR: -1%
+FangSong: -1%
+Felix Titling: -1%
+Footlight MT Light: -1%
+Forte: -1%
+Franklin Gothic Book: -1%
+Franklin Gothic Demi: -1%
+Franklin Gothic Demi Cond: -1%
+Franklin Gothic Heavy: -1%
+Franklin Gothic Medium: -1%
+Franklin Gothic Medium Cond: -1%
+FrankRuehl: -1%
+FreesiaUPC: -1%
+Freestyle Script: -1%
+French Script MT: -1%
+FV Yukon Aboriginal Serif: -1%
+Garamond: -1%
+Gautami: -1%
+Gentium Italic: -1%
+GentiumAlt Italic: -1%
+Georgia: -1%
+GF Zemen Unicode: -1%
+Gigi: -1%
+Gill Sans MT Bold Italic: -1%
+Gill Sans MT Condensed: -1%
+Gill Sans MT Ext Condensed Bold: -1%
+Gill Sans Ultra Bold: -1%
+Gill Sans Ultra Bold Condensed: -1%
+Gisha: -1%
+Gloucester MT Extra Condensed: -1%
+Goudy Old Style: -1%
+Goudy Stout: -1%
+GU Greek: -1%
+GU Hebrew: -1%
+Gulim: -1%
+GulimChe: -1%
+Gungsuh: -1%
+GungsuhChe: -1%
+Haettenschweiler: -1%
+Harlow Solid Italic: -1%
+Harrington: -1%
+HI Kakuhihewa Unicode Bold: -1%
+HI Keawe Unicode Bold: -1%
+HI Manokalanipo Unicode Bold: -1%
+HI Pi'ilani Unicode Bold: -1%
+High Tower Text: -1%
+Impact: -1%
+Imprint MT Shadow: -1%
+Informal Roman: -1%
+IrisUPC: -1%
+Iskoola Pota: -1%
+JasmineUPC: -1%
+Jokerman: -1%
+Juice ITC: -1%
+KaiTi: -1%
+Kalinga: -1%
+Kartika: -1%
+KodchiangUPC: -1%
+Kristen ITC: -1%
+Kunstler Script: -1%
+Latha: -1%
+Leelawadee: -1%
+Levenim MT: -1%
+LilyUPC: -1%
+Lucida Bright: -1%
+Lucida Calligraphy Italic: -1%
+Lucida Console: -1%
+Lucida Fax Regular: -1%
+Lucida Handwriting Italic: -1%
+Lucida Sans Demibold Italic: -1%
+Lucida Sans Typewriter Regular: -1%
+Lucida Sans Unicode: -1%
+Magneto Bold: -1%
+Maiandra GD: -1%
+Malgun Gothic: -1%
+Mangal: -1%
+Marlett: -1%
+Matisse ITC: -1%
+Matura MT Script Capitals: -1%
+Meiryo: -1%
+Microsoft Himalaya: -1%
+Microsoft JhengHei: -1%
+Microsoft Sans Serif: -1%
+Microsoft Uighur: -1%
+Microsoft YaHei: -1%
+Microsoft Yi Baiti: -1%
+MingLiU: -1%
+MingLiU_HKSCS: -1%
+MingLiU_HKSCS-ExtB: -1%
+MingLiU-ExtB: -1%
+Miriam: -1%
+Miriam Fixed: -1%
+Mistral: -1%
+Modern No. 20: -1%
+Mongolian Baiti: -1%
+Monotype Corsiva: -1%
+MoolBoran: -1%
+MS Gothic: -1%
+MS Mincho: -1%
+MS Outlook: -1%
+MS PGothic: -1%
+MS PMincho: -1%
+MS Reference 1: -1%
+MS Reference 2: -1%
+MS Reference Sans Serif: -1%
+MS Reference Specialty: -1%
+MS UI Gothic: -1%
+MT Extra: -1%
+MV Boli: -1%
+Narkisim: -1%
+Niagara Engraved: -1%
+Niagara Solid: -1%
+Nina: -1%
+NSimSun: -1%
+Nyala: -1%
+OCR A Extended: -1%
+Old English Text MT: -1%
+Onyx: -1%
+Palace Script MT: -1%
+Palatino Linotype: -1%
+Papyrus: -1%
+Parchment: -1%
+Perpetua: -1%
+Perpetua Titling MT Bold: -1%
+Plantagenet Cherokee: -1%
+Playbill: -1%
+PMingLiU: -1%
+PMingLiU-ExtB: -1%
+Poor Richard: -1%
+Pristina: -1%
+Raavi: -1%
+Rage Italic: -1%
+Ravie: -1%
+Rockwell: -1%
+Rockwell Condensed Bold: -1%
+Rockwell Extra Bold: -1%
+Rod: -1%
+Saysettha Lao: -1%
+Saysettha OT: -1%
+Script MT Bold: -1%
+Segoe Print: -1%
+Segoe Script: -1%
+Segoe UI: -1%
+Showcard Gothic: -1%
+Shruti: -1%
+SimHei: -1%
+Simplified Arabic: -1%
+Simplified Arabic Fixed: -1%
+SimSun: -1%
+SimSun-ExtB: -1%
+Snap ITC: -1%
+Stencil: -1%
+Sydnie: -1%
+Sylfaen: -1%
+Symbol: -1%
+Tahoma: -1%
+Tempus Sans ITC: -1%
+Tibetan Machine Uni: -1%
+Times New Pular: -1%
+Times New Roman: -1%
+Traditional Arabic: -1%
+Trebuchet MS: -1%
+Tunga: -1%
+Tw Cen MT Bold Italic: -1%
+Tw Cen MT Condensed: -1%
+Tw Cen MT Condensed Extra Bold: -1%
+Verdana: -1%
+Viner Hand ITC: -1%
+VisualUI: -1%
+Vivaldi Italic: -1%
+Vladimir Script: -1%
+Vrinda: -1%
+Webdings: -1%
+Wide Latin: -1%
+Wingdings: -1%
+Wingdings 2: -1%
+Wingdings 3: -1%
+WwinBurmese: -1%
+Z@R76E6.tmp: -1%
+Z@R7802.tmp: -1%
+Z@R799A.tmp: -1%
+Z@R7A38.tmp: -1%

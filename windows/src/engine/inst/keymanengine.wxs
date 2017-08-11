@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Module Id="engine" Version="$(var.VERSION)" Language="1033">
+    <Package Id="{10C11671-2746-463b-930A-38E615C4175C}" Keywords="Keyman,Keyboard,Engine" 
+             Description="Keyman Engine 10.0" Comments="Contact:  Your local administrator" 
+             Manufacturer="SIL International" InstallerVersion="200" Platform="x86" Languages="1033" SummaryCodepage="1252" />
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="CommonFilesFolder" Name=".">
+        <Directory Id="KEYMANROOT" Name="Keyman">
+          <Directory Id="KEYMAN_ENGINE" Name="Keyman Engine 10.0">
+            <Directory Id="INSTALLDIR" Name="." FileSource="..\..\..\bin\engine\">
+              <?include components.wxi ?>
+              <Directory Id="xml" Name="xml">
+                <Directory Id="osk" Name="osk" FileSource="..\..\engine\xml\osk\">
+                  <Component Id="xml" Guid="{BB7359CF-4E39-4022-ACDB-05694D237CA7}" Location="local">
+                    <File Id="osk.xsl" Name="osk.xsl" />
+                    <File Id="keyaltl.gif"         Name="key-altl.gif" />
+                    <File Id="keyaltr.gif"         Name="key-altr.gif" />
+                    <File Id="keybackspace.gif"    Name="key-backspace.gif" />
+                    <File Id="keybkslash.gif"      Name="key-bkslash.gif" />
+                    <File Id="keycapslock.gif"     Name="key-capslock.gif" />
+                    <File Id="keyctrll.gif"        Name="key-ctrll.gif" />
+                    <File Id="keyctrlr.gif"        Name="key-ctrlr.gif" />
+                    <File Id="keyenter.gif"        Name="key-enter.gif" />
+                    <File Id="keyplain.gif"        Name="key-plain.gif" />
+                    <File Id="keyshift102.gif"     Name="key-shift102.gif" />
+                    <File Id="keyshiftl.gif"       Name="key-shiftl.gif" />
+                    <File Id="keyshiftr.gif"       Name="key-shiftr.gif" />
+                    <File Id="keyspace.gif"        Name="key-space.gif" />
+                    <File Id="keytab.gif"          Name="key-tab.gif" />
+                  </Component>
+                </Directory>
+              </Directory>
+            </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
+
+      <Directory Id="CommonAppDataFolder" Name="CADF">
+        <Directory Id="CommonApp_KeymanRoot" Name="Keyman" >
+          <Directory Id="CommonApp_TS_Keyman" Name="Keyman Engine 10.0">
+            <Directory Id="CommonApp_TS_Keyman_Kbd" Name="Keyboard">
+              <Directory Id="CommonApp_TS_Keyman_Kbd_Pkg" Name="_Package" />
+            </Directory>
+            <Directory Id="CommonApp_TS_Keyman_Products" Name="Products" />
+          </Directory>
+          <Component Id="CommonAppDataRemovals" Guid="{B8AA53CB-E32E-47E6-88E6-C704B89A7108}">
+            <RegistryValue KeyPath="yes" Root="HKLM" Key="Software\Keyman\Keyman Engine\10.0" Name="root path" Type="string" Value="[INSTALLDIR]" />
+            <RegistryKey Action="createAndRemoveOnUninstall" Root="HKLM" Key="Software\Keyman\Keyman Engine\10.0" />
+            <RemoveFolder Id="CAD_ts_Uninstall" On="uninstall" />
+            <RemoveFolder Id="CAD_ts_Keyman_Uninstall" On="uninstall" Directory="CommonApp_TS_Keyman" />
+            <RemoveFolder Id="CAD_ts_Keyman_Kbd_Uninstall" On="uninstall" Directory="CommonApp_TS_Keyman_Kbd" />
+            <RemoveFolder Id="CAD_ts_Keyman_Products_Uninstall" On="uninstall" Directory="CommonApp_TS_Keyman_Products" />
+            <RemoveFolder Id="CAD_ts_Keyman_Kbd_Pkg_Uninst" On="uninstall" Directory="CommonApp_TS_Keyman_Kbd_Pkg" />
+          </Component>
+        </Directory>
+      </Directory>
+      <Directory Id="AppDataFolder" Name="ADF">
+        <Directory Id="App_KeymanRoot" Name="Keyman" >
+          <Directory Id="App_TS_Keyman" Name="Keyman Engine 10.0">
+            <Directory Id="App_TS_Keyman_Keyboard" Name="Keyboard">
+              <Directory Id="App_TS_Keyman_Kbd_Pkg" Name="_Package" />
+            </Directory>
+            <Directory Id="App_TS_Keyman_Products" Name="Products" />
+          </Directory>
+          <Component Id="AppDataRemovals" Guid="{95D0FCEE-F1B7-45B1-B263-B80A96D0AA92}">
+            <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Engine\10.0" Name="root path" Type="string" Value="[INSTALLDIR]" />
+            <RegistryKey Action="createAndRemoveOnUninstall" Root="HKCU" Key="Software\Keyman\Keyman Engine\10.0" />
+            <RemoveFolder Id="AD_ts_Uninstall" On="uninstall" />
+            <RemoveFolder Id="AD_ts_Keyman_Uninstall" On="uninstall" Directory="App_TS_Keyman" />
+            <RemoveFolder Id="AD_ts_Keyman_Keyboard_Uninstall" On="uninstall" Directory="App_TS_Keyman_Keyboard" />
+            <RemoveFolder Id="AD_ts_Keyman_Products_Uninstall" On="uninstall" Directory="App_TS_Keyman_Products" />
+            <RemoveFolder Id="AD_ts_Keyman_Kbd_Pkg_Uninst" On="uninstall" Directory="App_TS_Keyman_Kbd_Pkg" />
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+   
+    <CustomAction Id="PreUninstallA" Execute="deferred" Impersonate="no" BinaryKey="insthelper.dll" DllEntry="PreUninstall" />
+
+    <InstallExecuteSequence>
+      <Custom Action="PreUninstallA" After="InstallInitialize"><![CDATA[REMOVE="ALL" And Not REINSTALL And Not UPGRADINGPRODUCTCODE]]></Custom>
+    </InstallExecuteSequence>
+
+    <Binary Id="insthelper.dll" SourceFile="..\..\..\bin\inst\insthelper.dll" />
+
+  </Module>
+</Wix>

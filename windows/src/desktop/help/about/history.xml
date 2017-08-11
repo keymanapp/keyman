@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<section id="about_history">
+  <title>Version History</title>
+
+  <bridgehead>Keyman Desktop 9.0 Release Notes</bridgehead>
+
+  <para>Keyman Desktop 9.0.522.0</para>
+  
+  <itemizedlist>
+    <listitem>Keyboard hotkey toggles are not working in 9.0 (I5086)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.522.0</para>
+  
+  <itemizedlist>
+    <listitem>Improve compatibility with Firefox 42 and Internet Explorer 11 (I4933)</listitem>
+    <listitem>Fix hang when closing Keyman if Windows compatibility flag is incorrectly set (I5018)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.521.0</para>
+  
+  <itemizedlist>
+    <listitem>Updated digital certificate for Windows 8, 8.1 and 10 (I4978)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.519.0</para>
+  
+  <itemizedlist>
+    <listitem>Keyboard options do not work always work correctly because they are set twice while processing (I4978)</listitem>
+    <listitem>Update requirements in Help for Windows 10 (I4984)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.518.0</para>
+  
+  <itemizedlist>
+    <listitem>OEM products now have a cleaner menu display with indented keyboards and languages (I4920)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.516.0</para>
+  
+  <itemizedlist>
+    <listitem>Added: Note on why "Select keyboard layout for all applications" is disabled on Win 8.1+ (I4871)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.514.0</para>
+
+  <itemizedlist>
+    <listitem>Fixed: Inconsistent display of panels through Desktop (I4851)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.513.0</para>
+
+  <itemizedlist>
+    <listitem>Fixed: Keyman Desktop title in OSK has wrong grey background (I4849)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.512.0</para>
+
+  <itemizedlist>
+    <listitem>Fixed: If no baselayout is specified by the user, default to en-US (kbdus.dll) (I4786)</listitem>
+    <listitem>Fixed: Shift keys would sometimes 'stick' in Mozilla Firefox  (I4793)</listitem>
+    <listitem>Fixed: Log reported modifier state as well as Keyman current modifier state in debug logs (I4843)</listitem>
+    <listitem>Fixed: FileMakerPro 14 causes crash in Keyman Engine (I4846)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.510.0</para>
+
+  <itemizedlist>
+    <listitem>Keyman needs to rebuild its language profiles if they are inadvertently deleted (I4773)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.507.0</para>
+
+  <itemizedlist>
+    <listitem>Keyman loses focus sometimes when switching keyboards using the menu (I4731)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.506.0</para>
+
+  <itemizedlist>
+    <listitem>Language profile change notification while Keyman menu is visible sometimes causes a crash (I4715, I4683, I4591, I4577, I4541, I4472, I4431)</listitem>
+    <listitem>Improve reporting on registry errors (I4565, I4657)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.503.0</para>
+
+  <itemizedlist>
+    <listitem>MSKLC keyboards do not get correct name in Configuration Hotkeys tab (I4712)</listitem>
+    <listitem>MSKLC keyboards are not shown in the Keyman menu (I4713)</listitem>
+    <listitem>Keyboard and language hotkeys don't always work (I4714)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.494.0</para>
+
+  <itemizedlist>
+    <listitem>Fixed hotkeys not always working consistently (I4674)</listitem>
+    <listitem>Fixed read of invalid registry setting on some computers (I4660)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.493.0</para>
+
+  <itemizedlist>
+    <listitem>Add more detailed keyboard diagnostics (I4659)</listitem>
+    <listitem>Add Keep in Touch screen (I4658)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.492.0</para>
+
+  <itemizedlist>
+    <listitem>On Screen keyboard translates keys wrongly for European keyboards (I4650)</listitem>
+    <listitem>Mnemonic layout recompiler maps AltGr+# rather than \ on UK layouts (I4651)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.491.0</para>
+
+  <itemizedlist>
+    <listitem>Add logging for registration of keyboards for hotkey matching (I4648)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.490.0</para>
+
+  <itemizedlist>
+    <listitem>Add 'Enter License Key' link to splash screen (I4645)</listitem>
+    <listitem>Fix crash on startup on some computers with multiple Keyman products installed (I4624, I4519, I4602, I4640, I4633, I4636, I4637, I4638, I4639)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.489.0</para>
+
+  <itemizedlist>
+    <listitem>Backspace key was not working in Logos (I4642)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.488.0</para>
+  
+  <itemizedlist>
+    <listitem>Keyman could crash silently on exit due to null hotkeys being addressed (I4623)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.487.0</para>
+
+  <itemizedlist>
+    <listitem>.kmx installs upgraded from earlier versions were placed in the wrong folder (I4623)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.485.0</para>
+
+  <itemizedlist>
+    <listitem>keymanimport.log was generated incorrectly as unicode strings in an ansi file (I4617)</listitem>
+    <listitem>Keyman crashed when trying to recompile a missing mnemonic layout (I4615)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.484.0</para>
+
+  <para>No changes.</para>
+
+  <para>Keyman Desktop 9.0.483.0</para>
+
+  <itemizedlist>
+    <listitem>Support install of keyboard against fallback locales (I4607)</listitem>
+    <listitem>Support single keyboard buttons on OSK toolbar for OEM products (I4606)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.482.0</para>
+
+  <itemizedlist>
+    <listitem>Keyman installer did not show EULA when bundled with a keyboard (I4598)</listitem>
+    <listitem>Keyman Configuration enabled keyboards when OK clicked even if Keyman not running (I4382)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.481.0</para>
+
+  <itemizedlist>
+    <listitem>If a computer does not have US keyboard installed, then AltGr rules can go wrong (I4592)</listitem>
+    <listitem>The keyboard usage page can appear outside the OSK in some situations (I4593)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.480.0</para>
+
+  <itemizedlist>
+    <listitem>Spacebar results in incorrect output for subsequent letters on some keyboards (I4585)</listitem>
+    <listitem>If Ctrl+Alt simulates RAlt is on, then Ctrl+Alt rules don't work at all (I4551, I4583)</listitem>
+    <listitem>Add option to treat base keyboard deadkey as plain keys (I4552)</listitem>
+    <listitem>Switch for all languages not disabled on Win8 upgrades (I4576)</listitem>
+    <listitem>Support if(&amp;baselayout) with all of the ISO names (I4588)</listitem>
+    <listitem>Keyman fails to install shortcuts for keyboard documentation correctly (I4590)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.479.0</para>
+
+  <itemizedlist>
+    <listitem>Solution for output of Enter and Tab keys for some keyboards (I4575)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.478.0</para>
+
+  <itemizedlist>
+    <listitem>Solution for output of Enter and Tab keys for some keyboards (I4575)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.477.0</para>
+
+  <itemizedlist>
+    <listitem>Test solution for output of Enter and Tab keys for some keyboards (I4562)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.476.0</para>
+
+  <itemizedlist>
+    <listitem>Hotkey switching resulted in stuck Ctrl,Alt,Shift keys in some apps (I4511)</listitem>
+    <listitem>On Win 8, Keyman keyboards appear as "Unavailable Input Method" in Control Panel - mitigation only, not fixed (I4531)</listitem>
+    <listitem>Fixed: when Alt is down, release of Ctrl, Shift is not detectable within Keyman in some languages (I4548)</listitem>
+    <listitem>Mnemonic layout recompiler did not translate Lctrl Ralt for deadkeys correctly (I4549)</listitem>
+    <listitem>Logical flaw in mnemonic layout recompiler meant that AltGr base keys were never processed (I4550)</listitem>
+    <listitem>Upgrade to 476 or later requires recompile of all mnemonic layouts (I4553)</listitem>
+    <listitem>Keyboards without an icon must specify a default icon when registering to prevent control panel crashing (I4555)</listitem>
+    <listitem>Attached files were not shown when loading diag files (I4559)</listitem>
+    <listitem>Binary data in diagnostics was not streamed correctly (I4560)</listitem>
+  </itemizedlist>
+    
+  <para>Keyman Desktop 9.0.475.0</para>
+  
+  <itemizedlist>
+    <listitem>Language hotkeys associated with non-primary keyboards do not trigger language change (I4516)</listitem>
+    <listitem>Switch for all apps is not disabled in Win 8 (I4515)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.474.0</para>
+  
+  <itemizedlist>
+    <listitem>Crash when saving OSK to file, changing keyboard midstream [CrashID:keyman.exe_9.0.473.0_2C59B75E_EAccessViolation] (I4487)</listitem>
+    <listitem>The character map is not falling back to system fonts well when Code2000 missing (I4488)</listitem>
+    <listitem>Crash calling TSF [CrashID:kmshell.exe_9.0.473.0_2C45D42D_EOleSysError] (I4494)</listitem>
+    <listitem>Damaged package causes crash when trying to uninstall [CrashID:kmshell.exe_9.0.473.0_2C6B80C4_EOleException] (I4495)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.473.0</para>
+  
+  <itemizedlist>
+    <listitem>Verify that Internet Explorer 9.0 or later is present at install time (I4470)</listitem>
+    <listitem>Fix crash showing keyboard menu when product details are missing (I4458)</listitem>
+    <listitem>Fix crash when menu popup is dynamically resized by system (I4429)</listitem>
+    <listitem>Setup bootstrapper now handles upgrade scenarios with a prompt (I4460)</listitem>
+    <listitem>Upgrade dialog showed wrong version of Keyman Desktop (I4445)</listitem>
+    <listitem>Keyman Desktop Update dialog showed broken Tavultesoft image (I4456)</listitem>
+    <listitem>API fix: Keyman had a mismatch between KEYBOARDINFO and INTKEYBOARDINFO (I4462)</listitem>
+    <listitem>API fix: Keyman_BuildKeyboardList was including keyboards installed but with no profiles (I4461)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.472.0</para>
+  
+  <itemizedlist>
+    <listitem>Chinese keyboard was not working correctly (I4452)</listitem>
+    <listitem>Language hotkeys were not working (I4451)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.471.0</para>
+
+  <itemizedlist>
+    <listitem>Browser emulation control for kmshell breaks downlevel versions of Keyman (I4436)</listitem>
+    <listitem>Crash if Keyman Engine 7 or 8-based product installed when starting Keyman Desktop 9 (I4421)</listitem>
+    <listitem>Show Send to Tavultesoft button in Diagnostics (I4439)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.470.0</para>
+
+  <itemizedlist>
+    <listitem>Download Keyboard dialog had broken link (I4419)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.469.0</para>
+
+  <itemizedlist>
+    <listitem>Download Keyboard dialog does not display correctly (I4414)</listitem>
+    <listitem>OSK does not show underlying characters if base keyboard is not loaded (I4415)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.467.0</para>
+
+  <itemizedlist>
+    <listitem>Character Map needs to insert characters using SendInput (I4412)</listitem>
+    <listitem>Manual Activate dialog is misformatted (I4408)</listitem>
+    <listitem>Add HKCU FEATURE_BROWSER_EMULATION 9000 for kmshell.exe (I4400)</listitem>
+    <listitem>Character map allows Ctrl+Click to insert character (I4411)</listitem>
+  </itemizedlist>
+
+  <para>Keyman Desktop 9.0.466.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>OK and Cancel buttons are no longer missing on Proxy dialog (I4387)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.465.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Added HKCU FEATURE_BROWSER_EMULATION 9000 for kmshell.exe (I4400)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.464.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Added clean user interface selection for associated language in Free Edition (I4395)</listitem>
+    <listitem>Keyman Desktop Free Edition polish (I4393)</listitem>
+    <listitem>When configuration run from Splash and license key entered, splash didn't refresh (I4396)</listitem>
+    <listitem>Get Started got impatient and showed nag too quickly on start (I4397)</listitem>
+    <listitem>Hotkeys didn't show on keyboard list (I4398)</listitem>
+    <listitem>HTTP download now reports progress more cleanly (I4399)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.463.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Initial Free Edition changes (I4390)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.462.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Unticked keyboards in Keyman Configuration are not now shown in Windows Languages (I4376)</listitem>
+	<listitem>Keyman keyboards are no longer visible in Windows Languages when Keyman is not running (I4381)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.461.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Rapid typing in legacy mode no longer breaks (regression from 9.0.460.0) (I4378)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.460.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Icon size in tool tray is now correct when using large fonts (I4314)</listitem>
+	<listitem>Keyboard Upgrade from 6.0, 7.0, 8.0 now supports keyboards installed for Current User, fonts and Start Menu entries (I4324)</listitem>
+	<listitem>When On Screen Keyboard opens, if Keyman is off then icon now shows correctly (I4360)</listitem>
+	<listitem>On Screen Keyboard now always shows correct base layout when keyboard active (I4363)</listitem>
+	<listitem>Installer now enforces Windows 7 or later (I4366)</listitem>
+	<listitem>Deadkeys are now working with Microsoft Word in TSF-aware mode (I4370)</listitem>
+	<listitem>WOW64 is now tested consistently in all locations (I4374)</listitem>
+	<listitem>Add registry flag 'deep tsf integration' to allow us to disable enhanced integration with TSF-aware applications (I4375)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.459.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Deadkeys are now working correctly in all cases in Wordpad and other TSF-aware applications (except Word) (I4278)</listitem>
+	<listitem>All .ico formats do not load correctly in icon conversion for keyboard layouts (I4317)</listitem>
+	<listitem>Alt+LeftShift hotkey is now set on clean install (I4318)</listitem>
+	<listitem>If Keyman is not running, selecting a Keyman layout in Windows will no longer have any effect (I4325)</listitem>
+	<listitem>Keyboard and interface hotkeys are now working (I4326)</listitem>
+	<listitem>Deadkeys are now working correctly with mnemonic layouts (I4353, I4327)</listitem>
+	<listitem>AltGr keys are now working correctly in enhanced integration mode (I4351)</listitem>
+	<listitem>If splash screen is minimized, it can now be restored (I4356)</listitem>
+	<listitem>Splash screen buy links now go to correct version of Keyman (I4357)</listitem>
+	<listitem>COM registration updated for new interfaces in Keyman 9 (I4358)</listitem>
+	<listitem>OSK now shows correct base keyboard and refreshes when switching languages (I4359)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.458.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Getting Started window gave instructions that were not valid for KM9 (I3674)</listitem>
+	<listitem>Script error dialog was appearing behind splash dialog (regression from I3710) (I3730)</listitem>
+	<listitem>Balloon tip and About page had wrong product version (I4311)</listitem>
+	<listitem>Keyboard icons are now converted to 32BPP RGBA on install for Windows 8 compatibility (I4316)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.457.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Fixed: Keys that have rules but are not matched due to context did not generate output (I4290)</listitem>
+	<listitem>Fixed: Additional minor bug fixes (I4302)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.456.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Fixed: Crash in Keyman Configuration (I4296)</listitem>
+	<listitem>Fixed: Upgrade of keyboards failed to register in local machine context (I4297)</listitem>
+	<listitem>Fixed: Old TSF addin remained registered when upgrading (I4298)</listitem>
+	<listitem>Fixed: Keyman-installed Windows languages needed to be removed when upgrading (I4299)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.455.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Added: Support for upgrading configuration and keyboards from 8.0 to 9.0 (I4292, I4293)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.454.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Fixed: Switch from Keyman to Keyman keyboard caused loop in global language switch (I4277)</listitem>
+	<listitem>Fixed: Keyboard switching and legacy support edge case scenarios (I4285, I4286, I4287, I4288)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.453.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Fixed: Shift states were not being preserved correctly (I3605)</listitem>
+	<listitem>Fixed: Opening User Interface Language menu causes crash [CrashID:kmshell.exe_9.0.447.0_script_TfrmMain_0] (I4199)</listitem>
+	<listitem>Fixed: Deadkeys only work in first 61 characters of document (I4266)</listitem>
+	<listitem>Fixed: If Keyboard usage refreshes during exit, Keyman crashes [CrashID:keyman.exe_9.0.452.0_2C5FB0CD_EAccessViolation] (I4268)</listitem>
+	<listitem>Fixed: Switch language for all applications is not working (I4271)</listitem>
+	<listitem>Fixed: TIP only outputs first 127 characters of a rule result (I4272)</listitem>
+	<listitem>Fixed: kmtip does not work if already active before KM starts (I4274)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.452.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Fixed: Keyman installed keyboards do not seem to appear in Windows Language control panel in Win 8 (I4202)</listitem>
+	<listitem>Fixed: Icons do not show background correctly in lang switch window and Win 8 languages controls (also I4316) (I4204)</listitem>
+	<listitem>Fixed: Crash in Keyman Configuration [kmshell.exe_9.0.451.0_script_TfrmMain_0] (I4251)</listitem>
+	<listitem>Fixed: kmtip install does not register Win 8 support features (I4252)</listitem>
+	<listitem>Fixed: TSF deadkeys do not function correctly (I4262)</listitem>
+	<listitem>Fixed: Test for text editor running fails (I4265)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.451.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Fixed: Keyman Configuration crashed on first run due to koKeymanUniscribeManager reference (I4250)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.450.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Fixed: If kmtip CKMTipTextService::Activate fails, cleanup (I3706)</listitem>
+	<listitem>Minor: Refactor kmxfile utility functions (I3757)</listitem>
+	<listitem>Added: Removed all legacy keyboard management Win32 API calls and use only TSF (I4220)</listitem>
+	<listitem>Fixed: Crash when OSK closed/reopened without dismissing hint window [CrashID:keyman.exe_9.0.449.0_2C405C5D_EInvalidPointer] (I4242)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.449.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Opening font helper or keyboard usage from Keyman menu on Win 8 still shows HTML outside window (I4225)</listitem>
+	<listitem>Excmagic.debug left scattered around program file directories after uninstall (I4218)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.448.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Shift + Arrows do not select text (only move caret) in Win 8 when Keyman keyboard is active (I4201)</listitem>
+	<listitem>Keyman TIP should use ITfTextInputProcessorEx (I4216)</listitem>
+	<listitem>Keyman leaks an Internet Explorer window handle (I4214)</listitem>
+	<listitem>Help dialog appears below OSK and is inaccessible (I4209)</listitem>
+	<listitem>Font helper and Keyboard usage appear outside frame in Win 8 (I4208)</listitem>
+	<listitem>Shift states still not working with unprocessed keys in V9 (I4128)</listitem>
+	<listitem>Activate/Purchase dialogs are incomplete and the Buy Modules button doesn't work (I4090)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.447.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Exit Keyman hint appears to be blank on Win8? (I4187)</listitem>
+	<listitem>Pressing Enter in install keyboard dialog gives error about admin req (I4172)</listitem>
+	<listitem>Help Contents link does not work from Keyman menu (I3993)</listitem>
+	<listitem>Help window Help and Help on Keyboard links don't work (I3676)</listitem>
+	<listitem>Base Keyboard dialog has wrong style of buttons (I4184)</listitem>
+	<listitem>Use TTempFileManager for all temporary files (I4195)</listitem>
+	<listitem>Lang switch window shows wrong selection with Alt+LeftShift when TIP is active (I4191)</listitem>
+	<listitem>keyman.exe seems to be missing icon (I3769)</listitem>
+	<listitem>Lang switch window shifts on first view (I4190)</listitem>
+	<listitem>wm_kmmoreposting must be refactored for TIP work as it is not sequential (I4196)</listitem>
+	<listitem>Avoid interactions with full-screen RDP (I4197)</listitem>
+	<listitem>mcompile logs should be stored in diag folder (I4174)</listitem>
+	<listitem>Uninstalling a keyboard leaves the mnemonic recompiled layouts behind (I4173)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.446.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Keyman Engine installer does not include mcompile.exe (I4171)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.445.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Mnemonic layouts should be recompiled to positional based on user-selected base keyboard (I4169)</listitem>
+	<listitem>Console execute in utilexecute.pas needs a temp copy of buffer to avoid write access violations (I4170)</listitem>
+	<listitem>Shift states still not working with unprocessed keys in V9 (I4128)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.444.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Keyman Desktop installer does not install x64 TIP (I4161)</listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.443.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem></listitem>
+  </itemizedlist>
+  
+  <para>Keyman Desktop 9.0.442.0 (beta release)</para>
+
+  <itemizedlist>
+    <listitem>Add keyboard version information to Keyman Configuration (Tweak) (I4136)</listitem>
+  </itemizedlist>
+
+  <bridgehead>Related Topics</bridgehead>
+  <itemizedlist>
+    <listitem>
+      <para>
+        <xref linkend="about_whatsnew"></xref>
+      </para>
+    </listitem>
+  </itemizedlist>
+
+</section>

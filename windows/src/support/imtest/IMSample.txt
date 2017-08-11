@@ -1,0 +1,12 @@
+[Config]
+Font=Arial Unicode MS
+Size=20
+
+[Groups]
+IPA
+
+[Rules]
+IPA,"","a",U+00E6,    "a", U+0251, U+0250, U+028C
+IPA,"","e",U+025B, U+025C, U+0259,    "e", U+0258
+IPA,"","o",   "o", U+00F8, U+0254
+IPA,"","m",   "m", "M",    "###"

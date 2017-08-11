@@ -1,0 +1,230 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <ProjectOptions>
+    <PathDelim Value="\"/>
+    <Version Value="5"/>
+    <General>
+      <Flags>
+        <MainUnitHasUsesSectionForAllUnits Value="False"/>
+        <MainUnitHasCreateFormStatements Value="False"/>
+        <MainUnitHasTitleStatement Value="False"/>
+      </Flags>
+      <MainUnit Value="0"/>
+      <IconPath Value="./"/>
+      <TargetFileExt Value=".exe"/>
+      <ActiveEditorIndexAtStart Value="0"/>
+    </General>
+    <VersionInfo>
+      <ProjectVersion Value=""/>
+      <Language Value=""/>
+      <CharSet Value=""/>
+    </VersionInfo>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IgnoreBinaries Value="False"/>
+      <IncludeFileFilter Value="*.(pas|pp|inc|lfm|lpr|lrs|lpi|lpk|sh|xml)"/>
+      <ExcludeFileFilter Value="*.(bak|ppu|ppw|o|so);*~;backup"/>
+    </PublishOptions>
+    <RunParams>
+      <local>
+        <FormatVersion Value="1"/>
+        <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T 'Lazarus Run Output' -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+      </local>
+    </RunParams>
+    <Units Count="4">
+      <Unit0>
+        <Filename Value="ChangeOwner.dpr"/>
+        <IsPartOfProject Value="True"/>
+        <CursorPos X="1" Y="13"/>
+        <TopLine Value="1"/>
+        <EditorIndex Value="0"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="$(LazarusDir)\lcl\lclclasses.pp"/>
+        <UnitName Value="LCLClasses"/>
+        <CursorPos X="12" Y="32"/>
+        <TopLine Value="18"/>
+        <EditorIndex Value="8"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="..\..\..\USM_Token.pas"/>
+        <UnitName Value="USM_Token"/>
+        <CursorPos X="35" Y="1904"/>
+        <TopLine Value="1888"/>
+        <EditorIndex Value="7"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="$(LazarusDir)\lcl\include\lclintf.inc"/>
+        <CursorPos X="29" Y="335"/>
+        <TopLine Value="244"/>
+        <EditorIndex Value="6"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit3>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="213" Column="1" TopLine="199"/>
+      </Position1>
+      <Position2>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="214" Column="1" TopLine="200"/>
+      </Position2>
+      <Position3>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="213" Column="1" TopLine="199"/>
+      </Position3>
+      <Position4>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="214" Column="1" TopLine="200"/>
+      </Position4>
+      <Position5>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="213" Column="1" TopLine="199"/>
+      </Position5>
+      <Position6>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="214" Column="1" TopLine="200"/>
+      </Position6>
+      <Position7>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="213" Column="1" TopLine="199"/>
+      </Position7>
+      <Position8>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="214" Column="1" TopLine="200"/>
+      </Position8>
+      <Position9>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="213" Column="1" TopLine="199"/>
+      </Position9>
+      <Position10>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="214" Column="1" TopLine="200"/>
+      </Position10>
+      <Position11>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="213" Column="1" TopLine="199"/>
+      </Position11>
+      <Position12>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="214" Column="1" TopLine="200"/>
+      </Position12>
+      <Position13>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="217" Column="1" TopLine="203"/>
+      </Position13>
+      <Position14>
+        <Filename Value="ChangeOwner.dpr"/>
+        <Caret Line="57" Column="26" TopLine="47"/>
+      </Position14>
+      <Position15>
+        <Filename Value="ChangeOwner.dpr"/>
+        <Caret Line="18" Column="61" TopLine="4"/>
+      </Position15>
+      <Position16>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="192" Column="1" TopLine="178"/>
+      </Position16>
+      <Position17>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="196" Column="1" TopLine="182"/>
+      </Position17>
+      <Position18>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="201" Column="1" TopLine="187"/>
+      </Position18>
+      <Position19>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="213" Column="1" TopLine="199"/>
+      </Position19>
+      <Position20>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="214" Column="1" TopLine="200"/>
+      </Position20>
+      <Position21>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="213" Column="1" TopLine="199"/>
+      </Position21>
+      <Position22>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="214" Column="1" TopLine="200"/>
+      </Position22>
+      <Position23>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="213" Column="1" TopLine="199"/>
+      </Position23>
+      <Position24>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="214" Column="1" TopLine="200"/>
+      </Position24>
+      <Position25>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="213" Column="1" TopLine="199"/>
+      </Position25>
+      <Position26>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="217" Column="1" TopLine="203"/>
+      </Position26>
+      <Position27>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="234" Column="1" TopLine="220"/>
+      </Position27>
+      <Position28>
+        <Filename Value="$(LazarusDir)\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <Caret Line="192" Column="1" TopLine="178"/>
+      </Position28>
+      <Position29>
+        <Filename Value="ChangeOwner.dpr"/>
+        <Caret Line="58" Column="13" TopLine="40"/>
+      </Position29>
+      <Position30>
+        <Filename Value="..\..\..\USM_Types.pas"/>
+        <Caret Line="237" Column="1" TopLine="226"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="5"/>
+    <PathDelim Value="\"/>
+    <SearchPaths>
+      <OtherUnitFiles Value="..\..\..\;$(LazarusDir)\lcl\units\$(TargetCPU)-$(TargetOS)\;$(LazarusDir)\lcl\interfaces\win32\"/>
+    </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <CStyleOperator Value="False"/>
+        <AllowLabel Value="False"/>
+        <CPPInline Value="False"/>
+        <DelphiCompat Value="True"/>
+      </SyntaxOptions>
+    </Parsing>
+    <CodeGeneration>
+      <Generate Value="Faster"/>
+    </CodeGeneration>
+    <Other>
+      <CustomOptions Value="-dDYNAMIC_LINK
+"/>
+      <CompilerPath Value="$(CompPath)"/>
+    </Other>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="3">
+      <Item1>
+        <Name Value="ECodetoolError"/>
+      </Item1>
+      <Item2>
+        <Name Value="EFOpenError"/>
+      </Item2>
+      <Item3>
+        <Name Value="ESMNoThreadTokenAvailable"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

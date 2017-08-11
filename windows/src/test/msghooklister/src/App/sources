@@ -1,0 +1,79 @@
+!Include "..\sources_inc.txt"
+
+USER_C_FLAGS = $(USER_C_FLAGS) /DUNICODE /D_UNICODE /DDBGHELP_TRANSLATE_TCHAR
+
+MC_FLAGS=/u /U
+MC_SOURCEDIR=.
+PASS0_HEADERDIR=$(MC_SOURCEDIR)
+
+TARGETTYPE=PROGRAM
+UMTYPE=console
+UMENTRY=wmain
+TARGETNAME=MsgListerApp
+USE_STL=1
+STL_VER=70
+USE_NATIVE_EH=1
+
+# if a path to the Debugging tools isn't found, 
+# try and fashion our own
+!If ((!DEFINED(DBGSDK_INC_PATH)) || ("$(DBGSDK_INC_PATH)" == ""))
+
+#let the user specify an override
+!	If ((!DEFINED(DBGHELP_DIR)) || ("$(DBGHELP_DIR)" == ""))
+!	Message Change the following sdk variable to the path of Windows SDK
+#	note if the path contains spaces, you'll have to define it as one of the 
+#	above variables, they'll be stripped out otherwise
+
+SDK_DIR=G:/SDK/
+
+#	SDK platform subdirectory names, for the more recent versions
+!	IF DEFINED(AMD64) && "$(AMD64)" != "0"
+SDK_ARCH_DIR = x64/
+!	ELSE
+#	x86 libs are in the base dir
+SDK_ARCH_DIR =
+!	ENDIF
+
+DBGSDK_INC_PATH = $(SDK_DIR)\include
+DBGSDK_LIB_PATH = $(SDK_DIR)\lib\$(SDK_ARCH_DIR)
+
+!	ELSE #DBGHELP_DIR
+
+DBGSDK_INC_PATH = $(DBGHELP_DIR)\inc
+DBGSDK_LIB_PATH = $(DBGHELP_DIR)\lib\*
+
+!	ENDIF #DBGHELP_DIR
+!ENDIF  #DBGSDK_INC_PATH
+
+INCLUDES = $(INCLUDES);$(DBGSDK_INC_PATH)
+
+INCLUDES = $(INCLUDES);f:\Dev-cpp\projects\utilities\lib\util
+
+TARGETLIBS = $(SDK_LIB_PATH)\kernel32.lib \
+			 $(SDK_LIB_PATH)\user32.lib \
+			 $(SDK_LIB_PATH)\shell32.lib \
+			 $(SDK_LIB_PATH)\ole32.lib \
+			 $(DBGSDK_LIB_PATH)\dbghelp.lib
+			 
+!IF (("$(DDKBUILDENV)" == "chk") || ("$(DDKBUILDENV)" == "CHK"))
+
+DEBUG_CRTS=1
+USE_LIBCMT=1
+LINKER_NOREF=1
+
+!ELSE
+
+USE_MSVCRT=1
+
+!ENDIF
+
+SOURCES = install.cpp \
+		  main.cpp \
+		  messages.cpp \
+		  messages.mc \
+		  window.cpp \
+		  Version.rc \
+		  RuntimeLoader.cpp \
+		  util.cpp \
+		  Driver.cpp \
+		  hooks.cpp

@@ -1,0 +1,376 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="Apache Forrest" name="Generator">
+<meta name="Forrest-version" content="0.9-dev">
+<meta name="Forrest-skin-name" content="pelt">
+<title>Intermediate Format</title>
+<link type="text/css" href="../skin/basic.css" rel="stylesheet">
+<link media="screen" type="text/css" href="../skin/screen.css" rel="stylesheet">
+<link media="print" type="text/css" href="../skin/print.css" rel="stylesheet">
+<link type="text/css" href="../skin/profile.css" rel="stylesheet">
+<script src="../skin/getBlank.js" language="javascript" type="text/javascript"></script><script src="../skin/getMenu.js" language="javascript" type="text/javascript"></script><script src="../skin/fontsize.js" language="javascript" type="text/javascript"></script>
+<link rel="shortcut icon" href="../">
+</head>
+<body onload="init()">
+<script type="text/javascript">ndeSetTextSize();</script>
+<div id="top">
+<!--+
+    |header
+    +-->
+<div class="header">
+<!--+
+    |start group logo
+    +-->
+<div class="grouplogo">
+<a href="http://xmlgraphics.apache.org/"><img class="logoImage" alt="Apache XML Graphics" src="../images/group-logo.gif" title="Apache XML Graphics is responsible for the creation and maintenance of software for managing the conversion of XML formats to graphical output, and the creation and maintenance of related software components, based on software licensed to the Foundation"></a>
+</div>
+<!--+
+    |end group logo
+    +-->
+<!--+
+    |start Project Logo
+    +-->
+<div class="projectlogo">
+<a href="http://xmlgraphics.apache.org/fop/"><img class="logoImage" alt="Apache FOP" src="../images/logo.jpg" title="Apache FOP (Formatting Objects Processor) is the world's first output independent formatter. Output formats currently supported include PDF, PCL, PS, SVG, XML (area tree representation), Print, AWT, MIF and TXT. The primary output target is PDF."></a>
+</div>
+<!--+
+    |end Project Logo
+    +-->
+<!--+
+    |start Search
+    +-->
+<div class="searchbox">
+<form action="http://www.google.com/search" method="get" class="roundtopsmall">
+<input value="xmlgraphics.apache.org" name="sitesearch" type="hidden"><input onFocus="getBlank (this, 'Search the site with google');" size="25" name="q" id="query" type="text" value="Search the site with google">&nbsp; 
+                    <input name="Search" value="Search" type="submit">
+</form>
+</div>
+<!--+
+    |end search
+    +-->
+<!--+
+    |start Tabs
+    +-->
+<ul id="tabs">
+<li>
+<a class="unselected" href="../index.html">Home</a>
+</li>
+<li class="current">
+<a class="selected" href="../0.94/index.html">Version 0.94</a>
+</li>
+<li>
+<a class="unselected" href="../0.95/index.html">Version 0.95</a>
+</li>
+<li>
+<a class="unselected" href="../trunk/index.html">FOP Trunk</a>
+</li>
+<li>
+<a class="unselected" href="../dev/index.html">Development</a>
+</li>
+</ul>
+<!--+
+    |end Tabs
+    +-->
+</div>
+</div>
+<div id="main">
+<div id="publishedStrip">
+<!--+
+    |start Subtabs
+    +-->
+<div id="level2tabs"></div>
+<!--+
+    |end Endtabs
+    +-->
+<script type="text/javascript"><!--
+document.write("Last Published: " + document.lastModified);
+//  --></script>
+</div>
+<!--+
+    |breadtrail
+    +-->
+<div class="breadtrail">
+<a href="http://www.apache.org/">apache.org</a> &gt; <a href="http://xml.apache.org/">XML Federation</a> &gt; <a href="http://xmlgraphics.apache.org/">xmlgraphics.apache.org</a><script src="../skin/breadcrumbs.js" language="JavaScript" type="text/javascript"></script>
+</div>
+<!--+
+    |start Menu, mainarea
+    +-->
+<!--+
+    |start Menu
+    +-->
+<div id="menu">
+<div onclick="SwitchMenu('menu_selected_1.1', '../skin/')" id="menu_selected_1.1Title" class="menutitle" style="background-image: url('../skin/images/chapter_open.gif');">FOP 0.94</div>
+<div id="menu_selected_1.1" class="selectedmenuitemgroup" style="display: block;">
+<div class="menuitem">
+<a href="../0.94/index.html">About</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/releaseNotes_0.94.html">Release Notes</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/changes_0.94.html">Changes</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/knownissues_overview.html">Known Issues</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/upgrading.html">Upgrading</a>
+</div>
+<div onclick="SwitchMenu('menu_1.1.6', '../skin/')" id="menu_1.1.6Title" class="menutitle">Using FOP</div>
+<div id="menu_1.1.6" class="menuitemgroup">
+<div class="menuitem">
+<a href="../0.94/compiling.html">Build</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/configuration.html">Configure</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/running.html">Run</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/embedding.html">Embed</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/servlets.html">Servlets</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/anttask.html">Ant Task</a>
+</div>
+</div>
+<div onclick="SwitchMenu('menu_selected_1.1.7', '../skin/')" id="menu_selected_1.1.7Title" class="menutitle" style="background-image: url('../skin/images/chapter_open.gif');">Features</div>
+<div id="menu_selected_1.1.7" class="selectedmenuitemgroup" style="display: block;">
+<div class="menuitem">
+<a href="../0.94/output.html">Output Targets</a>
+</div>
+<div class="menupage">
+<div class="menupagetitle">Intermediate Format</div>
+</div>
+<div class="menuitem">
+<a href="../0.94/pdfencryption.html">PDF Encryption</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/pdfa.html">PDF/A</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/pdfx.html">PDF/X</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/graphics.html">Graphics</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/fonts.html">Fonts</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/hyphenation.html">Hyphenation</a>
+</div>
+<div class="menuitem">
+<a href="../0.94/extensions.html">Extensions</a>
+</div>
+</div>
+</div>
+<div id="credit"></div>
+<div id="roundbottom">
+<img style="display: none" class="corner" height="15" width="15" alt="" src="../skin/images/rc-b-l-15-1body-2menu-3menu.png"></div>
+<!--+
+  |alternative credits
+  +-->
+<div id="credit2"></div>
+</div>
+<!--+
+    |end Menu
+    +-->
+<!--+
+    |start content
+    +-->
+<div id="content">
+<div title="raw XML" class="xmllink">
+<a class="dida" href="intermediate.xml"><img alt="XML - icon" src="../skin/images/xmldoc.gif" class="skin"><br>
+        XML</a>
+</div>
+<div title="Portable Document Format" class="pdflink">
+<a class="dida" href="intermediate.pdf"><img alt="PDF -icon" src="../skin/images/pdfdoc.gif" class="skin"><br>
+        PDF</a>
+</div>
+<div class="trail">Font size: 
+	          &nbsp;<input value="Reset" class="resetfont" title="Reset text" onclick="ndeSetTextSize('reset'); return false;" type="button">      
+	          &nbsp;<input value="-a" class="smallerfont" title="Shrink text" onclick="ndeSetTextSize('decr'); return false;" type="button">
+	          &nbsp;<input value="+a" class="biggerfont" title="Enlarge text" onclick="ndeSetTextSize('incr'); return false;" type="button">
+</div>
+<h1>Intermediate Format</h1>
+<div id="front-matter">
+<div id="minitoc-area">
+<ul class="minitoc">
+<li>
+<a href="#introduction">Introduction</a>
+</li>
+<li>
+<a href="#usage">Usage of the Intermediate Format</a>
+<ul class="minitoc">
+<li>
+<a href="#concat">Concatenating Documents</a>
+</li>
+<li>
+<a href="#modifying">Modifying Documents</a>
+</li>
+<li>
+<a href="#advanced">Advanced Use</a>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+    
+<div class="note">
+<div class="label">Note</div>
+<div class="content">
+      Please note that the intermediate format is an <strong>advanced feature</strong> and can be ignored by most
+      users of Apache FOP.
+    </div>
+</div>
+    
+<a name="N10017"></a><a name="introduction"></a>
+<h2 class="underlined_10">Introduction</h2>
+<div class="section">
+<p>
+        The intermediate format (IF) is a proprietary XML format that represents the area tree 
+        generated by the layout engine. The area tree is conceptually defined in the 
+        <a class="external" href="http://www.w3.org/TR/2001/REC-xsl-20011015/slice1.html#section-N742-Formatting">XSL-FO specification in chapter 1.1.2</a>.
+        The IF can be generated through the area tree XML Renderer (the XMLRenderer).
+      </p>
+<p>
+        The intermediate format can be used to generate intermediate documents that are modified 
+        before they are finally rendered to their ultimate output format. Modifications include
+        adjusting and changing trait values, adding or modifying area objects, inserting prefabricated
+        pages, overlays, imposition (n-up, rotation, scaling etc.). Multiple IF files can be combined
+        to a single output file.
+      </p>
+</div>
+    
+<a name="N10028"></a><a name="usage"></a>
+<h2 class="underlined_10">Usage of the Intermediate Format</h2>
+<div class="section">
+<p>
+        As already mentioned, the IF is generated by using the <strong>XMLRenderer</strong> (MIME type: 
+        <strong>application/X-fop-areatree</strong>). So, you basically set the right MIME type for
+        the output format and process your FO files as if you would create a PDF file. However, there
+        is an important detail to consider: The various Renderers don't all use the same font sources.
+        To be able to create the right area tree for the ultimate output file, you need to create
+        the IF file using the right font setup. This is achieved by telling the XMLRenderer to mimic
+        another renderer. This is done by calling the XMLRenderer's mimicRenderer() method with an
+        instance of the ultimate target renderer as the single parameter. This has a consequence: An
+        IF file rendered with the Java2DRenderer may not look as expected when it was actually generated
+        for the PDF renderer. For renderers that use the same font setup, this restriction does not
+        apply (PDF and PS, for example). Generating the intermediate format file is the first step.
+      </p>
+<p>
+        The second step is to reparse the IF file using the <strong>AreaTreeParser</strong> which is 
+        found in the org.apache.fop.area package. The pages retrieved from the IF file are added to an
+        AreaTreeModel instance from where they are normally rendered using one of the available Renderer
+        implementations. You can find examples for the IF processing in the 
+        <a class="external" href="http://svn.apache.org/viewcvs.cgi/xmlgraphics/fop/trunk/examples/embedding/java/embedding/intermediate/"><span class="codefrag">examples/embedding</span></a>
+        directory in the FOP distribution
+      </p>
+<p>
+        The basic pattern to parse the IF format looks like this:
+      </p>
+<pre class="code">
+FopFactory fopFactory = FopFactory.newInstance();      
+      
+// Setup output
+OutputStream out = new java.io.FileOutputStream(pdffile);
+out = new java.io.BufferedOutputStream(out);
+try {
+    //Setup fonts and user agent
+    FontInfo fontInfo = new FontInfo();
+    FOUserAgent userAgent = fopFactory.newFOUserAgent();
+
+    //Construct the AreaTreeModel that will received the individual pages
+    AreaTreeModel treeModel = new RenderPagesModel(userAgent, 
+            MimeConstants.MIME_PDF, fontInfo, out);
+            
+    //Parse the IF file into the area tree
+    AreaTreeParser parser = new AreaTreeParser();
+    Source src = new StreamSource(myIFFile);
+    parser.parse(src, treeModel, userAgent);
+            
+    //Signal the end of the processing. The renderer can finalize the target document.
+    treeModel.endDocument();
+} finally {
+    out.close();
+}</pre>
+<p>
+        This example simply reads an IF file and renders it to a PDF file. Please note, that in normal
+        FOP operation you're shielded from having to instantiate the FontInfo object yourself. This
+        is normally a task of the AreaTreeHandler which is not present in this scenario. The same
+        applies to the AreaTreeModel instance, in this case an instance of a subclass called 
+        RenderPagesModel. RenderPagesModel is ideal in this case as it has very little overhead 
+        processing the individual pages. An important line in the example is the call to 
+        <span class="codefrag">endDocument()</span> on the AreaTreeModel. This lets the Renderer know that the processing
+        is now finished.
+      </p>
+<p>
+        The intermediate format can also be used from the <a href="running.html#standalone-start">command-line</a>
+        by using the "-atin" parameter for specifying the area tree XML as input file. You can also 
+        specify a "mimic renderer" by inserting a MIME type between "-at" and the output file.
+      </p>
+<a name="N10056"></a><a name="concat"></a>
+<h3 class="underlined_5">Concatenating Documents</h3>
+<p>
+          This initial example is obviously not very useful. It would be faster to create the PDF file 
+          directly. As the <a class="external" href="http://svn.apache.org/repos/asf/xmlgraphics/fop/trunk/examples/embedding/java/embedding/intermediate/ExampleConcat.java">ExampleConcat.java</a>
+          example shows you can easily parse multiple IF files in a row and add the parsed pages to the
+          same AreaTreeModel instance which essentially concatenates all the input document to one single
+          output document.
+        </p>
+<a name="N10064"></a><a name="modifying"></a>
+<h3 class="underlined_5">Modifying Documents</h3>
+<p>
+          One of the most important use cases for the intermediate format is obviously modifying the area
+          tree XML before finally rendering it to the target format. You can easily use XSLT to process
+          the IF file according to your needs. Please note, that we will currently not formally describe
+          the intermediate format. You need to have a good understanding its structure so you don't
+          create any non-parseable files. We may add an XML Schema and more detailed documentation at a
+          later time. You're invited to help us with that.
+        </p>
+<a name="N1006E"></a><a name="advanced"></a>
+<h3 class="underlined_5">Advanced Use</h3>
+<p>
+          The generation of the intermediate format as well as it parsing process has been designed to allow
+          for maximum flexibility and optimization. Please note that you can call <span class="codefrag">setTransformerHandler()</span> on
+          XMLRenderer to give the XMLRenderer your own TransformerHandler instance in case you would like to
+          do custom serialization (to a W3C DOM, for example) and/or to directly modify the area tree using 
+          XSLT. The AreaTreeParser on the other side allows you to retrieve a ContentHandler instance where
+          you can manually send SAX events to to start the parsing process (see <span class="codefrag">getContentHandler()</span>).
+        </p>
+</div>
+  
+<span class="version">
+          version 627324</span>
+</div>
+<!--+
+    |end content
+    +-->
+<div class="clearboth">&nbsp;</div>
+</div>
+<div id="footer">
+<!--+
+    |start bottomstrip
+    +-->
+<div class="lastmodified">
+<script type="text/javascript"><!--
+document.write("Last Published: " + document.lastModified);
+//  --></script>
+</div>
+<div class="copyright">
+        Copyright &copy;
+         1999-2008 <a href="http://www.apache.org/licenses/">The Apache Software Foundation.</a>
+</div>
+<!--+
+    |end bottomstrip
+    +-->
+</div>
+</body>
+</html>

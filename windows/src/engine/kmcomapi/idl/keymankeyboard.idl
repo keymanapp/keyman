@@ -1,0 +1,205 @@
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanKeyboard                                                             /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(A4E08956-64AB-41F5-950B-3073F38D32B2), 
+    version(1.0), 
+    helpstring("Interface for KeymanKeyboard Object"),
+    dual, 
+    oleautomation
+  ]
+   interface IKeymanKeyboard: IDispatch
+  {
+    [propget, id(0x00000001)]
+    HRESULT _stdcall Name([out, retval] BSTR * Value );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall Filename([out, retval] BSTR * Value );
+    [propget, id(0x00000003)]
+    HRESULT _stdcall Message([out, retval] BSTR * Value );
+    [propget, id(0x00000004)]
+    HRESULT _stdcall Copyright([out, retval] BSTR * Value );
+    [propget, id(0x00000005)]
+    HRESULT _stdcall Hotkey([out, retval] long * Value );
+    [propput, id(0x00000005)]
+    HRESULT _stdcall Hotkey([in] long Value );
+    [propget, id(0x00000006)]
+    HRESULT _stdcall Bitmap([out, retval] IPicture ** Value );
+//    [propget, id(0x00000007)]
+  //  HRESULT _stdcall OwnerPackage([out, retval] IKeymanPackage ** Value );
+//    [propget, id(0x00000008)]
+  //  HRESULT _stdcall Licence([out, retval] IKeymanLicence ** Value );
+    [propget, id(0x00000009)]
+    HRESULT _stdcall KeyboardName([out, retval] BSTR * Value );
+    [propget, id(0x0000000A)]
+    HRESULT _stdcall Encodings([out, retval] KeymanKeyboardEncodings * Value );
+  };
+
+  // KeymanKeyboardPackage
+/*
+  [
+    uuid(FE4782AD-AA02-45AA-A87F-24A2471DDA9B), 
+    version(1.0), 
+    helpstring("KeymanKeyboardPackage Object"),
+    noncreatable
+  ]
+  coclass KeymanKeyboardPackage
+  {
+    [default] interface IKeymanKeyboard;
+  };
+*/
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanKeyboardInstalled : IKeymanKeyboard                                  /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(2BA44E6E-C3EE-4ABE-B1EF-55FC386DDC1B),
+    version(1.0),
+    helpstring("Interface for KeymanKeyboardInstalled Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanKeyboardInstalled: IKeymanKeyboard
+  {
+    [id(0x0000000B)]            HRESULT _stdcall Uninstall( void );
+    [propget, id(0x0000000C)]   HRESULT _stdcall KeymanID([out, retval] long * Value );
+    [propget, id(0x0000000D)]   HRESULT _stdcall Loaded([out, retval] VARIANT_BOOL * Value );
+    [propput, id(0x0000000D)]   HRESULT _stdcall Loaded([in] VARIANT_BOOL Value );
+    [propget, id(0x0000000E)]   HRESULT _stdcall InstalledByAdmin([out, retval] VARIANT_BOOL * Value );
+    [propget, id(0x0000000F)]   HRESULT _stdcall OwnerPackage([out, retval] IKeymanPackageInstalled ** Value );
+    [propget, id(0x00000010)]   HRESULT _stdcall VisualKeyboard([out, retval] IKeymanVisualKeyboard ** Value );
+    [id(0x00000011)]            HRESULT _stdcall InstallVisualKeyboard([in] BSTR Filename );
+    [propget, id(0x00000012)]   HRESULT _stdcall OwnerProduct([out, retval] IKeymanProduct ** Value );
+  };
+
+  // KeymanKeyboardInstalled
+
+  [
+    uuid(4D45F4ED-476D-42D1-8C19-759CFA55C903),
+    version(1.0),
+    helpstring("KeymanKeyboardInstalled Object"),
+    noncreatable
+  ]
+  coclass KeymanKeyboardInstalled
+  {
+    [default] interface IKeymanKeyboardInstalled;
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanKeyboardFile : IKeymanKeyboard                                       /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(0D773297-5EFA-40E9-B08A-813958DDCFE3),
+    version(1.0),
+    helpstring("Interface for KeymanKeyboardFile Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanKeyboardFile: IKeymanKeyboard
+  {
+    [id(0x0000000B)]      HRESULT _stdcall Install( [in] VARIANT_BOOL AllUsers );
+  };
+
+  // KeymanKeyboardFile
+
+  [
+    uuid(328C23EA-8696-4417-BCE4-04D20CEFCD3D),
+    version(1.0),
+    helpstring("KeymanKeyboardFile Object"),
+    noncreatable
+  ]
+  coclass KeymanKeyboardFile
+  {
+    [default] interface IKeymanKeyboardFile;
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanKeyboards : IKeymanCollection                                        /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(A3426A95-4890-4A64-870F-CEE536E91EFE),
+    version(1.0),
+    helpstring("Interface for KeymanKeyboards Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanKeyboards: IKeymanCollection
+  {
+    [id(0x0000005)]    HRESULT _stdcall IndexOf([in] BSTR Name, [out, retval] long * Index );
+  };
+
+  // KeymanKeyboards
+
+  [
+    uuid(A305E96E-5100-4416-9900-110D40E5B0F8),
+    version(1.0),
+    helpstring("KeymanKeyboards Object"),
+    noncreatable
+  ]
+  coclass KeymanKeyboards
+  {
+    [default] interface IKeymanKeyboards;
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanKeyboardsInstalled : IKeymanKeyboards                                /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(FDD63849-ED59-4D5C-B690-994A83E044A2),
+    version(1.0),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanKeyboardsInstalled: IKeymanKeyboards
+  {
+    [id(0x0000006)]    HRESULT _stdcall GetKeyboardFromFile([in] BSTR Filename, [out, retval] IKeymanKeyboardFile ** Keyboard );
+    [propget, id(0x00000000), defaultcollelem]   HRESULT _stdcall Items([in] VARIANT Index, [out, retval] IKeymanKeyboardInstalled ** Value );
+    [id(0x0000010)]    HRESULT _stdcall Install([in] BSTR Filename, [in] VARIANT_BOOL AllUsers );
+    [id(0x0000011)]    HRESULT _stdcall Apply( void );
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanKeyboardsPackage : IKeymanKeyboards                                  /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(F3AF4C40-182D-4CAE-9BE2-207E3A541CB9),
+    version(1.0),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanKeyboardsPackage: IKeymanKeyboards
+  {
+    [propget, id(0x00000000), defaultcollelem]    HRESULT _stdcall Items([in] VARIANT Index, [out, retval] IKeymanKeyboard ** Value );
+  };
+
+  // KeymanKeyboardsPackage
+
+  [
+    uuid(AD31EB9E-2DAA-46BE-A0A9-3FAC4A416E9A),
+    version(1.0),
+    helpstring("KeymanKeyboardsForPackage Object"),
+    hidden
+  ]
+  coclass KeymanKeyboardsPackage
+  {
+    [default] interface IKeymanKeyboardsPackage;
+  };
+
+

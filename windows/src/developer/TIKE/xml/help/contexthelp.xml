@@ -1,0 +1,697 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml-stylesheet type="text/xsl" href="help.xsl" ?>
+<ContextHelp>
+  <Form Name="TframeBitmapEditor">
+    <Control Name="cmdbitmapChange" Title="Change">
+      <p>The Change option allows the editing of the icon filename.</p>
+    </Control>
+    <Control Name="cmdExport" Title="Export">
+      <p>The Export option allows the exporting of the new image to a selected location.</p>
+    </Control>
+    <Control Name="cmdImport" Title="Import">
+      <p>The import option allows for the loading of an existing icon from a selected location.</p>
+    </Control>
+    <Control Name="panEdit" Title="Colours">
+      <p>The toolbox allows for the changing of the colours, addition of text and shapes.  It also allows for the moving of the icon around the button and also a preview of the button is displayed.</p>
+    </Control>
+  </Form>
+  <Form Name="TframeOnScreenKeyboardEditor">
+    <Control Name="chkVKDisplayUnderlyingChars" Title="Display Underlying Character Layouts">
+      <p>If selected, then the visual keyboard will only be used if the current underlying layout is active. </p>
+    </Control>
+    <Control Name="chkVKInclude102key" Title="">
+      <p>Display 102nd Key</p>
+      <p>On European Keyboards a 102nd key is added.  This allows you to map a character on the 102nd key.</p>
+    </Control>
+    <Control Name="chkVKSplitCtrlAlt" Title="Right Ctrl/Alt">
+      <p>Allows for more combinations and also leaves the left Ctrl and Alt keys for general keyboard shortcuts, for example Ctrl C for Copy and Ctrl V for Paste.</p>
+    </Control>
+    <Control Name="cmdBrowseKeyBitmap" Title="Browse button">
+      <p>This allows for a bitmap/picture to be displayed on the selected key. Click on the Browse button to select the bitmap.</p>
+    </Control>
+    <Control Name="cmdExportOnScreenKeyboard" Title="XML">
+      <p>Export the keyboard to other file formats (HTML, BMP, or PNG), for use in documentation. Export the structure of the keyboard to XML format for automated processing. </p>
+    </Control>
+    <Control Name="cmdImportOnScreenKeyboard" Title="Import">
+      <p>Import an existing on screen keyboard layout.</p>
+    </Control>
+    <Control Name="cmdVKImportKMX" Title="Layout">
+      <p>Use the same layout as the new keyboard, assigning the same characters to the same keyboard letters.</p>
+    </Control>
+    <Control Name="editVKKeyText" Title="Text">
+      <p>Allows the user to enter text to be displayed on the selected key.</p>
+    </Control>
+  </Form>
+  <Form Name="TfrmCharacterMapNew">
+    <Control Name="editFilter" Title="Filter">
+      <p>The Filter allows a user to reduce the number of characters displayed in the character map.  The standard filter options used are by font name or block name.</p>
+    </Control>
+    <Control Name="Grid" Title="Unicode">
+      <p>The Character Map Grid displays each character in a square, with a visual representation of the character and the Unicode value displayed at the bottom of the square. Each font group is divided into a block headed by the font name.</p>
+    </Control>
+  </Form>
+  <Form Name="TfrmInstallerEditor">
+    <Control Name="cbEULA" Title="EULA" />
+    <Control Name="cbStartMenuLocation" Title="Location" />
+    <Control Name="cbStartMenuProgram" Title="Program" />
+    <Control Name="chkCreateStartMenu" Title="Start menu">
+      <p>To create a folder on the Start menu when the keyboard package is installed.</p>
+    </Control>
+    <Control Name="chkStartMenuUninstall" Title="Uninstall">
+      <p>The uninstall shortcut will be added automatically to the shortcut menu list when the package is installed.</p>
+    </Control>
+    <Control Name="clbAddins" Title="Include Addins">
+      <p>Addins can be added to be distributed with the install process by checking the required options.</p>
+    </Control>
+    <Control Name="cmdAddFile" Title="Add">
+      <p>To add additional files to the keyboard package to be distributed.  If you need to include fonts or documentation, put them into a package and include the package in this list. Do not include fonts or documentation directly.</p>
+    </Control>
+    <Control Name="cmdAddToProject" Title="Project" />
+    <Control Name="cmdCompile" Title="Windows Installer">
+      <p>Compiling the product takes all the files you have selected and compresses them into a single Windows Installer .msi file.</p>
+      <p>This option will check for errors an missing files. The success of the compiling will be displayed at the bottom of the screen.</p>
+    </Control>
+    <Control Name="cmdDeleteStartMenuEntry" Title="Delete">
+      <p>To delete the selected shortcut menu item.</p>
+    </Control>
+    <Control Name="cmdExportToWiX" Title="WIX" />
+    <Control Name="cmdInsertCopyright" Title="Copyright Symbol">
+      <p>Allows for the insertion of the copyright symbol.</p>
+    </Control>
+    <Control Name="cmdInstallProduct" Title="Install Product">
+      <p>This option allows for the installation of the package on to the computer when compiling has been completed.</p>
+    </Control>
+    <Control Name="cmdNewStartMenuEntry" Title="New">
+      <p>To add a new menu item to the list of shortcuts in the folder on the Start menu created during installation.</p>
+    </Control>
+    <Control Name="cmdOpenContainingFolder" Title="Open Containing Folder">
+      <p>This option opens the source folder of the selected file.</p>
+    </Control>
+    <Control Name="cmdOpenFile" Title="Edit">
+      <p>To open an editor to make changes to the selected file.</p>
+    </Control>
+    <Control Name="cmdRemoveFile" Title="Remove">
+      <p>This option allows the user to remove a selected file from the distribution list.</p>
+    </Control>
+    <Control Name="cmdSelectKCT" Title="Select">
+      <p>To select an existing branding file.</p>
+    </Control>
+    <Control Name="cmdUpload" Title="Upload">
+      <p>This option allows for the uploading of the keyboard package onto the Tavultesoft website.</p>
+    </Control>
+    <Control Name="editDestinationPath" Title="Program Files">
+      <p>The destination path will always be created under Program Files. The actual name of the Program Files folder may vary from computer to computer and language to language, but the installer will manage that automatically.</p>
+    </Control>
+    <Control Name="editFilePath" Title="Path">
+      <p>The location of the selected file.</p>
+    </Control>
+    <Control Name="editFileType" Title="File Type">
+      <p>Read Only.  Shows information about the type of file selected.</p>
+    </Control>
+    <Control Name="editInfoAuthor" Title="Author's">
+      <p>The name of the developer of the keyboard to displayed as part of the keyboard package details when installed.</p>
+    </Control>
+    <Control Name="editInfoCopyright" Title="Keyman Configuration">
+      <p>Copyright details for the keyboard are displayed when the keyboard is installed. They can also be viewed in Keyman Configuration.</p>
+    </Control>
+    <Control Name="editInfoEmail" Title="Email address">
+      <p>The email address of the developer to allow the user to contact them if required.</p>
+    </Control>
+    <Control Name="editInfoName" Title="Tavultesoft website">
+      <p>The name of the keyboard package to be displayed in many locations after installation and on the Tavultesoft website for downloading.</p>
+    </Control>
+    <Control Name="editInfoVersion" Title="Version">
+      <p>The version number allows for users to see if they have the latest version of the keyboard.  Version numbers should be in major.minor.patch format, where major,minor and patch are all numbers.  Other formats are not valid.  Also important information when upgrading a keyboard package.</p>
+    </Control>
+    <Control Name="editInfoWebSite" Title="Website">
+      <p>Displays a website address for the users to visit to view more information on the keyboard package.</p>
+    </Control>
+    <Control Name="editOptionalPostInstallationCommandLine" Title="WordPad">
+      <p>You can choose to run a program after installation. This can be a program in the package or another program such as WordPad to display a Readme file. Enclose the program name in quotation marks and use $INSTALLDIR\ as a prefix to reference the installed file location.</p>
+    </Control>
+    <Control Name="editOutPath" Title="">
+      <p>Output Path and File name</p>
+      <p>Displays the output path and filename of the file when the package is compiled.</p>
+    </Control>
+    <Control Name="editStartMenuDescription" Title="Start">
+      <p>The text to be displayed for the selected file as a menu item in the Start up folder that is created when the package is installed.</p>
+    </Control>
+    <Control Name="editStartMenuParameters" Title="Parameters" />
+    <Control Name="editStartMenuPath" Title="">
+      <p>Start Menu Path</p>
+      <p>Enter the path for the start menu folder to be created on installation.</p>
+    </Control>
+    <Control Name="lblProductFiles" Title="Wxs">
+      <p>If you need to include fonts or documentation, put them into a package and include the package in this list. Do not include fonts or documentation directly. If you are not using the Keyman Desktop user interface, then include all the files for your application here as well.</p>
+      <p>The distribution editor does not allow you to create multiple folders for your application. You can export the distribution source file created in this editor to a WiX source file (.wxs) and extend it there.</p>
+    </Control>
+    <Control Name="memoFileDetails" Title="File Details">
+      <p>Read Only.  Shows further information about the selected file, for example what the file is used for in the keyboard package.</p>
+    </Control>
+    <Control Name="SpTBXButton2" Title="Open Containing Folder" />
+  </Form>
+  <Form Name="TfrmKCTIconEditor">
+    <Control Name="frameBitmap" Title="Toolbox">
+      <p>The Toolbox allows for the editing of an existing icon or the creation of a new icon. The user cane change colours, add shapes and text. Use the move buttons to move the image on the icon and also displays a preview of the icon.</p>
+    </Control>
+  </Form>
+  <Form Name="TfrmKCTMenuEditor">
+    <Control Name="cbAction" Title="Toolbars">
+      <p>This option selects the action that will occur when a user selects an item from one of the menus or toolbars.</p>
+    </Control>
+    <Control Name="cbCmdLine" Title="Program Command Line" />
+    <Control Name="cbItemType" Title="Typing">
+      <p>The drop down list allows the user to select the type of menu item to be added.</p>
+      <p>The options available in the list are dependent on the location of the menu item:</p>
+      <p>Text</p>
+      <p>Graphics</p>
+      <p>Separator</p>
+      <p>Keyboards List</p>
+    </Control>
+    <Control Name="cmdAdd" Title="Add">
+      <p>This option allows for the addition of a new menu item to one of the menu locations.</p>
+    </Control>
+    <Control Name="cmdDelete" Title="Delete">
+      <p>This option allows for the deletion of an existing menu item.</p>
+    </Control>
+    <Control Name="cmdFont" Title="Font">
+      <p>This option allows for the selection of font attributes for the caption text to be displayed in the menu.</p>
+    </Control>
+    <Control Name="cmdImportIcon" Title="Import">
+      <p>This option allows for the importing of a graphic file to be used as an icon in the list to the left of the menu item.</p>
+    </Control>
+    <Control Name="cmdMoveDown" Title="Move down">
+      <p>This option allows for the moving of menu items down a list or move buttons across to the right on a toolbar.</p>
+    </Control>
+    <Control Name="cmdMoveToOtherMenu." Title="Other location">
+      <p>This option allows the user to move an existing menu item to another location. It gives the user the a drop down list to choose the new location.</p>
+    </Control>
+    <Control Name="cmdMoveUp" Title="Move Up">
+      <p>This option allows for the moving of menu items up a list or move buttons across to the left on a toolbar.</p>
+    </Control>
+    <Control Name="editCaption" Title="Hotkey">
+      <p>The text to be displayed in the menu. A hotkey can also be assigned by placing an ampersand &amp; symbol before the letter to be used in the caption</p>
+    </Control>
+    <Control Name="hkHotkey" Title="Menu item">
+      <p>This option allows for the assigning of a hotkey for the menu item. A hotkey can also be assigned by placing an ampersand &amp; symbol before the letter to be used in the caption, but a different hotkey can be assigned by using this option.</p>
+    </Control>
+    <Control Name="tcbLocation" Title="Tray Right Button Menu">
+      <p>The location of the menu item gives the user the choice of placing the item in one of four locations</p>
+      <p>Tool Tray Left Button Menu</p>
+      <p>Tool Tray Right Button Menu</p>
+      <p>On Screen Keyboard Toolbar</p>
+      <p>On Screen Keyboard Context Menu</p>
+    </Control>
+  </Form>
+  <Form Name="TfrmKCTMessageEditor">
+    <Control Name="cmdMessageFont" Title="Message Font" />
+    <Control Name="cmdReset" Title="Reset all">
+      <p>Reset the selected string back to its original value.</p>
+    </Control>
+    <Control Name="cmdResetAll" Title="Reset all">
+      <p>To set all strings back to original values.</p>
+    </Control>
+    <Control Name="editDefault" Title="Default" />
+    <Control Name="editIdentifier" Title="Identifier" />
+    <Control Name="memoParams" Title="Parameters" />
+    <Control Name="memoText" Title="Text">
+      <p>A description of the string.</p>
+    </Control>
+  </Form>
+  <Form Name="TfrmKCTNewFile">
+    <Control Name="lblTemplates" Title="New Customisation">
+      <p>This option allows the use of the default keyman template, an existing template or Blank Customisation.</p>
+    </Control>
+  </Form>
+  <Form Name="TfrmKCTOptionEditor">
+    <Control Name="cbOnlineLicenceType" Title="Licence Type" />
+    <Control Name="editAboutCommandLine" Title="About Command">
+      <p>Use the value $INSTALLDIR to refer to the install path of your application. Don't forget to surround the program path in double quotes.</p>
+    </Control>
+    <Control Name="editConfigurationCommandLine" Title="Configuration Command">
+      <p>Use the value $INSTALLDIR to refer to the install path of your application. Don't forget to surround the program path in double quotes.</p>
+    </Control>
+    <Control Name="editControllerFileName" Title="Help Command">
+      <p>The standard controller file name is keyman.exe. Use another executable name here if you wish to write your own controller application for your product. Please review the Keyman COM API documentation for details. Use the values $INSTALLDIR and $ENGINEDIR to reference the installation folder and Keyman Engine folders respectively. Read the Keyman COM API documentation for more information.</p>
+    </Control>
+    <Control Name="editHelpCommandLine" Title="Help Command">
+      <p>Use the value $INSTALLDIR to refer to the install path of your application. Don't forget to surround the program path in double quotes.</p>
+    </Control>
+    <Control Name="editOnlineName" Title="Website">
+      <p>The name of the keyboard package is displayed on the website or when installed. It should be a descriptive name, in any language, but remember that some applications may use a font that does not include the language you are writing the keyboard name in. Don't include a version number, help information or hotkey in the name.</p>
+    </Control>
+    <Control Name="editOnlineTrialDayCount" Title="Trial Day Count">
+      <p>The number of days a user can use the product on trial before buying the software.</p>
+    </Control>
+    <Control Name="editStartCommandLine" Title="Start Command">
+      <p>Use the value $INSTALLDIR to refer to the install path of your application. Don't forget to surround the program path in double quotes.</p>
+    </Control>
+    <Control Name="optCustomiseUserInterface" Title="XML">
+      <p>You can make changes to the Keyman Desktop user interface on the User Interface tab. The image and XML files will automatically be included in the installer when you select this branding file as the product licence option in the Distribution Editor, and kmshell.exe and related files will be included when the product is compiled.</p>
+    </Control>
+    <Control Name="optUseYourOwnInterface" Title="Use">
+      <p>You can create your own application, displaying your own splash screen, configuration, help and about dialogs, as well as any additional functionality that you want. You will need to include the appropriate files in the Distribution Editor when you select this branding file as the product licence option.</p>
+    </Control>
+  </Form>
+  <Form Name="TfrmKCTStartupEditor">
+    <Control Name="chkIncludeWelcome" Title="Welcome Screen">
+      <p>This option allows for the displaying of a welcome screen when the keyboard is opened. It can be used to inform the user of the features and uses of the keyboard.</p>
+    </Control>
+    <Control Name="chkSplashImage" Title="Splash Screen">
+      <p>The Splash screen can be turned on or off. If the option is unchecked a warning message will be displayed to warn that the image will be deleted and to have a copy of the file. The Splash screen can be turned off using Keyman Configuration.</p>
+    </Control>
+    <Control Name="cmdChangeSplash" Title="Splash">
+      <p>This option allows for the importing of a file to be used for the Splash screen.</p>
+    </Control>
+    <Control Name="editSplashFileName" Title="">
+      <p>Splash Screen file name</p>
+      <p>Displays the filename of the file selected as the Splash screen image.</p>
+    </Control>
+    <Control Name="editWelcomeHeight" Title="Welcome Screen Height">
+      <p>This option allows for the adjustment of the height of the welcome screen.</p>
+    </Control>
+    <Control Name="editWelcomeWidth" Title="Welcome Screen Width">
+      <p>This option allows for the adjustment of the width of the welcome screen.</p>
+    </Control>
+  </Form>
+  <Form Name="TfrmKCTUserInterfaceEditor">
+    <Control Name="cmdDelete" Title="Delete">
+      <p>The Delete option allows for the removing of a file from the user interface.</p>
+    </Control>
+    <Control Name="cmdEdit" Title="Open">
+      <p>This option allows for the user interface element for example a graphic to be opened in the default external editor for the file type to make editing changes.</p>
+    </Control>
+    <Control Name="cmdExport" Title="Export">
+      <p>The Export option allows for the exporting of a file from the user interface for example a graphic, this will allow it to be used for another keyboard package.</p>
+    </Control>
+    <Control Name="cmdImport" Title="Import">
+      <p>The Import option allows for the importing of a file for the user interface for example a graphic, this will allow it to be used for more than one keyboard package.</p>
+    </Control>
+    <Control Name="cmdOpenWith" Title="Open With">
+      <p>This option will display a list of recommended and optional programs to allow the selection of the required editor for the selected file to be edited.</p>
+    </Control>
+    <Control Name="cmdTestXML" Title="Test Page">
+      <p>This option will allow for the previewing of the customisation made to the user interface.</p>
+    </Control>
+  </Form>
+
+  <Form Name="TfrmKeyboardWizard">
+    <Control Name="KeyboardName" Title="Keyman Configuration">
+      <p>The name of the keyboard is displayed in Keyman Configuration, in the tray menu and in many other places. It should be a descriptive name, in any language, but remember that some applications may use a font that does not include the language you are writing the keyboard name in. Don't include a version number, help information or hotkey in the name.</p>
+    </Control>
+  </Form>
+  
+  <!-- ========================================================================
+  
+       Keyboard Editor
+  
+       ======================================================================== -->
+
+  <Form Name="TfrmKeymanWizard">
+  
+    <!-- Details tab -->
+    <!-- Layout tab -->
+    <!-- Icon tab -->
+    <!-- On-Screen tab -->
+    <!-- KeymanWeb tab -->
+    
+    <Control Name="chkKMWRTL" Title="Keyboard is right-to-left">
+      <p>Select this option to tell KeymanWeb to flag text entered by this keyboard as right-to-left (e.g. Arabic, Hebrew)</p>
+    </Control>
+
+    <Control Name="editKMWHelpText" Title="Help Text">
+      <p>A simple line of text to show under the On Screen Keyboard in KeymanWeb.  Can contain HTML formatting and links.  Mutually exclusive with the Help File box</p>
+    </Control>
+
+    <Control Name="editKMWHelpFile" Title="Help File">
+      <p>More complex help can be included by including an external file.  See the European Latin keyboard in Samples for a comprehensive example.</p>
+    </Control>
+
+    <Control Name="cmdKMWBrowseHelpFile" Title="Browse Help File">
+      <p>Choose a help file to include in the keyboard</p>
+    </Control>
+
+    <Control Name="cmdCompileKeymanWeb" Title="Compile to Web">
+      <p>Compiles the keyboard for KeymanWeb.  Two output files will be generated: [filename].js and [filename]_load.js.  The KeymanWeb Tutorial
+      contains more information about the difference between the two output files.</p>
+    </Control>
+
+    <Control Name="cmdTestKeymanWeb" Title="Test KeymanWeb Keyboard">
+      <p>Tests your KeymanWeb keyboard in an Internet Explorer embedded window</p>
+    </Control>
+    
+    <!-- Source tab -->
+    <!-- Compile tab -->
+  
+    <Control Name="chkCustomOnScreenKeyboard" Title="Include">
+      <p>A custom on screen (visual) keyboard can be included with your new keyboard. Check this option to display the on screen keyboard and options available.</p>
+    </Control>
+    <Control Name="chkLayoutDisplay102key" Title="European Keyboards">
+      <p>On European Keyboards a 102nd key is added.  This allows you to map a character on the 102nd key.</p>
+    </Control>
+    <Control Name="chkIncludeTaskbarIcon" Title="Taskbar">
+      <p>This option allows the user to choose whether the keyboard icon is displayed on the taskbar and to customise the look of the icon. Check the Include Icon on the Taskbar to display the icon bitmap editor.</p>
+    </Control>
+    <Control Name="chkSplitCtrlAlt" Title="Right Ctrl/Alt">
+      <p>Allows for more combinations and also leaves the left Ctrl and Alt keys for general keyboard shortcuts, for example Ctrl C for Copy and Ctrl V for Paste.</p>
+    </Control>
+    <Control Name="cmdAddToProject" Title="Project">
+      <p>This option adds the keyboard to the current active project.</p>
+    </Control>
+    <Control Name="cmdCompile" Title="Compile Keyboard">
+      <p>Select this option to begin the compiling of the keyboard. The success of the compile is displayed at the bottom of the screen.  If errors are displayed, click on the Start Debugging button.</p>
+    </Control>
+    <Control Name="cmdInsertCopyright" Title="">
+      <p>Insert Copyright</p>
+      <p>This allows for the insertion of a copyright symbol if needed.</p>
+    </Control>
+    <Control Name="cmdInstall" Title="Install">
+      <p>Install the compiled keyboard on to the computer.</p>
+    </Control>
+    <Control Name="lbDebugHosts" Title="Debug Hosts">
+      <p>To test on other platforms, open one of the debug host addresses
+      on your device.  Your device will need to be on the same network as
+      this computer.</p>
+
+      <p>You can test within the web browser on your device, or in the
+      native app if you have it installed: just click the Install
+      button on the debugger web page.</p>
+    </Control>
+    <Control Name="cmdSendURLsToEmail" Title="Send URLs to Email">
+      <p>The Send to email function makes it easier to open the addresses
+      on your mobile device without having to enter them manually.</p>
+    </Control>
+    <Control Name="cmdOpenContainingFolder2" Title="Open Containing Folder">
+      <p>This option will open the folder that contains all the files saved for the new keyboard project.</p>
+    </Control>
+    <Control Name="cmdStartDebugging" Title="Start Debugging">
+      <p>This option will allow for the debugging of a keyboard that could not be compiled and specific errors are displayed. It will direct the user to the source code of the keyboard file.</p>
+    </Control>
+    <Control Name="cmdUninstall" Title="Uninstall">
+      <p>Uninstall the keyboard from the computer.</p>
+    </Control>
+    <Control Name="cmdUpload" Title="Upload">
+      <p>This option allows the user to upload the compiled keyboard to Tavultesoft website to allow the sharing of the keyboard files.</p>
+    </Control>
+    <Control Name="cmdVKChange" Title="Change">
+      <p>The change button allows the change of the filename and/or location of the on screen keyboard.</p>
+    </Control>
+    <Control Name="editCharacterSet" Title="Unicode">
+      <p>Your keyboard should be either Unicode or Codepage based. Most keyboards today will be Unicode. If you are designing in the source editor, you can create a keyboard that is includes both Unicode and Codepage (or "ANSI") rules.</p>
+      <p>This corresponds to either of the following source lines:</p>
+      <p>begin ANSI &gt; use(main)</p>
+      <p>begin Unicode &gt; use(main)</p>
+    </Control>
+    <Control Name="editComments" Title="Message">
+      <p>The message provides some additional information to a user of your keyboard, when they install the keyboard.</p>
+      <p>This corresponds to the following source line:</p>
+      <p>store(&amp;message) 'Here is a message about a keyboard''</p>
+    </Control>
+    <Control Name="editCopyright" Title="Keyman Configuration">
+      <p>Copyright details for the keyboard are displayed when the keyboard is installed. They can also be viewed in Keyman Configuration.</p>
+    </Control>
+    <Control Name="editKeyOutputCode" Title="Unicode Character Value">
+      <p>If the Unicode value is known, enter the value and the corresponding character will be displayed on the key.</p>
+    </Control>
+    <Control Name="editMessage" Title="Message">
+      <p>To add additional details about the keyboard. The message will be displayed when the keyboard is selected in Keyman Configuration.</p>
+    </Control>
+    <Control Name="editOuputCharacters" Title="Release">
+      <p>To select another key in the keyboard, either:</p>
+      <p>Click on the key with the mouse, or</p>
+      <p>Press and release the Ctrl key to choose with the keyboard</p>
+    </Control>
+    <Control Name="editVKFileName" Title="">
+      <p>KVK Filename</p>
+      <p>Displays the file path and file name of the Keyman Visual Keyboard (KVK). Press the END key on your keyboard to view the filename or click on the Change button to change the filename and location.</p>
+    </Control>
+  </Form>
+
+  <Form Name="TfrmMustIncludeDebug">
+    <Control Name="chkAutoRecompile" Title="">
+      <p>TIKE Debugger</p>
+      <p>Debug information must be included in the compile keyboard before the debugger process can be started. From the Keyboard menu select Include Debug Information. The debug information will display the error sources when compiling.</p>
+      <p>The debugger can be used without the debug information by clicking on Test without debugger.</p>
+    </Control>
+  </Form>
+  <Form Name="TfrmNewFileDetails">
+    <Control Name="editFileName" Title="New Keyboard">
+      <p>Enter the name for your new keyboard. Click on the Browse button to change the location of the new keyboard.</p>
+    </Control>
+  </Form>
+
+  <Form Name="TfrmPackageEditor">
+    <Control Name="cbImageFile" Title="Image File">
+      <p>You can include an image file that will be displayed to the left of the install details when the package is installed. This image should be 140 pixels wide and 250 pixels high.</p>
+    </Control>
+    <Control Name="cbReadmeFile" Title="Readme file">
+      <p>The readme file can be displayed after the installation of the keyboard package, but can also be accessed from the keyboard folder at a later time. The file must be loaded under the Files tab, add option before being able to be selected from the drop down list.</p>
+    </Control>
+    <Control Name="cbStartMenuProgram" Title="Shortcut Program" />
+    <Control Name="chkCreateStartMenu" Title="Start menu">
+      <p>This option will allow you to create a folder on the Start menu when the keyboard package is installed.</p>
+    </Control>
+    <Control Name="chkStartMenuUninstall" Title="Uninstall">
+      <p>The uninstall shortcut will be added automatically to the shortcut menu list when the package is installed.</p>
+    </Control>
+    <Control Name="cmdAddFile" Title="Add Files">
+      <p>This option allows the user to add new files to the package.</p>
+    </Control>
+    <Control Name="cmdDeleteStartMenuEntry" Title="Delete">
+      <p>To delete the selected shortcut menu item from the Start menu folder.</p>
+    </Control>
+    <Control Name="cmdInsertCopyright" Title="Insert Copyright">
+      <p>This allows for the insertion of a copyright symbol if needed.</p>
+    </Control>
+
+    <!-- Compile Page -->
+    
+    <Control Name="editOutPath" Title="Compile">
+      <p>Displays the output path and filename of the file when the package is compiled.</p>
+    </Control>
+
+    <Control Name="cmdCompileInstaller" Title="Compile Installer">
+      <p>Creates a self-extracting installer consisting of the package plus Keyman Desktop or another Keyman Engine product that was created with the Branding Pack.</p>
+    </Control>
+
+    <Control Name="editInstallerOutputFilename" Title="Installer Output Filename">
+      <p>Displays the output filename and path for the self-extract installer.</p>
+    </Control>
+
+    <Control Name="cmdInstallWith" Title="Select Product Installer">
+      <p>Chooses a product installer, such as the Keyman Desktop installation source.  You can download Keyman Desktop installers from tavultesoft.com.</p>
+    </Control>
+    
+    <Control Name="cmdAddToProject" Title="Add to Project">
+      <p>This option  allows the user to add the compile package to the project, keeping all files together in the one location.</p>
+    </Control>
+    <Control Name="cmdBuildPackage" Title="Compile Package">
+      <p>This option checks the package has all the required files and for any errors.  The success of the compilation is displayed at the bottom of the screen.</p>
+    </Control>
+
+    <Control Name="cmdInstall" Title="Install Package">
+      <p>This option will install the package on the computer. A message will be displayed as to the success of the install.</p>
+    </Control>
+
+    <Control Name="cmdNewStartMenuEntry" Title="New">
+      <p>To add a new menu item to the list of shortcuts to be displayed in the Start menu folder created when the keyboard package is installed.</p>
+    </Control>
+    <Control Name="cmdOpenContainingFolder" Title="Open Containing Folder">
+      <p>Opens the source folder of the selected file.</p>
+    </Control>
+    <Control Name="cmdOpenContainingFolder2" Title="Open Containing Folder">
+      <p>This option will open the folder the selected package is located in.</p>
+    </Control>
+    <Control Name="cmdOpenFile" Title="Edit">
+      <p>This option allows the user to edit the selected file if the appropriate editor is available.</p>
+    </Control>
+    <Control Name="cmdRemoveFile" Title="Remove Files">
+      <p>This option allows the user to remove a selected file from the list.</p>
+    </Control>
+    <Control Name="cmdUninstall" Title="Uninstall Package">
+      <p>This option will uninstall the package from the computer. A message will be displayed as to the success of the uninstall.</p>
+    </Control>
+    <Control Name="cmdUpload" Title="Upload">
+      <p>This option will enable the developer to upload the package to the Tavultesoft website.</p>
+    </Control>
+    <Control Name="editFilePath" Title="Path">
+      <p>Displays the location of the selected file.</p>
+    </Control>
+    <Control Name="editFileType" Title="">
+      <p>File Type</p>
+      <p>Enter the details of the file type being added to the keyboard package.</p>
+    </Control>
+    <Control Name="editInfoAuthor" Title="Author's">
+      <p>Enter the name of the author or authors of the keyboard package.</p>
+    </Control>
+    <Control Name="editInfoCopyright" Title="Copyright">
+      <p>Enter the copyright details of the keyboard package This information will be displayed with the version, author and message information when the package is installed.</p>
+    </Control>
+    <Control Name="editInfoEmail" Title="Email address">
+      <p>Enter the contact email address for the keyboard package.</p>
+    </Control>
+    <Control Name="editInfoName" Title="Package Name">
+      <p>Package Name is the name that will be displayed when the package is installed. It should be a descriptive name, in any language, but remember that some applications may use a font that does not include the language you are writing the keyboard name in. Don't include a version number, help information or hotkey in the name.</p>
+    </Control>
+    <Control Name="editInfoVersion" Title="Package Version">
+      <p>The version number allows the user to check whether they have the latest version of the keyboard.  The format should be 'major.minor[.subversion]'.  Each number should be an integer, and you should avoid non-integer version strings.  See help for more details.</p>
+    </Control>
+    <Control Name="editInfoWebSite" Title="Website">
+      <p>The website details for the keyboard package if available.</p>
+    </Control>
+
+    <Control Name="editStartMenuDescription" Title="Start">
+      <p>The text to be displayed for the selected file as a menu item in the Start up folder that is created when the package is installed.</p>
+    </Control>
+    <Control Name="editStartMenuParameters" Title="Shortcut Parameters" />
+    <Control Name="editStartMenuPath" Title="">
+      <p>Start Menu Path</p>
+      <p>Enter the path of the start menu to be displayed when the keyboard package is installed.</p>
+    </Control>
+    <Control Name="lbFiles" Title="Package Files">
+      <p>This will display all the files that have been added to the keyboard package.  It allows for the addition and removal of files, the entering of file details and the editing of any of the files listed if the appropriate editor is available.</p>
+    </Control>
+    <Control Name="memoFileDetails" Title="Details">
+      <p>This option allows the user to enter details and other additional information about the selected file.</p>
+    </Control>
+  </Form>
+  <Form Name="TfrmProject">
+    <Control Name="web" Title="Project Manager" />
+  </Form>
+  <Form Name="TfrmKeymanWizard">
+    <Control Name="editName" Title="Keyboard Name">
+      <p>The name of the keyboard is displayed in Keyman Configuration, in the tray menu and in many other places.  It should be a descriptive 
+      name, in any language, but remember that some applications may use a font that does not include the language you are writing the 
+      keyboard name in.  Don't include a version number, help information or hotkey in the name.</p>
+
+      <p>This corresponds to the following source line:</p>
+      <div class="code">store(&amp;name) 'My Keyboard'</div>
+    </Control>
+    <Control Name="cbType" Title="Character Set">
+      <p>Your keyboard should be either Unicode or Codepage based.  Most keyboards today will be Unicode.  If you are designing in the source editor,
+      you can create a keyboard that is includes both Unicode and Codepage (or "ANSI") rules.</p>
+
+      <p>This corresponds to either of the following source lines:</p>
+      <div class="code">
+        begin ANSI &gt; use(main)<br />
+        begin Unicode &gt; use(main)
+      </div>
+    </Control>
+    <Control Name="editCopyright" Title="Copyright">
+      <p>Copyright details for the keyboard are displayed when the keyboard is installed.  They can also be viewed in Keyman Configuration.</p>
+
+      <p>This corresponds to the following source line:</p>
+      <div class="code">store(&amp;copyright) '© 2006 My Company'</div>
+    </Control>
+    <Control Name="editMessage" Title="Message">
+      <p>The message provides some additional information to a user of your keyboard, when they install the keyboard.</p>
+
+      <p>This corresponds to the following source line:</p>
+      <div class="code">store(&amp;message) 'Here is a message about a keyboard'</div>
+    </Control>
+    <Control Name="memoComments" Title="Comments">
+      <p>In this field, enter information about the keyboard for your own reference.  These comments will only be visible in the 
+      source file, and not to users of your keyboard.</p>
+
+      <p>The comments are placed at the top of the source file, e.g.:</p>
+      <div class="code">
+        c Version 1.2 - fixed a bug with the 'k' key<br/>
+        c Version 1.1 - improved matching on vowels<br/>
+        c Version 1.0 - initial version
+      </div>
+    </Control>
+    <Control Name="editKeyOutputText" Title="Output Character(s)">
+      <p>To select another key in the keyboard, either:</p>
+      <ul>
+        <li>Click on the key with the mouse, or</li>
+        <li>Press and release the Ctrl key to choose with the keyboard</li>
+      </ul>
+    </Control>
+  </Form>
+
+
+  <Form Name="TfrmPackageEditor">
+    <Control Name="cbReadMe" Title="Read Me Details">
+      <p>A readme file can be a text file (ANSI, UTF-8, or UTF-16), or an HTML file (recommended).  Other file types are also acceptable, 
+      but the package installer will load the file in a separate program.</p>
+    </Control>
+    <Control Name="cbKMPImageFile" Title="Package Image">
+      <p>You can include an image file that will be displayed to the left of the install details when the package is 
+        installed.  This image should be 140 pixels wide and 250 pixels high.</p>
+    </Control>
+    <Control Name="cmdTestPackage" Title="Test Package">
+      <p>You should try installing your package on your system before distributing it, to ensure that all files are 
+      installed correctly.  If you can, try installing your package on several different machines.</p>
+    </Control>
+  </Form>
+
+
+  <Form Name="TfrmKCTOptionEditor">
+    <Control Name="rbKeymanDesktopUI" Title="Customise the Keyman Desktop user interface">
+      <p>You can make changes to the Keyman Desktop user interface on the User Interface tab.  The image and XML files will 
+      automatically be included in the installer when you select this branding file as the product licence option in the 
+      Distribution Editor, and kmshell.exe and related files will be included when the product is compiled.
+      </p>
+    </Control>
+    <Control Name="rbCustomUI" Title="Use your own user interface">
+      <p>You can create your own application, displaying your own splash screen, configuration, help and about dialogs, as well
+      as any additional functionality that you want.  You will need to include the appropriate files in the Distribution Editor
+      when you select this branding file as the product licence option.
+      </p>
+    </Control>
+    <Control Name="editControllerFileName" Title="Controller file name">
+      <p>
+        The standard controller file name is keyman.exe.  Use another executable name here if you wish to write your own 
+        controller application for your product.  Please review the Keyman COM API documentation for details.  Use the values
+        $INSTALLDIR and $ENGINEDIR to reference the installation folder and Keyman Engine folders respectively.  Read the
+        Keyman COM API documentation for more information.
+      </p>
+    </Control>
+    <Control Name="editConfigurationCommandLine" Title="Configuration command line">
+      <p>Use the value $INSTALLDIR to refer to the install path of your application.  Don't forget to surround the program 
+      path in double quotes.</p>
+    </Control>
+    <Control Name="editAboutCommandLine" Title="About command line">
+      <p>Use the value $INSTALLDIR to refer to the install path of your application.  Don't forget to surround the program 
+      path in double quotes.</p>
+    </Control>
+    <Control Name="editHelpCommandLine" Title="Help command line">
+      <p>Use the value $INSTALLDIR to refer to the install path of your application.  Don't forget to surround the program 
+      path in double quotes.</p>
+    </Control>
+  </Form>
+
+  <Form Name="TfrmInstallerEditor">
+    <Control Name="lbFiles" Title="Product Files">
+      <p>
+        If you need to include fonts or documentation, put them into a package and include the package in 
+        this list.  Do not include fonts or documentation directly.  If you are <b>not</b> using the Keyman Desktop user interface,
+        then include all the files for your application here as well.
+      </p>
+      <p>
+        The distribution editor does not allow you to create multiple folders for your application.  You can export the distribution
+        source file created in this editor to a WiX source file (.wxs) and extend it there.
+      </p>
+    </Control>
+    <Control Name="editDestinationPath" Title="Destination Path">
+      <p>The destination path will always be created under Program Files.  The actual name of the Program Files folder may vary from 
+      computer to computer and language to language, but the installer will manage that automatically.</p>
+    </Control>
+    <Control Name="editCmdLine" Title="Optional Post-Installation Command">
+      <p>You can choose to run a program after installation.  This can be 
+      a program in the package or another program such as WordPad to display a Readme file.  Enclose the program name in quotation marks
+      and use $INSTALLDIR\ as a prefix to reference the installed file location.</p>
+    </Control>
+    <Control Name="cmdCompileProduct" Title="Build Product">
+      <p>Building the product takes all the files you have selected and compiles them into a single product file.</p>
+    </Control>
+    <Control Name="cmdTestProduct" Title="Test Product">
+      <p>You should try installing your product  on your system before distributing it, to ensure that all 
+      files are installed correctly.  If you can, try installing your product on several different machines.</p>
+      <p>If you are a registered user of Keyman Developer Professional, then you have access to a free product
+      validation service from Tavultesoft.  Tavultesoft will review your product's installer, user interface, and
+      integration and provide feedback on issues and resolution of these issues.  Simply upload your product to the
+      Tavultesoft website and click the Request Validation link on the site.</p>
+    </Control>
+  </Form>
+</ContextHelp>

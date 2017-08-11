@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><!-- $Id: status.xml 633396 2008-03-04 09:06:03Z jeremias $ --><!-- Status --><!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V1.3//EN" "document-v13.dtd">
+<document>
+  <header>
+    <title>FOP Status</title>
+    <subtitle>Current Status of FOP</subtitle>
+    <version>$Revision: 633396 $</version>
+  </header>
+  <body>
+    <section>
+      <title>Status</title>
+      <p>[last updated 4 March 2008]</p>
+      <figure width="585" height="175" src="images/track.png" alt="Planning and branches of FOP development"/>
+      <p>
+        This is the development status of Apache FOP. Development on
+        the maintenance branch where FOP 0.20.5 came from has been
+        halted. The code base has been largely redesigned. The new
+        code base has reached release 0.95.
+      </p>
+    </section>
+    <section>
+      <title>Development Status</title>
+      <p>The FOP code base has been largely rewritten, to address
+        design issues for layout and performance. The new design makes
+        it better possible to be conformant to the spec and be able to
+        handle large documents.</p>
+      <p>The redesign of the code base has largely been completed. The
+        new code reached production quality with release 0.93. In the
+        course of 2008 or 2009 we hope to release version 1.0.</p>
+      <p>
+        If you're looking for a long-term road-map we have to disappoint you. This is Open
+        Source and we're mostly volunteers working in their free time. What we have
+        is an idea where we want to go. How fast we get there depends on the 
+        available time, on how well our ideas work out while developing and on you!
+        There's a <link href="http://wiki.apache.org/xmlgraphics-fop/RoadMap">document in the Wiki</link>
+        where you can get a glimpse of what points we're currently focusing on.
+      </p>
+      <section id="component-status">
+        <title>Status of the individual components</title>
+        <p>
+          Not all the components of FOP currently have the same quality. The following
+          table tries to give you an overview:
+        </p>
+        <table>
+          <tr>
+            <th colspan="1" rowspan="1">Component</th>
+            <th colspan="1" rowspan="1">Status</th>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">API</td>
+            <td colspan="1" rowspan="1">stable</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">FO Tree</td>
+            <td colspan="1" rowspan="1">stable</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">Layout Engine</td>
+            <td colspan="1" rowspan="1">stable</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">Area Tree</td>
+            <td colspan="1" rowspan="1">stable</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">Intermediate Format Support</td>
+            <td colspan="1" rowspan="1">stable (could use a speed upgrade)</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">PDF (Library and Renderer)</td>
+            <td colspan="1" rowspan="1">stable (SVG: stable)</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">PostScript</td>
+            <td colspan="1" rowspan="1">stable (SVG: stable with restrictions)</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">Java2D, AWT, Bitmap Renderers</td>
+            <td colspan="1" rowspan="1">stable</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">Text Renderer</td>
+            <td colspan="1" rowspan="1">stable (not much feedback)</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">RTF Handler</td>
+            <td colspan="1" rowspan="1">beta, restricted functionality compared to PDF/PS</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">PCL Renderer</td>
+            <td colspan="1" rowspan="1">stable (not much feedback)</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">AFP Renderer</td>
+            <td colspan="1" rowspan="1">status unknown (not much feedback)</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">SVG Renderer</td>
+            <td colspan="1" rowspan="1">non-functional in sandbox, help needed</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">Font Support</td>
+            <td colspan="1" rowspan="1">stable</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">Image Support</td>
+            <td colspan="1" rowspan="1">beta (recently rewritten)</td>
+          </tr>
+          <tr>
+            <td colspan="1" rowspan="1">Hyphenation Subsystem</td>
+            <td colspan="1" rowspan="1">stable</td>
+          </tr>
+        </table>
+      </section>
+    </section>
+    <section>
+      <title>Maintenance Status</title>
+      <p>
+        The latest release of the maintenance branch is FOP 0.20.5, released on July 18th, 2003.
+        The maintenance branch has been frozen in 2004 so the team can concentrate on the new code
+        base.
+      </p>
+    </section>
+    <!--section id="stats">
+      <title>Statistics</title>
+      <table>
+        <tr>
+          <th>&#x00A0;</th>
+          <th>0.20.5</th>
+          <th>Development (aka trunk, redesign) as of August 1, 2003</th>
+        </tr>
+        <tr>
+          <td colspan="3">&#x00A0;</td>
+        </tr>
+        <tr>
+          <th colspan="3">Binaries</th>
+        </tr>
+        <tr>
+          <td>fop jar</td>
+          <td>1,485 kb</td>
+          <td>2,132 kb</td>
+        </tr>
+        <tr>
+          <td>hyphenation (in fop.jar)</td>
+          <td>348 kb</td>
+          <td>1,358 kb</td>
+        </tr>
+        <tr>
+          <td>ant jar</td>
+          <td>&#x00A0;</td>
+          <td>707 kb</td>
+        </tr>
+        <tr>
+          <td>avalon-framework jar</td>
+          <td>62 kb</td>
+          <td>72 kb</td>
+        </tr>
+        <tr>
+          <td>batik jar</td>
+          <td>2,063 kb</td>
+          <td>2,213 kb</td>
+        </tr>
+        <tr>
+          <td>commons-io-dev jar</td>
+          <td>&#x00A0;</td>
+          <td>71 kb</td>
+        </tr>
+        <tr>
+          <td>commons-lang jar</td>
+          <td>&#x00A0;</td>
+          <td>190 kb</td>
+        </tr>
+        <tr>
+          <td>servlet jar</td>
+          <td>&#x00A0;</td>
+          <td>39 kb</td>
+        </tr>
+        <tr>
+          <td>xalan jar</td>
+          <td>1,007 kb</td>
+          <td>1,007 kb</td>
+        </tr>
+        <tr>
+          <td>xerces jar</td>
+          <td>816 kb</td>
+          <td>816 kb</td>
+        </tr>
+        <tr>
+          <td>xml-apis jar</td>
+          <td>112 kb</td>
+          <td>112 kb</td>
+        </tr>
+        <tr>
+          <th colspan="3">Lines of Source Code, using "find . -iname "*.java" | xargs cat | wc -l"</th>
+        </tr>
+        <tr>
+          <td>org.apache.fop.fo.*</td>
+          <td>20,297</td>
+          <td>22,306</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.layout.*</td>
+          <td>9,444</td>
+          <td>4,238</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.layoutmgr.*</td>
+          <td>&#x00A0;</td>
+          <td>10,069</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.area.*</td>
+          <td>&#x00A0;</td>
+          <td>5,791</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.render.*</td>
+          <td>18,387</td>
+          <td>11,527</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.pdf.*</td>
+          <td>10,203</td>
+          <td>15,669</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.rtf.*</td>
+          <td>0</td>
+          <td>12,747</td>
+        </tr>
+        <tr>
+          <td>Other</td>
+          <td>29,821</td>
+          <td>32,543</td>
+        </tr>
+        <tr>
+          <td>Total</td>
+          <td>88,152</td>
+          <td>114,890</td>
+        </tr>
+        <tr>
+          <th colspan="3">Files, using "find . -iname "*.java" | wc -l"</th>
+        </tr>
+        <tr>
+          <td>org.apache.fop.fo.*</td>
+          <td>122</td>
+          <td>127</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.layout.*</td>
+          <td>49</td>
+          <td>24</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.layoutmgr.*</td>
+          <td>&#x00A0;</td>
+          <td>38</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.area.*</td>
+          <td>&#x00A0;</td>
+          <td>39</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.render.*</td>
+          <td>48</td>
+          <td>36</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.pdf.*</td>
+          <td>51</td>
+          <td>70</td>
+        </tr>
+        <tr>
+          <td>org.apache.fop.rtf.*</td>
+          <td>&#x00A0;</td>
+          <td>80</td>
+        </tr>
+        <tr>
+          <td>Other</td>
+          <td>129</td>
+          <td>140</td>
+        </tr>
+        <tr>
+          <td>Total</td>
+          <td>399</td>
+          <td>554</td>
+        </tr>
+      </table>
+    </section-->
+  </body>
+</document>

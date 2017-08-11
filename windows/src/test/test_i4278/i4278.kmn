@@ -1,0 +1,26 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I4278 - Test shift states in TIP'
+store(&LANGUAGE) 'x0402'
+store(&WINDOWSLANGUAGES) 'x0402 x0402 x0402 x0402 x0402 x0402 x0402 x0402'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
+'AB' + 'C' > '(abc)' 
+
++ 'D' > '(D)'
+'(D)' + 'E' > '(D)(E)'
+'(D)(E)' + 'F' > '(D)(E)(F)'
+                
++ 'G' > '(G)' dk(1)
+'(G)' dk(1) + 'H' > '(G)(H)' dk(2)
+'(G)(H)' dk(2) + 'I' > '(G)(H)(I)'
+
++ 'g' > '(g)' dk(1)
+'(g)' dk(1) + 'h' > '(g)(h)' dk(2)
+'(g)(h)' dk(2) + 'i' > '(g)(h)(i)'
+
++ 'J' > dk(1) '(J)'
+dk(1) '(J)' + 'K' > '(J)' dk(2) '(K)'
+'(J)' dk(2) '(K)' + 'L' > '(J)(K)(L)'

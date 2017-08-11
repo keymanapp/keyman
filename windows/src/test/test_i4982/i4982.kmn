@@ -1,0 +1,14 @@
+﻿store(&VERSION) '9.0'
+begin Unicode > use(main)
+store(&INCLUDECODES) 'codes.txt'
+
+group(main) using keys
+
+store(KHOKHAI) U+0E02
+
+store(consonants) $KOKAI $KHOKHAI
+store(vowels) $A
+
++ 'a' > $A
++ 'b' > $KOKAI
++ 'c' > $KHOKHAI

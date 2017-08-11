@@ -1,0 +1,58 @@
+﻿c This keyboard tests I783 for KeymanWeb
+c Specifically, whether or not the compiler
+c generates the correct indices for the
+c any/index match
+store(&VERSION) '7.0'
+store(&NAME) 'Test I783 - any/index'
+begin Unicode > use(main)
+                  
+store(in) 'abc'
+store(out) 'ABC'
+
+store(in2) 'def'
+store(out2) 'DEF'
+
+group(main) using keys
+
+any(in) + ' ' > index(out, 1) '1 '
+any(in) 'x' + ' ' > index(out, 1) '2 '
+any(in) 'xx' + ' ' > index(out, 1) '3 '
+any(in) 'xxx' + ' ' > index(out, 1) '4 '
+any(in) 'xxxx' + ' ' > index(out, 1) '5 '
+
+'x' any(in) + ' ' > index(out, 2) '6 '
+'xx' any(in) + ' ' > index(out, 3) '7 '
+'xxx' any(in) + ' ' > index(out, 4) '8 '
+'xxxx' any(in) + ' ' > index(out, 5) '9 '
+
+'x' any(in) 'x' + ' ' > index(out, 2) '10 '
+'xx' any(in) 'x' + ' ' > index(out, 3) '11 '
+'xxx' any(in) 'x' + ' ' > index(out, 4) '12 '
+'xxxx' any(in) 'x' + ' ' > index(out, 5) '13 '
+
+'x' any(in) 'xx' + ' ' > index(out, 2) '14 '
+'xx' any(in) 'xx' + ' ' > index(out, 3) '15 '
+'xxx' any(in) 'xx' + ' ' > index(out, 4) '16 '
+'xxxx' any(in) 'xx' + ' ' > index(out, 5) '17 '
+
+'x' any(in) 'xxx' + ' ' > index(out, 2) '18 '
+'xx' any(in) 'xxx' + ' ' > index(out, 3) '19 '
+'xxx' any(in) 'xxx' + ' ' > index(out, 4) '20 '
+'xxxx' any(in) 'xxx' + ' ' > index(out, 5) '21 '
+
+'x' any(in) 'xxxx' + ' ' > index(out, 2) '22 '
+'xx' any(in) 'xxxx' + ' ' > index(out, 3) '23 '
+'xxx' any(in) 'xxxx' + ' ' > index(out, 4) '24 '
+'xxxx' any(in) 'xxxx' + ' ' > index(out, 5) '25 '
+
+any(in) any(in2) + ' ' > index(out, 1) index(out2, 2) '26 '
+'x' any(in) any(in2) + ' ' > index(out, 2) index(out2, 3) '27 '
+'xx' any(in) any(in2) + ' ' > index(out, 3) index(out2, 4) '28 '
+
+any(in) any(in2) 'x' + ' ' > index(out, 1) index(out2, 2) '29 '
+any(in) any(in2) 'xx' + ' ' > index(out, 1) index(out2, 2) '30 '                                                                 
+
+'x' any(in) any(in2) 'x' + ' ' > index(out, 2) index(out2, 3) '31 '
+'xx' any(in) any(in2) 'x' + ' ' > index(out, 3) index(out2, 4) '32 '
+'x' any(in) any(in2) 'xx' + ' ' > index(out, 2) index(out2, 3) '33 '
+'xx' any(in) any(in2) 'xx' + ' ' > index(out, 3) index(out2, 4) '34 '

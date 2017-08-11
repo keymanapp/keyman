@@ -1,0 +1,15 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'Stromme2 -> Ctrl+Alt and Ralt Rules'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ [CTRL ALT K_A] > 'ctrl alt a '
++ [RALT K_B] > 'ralt b '
++ [LCTRL RALT K_C] > 'weird lctrl ralt c '
++ [SHIFT K_D] > 'shift d '
++ '?' > '[C A K_A] [RA K_B] [LC RA K_C] [S K_D] '
+
++ [CTRL K_F] > 'abc'
+'abc' + [CTRL K_F] > 'zed abc'

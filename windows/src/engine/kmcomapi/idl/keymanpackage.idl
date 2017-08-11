@@ -1,0 +1,215 @@
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanPackage                                                              /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(A81A080C-F994-4EAE-A5C4-104C26195B3A),
+    version(1.0),
+    helpstring("Interface for KeymanPackage Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanPackage: IDispatch
+  {
+    [propget, id(0x00000001)]
+    HRESULT _stdcall Name([out, retval] BSTR * Value );
+    [propget, id(0x00000002)]
+    HRESULT _stdcall Description([out, retval] BSTR * Value );
+    [propget, id(0x00000003)]
+    HRESULT _stdcall Keyboards([out, retval] IKeymanKeyboardsPackage ** Value );
+    [propget, id(0x00000004)]
+    HRESULT _stdcall Filename([out, retval] BSTR * Value );
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanPackageInstalled : IKeymanPackage                                    /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(07C9D604-DB99-4E61-82CE-310604DC9E72),
+    version(1.0),
+    helpstring("Interface for KeymanPackageInstalled Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanPackageInstalled: IKeymanPackage
+  {
+    [id(0x0000000A)]
+    HRESULT _stdcall Uninstall([in] VARIANT_BOOL RemoveFonts );
+    [propget, id(0x0000000B)]
+    HRESULT _stdcall InstalledByAdmin([out, retval] VARIANT_BOOL * Value );
+  };
+
+  // KeymanPackageInstalled
+
+  [
+    uuid(4BDC8DCC-283F-4B72-BBBD-3808E9081E78),
+    version(1.0),
+    helpstring("KeymanPackageInstalled Object"),
+    noncreatable
+  ]
+  coclass KeymanPackageInstalled
+  {
+    [default] interface IKeymanPackageInstalled;
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanPackageFile : IKeymanPackage                                         /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(E9618611-8434-4072-B803-CAE188205D5B),
+    version(1.0),
+    helpstring("Interface for KeymanPackageFile Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanPackageFile: IKeymanPackage
+  {
+    [id(0x0000000A)]
+    HRESULT _stdcall Install( [in] VARIANT_BOOL AllUsers );
+    [propget, id(0x0000000B)]
+    HRESULT _stdcall ReadMe([out, retval] BSTR * Value );
+    [propget, id(0x0000000C)]
+    HRESULT _stdcall Graphic([out, retval] IPicture ** Value );
+    [propget, id(0x0000000D)]
+    HRESULT _stdcall SubFiles([out, retval] IKeymanPackageSubFiles ** Value );
+  };
+
+  // KeymanPackageFile
+
+  [
+    uuid(EA395073-7196-4746-82E8-B36493D3F42A),
+    version(1.0),
+    helpstring("KeymanPackageFile Object"),
+    noncreatable
+  ]
+  coclass KeymanPackageFile
+  {
+    [default] interface IKeymanPackageFile;
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanPackageSubFile                                                       /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(4267EA59-CF06-4FED-B670-C9FBEAFEF77F),
+    version(1.0),
+    helpstring("Interface for KeymanPackageSubFile Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanPackageSubFile: IDispatch
+  {
+	[propget, id(0x00000001)] HRESULT _stdcall FileName( [out, retval] BSTR * Value );
+    [propget, id(0x00000002)] HRESULT _stdcall FileType( [out, retval] KeymanFileType * Value );
+    [propget, id(0x00000003)] HRESULT _stdcall Description( [out, retval] BSTR * Value );
+    [propget, id(0x00000004)] HRESULT _stdcall CopyLocation( [out, retval] KeymanPackageSubFileCopyLocation * Value );
+    [propget, id(0x00000005)] HRESULT _stdcall AsStream( [out, retval] IUnknown ** Value );
+  };
+
+  // KeymanPackageSubFile
+
+  [
+    uuid(50F6F091-C9AB-4290-A854-DA7D428B071A),
+    version(1.0),
+    helpstring("KeymanPackageSubFile Object"),
+    noncreatable
+  ]
+  coclass KeymanPackageSubFile
+  {
+    [default] interface IKeymanPackageSubFile;
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanPackageSubFiles                                                      /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(81EA70FD-5A0E-46E6-9912-92ECF8098207),
+    version(1.0),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanPackageSubFiles: IKeymanCollection
+  {
+    [propget, id(0x00000000), defaultcollelem]
+    HRESULT _stdcall Items([in] VARIANT Index, [out, retval] IKeymanPackageSubFile ** Value );
+  };
+
+  // KeymanPackageSubFiles
+
+  [
+    uuid(4B46C08E-4647-49F0-B7F9-C43B99B19CBC),
+    version(1.0),
+    helpstring("KeymanPackageSubFiles Object"),
+    noncreatable
+  ]
+  coclass KeymanPackageSubFiles
+  {
+    [default] interface IKeymanPackageSubFiles;
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanPackages                                                             /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(438799C8-F4A0-4838-9D54-17EF1A2FE6AD),
+    version(1.0),
+    helpstring("Interface for KeymanPackages Object"),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanPackages: IKeymanCollection
+  {
+  };
+
+/*-----------------------------------------------------------------------------/
+/                                                                              /
+/  IKeymanPackagesInstalled : IKeymanPackages                                  /
+/                                                                              /
+/-----------------------------------------------------------------------------*/
+
+  [
+    uuid(3FE3D351-3625-4550-94E9-05D225A4F450),
+    version(1.0),
+    dual,
+    oleautomation
+  ]
+   interface IKeymanPackagesInstalled: IKeymanPackages
+  {
+    [propget, id(0x00000000), defaultcollelem]
+    HRESULT _stdcall Items([in] VARIANT Index, [out, retval] IKeymanPackageInstalled ** Value );
+    [id(0x00000005)]
+    HRESULT _stdcall GetPackageFromFile([in] BSTR Filename, [out, retval] IKeymanPackageFile ** Package );
+    [id(0x00000006)]
+    HRESULT _stdcall Install([in] BSTR Filename, [in] VARIANT_BOOL AllUsers );
+  };
+
+  // KeymanPackagesInstalled
+
+  [
+    uuid(07577ED7-908C-4190-B461-555774BB3CEE),
+    version(1.0),
+    helpstring("KeymanPackagesInstalled Object"),
+    noncreatable
+  ]
+  coclass KeymanPackagesInstalled
+  {
+    [default] interface IKeymanPackagesInstalled;
+  };
+

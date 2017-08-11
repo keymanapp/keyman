@@ -1,0 +1,90 @@
+object Form1: TForm1
+  Left = 659
+  Height = 313
+  Top = 253
+  Width = 355
+  HorzScrollBar.Page = 354
+  VertScrollBar.Page = 312
+  ActiveControl = TreeView1
+  Caption = 'Winstation ACL Demo'
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  object TreeView1: TTreeView
+    Left = 16
+    Height = 102
+    Top = 40
+    Width = 187
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    DefaultItemHeight = 17
+    HideSelection = False
+    Indent = 19
+    TabOrder = 0
+    OnChange = TreeView1Change
+    OnExpanding = TreeView1Expanding
+    Options = [tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips]
+  end
+  object Button1: TButton
+    Left = 216
+    Height = 25
+    Top = 112
+    Width = 121
+    Anchors = [akTop, akRight]
+    BorderSpacing.InnerBorder = 4
+    Caption = 'Close'
+    OnClick = Button1Click
+    TabOrder = 1
+  end
+  object Button2: TButton
+    Left = 216
+    Height = 25
+    Top = 48
+    Width = 121
+    Anchors = [akTop, akRight]
+    BorderSpacing.InnerBorder = 4
+    Caption = 'Show ACL'
+    OnClick = Button2Click
+    TabOrder = 2
+  end
+  object Button3: TButton
+    Left = 216
+    Height = 25
+    Top = 80
+    Width = 121
+    Anchors = [akTop, akRight]
+    BorderSpacing.InnerBorder = 4
+    Caption = 'Show DACL (Text)'
+    OnClick = Button3Click
+    TabOrder = 3
+  end
+  object Memo1: TMemo
+    Left = 16
+    Height = 104
+    Top = 149
+    Width = 187
+    Anchors = [akLeft, akRight, akBottom]
+    Lines.Strings = (
+      'Memo1'
+    )
+    TabOrder = 4
+  end
+  object ComboBoxSession: TComboBox
+    Left = 16
+    Height = 21
+    Top = 16
+    Width = 323
+    Anchors = [akTop, akLeft, akRight]
+    AutoCompleteText = [cbactEndOfLineComplete, cbactSearchAscending]
+    ItemHeight = 13
+    MaxLength = 0
+    Style = csDropDownList
+    TabOrder = 5
+  end
+  object StatusBar1: TStatusBar
+    Height = 23
+    Top = 290
+    Width = 355
+    Panels = <>
+  end
+end

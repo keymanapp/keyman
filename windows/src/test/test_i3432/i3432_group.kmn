@@ -1,0 +1,32 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'I3432 - Test platform group rules'
+begin Unicode > use(platform)
+
+
+group(platform)
+
+if(&platform = 'ios') > use(ios)
+if(&platform = 'android') > use(android)
+if(&platform = 'windows') > use(windows)
+if(&platform = 'macosx') > use(macosx)
+nomatch > use(main)
+
+group(main) using keys
+
++ 'a' > 'No platform matched'
+
+group(ios) using keys
+
++ 'a' > 'iOS'
+
+group(android) using keys
+
++ 'a' > 'Android'
+
+group(windows) using keys
+
++ 'a' > 'Windows'
+
+group(macosx) using keys
+
++ 'a' > 'Mac OS X'

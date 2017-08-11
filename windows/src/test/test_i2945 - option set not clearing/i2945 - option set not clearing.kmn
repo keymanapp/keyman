@@ -1,0 +1,15 @@
+﻿c Press (x) to set the option
+c Press (t) to test it
+store(&VERSION) '8.0'
+store(&NAME) 'I2945 - Option set not clearing (x)'
+begin Unicode > use(main)
+
+store(opt) ''
+
+group(main) using keys
+
+if(opt = '') + 't' > 'Option is not set '
+if(opt = 'x') + 't' > 'Option is set '
++ 'x' > set(opt = 'x') 'option has been set '
++ 'X' > reset(opt) 'option has been reset '
++ 's' > save(opt) 'option has been saved '

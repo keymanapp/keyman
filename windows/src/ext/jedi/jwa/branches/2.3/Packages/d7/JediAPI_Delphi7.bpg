@@ -1,0 +1,33 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.01
+#------------------------------------------------------------------------------
+!ifndef ROOT
+ROOT = $(MAKEDIR)\..
+!endif
+#------------------------------------------------------------------------------
+MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
+DCC = $(ROOT)\bin\dcc32.exe $**
+BRCC = $(ROOT)\bin\brcc32.exe $**
+#------------------------------------------------------------------------------
+PROJECTS = JediApi_DynamicDebug.bpl JediApi_DynamicRelease.bpl \
+  JediApi_StaticDebug.bpl JediApi_StaticRelease.bpl JediApi_SingleUnits.bpl
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+JediApi_DynamicDebug.bpl: JediApi_DynamicDebug.dpk
+  $(DCC)
+
+JediApi_DynamicRelease.bpl: JediApi_DynamicRelease.dpk
+  $(DCC)
+
+JediApi_StaticDebug.bpl: JediApi_StaticDebug.dpk
+  $(DCC)
+
+JediApi_StaticRelease.bpl: JediApi_StaticRelease.dpk
+  $(DCC)
+
+JediApi_SingleUnits.bpl: JediApi_SingleUnits.dpk
+  $(DCC)
+
+

@@ -1,0 +1,7 @@
+﻿c Test crashes in Keyman Developer importing icons, etc.
+store(&VERSION) '8.0'
+store(&BITMAP) 'i3147.ico'
+begin Unicode > use(main)
+
+
+group(main) using keys

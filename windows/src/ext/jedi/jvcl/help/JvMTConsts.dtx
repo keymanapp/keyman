@@ -1,0 +1,67 @@
+##Package: ManagedThreads
+##Status: Generated
+----------------------------------------------------------------------------------------------------
+@@JvMTConsts.pas
+Summary
+    Contains the TJvMTConsts component.
+Author
+  Erwin Molendijk
+----------------------------------------------------------------------------------------------------
+@@TMTThreadStatus.tsFinished
+The thread has finished executing.
+
+----------------------------------------------------------------------------------------------------
+@@TMTTicket
+<TITLE TMTTicket type>
+Summary
+  Represents a thread ticket.
+Description
+  TMTTicket is an integer that identifies a thread. It is used by the Ticket property of the
+  TJvMTThread component.
+See Also
+  TJvMTThread.Ticket
+
+----------------------------------------------------------------------------------------------------
+@@TMTThreadStatus.tsTerminating
+The thread has been asked to terminate.
+
+----------------------------------------------------------------------------------------------------
+@@TMTThreadStatus.tsRunning
+The thread is running.
+
+----------------------------------------------------------------------------------------------------
+@@TMTThreadStatus.tsWaiting
+The thread is suspended.
+
+----------------------------------------------------------------------------------------------------
+@@TMTThreadStatus.tsInitializing
+The thread is not yet created.
+
+----------------------------------------------------------------------------------------------------
+@@TMTThreadStatus
+<TITLE TMTThreadStatus type>
+Summary
+  Indicates the status of a thread.
+Description
+  Write here a description
+See Also
+  TJvMTThread.Status
+
+----------------------------------------------------------------------------------------------------
+@@EMTThreadError
+Summary
+  The exception class for thread synchronization errors.
+Description
+  EMTThreadError is the exception class for errors in the Managed Thread components.
+See Also
+  EMTTerminateError
+
+----------------------------------------------------------------------------------------------------
+@@EMTTerminateError
+Summary
+  The exception class for thread terminate errors.
+Description
+  EMTThreadError is the exception class for terminate errors in the Managed Thread components.
+See Also
+  EMTThreadError
+

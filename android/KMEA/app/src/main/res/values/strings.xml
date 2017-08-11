@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <!-- Device type  -->
+    <string name="device_type" translatable="false">AndroidMobile</string>
+    
+    <!-- Application name -->
+    <string name="app_name" translatable="false">KMEA</string>
+    
+    <!-- Title for settings  -->
+	<string name="action_settings" translatable="false">Settings</string>
+       
+    <!-- Title for lists-->
+    <string name="title_keyboards" translatable="false">Keyboards</string>
+    <string name="title_add_keyboard" translatable="false">Add New Keyboard</string>
+    
+    <!-- Button labels -->
+    <string name="label_action_button" translatable="false">Action Button</string>
+    <string name="label_done" translatable="false">Done</string>
+    <string name="label_add" translatable="false">Add</string>
+    <string name="label_back" translatable="false">Back</string>
+    
+    <!-- Content descriptions -->
+    <string name="image_button" translatable="false">Image Button</string>
+    <string name="image_view" translatable="false">Image View</string>
+    
+    <!-- Popup menu labels -->
+    <string name="popup_menu_delete" translatable="false">Delete</string>
+    
+    <!-- Shared preferences name -->
+    <string name="kma_prefs_name" translatable="false">KMAPreferences</string>
+    
+    <!-- Other strings -->
+    <string name="help_bubble_text" translatable="false">Tap here to change keyboard</string>
+    <string name="trial_expired" translatable="false">Trial period has expired!</string>
+    <string name="reactivate" translatable="false">Reactivate</string>
+    
+</resources>
