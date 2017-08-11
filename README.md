@@ -9,6 +9,7 @@ Open Source
 | Android   | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanAndroid_Build)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanAndroid_NightlyAlpha)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanAndroid_Beta),branch:(default:false)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanAndroid_Stable),branch:(default:false)/statusIcon) |
 | Web       | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keymanweb_Build)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keymanweb_Nightly)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keymanweb_Beta),branch:(default:false)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keymanweb_Stable),branch:(default:false)/statusIcon)|
 | Windows   | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keyman_Build)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanDesktop_Nightly)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanDesktop_Beta),branch:(default:false)/statusIcon)| ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanDesktop_Stable),branch:(default:false)/statusIcon) |
+| Mac       | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanMac_Master)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanMac_Nightly)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanMac_Beta)/statusIcon)| ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanMac_Stable)/statusIcon) |
 
 [Keyman](https://keyman.com) makes it possible for you to type in over 1,000 languages on Windows, iPhone, iPad, Android tablets and phones, and even instantly in your web browser.
 
@@ -19,6 +20,8 @@ Open Source
 [Web](./web/README.md)
 
 [Windows](./windows/src/README.md)
+
+[Mac](./mac/README.md)
 
 # Release Types
 

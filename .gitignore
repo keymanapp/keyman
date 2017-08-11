@@ -225,3 +225,5 @@
 # /test/test_vistaaltfixunit/
 
 # /test/wm_unichar/
+
+.DS_Store
