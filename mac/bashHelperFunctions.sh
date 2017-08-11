@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # The following allows coloring of warning and error lines, but only works if there's a
 # terminal attached, so not on the build machine.
 if ! [[ "$TERM" == "" || "$TERM" == "dumb" ]]; then
