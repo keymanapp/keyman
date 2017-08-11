@@ -90,7 +90,6 @@
         <DCCReference Include="DevIncludePaths.pas"/>
         <DCCReference Include="DevInstallPackages.pas"/>
         <DCCReference Include="DevUtils.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\SourceRootPath.pas"/>
         <DCCReference Include="DevDelphiCompileWrapper.pas"/>
         <DCCReference Include="UfrmCompilerErrors.pas">
             <Form>CompilerErrorsForm</Form>
@@ -105,6 +104,7 @@
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="DevDelphiStarterCompileWrapper.pas"/>
+        <DCCReference Include="SourceRootPath.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

@@ -9,7 +9,6 @@ uses
   DevIncludePaths in 'DevIncludePaths.pas',
   DevInstallPackages in 'DevInstallPackages.pas',
   DevUtils in 'DevUtils.pas',
-  SourceRootPath in '..\..\global\delphi\general\SourceRootPath.pas',
   DevDelphiCompileWrapper in 'DevDelphiCompileWrapper.pas',
   UfrmCompilerErrors in 'UfrmCompilerErrors.pas' {CompilerErrorsForm},
   DevReleaseBuildCheck in 'DevReleaseBuildCheck.pas',
@@ -21,7 +20,8 @@ uses
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   Unicode in '..\..\global\delphi\general\Unicode.pas',
   GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
-  DevDelphiStarterCompileWrapper in 'DevDelphiStarterCompileWrapper.pas';
+  DevDelphiStarterCompileWrapper in 'DevDelphiStarterCompileWrapper.pas',
+  SourceRootPath in 'SourceRootPath.pas';
 
 begin
   try
