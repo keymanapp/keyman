@@ -16,8 +16,8 @@ display_usage() {
     echo "                  p|preprelease    Builds a DMG and download_info file in output\upload."
     echo "  -deploy-only    Suppresses build/clean/test for all targets."
     echo "  -tier TIER      Used with -deploy p to specify tier: alpha (default), beta, or stable."
-    echo "  -version #.#.#  Used with -deploy p to specify the build version number, which should be in the"
-    echo "                  form Major.Minor.BuildCounter"
+    echo "  -version #.#.#  Used to specify the build version number, which should be in the"
+    echo "                  form Major.Minor.BuildCounter (optional, but expected if deploy preprelease)"
     echo "  -config NAME    NAME is passed to xcodebuild as -configuration parameter. Defaults to Debug, unless"
     echo "                  the deploy option is used to specify preprelease, in which configuration will be"
     echo "                  Release (i.e., -config option is ignored)."
@@ -80,7 +80,6 @@ KME4M_PROJECT_PATH="$KME4M_BASE_PATH/$ENGINE_NAME$XCODE_PROJ_EXT"
 KMTESTAPP_PROJECT_PATH="$KMTESTAPP_BASE_PATH/$TESTAPP_NAME$XCODE_PROJ_EXT"
 KMIM_PROJECT_PATH="$KM4MIM_BASE_PATH/$IM_NAME$XCODE_PROJ_EXT"
 
-
 # KME4M_BUILD_PATH=engine/KME4M/build
 # APP_RESOURCES=keyman/Keyman/Keyman/libKeyman
 # APP_BUNDLE_PATH=$APP_RESOURCES/Keyman.bundle
@@ -97,7 +96,8 @@ CONFIG="Debug"
 LOCALDEPLOY=false
 PREPRELEASE=false
 KM_TIER="alpha"
-KM_VERSION="1.1.0"
+KM_VERSION="10.0.0"
+UPDATE_VERSION_IN_PLIST=false
 DO_KEYMANENGINE=true
 DO_KEYMANIM=true
 DO_KEYMANTESTAPP=false
@@ -152,6 +152,7 @@ while [[ $# -gt 0 ]] ; do
         -version)
             assertValidVersionNbr "$2"
             KM_VERSION="$2"
+            UPDATE_VERSION_IN_PLIST=true
             shift # past argument
             ;;
         -config)
@@ -256,15 +257,33 @@ execBuildCommand() {
     fi
 }
 
+updatePlist() {
+	if $UPDATE_VERSION_IN_PLIST ; then
+	    KM_COMPONENT_BASE_PATH="$1"
+	    KM_COMPONENT_NAME="$2"
+		KM_PLIST="$KM_COMPONENT_BASE_PATH/$KM_COMPONENT_NAME/Info.plist"
+		if [ -f "$KM_PLIST" ]; then 
+			echo "Setting $KM_COMPONENT_NAME version to $KM_VERSION"
+			/usr/libexec/Plistbuddy -c "Set CFBundleVersion $KM_VERSION" "$KM_PLIST"
+			/usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $KM_VERSION" "$KM_PLIST"
+		else
+			fail "File not found: $KM_PLIST"
+		fi
+	fi
+}
+
 if $DO_KEYMANENGINE ; then
+    updatePlist "$KME4M_BASE_PATH" "$ENGINE_NAME"
     execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS"
 fi
 
 if $DO_KEYMANIM ; then
+    updatePlist "$KM4MIM_BASE_PATH" "$IM_NAME"
     execBuildCommand $IM_NAME "xcodebuild -project \"$KMIM_PROJECT_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS"
 fi
 
 if $DO_KEYMANTESTAPP ; then
+    updatePlist "$KMTESTAPP_BASE_PATH" "$TESTAPP_NAME"
     execBuildCommand $TESTAPP_NAME "xcodebuild -project \"$KMTESTAPP_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS"
 fi
 
