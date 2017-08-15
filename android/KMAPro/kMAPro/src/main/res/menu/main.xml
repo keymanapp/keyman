@@ -2,24 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <!--
     <item
-	    android:id="@+id/menu_item_share"
+        android:id="@+id/menu_item_share"
         android:showAsAction="always"
         android:title="@string/action_share"
         android:actionProviderClass="android.widget.ShareActionProvider" />
     -->
     
-	<item android:id="@+id/action_share"
-    	android:showAsAction="always"
+    <item android:id="@+id/action_share"
+        android:showAsAction="always"
         android:title="@string/action_share"
         android:icon="@drawable/ic_light_action_share" />
-	
-	<item
+    
+    <item
         android:id="@+id/action_web"
         android:showAsAction="always"
         android:title="@string/action_web"
         android:icon="@drawable/ic_light_action_web" />
-	
-	<item
+    
+    <item
         android:id="@+id/action_overflow"
         android:showAsAction="always"
         android:title="@string/action_overflow"
@@ -28,25 +28,25 @@
         <menu>
             
             <item
-        		android:id="@+id/action_text_size"
-        		android:title="@string/action_text_size"
-        		android:icon="@drawable/ic_light_action_textsize" />
+                android:id="@+id/action_text_size"
+                android:title="@string/action_text_size"
+                android:icon="@drawable/ic_light_action_textsize" />
             
-			<item
-        		android:id="@+id/action_clear_text"
-        		android:title="@string/action_clear_text"
-        		android:icon="@drawable/ic_light_action_trash" />
-	
-			<item
-        		android:id="@+id/action_info"
-        		android:title="@string/action_info"
-        		android:icon="@drawable/ic_light_action_info" />
-			
-			<item
-        		android:id="@+id/action_get_started"
-        		android:title="@string/get_started"
-        		android:icon="@drawable/ic_action_get_started" />
+            <item
+                android:id="@+id/action_clear_text"
+                android:title="@string/action_clear_text"
+                android:icon="@drawable/ic_light_action_trash" />
+    
+            <item
+                android:id="@+id/action_info"
+                android:title="@string/action_info"
+                android:icon="@drawable/ic_light_action_info" />
+            
+            <item
+                android:id="@+id/action_get_started"
+                android:title="@string/get_started"
+                android:icon="@drawable/ic_action_get_started" />
         </menu>
     </item>
-	
+    
 </menu>
