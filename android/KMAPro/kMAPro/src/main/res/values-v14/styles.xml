@@ -10,7 +10,7 @@
         <item name="android:actionBarStyle">@style/KeymanActionBar</item>
     </style>
 
-	<style name="KeymanActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
+    <style name="KeymanActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
         <item name="android:background">#ffffff</item>
         <item name="android:logo">@drawable/keyman_logo</item>
         <item name="android:title"></item>
