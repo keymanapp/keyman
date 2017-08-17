@@ -1,0 +1,22 @@
+﻿c 
+c 1. Press key marked 'Ą'; should output 'Ą' unless preceded by 'c'
+c but outputs U+0103 because of its VKDictionary index
+c 
+c 2. Press key marked 'ā'; should output 'ā' but instead puts out 'a̐'
+c because it conflicts with a VKDictionary index
+c 
+
+store(&VERSION) '9.0'
+store(&NAME) '#160 VKDictionary conflict(web/touch)'
+store(&LAYOUTFILE) 'issue160-layout.js'
+store(&TARGETS) 'mobile'
+begin Unicode > use(main)
+
+group(main) using keys
+
++ [T_A_Hook] > 'a' U+0327
++ [T_A_Candrabindu] > 'a' U+0310
++ [T_A_Blah] > 'nothing' c just here to keep 0104 in sync
+c + [U_0101] > '***'
+'c' + [U_0104] > '?'
++ [T_A_305] > 'a' U+0305
