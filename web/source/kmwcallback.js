@@ -292,7 +292,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       if(e.vkCode > 255) keyCode = e.vkCode;           // added to support extended (touch-hold) keys for mnemonic layouts
         
-      if(e.LisVirtualKey)
+      if(e.LisVirtualKey || keyCode > 255)
       {
         if((Lruleshift & 0x4000) == 0x4000 || (keyCode > 255))  // added keyCode test to support extended keys
         {

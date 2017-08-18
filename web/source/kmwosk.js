@@ -604,11 +604,20 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
 
     /**
-     * Function     getVKDictionaryCode
-     * Scope        Private
+     * @summary Look up a custom virtual key code in the virtual key code dictionary KVKD.  On first run, will build the dictionary.
+     *
+     * `VKDictionary` is constructed from the keyboard's `KVKD` member. This list is constructed 
+     * at compile-time and is a list of 'additional' virtual key codes, starting at 256 (i.e. 
+     * outside the range of standard virtual key codes). These additional codes are both 
+     * `[T_xxx]` and `[U_xxxx]` custom key codes from the Keyman keyboard language. However, 
+     * `[U_xxxx]` keys only generate an entry in `KVKD` if there is a corresponding rule that 
+     * is associated with them in the keyboard rules. If the `[U_xxxx]` key code is only 
+     * referenced as the id of a key in the touch layout, then it does not get an entry in 
+     * the `KVKD` property.
+     *
+     * @private
      * @param       {string}      keyName   custom virtual key code to lookup in the dictionary
      * @return      {number}                key code > 255 on success, or 0 if not found
-     * Description  Look up a custom virtual key code in the virtual key code dictionary KVKD.  On first run, will build the dictionary.
      */
     osk.getVKDictionaryCode = function(keyName)
     {
@@ -699,9 +708,15 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       // TODO:  Refactor the overloading of the 'n' parameter here into separate methods.
 
-      // Test for fall back to U_xxxx key id - For this first test, we refer to Unicode values.
-      if((keyName.substr(0,2) == 'U_') && ((keyShiftState == 0) || (n > osk.keyCodes['K_SPACE']) &&  !(n>127 && n<160))) { // 127 - 160 refer to Unicode control codes.
+      // Test for fall back to U_xxxx key id - For this first test, we ignore the key code
+      // and use the keyName
+      if((keyName.substr(0,2) == 'U_')) { 
         ch=String.fromCharCode(parseInt(keyName.substr(2,6),16));
+        if(ch < 32 || (ch > 127 && ch < 160)) {
+          // 127 - 160 refer to Unicode control codes.
+          // Do not allow output of these codes via U_xxxx shortcuts.
+          ch = 0;
+        }
         // Hereafter, we refer to keycodes.
       } else if(n >= osk.keyCodes['K_0'] && n <= osk.keyCodes['K_9']) { // The number keys.
         ch = codesUS[keyShiftState][0][n-osk.keyCodes['K_0']];
@@ -792,14 +807,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         if(typeof Lkc.Lcode == 'undefined')
         {
           Lkc.Lcode = osk.getVKDictionaryCode(keyName);// Updated for Build 347
-          if(!Lkc.Lcode)
+          if(!Lkc.Lcode) 
           {
-            // Key code will be Unicode value for U_xxxx keys
-            if(keyName.substr(0,2) == 'U_')
-            {
-              var tUnicode=parseInt(keyName.substr(2),16);
-              if(!isNaN(tUnicode)) Lkc.Lcode=tUnicode;
-            }
+            // Special case for U_xxxx keys. This vk code will never be used
+            // in a keyboard, so we use this to ensure that keystroke processing
+            // occurs for the key.
+            Lkc.Lcode = 1; 
           }
         }
 
