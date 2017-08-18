@@ -16,6 +16,8 @@ group(main) using keys
 
 + [T_A_Hook] > 'a' U+0327
 + [T_A_Candrabindu] > 'a' U+0310
++ [SHIFT T_A_Hook] > 'SHIFT a' U+0327
++ [SHIFT T_A_Candrabindu] > 'SHIFT a' U+0310
 + [T_A_Blah] > 'nothing' c just here to keep 0104 in sync
 c + [U_0101] > '***'
 'c' + [U_0104] > '?'

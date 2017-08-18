@@ -700,7 +700,7 @@ function Keyboard_issue160()
   };
   this.g_main=function(t,e) {
     var k=KeymanWeb,r=0,m=0;
-    if(k.KKM(e,16384,259)&&k.KCM(1,t,"c",1)) {   // Line 21
+    if(k.KKM(e,16384,259)&&k.KCM(1,t,"c",1)) {   // Line 23
       r=m=1;
       k.KO(1,t,"?");
     }
@@ -712,11 +712,19 @@ function Keyboard_issue160()
       r=m=1;
       k.KO(0,t,"a̐");
     }
-    else if(k.KKM(e,16384,258)) {   // Line 19
+    else if(k.KKM(e,16400,256)) {   // Line 19
+      r=m=1;
+      k.KO(0,t,"SHIFT a̧");
+    }
+    else if(k.KKM(e,16400,257)) {   // Line 20
+      r=m=1;
+      k.KO(0,t,"SHIFT a̐");
+    }
+    else if(k.KKM(e,16384,258)) {   // Line 21
       r=m=1;
       k.KO(0,t,"nothing");
     }
-    else if(k.KKM(e,16384,260)) {   // Line 22
+    else if(k.KKM(e,16384,260)) {   // Line 24
       r=m=1;
       k.KO(0,t,"a̅");
     }

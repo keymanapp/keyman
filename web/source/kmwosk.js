@@ -712,7 +712,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       // and use the keyName
       if((keyName.substr(0,2) == 'U_')) { 
         ch=String.fromCharCode(parseInt(keyName.substr(2,6),16));
-        if(ch < 32 || (ch > 127 && ch < 160)) {
+        if(ch <= 32 || (ch > 127 && ch < 160)) {
           // 127 - 160 refer to Unicode control codes.
           // Do not allow output of these codes via U_xxxx shortcuts.
           ch = 0;
