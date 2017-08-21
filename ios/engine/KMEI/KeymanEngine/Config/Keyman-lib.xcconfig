@@ -1,0 +1,14 @@
+//
+//  Keyman.xcconfig
+//  Keyman Engine
+//
+//  Copyright (c) 2017 SIL International. All rights reserved.
+//
+
+//INFOPLIST_FILE = KeymanEngine/KeymanEngine-Info.plist
+PRODUCT_NAME = $(TARGET_NAME)
+
+GCC_PRECOMPILE_PREFIX_HEADER = YES
+GCC_PREFIX_HEADER = KeymanEngine/KeymanEngine-Prefix.pch
+
+IPHONEOS_DEPLOYMENT_TARGET = 4.0

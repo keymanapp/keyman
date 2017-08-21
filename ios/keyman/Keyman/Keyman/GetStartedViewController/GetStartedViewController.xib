@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="GetStartedViewController">
+            <connections>
+                <outlet property="navItem" destination="hTZ-IR-g2X" id="RIE-Dr-qPT"/>
+                <outlet property="tableView" destination="LeX-TH-9uh" id="aa4-7t-QPr"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <navigationBar tag="786586" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mHd-8N-aLO">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                    <items>
+                        <navigationItem title="Get Started" id="hTZ-IR-g2X">
+                            <barButtonItem key="rightBarButtonItem" title="Done" id="fqb-b7-uYN"/>
+                        </navigationItem>
+                    </items>
+                </navigationBar>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="60" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="LeX-TH-9uh">
+                    <rect key="frame" x="0.0" y="44" width="320" height="524"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="BHR-iq-jVb"/>
+                        <outlet property="delegate" destination="-1" id="YPb-FJ-aXa"/>
+                    </connections>
+                </tableView>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="mHd-8N-aLO" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="1Ph-ud-csW"/>
+                <constraint firstAttribute="trailing" secondItem="mHd-8N-aLO" secondAttribute="trailing" id="Ihe-cJ-5sW"/>
+                <constraint firstItem="LeX-TH-9uh" firstAttribute="top" secondItem="mHd-8N-aLO" secondAttribute="bottom" id="mr0-Yu-NKS"/>
+                <constraint firstItem="mHd-8N-aLO" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="n7a-OK-ZJN"/>
+                <constraint firstItem="LeX-TH-9uh" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="u0j-Tf-c4r"/>
+                <constraint firstAttribute="bottom" secondItem="LeX-TH-9uh" secondAttribute="bottom" id="uXY-cE-wIT"/>
+                <constraint firstAttribute="trailing" secondItem="LeX-TH-9uh" secondAttribute="trailing" id="ud3-Rj-MM7"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+        </view>
+    </objects>
+</document>

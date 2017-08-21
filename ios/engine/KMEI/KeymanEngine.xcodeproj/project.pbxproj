@@ -1,0 +1,1521 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		985C6C7E185527E400D5C0C2 /* KME-framework */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 985C6C80185527E400D5C0C2 /* Build configuration list for PBXAggregateTarget "KME-framework" */;
+			buildPhases = (
+				985C6C7F185527E400D5C0C2 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "KME-framework";
+			productName = "Keyman-lib";
+		};
+		F27FCAF1157FD80900FBBA20 /* KME-lib */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = F27FCAF2157FD80900FBBA20 /* Build configuration list for PBXAggregateTarget "KME-lib" */;
+			buildPhases = (
+				F27FCAF5157FD82100FBBA20 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "KME-lib";
+			productName = "Keyman-lib";
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		6C0A1407151EA8B3007FA4AD /* KMTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C0A1406151EA8B3007FA4AD /* KMTextView.m */; };
+		6C0A140C151EA925007FA4AD /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C0A1409151EA925007FA4AD /* AppDelegate.m */; };
+		6C0A140D151EA925007FA4AD /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C0A140B151EA925007FA4AD /* MainViewController.m */; };
+		6CBD0DE2151EC30300D70779 /* KMTextViewDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBD0DE1151EC30300D70779 /* KMTextViewDelegateProxy.m */; };
+		6CD5DFAA150F6DC8007A5DDE /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA8150F6DC8007A5DDE /* icon.png */; };
+		6CD5DFAB150F6DC8007A5DDE /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */; };
+		980CC8E419D51F3C0089BB57 /* KMURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 980CC8E319D51F3C0089BB57 /* KMURLProtocol.m */; };
+		980CC8E519D522060089BB57 /* KMURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 980CC8E219D51F3C0089BB57 /* KMURLProtocol.h */; };
+		980CC8E619D5221F0089BB57 /* KMURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 980CC8E319D51F3C0089BB57 /* KMURLProtocol.m */; };
+		980CC8E719D5222A0089BB57 /* KMURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 980CC8E319D51F3C0089BB57 /* KMURLProtocol.m */; };
+		980CC8E819D5223C0089BB57 /* KMURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 980CC8E219D51F3C0089BB57 /* KMURLProtocol.h */; };
+		980EEFD1196E19B7003F6A67 /* KeyboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F9D69C1954112F0087AA43 /* KeyboardViewController.m */; };
+		980EEFED196E1D64003F6A67 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F27FCB51157FE3CE00FBBA20 /* Keyman.bundle */; };
+		982899171ABB8D2400823833 /* KMKeyboardMenuView.m in Sources */ = {isa = PBXBuildFile; fileRef = 987F00061AB8FD0A00998116 /* KMKeyboardMenuView.m */; };
+		982899181ABB8D2500823833 /* KMKeyboardMenuView.m in Sources */ = {isa = PBXBuildFile; fileRef = 987F00061AB8FD0A00998116 /* KMKeyboardMenuView.m */; };
+		9839558619C13C3800AF3060 /* libKeyman.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98F9D6CA19541D220087AA43 /* libKeyman.a */; };
+		9841130B199D9B84005BD609 /* KMSubKeysView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9841130A199D9B84005BD609 /* KMSubKeysView.m */; };
+		984FD3EF17B48C670026ADA7 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984FD3EC17B48BBC0026ADA7 /* CoreText.framework */; };
+		9878F7711B8BF00F00360B8D /* NSString+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9878F76D1B8BF00F00360B8D /* NSString+Helpers.m */; };
+		9878F7721B8BF00F00360B8D /* UIButton+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9878F76F1B8BF00F00360B8D /* UIButton+Helpers.m */; };
+		9878F7731B8BF00F00360B8D /* UIView+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9878F7701B8BF00F00360B8D /* UIView+Helpers.m */; };
+		9878F7741B8BF01F00360B8D /* NSString+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9878F76D1B8BF00F00360B8D /* NSString+Helpers.m */; };
+		9878F7751B8BF01F00360B8D /* NSString+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9878F76D1B8BF00F00360B8D /* NSString+Helpers.m */; };
+		9878F7791B8BF07700360B8D /* UIButton+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9878F76F1B8BF00F00360B8D /* UIButton+Helpers.m */; };
+		9878F77A1B8BF07800360B8D /* UIButton+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9878F76F1B8BF00F00360B8D /* UIButton+Helpers.m */; };
+		9878F77D1B8BF07D00360B8D /* UIView+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9878F7701B8BF00F00360B8D /* UIView+Helpers.m */; };
+		9878F77E1B8BF07E00360B8D /* UIView+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9878F7701B8BF00F00360B8D /* UIView+Helpers.m */; };
+		987F00071AB8FD0A00998116 /* KMKeyboardMenuView.m in Sources */ = {isa = PBXBuildFile; fileRef = 987F00061AB8FD0A00998116 /* KMKeyboardMenuView.m */; };
+		987F3E9F1941AAB700209D4F /* KMKeyPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 989FDF91193C1C7100EECAF9 /* KMKeyPreviewView.m */; };
+		987F3EA01941AAC900209D4F /* KeyboardInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 989BDF31193D8CEC00278BBC /* KeyboardInfoViewController.m */; };
+		987F3EA11941AAE900209D4F /* KMKeyPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 989FDF91193C1C7100EECAF9 /* KMKeyPreviewView.m */; };
+		987F3EA21941AAF800209D4F /* KeyboardInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 989BDF31193D8CEC00278BBC /* KeyboardInfoViewController.m */; };
+		987F3EA31941ABF600209D4F /* KMKeyPreviewView.h in Headers */ = {isa = PBXBuildFile; fileRef = 989FDF90193C1C7100EECAF9 /* KMKeyPreviewView.h */; };
+		987F3EA41941AC0800209D4F /* KeyboardInfoViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 989BDF30193D8CEC00278BBC /* KeyboardInfoViewController.h */; };
+		987F3EA51941AC2700209D4F /* KMKeyPreviewView.h in Headers */ = {isa = PBXBuildFile; fileRef = 989FDF90193C1C7100EECAF9 /* KMKeyPreviewView.h */; };
+		987F3EA61941AC3400209D4F /* KeyboardInfoViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 989BDF30193D8CEC00278BBC /* KeyboardInfoViewController.h */; };
+		988B36B61ADF67290008752C /* inuktitut_pirurvik-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */; };
+		988B36B91ADF728A0008752C /* inuktitut_latin-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 988B36B71ADF728A0008752C /* inuktitut_latin-1.0.js */; };
+		988B36BA1ADF728A0008752C /* inuktitut_naqittaut-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 988B36B81ADF728A0008752C /* inuktitut_naqittaut-1.0.js */; };
+		989BDF32193D8CEC00278BBC /* KeyboardInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 989BDF31193D8CEC00278BBC /* KeyboardInfoViewController.m */; };
+		989FDF92193C1C7100EECAF9 /* KMKeyPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 989FDF91193C1C7100EECAF9 /* KMKeyPreviewView.m */; };
+		98A880EE177BF78400601A9E /* KMPopoverView.m in Sources */ = {isa = PBXBuildFile; fileRef = 98A880ED177BF78400601A9E /* KMPopoverView.m */; };
+		98ACCE0817A9EEEB00B7C780 /* KeyboardPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98C2648717A0F59900940E4F /* KeyboardPickerViewController.m */; };
+		98ACCE0917A9EF0700B7C780 /* LanguageDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98C0B11617A204BF007ECAFC /* LanguageDetailViewController.m */; };
+		98ACCE0A17A9EF1D00B7C780 /* LanguageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98C0B11317A20491007ECAFC /* LanguageViewController.m */; };
+		98ACCE0D17A9EF8C00B7C780 /* LanguageDetailViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 98C0B11517A204BF007ECAFC /* LanguageDetailViewController.h */; };
+		98ACCE0E17A9EF9700B7C780 /* LanguageViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 98C0B11217A20490007ECAFC /* LanguageViewController.h */; };
+		98ACCE0F17A9EFA500B7C780 /* KeyboardPickerViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 98C2648617A0F59900940E4F /* KeyboardPickerViewController.h */; };
+		98ACCE1117A9EFCE00B7C780 /* LanguageDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98C0B11617A204BF007ECAFC /* LanguageDetailViewController.m */; };
+		98ACCE1217A9EFE100B7C780 /* LanguageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98C0B11317A20491007ECAFC /* LanguageViewController.m */; };
+		98ACCE1317A9EFED00B7C780 /* KeyboardPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98C2648717A0F59900940E4F /* KeyboardPickerViewController.m */; };
+		98ACCE1517A9F01300B7C780 /* LanguageDetailViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 98C0B11517A204BF007ECAFC /* LanguageDetailViewController.h */; };
+		98ACCE1617A9F02300B7C780 /* LanguageViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 98C0B11217A20490007ECAFC /* LanguageViewController.h */; };
+		98ACCE1717A9F03000B7C780 /* KeyboardPickerViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 98C2648617A0F59900940E4F /* KeyboardPickerViewController.h */; };
+		98B34AB917F3B82000DF079E /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98B34AB817F3B82000DF079E /* AudioToolbox.framework */; };
+		98C0B11417A20493007ECAFC /* LanguageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98C0B11317A20491007ECAFC /* LanguageViewController.m */; };
+		98C0B11717A204BF007ECAFC /* LanguageDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98C0B11617A204BF007ECAFC /* LanguageDetailViewController.m */; };
+		98C2648817A0F59A00940E4F /* KeyboardPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98C2648717A0F59900940E4F /* KeyboardPickerViewController.m */; };
+		98D4190C17695E58008D2FF3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98D4190B17695E58008D2FF3 /* Default-568h@2x.png */; };
+		98E5B644177D49AF008A8723 /* KMPopoverView.h in Headers */ = {isa = PBXBuildFile; fileRef = 98A880EC177BF78400601A9E /* KMPopoverView.h */; };
+		98E5B645177D4A0B008A8723 /* KMPopoverView.m in Sources */ = {isa = PBXBuildFile; fileRef = 98A880ED177BF78400601A9E /* KMPopoverView.m */; };
+		98E5B646177D4A2B008A8723 /* KMPopoverView.m in Sources */ = {isa = PBXBuildFile; fileRef = 98A880ED177BF78400601A9E /* KMPopoverView.m */; };
+		98E5B647177D4A3B008A8723 /* KMPopoverView.h in Headers */ = {isa = PBXBuildFile; fileRef = 98A880EC177BF78400601A9E /* KMPopoverView.h */; };
+		98EF3BA619A5B03800A1365F /* KMSubKeysView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9841130A199D9B84005BD609 /* KMSubKeysView.m */; };
+		98EF3BA719A5B05000A1365F /* KMSubKeysView.h in Headers */ = {isa = PBXBuildFile; fileRef = 98411309199D9B84005BD609 /* KMSubKeysView.h */; };
+		98EF3BA819A5B06100A1365F /* KMSubKeysView.h in Headers */ = {isa = PBXBuildFile; fileRef = 98411309199D9B84005BD609 /* KMSubKeysView.h */; };
+		98EF3BA919A5B07100A1365F /* KMSubKeysView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9841130A199D9B84005BD609 /* KMSubKeysView.m */; };
+		98F9D692195402F90087AA43 /* KMTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C0A1406151EA8B3007FA4AD /* KMTextView.m */; };
+		98F9D6A01954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */; };
+		98F9D6A7195412620087AA43 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F26071FF158F8C6000F37184 /* libz.dylib */; };
+		98F9D6A81954126C0087AA43 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984FD3EC17B48BBC0026ADA7 /* CoreText.framework */; };
+		98F9D6A9195412720087AA43 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98B34AB817F3B82000DF079E /* AudioToolbox.framework */; };
+		98F9D6AA1954127F0087AA43 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2607203158F8CA200F37184 /* MobileCoreServices.framework */; };
+		98F9D6AB195412870087AA43 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2607201158F8C9600F37184 /* SystemConfiguration.framework */; };
+		98F9D6AC195412920087AA43 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F243888214BBD43100A3E055 /* UIKit.framework */; };
+		98F9D6AD1954129A0087AA43 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F243888614BBD43100A3E055 /* CoreGraphics.framework */; };
+		98F9D6AE195412A60087AA43 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F26071FD158F8C4600F37184 /* CFNetwork.framework */; };
+		98F9D6F019545AB60087AA43 /* KMInputViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F9D6EF19545AB60087AA43 /* KMInputViewController.m */; };
+		98F9D6F4195462C20087AA43 /* KMInputViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 98F9D6EE19545AB60087AA43 /* KMInputViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		98F9D6F5195463070087AA43 /* KMInputViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 98F9D6EE19545AB60087AA43 /* KMInputViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		98F9D6F61954632A0087AA43 /* KMInputViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F9D6EF19545AB60087AA43 /* KMInputViewController.m */; };
+		98F9D6F7195463390087AA43 /* KMInputViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F9D6EF19545AB60087AA43 /* KMInputViewController.m */; };
+		98FFB3D41B67006F00289F0E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98FFB3D31B67006F00289F0E /* WebKit.framework */; };
+		98FFB3D51B67008000289F0E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98FFB3D31B67006F00289F0E /* WebKit.framework */; };
+		CE25CCBD1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = CE25CCBC1F1DA7BB005AA2BC /* KMHTTPDownloader.m */; };
+		CE25CCBE1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = CE25CCBC1F1DA7BB005AA2BC /* KMHTTPDownloader.m */; };
+		CE25CCBF1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = CE25CCBC1F1DA7BB005AA2BC /* KMHTTPDownloader.m */; };
+		CE25CCC31F1DBF6F005AA2BC /* KMHTTPDownloadRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE25CCC21F1DBF6F005AA2BC /* KMHTTPDownloadRequest.m */; };
+		CE25CCC41F1F2310005AA2BC /* KMHTTPDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = CE25CCC01F1DA7D9005AA2BC /* KMHTTPDownloader.h */; };
+		CE25CCC51F1F2314005AA2BC /* KMHTTPDownloadRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE25CCC11F1DBF5A005AA2BC /* KMHTTPDownloadRequest.h */; };
+		CE25CCC61F1F2325005AA2BC /* KMHTTPDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = CE25CCC01F1DA7D9005AA2BC /* KMHTTPDownloader.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE25CCC71F1F2328005AA2BC /* KMHTTPDownloadRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE25CCC11F1DBF5A005AA2BC /* KMHTTPDownloadRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE25CCC81F1F2482005AA2BC /* KMHTTPDownloadRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE25CCC21F1DBF6F005AA2BC /* KMHTTPDownloadRequest.m */; };
+		CE25CCC91F1F2487005AA2BC /* KMHTTPDownloadRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE25CCC21F1DBF6F005AA2BC /* KMHTTPDownloadRequest.m */; };
+		CECB38951F2199BC0098882F /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = CECB38941F2199BC0098882F /* Reachability.m */; };
+		CECB38961F2199CF0098882F /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = CECB38941F2199BC0098882F /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		CECB38971F2199E40098882F /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = CECB38941F2199BC0098882F /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		CECB38981F2199FB0098882F /* Reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = CECB38931F2199BC0098882F /* Reachability.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CECB38991F219A010098882F /* Reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = CECB38931F2199BC0098882F /* Reachability.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F243888314BBD43100A3E055 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F243888214BBD43100A3E055 /* UIKit.framework */; };
+		F243888714BBD43100A3E055 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F243888614BBD43100A3E055 /* CoreGraphics.framework */; };
+		F243888F14BBD43100A3E055 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F243888E14BBD43100A3E055 /* main.m */; };
+		F26071FE158F8C4600F37184 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F26071FD158F8C4600F37184 /* CFNetwork.framework */; };
+		F2607200158F8C6000F37184 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F26071FF158F8C6000F37184 /* libz.dylib */; };
+		F2607202158F8C9600F37184 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2607201158F8C9600F37184 /* SystemConfiguration.framework */; };
+		F2607204158F8CA200F37184 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2607203158F8CA200F37184 /* MobileCoreServices.framework */; };
+		F273AB9915641EC500A47CEE /* KMManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F273AB9815641EC500A47CEE /* KMManager.m */; };
+		F273AB9C156440B700A47CEE /* KMTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = F273AB9315641C3F00A47CEE /* KMTextField.m */; };
+		F273ABA31564419700A47CEE /* KMTextFieldDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = F273ABA21564419700A47CEE /* KMTextFieldDelegateProxy.m */; };
+		F27FCA88157FB13B00FBBA20 /* KMManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F273AB9815641EC500A47CEE /* KMManager.m */; };
+		F27FCA8C157FB13B00FBBA20 /* KMTextViewDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBD0DE1151EC30300D70779 /* KMTextViewDelegateProxy.m */; };
+		F27FCA8E157FB13B00FBBA20 /* KMTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = F273AB9315641C3F00A47CEE /* KMTextField.m */; };
+		F27FCA90157FB13B00FBBA20 /* KMTextFieldDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = F273ABA21564419700A47CEE /* KMTextFieldDelegateProxy.m */; };
+		F27FCAC9157FD15900FBBA20 /* KMManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F273AB9815641EC500A47CEE /* KMManager.m */; };
+		F27FCACA157FD15900FBBA20 /* KMTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C0A1406151EA8B3007FA4AD /* KMTextView.m */; };
+		F27FCACB157FD15900FBBA20 /* KMTextViewDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBD0DE1151EC30300D70779 /* KMTextViewDelegateProxy.m */; };
+		F27FCACC157FD15900FBBA20 /* KMTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = F273AB9315641C3F00A47CEE /* KMTextField.m */; };
+		F27FCACD157FD15900FBBA20 /* KMTextFieldDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = F273ABA21564419700A47CEE /* KMTextFieldDelegateProxy.m */; };
+		F27FCAD4157FD43B00FBBA20 /* KMManager.h in Headers */ = {isa = PBXBuildFile; fileRef = F273AB9715641EC500A47CEE /* KMManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F27FCAD5157FD43B00FBBA20 /* KMTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C0A1405151EA8B3007FA4AD /* KMTextView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F27FCAD6157FD43B00FBBA20 /* KMTextViewDelegateProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CBD0DE0151EC30300D70779 /* KMTextViewDelegateProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F27FCAD7157FD43B00FBBA20 /* KMTextField.h in Headers */ = {isa = PBXBuildFile; fileRef = F273AB9215641C3F00A47CEE /* KMTextField.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F27FCAE1157FD49B00FBBA20 /* KMManager.h in Headers */ = {isa = PBXBuildFile; fileRef = F273AB9715641EC500A47CEE /* KMManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F27FCAE2157FD49B00FBBA20 /* KMTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C0A1405151EA8B3007FA4AD /* KMTextView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F27FCAE3157FD49B00FBBA20 /* KMTextViewDelegateProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CBD0DE0151EC30300D70779 /* KMTextViewDelegateProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F27FCAE4157FD49B00FBBA20 /* KMTextField.h in Headers */ = {isa = PBXBuildFile; fileRef = F273AB9215641C3F00A47CEE /* KMTextField.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F27FCAE5157FD49B00FBBA20 /* KMTextFieldDelegateProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = F273ABA11564419700A47CEE /* KMTextFieldDelegateProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F27FCB52157FE3CE00FBBA20 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F27FCB51157FE3CE00FBBA20 /* Keyman.bundle */; };
+		F27FCB69157FFE8B00FBBA20 /* KMTextFieldDelegateProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = F273ABA11564419700A47CEE /* KMTextFieldDelegateProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F27FCB6A157FFEA500FBBA20 /* Keyman.h in Headers */ = {isa = PBXBuildFile; fileRef = F27FCB67157FFE0B00FBBA20 /* Keyman.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F27FCB6B157FFEB000FBBA20 /* Keyman.h in Headers */ = {isa = PBXBuildFile; fileRef = F27FCB67157FFE0B00FBBA20 /* Keyman.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F27FCB7015802DA000FBBA20 /* CWLSynthesizeSingleton.h in Headers */ = {isa = PBXBuildFile; fileRef = F273AB9A15641F0E00A47CEE /* CWLSynthesizeSingleton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F27FCB7115802DC900FBBA20 /* CWLSynthesizeSingleton.h in Headers */ = {isa = PBXBuildFile; fileRef = F273AB9A15641F0E00A47CEE /* CWLSynthesizeSingleton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F2A0F5271590D48000AAB449 /* KeyboardNameTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = F2A0F5241590D48000AAB449 /* KeyboardNameTableViewCell.h */; };
+		F2A0F52A1590D48000AAB449 /* KeyboardNameTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F2A0F5251590D48000AAB449 /* KeyboardNameTableViewCell.m */; };
+		F2BE11001590D5E20091654B /* KeyboardNameTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = F2A0F5241590D48000AAB449 /* KeyboardNameTableViewCell.h */; };
+		F2BE11011590D5E20091654B /* KeyboardNameTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F2A0F5251590D48000AAB449 /* KeyboardNameTableViewCell.m */; };
+		F2BE11051590D5F50091654B /* KeyboardNameTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F2A0F5251590D48000AAB449 /* KeyboardNameTableViewCell.m */; };
+		F2DFDDB615A345420028D3C7 /* KMKeyboardPickerBarButtonItem.h in Headers */ = {isa = PBXBuildFile; fileRef = F2DFDDB415A345420028D3C7 /* KMKeyboardPickerBarButtonItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F2DFDDB715A345420028D3C7 /* KMKeyboardPickerBarButtonItem.h in Headers */ = {isa = PBXBuildFile; fileRef = F2DFDDB415A345420028D3C7 /* KMKeyboardPickerBarButtonItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F2DFDDB815A345420028D3C7 /* KMKeyboardPickerBarButtonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = F2DFDDB515A345420028D3C7 /* KMKeyboardPickerBarButtonItem.m */; };
+		F2DFDDB915A345420028D3C7 /* KMKeyboardPickerBarButtonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = F2DFDDB515A345420028D3C7 /* KMKeyboardPickerBarButtonItem.m */; };
+		F2DFDDBA15A345420028D3C7 /* KMKeyboardPickerBarButtonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = F2DFDDB515A345420028D3C7 /* KMKeyboardPickerBarButtonItem.m */; };
+		F2F1039B15A35F4200D76D84 /* KMKeyboardPickerButton.h in Headers */ = {isa = PBXBuildFile; fileRef = F2F1039915A35F4200D76D84 /* KMKeyboardPickerButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F2F1039C15A35F4200D76D84 /* KMKeyboardPickerButton.h in Headers */ = {isa = PBXBuildFile; fileRef = F2F1039915A35F4200D76D84 /* KMKeyboardPickerButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F2F1039D15A35F4200D76D84 /* KMKeyboardPickerButton.m in Sources */ = {isa = PBXBuildFile; fileRef = F2F1039A15A35F4200D76D84 /* KMKeyboardPickerButton.m */; };
+		F2F1039E15A35F4200D76D84 /* KMKeyboardPickerButton.m in Sources */ = {isa = PBXBuildFile; fileRef = F2F1039A15A35F4200D76D84 /* KMKeyboardPickerButton.m */; };
+		F2F1039F15A35F4200D76D84 /* KMKeyboardPickerButton.m in Sources */ = {isa = PBXBuildFile; fileRef = F2F1039A15A35F4200D76D84 /* KMKeyboardPickerButton.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		98F9D69E1954112F0087AA43 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F243887514BBD43000A3E055 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 98F9D6961954112F0087AA43;
+			remoteInfo = SystemKeyboard;
+		};
+		98F9D6A11954112F0087AA43 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F243887514BBD43000A3E055 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 98F9D6961954112F0087AA43;
+			remoteInfo = SystemKeyboard;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		98F9D6A61954112F0087AA43 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				98F9D6A01954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		6C0A13FC151EA2CA007FA4AD /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
+		6C0A1405151EA8B3007FA4AD /* KMTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = KMTextView.h; path = Classes/KMTextView.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		6C0A1406151EA8B3007FA4AD /* KMTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = KMTextView.m; path = Classes/KMTextView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		6C0A1408151EA925007FA4AD /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Classes/AppDelegate.h; sourceTree = "<group>"; };
+		6C0A1409151EA925007FA4AD /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Classes/AppDelegate.m; sourceTree = "<group>"; };
+		6C0A140A151EA925007FA4AD /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = MainViewController.h; path = Classes/MainViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		6C0A140B151EA925007FA4AD /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = MainViewController.m; path = Classes/MainViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		6C0A140E151EA930007FA4AD /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Config/Debug.xcconfig; sourceTree = "<group>"; };
+		6C0A140F151EA930007FA4AD /* Keyman.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; lineEnding = 0; name = Keyman.xcconfig; path = Config/Keyman.xcconfig; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcconfig; };
+		6C0A1410151EA930007FA4AD /* Project.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; lineEnding = 0; name = Project.xcconfig; path = Config/Project.xcconfig; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcconfig; };
+		6C0A1411151EA930007FA4AD /* Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; lineEnding = 0; name = Release.xcconfig; path = Config/Release.xcconfig; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcconfig; };
+		6CBD0DE0151EC30300D70779 /* KMTextViewDelegateProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = KMTextViewDelegateProxy.h; path = Classes/KMTextViewDelegateProxy.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		6CBD0DE1151EC30300D70779 /* KMTextViewDelegateProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = KMTextViewDelegateProxy.m; path = Classes/KMTextViewDelegateProxy.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		6CD5DFA8150F6DC8007A5DDE /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
+		6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x.png"; sourceTree = "<group>"; };
+		980CC8E219D51F3C0089BB57 /* KMURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KMURLProtocol.h; path = Classes/KMURLProtocol.h; sourceTree = "<group>"; };
+		980CC8E319D51F3C0089BB57 /* KMURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMURLProtocol.m; path = Classes/KMURLProtocol.m; sourceTree = "<group>"; };
+		98411309199D9B84005BD609 /* KMSubKeysView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KMSubKeysView.h; path = Classes/KMSubKeysView.h; sourceTree = "<group>"; };
+		9841130A199D9B84005BD609 /* KMSubKeysView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMSubKeysView.m; path = Classes/KMSubKeysView.m; sourceTree = "<group>"; };
+		98493BF71993370200845D28 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		984FA1F51974C0B30037EE5D /* Tavultesoft.KMEI.SystemKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Tavultesoft.KMEI.SystemKeyboard.entitlements; sourceTree = "<group>"; };
+		984FA1F61974C0EF0037EE5D /* KMEI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = KMEI.entitlements; sourceTree = "<group>"; };
+		984FD3EC17B48BBC0026ADA7 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
+		9878F76C1B8BF00F00360B8D /* NSString+Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+Helpers.h"; path = "Classes/Categories/NSString+Helpers.h"; sourceTree = "<group>"; };
+		9878F76D1B8BF00F00360B8D /* NSString+Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+Helpers.m"; path = "Classes/Categories/NSString+Helpers.m"; sourceTree = "<group>"; };
+		9878F76E1B8BF00F00360B8D /* UIButton+Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIButton+Helpers.h"; path = "Classes/Categories/UIButton+Helpers.h"; sourceTree = "<group>"; };
+		9878F76F1B8BF00F00360B8D /* UIButton+Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIButton+Helpers.m"; path = "Classes/Categories/UIButton+Helpers.m"; sourceTree = "<group>"; };
+		9878F7701B8BF00F00360B8D /* UIView+Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIView+Helpers.m"; path = "Classes/Categories/UIView+Helpers.m"; sourceTree = "<group>"; };
+		9878F7781B8BF05F00360B8D /* UIView+Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIView+Helpers.h"; path = "Classes/Categories/UIView+Helpers.h"; sourceTree = "<group>"; };
+		987F00051AB8FD0A00998116 /* KMKeyboardMenuView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KMKeyboardMenuView.h; path = Classes/KMKeyboardMenuView.h; sourceTree = "<group>"; };
+		987F00061AB8FD0A00998116 /* KMKeyboardMenuView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMKeyboardMenuView.m; path = Classes/KMKeyboardMenuView.m; sourceTree = "<group>"; };
+		988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_pirurvik-1.0.js"; path = "Keyboards/inuktitut_pirurvik-1.0.js"; sourceTree = SOURCE_ROOT; };
+		988B36B71ADF728A0008752C /* inuktitut_latin-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_latin-1.0.js"; path = "Keyboards/inuktitut_latin-1.0.js"; sourceTree = SOURCE_ROOT; };
+		988B36B81ADF728A0008752C /* inuktitut_naqittaut-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_naqittaut-1.0.js"; path = "Keyboards/inuktitut_naqittaut-1.0.js"; sourceTree = SOURCE_ROOT; };
+		989BDF30193D8CEC00278BBC /* KeyboardInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeyboardInfoViewController.h; path = Classes/KeyboardInfoViewController.h; sourceTree = "<group>"; };
+		989BDF31193D8CEC00278BBC /* KeyboardInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeyboardInfoViewController.m; path = Classes/KeyboardInfoViewController.m; sourceTree = "<group>"; };
+		989FDF90193C1C7100EECAF9 /* KMKeyPreviewView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KMKeyPreviewView.h; path = Classes/KMKeyPreviewView.h; sourceTree = "<group>"; };
+		989FDF91193C1C7100EECAF9 /* KMKeyPreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMKeyPreviewView.m; path = Classes/KMKeyPreviewView.m; sourceTree = "<group>"; };
+		98A880EC177BF78400601A9E /* KMPopoverView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = KMPopoverView.h; path = Classes/KMPopoverView.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		98A880ED177BF78400601A9E /* KMPopoverView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = KMPopoverView.m; path = Classes/KMPopoverView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		98B34AB817F3B82000DF079E /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		98C0B11217A20490007ECAFC /* LanguageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = LanguageViewController.h; path = Classes/LanguagePicker/LanguageViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		98C0B11317A20491007ECAFC /* LanguageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = LanguageViewController.m; path = Classes/LanguagePicker/LanguageViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		98C0B11517A204BF007ECAFC /* LanguageDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = LanguageDetailViewController.h; path = Classes/LanguagePicker/LanguageDetailViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		98C0B11617A204BF007ECAFC /* LanguageDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = LanguageDetailViewController.m; path = Classes/LanguagePicker/LanguageDetailViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		98C2648617A0F59900940E4F /* KeyboardPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeyboardPickerViewController.h; path = Classes/LanguagePicker/KeyboardPickerViewController.h; sourceTree = "<group>"; };
+		98C2648717A0F59900940E4F /* KeyboardPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = KeyboardPickerViewController.m; path = Classes/LanguagePicker/KeyboardPickerViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		98D4190B17695E58008D2FF3 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Tavultesoft.KMEI.SystemKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		98F9D69A1954112F0087AA43 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		98F9D69B1954112F0087AA43 /* KeyboardViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyboardViewController.h; sourceTree = "<group>"; };
+		98F9D69C1954112F0087AA43 /* KeyboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeyboardViewController.m; sourceTree = "<group>"; };
+		98F9D6CA19541D220087AA43 /* libKeyman.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libKeyman.a; path = "DerivedData/KeymanEngine/Build/Products/Debug-iphoneos/libKeyman.a"; sourceTree = "<group>"; };
+		98F9D6EE19545AB60087AA43 /* KMInputViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KMInputViewController.h; path = Classes/KMInputViewController.h; sourceTree = "<group>"; };
+		98F9D6EF19545AB60087AA43 /* KMInputViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMInputViewController.m; path = Classes/KMInputViewController.m; sourceTree = "<group>"; };
+		98FFB3D31B67006F00289F0E /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		CE25CCBC1F1DA7BB005AA2BC /* KMHTTPDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMHTTPDownloader.m; path = Classes/KMHTTPDownloader.m; sourceTree = "<group>"; };
+		CE25CCC01F1DA7D9005AA2BC /* KMHTTPDownloader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KMHTTPDownloader.h; path = Classes/KMHTTPDownloader.h; sourceTree = "<group>"; };
+		CE25CCC11F1DBF5A005AA2BC /* KMHTTPDownloadRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KMHTTPDownloadRequest.h; path = Classes/KMHTTPDownloadRequest.h; sourceTree = "<group>"; };
+		CE25CCC21F1DBF6F005AA2BC /* KMHTTPDownloadRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMHTTPDownloadRequest.m; path = Classes/KMHTTPDownloadRequest.m; sourceTree = "<group>"; };
+		CECB38931F2199BC0098882F /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = KeymanEngine/lib/Reachability/Reachability.h; sourceTree = SOURCE_ROOT; };
+		CECB38941F2199BC0098882F /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = KeymanEngine/lib/Reachability/Reachability.m; sourceTree = SOURCE_ROOT; };
+		F243887E14BBD43000A3E055 /* KMEI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KMEI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F243888214BBD43100A3E055 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		F243888614BBD43100A3E055 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		F243888E14BBD43100A3E055 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = main.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		F243889014BBD43100A3E055 /* KeymanEngine-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KeymanEngine-Prefix.pch"; sourceTree = "<group>"; };
+		F26071FD158F8C4600F37184 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		F26071FF158F8C6000F37184 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		F2607201158F8C9600F37184 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		F2607203158F8CA200F37184 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		F273AB9215641C3F00A47CEE /* KMTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = KMTextField.h; path = Classes/KMTextField.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		F273AB9315641C3F00A47CEE /* KMTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = KMTextField.m; path = Classes/KMTextField.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		F273AB9715641EC500A47CEE /* KMManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = KMManager.h; path = Classes/KMManager.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		F273AB9815641EC500A47CEE /* KMManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = KMManager.m; path = Classes/KMManager.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		F273AB9A15641F0E00A47CEE /* CWLSynthesizeSingleton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CWLSynthesizeSingleton.h; path = Classes/CWLSynthesizeSingleton.h; sourceTree = "<group>"; };
+		F273AB9B1564207600A47CEE /* KMManager+Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = "KMManager+Internal.h"; path = "Classes/KMManager+Internal.h"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		F273ABA11564419700A47CEE /* KMTextFieldDelegateProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = KMTextFieldDelegateProxy.h; path = Classes/KMTextFieldDelegateProxy.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		F273ABA21564419700A47CEE /* KMTextFieldDelegateProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = KMTextFieldDelegateProxy.m; path = Classes/KMTextFieldDelegateProxy.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		F27FCA7B157FB0DB00FBBA20 /* libKME-iphoneos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libKME-iphoneos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F27FCA7F157FB0DB00FBBA20 /* KME-iphoneos-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KME-iphoneos-Prefix.pch"; sourceTree = "<group>"; };
+		F27FCABE157FD10A00FBBA20 /* libKME-iphonesimulator.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libKME-iphonesimulator.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F27FCAC2157FD10A00FBBA20 /* KME-iphonesimulator-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KME-iphonesimulator-Prefix.pch"; sourceTree = "<group>"; };
+		F27FCAEE157FD59100FBBA20 /* Keyman-iphoneos.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = "Keyman-iphoneos.xcconfig"; path = "Config/Keyman-iphoneos.xcconfig"; sourceTree = "<group>"; };
+		F27FCAEF157FD59100FBBA20 /* Keyman-iphonesimulator.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = "Keyman-iphonesimulator.xcconfig"; path = "Config/Keyman-iphonesimulator.xcconfig"; sourceTree = "<group>"; };
+		F27FCAF6157FD95E00FBBA20 /* Keyman-lib.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; lineEnding = 0; name = "Keyman-lib.xcconfig"; path = "Config/Keyman-lib.xcconfig"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcconfig; };
+		F27FCB51157FE3CE00FBBA20 /* Keyman.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Keyman.bundle; path = KeymanEngine/resources/Keyman.bundle; sourceTree = "<group>"; };
+		F27FCB65157FF34800FBBA20 /* INSTRUCTIONS */ = {isa = PBXFileReference; lastKnownFileType = text; path = INSTRUCTIONS; sourceTree = "<group>"; };
+		F27FCB67157FFE0B00FBBA20 /* Keyman.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Keyman.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		F2A0F5241590D48000AAB449 /* KeyboardNameTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeyboardNameTableViewCell.h; path = Classes/LanguagePicker/KeyboardNameTableViewCell.h; sourceTree = "<group>"; };
+		F2A0F5251590D48000AAB449 /* KeyboardNameTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeyboardNameTableViewCell.m; path = Classes/LanguagePicker/KeyboardNameTableViewCell.m; sourceTree = "<group>"; };
+		F2DFDDB415A345420028D3C7 /* KMKeyboardPickerBarButtonItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = KMKeyboardPickerBarButtonItem.h; path = Classes/LanguagePicker/KMKeyboardPickerBarButtonItem.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		F2DFDDB515A345420028D3C7 /* KMKeyboardPickerBarButtonItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = KMKeyboardPickerBarButtonItem.m; path = Classes/LanguagePicker/KMKeyboardPickerBarButtonItem.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		F2F1039915A35F4200D76D84 /* KMKeyboardPickerButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = KMKeyboardPickerButton.h; path = Classes/LanguagePicker/KMKeyboardPickerButton.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		F2F1039A15A35F4200D76D84 /* KMKeyboardPickerButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = KMKeyboardPickerButton.m; path = Classes/LanguagePicker/KMKeyboardPickerButton.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		98F9D6941954112F0087AA43 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				98FFB3D51B67008000289F0E /* WebKit.framework in Frameworks */,
+				98F9D6AC195412920087AA43 /* UIKit.framework in Frameworks */,
+				98F9D6AB195412870087AA43 /* SystemConfiguration.framework in Frameworks */,
+				98F9D6AA1954127F0087AA43 /* MobileCoreServices.framework in Frameworks */,
+				98F9D6A7195412620087AA43 /* libz.dylib in Frameworks */,
+				9839558619C13C3800AF3060 /* libKeyman.a in Frameworks */,
+				98F9D6A81954126C0087AA43 /* CoreText.framework in Frameworks */,
+				98F9D6AD1954129A0087AA43 /* CoreGraphics.framework in Frameworks */,
+				98F9D6AE195412A60087AA43 /* CFNetwork.framework in Frameworks */,
+				98F9D6A9195412720087AA43 /* AudioToolbox.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F243887B14BBD43000A3E055 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				98FFB3D41B67006F00289F0E /* WebKit.framework in Frameworks */,
+				98B34AB917F3B82000DF079E /* AudioToolbox.framework in Frameworks */,
+				984FD3EF17B48C670026ADA7 /* CoreText.framework in Frameworks */,
+				F2607204158F8CA200F37184 /* MobileCoreServices.framework in Frameworks */,
+				F2607202158F8C9600F37184 /* SystemConfiguration.framework in Frameworks */,
+				F2607200158F8C6000F37184 /* libz.dylib in Frameworks */,
+				F26071FE158F8C4600F37184 /* CFNetwork.framework in Frameworks */,
+				F243888314BBD43100A3E055 /* UIKit.framework in Frameworks */,
+				F243888714BBD43100A3E055 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F27FCA78157FB0DB00FBBA20 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F27FCABB157FD10A00FBBA20 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6C0A13F9151EA151007FA4AD /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6CD5DFA8150F6DC8007A5DDE /* icon.png */,
+				6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */,
+			);
+			name = Resources;
+			path = KeymanEngine;
+			sourceTree = "<group>";
+		};
+		6C0A13FA151EA16F007FA4AD /* Web */ = {
+			isa = PBXGroup;
+			children = (
+				F27FCB51157FE3CE00FBBA20 /* Keyman.bundle */,
+			);
+			name = Web;
+			path = ..;
+			sourceTree = "<group>";
+		};
+		6C0A13FB151EA17C007FA4AD /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				6C0A1408151EA925007FA4AD /* AppDelegate.h */,
+				6C0A1409151EA925007FA4AD /* AppDelegate.m */,
+				6C0A140A151EA925007FA4AD /* MainViewController.h */,
+				6C0A140B151EA925007FA4AD /* MainViewController.m */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		6C0A13FE151EA3CF007FA4AD /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				6C0A1410151EA930007FA4AD /* Project.xcconfig */,
+				6C0A140E151EA930007FA4AD /* Debug.xcconfig */,
+				6C0A1411151EA930007FA4AD /* Release.xcconfig */,
+				6C0A140F151EA930007FA4AD /* Keyman.xcconfig */,
+				F27FCAEE157FD59100FBBA20 /* Keyman-iphoneos.xcconfig */,
+				F27FCAEF157FD59100FBBA20 /* Keyman-iphonesimulator.xcconfig */,
+				F27FCAF6157FD95E00FBBA20 /* Keyman-lib.xcconfig */,
+			);
+			name = Config;
+			sourceTree = "<group>";
+		};
+		980CC8E119D51EF00089BB57 /* KMURLProtocol */ = {
+			isa = PBXGroup;
+			children = (
+				980CC8E219D51F3C0089BB57 /* KMURLProtocol.h */,
+				980CC8E319D51F3C0089BB57 /* KMURLProtocol.m */,
+			);
+			name = KMURLProtocol;
+			sourceTree = "<group>";
+		};
+		98196DE4187BB0D200F001C3 /* TestHarness */ = {
+			isa = PBXGroup;
+			children = (
+				988B36B41ADF67180008752C /* Keyboards */,
+				6C0A13FB151EA17C007FA4AD /* Classes */,
+			);
+			name = TestHarness;
+			path = KeymanEngine;
+			sourceTree = "<group>";
+		};
+		98411308199D9ACD005BD609 /* SubKeysView */ = {
+			isa = PBXGroup;
+			children = (
+				98411309199D9B84005BD609 /* KMSubKeysView.h */,
+				9841130A199D9B84005BD609 /* KMSubKeysView.m */,
+			);
+			name = SubKeysView;
+			sourceTree = "<group>";
+		};
+		987F00041AB8FCB700998116 /* KeyboardMenuView */ = {
+			isa = PBXGroup;
+			children = (
+				987F00051AB8FD0A00998116 /* KMKeyboardMenuView.h */,
+				987F00061AB8FD0A00998116 /* KMKeyboardMenuView.m */,
+			);
+			name = KeyboardMenuView;
+			sourceTree = "<group>";
+		};
+		988B36B41ADF67180008752C /* Keyboards */ = {
+			isa = PBXGroup;
+			children = (
+				988B36B71ADF728A0008752C /* inuktitut_latin-1.0.js */,
+				988B36B81ADF728A0008752C /* inuktitut_naqittaut-1.0.js */,
+				988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */,
+			);
+			name = Keyboards;
+			sourceTree = "<group>";
+		};
+		989FDF8C193C1B0C00EECAF9 /* KeyPreviewView */ = {
+			isa = PBXGroup;
+			children = (
+				989FDF90193C1C7100EECAF9 /* KMKeyPreviewView.h */,
+				989FDF91193C1C7100EECAF9 /* KMKeyPreviewView.m */,
+			);
+			name = KeyPreviewView;
+			sourceTree = "<group>";
+		};
+		98A880EF177BF82600601A9E /* PopoverView */ = {
+			isa = PBXGroup;
+			children = (
+				98A880ED177BF78400601A9E /* KMPopoverView.m */,
+				98A880EC177BF78400601A9E /* KMPopoverView.h */,
+			);
+			name = PopoverView;
+			sourceTree = "<group>";
+		};
+		98C0B11817A22DB5007ECAFC /* PickerButtons */ = {
+			isa = PBXGroup;
+			children = (
+				F2DFDDB415A345420028D3C7 /* KMKeyboardPickerBarButtonItem.h */,
+				F2DFDDB515A345420028D3C7 /* KMKeyboardPickerBarButtonItem.m */,
+				F2F1039915A35F4200D76D84 /* KMKeyboardPickerButton.h */,
+				F2F1039A15A35F4200D76D84 /* KMKeyboardPickerButton.m */,
+			);
+			name = PickerButtons;
+			sourceTree = "<group>";
+		};
+		98C0B11C17A2302E007ECAFC /* TableViewCells */ = {
+			isa = PBXGroup;
+			children = (
+				F2A0F5241590D48000AAB449 /* KeyboardNameTableViewCell.h */,
+				F2A0F5251590D48000AAB449 /* KeyboardNameTableViewCell.m */,
+			);
+			name = TableViewCells;
+			sourceTree = "<group>";
+		};
+		98F9D6981954112F0087AA43 /* SystemKeyboard */ = {
+			isa = PBXGroup;
+			children = (
+				984FA1F51974C0B30037EE5D /* Tavultesoft.KMEI.SystemKeyboard.entitlements */,
+				98F9D69B1954112F0087AA43 /* KeyboardViewController.h */,
+				98F9D69C1954112F0087AA43 /* KeyboardViewController.m */,
+				98F9D6991954112F0087AA43 /* Supporting Files */,
+			);
+			path = SystemKeyboard;
+			sourceTree = "<group>";
+		};
+		98F9D6991954112F0087AA43 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				98F9D69A1954112F0087AA43 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		98F9D6ED19545A620087AA43 /* KMInputViewController */ = {
+			isa = PBXGroup;
+			children = (
+				98F9D6EE19545AB60087AA43 /* KMInputViewController.h */,
+				98F9D6EF19545AB60087AA43 /* KMInputViewController.m */,
+			);
+			name = KMInputViewController;
+			sourceTree = "<group>";
+		};
+		CE25CCBB1F1DA72A005AA2BC /* KMHTTPRequest */ = {
+			isa = PBXGroup;
+			children = (
+				CE25CCBC1F1DA7BB005AA2BC /* KMHTTPDownloader.m */,
+				CE25CCC01F1DA7D9005AA2BC /* KMHTTPDownloader.h */,
+				CE25CCC11F1DBF5A005AA2BC /* KMHTTPDownloadRequest.h */,
+				CE25CCC21F1DBF6F005AA2BC /* KMHTTPDownloadRequest.m */,
+			);
+			name = KMHTTPRequest;
+			sourceTree = "<group>";
+		};
+		F243887314BBD43000A3E055 = {
+			isa = PBXGroup;
+			children = (
+				98D4190B17695E58008D2FF3 /* Default-568h@2x.png */,
+				F243888114BBD43000A3E055 /* Frameworks */,
+				F243888814BBD43100A3E055 /* KeymanEngine */,
+				F27FCA7D157FB0DB00FBBA20 /* KME-iphoneos */,
+				F27FCAC0157FD10A00FBBA20 /* KME-iphonesimulator */,
+				984FA1F61974C0EF0037EE5D /* KMEI.entitlements */,
+				F243887F14BBD43000A3E055 /* Products */,
+				6C0A13F9151EA151007FA4AD /* Resources */,
+				F243888914BBD43100A3E055 /* Supporting Files */,
+				98F9D6981954112F0087AA43 /* SystemKeyboard */,
+				98196DE4187BB0D200F001C3 /* TestHarness */,
+			);
+			sourceTree = "<group>";
+		};
+		F243887F14BBD43000A3E055 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F243887E14BBD43000A3E055 /* KMEI.app */,
+				F27FCA7B157FB0DB00FBBA20 /* libKME-iphoneos.a */,
+				F27FCABE157FD10A00FBBA20 /* libKME-iphonesimulator.a */,
+				98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F243888114BBD43000A3E055 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				98B34AB817F3B82000DF079E /* AudioToolbox.framework */,
+				F26071FD158F8C4600F37184 /* CFNetwork.framework */,
+				F243888614BBD43100A3E055 /* CoreGraphics.framework */,
+				984FD3EC17B48BBC0026ADA7 /* CoreText.framework */,
+				98F9D6CA19541D220087AA43 /* libKeyman.a */,
+				F26071FF158F8C6000F37184 /* libz.dylib */,
+				F2607203158F8CA200F37184 /* MobileCoreServices.framework */,
+				98493BF71993370200845D28 /* QuartzCore.framework */,
+				F2607201158F8C9600F37184 /* SystemConfiguration.framework */,
+				F243888214BBD43100A3E055 /* UIKit.framework */,
+				98FFB3D31B67006F00289F0E /* WebKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F243888814BBD43100A3E055 /* KeymanEngine */ = {
+			isa = PBXGroup;
+			children = (
+				F273AB9515641C5800A47CEE /* SDK */,
+			);
+			path = KeymanEngine;
+			sourceTree = "<group>";
+		};
+		F243888914BBD43100A3E055 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				6C0A13FE151EA3CF007FA4AD /* Config */,
+				F243888E14BBD43100A3E055 /* main.m */,
+				F243889014BBD43100A3E055 /* KeymanEngine-Prefix.pch */,
+				6C0A13FC151EA2CA007FA4AD /* TODO */,
+				F27FCB65157FF34800FBBA20 /* INSTRUCTIONS */,
+			);
+			name = "Supporting Files";
+			path = KeymanEngine;
+			sourceTree = "<group>";
+		};
+		F2606FC4158F8B8600F37184 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				F26071F5158F8BE600F37184 /* Reachability */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		F26071F5158F8BE600F37184 /* Reachability */ = {
+			isa = PBXGroup;
+			children = (
+				CECB38931F2199BC0098882F /* Reachability.h */,
+				CECB38941F2199BC0098882F /* Reachability.m */,
+			);
+			name = Reachability;
+			path = asihttprequest/External/Reachability;
+			sourceTree = "<group>";
+		};
+		F2607212158FBCB500F37184 /* KeyboardPicker */ = {
+			isa = PBXGroup;
+			children = (
+				989BDF30193D8CEC00278BBC /* KeyboardInfoViewController.h */,
+				989BDF31193D8CEC00278BBC /* KeyboardInfoViewController.m */,
+				98C2648617A0F59900940E4F /* KeyboardPickerViewController.h */,
+				98C2648717A0F59900940E4F /* KeyboardPickerViewController.m */,
+				98C0B11517A204BF007ECAFC /* LanguageDetailViewController.h */,
+				98C0B11617A204BF007ECAFC /* LanguageDetailViewController.m */,
+				98C0B11217A20490007ECAFC /* LanguageViewController.h */,
+				98C0B11317A20491007ECAFC /* LanguageViewController.m */,
+				98C0B11817A22DB5007ECAFC /* PickerButtons */,
+				98C0B11C17A2302E007ECAFC /* TableViewCells */,
+			);
+			name = KeyboardPicker;
+			sourceTree = "<group>";
+		};
+		F273AB9515641C5800A47CEE /* SDK */ = {
+			isa = PBXGroup;
+			children = (
+				F2606FC4158F8B8600F37184 /* lib */,
+				6C0A13FA151EA16F007FA4AD /* Web */,
+				F273AB9615641D9300A47CEE /* Classes */,
+			);
+			name = SDK;
+			sourceTree = "<group>";
+		};
+		F273AB9615641D9300A47CEE /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				CE25CCBB1F1DA72A005AA2BC /* KMHTTPRequest */,
+				987F00041AB8FCB700998116 /* KeyboardMenuView */,
+				980CC8E119D51EF00089BB57 /* KMURLProtocol */,
+				98411308199D9ACD005BD609 /* SubKeysView */,
+				98F9D6ED19545A620087AA43 /* KMInputViewController */,
+				989FDF8C193C1B0C00EECAF9 /* KeyPreviewView */,
+				F273AB9F156440DC00A47CEE /* Categories */,
+				F2607212158FBCB500F37184 /* KeyboardPicker */,
+				F27FCB67157FFE0B00FBBA20 /* Keyman.h */,
+				F273AB9B1564207600A47CEE /* KMManager+Internal.h */,
+				F273AB9715641EC500A47CEE /* KMManager.h */,
+				F273AB9815641EC500A47CEE /* KMManager.m */,
+				F273ABA0156440FF00A47CEE /* Macros */,
+				98A880EF177BF82600601A9E /* PopoverView */,
+				F273AB9E156440CD00A47CEE /* UITextField */,
+				F273AB9D156440BA00A47CEE /* UITextView */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		F273AB9D156440BA00A47CEE /* UITextView */ = {
+			isa = PBXGroup;
+			children = (
+				6CBD0DE1151EC30300D70779 /* KMTextViewDelegateProxy.m */,
+				6C0A1405151EA8B3007FA4AD /* KMTextView.h */,
+				6C0A1406151EA8B3007FA4AD /* KMTextView.m */,
+				6CBD0DE0151EC30300D70779 /* KMTextViewDelegateProxy.h */,
+			);
+			name = UITextView;
+			sourceTree = "<group>";
+		};
+		F273AB9E156440CD00A47CEE /* UITextField */ = {
+			isa = PBXGroup;
+			children = (
+				F273AB9215641C3F00A47CEE /* KMTextField.h */,
+				F273AB9315641C3F00A47CEE /* KMTextField.m */,
+				F273ABA11564419700A47CEE /* KMTextFieldDelegateProxy.h */,
+				F273ABA21564419700A47CEE /* KMTextFieldDelegateProxy.m */,
+			);
+			name = UITextField;
+			sourceTree = "<group>";
+		};
+		F273AB9F156440DC00A47CEE /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				9878F76C1B8BF00F00360B8D /* NSString+Helpers.h */,
+				9878F76D1B8BF00F00360B8D /* NSString+Helpers.m */,
+				9878F76E1B8BF00F00360B8D /* UIButton+Helpers.h */,
+				9878F76F1B8BF00F00360B8D /* UIButton+Helpers.m */,
+				9878F7781B8BF05F00360B8D /* UIView+Helpers.h */,
+				9878F7701B8BF00F00360B8D /* UIView+Helpers.m */,
+			);
+			name = Categories;
+			sourceTree = "<group>";
+		};
+		F273ABA0156440FF00A47CEE /* Macros */ = {
+			isa = PBXGroup;
+			children = (
+				F273AB9A15641F0E00A47CEE /* CWLSynthesizeSingleton.h */,
+			);
+			name = Macros;
+			sourceTree = "<group>";
+		};
+		F27FCA7D157FB0DB00FBBA20 /* KME-iphoneos */ = {
+			isa = PBXGroup;
+			children = (
+				F27FCA7E157FB0DB00FBBA20 /* Supporting Files */,
+			);
+			path = "KME-iphoneos";
+			sourceTree = "<group>";
+		};
+		F27FCA7E157FB0DB00FBBA20 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F27FCA7F157FB0DB00FBBA20 /* KME-iphoneos-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F27FCAC0157FD10A00FBBA20 /* KME-iphonesimulator */ = {
+			isa = PBXGroup;
+			children = (
+				F27FCAC1157FD10A00FBBA20 /* Supporting Files */,
+			);
+			path = "KME-iphonesimulator";
+			sourceTree = "<group>";
+		};
+		F27FCAC1157FD10A00FBBA20 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F27FCAC2157FD10A00FBBA20 /* KME-iphonesimulator-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		F27FCA79157FB0DB00FBBA20 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F27FCB7115802DC900FBBA20 /* CWLSynthesizeSingleton.h in Headers */,
+				98F9D6F4195462C20087AA43 /* KMInputViewController.h in Headers */,
+				F27FCB6A157FFEA500FBBA20 /* Keyman.h in Headers */,
+				F27FCAD4157FD43B00FBBA20 /* KMManager.h in Headers */,
+				F27FCAD5157FD43B00FBBA20 /* KMTextView.h in Headers */,
+				F27FCAD6157FD43B00FBBA20 /* KMTextViewDelegateProxy.h in Headers */,
+				F27FCAD7157FD43B00FBBA20 /* KMTextField.h in Headers */,
+				F27FCB69157FFE8B00FBBA20 /* KMTextFieldDelegateProxy.h in Headers */,
+				F2DFDDB615A345420028D3C7 /* KMKeyboardPickerBarButtonItem.h in Headers */,
+				F2F1039B15A35F4200D76D84 /* KMKeyboardPickerButton.h in Headers */,
+				CECB38981F2199FB0098882F /* Reachability.h in Headers */,
+				CE25CCC71F1F2328005AA2BC /* KMHTTPDownloadRequest.h in Headers */,
+				CE25CCC61F1F2325005AA2BC /* KMHTTPDownloader.h in Headers */,
+				98EF3BA719A5B05000A1365F /* KMSubKeysView.h in Headers */,
+				980CC8E519D522060089BB57 /* KMURLProtocol.h in Headers */,
+				987F3EA41941AC0800209D4F /* KeyboardInfoViewController.h in Headers */,
+				987F3EA31941ABF600209D4F /* KMKeyPreviewView.h in Headers */,
+				98ACCE0F17A9EFA500B7C780 /* KeyboardPickerViewController.h in Headers */,
+				98ACCE0E17A9EF9700B7C780 /* LanguageViewController.h in Headers */,
+				98ACCE0D17A9EF8C00B7C780 /* LanguageDetailViewController.h in Headers */,
+				98E5B644177D49AF008A8723 /* KMPopoverView.h in Headers */,
+				F2BE11001590D5E20091654B /* KeyboardNameTableViewCell.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F27FCABC157FD10A00FBBA20 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F27FCB7015802DA000FBBA20 /* CWLSynthesizeSingleton.h in Headers */,
+				98F9D6F5195463070087AA43 /* KMInputViewController.h in Headers */,
+				F27FCB6B157FFEB000FBBA20 /* Keyman.h in Headers */,
+				F27FCAE1157FD49B00FBBA20 /* KMManager.h in Headers */,
+				F27FCAE2157FD49B00FBBA20 /* KMTextView.h in Headers */,
+				F27FCAE3157FD49B00FBBA20 /* KMTextViewDelegateProxy.h in Headers */,
+				F27FCAE4157FD49B00FBBA20 /* KMTextField.h in Headers */,
+				F2DFDDB715A345420028D3C7 /* KMKeyboardPickerBarButtonItem.h in Headers */,
+				F2F1039C15A35F4200D76D84 /* KMKeyboardPickerButton.h in Headers */,
+				F27FCAE5157FD49B00FBBA20 /* KMTextFieldDelegateProxy.h in Headers */,
+				CECB38991F219A010098882F /* Reachability.h in Headers */,
+				98EF3BA819A5B06100A1365F /* KMSubKeysView.h in Headers */,
+				CE25CCC41F1F2310005AA2BC /* KMHTTPDownloader.h in Headers */,
+				CE25CCC51F1F2314005AA2BC /* KMHTTPDownloadRequest.h in Headers */,
+				987F3EA61941AC3400209D4F /* KeyboardInfoViewController.h in Headers */,
+				987F3EA51941AC2700209D4F /* KMKeyPreviewView.h in Headers */,
+				98ACCE1717A9F03000B7C780 /* KeyboardPickerViewController.h in Headers */,
+				98ACCE1617A9F02300B7C780 /* LanguageViewController.h in Headers */,
+				980CC8E819D5223C0089BB57 /* KMURLProtocol.h in Headers */,
+				98ACCE1517A9F01300B7C780 /* LanguageDetailViewController.h in Headers */,
+				98E5B647177D4A3B008A8723 /* KMPopoverView.h in Headers */,
+				F2A0F5271590D48000AAB449 /* KeyboardNameTableViewCell.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		98F9D6961954112F0087AA43 /* SystemKeyboard */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 98F9D6A31954112F0087AA43 /* Build configuration list for PBXNativeTarget "SystemKeyboard" */;
+			buildPhases = (
+				98F9D6931954112F0087AA43 /* Sources */,
+				98F9D6941954112F0087AA43 /* Frameworks */,
+				98F9D6951954112F0087AA43 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SystemKeyboard;
+			productName = SystemKeyboard;
+			productReference = 98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		F243887D14BBD43000A3E055 /* KMEI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F24388A514BBD43100A3E055 /* Build configuration list for PBXNativeTarget "KMEI" */;
+			buildPhases = (
+				F243887A14BBD43000A3E055 /* Sources */,
+				F243887B14BBD43000A3E055 /* Frameworks */,
+				F243887C14BBD43000A3E055 /* Resources */,
+				98F9D6A61954112F0087AA43 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				98F9D69F1954112F0087AA43 /* PBXTargetDependency */,
+				98F9D6A21954112F0087AA43 /* PBXTargetDependency */,
+			);
+			name = KMEI;
+			productName = Keyman;
+			productReference = F243887E14BBD43000A3E055 /* KMEI.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F27FCA7A157FB0DB00FBBA20 /* KME-iphoneos */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F27FCA83157FB0DB00FBBA20 /* Build configuration list for PBXNativeTarget "KME-iphoneos" */;
+			buildPhases = (
+				F27FCA77157FB0DB00FBBA20 /* Sources */,
+				F27FCA78157FB0DB00FBBA20 /* Frameworks */,
+				F27FCA79157FB0DB00FBBA20 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "KME-iphoneos";
+			productName = "Keyman-iphoneos";
+			productReference = F27FCA7B157FB0DB00FBBA20 /* libKME-iphoneos.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		F27FCABD157FD10A00FBBA20 /* KME-iphonesimulator */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F27FCAC6157FD10B00FBBA20 /* Build configuration list for PBXNativeTarget "KME-iphonesimulator" */;
+			buildPhases = (
+				F27FCABA157FD10A00FBBA20 /* Sources */,
+				F27FCABB157FD10A00FBBA20 /* Frameworks */,
+				F27FCABC157FD10A00FBBA20 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "KME-iphonesimulator";
+			productName = "Keyman-iphonesimulator";
+			productReference = F27FCABE157FD10A00FBBA20 /* libKME-iphonesimulator.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F243887514BBD43000A3E055 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0830;
+				ORGANIZATIONNAME = "SIL International";
+				TargetAttributes = {
+					98F9D6961954112F0087AA43 = {
+						CreatedOnToolsVersion = 6.0;
+						DevelopmentTeam = N4M8L6CCXN;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
+					};
+					F243887D14BBD43000A3E055 = {
+						DevelopmentTeam = 3YE4W86L3G;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = F243887814BBD43000A3E055 /* Build configuration list for PBXProject "KeymanEngine" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				English,
+			);
+			mainGroup = F243887314BBD43000A3E055;
+			productRefGroup = F243887F14BBD43000A3E055 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F243887D14BBD43000A3E055 /* KMEI */,
+				F27FCA7A157FB0DB00FBBA20 /* KME-iphoneos */,
+				F27FCABD157FD10A00FBBA20 /* KME-iphonesimulator */,
+				F27FCAF1157FD80900FBBA20 /* KME-lib */,
+				985C6C7E185527E400D5C0C2 /* KME-framework */,
+				98F9D6961954112F0087AA43 /* SystemKeyboard */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		98F9D6951954112F0087AA43 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				980EEFED196E1D64003F6A67 /* Keyman.bundle in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F243887C14BBD43000A3E055 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				988B36BA1ADF728A0008752C /* inuktitut_naqittaut-1.0.js in Resources */,
+				6CD5DFAA150F6DC8007A5DDE /* icon.png in Resources */,
+				6CD5DFAB150F6DC8007A5DDE /* icon@2x.png in Resources */,
+				F27FCB52157FE3CE00FBBA20 /* Keyman.bundle in Resources */,
+				988B36B61ADF67290008752C /* inuktitut_pirurvik-1.0.js in Resources */,
+				98D4190C17695E58008D2FF3 /* Default-568h@2x.png in Resources */,
+				988B36B91ADF728A0008752C /* inuktitut_latin-1.0.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		985C6C7F185527E400D5C0C2 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#rm -rf ${BUILT_PRODUCTS_DIR}/libKeyman.a\n\n#lipo -create \"${BUILT_PRODUCTS_DIR}/../${CONFIGURATION}-iphonesimulator/libKME-iphonesimulator.a\" \"${BUILT_PRODUCTS_DIR}/libKME-iphoneos.a\" -output \"${BUILT_PRODUCTS_DIR}/libKeyman.a\"\n\n# name and build location\nFRAMEWORK_NAME=${PROJECT_NAME}\nFRAMEWORK_BUILD_PATH=\"${PROJECT_DIR}/build/Framework\"\n\n# these never change\nFRAMEWORK_VERSION=A\nFRAMEWORK_CURRENT_VERSION=1\nFRAMEWORK_COMPATIBILITY_VERSION=1\n\n# Clean any existing framework that might be there\nif [ -d \"$FRAMEWORK_BUILD_PATH\" ]\nthen\necho \"Framework: Cleaning framework...\"\nrm -rf \"$FRAMEWORK_BUILD_PATH\"\nfi\n\n# Build the canonical Framework bundle directory structure\necho \"Framework: Setting up directories...\"\nFRAMEWORK_DIR=$FRAMEWORK_BUILD_PATH/$FRAMEWORK_NAME.framework\nmkdir -p $FRAMEWORK_DIR\nmkdir -p $FRAMEWORK_DIR/Versions\nmkdir -p $FRAMEWORK_DIR/Versions/$FRAMEWORK_VERSION\nmkdir -p $FRAMEWORK_DIR/Versions/$FRAMEWORK_VERSION/Resources\nmkdir -p $FRAMEWORK_DIR/Versions/$FRAMEWORK_VERSION/Headers\n\necho \"Framework: Creating symlinks...\"\nln -s $FRAMEWORK_VERSION $FRAMEWORK_DIR/Versions/Current\nln -s Versions/Current/Headers $FRAMEWORK_DIR/Headers\nln -s Versions/Current/Resources $FRAMEWORK_DIR/Resources\nln -s Versions/Current/$FRAMEWORK_NAME $FRAMEWORK_DIR/$FRAMEWORK_NAME\n\n# combine lib files for various platforms into one\necho \"Framework: Creating library...\"\nlipo -create \"${BUILT_PRODUCTS_DIR}/../${CONFIGURATION}-iphonesimulator/libKME-iphonesimulator.a\" \"${BUILT_PRODUCTS_DIR}/libKME-iphoneos.a\" -o \"$FRAMEWORK_DIR/Versions/Current/$FRAMEWORK_NAME\"\n\necho \"Framework: Copying assets into current version...\"\ncp ${SRCROOT}/*.h $FRAMEWORK_DIR/Headers/\n              \n              #replace placeholder in plist with project name\n              cat \"${SRCROOT}/Framework.plist\" | sed 's/${PROJECT_NAME}/'\"${PROJECT_NAME}\"'/' > $FRAMEWORK_DIR/Resources/Info.plist\n";
+		};
+		F27FCAF5157FD82100FBBA20 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "UNIVERSAL_OUTPUTFOLDER=${PROJECT_DIR}/build/libKeyman\nBUNDLE_SOURCE=${PROJECT_DIR}/KeymanEngine/resources/Keyman.bundle\n\nrm -f ${UNIVERSAL_OUTPUTFOLDER}/libKeyman.a\nxcodebuild -configuration ${CONFIGURATION} -scheme KME-iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6' BUILD_DIR=\"${BUILD_DIR}\" BUILD_ROOT=\"${BUILD_ROOT}\" ONLY_ACTIVE_ARCH=no\nxcodebuild -configuration ${CONFIGURATION} -scheme KME-iphoneos -destination 'generic/platform=iOS' BUILD_DIR=\"${BUILD_DIR}\" BUILD_ROOT=\"${BUILD_ROOT}\" ONLY_ACTIVE_ARCH=no\n\nmkdir -p \"${UNIVERSAL_OUTPUTFOLDER}\"\n\nlipo -create \"${BUILT_PRODUCTS_DIR}/../${CONFIGURATION}-iphonesimulator/libKME-iphonesimulator.a\" \"${BUILT_PRODUCTS_DIR}/../${CONFIGURATION}-iphoneos/libKME-iphoneos.a\" -output \"${UNIVERSAL_OUTPUTFOLDER}/libKeyman.a\"\n\ncp -R \"${BUILD_DIR}/${CONFIGURATION}-iphoneos/usr/local/include\" \"${UNIVERSAL_OUTPUTFOLDER}/\"\ncp -R \"${BUNDLE_SOURCE}\" \"${UNIVERSAL_OUTPUTFOLDER}/\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		98F9D6931954112F0087AA43 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				980EEFD1196E19B7003F6A67 /* KeyboardViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F243887A14BBD43000A3E055 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F243888F14BBD43100A3E055 /* main.m in Sources */,
+				6C0A1407151EA8B3007FA4AD /* KMTextView.m in Sources */,
+				6C0A140C151EA925007FA4AD /* AppDelegate.m in Sources */,
+				6C0A140D151EA925007FA4AD /* MainViewController.m in Sources */,
+				6CBD0DE2151EC30300D70779 /* KMTextViewDelegateProxy.m in Sources */,
+				9878F7721B8BF00F00360B8D /* UIButton+Helpers.m in Sources */,
+				987F00071AB8FD0A00998116 /* KMKeyboardMenuView.m in Sources */,
+				980CC8E419D51F3C0089BB57 /* KMURLProtocol.m in Sources */,
+				CE25CCC31F1DBF6F005AA2BC /* KMHTTPDownloadRequest.m in Sources */,
+				F273AB9915641EC500A47CEE /* KMManager.m in Sources */,
+				CECB38951F2199BC0098882F /* Reachability.m in Sources */,
+				F273AB9C156440B700A47CEE /* KMTextField.m in Sources */,
+				F273ABA31564419700A47CEE /* KMTextFieldDelegateProxy.m in Sources */,
+				9878F7731B8BF00F00360B8D /* UIView+Helpers.m in Sources */,
+				98F9D6F019545AB60087AA43 /* KMInputViewController.m in Sources */,
+				F2BE11051590D5F50091654B /* KeyboardNameTableViewCell.m in Sources */,
+				F2DFDDB815A345420028D3C7 /* KMKeyboardPickerBarButtonItem.m in Sources */,
+				989BDF32193D8CEC00278BBC /* KeyboardInfoViewController.m in Sources */,
+				F2F1039D15A35F4200D76D84 /* KMKeyboardPickerButton.m in Sources */,
+				989FDF92193C1C7100EECAF9 /* KMKeyPreviewView.m in Sources */,
+				CE25CCBD1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */,
+				98A880EE177BF78400601A9E /* KMPopoverView.m in Sources */,
+				9878F7711B8BF00F00360B8D /* NSString+Helpers.m in Sources */,
+				9841130B199D9B84005BD609 /* KMSubKeysView.m in Sources */,
+				98C2648817A0F59A00940E4F /* KeyboardPickerViewController.m in Sources */,
+				98C0B11417A20493007ECAFC /* LanguageViewController.m in Sources */,
+				98C0B11717A204BF007ECAFC /* LanguageDetailViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F27FCA77157FB0DB00FBBA20 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				980CC8E619D5221F0089BB57 /* KMURLProtocol.m in Sources */,
+				98EF3BA619A5B03800A1365F /* KMSubKeysView.m in Sources */,
+				98F9D6F7195463390087AA43 /* KMInputViewController.m in Sources */,
+				9878F7741B8BF01F00360B8D /* NSString+Helpers.m in Sources */,
+				987F3EA01941AAC900209D4F /* KeyboardInfoViewController.m in Sources */,
+				987F3E9F1941AAB700209D4F /* KMKeyPreviewView.m in Sources */,
+				98ACCE0817A9EEEB00B7C780 /* KeyboardPickerViewController.m in Sources */,
+				98F9D692195402F90087AA43 /* KMTextView.m in Sources */,
+				98ACCE0A17A9EF1D00B7C780 /* LanguageViewController.m in Sources */,
+				98ACCE0917A9EF0700B7C780 /* LanguageDetailViewController.m in Sources */,
+				98E5B645177D4A0B008A8723 /* KMPopoverView.m in Sources */,
+				F27FCA88157FB13B00FBBA20 /* KMManager.m in Sources */,
+				F27FCA8C157FB13B00FBBA20 /* KMTextViewDelegateProxy.m in Sources */,
+				F27FCA8E157FB13B00FBBA20 /* KMTextField.m in Sources */,
+				CE25CCBE1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */,
+				CE25CCC81F1F2482005AA2BC /* KMHTTPDownloadRequest.m in Sources */,
+				F27FCA90157FB13B00FBBA20 /* KMTextFieldDelegateProxy.m in Sources */,
+				9878F77D1B8BF07D00360B8D /* UIView+Helpers.m in Sources */,
+				982899171ABB8D2400823833 /* KMKeyboardMenuView.m in Sources */,
+				9878F7791B8BF07700360B8D /* UIButton+Helpers.m in Sources */,
+				CECB38971F2199E40098882F /* Reachability.m in Sources */,
+				F2BE11011590D5E20091654B /* KeyboardNameTableViewCell.m in Sources */,
+				F2DFDDB915A345420028D3C7 /* KMKeyboardPickerBarButtonItem.m in Sources */,
+				F2F1039E15A35F4200D76D84 /* KMKeyboardPickerButton.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F27FCABA157FD10A00FBBA20 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				980CC8E719D5222A0089BB57 /* KMURLProtocol.m in Sources */,
+				98EF3BA919A5B07100A1365F /* KMSubKeysView.m in Sources */,
+				98F9D6F61954632A0087AA43 /* KMInputViewController.m in Sources */,
+				9878F7751B8BF01F00360B8D /* NSString+Helpers.m in Sources */,
+				987F3EA21941AAF800209D4F /* KeyboardInfoViewController.m in Sources */,
+				987F3EA11941AAE900209D4F /* KMKeyPreviewView.m in Sources */,
+				98ACCE1317A9EFED00B7C780 /* KeyboardPickerViewController.m in Sources */,
+				98ACCE1217A9EFE100B7C780 /* LanguageViewController.m in Sources */,
+				98ACCE1117A9EFCE00B7C780 /* LanguageDetailViewController.m in Sources */,
+				98E5B646177D4A2B008A8723 /* KMPopoverView.m in Sources */,
+				F27FCAC9157FD15900FBBA20 /* KMManager.m in Sources */,
+				F27FCACA157FD15900FBBA20 /* KMTextView.m in Sources */,
+				F27FCACB157FD15900FBBA20 /* KMTextViewDelegateProxy.m in Sources */,
+				F27FCACC157FD15900FBBA20 /* KMTextField.m in Sources */,
+				CE25CCBF1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */,
+				CE25CCC91F1F2487005AA2BC /* KMHTTPDownloadRequest.m in Sources */,
+				F27FCACD157FD15900FBBA20 /* KMTextFieldDelegateProxy.m in Sources */,
+				9878F77E1B8BF07E00360B8D /* UIView+Helpers.m in Sources */,
+				982899181ABB8D2500823833 /* KMKeyboardMenuView.m in Sources */,
+				9878F77A1B8BF07800360B8D /* UIButton+Helpers.m in Sources */,
+				CECB38961F2199CF0098882F /* Reachability.m in Sources */,
+				F2A0F52A1590D48000AAB449 /* KeyboardNameTableViewCell.m in Sources */,
+				F2DFDDBA15A345420028D3C7 /* KMKeyboardPickerBarButtonItem.m in Sources */,
+				F2F1039F15A35F4200D76D84 /* KMKeyboardPickerButton.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		98F9D69F1954112F0087AA43 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 98F9D6961954112F0087AA43 /* SystemKeyboard */;
+			targetProxy = 98F9D69E1954112F0087AA43 /* PBXContainerItemProxy */;
+		};
+		98F9D6A21954112F0087AA43 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 98F9D6961954112F0087AA43 /* SystemKeyboard */;
+			targetProxy = 98F9D6A11954112F0087AA43 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		985C6C81185527E400D5C0C2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F27FCAF6157FD95E00FBBA20 /* Keyman-lib.xcconfig */;
+			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				PRODUCT_NAME = "KME-framework";
+			};
+			name = Debug;
+		};
+		985C6C82185527E400D5C0C2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F27FCAF6157FD95E00FBBA20 /* Keyman-lib.xcconfig */;
+			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				PRODUCT_NAME = "KME-framework";
+			};
+			name = Release;
+		};
+		98F9D6A41954112F0087AA43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_ENTITLEMENTS = SystemKeyboard/Tavultesoft.KMEI.SystemKeyboard.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_BITCODE = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = SystemKeyboard/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/DerivedData/KeymanEngine/Build/Products/Debug-iphoneos",
+				);
+				METAL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = (
+					"-force_load",
+					"$(PROJECT_DIR)/DerivedData/KeymanEngine/Build/Products/Debug-iphoneos/libKeyman.a",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "${PRODUCT_NAME}";
+				PRODUCT_NAME = "Tavultesoft.KMEI.$(TARGET_NAME:rfc1034identifier)";
+				PROVISIONING_PROFILE = "";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		98F9D6A51954112F0087AA43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_ENTITLEMENTS = SystemKeyboard/Tavultesoft.KMEI.SystemKeyboard.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Summer Institute of Linguistics, Inc (SIL) (3YE4W86L3G)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Summer Institute of Linguistics, Inc (SIL) (3YE4W86L3G)";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_BITCODE = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = SystemKeyboard/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/DerivedData/KeymanEngine/Build/Products/Debug-iphoneos",
+				);
+				METAL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = (
+					"-force_load",
+					"$(PROJECT_DIR)/DerivedData/KeymanEngine/Build/Products/Debug-iphoneos/libKeyman.a",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "${PRODUCT_NAME}";
+				PRODUCT_NAME = "Tavultesoft.KMEI.$(TARGET_NAME:rfc1034identifier)";
+				PROVISIONING_PROFILE = "";
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F24388A314BBD43100A3E055 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6C0A140E151EA930007FA4AD /* Debug.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_BITCODE = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				VALID_ARCHS = "arm64 armv7s armv7";
+			};
+			name = Debug;
+		};
+		F24388A414BBD43100A3E055 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6C0A1411151EA930007FA4AD /* Release.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_BITCODE = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				SDKROOT = iphoneos;
+				VALID_ARCHS = "arm64 armv7s armv7";
+			};
+			name = Release;
+		};
+		F24388A614BBD43100A3E055 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6C0A140F151EA930007FA4AD /* Keyman.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = KMEI.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = 3YE4W86L3G;
+				ENABLE_BITCODE = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Engine;
+				PRODUCT_NAME = KMEI;
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos;
+				VALID_ARCHS = "arm64 armv7 armv7s";
+			};
+			name = Debug;
+		};
+		F24388A714BBD43100A3E055 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6C0A140F151EA930007FA4AD /* Keyman.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = KMEI.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Summer Institute of Linguistics, Inc (SIL) (3YE4W86L3G)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = 3YE4W86L3G;
+				ENABLE_BITCODE = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Engine;
+				PRODUCT_NAME = KMEI;
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos;
+				VALID_ARCHS = "arm64 armv7 armv7s";
+			};
+			name = Release;
+		};
+		F27FCA84157FB0DB00FBBA20 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F27FCAEE157FD59100FBBA20 /* Keyman-iphoneos.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				COPY_PHASE_STRIP = NO;
+				DSTROOT = /tmp/Keyman_iphoneos.dst;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "KME-iphoneos/KME-iphoneos-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "KME-iphoneos";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		F27FCA85157FB0DB00FBBA20 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F27FCAEE157FD59100FBBA20 /* Keyman-iphoneos.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				COPY_PHASE_STRIP = YES;
+				DSTROOT = /tmp/Keyman_iphoneos.dst;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "KME-iphoneos/KME-iphoneos-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "KME-iphoneos";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "arm64 armv7 armv7s";
+			};
+			name = Release;
+		};
+		F27FCAC7157FD10B00FBBA20 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F27FCAEF157FD59100FBBA20 /* Keyman-iphonesimulator.xcconfig */;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					x86_64,
+				);
+				COPY_PHASE_STRIP = NO;
+				DSTROOT = /tmp/Keyman_iphonesimulator.dst;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "KME-iphonesimulator/KME-iphonesimulator-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode5.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "KME-iphonesimulator";
+				SKIP_INSTALL = YES;
+				VALID_ARCHS = "x86_64 i386";
+			};
+			name = Debug;
+		};
+		F27FCAC8157FD10B00FBBA20 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F27FCAEF157FD59100FBBA20 /* Keyman-iphonesimulator.xcconfig */;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					x86_64,
+				);
+				COPY_PHASE_STRIP = YES;
+				DSTROOT = /tmp/Keyman_iphonesimulator.dst;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "KME-iphonesimulator/KME-iphonesimulator-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode5.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "KME-iphonesimulator";
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "x86_64 i386";
+			};
+			name = Release;
+		};
+		F27FCAF3157FD80900FBBA20 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F27FCAF6157FD95E00FBBA20 /* Keyman-lib.xcconfig */;
+			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "KME-lib";
+			};
+			name = Debug;
+		};
+		F27FCAF4157FD80900FBBA20 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F27FCAF6157FD95E00FBBA20 /* Keyman-lib.xcconfig */;
+			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				PRODUCT_NAME = "KME-lib";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		985C6C80185527E400D5C0C2 /* Build configuration list for PBXAggregateTarget "KME-framework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				985C6C81185527E400D5C0C2 /* Debug */,
+				985C6C82185527E400D5C0C2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		98F9D6A31954112F0087AA43 /* Build configuration list for PBXNativeTarget "SystemKeyboard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				98F9D6A41954112F0087AA43 /* Debug */,
+				98F9D6A51954112F0087AA43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F243887814BBD43000A3E055 /* Build configuration list for PBXProject "KeymanEngine" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F24388A314BBD43100A3E055 /* Debug */,
+				F24388A414BBD43100A3E055 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F24388A514BBD43100A3E055 /* Build configuration list for PBXNativeTarget "KMEI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F24388A614BBD43100A3E055 /* Debug */,
+				F24388A714BBD43100A3E055 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F27FCA83157FB0DB00FBBA20 /* Build configuration list for PBXNativeTarget "KME-iphoneos" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F27FCA84157FB0DB00FBBA20 /* Debug */,
+				F27FCA85157FB0DB00FBBA20 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F27FCAC6157FD10B00FBBA20 /* Build configuration list for PBXNativeTarget "KME-iphonesimulator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F27FCAC7157FD10B00FBBA20 /* Debug */,
+				F27FCAC8157FD10B00FBBA20 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F27FCAF2157FD80900FBBA20 /* Build configuration list for PBXAggregateTarget "KME-lib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F27FCAF3157FD80900FBBA20 /* Debug */,
+				F27FCAF4157FD80900FBBA20 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F243887514BBD43000A3E055 /* Project object */;
+}

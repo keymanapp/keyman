@@ -1,0 +1,12 @@
+//
+//  Release.xcconfig
+//  Keyman Engine
+//
+//  Copyright (c) 2017 SIL International. All rights reserved.
+//
+
+#include "Project.xcconfig"
+
+OTHER_CFLAGS = -DNS_BLOCK_ASSERTIONS=1
+GCC_OPTIMIZATION_LEVEL = s
+COPY_PHASE_STRIP = YES

@@ -1,0 +1,13 @@
+//
+//  Debug.xcconfig
+//  Keyman Engine
+//
+//  Copyright (c) 2017 SIL International. All rights reserved.
+//
+
+#include "Project.xcconfig"
+
+OTHER_CFLAGS = -DZM_DEBUG=1
+GCC_OPTIMIZATION_LEVEL = 0
+COPY_PHASE_STRIP = NO
+
