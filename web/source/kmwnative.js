@@ -12,14 +12,13 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
   /*   On-Screen (Visual) Keyboard Code    */
   /*                                       */
   /*****************************************/
-  (function()
-  {
+  (function() {
     // Declare KeymanWeb object
     var keymanweb=window['tavultesoft']['keymanweb'],osk=keymanweb['osk'],util=keymanweb['util'],device=util.device;
     var dbg=keymanweb.debug;
 
     // Force full initialization
-    keymanweb.fullInitialization = true;  
+    keymanweb.isEmbedded = false;  
 
     // Explicitly marks that KeymanWeb is in native mode.
     keymanweb.embedded = false;  
@@ -28,8 +27,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Set default device options
      * @param {Object}  opt device options object
      */       
-    keymanweb.setDefaultDeviceOptions=function(opt)   
-    {
+    keymanweb.setDefaultDeviceOptions=function(opt) {
       // Element attachment type    
       if(opt['attachType'] == '') opt['attachType'] = (device.touchable ? 'manual' : 'auto');  
     }
@@ -39,8 +37,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *    
      * @param   {string|boolean}   s       displayed text (or false)
      */       
-    util.wait = function(s)
-    {                    
+    util.wait = function(s) {                    
       // Keyboards loaded with page are initialized before the page is ready,
       // so cannot use the wait indicater (and don't need it, anyway)
       // Do not display if a blocking cloud server error has occurred (to prevent multiple errors)
@@ -48,13 +45,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(typeof(bg) == 'undefined' || bg == null || keymanweb.warned) return;
       
       var nn=bg.firstChild.childNodes;
-      if(s)
-      {      
+      if(s) {      
         bg.pending=true;
-        window.setTimeout(function()
-          {           
-            if(bg.pending)
-            {            
+        window.setTimeout(function() {           
+            if(bg.pending) {            
               window.scrollTo(0,0); 
               nn[0].style.display='none';
               nn[1].className='kmw-wait-text'; nn[1].innerHTML=s; 
@@ -62,11 +56,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
               bg.style.display='block';
             }
           },1000);
-      }
-      else
-      {                
-        if(bg.pending)
-        {
+      } else {                
+        if(bg.pending) {
           nn[1].innerHTML=''; 
           bg.pending=false; bg.style.display='none';
         }
@@ -74,8 +65,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
       
     // Get default style sheet path
-    keymanweb.getStyleSheetPath=function(ssName)
-    {
+    keymanweb.getStyleSheetPath=function(ssName) {
       var ssPath = util['getOption']('resources')+'osk/'+ssName;
       return ssPath; 
     }
@@ -90,8 +80,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *           
      * @param {string}  Lfilename  keyboard file name with optional prefix                     
      */   
-    keymanweb.getKeyboardPath=function(Lfilename)
-    {           
+    keymanweb.getKeyboardPath=function(Lfilename) {           
       var rx=RegExp('^(([\.]/)|([\.][\.]/)|(/))|(:)');   
       return (rx.test(Lfilename) ? '' : keymanweb.options['keyboards']) + Lfilename;
     }

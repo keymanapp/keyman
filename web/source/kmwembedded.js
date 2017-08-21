@@ -7,8 +7,7 @@
 /*                                       */
 /*****************************************/
 
-(function()
-{
+(function() {
   // Declare KeymanWeb and related objects
   var keymanweb=window['tavultesoft']['keymanweb'],osk=keymanweb['osk'],util=keymanweb['util'],device=util.device;
 
@@ -18,8 +17,8 @@
   // Flag to control refreshing of a keyboard that is already loaded
   keymanweb.mustReloadKeyboard = true;
   
-  // Skip full page initialization (code not needed for embedded applications)
-  keymanweb.fullInitialization = false;
+  // Skip full page initialization - skips native-mode only code
+  keymanweb.isEmbedded = true;
 
   // Explicitly marks that KeymanWeb is in embedded mode.
   keymanweb.embedded = true;  
@@ -27,8 +26,7 @@
   osk.popupDelay = 400;  // Delay must be less than native touch-hold delay 
   
   // Set default device options
-  keymanweb.setDefaultDeviceOptions = function(opt)
-  {
+  keymanweb.setDefaultDeviceOptions = function(opt) {
     opt['attachType'] = 'manual';
     device.app=opt['app'];
     device.touchable=true; 
@@ -40,14 +38,12 @@
   }
   
   // Get default style sheet path
-  keymanweb.getStyleSheetPath = function(ssName)
-  {
+  keymanweb.getStyleSheetPath = function(ssName) {
     return keymanweb.rootPath+ssName;
   }
 
   // Get KMEI, KMEA keyboard path (overrides default function)
-  keymanweb.getKeyboardPath = function(Lfilename)
-  {
+  keymanweb.getKeyboardPath = function(Lfilename) {
     return keymanweb.rootPath+'languages/' + Lfilename + "?v=" + (new Date()).getTime(); /*cache buster*/  
   }
 
@@ -57,12 +53,21 @@
    *  @param  {string}  s unmodified URL
    *  @return             modified URL         
    */
-  util.unCached = function(s)
-  {
+  util.unCached = function(s) {
     var t=(new Date().getTime());
     s = s + '?v=' + t;
     return s;
-  }       
+  }  
+  
+  util.wait = function() {
+    // Empty stub - this function should not be implemented or used within embedded code routes.
+    console.warn("util.wait() call attempted in embedded mode!");  // Sends log message to embedding app.
+  }
+
+  util.alert = function() {
+    // Empty stub - this function should not be implemented or used within embedded code routes.
+    console.warn("util.alert() call attempted in embedded mode!");  // Sends log message to embedding app.
+  }
  
   // TODO: This needs to be discussed with Serkan - can possibly get context without any reference to Pelem?? 
   
