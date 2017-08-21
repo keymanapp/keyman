@@ -10,11 +10,7 @@ display_usage ( ) {
     echo "build.sh [-kmw-source <kmwsrc> [-no-kmw-build]] | [-no-kmw] | [-libKeyman] | [-no-codesign] | [-clean]"
     echo
     echo "  -clean                  Removes all previously-existing build products for KMEI and the Keyman app before building."
-    echo "  -kmw-source <kmwsrc>    kmwsrc is optional path to keymanapp/keyman/web.  If provided,"
-    echo "                          build script will build KeymanWeb and then use those build artifacts for KMEI."
-    echo "                          Otherwise, download latest build artifacts from CI build server build.palaso.org."
-    echo "  -no-kmw-build           Doesn't build keyman.js, just copies existing version"
-    echo "  -no-kmw                 Uses existing keyman.js, doesn't try to build from local repo or download"
+    echo "  -no-kmw                 Uses existing keyman.js, doesn't try to build"
     echo "  -libKeyman              Builds only KMEI for its libKeyman resources; does not attempt to build the app."
     echo "  -no-codesign            Disables code-signing for the Keyman application, allowing it to be performed separately later."
     echo "                          Will not construct the archive and .ipa.  (includes -no-archive)"
@@ -39,6 +35,7 @@ APP_BUILD_PATH=keyman/Keyman/build/
 APP_BUNDLE_PATH=$APP_BUILD_PATH/Release-iphoneos/Keyman.app
 KEYBOARD_BUNDLE_PATH=$APP_BUILD_PATH/Release-iphoneos/SWKeyboard.appex
 ARCHIVE_PATH=$APP_BUILD_PATH/Release-iphoneos/Keyman.xcarchive
+KMW_SOURCE=../web/source
 
 do_clean ( ) {
   rm -rf $KMEI_BUILD_PATH
@@ -48,18 +45,10 @@ do_clean ( ) {
 
 KMEI_OUTPUT_FOLDER=$KMEI_BUILD_PATH/libKeyman
 
-# Default build artifacts from the CI build server
-# The default Mac OS X bash doesn't like "associative arrays" or the declare -A command, so we use a plain array here.
-CI_DEPENDENCIES=( \
-"https://build.palaso.org/guestAuth/app/rest/builds/buildType:%28id:Keymanweb_Build%29/artifacts/content/embedded/keyman.js" \
-"https://build.palaso.org/guestAuth/app/rest/builds/buildType:%28id:Keymanweb_Build%29/artifacts/content/embedded/resources/osk/kmwosk.css" \
-"https://build.palaso.org/guestAuth/app/rest/builds/buildType:%28id:Keymanweb_Build%29/artifacts/content/embedded/resources/osk/keymanweb-osk.ttf")
-
 ### START OF THE BUILD ###
 
-# Default is downloading and copying to assets
-DO_BUILD=false
-DO_DOWNLOAD=true
+# Default is building and copying to assets
+DO_KMW_BUILD=true
 DO_KEYMANAPP=true
 DO_ARCHIVE=true
 CLEAN_ONLY=false
@@ -68,22 +57,8 @@ CLEAN_ONLY=false
 while [[ $# -gt 0 ]] ; do
     key="$1"
     case $key in
-        -kmw-source)
-            DO_BUILD=true
-            DO_DOWNLOAD=false
-            KMW_SOURCE="$2/source/"
-            if [ ! -d "$KMW_SOURCE" ]; then
-                die "ERROR: \"$2\" is not a valid path to keymanapp/keyman/web"
-            fi
-            if [ "$3" = "-no-kmw-build" ]; then
-                DO_BUILD=false
-                shift # past argument
-            fi
-            shift # past argument
-            ;;
         -no-kmw)
-            DO_BUILD=false
-            DO_DOWNLOAD=false
+            DO_KMW_BUILD=false
             ;;
         -h|-?)
             display_usage
@@ -115,8 +90,7 @@ fi
 
 echo
 echo "KMW_SOURCE: $KMW_SOURCE"
-echo "DO_BUILD: $DO_BUILD"
-echo "DO_DOWNLOAD: $DO_DOWNLOAD"
+echo "DO_KMW_BUILD: $DO_KMW_BUILD"
 echo
 
 update_bundle ( ) {
@@ -124,15 +98,8 @@ update_bundle ( ) {
         mkdir -p "$BUNDLE_PATH"
     fi
 
-    if [ $DO_DOWNLOAD = true ]; then
-        fetch ${CI_DEPENDENCIES[0]} $BUNDLE_PATH/keymanios.js
-        fetch ${CI_DEPENDENCIES[1]} $BUNDLE_PATH/kmwosk.css
-        fetch ${CI_DEPENDENCIES[2]} $BUNDLE_PATH/keymanweb-osk.ttf
-        if [ $? -ne 0 ]; then
-            fail "ERROR:  Resource download failed."
-        fi
-    elif [ $DO_BUILD = true ]; then
-        echo Building KeymanWeb 2.0 from $KMW_SOURCE
+    if [ $DO_KMW_BUILD = true ]; then
+        echo Building KeymanWeb 10.0 from $KMW_SOURCE
         base_dir="$(pwd)"
 
         cd $KMW_SOURCE
