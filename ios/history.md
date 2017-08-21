@@ -1,6 +1,9 @@
 # Keyman for iPhone and iPad Version History
 
 ## 10.0 alpha
+* Updated versioning scheme for uniformity across all Keyman products.
+
+## 2017-08-18 2.6.0 beta
 * Numerous keyboarding bugfixes
 * Replaced an outdated internal library
 
