@@ -35,7 +35,6 @@ if(!window['tavultesoft']['keymanweb']['ui']['name']) {
     var ui=keymanweb['ui'] = {
       name: 'toggle',
       initialized: false,
-      shim: null,
       controller: null,
       oskButton: null,
       kbdButton: null,
@@ -479,21 +478,10 @@ if(!window['tavultesoft']['keymanweb']['ui']['name']) {
         ui.kbdButton._onmouseover = function()
           {
             ui.keyboardMenu.className="sfhover";
-            if(ui.shim)
-            {
-              var ss=ui.shim.style;
-              ss.left = ui.keyboardMenu.style.left;
-              ss.top = ui.keyboardMenu.style.top;
-              ss.width = ui.keyboardMenu.offsetWidth+"px";
-              ss.height = ui.keyboardMenu.offsetHeight+"px";
-              ss.zIndex = ui.keyboardMenu.style.zIndex-1;
-              ss.display = 'block';
-            }
           };
         ui.kbdButton._onmouseout = function()
           {
             ui.keyboardMenu.className="sfunhover";
-            if(ui.shim) ui.shim.style.display = 'none';
           };
         ui.kbdButton._onclick = null;
         ui.createMenu();
@@ -693,18 +681,6 @@ if(!window['tavultesoft']['keymanweb']['ui']['name']) {
     {    
       if(typeof(ui.keyboardMenu) == 'undefined')  // I2403 - Allow toggle design to be loaded twice
       {
-        if (window.createPopup && !('XmlHttpRequest' in window))
-        {
-          ui.shim = util['createElement']('iframe');
-          ui.shim.src = '';
-          ui.shim.style.display = 'none';
-          ui.shim.style.position = 'absolute';
-          ui.shim.style.filter = 'progidXImageTransform.Microsoft.Alpha(style=0,opacity=0)';
-          ui.shim.frameBorder = '0';
-          ui.shim.scrolling = 'no';
-          ui.kbdButton.getElem().appendChild(ui.shim);
-        }
-        
         ui.keyboardMenu=util['createElement']('ul');
         ui.keyboardMenu.id='KeymanWeb_KbdList';
         ui.keyboardMenu.className='sfunhover';

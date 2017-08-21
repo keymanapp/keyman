@@ -124,7 +124,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     osk.dfltX = '';               // Left position set by page code
     osk.dfltY = '';               // Top position set by page code
     osk.noDrag = false;           // allow page to override user OSK dragging
-    osk.shim = null;              // Shim DIV for OSK
     osk.keytip = null;            // Key preview (phones)
     osk.touchY = 0;               // First y position of touched key
 
@@ -3093,8 +3092,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         osk._DivVKbd.style.height=newHeight+'px';
         osk._DivVKbd.style.fontSize=(newHeight/8)+'px';
 
-        util['showShim'](osk._DivVKbd, osk.shim, osk._DivVKbdHelp);  // I1476 - Handle SELECT overlapping
-
         if(e  &&  e.preventDefault) e.preventDefault();
         e.cancelBubble = true;
         return false;
@@ -3171,13 +3168,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           { Lposx = e.clientX + document.body.scrollLeft; Lposy = e.clientY + document.body.scrollTop; }
         osk._Box.style.left = (Lposx-osk._VMoveX)+'px';
         osk._Box.style.top = (Lposy-osk._VMoveY)+'px';
-
-        // I1476 - Handle SELECT overlapping BEGIN
-        if(osk._DivVKbd)
-          util['showShim'](osk._DivVKbd, osk.shim, osk._DivVKbdHelp);
-        else
-          util['showShim'](osk._Box, osk.shim);
-        // I1476 - Handle SELECT overlapping END
 
         if(e  &&  e.preventDefault) e.preventDefault();
         var r=osk.getRect();
@@ -3570,7 +3560,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       else
       {
         if(osk._Box) osk._Box.style.display = 'none';
-        util['hideShim'](osk.shim);  // I1476 - Handle SELECT overlapping
       }
 
       // Allow UI to execute code when hiding the OSK

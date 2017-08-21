@@ -97,10 +97,6 @@ if(!window['tavultesoft']['keymanweb']['ui']['name']) {
           
       // Register keymanweb events
       ui.registerEvents();        
-          
-      // I1476 - Handle SELECT overlapping BEGIN   //todo***** make shim div local**************
-      if (window.createPopup  &&  !('XmlHttpRequest' in window)) ui._Shim = util['createShim']();    
-      // I1476 - Handle SELECT overlapping END
 
       ui.kbdIcon.src = imgPath+'kbdicon.gif';
       ui.kbdIcon.title = 'Display visual keyboard';
@@ -115,8 +111,6 @@ if(!window['tavultesoft']['keymanweb']['ui']['name']) {
       ui.innerDiv.appendChild(Lhdiv);
       ui.outerDiv.appendChild(ui.innerDiv);
       document.body.appendChild(ui.outerDiv);
-    
-      if(ui._Shim) document.body.appendChild(ui._Shim);  // I1476 - Handle SELECT overlapping
 
       ui.KeyboardSelector =  util['createElement']('SELECT'); // ControlSelector - KeymanWeb keyboard selector
       
@@ -446,7 +440,6 @@ if(!window['tavultesoft']['keymanweb']['ui']['name']) {
       if(!ui.initialized) return;
       
       ui.outerDiv.style.display = 'none';
-      util['hideShim'](ui._Shim);   // I1476 - Handle SELECT overlapping
     }
 
 

@@ -3627,11 +3627,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       // However, it possibly may be called before the OSK has been fully defined with the current keyboard, need to check.    
       //osk._Load(); 
       
-      
-      // I1476 - Handle SELECT overlapping BEGIN   TODO: Move this to float UI code ??
-      if(util._GetIEVersion() == 6) osk.shim = util['createShim']();  // I3363 (Build 301)
-      // I1476 - Handle SELECT overlapping END
-      
       //document.body.appendChild(osk._Box); 
 
       //osk._Load(false);
@@ -3703,8 +3698,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         } 
       }
 
-      if(osk.shim) 
-        document.body.appendChild(osk.shim);  // I1476 - Handle SELECT overlapping
       //document.body.appendChild(keymanweb._StyleBlock);
 
       // IE: call _SelectionChange when the user changes the selection 
