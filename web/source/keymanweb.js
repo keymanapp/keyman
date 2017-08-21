@@ -4484,14 +4484,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           }
         } else {
           if(Ptarg.value) {
-            if(Ptarg.value.length == 0) {
+            if(Ptarg.value.length == 0 || !Ptarg.base) {
               Ptarg.dir=elDir;
-            } else if(Ptarg.base) {
+            } else {
               // We need to do this for some contenteditable elements.
               Ptarg.base.dir=Ptarg.dir=elDir;
-            } else {
-              Ptarg.dir=elDir;
-            }
+            } 
           }
         }
       }
