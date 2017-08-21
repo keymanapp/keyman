@@ -17,7 +17,7 @@ if [ $? -ne 0 ]; then
 fi
 
 cd ../KMAPro
-./build.sh
+./build.sh $@
 
 if [ $? -ne 0 ]; then
     die "ERROR: KMAPro/build.sh failed"
