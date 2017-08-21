@@ -3095,7 +3095,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         }
 
         // Do not output error messages when embedded.  (KMEA/KMEI)
-        if(!keymanweb.embedded) {
+        if(!keymanweb.isEmbedded) {
           // We already know the load has failed... why wait?
           kbdStub.asyncLoader.callback('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '.');
           console.log('Error:  cannot find the', kbdName, 'keyboard for', kbdLang, 'at', kbdFile + '.');
@@ -3139,7 +3139,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
               util.wait(false);
             }
           } // A handler portion for cases where the new <script> block loads, but fails to process.
-        } else if(!keymanweb.embedded) {  // Do not output error messages when embedded.  (KMEA/KMEI)
+        } else if(!keymanweb.isEmbedded) {  // Do not output error messages when embedded.  (KMEA/KMEI)
             kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.');
             console.log('Error registering the', kbdName, 'keyboard for', kbdLang + '.');
         }

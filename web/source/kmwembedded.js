@@ -20,9 +20,6 @@
   // Skip full page initialization - skips native-mode only code
   keymanweb.isEmbedded = true;
 
-  // Explicitly marks that KeymanWeb is in embedded mode.
-  keymanweb.embedded = true;  
-
   osk.popupDelay = 400;  // Delay must be less than native touch-hold delay 
   
   // Set default device options
