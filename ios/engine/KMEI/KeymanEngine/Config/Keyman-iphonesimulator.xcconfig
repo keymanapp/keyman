@@ -1,0 +1,17 @@
+//
+//  Keyman.xcconfig
+//  Keyman Engine
+//
+//  Copyright (c) 2017 SIL International. All rights reserved.
+//
+
+//INFOPLIST_FILE = KeymanEngine/KeymanEngine-Info.plist
+PRODUCT_NAME = $(TARGET_NAME)
+
+GCC_PRECOMPILE_PREFIX_HEADER = YES
+GCC_PREFIX_HEADER = KME-iphonesimulator/KME-iphonesimulator-Prefix.pch
+
+ARCHS = i386
+VALID_ARCHS = i386
+
+IPHONEOS_DEPLOYMENT_TARGET = 4.0
