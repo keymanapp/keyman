@@ -7,11 +7,12 @@
 # KMW  - Keyman Web
 
 display_usage ( ) {
-    echo "build.sh [-no-kmw-build] | [-no-kmw]"
+    echo "build.sh [-no-kmw-build] | [-no-kmw] [-no-daemon]"
     echo
     echo "Build Keyman Engine Android (KMEA) using Keyman Web (KMW) artifacts"
     echo "  -no-kmw-build           Don't build KMW. Just copy existing artifacts"
     echo "  -no-kmw                 Don't build KMW. Don't copy artifacts"
+    echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"
     exit 1
 }
 
@@ -53,6 +54,7 @@ die ( ) {
 # Default is building KMW and copying artifacts
 DO_BUILD=true
 DO_COPY=true
+NO_DAEMON=false
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -66,6 +68,9 @@ while [[ $# -gt 0 ]] ; do
             DO_BUILD=false
             DO_COPY=false
             ;;
+        -no-daemon)
+            NO_DAEMON=true
+            ;;
         -h|-?)
             display_usage
             ;;
@@ -76,10 +81,16 @@ done
 echo
 echo "DO_BUILD: $DO_BUILD"
 echo "DO_COPY: $DO_COPY"
+echo "NO_DAEMON: $NO_DAEMON"
 echo
 
-# Destinations that will need the keymanweb artifacts
+if [ "$NO_DAEMON" = true ]; then
+  DAEMON_FLAG=--no-daemon
+else
+  DAEMON_FLAG=
+fi
 
+# Destinations that will need the keymanweb artifacts
 
 PLATFORM=`uname -s`
 
@@ -111,8 +122,8 @@ fi
 
 echo "Gradle Build of KMEA"
 cd $KMA_ROOT/KMEA
-./gradlew clean
-./gradlew aR
+./gradlew $DAEMON_FLAG clean
+./gradlew $DAEMON_FLAG aR
 if [ $? -ne 0 ]; then
     die "ERROR: Build of KMEA failed"
 fi
