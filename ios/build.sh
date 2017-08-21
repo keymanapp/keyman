@@ -7,7 +7,7 @@
 verify_on_mac
 
 display_usage ( ) {
-    echo "build.sh [-kmw-source <kmwsrc> [-no-kmw-build]] | [-no-kmw] | [-libKeyman] | [-no-codesign] | [-clean]"
+    echo "build.sh [-clean] [-no-kmw] [-libKeyman] [-no-codesign] [-no-archive] [-no-build]"
     echo
     echo "  -clean                  Removes all previously-existing build products for KMEI and the Keyman app before building."
     echo "  -no-kmw                 Uses existing keyman.js, doesn't try to build"
