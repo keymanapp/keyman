@@ -63,7 +63,7 @@ if(!tavultesoft['keymanweb']) {
       rootPath: '',             // Path to server root
       mustReloadKeyboard: false,// Force keyboard refreshing even if already loaded
       globalKeyboard: null,     // Indicates the currently-active keyboard for controls without independent keyboard settings.
-      globalLanguageCode: null  // Indicates the language code corresponding to `globalKeyboard`.
+      globalLanguageCode: null, // Indicates the language code corresponding to `globalKeyboard`.
       isEmbedded: false         // Indicates if the KeymanWeb instance is embedded within a mobile app.
                                 // Blocks full page initialization when set to `true`.
     };
