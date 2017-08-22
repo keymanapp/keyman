@@ -1,0 +1,8 @@
+**/DerivedData
+**/project.xcworkspace
+**/xcuserdata
+Keyman4MacIM/output/*
+Keyman4MacIM/Keyman4MacIM/Frameworks/**
+Keyman4Mac/Keyman4Mac/Frameworks/**
+**/build
+**/output

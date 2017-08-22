@@ -1,0 +1,16 @@
+------------------------
+Now
+------------------------
+
+- nothing
+
+------------------------
+Later
+------------------------
+
+- keyboard height is hardcoded for iphone and ipad
+	- once the mobile KM keyboard is created, see if this can be done dynamically
+	- difficult because the web keyboard is made of many components, none of which span the whole height
+
+- default:true
+	- do something with this

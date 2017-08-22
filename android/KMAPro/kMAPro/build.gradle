@@ -83,7 +83,6 @@ repositories {
 }
 
 dependencies {
-    compile project(':facebookSDK')
     compile 'com.android.support:support-v4:25.4.0'
     compile(name: 'keyman-engine', ext: 'aar')
 }

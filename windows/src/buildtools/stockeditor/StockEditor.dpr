@@ -9,7 +9,7 @@ uses
   Unicode in '..\..\global\delphi\general\Unicode.pas',
   UfrmStockMessageEditorMoveToGroup in 'UfrmStockMessageEditorMoveToGroup.pas' {frmStockMessageEditorMoveToGroup},
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
-  SourceRootPath in '..\..\global\delphi\general\SourceRootPath.pas',
+  SourceRootPath in '..\devtools\SourceRootPath.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas';
 

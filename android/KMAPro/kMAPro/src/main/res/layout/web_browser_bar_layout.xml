@@ -5,64 +5,64 @@
 
     <LinearLayout
         android:id="@+id/frame"
-    	android:layout_width="match_parent"
-    	android:layout_height="match_parent"
-    	android:layout_margin="3dp"
-    	android:padding="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="3dp"
+        android:padding="4dp"
         android:layout_alignParentLeft="true"
         android:layout_above="@+id/progressBar"
         android:weightSum="2"
-    	android:background="@drawable/address_field_bg"
-    	android:orientation="horizontal" >
+        android:background="@drawable/address_field_bg"
+        android:orientation="horizontal" >
 
-    	<EditText
-        	android:id="@+id/address_field"
-        	android:layout_width="match_parent"
-        	android:layout_height="wrap_content"
-        	android:layout_gravity="left|center_vertical"
-        	android:layout_weight="1"
-        	android:inputType="textUri"
-        	android:imeOptions="actionGo"
-        	android:textSize="18sp"
-        	android:textColor="@android:color/primary_text_light"
-        	android:hint="@string/hint_text"
-        	android:singleLine="true"
-        	android:background="@android:color/white" />
-    	
-    	<ImageButton
-        	android:id="@+id/clear_button"
-        	style="?android:attr/actionButtonStyle"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:layout_gravity="right|center_vertical"
-        	android:layout_weight="1"
-        	android:contentDescription="@string/image_button"
-        	android:src="@drawable/ic_action_clear"
-        	android:visibility="gone" />
-    	
-    	<ImageButton
-        	android:id="@+id/stop_button"
-        	style="?android:attr/actionButtonStyle"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:layout_gravity="right|center_vertical"
-        	android:layout_weight="1"
-        	android:contentDescription="@string/image_button"
-        	android:src="@drawable/ic_navigation_cancel"
-        	android:visibility="gone" />
-    	
-    	<ImageButton
-        	android:id="@+id/reload_button"
-        	style="?android:attr/actionButtonStyle"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:layout_gravity="right|center_vertical"
-        	android:layout_weight="1"
-        	android:contentDescription="@string/image_button"
-        	android:src="@drawable/ic_navigation_refresh"
-        	android:visibility="gone" />
+        <EditText
+            android:id="@+id/address_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:layout_weight="1"
+            android:inputType="textUri"
+            android:imeOptions="actionGo"
+            android:textSize="18sp"
+            android:textColor="@android:color/primary_text_light"
+            android:hint="@string/hint_text"
+            android:singleLine="true"
+            android:background="@android:color/white" />
+        
+        <ImageButton
+            android:id="@+id/clear_button"
+            style="?android:attr/actionButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:layout_weight="1"
+            android:contentDescription="@string/image_button"
+            android:src="@drawable/ic_action_clear"
+            android:visibility="gone" />
+        
+        <ImageButton
+            android:id="@+id/stop_button"
+            style="?android:attr/actionButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:layout_weight="1"
+            android:contentDescription="@string/image_button"
+            android:src="@drawable/ic_navigation_cancel"
+            android:visibility="gone" />
+        
+        <ImageButton
+            android:id="@+id/reload_button"
+            style="?android:attr/actionButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:layout_weight="1"
+            android:contentDescription="@string/image_button"
+            android:src="@drawable/ic_navigation_refresh"
+            android:visibility="gone" />
 
-	</LinearLayout>
+    </LinearLayout>
     
     <ProgressBar
         android:id="@+id/progressBar"

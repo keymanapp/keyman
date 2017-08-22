@@ -9,14 +9,8 @@
 
 # User-specific stuff:
 **/.idea/libraries/
-**/.idea/codeStyleSettings.xml
 **/.idea/dictionaries
-**/.idea/workspace.xml
-**/.idea/gradle.xml
-**/.idea/tasks.xml
-**/.idea/misc.xml
-**/.idea/modules.xml
-**/.idea/vcs.xml
+**/.idea/**/*.xml
 **/*.iml
 
 # Gradle generated files

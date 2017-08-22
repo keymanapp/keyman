@@ -1,0 +1,482 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9854389719DBB27000C7B036 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9854389619DBB27000C7B036 /* main.m */; };
+		9854389A19DBB27000C7B036 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9854389919DBB27000C7B036 /* AppDelegate.m */; };
+		9854389C19DBB27000C7B036 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9854389B19DBB27000C7B036 /* Images.xcassets */; };
+		9854389F19DBB27000C7B036 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9854389D19DBB27000C7B036 /* MainMenu.xib */; };
+		985438AB19DBB27000C7B036 /* Keyman4MacTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 985438AA19DBB27000C7B036 /* Keyman4MacTests.m */; };
+		985438B519DBB9F100C7B036 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 985438B419DBB9F100C7B036 /* Quartz.framework */; };
+		98BF924C1BF025B40002126A /* KMBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 98BF924B1BF025B40002126A /* KMBarView.m */; };
+		E28239171F3CF96A00C3F560 /* KeymanEngine4Mac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E28239161F3CF96A00C3F560 /* KeymanEngine4Mac.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		985438A519DBB27000C7B036 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9854388919DBB27000C7B036 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9854389019DBB27000C7B036;
+			remoteInfo = Keyman4Mac;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		984C2B1F1A79DD790023F89D /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		9854389119DBB27000C7B036 /* Keyman4Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Keyman4Mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9854389519DBB27000C7B036 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9854389619DBB27000C7B036 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		9854389819DBB27000C7B036 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		9854389919DBB27000C7B036 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		9854389B19DBB27000C7B036 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		9854389E19DBB27000C7B036 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		985438A419DBB27000C7B036 /* Keyman4MacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Keyman4MacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		985438A919DBB27000C7B036 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		985438AA19DBB27000C7B036 /* Keyman4MacTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Keyman4MacTests.m; sourceTree = "<group>"; };
+		985438B419DBB9F100C7B036 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		98BF924A1BF025B40002126A /* KMBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMBarView.h; sourceTree = "<group>"; };
+		98BF924B1BF025B40002126A /* KMBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMBarView.m; sourceTree = "<group>"; };
+		98C559751BE3167900563A12 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		E28239161F3CF96A00C3F560 /* KeymanEngine4Mac.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = KeymanEngine4Mac.framework; path = Keyman4Mac/Frameworks/KeymanEngine4Mac.framework; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9854388E19DBB27000C7B036 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E28239171F3CF96A00C3F560 /* KeymanEngine4Mac.framework in Frameworks */,
+				985438B519DBB9F100C7B036 /* Quartz.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		985438A119DBB27000C7B036 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		984C2B1C1A79CCC60023F89D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E28239161F3CF96A00C3F560 /* KeymanEngine4Mac.framework */,
+				98C559751BE3167900563A12 /* libz.tbd */,
+				985438B419DBB9F100C7B036 /* Quartz.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9854388819DBB27000C7B036 = {
+			isa = PBXGroup;
+			children = (
+				984C2B1C1A79CCC60023F89D /* Frameworks */,
+				9854389319DBB27000C7B036 /* Keyman4Mac */,
+				985438A719DBB27000C7B036 /* Keyman4MacTests */,
+				9854389219DBB27000C7B036 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9854389219DBB27000C7B036 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9854389119DBB27000C7B036 /* Keyman4Mac.app */,
+				985438A419DBB27000C7B036 /* Keyman4MacTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9854389319DBB27000C7B036 /* Keyman4Mac */ = {
+			isa = PBXGroup;
+			children = (
+				9854389819DBB27000C7B036 /* AppDelegate.h */,
+				9854389919DBB27000C7B036 /* AppDelegate.m */,
+				9854389B19DBB27000C7B036 /* Images.xcassets */,
+				9854389D19DBB27000C7B036 /* MainMenu.xib */,
+				9854389419DBB27000C7B036 /* Supporting Files */,
+				98BF924A1BF025B40002126A /* KMBarView.h */,
+				98BF924B1BF025B40002126A /* KMBarView.m */,
+			);
+			path = Keyman4Mac;
+			sourceTree = "<group>";
+		};
+		9854389419DBB27000C7B036 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				9854389519DBB27000C7B036 /* Info.plist */,
+				9854389619DBB27000C7B036 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		985438A719DBB27000C7B036 /* Keyman4MacTests */ = {
+			isa = PBXGroup;
+			children = (
+				985438AA19DBB27000C7B036 /* Keyman4MacTests.m */,
+				985438A819DBB27000C7B036 /* Supporting Files */,
+			);
+			path = Keyman4MacTests;
+			sourceTree = "<group>";
+		};
+		985438A819DBB27000C7B036 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				985438A919DBB27000C7B036 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9854389019DBB27000C7B036 /* Keyman4Mac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 985438AE19DBB27000C7B036 /* Build configuration list for PBXNativeTarget "Keyman4Mac" */;
+			buildPhases = (
+				E28239111F3CF59400C3F560 /* ShellScript */,
+				9854388D19DBB27000C7B036 /* Sources */,
+				9854388E19DBB27000C7B036 /* Frameworks */,
+				9854388F19DBB27000C7B036 /* Resources */,
+				984C2B1F1A79DD790023F89D /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Keyman4Mac;
+			productName = Keyman4Mac;
+			productReference = 9854389119DBB27000C7B036 /* Keyman4Mac.app */;
+			productType = "com.apple.product-type.application";
+		};
+		985438A319DBB27000C7B036 /* Keyman4MacTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 985438B119DBB27000C7B036 /* Build configuration list for PBXNativeTarget "Keyman4MacTests" */;
+			buildPhases = (
+				985438A019DBB27000C7B036 /* Sources */,
+				985438A119DBB27000C7B036 /* Frameworks */,
+				985438A219DBB27000C7B036 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				985438A619DBB27000C7B036 /* PBXTargetDependency */,
+			);
+			name = Keyman4MacTests;
+			productName = Keyman4MacTests;
+			productReference = 985438A419DBB27000C7B036 /* Keyman4MacTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9854388919DBB27000C7B036 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0710;
+				ORGANIZATIONNAME = "SIL International";
+				TargetAttributes = {
+					9854389019DBB27000C7B036 = {
+						CreatedOnToolsVersion = 6.0.1;
+					};
+					985438A319DBB27000C7B036 = {
+						CreatedOnToolsVersion = 6.0.1;
+						TestTargetID = 9854389019DBB27000C7B036;
+					};
+				};
+			};
+			buildConfigurationList = 9854388C19DBB27000C7B036 /* Build configuration list for PBXProject "Keyman4Mac" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 9854388819DBB27000C7B036;
+			productRefGroup = 9854389219DBB27000C7B036 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9854389019DBB27000C7B036 /* Keyman4Mac */,
+				985438A319DBB27000C7B036 /* Keyman4MacTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9854388F19DBB27000C7B036 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9854389C19DBB27000C7B036 /* Images.xcassets in Resources */,
+				9854389F19DBB27000C7B036 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		985438A219DBB27000C7B036 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		E28239111F3CF59400C3F560 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "SRC_DIR=\"${PROJECT_DIR}/../KeymanEngine4Mac/build/${CONFIGURATION}\"\nDEST_DIR=\"${PROJECT_DIR}/Keyman4Mac/Frameworks\"\nFRAMEWORK_NAME=\"KeymanEngine4Mac.framework\"\nSRC_FRAMEWORK_PATH=\"${SRC_DIR}/KeymanEngine4Mac.framework\"\nDEST_FRAMEWORK_PATH=\"${DEST_DIR}/${FRAMEWORK_NAME}\"\nif [[ \"${SRC_DIR}\" == \"${DEST_DIR}\" ]]; then\n    exit 0\nfi\n\necho \"Source: ${SRC_FRAMEWORK_PATH}\"\necho \"Dest: ${DEST_FRAMEWORK_PATH}\"\n\nif [ ! -d \"${SRC_FRAMEWORK_PATH}\" ]; then\n    if [ ! -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n        echo \"Keyman engine framework must be built first!\"\n        exit 1\n    fi\n    exit 0\nfi\n\necho \"Copying Keyman Engine framework from ${SRC_DIR} to ${DEST_DIR}...\"\n\nif [ ! -d \"${DEST_DIR}\" ]; then\n    if [ -e \"${DEST_DIR}\" ]; then\n        echo \"${DEST_DIR} exists, but it is not a directory!\"\n        exit 1\n    else\n        mkdir -p \"$DEST_DIR\"\n    fi\nelif [ -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n    rm -rf \"${DEST_FRAMEWORK_PATH}\"\nfi\n\ncp -Rf \"${SRC_FRAMEWORK_PATH}\" \"${DEST_FRAMEWORK_PATH}\"";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9854388D19DBB27000C7B036 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				98BF924C1BF025B40002126A /* KMBarView.m in Sources */,
+				9854389A19DBB27000C7B036 /* AppDelegate.m in Sources */,
+				9854389719DBB27000C7B036 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		985438A019DBB27000C7B036 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				985438AB19DBB27000C7B036 /* Keyman4MacTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		985438A619DBB27000C7B036 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9854389019DBB27000C7B036 /* Keyman4Mac */;
+			targetProxy = 985438A519DBB27000C7B036 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		9854389D19DBB27000C7B036 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9854389E19DBB27000C7B036 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		985438AC19DBB27000C7B036 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		985438AD19DBB27000C7B036 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		985438AF19DBB27000C7B036 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Keyman4Mac/Frameworks",
+					"$(PROJECT_DIR)",
+				);
+				INFOPLIST_FILE = Keyman4Mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman4Mac;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		985438B019DBB27000C7B036 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Keyman4Mac/Frameworks",
+					"$(PROJECT_DIR)",
+				);
+				INFOPLIST_FILE = Keyman4Mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman4Mac;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		985438B219DBB27000C7B036 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = Keyman4MacTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Keyman4Mac.app/Contents/MacOS/Keyman4Mac";
+			};
+			name = Debug;
+		};
+		985438B319DBB27000C7B036 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = Keyman4MacTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Keyman4Mac.app/Contents/MacOS/Keyman4Mac";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9854388C19DBB27000C7B036 /* Build configuration list for PBXProject "Keyman4Mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				985438AC19DBB27000C7B036 /* Debug */,
+				985438AD19DBB27000C7B036 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		985438AE19DBB27000C7B036 /* Build configuration list for PBXNativeTarget "Keyman4Mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				985438AF19DBB27000C7B036 /* Debug */,
+				985438B019DBB27000C7B036 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		985438B119DBB27000C7B036 /* Build configuration list for PBXNativeTarget "Keyman4MacTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				985438B219DBB27000C7B036 /* Debug */,
+				985438B319DBB27000C7B036 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9854388919DBB27000C7B036 /* Project object */;
+}

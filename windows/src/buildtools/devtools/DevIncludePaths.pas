@@ -88,7 +88,10 @@ const
     '$(BDS)\source\DUnit\Contrib\XPGen;$(BDS)\source\data\rest;$(BDS)\source\data\firedac;$(BDS)\source\tethering;'+
     '$(BDS)\source\DUnitX;$(BDS)\source\data\ems;$(BDS)\source\rtl\net;$(BDS)\source\FlatBox2D;';
 
-  SFile_PathDefinesMak = CSourceRootPath+'\PathDefines.mak';  // I3321
+function SFile_PathDefinesMak: string;
+begin
+  Result := CSourceRootPath+'\PathDefines.mak';  // I3321
+end;
 
 { TIncludePaths }
 

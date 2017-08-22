@@ -12,12 +12,12 @@
         android:background="@android:color/white" />
     
     <TextView 
-    	android:id="@android:id/empty"
-    	android:layout_width="match_parent"
-    	android:layout_height="match_parent"
-    	android:gravity="center"
-    	android:text="@string/no_bookmarks"
-    	android:background="@android:color/white" />
+        android:id="@android:id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/no_bookmarks"
+        android:background="@android:color/white" />
     
     <!-- *android:layout_above="@+id/toolbar" in ListView
     <LinearLayout

@@ -1,0 +1,14 @@
+/* 
+  InfoPlist.strings
+  Keyman4MacIM
+
+  Created by Serkan Kurt on 17/02/2015.
+  Copyright (c) 2017 SIL International. All rights reserved.
+*/
+
+NSHumanReadableCopyright = "Copyright © 2017 SIL International. All rights reserved.";
+
+CFBundleName = "Keyman";
+CFBundleDisplayName = "Keyman";
+CFBundleShortVersionString = "Keyman 1.0 for macOS";
+CFBundleGetInfoString = "Keyman 1.0 for macOS, Copyright 2017, SIL International";

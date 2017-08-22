@@ -23,9 +23,9 @@ signcode:
     $(SIGNCODE) /d "Keyman Engine" $(PROGRAM)\engine\kmcomapi.dll
 
 install:
-    regsvr32 /s /u "C:\Program Files (x86)\Common Files\Tavultesoft\Keyman Engine 10.0\kmcomapi.dll"
-    $(COPY) $(PROGRAM)\engine\kmcomapi.dll "C:\Program Files (x86)\Common Files\Tavultesoft\Keyman Engine 10.0"
-    regsvr32 "C:\Program Files (x86)\Common Files\Tavultesoft\Keyman Engine 10.0\kmcomapi.dll"
+    regsvr32 /s /u "C:\Program Files (x86)\Common Files\Keyman\Keyman Engine 10.0\kmcomapi.dll"
+    $(COPY) $(PROGRAM)\engine\kmcomapi.dll "C:\Program Files (x86)\Common Files\Keyman\Keyman Engine 10.0"
+    regsvr32 "C:\Program Files (x86)\Common Files\Keyman\Keyman Engine 10.0\kmcomapi.dll"
 
 backup:
     $(WZZIP) $(BUILD)\engine\kmcomapi.zip  $(BACKUPDEFAULTS) kmcomapi.dll

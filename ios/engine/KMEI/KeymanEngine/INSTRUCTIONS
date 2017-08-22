@@ -1,0 +1,38 @@
+===================================
+Creating the Library
+===================================
+
+1) select the "Keyman-iphonesimulator" target, and build for simulator
+2) select the "Keyman-iphoneos" target, and build for device
+3) select the "Keyman-lib" target, and build for device
+	- this merges the previous 2 into a universal lib
+4) you can now find the lib and headers (there should be 9 .h files) in the xcode build directory
+	- e.g. /Users/<username>/Library/Developer/Xcode/DerivedData/Keyman-xxxxxxxxxx/Build/Products/Release-iphoneos
+	- the header files are in this same place under usr/local/include
+
+
+
+===================================
+Distribution
+===================================
+
+1) Create a folder called "libKeyman"
+2) Copy in 3 items:
+	- libKeyman.a
+	- Keyman.bundle
+	- the include directory containing the 9 header files created above
+
+This is all a developer needs to use the SDK
+
+
+
+===================================
+Demo Application
+===================================
+
+The demo application is a separate Xcode project which uses the above SDK.
+
+Whenever a new SDK is compiled, it should be copied into the demo project (over-writing the old one).
+
+The demo project settings should not need to be changed in any way during this process.
+

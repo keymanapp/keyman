@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,7 +36,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.LabeledIntent;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -318,7 +318,10 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     intent.putExtra(Intent.EXTRA_TEXT, textView.getText().toString());
 
     List<ResolveInfo> resInfo = getPackageManager().queryIntentActivities(intent, 0);
-    String fbPackageName = "com.facebook.katana";
+    final String[] IGNORED_PACKAGE_NAMES = {
+      "com.facebook.katana",
+      "com.facebook.lite"
+    };
 
     for (ResolveInfo resolveInfo : resInfo) {
       String packageName = resolveInfo.activityInfo.packageName;
@@ -331,11 +334,10 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
       String htmlMailFormat = "<html><head></head><body>%s%s</body></html>";
       String extraMailText = "<br><br>Sent from&nbsp<a href=\"http://keyman.com/android\">Keyman for Android</a>";
 
-      if (!packageName.equals(fbPackageName)) {
-        if (packageName.equals("com.android.email")) {
-          // Text for email app, it doesn't currently support HTML
-          shareIntent.putExtra(Intent.EXTRA_TEXT, text);
-        } else if (packageName.equals("com.google.android.gm")) {
+      // Sharing to Facebook removed in https://github.com/keymanapp/keyman/issues/156
+      // Users can copy text or use Keyman as system keyboard for typing into Facebook
+      if (!Arrays.asList(IGNORED_PACKAGE_NAMES).contains(packageName)) {
+        if (packageName.equals("com.google.android.gm")) {
           // Html string for Gmail
           shareIntent.setType("message/rfc822");
           text = text.replace("<", "&lt;");
@@ -344,9 +346,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           text = text.replace('\n', ' ');
           text = text.replace(" ", "<br>");
           shareIntent.putExtra(Intent.EXTRA_TEXT, Html.fromHtml(String.format(htmlMailFormat, text, extraMailText)));
-        } else if (packageName.equals("com.twitter.android")) {
-          // Text for Twitter
-          shareIntent.putExtra(Intent.EXTRA_TEXT, text);
         } else {
           // Text for all others
           shareIntent.putExtra(Intent.EXTRA_TEXT, text);
@@ -355,12 +354,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         shareIntents.add(shareIntent);
       }
     }
-
-    Intent fbShareIntent = new Intent(this, FBShareActivity.class);
-    fbShareIntent.putExtra("messageText", textView.getText().toString());
-    fbShareIntent.putExtra("messageTextSize", (float) textSize);
-    fbShareIntent.putExtra("messageTextTypeface", KMManager.getKeyboardTextFontFilename());
-    shareIntents.add(new LabeledIntent(fbShareIntent, getPackageName(), "Facebook", R.drawable.ic_facebook_logo));
 
     Intent chooserIntent = Intent.createChooser(shareIntents.remove(0), "Share via");
     chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, shareIntents.toArray(new Parcelable[]{}));

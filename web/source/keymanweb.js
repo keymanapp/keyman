@@ -3223,7 +3223,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(PInternalName == '') {
         osk._Hide(false); 
 
-        if(typeof(util.wait) == 'function') {
+        if(!keymanweb.isEmbedded) {
           util.wait(false);
         }
 
@@ -3278,17 +3278,16 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
               kbdName = kbdName.replace(/\s*keyboard\s*/i, '');
 
               // Setup our default error-messaging callback if it should be implemented.
-              if(typeof(util.wait) == 'function') {  // No error messaging if this function doesn't exist.
+              if(!keymanweb.isEmbedded) {  // No error messaging if we're in embedded mode.
                 loadingStub.asyncLoader.callback = function(altString) {
                   
                   // Thanks, Closure errors.  
-                  if(typeof(util.wait) == 'function') {
+                  if(!keymanweb.isEmbedded) {
                     util.wait(false);
+                    util.alert(altString || 'Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available.', function() {
+                      keymanweb['setActiveKeyboard']('');
+                    });
                   }
-
-                  util.alert(altString || 'Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available.', function() {
-                    keymanweb['setActiveKeyboard']('');
-                  });
 
                   if(Ln > 0) {
                     var Ps = keymanweb._KeyboardStubs[0];
@@ -3299,7 +3298,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
               }
 
               //Display the loading delay bar (Note: only append 'keyboard' if not included in name.) 
-              if(typeof(util.wait) == 'function') {
+              if(!keymanweb.isEmbedded) {
                 util.wait('Installing keyboard<br/>' + kbdName);
               }
               
@@ -3350,7 +3349,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         }
 
         // Do not output error messages when embedded.  (KMEA/KMEI)
-        if(!keymanweb.embedded) {
+        if(!keymanweb.isEmbedded) {
           // We already know the load has failed... why wait?
           kbdStub.asyncLoader.callback('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '.');
           console.log('Error:  cannot find the', kbdName, 'keyboard for', kbdLang, 'at', kbdFile + '.');
@@ -3390,11 +3389,11 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             osk._Load();
 
             // Remove the wait message, if defined
-            if(typeof (util.wait) == 'function') {
+            if(!keymanweb.isEmbedded) {
               util.wait(false);
             }
           } // A handler portion for cases where the new <script> block loads, but fails to process.
-        } else if(!keymanweb.embedded) {  // Do not output error messages when embedded.  (KMEA/KMEI)
+        } else if(!keymanweb.isEmbedded) {  // Do not output error messages when embedded.  (KMEA/KMEI)
             kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.');
             console.log('Error registering the', kbdName, 'keyboard for', kbdLang + '.');
         }
@@ -3977,8 +3976,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       for(j=0; j<keymanweb.deferredKR.length; j++)
         keymanweb.KR(keymanweb.deferredKR[j]);
     
-      // Exit initialization here if target already fully initialized (if external routine exists)
-      if(!keymanweb.fullInitialization) return;
+      // Exit initialization here if we're using an embedded code path.
+      if(keymanweb.isEmbedded) return;
 
       // Determine the default font for mapped elements
       keymanweb.appliedFont=keymanweb.baseFont=keymanweb.getBaseFont();
