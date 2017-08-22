@@ -4482,10 +4482,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             keymanweb.setTextCaret(Ptarg,10000);
           }
         } else {
-          if(Ptarg.value) {
-            if(Ptarg.value.length == 0) {
+          if(Ptarg.value && Ptarg.value.length == 0) {
               Ptarg.dir=elDir;
-            } 
+          } else if(Ptarg.textContent && Ptarg.textContent.length == 0) { // As with contenteditable DIVs, for example.
+            Ptarg.dir=elDir;
           }
         }
       }
