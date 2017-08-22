@@ -64,7 +64,8 @@ if(!tavultesoft['keymanweb']) {
       srcPath: '',              // Path to folder containing executing keymanweb script
       rootPath: '',             // Path to server root
       mustReloadKeyboard: false,// Force keyboard refreshing even if already loaded
-      fullInitialization: true  // Force full page initialization unless overridden
+      isEmbedded: false         // Indicates if the KeymanWeb instance is embedded within a mobile app.
+                                // Blocks full page initialization when set to `true`.
     };
 
     keymanweb['initialized'] = 0;
