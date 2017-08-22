@@ -4486,10 +4486,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           if(Ptarg.value) {
             if(Ptarg.value.length == 0) {
               Ptarg.dir=elDir;
-            } else {
-              // We need to do this for some contenteditable elements.
-              Ptarg.base.dir=Ptarg.dir=elDir;
-            }
+            } 
           }
         }
       }
