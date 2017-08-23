@@ -680,23 +680,16 @@ if(!tavultesoft['keymanweb']) {
       return P_txt.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;');  // I1452 part 2
     }  
 
-
     /**
      * Function     createShim
-     * Scope        Public
-     * @return      {Object}      IFRAME element           
-     * Description  Create an IFRAME element to go between KMW and drop down (to fix IE6 bug)
+     * Scope        Public  
+     * Description  [Deprecated] Create an IFRAME element to go between KMW and drop down (to fix IE6 bug)
      */    
     util['createShim'] = util.createShim = function()     // I1476 - Handle SELECT overlapping BEGIN
     {
-      var e = util._CreateElement('IFRAME');
-      e.src = '';
-      e.style.display = 'none';
-      e.style.position = 'absolute';
-      e.style.filter = 'progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)';
-      e.frameBorder = '0';
-      e.scrolling = 'no';
-      return e;
+      console.warn("The util.createShim function is deprecated, as its old functionality is no longer needed.  " +
+        "It and references to its previously-produced shims may be safely removed.");
+      return;
     }
 
     // I1476 - Handle SELECT overlapping BEGIN
@@ -707,43 +700,23 @@ if(!tavultesoft['keymanweb']) {
      * @param       {Object}      Pvkbd         Visual keyboard DIV element 
      * @param       {Object}      Pframe        IFRAME shim element
      * @param       {Object}      Phelp         OSK Help DIV element               
-     * Description  Display iFrame under OSK at its currently defined position, to allow OSK to overlap SELECT elements (IE6 fix)  
+     * Description  [Deprecated] Display iFrame under OSK at its currently defined position, to allow OSK to overlap SELECT elements (IE6 fix)  
      */    
     util['showShim'] = util.showShim = function(Pvkbd,Pframe,Phelp)     
     {
-      if(Pframe)
-        try
-        {
-          Pframe.style.left = util._GetAbsoluteX(Pvkbd)+'px';
-          Pframe.style.top = util._GetAbsoluteY(Pvkbd)+'px';
-          if(Phelp)
-          {
-            Pframe.style.width = (util._GetAbsoluteX(Phelp)-util._GetAbsoluteX(Pvkbd)+Phelp.offsetWidth)+"px";
-            Pframe.style.height = (util._GetAbsoluteY(Phelp)-util._GetAbsoluteY(Pvkbd)+Phelp.offsetHeight)+"px";
-          }
-          else
-          {
-            Pframe.style.width = Pvkbd.offsetWidth+"px";
-            Pframe.style.height = Pvkbd.offsetHeight+"px";
-          }
-          Pframe.style.zindex = '9999';
-          Pframe.style.display = 'block';
-        } catch (Lerr) {} 
+      console.warn("The util.showShim function is deprecated, as its old functionality is no longer needed.  It may be safely removed.");
     }
 
     /**
      * Function     hideShim
      * Scope        Public
      * @param       {Object}      Pframe        IFRAME shim element
-     * Description  Hide iFrame shim containing OSK 
+     * Description  [Deprecated] Hide iFrame shim containing OSK 
      */    
     util['hideShim'] = function(Pframe)
     {
-      try {
-        if(Pframe) Pframe.style.display = 'none';
-      } catch (err) {}      
+      console.warn("The util.hideShim function is deprecated, as its old functionality is no longer needed.  It may be safely removed."); 
     }
-    // I1476 - Handle SELECT overlapping END
 
     /**
      * Function     rgba
