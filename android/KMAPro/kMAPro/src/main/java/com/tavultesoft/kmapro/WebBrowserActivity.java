@@ -72,6 +72,7 @@ public class WebBrowserActivity extends Activity {
     actionBar.setCustomView(webBarLayout);
     setContentView(R.layout.activity_web_browser);
 
+    //webView = new WebView(getApplicationContext());
     webView = (WebView) findViewById(R.id.webView);
     addressField = (EditText) findViewById(R.id.address_field);
     clearButton = (ImageButton) findViewById(R.id.clear_button);
@@ -224,6 +225,9 @@ public class WebBrowserActivity extends Activity {
     closeButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
+        // Hide the current keyboard so when Keyman app returns, there aren't 2 keyboards visible #220
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(addressField.getWindowToken(), 0);
         finish();
         overridePendingTransition(0, android.R.anim.fade_out);
       }
@@ -334,6 +338,7 @@ public class WebBrowserActivity extends Activity {
     super.onResume();
     if (webView != null) {
       webView.resumeTimers();
+      webView.onResume();
 
       if (didFinishLoading) {
         String fontFilename = KMManager.getKeyboardTextFontFilename();
@@ -349,6 +354,7 @@ public class WebBrowserActivity extends Activity {
     super.onPause();
     if (webView != null) {
       webView.pauseTimers();
+      webView.onPause();
     }
   }
 
