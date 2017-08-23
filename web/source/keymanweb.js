@@ -4484,7 +4484,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         } else {
           if(typeof Ptarg.value == "string" && Ptarg.value.length == 0) {
               Ptarg.dir=elDir;
-          } else if(Ptarg.textContent && Ptarg.textContent.length == 0) { // As with contenteditable DIVs, for example.
+          } else if(typeof Ptarg.textContent == "string" && Ptarg.textContent.length == 0) { // As with contenteditable DIVs, for example.
             Ptarg.dir=elDir;
           }
         }
