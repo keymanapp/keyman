@@ -219,7 +219,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
 
 - (id)init {
     if (self = [super init]) {
-        self.debugPrintingOn = NO;
+        self.debugPrintingOn = YES;
         self.keymanHelpOn = YES;
         self.canAddNewKeyboards = YES;
         self.canRemoveKeyboards = YES;
