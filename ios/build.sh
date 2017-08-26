@@ -16,6 +16,7 @@ display_usage ( ) {
     echo "                          Will not construct the archive and .ipa.  (includes -no-archive)"
     echo "  -no-archive             Bypasses the archive and .ipa preparation stage."
     echo "  -no-build               Cancels the build entirely.  Useful with 'build.sh -clean -no-build'."
+    echo "  -debug                  Sets the configuration to debug mode instead of release."
 exit 1
 }
 
@@ -32,9 +33,6 @@ BUNDLE_PATH=$KMEI_RESOURCES/Keyman.bundle/contents/resources
 APP_RESOURCES=keyman/Keyman/Keyman/libKeyman
 APP_BUNDLE_PATH=$APP_RESOURCES/Keyman.bundle
 APP_BUILD_PATH=keyman/Keyman/build/
-APP_BUNDLE_PATH=$APP_BUILD_PATH/Release-iphoneos/Keyman.app
-KEYBOARD_BUNDLE_PATH=$APP_BUILD_PATH/Release-iphoneos/SWKeyboard.appex
-ARCHIVE_PATH=$APP_BUILD_PATH/Release-iphoneos/Keyman.xcarchive
 KMW_SOURCE=../web/source
 
 do_clean ( ) {
@@ -52,6 +50,7 @@ DO_KMW_BUILD=true
 DO_KEYMANAPP=true
 DO_ARCHIVE=true
 CLEAN_ONLY=false
+CONFIG=Release
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -60,8 +59,9 @@ while [[ $# -gt 0 ]] ; do
         -no-kmw)
             DO_KMW_BUILD=false
             ;;
-        -h|-?)
+        -h|-?|-help)
             display_usage
+            exit 0
             ;;
         -libKeyman)
             DO_KEYMANAPP=false
@@ -80,9 +80,16 @@ while [[ $# -gt 0 ]] ; do
         -no-build)
             CLEAN_ONLY=true
             ;;
+        -debug)
+            CONFIG=Debug
+            ;;
     esac
     shift # past argument
 done
+
+APP_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.app
+KEYBOARD_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/SWKeyboard.appex
+ARCHIVE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
 
 if [ $CLEAN_ONLY = true ]; then
   exit 0
@@ -91,6 +98,7 @@ fi
 echo
 echo "KMW_SOURCE: $KMW_SOURCE"
 echo "DO_KMW_BUILD: $DO_KMW_BUILD"
+echo "CONFIGURATION: $CONFIG"
 echo
 
 update_bundle ( ) {
@@ -134,22 +142,23 @@ echo "Building KMEI..."
 
 #OTHER_CFLAGS=-fembed-bitcode is relied upon for building the samples by command-line.  They build fine within XCode itself without it, though.
 
-rm -r $KMEI_BUILD_PATH/Release-iphoneos 2>/dev/null
-xcodebuild -quiet -project engine/KMEI/KeymanEngine.xcodeproj -target KME-iphoneos OTHER_CFLAGS=-fembed-bitcode
-assertFileExists $KMEI_BUILD_PATH/Release-iphoneos/libKME-iphoneos.a
+rm -r $KMEI_BUILD_PATH/${CONFIG}-iphoneos 2>/dev/null
+xcodebuild -quiet -project engine/KMEI/KeymanEngine.xcodeproj -target KME-iphoneos OTHER_CFLAGS=-fembed-bitcode \
+  -configuration $CONFIG
+assertFileExists $KMEI_BUILD_PATH/${CONFIG}-iphoneos/libKME-iphoneos.a
 
-rm -r $KMEI_BUILD_PATH/Release-iphonesimulator 2>/dev/null
-xcodebuild -quiet -project engine/KMEI/KeymanEngine.xcodeproj -sdk iphonesimulator \
-  PLATFORM_NAME=iphonesimulator -target KME-iphonesimulator OTHER_CFLAGS=-fembed-bitcode
-assertFileExists $KMEI_BUILD_PATH/Release-iphonesimulator/libKME-iphonesimulator.a
+rm -r $KMEI_BUILD_PATH/${CONFIG}-iphonesimulator 2>/dev/null
+xcodebuild -quiet -project engine/KMEI/KeymanEngine.xcodeproj -sdk iphonesimulator PLATFORM_NAME=iphonesimulator \
+  -target KME-iphonesimulator OTHER_CFLAGS=-fembed-bitcode -configuration $CONFIG
+assertFileExists $KMEI_BUILD_PATH/${CONFIG}-iphonesimulator/libKME-iphonesimulator.a
 
 # Combine the two builds into KMEI.
 rm -f ${KMEI_OUTPUT_FOLDER}/libKeyman.a  2>/dev/null
 
-lipo -create "$KMEI_BUILD_PATH/Release-iphonesimulator/libKME-iphonesimulator.a" "$KMEI_BUILD_PATH/Release-iphoneos/libKME-iphoneos.a" -output "${KMEI_OUTPUT_FOLDER}/libKeyman.a"
+lipo -create "$KMEI_BUILD_PATH/${CONFIG}-iphonesimulator/libKME-iphonesimulator.a" "$KMEI_BUILD_PATH/${CONFIG}-iphoneos/libKME-iphoneos.a" -output "${KMEI_OUTPUT_FOLDER}/libKeyman.a"
 
 assertFileExists $KMEI_OUTPUT_FOLDER/libKeyman.a
-cp -Rf "$KMEI_BUILD_PATH/Release-iphoneos/usr/local/include" "${KMEI_OUTPUT_FOLDER}/"
+cp -Rf "$KMEI_BUILD_PATH/${CONFIG}-iphoneos/usr/local/include" "${KMEI_OUTPUT_FOLDER}/"
 
 echo "KMEI build complete."
 
@@ -166,8 +175,8 @@ if [ $DO_KEYMANAPP = true ]; then
     fi
 
     # To dynamically set the parameters in a way xcodebuild can use them, we need to construct the entire xcodebuild call as a string first.
-    BUILD_1="xcodebuild -quiet -project keyman/Keyman/Keyman.xcodeproj ${CODE_SIGN_IDENTITY} ${CODE_SIGNING_REQUIRED} ${DEV_TEAM} -target SWKeyboard"
-    BUILD_2="xcodebuild -quiet -project keyman/Keyman/Keyman.xcodeproj ${CODE_SIGN_IDENTITY} ${CODE_SIGNING_REQUIRED} ${DEV_TEAM} -target Keyman"
+    BUILD_1="xcodebuild -quiet -project keyman/Keyman/Keyman.xcodeproj ${CODE_SIGN_IDENTITY} ${CODE_SIGNING_REQUIRED} ${DEV_TEAM} -target SWKeyboard -configuration ${CONFIG}"
+    BUILD_2="xcodebuild -quiet -project keyman/Keyman/Keyman.xcodeproj ${CODE_SIGN_IDENTITY} ${CODE_SIGNING_REQUIRED} ${DEV_TEAM} -target Keyman -configuration ${CONFIG}"
 
     if [ $DO_ARCHIVE = false ]; then
       # Performs the actual build calls.
@@ -191,7 +200,7 @@ if [ $DO_KEYMANAPP = true ]; then
       # Time to prepare the deployment archive data.
       echo ""
       echo "Preparing .ipa file for deployment."
-      xcodebuild -quiet -workspace keymanios.xcworkspace -scheme Keyman -archivePath $ARCHIVE_PATH archive
+      xcodebuild -quiet -workspace keymanios.xcworkspace -scheme Keyman -archivePath $ARCHIVE_PATH archive -configuration $CONFIG
 
       # Pass the build number information along to the Plist file of the app.
       if [ $BUILD_NUMBER ]; then
@@ -204,7 +213,7 @@ if [ $DO_KEYMANAPP = true ]; then
         /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$ARCHIVE_PATH/Products/Applications/Keyman.app/Plugins/SWKeyboard.appex/Info.plist"
       fi
 
-      xcodebuild -quiet -exportArchive -archivePath keyman/Keyman/build/Release-iphoneos/Keyman.xcarchive -exportOptionsPlist exportAppStore.plist -exportPath keyman/keyman/build/Release-iphoneos
+      xcodebuild -quiet -exportArchive -archivePath keyman/Keyman/build/${CONFIG}-iphoneos/Keyman.xcarchive -exportOptionsPlist exportAppStore.plist -exportPath keyman/keyman/build/${CONFIG}-iphoneos -configuration $CONFIG
     fi
 
     #The resulting archives are placed in the keyman/Keyman/build/Release-iphoneos folder.
