@@ -3,6 +3,10 @@
 ## 10.0 alpha
 * Updated versioning scheme for uniformity across all Keyman products.
 
+## 2017-08-26 2.6.4 stable
+* Fixed bug with blank keyboard on some devices (#218)
+* Fixed bug with keyboard width being incorrect on iPhone 7, iPhone 7+ (#224) 
+
 ## 2017-08-18 2.6.0 beta
 * Numerous keyboarding bugfixes
 * Replaced an outdated internal library
