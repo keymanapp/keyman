@@ -318,7 +318,9 @@
                                                                  options:0
                                                                  metrics:nil
                                                                    views:viewsDict];
-    vFormat = @"H:[bView(>=320)]";
+    
+    CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+    vFormat = [NSString stringWithFormat:@"H:[bView(>=%lu)]", (unsigned long)screenWidth];
     NSArray *bView_constraint_V = [NSLayoutConstraint constraintsWithVisualFormat:vFormat
                                                                           options:0
                                                                           metrics:nil
@@ -345,13 +347,13 @@
     [self.view addConstraints:bView_constraint_POS_HL];
     
     CGSize size = self.kmInputView.frame.size;
-    vFormat = [NSString stringWithFormat:@"V:[cView(%d)]", (int)size.height%1000];
+    vFormat = [NSString stringWithFormat:@"V:[cView(%d)]", (int)size.height%1000]; // note this appears to relate to the rotation fix bug; may not work on iPads as 1000 is not enough
     cView_constraint_H = [NSLayoutConstraint constraintsWithVisualFormat:vFormat
                                                                  options:0
                                                                  metrics:nil
                                                                    views:viewsDict];
     
-    vFormat = @"H:[cView(>=320)]";
+    vFormat = [NSString stringWithFormat:@"H:[cView(>=%lu)]", (unsigned long)screenWidth];
     NSArray *cView_constraint_V = [NSLayoutConstraint constraintsWithVisualFormat:vFormat
                                                                           options:0
                                                                           metrics:nil
