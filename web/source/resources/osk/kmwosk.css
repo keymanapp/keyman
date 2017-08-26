@@ -19,7 +19,7 @@
 
 /* kmw-key-square applies only to OSK key elements, kmw-key-square-ex applies only to popup key elements */
 
-.phone .kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
+.phone.kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
         background-color:rgba(0,0,0,0.8);-webkit-user-select:none;}
 .phone .kmw-osk-inner-frame{margin:0;background:transparent;}
 .phone .kmw-key-layer-group{position:fixed;left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#999999;}
@@ -57,7 +57,7 @@
 .phone.android .kmw-key.kmw-spacebar.kmw-key-touched {background-color: #bbb;}
 .phone.android .kmw-spacebar-caption {color: #aaa;}
 
-.tablet .kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
+.tablet.kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
         background-color:rgba(0,0,0,0.8);-webkit-user-select:none;}
 .tablet .kmw-osk-inner-frame{margin:0;background:transparent;}
 .tablet .kmw-key-layer-group{position:fixed;left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#999999;}
@@ -290,3 +290,25 @@ div.android #keytip {background-color:#f00;}
           overflow:hidden;width:100%;height:100%;}
 .tablet-static .kmw-key-label{position:absolute;left:2px;top:2px;font:0.5em Arial;color:#888;background-color:transparent;}
 .tablet-static .kmw-key-text{position:relative;left:2px;top:2px;}
+
+.kmw-embedded .ios .kmw-key {
+    left: 0 !important;
+    bottom: 4px !important;
+}
+
+.kmw-embedded .ios .kmw-key-square {
+    height: 100% !important;
+}
+
+.kmw-embedded .ios.kmw-osk-frame {top:0 !important;bottom:initial !important; width:100% !important;}
+
+.kmw-embedded .ios.kmw-osk-frame {position: absolute !important;}
+
+.kmw-embedded .ios.kmw-osk-frame .kmw-key-layer-group {position: absolute !important; top: 0 !important; bottom: initial !important;}
+
+.kmw-embedded .ios.kmw-osk-frame .kmw-key-layer {position: absolute !important; top: 0 !important; bottom: initial !important;}
+
+.kmw-embedded .ios.kmw-osk-frame .kmw-key-square {position: absolute !important;}
+.kmw-embedded .ios.kmw-osk-frame .kmw-key-row {position: absolute !important;}
+.kmw-embedded .ios.kmw-osk-frame .kmw-key {position: absolute !important;}
+
