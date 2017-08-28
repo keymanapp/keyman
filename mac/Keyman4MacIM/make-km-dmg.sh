@@ -176,7 +176,7 @@ if  [[ $? != 0 || -d "$STAGING_DIR" ]] ; then
 fi
 
 # Step 5 - Convert image to a compressed readonly DMG image
-DMG_FILE_PATH="$DEST_DIR/Keyman-$KM_VERSION.dmg"
+DMG_FILE_PATH="$DEST_DIR/keyman-$KM_VERSION.dmg"
 displayInfo "Converting/compressing image to create \"$DMG_FILE_PATH\""
 if [[ -e "$DMG_FILE_PATH" ]] ; then
     if [[ "$VERBOSITY" != "-quiet" ]] ; then
