@@ -1,4 +1,4 @@
-f#!/bin/sh
+#!/bin/sh
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 if [[ "${OSTYPE}" != "darwin"* ]]; then
