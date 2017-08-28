@@ -92,7 +92,7 @@ elif [[ ! -d $DEST_DIR ]]; then
 	fail "Destination dir exists but is not a directory: $2"
 fi
 
-DMG_FILENAME="Keyman-$KM_VERSION.dmg"
+DMG_FILENAME="keyman-$KM_VERSION.dmg"
 DMG_FILEPATH="$DEST_DIR/$DMG_FILENAME"
 DOWNLOAD_INFO_FILEPATH="${DMG_FILEPATH}.download_info"
 if [[ ! -f "$DMG_FILEPATH" ]]; then
