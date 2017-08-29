@@ -1,2 +1,1 @@
-include ':facebookSDK'
 include ':kMAPro'
