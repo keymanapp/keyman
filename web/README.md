@@ -1,9 +1,8 @@
-**********************************************************************  
+# Keyman Web #   
+The Original Code is (C) 2017 SIL International
 
-  KeymanWeb 2.0
-  -------------  
-  
-  The Original Code is (C) 2017 SIL International
+## Minimum Web Requirements
+Google Closures Compiler is used to compile the javascript modules into a single module.  Java must be installed to run the compiler, which is stored in the tools folder.
 
 **********************************************************************
 
@@ -15,8 +14,5 @@ The following folders contain the distribution for KeymanWeb 2.0:
 	samples			Sample and test-case web-pages
 
 
-Google Closures Compiler is used to compile the javascript modules
-into a single module.  Java must be installed to run the compiler,
-which is stored in the tools folder.
 
 
