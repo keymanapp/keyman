@@ -233,22 +233,22 @@ if [ $BUILD_UI = true ]; then
 
     echo Compile ToolBar UI
     del $WEB_OUTPUT/kmuitoolbar.js 2>/dev/null
-    $compilecmd --js $SOURCE/kmwuitoolbar.js --externs $SOURCE/kmwreleasestub.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file $WEB_OUTPUT/kmwuitoolbar.js --warning_level VERBOSE --output_wrapper "(function() {%%output%%}());"
+    $compilecmd --js $SOURCE/kmwuitoolbar.js --externs $SOURCE/kmwreleasestub.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file $WEB_OUTPUT/kmwuitoolbar.js --warning_level VERBOSE --output_wrapper "(function() {%output%}());"
     assert $WEB_OUTPUT/kmwuitoolbar.js
 
     echo Compile Toggle UI
     del $WEB_OUTPUT/kmuitoggle.js 2>/dev/null
-    $compilecmd --js $SOURCE/kmwuitoggle.js --externs $SOURCE/kmwreleasestub.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file $WEB_OUTPUT/kmwuitoggle.js --warning_level VERBOSE --output_wrapper "(function() {%%output%%}());"
+    $compilecmd --js $SOURCE/kmwuitoggle.js --externs $SOURCE/kmwreleasestub.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file $WEB_OUTPUT/kmwuitoggle.js --warning_level VERBOSE --output_wrapper "(function() {%output%}());"
     assert $WEB_OUTPUT/kmwuitoggle.js
 
     echo Compile Float UI
     del $WEB_OUTPUT/kmuifloat.js 2>/dev/null
-    $compilecmd --js $SOURCE/kmwuifloat.js --externs $SOURCE/kmwreleasestub.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file $WEB_OUTPUT/kmwuifloat.js --warning_level VERBOSE --output_wrapper "(function() {%%output%%}());"
+    $compilecmd --js $SOURCE/kmwuifloat.js --externs $SOURCE/kmwreleasestub.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file $WEB_OUTPUT/kmwuifloat.js --warning_level VERBOSE --output_wrapper "(function() {%output%}());"
     assert $WEB_OUTPUT/kmwuifloat.js
 
     echo Compile Button UI
     del $WEB_OUTPUT/kmuibutton.js 2>/dev/null
-    $compilecmd --js $SOURCE/kmwuibutton.js --externs $SOURCE/kmwreleasestub.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file $WEB_OUTPUT/kmwuibutton.js --warning_level VERBOSE --output_wrapper "(function() {%%output%%}());"
+    $compilecmd --js $SOURCE/kmwuibutton.js --externs $SOURCE/kmwreleasestub.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file $WEB_OUTPUT/kmwuibutton.js --warning_level VERBOSE --output_wrapper "(function() {%output%}());"
     assert $WEB_OUTPUT/kmwuibutton.js
 
     echo User interface modules compiled and saved under $WEB_OUTPUT
