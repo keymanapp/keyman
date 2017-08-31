@@ -15,7 +15,8 @@ To build Keyman for macOS, do the following:
 ### Running Keyman
 1. Deploy Keyman locally using `./build.sh -deploy local -deploy-only`.
     * Alternatively copy **keyman/mac/Keyman4MacIM/build/Debug/Keyman.app** to **~/Library/Input Methods**
-2. Follow the installation instructions at [Installing Keyman for Mac OS X](https://help.keyman.com/products/mac/1.0/docs/start_download-install_keyman.php).
+2. If running for the first time, follow the installation instructions at
+[Installing Keyman for Mac OS X](https://help.keyman.com/products/mac/1.0/docs/start_download-install_keyman.php).
 
 ### Compiling from Xcode
 To build using Xcode, you will need to build KeymanEngine4Mac first and then build Keyman4MacIM.
@@ -26,9 +27,9 @@ To build using Xcode, you will need to build KeymanEngine4Mac first and then bui
 4. Open **keyman/mac/Keyman4MacIM/Keyman4MacIM.xcodeproj**
 5. Open the Project Navigator: View > Navigators > Show Project Navigator (Cmd-1)
 6. Select Keyman4MacIM. Click Build Settings, scroll down to the Signing section and change Code Signing Identity to
-    Don't Code Sign.
+Don't Code Sign.
     * This will modify **Keyman4MacIM.xcodeproj**. Do not commit the change.
-5. Build the project
+7. Build the project. Refer to [Running Keyman](#running-keyman) on how to install the app.
 
 ### Sample Projects
 Not yet available on Mac...
