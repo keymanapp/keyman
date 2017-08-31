@@ -36,10 +36,11 @@ Keyman for Android (formerly named KMAPro) can be built from a command line (pre
 2. Launch Android Studio and import the Gradle project **keyman/android/KMAPro/build.gradle**
 3. From the project view, *configure* anything that Gradle reports.
 4. Create a run configuration for kMAPro
-    i. Select Run --> Edit Configurations...
-    ii. Select Add New Configuration (+) --> Android App
-    iii. Change Module to kMAPro
-    iv. Name your run configuration kMAPro (or as desired)
+    1. Select Run --> Edit Configurations...
+    2. Select Add New Configuration (+) --> Android App
+    3. Change Module to kMAPro
+    4. Name your run configuration kMAPro (or as desired)
+    
 5. Run your new configuration: Select Run --> Run 'kMAPro'
 6. Select a physical device or create a new virtual device to match your target API version
 
@@ -47,11 +48,12 @@ Keyman for Android (formerly named KMAPro) can be built from a command line (pre
 1. Launch a command prompt
 2. cd to the **$ANDROID_HOME/tools** directory
 3. Ensure that a physical device is connected or an emulator is running.
-    i. To list physical devices: `adb devices`
-    ii. To list created emulator devices: `emulator -list-avds`
-    iii. [Create a new virtual device](https://developer.android.com/studio/run/managing-avds.html) if there are no
-    existing devices.
-    iv. Start an emulator: `emulator @nameofemulator`
+    1. To list physical devices: `adb devices`
+    2. To list created emulator devices: `emulator -list-avds`
+    3. [Create a new virtual device](https://developer.android.com/studio/run/managing-avds.html) if there are no
+    existing devices.    
+    4. Start an emulator: `emulator @nameofemulator`
+    
 4. Load the APK: `adb install -r path/to/apk.apk`
     i. If multiple devices are connected you may need `adb install -r -s SERIAL path/to/apk.apk`. Replace `SERIAL` with
        the device serial number listed in step 3.
