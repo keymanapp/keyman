@@ -30,21 +30,9 @@ WEB_OUTPUT="../output"
 EMBED_OUTPUT="../embedded"
 SOURCE="."
 
-# If we're on Mac OS X, the `cp` command doesn't like to create a new folder mirroring the original of a
-# cp -R command, dumping its contents into the destination folder rather than a new, copied subfolder.
-#
-# The RESOURCES variable is used to compensate for this behavior when necessary.
-# Expand this section if necessary for other shells.
-if [ $OSTYPE = "darwin16" ]; then
-    resources="resources/"
-else
-    resources=""
-fi
-
 readonly WEB_OUTPUT
 readonly EMBED_OUTPUT
 readonly SOURCE
-readonly resources
 
 # Get build version -- if not building in TeamCity, then always use 300
 : ${BUILD_COUNTER:=300}
@@ -159,7 +147,7 @@ if [ $BUILD_EMBED = true ]; then
 
     # echo Copy or update resources
 
-    cp -Rf $SOURCE/resources/ $EMBED_OUTPUT/$resources >/dev/null
+    cp -Rf $SOURCE/resources $EMBED_OUTPUT/ >/dev/null
 
     # Update build number if successful
     echo
@@ -205,23 +193,15 @@ if [ $BUILD_FULLWEB = true ]; then
     echo 
     echo Copy resources to $WEB_OUTPUT/ui, .../osk
 
-    if [ -z $resources ]; then  #if the string is empty.
-        ui=""
-        osk=""
-    else
-        ui=ui/
-        osk=osk/
-    fi
-
-    cp -Rf $SOURCE/resources/ui/  $WEB_OUTPUT/$ui  >/dev/null
-    cp -Rf $SOURCE/resources/osk/ $WEB_OUTPUT/$osk  >/dev/null
+    cp -Rf $SOURCE/resources/ui  $WEB_OUTPUT/  >/dev/null
+    cp -Rf $SOURCE/resources/osk $WEB_OUTPUT/  >/dev/null
 
     echo Copy source to $WEB_OUTPUT/src
     cp -Rf $SOURCE/*.js $WEB_OUTPUT/src
     echo $BUILD > $WEB_OUTPUT/src/version.txt
 
-    cp -Rf $SOURCE/resources/ui/  $WEB_OUTPUT/src/$ui >/dev/null
-    cp -Rf $SOURCE/resources/osk/ $WEB_OUTPUT/src/$osk >/dev/null
+    cp -Rf $SOURCE/resources/ui  $WEB_OUTPUT/src/ >/dev/null
+    cp -Rf $SOURCE/resources/osk $WEB_OUTPUT/src/ >/dev/null
 
     # Update build number if successful
     echo
