@@ -12,6 +12,7 @@ default:
     @echo     release               make a release
     @echo     web-install           sends the documentation to the website
     @echo     test-certificate      create a test certificate + CA (and install test CA)
+    @echo     signcode              sign the build artifacts
     @echo.
     @echo     Build flags:
     @echo           DEBUG           Include debug information
