@@ -40,7 +40,7 @@ backup:
 
 
 install:
-    $(COPY) $(PROGRAM)\developer\tike.exe "c:\Program Files (x86)\Tavultesoft\Keyman Developer 9.0\tike.exe"
+    $(COPY) $(PROGRAM)\developer\tike.exe "c:\Program Files (x86)\Keyman\Keyman Developer 10.0\tike.exe"
 
 test-manifest:
     # test that linked manifest exists and correct

@@ -29,4 +29,7 @@ test-manifest:
     # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
     $(MT) -nologo -inputresource:$(PROGRAM)\desktop\setup.exe -validate_manifest
 
+install:
+    rem
+
 !include ..\..\Target.mak

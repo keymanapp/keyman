@@ -23,4 +23,7 @@ signcode:
 backup:
     $(WZZIP) $(BUILD)\desktop\insthelp.zip  $(BACKUPDEFAULTS) insthelp.exe
 
+install:
+    rem
+
 !include ..\..\Target.mak
