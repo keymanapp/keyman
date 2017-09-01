@@ -15,9 +15,9 @@ In order to test any code changes on a physical device, Apple requires that an a
 - Open Xcode and the settings for the Keyman target.
 - Establish personal code-signing permissions.
   - Go to the **General** tab and enable "Automatically manage signing" and select your "Personal Team."
-	- Afterward, swap to the **Capabilities** tab and *disable* "App Groups."
-	- Correct any further error messages Xcode presents you with.
-	- **Note**:  Code-signing permissions must be reverted to the original settings for PRs.
+  - Afterward, swap to the **Capabilities** tab and *disable* "App Groups."
+  - Correct any further error messages Xcode presents you with.
+  - **Note**:  Code-signing permissions must be reverted to the original settings for PRs.
 - Under the **Product > Destination** Xcode menu, select the device you wish to use for testing.
 - Attempt to "Run" Keyman on the device.  The operation should fail, but this step is necessary to continue.
 - Now, on the device itself, go to **Settings > General > Profiles & Device Management** and give your developer account trusted permissions.
