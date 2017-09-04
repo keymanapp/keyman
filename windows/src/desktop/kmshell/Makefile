@@ -36,7 +36,7 @@ test-manifest:
     $(MT) -nologo -inputresource:$(PROGRAM)\desktop\kmshell.exe -validate_manifest
 
 install:
-    copy $(ROOT)\bin\desktop\kmshell.exe "C:\Program Files (x86)\Keyman\Keyman Desktop 10.0"
-    copy $(ROOT)\bin\desktop\xml\* "C:\Program Files (x86)\Keyman\Keyman Desktop 10.0\xml\"
+    copy $(ROOT)\bin\desktop\kmshell.exe $(INSTALLPATH_KEYMANDESKTOP)
+    copy $(ROOT)\bin\desktop\xml\* $(INSTALLPATH_KEYMANDESKTOP)\xml\
 
 !include ..\..\Target.mak
