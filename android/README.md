@@ -9,7 +9,7 @@ Keyman for Android has a minSdkVersion of 15 for [Android 4.0.3 Ice Cream Sandwi
 2. For Windows users, set environment variable **ANDROID_HOME** to the location of your Android SDK. The default installation location is **C:\Users\\[USER]\AppData\Local\Android\sdk** where [USER] is your username. You may need to log out and log back in to take effect.
 
 For MacOS/Linux users, add the following to **~/.bashrc** or **~/.bash_profile**
-```
+```bash
 export ANDROID_HOME=$HOME/Android/Sdk
 export PATH=$PATH:$ANDROID_HOME/tools
 ```
@@ -78,16 +78,17 @@ Building these projects follow the same steps as KMAPro:
 2. Run `./build.sh`
 
 Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imported in any project.
-A copy can be found at **android/Samples/KMSample1/app/libs/keyman-engine.aar**.
 
 ## How to Use Keyman Engine for Android Library
 
-1. Copy **keyman-engine.aar** into **[Your project folder]/app/libs/** folder.
+1. Add **keyman-engine.aar** into **[Your project folder]/app/libs/** folder.
+    a. If you built the Keyman Engine, get the copy from **android/Samples/KMSample1/app/libs/keyman-engine.aar**
+    b. Otherwise, [download](https://keyman.com/downloads/#android-engine) the Keyman Engine and extract the .aar file.
 2. Open your project in Android Studio.
 3. Open **build.gradle** (Module: app) in "Gradle Scripts".
 4. include `compile(name:'keyman-engine', ext:'aar')` in dependencies.
 5. after dependencies, insert
-````
+````gradle
     repositories {
         mavenCentral()
         flatDir {
