@@ -19,6 +19,36 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     var keymanweb=window['tavultesoft']['keymanweb'], osk=keymanweb['osk'],
         util=keymanweb['util'],device=util.device,dbg=keymanweb.debug;
 
+    // Define Keyman Developer modifier bit-flags (exposed for use by other modules)
+    osk.modifierCodes = {
+      "LCTRL":0x0001,
+      "RCTRL":0x0002,
+      "LALT":0x0004,
+      "RALT":0x0008,
+      "SHIFT":0x0010,
+      "CTRL":0x0020,
+      "ALT":0x0040,
+      "CAPS":0x0100,
+      "NO_CAPS":0x0200,
+      "NUM_LOCK":0x0400,
+      "NO_NUM_LOCK":0x0800,
+      "SCROLL_LOCK":0x1000,
+      "NO_SCROLL_LOCK":0x2000
+    };
+
+    osk.modifierBitmasks = {
+      "ALL":0x007F,
+      "CHIRAL":0x001F,
+      "NON_CHIRAL":0x0070
+    };
+
+    osk.stateBitmasks = {
+      "ALL":0x3F00,
+      "CAPS":0x0300,
+      "NUM_LOCK":0x0C00,
+      
+    };
+
     // Define standard keycode numbers (exposed for use by other modules)
     osk.keyCodes={
       "K_BKSP":8,"K_TAB":9,"K_ENTER":13,
@@ -650,7 +680,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var nextLayer = arguments.length < 2 ? null : nextLayerIn;
 
       // Layer must be identified by name, not number (27/08/2015)
-      if(typeof nextLayer == 'number')  nextLayer = osk.getLayerId(nextLayer);
+      if(typeof nextLayer == 'number')  nextLayer = osk.getLayerId(nextLayer * 0x10);
 
       // Identify next layer, if required by key
       if(!nextLayer) switch(keyName)
@@ -923,16 +953,37 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Scope        Private
      * @param       {number}      m     shift modifier code
      * @return      {string}            layer string from shift modifier code (desktop keyboards)
-     * Description  Get name of layer form code (Note reversal: ctrlalt, not altctrl)
+     * Description  Get name of layer from code, where the modifer order is determined by ascending bit-flag value.
      */
     osk.getLayerId = function(m)
     {
       var s='';
-      if(m == 0) return 'default';
-      if(m & 1) s = 'shift';
-      if(m & 4) s = 'alt'+s;
-      if(m & 2) s = 'ctrl'+s;
-      return s;
+      if(m == 0) {
+        return 'default';
+      } else {
+        if(m & osk.modifierCodes.LCTRL) {
+          s = s + 'leftctrl';
+        }
+        if(m & osk.modifierCodes.RCTRL) {
+          s = s + 'rightctrl';
+        }
+        if(m & osk.modifierCodes.LALT) {
+          s = s + 'leftalt';
+        }
+        if(m & osk.modifierCodes.RALT) {
+          s = s + 'rightalt';
+        }
+        if(m & osk.modifierCodes.SHIFT) {
+          s = s + 'shift';
+        }
+        if(m & osk.modifierCodes.CTRL) {
+          s = s + 'ctrl';
+        }
+        if(m & osk.modifierCodes.ALT) {
+          s = s + 'alt';
+        }
+        return s;
+      }
     }
 
     /**
@@ -1505,7 +1556,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var keyShiftState=0;
       if(e)
         // read shift states from Pevent
-        keyShiftState = e.Lmodifiers/0x10;
+        keyShiftState = e.Lmodifiers;
       else if(d)
         keyShiftState |= v;
       else
@@ -2490,6 +2541,148 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
 
     /**
+     * Converts the legacy BK property from pre 10.0 into the KLS keyboard layer spec format.
+     * 
+     * @param   {Array}   BK      keyboard object (as loaded)
+     * @return  {Object}
+     */
+    osk.processLegacyDefinitions = function(BK) {
+      var idList=['default','shift','ctrl','shiftctrl','alt','shiftalt','ctrlalt','shiftctrlalt'];
+
+      var KLS = {};
+
+      // The old default:  eight auto-managed layers...
+      for(var n=0; n<8; n++) {
+        var id = idList[n], arr = [], valid = false;
+
+        // ... with keycode mappings in blocks of 65.
+        for(var k=0; k < 65; k++) {
+          var index = k + 65 * n;
+          arr.push(BK[index]);
+
+          if(index < BK.length && BK[index] != '' && k != dfltCodes.indexOf('K_SPACE')) {
+            valid = true;
+          }
+        }
+
+        if(valid) {
+          KLS[id] = arr;
+        }
+      }
+
+      // There must always be at least a plain 'default' layer.
+      if(typeof KLS['default'] == 'undefined' || ! KLS['default']) {
+        KLS['default'] = Array.from(''.repeat(65));
+      }
+
+      // There must always be at least a plain 'shift' layer.
+      if(typeof KLS['shift'] == 'undefined' || ! KLS['shift']) {
+        KLS['shift'] = Array.from(''.repeat(65));
+      }
+
+      return KLS;
+    }
+
+    /**
+     * Sets a formatting property for the modifier keys when constructing a default layout for a keyboard.
+     * 
+     * @param   {Object}    layer   // One layer specification
+     * @param   {boolean}   chiral  // Whether or not the keyboard uses chiral modifier information.
+     * @param   {string}    formFactor  // The form factor of the device the layout is being constructed for.
+     */
+    osk.formatDefaultLayer = function(layer, chiral, formFactor) {
+      var layerId = layer['id'];
+
+      // Correct appearance of state-dependent modifier keys according to group
+      for(var i=0; i<layer['row'].length; i++) {
+        var row=layer['row'][i];
+        var keys=row['key'];
+        for(var j=0; j<keys.length; j++) {
+          var key=keys[j];
+          switch(key['id']) {
+            case 'K_SHIFT':
+            case 'K_LSHIFT':
+            case 'K_RSHIFT':
+              if(layerId.indexOf('shift') != -1) {
+                key['sp'] = '2';
+              } 
+              if((formFactor != 'desktop') && (layerId != 'default')) {
+                key['nextlayer']='default';
+              }
+              break;
+            case 'K_LCTRL':
+            case 'K_LCONTROL':
+              if(chiral) {
+                if(layerId.indexOf('leftctrl') != -1) {
+                  key['sp'] = '2';
+                }
+                break;
+              } 
+            case 'K_RCTRL':
+            case 'K_RCONTROL':
+              if(chiral) {
+                if(layerId.indexOf('rightctrl') != -1) {
+                  key['sp'] = '2';
+                }
+                break;
+              }
+            case 'K_CONTROL':
+              if(layerId.indexOf('ctrl') != -1) {
+                if(!chiral || (layerId.indexOf('leftctrl') != -1 && layerId.indexOf('rightctrl') != -1)) {
+                  key['sp'] = '2';              
+                }
+              }
+              break;
+            case 'K_LALT':
+              if(chiral) {
+                if(layerId.indexOf('leftalt') != -1) {
+                  key['sp'] = '2';
+                }
+                break;
+              } 
+            case 'K_RALT':
+              if(chiral) {
+                if(layerId.indexOf('rightalt') != -1) {
+                  key['sp'] = '2';
+                }
+                break;
+              } 
+            case 'K_ALT':
+              if(layerId.indexOf('alt') != -1) {
+                if(!chiral || (layerId.indexOf('leftalt') != -1 && layerId.indexOf('rightalt') != -1)) {
+                  key['sp'] = '2';              
+                }
+              }
+              break;
+          }
+        }
+      }
+    }
+
+    /**
+     * Generates a list of potential layer ids for the specified chirality mode.
+     */
+    osk.generateLayerIds = function(chiral) {
+      var layerCnt, offset;
+
+      if(chiral) {
+        layerCnt=32;
+        offset=0x00;
+      } else {
+        layerCnt=8;
+        offset=0x10;
+      }
+
+      var layerIds = [];
+
+      for(var i=0; i < layerCnt; i++) {
+        layerIds.push(osk.getLayerId(i * offset));
+      }
+
+      return layerIds;
+    }
+
+    /**
      * Build a default layout for keyboards with no explicit layout
      *
      * @param   {Object}  PVK     keyboard object (as loaded)
@@ -2501,77 +2694,56 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var layout;
 
       // Build a layout using the default for the device
-      var layoutType=formFactor,dfltLayout=keymanweb['dfltLayout'];
-      if(typeof dfltLayout[layoutType] != 'object') layoutType = 'desktop';
+      var layoutType=formFactor, dfltLayout=keymanweb['dfltLayout'];
+      if(typeof dfltLayout[layoutType] != 'object') {
+        layoutType = 'desktop';
+      }
 
       // Clone the default layout object for this device
       layout=util.deepCopy(dfltLayout[layoutType]);
 
-      var n,layers=layout['layer'],keyLabels=PVK['BK'],key102=PVK['K102'];
-      var i,j,k,m,row,rows,key,keys;
+      var kbdBitmask = PVK['KMBM'];
+      if(typeof kbdBitmask == 'undefined' || !kbdBitmask) {
+        kbdBitmask = osk.modifierBitmasks.NON_CHIRAL;
+      }
+
+      var n,layers=layout['layer'], keyLabels=PVK['KLS'], key102=PVK['K102'];
+      var i, j, k, m, row, rows, key, keys;
+      var chiral = (kbdBitmask & osk.modifierBitmasks['CHIRAL'] & ~osk.modifierCodes['SHIFT']);
+
+      if(typeof keyLabels == 'undefined' || !keyLabels) {
+        keyLabels = osk.processLegacyDefinitions(PVK['BK']);
+      }
 
       // Identify key labels (e.g. *Shift*) that require the special OSK font
       var specialLabel=/\*\w+\*/;
 
-      // For default layouts, add other layers as modified copies of the default layer
-      var idList=['default','shift','ctrl','ctrlshift','alt','altshift','ctrlalt','ctrlaltshift'];
-      //var shiftKeyLabels=['Shift','Shifted','Ctrl','CtrlShift','Alt','AltShift','CtrlAlt','CtrlAltShift'];
-      //var shiftedId=['K_SHIFT','K_SHIFT','K_LCTRL','K_SHIFT','K_LALT','K_SHIFT','K_ALTGR','K_SHIFT'];
-      for(n=0; n<8; n++)
-      {
+      // The 'default' layer must be the first one processed.
+      var idList = Object.getOwnPropertyNames(keyLabels);
+      idList.splice(idList.indexOf('default'), 1);
+      idList = [ 'default' ].concat(idList);
+
+      for(n=0; n<idList.length; n++) {
         // Populate non-default (shifted) keygroups
-        if(n > 0) layers[n]=util.deepCopy(layers[0]);
+        if(n > 0) {
+          layers[n]=util.deepCopy(layers[0]);
+        }
         layers[n]['id']=idList[n];
         layers[n]['nextlayer']=idList[n]; // This would only be different for a dynamic keyboard
 
-        // Correct appearance of state-dependent modifier keys according to group
-        for(i=0; i<layers[n]['row'].length; i++)
-        {
-          row=layers[n]['row'][i];
-          keys=row['key'];
-          for(j=0; j<keys.length; j++)
-          {
-            key=keys[j];
-            switch(key['id'])
-            {
-              case 'K_SHIFT':
-              case 'K_LSHIFT':
-              case 'K_RSHIFT':
-                if((n & 1) == 1) key['sp'] = '2';
-                if((formFactor != 'desktop') && (n > 0)) key['nextlayer']='default';
-                break;
-              case 'K_CONTROL':
-              case 'K_LCTRL':
-              case 'K_LCONTROL':
-              case 'K_RCTRL':
-              case 'K_RCONTROL':
-                if((n & 2) == 2) key['sp'] = '2';
-                break;
-              case 'K_ALT':
-              case 'K_LALT':
-              case 'K_RALT':
-                if((n & 4) == 4) key['sp'] = '2';
-                break;
-            }
-          }
-        }
+        // Extraced into a helper method to improve readability.
+        osk.formatDefaultLayer(layers[n], chiral != 0, formFactor);
 
+        // TODO:  refactor into the osk.formatDefaultLayer() method.
         // Hide extra key (OEM 102) if none in keyboard definition
-        if(typeof key102 == 'undefined' || !key102)
-        {
-          for(i=0; i<layers[n]['row'].length; i++)
-          {
-            for(j=0; j<layers[n]['row'][i]['key'].length; j++)
-            {
-              if(layers[n]['row'][i]['key'][j]['id'] == 'K_oE2')
-              {
-                if(formFactor == 'desktop')
-                {
+        if(typeof key102 == 'undefined' || !key102) {
+          for(i=0; i<layers[n]['row'].length; i++) {
+            for(j=0; j<layers[n]['row'][i]['key'].length; j++) {
+              if(layers[n]['row'][i]['key'][j]['id'] == 'K_oE2') {
+                if(formFactor == 'desktop') {
                   layers[n]['row'][i]['key'].splice(j,1);
                   layers[n]['row'][i]['key'][0]['width']='200';
-                }
-                else
-                {
+                } else {
                   layers[n]['row'][i]['key'][j]['sp']='10';
                 }
               }
@@ -2579,10 +2751,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           }
         }
       }
+
       // Add default key labels and key styles
       for(n=0; n<layers.length; n++)
       {
-        var layer=layers[n],kx,shiftKey=null,nextKey=null,allText='';
+        var layer=layers[n], kx, shiftKey=null, nextKey=null, allText='';
+        var layerSpec = keyLabels[layer['id']];
+        var isShift = layer['id'] == 'shift' ? 1 : 0;
+
         rows=layer['row'];
         for(i=0; i<rows.length; i++)
         {
@@ -2593,35 +2769,37 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             kx=dfltCodes.indexOf(key['id']);
 
             // Get keycap text from visual keyboard array, if defined in keyboard
-            if(typeof keyLabels != 'undefined' && kx >= 0 && kx+65*n < keyLabels.length) key['text']=keyLabels[kx+65*n];
+            if(kx >= 0 && kx < layerSpec.length) key['text']=layerSpec[kx];
 
-            // Fall back to US English keycap text (any 'ghost' keys must now be explicitly defined in layout)
-            if(key['text'] == '' &&  key['id'] != 'K_SPACE' && kx+65*n < dfltText.length) key['text']=dfltText[kx+65*n];
+            // Fall back to US English keycap text as default for the base two layers if not otherwise defined.
+            // (Any 'ghost' keys must be explicitly defined in layout for these layers.)
+            if(layer['id'] == 'default' || isShift) {
+              if(key['text'] == '' &&  key['id'] != 'K_SPACE' && kx+65 * isShift < dfltText.length) {
+                key['text']=dfltText[kx+65*isShift];
+              }
+            }
 
             // Leave any unmarked key caps as null strings
-            if(typeof(key['text']) == 'undefined') key['text']='';
-
-            if(key['id'] == 'K_SHIFT') shiftKey=key;
-            if(key['id'] == 'K_TAB') nextKey=key;
-
-            // Concatenate all keys for this layer, excluding special keys, to check for existence of layer
-            if(!specialLabel.test(key['text'])) allText=allText+key['text'];
+            if(typeof(key['text']) == 'undefined') { 
+              key['text']='';
+            }
+            if(key['id'] == 'K_SHIFT') {
+              shiftKey=key;
+            }
+            if(key['id'] == 'K_TAB') {
+              nextKey=key;
+            }
           }
         }
 
-        // Mark layer as valid if any key caps (excluding special keys) are defined, invalid otherwise
-        layer.valid=(allText.trim().length > 0);
         layer.shiftKey=shiftKey;
 
         // Set modifier key appearance and behaviour for non-desktop devices using the default layout
-        if(formFactor != 'desktop')
-        {
-          if(n > 0 && shiftKey != null)
-          {
+        if(formFactor != 'desktop') {
+          if(n > 0 && shiftKey != null) {
             shiftKey['sp']='2';
             shiftKey['sk']=null;
-            switch(layers[n].id)
-            {
+            switch(layers[n].id) {
               case 'ctrl':
                 shiftKey['text']='*Ctrl*'; break;
               case 'alt':
@@ -2634,33 +2812,70 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
 
       // Remove pop-up shift keys referencing invalid layers (Build 349)
-      for(n=0; n<8; n++)
-      {
+      for(n=0; n<layers.length; n++) {
         rows=layers[n]['row'];
-        for(i=0; i<rows.length; i++)
-        {
+        for(i=0; i<rows.length; i++) {
           keys=rows[i]['key'];
-          for(j=0; j<keys.length; j++)
-          {
+          for(j=0; j<keys.length; j++) {
             key=keys[j];
-            if(key['sk'] != null)
-            {
-              for(m=0; m<8; m++)
-              {
-                for(k=0; k<key['sk'].length; k++)
-                {
-                  if(key['sk'][k]['nextlayer'] == idList[m])
-                  {
-                    if(!layers[m].valid) key['sk'].splice(k,1);
-                    break;
-                  }
+            if(key['sk'] != null) {
+              for(k=0; k<key['sk'].length; k++) {
+                if(idList.indexOf(key['sk'][k]['nextlayer']) == -1) {
+                  key['sk'].splice(k--, 1);
                 }
               }
-              if(key['sk'].length == 0) key['sk']=null;
+
+              if(key['sk'].length == 0) {
+                key['sk']=null;
+              }
             }
           }
         }
       }
+
+      // Create empty layers (on desktop) for the unused modifiers - they're needed for OSK display.
+      if(formFactor == 'desktop') {
+        var allLayers = osk.generateLayerIds(chiral);
+
+        // Create layer for each item in list.
+        for(n=0; n<allLayers.length; n++) {
+          // Does the layer already exist?
+          if(idList.indexOf(allLayers[n]) != -1) {
+            continue;
+          }
+
+          // Populate non-default (shifted) keygroups
+          var layer;
+          if(n > 0) {
+            layer=util.deepCopy(layers[0]);
+          }
+          layer['id']=allLayers[n];
+          layer['nextlayer']=allLayers[n]; // This would only be different for a dynamic keyboard
+  
+          // Extraced into a helper method to improve readability.
+          osk.formatDefaultLayer(layer, chiral != 0, formFactor);
+  
+          // TODO:  refactor into the osk.formatDefaultLayer() method.
+          // Hide extra key (OEM 102) if none in keyboard definition
+          if(typeof key102 == 'undefined' || !key102) {
+            for(i=0; i<layer['row'].length; i++) {
+              for(j=0; j<layer['row'][i]['key'].length; j++) {
+                if(layer['row'][i]['key'][j]['id'] == 'K_oE2') {
+                  if(formFactor == 'desktop') {
+                    layer['row'][i]['key'].splice(j,1);
+                    layer['row'][i]['key'][0]['width']='200';
+                  } else {
+                    layer['row'][i]['key'][j]['sp']='10';
+                  }
+                }
+              }
+            }
+          }
+
+          layers.push(layer);
+        }
+      }
+
       return layout;
     }
 
