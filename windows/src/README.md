@@ -48,7 +48,7 @@ install it over a later version of Keyman, and will need to uninstall and reinst
 
 These steps are only required the first time you install Keyman:
 1. Install release versions of Keyman 10.0 and Keyman Developer 10.0.
-    * Download the [alpha versions](https://keyman.com/beta/) and run the installers.
+    * Download the [latest official builds (alpha)](https://keyman.com/beta/) and run the installers.
 2. Install the Keyman test certificates. Do the following for each KeymanTestCA cert in
 **windows/src/buildtools/certificates**:
     1. Open the certificate and click 'Install certificate...' to open the Certificate Import Wizard.
@@ -76,6 +76,7 @@ Configure Visual Studio to use two-space tab stops:
 1. Open the options dialog: Tools > Options
 2. Navigate to Text Editor > All Languages > Tabs
 3. Change 'Tab size' to 2 and 'Indent size' to 2
+4. Select 'Insert spaces'
 
 ### Delphi setup requirements
 
