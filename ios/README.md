@@ -25,4 +25,4 @@ In order to test any code changes on a physical device, Apple requires that an a
 - Attempt to "Run" Keyman on the device.  The operation should fail, but this step is necessary to continue.
 - Now, on the device itself, go to **Settings > General > Profiles & Device Management** and give your developer account trusted permissions.
 
-You should then be freely able to test the app on your personal development device.
+You should then be freely able to test the app on your personal development device so long as it is running iOS 8 or higher.
