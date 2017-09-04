@@ -177,7 +177,6 @@
 		987728D01B7C0E6400DBC159 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C0D811994613E009D2A13 /* WebKit.framework */; };
 		987728D11B7C0E7300DBC159 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C0D811994613E009D2A13 /* WebKit.framework */; };
 		989E4DBC1B1EB85200A345FB /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 989E4DBA1B1EB85200A345FB /* Settings.bundle */; };
-		98CD126219CA85710089385F /* KeyboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98CD126119CA85710089385F /* KeyboardViewController.m */; };
 		98CD126D19CA85B60089385F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98DE283417F50DBF00D6A496 /* AudioToolbox.framework */; };
 		98CD126E19CA85BF0089385F /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41903176952D0008D2FF3 /* CFNetwork.framework */; };
 		98CD126F19CA85C80089385F /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41905176952E0008D2FF3 /* MobileCoreServices.framework */; };
@@ -191,6 +190,7 @@
 		98CF00B91B461EDE00627DC6 /* get-started.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B51B461EDE00627DC6 /* get-started.png */; };
 		98CF00BA1B461EDE00627DC6 /* info.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B61B461EDE00627DC6 /* info.png */; };
 		98CF00BB1B461EDE00627DC6 /* menu-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B71B461EDE00627DC6 /* menu-icon.png */; };
+		C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
 		CE06AA681F171CA0006D91C3 /* Keyman.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418F71769486C008D2FF3 /* Keyman.h */; };
 /* End PBXBuildFile section */
 
@@ -383,8 +383,6 @@
 		98C893F119F0811A000B9AC8 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		98CD125C19CA85710089385F /* SWKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SWKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		98CD125F19CA85710089385F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		98CD126019CA85710089385F /* KeyboardViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyboardViewController.h; sourceTree = "<group>"; };
-		98CD126119CA85710089385F /* KeyboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeyboardViewController.m; sourceTree = "<group>"; };
 		98CD127619CA866B0089385F /* SWKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SWKeyboard.entitlements; sourceTree = "<group>"; };
 		98CF00B41B461EDE00627DC6 /* browser-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "browser-icon.png"; sourceTree = "<group>"; };
 		98CF00B51B461EDE00627DC6 /* get-started.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "get-started.png"; sourceTree = "<group>"; };
@@ -412,6 +410,8 @@
 		98D55EDC18480B6800104956 /* textsize_up.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_up.png; path = "Keyman Icons/textsize_up.png"; sourceTree = "<group>"; };
 		98D55EDD18480B6800104956 /* textsize_up@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_up@2x.png"; path = "Keyman Icons/textsize_up@2x.png"; sourceTree = "<group>"; };
 		98DE283417F50DBF00D6A496 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		C0FF76991F5D368B00BD23C3 /* SWKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SWKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
+		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -792,9 +792,9 @@
 			isa = PBXGroup;
 			children = (
 				98CD127619CA866B0089385F /* SWKeyboard.entitlements */,
-				98CD126019CA85710089385F /* KeyboardViewController.h */,
-				98CD126119CA85710089385F /* KeyboardViewController.m */,
 				98CD125E19CA85710089385F /* Supporting Files */,
+				C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */,
+				C0FF76991F5D368B00BD23C3 /* SWKeyboard-Bridging-Header.h */,
 			);
 			path = SWKeyboard;
 			sourceTree = "<group>";
@@ -924,6 +924,7 @@
 					98CD125B19CA85710089385F = {
 						CreatedOnToolsVersion = 6.0.1;
 						DevelopmentTeam = 3YE4W86L3G;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -1160,7 +1161,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98CD126219CA85710089385F /* KeyboardViewController.m in Sources */,
+				C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1197,6 +1198,7 @@
 		981AFADF19EF44DE006706BF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = Keyman/Keyman.entitlements;
@@ -1227,6 +1229,7 @@
 		981AFAE019EF44DE006706BF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = Keyman/Keyman.entitlements;
@@ -1376,11 +1379,16 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = NO;
+				"OTHER_SWIFT_FLAGS[arch=*]" = "-D DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = Tavultesoft.Keyman.SWKeyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "5d7c5750-a8be-473c-80ef-ed8773404e65";
 				PROVISIONING_PROFILE_SPECIFIER = "Keyman App SW Keyboard Debug";
 				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "SWKeyboard/SWKeyboard-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -1416,6 +1424,9 @@
 				PROVISIONING_PROFILE = "8599fd0f-af7f-4605-a931-3a6266a8744f";
 				PROVISIONING_PROFILE_SPECIFIER = "XC iOS: Tavultesoft.Keyman.SWKeyboard";
 				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "SWKeyboard/SWKeyboard-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
