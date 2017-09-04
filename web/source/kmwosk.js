@@ -2589,8 +2589,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param   {Object}    layer   // One layer specification
      * @param   {boolean}   chiral  // Whether or not the keyboard uses chiral modifier information.
      * @param   {string}    formFactor  // The form factor of the device the layout is being constructed for.
+     * @param   {boolean}   key102      // Whether or not the extended key 102 should be hidden.
      */
-    osk.formatDefaultLayer = function(layer, chiral, formFactor) {
+    osk.formatDefaultLayer = function(layer, chiral, formFactor, key102) {
       var layerId = layer['id'];
 
       // Correct appearance of state-dependent modifier keys according to group
@@ -2651,6 +2652,16 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
               if(layerId.indexOf('alt') != -1) {
                 if(!chiral || (layerId.indexOf('leftalt') != -1 && layerId.indexOf('rightalt') != -1)) {
                   key['sp'] = '2';              
+                }
+              }
+              break;
+            case 'K_oE2':
+              if(typeof key102 == 'undefined' || !key102) {
+                if(formFactor == 'desktop') {
+                  keys.splice(j--, 1);
+                  keys[0]['width']='200';
+                } else {
+                  keys[j]['sp']='10';
                 }
               }
               break;
@@ -2732,24 +2743,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         layers[n]['nextlayer']=idList[n]; // This would only be different for a dynamic keyboard
 
         // Extraced into a helper method to improve readability.
-        osk.formatDefaultLayer(layers[n], chiral != 0, formFactor);
-
-        // TODO:  refactor into the osk.formatDefaultLayer() method.
-        // Hide extra key (OEM 102) if none in keyboard definition
-        if(typeof key102 == 'undefined' || !key102) {
-          for(i=0; i<layers[n]['row'].length; i++) {
-            for(j=0; j<layers[n]['row'][i]['key'].length; j++) {
-              if(layers[n]['row'][i]['key'][j]['id'] == 'K_oE2') {
-                if(formFactor == 'desktop') {
-                  layers[n]['row'][i]['key'].splice(j,1);
-                  layers[n]['row'][i]['key'][0]['width']='200';
-                } else {
-                  layers[n]['row'][i]['key'][j]['sp']='10';
-                }
-              }
-            }
-          }
-        }
+        osk.formatDefaultLayer(layers[n], chiral != 0, formFactor, !!key102);
       }
 
       // Add default key labels and key styles
@@ -2853,24 +2847,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           layer['nextlayer']=allLayers[n]; // This would only be different for a dynamic keyboard
   
           // Extraced into a helper method to improve readability.
-          osk.formatDefaultLayer(layer, chiral != 0, formFactor);
-  
-          // TODO:  refactor into the osk.formatDefaultLayer() method.
-          // Hide extra key (OEM 102) if none in keyboard definition
-          if(typeof key102 == 'undefined' || !key102) {
-            for(i=0; i<layer['row'].length; i++) {
-              for(j=0; j<layer['row'][i]['key'].length; j++) {
-                if(layer['row'][i]['key'][j]['id'] == 'K_oE2') {
-                  if(formFactor == 'desktop') {
-                    layer['row'][i]['key'].splice(j,1);
-                    layer['row'][i]['key'][0]['width']='200';
-                  } else {
-                    layer['row'][i]['key'][j]['sp']='10';
-                  }
-                }
-              }
-            }
-          }
+          osk.formatDefaultLayer(layer, chiral != 0, formFactor, !!key102);
 
           layers.push(layer);
         }
