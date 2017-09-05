@@ -10,7 +10,7 @@
 #import "AppDelegate.h"
 #import "Keyman.h"
 #import "MainViewController.h"
-#import "SetUpViewController.h"
+#import <Keyman-Swift.h>
 
 @interface GetStartedViewController ()
 @property (strong, nonatomic) IBOutlet UINavigationItem *navItem;

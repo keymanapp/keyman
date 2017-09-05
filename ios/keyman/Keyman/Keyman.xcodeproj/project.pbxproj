@@ -104,7 +104,6 @@
 		9845A7D01A439A9200544E2E /* GetStartedViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7C11A439A9200544E2E /* GetStartedViewController.xib */; };
 		9845A7D21A439A9200544E2E /* InfoViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7C51A439A9200544E2E /* InfoViewController_iPad.xib */; };
 		9845A7D31A439A9200544E2E /* InfoViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7C61A439A9200544E2E /* InfoViewController_iPhone.xib */; };
-		9845A7D41A439A9200544E2E /* SetUpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A7C91A439A9200544E2E /* SetUpViewController.m */; };
 		9845A7D51A439A9200544E2E /* SetUpViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7CA1A439A9200544E2E /* SetUpViewController.xib */; };
 		9845A8321A439B4800544E2E /* UIImage+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A8301A439B4800544E2E /* UIImage+Helpers.m */; };
 		9845A8581A439B8F00544E2E /* app-info.css in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8341A439B8F00544E2E /* app-info.css */; };
@@ -189,6 +188,7 @@
 		98CF00BA1B461EDE00627DC6 /* info.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B61B461EDE00627DC6 /* info.png */; };
 		98CF00BB1B461EDE00627DC6 /* menu-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B71B461EDE00627DC6 /* menu-icon.png */; };
 		C0A1A6311F5E4F4300EAF822 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */; };
+		C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */; };
 		C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
 		C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */; };
 		CE06AA681F171CA0006D91C3 /* Keyman.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418F71769486C008D2FF3 /* Keyman.h */; };
@@ -286,8 +286,6 @@
 		9845A7C11A439A9200544E2E /* GetStartedViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GetStartedViewController.xib; sourceTree = "<group>"; };
 		9845A7C51A439A9200544E2E /* InfoViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InfoViewController_iPad.xib; sourceTree = "<group>"; };
 		9845A7C61A439A9200544E2E /* InfoViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InfoViewController_iPhone.xib; sourceTree = "<group>"; };
-		9845A7C81A439A9200544E2E /* SetUpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetUpViewController.h; sourceTree = "<group>"; };
-		9845A7C91A439A9200544E2E /* SetUpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SetUpViewController.m; sourceTree = "<group>"; };
 		9845A7CA1A439A9200544E2E /* SetUpViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetUpViewController.xib; sourceTree = "<group>"; };
 		9845A82F1A439B4800544E2E /* UIImage+Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Helpers.h"; sourceTree = "<group>"; };
 		9845A8301A439B4800544E2E /* UIImage+Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Helpers.m"; sourceTree = "<group>"; };
@@ -407,6 +405,7 @@
 		98D55EDD18480B6800104956 /* textsize_up@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_up@2x.png"; path = "Keyman Icons/textsize_up@2x.png"; sourceTree = "<group>"; };
 		98DE283417F50DBF00D6A496 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = SetUpViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF76991F5D368B00BD23C3 /* SWKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SWKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -518,9 +517,8 @@
 		9845A7C71A439A9200544E2E /* SetUpViewController */ = {
 			isa = PBXGroup;
 			children = (
-				9845A7C81A439A9200544E2E /* SetUpViewController.h */,
-				9845A7C91A439A9200544E2E /* SetUpViewController.m */,
 				9845A7CA1A439A9200544E2E /* SetUpViewController.xib */,
+				C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */,
 			);
 			path = SetUpViewController;
 			sourceTree = "<group>";
@@ -1139,11 +1137,11 @@
 				9845A7AA1A43983300544E2E /* KMWebBrowserViewController.m in Sources */,
 				9845A7BC1A4398B200544E2E /* KMDropDownListView.m in Sources */,
 				981AFA7F19EF44DE006706BF /* MainViewController.m in Sources */,
+				C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */,
 				9845A7BD1A4398B200544E2E /* KMDropDownView.m in Sources */,
 				9845A8321A439B4800544E2E /* UIImage+Helpers.m in Sources */,
 				C0A1A6311F5E4F4300EAF822 /* InfoViewController.swift in Sources */,
 				9845A8DD1A439FB200544E2E /* KMBookmarksViewController.m in Sources */,
-				9845A7D41A439A9200544E2E /* SetUpViewController.m in Sources */,
 				C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
