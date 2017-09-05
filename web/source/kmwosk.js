@@ -38,7 +38,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
     osk.modifierBitmasks = {
       "ALL":0x007F,
-      "CHIRAL":0x001F,
+      "CHIRAL":0x001F,    // The default bitmask, for non-chiral keyboards
+      "IS_CHIRAL":0x000F, // Used to test if a bitmask uses a chiral modifier.
       "NON_CHIRAL":0x0070
     };
 
@@ -46,7 +47,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       "ALL":0x3F00,
       "CAPS":0x0300,
       "NUM_LOCK":0x0C00,
-      
+      "SCROLL_LOCK":0x3000
     };
 
     // Define standard keycode numbers (exposed for use by other modules)
@@ -2724,7 +2725,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       var n,layers=layout['layer'], keyLabels=PVK['KLS'], key102=PVK['K102'];
       var i, j, k, m, row, rows, key, keys;
-      var chiral = (kbdBitmask & osk.modifierBitmasks['CHIRAL'] & ~osk.modifierCodes['SHIFT']);
+      var chiral = (kbdBitmask & osk.modifierBitmasks['IS_CHIRAL']);
 
       if(typeof keyLabels == 'undefined' || !keyLabels) {
         keyLabels = osk.processLegacyDefinitions(PVK['BK']);
