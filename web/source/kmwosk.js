@@ -2682,7 +2682,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       if(chiral) {
         layerCnt=32;
-        offset=0x00;
+        offset=0x01;
       } else {
         layerCnt=8;
         offset=0x10;
@@ -2772,6 +2772,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         var layer=layers[n], kx, shiftKey=null, nextKey=null, allText='';
         var layerSpec = keyLabels[layer['id']];
         var isShift = layer['id'] == 'shift' ? 1 : 0;
+        var isDefault = layer['id'] == 'default' || isShift ? 1 : 0;
 
         rows=layer['row'];
         for(i=0; i<rows.length; i++)
@@ -2783,14 +2784,16 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             kx=dfltCodes.indexOf(key['id']);
 
             // Only create keys for defined layers.  ('default' and 'shift' are always defined.)
-            if(layerSpec) {
+            if(layerSpec || isDefault) {
               // Get keycap text from visual keyboard array, if defined in keyboard
-              if(kx >= 0 && kx < layerSpec.length) key['text']=layerSpec[kx];
+              if(layerSpec) {
+                if(kx >= 0 && kx < layerSpec.length) key['text']=layerSpec[kx];
+              }
 
               // Fall back to US English keycap text as default for the base two layers if not otherwise defined.
               // (Any 'ghost' keys must be explicitly defined in layout for these layers.)
-              if(layer['id'] == 'default' || isShift) {
-                if(key['text'] == '' &&  key['id'] != 'K_SPACE' && kx+65 * isShift < dfltText.length) {
+              if(isDefault) {
+                if((key['text'] == '' || typeof key['text'] == 'undefined') &&  key['id'] != 'K_SPACE' && kx+65 * isShift < dfltText.length) {
                   key['text']=dfltText[kx+65*isShift];
                 }
               }
