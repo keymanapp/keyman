@@ -8,7 +8,6 @@
 
 #import "MainViewController.h"
 #import "AppDelegate.h"
-#import "InfoViewController.h"
 #import "GetStartedViewController.h"
 #import "KMWebBrowserViewController.h"
 #import "KMDropDownListView.h"

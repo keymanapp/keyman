@@ -12,12 +12,12 @@
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
-@property (strong, nonatomic) UIWindow *window;
-@property (strong, nonatomic) UIWindow *overlayWindow;
-@property (strong, nonatomic) UINavigationController *navigationController;
-@property (strong, nonatomic) MainViewController *viewController;
+@property (strong, nonatomic) UIWindow * _Nullable window;
+@property (strong, nonatomic) UIWindow * _Nonnull overlayWindow;
+@property (strong, nonatomic) UINavigationController * _Nullable navigationController;
+@property (strong, nonatomic) MainViewController * _Nullable viewController;
 
-+ (NSUserDefaults *)activeUserDefaults;
++ (NSUserDefaults * _Nonnull)activeUserDefaults;
 + (BOOL)isKeymanEnabledSystemWide;
 + (CGFloat)statusBarHeight;
 
