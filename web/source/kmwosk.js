@@ -950,7 +950,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
 
     /**
-     * Function     getlayerId
+     * Function     getLayerId
      * Scope        Private
      * @param       {number}      m     shift modifier code
      * @return      {string}            layer string from shift modifier code (desktop keyboards)
@@ -963,25 +963,25 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         return 'default';
       } else {
         if(m & osk.modifierCodes.LCTRL) {
-          s = s + 'leftctrl';
+          s = (s.length > 0 ? s + '-' : '') + 'leftctrl';
         }
         if(m & osk.modifierCodes.RCTRL) {
-          s = s + 'rightctrl';
+          s = (s.length > 0 ? s + '-' : '') + 'rightctrl';
         }
         if(m & osk.modifierCodes.LALT) {
-          s = s + 'leftalt';
+          s = (s.length > 0 ? s + '-' : '') + 'leftalt';
         }
         if(m & osk.modifierCodes.RALT) {
-          s = s + 'rightalt';
+          s = (s.length > 0 ? s + '-' : '') + 'rightalt';
         }
         if(m & osk.modifierCodes.SHIFT) {
-          s = s + 'shift';
+          s = (s.length > 0 ? s + '-' : '') + 'shift';
         }
         if(m & osk.modifierCodes.CTRL) {
-          s = s + 'ctrl';
+          s = (s.length > 0 ? s + '-' : '') + 'ctrl';
         }
         if(m & osk.modifierCodes.ALT) {
-          s = s + 'alt';
+          s = (s.length > 0 ? s + '-' : '') + 'alt';
         }
         return s;
       }
@@ -2692,6 +2692,17 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var layerIds = [];
 
       for(var i=0; i < layerCnt; i++) {
+        // Check for unpermitted modifier combos!
+        if((i & 0x0003) == 0x0003) {
+          continue;
+        } else if ((i & 0x000C) == 0x000C) {
+          continue;
+        } else if ((i & 0x0009) == 0x0009) {  // left-ctrl, right-alt
+          continue;
+        } else if ((i & 0x0006) == 0x0006) {  // right-ctrl, left-alt
+          continue;
+        }
+
         layerIds.push(osk.getLayerId(i * offset));
       }
 
