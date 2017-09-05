@@ -4,8 +4,8 @@
 * Updated versioning scheme for uniformity across all Keyman products.
 * Reworked the KeymanWeb attachment model significantly to allow greater user control. (#114)
   * The 'kmw-disabled' flag may now be used to automatically enable and disable KMW for attached controls.
-	* Attachment is now separate from the enabled and disabled state of a control.
-	* New API functions have been added:  `detachFromControl`, `enableControl`, `disableControl`, `setKeyboardForControl`.
+  * Attachment is now separate from the enabled and disabled state of a control.
+  * New API functions have been added:  `detachFromControl`, `enableControl`, `disableControl`, `setKeyboardForControl`.
 * Removed old code directed at legacy browsers no longer supported.  (#212)
 * Refactored code paths relating to KMW's embedding in the iOS and Android apps.  (#211)
 
