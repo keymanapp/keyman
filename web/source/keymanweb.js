@@ -2770,6 +2770,11 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       else if (e.which) s.Lcode = e.which;    
       else return null;
       
+      // TODO:  If keyboard is chiral, test chiral modifiers.
+      //        If it is not, use the test below.
+      // 
+      //        Also, might should detect them state keys here.
+
       s.Lmodifiers = 
         (e.shiftKey ? 0x10 : 0) |
         (e.ctrlKey ? (e.ctrlLeft ? 0x20 : 0x20) : 0) | 
