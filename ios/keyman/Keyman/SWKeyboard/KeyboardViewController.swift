@@ -3,7 +3,7 @@
 //  Keyman
 //
 //  Created by Gabriel Wong on 2017-09-04.
-//  Copyright © 2017 Tavultesoft Pty Ltd. All rights reserved.
+//  Copyright © 2017 SIL International. All rights reserved.
 //
 
 import Foundation

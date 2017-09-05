@@ -145,7 +145,6 @@
 		9845A89C1A439B8F00544E2E /* url-screeni.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8561A439B8F00544E2E /* url-screeni.png */; };
 		9845A8A01A439BB500544E2E /* setup.html in Resources */ = {isa = PBXBuildFile; fileRef = 9845A89E1A439BB500544E2E /* setup.html */; };
 		9845A8B51A439D3000544E2E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 98C893F119F0811A000B9AC8 /* Images.xcassets */; };
-		9845A8BC1A439D9D00544E2E /* KMActivityProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A8BA1A439D9D00544E2E /* KMActivityProvider.m */; };
 		9845A8CC1A439F1000544E2E /* 715-globe-toolbar.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8BE1A439F1000544E2E /* 715-globe-toolbar.png */; };
 		9845A8CD1A439F1000544E2E /* 715-globe-toolbar@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8BF1A439F1000544E2E /* 715-globe-toolbar@2x.png */; };
 		9845A8CE1A439F1000544E2E /* 715-globe-toolbar@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8C01A439F1000544E2E /* 715-globe-toolbar@3x.png */; };
@@ -191,6 +190,7 @@
 		98CF00BA1B461EDE00627DC6 /* info.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B61B461EDE00627DC6 /* info.png */; };
 		98CF00BB1B461EDE00627DC6 /* menu-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B71B461EDE00627DC6 /* menu-icon.png */; };
 		C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
+		C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */; };
 		CE06AA681F171CA0006D91C3 /* Keyman.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418F71769486C008D2FF3 /* Keyman.h */; };
 /* End PBXBuildFile section */
 
@@ -329,8 +329,6 @@
 		9845A8551A439B8F00544E2E /* url-screen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "url-screen.png"; sourceTree = "<group>"; };
 		9845A8561A439B8F00544E2E /* url-screeni.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "url-screeni.png"; sourceTree = "<group>"; };
 		9845A89E1A439BB500544E2E /* setup.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = setup.html; sourceTree = "<group>"; };
-		9845A8B91A439D9D00544E2E /* KMActivityProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMActivityProvider.h; sourceTree = "<group>"; };
-		9845A8BA1A439D9D00544E2E /* KMActivityProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMActivityProvider.m; sourceTree = "<group>"; };
 		9845A8BE1A439F1000544E2E /* 715-globe-toolbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "715-globe-toolbar.png"; sourceTree = "<group>"; };
 		9845A8BF1A439F1000544E2E /* 715-globe-toolbar@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "715-globe-toolbar@2x.png"; sourceTree = "<group>"; };
 		9845A8C01A439F1000544E2E /* 715-globe-toolbar@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "715-globe-toolbar@3x.png"; sourceTree = "<group>"; };
@@ -412,6 +410,8 @@
 		98DE283417F50DBF00D6A496 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		C0FF76991F5D368B00BD23C3 /* SWKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SWKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Bridging-Header.h"; sourceTree = "<group>"; };
+		C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = ActivityItemProvider.swift; sourceTree = "<group>"; tabWidth = 2; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -599,15 +599,6 @@
 			path = SetupSWK;
 			sourceTree = "<group>";
 		};
-		9845A8B81A439D9D00544E2E /* KMActivityProvider */ = {
-			isa = PBXGroup;
-			children = (
-				9845A8B91A439D9D00544E2E /* KMActivityProvider.h */,
-				9845A8BA1A439D9D00544E2E /* KMActivityProvider.m */,
-			);
-			path = KMActivityProvider;
-			sourceTree = "<group>";
-		};
 		9845A8BD1A439F1000544E2E /* Icons */ = {
 			isa = PBXGroup;
 			children = (
@@ -694,7 +685,6 @@
 				98C893F119F0811A000B9AC8 /* Images.xcassets */,
 				9845A7C21A439A9200544E2E /* InfoViewController */,
 				984FA1E21974B06C0037EE5D /* Keyman.entitlements */,
-				9845A8B81A439D9D00544E2E /* KMActivityProvider */,
 				9845A7B71A4398B200544E2E /* KMDropDownList */,
 				9845A79A1A43983300544E2E /* KMWebBrowser */,
 				98D418F41769486C008D2FF3 /* libKeyman */,
@@ -705,6 +695,8 @@
 				98ABADCC176935E500B62590 /* MainViewController.m */,
 				9845A7C71A439A9200544E2E /* SetUpViewController */,
 				98ABADBA176935E400B62590 /* Supporting Files */,
+				C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */,
+				C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */,
 			);
 			path = Keyman;
 			sourceTree = "<group>";
@@ -915,10 +907,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0810;
-				ORGANIZATIONNAME = "Tavultesoft Pty Ltd";
+				ORGANIZATIONNAME = "SIL International";
 				TargetAttributes = {
 					981AFA7519EF44DE006706BF = {
 						DevelopmentTeam = 3YE4W86L3G;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Manual;
 					};
 					98CD125B19CA85710089385F = {
@@ -1150,10 +1143,10 @@
 				981AFA7F19EF44DE006706BF /* MainViewController.m in Sources */,
 				9845A7BD1A4398B200544E2E /* KMDropDownView.m in Sources */,
 				9845A8321A439B4800544E2E /* UIImage+Helpers.m in Sources */,
-				9845A8BC1A439D9D00544E2E /* KMActivityProvider.m in Sources */,
 				9845A7D11A439A9200544E2E /* InfoViewController.m in Sources */,
 				9845A8DD1A439FB200544E2E /* KMBookmarksViewController.m in Sources */,
 				9845A7D41A439A9200544E2E /* SetUpViewController.m in Sources */,
+				C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1201,9 +1194,11 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Keyman/Keyman.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1211,6 +1206,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = "Keyman-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Keyman/libKeyman\"",
@@ -1221,6 +1217,9 @@
 				PROVISIONING_PROFILE = "b763adec-b421-4d7a-bd8f-b747685d06fa";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PROVISIONING_PROFILE_SPECIFIER = "Keyman App Debug";
+				SWIFT_OBJC_BRIDGING_HEADER = "Keyman/Keyman-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1232,15 +1231,18 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Keyman/Keyman.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				INFOPLIST_FILE = "Keyman-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Keyman/libKeyman\"",
@@ -1251,6 +1253,8 @@
 				PROVISIONING_PROFILE = "715dde50-1d18-463d-aaca-6869b1e1ab3a";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PROVISIONING_PROFILE_SPECIFIER = "XC iOS: Tavultesoft.Keyman";
+				SWIFT_OBJC_BRIDGING_HEADER = "Keyman/Keyman-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};

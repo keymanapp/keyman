@@ -12,10 +12,10 @@
 #import "GetStartedViewController.h"
 #import "KMWebBrowserViewController.h"
 #import "KMDropDownListView.h"
-#import "KMActivityProvider.h"
 #import "UIImage+Helpers.h"
 #import "CoreText/CTFontManager.h"
 #import <QuartzCore/QuartzCore.h>
+#import <Keyman-Swift.h>
 
 // Internal strings
 NSString *const baseUri = @"http://r.keymanweb.com/20/fonts/get_mobileconfig.php?id=";
@@ -733,8 +733,6 @@ NSUInteger const minIOSVersion4FontInstall = 7;
     [actionSheet dismissWithClickedButtonIndex:actionSheet.cancelButtonIndex animated:NO];
     
     if (NSClassFromString(@"UIActivityViewController")) {
-        KMActivityProvider *activityProvider = [[KMActivityProvider alloc] initWithPlaceholderItem:sender];
-        
         NSString *lrm = @"\u200e";
         NSString *rlm = @"\u200f";
         NSMutableString *mText = [textView.text mutableCopy];
@@ -742,13 +740,8 @@ NSUInteger const minIOSVersion4FontInstall = 7;
             [mText deleteCharactersInRange:NSMakeRange(0, 1)];
         }
         
-        [activityProvider setText:mText];
-        [activityProvider setFont:textView.font];
-        
-        /* Appliying custom activities: -> ... applicationActivities:appActivities];
-         KMActivity *kmActivity = [[KMActivity alloc] init];
-         NSArray *appActivities = @[kmActivity];
-         */
+        ActivityItemProvider *activityProvider = [[ActivityItemProvider alloc]
+            initWithText: mText font: textView.font];
         
         UISimpleTextPrintFormatter *printText = [[UISimpleTextPrintFormatter alloc] initWithText:textView.text];
         printText.font = textView.font;
