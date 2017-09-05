@@ -2541,18 +2541,20 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
 
     /**
-     * Converts the legacy BK property from pre 10.0 into the KLS keyboard layer spec format.
+     * Converts the legacy BK property from pre 10.0 into the KLS keyboard layer spec format,
+     * sparsifying it as possible to pre-emptively check invalid layers.
      * 
      * @param   {Array}   BK      keyboard object (as loaded)
      * @return  {Object}
      */
     osk.processLegacyDefinitions = function(BK) {
-      var idList=['default','shift','ctrl','shiftctrl','alt','shiftalt','ctrlalt','shiftctrlalt'];
+      //['default','shift','ctrl','shiftctrl','alt','shiftalt','ctrlalt','shiftctrlalt'];
+      var idList=osk.generateLayerIds(false); // Non-chiral.
 
       var KLS = {};
 
       // The old default:  eight auto-managed layers...
-      for(var n=0; n<8; n++) {
+      for(var n=0; n<idList.length; n++) {
         var id = idList[n], arr = [], valid = false;
 
         // ... with keycode mappings in blocks of 65.
@@ -2560,6 +2562,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           var index = k + 65 * n;
           arr.push(BK[index]);
 
+          // The entry for K_SPACE's keycode tends to hold ' ' instead of '', which causes
+          // the whole layer to be treated as 'valid' if not included in the conditional.
           if(index < BK.length && BK[index] != '' && k != dfltCodes.indexOf('K_SPACE')) {
             valid = true;
           }
@@ -2729,10 +2733,26 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       // Identify key labels (e.g. *Shift*) that require the special OSK font
       var specialLabel=/\*\w+\*/;
 
-      // The 'default' layer must be the first one processed.
-      var idList = Object.getOwnPropertyNames(keyLabels);
-      idList.splice(idList.indexOf('default'), 1);
-      idList = [ 'default' ].concat(idList);
+      // *** Step 1:  instantiate the layer objects. ***
+
+      // Get the list of valid layers, enforcing that the 'default' layer must be the first one processed.
+      var validIdList = Object.getOwnPropertyNames(keyLabels), invalidIdList = [];
+      validIdList.splice(validIdList.indexOf('default'), 1);
+      validIdList = [ 'default' ].concat(validIdList);
+
+      // For desktop devices, we must create all layers, even if invalid.
+      if(formFactor == 'desktop') {
+        invalidIdList = osk.generateLayerIds(chiral);
+
+        // Filter out all ids considered valid.  (We also don't want duplicates in the following list...)
+        for(n=0; n<invalidIdList.length; n++) {
+          if(validIdList.indexOf(invalidIdList[n]) != -1) {
+            invalidIdList.splice(n--, 1);
+          }
+        }
+      }
+
+      var idList = validIdList.concat(invalidIdList);
 
       for(n=0; n<idList.length; n++) {
         // Populate non-default (shifted) keygroups
@@ -2746,7 +2766,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         osk.formatDefaultLayer(layers[n], chiral != 0, formFactor, !!key102);
       }
 
-      // Add default key labels and key styles
+      // *** Step 2: Layer objects now exist; time to fill them with the appropriate key labels and key styles ***
       for(n=0; n<layers.length; n++)
       {
         var layer=layers[n], kx, shiftKey=null, nextKey=null, allText='';
@@ -2762,14 +2782,17 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             key=keys[j];
             kx=dfltCodes.indexOf(key['id']);
 
-            // Get keycap text from visual keyboard array, if defined in keyboard
-            if(kx >= 0 && kx < layerSpec.length) key['text']=layerSpec[kx];
+            // Only create keys for defined layers.  ('default' and 'shift' are always defined.)
+            if(layerSpec) {
+              // Get keycap text from visual keyboard array, if defined in keyboard
+              if(kx >= 0 && kx < layerSpec.length) key['text']=layerSpec[kx];
 
-            // Fall back to US English keycap text as default for the base two layers if not otherwise defined.
-            // (Any 'ghost' keys must be explicitly defined in layout for these layers.)
-            if(layer['id'] == 'default' || isShift) {
-              if(key['text'] == '' &&  key['id'] != 'K_SPACE' && kx+65 * isShift < dfltText.length) {
-                key['text']=dfltText[kx+65*isShift];
+              // Fall back to US English keycap text as default for the base two layers if not otherwise defined.
+              // (Any 'ghost' keys must be explicitly defined in layout for these layers.)
+              if(layer['id'] == 'default' || isShift) {
+                if(key['text'] == '' &&  key['id'] != 'K_SPACE' && kx+65 * isShift < dfltText.length) {
+                  key['text']=dfltText[kx+65*isShift];
+                }
               }
             }
 
@@ -2783,38 +2806,11 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             if(key['id'] == 'K_TAB') {
               nextKey=key;
             }
-          }
-        }
 
-        layer.shiftKey=shiftKey;
-
-        // Set modifier key appearance and behaviour for non-desktop devices using the default layout
-        if(formFactor != 'desktop') {
-          if(n > 0 && shiftKey != null) {
-            shiftKey['sp']='2';
-            shiftKey['sk']=null;
-            switch(layers[n].id) {
-              case 'ctrl':
-                shiftKey['text']='*Ctrl*'; break;
-              case 'alt':
-                shiftKey['text']='*Alt*'; break;
-              case 'ctrlalt':
-                shiftKey['text']='*AltGr*'; break;
-            };
-          }
-        }
-      }
-
-      // Remove pop-up shift keys referencing invalid layers (Build 349)
-      for(n=0; n<layers.length; n++) {
-        rows=layers[n]['row'];
-        for(i=0; i<rows.length; i++) {
-          keys=rows[i]['key'];
-          for(j=0; j<keys.length; j++) {
-            key=keys[j];
+            // Remove pop-up shift keys referencing invalid layers (Build 349)
             if(key['sk'] != null) {
               for(k=0; k<key['sk'].length; k++) {
-                if(idList.indexOf(key['sk'][k]['nextlayer']) == -1) {
+                if(validIdList.indexOf(key['sk'][k]['nextlayer']) == -1) {
                   key['sk'].splice(k--, 1);
                 }
               }
@@ -2825,31 +2821,25 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             }
           }
         }
-      }
 
-      // Create empty layers (on desktop) for the unused modifiers - they're needed for OSK display.
-      if(formFactor == 'desktop') {
-        var allLayers = osk.generateLayerIds(chiral);
+        // We're done with the layer keys initialization pass.  Time to do post-analysis layer-level init where necessary.
+        layer.shiftKey=shiftKey;
 
-        // Create layer for each item in list.
-        for(n=0; n<allLayers.length; n++) {
-          // Does the layer already exist?
-          if(idList.indexOf(allLayers[n]) != -1) {
-            continue;
+        // Set modifier key appearance and behaviour for non-desktop devices using the default layout
+        if(formFactor != 'desktop') {
+          if(n > 0 && shiftKey != null) {
+            shiftKey['sp']='2';
+            shiftKey['sk']=null;
+            // TODO:  May need extending/modification for chirality modes!
+            switch(layers[n].id) {
+              case 'ctrl':
+                shiftKey['text']='*Ctrl*'; break;
+              case 'alt':
+                shiftKey['text']='*Alt*'; break;
+              case 'ctrlalt':
+                shiftKey['text']='*AltGr*'; break;
+            };
           }
-
-          // Populate non-default (shifted) keygroups
-          var layer;
-          if(n > 0) {
-            layer=util.deepCopy(layers[0]);
-          }
-          layer['id']=allLayers[n];
-          layer['nextlayer']=allLayers[n]; // This would only be different for a dynamic keyboard
-  
-          // Extraced into a helper method to improve readability.
-          osk.formatDefaultLayer(layer, chiral != 0, formFactor, !!key102);
-
-          layers.push(layer);
         }
       }
 
