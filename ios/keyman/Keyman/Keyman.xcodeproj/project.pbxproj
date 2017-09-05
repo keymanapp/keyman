@@ -157,8 +157,7 @@
 		9845A8D71A439F1000544E2E /* UIButtonBarArrowRight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8C91A439F1000544E2E /* UIButtonBarArrowRight@2x.png */; };
 		9845A8D81A439F1000544E2E /* UIButtonBarRefresh@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8CA1A439F1000544E2E /* UIButtonBarRefresh@2x.png */; };
 		9845A8D91A439F1000544E2E /* UIButtonBarStop@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8CB1A439F1000544E2E /* UIButtonBarStop@2x.png */; };
-		9845A8DD1A439FB200544E2E /* KMBookmarksViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A8DB1A439FB200544E2E /* KMBookmarksViewController.m */; };
-		9845A8DE1A439FB200544E2E /* KMBookmarksViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8DC1A439FB200544E2E /* KMBookmarksViewController.xib */; };
+		9845A8DE1A439FB200544E2E /* BookmarksViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */; };
 		9846CC0C19EB5B8800F9AA03 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 98D418FF1769486C008D2FF3 /* Keyman.bundle */; };
 		985EA9DF19E64A580006C017 /* banner-Landscape-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D419E64A580006C017 /* banner-Landscape-568h@2x.png */; };
 		985EA9E019E64A580006C017 /* banner-Landscape-568h@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D519E64A580006C017 /* banner-Landscape-568h@3x.png */; };
@@ -189,6 +188,7 @@
 		98CF00BB1B461EDE00627DC6 /* menu-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B71B461EDE00627DC6 /* menu-icon.png */; };
 		C0A1A6311F5E4F4300EAF822 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */; };
 		C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */; };
+		C0A1A6351F5E786A00EAF822 /* BookmarksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */; };
 		C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
 		C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */; };
 		CE06AA681F171CA0006D91C3 /* Keyman.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418F71769486C008D2FF3 /* Keyman.h */; };
@@ -339,9 +339,7 @@
 		9845A8C91A439F1000544E2E /* UIButtonBarArrowRight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIButtonBarArrowRight@2x.png"; sourceTree = "<group>"; };
 		9845A8CA1A439F1000544E2E /* UIButtonBarRefresh@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIButtonBarRefresh@2x.png"; sourceTree = "<group>"; };
 		9845A8CB1A439F1000544E2E /* UIButtonBarStop@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIButtonBarStop@2x.png"; sourceTree = "<group>"; };
-		9845A8DA1A439FB200544E2E /* KMBookmarksViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMBookmarksViewController.h; sourceTree = "<group>"; };
-		9845A8DB1A439FB200544E2E /* KMBookmarksViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMBookmarksViewController.m; sourceTree = "<group>"; };
-		9845A8DC1A439FB200544E2E /* KMBookmarksViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = KMBookmarksViewController.xib; sourceTree = "<group>"; };
+		9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BookmarksViewController.xib; sourceTree = "<group>"; };
 		984C0D811994613E009D2A13 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		984FA1E21974B06C0037EE5D /* Keyman.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Keyman.entitlements; sourceTree = "<group>"; };
 		985EA9D419E64A580006C017 /* banner-Landscape-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape-568h@2x.png"; sourceTree = "<group>"; };
@@ -406,6 +404,7 @@
 		98DE283417F50DBF00D6A496 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = SetUpViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = BookmarksViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF76991F5D368B00BD23C3 /* SWKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SWKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -454,13 +453,12 @@
 			isa = PBXGroup;
 			children = (
 				9845A8BD1A439F1000544E2E /* Icons */,
-				9845A8DA1A439FB200544E2E /* KMBookmarksViewController.h */,
-				9845A8DB1A439FB200544E2E /* KMBookmarksViewController.m */,
-				9845A8DC1A439FB200544E2E /* KMBookmarksViewController.xib */,
+				9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */,
 				9845A79B1A43983300544E2E /* KMWebBrowserViewController.h */,
 				9845A79C1A43983300544E2E /* KMWebBrowserViewController.m */,
 				9845A79D1A43983300544E2E /* KMWebBrowserViewController.xib */,
 				9845A79E1A43983300544E2E /* NavBar */,
+				C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */,
 			);
 			path = KMWebBrowser;
 			sourceTree = "<group>";
@@ -946,7 +944,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9845A8DE1A439FB200544E2E /* KMBookmarksViewController.xib in Resources */,
+				9845A8DE1A439FB200544E2E /* BookmarksViewController.xib in Resources */,
 				9845A8601A439B8F00544E2E /* confirm-dl.png in Resources */,
 				981AFA8F19EF44DE006706BF /* 724-info@2x.png in Resources */,
 				9845A8D41A439F1000544E2E /* 786-browser@3x.png in Resources */,
@@ -1137,11 +1135,11 @@
 				9845A7AA1A43983300544E2E /* KMWebBrowserViewController.m in Sources */,
 				9845A7BC1A4398B200544E2E /* KMDropDownListView.m in Sources */,
 				981AFA7F19EF44DE006706BF /* MainViewController.m in Sources */,
+				C0A1A6351F5E786A00EAF822 /* BookmarksViewController.swift in Sources */,
 				C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */,
 				9845A7BD1A4398B200544E2E /* KMDropDownView.m in Sources */,
 				9845A8321A439B4800544E2E /* UIImage+Helpers.m in Sources */,
 				C0A1A6311F5E4F4300EAF822 /* InfoViewController.swift in Sources */,
-				9845A8DD1A439FB200544E2E /* KMBookmarksViewController.m in Sources */,
 				C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

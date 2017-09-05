@@ -7,10 +7,10 @@
 //
 
 #import "KMWebBrowserViewController.h"
-#import "KMBookmarksViewController.h"
 #import "AppDelegate.h"
 #import "UIImage+Helpers.h"
 #import "KMManager.h"
+#import <Keyman-Swift.h>
 
 @interface KMWebBrowserViewController ()
 
@@ -223,9 +223,9 @@
 }
 
 - (IBAction)bookmarks:(id)sender {
-    KMBookmarksViewController *kmBookmarksVC = [[KMBookmarksViewController alloc] init];
-    kmBookmarksVC.webBrowser = self;
-    [self presentViewController:kmBookmarksVC animated:YES completion:nil];
+    BookmarksViewController *bookmarksVC = [[BookmarksViewController alloc] init];
+    bookmarksVC.webBrowser = self;
+    [self presentViewController:bookmarksVC animated:YES completion:nil];
 }
 
 - (IBAction)globe:(id)sender {
