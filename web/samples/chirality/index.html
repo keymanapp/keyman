@@ -44,42 +44,42 @@
  
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-	// Thank you to https://stackoverflow.com/questions/22607150/getting-the-url-parameters-inside-the-html-page. 
-	var GetURLParameter = function(sParam) {
-		var sPageURL = window.location.search.substring(1);
-		var sURLVariables = sPageURL.split('&');
-		for (var i = 0; i < sURLVariables.length; i++) {
-			var sParameterName = sURLVariables[i].split('=');
-			if (sParameterName[0] == sParam) {
-				return sParameterName[1];
-			}
-		}
-	};
-	
-	var attachType = GetURLParameter("mode");
-	var attachText = attachType ? attachType : "default";
-	
-	var kmw=window.tavultesoft.keymanweb;
-	kmw.init({
-		attachType: 'auto',
-		resources:'resources'
-	});
+  // Thank you to https://stackoverflow.com/questions/22607150/getting-the-url-parameters-inside-the-html-page. 
+  var GetURLParameter = function(sParam) {
+    var sPageURL = window.location.search.substring(1);
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++) {
+      var sParameterName = sURLVariables[i].split('=');
+      if (sParameterName[0] == sParam) {
+        return sParameterName[1];
+      }
+    }
+  };
+  
+  var attachType = GetURLParameter("mode");
+  var attachText = attachType ? attachType : "default";
+  
+  var kmw=window.tavultesoft.keymanweb;
+  kmw.init({
+    attachType: 'auto',
+    resources:'resources'
+  });
     </script> 
     
     <!-- Add keyboard management script for local selection of keyboards to use -->
     <script src="./utilities.js"></script> 
   
-	<script>
+  <script>
 
-	</script>
+  </script>
   </head>
 
 <!-- Sample page HTML -->  
   <body onload='loadKeyboards();'> 
     <h2>KeymanWeb Sample Page - Uncompiled Source, Chirality Testing</h2>
-	<p>This page is designed to stress-test the new support for chiral modifiers and state keys.</p>
-	<p>Be sure to reference the developer console for additional feedback.  </p>
-	<hr/>
+  <p>This page is designed to stress-test the new support for chiral modifiers and state keys.</p>
+  <p>Be sure to reference the developer console for additional feedback.  </p>
+  <hr/>
     <div>
     <!-- 
       The following DIV is used to position the Button or Toolbar User Interfaces on the page.
@@ -87,14 +87,14 @@
       (It is ignored by other User Interfaces.)
     -->
     <div id='KeymanWebControl'>
-			<h3>Type in your language in this text area:</h3>
-			<textarea id='ta1' class='test' placeholder='Type here'></textarea>
-		
-			<h3>or in this input field:</h3>
-			<input class='test' value='' placeholder='or here'/>
-		</div>                                                                                   
+      <h3>Type in your language in this text area:</h3>
+      <textarea id='ta1' class='test' placeholder='Type here'></textarea>
+    
+      <h3>or in this input field:</h3>
+      <input class='test' value='' placeholder='or here'/>
+    </div>                                                                                   
   </div>
-	<hr/>
+  <hr/>
    <h3><a href="../index.html">Return to testing home page</a></h3>
   </body>
   
