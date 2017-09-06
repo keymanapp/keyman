@@ -2775,9 +2775,37 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var osk = keymanweb["osk"];
 
       if(keymanweb.isChiral()) {
-        s.Lmodifiers = (e.shiftKey ? 0x10 : 0); 
-        s.Lmodifiers = s.Lmodifiers | (e.ctrlKey ? (e.location == 1 ? osk.modifierCodes['LCTRL'] : osk.modifierCodes['RCTRL']) : 0); 
-        s.Lmodifiers = s.Lmodifiers | (e.altKey ? (e.location == 1 ? osk.modifierCodes['LALT'] : osk.modifierCodes['RALT']) : 0);
+        s.Lmodifiers = (e.shiftKey ? 0x10 : 0);
+
+        var ctrlEvent = false, altEvent = false;
+
+        switch(s.Lcode) {
+          case osk.keyCodes["K_CONTROL"]:
+          case osk.keyCodes["K_CTRL"]:
+          case osk.keyCodes["K_LCONTROL"]:
+          case osk.keyCodes["K_LCTRL"]:
+          case osk.keyCodes["K_RCONTROL"]:
+          case osk.keyCodes["K_RCTRL"]:
+            ctrlEvent = true;
+            break;
+          case osk.keyCodes["K_ALT"]:
+          case osk.keyCodes["K_LALT"]:
+          case osk.keyCodes["K_LMENU"]:
+          case osk.keyCodes["K_RALT"]:
+          case osk.keyCodes["K_RMENU"]:
+            altEvent = true;
+            break;
+        }
+
+        // TODO:  Ensure the keypress is also the CTRL or the ALT for the e.location != 0 check.
+        if(e.ctrlKey) {
+          s.Lmodifiers = s.Lmodifiers | ((e.location != 0 && ctrlEvent) ? 
+            (e.location == 1 ? osk.modifierCodes['LCTRL'] : osk.modifierCodes['RCTRL']) : osk.getModifierState(osk.layerId) & 0x0003); 
+        }
+        if(e.altKey) {
+          s.Lmodifiers = s.Lmodifiers | ((e.location != 0 && altEvent) ? 
+            (e.location == 1 ? osk.modifierCodes['LALT'] : osk.modifierCodes['RALT']) : osk.getModifierState(osk.layerId) & 0x000C);
+        }
       } else {
         s.Lmodifiers = 
           (e.shiftKey ? 0x10 : 0) |
@@ -2787,7 +2815,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       //s.LisVirtualKey = (e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x60) != 0)) || e.type != 'keypress';
       //s.LisVirtualKeyCode = false;
-      s.LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x60) != 0));
+      // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
+      s.LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x6F) != 0));
       s.LisVirtualKey = s.LisVirtualKeyCode || e.type != 'keypress';
       
       return s;
