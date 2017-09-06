@@ -2,7 +2,7 @@
 
 ## 10.0 alpha
 * Updated versioning scheme for uniformity across all Keyman products.
-* Reworked the KeymanWeb attachment model significantly to allow greater user control. (#114)
+* Reworked the KeymanWeb attachment model significantly to allow greater user control. (#98)
   * The 'kmw-disabled' flag may now be used to automatically enable and disable KMW for attached controls.
   * Attachment is now separate from the enabled and disabled state of a control.
   * New API functions have been added:  `detachFromControl`, `enableControl`, `disableControl`, `setKeyboardForControl`.
@@ -11,27 +11,27 @@
 
 ## 2017-07-10 2.0.473 stable
 * 2.0 stable release build.
-* Removed a build warning. #125
-* Fixed bug with longpress menus not working correctly on symbol/numeric layers (#117)
+* Removed a build warning. (#125)
+* Fixed bug with longpress menus not working correctly on symbol/numeric layers (#115)
 
 ## 2017-07-04 2.0.465 beta
 * Fixed issues with the Bookmarklet feature not loading correctly.  (#112)
 
 ## 2017-06-29 2.0.464 beta
-* Fix for broken keys in hardware keyboards on Android devices (#111)
+* Fix for broken keys in hardware keyboards on Android devices (#110)
 
 ## 2017-06-27 2.0.463 beta
-* Reworked keyboard load to provide clearer and faster feedback on errors, improve performance (#105)
+* Reworked keyboard load to provide clearer and faster feedback on errors, improve performance (#87)
 
 ## 2017-06-21 2.0.460 beta
 * Automated build configuration with enhanced build scripts (#102)
 
 ## 2017-06-16 2.0.453 stable
 * KeymanWeb now supports MutationObservers for dynamically added and removed input elements on the page
-when the initialization option `attachType` is set to auto and will attach/detach to these automatically. (#71)
-* The touch implementation now supports keyboards with layers of differing row counts (#76)
-* KeymanWeb support on touchscreen laptops is now greatly improved when not in touch-oriented mode (#82)
-* Updated the source for compatibility and removal of warnings when building under the latest versions of Google Closure (#73)
+when the initialization option `attachType` is set to auto and will attach/detach to these automatically. (#29)
+* The touch implementation now supports keyboards with layers of differing row counts (#53)
+* KeymanWeb support on touchscreen laptops is now greatly improved when not in touch-oriented mode (#61)
+* Updated the source for compatibility and removal of warnings when building under the latest versions of Google Closure (#72)
 * Updated copyright messages (#96)
 * General improvements to the KeymanWeb build paths (#95)
 * Fix bugs where `setActiveKeyboard` would fail, and setting default keyboards fail (#94)
@@ -97,7 +97,7 @@ when the initialization option `attachType` is set to auto and will attach/detac
 
 ## 2015-01-23 2.0.376 stable
 * RTL set on entry, add support for SVG (for system keyboard fonts).
-* Added delay between installing and activating keyboards (#6).
+* Added delay between installing and activating keyboards. (#6)
 
 ## 2014-11-11 2.0.375 stable
 * First open source build.
@@ -358,7 +358,7 @@ problematic.)
 * Correct focus management for desktop toolbar UI.
 
 ## 2.0.320 beta
-* Now takes language properties from keyboard descriptor (stub), not from keyboard, correcting problem with Eurolatin and other keyboards used for many different languages. (KMEW-26).'
+* Now takes language properties from keyboard descriptor (stub), not from keyboard, correcting problem with Eurolatin and other keyboards used for many different languages. (KMEW-26).
 * Remove (obsolete) shadow and rounding style functions.
 * Add custom alert and wait messages.
 * Correct size and position of duplicated touch-device input elements.
