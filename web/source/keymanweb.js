@@ -2770,16 +2770,21 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       else if (e.which) s.Lcode = e.which;    
       else return null;
       
-      // TODO:  If keyboard is chiral, test chiral modifiers.
-      //        If it is not, use the test below.
-      // 
-      //        Also, might should detect them state keys here.
+      //console.log("Caps State: " + e.getModifierState("CapsLock") + ", NumLock State: " + e.getModifierState("NumLock") + ", ScrollLock State: " + e.getModifierState("ScrollLock"));
 
-      s.Lmodifiers = 
-        (e.shiftKey ? 0x10 : 0) |
-        (e.ctrlKey ? (e.ctrlLeft ? 0x20 : 0x20) : 0) | 
-        (e.altKey ? (e.altLeft ? 0x40 : 0x40) : 0);  // I3363 (Build 301)
-      
+      var osk = keymanweb["osk"];
+
+      if(keymanweb.isChiral()) {
+        s.Lmodifiers = (e.shiftKey ? 0x10 : 0); 
+        s.Lmodifiers = s.Lmodifiers | (e.ctrlKey ? (e.location == 1 ? osk.modifierCodes['LCTRL'] : osk.modifierCodes['RCTRL']) : 0); 
+        s.Lmodifiers = s.Lmodifiers | (e.altKey ? (e.location == 1 ? osk.modifierCodes['LALT'] : osk.modifierCodes['RALT']) : 0);
+      } else {
+        s.Lmodifiers = 
+          (e.shiftKey ? 0x10 : 0) |
+          (e.ctrlKey ? (e.ctrlLeft ? 0x20 : 0x20) : 0) | 
+          (e.altKey ? (e.altLeft ? 0x40 : 0x40) : 0);  // I3363 (Build 301)
+      }
+
       //s.LisVirtualKey = (e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x60) != 0)) || e.type != 'keypress';
       //s.LisVirtualKeyCode = false;
       s.LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x60) != 0));
@@ -3458,6 +3463,29 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       return ((lg == 'cmn') || (lg == 'jpn') || (lg == 'kor'));
     }
     keymanweb.isCJK = keymanweb['isCJK']; // I3363 (Build 301)
+
+    /**
+     * Function     isChiral
+     * Scope        Public
+     * @param       {Object=}   k0
+     * @return      {boolean}
+     * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
+     */
+    keymanweb.isChiral = keymanweb['isChiral'] = function (k0) {
+      var k=keymanweb._ActiveKeyboard;
+
+      if(arguments.length > 0) {
+        k = k0;
+      }
+
+      if(k) {
+        if(k['KV']['KMBM']) {
+          return !!(k['KV']['KMBM'] & keymanweb['osk'].modifierBitmasks['IS_CHIRAL']);
+        }
+      }
+
+      return false;
+    }
     
     /**
      * Allow to change active keyboard by (internal) keyboard name
