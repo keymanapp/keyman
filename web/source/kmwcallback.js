@@ -290,13 +290,21 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var retVal = 0; // I3318
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
+      var bitmask;
+      if(keymanweb._ActiveKeyboard['KV']) {
+        bitmask = keymanweb._ActiveKeyboard['KV']['KMBM'];
+        if(typeof bitmask == 'undefined' || !bitmask) {
+          bitmask = osk.modifierBitmasks["NON_CHIRAL"];
+        }
+      }
+
       if(e.vkCode > 255) keyCode = e.vkCode;           // added to support extended (touch-hold) keys for mnemonic layouts
         
       if(e.LisVirtualKey || keyCode > 255)
       {
         if((Lruleshift & 0x4000) == 0x4000 || (keyCode > 255))  // added keyCode test to support extended keys
         {
-          retVal = ((Lrulekey == keyCode)  &&  ((Lruleshift&0x7F) == e.Lmodifiers)); //I3318, I3555
+          retVal = ((Lrulekey == keyCode)  &&  ((Lruleshift & bitmask) == e.Lmodifiers)); //I3318, I3555
         }
       }
       else if((Lruleshift & 0x4000) == 0)

@@ -33,7 +33,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       "NUM_LOCK":0x0400,
       "NO_NUM_LOCK":0x0800,
       "SCROLL_LOCK":0x1000,
-      "NO_SCROLL_LOCK":0x2000
+      "NO_SCROLL_LOCK":0x2000,
+      "VIRTUAL_KEY":0x4000
     };
 
     osk.modifierBitmasks = {
