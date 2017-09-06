@@ -2677,6 +2677,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
     /**
      * Generates a list of potential layer ids for the specified chirality mode.
+     * 
+     * @param   {boolean}   chiral    // Does the keyboard use chiral modifiers or not?
      */
     osk.generateLayerIds = function(chiral) {
       var layerCnt, offset;
@@ -2692,17 +2694,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var layerIds = [];
 
       for(var i=0; i < layerCnt; i++) {
-        // // Check for unpermitted modifier combos! - but this blocks visual feedback.
-        // if((i & 0x0003) == 0x0003) {
-        //   continue;
-        // } else if ((i & 0x000C) == 0x000C) {
-        //   continue;
-        // } else if ((i & 0x0009) == 0x0009) {  // left-ctrl, right-alt
-        //   continue;
-        // } else if ((i & 0x0006) == 0x0006) {  // right-ctrl, left-alt
-        //   continue;
-        // }
-
         layerIds.push(osk.getLayerId(i * offset));
       }
 
