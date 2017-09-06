@@ -1066,7 +1066,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
 
     /**
-     * Sets the new layer id, allowing for toggling shift/ctrl/alt
+     * Sets the new layer id, allowing for toggling shift/ctrl/alt while preserving the remainder
+     * of the modifiers represented by the current layer id (where applicable)
      *
      * @param       {string}      id      layer id (e.g. ctrlshift)
      */
@@ -1075,7 +1076,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var s=osk.layerId,idx=id;
       var i;
 
-      // Need to test if target layer is a standard layer
+      // Need to test if target layer is a standard layer (based on the plain 'default')
       var replacements= ['leftctrl', 'rightctrl', 'ctrl', 'leftalt', 'rightalt', 'alt', 'shift'];
 
       for(i=0; i < replacements.length; i++) {
@@ -1084,22 +1085,29 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         idx=idx.replace(replacements[i],'');
       }
 
-      // If default or a non-standard layer, select it
-      if(osk.layerId == 'default' || osk.layerId == 'numeric' || osk.layerId == 'symbol' || osk.layerId == 'currency' || idx != '')
-      {
+      // If we are presently on the default layer, drop the 'default' and go straight to the shifted mode.
+      // If on a common symbolic layer, drop out of symbolic mode and go straight to the shifted mode.
+      if(osk.layerId == 'default' || osk.layerId == 'numeric' || osk.layerId == 'symbol' || osk.layerId == 'currency' || idx != '') {
         s = id;
       }
-      // Otherwise modify the layer according to the current state and key pressed
+      // Otherwise, we are based upon the a layer that accepts modifier variations.
+      // Modify the layer according to the current state and key pressed.
+      //
+      // TODO:  Consider:  should this ever be allowed for a base layer other than 'default'?  If not,
+      // if(idx == '') with accompanying if-else structural shift would be a far better test here.
       else
       {
+        // Save our current modifier state.
         var modifier=osk.getModifierState(s);
 
+        // Strip down to the base modifiable layer.
         for(i=0; i < replacements.length; i++) {
           // Don't forget to remove the kebab-case hyphens!
           s=s.replace(replacements[i] + '-', '');
           s=s.replace(replacements[i],'');
         }
 
+        // Toggle the modifier represented by our input argument.
         switch(id)
         {
           case 'shift':
@@ -1126,9 +1134,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           default:
             s = id;
         }
-        //
-        if(s != 'default')
-        {
+        // Combine our base modifiable layer and attach the new modifier variation info to obtain our destination layer.
+        if(s != 'default') {
           if(s == '') {
             s = osk.getLayerId(modifier);
           } else {
@@ -1136,9 +1143,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           }
         }
       }
-      if(s == '') s = 'default';
+      
+      if(s == '') {
+        s = 'default';
+      }
 
-      // Set the new layer id.
+      // Actually set the new layer id.
       osk.layerId = s;
 
       // Check that requested layer is defined   (KMEA-1, but does not resolve issue)
@@ -1147,7 +1157,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       // Show default layer if an undefined layer has been requested
       osk.layerId='default';
-
     }
 
     /**
