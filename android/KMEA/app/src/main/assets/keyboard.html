@@ -88,6 +88,11 @@
     function insertText(dn, s) {
       window.console.log('insertText('+ dn +', ' + s +');');
       window.jsInterface.insertText(dn, s);
+
+      if (s == '7') {
+        var kmw=window['tavultesoft']['keymanweb'];
+        kmw['resetContext']();
+      }
     }
 
     function updateKMText(text) {

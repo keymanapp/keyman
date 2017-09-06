@@ -361,6 +361,26 @@
   osk.waitForFonts = function(kfd,ofd){return true;}
 
   /**
+   * @summary Revert to default layer and clear any modifier DDW
+   *
+   * @public
+   *
+   */
+  keymanweb['resetContext'] = function()
+  {
+    console.log("osk.resetContext()\n");
+    console.log("osk.layerId: " + osk.layerId);
+    console.log("osk.layerIndex: " + osk.layerIndex);
+    osk.layerId = 'default';
+    osk.layerIndex = 0;
+
+    keymanweb._IgnoreNextSelChange = 0;
+    keymanweb._CachedSelectionStart = null;
+    keymanweb._DeadkeyDeleteMatched();
+    keymanweb.mustReloadKeyboard = true;
+  }
+
+  /**
    *  Return position of language menu key to KeymanTouch
    *  
    *  @return  {string}      comma-separated x,y,w,h of language menu key
