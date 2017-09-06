@@ -91,7 +91,7 @@ if (!window['tavultesoft']['keymanweb']['initialized']) {
                                 { "id": "K_LCONTROL", "text": "*Ctrl*", "sp": "1", "width": "170" },
                                 { "id": "K_LALT", "text": "*Alt*", "sp": "1", "width": "160" },
                                 { "id": "K_SPACE", "text": "", "width": "770" },
-                                { "id": "K_ALT", "text": "*Alt*", "sp": "1", "width": "160" },
+                                { "id": "K_RALT", "text": "*Alt*", "sp": "1", "width": "160" },
                                 { "id": "K_RCONTROL", "text": "*Ctrl*", "sp": "1", "width": "170" }
                             ]
                         }
