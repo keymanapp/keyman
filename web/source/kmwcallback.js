@@ -314,7 +314,18 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(!retVal) this._DeadkeyResetMatched();  // I3318
       return retVal != 0;                            // I3318
     };
-    
+
+    /**
+     * Function     KSM
+     * Scope        Public
+     * @param       {Object}      e       keystroke event
+     * @param       {number}      Lstate  
+     * Description  Test keystroke against state key rules
+     */
+    keymanweb['KSM'] = keymanweb.KSM = function(e, Lstate) { // Keyboard_StateMatch
+      return ((Lstate & e.Lstates) == Lstate);
+    }
+
     /**
      * Function     KKI      
      * Scope        Public

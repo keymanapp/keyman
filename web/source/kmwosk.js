@@ -112,6 +112,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     osk._BaseLayoutEuro['se'] = '\u00a71234567890+´~~~QWERTYUIOP\u00c5\u00a8\'~~~ASDFGHJKL\u00d6\u00c4~~~~~<ZXCVBNM,.-~~~~~ ';  // Swedish
     osk._BaseLayoutEuro['uk'] = '`1234567890-=~~~QWERTYUIOP[]#~~~ASDFGHJKL;\'~~~~~\\ZXCVBNM,./~~~~~ '; // UK
 
+    // Tracks the OSK-based state of supported state keys.
+    // Using the exact keyCode name from above allows for certain optimizations elsewhere in the code.
+    osk._stateKeys = {
+      "K_CAPS":false,
+      "K_NUMLOCK":false,
+      "K_SCROLL":false
+    };
+
     // Additional members (mainly for touch input devices)
     osk.lgTimer = null;           // language switching timer
     osk.lgKey = null;             // language menu key element
@@ -801,7 +809,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     {
       var Lelem = keymanweb._LastActiveElement, Ls, Le, Lkc, Lsel;
 
-      // Each button id is of the form <layer>-<keyCode>, e.g. 'ctrlshift-K_Q' or 'popup-shift-K_501', etc.
+      // Each button id is of the form <layer>-<keyCode>, e.g. 'shift-ctrl-K_Q' or 'popup-shift-K_501', etc.
       var t=e.id.split('-');
       if(t.length < 2) return true; //shouldn't happen, but...
 
@@ -864,7 +872,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
 
         // First check the virtual key, and process shift, control, alt or function keys
-        Lkc = {Ltarg:Lelem,Lmodifiers:0,Lcode:osk.keyCodes[keyName],LisVirtualKey:true};
+        Lkc = {Ltarg:Lelem,Lmodifiers:0,Lstates:0,Lcode:osk.keyCodes[keyName],LisVirtualKey:true};
+
+        // Set the flags for the state keys.
+        Lkc.Lstates |= osk._stateKeys["K_CAPS"]    ? osk.modifierCodes["CAPS"] : osk.modifierCodes["NO_CAPS"];
+        Lkc.Lstates |= osk._stateKeys["K_NUMLOCK"] ? osk.modifierCodes["NUM_LOCK"] : osk.modifierCodes["NO_NUM_LOCK"];
+        Lkc.Lstates |= osk._stateKeys["K_SCROLL"]  ? osk.modifierCodes["SCROLL_LOCK"] : osk.modifierCodes["NO_SCROLL_LOCK"];
 
         // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
         if(keyName.substr(0,2) == 'U_') Lkc.LisVirtualKey=false;
@@ -957,6 +970,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
               break;
             case 'K_SPACE':
               keymanweb.KO(0, Lelem, ' ');
+              break;
+            case 'K_CAPS':
+            case 'K_NUMLOCK':
+            case 'K_SCROLL':
+              osk._stateKeys[keyName] = ! osk._stateKeys[keyName];
+              osk._Show();
               break;
             default:
               // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
@@ -1651,22 +1670,90 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return                                Always true
      * Description  Update the current shift state within KMW
      */
-    osk._UpdateVKShift = function(e, v, d)
-    {
-      var keyShiftState=0;
-      if(e)
+    osk._UpdateVKShift = function(e, v, d) {
+      var keyShiftState=0, lockStates=0, i;
+
+      var lockNames  = ["CAPS", "NUM_LOCK", "SCROLL_LOCK"];
+      var lockKeys   = ["K_CAPS", "K_NUMLOCK", "K_SCROLL"];
+
+      if(e) {
         // read shift states from Pevent
         keyShiftState = e.Lmodifiers;
-      else if(d)
+        lockStates = e.Lstates;
+
+        for(i=0; i < lockNames.length; i++) {
+          if(lockStates & osk.stateBitmasks[lockNames[i]]) {
+            osk._stateKeys[lockKeys[i]] = lockStates & osk.modifierCodes[lockNames[i]];
+          }
+        }
+      } else if(d) {
         keyShiftState |= v;
-      else
+
+        for(i=0; i < lockNames.length; i++) {
+          if(v & osk.stateBitmasks[lockNames[i]]) {
+            osk._stateKeys[lockKeys[i]] = true;
+          }
+        }
+      } else {
         keyShiftState &= ~v;
+
+        for(i=0; i < lockNames.length; i++) {
+          if(v & osk.stateBitmasks[lockNames[i]]) {
+            osk._stateKeys[lockKeys[i]] = false;
+          }
+        }
+      }
 
       // Find and display the selected OSK layer
       osk.layerId=osk.getLayerId(keyShiftState);
-      if(osk._Visible) osk._Show();
+
+      // osk._UpdateVKShiftStyle will be called automatically upon the next _Show.
+      if(osk._Visible) {
+        osk._Show();
+      }
 
       return true;
+    }
+
+    /**
+     * Function     _UpdateVKShiftStyle
+     * Scope        Private
+     * @param       {string=}   layerId
+     * Description  Updates the OSK's visual style for any toggled state keys
+     */
+    osk._UpdateVKShiftStyle = function(layerId) {
+      var i, n, layer=null, layerElement=null;
+
+      if(layerId) {
+        for(n=0; n<osk.layers.length; n++) {
+          if(osk.layers[n]["id"] == osk.layerId) {
+            break;
+          }
+        }
+
+        return;  // Failed to find the requested layer.
+      } else {
+        n=osk.layerIndex;
+        layerId=osk.layers[n]["id"];
+      }
+
+      layer=osk.layers[n];
+      
+      // Set the on/off state of any visible state keys.
+      var states =["K_CAPS",      "K_NUMLOCK",  "K_SCROLL"];
+      var keys   =[layer.capsKey, layer.numKey, layer.scrollKey];
+
+      for(i=0; i < keys.length; i++) {
+        // Skip any keys not in the OSK!
+        if(keys[i] == null) {
+          continue;
+        }
+
+        keys[i]['sp'] = osk._stateKeys[states[i]] ? '2' : '1';
+        var btn = document.getElementById(layerId+'-'+states[i]);
+
+        osk.setButtonClass(keys[i], btn, osk.layout);
+      }
     }
 
     /**
@@ -2284,7 +2371,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(key == null) return;
 
       // Get key name (K_...) from element ID
-      var keyName=key.id.split('-')[1];
+      var keyIdComponents = key.id.split('-');
+      var keyName=keyIdComponents[keyIdComponents.length-1];
 
       // Highlight the touched key
       osk.highlightKey(key,true);
@@ -2872,6 +2960,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       for(n=0; n<layers.length; n++)
       {
         var layer=layers[n], kx, shiftKey=null, nextKey=null, allText='';
+        var capsKey = null, numKey = null, scrollKey = null;  // null if not in the OSK layout.
         var layerSpec = keyLabels[layer['id']];
         var isShift = layer['id'] == 'shift' ? 1 : 0;
         var isDefault = layer['id'] == 'default' || isShift ? 1 : 0;
@@ -2905,11 +2994,23 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             if(typeof(key['text']) == 'undefined') { 
               key['text']='';
             }
-            if(key['id'] == 'K_SHIFT') {
-              shiftKey=key;
-            }
-            if(key['id'] == 'K_TAB') {
-              nextKey=key;
+            // Detect important tracking keys.
+            switch(key['id']) {
+              case "K_SHIFT":
+                shiftKey=key;
+                break;
+              case "K_TAB":
+                nextKey=key;
+                break;
+              case "K_CAPS":
+                capsKey=key;
+                break;
+              case "K_NUMLOCK":
+                numKey=key;
+                break;
+              case "K_SCROLL":
+                scrollKey=key;
+                break;
             }
 
             // Remove pop-up shift keys referencing invalid layers (Build 349)
@@ -2929,6 +3030,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
         // We're done with the layer keys initialization pass.  Time to do post-analysis layer-level init where necessary.
         layer.shiftKey=shiftKey;
+        layer.capsKey=capsKey;
+        layer.numKey=numKey;
+        layer.scrollKey=scrollKey;
 
         // Set modifier key appearance and behaviour for non-desktop devices using the default layout
         if(formFactor != 'desktop') {
@@ -3604,6 +3708,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             osk.nextLayer=osk.layerId;
             osk.layerIndex=nLayer=n;
             if(typeof osk.layers[n]['nextlayer'] == 'string') osk.nextLayer=osk.layers[n]['nextlayer'];
+
+            // If osk._Show has been called, there's probably been a change in modifier or state key state.  Keep it updated!
+            osk._UpdateVKShiftStyle();
           }
           else
           {
