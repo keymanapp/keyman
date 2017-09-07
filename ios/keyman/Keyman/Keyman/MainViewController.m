@@ -9,7 +9,6 @@
 #import "MainViewController.h"
 #import "AppDelegate.h"
 #import "GetStartedViewController.h"
-#import "KMWebBrowserViewController.h"
 #import "KMDropDownListView.h"
 #import "UIImage+Helpers.h"
 #import "CoreText/CTFontManager.h"
@@ -1534,9 +1533,9 @@ NSUInteger const minIOSVersion4FontInstall = 7;
 - (void)showKMWebBrowserView:(id)sender {
     [popover dismissPopoverAnimated:NO];
     [self dismissDropDownMenu];
-    KMWebBrowserViewController *kmWebBrowserVC = [[KMWebBrowserViewController alloc] init];
-    [kmWebBrowserVC setFontFamily:[[textView font] fontName]];
-    [self presentViewController:kmWebBrowserVC animated:YES completion:nil];
+    WebBrowserViewController *webBrowserVC = [[WebBrowserViewController alloc] init];
+    [webBrowserVC setFontFamily:[[textView font] fontName]];
+    [self presentViewController:webBrowserVC animated:YES completion:nil];
 }
 #endif
 

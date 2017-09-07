@@ -85,8 +85,7 @@
 		982D149D19FF462A007D4629 /* textsize_selected@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 982D148719FF462A007D4629 /* textsize_selected@3x.png */; };
 		982D149F19FF462A007D4629 /* textsize_up@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 982D148819FF462A007D4629 /* textsize_up@3x.png */; };
 		982D14A119FF462A007D4629 /* textsize@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 982D148919FF462A007D4629 /* textsize@3x.png */; };
-		9845A7AA1A43983300544E2E /* KMWebBrowserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A79C1A43983300544E2E /* KMWebBrowserViewController.m */; };
-		9845A7AB1A43983300544E2E /* KMWebBrowserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A79D1A43983300544E2E /* KMWebBrowserViewController.xib */; };
+		9845A7AB1A43983300544E2E /* WebBrowserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A79D1A43983300544E2E /* WebBrowserViewController.xib */; };
 		9845A7AC1A43983300544E2E /* kmwb-navbar-Landscape-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A79F1A43983300544E2E /* kmwb-navbar-Landscape-568h@2x.png */; };
 		9845A7AD1A43983300544E2E /* kmwb-navbar-Landscape-568h@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7A01A43983300544E2E /* kmwb-navbar-Landscape-568h@3x.png */; };
 		9845A7AE1A43983300544E2E /* kmwb-navbar-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7A11A43983300544E2E /* kmwb-navbar-Landscape.png */; };
@@ -189,6 +188,7 @@
 		C0A1A6311F5E4F4300EAF822 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */; };
 		C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */; };
 		C0A1A6351F5E786A00EAF822 /* BookmarksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */; };
+		C0A1A6371F5E8C9100EAF822 /* WebBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6361F5E8C9100EAF822 /* WebBrowserViewController.swift */; };
 		C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
 		C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */; };
 		CE06AA681F171CA0006D91C3 /* Keyman.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418F71769486C008D2FF3 /* Keyman.h */; };
@@ -263,9 +263,7 @@
 		982D148719FF462A007D4629 /* textsize_selected@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_selected@3x.png"; path = "Keyman Icons/textsize_selected@3x.png"; sourceTree = "<group>"; };
 		982D148819FF462A007D4629 /* textsize_up@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_up@3x.png"; path = "Keyman Icons/textsize_up@3x.png"; sourceTree = "<group>"; };
 		982D148919FF462A007D4629 /* textsize@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize@3x.png"; path = "Keyman Icons/textsize@3x.png"; sourceTree = "<group>"; };
-		9845A79B1A43983300544E2E /* KMWebBrowserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMWebBrowserViewController.h; sourceTree = "<group>"; };
-		9845A79C1A43983300544E2E /* KMWebBrowserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMWebBrowserViewController.m; sourceTree = "<group>"; };
-		9845A79D1A43983300544E2E /* KMWebBrowserViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = KMWebBrowserViewController.xib; sourceTree = "<group>"; };
+		9845A79D1A43983300544E2E /* WebBrowserViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WebBrowserViewController.xib; sourceTree = "<group>"; };
 		9845A79F1A43983300544E2E /* kmwb-navbar-Landscape-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "kmwb-navbar-Landscape-568h@2x.png"; sourceTree = "<group>"; };
 		9845A7A01A43983300544E2E /* kmwb-navbar-Landscape-568h@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "kmwb-navbar-Landscape-568h@3x.png"; sourceTree = "<group>"; };
 		9845A7A11A43983300544E2E /* kmwb-navbar-Landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "kmwb-navbar-Landscape.png"; sourceTree = "<group>"; };
@@ -405,6 +403,7 @@
 		C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = SetUpViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = BookmarksViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C0A1A6361F5E8C9100EAF822 /* WebBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = WebBrowserViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF76991F5D368B00BD23C3 /* SWKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SWKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -454,11 +453,10 @@
 			children = (
 				9845A8BD1A439F1000544E2E /* Icons */,
 				9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */,
-				9845A79B1A43983300544E2E /* KMWebBrowserViewController.h */,
-				9845A79C1A43983300544E2E /* KMWebBrowserViewController.m */,
-				9845A79D1A43983300544E2E /* KMWebBrowserViewController.xib */,
+				9845A79D1A43983300544E2E /* WebBrowserViewController.xib */,
 				9845A79E1A43983300544E2E /* NavBar */,
 				C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */,
+				C0A1A6361F5E8C9100EAF822 /* WebBrowserViewController.swift */,
 			);
 			path = KMWebBrowser;
 			sourceTree = "<group>";
@@ -1068,7 +1066,7 @@
 				982D149F19FF462A007D4629 /* textsize_up@3x.png in Resources */,
 				982D149119FF462A007D4629 /* 711-trash@3x.png in Resources */,
 				982D148D19FF462A007D4629 /* 702-share@3x.png in Resources */,
-				9845A7AB1A43983300544E2E /* KMWebBrowserViewController.xib in Resources */,
+				9845A7AB1A43983300544E2E /* WebBrowserViewController.xib in Resources */,
 				9822CB691A3A77D200D73CAA /* MainViewController_.xib in Resources */,
 				9845A8741A439B8F00544E2E /* font-size-a.png in Resources */,
 			);
@@ -1132,7 +1130,7 @@
 				981AFA7B19EF44DE006706BF /* main.m in Sources */,
 				9845A7CF1A439A9200544E2E /* GetStartedViewController.m in Sources */,
 				981AFA7C19EF44DE006706BF /* AppDelegate.m in Sources */,
-				9845A7AA1A43983300544E2E /* KMWebBrowserViewController.m in Sources */,
+				C0A1A6371F5E8C9100EAF822 /* WebBrowserViewController.swift in Sources */,
 				9845A7BC1A4398B200544E2E /* KMDropDownListView.m in Sources */,
 				981AFA7F19EF44DE006706BF /* MainViewController.m in Sources */,
 				C0A1A6351F5E786A00EAF822 /* BookmarksViewController.swift in Sources */,
@@ -1295,6 +1293,7 @@
 					"-force_load",
 					Keyman/libKeyman/libKeyman.a,
 				);
+				"OTHER_SWIFT_FLAGS[arch=*]" = "-D DEBUG";
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
@@ -1377,7 +1376,6 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				"OTHER_SWIFT_FLAGS[arch=*]" = "-D DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = Tavultesoft.Keyman.SWKeyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "5d7c5750-a8be-473c-80ef-ed8773404e65";

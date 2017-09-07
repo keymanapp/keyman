@@ -15,7 +15,7 @@ let bookmarkUrlKey: String = "BookMarkUrl"
 
 class BookmarksViewController:
 UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegate {
-  weak var webBrowser: KMWebBrowserViewController?
+  weak var webBrowser: WebBrowserViewController?
 
   @IBOutlet var tableView: UITableView!
   @IBOutlet var doneButton: UIBarButtonItem!
