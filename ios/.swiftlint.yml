@@ -2,3 +2,8 @@ disabled_rules:
   - function_body_length
   - function_parameter_count
   - todo
+
+identifier_name:
+  min_length:
+    warning: 0
+    error: 0

@@ -7,7 +7,7 @@
 //
 
 #import "KMDropDownListView.h"
-#import "KMDropDownView.h"
+#import <Keyman-Swift.h>
 
 @implementation KMDropDownListView
 
@@ -19,7 +19,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         [self setBackgroundColor:[UIColor clearColor]];
-        KMDropDownView *dropDownView = [[KMDropDownView alloc] initWithFrame:CGRectZero];
+        DropDownView *dropDownView = [[DropDownView alloc] initWithFrame:CGRectZero];
         CGFloat arrowHeight = dropDownView.arrowHeight;
         dropDownView.frame = CGRectMake(0, -arrowHeight, frame.size.width, frame.size.height+arrowHeight);
         [dropDownView setArrowPosX:frame.size.width-29];
