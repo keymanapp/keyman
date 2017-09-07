@@ -7,7 +7,6 @@
 //
 
 #import "MainViewController.h"
-#import "AppDelegate.h"
 #import "CoreText/CTFontManager.h"
 #import <QuartzCore/QuartzCore.h>
 #import <Keyman-Swift.h>
