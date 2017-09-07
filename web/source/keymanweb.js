@@ -2770,8 +2770,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       else if (e.which) s.Lcode = e.which;    
       else return null;
       
-      //console.log("Caps State: " + e.getModifierState("CapsLock") + ", NumLock State: " + e.getModifierState("NumLock") + ", ScrollLock State: " + e.getModifierState("ScrollLock"));
-
       var osk = keymanweb["osk"];
 
       if(keymanweb.isChiral()) {
@@ -2811,6 +2809,26 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           (e.shiftKey ? 0x10 : 0) |
           (e.ctrlKey ? (e.ctrlLeft ? 0x20 : 0x20) : 0) | 
           (e.altKey ? (e.altLeft ? 0x40 : 0x40) : 0);  // I3363 (Build 301)
+      }
+
+      s.Lstates = 0;
+      
+      if(e.getModifierState("CapsLock")) {
+        s.Lstates = osk.modifierCodes["CAPS"];
+      } else {
+        s.Lstates = osk.modifierCodes["NO_CAPS"];
+      }
+
+      if(e.getModifierState("NumLock")) {
+        s.Lstates |= osk.modifierCodes["NUM_LOCK"];
+      } else {
+        s.Lstates |= osk.modifierCodes["NO_NUM_LOCK"];
+      }
+
+      if(e.getModifierState("ScrollLock") || e.getModifierState("Scroll")) {  // "Scroll" for IE9.
+        s.Lstates |= osk.modifierCodes["SCROLL_LOCK"];
+      } else {
+        s.Lstates |= osk.modifierCodes["NO_SCROLL_LOCK"];
       }
 
       //s.LisVirtualKey = (e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x60) != 0)) || e.type != 'keypress';
@@ -2932,9 +2950,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         case 8: 
           keymanweb._DeadKeys = []; 
           break; // I3318 (always clear deadkeys after backspace) 
-        case 16: 
+        case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
         case 17: 
         case 18: 
+        case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
+        case 144:
+        case 145:
           keymanweb._NotifyKeyboard(Levent.Lcode,Levent.Ltarg,1); 
           return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
       }
@@ -3093,9 +3114,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             keymanweb.moveToNext(false);
           return true;        
                   
-        case 16: 
+        case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
         case 17: 
-        case 18: keymanweb._NotifyKeyboard(Levent.Lcode,Levent.Ltarg,0); return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1);  // I2187
+        case 18: 
+        case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
+        case 144:
+        case 145:
+          keymanweb._NotifyKeyboard(Levent.Lcode,Levent.Ltarg,0); 
+          return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1);  // I2187
       }
       
       // I736 start

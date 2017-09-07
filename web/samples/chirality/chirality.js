@@ -53,7 +53,11 @@ function Keyboard_chirality() {
         } else if(kls[layer][key] != '') {
           if (k.KKM(e, modCode, k.osk.keyCodes[keySymbol])) {
             r = m = 1;
-            k.KO(0, t, kls[layer][key]);
+            if(k.KSM(e, k.osk.modifierCodes['CAPS'])) {
+              k.KO(0, t, kls[layer][key].toUpperCase());
+            } else {
+              k.KO(0, t, kls[layer][key]);
+            }
             return r;
           }
         }

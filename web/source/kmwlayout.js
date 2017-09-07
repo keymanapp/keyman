@@ -183,7 +183,11 @@ if (!window['tavultesoft']['keymanweb']['initialized']) {
                                 {
                                     "id": "K_SHIFT", "text": "*Shift*", "sp": "1", "width": "200", "sk": [
                                         { "id": "K_LCONTROL", "text": "*Ctrl*", "sp": "1", "width": "50", "nextlayer": "ctrl" },
+                                        { "id": "K_LCONTROL", "text": "*LCtrl*", "sp": "1", "width": "50", "nextlayer": "leftctrl" },
+                                        { "id": "K_RCONTROL", "text": "*RCtrl*", "sp": "1", "width": "50", "nextlayer": "rightctrl" },
                                         { "id": "K_LALT", "text": "*Alt*", "sp": "1", "width": "50", "nextlayer": "alt" },
+                                        { "id": "K_LALT", "text": "*LAlt*", "sp": "1", "width": "50", "nextlayer": "leftalt" },
+                                        { "id": "K_RALT", "text": "*RAlt*", "sp": "1", "width": "50", "nextlayer": "rightalt" },
                                         { "id": "K_ALTGR", "text": "*AltGr*", "sp": "1", "width": "50", "nextlayer": "ctrl-alt" }]
                                 },
                                 { "id": "K_LOPT", "text": "*Menu*", "sp": "1", "width": "150" },
@@ -280,7 +284,11 @@ if (!window['tavultesoft']['keymanweb']['initialized']) {
                                 {
                                     "id": "K_SHIFT", "text": "*Shift*", "sp": "1", "width": "200", "sk": [
                                         { "id": "K_LCONTROL", "text": "*Ctrl*", "sp": "1", "width": "50", "nextlayer": "ctrl" },
+                                        { "id": "K_LCONTROL", "text": "*LCtrl*", "sp": "1", "width": "50", "nextlayer": "leftctrl" },
+                                        { "id": "K_RCONTROL", "text": "*RCtrl*", "sp": "1", "width": "50", "nextlayer": "rightctrl" },
                                         { "id": "K_LALT", "text": "*Alt*", "sp": "1", "width": "50", "nextlayer": "alt" },
+                                        { "id": "K_LALT", "text": "*LAlt*", "sp": "1", "width": "50", "nextlayer": "leftalt" },
+                                        { "id": "K_RALT", "text": "*RAlt*", "sp": "1", "width": "50", "nextlayer": "rightalt" },
                                         { "id": "K_ALTGR", "text": "*AltGr*", "sp": "1", "width": "50", "nextlayer": "ctrl-alt" }]
                                 },
                                 { "id": "K_LOPT", "text": "*Menu*", "width": "150", "sp": "1" },
