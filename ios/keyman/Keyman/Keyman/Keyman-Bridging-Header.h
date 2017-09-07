@@ -4,4 +4,5 @@
 
 #import "AppDelegate.h"
 #import "Keyman.h"
+#import "MainViewController.h"
 #import "Reachability.h"

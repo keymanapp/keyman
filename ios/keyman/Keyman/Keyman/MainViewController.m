@@ -8,7 +8,6 @@
 
 #import "MainViewController.h"
 #import "AppDelegate.h"
-#import "GetStartedViewController.h"
 #import "KMDropDownListView.h"
 #import "UIImage+Helpers.h"
 #import "CoreText/CTFontManager.h"

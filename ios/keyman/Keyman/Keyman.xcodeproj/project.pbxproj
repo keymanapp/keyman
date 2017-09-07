@@ -99,7 +99,6 @@
 		9845A7B61A43983300544E2E /* kmwb-navbar-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7A91A43983300544E2E /* kmwb-navbar-Portrait~ipad.png */; };
 		9845A7BC1A4398B200544E2E /* KMDropDownListView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A7B91A4398B200544E2E /* KMDropDownListView.m */; };
 		9845A7BD1A4398B200544E2E /* KMDropDownView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A7BB1A4398B200544E2E /* KMDropDownView.m */; };
-		9845A7CF1A439A9200544E2E /* GetStartedViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A7C01A439A9200544E2E /* GetStartedViewController.m */; };
 		9845A7D01A439A9200544E2E /* GetStartedViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7C11A439A9200544E2E /* GetStartedViewController.xib */; };
 		9845A7D21A439A9200544E2E /* InfoViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7C51A439A9200544E2E /* InfoViewController_iPad.xib */; };
 		9845A7D31A439A9200544E2E /* InfoViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7C61A439A9200544E2E /* InfoViewController_iPhone.xib */; };
@@ -185,6 +184,7 @@
 		98CF00B91B461EDE00627DC6 /* get-started.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B51B461EDE00627DC6 /* get-started.png */; };
 		98CF00BA1B461EDE00627DC6 /* info.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B61B461EDE00627DC6 /* info.png */; };
 		98CF00BB1B461EDE00627DC6 /* menu-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B71B461EDE00627DC6 /* menu-icon.png */; };
+		C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B01F60E8D400140735 /* GetStartedViewController.swift */; };
 		C0A1A6311F5E4F4300EAF822 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */; };
 		C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */; };
 		C0A1A6351F5E786A00EAF822 /* BookmarksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */; };
@@ -279,8 +279,6 @@
 		9845A7B91A4398B200544E2E /* KMDropDownListView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMDropDownListView.m; sourceTree = "<group>"; };
 		9845A7BA1A4398B200544E2E /* KMDropDownView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMDropDownView.h; sourceTree = "<group>"; };
 		9845A7BB1A4398B200544E2E /* KMDropDownView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMDropDownView.m; sourceTree = "<group>"; };
-		9845A7BF1A439A9200544E2E /* GetStartedViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetStartedViewController.h; sourceTree = "<group>"; };
-		9845A7C01A439A9200544E2E /* GetStartedViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetStartedViewController.m; sourceTree = "<group>"; };
 		9845A7C11A439A9200544E2E /* GetStartedViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GetStartedViewController.xib; sourceTree = "<group>"; };
 		9845A7C51A439A9200544E2E /* InfoViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InfoViewController_iPad.xib; sourceTree = "<group>"; };
 		9845A7C61A439A9200544E2E /* InfoViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InfoViewController_iPhone.xib; sourceTree = "<group>"; };
@@ -400,6 +398,7 @@
 		98D55EDC18480B6800104956 /* textsize_up.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_up.png; path = "Keyman Icons/textsize_up.png"; sourceTree = "<group>"; };
 		98D55EDD18480B6800104956 /* textsize_up@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_up@2x.png"; path = "Keyman Icons/textsize_up@2x.png"; sourceTree = "<group>"; };
 		98DE283417F50DBF00D6A496 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		C055F0B01F60E8D400140735 /* GetStartedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = GetStartedViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = SetUpViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = BookmarksViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -493,9 +492,8 @@
 		9845A7BE1A439A9200544E2E /* GetStartedViewController */ = {
 			isa = PBXGroup;
 			children = (
-				9845A7BF1A439A9200544E2E /* GetStartedViewController.h */,
-				9845A7C01A439A9200544E2E /* GetStartedViewController.m */,
 				9845A7C11A439A9200544E2E /* GetStartedViewController.xib */,
+				C055F0B01F60E8D400140735 /* GetStartedViewController.swift */,
 			);
 			path = GetStartedViewController;
 			sourceTree = "<group>";
@@ -1127,8 +1125,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */,
 				981AFA7B19EF44DE006706BF /* main.m in Sources */,
-				9845A7CF1A439A9200544E2E /* GetStartedViewController.m in Sources */,
 				981AFA7C19EF44DE006706BF /* AppDelegate.m in Sources */,
 				C0A1A6371F5E8C9100EAF822 /* WebBrowserViewController.swift in Sources */,
 				9845A7BC1A4398B200544E2E /* KMDropDownListView.m in Sources */,
