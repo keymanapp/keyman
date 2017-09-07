@@ -149,20 +149,16 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
        */
       keymanweb.setBlur = function(e)
       {
-        console.log("keymanweb.setBlur called");
-        //keymanweb.resetContext();
         // This works OK for iOS, but may need something else for other platforms
         if(('relatedTarget' in e) && e.relatedTarget)
         {
           if(e.relatedTarget.nodeName != 'DIV' || e.relatedTarget.className.indexOf('keymanweb-input') == -1)
           {
-            console.log("keymanweb.cancelInput...");
             keymanweb.cancelInput(); return;
           }
         }
         //Hide the OSK
-        console.log("keymanweb.cancelInput - focusing: " + keymanweb.focusing);
-        if(!keymanweb.focusing) keymanweb.cancelInput(); 
+        if(!keymanweb.focusing) keymanweb.cancelInput();
       }
       
       /**
@@ -174,7 +170,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       {                     
         //e.stopPropagation();  // not doing anything useful, no child elements
         //e.preventDefault();   // prevents user selection or scrolling, may be better if they are allowed?
-        console.log("keymanweb.setFocus called");
         keymanweb.focusing=true;
         keymanweb.focusTimer=window.setTimeout(function(){keymanweb.focusing=false;},1000);
   
@@ -215,8 +210,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           // Hide the KMW caret
           keymanweb.hideCaret(); 
           keymanweb._ActiveElement=target;
-          console.log("keymanweb: new target");
-          keymanweb.resetContext();
           // The issue here is that touching a DIV does not actually set the focus for iOS, even when enabled to accept focus (by setting tabIndex=0)
           // We must explicitly set the focus in order to remove focus from any non-KMW input
           target.focus();  //Android native browsers may not like this, but it is needed for Chrome, Safari
@@ -996,7 +989,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         x.onmspointermove=keymanweb.dragInput;
         
         // Hide keyboard and caret when losing focus from simulated input field
-        console.log("keymanweb assigning onblur");
         x.onblur=keymanweb.setBlur;
         
         // Note that touchend event propagates and is processed by body touchend handler
@@ -2385,8 +2377,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */    
     keymanweb._ControlFocus = function(e)
     {
-      console.log("keymanweb._ControlFocus called");
-      var Ltarg, Ln; 
+      var Ltarg, Ln;
       if(!keymanweb._Enabled) return true;
       e = keymanweb._GetEventObject(e);     // I2404 - Manage IE events in IFRAMEs
       if(!e) return true;
