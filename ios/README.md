@@ -1,9 +1,9 @@
 # Keyman for iOS
 
-## Minimum iOS Requirements
-Xcode
-
-iOS 8+
+## Prerequisites
+* Xcode 8
+* iOS 8+
+* SwiftLint (`brew install swiftlint`)
 
 ### Compiling from Command line
 To build Keyman for iOS, please run the build.sh build script within this folder.
@@ -17,10 +17,10 @@ In order to test any code changes on a physical device, Apple requires that an a
 - Open Xcode and the settings for the Keyman target.
 - Establish personal code-signing permissions.
   - Go to the **General** tab and enable "Automatically manage signing" and select your "Personal Team."
-	- Change the "Bundle Identifier" for both the Keyman and SWKeyboard targets to something personal and unique.
-  - Afterward, swap to the **Capabilities** tab, remove the existing "App Groups", and define your own unique group for the Keyman target.  
-	- Then, make the "App Group" settings of SWKeyboard match those of Keyman.
-	- Perform a find and replace for the group identifier "group.KM4I" and with your selected unique group name.
+  - Change the "Bundle Identifier" for both the Keyman and SWKeyboard targets to something personal and unique.
+  - Afterward, swap to the **Capabilities** tab, remove the existing "App Groups", and define your own unique group for the Keyman target.
+  - Then, make the "App Group" settings of SWKeyboard match those of Keyman.
+  - Perform a find and replace for the group identifier "group.KM4I" and with your selected unique group name.
   - Correct any further error messages Xcode presents you with.
   - **Note**:  All changes for this step (code-signing permissions, app groups, bundle identifier, etc) must be reverted to the original settings for submitted PRs.
 - Under the **Product > Destination** Xcode menu, select the device you wish to use for testing.
