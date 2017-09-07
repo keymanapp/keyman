@@ -8,7 +8,6 @@
 
 #import "MainViewController.h"
 #import "AppDelegate.h"
-#import "KMDropDownListView.h"
 #import "UIImage+Helpers.h"
 #import "CoreText/CTFontManager.h"
 #import <QuartzCore/QuartzCore.h>
@@ -1442,7 +1441,7 @@ NSUInteger const minIOSVersion4FontInstall = 7;
     #else
     NSArray *listItems = [NSArray arrayWithObjects:textSizeButton, trashButton, getStartedButton, infoButton, nil];
     #endif
-    KMDropDownListView *dropDownList = [[KMDropDownListView alloc] initWithListItems:listItems
+    DropDownListView *dropDownList = [[DropDownListView alloc] initWithListItems:listItems
                                                                             itemSize:CGSizeMake(w, h)
                                                                             position:CGPointMake(x, y)];
     dropDownList.tag = dropDownListTag;
