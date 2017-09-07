@@ -18,7 +18,8 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
     super.viewDidLoad()
     extendedLayoutIncludesOpaqueBars = true
     webView?.delegate = self
-    NotificationCenter.default.addObserver(self, selector: #selector(self.networkStatusChanged), name: NSNotification.Name.reachabilityChanged, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(self.networkStatusChanged),
+        name: NSNotification.Name.reachabilityChanged, object: nil)
     networkReachable = Reachability(hostName: "www.keyman.com")
     networkReachable?.startNotifier()
   }

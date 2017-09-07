@@ -44,7 +44,8 @@ UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegat
   }
 
   @IBAction func addBookmark(_ sender: Any) {
-    let alert = UIAlertView(title: "Add Bookmark", message: "", delegate: self, cancelButtonTitle: "Cancel", otherButtonTitles: "Add")
+    let alert = UIAlertView(title: "Add Bookmark", message: "", delegate: self,
+        cancelButtonTitle: "Cancel", otherButtonTitles: "Add")
     alert.alertViewStyle = .loginAndPasswordInput
     if let textField = alert.textField(at: 0) {
       textField.placeholder = "Title"
@@ -86,8 +87,7 @@ UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegat
     let userData = AppDelegate.activeUserDefaults()
     if !bookmarks.isEmpty {
       userData.set(bookmarks, forKey: webBrowserBookmarksKey)
-    }
-    else {
+    } else {
       userData.set(nil, forKey: webBrowserBookmarksKey)
     }
     userData.synchronize()
@@ -104,7 +104,7 @@ UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegat
     return sections
   }
 
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     // Return the number of rows in the section.
     return 1
   }
@@ -135,7 +135,9 @@ UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegat
     return true
   }
 
-  func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+  func tableView(_ tableView: UITableView,
+                 commit editingStyle: UITableViewCellEditingStyle,
+                 forRowAt indexPath: IndexPath) {
     if editingStyle == .delete {
       bookmarks.remove(at: indexPath.section)
       saveBookmarks()
@@ -167,12 +169,14 @@ UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegat
       return
     }
     guard let title = alertView.textField(at: 0)?.text, !title.isEmpty else {
-      let alert = UIAlertView(title: "Invalid Bookmark Title", message: "Please enter a valid title", delegate: self, cancelButtonTitle: "OK", otherButtonTitles: "")
+      let alert = UIAlertView(title: "Invalid Bookmark Title", message: "Please enter a valid title",
+          delegate: self, cancelButtonTitle: "OK", otherButtonTitles: "")
       alert.show()
       return
     }
     guard var urlString = alertView.textField(at: 1)?.text, let url = URL(string: urlString) else {
-      let alert = UIAlertView(title: "Invalid Bookmark Url", message: "Please enter a valid Url", delegate: self, cancelButtonTitle: "OK", otherButtonTitles: "")
+      let alert = UIAlertView(title: "Invalid Bookmark Url", message: "Please enter a valid Url",
+          delegate: self, cancelButtonTitle: "OK", otherButtonTitles: "")
       alert.show()
       return
     }
@@ -180,7 +184,7 @@ UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegat
       let url = URL(string: "http://\(urlString)")
       urlString = url?.absoluteString ?? urlString
     }
-    let bookmark = [bookmarkTitleKey : title, bookmarkUrlKey : urlString]
+    let bookmark = [bookmarkTitleKey: title, bookmarkUrlKey: urlString]
     bookmarks.append(bookmark)
     saveBookmarks()
     tableView.reloadData()

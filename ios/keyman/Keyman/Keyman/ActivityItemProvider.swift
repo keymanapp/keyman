@@ -9,7 +9,9 @@
 import Foundation
 import UIKit
 
-let htmlMailFormat = "<html><head><style type=\"text/css\">pre {font-family:\"%@\";font-size:%@;}</style></head><body><pre>%@</pre>%@</body></html>"
+let htmlMailFormat =
+  "<html><head><style type=\"text/css\">pre {font-family:\"%@\";font-size:%@;}</style>" +
+  "</head><body><pre>%@</pre>%@</body></html>"
 let mailFooterTextForPad = "<br><br>Sent from&nbsp<a href=\"http://keyman.com/ipad\">Keyman for iPad</a>"
 let mailFooterTextForPhone = "<br><br>Sent from&nbsp<a href=\"http://keyman.com/iphone\">Keyman for iPhone</a>"
 let fbText = "Can't read this? Help at http://keyman.com/fonts"
@@ -18,31 +20,29 @@ let fbText = "Can't read this? Help at http://keyman.com/fonts"
 class ActivityItemProvider: UIActivityItemProvider {
   let text: String
   let font: UIFont
-  
+
   init(text: String, font: UIFont?) {
     self.text = text
     self.font = font ?? UIFont.systemFont(ofSize: UIFont.systemFontSize)
     super.init(placeholderItem: text)
   }
-  
+
   override var item: Any {
-    get {
-      switch activityType {
-      case UIActivityType.mail?:
-        return htmlMail(withText: text, font: font)
-      case UIActivityType.postToFacebook?:
-        return "\(text)\n\n\(fbText)"
-      case UIActivityType.postToTwitter?:
-          if text.characters.count > 140 {
-            return text.substring(to: text.index(text.startIndex, offsetBy: 140))
-          }
-          return text
-      default:
+    switch activityType {
+    case UIActivityType.mail?:
+      return htmlMail(withText: text, font: font)
+    case UIActivityType.postToFacebook?:
+      return "\(text)\n\n\(fbText)"
+    case UIActivityType.postToTwitter?:
+        if text.characters.count > 140 {
+          return text.substring(to: text.index(text.startIndex, offsetBy: 140))
+        }
         return text
-      }
+    default:
+      return text
     }
   }
-  
+
   func htmlMail(withText text: String, font: UIFont) -> String {
     let mailText = text.replacingOccurrences(of: "<", with: "&lt;").replacingOccurrences(of: ">", with: "&gt;")
     let familyName = font.familyName
@@ -50,8 +50,7 @@ class ActivityItemProvider: UIActivityItemProvider {
     let footerText: String
     if UIDevice.current.userInterfaceIdiom == .pad {
       footerText = mailFooterTextForPad
-    }
-    else {
+    } else {
       footerText = mailFooterTextForPhone
     }
     // html mail format: family-name, font-size, text, footer-text

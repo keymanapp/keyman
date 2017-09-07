@@ -32,9 +32,11 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged), name: NSNotification.Name.keymanKeyboardChanged, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardPickerDismissed), name: NSNotification.Name.keymanKeyboardPickerDismissed, object: nil)
-    
+    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged),
+        name: NSNotification.Name.keymanKeyboardChanged, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardPickerDismissed),
+        name: NSNotification.Name.keymanKeyboardPickerDismissed, object: nil)
+
     webView.delegate = self
     webView.scalesPageToFit = true
 
@@ -45,32 +47,29 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
       let size = CGFloat.maximum(screenRect.size.height, screenRect.size.width)
       if size > 568.0 {
         // Navbar for iPhone 6 & 6 Plus
-        let bgImg: UIImage?
+        let imageName: String
         if UIInterfaceOrientationIsPortrait(orientation) {
-          bgImg = UIImage(named: "kmwb-navbar-Portrait.png")?.resizableImage(withCapInsets: UIEdgeInsetsMake(0, 0, 0, 0), resizingMode: .stretch)
+          imageName = "kmwb-navbar-Portrait.png"
+        } else {
+          imageName = "kmwb-navbar-Landscape-568h.png"
         }
-        else {
-          bgImg = UIImage(named: "kmwb-navbar-Landscape-568h.png")?.resizableImage(withCapInsets: UIEdgeInsetsMake(0, 0, 0, 0), resizingMode: .stretch)
-        }
+        let bgImg = UIImage(named: imageName)?.resizableImage(
+          withCapInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0), resizingMode: .stretch)
         navBar.setBackgroundImage(bgImg, for: UIBarMetrics.default)
-      }
-      else if size == 568 {
+      } else if size == 568 {
         // Navbar for iPhone and iPod Touch with 4" Display
         navBar.setBackgroundImage(UIImage(named: "kmwb-navbar-Portrait.png"), for: UIBarMetrics.default)
         navBar.setBackgroundImage(UIImage(named: "kmwb-navbar-Landscape-568h.png"), for: UIBarMetrics.compact)
-      }
-      else if size < 568.0 {
+      } else if size < 568.0 {
         // Navbar for iPhone and iPod Touch with 3.5" Display
         navBar.setBackgroundImage(UIImage(named: "kmwb-navbar-Portrait.png"), for: UIBarMetrics.default)
         navBar.setBackgroundImage(UIImage(named: "kmwb-navbar-Landscape.png"), for: UIBarMetrics.compact)
       }
-    }
-    else {
+    } else {
       // Navbar for iPad
       if UIInterfaceOrientationIsPortrait(orientation) {
         navBar.setBackgroundImage(UIImage(named: "kmwb-navbar-Portrait.png"), for: UIBarMetrics.default)
-      }
-      else {
+      } else {
         navBar.setBackgroundImage(UIImage(named: "kmwb-navbar-Landscape.png"), for: UIBarMetrics.default)
       }
     }
@@ -95,7 +94,8 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     addressField.rightView = rightView
 
     let refreshSize = CGSize(width: 18, height: 22)
-    let refreshIcon = UIImage(named: "UIButtonBarRefresh.png")?.resize(to: refreshSize).withRenderingMode(.alwaysOriginal)
+    let refreshIcon = UIImage(named: "UIButtonBarRefresh.png")?.resize(to: refreshSize)
+      .withRenderingMode(.alwaysOriginal)
     refreshButton = UIButton(type: UIButtonType.system)
     refreshButton.setImage(refreshIcon, for: .normal)
     refreshButton.frame = rightView.frame
@@ -104,7 +104,8 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     rightView.addSubview(refreshButton)
 
     let stopSize = CGSize(width: 17, height: 17)
-    let stopIcon = UIImage(named: "UIButtonBarStop.png")?.resize(to: stopSize).withRenderingMode(.alwaysOriginal)
+    let stopIcon = UIImage(named: "UIButtonBarStop.png")?.resize(to: stopSize)
+      .withRenderingMode(.alwaysOriginal)
     stopButton = UIButton(type: UIButtonType.system)
     stopButton.setImage(stopIcon, for: .normal)
     stopButton.frame = rightView.frame
@@ -134,27 +135,30 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
     let orientation: UIInterfaceOrientation = toInterfaceOrientation
     if UIDevice.current.userInterfaceIdiom == .phone {
-      let screenRect: CGRect = UIScreen.main.bounds
-      let size: CGFloat = screenRect.size.height > screenRect.size.width ? screenRect.size.height : screenRect.size.width
+      let screenRect = UIScreen.main.bounds
+      let size = CGFloat.maximum(screenRect.size.width, screenRect.size.height)
       if size > 568.0 {
+        // TODO: Refactor since duplicated in viewDidLoad()
         // Navbar for iPhone 6 & 6 Plus
-        var bgImg: UIImage? = nil
+        let imageName: String
         if UIInterfaceOrientationIsPortrait(orientation) {
-          bgImg = UIImage(named: "kmwb-navbar-Portrait.png")?.resizableImage(withCapInsets: UIEdgeInsetsMake(0, 0, 0, 0), resizingMode: .stretch)
+          imageName = "kmwb-navbar-Portrait.png"
+        } else {
+          imageName = "kmwb-navbar-Landscape-568h.png"
         }
-        else {
-          bgImg = UIImage(named: "kmwb-navbar-Landscape-568h.png")?.resizableImage(withCapInsets: UIEdgeInsetsMake(0, 0, 0, 0), resizingMode: .stretch)
-        }
+        let bgImg = UIImage(named: imageName)?.resizableImage(
+          withCapInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0), resizingMode: .stretch)
         navigationController?.navigationBar.setBackgroundImage(bgImg, for: UIBarMetrics.default)
       }
-    }
-    else {
+    } else {
+      let imageName: String
       if UIInterfaceOrientationIsPortrait(orientation) {
-        navigationController?.navigationBar.setBackgroundImage(UIImage(named: "kmwb-navbar-Portrait.png"), for: UIBarMetrics.default)
+        imageName = "kmwb-navbar-Portrait.png"
+      } else {
+        imageName = "kmwb-navbar-Landscape.png"
       }
-      else {
-        navigationController?.navigationBar.setBackgroundImage(UIImage(named: "kmwb-navbar-Landscape.png"), for: UIBarMetrics.default)
-      }
+      navigationController?.navigationBar.setBackgroundImage(
+        UIImage(named: imageName), for: UIBarMetrics.default)
     }
   }
 
@@ -213,7 +217,9 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   }
 
   // MARK: - UIWebViewDelegate methods
-  func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
+  func webView(_ webView: UIWebView,
+               shouldStartLoadWith request: URLRequest,
+               navigationType: UIWebViewNavigationType) -> Bool {
     updateAddress(request)
     return true
   }
@@ -259,8 +265,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     let kbInfo = notification.userInfo?[kKeymanKeyboardInfoKey] as? [AnyHashable: Any] ?? [AnyHashable: Any]()
     if let kbID = kbInfo[kKeymanKeyboardIdKey] as? String, let langID = kbInfo[kKeymanLanguageIdKey] as? String {
       newFontFamily = KMManager.sharedInstance().fontNameForKeyboard(withID: kbID, languageID: langID)
-    }
-    else {
+    } else {
       newFontFamily = UIFont.systemFont(ofSize: UIFont.systemFontSize).fontName
     }
   }

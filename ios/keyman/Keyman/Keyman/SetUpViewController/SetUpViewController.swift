@@ -23,7 +23,8 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
     doneButton?.target = self
     doneButton?.action = #selector(self.dismissView)
     webView?.delegate = self
-    NotificationCenter.default.addObserver(self, selector: #selector(self.networkStatusChanged), name: NSNotification.Name.reachabilityChanged, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(self.networkStatusChanged),
+        name: NSNotification.Name.reachabilityChanged, object: nil)
     networkReachable = Reachability(hostName: "www.keyman.com")
     networkReachable?.startNotifier()
   }
@@ -63,7 +64,8 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
     } else {
       installedKeyboards = currentKeyboardId
     }
-    let url = "http://keyman.com/iphone-and-ipad/app/systemkeyboard/index.php?active=\(currentKeyboardId)&installed=\(installedKeyboards)"
+    let url = "http://keyman.com/iphone-and-ipad/app/systemkeyboard/index.php" +
+        "?active=\(currentKeyboardId)&installed=\(installedKeyboards)"
     webView.loadRequest(URLRequest(url: URL(string: url)!))
     NSLog("Set up page URL: %@", url)
   }
