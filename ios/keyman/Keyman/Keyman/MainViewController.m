@@ -8,7 +8,6 @@
 
 #import "MainViewController.h"
 #import "AppDelegate.h"
-#import "UIImage+Helpers.h"
 #import "CoreText/CTFontManager.h"
 #import <QuartzCore/QuartzCore.h>
 #import <Keyman-Swift.h>
@@ -246,9 +245,9 @@ NSUInteger const minIOSVersion4FontInstall = 7;
     [textSizeController setMinimumValue:0.0];
     [textSizeController setMaximumValue:(maxTextSize - minTextSize)];
     [textSizeController setValue:(textSize - minTextSize)];
-    UIImage *textSizeUp = [[UIImage imageNamed:@"textsize_up.png"] scaleToSize:CGSizeMake(20, 20)];
+    UIImage *textSizeUp = [[UIImage imageNamed:@"textsize_up.png"] resizeTo:CGSizeMake(20, 20)];
     [textSizeController setMaximumValueImage:textSizeUp];
-    UIImage *textSizeDown = [[UIImage imageNamed:@"textsize_up.png"] scaleToSize:CGSizeMake(15, 15)];
+    UIImage *textSizeDown = [[UIImage imageNamed:@"textsize_up.png"] resizeTo:CGSizeMake(15, 15)];
     [textSizeController setMinimumValueImage:textSizeDown];
     [textSizeController addTarget:self action:@selector(sliderValueChanged:) forControlEvents:UIControlEventValueChanged];
     
@@ -340,8 +339,8 @@ NSUInteger const minIOSVersion4FontInstall = 7;
 }
 
 - (UIBarButtonItem *)createNavBarButtonWithImage:(UIImage *)image highlightedImage:(UIImage *)imageHighlighted imageScale:(CGFloat)scaleF action:(SEL)selector orientation:(UIInterfaceOrientation)orientation {
-    UIImage *icon = [image scaleToSize:CGSizeMake(image.size.width*scaleF, image.size.height*scaleF)];
-    UIImage *iconHighlighted = [imageHighlighted scaleToSize:CGSizeMake(imageHighlighted.size.width*scaleF, imageHighlighted.size.height*scaleF)];
+    UIImage *icon = [image resizeTo:CGSizeMake(image.size.width*scaleF, image.size.height*scaleF)];
+    UIImage *iconHighlighted = [imageHighlighted resizeTo:CGSizeMake(imageHighlighted.size.width*scaleF, imageHighlighted.size.height*scaleF)];
     
     if ([UIImage instancesRespondToSelector:@selector(imageWithRenderingMode:)]) { // This fixes icon display issues for iOS 7 SDK
         icon = [icon imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];

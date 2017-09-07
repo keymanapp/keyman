@@ -101,7 +101,6 @@
 		9845A7D21A439A9200544E2E /* InfoViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7C51A439A9200544E2E /* InfoViewController_iPad.xib */; };
 		9845A7D31A439A9200544E2E /* InfoViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7C61A439A9200544E2E /* InfoViewController_iPhone.xib */; };
 		9845A7D51A439A9200544E2E /* SetUpViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7CA1A439A9200544E2E /* SetUpViewController.xib */; };
-		9845A8321A439B4800544E2E /* UIImage+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A8301A439B4800544E2E /* UIImage+Helpers.m */; };
 		9845A8581A439B8F00544E2E /* app-info.css in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8341A439B8F00544E2E /* app-info.css */; };
 		9845A85A1A439B8F00544E2E /* backspace.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8351A439B8F00544E2E /* backspace.png */; };
 		9845A85C1A439B8F00544E2E /* bookmarklet.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8361A439B8F00544E2E /* bookmarklet.png */; };
@@ -189,6 +188,7 @@
 		C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */; };
 		C0A1A6351F5E786A00EAF822 /* BookmarksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */; };
 		C0A1A6371F5E8C9100EAF822 /* WebBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6361F5E8C9100EAF822 /* WebBrowserViewController.swift */; };
+		C0E943F81F61234C00E7D98C /* UIImage+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E943F71F61234C00E7D98C /* UIImage+Helpers.swift */; };
 		C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
 		C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */; };
 		CE06AA681F171CA0006D91C3 /* Keyman.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418F71769486C008D2FF3 /* Keyman.h */; };
@@ -279,8 +279,6 @@
 		9845A7C51A439A9200544E2E /* InfoViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InfoViewController_iPad.xib; sourceTree = "<group>"; };
 		9845A7C61A439A9200544E2E /* InfoViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InfoViewController_iPhone.xib; sourceTree = "<group>"; };
 		9845A7CA1A439A9200544E2E /* SetUpViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetUpViewController.xib; sourceTree = "<group>"; };
-		9845A82F1A439B4800544E2E /* UIImage+Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Helpers.h"; sourceTree = "<group>"; };
-		9845A8301A439B4800544E2E /* UIImage+Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Helpers.m"; sourceTree = "<group>"; };
 		9845A8341A439B8F00544E2E /* app-info.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = "app-info.css"; sourceTree = "<group>"; };
 		9845A8351A439B8F00544E2E /* backspace.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backspace.png; sourceTree = "<group>"; };
 		9845A8361A439B8F00544E2E /* bookmarklet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bookmarklet.png; sourceTree = "<group>"; };
@@ -401,6 +399,7 @@
 		C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = SetUpViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = BookmarksViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0A1A6361F5E8C9100EAF822 /* WebBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = WebBrowserViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C0E943F71F61234C00E7D98C /* UIImage+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = "UIImage+Helpers.swift"; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF76991F5D368B00BD23C3 /* SWKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SWKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -520,15 +519,6 @@
 				9845A8331A439B8F00544E2E /* Info */,
 			);
 			path = WebPages;
-			sourceTree = "<group>";
-		};
-		9845A82E1A439B4800544E2E /* Categories */ = {
-			isa = PBXGroup;
-			children = (
-				9845A82F1A439B4800544E2E /* UIImage+Helpers.h */,
-				9845A8301A439B4800544E2E /* UIImage+Helpers.m */,
-			);
-			path = Categories;
 			sourceTree = "<group>";
 		};
 		9845A8331A439B8F00544E2E /* Info */ = {
@@ -683,6 +673,7 @@
 				98ABADBA176935E400B62590 /* Supporting Files */,
 				C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */,
 				C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */,
+				C0E943F71F61234C00E7D98C /* UIImage+Helpers.swift */,
 			);
 			path = Keyman;
 			sourceTree = "<group>";
@@ -690,7 +681,6 @@
 		98ABADBA176935E400B62590 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				9845A82E1A439B4800544E2E /* Categories */,
 				9845A7D81A439AFB00544E2E /* WebPages */,
 				98ABADBC176935E400B62590 /* InfoPlist.strings */,
 				98AFAEDB17FE2ACF00178C0A /* Keyman Icons */,
@@ -1123,6 +1113,7 @@
 			files = (
 				C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */,
 				C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */,
+				C0E943F81F61234C00E7D98C /* UIImage+Helpers.swift in Sources */,
 				C055F0B31F60F7A400140735 /* DropDownView.swift in Sources */,
 				981AFA7B19EF44DE006706BF /* main.m in Sources */,
 				981AFA7C19EF44DE006706BF /* AppDelegate.m in Sources */,
@@ -1130,7 +1121,6 @@
 				981AFA7F19EF44DE006706BF /* MainViewController.m in Sources */,
 				C0A1A6351F5E786A00EAF822 /* BookmarksViewController.swift in Sources */,
 				C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */,
-				9845A8321A439B4800544E2E /* UIImage+Helpers.m in Sources */,
 				C0A1A6311F5E4F4300EAF822 /* InfoViewController.swift in Sources */,
 				C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */,
 			);
