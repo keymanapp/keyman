@@ -1386,6 +1386,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       // Touchstart (or mspointerdown) event highlights the touched list item
       var touchStart=function(e)
       {
+        console.log("keymanweb: touchStart called");
         e.stopPropagation();
         if(this.className.indexOf('selected') <= 0) this.className=this.className+' selected';
         osk.lgList.scrolling=false;
