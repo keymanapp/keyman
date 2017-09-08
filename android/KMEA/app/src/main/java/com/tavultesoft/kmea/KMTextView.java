@@ -111,6 +111,7 @@ public final class KMTextView extends EditText {
             int selEnd = textView.getSelectionEnd();
             KMManager.InAppKeyboard.loadUrl(String.format("javascript:updateKMText('%s')", textView.getText().toString()));
             KMManager.InAppKeyboard.loadUrl(String.format("javascript:updateKMSelectionRange(%d,%d)", selStart, selEnd));
+            KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_INAPP);
           }
           showKeyboard();
         } else {
