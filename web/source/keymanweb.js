@@ -1325,7 +1325,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */
     keymanweb['resetContext'] = keymanweb.resetContext = function()
     {
-      osk._Visible = 0;
       osk.layerId = 'default';
       osk.layerIndex = 0;
 
