@@ -8,9 +8,11 @@ Keyman for macOS can be built from a command line (preferred) or Xcode.
 
 ### Compiling from Command Line
 To build Keyman for macOS, do the following:
-1. Open a terminal
+1. Open a terminal.
 2. cd to **keyman/mac**. **build.sh** must be run in the directory containing the script.
 3. Build using `./build.sh -no-codesign`. Run `./build.sh -help` to see all options.
+    * If you have signing credentials from the core development team, you can build a signed version by omitting
+  `-no-codesign`.
 
 ### Running Keyman
 1. Deploy Keyman locally using `./build.sh -deploy local -deploy-only`.
@@ -25,11 +27,15 @@ To build using Xcode, you will need to build KeymanEngine4Mac first and then bui
 2. Open **keyman/mac/KeymanEngine4Mac/KeymanEngine4Mac.xcodeproj**
 3. Build the project: Product > Build (or Cmd-B)
 4. Open **keyman/mac/Keyman4MacIM/Keyman4MacIM.xcodeproj**
-5. Open the Project Navigator: View > Navigators > Show Project Navigator (Cmd-1)
-6. Select Keyman4MacIM. Click Build Settings, scroll down to the Signing section and change Code Signing Identity to
-Don't Code Sign.
-    * This will modify **Keyman4MacIM.xcodeproj**. Do not commit the change.
-7. Build the project. Refer to [Running Keyman](#running-keyman) on how to install the app.
+5. If you do not have signing credentials from the core development team, disable code signing in Xcode.
+    1. Open the Project Navigator: View > Navigators > Show Project Navigator (Cmd-1)
+    2. Select Keyman4MacIM and click Build Settings
+    3. In the Signing section, change Code Signing Identity to Don't Code Sign. This will modify
+    **Keyman4MacIM.xcodeproj**. Do not commit the change.
+6. Build the project. Refer to [Running Keyman](#running-keyman) on how to install the app.
 
-### Sample Projects
-Not yet available on Mac...
+### Testing
+The Keyman4Mac project builds a test-bed app that can be used to test keyboards without installing the input method.
+It can also be used as reference for the usage of Keyman Engine.
+
+Keyman4Mac tests are run using `./build.sh -test -no-codesign`.
