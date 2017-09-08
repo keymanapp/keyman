@@ -9,7 +9,7 @@
 import UIKit
 
 class GetStartedViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-  var mainViewController: UIViewController?
+  var mainViewController: MainViewController?
   @IBOutlet var navItem: UINavigationItem!
   @IBOutlet var tableView: UITableView!
 
@@ -138,16 +138,15 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
   func performAction(for indexPath: IndexPath) {
     switch indexPath.section {
     case 0:
-      (mainViewController as? MainViewController)?.dismissGetStartedView(nil)
-      KMManager.sharedInstance().showKeyboardPicker(
-        in: mainViewController, shouldAddKeyboard: true)
+      mainViewController?.dismissGetStartedView(nil)
+      KMManager.sharedInstance().showKeyboardPicker(in: mainViewController, shouldAddKeyboard: true)
     case 1:
-      (mainViewController as? MainViewController)?.dismissGetStartedView(nil)
+      mainViewController?.dismissGetStartedView(nil)
       let setUpVC = SetUpViewController()
-      (mainViewController as? MainViewController)?.present(setUpVC, animated: true, completion: nil)
+      mainViewController?.present(setUpVC, animated: true, completion: nil)
     case 2:
-      (mainViewController as? MainViewController)?.dismissGetStartedView(nil)
-      (mainViewController as? MainViewController)?.infoButtonClick(nil)
+      mainViewController?.dismissGetStartedView(nil)
+      mainViewController?.infoButtonClick(nil)
     default:
       break
     }
@@ -184,13 +183,13 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
   func switchValueChanged(_ sender: Any) {
     let userData = AppDelegate.activeUserDefaults()
     if let toggle = sender as? UISwitch {
-      userData.set(toggle.isOn, forKey: kKeymanDontShowGetStartedKey)
+      userData.set(toggle.isOn, forKey: dontShowGetStartedKey)
       userData.synchronize()
     }
   }
 
   func dontShowGetStarted() -> Bool {
     let userData = AppDelegate.activeUserDefaults()
-    return userData.bool(forKey: kKeymanDontShowGetStartedKey)
+    return userData.bool(forKey: dontShowGetStartedKey)
   }
 }

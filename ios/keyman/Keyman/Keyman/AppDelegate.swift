@@ -41,8 +41,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
-    NotificationCenter.default.post(name: NSNotification.Name.keymanLaunchedFromUrl, object: self,
-        userInfo: [kKeymanUrlKey: url]
+    NotificationCenter.default.post(name: launchedFromUrlNotification, object: self,
+        userInfo: [urlKey: url]
     )
     return true
   }
@@ -51,8 +51,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _overlayWindow = nil
     KMManager.sharedInstance().unregisterCustomFonts()
     let userData = AppDelegate.activeUserDefaults()
-    userData.set(viewController?.textView?.text, forKey: kKeymanUserTextKey)
-    userData.set(viewController?.textSize.description, forKey: kKeymanUserTextSizeKey)
+    userData.set(viewController?.textView?.text, forKey: userTextKey)
+    userData.set(viewController?.textSize.description, forKey: userTextSizeKey)
     userData.synchronize()
   }
 
