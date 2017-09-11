@@ -1167,18 +1167,20 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
       return true
     }
 
-    let userKbs: [[String: Any]]! = userData.object(forKey: kKeymanUserKeyboardsListKey) as? [[String: Any]]
-    if userKbs.count >= 2 {
-      return false
+    guard let userKbs = userData.object(forKey: kKeymanUserKeyboardsListKey) as? [[String: Any]] else {
+      return true
     }
     if userKbs.isEmpty {
       return true
+    }
+    if userKbs.count >= 2 {
+      return false
     }
 
     let firstKB = userKbs[0]
     let kbID = firstKB[kKeymanKeyboardIdKey] as? String
     let langID = firstKB[kKeymanLanguageIdKey] as? String
-    if (kbID == kKeymanDefaultKeyboardID) && (langID == langID) {
+    if (kbID == kKeymanDefaultKeyboardID) && (langID == kKeymanDefaultLanguageID) {
       return true
     }
     return false
