@@ -1323,10 +1323,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Scope        Public
      * Description  Revert OSK to default layer and clear any deadkeys and modifiers
      */
-    keymanweb['resetContext'] = keymanweb.resetContext = function()
-    {
+    keymanweb['resetContext'] = keymanweb.resetContext = function() {
       osk.layerId = 'default';
-      osk.layerIndex = 0;
 
       keymanweb._DeadkeyResetMatched();
       keymanweb._DeadkeyDeleteMatched();
