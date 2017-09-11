@@ -2778,31 +2778,44 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         var ctrlEvent = false, altEvent = false;
 
         switch(s.Lcode) {
-          case osk.keyCodes["K_CONTROL"]:
-          case osk.keyCodes["K_CTRL"]:
-          case osk.keyCodes["K_LCONTROL"]:
+          case osk.keyCodes["K_CTRL"]:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
           case osk.keyCodes["K_LCTRL"]:
-          case osk.keyCodes["K_RCONTROL"]:
           case osk.keyCodes["K_RCTRL"]:
+          case osk.keyCodes["K_CONTROL"]:
+          case osk.keyCodes["K_LCONTROL"]:
+          case osk.keyCodes["K_RCONTROL"]:
             ctrlEvent = true;
             break;
+          case osk.keyCodes["K_LMENU"]:     // The 2 "K_*MENU" entries exist in some legacy keyboards.
+          case osk.keyCodes["K_RMENU"]:
           case osk.keyCodes["K_ALT"]:
           case osk.keyCodes["K_LALT"]:
-          case osk.keyCodes["K_LMENU"]:
           case osk.keyCodes["K_RALT"]:
-          case osk.keyCodes["K_RMENU"]:
             altEvent = true;
             break;
         }
 
-        // TODO:  Ensure the keypress is also the CTRL or the ALT for the e.location != 0 check.
+        /**
+         * Two separate conditions exist that should trigger chiral modifier detection.  Examples below use CTRL but also work for ALT.
+         * 
+         * 1.  The user literally just pressed CTRL, so the event has a valid `location` property we can utilize.  
+         *     Problem: its layer isn't presently activated within the OSK.
+         * 
+         * 2.  CTRL has been held a while, so the OSK layer is valid, but the key event doesn't tell us the chirality of the active CTRL press.
+         * 
+         * In either case, `e.ctrlKey` is set to true, but as a result does nothing to tell us which case is active.
+         * 
+         * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
+         */
         if(e.ctrlKey) {
           s.Lmodifiers = s.Lmodifiers | ((e.location != 0 && ctrlEvent) ? 
-            (e.location == 1 ? osk.modifierCodes['LCTRL'] : osk.modifierCodes['RCTRL']) : osk.getModifierState(osk.layerId) & 0x0003); 
+            (e.location == 1 ? osk.modifierCodes['LCTRL'] : osk.modifierCodes['RCTRL']) : // Condition 1
+            osk.getModifierState(osk.layerId) & 0x0003);                                  // Condition 2
         }
         if(e.altKey) {
           s.Lmodifiers = s.Lmodifiers | ((e.location != 0 && altEvent) ? 
-            (e.location == 1 ? osk.modifierCodes['LALT'] : osk.modifierCodes['RALT']) : osk.getModifierState(osk.layerId) & 0x000C);
+            (e.location == 1 ? osk.modifierCodes['LALT'] : osk.modifierCodes['RALT']) :   // Condition 1
+            osk.getModifierState(osk.layerId) & 0x000C);                                  // Condition 2
         }
       } else {
         s.Lmodifiers = 
@@ -2831,8 +2844,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         s.Lstates |= osk.modifierCodes["NO_SCROLL_LOCK"];
       }
 
-      //s.LisVirtualKey = (e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x60) != 0)) || e.type != 'keypress';
-      //s.LisVirtualKeyCode = false;
       // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
       s.LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x6F) != 0));
       s.LisVirtualKey = s.LisVirtualKeyCode || e.type != 'keypress';
@@ -3526,20 +3537,33 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}
      * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
      */
-    keymanweb.isChiral = keymanweb['isChiral'] = function (k0) {
-      var k=keymanweb._ActiveKeyboard;
+    keymanweb.isChiral = keymanweb['isChiral'] = function(k0) {
+      return !!(keymanweb.getKeyboardModifierBitmask(k0) & keymanweb['osk'].modifierBitmasks['IS_CHIRAL']);
+    }
 
-      if(arguments.length > 0) {
+    /**
+     * Function     getKeyboardModifierBitmask
+     * Scope        Private
+     * @param       {Object=}   k0
+     * @return      {boolean}
+     * Description  Obtains the currently-active modifier bitmask for the active keyboard.
+     */
+    keymanweb.getKeyboardModifierBitmask = function(k0) {
+      var k=keymanweb._ActiveKeyboard;
+      
+      if(arguments.length > 0 && typeof k0 != 'undefined') {
         k = k0;
       }
 
-      if(k) {
-        if(k['KV']['KMBM']) {
-          return !!(k['KV']['KMBM'] & keymanweb['osk'].modifierBitmasks['IS_CHIRAL']);
-        }
+      if(!k) {
+        return 0x0000;
       }
 
-      return false;
+      if(k['KV'] && k['KV']['KMBM']) {
+        return k['KV']['KMBM'];
+      }
+
+      return keymanweb.osk.modifierBitmasks['NON_CHIRAL'];
     }
     
     /**
