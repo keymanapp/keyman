@@ -6,7 +6,6 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
 class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertViewDelegate {

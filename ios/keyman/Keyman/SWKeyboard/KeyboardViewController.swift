@@ -6,7 +6,7 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 class KeyboardViewController: KMInputViewController {
   override func updateViewConstraints() {
