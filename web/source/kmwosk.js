@@ -39,9 +39,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
     osk.modifierBitmasks = {
       "ALL":0x007F,
-      "CHIRAL":0x001F,    // The default bitmask, for non-chiral keyboards
+      "CHIRAL":0x001F,    // The base bitmask for chiral keyboards.  Includes SHIFT, which is non-chiral.
       "IS_CHIRAL":0x000F, // Used to test if a bitmask uses a chiral modifier.
-      "NON_CHIRAL":0x0070
+      "NON_CHIRAL":0x0070 // The default bitmask, for non-chiral keyboards
     };
 
     osk.stateBitmasks = {
@@ -82,6 +82,18 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       "K_UPPER":50006,"K_LOWER":50007,"K_ALPHA":50008,
       "K_SHIFTED":50009,"K_ALTGR":50010,
       "K_TABBACK":50011,"K_TABFWD":50012
+    };
+
+    // Cross-reference with the ids in osk.setButtonClass.
+    osk.buttonClasses = {
+      'DEFAULT':'0',
+      'SHIFT':'1',
+      'SHIFT-ON':'2',
+      'SPECIAL':'3',
+      'SPECIAL-ON':'4',
+      'DEADKEY':'8',
+      'BLANK':'9',
+      'HIDDEN':'10'
     };
 
     var codesUS=[['0123456789',';=,-./`','[\\]\''],[')!@#$%^&*(',':+<_>?~','{|}"']];
@@ -1052,34 +1064,34 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     {
         var modifier=0;
         if(layerId.indexOf('shift') >= 0) {
-          modifier += osk.modifierCodes["SHIFT"];
+          modifier |= osk.modifierCodes["SHIFT"];
         }
 
         // The chiral checks must not be directly exclusive due each other to visual OSK feedback.
         var ctrlMatched=false;
         if(layerId.indexOf('leftctrl') >= 0) {
-          modifier += osk.modifierCodes["LCTRL"];
+          modifier |= osk.modifierCodes["LCTRL"];
           ctrlMatched=true;
         } 
         if(layerId.indexOf('rightctrl') >= 0) {
-          modifier += osk.modifierCodes["RCTRL"];
+          modifier |= osk.modifierCodes["RCTRL"];
           ctrlMatched=true;
         } 
         if(layerId.indexOf('ctrl')  >= 0 && !ctrlMatched) {
-          modifier += osk.modifierCodes["CTRL"];
+          modifier |= osk.modifierCodes["CTRL"];
         }
 
         var altMatched=false;
         if(layerId.indexOf('leftalt') >= 0) {
-          modifier += osk.modifierCodes["LALT"];
+          modifier |= osk.modifierCodes["LALT"];
           altMatched=true;
         } 
         if(layerId.indexOf('rightalt') >= 0) {
-          modifier += osk.modifierCodes["RALT"];
+          modifier |= osk.modifierCodes["RALT"];
           altMatched=true;
         } 
         if(layerId.indexOf('alt')  >= 0 && !altMatched) {
-          modifier += osk.modifierCodes["ALT"];
+          modifier |= osk.modifierCodes["ALT"];
         }
 
         return modifier;
@@ -1749,7 +1761,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           continue;
         }
 
-        keys[i]['sp'] = osk._stateKeys[states[i]] ? '2' : '1';
+        keys[i]['sp'] = osk._stateKeys[states[i]] ? osk.buttonClasses['SHIFT-ON'] : osk.buttonClasses['SHIFT'];
         var btn = document.getElementById(layerId+'-'+states[i]);
 
         osk.setButtonClass(keys[i], btn, osk.layout);
@@ -2712,20 +2724,29 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {Object}    btn     button object
      * @param       {Object=}   layout  source layout description (optional, sometimes)
      */
-    osk.setButtonClass = function(key,btn,layout)
-    {
-      var n=0,keyTypes=['default','shift','shift-on','special','special-on','','','','deadkey','blank','hidden'];
-      if(typeof key['dk'] == 'string' && key['dk'] == '1') n=8;
-      if(typeof key['sp'] == 'string') n=parseInt(key['sp'],10);
-      if(n < 0 || n > 10) n=0;
+    osk.setButtonClass = function(key,btn,layout) {
+      var n=0, keyTypes=['default','shift','shift-on','special','special-on','','','','deadkey','blank','hidden'];
+      if(typeof key['dk'] == 'string' && key['dk'] == '1') { 
+        n=8;
+      }
+
+      if(typeof key['sp'] == 'string') {
+        n=parseInt(key['sp'],10);
+      } 
+
+      if(n < 0 || n > 10) {
+        n=0;
+      }
+
       layout=layout||osk.layout;
 
       // Apply an overriding class for 5-row layouts
       var nRows=layout.layer[0].row.length;
-      if(nRows > 4 && util.device.formFactor == 'phone')
+      if(nRows > 4 && util.device.formFactor == 'phone') {
         btn.className='kmw-key kmw-5rows kmw-key-'+keyTypes[n];
-      else
+      } else {
         btn.className='kmw-key kmw-key-'+keyTypes[n];
+      }
     }
 
     /**
@@ -2762,14 +2783,15 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         }
       }
 
-      // There must always be at least a plain 'default' layer.
+      // There must always be at least a plain 'default' layer.  Array(65).fill('') would be preferable but isn't supported on IE, 
+      // but buildDefaultLayer will set the defaults for these layers if no entry exists for them in the array due to length.
       if(typeof KLS['default'] == 'undefined' || ! KLS['default']) {
-        KLS['default'] = Array.from(''.repeat(65));
+        KLS['default'] = [''];
       }
 
       // There must always be at least a plain 'shift' layer.
       if(typeof KLS['shift'] == 'undefined' || ! KLS['shift']) {
-        KLS['shift'] = Array.from(''.repeat(65));
+        KLS['shift'] = [''];
       }
 
       return KLS;
@@ -2797,7 +2819,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             case 'K_LSHIFT':
             case 'K_RSHIFT':
               if(layerId.indexOf('shift') != -1) {
-                key['sp'] = '2';
+                key['sp'] = osk.buttonClasses['SHIFT-ON'];
               } 
               if((formFactor != 'desktop') && (layerId != 'default')) {
                 key['nextlayer']='default';
@@ -2807,7 +2829,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             case 'K_LCONTROL':
               if(chiral) {
                 if(layerId.indexOf('leftctrl') != -1) {
-                  key['sp'] = '2';
+                  key['sp'] = osk.buttonClasses['SHIFT-ON'];
                 }
                 break;
               } 
@@ -2815,35 +2837,35 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             case 'K_RCONTROL':
               if(chiral) {
                 if(layerId.indexOf('rightctrl') != -1) {
-                  key['sp'] = '2';
+                  key['sp'] = osk.buttonClasses['SHIFT-ON'];
                 }
                 break;
               }
             case 'K_CONTROL':
               if(layerId.indexOf('ctrl') != -1) {
                 if(!chiral || (layerId.indexOf('leftctrl') != -1 && layerId.indexOf('rightctrl') != -1)) {
-                  key['sp'] = '2';              
+                  key['sp'] = osk.buttonClasses['SHIFT-ON'];              
                 }
               }
               break;
             case 'K_LALT':
               if(chiral) {
                 if(layerId.indexOf('leftalt') != -1) {
-                  key['sp'] = '2';
+                  key['sp'] = osk.buttonClasses['SHIFT-ON'];
                 }
                 break;
               } 
             case 'K_RALT':
               if(chiral) {
                 if(layerId.indexOf('rightalt') != -1) {
-                  key['sp'] = '2';
+                  key['sp'] = osk.buttonClasses['SHIFT-ON'];
                 }
                 break;
               } 
             case 'K_ALT':
               if(layerId.indexOf('alt') != -1) {
                 if(!chiral || (layerId.indexOf('leftalt') != -1 && layerId.indexOf('rightalt') != -1)) {
-                  key['sp'] = '2';              
+                  key['sp'] = osk.buttonClasses['SHIFT-ON'];              
                 }
               }
               break;
@@ -2853,7 +2875,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
                   keys.splice(j--, 1);
                   keys[0]['width']='200';
                 } else {
-                  keys[j]['sp']='10';
+                  keys[j]['sp']=osk.buttonClasses['HIDDEN'];
                 }
               }
               break;
@@ -3037,7 +3059,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         // Set modifier key appearance and behaviour for non-desktop devices using the default layout
         if(formFactor != 'desktop') {
           if(n > 0 && shiftKey != null) {
-            shiftKey['sp']='2';
+            shiftKey['sp']=osk.buttonClasses['SHIFT-ON'];
             shiftKey['sk']=null;
             // TODO:  May need extending/modification for chirality modes!
             switch(layers[n].id) {
