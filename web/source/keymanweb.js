@@ -4834,7 +4834,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
 
     keymanweb._documentRefocus = function(e) {
-      util.detachDOMEvent(window, 'mousemove', keymanweb._documentMouseBlur, false);
+      util.detachDOMEvent(window, 'mousemove', keymanweb._refocusMouseBlur, false);
     }
 
     util.attachDOMEvent(window, 'focus', keymanweb._ResetVKShift,false);  // I775
