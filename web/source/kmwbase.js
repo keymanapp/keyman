@@ -66,7 +66,8 @@ if(!tavultesoft['keymanweb']) {
       globalLanguageCode: null, // Indicates the language code corresponding to `globalKeyboard`.
       isEmbedded: false,        // Indicates if the KeymanWeb instance is embedded within a mobile app.
                                 // Blocks full page initialization when set to `true`.
-      refocusTimer: 0           // Tracks a timeout event that aids of OSK modifier/state key tracking when the document loses focus.
+      refocusTimer: 0,          // Tracks a timeout event that aids of OSK modifier/state key tracking when the document loses focus.
+      modStateFlags: 0          // Tracks the present state of the physical keyboard's active modifier flags.  Needed for AltGr simulation.
     };
 
     keymanweb['initialized'] = 0;
