@@ -47,30 +47,34 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
       let size = CGFloat.maximum(screenRect.size.height, screenRect.size.width)
       if size > 568.0 {
         // Navbar for iPhone 6 & 6 Plus
-        let imageName: String
+        let image: UIImage
         if UIInterfaceOrientationIsPortrait(orientation) {
-          imageName = "kmwb-navbar-Portrait.png"
+          image = #imageLiteral(resourceName: "kmwb-navbar-Portrait.png")
         } else {
-          imageName = "kmwb-navbar-Landscape-568h.png"
+          image = #imageLiteral(resourceName: "kmwb-navbar-Landscape-568h.png")
         }
-        let bgImg = UIImage(named: imageName)?.resizableImage(
+        let bgImg = image.resizableImage(
           withCapInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0), resizingMode: .stretch)
         navBar.setBackgroundImage(bgImg, for: UIBarMetrics.default)
       } else if size == 568 {
         // Navbar for iPhone and iPod Touch with 4" Display
-        navBar.setBackgroundImage(UIImage(named: "kmwb-navbar-Portrait.png"), for: UIBarMetrics.default)
-        navBar.setBackgroundImage(UIImage(named: "kmwb-navbar-Landscape-568h.png"), for: UIBarMetrics.compact)
+        navBar.setBackgroundImage(#imageLiteral(resourceName: "kmwb-navbar-Portrait.png"),
+                                  for: UIBarMetrics.default)
+        navBar.setBackgroundImage(#imageLiteral(resourceName: "kmwb-navbar-Landscape-568h.png"),
+                                  for: UIBarMetrics.compact)
       } else if size < 568.0 {
         // Navbar for iPhone and iPod Touch with 3.5" Display
-        navBar.setBackgroundImage(UIImage(named: "kmwb-navbar-Portrait.png"), for: UIBarMetrics.default)
-        navBar.setBackgroundImage(UIImage(named: "kmwb-navbar-Landscape.png"), for: UIBarMetrics.compact)
+        navBar.setBackgroundImage(#imageLiteral(resourceName: "kmwb-navbar-Portrait.png"),
+                                  for: UIBarMetrics.default)
+        navBar.setBackgroundImage(#imageLiteral(resourceName: "kmwb-navbar-Landscape.png"),
+                                  for: UIBarMetrics.compact)
       }
     } else {
       // Navbar for iPad
       if UIInterfaceOrientationIsPortrait(orientation) {
-        navBar.setBackgroundImage(UIImage(named: "kmwb-navbar-Portrait.png"), for: UIBarMetrics.default)
+        navBar.setBackgroundImage(#imageLiteral(resourceName: "kmwb-navbar-Portrait.png"), for: UIBarMetrics.default)
       } else {
-        navBar.setBackgroundImage(UIImage(named: "kmwb-navbar-Landscape.png"), for: UIBarMetrics.default)
+        navBar.setBackgroundImage(#imageLiteral(resourceName: "kmwb-navbar-Landscape.png"), for: UIBarMetrics.default)
       }
     }
 
@@ -94,7 +98,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     addressField.rightView = rightView
 
     let refreshSize = CGSize(width: 18, height: 22)
-    let refreshIcon = UIImage(named: "UIButtonBarRefresh.png")?.resize(to: refreshSize)
+    let refreshIcon = #imageLiteral(resourceName: "UIButtonBarRefresh.png").resize(to: refreshSize)
       .withRenderingMode(.alwaysOriginal)
     refreshButton = UIButton(type: UIButtonType.system)
     refreshButton.setImage(refreshIcon, for: .normal)
@@ -104,7 +108,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     rightView.addSubview(refreshButton)
 
     let stopSize = CGSize(width: 17, height: 17)
-    let stopIcon = UIImage(named: "UIButtonBarStop.png")?.resize(to: stopSize)
+    let stopIcon = #imageLiteral(resourceName: "UIButtonBarStop.png").resize(to: stopSize)
       .withRenderingMode(.alwaysOriginal)
     stopButton = UIButton(type: UIButtonType.system)
     stopButton.setImage(stopIcon, for: .normal)
@@ -140,25 +144,24 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
       if size > 568.0 {
         // TODO: Refactor since duplicated in viewDidLoad()
         // Navbar for iPhone 6 & 6 Plus
-        let imageName: String
+        let image: UIImage
         if UIInterfaceOrientationIsPortrait(orientation) {
-          imageName = "kmwb-navbar-Portrait.png"
+          image = #imageLiteral(resourceName: "kmwb-navbar-Portrait.png")
         } else {
-          imageName = "kmwb-navbar-Landscape-568h.png"
+          image = #imageLiteral(resourceName: "kmwb-navbar-Landscape-568h.png")
         }
-        let bgImg = UIImage(named: imageName)?.resizableImage(
+        let bgImg = image.resizableImage(
           withCapInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0), resizingMode: .stretch)
         navigationController?.navigationBar.setBackgroundImage(bgImg, for: UIBarMetrics.default)
       }
     } else {
-      let imageName: String
+      let image: UIImage
       if UIInterfaceOrientationIsPortrait(orientation) {
-        imageName = "kmwb-navbar-Portrait.png"
+        image = #imageLiteral(resourceName: "kmwb-navbar-Portrait.png")
       } else {
-        imageName = "kmwb-navbar-Landscape.png"
+        image = #imageLiteral(resourceName: "kmwb-navbar-Landscape.png")
       }
-      navigationController?.navigationBar.setBackgroundImage(
-        UIImage(named: imageName), for: UIBarMetrics.default)
+      navigationController?.navigationBar.setBackgroundImage(image, for: UIBarMetrics.default)
     }
   }
 

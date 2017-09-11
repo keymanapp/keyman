@@ -37,22 +37,22 @@ class KeyboardViewController: KMInputViewController {
 
   func setupTopBarImage(isPortrait: Bool) {
     if isPortrait {
-      topBarImageView.image = UIImage(named: "banner-Portrait.png")
+      topBarImageView.image = #imageLiteral(resourceName: "banner-Portrait.png")
       return
     }
 
     // iPad
     if UIDevice.current.userInterfaceIdiom != UIUserInterfaceIdiom.phone {
-      topBarImageView.image = UIImage(named: "banner-Landscape.png")
+      topBarImageView.image = #imageLiteral(resourceName: "banner-Landscape.png")
       return
     }
 
     // iPhone
     let screenRect = UIScreen.main.bounds
     if CGFloat.maximum(screenRect.height, screenRect.width) >= 568.0 {
-      topBarImageView.image = UIImage(named: "banner-Landscape-568h.png")
+      topBarImageView.image = #imageLiteral(resourceName: "banner-Landscape-568h.png")
     } else {
-      topBarImageView.image = UIImage(named: "banner-Landscape.png")
+      topBarImageView.image = #imageLiteral(resourceName: "banner-Landscape.png")
     }
   }
 }

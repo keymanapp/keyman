@@ -45,7 +45,6 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
   var customKeyboard2Download = [String: Any]()
   var wasKeyboardVisible: Bool = false
 
-  var iosVersion: Int = 0
   var screenWidth: CGFloat = 0.0
   var screenHeight: CGFloat = 0.0
   var portLeftMargin: CGFloat = 0.0
@@ -103,7 +102,6 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     extendedLayoutIncludesOpaqueBars = true
     automaticallyAdjustsScrollViewInsets = false
 
-    iosVersion = (UIDevice.current.systemVersion as NSString).integerValue
     let systemFonts = Set<String>(UIFont.familyNames)
     let screenRect = UIScreen.main.bounds
     let orientation = UIApplication.shared.statusBarOrientation
@@ -177,10 +175,10 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
       // Navbar for iPad
       if UIInterfaceOrientationIsPortrait(orientation) {
         navigationController?.navigationBar.setBackgroundImage(
-            UIImage(named: "navbar-Portrait.png"), for: UIBarMetrics.default)
+          #imageLiteral(resourceName: "navbar-Portrait.png"), for: UIBarMetrics.default)
       } else {
         navigationController?.navigationBar.setBackgroundImage(
-            UIImage(named: "navbar-Landscape.png"), for: UIBarMetrics.default)
+            #imageLiteral(resourceName: "navbar-Landscape.png"), for: UIBarMetrics.default)
       }
     }
 
@@ -418,7 +416,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
 
   func keyboardDidShow(_ notification: Notification) {
     // Workaround to display overlay window above keyboard
-    if iosVersion >= 9 {
+    if #available(iOS 9.0, *) {
       let windows = UIApplication.shared.windows
       let lastWindow = windows.last
       overlayWindow.windowLevel = lastWindow!.windowLevel + 1

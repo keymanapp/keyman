@@ -25,7 +25,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
 
     tableView.isScrollEnabled = false
 
-    let icon = UIImageView(image: UIImage(named: "887-notepad.png"))
+    let icon = UIImageView(image: #imageLiteral(resourceName: "887-notepad.png"))
     navItem.leftBarButtonItem = UIBarButtonItem(customView: icon)
 
     tableView.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 15)
