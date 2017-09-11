@@ -2825,6 +2825,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       keymanweb.modStateFlags = curModState;
       console.log(e, ", location: ", e.location);
 
+      // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
+      var altGrMask = osk.modifierCodes['RALT'] | osk.modifierCodes['LCTRL'];
+      if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
+        // We just released AltGr - make sure it's all released.
+        curModState &= ~ altGrMask;
+      }
       // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
       if(curModState & osk.modifierCodes['RALT']) {
         curModState &= ~osk.modifierCodes['LCTRL'];
