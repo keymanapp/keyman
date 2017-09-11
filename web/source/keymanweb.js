@@ -2744,7 +2744,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Function     _GetKeyEventProperties
      * Scope        Private
      * @param       {Event}       e         Event object
-     * @param       {boolean}     keyState  true if call results from a keyDown event, false if keyUp, undefined if keyPress
+     * @param       {boolean=}    keyState  true if call results from a keyDown event, false if keyUp, undefined if keyPress
      * @return      {Object.<string,*>}     KMW keyboard event object: 
      * Description  Get object with target element, key code, shift state, virtual key state 
      *                Ltarg=target element
@@ -2771,98 +2771,83 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       else if (e.which) s.Lcode = e.which;    
       else return null;
       
-      var osk = keymanweb["osk"];
+      // Stage 1 - track the true state of the keyboard's modifiers.
+      var osk = keymanweb["osk"], prevModState = keymanweb.modStateFlags, curModState = 0x0000;
+      var ctrlEvent = false, altEvent = false;
+      
+      switch(s.Lcode) {
+        case osk.keyCodes["K_CTRL"]:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
+        case osk.keyCodes["K_LCTRL"]:
+        case osk.keyCodes["K_RCTRL"]:
+        case osk.keyCodes["K_CONTROL"]:
+        case osk.keyCodes["K_LCONTROL"]:
+        case osk.keyCodes["K_RCONTROL"]:
+          ctrlEvent = true;
+          break;
+        case osk.keyCodes["K_LMENU"]:     // The 2 "K_*MENU" entries exist in some legacy keyboards.
+        case osk.keyCodes["K_RMENU"]:
+        case osk.keyCodes["K_ALT"]:
+        case osk.keyCodes["K_LALT"]:
+        case osk.keyCodes["K_RALT"]:
+          altEvent = true;
+          break;
+      }
 
+      /**
+       * Two separate conditions exist that should trigger chiral modifier detection.  Examples below use CTRL but also work for ALT.
+       * 
+       * 1.  The user literally just pressed CTRL, so the event has a valid `location` property we can utilize.  
+       *     Problem: its layer isn't presently activated within the OSK.
+       * 
+       * 2.  CTRL has been held a while, so the OSK layer is valid, but the key event doesn't tell us the chirality of the active CTRL press.
+       *     Bonus issue:  RAlt simulation may cause erasure of this location property, but it should ONLY be empty if pressed in this case.
+       *     We default to the 'left' variants since they're more likely to exist and cause less issues with RAlt simulation handling.
+       * 
+       * In either case, `e.ctrlKey` is set to true, but as a result does nothing to tell us which case is active.
+       * 
+       * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
+       */
+
+      curModState |= (e.shiftKey ? 0x10 : 0);      
+
+      if(e.ctrlKey) {
+        curModState |= ((e.location != 0 && ctrlEvent) ? 
+          (e.location == 1 ? osk.modifierCodes['LCTRL'] : osk.modifierCodes['RCTRL']) : // Condition 1
+          prevModState & 0x0003);                                                       // Condition 2
+      }
+      if(e.altKey) {
+        curModState |= ((e.location != 0 && altEvent) ? 
+          (e.location == 1 ? osk.modifierCodes['LALT'] : osk.modifierCodes['RALT']) :   // Condition 1
+          prevModState & 0x000C);                                                       // Condition 2
+      }
+
+      // Set our modifier state tracking variable for the next round.
+      keymanweb.modStateFlags = curModState;
+      console.log(e, ", location: ", e.location);
+
+      // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
+      if(curModState & osk.modifierCodes['RALT']) {
+        curModState &= ~osk.modifierCodes['LCTRL'];
+      }
+
+      // Stage 2 - map the modifier set to the appropriate keystroke's modifiers.
       if(keymanweb.isChiral()) {
-        s.Lmodifiers = (e.shiftKey ? 0x10 : 0);
+        s.Lmodifiers = curModState;
 
-        var ctrlEvent = false, altEvent = false;
-
-        switch(s.Lcode) {
-          case osk.keyCodes["K_CTRL"]:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
-          case osk.keyCodes["K_LCTRL"]:
-          case osk.keyCodes["K_RCTRL"]:
-          case osk.keyCodes["K_CONTROL"]:
-          case osk.keyCodes["K_LCONTROL"]:
-          case osk.keyCodes["K_RCONTROL"]:
-            ctrlEvent = true;
-            break;
-          case osk.keyCodes["K_LMENU"]:     // The 2 "K_*MENU" entries exist in some legacy keyboards.
-          case osk.keyCodes["K_RMENU"]:
-          case osk.keyCodes["K_ALT"]:
-          case osk.keyCodes["K_LALT"]:
-          case osk.keyCodes["K_RALT"]:
-            altEvent = true;
-            break;
-        }
-
-        /**
-         * Two separate conditions exist that should trigger chiral modifier detection.  Examples below use CTRL but also work for ALT.
-         * 
-         * 1.  The user literally just pressed CTRL, so the event has a valid `location` property we can utilize.  
-         *     Problem: its layer isn't presently activated within the OSK.
-         * 
-         * 2.  CTRL has been held a while, so the OSK layer is valid, but the key event doesn't tell us the chirality of the active CTRL press.
-         *     Bonus issue:  RAlt simulation may cause erasure of this location property, but it should ONLY be empty if pressed in this case.
-         *     We default to the 'left' variants since they're more likely to exist and cause less issues with RAlt simulation handling.
-         * 
-         * In either case, `e.ctrlKey` is set to true, but as a result does nothing to tell us which case is active.
-         * 
-         * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
-         */
-
-        var modState = osk.getModifierState(osk.layerId);
-
-        if(e.ctrlKey) {
-          s.Lmodifiers = s.Lmodifiers | ((e.location != 0 && ctrlEvent) ? 
-            (e.location == 1 ? osk.modifierCodes['LCTRL'] : osk.modifierCodes['RCTRL']) : // Condition 1
-            (modState & 0x0003) ? modState & 0x0003 : osk.modifierCodes['LCTRL']);                                  // Condition 2
-        }
-        if(e.altKey) {
-          s.Lmodifiers = s.Lmodifiers | ((e.location != 0 && altEvent) ? 
-            (e.location == 1 ? osk.modifierCodes['LALT'] : osk.modifierCodes['RALT']) :   // Condition 1
-            (modState & 0x000C) ? modState & 0x000C : osk.modifierCodes['LALT']);                                  // Condition 2
+        // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
+        // AltGr / Right-alt simulation.
+        if(osk.emulatesAltGr() && (s.Lmodifiers & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
+          s.Lmodifiers ^= osk.modifierBitmasks['ALT_GR_SIM'];
+          s.Lmodifiers |= osk.modifierCodes['RALT'];
         }
       } else {
         s.Lmodifiers = 
           (e.shiftKey ? 0x10 : 0) |
-          (e.ctrlKey ? (e.ctrlLeft ? 0x20 : 0x20) : 0) | 
-          (e.altKey ? (e.altLeft ? 0x40 : 0x40) : 0);  // I3363 (Build 301)
+          ((curModState & (osk.modifierCodes["LCTRL"] | osk.modifierCodes["RCTRL"])) ? 0x20 : 0) | 
+          ((curModState & (osk.modifierCodes["LALT"] | osk.modifierCodes["RALT"]))   ? 0x40 : 0); 
       }
 
-      // // TODO:  Wrap this nasty, nasty block in the eventual "sim AltGr" check.  Make a separate flag-clear for LCTRL if we must.
-      // var altGrSimMask = osk.modifierCodes['LALT'] | osk.modifierCodes['LCTRL'];
-
-      // // Simulate RALT via the classic AltGr shortcut - but only if no such chiral layer exists.
-      // if(((s.Lmodifiers & altGrSimMask) == altGrSimMask) && true) {
-      //   s.Lmodifiers |= osk.modifierCodes['RALT'];
-      // } 
-      
-      // // Are we in a state of either simulating or receiving a RALT signal?
-      // if(((s.Lmodifiers | osk.getModifierState(osk.layerId)) & osk.modifierCodes['RALT']) == osk.modifierCodes['RALT']) {
-      //   if(e.ctrlKey && e.altKey) {
-      //     // As long as the keystroke combo remains pressed, maintain the RALT simulation.
-      //     // If we have a standard RALT signal, cancel any LALT and LCTRL modifiers - especially LCTRL,
-      //     // given its appearance in Windows' OS-level AltGr simulation.
-      //     s.Lmodifiers &= ~altGrSimMask;
-      //   } else if(e.ctrlKey || e.altKey) {
-      //     console.log(e, ", location: ", e.location);
-      //     // If we're just now changing the modifiers, we can use the location property to tell us if we
-      //     // were using the shortcut.
-      //     if(e.location == 1) {
-      //       s.Lmodifiers &= ~osk.modifierCodes['RALT'];
-      //       if(e.location == 1 && e.altKey) {
-      //         s.Lmodifiers |= osk.modifierCodes['LALT'];
-      //       } else if(e.location == 1 && e.ctrlKey) {
-      //         s.Lmodifiers |= osk.modifierCodes['LCTRL'];
-      //       }
-      //     }
-      //   } else {
-      //     console.log(e, ", location: ", e.location);
-      //     s.Lmodifiers &= ~(osk.modifierBitmasks['IS_CHIRAL']);  // Cancel all chiral flags.
-      //   }
-      // } 
-
+      // Stage 3 - detect state key information.  It can be looked up per keypress with no issue.
       s.Lstates = 0;
       
       if(e.getModifierState("CapsLock")) {
@@ -2936,20 +2921,16 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         if(Levent.initKeyEvent)
         {
           Levent.initKeyEvent('keypress',true,true,null,false,false,false,false,0,32);
-          var LkeyPress = keymanweb._KeyPress; 
+          Levent._blockKMW = true; // Tell keymanweb._KeyPress to ignore this simulated event.
           
-          /**
-           * Function     _KeyPress
-           * Scope        Private
-           * @param       {Event}     e     event         
-           * Description  Temporarily disable keypress event handling  TODO: does this really work??? objects are passed by reference so should be OK
-           */       
-          keymanweb._KeyPress = function(e) {};
+          // Nasty problems arise from the simulated keystroke if we don't temporarily block the handler.
+          keymanweb.blockKeypress = true;
           Pelem.dispatchEvent(Levent);
           Levent=document.createEvent('KeyboardEvent');
           Levent.initKeyEvent('keypress',true,true,null,false,false,false,false,8,0);
+          Levent._blockKMW = true; // Tell keymanweb._KeyPress to ignore this simulated event.
           Pelem.dispatchEvent(Levent);
-          keymanweb._KeyPress = LkeyPress;
+          keymanweb.blockKeypress = false;
         }
       }
     }
@@ -3108,8 +3089,11 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}           
      * Description Processes keypress event (does not pass data to keyboard)
      */       
-    keymanweb._KeyPress = function(e)
-    {
+    keymanweb._KeyPress = function(e) {
+      if(e._blockKMW) { // A custom event property added for bugfix-oriented simulated keypress events.
+        return false;
+      }
+
       var Levent;
       if(!keymanweb._Enabled || keymanweb._DisableInput || keymanweb._ActiveKeyboard == null) return true;
 
@@ -3584,7 +3568,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Function     getKeyboardModifierBitmask
      * Scope        Private
      * @param       {Object=}   k0
-     * @return      {boolean}
+     * @return      {number}
      * Description  Obtains the currently-active modifier bitmask for the active keyboard.
      */
     keymanweb.getKeyboardModifierBitmask = function(k0) {
@@ -3602,7 +3586,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         return k['KV']['KMBM'];
       }
 
-      return keymanweb.osk.modifierBitmasks['NON_CHIRAL'];
+      return osk.modifierBitmasks['NON_CHIRAL'];
     }
     
     /**
@@ -4827,7 +4811,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         window.clearTimeout(keymanweb.refocusTimer);
 
         e.keyCode = osk.keyCodes['K_CAPS'];  // A safe keycode to use; has no output.
-        var Levent = keymanweb._GetKeyEventProperties(e, null);
+        var Levent = keymanweb._GetKeyEventProperties(e);
 
         osk._UpdateVKShift(Levent, Levent.Lcode-15, 1);
       }, 50); // Chosen to throttle the messaging rate.

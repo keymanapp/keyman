@@ -39,6 +39,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
     osk.modifierBitmasks = {
       "ALL":0x007F,
+      "ALT_GR_SIM": (osk.modifierCodes["LCTRL"] | osk.modifierCodes["LALT"]),
       "CHIRAL":0x001F,    // The base bitmask for chiral keyboards.  Includes SHIFT, which is non-chiral.
       "IS_CHIRAL":0x000F, // Used to test if a bitmask uses a chiral modifier.
       "NON_CHIRAL":0x0070 // The default bitmask, for non-chiral keyboards
@@ -917,6 +918,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         // Define modifiers value for sending to keyboard mapping function
         Lkc.Lmodifiers = keyShiftState;
 
+        // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
+        if((Lkc.Lmodifiers & osk.modifierBitmasks["ALT_GR_SIM"]) == osk.modifierBitmasks["ALT_GR_SIM"] && osk.emulatesAltGr()) {
+          Lkc.Lmodifiers &= ~osk.modifierBitmasks["ALT_GR_SIM"];
+          Lkc.Lmodifiers |= osk.modifierCodes["RALT"];
+        }
+
         // Include *limited* support for mnemonic keyboards (Sept 2012)
         if(keymanweb._ActiveKeyboard && (keymanweb._ActiveKeyboard['KM']))
         {
@@ -940,6 +947,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         {
           Lkc.Lcode=keymanweb._USKeyCodeToCharCode(Lkc); Lkc.LisVirtualKey=false;
         }
+
         // Pass this key code and state to the keyboard program
         if(!keymanweb._ActiveKeyboard || (Lkc.Lcode != 0 && !keymanweb._ActiveKeyboard['gs'](Lelem, Lkc)))
         {
@@ -1692,6 +1700,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         // read shift states from Pevent
         keyShiftState = e.Lmodifiers;
         lockStates = e.Lstates;
+
+        // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
+        if(osk.emulatesAltGr() && (keymanweb.modStateFlags & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
+          keyShiftState |= keymanweb.isChiral() ? osk.modifierBitmasks['ALT_GR_SIM'] : osk.modifierCodes["CTRL"] | osk.modifierCodes["ALT"];
+          keyShiftState &= keymanweb.isChiral() ? ~osk.modifierCodes['RALT'] : 0;
+        }
 
         for(i=0; i < lockNames.length; i++) {
           if(lockStates & osk.stateBitmasks[lockNames[i]]) {
@@ -2910,6 +2924,15 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
 
     /**
+     * Signifies whether or not the OSK facilitates AltGr / Right-alt emulation for this keyboard.
+     * @param   {Object=}   keyLabels
+     * @return  {boolean}
+     */
+    osk.emulatesAltGr = function(keyLabels) {
+      return !(keyLabels ? keyLabels : osk.layers)[osk.getLayerId(osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])];
+    }
+
+    /**
      * Build a default layout for keyboards with no explicit layout
      *
      * @param   {Object}  PVK     keyboard object (as loaded)
@@ -2951,6 +2974,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var validIdList = Object.getOwnPropertyNames(keyLabels), invalidIdList = [];
       validIdList.splice(validIdList.indexOf('default'), 1);
       validIdList = [ 'default' ].concat(validIdList);
+
+      // Automatic AltGr emulation if the 'leftctrl-leftalt' layer is otherwise undefined.
+      if(osk.emulatesAltGr(keyLabels) && validIdList.indexOf('rightalt') != -1) {
+        validIdList.push('leftctrl-leftalt');
+        keyLabels['leftctrl-leftalt'] = keyLabels['rightalt'];
+      }
 
       // For desktop devices, we must create all layers, even if invalid.
       if(formFactor == 'desktop') {
