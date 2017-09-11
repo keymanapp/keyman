@@ -64,8 +64,9 @@ if(!tavultesoft['keymanweb']) {
       mustReloadKeyboard: false,// Force keyboard refreshing even if already loaded
       globalKeyboard: null,     // Indicates the currently-active keyboard for controls without independent keyboard settings.
       globalLanguageCode: null, // Indicates the language code corresponding to `globalKeyboard`.
-      isEmbedded: false         // Indicates if the KeymanWeb instance is embedded within a mobile app.
+      isEmbedded: false,        // Indicates if the KeymanWeb instance is embedded within a mobile app.
                                 // Blocks full page initialization when set to `true`.
+      refocusTimer: 0           // Tracks a timeout event that aids of OSK modifier/state key tracking when the document loses focus.
     };
 
     keymanweb['initialized'] = 0;

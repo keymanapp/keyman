@@ -2743,8 +2743,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     /**
      * Function     _GetKeyEventProperties
      * Scope        Private
-     * @param       {Event}       e       Event object
-     * @return      {Object.<string,*>}   KMW keyboard event object: 
+     * @param       {Event}       e         Event object
+     * @param       {boolean}     keyState  true if call results from a keyDown event, false if keyUp, undefined if keyPress
+     * @return      {Object.<string,*>}     KMW keyboard event object: 
      * Description  Get object with target element, key code, shift state, virtual key state 
      *                Ltarg=target element
      *                Lcode=keyCode
@@ -2752,7 +2753,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *                LisVirtualKeyCode e.g. ctrl/alt key
      *                LisVirtualKey     e.g. Virtual key or non-keypress event
      */    
-    keymanweb._GetKeyEventProperties = function(e)
+    keymanweb._GetKeyEventProperties = function(e, keyState)
     {
       var s = new Object();
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
@@ -2802,20 +2803,25 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
          *     Problem: its layer isn't presently activated within the OSK.
          * 
          * 2.  CTRL has been held a while, so the OSK layer is valid, but the key event doesn't tell us the chirality of the active CTRL press.
+         *     Bonus issue:  RAlt simulation may cause erasure of this location property, but it should ONLY be empty if pressed in this case.
+         *     We default to the 'left' variants since they're more likely to exist and cause less issues with RAlt simulation handling.
          * 
          * In either case, `e.ctrlKey` is set to true, but as a result does nothing to tell us which case is active.
          * 
          * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
          */
+
+        var modState = osk.getModifierState(osk.layerId);
+
         if(e.ctrlKey) {
           s.Lmodifiers = s.Lmodifiers | ((e.location != 0 && ctrlEvent) ? 
             (e.location == 1 ? osk.modifierCodes['LCTRL'] : osk.modifierCodes['RCTRL']) : // Condition 1
-            osk.getModifierState(osk.layerId) & 0x0003);                                  // Condition 2
+            (modState & 0x0003) ? modState & 0x0003 : osk.modifierCodes['LCTRL']);                                  // Condition 2
         }
         if(e.altKey) {
           s.Lmodifiers = s.Lmodifiers | ((e.location != 0 && altEvent) ? 
             (e.location == 1 ? osk.modifierCodes['LALT'] : osk.modifierCodes['RALT']) :   // Condition 1
-            osk.getModifierState(osk.layerId) & 0x000C);                                  // Condition 2
+            (modState & 0x000C) ? modState & 0x000C : osk.modifierCodes['LALT']);                                  // Condition 2
         }
       } else {
         s.Lmodifiers = 
@@ -2823,6 +2829,39 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           (e.ctrlKey ? (e.ctrlLeft ? 0x20 : 0x20) : 0) | 
           (e.altKey ? (e.altLeft ? 0x40 : 0x40) : 0);  // I3363 (Build 301)
       }
+
+      // // TODO:  Wrap this nasty, nasty block in the eventual "sim AltGr" check.  Make a separate flag-clear for LCTRL if we must.
+      // var altGrSimMask = osk.modifierCodes['LALT'] | osk.modifierCodes['LCTRL'];
+
+      // // Simulate RALT via the classic AltGr shortcut - but only if no such chiral layer exists.
+      // if(((s.Lmodifiers & altGrSimMask) == altGrSimMask) && true) {
+      //   s.Lmodifiers |= osk.modifierCodes['RALT'];
+      // } 
+      
+      // // Are we in a state of either simulating or receiving a RALT signal?
+      // if(((s.Lmodifiers | osk.getModifierState(osk.layerId)) & osk.modifierCodes['RALT']) == osk.modifierCodes['RALT']) {
+      //   if(e.ctrlKey && e.altKey) {
+      //     // As long as the keystroke combo remains pressed, maintain the RALT simulation.
+      //     // If we have a standard RALT signal, cancel any LALT and LCTRL modifiers - especially LCTRL,
+      //     // given its appearance in Windows' OS-level AltGr simulation.
+      //     s.Lmodifiers &= ~altGrSimMask;
+      //   } else if(e.ctrlKey || e.altKey) {
+      //     console.log(e, ", location: ", e.location);
+      //     // If we're just now changing the modifiers, we can use the location property to tell us if we
+      //     // were using the shortcut.
+      //     if(e.location == 1) {
+      //       s.Lmodifiers &= ~osk.modifierCodes['RALT'];
+      //       if(e.location == 1 && e.altKey) {
+      //         s.Lmodifiers |= osk.modifierCodes['LALT'];
+      //       } else if(e.location == 1 && e.ctrlKey) {
+      //         s.Lmodifiers |= osk.modifierCodes['LCTRL'];
+      //       }
+      //     }
+      //   } else {
+      //     console.log(e, ", location: ", e.location);
+      //     s.Lmodifiers &= ~(osk.modifierBitmasks['IS_CHIRAL']);  // Cancel all chiral flags.
+      //   }
+      // } 
 
       s.Lstates = 0;
       
@@ -2954,7 +2993,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(!osk.ready) return true;
       
       // Get event properties  
-      var Levent = keymanweb._GetKeyEventProperties(e);
+      var Levent = keymanweb._GetKeyEventProperties(e, true);
       if(Levent == null) return true;
       switch(Levent.Lcode)
       {
@@ -3110,7 +3149,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */       
     keymanweb._KeyUp = function(e)
     {
-      var Levent = keymanweb._GetKeyEventProperties(e);
+      var Levent = keymanweb._GetKeyEventProperties(e, false);
       if(Levent == null || !osk.ready) return true;
 
       switch(Levent.Lcode)
@@ -4215,6 +4254,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       observationConfig = { subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'readonly']};
       new MutationObserver(keymanweb._EnablementMutationObserverCore).observe(observationTarget, observationConfig);
 
+      // Handlers for intercepting changes in modifiers and state keys when no input element is focused.
+      util.attachDOMEvent(window, 'blur',  keymanweb._documentBlur, true);
+      util.attachDOMEvent(window, 'focus', keymanweb._documentRefocus, true);
+
       // Set exposed initialization flag to 2 to indicate deferred initialization also complete
       keymanweb['initialized']=2;
     }
@@ -4768,6 +4811,30 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       
       // Or US English if no stubs loaded (should never happen)
       return 'Keyboard_us:eng';    
+    }
+
+    keymanweb._documentBlur = function(e) {
+      util.attachDOMEvent(window, 'mousemove', keymanweb._refocusMouseBlur, false);
+    }
+
+    keymanweb._refocusMouseBlur = function(e) {
+      //console.log("Creepy.");
+      if(keymanweb.refocusTimer) {
+        window.clearTimeout(keymanweb.refocusTimer);
+      }
+      
+      keymanweb.refocusTimer = window.setTimeout(function() {
+        window.clearTimeout(keymanweb.refocusTimer);
+
+        e.keyCode = osk.keyCodes['K_CAPS'];  // A safe keycode to use; has no output.
+        var Levent = keymanweb._GetKeyEventProperties(e, null);
+
+        osk._UpdateVKShift(Levent, Levent.Lcode-15, 1);
+      }, 50); // Chosen to throttle the messaging rate.
+    }
+
+    keymanweb._documentRefocus = function(e) {
+      util.detachDOMEvent(window, 'mousemove', keymanweb._documentMouseBlur, false);
     }
 
     util.attachDOMEvent(window, 'focus', keymanweb._ResetVKShift,false);  // I775
