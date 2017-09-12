@@ -9,10 +9,10 @@
 #import "LanguageViewController.h"
 #import "LanguageDetailViewController.h"
 #import "KeyboardPickerViewController.h"
-#import "KeyboardNameTableViewCell.h"
 #import "KMManager+Internal.h"
 #import "QuartzCore/QuartzCore.h"
 #import <UIKit/UIKit.h>
+#import <KMEI-Swift.h>
 
 static const NSInteger kmErrorAlertTag = -1;
 static const NSInteger kmActivityViewTag = -2;
