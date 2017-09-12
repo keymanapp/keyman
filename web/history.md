@@ -8,6 +8,9 @@
   * New API functions have been added:  `detachFromControl`, `enableControl`, `disableControl`, `setKeyboardForControl`.
 * Removed old code directed at legacy browsers no longer supported.  (#212)
 * Refactored code paths relating to KMW's embedding in the iOS and Android apps.  (#211)
+* Added support for L/R Alt and Ctrl modifiers for keyboards. (#9) (#52)
+* Added support for use of the Caps Lock state within keyboards if specified by a keyboard designer.
+
 
 ## 2017-07-10 2.0.473 stable
 * 2.0 stable release build.

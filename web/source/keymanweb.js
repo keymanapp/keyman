@@ -2821,39 +2821,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           prevModState & 0x000C);                                                       // Condition 2
       }
 
-      // Set our modifier state tracking variable for the next round.
-      keymanweb.modStateFlags = curModState;
-      console.log(e, ", location: ", e.location);
-
-      // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
-      var altGrMask = osk.modifierCodes['RALT'] | osk.modifierCodes['LCTRL'];
-      if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
-        // We just released AltGr - make sure it's all released.
-        curModState &= ~ altGrMask;
-      }
-      // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
-      if(curModState & osk.modifierCodes['RALT']) {
-        curModState &= ~osk.modifierCodes['LCTRL'];
-      }
-
-      // Stage 2 - map the modifier set to the appropriate keystroke's modifiers.
-      if(keymanweb.isChiral()) {
-        s.Lmodifiers = curModState;
-
-        // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
-        // AltGr / Right-alt simulation.
-        if(osk.emulatesAltGr() && (s.Lmodifiers & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
-          s.Lmodifiers ^= osk.modifierBitmasks['ALT_GR_SIM'];
-          s.Lmodifiers |= osk.modifierCodes['RALT'];
-        }
-      } else {
-        s.Lmodifiers = 
-          (e.shiftKey ? 0x10 : 0) |
-          ((curModState & (osk.modifierCodes["LCTRL"] | osk.modifierCodes["RCTRL"])) ? 0x20 : 0) | 
-          ((curModState & (osk.modifierCodes["LALT"] | osk.modifierCodes["RALT"]))   ? 0x40 : 0); 
-      }
-
-      // Stage 3 - detect state key information.  It can be looked up per keypress with no issue.
+      // Stage 2 - detect state key information.  It can be looked up per keypress with no issue.
       s.Lstates = 0;
       
       if(e.getModifierState("CapsLock")) {
@@ -2872,6 +2840,41 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         s.Lstates |= osk.modifierCodes["SCROLL_LOCK"];
       } else {
         s.Lstates |= osk.modifierCodes["NO_SCROLL_LOCK"];
+      }
+
+      // We need these states to be tracked as well for proper OSK updates.
+      curModState |= s.Lstates;
+
+      // Stage 3 - Set our modifier state tracking variable and perform basic AltGr-related management.
+      s.LmodifierChange = keymanweb.modStateFlags != curModState;
+      keymanweb.modStateFlags = curModState;
+
+      // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
+      var altGrMask = osk.modifierCodes['RALT'] | osk.modifierCodes['LCTRL'];
+      if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
+        // We just released AltGr - make sure it's all released.
+        curModState &= ~ altGrMask;
+      }
+      // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
+      if(curModState & osk.modifierCodes['RALT']) {
+        curModState &= ~osk.modifierCodes['LCTRL'];
+      }
+
+      // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
+      if(keymanweb.isChiral()) {
+        s.Lmodifiers = curModState & osk.modifierBitmasks['CHIRAL'];
+
+        // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
+        // AltGr / Right-alt simulation.
+        if(osk.emulatesAltGr() && (s.Lmodifiers & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
+          s.Lmodifiers ^= osk.modifierBitmasks['ALT_GR_SIM'];
+          s.Lmodifiers |= osk.modifierCodes['RALT'];
+        }
+      } else {
+        s.Lmodifiers = 
+          (e.shiftKey ? 0x10 : 0) |
+          ((curModState & (osk.modifierCodes["LCTRL"] | osk.modifierCodes["RCTRL"])) ? 0x20 : 0) | 
+          ((curModState & (osk.modifierCodes["LALT"] | osk.modifierCodes["RALT"]))   ? 0x40 : 0); 
       }
 
       // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
@@ -2927,16 +2930,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         if(Levent.initKeyEvent)
         {
           Levent.initKeyEvent('keypress',true,true,null,false,false,false,false,0,32);
-          Levent._blockKMW = true; // Tell keymanweb._KeyPress to ignore this simulated event.
+          Levent._kmw_block = true; // Tell keymanweb._KeyPress to ignore this simulated event.
           
           // Nasty problems arise from the simulated keystroke if we don't temporarily block the handler.
-          keymanweb.blockKeypress = true;
           Pelem.dispatchEvent(Levent);
           Levent=document.createEvent('KeyboardEvent');
           Levent.initKeyEvent('keypress',true,true,null,false,false,false,false,8,0);
-          Levent._blockKMW = true; // Tell keymanweb._KeyPress to ignore this simulated event.
+          Levent._kmw_block = true; // Tell keymanweb._KeyPress to ignore this simulated event.
           Pelem.dispatchEvent(Levent);
-          keymanweb.blockKeypress = false;
         }
       }
     }
@@ -2995,6 +2996,11 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         case 145:
           keymanweb._NotifyKeyboard(Levent.Lcode,Levent.Ltarg,1); 
           return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
+      }
+
+      if(Levent.LmodifierChange) {
+        keymanweb._NotifyKeyboard(0,Levent.Ltarg,1); 
+        osk._UpdateVKShift(Levent, 0, 1);
       }
       
       // I1207
@@ -3096,7 +3102,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Description Processes keypress event (does not pass data to keyboard)
      */       
     keymanweb._KeyPress = function(e) {
-      if(e._blockKMW) { // A custom event property added for bugfix-oriented simulated keypress events.
+      if(e._kmw_block) { // A custom event property added for bugfix-oriented simulated keypress events.
         return false;
       }
 
@@ -3164,6 +3170,11 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1);  // I2187
       }
       
+      if(Levent.LmodifierChange){
+        keymanweb._NotifyKeyboard(0,Levent.Ltarg,0); 
+        osk._UpdateVKShift(Levent, 0, 1);  // I2187
+      }
+
       // I736 start
       var Ldv;
       if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  Ldv.type != 'control')   // I1479 - avoid createRange on controls
@@ -4244,10 +4255,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       observationConfig = { subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'readonly']};
       new MutationObserver(keymanweb._EnablementMutationObserverCore).observe(observationTarget, observationConfig);
 
-      // Handlers for intercepting changes in modifiers and state keys when no input element is focused.
-      util.attachDOMEvent(window, 'blur',  keymanweb._documentBlur, true);
-      util.attachDOMEvent(window, 'focus', keymanweb._documentRefocus, true);
-
       // Set exposed initialization flag to 2 to indicate deferred initialization also complete
       keymanweb['initialized']=2;
     }
@@ -4801,30 +4808,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       
       // Or US English if no stubs loaded (should never happen)
       return 'Keyboard_us:eng';    
-    }
-
-    keymanweb._documentBlur = function(e) {
-      util.attachDOMEvent(window, 'mousemove', keymanweb._refocusMouseBlur, false);
-    }
-
-    keymanweb._refocusMouseBlur = function(e) {
-      //console.log("Creepy.");
-      if(keymanweb.refocusTimer) {
-        window.clearTimeout(keymanweb.refocusTimer);
-      }
-      
-      keymanweb.refocusTimer = window.setTimeout(function() {
-        window.clearTimeout(keymanweb.refocusTimer);
-
-        e.keyCode = osk.keyCodes['K_CAPS'];  // A safe keycode to use; has no output.
-        var Levent = keymanweb._GetKeyEventProperties(e);
-
-        osk._UpdateVKShift(Levent, Levent.Lcode-15, 1);
-      }, 50); // Chosen to throttle the messaging rate.
-    }
-
-    keymanweb._documentRefocus = function(e) {
-      util.detachDOMEvent(window, 'mousemove', keymanweb._refocusMouseBlur, false);
     }
 
     util.attachDOMEvent(window, 'focus', keymanweb._ResetVKShift,false);  // I775
