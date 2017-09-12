@@ -153,6 +153,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 
+// Suppress warning for missing [super dealloc]
+// The call to dealloc is implicit and an explicit call is forbidden since we use ARC.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
 - (void)dealloc
 {
 	[self stopNotifier];
@@ -160,10 +164,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	{
 		CFRelease(_reachabilityRef);
 	}
-  
-  // Keyman addition:  Removes a build warning.
-  [super dealloc];
 }
+#pragma clang diagnostic pop
 
 
 #pragma mark - Network Flag Handling

@@ -1191,7 +1191,7 @@
 					"-force_load",
 					"$(PROJECT_DIR)/build/libKeyman/libKeyman.a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "${PRODUCT_NAME}";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Engine.SystemKeyboard;
 				PRODUCT_NAME = "Tavultesoft.KMEI.$(TARGET_NAME:rfc1034identifier)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -1232,7 +1232,7 @@
 					"-force_load",
 					"$(PROJECT_DIR)/build/libKeyman/libKeyman.a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "${PRODUCT_NAME}";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Engine.SystemKeyboard;
 				PRODUCT_NAME = "Tavultesoft.KMEI.$(TARGET_NAME:rfc1034identifier)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
