@@ -9,7 +9,6 @@
 
 #import "MainViewController.h"
 #import "KMManager.h"
-#import "KMKeyboardPickerButton.h"
 #import <QuartzCore/QuartzCore.h>
 #import <KMEI-Swift.h>
 
@@ -162,7 +161,7 @@
 	[contentView addSubview:self.textView3];
 	
 	// Button - keyboard picker
-	KMKeyboardPickerButton* kbButton = [KMKeyboardPickerButton buttonWithPresentingViewController:self];
+  KeyboardPickerButton* kbButton = [[KeyboardPickerButton alloc] initWithPresentingVC:self];
 	kbButton.center = CGPointMake(contentWidth / 2.0f, CGRectGetMaxY(self.textView3.frame) + 30.0f);
 	kbButton.frame = CGRectIntegral(kbButton.frame);
 	kbButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;

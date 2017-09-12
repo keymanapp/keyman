@@ -112,6 +112,7 @@
 		98FFB3D41B67006F00289F0E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98FFB3D31B67006F00289F0E /* WebKit.framework */; };
 		98FFB3D51B67008000289F0E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98FFB3D31B67006F00289F0E /* WebKit.framework */; };
 		C08C620C1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C620B1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift */; };
+		C08C62101F67BD4500268D03 /* KeyboardPickerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C620F1F67BD4500268D03 /* KeyboardPickerButton.swift */; };
 		C0A5FF371F6682EB00BE740C /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A5FF361F6682EB00BE740C /* PopoverView.swift */; };
 		CE25CCBD1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = CE25CCBC1F1DA7BB005AA2BC /* KMHTTPDownloader.m */; };
 		CE25CCBE1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = CE25CCBC1F1DA7BB005AA2BC /* KMHTTPDownloader.m */; };
@@ -167,11 +168,6 @@
 		F2BE11001590D5E20091654B /* KeyboardNameTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = F2A0F5241590D48000AAB449 /* KeyboardNameTableViewCell.h */; };
 		F2BE11011590D5E20091654B /* KeyboardNameTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F2A0F5251590D48000AAB449 /* KeyboardNameTableViewCell.m */; };
 		F2BE11051590D5F50091654B /* KeyboardNameTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F2A0F5251590D48000AAB449 /* KeyboardNameTableViewCell.m */; };
-		F2F1039B15A35F4200D76D84 /* KMKeyboardPickerButton.h in Headers */ = {isa = PBXBuildFile; fileRef = F2F1039915A35F4200D76D84 /* KMKeyboardPickerButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F2F1039C15A35F4200D76D84 /* KMKeyboardPickerButton.h in Headers */ = {isa = PBXBuildFile; fileRef = F2F1039915A35F4200D76D84 /* KMKeyboardPickerButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F2F1039D15A35F4200D76D84 /* KMKeyboardPickerButton.m in Sources */ = {isa = PBXBuildFile; fileRef = F2F1039A15A35F4200D76D84 /* KMKeyboardPickerButton.m */; };
-		F2F1039E15A35F4200D76D84 /* KMKeyboardPickerButton.m in Sources */ = {isa = PBXBuildFile; fileRef = F2F1039A15A35F4200D76D84 /* KMKeyboardPickerButton.m */; };
-		F2F1039F15A35F4200D76D84 /* KMKeyboardPickerButton.m in Sources */ = {isa = PBXBuildFile; fileRef = F2F1039A15A35F4200D76D84 /* KMKeyboardPickerButton.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -261,6 +257,7 @@
 		98F9D6EF19545AB60087AA43 /* KMInputViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMInputViewController.m; sourceTree = "<group>"; };
 		98FFB3D31B67006F00289F0E /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		C08C620B1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardPickerBarButtonItem.swift; sourceTree = "<group>"; };
+		C08C620F1F67BD4500268D03 /* KeyboardPickerButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardPickerButton.swift; sourceTree = "<group>"; };
 		C0A5FF351F6682EA00BE740C /* KMEI-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KMEI-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0A5FF361F6682EB00BE740C /* PopoverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
 		CE25CCBC1F1DA7BB005AA2BC /* KMHTTPDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMHTTPDownloader.m; sourceTree = "<group>"; };
@@ -298,8 +295,6 @@
 		F27FCB67157FFE0B00FBBA20 /* Keyman.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Keyman.h; path = ../Keyman.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		F2A0F5241590D48000AAB449 /* KeyboardNameTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyboardNameTableViewCell.h; sourceTree = "<group>"; };
 		F2A0F5251590D48000AAB449 /* KeyboardNameTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyboardNameTableViewCell.m; sourceTree = "<group>"; };
-		F2F1039915A35F4200D76D84 /* KMKeyboardPickerButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = KMKeyboardPickerButton.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		F2F1039A15A35F4200D76D84 /* KMKeyboardPickerButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = KMKeyboardPickerButton.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -464,8 +459,7 @@
 		98C0B11817A22DB5007ECAFC /* PickerButtons */ = {
 			isa = PBXGroup;
 			children = (
-				F2F1039915A35F4200D76D84 /* KMKeyboardPickerButton.h */,
-				F2F1039A15A35F4200D76D84 /* KMKeyboardPickerButton.m */,
+				C08C620F1F67BD4500268D03 /* KeyboardPickerButton.swift */,
 				C08C620B1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift */,
 			);
 			name = PickerButtons;
@@ -746,7 +740,6 @@
 				F27FCAD6157FD43B00FBBA20 /* KMTextViewDelegateProxy.h in Headers */,
 				F27FCAD7157FD43B00FBBA20 /* KMTextField.h in Headers */,
 				F27FCB69157FFE8B00FBBA20 /* KMTextFieldDelegateProxy.h in Headers */,
-				F2F1039B15A35F4200D76D84 /* KMKeyboardPickerButton.h in Headers */,
 				CECB38981F2199FB0098882F /* Reachability.h in Headers */,
 				CE25CCC71F1F2328005AA2BC /* KMHTTPDownloadRequest.h in Headers */,
 				CE25CCC61F1F2325005AA2BC /* KMHTTPDownloader.h in Headers */,
@@ -772,7 +765,6 @@
 				F27FCAE2157FD49B00FBBA20 /* KMTextView.h in Headers */,
 				F27FCAE3157FD49B00FBBA20 /* KMTextViewDelegateProxy.h in Headers */,
 				F27FCAE4157FD49B00FBBA20 /* KMTextField.h in Headers */,
-				F2F1039C15A35F4200D76D84 /* KMKeyboardPickerButton.h in Headers */,
 				F27FCAE5157FD49B00FBBA20 /* KMTextFieldDelegateProxy.h in Headers */,
 				CECB38991F219A010098882F /* Reachability.h in Headers */,
 				98EF3BA819A5B06100A1365F /* KMSubKeysView.h in Headers */,
@@ -1029,11 +1021,11 @@
 				98F9D6F019545AB60087AA43 /* KMInputViewController.m in Sources */,
 				F2BE11051590D5F50091654B /* KeyboardNameTableViewCell.m in Sources */,
 				989BDF32193D8CEC00278BBC /* KeyboardInfoViewController.m in Sources */,
-				F2F1039D15A35F4200D76D84 /* KMKeyboardPickerButton.m in Sources */,
 				989FDF92193C1C7100EECAF9 /* KMKeyPreviewView.m in Sources */,
 				CE25CCBD1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */,
 				9878F7711B8BF00F00360B8D /* NSString+Helpers.m in Sources */,
 				9841130B199D9B84005BD609 /* KMSubKeysView.m in Sources */,
+				C08C62101F67BD4500268D03 /* KeyboardPickerButton.swift in Sources */,
 				98C2648817A0F59A00940E4F /* KeyboardPickerViewController.m in Sources */,
 				98C0B11417A20493007ECAFC /* LanguageViewController.m in Sources */,
 				98C0B11717A204BF007ECAFC /* LanguageDetailViewController.m in Sources */,
@@ -1065,7 +1057,6 @@
 				9878F7791B8BF07700360B8D /* UIButton+Helpers.m in Sources */,
 				CECB38971F2199E40098882F /* Reachability.m in Sources */,
 				F2BE11011590D5E20091654B /* KeyboardNameTableViewCell.m in Sources */,
-				F2F1039E15A35F4200D76D84 /* KMKeyboardPickerButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1094,7 +1085,6 @@
 				9878F77A1B8BF07800360B8D /* UIButton+Helpers.m in Sources */,
 				CECB38961F2199CF0098882F /* Reachability.m in Sources */,
 				F2A0F52A1590D48000AAB449 /* KeyboardNameTableViewCell.m in Sources */,
-				F2F1039F15A35F4200D76D84 /* KMKeyboardPickerButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

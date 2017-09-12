@@ -15,6 +15,4 @@
 #import "KMTextField.h"
 #import "KMTextFieldDelegateProxy.h"
 
-#import "KMKeyboardPickerButton.h"
-
 #import "KMInputViewController.h"
