@@ -185,6 +185,8 @@
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
         <DCCReference Include="kccompilekvk.pas"/>
+        <DCCReference Include="..\TIKE\compile\ValidateKeyboardInfo.pas"/>
+        <DCCReference Include="..\TIKE\compile\MergeKeyboardInfo.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

@@ -55,7 +55,9 @@ uses
   ResourceStrings,
   KCCompileProject,
   KCCompileKVK,
-  CompileKeymanWeb;
+  CompileKeymanWeb,
+  ValidateKeyboardInfo,
+  MergeKeyboardInfo;
 
 var
   hOutfile: THandle;
@@ -104,6 +106,8 @@ var
   FClean: Boolean;
   FFullySilent: Boolean;
   FWarnAsError: Boolean;
+  FValidating: Boolean;
+  FMerging: Boolean;
 begin
   FSilent := False;
   FFullySilent := False;
@@ -114,6 +118,8 @@ begin
   FClean := False;
   FNologo := False;
   FWarnAsError := False;
+  FValidating := False;
+  FMerging := False;
   FInstallerMSI := '';
 
   FParamInfile := '';
@@ -144,6 +150,8 @@ begin
         then FError := True
         else FParamTarget := ParamStr(i);
     end
+    else if s = '-v' then FValidating := True
+    else if s = '-m' then FMerging := True
     else if FParamInfile = '' then FParamInfile := ParamStr(i)
     else if FParamOutfile = '' then FParamOutfile := ParamStr(i)
     else if FParamDebugfile = '' then FParamDebugfile := ParamStr(i)
@@ -166,8 +174,9 @@ begin
   if FError or (FParamInfile = '') then
   begin
     writeln('');
-    writeln('Usage: kmcomp [-s[s]] [-nologo] [-c] [-d] [-w] infile [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
+    writeln('Usage: kmcomp [-s[s]] [-nologo] [-c] [-d] [-w] [-v] [-m] infile [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
     writeln('          infile        can be a .kmn file (Keyboard Source, .kps file (Package Source), or .kpj (project)');   // I4699   // I4825
+    writeln('                        if -v specified, can also be a .keyboard_info file');
     writeln('          outfile.kmx   can only be specified for a .kmn infile');
     writeln('          outfile.js    write a KeymanWeb file');
     writeln('          error.log     write to an error log; outfile must be specified');   // I4825
@@ -178,6 +187,8 @@ begin
     writeln('          -c       clean target (only for .kpj)');
     writeln('          -d       include debug information');
     writeln('          -w       treat warnings as errors');
+    writeln('          -v       validate infile');
+    writeln('          -m       merge information from infile (can be .kmp and .js, comma separated) into .keyboard_info output file');
     writeln('          -t       build only the target file from the project (only for .kpj)');   // I4699
     Halt(2);
   end;
@@ -194,7 +205,11 @@ begin
     else
       hOutfile := 0;
 
-    if LowerCase(ExtractFileExt(FParamInfile)) = '.kpj' then   // I4699
+    if FMerging then
+      FError := not TMergeKeyboardInfo.Execute(FParamInfile, FParamOutfile, FSilent, @CompilerMessage)
+    else if FValidating then
+      FError := not TValidateKeyboardInfo.Execute(FParamInfile, FSilent, @CompilerMessage)
+    else if LowerCase(ExtractFileExt(FParamInfile)) = '.kpj' then   // I4699
       Ferror := not DoKCCompileProject(FParamInfile, FFullySilent, FSilent, FDebug, FClean, FWarnAsError, FParamTarget)   // I4706   // I4707
     else if LowerCase(ExtractFileExt(FParamInfile)) = '.kps' then
       FError := not DoKCCompilePackage(FParamInfile, FFullySilent, FSilent, FWarnAsError, FInstaller, FInstallerMSI, FUpdateInstaller)   // I4706
