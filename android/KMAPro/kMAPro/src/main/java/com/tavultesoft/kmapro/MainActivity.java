@@ -62,12 +62,11 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener {
 
-  private KMTextView textView, textView2;
+  private KMTextView textView;
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
   private int textSize = minTextSize;
   private static final String userTextKey = "UserText";
-  private static final String userTextKey2 = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
   protected static final String dontShowGetStartedKey = "DontShowGetStarted";
   protected static final String didCheckUserDataKey = "DidCheckUserData";
@@ -87,15 +86,11 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
     setContentView(R.layout.activity_main);
     textView = (KMTextView) findViewById(R.id.kmTextView);
-    textView2 = (KMTextView) findViewById(R.id.kmTextView2);
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     textView.setText(prefs.getString(userTextKey, ""));
-    textView2.setText(prefs.getString(userTextKey2, ""));
     textSize = prefs.getInt(userTextSizeKey, minTextSize);
     textView.setTextSize((float) textSize);
-    textView2.setTextSize((float) textSize);
     textView.setSelection(textView.getText().length());
-    textView2.setSelection(textView2.getText().length());
 
     boolean didCheckUserData = prefs.getBoolean(MainActivity.didCheckUserDataKey, false);
     if (!didCheckUserData && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)) {
@@ -198,7 +193,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putString(userTextKey, textView.getText().toString());
-    editor.putString(userTextKey2, textView2.getText().toString());
     editor.putInt(userTextSizeKey, textSize);
     editor.commit();
   }
@@ -270,7 +264,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   @Override
   public void onKeyboardChanged(String newKeyboard) {
     textView.setTypeface(KMManager.getKeyboardTextFontTypeface(this));
-    textView2.setTypeface(KMManager.getKeyboardTextFontTypeface(this));
   }
 
   @Override
@@ -301,7 +294,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     Point size = new Point(0, 0);
     getWindowManager().getDefaultDisplay().getSize(size);
     int screenHeight = size.y;
-    //textView.setHeight(screenHeight - statusBarHeight - actionBarHeight - keyboardHeight);
+    textView.setHeight(screenHeight - statusBarHeight - actionBarHeight - keyboardHeight);
   }
 
   private void showInfo() {

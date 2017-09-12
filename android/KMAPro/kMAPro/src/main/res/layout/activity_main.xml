@@ -6,39 +6,19 @@
     android:background="@color/yellow_background"
     tools:context=".MainActivity" >
 
-    <LinearLayout
+    <com.tavultesoft.kmea.KMTextView
+        android:id="@+id/kmTextView"
+        android:background="@drawable/textview_bg"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:weightSum="3"
-        android:orientation="vertical">
-        <com.tavultesoft.kmea.KMTextView
-            android:id="@+id/kmTextView"
-            android:background="@drawable/textview_bg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_alignParentTop="true"
-            android:ems="10"
-            android:inputType="textMultiLine"
-            android:hint="@string/textview_hint"
-            android:gravity="top"
-            android:scrollbars="vertical" >
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:ems="10"
+        android:inputType="textMultiLine"
+        android:hint="@string/textview_hint"
+        android:gravity="top"
+        android:scrollbars="vertical" >
 
-            <requestFocus />
-        </com.tavultesoft.kmea.KMTextView>
+        <requestFocus />
+    </com.tavultesoft.kmea.KMTextView>
 
-        <com.tavultesoft.kmea.KMTextView
-            android:id="@+id/kmTextView2"
-            android:background="@drawable/textview2_bg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_alignParentTop="true"
-            android:ems="10"
-            android:inputType="textMultiLine"
-            android:hint="this is temporary..."
-            android:gravity="top"
-            android:scrollbars="vertical" >
-        </com.tavultesoft.kmea.KMTextView>
-    </LinearLayout>
 </RelativeLayout>
