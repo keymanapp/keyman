@@ -9,9 +9,9 @@
 
 #import "MainViewController.h"
 #import "KMManager.h"
-#import "KMKeyboardPickerBarButtonItem.h"
 #import "KMKeyboardPickerButton.h"
 #import <QuartzCore/QuartzCore.h>
+#import <KMEI-Swift.h>
 
 @implementation MainViewController
 
@@ -75,7 +75,7 @@
     //[[KMManager sharedInstance] fetchKeyboardsList];
 	self.view.backgroundColor = [UIColor grayColor];
 	
-	self.navigationItem.rightBarButtonItem = [KMKeyboardPickerBarButtonItem buttonWithPresentingViewController:self];
+  self.navigationItem.rightBarButtonItem = [[KeyboardPickerBarButtonItem alloc] initWithPresentingVC: self];
 	
 	UIView *contentView = [self contentView];
 	contentView.frame = self.view.bounds;
