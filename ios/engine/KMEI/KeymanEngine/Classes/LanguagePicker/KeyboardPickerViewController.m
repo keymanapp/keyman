@@ -8,8 +8,8 @@
 
 #import "KeyboardPickerViewController.h"
 #import "LanguageViewController.h"
-#import "KeyboardInfoViewController.h"
 #import "KMManager+Internal.h"
+#import <KMEI-Swift.h>
 
 static const NSInteger kmErrorAlertTag = -1;
 static const NSInteger kmToolbarButtonTag = 100;
