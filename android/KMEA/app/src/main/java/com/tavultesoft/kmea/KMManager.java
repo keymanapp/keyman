@@ -1732,11 +1732,11 @@ public final class KMManager {
 
   public static void resetContext(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
+      if (InAppKeyboard != null && InAppKeyboardLoaded) {
         InAppKeyboard.loadUrl("javascript:resetContext()");
       }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
+      if (SystemKeyboard != null && SystemKeyboardLoaded) {
         SystemKeyboard.loadUrl("javascript:resetContext()");
       }
     }
