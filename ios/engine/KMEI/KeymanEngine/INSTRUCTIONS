@@ -7,8 +7,7 @@ Creating the Library
 3) select the "Keyman-lib" target, and build for device
 	- this merges the previous 2 into a universal lib
 4) you can now find the lib and headers (there should be 9 .h files) in the xcode build directory
-	- e.g. /Users/<username>/Library/Developer/Xcode/DerivedData/Keyman-xxxxxxxxxx/Build/Products/Release-iphoneos
-	- the header files are in this same place under usr/local/include
+	- e.g. ${PROJECT_DIR}/build/libKeyman
 
 
 

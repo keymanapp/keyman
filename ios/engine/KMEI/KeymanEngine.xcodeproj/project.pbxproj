@@ -266,7 +266,7 @@
 		98F9D69A1954112F0087AA43 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		98F9D69B1954112F0087AA43 /* KeyboardViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyboardViewController.h; sourceTree = "<group>"; };
 		98F9D69C1954112F0087AA43 /* KeyboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeyboardViewController.m; sourceTree = "<group>"; };
-		98F9D6CA19541D220087AA43 /* libKeyman.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libKeyman.a; path = "DerivedData/KeymanEngine/Build/Products/Debug-iphoneos/libKeyman.a"; sourceTree = "<group>"; };
+		98F9D6CA19541D220087AA43 /* libKeyman.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libKeyman.a; path = build/libKeyman/libKeyman.a; sourceTree = "<group>"; };
 		98F9D6EE19545AB60087AA43 /* KMInputViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KMInputViewController.h; path = Classes/KMInputViewController.h; sourceTree = "<group>"; };
 		98F9D6EF19545AB60087AA43 /* KMInputViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMInputViewController.m; path = Classes/KMInputViewController.m; sourceTree = "<group>"; };
 		98FFB3D31B67006F00289F0E /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -1183,13 +1183,13 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/DerivedData/KeymanEngine/Build/Products/Debug-iphoneos",
+					"$(PROJECT_DIR)/build/libKeyman",
 				);
 				METAL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-force_load",
-					"$(PROJECT_DIR)/DerivedData/KeymanEngine/Build/Products/Debug-iphoneos/libKeyman.a",
+					"$(PROJECT_DIR)/build/libKeyman/libKeyman.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "${PRODUCT_NAME}";
 				PRODUCT_NAME = "Tavultesoft.KMEI.$(TARGET_NAME:rfc1034identifier)";
@@ -1225,12 +1225,12 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/DerivedData/KeymanEngine/Build/Products/Debug-iphoneos",
+					"$(PROJECT_DIR)/build/libKeyman",
 				);
 				METAL_ENABLE_DEBUG_INFO = NO;
 				OTHER_LDFLAGS = (
 					"-force_load",
-					"$(PROJECT_DIR)/DerivedData/KeymanEngine/Build/Products/Debug-iphoneos/libKeyman.a",
+					"$(PROJECT_DIR)/build/libKeyman/libKeyman.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "${PRODUCT_NAME}";
 				PRODUCT_NAME = "Tavultesoft.KMEI.$(TARGET_NAME:rfc1034identifier)";
