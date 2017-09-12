@@ -13,7 +13,6 @@
 #import "KMURLProtocol.h"
 #import "KMTextField.h"
 #import "KMTextView.h"
-#import "KMPopoverView.h"
 #import "KMKeyPreviewView.h"
 #import "KMSubKeysView.h"
 #import "KMKeyboardMenuView.h"
@@ -24,6 +23,7 @@
 #import <CommonCrypto/CommonDigest.h>
 #import "UIButton+Helpers.h"
 #import <objc/message.h>
+#import <KMEI-Swift.h>
 
 #pragma mark - Constants
 
@@ -85,7 +85,7 @@ NSString *const kKeymanSynchronizeSWKeyboardKey = @"KeymanSynchronizeSWKeyboard"
 
 // Views
 static id webView = nil;
-static KMPopoverView *helpBubbleView = nil;
+static PopoverView *helpBubbleView = nil;
 static KMKeyPreviewView *keyPreviewView = nil;
 static KMSubKeysView *subKeysView = nil;
 static KMKeyboardMenuView *keyboardMenuView = nil;
@@ -1126,7 +1126,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
 
 - (void)showHelpBubbleAtPoint:(CGPoint)point {
     [helpBubbleView removeFromSuperview];
-    helpBubbleView = [[KMPopoverView alloc] initWithFrame:CGRectZero];
+    helpBubbleView = [[PopoverView alloc] initWithFrame:CGRectZero];
     [helpBubbleView setBackgroundColor:[UIColor colorWithRed:253.0/255.0 green:244.0/255.0 blue:196.0/255.0 alpha:1.0]];
     [helpBubbleView setBackgroundColor2:[UIColor colorWithRed:233.0/255.0 green:224.0/255.0 blue:176.0/255.0 alpha:1.0]];
     [helpBubbleView setBorderColor:[UIColor colorWithRed:0.5 green:0.25 blue:0.25 alpha:1.0]];

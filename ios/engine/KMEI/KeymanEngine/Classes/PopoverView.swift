@@ -1,0 +1,140 @@
+//
+//  PopoverView.swift
+//  KeymanEngine
+//
+//  Created by Gabriel Wong on 2017-09-11.
+//  Copyright © 2017 SIL International. All rights reserved.
+//
+
+import UIKit
+
+class PopoverView: UIView {
+  let strokeWidth: CGFloat = 2.0
+  let arrowWidth: CGFloat = 21.0
+  let arrowHeight: CGFloat = 7.0
+  let borderRadius: CGFloat = 5.0
+  var borderColor = UIColor(red: 125.0 / 255.0, green: 133.0 / 255.0, blue: 145.0 / 255.0, alpha: 1.0)
+  var bgColor = UIColor(red: 175.0 / 255.0, green: 175.0 / 255.0, blue: 175.0 / 255.0, alpha: 0.75)
+  var backgroundColor2 = UIColor(red: 105.0 / 255.0, green: 105.0 / 255.0, blue: 105.0 / 255.0, alpha: 0.75)
+  var arrowX: CGFloat = 0.0
+
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    super.backgroundColor = UIColor.clear
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override func draw(_ rect: CGRect) {
+    guard let context = UIGraphicsGetCurrentContext() else {
+      return
+    }
+    UIGraphicsPushContext(context)
+    let currentFrame = bounds
+
+    context.setLineJoin(CGLineJoin.round)
+    context.setLineWidth(strokeWidth)
+    context.setStrokeColor(borderColor.cgColor)
+    context.setFillColor(bgColor.cgColor)
+
+    context.beginPath()
+    let arrowPosY: CGFloat = currentFrame.size.height - (arrowHeight + strokeWidth)
+    context.move(to: CGPoint(x: borderRadius + strokeWidth, y: arrowPosY))
+    context.addLine(to: CGPoint(x: arrowPosX - arrowWidth / 2.0, y: arrowPosY))
+    context.addLine(to: CGPoint(x: arrowPosX, y: currentFrame.size.height - strokeWidth))
+    context.addLine(to: CGPoint(x: arrowPosX + arrowWidth / 2.0, y: arrowPosY))
+    context.addArc(tangent1End: CGPoint(x: currentFrame.size.width - strokeWidth,
+                                        y: arrowPosY),
+                   tangent2End: CGPoint(x: currentFrame.size.width - strokeWidth,
+                                        y: strokeWidth),
+                   radius: borderRadius - strokeWidth)
+    context.addArc(tangent1End: CGPoint(x: currentFrame.size.width - strokeWidth,
+                                        y: strokeWidth),
+                   tangent2End: CGPoint(x: round(currentFrame.size.width / 2.0 +
+                      arrowWidth / 2.0) - strokeWidth,
+                                        y: strokeWidth),
+                   radius: borderRadius - strokeWidth)
+    context.addArc(tangent1End: CGPoint(x: strokeWidth, y: strokeWidth),
+                   tangent2End: CGPoint(x: strokeWidth, y: arrowPosY),
+                   radius: borderRadius - strokeWidth)
+    context.addArc(tangent1End: CGPoint(x: strokeWidth, y: arrowPosY),
+                   tangent2End: CGPoint(x: currentFrame.size.width - strokeWidth,
+                                        y: arrowPosY),
+                   radius: borderRadius - strokeWidth)
+    context.closePath()
+    context.drawPath(using: CGPathDrawingMode.fillStroke)
+
+    context.beginPath()
+    context.move(to: CGPoint(x: borderRadius + strokeWidth, y: arrowPosY))
+    context.addLine(to: CGPoint(x: arrowPosX - arrowWidth / 2.0, y: arrowPosY))
+    context.addLine(to: CGPoint(x: arrowPosX, y: currentFrame.size.height - strokeWidth))
+    context.addLine(to: CGPoint(x: arrowPosX + arrowWidth / 2.0, y: arrowPosY))
+    context.addArc(tangent1End: CGPoint(x: currentFrame.size.width - strokeWidth,
+                                        y: arrowPosY),
+                   tangent2End: CGPoint(x: currentFrame.size.width - strokeWidth,
+                                        y: strokeWidth),
+                   radius: borderRadius - strokeWidth)
+    context.addArc(tangent1End: CGPoint(x: currentFrame.size.width - strokeWidth,
+                                        y: strokeWidth),
+                   tangent2End: CGPoint(x: round(currentFrame.size.width / 2.0 +
+                       arrowWidth / 2.0) - strokeWidth,
+                                        y: strokeWidth),
+                   radius: borderRadius - strokeWidth)
+    context.addArc(tangent1End: CGPoint(x: strokeWidth, y: strokeWidth),
+                   tangent2End: CGPoint(x: strokeWidth, y: arrowPosY),
+                   radius: borderRadius - strokeWidth)
+    context.addArc(tangent1End: CGPoint(x: strokeWidth, y: arrowPosY),
+                   tangent2End: CGPoint(x: currentFrame.size.width - strokeWidth,
+                                        y: arrowPosY),
+                   radius: borderRadius - strokeWidth)
+    context.closePath()
+    context.clip()
+
+    let colorSpace = CGColorSpaceCreateDeviceRGB()
+    let gradientColors = [bgColor.cgColor, backgroundColor2.cgColor] as CFArray
+    let gradientLocations: [CGFloat] = [0, 1]
+    guard let gradient = CGGradient(colorsSpace: colorSpace, colors: gradientColors,
+                                    locations: gradientLocations) else {
+                                      return
+    }
+
+    let startPoint = CGPoint(x: rect.midX, y: rect.minY)
+    let endPoint = CGPoint(x: rect.midX, y: rect.maxY)
+
+    context.drawLinearGradient(gradient, start: startPoint, end: endPoint, options: [])
+    UIGraphicsPopContext()
+  }
+
+  override var backgroundColor: UIColor? {
+    get {
+      return super.backgroundColor
+    }
+
+    set(color) {
+      super.backgroundColor = UIColor.clear
+      if let color = color {
+        bgColor = color
+      }
+    }
+  }
+
+  var arrowPosX: CGFloat {
+    get {
+      return arrowX
+    }
+
+    set(posX) {
+      let currentFrame = bounds
+      if posX < (arrowWidth / 2.0 + borderRadius + strokeWidth) {
+        arrowX = arrowWidth / 2.0 + borderRadius + strokeWidth
+      } else if posX > (currentFrame.size.width - arrowWidth / 2.0 - borderRadius - strokeWidth) {
+        arrowX = currentFrame.size.width - arrowWidth / 2.0 - borderRadius - strokeWidth
+      } else {
+        arrowX = posX
+      }
+      setNeedsDisplay()
+    }
+  }
+}
