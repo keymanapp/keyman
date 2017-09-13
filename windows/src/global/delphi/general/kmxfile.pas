@@ -63,6 +63,7 @@ type
 
   TKeyboardInfo = record
     KeyboardID: Dword;    // Windows language
+    FileVersion: Dword;
     KeyboardName: WideString;
     CopyrightString, MessageString: WideString;
     DefaultHotkey: Dword;
@@ -332,13 +333,15 @@ begin
     Write(kfh, SizeOf(TKeyboardFileHeader));
 
     if CalculateBufferCRC(Size, Memory) <> cs then
-      raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);;
+      raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);
 
     if kfh.dwIdentifier <> FILEID_COMPILED then
-      raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);;
+      raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);
+
     if (kfh.dwFileVersion = $0500) or (kfh.dwFileVersion = $0501) or (kfh.dwFileVersion = $0600) or (kfh.dwFileVersion = $0700) or (kfh.dwFileVersion = $0800) or  // I3377
       (kfh.dwFileVersion = $0900) then  // I3377
     begin
+      ki.FileVersion := kfh.dwFileVersion;
       GetSystemStore(Memory, TSS_NAME, ki.KeyboardName);
       GetSystemStore(Memory, TSS_COPYRIGHT, ki.CopyrightString);
       GetSystemStore(Memory, TSS_MESSAGE, ki.MessageString);
