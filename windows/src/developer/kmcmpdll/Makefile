@@ -24,6 +24,6 @@ test-manifest:
     @rem This target needed as dependency for TIKE and KMCMPDLL
 
 install:
-    $(COPY) $(PROGRAM)\developer\kmcmpdll.dll "c:\program files (x86)\tavultesoft\keyman developer 9.0\kmcmpdll.dll"
+    $(COPY) $(PROGRAM)\developer\kmcmpdll.dll $(INSTALLPATH_KEYMANDEVELOPER)\kmcmpdll.dll
     
 !include ..\..\Target.mak
