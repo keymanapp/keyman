@@ -103,6 +103,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     attribute.imeOptions |= EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_FLAG_NO_FULLSCREEN;
     super.onStartInput(attribute, restarting);
     KMManager.onStartInput(attribute, restarting);
+    KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+
     //Log.i("SystemKeyboard", "onStartInput");
     InputConnection ic = getCurrentInputConnection();
     if (ic != null) {
