@@ -1,5 +1,11 @@
 ﻿KeymanWeb.KR(new Keyboard_chirality());
 
+/**
+ * Please note that this is an experimental handwritten keyboard designed for initial testing of modifier chirality support for KeymanWeb.
+ * As it is handcoded, it uses multiple codesize optimization techniques that Keyman Developer simply does not and will not employ, and it
+ * will only work with KeymanWeb based implementations.  (Not supported for Keyman Desktop or Keyman for Mac.)
+ */
+
 function Keyboard_chirality() {
   this.KI = "Keyboard_chirality";
   this.KN = "Development Chirality Test Keyboard";
@@ -42,6 +48,7 @@ function Keyboard_chirality() {
     // Maps keystrokes by base key-codes and array into the key symbols displayed in KLS.
     for(var i = 0; i < layers.length; i++) {
       // Obtain the modifier code to match for the selected layer.
+      // The following uses a non-public property potentially subject to change in the future.
       var modCode = k.osk.modifierCodes['VIRTUAL_KEY'] | k.osk.getModifierState(layers[i]);
       var layer = layers[i];
       
