@@ -39,7 +39,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
     osk.modifierBitmasks = {
       "ALL":0x007F,
-      "ALT_GR_SIM": (osk.modifierCodes["LCTRL"] | osk.modifierCodes["LALT"]),
+      "ALT_GR_SIM": (osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT']),
       "CHIRAL":0x001F,    // The base bitmask for chiral keyboards.  Includes SHIFT, which is non-chiral.
       "IS_CHIRAL":0x000F, // Used to test if a bitmask uses a chiral modifier.
       "NON_CHIRAL":0x0070 // The default bitmask, for non-chiral keyboards
@@ -782,7 +782,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
       if(keyShiftState == 0) {
         checkCodes = true;
-      } else if (keyShiftState == osk.modifierCodes["SHIFT"]) {
+      } else if (keyShiftState == osk.modifierCodes['SHIFT']) {
         checkCodes = true; 
         keyShiftState = 1; // It's used as an index.
       }
@@ -888,9 +888,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         Lkc = {Ltarg:Lelem,Lmodifiers:0,Lstates:0,Lcode:osk.keyCodes[keyName],LisVirtualKey:true};
 
         // Set the flags for the state keys.
-        Lkc.Lstates |= osk._stateKeys["K_CAPS"]    ? osk.modifierCodes["CAPS"] : osk.modifierCodes["NO_CAPS"];
-        Lkc.Lstates |= osk._stateKeys["K_NUMLOCK"] ? osk.modifierCodes["NUM_LOCK"] : osk.modifierCodes["NO_NUM_LOCK"];
-        Lkc.Lstates |= osk._stateKeys["K_SCROLL"]  ? osk.modifierCodes["SCROLL_LOCK"] : osk.modifierCodes["NO_SCROLL_LOCK"];
+        Lkc.Lstates |= osk._stateKeys['K_CAPS']    ? osk.modifierCodes['CAPS'] : osk.modifierCodes['NO_CAPS'];
+        Lkc.Lstates |= osk._stateKeys['K_NUMLOCK'] ? osk.modifierCodes['NUM_LOCK'] : osk.modifierCodes['NO_NUM_LOCK'];
+        Lkc.Lstates |= osk._stateKeys['K_SCROLL']  ? osk.modifierCodes['SCROLL_LOCK'] : osk.modifierCodes['NO_SCROLL_LOCK'];
 
         // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
         if(keyName.substr(0,2) == 'U_') Lkc.LisVirtualKey=false;
@@ -919,9 +919,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         Lkc.Lmodifiers = keyShiftState;
 
         // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
-        if((Lkc.Lmodifiers & osk.modifierBitmasks["ALT_GR_SIM"]) == osk.modifierBitmasks["ALT_GR_SIM"] && osk.emulatesAltGr()) {
-          Lkc.Lmodifiers &= ~osk.modifierBitmasks["ALT_GR_SIM"];
-          Lkc.Lmodifiers |= osk.modifierCodes["RALT"];
+        if((Lkc.Lmodifiers & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM'] && osk.emulatesAltGr()) {
+          Lkc.Lmodifiers &= ~osk.modifierBitmasks['ALT_GR_SIM'];
+          Lkc.Lmodifiers |= osk.modifierCodes['RALT'];
         }
 
         // Include *limited* support for mnemonic keyboards (Sept 2012)
@@ -1072,34 +1072,34 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     {
         var modifier=0;
         if(layerId.indexOf('shift') >= 0) {
-          modifier |= osk.modifierCodes["SHIFT"];
+          modifier |= osk.modifierCodes['SHIFT'];
         }
 
         // The chiral checks must not be directly exclusive due each other to visual OSK feedback.
         var ctrlMatched=false;
         if(layerId.indexOf('leftctrl') >= 0) {
-          modifier |= osk.modifierCodes["LCTRL"];
+          modifier |= osk.modifierCodes['LCTRL'];
           ctrlMatched=true;
         } 
         if(layerId.indexOf('rightctrl') >= 0) {
-          modifier |= osk.modifierCodes["RCTRL"];
+          modifier |= osk.modifierCodes['RCTRL'];
           ctrlMatched=true;
         } 
         if(layerId.indexOf('ctrl')  >= 0 && !ctrlMatched) {
-          modifier |= osk.modifierCodes["CTRL"];
+          modifier |= osk.modifierCodes['CTRL'];
         }
 
         var altMatched=false;
         if(layerId.indexOf('leftalt') >= 0) {
-          modifier |= osk.modifierCodes["LALT"];
+          modifier |= osk.modifierCodes['LALT'];
           altMatched=true;
         } 
         if(layerId.indexOf('rightalt') >= 0) {
-          modifier |= osk.modifierCodes["RALT"];
+          modifier |= osk.modifierCodes['RALT'];
           altMatched=true;
         } 
         if(layerId.indexOf('alt')  >= 0 && !altMatched) {
-          modifier |= osk.modifierCodes["ALT"];
+          modifier |= osk.modifierCodes['ALT'];
         }
 
         return modifier;
@@ -1151,25 +1151,25 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         switch(id)
         {
           case 'shift':
-            modifier ^= osk.modifierCodes["SHIFT"];
+            modifier ^= osk.modifierCodes['SHIFT'];
             break;
           case 'leftctrl':
-            modifier ^= osk.modifierCodes["LCTRL"];
+            modifier ^= osk.modifierCodes['LCTRL'];
             break;
           case 'rightctrl':
-            modifier ^= osk.modifierCodes["RCTRL"];
+            modifier ^= osk.modifierCodes['RCTRL'];
             break;
           case 'ctrl':
-            modifier ^= osk.modifierCodes["CTRL"];
+            modifier ^= osk.modifierCodes['CTRL'];
             break;
           case 'leftalt':
-            modifier ^= osk.modifierCodes["LALT"];
+            modifier ^= osk.modifierCodes['LALT'];
             break;
           case 'rightalt':
-            modifier ^= osk.modifierCodes["RALT"];
+            modifier ^= osk.modifierCodes['RALT'];
             break;
           case 'alt':
-            modifier ^= osk.modifierCodes["ALT"];
+            modifier ^= osk.modifierCodes['ALT'];
             break;
           default:
             s = id;
@@ -1693,8 +1693,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     osk._UpdateVKShift = function(e, v, d) {
       var keyShiftState=0, lockStates=0, i;
 
-      var lockNames  = ["CAPS", "NUM_LOCK", "SCROLL_LOCK"];
-      var lockKeys   = ["K_CAPS", "K_NUMLOCK", "K_SCROLL"];
+      var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
+      var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
 
       if(e) {
         // read shift states from Pevent
@@ -1702,9 +1702,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         lockStates = e.Lstates;
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
-        if(osk.emulatesAltGr() && (keymanweb.modStateFlags & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
-          keyShiftState |= keymanweb.isChiral() ? osk.modifierBitmasks['ALT_GR_SIM'] : osk.modifierCodes["CTRL"] | osk.modifierCodes["ALT"];
-          keyShiftState &= keymanweb.isChiral() ? ~osk.modifierCodes['RALT'] : 0;
+        if(keymanweb.isChiral() && osk.emulatesAltGr() && 
+            (keymanweb.modStateFlags & osk.modifierBitmasks.ALT_GR_SIM) == osk.modifierBitmasks.ALT_GR_SIM) {
+          keyShiftState |= osk.modifierBitmasks.ALT_GR_SIM;
+          keyShiftState &= ~osk.modifierCodes.RALT;
         }
 
         for(i=0; i < lockNames.length; i++) {
@@ -1752,7 +1753,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       if(layerId) {
         for(n=0; n<osk.layers.length; n++) {
-          if(osk.layers[n]["id"] == osk.layerId) {
+          if(osk.layers[n]['id'] == osk.layerId) {
             break;
           }
         }
@@ -1760,13 +1761,13 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         return;  // Failed to find the requested layer.
       } else {
         n=osk.layerIndex;
-        layerId=osk.layers[n]["id"];
+        layerId=osk.layers[n]['id'];
       }
 
       layer=osk.layers[n];
       
       // Set the on/off state of any visible state keys.
-      var states =["K_CAPS",      "K_NUMLOCK",  "K_SCROLL"];
+      var states =['K_CAPS',      'K_NUMLOCK',  'K_SCROLL'];
       var keys   =[layer.capsKey, layer.numKey, layer.scrollKey];
 
       for(i=0; i < keys.length; i++) {
@@ -2929,7 +2930,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return  {boolean}
      */
     osk.emulatesAltGr = function(keyLabels) {
-      return !(keyLabels ? keyLabels : osk.layers)[osk.getLayerId(osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])];
+      return !(keyLabels ? keyLabels : osk.layers)[osk.getLayerId(osk.modifierCodes.LCTRL | osk.modifierCodes.LALT)];
     }
 
     /**
@@ -2959,7 +2960,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       var n,layers=layout['layer'], keyLabels=PVK['KLS'], key102=PVK['K102'];
       var i, j, k, m, row, rows, key, keys;
-      var chiral = (kbdBitmask & osk.modifierBitmasks['IS_CHIRAL']);
+      var chiral = (kbdBitmask & osk.modifierBitmasks.IS_CHIRAL);
 
       if(typeof keyLabels == 'undefined' || !keyLabels) {
         keyLabels = osk.processLegacyDefinitions(PVK['BK']);

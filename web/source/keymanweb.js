@@ -1818,7 +1818,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param {string} x keyboard name string
      * 
      */  
-    keymanweb["removeKeyboards"] = function(x)
+    keymanweb['removeKeyboards'] = function(x)
     {
       if(arguments.length == 0) return;
 
@@ -2772,23 +2772,23 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       else return null;
       
       // Stage 1 - track the true state of the keyboard's modifiers.
-      var osk = keymanweb["osk"], prevModState = keymanweb.modStateFlags, curModState = 0x0000;
+      var osk = keymanweb['osk'], prevModState = keymanweb.modStateFlags, curModState = 0x0000;
       var ctrlEvent = false, altEvent = false;
       
       switch(s.Lcode) {
-        case osk.keyCodes["K_CTRL"]:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
-        case osk.keyCodes["K_LCTRL"]:
-        case osk.keyCodes["K_RCTRL"]:
-        case osk.keyCodes["K_CONTROL"]:
-        case osk.keyCodes["K_LCONTROL"]:
-        case osk.keyCodes["K_RCONTROL"]:
+        case osk.keyCodes['K_CTRL']:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
+        case osk.keyCodes['K_LCTRL']:
+        case osk.keyCodes['K_RCTRL']:
+        case osk.keyCodes.K_CONTROL:
+        case osk.keyCodes.K_LCONTROL:
+        case osk.keyCodes.K_RCONTROL:
           ctrlEvent = true;
           break;
-        case osk.keyCodes["K_LMENU"]:     // The 2 "K_*MENU" entries exist in some legacy keyboards.
-        case osk.keyCodes["K_RMENU"]:
-        case osk.keyCodes["K_ALT"]:
-        case osk.keyCodes["K_LALT"]:
-        case osk.keyCodes["K_RALT"]:
+        case osk.keyCodes['K_LMENU']:     // The 2 "K_*MENU" entries exist in some legacy keyboards.
+        case osk.keyCodes['K_RMENU']:
+        case osk.keyCodes.K_ALT:
+        case osk.keyCodes.K_LALT:
+        case osk.keyCodes.K_RALT:
           altEvent = true;
           break;
       }
@@ -2812,12 +2812,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       if(e.ctrlKey) {
         curModState |= ((e.location != 0 && ctrlEvent) ? 
-          (e.location == 1 ? osk.modifierCodes['LCTRL'] : osk.modifierCodes['RCTRL']) : // Condition 1
+          (e.location == 1 ? osk.modifierCodes.LCTRL : osk.modifierCodes.RCTRL) : // Condition 1
           prevModState & 0x0003);                                                       // Condition 2
       }
       if(e.altKey) {
         curModState |= ((e.location != 0 && altEvent) ? 
-          (e.location == 1 ? osk.modifierCodes['LALT'] : osk.modifierCodes['RALT']) :   // Condition 1
+          (e.location == 1 ? osk.modifierCodes.LALT : osk.modifierCodes.RALT) :   // Condition 1
           prevModState & 0x000C);                                                       // Condition 2
       }
 
@@ -2825,21 +2825,21 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       s.Lstates = 0;
       
       if(e.getModifierState("CapsLock")) {
-        s.Lstates = osk.modifierCodes["CAPS"];
+        s.Lstates = osk.modifierCodes.CAPS;
       } else {
-        s.Lstates = osk.modifierCodes["NO_CAPS"];
+        s.Lstates = osk.modifierCodes.NO_CAPS;
       }
 
       if(e.getModifierState("NumLock")) {
-        s.Lstates |= osk.modifierCodes["NUM_LOCK"];
+        s.Lstates |= osk.modifierCodes.NUM_LOCK;
       } else {
-        s.Lstates |= osk.modifierCodes["NO_NUM_LOCK"];
+        s.Lstates |= osk.modifierCodes.NO_NUM_LOCK;
       }
 
       if(e.getModifierState("ScrollLock") || e.getModifierState("Scroll")) {  // "Scroll" for IE9.
-        s.Lstates |= osk.modifierCodes["SCROLL_LOCK"];
+        s.Lstates |= osk.modifierCodes.SCROLL_LOCK;
       } else {
-        s.Lstates |= osk.modifierCodes["NO_SCROLL_LOCK"];
+        s.Lstates |= osk.modifierCodes.NO_SCROLL_LOCK;
       }
 
       // We need these states to be tracked as well for proper OSK updates.
@@ -2850,31 +2850,32 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       keymanweb.modStateFlags = curModState;
 
       // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
-      var altGrMask = osk.modifierCodes['RALT'] | osk.modifierCodes['LCTRL'];
+      var altGrMask = osk.modifierCodes.RALT | osk.modifierCodes.LCTRL;
       if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
         // We just released AltGr - make sure it's all released.
         curModState &= ~ altGrMask;
       }
       // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
-      if(curModState & osk.modifierCodes['RALT']) {
-        curModState &= ~osk.modifierCodes['LCTRL'];
+      if(curModState & osk.modifierCodes.RALT) {
+        curModState &= ~osk.modifierCodes.LCTRL;
       }
 
       // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
       if(keymanweb.isChiral()) {
-        s.Lmodifiers = curModState & osk.modifierBitmasks['CHIRAL'];
+        s.Lmodifiers = curModState & osk.modifierBitmasks.CHIRAL;
 
         // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
         // AltGr / Right-alt simulation.
-        if(osk.emulatesAltGr() && (s.Lmodifiers & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
-          s.Lmodifiers ^= osk.modifierBitmasks['ALT_GR_SIM'];
-          s.Lmodifiers |= osk.modifierCodes['RALT'];
+        if(osk.emulatesAltGr() && (s.Lmodifiers & osk.modifierBitmasks.ALT_GR_SIM) == osk.modifierBitmasks.ALT_GR_SIM) {
+          s.Lmodifiers ^= osk.modifierBitmasks.ALT_GR_SIM;
+          s.Lmodifiers |= osk.modifierCodes.RALT;
         }
       } else {
+        // No need to sim AltGr here; we don't need chiral ALTs.
         s.Lmodifiers = 
           (e.shiftKey ? 0x10 : 0) |
-          ((curModState & (osk.modifierCodes["LCTRL"] | osk.modifierCodes["RCTRL"])) ? 0x20 : 0) | 
-          ((curModState & (osk.modifierCodes["LALT"] | osk.modifierCodes["RALT"]))   ? 0x40 : 0); 
+          ((curModState & (osk.modifierCodes.LCTRL | osk.modifierCodes.RCTRL)) ? 0x20 : 0) | 
+          ((curModState & (osk.modifierCodes.LALT | osk.modifierCodes.RALT))   ? 0x40 : 0); 
       }
 
       // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
@@ -3072,7 +3073,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(LeventMatched)
       {
         keymanweb._FindCaret(Levent.Ltarg); //I779
-        if(e  &&  e.preventDefault) e.preventDefault();
+        if(e  &&  e.preventDefault) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
         keymanweb._KeyPressToSwallow = (e?e.keyCode:0);
         return false;
       }
@@ -3128,7 +3132,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(keymanweb._KeyPressToSwallow || keymanweb.callKeyboardStartGroup(Levent.Ltarg,Levent))
       {
         keymanweb._KeyPressToSwallow=0;
-        if(e  &&  e.preventDefault) e.preventDefault();
+        if(e  &&  e.preventDefault) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
         keymanweb._FindCaret(Levent.Ltarg);  // I779
         return false;
       }
@@ -3578,7 +3585,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
      */
     keymanweb.isChiral = keymanweb['isChiral'] = function(k0) {
-      return !!(keymanweb.getKeyboardModifierBitmask(k0) & keymanweb['osk'].modifierBitmasks['IS_CHIRAL']);
+      return !!(keymanweb.getKeyboardModifierBitmask(k0) & keymanweb['osk'].modifierBitmasks.IS_CHIRAL);
     }
 
     /**

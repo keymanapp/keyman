@@ -37,7 +37,7 @@ function Keyboard_chirality() {
     // Handwritten time!
     var kls = this.KV.KLS;
     
-    var layers = ['leftctrl', 'default', 'shift', 'leftctrl', 'leftctrl-shift', 'leftalt', 'rightalt', 'leftalt-shift', 'rightalt-shift'];
+    var layers = ['default', 'shift', 'leftctrl', 'leftctrl-shift', 'leftalt', 'rightalt', 'leftalt-shift', 'rightalt-shift'];
     
     // Maps keystrokes by base key-codes and array into the key symbols displayed in KLS.
     for(var i = 0; i < layers.length; i++) {

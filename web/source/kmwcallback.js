@@ -294,7 +294,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(keymanweb._ActiveKeyboard['KV']) {
         bitmask = keymanweb.getKeyboardModifierBitmask();
         if(typeof bitmask == 'undefined' || !bitmask) {
-          bitmask = osk.modifierBitmasks["NON_CHIRAL"];
+          bitmask = osk.modifierBitmasks.NON_CHIRAL;
         }
       }
 
