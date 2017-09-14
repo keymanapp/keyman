@@ -7,7 +7,6 @@
 //
 
 #import "LanguageViewController.h"
-#import "LanguageDetailViewController.h"
 #import "KMManager+Internal.h"
 #import "QuartzCore/QuartzCore.h"
 #import <UIKit/UIKit.h>
@@ -298,8 +297,9 @@ static const NSInteger kmToolbarActivityIndicatorTag = 102;
     langDetailView.languageIndex = langIndex;
     langDetailView.languageName = [[languages objectAtIndex:langIndex] objectForKey:kKeymanNameKey];
     langDetailView.languageID = [[languages objectAtIndex:langIndex] objectForKey:kKeymanIdKey];
-    langDetailView.keyboards = [[NSArray alloc] initWithArray:[[KMManager sharedInstance] keyboardsForIndex:langIndex]];
+    NSArray *keyboards = [[NSArray alloc] initWithArray:[[KMManager sharedInstance] keyboardsForIndex:langIndex]];
 
+    langDetailView.keyboards = keyboards;
     [self.navigationController pushViewController:langDetailView animated:YES];
 }
 
