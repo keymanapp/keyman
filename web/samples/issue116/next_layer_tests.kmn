@@ -1,0 +1,12 @@
+﻿store(&VERSION) '9.0'
+store(&TARGETS) 'web'
+store(&ETHNOLOGUECODE) 'eng'
+store(&COPYRIGHT) '2017 SIL International'
+store(&LAYOUTFILE) 'next_layer_tests-layout.js'
+store(&NAME) 'Issue 116'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ [T_CAPS_Q] > "CAPS MODE Q"

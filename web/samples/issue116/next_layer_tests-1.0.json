@@ -1,0 +1,20 @@
+﻿{
+  "options" : {
+    "device" : "any",
+    "keyboardBaseUri" : "http://your-host-here/keyboard-path/",
+    "fontBaseUri" : "http://your-host-here/font-path/"
+  },
+  "keyboard" : {
+    "id" : "next_layer_tests",
+    "name" : "Issue 116",
+    "filename" : "next_layer_tests-1.0.js",
+    "version" : "1.0",
+    "lastModified" : "2017-09-14T12:27:35.424+07:00",
+    "languages" : [
+      {
+        "id" : "eng",
+        "name" : "English"
+      }
+      ]
+  }
+}
