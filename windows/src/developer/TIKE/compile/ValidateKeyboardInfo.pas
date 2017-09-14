@@ -7,7 +7,7 @@ uses
 
 type
   TValidateKeyboardInfo = class
-    class function Execute(JsonFile: string; FSilent: Boolean; FCallback: TCompilerCallback): Boolean;
+    class function Execute(JsonFile: string; FDistribution, FSilent: Boolean; FCallback: TCompilerCallback): Boolean;
   end;
 
 implementation
@@ -19,7 +19,8 @@ uses
 { TValidateKeyboardInfo }
 
 const
-  SKeyboardInfoSchemaJson = 'keyboard_info.source.json';
+  SKeyboardInfoSourceSchemaJson = 'keyboard_info.source.json';
+  SKeyboardInfoDistSchemaJson = 'keyboard_info.distribution.json';
 
 var
   GCallback: TCompilerCallback = nil;
@@ -35,12 +36,14 @@ begin
   Result := TRUE;
 end;
 
-class function TValidateKeyboardInfo.Execute(JsonFile: string; FSilent: Boolean; FCallback: TCompilerCallback): Boolean;
+class function TValidateKeyboardInfo.Execute(JsonFile: string; FDistribution, FSilent: Boolean; FCallback: TCompilerCallback): Boolean;
 var
   SchemaFile: string;
 begin
   GCallback := FCallback;
-  SchemaFile := ExtractFilePath(ParamStr(0)) + SKeyboardInfoSchemaJson;
+  if FDistribution
+    then SchemaFile := ExtractFilePath(ParamStr(0)) + SKeyboardInfoDistSchemaJson
+    else SchemaFile := ExtractFilePath(ParamStr(0)) + SKeyboardInfoSourceSchemaJson;
   Result := ValidateJsonFile(PWideChar(SchemaFile), PWideChar(JsonFile), ValidateMessageProc);
   if not FSilent then
   begin

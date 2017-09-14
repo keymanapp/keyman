@@ -112,6 +112,8 @@ var
   FParamInfile2: string;
   FParamJsonFields: string;
   FJsonExtract: Boolean;
+  FParamDistribution: Boolean;
+  FMergingValidateIds: Boolean;
 begin
   FSilent := False;
   FFullySilent := False;
@@ -125,6 +127,8 @@ begin
   FValidating := False;
   FJsonExtract := False;
   FMerging := False;
+  FMergingValidateIds := False;
+  FParamDistribution := False;
   FInstallerMSI := '';
 
   FParamInfile := '';
@@ -156,6 +160,8 @@ begin
         else FParamTarget := ParamStr(i);
     end
     else if s = '-v' then FValidating := True
+    else if s = '-vs' then FValidating := True
+    else if s = '-vd' then begin FValidating := True; FParamDistribution := True; end
     else if s = '-m' then
     begin
       FMerging := True;
@@ -165,6 +171,8 @@ begin
         FParamInfile2 := ParamStr(i);
       end;
     end
+    else if s = '-m-validate-id' then
+      FMergingValidateIds := True
     else if s = '-extract-keyboard-info' then
     begin
       FJsonExtract := True;
@@ -210,8 +218,10 @@ begin
     writeln('          -t       build only the target file from the project (only for .kpj)');   // I4699
     writeln;
     writeln(' JSON .keyboard_info compile targets:');
-    writeln('          -v       validate infile');
+    writeln('          -v[s]    validate infile against source schema');
+    writeln('          -vd      validate infile against distribution schema');
     writeln('          -m       merge information from infile (can be .kmp and .js) into .keyboard_info output file');
+    writeln('          -m-validate-id validate the id against the .js, .kmx and .kmp filenames when merging');
     writeln('          -json-extract print json data .keyboard_info for build script integration');
     Halt(2);
   end;
@@ -229,9 +239,9 @@ begin
       hOutfile := 0;
 
     if FMerging then
-      FError := not TMergeKeyboardInfo.Execute(FParamInfile, FParamInfile2, FParamOutfile, FSilent, @CompilerMessage)
+      FError := not TMergeKeyboardInfo.Execute(FParamInfile, FParamInfile2, FParamOutfile, FMergingValidateIds, FSilent, @CompilerMessage)
     else if FValidating then
-      FError := not TValidateKeyboardInfo.Execute(FParamInfile, FSilent, @CompilerMessage)
+      FError := not TValidateKeyboardInfo.Execute(FParamInfile, FParamDistribution, FSilent, @CompilerMessage)
     else if FJsonExtract then
       FError := not TJsonExtractKeyboardInfo.Execute(FParamInfile, FParamJsonFields, FSilent, @CompilerMessage)
     else if LowerCase(ExtractFileExt(FParamInfile)) = '.kpj' then   // I4699

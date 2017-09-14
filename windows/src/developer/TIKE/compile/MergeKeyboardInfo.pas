@@ -46,16 +46,18 @@ type
     json: TJSONObject;
     FSilent: Boolean;
     FCallback: TCompilerCallback;
-    FJsFile, FKmpFile, FJsonFile: string;
+    FBaseName, FJsFile, FKmpFile, FJsonFile: string;
+    FMergingValidateIds: Boolean;
     FKMPInfFile: TKMPInfFile;
     FKMXFiles: array of TKeyboardInfoMap;
     FJSFileData: string;
+    FVersion: string;
     function Failed(message: string): Boolean;
     function Execute: Boolean; overload;
     function LoadJsonFile: Boolean;
     function LoadKMPFile: Boolean;
     function LoadJSFile: Boolean;
-    constructor Create(AJsFile, AKmpFile, AJsonFile: string; ASilent: Boolean; ACallback: TCompilerCallback);
+    constructor Create(AJsFile, AKmpFile, AJsonFile: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback);
     procedure AddAuthor;
     procedure AddAuthorEmail;
     procedure CheckOrAddEncodings;
@@ -70,9 +72,10 @@ type
     procedure CheckOrAddVersion;
     function SaveJsonFile: Boolean;
     function LoadKMXFile: Boolean;
+    procedure CheckKMXFilenames;
   public
     destructor Destroy; override;
-    class function Execute(AJsFile, AKmpFile, AJsonFile: string; ASilent: Boolean; ACallback: TCompilerCallback): Boolean; overload;
+    class function Execute(AJsFile, AKmpFile, AJsonFile: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean; overload;
   end;
 
 implementation
@@ -95,9 +98,9 @@ type
 { TMergeKeyboardInfo }
 
 class function TMergeKeyboardInfo.Execute(AJsFile, AKmpFile, AJsonFile: string;
-  ASilent: Boolean; ACallback: TCompilerCallback): Boolean;
+  AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean;
 begin
-  with TMergeKeyboardInfo.Create(AJsFile, AKmpFile, AJsonFile, ASilent, ACallback) do
+  with TMergeKeyboardInfo.Create(AJsFile, AKmpFile, AJsonFile, AMergingValidateIds, ASilent, ACallback) do
   try
     Result := Execute;
   finally
@@ -106,10 +109,11 @@ begin
 end;
 
 constructor TMergeKeyboardInfo.Create(AJsFile, AKmpFile, AJsonFile: string;
-  ASilent: Boolean; ACallback: TCompilerCallback);
+  AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback);
 begin
   inherited Create;
 
+  FMergingValidateIds := AMergingValidateIds;
   FSilent := ASilent;
   FCallback := ACallback;
 
@@ -125,6 +129,8 @@ begin
   end;
 
   FJsonFile := AJsonFile;
+
+  FBaseName := ChangeFileExt(ExtractFileName(FJsonFile), '');
 end;
 
 destructor TMergeKeyboardInfo.Destroy;
@@ -146,16 +152,20 @@ begin
     if not LoadJSFile then
       Exit(Failed('Could not load JS file '+FJsFile));
 
+    CheckKMXFileNames;
+
     CheckOrAddID;
     AddName;
     AddAuthor;
     AddAuthorEmail;
     AddLastModifiedDate;
+
+    CheckOrAddVersion;  // must be called before CheckOrAddJsFilename
+
     CheckOrAddPackageFilename;
     CheckOrAddJsFilename;
     CheckOrAddEncodings;
     AddPackageIncludes;
-    CheckOrAddVersion;
     CheckOrAddMinKeymanDesktopVersion;
     AddPlatformSupport;
 
@@ -351,7 +361,7 @@ begin
     FName := FKMPInfFile.Info.Desc[PackageInfo_Name]
   else if FJSFileData <> '' then
   begin
-    with TRegEx.Match(FJsFileData, '/this\.KN="([^"]+)"/') do
+    with TRegEx.Match(FJsFileData, 'this\.KN="([^"]+)"') do
     begin
       if Success
         then FName := Groups[1].Value
@@ -438,6 +448,15 @@ begin
     if FKmpFile = '' then Exit;
     json.AddPair('packageFilename', FFilename);
   end;
+
+  // Check that the id of the keyboard matches the filename; used only for release/ keyboards
+  // in the keyboards repository
+  if FMergingValidateIds then
+  begin
+    if ChangeFileExt(FFilename, '') <> FBaseName then
+      raise EInvalidKeyboardInfo.CreateFmt('packageFilename field is "%s" but should be "%s.kmp"',
+        [FFilename, FBaseName]);
+  end;
 end;
 
 //
@@ -463,11 +482,14 @@ begin
     json.AddPair('jsFilename', FFilename);
   end;
 
-
-  if json.GetValue('jsFilename') <> nil then Exit;
-  if FJsFile = '' then Exit;
-
-  json.AddPair('jsFilename', ExtractFileName(FJsFile));
+  // Check that the id of the keyboard matches the filename; used only for release/ keyboards
+  // in the keyboards repository
+  if FMergingValidateIds then
+  begin
+    if ChangeFileExt(FFilename, '') <> FBaseName+'-'+FVersion then
+      raise EInvalidKeyboardInfo.CreateFmt('jsFilename field is "%s" but should be "%s-%s.js"',
+        [FFilename, FVersion, FBaseName]);
+  end;
 end;
 
 //
@@ -504,7 +526,7 @@ begin
       else if vc.Items[i].Value = 'unicode' then Include(encodingsc, keUnicode);
 
     if encodingsc <> encodings then
-      raise EInvalidKeyboardInfo.CreateFmt('encodings field is "%s" but should be "%s"', [v.ToJSON, vc.ToJSON]);
+      raise EInvalidKeyboardInfo.CreateFmt('encodings field is "%s" but should be "%s"', [vc.ToJSON, v.ToJSON]);
   end
   else
     json.AddPair('encodings', v);
@@ -565,20 +587,20 @@ end;
 //
 procedure TMergeKeyboardInfo.CheckOrAddVersion;
 var
-  FVersion: string;
   v: TJSONValue;
 begin
-  FVersion := '1.0';
-
   if Assigned(FKMPInfFile) then
   begin
     FVersion := FKMPInfFile.Info.Desc[PackageInfo_Version];
   end
   else if FJsFileData <> '' then
   begin
-    with TRegEx.Match(FJsFileData, '/this\.KBVER="([^"]+)"/') do
-      if Success then FVersion := Groups[1].Value;
+    with TRegEx.Match(FJsFileData, 'this\.KBVER=([''"])([^''"]+)(\1)') do
+      if Success then FVersion := Groups[2].Value;
   end;
+
+  if FVersion = '' then
+    FVersion := '1.0';
 
   v := json.GetValue('version');
   if v <> nil then
@@ -652,6 +674,22 @@ begin
   end;
 
   json.AddPair('platformSupport', v);
+end;
+
+procedure TMergeKeyboardInfo.CheckKMXFilenames;
+begin
+  // Check that the id of the kmx files matches the filename; used only for release/ keyboards
+  // in the keyboards repository. This implies there should be only 1 kmx in release/ keyboard
+  // packages; this check would not be done in the packages folder.
+  if FMergingValidateIds and Assigned(FKMPInfFile) then
+  begin
+    if Length(FKMXFiles) <> 1 then
+      raise EInvalidKeyboardInfo.Create('There should be exactly 1 .kmx file in the package.');
+
+    if ChangeFileExt(FKMXFiles[0].Filename, '') <> FBaseName then
+      raise EInvalidKeyboardInfo.CreateFmt('The file "%s" file in the package has the wrong filename. It should be "%s.kmx"',
+        [FKMXFiles[0].Filename, FBaseName]);
+  end;
 end;
 
 

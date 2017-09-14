@@ -15,6 +15,7 @@ implementation
 uses
   System.Classes,
   System.Json,
+  System.StrUtils,
   System.SysUtils,
   utilstr;
 
@@ -45,7 +46,7 @@ begin
           v := json.GetValue(s);
           if Assigned(v) then
           begin
-            writeln(s+'='+v.Value);
+            writeln(s+'="'+ReplaceStr(v.Value, '"', '\"')+'"');
           end;
         end;
       finally
