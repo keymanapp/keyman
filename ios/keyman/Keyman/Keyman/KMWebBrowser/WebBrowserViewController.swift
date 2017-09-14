@@ -23,8 +23,8 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   @IBOutlet var globeButton: UIBarButtonItem!
   @IBOutlet var closeButton: UIBarButtonItem!
 
-  var fontFamily: String = UIFont.systemFont(ofSize: UIFont.systemFontSize).fontName
-  var newFontFamily: String = ""
+  var fontFamily = UIFont.systemFont(ofSize: UIFont.systemFontSize).fontName
+  var newFontFamily = ""
 
   let webBrowserLastURLKey = "KMWebBrowserLastURL"
 
@@ -170,7 +170,9 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
 
   func loadAddress(_ sender: Any, event: UIEvent) {
     guard let urlString = addressField?.text, var url = URL(string: urlString) else {
-      NSLog("Attempting to load invalid URL: %@", addressField?.text ?? "nil")
+      #if DEBUG
+        NSLog("Attempting to load invalid URL: %@", addressField?.text ?? "nil")
+      #endif
       return
     }
     if url.scheme == nil {
@@ -273,7 +275,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   }
 
   func keyboardPickerDismissed(_ notification: Notification) {
-    if !(newFontFamily == fontFamily) {
+    if newFontFamily != fontFamily {
       fontFamily = newFontFamily
       webView?.reload()
     }

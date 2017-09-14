@@ -66,6 +66,20 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
     let url = "http://keyman.com/iphone-and-ipad/app/systemkeyboard/index.php" +
         "?active=\(currentKeyboardId)&installed=\(installedKeyboards)"
     webView.loadRequest(URLRequest(url: URL(string: url)!))
-    NSLog("Set up page URL: %@", url)
+    #if DEBUG
+      NSLog("Set up page URL: %@", url)
+    #endif
+  }
+
+  func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest,
+               navigationType: UIWebViewNavigationType) -> Bool {
+    if navigationType == UIWebViewNavigationType.linkClicked {
+      if let url = request.url {
+        UIApplication.shared.openURL(url)
+      }
+      return false
+    }
+
+    return true
   }
 }

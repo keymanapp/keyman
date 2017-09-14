@@ -19,9 +19,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
-    Thread.sleep(forTimeInterval: 1.0)
-
     window = UIWindow(frame: UIScreen.main.bounds)
+
+    // Initialize overlayWindow
     _ = overlayWindow
 
     // Override point for customization after application launch.

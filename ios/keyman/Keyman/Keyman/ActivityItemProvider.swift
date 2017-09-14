@@ -11,9 +11,9 @@ import UIKit
 let htmlMailFormat =
   "<html><head><style type=\"text/css\">pre {font-family:\"%@\";font-size:%@;}</style>" +
   "</head><body><pre>%@</pre>%@</body></html>"
-let mailFooterTextForPad = "<br><br>Sent from&nbsp<a href=\"http://keyman.com/ipad\">Keyman for iPad</a>"
-let mailFooterTextForPhone = "<br><br>Sent from&nbsp<a href=\"http://keyman.com/iphone\">Keyman for iPhone</a>"
-let fbText = "Can't read this? Help at http://keyman.com/fonts"
+let mailFooterTextForPad = "<br><br>Sent from&nbsp;<a href=\"https://keyman.com/ipad\">Keyman for iPad</a>"
+let mailFooterTextForPhone = "<br><br>Sent from&nbsp;<a href=\"https://keyman.com/iphone\">Keyman for iPhone</a>"
+let fbText = "Can't read this? Help at https://keyman.com/fonts"
 
 // Prepares the share text
 class ActivityItemProvider: UIActivityItemProvider {
@@ -43,7 +43,9 @@ class ActivityItemProvider: UIActivityItemProvider {
   }
 
   func htmlMail(withText text: String, font: UIFont) -> String {
-    let mailText = text.replacingOccurrences(of: "<", with: "&lt;").replacingOccurrences(of: ">", with: "&gt;")
+    let mailText = text.replacingOccurrences(of: "&", with: "&amp;")
+      .replacingOccurrences(of: "<", with: "&lt;")
+      .replacingOccurrences(of: ">", with: "&gt;")
     let familyName = font.familyName
     let fontSize = String(Int(font.pointSize))
     let footerText: String

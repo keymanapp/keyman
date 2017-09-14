@@ -59,6 +59,10 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     return UIApplication.shared.delegate as? AppDelegate
   }
 
+  var overlayWindow: UIWindow! {
+    return appDelegate?.overlayWindow
+  }
+
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
 
@@ -539,7 +543,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
 
   func keyboardPickerDismissed(_ notification: Notification) {
     textView.becomeFirstResponder()
-    if UIDevice.current.userInterfaceIdiom == .pad {
+    if UIDevice.current.userInterfaceIdiom == .pad && shouldShowGetStarted() {
       perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
     }
   }
@@ -770,10 +774,6 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     alert.addAction(cancel)
     alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[4]
     present(alert, animated: true, completion: nil)
-  }
-
-  var overlayWindow: UIWindow! {
-    return appDelegate?.overlayWindow
   }
 
   func showActivityIndicator() {
