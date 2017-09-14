@@ -339,7 +339,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
 
     if !textView.isEditable {
       showActivityIndicator()
-    } else if shouldShowGetStarted() {
+    } else if shouldShowGetStarted {
       perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
     }
   }
@@ -543,7 +543,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
 
   func keyboardPickerDismissed(_ notification: Notification) {
     textView.becomeFirstResponder()
-    if UIDevice.current.userInterfaceIdiom == .pad && shouldShowGetStarted() {
+    if UIDevice.current.userInterfaceIdiom == .pad && shouldShowGetStarted {
       perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
     }
   }
@@ -603,7 +603,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
       if wasKeyboardVisible {
         perform(#selector(self.showKeyboard), with: nil, afterDelay: 0.75)
       }
-      if shouldShowGetStarted() {
+      if shouldShowGetStarted {
         perform(#selector(self.showGetStartedView), with: nil, afterDelay: 0.75)
       }
     } else {
@@ -841,7 +841,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
         performAction(from: launchUrl)
       } else {
         loadSavedUserText()
-        if shouldShowGetStarted() {
+        if shouldShowGetStarted {
           perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
         }
       }
@@ -851,7 +851,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
       loadSavedUserText()
       textView.isEditable = true
       textView.becomeFirstResponder()
-      if shouldShowGetStarted() {
+      if shouldShowGetStarted {
         perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
       }
     }
@@ -1084,7 +1084,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
       userData.synchronize()
       self.profileName = nil
     } else if alertView.tag == 2 {
-      if shouldShowGetStarted() {
+      if shouldShowGetStarted {
         showGetStartedView(nil)
       }
     }
@@ -1152,7 +1152,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     overlayWindow.isHidden = true
   }
 
-  func shouldShowGetStarted() -> Bool {
+  var shouldShowGetStarted: Bool {
     // Do not display "Get started" when MainView is not visible
     if navigationController?.visibleViewController != self {
       return false
