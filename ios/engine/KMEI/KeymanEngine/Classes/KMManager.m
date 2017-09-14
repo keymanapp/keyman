@@ -16,7 +16,6 @@
 #import "KMKeyPreviewView.h"
 #import "KMSubKeysView.h"
 #import "KMKeyboardMenuView.h"
-#import "KeyboardPickerViewController.h"
 #import "UIView+Helpers.h"
 #import <QuartzCore/QuartzCore.h>
 #import <CoreText/CoreText.h>
