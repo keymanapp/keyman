@@ -720,45 +720,42 @@
             "key": [
               {
                 "id": "T_CAPS_Q",
-                "text": "Q",
-                "layer": "default"
+                "text": "Q"
               },
               {
-                "id": "K_W",
-                "text": "W",
-                "layer": "shift"
+                "id": "T_CAPS_W",
+                "text": "W"
               },
               {
-                "id": "K_E",
-                "text": "E",
-                "layer": "shift"
+                "id": "T_CAPS_E",
+                "text": "E"
               },
               {
-                "id": "K_R",
+                "id": "T_CAPS_R",
                 "text": "R"
               },
               {
-                "id": "K_T",
+                "id": "T_CAPS_T",
                 "text": "T"
               },
               {
-                "id": "K_Y",
+                "id": "T_CAPS_Y",
                 "text": "Y"
               },
               {
-                "id": "K_U",
+                "id": "T_CAPS_U",
                 "text": "U"
               },
               {
-                "id": "K_I",
+                "id": "T_CAPS_I",
                 "text": "I"
               },
               {
-                "id": "K_O",
+                "id": "T_CAPS_O",
                 "text": "O"
               },
               {
-                "id": "K_P",
+                "id": "T_CAPS_P",
                 "text": "P"
               }
             ]
@@ -767,40 +764,40 @@
             "id": 2,
             "key": [
               {
-                "id": "K_A",
+                "id": "T_CAPS_A",
                 "text": "A",
                 "pad": 70
               },
               {
-                "id": "K_S",
+                "id": "T_CAPS_S",
                 "text": "S"
               },
               {
-                "id": "K_D",
+                "id": "T_CAPS_D",
                 "text": "D"
               },
               {
-                "id": "K_F",
+                "id": "T_CAPS_F",
                 "text": "F"
               },
               {
-                "id": "K_G",
+                "id": "T_CAPS_G",
                 "text": "G"
               },
               {
-                "id": "K_H",
+                "id": "T_CAPS_H",
                 "text": "H"
               },
               {
-                "id": "K_J",
+                "id": "T_CAPS_J",
                 "text": "J"
               },
               {
-                "id": "K_K",
+                "id": "T_CAPS_K",
                 "text": "K"
               },
               {
-                "id": "K_L",
+                "id": "T_CAPS_L",
                 "text": "L"
               },
               {
@@ -822,31 +819,31 @@
                 "nextlayer": "default"
               },
               {
-                "id": "K_Z",
+                "id": "T_CAPS_Z",
                 "text": "Z"
               },
               {
-                "id": "K_X",
+                "id": "T_CAPS_X",
                 "text": "X"
               },
               {
-                "id": "K_C",
+                "id": "T_CAPS_C",
                 "text": "C"
               },
               {
-                "id": "K_V",
+                "id": "T_CAPS_V",
                 "text": "V"
               },
               {
-                "id": "K_B",
+                "id": "T_CAPS_B",
                 "text": "B"
               },
               {
-                "id": "K_N",
+                "id": "T_CAPS_N",
                 "text": "N"
               },
               {
-                "id": "K_M",
+                "id": "T_CAPS_M",
                 "text": "M"
               },
               {
@@ -1644,43 +1641,39 @@
                 "layer": "default"
               },
               {
-                "id": "K_W",
-                "text": "W",
-                "layer": "shift"
+                "id": "T_CAPS_W",
+                "text": "W"
               },
               {
-                "id": "K_E",
-                "text": "E",
-                "layer": "shift"
+                "id": "T_CAPS_E",
+                "text": "E"
               },
               {
-                "id": "K_R",
-                "text": "R",
-                "layer": "shift"
+                "id": "T_CAPS_R",
+                "text": "R"
               },
               {
-                "id": "K_T",
-                "text": "T",
-                "layer": "shift"
+                "id": "T_CAPS_T",
+                "text": "T"
               },
               {
-                "id": "K_Y",
+                "id": "T_CAPS_Y",
                 "text": "Y"
               },
               {
-                "id": "K_U",
+                "id": "T_CAPS_U",
                 "text": "U"
               },
               {
-                "id": "K_I",
+                "id": "T_CAPS_I",
                 "text": "I"
               },
               {
-                "id": "K_O",
+                "id": "T_CAPS_O",
                 "text": "O"
               },
               {
-                "id": "K_P",
+                "id": "T_CAPS_P",
                 "text": "P"
               }
             ]
@@ -1689,40 +1682,40 @@
             "id": 2,
             "key": [
               {
-                "id": "K_A",
+                "id": "T_CAPS_A",
                 "text": "A",
                 "pad": "50"
               },
               {
-                "id": "K_S",
+                "id": "T_CAPS_U",
                 "text": "S"
               },
               {
-                "id": "K_D",
+                "id": "T_CAPS_D",
                 "text": "D"
               },
               {
-                "id": "K_F",
+                "id": "T_CAPS_F",
                 "text": "F"
               },
               {
-                "id": "K_G",
+                "id": "T_CAPS_G",
                 "text": "G"
               },
               {
-                "id": "K_H",
+                "id": "T_CAPS_H",
                 "text": "H"
               },
               {
-                "id": "K_J",
+                "id": "T_CAPS_J",
                 "text": "J"
               },
               {
-                "id": "K_K",
+                "id": "T_CAPS_K",
                 "text": "K"
               },
               {
-                "id": "K_L",
+                "id": "T_CAPS_L",
                 "text": "L"
               },
               {
@@ -1743,31 +1736,31 @@
                 "nextlayer": "default"
               },
               {
-                "id": "K_Z",
+                "id": "T_CAPS_Z",
                 "text": "Z"
               },
               {
-                "id": "K_X",
+                "id": "T_CAPS_X",
                 "text": "X"
               },
               {
-                "id": "K_C",
+                "id": "T_CAPS_C",
                 "text": "C"
               },
               {
-                "id": "K_V",
+                "id": "T_CAPS_V",
                 "text": "V"
               },
               {
-                "id": "K_B",
+                "id": "T_CAPS_B",
                 "text": "B"
               },
               {
-                "id": "K_N",
+                "id": "T_CAPS_N",
                 "text": "N"
               },
               {
-                "id": "K_M",
+                "id": "T_CAPS_M",
                 "text": "M"
               },
               {
