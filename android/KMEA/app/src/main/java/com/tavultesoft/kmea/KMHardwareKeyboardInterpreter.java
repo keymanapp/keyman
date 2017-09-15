@@ -9,6 +9,8 @@ import android.util.Log;
 import android.content.Context;
 import android.view.KeyEvent;
 
+import java.util.HashMap;
+
 public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
 
   /**
@@ -114,18 +116,75 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
 
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
+    Log.d("onKeyDown", "keyCode " + String.valueOf(keyCode));
+    Log.d("onKeyDown", "keyEvent.meta " + Integer.toHexString(event.getMetaState()));
+
+    // Note: Keep this table in sync with kmwosk.js osk.modifierCodes
+    final HashMap<String, Integer> modifierCodes = new HashMap<String, Integer>() {{
+      put("LCTRL", 0x0001);
+      put("RCTRL", 0x0002);
+      put("LALT", 0x0004);
+      put("RALT", 0x0008);
+      put("SHIFT", 0x0010);
+      put("CTRL", 0x0020);
+      put("ALT", 0x0040);
+      put("CAPS", 0x0100);
+      put("NO_CAPS", 0x0200);
+      put("NUM_LOCK", 0x0400);
+      put("NO_NUM_LOCK", 0x0800);
+      put("SCROLL_LOCK", 0x1000);
+      put("NO_SCROLL_LOCK", 0x2000);
+      put("VIRTUAL_KEY", 0x4000);
+    }};
+
     if (keyCode > 84 || keyCode < 0) {
       // The key is outside the range of keys we understand
       return false;
     }
 
-    int androidModifiers = event.getModifiers(), keymanModifiers = 0;
-    if ((androidModifiers & KeyEvent.META_SHIFT_ON) != 0) keymanModifiers |= 0x10;
-    if ((androidModifiers & KeyEvent.META_CTRL_ON) != 0) keymanModifiers |= 0x20;
-    if ((androidModifiers & KeyEvent.META_ALT_ON) != 0) keymanModifiers |= 0x40;
+    boolean isChiral = true; // TODO get from KMManager / KMKeyboard
+    /*
+    if (this.keyboardType == KMManager.KeyboardType.KEYBOARD_TYPE_INAPP) {
+      isChiral = KMManager.In
+    }
+    */
 
-    if (keyCode == KeyEvent.KEYCODE_TAB && keymanModifiers == 0x20) {
-      // Trigger the Keyman language menu
+    // States of modifier keys
+    // KeyEvent.getModifiers() specifically masks out lock keys (KeyEvent.META_CAPS_LOCK_ON,
+    // KeyEvent.META_SCROLL_LOCK_ON, KeyEvent.META_NUM_LOCK_ON), so get their states separately
+    int androidModifiers = event.getModifiers(), keymanModifiers = 0;
+    boolean capsOn = event.isCapsLockOn();
+    boolean numOn = event.isNumLockOn();
+    boolean scrollOn = event.isScrollLockOn();
+
+    // By design, SHIFT is non-chiral
+    if ((androidModifiers & KeyEvent.META_SHIFT_ON) != 0) {
+      keymanModifiers |= modifierCodes.get("SHIFT");
+    }
+    if ((androidModifiers & KeyEvent.META_CTRL_LEFT_ON) != 0) {
+      keymanModifiers |= isChiral ? modifierCodes.get("LCTRL") : modifierCodes.get("CTRL");
+    }
+    if ((androidModifiers & KeyEvent.META_CTRL_RIGHT_ON) != 0) {
+      keymanModifiers |= isChiral ? modifierCodes.get("RCTRL") : modifierCodes.get("CTRL");
+    }
+    if ((androidModifiers & KeyEvent.META_ALT_LEFT_ON) != 0) {
+      keymanModifiers |= isChiral ? modifierCodes.get("LALT") : modifierCodes.get("ALT");
+    }
+    if ((androidModifiers & KeyEvent.META_ALT_RIGHT_ON) != 0) {
+      keymanModifiers |= isChiral ? modifierCodes.get("RALT") : modifierCodes.get("ALT");
+    }
+
+    int Lstates = 0;
+    Lstates |= capsOn ? modifierCodes.get("CAPS") : modifierCodes.get("NO_CAPS");
+    Lstates |= numOn ? modifierCodes.get("NUM_LOCK") : modifierCodes.get("NO_NUM_LOCK");
+    Lstates |= scrollOn ? modifierCodes.get("SCROLL_LOCK") : modifierCodes.get("NO_SCROLL_LOCK");
+
+    Log.d("onKeyDown", "androidModifier 0x" + Integer.toHexString(androidModifiers));
+    Log.d("onKeyDown", "capsOn " + String.valueOf(capsOn) + " ; numOn " + String.valueOf(numOn) + "; scrollOn " + String.valueOf(scrollOn));
+    Log.d("onKeyDown", "keymanModfiers 0x" + Integer.toHexString(keymanModifiers) + ", Lstates 0x" + Integer.toHexString(Lstates));
+
+    // CTRL-Tab triggers the Keyman language menu
+    if (keyCode == KeyEvent.KEYCODE_TAB && ((androidModifiers & KeyEvent.META_CTRL_ON) != 0)) {
       KMManager.showKeyboardPicker(context, keyboardType);
       return false;
     }
@@ -136,7 +195,7 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
     }
 
     // Send keystroke to KeymanWeb for processing: will return true to swallow the keystroke
-    return KMManager.executeHardwareKeystroke(keyCodeMap[keyCode], keymanModifiers, keyboardType);
+    return KMManager.executeHardwareKeystroke(keyCodeMap[keyCode], keymanModifiers, keyboardType, Lstates);
   }
 
   @Override

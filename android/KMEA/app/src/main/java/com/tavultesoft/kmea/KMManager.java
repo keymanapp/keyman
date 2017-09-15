@@ -125,6 +125,7 @@ public final class KMManager {
   public static final String KMKey_Filename = "filename";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
+  public static final String KMKey_Chirality = "chirality";
   public static final String KMKey_CustomKeyboard = "CustomKeyboard";
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
@@ -140,6 +141,7 @@ public final class KMManager {
   public static final String KMDefault_KeyboardName = "EuroLatin2 Keyboard";
   public static final String KMDefault_LanguageName = "English";
   public static final String KMDefault_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
+  public static final String KMDefault_Chirality = "false";
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
@@ -178,22 +180,23 @@ public final class KMManager {
     IMService = service;
   }
 
-  public static boolean executeHardwareKeystroke(int code, int shift) {
+  public static boolean executeHardwareKeystroke(int code, int shift, int lstates) {
     if (SystemKeyboard != null) {
-      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_SYSTEM, lstates);
     } else if (InAppKeyboard != null) {
-      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_INAPP);
+      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_INAPP, lstates);
     }
 
     return false;
   }
 
-  public static boolean executeHardwareKeystroke(int code, int shift, KeyboardType keyboard) {
+  public static boolean executeHardwareKeystroke(
+    int code, int shift, KeyboardType keyboard, int lstates) {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      InAppKeyboard.executeHardwareKeystroke(code, shift);
+      InAppKeyboard.executeHardwareKeystroke(code, shift, lstates);
       return true;
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      SystemKeyboard.executeHardwareKeystroke(code, shift);
+      SystemKeyboard.executeHardwareKeystroke(code, shift, lstates);
       return true;
     }
 
@@ -214,6 +217,20 @@ public final class KMManager {
       InAppKeyboard.setWebViewClient(new KMInAppKeyboardWebViewClient(appContext));
       InAppKeyboard.addJavascriptInterface(new KMInAppKeyboardJSHandler(appContext), "jsInterface");
       InAppKeyboard.loadKeyboard();
+
+      // TODO: Test code adding chirality keyboard that needs to be removed before merging
+      HashMap<String, String> kbInfo = new HashMap<String, String>();
+      final String Chirality_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
+
+      kbInfo.put(KMManager.KMKey_KeyboardID, "chirality");
+      kbInfo.put(KMManager.KMKey_LanguageID, "eng");
+      kbInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
+      kbInfo.put(KMManager.KMKey_LanguageName, "English");
+      kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
+      kbInfo.put(KMManager.KMKey_Font, Chirality_KeyboardFont);
+      kbInfo.put(KMManager.KMKey_Chirality, "true");
+      addKeyboard(appContext, kbInfo);
+      // end of test code
     }
   }
 
@@ -454,9 +471,11 @@ public final class KMManager {
         newKbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
         newKbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
         newKbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
-        newKbInfo.put(KMManager.KMKey_KeyboardVersion, getLatestKeyboardFileVersion(context, KMManager.KMDefault_KeyboardID));
+        newKbInfo.put(KMManager.KMKey_KeyboardVersion,
+          getLatestKeyboardFileVersion(context, KMManager.KMDefault_KeyboardID));
         newKbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
         newKbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
+        newKbInfo.put(KMManager.KMKey_Chirality, KMDefault_Chirality);
         kbList.set(0, newKbInfo);
         shouldUpdateList = true;
         shouldClearCache = true;

@@ -56,6 +56,10 @@
       return oskWidth;
     }
 
+    function isChiral() {
+      return tavultesoft.keymanweb.isChiral();
+    }
+
     function setKeymanLanguage(keyboardName, internalName, languageName, langId, version, font, oskFont) {
       //oskFont.files = ['NotoSansSyriacWestern-Regular.svg#NotoSansSyriacWesternRegular'];
       //window.console.log('oskFonts = '+JSON.stringify(oskFont));
@@ -172,11 +176,11 @@
       kmw['executePopupKey'](keyID, keyText);
     }
 
-    function executeHardwareKeystroke(code, shift) {
+    function executeHardwareKeystroke(code, shift, lstates) {
       var kmw=window['tavultesoft']['keymanweb'];
-      window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ');');
+      window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ', ' + lstates + ');');
       try {
-        var r = kmw['executeHardwareKeystroke'](code, shift);
+        var r = kmw['executeHardwareKeystroke'](code, shift, lstates);
         window.console.log('executeHardwareKeystroke completed with '+r);
       } catch(e) {
         window.console.log('oops: '+e);

@@ -456,8 +456,9 @@
    *  
    *  @param  {number}  code   key identifier
    *  @param  {number}  shift  shift state (0x10=shift 0x20=ctrl 0x40=alt)
+   *  @param  {number}  lstate lock state (caps, num, scroll locks)
    **/            
-  keymanweb['executeHardwareKeystroke'] = function(code, shift) {              
+  keymanweb['executeHardwareKeystroke'] = function(code, shift, lstate = 0) {
     if(!keymanweb._ActiveKeyboard || code == 0) {
       return false;
     }
@@ -466,7 +467,7 @@
     device.touchable = false;
     device.formFactor = 'desktop'; 
     try {
-      result = keymanweb.executeHardwareKeystrokeInternal(code, shift);
+      result = keymanweb.executeHardwareKeystrokeInternal(code, shift, lstate);
     } catch (err) {
       console.error(err.message, err);
     }
@@ -480,8 +481,9 @@
    *  
    *  @param  {number}  code   key identifier
    *  @param  {number}  shift  shift state (0x10=shift 0x20=ctrl 0x40=alt)
+   *  @param  {number}  lstates lock state (caps, scroll, num locks)
    **/            
-  keymanweb.executeHardwareKeystrokeInternal = function(code, shift) {
+  keymanweb.executeHardwareKeystrokeInternal = function(code, shift, lstates) {
     
       // Clear any pending (non-popup) key
       osk.keyPending = null;
@@ -498,6 +500,7 @@
         Lmodifiers: shift,
         vkCode: code,
         Lcode: code,
+        Lstates: lstates,
         LisVirtualKey: true,
         LisVirtualKeyCode: false
       }; 
