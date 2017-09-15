@@ -38,7 +38,7 @@ typedef void (^KMFetchKeyboardsBlock)(NSDictionary*);
 @property (nonatomic, strong) Reachability *reachability;
 @property (nonatomic, strong) KMHTTPDownloader *downloadQueue;
 @property (nonatomic, strong) KMHTTPDownloader *sharedQueue;
-@property (nonatomic, strong) KMHTTPDownloadRequest *currentRequest;
+@property (nonatomic, strong) HTTPDownloadRequest *currentRequest;
 @property (assign) BOOL shouldReloadKeyboard;
 @property (assign) BOOL didSynchronize;
 @property (assign) BOOL blockInsertText;

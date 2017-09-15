@@ -6,8 +6,9 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
-#import "KMHTTPDownloader.h"
 #import "KMManager.h"
+#import "KMHTTPDownloader.h"
+#import <KMEI-Swift.h>
 
 @implementation KMHTTPDownloader
   - (id) init:(id<KMHTTPDownloadDelegate>) handler {
@@ -23,12 +24,12 @@
     return self;
   }
   
-  - (void) addRequest:(KMHTTPDownloadRequest *)request {
+  - (void) addRequest:(HTTPDownloadRequest *)request {
     [_queue addObject:request];
   }
   
-  - (KMHTTPDownloadRequest *) popRequest {
-    KMHTTPDownloadRequest *req = [_queue objectAtIndex:0];
+  - (HTTPDownloadRequest *) popRequest {
+    HTTPDownloadRequest *req = [_queue objectAtIndex:0];
     if (req != nil) {
       [_queue removeObjectAtIndex:0];
     }
@@ -47,13 +48,13 @@
   - (void) runRequest {
     // Perhaps more of an 'if', relying on 'completed' messages to continue the loop?
     if([_queue count] > 0) {
-      KMHTTPDownloadRequest *req = [self popRequest];
+      HTTPDownloadRequest *req = [self popRequest];
       self->_currentRequest = req;
       
-      if(req.typeCode == kmDownloadFile) {
+      if(req.typeCode == DownloadTypeDownloadFile) {
         [req setTask:[_downloadSession downloadTaskWithURL:[req url]]];
         [_handler downloadRequestStarted:req];
-      } else if(req.typeCode == kmDownloadCachedData) {
+      } else if(req.typeCode == DownloadTypeDownloadCachedData) {
         [req setTask:[_downloadSession dataTaskWithURL:[req url]]];
         //[_handler dataRequestStarted:req]; // Consider implementing later, should we need it?
       }
@@ -96,7 +97,7 @@
           completionHandler:(void (^)(NSCachedURLResponse *cachedResponse)) completionHandler {
     
     // We only evaluate one at a time, so the 'current request' holds the data task's original request data.
-    KMHTTPDownloadRequest *request = self->_currentRequest;
+    HTTPDownloadRequest *request = self->_currentRequest;
     request.rawResponseData = proposedResponse.data;
     
     completionHandler(proposedResponse); // With current internal settings, this will cache the data as we desire.
@@ -104,7 +105,7 @@
 
   - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task
           didCompleteWithError:(NSError *)error {
-    KMHTTPDownloadRequest *req = self->_currentRequest;
+    HTTPDownloadRequest *req = self->_currentRequest;
     self->_currentRequest = nil;
     
     

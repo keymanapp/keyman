@@ -1303,8 +1303,8 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
     if(completionBlock != nil) {
       userData = [NSDictionary dictionaryWithObjectsAndKeys:completionBlock, @"completionBlock", nil];
     }
-  
-    _self.currentRequest = [[KMHTTPDownloadRequest alloc] initWithURL:url downloadType:kmDownloadCachedData userInfo:userData];
+
+    _self.currentRequest = [[HTTPDownloadRequest alloc] initWithUrl:url downloadType:DownloadTypeDownloadCachedData userInfo:userData];
   
     [_self.sharedQueue addRequest:_self.currentRequest];
     [_self.sharedQueue run];
@@ -1558,7 +1558,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
       
         [self.downloadQueue setUserInfo:commonUserData];
       
-        KMHTTPDownloadRequest *request = [[KMHTTPDownloadRequest alloc] initWithURL:keyboardURL userInfo:commonUserData];
+        HTTPDownloadRequest *request = [[HTTPDownloadRequest alloc] initWithUrl:keyboardURL userInfo:commonUserData];
         [request setDestinationFile:keyboardPath];
         [request setTag:0];
       
@@ -1568,7 +1568,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
           for (int i=0; i<[keyboardFontURLs count]; i++) {
             NSString *fontPath = [self fontPathForFilename:[[keyboardFontURLs objectAtIndex:i] lastPathComponent]];
           
-            request = [[KMHTTPDownloadRequest alloc] initWithURL:[[NSURL alloc] initWithString:fontPath] userInfo:commonUserData];
+            request = [[HTTPDownloadRequest alloc] initWithUrl:[[NSURL alloc] initWithString:fontPath] userInfo:commonUserData];
             [request setDestinationFile:fontPath];
             [request setTag:i+1];
             [self.downloadQueue addRequest:request];
@@ -1717,7 +1717,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
     NSString *kbVersion = [keyboardDict objectForKey:kKeymanKeyboardVersionKey];
     NSString *keyboardPath = [self keyboardPathForFilename:[keyboardURL lastPathComponent] keyboardVersion:kbVersion];
   
-    KMHTTPDownloadRequest *request = [[KMHTTPDownloadRequest alloc] initWithURL:keyboardURL userInfo:commonUserData];
+    HTTPDownloadRequest *request = [[HTTPDownloadRequest alloc] initWithUrl:keyboardURL userInfo:commonUserData];
     [request setDestinationFile:keyboardPath];
     [request setTag:0];
   
@@ -1727,7 +1727,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
         for (int i=0; i<[keyboardFontURLs count]; i++) {
             NSString *fontPath = [self fontPathForFilename:[[keyboardFontURLs objectAtIndex:i] lastPathComponent]];
           
-            request = [[KMHTTPDownloadRequest alloc] initWithURL:[keyboardFontURLs objectAtIndex:i] userInfo:commonUserData];
+            request = [[HTTPDownloadRequest alloc] initWithUrl:[keyboardFontURLs objectAtIndex:i] userInfo:commonUserData];
             [request setDestinationFile:fontPath];
             [request setTag:i+1];
             [self.downloadQueue addRequest:request];
@@ -1746,18 +1746,18 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
     }
 }
   
-- (void)downloadRequestStarted:(KMHTTPDownloadRequest *)request {
+- (void)downloadRequestStarted:(HTTPDownloadRequest *)request {
     // If we're downloading a new keyboard.  The extra check is there to filter out other potential request types in the future.
-    if (request.tag == 0 && request.typeCode == kmDownloadFile) {
+    if (request.tag == 0 && request.typeCode == DownloadTypeDownloadFile) {
         [[NSNotificationCenter defaultCenter] postNotificationName:kKeymanKeyboardDownloadStartedNotification
                                                             object:self
                                                           userInfo:[request userInfo]];
     }
 }
 
-- (void)downloadRequestFinished:(KMHTTPDownloadRequest *)request {
+- (void)downloadRequestFinished:(HTTPDownloadRequest *)request {
   
-  if(request.typeCode == kmDownloadFile) {
+  if(request.typeCode == DownloadTypeDownloadFile) {
   
     NSString *kbId = nil;
     NSString *langId = nil;
@@ -1775,7 +1775,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
     }
     BOOL isUpdate = [[[request userInfo] objectForKey:kKeymanUpdateKey] boolValue];
     
-    int statusCode = (int)[request responseStatusCode];
+    int statusCode = (int)[request responseStatusCodeObjc];
     if (statusCode == 200) { // The request has succeeded.
         if ([self.downloadQueue requestsCount] == 0) { // Download queue finished.
             [self setDownloadQueue:nil];
@@ -1824,7 +1824,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
         
         [self downloadFailedForKeyboard:[request userInfo] error:error];
     }
-  } else if(request.typeCode == kmDownloadCachedData) {
+  } else if(request.typeCode == DownloadTypeDownloadCachedData) {
     // TODO:  Implement.
     
     if(request == self.currentRequest) {
@@ -1861,8 +1861,8 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
   }
 }
 
-- (void)downloadRequestFailed:(KMHTTPDownloadRequest *)request {
-  if(request.typeCode == kmDownloadFile) {
+- (void)downloadRequestFailed:(HTTPDownloadRequest *)request {
+  if(request.typeCode == DownloadTypeDownloadFile) {
     [self setDownloadQueue:nil];
     
     NSError *error = [request error];
@@ -1899,7 +1899,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
     }
     
     [self downloadFailedForKeyboard:[request userInfo] error:error];
-  } else if(request.typeCode == kmDownloadCachedData) {
+  } else if(request.typeCode == DownloadTypeDownloadCachedData) {
     if(request == self.currentRequest) {
       NSError *error = [self.currentRequest error];
       

@@ -7,21 +7,22 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "KMHTTPDownloadRequest.h"
+
+@class HTTPDownloadRequest;
 
 @class KMHTTPDownloader;
 
 @protocol KMHTTPDownloadDelegate
-  - (void) downloadRequestStarted:(KMHTTPDownloadRequest *)  request;
-  - (void) downloadRequestFinished:(KMHTTPDownloadRequest *) request;
-  - (void) downloadRequestFailed:(KMHTTPDownloadRequest *)   request;
+  - (void) downloadRequestStarted:(HTTPDownloadRequest *)  request;
+  - (void) downloadRequestFinished:(HTTPDownloadRequest *) request;
+  - (void) downloadRequestFailed:(HTTPDownloadRequest *)   request;
   - (void) downloadQueueFinished:(KMHTTPDownloader *)  queue;
 @end
 
 @interface KMHTTPDownloader : NSObject<NSURLSessionDelegate, NSURLSessionTaskDelegate, NSURLSessionDataDelegate> {
   // Holds the necessary HTTP requests, in order of entry.
   NSMutableArray *_queue;
-  KMHTTPDownloadRequest *_currentRequest;
+  HTTPDownloadRequest *_currentRequest;
   
   NSURLSession *_downloadSession;
 }
@@ -30,9 +31,9 @@
   
   - (id)init:(id<KMHTTPDownloadDelegate>) handler;
 
-  - (void)addRequest:(KMHTTPDownloadRequest *) request;
+  - (void)addRequest:(HTTPDownloadRequest *) request;
   
-  - (KMHTTPDownloadRequest *)popRequest;
+  - (HTTPDownloadRequest *)popRequest;
   
   - (void)cancelAllOperations;
 

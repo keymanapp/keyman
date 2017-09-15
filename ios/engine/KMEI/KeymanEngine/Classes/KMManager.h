@@ -115,7 +115,7 @@ typedef enum {
   id __weak inputDelegate_;
   KMHTTPDownloader *downloadQueue_;
   KMHTTPDownloader *sharedQueue_;
-  KMHTTPDownloadRequest *currentRequest_;
+  HTTPDownloadRequest *currentRequest_;
 	Reachability *reachability_;
 }
 
