@@ -8,19 +8,18 @@
 
 import UIKit
 
-let webBrowserBookmarksKey: String = "KMWebBrowserBookmarks"
-let bookmarkTitleKey: String = "BookmarkTitle"
-let bookmarkUrlKey: String = "BookMarkUrl"
+private let webBrowserBookmarksKey = "KMWebBrowserBookmarks"
+private let bookmarkTitleKey = "BookmarkTitle"
+private let bookmarkUrlKey = "BookMarkUrl"
 
-class BookmarksViewController:
-UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegate {
+class BookmarksViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegate {
   weak var webBrowser: WebBrowserViewController?
 
   @IBOutlet var tableView: UITableView!
   @IBOutlet var doneButton: UIBarButtonItem!
   @IBOutlet var navBarTopConstraint: NSLayoutConstraint!
   // TODO: Create struct for bookmarks
-  var bookmarks = [[String: String]]()
+  private var bookmarks = [[String: String]]()
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -66,7 +65,7 @@ UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegat
     alert.show()
   }
 
-  func checkIfEmpty() {
+  private func checkIfEmpty() {
     if tableView.numberOfSections == 0 {
       let label = UILabel(frame: tableView.frame)
       label.textAlignment = .center
@@ -77,12 +76,12 @@ UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegat
     }
   }
 
-  func loadBookmarks() {
+  private func loadBookmarks() {
     let userData = AppDelegate.activeUserDefaults()
     bookmarks = userData.object(forKey: webBrowserBookmarksKey) as? [[String: String]] ?? [[String: String]]()
   }
 
-  func saveBookmarks() {
+  private func saveBookmarks() {
     let userData = AppDelegate.activeUserDefaults()
     if !bookmarks.isEmpty {
       userData.set(bookmarks, forKey: webBrowserBookmarksKey)
@@ -91,8 +90,6 @@ UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegat
     }
     userData.synchronize()
   }
-
-  // MARK: - Table view data source
 
   func numberOfSections(in tableView: UITableView) -> Int {
     // Return the number of sections.
@@ -122,7 +119,6 @@ UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegat
     return cell
   }
 
-  // MARK: - Table view delegate
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     let bookmark = bookmarks[indexPath.section]
     cell.textLabel?.text = bookmark[bookmarkTitleKey]
@@ -154,7 +150,7 @@ UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegat
     performAction(for: indexPath)
   }
 
-  func performAction(for indexPath: IndexPath) {
+  private func performAction(for indexPath: IndexPath) {
     let bookmark = bookmarks[indexPath.section]
     if let urlString = bookmark[bookmarkUrlKey], let url = URL(string: urlString) {
       webBrowser?.webView?.loadRequest(URLRequest(url: url))
@@ -162,7 +158,6 @@ UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegat
     dismiss(animated: true, completion: nil)
   }
 
-  // MARK: - Alert view delegate
   func alertView(_ alertView: UIAlertView, clickedButtonAt buttonIndex: Int) {
     if buttonIndex == alertView.cancelButtonIndex {
       return

@@ -11,7 +11,7 @@ import UIKit
 class InfoViewController: UIViewController, UIWebViewDelegate {
   @IBOutlet var webView: UIWebView!
 
-  var networkReachable: Reachability?
+  private var networkReachable: Reachability?
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -37,12 +37,12 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
     }
   }
 
-  func loadFromLocal() {
+  private func loadFromLocal() {
     let filePath = Bundle.main.path(forResource: "info", ofType: "html", inDirectory: nil)
     webView.loadRequest(URLRequest(url: URL.init(fileURLWithPath: filePath!)))
   }
 
-  func loadFromServer() {
+  private func loadFromServer() {
     let keyboardInfo = KMManager.sharedInstance().currentKeyboardInfo() as? [AnyHashable : String]
     let currentKeyboardId = keyboardInfo?[kKeymanKeyboardIdKey] ?? kKeymanDefaultKeyboardID
     let userData = AppDelegate.activeUserDefaults()

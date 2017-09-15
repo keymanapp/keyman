@@ -443,12 +443,12 @@
 		9845A79A1A43983300544E2E /* KMWebBrowser */ = {
 			isa = PBXGroup;
 			children = (
-				9845A8BD1A439F1000544E2E /* Icons */,
 				9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */,
 				9845A79D1A43983300544E2E /* WebBrowserViewController.xib */,
-				9845A79E1A43983300544E2E /* NavBar */,
 				C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */,
 				C0A1A6361F5E8C9100EAF822 /* WebBrowserViewController.swift */,
+				9845A8BD1A439F1000544E2E /* Icons */,
+				9845A79E1A43983300544E2E /* NavBar */,
 			);
 			path = KMWebBrowser;
 			sourceTree = "<group>";

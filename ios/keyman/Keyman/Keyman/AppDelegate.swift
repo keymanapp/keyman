@@ -51,6 +51,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _overlayWindow = nil
     KMManager.sharedInstance().unregisterCustomFonts()
     let userData = AppDelegate.activeUserDefaults()
+    // TODO: Have viewController save its data
     userData.set(viewController?.textView?.text, forKey: userTextKey)
     userData.set(viewController?.textSize.description, forKey: userTextSizeKey)
     userData.synchronize()

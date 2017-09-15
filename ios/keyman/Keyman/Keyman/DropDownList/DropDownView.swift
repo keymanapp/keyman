@@ -13,14 +13,14 @@ class DropDownView: UIView {
   let borderRadius: CGFloat = 5.0
   let arrowWidth: CGFloat = 21.0
   let arrowHeight: CGFloat = 7.0
-  let borderColor = UIColor.lightGray
+  private let borderColor = UIColor.lightGray
 
-  var arrowX: CGFloat
-  var bgColor = UIColor(white: 1.0, alpha: 1.0)
+  private var _arrowPosX: CGFloat
+  private var bgColor = UIColor(white: 1.0, alpha: 1.0)
   var backgroundColor2 = UIColor(white: 1.0, alpha: 1.0)
 
   override init(frame: CGRect) {
-    arrowX = frame.width / 2.0
+    _arrowPosX = frame.width / 2.0
     super.init(frame: frame)
     super.backgroundColor = UIColor.clear
   }
@@ -115,16 +115,16 @@ class DropDownView: UIView {
 
   var arrowPosX: CGFloat {
     get {
-      return arrowX
+      return _arrowPosX
     }
 
     set(x) {
       if x < (arrowWidth / 2.0 + borderRadius + strokeWidth) {
-        arrowX = arrowWidth / 2.0 + borderRadius + strokeWidth
+        _arrowPosX = arrowWidth / 2.0 + borderRadius + strokeWidth
       } else if x > (bounds.width - arrowWidth / 2.0 - borderRadius - strokeWidth) {
-        arrowX = bounds.width - arrowWidth / 2.0 - borderRadius - strokeWidth
+        _arrowPosX = bounds.width - arrowWidth / 2.0 - borderRadius - strokeWidth
       } else {
-        arrowX = x
+        _arrowPosX = x
       }
 
       setNeedsDisplay()

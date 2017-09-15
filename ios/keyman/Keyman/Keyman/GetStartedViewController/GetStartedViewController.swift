@@ -55,7 +55,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
                              width: dontShowAgainSwitch.frame.width,
                              height: dontShowAgainSwitch.frame.height)
     dontShowAgainSwitch.frame = switchFrame
-    dontShowAgainSwitch.isOn = dontShowGetStarted()
+    dontShowAgainSwitch.isOn = dontShowGetStarted
     dontShowAgainSwitch.addTarget(self, action: #selector(self.switchValueChanged),
                                   for: .valueChanged)
 
@@ -68,7 +68,6 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     tableView.tableFooterView = footer
   }
 
-  // MARK: - Table view data source
   func numberOfSections(in tableView: UITableView) -> Int {
     return 3
   }
@@ -95,7 +94,6 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     return cell
   }
 
-  // MARK: - Table view delegate
   func tableView(_ tableView: UITableView,
                  willDisplay cell: UITableViewCell,
                  forRowAt indexPath: IndexPath) {
@@ -135,7 +133,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     performAction(for: indexPath)
   }
 
-  func performAction(for indexPath: IndexPath) {
+  private func performAction(for indexPath: IndexPath) {
     switch indexPath.section {
     case 0:
       mainViewController?.dismissGetStartedView(nil)
@@ -156,7 +154,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     tableView.reloadData()
   }
 
-  func didAddKeyboard() -> Bool {
+  private func didAddKeyboard() -> Bool {
     let userData = AppDelegate.activeUserDefaults()
     let userKbs = userData.object(forKey: kKeymanUserKeyboardsListKey) as? [[AnyHashable: String]]
     guard let userKeyboards = userKbs else {
@@ -188,7 +186,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     }
   }
 
-  func dontShowGetStarted() -> Bool {
+  private var dontShowGetStarted: Bool {
     let userData = AppDelegate.activeUserDefaults()
     return userData.bool(forKey: dontShowGetStartedKey)
   }

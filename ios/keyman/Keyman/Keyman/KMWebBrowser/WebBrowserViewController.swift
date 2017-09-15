@@ -13,10 +13,12 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   @IBOutlet var navBar: UINavigationBar!
   @IBOutlet var toolBar: UIToolbar!
   @IBOutlet var navBarTopConstraint: NSLayoutConstraint!
-  var addressField: UITextField!
-  var rightView: UIView!
-  var refreshButton: UIButton!
-  var stopButton: UIButton!
+
+  private var addressField: UITextField!
+  private var rightView: UIView!
+  private var refreshButton: UIButton!
+  private var stopButton: UIButton!
+
   @IBOutlet var backButton: UIBarButtonItem!
   @IBOutlet var forwardButton: UIBarButtonItem!
   @IBOutlet var bookmarksButton: UIBarButtonItem!
@@ -24,9 +26,9 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   @IBOutlet var closeButton: UIBarButtonItem!
 
   var fontFamily = UIFont.systemFont(ofSize: UIFont.systemFontSize).fontName
-  var newFontFamily = ""
+  private var newFontFamily = ""
 
-  let webBrowserLastURLKey = "KMWebBrowserLastURL"
+  private let webBrowserLastURLKey = "KMWebBrowserLastURL"
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -220,7 +222,6 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     dismiss(animated: true, completion: nil)
   }
 
-  // MARK: - UIWebViewDelegate methods
   func webView(_ webView: UIWebView,
                shouldStartLoadWith request: URLRequest,
                navigationType: UIWebViewNavigationType) -> Bool {
@@ -250,14 +251,14 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     alert.show()
   }
 
-  func updateButtons() {
+  private func updateButtons() {
     refreshButton.isHidden = webView.isLoading
     stopButton.isHidden = !webView.isLoading
     backButton.isEnabled = webView.canGoBack
     forwardButton.isEnabled = webView.canGoForward
   }
 
-  func appendCSSFontFamily() {
+  private func appendCSSFontFamily() {
     let jsStr: String = "var style = document.createElement('style');" +
       "style.type = 'text/css';" +
       "style.innerHTML = '*{font-family:\"\(fontFamily)\" !important;}';" +

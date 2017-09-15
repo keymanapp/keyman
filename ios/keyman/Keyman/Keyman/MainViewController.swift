@@ -31,29 +31,29 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
   var textView: KMTextView!
   var textSize: CGFloat = 0.0
 
-  var getStartedVC: GetStartedViewController!
-  var infoView: InfoViewController!
-  var popover: UIPopoverController?
-  var textSizeController: UISlider!
-  var dropdownItems: [UIBarButtonItem]!
+  private var getStartedVC: GetStartedViewController!
+  private var infoView: InfoViewController!
+  private var popover: UIPopoverController?
+  private var textSizeController: UISlider!
+  private var dropdownItems: [UIBarButtonItem]!
 
-  var profiles2Install = [String]()
-  var checkedProfiles = [String]()
-  var profileName: String?
-  var launchUrl: URL?
-  var keyboard2Download = [String: Any]()
-  var customKeyboard2Download = [String: Any]()
-  var wasKeyboardVisible: Bool = false
+  private var profiles2Install: [String] = []
+  private var checkedProfiles: [String] = []
+  private var profileName: String?
+  private var launchUrl: URL?
+  private var keyboard2Download: [String: Any] = [:]
+  private var customKeyboard2Download: [String: Any] = [:]
+  private var wasKeyboardVisible: Bool = false
 
-  var screenWidth: CGFloat = 0.0
-  var screenHeight: CGFloat = 0.0
-  var portLeftMargin: CGFloat = 0.0
-  var portRightMargin: CGFloat = 0.0
-  var lscpeLeftMargin: CGFloat = 0.0
-  var lscpeRightMargin: CGFloat = 0.0
-  var loadTimer: Timer?
-  var updateStatus: Int = 0  // TODO: Make into enum
-  var didDownload: Bool = false
+  private var screenWidth: CGFloat = 0.0
+  private var screenHeight: CGFloat = 0.0
+  private var portLeftMargin: CGFloat = 0.0
+  private var portRightMargin: CGFloat = 0.0
+  private var lscpeLeftMargin: CGFloat = 0.0
+  private var lscpeRightMargin: CGFloat = 0.0
+  private var loadTimer: Timer?
+  private var updateStatus: Int = 0  // TODO: Make into enum
+  private var didDownload: Bool = false
 
   var appDelegate: AppDelegate! {
     return UIApplication.shared.delegate as? AppDelegate
@@ -233,7 +233,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     wasKeyboardVisible = textView.isFirstResponder
   }
 
-  func setNavBarButtons() {
+  private func setNavBarButtons() {
     let orientation: UIInterfaceOrientation = UIApplication.shared.statusBarOrientation
     let fixedSpace = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
 
@@ -300,11 +300,11 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  func createNavBarButton(with image: UIImage,
-                          highlightedImage imageHighlighted: UIImage,
-                          imageScale scaleF: CGFloat,
-                          action selector: Selector,
-                          orientation: UIInterfaceOrientation) -> UIBarButtonItem {
+  private func createNavBarButton(with image: UIImage,
+                                  highlightedImage imageHighlighted: UIImage,
+                                  imageScale scaleF: CGFloat,
+                                  action selector: Selector,
+                                  orientation: UIInterfaceOrientation) -> UIBarButtonItem {
     let icon = image.resize(to: CGSize(width: image.size.width * scaleF, height: image.size.height * scaleF))
         .withRenderingMode(.alwaysOriginal)
     let iconHighlighted = imageHighlighted.resize(to:
@@ -390,7 +390,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     resizeViews(withKeyboardVisible: textView.isFirstResponder)
   }
 
-  func resizeViews(withKeyboardVisible keyboardVisible: Bool) {
+  private func resizeViews(withKeyboardVisible keyboardVisible: Bool) {
     // Resize textView and infoView
     let mainScreen: CGRect = UIScreen.main.bounds
     let margin: CGFloat = 2.0
@@ -404,15 +404,14 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     infoView?.view?.frame = CGRect(x: 0, y: barHeights, width: width, height: height + kbHeight)
   }
 
-  func navBarWidth() -> CGFloat {
+  private func navBarWidth() -> CGFloat {
     return navigationController!.navigationBar.frame.width
   }
 
-  func navBarHeight() -> CGFloat {
+  private func navBarHeight() -> CGFloat {
     return navigationController!.navigationBar.frame.height
   }
 
-  // MARK: - Keyboard notifications
   func keyboardWillShow(_ notification: Notification) {
     _ = dismissDropDownMenu()
     resizeViews(withKeyboardVisible: true)
@@ -431,7 +430,6 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     resizeViews(withKeyboardVisible: false)
   }
 
-  // MARK: - Keyman notifications
   func keyboardLoaded(_ notification: Notification) {
     startTimer()
   }
@@ -809,19 +807,19 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     textSizeTitle?.text = "Text size: \(Int(textSize))"
   }
 
-  func rectForBarButtonItem(_ barButtonItem: UIBarButtonItem) -> CGRect {
+  private func rectForBarButtonItem(_ barButtonItem: UIBarButtonItem) -> CGRect {
     let view =  barButtonItem.value(forKey: "view") as? UIView
     return view?.frame ?? CGRect.zero
   }
 
-  func startTimer() {
+  private func startTimer() {
     if loadTimer == nil {
       loadTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self,
                                        selector: #selector(self.timerAction), userInfo: nil, repeats: true)
     }
   }
 
-  func stopTimer() {
+  private func stopTimer() {
     if let timer = loadTimer {
       timer.invalidate()
       loadTimer = nil
@@ -857,7 +855,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  func resetTextViewCursor() {
+  private func resetTextViewCursor() {
     textView.selectedRange = NSRange(location: 0, length: 0)
 
     // TODO: Figure out what this does
@@ -867,7 +865,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  func loadSavedUserText() {
+  private func loadSavedUserText() {
     let userData = AppDelegate.activeUserDefaults()
     let userText = userData.object(forKey: userTextKey) as? String
     let userTextSize = userData.object(forKey: userTextSizeKey) as? String
@@ -883,7 +881,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  func params(of query: String) -> [String: String] {
+  private func params(of query: String) -> [String: String] {
     let components = query.components(separatedBy: "&")
     return components.reduce([String: String]()) { prevParams, s in
       var params = prevParams
@@ -896,7 +894,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
   }
 
   // TODO: Refactor control flow
-  func performAction(from url: URL) {
+  private func performAction(from url: URL) {
     guard let query = url.query else {
       launchUrl = nil
       return
@@ -964,7 +962,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  func dictionaryWithKeyboardID(_ kbID: String, languageID langID: String) -> [String: String]? {
+  private func dictionaryWithKeyboardID(_ kbID: String, languageID langID: String) -> [String: String]? {
     let index = KMManager.sharedInstance().indexForUserKeyboard(withID: kbID, languageID: langID)
 
     if index < 0 {
@@ -975,7 +973,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     return userKeyboards?[index] as? [String: String]
   }
 
-  func profileNameWithKeyboardID(_ kbID: String, languageID langID: String) -> String? {
+  private func profileNameWithKeyboardID(_ kbID: String, languageID langID: String) -> String? {
     guard let kbDict = dictionaryWithKeyboardID(kbID, languageID: langID) else {
       return nil
     }
@@ -986,7 +984,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     return profileNameWithJSONFont(jsonFont)
   }
 
-  func profileNameWithJSONFont(_ jsonFont: String) -> String? {
+  private func profileNameWithJSONFont(_ jsonFont: String) -> String? {
     guard let fontData = jsonFont.data(using: String.Encoding.utf8) else {
       return nil
     }
@@ -1002,7 +1000,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     return nil
   }
 
-  func checkProfile(forKeyboardID kbID: String, languageID langID: String, doListCheck: Bool) {
+  private func checkProfile(forKeyboardID kbID: String, languageID langID: String, doListCheck: Bool) {
     if (kbID == kKeymanDefaultKeyboardID) && (langID == kKeymanDefaultLanguageID) {
       return
     }
@@ -1037,8 +1035,8 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     textView.becomeFirstResponder()
   }
 
-  func showAlert(withTitle title: String, message msg: String, cancelButtonTitle cbTitle: String?,
-                 otherButtonTitles obTitles: String?, tag: Int) {
+  private func showAlert(withTitle title: String, message msg: String, cancelButtonTitle cbTitle: String?,
+                         otherButtonTitles obTitles: String?, tag: Int) {
     dismissGetStartedView(nil)
     let alertView = UIAlertView(title: title, message: msg, delegate: self, cancelButtonTitle: cbTitle,
                                 otherButtonTitles: obTitles ?? "")
@@ -1046,7 +1044,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     alertView.show()
   }
 
-  func performAlertButtonClick(withTag tag: Int) {
+  private func performAlertButtonClick(withTag tag: Int) {
     switch tag {
     case 0:
       let langID = keyboard2Download[kKeymanLanguageIdKey] as? String
@@ -1110,7 +1108,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     navigationController?.view?.addSubview(dropDownList)
   }
 
-  func dismissDropDownMenu() -> Bool {
+  private func dismissDropDownMenu() -> Bool {
     let view = navigationController?.view?.viewWithTag(dropDownListTag)
     if view != nil && wasKeyboardVisible {
       textView.becomeFirstResponder()
@@ -1152,7 +1150,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     overlayWindow.isHidden = true
   }
 
-  var shouldShowGetStarted: Bool {
+  private var shouldShowGetStarted: Bool {
     // Do not display "Get started" when MainView is not visible
     if navigationController?.visibleViewController != self {
       return false
@@ -1190,11 +1188,13 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     popover?.dismiss(animated: false)
     _ = dismissDropDownMenu()
     let webBrowserVC = WebBrowserViewController()
-    webBrowserVC.fontFamily = (textView.font?.fontName)!
+    if let fontFamily = textView.font?.fontName {
+      webBrowserVC.fontFamily = fontFamily
+    }
     present(webBrowserVC, animated: true, completion: nil)
   }
 
-  func transform(for orientation: UIInterfaceOrientation) -> CGAffineTransform {
+  private func transform(for orientation: UIInterfaceOrientation) -> CGAffineTransform {
     return CGAffineTransform.identity
   }
 }
