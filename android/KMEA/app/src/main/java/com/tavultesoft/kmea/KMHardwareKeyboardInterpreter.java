@@ -116,9 +116,6 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
 
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
-    Log.d("onKeyDown", "keyCode " + String.valueOf(keyCode));
-    Log.d("onKeyDown", "keyEvent.meta " + Integer.toHexString(event.getMetaState()));
-
     // Note: Keep this table in sync with kmwosk.js osk.modifierCodes
     final HashMap<String, Integer> modifierCodes = new HashMap<String, Integer>() {{
       put("LCTRL", 0x0001);
@@ -142,12 +139,14 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
       return false;
     }
 
-    boolean isChiral = true; // TODO get from KMManager / KMKeyboard
-    /*
+    boolean isChiral = false;
     if (this.keyboardType == KMManager.KeyboardType.KEYBOARD_TYPE_INAPP) {
-      isChiral = KMManager.In
+      isChiral = KMManager.InAppKeyboard.getChirality();
+    } else if (this.keyboardType == KMManager.KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      isChiral = KMManager.SystemKeyboard.getChirality();
     }
-    */
+    Log.d("onKeyDown", "keyCode " + String.valueOf(keyCode) + "; keyEvent.meta " +
+      Integer.toHexString(event.getMetaState()) + "; isChiral " + String.valueOf(isChiral));
 
     // States of modifier keys
     // KeyEvent.getModifiers() specifically masks out lock keys (KeyEvent.META_CAPS_LOCK_ON,
@@ -174,11 +173,13 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
       keymanModifiers |= isChiral ? modifierCodes.get("RALT") : modifierCodes.get("ALT");
     }
 
+    // TODO : How to handle Caps lock for non-chiral keyboards?
     int Lstates = 0;
-    Lstates |= capsOn ? modifierCodes.get("CAPS") : modifierCodes.get("NO_CAPS");
-    Lstates |= numOn ? modifierCodes.get("NUM_LOCK") : modifierCodes.get("NO_NUM_LOCK");
-    Lstates |= scrollOn ? modifierCodes.get("SCROLL_LOCK") : modifierCodes.get("NO_SCROLL_LOCK");
-
+    if (isChiral) {
+      Lstates |= capsOn ? modifierCodes.get("CAPS") : modifierCodes.get("NO_CAPS");
+      Lstates |= numOn ? modifierCodes.get("NUM_LOCK") : modifierCodes.get("NO_NUM_LOCK");
+      Lstates |= scrollOn ? modifierCodes.get("SCROLL_LOCK") : modifierCodes.get("NO_SCROLL_LOCK");
+    }
     Log.d("onKeyDown", "androidModifier 0x" + Integer.toHexString(androidModifiers));
     Log.d("onKeyDown", "capsOn " + String.valueOf(capsOn) + " ; numOn " + String.valueOf(numOn) + "; scrollOn " + String.valueOf(scrollOn));
     Log.d("onKeyDown", "keymanModfiers 0x" + Integer.toHexString(keymanModifiers) + ", Lstates 0x" + Integer.toHexString(Lstates));

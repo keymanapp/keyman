@@ -125,7 +125,6 @@ public final class KMManager {
   public static final String KMKey_Filename = "filename";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
-  public static final String KMKey_Chirality = "chirality";
   public static final String KMKey_CustomKeyboard = "CustomKeyboard";
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
@@ -141,7 +140,6 @@ public final class KMManager {
   public static final String KMDefault_KeyboardName = "EuroLatin2 Keyboard";
   public static final String KMDefault_LanguageName = "English";
   public static final String KMDefault_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
-  public static final String KMDefault_Chirality = "false";
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
@@ -228,8 +226,8 @@ public final class KMManager {
       kbInfo.put(KMManager.KMKey_LanguageName, "English");
       kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
       kbInfo.put(KMManager.KMKey_Font, Chirality_KeyboardFont);
-      kbInfo.put(KMManager.KMKey_Chirality, "true");
       addKeyboard(appContext, kbInfo);
+      Log.d("KMM", "initInApp");
       // end of test code
     }
   }
@@ -248,6 +246,7 @@ public final class KMManager {
       SystemKeyboard.setWebViewClient(new KMSystemKeyboardWebViewClient(appContext));
       SystemKeyboard.addJavascriptInterface(new KMSystemKeyboardJSHandler(appContext), "jsInterface");
       SystemKeyboard.loadKeyboard();
+      Log.d("KMM", "initSystem");
     }
   }
 
@@ -330,6 +329,7 @@ public final class KMManager {
   }
 
   public static void onConfigurationChanged(Configuration newConfig) {
+    Log.d("KMM", "onConfigChanged");
     // KMKeyboard
     if (InAppKeyboard != null) {
       InAppKeyboard.onConfigurationChanged(newConfig);
@@ -475,7 +475,6 @@ public final class KMManager {
           getLatestKeyboardFileVersion(context, KMManager.KMDefault_KeyboardID));
         newKbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
         newKbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
-        newKbInfo.put(KMManager.KMKey_Chirality, KMDefault_Chirality);
         kbList.set(0, newKbInfo);
         shouldUpdateList = true;
         shouldClearCache = true;
@@ -1381,6 +1380,7 @@ public final class KMManager {
   }
 
   public static void switchToNextKeyboard(Context context) {
+    Log.d("KMM", "switchToNextKeyboard");
     int index = KeyboardPickerActivity.getCurrentKeyboardIndex(context);
     index++;
     HashMap<String, String> kbInfo = KeyboardPickerActivity.getKeyboardInfo(context, index);
@@ -2277,6 +2277,12 @@ public final class KMManager {
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
+    public void setIsChiral(boolean isChiral) {
+      InAppKeyboard.setChirality(isChiral);
+    }
+
+    // This annotation is required in Jelly Bean and later:
+    @JavascriptInterface
     public void insertText(final int dn, final String s) {
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
@@ -2378,6 +2384,12 @@ public final class KMManager {
       DisplayMetrics dms = context.getResources().getDisplayMetrics();
       int kbWidth = (int) (dms.widthPixels / dms.density);
       return kbWidth;
+    }
+
+    // This annotation is required in Jelly Bean and later:
+    @JavascriptInterface
+    public void setIsChiral(boolean isChiral) {
+      SystemKeyboard.setChirality(isChiral);
     }
 
     // This annotation is required in Jelly Bean and later:

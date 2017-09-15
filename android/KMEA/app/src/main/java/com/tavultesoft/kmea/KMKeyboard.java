@@ -54,6 +54,7 @@ final class KMKeyboard extends WebView {
   private GestureDetector gestureDetector;
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
   private boolean ShouldShowHelpBubble = false;
+  private boolean isChiral = false;
 
   protected boolean keyboardSet = false;
   protected boolean keyboardPickerEnabled = true;
@@ -65,7 +66,6 @@ final class KMKeyboard extends WebView {
   public ArrayList<HashMap<String, String>> subKeysList = null;
   public String[] subKeysWindowPos = {"0", "0"};
   public String specialOskFont = "";
-  public boolean isChiral = false;
 
   public KMKeyboard(Context context) {
     super(context);
@@ -139,9 +139,9 @@ final class KMKeyboard extends WebView {
     setBackgroundColor(0);
   }
 
-  public void executeHardwareKeystroke(int code, int shift, int lstate) {
+  public void executeHardwareKeystroke(int code, int shift, int lstates) {
     String jsFormat = "javascript:executeHardwareKeystroke(%d,%d, %d)";
-    String jsString = String.format(jsFormat, code, shift, lstate);
+    String jsString = String.format(jsFormat, code, shift, lstates);
     loadUrl(jsString);
   }
 
@@ -298,6 +298,16 @@ final class KMKeyboard extends WebView {
       Log.d("KMKeyboard", jsString);
     }
 
+    Log.d("KMKeyboard", "1");
+    // Add a little delay for the keyboard to load so the chirality can be properly detected
+    Handler chiralityHandler = new Handler();
+    chiralityHandler.postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        loadUrl("javascript:setIsChiral()");
+      }
+    }, 1000);
+
     currentKeyboard = kbKey;
     keyboardSet = true;
     saveCurrentKeyboardIndex();
@@ -389,6 +399,16 @@ final class KMKeyboard extends WebView {
       Log.d("KMKeyboard", jsString);
     }
 
+    Log.d("KMKeyboard", "2");
+    // Add a little delay for the keyboard to load so the chirality can be properly detected
+    Handler chiralityHandler = new Handler();
+    chiralityHandler.postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        loadUrl("javascript:setIsChiral()");
+      }
+    }, 1000);
+
     currentKeyboard = kbKey;
     keyboardSet = true;
     saveCurrentKeyboardIndex();
@@ -405,6 +425,15 @@ final class KMKeyboard extends WebView {
     KeyboardEventHandler.notifyListeners(kbEventListeners, keyboardType, EventType.KEYBOARD_CHANGED, currentKeyboard);
 
     return retVal;
+  }
+
+  public void setChirality(boolean flag) {
+    Log.d("KMKeyboard", "setChirality(" + String.valueOf(flag) + ") called");
+    this.isChiral = flag;
+  }
+
+  public boolean getChirality() {
+    return this.isChiral;
   }
 
   private void saveCurrentKeyboardIndex() {
