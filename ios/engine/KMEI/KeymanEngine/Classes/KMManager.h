@@ -39,7 +39,6 @@
 #import <Foundation/Foundation.h>
 #import "CWLSynthesizeSingleton.h"
 #import <WebKit/WebKit.h>
-#import "KMHTTPDownloader.h"
 
 // Subscribe to these notifications to handle your app's behaviour after a Keyman event
 extern NSString *const kKeymanLanguagesUpdatedNotification;
@@ -101,8 +100,10 @@ typedef enum {
 } eKMKeyboardState;
 
 @class Reachability;
+@class HTTPDownloader;
+@class HTTPDownloadRequest;
 
-@interface KMManager : NSObject <UIWebViewDelegate, WKNavigationDelegate, WKScriptMessageHandler, KMHTTPDownloadDelegate> {
+@interface KMManager : NSObject <UIWebViewDelegate, WKNavigationDelegate, WKScriptMessageHandler> {
 	BOOL debugPrintingOn_;
     NSString *languageID_;
 	NSString *keyboardID_;
@@ -113,8 +114,8 @@ typedef enum {
 	
 	id __weak webDelegate_;
   id __weak inputDelegate_;
-  KMHTTPDownloader *downloadQueue_;
-  KMHTTPDownloader *sharedQueue_;
+  HTTPDownloader *downloadQueue_;
+  HTTPDownloader *sharedQueue_;
   HTTPDownloadRequest *currentRequest_;
 	Reachability *reachability_;
 }

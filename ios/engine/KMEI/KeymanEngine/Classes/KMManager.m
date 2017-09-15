@@ -156,7 +156,7 @@ BOOL didResizeToOrientation = NO;
 
 #pragma mark - Private Interface
 
-@interface KMManager ()
+@interface KMManager() <HTTPDownloadDelegate>
 // Keyboard Info
 + (CGFloat)keyboardHeight;
 + (CGFloat)keyboardHeightWithOrientation:(UIInterfaceOrientation)orientation;
@@ -281,10 +281,10 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:self.reachability];
         [self.reachability startNotifier];
       
-        /* KMHTTPDownloader only uses this for its delegate methods.  So long as we don't
+        /* HTTPDownloader only uses this for its delegate methods.  So long as we don't
          * set the queue running, this should be perfectly fine.
          */
-        self.sharedQueue = [[KMHTTPDownloader alloc] init:self];
+        self.sharedQueue = [[HTTPDownloader alloc] init:self];
         
         [self registerCustomFonts];
     }
@@ -1552,7 +1552,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
         BOOL isUpdate = ([self latestKeyboardFileVersionWithID:kbID] != nil);
       
       
-        [self setDownloadQueue:[[KMHTTPDownloader alloc] init:self]];
+        [self setDownloadQueue:[[HTTPDownloader alloc] init:self]];
         NSDictionary *commonUserData = [NSDictionary dictionaryWithObjectsAndKeys:[kbInfo objectForKey:kKeymanKeyboardInfoKey], kKeymanKeyboardInfoKey,
                                        [NSNumber numberWithBool:isUpdate], kKeymanUpdateKey, nil];
       
@@ -1709,7 +1709,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
         }
     }
   
-    [self setDownloadQueue:[[KMHTTPDownloader alloc] init:self]];
+    [self setDownloadQueue:[[HTTPDownloader alloc] init:self]];
     NSDictionary *commonUserData = [NSDictionary dictionaryWithObjectsAndKeys:kbInfo, kKeymanKeyboardInfoKey,
                                    [NSNumber numberWithBool:isUpdate], kKeymanUpdateKey, nil];
     [self.downloadQueue setUserInfo:commonUserData];
@@ -1737,7 +1737,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
     [self.downloadQueue run];
 }
 
-- (void)downloadQueueFinished:(KMHTTPDownloader *)queue {
+- (void)downloadQueueFinished:(HTTPDownloader *)queue {
     if (self.debugPrintingOn) {
         NSArray *directoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[self activeFontDirectory] error:nil];
         [self KMLog:[NSString stringWithFormat:@"Font Directory: %@", directoryContents] checkDebugPrinting:YES];

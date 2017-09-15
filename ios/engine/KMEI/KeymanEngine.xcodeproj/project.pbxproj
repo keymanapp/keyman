@@ -100,11 +100,7 @@
 		C092D8391F6A70C8005C5485 /* LanguageDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C092D8381F6A70C8005C5485 /* LanguageDetailViewController.swift */; };
 		C0A5FF371F6682EB00BE740C /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A5FF361F6682EB00BE740C /* PopoverView.swift */; };
 		C0ED71B31F6BB0B1002A2FD6 /* HTTPDownloadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ED71B21F6BB0B1002A2FD6 /* HTTPDownloadRequest.swift */; };
-		CE25CCBD1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = CE25CCBC1F1DA7BB005AA2BC /* KMHTTPDownloader.m */; };
-		CE25CCBE1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = CE25CCBC1F1DA7BB005AA2BC /* KMHTTPDownloader.m */; };
-		CE25CCBF1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = CE25CCBC1F1DA7BB005AA2BC /* KMHTTPDownloader.m */; };
-		CE25CCC41F1F2310005AA2BC /* KMHTTPDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = CE25CCC01F1DA7D9005AA2BC /* KMHTTPDownloader.h */; };
-		CE25CCC61F1F2325005AA2BC /* KMHTTPDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = CE25CCC01F1DA7D9005AA2BC /* KMHTTPDownloader.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C0ED71B51F6BBFAF002A2FD6 /* HTTPDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ED71B41F6BBFAF002A2FD6 /* HTTPDownloader.swift */; };
 		CECB38951F2199BC0098882F /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = CECB38941F2199BC0098882F /* Reachability.m */; };
 		CECB38961F2199CF0098882F /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = CECB38941F2199BC0098882F /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		CECB38971F2199E40098882F /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = CECB38941F2199BC0098882F /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -234,8 +230,7 @@
 		C0A5FF351F6682EA00BE740C /* KMEI-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KMEI-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0A5FF361F6682EB00BE740C /* PopoverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
 		C0ED71B21F6BB0B1002A2FD6 /* HTTPDownloadRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPDownloadRequest.swift; sourceTree = "<group>"; };
-		CE25CCBC1F1DA7BB005AA2BC /* KMHTTPDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMHTTPDownloader.m; sourceTree = "<group>"; };
-		CE25CCC01F1DA7D9005AA2BC /* KMHTTPDownloader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMHTTPDownloader.h; sourceTree = "<group>"; };
+		C0ED71B41F6BBFAF002A2FD6 /* HTTPDownloader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPDownloader.swift; sourceTree = "<group>"; };
 		CECB38931F2199BC0098882F /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = KeymanEngine/lib/Reachability/Reachability.h; sourceTree = SOURCE_ROOT; };
 		CECB38941F2199BC0098882F /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = KeymanEngine/lib/Reachability/Reachability.m; sourceTree = SOURCE_ROOT; };
 		F243887E14BBD43000A3E055 /* KMEI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KMEI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -471,14 +466,13 @@
 			name = KMInputViewController;
 			sourceTree = "<group>";
 		};
-		CE25CCBB1F1DA72A005AA2BC /* KMHTTPRequest */ = {
+		CE25CCBB1F1DA72A005AA2BC /* HTTPRequest */ = {
 			isa = PBXGroup;
 			children = (
-				CE25CCBC1F1DA7BB005AA2BC /* KMHTTPDownloader.m */,
-				CE25CCC01F1DA7D9005AA2BC /* KMHTTPDownloader.h */,
+				C0ED71B41F6BBFAF002A2FD6 /* HTTPDownloader.swift */,
 				C0ED71B21F6BB0B1002A2FD6 /* HTTPDownloadRequest.swift */,
 			);
-			name = KMHTTPRequest;
+			name = HTTPRequest;
 			sourceTree = "<group>";
 		};
 		F243887314BBD43000A3E055 = {
@@ -594,7 +588,7 @@
 		F273AB9615641D9300A47CEE /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				CE25CCBB1F1DA72A005AA2BC /* KMHTTPRequest */,
+				CE25CCBB1F1DA72A005AA2BC /* HTTPRequest */,
 				987F00041AB8FCB700998116 /* KeyboardMenuView */,
 				980CC8E119D51EF00089BB57 /* KMURLProtocol */,
 				98411308199D9ACD005BD609 /* SubKeysView */,
@@ -705,7 +699,6 @@
 				F27FCAD7157FD43B00FBBA20 /* KMTextField.h in Headers */,
 				F27FCB69157FFE8B00FBBA20 /* KMTextFieldDelegateProxy.h in Headers */,
 				CECB38981F2199FB0098882F /* Reachability.h in Headers */,
-				CE25CCC61F1F2325005AA2BC /* KMHTTPDownloader.h in Headers */,
 				98EF3BA719A5B05000A1365F /* KMSubKeysView.h in Headers */,
 				980CC8E519D522060089BB57 /* KMURLProtocol.h in Headers */,
 				987F3EA31941ABF600209D4F /* KMKeyPreviewView.h in Headers */,
@@ -726,7 +719,6 @@
 				F27FCAE5157FD49B00FBBA20 /* KMTextFieldDelegateProxy.h in Headers */,
 				CECB38991F219A010098882F /* Reachability.h in Headers */,
 				98EF3BA819A5B06100A1365F /* KMSubKeysView.h in Headers */,
-				CE25CCC41F1F2310005AA2BC /* KMHTTPDownloader.h in Headers */,
 				987F3EA51941AC2700209D4F /* KMKeyPreviewView.h in Headers */,
 				980CC8E819D5223C0089BB57 /* KMURLProtocol.h in Headers */,
 			);
@@ -975,11 +967,11 @@
 				C0A5FF371F6682EB00BE740C /* PopoverView.swift in Sources */,
 				98F9D6F019545AB60087AA43 /* KMInputViewController.m in Sources */,
 				989FDF92193C1C7100EECAF9 /* KMKeyPreviewView.m in Sources */,
-				CE25CCBD1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */,
 				9878F7711B8BF00F00360B8D /* NSString+Helpers.m in Sources */,
 				9841130B199D9B84005BD609 /* KMSubKeysView.m in Sources */,
 				C08C62171F67CFB800268D03 /* KeyboardPickerViewController.swift in Sources */,
 				C08C62101F67BD4500268D03 /* KeyboardPickerButton.swift in Sources */,
+				C0ED71B51F6BBFAF002A2FD6 /* HTTPDownloader.swift in Sources */,
 				C04C2A6D1F6B7D9A00BA42B6 /* LanguageViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -997,7 +989,6 @@
 				F27FCA88157FB13B00FBBA20 /* KMManager.m in Sources */,
 				F27FCA8C157FB13B00FBBA20 /* KMTextViewDelegateProxy.m in Sources */,
 				F27FCA8E157FB13B00FBBA20 /* KMTextField.m in Sources */,
-				CE25CCBE1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */,
 				F27FCA90157FB13B00FBBA20 /* KMTextFieldDelegateProxy.m in Sources */,
 				9878F77D1B8BF07D00360B8D /* UIView+Helpers.m in Sources */,
 				982899171ABB8D2400823833 /* KMKeyboardMenuView.m in Sources */,
@@ -1019,7 +1010,6 @@
 				F27FCACA157FD15900FBBA20 /* KMTextView.m in Sources */,
 				F27FCACB157FD15900FBBA20 /* KMTextViewDelegateProxy.m in Sources */,
 				F27FCACC157FD15900FBBA20 /* KMTextField.m in Sources */,
-				CE25CCBF1F1DA7BB005AA2BC /* KMHTTPDownloader.m in Sources */,
 				F27FCACD157FD15900FBBA20 /* KMTextFieldDelegateProxy.m in Sources */,
 				9878F77E1B8BF07E00360B8D /* UIView+Helpers.m in Sources */,
 				982899181ABB8D2500823833 /* KMKeyboardMenuView.m in Sources */,

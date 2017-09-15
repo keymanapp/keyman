@@ -11,7 +11,6 @@
 #import "KMManager.h"
 #import "Reachability.h"
 #import "KMInputViewController.h"
-#import "KMHTTPDownloader.h"
 
 extern NSString *const kKeymanApiBaseURL;
 extern NSString *const kKeymanOptionsKey;
@@ -36,8 +35,8 @@ typedef void (^KMFetchKeyboardsBlock)(NSDictionary*);
 @property (nonatomic, strong) NSMutableDictionary *keymanFonts;
 //@property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, strong) Reachability *reachability;
-@property (nonatomic, strong) KMHTTPDownloader *downloadQueue;
-@property (nonatomic, strong) KMHTTPDownloader *sharedQueue;
+@property (nonatomic, strong) HTTPDownloader *downloadQueue;
+@property (nonatomic, strong) HTTPDownloader *sharedQueue;
 @property (nonatomic, strong) HTTPDownloadRequest *currentRequest;
 @property (assign) BOOL shouldReloadKeyboard;
 @property (assign) BOOL didSynchronize;
