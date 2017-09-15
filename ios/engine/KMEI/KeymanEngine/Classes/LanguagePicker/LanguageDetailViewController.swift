@@ -9,16 +9,16 @@
 import UIKit
 
 private let toolbarButtonTag = 100
-private let toolbarLabelTag: Int = 101
-private let toolbarActivityIndicatorTag: Int = 102
+private let toolbarLabelTag = 101
+private let toolbarActivityIndicatorTag = 102
 
 class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   var languageIndex = 0
   var languageName = ""
   var languageID = ""
   var keyboards: [[String: Any]] = []
-  var userKeyboards: [String: [String: Any]] = [:]
-  var isUpdate = false
+  private var userKeyboards: [String: [String: Any]] = [:]
+  private var isUpdate = false
 
   override func loadView() {
     super.loadView()
@@ -147,7 +147,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     navigationItem.setHidesBackButton(false, animated: true)
   }
 
-  func loadUserKeyboards() {
+  private func loadUserKeyboards() {
     let userData = KMManager.sharedInstance().activeUserDefaults()
     guard let userKbList = userData?.array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]],
       !userKbList.isEmpty else {
@@ -164,7 +164,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  func isAdded(languageID: String?, keyboardID: String?) -> Bool {
+  private func isAdded(languageID: String?, keyboardID: String?) -> Bool {
     guard let languageID = languageID, let keyboardID = keyboardID else {
       return false
     }

@@ -16,7 +16,8 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
   var keyboardVersion: String = ""
   var keyboardCopyright: String = ""
   var isCustomKeyboard: Bool = false
-  var infoArray = [[String: String]]()
+
+  private var infoArray = [[String: String]]()
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -77,7 +78,7 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  func fetchedKeyboardData(_ data: Data) {
+  private func fetchedKeyboardData(_ data: Data) {
     guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [AnyHashable: Any] else {
       return
     }
@@ -101,24 +102,24 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     if !isCustomKeyboard {
       if indexPath.row == 1 {
         cell.accessoryType = .disclosureIndicator
-      } else if indexPath.row == 2 && !canDeleteKeyboard() {
+      } else if indexPath.row == 2 && !canDeleteKeyboard {
         cell.isUserInteractionEnabled = false
         cell.textLabel?.isEnabled = false
         cell.detailTextLabel?.isEnabled = false
       }
-    } else if indexPath.row == 1 && !canDeleteKeyboard() {
+    } else if indexPath.row == 1 && !canDeleteKeyboard {
       cell.isUserInteractionEnabled = false
       cell.textLabel?.isEnabled = false
       cell.detailTextLabel?.isEnabled = false
     }
   }
 
-  func isCurrentKeyboard() -> Bool {
+  private var isCurrentKeyboard: Bool {
     return KMManager.sharedInstance().keyboardID == keyboardID &&
       KMManager.sharedInstance().languageID == languageID
   }
 
-  func canDeleteKeyboard() -> Bool {
+  private var canDeleteKeyboard: Bool {
     if !KMManager.sharedInstance().canRemoveKeyboards {
       return false
     }
@@ -133,7 +134,7 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     return keyboardCount > 1
   }
 
-  func showDeleteKeyboard() {
+  private func showDeleteKeyboard() {
     let alert = UIAlertView(title: title ?? "",
                             message: "Would you like to delete this keyboard?",
                             delegate: self,
@@ -154,7 +155,7 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
       let kbDict = userKeyboards[keyboardIndex]
 
       if KMManager.sharedInstance().removeKeyboard(at: UInt(keyboardIndex)) {
-        if isCurrentKeyboard() {
+        if isCurrentKeyboard {
           // Select default keyboard
 
           let kbID = userKeyboards[0][kKeymanKeyboardIdKey]

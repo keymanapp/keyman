@@ -14,10 +14,10 @@ private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
 
 class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
-  var userKeyboards: [[String: String]] = []
-  var updateQueue: [[String: String]]?
+  private var userKeyboards: [[String: String]] = []
+  private var updateQueue: [[String: String]]?
   private var _isDoneButtonEnabled = false
-  var isDidUpdateCheck = false
+  private var isDidUpdateCheck = false
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -400,7 +400,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     updateKeyboards()
   }
 
-  func checkUpdates() -> Bool {
+  private func checkUpdates() -> Bool {
     if KMManager.sharedInstance().keyboardsInfo == nil {
       return false
     }
@@ -412,7 +412,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  func updateKeyboards() {
+  private func updateKeyboards() {
     updateQueue = [[String: String]]()
     var kbIDs = Set<String>()
     for kb in userKeyboards {
@@ -435,7 +435,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  func scroll(toSelectedKeyboard animated: Bool) {
+  private func scroll(toSelectedKeyboard animated: Bool) {
     let index = userKeyboards.index { kb in
       let langID = kb[kKeymanLanguageIdKey]
       let kbID = kb[kKeymanKeyboardIdKey]
@@ -449,7 +449,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  func setIsDoneButtonEnabled(_ value: Bool) {
+  private func setIsDoneButtonEnabled(_ value: Bool) {
     _isDoneButtonEnabled = value
     if _isDoneButtonEnabled {
       let doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self,
@@ -462,7 +462,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  func isCurrentKeyboard(languageID: String?, keyboardID: String?) -> Bool {
+  private func isCurrentKeyboard(languageID: String?, keyboardID: String?) -> Bool {
     return KMManager.sharedInstance().keyboardID == keyboardID &&
       KMManager.sharedInstance().languageID == languageID
   }
