@@ -763,6 +763,13 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         // Turn off key highlighting (or preview)
         osk.highlightKey(e,false);
 
+        // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
+        if(device.formFactor == 'desktop') {
+          if(osk.selectLayer(keyName, nextLayer)){
+            return true;
+          }
+        }
+
         // Prevent any output from 'ghost' (unmapped) keys
         if(keyName != 'K_SPACE')
         {
