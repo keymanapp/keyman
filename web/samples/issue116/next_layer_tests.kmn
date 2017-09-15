@@ -1,0 +1,40 @@
+﻿store(&VERSION) '9.0'
+store(&TARGETS) 'web'
+store(&ETHNOLOGUECODE) 'eng'
+store(&COPYRIGHT) '2017 SIL International'
+store(&LAYOUTFILE) 'next_layer_tests-layout.js'
+store(&NAME) 'Issue 116'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ [T_CAPS_Q] > "CAPS MODE Q"
++ [T_CAPS_W] > "CAPS MODE W"
++ [T_CAPS_E] > "CAPS MODE E"
++ [T_CAPS_R] > "CAPS MODE R"
++ [T_CAPS_T] > "CAPS MODE T"
++ [T_CAPS_Y] > "CAPS MODE Y"
++ [T_CAPS_U] > "CAPS MODE U"
++ [T_CAPS_I] > "CAPS MODE I"
++ [T_CAPS_O] > "CAPS MODE O"
++ [T_CAPS_P] > "CAPS MODE P"
+
++ [T_CAPS_A] > "CAPS MODE A"
++ [T_CAPS_S] > "CAPS MODE S"
++ [T_CAPS_D] > "CAPS MODE D"
++ [T_CAPS_F] > "CAPS MODE F"
++ [T_CAPS_G] > "CAPS MODE G"
++ [T_CAPS_H] > "CAPS MODE H"
++ [T_CAPS_J] > "CAPS MODE J"
++ [T_CAPS_K] > "CAPS MODE K"
++ [T_CAPS_L] > "CAPS MODE L"
+
++ [T_CAPS_Z] > "CAPS MODE Z"
++ [T_CAPS_X] > "CAPS MODE X"
++ [T_CAPS_C] > "CAPS MODE C"
++ [T_CAPS_V] > "CAPS MODE V"
++ [T_CAPS_B] > "CAPS MODE B"
++ [T_CAPS_N] > "CAPS MODE N"
++ [T_CAPS_M] > "CAPS MODE M"
+

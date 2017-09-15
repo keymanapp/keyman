@@ -763,11 +763,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         // Turn off key highlighting (or preview)
         osk.highlightKey(e,false);
 
-        // Process modifier key action
-        // TODO: Fixup the duplication of nextlayer processing here and below.
-        //       This breaks the `nextlayer` property on keys with output
-        //       even though it does the right thing for modifier keys.
-        if(osk.selectLayer(keyName,nextLayer)) return true;
+        // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
+        if(device.formFactor == 'desktop') {
+          if(osk.selectLayer(keyName, nextLayer)){
+            return true;
+          }
+        }
 
         // Prevent any output from 'ghost' (unmapped) keys
         if(keyName != 'K_SPACE')
