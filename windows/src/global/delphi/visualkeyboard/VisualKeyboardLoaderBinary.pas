@@ -42,6 +42,7 @@ begin
   Stream.Read(w, sizeof(w));
   SetLength(str, w);
   Stream.Read(PChar(str)^, w*2);
+  SetLength(str, w-1);  // Remove nul byte at end of string
   Result := str;
 end;
 
