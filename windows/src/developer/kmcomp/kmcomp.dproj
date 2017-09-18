@@ -88,8 +88,8 @@
         <DCC_Optimize>false</DCC_Optimize>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_RunParams>i3317_nosupp.kmn i3317_nosupp-1.0.js</Debugger_RunParams>
-        <Debugger_CWD>c:\keyman\9.0\src\test\test_i3317</Debugger_CWD>
+        <Debugger_RunParams>-d arabic_izza.kpj</Debugger_RunParams>
+        <Debugger_CWD>c:\projects\keyman\keyboards\release\a\arabic_izza</Debugger_CWD>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
