@@ -2259,19 +2259,24 @@ begin
       kp := gp.dpKeyArray;
       for j := 0 to gp.cxKeyArray-1 do
       begin
-        FBitMask := FBitMask or JavaScript_Shift(kp, fMnemonic);
+        if not RuleIsExcludedByPlatform(kp) then
+          FBitMask := FBitMask or JavaScript_Shift(kp, fMnemonic);
         Inc(kp);
       end;
     end;
     Inc(gp);
   end;
 
+  if ((FBitMask and KMX_MASK_MODIFIER_CHIRAL) <> 0) and
+    ((FBitMask and KMX_MASK_MODIFIER_NONCHIRAL) <> 0) then
+  begin
+    ReportError(0, CWARN_DontMixChiralAndNonChiralModifiers, 'This keyboard contains Ctrl,Alt and LCtrl,LAlt,RCtrl,RAlt sets of modifiers. Use only one or the other set for web target.');
+  end;
   //TODO: Should FBitMask include the ISVIRTUALKEY bit?
 
-  if FDebug then
-    Result := FormatModifierAsBitflags(FBitMask)
-  else
-    Result := '0x'+IntToHex(FBitMask, 4);
+  if FDebug
+    then Result := FormatModifierAsBitflags(FBitMask)
+    else Result := '0x'+IntToHex(FBitMask, 4);
 end;
 
 end.
