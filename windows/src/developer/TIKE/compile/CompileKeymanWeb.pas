@@ -209,8 +209,7 @@ type
     FDebug: Boolean;   // I3681
     FTabStop: string;   // I3681
     fMnemonic: Boolean;
-    FTouchLayoutFont: string;
-    FGenerateOldBK: Boolean;   // I4872
+    FTouchLayoutFont: string;   // I4872
 
     function JavaScript_String(ch: DWord): string;  // I2242
 
@@ -1109,7 +1108,7 @@ function TCompileKeymanWeb.VisualKeyboardFromFile(const FVisualKeyboardFileName:
     'function(x){var e=Array.apply(null,Array(65)).map(String.prototype.valueOf,"")'+
     ',r=[],v,i,m=[''default'',''shift'',''ctrl'',''shift-ctrl'',''alt'',''shift-alt'','+
     '''ctrl-alt'',''shift-ctrl-alt''];for(i=m.length-1;i>=0;i--)if((v=x[m[i]])||r.length)'+
-    'r=(v?v:e).slice().concat(r);return r};';
+    'r=(v?v:e).slice().concat(r);return r}';
   func_debug =
     'function(x){'#13#10+
     '    var'#13#10+
@@ -1117,7 +1116,8 @@ function TCompileKeymanWeb.VisualKeyboardFromFile(const FVisualKeyboardFileName:
     '      result=[], v, i,'#13#10+
     '      modifiers=[''default'',''shift'',''ctrl'',''shift-ctrl'',''alt'',''shift-alt'',''ctrl-alt'',''shift-ctrl-alt''];'#13#10+
     '    for(i=modifiers.length-1;i>=0;i--) {'#13#10+
-    '      if((v = x[modifiers[i]]) || result.length > 0) {'#13#10+
+    '      v = x[modifiers[i]];'#13#10+
+    '      if(v || result.length > 0) {'#13#10+
     '        result=(v ? v : empty).slice().concat(result);'#13#10+
     '      }'#13#10+
     '    }'#13#10+
@@ -1129,9 +1129,7 @@ function TCompileKeymanWeb.VisualKeyboardFromFile(const FVisualKeyboardFileName:
 
 var
   FVK: TVisualKeyboard;
-  MaxShift, i, j, n: Integer;
   f102, fbold, fitalic: string;
-  FPos: array[0..$40 {space}] of WideString;
   fDisplayUnderlying: string;
 begin
   Result := '';
@@ -1144,46 +1142,7 @@ begin
     if kvkhDisplayUnderlying in FVK.Header.Flags then fDisplayUnderlying := '1' else fDisplayUnderlying := '0';   // I3886
 
     Result := Format('{F:''%s%s 1em "%s"'',K102:%s', [fitalic, fbold, FVK.Header.UnicodeFont.Name, f102]);   // I3886   // I3956
-
-    FGenerateOldBK := True;
-    if FGenerateOldBK then // note: this is currently always false
-    begin
-      Result := Result + ',BK:new Array(';
-      MaxShift := 0;
-      for i := 0 to FVK.Keys.Count - 1 do
-        if FVK.Keys[i].Shift > MaxShift then
-          MaxShift := FVK.Keys[i].Shift;
-
-      for j := 0 to MaxShift do
-      begin
-        for i := 0 to High(FPos) do FPos[i] := '';
-
-        for i := 0 to FVK.Keys.Count - 1 do
-        begin
-          if kvkkUnicode in FVK.Keys[i].Flags then
-          begin
-            if FVK.Keys[i].Shift = j then
-            begin
-              n := CKeymanWebKeyCodes[FVK.Keys[i].VKey];
-              if n <> $FF then FPos[n] := FVK.Keys[i].Text;
-            end;
-          end;
-        end;
-
-        for i := 0 to High(FPos) do
-        begin
-          Result := Result + '"'+WideQuote(FPos[i])+'"';
-          if i < High(FPos) then Result := Result + ',';
-        end;
-
-        if j < MaxShift then Result := Result + ',';
-      end;
-
-      Result := Result + ')';
-    end;
-
     Result := Result + Format('};%s%sthis.KDU=%s', [nl,FTabStop,fDisplayUnderlying]);   // I3946   // I3956
-
     Result := Result + ';'+VisualKeyboardToKLS(FVK);
     Result := Result + ';'+BuildBKFromKLS;
   finally
