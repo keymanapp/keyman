@@ -50,7 +50,8 @@ const
   CWARN_InvalidJSONMetadataFile =         $20A0;   // I4872
   CWARN_JSONMetadataOSKFontShouldMatchTouchFont = $20A1;   // I4872
 
-  CWARN_DontMixChiralAndNonChiralModifiers = $20A2;
+  CWARN_DontMixChiralAndNonChiralModifiers = $20A3;
+
 
 implementation
 
