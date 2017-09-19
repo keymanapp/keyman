@@ -294,6 +294,10 @@ const VKeyNames: array[0..255] of string = (
 	'K_?FE',				// &HFE
 	'K_?FF');				// &HFF
 
+///
+/// Virtual key names used in KeymanWeb. Blanks indicate a
+/// virtual key that is not recognised by KeymanWeb.
+///
 const KMWVKeyNames: array[0..255] of string = (
   '',
   '',

@@ -242,7 +242,7 @@ type
     function GetKeyboardModifierBitmask: string;
     function FormatModifierAsBitflags(FBitMask: Cardinal): string;
     function FormatKeyAsString(key: Integer): string;
-    function DebugSetupString: string;
+    function JavaScript_SetupDebug: string;
   public
     function Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallback): Boolean;   // I3681   // I4140   // I4688   // I4866
     constructor Create;
@@ -619,6 +619,15 @@ begin
   end;
 end;
 
+///
+/// Returns a Javascript representation of a key value, either as a constant (debug mode)
+/// or as an integer.
+///
+/// @param fkp         Pointer to key record
+/// @param FMnemonic   True if the keyboard is a mnemonic layout
+///
+/// @return string representation of the key value, e.g. 'keyCodes.K_A /* 0x41 */' or '65'
+///
 function TCompileKeymanWeb.JavaScript_KeyAsString(fkp: PFILE_KEY; FMnemonic: Boolean): string;
 begin
   if FDebug
@@ -898,6 +907,17 @@ begin
   end;
 end;
 
+///
+/// Returns a Javascript representation of a key modifier state, either as a constant (debug mode)
+/// or as an integer.
+///
+/// @param fkp         Pointer to key record
+/// @param FMnemonic   True if the keyboard is a mnemonic layout
+///
+/// @return string representation of the key modifier state, e.g.
+///         'modCodes.SHIFT | modCodes.CAPS | modCodes.VIRTUAL_KEY /* 0x4110 */' or
+///         '16656'
+///
 function TCompileKeymanWeb.JavaScript_ShiftAsString(fkp: PFILE_KEY; FMnemonic: Boolean): string;
 begin
   if not FDebug
@@ -1575,7 +1595,7 @@ begin
     [sName, nl,
     sName, nl,
     nl,
-    FTabStop, DebugSetupString, nl,
+    FTabStop, JavaScript_SetupDebug, nl,
     FTabStop, sName, nl,
     FTabStop, RequotedString(sFullName), nl,
     FTabStop, sVisualKeyboard, nl,
@@ -2132,7 +2152,13 @@ begin
   Result := GetKeymanWebCompiledFileName(FileName, GetKeyboardVersionString(FileName));
 end;
 
-function TCompileKeymanWeb.DebugSetupString: string;
+///
+/// If debug mode, then returns Javascript code necessary for
+/// accessing constants in the compiled keyboard
+///
+/// @return string of JavaScript code
+///
+function TCompileKeymanWeb.JavaScript_SetupDebug: string;
 begin
   if FDebug then
     Result := 'var modCodes = tavultesoft.keymanweb.osk.modifierCodes;'+nl+
@@ -2141,6 +2167,13 @@ begin
     Result := '';
 end;
 
+///
+/// Converts a modifier bit mask integer into its component bit flags
+///
+/// @param FBitMask A KMX modifier bitmask value
+///
+/// @return string of JavaScript code, e.g. 'modCodes.SHIFT | modCodes.CTRL /* 0x0030 */'
+///
 function TCompileKeymanWeb.FormatModifierAsBitflags(FBitMask: Cardinal): string;
 const
   mask: array[0..14] of string = (
@@ -2189,6 +2222,13 @@ begin
   Result := Result + ' /* 0x' + IntToHex(FBitMask, 4) + ' */';
 end;
 
+///
+/// Converts a key value into a constant
+///
+/// @param key A virtual key code
+///
+/// @return string of JavaScript code, e.g. 'keyCodes.K_A /* 0x41 */'
+///
 function TCompileKeymanWeb.FormatKeyAsString(key: Integer): string;
 begin
   if (key <= 255) and (KMWVKeyNames[key] <> '')
@@ -2196,6 +2236,12 @@ begin
     else Result := IntToHex(key, 2);
 end;
 
+///
+/// Determine the modifiers used in the target keyboard and return a bitmask
+/// representing them, or an integer value when not in debug mode
+///
+/// @return string of JavaScript code, e.g. 'modCodes.SHIFT | modCodes.CTRL /* 0x0030 */'
+///
 function TCompileKeymanWeb.GetKeyboardModifierBitmask: string;
 var
   i: Integer;
