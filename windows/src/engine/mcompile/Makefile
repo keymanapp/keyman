@@ -22,7 +22,7 @@ backup:
     $(WZZIP) $(BUILD)\engine\mcompile.exe  $(BACKUPDEFAULTS) mcompile.exe
 
 install:
-    $(COPY) $(PROGRAM)\engine\mcompile.exe $(INSTALLPATH_KEYMANENGINE)
+    $(COPY) $(PROGRAM)\engine\mcompile.exe "$(INSTALLPATH_KEYMANENGINE)"
 
 test-manifest:
     # test that linked manifest exists and correct

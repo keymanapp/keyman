@@ -65,7 +65,6 @@ void KeyCapsLockPress(BOOL FIsUp)  // I3284 - void   // I3529
 	{
 		if(FIsUp && !(GetKeyState(VK_CAPITAL) & 1))		// I267 - 24/11/2006 invert GetKeyState test
 		{
-		  //*Globals::ShiftState() |= CAPITALFLAG;   // I4548
 			keybd_event(VK_CAPITAL, 0xFF, 0, 0);
 			keybd_event(VK_CAPITAL, 0xFF, KEYEVENTF_KEYUP, 0);
 		}
@@ -74,8 +73,6 @@ void KeyCapsLockPress(BOOL FIsUp)  // I3284 - void   // I3529
 	{
 		if(!FIsUp && (GetKeyState(VK_CAPITAL) & 1))  
 		{												// I267 - 24/11/2006 invert GetKeyState test
-		//FShouldIgnoreNextKey[vkKey] = 2;  // KEY DOWN AND THEN UP
-		  //*Globals::ShiftState() &= ~CAPITALFLAG;   // I4548
 			keybd_event(VK_CAPITAL, 0xFF, KEYEVENTF_KEYUP, 0);
 			keybd_event(VK_CAPITAL, 0xFF, 0, 0);
 		}
@@ -93,15 +90,10 @@ void KeyShiftPress(BOOL FIsUp)  // I3284 - void   // I3529
 
 	if(_td->lpActiveKeyboard->Keyboard->dwFlags & KF_SHIFTFREESCAPS)
 	{
-		//SendDebugMessageFormat(0, sdmDebug, 0, "KeyShiftPress -- KF_SHIFTFRESSCAPS [%s]", FIsUp ? "up" : "down");
 		if(!FIsUp)
 		{
-		  //*Globals::IgnoreNextCaps() += 2;
-			//keybd_event(VK_SHIFT, 0xFF, KEYEVENTF_KEYUP, 0);
-			//*Globals::ShiftState() &= ~CAPITALFLAG;   // I4548
 			keybd_event(VK_CAPITAL, 0xFF, 0, 0);
 			keybd_event(VK_CAPITAL, 0xFF, KEYEVENTF_KEYUP, 0);
-			//keybd_event(VK_SHIFT, 0xFF, 0, 0);
 		}
 	}
 }
