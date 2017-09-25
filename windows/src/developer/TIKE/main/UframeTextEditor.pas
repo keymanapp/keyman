@@ -59,7 +59,7 @@ uses
   Dialogs, Menus, ImgList,
   MenuImgList, ExtCtrls,
 
-{IFDEF USE_PLUSMEMO}
+{$IFDEF USE_PLUSMEMO}
   SyntaxHighlight,
   PlusMemo,
   PlusGutter,
@@ -67,7 +67,7 @@ uses
   HtmlHighlight,
   pmprint,
   PMSupport,
-{ENDIF}
+{$ENDIF}
 
   TextFileFormat, UfrmTike,
   System.ImageList, KeymanDeveloperMemo,
