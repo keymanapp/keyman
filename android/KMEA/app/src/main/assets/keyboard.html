@@ -60,10 +60,8 @@
       var isChiral = false;
       if (typeof m !== "undefined") {
         isChiral = tavultesoft.keymanweb.isChiral(m);
-        window.console.log('Keyboard ('+m+') isChiral = '+isChiral);
       } else {
         isChiral = tavultesoft.keymanweb.isChiral();
-        window.console.log('Keyboard () isChiral = '+isChiral);
       }
       window.jsInterface.setIsChiral(isChiral);
     }

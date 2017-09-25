@@ -298,7 +298,6 @@ final class KMKeyboard extends WebView {
       Log.d("KMKeyboard", jsString);
     }
 
-    Log.d("KMKeyboard", "1");
     // Add a little delay for the keyboard to load so the chirality can be properly detected
     Handler chiralityHandler = new Handler();
     chiralityHandler.postDelayed(new Runnable() {
@@ -399,7 +398,6 @@ final class KMKeyboard extends WebView {
       Log.d("KMKeyboard", jsString);
     }
 
-    Log.d("KMKeyboard", "2");
     // Add a little delay for the keyboard to load so the chirality can be properly detected
     Handler chiralityHandler = new Handler();
     chiralityHandler.postDelayed(new Runnable() {
@@ -428,7 +426,6 @@ final class KMKeyboard extends WebView {
   }
 
   public void setChirality(boolean flag) {
-    Log.d("KMKeyboard", "setChirality(" + String.valueOf(flag) + ") called");
     this.isChiral = flag;
   }
 

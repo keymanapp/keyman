@@ -113,9 +113,10 @@ if [ $? -ne 0 ]; then
     die "ERROR: Build of KMEA failed"
 fi
 
-echo "Copying Keyman Engine for Android to KMAPro and Sample apps"
+echo "Copying Keyman Engine for Android to KMAPro, Sample apps, and Tests"
 mv $KMA_ROOT/KMEA/app/build/outputs/aar/app-release.aar $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar
 cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample1/app/libs/keyman-engine.aar
 cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample2/app/libs/keyman-engine.aar
+cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Tests/keyman-engine.aar
 
 cd ..\

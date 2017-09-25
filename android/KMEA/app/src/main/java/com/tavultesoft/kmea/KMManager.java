@@ -215,20 +215,6 @@ public final class KMManager {
       InAppKeyboard.setWebViewClient(new KMInAppKeyboardWebViewClient(appContext));
       InAppKeyboard.addJavascriptInterface(new KMInAppKeyboardJSHandler(appContext), "jsInterface");
       InAppKeyboard.loadKeyboard();
-
-      // TODO: Test code adding chirality keyboard that needs to be removed before merging
-      HashMap<String, String> kbInfo = new HashMap<String, String>();
-      final String Chirality_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
-
-      kbInfo.put(KMManager.KMKey_KeyboardID, "chirality");
-      kbInfo.put(KMManager.KMKey_LanguageID, "eng");
-      kbInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
-      kbInfo.put(KMManager.KMKey_LanguageName, "English");
-      kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
-      kbInfo.put(KMManager.KMKey_Font, Chirality_KeyboardFont);
-      addKeyboard(appContext, kbInfo);
-      Log.d("KMM", "initInApp");
-      // end of test code
     }
   }
 
@@ -246,7 +232,6 @@ public final class KMManager {
       SystemKeyboard.setWebViewClient(new KMSystemKeyboardWebViewClient(appContext));
       SystemKeyboard.addJavascriptInterface(new KMSystemKeyboardJSHandler(appContext), "jsInterface");
       SystemKeyboard.loadKeyboard();
-      Log.d("KMM", "initSystem");
     }
   }
 
@@ -329,7 +314,6 @@ public final class KMManager {
   }
 
   public static void onConfigurationChanged(Configuration newConfig) {
-    Log.d("KMM", "onConfigChanged");
     // KMKeyboard
     if (InAppKeyboard != null) {
       InAppKeyboard.onConfigurationChanged(newConfig);
@@ -1380,7 +1364,6 @@ public final class KMManager {
   }
 
   public static void switchToNextKeyboard(Context context) {
-    Log.d("KMM", "switchToNextKeyboard");
     int index = KeyboardPickerActivity.getCurrentKeyboardIndex(context);
     index++;
     HashMap<String, String> kbInfo = KeyboardPickerActivity.getKeyboardInfo(context, index);
