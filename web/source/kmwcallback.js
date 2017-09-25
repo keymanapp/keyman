@@ -290,13 +290,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var retVal = 0; // I3318
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
-      var bitmask;
-      if(keymanweb._ActiveKeyboard['KV']) {
-        bitmask = keymanweb.getKeyboardModifierBitmask();
-        if(typeof bitmask == 'undefined' || !bitmask) {
-          bitmask = osk.modifierBitmasks.NON_CHIRAL;
-        }
-      }
+      var bitmask = keymanweb.getKeyboardModifierBitmask();
 
       if(e.vkCode > 255) keyCode = e.vkCode;           // added to support extended (touch-hold) keys for mnemonic layouts
         
