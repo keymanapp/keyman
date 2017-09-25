@@ -59,7 +59,7 @@ uses
   Dialogs, Menus, ImgList,
   MenuImgList, ExtCtrls,
 
-{$IFDEF USE_PLUSMEMO}
+{IFDEF USE_PLUSMEMO}
   SyntaxHighlight,
   PlusMemo,
   PlusGutter,
@@ -67,7 +67,7 @@ uses
   HtmlHighlight,
   pmprint,
   PMSupport,
-{$ENDIF}
+{ENDIF}
 
   TextFileFormat, UfrmTike,
   System.ImageList, KeymanDeveloperMemo,
@@ -925,7 +925,9 @@ begin
     if ch = '' then Exit;
 
     if Uni_IsSurrogate2(ch[1]) then
-      ch := memo.GetTextPart(memo.SelStart-2, memo.SelStart);
+      ch := memo.GetTextPart(memo.SelStart-2, memo.SelStart)
+    else if Uni_IsSurrogate1(ch[1]) then
+      ch := memo.GetTextPart(memo.SelStart-1, memo.SelStart+1);
 
     token := FormatUnicode(ch);
   end;
