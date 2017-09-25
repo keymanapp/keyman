@@ -215,6 +215,5 @@ END
 STRINGTABLE
 BEGIN
     CWARN_DontMixChiralAndNonChiralModifiers "Don't mix the use of left/right modifiers with non-left/right modifiers in the same platform"
-    CWARN_MixingLeftAndRightModifiersCtrl    "LCTRL and RCTRL should not both be used in the same rule"
-    CWARN_MixingLeftAndRightModifiersAlt     "LALT and RALT should not both be used in the same rule"
+    CWARN_MixingLeftAndRightModifiers        "Left and right modifiers should not both be used in the same rule"
 END

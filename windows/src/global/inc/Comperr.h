@@ -180,8 +180,7 @@
 #define CWARN_KVKFileIsInSourceFormat          0x000020A2
 
 #define CWARN_DontMixChiralAndNonChiralModifiers 0x000020A3
-#define CWARN_MixingLeftAndRightModifiersCtrl    0x000020A4
-#define CWARN_MixingLeftAndRightModifiersAlt     0x000020A5
+#define CWARN_MixingLeftAndRightModifiers        0x000020A4
 
 #define CERR_BufferOverflow							0x000080C0
 #define CERR_Break									0x000080C1
