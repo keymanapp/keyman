@@ -2887,8 +2887,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Scope        Private
      * @param       {Event}       e     event
      * @return      {boolean}           
-     * Description  Processes physical keydown event and passes data to keyboard, buffering KMW's states
-     *              and setting KMW to desktop mode temporarily as needed. 
+     * Description  Processes keydown event and passes data to keyboard. 
      */ 
     keymanweb._KeyDown = function(e) {
       var Ldv,eClass=''; 
