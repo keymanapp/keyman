@@ -1,8 +1,9 @@
 # Keyman for Android
 
 ## 10.0 alpha
-* Removed "Share to Facebook" feature (#156)
-* Fix dual keyboards that appear when closing Keyman Browser (#220)
+* Add feature to reset keyboard to default layer when new input field focused (keymanapp/keyman#288)
+* Removed "Share to Facebook" feature (keymanapp/keyman#156)
+* Fix dual keyboards that appear when closing Keyman Browser (keymanapp/keyman#220)
 
 ## 2017-08-10 2.8.300 stable
 * No changes, just published latest beta as stable

@@ -140,26 +140,26 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         keymanweb._ActiveElement=null; 
         keymanweb.hideCaret(); 
         osk.hideNow();
-      }
-      
+      };
+
       /**
        * Handle losing focus from simulated input field 
-       *      
+       *
        * @param       {Event}      e    event
-       */       
+       */
       keymanweb.setBlur = function(e)
-      {                       
+      {
         // This works OK for iOS, but may need something else for other platforms
         if(('relatedTarget' in e) && e.relatedTarget)
-        {                     
+        {
           if(e.relatedTarget.nodeName != 'DIV' || e.relatedTarget.className.indexOf('keymanweb-input') == -1)
-          {         
-            keymanweb.cancelInput(); return;        
+          {
+            keymanweb.cancelInput(); return;
           }
-        }        
-        //Hide the OSK      
-        if(!keymanweb.focusing) keymanweb.cancelInput(); 
-      }   
+        }
+        //Hide the OSK
+        if(!keymanweb.focusing) keymanweb.cancelInput();
+      }
       
       /**
        * Handle receiving focus by simulated input field 
@@ -170,7 +170,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       {                     
         //e.stopPropagation();  // not doing anything useful, no child elements
         //e.preventDefault();   // prevents user selection or scrolling, may be better if they are allowed?
-
         keymanweb.focusing=true;
         keymanweb.focusTimer=window.setTimeout(function(){keymanweb.focusing=false;},1000);
   
@@ -207,10 +206,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
         // Move the caret and refocus if necessary     
         if(keymanweb._ActiveElement != target) 
-        {                         
+        {
           // Hide the KMW caret
           keymanweb.hideCaret(); 
-          keymanweb._ActiveElement=target; 
+          keymanweb._ActiveElement=target;
           // The issue here is that touching a DIV does not actually set the focus for iOS, even when enabled to accept focus (by setting tabIndex=0)
           // We must explicitly set the focus in order to remove focus from any non-KMW input
           target.focus();  //Android native browsers may not like this, but it is needed for Chrome, Safari
@@ -1318,7 +1317,23 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     keymanweb.updateInput=function(x){};
   
     // End of I3363 (Build 301) additions
-    
+
+    /**
+     * Function     resetContext
+     * Scope        Public
+     * Description  Revert OSK to default layer and clear any deadkeys and modifiers
+     */
+    keymanweb['resetContext'] = keymanweb.resetContext = function() {
+      osk.layerId = 'default';
+
+      keymanweb._DeadkeyResetMatched();
+      keymanweb._DeadkeyDeleteMatched();
+      keymanweb.cachedContext.reset();
+      keymanweb._ResetVKShift();
+
+      osk._Show();
+    };
+
     /**
      * Exposed function to load keyboards by name. One or more arguments may be used
      * 
@@ -2358,8 +2373,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}             always true  (?) 
      */    
     keymanweb._ControlFocus = function(e)
-    {                   
-      var Ltarg, Ln; 
+    {
+      var Ltarg, Ln;
       if(!keymanweb._Enabled) return true;
       e = keymanweb._GetEventObject(e);     // I2404 - Manage IE events in IFRAMEs
       if(!e) return true;
@@ -2644,7 +2659,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
     
     /**
-     * Execute external (UI) code needed on laoding keyboard
+     * Execute external (UI) code needed on loading keyboard
      * 
      * @param       {string}            _internalName
      * @return      {boolean}   
