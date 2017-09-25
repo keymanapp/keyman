@@ -44,21 +44,6 @@
  
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-  // Thank you to https://stackoverflow.com/questions/22607150/getting-the-url-parameters-inside-the-html-page. 
-  var GetURLParameter = function(sParam) {
-    var sPageURL = window.location.search.substring(1);
-    var sURLVariables = sPageURL.split('&');
-    for (var i = 0; i < sURLVariables.length; i++) {
-      var sParameterName = sURLVariables[i].split('=');
-      if (sParameterName[0] == sParam) {
-        return sParameterName[1];
-      }
-    }
-  };
-  
-  var attachType = GetURLParameter("mode");
-  var attachText = attachType ? attachType : "default";
-  
   var kmw=window.tavultesoft.keymanweb;
   kmw.init({
     attachType: 'auto',
