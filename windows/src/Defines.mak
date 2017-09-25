@@ -25,9 +25,9 @@ BUILD=$(ROOT)\build
 DEBUGPATH=$(ROOT)\debug
 OUTLIB=$(ROOT)\lib
 
-INSTALLPATH_KEYMANDESKTOP="%ProgramFiles(X86)%\Keyman\Keyman Desktop 10.0"
-INSTALLPATH_KEYMANDEVELOPER="%ProgramFiles(X86)%\Keyman\Keyman Developer 10.0"
-INSTALLPATH_KEYMANENGINE="%CommonProgramFiles(X86)%\Keyman\Keyman Engine 10.0"
+INSTALLPATH_KEYMANDESKTOP=%ProgramFiles(X86)%\Keyman\Keyman Desktop 10.0
+INSTALLPATH_KEYMANDEVELOPER=%ProgramFiles(X86)%\Keyman\Keyman Developer 10.0
+INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine 10.0
 
 !IFDEF DEBUG
   MAKEFLAG_DEBUG=-DDEBUG

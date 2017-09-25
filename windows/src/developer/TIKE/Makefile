@@ -40,7 +40,7 @@ backup:
 
 
 install:
-    $(COPY) $(PROGRAM)\developer\tike.exe $(INSTALLPATH_KEYMANDEVELOPER)\tike.exe
+    $(COPY) $(PROGRAM)\developer\tike.exe "$(INSTALLPATH_KEYMANDEVELOPER)\tike.exe"
 
 test-manifest:
     # test that linked manifest exists and correct

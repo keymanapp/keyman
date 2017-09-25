@@ -23,9 +23,9 @@ signcode:
     $(SIGNCODE) /d "Keyman Engine" $(PROGRAM)\engine\kmcomapi.dll
 
 install:
-    regsvr32 /s /u $(INSTALLPATH_KEYMANENGINE)\kmcomapi.dll
-    $(COPY) $(PROGRAM)\engine\kmcomapi.dll $(INSTALLPATH_KEYMANENGINE)
-    regsvr32 $(INSTALLPATH_KEYMANENGINE)\kmcomapi.dll
+    cmd /c regsvr32 /s /u "$(INSTALLPATH_KEYMANENGINE)\kmcomapi.dll"
+    $(COPY) $(PROGRAM)\engine\kmcomapi.dll "$(INSTALLPATH_KEYMANENGINE)"
+    cmd /c regsvr32 /s "$(INSTALLPATH_KEYMANENGINE)\kmcomapi.dll"
 
 backup:
     $(WZZIP) $(BUILD)\engine\kmcomapi.zip  $(BACKUPDEFAULTS) kmcomapi.dll

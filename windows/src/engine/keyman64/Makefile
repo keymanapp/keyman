@@ -25,6 +25,6 @@ backup:
     $(WZZIP) $(BUILD)\engine\keyman64.zip  $(BACKUPDEFAULTS) keyman64.dll
 
 install:
-    $(COPY) $(PROGRAM)\engine\keyman64.dll $(INSTALLPATH_KEYMANENGINE)\keyman64.dll
+    $(COPY) $(PROGRAM)\engine\keyman64.dll "$(INSTALLPATH_KEYMANENGINE)\keyman64.dll"
 
 !include ..\..\Target.mak

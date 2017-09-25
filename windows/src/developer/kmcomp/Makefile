@@ -28,6 +28,6 @@ test-manifest:
     $(MT) -nologo -inputresource:$(PROGRAM)\developer\kmcomp.exe -validate_manifest
 
 install:
-    $(COPY) $(PROGRAM)\developer\kmcomp.exe $(INSTALLPATH_KEYMANDEVELOPER)\kmcomp.exe
+    $(COPY) $(PROGRAM)\developer\kmcomp.exe "$(INSTALLPATH_KEYMANDEVELOPER)\kmcomp.exe"
 
 !include ..\..\Target.mak
