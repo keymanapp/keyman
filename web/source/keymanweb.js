@@ -2936,25 +2936,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
       var cachedTouchable = device.touchable, cachedFormFactor = device.formFactor;
       var result = false; // Signals if we successfully handled the keystroke.
-      device.touchable = false;
-      device.formFactor = 'desktop'; 
-      
-      result = keymanweb._KeyDownInternal(e);
 
-      device.touchable = cachedTouchable; 
-      device.formFactor = cachedFormFactor;
-    }   
-
-    /**
-     * Function     _KeyDownInternal
-     * Scope        Private
-     * @param       {Event}       e     event
-     * @return      {boolean}           
-     * Description  Processes keydown event and passes data to keyboard 
-     */    
-    keymanweb._KeyDownInternal = function(e) {
-
-      
       // I1207
       if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  (Levent.Lcode<33 || Levent.Lcode>40)) {
         Ldv.createRange().select();
