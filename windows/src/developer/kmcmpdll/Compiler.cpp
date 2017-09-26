@@ -2247,9 +2247,12 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 				  }
 			  } while(!finished);
 
+        if ((sFlag & (LCTRLFLAG | LALTFLAG)) && (sFlag & (RCTRLFLAG | RALTFLAG))) {
+          AddWarning(CWARN_MixingLeftAndRightModifiers);
+        }
 			  //printf("sFlag: %x\n", sFlag);
 
-              tstr[mx++] = UC_SENTINEL;
+        tstr[mx++] = UC_SENTINEL;
 			  tstr[mx++] = CODE_EXTENDED;
 			  tstr[mx++] = sFlag;
 

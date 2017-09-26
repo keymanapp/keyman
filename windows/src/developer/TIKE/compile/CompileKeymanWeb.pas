@@ -219,7 +219,9 @@ type
     function JavaScript_Name(i: Integer; pwszName: PWideChar; UseNameForRelease: Boolean = False): string;   // I3659
     function JavaScript_Store(pwsz: PWideChar): string;
     function JavaScript_Shift(fkp: PFILE_KEY; FMnemonic: Boolean): Integer;
+    function JavaScript_ShiftAsString(fkp: PFILE_KEY; FMnemonic: Boolean): string;   // I4872
     function JavaScript_Key(fkp: PFILE_KEY; FMnemonic: Boolean): Integer;
+    function JavaScript_KeyAsString(fkp: PFILE_KEY; FMnemonic: Boolean): string;
     function JavaScript_ContextLength(Context: PWideChar): Integer;
     function JavaScript_OutputString(fkp: PFILE_KEY; pwszOutput: PWideChar; fgp: PFILE_GROUP): string;
     function JavaScript_ContextMatch(fkp: PFILE_KEY; context: PWideChar): string;
@@ -236,7 +238,11 @@ type
     function HasSupplementaryPlaneChars: Boolean;   // I3317
     function ValidateLayoutFile(var sLayoutFile: string; const sVKDictionary: string): Boolean;   // I4139
     function GetSystemStoreValue(Index: DWORD; const Default: string = ''): string;   // I4259
-    function ValidateJsonFile(const AJSONFilename: string): Boolean;   // I4872
+    function ValidateJsonFile(const AJSONFilename: string): Boolean;
+    function GetKeyboardModifierBitmask: string;
+    function FormatModifierAsBitflags(FBitMask: Cardinal): string;
+    function FormatKeyAsString(key: Integer): string;
+    function JavaScript_SetupDebug: string;
   public
     function Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallback): Boolean;   // I3681   // I4140   // I4688   // I4866
     constructor Create;
@@ -613,6 +619,22 @@ begin
   end;
 end;
 
+///
+/// Returns a Javascript representation of a key value, either as a constant (debug mode)
+/// or as an integer.
+///
+/// @param fkp         Pointer to key record
+/// @param FMnemonic   True if the keyboard is a mnemonic layout
+///
+/// @return string representation of the key value, e.g. 'keyCodes.K_A /* 0x41 */' or '65'
+///
+function TCompileKeymanWeb.JavaScript_KeyAsString(fkp: PFILE_KEY; FMnemonic: Boolean): string;
+begin
+  if FDebug
+    then Result := ' '+FormatKeyAsString(JavaScript_Key(fkp, FMnemonic))
+    else Result := IntToStr(JavaScript_Key(fkp, FMnemonic));
+end;
+
 function TCompileKeymanWeb.JavaScript_Name(i: Integer; pwszName: PWideChar; UseNameForRelease: Boolean): string;   // I3659
 begin
   if not Assigned(pwszName) or (pwszName^ = #0) or (not Self.FDebug and not UseNameForRelease) then   // I3659   // I3681
@@ -866,24 +888,11 @@ function TCompileKeymanWeb.JavaScript_Shift(fkp: PFILE_KEY; FMnemonic: Boolean):
 begin
   if not FMnemonic then
   begin
-    Result := KMX_ISVIRTUALKEY;
-
-    if (fkp.ShiftFlags and (
-      KMX_LCTRLFLAG or KMX_RCTRLFLAG or KMX_LALTFLAG or KMX_RALTFLAG)) <> 0 then   // I4118
-    begin
-      ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags LALT, RALT, LCTRL, RCTRL are not supported in KeymanWeb');
-    end;
-
-    if (fkp.ShiftFlags and (
-      KMX_CAPITALFLAG or KMX_NOTCAPITALFLAG or KMX_NUMLOCKFLAG or KMX_NOTNUMLOCKFLAG or KMX_SCROLLFLAG or KMX_NOTSCROLLFLAG)) <> 0 then   // I4118
-    begin
-      ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags CAPS and NCAPS are not supported in KeymanWeb');
-    end;
-
     if (fkp.ShiftFlags and KMX_ISVIRTUALKEY) = KMX_ISVIRTUALKEY then
-      Result := Result or (Integer(fkp.ShiftFlags) and $70)
+      Result := fkp.ShiftFlags
     else
     begin
+      Result := KMX_ISVIRTUALKEY;
       if Pos(fkp.Key, USEnglishShift) > 0 then
         Result := Result or KMX_SHIFTFLAG;
     end;
@@ -896,23 +905,24 @@ begin
       ReportError(fkp.Line, CERR_VirtualKeysNotValidForMnemonicLayouts, 'Virtual keys are not valid for mnemonic layouts');  // I1971   // I4061
     Result := 0;
   end;
-//  Result :=
-{  if ShiftFlags and K_SHIFT
-  KMX_LCTRLFLAG      = $0001;	// Left Control flag
-  KMX_RCTRLFLAG      = $0002;	// Right Control flag
-  KMX_LALTFLAG       = $0004;	// Left Alt flag
-  KMX_RALTFLAG       = $0008;	// Right Alt flag
-  KMX_SHIFTFLAG      = $0010;	// Either shift flag
-  KMX_CTRLFLAG       = $0020;	// Either ctrl flag
-  KMX_ALTFLAG        = $0040;	// Either alt flag
-  KMX_CAPITALFLAG    = $0100;	// Caps lock on
-  KMX_NOTCAPITALFLAG = $0200;	// Caps lock NOT on
-  KMX_NUMLOCKFLAG    = $0400;	// Num lock on
-  KMX_NOTNUMLOCKFLAG = $0800;	// Num lock NOT on
-  KMX_SCROLLFLAG     = $1000;	// Scroll lock on
-  KMX_NOTSCROLLFLAG  = $2000;	// Scroll lock NOT on
-  KMX_ISVIRTUALKEY   = $4000;	// It is a Virtual Key Sequence
-}
+end;
+
+///
+/// Returns a Javascript representation of a key modifier state, either as a constant (debug mode)
+/// or as an integer.
+///
+/// @param fkp         Pointer to key record
+/// @param FMnemonic   True if the keyboard is a mnemonic layout
+///
+/// @return string representation of the key modifier state, e.g.
+///         'modCodes.SHIFT | modCodes.CAPS | modCodes.VIRTUAL_KEY /* 0x4110 */' or
+///         '16656'
+///
+function TCompileKeymanWeb.JavaScript_ShiftAsString(fkp: PFILE_KEY; FMnemonic: Boolean): string;
+begin
+  if not FDebug
+    then Result := IntToStr(JavaScript_Shift(fkp, FMnemonic))
+    else Result := ' '+FormatModifierAsBitflags(JavaScript_Shift(fkp, FMnemonic));
 end;
 
 function TCompileKeymanWeb.JavaScript_Store(pwsz: PWideChar): string;
@@ -1019,20 +1029,127 @@ end;
 
 function TCompileKeymanWeb.VisualKeyboardFromFile(const FVisualKeyboardFileName: string): WideString;
 
-    function WideQuote(s: WideString): WideString;
-    var
-      i: Integer;
+  function WideQuote(s: WideString): WideString;
+  var
+    i: Integer;
+  begin
+    Result := '';
+    for i := 1 to Length(s) do
+      if (s[i] = '"') or (s[i] = '\') then Result := Result + '\'+s[i] else Result := Result + s[i];
+  end;
+
+  function VKShiftToLayerName(Shift: Integer): string;
+  const
+    masks: array[0..6] of string = (
+      'shift',
+      'ctrl',
+      'alt',
+      'leftctrl',
+      'rightctrl',
+      'leftalt',
+      'rightalt'
+    );
+  var
+    i: Integer;
+  begin
+    if shift = 0 then
+      Result := 'default'
+    else
     begin
       Result := '';
-      for i := 1 to Length(s) do
-        if (s[i] = '"') or (s[i] = '\') then Result := Result + '\'+s[i] else Result := Result + s[i];
+      for i := 0 to 6 do
+        if shift and (1 shl i) <> 0 then
+          Result := Result + masks[i] + '-';
+      Delete(Result, Length(Result), 1);
     end;
+  end;
+
+  function VisualKeyboardToKLS(FVK: TVisualKeyboard): string;
+  type
+    TLayer = record
+      Shift: Integer;
+      Name: string;
+      Keys: array[0..64] of string;
+    end;
+  var
+    i: Integer;
+    layers: array of TLayer;  // TDictionary may be faster but not worth the extra dev cost
+    n, j: Integer;
+    Found: Boolean;
+  begin
+    // Discover the layers used in the visual keyboard
+
+    for i := 0 to FVK.Keys.Count - 1 do
+    begin
+      if kvkkUnicode in FVK.Keys[i].Flags then
+      begin
+        // Find the index of the key in KMW VK arrays
+        n := CKeymanWebKeyCodes[FVK.Keys[i].VKey];
+        if n = $FF then Continue;
+
+        Found := False;
+        for j := 0 to High(layers) do
+          if layers[j].Shift = FVK.Keys[i].Shift then
+          begin
+            Found := True;
+            layers[j].Keys[n] := FVK.Keys[i].Text;
+            Break;
+          end;
+
+        if not Found then
+        begin
+          SetLength(layers, Length(layers)+1);
+          layers[High(Layers)].Shift := FVK.Keys[i].Shift;
+          layers[High(Layers)].Keys[n] := FVK.Keys[i].Text;
+        end;
+      end;
+    end;
+
+    // Build the layer array
+
+    Result := nl+FTabStop+'this.KLS={'+nl;
+
+    for i := 0 to High(layers) do
+    begin
+      Result := Result + Format('%s%s"%s": [', [FTabStop,FTabStop,VKShiftToLayerName(layers[i].Shift)]);
+      for j := 0 to High(layers[i].Keys)-1 do
+      begin
+        Result := Result + '"'+WideQuote(layers[i].Keys[j])+'",';
+      end;
+      Result := Result + '"'+WideQuote(layers[i].Keys[High(layers[i].Keys)])+'"]';
+      if i < High(Layers) then
+        Result := Result + ',' + nl;
+    end;
+    Result := Result + nl+FTabStop+'}';
+  end;
+
+  function BuildBKFromKLS: string;
+  const func =
+    'function(x){var e=Array.apply(null,Array(65)).map(String.prototype.valueOf,"")'+
+    ',r=[],v,i,m=[''default'',''shift'',''ctrl'',''shift-ctrl'',''alt'',''shift-alt'','+
+    '''ctrl-alt'',''shift-ctrl-alt''];for(i=m.length-1;i>=0;i--)if((v=x[m[i]])||r.length)'+
+    'r=(v?v:e).slice().concat(r);return r}';
+  func_debug =
+    'function(x){'#13#10+
+    '    var'#13#10+
+    '      empty=Array.apply(null, Array(65)).map(String.prototype.valueOf,""),'#13#10+
+    '      result=[], v, i,'#13#10+
+    '      modifiers=[''default'',''shift'',''ctrl'',''shift-ctrl'',''alt'',''shift-alt'',''ctrl-alt'',''shift-ctrl-alt''];'#13#10+
+    '    for(i=modifiers.length-1;i>=0;i--) {'#13#10+
+    '      v = x[modifiers[i]];'#13#10+
+    '      if(v || result.length > 0) {'#13#10+
+    '        result=(v ? v : empty).slice().concat(result);'#13#10+
+    '      }'#13#10+
+    '    }'#13#10+
+    '    return result;'#13#10+
+    '  }';
+  begin
+    Result := nl+FTabStop+'this.KV.BK=('+IfThen(FDebug,func_debug,func)+')(this.KLS)';
+  end;
 
 var
   FVK: TVisualKeyboard;
-  MaxShift, i, j, n: Integer;
   f102, fbold, fitalic: string;
-  FPos: array[0..$40 {space}] of WideString;
   fDisplayUnderlying: string;
 begin
   Result := '';
@@ -1044,41 +1161,10 @@ begin
     if kvkh102 in FVK.Header.Flags then f102 := '1' else f102 := '0';
     if kvkhDisplayUnderlying in FVK.Header.Flags then fDisplayUnderlying := '1' else fDisplayUnderlying := '0';   // I3886
 
-    Result := Format('{F:''%s%s 1em "%s"'',K102:%s,BK:new Array(', [fitalic, fbold, FVK.Header.UnicodeFont.Name, f102]);   // I3886   // I3956
-
-    MaxShift := 0;
-    for i := 0 to FVK.Keys.Count - 1 do
-      if FVK.Keys[i].Shift > MaxShift then
-        MaxShift := FVK.Keys[i].Shift;
-
-    for j := 0 to MaxShift do
-    begin
-      for i := 0 to High(FPos) do FPos[i] := '';
-      
-      for i := 0 to FVK.Keys.Count - 1 do
-      begin
-        if kvkkUnicode in FVK.Keys[i].Flags then
-        begin
-          if FVK.Keys[i].Shift = j then
-          begin
-            n := CKeymanWebKeyCodes[FVK.Keys[i].VKey];
-            if n <> $FF then FPos[n] := FVK.Keys[i].Text;
-          end;
-        end;
-      end;
-
-      for i := 0 to High(FPos) do
-      begin
-        Result := Result + '"'+WideQuote(FPos[i])+'"';
-        if i < High(FPos) then Result := Result + ',';
-      end;
-
-      if j < MaxShift then Result := Result + ',';
-    end;
-
-    Result := Result + ')}';
-
-    Result := Result + Format(';this.KDU=%s', [fDisplayUnderlying]);   // I3946   // I3956
+    Result := Format('{F:''%s%s 1em "%s"'',K102:%s', [fitalic, fbold, FVK.Header.UnicodeFont.Name, f102]);   // I3886   // I3956
+    Result := Result + Format('};%s%sthis.KDU=%s', [nl,FTabStop,fDisplayUnderlying]);   // I3946   // I3956
+    Result := Result + ';'+VisualKeyboardToKLS(FVK);
+    Result := Result + ';'+BuildBKFromKLS;
   finally
     FVK.Free;
   end;
@@ -1343,6 +1429,7 @@ var
   sLayoutFile, sVKDictionary: string;
   linecomment: string;  // I3438
   HasRules: Boolean;
+  sModifierBitmask: string;
 begin
   Result := '';//UTF16SignatureW;  // + '// compiled by Keyman Developer'+nl;  // I3474
 	{ Locate the name of the keyboard }
@@ -1488,28 +1575,34 @@ begin
   else
     sVisualKeyboard := 'null';
 
+  sModifierBitmask := GetKeyboardModifierBitmask;
+
   fMnemonic := vMnemonic = 1;
 
   Result := Result + Format(
     'KeymanWeb.KR(new %s());%s'+
     'function %s()%s'+
     '{%s'+
+    '%s%s%s'+
     '%sthis.KI="%s";%s'+
     '%sthis.KN="%s";%s'+
     '%sthis.KV=%s;%s'+
     '%sthis.KH=%s;%s'+
     '%sthis.KM=%d;%s'+
     '%sthis.KBVER="%s";%s'+   // I4155
+    '%sthis.KMBM=%s;%s'+
     '%s',
     [sName, nl,
     sName, nl,
     nl,
+    FTabStop, JavaScript_SetupDebug, nl,
     FTabStop, sName, nl,
     FTabStop, RequotedString(sFullName), nl,
     FTabStop, sVisualKeyboard, nl,
     FTabStop, sHelp, nl,
     FTabStop, vMnemonic, nl,
     FTabStop, FKeyboardVersion, nl,   // I4155
+    FTabStop, sModifierBitmask, nl,
     sRTL]);   // I3681
 
   if HasSupplementaryPlaneChars then
@@ -1593,9 +1686,9 @@ begin
         HasRules := TRue;
         if fgp.fUsingKeys then
         begin
-          Result := Result + Format('if(k.KKM(e,%d,%d)',
-            [JavaScript_Shift(fkp, fMnemonic),
-            JavaScript_Key(fkp, fMnemonic)]);
+            Result := Result + Format('if(k.KKM(e,%s,%s)',
+              [JavaScript_ShiftAsString(fkp, fMnemonic),
+              JavaScript_KeyAsString(fkp, fMnemonic)]);
         end;
 
         if xstrlen(fkp.dpContext) > 0 then
@@ -2057,6 +2150,133 @@ function GetKeymanWebCompiledFileName(const FileName: WideString): WideString;  
   end;
 begin
   Result := GetKeymanWebCompiledFileName(FileName, GetKeyboardVersionString(FileName));
+end;
+
+///
+/// If debug mode, then returns Javascript code necessary for
+/// accessing constants in the compiled keyboard
+///
+/// @return string of JavaScript code
+///
+function TCompileKeymanWeb.JavaScript_SetupDebug: string;
+begin
+  if FDebug then
+    Result := 'var modCodes = tavultesoft.keymanweb.osk.modifierCodes;'+nl+
+              FTabStop+'var keyCodes = tavultesoft.keymanweb.osk.keyCodes;'+nl
+  else
+    Result := '';
+end;
+
+///
+/// Converts a modifier bit mask integer into its component bit flags
+///
+/// @param FBitMask A KMX modifier bitmask value
+///
+/// @return string of JavaScript code, e.g. 'modCodes.SHIFT | modCodes.CTRL /* 0x0030 */'
+///
+function TCompileKeymanWeb.FormatModifierAsBitflags(FBitMask: Cardinal): string;
+const
+  mask: array[0..14] of string = (
+    'LCTRL',             // 0X0001
+    'RCTRL',             // 0X0002
+    'LALT',              // 0X0004
+    'RALT',              // 0X0008
+
+    'SHIFT',             // 0X0010
+    'CTRL',              // 0X0020
+    'ALT',               // 0X0040
+
+    '???',               // Reserved
+
+    'CAPS',              // 0X0100
+    'NO_CAPS',           // 0X0200
+
+    'NUM_LOCK',          // 0X0400
+    'NO_NUM_LOCK',       // 0X0800
+
+    'SCROLL_LOCK',       // 0X1000
+    'NO_SCROLL_LOCK',    // 0X2000
+
+    'VIRTUAL_KEY'        // 0X4000
+  );
+var
+  i: Integer;
+begin
+  //TODO: We need to think about mnemonic layouts which are incompletely supported at present
+  //tavultesoft.keymanweb.osk.
+
+  Result := '';
+
+  for i := 0 to High(mask) do
+  begin
+    if FBitMask and (1 shl i) <> 0 then
+    begin
+      if Result <> '' then Result := Result + ' | ';
+      Result := Result + 'modCodes.'+mask[i];
+    end;
+  end;
+
+  if Result = '' then
+    Result := '0';
+
+  Result := Result + ' /* 0x' + IntToHex(FBitMask, 4) + ' */';
+end;
+
+///
+/// Converts a key value into a constant
+///
+/// @param key A virtual key code
+///
+/// @return string of JavaScript code, e.g. 'keyCodes.K_A /* 0x41 */'
+///
+function TCompileKeymanWeb.FormatKeyAsString(key: Integer): string;
+begin
+  if (key <= 255) and (KMWVKeyNames[key] <> '')
+    then Result := 'keyCodes.'+KMWVKeyNames[key]+ ' /* 0x' + IntToHex(key, 2) + ' */'
+    else Result := IntToHex(key, 2);
+end;
+
+///
+/// Determine the modifiers used in the target keyboard and return a bitmask
+/// representing them, or an integer value when not in debug mode
+///
+/// @return string of JavaScript code, e.g. 'modCodes.SHIFT | modCodes.CTRL /* 0x0030 */'
+///
+function TCompileKeymanWeb.GetKeyboardModifierBitmask: string;
+var
+  i: Integer;
+  gp: PFILE_GROUP;
+  j: Integer;
+  kp: PFILE_KEY;
+  FBitMask: Integer;
+begin
+  FBitMask := 0;
+  gp := fk.dpGroupArray;
+  for i := 0 to fk.cxGroupArray-1 do
+  begin
+    if gp.fUsingKeys then
+    begin
+      kp := gp.dpKeyArray;
+      for j := 0 to gp.cxKeyArray-1 do
+      begin
+        if not RuleIsExcludedByPlatform(kp) then
+          FBitMask := FBitMask or JavaScript_Shift(kp, fMnemonic);
+        Inc(kp);
+      end;
+    end;
+    Inc(gp);
+  end;
+
+  if ((FBitMask and KMX_MASK_MODIFIER_CHIRAL) <> 0) and
+    ((FBitMask and KMX_MASK_MODIFIER_NONCHIRAL) <> 0) then
+  begin
+    ReportError(0, CWARN_DontMixChiralAndNonChiralModifiers, 'This keyboard contains Ctrl,Alt and LCtrl,LAlt,RCtrl,RAlt sets of modifiers. Use only one or the other set for web target.');
+  end;
+  //TODO: Should FBitMask include the ISVIRTUALKEY bit?
+
+  if FDebug
+    then Result := FormatModifierAsBitflags(FBitMask)
+    else Result := '0x'+IntToHex(FBitMask, 4);
 end;
 
 end.

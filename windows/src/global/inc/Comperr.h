@@ -179,6 +179,9 @@
 #define CWARN_JSONMetadataOSKFontShouldMatchTouchFont 0x000020A1
 #define CWARN_KVKFileIsInSourceFormat          0x000020A2
 
+#define CWARN_DontMixChiralAndNonChiralModifiers 0x000020A3
+#define CWARN_MixingLeftAndRightModifiers        0x000020A4
+
 #define CERR_BufferOverflow							0x000080C0
 #define CERR_Break									0x000080C1
 
