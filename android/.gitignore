@@ -20,8 +20,7 @@
 **/.DS_Store
 
 # This is the file output from KMEA; it's part of our build process.
-**/libs/keyman-engine.aar
-Tests/**/keyman-engine.aar
+**/keyman-engine.aar
 
 # keymanweb dependencies
 KMEA/app/src/main/assets/

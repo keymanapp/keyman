@@ -4,12 +4,8 @@
 
 package com.tavultesoft.kmea;
 
-import android.util.Log;
-
 import android.content.Context;
 import android.view.KeyEvent;
-
-import java.util.HashMap;
 
 public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
 
@@ -116,35 +112,13 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
 
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
-    // Note: Keep this table in sync with kmwosk.js osk.modifierCodes
-    final HashMap<String, Integer> modifierCodes = new HashMap<String, Integer>() {{
-      put("LCTRL", 0x0001);
-      put("RCTRL", 0x0002);
-      put("LALT", 0x0004);
-      put("RALT", 0x0008);
-      put("SHIFT", 0x0010);
-      put("CTRL", 0x0020);
-      put("ALT", 0x0040);
-      put("CAPS", 0x0100);
-      put("NO_CAPS", 0x0200);
-      put("NUM_LOCK", 0x0400);
-      put("NO_NUM_LOCK", 0x0800);
-      put("SCROLL_LOCK", 0x1000);
-      put("NO_SCROLL_LOCK", 0x2000);
-      put("VIRTUAL_KEY", 0x4000);
-    }};
 
     if (keyCode > 84 || keyCode < 0) {
       // The key is outside the range of keys we understand
       return false;
     }
 
-    boolean isChiral = false;
-    if (this.keyboardType == KMManager.KeyboardType.KEYBOARD_TYPE_INAPP) {
-      isChiral = KMManager.InAppKeyboard.getChirality();
-    } else if (this.keyboardType == KMManager.KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      isChiral = KMManager.SystemKeyboard.getChirality();
-    }
+    boolean isChiral = KMManager.getActiveKeyboard().getChirality();
 
     // States of modifier keys
     // KeyEvent.getModifiers() specifically masks out lock keys (KeyEvent.META_CAPS_LOCK_ON,
@@ -156,27 +130,25 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
 
     // By design, SHIFT is non-chiral
     if ((androidModifiers & KeyEvent.META_SHIFT_ON) != 0) {
-      keymanModifiers |= modifierCodes.get("SHIFT");
+      keymanModifiers |= KMModifierCodes.get("SHIFT");
     }
     if ((androidModifiers & KeyEvent.META_CTRL_LEFT_ON) != 0) {
-      keymanModifiers |= isChiral ? modifierCodes.get("LCTRL") : modifierCodes.get("CTRL");
+      keymanModifiers |= isChiral ? KMModifierCodes.get("LCTRL") : KMModifierCodes.get("CTRL");
     }
     if ((androidModifiers & KeyEvent.META_CTRL_RIGHT_ON) != 0) {
-      keymanModifiers |= isChiral ? modifierCodes.get("RCTRL") : modifierCodes.get("CTRL");
+      keymanModifiers |= isChiral ? KMModifierCodes.get("RCTRL") : KMModifierCodes.get("CTRL");
     }
     if ((androidModifiers & KeyEvent.META_ALT_LEFT_ON) != 0) {
-      keymanModifiers |= isChiral ? modifierCodes.get("LALT") : modifierCodes.get("ALT");
+      keymanModifiers |= isChiral ? KMModifierCodes.get("LALT") : KMModifierCodes.get("ALT");
     }
     if ((androidModifiers & KeyEvent.META_ALT_RIGHT_ON) != 0) {
-      keymanModifiers |= isChiral ? modifierCodes.get("RALT") : modifierCodes.get("ALT");
+      keymanModifiers |= isChiral ? KMModifierCodes.get("RALT") : KMModifierCodes.get("ALT");
     }
 
     int Lstates = 0;
-    if (isChiral) {
-      Lstates |= capsOn ? modifierCodes.get("CAPS") : modifierCodes.get("NO_CAPS");
-      Lstates |= numOn ? modifierCodes.get("NUM_LOCK") : modifierCodes.get("NO_NUM_LOCK");
-      Lstates |= scrollOn ? modifierCodes.get("SCROLL_LOCK") : modifierCodes.get("NO_SCROLL_LOCK");
-    }
+    Lstates |= capsOn ? KMModifierCodes.get("CAPS") : KMModifierCodes.get("NO_CAPS");
+    Lstates |= numOn ? KMModifierCodes.get("NUM_LOCK") : KMModifierCodes.get("NO_NUM_LOCK");
+    Lstates |= scrollOn ? KMModifierCodes.get("SCROLL_LOCK") : KMModifierCodes.get("NO_SCROLL_LOCK");
 
     // CTRL-Tab triggers the Keyman language menu
     if (keyCode == KeyEvent.KEYCODE_TAB && ((androidModifiers & KeyEvent.META_CTRL_ON) != 0)) {

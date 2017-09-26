@@ -1160,10 +1160,7 @@ public final class KMManager {
           }
 
           if (result > 0) {
-            if (KMManager.InAppKeyboard != null)
-              KMManager.InAppKeyboard.loadKeyboard();
-            if (KMManager.SystemKeyboard != null)
-              KMManager.SystemKeyboard.loadKeyboard();
+            KMManager.getActiveKeyboard().loadKeyboard();
           }
         }
       }.execute();
@@ -1378,10 +1375,20 @@ public final class KMManager {
     String langName = kbInfo.get(KMManager.KMKey_LanguageName);
     String kFont = kbInfo.get(KMManager.KMKey_Font);
     String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
-    if (InAppKeyboard != null)
-      InAppKeyboard.setKeyboard(kbId, langId, kbName, langName, kFont, kOskFont);
-    if (SystemKeyboard != null)
-      SystemKeyboard.setKeyboard(kbId, langId, kbName, langName, kFont, kOskFont);
+    KMManager.getActiveKeyboard().setKeyboard(kbId, langId, kbName, langName, kFont, kOskFont);
+  }
+
+  public static KMKeyboard getActiveKeyboard() {
+    Log.d("KMM", "InApp: " + String.valueOf(InAppKeyboard != null) + " SystemKeyboard: " + String.valueOf(SystemKeyboard != null));
+    Log.d("KMM", "InAppKeyboardLoaded: " + String.valueOf(InAppKeyboardLoaded) + " SystemKeyboardLoaded: " + String.valueOf(SystemKeyboardLoaded));
+    if (InAppKeyboard != null && InAppKeyboardLoaded) {
+      return InAppKeyboard;
+    } else if (SystemKeyboard != null && SystemKeyboardLoaded) {
+      return SystemKeyboard;
+    } else {
+      Log.w("KMManager", "Cannot determine active keyboard");
+      return null;
+    }
   }
 
   public static String getKeyboardTextFontFilename() {
@@ -1779,25 +1786,11 @@ public final class KMManager {
   }
 
   public static boolean isHelpBubbleEnabled() {
-    boolean retVal = true;
-
-    if (InAppKeyboard != null) {
-      retVal = InAppKeyboard.isHelpBubbleEnabled;
-    } else if (SystemKeyboard != null) {
-      retVal = SystemKeyboard.isHelpBubbleEnabled;
-    }
-
-    return retVal;
+    return KMManager.getActiveKeyboard().isHelpBubbleEnabled;
   }
 
   public static void setHelpBubbleEnabled(boolean newValue) {
-    if (InAppKeyboard != null) {
-      InAppKeyboard.isHelpBubbleEnabled = newValue;
-    }
-
-    if (SystemKeyboard != null) {
-      SystemKeyboard.isHelpBubbleEnabled = newValue;
-    }
+    KMManager.getActiveKeyboard().isHelpBubbleEnabled = newValue;
   }
 
   public static boolean canAddNewKeyboard() {
@@ -2258,7 +2251,6 @@ public final class KMManager {
       return kbWidth;
     }
 
-    // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
     public void setIsChiral(boolean isChiral) {
       InAppKeyboard.setChirality(isChiral);
@@ -2369,7 +2361,6 @@ public final class KMManager {
       return kbWidth;
     }
 
-    // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
     public void setIsChiral(boolean isChiral) {
       SystemKeyboard.setChirality(isChiral);
