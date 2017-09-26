@@ -1,11 +1,11 @@
 #!/bin/sh
-# Build Chirality
+# Build KeyboardHarness test app
 
 echo Build KMEA
 cd ../../KMEA
 ./build.sh
-cd ../Tests/Chirality
+cd ../Tests/KeyboardHarness
 cp ../keyman-engine.aar app/libs/
 
-echo Build Chirality
+echo Build KeyboardHarness test app
 ./gradlew clean build

@@ -1,4 +1,4 @@
-package com.keyman.chirality;
+package com.keyman.android.tests.keyboardHarness;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
