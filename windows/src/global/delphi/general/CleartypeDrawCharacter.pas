@@ -325,7 +325,12 @@ procedure TClearTypeDrawCharacter.SelectFallbackFont(Handle: THandle; const Text
 var
   uc: DWord;
 begin
-  uc := Char.ConvertToUtf32(Text, 0);  // I3310
+  try
+    uc := Char.ConvertToUtf32(Text, 0);  // I3310
+  except
+    on E:EArgumentOutOfRangeException do
+      uc := $FFFD;  // Not a character, invalid Unicode
+  end;
   if uc < $10000 then      SelectFont(Handle, ctfCode2000)
   else if uc < $20000 then SelectFont(Handle, ctfCode2001)
   else if uc < $30000 then SelectFont(Handle, ctfCode2002)
