@@ -22,7 +22,7 @@ backup:
     $(WZZIP) $(BUILD)\engine\mcompile.exe  $(BACKUPDEFAULTS) mcompile.exe
 
 install:
-    $(COPY) $(PROGRAM)\engine\mcompile.exe "C:\Program Files (x86)\Common Files\Tavultesoft\Keyman Engine 9.0"
+    $(COPY) $(PROGRAM)\engine\mcompile.exe "$(INSTALLPATH_KEYMANENGINE)"
 
 test-manifest:
     # test that linked manifest exists and correct

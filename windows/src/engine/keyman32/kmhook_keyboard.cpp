@@ -173,6 +173,8 @@ int ProcessLanguageSwitchShiftKey(WPARAM wParam, BOOL isUp)
 
   switch(wParam)   // I4548
   {
+    case VK_LSHIFT:
+    case VK_RSHIFT:
     case VK_SHIFT:   
     case VK_CONTROL: 
     case VK_LCONTROL:   // I4124

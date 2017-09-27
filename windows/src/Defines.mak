@@ -25,6 +25,10 @@ BUILD=$(ROOT)\build
 DEBUGPATH=$(ROOT)\debug
 OUTLIB=$(ROOT)\lib
 
+INSTALLPATH_KEYMANDESKTOP=%ProgramFiles(X86)%\Keyman\Keyman Desktop 10.0
+INSTALLPATH_KEYMANDEVELOPER=%ProgramFiles(X86)%\Keyman\Keyman Developer 10.0
+INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine 10.0
+
 !IFDEF DEBUG
   MAKEFLAG_DEBUG=-DDEBUG
 !ENDIF
@@ -198,8 +202,7 @@ SC_PFX_SHA256="$(ROOT)\src\buildtools\certificates\keymantest-sha256.pfx"
 SC_PFX_SHA1="$(ROOT)\src\buildtools\certificates\keymantest-sha1.pfx"
 SC_PWD=""
 
-SIGNTOOL="C:\Program Files (x86)\Windows Kits\8.0\bin\x86\signtool.exe"
-SIGNCODE=@$(ROOT)\src\buildtools\signtime.bat $(SIGNTOOL) $(SC_PFX_SHA1) $(SC_PFX_SHA256) $(SC_URL) $(SC_PWD)
+SIGNCODE=@$(ROOT)\src\buildtools\signtime.bat signtool.exe $(SC_PFX_SHA1) $(SC_PFX_SHA256) $(SC_URL) $(SC_PWD)
 
 !ifdef USERDEFINES
 !include $(ROOT)\src\UserDefines.mak

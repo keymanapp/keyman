@@ -42,7 +42,12 @@ begin
   Stream.Read(w, sizeof(w));
   SetLength(str, w);
   Stream.Read(PChar(str)^, w*2);
-  Result := str;
+  // The string read is a C-style null terminated string. We need
+  // to remove the null character because Pascal strings don't
+  // use null termination in the same way. Best way to do this is
+  // to cast it as a C-style string, which reliably terminates at
+  // first null byte.
+  Result := PWideChar(str);
 end;
 
 procedure TVisualKeyboardLoaderBinary.ReadFont(Stream: TStream; FFont: TFont);

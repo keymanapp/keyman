@@ -1730,6 +1730,18 @@ public final class KMManager {
     return result;
   }
 
+  public static void resetContext(KeyboardType kbType) {
+    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      if (InAppKeyboard != null && InAppKeyboardLoaded) {
+        InAppKeyboard.loadUrl("javascript:resetContext()");
+      }
+    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      if (SystemKeyboard != null && SystemKeyboardLoaded) {
+        SystemKeyboard.loadUrl("javascript:resetContext()");
+      }
+    }
+  }
+
   public static int getCurrentKeyboardIndex(Context context) {
     return KeyboardPickerActivity.getCurrentKeyboardIndex(context);
   }

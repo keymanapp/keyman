@@ -25,6 +25,6 @@ backup:
     $(WZZIP) $(BUILD)\engine\keyman32.zip  $(BACKUPDEFAULTS) keyman32.dll
 
 install:
-    $(COPY) $(PROGRAM)\engine\keyman32.dll "C:\Program Files (x86)\Common Files\Keyman\Keyman Engine 10.0\keyman32.dll"
+    $(COPY) $(PROGRAM)\engine\keyman32.dll "$(INSTALLPATH_KEYMANENGINE)\keyman32.dll"
 
 !include ..\..\Target.mak

@@ -26,7 +26,7 @@ backup:
     $(WZZIP) $(BUILD)\engine\keymanx64.exe  $(BACKUPDEFAULTS) keymanx64.exe
 
 install:
-    $(COPY) $(PROGRAM)\engine\keymanx64.exe "C:\Program Files (x86)\Common Files\Tavultesoft\Keyman Engine 9.0"
+    $(COPY) $(PROGRAM)\engine\keymanx64.exe "$(INSTALLPATH_KEYMANENGINE)"
 
 test-uiaccess:
     grep -c "uiAccess=\"true\"" manifest.xml

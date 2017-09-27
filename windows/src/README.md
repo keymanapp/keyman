@@ -1,31 +1,28 @@
-Keyman Desktop 10.0 and Keyman Developer 10.0
-=============================================
+# Keyman Desktop 10.0 and Keyman Developer 10.0
 
-Build Prerequisites
-===================
+## Build Prerequisites
 
-1. Install VS2017 Community Edition (see below for details)
-2. Install Delphi 10.2 Berlin (if Starter Edition, see below for additional notes) 
-3. Install git https://git-scm.com/download/win
-4. Add Keyman root folder to antivirus exclusions (performance and file lock reasons) [optional - but highly recommended]
-5. Start Delphi 10.2 Berlin IDE once after installation to create default environment files and ensure registration is complete.
-6. Set environment variables per notes below: `KEYMAN_ROOT`, `DELPHI_STARTER`, `USERDEFINES`, (`USE_PLUSMEMO`, `KEYMAN_ENCUMBERED_ROOT`)
-7. Add the `windows/lib` folder in the Keyman repository to your `PATH` environment variable (required for packages in Delphi)
+1. Install [VS2017 Community Edition](#visual-studio-2017-community-edition-setup-requirements).
+2. Install [Delphi 10.2](#delphi-setup-requirements).
+3. Install [git](https://git-scm.com/download/win).
+4. Add the Keyman root folder to antivirus exclusions for performance and file lock reasons (optional - but highly recommended).
+5. Start Delphi 10.2 IDE once after installation to create default environment files and ensure registration is complete.
+6. Set environment variables per [notes below](#environment-variables): `KEYMAN_ROOT`, `DELPHI_STARTER`, `USERDEFINES`, (`USE_PLUSMEMO`, `KEYMAN_ENCUMBERED_ROOT`).
+7. Add the **windows/lib** folder in the Keyman repository to your `PATH` environment variable (required for packages in Delphi)
 
-Release build prerequisites
----------------------------
+### Release build prerequisites
 
-1. Install 7-Zip 64-bit (or 32-bit on x86 Windows) http://www.7-zip.org/ (used for archiving build files -- may be eliminated in future)
-2. Install HTML Help Workshop from https://www.microsoft.com/en-us/download/details.aspx?id=21138
-3. Run `make test-certificate` to create a test certificate, or else create `UserDefines.mak` to locate code signing certificates
-4. Install WiX to c:\program files (x86)\windows installer xml v3.5 https://wix.codeplex.com/releases/view/60102
+For local development you do not need to perform a release build so these are optional.
 
-Building Keyman Desktop and Keyman Developer
-============================================
+1. Install [7-Zip](http://www.7-zip.org/) 64-bit (or 32-bit on x86 Windows). 7-Zip is used for archiving build files -- may be eliminated in future.
+2. Install [HTML Help Workshop](https://www.microsoft.com/en-us/download/details.aspx?id=21138)
+4. Install [WiX](https://wix.codeplex.com/releases/view/60102) to **C:\Program Files (x86)\Windows Installer XML v3.5**
 
-1. Start a `VS2017 x64_x86 Cross Tools` command prompt.
-2. Run `make build` from the folder `windows/src` folder.
-3. Artifacts from a successful build will be placed in `windows/bin` folder.
+## Building Keyman Desktop and Keyman Developer
+
+1. Start 'x64_x86 Cross Tools Command Prompt for VS 2017'.
+2. Run `make build` from the **windows/src** folder.
+3. Artifacts from a successful build will be placed in **windows/bin** folder.
 
 Type `make` to see build targets. Common build targets are:
 
@@ -33,53 +30,80 @@ Type `make` to see build targets. Common build targets are:
   `make clean` <-- remove temporary files and build artifacts
   `make release` <-- makes a release of all Keyman Windows projects
 
-Release build
--------------
+By default the version generated will be 10.0.700.0.
 
-1. Start a `VS2017 x64_x86 Cross Tools` command prompt.
-2. Run `make release` from the folder `windows/src` folder.
-3. Artifacts from a successful build will be placed in `windows/release` folder.
+### Release build
+
+To perform a release build, you will need to obtain valid certificates. A release build is
+unnecessary for local development.
+
+1. Start 'x64_x86 Cross Tools Command Prompt for VS 2017'.
+2. Run `make release` from the **windows/src** folder.
+3. Artifacts from a successful build will be placed in **windows/release** folder.
 
 Note: by default, the version generated will be 10.0.700.0. You will not be able to
 install it over a later version of Keyman, and will need to uninstall and reinstall.
 
-Detailed Preqrequisite Notes
-============================
+## Installing Keyman
 
-Visual Studio 2017 Community Edition setup requirements
--------------------------------------------------------
+These steps are only required the first time you install Keyman:
+1. Install release versions of Keyman 10.0 and Keyman Developer 10.0.
+    * Download the [latest official builds (alpha)](https://keyman.com/beta/) and run the installers.
+2. Install the Keyman test certificates. Do the following for each KeymanTestCA cert in
+**windows/src/buildtools/certificates**:
+    1. Open the certificate and click 'Install certificate...' to open the Certificate Import Wizard.
+    2. Select either 'Current User' or 'Local Machine' for 'Store Location' depending on your preference and
+    click Next.
+    3. Select 'Place all certificates in the following store' and 'Browse...' to select
+    'Trusted Root Certification Authorities'. Click Next and finish the wizard.
+
+To deploy a development build of Keyman and Keyman Developer,
+1. Start 'x64_x86 Cross Tools Command Prompt for VS 2017'.
+2. Run `make signcode` from the **windows/src** folder.
+3. Ensure that Keyman and Keyman Developer are not running.
+4. Run `make install` in **windows/src/engine**, **windows/src/desktop** and **windows/src/developer**.
+
+## Detailed Prerequisite Notes
+
+### Visual Studio 2017 Community Edition setup requirements
 
 In Visual Studio 2017, you need to have the following components installed:
 * Universal Windows Platform development
+    * Desktop development with C++ > Windows 8.1 SDK and UCRT SDK
 * Desktop development with C++
-* 'Windows 8.1 SDK and UCRT SDK'
-* Universal CRT SDK
 
-* Two-space tab stops (spaces, not tabs). Some existing code has tabs rather than spaces
+Configure Visual Studio to use two-space tab stops:
+1. Open the options dialog: Tools > Options
+2. Navigate to Text Editor > All Languages > Tabs
+3. Change 'Tab size' to 2 and 'Indent size' to 2
+4. Select 'Insert spaces'
 
-Delphi setup requirements
--------------------------
+### Delphi setup requirements
 
-* Windows 32 and 64 bit (note, only 32 bit on Delphi Starter)
+Delphi Starter Edition is free and can be downloaded [here](https://www.embarcadero.com/products/delphi/starter).
+Some features of Keyman are [limited](#delphi_starter---building-with-delphi-starter-edition) when built using
+the Starter Edition. You must set the `DELPHI_STARTER` environment variable when using the Starter Edition.
+
+Install Delphi using the following options:
+* Windows 32 and 64 bit (note: Delphi Starter only has 32 bit)
 * No 3rd party components required
 * No Interbase components required
 
-Environment Variables
-=====================
+## Environment Variables
 
-KEYMAN_ROOT - Locating the source
----------------------------------
+To check whether these variables are set, run `SET NAME_OF_VAR` in command prompt.
+
+### KEYMAN_ROOT - Locating the source
 
 If you pull the entire `keyman.git` repo to `c:\keyman`, then the paths by default will
 work without changes. Otherwise, you will need to set an environment variable
 `KEYMAN_ROOT` to the root path of the Keyman repo. For example:
 
-````
+```
 SET KEYMAN_ROOT=c:\projects\keyman
-````
+```
 
-DELPHI_STARTER - Building with Delphi Starter Edition
------------------------------------------------------
+### DELPHI_STARTER - Building with Delphi Starter Edition
 
 Keyman can be built from the command line with Delphi Starter Edition. You will need
 to set the environment variable `DELPHI_STARTER` to enable a command line build with
@@ -100,8 +124,7 @@ However, there are three limitations:
 
 3. The encumbered components cannot be built with Delphi Starter Edition.
 
-USERDEFINES - User Defines
---------------------------
+### USERDEFINES - User Defines
 
 You can specify defines that will not be added to the git repository and will be used in
 the build in the UserDefines.mak file in the root folder. This is used mostly for 
@@ -111,8 +134,7 @@ executables when you build a release.
 To include UserDefines.mak in the build, use the command line parameter `-DUSERDEFINES`. You
 can also set an environment variable `USERDEFINES=1` to get the same result.
 
-KEYMAN_ENCUMBERED_ROOT and USE_PLUSMEMO - Encumbered components
----------------------------------------------------------------
+### KEYMAN_ENCUMBERED_ROOT and USE_PLUSMEMO - Encumbered components
 
 Keyman Developer can be built with an encumbered text editor, `TPlusMemo`. The standard 
 open source release uses a very basic `TMemo` without syntax highlighting and lots of 

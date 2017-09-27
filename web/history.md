@@ -8,6 +8,7 @@
   * New API functions have been added:  `detachFromControl`, `enableControl`, `disableControl`, `setKeyboardForControl`.
 * Removed old code directed at legacy browsers no longer supported.  (#212)
 * Refactored code paths relating to KMW's embedding in the iOS and Android apps.  (#211)
+* Fixed next-layer processing (#116)
 
 ## 2017-07-10 2.0.473 stable
 * 2.0 stable release build.

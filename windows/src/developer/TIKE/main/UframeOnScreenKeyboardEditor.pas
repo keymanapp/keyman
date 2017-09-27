@@ -298,16 +298,9 @@ begin
 end;
 
 procedure TframeOnScreenKeyboardEditor.tmrUpdateCharacterMapTimer(Sender: TObject);
-var
-  token: WideString;
-  x, token_start: Integer;
-  //prev_token: WideString;
 begin
   tmrUpdateCharacterMap.Enabled := False;
-  x := editVKKeyText.SelStart+editVKKeyText.SelLength;
-  token_start := 0;
-  token := FormatUnicode(Copy(editVKKeyText.Text, x, 1));
-  UpdateCharacterMap(False, token, x, token_start, False);   // I4807
+  UpdateCharacterMap(False, editVKKeyText.Text, 0, 0, True);
 end;
 
 { ---------------------------------------------------------------------------- }

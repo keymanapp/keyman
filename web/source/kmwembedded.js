@@ -32,39 +32,39 @@
     if(device.app.indexOf('Mobile') >= 0) device.formFactor='phone';
     if(device.app.indexOf('Tablet') >= 0) device.formFactor='tablet';
     device.browser='native';
-  }
+  };
   
   // Get default style sheet path
   keymanweb.getStyleSheetPath = function(ssName) {
     return keymanweb.rootPath+ssName;
-  }
+  };
 
   // Get KMEI, KMEA keyboard path (overrides default function)
   keymanweb.getKeyboardPath = function(Lfilename) {
     return keymanweb.rootPath+'languages/' + Lfilename + "?v=" + (new Date()).getTime(); /*cache buster*/  
-  }
+  };
 
     /**
    * Force reload of resource
    * 
    *  @param  {string}  s unmodified URL
-   *  @return             modified URL         
+   *  @return             modified URL
    */
   util.unCached = function(s) {
     var t=(new Date().getTime());
     s = s + '?v=' + t;
     return s;
-  }  
+  };
   
   util.wait = function() {
     // Empty stub - this function should not be implemented or used within embedded code routes.
     console.warn("util.wait() call attempted in embedded mode!");  // Sends log message to embedding app.
-  }
+  };
 
   util.alert = function() {
     // Empty stub - this function should not be implemented or used within embedded code routes.
     console.warn("util.alert() call attempted in embedded mode!");  // Sends log message to embedding app.
-  }
+  };
  
   // TODO: This needs to be discussed with Serkan - can possibly get context without any reference to Pelem?? 
   
@@ -83,8 +83,8 @@
    */    
   keymanweb.KC_ = function(n, ln, Pelem) 
   {
-    var Ldv;
-    if(Pelem.body) var Ldoc=Pelem; else var Ldoc=Pelem.ownerDocument; // I1481 - use Ldoc to get the ownerDocument when no selection is found
+    var Ldv, Ldoc;
+    if(Pelem.body) Ldoc=Pelem; else Ldoc=Pelem.ownerDocument; // I1481 - use Ldoc to get the ownerDocument when no selection is found
    
     if(keymanweb.legacy)
     {
@@ -92,7 +92,7 @@
     }
     else if(Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&
       (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')) //  &&  Pelem.tagName == 'HTML')  &&  Pelem.tagName == 'HTML')
-		  // I2457 - support contentEditable elements in mozilla, webkit
+      // I2457 - support contentEditable elements in mozilla, webkit
     {
       /* Mozilla midas html editor and editable elements */
       var Lsel = Ldv.getSelection();
@@ -150,7 +150,7 @@
     }
 
     return "";
-  }  
+  };
 
   /**
    * Refresh element content after change of text (if required)
@@ -160,27 +160,27 @@
   keymanweb.refreshElementContent = function(Pelem) 
   {
     if('ontextchange' in keymanweb) keymanweb['ontextchange'](Pelem);
-  }
+  };
 
   /**
    * Set target element text direction (LTR or RTL): not functional for KMEI, KMEA
    *    
    * @param       {Object}      Ptarg      Target element
    */    
-  keymanweb._SetTargDir = function(Ptarg){}
+  keymanweb._SetTargDir = function(Ptarg){};
   
-/**
+  /**
    * Align input fields (should not be needed with KMEI, KMEA)
    * 
    *  @param  {boolean}   align    align and make visible, else hide
    * 
    **/
-  keymanweb.alignInputs = function(align) {}
+  keymanweb.alignInputs = function(align) {};
 
   /**
    * Use rotation events to adjust OSK element positions and scaling if necessary
    */     
-  keymanweb.handleRotationEvents = function() {}
+  keymanweb.handleRotationEvents = function() {};
 
   /**
    * Adjust the absolute height of each keyboard element after a rotation - modified for KMEI, 13/11/14
@@ -239,7 +239,7 @@
     } 
     
     return true;
-  }
+  };
   
   /**
    * Caret position always determined from the active (but hidden) element
@@ -249,17 +249,17 @@
   keymanweb.isPositionSynthesized = function()
   {
     return false;
-  }
+  };
 
   /**
    * correctOSKTextSize handles rotation event -- currently rebuilds keyboard and adjusts font sizes
-   */             
+   */
   keymanweb['correctOSKTextSize']=function() {
     if(osk.adjustHeights()) {
       osk._Load();
     }
-  }
-   
+  };
+
   // Send the subkey array to iOS, with centre,top of base key position
   /**
    * Create a popup key array natively 
@@ -269,15 +269,15 @@
   osk.touchHold = function(key)
   {        
     if(key.subKeys && (typeof(window['oskCreatePopup']) == 'function'))
-    {                           
+    {
       var xBase=util._GetAbsoluteX(key)-util._GetAbsoluteX(osk._DivVKbd)+key.offsetWidth/2,
           yBase=util._GetAbsoluteY(key)-util._GetAbsoluteY(osk._DivVKbd);      
       
       if(device.formFactor == 'phone') osk.prependBaseKey(key);
       osk.popupBaseKey = key; osk.popupPending=true;      
       window['oskCreatePopup'](key.subKeys,xBase,yBase,key.offsetWidth,key.offsetHeight);
-    }      
-  }
+    }
+  };
 
   /**
    * Function called by iOS when a device-implemented keyboard popup is displayed or hidden
@@ -288,16 +288,16 @@
   keymanweb['popupVisible'] = function(isVisible)
   {
     osk.popupVisible = isVisible;
-  }
+  };
 
   // Popup key highlighting (managed by device, dummy call)
-  osk.highlightSubKeys = function(k,x,y){}
+  osk.highlightSubKeys = function(k,x,y){};
 
   // Create a keytip (dummy call - actual keytip handled by native code)
   osk.createKeyTip = function()
   {
       if(device.formFactor == 'phone') osk.keytip = {key:null,state:false};
-  }    
+  };
     
   // Send the key details to KMEI or KMEA for showing or hiding the native-code keytip
   osk.showKeyTip = function(key,on) 
@@ -328,7 +328,7 @@
       if(osk.touchCount == 0 || key == null) clearPreview();
     }
     tip.key = key; tip.state = on;
-  }
+  };
 
   osk.menuEvent = null;
   osk.optionKey = function(e,keyName,keyDown)
@@ -355,17 +355,18 @@
         if('hideKeyboard' in keymanweb) keymanweb['hideKeyboard']();
       }
     }
-  }
+  };
 
   // For KMEI and KMEA will always assume fonts are already installed
-  osk.waitForFonts = function(kfd,ofd){return true;}
+  osk.waitForFonts = function(kfd,ofd){return true;};
+
 
   /**
    *  Return position of language menu key to KeymanTouch
    *  
    *  @return  {string}      comma-separated x,y,w,h of language menu key
    *  
-   **/            
+   **/
   keymanweb['touchMenuPos'] = function()
   {
     if(osk.lgKey == null) return '';  
@@ -381,7 +382,7 @@
         x=util._GetAbsoluteX(key) - util._GetAbsoluteX(osk._DivVKbd) + w/2,
         y=util._GetAbsoluteY(key) - util._GetAbsoluteY(osk._DivVKbd);
     return x+','+y+','+w+','+h;
-  }
+  };
   
  /**
    *  Accept an external key ID (from KeymanTouch) and pass to the keyboard mapping
@@ -445,10 +446,10 @@
 
       // Use default mapping only if necessary (last resort) 
       var ch = osk.defaultKeyOutput(keyName,Lkc.Lcode,keyShiftState);
-      if(ch) keymanweb.KO(0, Lelem, ch);           
-              
-      return true;       
-  }
+      if(ch) keymanweb.KO(0, Lelem, ch);
+
+      return true;
+  };
 
   /**
    *  API endpoint for hardware keystroke events from Android external keyboards

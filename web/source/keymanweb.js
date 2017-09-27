@@ -140,26 +140,26 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         keymanweb._ActiveElement=null; 
         keymanweb.hideCaret(); 
         osk.hideNow();
-      }
-      
+      };
+
       /**
        * Handle losing focus from simulated input field 
-       *      
+       *
        * @param       {Event}      e    event
-       */       
+       */
       keymanweb.setBlur = function(e)
-      {                       
+      {
         // This works OK for iOS, but may need something else for other platforms
         if(('relatedTarget' in e) && e.relatedTarget)
-        {                     
+        {
           if(e.relatedTarget.nodeName != 'DIV' || e.relatedTarget.className.indexOf('keymanweb-input') == -1)
-          {         
-            keymanweb.cancelInput(); return;        
+          {
+            keymanweb.cancelInput(); return;
           }
-        }        
-        //Hide the OSK      
-        if(!keymanweb.focusing) keymanweb.cancelInput(); 
-      }   
+        }
+        //Hide the OSK
+        if(!keymanweb.focusing) keymanweb.cancelInput();
+      }
       
       /**
        * Handle receiving focus by simulated input field 
@@ -170,7 +170,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       {                     
         //e.stopPropagation();  // not doing anything useful, no child elements
         //e.preventDefault();   // prevents user selection or scrolling, may be better if they are allowed?
-
         keymanweb.focusing=true;
         keymanweb.focusTimer=window.setTimeout(function(){keymanweb.focusing=false;},1000);
   
@@ -207,10 +206,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
         // Move the caret and refocus if necessary     
         if(keymanweb._ActiveElement != target) 
-        {                         
+        {
           // Hide the KMW caret
           keymanweb.hideCaret(); 
-          keymanweb._ActiveElement=target; 
+          keymanweb._ActiveElement=target;
           // The issue here is that touching a DIV does not actually set the focus for iOS, even when enabled to accept focus (by setting tabIndex=0)
           // We must explicitly set the focus in order to remove focus from any non-KMW input
           target.focus();  //Android native browsers may not like this, but it is needed for Chrome, Safari
@@ -1152,10 +1151,16 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
           util.attachDOMEvent(baseElement,'focus', keymanweb._ControlFocus);
           util.attachDOMEvent(baseElement,'blur', keymanweb._ControlBlur);
-          // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
-          Pelem.onkeypress = keymanweb._KeyPress;
-          Pelem.onkeydown = keymanweb._KeyDown;
-          Pelem.onkeyup = keymanweb._KeyUp;      
+
+          // TODO:  Rework KMW to properly support physical keyboard use while in touch mode properly.
+          //        As not all the proper infrastructure exists (regarding certain keyboard stores/rules),
+          //        we leave physical keystroke input disabled when in touch mode.
+          if(!isAlias) {
+            // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
+            Pelem.onkeypress = keymanweb._KeyPress;
+            Pelem.onkeydown = keymanweb._KeyDown;
+            Pelem.onkeyup = keymanweb._KeyUp;      
+          }
         }
       } 
     }; 
@@ -1318,7 +1323,23 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     keymanweb.updateInput=function(x){};
   
     // End of I3363 (Build 301) additions
-    
+
+    /**
+     * Function     resetContext
+     * Scope        Public
+     * Description  Revert OSK to default layer and clear any deadkeys and modifiers
+     */
+    keymanweb['resetContext'] = keymanweb.resetContext = function() {
+      osk.layerId = 'default';
+
+      keymanweb._DeadkeyResetMatched();
+      keymanweb._DeadkeyDeleteMatched();
+      keymanweb.cachedContext.reset();
+      keymanweb._ResetVKShift();
+
+      osk._Show();
+    };
+
     /**
      * Exposed function to load keyboards by name. One or more arguments may be used
      * 
@@ -2358,8 +2379,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}             always true  (?) 
      */    
     keymanweb._ControlFocus = function(e)
-    {                   
-      var Ltarg, Ln; 
+    {
+      var Ltarg, Ln;
       if(!keymanweb._Enabled) return true;
       e = keymanweb._GetEventObject(e);     // I2404 - Manage IE events in IFRAMEs
       if(!e) return true;
@@ -2644,7 +2665,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
     
     /**
-     * Execute external (UI) code needed on laoding keyboard
+     * Execute external (UI) code needed on loading keyboard
      * 
      * @param       {string}            _internalName
      * @return      {boolean}   
@@ -2859,127 +2880,149 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     {
       if(keymanweb._ActiveKeyboard != null && typeof(keymanweb._ActiveKeyboard['KNS']) == 'function') keymanweb._ActiveKeyboard['KNS'](_PCommand,_PTarget,_PData);
     }
-          
+    
+    
     /**
      * Function     _KeyDown
      * Scope        Private
      * @param       {Event}       e     event
      * @return      {boolean}           
-     * Description  Processes keydown event and passes data to keyboard 
-     */    
-    keymanweb._KeyDown = function(e)
-    {
+     * Description  Processes keydown event and passes data to keyboard. 
+     */ 
+    keymanweb._KeyDown = function(e) {
       var Ldv,eClass=''; 
 
       keymanweb._KeyPressToSwallow = 0;
-      if(!keymanweb._Enabled || keymanweb._DisableInput || keymanweb._ActiveKeyboard == null) return true;
+      if(!keymanweb._Enabled || keymanweb._DisableInput || keymanweb._ActiveKeyboard == null) {
+        return true;
+      }
 
       // Prevent mapping element is readonly or tagged as kmw-disabled
       var el=util.eventTarget(e);
-      if(device.touchable)
-      {
-        if(el && typeof el.kmwInput != 'undefined' && el.kmwInput == false) return true;
-      }    
-      else if(el && el.className.indexOf('kmw-disabled') >= 0) return true; 
+      if(device.touchable) {
+        if(el && typeof el.kmwInput != 'undefined' && el.kmwInput == false) {
+          return true;
+        }
+      } else if(el && el.className.indexOf('kmw-disabled') >= 0) {
+        return true; 
+      }
       
       // Or if OSK not yet ready (for any reason)
-      if(!osk.ready) return true;
+      if(!osk.ready) {
+        return true;
+      }
       
       // Get event properties  
       var Levent = keymanweb._GetKeyEventProperties(e);
-      if(Levent == null) return true;
-      switch(Levent.Lcode)
-      {
+      if(Levent == null) {
+        return true;
+      }
+
+      switch(Levent.Lcode) {
         case 8: 
           keymanweb._DeadKeys = []; 
           break; // I3318 (always clear deadkeys after backspace) 
         case 16: 
         case 17: 
         case 18: 
+          // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
           keymanweb._NotifyKeyboard(Levent.Lcode,Levent.Ltarg,1); 
-          return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
+          if(!device.touchable) {
+            return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
+          } else {
+            return true;
+          }
       }
-      
+      var cachedTouchable = device.touchable, cachedFormFactor = device.formFactor;
+      var result = false; // Signals if we successfully handled the keystroke.
+
       // I1207
-      if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  (Levent.Lcode<33 || Levent.Lcode>40))
-      {
+      if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  (Levent.Lcode<33 || Levent.Lcode>40)) {
         Ldv.createRange().select();
       }
 
-      if(!window.event)
-      {
+      if(!window.event) {
         // I1466 - Convert the - keycode on mnemonic as well as positional layouts
         // FireFox, Mozilla Suite
-        if(keymanweb._VKMap_FF_IE['k'+Levent.Lcode]) Levent.Lcode=keymanweb._VKMap_FF_IE['k'+Levent.Lcode];
+        if(keymanweb._VKMap_FF_IE['k'+Levent.Lcode]) {
+          Levent.Lcode=keymanweb._VKMap_FF_IE['k'+Levent.Lcode];
+        }
       }
       //else 
       //{
       // Safari, IE, Opera?
       //}
       
-      if(!keymanweb._ActiveKeyboard['KM'])
-      {
+      if(!keymanweb._ActiveKeyboard['KM']) {
         // Positional Layout
 
         var LeventMatched=0;
         /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
         var Lbase=keymanweb._VKMap[osk._BaseLayout];
-        if(Lbase && Lbase['k'+Levent.Lcode]) Levent.Lcode=Lbase['k'+Levent.Lcode];
+        if(Lbase && Lbase['k'+Levent.Lcode]) {
+          Levent.Lcode=Lbase['k'+Levent.Lcode];
+        }
         /* 13/03/2007 MCD: Swedish: End mapping of keystroke to US keyboard */
         
-        if(typeof(keymanweb._ActiveKeyboard['KM'])=='undefined'  &&  !(Levent.Lmodifiers & 0x60))
-        {
+        if(typeof(keymanweb._ActiveKeyboard['KM'])=='undefined'  &&  !(Levent.Lmodifiers & 0x60)) {
           // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
           var Levent2={Lcode:keymanweb._USKeyCodeToCharCode(Levent),Ltarg:Levent.Ltarg,Lmodifiers:0,LisVirtualKey:0};
-          if(keymanweb.callKeyboardStartGroup(Levent2.Ltarg,Levent2)) LeventMatched=1;
+          if(keymanweb.callKeyboardStartGroup(Levent2.Ltarg,Levent2)) {
+            LeventMatched=1;
+          }
         }
         
         LeventMatched = LeventMatched || keymanweb.callKeyboardStartGroup(Levent.Ltarg,Levent);
         
         // Support backspace in simulated input DIV from physical keyboard where not matched in rule  I3363 (Build 301)
-        if(Levent.Lcode == 8 && !LeventMatched && Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0)
+        if(Levent.Lcode == 8 && !LeventMatched && Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
           keymanweb.KO(1,keymanweb._LastActiveElement,"");
-      }
-      else 
-      {
+        }
+      } else {
         // Mnemonic layout
-        if(Levent.Lcode == 8) // I1595 - Backspace for mnemonic
-        {
+        if(Levent.Lcode == 8) { // I1595 - Backspace for mnemonic
           keymanweb._KeyPressToSwallow = 1;
-          if(!keymanweb.callKeyboardStartGroup(Levent.Ltarg,Levent))
+          if(!keymanweb.callKeyboardStartGroup(Levent.Ltarg,Levent)) {
             keymanweb.KO(1,keymanweb._LastActiveElement,""); // I3363 (Build 301)
+          }
           return false;  //added 16/3/13 to fix double backspace on mnemonic layouts on desktop
         }
-        else
+        else {
           keymanweb._KeyPressToSwallow = 0;
+        }
       }
 
-      if(!LeventMatched  &&  Levent.Lcode >= 96  &&  Levent.Lcode <= 111)
-      {
+      if(!LeventMatched  &&  Levent.Lcode >= 96  &&  Levent.Lcode <= 111) {
         // Number pad, numlock on
   //      _Debug('KeyPress NumPad code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
 
-        if(Levent.Lcode < 106) var Lch = Levent.Lcode-48;
-        else Lch = Levent.Lcode-64;
+        if(Levent.Lcode < 106) {
+          var Lch = Levent.Lcode-48;
+        } else {
+          Lch = Levent.Lcode-64;
+        }
         keymanweb.KO(0, Levent.Ltarg, String._kmwFromCharCode(Lch)); //I3319
 
         LeventMatched = 1;
       }
     
-      if(LeventMatched)
-      {
+      if(LeventMatched) {
         keymanweb._FindCaret(Levent.Ltarg); //I779
-        if(e  &&  e.preventDefault) e.preventDefault();
+        if(e  &&  e.preventDefault) {
+          e.preventDefault();
+        }
         keymanweb._KeyPressToSwallow = (e?e.keyCode:0);
         return false;
+      } else {
+        keymanweb._KeyPressToSwallow = 0;
       }
-      else keymanweb._KeyPressToSwallow = 0;
       
-      if(Levent.Lcode == 8)
-      {
+      if(Levent.Lcode == 8) {
         /* Backspace - delete deadkeys, also special rule if desired? */
         // This is needed to prevent jumping to previous page, but why???  // I3363 (Build 301)
-        if(Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) return false;
+        if(Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
+          return false;
+        }
       }
       return true;
     }                
@@ -2998,31 +3041,40 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}           
      * Description Processes keypress event (does not pass data to keyboard)
      */       
-    keymanweb._KeyPress = function(e)
-    {
+    keymanweb._KeyPress = function(e) {
       var Levent;
-      if(!keymanweb._Enabled || keymanweb._DisableInput || keymanweb._ActiveKeyboard == null) return true;
+      if(!keymanweb._Enabled || keymanweb._DisableInput || keymanweb._ActiveKeyboard == null) {
+        return true;
+      }
 
       Levent = keymanweb._GetKeyEventProperties(e);
-      if(Levent == null || Levent.LisVirtualKey) return true;
+      if(Levent == null || Levent.LisVirtualKey) {
+        return true;
+      }
 
   //    _Debug('KeyPress code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
 
       /* I732 START - 13/03/2007 MCD: Swedish: Start positional keyboard layout code: prevent keystroke */
-      if(!keymanweb._ActiveKeyboard['KM'])
-      {
-        if(!keymanweb._KeyPressToSwallow) return true;
-        if(Levent.Lcode < 0x20 || (keymanweb._BrowserIsSafari  &&  (Levent.Lcode > 0xF700  &&  Levent.Lcode < 0xF900))) return true;
+      if(!keymanweb._ActiveKeyboard['KM']) {
+        if(!keymanweb._KeyPressToSwallow) {
+          return true;
+        }
+        if(Levent.Lcode < 0x20 || (keymanweb._BrowserIsSafari  &&  (Levent.Lcode > 0xF700  &&  Levent.Lcode < 0xF900))) {
+          return true;
+        }
         e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-        if(e) e.returnValue = false;
+        if(e) {
+          e.returnValue = false;
+        }
         return false;
       }
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
       
-      if(keymanweb._KeyPressToSwallow || keymanweb.callKeyboardStartGroup(Levent.Ltarg,Levent))
-      {
+      if(keymanweb._KeyPressToSwallow || keymanweb.callKeyboardStartGroup(Levent.Ltarg,Levent)) {
         keymanweb._KeyPressToSwallow=0;
-        if(e  &&  e.preventDefault) e.preventDefault();
+        if(e  &&  e.preventDefault) {
+          e.preventDefault();
+        }
         keymanweb._FindCaret(Levent.Ltarg);  // I779
         return false;
       }

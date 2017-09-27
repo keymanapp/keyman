@@ -25,13 +25,7 @@ backup:
     $(WZZIP) $(BUILD)\engine\kmtip64.zip x64\kmtip64.pdb $(BACKUPDEFAULTS) x64\kmtip64.dll
 
 install:
-    cd c:\program files (x86)\common files\keyman\keyman engine 10.0
-    #regsvr32 /s /u kmtip.dll
-    #regsvr32 /s /u kmtip64.dll
-    $(COPY) $(PROGRAM)\engine\kmtip.dll "c:\program files (x86)\common files\keyman\keyman engine 10.0\kmtip.dll"
-    $(COPY) $(PROGRAM)\engine\kmtip64.dll "c:\program files (x86)\common files\keyman\keyman engine 10.0\kmtip64.dll"
-    #regsvr32 /s kmtip.dll
-    #regsvr32 /s kmtip64.dll
-    cd $(ROOT)\src\engine\kmtip
+    $(COPY) $(PROGRAM)\engine\kmtip.dll "$(INSTALLPATH_KEYMANENGINE)\kmtip.dll"
+    $(COPY) $(PROGRAM)\engine\kmtip64.dll "$(INSTALLPATH_KEYMANENGINE)\kmtip64.dll"
 
 !include ..\..\Target.mak
