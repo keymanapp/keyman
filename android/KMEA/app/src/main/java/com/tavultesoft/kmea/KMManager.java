@@ -88,6 +88,7 @@ public final class KMManager {
   private static boolean shouldAllowSetKeyboard = true;
   private static ArrayList<OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
   private static boolean didCopyAssets = false;
+  private static boolean isChiral = false;
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
 
@@ -215,6 +216,20 @@ public final class KMManager {
       InAppKeyboard.setWebViewClient(new KMInAppKeyboardWebViewClient(appContext));
       InAppKeyboard.addJavascriptInterface(new KMInAppKeyboardJSHandler(appContext), "jsInterface");
       InAppKeyboard.loadKeyboard();
+
+      // TODO: Test code adding chirality keyboard that needs to be removed before merging
+      HashMap<String, String> kbInfo = new HashMap<String, String>();
+      final String Chirality_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
+
+      kbInfo.put(KMManager.KMKey_KeyboardID, "chirality");
+      kbInfo.put(KMManager.KMKey_LanguageID, "eng");
+      kbInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
+      kbInfo.put(KMManager.KMKey_LanguageName, "English");
+      kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
+      kbInfo.put(KMManager.KMKey_Font, Chirality_KeyboardFont);
+      addKeyboard(appContext, kbInfo);
+      Log.d("KMM", "initInApp");
+      // end of test code
     }
   }
 
@@ -272,6 +287,27 @@ public final class KMManager {
     mainLayout.addView(keyboardLayout);
     //mainLayout.addView(overlayLayout);
     return mainLayout;
+  }
+
+  /*
+  public static void setIsChiral(KeyboardType keyboardType) {
+    Log.d("KMM", "kb: " + String.valueOf(keyboardType) + "InApp loaded: " + InAppKeyboardLoaded + " System loaded: " + SystemKeyboardLoaded);
+    KMManager.getKeyboard(keyboardType).loadUrl("javascript:setIsChiral()");
+  }
+*/
+  public static void checkIsChiral(KeyboardType keyboardType) {
+    Log.d("KMM", "keyboardType: " + String.valueOf(keyboardType) + "In loaded: " +
+      String.valueOf(InAppKeyboardLoaded) + " Sys loaded: " + String.valueOf(SystemKeyboardLoaded));
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      SystemKeyboard.loadUrl("javascript:setIsChiral()");
+    }
+    else {
+      InAppKeyboard.loadUrl("javascript:setIsChiral()");
+    }
+  }
+
+  public static boolean getChirality() {
+    return KMManager.isChiral;
   }
 
   public static void onStartInput(EditorInfo attribute, boolean restarting) {
@@ -2276,8 +2312,7 @@ public final class KMManager {
     }
 
     @JavascriptInterface
-    public void setIsChiral(boolean isChiral) {
-      InAppKeyboard.setChirality(isChiral);
+    public void setIsChiral(boolean isChiral) { KMManager.isChiral = isChiral; // { InAppKeyboard.setChirality(isChiral);
     }
 
     // This annotation is required in Jelly Bean and later:
@@ -2386,8 +2421,7 @@ public final class KMManager {
     }
 
     @JavascriptInterface
-    public void setIsChiral(boolean isChiral) {
-      SystemKeyboard.setChirality(isChiral);
+    public void setIsChiral(boolean isChiral) { KMManager.isChiral = isChiral; // { SystemKeyboard.setChirality(isChiral);
     }
 
     // This annotation is required in Jelly Bean and later:

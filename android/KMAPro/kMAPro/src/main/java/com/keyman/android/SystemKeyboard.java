@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.inputmethodservice.InputMethodService;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -159,15 +160,18 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public void onKeyboardLoaded(KeyboardType keyboardType) {
+    Log.d("SK", "onKeyboardLoaded " + String.valueOf(keyboardType));
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (exText != null)
         exText = null;
     }
+    KMManager.checkIsChiral(keyboardType);
   }
 
   @Override
-  public void onKeyboardChanged(String newKeyboard) {
-    // Do nothing
+  public void onKeyboardChanged(String newKeyboard, KeyboardType keyboardType) {
+    Log.d("SK", "onKeyboardChanged");
+    KMManager.checkIsChiral(keyboardType);
   }
 
   @Override

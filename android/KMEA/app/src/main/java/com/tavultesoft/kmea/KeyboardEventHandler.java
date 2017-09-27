@@ -26,17 +26,21 @@ public final class KeyboardEventHandler {
       // make a copy of the list to avoid concurrent modification while iterating
         ArrayList<OnKeyboardEventListener> _listeners = (ArrayList<OnKeyboardEventListener>) listeners.clone();
       if (event == EventType.KEYBOARD_LOADED) {
-        for (OnKeyboardEventListener listener : _listeners)
+        for (OnKeyboardEventListener listener : _listeners) {
           listener.onKeyboardLoaded(keyboardType);
+        }
       } else if (event == EventType.KEYBOARD_CHANGED) {
-        for (OnKeyboardEventListener listener : _listeners)
-          listener.onKeyboardChanged(newValue);
+        for (OnKeyboardEventListener listener : _listeners) {
+          listener.onKeyboardChanged(newValue, keyboardType);
+        }
       } else if (event == EventType.KEYBOARD_SHOWN) {
-        for (OnKeyboardEventListener listener : _listeners)
+        for (OnKeyboardEventListener listener : _listeners) {
           listener.onKeyboardShown();
+        }
       } else if (event == EventType.KEYBOARD_DISMISSED) {
-        for (OnKeyboardEventListener listener : _listeners)
+        for (OnKeyboardEventListener listener : _listeners) {
           listener.onKeyboardDismissed();
+        }
       }
     }
   }
@@ -59,7 +63,7 @@ public final class KeyboardEventHandler {
   public static interface OnKeyboardEventListener {
     void onKeyboardLoaded(KeyboardType keyboardType);
 
-    void onKeyboardChanged(String newKeyboard); // newKeyboard string format: languageID_keyboardID e.g. eng_us
+    void onKeyboardChanged(String newKeyboard, KeyboardType keyboardType); // newKeyboard string format: languageID_keyboardID e.g. eng_us
 
     void onKeyboardShown();
 
