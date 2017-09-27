@@ -87,7 +87,10 @@ uses
   VisualKeyboardLoaderXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas',
   VisualKeyboardSaverBinary in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas',
   VisualKeyboardSaverXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
-  kccompilekvk in 'kccompilekvk.pas';
+  kccompilekvk in 'kccompilekvk.pas',
+  ValidateKeyboardInfo in '..\TIKE\compile\ValidateKeyboardInfo.pas',
+  MergeKeyboardInfo in '..\TIKE\compile\MergeKeyboardInfo.pas',
+  JsonExtractKeyboardInfo in '..\TIKE\compile\JsonExtractKeyboardInfo.pas';
 
 {$R icons.RES}
 {$R version.res}

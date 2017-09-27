@@ -88,8 +88,13 @@
         <DCC_Optimize>false</DCC_Optimize>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_RunParams>-d arabic_izza.kpj</Debugger_RunParams>
-        <Debugger_CWD>c:\projects\keyman\keyboards\release\a\arabic_izza</Debugger_CWD>
+        <Debugger_RunParams> -m-validate-id -s -m &quot;build\Thamizha Tamil99.kmp&quot;  build\ekwtamil99uni.keyboard_info</Debugger_RunParams>
+        <Debugger_CWD>c:\projects\keyman\keyboards\release\e\ekwtamil99uni</Debugger_CWD>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <Icon_MainIcon>kmcomp_Icon.ico</Icon_MainIcon>
+        <Manifest_File>(None)</Manifest_File>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -185,6 +190,9 @@
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
         <DCCReference Include="kccompilekvk.pas"/>
+        <DCCReference Include="..\TIKE\compile\ValidateKeyboardInfo.pas"/>
+        <DCCReference Include="..\TIKE\compile\MergeKeyboardInfo.pas"/>
+        <DCCReference Include="..\TIKE\compile\JsonExtractKeyboardInfo.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -235,6 +243,10 @@
                     <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
                     <VersionInfoKeys Name="Comments"/>
                 </VersionInfoKeys>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k250.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp250.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>
                 <Platform value="Linux64">False</Platform>
