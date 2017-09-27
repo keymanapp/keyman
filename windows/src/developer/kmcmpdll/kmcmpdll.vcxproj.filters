@@ -52,6 +52,12 @@
     <ClInclude Include="..\..\global\inc\Vkeys.h">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\ext\json-schema-validator\json-schema.hpp">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\json\json.hpp">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Compiler.cpp" />
@@ -64,6 +70,10 @@
     <ClCompile Include="..\..\global\vc\unicode.cpp" />
     <ClCompile Include="virtualcharkeys.cpp" />
     <ClCompile Include="..\..\global\vc\xstring.cpp" />
+    <ClCompile Include="..\..\ext\json-schema-validator\json-schema-draft4.json.cpp" />
+    <ClCompile Include="..\..\ext\json-schema-validator\json-uri.cpp" />
+    <ClCompile Include="..\..\ext\json-schema-validator\json-validator.cpp" />
+    <ClCompile Include="json-validation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Compiler.rc" />

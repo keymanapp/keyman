@@ -211,3 +211,9 @@ BEGIN
     CWARN_UseNotLastStatementInRule     "A rule with use() statements in the output should not have other content following the use() statements"
     CWARN_KVKFileIsInSourceFormat     ".kvk file should be binary but is an XML file"
 END
+
+STRINGTABLE
+BEGIN
+    CWARN_DontMixChiralAndNonChiralModifiers "Don't mix the use of left/right modifiers with non-left/right modifiers in the same platform"
+    CWARN_MixingLeftAndRightModifiers        "Left and right modifiers should not both be used in the same rule"
+END

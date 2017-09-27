@@ -63,6 +63,7 @@ type
 
   TKeyboardInfo = record
     KeyboardID: Dword;    // Windows language
+    FileVersion: Dword;
     KeyboardName: WideString;
     CopyrightString, MessageString: WideString;
     DefaultHotkey: Dword;
@@ -103,6 +104,19 @@ const
   KMX_NOTSCROLLFLAG  = $2000;	// Scroll lock NOT on
   KMX_ISVIRTUALKEY   = $4000;	// It is a Virtual Key Sequence
   KMX_VIRTUALCHARKEY = $8000; // It is a virtual character key sequence - mnemonic layouts 
+
+  // Combinations of key masks
+  KMX_MASK_MODIFIER_CHIRAL = KMX_LCTRLFLAG or KMX_RCTRLFLAG or KMX_LALTFLAG or KMX_RALTFLAG;
+  KMX_MASK_MODIFIER_SHIFT = KMX_SHIFTFLAG;
+  KMX_MASK_MODIFIER_NONCHIRAL = KMX_CTRLFLAG or KMX_ALTFLAG;
+  KMX_MASK_STATEKEY = KMX_CAPITALFLAG or KMX_NOTCAPITALFLAG or
+                      KMX_NUMLOCKFLAG or KMX_NOTNUMLOCKFLAG or
+                      KMX_SCROLLFLAG or KMX_NOTSCROLLFLAG;
+  KMX_MASK_KEYTYPE  = KMX_ISVIRTUALKEY or KMX_VIRTUALCHARKEY;
+
+  KMX_MASK_MODIFIER = KMX_MASK_MODIFIER_CHIRAL or KMX_MASK_MODIFIER_SHIFT or KMX_MASK_MODIFIER_NONCHIRAL;
+  KMX_MASK_KEYS     = KMX_MASK_MODIFIER or KMX_MASK_STATEKEY;
+  KMX_MASK_VALID    = KMX_MASK_KEYS or KMX_MASK_KEYTYPE;
 
 const
   TSS_NONE                = 0;
@@ -332,13 +346,15 @@ begin
     Write(kfh, SizeOf(TKeyboardFileHeader));
 
     if CalculateBufferCRC(Size, Memory) <> cs then
-      raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);;
+      raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);
 
     if kfh.dwIdentifier <> FILEID_COMPILED then
-      raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);;
+      raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);
+
     if (kfh.dwFileVersion = $0500) or (kfh.dwFileVersion = $0501) or (kfh.dwFileVersion = $0600) or (kfh.dwFileVersion = $0700) or (kfh.dwFileVersion = $0800) or  // I3377
       (kfh.dwFileVersion = $0900) then  // I3377
     begin
+      ki.FileVersion := kfh.dwFileVersion;
       GetSystemStore(Memory, TSS_NAME, ki.KeyboardName);
       GetSystemStore(Memory, TSS_COPYRIGHT, ki.CopyrightString);
       GetSystemStore(Memory, TSS_MESSAGE, ki.MessageString);

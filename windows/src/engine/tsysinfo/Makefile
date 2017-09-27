@@ -32,8 +32,8 @@ backup:
     $(WZZIP) $(BUILD)\engine\tsysinfo.zip  $(BACKUPDEFAULTS) tsysinfo.exe
 
 install:
-    $(COPY) $(PROGRAM)\engine\tsysinfo.exe $(INSTALLPATH_KEYMANENGINE)
-    $(COPY) $(ROOT)\src\engine\tsysinfo\*.xsl $(INSTALLPATH_KEYMANENGINE)
+    $(COPY) $(PROGRAM)\engine\tsysinfo.exe "$(INSTALLPATH_KEYMANENGINE)"
+    $(COPY) $(ROOT)\src\engine\tsysinfo\*.xsl "$(INSTALLPATH_KEYMANENGINE)"
 
 test-manifest:
     # test that linked manifest exists and correct

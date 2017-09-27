@@ -68,6 +68,9 @@
                 <RemoveFolder Id="CachedInstallDir" Property="CachedInstallDir" On="uninstall" />
                 <RemoveFolder Id="CachedInstallDirParent" Property="CachedInstallDirParent" On="uninstall" />
 
+                <File Id="keyboard_info.distribution.json" Name="keyboard_info.distribution.json" Source="..\..\global\inst\data\keyboard_info\" />
+                <File Id="keyboard_info.source.json" Name="keyboard_info.source.json" Source="..\..\global\inst\data\keyboard_info\" />
+                
                 <?include 'file_associations.wxi' ?>
               </Component>
 

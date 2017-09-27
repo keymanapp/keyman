@@ -55,7 +55,10 @@ uses
   ResourceStrings,
   KCCompileProject,
   KCCompileKVK,
-  CompileKeymanWeb;
+  CompileKeymanWeb,
+  JsonExtractKeyboardInfo,
+  ValidateKeyboardInfo,
+  MergeKeyboardInfo;
 
 var
   hOutfile: THandle;
@@ -104,6 +107,13 @@ var
   FClean: Boolean;
   FFullySilent: Boolean;
   FWarnAsError: Boolean;
+  FValidating: Boolean;
+  FMerging: Boolean;
+  FParamInfile2: string;
+  FParamJsonFields: string;
+  FJsonExtract: Boolean;
+  FParamDistribution: Boolean;
+  FMergingValidateIds: Boolean;
 begin
   FSilent := False;
   FFullySilent := False;
@@ -114,6 +124,11 @@ begin
   FClean := False;
   FNologo := False;
   FWarnAsError := False;
+  FValidating := False;
+  FJsonExtract := False;
+  FMerging := False;
+  FMergingValidateIds := False;
+  FParamDistribution := False;
   FInstallerMSI := '';
 
   FParamInfile := '';
@@ -144,6 +159,26 @@ begin
         then FError := True
         else FParamTarget := ParamStr(i);
     end
+    else if s = '-v' then FValidating := True
+    else if s = '-vs' then FValidating := True
+    else if s = '-vd' then begin FValidating := True; FParamDistribution := True; end
+    else if s = '-m' then
+    begin
+      FMerging := True;
+      if (FParamInfile <> '') and (FParamInfile2 = '') then
+      begin
+        Inc(i);
+        FParamInfile2 := ParamStr(i);
+      end;
+    end
+    else if s = '-m-validate-id' then
+      FMergingValidateIds := True
+    else if s = '-extract-keyboard-info' then
+    begin
+      FJsonExtract := True;
+      Inc(i);
+      FParamJsonFields := ParamStr(i);
+    end
     else if FParamInfile = '' then FParamInfile := ParamStr(i)
     else if FParamOutfile = '' then FParamOutfile := ParamStr(i)
     else if FParamDebugfile = '' then FParamDebugfile := ParamStr(i)
@@ -166,8 +201,10 @@ begin
   if FError or (FParamInfile = '') then
   begin
     writeln('');
-    writeln('Usage: kmcomp [-s[s]] [-nologo] [-c] [-d] [-w] infile [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
+    writeln('Usage: kmcomp [-s[s]] [-nologo] [-c] [-d] [-w] [-v] [-m] infile [-m infile] [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
+    writeln('              [-extract-keyboard-info field[,field...]]');
     writeln('          infile        can be a .kmn file (Keyboard Source, .kps file (Package Source), or .kpj (project)');   // I4699   // I4825
+    writeln('                        if -v specified, can also be a .keyboard_info file');
     writeln('          outfile.kmx   can only be specified for a .kmn infile');
     writeln('          outfile.js    write a KeymanWeb file');
     writeln('          error.log     write to an error log; outfile must be specified');   // I4825
@@ -179,6 +216,13 @@ begin
     writeln('          -d       include debug information');
     writeln('          -w       treat warnings as errors');
     writeln('          -t       build only the target file from the project (only for .kpj)');   // I4699
+    writeln;
+    writeln(' JSON .keyboard_info compile targets:');
+    writeln('          -v[s]    validate infile against source schema');
+    writeln('          -vd      validate infile against distribution schema');
+    writeln('          -m       merge information from infile (can be .kmp and .js) into .keyboard_info output file');
+    writeln('          -m-validate-id validate the id against the .js, .kmx and .kmp filenames when merging');
+    writeln('          -json-extract print json data .keyboard_info for build script integration');
     Halt(2);
   end;
 
@@ -194,7 +238,13 @@ begin
     else
       hOutfile := 0;
 
-    if LowerCase(ExtractFileExt(FParamInfile)) = '.kpj' then   // I4699
+    if FMerging then
+      FError := not TMergeKeyboardInfo.Execute(FParamInfile, FParamInfile2, FParamOutfile, FMergingValidateIds, FSilent, @CompilerMessage)
+    else if FValidating then
+      FError := not TValidateKeyboardInfo.Execute(FParamInfile, FParamDistribution, FSilent, @CompilerMessage)
+    else if FJsonExtract then
+      FError := not TJsonExtractKeyboardInfo.Execute(FParamInfile, FParamJsonFields, FSilent, @CompilerMessage)
+    else if LowerCase(ExtractFileExt(FParamInfile)) = '.kpj' then   // I4699
       Ferror := not DoKCCompileProject(FParamInfile, FFullySilent, FSilent, FDebug, FClean, FWarnAsError, FParamTarget)   // I4706   // I4707
     else if LowerCase(ExtractFileExt(FParamInfile)) = '.kps' then
       FError := not DoKCCompilePackage(FParamInfile, FFullySilent, FSilent, FWarnAsError, FInstaller, FInstallerMSI, FUpdateInstaller)   // I4706

@@ -166,12 +166,14 @@ LPSTR KeyNames[256] = {
 	"?9D",				// &H9D
 	"?9E",				// &H9E
 	"?9F",				// &H9F
-	"?A0",				// &HA0
-	"?A1",				// &HA1
-	"?A2",				// &HA2
-	"?A3",				// &HA3
-	"?A4",				// &HA4
-	"?A5",				// &HA5
+
+	"?LShift",				// &HA0
+	"?RShift",				// &HA1
+	"?LControl",				// &HA2
+	"?RControl",				// &HA3
+	"?LAlt",				// &HA4
+	"?RAlt",				// &HA5
+
 	"?A6",				// &HA6
 	"?A7",				// &HA7
 	"?A8",				// &HA8
