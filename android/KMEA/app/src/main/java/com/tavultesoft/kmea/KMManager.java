@@ -1160,7 +1160,12 @@ public final class KMManager {
           }
 
           if (result > 0) {
-            KMManager.getActiveKeyboard().loadKeyboard();
+            if (KMManager.InAppKeyboard != null) {
+              InAppKeyboard.loadKeyboard();
+            }
+            if ( KMManager.SystemKeyboard != null) {
+              SystemKeyboard.loadKeyboard();
+            }
           }
         }
       }.execute();
@@ -1375,18 +1380,23 @@ public final class KMManager {
     String langName = kbInfo.get(KMManager.KMKey_LanguageName);
     String kFont = kbInfo.get(KMManager.KMKey_Font);
     String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
-    KMManager.getActiveKeyboard().setKeyboard(kbId, langId, kbName, langName, kFont, kOskFont);
+    if (InAppKeyboard != null) {
+      InAppKeyboard.setKeyboard(kbId, langId, kbName, langName, kFont, kOskFont);
+    }
+    if (SystemKeyboard != null) {
+      SystemKeyboard.setKeyboard(kbId, langId, kbName, langName, kFont, kOskFont);
+    }
   }
 
-  public static KMKeyboard getActiveKeyboard() {
-    Log.d("KMM", "InApp: " + String.valueOf(InAppKeyboard != null) + " SystemKeyboard: " + String.valueOf(SystemKeyboard != null));
-    Log.d("KMM", "InAppKeyboardLoaded: " + String.valueOf(InAppKeyboardLoaded) + " SystemKeyboardLoaded: " + String.valueOf(SystemKeyboardLoaded));
-    if (InAppKeyboard != null && InAppKeyboardLoaded) {
+  // TODO: Refactor InAppKeyboard / SystemKeyboard logic
+  public static KMKeyboard getKeyboard(KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
       return InAppKeyboard;
-    } else if (SystemKeyboard != null && SystemKeyboardLoaded) {
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       return SystemKeyboard;
     } else {
-      Log.w("KMManager", "Cannot determine active keyboard");
+      // What should we do if KeyboardType.KEYBOARD_TYPE_UNDEFINED?
+      Log.w("KMManager", "Invalid keyboard");
       return null;
     }
   }
@@ -1786,11 +1796,25 @@ public final class KMManager {
   }
 
   public static boolean isHelpBubbleEnabled() {
-    return KMManager.getActiveKeyboard().isHelpBubbleEnabled;
+    boolean retVal = true;
+
+    if (InAppKeyboard != null) {
+      retVal = InAppKeyboard.isHelpBubbleEnabled;
+    } else if (SystemKeyboard != null) {
+      retVal = SystemKeyboard.isHelpBubbleEnabled;
+    }
+
+    return retVal;
   }
 
   public static void setHelpBubbleEnabled(boolean newValue) {
-    KMManager.getActiveKeyboard().isHelpBubbleEnabled = newValue;
+    if (InAppKeyboard != null) {
+      InAppKeyboard.isHelpBubbleEnabled = newValue;
+    }
+
+    if (SystemKeyboard != null) {
+      SystemKeyboard.isHelpBubbleEnabled = newValue;
+    }
   }
 
   public static boolean canAddNewKeyboard() {
