@@ -258,24 +258,22 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
   @Override
   public void onKeyboardLoaded(KeyboardType keyboardType) {
-    KMManager.checkIsChiral(keyboardType);
+    // Do nothing
   }
 
   @Override
   public void onKeyboardChanged(String newKeyboard, KeyboardType keyboardType) {
-    Log.d("MainActivity", "onKeyboardChanged");
     textView.setTypeface(KMManager.getKeyboardTextFontTypeface(this));
-    KMManager.checkIsChiral(keyboardType);
   }
 
   @Override
   public void onKeyboardShown() {
-    Log.d("MainActivity", "onKeyboardShown");
     resizeTextView(true);
   }
 
   @Override
-  public void onKeyboardDismissed() {
+  public void onKeyboardDismissed()
+  {
     resizeTextView(false);
   }
 

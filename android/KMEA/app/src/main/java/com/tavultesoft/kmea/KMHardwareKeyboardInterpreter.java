@@ -118,7 +118,7 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
       return false;
     }
 
-    boolean isChiral = KMManager.getChirality();
+    boolean isChiral = KMManager.getKeyboard(this.keyboardType).getChirality();
 
     // States of modifier keys
     // KeyEvent.getModifiers() specifically masks out lock keys (KeyEvent.META_CAPS_LOCK_ON,

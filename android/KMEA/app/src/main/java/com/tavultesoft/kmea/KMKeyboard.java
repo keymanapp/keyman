@@ -54,7 +54,7 @@ final class KMKeyboard extends WebView {
   private GestureDetector gestureDetector;
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
   private boolean ShouldShowHelpBubble = false;
-//  private boolean isChiral = false;
+  private boolean isChiral = false;
 
   protected boolean keyboardSet = false;
   protected boolean keyboardPickerEnabled = true;
@@ -298,16 +298,6 @@ final class KMKeyboard extends WebView {
       Log.d("KMKeyboard", jsString);
     }
 
-    /*
-    // Add a little delay for the keyboard to load so the chirality can be properly detected
-    Handler chiralityHandler = new Handler();
-    chiralityHandler.postDelayed(new Runnable() {
-      @Override
-      public void run() {
-        loadUrl("javascript:setIsChiral()");
-      }
-    }, 1000);
-*/
     currentKeyboard = kbKey;
     keyboardSet = true;
     saveCurrentKeyboardIndex();
@@ -399,16 +389,6 @@ final class KMKeyboard extends WebView {
       Log.d("KMKeyboard", jsString);
     }
 
-    /*
-    // Add a little delay for the keyboard to load so the chirality can be properly detected
-    Handler chiralityHandler = new Handler();
-    chiralityHandler.postDelayed(new Runnable() {
-      @Override
-      public void run() {
-        loadUrl("javascript:setIsChiral()");
-      }
-    }, 1000);
-*/
     currentKeyboard = kbKey;
     keyboardSet = true;
     saveCurrentKeyboardIndex();
@@ -427,15 +407,16 @@ final class KMKeyboard extends WebView {
     return retVal;
   }
 
-  /*
   public void setChirality(boolean flag) {
     this.isChiral = flag;
   }
 
   public boolean getChirality() {
+
     return this.isChiral;
+
   }
-  */
+
   private void saveCurrentKeyboardIndex() {
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();

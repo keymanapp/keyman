@@ -40,6 +40,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     if (BuildConfig.DEBUG) {
       KMManager.setDebugMode(true);
     }
+    Log.d("SystemKeyboard", "addKeyboardEventListener");
     KMManager.addKeyboardEventListener(this);
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
     interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
@@ -160,18 +161,18 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public void onKeyboardLoaded(KeyboardType keyboardType) {
-    Log.d("SK", "onKeyboardLoaded " + String.valueOf(keyboardType));
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (exText != null)
         exText = null;
     }
-    KMManager.checkIsChiral(keyboardType);
   }
 
   @Override
   public void onKeyboardChanged(String newKeyboard, KeyboardType keyboardType) {
-    Log.d("SK", "onKeyboardChanged");
-    KMManager.checkIsChiral(keyboardType);
+    // System keyboard changed, so refresh the chiral modifier status
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      KMManager.checkIsChiral(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    }
   }
 
   @Override
