@@ -1,7 +1,7 @@
 # Keyman for iOS
 
 ## Prerequisites
-* Xcode 8
+* Xcode 9
 * iOS 8+
 * SwiftLint (`brew install swiftlint`)
 

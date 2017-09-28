@@ -218,7 +218,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     KMManager.sharedInstance().showKeyboardPicker(in: self, shouldAddKeyboard: false)
   }
 
-  func close(_ sender: Any?) {
+  @objc func close(_ sender: Any?) {
     dismiss(animated: true, completion: nil)
   }
 
