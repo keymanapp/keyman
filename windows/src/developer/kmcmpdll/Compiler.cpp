@@ -1255,8 +1255,6 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 		if((fk->dwFlags & KF_AUTOMATICVERSION) == 0) return CERR_VersionAlreadyIncluded;
 		p = sp->dpString;
 		if(*p < '5') AddWarning(CWARN_OldVersion);
-
-    AddWarning(CWARN_OldVersion);
 		
 		if(wcsncmp(p, L"3.0", 3) == 0)       fk->version = VERSION_50;   //0x0a0b000n= a.bn
 		else if(wcsncmp(p, L"3.1", 3) == 0)  fk->version = VERSION_50;   //all versions < 5.0
