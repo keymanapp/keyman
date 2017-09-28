@@ -150,7 +150,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     }
   }
 
-  func refreshTable() {
+  @objc func refreshTable() {
     tableView.reloadData()
   }
 
@@ -178,7 +178,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     }
   }
 
-  func switchValueChanged(_ sender: Any) {
+  @objc func switchValueChanged(_ sender: Any) {
     let userData = AppDelegate.activeUserDefaults()
     if let toggle = sender as? UISwitch {
       userData.set(toggle.isOn, forKey: dontShowGetStartedKey)

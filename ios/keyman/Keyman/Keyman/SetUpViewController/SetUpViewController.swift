@@ -28,7 +28,7 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
     networkReachable?.startNotifier()
   }
 
-  func networkStatusChanged(_ notification: Notification) {
+  @objc func networkStatusChanged(_ notification: Notification) {
     reloadKeymanHelp()
   }
 
@@ -42,7 +42,7 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
     }
   }
 
-  func dismissView() {
+  @objc func dismissView() {
     dismiss(animated: true, completion: nil)
   }
 

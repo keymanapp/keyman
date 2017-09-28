@@ -8,9 +8,10 @@
 
 import UIKit
 
-private let htmlMailFormat =
-  "<html><head><style type=\"text/css\">pre {font-family:\"%@\";font-size:%@;}</style>" +
-  "</head><body><pre>%@</pre>%@</body></html>"
+private let htmlMailFormat = """
+  <html><head><style type=\"text/css\">pre {font-family:\"%@\";font-size:%@;}</style>
+  </head><body><pre>%@</pre>%@</body></html>
+  """
 private let mailFooterTextForPad =
     "<br><br>Sent from&nbsp;<a href=\"https://keyman.com/ipad\">Keyman for iPad</a>"
 private let mailFooterTextForPhone =
@@ -36,7 +37,7 @@ class ActivityItemProvider: UIActivityItemProvider {
       return "\(text)\n\n\(fbText)"
     case UIActivityType.postToTwitter?:
         if text.characters.count > 140 {
-          return text.substring(to: text.index(text.startIndex, offsetBy: 140))
+          return text[..<text.index(text.startIndex, offsetBy: 140)]
         }
         return text
     default:

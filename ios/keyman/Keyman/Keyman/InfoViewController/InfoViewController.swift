@@ -23,7 +23,7 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
     networkReachable?.startNotifier()
   }
 
-  func networkStatusChanged(_ notification: Notification) {
+  @objc func networkStatusChanged(_ notification: Notification) {
     reloadKeymanHelp()
   }
 

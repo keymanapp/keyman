@@ -83,7 +83,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     return _overlayWindow!
   }
 
-  func registerCustomFonts() {
+  @objc func registerCustomFonts() {
     KMManager.sharedInstance().registerCustomFonts()
   }
 

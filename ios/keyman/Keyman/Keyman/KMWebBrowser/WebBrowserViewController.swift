@@ -170,7 +170,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     navBarTopConstraint.constant = AppDelegate.statusBarHeight()
   }
 
-  func loadAddress(_ sender: Any, event: UIEvent) {
+  @objc func loadAddress(_ sender: Any, event: UIEvent) {
     guard let urlString = addressField?.text, var url = URL(string: urlString) else {
       #if DEBUG
         NSLog("Attempting to load invalid URL: %@", addressField?.text ?? "nil")
@@ -192,11 +192,11 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     userData.synchronize()
   }
 
-  func refresh(_ sender: Any) {
+  @objc func refresh(_ sender: Any) {
     webView.reload()
   }
 
-  func stop(_ sender: Any?) {
+  @objc func stop(_ sender: Any?) {
     webView.stopLoading()
   }
 
@@ -266,7 +266,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     webView?.stringByEvaluatingJavaScript(from: jsStr)
   }
 
-  func keyboardChanged(_ notification: Notification) {
+  @objc func keyboardChanged(_ notification: Notification) {
     let kbInfo = notification.userInfo?[kKeymanKeyboardInfoKey] as? [AnyHashable: Any] ?? [AnyHashable: Any]()
     if let kbID = kbInfo[kKeymanKeyboardIdKey] as? String, let langID = kbInfo[kKeymanLanguageIdKey] as? String {
       newFontFamily = KMManager.sharedInstance().fontNameForKeyboard(withID: kbID, languageID: langID)
@@ -275,7 +275,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     }
   }
 
-  func keyboardPickerDismissed(_ notification: Notification) {
+  @objc func keyboardPickerDismissed(_ notification: Notification) {
     if newFontFamily != fontFamily {
       fontFamily = newFontFamily
       webView?.reload()

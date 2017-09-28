@@ -131,7 +131,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     var profilesByFontName = [String: String](minimumCapacity: kmFonts.count - 1)
     for (key, value) in kmFonts where key != "keymanweb-osk.ttf" {
       let fontName = value[kKeymanFontNameKey] as! String
-      let type = key.substring(from: key.range(of: ".", options: .backwards)!.lowerBound)
+      let type = key[key.range(of: ".", options: .backwards)!.lowerBound...]
       profilesByFontName[fontName] = key.replacingOccurrences(of: type, with: ".mobileconfig")
     }
 
@@ -412,12 +412,12 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     return navigationController!.navigationBar.frame.height
   }
 
-  func keyboardWillShow(_ notification: Notification) {
+  @objc func keyboardWillShow(_ notification: Notification) {
     _ = dismissDropDownMenu()
     resizeViews(withKeyboardVisible: true)
   }
 
-  func keyboardDidShow(_ notification: Notification) {
+  @objc func keyboardDidShow(_ notification: Notification) {
     // Workaround to display overlay window above keyboard
     if #available(iOS 9.0, *) {
       let windows = UIApplication.shared.windows
@@ -426,15 +426,15 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  func keyboardWillHide(_ notification: Notification) {
+  @objc func keyboardWillHide(_ notification: Notification) {
     resizeViews(withKeyboardVisible: false)
   }
 
-  func keyboardLoaded(_ notification: Notification) {
+  @objc func keyboardLoaded(_ notification: Notification) {
     startTimer()
   }
 
-  func keyboardChanged(_ notification: Notification) {
+  @objc func keyboardChanged(_ notification: Notification) {
     var listCheck: Bool = true
     if didDownload {
       listCheck = false
@@ -447,13 +447,13 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     checkProfile(forKeyboardID: kbID, languageID: langID, doListCheck: listCheck)
   }
 
-  func keyboardDownloadStarted(_ notification: Notification) {
+  @objc func keyboardDownloadStarted(_ notification: Notification) {
     if launchUrl != nil {
       showActivityIndicator()
     }
   }
 
-  func keyboardDownloadFinished(_ notification: Notification) {
+  @objc func keyboardDownloadFinished(_ notification: Notification) {
     didDownload = true
     guard let url = launchUrl else {
       return
@@ -521,7 +521,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     launchUrl = nil
   }
 
-  func keyboardDownloadFailed(_ notification: Notification) {
+  @objc func keyboardDownloadFailed(_ notification: Notification) {
     if launchUrl != nil {
       perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
       let error = notification.userInfo?[NSUnderlyingErrorKey] as! Error
@@ -531,22 +531,22 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  func languagesUpdated(_ notification: Notification) {
+  @objc func languagesUpdated(_ notification: Notification) {
     updateStatus = 1
   }
 
-  func languagesDownloadFailed(_ notification: Notification) {
+  @objc func languagesDownloadFailed(_ notification: Notification) {
     updateStatus = -1
   }
 
-  func keyboardPickerDismissed(_ notification: Notification) {
+  @objc func keyboardPickerDismissed(_ notification: Notification) {
     textView.becomeFirstResponder()
     if UIDevice.current.userInterfaceIdiom == .pad && shouldShowGetStarted {
       perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
     }
   }
 
-  func launched(fromUrl notification: Notification) {
+  @objc func launched(fromUrl notification: Notification) {
     if let url = notification.userInfo?[urlKey] as? URL, url.query != nil {
       launchUrl = url
       if updateStatus > 0 {
@@ -557,7 +557,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  func keyboardRemoved(_ notification: Notification) {
+  @objc func keyboardRemoved(_ notification: Notification) {
     guard let kbInfo = notification.userInfo?[kKeymanKeyboardInfoKey] as? [String: Any] else {
       return
     }
@@ -575,7 +575,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     userData.synchronize()
   }
 
-  func infoButtonClick(_ sender: Any?) {
+  @objc func infoButtonClick(_ sender: Any?) {
     UIView.setAnimationDelegate(self)
     let animSelector = NSSelectorFromString("animationDidStop:finished:context:")
     UIView.setAnimationDidStop(animSelector)
@@ -634,7 +634,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  func actionButtonClick(_ sender: Any) {
+  @objc func actionButtonClick(_ sender: Any) {
     _ = dismissDropDownMenu()
     popover?.dismiss(animated: false)
 
@@ -642,7 +642,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     let rlm = "\u{200f}"
     var text: String! = textView.text
     if text.hasPrefix(lrm) || text.hasPrefix(rlm) {
-       text = text.substring(from: text.index(after: text.startIndex))
+      text = String(text[text.index(after: text.startIndex)...])
     }
 
     let activityProvider = ActivityItemProvider(text: text, font: textView.font)
@@ -668,7 +668,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  func textSizeButtonClick(_ sender: Any) {
+  @objc func textSizeButtonClick(_ sender: Any) {
     _ = dismissDropDownMenu()
     popover?.dismiss(animated: false)
 
@@ -739,7 +739,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  func dismissTextSizeVC(_ sender: Any) {
+  @objc func dismissTextSizeVC(_ sender: Any) {
     let presentedVC = presentedViewController
     if UIDevice.current.userInterfaceIdiom == .phone {
       let containerView: UIView! = presentedVC?.view?.viewWithTag(1)
@@ -757,11 +757,11 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
         })
       })
     } else {
-      presentedVC?.dismiss(animated: true) { _ in }
+      presentedVC?.dismiss(animated: true, completion: nil)
     }
   }
 
-  func trashButtonClick(_ sender: Any) {
+  @objc func trashButtonClick(_ sender: Any) {
     _ = dismissDropDownMenu()
     let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
     let clear = UIAlertAction(title: "Clear Text", style: .destructive, handler: {(_ action: UIAlertAction) -> Void in
@@ -795,12 +795,12 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     overlayWindow.addSubview(containerView)
   }
 
-  func dismissActivityIndicator() {
+  @objc func dismissActivityIndicator() {
     overlayWindow.viewWithTag(activityIndicatorViewTag)?.removeFromSuperview()
     overlayWindow.isHidden = true
   }
 
-  func sliderValueChanged(_ sender: UISlider) {
+  @objc func sliderValueChanged(_ sender: UISlider) {
     textSize = CGFloat(sender.value + Float(minTextSize)).rounded()
     textView.font = textView.font?.withSize(textSize)
     let textSizeTitle = presentedViewController?.view.viewWithTag(2) as? UILabel
@@ -826,7 +826,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  func timerAction() {
+  @objc func timerAction() {
     if updateStatus == 1 {
       stopTimer()
 
@@ -1031,7 +1031,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  func showKeyboard() {
+  @objc func showKeyboard() {
     textView.becomeFirstResponder()
   }
 
@@ -1088,7 +1088,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  func showDropDownMenu(_ sender: Any) {
+  @objc func showDropDownMenu(_ sender: Any) {
     if dismissDropDownMenu() {
       return
     }
@@ -1117,7 +1117,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     return view != nil
   }
 
-  func showGetStartedView(_ sender: Any?) {
+  @objc func showGetStartedView(_ sender: Any?) {
     if !overlayWindow.isHidden && overlayWindow.viewWithTag(getStartedViewTag) != nil {
       return
     }
@@ -1145,7 +1145,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     overlayWindow.addSubview(containerView)
   }
 
-  func dismissGetStartedView(_ sender: Any?) {
+  @objc func dismissGetStartedView(_ sender: Any?) {
     overlayWindow.viewWithTag(getStartedViewTag)?.removeFromSuperview()
     overlayWindow.isHidden = true
   }
@@ -1184,7 +1184,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     return false
   }
 
-  func showKMWebBrowserView(_ sender: Any) {
+  @objc func showKMWebBrowserView(_ sender: Any) {
     popover?.dismiss(animated: false)
     _ = dismissDropDownMenu()
     let webBrowserVC = WebBrowserViewController()
