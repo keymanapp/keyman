@@ -30,9 +30,9 @@ class KeyboardViewController: KMInputViewController {
     setupTopBarImage(isPortrait: KMInputViewController.isPortrait())
   }
 
-  override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
-    super.willRotate(to: toInterfaceOrientation, duration: duration)
-    setupTopBarImage(isPortrait: UIInterfaceOrientationIsPortrait(toInterfaceOrientation))
+  override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    super.viewWillTransition(to: size, with: coordinator)
+    setupTopBarImage(isPortrait: UIDevice.current.orientation.isPortrait)
   }
 
   func setupTopBarImage(isPortrait: Bool) {
