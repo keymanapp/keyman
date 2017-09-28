@@ -18,9 +18,6 @@
 		37BF5A3E1DE8404E0014AF19 /* KMTextFieldDelegateProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418FC1769486C008D2FF3 /* KMTextFieldDelegateProxy.h */; };
 		37BF5A3F1DE8404E0014AF19 /* KMTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418FD1769486C008D2FF3 /* KMTextView.h */; };
 		37BF5A401DE8404E0014AF19 /* KMTextViewDelegateProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418FE1769486C008D2FF3 /* KMTextViewDelegateProxy.h */; };
-		981AFA7B19EF44DE006706BF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 98ABADBF176935E400B62590 /* main.m */; };
-		981AFA7C19EF44DE006706BF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 98ABADC3176935E400B62590 /* AppDelegate.m */; };
-		981AFA7F19EF44DE006706BF /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98ABADCC176935E500B62590 /* MainViewController.m */; };
 		981AFA8519EF44DE006706BF /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98DE283417F50DBF00D6A496 /* AudioToolbox.framework */; };
 		981AFA8619EF44DE006706BF /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41903176952D0008D2FF3 /* CFNetwork.framework */; };
 		981AFA8719EF44DE006706BF /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41905176952E0008D2FF3 /* MobileCoreServices.framework */; };
@@ -85,8 +82,7 @@
 		982D149D19FF462A007D4629 /* textsize_selected@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 982D148719FF462A007D4629 /* textsize_selected@3x.png */; };
 		982D149F19FF462A007D4629 /* textsize_up@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 982D148819FF462A007D4629 /* textsize_up@3x.png */; };
 		982D14A119FF462A007D4629 /* textsize@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 982D148919FF462A007D4629 /* textsize@3x.png */; };
-		9845A7AA1A43983300544E2E /* KMWebBrowserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A79C1A43983300544E2E /* KMWebBrowserViewController.m */; };
-		9845A7AB1A43983300544E2E /* KMWebBrowserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A79D1A43983300544E2E /* KMWebBrowserViewController.xib */; };
+		9845A7AB1A43983300544E2E /* WebBrowserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A79D1A43983300544E2E /* WebBrowserViewController.xib */; };
 		9845A7AC1A43983300544E2E /* kmwb-navbar-Landscape-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A79F1A43983300544E2E /* kmwb-navbar-Landscape-568h@2x.png */; };
 		9845A7AD1A43983300544E2E /* kmwb-navbar-Landscape-568h@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7A01A43983300544E2E /* kmwb-navbar-Landscape-568h@3x.png */; };
 		9845A7AE1A43983300544E2E /* kmwb-navbar-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7A11A43983300544E2E /* kmwb-navbar-Landscape.png */; };
@@ -98,16 +94,10 @@
 		9845A7B41A43983300544E2E /* kmwb-navbar-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7A71A43983300544E2E /* kmwb-navbar-Portrait@2x~ipad.png */; };
 		9845A7B51A43983300544E2E /* kmwb-navbar-Portrait@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7A81A43983300544E2E /* kmwb-navbar-Portrait@3x.png */; };
 		9845A7B61A43983300544E2E /* kmwb-navbar-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7A91A43983300544E2E /* kmwb-navbar-Portrait~ipad.png */; };
-		9845A7BC1A4398B200544E2E /* KMDropDownListView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A7B91A4398B200544E2E /* KMDropDownListView.m */; };
-		9845A7BD1A4398B200544E2E /* KMDropDownView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A7BB1A4398B200544E2E /* KMDropDownView.m */; };
-		9845A7CF1A439A9200544E2E /* GetStartedViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A7C01A439A9200544E2E /* GetStartedViewController.m */; };
 		9845A7D01A439A9200544E2E /* GetStartedViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7C11A439A9200544E2E /* GetStartedViewController.xib */; };
-		9845A7D11A439A9200544E2E /* InfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A7C41A439A9200544E2E /* InfoViewController.m */; };
 		9845A7D21A439A9200544E2E /* InfoViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7C51A439A9200544E2E /* InfoViewController_iPad.xib */; };
 		9845A7D31A439A9200544E2E /* InfoViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7C61A439A9200544E2E /* InfoViewController_iPhone.xib */; };
-		9845A7D41A439A9200544E2E /* SetUpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A7C91A439A9200544E2E /* SetUpViewController.m */; };
 		9845A7D51A439A9200544E2E /* SetUpViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7CA1A439A9200544E2E /* SetUpViewController.xib */; };
-		9845A8321A439B4800544E2E /* UIImage+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A8301A439B4800544E2E /* UIImage+Helpers.m */; };
 		9845A8581A439B8F00544E2E /* app-info.css in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8341A439B8F00544E2E /* app-info.css */; };
 		9845A85A1A439B8F00544E2E /* backspace.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8351A439B8F00544E2E /* backspace.png */; };
 		9845A85C1A439B8F00544E2E /* bookmarklet.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8361A439B8F00544E2E /* bookmarklet.png */; };
@@ -145,7 +135,6 @@
 		9845A89C1A439B8F00544E2E /* url-screeni.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8561A439B8F00544E2E /* url-screeni.png */; };
 		9845A8A01A439BB500544E2E /* setup.html in Resources */ = {isa = PBXBuildFile; fileRef = 9845A89E1A439BB500544E2E /* setup.html */; };
 		9845A8B51A439D3000544E2E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 98C893F119F0811A000B9AC8 /* Images.xcassets */; };
-		9845A8BC1A439D9D00544E2E /* KMActivityProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A8BA1A439D9D00544E2E /* KMActivityProvider.m */; };
 		9845A8CC1A439F1000544E2E /* 715-globe-toolbar.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8BE1A439F1000544E2E /* 715-globe-toolbar.png */; };
 		9845A8CD1A439F1000544E2E /* 715-globe-toolbar@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8BF1A439F1000544E2E /* 715-globe-toolbar@2x.png */; };
 		9845A8CE1A439F1000544E2E /* 715-globe-toolbar@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8C01A439F1000544E2E /* 715-globe-toolbar@3x.png */; };
@@ -160,8 +149,7 @@
 		9845A8D71A439F1000544E2E /* UIButtonBarArrowRight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8C91A439F1000544E2E /* UIButtonBarArrowRight@2x.png */; };
 		9845A8D81A439F1000544E2E /* UIButtonBarRefresh@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8CA1A439F1000544E2E /* UIButtonBarRefresh@2x.png */; };
 		9845A8D91A439F1000544E2E /* UIButtonBarStop@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8CB1A439F1000544E2E /* UIButtonBarStop@2x.png */; };
-		9845A8DD1A439FB200544E2E /* KMBookmarksViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9845A8DB1A439FB200544E2E /* KMBookmarksViewController.m */; };
-		9845A8DE1A439FB200544E2E /* KMBookmarksViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8DC1A439FB200544E2E /* KMBookmarksViewController.xib */; };
+		9845A8DE1A439FB200544E2E /* BookmarksViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */; };
 		9846CC0C19EB5B8800F9AA03 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 98D418FF1769486C008D2FF3 /* Keyman.bundle */; };
 		985EA9DF19E64A580006C017 /* banner-Landscape-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D419E64A580006C017 /* banner-Landscape-568h@2x.png */; };
 		985EA9E019E64A580006C017 /* banner-Landscape-568h@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D519E64A580006C017 /* banner-Landscape-568h@3x.png */; };
@@ -177,7 +165,6 @@
 		987728D01B7C0E6400DBC159 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C0D811994613E009D2A13 /* WebKit.framework */; };
 		987728D11B7C0E7300DBC159 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C0D811994613E009D2A13 /* WebKit.framework */; };
 		989E4DBC1B1EB85200A345FB /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 989E4DBA1B1EB85200A345FB /* Settings.bundle */; };
-		98CD126219CA85710089385F /* KeyboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98CD126119CA85710089385F /* KeyboardViewController.m */; };
 		98CD126D19CA85B60089385F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98DE283417F50DBF00D6A496 /* AudioToolbox.framework */; };
 		98CD126E19CA85BF0089385F /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41903176952D0008D2FF3 /* CFNetwork.framework */; };
 		98CD126F19CA85C80089385F /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41905176952E0008D2FF3 /* MobileCoreServices.framework */; };
@@ -191,6 +178,18 @@
 		98CF00B91B461EDE00627DC6 /* get-started.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B51B461EDE00627DC6 /* get-started.png */; };
 		98CF00BA1B461EDE00627DC6 /* info.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B61B461EDE00627DC6 /* info.png */; };
 		98CF00BB1B461EDE00627DC6 /* menu-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B71B461EDE00627DC6 /* menu-icon.png */; };
+		C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B01F60E8D400140735 /* GetStartedViewController.swift */; };
+		C055F0B31F60F7A400140735 /* DropDownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B21F60F7A400140735 /* DropDownView.swift */; };
+		C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B41F610FB200140735 /* DropDownListView.swift */; };
+		C0A1A6311F5E4F4300EAF822 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */; };
+		C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */; };
+		C0A1A6351F5E786A00EAF822 /* BookmarksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */; };
+		C0A1A6371F5E8C9100EAF822 /* WebBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6361F5E8C9100EAF822 /* WebBrowserViewController.swift */; };
+		C0E943F81F61234C00E7D98C /* UIImage+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E943F71F61234C00E7D98C /* UIImage+Helpers.swift */; };
+		C0E943FA1F6124E100E7D98C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E943F91F6124E100E7D98C /* AppDelegate.swift */; };
+		C0E943FE1F61377900E7D98C /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E943FD1F61377900E7D98C /* MainViewController.swift */; };
+		C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
+		C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */; };
 		CE06AA681F171CA0006D91C3 /* Keyman.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418F71769486C008D2FF3 /* Keyman.h */; };
 /* End PBXBuildFile section */
 
@@ -263,9 +262,7 @@
 		982D148719FF462A007D4629 /* textsize_selected@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_selected@3x.png"; path = "Keyman Icons/textsize_selected@3x.png"; sourceTree = "<group>"; };
 		982D148819FF462A007D4629 /* textsize_up@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_up@3x.png"; path = "Keyman Icons/textsize_up@3x.png"; sourceTree = "<group>"; };
 		982D148919FF462A007D4629 /* textsize@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize@3x.png"; path = "Keyman Icons/textsize@3x.png"; sourceTree = "<group>"; };
-		9845A79B1A43983300544E2E /* KMWebBrowserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMWebBrowserViewController.h; sourceTree = "<group>"; };
-		9845A79C1A43983300544E2E /* KMWebBrowserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMWebBrowserViewController.m; sourceTree = "<group>"; };
-		9845A79D1A43983300544E2E /* KMWebBrowserViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = KMWebBrowserViewController.xib; sourceTree = "<group>"; };
+		9845A79D1A43983300544E2E /* WebBrowserViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WebBrowserViewController.xib; sourceTree = "<group>"; };
 		9845A79F1A43983300544E2E /* kmwb-navbar-Landscape-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "kmwb-navbar-Landscape-568h@2x.png"; sourceTree = "<group>"; };
 		9845A7A01A43983300544E2E /* kmwb-navbar-Landscape-568h@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "kmwb-navbar-Landscape-568h@3x.png"; sourceTree = "<group>"; };
 		9845A7A11A43983300544E2E /* kmwb-navbar-Landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "kmwb-navbar-Landscape.png"; sourceTree = "<group>"; };
@@ -277,22 +274,10 @@
 		9845A7A71A43983300544E2E /* kmwb-navbar-Portrait@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "kmwb-navbar-Portrait@2x~ipad.png"; sourceTree = "<group>"; };
 		9845A7A81A43983300544E2E /* kmwb-navbar-Portrait@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "kmwb-navbar-Portrait@3x.png"; sourceTree = "<group>"; };
 		9845A7A91A43983300544E2E /* kmwb-navbar-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "kmwb-navbar-Portrait~ipad.png"; sourceTree = "<group>"; };
-		9845A7B81A4398B200544E2E /* KMDropDownListView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMDropDownListView.h; sourceTree = "<group>"; };
-		9845A7B91A4398B200544E2E /* KMDropDownListView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMDropDownListView.m; sourceTree = "<group>"; };
-		9845A7BA1A4398B200544E2E /* KMDropDownView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMDropDownView.h; sourceTree = "<group>"; };
-		9845A7BB1A4398B200544E2E /* KMDropDownView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMDropDownView.m; sourceTree = "<group>"; };
-		9845A7BF1A439A9200544E2E /* GetStartedViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetStartedViewController.h; sourceTree = "<group>"; };
-		9845A7C01A439A9200544E2E /* GetStartedViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetStartedViewController.m; sourceTree = "<group>"; };
 		9845A7C11A439A9200544E2E /* GetStartedViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GetStartedViewController.xib; sourceTree = "<group>"; };
-		9845A7C31A439A9200544E2E /* InfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InfoViewController.h; sourceTree = "<group>"; };
-		9845A7C41A439A9200544E2E /* InfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InfoViewController.m; sourceTree = "<group>"; };
 		9845A7C51A439A9200544E2E /* InfoViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InfoViewController_iPad.xib; sourceTree = "<group>"; };
 		9845A7C61A439A9200544E2E /* InfoViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InfoViewController_iPhone.xib; sourceTree = "<group>"; };
-		9845A7C81A439A9200544E2E /* SetUpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetUpViewController.h; sourceTree = "<group>"; };
-		9845A7C91A439A9200544E2E /* SetUpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SetUpViewController.m; sourceTree = "<group>"; };
 		9845A7CA1A439A9200544E2E /* SetUpViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetUpViewController.xib; sourceTree = "<group>"; };
-		9845A82F1A439B4800544E2E /* UIImage+Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Helpers.h"; sourceTree = "<group>"; };
-		9845A8301A439B4800544E2E /* UIImage+Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Helpers.m"; sourceTree = "<group>"; };
 		9845A8341A439B8F00544E2E /* app-info.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = "app-info.css"; sourceTree = "<group>"; };
 		9845A8351A439B8F00544E2E /* backspace.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backspace.png; sourceTree = "<group>"; };
 		9845A8361A439B8F00544E2E /* bookmarklet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bookmarklet.png; sourceTree = "<group>"; };
@@ -329,8 +314,6 @@
 		9845A8551A439B8F00544E2E /* url-screen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "url-screen.png"; sourceTree = "<group>"; };
 		9845A8561A439B8F00544E2E /* url-screeni.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "url-screeni.png"; sourceTree = "<group>"; };
 		9845A89E1A439BB500544E2E /* setup.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = setup.html; sourceTree = "<group>"; };
-		9845A8B91A439D9D00544E2E /* KMActivityProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMActivityProvider.h; sourceTree = "<group>"; };
-		9845A8BA1A439D9D00544E2E /* KMActivityProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMActivityProvider.m; sourceTree = "<group>"; };
 		9845A8BE1A439F1000544E2E /* 715-globe-toolbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "715-globe-toolbar.png"; sourceTree = "<group>"; };
 		9845A8BF1A439F1000544E2E /* 715-globe-toolbar@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "715-globe-toolbar@2x.png"; sourceTree = "<group>"; };
 		9845A8C01A439F1000544E2E /* 715-globe-toolbar@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "715-globe-toolbar@3x.png"; sourceTree = "<group>"; };
@@ -345,9 +328,7 @@
 		9845A8C91A439F1000544E2E /* UIButtonBarArrowRight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIButtonBarArrowRight@2x.png"; sourceTree = "<group>"; };
 		9845A8CA1A439F1000544E2E /* UIButtonBarRefresh@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIButtonBarRefresh@2x.png"; sourceTree = "<group>"; };
 		9845A8CB1A439F1000544E2E /* UIButtonBarStop@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIButtonBarStop@2x.png"; sourceTree = "<group>"; };
-		9845A8DA1A439FB200544E2E /* KMBookmarksViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMBookmarksViewController.h; sourceTree = "<group>"; };
-		9845A8DB1A439FB200544E2E /* KMBookmarksViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMBookmarksViewController.m; sourceTree = "<group>"; };
-		9845A8DC1A439FB200544E2E /* KMBookmarksViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = KMBookmarksViewController.xib; sourceTree = "<group>"; };
+		9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BookmarksViewController.xib; sourceTree = "<group>"; };
 		984C0D811994613E009D2A13 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		984FA1E21974B06C0037EE5D /* Keyman.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Keyman.entitlements; sourceTree = "<group>"; };
 		985EA9D419E64A580006C017 /* banner-Landscape-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape-568h@2x.png"; sourceTree = "<group>"; };
@@ -370,12 +351,7 @@
 		98ABADB7176935E400B62590 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		98ABADBB176935E400B62590 /* Keyman-Free-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Keyman-Free-Info.plist"; sourceTree = "<group>"; };
 		98ABADBD176935E400B62590 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		98ABADBF176935E400B62590 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = main.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		98ABADC1176935E400B62590 /* Keyman-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Prefix.pch"; sourceTree = "<group>"; };
-		98ABADC2176935E400B62590 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AppDelegate.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		98ABADC3176935E400B62590 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AppDelegate.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		98ABADCB176935E500B62590 /* MainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = MainViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		98ABADCC176935E500B62590 /* MainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = MainViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		98ABADCF176935E500B62590 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainViewController_iPhone.xib; sourceTree = "<group>"; };
 		98ABADD2176935E500B62590 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainViewController_iPad.xib; sourceTree = "<group>"; };
 		98AD861219B56AAE00D25C26 /* 887-notepad-selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "887-notepad-selected.png"; path = "Keyman Icons/887-notepad-selected.png"; sourceTree = "<group>"; };
@@ -383,8 +359,6 @@
 		98C893F119F0811A000B9AC8 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		98CD125C19CA85710089385F /* SWKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SWKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		98CD125F19CA85710089385F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		98CD126019CA85710089385F /* KeyboardViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyboardViewController.h; sourceTree = "<group>"; };
-		98CD126119CA85710089385F /* KeyboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeyboardViewController.m; sourceTree = "<group>"; };
 		98CD127619CA866B0089385F /* SWKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SWKeyboard.entitlements; sourceTree = "<group>"; };
 		98CF00B41B461EDE00627DC6 /* browser-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "browser-icon.png"; sourceTree = "<group>"; };
 		98CF00B51B461EDE00627DC6 /* get-started.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "get-started.png"; sourceTree = "<group>"; };
@@ -412,6 +386,20 @@
 		98D55EDC18480B6800104956 /* textsize_up.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_up.png; path = "Keyman Icons/textsize_up.png"; sourceTree = "<group>"; };
 		98D55EDD18480B6800104956 /* textsize_up@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_up@2x.png"; path = "Keyman Icons/textsize_up@2x.png"; sourceTree = "<group>"; };
 		98DE283417F50DBF00D6A496 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		C055F0B01F60E8D400140735 /* GetStartedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = GetStartedViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C055F0B21F60F7A400140735 /* DropDownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DropDownView.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C055F0B41F610FB200140735 /* DropDownListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DropDownListView.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = SetUpViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = BookmarksViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C0A1A6361F5E8C9100EAF822 /* WebBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = WebBrowserViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C0E943F71F61234C00E7D98C /* UIImage+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = "UIImage+Helpers.swift"; sourceTree = "<group>"; tabWidth = 2; };
+		C0E943F91F6124E100E7D98C /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C0E943FD1F61377900E7D98C /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C0FF76991F5D368B00BD23C3 /* SWKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SWKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
+		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
+		C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Bridging-Header.h"; sourceTree = "<group>"; };
+		C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = ActivityItemProvider.swift; sourceTree = "<group>"; tabWidth = 2; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -455,13 +443,11 @@
 		9845A79A1A43983300544E2E /* KMWebBrowser */ = {
 			isa = PBXGroup;
 			children = (
+				9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */,
+				9845A79D1A43983300544E2E /* WebBrowserViewController.xib */,
+				C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */,
+				C0A1A6361F5E8C9100EAF822 /* WebBrowserViewController.swift */,
 				9845A8BD1A439F1000544E2E /* Icons */,
-				9845A8DA1A439FB200544E2E /* KMBookmarksViewController.h */,
-				9845A8DB1A439FB200544E2E /* KMBookmarksViewController.m */,
-				9845A8DC1A439FB200544E2E /* KMBookmarksViewController.xib */,
-				9845A79B1A43983300544E2E /* KMWebBrowserViewController.h */,
-				9845A79C1A43983300544E2E /* KMWebBrowserViewController.m */,
-				9845A79D1A43983300544E2E /* KMWebBrowserViewController.xib */,
 				9845A79E1A43983300544E2E /* NavBar */,
 			);
 			path = KMWebBrowser;
@@ -485,23 +471,20 @@
 			path = NavBar;
 			sourceTree = "<group>";
 		};
-		9845A7B71A4398B200544E2E /* KMDropDownList */ = {
+		9845A7B71A4398B200544E2E /* DropDownList */ = {
 			isa = PBXGroup;
 			children = (
-				9845A7B81A4398B200544E2E /* KMDropDownListView.h */,
-				9845A7B91A4398B200544E2E /* KMDropDownListView.m */,
-				9845A7BA1A4398B200544E2E /* KMDropDownView.h */,
-				9845A7BB1A4398B200544E2E /* KMDropDownView.m */,
+				C055F0B41F610FB200140735 /* DropDownListView.swift */,
+				C055F0B21F60F7A400140735 /* DropDownView.swift */,
 			);
-			path = KMDropDownList;
+			path = DropDownList;
 			sourceTree = "<group>";
 		};
 		9845A7BE1A439A9200544E2E /* GetStartedViewController */ = {
 			isa = PBXGroup;
 			children = (
-				9845A7BF1A439A9200544E2E /* GetStartedViewController.h */,
-				9845A7C01A439A9200544E2E /* GetStartedViewController.m */,
 				9845A7C11A439A9200544E2E /* GetStartedViewController.xib */,
+				C055F0B01F60E8D400140735 /* GetStartedViewController.swift */,
 			);
 			path = GetStartedViewController;
 			sourceTree = "<group>";
@@ -509,10 +492,9 @@
 		9845A7C21A439A9200544E2E /* InfoViewController */ = {
 			isa = PBXGroup;
 			children = (
-				9845A7C31A439A9200544E2E /* InfoViewController.h */,
-				9845A7C41A439A9200544E2E /* InfoViewController.m */,
 				9845A7C51A439A9200544E2E /* InfoViewController_iPad.xib */,
 				9845A7C61A439A9200544E2E /* InfoViewController_iPhone.xib */,
+				C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */,
 			);
 			path = InfoViewController;
 			sourceTree = "<group>";
@@ -520,9 +502,8 @@
 		9845A7C71A439A9200544E2E /* SetUpViewController */ = {
 			isa = PBXGroup;
 			children = (
-				9845A7C81A439A9200544E2E /* SetUpViewController.h */,
-				9845A7C91A439A9200544E2E /* SetUpViewController.m */,
 				9845A7CA1A439A9200544E2E /* SetUpViewController.xib */,
+				C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */,
 			);
 			path = SetUpViewController;
 			sourceTree = "<group>";
@@ -534,15 +515,6 @@
 				9845A8331A439B8F00544E2E /* Info */,
 			);
 			path = WebPages;
-			sourceTree = "<group>";
-		};
-		9845A82E1A439B4800544E2E /* Categories */ = {
-			isa = PBXGroup;
-			children = (
-				9845A82F1A439B4800544E2E /* UIImage+Helpers.h */,
-				9845A8301A439B4800544E2E /* UIImage+Helpers.m */,
-			);
-			path = Categories;
 			sourceTree = "<group>";
 		};
 		9845A8331A439B8F00544E2E /* Info */ = {
@@ -597,15 +569,6 @@
 				9845A89E1A439BB500544E2E /* setup.html */,
 			);
 			path = SetupSWK;
-			sourceTree = "<group>";
-		};
-		9845A8B81A439D9D00544E2E /* KMActivityProvider */ = {
-			isa = PBXGroup;
-			children = (
-				9845A8B91A439D9D00544E2E /* KMActivityProvider.h */,
-				9845A8BA1A439D9D00544E2E /* KMActivityProvider.m */,
-			);
-			path = KMActivityProvider;
 			sourceTree = "<group>";
 		};
 		9845A8BD1A439F1000544E2E /* Icons */ = {
@@ -688,23 +651,23 @@
 		98ABADB9176935E400B62590 /* Keyman */ = {
 			isa = PBXGroup;
 			children = (
-				98ABADC2176935E400B62590 /* AppDelegate.h */,
-				98ABADC3176935E400B62590 /* AppDelegate.m */,
 				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
 				98C893F119F0811A000B9AC8 /* Images.xcassets */,
 				9845A7C21A439A9200544E2E /* InfoViewController */,
 				984FA1E21974B06C0037EE5D /* Keyman.entitlements */,
-				9845A8B81A439D9D00544E2E /* KMActivityProvider */,
-				9845A7B71A4398B200544E2E /* KMDropDownList */,
+				9845A7B71A4398B200544E2E /* DropDownList */,
 				9845A79A1A43983300544E2E /* KMWebBrowser */,
 				98D418F41769486C008D2FF3 /* libKeyman */,
 				9822CB671A3A77D200D73CAA /* MainViewController_.xib */,
 				98ABADD1176935E500B62590 /* MainViewController_iPad.xib */,
 				98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */,
-				98ABADCB176935E500B62590 /* MainViewController.h */,
-				98ABADCC176935E500B62590 /* MainViewController.m */,
 				9845A7C71A439A9200544E2E /* SetUpViewController */,
 				98ABADBA176935E400B62590 /* Supporting Files */,
+				C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */,
+				C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */,
+				C0E943F71F61234C00E7D98C /* UIImage+Helpers.swift */,
+				C0E943F91F6124E100E7D98C /* AppDelegate.swift */,
+				C0E943FD1F61377900E7D98C /* MainViewController.swift */,
 			);
 			path = Keyman;
 			sourceTree = "<group>";
@@ -712,7 +675,6 @@
 		98ABADBA176935E400B62590 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				9845A82E1A439B4800544E2E /* Categories */,
 				9845A7D81A439AFB00544E2E /* WebPages */,
 				98ABADBC176935E400B62590 /* InfoPlist.strings */,
 				98AFAEDB17FE2ACF00178C0A /* Keyman Icons */,
@@ -720,7 +682,6 @@
 				98ABADBB176935E400B62590 /* Keyman-Free-Info.plist */,
 				981AFAE219EF44DE006706BF /* Keyman-Info.plist */,
 				98ABADC1176935E400B62590 /* Keyman-Prefix.pch */,
-				98ABADBF176935E400B62590 /* main.m */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -792,9 +753,9 @@
 			isa = PBXGroup;
 			children = (
 				98CD127619CA866B0089385F /* SWKeyboard.entitlements */,
-				98CD126019CA85710089385F /* KeyboardViewController.h */,
-				98CD126119CA85710089385F /* KeyboardViewController.m */,
 				98CD125E19CA85710089385F /* Supporting Files */,
+				C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */,
+				C0FF76991F5D368B00BD23C3 /* SWKeyboard-Bridging-Header.h */,
 			);
 			path = SWKeyboard;
 			sourceTree = "<group>";
@@ -914,16 +875,18 @@
 		98ABADA8176935E400B62590 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0810;
-				ORGANIZATIONNAME = "Tavultesoft Pty Ltd";
+				LastUpgradeCheck = 0900;
+				ORGANIZATIONNAME = "SIL International";
 				TargetAttributes = {
 					981AFA7519EF44DE006706BF = {
 						DevelopmentTeam = 3YE4W86L3G;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Manual;
 					};
 					98CD125B19CA85710089385F = {
 						CreatedOnToolsVersion = 6.0.1;
 						DevelopmentTeam = 3YE4W86L3G;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -956,7 +919,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9845A8DE1A439FB200544E2E /* KMBookmarksViewController.xib in Resources */,
+				9845A8DE1A439FB200544E2E /* BookmarksViewController.xib in Resources */,
 				9845A8601A439B8F00544E2E /* confirm-dl.png in Resources */,
 				981AFA8F19EF44DE006706BF /* 724-info@2x.png in Resources */,
 				9845A8D41A439F1000544E2E /* 786-browser@3x.png in Resources */,
@@ -1080,7 +1043,7 @@
 				982D149F19FF462A007D4629 /* textsize_up@3x.png in Resources */,
 				982D149119FF462A007D4629 /* 711-trash@3x.png in Resources */,
 				982D148D19FF462A007D4629 /* 702-share@3x.png in Resources */,
-				9845A7AB1A43983300544E2E /* KMWebBrowserViewController.xib in Resources */,
+				9845A7AB1A43983300544E2E /* WebBrowserViewController.xib in Resources */,
 				9822CB691A3A77D200D73CAA /* MainViewController_.xib in Resources */,
 				9845A8741A439B8F00544E2E /* font-size-a.png in Resources */,
 			);
@@ -1119,7 +1082,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/Keyman-Info.plist\")\nverstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/Keyman-Info.plist\")\n/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"";
+			shellScript = "verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/Keyman-Info.plist\")\nverstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/Keyman-Info.plist\")\n/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"\n\nif which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
 		};
 		CE06AA671F161422006D91C3 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1132,7 +1095,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# For corresponding with the console build\nDESTINATION=Keyman/\nSOURCE=../../engine/KMEI/build/libKeyman\n\ncp -Rf \"$SOURCE\" \"$DESTINATION\"";
+			shellScript = "# For corresponding with the console build\nDESTINATION=Keyman/\nSOURCE=../../engine/KMEI/build/libKeyman\n\ncp -Rf \"$SOURCE\" \"$DESTINATION\"\n\nif which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1141,18 +1104,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				981AFA7B19EF44DE006706BF /* main.m in Sources */,
-				9845A7CF1A439A9200544E2E /* GetStartedViewController.m in Sources */,
-				981AFA7C19EF44DE006706BF /* AppDelegate.m in Sources */,
-				9845A7AA1A43983300544E2E /* KMWebBrowserViewController.m in Sources */,
-				9845A7BC1A4398B200544E2E /* KMDropDownListView.m in Sources */,
-				981AFA7F19EF44DE006706BF /* MainViewController.m in Sources */,
-				9845A7BD1A4398B200544E2E /* KMDropDownView.m in Sources */,
-				9845A8321A439B4800544E2E /* UIImage+Helpers.m in Sources */,
-				9845A8BC1A439D9D00544E2E /* KMActivityProvider.m in Sources */,
-				9845A7D11A439A9200544E2E /* InfoViewController.m in Sources */,
-				9845A8DD1A439FB200544E2E /* KMBookmarksViewController.m in Sources */,
-				9845A7D41A439A9200544E2E /* SetUpViewController.m in Sources */,
+				C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */,
+				C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */,
+				C0E943F81F61234C00E7D98C /* UIImage+Helpers.swift in Sources */,
+				C0E943FE1F61377900E7D98C /* MainViewController.swift in Sources */,
+				C055F0B31F60F7A400140735 /* DropDownView.swift in Sources */,
+				C0A1A6371F5E8C9100EAF822 /* WebBrowserViewController.swift in Sources */,
+				C0E943FA1F6124E100E7D98C /* AppDelegate.swift in Sources */,
+				C0A1A6351F5E786A00EAF822 /* BookmarksViewController.swift in Sources */,
+				C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */,
+				C0A1A6311F5E4F4300EAF822 /* InfoViewController.swift in Sources */,
+				C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1160,7 +1122,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98CD126219CA85710089385F /* KeyboardViewController.m in Sources */,
+				C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1197,11 +1159,14 @@
 		981AFADF19EF44DE006706BF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Keyman/Keyman.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1209,6 +1174,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = "Keyman-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Keyman/libKeyman\"",
@@ -1219,6 +1185,10 @@
 				PROVISIONING_PROFILE = "b763adec-b421-4d7a-bd8f-b747685d06fa";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PROVISIONING_PROFILE_SPECIFIER = "Keyman App Debug";
+				SWIFT_OBJC_BRIDGING_HEADER = "Keyman/Keyman-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1227,17 +1197,21 @@
 		981AFAE019EF44DE006706BF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Keyman/Keyman.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				INFOPLIST_FILE = "Keyman-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Keyman/libKeyman\"",
@@ -1248,6 +1222,9 @@
 				PROVISIONING_PROFILE = "715dde50-1d18-463d-aaca-6869b1e1ab3a";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PROVISIONING_PROFILE_SPECIFIER = "XC iOS: Tavultesoft.Keyman";
+				SWIFT_OBJC_BRIDGING_HEADER = "Keyman/Keyman-Bridging-Header.h";
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1261,12 +1238,18 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -1294,6 +1277,7 @@
 					"-force_load",
 					Keyman/libKeyman/libKeyman.a,
 				);
+				"OTHER_SWIFT_FLAGS[arch=*]" = "-D DEBUG";
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
@@ -1309,12 +1293,18 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -1340,6 +1330,7 @@
 				);
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1381,6 +1372,11 @@
 				PROVISIONING_PROFILE = "5d7c5750-a8be-473c-80ef-ed8773404e65";
 				PROVISIONING_PROFILE_SPECIFIER = "Keyman App SW Keyboard Debug";
 				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "SWKeyboard/SWKeyboard-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -1416,6 +1412,10 @@
 				PROVISIONING_PROFILE = "8599fd0f-af7f-4605-a931-3a6266a8744f";
 				PROVISIONING_PROFILE_SPECIFIER = "XC iOS: Tavultesoft.Keyman.SWKeyboard";
 				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "SWKeyboard/SWKeyboard-Bridging-Header.h";
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
