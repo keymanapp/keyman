@@ -806,7 +806,7 @@
 		F243887514BBD43000A3E055 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = "SIL International";
 				TargetAttributes = {
 					98F9D6961954112F0087AA43 = {
@@ -1149,12 +1149,18 @@
 				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -1185,12 +1191,18 @@
 				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -1207,6 +1219,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				VALID_ARCHS = "arm64 armv7s armv7";
 			};
 			name = Release;
@@ -1269,7 +1282,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F27FCAEE157FD59100FBBA20 /* Keyman-iphoneos.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				COPY_PHASE_STRIP = NO;
 				DSTROOT = /tmp/Keyman_iphoneos.dst;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1297,7 +1309,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F27FCAEE157FD59100FBBA20 /* Keyman-iphoneos.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				COPY_PHASE_STRIP = YES;
 				DSTROOT = /tmp/Keyman_iphoneos.dst;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1320,10 +1331,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F27FCAEF157FD59100FBBA20 /* Keyman-iphonesimulator.xcconfig */;
 			buildSettings = {
-				ARCHS = (
-					i386,
-					x86_64,
-				);
 				COPY_PHASE_STRIP = NO;
 				DSTROOT = /tmp/Keyman_iphonesimulator.dst;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1356,10 +1363,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F27FCAEF157FD59100FBBA20 /* Keyman-iphonesimulator.xcconfig */;
 			buildSettings = {
-				ARCHS = (
-					i386,
-					x86_64,
-				);
 				COPY_PHASE_STRIP = YES;
 				DSTROOT = /tmp/Keyman_iphonesimulator.dst;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
