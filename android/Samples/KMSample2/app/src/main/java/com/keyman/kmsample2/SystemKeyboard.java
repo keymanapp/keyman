@@ -1,9 +1,16 @@
 package com.keyman.kmsample2;
 
+import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.KMManager.KeyboardType;
+import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
+import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.inputmethodservice.InputMethodService;
+import java.util.HashMap;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -12,15 +19,10 @@ import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMManager.KeyboardType;
-import com.tavultesoft.kmea.KeyboardEventHandler;
-
-import java.util.HashMap;
-
-public class SystemKeyboard extends InputMethodService implements KeyboardEventHandler.OnKeyboardEventListener {
+public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
 
   private static View inputView = null;
+  private KMHardwareKeyboardInterpreter interpreter = null;
 
   /**
    * Main initialization of the input method component. Be sure to call
@@ -32,6 +34,7 @@ public class SystemKeyboard extends InputMethodService implements KeyboardEventH
     KMManager.setDebugMode(true);
     KMManager.addKeyboardEventListener(this);
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
     // Add a custom keyboard
     HashMap<String, String> kbInfo = new HashMap<String, String>();
@@ -48,6 +51,7 @@ public class SystemKeyboard extends InputMethodService implements KeyboardEventH
   public void onDestroy() {
     inputView = null;
     KMManager.removeKeyboardEventListener(this);
+    interpreter = null; // Throw it away, since we're losing our application's context.
     KMManager.onDestroy();
     super.onDestroy();
   }
@@ -103,7 +107,7 @@ public class SystemKeyboard extends InputMethodService implements KeyboardEventH
     attribute.imeOptions |= EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_FLAG_NO_FULLSCREEN;
     super.onStartInput(attribute, restarting);
     KMManager.onStartInput(attribute, restarting);
-
+    KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_SYSTEM);
     // User switched to a new input field so we should extract the text from input field
     // and pass it to Keyman Engine together with selection range
     InputConnection ic = getCurrentInputConnection();
@@ -158,11 +162,14 @@ public class SystemKeyboard extends InputMethodService implements KeyboardEventH
     // Handle Keyman keyboard loaded event here if needed
     // We can set our custom keyboard here
     int kbIndex = KMManager.getKeyboardIndex(this, "tamil99m", "tam");
-    KMManager.setKeyboard(this, kbIndex);
   }
 
   @Override
-  public void onKeyboardChanged(String newKeyboard) {
+  public void onKeyboardChanged(String newKeyboard, KeyboardType keyboardType) {
+    // System keyboard changed, so refresh the chiral modifier status
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      KMManager.checkIsChiral(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    }
     // Handle Keyman keyboard changed event here if needed
   }
 
@@ -174,5 +181,25 @@ public class SystemKeyboard extends InputMethodService implements KeyboardEventH
   @Override
   public void onKeyboardDismissed() {
     // Handle Keyman keyboard dismissed event here if needed
+  }
+
+  @Override
+  public boolean onKeyDown(int keyCode, KeyEvent event) {
+    return interpreter.onKeyDown(keyCode, event);  // if false, will revert to default handling.
+  }
+
+  @Override
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+    return interpreter.onKeyUp(keyCode, event);
+  }
+
+  @Override
+  public boolean onKeyMultiple(int keyCode, int count, KeyEvent event) {
+    return interpreter.onKeyMultiple(keyCode, count, event);
+  }
+
+  @Override
+  public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+    return interpreter.onKeyLongPress(keyCode, event);
   }
 }

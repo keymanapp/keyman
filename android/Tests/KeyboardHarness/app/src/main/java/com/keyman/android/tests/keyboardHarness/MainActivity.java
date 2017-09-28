@@ -88,13 +88,10 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   @Override
   public void onKeyboardLoaded(KeyboardType keyboardType) {
     // Handle Keyman keyboard loaded event here if needed
-    // We can set our custom keyboard here
-    int kbIndex = KMManager.getKeyboardIndex(this, "chirality", "eng");
-    KMManager.setKeyboard(this, kbIndex);
   }
 
   @Override
-  public void onKeyboardChanged(String newKeyboard) {
+  public void onKeyboardChanged(String newKeyboard, KeyboardType keyboardType) {
     // Handle Keyman keyboard changed event here if needed
   }
 
