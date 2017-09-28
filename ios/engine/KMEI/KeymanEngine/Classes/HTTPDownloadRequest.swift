@@ -12,30 +12,30 @@
 }
 
 class HTTPDownloadRequest: NSObject {
-  let url: URL
-  let typeCode: DownloadType
-  let userInfo: [String: Any]
+  @objc let url: URL
+  @objc let typeCode: DownloadType
+  @objc let userInfo: [String: Any]
   var task: URLSessionTask?
-  var destinationFile: String?
-  var rawResponseData: Data?
-  var tag: Int = 0
+  @objc var destinationFile: String?
+  @objc var rawResponseData: Data?
+  @objc var tag: Int = 0
 
-  init(url: URL, downloadType type: DownloadType, userInfo info: [String: Any]) {
+  @objc init(url: URL, downloadType type: DownloadType, userInfo info: [String: Any]) {
     self.url = url
     typeCode = type
     userInfo = info
     super.init()
   }
 
-  convenience init(url: URL) {
+  @objc convenience init(url: URL) {
     self.init(url: url, downloadType: DownloadType.downloadFile, userInfo: [:])
   }
 
-  convenience init(url: URL, userInfo info: [String: Any]) {
+  @objc convenience init(url: URL, userInfo info: [String: Any]) {
     self.init(url: url, downloadType: DownloadType.downloadFile, userInfo: info)
   }
 
-  convenience init(url: URL, downloadType type: DownloadType) {
+  @objc convenience init(url: URL, downloadType type: DownloadType) {
     self.init(url: url, downloadType: type, userInfo: [:])
   }
 
@@ -47,21 +47,21 @@ class HTTPDownloadRequest: NSObject {
   }
 
   // TODO: Remove
-  var responseStatusCodeObjc: Int {
+  @objc var responseStatusCodeObjc: Int {
     if let code = responseStatusCode {
       return code
     }
     return -1
   }
 
-  var responseStatusMessage: String? {
+  @objc var responseStatusMessage: String? {
     guard let statusCode = responseStatusCode else {
       return nil
     }
     return HTTPURLResponse.localizedString(forStatusCode: statusCode)
   }
 
-  var error: Error? {
+  @objc var error: Error? {
     return task?.error
   }
 }

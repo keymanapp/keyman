@@ -110,7 +110,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  func keyboardDownloadStarted(_ notification: Notification) {
+  @objc func keyboardDownloadStarted(_ notification: Notification) {
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
 
@@ -142,7 +142,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     navigationController?.setToolbarHidden(false, animated: true)
   }
 
-  func keyboardDownloadFailed(_ notification: Notification) {
+  @objc func keyboardDownloadFailed(_ notification: Notification) {
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }

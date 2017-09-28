@@ -19,9 +19,9 @@ class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLS
   weak var handler: HTTPDownloadDelegate?
   var currentRequest: HTTPDownloadRequest?
   var downloadSession: URLSession!
-  var userInfo: [String: Any] = [:]
+  @objc var userInfo: [String: Any] = [:]
 
-  init(_ handler: HTTPDownloadDelegate?) {
+  @objc init(_ handler: HTTPDownloadDelegate?) {
     super.init()
     self.handler = handler
 
@@ -29,7 +29,7 @@ class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLS
     downloadSession = URLSession(configuration: config, delegate: self, delegateQueue: nil)
   }
 
-  func addRequest(_ request: HTTPDownloadRequest) {
+  @objc func addRequest(_ request: HTTPDownloadRequest) {
     queue.append(request)
   }
 
@@ -41,7 +41,7 @@ class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLS
   }
 
   // Starts the queue.  The queue is managed via event messages in order to process them sequentially.
-  func run() {
+  @objc func run() {
     if !queue.isEmpty {
       runRequest()
     }
@@ -115,7 +115,7 @@ class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLS
     }
   }
 
-  func cancelAllOperations() {
+  @objc func cancelAllOperations() {
     while !queue.isEmpty {
       _ = popRequest()
     }
@@ -126,7 +126,7 @@ class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLS
     }
   }
 
-  var requestsCount: Int {
+  @objc var requestsCount: Int {
     return queue.count
   }
 }

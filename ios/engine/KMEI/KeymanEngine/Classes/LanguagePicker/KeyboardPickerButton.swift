@@ -12,7 +12,7 @@ import QuartzCore
 class KeyboardPickerButton: UIButton {
   weak var presentingVC: UIViewController?
 
-  init(presentingVC: UIViewController) {
+  @objc init(presentingVC: UIViewController) {
     super.init(frame: .zero)
     self.presentingVC = presentingVC
 
@@ -43,7 +43,7 @@ class KeyboardPickerButton: UIButton {
     presentingVC = nil
   }
 
-  func showKeyboardPicker() {
+  @objc func showKeyboardPicker() {
     if let presentingVC = presentingVC {
       KMManager.sharedInstance().showKeyboardPicker(in: presentingVC, shouldAddKeyboard: false)
     }

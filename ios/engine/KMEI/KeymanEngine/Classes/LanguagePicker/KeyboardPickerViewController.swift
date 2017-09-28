@@ -206,13 +206,13 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     switchKeyboard(indexPath.row)
   }
 
-  func keyboardDownloadStarted(_ notification: Notification) {
+  @objc func keyboardDownloadStarted(_ notification: Notification) {
     view.isUserInteractionEnabled = false
     navigationItem.leftBarButtonItem?.isEnabled = false
     navigationItem.rightBarButtonItem?.isEnabled = false
   }
 
-  func keyboardDownloadFinished(_ notification: Notification) {
+  @objc func keyboardDownloadFinished(_ notification: Notification) {
     if view == navigationController?.topViewController?.view {
       if updateQueue == nil {
         return
@@ -280,7 +280,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  func keyboardDownloadFailed(_ notification: Notification) {
+  @objc func keyboardDownloadFailed(_ notification: Notification) {
     view.isUserInteractionEnabled = true
     navigationItem.leftBarButtonItem?.isEnabled = true
     if let item = navigationItem.rightBarButtonItem {
@@ -303,7 +303,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     alert.show()
   }
 
-  func keyboardChanged(_ notification: Notification) {
+  @objc func keyboardChanged(_ notification: Notification) {
   }
 
   private func switchKeyboard(_ index: Int) {
@@ -359,19 +359,19 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  func doneClicked(_ sender: Any) {
+  @objc func doneClicked(_ sender: Any) {
     KMManager.sharedInstance().dismissKeyboardPicker(self)
   }
 
-  func cancelClicked(_ sender: Any) {
+  @objc func cancelClicked(_ sender: Any) {
     KMManager.sharedInstance().dismissKeyboardPicker(self)
   }
 
-  func addClicked(_ sender: Any) {
+  @objc func addClicked(_ sender: Any) {
     showAddKeyboard()
   }
 
-  func updateClicked(_ sender: Any) {
+  @objc func updateClicked(_ sender: Any) {
     navigationController?.toolbar?.viewWithTag(toolbarButtonTag)?.removeFromSuperview()
     let toolbarFrame = navigationController!.toolbar!.frame
     let width = toolbarFrame.width * 0.95
@@ -467,11 +467,11 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       KMManager.sharedInstance().languageID == languageID
   }
 
-  func hideToolbarDelayed(_ timer: Timer) {
+  @objc func hideToolbarDelayed(_ timer: Timer) {
     navigationController?.setToolbarHidden(true, animated: true)
   }
 
-  func showAddKeyboard() {
+  @objc func showAddKeyboard() {
     let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
     button?.isEnabled = false
     let vc = LanguageViewController()

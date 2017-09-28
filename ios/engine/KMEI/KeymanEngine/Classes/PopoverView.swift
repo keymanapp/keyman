@@ -11,11 +11,11 @@ import UIKit
 class PopoverView: UIView {
   let strokeWidth: CGFloat = 2.0
   let arrowWidth: CGFloat = 21.0
-  let arrowHeight: CGFloat = 7.0
+  @objc let arrowHeight: CGFloat = 7.0
   let borderRadius: CGFloat = 5.0
-  var borderColor = UIColor(red: 125.0 / 255.0, green: 133.0 / 255.0, blue: 145.0 / 255.0, alpha: 1.0)
+  @objc var borderColor = UIColor(red: 125.0 / 255.0, green: 133.0 / 255.0, blue: 145.0 / 255.0, alpha: 1.0)
   private var bgColor = UIColor(red: 175.0 / 255.0, green: 175.0 / 255.0, blue: 175.0 / 255.0, alpha: 0.75)
-  var backgroundColor2 = UIColor(red: 105.0 / 255.0, green: 105.0 / 255.0, blue: 105.0 / 255.0, alpha: 0.75)
+  @objc var backgroundColor2 = UIColor(red: 105.0 / 255.0, green: 105.0 / 255.0, blue: 105.0 / 255.0, alpha: 0.75)
   private var _arrowPosX: CGFloat = 0.0
 
   override init(frame: CGRect) {
@@ -120,7 +120,7 @@ class PopoverView: UIView {
     }
   }
 
-  var arrowPosX: CGFloat {
+  @objc var arrowPosX: CGFloat {
     get {
       return _arrowPosX
     }

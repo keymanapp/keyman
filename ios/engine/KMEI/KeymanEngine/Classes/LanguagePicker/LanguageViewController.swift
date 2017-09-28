@@ -105,7 +105,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
       guard let name = item[kKeymanNameKey] as? String else {
         continue
       }
-      let firstLetter = name.substring(to: name.index(after: name.startIndex))
+      let firstLetter = String(name[..<name.index(after: name.startIndex)])
       if !sectionIndexTitles.contains(firstLetter) {
         sectionIndexTitles.append(firstLetter)
         indices.append(index)
@@ -209,7 +209,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  func languageFetchFinished() {
+  @objc func languageFetchFinished() {
     dismissActivityView()
     tableView.reloadData()
     if numberOfSections(in: tableView) == 0 {
@@ -217,12 +217,12 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  func languageFetchFailed() {
+  @objc func languageFetchFailed() {
     dismissActivityView()
     showConnectionErrorAlert()
   }
 
-  func keyboardDownloadStarted(_ notification: Notification) {
+  @objc func keyboardDownloadStarted(_ notification: Notification) {
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
 
@@ -257,7 +257,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     navigationController?.setToolbarHidden(false, animated: true)
   }
 
-  func keyboardDownloadFailed(_ notification: Notification) {
+  @objc func keyboardDownloadFailed(_ notification: Notification) {
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }
