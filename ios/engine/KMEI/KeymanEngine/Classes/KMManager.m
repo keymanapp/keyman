@@ -15,7 +15,6 @@
 #import "KMTextView.h"
 #import "KMKeyPreviewView.h"
 #import "KMSubKeysView.h"
-#import "KMKeyboardMenuView.h"
 #import "UIView+Helpers.h"
 #import <QuartzCore/QuartzCore.h>
 #import <CoreText/CoreText.h>
@@ -87,7 +86,7 @@ static id webView = nil;
 static PopoverView *helpBubbleView = nil;
 static KMKeyPreviewView *keyPreviewView = nil;
 static KMSubKeysView *subKeysView = nil;
-static KMKeyboardMenuView *keyboardMenuView = nil;
+static KeyboardMenuView *keyboardMenuView = nil;
 
 // Arrays
 static NSMutableArray *subKeyIDs = nil;
@@ -3983,7 +3982,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
             [self setMenuKeyFrame:keyFrame];
             if (!CGRectEqualToRect(menuKeyFrame, CGRectZero)) {
                 [keyboardMenuView removeFromSuperview];
-                keyboardMenuView = [[KMKeyboardMenuView alloc] initWithKeyFrame:menuKeyFrame inputViewController:ic closeButtonTitle:closeButtonTitle];
+                keyboardMenuView = [[KeyboardMenuView alloc] initWithKeyFrame:menuKeyFrame inputViewController:ic closeButtonTitle:closeButtonTitle];
                 [parentView addSubview:keyboardMenuView];
             }
         }];
@@ -3993,7 +3992,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
         [self setMenuKeyFrame:keyFrame];
         if (!CGRectEqualToRect(menuKeyFrame, CGRectZero)) {
             [keyboardMenuView removeFromSuperview];
-            keyboardMenuView = [[KMKeyboardMenuView alloc] initWithKeyFrame:menuKeyFrame inputViewController:ic closeButtonTitle:closeButtonTitle];
+            keyboardMenuView = [[KeyboardMenuView alloc] initWithKeyFrame:menuKeyFrame inputViewController:ic closeButtonTitle:closeButtonTitle];
             [parentView addSubview:keyboardMenuView];
         }
     }
