@@ -26,7 +26,7 @@ BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
   return TRUE;
 }
 
-BOOL VerifyKeyboardVersionF(PFILE_KEYBOARD fk, DWORD ver) {
+BOOL VerifyKeyboardVersion(PFILE_KEYBOARD fk, DWORD ver) {
   if (fk->dwFlags & KF_AUTOMATICVERSION) {
     fk->version = max(fk->version, ver);
     return TRUE;

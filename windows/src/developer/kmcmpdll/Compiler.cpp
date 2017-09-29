@@ -1032,7 +1032,7 @@ DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p)
 	{
     // In this case, we want to change behaviour for older versioned keyboards so that
     // we don't mix up named character codes which weren't supported in 5.x
-    VerifyKeyboardVersion(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
 		// Add a single char store as a defined character constant
 		char *codename = wstrtostr(sp->szName);
 		if(Uni_IsSurrogate1(*sp->dpString))
@@ -1166,7 +1166,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 		break;
 	
 	case TSS_ETHNOLOGUECODE:
-    VerifyKeyboardVersion(fk, VERSION_60, CERR_60FeatureOnly_EthnologueCode);
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_EthnologueCode);
     if((msg = ProcessEthnologueStore(sp->dpString)) != CERR_None) return msg;  // I2646
 		break;
 	
@@ -1180,7 +1180,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 		break;
 
 	case TSS_INCLUDECODES:
-		VerifyKeyboardVersion(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
+		VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
 		pp = wstrtostr(sp->dpString);
 		if(!CodeConstants->LoadFile(pp))
 		{
@@ -1201,7 +1201,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 		  q = wcstok_s(NULL, L" c\n", &context);  // I3481
 		  if(!q)
 		  {
-        VerifyKeyboardVersion(fk, VERSION_70, CERR_InvalidLanguageLine);
+        VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_InvalidLanguageLine);
 		    j = SUBLANGID(i);
 		    i = PRIMARYLANGID(i);
       }
@@ -1235,7 +1235,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 		break;
 
 	case TSS_MNEMONIC:
-    VerifyKeyboardVersion(fk, VERSION_60, CERR_60FeatureOnly_MnemonicLayout);
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_MnemonicLayout);
 		FMnemonicLayout = atoiW(sp->dpString) == 1;
 		break;
 
@@ -1243,7 +1243,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 		break;
 
 	case TSS_OLDCHARPOSMATCHING:
-    VerifyKeyboardVersion(fk, VERSION_60, CERR_60FeatureOnly_OldCharPosMatching);
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_OldCharPosMatching);
 		FOldCharPosMatching = atoiW(sp->dpString);
 		break;
 
@@ -1275,7 +1275,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 		break;
 
 	case TSS_VISUALKEYBOARD:
-    VerifyKeyboardVersion(fk, VERSION_70, CERR_70FeatureOnly);
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
     {
       // Strip path from the store, leaving bare filename only
       p = sp->dpString;
@@ -1302,21 +1302,21 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 	case TSS_KMW_HELPFILE:
 	case TSS_KMW_HELPTEXT:
 	case TSS_KMW_EMBEDJS:
-    VerifyKeyboardVersion(fk, VERSION_70, CERR_70FeatureOnly);
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
     break;
 
   case TSS_KMW_EMBEDCSS:
-    VerifyKeyboardVersion(fk, VERSION_90, CERR_90FeatureOnlyEmbedCSS);
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyEmbedCSS);
     break;
 
   case TSS_TARGETS:   // I4504
-    VerifyKeyboardVersion(fk, VERSION_90, CERR_90FeatureOnlyTargets);
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyTargets);
     break;
 
   case TSS_WINDOWSLANGUAGES:
     {
       wchar_t *context = NULL;
-      VerifyKeyboardVersion(fk, VERSION_70, CERR_70FeatureOnly);
+      VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
       size_t szQ = wcslen(sp->dpString) * 6 + 1;  // I3481
       q = new WCHAR[szQ]; // guaranteed to be enough space for recoding
       *q = 0; WCHAR *r = q;
@@ -1341,20 +1341,20 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 		  break;
     }
   case TSS_COMPARISON:
-    VerifyKeyboardVersion(fk, VERSION_80, CERR_80FeatureOnly);
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
     break;
 
   case TSS_VKDICTIONARY:  // I3438
-    VerifyKeyboardVersion(fk, VERSION_90, CERR_90FeatureOnlyVirtualKeyDictionary);
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyVirtualKeyDictionary);
     break;
 
   case TSS_LAYOUTFILE:  // I3483
-    VerifyKeyboardVersion(fk, VERSION_90, CERR_90FeatureOnlyLayoutFile);   // I4140
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyLayoutFile);   // I4140
     // Used by KMW compiler
     break;
 
   case TSS_KEYBOARDVERSION:   // I4140
-    VerifyKeyboardVersion(fk, VERSION_90, CERR_90FeatureOnlyKeyboardVersion);
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyKeyboardVersion);
     if(!IsValidKeyboardVersion(sp->dpString)) {
       return CERR_KeyboardVersionFormatInvalid;
     }
@@ -1978,7 +1978,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
         }
         else if(_wcsnicmp(p, L"baselayout", 10) == 0)  // I3430
         {
-          VerifyKeyboardVersion(fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
+          VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
           if(sFlag) return CERR_InvalidInVirtualKeySection;
 			    p += 10;
 			    q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -1992,7 +1992,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 		  case 5:
         if(_wcsnicmp( p, L"if", 2) == 0)
         {
-          VerifyKeyboardVersion(fk, VERSION_80, CERR_80FeatureOnly);
+          VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
           if(sFlag) return CERR_InvalidInVirtualKeySection;
           p += 2;
           q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2066,7 +2066,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 				  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
 				  if(q)
 				  {
-            VerifyKeyboardVersion(fk, VERSION_60, CERR_60FeatureOnly_Contextn);
+            VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_Contextn);
 					  int n1;
 					  n1 = atoiW(q);
 					  if(n1 < 1 || n1 >= 0xF000) return CERR_InvalidToken;
@@ -2091,7 +2091,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			  }
 			  else if(_wcsnicmp(p, L"call", 4) == 0)
 			  {
-          VerifyKeyboardVersion(fk, VERSION_501, CERR_501FeatureOnly_Call);
+          VERIFY_KEYBOARD_VERSION(fk, VERSION_501, CERR_501FeatureOnly_Call);
 				  if(sFlag) return CERR_CallInVirtualKeySection;
 				  p += 4;
 				  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2119,7 +2119,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 		  case 8:
 		    if(_wcsnicmp(p, L"notany", 6) == 0)
 		    {
-          VerifyKeyboardVersion(fk, VERSION_70, CERR_70FeatureOnly)
+          VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly)
 			    if(sFlag) return CERR_AnyInVirtualKeySection;
 			    p += 6;
 			    q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2173,7 +2173,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 		  case 10:
         if(_wcsnicmp(p, L"reset", 5) == 0)
         {
-          VerifyKeyboardVersion(fk, VERSION_80, CERR_80FeatureOnly);
+          VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
           if(sFlag) return CERR_InvalidInVirtualKeySection;
           p += 5;
           q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2270,7 +2270,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			  {
 				  if(*q == '\'' || *q == '"')
 				  {
-            VerifyKeyboardVersion(fk, VERSION_60, CERR_60FeatureOnly_VirtualCharKey);
+            VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_VirtualCharKey);
 					  if(!FMnemonicLayout) AddWarning(CWARN_VirtualCharKeyWithPositionalLayout);
 					  WCHAR chQuote = *q;
 					  q++; if(*q == chQuote || *q == '\n' || *q == 0) return CERR_InvalidToken;
@@ -2307,7 +2307,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 
 					if(i == VK__MAX + 1)
           {
-            VerifyKeyboardVersion(fk, VERSION_90, CERR_InvalidToken);
+            VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_InvalidToken);
 
             i = GetVKCode(fk, vkname);  // I3438
             if(i == 0)
@@ -2334,7 +2334,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 		  case 14:
         if(_wcsnicmp(p, L"set", 3) == 0)
         {
-          VerifyKeyboardVersion(fk, VERSION_80, CERR_80FeatureOnly);
+          VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
           p += 3;
           q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
           if(!q) return CERR_InvalidSet;
@@ -2344,7 +2344,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
         }
         else if(_wcsnicmp(p, L"save", 4) == 0)
         {
-          VerifyKeyboardVersion(fk, VERSION_80, CERR_80FeatureOnly);
+          VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
           p += 4;
           q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
           if(!q) return CERR_InvalidSave;
@@ -2376,7 +2376,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 				  return CERR_InvalidToken;
 			  continue;
 		  case 16:
-        VerifyKeyboardVersion(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
+        VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
 			  q = p+1;
 			  while(isalnum(*q) || *q == '-' || *q == '_') q++;
 			  c = *q; *q = 0;
@@ -2398,7 +2398,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			  continue;
       case 17:
         if(_wcsnicmp(p, L"platform", 8) != 0) return CERR_InvalidToken;  // I3430
-        VerifyKeyboardVersion(fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
+        VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
         if(sFlag) return CERR_InvalidInVirtualKeySection;
 			  p += 8;
 			  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2407,7 +2407,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
         continue;
       case 18:  // I3437
         if(_wcsnicmp(p, L"layer", 5) != 0) return CERR_InvalidToken;
-        VerifyKeyboardVersion(fk, VERSION_90, CERR_90FeatureOnly_SetSystemStores);
+        VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_SetSystemStores);
         if(sFlag) return CERR_InvalidInVirtualKeySection;
 			  p += 5;
 			  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2516,7 +2516,7 @@ DWORD process_if(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx)  // I3431
 
   if(r[0] == '&')
   {
-    VerifyKeyboardVersion(fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
 	  for(i = 0; StoreTokens[i]; i++)
 	  {
 		  if(_wcsicmp(r, StoreTokens[i]) == 0) break;
@@ -2627,7 +2627,7 @@ DWORD process_set(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx)
 
   if(r[0] == '&')
   {
-    VerifyKeyboardVersion(fk, VERSION_90, CERR_90FeatureOnly_SetSystemStores);  // I3437
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_SetSystemStores);  // I3437
 	  for(i = 0; StoreTokens[i]; i++)
 	  {
 		  if(_wcsicmp(r, StoreTokens[i]) == 0) break;
@@ -3224,7 +3224,7 @@ DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PWSTR szName, PDWORD FileSize, PBYTE *
 
 	/* Test for version 7.0 icon support */
   if (*((PCHAR)*Buf) != 'B' && *(((PCHAR)*Buf) + 1) != 'M') {
-    VerifyKeyboardVersion(fk, VERSION_70, CERR_70FeatureOnly);
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
   }
 
 	return CERR_None;
