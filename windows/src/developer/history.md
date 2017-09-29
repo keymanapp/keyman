@@ -423,7 +423,6 @@
 * Create your own product using the Branding Pack and the Keyman Engine
 * Fully customisable user interface for your product with Branding Editor
 * Distribution Editor to create a Windows Installer .msi for your product
-
 * Customer Relationship Manager
     * manage your customers and their licences from your desktop
     * fully integrated with the Tavultesoft Online Store
