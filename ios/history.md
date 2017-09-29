@@ -45,7 +45,7 @@
 * Now displays version and build number in info page
 * Other bug fixes & improvements
 
-## 2014-11-2014 2.0.0 stable
+## 2014-11-10 2.0.0 stable
 ### New Features
 * Use any Keyman keyboard throughout your entire iOS 8 device
 * Custom installable fonts with iOS 8
