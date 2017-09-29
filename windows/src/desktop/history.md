@@ -313,7 +313,7 @@
 ## 9.0.442 beta
 * Add keyboard version information to Keyman Configuration (Tweak) (I4136)
 
-# Old Release Notes - What's New?
+# Legacy Release Notes - What's New?
 
 ## 8.0.0 stable
 
