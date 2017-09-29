@@ -5,9 +5,9 @@ _hu_base_dir=$(dirname "$BASH_SOURCE")/..
 . $_hu_base_dir/resources/shellHelperFunctions.sh
 
 get_history_file_path() {
-  verify_project $1
+  get_platform_folder $1
 
-  history_file_path="$_hu_base_dir/$1/history.md"
+  history_file_path="$platform_folder/history.md"
 }
 
 # Creates and initializes a variable called `history_file` that contains the raw content

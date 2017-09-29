@@ -1,5 +1,7 @@
 #!/bin/sh
 
+_shf_base_dir=$(dirname "$BASH_SOURCE")/..
+
 # Allows for a quick macOS check for those scripts requiring a macOS environment.
 verify_on_mac() {
   if [[ "${OSTYPE}" != "darwin"* ]]; then
@@ -23,6 +25,36 @@ verify_project() {
 
   if [ $match = false ]; then
     fail "Invalid project specified!"
+  fi
+}
+
+# The list of valid platforms that our build scripts ought expect.
+platforms=("android" "ios" "mac" "web" "desktop" "developer")
+
+# Used to validate a specified 'platform' parameter.
+verify_platform() {
+  match=false
+  for proj in ${platforms[@]}
+  do
+    if [ $proj = $1 ]; then
+      match=true
+    fi
+  done
+
+  if [ $match = false ]; then
+    fail "Invalid platform specified!"
+  fi
+}
+
+# Gets the folder containing each platform's history.md file, which is also the base folder for most of the platforms.
+# Sets $platform_folder accordingly.
+get_platform_folder() {
+  verify_platform $1
+  
+  if [[ $1 = "desktop" || $1 = "developer" ]]; then
+    platform_folder="$_shf_base_dir/windows/src/$1"
+  else
+    platform_folder="$_shf_base_dir/$1"
   fi
 }
 
