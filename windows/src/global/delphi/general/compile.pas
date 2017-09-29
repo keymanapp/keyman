@@ -122,6 +122,13 @@ const
   CKF_KEYMAN = 0;
   CKF_KEYMANWEB = 1;
 
+const
+  CERR_FATAL   = $00008000;
+  CERR_ERROR   = $00004000;
+  CERR_WARNING = $00002000;
+  CERR_MEMORY  = $00001000;
+  CWARN_Info =   $0000208A;
+
 function CompileKeyboardFile(kmnFile, kmxFile: PChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback): Integer; cdecl;   // I4865   // I4866
 function CompileKeyboardFileToBuffer(kmnFile: PChar; buf: PFILE_KEYBOARD; CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback; Target: Integer): Integer; cdecl;   // I4865   // I4866
 
