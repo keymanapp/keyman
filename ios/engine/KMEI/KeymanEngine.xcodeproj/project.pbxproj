@@ -46,7 +46,6 @@
 		980EEFD1196E19B7003F6A67 /* KeyboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F9D69C1954112F0087AA43 /* KeyboardViewController.m */; };
 		980EEFED196E1D64003F6A67 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F27FCB51157FE3CE00FBBA20 /* Keyman.bundle */; };
 		9839558619C13C3800AF3060 /* libKeyman.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98F9D6CA19541D220087AA43 /* libKeyman.a */; };
-		9841130B199D9B84005BD609 /* KMSubKeysView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9841130A199D9B84005BD609 /* KMSubKeysView.m */; };
 		984FD3EF17B48C670026ADA7 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984FD3EC17B48BBC0026ADA7 /* CoreText.framework */; };
 		9878F7711B8BF00F00360B8D /* NSString+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9878F76D1B8BF00F00360B8D /* NSString+Helpers.m */; };
 		9878F7721B8BF00F00360B8D /* UIButton+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9878F76F1B8BF00F00360B8D /* UIButton+Helpers.m */; };
@@ -67,10 +66,6 @@
 		989FDF92193C1C7100EECAF9 /* KMKeyPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 989FDF91193C1C7100EECAF9 /* KMKeyPreviewView.m */; };
 		98B34AB917F3B82000DF079E /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98B34AB817F3B82000DF079E /* AudioToolbox.framework */; };
 		98D4190C17695E58008D2FF3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98D4190B17695E58008D2FF3 /* Default-568h@2x.png */; };
-		98EF3BA619A5B03800A1365F /* KMSubKeysView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9841130A199D9B84005BD609 /* KMSubKeysView.m */; };
-		98EF3BA719A5B05000A1365F /* KMSubKeysView.h in Headers */ = {isa = PBXBuildFile; fileRef = 98411309199D9B84005BD609 /* KMSubKeysView.h */; };
-		98EF3BA819A5B06100A1365F /* KMSubKeysView.h in Headers */ = {isa = PBXBuildFile; fileRef = 98411309199D9B84005BD609 /* KMSubKeysView.h */; };
-		98EF3BA919A5B07100A1365F /* KMSubKeysView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9841130A199D9B84005BD609 /* KMSubKeysView.m */; };
 		98F9D692195402F90087AA43 /* KMTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C0A1406151EA8B3007FA4AD /* KMTextView.m */; };
 		98F9D6A01954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */; };
 		98F9D6A7195412620087AA43 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F26071FF158F8C6000F37184 /* libz.dylib */; };
@@ -90,6 +85,7 @@
 		98FFB3D51B67008000289F0E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98FFB3D31B67006F00289F0E /* WebKit.framework */; };
 		C034BBBE1F7CCE7D00021FF5 /* KeyboardMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */; };
 		C04C2A6D1F6B7D9A00BA42B6 /* LanguageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04C2A6C1F6B7D9A00BA42B6 /* LanguageViewController.swift */; };
+		C07B42AF1F7CEE2700ECA97F /* SubKeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */; };
 		C08C620C1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C620B1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift */; };
 		C08C62101F67BD4500268D03 /* KeyboardPickerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C620F1F67BD4500268D03 /* KeyboardPickerButton.swift */; };
 		C08C62131F67C31100268D03 /* KeyboardNameTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C62121F67C31100268D03 /* KeyboardNameTableViewCell.swift */; };
@@ -189,8 +185,6 @@
 		6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x.png"; sourceTree = "<group>"; };
 		980CC8E219D51F3C0089BB57 /* KMURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMURLProtocol.h; sourceTree = "<group>"; };
 		980CC8E319D51F3C0089BB57 /* KMURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMURLProtocol.m; sourceTree = "<group>"; };
-		98411309199D9B84005BD609 /* KMSubKeysView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSubKeysView.h; sourceTree = "<group>"; };
-		9841130A199D9B84005BD609 /* KMSubKeysView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSubKeysView.m; sourceTree = "<group>"; };
 		98493BF71993370200845D28 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		984FA1F51974C0B30037EE5D /* Tavultesoft.KMEI.SystemKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Tavultesoft.KMEI.SystemKeyboard.entitlements; sourceTree = "<group>"; };
 		984FA1F61974C0EF0037EE5D /* KMEI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = KMEI.entitlements; sourceTree = "<group>"; };
@@ -218,6 +212,7 @@
 		98FFB3D31B67006F00289F0E /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardMenuView.swift; sourceTree = "<group>"; };
 		C04C2A6C1F6B7D9A00BA42B6 /* LanguageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LanguageViewController.swift; sourceTree = "<group>"; };
+		C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubKeysView.swift; sourceTree = "<group>"; };
 		C08C620B1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardPickerBarButtonItem.swift; sourceTree = "<group>"; };
 		C08C620F1F67BD4500268D03 /* KeyboardPickerButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardPickerButton.swift; sourceTree = "<group>"; };
 		C08C62121F67C31100268D03 /* KeyboardNameTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardNameTableViewCell.swift; sourceTree = "<group>"; };
@@ -376,8 +371,7 @@
 		98411308199D9ACD005BD609 /* SubKeysView */ = {
 			isa = PBXGroup;
 			children = (
-				98411309199D9B84005BD609 /* KMSubKeysView.h */,
-				9841130A199D9B84005BD609 /* KMSubKeysView.m */,
+				C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */,
 			);
 			name = SubKeysView;
 			sourceTree = "<group>";
@@ -695,7 +689,6 @@
 				F27FCAD7157FD43B00FBBA20 /* KMTextField.h in Headers */,
 				F27FCB69157FFE8B00FBBA20 /* KMTextFieldDelegateProxy.h in Headers */,
 				CECB38981F2199FB0098882F /* Reachability.h in Headers */,
-				98EF3BA719A5B05000A1365F /* KMSubKeysView.h in Headers */,
 				980CC8E519D522060089BB57 /* KMURLProtocol.h in Headers */,
 				987F3EA31941ABF600209D4F /* KMKeyPreviewView.h in Headers */,
 			);
@@ -714,7 +707,6 @@
 				F27FCAE4157FD49B00FBBA20 /* KMTextField.h in Headers */,
 				F27FCAE5157FD49B00FBBA20 /* KMTextFieldDelegateProxy.h in Headers */,
 				CECB38991F219A010098882F /* Reachability.h in Headers */,
-				98EF3BA819A5B06100A1365F /* KMSubKeysView.h in Headers */,
 				987F3EA51941AC2700209D4F /* KMKeyPreviewView.h in Headers */,
 				980CC8E819D5223C0089BB57 /* KMURLProtocol.h in Headers */,
 			);
@@ -963,10 +955,10 @@
 				98F9D6F019545AB60087AA43 /* KMInputViewController.m in Sources */,
 				989FDF92193C1C7100EECAF9 /* KMKeyPreviewView.m in Sources */,
 				9878F7711B8BF00F00360B8D /* NSString+Helpers.m in Sources */,
-				9841130B199D9B84005BD609 /* KMSubKeysView.m in Sources */,
 				C08C62171F67CFB800268D03 /* KeyboardPickerViewController.swift in Sources */,
 				C08C62101F67BD4500268D03 /* KeyboardPickerButton.swift in Sources */,
 				C0ED71B51F6BBFAF002A2FD6 /* HTTPDownloader.swift in Sources */,
+				C07B42AF1F7CEE2700ECA97F /* SubKeysView.swift in Sources */,
 				C034BBBE1F7CCE7D00021FF5 /* KeyboardMenuView.swift in Sources */,
 				C04C2A6D1F6B7D9A00BA42B6 /* LanguageViewController.swift in Sources */,
 			);
@@ -977,7 +969,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				980CC8E619D5221F0089BB57 /* KMURLProtocol.m in Sources */,
-				98EF3BA619A5B03800A1365F /* KMSubKeysView.m in Sources */,
 				98F9D6F7195463390087AA43 /* KMInputViewController.m in Sources */,
 				9878F7741B8BF01F00360B8D /* NSString+Helpers.m in Sources */,
 				987F3E9F1941AAB700209D4F /* KMKeyPreviewView.m in Sources */,
@@ -997,7 +988,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				980CC8E719D5222A0089BB57 /* KMURLProtocol.m in Sources */,
-				98EF3BA919A5B07100A1365F /* KMSubKeysView.m in Sources */,
 				98F9D6F61954632A0087AA43 /* KMInputViewController.m in Sources */,
 				9878F7751B8BF01F00360B8D /* NSString+Helpers.m in Sources */,
 				987F3EA11941AAE900209D4F /* KMKeyPreviewView.m in Sources */,

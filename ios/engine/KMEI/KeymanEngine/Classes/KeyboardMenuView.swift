@@ -228,7 +228,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
     let colorSpace = CGColorSpaceCreateDeviceRGB()
     let gradientColors = [bgColor.cgColor, bgColor2.cgColor] as CFArray
-    let gradientLocations: [CGFloat] = [0, 1] as [CGFloat]
+    let gradientLocations: [CGFloat] = [0, 1]
     if let gradient = CGGradient(colorsSpace: colorSpace, colors: gradientColors, locations: gradientLocations) {
       let startPoint = CGPoint(x: rect.midX, y: rect.minY)
       let endPoint = CGPoint(x: rect.midX, y: rect.maxY)

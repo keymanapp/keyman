@@ -14,7 +14,6 @@
 #import "KMTextField.h"
 #import "KMTextView.h"
 #import "KMKeyPreviewView.h"
-#import "KMSubKeysView.h"
 #import "UIView+Helpers.h"
 #import <QuartzCore/QuartzCore.h>
 #import <CoreText/CoreText.h>
@@ -85,7 +84,7 @@ NSString *const kKeymanSynchronizeSWKeyboardKey = @"KeymanSynchronizeSWKeyboard"
 static id webView = nil;
 static PopoverView *helpBubbleView = nil;
 static KMKeyPreviewView *keyPreviewView = nil;
-static KMSubKeysView *subKeysView = nil;
+static SubKeysView *subKeysView = nil;
 static KeyboardMenuView *keyboardMenuView = nil;
 
 // Arrays
@@ -3527,7 +3526,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
         }
         
         [self dismissKeyPreview];
-        subKeysView = [[KMSubKeysView alloc] initWithKeyFrame:keyFrame subKeys:subKeys];
+        subKeysView = [[SubKeysView alloc] initWithKeyFrame:keyFrame subKeys:subKeys];
         [[NSNotificationCenter defaultCenter] postNotificationName:kKeymanSubKeysMenuWillShowNotification object:self
                                                           userInfo:nil];
         [[[self class] inputView] addSubview:subKeysView];
