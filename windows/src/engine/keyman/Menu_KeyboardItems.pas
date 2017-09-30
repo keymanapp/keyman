@@ -45,6 +45,7 @@ interface
 uses
   Windows,
   Classes,
+  Vcl.ComCtrls,
   Controls,
   custinterfaces,
   Graphics,
@@ -58,6 +59,8 @@ function CreateKeymanMenuItem(FKeyman: IKeyman; Owner: TPopupMenu; cmi: IKeymanC
 
 procedure BuildCustMenu(FKeyman: IKeyman; FMenu: TPopupMenu; Location: TCustomisationMenuItemLocation);   // I3933
 
+procedure AddKeyboardToolbarItems(FKeyman: IKeyman; toolbar: TToolBar; imglist: TImageList; MenuClick: TNotifyEvent);
+
 implementation
 
 uses
@@ -67,6 +70,7 @@ uses
   KeymanDesktopShell,
   kmint,
   LangSwitchManager,
+  LangSwitchUtils,
   MessageIdentifierConsts,
   MessageIdentifiers,
   InterfaceHotkeys,
@@ -106,10 +110,9 @@ procedure AddKeyboardItems(FKeyman: IKeyman; mnu: TPopupMenu; MenuClick: TNotify
 
   function CreateKeyboardMenuItem(Language: TLangSwitchLanguage; Keyboard: TLangSwitchKeyboard): TKeymanMenuItem;   // I3933
   var
-    kmkbd: IKeymanKeyboardInstalled;
     kbd: IKeymanKeyboardInstalled;
     FCaption: WideString;
-    i, j: Integer;
+    i: Integer;
     FHKL: HKL;
     FTargetLanguage: IKeymanLanguage;
     FProfileGUID: TGUID;
@@ -123,20 +126,6 @@ procedure AddKeyboardItems(FKeyman: IKeyman; mnu: TPopupMenu; MenuClick: TNotify
     if Keyboard is TLangSwitchKeyboard_TIP then   // I4398
     begin
       FProfileGUID := (Keyboard as TLangSwitchKeyboard_TIP).Profile.guidProfile;
-
-      for i := 0 to FKeyman.Keyboards.Count - 1 do
-      begin
-        kbd := FKeyman.Keyboards[i];
-        for j := 0 to kbd.Languages.Count - 1 do
-          if kbd.Languages[j].ProfileGUID = FProfileGUID then
-          begin
-            kmkbd := kbd as IKeymanKeyboardInstalled;
-            Break;
-          end;
-        if Assigned(kmkbd) then
-          Break;
-      end;
-
       for i := 0 to FKeyman.Languages.Count - 1 do
         if FKeyman.Languages[i].ProfileGUID = FProfileGUID then
         begin
@@ -407,6 +396,112 @@ begin
 
       FMenu.Items.Add(mi);
     end;
+end;
+
+
+
+
+
+
+procedure AddKeyboardToolbarItems(FKeyman: IKeyman; toolbar: TToolBar; imglist: TImageList; MenuClick: TNotifyEvent);
+
+  procedure CreateKeyboardToolbarItem(Language: TLangSwitchLanguage; Keyboard: TLangSwitchKeyboard);   // I3933
+  var
+    btn: TKeymanToolButton;
+    kbd: IKeymanKeyboardInstalled;
+    FCaption: WideString;
+    i: Integer;
+    FHKL: HKL;
+    FTargetLanguage: IKeymanLanguage;
+    FProfileGUID: TGUID;
+    bmp: TBitmap;
+  begin
+    bmp := TBitmap.Create;
+    try
+      bmp.Width := 16;
+      bmp.Height := 16;
+
+
+      btn := TKeymanToolButton.Create(toolbar);
+
+      FTargetLanguage := nil;
+      kbd := nil;
+
+      if Keyboard is TLangSwitchKeyboard_TIP then   // I4398
+      begin
+        FProfileGUID := (Keyboard as TLangSwitchKeyboard_TIP).Profile.guidProfile;
+
+        for i := 0 to FKeyman.Languages.Count - 1 do
+          if FKeyman.Languages[i].ProfileGUID = FProfileGUID then
+          begin
+            FTargetLanguage := FKeyman.Languages[i];
+            Break;
+          end;
+
+        if Assigned(Keyboard.Bitmap) then
+        begin
+          btn.ImageIndex := imglist.Add(Keyboard.Bitmap, Keyboard.Bitmap);
+        end
+        else
+        begin
+          DrawLanguageIcon(bmp.Canvas, 0, 0, Language.IconText);
+          btn.ImageIndex := imglist.AddMasked(bmp, clNone);
+        end;
+      end
+      else if Keyboard is TLangSwitchKeyboard_WinKeyboard then
+      begin
+        DrawLanguageIcon(bmp.Canvas, 0, 0, Language.IconText);
+        btn.ImageIndex := imglist.AddMasked(bmp, clNone);
+        FHKL := (Keyboard as TLangSwitchKeyboard_WinKeyboard).HKL;
+        for i := 0 to FKeyman.Languages.Count - 1 do
+          if FKeyman.Languages[i].HKL = FHKL then
+          begin
+            FTargetLanguage := FKeyman.Languages[i];
+            Break;
+          end;
+      end;
+
+      btn.KeyboardName := Keyboard.ID;
+
+      FCaption := Language.Caption + ' - ' + Keyboard.Caption;
+
+      btn.ShowHint := True;
+      btn.Hint := MsgFromStr(':String[@Caption='''+xmlencode(StripHotkey(FCaption))+''']');
+      if btn.Hint = '' then
+        btn.Hint := StringReplace(FCaption, '&', '&&', [rfReplaceAll]);
+
+      btn.Width := 23;
+      btn.Left := 0;
+      btn.OnClick := MenuClick;
+
+      btn.Down := Keyboard.Active;
+
+      // TODO: Support icon for TSF TIPs
+
+      toolbar.InsertControl(btn);
+    finally
+      bmp.Free;
+    end;
+  end;
+
+
+var
+  i: Integer;
+  FLanguage: TLangSwitchLanguage;
+  j: Integer;
+begin
+  { Use the lang switch manager to get the list of installed languages }
+
+  frmKeyman7Main.LangSwitchManager.Refresh;   // I4207 ?? is this really needed
+
+  for i := 0 to frmKeyman7Main.LangSwitchManager.LanguageCount - 1 do   // I3933
+  begin
+    FLanguage := frmKeyman7Main.LangSwitchManager.Languages[i];
+    for j := 0 to FLanguage.KeyboardCount - 1 do
+    begin
+      CreateKeyboardToolbarItem(FLanguage, FLanguage.Keyboards[j]);
+    end;
+  end;
 end;
 
 end.

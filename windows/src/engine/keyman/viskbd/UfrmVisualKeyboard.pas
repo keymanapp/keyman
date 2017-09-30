@@ -188,7 +188,6 @@ type
     FUpdatingToolbar: Boolean;
     FActivePageSet: Boolean;
     FRegistered: Boolean;
-    FKeyboardMenuButton: TToolButton;   // I3962
     FLastTotalKeyboards: Integer;   // I4606
 
     procedure ResetShiftStates;  // I1144
@@ -233,8 +232,8 @@ type
     procedure CreateWebHintManager;
     procedure AdjustToClosestMonitor(var x, y, cx, cy: Integer);
 
-    procedure KeyboardMenuClick(Sender: TObject);   // I3962
-    function IsHintBarEnabled: Boolean;   // I4390
+    function IsHintBarEnabled: Boolean;
+    procedure KeyboardButtonClick(Sender: TObject);   // I4390
   protected
     procedure CreateParams(var Params: TCreateParams); override;
   public
@@ -425,7 +424,9 @@ begin
             begin
               tbLeft.Perform(TB_AUTOSIZE, 0, 0);
 
-              FKeyboardMenuButton := TToolButton.Create(Self);
+              AddKeyboardToolbarItems(kmcom, tbKeyboards, ilKeyboards, KeyboardButtonClick);
+
+{              FKeyboardMenuButton := TToolButton.Create(Self);
               FKeyboardMenuButton.Left := x;
               FKeyboardMenuButton.Width := 23;
               tbKeyboards.InsertControl(FKeyboardMenuButton);
@@ -433,7 +434,7 @@ begin
               //btn.ShowHint := True;
               //FKeyboardMenuButton.OnMouseEnter := BtnShowKeyboardHint;
               //FKeyboardMenuButton.OnMouseLeave := BtnHideKeyboardHint;
-              FKeyboardMenuButton.OnClick := KeyboardMenuClick;
+              FKeyboardMenuButton.OnClick := KeyboardMenuClick;}
               x := 0;
               tb := tbRight;
             end;
@@ -735,15 +736,18 @@ begin
   Result := panTop.Visible;
 end;
 
-procedure TfrmVisualKeyboard.KeyboardMenuClick(Sender: TObject);   // I3962   // I3990
+procedure TfrmVisualKeyboard.KeyboardButtonClick(Sender: TObject);
 var
-  FRect: TRect;
+  id: string;
+  kbd: TLangSwitchKeyboard;
 begin
-  FRect.TopLeft := FKeyboardMenuButton.ClientToScreen(Point(0, 0));
-  FRect.Top := Top;
-  FRect.BottomRight := FKeyboardMenuButton.ClientToScreen(Point(FKeyboardMenuButton.ClientWidth,
-    FKeyboardMenuButton.ClientHeight));
-  frmKeyman7Main.ShowMenu(nil, milLeft, False, FRect);
+  if not (Sender is TKeymanToolButton) then
+    Exit;
+
+  id := (Sender as TKeymanToolButton).KeyboardName;
+  kbd := frmKeyman7Main.LangSwitchManager.FindKeyboard(id);
+  if Assigned(kbd) then
+    frmKeyman7Main.ActivateKeyboard(kbd);
 end;
 
 procedure TfrmVisualKeyboard.CreateParams(var Params: TCreateParams);
@@ -1111,38 +1115,18 @@ procedure TfrmVisualKeyboard.UpdateKeyboardIcon;   // I3962
   end;
 var
   kbd: TLangSwitchKeyboard;
-  FBitmap: TBitmap;
-  FIconText: WideString;
+  i: Integer;
+  btn: TKeymanToolButton;
 begin
-  ilKeyboards.Clear;
-  FIconText := '';
   kbd := frmKeyman7Main.LangSwitchManager.ActiveKeyboard;
-  if Assigned(kbd) then
-  begin
-    if Assigned(kbd.Bitmap) then
-    begin
-      if Assigned(FKeyboardMenuButton) then
-        FKeyboardMenuButton.ImageIndex := ilKeyboards.Add(kbd.Bitmap, nil);
-    end
-    else
-      FIconText := kbd.Language.IconText;
-  end
-  else
-    FIconText := '??';
 
-  if FIconText <> '' then
-  begin
-    // Use the language's bitmap
-    FBitmap := TBitmap.Create;
-    try
-      FBitmap.SetSize(16, 16);
-      DrawLanguageIcon(FBitmap.Canvas, 0, 0, FIconText);
-      if Assigned(FKeyboardMenuButton) then
-        FKeyboardMenuButton.ImageIndex := ilKeyboards.Add(FBitmap, nil);
-    finally
-      FBitmap.Free;
+  for i := 0 to tbKeyboards.ControlCount - 1 do
+    if (tbKeyboards.Controls[i] is TToolButton) then
+    begin
+      btn := tbKeyboards.Controls[i] as TKeymanToolButton;
+      btn.Down := btn.KeyboardName = kbd.ID;
+      btn.Marked := btn.Down;
     end;
-  end;
 
   UpdateButtons(kbd, tbLeft);   // I4606
   UpdateButtons(kbd, tbRight);   // I4606
