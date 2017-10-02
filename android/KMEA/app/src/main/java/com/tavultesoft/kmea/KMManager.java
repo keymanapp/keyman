@@ -2402,6 +2402,7 @@ public final class KMManager {
       return kbWidth;
     }
 
+    // Store the current keyboard chirality status from KMW in SystemKeyboard
     @JavascriptInterface
     public void setIsChiral(boolean isChiral) {
       if (isDebugMode()) {

@@ -92,7 +92,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   }
 
   @Override
-  public void onKeyboardChanged(String newKeyboard, KeyboardType keyboardType) {
+  public void onKeyboardChanged(String newKeyboard) {
     // Handle Keyman keyboard changed event here if needed
   }
 

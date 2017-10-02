@@ -8,7 +8,7 @@ import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
-import com.tavultesoft.kmea.KeyboardEventHandler;
+import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -24,7 +24,7 @@ import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 
 
-public class SystemKeyboard extends InputMethodService implements KeyboardEventHandler.OnKeyboardEventListener {
+public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
 
   private static View inputView = null;
   private static ExtractedText exText = null;
