@@ -27,6 +27,16 @@
       kmw['getOskHeight'] = getOskHeight;
       kmw['getOskWidth'] = getOskWidth;
       kmw['setActiveElement']('ta');
+
+      kmw.addEventListener('keyboardchange', function(internalName, languageCode) {
+        setIsChiral();
+        return true;
+      });
+      kmw.addEventListener('keyboardloaded', function(internalName) {
+        setIsChiral();
+        return true;
+      });
+
       ta.readOnly = false;
     }
 
@@ -63,16 +73,8 @@
       } else {
         isChiral = tavultesoft.keymanweb.isChiral();
       }
-      window.console.log("keyboard.html setIsChiral " + isChiral);
-
-      //window.console.log('isChiral is ' + isChiral);
-      //window.jsInterface.setIsChiral(isChiral);
-
-      fragmentToggle = (fragmentToggle + 1) % 100;
-      var div = document.createElement('div');
-      div.innerHTML = t;
-      var dt = div.firstChild.nodeValue;
-      window.location.hash = 'setIsChiral-'+fragmentToggle+'+chiral='+isChiral;
+      window.console.log("keyboard.html: setIsChiral " + isChiral);
+      window.jsInterface.setIsChiral(isChiral);
     }
 
     function setKeymanLanguage(keyboardName, internalName, languageName, langId, version, font, oskFont) {

@@ -8,13 +8,12 @@ import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.KeyboardEventHandler;
 
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.inputmethodservice.InputMethodService;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,8 @@ import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 
-public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
+
+public class SystemKeyboard extends InputMethodService implements KeyboardEventHandler.OnKeyboardEventListener {
 
   private static View inputView = null;
   private static ExtractedText exText = null;
@@ -40,7 +40,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     if (BuildConfig.DEBUG) {
       KMManager.setDebugMode(true);
     }
-    Log.d("SystemKeyboard", "addKeyboardEventListener");
     KMManager.addKeyboardEventListener(this);
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
     interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
@@ -168,7 +167,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   }
 
   @Override
-  public void onKeyboardChanged(String newKeyboard, KeyboardType keyboardType) {
+  public void onKeyboardChanged(String newKeyboard) {
     // Do nothing
   }
 

@@ -293,7 +293,6 @@ public final class KMTextView extends EditText {
 
     if (KMManager.isDebugMode())
       Log.d("showKeyboard()", "Keyboard shown");
-
     KeyboardEventHandler.notifyListeners(kbEventListeners, KeyboardType.KEYBOARD_TYPE_INAPP, EventType.KEYBOARD_SHOWN, null);
   }
 

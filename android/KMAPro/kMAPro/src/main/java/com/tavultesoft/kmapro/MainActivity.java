@@ -262,7 +262,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   }
 
   @Override
-  public void onKeyboardChanged(String newKeyboard, KeyboardType keyboardType) {
+  public void onKeyboardChanged(String newKeyboard) {
     textView.setTypeface(KMManager.getKeyboardTextFontTypeface(this));
   }
 
@@ -272,8 +272,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   }
 
   @Override
-  public void onKeyboardDismissed()
-  {
+  public void onKeyboardDismissed() {
     resizeTextView(false);
   }
 

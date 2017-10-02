@@ -288,15 +288,6 @@ public final class KMManager {
     return mainLayout;
   }
 
-  public static void checkIsChiral(KeyboardType keyboardType) {
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      SystemKeyboard.loadUrl("javascript:setIsChiral()");
-    }
-    else {
-      InAppKeyboard.loadUrl("javascript:setIsChiral()");
-    }
-  }
-
   public static void onStartInput(EditorInfo attribute, boolean restarting) {
     if (!restarting) {
       String packageName = attribute.packageName;
@@ -2072,18 +2063,7 @@ public final class KMManager {
           hashMap.put("keyText", keyText);
           InAppKeyboard.subKeysList.add(hashMap);
         }
-      } else if (url.indexOf("setIsChiral") >= 0) {
-        int start = url.indexOf("chiral=") + 7;
-        String t = url.substring(start);
-        String chirality =  url.substring(start);
-        Log.d("shouldOverride", "chirality is " + chirality);
-        if (InAppKeyboard.getVisibility() == View.VISIBLE) {
-          InAppKeyboard.setChirality(chirality == "true");
-        } else if (SystemKeyboard.getVisibility() == View.VISIBLE) {
-          SystemKeyboard.setChirality(chirality == "true");
-        }
       }
-
       return false;
     }
   }
@@ -2279,33 +2259,11 @@ public final class KMManager {
     }
   }
 
-  private static final class KMInAppKeyboardJSHandler implements OnKeyboardEventListener {
+  private static final class KMInAppKeyboardJSHandler {
     private Context context;
 
     KMInAppKeyboardJSHandler(Context context) {
       this.context = context;
-    }
-
-    @Override
-    public void onKeyboardLoaded(KeyboardType keyboardType){
-      Log.d("KMInJSHandler", "checkIsChiral");
-      InAppKeyboard.loadUrl("javascript:setIsChiral()");
-    }
-
-    @Override
-    public void onKeyboardChanged(String newKeyboard, KeyboardType keyboardType){
-      // newKeyboard string format: languageID_keyboardID e.g. eng_us
-      InAppKeyboard.loadUrl("javascript:setIsChiral()");
-    }
-
-    @Override
-    public void onKeyboardShown() {
-      // Do nothing
-    }
-
-    @Override
-    public void onKeyboardDismissed(){
-      // Do nothing
     }
 
     // This annotation is required in Jelly Bean and later:
@@ -2330,6 +2288,7 @@ public final class KMManager {
       return kbWidth;
     }
 
+    // Store the current keyboard chirality status from KMW in InAppKeyboard
     @JavascriptInterface
     public void setIsChiral(boolean isChiral) {
       if (isDebugMode()) {
