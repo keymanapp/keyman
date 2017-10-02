@@ -202,7 +202,7 @@ if [ $DO_KEYMANAPP = true ]; then
       echo "Preparing .ipa file for deployment."
       xcodebuild -quiet -workspace keymanios.xcworkspace -scheme Keyman -archivePath $ARCHIVE_PATH archive -configuration $CONFIG -allowProvisioningUpdates
 
-      assertFileExists "$ARCHIVE_PATH"
+      assertDirExists "$ARCHIVE_PATH"
 
       # Pass the build number information along to the Plist file of the app.
       if [ $BUILD_NUMBER ]; then
