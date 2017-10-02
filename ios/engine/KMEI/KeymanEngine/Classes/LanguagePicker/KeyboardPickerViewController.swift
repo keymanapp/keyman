@@ -13,13 +13,13 @@ private let toolbarButtonTag = 100
 private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
 
-class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
+public class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   private var userKeyboards: [[String: String]] = []
   private var updateQueue: [[String: String]]?
   private var _isDoneButtonEnabled = false
   private var isDidUpdateCheck = false
 
-  override func viewDidLoad() {
+  public override func viewDidLoad() {
     super.viewDidLoad()
 
     title = "Keyboards"
@@ -57,14 +57,14 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     NotificationCenter.default.removeObserver(self)
   }
 
-  override func viewWillAppear(_ animated: Bool) {
+  public override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
 
     loadUserKeyboards()
     scroll(toSelectedKeyboard: false)
   }
 
-  override func viewDidAppear(_ animated: Bool) {
+  public override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     if isDidUpdateCheck || !checkUpdates() {
       return
@@ -89,15 +89,15 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     scroll(toSelectedKeyboard: false)
   }
 
-  override func numberOfSections(in tableView: UITableView) -> Int {
+  public override func numberOfSections(in tableView: UITableView) -> Int {
     return 1
   }
 
-  override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return userKeyboards.count
   }
 
-  override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cellIdentifier = "Cell"
     if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
       return cell
@@ -111,7 +111,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   // TODO: Refactor. Duplicated in KeyboardInfoViewController
-  override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+  public override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
     if !KMManager.sharedInstance().canRemoveKeyboards {
       return false
     }
@@ -125,8 +125,8 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     return userKeyboards.count > 1
   }
 
-  override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle,
-                          forRowAt indexPath: IndexPath) {
+  public override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle,
+                                 forRowAt indexPath: IndexPath) {
     if editingStyle != .delete {
       return
     }
@@ -156,8 +156,8 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     setIsDoneButtonEnabled(true)
   }
 
-  override func tableView(_ tableView: UITableView,
-                          accessoryButtonTappedForRowWith indexPath: IndexPath) {
+  public override func tableView(_ tableView: UITableView,
+                                 accessoryButtonTappedForRowWith indexPath: IndexPath) {
     showKeyboardInfoView(with: indexPath.row)
   }
 
@@ -182,7 +182,9 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     navigationController?.pushViewController(infoView, animated: true)
   }
 
-  override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+  public override func tableView(_ tableView: UITableView,
+                                 willDisplay cell: UITableViewCell,
+                                 forRowAt indexPath: IndexPath) {
     cell.selectionStyle = .none
     let languageID = userKeyboards[indexPath.row][kKeymanLanguageIdKey]
     let keyboardID = userKeyboards[indexPath.row][kKeymanKeyboardIdKey]
@@ -202,7 +204,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+  public override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     switchKeyboard(indexPath.row)
   }
 
@@ -471,7 +473,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     navigationController?.setToolbarHidden(true, animated: true)
   }
 
-  @objc func showAddKeyboard() {
+  @objc public func showAddKeyboard() {
     let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
     button?.isEnabled = false
     let vc = LanguageViewController()

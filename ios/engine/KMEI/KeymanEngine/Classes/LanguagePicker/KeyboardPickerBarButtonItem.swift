@@ -8,14 +8,14 @@
 
 import UIKit
 
-class KeyboardPickerBarButtonItem: UIBarButtonItem {
+public class KeyboardPickerBarButtonItem: UIBarButtonItem {
   weak var presentingVC: UIViewController?
 
   // Returns a UIBarButtonItem that will display the keyboard picker when tapped
   //   - since the keyboard picker is modal, a UIViewController must be supplied to display it
   //   - the button has default images for normal and landscape orientations
   //      - these can be overridden with other images or a title
-  @objc init(presentingVC: UIViewController) {
+  @objc public init(presentingVC: UIViewController) {
     super.init()
     style = .plain
     action = #selector(self.showKeyboardPicker)
@@ -39,7 +39,7 @@ class KeyboardPickerBarButtonItem: UIBarButtonItem {
     }
   }
 
-  required init?(coder aDecoder: NSCoder) {
+  public required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
@@ -47,13 +47,13 @@ class KeyboardPickerBarButtonItem: UIBarButtonItem {
     presentingVC = nil
   }
 
-  @objc func showKeyboardPicker() {
+  @objc public func showKeyboardPicker() {
     if let presentingVC = presentingVC {
       KMManager.sharedInstance().showKeyboardPicker(in: presentingVC, shouldAddKeyboard: false)
     }
   }
 
-  override var title: String? {
+  public override var title: String? {
     get {
       return super.title
     }

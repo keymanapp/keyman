@@ -6,7 +6,7 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
-class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate {
+public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate {
   private let bgColor = UIColor(red: 255.0 / 255.0, green: 255.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0)
   private let bgColor2 = UIColor(red: 255.0 / 255.0, green: 255.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0)
   private let borderColor = UIColor(red: 134.0 / 255.0, green: 137.0 / 255.0, blue: 139.0 / 255.0, alpha: 1.0)
@@ -24,7 +24,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
   private let closeButtonTitle: String?
 
   private var _inputViewController: KMInputViewController?
-  override var inputViewController: KMInputViewController? {
+  public override var inputViewController: KMInputViewController? {
     return _inputViewController
   }
 
@@ -66,7 +66,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     return _tableList!
   }
 
-  @objc init(keyFrame frame: CGRect, inputViewController: KMInputViewController, closeButtonTitle: String) {
+  @objc public init(keyFrame frame: CGRect, inputViewController: KMInputViewController, closeButtonTitle: String) {
     let isSystemKeyboard = KMManager.isKeymanSystemKeyboard()
     let isPortrait: Bool
     if isSystemKeyboard {
@@ -151,11 +151,11 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
   }
 
-  required init?(coder aDecoder: NSCoder) {
+  public required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
-  override func draw(_ rect: CGRect) {
+  public override func draw(_ rect: CGRect) {
     let keyWidth = keyFrame.width
     let keyHeight = keyFrame.height
     let viewWidth = menuFrame.width
@@ -237,7 +237,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     UIGraphicsPopContext()
   }
 
-  override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+  public override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
     let point = gestureRecognizer.location(in: gestureRecognizer.view)
     guard let view = gestureRecognizer.view?.hitTest(point, with: nil) else {
       return false
@@ -249,15 +249,15 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     KMManager.sharedInstance().dismissKeyboardMenu()
   }
 
-  func numberOfSections(in tableView: UITableView) -> Int {
+  public func numberOfSections(in tableView: UITableView) -> Int {
     return 1
   }
 
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return tableList.count
   }
 
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cellIdentifier = "Cell"
     if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
       return cell
@@ -270,11 +270,11 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     return cell
   }
 
-  func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+  public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
     return rowHeight
   }
 
-  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+  public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     cell.textLabel?.textColor = UIColor.darkGray
     cell.textLabel?.textAlignment = .left
     cell.textLabel?.font = UIFont.systemFont(ofSize: fontSize)
@@ -305,7 +305,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     }
   }
 
-  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     switchKeyboard(indexPath.row)
     KMManager.sharedInstance().dismissKeyboardMenu()
   }

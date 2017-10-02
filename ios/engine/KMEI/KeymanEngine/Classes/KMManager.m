@@ -20,7 +20,7 @@
 #import <CommonCrypto/CommonDigest.h>
 #import "UIButton+Helpers.h"
 #import <objc/message.h>
-#import <KMEI-Swift.h>
+#import "KeymanEngine/KeymanEngine-Swift.h"
 
 #pragma mark - Constants
 

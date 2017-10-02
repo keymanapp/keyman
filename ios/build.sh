@@ -31,7 +31,6 @@ KMEI_RESOURCES=engine/KMEI/KeymanEngine/resources
 KMEI_BUILD_PATH=engine/KMEI/build
 BUNDLE_PATH=$KMEI_RESOURCES/Keyman.bundle/contents/resources
 APP_RESOURCES=keyman/Keyman/Keyman/libKeyman
-APP_BUNDLE_PATH=$APP_RESOURCES/Keyman.bundle
 APP_BUILD_PATH=keyman/Keyman/build/
 KMW_SOURCE=../web/source
 
@@ -40,8 +39,6 @@ do_clean ( ) {
   rm -rf $APP_BUILD_PATH
   rm -rf $APP_BUNDLE_PATH
 }
-
-KMEI_OUTPUT_FOLDER=$KMEI_BUILD_PATH/libKeyman
 
 ### START OF THE BUILD ###
 
@@ -124,17 +121,9 @@ update_bundle ( ) {
 
         cd $base_dir
     fi
-
-    #Copy the updated bundle to our output folder.
-    cp -Rf $KMEI_RESOURCES/Keyman.bundle ${KMEI_OUTPUT_FOLDER}
 }
 
 # First things first - update our dependencies.
-
-if ! [ -d "${KMEI_OUTPUT_FOLDER}" ]; then
-    mkdir -p "${KMEI_OUTPUT_FOLDER}"
-fi
-
 update_bundle
 
 echo
@@ -142,33 +131,14 @@ echo "Building KMEI..."
 
 #OTHER_CFLAGS=-fembed-bitcode is relied upon for building the samples by command-line.  They build fine within XCode itself without it, though.
 
-rm -r $KMEI_BUILD_PATH/${CONFIG}-iphoneos 2>/dev/null
-xcodebuild -quiet -project engine/KMEI/KeymanEngine.xcodeproj -target KME-iphoneos OTHER_CFLAGS=-fembed-bitcode \
-  -configuration $CONFIG
-assertFileExists $KMEI_BUILD_PATH/${CONFIG}-iphoneos/libKME-iphoneos.a
-
-rm -r $KMEI_BUILD_PATH/${CONFIG}-iphonesimulator 2>/dev/null
-xcodebuild -quiet -project engine/KMEI/KeymanEngine.xcodeproj -sdk iphonesimulator PLATFORM_NAME=iphonesimulator \
-  -target KME-iphonesimulator OTHER_CFLAGS=-fembed-bitcode -configuration $CONFIG
-assertFileExists $KMEI_BUILD_PATH/${CONFIG}-iphonesimulator/libKME-iphonesimulator.a
-
-# Combine the two builds into KMEI.
-rm -f ${KMEI_OUTPUT_FOLDER}/libKeyman.a  2>/dev/null
-
-lipo -create "$KMEI_BUILD_PATH/${CONFIG}-iphonesimulator/libKME-iphonesimulator.a" "$KMEI_BUILD_PATH/${CONFIG}-iphoneos/libKME-iphoneos.a" -output "${KMEI_OUTPUT_FOLDER}/libKeyman.a"
-
-assertFileExists $KMEI_OUTPUT_FOLDER/libKeyman.a
-cp -Rf "$KMEI_BUILD_PATH/${CONFIG}-iphoneos/usr/local/include" "${KMEI_OUTPUT_FOLDER}/"
+rm -r $KMEI_BUILD_PATH/$CONFIG-iphoneos 2>/dev/null
+xcodebuild -quiet -project engine/KMEI/KeymanEngine.xcodeproj -target KME-universal -configuration $CONFIG \
+  $CODE_SIGN_IDENTITY $CODE_SIGNING_REQUIRED $DEV_TEAM
+assertDirectoryExists $KMEI_BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
 
 echo "KMEI build complete."
 
 if [ $DO_KEYMANAPP = true ]; then
-    # Copy the KMEI resources into the Keyman App's project.
-    if ! [ -d "${APP_RESOURCES}" ]; then
-        mkdir -p "${APP_RESOURCES}"
-    fi
-    cp -Rf $KMEI_OUTPUT_FOLDER/* $APP_RESOURCES
-
     # Provides a needed link for codesigning for our CI.
     if ! [ -z "${DEVELOPMENT_TEAM}" ]; then
       DEV_TEAM="DEVELOPMENT_TEAM=${DEVELOPMENT_TEAM}"

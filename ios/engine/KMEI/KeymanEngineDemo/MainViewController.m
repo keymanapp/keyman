@@ -8,9 +8,8 @@
 //
 
 #import "MainViewController.h"
-#import "KMManager.h"
+#import "KeymanEngine.h"
 #import <QuartzCore/QuartzCore.h>
-#import <KMEI-Swift.h>
 
 @implementation MainViewController
 

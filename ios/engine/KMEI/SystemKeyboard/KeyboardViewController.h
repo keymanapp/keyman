@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Keyman.h"
+#import "KeymanEngine.h"
 
 @interface KeyboardViewController : KMInputViewController
 

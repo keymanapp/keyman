@@ -13,7 +13,7 @@
 //	own delegate caused an infinite loop in Apple's code, repeatedly calling the selectionDidChange callback
 //		See: http://lists.apple.com/archives/cocoa-dev/2010/Feb/msg01391.html
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @protocol KMTextViewDelegate;
 

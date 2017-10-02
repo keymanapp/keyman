@@ -6,6 +6,7 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
+import KeymanEngine
 import UIKit
 
 class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertViewDelegate {

@@ -60,6 +60,12 @@ assertFileExists() {
     fi
 }
 
+assertDirectoryExists() {
+    if ! [ -d $1 ]; then
+        fail "Build failed:  missing $1"
+    fi
+}
+
 assertValidVersionNbr()
 {
     if [[ "$1" == "" || ! "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then

@@ -7,6 +7,7 @@
 //
 
 #import "KeyboardViewController.h"
+#import "KeymanEngine.h"
 
 @interface KeyboardViewController ()
 

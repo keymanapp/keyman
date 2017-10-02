@@ -8,26 +8,27 @@
 
 import UIKit
 
-class PopoverView: UIView {
+public class PopoverView: UIView {
   let strokeWidth: CGFloat = 2.0
   let arrowWidth: CGFloat = 21.0
-  @objc let arrowHeight: CGFloat = 7.0
+  @objc public let arrowHeight: CGFloat = 7.0
   let borderRadius: CGFloat = 5.0
-  @objc var borderColor = UIColor(red: 125.0 / 255.0, green: 133.0 / 255.0, blue: 145.0 / 255.0, alpha: 1.0)
+  @objc public var borderColor = UIColor(red: 125.0 / 255.0, green: 133.0 / 255.0, blue: 145.0 / 255.0, alpha: 1.0)
   private var bgColor = UIColor(red: 175.0 / 255.0, green: 175.0 / 255.0, blue: 175.0 / 255.0, alpha: 0.75)
-  @objc var backgroundColor2 = UIColor(red: 105.0 / 255.0, green: 105.0 / 255.0, blue: 105.0 / 255.0, alpha: 0.75)
+  @objc public var backgroundColor2 = UIColor(red: 105.0 / 255.0,
+      green: 105.0 / 255.0, blue: 105.0 / 255.0, alpha: 0.75)
   private var _arrowPosX: CGFloat = 0.0
 
-  override init(frame: CGRect) {
+  public override init(frame: CGRect) {
     super.init(frame: frame)
     super.backgroundColor = UIColor.clear
   }
 
-  required init?(coder aDecoder: NSCoder) {
+  public required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
-  override func draw(_ rect: CGRect) {
+  public override func draw(_ rect: CGRect) {
     guard let context = UIGraphicsGetCurrentContext() else {
       return
     }
@@ -107,7 +108,7 @@ class PopoverView: UIView {
     UIGraphicsPopContext()
   }
 
-  override var backgroundColor: UIColor? {
+  public override var backgroundColor: UIColor? {
     get {
       return super.backgroundColor
     }
@@ -120,7 +121,7 @@ class PopoverView: UIView {
     }
   }
 
-  @objc var arrowPosX: CGFloat {
+  @objc public var arrowPosX: CGFloat {
     get {
       return _arrowPosX
     }

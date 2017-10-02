@@ -9,10 +9,10 @@
 import UIKit
 import QuartzCore
 
-class KeyboardPickerButton: UIButton {
+public class KeyboardPickerButton: UIButton {
   weak var presentingVC: UIViewController?
 
-  @objc init(presentingVC: UIViewController) {
+  @objc public init(presentingVC: UIViewController) {
     super.init(frame: .zero)
     self.presentingVC = presentingVC
 
@@ -35,7 +35,7 @@ class KeyboardPickerButton: UIButton {
     frame = frame.insetBy(dx: -15.0, dy: -3.0)
   }
 
-  required init?(coder aDecoder: NSCoder) {
+  public required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
@@ -50,7 +50,7 @@ class KeyboardPickerButton: UIButton {
   }
 
   // Clear images if the developer sets a title
-  override func setTitle(_ title: String?, for state: UIControlState) {
+  public override func setTitle(_ title: String?, for state: UIControlState) {
     setImage(nil, for: state)
     super.setTitle(title, for: state)
   }

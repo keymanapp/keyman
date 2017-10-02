@@ -6,22 +6,22 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
-@objc protocol HTTPDownloadDelegate: class {
+@objc public protocol HTTPDownloadDelegate: class {
   func downloadRequestStarted(_ request: HTTPDownloadRequest)
   func downloadRequestFinished(_ request: HTTPDownloadRequest)
   func downloadRequestFailed(_ request: HTTPDownloadRequest)
   func downloadQueueFinished(_ queue: HTTPDownloader)
 }
 
-class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDelegate {
+public class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDelegate {
   var queue: [HTTPDownloadRequest] = []
   // TODO: Make unowned
   weak var handler: HTTPDownloadDelegate?
   var currentRequest: HTTPDownloadRequest?
   var downloadSession: URLSession!
-  @objc var userInfo: [String: Any] = [:]
+  @objc public var userInfo: [String: Any] = [:]
 
-  @objc init(_ handler: HTTPDownloadDelegate?) {
+  @objc public init(_ handler: HTTPDownloadDelegate?) {
     super.init()
     self.handler = handler
 
@@ -29,7 +29,7 @@ class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLS
     downloadSession = URLSession(configuration: config, delegate: self, delegateQueue: nil)
   }
 
-  @objc func addRequest(_ request: HTTPDownloadRequest) {
+  @objc public func addRequest(_ request: HTTPDownloadRequest) {
     queue.append(request)
   }
 
@@ -41,7 +41,7 @@ class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLS
   }
 
   // Starts the queue.  The queue is managed via event messages in order to process them sequentially.
-  @objc func run() {
+  @objc public func run() {
     if !queue.isEmpty {
       runRequest()
     }
@@ -88,16 +88,16 @@ class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLS
     }
   }
 
-  func urlSession(_ session: URLSession, dataTask: URLSessionDataTask,
-                  willCacheResponse proposedResponse: CachedURLResponse,
-                  completionHandler: @escaping (CachedURLResponse?) -> Void) {
+  public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask,
+                         willCacheResponse proposedResponse: CachedURLResponse,
+                         completionHandler: @escaping (CachedURLResponse?) -> Void) {
     // We only evaluate one at a time, so the 'current request' holds the data task's original request data.
     currentRequest?.rawResponseData = proposedResponse.data
     completionHandler(proposedResponse)
     // With current internal settings, this will cache the data as we desire.
   }
 
-  func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+  public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
     let req = currentRequest
     currentRequest = nil
     if task.error != nil {
@@ -115,7 +115,7 @@ class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLS
     }
   }
 
-  @objc func cancelAllOperations() {
+  @objc public func cancelAllOperations() {
     while !queue.isEmpty {
       _ = popRequest()
     }
@@ -126,7 +126,7 @@ class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLS
     }
   }
 
-  @objc var requestsCount: Int {
+  @objc public var requestsCount: Int {
     return queue.count
   }
 }

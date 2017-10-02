@@ -6,36 +6,36 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
-@objc enum DownloadType: Int {
+@objc public enum DownloadType: Int {
   case downloadFile
   case downloadCachedData
 }
 
-class HTTPDownloadRequest: NSObject {
-  @objc let url: URL
-  @objc let typeCode: DownloadType
-  @objc let userInfo: [String: Any]
+public class HTTPDownloadRequest: NSObject {
+  @objc public let url: URL
+  @objc public let typeCode: DownloadType
+  @objc public let userInfo: [String: Any]
   var task: URLSessionTask?
-  @objc var destinationFile: String?
-  @objc var rawResponseData: Data?
-  @objc var tag: Int = 0
+  @objc public var destinationFile: String?
+  @objc public var rawResponseData: Data?
+  @objc public var tag: Int = 0
 
-  @objc init(url: URL, downloadType type: DownloadType, userInfo info: [String: Any]) {
+  @objc public init(url: URL, downloadType type: DownloadType, userInfo info: [String: Any]) {
     self.url = url
     typeCode = type
     userInfo = info
     super.init()
   }
 
-  @objc convenience init(url: URL) {
+  @objc public convenience init(url: URL) {
     self.init(url: url, downloadType: DownloadType.downloadFile, userInfo: [:])
   }
 
-  @objc convenience init(url: URL, userInfo info: [String: Any]) {
+  @objc public convenience init(url: URL, userInfo info: [String: Any]) {
     self.init(url: url, downloadType: DownloadType.downloadFile, userInfo: info)
   }
 
-  @objc convenience init(url: URL, downloadType type: DownloadType) {
+  @objc public convenience init(url: URL, downloadType type: DownloadType) {
     self.init(url: url, downloadType: type, userInfo: [:])
   }
 
@@ -47,21 +47,21 @@ class HTTPDownloadRequest: NSObject {
   }
 
   // TODO: Remove
-  @objc var responseStatusCodeObjc: Int {
+  @objc public var responseStatusCodeObjc: Int {
     if let code = responseStatusCode {
       return code
     }
     return -1
   }
 
-  @objc var responseStatusMessage: String? {
+  @objc public var responseStatusMessage: String? {
     guard let statusCode = responseStatusCode else {
       return nil
     }
     return HTTPURLResponse.localizedString(forStatusCode: statusCode)
   }
 
-  @objc var error: Error? {
+  @objc public var error: Error? {
     return task?.error
   }
 }
