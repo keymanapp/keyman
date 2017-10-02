@@ -308,6 +308,7 @@
 		6C0A13F9151EA151007FA4AD /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				98D4190B17695E58008D2FF3 /* Default-568h@2x.png */,
 				6CD5DFA8150F6DC8007A5DDE /* icon.png */,
 				6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */,
 			);
@@ -458,7 +459,6 @@
 		F243887314BBD43000A3E055 = {
 			isa = PBXGroup;
 			children = (
-				98D4190B17695E58008D2FF3 /* Default-568h@2x.png */,
 				F243888114BBD43000A3E055 /* Frameworks */,
 				F243888814BBD43100A3E055 /* KeymanEngine */,
 				F27FCA7D157FB0DB00FBBA20 /* KME-iphoneos */,
@@ -713,9 +713,9 @@
 			productReference = 98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		F243887D14BBD43000A3E055 /* KMEI */ = {
+		F243887D14BBD43000A3E055 /* KeymanEngineDemo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F24388A514BBD43100A3E055 /* Build configuration list for PBXNativeTarget "KMEI" */;
+			buildConfigurationList = F24388A514BBD43100A3E055 /* Build configuration list for PBXNativeTarget "KeymanEngineDemo" */;
 			buildPhases = (
 				F243887A14BBD43000A3E055 /* Sources */,
 				F243887B14BBD43000A3E055 /* Frameworks */,
@@ -729,7 +729,7 @@
 				98F9D69F1954112F0087AA43 /* PBXTargetDependency */,
 				98F9D6A21954112F0087AA43 /* PBXTargetDependency */,
 			);
-			name = KMEI;
+			name = KeymanEngineDemo;
 			productName = Keyman;
 			productReference = F243887E14BBD43000A3E055 /* KMEI.app */;
 			productType = "com.apple.product-type.application";
@@ -811,7 +811,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				F243887D14BBD43000A3E055 /* KMEI */,
+				F243887D14BBD43000A3E055 /* KeymanEngineDemo */,
 				F27FCA7A157FB0DB00FBBA20 /* KME-iphoneos */,
 				F27FCABD157FD10A00FBBA20 /* KME-iphonesimulator */,
 				F27FCAF1157FD80900FBBA20 /* KME-lib */,
@@ -1056,7 +1056,7 @@
 					"-force_load",
 					"$(PROJECT_DIR)/build/libKeyman/libKeyman.a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Engine.SystemKeyboard;
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.EngineDemo.SystemKeyboard;
 				PRODUCT_NAME = "Tavultesoft.KMEI.$(TARGET_NAME:rfc1034identifier)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -1097,7 +1097,7 @@
 					"-force_load",
 					"$(PROJECT_DIR)/build/libKeyman/libKeyman.a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Engine.SystemKeyboard;
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.EngineDemo.SystemKeyboard;
 				PRODUCT_NAME = "Tavultesoft.KMEI.$(TARGET_NAME:rfc1034identifier)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -1204,7 +1204,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Engine;
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.EngineDemo;
 				PRODUCT_NAME = KMEI;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -1232,7 +1232,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Engine;
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.EngineDemo;
 				PRODUCT_NAME = KMEI;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -1399,7 +1399,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F24388A514BBD43100A3E055 /* Build configuration list for PBXNativeTarget "KMEI" */ = {
+		F24388A514BBD43100A3E055 /* Build configuration list for PBXNativeTarget "KeymanEngineDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F24388A614BBD43100A3E055 /* Debug */,
