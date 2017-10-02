@@ -294,11 +294,6 @@ public final class KMTextView extends EditText {
     if (KMManager.isDebugMode())
       Log.d("showKeyboard()", "Keyboard shown");
 
-    // In-app keyboard is shown, so refresh the chiral modifier status
-    if (KMManager.InAppKeyboard != null) {
-      KMManager.checkIsChiral(KeyboardType.KEYBOARD_TYPE_INAPP);
-    }
-
     KeyboardEventHandler.notifyListeners(kbEventListeners, KeyboardType.KEYBOARD_TYPE_INAPP, EventType.KEYBOARD_SHOWN, null);
   }
 

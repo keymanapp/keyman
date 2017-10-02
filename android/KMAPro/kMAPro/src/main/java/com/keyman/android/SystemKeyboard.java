@@ -169,10 +169,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public void onKeyboardChanged(String newKeyboard, KeyboardType keyboardType) {
-    // System keyboard changed, so refresh the chiral modifier status
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      KMManager.checkIsChiral(KeyboardType.KEYBOARD_TYPE_SYSTEM);
-    }
+    // Do nothing
   }
 
   @Override
