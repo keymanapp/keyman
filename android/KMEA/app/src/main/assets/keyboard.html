@@ -66,14 +66,16 @@
       return oskWidth;
     }
 
-    function setIsChiral(m) {
+    // Query KMW if keyboardID is a keyboard with chiral modifiers.
+    // If keyboardID not given, use active keyboard
+    function setIsChiral(keyboardID) {
       var isChiral = false;
-      if (typeof m !== "undefined") {
-        isChiral = tavultesoft.keymanweb.isChiral(m);
+      if (typeof keyboardID !== "undefined") {
+        isChiral = tavultesoft.keymanweb.isChiral(keyboardID);
       } else {
         isChiral = tavultesoft.keymanweb.isChiral();
       }
-      window.console.log("keyboard.html: setIsChiral " + isChiral);
+      window.console.log('Keyboard setIsChiral = ' + isChiral);
       window.jsInterface.setIsChiral(isChiral);
     }
 
