@@ -1079,7 +1079,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
 }
 
 - (NSString *)sdkVersion {
-    NSBundle *keymanBundle = [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:@"Keyman" ofType:@"bundle"]];
+    NSBundle *keymanBundle = [NSBundle bundleWithPath:[[NSBundle bundleForClass:[self class]] pathForResource:@"Keyman" ofType:@"bundle"]];
     NSDictionary *info = [NSDictionary dictionaryWithContentsOfFile:[keymanBundle pathForResource:@"KeymanEngine-Info" ofType:@"plist"]];
     return [info objectForKey:@"CFBundleVersion"];
 }
@@ -2516,7 +2516,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
     }
     
     NSError *error = nil;
-    NSBundle *keymanBundle = [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:@"Keyman" ofType:@"bundle"]];
+    NSBundle *keymanBundle = [NSBundle bundleWithPath:[[NSBundle bundleForClass:[self class]] pathForResource:@"Keyman" ofType:@"bundle"]];
     NSString *pathToCopy = [keymanBundle pathForResource:kKeymanFileName ofType:kKeymanFileExtension];
     NSString *destinationPath = nil;
     if ([pathToCopy length]) {

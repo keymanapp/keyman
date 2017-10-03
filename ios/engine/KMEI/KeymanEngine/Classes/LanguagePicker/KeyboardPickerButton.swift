@@ -21,14 +21,9 @@ public class KeyboardPickerButton: UIButton {
     setColor(UIColor(red: 0.62, green: 0.68, blue: 0.76, alpha: 1.0))
     addTarget(self, action: #selector(self.showKeyboardPicker), for: .touchUpInside)
 
-    guard let bundlePath = Bundle.main.path(forResource: "Keyman", ofType: "bundle") else {
-      return
-    }
-    let keymanBundle = Bundle(path: bundlePath)
+    let bundlePath = Bundle(for: type(of :self)).path(forResource: "Keyman", ofType: "bundle")!
     let retinaSuffix = KMManager.retinaScreen() ? "@2x" : ""
-    guard let imagePath = keymanBundle?.path(forResource: "keyboard_icon\(retinaSuffix)", ofType: "png") else {
-      return
-    }
+    let imagePath = Bundle(path: bundlePath)!.path(forResource: "keyboard_icon\(retinaSuffix)", ofType: "png")!
 
     setImage(UIImage(contentsOfFile: imagePath), for: .normal)
     sizeToFit()

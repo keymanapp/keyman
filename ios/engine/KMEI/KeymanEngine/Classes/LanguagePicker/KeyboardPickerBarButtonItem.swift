@@ -22,20 +22,16 @@ public class KeyboardPickerBarButtonItem: UIBarButtonItem {
     target = self
     self.presentingVC = presentingVC
 
-    guard let bundlePath = Bundle.main.path(forResource: "Keyman", ofType: "bundle") else {
-      return
-    }
-    let keymanBundle = Bundle(path: bundlePath)
+    let bundlePath = Bundle(for: type(of: self)).path(forResource: "Keyman", ofType: "bundle")!
+    let keymanBundle = Bundle(path: bundlePath)!
     let retinaSuffix = KMManager.retinaScreen() ? "@2x" : ""
-
-    if let imagePath = keymanBundle?.path(forResource: "keyboard_icon\(retinaSuffix)", ofType: "png") {
-      image = UIImage(contentsOfFile: imagePath)
-    }
+    let imagePath = keymanBundle.path(forResource: "keyboard_icon\(retinaSuffix)", ofType: "png")!
+    image = UIImage(contentsOfFile: imagePath)
 
     if UIDevice.current.userInterfaceIdiom == .phone {
-      if let imagePath = keymanBundle?.path(forResource: "keyboard_icon_landscape\(retinaSuffix)", ofType: "png") {
-        landscapeImagePhone = UIImage(contentsOfFile: imagePath)
-      }
+      let landscapeImagePath = keymanBundle.path(
+        forResource:"keyboard_icon_landscape\(retinaSuffix)", ofType: "png")!
+      landscapeImagePhone = UIImage(contentsOfFile: landscapeImagePath)
     }
   }
 
