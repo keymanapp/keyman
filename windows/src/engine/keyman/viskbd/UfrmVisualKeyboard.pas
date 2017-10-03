@@ -151,7 +151,7 @@ type
     procedure tmrFadeTimer(Sender: TObject);
     procedure tmrStatusTimer(Sender: TObject);
     procedure panTopPaint(Sender: TObject);
-    procedure tbRightAdvancedCustomDraw(Sender: TToolBar; const ARect: TRect; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
+    procedure tbAdvancedCustomDraw(Sender: TToolBar; const ARect: TRect; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
     procedure mnuPopupPopup(Sender: TObject);
     procedure panTopResize(Sender: TObject);
     procedure FormDeactivate(Sender: TObject);
@@ -166,7 +166,10 @@ type
     procedure TitleMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure FormResize(Sender: TObject);
-    procedure panTitlePaint(Sender: TObject);   // I4849
+    procedure panTitlePaint(Sender: TObject);
+    procedure tbKeyboardsAdvancedCustomDrawButton(Sender: TToolBar;
+      Button: TToolButton; State: TCustomDrawState; Stage: TCustomDrawStage;
+      var Flags: TTBCustomDrawFlags; var DefaultDraw: Boolean);   // I4849
   private
     webHintManager: TWebBrowserManager;
     btnKeyboardHelp: TToolButton;
@@ -821,7 +824,23 @@ begin
     Perform(Messages[Button], HTCAPTION, MAKELONG(X, Y));
 end;
 
-procedure TfrmVisualKeyboard.tbRightAdvancedCustomDraw(Sender: TToolBar;
+procedure TfrmVisualKeyboard.tbKeyboardsAdvancedCustomDrawButton(
+  Sender: TToolBar; Button: TToolButton; State: TCustomDrawState;
+  Stage: TCustomDrawStage; var Flags: TTBCustomDrawFlags;
+  var DefaultDraw: Boolean);
+begin
+  DefaultDraw := True;
+  // Draw a darker border around active keyboard icon to make it more visible
+  if Button.Down and (Stage = cdPostPaint) then
+  begin
+    Sender.Canvas.Pen.Color := RGB(64,64,96);
+    Sender.Canvas.Brush.Style := bsClear;
+    Sender.Canvas.Rectangle(Button.Left,Button.Top,Button.Width+Button.Left,Button.Height+Button.Top);
+    Sender.Canvas.Rectangle(Button.Left+1,Button.Top+1,Button.Width+Button.Left-1,Button.Height+Button.Top-1);
+  end;
+end;
+
+procedure TfrmVisualKeyboard.tbAdvancedCustomDraw(Sender: TToolBar;
   const ARect: TRect; Stage: TCustomDrawStage; var DefaultDraw: Boolean);
 begin
   if Stage = cdPrePaint then
@@ -1437,7 +1456,6 @@ end;
 procedure TfrmVisualKeyboard.panTitlePaint(Sender: TObject);   // I4849
 begin
   GradientFillCanvas(panTitle.Canvas, $DAC379, $A8975E {C2D4DA, $A6BAC2}, panTitle.ClientRect, gdVertical); // I2633   // I4098
-
 end;
 
 procedure TfrmVisualKeyboard.panTopPaint(Sender: TObject);
