@@ -200,7 +200,9 @@ if [ $DO_KEYMANAPP = true ]; then
       # Time to prepare the deployment archive data.
       echo ""
       echo "Preparing .ipa file for deployment."
-      xcodebuild -quiet -workspace keymanios.xcworkspace -scheme Keyman -archivePath $ARCHIVE_PATH archive -configuration $CONFIG
+      xcodebuild -quiet -workspace keymanios.xcworkspace -scheme Keyman -archivePath $ARCHIVE_PATH archive -configuration $CONFIG -allowProvisioningUpdates
+
+      assertDirExists "$ARCHIVE_PATH"
 
       # Pass the build number information along to the Plist file of the app.
       if [ $BUILD_NUMBER ]; then
@@ -213,7 +215,7 @@ if [ $DO_KEYMANAPP = true ]; then
         /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$ARCHIVE_PATH/Products/Applications/Keyman.app/Plugins/SWKeyboard.appex/Info.plist"
       fi
 
-      xcodebuild -quiet -exportArchive -archivePath keyman/Keyman/build/${CONFIG}-iphoneos/Keyman.xcarchive -exportOptionsPlist exportAppStore.plist -exportPath keyman/keyman/build/${CONFIG}-iphoneos -configuration $CONFIG
+      xcodebuild -quiet -exportArchive -archivePath keyman/Keyman/build/${CONFIG}-iphoneos/Keyman.xcarchive -exportOptionsPlist exportAppStore.plist -exportPath keyman/keyman/build/${CONFIG}-iphoneos -configuration $CONFIG  -allowProvisioningUpdates
     fi
 
     #The resulting archives are placed in the keyman/Keyman/build/Release-iphoneos folder.
