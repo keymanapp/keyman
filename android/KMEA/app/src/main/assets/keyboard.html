@@ -27,17 +27,10 @@
       kmw['getOskHeight'] = getOskHeight;
       kmw['getOskWidth'] = getOskWidth;
       kmw['setActiveElement']('ta');
-
-      kmw.addEventListener('keyboardchange', function(internalName, languageCode) {
-        setIsChiral();
-        return true;
-      });
-      kmw.addEventListener('keyboardloaded', function(internalName) {
-        setIsChiral();
-        return true;
-      });
-
       ta.readOnly = false;
+
+      kmw.addEventListener('keyboardloaded', setIsChiral);
+      kmw.addEventListener('keyboardchange', setIsChiral);
     }
 
     function setOskHeight(h) {
@@ -66,17 +59,13 @@
       return oskWidth;
     }
 
-    // Query KMW if keyboardID is a keyboard with chiral modifiers.
-    // If keyboardID not given, use active keyboard
-    function setIsChiral(keyboardID) {
-      var isChiral = false;
-      if (typeof keyboardID !== "undefined") {
-        isChiral = tavultesoft.keymanweb.isChiral(keyboardID);
-      } else {
-        isChiral = tavultesoft.keymanweb.isChiral();
-      }
-      window.console.log('Keyboard setIsChiral = ' + isChiral);
+    // Query KMW if a given keyboard uses chiral modifiers.
+    function setIsChiral(keyboardProperties) {
+      var isChiral = tavultesoft.keymanweb.isChiral();
+      window.console.log('setIsChiral = ' + isChiral);
+
       window.jsInterface.setIsChiral(isChiral);
+      return true;
     }
 
     function setKeymanLanguage(keyboardName, internalName, languageName, langId, version, font, oskFont) {
