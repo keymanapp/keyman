@@ -17,8 +17,6 @@
 		98ABFD4B1AD3A047005534F0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD491AD3A047005534F0 /* LaunchScreen.xib */; };
 		98ABFD741AD3A09E005534F0 /* aava1.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD631AD3A09E005534F0 /* aava1.ttf */; };
 		98ABFD751AD3A09E005534F0 /* tamil99m-1.1.js in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD641AD3A09E005534F0 /* tamil99m-1.1.js */; };
-		98ABFD761AD3A09E005534F0 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD721AD3A09E005534F0 /* Keyman.bundle */; };
-		98ABFD771AD3A09E005534F0 /* libKeyman.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD731AD3A09E005534F0 /* libKeyman.a */; };
 		98ABFD7B1AD3A12E005534F0 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD781AD3A12D005534F0 /* CFNetwork.framework */; };
 		98ABFD7C1AD3A12E005534F0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD791AD3A12E005534F0 /* CoreGraphics.framework */; };
 		98ABFD7D1AD3A12E005534F0 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD7A1AD3A12E005534F0 /* CoreText.framework */; };
@@ -29,8 +27,6 @@
 		98ABFD871AD3A169005534F0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD861AD3A169005534F0 /* UIKit.framework */; };
 		98ABFD921AD3A232005534F0 /* KeyboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98ABFD911AD3A232005534F0 /* KeyboardViewController.m */; };
 		98ABFD951AD3A232005534F0 /* SWKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 98ABFD8C1AD3A232005534F0 /* SWKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		98ABFD9A1AD3A29A005534F0 /* libKeyman.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD731AD3A09E005534F0 /* libKeyman.a */; };
-		98ABFD9B1AD3A29E005534F0 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD721AD3A09E005534F0 /* Keyman.bundle */; };
 		98ABFD9C1AD3A2AB005534F0 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD7E1AD3A134005534F0 /* AudioToolbox.framework */; };
 		98ABFD9D1AD3A2B3005534F0 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD781AD3A12D005534F0 /* CFNetwork.framework */; };
 		98ABFD9E1AD3A2BC005534F0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD791AD3A12E005534F0 /* CoreGraphics.framework */; };
@@ -39,6 +35,9 @@
 		98ABFDA11AD3A2C8005534F0 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD801AD3A144005534F0 /* MobileCoreServices.framework */; };
 		98ABFDA21AD3A2CD005534F0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD861AD3A169005534F0 /* UIKit.framework */; };
 		98ABFDA31AD3A2D5005534F0 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD821AD3A153005534F0 /* SystemConfiguration.framework */; };
+		C01AB59F1F8346FC009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */; };
+		C01AB5A01F834706009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */; };
+		C01AB5A11F834706009B37D3 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +60,17 @@
 				98ABFD951AD3A232005534F0 /* SWKeyboard.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C01AB5A21F834706009B37D3 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C01AB5A11F834706009B37D3 /* KeymanEngine.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -106,6 +116,7 @@
 		98ABFD911AD3A232005534F0 /* KeyboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeyboardViewController.m; sourceTree = "<group>"; };
 		98ABFDA41AD3A363005534F0 /* SWKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SWKeyboard.entitlements; sourceTree = "<group>"; };
 		98ABFDA51AD3A388005534F0 /* KMSample2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = KMSample2.entitlements; sourceTree = "<group>"; };
+		C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,8 +127,8 @@
 				98ABFD7F1AD3A134005534F0 /* AudioToolbox.framework in Frameworks */,
 				98ABFD7B1AD3A12E005534F0 /* CFNetwork.framework in Frameworks */,
 				98ABFD7C1AD3A12E005534F0 /* CoreGraphics.framework in Frameworks */,
+				C01AB5A01F834706009B37D3 /* KeymanEngine.framework in Frameworks */,
 				98ABFD7D1AD3A12E005534F0 /* CoreText.framework in Frameworks */,
-				98ABFD771AD3A09E005534F0 /* libKeyman.a in Frameworks */,
 				98ABFD851AD3A15B005534F0 /* libz.dylib in Frameworks */,
 				98ABFD811AD3A144005534F0 /* MobileCoreServices.framework in Frameworks */,
 				98ABFD831AD3A153005534F0 /* SystemConfiguration.framework in Frameworks */,
@@ -130,11 +141,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C01AB59F1F8346FC009B37D3 /* KeymanEngine.framework in Frameworks */,
 				98ABFD9C1AD3A2AB005534F0 /* AudioToolbox.framework in Frameworks */,
 				98ABFD9D1AD3A2B3005534F0 /* CFNetwork.framework in Frameworks */,
 				98ABFD9E1AD3A2BC005534F0 /* CoreGraphics.framework in Frameworks */,
 				98ABFD9F1AD3A2BC005534F0 /* CoreText.framework in Frameworks */,
-				98ABFD9A1AD3A29A005534F0 /* libKeyman.a in Frameworks */,
 				98ABFDA01AD3A2C2005534F0 /* libz.dylib in Frameworks */,
 				98ABFDA11AD3A2C8005534F0 /* MobileCoreServices.framework in Frameworks */,
 				98ABFDA31AD3A2D5005534F0 /* SystemConfiguration.framework in Frameworks */,
@@ -195,6 +206,7 @@
 		98ABFD601AD3A087005534F0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */,
 				987CC6911BAA71E30057459B /* WebKit.framework */,
 				98ABFD7E1AD3A134005534F0 /* AudioToolbox.framework */,
 				98ABFD781AD3A12D005534F0 /* CFNetwork.framework */,
@@ -283,6 +295,7 @@
 				98ABFD341AD3A047005534F0 /* Frameworks */,
 				98ABFD351AD3A047005534F0 /* Resources */,
 				98ABFD991AD3A232005534F0 /* Embed App Extensions */,
+				C01AB5A21F834706009B37D3 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -368,7 +381,6 @@
 				98ABFD751AD3A09E005534F0 /* tamil99m-1.1.js in Resources */,
 				98ABFD4B1AD3A047005534F0 /* LaunchScreen.xib in Resources */,
 				98ABFD481AD3A047005534F0 /* Images.xcassets in Resources */,
-				98ABFD761AD3A09E005534F0 /* Keyman.bundle in Resources */,
 				98ABFD741AD3A09E005534F0 /* aava1.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -377,7 +389,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98ABFD9B1AD3A29E005534F0 /* Keyman.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -469,10 +480,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = (
-					"-force_load",
-					libKeyman/libKeyman.a,
-				);
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -508,10 +516,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = (
-					"-force_load",
-					libKeyman/libKeyman.a,
-				);
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -521,16 +526,19 @@
 		98ABFD5B1AD3A047005534F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = KMSample2/KMSample2.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = KMSample2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/libKeyman",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -539,16 +547,19 @@
 		98ABFD5C1AD3A047005534F0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = KMSample2/KMSample2.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = KMSample2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/libKeyman",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -557,19 +568,21 @@
 		98ABFD971AD3A232005534F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_ENTITLEMENTS = SWKeyboard/SWKeyboard.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/libKeyman",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -579,15 +592,17 @@
 		98ABFD981AD3A232005534F0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_ENTITLEMENTS = SWKeyboard/SWKeyboard.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/libKeyman",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;

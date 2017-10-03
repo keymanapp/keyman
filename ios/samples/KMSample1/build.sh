@@ -29,17 +29,11 @@ assert ( ) {
 
 verify_KMEI ( ) {
     KMEI_BUILD_EXISTS=true
-    if ! [ -d "${LIB_KEYMAN_SRC}/include" ]; then
-        KMEI_BUILD_EXISTS=false
-    elif ! [ -d "${LIB_KEYMAN_SRC}/Keyman.bundle" ]; then
-        KMEI_BUILD_EXISTS=false
-    elif ! [ -f "${LIB_KEYMAN_SRC}/libKeyman.a" ]; then
-        KMEI_BUILD_EXISTS=false
-    fi
+    [ -d "$LIB_KEYMAN_SRC" ] || KMEI_BUILD_EXISTS=false
 }
 
-LIB_KEYMAN_SRC=../../engine/KMEI/build/libKeyman
-LIB_KEYMAN_DEST=./
+LIB_KEYMAN_SRC=../../engine/KMEI/build/Debug-universal/KeymanEngine.framework
+LIB_KEYMAN_DEST_DIR=./
 
 KMEI_BUILD_DIR="../../"
 KMEI_BUILD="./build.sh -libKeyman"
@@ -109,7 +103,7 @@ if [ $DO_UPDATE = true ]; then
     fi
 
     # Copy resources.
-    cp -Rf "$LIB_KEYMAN_SRC" "$LIB_KEYMAN_DEST"
+    cp -Rf "$LIB_KEYMAN_SRC" "$LIB_KEYMAN_DEST_DIR"
 fi
 
 if [ $CODE_SIGN = true ]; then

@@ -14,8 +14,6 @@
 		98ABFCEC1AD39165005534F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCEA1AD39165005534F0 /* Main.storyboard */; };
 		98ABFCEE1AD39165005534F0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCED1AD39165005534F0 /* Images.xcassets */; };
 		98ABFCF11AD39165005534F0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCEF1AD39165005534F0 /* LaunchScreen.xib */; };
-		98ABFD151AD391A8005534F0 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD131AD391A8005534F0 /* Keyman.bundle */; };
-		98ABFD161AD391A8005534F0 /* libKeyman.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD141AD391A8005534F0 /* libKeyman.a */; };
 		98ABFD191AD391CB005534F0 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD181AD391CB005534F0 /* AudioToolbox.framework */; };
 		98ABFD1B1AD391D1005534F0 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD1A1AD391D1005534F0 /* CFNetwork.framework */; };
 		98ABFD1D1AD391D6005534F0 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD1C1AD391D6005534F0 /* CoreText.framework */; };
@@ -26,7 +24,23 @@
 		98ABFD271AD3921B005534F0 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD261AD3921B005534F0 /* libz.dylib */; };
 		98ABFD2C1AD393AD005534F0 /* aava1.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD2A1AD393AD005534F0 /* aava1.ttf */; };
 		98ABFD2D1AD393AD005534F0 /* tamil99m-1.1.js in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD2B1AD393AD005534F0 /* tamil99m-1.1.js */; };
+		C01AB59A1F8345C5009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */; };
+		C01AB59C1F8345CB009B37D3 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C01AB59D1F8345CB009B37D3 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C01AB59C1F8345CB009B37D3 /* KeymanEngine.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		987CC6941BAA731A0057459B /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -40,19 +54,6 @@
 		98ABFCEB1AD39165005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		98ABFCED1AD39165005534F0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		98ABFCF01AD39165005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		98ABFD081AD391A8005534F0 /* CWLSynthesizeSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWLSynthesizeSingleton.h; sourceTree = "<group>"; };
-		98ABFD091AD391A8005534F0 /* Keyman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Keyman.h; sourceTree = "<group>"; };
-		98ABFD0A1AD391A8005534F0 /* KMInputViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMInputViewController.h; sourceTree = "<group>"; };
-		98ABFD0B1AD391A8005534F0 /* KMKeyboardPickerBarButtonItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMKeyboardPickerBarButtonItem.h; sourceTree = "<group>"; };
-		98ABFD0C1AD391A8005534F0 /* KMKeyboardPickerButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMKeyboardPickerButton.h; sourceTree = "<group>"; };
-		98ABFD0D1AD391A8005534F0 /* KMManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMManager.h; sourceTree = "<group>"; };
-		98ABFD0E1AD391A8005534F0 /* KMTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMTextField.h; sourceTree = "<group>"; };
-		98ABFD0F1AD391A8005534F0 /* KMTextFieldDelegateProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMTextFieldDelegateProxy.h; sourceTree = "<group>"; };
-		98ABFD101AD391A8005534F0 /* KMTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMTextView.h; sourceTree = "<group>"; };
-		98ABFD111AD391A8005534F0 /* KMTextViewDelegateProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMTextViewDelegateProxy.h; sourceTree = "<group>"; };
-		98ABFD121AD391A8005534F0 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
-		98ABFD131AD391A8005534F0 /* Keyman.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Keyman.bundle; sourceTree = "<group>"; };
-		98ABFD141AD391A8005534F0 /* libKeyman.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libKeyman.a; sourceTree = "<group>"; };
 		98ABFD181AD391CB005534F0 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		98ABFD1A1AD391D1005534F0 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		98ABFD1C1AD391D6005534F0 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
@@ -63,6 +64,7 @@
 		98ABFD261AD3921B005534F0 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		98ABFD2A1AD393AD005534F0 /* aava1.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = aava1.ttf; sourceTree = "<group>"; };
 		98ABFD2B1AD393AD005534F0 /* tamil99m-1.1.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "tamil99m-1.1.js"; sourceTree = "<group>"; };
+		C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,11 +72,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C01AB59A1F8345C5009B37D3 /* KeymanEngine.framework in Frameworks */,
 				98ABFD191AD391CB005534F0 /* AudioToolbox.framework in Frameworks */,
 				98ABFD1B1AD391D1005534F0 /* CFNetwork.framework in Frameworks */,
 				98ABFD1F1AD391DB005534F0 /* CoreGraphics.framework in Frameworks */,
 				98ABFD1D1AD391D6005534F0 /* CoreText.framework in Frameworks */,
-				98ABFD161AD391A8005534F0 /* libKeyman.a in Frameworks */,
 				98ABFD271AD3921B005534F0 /* libz.dylib in Frameworks */,
 				98ABFD231AD3920D005534F0 /* MobileCoreServices.framework in Frameworks */,
 				98ABFD211AD391E5005534F0 /* SystemConfiguration.framework in Frameworks */,
@@ -92,7 +94,6 @@
 				98ABFD171AD391B0005534F0 /* Frameworks */,
 				98ABFD281AD393AD005534F0 /* Keyboards */,
 				98ABFCDF1AD39165005534F0 /* KMSample1 */,
-				98ABFD061AD391A8005534F0 /* libKeyman */,
 				98ABFCDE1AD39165005534F0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -129,37 +130,10 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		98ABFD061AD391A8005534F0 /* libKeyman */ = {
-			isa = PBXGroup;
-			children = (
-				98ABFD071AD391A8005534F0 /* include */,
-				98ABFD131AD391A8005534F0 /* Keyman.bundle */,
-				98ABFD141AD391A8005534F0 /* libKeyman.a */,
-			);
-			path = libKeyman;
-			sourceTree = "<group>";
-		};
-		98ABFD071AD391A8005534F0 /* include */ = {
-			isa = PBXGroup;
-			children = (
-				98ABFD081AD391A8005534F0 /* CWLSynthesizeSingleton.h */,
-				98ABFD091AD391A8005534F0 /* Keyman.h */,
-				98ABFD0A1AD391A8005534F0 /* KMInputViewController.h */,
-				98ABFD0B1AD391A8005534F0 /* KMKeyboardPickerBarButtonItem.h */,
-				98ABFD0C1AD391A8005534F0 /* KMKeyboardPickerButton.h */,
-				98ABFD0D1AD391A8005534F0 /* KMManager.h */,
-				98ABFD0E1AD391A8005534F0 /* KMTextField.h */,
-				98ABFD0F1AD391A8005534F0 /* KMTextFieldDelegateProxy.h */,
-				98ABFD101AD391A8005534F0 /* KMTextView.h */,
-				98ABFD111AD391A8005534F0 /* KMTextViewDelegateProxy.h */,
-				98ABFD121AD391A8005534F0 /* Reachability.h */,
-			);
-			path = include;
-			sourceTree = "<group>";
-		};
 		98ABFD171AD391B0005534F0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */,
 				987CC6941BAA731A0057459B /* WebKit.framework */,
 				98ABFD181AD391CB005534F0 /* AudioToolbox.framework */,
 				98ABFD1A1AD391D1005534F0 /* CFNetwork.framework */,
@@ -200,6 +174,7 @@
 				98ABFCD91AD39165005534F0 /* Sources */,
 				98ABFCDA1AD39165005534F0 /* Frameworks */,
 				98ABFCDB1AD39165005534F0 /* Resources */,
+				C01AB59D1F8345CB009B37D3 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -250,7 +225,6 @@
 				98ABFD2C1AD393AD005534F0 /* aava1.ttf in Resources */,
 				98ABFCEC1AD39165005534F0 /* Main.storyboard in Resources */,
 				98ABFCF11AD39165005534F0 /* LaunchScreen.xib in Resources */,
-				98ABFD151AD391A8005534F0 /* Keyman.bundle in Resources */,
 				98ABFCEE1AD39165005534F0 /* Images.xcassets in Resources */,
 				98ABFD2D1AD393AD005534F0 /* tamil99m-1.1.js in Resources */,
 			);
@@ -328,10 +302,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = (
-					"-force_load",
-					libKeyman/libKeyman.a,
-				);
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -367,10 +338,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = (
-					"-force_load",
-					libKeyman/libKeyman.a,
-				);
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -380,13 +348,15 @@
 		98ABFD011AD39165005534F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = KMSample1/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/libKeyman",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -394,13 +364,15 @@
 		98ABFD021AD39165005534F0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = KMSample1/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/libKeyman",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

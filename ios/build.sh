@@ -30,9 +30,13 @@ fetch ( ) {
 KMEI_RESOURCES=engine/KMEI/KeymanEngine/resources
 KMEI_BUILD_PATH=engine/KMEI/build
 BUNDLE_PATH=$KMEI_RESOURCES/Keyman.bundle/contents/resources
-APP_RESOURCES=keyman/Keyman/Keyman/libKeyman
+APP_FRAMEWORK_PATH=keyman/Keyman/KeymanEngine.framework
 APP_BUILD_PATH=keyman/Keyman/build/
 KMW_SOURCE=../web/source
+
+APP_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.app
+KEYBOARD_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/SWKeyboard.appex
+ARCHIVE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
 
 do_clean ( ) {
   rm -rf $KMEI_BUILD_PATH
@@ -84,10 +88,6 @@ while [[ $# -gt 0 ]] ; do
     shift # past argument
 done
 
-APP_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.app
-KEYBOARD_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/SWKeyboard.appex
-ARCHIVE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
-
 if [ $CLEAN_ONLY = true ]; then
   exit 0
 fi
@@ -131,10 +131,14 @@ echo "Building KMEI..."
 
 #OTHER_CFLAGS=-fembed-bitcode is relied upon for building the samples by command-line.  They build fine within XCode itself without it, though.
 
-rm -r $KMEI_BUILD_PATH/$CONFIG-iphoneos 2>/dev/null
+rm -r $KMEI_BUILD_PATH/$CONFIG-universal 2>/dev/null
+BUILD_FRAMEWORK_PATH=$KMEI_BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
 xcodebuild -quiet -project engine/KMEI/KeymanEngine.xcodeproj -target KME-universal -configuration $CONFIG \
   $CODE_SIGN_IDENTITY $CODE_SIGNING_REQUIRED $DEV_TEAM
-assertDirectoryExists $KMEI_BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
+assertDirectoryExists "$BUILD_FRAMEWORK_PATH"
+
+rm -r "$APP_FRAMEWORK_PATH"
+cp -R "$BUILD_FRAMEWORK_PATH" "$APP_FRAMEWORK_PATH"
 
 echo "KMEI build complete."
 
