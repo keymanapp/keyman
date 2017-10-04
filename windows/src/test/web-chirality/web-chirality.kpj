@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_7aa90ee616d809ba35375f207edda587</ID>
+      <Filename>test_nonchiral.kmn</Filename>
+      <Filepath>test_nonchiral.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Sample</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_65caa3e7a6673c665d87e82bfaa8a150</ID>
+      <Filename>test_nonchiral_partial.kmn</Filename>
+      <Filepath>test_nonchiral_partial.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Sample</Name>
+      </Details>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

@@ -92,15 +92,42 @@ type
   TTouchLayoutPredefinedLayer = string;
 
 const
-  PredefinedLayers: array[0..7] of TTouchLayoutPredefinedLayer = (
+  PredefinedLayers: array[0..23] of TTouchLayoutPredefinedLayer = (
     'default',
+
+    // Legacy predefined layer names
     'shift',
     'ctrl',
     'alt',
     'ctrlalt',
     'ctrlshift',
     'altshift',
-    'ctrlaltshift'
+    'ctrlaltshift',
+
+    // 10.0 predefined layer names
+    //'default',
+    //'shift',
+    //'ctrl',
+    'shift-ctrl',
+    //'alt',
+    'shift-alt',
+    'ctrl-alt',
+    'shift-ctrl-alt',
+
+    //'default',
+    'leftctrl',
+    'rightctrl',
+    'leftalt',
+    'leftctrl-leftalt',
+    'rightalt',
+    'rightctrl-rightalt',
+    //'shift',
+    'shift-lctrl',
+    'shift-rctrl',
+    'shift-lalt',
+    'shift-ralt',
+    'shift-lctrl-lalt',
+    'shift-rctrl-ralt'
   );
 
 implementation

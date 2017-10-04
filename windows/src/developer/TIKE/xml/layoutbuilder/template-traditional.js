@@ -264,7 +264,7 @@
         ]
       },
       {
-        "id": "ctrlshift",
+        "id": "shift-ctrl",
         "row": [
            {
             "id": 1,
@@ -438,7 +438,7 @@
         ]
       },
       {
-        "id": "altshift",
+        "id": "shift-alt",
         "row": [
            {
             "id": 1,
@@ -525,7 +525,7 @@
         ]
       },
       {
-        "id": "ctrlalt",
+        "id": "ctrl-alt",
         "row": [
            {
             "id": 1,
@@ -612,7 +612,7 @@
         ]
       },
       {
-        "id": "ctrlaltshift",
+        "id": "shift-ctrl-alt",
         "row": [
            {
             "id": 1,

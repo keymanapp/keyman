@@ -299,7 +299,93 @@ $(function () {
 
   this.keyMargin = 5;
 
-  this.layerOverrides = ['default', 'shift', 'ctrl', 'ctrlshift', 'alt', 'altshift', 'ctrlalt', 'ctrlaltshift'];
+  // from kmwosk.js:
+  this.modifierCodes = {
+    "LCTRL":0x0001,
+    "RCTRL":0x0002,
+    "LALT":0x0004,
+    "RALT":0x0008,
+    "SHIFT":0x0010,
+    "CTRL":0x0020,
+    "ALT":0x0040,
+    "CAPS":0x0100,
+    "NO_CAPS":0x0200
+    /*"NUM_LOCK":0x0400, We don't support these in the designer
+    "NO_NUM_LOCK":0x0800,
+    "SCROLL_LOCK":0x1000,
+    "NO_SCROLL_LOCK":0x2000,
+    "VIRTUAL_KEY":0x4000*/
+  };
+     
+  // Lists the combinations that we allow users to use. Some are mutually exclusive,
+  // such as Left+Right modifiers, or chiral and non-chiral modifiers (excl. Shift)
+  this.validModifierCombinations = [
+    0,
+    
+    this.modifierCodes.LCTRL,
+    this.modifierCodes.RCTRL,
+    
+    this.modifierCodes.LALT,
+    this.modifierCodes.LCTRL | this.modifierCodes.LALT,
+    
+    this.modifierCodes.RALT,
+    this.modifierCodes.RCTRL | this.modifierCodes.RALT,
+    
+    this.modifierCodes.SHIFT,
+    
+    this.modifierCodes.LCTRL | this.modifierCodes.SHIFT,
+    this.modifierCodes.LALT | this.modifierCodes.SHIFT,
+    this.modifierCodes.LCTRL | this.modifierCodes.LALT | this.modifierCodes.SHIFT,
+    
+    this.modifierCodes.RCTRL | this.modifierCodes.SHIFT,
+    this.modifierCodes.RALT | this.modifierCodes.SHIFT,
+    this.modifierCodes.RCTRL | this.modifierCodes.RALT | this.modifierCodes.SHIFT,
+    
+    this.modifierCodes.CTRL,
+    this.modifierCodes.CTRL | this.modifierCodes.SHIFT,
+    
+    this.modifierCodes.ALT,
+    this.modifierCodes.CTRL | this.modifierCodes.ALT,
+    this.modifierCodes.SHIFT | this.modifierCodes.ALT,
+    this.modifierCodes.SHIFT | this.modifierCodes.CTRL | this.modifierCodes.ALT
+  ];
+  
+  // Add CAPS and NO_CAPS variants for all of the above
+  (function(c, codes) {
+    var i, n = c.length;
+    for(i = 0; i < n; i++)
+      c.push(c[i] | codes.CAPS);
+    for(i = 0; i < n; i++)
+      c.push(c[i] | codes.NO_CAPS);
+  })(this.validModifierCombinations, this.modifierCodes);
+  
+  this.modifierNames = [
+    'leftctrl',   // 0x001
+    'rightctrl',  // 0x002
+    'leftalt',    // 0x004
+    'rightalt',   // 0x008
+    'shift',      // 0x010
+    'ctrl',       // 0x020
+    'alt',        // 0x040
+    '',           // 0x080 - reserved
+    'caps',       // 0x100
+    'nocaps'      // 0x200
+  ];
+  
+  /**
+  *  Get kebab-cased full name of a modifier combination given a bitmask
+  *
+  *  @param  {Number}  c
+  *  @return {string}
+  **/
+  this.getModifierCombinationName = function(c) {
+    var r = '';
+    if(c == 0) return 'default';
+    for(var i = 0; i < this.modifierNames.length; i++) {
+      if(c & (1<<i)) r += (r == '' ? '' : '-') + this.modifierNames[i];
+    }
+    return r;
+  };
 
   this.getPresentation = function () {
     var platform = $('#selPlatformPresentation').val();
@@ -404,14 +490,19 @@ $(function () {
       $(opt).append(KVKL[builder.lastPlatform].layer[layer].id);
       $('#selSubKeyNextLayer').append(opt);
     }
-    for (var layer = 0; layer < this.layerOverrides.length; layer++) {
+    for (var modifier = 0; modifier < this.validModifierCombinations.length; modifier++) {
+      var name = this.getModifierCombinationName(this.validModifierCombinations[modifier]);
       opt = document.createElement('option');
-      $(opt).append(this.layerOverrides[layer]);
+      $(opt).append(name);
       $('#selKeyLayerOverride').append(opt);
 
       opt = document.createElement('option');
-      $(opt).append(this.layerOverrides[layer]);
+      $(opt).append(name);
       $('#selSubKeyLayerOverride').append(opt);
+      
+      opt = document.createElement('option');
+      $(opt).append(name);
+      $('#addLayerList').append(opt);
     }
   }
 
@@ -1408,8 +1499,8 @@ $(function () {
     buttons: {
       "OK": function () {
         var newLayerName = $('#layerName').val();
-        if (!newLayerName.match(/^[a-zA-Z0-9_]+$/)) {
-          alert('Layer name must contain only alphanumerics and underscore.');
+        if (!newLayerName.match(/^[a-zA-Z0-9_-]+$/)) {
+          alert('Layer name must contain only alphanumerics, hyphen underscore.');
           return;
         }
 
@@ -1474,6 +1565,29 @@ $(function () {
       }
     }
   });
+  
+  
+  $('#addLayerName').on('input', function() {
+    var layerName = $(this).val();
+    $('#addLayerList').val(layerName);
+    if($('#addLayerList')[0].selectedIndex < 0) {
+      $('#addLayerList').val('(custom)');
+      $('#addLayerNote').text('');
+    } else {
+      $('#addLayerNote').text(layerName+' is a recognised modifier-aware layer name.');
+    }
+  });
+  
+  $('#addLayerList').change(function() {
+    var v = $(this).val();
+    if(v == '(custom)') {
+      $('#addLayerName').val('');
+      $('#addLayerNote').text('');
+    } else {
+      $('#addLayerName').val(v);
+      $('#addLayerNote').text(v+' is a recognised modifier-aware layer name.');
+    }
+  });
 
   $('#addLayerDialog').dialog({
     autoOpen: false,
@@ -1482,14 +1596,21 @@ $(function () {
     modal: true,
     buttons: {
       "OK": function () {
-        if (!$('#addLayerName').val().match(/^[a-zA-Z0-9_]+$/)) {
+        var id = $('#addLayerName').val();
+        if (!id.match(/^[a-zA-Z0-9_-]+$/)) {
           alert('Layer name must contain only alphanumerics and underscore.');
           return;
+        }
+        for(var i = 0; i < KVKL[builder.lastPlatform].layer.length; i++) {
+          if(KVKL[builder.lastPlatform].layer[i].id == id) {
+            alert('Layer name must not already be in use for the current platform.');
+            return;
+          }
         }
         builder.saveUndo();
         builder.generate();
         var layer = $.extend(true, {}, KVKL[builder.lastPlatform].layer[builder.lastLayerIndex]);
-        layer.id = $('#addLayerName').val();
+        layer.id = id;
         var n = KVKL[builder.lastPlatform].layer.push(layer) - 1;
         builder.selectPlatform();
         $('#selLayer').val(n);
