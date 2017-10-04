@@ -54,6 +54,7 @@ final class KMKeyboard extends WebView {
   private GestureDetector gestureDetector;
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
   private boolean ShouldShowHelpBubble = false;
+  private boolean isChiral = false;
 
   protected boolean keyboardSet = false;
   protected boolean keyboardPickerEnabled = true;
@@ -138,9 +139,9 @@ final class KMKeyboard extends WebView {
     setBackgroundColor(0);
   }
 
-  public void executeHardwareKeystroke(int code, int shift) {
-    String jsFormat = "javascript:executeHardwareKeystroke(%d,%d)";
-    String jsString = String.format(jsFormat, code, shift);
+  public void executeHardwareKeystroke(int code, int shift, int lstates) {
+    String jsFormat = "javascript:executeHardwareKeystroke(%d,%d, %d)";
+    String jsString = String.format(jsFormat, code, shift, lstates);
     loadUrl(jsString);
   }
 
@@ -404,6 +405,16 @@ final class KMKeyboard extends WebView {
     KeyboardEventHandler.notifyListeners(kbEventListeners, keyboardType, EventType.KEYBOARD_CHANGED, currentKeyboard);
 
     return retVal;
+  }
+
+  public void setChirality(boolean flag) {
+    this.isChiral = flag;
+  }
+
+  public boolean getChirality() {
+
+    return this.isChiral;
+
   }
 
   private void saveCurrentKeyboardIndex() {

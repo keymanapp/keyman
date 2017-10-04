@@ -1,6 +1,7 @@
 # Keyman for Android
 
 ## 10.0 alpha
+* Added support for L/R Alt and Ctrl and Caps Lock modifiers for keyboards if specified by a keyboard designer
 * Add feature to reset keyboard to default layer when new input field focused (keymanapp/keyman#288)
 * Removed "Share to Facebook" feature (keymanapp/keyman#156)
 * Fix dual keyboards that appear when closing Keyman Browser (keymanapp/keyman#220)

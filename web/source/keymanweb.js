@@ -3627,11 +3627,15 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     /**
      * Function     isChiral
      * Scope        Public
-     * @param       {Object=}   k0
+     * @param       {string|Object=}   k0
      * @return      {boolean}
      * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
      */
     keymanweb.isChiral = keymanweb['isChiral'] = function(k0) {
+      if(typeof(k0) == "string") {
+        k0 = keymanweb._getKeyboardByID(k0);
+      }
+
       return !!(keymanweb.getKeyboardModifierBitmask(k0) & keymanweb['osk'].modifierBitmasks.IS_CHIRAL);
     }
 
