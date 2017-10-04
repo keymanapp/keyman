@@ -8,15 +8,15 @@
 4. Add the Keyman root folder to antivirus exclusions for performance and file lock reasons (optional - but highly recommended).
 5. Start Delphi 10.2 IDE once after installation to create default environment files and ensure registration is complete.
 6. Set environment variables per [notes below](#environment-variables): `KEYMAN_ROOT`, `DELPHI_STARTER`, `USERDEFINES`, (`USE_PLUSMEMO`, `KEYMAN_ENCUMBERED_ROOT`).
-7. Add the **windows/lib** folder in the Keyman repository to your `PATH` environment variable (required for packages in Delphi)
+7. Add the **windows/lib** folder in the Keyman repository to your `PATH` environment variable (required for packages in Delphi).
 
 ### Release build prerequisites
 
 For local development you do not need to perform a release build so these are optional.
 
 1. Install [7-Zip](http://www.7-zip.org/) 64-bit (or 32-bit on x86 Windows). 7-Zip is used for archiving build files -- may be eliminated in future.
-2. Install [HTML Help Workshop](https://www.microsoft.com/en-us/download/details.aspx?id=21138)
-4. Install [WiX](https://wix.codeplex.com/releases/view/60102) to **C:\Program Files (x86)\Windows Installer XML v3.5**
+2. Install [HTML Help Workshop](https://www.microsoft.com/en-us/download/details.aspx?id=21138).
+4. Install [WiX](https://wix.codeplex.com/releases/view/60102) to **C:\Program Files (x86)\Windows Installer XML v3.5**.
 
 ## Building Keyman Desktop and Keyman Developer
 
@@ -48,7 +48,7 @@ install it over a later version of Keyman, and will need to uninstall and reinst
 
 These steps are only required the first time you install Keyman:
 1. Install release versions of Keyman 10.0 and Keyman Developer 10.0.
-    * Download the [latest official builds (alpha)](https://keyman.com/beta/) and run the installers.
+  * Download the [latest official builds (alpha)](https://keyman.com/beta/) and run the installers.
 2. Install the Keyman test certificates. Do the following for each KeymanTestCA cert in
 **windows/src/buildtools/certificates**:
     1. Open the certificate and click 'Install certificate...' to open the Certificate Import Wizard.
@@ -73,10 +73,10 @@ In Visual Studio 2017, you need to have the following components installed:
 * Desktop development with C++
 
 Configure Visual Studio to use two-space tab stops:
-1. Open the options dialog: Tools > Options
-2. Navigate to Text Editor > All Languages > Tabs
-3. Change 'Tab size' to 2 and 'Indent size' to 2
-4. Select 'Insert spaces'
+1. Open the options dialog: Tools > Options.
+2. Navigate to Text Editor > All Languages > Tabs.
+3. Change 'Tab size' to 2 and 'Indent size' to 2.
+4. Select 'Insert spaces'.
 
 ### Delphi setup requirements
 
@@ -140,9 +140,10 @@ Keyman Developer can be built with an encumbered text editor, `TPlusMemo`. The s
 open source release uses a very basic `TMemo` without syntax highlighting and lots of 
 other niceties. To build with the `TPlusMemo` version, use the `-DUSE_PLUSMEMO` define, and
 make sure you have pulled the private `keyman-encumbered-components` repo to `<path>\src`. 
-You will also need to set the `KEYMAN_ENCUMBERED_ROOT` environment variable to `<path>`. 
-If you will be working with this regularly, you should set an environment variable 
-`USE_PLUSMEMO=USE_PLUSMEMO`, and then the command line build and the
+(That is, set the base folder of the repo to have the name `src`.)
+You will also need to set the `KEYMAN_ENCUMBERED_ROOT` environment variable to `<path>`,
+the repo's parent folder. If you will be working with this regularly, you should set an 
+environment variable `USE_PLUSMEMO=USE_PLUSMEMO`, and then the command line build and the
 IDE build will include the component correctly.
 
 At some point, this editor will be replaced with an unencumbered one.

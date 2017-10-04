@@ -178,22 +178,23 @@ public final class KMManager {
     IMService = service;
   }
 
-  public static boolean executeHardwareKeystroke(int code, int shift) {
+  public static boolean executeHardwareKeystroke(int code, int shift, int lstates) {
     if (SystemKeyboard != null) {
-      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_SYSTEM, lstates);
     } else if (InAppKeyboard != null) {
-      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_INAPP);
+      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_INAPP, lstates);
     }
 
     return false;
   }
 
-  public static boolean executeHardwareKeystroke(int code, int shift, KeyboardType keyboard) {
+  public static boolean executeHardwareKeystroke(
+    int code, int shift, KeyboardType keyboard, int lstates) {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      InAppKeyboard.executeHardwareKeystroke(code, shift);
+      InAppKeyboard.executeHardwareKeystroke(code, shift, lstates);
       return true;
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      SystemKeyboard.executeHardwareKeystroke(code, shift);
+      SystemKeyboard.executeHardwareKeystroke(code, shift, lstates);
       return true;
     }
 
@@ -454,7 +455,8 @@ public final class KMManager {
         newKbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
         newKbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
         newKbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
-        newKbInfo.put(KMManager.KMKey_KeyboardVersion, getLatestKeyboardFileVersion(context, KMManager.KMDefault_KeyboardID));
+        newKbInfo.put(KMManager.KMKey_KeyboardVersion,
+          getLatestKeyboardFileVersion(context, KMManager.KMDefault_KeyboardID));
         newKbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
         newKbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
         kbList.set(0, newKbInfo);
@@ -1158,10 +1160,12 @@ public final class KMManager {
           }
 
           if (result > 0) {
-            if (KMManager.InAppKeyboard != null)
-              KMManager.InAppKeyboard.loadKeyboard();
-            if (KMManager.SystemKeyboard != null)
-              KMManager.SystemKeyboard.loadKeyboard();
+            if (KMManager.InAppKeyboard != null) {
+              InAppKeyboard.loadKeyboard();
+            }
+            if ( KMManager.SystemKeyboard != null) {
+              SystemKeyboard.loadKeyboard();
+            }
           }
         }
       }.execute();
@@ -1376,10 +1380,25 @@ public final class KMManager {
     String langName = kbInfo.get(KMManager.KMKey_LanguageName);
     String kFont = kbInfo.get(KMManager.KMKey_Font);
     String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
-    if (InAppKeyboard != null)
+    if (InAppKeyboard != null) {
       InAppKeyboard.setKeyboard(kbId, langId, kbName, langName, kFont, kOskFont);
-    if (SystemKeyboard != null)
+    }
+    if (SystemKeyboard != null) {
       SystemKeyboard.setKeyboard(kbId, langId, kbName, langName, kFont, kOskFont);
+    }
+  }
+
+  // TODO: Refactor InAppKeyboard / SystemKeyboard logic
+  public static KMKeyboard getKMKeyboard(KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      return InAppKeyboard;
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      return SystemKeyboard;
+    } else {
+      // What should we do if KeyboardType.KEYBOARD_TYPE_UNDEFINED?
+      Log.w("KMManager", "Invalid keyboard");
+      return null;
+    }
   }
 
   public static String getKeyboardTextFontFilename() {
@@ -2031,7 +2050,6 @@ public final class KMManager {
           InAppKeyboard.subKeysList.add(hashMap);
         }
       }
-
       return false;
     }
   }
@@ -2256,6 +2274,15 @@ public final class KMManager {
       return kbWidth;
     }
 
+    // Store the current keyboard chirality status from KMW in InAppKeyboard
+    @JavascriptInterface
+    public void setIsChiral(boolean isChiral) {
+      if (isDebugMode()) {
+        Log.d("KMManager", "InAppKeyboard chirality: " + String.valueOf(isChiral));
+      }
+      InAppKeyboard.setChirality(isChiral);
+    }
+
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
     public void insertText(final int dn, final String s) {
@@ -2359,6 +2386,15 @@ public final class KMManager {
       DisplayMetrics dms = context.getResources().getDisplayMetrics();
       int kbWidth = (int) (dms.widthPixels / dms.density);
       return kbWidth;
+    }
+
+    // Store the current keyboard chirality status from KMW in SystemKeyboard
+    @JavascriptInterface
+    public void setIsChiral(boolean isChiral) {
+      if (isDebugMode()) {
+        Log.d("KMManager", "SystemKeyboard chirality: " + String.valueOf(isChiral));
+      }
+      SystemKeyboard.setChirality(isChiral);
     }
 
     // This annotation is required in Jelly Bean and later:

@@ -88,8 +88,8 @@
         <DCC_Optimize>false</DCC_Optimize>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_RunParams> -m-validate-id -s -m &quot;build\Thamizha Tamil99.kmp&quot;  build\ekwtamil99uni.keyboard_info</Debugger_RunParams>
-        <Debugger_CWD>c:\projects\keyman\keyboards\release\e\ekwtamil99uni</Debugger_CWD>
+        <Debugger_RunParams>arabic_izza.kpj</Debugger_RunParams>
+        <Debugger_CWD>c:\projects\keyman\keyboards\release\a\arabic_izza</Debugger_CWD>
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
@@ -249,7 +249,6 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>
-                <Platform value="Linux64">False</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>
