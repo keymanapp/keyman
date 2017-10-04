@@ -215,20 +215,6 @@ public final class KMManager {
       InAppKeyboard.setWebViewClient(new KMInAppKeyboardWebViewClient(appContext));
       InAppKeyboard.addJavascriptInterface(new KMInAppKeyboardJSHandler(appContext), "jsInterface");
       InAppKeyboard.loadKeyboard();
-
-      // TODO: Test code adding chirality keyboard that needs to be removed before merging
-      HashMap<String, String> kbInfo = new HashMap<String, String>();
-      final String Chirality_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
-
-      kbInfo.put(KMManager.KMKey_KeyboardID, "chirality");
-      kbInfo.put(KMManager.KMKey_LanguageID, "eng");
-      kbInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
-      kbInfo.put(KMManager.KMKey_LanguageName, "English");
-      kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
-      kbInfo.put(KMManager.KMKey_Font, Chirality_KeyboardFont);
-      addKeyboard(appContext, kbInfo);
-      Log.d("KMManager", "initInApp");
-      // end of test code
     }
   }
 
