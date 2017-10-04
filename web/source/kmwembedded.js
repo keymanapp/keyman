@@ -436,7 +436,7 @@
       if(keyName.substr(0,2) == 'U_') Lkc.isVirtualKey=false;
       
       // Define modifiers value for sending to keyboard mapping function
-      Lkc.Lmodifiers = keyShiftState*0x10; 
+      Lkc.Lmodifiers = keyShiftState; 
 
       // Pass this key code and state to the keyboard program
       if(!keymanweb._ActiveKeyboard ||  Lkc.Lcode == 0) return false;
@@ -517,7 +517,7 @@
         keymanweb.KO(0, Lelem, '\n');
         return true;
       }
-      var ch = osk.defaultKeyOutput('', Lkc.Lcode, shift / 0x10);
+      var ch = osk.defaultKeyOutput('', Lkc.Lcode, shift);
       if(ch) {
         keymanweb.KO(0, Lelem, ch);                     
         return true;
