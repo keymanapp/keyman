@@ -27,6 +27,7 @@
       kmw['getOskHeight'] = getOskHeight;
       kmw['getOskWidth'] = getOskWidth;
       kmw['setActiveElement']('ta');
+
       ta.readOnly = false;
 
       kmw.addEventListener('keyboardloaded', setIsChiral);
@@ -61,7 +62,10 @@
 
     // Query KMW if a given keyboard uses chiral modifiers.
     function setIsChiral(keyboardProperties) {
-      var isChiral = tavultesoft.keymanweb.isChiral();
+      var name = typeof(keyboardProperties.internalName) == "undefined" ? keyboardProperties.keyboardName : keyboardProperties.internalName;
+
+      var isChiral = tavultesoft.keymanweb.isChiral(name);
+      window.console.log('For keyboard "' + name + '"');
       window.console.log('setIsChiral = ' + isChiral);
 
       window.jsInterface.setIsChiral(isChiral);
