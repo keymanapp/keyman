@@ -63,7 +63,6 @@
     // Query KMW if a given keyboard uses chiral modifiers.
     function setIsChiral(keyboardProperties) {
       var name = typeof(keyboardProperties.internalName) == "undefined" ? keyboardProperties.keyboardName : keyboardProperties.internalName;
-
       var isChiral = tavultesoft.keymanweb.isChiral(name);
       window.console.log('For keyboard "' + name + '"');
       window.console.log('setIsChiral = ' + isChiral);
