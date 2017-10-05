@@ -91,10 +91,11 @@ type
     FValid: Boolean;   // I4207
     FActive: Boolean;   // I3933
     FKeymanID: Integer; // If associated with a Keyman keyboard, otherwise KEYMANID_NONKEYMAN   // I3949
-    FLanguage: TLangSwitchLanguage;    // I3961n
+    FLanguage: TLangSwitchLanguage;
   protected
     function GetBitmap: Vcl.Graphics.TBitmap; virtual;
     function GetItemID: Integer; virtual; abstract;
+    function GetID: string; virtual; abstract;
     function GetKeymanLanguage: IKeymanLanguage; virtual; abstract;
     function HasHKL(AHKL: HKL): Boolean; virtual; abstract;   // I5086
   public
@@ -106,6 +107,7 @@ type
     property Tooltip: WideString read FToolTip;
     property ItemType: TLangSwitchItemType read FItemType;
     property ItemID: Integer read GetItemID;
+    property ID: string read GetID;
     property Bitmap: Vcl.Graphics.TBitmap read GetBitmap;
     property KeymanID: Integer read FKeymanID;   // I3949
     property KeymanLanguage: IKeymanLanguage read GetKeymanLanguage;
@@ -181,7 +183,8 @@ type
     procedure UpdateActive(FLangID: Cardinal; FActiveItemType: TLangSwitchItemType; FHKL: HKL); overload;   // I3933
     procedure UpdateActive(FLangID: Cardinal; FActiveItemType: TLangSwitchItemType; FClsid, FProfileGuid: TGUID); overload;   // I3933
     procedure Refresh;
-    function FindKeyboard(FHKL: HKL; FProfileGuid: TGUID): TLangSwitchKeyboard;
+    function FindKeyboard(FHKL: HKL; FProfileGuid: TGUID): TLangSwitchKeyboard; overload;
+    function FindKeyboard(id: string): TLangSwitchKeyboard; overload;
     property Languages[Index: Integer]: TLangSwitchLanguage read GetLanguage;
     property LanguageCount: Integer read GetLanguageCount;
     property TotalKeyboardCount: Integer read GetTotalKeyboardCount;   // I4606
@@ -194,6 +197,7 @@ type
     FIconHandle: HICON;
   protected
     function GetItemID: Integer; override;
+    function GetID: string; override;
     function GetKeymanLanguage: IKeymanLanguage; override;
     function HasHKL(AHKL: HKL): Boolean; override;   // I5086
   public
@@ -211,6 +215,7 @@ type
   protected
     function GetBitmap: Vcl.Graphics.TBitmap; override;
     function GetItemID: Integer; override;
+    function GetID: string; override;
     function GetKeymanLanguage: IKeymanLanguage; override;
     function HasHKL(AHKL: HKL): Boolean; override;   // I5086
   public
@@ -563,6 +568,18 @@ begin
   end;
 end;
 
+function TLangSwitchManager.FindKeyboard(id: string): TLangSwitchKeyboard;
+var
+  i: Integer;
+  j: Integer;
+begin
+  for i := 0 to FLanguages.Count - 1 do
+    for j := 0 to FLanguages[i].KeyboardCount - 1 do
+      if FLanguages[i].Keyboards[j].ID = id then
+        Exit(FLanguages[i].Keyboards[j]);
+  Result := nil;
+end;
+
 function TLangSwitchManager.FindKeyboard(FHKL: HKL;
   FProfileGuid: TGUID): TLangSwitchKeyboard;
 var
@@ -686,6 +703,11 @@ begin
     FWinKeyboardBitmap.Transparent := True;
   end;
   Result := FWinKeyboardBitmap;
+end;
+
+function TLangSwitchKeyboard_WinKeyboard.GetID: string;
+begin
+  Result := IntToHex(FHKL, 8);
 end;
 
 function TLangSwitchKeyboard_WinKeyboard.GetItemID: Integer;
@@ -855,6 +877,12 @@ begin
   if FIconHandle <> 0 then DestroyIcon(FIconHandle);   // I4202
   FIconHandle := 0;   // I4715
   inherited Destroy;
+end;
+
+function TLangSwitchKeyboard_TIP.GetID: string;
+begin
+  Result := Format('%04.4x:%s:%s',
+    [FProfile.langid, GuidToString(FProfile.clsid), GuidToString(FProfile.guidProfile)]);
 end;
 
 function TLangSwitchKeyboard_TIP.GetItemID: Integer;
