@@ -12,7 +12,6 @@
 #import "KMURLProtocol.h"
 #import "KMTextField.h"
 #import "KMTextView.h"
-#import "KMKeyPreviewView.h"
 #import "UIView+Helpers.h"
 #import <QuartzCore/QuartzCore.h>
 #import <CoreText/CoreText.h>
@@ -82,7 +81,7 @@ NSString *const kKeymanSynchronizeSWKeyboardKey = @"KeymanSynchronizeSWKeyboard"
 // Views
 static id webView = nil;
 static PopoverView *helpBubbleView = nil;
-static KMKeyPreviewView *keyPreviewView = nil;
+static KeyPreviewView *keyPreviewView = nil;
 static SubKeysView *subKeysView = nil;
 static KeyboardMenuView *keyboardMenuView = nil;
 
@@ -3236,7 +3235,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
         range5.location += range5.length;
         NSString *t = [fragment substringFromIndex:range5.location];
         keyFrame = [self getKeyFrameWithX:x Y:y W:w H:h];
-        keyPreviewView = [[KMKeyPreviewView alloc] initWithFrame:keyFrame];
+        keyPreviewView = [[KeyPreviewView alloc] initWithFrame:keyFrame];
         NSMutableString *text = nil;
         NSArray *unicodes = [t componentsSeparatedByString:@","];
         NSScanner *scanner = nil;
