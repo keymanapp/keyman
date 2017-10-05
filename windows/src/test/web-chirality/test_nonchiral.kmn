@@ -1,0 +1,16 @@
+﻿store(&VERSION) '9.0'
+store(&LAYOUTFILE) 'test_nonchiral-layout.js'
+store(&NAME) 'Sample'
+store(&VISUALKEYBOARD) 'test_nonchiral.kvks'
+begin Unicode > use(main)
+
+
+group(main) using keys
++ [SHIFT CTRL ALT K_J] > 'ជ'
++ [CTRL ALT K_H] > 'ឆ'
++ [SHIFT ALT K_G] > 'ច'
++ [ALT K_F] > 'ង'
++ [SHIFT CTRL K_D] > 'ឃ'
++ [CTRL K_D] > 'គ'
++ [SHIFT K_S] > 'ខ'
++ [K_A] > 'ក'

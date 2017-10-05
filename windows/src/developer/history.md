@@ -1,8 +1,12 @@
 # Keyman Developer Version History
 
 ## 10.0 alpha
-* Keyman Developer moved to open source
-* KeymanWeb is now continuously integrated with Developer, ensuring that each update uses the most current version possible.
+* Keyman Developer moved to open source (#121)
+* KeymanWeb is now continuously integrated with Developer, ensuring that each update uses the most current version possible (#122)
+* Keyman Developer compiler now generates keyboards that distinguish left and right ctrl/alt (#313)
+* Keyman Developer visual editors now supports keyboards that distinguish left and right ctrl/alt for web/mobile targets (#342)
+* The `&version` store is now optional and the compiler will determine and report on the minimum version required if it is not present (#334)
+* Add support for processing `.keyboard_info` files to command line compiler (#331)
 
 ## 9.0.523 stable
 * Fix: When a longpress popup is being edited, selecting another primary key can copy the details to that key's popup (additional scenario, I4926)

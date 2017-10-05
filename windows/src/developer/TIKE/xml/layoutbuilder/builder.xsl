@@ -60,8 +60,8 @@
                 <label for='inpKeyWidth'>Width:</label>
                 <input id='inpKeyWidth' size='5' maxlength='5' />
                 <label for='selKeyNextLayer'>Next Layer:</label> <select id='selKeyNextLayer'></select>
-                <button id='btnAddSubKeyArray'>Add touch+hold popup</button>
-                <button id='btnDelSubKeyArray'>Remove touch+hold popup</button>
+                <button id='btnAddSubKeyArray'>Add longpress popup</button>
+                <button id='btnDelSubKeyArray'>Remove longpress popup</button>
                 <br class='clear' />
               </div>
               
@@ -96,7 +96,11 @@
                 <div id='addLayerDialog' title='Add layer'>
                     <form>
                         <fieldset>
-                            Name: <input type='text' id='addLayerName' size='16' maxlength='64' />
+                            <label for='addLayerList'>Modifier-based layer:</label> <select id='addLayerList'><option>(custom)</option></select><br />
+                        </fieldset>
+                        <fieldset>
+                            <label for='addLayerName'>Name:</label> <input type='text' id='addLayerName' size='16' maxlength='64' /><br/>
+                            <span id='addLayerNote'></span>
                         </fieldset>
                     </form>
                 </div>
