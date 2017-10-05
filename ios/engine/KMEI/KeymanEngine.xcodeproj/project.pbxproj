@@ -22,8 +22,6 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		6C0A140C151EA925007FA4AD /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C0A1409151EA925007FA4AD /* AppDelegate.m */; };
-		6C0A140D151EA925007FA4AD /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C0A140B151EA925007FA4AD /* MainViewController.m */; };
 		6CD5DFAA150F6DC8007A5DDE /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA8150F6DC8007A5DDE /* icon.png */; };
 		6CD5DFAB150F6DC8007A5DDE /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */; };
 		984FD3EF17B48C670026ADA7 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984FD3EC17B48BBC0026ADA7 /* CoreText.framework */; };
@@ -44,6 +42,8 @@
 		98FFB3D41B67006F00289F0E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98FFB3D31B67006F00289F0E /* WebKit.framework */; };
 		98FFB3D51B67008000289F0E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98FFB3D31B67006F00289F0E /* WebKit.framework */; };
 		C040E50E1F85FF8A00901EE4 /* KeyPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E50D1F85FF8A00901EE4 /* KeyPreviewView.swift */; };
+		C040E5121F86107E00901EE4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E5111F86107E00901EE4 /* AppDelegate.swift */; };
+		C040E5141F86108900901EE4 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E5131F86108900901EE4 /* MainViewController.swift */; };
 		C04514881F85D7F500D88416 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04514871F85D7F500D88416 /* KeyboardViewController.swift */; };
 		C045148A1F85DF9100D88416 /* KeymanInputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04514891F85DF9000D88416 /* KeymanInputViewController.swift */; };
 		C06D372F1F81F4E100F61AE0 /* KeymanEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = C06D372D1F81F4E100F61AE0 /* KeymanEngine.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -84,7 +84,6 @@
 		C06D37601F82095200F61AE0 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F27FCB51157FE3CE00FBBA20 /* Keyman.bundle */; };
 		F243888314BBD43100A3E055 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F243888214BBD43100A3E055 /* UIKit.framework */; };
 		F243888714BBD43100A3E055 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F243888614BBD43100A3E055 /* CoreGraphics.framework */; };
-		F243888F14BBD43100A3E055 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F243888E14BBD43100A3E055 /* main.m */; };
 		F26071FE158F8C4600F37184 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F26071FD158F8C4600F37184 /* CFNetwork.framework */; };
 		F2607200158F8C6000F37184 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F26071FF158F8C6000F37184 /* libz.dylib */; };
 		F2607202158F8C9600F37184 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2607201158F8C9600F37184 /* SystemConfiguration.framework */; };
@@ -158,10 +157,6 @@
 		6C0A13FC151EA2CA007FA4AD /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
 		6C0A1405151EA8B3007FA4AD /* KMTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = KMTextView.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		6C0A1406151EA8B3007FA4AD /* KMTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = KMTextView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		6C0A1408151EA925007FA4AD /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		6C0A1409151EA925007FA4AD /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		6C0A140A151EA925007FA4AD /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = MainViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		6C0A140B151EA925007FA4AD /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = MainViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		6C0A140E151EA930007FA4AD /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		6C0A140F151EA930007FA4AD /* Keyman.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; lineEnding = 0; path = Keyman.xcconfig; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcconfig; };
 		6C0A1410151EA930007FA4AD /* Project.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; lineEnding = 0; path = Project.xcconfig; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcconfig; };
@@ -193,6 +188,8 @@
 		98FFB3D31B67006F00289F0E /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardMenuView.swift; sourceTree = "<group>"; };
 		C040E50D1F85FF8A00901EE4 /* KeyPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPreviewView.swift; sourceTree = "<group>"; };
+		C040E5111F86107E00901EE4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C040E5131F86108900901EE4 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		C04514861F85D7F500D88416 /* SystemKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SystemKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
 		C04514871F85D7F500D88416 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 		C04514891F85DF9000D88416 /* KeymanInputViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeymanInputViewController.swift; sourceTree = "<group>"; };
@@ -215,7 +212,6 @@
 		F243887E14BBD43000A3E055 /* KeymanEngineDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeymanEngineDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F243888214BBD43100A3E055 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		F243888614BBD43100A3E055 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		F243888E14BBD43100A3E055 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = main.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		F243889014BBD43100A3E055 /* KeymanEngine-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KeymanEngine-Prefix.pch"; sourceTree = "<group>"; };
 		F26071FD158F8C4600F37184 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		F26071FF158F8C6000F37184 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
@@ -328,10 +324,8 @@
 		98196DE4187BB0D200F001C3 /* KeymanEngineDemo */ = {
 			isa = PBXGroup;
 			children = (
-				6C0A1408151EA925007FA4AD /* AppDelegate.h */,
-				6C0A1409151EA925007FA4AD /* AppDelegate.m */,
-				6C0A140A151EA925007FA4AD /* MainViewController.h */,
-				6C0A140B151EA925007FA4AD /* MainViewController.m */,
+				C040E5111F86107E00901EE4 /* AppDelegate.swift */,
+				C040E5131F86108900901EE4 /* MainViewController.swift */,
 				6C0A13F9151EA151007FA4AD /* Resources */,
 				988B36B41ADF67180008752C /* Keyboards */,
 			);
@@ -492,7 +486,6 @@
 			isa = PBXGroup;
 			children = (
 				6C0A13FE151EA3CF007FA4AD /* Config */,
-				F243888E14BBD43100A3E055 /* main.m */,
 				F243889014BBD43100A3E055 /* KeymanEngine-Prefix.pch */,
 				6C0A13FC151EA2CA007FA4AD /* TODO */,
 				F27FCB65157FF34800FBBA20 /* INSTRUCTIONS */,
@@ -887,9 +880,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F243888F14BBD43100A3E055 /* main.m in Sources */,
-				6C0A140C151EA925007FA4AD /* AppDelegate.m in Sources */,
-				6C0A140D151EA925007FA4AD /* MainViewController.m in Sources */,
+				C040E5121F86107E00901EE4 /* AppDelegate.swift in Sources */,
+				C040E5141F86108900901EE4 /* MainViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1244,7 +1236,7 @@
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "KeymanEngineDemo/KeymanEngineDemo-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
@@ -1273,7 +1265,7 @@
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "KeymanEngineDemo/KeymanEngineDemo-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 				VALID_ARCHS = "arm64 armv7 armv7s";
