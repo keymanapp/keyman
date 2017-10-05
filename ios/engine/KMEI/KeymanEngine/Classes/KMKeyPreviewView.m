@@ -8,7 +8,7 @@
 
 #import "KMKeyPreviewView.h"
 #import "KMManager+Internal.h"
-#import "KMInputViewController.h"
+#import "KeymanEngine/KeymanEngine-Swift.h"
 
 @interface KMKeyPreviewView ()
 @property (assign) CGRect keyFrame;
@@ -29,7 +29,7 @@
 - (id)initWithFrame:(CGRect)frame {
     BOOL isPortrait = YES;
     if ([KMManager isKeymanSystemKeyboard])
-        isPortrait = [KMInputViewController isPortrait];
+        isPortrait = [KeymanInputViewController isPortrait];
     else {
         UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
         isPortrait = UIInterfaceOrientationIsPortrait(orientation);
@@ -43,7 +43,7 @@
     CGFloat viewPosY = keyFrame.origin.y - (viewHeight - keyFrame.size.height);
     
     adjY = 0;
-    NSInteger tbHeight = [[KMManager sharedInstance] isSystemKeyboardTopBarEnabled]?[KMInputViewController topBarHeight]:0;
+    NSInteger tbHeight = [[KMManager sharedInstance] isSystemKeyboardTopBarEnabled]?[KeymanInputViewController topBarHeight]:0;
     if ([KMManager isKeymanSystemKeyboard] && (viewPosY < -tbHeight)) {
         adjY = viewPosY + tbHeight;
         viewPosY = -tbHeight;

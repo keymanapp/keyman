@@ -23,8 +23,8 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
   private var tableView: UITableView?
   private let closeButtonTitle: String?
 
-  private var _inputViewController: KMInputViewController?
-  public override var inputViewController: KMInputViewController? {
+  private var _inputViewController: KeymanInputViewController?
+  public override var inputViewController: KeymanInputViewController? {
     return _inputViewController
   }
 
@@ -66,11 +66,11 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
     return _tableList!
   }
 
-  @objc public init(keyFrame frame: CGRect, inputViewController: KMInputViewController, closeButtonTitle: String) {
+  @objc public init(keyFrame frame: CGRect, inputViewController: KeymanInputViewController, closeButtonTitle: String) {
     let isSystemKeyboard = KMManager.isKeymanSystemKeyboard()
     let isPortrait: Bool
     if isSystemKeyboard {
-      isPortrait = KMInputViewController.isPortrait()
+      isPortrait = KeymanInputViewController.isPortrait
     } else {
       isPortrait = UIApplication.shared.statusBarOrientation.isPortrait
     }
@@ -78,7 +78,7 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
     _inputViewController = inputViewController
     self.closeButtonTitle = closeButtonTitle
     topBarHeight = KMManager.sharedInstance().isSystemKeyboardTopBarEnabled ?
-      CGFloat(KMInputViewController.topBarHeight()) : 0
+      CGFloat(KeymanInputViewController.topBarHeight) : 0
     keyFrame = frame
     rowHeight = UIDevice.current.userInterfaceIdiom == .phone ? 30 : 60
     fontSize = UIDevice.current.userInterfaceIdiom == .phone ? 14 : 21

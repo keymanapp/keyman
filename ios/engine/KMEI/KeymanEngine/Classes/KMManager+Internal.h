@@ -10,12 +10,13 @@
 
 #import "KMManager.h"
 #import "Reachability.h"
-#import "KMInputViewController.h"
 
 extern NSString *const kKeymanApiBaseURL;
 extern NSString *const kKeymanOptionsKey;
 extern NSString *const kKeymanLanguageKey;
 extern NSString *const kKeymanKeyboardCopyrightKey;
+
+@class KeymanInputViewController;
 
 @protocol KMWebViewDelegate;
 
@@ -74,7 +75,7 @@ typedef void (^KMFetchKeyboardsBlock)(NSDictionary*);
 - (void)updateViewConstraints;
 - (void)inputViewDidLoad;
 - (void)inputViewWillRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration;
-- (void)showKeyboardMenu:(KMInputViewController *)ic closeButtonTitle:(NSString *)closeButtonTitle;
+- (void)showKeyboardMenu:(KeymanInputViewController *)ic closeButtonTitle:(NSString *)closeButtonTitle;
 - (void)dismissKeyboardMenu;
 - (BOOL)isKeyboardMenuVisible;
 - (void)reloadKeyboard;

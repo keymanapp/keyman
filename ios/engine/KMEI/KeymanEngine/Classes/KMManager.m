@@ -9,7 +9,6 @@
 
 #import "KMManager.h"
 #import "KMManager+Internal.h"
-#import "KMInputViewController.h"
 #import "KMURLProtocol.h"
 #import "KMTextField.h"
 #import "KMTextView.h"
@@ -1144,7 +1143,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
     
     BOOL isPortrait = YES;
     if (kIsKeymanSystemKeyboard)
-        isPortrait = [KMInputViewController isPortrait];
+        isPortrait = [KeymanInputViewController isPortrait];
     else {
         UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
         isPortrait = UIInterfaceOrientationIsPortrait(orientation);
@@ -2125,7 +2124,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
 + (CGFloat)keyboardHeight {
     BOOL isPortrait = YES;
     if (kIsKeymanSystemKeyboard)
-        isPortrait = [KMInputViewController isPortrait];
+        isPortrait = [KeymanInputViewController isPortrait];
     else {
         UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
         isPortrait = UIInterfaceOrientationIsPortrait(orientation);
@@ -3970,7 +3969,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
     menuKeyFrame = frame;
 }
 
-- (void)showKeyboardMenu:(KMInputViewController *)ic closeButtonTitle:(NSString *)closeButtonTitle {
+- (void)showKeyboardMenu:(KeymanInputViewController *)ic closeButtonTitle:(NSString *)closeButtonTitle {
     UIView *parentView = ic.view;
     if (parentView == nil)
         parentView = webView;
