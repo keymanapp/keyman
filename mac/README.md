@@ -8,7 +8,7 @@ Keyman for macOS can be built from a command line (preferred) or Xcode.
 
 ### Compiling from Command Line
 To build Keyman for macOS, do the following:
-1. Open a terminal.
+1. Open a Terminal window.
 2. cd to **keyman/mac**. **build.sh** must be run in the directory containing the script.
 3. Build using `./build.sh -no-codesign`. Run `./build.sh -help` to see all options.
     * If you have signing credentials from the core development team, you can build a signed version by omitting
