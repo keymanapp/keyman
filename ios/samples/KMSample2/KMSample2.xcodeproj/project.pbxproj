@@ -25,7 +25,6 @@
 		98ABFD831AD3A153005534F0 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD821AD3A153005534F0 /* SystemConfiguration.framework */; };
 		98ABFD851AD3A15B005534F0 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD841AD3A15B005534F0 /* libz.dylib */; };
 		98ABFD871AD3A169005534F0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD861AD3A169005534F0 /* UIKit.framework */; };
-		98ABFD921AD3A232005534F0 /* KeyboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98ABFD911AD3A232005534F0 /* KeyboardViewController.m */; };
 		98ABFD951AD3A232005534F0 /* SWKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 98ABFD8C1AD3A232005534F0 /* SWKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		98ABFD9C1AD3A2AB005534F0 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD7E1AD3A134005534F0 /* AudioToolbox.framework */; };
 		98ABFD9D1AD3A2B3005534F0 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD781AD3A12D005534F0 /* CFNetwork.framework */; };
@@ -38,6 +37,7 @@
 		C01AB59F1F8346FC009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */; };
 		C01AB5A01F834706009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */; };
 		C01AB5A11F834706009B37D3 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C045148D1F85E33300D88416 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C045148C1F85E33300D88416 /* KeyboardViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -112,11 +112,11 @@
 		98ABFD861AD3A169005534F0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		98ABFD8C1AD3A232005534F0 /* SWKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SWKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		98ABFD8F1AD3A232005534F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		98ABFD901AD3A232005534F0 /* KeyboardViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyboardViewController.h; sourceTree = "<group>"; };
-		98ABFD911AD3A232005534F0 /* KeyboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeyboardViewController.m; sourceTree = "<group>"; };
 		98ABFDA41AD3A363005534F0 /* SWKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SWKeyboard.entitlements; sourceTree = "<group>"; };
 		98ABFDA51AD3A388005534F0 /* KMSample2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = KMSample2.entitlements; sourceTree = "<group>"; };
 		C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
+		C045148B1F85E33300D88416 /* SWKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SWKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
+		C045148C1F85E33300D88416 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -269,8 +269,8 @@
 			isa = PBXGroup;
 			children = (
 				98ABFDA41AD3A363005534F0 /* SWKeyboard.entitlements */,
-				98ABFD901AD3A232005534F0 /* KeyboardViewController.h */,
-				98ABFD911AD3A232005534F0 /* KeyboardViewController.m */,
+				C045148C1F85E33300D88416 /* KeyboardViewController.swift */,
+				C045148B1F85E33300D88416 /* SWKeyboard-Bridging-Header.h */,
 				98ABFD8E1AD3A232005534F0 /* Supporting Files */,
 			);
 			path = SWKeyboard;
@@ -345,6 +345,7 @@
 					98ABFD8B1AD3A232005534F0 = {
 						CreatedOnToolsVersion = 6.2;
 						DevelopmentTeam = N4M8L6CCXN;
+						LastSwiftMigration = 0900;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -409,7 +410,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98ABFD921AD3A232005534F0 /* KeyboardViewController.m in Sources */,
+				C045148D1F85E33300D88416 /* KeyboardViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -569,6 +570,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SWKeyboard/SWKeyboard.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -586,6 +588,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "SWKeyboard/SWKeyboard-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -593,6 +598,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SWKeyboard/SWKeyboard.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -606,6 +612,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "SWKeyboard/SWKeyboard-Bridging-Header.h";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
