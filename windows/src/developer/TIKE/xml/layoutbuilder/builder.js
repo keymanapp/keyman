@@ -1500,7 +1500,7 @@ $(function () {
       "OK": function () {
         var newLayerName = $('#layerName').val();
         if (!newLayerName.match(/^[a-zA-Z0-9_-]+$/)) {
-          alert('Layer name must contain only alphanumerics, hyphen underscore.');
+          alert('Layer name must contain only alphanumerics, underscore and hyphen.');
           return;
         }
 
@@ -1598,7 +1598,7 @@ $(function () {
       "OK": function () {
         var id = $('#addLayerName').val();
         if (!id.match(/^[a-zA-Z0-9_-]+$/)) {
-          alert('Layer name must contain only alphanumerics and underscore.');
+          alert('Layer name must contain only alphanumerics, underscore and hyphen.');
           return;
         }
         for(var i = 0; i < KVKL[builder.lastPlatform].layer.length; i++) {
