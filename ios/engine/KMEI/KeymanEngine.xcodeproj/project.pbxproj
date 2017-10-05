@@ -26,7 +26,6 @@
 		6C0A140D151EA925007FA4AD /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C0A140B151EA925007FA4AD /* MainViewController.m */; };
 		6CD5DFAA150F6DC8007A5DDE /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA8150F6DC8007A5DDE /* icon.png */; };
 		6CD5DFAB150F6DC8007A5DDE /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */; };
-		980EEFD1196E19B7003F6A67 /* KeyboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F9D69C1954112F0087AA43 /* KeyboardViewController.m */; };
 		984FD3EF17B48C670026ADA7 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984FD3EC17B48BBC0026ADA7 /* CoreText.framework */; };
 		988B36B61ADF67290008752C /* inuktitut_pirurvik-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */; };
 		988B36B91ADF728A0008752C /* inuktitut_latin-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 988B36B71ADF728A0008752C /* inuktitut_latin-1.0.js */; };
@@ -44,6 +43,7 @@
 		98F9D6AE195412A60087AA43 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F26071FD158F8C4600F37184 /* CFNetwork.framework */; };
 		98FFB3D41B67006F00289F0E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98FFB3D31B67006F00289F0E /* WebKit.framework */; };
 		98FFB3D51B67008000289F0E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98FFB3D31B67006F00289F0E /* WebKit.framework */; };
+		C04514881F85D7F500D88416 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04514871F85D7F500D88416 /* KeyboardViewController.swift */; };
 		C06D372F1F81F4E100F61AE0 /* KeymanEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = C06D372D1F81F4E100F61AE0 /* KeymanEngine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C06D37331F81F5C300F61AE0 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = CECB38941F2199BC0098882F /* Reachability.m */; };
 		C06D37341F81F5C300F61AE0 /* HTTPDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ED71B41F6BBFAF002A2FD6 /* HTTPDownloader.swift */; };
@@ -192,13 +192,13 @@
 		98D4190B17695E58008D2FF3 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Tavultesoft.KMEI.SystemKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		98F9D69A1954112F0087AA43 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		98F9D69B1954112F0087AA43 /* KeyboardViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyboardViewController.h; sourceTree = "<group>"; };
-		98F9D69C1954112F0087AA43 /* KeyboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeyboardViewController.m; sourceTree = "<group>"; };
 		98F9D6CA19541D220087AA43 /* libKeyman.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libKeyman.a; path = build/libKeyman/libKeyman.a; sourceTree = "<group>"; };
 		98F9D6EE19545AB60087AA43 /* KMInputViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMInputViewController.h; sourceTree = "<group>"; };
 		98F9D6EF19545AB60087AA43 /* KMInputViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMInputViewController.m; sourceTree = "<group>"; };
 		98FFB3D31B67006F00289F0E /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardMenuView.swift; sourceTree = "<group>"; };
+		C04514861F85D7F500D88416 /* SystemKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SystemKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
+		C04514871F85D7F500D88416 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 		C04C2A6C1F6B7D9A00BA42B6 /* LanguageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LanguageViewController.swift; sourceTree = "<group>"; };
 		C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C06D372D1F81F4E100F61AE0 /* KeymanEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeymanEngine.h; sourceTree = "<group>"; };
@@ -405,8 +405,8 @@
 			isa = PBXGroup;
 			children = (
 				984FA1F51974C0B30037EE5D /* Tavultesoft.KMEI.SystemKeyboard.entitlements */,
-				98F9D69B1954112F0087AA43 /* KeyboardViewController.h */,
-				98F9D69C1954112F0087AA43 /* KeyboardViewController.m */,
+				C04514871F85D7F500D88416 /* KeyboardViewController.swift */,
+				C04514861F85D7F500D88416 /* SystemKeyboard-Bridging-Header.h */,
 				98F9D6991954112F0087AA43 /* Supporting Files */,
 			);
 			path = SystemKeyboard;
@@ -731,6 +731,7 @@
 					98F9D6961954112F0087AA43 = {
 						CreatedOnToolsVersion = 6.0;
 						DevelopmentTeam = N4M8L6CCXN;
+						LastSwiftMigration = 0900;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -853,7 +854,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				980EEFD1196E19B7003F6A67 /* KeyboardViewController.m in Sources */,
+				C04514881F85D7F500D88416 /* KeyboardViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -967,6 +968,9 @@
 				PRODUCT_NAME = "Tavultesoft.KMEI.$(TARGET_NAME:rfc1034identifier)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "SystemKeyboard/SystemKeyboard-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -1003,6 +1007,8 @@
 				PRODUCT_NAME = "Tavultesoft.KMEI.$(TARGET_NAME:rfc1034identifier)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "SystemKeyboard/SystemKeyboard-Bridging-Header.h";
+				SWIFT_VERSION = 4.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
