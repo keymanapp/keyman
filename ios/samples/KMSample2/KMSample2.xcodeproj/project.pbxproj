@@ -9,9 +9,6 @@
 /* Begin PBXBuildFile section */
 		987CC6921BAA71E30057459B /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 987CC6911BAA71E30057459B /* WebKit.framework */; };
 		987CC6931BAA720E0057459B /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 987CC6911BAA71E30057459B /* WebKit.framework */; };
-		98ABFD3D1AD3A047005534F0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 98ABFD3C1AD3A047005534F0 /* main.m */; };
-		98ABFD401AD3A047005534F0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 98ABFD3F1AD3A047005534F0 /* AppDelegate.m */; };
-		98ABFD431AD3A047005534F0 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98ABFD421AD3A047005534F0 /* ViewController.m */; };
 		98ABFD461AD3A047005534F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD441AD3A047005534F0 /* Main.storyboard */; };
 		98ABFD481AD3A047005534F0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD471AD3A047005534F0 /* Images.xcassets */; };
 		98ABFD4B1AD3A047005534F0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD491AD3A047005534F0 /* LaunchScreen.xib */; };
@@ -37,6 +34,8 @@
 		C01AB59F1F8346FC009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */; };
 		C01AB5A01F834706009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */; };
 		C01AB5A11F834706009B37D3 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C0324B871F87245200AF3785 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B861F87245200AF3785 /* AppDelegate.swift */; };
+		C0324B891F87245B00AF3785 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B881F87245B00AF3785 /* ViewController.swift */; };
 		C045148D1F85E33300D88416 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C045148C1F85E33300D88416 /* KeyboardViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -79,29 +78,11 @@
 		987CC6911BAA71E30057459B /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		98ABFD371AD3A047005534F0 /* KMSample2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KMSample2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		98ABFD3B1AD3A047005534F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		98ABFD3C1AD3A047005534F0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		98ABFD3E1AD3A047005534F0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		98ABFD3F1AD3A047005534F0 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		98ABFD411AD3A047005534F0 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		98ABFD421AD3A047005534F0 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		98ABFD451AD3A047005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		98ABFD471AD3A047005534F0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		98ABFD4A1AD3A047005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		98ABFD631AD3A09E005534F0 /* aava1.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = aava1.ttf; sourceTree = "<group>"; };
 		98ABFD641AD3A09E005534F0 /* tamil99m-1.1.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "tamil99m-1.1.js"; sourceTree = "<group>"; };
-		98ABFD671AD3A09E005534F0 /* CWLSynthesizeSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWLSynthesizeSingleton.h; sourceTree = "<group>"; };
-		98ABFD681AD3A09E005534F0 /* Keyman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Keyman.h; sourceTree = "<group>"; };
-		98ABFD691AD3A09E005534F0 /* KMInputViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMInputViewController.h; sourceTree = "<group>"; };
-		98ABFD6A1AD3A09E005534F0 /* KMKeyboardPickerBarButtonItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMKeyboardPickerBarButtonItem.h; sourceTree = "<group>"; };
-		98ABFD6B1AD3A09E005534F0 /* KMKeyboardPickerButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMKeyboardPickerButton.h; sourceTree = "<group>"; };
-		98ABFD6C1AD3A09E005534F0 /* KMManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMManager.h; sourceTree = "<group>"; };
-		98ABFD6D1AD3A09E005534F0 /* KMTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMTextField.h; sourceTree = "<group>"; };
-		98ABFD6E1AD3A09E005534F0 /* KMTextFieldDelegateProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMTextFieldDelegateProxy.h; sourceTree = "<group>"; };
-		98ABFD6F1AD3A09E005534F0 /* KMTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMTextView.h; sourceTree = "<group>"; };
-		98ABFD701AD3A09E005534F0 /* KMTextViewDelegateProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMTextViewDelegateProxy.h; sourceTree = "<group>"; };
-		98ABFD711AD3A09E005534F0 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
-		98ABFD721AD3A09E005534F0 /* Keyman.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Keyman.bundle; sourceTree = "<group>"; };
-		98ABFD731AD3A09E005534F0 /* libKeyman.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libKeyman.a; sourceTree = "<group>"; };
 		98ABFD781AD3A12D005534F0 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		98ABFD791AD3A12E005534F0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		98ABFD7A1AD3A12E005534F0 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
@@ -115,7 +96,8 @@
 		98ABFDA41AD3A363005534F0 /* SWKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SWKeyboard.entitlements; sourceTree = "<group>"; };
 		98ABFDA51AD3A388005534F0 /* KMSample2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = KMSample2.entitlements; sourceTree = "<group>"; };
 		C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
-		C045148B1F85E33300D88416 /* SWKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SWKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
+		C0324B861F87245200AF3785 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C0324B881F87245B00AF3785 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		C045148C1F85E33300D88416 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -163,7 +145,6 @@
 				98ABFD601AD3A087005534F0 /* Frameworks */,
 				98ABFD611AD3A09E005534F0 /* Keyboards */,
 				98ABFD391AD3A047005534F0 /* KMSample2 */,
-				98ABFD651AD3A09E005534F0 /* libKeyman */,
 				98ABFD381AD3A047005534F0 /* Products */,
 				98ABFD8D1AD3A232005534F0 /* SWKeyboard */,
 			);
@@ -182,10 +163,8 @@
 			isa = PBXGroup;
 			children = (
 				98ABFDA51AD3A388005534F0 /* KMSample2.entitlements */,
-				98ABFD3E1AD3A047005534F0 /* AppDelegate.h */,
-				98ABFD3F1AD3A047005534F0 /* AppDelegate.m */,
-				98ABFD411AD3A047005534F0 /* ViewController.h */,
-				98ABFD421AD3A047005534F0 /* ViewController.m */,
+				C0324B861F87245200AF3785 /* AppDelegate.swift */,
+				C0324B881F87245B00AF3785 /* ViewController.swift */,
 				98ABFD441AD3A047005534F0 /* Main.storyboard */,
 				98ABFD471AD3A047005534F0 /* Images.xcassets */,
 				98ABFD491AD3A047005534F0 /* LaunchScreen.xib */,
@@ -198,7 +177,6 @@
 			isa = PBXGroup;
 			children = (
 				98ABFD3B1AD3A047005534F0 /* Info.plist */,
-				98ABFD3C1AD3A047005534F0 /* main.m */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -237,40 +215,11 @@
 			path = tamil99m;
 			sourceTree = "<group>";
 		};
-		98ABFD651AD3A09E005534F0 /* libKeyman */ = {
-			isa = PBXGroup;
-			children = (
-				98ABFD661AD3A09E005534F0 /* include */,
-				98ABFD721AD3A09E005534F0 /* Keyman.bundle */,
-				98ABFD731AD3A09E005534F0 /* libKeyman.a */,
-			);
-			path = libKeyman;
-			sourceTree = "<group>";
-		};
-		98ABFD661AD3A09E005534F0 /* include */ = {
-			isa = PBXGroup;
-			children = (
-				98ABFD671AD3A09E005534F0 /* CWLSynthesizeSingleton.h */,
-				98ABFD681AD3A09E005534F0 /* Keyman.h */,
-				98ABFD691AD3A09E005534F0 /* KMInputViewController.h */,
-				98ABFD6A1AD3A09E005534F0 /* KMKeyboardPickerBarButtonItem.h */,
-				98ABFD6B1AD3A09E005534F0 /* KMKeyboardPickerButton.h */,
-				98ABFD6C1AD3A09E005534F0 /* KMManager.h */,
-				98ABFD6D1AD3A09E005534F0 /* KMTextField.h */,
-				98ABFD6E1AD3A09E005534F0 /* KMTextFieldDelegateProxy.h */,
-				98ABFD6F1AD3A09E005534F0 /* KMTextView.h */,
-				98ABFD701AD3A09E005534F0 /* KMTextViewDelegateProxy.h */,
-				98ABFD711AD3A09E005534F0 /* Reachability.h */,
-			);
-			path = include;
-			sourceTree = "<group>";
-		};
 		98ABFD8D1AD3A232005534F0 /* SWKeyboard */ = {
 			isa = PBXGroup;
 			children = (
 				98ABFDA41AD3A363005534F0 /* SWKeyboard.entitlements */,
 				C045148C1F85E33300D88416 /* KeyboardViewController.swift */,
-				C045148B1F85E33300D88416 /* SWKeyboard-Bridging-Header.h */,
 				98ABFD8E1AD3A232005534F0 /* Supporting Files */,
 			);
 			path = SWKeyboard;
@@ -296,6 +245,7 @@
 				98ABFD351AD3A047005534F0 /* Resources */,
 				98ABFD991AD3A232005534F0 /* Embed App Extensions */,
 				C01AB5A21F834706009B37D3 /* Embed Frameworks */,
+				C0324B8A1F8726DC00AF3785 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -314,6 +264,7 @@
 				98ABFD881AD3A232005534F0 /* Sources */,
 				98ABFD891AD3A232005534F0 /* Frameworks */,
 				98ABFD8A1AD3A232005534F0 /* Resources */,
+				C0324B8B1F8726E500AF3785 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -330,12 +281,13 @@
 		98ABFD2F1AD3A046005534F0 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0620;
-				ORGANIZATIONNAME = "Tavultesoft Pty Ltd";
+				LastUpgradeCheck = 0900;
+				ORGANIZATIONNAME = "SIL International";
 				TargetAttributes = {
 					98ABFD361AD3A047005534F0 = {
 						CreatedOnToolsVersion = 6.2;
 						DevelopmentTeam = N4M8L6CCXN;
+						LastSwiftMigration = 0900;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -395,14 +347,42 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		C0324B8A1F8726DC00AF3785 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
+		};
+		C0324B8B1F8726E500AF3785 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		98ABFD331AD3A047005534F0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98ABFD431AD3A047005534F0 /* ViewController.m in Sources */,
-				98ABFD401AD3A047005534F0 /* AppDelegate.m in Sources */,
-				98ABFD3D1AD3A047005534F0 /* main.m in Sources */,
+				C0324B891F87245B00AF3785 /* ViewController.swift in Sources */,
+				C0324B871F87245200AF3785 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -452,20 +432,31 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -495,20 +486,30 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -519,6 +520,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -529,6 +531,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = KMSample2/KMSample2.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -540,8 +543,11 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Sample2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -550,6 +556,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = KMSample2/KMSample2.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -561,8 +568,10 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Sample2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -585,10 +594,11 @@
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Sample2.SystemKeyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "SWKeyboard/SWKeyboard-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 			};
@@ -609,10 +619,11 @@
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Sample2.SystemKeyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "SWKeyboard/SWKeyboard-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;

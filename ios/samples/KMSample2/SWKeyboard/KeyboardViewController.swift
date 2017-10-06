@@ -3,7 +3,7 @@
 //  SWKeyboard
 //
 //  Created by Gabriel Wong on 2017-10-05.
-//  Copyright © 2017 Tavultesoft Pty Ltd. All rights reserved.
+//  Copyright © 2017 SIL International. All rights reserved.
 //
 
 import KeymanEngine
