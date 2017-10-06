@@ -1381,7 +1381,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       /**
        * Function       isUniqueRequest
        * Scope          Private
-       * @param         {object} 
+       * @param         tEntry      {object} 
        * Description    Checks to ensure that the stub isn't already loaded within KMW or subject
        *                to an already-pending request.
        */
