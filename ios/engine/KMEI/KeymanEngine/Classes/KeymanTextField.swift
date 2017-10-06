@@ -17,7 +17,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
   public var shouldSetCustomFontOnKeyboardChange = true
   public var isInputClickSoundEnabled = true
 
-  private var delegateProxy: KMTextFieldDelegateProxy?
+  private var delegateProxy: KeymanTextFieldDelegateProxy!
   private var shouldUpdateKMText = false
 
   // MARK: - Object Admin
@@ -32,27 +32,16 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
 
   public override init(frame: CGRect) {
     super.init(frame: frame)
-
-    delegateProxy = KMTextFieldDelegateProxy()
-    delegate = delegateProxy
-
-    if #available(iOS 9.0, *) {
-      inputAssistantItem.leadingBarButtonGroups = []
-      inputAssistantItem.trailingBarButtonGroups = []
-    }
-
-    KMManager.sharedInstance() // Preload webview keyboard
-
-    NotificationCenter.default.addObserver(self, selector: #selector(self.textFieldTextDidChange),
-                                           name: .UITextFieldTextDidChange, object: self)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged),
-                                           name: NSNotification.Name.keymanKeyboardChanged, object: nil)
+    performCommonInit()
   }
 
   public required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
+    performCommonInit()
+  }
 
-    delegateProxy = KMTextFieldDelegateProxy(self)
+  private func performCommonInit() {
+    delegateProxy = KeymanTextFieldDelegateProxy(self)
     delegate = delegateProxy
 
     if #available(iOS 9.0, *) {
@@ -66,6 +55,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
                                            name: .UITextFieldTextDidChange, object: self)
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged),
                                            name: NSNotification.Name.keymanKeyboardChanged, object: nil)
+
   }
 
   // MARK: - Class Overrides
@@ -104,10 +94,10 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
 
   // MARK: - Public Methods
 
-  // Use this KMTextFieldDelegate instead of the normal UITextFieldDelegate.
+  // Use this KeymanTextFieldDelegate instead of the normal UITextFieldDelegate.
   // All of the normal UITextFieldDelegate methods are supported.
-  @objc public func setKeymanDelegate(_ keymanDelegate: KMTextFieldDelegate?) {
-    delegateProxy?.keymanDelegate = keymanDelegate
+  public func setKeymanDelegate(_ keymanDelegate: KeymanTextFieldDelegate?) {
+    delegateProxy.keymanDelegate = keymanDelegate
     KMManager.sharedInstance().kmLog(
       "KeymanTextField: \(self.debugDescription) keymanDelegate set to: \(keymanDelegate.debugDescription)",
       checkDebugPrinting: true)

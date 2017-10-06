@@ -10,7 +10,7 @@ import KeymanEngine
 import UIKit
 import QuartzCore
 
-class MainViewController: UIViewController, UIAlertViewDelegate, KMTextViewDelegate, KMTextFieldDelegate {
+class MainViewController: UIViewController, UIAlertViewDelegate, KMTextViewDelegate, KeymanTextFieldDelegate {
   var textView1: KMTextView!
   var textView2: KeymanTextField!
   var textView3: UITextView!

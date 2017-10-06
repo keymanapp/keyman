@@ -11,5 +11,3 @@
 
 #import "KMTextView.h"
 #import "KMTextViewDelegateProxy.h"
-
-#import "KMTextFieldDelegateProxy.h"
