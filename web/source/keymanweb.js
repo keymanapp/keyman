@@ -1719,13 +1719,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       // Update the UI 
       keymanweb.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC']);
-
-      // If the first stub, must load (and optionally display) the keyboard
-      if(keymanweb._KeyboardStubs.length == 1 && document.readyState=='complete') {
-        keymanweb._SetActiveKeyboard(sp['KI'], sp['KLC']);     
-        keymanweb.globalKeyboard = sp['KI'];
-        keymanweb.globalLanguageCode = sp['KLC'];
-      }
     }
     
     /** 
@@ -4220,7 +4213,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         keymanweb.KR(keymanweb.deferredKR[j]);
     
       // Exit initialization here if we're using an embedded code path.
-      if(keymanweb.isEmbedded) return;
+      if(keymanweb.isEmbedded) {
+        if(keymanweb._KeyboardStubs.length > 0) {
+          // Select the first stub as our active keyboard.  This is set later for 'native' KMW.
+          keymanweb._SetActiveKeyboard(keymanweb._KeyboardStubs[0]['KI'], keymanweb._KeyboardStubs[0]['KLC']);     
+        }
+
+        return;
+      }
 
       // Determine the default font for mapped elements
       keymanweb.appliedFont=keymanweb.baseFont=keymanweb.getBaseFont();
@@ -4322,7 +4322,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(document.selection  &&  !keymanweb.legacy)
         util.attachDOMEvent(document, 'selectionchange', keymanweb._SelectionChange);
     
-      // Restore and reload the currently selected keyboard 
+      // Restore and reload the currently selected keyboard, selecting a default keyboard if necessary.
       keymanweb.restoreCurrentKeyboard(); 
 
       /* Setup of handlers for dynamically-added and (eventually) dynamically-removed elements.
@@ -4858,11 +4858,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         if(stubs[i]['KI'] == t[0] && (stubs[i]['KLC'] == t[1] || t[1] == '')) break;
       }
     
-      // Restore the stub with the saved keyboard, or else the first keyboard that matches
+      // Sets the default stub (as specified above with the `getSavedKeyboard` call) as active.
       // if((i < n) || (device.touchable && (keymanweb._ActiveKeyboard == null)))
       if((i < n) || (keymanweb._ActiveKeyboard == null))
       {
         keymanweb._SetActiveKeyboard(t[0],t[1],false);
+        keymanweb.globalKeyboard = t[0];
+        keymanweb.globalLanguageCode = t[1];
+
         keymanweb.doKeyboardChange(t[0],t[1]);        // And update the UI if necessary
       }
     } 

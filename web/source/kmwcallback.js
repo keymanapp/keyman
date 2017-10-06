@@ -84,7 +84,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var Li,Lstub;
 
       // Check if the active stub refers to this keyboard, else find applicable stub
-      var Ps=keymanweb._ActiveStub;     
+      var Ps=keymanweb._ActiveStub, as = keymanweb._ActiveStub;     
       if(!Ps || !('KI' in Ps) || (Ps['KI'] != Pk['KI']))
       {             
         // Find the first stub for this keyboard
@@ -113,6 +113,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       // Execute any external (UI) code needed after loading keyboard
       keymanweb.doKeyboardLoaded(Pk['KI']);
+
+      // Restore the originally-active stub to its prior state.  No need to change it permanently.
+      keymanweb._ActiveStub = as;
     }
 
     /**
