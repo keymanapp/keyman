@@ -22,7 +22,7 @@ let dontShowGetStartedKey = "DontShowGetStarted"
 let launchedFromUrlNotification = NSNotification.Name("LaunchedFromUrlNotification")
 let urlKey = "url"
 
-class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDelegate, UIAlertViewDelegate {
+class MainViewController: UIViewController, KeymanTextViewDelegate, UIActionSheetDelegate, UIAlertViewDelegate {
   private let minTextSize: CGFloat = 9.0
   private let maxTextSize: CGFloat = 72.0
   private let getStartedViewTag = 7183

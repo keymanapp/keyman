@@ -17,7 +17,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   public var shouldSetCustomFontOnKeyboardChange = true
   public var isInputClickSoundEnabled = true
 
-  private var delegateProxy: KMTextViewDelegateProxy!
+  private var delegateProxy: KeymanTextViewDelegateProxy!
   private var shouldUpdateKMText = false
 
   // MARK: - Object Admin
@@ -45,7 +45,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   }
 
   private func performCommonInit() {
-    delegateProxy = KMTextViewDelegateProxy()
+    delegateProxy = KeymanTextViewDelegateProxy(self)
     delegate = delegateProxy
 
     if #available(iOS 9.0, *) {
@@ -94,9 +94,9 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
 
   // MARK: - Public Methods
 
-  // Use this KMTextViewDelegate instead of the normal UITextViewDelegate.
+  // Use this KeymanTextViewDelegate instead of the normal UITextViewDelegate.
   //   - All of the normal UITextViewDelegate methods are supported.
-  @objc public func setKeymanDelegate(_ keymanDelegate: KMTextViewDelegate?) {
+  public func setKeymanDelegate(_ keymanDelegate: KeymanTextViewDelegate?) {
     delegateProxy.keymanDelegate = keymanDelegate
     KMManager.sharedInstance().kmLog(
       "KeymanTextView: \(self.debugDescription) keymanDelegate set to: \(keymanDelegate.debugDescription)",
