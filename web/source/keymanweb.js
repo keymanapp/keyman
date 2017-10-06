@@ -1376,6 +1376,29 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       // Create a temporary array of metadata objects from the arguments used
       var i,j,kp,kbid,lgid,kvid,cmd='',comma='';      
       keymanweb.cloudList=[];  
+
+      /** 
+       * Function       isUniqueRequest
+       * Scope          Private
+       * @param         {object} 
+       * Description    Checks to ensure that the stub isn't already loaded within KMW or subject
+       *                to an already-pending request.
+       */
+      var isUniqueRequest = function(tEntry) {
+        var k;
+
+        if(keymanweb.findStub(tEntry['id'], tEntry['language']) == null) {
+          for(k=0; k < keymanweb.cloudList.length; k++) {
+            if(keymanweb.cloudList[k]['id'] == tEntry['id'] && keymanweb.cloudList[k]['language'] == tEntry['language']) {
+              return false;
+            }
+          }
+          return true;
+        } else {
+          return false;
+        }
+      };
+
       for(i=0; i<x.length; i++)
       {
         if(typeof(x[i]) == 'string' && x[i].length > 0) 
@@ -1391,7 +1414,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             tEntry={'id':pList[0]};
             if(lList[j] != '') tEntry['language']=lList[j];
             if(pList.length > 2) tEntry['version']=pList[2]; 
-            keymanweb.cloudList.push(tEntry);        
+
+            // If we've already registered or requested a stub for this keyboard-language pairing,
+            // don't bother with a cloud request.
+            if(isUniqueRequest(tEntry)) {
+              keymanweb.cloudList.push(tEntry);        
+            }
           }
         }
         if(typeof(x[i]) == 'object' && x[i] != null)
@@ -1410,17 +1438,20 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
                 
             //Array or single entry?
             if(typeof(lList.length) == 'number') {
-              for(j=0; j<lList.length; j++)
-                keymanweb.cloudList.push(
-                  {'id':x[i]['id'],'language':x[i]['language'][j]['id']}
-                );
+              for(j=0; j<lList.length; j++) {
+                var tEntry = {'id':x[i]['id'],'language':x[i]['language'][j]['id']};
+                if(isUniqueRequest(tEntry)) {
+                  keymanweb.cloudList.push(tEntry);        
+                }
+              }
             }
             // Single language element
             else
             {
-              keymanweb.cloudList.push(
-                {'id':x[i]['id'],'language':x[i]['language']['id']}
-              );
+              var tEntry = {'id':x[i]['id'],'language':x[i]['language'][j]['id']};
+              if(isUniqueRequest(tEntry)) {
+                keymanweb.cloudList.push(tEntry);        
+              }
             }
           }        
         }
