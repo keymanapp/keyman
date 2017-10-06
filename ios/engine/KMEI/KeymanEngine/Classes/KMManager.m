@@ -9,7 +9,6 @@
 
 #import "KMManager.h"
 #import "KMManager+Internal.h"
-#import "KMURLProtocol.h"
 #import "UIView+Helpers.h"
 #import <QuartzCore/QuartzCore.h>
 #import <CoreText/CoreText.h>
@@ -220,7 +219,7 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
         subKeyColor = [UIColor colorWithRed:244.0/255.0 green:244.0/255.0  blue:244.0/255.0  alpha:1.0];
         subKeyColorHighlighted = [UIColor colorWithRed:136.0/255.0 green:136.0/255.0 blue:255.0/255.0 alpha:1.0];
         
-        [NSURLProtocol registerClass:[KMURLProtocol class]];
+        [NSURLProtocol registerClass:[KeymanURLProtocol class]];
         NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
         NSDictionary *extensionInfo = [infoDict objectForKey:@"NSExtension"];
         NSString *extensionID = [extensionInfo objectForKey:@"NSExtensionPointIdentifier"];
