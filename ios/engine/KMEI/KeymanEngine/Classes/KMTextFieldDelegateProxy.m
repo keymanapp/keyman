@@ -7,7 +7,7 @@
 //
 
 #import "KMTextFieldDelegateProxy.h"
-#import "KMTextField.h"
+#import "KeymanEngine/KeymanEngine-Swift.h"
 
 @implementation KMTextFieldDelegateProxy
 
@@ -22,7 +22,7 @@
 #pragma mark - UITextFieldDelegate
 
 // NOTE: the return value from the textField's hook is ignored
-- (BOOL)textFieldShouldBeginEditing:(KMTextField *)textField {
+- (BOOL)textFieldShouldBeginEditing:(KeymanTextField *)textField {
 	if ([textField respondsToSelector:@selector(textFieldShouldBeginEditing:)]) {
 		[textField textFieldShouldBeginEditing:textField];
 	}
@@ -32,7 +32,7 @@
 	return YES;
 }
 
-- (void)textFieldDidBeginEditing:(KMTextField *)textField {
+- (void)textFieldDidBeginEditing:(KeymanTextField *)textField {
 	if ([textField respondsToSelector:@selector(textFieldDidBeginEditing:)]) {
 		[textField textFieldDidBeginEditing:textField];
 	}
@@ -42,7 +42,7 @@
 }
 
 // NOTE: the return value from the textField's hook is ignored
-- (BOOL)textFieldShouldEndEditing:(KMTextField *)textField {
+- (BOOL)textFieldShouldEndEditing:(KeymanTextField *)textField {
 	if ([textField respondsToSelector:@selector(textFieldShouldEndEditing:)]) {
 		[textField textFieldShouldEndEditing:textField];
 	}
@@ -53,7 +53,7 @@
 	return YES;
 }
 
-- (void)textFieldDidEndEditing:(KMTextField *)textField {
+- (void)textFieldDidEndEditing:(KeymanTextField *)textField {
 	if ([textField respondsToSelector:@selector(textFieldDidEndEditing:)]) {
 		[textField textFieldDidEndEditing:textField];
 	}
@@ -63,7 +63,7 @@
 }
 
 // NOTE: the return value from the textField's hook is ignored
-- (BOOL)textField:(KMTextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+- (BOOL)textField:(KeymanTextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
 	if ([textField respondsToSelector:@selector(textField:shouldChangeCharactersInRange:replacementString:)]) {
 		[textField textField:textField shouldChangeCharactersInRange:range replacementString:string];
 	}
@@ -75,7 +75,7 @@
 }
 
 // NOTE: the return value from the textField's hook is ignored
-- (BOOL)textFieldShouldClear:(KMTextField *)textField {
+- (BOOL)textFieldShouldClear:(KeymanTextField *)textField {
 	if ([textField respondsToSelector:@selector(textFieldShouldClear:)]) {
 		[textField textFieldShouldClear:textField];
 	}
@@ -87,7 +87,7 @@
 }
 
 // NOTE: the return value from the textField's hook is ignored
-- (BOOL)textFieldShouldReturn:(KMTextField *)textField {
+- (BOOL)textFieldShouldReturn:(KeymanTextField *)textField {
 	if ([textField respondsToSelector:@selector(textFieldShouldReturn:)]) {
 		[textField textFieldShouldReturn:textField];
 	}

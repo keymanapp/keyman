@@ -6,7 +6,7 @@
 //
 //
 //	A one-stop hub for:
-//     - global settings and behaviour for KMTextView and KMTextField
+//     - global settings and behaviour for KMTextView and KeymanTextField
 //     - displaying the keyboard picker/downloader
 //     - all interaction with the Keyman servers (polling for info, downloading keyboards, etc)
 //
@@ -29,7 +29,7 @@
 //      [[KMManager sharedInstance] setKeyboardWithID:kbID languageID:langID keyboardName:kbName languageName:langName font:kbFont, oskFont:nil];
 //
 //
-//  NOTES: 1) The easiest way to use this SDK is to simply use KMTextViews and KMTextFields in place of their UIKit counterparts
+//  NOTES: 1) The easiest way to use this SDK is to simply use KMTextViews and KeymanTextFields in place of their UIKit counterparts
 //         2) All keyboard downloading and picking can be handled by globe key on the keyboard, displaying a KMKeyboardPickerButton or a
 //            KMKeyboardPickerBarButtonItem
 //             - when tapped, these will display a UI for the user to navigate all available Keyman keyboards
@@ -191,7 +191,7 @@ typedef enum {
 
 // Displays a list of available keyboards and allows a user to add/download new keyboards or remove existing ones
 //   - it is recommended that you pass in your current UIViewController rather than the navigation controller
-//   - to enable/disable the keyboard picker on the keyboard, see KMTextView/KMTextField class reference
+//   - to enable/disable the keyboard picker on the keyboard, see KMTextView/KeymanTextField class reference
 - (void)showKeyboardPickerInViewController:(UIViewController *)viewController shouldAddKeyboard:(BOOL)shouldAddKeyboard;
 - (void)dismissKeyboardPicker:(UIViewController *)viewController;
 

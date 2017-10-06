@@ -10,7 +10,6 @@
 #import "KMManager.h"
 #import "KMManager+Internal.h"
 #import "KMURLProtocol.h"
-#import "KMTextField.h"
 #import "KMTextView.h"
 #import "UIView+Helpers.h"
 #import <QuartzCore/QuartzCore.h>
@@ -904,8 +903,8 @@ CWL_SYNTHESIZE_SINGLETON_FOR_CLASS_WITH_ACCESSOR(KMManager, sharedInstance);
         id firstResponder = [[[UIApplication sharedApplication] keyWindow] findFirstResponder];
         if ([firstResponder isKindOfClass:[KMTextView class]])
             [(KMTextView *)firstResponder dismissKeyboard];
-        else if ([firstResponder isKindOfClass:[KMTextField class]])
-            [(KMTextField *)firstResponder dismissKeyboard];
+        else if ([firstResponder isKindOfClass:[KeymanTextField class]])
+            [(KeymanTextField *)firstResponder dismissKeyboard];
     }
     
     KeyboardPickerViewController *vc = [[KeyboardPickerViewController alloc] init];

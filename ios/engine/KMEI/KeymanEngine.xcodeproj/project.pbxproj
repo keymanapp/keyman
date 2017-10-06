@@ -42,6 +42,7 @@
 		98FFB3D41B67006F00289F0E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98FFB3D31B67006F00289F0E /* WebKit.framework */; };
 		98FFB3D51B67008000289F0E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98FFB3D31B67006F00289F0E /* WebKit.framework */; };
 		C040E50E1F85FF8A00901EE4 /* KeyPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E50D1F85FF8A00901EE4 /* KeyPreviewView.swift */; };
+		C040E5101F8606E300901EE4 /* KeymanTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E50F1F8606E300901EE4 /* KeymanTextField.swift */; };
 		C040E5121F86107E00901EE4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E5111F86107E00901EE4 /* AppDelegate.swift */; };
 		C040E5141F86108900901EE4 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E5131F86108900901EE4 /* MainViewController.swift */; };
 		C04514881F85D7F500D88416 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04514871F85D7F500D88416 /* KeyboardViewController.swift */; };
@@ -65,13 +66,11 @@
 		C06D37441F81F5C400F61AE0 /* KeyboardNameTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C62121F67C31100268D03 /* KeyboardNameTableViewCell.swift */; };
 		C06D37451F81F5C400F61AE0 /* KMManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F273AB9815641EC500A47CEE /* KMManager.m */; };
 		C06D37461F81F5C400F61AE0 /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A5FF361F6682EB00BE740C /* PopoverView.swift */; };
-		C06D37471F81F5C400F61AE0 /* KMTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = F273AB9315641C3F00A47CEE /* KMTextField.m */; };
 		C06D37481F81F5C400F61AE0 /* KMTextFieldDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = F273ABA21564419700A47CEE /* KMTextFieldDelegateProxy.m */; };
 		C06D37491F81F5C400F61AE0 /* KMTextViewDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBD0DE1151EC30300D70779 /* KMTextViewDelegateProxy.m */; };
 		C06D374A1F81F5C400F61AE0 /* KMTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C0A1406151EA8B3007FA4AD /* KMTextView.m */; };
 		C06D374B1F81F5F400F61AE0 /* Keyman.h in Headers */ = {isa = PBXBuildFile; fileRef = F27FCB67157FFE0B00FBBA20 /* Keyman.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C06D374D1F81FFF900F61AE0 /* KMManager.h in Headers */ = {isa = PBXBuildFile; fileRef = F273AB9715641EC500A47CEE /* KMManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		C06D374E1F81FFF900F61AE0 /* KMTextField.h in Headers */ = {isa = PBXBuildFile; fileRef = F273AB9215641C3F00A47CEE /* KMTextField.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C06D374F1F81FFF900F61AE0 /* KMTextFieldDelegateProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = F273ABA11564419700A47CEE /* KMTextFieldDelegateProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C06D37521F82001100F61AE0 /* KMTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C0A1405151EA8B3007FA4AD /* KMTextView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C06D37531F82001100F61AE0 /* KMTextViewDelegateProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CBD0DE0151EC30300D70779 /* KMTextViewDelegateProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -188,6 +187,7 @@
 		98FFB3D31B67006F00289F0E /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardMenuView.swift; sourceTree = "<group>"; };
 		C040E50D1F85FF8A00901EE4 /* KeyPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPreviewView.swift; sourceTree = "<group>"; };
+		C040E50F1F8606E300901EE4 /* KeymanTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanTextField.swift; sourceTree = "<group>"; };
 		C040E5111F86107E00901EE4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C040E5131F86108900901EE4 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		C04514861F85D7F500D88416 /* SystemKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SystemKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -217,8 +217,6 @@
 		F26071FF158F8C6000F37184 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		F2607201158F8C9600F37184 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		F2607203158F8CA200F37184 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		F273AB9215641C3F00A47CEE /* KMTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = KMTextField.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		F273AB9315641C3F00A47CEE /* KMTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = KMTextField.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		F273AB9715641EC500A47CEE /* KMManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = KMManager.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		F273AB9815641EC500A47CEE /* KMManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = KMManager.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		F273AB9A15641F0E00A47CEE /* CWLSynthesizeSingleton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CWLSynthesizeSingleton.h; sourceTree = "<group>"; };
@@ -562,10 +560,9 @@
 		F273AB9E156440CD00A47CEE /* UITextField */ = {
 			isa = PBXGroup;
 			children = (
-				F273AB9215641C3F00A47CEE /* KMTextField.h */,
-				F273AB9315641C3F00A47CEE /* KMTextField.m */,
 				F273ABA11564419700A47CEE /* KMTextFieldDelegateProxy.h */,
 				F273ABA21564419700A47CEE /* KMTextFieldDelegateProxy.m */,
+				C040E50F1F8606E300901EE4 /* KeymanTextField.swift */,
 			);
 			name = UITextField;
 			sourceTree = "<group>";
@@ -633,7 +630,6 @@
 				C06D372F1F81F4E100F61AE0 /* KeymanEngine.h in Headers */,
 				C06D374B1F81F5F400F61AE0 /* Keyman.h in Headers */,
 				C06D374D1F81FFF900F61AE0 /* KMManager.h in Headers */,
-				C06D374E1F81FFF900F61AE0 /* KMTextField.h in Headers */,
 				C06D374F1F81FFF900F61AE0 /* KMTextFieldDelegateProxy.h in Headers */,
 				C06D37521F82001100F61AE0 /* KMTextView.h in Headers */,
 				C06D37531F82001100F61AE0 /* KMTextViewDelegateProxy.h in Headers */,
@@ -866,10 +862,10 @@
 				C06D37421F81F5C400F61AE0 /* KeyboardPickerButton.swift in Sources */,
 				C06D37431F81F5C400F61AE0 /* KeyboardPickerBarButtonItem.swift in Sources */,
 				C06D37441F81F5C400F61AE0 /* KeyboardNameTableViewCell.swift in Sources */,
+				C040E5101F8606E300901EE4 /* KeymanTextField.swift in Sources */,
 				C06D37451F81F5C400F61AE0 /* KMManager.m in Sources */,
 				C045148A1F85DF9100D88416 /* KeymanInputViewController.swift in Sources */,
 				C06D37461F81F5C400F61AE0 /* PopoverView.swift in Sources */,
-				C06D37471F81F5C400F61AE0 /* KMTextField.m in Sources */,
 				C06D37481F81F5C400F61AE0 /* KMTextFieldDelegateProxy.m in Sources */,
 				C06D37491F81F5C400F61AE0 /* KMTextViewDelegateProxy.m in Sources */,
 				C06D374A1F81F5C400F61AE0 /* KMTextView.m in Sources */,

@@ -12,7 +12,7 @@ import QuartzCore
 
 class MainViewController: UIViewController, UIAlertViewDelegate, KMTextViewDelegate, KMTextFieldDelegate {
   var textView1: KMTextView!
-  var textView2: KMTextField!
+  var textView2: KeymanTextField!
   var textView3: UITextView!
 
   deinit {
@@ -90,7 +90,7 @@ class MainViewController: UIViewController, UIAlertViewDelegate, KMTextViewDeleg
 
     // Text Views/Fields
     textView1 = KMTextView()
-    textView2 = KMTextField()
+    textView2 = KeymanTextField()
     textView3 = UITextView()
     setTextViewStyle(textView1)
     setTextFieldStyle(textView2)
