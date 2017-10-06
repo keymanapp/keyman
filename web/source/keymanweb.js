@@ -1346,12 +1346,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param {string|Object} x keyboard name string or keyboard metadata JSON object
      * 
      */  
-    keymanweb['addKeyboards'] = function(x)
-    {                       
-    if(arguments.length == 0)
-      keymanweb.keymanCloudRequest('',false);
-    else
-      keymanweb.addKeyboardArray(arguments);
+    keymanweb['addKeyboards'] = function(x) {                       
+      if(arguments.length == 0) {
+        keymanweb.keymanCloudRequest('',false);
+      } else {
+        keymanweb.addKeyboardArray(arguments);
+      }
     }
     
     /**
@@ -1360,24 +1360,25 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param {string|Object} x keyboard name string or keyboard metadata JSON object
      * 
      */  
-    keymanweb.addKeyboardArray = function(x)
-    {
+    keymanweb.addKeyboardArray = function(x) {
       // Store all keyboard meta-data for registering later if called before initialization
-      if(!keymanweb['initialized']) 
-      {
-        for(var k=0; k<x.length; k++)
-          keymanweb.deferredStubs.push(x[k]); 
-        return; 
+      if(!keymanweb['initialized']) {
+        for(var k=0; k<x.length; k++) {
+          keymanweb.deferredStubs.push(x[k]);
+        }
+        return;
       }
   
       // Ignore empty array passed as argument
-      if(x.length == 0) return;
+      if(x.length == 0) {
+        return;
+      }
     
       // Create a temporary array of metadata objects from the arguments used
-      var i,j,kp,kbid,lgid,kvid,cmd='',comma='';      
-      keymanweb.cloudList=[];  
+      var i,j,kp,kbid,lgid,kvid,cmd='',comma='';
+      keymanweb.cloudList=[];
 
-      /** 
+      /**
        * Function       isUniqueRequest
        * Scope          Private
        * @param         {object} 
@@ -1399,98 +1400,99 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         }
       };
 
-      for(i=0; i<x.length; i++)
-      {
-        if(typeof(x[i]) == 'string' && x[i].length > 0) 
-        {  
+      for(i=0; i<x.length; i++) {
+        if(typeof(x[i]) == 'string' && x[i].length > 0) {
           var pList=x[i].split('@'),lList=[''],tEntry;
-          if(pList[0].toLowerCase() == 'english') pList[0] = 'us';
-          if(pList.length > 1)
-          {
+          if(pList[0].toLowerCase() == 'english') {
+            pList[0] = 'us';
+          }
+
+          if(pList.length > 1) {
             lList=pList[1].split(',');
           }
-          for(j=0; j<lList.length; j++)
-          {
+
+          for(j=0; j<lList.length; j++) {
             tEntry={'id':pList[0]};
-            if(lList[j] != '') tEntry['language']=lList[j];
-            if(pList.length > 2) tEntry['version']=pList[2]; 
+            if(lList[j] != '') {
+              tEntry['language']=lList[j];
+            }
+            if(pList.length > 2) {
+              tEntry['version']=pList[2];
+            }
 
             // If we've already registered or requested a stub for this keyboard-language pairing,
             // don't bother with a cloud request.
             if(isUniqueRequest(tEntry)) {
-              keymanweb.cloudList.push(tEntry);        
+              keymanweb.cloudList.push(tEntry);
             }
           }
         }
-        if(typeof(x[i]) == 'object' && x[i] != null)
-        {               
-          // Register any local keyboards immediately: 
+        if(typeof(x[i]) == 'object' && x[i] != null) {
+          // Register any local keyboards immediately:
           // - must specify filename, keyboard name, language codes, region codes
           // - no request will be sent to cloud
-          if(typeof(x[i]['filename']) == 'string')
-          {                                                   
-            if(!keymanweb.addStub(x[i])) 
-              alert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');   
-          }
-          else
-          {
-            lList=x[i]['language'];   
+          if(typeof(x[i]['filename']) == 'string') {                                                   
+            if(!keymanweb.addStub(x[i])) {
+              alert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');
+            }
+          } else {
+            lList=x[i]['language'];
                 
             //Array or single entry?
             if(typeof(lList.length) == 'number') {
               for(j=0; j<lList.length; j++) {
                 var tEntry = {'id':x[i]['id'],'language':x[i]['language'][j]['id']};
                 if(isUniqueRequest(tEntry)) {
-                  keymanweb.cloudList.push(tEntry);        
+                  keymanweb.cloudList.push(tEntry);
                 }
               }
-            }
-            // Single language element
-            else
-            {
+            } else { // Single language element
               var tEntry = {'id':x[i]['id'],'language':x[i]['language'][j]['id']};
               if(isUniqueRequest(tEntry)) {
-                keymanweb.cloudList.push(tEntry);        
+                keymanweb.cloudList.push(tEntry);
               }
             }
-          }        
+          }
         }
-      }      
+      }
       
       // Return if all keyboards being registered are local and fully specified
-      if(keymanweb.cloudList.length == 0) return;
+      if(keymanweb.cloudList.length == 0) {
+        return;
+      }
 
       // Update the keyboard metadata list from keyman.com - build the command
-      cmd='&keyboardid=';      
-      for(i=0; i<keymanweb.cloudList.length; i++)
-      {                          
-      
+      cmd='&keyboardid=';
+      for(i=0; i<keymanweb.cloudList.length; i++) {      
         kp=keymanweb.cloudList[i];
         kbid=kp['id']; lgid=''; kvid='';  
-        if(typeof(kp['language']) == 'string' && kp['language'] != '') 
+        if(typeof(kp['language']) == 'string' && kp['language'] != '') {
           lgid=kp['language'];
-        if(typeof(kp['version']) == 'string' && kp['version'] != '')
-          kvid=kp['version'];
-        if(lgid != '') 
-        {
-          kbid=kbid+'@'+lgid;
-          if(kvid != '') kbid=kbid+'@'+kvid;
         }
-        else
-        {
-          if(kvid != '') kbid=kbid+'@@'+kvid;
+        if(typeof(kp['version']) == 'string' && kp['version'] != '') {
+          kvid=kp['version'];
+        }
+        if(lgid != '') {
+          kbid=kbid+'@'+lgid;
+          if(kvid != '') {
+            kbid=kbid+'@'+kvid;
+          }
+        } else {
+          if(kvid != '') {
+            kbid=kbid+'@@'+kvid;
+          }
         }
 
   //TODO: add specifier validation...        
                 
-        cmd=cmd+comma+kbid;                      
+        cmd=cmd+comma+kbid;
         comma=',';
       }  
-  
+      
       // Request keyboard metadata from the Keyman Cloud keyboard metadata server
-      keymanweb.keymanCloudRequest(cmd,false);   
+      keymanweb.keymanCloudRequest(cmd,false);
     }
-  
+
     /**
      *  Request keyboard metadata from the Keyman Cloud keyboard metadata server
      *   
