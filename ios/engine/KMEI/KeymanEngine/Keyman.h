@@ -9,5 +9,4 @@
 
 #import "KMManager.h"
 
-#import "KMTextView.h"
 #import "KMTextViewDelegateProxy.h"

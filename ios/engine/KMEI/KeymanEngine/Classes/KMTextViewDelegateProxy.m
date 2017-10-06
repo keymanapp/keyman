@@ -7,7 +7,7 @@
 //
 
 #import "KMTextViewDelegateProxy.h"
-#import "KMTextView.h"
+#import "KeymanEngine/KeymanEngine-Swift.h"
 
 @implementation KMTextViewDelegateProxy
 
@@ -22,7 +22,7 @@
 #pragma mark - UITextViewDelegate
 
 // NOTE: the return value from the textView's hook is ignored
-- (BOOL)textViewShouldBeginEditing:(KMTextView *)textView {
+- (BOOL)textViewShouldBeginEditing:(KeymanTextView *)textView {
 	if ([textView respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
 		[textView textViewShouldBeginEditing:textView];
 	}
@@ -33,7 +33,7 @@
 }
 
 // NOTE: the return value from the textView's hook is ignored
-- (BOOL)textViewShouldEndEditing:(KMTextView *)textView {
+- (BOOL)textViewShouldEndEditing:(KeymanTextView *)textView {
 	if ([textView respondsToSelector:@selector(textViewShouldEndEditing:)]) {
 		[textView textViewShouldEndEditing:textView];
 	}
@@ -44,7 +44,7 @@
 	return YES;
 }
 
-- (void)textViewDidBeginEditing:(KMTextView *)textView {
+- (void)textViewDidBeginEditing:(KeymanTextView *)textView {
 	if ([textView respondsToSelector:@selector(textViewDidBeginEditing:)]) {
 		[textView textViewDidBeginEditing:textView];
 	}
@@ -53,7 +53,7 @@
 	}
 }
 
-- (void)textViewDidEndEditing:(KMTextView *)textView {
+- (void)textViewDidEndEditing:(KeymanTextView *)textView {
 	if ([textView respondsToSelector:@selector(textViewDidEndEditing:)]) {
 		[textView textViewDidEndEditing:textView];
 	}
@@ -63,7 +63,7 @@
 }
 
 // NOTE: the return value from the textView's hook is ignored
-- (BOOL)textView:(KMTextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+- (BOOL)textView:(KeymanTextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
 	if ([textView respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementText:)]) {
 		[textView textView:textView shouldChangeTextInRange:range replacementText:text];
 	}
@@ -74,7 +74,7 @@
 	return YES;
 }
 
-- (void)textViewDidChange:(KMTextView *)textView {
+- (void)textViewDidChange:(KeymanTextView *)textView {
 	if ([textView respondsToSelector:@selector(textViewDidChange:)]) {
 		[textView textViewDidChange:textView];
 	}
@@ -83,7 +83,7 @@
 	}
 }
 
-- (void)textViewDidChangeSelection:(KMTextView *)textView {
+- (void)textViewDidChangeSelection:(KeymanTextView *)textView {
 	if ([textView respondsToSelector:@selector(textViewDidChangeSelection:)]) {
 		[textView textViewDidChangeSelection:textView];
 	}

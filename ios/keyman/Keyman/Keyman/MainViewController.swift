@@ -29,7 +29,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
   private let activityIndicatorViewTag = 6573
   private let dropDownListTag = 686876
 
-  var textView: KMTextView!
+  var textView: KeymanTextView!
   var textSize: CGFloat = 0.0
 
   private var getStartedVC: GetStartedViewController!
@@ -189,7 +189,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
 
     // Setup Keyman TextView
     textSize = 16.0
-    textView = KMTextView(frame: screenRect)
+    textView = KeymanTextView(frame: screenRect)
     textView.setKeymanDelegate(self)
     textView.viewController = self
     textView.backgroundColor = bgColor

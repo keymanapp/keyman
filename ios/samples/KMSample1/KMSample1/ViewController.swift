@@ -9,7 +9,7 @@ import KeymanEngine
 import UIKit
 
 class ViewController: UIViewController, KMTextViewDelegate {
-  @IBOutlet var textView: KMTextView!
+  @IBOutlet var textView: KeymanTextView!
 
   override func viewDidLoad() {
     super.viewDidLoad()

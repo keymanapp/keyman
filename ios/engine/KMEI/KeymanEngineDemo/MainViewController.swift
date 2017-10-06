@@ -11,7 +11,7 @@ import UIKit
 import QuartzCore
 
 class MainViewController: UIViewController, UIAlertViewDelegate, KMTextViewDelegate, KeymanTextFieldDelegate {
-  var textView1: KMTextView!
+  var textView1: KeymanTextView!
   var textView2: KeymanTextField!
   var textView3: UITextView!
 
@@ -89,7 +89,7 @@ class MainViewController: UIViewController, UIAlertViewDelegate, KMTextViewDeleg
     contentView.addSubview(normalLabel)
 
     // Text Views/Fields
-    textView1 = KMTextView()
+    textView1 = KeymanTextView()
     textView2 = KeymanTextField()
     textView3 = UITextView()
     setTextViewStyle(textView1)
