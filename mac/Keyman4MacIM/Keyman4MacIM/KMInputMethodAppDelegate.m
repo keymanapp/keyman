@@ -59,12 +59,11 @@ typedef enum {
 @synthesize activeKeyboards = _activeKeyboards;
 @synthesize contextBuffer = _contextBuffer;
 @synthesize alwaysShowOSK = _alwaysShowOSK;
-@synthesize useNullChar = _useNullChar;
 
 - (id)init {
     self = [super init];
     if (self) {
-        // _debugMode = YES; // Disable before release
+        _debugMode = YES; // Disable before release
         [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
                                                            andSelector:@selector(handleURLEvent:withReplyEvent:)
                                                          forEventClass:kInternetEventClass
@@ -535,25 +534,6 @@ typedef enum {
     if (_contextBuffer.length)
         [_contextBuffer replaceOccurrencesOfString:@"\0" withString:[NSString nullChar] options:0 range:NSMakeRange(0, 1)];
     [self.kme setContextBuffer:self.contextBuffer];
-}
-
-- (void)setUseNullChar:(BOOL)useNullChar {
-    _useNullChar = YES;
-    /*
-    _useNullChar = useNullChar;
-    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    [userData setBool:_useNullChar forKey:@"KMUseNullCharKey"];
-    [userData synchronize];
-    */
-}
-
-- (BOOL)useNullChar {
-    return YES;
-    /*
-    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    _useNullChar = [userData boolForKey:@"KMUseNullCharKey"];
-    return _useNullChar;
-    */
 }
 
 - (void)awakeFromNib {
