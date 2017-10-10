@@ -31,14 +31,24 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
     // Add a custom keyboard
     HashMap<String, String> kbInfo = new HashMap<String, String>();
-    final String Chirality_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
-    
+    final String KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
+
+    // Chirality test keyboard
     kbInfo.put(KMManager.KMKey_KeyboardID, "chirality");
     kbInfo.put(KMManager.KMKey_LanguageID, "eng");
     kbInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
     kbInfo.put(KMManager.KMKey_LanguageName, "English");
     kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
-    kbInfo.put(KMManager.KMKey_Font, Chirality_KeyboardFont);
+    kbInfo.put(KMManager.KMKey_Font, KeyboardFont);
+    KMManager.addKeyboard(this, kbInfo);
+
+    // Longpress name/text test keyboard
+    kbInfo.put(KMManager.KMKey_KeyboardID, "longpress");
+    kbInfo.put(KMManager.KMKey_LanguageID, "eng");
+    kbInfo.put(KMManager.KMKey_KeyboardName, "Test Longpress");
+    kbInfo.put(KMManager.KMKey_LanguageName, "English");
+    kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
+    kbInfo.put(KMManager.KMKey_Font, KeyboardFont);
     KMManager.addKeyboard(this, kbInfo);
   }
 

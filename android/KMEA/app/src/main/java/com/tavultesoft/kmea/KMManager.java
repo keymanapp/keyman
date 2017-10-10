@@ -1986,15 +1986,7 @@ public final class KMManager {
 
         start = url.indexOf("t=") + 2;
         String t = url.substring(start);
-        String text = "";
-        String[] values = t.split("\\,");
-        int length = values.length;
-        for (int i = 0; i < length; i++) {
-          if (values[i].startsWith("0x")) {
-            int c = Integer.parseInt(values[i].substring(2), 16);
-            text += String.valueOf((char) c);
-          }
-        }
+        String text = InAppKeyboard.convertKeyText(t);
 
         float left = x - w / 2.0f;
         float right = left + w;
@@ -2030,19 +2022,8 @@ public final class KMManager {
         InAppKeyboard.subKeysList = new ArrayList<HashMap<String, String>>();
         for (int i = 0; i < klCount; i++) {
           String[] values = keyList[i].split("\\:");
-          String keyId = "";
-          String keyText = "";
-          if (values.length == 2) {
-            keyId = values[0];
-            keyText = values[1];
-          } else if (values.length == 1) {
-            keyId = values[0];
-            keyText = values[0];
-            int index = keyText.indexOf("-");
-            if (index >= 0) {
-              keyText = keyText.substring(index + 1);
-            }
-          }
+          String keyId = (values.length > 0) ? values[0] : "";
+          String keyText = (values.length > 1) ? values[1] : "";
 
           HashMap<String, String> hashMap = new HashMap<String, String>();
           hashMap.put("keyId", keyId);
@@ -2177,15 +2158,7 @@ public final class KMManager {
 
         start = url.indexOf("t=") + 2;
         String t = url.substring(start);
-        String text = "";
-        String[] values = t.split("\\,");
-        int length = values.length;
-        for (int i = 0; i < length; i++) {
-          if (values[i].startsWith("0x")) {
-            int c = Integer.parseInt(values[i].substring(2), 16);
-            text += String.valueOf((char) c);
-          }
-        }
+        String text = SystemKeyboard.convertKeyText(t);
 
         float left = x - w / 2.0f;
         float right = left + w;
@@ -2221,18 +2194,8 @@ public final class KMManager {
         SystemKeyboard.subKeysList = new ArrayList<HashMap<String, String>>();
         for (int i = 0; i < klCount; i++) {
           String[] values = keyList[i].split("\\:");
-          String keyId = "";
-          String keyText = "";
-          if (values.length == 2) {
-            keyId = values[0];
-            keyText = values[1];
-          } else if (values.length == 1) {
-            keyId = values[0];
-            keyText = values[0];
-            int index = keyText.indexOf("-");
-            if (index >= 0)
-              keyText = keyText.substring(index + 1);
-          }
+          String keyId = (values.length > 0) ? values[0] : "";
+          String keyText = (values.length > 1) ? values[1] : "";
 
           HashMap<String, String> hashMap = new HashMap<String, String>();
           hashMap.put("keyId", keyId);

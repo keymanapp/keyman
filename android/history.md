@@ -1,6 +1,7 @@
 # Keyman for Android
 
 ## 10.0 alpha
+* Refactor longpress text when it comes from the key Id. Fixes touch layout crash when K_SPACE is a longpress
 * Added support for L/R Alt and Ctrl and Caps Lock modifiers for keyboards if specified by a keyboard designer
 * Add feature to reset keyboard to default layer when new input field focused (keymanapp/keyman#288)
 * Removed "Share to Facebook" feature (keymanapp/keyman#156)
