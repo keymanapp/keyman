@@ -12,7 +12,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
   (function() 
   {
-    var keymanweb=tavultesoft['keymanweb'],util=keymanweb['util'];
+    var keymanweb=tavultesoft['keymanweb'],util=keymanweb['util'],interface=keymanweb['interface'];
     
     keymanweb._LogDebug = true; //false; // typeof(debug) == 'undefined' ? true : debug;
     if(util.device.formFactor == 'phone')return; // I3363 (Build 301)
@@ -168,7 +168,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         {
           if(keymanweb._DeadKeys[Li].p > Lp) Lp = keymanweb._DeadKeys[Li].p;
         }
-        Ls = keymanweb.KC(Lp+1, Lp+1, Pelem); Lt = '<span style="font-size: 12pt">';
+        Ls = interface.context(Lp+1, Lp+1, Pelem); Lt = '<span style="font-size: 12pt">';
         if(Ls !== false && Ls._kmwLength() > Lp)  //I3319
         {
           /* We want to show the previous character in the context */
@@ -219,7 +219,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         if(keymanweb._DeadKeys[Li].p > Lp) Lp = keymanweb._DeadKeys[Li].p;
       }
 
-      var Ls = keymanweb.KC(Lp, Lp, Pelem);
+      var Ls = interface.context(Lp, Lp, Pelem);
       Lt = keymanweb._DebugDepth + ' &nbsp; Context='+Ls+'<br>';
       
       for(Li = 0; Li < keymanweb._DeadKeys.length; Li++)

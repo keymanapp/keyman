@@ -79,6 +79,7 @@ if(!tavultesoft['keymanweb']) {
     var util = keymanweb['util'] = {};
     var osk = keymanweb['osk'] = {ready:false};
     var ui = keymanweb['ui'] = {};
+    var interface = keymanweb['interface'] = {};
 
     // Stub functions (defined later in code only if required)
     keymanweb.setDefaultDeviceOptions = function(opt){}     

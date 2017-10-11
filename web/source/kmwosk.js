@@ -959,7 +959,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           switch(keyName)
           {
             case 'K_BKSP':  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-              keymanweb.KO(1,keymanweb._LastActiveElement,"");
+              interface.output(1,keymanweb._LastActiveElement,"");
               break;
             case 'K_TAB':
               var bBack=(osk.layerId == 'shift');
@@ -974,7 +974,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             case 'K_ENTER':
               // Insert new line in text area fields
               if(Lelem.nodeName == 'TEXTAREA' || (typeof Lelem.base != 'undefined' && Lelem.base.nodeName == 'TEXTAREA'))
-                keymanweb.KO(0, Lelem, '\n');
+                interface.output(0, Lelem, '\n');
               // Or move to next field from TEXT fields
               else
               {
@@ -990,7 +990,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
               }
               break;
             case 'K_SPACE':
-              keymanweb.KO(0, Lelem, ' ');
+              interface.output(0, Lelem, ' ');
               break;
             case 'K_CAPS':
             case 'K_NUMLOCK':
@@ -1001,7 +1001,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             default:
               // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
               var ch = osk.defaultKeyOutput(keyName,Lkc.Lcode,keyShiftState);
-              if(ch)keymanweb.KO(0, Lelem, ch);
+              if(ch) {
+                interface.output(0, Lelem, ch);
+              }
           }
         }
 
@@ -2391,12 +2393,13 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       // Get nearest key if touching a hidden key or the end of a key row
       if((key && (key.className.indexOf('key-hidden') >= 0))
-        || t.className.indexOf('kmw-key-row') >= 0)
-      {
+        || t.className.indexOf('kmw-key-row') >= 0) {
         key = osk.findNearestKey(e,t);
       }
       // Do not do anything if no key identified!
-      if(key == null) return;
+      if(key == null) {
+        return;
+      }
 
       // Get key name (K_...) from element ID
       var keyIdComponents = key.id.split('-');
@@ -2412,25 +2415,19 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         osk.keyPending = null;
       }
       // Also backspace, to allow delete to repeat while key held
-      else if(keyName == 'K_BKSP')
-      {
-        keymanweb.KO(1,keymanweb._LastActiveElement,"");
+      else if(keyName == 'K_BKSP') {
+        keymanweb.interface(1,keymanweb._LastActiveElement,"");
         osk.deleting = window.setTimeout(osk.repeatDelete,500);
         osk.keyPending = null;
-      }
-      else
-      {
-        if(osk.keyPending)
-        {
+      } else {
+        if(osk.keyPending) {
           osk.highlightKey(osk.keyPending,false);
           osk.clickKey(osk.keyPending);
           osk.clearPopup();
           // Decrement the number of unreleased touch points to prevent
           // sending the keystroke again when the key is actually released
           osk.touchCount--;
-        }
-        else
-        {
+        } else {
           // If this key has subkey, start timer to display subkeys after delay, set up release
           osk.touchHold(key);
           //if(key.subKeys != null) osk.subkeyDelayTimer=window.setTimeout(function(){osk.showSubKeys(key);},osk.popupDelay);
@@ -2724,11 +2721,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     /**
      *  Repeat backspace as long as the backspace key is held down
      **/
-    osk.repeatDelete = function()
-    {
-      if(osk.deleting)
-      {
-        keymanweb.KO(1,keymanweb._LastActiveElement,"");
+    osk.repeatDelete = function() {
+      if(osk.deleting) {
+        interface.output(1,keymanweb._LastActiveElement,"");
         osk.deleting = window.setTimeout(osk.repeatDelete,100);
       }
     }

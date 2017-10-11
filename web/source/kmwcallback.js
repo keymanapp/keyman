@@ -6,14 +6,10 @@
 // KMW system, so we use the fact that 'initialized' is only 1 / true after all scripts are loaded for the initial
 // load of KMW.
 if(!window['tavultesoft']['keymanweb']['initialized']) { 
-  (function() 
-  {    
-    // Define the keyboard interface object.
-    window['KeymanWeb'] = {};
-
+  (function() {    
     // Declare KeymanWeb and util objects
-    var keymanweb=window['tavultesoft']['keymanweb'], util=keymanweb['util'], 
-      osk=keymanweb['osk'],device=util.device,dbg=keymanweb.debug;     //osk defined here, build 350
+    var keymanweb=window['tavultesoft']['keymanweb'], interface=window['KeymanWeb']=keymanweb['interface'],
+      util=keymanweb['util'], osk=keymanweb['osk'],device=util.device,dbg=keymanweb.debug; //osk defined here, build 350
     
     keymanweb.TSS_LAYER = 33;
     keymanweb.TSS_PLATFORM = 31;
@@ -26,8 +22,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Scope        Public
      * Description  Save keyboard focus
      */    
-    KeymanWeb['KSF'] = keymanweb.KSF = function()     // KeyboardSaveFocus
-    {
+    KeymanWeb['KSF'] = interface['saveFocus'] = interface.saveFocus = function() {
       keymanweb._IgnoreNextSelChange = 1;
     }
       
@@ -39,76 +34,79 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}               true if inserted
      * Description  Insert text into active control
      */    
-    KeymanWeb['KT'] = keymanweb.KT = function(Ptext,PdeadKey)  // KeyboardInsertText
-    {
+    KeymanWeb['KT'] = interface['insertText'] = interface.insertText = function(Ptext,PdeadKey) {
       keymanweb.cachedContext.reset();
-      //_DebugEnter('InsertText');  
+      //_DebugEnter('InsertText');
       var Lelem = keymanweb._LastActiveElement, Ls, Le, Lkc, Lsel, Lv=false;
-      if(Lelem != null)
-      {
+      if(Lelem != null) {
         Ls=Lelem._KeymanWebSelectionStart;
         Le=Lelem._KeymanWebSelectionEnd;
         Lsel=keymanweb._Selection;
-        //if(!Lsel || Lsel.parentElement() == Lelem)  // I1506
-        //{
-          keymanweb._IsActivatingKeymanWebUI = 1;
-          keymanweb._IgnoreNextSelChange = 100;
-          keymanweb._FocusLastActiveElement();
-          if(keymanweb._IsMozillaEditableIframe(Lelem,0)) Lelem = Lelem.documentElement;  // I3363 (Build 301)
-          if(document.selection  &&  Lsel != null) Lsel.select();
-          Lelem._KeymanWebSelectionStart=Ls;
-          Lelem._KeymanWebSelectionEnd=Le;
-          keymanweb._IgnoreNextSelChange = 0;
-          if(Ptext!=null)keymanweb.KO(0, Lelem, Ptext);
-          if((typeof(PdeadKey)!=='undefined') && (PdeadKey !== null)) keymanweb.KDO(0, Lelem, PdeadKey);
-          Lelem._KeymanWebSelectionStart=null;
-          Lelem._KeymanWebSelectionEnd=null;
-          Lv=true;
-        //}
+
+        keymanweb._IsActivatingKeymanWebUI = 1;
+        keymanweb._IgnoreNextSelChange = 100;
+        keymanweb._FocusLastActiveElement();
+        if(keymanweb._IsMozillaEditableIframe(Lelem,0)) {
+          Lelem = Lelem.documentElement;  // I3363 (Build 301)
+        }
+        if(document.selection  &&  Lsel != null) {
+          Lsel.select();
+        }
+        Lelem._KeymanWebSelectionStart=Ls;
+        Lelem._KeymanWebSelectionEnd=Le;
+        keymanweb._IgnoreNextSelChange = 0;
+        if(Ptext!=null) {
+          interface.output(0, Lelem, Ptext);
+        }
+        if((typeof(PdeadKey)!=='undefined') && (PdeadKey !== null)) {
+          interface.deadkeyOutput(0, Lelem, PdeadKey);
+        }
+        Lelem._KeymanWebSelectionStart=null;
+        Lelem._KeymanWebSelectionEnd=null;
+        Lv=true;
       }
       //_DebugExit('InsertText');
       return Lv;
     }
     
     /**
-     * Function     KR                    
+     * Function     registerKeyboard  KR                    
      * Scope        Public
      * @param       {Object}      Pk      Keyboard  object
      * Description  Register and load the keyboard
      */    
-    KeymanWeb['KR'] = keymanweb.KR = function(Pk)
-    {
+    KeymanWeb['KR'] = interface['registerKeyboard'] = interface.registerKeyboard = function(Pk) {
       // If initialization not yet complete, list the keyboard to be registered on completion of initialization
-      if(!keymanweb['initialized'])
-      {          
+      if(!keymanweb['initialized']) {
         keymanweb.deferredKR.push(Pk); return;
       }
       
       var Li,Lstub;
 
       // Check if the active stub refers to this keyboard, else find applicable stub
-      var Ps=keymanweb._ActiveStub;     
-      if(!Ps || !('KI' in Ps) || (Ps['KI'] != Pk['KI']))
-      {             
+      var Ps=keymanweb._ActiveStub;
+      if(!Ps || !('KI' in Ps) || (Ps['KI'] != Pk['KI'])) {
         // Find the first stub for this keyboard
-        for(Lstub=0;Lstub < keymanweb._KeyboardStubs.length; Lstub++)  // I1511 - array prototype extended
-        {  
+        for(Lstub=0;Lstub < keymanweb._KeyboardStubs.length; Lstub++) { // I1511 - array prototype extended
           Ps=keymanweb._KeyboardStubs[Lstub];
-          if(Pk['KI'] == Ps['KI'])break;        
+          if(Pk['KI'] == Ps['KI'])break;
           Ps=null;
         }
       } 
       
       // Build 369: ensure active stub defined when loading local keyboards 
-      if(keymanweb._ActiveStub == null && Ps != null) keymanweb._ActiveStub = Ps;  
+      if(keymanweb._ActiveStub == null && Ps != null) {
+        keymanweb._ActiveStub = Ps;
+      }
       
       // Register the stub for this language (unless it is already registered)
       // keymanweb.KRS(Ps?Ps:Pk); 
 
       // Test if keyboard already loaded
-      for(Li=0; Li<keymanweb._Keyboards.length; Li++)
-      {
-        if(Pk['KI'] == keymanweb._Keyboards[Li]['KI']) return;
+      for(Li=0; Li<keymanweb._Keyboards.length; Li++) {
+        if(Pk['KI'] == keymanweb._Keyboards[Li]['KI']) {
+          return;
+        }
       }
     
       // Append to keyboards array
@@ -128,60 +126,41 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {?number}               1 if already registered, else null
      */    
   //var ts0=new Date().toTimeString().substr(3,5);
-    KeymanWeb['KRS'] = keymanweb.KRS = function(Pstub)   
-    {
+    KeymanWeb['KRS'] = interface['registerStub'] = interface.registerStub = function(Pstub) {
       var Lk;
       
       // In initialization not complete, list the stub to be registered on completion of initialization
-      if(!keymanweb['initialized'])
-      {
-        keymanweb.deferredKRS.push(Pstub); 
+      if(!keymanweb['initialized']) {
+        keymanweb.deferredKRS.push(Pstub);
         return null;
       }
 
       // The default stub is always the first keyboard stub loaded [and will be ignored by desktop browsers - not for beta, anyway]
-      if(keymanweb.dfltStub == null)
-      {
+      if(keymanweb.dfltStub == null) {
         keymanweb.dfltStub=Pstub;
         //if(device.formFactor == 'desktop') return 1;    //Needs further thought before release
       }
 
       // If no language code has been defined, and no stub has been registered for this keyboard, register with empty string as the language code
-      if(typeof(Pstub['KLC']) == 'undefined') Pstub['KLC'] = '';
-      if(typeof(Pstub['KL']) == 'undefined')  Pstub['KL'] = 'undefined';
+      if(typeof(Pstub['KLC']) == 'undefined') {
+        Pstub['KLC'] = '';
+      }
+      if(typeof(Pstub['KL']) == 'undefined') {
+        Pstub['KL'] = 'undefined';
+      }
 
       // If language code already defined (or not specified in stub), check to see if stub already registered
-      for(Lk=0; Lk<keymanweb._KeyboardStubs.length; Lk++)
-      {
-        if(keymanweb._KeyboardStubs[Lk]['KI'] == Pstub['KI'])
-        {
-          if(Pstub['KLC'] == '' || (keymanweb._KeyboardStubs[Lk]['KLC'] == Pstub['KLC'])) return 1; // no need to register
+      for(Lk=0; Lk<keymanweb._KeyboardStubs.length; Lk++) {
+        if(keymanweb._KeyboardStubs[Lk]['KI'] == Pstub['KI']) {
+          if(Pstub['KLC'] == '' || (keymanweb._KeyboardStubs[Lk]['KLC'] == Pstub['KLC'])) {
+            return 1; // no need to register
+          }
         }
       }
     
       // Register stub (add to KeyboardStubs array)
       keymanweb._KeyboardStubs=keymanweb._push(keymanweb._KeyboardStubs,Pstub);
-  /*    
-      // Sort stub array so that English is always first
-      if(keymanweb._KeyboardStubs.length > 1) keymanweb._KeyboardStubs.sort(function(a,b){
-        var ax,bx;
-        switch(a['KLC'])
-        {
-          case 'eng': ax=0; break;
-          case 'fra': ax=1; break;
-          case 'deu': ax=2; break;
-          default: ax=10; break;
-        }
-        switch(b['KLC'])
-        {
-          case 'eng': bx=0; break;
-          case 'fra': bx=1; break;
-          case 'deu': bx=2; break;
-          default: bx=10; break;
-        }
-        return ax-bx;
-        });
-  */
+
       // TODO: Need to distinguish between initial loading of a large number of stubs and any subsequent loading.
       //   UI initialization should not be needed for each registration, only at end.
       // Reload this keyboard if it was the last active keyboard and 
@@ -206,18 +185,19 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
      */    
     
-    KeymanWeb['KC'] = keymanweb.KC = function(n, ln, Pelem)
-    {
+    KeymanWeb['KC'] = interface['context'] = interface.context = function(n, ln, Pelem) {
       var v = keymanweb.cachedContext.get(n, ln);
-      if(v !== null) return v;
+      if(v !== null) {
+        return v;
+      }
       
-      var r = keymanweb.KC_(n, ln, Pelem); 
+      var r = keymanweb.KC_(n, ln, Pelem);
       keymanweb.cachedContext.set(n, ln, r);
       return r;
     }
     
     /**
-     * Function     KN    
+     * Function     nul           KN    
      * Scope        Public
      * @param       {number}      n       Length of context to check
      * @param       {Object}      Ptarg   Element to work with (must be currently focused element)
@@ -229,9 +209,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *             KN(2,Pelem) == FALSE
      *             KN(4,Pelem) == TRUE
      */    
-    KeymanWeb['KN'] = keymanweb.KN = function(n, Ptarg)    // KeyboardNul
-    {
-      var cx=this.KC(n+1, 1, Ptarg);
+    KeymanWeb['KN'] = interface['nul'] = interface.nul = function(n, Ptarg) {
+      var cx=interface.context(n+1, 1, Ptarg);
       if(cx === false) {
         // It appears that this can no longer be returned with KMW so probably should be removed
         // after testing
@@ -243,7 +222,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
 
     /**
-     * Function     KCM   
+     * Function     contextMatch  KCM   
      * Scope        Public
      * @param       {number}      n       Number of characters to move back from caret
      * @param       {Object}      Ptarg   Focused element
@@ -252,12 +231,13 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}             True if selected context matches val
      * Description  Test keyboard context for match
      */    
-    KeymanWeb['KCM'] = keymanweb.KCM = function(n, Ptarg, val, ln)  // Keyboard_ContextMatch 
-    {             
-      //KeymanWeb._Debug('KeymanWeb.KCM(n='+n+', Ptarg, val='+val+', ln='+ln+'): return '+(this.KC(n,ln,Ptarg)==val)); 
-      var cx=this.KC(n, ln, Ptarg);
-      if(cx !== false && cx === val) return true; // I3318
-      keymanweb._DeadkeyResetMatched();                // I3318
+    KeymanWeb['KCM'] = interface['contextMatch'] = interface.contextMatch = function(n, Ptarg, val, ln) {
+      //KeymanWeb._Debug('KeymanWeb.KCM(n='+n+', Ptarg, val='+val+', ln='+ln+'): return '+(interface.context(n,ln,Ptarg)==val)); 
+      var cx=interface.context(n, ln, Ptarg);
+      if(cx !== false && cx === val) {
+        return true; // I3318
+      }
+      keymanweb._DeadkeyResetMatched(); // I3318
       return false;
     }
 
@@ -268,19 +248,16 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}     true if keypress event
      * Description  Test if event as a keypress event
      */    
-    KeymanWeb['KIK'] = keymanweb.KIK = function(e)          // Keyboard_IsKeypress 
-    {                      
-      if(keymanweb._ActiveKeyboard['KM'])    // I1380 - support KIK for positional layouts
+    KeymanWeb['KIK'] = interface['isKeypress'] = interface.isKeypress = function(e) {
+      if(keymanweb._ActiveKeyboard['KM']) {   // I1380 - support KIK for positional layouts
         return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
-      else  
+      } else {
         return keymanweb._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts
-      //if(e.charCode != 0) != null)
-      // return e.charCode != 0;
-      //return e.type == 'keypress';
+      }
     }
     
     /**
-     * Function     KKM      
+     * Function     keyMatch      KKM      
      * Scope        Public
      * @param       {Object}      e           keystroke event
      * @param       {number}      Lruleshift
@@ -288,57 +265,57 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}                 True if key matches rule
      * Description  Test keystroke with modifiers against rule
      */    
-    KeymanWeb['KKM'] = keymanweb.KKM = function(e,Lruleshift,Lrulekey)  // Keyboard_KeyMatch 
-    { 
+    KeymanWeb['KKM'] = interface['keyMatch'] = interface.keyMatch = function(e,Lruleshift,Lrulekey) {
       var retVal = 0; // I3318
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
       var bitmask = keymanweb.getKeyboardModifierBitmask();
 
-      if(e.vkCode > 255) keyCode = e.vkCode;           // added to support extended (touch-hold) keys for mnemonic layouts
+      if(e.vkCode > 255) {
+        keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
+      }
         
-      if(e.LisVirtualKey || keyCode > 255)
-      {
-        if((Lruleshift & 0x4000) == 0x4000 || (keyCode > 255))  // added keyCode test to support extended keys
-        {
-          retVal = ((Lrulekey == keyCode)  &&  ((Lruleshift & bitmask) == e.Lmodifiers)); //I3318, I3555
+      if(e.LisVirtualKey || keyCode > 255) {
+        if((Lruleshift & 0x4000) == 0x4000 || (keyCode > 255)) { // added keyCode test to support extended keys
+          retVal = ((Lrulekey == keyCode) && ((Lruleshift & bitmask) == e.Lmodifiers)); //I3318, I3555
         }
+      } else if((Lruleshift & 0x4000) == 0) {
+        retVal = (keyCode == Lrulekey); // I3318, I3555
       }
-      else if((Lruleshift & 0x4000) == 0)
-      {
-        retVal = (keyCode == Lrulekey);         // I3318, I3555
+      if(!retVal) {
+        keymanweb._DeadkeyResetMatched();  // I3318
       }
-      if(!retVal) keymanweb._DeadkeyResetMatched();  // I3318
-      return retVal != 0;                            // I3318
+      return retVal != 0; // I3318
     };
 
     /**
-     * Function     KSM
+     * Function     stateMatch    KSM
      * Scope        Public
      * @param       {Object}      e       keystroke event
      * @param       {number}      Lstate  
      * Description  Test keystroke against state key rules
      */
-    KeymanWeb['KSM'] = keymanweb.KSM = function(e, Lstate) { // Keyboard_StateMatch
+    KeymanWeb['KSM'] = interface['stateMatch'] = interface.stateMatch = function(e, Lstate) {
       return ((Lstate & e.Lstates) == Lstate);
     }
 
     /**
-     * Function     KKI      
+     * Function     keyInformation  KKI
      * Scope        Public
      * @param       {Object}      e
      * @return      {Object}              Object with event's virtual key flag, key code, and modifiers
      * Description  Get object with extended key event information
      */    
-    KeymanWeb['KKI'] = keymanweb.KKI = function(e)
-    {
+    KeymanWeb['KKI'] = interface['keyInformation'] = interface.keyInformation = function(e) {
       var ei = {};
-      ei['vk'] = e.LisVirtualKey; ei['code'] = e.Lcode; ei['modifiers'] = e.Lmodifiers;
+      ei['vk'] = e.LisVirtualKey;
+      ei['code'] = e.Lcode;
+      ei['modifiers'] = e.Lmodifiers;
       return ei;
     };
     
     /**
-     * Function     KDM      
+     * Function     deadkeyMatch  KDM      
      * Scope        Public
      * @param       {number}      n       current cursor position
      * @param       {Object}      Ptarg   target element
@@ -346,70 +323,74 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}             True if deadkey found selected context matches val
      * Description  Match deadkey at current cursor position
      */    
-    KeymanWeb['KDM'] = keymanweb.KDM = function(n, Ptarg, d)
-    {                              
-      if(keymanweb._DeadKeys.length == 0) return false; // I3318  
-    
-      var sp=keymanweb._SelPos(Ptarg); 
-      n = sp - n;   
-      for(var i = 0; i < keymanweb._DeadKeys.length; i++)
+    KeymanWeb['KDM'] = interface['deadkeyMatch'] = interface.deadkeyMatch = function(n, Ptarg, d) {
+      if(keymanweb._DeadKeys.length == 0) {
+        return false; // I3318
+      }
+
+      var sp=keymanweb._SelPos(Ptarg);
+      n = sp - n;
+      for(var i = 0; i < keymanweb._DeadKeys.length; i++) {
         if(keymanweb._DeadKeys[i].p == n  &&  keymanweb._DeadKeys[i].d == d) {
-          keymanweb._DeadKeys[i].matched = 1; return true; // I3318        
+          keymanweb._DeadKeys[i].matched = 1;
+          return true; // I3318
         }
-      keymanweb._DeadkeyResetMatched();                      // I3318
+      }
+      keymanweb._DeadkeyResetMatched(); // I3318
 
       return false;
     }
     
     /**
-     * Function     KBR      
+     * Function     beepReset   KBR      
      * Scope        Public
      * Description  Reset/terminate beep or flash (not currently used: Aug 2011)
      */    
-    KeymanWeb['KBR'] = keymanweb.KBR = function() // KeyboardBeepReset
-    {
+    KeymanWeb['KBR'] = interface['beepReset'] = interface.beepReset = function() {
       keymanweb.cachedContext.reset();
       
       var Lbo;
       keymanweb._BeepTimeout = 0;
-      for(Lbo=0;Lbo<keymanweb._BeepObjects.length;Lbo++)  // I1511 - array prototype extended
-      {
+      for(Lbo=0;Lbo<keymanweb._BeepObjects.length;Lbo++) { // I1511 - array prototype extended
         keymanweb._BeepObjects[Lbo].e.style.backgroundColor = keymanweb._BeepObjects[Lbo].c;
       }
       keymanweb._BeepObjects = [];
     }
       
     /**
-     * Function     KB      
+     * Function     beep          KB      
      * Scope        Public
      * @param       {Object}      Pelem     element to flash
      * Description  Flash body as substitute for audible beep
      */    
-    KeymanWeb['KB'] = keymanweb.KB = function(Pelem)    // Keyboard_Beep
-    {    
+    KeymanWeb['KB'] = interface['beep'] = interface.beep = function(Pelem) {
       keymanweb.cachedContext.reset();
       
-      if(Pelem.body) Pelem=Pelem.body; // I1446 - beep sometimes fails to flash when using OSK and rich control
+      if(Pelem.body) {
+        Pelem=Pelem.body; // I1446 - beep sometimes fails to flash when using OSK and rich control
+      }
       
-      if(!Pelem.style || typeof(Pelem.style.backgroundColor)=='undefined') return;
+      if(!Pelem.style || typeof(Pelem.style.backgroundColor)=='undefined') {
+        return;
+      }
 
-      for(var Lbo=0;Lbo<keymanweb._BeepObjects.length;Lbo++)   // I1446 - beep sometimes fails to return background color to normal
-      {                                                     // I1511 - array prototype extended
-        if(keymanweb._BeepObjects[Lbo].e == Pelem) return;
+      for(var Lbo=0;Lbo<keymanweb._BeepObjects.length;Lbo++) { // I1446 - beep sometimes fails to return background color to normal
+                                                               // I1511 - array prototype extended
+        if(keymanweb._BeepObjects[Lbo].e == Pelem) {
+          return;
+        }
       }
       
       keymanweb._BeepObjects=keymanweb._push(keymanweb._BeepObjects,{e:Pelem, c:Pelem.style.backgroundColor});
       Pelem.style.backgroundColor = '#000000';
-      if(keymanweb._BeepTimeout == 0)
-      {
+      if(keymanweb._BeepTimeout == 0) {
         keymanweb._BeepTimeout = 1;
-        window.setTimeout(keymanweb.KBR, 50);
+        window.setTimeout(interface.beepReset, 50);
       }
-      //Pelem.style.backgroundColor = Lcolour;
     }
     
     /**
-     * Function     KA      
+     * Function     any           KA      
      * Scope        Public
      * @param       {number}      n     character position (index) 
      * @param       {string}      ch    character to find in string
@@ -417,8 +398,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}           True if character found in 'any' string, sets index accordingly
      * Description  Test for character matching
      */    
-    KeymanWeb['KA'] = keymanweb.KA = function(n,ch,s)  // Keyboard_Any()
-    {   
+    KeymanWeb['KA'] = interface['any'] = interface.any = function(n,ch,s) {
       if(ch == '') {
         return false;
       }
@@ -428,86 +408,86 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
     
     /**
-     * Function     KO      
+     * Function     output        KO  
      * Scope        Public
      * @param       {number}      dn      number of characters to overwrite
      * @param       {Object}      Pelem   element to output to 
      * @param       {string}      s       string to output   
      * Description  Keyboard output
      */    
-    KeymanWeb['KO'] = keymanweb.KO = function(dn, Pelem, s) // Keyboard_Output()
-    {
+    KeymanWeb['KO'] = interface['output'] = interface.output = function(dn, Pelem, s) {
       keymanweb.cachedContext.reset();
-          
+      
       // KeymanTouch for Android uses direct insertion of the character string
-      if('oninserttext' in keymanweb)
-      {
-        keymanweb['oninserttext'](dn,s); 
-      }   
-    
-      if(Pelem.body) var Ldoc=Pelem; else var Ldoc=Pelem.ownerDocument;	// I1481 - integration with rich editors not working 100%
+      if('oninserttext' in keymanweb) {
+        keymanweb['oninserttext'](dn,s);
+      }
+
+      if(Pelem.body) {
+        var Ldoc=Pelem;
+      } else {
+        var Ldoc=Pelem.ownerDocument;	// I1481 - integration with rich editors not working 100%
+      }
       var Li, Ldv;
     
-      if(Pelem.className.indexOf('keymanweb-input') >= 0) 
-      {
+      if(Pelem.className.indexOf('keymanweb-input') >= 0) {
         var t=keymanweb.getTextBeforeCaret(Pelem);
-        if(dn > 0) t=t._kmwSubstr(0,t._kmwLength()-dn)+s; else t=t+s;
+        if(dn > 0) {
+          t=t._kmwSubstr(0,t._kmwLength()-dn)+s; 
+        } else {
+          t=t+s;
+        }
         keymanweb.setTextBeforeCaret(Pelem,t);
         return;
       }
     
-      if (keymanweb.legacy)
-      { 
-        if(dn>0)
+      if (keymanweb.legacy) {
+        if(dn>0) {
           Pelem.value=Pelem.value._kmwSubstr(0,Pelem.value._kmwLength()-dn)+s;  //I3319
-        else
+        } else {
           Pelem.value=Pelem.value+s;
-      }
-      else if (Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&  
+        }
+      } else if (Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&  
           (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')      
-        )  // I2457 - support contentEditable elements in mozilla, webkit
-      {
+        ) { // I2457 - support contentEditable elements in mozilla, webkit
         /* Editable iframe and contentEditable elements for mozilla */
         var _IsEditableIframe = Ldoc.designMode.toLowerCase() == 'on';
-        if(_IsEditableIframe) var _CacheableCommands = keymanweb._CacheCommands(Ldoc);
+        if(_IsEditableIframe) {
+          var _CacheableCommands = keymanweb._CacheCommands(Ldoc);
+        }
       
         var Lsel = Ldv.getSelection();
         var LselectionStart = Lsel.focusNode.nodeValue ? Lsel.focusNode.substringData(0,Lsel.focusOffset)._kmwLength() : 0;  // I3319
         
-        if(!Lsel.isCollapsed) Lsel.deleteFromDocument();  // I2134, I2192
+        if(!Lsel.isCollapsed) {
+          Lsel.deleteFromDocument();  // I2134, I2192
+        }
         //KeymanWeb._Debug('KO: focusOffset='+Lsel.focusOffset+', dn='+dn+', s='+s+' focusNode.type='+Lsel.focusNode.nodeType+', focusNode.parentNode.tagName='+(Lsel.focusNode.parentNode?Lsel.focusNode.parentNode.tagName:'NULL') );
 
         var Lrange = Lsel.getRangeAt(0);
-        if(dn > 0) { 
+        if(dn > 0) {
           Lrange.setStart(Lsel.focusNode, Lsel.focusOffset - Lsel.focusNode.nodeValue.substr(0,Lsel.focusOffset)._kmwSubstr(-dn).length); // I3319
-          Lrange.deleteContents(); 
+          Lrange.deleteContents();
         }
 
         //KeymanWeb._Debug('KO: focusOffset='+Lsel.focusOffset+', dn='+dn+', s='+s+' focusNode.type='+Lsel.focusNode.nodeType+', focusNode.parentNode.tagName='+(Lsel.focusNode.parentNode?Lsel.focusNode.parentNode.tagName:'NULL') );
 
-        if(s._kmwLength() > 0)  // I2132 - exception if s.length > 0, I3319
-        {
-          if(Lsel.focusNode.nodeType == 3)
-          {
+        if(s._kmwLength() > 0) { // I2132 - exception if s.length > 0, I3319
+          if(Lsel.focusNode.nodeType == 3) {
             // I2134, I2192
             // Already in a text node
             //KeymanWeb._Debug('KO: Already in a text node, adding "'+s+'": '+Lsel.focusOffset + '-> '+Lsel.toString());
             var LfocusOffset = Lsel.focusOffset;
             //KeymanWeb._Debug('KO: node.text="'+Lsel.focusNode.data+'", node.length='+Lsel.focusNode.length);
             Lsel.focusNode.insertData(Lsel.focusOffset, s);
-            try
-            {
+            try {
               Lsel.extend(Lsel.focusNode, LfocusOffset + s.length); 
-            }
-            catch(e)
-            {
+            } catch(e) {
               // Chrome (through 4.0 at least) throws an exception because it has not synchronised its content with the selection.  scrollIntoView synchronises the content for selection
               Lsel.focusNode.parentNode.scrollIntoView();
               Lsel.extend(Lsel.focusNode, LfocusOffset + s.length);
             }
-          }
-          else
-          {
+          } else {
             // Create a new text node - empty control
             //KeymanWeb._Debug('KO: Creating a new text node for "'+s+'"');
             var n = Ldoc.createTextNode(s);
@@ -515,46 +495,43 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             Lsel.extend(n,s.length);
           }
         }
-        if(_IsEditableIframe) keymanweb._CacheCommandsReset(Ldoc, _CacheableCommands, null);// I2457 - support contentEditable elements in mozilla, webkit
+
+        if(_IsEditableIframe) {
+          keymanweb._CacheCommandsReset(Ldoc, _CacheableCommands, null);// I2457 - support contentEditable elements in mozilla, webkit
+        }
         
         Lsel.collapseToEnd();
 
         // Adjust deadkey positions 
-        if(dn >= 0)
-        {
+        if(dn >= 0) {
           keymanweb._DeadkeyDeleteMatched();                                  // I3318
           keymanweb._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318
-        }
-      }
-      
-      // Internet Explorer   (including IE9)   
-      else if(Ldoc  &&  (Ldv=Ldoc.selection)) // build 77 - use elem.ownerDocument.selection
-      { 
-        if(Ldoc.body.isContentEditable || Ldoc.designMode.toLowerCase()=='on')  // I1295 - isContentEditable
-        {
+        } // Internet Explorer   (including IE9)   
+      } else if(Ldoc  &&  (Ldv=Ldoc.selection)) { // build 77 - use elem.ownerDocument.selection
+        if(Ldoc.body.isContentEditable || Ldoc.designMode.toLowerCase()=='on') { // I1295 - isContentEditable
           var _CacheableCommands = keymanweb._CacheCommands(Ldoc);
         }
     
         var Lrange = Ldv.createRange(), Ls1;
-        if(Lrange.text != '') 
-        {
+        if(Lrange.text != '') {
           Ldv.clear();
           dn = 0;
+        } else {
+          Lrange.collapse(true);
         }
-        else Lrange.collapse(true);
 
         if(dn > 0) {              
           Lrange.moveStart('character',-2*dn);  // I3319 (next four lines
           var s0=Lrange.text,s1=s0._kmwSubstr(-dn);
           Lrange.collapse(false); //move start back to end
           Lrange.moveStart('character',-s1.length);
+        } else {
+          dn = 0;
         }
-        else dn = 0;
 
         Lrange.text = s;
 
-        if(Ldoc.body.isContentEditable || Ldoc.designMode.toLowerCase()=='on') // I1295 - isContentEditable
-        {
+        if(Ldoc.body.isContentEditable || Ldoc.designMode.toLowerCase()=='on') { // I1295 - isContentEditable
           Lrange.moveStart('character',-s.length);
           
           keymanweb._CacheCommandsReset(Ldoc, _CacheableCommands,Lrange.select);
@@ -562,8 +539,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           Lrange.select();
         }
         // Adjust deadkey positions 
-        if(dn >= 0)
-        {
+        if(dn >= 0) {
           keymanweb._DeadkeyDeleteMatched();                                  // I3318
           keymanweb._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318
         }
@@ -571,20 +547,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         keymanweb._Selection = Ldv.createRange();
         keymanweb._Selection.select();
         keymanweb._Selection.scrollIntoView();
-      }    
-
-      // Mozilla et al; IE9+ also recognizes setSelectionRange, but does not seem to work in exactly the same way as Mozilla
-      else if (Pelem.setSelectionRange)
-      {                                        
+        // Mozilla et al; IE9+ also recognizes setSelectionRange, but does not seem to work in exactly the same way as Mozilla
+      } else if (Pelem.setSelectionRange) {                                        
         var LselectionStart, LselectionEnd;
               
-        if(Pelem._KeymanWebSelectionStart != null) // changed to allow a value of 0
-        {
+        if(Pelem._KeymanWebSelectionStart != null) {// changed to allow a value of 0
           LselectionStart = Pelem._KeymanWebSelectionStart;
           LselectionEnd = Pelem._KeymanWebSelectionEnd;
-        }
-        else
-        {
+        } else {
           LselectionStart = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionStart);  // I3319
           LselectionEnd = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionEnd);      // I3319
         }
@@ -594,19 +564,17 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           LscrollTop = Pelem.scrollTop; LscrollLeft = Pelem.scrollLeft;
         }
 
-        if(dn < 0) // Don't delete, leave context alone (dn = -1)
-        {
+        if(dn < 0) {// Don't delete, leave context alone (dn = -1)
           Pelem.value = Pelem.value._kmwSubstring(0,LselectionStart) + s + Pelem.value._kmwSubstring(LselectionEnd);    //I3319
           dn = 0;
-        }
-        else if(LselectionStart < dn)
+        } else if(LselectionStart < dn) {
           Pelem.value = s + Pelem.value._kmwSubstring(LselectionEnd); //I3319
-        else
+        } else {
           Pelem.value = Pelem.value._kmwSubstring(0,LselectionStart-dn) + s + Pelem.value._kmwSubstring(LselectionEnd); //I3319
+        }
 
         // Adjust deadkey positions 
-        if(dn >= 0)
-        {
+        if(dn >= 0) {
           keymanweb._DeadkeyDeleteMatched(); // I3318
           keymanweb._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318,I3319
         }
@@ -623,30 +591,34 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
 
       // Refresh element content after change (if needed)
-      if(typeof(keymanweb.refreshElementContent) == 'function') keymanweb.refreshElementContent(Pelem);    
+      if(typeof(keymanweb.refreshElementContent) == 'function') {
+        keymanweb.refreshElementContent(Pelem);
+      }
     }
     
     /**
-     * Function     KDO      
+     * Function     deadkeyOutput KDO      
      * Scope        Public
      * @param       {number}      Pdn     no of character to overwrite (delete) 
      * @param       {Object}      Pelem   element to output to 
      * @param       {number}      Pd      deadkey id
      * Description  Record a deadkey at current cursor position, deleting Pdn characters first
      */    
-    KeymanWeb['KDO'] = keymanweb.KDO = function(Pdn,Pelem,Pd)
-    {               
-      keymanweb.cachedContext.reset();             
-      var Lc = new Object(); 
-      if(Pdn >= 0) keymanweb.KO(Pdn,Pelem,"");  //I3318 corrected to >=
-      Lc.p=keymanweb._SelPos(Pelem); Lc.d=Pd;                 
-      keymanweb._DeadKeys=keymanweb._push(keymanweb._DeadKeys,Lc);        
-              
-  //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
+    KeymanWeb['KDO'] = interface['deadkeyOutput'] = interface.deadkeyOutput = function(Pdn,Pelem,Pd) {
+      keymanweb.cachedContext.reset();
+      var Lc = new Object();
+      if(Pdn >= 0) {
+        interface.output(Pdn,Pelem,"");  //I3318 corrected to >=
+      }
+      Lc.p=keymanweb._SelPos(Pelem); 
+      Lc.d=Pd;
+      keymanweb._DeadKeys=keymanweb._push(keymanweb._DeadKeys,Lc);
+      
+      //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
     }
 
     /**
-     * Function     KIO      
+     * Function     indexOutput   KIO      
      * Scope        Public
      * @param       {number}      Pdn     no of character to overwrite (delete) 
      * @param       {string}      Ps      string
@@ -654,30 +626,35 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {Object}      Pelem   element to output to 
      * Description  Output a character selected from the string according to the offset in the index array
      */    
-    KeymanWeb['KIO'] = keymanweb.KIO = function(Pdn,Ps,Pn,Pelem)
-    {
+    KeymanWeb['KIO'] = interface['indexOutput'] = interface.indexOutput = function(Pdn,Ps,Pn,Pelem) {
       keymanweb.cachedContext.reset();
-      if(keymanweb._AnyIndices[Pn-1] < Ps._kmwLength())                      //I3319        
-        keymanweb.KO(Pdn,Pelem,Ps._kmwCharAt(keymanweb._AnyIndices[Pn-1]));  //I3319
+      if(keymanweb._AnyIndices[Pn-1] < Ps._kmwLength()) {                        //I3319
+        interface.output(Pdn,Pelem,Ps._kmwCharAt(keymanweb._AnyIndices[Pn-1]));  //I3319
+      }
     }
-    
-  /**
-   * Function     _CacheCommands
-   * Scope        Private
-   * @param       {Object}    _Document
-   * @return      {Array.<string>}        List of style commands that are cacheable
-   * Description  Build reate list of styles that can be applied in iframes
-   */    
-    KeymanWeb._CacheCommands = function(_Document) // I1204 - style application in IFRAMEs, I2192, I2134, I2192   
-    {
+
+    /**
+     * Function     _CacheCommands
+     * Scope        Private
+     * @param       {Object}    _Document
+     * @return      {Array.<string>}        List of style commands that are cacheable
+     * Description  Build reate list of styles that can be applied in iframes
+     */    
+    KeymanWeb._CacheCommands = function(_Document) { // I1204 - style application in IFRAMEs, I2192, I2134, I2192   
       //var _CacheableBackColor=(_Document.selection?'hilitecolor':'backcolor');
-      var _CacheableCommands=[['backcolor',1],['fontname',1],['fontsize',1],['forecolor',1],['bold',0],['italic',0],['strikethrough',0],['subscript',0],['superscript',0],['underline',0]];
-      if(_Document.defaultView) keymanweb._push(_CacheableCommands,['hilitecolor',1]);
+      var _CacheableCommands=[
+        ['backcolor',1],['fontname',1],['fontsize',1],['forecolor',1],['bold',0],
+        ['italic',0],['strikethrough',0],['subscript',0],['superscript',0],['underline',0]
+      ];
+      if(_Document.defaultView) {
+        keymanweb._push(_CacheableCommands,['hilitecolor',1]);
+      }
         
-      for(var n=0;n < _CacheableCommands.length; n++)  // I1511 - array prototype extended
-      {
+      for(var n=0;n < _CacheableCommands.length; n++) { // I1511 - array prototype extended
         //KeymanWeb._Debug('Command:'+_CacheableCommands[n][0]);
-        keymanweb._push(_CacheableCommands[n],_CacheableCommands[n][1] ? _Document.queryCommandValue(_CacheableCommands[n][0]) : _Document.queryCommandState(_CacheableCommands[n][0]));
+        keymanweb._push(_CacheableCommands[n],_CacheableCommands[n][1] ?
+            _Document.queryCommandValue(_CacheableCommands[n][0]) :
+            _Document.queryCommandState(_CacheableCommands[n][0]));
       }
       return _CacheableCommands;
     }
@@ -691,21 +668,20 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      Nothing
      * Description  Restore styles in IFRAMEs (??)
      */    
-    KeymanWeb._CacheCommandsReset = function(_Document, _CacheableCommands, _func)
-    {
-      for(var n=0;n < _CacheableCommands.length; n++)  // I1511 - array prototype extended
-      {
+    KeymanWeb._CacheCommandsReset = function(_Document, _CacheableCommands, _func) {
+      for(var n=0;n < _CacheableCommands.length; n++) { // I1511 - array prototype extended
         //KeymanWeb._Debug('ResetCacheCommand:'+_CacheableCommands[n][0]+'='+_CacheableCommands[n][2]);
-        if(_CacheableCommands[n][1])
-        {
-          if(_Document.queryCommandValue(_CacheableCommands[n][0]) != _CacheableCommands[n][2])
-          {
-            if(_func)_func();
+        if(_CacheableCommands[n][1]) {
+          if(_Document.queryCommandValue(_CacheableCommands[n][0]) != _CacheableCommands[n][2]) {
+            if(_func) {
+              _func();
+            }
             _Document.execCommand(_CacheableCommands[n][0], false, _CacheableCommands[n][2]);
           }
-        }
-        else if(_Document.queryCommandState(_CacheableCommands[n][0]) != _CacheableCommands[n][2])
-        {if(_func)_func();
+        } else if(_Document.queryCommandState(_CacheableCommands[n][0]) != _CacheableCommands[n][2]) {
+          if(_func) {
+            _func();
+          }
           //KeymanWeb._Debug('executing command '+_CacheableCommand[n][0]);
           _Document.execCommand(_CacheableCommands[n][0], false, null);
         }
@@ -720,43 +696,47 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {Object}      Pelem       Currently active element (may be needed by future tests)     
      * @return      {boolean}                 True if the test succeeds 
      */       
-    KeymanWeb['KIFS'] = keymanweb.KIFS = function(systemId,strValue,Pelem)
-    {     
-      var result=true;             
-      if(systemId == keymanweb.TSS_LAYER) 
+    KeymanWeb['KIFS'] = interface['ifStore'] = interface.ifStore = function(systemId,strValue,Pelem) {
+      var result=true;
+      if(systemId == keymanweb.TSS_LAYER) {
         result = (osk.layerId === strValue);
-      else if(systemId == keymanweb.TSS_PLATFORM)
-      {
+      } else if(systemId == keymanweb.TSS_PLATFORM) {
         var i,constraint,constraints=strValue.split(' ');
-        for(i=0; i<constraints.length; i++)
-        {
+        for(i=0; i<constraints.length; i++) {
           constraint=constraints[i].toLowerCase();
-          switch(constraint)
-          {
+          switch(constraint) {
             case 'touch':
             case 'hardware':
-              if(device.touchable != (constraint == 'touch')) result=false;
+              if(device.touchable != (constraint == 'touch')) {
+                result=false;
+              }
           }
-          switch(constraint)
-          {
+
+          switch(constraint) {
             case 'windows':
             case 'android':
             case 'ios':
             case 'macosx':
             case 'linux':
-              if(device.OS.toLowerCase() != constraint) result=false;
+              if(device.OS.toLowerCase() != constraint) {
+                result=false;
+              }
           }
-          switch(constraint)
-          {
+
+          switch(constraint) {
             case 'tablet':
             case 'phone':
             case 'desktop':
-              if(device.formFactor != constraint) result=false;
+              if(device.formFactor != constraint) {
+                result=false;
+              }
           }
-          switch(constraint)
-          {
+
+          switch(constraint) {
             case 'web':
-              if(device.browser == 'native') result=false; // web matches anything other than 'native'
+              if(device.browser == 'native') {
+                result=false; // web matches anything other than 'native'
+              }
               break;
             case 'native':
             case 'ie':
@@ -764,11 +744,13 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             case 'firefox':
             case 'safari':
             case 'opera':
-              if(device.browser != constraint) result=false;  
+              if(device.browser != constraint) {
+                result=false;
+              }
           }
         }
-      }  
-      return result;    //Moved from previous line, now supports layer selection, Build 350 
+      }
+      return result; //Moved from previous line, now supports layer selection, Build 350 
     }
   
     /**
@@ -780,13 +762,13 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}                 True if command succeeds
      *                                        (i.e. for TSS_LAYER, if the layer is successfully selected)
      */    
-    KeymanWeb['KSETS'] = function(systemId,strValue,Pelem)
-    {
+    KeymanWeb['KSETS'] = interface['setStore'] = function(systemId,strValue,Pelem) {
       keymanweb.cachedContext.reset();
-      if(systemId == keymanweb.TSS_LAYER)
+      if(systemId == keymanweb.TSS_LAYER) {
         return osk.showLayer(strValue);     //Buld 350, osk reference now OK, so should work
-      else
+      } else {
         return false;
+      }
     }
   
     /**
@@ -797,14 +779,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {string}      dfltValue   default value
      * @return      {string}                  current or default option value   
      */    
-    KeymanWeb['KLOAD'] = function(kbdName,storeName,dfltValue)
-    {
+    KeymanWeb['KLOAD'] = interface['loadStore'] = function(kbdName,storeName,dfltValue) {
       keymanweb.cachedContext.reset();
       var cName='KeymanWeb_'+kbdName+'_Option_'+storeName,cValue=util.loadCookie(cName);
-      if(typeof cValue[storeName] != 'undefined') 
+      if(typeof cValue[storeName] != 'undefined') {
         return unescape(cValue[storeName]);
-      else
+      } else {
         return dfltValue;
+      }
     }
 
     /**
@@ -814,13 +796,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {string}      optValue    option value to save
      * @return      {boolean}                 true if save successful
      */    
-    KeymanWeb['KSAVE'] = function(storeName,optValue)
-    {
+    KeymanWeb['KSAVE'] = interface['saveStore'] = function(storeName,optValue) {
       keymanweb.cachedContext.reset();
       var kbd=keymanweb._ActiveKeyboard;
-      if(!kbd || typeof kbd['KI'] == 'undefined' || kbd['KI'] == '') return false;
+      if(!kbd || typeof kbd['KI'] == 'undefined' || kbd['KI'] == '') {
+        return false;
+      }
       
-      var cName='KeymanWeb_'+kbd['KI']+'_Option_'+storeName,cValue=escape(optValue);
+      var cName='KeymanWeb_'+kbd['KI']+'_Option_'+storeName, cValue=escape(optValue);
 
       util.saveCookie(cName,cValue);
       return true;
@@ -829,13 +812,26 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
   /**
     * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
     */
-    KeymanWeb['GetLastActiveElement'] = function() { return keymanweb._LastActiveElement; }
-    KeymanWeb['FocusLastActiveElement'] = function() { keymanweb._FocusLastActiveElement(); }
+    KeymanWeb['GetLastActiveElement'] = function() {
+      return keymanweb._LastActiveElement; 
+    }
+
+    KeymanWeb['FocusLastActiveElement'] = function() { 
+      keymanweb._FocusLastActiveElement(); 
+    }
 
     //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
-    KeymanWeb['HideHelp'] = function() {osk._Hide(true);}
-    KeymanWeb['ShowHelp'] = function(Px,Py) {osk._Show(Px,Py);}  
-    KeymanWeb['ShowPinnedHelp'] = function() {osk.userPositioned=true; osk._Show(-1,-1);}
+    KeymanWeb['HideHelp'] = function() {
+      osk._Hide(true);
+    }
+
+    KeymanWeb['ShowHelp'] = function(Px,Py) {
+      osk._Show(Px,Py);
+    }
+
+    KeymanWeb['ShowPinnedHelp'] = function() {
+      osk.userPositioned=true; osk._Show(-1,-1);
+    }
     
     /**
      * Cache of context storing and retrieving return values from KC

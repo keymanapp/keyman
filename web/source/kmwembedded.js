@@ -10,6 +10,7 @@
 (function() {
   // Declare KeymanWeb and related objects
   var keymanweb=window['tavultesoft']['keymanweb'],osk=keymanweb['osk'],util=keymanweb['util'],device=util.device;
+  var interface=keymanweb['interface'];
 
   // Allow definition of application name
   keymanweb.options['app']='';
@@ -525,16 +526,16 @@
    */
   keymanweb.processDefaultMapping = function(code, shift, Lelem, keyName) {
     if (code == osk.keyCodes.K_SPACE) {
-        keymanweb.KO(0, Lelem, ' ');
+        interface.output(0, Lelem, ' ');
         return true;
     }
     else if (code == osk.keyCodes.K_ENTER) {
-        keymanweb.KO(0, Lelem, '\n');
+        interface.output(0, Lelem, '\n');
         return true;
     }
     var ch = osk.defaultKeyOutput(keyName, code, shift);
     if(ch) {
-        keymanweb.KO(0, Lelem, ch);
+        interface.output(0, Lelem, ch);
         return true;
     }
 
