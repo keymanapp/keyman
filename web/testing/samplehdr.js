@@ -47,10 +47,18 @@
     // The first keyboard added will be the default keyboard for touch devices.
     // For faster loading, it may be best for the default keybaord to be 
     // locally sourced.
-   
     kmw.addKeyboards({id:'us',name:'English',language:{id:'eng',name:'English'},
       filename:'./us-1.0.js'});
-
+      
+    // Add more keyboards to the language menu, by keyboard name,
+    // keyboard name and language code, or just the ISO 639 language code.  
+    kmw.addKeyboards('french','european2@swe','european2@nor','@heb');
+  
+    // Add a keyboard by language name.  Note that the name must be spelled
+    // correctly, or the keyboard will not be found.  (Using ISO codes is
+    // usually easier.)
+    kmw.addKeyboardsForLanguage('Dzongkha');
+    
     // Add a fully-specified, locally-sourced, keyboard with custom font  
     kmw.addKeyboards({id:'lao_2008_basic',name:'Lao Basic',
       language:{
@@ -59,7 +67,6 @@
         },
       filename:'./lao_2008_basic.js'
       });   
-
 
     // The following two optional calls should be delayed until language menus are fully loaded:
     //  (a) a specific mapped input element input is focused, to ensure that the OSK appears
@@ -95,12 +102,6 @@
         kmw.addKeyboardsForLanguage(sKbd);
         break;
     }
-  }
-  
-  function removeKeyboard(n)
-  {
-	  var sKbd=document.getElementById('kbd_id4').value, kmw=tavultesoft.keymanweb;
-	  kmw["removeKeyboards"](sKbd);
   }
   
   // Add keyboard on Enter (as well as pressing button)

@@ -43,31 +43,14 @@
   function loadKeyboards() 
   { 
     var kmw=tavultesoft.keymanweb;
-    
-    // The first keyboard added will be the default keyboard for touch devices.
-    // For faster loading, it may be best for the default keybaord to be 
-    // locally sourced.
-    kmw.addKeyboards({id:'us',name:'English',language:{id:'eng',name:'English'},
-      filename:'./us-1.0.js'});
-      
-    // Add more keyboards to the language menu, by keyboard name,
-    // keyboard name and language code, or just the ISO 639 language code.  
-    kmw.addKeyboards('french','european2@swe','european2@nor','@heb');
-  
-    // Add a keyboard by language name.  Note that the name must be spelled
-    // correctly, or the keyboard will not be found.  (Using ISO codes is
-    // usually easier.)
-    kmw.addKeyboardsForLanguage('Dzongkha');
 
-    // The following two optional calls should be delayed until language menus are fully loaded:
-    //  (a) a specific mapped input element input is focused, to ensure that the OSK appears
-    //  (b) a specific keyboard is loaded, rather than the keyboard last used.         
-  //window.setTimeout(function(){kmw.setActiveElement('ta1',true);},2500);
-  //window.setTimeout(function(){kmw.setActiveKeyboard('Keyboard_french','fra');},3000);
-  
-    // Note that locally specified keyboards will be listed before keyboards 
-    // requested from the remote server by user interfaces that do not order
-    // keyboards alphabetically by language.
+    // Add a fully-specified, locally-sourced, keyboard.
+    kmw.addKeyboards({id:'layered_debug_keyboard',name:'Web_Layer_Debugging',
+      language:{
+        id:'dbg',name:'Debug',region:'North America'
+        },
+      filename:'./layered_debug_keyboard-1.0.js'
+      });   
   }
   
   // Script to allow a user to add any keyboard to the keyboard menu 
@@ -93,6 +76,12 @@
         kmw.addKeyboardsForLanguage(sKbd);
         break;
     }
+  }
+  
+  function removeKeyboard(n)
+  {
+	  var sKbd=document.getElementById('kbd_id4').value, kmw=tavultesoft.keymanweb;
+	  kmw["removeKeyboards"](sKbd);
   }
   
   // Add keyboard on Enter (as well as pressing button)
