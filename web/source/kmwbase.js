@@ -74,9 +74,6 @@ if(!tavultesoft['keymanweb']) {
     keymanweb['build'] = tavultesoft.__BUILD__;
     keymanweb['version'] = '10.0';
     keymanweb['helpURL'] = 'http://help.keyman.com/go'; 
-
-    // Expose (old) KeymanWeb object for use by compiled keyboards (replaces legacy object in earlier versions)
-    window['KeymanWeb'] = keymanweb;
     
     // Define public OSK, user interface and utility function objects 
     var util = keymanweb['util'] = {};

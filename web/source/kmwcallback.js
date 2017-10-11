@@ -7,7 +7,10 @@
 // load of KMW.
 if(!window['tavultesoft']['keymanweb']['initialized']) { 
   (function() 
-  {
+  {    
+    // Define the keyboard interface object.
+    window['KeymanWeb'] = {};
+
     // Declare KeymanWeb and util objects
     var keymanweb=window['tavultesoft']['keymanweb'], util=keymanweb['util'], 
       osk=keymanweb['osk'],device=util.device,dbg=keymanweb.debug;     //osk defined here, build 350
@@ -23,7 +26,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Scope        Public
      * Description  Save keyboard focus
      */    
-    keymanweb['KSF'] = keymanweb.KSF = function()     // KeyboardSaveFocus
+    KeymanWeb['KSF'] = keymanweb.KSF = function()     // KeyboardSaveFocus
     {
       keymanweb._IgnoreNextSelChange = 1;
     }
@@ -36,7 +39,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}               true if inserted
      * Description  Insert text into active control
      */    
-    keymanweb['KT'] = keymanweb.KT = function(Ptext,PdeadKey)  // KeyboardInsertText
+    KeymanWeb['KT'] = keymanweb.KT = function(Ptext,PdeadKey)  // KeyboardInsertText
     {
       keymanweb.cachedContext.reset();
       //_DebugEnter('InsertText');  
@@ -73,7 +76,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {Object}      Pk      Keyboard  object
      * Description  Register and load the keyboard
      */    
-    keymanweb['KR'] = keymanweb.KR = function(Pk)
+    KeymanWeb['KR'] = keymanweb.KR = function(Pk)
     {
       // If initialization not yet complete, list the keyboard to be registered on completion of initialization
       if(!keymanweb['initialized'])
@@ -125,7 +128,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {?number}               1 if already registered, else null
      */    
   //var ts0=new Date().toTimeString().substr(3,5);
-    keymanweb['KRS'] = keymanweb.KRS = function(Pstub)   
+    KeymanWeb['KRS'] = keymanweb.KRS = function(Pstub)   
     {
       var Lk;
       
@@ -203,7 +206,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
      */    
     
-    keymanweb['KC'] = keymanweb.KC = function(n, ln, Pelem)
+    KeymanWeb['KC'] = keymanweb.KC = function(n, ln, Pelem)
     {
       var v = keymanweb.cachedContext.get(n, ln);
       if(v !== null) return v;
@@ -226,7 +229,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *             KN(2,Pelem) == FALSE
      *             KN(4,Pelem) == TRUE
      */    
-    keymanweb['KN'] = keymanweb.KN = function(n, Ptarg)    // KeyboardNul
+    KeymanWeb['KN'] = keymanweb.KN = function(n, Ptarg)    // KeyboardNul
     {
       var cx=this.KC(n+1, 1, Ptarg);
       if(cx === false) {
@@ -249,12 +252,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}             True if selected context matches val
      * Description  Test keyboard context for match
      */    
-    keymanweb['KCM'] = keymanweb.KCM = function(n, Ptarg, val, ln)  // Keyboard_ContextMatch 
+    KeymanWeb['KCM'] = keymanweb.KCM = function(n, Ptarg, val, ln)  // Keyboard_ContextMatch 
     {             
       //KeymanWeb._Debug('KeymanWeb.KCM(n='+n+', Ptarg, val='+val+', ln='+ln+'): return '+(this.KC(n,ln,Ptarg)==val)); 
       var cx=this.KC(n, ln, Ptarg);
       if(cx !== false && cx === val) return true; // I3318
-      this._DeadkeyResetMatched();                // I3318
+      keymanweb._DeadkeyResetMatched();                // I3318
       return false;
     }
 
@@ -265,7 +268,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}     true if keypress event
      * Description  Test if event as a keypress event
      */    
-    keymanweb['KIK'] = keymanweb.KIK = function(e)          // Keyboard_IsKeypress 
+    KeymanWeb['KIK'] = keymanweb.KIK = function(e)          // Keyboard_IsKeypress 
     {                      
       if(keymanweb._ActiveKeyboard['KM'])    // I1380 - support KIK for positional layouts
         return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
@@ -285,7 +288,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}                 True if key matches rule
      * Description  Test keystroke with modifiers against rule
      */    
-    keymanweb['KKM'] = keymanweb.KKM = function(e,Lruleshift,Lrulekey)  // Keyboard_KeyMatch 
+    KeymanWeb['KKM'] = keymanweb.KKM = function(e,Lruleshift,Lrulekey)  // Keyboard_KeyMatch 
     { 
       var retVal = 0; // I3318
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
@@ -305,7 +308,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       {
         retVal = (keyCode == Lrulekey);         // I3318, I3555
       }
-      if(!retVal) this._DeadkeyResetMatched();  // I3318
+      if(!retVal) keymanweb._DeadkeyResetMatched();  // I3318
       return retVal != 0;                            // I3318
     };
 
@@ -316,7 +319,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {number}      Lstate  
      * Description  Test keystroke against state key rules
      */
-    keymanweb['KSM'] = keymanweb.KSM = function(e, Lstate) { // Keyboard_StateMatch
+    KeymanWeb['KSM'] = keymanweb.KSM = function(e, Lstate) { // Keyboard_StateMatch
       return ((Lstate & e.Lstates) == Lstate);
     }
 
@@ -327,7 +330,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {Object}              Object with event's virtual key flag, key code, and modifiers
      * Description  Get object with extended key event information
      */    
-    keymanweb['KKI'] = keymanweb.KKI = function(e)
+    KeymanWeb['KKI'] = keymanweb.KKI = function(e)
     {
       var ei = {};
       ei['vk'] = e.LisVirtualKey; ei['code'] = e.Lcode; ei['modifiers'] = e.Lmodifiers;
@@ -343,7 +346,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}             True if deadkey found selected context matches val
      * Description  Match deadkey at current cursor position
      */    
-    keymanweb['KDM'] = keymanweb.KDM = function(n, Ptarg, d)
+    KeymanWeb['KDM'] = keymanweb.KDM = function(n, Ptarg, d)
     {                              
       if(keymanweb._DeadKeys.length == 0) return false; // I3318  
     
@@ -353,7 +356,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         if(keymanweb._DeadKeys[i].p == n  &&  keymanweb._DeadKeys[i].d == d) {
           keymanweb._DeadKeys[i].matched = 1; return true; // I3318        
         }
-      this._DeadkeyResetMatched();                      // I3318
+      keymanweb._DeadkeyResetMatched();                      // I3318
 
       return false;
     }
@@ -363,7 +366,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Scope        Public
      * Description  Reset/terminate beep or flash (not currently used: Aug 2011)
      */    
-    keymanweb['KBR'] = keymanweb.KBR = function() // KeyboardBeepReset
+    KeymanWeb['KBR'] = keymanweb.KBR = function() // KeyboardBeepReset
     {
       keymanweb.cachedContext.reset();
       
@@ -382,7 +385,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {Object}      Pelem     element to flash
      * Description  Flash body as substitute for audible beep
      */    
-    keymanweb['KB'] = keymanweb.KB = function(Pelem)    // Keyboard_Beep
+    KeymanWeb['KB'] = keymanweb.KB = function(Pelem)    // Keyboard_Beep
     {    
       keymanweb.cachedContext.reset();
       
@@ -414,7 +417,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}           True if character found in 'any' string, sets index accordingly
      * Description  Test for character matching
      */    
-    keymanweb['KA'] = keymanweb.KA = function(n,ch,s)  // Keyboard_Any()
+    KeymanWeb['KA'] = keymanweb.KA = function(n,ch,s)  // Keyboard_Any()
     {   
       if(ch == '') {
         return false;
@@ -432,7 +435,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {string}      s       string to output   
      * Description  Keyboard output
      */    
-    keymanweb['KO'] = keymanweb.KO = function(dn, Pelem, s) // Keyboard_Output()
+    KeymanWeb['KO'] = keymanweb.KO = function(dn, Pelem, s) // Keyboard_Output()
     {
       keymanweb.cachedContext.reset();
           
@@ -631,7 +634,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {number}      Pd      deadkey id
      * Description  Record a deadkey at current cursor position, deleting Pdn characters first
      */    
-    keymanweb['KDO'] = keymanweb.KDO = function(Pdn,Pelem,Pd)
+    KeymanWeb['KDO'] = keymanweb.KDO = function(Pdn,Pelem,Pd)
     {               
       keymanweb.cachedContext.reset();             
       var Lc = new Object(); 
@@ -651,7 +654,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {Object}      Pelem   element to output to 
      * Description  Output a character selected from the string according to the offset in the index array
      */    
-    keymanweb['KIO'] = keymanweb.KIO = function(Pdn,Ps,Pn,Pelem)
+    KeymanWeb['KIO'] = keymanweb.KIO = function(Pdn,Ps,Pn,Pelem)
     {
       keymanweb.cachedContext.reset();
       if(keymanweb._AnyIndices[Pn-1] < Ps._kmwLength())                      //I3319        
@@ -665,7 +668,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
    * @return      {Array.<string>}        List of style commands that are cacheable
    * Description  Build reate list of styles that can be applied in iframes
    */    
-    keymanweb._CacheCommands = function(_Document) // I1204 - style application in IFRAMEs, I2192, I2134, I2192   
+    KeymanWeb._CacheCommands = function(_Document) // I1204 - style application in IFRAMEs, I2192, I2134, I2192   
     {
       //var _CacheableBackColor=(_Document.selection?'hilitecolor':'backcolor');
       var _CacheableCommands=[['backcolor',1],['fontname',1],['fontsize',1],['forecolor',1],['bold',0],['italic',0],['strikethrough',0],['subscript',0],['superscript',0],['underline',0]];
@@ -688,7 +691,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      Nothing
      * Description  Restore styles in IFRAMEs (??)
      */    
-    keymanweb._CacheCommandsReset = function(_Document, _CacheableCommands, _func)
+    KeymanWeb._CacheCommandsReset = function(_Document, _CacheableCommands, _func)
     {
       for(var n=0;n < _CacheableCommands.length; n++)  // I1511 - array prototype extended
       {
@@ -716,8 +719,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {string}      strValue    String value to compare to
      * @param       {Object}      Pelem       Currently active element (may be needed by future tests)     
      * @return      {boolean}                 True if the test succeeds 
-   */       
-    keymanweb['KIFS'] = keymanweb.KIFS = function(systemId,strValue,Pelem)
+     */       
+    KeymanWeb['KIFS'] = keymanweb.KIFS = function(systemId,strValue,Pelem)
     {     
       var result=true;             
       if(systemId == keymanweb.TSS_LAYER) 
@@ -777,7 +780,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}                 True if command succeeds
      *                                        (i.e. for TSS_LAYER, if the layer is successfully selected)
      */    
-    keymanweb['KSETS'] = function(systemId,strValue,Pelem)
+    KeymanWeb['KSETS'] = function(systemId,strValue,Pelem)
     {
       keymanweb.cachedContext.reset();
       if(systemId == keymanweb.TSS_LAYER)
@@ -794,7 +797,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {string}      dfltValue   default value
      * @return      {string}                  current or default option value   
      */    
-    keymanweb['KLOAD'] = function(kbdName,storeName,dfltValue)
+    KeymanWeb['KLOAD'] = function(kbdName,storeName,dfltValue)
     {
       keymanweb.cachedContext.reset();
       var cName='KeymanWeb_'+kbdName+'_Option_'+storeName,cValue=util.loadCookie(cName);
@@ -811,7 +814,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {string}      optValue    option value to save
      * @return      {boolean}                 true if save successful
      */    
-    keymanweb['KSAVE'] = function(storeName,optValue)
+    KeymanWeb['KSAVE'] = function(storeName,optValue)
     {
       keymanweb.cachedContext.reset();
       var kbd=keymanweb._ActiveKeyboard;
@@ -826,13 +829,13 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
   /**
     * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
     */
-    keymanweb['GetLastActiveElement'] = function() { return keymanweb._LastActiveElement; }
-    keymanweb['FocusLastActiveElement'] = function() { keymanweb._FocusLastActiveElement(); }
+    KeymanWeb['GetLastActiveElement'] = function() { return keymanweb._LastActiveElement; }
+    KeymanWeb['FocusLastActiveElement'] = function() { keymanweb._FocusLastActiveElement(); }
 
     //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
-    keymanweb['HideHelp'] = function() {osk._Hide(true);}
-    keymanweb['ShowHelp'] = function(Px,Py) {osk._Show(Px,Py);}  
-    keymanweb['ShowPinnedHelp'] = function() {osk.userPositioned=true; osk._Show(-1,-1);}
+    KeymanWeb['HideHelp'] = function() {osk._Hide(true);}
+    KeymanWeb['ShowHelp'] = function(Px,Py) {osk._Show(Px,Py);}  
+    KeymanWeb['ShowPinnedHelp'] = function() {osk.userPositioned=true; osk._Show(-1,-1);}
     
     /**
      * Cache of context storing and retrieving return values from KC
