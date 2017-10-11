@@ -2233,7 +2233,7 @@ function TCompileKeymanWeb.FormatKeyAsString(key: Integer): string;
 begin
   if (key <= 255) and (KMWVKeyNames[key] <> '')
     then Result := 'keyCodes.'+KMWVKeyNames[key]+ ' /* 0x' + IntToHex(key, 2) + ' */'
-    else Result := IntToHex(key, 2);
+    else Result := '0x' + IntToHex(key, 2);
 end;
 
 ///
