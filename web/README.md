@@ -6,12 +6,13 @@ Google Closures Compiler is used to compile the JavaScript modules into a single
 
 **********************************************************************
 
-The following folders contain the distribution for KeymanWeb 2.0:
+The following folders contain the distribution for KeymanWeb:
 
 	source			Source code
 	output			Fully-compiled KeymanWeb modules for testing
 	embedded		Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
-	samples			Sample and test-case web-pages
+	samples			Sample pages demonstrating ways to link with KeymanWeb
+  testing     Test-case web-pages for various aspects of KeymanWeb functionality
 
 ## Usage
 Open **index.html** or **samples/index.html** in your browser. The pages using uncompiled KeymanWeb should work as-is.

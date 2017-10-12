@@ -46,12 +46,13 @@
     <script>
       var kmw=window.tavultesoft.keymanweb;
       kmw.init({
+		attachType:'auto',
         resources:'resources'
         });
     </script> 
     
     <!-- Add keyboard management script for local selection of keyboards to use -->
-    <script src="./issue58.js"></script> 
+    <script src="./samplehdr.js"></script> 
   
   </head>
 
@@ -86,9 +87,6 @@
     <input type='input' id='kbd_id3' class='kmw-disabled' onkeypress="clickOnEnter(event,3);"/>
     <input type='button' id='btn3' onclick='addKeyboard(3);' value='Add' />   
 
-	<h3>Remove a keyboard by keyboard name:</h3>
-    <input type='input' id='kbd_id4' class='kmw-disabled' onkeypress="clickOnEnter(event,1);"/>
-    <input type='button' id='btn4' onclick='removeKeyboard(1);' value='Remove' />
 
     <h3><a href="../samples/index.html">Return to testing home page</a></h3>
   </div>
