@@ -2415,7 +2415,7 @@ if(!window['keyman']['initialized']) {
       }
       // Also backspace, to allow delete to repeat while key held
       else if(keyName == 'K_BKSP') {
-        kbdInterface(1,keymanweb._LastActiveElement,"");
+        kbdInterface.output(1,keymanweb._LastActiveElement,"");
         osk.deleting = window.setTimeout(osk.repeatDelete,500);
         osk.keyPending = null;
       } else {

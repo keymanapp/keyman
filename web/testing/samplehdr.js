@@ -42,7 +42,7 @@
 
   function loadKeyboards() 
   { 
-    var kmw=tavultesoft.keymanweb;
+    var kmw=keyman;
     
     // The first keyboard added will be the default keyboard for touch devices.
     // For faster loading, it may be best for the default keybaord to be 
@@ -82,7 +82,7 @@
   // Script to allow a user to add any keyboard to the keyboard menu 
   function addKeyboard(n)
   { 
-    var sKbd,kmw=tavultesoft.keymanweb;
+    var sKbd,kmw=keyman;
     switch(n)
     {
       case 1:

@@ -42,7 +42,7 @@
 
   function loadKeyboards() 
   { 
-    var kmw=tavultesoft.keymanweb;
+    var kmw=keyman;
 
     // Add a fully-specified, locally-sourced, keyboard.
     kmw.addKeyboards({id:'layered_debug_keyboard',name:'Web_Layer_Debugging',
@@ -56,7 +56,7 @@
   // Script to allow a user to add any keyboard to the keyboard menu 
   function addKeyboard(n)
   { 
-    var sKbd,kmw=tavultesoft.keymanweb;
+    var sKbd,kmw=keyman;
     switch(n)
     {
       case 1:
@@ -80,7 +80,7 @@
   
   function removeKeyboard(n)
   {
-	  var sKbd=document.getElementById('kbd_id4').value, kmw=tavultesoft.keymanweb;
+	  var sKbd=document.getElementById('kbd_id4').value, kmw=keyman;
 	  kmw["removeKeyboards"](sKbd);
   }
   
