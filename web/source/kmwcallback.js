@@ -5,10 +5,10 @@
 // If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the 
 // KMW system, so we use the fact that 'initialized' is only 1 / true after all scripts are loaded for the initial
 // load of KMW.
-if(!window['tavultesoft']['keymanweb']['initialized']) { 
+if(!window['keyman']['initialized']) { 
   (function() {    
     // Declare KeymanWeb and util objects
-    var keymanweb=window['tavultesoft']['keymanweb'], interface=window['KeymanWeb']=keymanweb['interface'],
+    var keymanweb=window['keyman'], kbdInterface=window['KeymanWeb']=keymanweb['interface'], KeymanWeb=kbdInterface,
       util=keymanweb['util'], osk=keymanweb['osk'],device=util.device,dbg=keymanweb.debug; //osk defined here, build 350
     
     keymanweb.TSS_LAYER = 33;
@@ -22,7 +22,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Scope        Public
      * Description  Save keyboard focus
      */    
-    KeymanWeb['KSF'] = interface['saveFocus'] = interface.saveFocus = function() {
+    KeymanWeb['KSF'] = kbdInterface['saveFocus'] = kbdInterface.saveFocus = function() {
       keymanweb._IgnoreNextSelChange = 1;
     }
       
@@ -34,7 +34,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}               true if inserted
      * Description  Insert text into active control
      */    
-    KeymanWeb['KT'] = interface['insertText'] = interface.insertText = function(Ptext,PdeadKey) {
+    KeymanWeb['KT'] = kbdInterface['insertText'] = kbdInterface.insertText = function(Ptext,PdeadKey) {
       keymanweb.cachedContext.reset();
       //_DebugEnter('InsertText');
       var Lelem = keymanweb._LastActiveElement, Ls, Le, Lkc, Lsel, Lv=false;
@@ -56,10 +56,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         Lelem._KeymanWebSelectionEnd=Le;
         keymanweb._IgnoreNextSelChange = 0;
         if(Ptext!=null) {
-          interface.output(0, Lelem, Ptext);
+          kbdInterface.output(0, Lelem, Ptext);
         }
         if((typeof(PdeadKey)!=='undefined') && (PdeadKey !== null)) {
-          interface.deadkeyOutput(0, Lelem, PdeadKey);
+          kbdInterface.deadkeyOutput(0, Lelem, PdeadKey);
         }
         Lelem._KeymanWebSelectionStart=null;
         Lelem._KeymanWebSelectionEnd=null;
@@ -75,7 +75,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {Object}      Pk      Keyboard  object
      * Description  Register and load the keyboard
      */    
-    KeymanWeb['KR'] = interface['registerKeyboard'] = interface.registerKeyboard = function(Pk) {
+    KeymanWeb['KR'] = kbdInterface['registerKeyboard'] = kbdInterface.registerKeyboard = function(Pk) {
       // If initialization not yet complete, list the keyboard to be registered on completion of initialization
       if(!keymanweb['initialized']) {
         keymanweb.deferredKR.push(Pk); return;
@@ -126,7 +126,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {?number}               1 if already registered, else null
      */    
   //var ts0=new Date().toTimeString().substr(3,5);
-    KeymanWeb['KRS'] = interface['registerStub'] = interface.registerStub = function(Pstub) {
+    KeymanWeb['KRS'] = kbdInterface['registerStub'] = kbdInterface.registerStub = function(Pstub) {
       var Lk;
       
       // In initialization not complete, list the stub to be registered on completion of initialization
@@ -185,7 +185,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
      */    
     
-    KeymanWeb['KC'] = interface['context'] = interface.context = function(n, ln, Pelem) {
+    KeymanWeb['KC'] = kbdInterface['context'] = kbdInterface.context = function(n, ln, Pelem) {
       var v = keymanweb.cachedContext.get(n, ln);
       if(v !== null) {
         return v;
@@ -209,13 +209,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *             KN(2,Pelem) == FALSE
      *             KN(4,Pelem) == TRUE
      */    
-    KeymanWeb['KN'] = interface['nul'] = interface.nul = function(n, Ptarg) {
-      var cx=interface.context(n+1, 1, Ptarg);
-      if(cx === false) {
-        // It appears that this can no longer be returned with KMW so probably should be removed
-        // after testing
-        return true;
-      }
+    KeymanWeb['KN'] = kbdInterface['nul'] = kbdInterface.nul = function(n, Ptarg) {
+      var cx=kbdInterface.context(n+1, 1, Ptarg);
       
       // With #31, the result will be a replacement character if context is empty.
       return cx === "\uFFFE";
@@ -231,10 +226,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}             True if selected context matches val
      * Description  Test keyboard context for match
      */    
-    KeymanWeb['KCM'] = interface['contextMatch'] = interface.contextMatch = function(n, Ptarg, val, ln) {
-      //KeymanWeb._Debug('KeymanWeb.KCM(n='+n+', Ptarg, val='+val+', ln='+ln+'): return '+(interface.context(n,ln,Ptarg)==val)); 
-      var cx=interface.context(n, ln, Ptarg);
-      if(cx !== false && cx === val) {
+    KeymanWeb['KCM'] = kbdInterface['contextMatch'] = kbdInterface.contextMatch = function(n, Ptarg, val, ln) {
+      //KeymanWeb._Debug('KeymanWeb.KCM(n='+n+', Ptarg, val='+val+', ln='+ln+'): return '+(kbdInterface.context(n,ln,Ptarg)==val)); 
+      var cx=kbdInterface.context(n, ln, Ptarg);
+      if(cx === val) {
         return true; // I3318
       }
       keymanweb._DeadkeyResetMatched(); // I3318
@@ -248,7 +243,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}     true if keypress event
      * Description  Test if event as a keypress event
      */    
-    KeymanWeb['KIK'] = interface['isKeypress'] = interface.isKeypress = function(e) {
+    KeymanWeb['KIK'] = kbdInterface['isKeypress'] = kbdInterface.isKeypress = function(e) {
       if(keymanweb._ActiveKeyboard['KM']) {   // I1380 - support KIK for positional layouts
         return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
       } else {
@@ -265,7 +260,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}                 True if key matches rule
      * Description  Test keystroke with modifiers against rule
      */    
-    KeymanWeb['KKM'] = interface['keyMatch'] = interface.keyMatch = function(e,Lruleshift,Lrulekey) {
+    KeymanWeb['KKM'] = kbdInterface['keyMatch'] = kbdInterface.keyMatch = function(e,Lruleshift,Lrulekey) {
       var retVal = 0; // I3318
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
@@ -295,7 +290,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {number}      Lstate  
      * Description  Test keystroke against state key rules
      */
-    KeymanWeb['KSM'] = interface['stateMatch'] = interface.stateMatch = function(e, Lstate) {
+    KeymanWeb['KSM'] = kbdInterface['stateMatch'] = kbdInterface.stateMatch = function(e, Lstate) {
       return ((Lstate & e.Lstates) == Lstate);
     }
 
@@ -306,7 +301,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {Object}              Object with event's virtual key flag, key code, and modifiers
      * Description  Get object with extended key event information
      */    
-    KeymanWeb['KKI'] = interface['keyInformation'] = interface.keyInformation = function(e) {
+    KeymanWeb['KKI'] = kbdInterface['keyInformation'] = kbdInterface.keyInformation = function(e) {
       var ei = {};
       ei['vk'] = e.LisVirtualKey;
       ei['code'] = e.Lcode;
@@ -323,7 +318,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}             True if deadkey found selected context matches val
      * Description  Match deadkey at current cursor position
      */    
-    KeymanWeb['KDM'] = interface['deadkeyMatch'] = interface.deadkeyMatch = function(n, Ptarg, d) {
+    KeymanWeb['KDM'] = kbdInterface['deadkeyMatch'] = kbdInterface.deadkeyMatch = function(n, Ptarg, d) {
       if(keymanweb._DeadKeys.length == 0) {
         return false; // I3318
       }
@@ -346,7 +341,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Scope        Public
      * Description  Reset/terminate beep or flash (not currently used: Aug 2011)
      */    
-    KeymanWeb['KBR'] = interface['beepReset'] = interface.beepReset = function() {
+    KeymanWeb['KBR'] = kbdInterface['beepReset'] = kbdInterface.beepReset = function() {
       keymanweb.cachedContext.reset();
       
       var Lbo;
@@ -363,7 +358,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {Object}      Pelem     element to flash
      * Description  Flash body as substitute for audible beep
      */    
-    KeymanWeb['KB'] = interface['beep'] = interface.beep = function(Pelem) {
+    KeymanWeb['KB'] = kbdInterface['beep'] = kbdInterface.beep = function(Pelem) {
       keymanweb.cachedContext.reset();
       
       if(Pelem.body) {
@@ -385,7 +380,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       Pelem.style.backgroundColor = '#000000';
       if(keymanweb._BeepTimeout == 0) {
         keymanweb._BeepTimeout = 1;
-        window.setTimeout(interface.beepReset, 50);
+        window.setTimeout(kbdInterface.beepReset, 50);
       }
     }
     
@@ -398,7 +393,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}           True if character found in 'any' string, sets index accordingly
      * Description  Test for character matching
      */    
-    KeymanWeb['KA'] = interface['any'] = interface.any = function(n,ch,s) {
+    KeymanWeb['KA'] = kbdInterface['any'] = kbdInterface.any = function(n,ch,s) {
       if(ch == '') {
         return false;
       }
@@ -415,7 +410,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {string}      s       string to output   
      * Description  Keyboard output
      */    
-    KeymanWeb['KO'] = interface['output'] = interface.output = function(dn, Pelem, s) {
+    KeymanWeb['KO'] = kbdInterface['output'] = kbdInterface.output = function(dn, Pelem, s) {
       keymanweb.cachedContext.reset();
       
       // KeymanTouch for Android uses direct insertion of the character string
@@ -604,11 +599,11 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {number}      Pd      deadkey id
      * Description  Record a deadkey at current cursor position, deleting Pdn characters first
      */    
-    KeymanWeb['KDO'] = interface['deadkeyOutput'] = interface.deadkeyOutput = function(Pdn,Pelem,Pd) {
+    KeymanWeb['KDO'] = kbdInterface['deadkeyOutput'] = kbdInterface.deadkeyOutput = function(Pdn,Pelem,Pd) {
       keymanweb.cachedContext.reset();
       var Lc = new Object();
       if(Pdn >= 0) {
-        interface.output(Pdn,Pelem,"");  //I3318 corrected to >=
+        kbdInterface.output(Pdn,Pelem,"");  //I3318 corrected to >=
       }
       Lc.p=keymanweb._SelPos(Pelem); 
       Lc.d=Pd;
@@ -626,10 +621,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {Object}      Pelem   element to output to 
      * Description  Output a character selected from the string according to the offset in the index array
      */    
-    KeymanWeb['KIO'] = interface['indexOutput'] = interface.indexOutput = function(Pdn,Ps,Pn,Pelem) {
+    KeymanWeb['KIO'] = kbdInterface['indexOutput'] = kbdInterface.indexOutput = function(Pdn,Ps,Pn,Pelem) {
       keymanweb.cachedContext.reset();
       if(keymanweb._AnyIndices[Pn-1] < Ps._kmwLength()) {                        //I3319
-        interface.output(Pdn,Pelem,Ps._kmwCharAt(keymanweb._AnyIndices[Pn-1]));  //I3319
+        kbdInterface.output(Pdn,Pelem,Ps._kmwCharAt(keymanweb._AnyIndices[Pn-1]));  //I3319
       }
     }
 
@@ -696,7 +691,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {Object}      Pelem       Currently active element (may be needed by future tests)     
      * @return      {boolean}                 True if the test succeeds 
      */       
-    KeymanWeb['KIFS'] = interface['ifStore'] = interface.ifStore = function(systemId,strValue,Pelem) {
+    KeymanWeb['KIFS'] = kbdInterface['ifStore'] = kbdInterface.ifStore = function(systemId,strValue,Pelem) {
       var result=true;
       if(systemId == keymanweb.TSS_LAYER) {
         result = (osk.layerId === strValue);
@@ -762,7 +757,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {boolean}                 True if command succeeds
      *                                        (i.e. for TSS_LAYER, if the layer is successfully selected)
      */    
-    KeymanWeb['KSETS'] = interface['setStore'] = function(systemId,strValue,Pelem) {
+    KeymanWeb['KSETS'] = kbdInterface['setStore'] = function(systemId,strValue,Pelem) {
       keymanweb.cachedContext.reset();
       if(systemId == keymanweb.TSS_LAYER) {
         return osk.showLayer(strValue);     //Buld 350, osk reference now OK, so should work
@@ -779,7 +774,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {string}      dfltValue   default value
      * @return      {string}                  current or default option value   
      */    
-    KeymanWeb['KLOAD'] = interface['loadStore'] = function(kbdName,storeName,dfltValue) {
+    KeymanWeb['KLOAD'] = kbdInterface['loadStore'] = function(kbdName,storeName,dfltValue) {
       keymanweb.cachedContext.reset();
       var cName='KeymanWeb_'+kbdName+'_Option_'+storeName,cValue=util.loadCookie(cName);
       if(typeof cValue[storeName] != 'undefined') {
@@ -796,7 +791,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param       {string}      optValue    option value to save
      * @return      {boolean}                 true if save successful
      */    
-    KeymanWeb['KSAVE'] = interface['saveStore'] = function(storeName,optValue) {
+    KeymanWeb['KSAVE'] = kbdInterface['saveStore'] = function(storeName,optValue) {
       keymanweb.cachedContext.reset();
       var kbd=keymanweb._ActiveKeyboard;
       if(!kbd || typeof kbd['KI'] == 'undefined' || kbd['KI'] == '') {

@@ -6,18 +6,17 @@
 // If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the
 // KMW system, so we use the fact that 'initialized' is only 1 / true after all scripts are loaded for the initial
 // load of KMW.
-if(!window['tavultesoft']['keymanweb']['initialized']) {
+if(!window['keyman']['initialized']) {
   /*****************************************/
   /*                                       */
   /*   On-Screen (Visual) Keyboard Code    */
   /*                                       */
   /*****************************************/
 
-  (function()
-  {
+  (function() {
     // Declare KeymanWeb and member objects
-    var keymanweb=window['tavultesoft']['keymanweb'], osk=keymanweb['osk'],
-        util=keymanweb['util'],device=util.device,dbg=keymanweb.debug;
+    var keymanweb=window['keyman'], osk=keymanweb['osk'], util=keymanweb['util'], device=util.device, dbg=keymanweb.debug;
+    var kbdInterface=keymanweb['interface'];
 
     // Define Keyman Developer modifier bit-flags (exposed for use by other modules)
     osk.modifierCodes = {
@@ -959,7 +958,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           switch(keyName)
           {
             case 'K_BKSP':  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-              interface.output(1,keymanweb._LastActiveElement,"");
+              kbdInterface.output(1,keymanweb._LastActiveElement,"");
               break;
             case 'K_TAB':
               var bBack=(osk.layerId == 'shift');
@@ -974,7 +973,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             case 'K_ENTER':
               // Insert new line in text area fields
               if(Lelem.nodeName == 'TEXTAREA' || (typeof Lelem.base != 'undefined' && Lelem.base.nodeName == 'TEXTAREA'))
-                interface.output(0, Lelem, '\n');
+                kbdInterface.output(0, Lelem, '\n');
               // Or move to next field from TEXT fields
               else
               {
@@ -990,7 +989,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
               }
               break;
             case 'K_SPACE':
-              interface.output(0, Lelem, ' ');
+              kbdInterface.output(0, Lelem, ' ');
               break;
             case 'K_CAPS':
             case 'K_NUMLOCK':
@@ -1002,7 +1001,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
               // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
               var ch = osk.defaultKeyOutput(keyName,Lkc.Lcode,keyShiftState);
               if(ch) {
-                interface.output(0, Lelem, ch);
+                kbdInterface.output(0, Lelem, ch);
               }
           }
         }
@@ -2416,7 +2415,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
       // Also backspace, to allow delete to repeat while key held
       else if(keyName == 'K_BKSP') {
-        keymanweb.interface(1,keymanweb._LastActiveElement,"");
+        kbdInterface(1,keymanweb._LastActiveElement,"");
         osk.deleting = window.setTimeout(osk.repeatDelete,500);
         osk.keyPending = null;
       } else {
@@ -2723,7 +2722,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      **/
     osk.repeatDelete = function() {
       if(osk.deleting) {
-        interface.output(1,keymanweb._LastActiveElement,"");
+        kbdInterface.output(1,keymanweb._LastActiveElement,"");
         osk.deleting = window.setTimeout(osk.repeatDelete,100);
       }
     }
