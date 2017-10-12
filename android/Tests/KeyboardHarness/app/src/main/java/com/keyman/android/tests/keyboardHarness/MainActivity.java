@@ -30,26 +30,27 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     textView = (KMTextView) findViewById(R.id.kmTextView);
 
     // Add a custom keyboard
-    HashMap<String, String> kbInfo = new HashMap<String, String>();
+    HashMap<String, String> ckbInfo = new HashMap<String, String>();
     final String KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
 
     // Chirality test keyboard
-    kbInfo.put(KMManager.KMKey_KeyboardID, "chirality");
-    kbInfo.put(KMManager.KMKey_LanguageID, "eng");
-    kbInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
-    kbInfo.put(KMManager.KMKey_LanguageName, "English");
-    kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
-    kbInfo.put(KMManager.KMKey_Font, KeyboardFont);
-    KMManager.addKeyboard(this, kbInfo);
+    ckbInfo.put(KMManager.KMKey_KeyboardID, "chirality");
+    ckbInfo.put(KMManager.KMKey_LanguageID, "eng");
+    ckbInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
+    ckbInfo.put(KMManager.KMKey_LanguageName, "English");
+    ckbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
+    ckbInfo.put(KMManager.KMKey_Font, KeyboardFont);
+    KMManager.addKeyboard(this, ckbInfo);
 
-    // Longpress name/text test keyboard
-    kbInfo.put(KMManager.KMKey_KeyboardID, "longpress");
-    kbInfo.put(KMManager.KMKey_LanguageID, "eng");
-    kbInfo.put(KMManager.KMKey_KeyboardName, "Test Longpress");
-    kbInfo.put(KMManager.KMKey_LanguageName, "English");
-    kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
-    kbInfo.put(KMManager.KMKey_Font, KeyboardFont);
-    KMManager.addKeyboard(this, kbInfo);
+    // Tchad test keyboard
+    HashMap<String, String> tkbInfo = new HashMap<String, String>();
+    tkbInfo.put(KMManager.KMKey_KeyboardID, "tchaduni");
+    tkbInfo.put(KMManager.KMKey_LanguageID, "shu");
+    tkbInfo.put(KMManager.KMKey_KeyboardName, "Tchad Unicode V3");
+    tkbInfo.put(KMManager.KMKey_LanguageName, "Tchad");
+    tkbInfo.put(KMManager.KMKey_KeyboardVersion, "3.0");
+    tkbInfo.put(KMManager.KMKey_Font, KeyboardFont);
+    KMManager.addKeyboard(this, tkbInfo);
   }
 
   @Override
