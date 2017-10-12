@@ -18,7 +18,7 @@
       //document.body.style.backgroundColor="transparent";
       window.console.log('Device type = '+device);
       window.console.log('Keyboard height = '+oskHeight);
-      var kmw=window['tavultesoft']['keymanweb'];
+      var kmw=window['keyman'];
       kmw.init({'app':device,'fonts':'fonts/'});
       kmw['util']['setOption']('attachType','manual');
       kmw['oninserttext'] = insertText;
@@ -38,7 +38,7 @@
       if(h > 0) {
         oskHeight = h;
       }
-      var kmw=window['tavultesoft']['keymanweb'];
+      var kmw=window['keyman'];
       kmw['correctOSKTextSize']();
     }
 
@@ -63,7 +63,7 @@
     // Query KMW if a given keyboard uses chiral modifiers.
     function setIsChiral(keyboardProperties) {
       var name = typeof(keyboardProperties.internalName) == "undefined" ? keyboardProperties.keyboardName : keyboardProperties.internalName;
-      var isChiral = tavultesoft.keymanweb.isChiral(name);
+      var isChiral = keymanweb.isChiral(name);
       window.console.log('For keyboard "' + name + '"');
       window.console.log('setIsChiral = ' + isChiral);
 
@@ -74,7 +74,9 @@
     function setKeymanLanguage(keyboardName, internalName, languageName, langId, version, font, oskFont) {
       //oskFont.files = ['NotoSansSyriacWestern-Regular.svg#NotoSansSyriacWesternRegular'];
       //window.console.log('oskFonts = '+JSON.stringify(oskFont));
-      var kmw=window['tavultesoft']['keymanweb'];
+      var kmw=window['keyman'];
+      var kbdInterface=kmw['interface'];
+
       // Defaults for mising arguments
       switch (arguments.length) {
         case 1:
@@ -94,7 +96,7 @@
           break;
       }
 
-      kmw['KRS']({KN:keyboardName,KI:'Keyboard_'+internalName,KLC:langId,KL:languageName,
+      kbdInterface.registerStub({KN:keyboardName,KI:'Keyboard_'+internalName,KLC:langId,KL:languageName,
         KF:internalName+'-'+version+'.js',KFont:font,KOskFont:oskFont});
       kmw['setActiveKeyboard']('Keyboard_'+internalName,langId);
       kmw['osk']['show'](true);
@@ -106,7 +108,7 @@
     }
 
     function resetContext() {
-      tavultesoft.keymanweb.resetContext();
+      keymanweb.resetContext();
     }
 
     function updateKMText(text) {
@@ -114,14 +116,14 @@
           text = '';
       }
       var ta = document.getElementById('ta');
-      var kmw = window['tavultesoft']['keymanweb'];
+      var kmw = window['keyman'];
       ta.value = text;
       kmw['setActiveElement'](ta);
     }
 
     function updateKMSelectionRange(start, end) {
       var ta = document.getElementById('ta');
-      var kmw = window['tavultesoft']['keymanweb'];
+      var kmw = window['keyman'];
       ta.selectionStart = ta._KeymanWebSelectionStart = start;
       ta.selectionEnd = ta._KeymanWebSelectionEnd = end;
       kmw['setActiveElement'](ta);
@@ -175,22 +177,22 @@
 
     function showHelpBubble() {
       fragmentToggle = (fragmentToggle + 1) % 100;
-      var kmw = window['tavultesoft']['keymanweb'];
+      var kmw = window['keyman'];
       var pos = kmw['touchMenuPos']();
       window.console.log('showHelpBubble ' + pos);
       window.location.hash = 'showHelpBubble-' + fragmentToggle + '+keyPos=' + pos;
     }
 
     function executePopupKey(keyID, keyText) {
-      var kmw=window['tavultesoft']['keymanweb'];
-
+      var kmw=window['keyman'];
+      
       // KMW only needs keyID to process the popup key. keyText merely logged to console
       window.console.log('executePopupKey('+keyID+'); keyText: ' + keyText);
       kmw['executePopupKey'](keyID);
     }
 
     function executeHardwareKeystroke(code, shift, lstates) {
-      var kmw=window['tavultesoft']['keymanweb'];
+      var kmw=window['keyman'];
       window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ', ' + lstates + ');');
       try {
         var r = kmw['executeHardwareKeystroke'](code, shift, lstates);
@@ -201,7 +203,7 @@
     }
 
     function popupVisible(value) {
-      var kmw=window['tavultesoft']['keymanweb'];
+      var kmw=window['keyman'];
       kmw['popupVisible'](value);
     }
 
