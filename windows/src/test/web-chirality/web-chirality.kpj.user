@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProjectUser>
+  <templatepath>file:///C:/Projects/keyman/open/windows/src/developer/TIKE/xml/project/</templatepath>
+  <stringspath>file:///C:/Projects/keyman/open/windows/src/developer/TIKE/xml/project/</stringspath>
+  <state></state>
+  <FileStates>
+    <FileState>
+      <ID>id_7aa90ee616d809ba35375f207edda587</ID>
+      <FullPath>C:\Projects\keyman\open\windows\src\test\web-chirality\test_nonchiral.kmn</FullPath>
+      <Debug>False</Debug>
+    </FileState>
+    <FileState>
+      <ID>id_65caa3e7a6673c665d87e82bfaa8a150</ID>
+      <FullPath>C:\Projects\keyman\open\windows\src\test\web-chirality\test_nonchiral_partial.kmn</FullPath>
+      <IDEState>
+        <LayoutDisplay102Key>0</LayoutDisplay102Key>
+        <DebugDefaultFont>1</DebugDefaultFont>
+        <DebugFont>Courier New|12|   |0</DebugFont>
+        <CodeFont>Courier New|12|   |0</CodeFont>
+        <CharFont>Courier New|12|   |0</CharFont>
+      </IDEState>
+      <Debug>False</Debug>
+    </FileState>
+  </FileStates>
+  <MRU>
+    <File>
+      <ID>id_MRU0</ID>
+      <Filename>test_nonchiral_partial.kmn</Filename>
+      <FileType>.kmn</FileType>
+      <FullPath>C:\Projects\keyman\open\windows\src\test\web-chirality\test_nonchiral_partial.kmn</FullPath>
+    </File>
+  </MRU>
+</KeymanDeveloperProjectUser>
