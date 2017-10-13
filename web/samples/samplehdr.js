@@ -82,7 +82,7 @@
   // Script to allow a user to add any keyboard to the keyboard menu 
   function addKeyboard(n)
   { 
-    var sKbd,kmw=tavultesoft.keymanweb;
+    var sKbd,kmw=keyman;
     switch(n)
     {
       case 1:
