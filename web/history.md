@@ -11,6 +11,7 @@
 * Added support for L/R Alt and Ctrl modifiers for keyboards. (#9) (#52)
 * Added support for use of the Caps Lock state within keyboards if specified by a keyboard designer.
 * Fixed next-layer processing (#116)
+* Reworked the keyboard-interfacing API calls and base layout of KeymanWeb (#349)
 
 ## 2017-07-10 2.0.473 stable
 * 2.0 stable release build.
