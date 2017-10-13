@@ -9,7 +9,7 @@
 import AudioToolbox
 import UIKit
 
-public class KeymanTextField: UITextField, UITextFieldDelegate {
+public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate {
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
@@ -49,20 +49,19 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
       inputAssistantItem.trailingBarButtonGroups = []
     }
 
-    KMManager.sharedInstance() // Preload webview keyboard
+    _ = Manager.shared // Preload webview keyboard
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.textFieldTextDidChange),
                                            name: .UITextFieldTextDidChange, object: self)
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged),
                                            name: NSNotification.Name.keymanKeyboardChanged, object: nil)
-
   }
 
   // MARK: - Class Overrides
   public override var inputView: UIView? {
     get {
-      KMManager.sharedInstance().webDelegate = self
-      return KMManager.inputView()
+      Manager.shared.webDelegate = self
+      return Manager.inputView()
     }
 
     set(inputView) {
@@ -84,7 +83,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
       }
 
       if delegate !== delegateProxy {
-        KMManager.sharedInstance().kmLog(
+        Manager.shared.kmLog(
           "Trying to set KeymanTextField's delegate directly. Use setKeymanDelegate() instead.",
           checkDebugPrinting: true)
       }
@@ -98,7 +97,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
   // All of the normal UITextFieldDelegate methods are supported.
   public func setKeymanDelegate(_ keymanDelegate: KeymanTextFieldDelegate?) {
     delegateProxy.keymanDelegate = keymanDelegate
-    KMManager.sharedInstance().kmLog(
+    Manager.shared.kmLog(
       "KeymanTextField: \(self.debugDescription) keymanDelegate set to: \(keymanDelegate.debugDescription)",
       checkDebugPrinting: true)
   }
@@ -106,11 +105,11 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
   // Dismisses the keyboard if this textview is the first responder.
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
   @objc public func dismissKeyboard() {
-    KMManager.sharedInstance().kmLog(
+    Manager.shared.kmLog(
       "KeymanTextField: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
       checkDebugPrinting: true)
     resignFirstResponder()
-    KMManager.inputView().endEditing(true)
+    Manager.inputView().endEditing(true)
   }
 
   public override var text: String! {
@@ -125,11 +124,11 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
         super.text = ""
       }
 
-      KMManager.setKMText(self.text)
+      Manager.setText(self.text)
       let textRange = selectedTextRange!
       let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                              length: offset(from: textRange.start, to: textRange.end))
-      KMManager.setKMSelectionRange(newRange, manually: false)
+      Manager.setSelectionRange(newRange, manually: false)
     }
   }
 
@@ -141,15 +140,15 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
       dismissKeyboard()
     } else if fragment.contains("menuKeyUp") {
       if let viewController = viewController {
-        KMManager.sharedInstance().showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
+        Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
       } else {
-        KMManager.sharedInstance().switchToNextKeyboard()
+        Manager.shared.switchToNextKeyboard()
       }
     }
   }
 
   private func processInsertText(_ fragment: String) {
-    if KMManager.sharedInstance().isSubKeysMenuVisible() {
+    if Manager.shared.isSubKeysMenuVisible {
       return
     }
 
@@ -220,7 +219,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
       }
       let newRange = NSRange(location: offset(from: beginningOfDocument, to: range.start),
                              length: offset(from: range.start, to: range.end))
-      KMManager.setKMSelectionRange(newRange, manually: false)
+      Manager.setSelectionRange(newRange, manually: false)
     }
   }
 
@@ -233,18 +232,18 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
   @objc public func textFieldTextDidChange(_ notification: Notification) {
     if shouldUpdateKMText {
       // Catches copy/paste operations
-      KMManager.setKMText(text)
+      Manager.setText(text)
       let textRange = selectedTextRange!
       let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                              length: offset(from: textRange.start, to: textRange.end))
-      KMManager.setKMSelectionRange(newRange, manually: false)
+      Manager.setSelectionRange(newRange, manually: false)
       shouldUpdateKMText = false
     }
   }
 
   public func textFieldShouldClear(_ textField: UITextField) -> Bool {
     if textField == self {
-      KMManager.clearText()
+      Manager.clearText()
     }
     return true
   }
@@ -252,11 +251,11 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
   public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
     let leftToRightMark = "\u{200e}"
     let rightToLeftOverride = "\u{202e}"
-    let keyboardID = KMManager.sharedInstance().keyboardID
-    let languageID = KMManager.sharedInstance().languageID
+    let keyboardID = Manager.shared.keyboardID!
+    let languageID = Manager.shared.languageID!
     let textWD = baseWritingDirection(for: beginningOfDocument, in: .forward)
 
-    if KMManager.sharedInstance().isRTLKeyboard(withID: keyboardID, languageID: languageID) {
+    if Manager.shared.isRTLKeyboard(withID: keyboardID, languageID: languageID) {
       if textWD != .rightToLeft {
         if text.hasPrefix(leftToRightMark) {
           text = String(text.utf16.dropFirst())
@@ -283,11 +282,11 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
   }
 
   public func textFieldDidBeginEditing(_ textField: UITextField) {
-    KMManager.sharedInstance().webDelegate = self
+    Manager.shared.webDelegate = self
 
-    let keyboardID = KMManager.sharedInstance().keyboardID
-    let languageID = KMManager.sharedInstance().languageID
-    let fontName = KMManager.sharedInstance().fontNameForKeyboard(withID: keyboardID, languageID: languageID)
+    let keyboardID = Manager.shared.keyboardID!
+    let languageID = Manager.shared.languageID!
+    let fontName = Manager.shared.fontNameForKeyboard(withID: keyboardID, languageID: languageID)
     let fontSize = font?.pointSize ?? UIFont.systemFontSize
     if let fontName = fontName {
       font = UIFont(name: fontName, size: fontSize)
@@ -295,16 +294,16 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
       font = UIFont.systemFont(ofSize: fontSize)
     }
 
-    KMManager.sharedInstance().kmLog("TextField setFont: \(String(describing: font?.familyName))",
+    Manager.shared.kmLog("TextField setFont: \(String(describing: font?.familyName))",
       checkDebugPrinting: true)
 
     // copy this textField's text to the webview
-    KMManager.setKMText(text)
+    Manager.setText(text)
     let textRange = selectedTextRange!
     let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                            length: offset(from: textRange.start, to: textRange.end))
-    KMManager.setKMSelectionRange(newRange, manually: false)
-    KMManager.sharedInstance().kmLog(
+    Manager.setSelectionRange(newRange, manually: false)
+    Manager.shared.kmLog(
       "KeymanTextField: \(self.debugDescription) Became first responder. Value: \(String(describing: text))",
       checkDebugPrinting: true)
   }
@@ -326,7 +325,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
     let kbInfo = notification.userInfo?[kKeymanKeyboardInfoKey] as? [AnyHashable: Any]
     let keyboardID = kbInfo?[kKeymanKeyboardIdKey] as? String
     let languageID = kbInfo?[kKeymanLanguageIdKey] as? String
-    let fontName = KMManager.sharedInstance().fontNameForKeyboard(withID: keyboardID, languageID: languageID)
+    let fontName = Manager.shared.fontNameForKeyboard(withID: keyboardID!, languageID: languageID!)
     let fontSize = font?.pointSize ?? UIFont.systemFontSize
     if let fontName = fontName {
       font = UIFont(name: fontName, size: fontSize)
@@ -338,7 +337,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate {
       resignFirstResponder()
       becomeFirstResponder()
     }
-    KMManager.sharedInstance().kmLog(
+    Manager.shared.kmLog(
       "KeymanTextField \(self.debugDescription) setFont: \(font!.familyName)", checkDebugPrinting: true)
   }
 

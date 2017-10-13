@@ -32,7 +32,7 @@ public class KeymanURLProtocol: URLProtocol, NSURLConnectionDataDelegate {
 
   public override func startLoading() {
     guard let mutableRequest = request as? NSMutableURLRequest else {
-      KMManager.sharedInstance().kmLog("KeymanURLProtocol: Bridge to NSMutableURLRequest failed",
+      Manager.shared.kmLog("KeymanURLProtocol: Bridge to NSMutableURLRequest failed",
                                        checkDebugPrinting: true)
       return
     }

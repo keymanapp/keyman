@@ -115,16 +115,16 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private var isCurrentKeyboard: Bool {
-    return KMManager.sharedInstance().keyboardID == keyboardID &&
-      KMManager.sharedInstance().languageID == languageID
+    return Manager.shared.keyboardID == keyboardID &&
+      Manager.shared.languageID == languageID
   }
 
   private var canDeleteKeyboard: Bool {
-    if !KMManager.sharedInstance().canRemoveKeyboards {
+    if !Manager.shared.canRemoveKeyboards {
       return false
     }
 
-    if !KMManager.sharedInstance().canRemoveDefaultKeyboard {
+    if !Manager.shared.canRemoveDefaultKeyboard {
       return keyboardIndex != 0
     }
 
@@ -150,22 +150,22 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     }
 
     if alertView.tag == 1 {
-      let userData = KMManager.sharedInstance().activeUserDefaults()
-      let userKeyboards = userData!.array(forKey: kKeymanUserKeyboardsListKey) as! [[String: String]]
+      let userData = Manager.shared.activeUserDefaults()
+      let userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey) as! [[String: String]]
       let kbDict = userKeyboards[keyboardIndex]
 
-      if KMManager.sharedInstance().removeKeyboard(at: UInt(keyboardIndex)) {
+      if Manager.shared.removeKeyboard(at: keyboardIndex) {
         if isCurrentKeyboard {
           // Select default keyboard
 
-          let kbID = userKeyboards[0][kKeymanKeyboardIdKey]
-          let langID = userKeyboards[0][kKeymanLanguageIdKey]
+          let kbID = userKeyboards[0][kKeymanKeyboardIdKey]!
+          let langID = userKeyboards[0][kKeymanLanguageIdKey]!
           let kbName = userKeyboards[0][kKeymanKeyboardNameKey]
           let langName = userKeyboards[0][kKeymanLanguageNameKey]
           let font = userKeyboards[0][kKeymanFontKey]
           let oskFont = userKeyboards[0][kKeymanOskFontKey]
-          KMManager.sharedInstance().setKeyboardWithID(kbID, languageID: langID,
-            keyboardName: kbName, languageName: langName, font: font, oskFont: oskFont)
+          Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
+                                     languageName: langName, font: font, oskFont: oskFont)
         }
         NotificationCenter.default.post(name: NSNotification.Name.keymanKeyboardRemoved,
                                         object: self, userInfo: [ kKeymanKeyboardInfoKey: kbDict ]

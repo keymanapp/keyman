@@ -14,7 +14,8 @@
 public class HTTPDownloadRequest: NSObject {
   @objc public let url: URL
   @objc public let typeCode: DownloadType
-  @objc public let userInfo: [String: Any]
+  // TODO: Make values of this dict properties of the class
+  @objc public var userInfo: [String: Any]
   var task: URLSessionTask?
   @objc public var destinationFile: String?
   @objc public var rawResponseData: Data?

@@ -21,7 +21,7 @@ public enum MenuBehaviour: Int {
   case showNever
 }
 
-open class KeymanInputViewController: UIInputViewController {
+open class KeymanInputViewController: UIInputViewController, KeymanWebViewDelegate {
   var menuCloseButtonTitle = ""
   var isInputClickSoundEnabled = true
   var globeKeyTapBehaviour = GlobeKeyTapBehaviour(rawValue: 0)!
@@ -49,12 +49,12 @@ open class KeymanInputViewController: UIInputViewController {
   }
 
   open override var hasFullAccess: Bool {
-    return KMManager.sharedInstance().canAccessSharedContainer()
+    return Manager.shared.canAccessSharedContainer()
   }
 
   private var keyboardListCount: Int {
-    let userData = KMManager.sharedInstance().activeUserDefaults()
-    let keyboardList = userData?.array(forKey: kKeymanUserKeyboardsListKey)
+    let userData = Manager.shared.activeUserDefaults()
+    let keyboardList = userData.array(forKey: kKeymanUserKeyboardsListKey)
     return keyboardList?.count ?? 0
   }
 
@@ -64,8 +64,8 @@ open class KeymanInputViewController: UIInputViewController {
   }
 
   public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    kmInputView = KMManager.inputView()
-    isTopBarEnabled = KMManager.sharedInstance().isSystemKeyboardTopBarEnabled
+    kmInputView = Manager.inputView()
+    isTopBarEnabled = Manager.shared.isSystemKeyboardTopBarEnabled
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
   }
 
@@ -79,7 +79,7 @@ open class KeymanInputViewController: UIInputViewController {
       return
     }
 
-    KMManager.sharedInstance().updateViewConstraints()
+    Manager.shared.updateViewConstraints()
 
     let topBarHeight = isTopBarEnabled ? CGFloat(KeymanInputViewController.topBarHeight) : 0
     barHeightConstraints[0].constant = topBarHeight
@@ -112,8 +112,8 @@ open class KeymanInputViewController: UIInputViewController {
     let bgColor = UIColor(red: 210.0 / 255.0, green: 214.0 / 255.0, blue: 220.0 / 255.0, alpha: 1.0)
     view.backgroundColor = bgColor
 
-    KMManager.sharedInstance().inputViewDidLoad()
-    KMManager.sharedInstance().inputDelegate = self
+    Manager.shared.inputViewDidLoad()
+    Manager.shared.inputDelegate = self
 
     topBarImageView?.removeFromSuperview()
     topBarImageView = UIImageView()
@@ -137,7 +137,7 @@ open class KeymanInputViewController: UIInputViewController {
   }
 
   open override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
-    KMManager.sharedInstance().inputViewWillRotate(to: toInterfaceOrientation, duration: duration)
+    Manager.shared.inputViewWillRotate(to: toInterfaceOrientation, duration: duration)
   }
 
   open override func textDidChange(_ textInput: UITextInput?) {
@@ -152,12 +152,12 @@ open class KeymanInputViewController: UIInputViewController {
       newRange = context.startIndex..<context.startIndex
     }
 
-    KMManager.setKMText(context)
-    KMManager.setKMSelectionRange(NSRange(newRange, in: context), manually: false)
+    Manager.setText(context)
+    Manager.setSelectionRange(NSRange(newRange, in: context), manually: false)
   }
 
   private func processInsertText(_ fragment: String) {
-    if KMManager.sharedInstance().isSubKeysMenuVisible() {
+    if Manager.shared.isSubKeysMenuVisible {
       return
     }
 
@@ -224,14 +224,13 @@ open class KeymanInputViewController: UIInputViewController {
     if fragment.contains("insertText") {
       processInsertText(fragment)
     } else if fragment.contains("menuKeyUp") {
-      if KMManager.sharedInstance().isKeyboardMenuVisible() {
+      if Manager.shared.isKeyboardMenuVisible {
         return
       }
 
       switch globeKeyTapBehaviour {
       case .switchToNextKeyboard:
-        let nextIndex = KMManager.sharedInstance().switchToNextKeyboard()
-        if nextIndex <= 0 {
+        if let nextIndex = Manager.shared.switchToNextKeyboard(), nextIndex <= 0 {
           advanceToNextInputMode()
         }
       case .switchToNextInputMethod:

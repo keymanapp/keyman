@@ -238,12 +238,15 @@ KeymanTextViewDelegate, KeymanTextFieldDelegate {
     let font = kbInfo?[kKeymanFontKey] as? String
     let oskFont = kbInfo?[kKeymanOskFontKey] as? String
 
-    if kbID != nil && langID != nil && kbName != nil && langName != nil {
-      KMManager.sharedInstance().addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-                                             languageName: langName, isRTL: isRTL, isCustom: isCustom,
+    if let kbID = kbID,
+       let langID = langID,
+       let kbName = kbName,
+       let langName = langName {
+      Manager.shared.addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
+                                 languageName: langName, isRTL: isRTL, isCustom: isCustom,
                                              font: font, oskFont: oskFont)
-      KMManager.sharedInstance().setKeyboardWithID(kbID, languageID: langID, keyboardName: kbName,
-                                                   languageName: langName, font: font, oskFont: oskFont)
+      Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
+                                 languageName: langName, font: font, oskFont: oskFont)
       perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
     }
   }
@@ -279,7 +282,7 @@ KeymanTextViewDelegate, KeymanTextFieldDelegate {
 
   func downloadCustomKeyboard() {
     let url = URL(string: "https://sites.google.com/site/hebrewsoftware/files/yiddish_zc-1.0.json")
-    KMManager.sharedInstance().downloadKeyboard(from: url!, isDirect: false)
+    Manager.shared.downloadKeyboard(from: url!, isDirect: false)
   }
 
   func showActivityIndicator() {

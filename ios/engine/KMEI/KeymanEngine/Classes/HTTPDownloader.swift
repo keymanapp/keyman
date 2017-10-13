@@ -74,7 +74,7 @@ public class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegat
     guard let currentRequest = currentRequest else {
       return
     }
-    KMManager.sharedInstance().kmLog("Downloaded file \(currentRequest.url) as \(location), " +
+    Manager.shared.kmLog("Downloaded file \(currentRequest.url) as \(location), " +
       "to be copied to \(currentRequest.destinationFile ?? "nil")", checkDebugPrinting: false)
 
     // If a destination file for the download has already been specified, let's go ahead and copy it over.
@@ -83,7 +83,7 @@ public class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegat
         try FileManager.default.copyItem(at: location,
                                          to: URL(fileURLWithPath: destFile))
       } catch {
-        KMManager.sharedInstance().kmLog("Error saving the download: \(error)", checkDebugPrinting: false)
+        Manager.shared.kmLog("Error saving the download: \(error)", checkDebugPrinting: false)
       }
     }
   }

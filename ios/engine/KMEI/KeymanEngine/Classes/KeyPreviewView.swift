@@ -22,7 +22,7 @@ public class KeyPreviewView: UIView {
 
   @objc public override init(frame: CGRect) {
     let isPortrait: Bool
-    if KMManager.isKeymanSystemKeyboard() {
+    if Manager.isKeymanSystemKeyboard {
       isPortrait = KeymanInputViewController.isPortrait
     } else {
       isPortrait = UIApplication.shared.statusBarOrientation.isPortrait
@@ -35,9 +35,9 @@ public class KeyPreviewView: UIView {
     var viewPosX = keyFrame.origin.x - (viewWidth - keyFrame.width) / 2.0
     var viewPosY = keyFrame.origin.y - (viewHeight - keyFrame.height)
 
-    let tbHeight = KMManager.sharedInstance().isSystemKeyboardTopBarEnabled ?
+    let tbHeight = Manager.shared.isSystemKeyboardTopBarEnabled ?
       CGFloat(KeymanInputViewController.topBarHeight) : 0
-    if KMManager.isKeymanSystemKeyboard() && (viewPosY < -tbHeight) {
+    if Manager.isKeymanSystemKeyboard && (viewPosY < -tbHeight) {
       adjY = viewPosY + tbHeight
       viewPosY = CGFloat(-tbHeight)
       viewHeight += adjY

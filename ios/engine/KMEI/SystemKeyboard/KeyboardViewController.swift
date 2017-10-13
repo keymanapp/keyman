@@ -10,8 +10,8 @@ import KeymanEngine
 
 class KeyboardViewController: KeymanInputViewController {
   override func viewDidLoad() {
-    KMManager.setApplicationGroupIdentifier("group.KMEI")
-    KMManager.sharedInstance().debugPrintingOn = true
+    Manager.setApplicationGroupIdentifier("group.KMEI")
+    Manager.shared.isDebugPrintingOn = true
     super.viewDidLoad()
   }
 }

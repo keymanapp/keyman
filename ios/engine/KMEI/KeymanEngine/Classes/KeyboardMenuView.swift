@@ -35,8 +35,8 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
       return tableList
     }
 
-    let userData = KMManager.sharedInstance().activeUserDefaults()
-    let keyboardList = userData?.array(forKey: kKeymanUserKeyboardsListKey)
+    let userData = Manager.shared.activeUserDefaults()
+    let keyboardList = userData.array(forKey: kKeymanUserKeyboardsListKey)
 
     let titleCloseButton: String
     if let closeButtonTitle = closeButtonTitle {
@@ -50,24 +50,25 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
       _tableList = keyboardList
       _tableList!.append(titleCloseButton)
     } else {
-      let kbVersion: String = KMManager.sharedInstance().latestKeyboardFileVersion(withID: kKeymanDefaultKeyboardID)
-      _tableList = [[
+      var keyboard = [
         kKeymanKeyboardIdKey: kKeymanDefaultKeyboardID,
         kKeymanLanguageIdKey: kKeymanDefaultLanguageID,
         kKeymanKeyboardNameKey: kKeymanDefaultKeyboardName,
         kKeymanLanguageNameKey: kKeymanDefaultLanguageName,
-        kKeymanKeyboardVersionKey: kbVersion,
         kKeymanKeyboardRTLKey: kKeymanDefaultKeyboardRTL,
         kKeymanFontKey: kKeymanDefaultKeyboardFont
-        ]
       ]
+      if let version = Manager.shared.latestKeyboardFileVersion(withID: kKeymanDefaultKeyboardID) {
+        keyboard[kKeymanKeyboardVersionKey] = version
+      }
+      _tableList = [keyboard]
       _tableList!.append(titleCloseButton)
     }
     return _tableList!
   }
 
   @objc public init(keyFrame frame: CGRect, inputViewController: KeymanInputViewController, closeButtonTitle: String) {
-    let isSystemKeyboard = KMManager.isKeymanSystemKeyboard()
+    let isSystemKeyboard = Manager.isKeymanSystemKeyboard
     let isPortrait: Bool
     if isSystemKeyboard {
       isPortrait = KeymanInputViewController.isPortrait
@@ -77,7 +78,7 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
 
     _inputViewController = inputViewController
     self.closeButtonTitle = closeButtonTitle
-    topBarHeight = KMManager.sharedInstance().isSystemKeyboardTopBarEnabled ?
+    topBarHeight = Manager.shared.isSystemKeyboardTopBarEnabled ?
       CGFloat(KeymanInputViewController.topBarHeight) : 0
     keyFrame = frame
     rowHeight = UIDevice.current.userInterfaceIdiom == .phone ? 30 : 60
@@ -86,7 +87,7 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
 
     var mainFrame = inputViewController.view.frame
     if mainFrame == CGRect.zero {
-      mainFrame = KMManager.inputView().frame
+      mainFrame = Manager.inputView().frame
     }
     super.init(frame: mainFrame)
 
@@ -95,8 +96,8 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
     let baseHeight = keyFrame.size.height
     let containerWidth = maxWidth - strokeWidth * 2
     var containerHeight = CGFloat(tableList.count) * rowHeight
-    let vHeight = KMManager.keyboardHeight() + topBarHeight
-    let bY = KMManager.keyboardHeight() - (keyFrame.origin.y + baseHeight)
+    let vHeight = Manager.keyboardHeight + topBarHeight
+    let bY = Manager.keyboardHeight - (keyFrame.origin.y + baseHeight)
 
     if containerHeight + baseHeight > vHeight - bY {
       let maxRows = (vHeight - baseHeight - bY) / rowHeight
@@ -247,7 +248,7 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
   }
 
   @objc func tapAction(_ sender: UITapGestureRecognizer) {
-    KMManager.sharedInstance().dismissKeyboardMenu()
+    Manager.shared.dismissKeyboardMenu()
   }
 
   public func numberOfSections(in tableView: UITableView) -> Int {
@@ -294,8 +295,8 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
       let keyboardID = keyboard?[kKeymanKeyboardIdKey] as? String
       cell.textLabel?.text = keyboard?[kKeymanKeyboardNameKey] as? String
       cell.tag = indexPath.row
-      if (KMManager.sharedInstance().languageID == languageID) &&
-        (KMManager.sharedInstance().keyboardID == keyboardID) {
+      if (Manager.shared.languageID == languageID) &&
+        (Manager.shared.keyboardID == keyboardID) {
         cell.selectionStyle = .none
         cell.isSelected = true
         cell.accessoryType = .checkmark
@@ -308,7 +309,7 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
 
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     switchKeyboard(indexPath.row)
-    KMManager.sharedInstance().dismissKeyboardMenu()
+    Manager.shared.dismissKeyboardMenu()
   }
 
   func getMaxWidth() -> CGFloat {
@@ -347,8 +348,8 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
     let font = kb[kKeymanFontKey] as? String
     let oskFont = kb[kKeymanOskFontKey] as? String
 
-    if KMManager.sharedInstance().setKeyboardWithID(kbID, languageID: langID, keyboardName: kbName,
-                                                    languageName: langName, font: font, oskFont: oskFont) {
+    if Manager.shared.setKeyboard(withID: kbID!, languageID: langID!, keyboardName: kbName,
+                                  languageName: langName, font: font, oskFont: oskFont) {
       tableView?.reloadData()
     }
   }

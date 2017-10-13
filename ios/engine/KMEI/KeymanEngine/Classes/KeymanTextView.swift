@@ -9,7 +9,7 @@
 import AudioToolbox
 import UIKit
 
-public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback {
+public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback, KeymanWebViewDelegate {
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
@@ -53,7 +53,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
       inputAssistantItem.trailingBarButtonGroups = []
     }
 
-    KMManager.sharedInstance() // Preload webview keyboard
+    Manager.shared // Preload webview keyboard
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged),
                                            name: .keymanKeyboardChanged, object: nil)
   }
@@ -61,8 +61,8 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   // MARK: - Class Overrides
   public override var inputView: UIView? {
     get {
-      KMManager.sharedInstance().webDelegate = self
-      return KMManager.inputView()
+      Manager.shared.webDelegate = self
+      return Manager.inputView()
     }
 
     set(inputView) {
@@ -84,7 +84,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
       }
 
       if delegate !== delegateProxy {
-        KMManager.sharedInstance().kmLog(
+        Manager.shared.kmLog(
           "Trying to set KeymanTextView's delegate directly. Use setKeymanDelegate() instead.",
           checkDebugPrinting: true)
       }
@@ -98,7 +98,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   //   - All of the normal UITextViewDelegate methods are supported.
   public func setKeymanDelegate(_ keymanDelegate: KeymanTextViewDelegate?) {
     delegateProxy.keymanDelegate = keymanDelegate
-    KMManager.sharedInstance().kmLog(
+    Manager.shared.kmLog(
       "KeymanTextView: \(self.debugDescription) keymanDelegate set to: \(keymanDelegate.debugDescription)",
       checkDebugPrinting: true)
   }
@@ -106,11 +106,11 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   // Dismisses the keyboard if this textview is the first responder.
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
   @objc public func dismissKeyboard() {
-    KMManager.sharedInstance().kmLog(
+    Manager.shared.kmLog(
       "KeymanTextView: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
       checkDebugPrinting: true)
     resignFirstResponder()
-    KMManager.inputView().endEditing(true)
+    Manager.inputView().endEditing(true)
   }
 
   public override var text: String! {
@@ -125,8 +125,8 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
         super.text = ""
       }
 
-      KMManager.setKMText(self.text)
-      KMManager.setKMSelectionRange(selectedRange, manually: false)
+      Manager.setText(self.text)
+      Manager.setSelectionRange(selectedRange, manually: false)
     }
   }
 
@@ -138,15 +138,15 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
       dismissKeyboard()
     } else if fragment.contains("menuKeyUp") {
       if let viewController = viewController {
-        KMManager.sharedInstance().showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
+        Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
       } else {
-        KMManager.sharedInstance().switchToNextKeyboard()
+        Manager.shared.switchToNextKeyboard()
       }
     }
   }
 
   private func processInsertText(_ fragment: String) {
-    if KMManager.sharedInstance().isSubKeysMenuVisible() {
+    if Manager.shared.isSubKeysMenuVisible {
       return
     }
 
@@ -216,7 +216,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   // MARK: - UITextViewDelegate Hooks
   public override var selectedTextRange: UITextRange? {
     didSet {
-      KMManager.setKMSelectionRange(selectedRange, manually: false)
+      Manager.setSelectionRange(selectedRange, manually: false)
     }
   }
 
@@ -229,11 +229,11 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   public func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
     let leftToRightMark = "\u{200e}"
     let rightToLeftMark = "\u{200f}" // or "\u{202e}"
-    let keyboardID = KMManager.sharedInstance().keyboardID
-    let languageID = KMManager.sharedInstance().languageID
+    let keyboardID = Manager.shared.keyboardID!
+    let languageID = Manager.shared.languageID!
     let textWD = baseWritingDirection(for: beginningOfDocument, in: .forward)
 
-    if KMManager.sharedInstance().isRTLKeyboard(withID: keyboardID, languageID: languageID) {
+    if Manager.shared.isRTLKeyboard(withID: keyboardID, languageID: languageID) {
       if textWD != .rightToLeft {
         if text.hasPrefix(leftToRightMark) {
           text = String(text.utf16.dropFirst())
@@ -263,11 +263,11 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   }
 
   public func textViewDidBeginEditing(_ textView: UITextView) {
-    KMManager.sharedInstance().webDelegate = self
+    Manager.shared.webDelegate = self
 
-    let keyboardID = KMManager.sharedInstance().keyboardID
-    let languageID = KMManager.sharedInstance().languageID
-    let fontName = KMManager.sharedInstance().fontNameForKeyboard(withID: keyboardID, languageID: languageID)
+    let keyboardID = Manager.shared.keyboardID!
+    let languageID = Manager.shared.languageID!
+    let fontName = Manager.shared.fontNameForKeyboard(withID: keyboardID, languageID: languageID)
     let fontSize = font?.pointSize ?? UIFont.systemFontSize
     if let fontName = fontName {
       font = UIFont(name: fontName, size: fontSize)
@@ -275,13 +275,13 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
       font = UIFont.systemFont(ofSize: fontSize)
     }
 
-    KMManager.sharedInstance().kmLog("TextView setFont: \(String(describing: font?.familyName))",
+    Manager.shared.kmLog("TextView setFont: \(String(describing: font?.familyName))",
       checkDebugPrinting: true)
 
     // copy this textView's text to the webview
-    KMManager.setKMText(text)
-    KMManager.setKMSelectionRange(selectedRange, manually: false)
-    KMManager.sharedInstance().kmLog(
+    Manager.setText(text)
+    Manager.setSelectionRange(selectedRange, manually: false)
+    Manager.shared.kmLog(
       "KeymanTextView: \(self.debugDescription) Became first responder. Value: \(text.debugDescription)",
       checkDebugPrinting: true)
   }
@@ -296,8 +296,8 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   public func textViewDidChange(_ textView: UITextView) {
     if shouldUpdateKMText {
       // Catches copy/paste operations
-      KMManager.setKMText(textView.text)
-      KMManager.setKMSelectionRange(textView.selectedRange, manually: false)
+      Manager.setText(textView.text)
+      Manager.setSelectionRange(textView.selectedRange, manually: false)
       shouldUpdateKMText = false
     }
   }
@@ -318,7 +318,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
     let kbInfo = notification.userInfo?[kKeymanKeyboardInfoKey] as? [AnyHashable: Any]
     let keyboardID = kbInfo?[kKeymanKeyboardIdKey] as? String
     let languageID = kbInfo?[kKeymanLanguageIdKey] as? String
-    let fontName = KMManager.sharedInstance().fontNameForKeyboard(withID: keyboardID, languageID: languageID)
+    let fontName = Manager.shared.fontNameForKeyboard(withID: keyboardID!, languageID: languageID!)
     let fontSize = font?.pointSize ?? UIFont.systemFontSize
     if let fontName = fontName {
       font = UIFont(name: fontName, size: fontSize)
@@ -331,7 +331,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
       becomeFirstResponder()
     }
 
-    KMManager.sharedInstance().kmLog("TextView setFont: \(String(describing: font?.familyName))",
+    Manager.shared.kmLog("TextView setFont: \(String(describing: font?.familyName))",
       checkDebugPrinting: true)
   }
 

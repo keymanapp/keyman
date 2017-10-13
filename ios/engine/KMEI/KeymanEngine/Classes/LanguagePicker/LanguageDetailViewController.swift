@@ -75,7 +75,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
       cell.detailTextLabel?.isEnabled = true
     }
 
-    let kbState = KMManager.sharedInstance().stateForKeyboard(withID: keyboardID)
+    let kbState = Manager.shared.stateForKeyboard(withID: keyboardID)
     cell.setKeyboardState(kbState, selected: false, defaultAccessoryType: cell.accessoryType)
   }
 
@@ -84,9 +84,9 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     let kbID = keyboards[indexPath.section][kKeymanIdKey] as! String
     let kbName = keyboards[indexPath.section][kKeymanNameKey]
 
-    let state = KMManager.sharedInstance().stateForKeyboard(withID: kbID)
-    if state != kKMKeyboardStateDownloading {
-      if state == kKMKeyboardStateNeedsDownload {
+    let state = Manager.shared.stateForKeyboard(withID: kbID)
+    if state != .downloading {
+      if state == .needsDownload {
         isUpdate = false
       } else {
         isUpdate = true
@@ -105,8 +105,8 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   func alertView(_ alertView: UIAlertView, clickedButtonAt buttonIndex: Int) {
     // Keyboard download confirmation alert (tag is used for keyboard index).
     if buttonIndex != alertView.cancelButtonIndex {
-      KMManager.sharedInstance().downloadKeyboard(forLanguageIndex: languageIndex,
-                                                  keyboardIndex: alertView.tag, isUpdate: isUpdate)
+      Manager.shared.downloadKeyboard(forLanguageIndex: languageIndex,
+                                      keyboardIndex: alertView.tag, isUpdate: isUpdate)
     }
   }
 
@@ -148,8 +148,8 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func loadUserKeyboards() {
-    let userData = KMManager.sharedInstance().activeUserDefaults()
-    guard let userKbList = userData?.array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]],
+    let userData = Manager.shared.activeUserDefaults()
+    guard let userKbList = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]],
       !userKbList.isEmpty else {
       userKeyboards = [:]
       return

@@ -24,7 +24,7 @@ public class KeyboardPickerBarButtonItem: UIBarButtonItem {
 
     let bundlePath = Bundle(for: type(of: self)).path(forResource: "Keyman", ofType: "bundle")!
     let keymanBundle = Bundle(path: bundlePath)!
-    let retinaSuffix = KMManager.retinaScreen() ? "@2x" : ""
+    let retinaSuffix = Manager.retinaScreen ? "@2x" : ""
     let imagePath = keymanBundle.path(forResource: "keyboard_icon\(retinaSuffix)", ofType: "png")!
     image = UIImage(contentsOfFile: imagePath)
 
@@ -45,7 +45,7 @@ public class KeyboardPickerBarButtonItem: UIBarButtonItem {
 
   @objc public func showKeyboardPicker() {
     if let presentingVC = presentingVC {
-      KMManager.sharedInstance().showKeyboardPicker(in: presentingVC, shouldAddKeyboard: false)
+      Manager.shared.showKeyboardPicker(in: presentingVC, shouldAddKeyboard: false)
     }
   }
 

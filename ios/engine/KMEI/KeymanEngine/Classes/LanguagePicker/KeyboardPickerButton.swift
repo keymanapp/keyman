@@ -22,7 +22,7 @@ public class KeyboardPickerButton: UIButton {
     addTarget(self, action: #selector(self.showKeyboardPicker), for: .touchUpInside)
 
     let bundlePath = Bundle(for: type(of :self)).path(forResource: "Keyman", ofType: "bundle")!
-    let retinaSuffix = KMManager.retinaScreen() ? "@2x" : ""
+    let retinaSuffix = Manager.retinaScreen ? "@2x" : ""
     let imagePath = Bundle(path: bundlePath)!.path(forResource: "keyboard_icon\(retinaSuffix)", ofType: "png")!
 
     setImage(UIImage(contentsOfFile: imagePath), for: .normal)
@@ -40,7 +40,7 @@ public class KeyboardPickerButton: UIButton {
 
   @objc func showKeyboardPicker() {
     if let presentingVC = presentingVC {
-      KMManager.sharedInstance().showKeyboardPicker(in: presentingVC, shouldAddKeyboard: false)
+      Manager.shared.showKeyboardPicker(in: presentingVC, shouldAddKeyboard: false)
     }
   }
 
