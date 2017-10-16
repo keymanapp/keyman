@@ -417,6 +417,22 @@ final class KMKeyboard extends WebView {
 
   }
 
+  // Converts a string from Unicode numbers (\\uxxxx) to character string
+  // Returns: String
+  protected String convertKeyText(String ktext) {
+    String title = "";
+    String[] values = ktext.split("\\\\u");
+    int length = values.length;
+    if (length > 1) {
+      // Skip the layer and parse text
+      for (int j = 1; j < length; j++) {
+        int c = Integer.parseInt(values[j], 16);
+        title += String.valueOf((char) c);
+      }
+    }
+    return title;
+  }
+
   private void saveCurrentKeyboardIndex() {
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
@@ -542,7 +558,7 @@ final class KMKeyboard extends WebView {
         public void onClick(View v) {
           int index = v.getId() - 1;
           String keyId = subKeysList.get(index).get("keyId");
-          String keyText = subKeysList.get(index).get("keyText");
+          String keyText = getKeyText(index);
 
           String jsFormat = "javascript:executePopupKey('%s','%s')";
           String jsString = String.format(jsFormat, keyId, keyText);
@@ -551,20 +567,9 @@ final class KMKeyboard extends WebView {
       });
       button.setClickable(false);
 
-      String ktext = subKeysList.get(i).get("keyText");
-      if (ktext.isEmpty()) {
-        ktext = subKeysList.get(i).get("keyId");
-      }
+      String ktext = getKeyText(i);
 
-      String title = "";
-      String[] values = ktext.split("\\,");
-      int length = values.length;
-      for (int j = 0; j < length; j++) {
-        if (values[j].startsWith("0x") || values[j].startsWith("U_") || values[j].startsWith("K_")) {
-          int c = Integer.parseInt(values[j].substring(2), 16);
-          title += String.valueOf((char) c);
-        }
-      }
+      String title = convertKeyText(ktext);
 
       // Disable Android's default uppercasing transformation on buttons.
       button.setTransformationMethod(null);
@@ -658,6 +663,15 @@ final class KMKeyboard extends WebView {
     subKeysWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX, posY);
     String jsString = "javascript:popupVisible(1)";
     loadUrl(jsString);
+  }
+
+  private String getKeyText(int i) {
+    String ktext = subKeysList.get(i).get("keyText");
+    if (ktext.isEmpty()) {
+      ktext = subKeysList.get(i).get("keyId");
+      ktext = ktext.replaceAll("U_", "\\\\u");
+    }
+    return ktext;
   }
 
   private String makeSvgOnlyFont(String font) {

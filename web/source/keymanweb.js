@@ -3952,7 +3952,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(Pelem.tagName) {
         var tagName = Pelem.tagName.toLowerCase();
         if(tagName == 'input' || tagName == 'textarea' || tagName == 'iframe') {
-          possibleInputs.concat(Pelem);
+          possibleInputs.push(Pelem);
         }
       } else if(Pelem.nodeName == "#text") {
         return [];
@@ -3981,7 +3981,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
       
       if(Pelem.isContentEditable) {
-        possibleInputs = possibleInputs.concat(Pelem);
+        possibleInputs.push(Pelem);
       }
 
       return possibleInputs;

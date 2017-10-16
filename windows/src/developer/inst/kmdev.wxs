@@ -215,7 +215,7 @@
 
                 <Directory Id='xmllayout' Name='layoutbuilder' FileSource='..\..\developer\tike\xml\layoutbuilder\'>
                     <Component><File Id='xml_file_layoutbuilder_builder.css' Name='builder.css' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_builder.html' Name='builder.html' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_file_layoutbuilder_physical_keyboard_template' Name='physical-keyboard-template.js' KeyPath="yes" /></Component>
                     <Component><File Id='xml_file_layoutbuilder_builder.js' Name='builder.js' KeyPath="yes" /></Component>
                     <Component><File Id='xml_file_layoutbuilder_builder.xsl' Name='builder.xsl' KeyPath="yes" /></Component>
                     <Component><File Id='xml_file_layoutbuilder_jquery_1.10.2.js' Name='jquery-1.10.2.js' KeyPath="yes" /></Component>
@@ -447,7 +447,7 @@
       <ComponentRef Id='xml_file80'/>
       <ComponentRef Id='xml_file81'/>
       <ComponentRef Id='xml_file_layoutbuilder_builder.css'/>
-      <ComponentRef Id='xml_file_layoutbuilder_builder.html'/>
+      <ComponentRef Id='xml_file_layoutbuilder_physical_keyboard_template' />
       <ComponentRef Id='xml_file_layoutbuilder_builder.js'/>
       <ComponentRef Id='xml_file_layoutbuilder_builder.xsl'/>
       <ComponentRef Id='xml_file_layoutbuilder_jquery_1.10.2.js'/>

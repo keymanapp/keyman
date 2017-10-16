@@ -210,10 +210,10 @@
         while (theHex.length < 4) {
           theHex = '0' + theHex;
         }
-        theHex = '0x' + theHex;
-        hexString += theHex + ',';
+        theHex = '\\u' + theHex;
+        hexString += theHex;
       }
-      return hexString.substr(0, hexString.length-1);
+      return hexString;
     }
 
   </script>

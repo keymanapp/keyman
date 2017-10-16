@@ -444,9 +444,7 @@
       // If key is mapped, return true
       if(keymanweb._ActiveKeyboard['gs'](Lelem, Lkc)) return true;
 
-      // Use default mapping only if necessary (last resort) 
-      var ch = osk.defaultKeyOutput(keyName,Lkc.Lcode,keyShiftState);
-      if(ch) keymanweb.KO(0, Lelem, ch);
+      keymanweb.processDefaultMapping(Lkc.Lcode, keyShiftState, Lelem, keyName);
 
       return true;
   };
@@ -512,23 +510,34 @@
       if(keymanweb._ActiveKeyboard['gs'](Lelem, Lkc)) {
         return true;
       }
-      
-      // Use default mapping only if necessary (last resort)
-      if (Lkc.Lcode == osk.keyCodes.K_SPACE) {
-        keymanweb.KO(0, Lelem, ' ');
-        return true;
-      }
-      else if (Lkc.Lcode == osk.keyCodes.K_ENTER) {
-        keymanweb.KO(0, Lelem, '\n');
-        return true;
-      }
-      var ch = osk.defaultKeyOutput('', Lkc.Lcode, shift);
-      if(ch) {
-        keymanweb.KO(0, Lelem, ch);                     
-        return true;
-      }
 
-      return false;
+      return keymanweb.processDefaultMapping(Lkc.Lcode, shift, Lelem, '');
   };
 
+  /**
+   * Process default mapping only if necessary (last resort)
+   *  @param  {number}  code   key identifier
+   *  @param  {number}  shift  shift state (0x01=left ctrl 0x02=right ctrl 0x04=left alt 0x08=right alt
+   *                                        0x10=shift 0x20=ctrl 0x40=alt)
+   *  @param  {Object}  Lelem   element to output to
+   *  @param  {string}  keyName
+   *  @return {boolean}         true if key code successfully processed
+   */
+  keymanweb.processDefaultMapping = function(code, shift, Lelem, keyName) {
+    if (code == osk.keyCodes.K_SPACE) {
+        keymanweb.KO(0, Lelem, ' ');
+        return true;
+    }
+    else if (code == osk.keyCodes.K_ENTER) {
+        keymanweb.KO(0, Lelem, '\n');
+        return true;
+    }
+    var ch = osk.defaultKeyOutput(keyName, code, shift);
+    if(ch) {
+        keymanweb.KO(0, Lelem, ch);
+        return true;
+    }
+
+    return false;
+  }
 })();

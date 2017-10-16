@@ -158,7 +158,7 @@ object frmVisualKeyboard: TfrmVisualKeyboard
         TabOrder = 1
         Transparent = False
         Wrapable = False
-        OnAdvancedCustomDraw = tbRightAdvancedCustomDraw
+        OnAdvancedCustomDraw = tbAdvancedCustomDraw
         OnMouseDown = TitleMouseDown
         OnMouseMove = TitleMouseMove
         OnMouseUp = TitleMouseUp
@@ -180,7 +180,7 @@ object frmVisualKeyboard: TfrmVisualKeyboard
         Images = ilToolbar
         TabOrder = 2
         Wrapable = False
-        OnAdvancedCustomDraw = tbRightAdvancedCustomDraw
+        OnAdvancedCustomDraw = tbAdvancedCustomDraw
         OnMouseDown = TitleMouseDown
         OnMouseMove = TitleMouseMove
         OnMouseUp = TitleMouseUp
@@ -201,7 +201,8 @@ object frmVisualKeyboard: TfrmVisualKeyboard
         TabOrder = 3
         Transparent = False
         Wrapable = False
-        OnAdvancedCustomDraw = tbRightAdvancedCustomDraw
+        OnAdvancedCustomDraw = tbAdvancedCustomDraw
+        OnAdvancedCustomDrawButton = tbKeyboardsAdvancedCustomDrawButton
         OnMouseDown = TitleMouseDown
         OnMouseMove = TitleMouseMove
         OnMouseUp = TitleMouseUp
@@ -239,7 +240,6 @@ object frmVisualKeyboard: TfrmVisualKeyboard
         Height = 21
         Align = alClient
         TabOrder = 0
-        Silent = False
         DisableCtrlShortcuts = 'N'
         UserInterfaceOptions = [DisableTextSelect, DontUse3DBorders, EnablesFormsAutoComplete, EnableThemes]
         About = ' EmbeddedWB http://bsalsa.com/'

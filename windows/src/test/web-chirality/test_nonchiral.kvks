@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<visualkeyboard>
+  <header>
+    <version>10.0</version>
+    <kbdname>test-nonchiral</kbdname>
+    <flags/>
+  </header>
+  <encoding name="unicode" fontname="Arial" fontsize="-12">
+    <layer shift="SC">
+      <key vkey="K_D">ឃ</key>
+    </layer>
+    <layer shift="SA">
+      <key vkey="K_G">ច</key>
+    </layer>
+    <layer shift="SCA">
+      <key vkey="K_J">ជ</key>
+    </layer>
+    <layer shift="S">
+      <key vkey="K_S">ខ</key>
+    </layer>
+    <layer shift="">
+      <key vkey="K_A">ក</key>
+    </layer>
+    <layer shift="C">
+      <key vkey="K_D">គ</key>
+    </layer>
+    <layer shift="A">
+      <key vkey="K_F">ង</key>
+    </layer>
+    <layer shift="CA">
+      <key vkey="K_H">ឆ</key>
+    </layer>
+  </encoding>
+</visualkeyboard>

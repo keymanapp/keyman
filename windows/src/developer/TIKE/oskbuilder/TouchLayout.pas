@@ -47,16 +47,25 @@ type
   TTouchLayoutObject = class
   private
     FJSON: TJSONObject;
+    FParent: TTouchLayoutObject;
   protected
     function GetValue(const name: string; var value: TJSONValue): Boolean; overload;
     function GetValue(const name: string; var value: string): Boolean; overload;
     function GetValue(const name: string; var value: Integer): Boolean; overload;
+
+    procedure AddJSONValue(JSON: TJSONObject; const name, value: string); overload;
+    procedure AddJSONValue(JSON: TJSONObject; const name: string;
+      value: Integer); overload;
+
     //function GetArray(const name: string): TJSONArray; overload;
     procedure ReadArray(const name: string; cls: TTouchLayoutClass; add: TTouchLayoutAddProc);
     procedure DoRead; virtual; abstract;
+    procedure DoWrite(JSON: TJSONObject); virtual; abstract;
   public
-    constructor Create; virtual;
+    constructor Create(AParent: TTouchLayoutObject); virtual;
     procedure Read(JSON: TJSONObject);
+    procedure Write(JSON: TJSONObject);
+    property Parent: TTouchLayoutObject read FParent;
   end;
 
   TTouchLayoutSubKey = class(TTouchLayoutObject)
@@ -75,6 +84,7 @@ type
     procedure SetSpT(const Value: TTouchKeyType);   // I4119
   protected
     procedure DoRead; override;
+    procedure DoWrite(JSON: TJSONObject); override;
   public
     property Id: string read FId write FId;
     property Text: string read FText write FText;
@@ -109,8 +119,9 @@ type
     procedure SetSpT(const Value: TTouchKeyType);   // I4119
   protected
     procedure DoRead; override;
+    procedure DoWrite(JSON: TJSONObject); override;
   public
-    constructor Create; override;
+    constructor Create(AParent: TTouchLayoutObject); override;
     destructor Destroy; override;
     property Id: string read FId write FId;
     property Text: string read FText write FText;
@@ -135,9 +146,11 @@ type
     FKeys: TTouchLayoutKeys;
   protected
     procedure DoRead; override;
+    procedure DoWrite(JSON: TJSONObject); override;
   public
-    constructor Create; override;
+    constructor Create(AParent: TTouchLayoutObject); override;
     destructor Destroy; override;
+    function FindKeyById(Id: string): TTouchLayoutKey;
     property Id: string read FId write FId;
     property Keys: TTouchLayoutKeys read FKeys;
   end;
@@ -151,9 +164,11 @@ type
     FId: string;
   protected
     procedure DoRead; override;
+    procedure DoWrite(JSON: TJSONObject); override;
   public
-    constructor Create; override;
+    constructor Create(AParent: TTouchLayoutObject); override;
     destructor Destroy; override;
+    function FindKeyById(Id: string): TTouchLayoutKey;
     property Id: string read FId write FId;
     property Rows: TTouchLayoutRows read FRows;
   end;
@@ -171,8 +186,9 @@ type
     FFont: string;
   protected
     procedure DoRead; override;
+    procedure DoWrite(JSON: TJSONObject); override;
   public
-    constructor Create; override;
+    constructor Create(AParent: TTouchLayoutObject); override;
     destructor Destroy; override;
     property Name: string read FName write FName;
     property Font: string read FFont write FFont;
@@ -187,8 +203,9 @@ type
     FPlatforms: TTouchLayoutPlatforms;
   protected
     procedure DoRead; override;
+    procedure DoWrite(JSON: TJSONObject); override;
   public
-    constructor Create; override;
+    constructor Create(AParent: TTouchLayoutObject); override;
     destructor Destroy; override;
     property Platforms: TTouchLayoutPlatforms read FPlatforms;
   end;
@@ -211,6 +228,7 @@ type
     constructor Create;
     destructor Destroy; override;
     function Load(json: string): Boolean;
+    function Write(AFormatted: Boolean): string;
     function Save(AFormatted: Boolean): string;   // I4655
     function Merge(ASource: TTouchLayout): Boolean;
     function HasPlatform(const APlatform: string): Boolean;
@@ -290,7 +308,7 @@ begin
   end;
 
   FreeAndNil(FData);
-  FData := TTouchLayoutData.Create;
+  FData := TTouchLayoutData.Create(nil);
   FData.Read(v);
 
   FLayout := v;
@@ -438,7 +456,7 @@ end;
 constructor TTouchLayout.Create;
 begin
   inherited Create;
-  FData := TTouchLayoutData.Create;
+  FData := TTouchLayoutData.Create(nil);
 end;
 
 destructor TTouchLayout.Destroy;
@@ -558,6 +576,21 @@ begin
   ValidateObject(v, @LayoutDef[0], Length(LayoutDef));
 end;
 
+function TTouchLayout.Write(AFormatted: Boolean): string;
+var
+  o: TJSONObject;
+begin
+  o := TJSONObject.Create;
+  FData.Write(o);
+  FreeAndNil(FLayout);
+  FLayout := o;
+  FreeAndNil(FData);
+  FData := TTouchLayoutData.Create(nil);
+  FData.Read(FLayout);
+
+  Result := Save(AFormatted);
+end;
+
 { TTouchLayoutObject }
 
 function TTouchLayoutObject.GetValue(const name: string; var value: TJSONValue): Boolean;
@@ -581,8 +614,10 @@ begin
   Result := True;
 end;
 
-constructor TTouchLayoutObject.Create;
+constructor TTouchLayoutObject.Create(AParent: TTouchLayoutObject);
 begin
+  inherited Create;
+  FParent := AParent;
 end;
 
 function TTouchLayoutObject.GetValue(const name: string; var value: Integer): Boolean;
@@ -612,11 +647,16 @@ begin
     a := v as TJSONArray;
     for i := 0 to a.Count - 1 do
     begin
-      ask := cls.Create;
+      ask := cls.Create(Self);
       ask.Read(a.Items[i] as TJSONObject);
       add(ask);
     end;
   end;
+end;
+
+procedure TTouchLayoutObject.Write(JSON: TJSONObject);
+begin
+  DoWrite(JSON);
 end;
 
 { TTouchLayoutSubKey }
@@ -635,6 +675,32 @@ begin
   GetValue('text', FText);
 end;
 
+procedure TTouchLayoutObject.AddJSONValue(JSON: TJSONObject; const name, value: string);
+begin
+  if value <> '' then
+    JSON.AddPair(name, value);
+end;
+
+procedure TTouchLayoutObject.AddJSONValue(JSON: TJSONObject; const name: string; value: Integer);
+begin
+  if value <> 0 then
+    JSON.AddPair(name, TJSONNumber.Create(value));
+end;
+
+procedure TTouchLayoutSubKey.DoWrite(JSON: TJSONObject);
+begin
+  AddJSONValue(JSON, 'nextlayer', FNextLayer);
+  AddJSONValue(JSON, 'fontsize', FFontSize);
+  AddJSONValue(JSON, 'layer', FLayer);
+  AddJSONValue(JSON, 'width', FWidth);
+  AddJSONValue(JSON, 'dk', FDk);
+  AddJSONValue(JSON, 'font', FFont);
+  AddJSONValue(JSON, 'id', FId);
+  AddJSONValue(JSON, 'pad', FPad);
+  AddJSONValue(JSON, 'sp', FSp);
+  AddJSONValue(JSON, 'text', FText);
+end;
+
 function TTouchLayoutSubKey.GetSpT: TTouchKeyType;   // I4119
 begin
   Result := TTouchKeyType(FSp);
@@ -647,9 +713,9 @@ end;
 
 { TTouchLayoutPlatform }
 
-constructor TTouchLayoutPlatform.Create;
+constructor TTouchLayoutPlatform.Create(AParent: TTouchLayoutObject);
 begin
-  inherited Create;
+  inherited Create(AParent);
   FLayers := TTouchLayoutLayers.Create;
 end;
 
@@ -667,11 +733,33 @@ begin
     procedure (obj: TTouchLayoutObject) begin FLayers.Add(obj as TTouchLayoutLayer); end);
 end;
 
+procedure TTouchLayoutPlatform.DoWrite(JSON: TJSONObject);
+var
+  v: TJSONArray;
+  o: TJSONObject;
+  i: Integer;
+begin
+  AddJSONValue(JSON, 'font', FFont);
+  AddJSONValue(JSON, 'fontsize', FFontSize);
+
+  if FLayers.Count > 0 then
+  begin
+    v := TJSONArray.Create;
+    for i := 0 to FLayers.Count - 1 do
+    begin
+      o := TJSONObject.Create;
+      FLayers[i].Write(o);
+      v.Add(o);
+    end;
+    JSON.AddPair('layer', v);
+  end;
+end;
+
 { TTouchLayoutData }
 
-constructor TTouchLayoutData.Create;
+constructor TTouchLayoutData.Create(AParent: TTouchLayoutObject);
 begin
-  inherited Create;
+  inherited Create(AParent);
   FPlatforms := TTouchLayoutPlatforms.Create;
 end;
 
@@ -689,7 +777,7 @@ procedure TTouchLayoutData.DoRead;
   begin
     if GetValue(name, v) and (v is TJSONObject) then
     begin
-      p := TTouchLayoutPlatform.Create;
+      p := TTouchLayoutPlatform.Create(Self);
       p.FName := name;
       p.Read(v as TJSONObject);
       FPlatforms.Add(p);
@@ -701,10 +789,24 @@ begin
   ReadPlatform('desktop');
 end;
 
+procedure TTouchLayoutData.DoWrite(JSON: TJSONObject);
+var
+  o: TJSONObject;
+  i: Integer;
+begin
+  for i := 0 to FPlatforms.Count - 1 do
+  begin
+    o := TJSONObject.Create;
+    FPlatforms[i].Write(o);
+    JSON.AddPair(FPlatforms[i].Name, o);
+  end;
+end;
+
 { TTouchLayoutKey }
 
-constructor TTouchLayoutKey.Create;
+constructor TTouchLayoutKey.Create(AParent: TTouchLayoutObject);
 begin
+  inherited Create(AParent);
   FSk := TTouchLayoutSubKeys.Create;
 end;
 
@@ -730,6 +832,36 @@ begin
     procedure (obj: TTouchLayoutObject) begin FSk.Add(obj as TTouchLayoutSubKey); end);
 end;
 
+procedure TTouchLayoutKey.DoWrite(JSON: TJSONObject);
+var
+  i: Integer;
+  v: TJSONArray;
+  o: TJSONObject;
+begin
+  AddJSONValue(JSON, 'nextlayer', FNextLayer);
+  AddJSONValue(JSON, 'fontsize', FFontSize);
+  AddJSONValue(JSON, 'layer', FLayer);
+  AddJSONValue(JSON, 'width', FWidth);
+  AddJSONValue(JSON, 'dk', FDk);
+  AddJSONValue(JSON, 'font', FFont);
+  AddJSONValue(JSON, 'id', FId);
+  AddJSONValue(JSON, 'pad', FPad);
+  AddJSONValue(JSON, 'sp', FSp);
+  AddJSONValue(JSON, 'text', FText);
+
+  if FSk.Count > 0 then
+  begin
+    v := TJSONArray.Create;
+    for i := 0 to FSk.Count - 1 do
+    begin
+      o := TJSONObject.Create;
+      FSk[i].Write(o);
+      v.Add(o);
+    end;
+    JSON.AddPair('sk', v);
+  end;
+end;
+
 function TTouchLayoutKey.GetSpT: TTouchKeyType;   // I4119
 begin
   Result := TTouchKeyType(FSp);
@@ -742,9 +874,9 @@ end;
 
 { TTouchLayoutRow }
 
-constructor TTouchLayoutRow.Create;
+constructor TTouchLayoutRow.Create(AParent: TTouchLayoutObject);
 begin
-  inherited Create;
+  inherited Create(AParent);
   FKeys := TTouchLayoutKeys.Create;
 end;
 
@@ -761,11 +893,45 @@ begin
     procedure (obj: TTouchLayoutObject) begin FKeys.Add(obj as TTouchLayoutKey); end);
 end;
 
+procedure TTouchLayoutRow.DoWrite(JSON: TJSONObject);
+var
+  v: TJSONArray;
+  o: TJSONObject;
+  i: Integer;
+begin
+  AddJSONValue(JSON, 'id', FId);
+
+  if FKeys.Count > 0 then
+  begin
+    v := TJSONArray.Create;
+    for i := 0 to FKeys.Count - 1 do
+    begin
+      o := TJSONObject.Create;
+      FKeys[i].Write(o);
+      v.Add(o);
+    end;
+    JSON.AddPair('key', v);
+  end;
+end;
+
+function TTouchLayoutRow.FindKeyById(Id: string): TTouchLayoutKey;
+var
+  k: TTouchLayoutKey;
+begin
+  for k in Keys do
+  begin
+    if SameText(k.Id, Id) then
+      Exit(k);
+  end;
+
+  Result := nil;
+end;
+
 { TTouchLayoutLayer }
 
-constructor TTouchLayoutLayer.Create;
+constructor TTouchLayoutLayer.Create(AParent: TTouchLayoutObject);
 begin
-  inherited Create;
+  inherited Create(AParent);
   FRows := TTouchLayoutRows.Create;
 end;
 
@@ -780,6 +946,39 @@ begin
   GetValue('id', FId);
   ReadArray('row', TTouchLayoutRow,
     procedure (obj: TTouchLayoutObject) begin FRows.Add(obj as TTouchLayoutRow); end);
+end;
+
+procedure TTouchLayoutLayer.DoWrite(JSON: TJSONObject);
+var
+  v: TJSONArray;
+  o: TJSONObject;
+  i: Integer;
+begin
+  AddJSONValue(JSON, 'id', FId);
+
+  if FRows.Count > 0 then
+  begin
+    v := TJSONArray.Create;
+    for i := 0 to FRows.Count - 1 do
+    begin
+      o := TJSONObject.Create;
+      FRows[i].Write(o);
+      v.Add(o);
+    end;
+    JSON.AddPair('row', v);
+  end;
+end;
+
+function TTouchLayoutLayer.FindKeyById(Id: string): TTouchLayoutKey;
+var
+  r: TTouchLayoutRow;
+begin
+  for r in Rows do
+  begin
+    Result := r.FindKeyById(Id);
+    if Assigned(Result) then Exit;
+  end;
+  Result := nil;
 end;
 
 { TTouchLayoutLayers }

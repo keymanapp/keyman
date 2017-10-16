@@ -81,6 +81,7 @@ type
     procedure UpdateCharacterMap(code: string);  // I4046
     function GetFontInfo(Index: TKeyboardFont): TKeyboardFontInfo;   // I4057
     procedure SetFontInfo(Index: TKeyboardFont; const Value: TKeyboardFontInfo);   // I4057
+    procedure SetupModifierKeysForImportedLayout;
     { Private declarations }
   protected
 
@@ -205,6 +206,10 @@ var
   FVK: TVisualKeyboard;
   nrow: Integer;
   LocalKeyData: array[0..58] of TKeyData;
+  baseTemplate: AnsiString;
+  baseTemplateLayer: AnsiString;
+  FTouchLayout: TTouchLayout;
+  FOldLayout: TTouchLayout;
 
     function GetKeyIndex(VK: Word): Integer;
     var
@@ -222,7 +227,9 @@ var
     function FillOSK(Shift: Word): Boolean;
     var
       i, n: Integer;
+      Found: Boolean;
     begin
+      Found := False;
       for i := 0 to High(LocalKeyData) do
       begin
         LocalKeyData[i].Data := KeyData[i];
@@ -237,10 +244,11 @@ var
           n := GetKeyIndex(FVK.Keys[i].VKey);
           if n < 0 then Continue;
           LocalKeyData[n].Cap := FVK.Keys[i].Text;
+          Found := True;
         end;
       end;
 
-      Result := True;   // I4146
+      Result := Found;   // I4146
     end;
 
 // string escaping and un-escaping
@@ -269,11 +277,35 @@ var
 type
   TLayoutShiftState = record Shift: Word; id: ansistring end;
 const
-  ShiftStates: array[0..1] of TLayoutShiftState = (
+  ShiftStates: array[0..21] of TLayoutShiftState = (
     (Shift: KVKS_NORMAL; id: 'default'),
-    (Shift: KVKS_SHIFT; id: 'shift')
-  );
+    (Shift: KVKS_SHIFT; id: 'shift'),
+    (Shift: KVKS_CTRL; id: 'ctrl'),
+    (Shift: KVKS_SHIFT or KVKS_CTRL; id: 'shift-ctrl'),
+    (Shift: KVKS_ALT; id: 'alt'),
+    (Shift: KVKS_SHIFT or KVKS_ALT; id: 'shift-alt'),
+    (Shift: KVKS_CTRL or KVKS_ALT; id: 'ctrl-alt'),
+    (Shift: KVKS_SHIFT or KVKS_CTRL or KVKS_ALT; id: 'shift-ctrl-alt'),
 
+    (Shift: KVKS_NORMAL; id: 'default'),
+    (Shift: KVKS_LCTRL; id: 'leftctrl'),
+    (Shift: KVKS_RCTRL; id: 'rightctrl'),
+    (Shift: KVKS_LALT; id: 'leftalt'),
+    (Shift: KVKS_LCTRL or KVKS_LALT; id: 'leftctrl-leftalt'),
+    (Shift: KVKS_RALT; id: 'rightalt'),
+    (Shift: KVKS_RCTRL or KVKS_RALT; id: 'rightctrl-rightalt'),
+    (Shift: KVKS_SHIFT; id: 'shift'),
+    (Shift: KVKS_SHIFT or KVKS_LCTRL; id: 'shift-lctrl'),
+    (Shift: KVKS_SHIFT or KVKS_RCTRL; id: 'shift-rctrl'),
+    (Shift: KVKS_SHIFT or KVKS_LALT; id: 'shift-lalt'),
+    (Shift: KVKS_SHIFT or KVKS_RALT; id: 'shift-ralt'),
+    (Shift: KVKS_SHIFT or KVKS_LCTRL or KVKS_LALT; id: 'shift-lctrl-lalt'),
+    (Shift: KVKS_SHIFT or KVKS_RCTRL or KVKS_RALT; id: 'shift-rctrl-ralt')
+  );
+const
+  NFirstChiralShiftState = 8;
+var
+  n1, n2: Integer;
 begin
   if not FileExists(KVKFileName) then
   begin
@@ -294,20 +326,49 @@ begin
       end;
     end;
 
+    baseTemplate := '{ "tablet": { "layer": [';
     f := '{ "desktop": { "font": '+EscapeString(Header.UnicodeFont.Name)+', "layer": [';
 
-    for n := 0 to High(ShiftStates) do
+    if kvkhAltGr in FVK.Header.Flags then
+    begin
+      n1 := NFirstChiralShiftState;
+      n2 := High(ShiftStates);
+    end
+    else
+    begin
+      n1 := 0;
+      n2 := NFirstChiralShiftState - 1;
+    end;
+
+    with TStringList.Create do
+    try
+      LoadFromFile(GetLayoutBuilderPath + 'physical-keyboard-template.js');
+      baseTemplateLayer := String_UtoA(Text);
+    finally
+      Free;
+    end;
+
+    for n := n1 to n2 do
     begin
       if not FillOSK(ShiftStates[n].Shift) then
       begin
         Continue;
       end;
 
-      if n > 0 then
+      if n > n1 then
+      begin
         f := f + ',';
+        baseTemplate := baseTemplate + ',';
+      end;
+
       f := f + '{' +
         '"id": "'+ShiftStates[n].id+'",'+
         '"row": [';
+
+      baseTemplate := baseTemplate + '{' +
+        '"id": "'+ShiftStates[n].id+'",' +
+        baseTemplateLayer+
+        '}';
 
       nrow := 1;
       for I := 0 to High(LocalKeyData) do
@@ -335,14 +396,136 @@ begin
                ']}';  // END row array, layer
     end;
     f := f + ']}}';
+
+    baseTemplate := baseTemplate + ']}}';
   finally
     Free;
   end;
   FSavedLayoutJS := String_AtoU(f);
 
-  FTemplateFileName := GetLayoutBuilderPath + 'template-traditional.js';
-  Load('',True,False);
+  // Merge the two files -- the base template and the constructed KVK keys
+  //Load(String_AtoU(baseTemplate),True,True);
+
+  FTouchLayout := TTouchLayout.Create;   // I3642
+  try
+    if FTouchLayout.Load(String_AtoU(baseTemplate)) then
+    begin
+      FOldLayout := TTouchLayout.Create;
+      try
+        FOldLayout.Load(FSavedLayoutJS);
+        if FTouchLayout.Merge(FOldLayout)
+          then FSavedLayoutJS := FTouchLayout.Save(False);
+      finally
+        FOldLayout.Free;
+      end;
+    end;
+  finally
+    FTouchLayout.Free;
+  end;
+
+  // Setup modifier keys in the final keyboard
+  SetupModifierKeysForImportedLayout;
+
   DoModified;
+end;
+
+{**
+ * Sets up the K_LCONTROL modifier key to access all other layers for
+ * each layer on each given platform. Will rewrite the K_LCONTROL key
+ * or remove it if there are no extended layers.
+ *}
+procedure TframeTouchLayoutBuilder.SetupModifierKeysForImportedLayout;
+  procedure SetupModifierKeysForPlatform(p: TTouchLayoutPlatform);
+  var
+    l, l2: TTouchLayoutLayer;
+    k: TTouchLayoutKey;
+    nExtendedLayers: Integer;
+    FirstExtendedLayerID: string;
+    sk: TTouchLayoutSubKey;
+  begin
+    nExtendedLayers := 0;
+
+    for l in p.Layers do
+    begin
+      if (l.id <> 'default') and (l.Id <> 'shift') then
+      begin
+        Inc(nExtendedLayers);
+        if FirstExtendedLayerID = '' then
+          FirstExtendedLayerID := l.Id;
+      end;
+    end;
+
+    for l in p.Layers do
+    begin
+      // Find the Ctrl key for the layer
+      k := l.FindKeyById('K_LCONTROL');
+      if not Assigned(k) then
+        Continue;
+
+      // If there are no extended layers, delete it
+      if nExtendedLayers = 0 then
+      begin
+        (k.Parent as TTouchLayoutRow).Keys.Remove(k);
+        // Stretch Spacebar?
+        Continue;
+      end;
+
+      // If there are extended layers, set it up to
+      // go to the first extended layer from Default, Shift, or
+      // return to default from any other layer.
+      // Long-press will go to other extended layers.
+
+      if (l.id = 'default') or (l.Id = 'shift') then
+      begin
+        k.NextLayer := FirstExtendedLayerID;
+        k.Text := FirstExtendedLayerID;
+      end
+      else
+      begin
+        k.NextLayer := 'default';
+        k.Text := 'default';
+      end;
+
+      if nExtendedLayers > 1 then
+      begin
+        for l2 in p.Layers do
+        begin
+          if (l2.id = 'default') or (l2.Id = 'shift') then Continue;
+          if l2.id = l.id then Continue;
+          sk := TTouchLayoutSubKey.Create(k);
+          sk.Id := 'K_LCONTROL';
+          sk.Text := l2.id;
+          sk.SpT := tktSpecial;
+          sk.NextLayer := l2.Id;
+          k.Sk.Add(sk);
+        end;
+      end;
+    end;
+  end;
+var
+  p: TTouchLayoutPlatform;
+begin
+  with TTouchLayout.Create do
+  try
+    Load(FSavedLayoutJS);
+    for p in Data.Platforms do
+    begin
+      SetupModifierKeysForPlatform(p);
+    end;
+    FSavedLayoutJS := Write(True);
+  finally
+    Free;
+  end;
+
+  try
+    DoLoad;
+  except
+    on E:Exception do
+    begin
+      ShowMessage(E.Message);
+      Exit;
+    end;
+  end;
 end;
 
 function TframeTouchLayoutBuilder.IsModified: Boolean;
