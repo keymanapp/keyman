@@ -792,11 +792,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       // Test for fall back to U_xxxx key id - For this first test, we ignore the key code
       // and use the keyName
       if((keyName.substr(0,2) == 'U_')) {
-        var value = parseInt(keyName.substr(2,6), 16);
-        ch=String.fromCharCode(value);
-        if((value <= 31) || ((value >= 127) && (value <= 159))) {
-          // 0 - 31 and 127 - 159 refer to Unicode control codes.
+        var codePoint = parseInt(keyName.substr(2,6), 16);
+        ch=String.fromCharCode(codePoint);
+        if((0x0 <= codePoint && codePoint <= 0x1F) || (0x80 <= codePoint) && (codePoint <= 0x9F)) {
+          // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
           // Do not allow output of these codes via U_xxxx shortcuts.
+          console.log("Suppressing Unicode control code: U_00" + codePoint.toString(16));
           ch = '';
         }
         // Hereafter, we refer to keycodes.

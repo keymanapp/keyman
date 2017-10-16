@@ -680,8 +680,28 @@ function Keyboard_longpress() {
                         "width": "610",
                         "sp": "0",
                         "sk": [{
-                            "text": "[nbsp]",
-                            "id": "U_00a0"
+                            // Unicode C0 Control Codes U_0000 to U_001F suppressed
+                            "text": "00",
+                            "id": "U_0000"
+                        }, {
+                            "text": "1F",
+                            "id": "U_001F"
+                        }, {
+                            "text": "20",
+                            "id": "U_0020"
+                        }, {
+                            "text": "7F",
+                            "id": "U_007F"
+                        }, {
+                            // Unicode C1 Control Codes U_0080 to U_009F suppressed
+                            "text": "80",
+                            "id": "U_0080"
+                        }, {
+                            "text": "9F",
+                            "id": "U_009F"
+                        }, {
+                            "text": "A0",
+                            "id": "U_00A0"
                         }]
                     }, {
                         "id": "K_ENTER",

@@ -30,10 +30,10 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     textView = (KMTextView) findViewById(R.id.kmTextView);
 
     // Add a custom keyboard
-    HashMap<String, String> ckbInfo = new HashMap<String, String>();
     final String KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
 
     // Chirality test keyboard
+    HashMap<String, String> ckbInfo = new HashMap<String, String>();
     ckbInfo.put(KMManager.KMKey_KeyboardID, "chirality");
     ckbInfo.put(KMManager.KMKey_LanguageID, "eng");
     ckbInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
@@ -41,6 +41,16 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     ckbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
     ckbInfo.put(KMManager.KMKey_Font, KeyboardFont);
     KMManager.addKeyboard(this, ckbInfo);
+
+    // Longpress test keyboard
+    HashMap<String, String> lkbInfo = new HashMap<String, String>();
+    lkbInfo.put(KMManager.KMKey_KeyboardID, "longpress");
+    lkbInfo.put(KMManager.KMKey_LanguageID, "eng");
+    lkbInfo.put(KMManager.KMKey_KeyboardName, "Longpress Keyboard");
+    lkbInfo.put(KMManager.KMKey_LanguageName, "English");
+    lkbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
+    lkbInfo.put(KMManager.KMKey_Font, KeyboardFont);
+    KMManager.addKeyboard(this, lkbInfo);
 
     // Tchad test keyboard
     HashMap<String, String> tkbInfo = new HashMap<String, String>();
