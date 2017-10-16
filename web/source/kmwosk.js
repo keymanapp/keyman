@@ -1010,14 +1010,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         // Test if this key has a non-default next layer
         if(typeof e.key != 'undefined' && e.key['nextlayer'] !== null) osk.nextLayer=e.key['nextlayer'];
 
-        // TODO: Verify the layer name is valid?
-
-        // Refresh the OSK if a different layer must be displayed
-        if(osk.nextLayer != osk.layerId)
-        {
-          osk.layerId=osk.nextLayer;
-          osk._Show();
-        }
+        // Swap layer as appropriate.
+        osk.selectLayer(keyName, nextLayer);
 
         /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
         Lelem._KeymanWebSelectionStart=null;

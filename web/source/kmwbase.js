@@ -154,6 +154,7 @@ if(!tavultesoft['keymanweb']) {
      * Scope        Public
      * @param       {Object}    nl a node list, as returned from getElementsBy_____ methods.
      * Description  Transforms a node list into an array.   * 
+     * @return      {Array<Element>}
      */
     util.arrayFromNodeList = function(nl) {
       var res = [];
