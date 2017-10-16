@@ -84,8 +84,9 @@ if(!window['keyman']['initialized']) {
       var Li,Lstub;
 
       // Check if the active stub refers to this keyboard, else find applicable stub
-      var Ps=keymanweb._ActiveStub;
-      if(!Ps || !('KI' in Ps) || (Ps['KI'] != Pk['KI'])) {
+
+      var Ps=keymanweb._ActiveStub, savedActiveStub = keymanweb._ActiveStub;
+      if(!Ps || !('KI' in Ps) || (Ps['KI'] != Pk['KI'])) {         
         // Find the first stub for this keyboard
         for(Lstub=0;Lstub < keymanweb._KeyboardStubs.length; Lstub++) { // I1511 - array prototype extended
           Ps=keymanweb._KeyboardStubs[Lstub];
@@ -114,6 +115,9 @@ if(!window['keyman']['initialized']) {
 
       // Execute any external (UI) code needed after loading keyboard
       keymanweb.doKeyboardLoaded(Pk['KI']);
+
+      // Restore the originally-active stub to its prior state.  No need to change it permanently.
+      keymanweb._ActiveStub = savedActiveStub;
     }
 
     /**
