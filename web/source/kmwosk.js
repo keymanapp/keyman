@@ -744,7 +744,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
           if(keymanweb.isChiral()) {
             nextLayer = 'leftctrl-rightalt';
           } else {
-            nextLayer = 'ctrlalt';
+            nextLayer = 'ctrl-alt';
           }
           break;
         case 'K_CURRENCIES':
@@ -769,15 +769,15 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     }
 
     /**
-     * Get the default key code from the virtual key code (physical keyboard mapping)
+     * Get the default key string from the virtual key code (physical keyboard mapping)
      *
      * @param   {string}  keyName
      * @param   {number}  n
      * @param   {number}  keyShiftState
-     * @return  {number}
+     * @return  {string}
      */
     osk.defaultKeyOutput = function(keyName,n,keyShiftState) {
-      var ch = 0, checkCodes = false;
+      var ch = '', checkCodes = false;
 
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
       if(keyShiftState == 0) {
@@ -791,12 +791,13 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       // Test for fall back to U_xxxx key id - For this first test, we ignore the key code
       // and use the keyName
-      if((keyName.substr(0,2) == 'U_')) { 
-        ch=String.fromCharCode(parseInt(keyName.substr(2,6),16));
-        if(ch <= 32 || (ch > 127 && ch < 160)) {
-          // 127 - 160 refer to Unicode control codes.
+      if((keyName.substr(0,2) == 'U_')) {
+        var value = parseInt(keyName.substr(2,6), 16);
+        ch=String.fromCharCode(value);
+        if((value <= 31) || ((value >= 127) && (value <= 159))) {
+          // 0 - 31 and 127 - 159 refer to Unicode control codes.
           // Do not allow output of these codes via U_xxxx shortcuts.
-          ch = 0;
+          ch = '';
         }
         // Hereafter, we refer to keycodes.
       } else if(checkCodes) {
@@ -3098,7 +3099,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
                 shiftKey['text']='*Ctrl*'; break;
               case 'alt':
                 shiftKey['text']='*Alt*'; break;
-              case 'ctrlalt':
+              case 'ctrl-alt':
                 shiftKey['text']='*AltGr*'; break;
             };
           }

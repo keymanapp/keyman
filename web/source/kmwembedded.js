@@ -437,6 +437,12 @@
       // Define modifiers value for sending to keyboard mapping function
       Lkc.Lmodifiers = keyShiftState;
 
+      // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
+      if((Lkc.Lmodifiers & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM'] && osk.emulatesAltGr()) {
+          Lkc.Lmodifiers &= ~osk.modifierBitmasks['ALT_GR_SIM'];
+          Lkc.Lmodifiers |= osk.modifierCodes['RALT'];
+      }
+
       Lkc.vkCode=Lkc.Lcode;
 
       // Pass this key code and state to the keyboard program
