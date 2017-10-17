@@ -13,7 +13,7 @@
 * Fixed keyboard loading upon initialization, redundant cloud requests for keyboards.  (#103)
 * Fixed next-layer processing (#116) (#358)
 * Fixed auto-attaching mode bug. (#352)
-* Fixed key codes for longpress keys
+* Fixed key codes for longpress keys and handle default keys beyond U_FFFF
 
 ## 2017-07-10 2.0.473 stable
 * 2.0 stable release build.

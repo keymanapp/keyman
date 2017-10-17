@@ -427,6 +427,7 @@ final class KMKeyboard extends WebView {
     for (int j = 0; j < length; j++) {
       if (!values[j].isEmpty() && !values[j].contains("-")) {
         int c = Integer.parseInt(values[j], 16);
+        // TODO: \\uxxxxxx will need to be handled with title.codePointAt(c)
         title += String.valueOf((char) c);
       }
     }

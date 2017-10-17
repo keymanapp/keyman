@@ -28,39 +28,29 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
     setContentView(R.layout.activity_main);
     textView = (KMTextView) findViewById(R.id.kmTextView);
-
-    // Add a custom keyboard
     final String KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
 
+    // Add custom keyboards
+
     // Chirality test keyboard
-    HashMap<String, String> ckbInfo = new HashMap<String, String>();
-    ckbInfo.put(KMManager.KMKey_KeyboardID, "chirality");
-    ckbInfo.put(KMManager.KMKey_LanguageID, "eng");
-    ckbInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
-    ckbInfo.put(KMManager.KMKey_LanguageName, "English");
-    ckbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
-    ckbInfo.put(KMManager.KMKey_Font, KeyboardFont);
-    KMManager.addKeyboard(this, ckbInfo);
+    HashMap<String, String> chiralityKBInfo = new HashMap<String, String>();
+    chiralityKBInfo.put(KMManager.KMKey_KeyboardID, "chirality");
+    chiralityKBInfo.put(KMManager.KMKey_LanguageID, "eng");
+    chiralityKBInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
+    chiralityKBInfo.put(KMManager.KMKey_LanguageName, "English");
+    chiralityKBInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
+    chiralityKBInfo.put(KMManager.KMKey_Font, KeyboardFont);
+    KMManager.addKeyboard(this, chiralityKBInfo);
 
     // Longpress test keyboard
-    HashMap<String, String> lkbInfo = new HashMap<String, String>();
-    lkbInfo.put(KMManager.KMKey_KeyboardID, "longpress");
-    lkbInfo.put(KMManager.KMKey_LanguageID, "eng");
-    lkbInfo.put(KMManager.KMKey_KeyboardName, "Longpress Keyboard");
-    lkbInfo.put(KMManager.KMKey_LanguageName, "English");
-    lkbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
-    lkbInfo.put(KMManager.KMKey_Font, KeyboardFont);
-    KMManager.addKeyboard(this, lkbInfo);
-
-    // Tchad test keyboard
-    HashMap<String, String> tkbInfo = new HashMap<String, String>();
-    tkbInfo.put(KMManager.KMKey_KeyboardID, "tchaduni");
-    tkbInfo.put(KMManager.KMKey_LanguageID, "shu");
-    tkbInfo.put(KMManager.KMKey_KeyboardName, "Tchad Unicode V3");
-    tkbInfo.put(KMManager.KMKey_LanguageName, "Tchad");
-    tkbInfo.put(KMManager.KMKey_KeyboardVersion, "3.0");
-    tkbInfo.put(KMManager.KMKey_Font, KeyboardFont);
-    KMManager.addKeyboard(this, tkbInfo);
+    HashMap<String, String> longpressKBbInfo = new HashMap<String, String>();
+    longpressKBbInfo.put(KMManager.KMKey_KeyboardID, "longpress");
+    longpressKBbInfo.put(KMManager.KMKey_LanguageID, "eng");
+    longpressKBbInfo.put(KMManager.KMKey_KeyboardName, "Longpress Keyboard");
+    longpressKBbInfo.put(KMManager.KMKey_LanguageName, "English");
+    longpressKBbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
+    longpressKBbInfo.put(KMManager.KMKey_Font, "code2001.ttf");
+    KMManager.addKeyboard(this, longpressKBbInfo);
   }
 
   @Override
@@ -114,6 +104,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   @Override
   public void onKeyboardChanged(String newKeyboard) {
     // Handle Keyman keyboard changed event here if needed
+    textView.setTypeface(KMManager.getKeyboardTextFontTypeface(this));
   }
 
   @Override
