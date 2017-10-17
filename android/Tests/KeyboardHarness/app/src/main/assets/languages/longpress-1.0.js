@@ -7,17 +7,17 @@ function Keyboard_longpress() {
     this.KH = '';
     this.KM = 0;
     this.KBVER = "1.0";
-    this.KVKD = "T_C";
+    this.KMBM = 0x0000;
     this.KVKL = {
         "tablet": {
-            "font": "Tahoma",
+            "font": "code2001",
             "layer": [{
                 "id": "default",
                 "row": [{
                     "id": 1,
                     "key": [{
-                        "id": "K_Q",
-                        "text": "q"
+                        "id": "U_10481",
+                        "text": "\uD801\uDC81"
                     }, {
                         "id": "K_W",
                         "text": "w"
@@ -513,14 +513,14 @@ function Keyboard_longpress() {
             }]
         },
         "phone": {
-            "font": "Tahoma",
+            "font": "Code2001",
             "layer": [{
                 "id": "default",
                 "row": [{
                     "id": 1,
                     "key": [{
-                        "id": "K_Q",
-                        "text": "q"
+                        "id": "U_10481",
+                        "text": "\uD801\uDC81"
                     }, {
                         "id": "K_W",
                         "text": "w"
@@ -602,12 +602,6 @@ function Keyboard_longpress() {
                         "id": "K_C",
                         "text": "c",
                         "sk": [{
-                            "text": "tc",
-                            "id": "T_c"
-                        }, {
-                            "text": "uc",
-                            "id": "K_00E7"
-                        }, {
                             "text": "\u00E7",
                             "id": "U_00E7"
                         }]
@@ -680,8 +674,28 @@ function Keyboard_longpress() {
                         "width": "610",
                         "sp": "0",
                         "sk": [{
-                            "text": "[nbsp]",
-                            "id": "U_00a0"
+                            // Unicode C0 Control Codes U_0000 to U_001F suppressed
+                            "text": "00",
+                            "id": "U_0000"
+                        }, {
+                            "text": "1F",
+                            "id": "U_001F"
+                        }, {
+                            "text": "20",
+                            "id": "U_0020"
+                        }, {
+                            "text": "7F",
+                            "id": "U_007F"
+                        }, {
+                            // Unicode C1 Control Codes U_0080 to U_009F suppressed
+                            "text": "80",
+                            "id": "U_0080"
+                        }, {
+                            "text": "9F",
+                            "id": "U_009F"
+                        }, {
+                            "text": "A0",
+                            "id": "U_00A0"
                         }]
                     }, {
                         "id": "K_ENTER",
@@ -1022,7 +1036,7 @@ function Keyboard_longpress() {
             }]
         }
     };
-    this.KVER = "10.0.937.0";
+    this.KVER = "10.0.955.0";
     this.gs = function(t, e) {
         return this.g0(t, e);
     };
@@ -1030,10 +1044,6 @@ function Keyboard_longpress() {
         var k = KeymanWeb,
             r = 0,
             m = 0;
-        if (k.KKM(e, 16384, 256)) {
-            r = m = 1;
-            k.KO(0, t, "ç");
-        }
         return r;
     };
 }
