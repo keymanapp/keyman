@@ -5,36 +5,6 @@
 //  Created by Gabriel Wong on 2017-10-06.
 //  Copyright © 2017 SIL International. All rights reserved.
 //
-//	A one-stop hub for:
-//     - global settings and behaviour for KeymanTextView and KeymanTextField
-//     - displaying the keyboard picker/downloader
-//     - all interaction with the Keyman servers (polling for info, downloading keyboards, etc)
-//
-//	
-//	This manager should be setup when the app first launches.
-//
-//  Example 1 (bare minimum):
-//
-//      [KMManager sharedInstance];
-//
-//
-//  Example 2:
-//	
-//		[[KMManager sharedInstance] setDebugPrintingOn:YES];
-//      NSString *kbID = @"european2";
-//      NSString *langID = @"eng";
-//      NSString *kbName = @"EuroLatin2 Keyboard";
-//      NSString *langName = @"English";
-//      NSString *kbFont = @"DejaVuSans.ttf";
-//      [[KMManager sharedInstance] setKeyboardWithID:kbID languageID:langID keyboardName:kbName languageName:langName font:kbFont, oskFont:nil];
-//
-//
-//  NOTES: 1) The easiest way to use this SDK is to simply use KeymanTextViews and KeymanTextFields in place of their UIKit counterparts
-//         2) All keyboard downloading and picking can be handled by globe key on the keyboard, displaying a KMKeyboardPickerButton or a
-//            KMKeyboardPickerBarButtonItem
-//             - when tapped, these will display a UI for the user to navigate all available Keyman keyboards
-//         3) Only use the more advance functionality of KMManager if you're comfortable with asynchronous
-//            calls and the associated error handling
 
 import CoreText
 import Foundation
@@ -597,7 +567,9 @@ UIGestureRecognizerDelegate {
 
     kmLog("Setting language: \(languageID)_\(keyboardID)", checkDebugPrinting: true)
     if usingTempFolder {
-      copyKeymanFilesToTemp()
+      if !copyKeymanFilesToTemp() {
+        return false
+      }
     }
 
     if keyboardID.isEmpty || languageID.isEmpty {
@@ -609,9 +581,9 @@ UIGestureRecognizerDelegate {
       kmLog("Could not set keyboardID to \(keyboardID) because the keyboard file does not exist",
         checkDebugPrinting: false)
       if (self.keyboardID == nil || self.languageID == nil) && keyboardID != kKeymanDefaultKeyboardID {
-        setKeyboard(withID: kKeymanDefaultKeyboardID, languageID: kKeymanDefaultLanguageID,
-                    keyboardName: kKeymanDefaultKeyboardName, languageName: kKeymanDefaultLanguageName,
-                    font: kKeymanDefaultKeyboardFont, oskFont: nil)
+        _ = setKeyboard(withID: kKeymanDefaultKeyboardID, languageID: kKeymanDefaultLanguageID,
+                        keyboardName: kKeymanDefaultKeyboardName, languageName: kKeymanDefaultLanguageName,
+                        font: kKeymanDefaultKeyboardFont, oskFont: nil)
       }
       return false
     }
@@ -2216,8 +2188,8 @@ UIGestureRecognizerDelegate {
     let kbInfo = keyboardInfo[kKeymanKeyboardInfoKey] ?? keyboardInfo
     NotificationCenter.default.post(name: .keymanKeyboardDownloadFailed, object: self,
                                     userInfo: [
-                                      kKeymanKeyboardInfoKey : kbInfo,
-                                      NSUnderlyingErrorKey : error
+                                      kKeymanKeyboardInfoKey: kbInfo,
+                                      NSUnderlyingErrorKey: error
                                     ])
   }
 
@@ -2762,7 +2734,7 @@ UIGestureRecognizerDelegate {
       // Touch & Hold Began
       let touchPoint = sender.location(in: sender.view)
       // Check if touch was for language menu button
-      keyboardWebView.evaluateJavaScript("langMenuPos();") { result, error in
+      keyboardWebView.evaluateJavaScript("langMenuPos();") { result, _ in
         let keyFrame = result as! String
         self.setMenuKeyFrame(keyFrame)
         if menuKeyFrame.contains(touchPoint) {
@@ -3091,7 +3063,7 @@ UIGestureRecognizerDelegate {
 
   func showKeyboardMenu(_ ic: KeymanInputViewController, closeButtonTitle: String) {
     let parentView = ic.view ?? keyboardWebView
-    keyboardWebView.evaluateJavaScript("langMenuPos();") { result, error in
+    keyboardWebView.evaluateJavaScript("langMenuPos();") { result, _ in
       let keyFrame = result as! String
       self.setMenuKeyFrame(keyFrame)
       if menuKeyFrame != .zero {
@@ -3132,4 +3104,3 @@ UIGestureRecognizerDelegate {
     return Bundle(path: Bundle(for: Manager.self).path(forResource: "Keyman", ofType: "bundle")!)!
   }
 }
-

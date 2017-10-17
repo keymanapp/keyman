@@ -58,9 +58,6 @@
 		C06D37351F81F5C300F61AE0 /* HTTPDownloadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ED71B21F6BB0B1002A2FD6 /* HTTPDownloadRequest.swift */; };
 		C06D37361F81F5C300F61AE0 /* KeyboardMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */; };
 		C06D37381F81F5C400F61AE0 /* SubKeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */; };
-		C06D373B1F81F5C400F61AE0 /* NSString+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9878F76D1B8BF00F00360B8D /* NSString+Helpers.m */; };
-		C06D373C1F81F5C400F61AE0 /* UIButton+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9878F76F1B8BF00F00360B8D /* UIButton+Helpers.m */; };
-		C06D373D1F81F5C400F61AE0 /* UIView+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 9878F7701B8BF00F00360B8D /* UIView+Helpers.m */; };
 		C06D373E1F81F5C400F61AE0 /* KeyboardInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C62141F67C8D500268D03 /* KeyboardInfoViewController.swift */; };
 		C06D373F1F81F5C400F61AE0 /* KeyboardPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C62161F67CFB800268D03 /* KeyboardPickerViewController.swift */; };
 		C06D37401F81F5C400F61AE0 /* LanguageDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C092D8381F6A70C8005C5485 /* LanguageDetailViewController.swift */; };
@@ -69,7 +66,6 @@
 		C06D37431F81F5C400F61AE0 /* KeyboardPickerBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C620B1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift */; };
 		C06D37441F81F5C400F61AE0 /* KeyboardNameTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C62121F67C31100268D03 /* KeyboardNameTableViewCell.swift */; };
 		C06D37461F81F5C400F61AE0 /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A5FF361F6682EB00BE740C /* PopoverView.swift */; };
-		C06D37541F82002700F61AE0 /* CWLSynthesizeSingleton.h in Headers */ = {isa = PBXBuildFile; fileRef = F273AB9A15641F0E00A47CEE /* CWLSynthesizeSingleton.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C06D37561F8200F000F61AE0 /* Reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = CECB38931F2199BC0098882F /* Reachability.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C06D37571F82060900F61AE0 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */; };
 		C06D375A1F82075A00F61AE0 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */; };
@@ -163,12 +159,6 @@
 		984FA1F51974C0B30037EE5D /* Tavultesoft.KMEI.SystemKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Tavultesoft.KMEI.SystemKeyboard.entitlements; sourceTree = "<group>"; };
 		984FA1F61974C0EF0037EE5D /* KMEI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = KMEI.entitlements; sourceTree = "<group>"; };
 		984FD3EC17B48BBC0026ADA7 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
-		9878F76C1B8BF00F00360B8D /* NSString+Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+Helpers.h"; path = "Categories/NSString+Helpers.h"; sourceTree = "<group>"; };
-		9878F76D1B8BF00F00360B8D /* NSString+Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+Helpers.m"; path = "Categories/NSString+Helpers.m"; sourceTree = "<group>"; };
-		9878F76E1B8BF00F00360B8D /* UIButton+Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIButton+Helpers.h"; path = "Categories/UIButton+Helpers.h"; sourceTree = "<group>"; };
-		9878F76F1B8BF00F00360B8D /* UIButton+Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIButton+Helpers.m"; path = "Categories/UIButton+Helpers.m"; sourceTree = "<group>"; };
-		9878F7701B8BF00F00360B8D /* UIView+Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIView+Helpers.m"; path = "Categories/UIView+Helpers.m"; sourceTree = "<group>"; };
-		9878F7781B8BF05F00360B8D /* UIView+Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIView+Helpers.h"; path = "Categories/UIView+Helpers.h"; sourceTree = "<group>"; };
 		988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_pirurvik-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_pirurvik-1.0.js"; sourceTree = SOURCE_ROOT; };
 		988B36B71ADF728A0008752C /* inuktitut_latin-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_latin-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_latin-1.0.js"; sourceTree = SOURCE_ROOT; };
 		988B36B81ADF728A0008752C /* inuktitut_naqittaut-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_naqittaut-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_naqittaut-1.0.js"; sourceTree = SOURCE_ROOT; };
@@ -220,7 +210,6 @@
 		F26071FF158F8C6000F37184 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		F2607201158F8C9600F37184 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		F2607203158F8CA200F37184 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		F273AB9A15641F0E00A47CEE /* CWLSynthesizeSingleton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CWLSynthesizeSingleton.h; sourceTree = "<group>"; };
 		F27FCA7F157FB0DB00FBBA20 /* KME-iphoneos-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KME-iphoneos-Prefix.pch"; sourceTree = "<group>"; };
 		F27FCAC2157FD10A00FBBA20 /* KME-iphonesimulator-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KME-iphonesimulator-Prefix.pch"; sourceTree = "<group>"; };
 		F27FCAEE157FD59100FBBA20 /* Keyman-iphoneos.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphoneos.xcconfig"; sourceTree = "<group>"; };
@@ -529,9 +518,7 @@
 				98411308199D9ACD005BD609 /* SubKeysView */,
 				98F9D6ED19545A620087AA43 /* KeymanInputViewController */,
 				989FDF8C193C1B0C00EECAF9 /* KeyPreviewView */,
-				F273AB9F156440DC00A47CEE /* Categories */,
 				F2607212158FBCB500F37184 /* KeyboardPicker */,
-				F273ABA0156440FF00A47CEE /* Macros */,
 				98A880EF177BF82600601A9E /* PopoverView */,
 				F273AB9E156440CD00A47CEE /* UITextField */,
 				F273AB9D156440BA00A47CEE /* UITextView */,
@@ -560,27 +547,6 @@
 				C0324B8C1F87480700AF3785 /* KeymanTextFieldDelegateProxy.swift */,
 			);
 			name = UITextField;
-			sourceTree = "<group>";
-		};
-		F273AB9F156440DC00A47CEE /* Categories */ = {
-			isa = PBXGroup;
-			children = (
-				9878F76C1B8BF00F00360B8D /* NSString+Helpers.h */,
-				9878F76D1B8BF00F00360B8D /* NSString+Helpers.m */,
-				9878F76E1B8BF00F00360B8D /* UIButton+Helpers.h */,
-				9878F76F1B8BF00F00360B8D /* UIButton+Helpers.m */,
-				9878F7781B8BF05F00360B8D /* UIView+Helpers.h */,
-				9878F7701B8BF00F00360B8D /* UIView+Helpers.m */,
-			);
-			name = Categories;
-			sourceTree = "<group>";
-		};
-		F273ABA0156440FF00A47CEE /* Macros */ = {
-			isa = PBXGroup;
-			children = (
-				F273AB9A15641F0E00A47CEE /* CWLSynthesizeSingleton.h */,
-			);
-			name = Macros;
 			sourceTree = "<group>";
 		};
 		F27FCA7D157FB0DB00FBBA20 /* KME-iphoneos */ = {
@@ -623,7 +589,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C06D372F1F81F4E100F61AE0 /* KeymanEngine.h in Headers */,
-				C06D37541F82002700F61AE0 /* CWLSynthesizeSingleton.h in Headers */,
 				C06D37561F8200F000F61AE0 /* Reachability.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -842,9 +807,6 @@
 				C06D37381F81F5C400F61AE0 /* SubKeysView.swift in Sources */,
 				C0CE581E1F877B4D00AE6A7E /* NSNotification.Name+Notifications.swift in Sources */,
 				C0A93A541F8B21240079948B /* Manager.swift in Sources */,
-				C06D373B1F81F5C400F61AE0 /* NSString+Helpers.m in Sources */,
-				C06D373C1F81F5C400F61AE0 /* UIButton+Helpers.m in Sources */,
-				C06D373D1F81F5C400F61AE0 /* UIView+Helpers.m in Sources */,
 				C06D373E1F81F5C400F61AE0 /* KeyboardInfoViewController.swift in Sources */,
 				C06D373F1F81F5C400F61AE0 /* KeyboardPickerViewController.swift in Sources */,
 				C0324B911F8763E100AF3785 /* KeymanTextViewDelegateProxy.swift in Sources */,
