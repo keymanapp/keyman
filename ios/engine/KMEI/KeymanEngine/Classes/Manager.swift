@@ -979,17 +979,18 @@ UIGestureRecognizerDelegate {
       return []
     }
 
+    guard let baseString = options[kKeymanFontBaseURIKey] as? String,
+          let baseURL = URL(string: baseString) else {
+      kmLog("Missing font base URL in options: \(options)", checkDebugPrinting: false)
+      return []
+    }
+
     let fontFiles = fontObject[kKeymanFontFilesKey]
     if let fontFiles = fontFiles as? [String] {
-      return try fontFiles.flatMap { source in
-        if source.hasSuffix(".ttf") || source.hasSuffix(".otf") {
-          return try urlOrThrow(string: source)
-        }
-        return nil
-      }
+      return fontFiles.filter({ $0.hasFontExtension }).map({ baseURL.appendingPathComponent($0) })
     } else if let source = fontFiles as? String {
-      if source.hasSuffix(".ttf") || source.hasSuffix(".otf") {
-        return try [urlOrThrow(string: source)]
+      if source.hasFontExtension {
+        return [baseURL.appendingPathComponent(source)]
       }
       return []
     } else {
