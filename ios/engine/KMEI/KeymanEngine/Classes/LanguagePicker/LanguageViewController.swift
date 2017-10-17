@@ -88,7 +88,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
         cell.selectedBackgroundView = selectionColor
       }
     }
-    cell.detailTextLabel?.text = keyboards.count < 2 ? (keyboards[0][kKeymanNameKey] as? String ?? "") : ""
+    cell.detailTextLabel?.text = keyboards.count < 2 ? (keyboards.first?[kKeymanNameKey] as? String ?? "") : ""
     return cell
   }
 
@@ -98,7 +98,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
       return sectionIndexTitles
     }
 
-    let languages = Manager.shared.languages as? [[String: Any]] ?? []
+    let languages = Manager.shared.languages ?? []
     sectionIndexTitles = []
     indices = []
     for (index, item) in languages.enumerated() {
@@ -119,7 +119,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    let languages = Manager.shared.languages as! [[String: Any]]
+    let languages = Manager.shared.languages
     if indexPath.section >= languages.count {
       return
     }
@@ -160,7 +160,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
       showLanguageDetailView(title: title, languageIndex: indexPath.section)
       return
     }
-    let languages = Manager.shared.languages ?? []
+    let languages = Manager.shared.languages
     let langName = languages[indexPath.section][kKeymanNameKey] as? String ?? ""
     let keyboards = Manager.shared.keyboards(for: indexPath.section)
     let kbID = keyboards?[0][kKeymanIdKey] as? String
@@ -184,20 +184,19 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
 
   private func showLanguageDetailView(title: String, languageIndex langIndex: Int) {
     let langDetailView = LanguageDetailViewController()
-    let languages = Manager.shared.languages as! [[String: Any]]
+    let languages = Manager.shared.languages
     langDetailView.title = title
     langDetailView.languageIndex = langIndex
     langDetailView.languageName = languages[langIndex][kKeymanNameKey] as! String
     langDetailView.languageID = languages[langIndex][kKeymanIdKey] as! String
-    let keyboards = Manager.shared.keyboards(for: langIndex)
 
-    langDetailView.keyboards = keyboards as! [[String : Any]]
+    langDetailView.keyboards = Manager.shared.keyboards(for: langIndex)!
     navigationController?.pushViewController(langDetailView, animated: true)
   }
 
   func alertView(_ alertView: UIAlertView, clickedButtonAt buttonIndex: Int) {
     if alertView.tag == errorAlertTag {
-      if Manager.shared.languages == nil {
+      if !Manager.shared.languages.isEmpty {
         navigationController?.popToRootViewController(animated: true)
       }
     } else {

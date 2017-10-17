@@ -960,14 +960,14 @@ UIGestureRecognizerDelegate {
     var request = HTTPDownloadRequest(url: keyboardURL, userInfo: commonUserData)
     request.destinationFile = keyboardPath?.path
     request.tag = 0
-
     downloadQueue!.addRequest(request)
-      for (i, url) in kbFontURLs.enumerated() {
-        request = HTTPDownloadRequest(url: url, userInfo: commonUserData)
-        request.destinationFile = fontPath(forFilename: url.lastPathComponent)?.path
-        request.tag = i + 1
-        downloadQueue!.addRequest(request)
-      }
+
+    for (i, url) in kbFontURLs.enumerated() {
+      request = HTTPDownloadRequest(url: url, userInfo: commonUserData)
+      request.destinationFile = fontPath(forFilename: url.lastPathComponent)?.path
+      request.tag = i + 1
+      downloadQueue!.addRequest(request)
+    }
     downloadQueue!.run()
   }
 
@@ -1339,15 +1339,19 @@ UIGestureRecognizerDelegate {
     if let userKeyboards = userKeyboards as? [[String: String]] {
       if let kb = userKeyboards.first(where: { isCurrentKeyboard($0) }) {
         let font = kb[kKeymanFontKey]
-        let fontFilename = self.fontFilename(fromJSONFont: font!)
-        return keymanFonts[fontFilename!]?[kKeymanFontNameKey] as? String
+        if let fontFilename = self.fontFilename(fromJSONFont: font!) {
+          return keymanFonts[fontFilename]?[kKeymanFontNameKey] as? String
+        }
+        return nil
       }
     }
 
     if let kb = keyboardsDictionary["\(languageID)_\(keyboardID)"] {
       let font = kb[kKeymanFontKey]
-      let fontFilename = self.fontFilename(fromJSONFont: font!)
-      return keymanFonts[fontFilename!]?[kKeymanFontNameKey] as? String
+      if let fontFilename = self.fontFilename(fromJSONFont: font!) {
+        return keymanFonts[fontFilename]?[kKeymanFontNameKey] as? String
+      }
+      return nil
     }
 
     return nil
@@ -1677,15 +1681,18 @@ UIGestureRecognizerDelegate {
 
         if keyboardsInfo![kbID!] == nil {
           let kbUri = "\(kbBaseUri!)\(kbDict[kKeymanKeyboardFilenameKey]!)"
-          keyboardsInfo![kbID!] = [
+          var keyboard = [
             kKeymanKeyboardNameKey: (kbDict[kKeymanNameKey] as? String)!,
             kKeymanKeyboardVersionKey: kbVersion,
             kKeymanKeyboardRTLKey: isRTL,
             kKeymanKeyboardModifiedKey: (kbDict[kKeymanKeyboardModifiedKey] as? String)!,
-            kKeymanKeyboardFileSizeKey: (kbDict[kKeymanKeyboardFileSizeKey] as? String)!,
-            kKeymanKeyboardURIKey: kbUri,
-            kKeymanFontKey: (kbDict[kKeymanFontKey] as? String)!
+            kKeymanKeyboardFileSizeKey: String((kbDict[kKeymanKeyboardFileSizeKey] as? Int)!),
+            kKeymanKeyboardURIKey: kbUri
           ]
+          if let font = kbDict[kKeymanFontKey] as? String {
+            keyboard[kKeymanFontKey] = font
+          }
+          keyboardsInfo![kbID!] = keyboard
         }
 
         let dictKey = "\(langId!)_\(kbID!)"
@@ -1698,7 +1705,7 @@ UIGestureRecognizerDelegate {
             kKeymanLanguageNameKey: (langDict[kKeymanNameKey] as? String)!,
             kKeymanKeyboardVersionKey: kbVersion,
             kKeymanKeyboardRTLKey: isRTL,
-            kKeymanFontKey: jsFont(fromFontDictionary: (kbDict[kKeymanFontKey] as? [AnyHashable: Any])!),
+            kKeymanFontKey: jsFont(fromFontDictionary: kbDict[kKeymanFontKey] as? [AnyHashable: Any])
           ]
           if let oskFont = oskFont {
             dict[kKeymanOskFontKey] = jsFont(fromFontDictionary: oskFont)
@@ -2006,14 +2013,14 @@ UIGestureRecognizerDelegate {
     keyboardWebView.addSubview(helpBubbleView)
   }
 
-  func keyboards(for index: Int) -> [[String: String]]? {
+  func keyboards(for index: Int) -> [[String: Any]]? {
     if index < languages.count {
-      return languages[index][kKeymanLanguageKeyboardsKey] as? [[String: String]]
+      return languages[index][kKeymanLanguageKeyboardsKey] as? [[String: Any]]
     }
     return nil
   }
 
-  func keyboardInfo(forLanguageIndex languageIndex: Int, keyboardIndex: Int) -> [String: String]? {
+  func keyboardInfo(forLanguageIndex languageIndex: Int, keyboardIndex: Int) -> [String: Any]? {
     guard let keyboards = keyboards(for: languageIndex) else {
       return nil
     }
@@ -2027,20 +2034,20 @@ UIGestureRecognizerDelegate {
     guard let keyboard = keyboardInfo(forLanguageIndex: languageIndex, keyboardIndex: keyboardIndex) else {
       return
     }
-    let kbID = keyboard[kKeymanIdKey]
+    let kbID = keyboard[kKeymanIdKey] as! String
     let langID = languages[languageIndex][kKeymanIdKey] as? String
-    downloadKeyboard(withID: kbID!, languageID: langID!, isUpdate: isUpdate)
+    downloadKeyboard(withID: kbID, languageID: langID!, isUpdate: isUpdate)
   }
 
   public func downloadQueueFinished(_ queue: HTTPDownloader) {
     if isDebugPrintingOn {
       if let fontDir = activeFontDirectory()?.path {
         let contents = try? FileManager.default.contentsOfDirectory(atPath: fontDir)
-        kmLog("Font Directory: \(String(describing: contents))", checkDebugPrinting: true)
+        kmLog("Font Directory contents: \(String(describing: contents))", checkDebugPrinting: true)
       }
       if let langDir = activeLanguageDirectory()?.path {
         let contents = try? FileManager.default.contentsOfDirectory(atPath: langDir)
-        kmLog("Language Directory: \(String(describing: contents))", checkDebugPrinting: true)
+        kmLog("Language Directory contents: \(String(describing: contents))", checkDebugPrinting: true)
       }
     }
   }

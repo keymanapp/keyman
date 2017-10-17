@@ -13,7 +13,8 @@
   func downloadQueueFinished(_ queue: HTTPDownloader)
 }
 
-public class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDelegate {
+public class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDownloadDelegate,
+URLSessionDataDelegate {
   var queue: [HTTPDownloadRequest] = []
   // TODO: Make unowned
   weak var handler: HTTPDownloadDelegate?
@@ -69,8 +70,8 @@ public class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegat
   }
 
   // This is triggered before the 'didCompleteWithError' delegate method.
-  func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
-                  didFinishDownloadingTo location: URL) {
+  public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
+                         didFinishDownloadingTo location: URL) {
     guard let currentRequest = currentRequest else {
       return
     }
