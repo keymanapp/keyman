@@ -108,6 +108,14 @@ let kKeymanDefaultKeyboardName = "EuroLatin2 Keyboard"
 let kKeymanDefaultLanguageName = "English"
 let kKeymanDefaultKeyboardRTL = "N"
 let kKeymanDefaultKeyboardFont = "{\"family\":\"LatinWeb\",\"files\":[\"DejaVuSans.ttf\",\"DejaVuSans.mobileconfig\"]}"
+let kKeymanDefaultKeyboard = [
+  kKeymanKeyboardIdKey: kKeymanDefaultKeyboardID,
+  kKeymanLanguageIdKey: kKeymanDefaultLanguageID,
+  kKeymanKeyboardNameKey: kKeymanDefaultKeyboardName,
+  kKeymanLanguageNameKey: kKeymanDefaultLanguageName,
+  kKeymanKeyboardRTLKey: kKeymanDefaultKeyboardRTL,
+  kKeymanFontKey: kKeymanDefaultKeyboardFont
+]
 
 // JSON keys for language REST calls
 let kKeymanOptionsKey = "options"
@@ -345,17 +353,17 @@ UIGestureRecognizerDelegate {
     let userKeyboards = activeUserDefaults().array(forKey: kKeymanUserKeyboardsListKey)
     let index = indexForUserKeyboard(withID: keyboardID, languageID: languageID)
 
-    let kbDict: [String: String]
+    let kbDict: [String: String]?
     if let index = index {
-      kbDict = userKeyboards![index] as! [String: String]
+      kbDict = userKeyboards![index] as? [String: String]
     } else {
-      kbDict = keyboardsDictionary[key]!
+      kbDict = keyboardsDictionary[key]
     }
 
-    var langName = kbDict[kKeymanLanguageNameKey]
-    var kbName = kbDict[kKeymanKeyboardNameKey]
+    var langName = kbDict?[kKeymanLanguageNameKey]
+    var kbName = kbDict?[kKeymanKeyboardNameKey]
     let kbVersion = latestKeyboardFileVersion(withID: keyboardID) ?? "1.0"
-    let isRTL = kbDict[kKeymanKeyboardRTLKey]
+    let isRTL = kbDict?[kKeymanKeyboardRTLKey]
 
     if key == "\(kKeymanDefaultLanguageID)_\(kKeymanDefaultKeyboardID)" {
       if langName == nil || kbName == nil {
@@ -468,15 +476,15 @@ UIGestureRecognizerDelegate {
     let userKeyboards = activeUserDefaults().array(forKey: kKeymanUserKeyboardsListKey)
     let index = indexForUserKeyboard(withID: keyboardID, languageID: languageID)
 
-    let kbDict: [String: String]
+    let kbDict: [String: String]?
     if let index = index {
-      kbDict = userKeyboards![index] as! [String: String]
+      kbDict = userKeyboards![index] as? [String: String]
     } else {
-      kbDict = keyboardsDictionary[key]!
+      kbDict = keyboardsDictionary[key]
     }
 
     let kbVersion = latestKeyboardFileVersion(withID: keyboardID) ?? "1.0"
-    let isRTL = kbDict[kKeymanKeyboardRTLKey]
+    let isRTL = kbDict?[kKeymanKeyboardRTLKey]
 
     var jsFont = self.jsFont(forKeyboardID: keyboardID, languageID: languageID)
     var jsOskFont = self.jsOskFont(forKeyboardID: keyboardID, languageID: languageID)
@@ -593,15 +601,15 @@ UIGestureRecognizerDelegate {
     let userKeyboards = activeUserDefaults().array(forKey: kKeymanUserKeyboardsListKey)
     let index = indexForUserKeyboard(withID: keyboardID, languageID: languageID)
 
-    let kbDict: [String: String]
+    let kbDict: [String: String]?
     if let index = index {
-      kbDict = userKeyboards![index] as! [String: String]
+      kbDict = userKeyboards![index] as? [String: String]
     } else {
-      kbDict = keyboardsDictionary[key]!
+      kbDict = keyboardsDictionary[key]
     }
 
     let kbVersion = latestKeyboardFileVersion(withID: keyboardID) ?? "1.0"
-    let isRTL = kbDict[kKeymanKeyboardRTLKey]
+    let isRTL = kbDict?[kKeymanKeyboardRTLKey]
 
     var jsFont = jsFontString(font)
     var jsOskFont: String
@@ -2504,7 +2512,7 @@ UIGestureRecognizerDelegate {
     let deviceType = (UIDevice.current.userInterfaceIdiom == .phone) ? "AppleMobile" : "AppleTablet"
     webView.evaluateJavaScript("setDeviceType('\(deviceType)');", completionHandler: nil)
     if (keyboardID == nil || languageID == nil) && !shouldReloadKeyboard {
-      var newKb: [String: String]?
+      var newKb = kKeymanDefaultKeyboard
       let userData = kIsKeymanSystemKeyboard ? UserDefaults.standard : activeUserDefaults()
       if let currentKb = userData.dictionary(forKey: kKeymanUserCurrentKeyboardKey) as? [String: String] {
         let kbID = currentKb[kKeymanKeyboardIdKey]
@@ -2512,19 +2520,17 @@ UIGestureRecognizerDelegate {
         if userKeyboardExists(withID: kbID, languageID: langID) {
           newKb = currentKb
           if let kbName = currentKb[kKeymanKeyboardNameKey]?.replacingOccurrences(of: "\\'", with: "\'") {
-            newKb![kKeymanKeyboardNameKey] = kbName
+            newKb[kKeymanKeyboardNameKey] = kbName
           }
           if let langName = currentKb[kKeymanLanguageNameKey]?.replacingOccurrences(of: "\\'", with: "\'") {
-            newKb![kKeymanLanguageNameKey] = langName
+            newKb[kKeymanLanguageNameKey] = langName
           }
         }
       } else if let userKbs = activeUserDefaults().array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]],
         !userKbs.isEmpty {
         newKb = userKbs[0]
       }
-      if let newKb = newKb {
-        setKeyboard(newKb)
-      }
+      setKeyboard(newKb)
     }
 
     let kbInfo = [kKeymanKeyboardIdKey: keyboardID, kKeymanLanguageIdKey: languageID]
