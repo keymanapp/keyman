@@ -1874,7 +1874,7 @@ UIGestureRecognizerDelegate {
       }
       let langMenuKeyPos = String(describing: result)
       let pos = langMenuKeyPos.components(separatedBy: ",")
-      guard pos.count == 2, let px = Float(pos[0]), let py = Float(pos[1]) else {
+      guard let px = Float(pos[0]), let py = Float(pos[1]) else {
         self.kmLog("Unexpected result for langMenuPos(): \(langMenuKeyPos)", checkDebugPrinting: false)
         return
       }
