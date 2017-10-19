@@ -68,7 +68,7 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
   }
 
   @objc public init(keyFrame frame: CGRect, inputViewController: KeymanInputViewController, closeButtonTitle: String) {
-    let isSystemKeyboard = Manager.isKeymanSystemKeyboard
+    let isSystemKeyboard = Manager.shared.isSystemKeyboard
     let isPortrait: Bool
     if isSystemKeyboard {
       isPortrait = KeymanInputViewController.isPortrait
@@ -87,7 +87,7 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
 
     var mainFrame = inputViewController.view.frame
     if mainFrame == CGRect.zero {
-      mainFrame = Manager.inputView().frame
+      mainFrame = Manager.shared.inputView.frame
     }
     super.init(frame: mainFrame)
 
@@ -96,8 +96,8 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
     let baseHeight = keyFrame.size.height
     let containerWidth = maxWidth - strokeWidth * 2
     var containerHeight = CGFloat(tableList.count) * rowHeight
-    let vHeight = Manager.keyboardHeight + topBarHeight
-    let bY = Manager.keyboardHeight - (keyFrame.origin.y + baseHeight)
+    let vHeight = Manager.shared.keyboardHeight + topBarHeight
+    let bY = Manager.shared.keyboardHeight - (keyFrame.origin.y + baseHeight)
 
     if containerHeight + baseHeight > vHeight - bY {
       let maxRows = (vHeight - baseHeight - bY) / rowHeight

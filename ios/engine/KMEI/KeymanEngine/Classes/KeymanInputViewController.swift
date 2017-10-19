@@ -64,7 +64,7 @@ open class KeymanInputViewController: UIInputViewController, KeymanWebViewDelega
   }
 
   public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    kmInputView = Manager.inputView()
+    kmInputView = Manager.shared.inputView
     isTopBarEnabled = Manager.shared.isSystemKeyboardTopBarEnabled
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
   }
@@ -152,8 +152,8 @@ open class KeymanInputViewController: UIInputViewController, KeymanWebViewDelega
       newRange = context.startIndex..<context.startIndex
     }
 
-    Manager.setText(context)
-    Manager.setSelectionRange(NSRange(newRange, in: context), manually: false)
+    Manager.shared.setText(context)
+    Manager.shared.setSelectionRange(NSRange(newRange, in: context), manually: false)
   }
 
   private func processInsertText(_ fragment: String) {

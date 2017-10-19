@@ -23,7 +23,7 @@ public class SubKeysView: UIView {
   @objc public let containerView: UIView
 
   @objc public init(keyFrame frame: CGRect, subKeys: [UIButton]) {
-    let isSystemKeyboard = Manager.isKeymanSystemKeyboard
+    let isSystemKeyboard = Manager.shared.isSystemKeyboard
     var isPortrait = true
     if isSystemKeyboard {
       isPortrait = KeymanInputViewController.isPortrait
@@ -57,7 +57,7 @@ public class SubKeysView: UIView {
       }
     }
 
-    let kbHeight = Manager.inputView().frame.size.height
+    let kbHeight = Manager.shared.inputView.frame.size.height
     let tbHeight = Manager.shared.isSystemKeyboardTopBarEnabled ?
       CGFloat(KeymanInputViewController.topBarHeight) : 0
     var maxContainerHeight = (screenHeight - kbHeight) + keyFrame.origin.y - strokeWidth

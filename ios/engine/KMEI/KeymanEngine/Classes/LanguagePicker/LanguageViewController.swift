@@ -24,7 +24,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   override func loadView() {
     super.loadView()
     if Manager.shared.currentRequest == nil && Manager.shared.languages.isEmpty {
-      Manager.fetchKeyboards(completionBlock: nil)
+      Manager.shared.fetchKeyboards(completionBlock: nil)
     }
     loadUserKeyboards()
   }

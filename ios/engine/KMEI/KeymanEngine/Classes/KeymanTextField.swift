@@ -49,8 +49,6 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
       inputAssistantItem.trailingBarButtonGroups = []
     }
 
-    _ = Manager.shared // Preload webview keyboard
-
     NotificationCenter.default.addObserver(self, selector: #selector(self.textFieldTextDidChange),
                                            name: .UITextFieldTextDidChange, object: self)
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged),
@@ -61,7 +59,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
   public override var inputView: UIView? {
     get {
       Manager.shared.webDelegate = self
-      return Manager.inputView()
+      return Manager.shared.inputView
     }
 
     set(inputView) {
@@ -109,7 +107,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
       "KeymanTextField: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
       checkDebugPrinting: true)
     resignFirstResponder()
-    Manager.inputView().endEditing(true)
+    Manager.shared.inputView.endEditing(true)
   }
 
   public override var text: String! {
@@ -124,11 +122,11 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
         super.text = ""
       }
 
-      Manager.setText(self.text)
+      Manager.shared.setText(self.text)
       let textRange = selectedTextRange ?? UITextRange()
       let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                              length: offset(from: textRange.start, to: textRange.end))
-      Manager.setSelectionRange(newRange, manually: false)
+      Manager.shared.setSelectionRange(newRange, manually: false)
     }
   }
 
@@ -219,7 +217,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
       }
       let newRange = NSRange(location: offset(from: beginningOfDocument, to: range.start),
                              length: offset(from: range.start, to: range.end))
-      Manager.setSelectionRange(newRange, manually: false)
+      Manager.shared.setSelectionRange(newRange, manually: false)
     }
   }
 
@@ -232,18 +230,18 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
   @objc public func textFieldTextDidChange(_ notification: Notification) {
     if shouldUpdateKMText {
       // Catches copy/paste operations
-      Manager.setText(text)
+      Manager.shared.setText(text)
       let textRange = selectedTextRange!
       let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                              length: offset(from: textRange.start, to: textRange.end))
-      Manager.setSelectionRange(newRange, manually: false)
+      Manager.shared.setSelectionRange(newRange, manually: false)
       shouldUpdateKMText = false
     }
   }
 
   public func textFieldShouldClear(_ textField: UITextField) -> Bool {
     if textField == self {
-      Manager.clearText()
+      Manager.shared.clearText()
     }
     return true
   }
@@ -308,11 +306,11 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
       checkDebugPrinting: true)
 
     // copy this textField's text to the webview
-    Manager.setText(text)
+    Manager.shared.setText(text)
     let textRange = selectedTextRange!
     let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                            length: offset(from: textRange.start, to: textRange.end))
-    Manager.setSelectionRange(newRange, manually: false)
+    Manager.shared.setSelectionRange(newRange, manually: false)
     Manager.shared.kmLog(
       "KeymanTextField: \(self.debugDescription) Became first responder. Value: \(String(describing: text))",
       checkDebugPrinting: true)

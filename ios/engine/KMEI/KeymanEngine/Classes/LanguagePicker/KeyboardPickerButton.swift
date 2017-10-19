@@ -22,7 +22,7 @@ public class KeyboardPickerButton: UIButton {
     addTarget(self, action: #selector(self.showKeyboardPicker), for: .touchUpInside)
 
     let bundlePath = Bundle(for: type(of :self)).path(forResource: "Keyman", ofType: "bundle")!
-    let retinaSuffix = Manager.retinaScreen ? "@2x" : ""
+    let retinaSuffix = Manager.shared.retinaScreen ? "@2x" : ""
     let imagePath = Bundle(path: bundlePath)!.path(forResource: "keyboard_icon\(retinaSuffix)", ofType: "png")!
 
     setImage(UIImage(contentsOfFile: imagePath), for: .normal)

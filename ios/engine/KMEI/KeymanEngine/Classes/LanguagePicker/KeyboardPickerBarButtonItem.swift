@@ -24,7 +24,7 @@ public class KeyboardPickerBarButtonItem: UIBarButtonItem {
 
     let bundlePath = Bundle(for: type(of: self)).path(forResource: "Keyman", ofType: "bundle")!
     let keymanBundle = Bundle(path: bundlePath)!
-    let retinaSuffix = Manager.retinaScreen ? "@2x" : ""
+    let retinaSuffix = Manager.shared.retinaScreen ? "@2x" : ""
     let imagePath = keymanBundle.path(forResource: "keyboard_icon\(retinaSuffix)", ofType: "png")!
     image = UIImage(contentsOfFile: imagePath)
 

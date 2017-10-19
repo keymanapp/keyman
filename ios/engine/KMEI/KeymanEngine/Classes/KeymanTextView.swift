@@ -53,7 +53,6 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
       inputAssistantItem.trailingBarButtonGroups = []
     }
 
-    Manager.shared // Preload webview keyboard
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged),
                                            name: .keymanKeyboardChanged, object: nil)
   }
@@ -62,7 +61,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   public override var inputView: UIView? {
     get {
       Manager.shared.webDelegate = self
-      return Manager.inputView()
+      return Manager.shared.inputView
     }
 
     set(inputView) {
@@ -110,7 +109,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
       "KeymanTextView: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
       checkDebugPrinting: true)
     resignFirstResponder()
-    Manager.inputView().endEditing(true)
+    Manager.shared.inputView.endEditing(true)
   }
 
   public override var text: String! {
@@ -125,8 +124,8 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
         super.text = ""
       }
 
-      Manager.setText(self.text)
-      Manager.setSelectionRange(selectedRange, manually: false)
+      Manager.shared.setText(self.text)
+      Manager.shared.setSelectionRange(selectedRange, manually: false)
     }
   }
 
@@ -216,7 +215,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   // MARK: - UITextViewDelegate Hooks
   public override var selectedTextRange: UITextRange? {
     didSet {
-      Manager.setSelectionRange(selectedRange, manually: false)
+      Manager.shared.setSelectionRange(selectedRange, manually: false)
     }
   }
 
@@ -288,8 +287,8 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
       checkDebugPrinting: true)
 
     // copy this textView's text to the webview
-    Manager.setText(text)
-    Manager.setSelectionRange(selectedRange, manually: false)
+    Manager.shared.setText(text)
+    Manager.shared.setSelectionRange(selectedRange, manually: false)
     Manager.shared.kmLog(
       "KeymanTextView: \(self.debugDescription) Became first responder. Value: \(text.debugDescription)",
       checkDebugPrinting: true)
@@ -305,8 +304,8 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   public func textViewDidChange(_ textView: UITextView) {
     if shouldUpdateKMText {
       // Catches copy/paste operations
-      Manager.setText(textView.text)
-      Manager.setSelectionRange(textView.selectedRange, manually: false)
+      Manager.shared.setText(textView.text)
+      Manager.shared.setSelectionRange(textView.selectedRange, manually: false)
       shouldUpdateKMText = false
     }
   }
