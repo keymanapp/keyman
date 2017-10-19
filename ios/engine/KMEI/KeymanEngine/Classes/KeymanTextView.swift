@@ -229,11 +229,16 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   public func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
     let leftToRightMark = "\u{200e}"
     let rightToLeftMark = "\u{200f}" // or "\u{202e}"
-    let keyboardID = Manager.shared.keyboardID!
-    let languageID = Manager.shared.languageID!
     let textWD = baseWritingDirection(for: beginningOfDocument, in: .forward)
 
-    if Manager.shared.isRTLKeyboard(withID: keyboardID, languageID: languageID) {
+    let isRTL: Bool
+    if let keyboardID = Manager.shared.keyboardID,
+       let languageID = Manager.shared.languageID {
+      isRTL = Manager.shared.isRTLKeyboard(withID: keyboardID, languageID: languageID)
+    } else {
+      isRTL = false
+    }
+    if isRTL {
       if textWD != .rightToLeft {
         if text.hasPrefix(leftToRightMark) {
           text = String(text.utf16.dropFirst())
@@ -265,9 +270,13 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   public func textViewDidBeginEditing(_ textView: UITextView) {
     Manager.shared.webDelegate = self
 
-    let keyboardID = Manager.shared.keyboardID!
-    let languageID = Manager.shared.languageID!
-    let fontName = Manager.shared.fontNameForKeyboard(withID: keyboardID, languageID: languageID)
+    let fontName: String?
+    if let keyboardID = Manager.shared.keyboardID,
+       let languageID = Manager.shared.languageID {
+      fontName = Manager.shared.fontNameForKeyboard(withID: keyboardID, languageID: languageID)
+    } else {
+      fontName = nil
+    }
     let fontSize = font?.pointSize ?? UIFont.systemFontSize
     if let fontName = fontName {
       font = UIFont(name: fontName, size: fontSize)
