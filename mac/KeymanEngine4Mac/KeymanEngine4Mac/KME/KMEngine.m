@@ -91,6 +91,9 @@ DWORD VKMap[0x80];
     if (!gp)
         return nil;
     
+    if (([event modifierFlags] & NSEventModifierFlagCommand) == NSEventModifierFlagCommand)
+        return nil; // Engine should NEVER attempt to process characters when the Command key is pressed.
+    
     if (gp.fUsingKeys) {
         // Begin group using keys
         unsigned short keyCode = [event keyCode];
@@ -121,17 +124,17 @@ DWORD VKMap[0x80];
             NSLog(@"[event modifierFlags] = %lX", [event modifierFlags]);
         }
         DWORD mask = 0;
-        if (([event modifierFlags] & NSShiftKeyMask) == NSShiftKeyMask)
+        if (([event modifierFlags] & NSEventModifierFlagShift) == NSEventModifierFlagShift)
             mask |= K_SHIFTFLAG;
         
-        if (([event modifierFlags] & NSAlphaShiftKeyMask) == NSAlphaShiftKeyMask)
+        if (([event modifierFlags] & NSEventModifierFlagCapsLock) == NSEventModifierFlagCapsLock)
             mask |= CAPITALFLAG;
 
         if (([event modifierFlags] & MK_LEFT_ALT_MASK) == MK_LEFT_ALT_MASK)
             mask |= LALTFLAG;
         else if (([event modifierFlags] & MK_RIGHT_ALT_MASK) == MK_RIGHT_ALT_MASK)
             mask |= RALTFLAG;
-        else if (([event modifierFlags] & NSAlternateKeyMask) == NSAlternateKeyMask)
+        else if (([event modifierFlags] & NSEventModifierFlagOption) == NSEventModifierFlagOption)
             mask |= K_ALTFLAG;
         
         if (([event modifierFlags] & MK_LEFT_CTRL_MASK) == MK_LEFT_CTRL_MASK)

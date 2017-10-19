@@ -24,6 +24,7 @@ NSMutableString* _pendingBuffer;
 NSUInteger _numberOfPostedDeletesToExpect = 0;
 CGKeyCode _keyCodeOfOriginalEvent;
 CGEventSourceRef _sourceFromOriginalEvent = nil;
+BOOL _contextOutOfDate = YES;
 
 // This flag indicates which mode is being used for replacing already typed text when composing characters
 // (i.e., when not using deadkeys). Some apps (and some javascript-based websites, such as Google Docs) do
@@ -43,6 +44,7 @@ BOOL _clientSelectionCanChangeUnexpectedly = NO;
 // does mouse-click somewhere else, it could lead to bad behaviour).
 // in Firefox, we're already in legacy mode and we do get mouse clicks, so we're already doing the best we can.
 NSUInteger _failuresToRetrieveExpectedContext = NSUIntegerMax;
+BOOL _forceRemoveSelectionInGoogleDocs = NO;
 NSRange _previousSelRange;
 
 - (KMInputMethodAppDelegate *)AppDelegate {
@@ -62,27 +64,31 @@ NSRange _previousSelRange;
 }
 
 - (NSUInteger)recognizedEvents:(id)sender {
-    return (NSKeyDownMask | NSLeftMouseDownMask);
+    return (NSKeyDownMask | NSLeftMouseDownMask | NSLeftMouseUpMask);
 }
 
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
     if ([self.AppDelegate debugMode])
         NSLog(@"Event = %@", event);
     
-    if (event == nil || sender == nil || event.type == NSLeftMouseDragged)
-        return NO;
+    if (event == nil || sender == nil || self.kmx == nil)
+        return NO; // Not sure this can ever happen.
     
     // OSK key feedback from hardware keyboard is disabled
     /*if (event.type == NSKeyDown)
         [self.AppDelegate handleKeyEvent:event];*/
     
-    if (self.kmx == nil )
-        return NO;
-    
     if (event.type == NSLeftMouseDown || event.type == NSLeftMouseUp ) {
-        [self performSelector:@selector(updateContextBuffer:) withObject:sender afterDelay:0.01];
+        if (_clientSelectionCanChangeUnexpectedly) {
+            if ([self.AppDelegate debugMode])
+                NSLog(@"WARNING: We are dealing with an app/context where we THINK we shouldn't be getting mouse events, but we just got one!");
+            _clientSelectionCanChangeUnexpectedly = NO;
+        }
+        _contextOutOfDate = YES;
         return NO;
     }
+    else if (event.type != NSKeyDown || ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand))
+        return NO; // We ignore NSLeftMouseDragged events and any Command-key events.
     
     if (_legacyMode && event.type == NSKeyDown && event.keyCode == kProcessPendingBuffer)
     {
@@ -108,42 +114,40 @@ NSRange _previousSelRange;
         return YES;
     }
     
-    if (!self.willDeleteNullChar) {
-        if (_failuresToRetrieveExpectedContext < 3) {
-            if ([self AppDelegate].debugMode) {
-                NSLog(@"Checking to see if we're in Google Docs (or some other site that can't give context).");
-            }
-            NSUInteger bufferLength = [self contextBuffer].length;
-            if (bufferLength) {
-                NSUInteger location = [sender selectedRange].location;
-                
-                if (location != NSNotFound && location > 0) {
-                    NSString *clientContext = [[sender attributedSubstringFromRange:NSMakeRange(0, location)] string];
-                    if (clientContext == nil || !clientContext.length ||
-                        [clientContext characterAtIndex:clientContext.length - 1] !=
-                        [[self contextBuffer] characterAtIndex:bufferLength - 1]) {
-                        _failuresToRetrieveExpectedContext++;
-                    }
-                    else {
-                        if ([self AppDelegate].debugMode) {
-                            NSLog(@"We got what we were expecting from the client. We can stop checking.");
-                        }
-                        _failuresToRetrieveExpectedContext = NSUIntegerMax;
-                    }
-                }
-                else {
+    if (!self.willDeleteNullChar && !_contextOutOfDate && _failuresToRetrieveExpectedContext < 3) {
+        if ([self AppDelegate].debugMode) {
+            NSLog(@"Checking to see if we're in Google Docs (or some other site that can't give context).");
+        }
+        NSUInteger bufferLength = self.contextBuffer.length;
+        if (bufferLength) {
+            NSUInteger location = [sender selectedRange].location;
+            
+            if (location != NSNotFound && location > 0) {
+                NSString *clientContext = [[sender attributedSubstringFromRange:NSMakeRange(0, location)] string];
+                if (clientContext == nil || !clientContext.length ||
+                    [clientContext characterAtIndex:clientContext.length - 1] !=
+                    [self.contextBuffer characterAtIndex:bufferLength - 1]) {
                     _failuresToRetrieveExpectedContext++;
                 }
-                
-                if (_failuresToRetrieveExpectedContext == 3)
-                {
+                else {
                     if ([self AppDelegate].debugMode) {
-                        NSLog(@"Detected Google Docs or some other editor that can't provide context. Using legacy mode.");
+                        NSLog(@"We got what we were expecting from the client. We can stop checking.");
                     }
                     _failuresToRetrieveExpectedContext = NSUIntegerMax;
-                    _legacyMode = YES;
-                    _clientSelectionCanChangeUnexpectedly = NO;
                 }
+            }
+            else {
+                _failuresToRetrieveExpectedContext++;
+            }
+            
+            if (_failuresToRetrieveExpectedContext == 3)
+            {
+                if ([self AppDelegate].debugMode) {
+                    NSLog(@"Detected Google Docs or some other editor that can't provide context. Using legacy mode.");
+                }
+                _failuresToRetrieveExpectedContext = NSUIntegerMax;
+                _legacyMode = YES;
+                _clientSelectionCanChangeUnexpectedly = NO;
             }
         }
     }
@@ -179,6 +183,9 @@ NSRange _previousSelRange;
         }
     }
     
+    if (_contextOutOfDate)
+        [self updateContextBuffer:sender];
+    
     BOOL handled = NO;
     BOOL deleteBackPosted = NO;
     NSArray *actions = nil;
@@ -196,21 +203,12 @@ NSRange _previousSelRange;
         if ([actionType isEqualToString:Q_STR]) {
             if ([self.AppDelegate debugMode])
                 NSLog(@"About to start handling Q_STR action...");
-            
-            // TODO: Handle typing a simple character (e.g., 't') in a legacy app when there is an existing selection.
-            // It should not leave the typed character selected.
-            
+                
             NSString *output = [action objectForKey:actionType];
             if ([self.AppDelegate debugMode])
                 NSLog(@"output = %@", output);
             if (deleteBackPosted)
             {
-//                if (_pendingBuffer == nil || _pendingBuffer.length == 0)
-//                {
-//                    if ([self.AppDelegate debugMode])
-//                        NSLog(@"Posting the 'done deleting' code...");
-//                    [self postSpecialDoneDeletingCode];
-//                }
                 [self appendPendingBuffer:output];
                 if ([self.AppDelegate debugMode])
                     NSLog(@"pendingBuffer = %@", [self pendingBuffer]);
@@ -238,6 +236,26 @@ NSRange _previousSelRange;
                     [sender insertText:output replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
                     _previousSelRange.location += output.length;
                     _previousSelRange.length = 0;
+                    
+                    // In Google Docs in Safari when there is an existing selection, the inserted characters
+                    // stays selected. The following clears the selection.
+                    if (_legacyMode && _forceRemoveSelectionInGoogleDocs) {
+                        if ([self.AppDelegate debugMode])
+                            NSLog(@"Sending Command-Shift-A to clear selection in Google Docs");
+                        ProcessSerialNumber psn;
+                        GetFrontProcess(&psn);
+
+                        CGEventRef event = CGEventCreateKeyboardEvent(NULL, kVK_ANSI_A, true);
+                        //set shift and command keys down for above event
+                        CGEventSetFlags(event, kCGEventFlagMaskShift | kCGEventFlagMaskCommand);
+                        CGEventPostToPSN(&psn, event);
+                        CFRelease(event);
+
+                        event = CGEventCreateKeyboardEvent(NULL, kVK_ANSI_A, false);
+                        CGEventSetFlags(event, kCGEventFlagMaskShift | kCGEventFlagMaskCommand);
+                        CGEventPostToPSN(&psn, event);
+                        CFRelease(event);
+                    }
                 }
             }
             
@@ -377,7 +395,7 @@ NSRange _previousSelRange;
         }
         
         NSString* charactersToAppend = nil;
-        BOOL didUpdateContext = NO;
+        BOOL updateEngineContext = YES;
         unsigned short keyCode = event.keyCode;
         switch (keyCode) {
             case kVK_Delete:
@@ -410,7 +428,6 @@ NSRange _previousSelRange;
                             if ([self.AppDelegate debugMode])
                                 NSLog(@"Posting special code to tell IM to insert characters from pending buffer.");
                             [self performSelector:@selector(initiatePendingBufferProcessing:) withObject:sender afterDelay:0.1];
-                            //  [self postKeyPressToFrontProcess:kProcessPendingBuffer from:NULL];
                         }
                         else {
                             if ([self.AppDelegate debugMode]) {
@@ -422,7 +439,7 @@ NSRange _previousSelRange;
                             _sourceFromOriginalEvent = nil;
                             _keyCodeOfOriginalEvent = 0;
                         }
-                        didUpdateContext = YES;
+                        updateEngineContext = NO;
                     }
                 }
                 else {
@@ -433,7 +450,7 @@ NSRange _previousSelRange;
             case kVK_LeftArrow:
                 // Marc has suggested that it's better to just let it be dumb. Too many potential pitfalls
                 // trying to guess where in the context we ended up after a left arrow.
-//                if (_legacyMode && [self contextBuffer].length) {
+//                if (_legacyMode && self.contextBuffer.length) {
 //                    NSUInteger flags = [event modifierFlags] & NSEventModifierFlagDeviceIndependentFlagsMask;
 //                    if ([self.AppDelegate debugMode])
 //                        NSLog(@"Legacy app Left arrow. flags = 0x%02x", (int)flags);
@@ -450,8 +467,8 @@ NSRange _previousSelRange;
             case kVK_End:
             case kVK_PageUp:
             case kVK_PageDown:
-                [self performSelector:@selector(updateContextBuffer:) withObject:sender afterDelay:0.01];
-                didUpdateContext = YES;
+                _contextOutOfDate = YES;
+                updateEngineContext = NO;
                 break;
                 
             case kVK_Return:
@@ -483,14 +500,17 @@ NSRange _previousSelRange;
             }
         }
         
-        if (!didUpdateContext) {
+        if (updateEngineContext) {
             [self.kme setContextBuffer:self.contextBuffer];
         }
     }
     
     if ([self.AppDelegate debugMode]) {
         NSLog(@"handledEvent: %@", handled?@"YES":@"NO");
-        NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}");
+        if (_contextOutOfDate)
+            NSLog(@"Context now out of date.");
+        else
+            NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}");
         NSLog(@"kme.contextBuffer = \"%@\"", self.kme.contextBuffer.length?[self.kme.contextBuffer codeString]:@"{empty}");
         NSRange range = [sender markedRange];
         NSLog(@"sender.markedRange.location = \"%lu\"", range.location);
@@ -516,6 +536,7 @@ NSRange _previousSelRange;
     if ([self.AppDelegate debugMode])
         NSLog(@"New active app %@", clientAppId);
     _clientSelectionCanChangeUnexpectedly = NO;
+    _forceRemoveSelectionInGoogleDocs = NO;
     // REVIEW: Should this list be in a info.plist file
     // Use a table of known apps to decide whether or not to operate in legacy mode
     // and whether or not to follow calls to setMarkedText with calls to insertText.
@@ -535,13 +556,16 @@ NSRange _previousSelRange;
         _legacyMode = NO;
     }
     
-    if ([clientAppId isEqual: @"com.google.Chrome"] || [clientAppId isEqual: @"com.apple.Terminal"]) {
+    if ([clientAppId isEqual: @"com.google.Chrome"] ||
+        [clientAppId isEqual: @"com.apple.Terminal"] ||
+        [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
         _clientSelectionCanChangeUnexpectedly = YES;
     }
     
     // Most things in Safari work well using the normal way, but Google Docs doesn't.
     if ([clientAppId isEqual: @"com.google.Chrome"] || [clientAppId isEqual: @"com.apple.Safari"]) {
         _failuresToRetrieveExpectedContext = 0;
+        _forceRemoveSelectionInGoogleDocs = [clientAppId isEqual: @"com.apple.Safari"];
     }
     else {
         _failuresToRetrieveExpectedContext = NSUIntegerMax;
@@ -565,7 +589,7 @@ NSRange _previousSelRange;
         }
     }
 
-    [self performSelector:@selector(updateContextBuffer:) withObject:sender afterDelay:0.25];
+    _contextOutOfDate = YES;
 }
 
 - (void)deactivateServer:(id)sender {
@@ -628,6 +652,13 @@ NSRange _previousSelRange;
 }
 
 - (NSMutableString *)contextBuffer {
+    if (_contextOutOfDate) {
+        NSException* exception = [NSException
+                                  exceptionWithName:@"InvalidOperationException"
+                                  reason:@"Attempt to access out-of-date context."
+                                  userInfo:nil];
+        @throw exception;
+    }
     return self.AppDelegate.contextBuffer;
 }
 
@@ -662,21 +693,12 @@ NSRange _previousSelRange;
     // selectedRange as not found, we probably can't reliably assume that the current location is really
     // at the end of the "preBuffer", so maybe we just need to assume no context.
     [self.AppDelegate setContextBuffer:preBuffer.length?[NSMutableString stringWithString:preBuffer]:nil];
+    _contextOutOfDate = NO;
     if ([self.AppDelegate debugMode]) {
         NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}");
         NSLog(@"***");
     }
     _previousSelRange = selRange;
-}
-
-- (void)clearContextBuffer {
-    if ([self.AppDelegate debugMode])
-        NSLog(@"*** clearContextBuffer ***");
-    [self.AppDelegate setContextBuffer:nil];
-    if ([self.AppDelegate debugMode]) {
-        NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?self.contextBuffer:@"{empty}");
-        NSLog(@"***");
-    }
 }
 
 - (void)menuAction:(id)sender {
