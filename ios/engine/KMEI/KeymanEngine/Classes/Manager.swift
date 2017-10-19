@@ -1,5 +1,5 @@
 //
-// /Manager.swift
+//  Manager.swift
 //  KeymanEngine
 //
 //  Created by Gabriel Wong on 2017-10-06.

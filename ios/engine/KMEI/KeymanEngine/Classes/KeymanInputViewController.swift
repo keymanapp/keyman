@@ -197,9 +197,9 @@ open class KeymanInputViewController: UIInputViewController, KeymanWebViewDelega
     }
 
     for _ in 0..<dn {
-      let oldContext = textDocumentProxy.documentContextBeforeInput!
+      let oldContext = textDocumentProxy.documentContextBeforeInput ?? ""
       textDocumentProxy.deleteBackward()
-      let newContext = textDocumentProxy.documentContextBeforeInput!
+      let newContext = textDocumentProxy.documentContextBeforeInput ?? ""
       let unitsDeleted = oldContext.utf16.count - newContext.utf16.count
       if unitsDeleted > 1 {
         if !KeymanInputViewController.isSurrogate(oldContext.utf16.last!) {

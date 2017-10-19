@@ -125,7 +125,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
       }
 
       Manager.setText(self.text)
-      let textRange = selectedTextRange!
+      let textRange = selectedTextRange ?? UITextRange()
       let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                              length: offset(from: textRange.start, to: textRange.end))
       Manager.setSelectionRange(newRange, manually: false)

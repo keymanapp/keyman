@@ -180,7 +180,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
 
     let text = String(utf16CodeUnits: codeUnits, count: codeUnits.count)
 
-    let textRange = selectedTextRange!
+    let textRange = selectedTextRange ?? UITextRange()
     let selRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                            length: offset(from: textRange.start, to: textRange.end))
 
