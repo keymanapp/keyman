@@ -98,7 +98,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
       return sectionIndexTitles
     }
 
-    let languages = Manager.shared.languages ?? []
+    let languages = Manager.shared.languages
     sectionIndexTitles = []
     indices = []
     for (index, item) in languages.enumerated() {
@@ -161,15 +161,15 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
       return
     }
     let languages = Manager.shared.languages
-    let langName = languages[indexPath.section][kKeymanNameKey] as? String ?? ""
+    let langName = languages[indexPath.section][kKeymanNameKey] as? String ?? "nil"
     let keyboards = Manager.shared.keyboards(for: indexPath.section)
     let kbID = keyboards?[0][kKeymanIdKey] as? String
-    let kbName = keyboards?[0][kKeymanNameKey] as? String
+    let kbName = keyboards?[0][kKeymanNameKey] as? String ?? "nil"
 
     let state = Manager.shared.stateForKeyboard(withID: kbID!)
     if state != .downloading {
       isUpdate = state != .needsDownload
-      let alert = UIAlertView(title: "\(langName): \(String(describing: kbName))",
+      let alert = UIAlertView(title: "\(langName): \(kbName)",
         message: "Would you like to download this keyboard?", delegate: self,
         cancelButtonTitle: "Cancel", otherButtonTitles: "Download")
       alert.tag = 0
