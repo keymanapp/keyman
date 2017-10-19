@@ -187,6 +187,18 @@ UIGestureRecognizerDelegate {
   /// Keyman system-wide keyboard
   public let isSystemKeyboard: Bool
 
+  /// The version of the Keyman SDK
+  public var sdkVersion: String {
+    let info = NSDictionary(contentsOfFile: keymanBundle.path(forResource: "KeymanEngine-Info",
+                                                              ofType: "plist")!)
+    return info!["CFBundleVersion"] as! String
+  }
+
+  /// Keyman Web resources
+  public var keymanBundle: Bundle {
+    return Bundle(path: Bundle(for: Manager.self).path(forResource: "Keyman", ofType: "bundle")!)!
+  }
+
   var keyboardID: String?
   var languageID: String?
   weak var webDelegate: KeymanWebViewDelegate?
@@ -285,6 +297,10 @@ UIGestureRecognizerDelegate {
     sharedQueue = HTTPDownloader.init(self)
     registerCustomFonts()
   }
+
+  // MARK: - Keyboard management
+
+  // TODO: Lots of duplicated logic in the setKeyboard() functions
 
   /// Set the current keyboard.
   ///
@@ -666,93 +682,6 @@ UIGestureRecognizerDelegate {
     """
   }
 
-  /// Displays a list of available keyboards and allows a user to add/download new keyboards
-  /// or remove existing ones.
-  ///
-  /// - Parameters:
-  ///   - in: The current UIViewController (recommended) or the navigation controller
-  ///   - shouldAddKeyboard: Whether to immediately open the view to add a new keyboard
-  /// - SeeAlso:
-  /// KeymanTextView/KeymanTextField to enable/disable the keyboard picker
-  public func showKeyboardPicker(in viewController: UIViewController, shouldAddKeyboard: Bool) {
-    let vc = KeyboardPickerViewController()
-    let nc = UINavigationController(rootViewController: vc)
-    nc.modalTransitionStyle = .coverVertical
-    nc.modalPresentationStyle = .pageSheet
-    viewController.present(nc, animated: true) {() -> Void in
-      if shouldAddKeyboard {
-        vc.showAddKeyboard()
-      } else {
-        let userData = self.activeUserDefaults()
-        userData.set(true, forKey: kKeymanKeyboardPickerDisplayedKey)
-        userData.synchronize()
-        self.isKeymanHelpOn = false
-      }
-    }
-  }
-
-  public func dismissKeyboardPicker(_ viewController: UIViewController) {
-    viewController.dismiss(animated: true)
-    if shouldReloadKeyboard {
-      reloadKeyboard()
-    }
-    NotificationCenter.default.post(name: .keymanKeyboardPickerDismissed, object: self)
-  }
-
-  /// Asynchronously fetches the dictionary of possible languages/keyboards to be displayed in the keyboard picker.
-  /// If not called before the picker is shown, the dictionary will be fetched automatically.
-  /// This method allows you to fetch the info in advance at a time that's appropriate for your app.
-  /// See `NSNotification.Name+Notifications` for a list of relevant notifications.
-  ///
-  /// To save bandwidth, a cached version is used if:
-  /// - the Keyman server is unreachable
-  /// - the list has been recently fetched
-  public func fetchKeyboardsList() {
-    // TODO: Merge with this function
-    fetchKeyboards(completionBlock: nil)
-  }
-
-  /// - Returns: Whether the keyboard exists in the user keyboards list
-  public func userKeyboardExists(withID keyboardID: String?, languageID: String?) -> Bool {
-    return indexForUserKeyboard(withID: keyboardID, languageID: languageID) != nil
-  }
-
-  /// - Returns: The index of the keyboard if it exist in user keyboards list
-  public func indexForUserKeyboard(withID keyboardID: String?, languageID: String?) -> Int? {
-    let userKeyboards = activeUserDefaults().array(forKey: kKeymanUserKeyboardsListKey)
-    guard let keyboards = userKeyboards as? [[String: String]] else {
-      return nil
-    }
-    return keyboards.index { kb in
-      return keyboardID == kb[kKeymanKeyboardIdKey] && languageID == kb[kKeymanLanguageIdKey]
-    }
-  }
-
-  /// - Returns: Info for the current keyboard, if a keyboard is set
-  public func currentKeyboardInfo() -> [String: String]? {
-    guard let keyboardID = keyboardID, let languageID = languageID else {
-      return nil
-    }
-
-    let userKeyboards = activeUserDefaults().array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]]
-    let userKeyboard = userKeyboards?.first { kb in
-      return keyboardID == kb[kKeymanKeyboardIdKey] && languageID == kb[kKeymanLanguageIdKey]
-    }
-    if let userKeyboard = userKeyboard {
-      return userKeyboard
-    }
-
-    let key = "\(languageID)_\(keyboardID)"
-    if let kbInfo = keyboardsDictionary[key] {
-      return kbInfo
-    }
-
-    return [
-      kKeymanKeyboardIdKey: keyboardID,
-      kKeymanLanguageIdKey: languageID
-    ]
-  }
-
   /// Adds a new keyboard to the list in the keyboard picker if it doesn't already exist.
   /// The keyboard must be downloaded (see `downloadKeyboard()`) or preloaded (see `preloadLanguageFile()`)
   ///
@@ -834,6 +763,264 @@ UIGestureRecognizerDelegate {
     NotificationCenter.default.post(name: .keymanKeyboardRemoved, object: self,
                                     userInfo: [kKeymanKeyboardInfoKey: kbDict])
     return true
+  }
+
+  /// - Returns: Whether the keyboard exists in the user keyboards list
+  public func userKeyboardExists(withID keyboardID: String?, languageID: String?) -> Bool {
+    return indexForUserKeyboard(withID: keyboardID, languageID: languageID) != nil
+  }
+
+  /// - Returns: The index of the keyboard if it exist in user keyboards list
+  public func indexForUserKeyboard(withID keyboardID: String?, languageID: String?) -> Int? {
+    let userKeyboards = activeUserDefaults().array(forKey: kKeymanUserKeyboardsListKey)
+    guard let keyboards = userKeyboards as? [[String: String]] else {
+      return nil
+    }
+    return keyboards.index { kb in
+      return keyboardID == kb[kKeymanKeyboardIdKey] && languageID == kb[kKeymanLanguageIdKey]
+    }
+  }
+
+  /// - Returns: Info for the current keyboard, if a keyboard is set
+  public var currentKeyboardInfo: [String: String]? {
+    guard let keyboardID = keyboardID, let languageID = languageID else {
+      return nil
+    }
+
+    let userKeyboards = activeUserDefaults().array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]]
+    let userKeyboard = userKeyboards?.first { kb in
+      return keyboardID == kb[kKeymanKeyboardIdKey] && languageID == kb[kKeymanLanguageIdKey]
+    }
+    if let userKeyboard = userKeyboard {
+      return userKeyboard
+    }
+
+    let key = "\(languageID)_\(keyboardID)"
+    if let kbInfo = keyboardsDictionary[key] {
+      return kbInfo
+    }
+
+    return [
+      kKeymanKeyboardIdKey: keyboardID,
+      kKeymanLanguageIdKey: languageID
+    ]
+  }
+
+  /// Switch to the next keyboard.
+  /// - Returns: Index of the newly selected keyboard.
+  public func switchToNextKeyboard() -> Int? {
+    guard let index = currentKeyboardIndex else {
+      return nil
+    }
+
+    let userData = activeUserDefaults()
+    guard let userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]] else {
+      return index
+    }
+    if userKeyboards.isEmpty {
+      return index
+    }
+
+    let newIndex = (index + 1) % userKeyboards.count
+    setKeyboard(userKeyboards[newIndex])
+    return newIndex
+  }
+
+  /// - Returns: Index of the current keyboard in the keyboard list.
+  public var currentKeyboardIndex: Int? {
+    let userData = activeUserDefaults()
+    guard let userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]] else {
+      return nil
+    }
+    return userKeyboards.index { isCurrentKeyboard($0) }
+  }
+
+  func isCurrentKeyboard(withID keyboardID: String?, languageID: String?) -> Bool {
+    return self.keyboardID == keyboardID && self.languageID == languageID
+  }
+
+  func isCurrentKeyboard(_ keyboard: [String: Any]) -> Bool {
+    let keyboardID = keyboard[kKeymanKeyboardIdKey] as? String
+    let languageID = keyboard[kKeymanLanguageIdKey] as? String
+    return keyboardID == self.keyboardID && languageID == self.languageID
+  }
+
+  /// - Returns: The font name for the given keyboard ID and languageID, or returns nil if
+  ///   - The keyboard doesn't have a font
+  ///   - The keyboard info is not available in the user keyboards list or in keyboardsDictionary
+  public func fontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
+    let userData = activeUserDefaults()
+    let userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey)
+
+    if let userKeyboards = userKeyboards as? [[String: String]] {
+      if let kb = userKeyboards.first(where: { isCurrentKeyboard($0) }) {
+        let font = kb[kKeymanFontKey]
+        if let fontFilename = self.fontFilename(fromJSONFont: font!) {
+          return keymanFonts[fontFilename]?[kKeymanFontNameKey] as? String
+        }
+        return nil
+      }
+    }
+
+    if let kb = keyboardsDictionary["\(languageID)_\(keyboardID)"] {
+      let font = kb[kKeymanFontKey]
+      if let fontFilename = self.fontFilename(fromJSONFont: font!) {
+        return keymanFonts[fontFilename]?[kKeymanFontNameKey] as? String
+      }
+      return nil
+    }
+
+    return nil
+  }
+
+  /// - Returns: the OSK font name for the given keyboard ID and languageID, or returns nil if
+  ///   - The keyboard doesn't have an OSK font
+  ///   - The keyboard info is not available in the user keyboards list or in keyboardsDictionary
+  func oskFontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
+    let userData = activeUserDefaults()
+    let userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey)
+
+    if let userKeyboards = userKeyboards as? [[String: String]] {
+      if let kb = userKeyboards.first(where: { isCurrentKeyboard($0) }) {
+        if let font = kb[kKeymanOskFontKey] {
+          let fontFilename = self.fontFilename(fromJSONFont: font)
+          return keymanFonts[fontFilename!]?[kKeymanFontNameKey] as? String
+        }
+      }
+    }
+
+    if let kb = keyboardsDictionary["\(languageID)_\(keyboardID)"] {
+      if let font = kb[kKeymanOskFontKey] {
+        let fontFilename = self.fontFilename(fromJSONFont: font)
+        return keymanFonts[fontFilename!]?[kKeymanFontNameKey] as? String
+      }
+    }
+
+    return nil
+  }
+
+  func isRTLKeyboard(withID keyboardID: String, languageID: String) -> Bool {
+    // TODO: Refactor using a function that retrieves keyboard
+    let userData = activeUserDefaults()
+    if let userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]] {
+      let keyboard = userKeyboards.first { keyboard in
+        return keyboard[kKeymanKeyboardIdKey] == keyboardID && keyboard[kKeymanLanguageIdKey] == languageID
+      }
+      if let keyboard = keyboard {
+        return keyboard[kKeymanKeyboardRTLKey] == "Y"
+      }
+    }
+    let kbKey = "\(languageID)_\(keyboardID)"
+    return keyboardsDictionary[kbKey]?[kKeymanKeyboardRTLKey] == "Y"
+  }
+
+  func keyboards(for index: Int) -> [[String: Any]]? {
+    if index < languages.count {
+      return languages[index][kKeymanLanguageKeyboardsKey] as? [[String: Any]]
+    }
+    return nil
+  }
+
+  func keyboardInfo(forLanguageIndex languageIndex: Int, keyboardIndex: Int) -> [String: Any]? {
+    guard let keyboards = keyboards(for: languageIndex) else {
+      return nil
+    }
+    if keyboardIndex < keyboards.count {
+      return keyboards[keyboardIndex]
+    }
+    return nil
+  }
+
+  func fontFilename(fromJSONFont jsonFont: String) -> String? {
+    if jsonFont.hasFontExtension {
+      return jsonFont
+    }
+
+    let jsonObject: Any
+    do {
+      jsonObject = try JSONSerialization.jsonObject(with: jsonFont.data(using: String.Encoding.utf8)!,
+                                                    options: .mutableContainers)
+    } catch {
+      kmLog("Error decoding font JSON object: \(error)", checkDebugPrinting: false)
+      return nil
+    }
+    guard let fontDict = jsonObject as? [AnyHashable: Any] else {
+      return nil
+    }
+    let fontFiles = fontDict[kKeymanFontFilesKey]
+    if let fontFiles = fontFiles as? [String] {
+      if let fontFile = fontFiles.first(where: { $0.hasFontExtension }) {
+        return fontFile
+      }
+    } else if let fontFile = fontFiles as? String {
+      if fontFile.hasFontExtension {
+        return fontFile
+      }
+    }
+    return nil
+  }
+
+  func jsFont(forKeyboardID kbID: String, languageID langID: String) -> String {
+    let kbKey = "\(langID)_\(kbID)"
+    let kbDict = keyboardsDictionary[kbKey]
+    let jsFont = kbDict?[kKeymanFontKey]
+    return jsFont ?? "''"
+  }
+
+  func jsOskFont(forKeyboardID kbID: String, languageID langID: String) -> String {
+    let kbKey = "\(langID)_\(kbID)"
+    let kbDict = keyboardsDictionary[kbKey]
+    let jsOskFont = kbDict?[kKeymanOskFontKey]
+    return jsOskFont ?? "''"
+  }
+
+  func jsFont(fromFontDictionary fontDict: [AnyHashable: Any]?) -> String {
+    guard let fontDict = fontDict, !fontDict.isEmpty else {
+      return "''"
+    }
+
+    let data: Data
+    do {
+      data = try JSONSerialization.data(withJSONObject: fontDict, options: [])
+    } catch {
+      kmLog("Failed to encode font dictionary as JSON: \(String(describing: fontDict))", checkDebugPrinting: false)
+      return "''"
+    }
+
+    return String(data: data, encoding: .ascii)!
+      .replacingOccurrences(of: kKeymanFontFilenameKey, with: kKeymanFontFilesKey)
+      .replacingOccurrences(of: kKeymanFontSourceKey, with: kKeymanFontFilesKey)
+  }
+
+  // MARK: - Downloading keyboards
+
+  /// Asynchronously fetches the dictionary of possible languages/keyboards to be displayed in the keyboard picker.
+  /// If not called before the picker is shown, the dictionary will be fetched automatically.
+  /// This method allows you to fetch the info in advance at a time that's appropriate for your app.
+  /// See `NSNotification.Name+Notifications` for a list of relevant notifications.
+  ///
+  /// To save bandwidth, a cached version is used if:
+  /// - the Keyman server is unreachable
+  /// - the list has been recently fetched
+  public func fetchKeyboardsList() {
+    // TODO: Merge with this function
+    fetchKeyboards(completionBlock: nil)
+  }
+
+  // This function appears to fetch the keyboard metadata from r.keymanweb.com.
+  func fetchKeyboards(completionBlock: FetchKeyboardsBlock? = nil) {
+    if currentRequest != nil {
+      return
+    }
+
+    let deviceType = (UIDevice.current.userInterfaceIdiom == .phone) ? "iphone" : "ipad"
+    let url = URL(string: "\(kKeymanApiBaseURL)languages?device=\(deviceType)")!
+    let userData = completionBlock.map { ["completionBlock": $0] }
+
+    let request = HTTPDownloadRequest(url: url, downloadType: .downloadCachedData, userInfo: userData ?? [:])
+    currentRequest = request
+    sharedQueue.addRequest(request)
+    sharedQueue.run()
   }
 
   /// Asynchronously fetches the .js file for the keyboard with given IDs.
@@ -1181,436 +1368,6 @@ UIGestureRecognizerDelegate {
     }
   }
 
-  private func preloadFile(srcUrl: URL, dstDir dirUrl: URL, shouldOverwrite: Bool) {
-    let dstUrl = dirUrl.appendingPathComponent(srcUrl.lastPathComponent)
-    do {
-      if !FileManager.default.fileExists(atPath: dstUrl.path) {
-        try FileManager.default.copyItem(at: srcUrl, to: dstUrl)
-      } else if shouldOverwrite {
-        try FileManager.default.removeItem(at: dstUrl)
-        try FileManager.default.copyItem(at: srcUrl, to: dstUrl)
-      } else {
-        kmLog("File already exists at \(dstUrl) and not overwriting", checkDebugPrinting: false)
-        return
-      }
-      addSkipBackupAttribute(to: dstUrl)
-    } catch {
-      kmLog("Error copying file: \(error)", checkDebugPrinting: false)
-    }
-  }
-
-  /// Preloads a .js file for a language so that the keyboard is available without downloading.
-  /// - Precondition:
-  ///   - The .js filename must remain the same as when obtained from Keyman.
-  ///   - The .js file must be bundled in your application.
-  public func preloadLanguageFile(atPath languagePath: String, shouldOverwrite: Bool) {
-    guard let languageDir = activeLanguageDirectory() else {
-      kmLog("Could not find/create the Keyman language directory", checkDebugPrinting: false)
-      return
-    }
-    preloadFile(srcUrl: URL.init(fileURLWithPath: languagePath),
-                dstDir: languageDir,
-                shouldOverwrite: shouldOverwrite)
-  }
-
-  /// Preloads a .ttf or .otf file to be available without downloading.
-  /// - Precondition:
-  ///   - The font file must be bundled in your application.
-  /// - SeeAlso: `registerCustomFonts()`
-  public func preloadFontFile(atPath fontPath: String, shouldOverwrite: Bool) {
-    guard let fontDir = activeFontDirectory() else {
-      kmLog("Could not find/create the Keyman font directory", checkDebugPrinting: false)
-      return
-    }
-    preloadFile(srcUrl: URL.init(fileURLWithPath: fontPath),
-                dstDir: fontDir,
-                shouldOverwrite: shouldOverwrite)
-  }
-
-  /// Registers all new fonts found in the font path. Call this after you have preloaded all your font files
-  /// with `preloadFontFile(atPath:shouldOverwrite:)`
-  public func registerCustomFonts() {
-    // TODO: Why is this separate from preloading?
-    let directoryContents: [String]
-    do {
-      directoryContents = try FileManager.default.contentsOfDirectory(atPath: activeFontDirectory().path)
-    } catch {
-      kmLog("Failed to list font dir contents: \(error)", checkDebugPrinting: false)
-      return
-    }
-
-    for fontFilename in directoryContents where fontFilename.hasFontExtension {
-      if let fontInfo = keymanFonts[fontFilename] {
-        if fontInfo[kKeymanFontRegisteredKey] as? Int != 0 {
-          if let newFontInfo = registerFont(withFilename: fontFilename) {
-            keymanFonts[fontFilename] = newFontInfo
-          }
-        }
-      } else {
-        if let fontInfo = registerFont(withFilename: fontFilename) {
-          keymanFonts[fontFilename] = fontInfo
-        }
-      }
-    }
-  }
-
-  /// Unregisters all registered fonts in the font path.
-  public func unregisterCustomFonts() {
-    let directoryContents: [String]
-    do {
-      directoryContents = try FileManager.default.contentsOfDirectory(atPath: activeFontDirectory().path)
-    } catch {
-      kmLog("Failed to list font dir contents: \(error)", checkDebugPrinting: false)
-      return
-    }
-
-    for fontFilename in directoryContents where fontFilename.hasFontExtension {
-      if var fontInfo = keymanFonts[fontFilename], fontInfo[kKeymanFontRegisteredKey] as? Int != 0 {
-        fontInfo[kKeymanFontRegisteredKey] = 0
-        keymanFonts[fontFilename] = fontInfo
-      }
-    }
-  }
-
-  /// - Returns: The font name for the given keyboard ID and languageID, or returns nil if
-  ///   - The keyboard doesn't have a font
-  ///   - The keyboard info is not available in the user keyboards list or in keyboardsDictionary
-  public func fontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
-    let userData = activeUserDefaults()
-    let userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey)
-
-    if let userKeyboards = userKeyboards as? [[String: String]] {
-      if let kb = userKeyboards.first(where: { isCurrentKeyboard($0) }) {
-        let font = kb[kKeymanFontKey]
-        if let fontFilename = self.fontFilename(fromJSONFont: font!) {
-          return keymanFonts[fontFilename]?[kKeymanFontNameKey] as? String
-        }
-        return nil
-      }
-    }
-
-    if let kb = keyboardsDictionary["\(languageID)_\(keyboardID)"] {
-      let font = kb[kKeymanFontKey]
-      if let fontFilename = self.fontFilename(fromJSONFont: font!) {
-        return keymanFonts[fontFilename]?[kKeymanFontNameKey] as? String
-      }
-      return nil
-    }
-
-    return nil
-  }
-
-  /// - Returns: the OSK font name for the given keyboard ID and languageID, or returns nil if
-  ///   - The keyboard doesn't have an OSK font
-  ///   - The keyboard info is not available in the user keyboards list or in keyboardsDictionary
-  func oskFontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
-    let userData = activeUserDefaults()
-    let userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey)
-
-    if let userKeyboards = userKeyboards as? [[String: String]] {
-      if let kb = userKeyboards.first(where: { isCurrentKeyboard($0) }) {
-        if let font = kb[kKeymanOskFontKey] {
-          let fontFilename = self.fontFilename(fromJSONFont: font)
-          return keymanFonts[fontFilename!]?[kKeymanFontNameKey] as? String
-        }
-      }
-    }
-
-    if let kb = keyboardsDictionary["\(languageID)_\(keyboardID)"] {
-      if let font = kb[kKeymanOskFontKey] {
-        let fontFilename = self.fontFilename(fromJSONFont: font)
-        return keymanFonts[fontFilename!]?[kKeymanFontNameKey] as? String
-      }
-    }
-
-    return nil
-  }
-
-  /// - Returns: The version of the Keyman SDK
-  var sdkVersion: String {
-    let info = NSDictionary(contentsOfFile: keymanBundle.path(forResource: "KeymanEngine-Info",
-                                                              ofType: "plist")!)
-    return info!["CFBundleVersion"] as! String
-  }
-
-  // TODO: Use a logging library or have more than 2 log levels
-  // Facilitates KeymanEngine internal logging.
-  func kmLog(_ logStr: String, checkDebugPrinting: Bool) {
-    if checkDebugPrinting && !isDebugPrintingOn {
-      return
-    }
-    NSLog("%@", logStr)
-    // TODO: Remove this
-    NotificationCenter.default.post(name: .keymanDebugLog, object: self,
-                                    userInfo: ["log": logStr])
-  }
-
-  // Local file storage
-  private func copyWebFilesToLibrary() {
-    guard let libraryDirectory = activeKeymanDirectory() else {
-      kmLog("Could not locate library directory! Could not copy Keyman files.", checkDebugPrinting: false)
-      return
-    }
-
-    do {
-      try copyFromBundle(resourceName: kKeymanFileName,
-                         resourceExtension: kKeymanFileExtension,
-                         dstDir: libraryDirectory)
-      try copyFromBundle(resourceName: kKeymaniOSCodeFileName,
-                         resourceExtension: nil,
-                         dstDir: libraryDirectory)
-      try copyFromBundle(resourceName: "\(kKeymanDefaultKeyboardID)-1.6",
-                         resourceExtension: "js",
-                         dstDir: activeLanguageDirectory())
-      try copyFromBundle(resourceName: "DejaVuSans",
-                         resourceExtension: "ttf",
-                         dstDir: activeFontDirectory())
-      try copyFromBundle(resourceName: "kmwosk",
-                         resourceExtension: "css",
-                         dstDir: libraryDirectory)
-      try copyFromBundle(resourceName: "keymanweb-osk",
-                         resourceExtension: "ttf",
-                         dstDir: libraryDirectory)
-    } catch {
-      kmLog("copyWebFilesToLibrary: \(error)", checkDebugPrinting: false)
-    }
-  }
-
-  private func copyFromBundle(resourceName: String, resourceExtension: String?, dstDir: URL?) throws {
-    let filenameForLog = "\(resourceName)\(resourceExtension.map { ".\($0)" } ?? "")"
-    guard let srcUrl = keymanBundle.url(forResource: resourceName, withExtension: resourceExtension) else {
-      let message = "Could not locate \(filenameForLog) in the Keyman bundle for copying."
-      throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
-    }
-    guard let dstDir = dstDir else {
-      let message = "Destination directory for \(filenameForLog) is nil"
-      throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
-    }
-    let dstUrl = dstDir.appendingPathComponent(srcUrl.lastPathComponent)
-
-    // FIXME: FileManager exceptions are swallowed.
-    copyAndExcludeFromBackup(at: srcUrl, to: dstUrl)
-  }
-
-  private func compareFileModDates(_ a: String, _ b: String) -> ComparisonResult? {
-    guard let aAttrs = try? FileManager.default.attributesOfItem(atPath: a),
-          let bAttrs = try? FileManager.default.attributesOfItem(atPath: b),
-          let aModDate = aAttrs[.modificationDate] as? Date,
-          let bModDate = bAttrs[.modificationDate] as? Date else {
-      return nil
-    }
-    if aModDate > bModDate {
-      return .orderedDescending
-    }
-    if aModDate < bModDate {
-      return .orderedAscending
-    }
-    return .orderedSame
-  }
-
-  func renameOldKeyboardFiles() {
-    let fileManager = FileManager.default
-    guard let langDir = activeLanguageDirectory(),
-          let dirContents = try? fileManager.contentsOfDirectory(atPath: langDir.path) else {
-      kmLog("renameOldKeyboardFiles(): Failed to list language directory", checkDebugPrinting: false)
-      return
-    }
-
-    for filename in dirContents {
-      if !filename.contains("-") {
-        if filename == "us.js" {
-          let fileUrl = langDir.appendingPathComponent(filename)
-          try? fileManager.removeItem(at: fileUrl)
-
-          let userData = activeUserDefaults()
-          let curKB = userData.object(forKey: kKeymanUserCurrentKeyboardKey) as? [AnyHashable: Any]
-          if curKB?[kKeymanKeyboardIdKey] as? String == "us" {
-            userData.removeObject(forKey: kKeymanUserCurrentKeyboardKey)
-            userData.synchronize()
-          }
-        } else {
-          let newFilename = "\(filename.dropLast(3))-1.0.js"
-          let fileUrl = langDir.appendingPathComponent(filename)
-          let newFileUrl = langDir.appendingPathComponent(newFilename)
-          try? fileManager.moveItem(at: fileUrl, to: newFileUrl)
-        }
-      } else {
-        let oldFilename = "\(filename[filename.startIndex..<filename.index(of: "-")!]).js"
-        let oldFileUrl = langDir.appendingPathComponent(oldFilename)
-        try? fileManager.removeItem(at: oldFileUrl)
-      }
-    }
-  }
-
-  // TODO: Consider making these lazy vars
-  // FIXME: Check for errors when creating directory
-  private func createSubdirectory(baseDir: URL?, name: String) -> URL? {
-    guard let baseDir = baseDir else {
-      return nil
-    }
-    let newDir = baseDir.appendingPathComponent(name)
-    try? FileManager.default.createDirectory(at: newDir,
-                                             withIntermediateDirectories: true,
-                                             attributes: nil)
-    return newDir
-  }
-
-  private func defaultKeymanDirectory() -> URL? {
-    let paths = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
-    if paths.isEmpty {
-      return nil
-    }
-    return createSubdirectory(baseDir: URL(fileURLWithPath: paths[0]), name: "keyman")
-  }
-
-  private func defaultLanguageDirectory() -> URL? {
-    return createSubdirectory(baseDir: defaultKeymanDirectory(), name: "languages")
-  }
-
-  private func defaultFontDirectory() -> URL? {
-    return createSubdirectory(baseDir: defaultKeymanDirectory(), name: "fonts")
-  }
-
-  var sharedContainerURL: URL? {
-    return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Manager.applicationGroupIdentifier)
-  }
-
-  func sharedKeymanDirectory() -> URL? {
-    return createSubdirectory(baseDir: sharedContainerURL, name: "keyman")
-  }
-
-  func sharedLanguageDirectory() -> URL? {
-    return createSubdirectory(baseDir: sharedKeymanDirectory(), name: "languages")
-  }
-
-  func sharedFontDirectory() -> URL? {
-    return createSubdirectory(baseDir: sharedKeymanDirectory(), name: "fonts")
-  }
-
-  func activeKeymanDirectory() -> URL! {
-    return canAccessSharedContainer() ? sharedKeymanDirectory() : defaultKeymanDirectory()
-  }
-
-  func activeLanguageDirectory() -> URL! {
-    return canAccessSharedContainer() ? sharedLanguageDirectory() : defaultLanguageDirectory()
-  }
-
-  func activeFontDirectory() -> URL! {
-    return canAccessSharedContainer() ? sharedFontDirectory() : defaultFontDirectory()
-  }
-
-  func activeUserDefaults() -> UserDefaults {
-    return canAccessSharedContainer() ? UserDefaults(suiteName: Manager.applicationGroupIdentifier)!
-      : UserDefaults.standard
-  }
-
-  // FIXME: The check for empty filename, etc was removed. Check whether that needs to be added back.
-  private func keyboardPath(forID keyboardID: String, keyboardVersion: String?) -> URL? {
-    var keyboardVersion = keyboardVersion
-    if keyboardVersion == nil {
-      keyboardVersion = latestKeyboardFileVersion(withID: keyboardID)
-    }
-    guard let version = keyboardVersion else {
-      return nil
-    }
-    return activeLanguageDirectory()?.appendingPathComponent("\(keyboardID)-\(version).js")
-  }
-
-  func keyboardPath(forFilename filename: String, keyboardVersion: String?) -> URL? {
-    if !filename.contains("-") {
-      let name = "\(filename.dropLast(3))-\(keyboardVersion ?? "1.0").js"
-      return activeLanguageDirectory()?.appendingPathComponent(name)
-    }
-    return activeLanguageDirectory()?.appendingPathComponent(filename)
-  }
-
-  func fontPath(forFilename filename: String) -> URL? {
-    return activeFontDirectory()?.appendingPathComponent(filename)
-  }
-
-  public var keyboardHeight: CGFloat {
-    let isPortrait: Bool
-    if isSystemKeyboard {
-      isPortrait = KeymanInputViewController.isPortrait
-    } else {
-      isPortrait = UIDevice.current.orientation.isPortrait
-    }
-
-    if UIDevice.current.userInterfaceIdiom == .pad {
-      if isPortrait {
-        return isSystemKeyboard ? kKeymanPadPortraitSystemKeyboardHeight : kKeymanPadPortraitInAppKeyboardHeight
-      } else {
-        return isSystemKeyboard ? kKeymanPadLandscapeSystemKeyboardHeight
-          : kKeymanPadLandscapeInAppKeyboardHeight
-      }
-    } else {
-      if isPortrait {
-        return isSystemKeyboard ? kKeymanPhonePortraitSystemKeyboardHeight
-          : kKeymanPhonePortraitInAppKeyboardHeight
-      } else {
-        return isSystemKeyboard ? kKeymanPhoneLandscapeSystemKeyboardHeight
-          : kKeymanPhoneLandscapeInAppKeyboardHeight
-      }
-    }
-  }
-
-  func keyboardHeight(with orientation: UIInterfaceOrientation) -> CGFloat {
-    if UIDevice.current.userInterfaceIdiom == .pad {
-      if orientation.isPortrait {
-        return isSystemKeyboard ? kKeymanPadPortraitSystemKeyboardHeight
-          : kKeymanPadPortraitInAppKeyboardHeight
-      } else {
-        return isSystemKeyboard ? kKeymanPadLandscapeSystemKeyboardHeight
-          : kKeymanPadLandscapeInAppKeyboardHeight
-      }
-    } else {
-      if orientation.isPortrait {
-        return isSystemKeyboard ? kKeymanPhonePortraitSystemKeyboardHeight
-          : kKeymanPhonePortraitInAppKeyboardHeight
-      } else {
-        return isSystemKeyboard ? kKeymanPhoneLandscapeSystemKeyboardHeight
-          : kKeymanPhoneLandscapeInAppKeyboardHeight
-      }
-    }
-  }
-
-  var keyboardWidth: CGFloat {
-    return UIScreen.main.bounds.width
-  }
-
-  var keyboardSize: CGSize {
-    return CGSize(width: keyboardWidth, height: keyboardHeight)
-  }
-
-  // Keyman interaction
-  private func resizeKeyboard() {
-    let newSize = keyboardSize
-    if didResizeToOrientation && isSystemKeyboard && lastKeyboardSize == newSize {
-      didResizeToOrientation = false
-      return
-    }
-    lastKeyboardSize = newSize
-
-    inputView!.frame = CGRect(origin: .zero, size: newSize)
-
-    // Workaround for WKWebView bug with landscape orientation
-    // TODO: Check if still necessary and if there's a better solution
-    if isSystemKeyboard {
-      perform(#selector(self.resizeDelay), with: self, afterDelay: 1.0)
-    }
-
-    var oskHeight = Int(newSize.height)
-    oskHeight -= oskHeight % (isSystemKeyboard ? 10 : 20)
-
-    inputView.evaluateJavaScript("setOskWidth(\(Int(newSize.width)));", completionHandler: nil)
-    inputView.evaluateJavaScript("setOskHeight(\(Int(oskHeight)));", completionHandler: nil)
-  }
-
-  private var keymanScrollView: UIScrollView {
-    return inputView.scrollView
-  }
-
-  // Misc
   private func createKeyboardsInfo() {
     let kbBaseUri = options[kKeymanKeyboardBaseURIKey] as? String
     keyboardsInfo = [:]
@@ -1661,306 +1418,55 @@ UIGestureRecognizerDelegate {
     updateUserKeyboardsList()
   }
 
-  // MARK: - Internal Methods
-  // TODO: Move to separate class
-  private func createInputView() -> WKWebView {
-    let config = WKWebViewConfiguration()
-    let prefs = WKPreferences()
-    prefs.javaScriptEnabled = true
-    config.preferences = prefs
-    config.suppressesIncrementalRendering = false
-    let userContentController = WKUserContentController()
-    userContentController.add(self, name: "keyman")
-    config.userContentController = userContentController
-    let frame = CGRect(origin: .zero, size: keyboardSize)
-    let view = WKWebView(frame: frame, configuration: config)
-    view.isOpaque = false
-    view.backgroundColor = UIColor.clear
-    view.navigationDelegate = self
-
-    view.scrollView.isScrollEnabled = false
-    // FIXME: Indicate failure to load URL
-    if #available(iOS 9.0, *) {
-      if let url = activeKeymanDirectory()?.appendingPathComponent(kKeymanFullFileName) {
-        view.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
-      }
-    } else {
-      // Copy Keyman files to the temp folder and load from there
-      if copyKeymanFilesToTemp() {
-        let url = URL(fileURLWithPath: NSTemporaryDirectory())
-          .appendingPathComponent("keyman")
-          .appendingPathComponent(kKeymanFullFileName)
-        view.load(URLRequest(url: url, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
-      }
+  private func updateUserKeyboardsList() {
+    if keyboardsDictionary.isEmpty {
+      return
     }
-    return view
-  }
+    let userData = activeUserDefaults()
 
-  // TODO: Switch from NSRange
-  func setSelectionRange(_ range: NSRange, manually: Bool) {
-    if range.location != NSNotFound {
-      let jsString = "setCursorRange(\(range.location),\(range.length))"
-      inputView.evaluateJavaScript(jsString, completionHandler: nil)
+    let lastVersion = userData.string(forKey: kKeymanEngineVersionKey) ?? "1.0"
+    if compareVersions(lastVersion, sdkVersion) == .orderedSame {
+      return
     }
-  }
+    userData.set(sdkVersion, forKey: kKeymanEngineVersionKey)
 
-  func clearText() {
-    setText(nil)
-    setSelectionRange(NSRange(location: 0, length: 0), manually: true)
-    kmLog("Cleared text.", checkDebugPrinting: true)
-  }
-
-  func setText(_ text: String?) {
-    var text = text ?? ""
-    text = text.replacingOccurrences(of: "\\", with: "\\\\")
-    text = text.replacingOccurrences(of: "'", with: "\\'")
-    text = text.replacingOccurrences(of: "\n", with: "\\n")
-    let jsString = "setKeymanVal('\(text)');"
-    inputView.evaluateJavaScript(jsString, completionHandler: nil)
-  }
-
-  // This function appears to fetch the keyboard metadata from r.keymanweb.com.
-  func fetchKeyboards(completionBlock: FetchKeyboardsBlock? = nil) {
-    if currentRequest != nil {
+    guard var userKbList = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]] else {
+      kmLog("No user keyboards to update", checkDebugPrinting: true)
       return
     }
 
-    let deviceType = (UIDevice.current.userInterfaceIdiom == .phone) ? "iphone" : "ipad"
-    let url = URL(string: "\(kKeymanApiBaseURL)languages?device=\(deviceType)")!
-    let userData = completionBlock.map { ["completionBlock": $0] }
-
-    let request = HTTPDownloadRequest(url: url, downloadType: .downloadCachedData, userInfo: userData ?? [:])
-    currentRequest = request
-    sharedQueue.addRequest(request)
-    sharedQueue.run()
-  }
-
-  // TODO: Remove dependence on this since we have super retina screens.
-  var retinaScreen: Bool {
-    return UIScreen.main.scale == 2.0
-  }
-
-  // MARK: - Keyboard Notifications
-  @objc func keyboardWillShow(_ notification: Notification) {
-    dismissSubKeys()
-    dismissKeyPreview()
-    resizeKeyboard()
-
-    if isKeymanHelpOn {
-      helpBubbleView?.removeFromSuperview()
-      let showHelpBubble = #selector(self.showHelpBubble as () -> Void)
-      NSObject.cancelPreviousPerformRequests(withTarget: self, selector: showHelpBubble, object: nil)
-      perform(showHelpBubble, with: nil, afterDelay: 1.5)
-    }
-  }
-
-  @objc func keyboardWillHide(_ notification: Notification) {
-    dismissHelpBubble()
-    dismissSubKeys()
-    dismissKeyPreview()
-  }
-
-  // MARK: - Public Methods
-
-  /// Switch to the next keyboard.
-  /// - Returns: Index of the newly selected keyboard.
-  public func switchToNextKeyboard() -> Int? {
-    guard let index = currentKeyboardIndex else {
-      return nil
-    }
-
-    let userData = activeUserDefaults()
-    guard let userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]] else {
-      return index
-    }
-    if userKeyboards.isEmpty {
-      return index
-    }
-
-    let newIndex = (index + 1) % userKeyboards.count
-    setKeyboard(userKeyboards[newIndex])
-    return newIndex
-  }
-
-  /// - Returns: Index of the current keyboard in the keyboard list.
-  public var currentKeyboardIndex: Int? {
-    let userData = activeUserDefaults()
-    guard let userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]] else {
-      return nil
-    }
-    return userKeyboards.index { isCurrentKeyboard($0) }
-  }
-
-  func updateKeyboardVersion(forID kbID: String, newKeyboardVersion kbVersion: String) {
-    let userData = activeUserDefaults()
-    guard var userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]] else {
-      return
-    }
-
-    // Set version in user keyboards list
-    for i in userKeyboards.indices {
-      var kb = userKeyboards[i]
-      if kbID == kb[kKeymanKeyboardIdKey] {
-        kb[kKeymanKeyboardVersionKey] = kbVersion
-        userKeyboards[i] = kb
+    for i in userKbList.indices {
+      let kbID = userKbList[i][kKeymanKeyboardIdKey]!
+      let langID = userKbList[i][kKeymanLanguageIdKey]!
+      if var kb = keyboardsDictionary["\(langID)_\(kbID)"] {
+        kb[kKeymanKeyboardVersionKey] = latestKeyboardFileVersion(withID: kbID)
+        kb[kKeymanCustomKeyboardKey] = "N"
+        userKbList[i] = kb
+      } else {
+        var kb = userKbList[i]
+        kb[kKeymanCustomKeyboardKey] = "Y"
+        userKbList[i] = kb
       }
     }
-    userData.set(userKeyboards, forKey: kKeymanUserKeyboardsListKey)
+    userData.set(userKbList, forKey: kKeymanUserKeyboardsListKey)
     userData.synchronize()
+  }
 
-    // Set version for current keyboard
-    // TODO: Move this UserDefaults into a function
-    let currentUserData = isSystemKeyboard ? UserDefaults.standard : activeUserDefaults()
-    if var userKb = currentUserData.object(forKey: kKeymanUserCurrentKeyboardKey) as? [String: String] {
-      if kbID == userKb[kKeymanKeyboardIdKey] {
-        userKb[kKeymanKeyboardVersionKey] = kbVersion
-        currentUserData.set(userKb, forKey: kKeymanUserCurrentKeyboardKey)
-        currentUserData.synchronize()
+  func keyboardIdForCurrentRequest() -> String? {
+    if let currentRequest = currentRequest {
+      let tmpStr = currentRequest.url.lastPathComponent
+      if tmpStr.hasSuffix(".js") {
+        return String(tmpStr.dropLast(3))
       }
-    }
-  }
-
-  func reloadKeyboard() {
-    // FIXME: Duplicated elsewhere
-    if #available(iOS 9.0, *) {
-      guard let codeURL = activeKeymanDirectory()?.appendingPathComponent(kKeymanFullFileName) else {
-        return
-      }
-      inputView.loadFileURL(codeURL, allowingReadAccessTo: codeURL.deletingLastPathComponent())
-    } else {
-      // Copy Keyman files to the temp folder and load from there
-      if copyKeymanFilesToTemp() {
-        let codeURL = URL(fileURLWithPath: NSTemporaryDirectory())
-          .appendingPathComponent("keyman")
-          .appendingPathComponent(kKeymanFullFileName)
-        inputView.load(URLRequest(url: codeURL, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
-      }
-    }
-  }
-
-  @objc func resetKeyboard() {
-    keyboardID = nil
-    languageID = nil
-
-    let userKeyboards = activeUserDefaults().array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]]
-    if let index = indexForUserKeyboard(withID: keyboardID, languageID: languageID) {
-      setKeyboard(userKeyboards![index])
-    } else if let userKeyboards = userKeyboards, !userKeyboards.isEmpty {
-      setKeyboard(userKeyboards[0])
-    } else {
-      setKeyboard(withID: kKeymanDefaultKeyboardID, languageID: kKeymanDefaultLanguageID,
-                  keyboardName: kKeymanDefaultKeyboardName, languageName: kKeymanDefaultLanguageName,
-                  font: kKeymanDefaultKeyboardFont, oskFont: nil)
-    }
-  }
-
-  private var usingTempFolder: Bool {
-    if #available(iOS 9.0, *) {
-      return false
-    }
-    return true
-  }
-
-  @objc func showHelpBubble() {
-    // Help bubble is always disabled for system-wide keyboard
-    if isSystemKeyboard || keyboardMenuView != nil {
-      return
-    }
-
-    let jsString = "langMenuPos();"
-    inputView.evaluateJavaScript(jsString) { result, _ in
-      guard let result = result else {
-        return
-      }
-      let langMenuKeyPos = String(describing: result)
-      let pos = langMenuKeyPos.components(separatedBy: ",")
-      guard let px = Float(pos[0]), let py = Float(pos[1]) else {
-        self.kmLog("Unexpected result for langMenuPos(): \(langMenuKeyPos)", checkDebugPrinting: false)
-        return
-      }
-      self.showHelpBubble(at: CGPoint(x: CGFloat(px), y: CGFloat(py)))
-    }
-  }
-
-  // TODO: The bulk of this should be moved to PopoverView
-  func showHelpBubble(at point: CGPoint) {
-    self.helpBubbleView?.removeFromSuperview()
-    let helpBubbleView = PopoverView(frame: CGRect.zero)
-    self.helpBubbleView = helpBubbleView
-    helpBubbleView.backgroundColor = UIColor(red: 253.0 / 255.0, green: 244.0 / 255.0,
-                                             blue: 196.0 / 255.0, alpha: 1.0)
-    helpBubbleView.backgroundColor2 = UIColor(red: 233.0 / 255.0, green: 224.0 / 255.0,
-                                              blue: 176.0 / 255.0, alpha: 1.0)
-    helpBubbleView.borderColor = UIColor(red: 0.5, green: 0.25, blue: 0.25, alpha: 1.0)
-
-    let isPad = UIDevice.current.userInterfaceIdiom == .pad
-    let sizeMultiplier = CGFloat(isPad ? 1.5 : 1.0)
-    let frameWidth = 90.0 * sizeMultiplier
-    let frameHeight = (40.0 + helpBubbleView.arrowHeight) * sizeMultiplier
-    let fontSize = 10.0 * sizeMultiplier
-
-    let inputViewFrame = inputView.frame
-    let screenWidth = inputViewFrame.size.width
-
-    // TODO: Refactor this out
-    let isPortrait: Bool
-    if isSystemKeyboard {
-      isPortrait = KeymanInputViewController.isPortrait
-    } else {
-      isPortrait = UIApplication.shared.statusBarOrientation.isPortrait
-    }
-
-    let adjY: CGFloat
-    if isPortrait {
-      adjY = isSystemKeyboard ? 9.0 : 4.0
-    } else {
-      adjY = isSystemKeyboard ? 3.0 : 4.0
-    }
-    let px = point.x
-    let py = point.y + adjY + (isPad ? 2.0 : 1.0)
-    var x = px - frameWidth / 2
-    let y = py - frameHeight
-    if x < 0 {
-      x = 0
-    } else if x + frameWidth > screenWidth {
-      x = screenWidth - frameWidth
-    }
-
-    helpBubbleView.frame = CGRect(x: x, y: y, width: frameWidth, height: frameHeight)
-    if x == 0 {
-      helpBubbleView.arrowPosX = px
-    } else if x == screenWidth - frameWidth {
-      helpBubbleView.arrowPosX = (px - x)
-    } else {
-      helpBubbleView.arrowPosX = frameWidth / 2
-    }
-
-    let helpText = UILabel(frame: CGRect(x: 5, y: 0,
-                                         width: frameWidth - 10, height: frameHeight - helpBubbleView.arrowHeight))
-    helpText.backgroundColor = UIColor.clear
-    helpText.font = helpText.font.withSize(fontSize)
-    helpText.textAlignment = .center
-    helpText.textColor = UIColor.darkText
-    helpText.lineBreakMode = .byWordWrapping
-    helpText.numberOfLines = 0
-    helpText.text = kKeymanKeyboardChangeHelpText
-    helpBubbleView.addSubview(helpText)
-    inputView.addSubview(helpBubbleView)
-  }
-
-  func keyboards(for index: Int) -> [[String: Any]]? {
-    if index < languages.count {
-      return languages[index][kKeymanLanguageKeyboardsKey] as? [[String: Any]]
-    }
-    return nil
-  }
-
-  func keyboardInfo(forLanguageIndex languageIndex: Int, keyboardIndex: Int) -> [String: Any]? {
-    guard let keyboards = keyboards(for: languageIndex) else {
+      // TODO: Maybe don't return nil and just continue
       return nil
-    }
-    if keyboardIndex < keyboards.count {
-      return keyboards[keyboardIndex]
+    } else if let downloadQueue = downloadQueue {
+      let kbInfo = downloadQueue.userInfo[kKeymanKeyboardInfoKey]
+      if let dict = kbInfo as? [String: String] {
+        return dict[kKeymanKeyboardIdKey]
+      } else if let array = kbInfo as? [[String: String]] {
+        return array[0][kKeymanKeyboardIdKey]
+      }
     }
     return nil
   }
@@ -1973,6 +1479,22 @@ UIGestureRecognizerDelegate {
     let langID = languages[languageIndex][kKeymanIdKey] as? String
     downloadKeyboard(withID: kbID, languageID: langID!, isUpdate: isUpdate)
   }
+
+  @objc func reachabilityChanged(_ notification: Notification) {
+    if isDebugPrintingOn {
+      var reachStr = "Not Reachable"
+      let status: NetworkStatus = reachability.currentReachabilityStatus()
+      if status == ReachableViaWiFi {
+        reachStr = "Reachable Via WiFi"
+      }
+      if status == ReachableViaWWAN {
+        reachStr = "Reachable Via WWan"
+      }
+      kmLog("Reachability changed to '\(reachStr)'", checkDebugPrinting: true)
+    }
+  }
+
+  // MARK: - HTTPDownloadDelegate methods
 
   public func downloadQueueFinished(_ queue: HTTPDownloader) {
     if isDebugPrintingOn {
@@ -2152,113 +1674,331 @@ UIGestureRecognizerDelegate {
                                     userInfo: [
                                       kKeymanKeyboardInfoKey: kbInfo,
                                       NSUnderlyingErrorKey: error
-                                    ])
+      ])
   }
 
-  func latestKeyboardFileVersion(withID keyboardID: String) -> String? {
-    guard let langDirPath = activeLanguageDirectory()?.path else {
-      return nil
+  // MARK: - Loading custom keyboards
+
+  private func preloadFile(srcUrl: URL, dstDir dirUrl: URL, shouldOverwrite: Bool) {
+    let dstUrl = dirUrl.appendingPathComponent(srcUrl.lastPathComponent)
+    do {
+      if !FileManager.default.fileExists(atPath: dstUrl.path) {
+        try FileManager.default.copyItem(at: srcUrl, to: dstUrl)
+      } else if shouldOverwrite {
+        try FileManager.default.removeItem(at: dstUrl)
+        try FileManager.default.copyItem(at: srcUrl, to: dstUrl)
+      } else {
+        kmLog("File already exists at \(dstUrl) and not overwriting", checkDebugPrinting: false)
+        return
+      }
+      addSkipBackupAttribute(to: dstUrl)
+    } catch {
+      kmLog("Error copying file: \(error)", checkDebugPrinting: false)
     }
-    guard let dirContents = try? FileManager.default.contentsOfDirectory(atPath: langDirPath) else {
-      return nil
+  }
+
+  /// Preloads a .js file for a language so that the keyboard is available without downloading.
+  /// - Precondition:
+  ///   - The .js filename must remain the same as when obtained from Keyman.
+  ///   - The .js file must be bundled in your application.
+  public func preloadLanguageFile(atPath languagePath: String, shouldOverwrite: Bool) {
+    guard let languageDir = activeLanguageDirectory() else {
+      kmLog("Could not find/create the Keyman language directory", checkDebugPrinting: false)
+      return
+    }
+    preloadFile(srcUrl: URL.init(fileURLWithPath: languagePath),
+                dstDir: languageDir,
+                shouldOverwrite: shouldOverwrite)
+  }
+
+  /// Preloads a .ttf or .otf file to be available without downloading.
+  /// - Precondition:
+  ///   - The font file must be bundled in your application.
+  /// - SeeAlso: `registerCustomFonts()`
+  public func preloadFontFile(atPath fontPath: String, shouldOverwrite: Bool) {
+    guard let fontDir = activeFontDirectory() else {
+      kmLog("Could not find/create the Keyman font directory", checkDebugPrinting: false)
+      return
+    }
+    preloadFile(srcUrl: URL.init(fileURLWithPath: fontPath),
+                dstDir: fontDir,
+                shouldOverwrite: shouldOverwrite)
+  }
+
+  /// Registers all new fonts found in the font path. Call this after you have preloaded all your font files
+  /// with `preloadFontFile(atPath:shouldOverwrite:)`
+  public func registerCustomFonts() {
+    // TODO: Why is this separate from preloading?
+    let directoryContents: [String]
+    do {
+      directoryContents = try FileManager.default.contentsOfDirectory(atPath: activeFontDirectory().path)
+    } catch {
+      kmLog("Failed to list font dir contents: \(error)", checkDebugPrinting: false)
+      return
     }
 
-    var latestVersion: String?
-    for filename in dirContents where filename.hasPrefix("\(keyboardID)-") && filename.hasJavaScriptExtension {
-      let dashRange = filename.range(of: "-", options: .backwards)!
-      let extensionRange = filename.range(of: ".js", options: .backwards)!
-      let version = String(filename[dashRange.upperBound..<extensionRange.lowerBound])
-
-      if let previousMax = latestVersion {
-        if let result = compareVersions(previousMax, version), result == .orderedAscending {
-          latestVersion = previousMax
+    for fontFilename in directoryContents where fontFilename.hasFontExtension {
+      if let fontInfo = keymanFonts[fontFilename] {
+        if fontInfo[kKeymanFontRegisteredKey] as? Int != 0 {
+          if let newFontInfo = registerFont(withFilename: fontFilename) {
+            keymanFonts[fontFilename] = newFontInfo
+          }
         }
-      } else if compareVersions(version, version) != nil {  // Ensure that the version number is valid
-        latestVersion = version
+      } else {
+        if let fontInfo = registerFont(withFilename: fontFilename) {
+          keymanFonts[fontFilename] = fontInfo
+        }
       }
     }
-    return latestVersion
   }
 
-  /// Compares version numbers in dotted numberic format.
-  /// - Returns: ComparisonResult if both version numbers are valid.
-  func compareVersions(_ v1: String, _ v2: String) -> ComparisonResult? {
-    if v1.isEmpty || v2.isEmpty {
+  /// Unregisters all registered fonts in the font path.
+  public func unregisterCustomFonts() {
+    let directoryContents: [String]
+    do {
+      directoryContents = try FileManager.default.contentsOfDirectory(atPath: activeFontDirectory().path)
+    } catch {
+      kmLog("Failed to list font dir contents: \(error)", checkDebugPrinting: false)
+      return
+    }
+
+    for fontFilename in directoryContents where fontFilename.hasFontExtension {
+      if var fontInfo = keymanFonts[fontFilename], fontInfo[kKeymanFontRegisteredKey] as? Int != 0 {
+        fontInfo[kKeymanFontRegisteredKey] = 0
+        keymanFonts[fontFilename] = fontInfo
+      }
+    }
+  }
+
+  private func registerFont(withFilename fontFilename: String) -> [String: Any]? {
+    guard let fontURL = activeFontDirectory()?.appendingPathComponent(fontFilename),
+      FileManager.default.fileExists(atPath: fontURL.path) else {
+        return nil
+    }
+
+    guard let provider = CGDataProvider(url: fontURL as CFURL) else {
+      kmLog("Failed to open \(fontURL)", checkDebugPrinting: false)
       return nil
     }
-    let components1 = v1.components(separatedBy: ".")
-    let components2 = v2.components(separatedBy: ".")
+    guard let font = CGFont(provider) else {
+      kmLog("Failed to read font at \(fontURL)", checkDebugPrinting: false)
+      return nil
+    }
 
-    let len = max(components1.count, components2.count)
-    for i in 0..<len {
-      // Shorter version number padded with trailing zero components
-      let component1 = components1[safe: i] ?? "0"
-      let component2 = components2[safe: i] ?? "0"
-      guard let val1 = Int(component1), val1 >= 0 else {
-        return nil
+    var didRegister: Bool = false
+    let fontName = font.postScriptName! as String
+    if !fontExists(fontName) {
+      var errorRef: Unmanaged<CFError>?
+      didRegister = CTFontManagerRegisterFontsForURL(fontURL as CFURL, .none, &errorRef)
+      let error = errorRef?.takeRetainedValue() // Releases errorRef
+      if !didRegister {
+        kmLog("Failed to register font: \(fontURL) reason: \(error!.localizedDescription)",
+          checkDebugPrinting: false)
+      } else {
+        kmLog("Registered font: \(fontURL)", checkDebugPrinting: true)
       }
-      guard let val2 = Int(component2), val1 >= 0 else {
-        return nil
-      }
-      if val1 < val2 {
-        return .orderedAscending
-      }
-      if val1 > val2 {
-        return .orderedDescending
-      }
+    }
+    return [
+      kKeymanFontNameKey: fontName,
+      // TODO: Check if didRegister should be true if font exists
+      kKeymanFontRegisteredKey: didRegister ? 1 : 0
+    ]
+  }
+
+  private func unregisterFont(withFilename fontFilename: String) -> Bool {
+    guard let fontURL = activeFontDirectory()?.appendingPathComponent(fontFilename),
+      FileManager.default.fileExists(atPath: fontURL.path) else {
+        return false
+    }
+    var errorRef: Unmanaged<CFError>?
+    let didUnregister = CTFontManagerUnregisterFontsForURL(fontURL as CFURL, .none, &errorRef)
+    let error = errorRef?.takeRetainedValue() // Releases errorRef
+    if !didUnregister {
+      kmLog("Failed to unregister font: \(fontURL) reason: \(error!.localizedDescription)", checkDebugPrinting: false)
+    } else {
+      kmLog("Unregistered font: \(fontFilename)", checkDebugPrinting: true)
+    }
+    return didUnregister
+  }
+
+  private func fontExists(_ fontName: String) -> Bool {
+    return UIFont.familyNames.contains { familyName in
+      let fontNames = UIFont.fontNames(forFamilyName: familyName)
+      return fontNames.contains(fontName)
+    }
+  }
+
+  // TODO: Use a logging library or have more than 2 log levels
+  // Facilitates KeymanEngine internal logging.
+  func kmLog(_ logStr: String, checkDebugPrinting: Bool) {
+    if checkDebugPrinting && !isDebugPrintingOn {
+      return
+    }
+    NSLog("%@", logStr)
+    // TODO: Remove this
+    NotificationCenter.default.post(name: .keymanDebugLog, object: self,
+                                    userInfo: ["log": logStr])
+  }
+
+  // MARK: - File system and UserData management
+
+  // Local file storage
+  private func copyWebFilesToLibrary() {
+    guard let libraryDirectory = activeKeymanDirectory() else {
+      kmLog("Could not locate library directory! Could not copy Keyman files.", checkDebugPrinting: false)
+      return
+    }
+
+    do {
+      try copyFromBundle(resourceName: kKeymanFileName,
+                         resourceExtension: kKeymanFileExtension,
+                         dstDir: libraryDirectory)
+      try copyFromBundle(resourceName: kKeymaniOSCodeFileName,
+                         resourceExtension: nil,
+                         dstDir: libraryDirectory)
+      try copyFromBundle(resourceName: "\(kKeymanDefaultKeyboardID)-1.6",
+                         resourceExtension: "js",
+                         dstDir: activeLanguageDirectory())
+      try copyFromBundle(resourceName: "DejaVuSans",
+                         resourceExtension: "ttf",
+                         dstDir: activeFontDirectory())
+      try copyFromBundle(resourceName: "kmwosk",
+                         resourceExtension: "css",
+                         dstDir: libraryDirectory)
+      try copyFromBundle(resourceName: "keymanweb-osk",
+                         resourceExtension: "ttf",
+                         dstDir: libraryDirectory)
+    } catch {
+      kmLog("copyWebFilesToLibrary: \(error)", checkDebugPrinting: false)
+    }
+  }
+
+  private func copyFromBundle(resourceName: String, resourceExtension: String?, dstDir: URL?) throws {
+    let filenameForLog = "\(resourceName)\(resourceExtension.map { ".\($0)" } ?? "")"
+    guard let srcUrl = keymanBundle.url(forResource: resourceName, withExtension: resourceExtension) else {
+      let message = "Could not locate \(filenameForLog) in the Keyman bundle for copying."
+      throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
+    }
+    guard let dstDir = dstDir else {
+      let message = "Destination directory for \(filenameForLog) is nil"
+      throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
+    }
+    let dstUrl = dstDir.appendingPathComponent(srcUrl.lastPathComponent)
+
+    // FIXME: FileManager exceptions are swallowed.
+    copyAndExcludeFromBackup(at: srcUrl, to: dstUrl)
+  }
+
+  private func compareFileModDates(_ a: String, _ b: String) -> ComparisonResult? {
+    guard let aAttrs = try? FileManager.default.attributesOfItem(atPath: a),
+          let bAttrs = try? FileManager.default.attributesOfItem(atPath: b),
+          let aModDate = aAttrs[.modificationDate] as? Date,
+          let bModDate = bAttrs[.modificationDate] as? Date else {
+      return nil
+    }
+    if aModDate > bModDate {
+      return .orderedDescending
+    }
+    if aModDate < bModDate {
+      return .orderedAscending
     }
     return .orderedSame
   }
 
-  func keyboardIdForCurrentRequest() -> String? {
-    if let currentRequest = currentRequest {
-      let tmpStr = currentRequest.url.lastPathComponent
-      if tmpStr.hasSuffix(".js") {
-        return String(tmpStr.dropLast(3))
+  func renameOldKeyboardFiles() {
+    let fileManager = FileManager.default
+    guard let langDir = activeLanguageDirectory(),
+          let dirContents = try? fileManager.contentsOfDirectory(atPath: langDir.path) else {
+      kmLog("renameOldKeyboardFiles(): Failed to list language directory", checkDebugPrinting: false)
+      return
+    }
+
+    for filename in dirContents {
+      if !filename.contains("-") {
+        if filename == "us.js" {
+          let fileUrl = langDir.appendingPathComponent(filename)
+          try? fileManager.removeItem(at: fileUrl)
+
+          let userData = activeUserDefaults()
+          let curKB = userData.object(forKey: kKeymanUserCurrentKeyboardKey) as? [AnyHashable: Any]
+          if curKB?[kKeymanKeyboardIdKey] as? String == "us" {
+            userData.removeObject(forKey: kKeymanUserCurrentKeyboardKey)
+            userData.synchronize()
+          }
+        } else {
+          let newFilename = "\(filename.dropLast(3))-1.0.js"
+          let fileUrl = langDir.appendingPathComponent(filename)
+          let newFileUrl = langDir.appendingPathComponent(newFilename)
+          try? fileManager.moveItem(at: fileUrl, to: newFileUrl)
+        }
+      } else {
+        let oldFilename = "\(filename[filename.startIndex..<filename.index(of: "-")!]).js"
+        let oldFileUrl = langDir.appendingPathComponent(oldFilename)
+        try? fileManager.removeItem(at: oldFileUrl)
       }
-      // TODO: Maybe don't return nil and just continue
+    }
+  }
+
+  // TODO: Consider making these lazy vars
+  // FIXME: Check for errors when creating directory
+  private func createSubdirectory(baseDir: URL?, name: String) -> URL? {
+    guard let baseDir = baseDir else {
       return nil
-    } else if let downloadQueue = downloadQueue {
-      let kbInfo = downloadQueue.userInfo[kKeymanKeyboardInfoKey]
-      if let dict = kbInfo as? [String: String] {
-        return dict[kKeymanKeyboardIdKey]
-      } else if let array = kbInfo as? [[String: String]] {
-        return array[0][kKeymanKeyboardIdKey]
-      }
     }
-    return nil
+    let newDir = baseDir.appendingPathComponent(name)
+    try? FileManager.default.createDirectory(at: newDir,
+                                             withIntermediateDirectories: true,
+                                             attributes: nil)
+    return newDir
   }
 
-  @objc func resizeDelay() {
-    // + 1000 to work around iOS bug with resizing on landscape orientation. Technically we only
-    // need this for landscape but it doesn't hurt to do it with both. 1000 is a big number that
-    // should hopefully work on all devices.
-    let kbWidth = keyboardWidth
-    let kbHeight = keyboardHeight
-    inputView?.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight + 1000)
-  }
-
-  func resizeKeyboardIfNeeded() {
-    // TODO: Check if necessary since resizeKeyboard() checks old size
-    let newSize = keyboardSize
-    if newSize != lastKeyboardSize {
-      resizeKeyboard()
-      lastKeyboardSize = newSize
+  private func defaultKeymanDirectory() -> URL? {
+    let paths = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
+    if paths.isEmpty {
+      return nil
     }
+    return createSubdirectory(baseDir: URL(fileURLWithPath: paths[0]), name: "keyman")
   }
 
-  func resizeKeyboard(with orientation: UIInterfaceOrientation) {
-    // TODO: Update to use new size instead of orientation since viewWillRotate() is deprecated
-    // TODO: Refactor to use resizeKeyboard()
-    let kbWidth = keyboardWidth
-    let kbHeight = keyboardHeight(with: orientation)
-    inputView?.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
+  private func defaultLanguageDirectory() -> URL? {
+    return createSubdirectory(baseDir: defaultKeymanDirectory(), name: "languages")
+  }
 
-    var oskHeight = Int(kbHeight)
-    oskHeight -= oskHeight % (isSystemKeyboard ? 10 : 20)
+  private func defaultFontDirectory() -> URL? {
+    return createSubdirectory(baseDir: defaultKeymanDirectory(), name: "fonts")
+  }
 
-    inputView?.evaluateJavaScript("setOskWidth(\(Int(kbWidth)));", completionHandler: nil)
-    inputView?.evaluateJavaScript("setOskHeight(\(Int(oskHeight)));", completionHandler: nil)
+  var sharedContainerURL: URL? {
+    return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Manager.applicationGroupIdentifier)
+  }
+
+  func sharedKeymanDirectory() -> URL? {
+    return createSubdirectory(baseDir: sharedContainerURL, name: "keyman")
+  }
+
+  func sharedLanguageDirectory() -> URL? {
+    return createSubdirectory(baseDir: sharedKeymanDirectory(), name: "languages")
+  }
+
+  func sharedFontDirectory() -> URL? {
+    return createSubdirectory(baseDir: sharedKeymanDirectory(), name: "fonts")
+  }
+
+  func activeKeymanDirectory() -> URL! {
+    return canAccessSharedContainer() ? sharedKeymanDirectory() : defaultKeymanDirectory()
+  }
+
+  func activeLanguageDirectory() -> URL! {
+    return canAccessSharedContainer() ? sharedLanguageDirectory() : defaultLanguageDirectory()
+  }
+
+  func activeFontDirectory() -> URL! {
+    return canAccessSharedContainer() ? sharedFontDirectory() : defaultFontDirectory()
+  }
+
+  func activeUserDefaults() -> UserDefaults {
+    return canAccessSharedContainer() ? UserDefaults(suiteName: Manager.applicationGroupIdentifier)!
+      : UserDefaults.standard
   }
 
   func canAccessSharedContainer() -> Bool {
@@ -2272,7 +2012,7 @@ UIGestureRecognizerDelegate {
     return FileManager.default.fileExists(atPath: keymanFile.path)
   }
 
-  func copyUserDefaultsToSharedContainer() {
+  private func copyUserDefaultsToSharedContainer() {
     guard let sharedUserData = UserDefaults(suiteName: Manager.applicationGroupIdentifier) else {
       return
     }
@@ -2287,7 +2027,7 @@ UIGestureRecognizerDelegate {
     sharedUserData.synchronize()
   }
 
-  func copyUserDefaultsFromSharedContainer() {
+  private func copyUserDefaultsFromSharedContainer() {
     guard let sharedUserData = UserDefaults(suiteName: Manager.applicationGroupIdentifier) else {
       return
     }
@@ -2347,8 +2087,8 @@ UIGestureRecognizerDelegate {
 
   private func copyDirectoryContents(at srcDir: URL?, to dstDir: URL?) throws {
     guard let srcDir = srcDir,
-          let dstDir = dstDir else {
-      return
+      let dstDir = dstDir else {
+        return
     }
     let srcContents = try FileManager.default.contentsOfDirectory(at: srcDir, includingPropertiesForKeys: [])
     for srcFile in srcContents {
@@ -2356,7 +2096,7 @@ UIGestureRecognizerDelegate {
     }
   }
 
-  func copyKeymanFilesToSharedContainer() -> Bool {
+  private func copyKeymanFilesToSharedContainer() -> Bool {
     do {
       try copyDirectoryContents(at: defaultKeymanDirectory(), to: sharedKeymanDirectory())
       try copyDirectoryContents(at: defaultLanguageDirectory(), to: sharedLanguageDirectory())
@@ -2368,7 +2108,7 @@ UIGestureRecognizerDelegate {
     }
   }
 
-  func copyKeymanFilesFromSharedContainer() -> Bool {
+  private func copyKeymanFilesFromSharedContainer() -> Bool {
     do {
       try copyDirectoryContents(at: sharedKeymanDirectory(), to: defaultKeymanDirectory())
       try copyDirectoryContents(at: sharedLanguageDirectory(), to: defaultLanguageDirectory())
@@ -2381,7 +2121,7 @@ UIGestureRecognizerDelegate {
     return true
   }
 
-  func copyKeymanFilesToTemp() -> Bool {
+  private func copyKeymanFilesToTemp() -> Bool {
     let tempKeymanDir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("keyman")
     let tempLangDir = tempKeymanDir.appendingPathComponent("languages")
     let tempFontDir = tempKeymanDir.appendingPathComponent("fonts")
@@ -2400,52 +2140,473 @@ UIGestureRecognizerDelegate {
     return true
   }
 
-  private func updateUserKeyboardsList() {
-    if keyboardsDictionary.isEmpty {
-      return
+  private var usingTempFolder: Bool {
+    if #available(iOS 9.0, *) {
+      return false
     }
-    let userData = activeUserDefaults()
-
-    let lastVersion = userData.string(forKey: kKeymanEngineVersionKey) ?? "1.0"
-    if compareVersions(lastVersion, sdkVersion) == .orderedSame {
-      return
-    }
-    userData.set(sdkVersion, forKey: kKeymanEngineVersionKey)
-
-    guard var userKbList = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]] else {
-      kmLog("No user keyboards to update", checkDebugPrinting: true)
-      return
-    }
-
-    for i in userKbList.indices {
-      let kbID = userKbList[i][kKeymanKeyboardIdKey]!
-      let langID = userKbList[i][kKeymanLanguageIdKey]!
-      if var kb = keyboardsDictionary["\(langID)_\(kbID)"] {
-        kb[kKeymanKeyboardVersionKey] = latestKeyboardFileVersion(withID: kbID)
-        kb[kKeymanCustomKeyboardKey] = "N"
-        userKbList[i] = kb
-      } else {
-        var kb = userKbList[i]
-        kb[kKeymanCustomKeyboardKey] = "Y"
-        userKbList[i] = kb
-      }
-    }
-    userData.set(userKbList, forKey: kKeymanUserKeyboardsListKey)
-    userData.synchronize()
+    return true
   }
 
-  @objc func reachabilityChanged(_ notification: Notification) {
-    if isDebugPrintingOn {
-      var reachStr = "Not Reachable"
-      let status: NetworkStatus = reachability.currentReachabilityStatus()
-      if status == ReachableViaWiFi {
-        reachStr = "Reachable Via WiFi"
-      }
-      if status == ReachableViaWWAN {
-        reachStr = "Reachable Via WWan"
-      }
-      kmLog("Reachability changed to '\(reachStr)'", checkDebugPrinting: true)
+  // FIXME: The check for empty filename, etc was removed. Check whether that needs to be added back.
+  private func keyboardPath(forID keyboardID: String, keyboardVersion: String?) -> URL? {
+    var keyboardVersion = keyboardVersion
+    if keyboardVersion == nil {
+      keyboardVersion = latestKeyboardFileVersion(withID: keyboardID)
     }
+    guard let version = keyboardVersion else {
+      return nil
+    }
+    return activeLanguageDirectory()?.appendingPathComponent("\(keyboardID)-\(version).js")
+  }
+
+  func keyboardPath(forFilename filename: String, keyboardVersion: String?) -> URL? {
+    if !filename.contains("-") {
+      let name = "\(filename.dropLast(3))-\(keyboardVersion ?? "1.0").js"
+      return activeLanguageDirectory()?.appendingPathComponent(name)
+    }
+    return activeLanguageDirectory()?.appendingPathComponent(filename)
+  }
+
+  func fontPath(forFilename filename: String) -> URL? {
+    return activeFontDirectory()?.appendingPathComponent(filename)
+  }
+
+  func latestKeyboardFileVersion(withID keyboardID: String) -> String? {
+    guard let langDirPath = activeLanguageDirectory()?.path else {
+      return nil
+    }
+    guard let dirContents = try? FileManager.default.contentsOfDirectory(atPath: langDirPath) else {
+      return nil
+    }
+
+    var latestVersion: String?
+    for filename in dirContents where filename.hasPrefix("\(keyboardID)-") && filename.hasJavaScriptExtension {
+      let dashRange = filename.range(of: "-", options: .backwards)!
+      let extensionRange = filename.range(of: ".js", options: .backwards)!
+      let version = String(filename[dashRange.upperBound..<extensionRange.lowerBound])
+
+      if let previousMax = latestVersion {
+        if let result = compareVersions(previousMax, version), result == .orderedAscending {
+          latestVersion = previousMax
+        }
+      } else if compareVersions(version, version) != nil {  // Ensure that the version number is valid
+        latestVersion = version
+      }
+    }
+    return latestVersion
+  }
+
+  /// Compares version numbers in dotted numberic format.
+  /// - Returns: ComparisonResult if both version numbers are valid.
+  func compareVersions(_ v1: String, _ v2: String) -> ComparisonResult? {
+    if v1.isEmpty || v2.isEmpty {
+      return nil
+    }
+    let components1 = v1.components(separatedBy: ".")
+    let components2 = v2.components(separatedBy: ".")
+
+    let len = max(components1.count, components2.count)
+    for i in 0..<len {
+      // Shorter version number padded with trailing zero components
+      let component1 = components1[safe: i] ?? "0"
+      let component2 = components2[safe: i] ?? "0"
+      guard let val1 = Int(component1), val1 >= 0 else {
+        return nil
+      }
+      guard let val2 = Int(component2), val1 >= 0 else {
+        return nil
+      }
+      if val1 < val2 {
+        return .orderedAscending
+      }
+      if val1 > val2 {
+        return .orderedDescending
+      }
+    }
+    return .orderedSame
+  }
+
+  func updateKeyboardVersion(forID kbID: String, newKeyboardVersion kbVersion: String) {
+    let userData = activeUserDefaults()
+    guard var userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]] else {
+      return
+    }
+
+    // Set version in user keyboards list
+    for i in userKeyboards.indices {
+      var kb = userKeyboards[i]
+      if kbID == kb[kKeymanKeyboardIdKey] {
+        kb[kKeymanKeyboardVersionKey] = kbVersion
+        userKeyboards[i] = kb
+      }
+    }
+    userData.set(userKeyboards, forKey: kKeymanUserKeyboardsListKey)
+    userData.synchronize()
+
+    // Set version for current keyboard
+    // TODO: Move this UserDefaults into a function
+    let currentUserData = isSystemKeyboard ? UserDefaults.standard : activeUserDefaults()
+    if var userKb = currentUserData.object(forKey: kKeymanUserCurrentKeyboardKey) as? [String: String] {
+      if kbID == userKb[kKeymanKeyboardIdKey] {
+        userKb[kKeymanKeyboardVersionKey] = kbVersion
+        currentUserData.set(userKb, forKey: kKeymanUserCurrentKeyboardKey)
+        currentUserData.synchronize()
+      }
+    }
+  }
+
+  func synchronizeSWKeyboard() {
+    copyUserDefaultsFromSharedContainer()
+    copyKeymanFilesFromSharedContainer()
+  }
+
+  // MARK: - View management
+
+  public var keyboardHeight: CGFloat {
+    let isPortrait: Bool
+    if isSystemKeyboard {
+      isPortrait = KeymanInputViewController.isPortrait
+    } else {
+      isPortrait = UIDevice.current.orientation.isPortrait
+    }
+
+    if UIDevice.current.userInterfaceIdiom == .pad {
+      if isPortrait {
+        return isSystemKeyboard ? kKeymanPadPortraitSystemKeyboardHeight : kKeymanPadPortraitInAppKeyboardHeight
+      } else {
+        return isSystemKeyboard ? kKeymanPadLandscapeSystemKeyboardHeight
+          : kKeymanPadLandscapeInAppKeyboardHeight
+      }
+    } else {
+      if isPortrait {
+        return isSystemKeyboard ? kKeymanPhonePortraitSystemKeyboardHeight
+          : kKeymanPhonePortraitInAppKeyboardHeight
+      } else {
+        return isSystemKeyboard ? kKeymanPhoneLandscapeSystemKeyboardHeight
+          : kKeymanPhoneLandscapeInAppKeyboardHeight
+      }
+    }
+  }
+
+  func keyboardHeight(with orientation: UIInterfaceOrientation) -> CGFloat {
+    if UIDevice.current.userInterfaceIdiom == .pad {
+      if orientation.isPortrait {
+        return isSystemKeyboard ? kKeymanPadPortraitSystemKeyboardHeight
+          : kKeymanPadPortraitInAppKeyboardHeight
+      } else {
+        return isSystemKeyboard ? kKeymanPadLandscapeSystemKeyboardHeight
+          : kKeymanPadLandscapeInAppKeyboardHeight
+      }
+    } else {
+      if orientation.isPortrait {
+        return isSystemKeyboard ? kKeymanPhonePortraitSystemKeyboardHeight
+          : kKeymanPhonePortraitInAppKeyboardHeight
+      } else {
+        return isSystemKeyboard ? kKeymanPhoneLandscapeSystemKeyboardHeight
+          : kKeymanPhoneLandscapeInAppKeyboardHeight
+      }
+    }
+  }
+
+  var keyboardWidth: CGFloat {
+    return UIScreen.main.bounds.width
+  }
+
+  var keyboardSize: CGSize {
+    return CGSize(width: keyboardWidth, height: keyboardHeight)
+  }
+
+  // Keyman interaction
+  private func resizeKeyboard() {
+    let newSize = keyboardSize
+    if didResizeToOrientation && isSystemKeyboard && lastKeyboardSize == newSize {
+      didResizeToOrientation = false
+      return
+    }
+    lastKeyboardSize = newSize
+
+    inputView!.frame = CGRect(origin: .zero, size: newSize)
+
+    // Workaround for WKWebView bug with landscape orientation
+    // TODO: Check if still necessary and if there's a better solution
+    if isSystemKeyboard {
+      perform(#selector(self.resizeDelay), with: self, afterDelay: 1.0)
+    }
+
+    var oskHeight = Int(newSize.height)
+    oskHeight -= oskHeight % (isSystemKeyboard ? 10 : 20)
+
+    inputView.evaluateJavaScript("setOskWidth(\(Int(newSize.width)));", completionHandler: nil)
+    inputView.evaluateJavaScript("setOskHeight(\(Int(oskHeight)));", completionHandler: nil)
+  }
+
+  private var keymanScrollView: UIScrollView {
+    return inputView.scrollView
+  }
+
+  // TODO: Move to separate class
+  private func createInputView() -> WKWebView {
+    let config = WKWebViewConfiguration()
+    let prefs = WKPreferences()
+    prefs.javaScriptEnabled = true
+    config.preferences = prefs
+    config.suppressesIncrementalRendering = false
+    let userContentController = WKUserContentController()
+    userContentController.add(self, name: "keyman")
+    config.userContentController = userContentController
+    let frame = CGRect(origin: .zero, size: keyboardSize)
+    let view = WKWebView(frame: frame, configuration: config)
+    view.isOpaque = false
+    view.backgroundColor = UIColor.clear
+    view.navigationDelegate = self
+
+    view.scrollView.isScrollEnabled = false
+    // FIXME: Indicate failure to load URL
+    if #available(iOS 9.0, *) {
+      if let url = activeKeymanDirectory()?.appendingPathComponent(kKeymanFullFileName) {
+        view.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+      }
+    } else {
+      // Copy Keyman files to the temp folder and load from there
+      if copyKeymanFilesToTemp() {
+        let url = URL(fileURLWithPath: NSTemporaryDirectory())
+          .appendingPathComponent("keyman")
+          .appendingPathComponent(kKeymanFullFileName)
+        view.load(URLRequest(url: url, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
+      }
+    }
+    return view
+  }
+
+  @objc func clearSubKeyArrays() {
+    if subKeysView == nil {
+      subKeys.removeAll()
+      subKeyIDs.removeAll()
+      subKeyTexts.removeAll()
+    }
+  }
+
+  @objc func dismissHelpBubble() {
+    if let view = helpBubbleView {
+      view.removeFromSuperview()
+      helpBubbleView = nil
+    }
+  }
+
+  @objc func dismissKeyPreview() {
+    if let view = keyPreviewView {
+      view.removeFromSuperview()
+      keyPreviewView = nil
+    }
+  }
+
+  var isSubKeysMenuVisible: Bool {
+    return subKeysView != nil
+  }
+
+  private func dismissSubKeys() {
+    if let subKeysView = subKeysView {
+      subKeysView.removeFromSuperview()
+      subKeysView.subviews.forEach { $0.removeFromSuperview() }
+      self.subKeysView = nil
+      setPopupVisible(false)
+      NotificationCenter.default.post(name: .keymanSubKeysMenuDismissed, object: self, userInfo: nil)
+    }
+    subKeys.removeAll()
+    subKeyIDs.removeAll()
+    subKeyTexts.removeAll()
+  }
+
+  private func setPopupVisible(_ visible: Bool) {
+    // FIXME: Looking at KMW, the parameter should be a bool
+    let jsString = "popupVisible(\(visible ? "1" : "0"));"
+    inputView.evaluateJavaScript(jsString, completionHandler: nil)
+  }
+
+  /// Displays a list of available keyboards and allows a user to add/download new keyboards
+  /// or remove existing ones.
+  ///
+  /// - Parameters:
+  ///   - in: The current UIViewController (recommended) or the navigation controller
+  ///   - shouldAddKeyboard: Whether to immediately open the view to add a new keyboard
+  /// - SeeAlso:
+  /// KeymanTextView/KeymanTextField to enable/disable the keyboard picker
+  public func showKeyboardPicker(in viewController: UIViewController, shouldAddKeyboard: Bool) {
+    let vc = KeyboardPickerViewController()
+    let nc = UINavigationController(rootViewController: vc)
+    nc.modalTransitionStyle = .coverVertical
+    nc.modalPresentationStyle = .pageSheet
+    viewController.present(nc, animated: true) {() -> Void in
+      if shouldAddKeyboard {
+        vc.showAddKeyboard()
+      } else {
+        let userData = self.activeUserDefaults()
+        userData.set(true, forKey: kKeymanKeyboardPickerDisplayedKey)
+        userData.synchronize()
+        self.isKeymanHelpOn = false
+      }
+    }
+  }
+
+  public func dismissKeyboardPicker(_ viewController: UIViewController) {
+    viewController.dismiss(animated: true)
+    if shouldReloadKeyboard {
+      reloadKeyboard()
+    }
+    NotificationCenter.default.post(name: .keymanKeyboardPickerDismissed, object: self)
+  }
+
+  func reloadKeyboard() {
+    // FIXME: Duplicated elsewhere
+    if #available(iOS 9.0, *) {
+      guard let codeURL = activeKeymanDirectory()?.appendingPathComponent(kKeymanFullFileName) else {
+        return
+      }
+      inputView.loadFileURL(codeURL, allowingReadAccessTo: codeURL.deletingLastPathComponent())
+    } else {
+      // Copy Keyman files to the temp folder and load from there
+      if copyKeymanFilesToTemp() {
+        let codeURL = URL(fileURLWithPath: NSTemporaryDirectory())
+          .appendingPathComponent("keyman")
+          .appendingPathComponent(kKeymanFullFileName)
+        inputView.load(URLRequest(url: codeURL, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
+      }
+    }
+  }
+
+  @objc func resetKeyboard() {
+    keyboardID = nil
+    languageID = nil
+
+    let userKeyboards = activeUserDefaults().array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]]
+    if let index = indexForUserKeyboard(withID: keyboardID, languageID: languageID) {
+      setKeyboard(userKeyboards![index])
+    } else if let userKeyboards = userKeyboards, !userKeyboards.isEmpty {
+      setKeyboard(userKeyboards[0])
+    } else {
+      setKeyboard(withID: kKeymanDefaultKeyboardID, languageID: kKeymanDefaultLanguageID,
+                  keyboardName: kKeymanDefaultKeyboardName, languageName: kKeymanDefaultLanguageName,
+                  font: kKeymanDefaultKeyboardFont, oskFont: nil)
+    }
+  }
+
+  @objc func showHelpBubble() {
+    // Help bubble is always disabled for system-wide keyboard
+    if isSystemKeyboard || keyboardMenuView != nil {
+      return
+    }
+
+    let jsString = "langMenuPos();"
+    inputView.evaluateJavaScript(jsString) { result, _ in
+      guard let result = result else {
+        return
+      }
+      let langMenuKeyPos = String(describing: result)
+      let pos = langMenuKeyPos.components(separatedBy: ",")
+      guard let px = Float(pos[0]), let py = Float(pos[1]) else {
+        self.kmLog("Unexpected result for langMenuPos(): \(langMenuKeyPos)", checkDebugPrinting: false)
+        return
+      }
+      self.showHelpBubble(at: CGPoint(x: CGFloat(px), y: CGFloat(py)))
+    }
+  }
+
+  // TODO: The bulk of this should be moved to PopoverView
+  func showHelpBubble(at point: CGPoint) {
+    self.helpBubbleView?.removeFromSuperview()
+    let helpBubbleView = PopoverView(frame: CGRect.zero)
+    self.helpBubbleView = helpBubbleView
+    helpBubbleView.backgroundColor = UIColor(red: 253.0 / 255.0, green: 244.0 / 255.0,
+                                             blue: 196.0 / 255.0, alpha: 1.0)
+    helpBubbleView.backgroundColor2 = UIColor(red: 233.0 / 255.0, green: 224.0 / 255.0,
+                                              blue: 176.0 / 255.0, alpha: 1.0)
+    helpBubbleView.borderColor = UIColor(red: 0.5, green: 0.25, blue: 0.25, alpha: 1.0)
+
+    let isPad = UIDevice.current.userInterfaceIdiom == .pad
+    let sizeMultiplier = CGFloat(isPad ? 1.5 : 1.0)
+    let frameWidth = 90.0 * sizeMultiplier
+    let frameHeight = (40.0 + helpBubbleView.arrowHeight) * sizeMultiplier
+    let fontSize = 10.0 * sizeMultiplier
+
+    let inputViewFrame = inputView.frame
+    let screenWidth = inputViewFrame.size.width
+
+    // TODO: Refactor this out
+    let isPortrait: Bool
+    if isSystemKeyboard {
+      isPortrait = KeymanInputViewController.isPortrait
+    } else {
+      isPortrait = UIApplication.shared.statusBarOrientation.isPortrait
+    }
+
+    let adjY: CGFloat
+    if isPortrait {
+      adjY = isSystemKeyboard ? 9.0 : 4.0
+    } else {
+      adjY = isSystemKeyboard ? 3.0 : 4.0
+    }
+    let px = point.x
+    let py = point.y + adjY + (isPad ? 2.0 : 1.0)
+    var x = px - frameWidth / 2
+    let y = py - frameHeight
+    if x < 0 {
+      x = 0
+    } else if x + frameWidth > screenWidth {
+      x = screenWidth - frameWidth
+    }
+
+    helpBubbleView.frame = CGRect(x: x, y: y, width: frameWidth, height: frameHeight)
+    if x == 0 {
+      helpBubbleView.arrowPosX = px
+    } else if x == screenWidth - frameWidth {
+      helpBubbleView.arrowPosX = (px - x)
+    } else {
+      helpBubbleView.arrowPosX = frameWidth / 2
+    }
+
+    let helpText = UILabel(frame: CGRect(x: 5, y: 0,
+                                         width: frameWidth - 10, height: frameHeight - helpBubbleView.arrowHeight))
+    helpText.backgroundColor = UIColor.clear
+    helpText.font = helpText.font.withSize(fontSize)
+    helpText.textAlignment = .center
+    helpText.textColor = UIColor.darkText
+    helpText.lineBreakMode = .byWordWrapping
+    helpText.numberOfLines = 0
+    helpText.text = kKeymanKeyboardChangeHelpText
+    helpBubbleView.addSubview(helpText)
+    inputView.addSubview(helpBubbleView)
+  }
+
+  @objc func resizeDelay() {
+    // + 1000 to work around iOS bug with resizing on landscape orientation. Technically we only
+    // need this for landscape but it doesn't hurt to do it with both. 1000 is a big number that
+    // should hopefully work on all devices.
+    let kbWidth = keyboardWidth
+    let kbHeight = keyboardHeight
+    inputView?.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight + 1000)
+  }
+
+  func resizeKeyboardIfNeeded() {
+    // TODO: Check if necessary since resizeKeyboard() checks old size
+    let newSize = keyboardSize
+    if newSize != lastKeyboardSize {
+      resizeKeyboard()
+      lastKeyboardSize = newSize
+    }
+  }
+
+  func resizeKeyboard(with orientation: UIInterfaceOrientation) {
+    // TODO: Update to use new size instead of orientation since viewWillRotate() is deprecated
+    // TODO: Refactor to use resizeKeyboard()
+    let kbWidth = keyboardWidth
+    let kbHeight = keyboardHeight(with: orientation)
+    inputView?.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
+
+    var oskHeight = Int(kbHeight)
+    oskHeight -= oskHeight % (isSystemKeyboard ? 10 : 20)
+
+    inputView?.evaluateJavaScript("setOskWidth(\(Int(kbWidth)));", completionHandler: nil)
+    inputView?.evaluateJavaScript("setOskHeight(\(Int(oskHeight)));", completionHandler: nil)
   }
 
   // MARK: - WKScriptMessageHandler methods
@@ -2464,6 +2625,56 @@ UIGestureRecognizerDelegate {
       inputDelegate?.updatedFragment(fragment)
       updatedFragment(fragment)
     }
+  }
+
+  // MARK: - Text
+
+  // TODO: Switch from NSRange
+  func setSelectionRange(_ range: NSRange, manually: Bool) {
+    if range.location != NSNotFound {
+      let jsString = "setCursorRange(\(range.location),\(range.length))"
+      inputView.evaluateJavaScript(jsString, completionHandler: nil)
+    }
+  }
+
+  func clearText() {
+    setText(nil)
+    setSelectionRange(NSRange(location: 0, length: 0), manually: true)
+    kmLog("Cleared text.", checkDebugPrinting: true)
+  }
+
+  func setText(_ text: String?) {
+    var text = text ?? ""
+    text = text.replacingOccurrences(of: "\\", with: "\\\\")
+    text = text.replacingOccurrences(of: "'", with: "\\'")
+    text = text.replacingOccurrences(of: "\n", with: "\\n")
+    let jsString = "setKeymanVal('\(text)');"
+    inputView.evaluateJavaScript(jsString, completionHandler: nil)
+  }
+
+  // TODO: Remove dependence on this since we have super retina screens.
+  var retinaScreen: Bool {
+    return UIScreen.main.scale == 2.0
+  }
+
+  // MARK: - Keyboard Notifications
+  @objc func keyboardWillShow(_ notification: Notification) {
+    dismissSubKeys()
+    dismissKeyPreview()
+    resizeKeyboard()
+
+    if isKeymanHelpOn {
+      helpBubbleView?.removeFromSuperview()
+      let showHelpBubble = #selector(self.showHelpBubble as () -> Void)
+      NSObject.cancelPreviousPerformRequests(withTarget: self, selector: showHelpBubble, object: nil)
+      perform(showHelpBubble, with: nil, afterDelay: 1.5)
+    }
+  }
+
+  @objc func keyboardWillHide(_ notification: Notification) {
+    dismissHelpBubble()
+    dismissSubKeys()
+    dismissKeyPreview()
   }
 
   // MARK: - WKNavigationDelegate methods
@@ -2638,28 +2849,6 @@ UIGestureRecognizerDelegate {
     }
   }
 
-  @objc func clearSubKeyArrays() {
-    if subKeysView == nil {
-      subKeys.removeAll()
-      subKeyIDs.removeAll()
-      subKeyTexts.removeAll()
-    }
-  }
-
-  @objc func dismissHelpBubble() {
-    if let view = helpBubbleView {
-      view.removeFromSuperview()
-      helpBubbleView = nil
-    }
-  }
-
-  @objc func dismissKeyPreview() {
-    if let view = keyPreviewView {
-      view.removeFromSuperview()
-      keyPreviewView = nil
-    }
-  }
-
   // MARK: - UIGestureRecognizer
   public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
                                 shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -2786,163 +2975,6 @@ UIGestureRecognizerDelegate {
     subKeyTexts.removeAll()
   }
 
-  var isSubKeysMenuVisible: Bool {
-    return subKeysView != nil
-  }
-
-  private func dismissSubKeys() {
-    if let subKeysView = subKeysView {
-      subKeysView.removeFromSuperview()
-      subKeysView.subviews.forEach { $0.removeFromSuperview() }
-      self.subKeysView = nil
-      setPopupVisible(false)
-      NotificationCenter.default.post(name: .keymanSubKeysMenuDismissed, object: self, userInfo: nil)
-    }
-    subKeys.removeAll()
-    subKeyIDs.removeAll()
-    subKeyTexts.removeAll()
-  }
-
-  private func setPopupVisible(_ visible: Bool) {
-    // FIXME: Looking at KMW, the parameter should be a bool
-    let jsString = "popupVisible(\(visible ? "1" : "0"));"
-    inputView.evaluateJavaScript(jsString, completionHandler: nil)
-  }
-
-  private func registerFont(withFilename fontFilename: String) -> [String: Any]? {
-    guard let fontURL = activeFontDirectory()?.appendingPathComponent(fontFilename),
-        FileManager.default.fileExists(atPath: fontURL.path) else {
-      return nil
-    }
-
-    guard let provider = CGDataProvider(url: fontURL as CFURL) else {
-      kmLog("Failed to open \(fontURL)", checkDebugPrinting: false)
-      return nil
-    }
-    guard let font = CGFont(provider) else {
-      kmLog("Failed to read font at \(fontURL)", checkDebugPrinting: false)
-      return nil
-    }
-
-    var didRegister: Bool = false
-    let fontName = font.postScriptName! as String
-    if !fontExists(fontName) {
-      var errorRef: Unmanaged<CFError>?
-      didRegister = CTFontManagerRegisterFontsForURL(fontURL as CFURL, .none, &errorRef)
-      let error = errorRef?.takeRetainedValue() // Releases errorRef
-      if !didRegister {
-        kmLog("Failed to register font: \(fontURL) reason: \(error!.localizedDescription)",
-          checkDebugPrinting: false)
-      } else {
-        kmLog("Registered font: \(fontURL)", checkDebugPrinting: true)
-      }
-    }
-    return [
-      kKeymanFontNameKey: fontName,
-      // TODO: Check if didRegister should be true if font exists
-      kKeymanFontRegisteredKey: didRegister ? 1 : 0
-    ]
-  }
-
-  private func unregisterFont(withFilename fontFilename: String) -> Bool {
-    guard let fontURL = activeFontDirectory()?.appendingPathComponent(fontFilename),
-      FileManager.default.fileExists(atPath: fontURL.path) else {
-        return false
-    }
-    var errorRef: Unmanaged<CFError>?
-    let didUnregister = CTFontManagerUnregisterFontsForURL(fontURL as CFURL, .none, &errorRef)
-    let error = errorRef?.takeRetainedValue() // Releases errorRef
-    if !didUnregister {
-      kmLog("Failed to unregister font: \(fontURL) reason: \(error!.localizedDescription)", checkDebugPrinting: false)
-    } else {
-      kmLog("Unregistered font: \(fontFilename)", checkDebugPrinting: true)
-    }
-    return didUnregister
-  }
-
-  private func fontExists(_ fontName: String) -> Bool {
-    return UIFont.familyNames.contains { familyName in
-      let fontNames = UIFont.fontNames(forFamilyName: familyName)
-      return fontNames.contains(fontName)
-    }
-  }
-
-  func isRTLKeyboard(withID keyboardID: String, languageID: String) -> Bool {
-    // TODO: Refactor using a function that retrieves keyboard
-    let userData = activeUserDefaults()
-    if let userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]] {
-      let keyboard = userKeyboards.first { keyboard in
-        return keyboard[kKeymanKeyboardIdKey] == keyboardID && keyboard[kKeymanLanguageIdKey] == languageID
-      }
-      if let keyboard = keyboard {
-        return keyboard[kKeymanKeyboardRTLKey] == "Y"
-      }
-    }
-    let kbKey = "\(languageID)_\(keyboardID)"
-    return keyboardsDictionary[kbKey]?[kKeymanKeyboardRTLKey] == "Y"
-  }
-
-  func fontFilename(fromJSONFont jsonFont: String) -> String? {
-    if jsonFont.hasFontExtension {
-      return jsonFont
-    }
-
-    let jsonObject: Any
-    do {
-      jsonObject = try JSONSerialization.jsonObject(with: jsonFont.data(using: String.Encoding.utf8)!,
-                                                    options: .mutableContainers)
-    } catch {
-      kmLog("Error decoding font JSON object: \(error)", checkDebugPrinting: false)
-      return nil
-    }
-    guard let fontDict = jsonObject as? [AnyHashable: Any] else {
-      return nil
-    }
-    let fontFiles = fontDict[kKeymanFontFilesKey]
-    if let fontFiles = fontFiles as? [String] {
-      if let fontFile = fontFiles.first(where: { $0.hasFontExtension }) {
-        return fontFile
-      }
-    } else if let fontFile = fontFiles as? String {
-      if fontFile.hasFontExtension {
-        return fontFile
-      }
-    }
-    return nil
-  }
-
-  func jsFont(forKeyboardID kbID: String, languageID langID: String) -> String {
-    let kbKey = "\(langID)_\(kbID)"
-    let kbDict = keyboardsDictionary[kbKey]
-    let jsFont = kbDict?[kKeymanFontKey]
-    return jsFont ?? "''"
-  }
-
-  func jsOskFont(forKeyboardID kbID: String, languageID langID: String) -> String {
-    let kbKey = "\(langID)_\(kbID)"
-    let kbDict = keyboardsDictionary[kbKey]
-    let jsOskFont = kbDict?[kKeymanOskFontKey]
-    return jsOskFont ?? "''"
-  }
-
-  func jsFont(fromFontDictionary fontDict: [AnyHashable: Any]?) -> String {
-    guard let fontDict = fontDict, !fontDict.isEmpty else {
-      return "''"
-    }
-
-    let data: Data
-    do {
-      data = try JSONSerialization.data(withJSONObject: fontDict, options: [])
-    } catch {
-      kmLog("Failed to encode font dictionary as JSON: \(String(describing: fontDict))", checkDebugPrinting: false)
-      return "''"
-    }
-
-    return String(data: data, encoding: .ascii)!
-      .replacingOccurrences(of: kKeymanFontFilenameKey, with: kKeymanFontFilesKey)
-      .replacingOccurrences(of: kKeymanFontSourceKey, with: kKeymanFontFilesKey)
-  }
-
   // MARK: - InputViewController methods
   // TODO: Manager should not have InputViewController methods. Move this into KeymanInputViewController.
   func updateViewConstraints() {
@@ -3001,11 +3033,6 @@ UIGestureRecognizerDelegate {
     didResizeToOrientation = true
   }
 
-  func synchronizeSWKeyboard() {
-    copyUserDefaultsFromSharedContainer()
-    copyKeymanFilesFromSharedContainer()
-  }
-
   private func setMenuKeyFrame(_ frameStr: String) {
     var frame = CGRect.zero
     if !frameStr.isEmpty {
@@ -3048,19 +3075,5 @@ UIGestureRecognizerDelegate {
 
   var isSystemKeyboardTopBarEnabled: Bool {
     return true
-  }
-
-  func isCurrentKeyboard(withID keyboardID: String?, languageID: String?) -> Bool {
-    return self.keyboardID == keyboardID && self.languageID == languageID
-  }
-
-  func isCurrentKeyboard(_ keyboard: [String: Any]) -> Bool {
-    let keyboardID = keyboard[kKeymanKeyboardIdKey] as? String
-    let languageID = keyboard[kKeymanLanguageIdKey] as? String
-    return keyboardID == self.keyboardID && languageID == self.languageID
-  }
-
-  var keymanBundle: Bundle {
-    return Bundle(path: Bundle(for: Manager.self).path(forResource: "Keyman", ofType: "bundle")!)!
   }
 }
