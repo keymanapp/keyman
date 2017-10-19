@@ -126,7 +126,7 @@ private let kKeymanPadLandscapeSystemKeyboardHeight: CGFloat = 352.0
 public class Manager: NSObject, WKNavigationDelegate, WKScriptMessageHandler, HTTPDownloadDelegate,
 UIGestureRecognizerDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
-  public static var applicationGroupIdentifier: String!
+  public static var applicationGroupIdentifier: String?
 
   public static let shared = Manager()
 
@@ -1969,7 +1969,11 @@ UIGestureRecognizerDelegate {
   }
 
   var sharedContainerURL: URL? {
-    return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Manager.applicationGroupIdentifier)
+    guard let groupID = Manager.applicationGroupIdentifier else {
+      kmLog("applicationGroupIdentifier is unset", checkDebugPrinting: false)
+      return nil
+    }
+    return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupID)
   }
 
   func sharedKeymanDirectory() -> URL? {
@@ -1997,8 +2001,15 @@ UIGestureRecognizerDelegate {
   }
 
   func activeUserDefaults() -> UserDefaults {
-    return canAccessSharedContainer() ? UserDefaults(suiteName: Manager.applicationGroupIdentifier)!
-      : UserDefaults.standard
+    return canAccessSharedContainer() ? sharedUserDefaults! : UserDefaults.standard
+  }
+
+  var sharedUserDefaults: UserDefaults? {
+    guard let groupID = Manager.applicationGroupIdentifier else {
+      kmLog("applicationGroupIdentifier is unset", checkDebugPrinting: false)
+      return nil
+    }
+    return UserDefaults(suiteName: groupID)
   }
 
   func canAccessSharedContainer() -> Bool {
@@ -2013,7 +2024,7 @@ UIGestureRecognizerDelegate {
   }
 
   private func copyUserDefaultsToSharedContainer() {
-    guard let sharedUserData = UserDefaults(suiteName: Manager.applicationGroupIdentifier) else {
+    guard let sharedUserData = sharedUserDefaults else {
       return
     }
     let defaultUserData = UserDefaults.standard
@@ -2028,7 +2039,7 @@ UIGestureRecognizerDelegate {
   }
 
   private func copyUserDefaultsFromSharedContainer() {
-    guard let sharedUserData = UserDefaults(suiteName: Manager.applicationGroupIdentifier) else {
+    guard let sharedUserData = sharedUserDefaults else {
       return
     }
     let defaultUserData = UserDefaults.standard
