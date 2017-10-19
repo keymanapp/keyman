@@ -275,7 +275,7 @@ public class KeyboardPickerViewController: UITableViewController, UIAlertViewDel
       // Add keyboard.
       Manager.shared.addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
                                  languageName: langName, isRTL: isRTL, isCustom: false, font: font,
-                                             oskFont: oskFont)
+                                 oskFont: oskFont)
       Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
                                  languageName: langName, font: font, oskFont: oskFont)
       navigationController?.popToRootViewController(animated: true)

@@ -7,9 +7,7 @@
 //
 
 import CoreText
-import Foundation
-import ObjectiveC
-import QuartzCore
+import UIKit
 import WebKit
 
 typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
@@ -693,18 +691,6 @@ UIGestureRecognizerDelegate {
   /// - SeeAlso:
   /// KeymanTextView/KeymanTextField to enable/disable the keyboard picker
   public func showKeyboardPicker(in viewController: UIViewController, shouldAddKeyboard: Bool) {
-    if UIDevice.current.userInterfaceIdiom == .pad {
-      // TODO fix since private API
-      /*
-      let firstResponder = UIApplication.shared.keyWindow?.findFirstResponder()
-      if let firstResponder = firstResponder as? KeymanTextView {
-        firstResponder.dismissKeyboard()
-      } else if let firstResponder = firstResponder as? KeymanTextField {
-        firstResponder.dismissKeyboard()
-      }
-      */
-    }
-
     let vc = KeyboardPickerViewController()
     let nc = UINavigationController(rootViewController: vc)
     nc.modalTransitionStyle = .coverVertical
