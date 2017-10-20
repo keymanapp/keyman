@@ -53,7 +53,7 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
   }
 
   private func loadFromServer() {
-    let keyboardInfo = KMManager.sharedInstance().currentKeyboardInfo() as? [AnyHashable : String]
+    let keyboardInfo = Manager.shared.currentKeyboardInfo
     let currentKeyboardId = keyboardInfo?[kKeymanKeyboardIdKey] ?? kKeymanDefaultKeyboardID
     let userData = AppDelegate.activeUserDefaults()
     let keyboards = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [NSDictionary]

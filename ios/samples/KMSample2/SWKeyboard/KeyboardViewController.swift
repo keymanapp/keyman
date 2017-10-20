@@ -10,13 +10,21 @@ import KeymanEngine
 import UIKit
 
 class KeyboardViewController: KeymanInputViewController {
-  override func viewDidLoad() {
-    // Replace with your application group id
-    KMManager.setApplicationGroupIdentifier("group.KMSample")
+  override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    // Replace with your application group id. Must be set before call to super.init().
+    Manager.applicationGroupIdentifier = "group.KMSample"
 
     // Disable before release
-    KMManager.sharedInstance().debugPrintingOn = true
+    Manager.shared.isDebugPrintingOn = true
 
+    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override func viewDidLoad() {
     super.viewDidLoad()
 
     topBarImageView?.backgroundColor = UIColor(red: 1.0, green: 96.0 / 255.0, blue: 0.0, alpha: 1.0)

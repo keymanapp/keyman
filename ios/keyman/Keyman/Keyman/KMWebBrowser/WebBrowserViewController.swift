@@ -216,7 +216,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   }
 
   @IBAction func globe(_ sender: Any) {
-    KMManager.sharedInstance().showKeyboardPicker(in: self, shouldAddKeyboard: false)
+    Manager.shared.showKeyboardPicker(in: self, shouldAddKeyboard: false)
   }
 
   @objc func close(_ sender: Any?) {
@@ -269,8 +269,10 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
 
   @objc func keyboardChanged(_ notification: Notification) {
     let kbInfo = notification.userInfo?[kKeymanKeyboardInfoKey] as? [AnyHashable: Any] ?? [AnyHashable: Any]()
-    if let kbID = kbInfo[kKeymanKeyboardIdKey] as? String, let langID = kbInfo[kKeymanLanguageIdKey] as? String {
-      newFontFamily = KMManager.sharedInstance().fontNameForKeyboard(withID: kbID, languageID: langID)
+    if let kbID = kbInfo[kKeymanKeyboardIdKey] as? String,
+       let langID = kbInfo[kKeymanLanguageIdKey] as? String,
+       let fontName = Manager.shared.fontNameForKeyboard(withID: kbID, languageID: langID) {
+      newFontFamily = fontName
     } else {
       newFontFamily = UIFont.systemFont(ofSize: UIFont.systemFontSize).fontName
     }

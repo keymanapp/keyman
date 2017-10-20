@@ -20,6 +20,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+    Manager.applicationGroupIdentifier = "group.KM4I"
+    #if DEBUG
+      Manager.shared.isDebugPrintingOn = true
+    #endif
+
     window = UIWindow(frame: UIScreen.main.bounds)
 
     // Initialize overlayWindow
@@ -50,7 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func applicationDidEnterBackground(_ application: UIApplication) {
     _overlayWindow = nil
-    KMManager.sharedInstance().unregisterCustomFonts()
+    Manager.shared.unregisterCustomFonts()
     let userData = AppDelegate.activeUserDefaults()
     // TODO: Have viewController save its data
     userData.set(viewController?.textView?.text, forKey: userTextKey)
@@ -85,7 +90,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   @objc func registerCustomFonts() {
-    KMManager.sharedInstance().registerCustomFonts()
+    Manager.shared.registerCustomFonts()
   }
 
   class func activeUserDefaults() -> UserDefaults {

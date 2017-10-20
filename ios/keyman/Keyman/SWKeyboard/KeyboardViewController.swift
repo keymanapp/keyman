@@ -10,6 +10,19 @@ import KeymanEngine
 import UIKit
 
 class KeyboardViewController: KeymanInputViewController {
+  override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    Manager.applicationGroupIdentifier = "group.KM4I"
+
+    #if DEBUG
+      Manager.shared.isDebugPrintingOn = true
+    #endif
+    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
   override func updateViewConstraints() {
     super.updateViewConstraints()
 
@@ -21,12 +34,6 @@ class KeyboardViewController: KeymanInputViewController {
   }
 
   override func viewDidLoad() {
-    KMManager.setApplicationGroupIdentifier("group.KM4I")
-
-    #if DEBUG
-      KMManager.sharedInstance().debugPrintingOn = true
-    #endif
-
     super.viewDidLoad()
     setupTopBarImage(isPortrait: KeymanInputViewController.isPortrait)
   }

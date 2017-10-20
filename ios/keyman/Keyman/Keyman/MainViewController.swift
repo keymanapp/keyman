@@ -115,20 +115,15 @@ class MainViewController: UIViewController, KeymanTextViewDelegate, UIActionShee
 
     // Setup Keyman Manager & fetch keyboards list
     updateStatus = 0
-    KMManager.setApplicationGroupIdentifier("group.KM4I")
 
-    #if DEBUG
-      KMManager.sharedInstance().debugPrintingOn = true
-    #endif
-
-    KMManager.sharedInstance().canRemoveDefaultKeyboard = true
-    KMManager.sharedInstance().fetchKeyboardsList()
+    Manager.shared.canRemoveDefaultKeyboard = true
+    Manager.shared.fetchKeyboardsList()
 
     let bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
     view?.backgroundColor = bgColor
 
     // Check for configuration profiles/fonts to install
-    let kmFonts = KMManager.sharedInstance().keymanFonts as! [String: [String: Any]]
+    let kmFonts = Manager.shared.keymanFonts
     var profilesByFontName = [String: String](minimumCapacity: kmFonts.count - 1)
     for (key, value) in kmFonts where key != "keymanweb-osk.ttf" {
       let fontName = value[kKeymanFontNameKey] as! String
@@ -460,17 +455,17 @@ class MainViewController: UIViewController, KeymanTextViewDelegate, UIActionShee
       return
     }
     let userData = AppDelegate.activeUserDefaults()
-    let userKeyboards: [Any]? = userData.array(forKey: kKeymanUserKeyboardsListKey)
+    let userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey)
     if userKeyboards == nil || userKeyboards!.isEmpty {
       let isRTL = (kKeymanDefaultKeyboardRTL == "Y") ? true : false
-      KMManager.sharedInstance().addKeyboard(withID: kKeymanDefaultKeyboardID,
-                                             languageID: kKeymanDefaultLanguageID,
-                                             keyboardName: kKeymanDefaultKeyboardName,
-                                             languageName: kKeymanDefaultLanguageName,
-                                             isRTL: isRTL,
-                                             isCustom: false,
-                                             font: kKeymanDefaultKeyboardFont,
-                                             oskFont: nil)
+      Manager.shared.addKeyboard(withID: kKeymanDefaultKeyboardID,
+                                 languageID: kKeymanDefaultLanguageID,
+                                 keyboardName: kKeymanDefaultKeyboardName,
+                                 languageName: kKeymanDefaultLanguageName,
+                                 isRTL: isRTL,
+                                 isCustom: false,
+                                 font: kKeymanDefaultKeyboardFont,
+                                 oskFont: nil)
     }
 
     perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
@@ -481,15 +476,15 @@ class MainViewController: UIViewController, KeymanTextViewDelegate, UIActionShee
       let langID = info[kKeymanLanguageIdKey] as! String
       if url.query == nil || url.query!.range(of: "url=") == nil {
         let dictKey = "\(langID)_\(kbID)"
-        if let kbDict = KMManager.sharedInstance().keyboardsDictionary[dictKey] as? [String: String] {
+        if let kbDict = Manager.shared.keyboardsDictionary[dictKey] {
           let kbName = kbDict[kKeymanKeyboardNameKey]!
           let langName = kbDict[kKeymanLanguageNameKey]!
           let isRTL = (kbDict[kKeymanKeyboardRTLKey]! == "Y") ? true : false
           let font = kbDict[kKeymanFontKey]!
           let oskFont = kbDict[kKeymanOskFontKey]!
-          KMManager.sharedInstance().addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
+          Manager.shared.addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
               languageName: langName, isRTL: isRTL, isCustom: false, font: font, oskFont: oskFont)
-          KMManager.sharedInstance().setKeyboardWithID(kbID, languageID: langID, keyboardName: kbName,
+          Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
               languageName: langName, font: font, oskFont: oskFont)
         }
       } else {
@@ -498,9 +493,9 @@ class MainViewController: UIViewController, KeymanTextViewDelegate, UIActionShee
         let isRTL = ((info[kKeymanKeyboardRTLKey] as! String) == "Y") ? true : false
         let font = info[kKeymanFontKey] as! String
         let oskFont = info[kKeymanOskFontKey] as! String
-        KMManager.sharedInstance().addKeyboard(withID: nil, languageID: nil, keyboardName: kbName,
+        Manager.shared.addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
             languageName: langName, isRTL: isRTL, isCustom: false, font: font, oskFont: oskFont)
-        KMManager.sharedInstance().setKeyboardWithID(nil, languageID: nil, keyboardName: kbName,
+        Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
             languageName: langName, font: font, oskFont: oskFont)
       }
     } else if let infoArray = kbInfo as? [[String: Any]] {
@@ -512,9 +507,9 @@ class MainViewController: UIViewController, KeymanTextViewDelegate, UIActionShee
         let isRTL = (info[kKeymanKeyboardRTLKey] as! String) == "Y"
         let font = info[kKeymanFontKey] as! String
         let oskFont = info[kKeymanOskFontKey] as! String
-        KMManager.sharedInstance().addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
+        Manager.shared.addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
             languageName: langName, isRTL: isRTL, isCustom: false, font: font, oskFont: oskFont)
-        KMManager.sharedInstance().setKeyboardWithID(kbID, languageID: langID, keyboardName: kbName,
+        Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
             languageName: langName, font: font, oskFont: oskFont)
       }
     }
@@ -913,7 +908,7 @@ class MainViewController: UIViewController, KeymanTextViewDelegate, UIActionShee
       let direct = params["direct"]
 
       if let jsonUrl = jsonUrl {
-        KMManager.sharedInstance().dismissKeyboardPicker(self)
+        Manager.shared.dismissKeyboardPicker(self)
         if !infoView.view.isHidden {
           perform(#selector(self.infoButtonClick), with: nil)
         }
@@ -936,14 +931,14 @@ class MainViewController: UIViewController, KeymanTextViewDelegate, UIActionShee
       // Query should include keyboard and language IDs to set the keyboard (first download if not available)
       if let kbID = params["keyboard"], let langID = params["language"] {
         let dictKey = "\(langID)_\(kbID)"
-        let kbDict = KMManager.sharedInstance().keyboardsDictionary[dictKey] as? [String: String] ?? [String: String]()
-        let kbName = kbDict[kKeymanKeyboardNameKey] ?? ""
-        let langName = kbDict[kKeymanLanguageNameKey] ?? ""
-        let isRTL = kbDict[kKeymanKeyboardRTLKey] == "Y"
-        let font = kbDict[kKeymanFontKey]
-        let oskFont = kbDict[kKeymanOskFontKey]
+        let kbDict = Manager.shared.keyboardsDictionary[dictKey]
+        let kbName = kbDict?[kKeymanKeyboardNameKey] ?? ""
+        let langName = kbDict?[kKeymanLanguageNameKey] ?? ""
+        let isRTL = kbDict?[kKeymanKeyboardRTLKey] == "Y"
+        let font = kbDict?[kKeymanFontKey]
+        let oskFont = kbDict?[kKeymanOskFontKey]
 
-        if KMManager.sharedInstance().stateForKeyboard(withID: kbID) == kKMKeyboardStateNeedsDownload {
+        if Manager.shared.stateForKeyboard(withID: kbID) == .needsDownload {
           keyboard2Download = [
             kKeymanLanguageIdKey: langID,
             kKeymanKeyboardIdKey: kbID
@@ -951,11 +946,11 @@ class MainViewController: UIViewController, KeymanTextViewDelegate, UIActionShee
           showAlert(withTitle: "\(langName): \(kbName)", message: "Would you like to install this keyboard?",
                     cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 0)
         } else {
-          KMManager.sharedInstance().addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-                                                 languageName: langName, isRTL: isRTL, isCustom: false,
-                                                 font: font, oskFont: oskFont)
-          KMManager.sharedInstance().setKeyboardWithID(kbID, languageID: langID, keyboardName: kbName,
-                                                       languageName: langName, font: font, oskFont: oskFont)
+          Manager.shared.addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
+                                     languageName: langName, isRTL: isRTL, isCustom: false,
+                                     font: font, oskFont: oskFont)
+          Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
+                                     languageName: langName, font: font, oskFont: oskFont)
         }
       } else {
         launchUrl = nil
@@ -964,9 +959,7 @@ class MainViewController: UIViewController, KeymanTextViewDelegate, UIActionShee
   }
 
   private func dictionaryWithKeyboardID(_ kbID: String, languageID langID: String) -> [String: String]? {
-    let index = KMManager.sharedInstance().indexForUserKeyboard(withID: kbID, languageID: langID)
-
-    if index < 0 {
+    guard let index = Manager.shared.indexForUserKeyboard(withID: kbID, languageID: langID) else {
       return nil
     }
 
@@ -1050,7 +1043,7 @@ class MainViewController: UIViewController, KeymanTextViewDelegate, UIActionShee
     case 0:
       let langID = keyboard2Download[kKeymanLanguageIdKey] as? String
       let kbID = keyboard2Download[kKeymanKeyboardIdKey] as? String
-      KMManager.sharedInstance().downloadKeyboard(withID: kbID, languageID: langID, isUpdate: false)
+      Manager.shared.downloadKeyboard(withID: kbID!, languageID: langID!, isUpdate: false)
     case 1:
       if let profileName = profileName {
         checkedProfiles.append(profileName)
@@ -1064,7 +1057,7 @@ class MainViewController: UIViewController, KeymanTextViewDelegate, UIActionShee
     case 2:
       if let jsonUrl = customKeyboard2Download["url"] as? URL,
         let isDirect = customKeyboard2Download["direct"] as? Bool {
-        KMManager.sharedInstance().downloadKeyboard(from: jsonUrl, isDirect: isDirect)
+        Manager.shared.downloadKeyboard(from: jsonUrl, isDirect: isDirect)
       }
     default:
       break

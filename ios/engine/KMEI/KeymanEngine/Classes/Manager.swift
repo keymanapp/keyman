@@ -61,20 +61,20 @@ public let kKeymanCustomKeyboardKey = "CustomKeyboard"
 // Common user defaults keys
 
 // Stores array of user keyboards info list
-let kKeymanUserKeyboardsListKey = "UserKeyboardsList"
+public let kKeymanUserKeyboardsListKey = "UserKeyboardsList"
 // Stores currently/last selected keyboard info
-let kKeymanUserCurrentKeyboardKey = "UserCurrentKeyboard"
+public let kKeymanUserCurrentKeyboardKey = "UserCurrentKeyboard"
 
 // Internal user defaults keys
-let kKeymanEngineVersionKey = "KeymanEngineVersion"
-let kKeymanKeyboardPickerDisplayedKey = "KeyboardPickerDisplayed"
-let kKeymanSynchronizeSWKeyboardKey = "KeymanSynchronizeSWKeyboard"
+private let kKeymanEngineVersionKey = "KeymanEngineVersion"
+private let kKeymanKeyboardPickerDisplayedKey = "KeyboardPickerDisplayed"
+private let kKeymanSynchronizeSWKeyboardKey = "KeymanSynchronizeSWKeyboard"
 
 // Strings
 private let kKeymanKeyboardChangeHelpText = "Tap here to change keyboard"
 
 // URLs and Filenames
-let kKeymanApiBaseURL = "https://r.keymanweb.com/api/3.0/"
+private let kKeymanApiBaseURL = "https://r.keymanweb.com/api/3.0/"
 private let kKeymanApiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url="
 private let kKeymanFileName = "keyboard"
 private let kKeymanFileExtension = "html"
@@ -83,13 +83,13 @@ private let kKeymaniOSCodeFileName = "keymanios.js"
 private let kKeymanHostName = "r.keymanweb.com"
 
 // Default Keyboard Info
-let kKeymanDefaultKeyboardID = "european2"
-let kKeymanDefaultLanguageID = "eng"
-let kKeymanDefaultKeyboardName = "EuroLatin2 Keyboard"
-let kKeymanDefaultLanguageName = "English"
-let kKeymanDefaultKeyboardRTL = "N"
-let kKeymanDefaultKeyboardFont = "{\"family\":\"LatinWeb\",\"files\":[\"DejaVuSans.ttf\",\"DejaVuSans.mobileconfig\"]}"
-let kKeymanDefaultKeyboard = [
+public let kKeymanDefaultKeyboardID = "european2"
+public let kKeymanDefaultLanguageID = "eng"
+public let kKeymanDefaultKeyboardName = "EuroLatin2 Keyboard"
+public let kKeymanDefaultLanguageName = "English"
+public let kKeymanDefaultKeyboardRTL = "N"
+public let kKeymanDefaultKeyboardFont = "{\"family\":\"LatinWeb\",\"files\":[\"DejaVuSans.ttf\",\"DejaVuSans.mobileconfig\"]}"
+public let kKeymanDefaultKeyboard = [
   kKeymanKeyboardIdKey: kKeymanDefaultKeyboardID,
   kKeymanLanguageIdKey: kKeymanDefaultLanguageID,
   kKeymanKeyboardNameKey: kKeymanDefaultKeyboardName,

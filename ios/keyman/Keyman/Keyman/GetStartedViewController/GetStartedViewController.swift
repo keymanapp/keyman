@@ -10,7 +10,7 @@ import KeymanEngine
 import UIKit
 
 class GetStartedViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-  var mainViewController: MainViewController?
+  var mainViewController: MainViewController!
   @IBOutlet var navItem: UINavigationItem!
   @IBOutlet var tableView: UITableView!
 
@@ -137,15 +137,15 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
   private func performAction(for indexPath: IndexPath) {
     switch indexPath.section {
     case 0:
-      mainViewController?.dismissGetStartedView(nil)
-      KMManager.sharedInstance().showKeyboardPicker(in: mainViewController, shouldAddKeyboard: true)
+      mainViewController.dismissGetStartedView(nil)
+      Manager.shared.showKeyboardPicker(in: mainViewController, shouldAddKeyboard: true)
     case 1:
-      mainViewController?.dismissGetStartedView(nil)
+      mainViewController.dismissGetStartedView(nil)
       let setUpVC = SetUpViewController()
-      mainViewController?.present(setUpVC, animated: true, completion: nil)
+      mainViewController.present(setUpVC, animated: true, completion: nil)
     case 2:
-      mainViewController?.dismissGetStartedView(nil)
-      mainViewController?.infoButtonClick(nil)
+      mainViewController.dismissGetStartedView(nil)
+      mainViewController.infoButtonClick(nil)
     default:
       break
     }
