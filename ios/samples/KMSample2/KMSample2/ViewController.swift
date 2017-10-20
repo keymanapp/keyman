@@ -30,11 +30,11 @@ class ViewController: UIViewController, KeymanTextViewDelegate {
                                    shouldOverwrite: true)
     Manager.shared.registerCustomFonts()
 
-    Manager.shared.addKeyboard(withID: kKeymanDefaultKeyboardID, languageID: kKeymanDefaultLanguageID,
-                               keyboardName: kKeymanDefaultKeyboardName,
-                               languageName: kKeymanDefaultLanguageName,
+    Manager.shared.addKeyboard(withID: DefaultKeyboard.keyboardID, languageID: DefaultKeyboard.languageID,
+                               keyboardName: DefaultKeyboard.keyboardName,
+                               languageName: DefaultKeyboard.languageName,
                                isRTL: false, isCustom: false,
-                               font: kKeymanDefaultKeyboardFont, oskFont: nil)
+                               font: DefaultKeyboard.keyboardFont, oskFont: nil)
     Manager.shared.addKeyboard(withID: "tamil99m", languageID: "tam",
                                keyboardName: "Tamil 99M", languageName: "Tamil",
                                isRTL: false, isCustom: true, font: "aava1.ttf", oskFont: nil)

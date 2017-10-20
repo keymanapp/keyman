@@ -323,9 +323,9 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
       return
     }
 
-    let kbInfo = notification.userInfo?[kKeymanKeyboardInfoKey] as? [AnyHashable: Any]
-    let keyboardID = kbInfo?[kKeymanKeyboardIdKey] as? String
-    let languageID = kbInfo?[kKeymanLanguageIdKey] as? String
+    let kbInfo = notification.userInfo?[Key.keyboardInfo] as? [AnyHashable: Any]
+    let keyboardID = kbInfo?[Key.keyboardId] as? String
+    let languageID = kbInfo?[Key.languageId] as? String
     let fontName = Manager.shared.fontNameForKeyboard(withID: keyboardID!, languageID: languageID!)
     let fontSize = font?.pointSize ?? UIFont.systemFontSize
     if let fontName = fontName {

@@ -54,7 +54,7 @@ open class KeymanInputViewController: UIInputViewController, KeymanWebViewDelega
 
   private var keyboardListCount: Int {
     let userData = Manager.shared.activeUserDefaults()
-    let keyboardList = userData.array(forKey: kKeymanUserKeyboardsListKey)
+    let keyboardList = userData.array(forKey: Key.userKeyboardsList)
     return keyboardList?.count ?? 0
   }
 

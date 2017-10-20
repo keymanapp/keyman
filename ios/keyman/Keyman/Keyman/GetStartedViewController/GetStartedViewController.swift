@@ -157,7 +157,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
 
   private func didAddKeyboard() -> Bool {
     let userData = AppDelegate.activeUserDefaults()
-    let userKbs = userData.object(forKey: kKeymanUserKeyboardsListKey) as? [[AnyHashable: String]]
+    let userKbs = userData.object(forKey: Key.userKeyboardsList) as? [[AnyHashable: String]]
     guard let userKeyboards = userKbs else {
       return false
     }
@@ -170,9 +170,9 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     }
 
     let firstKB = userKeyboards[0]
-    let kbID = firstKB[kKeymanKeyboardIdKey] ?? ""
-    let langID = firstKB[kKeymanLanguageIdKey] ?? ""
-    if (kbID == kKeymanDefaultKeyboardID) && (langID == langID) {
+    let kbID = firstKB[Key.keyboardId] ?? ""
+    let langID = firstKB[Key.languageId] ?? ""
+    if (kbID == DefaultKeyboard.keyboardID) && (langID == langID) {
       return false
     } else {
       return true

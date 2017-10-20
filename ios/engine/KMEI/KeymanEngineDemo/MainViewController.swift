@@ -214,11 +214,11 @@ KeymanTextViewDelegate, KeymanTextFieldDelegate {
 
   // MARK: - Responding to Keyman notifications
   @objc func keyboardDownloadStarted(_ notification: Notification) {
-    let kbInfo = notification.userInfo?[kKeymanKeyboardInfoKey] as? [AnyHashable: Any]
-    let kbID = kbInfo?[kKeymanKeyboardIdKey] as? String
-    let langID = kbInfo?[kKeymanLanguageIdKey] as? String
-    let kbName = kbInfo?[kKeymanKeyboardNameKey] as? String
-    let langName = kbInfo?[kKeymanLanguageNameKey] as? String
+    let kbInfo = notification.userInfo?[Key.keyboardInfo] as? [AnyHashable: Any]
+    let kbID = kbInfo?[Key.keyboardId] as? String
+    let langID = kbInfo?[Key.languageId] as? String
+    let kbName = kbInfo?[Key.keyboardName] as? String
+    let langName = kbInfo?[Key.languageName] as? String
     if kbID != nil && langID != nil && kbName != nil && langName != nil {
       showActivityIndicator()
     }
@@ -228,15 +228,15 @@ KeymanTextViewDelegate, KeymanTextFieldDelegate {
     // This is an example of responding to a Keyman event.
     //   - for a list of all events, see KMManager.h
 
-    let kbInfo = notification.userInfo?[kKeymanKeyboardInfoKey] as? [AnyHashable: Any]
-    let kbID = kbInfo?[kKeymanKeyboardIdKey] as? String
-    let langID = kbInfo?[kKeymanLanguageIdKey] as? String
-    let kbName = kbInfo?[kKeymanKeyboardNameKey] as? String
-    let langName = kbInfo?[kKeymanLanguageNameKey] as? String
-    let isRTL = (kbInfo?[kKeymanKeyboardRTLKey] as? String) == "Y"
-    let isCustom = (kbInfo?[kKeymanCustomKeyboardKey] as? String) == "Y"
-    let font = kbInfo?[kKeymanFontKey] as? String
-    let oskFont = kbInfo?[kKeymanOskFontKey] as? String
+    let kbInfo = notification.userInfo?[Key.keyboardInfo] as? [AnyHashable: Any]
+    let kbID = kbInfo?[Key.keyboardId] as? String
+    let langID = kbInfo?[Key.languageId] as? String
+    let kbName = kbInfo?[Key.keyboardName] as? String
+    let langName = kbInfo?[Key.languageName] as? String
+    let isRTL = (kbInfo?[Key.keyboardRTL] as? String) == "Y"
+    let isCustom = (kbInfo?[Key.customKeyboard] as? String) == "Y"
+    let font = kbInfo?[Key.font] as? String
+    let oskFont = kbInfo?[Key.oskFont] as? String
 
     if let kbID = kbID,
        let langID = langID,
@@ -252,11 +252,11 @@ KeymanTextViewDelegate, KeymanTextFieldDelegate {
   }
 
   @objc func keyboardDownloadFailed(_ notification: Notification) {
-    let kbInfo = notification.userInfo?[kKeymanKeyboardInfoKey] as? [AnyHashable: Any]
-    let kbID = kbInfo?[kKeymanKeyboardIdKey] as? String
-    let langID = kbInfo?[kKeymanLanguageIdKey] as? String
-    let kbName = kbInfo?[kKeymanKeyboardNameKey] as? String
-    let langName = kbInfo?[kKeymanLanguageNameKey] as? String
+    let kbInfo = notification.userInfo?[Key.keyboardInfo] as? [AnyHashable: Any]
+    let kbID = kbInfo?[Key.keyboardId] as? String
+    let langID = kbInfo?[Key.languageId] as? String
+    let kbName = kbInfo?[Key.keyboardName] as? String
+    let langName = kbInfo?[Key.languageName] as? String
     if kbID != nil && langID != nil && kbName != nil && langName != nil {
       guard let error = notification.userInfo?[NSUnderlyingErrorKey] as? Error else {
         return

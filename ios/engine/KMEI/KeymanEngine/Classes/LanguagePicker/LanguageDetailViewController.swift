@@ -61,8 +61,8 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     let cell = cell as! KeyboardNameTableViewCell
     cell.indexPath = indexPath
-    cell.textLabel?.text = (keyboards[indexPath.section][kKeymanNameKey] as! String)
-    let keyboardID = keyboards[indexPath.section][kKeymanIdKey] as! String
+    cell.textLabel?.text = (keyboards[indexPath.section][Key.name] as! String)
+    let keyboardID = keyboards[indexPath.section][Key.id] as! String
     if isAdded(languageID: languageID, keyboardID: keyboardID) {
       cell.accessoryType = .checkmark
       cell.isUserInteractionEnabled = false
@@ -81,8 +81,8 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.cellForRow(at: indexPath)?.isSelected = false
-    let kbID = keyboards[indexPath.section][kKeymanIdKey] as! String
-    let kbName = keyboards[indexPath.section][kKeymanNameKey]
+    let kbID = keyboards[indexPath.section][Key.id] as! String
+    let kbName = keyboards[indexPath.section][Key.name]
 
     let state = Manager.shared.stateForKeyboard(withID: kbID)
     if state != .downloading {
@@ -149,7 +149,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
   private func loadUserKeyboards() {
     let userData = Manager.shared.activeUserDefaults()
-    guard let userKbList = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [[String: String]],
+    guard let userKbList = userData.array(forKey: Key.userKeyboardsList) as? [[String: String]],
       !userKbList.isEmpty else {
       userKeyboards = [:]
       return
@@ -157,8 +157,8 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
     userKeyboards = [:]
     for kb in userKbList {
-      let langID = kb[kKeymanLanguageIdKey]
-      let kbID = kb[kKeymanKeyboardIdKey]
+      let langID = kb[Key.languageId]
+      let kbID = kb[Key.keyboardId]
       let dictKey = "\(langID!)_\(kbID!)"
       userKeyboards[dictKey] = kb
     }

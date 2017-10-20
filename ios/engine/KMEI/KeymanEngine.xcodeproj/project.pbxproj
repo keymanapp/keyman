@@ -73,6 +73,7 @@
 		C06D37601F82095200F61AE0 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F27FCB51157FE3CE00FBBA20 /* Keyman.bundle */; };
 		C075EB061F8EFF870041F4BD /* String+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C075EB051F8EFF870041F4BD /* String+Helpers.swift */; };
 		C082CE151F90AFD400860F02 /* Collection+SafeAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = C082CE141F90AFD400860F02 /* Collection+SafeAccess.swift */; };
+		C0959CD41F99C44E00B616BC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0959CD31F99C44E00B616BC /* Constants.swift */; };
 		C0A93A541F8B21240079948B /* Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A93A531F8B21240079948B /* Manager.swift */; };
 		C0CE581E1F877B4D00AE6A7E /* NSNotification.Name+Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CE581D1F877B4D00AE6A7E /* NSNotification.Name+Notifications.swift */; };
 		C0EF3E7B1F95B65300CE9BD4 /* KeymanWebViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EF3E7A1F95B65300CE9BD4 /* KeymanWebViewDelegate.swift */; };
@@ -194,6 +195,7 @@
 		C08C62141F67C8D500268D03 /* KeyboardInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardInfoViewController.swift; sourceTree = "<group>"; };
 		C08C62161F67CFB800268D03 /* KeyboardPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardPickerViewController.swift; sourceTree = "<group>"; };
 		C092D8381F6A70C8005C5485 /* LanguageDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LanguageDetailViewController.swift; sourceTree = "<group>"; };
+		C0959CD31F99C44E00B616BC /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		C0A5FF361F6682EB00BE740C /* PopoverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
 		C0A93A531F8B21240079948B /* Manager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Manager.swift; sourceTree = "<group>"; };
 		C0CE581D1F877B4D00AE6A7E /* NSNotification.Name+Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotification.Name+Notifications.swift"; sourceTree = "<group>"; };
@@ -527,6 +529,7 @@
 				C082CE141F90AFD400860F02 /* Collection+SafeAccess.swift */,
 				C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */,
 				C0EF3E7A1F95B65300CE9BD4 /* KeymanWebViewDelegate.swift */,
+				C0959CD31F99C44E00B616BC /* Constants.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -825,6 +828,7 @@
 				C045148A1F85DF9100D88416 /* KeymanInputViewController.swift in Sources */,
 				C06D37461F81F5C400F61AE0 /* PopoverView.swift in Sources */,
 				C06085B41F9485E40057E5B9 /* UIButton+Helpers.swift in Sources */,
+				C0959CD41F99C44E00B616BC /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -86,10 +86,10 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [AnyHashable: Any] else {
       return
     }
-    let keyboards = json[kKeymanLanguageKey] as? [Any]
+    let keyboards = json[Key.language] as? [Any]
     let kbDict = keyboards?[0] as? [AnyHashable: Any]
     var info = infoArray[1]
-    let copyright = kbDict?[kKeymanKeyboardCopyrightKey] as? String ?? "Unknown"
+    let copyright = kbDict?[Key.keyboardCopyright] as? String ?? "Unknown"
 
     info["subtitle"] = copyright
     infoArray[1] = info
@@ -155,24 +155,24 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
 
     if alertView.tag == 1 {
       let userData = Manager.shared.activeUserDefaults()
-      let userKeyboards = userData.array(forKey: kKeymanUserKeyboardsListKey) as! [[String: String]]
+      let userKeyboards = userData.array(forKey: Key.userKeyboardsList) as! [[String: String]]
       let kbDict = userKeyboards[keyboardIndex]
 
       if Manager.shared.removeKeyboard(at: keyboardIndex) {
         if isCurrentKeyboard {
           // Select default keyboard
 
-          let kbID = userKeyboards[0][kKeymanKeyboardIdKey]!
-          let langID = userKeyboards[0][kKeymanLanguageIdKey]!
-          let kbName = userKeyboards[0][kKeymanKeyboardNameKey]
-          let langName = userKeyboards[0][kKeymanLanguageNameKey]
-          let font = userKeyboards[0][kKeymanFontKey]
-          let oskFont = userKeyboards[0][kKeymanOskFontKey]
+          let kbID = userKeyboards[0][Key.keyboardId]!
+          let langID = userKeyboards[0][Key.languageId]!
+          let kbName = userKeyboards[0][Key.keyboardName]
+          let langName = userKeyboards[0][Key.languageName]
+          let font = userKeyboards[0][Key.font]
+          let oskFont = userKeyboards[0][Key.oskFont]
           Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
                                      languageName: langName, font: font, oskFont: oskFont)
         }
         NotificationCenter.default.post(name: NSNotification.Name.keymanKeyboardRemoved,
-                                        object: self, userInfo: [ kKeymanKeyboardInfoKey: kbDict ]
+                                        object: self, userInfo: [Key.keyboardInfo: kbDict]
         )
         navigationController?.popToRootViewController(animated: true)
       }

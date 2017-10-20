@@ -36,7 +36,7 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
     }
 
     let userData = Manager.shared.activeUserDefaults()
-    let keyboardList = userData.array(forKey: kKeymanUserKeyboardsListKey)
+    let keyboardList = userData.array(forKey: Key.userKeyboardsList)
 
     let titleCloseButton: String
     if let closeButtonTitle = closeButtonTitle {
@@ -51,15 +51,15 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
       _tableList!.append(titleCloseButton)
     } else {
       var keyboard = [
-        kKeymanKeyboardIdKey: kKeymanDefaultKeyboardID,
-        kKeymanLanguageIdKey: kKeymanDefaultLanguageID,
-        kKeymanKeyboardNameKey: kKeymanDefaultKeyboardName,
-        kKeymanLanguageNameKey: kKeymanDefaultLanguageName,
-        kKeymanKeyboardRTLKey: kKeymanDefaultKeyboardRTL,
-        kKeymanFontKey: kKeymanDefaultKeyboardFont
+        Key.keyboardId: DefaultKeyboard.keyboardID,
+        Key.languageId: DefaultKeyboard.languageID,
+        Key.keyboardName: DefaultKeyboard.keyboardName,
+        Key.languageName: DefaultKeyboard.languageName,
+        Key.keyboardRTL: DefaultKeyboard.keyboardRTL,
+        Key.font: DefaultKeyboard.keyboardFont
       ]
-      if let version = Manager.shared.latestKeyboardFileVersion(withID: kKeymanDefaultKeyboardID) {
-        keyboard[kKeymanKeyboardVersionKey] = version
+      if let version = Manager.shared.latestKeyboardFileVersion(withID: DefaultKeyboard.keyboardID) {
+        keyboard[Key.keyboardVersion] = version
       }
       _tableList = [keyboard]
       _tableList!.append(titleCloseButton)
@@ -291,9 +291,9 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
       cell.accessoryType = .disclosureIndicator
     } else {
       let keyboard = tableList[indexPath.row] as? [AnyHashable: Any]
-      let languageID = keyboard?[kKeymanLanguageIdKey] as? String
-      let keyboardID = keyboard?[kKeymanKeyboardIdKey] as? String
-      cell.textLabel?.text = keyboard?[kKeymanKeyboardNameKey] as? String
+      let languageID = keyboard?[Key.languageId] as? String
+      let keyboardID = keyboard?[Key.keyboardId] as? String
+      cell.textLabel?.text = keyboard?[Key.keyboardName] as? String
       cell.tag = indexPath.row
       if (Manager.shared.languageID == languageID) &&
         (Manager.shared.keyboardID == keyboardID) {
@@ -317,7 +317,7 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
     for obj in tableList {
       let text: String?
       if let kb = obj as? [AnyHashable: Any] {
-        text = kb[kKeymanKeyboardNameKey] as? String
+        text = kb[Key.keyboardName] as? String
       } else {
         text = obj as? String
       }
@@ -341,12 +341,12 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
     guard let kb = tableList[index] as? [AnyHashable: Any] else {
       return
     }
-    let langID = kb[kKeymanLanguageIdKey] as? String
-    let kbID = kb[kKeymanKeyboardIdKey] as? String
-    let langName = kb[kKeymanLanguageNameKey] as? String
-    let kbName = kb[kKeymanKeyboardNameKey] as? String
-    let font = kb[kKeymanFontKey] as? String
-    let oskFont = kb[kKeymanOskFontKey] as? String
+    let langID = kb[Key.languageId] as? String
+    let kbID = kb[Key.keyboardId] as? String
+    let langName = kb[Key.languageName] as? String
+    let kbName = kb[Key.keyboardName] as? String
+    let font = kb[Key.font] as? String
+    let oskFont = kb[Key.oskFont] as? String
 
     if Manager.shared.setKeyboard(withID: kbID!, languageID: langID!, keyboardName: kbName,
                                   languageName: langName, font: font, oskFont: oskFont) {
