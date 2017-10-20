@@ -28,7 +28,7 @@ public class SubKeysView: UIView {
     if isSystemKeyboard {
       isPortrait = KeymanInputViewController.isPortrait
     } else {
-      isPortrait = UIInterfaceOrientationIsPortrait(UIApplication.shared.statusBarOrientation)
+      isPortrait = UIDevice.current.orientation.isPortrait
     }
 
     let screenRect = UIScreen.main.bounds

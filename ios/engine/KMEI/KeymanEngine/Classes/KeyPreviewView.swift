@@ -25,7 +25,7 @@ public class KeyPreviewView: UIView {
     if Manager.shared.isSystemKeyboard {
       isPortrait = KeymanInputViewController.isPortrait
     } else {
-      isPortrait = UIApplication.shared.statusBarOrientation.isPortrait
+      isPortrait = UIDevice.current.orientation.isPortrait
     }
 
     keyFrame = frame

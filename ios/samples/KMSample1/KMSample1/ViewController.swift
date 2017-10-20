@@ -14,6 +14,7 @@ class ViewController: UIViewController, KeymanTextViewDelegate {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    Manager.shared.openURL = UIApplication.shared.openURL
     Manager.shared.isDebugPrintingOn = true
     Manager.shared.isKeymanHelpOn = false
     Manager.shared.preloadLanguageFile(atPath: Bundle.main.path(forResource: "tamil99m-1.1", ofType: "js")!,

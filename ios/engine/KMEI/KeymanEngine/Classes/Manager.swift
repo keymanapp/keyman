@@ -199,6 +199,13 @@ UIGestureRecognizerDelegate {
     return Bundle(path: Bundle(for: Manager.self).path(forResource: "Keyman", ofType: "bundle")!)!
   }
 
+  /// In keyboard extensions (system keyboard), `UIApplication.openURL(_:)` is unavailable. The API is not called in
+  /// the system keyboard since `KeyboardInfoViewController` is never used. `openURL(:_)` is only used in applications,
+  /// where it is safe. However, the entire Keyman Engine framework must be compiled with extension-safe APIs.
+  ///
+  /// Set this to `UIApplication.shared.openURL` in your application.
+  public var openURL: ((URL) -> Bool)?
+
   var keyboardID: String?
   var languageID: String?
   weak var webDelegate: KeymanWebViewDelegate?
@@ -2547,7 +2554,7 @@ UIGestureRecognizerDelegate {
     if isSystemKeyboard {
       isPortrait = KeymanInputViewController.isPortrait
     } else {
-      isPortrait = UIApplication.shared.statusBarOrientation.isPortrait
+      isPortrait = UIDevice.current.orientation.isPortrait
     }
 
     let adjY: CGFloat

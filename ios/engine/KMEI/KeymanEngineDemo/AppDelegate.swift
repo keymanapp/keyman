@@ -18,6 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     Manager.applicationGroupIdentifier = "group.KMEI"
     Manager.shared.isDebugPrintingOn = true
     Manager.shared.canRemoveDefaultKeyboard = true
+    Manager.shared.openURL = UIApplication.shared.openURL
+
     window = UIWindow(frame: UIScreen.main.bounds)
 
     let mainViewController = MainViewController(nibName: nil, bundle: nil)

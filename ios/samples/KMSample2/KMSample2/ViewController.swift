@@ -18,6 +18,8 @@ class ViewController: UIViewController, KeymanTextViewDelegate {
     // Replace with your application group id
     Manager.applicationGroupIdentifier = "group.KMSample"
 
+    Manager.shared.openURL = UIApplication.shared.openURL
+
     // Disable before release
     Manager.shared.isDebugPrintingOn = true
 

@@ -24,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     #if DEBUG
       Manager.shared.isDebugPrintingOn = true
     #endif
+    Manager.shared.openURL = UIApplication.shared.openURL
 
     window = UIWindow(frame: UIScreen.main.bounds)
 
