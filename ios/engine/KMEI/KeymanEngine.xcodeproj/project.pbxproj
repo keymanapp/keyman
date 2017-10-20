@@ -403,6 +403,17 @@
 			name = KeymanInputViewController;
 			sourceTree = "<group>";
 		};
+		C055E6E81F99EA320035C2DD /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				C0CE581D1F877B4D00AE6A7E /* NSNotification.Name+Notifications.swift */,
+				C075EB051F8EFF870041F4BD /* String+Helpers.swift */,
+				C082CE141F90AFD400860F02 /* Collection+SafeAccess.swift */,
+				C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
 		C06D372C1F81F4E100F61AE0 /* KeymanEngine */ = {
 			isa = PBXGroup;
 			children = (
@@ -513,6 +524,7 @@
 		F273AB9615641D9300A47CEE /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				C055E6E81F99EA320035C2DD /* Extension */,
 				C0A93A531F8B21240079948B /* Manager.swift */,
 				CE25CCBB1F1DA72A005AA2BC /* HTTPRequest */,
 				987F00041AB8FCB700998116 /* KeyboardMenuView */,
@@ -524,10 +536,6 @@
 				98A880EF177BF82600601A9E /* PopoverView */,
 				F273AB9E156440CD00A47CEE /* UITextField */,
 				F273AB9D156440BA00A47CEE /* UITextView */,
-				C0CE581D1F877B4D00AE6A7E /* NSNotification.Name+Notifications.swift */,
-				C075EB051F8EFF870041F4BD /* String+Helpers.swift */,
-				C082CE141F90AFD400860F02 /* Collection+SafeAccess.swift */,
-				C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */,
 				C0EF3E7A1F95B65300CE9BD4 /* KeymanWebViewDelegate.swift */,
 				C0959CD31F99C44E00B616BC /* Constants.swift */,
 			);
