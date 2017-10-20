@@ -32,8 +32,6 @@ public struct Key {
   public static let fontFiles = "files"
   // Font filename is deprecated
   public static let fontFilename = "filename"
-  public static let fontName = "fontname"
-  public static let fontRegistered = "fontregistered"
   public static let keyboardFilename = "filename"
   public static let keyboardModified = "lastModified"
   public static let keyboardRTL = "rtl"
