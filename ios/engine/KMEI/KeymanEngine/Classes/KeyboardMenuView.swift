@@ -29,7 +29,7 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
   }
 
   // TODO: Only contain the keyboards and not the close button text
-  private var _tableList: [Any]? = []
+  private var _tableList: [Any]?
   var tableList: [Any] {
     if let tableList = _tableList {
       return tableList
@@ -67,7 +67,7 @@ public class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSourc
     return _tableList!
   }
 
-  @objc public init(keyFrame frame: CGRect, inputViewController: KeymanInputViewController, closeButtonTitle: String) {
+  @objc public init(keyFrame frame: CGRect, inputViewController: KeymanInputViewController, closeButtonTitle: String?) {
     let isSystemKeyboard = Manager.shared.isSystemKeyboard
     let isPortrait: Bool
     if isSystemKeyboard {

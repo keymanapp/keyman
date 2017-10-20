@@ -22,7 +22,7 @@ public enum MenuBehaviour: Int {
 }
 
 open class KeymanInputViewController: UIInputViewController, KeymanWebViewDelegate {
-  var menuCloseButtonTitle = ""
+  var menuCloseButtonTitle: String?
   var isInputClickSoundEnabled = true
   var globeKeyTapBehaviour = GlobeKeyTapBehaviour(rawValue: 0)!
   var menuBehaviour = MenuBehaviour(rawValue: 0)!
@@ -242,9 +242,7 @@ open class KeymanInputViewController: UIInputViewController, KeymanWebViewDelega
       switch menuBehaviour {
       case .showAlways,
            .showIfMultipleKeyboards where keyboardListCount > 1:
-        break
-        //KMManager.sharedInstance().showKeyboardMenu(self,
-          //                                          closeButtonTitle: menuCloseButtonTitle)
+        Manager.shared.showKeyboardMenu(self, closeButtonTitle: menuCloseButtonTitle)
       case .showIfMultipleKeyboards, // keyboardListCount() <= 1
            .showNever:
         break

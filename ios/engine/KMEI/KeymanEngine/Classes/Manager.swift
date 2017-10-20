@@ -3059,7 +3059,7 @@ UIGestureRecognizerDelegate {
     menuKeyFrame = frame
   }
 
-  func showKeyboardMenu(_ ic: KeymanInputViewController, closeButtonTitle: String) {
+  func showKeyboardMenu(_ ic: KeymanInputViewController, closeButtonTitle: String?) {
     let parentView = ic.view ?? inputView
     inputView.evaluateJavaScript("langMenuPos();") { result, _ in
       let keyFrame = result as! String
