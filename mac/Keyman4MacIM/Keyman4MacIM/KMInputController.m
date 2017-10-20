@@ -45,6 +45,7 @@ BOOL _clientSelectionCanChangeUnexpectedly = NO;
 // in Firefox, we're already in legacy mode and we do get mouse clicks, so we're already doing the best we can.
 NSUInteger _failuresToRetrieveExpectedContext = NSUIntegerMax;
 BOOL _forceRemoveSelectionInGoogleDocs = NO;
+BOOL _cannnotTrustSelectionLength = NO;
 NSRange _previousSelRange;
 
 - (KMInputMethodAppDelegate *)AppDelegate {
@@ -147,7 +148,10 @@ NSRange _previousSelRange;
                 }
                 _failuresToRetrieveExpectedContext = NSUIntegerMax;
                 _legacyMode = YES;
-                _clientSelectionCanChangeUnexpectedly = NO;
+                if (_clientSelectionCanChangeUnexpectedly) {
+                    _cannnotTrustSelectionLength = YES;
+                    _clientSelectionCanChangeUnexpectedly = NO;
+                }
             }
         }
     }
@@ -171,12 +175,14 @@ NSRange _previousSelRange;
         if (currentSelRange.location == NSNotFound) {
             _clientSelectionCanChangeUnexpectedly = NO;
         }
-        else if ((_previousSelRange.location != currentSelRange.location || _previousSelRange.length != currentSelRange.length)) {
+        else if ((_previousSelRange.location != currentSelRange.location || _cannnotTrustSelectionLength || _previousSelRange.length != currentSelRange.length)) {
             if ([self.AppDelegate debugMode]) {
                 NSLog(@"Client selection may have changed since context was set. Resetting context...");
                 NSLog(@"  _previousSelRange.location = %lu", _previousSelRange.location);
                 NSLog(@"  _previousSelRange.length = %lu", _previousSelRange.length);
                 NSLog(@"  currentSelRange.location = %lu", currentSelRange.location);
+                if (_cannnotTrustSelectionLength)
+                    NSLog(@"The following cannot be trusted and will be ignored:");
                 NSLog(@"  currentSelRange.length = %lu", currentSelRange.length);
             }
             [self updateContextBuffer:sender];
@@ -336,8 +342,11 @@ NSRange _previousSelRange;
                 }
                 if (_legacyMode && pos >= n) {
                     // n is now the number of delete-backs we need to post (plus one more if there is selected text)
-                    if ([self.AppDelegate debugMode])
+                    if ([self.AppDelegate debugMode]) {
                         NSLog(@"Legacy mode: calling deleteBack");
+                        if (_cannnotTrustSelectionLength)
+                            NSLog(@"Cannot trust cliebt to report accurate selection length - assuming no selection.");
+                    }
                     
                     // Note: If pos is "not found", most likely the client can't accurately report the location. This might be
                     // dangerous, but for now let's go ahead and attempt to delete the characters we think should be there.
@@ -348,7 +357,8 @@ NSRange _previousSelRange;
                                                   userInfo:nil];
                         @throw exception;
                     }
-                    if (selectedRange.length > 0)
+                    
+                    if (!_cannnotTrustSelectionLength && selectedRange.length > 0)
                         n++; // First delete-back will delete the existing selection.
                     [self deleteBack:n for:event];
                     deleteBackPosted = YES;
@@ -513,11 +523,13 @@ NSRange _previousSelRange;
             NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}");
         NSLog(@"kme.contextBuffer = \"%@\"", self.kme.contextBuffer.length?[self.kme.contextBuffer codeString]:@"{empty}");
         NSRange range = [sender markedRange];
-        NSLog(@"sender.markedRange.location = \"%lu\"", range.location);
-        NSLog(@"sender.markedRange.length = \"%lu\"", range.length);
+        NSLog(@"sender.markedRange.location = %lu", range.location);
+        NSLog(@"sender.markedRange.length = %lu", range.length);
         range = [sender selectedRange];
-        NSLog(@"sender.selectedRange.location = \"%lu\"", range.location);
-        NSLog(@"sender.selectedRange.length = \"%lu\"", range.length);
+        NSLog(@"sender.selectedRange.location = %lu", range.location);
+        if (_cannnotTrustSelectionLength)
+            NSLog(@"The following cannot be trusted and will be ignored:");
+        NSLog(@"sender.selectedRange.length = %lu", range.length);
         NSLog(@"***");
     }
     
@@ -537,6 +549,7 @@ NSRange _previousSelRange;
         NSLog(@"New active app %@", clientAppId);
     _clientSelectionCanChangeUnexpectedly = NO;
     _forceRemoveSelectionInGoogleDocs = NO;
+    _cannnotTrustSelectionLength = NO;
     // REVIEW: Should this list be in a info.plist file
     // Use a table of known apps to decide whether or not to operate in legacy mode
     // and whether or not to follow calls to setMarkedText with calls to insertText.
@@ -672,7 +685,6 @@ NSRange _previousSelRange;
     NSUInteger len = [sender length];
     if ([self.AppDelegate debugMode]) {
         NSLog(@"selRange.location: %lu", (unsigned long)selRange.location);
-        NSLog(@"selRange.length: %lu", (unsigned long)selRange.length);
         NSLog(@"sender length: %lu", len);
     }
     
@@ -791,13 +803,11 @@ NSRange _previousSelRange;
     {
         if ([self.AppDelegate debugMode])
             NSLog(@"Posting a delete (down/up) at kCGHIDEventTap.");
-        //delete-back down
-        ev = CGEventCreateKeyboardEvent (_sourceFromOriginalEvent, kVK_Delete, true);
+        
+        ev = CGEventCreateKeyboardEvent (_sourceFromOriginalEvent, kVK_Delete, true);//delete-back down
         CGEventPost(kCGHIDEventTap, ev);
         CFRelease(ev);
-        
-        //delete-back up
-        ev = CGEventCreateKeyboardEvent (_sourceFromOriginalEvent, kVK_Delete, false);
+        ev = CGEventCreateKeyboardEvent (_sourceFromOriginalEvent, kVK_Delete, false); //delete-back up
         CGEventPost(kCGHIDEventTap, ev);
         CFRelease(ev);
     }
