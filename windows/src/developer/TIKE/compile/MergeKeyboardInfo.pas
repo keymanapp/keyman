@@ -371,7 +371,7 @@ begin
   else
     Exit;
 
-  json.AddPair('id', FName);
+  json.AddPair('name', FName);
 end;
 
 //
