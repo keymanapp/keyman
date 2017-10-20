@@ -651,26 +651,26 @@ end;
 //
 procedure TMergeKeyboardInfo.AddPlatformSupport;
 var
-  v: TJSONArray;
+  v: TJSONObject;
 begin
   if json.GetValue('platformSupport') <> nil then Exit;
 
-  v := TJSONArray.Create;
+  v := TJSONObject.Create;
 
   if Assigned(FKMPInfFile) then
   begin
-    v.Add('windows');
-    v.Add('macos');
+    v.AddPair('windows', 'full');
+    v.AddPair('macos', 'full');
   end
   else if Length(FKMXFiles) > 0 then
-    v.Add('windows');
+    v.AddPair('windows', 'full');
 
   if FJsFile <> '' then
   begin
-    v.Add('desktopWeb');
-    v.Add('mobileWeb');
-    v.Add('android');
-    v.Add('ios');
+    v.AddPair('desktopWeb', 'full');
+    v.AddPair('mobileWeb', 'full');
+    v.AddPair('android', 'full');
+    v.AddPair('ios', 'full');
   end;
 
   json.AddPair('platformSupport', v);
