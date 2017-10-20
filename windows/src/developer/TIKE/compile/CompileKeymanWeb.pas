@@ -2272,10 +2272,9 @@ begin
   begin
     ReportError(0, CWARN_DontMixChiralAndNonChiralModifiers, 'This keyboard contains Ctrl,Alt and LCtrl,LAlt,RCtrl,RAlt sets of modifiers. Use only one or the other set for web target.');
   end;
-  //TODO: Should FBitMask include the ISVIRTUALKEY bit?
 
   if FDebug
-    then Result := FormatModifierAsBitflags(FBitMask)
+    then Result := FormatModifierAsBitflags(FBitMask and KMX_MASK_KEYS) // Exclude KMX_ISVIRTUALKEY, KMX_VIRTUALCHARKEY
     else Result := '0x'+IntToHex(FBitMask, 4);
 end;
 

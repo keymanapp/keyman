@@ -3683,8 +3683,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         return 0x0000;
       }
 
-      if(k['KV'] && k['KV']['KMBM']) {
-        return k['KV']['KMBM'];
+      if(k['KMBM']) {
+        return k['KMBM'];
       }
 
       return osk.modifierBitmasks['NON_CHIRAL'];
