@@ -4,8 +4,6 @@
 
 package com.tavultesoft.kmea;
 
-import android.util.Log;
-
 import android.content.Context;
 import android.view.KeyEvent;
 
@@ -114,18 +112,46 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
 
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
+
     if (keyCode > 84 || keyCode < 0) {
       // The key is outside the range of keys we understand
       return false;
     }
 
-    int androidModifiers = event.getModifiers(), keymanModifiers = 0;
-    if ((androidModifiers & KeyEvent.META_SHIFT_ON) != 0) keymanModifiers |= 0x10;
-    if ((androidModifiers & KeyEvent.META_CTRL_ON) != 0) keymanModifiers |= 0x20;
-    if ((androidModifiers & KeyEvent.META_ALT_ON) != 0) keymanModifiers |= 0x40;
+    boolean isChiral = KMManager.getKMKeyboard(this.keyboardType).getChirality();
 
-    if (keyCode == KeyEvent.KEYCODE_TAB && keymanModifiers == 0x20) {
-      // Trigger the Keyman language menu
+    // States of modifier keys
+    // KeyEvent.getModifiers() specifically masks out lock keys (KeyEvent.META_CAPS_LOCK_ON,
+    // KeyEvent.META_SCROLL_LOCK_ON, KeyEvent.META_NUM_LOCK_ON), so get their states separately
+    int androidModifiers = event.getModifiers(), keymanModifiers = 0;
+    boolean capsOn = event.isCapsLockOn();
+    boolean numOn = event.isNumLockOn();
+    boolean scrollOn = event.isScrollLockOn();
+
+    // By design, SHIFT is non-chiral
+    if ((androidModifiers & KeyEvent.META_SHIFT_ON) != 0) {
+      keymanModifiers |= KMModifierCodes.get("SHIFT");
+    }
+    if ((androidModifiers & KeyEvent.META_CTRL_LEFT_ON) != 0) {
+      keymanModifiers |= isChiral ? KMModifierCodes.get("LCTRL") : KMModifierCodes.get("CTRL");
+    }
+    if ((androidModifiers & KeyEvent.META_CTRL_RIGHT_ON) != 0) {
+      keymanModifiers |= isChiral ? KMModifierCodes.get("RCTRL") : KMModifierCodes.get("CTRL");
+    }
+    if ((androidModifiers & KeyEvent.META_ALT_LEFT_ON) != 0) {
+      keymanModifiers |= isChiral ? KMModifierCodes.get("LALT") : KMModifierCodes.get("ALT");
+    }
+    if ((androidModifiers & KeyEvent.META_ALT_RIGHT_ON) != 0) {
+      keymanModifiers |= isChiral ? KMModifierCodes.get("RALT") : KMModifierCodes.get("ALT");
+    }
+
+    int Lstates = 0;
+    Lstates |= capsOn ? KMModifierCodes.get("CAPS") : KMModifierCodes.get("NO_CAPS");
+    Lstates |= numOn ? KMModifierCodes.get("NUM_LOCK") : KMModifierCodes.get("NO_NUM_LOCK");
+    Lstates |= scrollOn ? KMModifierCodes.get("SCROLL_LOCK") : KMModifierCodes.get("NO_SCROLL_LOCK");
+
+    // CTRL-Tab triggers the Keyman language menu
+    if (keyCode == KeyEvent.KEYCODE_TAB && ((androidModifiers & KeyEvent.META_CTRL_ON) != 0)) {
       KMManager.showKeyboardPicker(context, keyboardType);
       return false;
     }
@@ -136,7 +162,7 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
     }
 
     // Send keystroke to KeymanWeb for processing: will return true to swallow the keystroke
-    return KMManager.executeHardwareKeystroke(keyCodeMap[keyCode], keymanModifiers, keyboardType);
+    return KMManager.executeHardwareKeystroke(keyCodeMap[keyCode], keymanModifiers, keyboardType, Lstates);
   }
 
   @Override

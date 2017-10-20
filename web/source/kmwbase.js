@@ -64,8 +64,10 @@ if(!tavultesoft['keymanweb']) {
       mustReloadKeyboard: false,// Force keyboard refreshing even if already loaded
       globalKeyboard: null,     // Indicates the currently-active keyboard for controls without independent keyboard settings.
       globalLanguageCode: null, // Indicates the language code corresponding to `globalKeyboard`.
-      isEmbedded: false         // Indicates if the KeymanWeb instance is embedded within a mobile app.
+      isEmbedded: false,        // Indicates if the KeymanWeb instance is embedded within a mobile app.
                                 // Blocks full page initialization when set to `true`.
+      refocusTimer: 0,          // Tracks a timeout event that aids of OSK modifier/state key tracking when the document loses focus.
+      modStateFlags: 0          // Tracks the present state of the physical keyboard's active modifier flags.  Needed for AltGr simulation.
     };
 
     keymanweb['initialized'] = 0;
@@ -152,6 +154,7 @@ if(!tavultesoft['keymanweb']) {
      * Scope        Public
      * @param       {Object}    nl a node list, as returned from getElementsBy_____ methods.
      * Description  Transforms a node list into an array.   * 
+     * @return      {Array<Element>}
      */
     util.arrayFromNodeList = function(nl) {
       var res = [];

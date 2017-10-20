@@ -27,7 +27,11 @@
       kmw['getOskHeight'] = getOskHeight;
       kmw['getOskWidth'] = getOskWidth;
       kmw['setActiveElement']('ta');
+
       ta.readOnly = false;
+
+      kmw.addEventListener('keyboardloaded', setIsChiral);
+      kmw.addEventListener('keyboardchange', setIsChiral);
     }
 
     function setOskHeight(h) {
@@ -54,6 +58,17 @@
       }
       window.console.log('Keyboard width = '+oskWidth);
       return oskWidth;
+    }
+
+    // Query KMW if a given keyboard uses chiral modifiers.
+    function setIsChiral(keyboardProperties) {
+      var name = typeof(keyboardProperties.internalName) == "undefined" ? keyboardProperties.keyboardName : keyboardProperties.internalName;
+      var isChiral = tavultesoft.keymanweb.isChiral(name);
+      window.console.log('For keyboard "' + name + '"');
+      window.console.log('setIsChiral = ' + isChiral);
+
+      window.jsInterface.setIsChiral(isChiral);
+      return true;
     }
 
     function setKeymanLanguage(keyboardName, internalName, languageName, langId, version, font, oskFont) {
@@ -168,15 +183,17 @@
 
     function executePopupKey(keyID, keyText) {
       var kmw=window['tavultesoft']['keymanweb'];
-      window.console.log('executePopupKey('+keyID+', ' + keyText + ');');
-      kmw['executePopupKey'](keyID, keyText);
+
+      // KMW only needs keyID to process the popup key. keyText merely logged to console
+      window.console.log('executePopupKey('+keyID+'); keyText: ' + keyText);
+      kmw['executePopupKey'](keyID);
     }
 
-    function executeHardwareKeystroke(code, shift) {
+    function executeHardwareKeystroke(code, shift, lstates) {
       var kmw=window['tavultesoft']['keymanweb'];
-      window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ');');
+      window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ', ' + lstates + ');');
       try {
-        var r = kmw['executeHardwareKeystroke'](code, shift);
+        var r = kmw['executeHardwareKeystroke'](code, shift, lstates);
         window.console.log('executeHardwareKeystroke completed with '+r);
       } catch(e) {
         window.console.log('oops: '+e);
@@ -195,10 +212,10 @@
         while (theHex.length < 4) {
           theHex = '0' + theHex;
         }
-        theHex = '0x' + theHex;
-        hexString += theHex + ',';
+        theHex = '\\u' + theHex;
+        hexString += theHex;
       }
-      return hexString.substr(0, hexString.length-1);
+      return hexString;
     }
 
   </script>

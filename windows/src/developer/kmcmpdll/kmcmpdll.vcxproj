@@ -177,6 +177,7 @@
     <ClInclude Include="NamedCodeConstants.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="..\..\global\inc\unicode.h" />
+    <ClInclude Include="versioning.h" />
     <ClInclude Include="virtualcharkeys.h" />
     <ClInclude Include="..\..\global\inc\Vkeys.h" />
   </ItemGroup>
@@ -224,6 +225,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="versioning.cpp" />
     <ClCompile Include="virtualcharkeys.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>

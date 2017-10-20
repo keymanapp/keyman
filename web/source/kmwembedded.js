@@ -400,7 +400,7 @@
       keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)      
       
       var t=keyName.split('-'),layer=(t.length>1?t[0]:osk.layerId);
-      keyName=t[t.length-1];       
+      keyName=t[t.length-1];
       if(layer == 'undefined') layer=osk.layerId;
               
       var Lelem=keymanweb._LastActiveElement,Lkc,keyShiftState=osk.getModifierState(layer);
@@ -411,32 +411,39 @@
       if(osk.selectLayer(keyName,null)) return true;      
       
       // Check the virtual key 
-      Lkc = {Ltarg:Lelem,Lmodifiers:0,Lcode:osk.keyCodes[keyName],LisVirtualKey:true}; 
+      Lkc = {Ltarg:Lelem,Lmodifiers:0,Lstates:0,Lcode:osk.keyCodes[keyName],LisVirtualKey:true};
 
-      if(typeof Lkc.Lcode == 'undefined')
-        Lkc.Lcode = osk.getVKDictionaryCode(keyName);
+      // Set the flags for the state keys.
+      Lkc.Lstates |= osk._stateKeys['K_CAPS']    ? osk.modifierCodes['CAPS'] : osk.modifierCodes['NO_CAPS'];
+      Lkc.Lstates |= osk._stateKeys['K_NUMLOCK'] ? osk.modifierCodes['NUM_LOCK'] : osk.modifierCodes['NO_NUM_LOCK'];
+      Lkc.Lstates |= osk._stateKeys['K_SCROLL']  ? osk.modifierCodes['SCROLL_LOCK'] : osk.modifierCodes['NO_SCROLL_LOCK'];
 
-      if(!Lkc.Lcode)
-      {
-        // Key code will be Unicode value for U_xxxx keys
-        if(keyName.substr(0,2) == 'U_')
-        {                 
-          var tUnicode=parseInt(keyName.substr(2),16);
-          if(!isNaN(tUnicode)) Lkc.Lcode=tUnicode;  
-        }
+      // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
+      if(keyName.substr(0,2) == 'U_') Lkc.isVirtualKey=false;
+
+      // Get code for non-physical keys
+      if(typeof Lkc.Lcode == 'undefined') {
+          Lkc.Lcode = osk.getVKDictionaryCode(keyName);
+          if (!Lkc.Lcode) {
+              // Special case for U_xxxx keys
+              Lkc.Lcode = 1;
+          }
       }
-     
+
       //if(!Lkc.Lcode) return false;  // Value is now zero if not known (Build 347)
       //Build 353: revert to prior test to try to fix lack of KMEI output, May 1, 2014      
-      if(isNaN(Lkc.Lcode) || !Lkc.Lcode) return false;  
-            
-      Lkc.vkCode=Lkc.Lcode;
+      if(isNaN(Lkc.Lcode) || !Lkc.Lcode) return false;
 
-      // Ensure that KIK returns true for U_xxxx keys to avoid firing nomatch
-      if(keyName.substr(0,2) == 'U_') Lkc.isVirtualKey=false;
-      
       // Define modifiers value for sending to keyboard mapping function
-      Lkc.Lmodifiers = keyShiftState*0x10; 
+      Lkc.Lmodifiers = keyShiftState;
+
+      // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
+      if((Lkc.Lmodifiers & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM'] && osk.emulatesAltGr()) {
+          Lkc.Lmodifiers &= ~osk.modifierBitmasks['ALT_GR_SIM'];
+          Lkc.Lmodifiers |= osk.modifierCodes['RALT'];
+      }
+
+      Lkc.vkCode=Lkc.Lcode;
 
       // Pass this key code and state to the keyboard program
       if(!keymanweb._ActiveKeyboard ||  Lkc.Lcode == 0) return false;
@@ -444,9 +451,7 @@
       // If key is mapped, return true
       if(keymanweb._ActiveKeyboard['gs'](Lelem, Lkc)) return true;
 
-      // Use default mapping only if necessary (last resort) 
-      var ch = osk.defaultKeyOutput(keyName,Lkc.Lcode,keyShiftState);
-      if(ch) keymanweb.KO(0, Lelem, ch);
+      keymanweb.processDefaultMapping(Lkc.Lcode, keyShiftState, Lelem, keyName);
 
       return true;
   };
@@ -455,9 +460,11 @@
    *  API endpoint for hardware keystroke events from Android external keyboards
    *  
    *  @param  {number}  code   key identifier
-   *  @param  {number}  shift  shift state (0x10=shift 0x20=ctrl 0x40=alt)
+   *  @param  {number}  shift  shift state (0x01=left ctrl 0x02=right ctrl 0x04=left alt 0x08=right alt
+   *                                        0x10=shift 0x20=ctrl 0x40=alt)
+   *  @param  {number}  lstates lock state (0x0200=no caps 0x0400=num 0x0800=no num 0x1000=scroll 0x2000=no scroll locks)
    **/            
-  keymanweb['executeHardwareKeystroke'] = function(code, shift) {              
+  keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0) {
     if(!keymanweb._ActiveKeyboard || code == 0) {
       return false;
     }
@@ -466,7 +473,7 @@
     device.touchable = false;
     device.formFactor = 'desktop'; 
     try {
-      result = keymanweb.executeHardwareKeystrokeInternal(code, shift);
+      result = keymanweb.executeHardwareKeystrokeInternal(code, shift, lstates);
     } catch (err) {
       console.error(err.message, err);
     }
@@ -479,9 +486,11 @@
    *  Process the hardware key to the keyboard mapping
    *  
    *  @param  {number}  code   key identifier
-   *  @param  {number}  shift  shift state (0x10=shift 0x20=ctrl 0x40=alt)
+   *  @param  {number}  shift  shift state (0x01=left ctrl 0x02=right ctrl 0x04=left alt 0x08=right alt
+   *                                        0x10=shift 0x20=ctrl 0x40=alt)
+   *  @param  {number}  lstates lock state (0x0200=no caps 0x0400=num 0x0800=no num 0x1000=scroll 0x2000=no scroll locks)
    **/            
-  keymanweb.executeHardwareKeystrokeInternal = function(code, shift) {
+  keymanweb.executeHardwareKeystrokeInternal = function(code, shift, lstates) {
     
       // Clear any pending (non-popup) key
       osk.keyPending = null;
@@ -498,6 +507,7 @@
         Lmodifiers: shift,
         vkCode: code,
         Lcode: code,
+        Lstates: lstates,
         LisVirtualKey: true,
         LisVirtualKeyCode: false
       }; 
@@ -507,23 +517,34 @@
       if(keymanweb._ActiveKeyboard['gs'](Lelem, Lkc)) {
         return true;
       }
-      
-      // Use default mapping only if necessary (last resort)
-      if (Lkc.Lcode == osk.keyCodes.K_SPACE) {
-        keymanweb.KO(0, Lelem, ' ');
-        return true;
-      }
-      else if (Lkc.Lcode == osk.keyCodes.K_ENTER) {
-        keymanweb.KO(0, Lelem, '\n');
-        return true;
-      }
-      var ch = osk.defaultKeyOutput('', Lkc.Lcode, shift / 0x10);
-      if(ch) {
-        keymanweb.KO(0, Lelem, ch);                     
-        return true;
-      }
 
-      return false;
+      return keymanweb.processDefaultMapping(Lkc.Lcode, shift, Lelem, '');
   };
 
+  /**
+   * Process default mapping only if necessary (last resort)
+   *  @param  {number}  code   key identifier
+   *  @param  {number}  shift  shift state (0x01=left ctrl 0x02=right ctrl 0x04=left alt 0x08=right alt
+   *                                        0x10=shift 0x20=ctrl 0x40=alt)
+   *  @param  {Object}  Lelem   element to output to
+   *  @param  {string}  keyName
+   *  @return {boolean}         true if key code successfully processed
+   */
+  keymanweb.processDefaultMapping = function(code, shift, Lelem, keyName) {
+    if (code == osk.keyCodes.K_SPACE) {
+        keymanweb.KO(0, Lelem, ' ');
+        return true;
+    }
+    else if (code == osk.keyCodes.K_ENTER) {
+        keymanweb.KO(0, Lelem, '\n');
+        return true;
+    }
+    var ch = osk.defaultKeyOutput(keyName, code, shift);
+    if(ch) {
+        keymanweb.KO(0, Lelem, ch);
+        return true;
+    }
+
+    return false;
+  }
 })();

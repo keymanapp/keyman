@@ -305,6 +305,8 @@ uses
   System.StrUtils,
   System.Variants,
 
+  compile,
+
   Project,
   ProjectFileType,
   ProjectLoader,
@@ -1040,12 +1042,13 @@ var
 begin
   FLogState := plsInfo; errtype := 'info';   // I4706
 
-  case msgcode and $F000 of
-    $1000: begin errtype := 'fatal';   FLogState := plsFatal; end;
-    $2000: begin errtype := 'warning'; FLogState := plsWarning; end;
-    $4000: begin errtype := 'error';   FLogState := plsError; end;
-    $8000: begin errtype := 'fatal';   FLogState := plsFatal; end;
-  end;
+  if msgcode <> CWARN_Info then
+    case msgcode and $F000 of
+      $1000: begin errtype := 'fatal';   FLogState := plsFatal; end;
+      $2000: begin errtype := 'warning'; FLogState := plsWarning; end;
+      $4000: begin errtype := 'error';   FLogState := plsError; end;
+      $8000: begin errtype := 'fatal';   FLogState := plsFatal; end;
+    end;
 
   if FLogState = plsWarning then   // I4706
     TProject.CompilerMessageFile.FHasWarning := True;

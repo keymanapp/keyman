@@ -84,7 +84,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var Li,Lstub;
 
       // Check if the active stub refers to this keyboard, else find applicable stub
-      var Ps=keymanweb._ActiveStub;     
+      var Ps=keymanweb._ActiveStub, savedActiveStub = keymanweb._ActiveStub;     
       if(!Ps || !('KI' in Ps) || (Ps['KI'] != Pk['KI']))
       {             
         // Find the first stub for this keyboard
@@ -113,6 +113,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       // Execute any external (UI) code needed after loading keyboard
       keymanweb.doKeyboardLoaded(Pk['KI']);
+
+      // Restore the originally-active stub to its prior state.  No need to change it permanently.
+      keymanweb._ActiveStub = savedActiveStub;
     }
 
     /**
@@ -290,13 +293,15 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       var retVal = 0; // I3318
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
+      var bitmask = keymanweb.getKeyboardModifierBitmask();
+
       if(e.vkCode > 255) keyCode = e.vkCode;           // added to support extended (touch-hold) keys for mnemonic layouts
         
       if(e.LisVirtualKey || keyCode > 255)
       {
         if((Lruleshift & 0x4000) == 0x4000 || (keyCode > 255))  // added keyCode test to support extended keys
         {
-          retVal = ((Lrulekey == keyCode)  &&  ((Lruleshift&0x7F) == e.Lmodifiers)); //I3318, I3555
+          retVal = ((Lrulekey == keyCode)  &&  ((Lruleshift & bitmask) == e.Lmodifiers)); //I3318, I3555
         }
       }
       else if((Lruleshift & 0x4000) == 0)
@@ -306,7 +311,18 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(!retVal) this._DeadkeyResetMatched();  // I3318
       return retVal != 0;                            // I3318
     };
-    
+
+    /**
+     * Function     KSM
+     * Scope        Public
+     * @param       {Object}      e       keystroke event
+     * @param       {number}      Lstate  
+     * Description  Test keystroke against state key rules
+     */
+    keymanweb['KSM'] = keymanweb.KSM = function(e, Lstate) { // Keyboard_StateMatch
+      return ((Lstate & e.Lstates) == Lstate);
+    }
+
     /**
      * Function     KKI      
      * Scope        Public

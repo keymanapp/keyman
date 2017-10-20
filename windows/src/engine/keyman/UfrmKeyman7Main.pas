@@ -280,7 +280,6 @@ type
 //TOUCH    procedure ProcessContextChange(Atom: DWORD);
 
     procedure PostGlobalKeyboardChange(FActiveKeyboard: TLangSwitchKeyboard);   // I4271
-    procedure ActivateKeyboard(Keyboard: TLangSwitchKeyboard);   // I4326
     function IsControllerWindow(AHandle: THandle): Boolean;   // I4731
     function GetControllerWindows: THandleArray;   // I4731
     procedure UpdateFocusInfo;   // I4731
@@ -299,6 +298,7 @@ type
 
     procedure SetLastFocus;
     procedure ShowMenu(Sender: TObject; Location: TCustomisationMenuItemLocation; NearTray: Boolean; IconRect: TRect);   // I3961   // I3990
+    procedure ActivateKeyboard(Keyboard: TLangSwitchKeyboard);   // I4326
 
     function ActiveKeyboard: IKeymanKeyboardInstalled;
 

@@ -1346,12 +1346,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param {string|Object} x keyboard name string or keyboard metadata JSON object
      * 
      */  
-    keymanweb['addKeyboards'] = function(x)
-    {                       
-    if(arguments.length == 0)
-      keymanweb.keymanCloudRequest('',false);
-    else
-      keymanweb.addKeyboardArray(arguments);
+    keymanweb['addKeyboards'] = function(x) {                       
+      if(arguments.length == 0) {
+        keymanweb.keymanCloudRequest('',false);
+      } else {
+        keymanweb.addKeyboardArray(arguments);
+      }
     }
     
     /**
@@ -1360,106 +1360,139 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param {string|Object} x keyboard name string or keyboard metadata JSON object
      * 
      */  
-    keymanweb.addKeyboardArray = function(x)
-    {
+    keymanweb.addKeyboardArray = function(x) {
       // Store all keyboard meta-data for registering later if called before initialization
-      if(!keymanweb['initialized']) 
-      {
-        for(var k=0; k<x.length; k++)
-          keymanweb.deferredStubs.push(x[k]); 
-        return; 
+      if(!keymanweb['initialized']) {
+        for(var k=0; k<x.length; k++) {
+          keymanweb.deferredStubs.push(x[k]);
+        }
+        return;
       }
   
       // Ignore empty array passed as argument
-      if(x.length == 0) return;
+      if(x.length == 0) {
+        return;
+      }
     
       // Create a temporary array of metadata objects from the arguments used
-      var i,j,kp,kbid,lgid,kvid,cmd='',comma='';      
-      keymanweb.cloudList=[];  
-      for(i=0; i<x.length; i++)
-      {
-        if(typeof(x[i]) == 'string' && x[i].length > 0) 
-        {  
+      var i,j,kp,kbid,lgid,kvid,cmd='',comma='';
+      keymanweb.cloudList=[];
+
+      /**
+       * Function       isUniqueRequest
+       * Scope          Private
+       * @param         tEntry      {object} 
+       * Description    Checks to ensure that the stub isn't already loaded within KMW or subject
+       *                to an already-pending request.
+       */
+      var isUniqueRequest = function(tEntry) {
+        var k;
+
+        if(keymanweb.findStub(tEntry['id'], tEntry['language']) == null) {
+          for(k=0; k < keymanweb.cloudList.length; k++) {
+            if(keymanweb.cloudList[k]['id'] == tEntry['id'] && keymanweb.cloudList[k]['language'] == tEntry['language']) {
+              return false;
+            }
+          }
+          return true;
+        } else {
+          return false;
+        }
+      };
+
+      for(i=0; i<x.length; i++) {
+        if(typeof(x[i]) == 'string' && x[i].length > 0) {
           var pList=x[i].split('@'),lList=[''],tEntry;
-          if(pList[0].toLowerCase() == 'english') pList[0] = 'us';
-          if(pList.length > 1)
-          {
+          if(pList[0].toLowerCase() == 'english') {
+            pList[0] = 'us';
+          }
+
+          if(pList.length > 1) {
             lList=pList[1].split(',');
           }
-          for(j=0; j<lList.length; j++)
-          {
+
+          for(j=0; j<lList.length; j++) {
             tEntry={'id':pList[0]};
-            if(lList[j] != '') tEntry['language']=lList[j];
-            if(pList.length > 2) tEntry['version']=pList[2]; 
-            keymanweb.cloudList.push(tEntry);        
+            if(lList[j] != '') {
+              tEntry['language']=lList[j];
+            }
+            if(pList.length > 2) {
+              tEntry['version']=pList[2];
+            }
+
+            // If we've already registered or requested a stub for this keyboard-language pairing,
+            // don't bother with a cloud request.
+            if(isUniqueRequest(tEntry)) {
+              keymanweb.cloudList.push(tEntry);
+            }
           }
         }
-        if(typeof(x[i]) == 'object' && x[i] != null)
-        {               
-          // Register any local keyboards immediately: 
+        if(typeof(x[i]) == 'object' && x[i] != null) {
+          // Register any local keyboards immediately:
           // - must specify filename, keyboard name, language codes, region codes
           // - no request will be sent to cloud
-          if(typeof(x[i]['filename']) == 'string')
-          {                                                   
-            if(!keymanweb.addStub(x[i])) 
-              alert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');   
-          }
-          else
-          {
-            lList=x[i]['language'];   
+          if(typeof(x[i]['filename']) == 'string') {                                                   
+            if(!keymanweb.addStub(x[i])) {
+              alert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');
+            }
+          } else {
+            lList=x[i]['language'];
                 
             //Array or single entry?
             if(typeof(lList.length) == 'number') {
-              for(j=0; j<lList.length; j++)
-                keymanweb.cloudList.push(
-                  {'id':x[i]['id'],'language':x[i]['language'][j]['id']}
-                );
+              for(j=0; j<lList.length; j++) {
+                var tEntry = {'id':x[i]['id'],'language':x[i]['language'][j]['id']};
+                if(isUniqueRequest(tEntry)) {
+                  keymanweb.cloudList.push(tEntry);
+                }
+              }
+            } else { // Single language element
+              var tEntry = {'id':x[i]['id'],'language':x[i]['language'][j]['id']};
+              if(isUniqueRequest(tEntry)) {
+                keymanweb.cloudList.push(tEntry);
+              }
             }
-            // Single language element
-            else
-            {
-              keymanweb.cloudList.push(
-                {'id':x[i]['id'],'language':x[i]['language']['id']}
-              );
-            }
-          }        
+          }
         }
-      }      
+      }
       
       // Return if all keyboards being registered are local and fully specified
-      if(keymanweb.cloudList.length == 0) return;
+      if(keymanweb.cloudList.length == 0) {
+        return;
+      }
 
       // Update the keyboard metadata list from keyman.com - build the command
-      cmd='&keyboardid=';      
-      for(i=0; i<keymanweb.cloudList.length; i++)
-      {                          
-      
+      cmd='&keyboardid=';
+      for(i=0; i<keymanweb.cloudList.length; i++) {      
         kp=keymanweb.cloudList[i];
         kbid=kp['id']; lgid=''; kvid='';  
-        if(typeof(kp['language']) == 'string' && kp['language'] != '') 
+        if(typeof(kp['language']) == 'string' && kp['language'] != '') {
           lgid=kp['language'];
-        if(typeof(kp['version']) == 'string' && kp['version'] != '')
-          kvid=kp['version'];
-        if(lgid != '') 
-        {
-          kbid=kbid+'@'+lgid;
-          if(kvid != '') kbid=kbid+'@'+kvid;
         }
-        else
-        {
-          if(kvid != '') kbid=kbid+'@@'+kvid;
+        if(typeof(kp['version']) == 'string' && kp['version'] != '') {
+          kvid=kp['version'];
+        }
+        if(lgid != '') {
+          kbid=kbid+'@'+lgid;
+          if(kvid != '') {
+            kbid=kbid+'@'+kvid;
+          }
+        } else {
+          if(kvid != '') {
+            kbid=kbid+'@@'+kvid;
+          }
         }
 
   //TODO: add specifier validation...        
                 
-        cmd=cmd+comma+kbid;                      
+        cmd=cmd+comma+kbid;
         comma=',';
       }  
-  
+      
       // Request keyboard metadata from the Keyman Cloud keyboard metadata server
-      keymanweb.keymanCloudRequest(cmd,false);   
+      keymanweb.keymanCloudRequest(cmd,false);
     }
-  
+
     /**
      *  Request keyboard metadata from the Keyman Cloud keyboard metadata server
      *   
@@ -1686,13 +1719,6 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
 
       // Update the UI 
       keymanweb.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC']);
-
-      // If the first stub, must load (and optionally display) the keyboard
-      if(keymanweb._KeyboardStubs.length == 1 && document.readyState=='complete') {
-        keymanweb._SetActiveKeyboard(sp['KI'], sp['KLC']);     
-        keymanweb.globalKeyboard = sp['KI'];
-        keymanweb.globalLanguageCode = sp['KLC'];
-      }
     }
     
     /** 
@@ -1839,7 +1865,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param {string} x keyboard name string
      * 
      */  
-    keymanweb["removeKeyboards"] = function(x)
+    keymanweb['removeKeyboards'] = function(x)
     {
       if(arguments.length == 0) return;
 
@@ -2764,8 +2790,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     /**
      * Function     _GetKeyEventProperties
      * Scope        Private
-     * @param       {Event}       e       Event object
-     * @return      {Object.<string,*>}   KMW keyboard event object: 
+     * @param       {Event}       e         Event object
+     * @param       {boolean=}    keyState  true if call results from a keyDown event, false if keyUp, undefined if keyPress
+     * @return      {Object.<string,*>}     KMW keyboard event object: 
      * Description  Get object with target element, key code, shift state, virtual key state 
      *                Ltarg=target element
      *                Lcode=keyCode
@@ -2773,7 +2800,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      *                LisVirtualKeyCode e.g. ctrl/alt key
      *                LisVirtualKey     e.g. Virtual key or non-keypress event
      */    
-    keymanweb._GetKeyEventProperties = function(e)
+    keymanweb._GetKeyEventProperties = function(e, keyState)
     {
       var s = new Object();
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
@@ -2791,14 +2818,115 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       else if (e.which) s.Lcode = e.which;    
       else return null;
       
-      s.Lmodifiers = 
-        (e.shiftKey ? 0x10 : 0) |
-        (e.ctrlKey ? (e.ctrlLeft ? 0x20 : 0x20) : 0) | 
-        (e.altKey ? (e.altLeft ? 0x40 : 0x40) : 0);  // I3363 (Build 301)
+      // Stage 1 - track the true state of the keyboard's modifiers.
+      var osk = keymanweb['osk'], prevModState = keymanweb.modStateFlags, curModState = 0x0000;
+      var ctrlEvent = false, altEvent = false;
       
-      //s.LisVirtualKey = (e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x60) != 0)) || e.type != 'keypress';
-      //s.LisVirtualKeyCode = false;
-      s.LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x60) != 0));
+      switch(s.Lcode) {
+        case osk.keyCodes['K_CTRL']:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
+        case osk.keyCodes['K_LCTRL']:
+        case osk.keyCodes['K_RCTRL']:
+        case osk.keyCodes.K_CONTROL:
+        case osk.keyCodes.K_LCONTROL:
+        case osk.keyCodes.K_RCONTROL:
+          ctrlEvent = true;
+          break;
+        case osk.keyCodes['K_LMENU']:     // The 2 "K_*MENU" entries exist in some legacy keyboards.
+        case osk.keyCodes['K_RMENU']:
+        case osk.keyCodes.K_ALT:
+        case osk.keyCodes.K_LALT:
+        case osk.keyCodes.K_RALT:
+          altEvent = true;
+          break;
+      }
+
+      /**
+       * Two separate conditions exist that should trigger chiral modifier detection.  Examples below use CTRL but also work for ALT.
+       * 
+       * 1.  The user literally just pressed CTRL, so the event has a valid `location` property we can utilize.  
+       *     Problem: its layer isn't presently activated within the OSK.
+       * 
+       * 2.  CTRL has been held a while, so the OSK layer is valid, but the key event doesn't tell us the chirality of the active CTRL press.
+       *     Bonus issue:  RAlt simulation may cause erasure of this location property, but it should ONLY be empty if pressed in this case.
+       *     We default to the 'left' variants since they're more likely to exist and cause less issues with RAlt simulation handling.
+       * 
+       * In either case, `e.ctrlKey` is set to true, but as a result does nothing to tell us which case is active.
+       * 
+       * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
+       */
+
+      curModState |= (e.shiftKey ? 0x10 : 0);      
+
+      if(e.ctrlKey) {
+        curModState |= ((e.location != 0 && ctrlEvent) ? 
+          (e.location == 1 ? osk.modifierCodes.LCTRL : osk.modifierCodes.RCTRL) : // Condition 1
+          prevModState & 0x0003);                                                       // Condition 2
+      }
+      if(e.altKey) {
+        curModState |= ((e.location != 0 && altEvent) ? 
+          (e.location == 1 ? osk.modifierCodes.LALT : osk.modifierCodes.RALT) :   // Condition 1
+          prevModState & 0x000C);                                                       // Condition 2
+      }
+
+      // Stage 2 - detect state key information.  It can be looked up per keypress with no issue.
+      s.Lstates = 0;
+      
+      if(e.getModifierState("CapsLock")) {
+        s.Lstates = osk.modifierCodes.CAPS;
+      } else {
+        s.Lstates = osk.modifierCodes.NO_CAPS;
+      }
+
+      if(e.getModifierState("NumLock")) {
+        s.Lstates |= osk.modifierCodes.NUM_LOCK;
+      } else {
+        s.Lstates |= osk.modifierCodes.NO_NUM_LOCK;
+      }
+
+      if(e.getModifierState("ScrollLock") || e.getModifierState("Scroll")) {  // "Scroll" for IE9.
+        s.Lstates |= osk.modifierCodes.SCROLL_LOCK;
+      } else {
+        s.Lstates |= osk.modifierCodes.NO_SCROLL_LOCK;
+      }
+
+      // We need these states to be tracked as well for proper OSK updates.
+      curModState |= s.Lstates;
+
+      // Stage 3 - Set our modifier state tracking variable and perform basic AltGr-related management.
+      s.LmodifierChange = keymanweb.modStateFlags != curModState;
+      keymanweb.modStateFlags = curModState;
+
+      // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
+      var altGrMask = osk.modifierCodes.RALT | osk.modifierCodes.LCTRL;
+      if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
+        // We just released AltGr - make sure it's all released.
+        curModState &= ~ altGrMask;
+      }
+      // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
+      if(curModState & osk.modifierCodes.RALT) {
+        curModState &= ~osk.modifierCodes.LCTRL;
+      }
+
+      // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
+      if(keymanweb.isChiral()) {
+        s.Lmodifiers = curModState & osk.modifierBitmasks.CHIRAL;
+
+        // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
+        // AltGr / Right-alt simulation.
+        if(osk.emulatesAltGr() && (s.Lmodifiers & osk.modifierBitmasks.ALT_GR_SIM) == osk.modifierBitmasks.ALT_GR_SIM) {
+          s.Lmodifiers ^= osk.modifierBitmasks.ALT_GR_SIM;
+          s.Lmodifiers |= osk.modifierCodes.RALT;
+        }
+      } else {
+        // No need to sim AltGr here; we don't need chiral ALTs.
+        s.Lmodifiers = 
+          (e.shiftKey ? 0x10 : 0) |
+          ((curModState & (osk.modifierCodes.LCTRL | osk.modifierCodes.RCTRL)) ? 0x20 : 0) | 
+          ((curModState & (osk.modifierCodes.LALT | osk.modifierCodes.RALT))   ? 0x40 : 0); 
+      }
+
+      // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
+      s.LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x6F) != 0));
       s.LisVirtualKey = s.LisVirtualKeyCode || e.type != 'keypress';
       
       return s;
@@ -2850,20 +2978,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         if(Levent.initKeyEvent)
         {
           Levent.initKeyEvent('keypress',true,true,null,false,false,false,false,0,32);
-          var LkeyPress = keymanweb._KeyPress; 
+          Levent._kmw_block = true; // Tell keymanweb._KeyPress to ignore this simulated event.
           
-          /**
-           * Function     _KeyPress
-           * Scope        Private
-           * @param       {Event}     e     event         
-           * Description  Temporarily disable keypress event handling  TODO: does this really work??? objects are passed by reference so should be OK
-           */       
-          keymanweb._KeyPress = function(e) {};
+          // Nasty problems arise from the simulated keystroke if we don't temporarily block the handler.
           Pelem.dispatchEvent(Levent);
           Levent=document.createEvent('KeyboardEvent');
           Levent.initKeyEvent('keypress',true,true,null,false,false,false,false,8,0);
+          Levent._kmw_block = true; // Tell keymanweb._KeyPress to ignore this simulated event.
           Pelem.dispatchEvent(Levent);
-          keymanweb._KeyPress = LkeyPress;
         }
       }
     }
@@ -2913,7 +3035,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
       
       // Get event properties  
-      var Levent = keymanweb._GetKeyEventProperties(e);
+      var Levent = keymanweb._GetKeyEventProperties(e, true);
       if(Levent == null) {
         return true;
       }
@@ -2922,9 +3044,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         case 8: 
           keymanweb._DeadKeys = []; 
           break; // I3318 (always clear deadkeys after backspace) 
-        case 16: 
+        case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
         case 17: 
         case 18: 
+        case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
+        case 144:
+        case 145:
           // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
           keymanweb._NotifyKeyboard(Levent.Lcode,Levent.Ltarg,1); 
           if(!device.touchable) {
@@ -2933,9 +3058,12 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             return true;
           }
       }
-      var cachedTouchable = device.touchable, cachedFormFactor = device.formFactor;
-      var result = false; // Signals if we successfully handled the keystroke.
 
+      if(Levent.LmodifierChange) {
+        keymanweb._NotifyKeyboard(0,Levent.Ltarg,1); 
+        osk._UpdateVKShift(Levent, 0, 1);
+      }
+      
       // I1207
       if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  (Levent.Lcode<33 || Levent.Lcode>40)) {
         Ldv.createRange().select();
@@ -3010,6 +3138,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         keymanweb._FindCaret(Levent.Ltarg); //I779
         if(e  &&  e.preventDefault) {
           e.preventDefault();
+          e.stopPropagation();
         }
         keymanweb._KeyPressToSwallow = (e?e.keyCode:0);
         return false;
@@ -3042,6 +3171,10 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * Description Processes keypress event (does not pass data to keyboard)
      */       
     keymanweb._KeyPress = function(e) {
+      if(e._kmw_block) { // A custom event property added for bugfix-oriented simulated keypress events.
+        return false;
+      }
+
       var Levent;
       if(!keymanweb._Enabled || keymanweb._DisableInput || keymanweb._ActiveKeyboard == null) {
         return true;
@@ -3074,6 +3207,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         keymanweb._KeyPressToSwallow=0;
         if(e  &&  e.preventDefault) {
           e.preventDefault();
+          e.stopPropagation();
         }
         keymanweb._FindCaret(Levent.Ltarg);  // I779
         return false;
@@ -3091,7 +3225,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */       
     keymanweb._KeyUp = function(e)
     {
-      var Levent = keymanweb._GetKeyEventProperties(e);
+      var Levent = keymanweb._GetKeyEventProperties(e, false);
       if(Levent == null || !osk.ready) return true;
 
       switch(Levent.Lcode)
@@ -3106,11 +3240,21 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
             keymanweb.moveToNext(false);
           return true;        
                   
-        case 16: 
+        case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
         case 17: 
-        case 18: keymanweb._NotifyKeyboard(Levent.Lcode,Levent.Ltarg,0); return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1);  // I2187
+        case 18: 
+        case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
+        case 144:
+        case 145:
+          keymanweb._NotifyKeyboard(Levent.Lcode,Levent.Ltarg,0); 
+          return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1);  // I2187
       }
       
+      if(Levent.LmodifierChange){
+        keymanweb._NotifyKeyboard(0,Levent.Ltarg,0); 
+        osk._UpdateVKShift(Levent, 0, 1);  // I2187
+      }
+
       // I736 start
       var Ldv;
       if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  Ldv.type != 'control')   // I1479 - avoid createRange on controls
@@ -3505,6 +3649,46 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       return ((lg == 'cmn') || (lg == 'jpn') || (lg == 'kor'));
     }
     keymanweb.isCJK = keymanweb['isCJK']; // I3363 (Build 301)
+
+    /**
+     * Function     isChiral
+     * Scope        Public
+     * @param       {string|Object=}   k0
+     * @return      {boolean}
+     * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
+     */
+    keymanweb.isChiral = keymanweb['isChiral'] = function(k0) {
+      if(typeof(k0) == "string") {
+        k0 = keymanweb._getKeyboardByID(k0);
+      }
+
+      return !!(keymanweb.getKeyboardModifierBitmask(k0) & keymanweb['osk'].modifierBitmasks.IS_CHIRAL);
+    }
+
+    /**
+     * Function     getKeyboardModifierBitmask
+     * Scope        Private
+     * @param       {Object=}   k0
+     * @return      {number}
+     * Description  Obtains the currently-active modifier bitmask for the active keyboard.
+     */
+    keymanweb.getKeyboardModifierBitmask = function(k0) {
+      var k=keymanweb._ActiveKeyboard;
+      
+      if(arguments.length > 0 && typeof k0 != 'undefined') {
+        k = k0;
+      }
+
+      if(!k) {
+        return 0x0000;
+      }
+
+      if(k['KMBM']) {
+        return k['KMBM'];
+      }
+
+      return osk.modifierBitmasks['NON_CHIRAL'];
+    }
     
     /**
      * Allow to change active keyboard by (internal) keyboard name
@@ -3768,7 +3952,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(Pelem.tagName) {
         var tagName = Pelem.tagName.toLowerCase();
         if(tagName == 'input' || tagName == 'textarea' || tagName == 'iframe') {
-          possibleInputs.concat(Pelem);
+          possibleInputs.push(Pelem);
         }
       } else if(Pelem.nodeName == "#text") {
         return [];
@@ -3797,7 +3981,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
       
       if(Pelem.isContentEditable) {
-        possibleInputs = possibleInputs.concat(Pelem);
+        possibleInputs.push(Pelem);
       }
 
       return possibleInputs;
@@ -4029,7 +4213,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         keymanweb.KR(keymanweb.deferredKR[j]);
     
       // Exit initialization here if we're using an embedded code path.
-      if(keymanweb.isEmbedded) return;
+      if(keymanweb.isEmbedded) {
+        if(keymanweb._KeyboardStubs.length > 0) {
+          // Select the first stub as our active keyboard.  This is set later for 'native' KMW.
+          keymanweb._SetActiveKeyboard(keymanweb._KeyboardStubs[0]['KI'], keymanweb._KeyboardStubs[0]['KLC']);     
+        }
+
+        return;
+      }
 
       // Determine the default font for mapped elements
       keymanweb.appliedFont=keymanweb.baseFont=keymanweb.getBaseFont();
@@ -4131,7 +4322,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(document.selection  &&  !keymanweb.legacy)
         util.attachDOMEvent(document, 'selectionchange', keymanweb._SelectionChange);
     
-      // Restore and reload the currently selected keyboard 
+      // Restore and reload the currently selected keyboard, selecting a default keyboard if necessary.
       keymanweb.restoreCurrentKeyboard(); 
 
       /* Setup of handlers for dynamically-added and (eventually) dynamically-removed elements.
@@ -4667,11 +4858,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         if(stubs[i]['KI'] == t[0] && (stubs[i]['KLC'] == t[1] || t[1] == '')) break;
       }
     
-      // Restore the stub with the saved keyboard, or else the first keyboard that matches
+      // Sets the default stub (as specified above with the `getSavedKeyboard` call) as active.
       // if((i < n) || (device.touchable && (keymanweb._ActiveKeyboard == null)))
       if((i < n) || (keymanweb._ActiveKeyboard == null))
       {
         keymanweb._SetActiveKeyboard(t[0],t[1],false);
+        keymanweb.globalKeyboard = t[0];
+        keymanweb.globalLanguageCode = t[1];
+
         keymanweb.doKeyboardChange(t[0],t[1]);        // And update the UI if necessary
       }
     } 

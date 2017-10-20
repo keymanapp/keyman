@@ -16,7 +16,7 @@ String.kmwFromCharCode = function(cp0) {
     var c = Number(arguments[i]);
     if (!isFinite(c) || c < 0 || c > 0x10FFFF || Math.floor(c) !== c) {
       throw new RangeError("Invalid code point " + c);
-	  }
+    }
     if (c < 0x10000) {
       chars.push(c);
     } else {

@@ -64,12 +64,6 @@ var
   hOutfile: THandle;
   HasWarning: Boolean = False;
 
-const
-  CERR_FATAL   = $00008000;
-  CERR_ERROR   = $00004000;
-  CERR_WARNING = $00002000;
-  CERR_MEMORY  = $00001000;
-
 function CompileKeyboard(FInFile, FOutFile: string; FDebug, FSilent, FWarnAsError: Boolean): Boolean; forward;   // I4706
 
 function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;   // I3310
@@ -79,9 +73,11 @@ var
 const
 	nlstr: array[0..2] of ansichar = (#$D, #$A, #$0);   // I3310
 begin
-  if (msgcode and CERR_ERROR) <> 0   then p := 'Error';
-  if (msgcode and CERR_WARNING) <> 0 then begin p := 'Warning'; HasWarning := True; end;   // I4706
-  if (msgcode and CERR_FATAL) <> 0   then p := 'Fatal';
+  if (msgcode = CWARN_Info) then p := 'Info'
+  else if (msgcode and CERR_ERROR) <> 0   then p := 'Error'
+  else if (msgcode and CERR_WARNING) <> 0 then begin p := 'Warning'; HasWarning := True; end   // I4706
+  else if (msgcode and CERR_FATAL) <> 0   then p := 'Fatal'
+  else p := 'Memory';
 
   str := System.AnsiStrings.Format('%s %d: %8.8X %s', [p, line, msgcode, text]);   // I3310
 
