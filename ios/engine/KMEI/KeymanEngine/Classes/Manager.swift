@@ -1672,7 +1672,7 @@ UIGestureRecognizerDelegate {
 
     for fontFilename in directoryContents where fontFilename.hasFontExtension {
       if let fontInfo = keymanFonts[fontFilename] {
-        if fontInfo[Key.fontRegistered] as? Int != 0 {
+        if fontInfo[Key.fontRegistered] as? Int == 0 {
           if let newFontInfo = registerFont(withFilename: fontFilename) {
             keymanFonts[fontFilename] = newFontInfo
           }
@@ -1697,8 +1697,10 @@ UIGestureRecognizerDelegate {
 
     for fontFilename in directoryContents where fontFilename.hasFontExtension {
       if var fontInfo = keymanFonts[fontFilename], fontInfo[Key.fontRegistered] as? Int != 0 {
-        fontInfo[Key.fontRegistered] = 0
-        keymanFonts[fontFilename] = fontInfo
+        if unregisterFont(withFilename: fontFilename) {
+          fontInfo[Key.fontRegistered] = 0
+          keymanFonts[fontFilename] = fontInfo
+        }
       }
     }
   }
