@@ -560,7 +560,8 @@ NSRange _previousSelRange;
         [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
         [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
         [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
-        [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"]) {
+        [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"]
+        /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */) {
         _legacyMode = YES;
         if ([self.AppDelegate debugMode])
             NSLog(@"Using legacy mode for this app.");
