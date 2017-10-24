@@ -53,6 +53,8 @@
         [self performSelector:@selector(updateContextBuffer:) withObject:sender afterDelay:0.25];
         return NO;
     }
+    else if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand)
+        return NO; // We ignore any Command-key events.
     
     BOOL handled = NO;
     NSArray *actions = nil;
