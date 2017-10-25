@@ -13,6 +13,7 @@
 * Fixed keyboard loading upon initialization, redundant cloud requests for keyboards.  (#103)
 * Fixed next-layer processing (#116) (#358)
 * Fixed auto-attaching mode bug. (#352)
+* Set the default behavior of KMW to auto-attach for all devices, rather than only desktops. (#375)
 * Fixed key codes for longpress keys and handle default keys beyond U_FFFF
 
 ## 2017-07-10 2.0.473 stable
