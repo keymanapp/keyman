@@ -4098,7 +4098,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       opt['fonts'] = fixPath(opt['fonts']);    
 
       // Set element attachment type    
-      if(opt['attachType'] == '') opt['attachType'] = (device.touchable ? 'manual' : 'auto');
+      if(opt['attachType'] == '') opt['attachType'] = 'auto';
 
   /*    
 
