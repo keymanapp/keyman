@@ -224,9 +224,8 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       // Update keyboard version
       let downloadedKbInfo = notification.userInfo?[Key.keyboardInfo] as? [String: String]
       if let kbID = downloadedKbInfo?[Key.keyboardId],
-         let currentKbInfo = Manager.shared.keyboardsInfo?[kbID],
-         let kbVersion = currentKbInfo[Key.keyboardVersion] {
-        Manager.shared.updateKeyboardVersion(forID: kbID, newKeyboardVersion: kbVersion)
+         let currentKbInfo = Manager.shared.keyboardsInfo?[kbID] {
+        Manager.shared.updateKeyboardVersion(forID: kbID, newKeyboardVersion: currentKbInfo.version)
       }
 
       updateQueue!.remove(at: 0)

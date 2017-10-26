@@ -29,7 +29,7 @@ public enum KeyboardState {
 private let keyboardChangeHelpText = "Tap here to change keyboard"
 
 // URLs and Filenames
-private let apiBaseURL = "https://r.keymanweb.com/api/3.0/"
+private let apiBaseURL = "https://r.keymanweb.com/api/4.0/"
 private let apiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url="
 private let kmwFileName = "keyboard"
 private let kmwFileExtension = "html"
@@ -100,7 +100,7 @@ UIGestureRecognizerDelegate {
   /// - If you find yourself using other info (like the URI), there is probably a Manager method that does what you
   ///   want already
   /// - This list won't be available until .languagesUpdated has been broadcasted
-  public private(set) var languages: [[String: Any]] = []
+  public private(set) var languages: [Language] = []
 
   /// Dictionary of Keyman keyboards to store language and keyboard names etc.
   ///
@@ -137,7 +137,7 @@ UIGestureRecognizerDelegate {
   weak var webDelegate: KeymanWebViewDelegate?
   weak var inputDelegate: KeymanWebViewDelegate?
   var currentRequest: HTTPDownloadRequest?
-  var keyboardsInfo: [String: [String: String]]?
+  var keyboardsInfo: [String: Keyboard]?
   var shouldReloadKeyboard = false
   var inputView: WKWebView! = nil
 
@@ -168,7 +168,7 @@ UIGestureRecognizerDelegate {
   private var menuKeyFrame = CGRect.zero
 
   // Dictionary of Keyman options
-  var options: [AnyHashable: Any] = [:]
+  var options: Options?
 
   // MARK: - Object Admin
   deinit {
@@ -846,10 +846,6 @@ UIGestureRecognizerDelegate {
     return keyboardsDictionary[kbKey]?[Key.keyboardRTL] == "Y"
   }
 
-  func keyboards(for index: Int) -> [[String: Any]]? {
-    return languages[safe: index]?[Key.languageKeyboards] as? [[String: Any]]
-  }
-
   func fontFilename(fromJSONFont jsonFont: String) -> String? {
     if jsonFont.hasFontExtension {
       return jsonFont
@@ -893,6 +889,17 @@ UIGestureRecognizerDelegate {
     return jsOskFont ?? "''"
   }
 
+  func jsFont(fromFont font: Font?) -> String {
+    guard let font = font else {
+      return jsFont(fromFontDictionary: nil)
+    }
+    return jsFont(fromFontDictionary: [
+      Key.fontFamily: font.family,
+      Key.fontSource: font.source,
+      "size": font.size
+    ])
+  }
+
   func jsFont(fromFontDictionary fontDict: [AnyHashable: Any]?) -> String {
     guard let fontDict = fontDict, !fontDict.isEmpty else {
       return "''"
@@ -933,7 +940,7 @@ UIGestureRecognizerDelegate {
     }
 
     let deviceType = (UIDevice.current.userInterfaceIdiom == .phone) ? "iphone" : "ipad"
-    let url = URL(string: "\(apiBaseURL)languages?device=\(deviceType)")!
+    let url = URL(string: "\(apiBaseURL)languages?dateformat=seconds&device=\(deviceType)")!
     let userData = completionBlock.map { ["completionBlock": $0] } ?? [:]
 
     let request = HTTPDownloadRequest(url: url, downloadType: .downloadCachedData, userInfo: userData)
@@ -979,8 +986,8 @@ UIGestureRecognizerDelegate {
       return
     }
 
-    let urlStr = keyboardsInfo[keyboardID]![Key.keyboardURI]!
-    let keyboardURL = URL(string: urlStr)!
+    let filename = keyboardsInfo[keyboardID]!.filename
+    let keyboardURL = options!.keyboardBaseURL.appendingPathComponent(filename)
 
     let kbFontStr = keyboardDict[Key.font] ?? ""
     let kbOskFontStr = keyboardDict[Key.oskFont] ?? ""
@@ -1027,9 +1034,8 @@ UIGestureRecognizerDelegate {
       return []
     }
 
-    guard let baseString = options[Key.fontBaseURI] as? String,
-          let baseURL = URL(string: baseString) else {
-      kmLog("Missing font base URL in options: \(options)", checkDebugPrinting: false)
+    guard let baseURL = options?.fontBaseURL else {
+      kmLog("Options not yet loaded", checkDebugPrinting: false)
       return []
     }
 
@@ -1271,7 +1277,7 @@ UIGestureRecognizerDelegate {
     guard let keyboardsInfo = keyboardsInfo else {
       return .upToDate
     }
-    let kbVersion = keyboardsInfo[keyboardID]![Key.keyboardVersion] ?? "1.0"
+    let kbVersion = keyboardsInfo[keyboardID]!.version
     if compareVersions(latestVersion, kbVersion) == .orderedDescending {
       return .upToDate
     } else {
@@ -1279,53 +1285,31 @@ UIGestureRecognizerDelegate {
     }
   }
 
+  /// - Precondition: `options` and `languages` are set.
   private func createKeyboardsInfo() {
-    let kbBaseUri = options[Key.keyboardBaseURI] as? String
-    keyboardsInfo = [:]
-    keyboardsDictionary = [:]
-    for langDict in languages {
-      let keyboards = langDict[Key.languageKeyboards] as! [[String: Any]]
-      for kbDict in keyboards {
-        let langId = langDict[Key.id] as? String
-        let kbID = kbDict[Key.id] as? String
-        let kbVersion = kbDict[Key.keyboardVersion] as? String ?? "1.0"
-        let isRTL = kbDict[Key.keyboardRTL] as? String ?? "N"
-
-        if keyboardsInfo![kbID!] == nil {
-          let kbUri = "\(kbBaseUri!)\(kbDict[Key.keyboardFilename]!)"
-          var keyboard = [
-            Key.keyboardName: (kbDict[Key.name] as? String)!,
-            Key.keyboardVersion: kbVersion,
-            Key.keyboardRTL: isRTL,
-            Key.keyboardModified: (kbDict[Key.keyboardModified] as? String)!,
-            Key.keyboardFileSize: String((kbDict[Key.keyboardFileSize] as? Int)!),
-            Key.keyboardURI: kbUri
-          ]
-          if let font = kbDict[Key.font] as? String {
-            keyboard[Key.font] = font
-          }
-          keyboardsInfo![kbID!] = keyboard
+    let keyboardsWithID = languages.flatMap { language in
+      language.keyboards!.map { kb in (kb.id, kb) }
+    }
+    keyboardsInfo = Dictionary(keyboardsWithID, uniquingKeysWith: { (old, _) in old })
+    let keyboardsWithLanguage = languages.flatMap { language -> [(String, [String: String])] in
+      language.keyboards!.map { kb in
+        let key = "\(language.id)_\(kb.id)"
+        var dict = [
+          Key.keyboardId: kb.id,
+          Key.languageId: language.id,
+          Key.keyboardName: kb.name,
+          Key.languageName: language.name,
+          Key.keyboardVersion: kb.version,
+          Key.keyboardRTL: kb.isRTL ? "Y" : "N",
+          Key.font: jsFont(fromFont: kb.font)
+        ]
+        if let oskFont = kb.oskFont {
+          dict[Key.oskFont] = jsFont(fromFont: oskFont)
         }
-
-        let dictKey = "\(langId!)_\(kbID!)"
-        if keyboardsDictionary[dictKey] == nil {
-          let oskFont = kbDict[Key.oskFont] as? [AnyHashable: Any]
-          var dict = [
-            Key.keyboardId: (kbDict[Key.id] as? String)!,
-            Key.languageId: (langDict[Key.id] as? String)!,
-            Key.keyboardName: (kbDict[Key.name] as? String)!,
-            Key.languageName: (langDict[Key.name] as? String)!,
-            Key.keyboardVersion: kbVersion,
-            Key.keyboardRTL: isRTL,
-            Key.font: jsFont(fromFontDictionary: kbDict[Key.font] as? [AnyHashable: Any])
-          ]
-          if let oskFont = oskFont {
-            dict[Key.oskFont] = jsFont(fromFontDictionary: oskFont)
-          }
-          keyboardsDictionary[dictKey] = dict
-        }
+        return (key, dict)
       }
     }
+    keyboardsDictionary = Dictionary(uniqueKeysWithValues: keyboardsWithLanguage)
     updateUserKeyboardsList()
   }
 
@@ -1378,15 +1362,6 @@ UIGestureRecognizerDelegate {
       }
     }
     return nil
-  }
-
-  func downloadKeyboard(forLanguageIndex languageIndex: Int, keyboardIndex: Int, isUpdate: Bool) {
-    guard let keyboard = keyboards(for: languageIndex)?[safe: keyboardIndex] else {
-      return
-    }
-    let kbID = keyboard[Key.id] as! String
-    let langID = languages[languageIndex][Key.id] as? String
-    downloadKeyboard(withID: kbID, languageID: langID!, isUpdate: isUpdate)
   }
 
   @objc func reachabilityChanged(_ notification: Notification) {
@@ -1491,34 +1466,34 @@ UIGestureRecognizerDelegate {
       }
     case .downloadCachedData:
       if request == currentRequest {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .secondsSince1970
+        let result: LanguagesAPICall
         do {
-          let responseDict = try JSONSerialization.jsonObject(with: request.rawResponseData!,
-                                                              options: .mutableContainers) as? [AnyHashable: Any]
-          options = responseDict?[Key.options] as? [AnyHashable: Any] ?? [:]
-          let unsortedLanguages = (responseDict![Key.languages] as! [AnyHashable: Any])[Key.languages]
-            as! [[String: Any]]
-          languages = unsortedLanguages.sorted { a, b -> Bool in
-            let aName = a[Key.name] as! String
-            let bName = b[Key.name] as! String
-            return aName.localizedCaseInsensitiveCompare(bName) == .orderedAscending
-          }
-
-          createKeyboardsInfo()
-          kmLog("Request completed -- \(languages.count) languages.", checkDebugPrinting: true)
-          currentRequest = nil
-
-          if let completionBlock = request.userInfo["completionBlock"] as? FetchKeyboardsBlock {
-            completionBlock(nil)
-          }
-
-          NotificationCenter.default.post(name: .keymanLanguagesUpdated, object: self)
+          result = try decoder.decode(LanguagesAPICall.self, from: request.rawResponseData!)
         } catch {
           kmLog("Failed: \(error).", checkDebugPrinting: true)
           let error = NSError(domain: "Keyman", code: 0,
                               userInfo: [NSLocalizedDescriptionKey: error.localizedDescription])
           NotificationCenter.default.post(name: .keymanLanguagesDownloadFailed, object: self,
                                           userInfo: [NSUnderlyingErrorKey: error])
+          return
         }
+
+        options = result.options
+        languages = result.languages.sorted { a, b -> Bool in
+          a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
+        }
+
+        createKeyboardsInfo()
+        kmLog("Request completed -- \(languages.count) languages.", checkDebugPrinting: true)
+        currentRequest = nil
+
+        if let completionBlock = request.userInfo["completionBlock"] as? FetchKeyboardsBlock {
+          completionBlock(nil)
+        }
+
+        NotificationCenter.default.post(name: .keymanLanguagesUpdated, object: self)
       }
     }
   }
@@ -1583,7 +1558,7 @@ UIGestureRecognizerDelegate {
                                     userInfo: [
                                       Key.keyboardInfo: kbInfo,
                                       NSUnderlyingErrorKey: error
-      ])
+                                    ])
   }
 
   // MARK: - Loading custom keyboards
