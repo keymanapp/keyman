@@ -9,12 +9,12 @@
     var kmw=tavultesoft.keymanweb;
     
     // We start by adding a keyboard correctly.  It's best to include a 'control' in our experiment.
-    kmw.addKeyboards({id:'us',name:'English',language:{id:'eng',name:'English'},
+    kmw.addKeyboards({id:'us',name:'English',languages:{id:'eng',name:'English'},
       filename:'../us-1.0.js'});
       
     // Insert a keyboard that cannot be found.
     kmw.addKeyboards({id:'lao_2008_basic',name:'wrong-filename',
-      language:{
+      languages:{
         id:'lao',name:'debugging',region:'Asia',
         font:{family:'LaoWeb',source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']}
         },
@@ -23,7 +23,7 @@
 	  
 	// Insert a keyboard that will generate a timing error.  
     kmw.addKeyboards({id:'unparsable',name:'non-parsable',
-      language:{
+      languages:{
         id:'lao',name:'debugging',region:'Asia',
         font:{family:'LaoWeb',source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']}
         },
@@ -33,7 +33,7 @@
 	  
 	// Insert a keyboard that will generate a timing error.  
     kmw.addKeyboards({id:'timeout',name:'timeout',
-      language:{
+      languages:{
         id:'lao',name:'debugging',region:'Asia',
         font:{family:'LaoWeb',source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']}
         },
