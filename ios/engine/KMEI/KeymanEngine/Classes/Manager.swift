@@ -173,8 +173,9 @@ UIGestureRecognizerDelegate {
   // MARK: - Object Admin
   deinit {
     NotificationCenter.default.removeObserver(self)
-    if currentRequest?.userInfo != nil {
-      currentRequest!.userInfo["completionBlock"] = nil
+    // FIXME: Likely unneeded unless a reference exists to currentRequest outside of Manager
+    if let currentRequest = currentRequest {
+      currentRequest.userInfo["completionBlock"] = nil
     }
   }
 
@@ -709,9 +710,7 @@ UIGestureRecognizerDelegate {
     guard let keyboards = userKeyboards as? [[String: String]] else {
       return nil
     }
-    return keyboards.index { kb in
-      return keyboardID == kb[Key.keyboardId] && languageID == kb[Key.languageId]
-    }
+    return keyboards.index { kb in keyboardID == kb[Key.keyboardId] && languageID == kb[Key.languageId] }
   }
 
   /// - Returns: Info for the current keyboard, if a keyboard is set
@@ -848,20 +847,7 @@ UIGestureRecognizerDelegate {
   }
 
   func keyboards(for index: Int) -> [[String: Any]]? {
-    if index < languages.count {
-      return languages[index][Key.languageKeyboards] as? [[String: Any]]
-    }
-    return nil
-  }
-
-  func keyboardInfo(forLanguageIndex languageIndex: Int, keyboardIndex: Int) -> [String: Any]? {
-    guard let keyboards = keyboards(for: languageIndex) else {
-      return nil
-    }
-    if keyboardIndex < keyboards.count {
-      return keyboards[keyboardIndex]
-    }
-    return nil
+    return languages[safe: index]?[Key.languageKeyboards] as? [[String: Any]]
   }
 
   func fontFilename(fromJSONFont jsonFont: String) -> String? {
@@ -948,9 +934,9 @@ UIGestureRecognizerDelegate {
 
     let deviceType = (UIDevice.current.userInterfaceIdiom == .phone) ? "iphone" : "ipad"
     let url = URL(string: "\(apiBaseURL)languages?device=\(deviceType)")!
-    let userData = completionBlock.map { ["completionBlock": $0] }
+    let userData = completionBlock.map { ["completionBlock": $0] } ?? [:]
 
-    let request = HTTPDownloadRequest(url: url, downloadType: .downloadCachedData, userInfo: userData ?? [:])
+    let request = HTTPDownloadRequest(url: url, downloadType: .downloadCachedData, userInfo: userData)
     currentRequest = request
     sharedQueue.addRequest(request)
     sharedQueue.run()
@@ -1059,14 +1045,6 @@ UIGestureRecognizerDelegate {
       let message = "Unexpected error: \(String(describing: fontFiles)) is not a valid type to be processed."
       throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
     }
-  }
-
-  private func urlOrThrow(string: String) throws -> URL {
-    if let url = URL(string: string) {
-      return url
-    }
-    throw NSError(domain: "Keyman", code: 0,
-                  userInfo: [NSLocalizedDescriptionKey: "Invalid URL: \(string)"])
   }
 
   /// Downloads a custom keyboard from the URL
@@ -1391,8 +1369,6 @@ UIGestureRecognizerDelegate {
       if tmpStr.hasSuffix(".js") {
         return String(tmpStr.dropLast(3))
       }
-      // TODO: Maybe don't return nil and just continue
-      return nil
     } else if let downloadQueue = downloadQueue {
       let kbInfo = downloadQueue.userInfo[Key.keyboardInfo]
       if let dict = kbInfo as? [String: String] {
@@ -1405,7 +1381,7 @@ UIGestureRecognizerDelegate {
   }
 
   func downloadKeyboard(forLanguageIndex languageIndex: Int, keyboardIndex: Int, isUpdate: Bool) {
-    guard let keyboard = keyboardInfo(forLanguageIndex: languageIndex, keyboardIndex: keyboardIndex) else {
+    guard let keyboard = keyboards(for: languageIndex)?[safe: keyboardIndex] else {
       return
     }
     let kbID = keyboard[Key.id] as! String
@@ -1480,7 +1456,7 @@ UIGestureRecognizerDelegate {
                                           userInfo: request.userInfo)
           if isUpdate {
             shouldReloadKeyboard = true
-            reloadKeyboard()
+            reloadKeyboard(in: inputView)
           }
           let userData = activeUserDefaults()
           userData.set([Date()], forKey: Key.synchronizeSWKeyboard)
@@ -1519,9 +1495,9 @@ UIGestureRecognizerDelegate {
           let responseDict = try JSONSerialization.jsonObject(with: request.rawResponseData!,
                                                               options: .mutableContainers) as? [AnyHashable: Any]
           options = responseDict?[Key.options] as? [AnyHashable: Any] ?? [:]
-          let unsortedLanguages = (responseDict?[Key.languages] as? [AnyHashable: Any])?[Key.languages]
-            as? [[String: Any]]
-          languages = unsortedLanguages!.sorted { a, b -> Bool in
+          let unsortedLanguages = (responseDict![Key.languages] as! [AnyHashable: Any])[Key.languages]
+            as! [[String: Any]]
+          languages = unsortedLanguages.sorted { a, b -> Bool in
             let aName = a[Key.name] as! String
             let bName = b[Key.name] as! String
             return aName.localizedCaseInsensitiveCompare(bName) == .orderedAscending
@@ -1621,7 +1597,7 @@ UIGestureRecognizerDelegate {
         try FileManager.default.removeItem(at: dstUrl)
         try FileManager.default.copyItem(at: srcUrl, to: dstUrl)
       } else {
-        kmLog("File already exists at \(dstUrl) and not overwriting", checkDebugPrinting: false)
+        kmLog("File already exists at \(dstUrl) and not overwriting", checkDebugPrinting: true)
         return
       }
       addSkipBackupAttribute(to: dstUrl)
@@ -1661,7 +1637,6 @@ UIGestureRecognizerDelegate {
   /// Registers all new fonts found in the font path. Call this after you have preloaded all your font files
   /// with `preloadFontFile(atPath:shouldOverwrite:)`
   public func registerCustomFonts() {
-    // TODO: Why is this separate from preloading?
     let directoryContents: [String]
     do {
       directoryContents = try FileManager.default.contentsOfDirectory(atPath: activeFontDirectory().path)
@@ -1758,8 +1733,7 @@ UIGestureRecognizerDelegate {
 
   private func fontExists(_ fontName: String) -> Bool {
     return UIFont.familyNames.contains { familyName in
-      let fontNames = UIFont.fontNames(forFamilyName: familyName)
-      return fontNames.contains(fontName)
+      UIFont.fontNames(forFamilyName: familyName).contains(fontName)
     }
   }
 
@@ -2159,7 +2133,7 @@ UIGestureRecognizerDelegate {
       guard let val1 = Int(component1), val1 >= 0 else {
         return nil
       }
-      guard let val2 = Int(component2), val1 >= 0 else {
+      guard let val2 = Int(component2), val2 >= 0 else {
         return nil
       }
       if val1 < val2 {
@@ -2209,37 +2183,26 @@ UIGestureRecognizerDelegate {
   // MARK: - View management
 
   public var keyboardHeight: CGFloat {
-    let isPortrait: Bool
     if isSystemKeyboard {
-      isPortrait = KeymanInputViewController.isPortrait
+      return keyboardHeight(isPortrait: KeymanInputViewController.isPortrait)
     } else {
-      isPortrait = UIDevice.current.orientation.isPortrait
-    }
-
-    if UIDevice.current.userInterfaceIdiom == .pad {
-      if isPortrait {
-        return isSystemKeyboard ? padPortraitSystemKeyboardHeight : padPortraitInAppKeyboardHeight
-      } else {
-        return isSystemKeyboard ? padLandscapeSystemKeyboardHeight : padLandscapeInAppKeyboardHeight
-      }
-    } else {
-      if isPortrait {
-        return isSystemKeyboard ? phonePortraitSystemKeyboardHeight : phonePortraitInAppKeyboardHeight
-      } else {
-        return isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : phoneLandscapeInAppKeyboardHeight
-      }
+      return keyboardHeight(isPortrait: UIDevice.current.orientation.isPortrait)
     }
   }
 
   func keyboardHeight(with orientation: UIInterfaceOrientation) -> CGFloat {
+    return keyboardHeight(isPortrait: orientation.isPortrait)
+  }
+
+  func keyboardHeight(isPortrait: Bool) -> CGFloat {
     if UIDevice.current.userInterfaceIdiom == .pad {
-      if orientation.isPortrait {
+      if isPortrait {
         return isSystemKeyboard ? padPortraitSystemKeyboardHeight : padPortraitInAppKeyboardHeight
       } else {
         return isSystemKeyboard ? padLandscapeSystemKeyboardHeight : padLandscapeInAppKeyboardHeight
       }
     } else {
-      if orientation.isPortrait {
+      if isPortrait {
         return isSystemKeyboard ? phonePortraitSystemKeyboardHeight : phonePortraitInAppKeyboardHeight
       } else {
         return isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : phoneLandscapeInAppKeyboardHeight
@@ -2300,20 +2263,7 @@ UIGestureRecognizerDelegate {
     view.navigationDelegate = self
 
     view.scrollView.isScrollEnabled = false
-    // FIXME: Indicate failure to load URL
-    if #available(iOS 9.0, *) {
-      if let url = activeKeymanDirectory()?.appendingPathComponent(kmwFullFileName) {
-        view.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
-      }
-    } else {
-      // Copy Keyman files to the temp folder and load from there
-      if copyKeymanFilesToTemp() {
-        let url = URL(fileURLWithPath: NSTemporaryDirectory())
-          .appendingPathComponent("keyman")
-          .appendingPathComponent(kmwFullFileName)
-        view.load(URLRequest(url: url, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
-      }
-    }
+    reloadKeyboard(in: view)
     return view
   }
 
@@ -2390,35 +2340,36 @@ UIGestureRecognizerDelegate {
   public func dismissKeyboardPicker(_ viewController: UIViewController) {
     viewController.dismiss(animated: true)
     if shouldReloadKeyboard {
-      reloadKeyboard()
+      reloadKeyboard(in: inputView)
     }
     NotificationCenter.default.post(name: .keymanKeyboardPickerDismissed, object: self)
   }
 
-  func reloadKeyboard() {
-    // FIXME: Duplicated elsewhere
+  private func reloadKeyboard(in view: WKWebView) {
     if #available(iOS 9.0, *) {
       guard let codeURL = activeKeymanDirectory()?.appendingPathComponent(kmwFullFileName) else {
         return
       }
-      inputView.loadFileURL(codeURL, allowingReadAccessTo: codeURL.deletingLastPathComponent())
+      view.loadFileURL(codeURL, allowingReadAccessTo: codeURL.deletingLastPathComponent())
     } else {
-      // Copy Keyman files to the temp folder and load from there
+      // WKWebView in iOS < 9 is missing loadFileURL().
+      // The files need to be copied to a temporary directory and loaded from there.
       if copyKeymanFilesToTemp() {
         let codeURL = URL(fileURLWithPath: NSTemporaryDirectory())
           .appendingPathComponent("keyman")
           .appendingPathComponent(kmwFullFileName)
-        inputView.load(URLRequest(url: codeURL, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
+        view.load(URLRequest(url: codeURL, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
       }
     }
   }
 
   @objc func resetKeyboard() {
+    let index = indexForUserKeyboard(withID: keyboardID, languageID: languageID)
     keyboardID = nil
     languageID = nil
 
     let userKeyboards = activeUserDefaults().array(forKey: Key.userKeyboardsList) as? [[String: String]]
-    if let index = indexForUserKeyboard(withID: keyboardID, languageID: languageID) {
+    if let index = index {
       setKeyboard(userKeyboards![index])
     } else if let userKeyboards = userKeyboards, !userKeyboards.isEmpty {
       setKeyboard(userKeyboards[0])
@@ -2631,6 +2582,7 @@ UIGestureRecognizerDelegate {
     webView.evaluateJavaScript("setDeviceType('\(deviceType)');", completionHandler: nil)
     if (keyboardID == nil || languageID == nil) && !shouldReloadKeyboard {
       var newKb = DefaultKeyboard.keyboard
+
       let userData = isSystemKeyboard ? UserDefaults.standard : activeUserDefaults()
       if let currentKb = userData.dictionary(forKey: Key.userCurrentKeyboard) as? [String: String] {
         let kbID = currentKb[Key.keyboardId]
@@ -2948,7 +2900,7 @@ UIGestureRecognizerDelegate {
       synchronizeSWKeyboard()
       if keyboardID != nil && languageID != nil {
         shouldReloadKeyboard = true
-        reloadKeyboard()
+        reloadKeyboard(in: inputView)
       }
       didSynchronize = true
       standardUserDef.set(activeUserDef.object(forKey: Key.synchronizeSWKeyboard),

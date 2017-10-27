@@ -47,14 +47,6 @@ public class HTTPDownloadRequest: NSObject {
     return nil
   }
 
-  // TODO: Remove
-  @objc public var responseStatusCodeObjc: Int {
-    if let code = responseStatusCode {
-      return code
-    }
-    return -1
-  }
-
   @objc public var responseStatusMessage: String? {
     guard let statusCode = responseStatusCode else {
       return nil
