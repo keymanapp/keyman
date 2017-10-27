@@ -34,10 +34,6 @@ APP_FRAMEWORK_PATH=keyman/Keyman/KeymanEngine.framework
 APP_BUILD_PATH=keyman/Keyman/build/
 KMW_SOURCE=../web/source
 
-APP_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.app
-KEYBOARD_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/SWKeyboard.appex
-ARCHIVE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
-
 do_clean ( ) {
   rm -rf $KMEI_BUILD_PATH
   rm -rf $APP_BUILD_PATH
@@ -88,6 +84,11 @@ while [[ $# -gt 0 ]] ; do
     shift # past argument
 done
 
+APP_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.app
+KEYBOARD_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/SWKeyboard.appex
+ARCHIVE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
+BUILD_FRAMEWORK_PATH=$KMEI_BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
+
 if [ $CLEAN_ONLY = true ]; then
   exit 0
 fi
@@ -132,10 +133,15 @@ echo "Building KMEI..."
 #OTHER_CFLAGS=-fembed-bitcode is relied upon for building the samples by command-line.  They build fine within XCode itself without it, though.
 
 rm -r $KMEI_BUILD_PATH/$CONFIG-universal 2>/dev/null
-BUILD_FRAMEWORK_PATH=$KMEI_BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
 xcodebuild -quiet -project engine/KMEI/KeymanEngine.xcodeproj -target KME-universal -configuration $CONFIG \
   $CODE_SIGN_IDENTITY $CODE_SIGNING_REQUIRED $DEV_TEAM
 assertDirExists "$BUILD_FRAMEWORK_PATH"
+
+if [ $BUILD_NUMBER ]; then
+  echo "Setting version number in KeymanEngine to $BUILD_NUMBER."
+  /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" "$BUILD_FRAMEWORK_PATH/Info.plist"
+  /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$BUILD_FRAMEWORK_PATH/Info.plist"
+fi
 
 rm -r "$APP_FRAMEWORK_PATH"
 cp -R "$BUILD_FRAMEWORK_PATH" "$APP_FRAMEWORK_PATH"
@@ -158,7 +164,7 @@ if [ $DO_KEYMANAPP = true ]; then
 
       # Pass the build number information along to the Plist file of the keyboard.  We want to intercept it before it's embedded into the app!
       if [ $BUILD_NUMBER ]; then
-        echo "Setting version numbers to $BUILD_NUMBER."
+        echo "Setting version number in SWKeyboard to $BUILD_NUMBER."
         /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" "$KEYBOARD_BUNDLE_PATH/Info.plist"
         /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$KEYBOARD_BUNDLE_PATH/Info.plist"
       fi
@@ -167,6 +173,7 @@ if [ $DO_KEYMANAPP = true ]; then
 
       # Pass the build number information along to the Plist file of the app.
       if [ $BUILD_NUMBER ]; then
+        echo "Setting version number in Keyman app to $BUILD_NUMBER."
         /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" "$APP_BUNDLE_PATH/Info.plist"
         /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$APP_BUNDLE_PATH/Info.plist"
       fi
