@@ -89,6 +89,7 @@ public struct Keyboard: Codable {
     let filename = try container.decode(String.self, forKey: .filename)
     let isDefault = try container.decodeIfPresent(Bool.self, forKey: .isDefault)
     let isRTL = try container.decodeIfPresent(Bool.self, forKey: .isRTL)
+    // TODO: Handle both seconds and ISO 8601
     let lastModified = try container.decode(Date.self, forKey: .lastModified)
     let fileSize = try container.decode(Int.self, forKey: .fileSize)
     let version = try container.decode(String.self, forKey: .version)

@@ -13,7 +13,7 @@ private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
 
 class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
-  private var userKeyboards: [String: [String: Any]] = [:]
+  private var userKeyboards: [String: InstallableKeyboard] = [:]
   private var isUpdate = false
   private let language: Language
 
@@ -154,17 +154,14 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
   private func loadUserKeyboards() {
     let userData = Manager.shared.activeUserDefaults()
-    guard let userKbList = userData.array(forKey: Key.userKeyboardsList) as? [[String: String]],
-      !userKbList.isEmpty else {
+    guard let userKbList = userData.installableKeyboards(forKey: Key.userKeyboardsList), !userKbList.isEmpty else {
       userKeyboards = [:]
       return
     }
 
     userKeyboards = [:]
     for kb in userKbList {
-      let langID = kb[Key.languageId]
-      let kbID = kb[Key.keyboardId]
-      let dictKey = "\(langID!)_\(kbID!)"
+      let dictKey = "\(kb.languageID)_\(kb.id)"
       userKeyboards[dictKey] = kb
     }
   }

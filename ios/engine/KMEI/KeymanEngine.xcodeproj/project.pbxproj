@@ -67,6 +67,7 @@
 		C082CE151F90AFD400860F02 /* Collection+SafeAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = C082CE141F90AFD400860F02 /* Collection+SafeAccess.swift */; };
 		C0959CD41F99C44E00B616BC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0959CD31F99C44E00B616BC /* Constants.swift */; };
 		C0A93A541F8B21240079948B /* Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A93A531F8B21240079948B /* Manager.swift */; };
+		C0B901AA1FA1AFC200764EB8 /* UserDefaults+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B901A91FA1AFC200764EB8 /* UserDefaults+Types.swift */; };
 		C0CE581E1F877B4D00AE6A7E /* NSNotification.Name+Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CE581D1F877B4D00AE6A7E /* NSNotification.Name+Notifications.swift */; };
 		C0D3F35E1F9F33490055C7CF /* Options.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F35D1F9F33490055C7CF /* Options.swift */; };
 		C0D3F3601F9F3AD80055C7CF /* InstallableKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F35F1F9F3AD80055C7CF /* InstallableKeyboard.swift */; };
@@ -184,6 +185,7 @@
 		C0959CD31F99C44E00B616BC /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		C0A5FF361F6682EB00BE740C /* PopoverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
 		C0A93A531F8B21240079948B /* Manager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Manager.swift; sourceTree = "<group>"; };
+		C0B901A91FA1AFC200764EB8 /* UserDefaults+Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Types.swift"; sourceTree = "<group>"; };
 		C0CE581D1F877B4D00AE6A7E /* NSNotification.Name+Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotification.Name+Notifications.swift"; sourceTree = "<group>"; };
 		C0D3F35D1F9F33490055C7CF /* Options.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Options.swift; sourceTree = "<group>"; };
 		C0D3F35F1F9F3AD80055C7CF /* InstallableKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallableKeyboard.swift; sourceTree = "<group>"; };
@@ -385,6 +387,7 @@
 				C075EB051F8EFF870041F4BD /* String+Helpers.swift */,
 				C082CE141F90AFD400860F02 /* Collection+SafeAccess.swift */,
 				C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */,
+				C0B901A91FA1AFC200764EB8 /* UserDefaults+Types.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -752,6 +755,7 @@
 				C0CE581E1F877B4D00AE6A7E /* NSNotification.Name+Notifications.swift in Sources */,
 				C0A93A541F8B21240079948B /* Manager.swift in Sources */,
 				C06D373E1F81F5C400F61AE0 /* KeyboardInfoViewController.swift in Sources */,
+				C0B901AA1FA1AFC200764EB8 /* UserDefaults+Types.swift in Sources */,
 				C06D373F1F81F5C400F61AE0 /* KeyboardPickerViewController.swift in Sources */,
 				C0324B911F8763E100AF3785 /* TextViewDelegateProxy.swift in Sources */,
 				C040E50E1F85FF8A00901EE4 /* KeyPreviewView.swift in Sources */,

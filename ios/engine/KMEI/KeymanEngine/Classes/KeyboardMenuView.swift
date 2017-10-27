@@ -36,7 +36,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     }
 
     let userData = Manager.shared.activeUserDefaults()
-    let keyboardList = userData.array(forKey: Key.userKeyboardsList)
+    let keyboardList = userData.installableKeyboards(forKey: Key.userKeyboardsList)
 
     let titleCloseButton: String
     if let closeButtonTitle = closeButtonTitle {
@@ -290,13 +290,10 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       cell.isSelected = false
       cell.accessoryType = .disclosureIndicator
     } else {
-      let keyboard = tableList[indexPath.row] as? [AnyHashable: Any]
-      let languageID = keyboard?[Key.languageId] as? String
-      let keyboardID = keyboard?[Key.keyboardId] as? String
-      cell.textLabel?.text = keyboard?[Key.keyboardName] as? String
+      let keyboard = tableList[indexPath.row] as! InstallableKeyboard
+      cell.textLabel?.text = keyboard.name
       cell.tag = indexPath.row
-      if (Manager.shared.languageID == languageID) &&
-        (Manager.shared.keyboardID == keyboardID) {
+      if (Manager.shared.languageID == keyboard.languageID) && (Manager.shared.keyboardID == keyboard.id) {
         cell.selectionStyle = .none
         cell.isSelected = true
         cell.accessoryType = .checkmark
@@ -338,18 +335,10 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       inputViewController?.advanceToNextInputMode()
       return
     }
-    guard let kb = tableList[index] as? [AnyHashable: Any] else {
+    guard let kb = tableList[index] as? InstallableKeyboard else {
       return
     }
-    let langID = kb[Key.languageId] as? String
-    let kbID = kb[Key.keyboardId] as? String
-    let langName = kb[Key.languageName] as? String
-    let kbName = kb[Key.keyboardName] as? String
-    let font = kb[Key.font] as? String
-    let oskFont = kb[Key.oskFont] as? String
-
-    if Manager.shared.setKeyboard(withID: kbID!, languageID: langID!, keyboardName: kbName,
-                                  languageName: langName, font: font, oskFont: oskFont) {
+    if Manager.shared.setKeyboard(kb) {
       tableView?.reloadData()
     }
   }

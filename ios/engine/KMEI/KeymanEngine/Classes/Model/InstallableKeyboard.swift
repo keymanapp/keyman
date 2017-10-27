@@ -10,15 +10,15 @@ import Foundation
 
 /// Mainly differs from the API `Keyboard` by having an associated language.
 public struct InstallableKeyboard: Codable {
-  public let id: String
-  public let name: String
-  public let languageID: String
-  public let languageName: String
-  public let version: String
-  public let isRTL: Bool
-  public let font: Font?
-  public let oskFont: Font?
-  public let isCustom: Bool
+  public var id: String
+  public var name: String
+  public var languageID: String
+  public var languageName: String
+  public var version: String
+  public var isRTL: Bool
+  public var font: Font?
+  public var oskFont: Font?
+  public var isCustom: Bool
 
   public init(id: String,
               name: String,

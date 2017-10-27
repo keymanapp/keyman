@@ -66,6 +66,7 @@ public struct Key {
   static let update = "update"
 }
 
+// TODO: Remove
 public struct DefaultKeyboard {
   public static let keyboardID = "european2"
   public static let languageID = "eng"
@@ -83,4 +84,17 @@ public struct DefaultKeyboard {
     Key.keyboardRTL: keyboardRTL,
     Key.font: keyboardFont
   ]
+}
+
+public struct Constants {
+  private static let defaultFont = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
+  public static let defaultKeyboard = InstallableKeyboard(id: "european2",
+                                                          name: "EuroLatin2 Keyboard",
+                                                          languageID: "eng",
+                                                          languageName: "English",
+                                                          version: "1.6",
+                                                          isRTL: false,
+                                                          font: defaultFont,
+                                                          oskFont: nil,
+                                                          isCustom: false)
 }

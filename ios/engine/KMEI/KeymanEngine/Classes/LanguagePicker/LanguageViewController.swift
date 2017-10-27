@@ -275,16 +275,14 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   func loadUserKeyboards() {
     userKeyboards = [:]
     let userData = Manager.shared.activeUserDefaults()
-    guard let userKbList = userData.array(forKey: Key.userKeyboardsList) as? [[String: Any]] else {
+    guard let userKbList = userData.installableKeyboards(forKey: Key.userKeyboardsList) else {
       userKeyboards = [:]
       return
     }
 
     for kb in userKbList {
-      if let langID = kb[Key.languageId] as? String, let kbID = kb[Key.keyboardId] as? String {
-        let dictKey = "\(langID)_\(kbID)"
-        userKeyboards[dictKey] = kb
-      }
+      let dictKey = "\(kb.languageID)_\(kb.id)"
+      userKeyboards[dictKey] = kb
     }
   }
 

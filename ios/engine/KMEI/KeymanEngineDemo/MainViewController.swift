@@ -213,59 +213,30 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
 
   // MARK: - Responding to Keyman notifications
   @objc func keyboardDownloadStarted(_ notification: Notification) {
-    let kbInfo = notification.userInfo?[Key.keyboardInfo] as? [AnyHashable: Any]
-    let kbID = kbInfo?[Key.keyboardId] as? String
-    let langID = kbInfo?[Key.languageId] as? String
-    let kbName = kbInfo?[Key.keyboardName] as? String
-    let langName = kbInfo?[Key.languageName] as? String
-    if kbID != nil && langID != nil && kbName != nil && langName != nil {
-      showActivityIndicator()
-    }
+    showActivityIndicator()
   }
 
   @objc func keyboardDownloaded(_ notification: Notification) {
     // This is an example of responding to a Keyman event.
     //   - for a list of all events, see KMManager.h
 
-    let kbInfo = notification.userInfo?[Key.keyboardInfo] as? [AnyHashable: Any]
-    let kbID = kbInfo?[Key.keyboardId] as? String
-    let langID = kbInfo?[Key.languageId] as? String
-    let kbName = kbInfo?[Key.keyboardName] as? String
-    let langName = kbInfo?[Key.languageName] as? String
-    let isRTL = (kbInfo?[Key.keyboardRTL] as? String) == "Y"
-    let isCustom = (kbInfo?[Key.customKeyboard] as? String) == "Y"
-    let font = kbInfo?[Key.font] as? String
-    let oskFont = kbInfo?[Key.oskFont] as? String
-
-    if let kbID = kbID,
-       let langID = langID,
-       let kbName = kbName,
-       let langName = langName {
-      Manager.shared.addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-                                 languageName: langName, isRTL: isRTL, isCustom: isCustom,
-                                             font: font, oskFont: oskFont)
-      Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-                                 languageName: langName, font: font, oskFont: oskFont)
-      perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
+    let keyboards = notification.userInfo![Key.keyboardInfo] as! [InstallableKeyboard]
+    for keyboard in keyboards {
+      Manager.shared.addKeyboard(keyboard)
+      Manager.shared.setKeyboard(keyboard)
     }
+    perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
   }
 
   @objc func keyboardDownloadFailed(_ notification: Notification) {
-    let kbInfo = notification.userInfo?[Key.keyboardInfo] as? [AnyHashable: Any]
-    let kbID = kbInfo?[Key.keyboardId] as? String
-    let langID = kbInfo?[Key.languageId] as? String
-    let kbName = kbInfo?[Key.keyboardName] as? String
-    let langName = kbInfo?[Key.languageName] as? String
-    if kbID != nil && langID != nil && kbName != nil && langName != nil {
-      guard let error = notification.userInfo?[NSUnderlyingErrorKey] as? Error else {
-        return
-      }
-      if error.localizedDescription != "Download queue is busy" {
-        perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
-        perform(#selector(self.showAlert), with: error.localizedDescription, afterDelay: 1.1)
-      } else {
-        showAlert(error.localizedDescription)
-      }
+    guard let error = notification.userInfo?[NSUnderlyingErrorKey] as? Error else {
+      return
+    }
+    if error.localizedDescription != "Download queue is busy" {
+      perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
+      perform(#selector(self.showAlert), with: error.localizedDescription, afterDelay: 1.1)
+    } else {
+      showAlert(error.localizedDescription)
     }
   }
 
