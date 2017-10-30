@@ -19,10 +19,16 @@ public struct Font: Codable {
   /// Font size (in CSS dimensions).
   public let size: String
 
-  public init(family: String, source: [String], size: String?) {
+  public init(family: String, source: [String], size: String? = nil) {
     self.family = family
     self.source = source
     self.size = size ?? "1em"
+  }
+
+  public init(filename: String) {
+    let family = "font_family_\(filename)"
+    let source = [filename]
+    self.init(family: family, source: source)
   }
 
   public init(from decoder: Decoder) throws {
