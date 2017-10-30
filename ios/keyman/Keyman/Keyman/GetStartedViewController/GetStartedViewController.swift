@@ -170,7 +170,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     }
 
     let firstKB = userKeyboards[0]
-    return firstKB.id != DefaultKeyboard.keyboardID || firstKB.languageID != DefaultKeyboard.languageID
+    return firstKB.id != Constants.defaultKeyboard.id || firstKB.languageID != Constants.defaultKeyboard.languageID
   }
 
   @objc func switchValueChanged(_ sender: Any) {

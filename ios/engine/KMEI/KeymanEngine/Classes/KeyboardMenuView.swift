@@ -50,16 +50,9 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       _tableList = keyboardList
       _tableList!.append(titleCloseButton)
     } else {
-      var keyboard = [
-        Key.keyboardId: DefaultKeyboard.keyboardID,
-        Key.languageId: DefaultKeyboard.languageID,
-        Key.keyboardName: DefaultKeyboard.keyboardName,
-        Key.languageName: DefaultKeyboard.languageName,
-        Key.keyboardRTL: DefaultKeyboard.keyboardRTL,
-        Key.font: DefaultKeyboard.keyboardFont
-      ]
-      if let version = Manager.shared.latestKeyboardFileVersion(withID: DefaultKeyboard.keyboardID) {
-        keyboard[Key.keyboardVersion] = version
+      var keyboard = Constants.defaultKeyboard
+      if let version = Manager.shared.latestKeyboardFileVersion(withID: Constants.defaultKeyboard.id) {
+        keyboard.version = version
       }
       _tableList = [keyboard]
       _tableList!.append(titleCloseButton)
@@ -313,8 +306,8 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     var w: CGFloat = 0
     for obj in tableList {
       let text: String?
-      if let kb = obj as? [AnyHashable: Any] {
-        text = kb[Key.keyboardName] as? String
+      if let kb = obj as? InstallableKeyboard {
+        text = kb.name
       } else {
         text = obj as? String
       }

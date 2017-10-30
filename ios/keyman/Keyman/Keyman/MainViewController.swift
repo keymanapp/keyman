@@ -912,7 +912,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   private func checkProfile(forKeyboardID kbID: String, languageID langID: String, doListCheck: Bool) {
-    if (kbID == DefaultKeyboard.keyboardID) && (langID == DefaultKeyboard.languageID) {
+    if kbID == Constants.defaultKeyboard.id && langID == Constants.defaultKeyboard.languageID {
       return
     }
 
@@ -1087,10 +1087,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
 
     let firstKB = userKbs[0]
-    if firstKB.id == DefaultKeyboard.keyboardID && firstKB.languageID == DefaultKeyboard.languageID {
-      return true
-    }
-    return false
+    return firstKB.id != Constants.defaultKeyboard.id || firstKB.languageID != Constants.defaultKeyboard.languageID
   }
 
   @objc func showKMWebBrowserView(_ sender: Any) {

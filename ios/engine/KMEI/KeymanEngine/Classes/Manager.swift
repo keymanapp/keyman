@@ -209,8 +209,8 @@ UIGestureRecognizerDelegate {
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
                                            name: .UIKeyboardWillHide, object: nil)
 
-    let kbVersion = latestKeyboardFileVersion(withID: DefaultKeyboard.keyboardID)
-    updateKeyboardVersion(forID: DefaultKeyboard.keyboardID, newKeyboardVersion: kbVersion!)
+    let kbVersion = latestKeyboardFileVersion(withID: Constants.defaultKeyboard.id)
+    updateKeyboardVersion(forID: Constants.defaultKeyboard.id, newKeyboardVersion: kbVersion!)
 
     inputView = createInputView() // Pre-load keyboard
 
@@ -1131,7 +1131,7 @@ UIGestureRecognizerDelegate {
       try copyFromBundle(resourceName: iOSCodeFileName,
                          resourceExtension: nil,
                          dstDir: libraryDirectory)
-      try copyFromBundle(resourceName: "\(DefaultKeyboard.keyboardID)-1.6",
+      try copyFromBundle(resourceName: "\(Constants.defaultKeyboard.id)-1.6",
                          resourceExtension: "js",
                          dstDir: activeLanguageDirectory())
       try copyFromBundle(resourceName: "DejaVuSans",
