@@ -131,8 +131,6 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
         userKeyboards = userData.installableKeyboards(forKey: Key.userKeyboardsList)!
         Manager.shared.setKeyboard(userKeyboards[0])
       }
-      NotificationCenter.default.post(name: NSNotification.Name.keymanKeyboardRemoved,
-        object: self, userInfo: [Key.keyboardInfo: kb])
       self.tableView.reloadData()
     }
     setIsDoneButtonEnabled(true)

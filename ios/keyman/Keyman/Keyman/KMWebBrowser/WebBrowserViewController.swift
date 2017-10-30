@@ -32,6 +32,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   private let webBrowserLastURLKey = "KMWebBrowserLastURL"
 
   private var keyboardChangedObserver: NotificationObserver?
+  private var keyboardPickerDismissedObserver: NotificationObserver?
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -39,8 +40,9 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     keyboardChangedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardChanged,
       using: keyboardChanged)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardPickerDismissed),
-        name: NSNotification.Name.keymanKeyboardPickerDismissed, object: nil)
+    keyboardPickerDismissedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardPickerDismissed,
+      using: keyboardPickerDismissed)
 
     webView.delegate = self
     webView.scalesPageToFit = true
@@ -135,10 +137,6 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     navBarTopConstraint.constant = AppDelegate.statusBarHeight()
-  }
-
-  deinit {
-    NotificationCenter.default.removeObserver(self)
   }
 
   override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
@@ -278,7 +276,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     }
   }
 
-  @objc func keyboardPickerDismissed(_ notification: Notification) {
+  private func keyboardPickerDismissed() {
     if newFontFamily != fontFamily {
       fontFamily = newFontFamily
       webView?.reload()

@@ -163,9 +163,7 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
           // Select default keyboard
           Manager.shared.setKeyboard(kb)
         }
-        NotificationCenter.default.post(name: NSNotification.Name.keymanKeyboardRemoved,
-                                        object: self, userInfo: [Key.keyboardInfo: kb]
-        )
+        NotificationCenter.default.post(name: Notifications.keyboardRemoved, object: self, value: kb)
         navigationController?.popToRootViewController(animated: true)
       }
     }

@@ -23,11 +23,6 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
   private var keyboardChangedObserver: NotificationObserver?
 
   // MARK: - Object Admin
-  deinit {
-    NotificationCenter.default.removeObserver(self)
-    delegate = nil
-  }
-
   public convenience init() {
     self.init(frame: CGRect.zero)
   }

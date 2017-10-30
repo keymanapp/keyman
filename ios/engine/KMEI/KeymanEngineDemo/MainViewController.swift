@@ -18,6 +18,7 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
   private var keyboardDownloadStartedObserver: NotificationObserver?
   private var keyboardDownloadCompletedObserver: NotificationObserver?
   private var keyboardDownloadFailedObserver: NotificationObserver?
+  private var keyboardPickerDismissedObserver: NotificationObserver?
 
   deinit {
     NotificationCenter.default.removeObserver(self)
@@ -40,12 +41,9 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
     keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadFailed,
       using: keyboardDownloadFailed)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.languagesUpdated),
-                                           name: .keymanLanguagesUpdated, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardLoaded),
-                                           name: .keymanKeyboardLoaded, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardPickerDismissed),
-                                           name: .keymanKeyboardPickerDismissed, object: nil)
+    keyboardPickerDismissedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardPickerDismissed,
+      using: keyboardPickerDismissed)
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -242,11 +240,7 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
     }
   }
 
-  @objc func languagesUpdated(_ notification: Notification) { }
-
-  @objc func keyboardLoaded(_ notification: Notification) { }
-
-  @objc func keyboardPickerDismissed(_ notification: Notification) {
+  private func keyboardPickerDismissed() {
     textView1.becomeFirstResponder()
   }
 

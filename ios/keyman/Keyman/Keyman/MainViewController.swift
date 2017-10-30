@@ -56,10 +56,15 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var updateStatus: Int = 0  // TODO: Make into enum
   private var didDownload: Bool = false
 
+  private var keyboardLoadedObserver: NotificationObserver?
+  private var languagesUpdatedObserver: NotificationObserver?
+  private var languagesDownloadFailedObserver: NotificationObserver?
+  private var keyboardPickerDismissedObserver: NotificationObserver?
   private var keyboardChangedObserver: NotificationObserver?
   private var keyboardDownloadStartedObserver: NotificationObserver?
   private var keyboardDownloadCompletedObserver: NotificationObserver?
   private var keyboardDownloadFailedObserver: NotificationObserver?
+  private var keyboardRemovedObserver: NotificationObserver?
 
   var appDelegate: AppDelegate! {
     return UIApplication.shared.delegate as? AppDelegate
@@ -79,17 +84,21 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         name: NSNotification.Name.UIKeyboardWillShow, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
         name: NSNotification.Name.UIKeyboardWillHide, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardLoaded),
-        name: NSNotification.Name.keymanKeyboardLoaded, object: nil)
+    keyboardLoadedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardLoaded,
+      using: keyboardLoaded)
     keyboardChangedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardChanged,
       using: keyboardChanged)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.languagesUpdated),
-        name: NSNotification.Name.keymanLanguagesUpdated, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.languagesDownloadFailed),
-        name: NSNotification.Name.keymanLanguagesDownloadFailed, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardPickerDismissed),
-        name: NSNotification.Name.keymanKeyboardPickerDismissed, object: nil)
+    languagesUpdatedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.languagesUpdated,
+      using: languagesUpdated)
+    languagesDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.languagesDownloadFailed,
+      using: languagesDownloadFailed)
+    keyboardPickerDismissedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardPickerDismissed,
+      using: keyboardPickerDismissed)
     keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadStarted,
       using: keyboardDownloadStarted)
@@ -99,8 +108,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadFailed,
       using: keyboardDownloadFailed)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardRemoved),
-        name: NSNotification.Name.keymanKeyboardRemoved, object: nil)
+    keyboardRemovedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardRemoved,
+      using: keyboardRemoved)
     NotificationCenter.default.addObserver(self, selector: #selector(self.launched),
         name: launchedFromUrlNotification, object: nil)
 
@@ -435,7 +445,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     resizeViews(withKeyboardVisible: false)
   }
 
-  @objc func keyboardLoaded(_ notification: Notification) {
+  // MARK: - Keyman Notifications
+
+  private func keyboardLoaded(_ notification: KeyboardLoadedNotification) {
     startTimer()
   }
 
@@ -487,20 +499,35 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
   }
 
-  @objc func languagesUpdated(_ notification: Notification) {
+  private func languagesUpdated() {
     updateStatus = 1
   }
 
-  @objc func languagesDownloadFailed(_ notification: Notification) {
+  private func languagesDownloadFailed(_ notification: LanguagesDownloadFailedNotification) {
     updateStatus = -1
   }
 
-  @objc func keyboardPickerDismissed(_ notification: Notification) {
+  private func keyboardPickerDismissed() {
     textView.becomeFirstResponder()
     if UIDevice.current.userInterfaceIdiom == .pad && shouldShowGetStarted {
       perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
     }
   }
+
+  private func keyboardRemoved(_ keyboard: InstallableKeyboard) {
+    guard let font = keyboard.font,
+      let profile = profileName(withFont: font) else {
+        return
+    }
+    profiles2Install = profiles2Install.filter { $0 != profile }
+    profiles2Install.append(profile)
+    checkedProfiles = checkedProfiles.filter { $0 != profile }
+    let userData = AppDelegate.activeUserDefaults()
+    userData.set(checkedProfiles, forKey: checkedProfilesKey)
+    userData.synchronize()
+  }
+
+  // MARK: - View Actions
 
   @objc func launched(fromUrl notification: Notification) {
     if let url = notification.userInfo?[urlKey] as? URL, url.query != nil {
@@ -511,20 +538,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     } else {
       launchUrl = nil
     }
-  }
-
-  @objc func keyboardRemoved(_ notification: Notification) {
-    let kbInfo = notification.userInfo?[Key.keyboardInfo] as! InstallableKeyboard
-    guard let font = kbInfo.font,
-          let profile = profileName(withFont: font) else {
-      return
-    }
-    profiles2Install = profiles2Install.filter { $0 != profile }
-    profiles2Install.append(profile)
-    checkedProfiles = checkedProfiles.filter { $0 != profile }
-    let userData = AppDelegate.activeUserDefaults()
-    userData.set(checkedProfiles, forKey: checkedProfilesKey)
-    userData.synchronize()
   }
 
   @objc func infoButtonClick(_ sender: Any?) {
