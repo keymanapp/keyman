@@ -309,9 +309,9 @@ UIGestureRecognizerDelegate {
       perform(showHelpBubble, with: nil, afterDelay: 1.5)
     }
 
-    NotificationCenter.default.post(name: .keymanKeyboardChanged,
+    NotificationCenter.default.post(name: Notifications.keyboardChanged,
                                     object: self,
-                                    userInfo: [Key.keyboardInfo: kb])
+                                    value: kb)
     return true
   }
 
@@ -494,7 +494,7 @@ UIGestureRecognizerDelegate {
   /// Asynchronously fetches the dictionary of possible languages/keyboards to be displayed in the keyboard picker.
   /// If not called before the picker is shown, the dictionary will be fetched automatically.
   /// This method allows you to fetch the info in advance at a time that's appropriate for your app.
-  /// See `NSNotification.Name+Notifications` for a list of relevant notifications.
+  /// See `Notifications` for a list of relevant notifications.
   ///
   /// To save bandwidth, a cached version is used if:
   /// - the Keyman server is unreachable
@@ -521,7 +521,7 @@ UIGestureRecognizerDelegate {
   }
 
   /// Asynchronously fetches the .js file for the keyboard with given IDs.
-  /// See `NSNotification+Notifications` for notification on success/failiure.
+  /// See `Notifications` for notification on success/failiure.
   /// - Parameters:
   ///   - isUpdate: Keep the keyboard files on failure
   public func downloadKeyboard(withID keyboardID: String, languageID: String, isUpdate: Bool) {
@@ -807,7 +807,9 @@ UIGestureRecognizerDelegate {
     // If we're downloading a new keyboard.
     // The extra check is there to filter out other potential request types in the future.
     if request.tag == 0 && request.typeCode == .downloadFile {
-      NotificationCenter.default.post(name: .keymanKeyboardDownloadStarted, object: self, userInfo: request.userInfo)
+      NotificationCenter.default.post(name: Notifications.keyboardDownloadStarted,
+                                      object: self,
+                                      value: request.userInfo[Key.keyboardInfo] as! [InstallableKeyboard])
     }
   }
 
@@ -828,8 +830,9 @@ UIGestureRecognizerDelegate {
           registerCustomFonts()
           kmLog("Downloaded keyboard: \(kbID).", checkDebugPrinting: true)
 
-          NotificationCenter.default.post(name: .keymanKeyboardDownloadCompleted, object: self,
-                                          userInfo: request.userInfo)
+          NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
+                                          object: self,
+                                          value: keyboards)
           if isUpdate {
             shouldReloadKeyboard = true
             reloadKeyboard(in: inputView)
@@ -944,12 +947,11 @@ UIGestureRecognizerDelegate {
     }
   }
 
-  private func downloadFailed(forKeyboards keyboards: [InstallableKeyboard], error: NSError) {
-    let userInfo: [AnyHashable: Any] = [
-      NSUnderlyingErrorKey: error,
-      Key.keyboardInfo: keyboards
-    ]
-    NotificationCenter.default.post(name: .keymanKeyboardDownloadFailed, object: self, userInfo: userInfo)
+  private func downloadFailed(forKeyboards keyboards: [InstallableKeyboard], error: Error) {
+    let notification = KeyboardDownloadFailedNotification(keyboards: keyboards, error: error)
+    NotificationCenter.default.post(name: Notifications.keyboardDownloadFailed,
+                                    object: self,
+                                    value: notification)
   }
 
   // MARK: - Loading custom keyboards

@@ -20,6 +20,8 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
   private var delegateProxy: TextViewDelegateProxy!
   private var shouldUpdateKMText = false
 
+  private var keyboardChangedObserver: NotificationObserver?
+
   // MARK: - Object Admin
   deinit {
     NotificationCenter.default.removeObserver(self)
@@ -53,8 +55,8 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
       inputAssistantItem.trailingBarButtonGroups = []
     }
 
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged),
-                                           name: .keymanKeyboardChanged, object: nil)
+    keyboardChangedObserver = NotificationCenter.default.addObserver(forName: Notifications.keyboardChanged,
+                                                                     using: keyboardChanged)
   }
 
   // MARK: - Class Overrides
@@ -318,13 +320,12 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
   }
 
   // MARK: - Keyman notifications
-  @objc func keyboardChanged(_ notification: Notification) {
+  private func keyboardChanged(_ kb: InstallableKeyboard) {
     if !shouldSetCustomFontOnKeyboardChange {
       return
     }
 
     // TODO: Get font name directly from keyboard
-    let kb = notification.userInfo?[Key.keyboardInfo] as! InstallableKeyboard
     let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID)
     let fontSize = font?.pointSize ?? UIFont.systemFontSize
     if let fontName = fontName {

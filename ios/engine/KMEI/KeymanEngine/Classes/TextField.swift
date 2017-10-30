@@ -20,6 +20,8 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
   private var delegateProxy: TextFieldDelegateProxy!
   private var shouldUpdateKMText = false
 
+  private var keyboardChangedObserver: NotificationObserver?
+
   // MARK: - Object Admin
   deinit {
     NotificationCenter.default.removeObserver(self)
@@ -51,8 +53,8 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.textFieldTextDidChange),
                                            name: .UITextFieldTextDidChange, object: self)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged),
-                                           name: NSNotification.Name.keymanKeyboardChanged, object: nil)
+    keyboardChangedObserver = NotificationCenter.default.addObserver(forName: Notifications.keyboardChanged,
+                                                                     using: keyboardChanged)
   }
 
   // MARK: - Class Overrides
@@ -325,13 +327,12 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
   }
 
   // MARK: - Keyman notifications
-  @objc func keyboardChanged(_ notification: Notification) {
+  private func keyboardChanged(_ kb: InstallableKeyboard) {
     if !shouldSetCustomFontOnKeyboardChange {
       return
     }
 
     // TODO: Get font name directly from keyboard object
-    let kb = notification.userInfo?[Key.keyboardInfo] as! InstallableKeyboard
     let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID)
     let fontSize = font?.pointSize ?? UIFont.systemFontSize
     if let fontName = fontName {

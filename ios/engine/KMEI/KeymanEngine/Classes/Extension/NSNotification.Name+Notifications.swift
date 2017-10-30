@@ -11,10 +11,6 @@ import Foundation
 public extension NSNotification.Name {
   public static let keymanLanguagesUpdated = Notification.Name("KeymanLanguagesUpdated")
   public static let keymanLanguagesDownloadFailed = Notification.Name("KeymanLanguagesDownloadFailed")
-  public static let keymanKeyboardDownloadStarted = Notification.Name("KeymanKeyboardDownloadStarted")
-  public static let keymanKeyboardDownloadCompleted = Notification.Name("KeymanKeyboardDownloadCompleted")
-  public static let keymanKeyboardDownloadFailed = Notification.Name("KeymanKeyboardDownloadFailed")
-  public static let keymanKeyboardChanged = Notification.Name("KeymanKeyboardChanged")
   public static let keymanKeyboardLoaded = Notification.Name("KeymanKeyboardLoaded")
   public static let keymanKeyboardPickerDismissed = Notification.Name("KeymanKeyboardPickerDismissed")
 

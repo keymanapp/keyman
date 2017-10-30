@@ -31,11 +31,14 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
 
   private let webBrowserLastURLKey = "KMWebBrowserLastURL"
 
+  private var keyboardChangedObserver: NotificationObserver?
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged),
-        name: NSNotification.Name.keymanKeyboardChanged, object: nil)
+    keyboardChangedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardChanged,
+      using: keyboardChanged)
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardPickerDismissed),
         name: NSNotification.Name.keymanKeyboardPickerDismissed, object: nil)
 
@@ -267,8 +270,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     webView?.stringByEvaluatingJavaScript(from: jsStr)
   }
 
-  @objc func keyboardChanged(_ notification: Notification) {
-    let kb = notification.userInfo![Key.keyboardInfo] as! InstallableKeyboard
+  private func keyboardChanged(_ kb: InstallableKeyboard) {
     if let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID) {
       newFontFamily = fontName
     } else {

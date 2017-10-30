@@ -21,6 +21,9 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   private var selectedSection = 0
   private var isUpdate = false
 
+  private var keyboardDownloadStartedObserver: NotificationObserver?
+  private var keyboardDownloadFailedObserver: NotificationObserver?
+
   override func loadView() {
     super.loadView()
     if Manager.shared.currentRequest == nil && Manager.shared.languages.isEmpty {
@@ -37,10 +40,12 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
                                            name: NSNotification.Name.keymanLanguagesUpdated, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(self.languageFetchFailed),
                                            name: NSNotification.Name.keymanLanguagesDownloadFailed, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloadStarted),
-                                           name: NSNotification.Name.keymanKeyboardDownloadStarted, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloadFailed),
-                                           name: NSNotification.Name.keymanKeyboardDownloadFailed, object: nil)
+    keyboardDownloadStartedObserver =
+      NotificationCenter.default.addObserver(forName: Notifications.keyboardDownloadStarted,
+                                             using: keyboardDownloadStarted)
+    keyboardDownloadFailedObserver =
+      NotificationCenter.default.addObserver(forName: Notifications.keyboardDownloadFailed,
+                                             using: keyboardDownloadFailed)
   }
 
   override func viewDidAppear(_ animated: Bool) {
@@ -209,7 +214,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     showConnectionErrorAlert()
   }
 
-  @objc func keyboardDownloadStarted(_ notification: Notification) {
+  private func keyboardDownloadStarted(_ notification: KeyboardDownloadStartedNotification) {
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
 
@@ -244,7 +249,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     navigationController?.setToolbarHidden(false, animated: true)
   }
 
-  @objc func keyboardDownloadFailed(_ notification: Notification) {
+  private func keyboardDownloadFailed(_ notification: KeyboardDownloadFailedNotification) {
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }

@@ -19,6 +19,10 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   private var _isDoneButtonEnabled = false
   private var isDidUpdateCheck = false
 
+  private var keyboardDownloadStartedObserver: NotificationObserver?
+  private var keyboardDownloadCompletedObserver: NotificationObserver?
+  private var keyboardDownloadFailedObserver: NotificationObserver?
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -35,26 +39,15 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     navigationController?.toolbar?.barTintColor = UIColor(red: 0.5, green: 0.75,
                                                           blue: 0.25, alpha: 0.9)
 
-    NotificationCenter.default.addObserver(self,
-      selector: #selector(self.keyboardDownloadStarted),
-      name: NSNotification.Name.keymanKeyboardDownloadStarted,
-      object: nil)
-    NotificationCenter.default.addObserver(self,
-      selector: #selector(self.keyboardDownloadFinished),
-      name: NSNotification.Name.keymanKeyboardDownloadCompleted,
-      object: nil)
-    NotificationCenter.default.addObserver(self,
-      selector: #selector(self.keyboardDownloadFailed),
-      name: NSNotification.Name.keymanKeyboardDownloadFailed,
-      object: nil)
-    NotificationCenter.default.addObserver(self,
-      selector: #selector(self.keyboardChanged),
-      name: NSNotification.Name.keymanKeyboardChanged,
-      object: nil)
-  }
-
-  deinit {
-    NotificationCenter.default.removeObserver(self)
+    keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadStarted,
+      using: keyboardDownloadStarted)
+    keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadCompleted,
+      using: keyboardDownloadCompleted)
+    keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadFailed,
+      using: keyboardDownloadFailed)
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -191,13 +184,13 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     switchKeyboard(indexPath.row)
   }
 
-  @objc func keyboardDownloadStarted(_ notification: Notification) {
+  private func keyboardDownloadStarted(_ keyboards: [InstallableKeyboard]) {
     view.isUserInteractionEnabled = false
     navigationItem.leftBarButtonItem?.isEnabled = false
     navigationItem.rightBarButtonItem?.isEnabled = false
   }
 
-  @objc func keyboardDownloadFinished(_ notification: Notification) {
+  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
     if view == navigationController?.topViewController?.view {
       if updateQueue == nil {
         return
@@ -205,7 +198,6 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       Manager.shared.shouldReloadKeyboard = true
 
       // Update keyboard version
-      let keyboards = notification.userInfo?[Key.keyboardInfo] as! [InstallableKeyboard]
       for keyboard in keyboards {
         if let currentKbInfo = Manager.shared.keyboardsInfo?[keyboard.id] {
           Manager.shared.updateKeyboardVersion(forID: keyboard.id, newKeyboardVersion: currentKbInfo.version)
@@ -245,7 +237,6 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       }
 
       // Add keyboard.
-      let keyboards = notification.userInfo![Key.keyboardInfo] as! [InstallableKeyboard]
       for keyboard in keyboards {
         Manager.shared.addKeyboard(keyboard)
         Manager.shared.setKeyboard(keyboard)
@@ -255,7 +246,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  @objc func keyboardDownloadFailed(_ notification: Notification) {
+  private func keyboardDownloadFailed(_ notification: KeyboardDownloadFailedNotification) {
     view.isUserInteractionEnabled = true
     navigationItem.leftBarButtonItem?.isEnabled = true
     if let item = navigationItem.rightBarButtonItem {
@@ -271,14 +262,10 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     }
     navigationController?.setToolbarHidden(true, animated: true)
 
-    let error = notification.userInfo?[NSUnderlyingErrorKey] as? Error
-    let alert = UIAlertView(title: title, message: error?.localizedDescription ?? "",
+    let alert = UIAlertView(title: title, message: notification.error.localizedDescription,
                             delegate: self, cancelButtonTitle: "OK", otherButtonTitles: "")
     alert.tag = errorAlertTag
     alert.show()
-  }
-
-  @objc func keyboardChanged(_ notification: Notification) {
   }
 
   private func switchKeyboard(_ index: Int) {

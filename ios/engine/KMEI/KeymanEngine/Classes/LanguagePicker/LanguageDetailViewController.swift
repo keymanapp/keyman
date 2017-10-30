@@ -17,6 +17,9 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   private var isUpdate = false
   private let language: Language
 
+  private var keyboardDownloadStartedObserver: NotificationObserver?
+  private var keyboardDownloadFailedObserver: NotificationObserver?
+
   init(language: Language) {
     self.language = language
     super.init(nibName: nil, bundle: nil)
@@ -33,14 +36,12 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloadStarted),
-                                           name: NSNotification.Name.keymanKeyboardDownloadStarted, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloadFailed),
-                                           name: NSNotification.Name.keymanKeyboardDownloadFailed, object: nil)
-  }
-
-  deinit {
-    NotificationCenter.default.removeObserver(self)
+    keyboardDownloadStartedObserver =
+      NotificationCenter.default.addObserver(forName: Notifications.keyboardDownloadStarted,
+                                             using: keyboardDownloadStarted)
+    keyboardDownloadFailedObserver =
+      NotificationCenter.default.addObserver(forName: Notifications.keyboardDownloadFailed,
+                                             using: keyboardDownloadFailed)
   }
 
   override func numberOfSections(in tableView: UITableView) -> Int {
@@ -115,7 +116,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  @objc func keyboardDownloadStarted(_ notification: Notification) {
+  private func keyboardDownloadStarted(_ notification: KeyboardDownloadStartedNotification) {
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
 
@@ -147,7 +148,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     navigationController?.setToolbarHidden(false, animated: true)
   }
 
-  @objc func keyboardDownloadFailed(_ notification: Notification) {
+  private func keyboardDownloadFailed(_ notification: KeyboardDownloadFailedNotification) {
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }
