@@ -7,26 +7,9 @@
 //
 
 public struct Key {
-  // Common dictionary keys when handling language/keyboard info
-  public static let id = "id"
-  public static let name = "name"
-  // If there is no value for this key, revert to IdKey
   public static let keyboardId = "kbId"
-  // If there is no value for this key, revert to IdKey
   public static let languageId = "langId"
-  // If there is no value for this key, revert to NameKey
-  public static let keyboardName = "kbName"
-  // If there is no value for this key, revert to NameKey
-  public static let languageName = "langName"
-  // If there is no value for this key, revert to NameKey
-  public static let keyboardVersion = "version"
-  public static let keyboard = "keyboard"
-  public static let languageKeyboards = "keyboards"
-  public static let keyboardFileSize = "fileSize"
-  // If there is no value for this key, revert to KeyboardFileSizeKey
-  public static let keyboardGZipFileSize = "fileSizeGzip"
-  public static let font = "font"
-  public static let oskFont = "oskFont"
+
   public static let fontFamily = "family"
   public static let fontSource = "source"
   public static let fontFiles = "files"
@@ -34,11 +17,7 @@ public struct Key {
   public static let fontFilename = "filename"
   public static let fontName = "fontname"
   public static let fontRegistered = "fontregistered"
-  public static let keyboardFilename = "filename"
-  public static let keyboardModified = "lastModified"
-  public static let keyboardRTL = "rtl"
   public static let keyboardInfo = "keyboardInfo"
-  public static let customKeyboard = "CustomKeyboard"
 
   /// Array of user keyboards info list in UserDefaults
   public static let userKeyboardsList = "UserKeyboardsList"
@@ -58,9 +37,6 @@ public struct Key {
   // TODO: Check if it matches with the key in Keyman Cloud API
   static let keyboardCopyright = "copyright"
   static let languages = "languages"
-  static let keyboardBaseURI = "keyboardBaseUri"
-  static let fontBaseURI = "fontBaseUri"
-  static let keyboardURI = "uri"
 
   // Other keys
   static let update = "update"
