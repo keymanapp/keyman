@@ -42,7 +42,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var checkedProfiles: [String] = []
   private var profileName: String?
   private var launchUrl: URL?
-  private var keyboard2Download: [String: Any] = [:]
+  private var keyboardToDownload: InstallableKeyboard?
   private var customKeyboard2Download: [String: Any] = [:]
   private var wasKeyboardVisible: Bool = false
 
@@ -437,10 +437,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       didDownload = false
     }
 
-    let kbInfo = notification.userInfo?[Key.keyboardInfo] as? [AnyHashable: Any] ?? [AnyHashable: Any]()
-    let kbID: String = kbInfo[Key.keyboardId] as? String ?? ""
-    let langID: String = kbInfo[Key.languageId] as? String ?? ""
-    checkProfile(forKeyboardID: kbID, languageID: langID, doListCheck: listCheck)
+    let kb = notification.userInfo![Key.keyboardInfo] as! InstallableKeyboard
+    checkProfile(forKeyboardID: kb.id, languageID: kb.languageID, doListCheck: listCheck)
   }
 
   @objc func keyboardDownloadStarted(_ notification: Notification) {
@@ -451,67 +449,22 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
   @objc func keyboardDownloadFinished(_ notification: Notification) {
     didDownload = true
-    guard let url = launchUrl else {
+    if launchUrl == nil {
       return
     }
+
     let userData = AppDelegate.activeUserDefaults()
-    let userKeyboards = userData.array(forKey: Key.userKeyboardsList)
+    let userKeyboards = userData.installableKeyboards(forKey: Key.userKeyboardsList)
     if userKeyboards == nil || userKeyboards!.isEmpty {
-      let isRTL = (DefaultKeyboard.keyboardRTL == "Y") ? true : false
-      Manager.shared.addKeyboard(withID: DefaultKeyboard.keyboardID,
-                                 languageID: DefaultKeyboard.languageID,
-                                 keyboardName: DefaultKeyboard.keyboardName,
-                                 languageName: DefaultKeyboard.languageName,
-                                 isRTL: isRTL,
-                                 isCustom: false,
-                                 font: DefaultKeyboard.keyboardFont,
-                                 oskFont: nil)
+      Manager.shared.addKeyboard(Constants.defaultKeyboard)
     }
 
     perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
-    let kbInfo = notification.userInfo?[Key.keyboardInfo]
+    let keyboards = notification.userInfo?[Key.keyboardInfo] as! [InstallableKeyboard]
 
-    if let info = kbInfo as? [String: Any] {
-      let kbID = info[Key.keyboardId] as! String
-      let langID = info[Key.languageId] as! String
-      if url.query == nil || url.query!.range(of: "url=") == nil {
-        let dictKey = "\(langID)_\(kbID)"
-        if let kbDict = Manager.shared.keyboardsDictionary[dictKey] {
-          let kbName = kbDict[Key.keyboardName]!
-          let langName = kbDict[Key.languageName]!
-          let isRTL = (kbDict[Key.keyboardRTL]! == "Y") ? true : false
-          let font = kbDict[Key.font]!
-          let oskFont = kbDict[Key.oskFont]!
-          Manager.shared.addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-              languageName: langName, isRTL: isRTL, isCustom: false, font: font, oskFont: oskFont)
-          Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-              languageName: langName, font: font, oskFont: oskFont)
-        }
-      } else {
-        let kbName = info[Key.keyboardName] as! String
-        let langName = info[Key.languageName] as! String
-        let isRTL = ((info[Key.keyboardRTL] as! String) == "Y") ? true : false
-        let font = info[Key.font] as! String
-        let oskFont = info[Key.oskFont] as! String
-        Manager.shared.addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-            languageName: langName, isRTL: isRTL, isCustom: false, font: font, oskFont: oskFont)
-        Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-            languageName: langName, font: font, oskFont: oskFont)
-      }
-    } else if let infoArray = kbInfo as? [[String: Any]] {
-      for info in infoArray {
-        let kbID = info[Key.keyboardId] as! String
-        let langID = info[Key.languageId] as! String
-        let kbName = info[Key.keyboardName] as! String
-        let langName = info[Key.languageName] as! String
-        let isRTL = (info[Key.keyboardRTL] as! String) == "Y"
-        let font = info[Key.font] as! String
-        let oskFont = info[Key.oskFont] as! String
-        Manager.shared.addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-            languageName: langName, isRTL: isRTL, isCustom: false, font: font, oskFont: oskFont)
-        Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-            languageName: langName, font: font, oskFont: oskFont)
-      }
+    for keyboard in keyboards {
+      Manager.shared.addKeyboard(keyboard)
+      Manager.shared.setKeyboard(keyboard)
     }
 
     launchUrl = nil
@@ -554,13 +507,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   @objc func keyboardRemoved(_ notification: Notification) {
-    guard let kbInfo = notification.userInfo?[Key.keyboardInfo] as? [String: Any] else {
-      return
-    }
-    guard let font = kbInfo[Key.font] as? String else {
-      return
-    }
-    guard let profile = profileNameWithJSONFont(font) else {
+    let kbInfo = notification.userInfo?[Key.keyboardInfo] as! InstallableKeyboard
+    guard let font = kbInfo.font,
+          let profile = profileName(withFont: font) else {
       return
     }
     profiles2Install = profiles2Install.filter { $0 != profile }
@@ -930,27 +879,18 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     } else {
       // Query should include keyboard and language IDs to set the keyboard (first download if not available)
       if let kbID = params["keyboard"], let langID = params["language"] {
-        let dictKey = "\(langID)_\(kbID)"
-        let kbDict = Manager.shared.keyboardsDictionary[dictKey]
-        let kbName = kbDict?[Key.keyboardName] ?? ""
-        let langName = kbDict?[Key.languageName] ?? ""
-        let isRTL = kbDict?[Key.keyboardRTL] == "Y"
-        let font = kbDict?[Key.font]
-        let oskFont = kbDict?[Key.oskFont]
+        guard let keyboard = Manager.shared.repositoryKeyboard(withID: kbID, languageID: langID) else {
+          return
+        }
 
         if Manager.shared.stateForKeyboard(withID: kbID) == .needsDownload {
-          keyboard2Download = [
-            Key.languageId: langID,
-            Key.keyboardId: kbID
-          ]
-          showAlert(withTitle: "\(langName): \(kbName)", message: "Would you like to install this keyboard?",
+          keyboardToDownload = keyboard
+          showAlert(withTitle: "\(keyboard.languageName): \(keyboard.name)",
+            message: "Would you like to install this keyboard?",
                     cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 0)
         } else {
-          Manager.shared.addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-                                     languageName: langName, isRTL: isRTL, isCustom: false,
-                                     font: font, oskFont: oskFont)
-          Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-                                     languageName: langName, font: font, oskFont: oskFont)
+          Manager.shared.addKeyboard(keyboard)
+          Manager.shared.setKeyboard(keyboard)
         }
       } else {
         launchUrl = nil
@@ -958,40 +898,17 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
   }
 
-  private func dictionaryWithKeyboardID(_ kbID: String, languageID langID: String) -> [String: String]? {
-    guard let index = Manager.shared.indexForUserKeyboard(withID: kbID, languageID: langID) else {
+  private func profileName(withKeyboardID kbID: String, languageID langID: String) -> String? {
+    guard let keyboard = Manager.shared.userKeyboard(withID: kbID, languageID: langID),
+          let font = keyboard.font else {
       return nil
     }
 
-    let userKeyboards = AppDelegate.activeUserDefaults().array(forKey: Key.userKeyboardsList)
-    return userKeyboards?[index] as? [String: String]
+    return profileName(withFont: font)
   }
 
-  private func profileNameWithKeyboardID(_ kbID: String, languageID langID: String) -> String? {
-    guard let kbDict = dictionaryWithKeyboardID(kbID, languageID: langID) else {
-      return nil
-    }
-    guard let jsonFont = kbDict[Key.font] else {
-      return nil
-    }
-
-    return profileNameWithJSONFont(jsonFont)
-  }
-
-  private func profileNameWithJSONFont(_ jsonFont: String) -> String? {
-    guard let fontData = jsonFont.data(using: String.Encoding.utf8) else {
-      return nil
-    }
-    guard let fontDict = (try? JSONSerialization.jsonObject(with: fontData, options: .mutableContainers))
-      as? [String: Any] else {
-      return nil
-    }
-
-    let fontSource = fontDict[Key.fontFiles]
-    if let fontSource = fontSource as? [String] {
-      return fontSource.first { !($0.contains(".mobileconfig")) }
-    }
-    return nil
+  private func profileName(withFont font: Font) -> String? {
+    return font.source.first { !($0.contains(".mobileconfig")) }
   }
 
   private func checkProfile(forKeyboardID kbID: String, languageID langID: String, doListCheck: Bool) {
@@ -999,7 +916,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       return
     }
 
-    guard let profile = profileNameWithKeyboardID(kbID, languageID: langID) else {
+    guard let profile = profileName(withKeyboardID: kbID, languageID: langID) else {
       return
     }
 
@@ -1015,8 +932,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     if doInstall {
       profileName = profile
-      let kbDict = dictionaryWithKeyboardID(kbID, languageID: langID)
-      let languageName = kbDict?[Key.languageName] ?? ""
+      let keyboard = Manager.shared.userKeyboard(withID: kbID, languageID: langID)!
+      let languageName = keyboard.languageName
       let title = "\(languageName) Font"
       let msg = "Touch Install to make \(languageName) display correctly in all your apps"
       showAlert(withTitle: title, message: msg, cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 1)
@@ -1041,9 +958,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private func performAlertButtonClick(withTag tag: Int) {
     switch tag {
     case 0:
-      let langID = keyboard2Download[Key.languageId] as? String
-      let kbID = keyboard2Download[Key.keyboardId] as? String
-      Manager.shared.downloadKeyboard(withID: kbID!, languageID: langID!, isUpdate: false)
+      if let keyboard = keyboardToDownload {
+        Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: keyboard.languageID, isUpdate: false)
+      }
     case 1:
       if let profileName = profileName {
         checkedProfiles.append(profileName)
@@ -1159,7 +1076,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       return true
     }
 
-    guard let userKbs = userData.object(forKey: Key.userKeyboardsList) as? [[String: Any]] else {
+    guard let userKbs = userData.installableKeyboards(forKey: Key.userKeyboardsList) else {
       return true
     }
     if userKbs.isEmpty {
@@ -1170,9 +1087,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
 
     let firstKB = userKbs[0]
-    let kbID = firstKB[Key.keyboardId] as? String
-    let langID = firstKB[Key.languageId] as? String
-    if (kbID == DefaultKeyboard.keyboardID) && (langID == DefaultKeyboard.languageID) {
+    if firstKB.id == DefaultKeyboard.keyboardID && firstKB.languageID == DefaultKeyboard.languageID {
       return true
     }
     return false

@@ -45,10 +45,10 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
 
   private func loadFromServer() {
     let keyboardInfo = Manager.shared.currentKeyboardInfo
-    let currentKeyboardId = keyboardInfo?[Key.keyboardId] ?? DefaultKeyboard.keyboardID
+    let currentKeyboardId = keyboardInfo?.id ?? Constants.defaultKeyboard.id
     let userData = AppDelegate.activeUserDefaults()
-    let keyboards = userData.array(forKey: Key.userKeyboardsList) as? [NSDictionary]
-    let keyboardIds = keyboards?.flatMap { $0.object(forKey: Key.keyboardId) as? String }
+    let keyboards = userData.installableKeyboards(forKey: Key.userKeyboardsList)
+    let keyboardIds = keyboards?.map { $0.id }
     let installedKeyboards: String
     if let ids = keyboardIds, !ids.isEmpty {
       installedKeyboards = Array(Set(ids)).joined(separator: ",")

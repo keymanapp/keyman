@@ -15,7 +15,7 @@ private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
 
 class LanguageViewController: UITableViewController, UIAlertViewDelegate {
-  private var userKeyboards: [AnyHashable: Any] = [:]
+  private var userKeyboards: [String: InstallableKeyboard] = [:]
   private var sectionIndexTitles: [String] = []
   private var indices: [Int] = []
   private var selectedSection = 0

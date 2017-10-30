@@ -268,10 +268,8 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   }
 
   @objc func keyboardChanged(_ notification: Notification) {
-    let kbInfo = notification.userInfo?[Key.keyboardInfo] as? [AnyHashable: Any] ?? [AnyHashable: Any]()
-    if let kbID = kbInfo[Key.keyboardId] as? String,
-       let langID = kbInfo[Key.languageId] as? String,
-       let fontName = Manager.shared.fontNameForKeyboard(withID: kbID, languageID: langID) {
+    let kb = notification.userInfo![Key.keyboardInfo] as! InstallableKeyboard
+    if let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID) {
       newFontFamily = fontName
     } else {
       newFontFamily = UIFont.systemFont(ofSize: UIFont.systemFontSize).fontName
