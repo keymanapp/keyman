@@ -1436,18 +1436,23 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
               alert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');
             }
           } else {
-            lList=x[i]['language'];
+            if(x[i]['language']) {
+              console.warn("The 'language' property for keyboard stubs has been deprecated.  Please use the 'languages' property instead.");
+              x[i]['languages'] = x[i]['language'];
+            }
+
+            lList=x[i]['languages'];
                 
             //Array or single entry?
             if(typeof(lList.length) == 'number') {
               for(j=0; j<lList.length; j++) {
-                var tEntry = {'id':x[i]['id'],'language':x[i]['language'][j]['id']};
+                var tEntry = {'id':x[i]['id'],'language':x[i]['languages'][j]['id']};
                 if(isUniqueRequest(tEntry)) {
                   keymanweb.cloudList.push(tEntry);
                 }
               }
             } else { // Single language element
-              var tEntry = {'id':x[i]['id'],'language':x[i]['language'][j]['id']};
+              var tEntry = {'id':x[i]['id'],'language':x[i]['languages'][j]['id']};
               if(isUniqueRequest(tEntry)) {
                 keymanweb.cloudList.push(tEntry);
               }
@@ -1587,7 +1592,11 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     keymanweb.addStub = function(arg)
     {                         
       if(typeof(arg['id']) != 'string') return false;
-      if(typeof(arg['language']) == 'undefined') return false;
+      if(typeof(arg['language']) != "undefined") {
+        console.warn("The 'language' property for keyboard stubs has been deprecated.  Please use the 'languages' property instead.");
+        arg['languages'] = arg['language'];
+      }
+      if(typeof(arg['languages']) == 'undefined') return false;
       
       // Default the keyboard name to its id, capitalized
       if(typeof(arg['name']) != 'string')
@@ -1596,7 +1605,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         arg['name'] = arg['name'].substr(0,1).toUpperCase()+arg['name'].substr(1);
       }
 
-      var lgArg=arg['language'],lgList=[],i,lg;
+      var lgArg=arg['languages'],lgList=[],i,lg;
       if(typeof(lgArg.length) == 'undefined') lgList[0] = lgArg; else lgList = lgArg; 
 
       var localOptions={

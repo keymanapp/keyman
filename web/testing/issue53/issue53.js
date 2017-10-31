@@ -46,7 +46,7 @@
 
     // Add a fully-specified, locally-sourced, keyboard.
     kmw.addKeyboards({id:'layered_debug_keyboard',name:'Web_Layer_Debugging',
-      language:{
+      languages:{
         id:'dbg',name:'Debug',region:'North America'
         },
       filename:'./layered_debug_keyboard-1.0.js'

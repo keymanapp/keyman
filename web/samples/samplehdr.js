@@ -47,12 +47,12 @@
     // The first keyboard added will be the default keyboard for touch devices.
     // For faster loading, it may be best for the default keybaord to be 
     // locally sourced.
-    kmw.addKeyboards({id:'us',name:'English',language:{id:'eng',name:'English'},
+    kmw.addKeyboards({id:'us',name:'English',languages:{id:'eng',name:'English'},
       filename:'./us-1.0.js'});
       
     // Add more keyboards to the language menu, by keyboard name,
     // keyboard name and language code, or just the ISO 639 language code.  
-    kmw.addKeyboards('french','european2@swe','european2@nor','@heb');
+    kmw.addKeyboards('french', 'european2@nor,swe', '@heb'); // Loads all from uniquely-identifying strings.
   
     // Add a keyboard by language name.  Note that the name must be spelled
     // correctly, or the keyboard will not be found.  (Using ISO codes is
@@ -61,7 +61,7 @@
     
     // Add a fully-specified, locally-sourced, keyboard with custom font  
     kmw.addKeyboards({id:'lao_2008_basic',name:'Lao Basic',
-      language:{
+      languages:{
         id:'lao',name:'Lao',region:'Asia',
         font:{family:'LaoWeb',source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']}
         },
