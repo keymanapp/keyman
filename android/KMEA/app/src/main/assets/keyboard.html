@@ -63,7 +63,8 @@
     // Query KMW if a given keyboard uses chiral modifiers.
     function setIsChiral(keyboardProperties) {
       var name = typeof(keyboardProperties.internalName) == "undefined" ? keyboardProperties.keyboardName : keyboardProperties.internalName;
-      var isChiral = keymanweb.isChiral(name);
+      var kmw=window['keyman'];
+      var isChiral = kmw.isChiral(name);
       window.console.log('For keyboard "' + name + '"');
       window.console.log('setIsChiral = ' + isChiral);
 
@@ -108,7 +109,8 @@
     }
 
     function resetContext() {
-      keymanweb.resetContext();
+      var kmw=window['keyman'];
+      kmw.resetContext();
     }
 
     function updateKMText(text) {
