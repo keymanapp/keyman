@@ -70,6 +70,9 @@ typedef enum {
                                                             andEventID:kAEGetURL];
     }
     
+    NSError *error = NULL;
+    _regexStartsWithNonCombiningMark = [NSRegularExpression regularExpressionWithPattern:@"^\\P{M}" options:NSRegularExpressionCaseInsensitive error:&error];
+
     return self;
 }
 
@@ -854,7 +857,15 @@ typedef enum {
     }
     
     if (didUnzip) {
+        if (_debugMode) {
+            NSLog(@"Unzipped file: %@", filePath);
+        }
         [self installFontsAtPath:[self.keyboardsPath stringByAppendingPathComponent:folderName]];
+    }
+    else {
+        if (_debugMode) {
+            NSLog(@"Failed to unzip file: %@", filePath);
+        }
     }
     
     return didUnzip;

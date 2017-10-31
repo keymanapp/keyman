@@ -222,7 +222,7 @@ NSRange _previousSelRange;
             else {
                 NSUInteger nc = [self.contextBuffer deleteLastNullChars];
                 // Each null in the context buffer presumably corresponds to a space we inserted when
-                // processing the Q_BACk, which we now need to replace with the text we're inserting.
+                // processing the Q_BACK, which we now need to replace with the text we're inserting.
                 if (nc > 0) {
                     NSRange selRange = [sender selectedRange];
                     NSUInteger pos = selRange.location;
@@ -310,25 +310,42 @@ NSRange _previousSelRange;
                 if (!_legacyMode && pos >= n && pos != NSNotFound) {
                     NSInteger preCharPos = pos - (n+1);
                     if ((preCharPos) >= 0) {
-                        
-                        NSString *preChar = [[sender attributedSubstringFromRange:NSMakeRange(preCharPos, 1)] string];
-                        if (!preChar) {
-                            if ([self.AppDelegate debugMode]) {
-                                NSLog(@"Client apparently doesn't implement attributedSubstringFromRange. Attempting to get preChar from context...");
+                        NSUInteger nbrOfPreCharacters;
+                        NSString *preChar = nil;
+                        for (nbrOfPreCharacters = 1; YES; nbrOfPreCharacters++, preCharPos--) {
+                            preChar = [[sender attributedSubstringFromRange:NSMakeRange(preCharPos, nbrOfPreCharacters)] string];
+                            if (!preChar) {
+                                if ([self.AppDelegate debugMode]) {
+                                    NSLog(@"Client apparently doesn't implement attributedSubstringFromRange. Attempting to get preChar from context...");
+                                }
+                                if (self.contextBuffer != nil && preCharPos < self.contextBuffer.length) {
+                                    preChar = [self.contextBuffer substringWithRange:NSMakeRange(preCharPos, 1)];
+                                }
+                                if (!preChar)
+                                    break;
                             }
-                            if (self.contextBuffer != nil && preCharPos < self.contextBuffer.length) {
-                                preChar = [self.contextBuffer substringWithRange:NSMakeRange(preCharPos, 1)];
+                            
+                            if ([[self.AppDelegate regexStartsWithNonCombiningMark] numberOfMatchesInString:preChar options:0 range:NSMakeRange(0, [preChar length])] > 0)
+                                break;
+                            if (preCharPos == 0) {
+                                if ([self.AppDelegate debugMode]) {
+                                    NSLog(@"Failed to find a base character!");
+                                }
+                                break;
+                            }
+                            if ([self.AppDelegate debugMode]) {
+                                NSLog(@"Have not yet found a base character. nbrOfPreCharacters = %lu", nbrOfPreCharacters);
                             }
                         }
                         if (preChar) {
                             if ([self.AppDelegate debugMode]) {
-                                NSLog(@"preChar (to insert at %lu) = \"%@\"", pos - (n+1), preChar);
+                                NSLog(@"preChar (to insert at %lu) = \"%@\"", preCharPos, preChar);
                             }
-                            [sender insertText:preChar replacementRange:NSMakeRange(pos - (n+1), n+1)];
+                            [sender insertText:preChar replacementRange:NSMakeRange(preCharPos, n+nbrOfPreCharacters)];
                         }
                         else {
                             if ([self.AppDelegate debugMode]) {
-                                NSLog(@"Switching to legacy mode - client apparently doesn't implement attributedSubstringFromRange.");
+                                NSLog(@"Switching to legacy mode - client apparently doesn't implement attributedSubstringFromRange and no previous character in context buffer.");
                             }
                             _legacyMode = YES; // client apparently doesn't implement attributedSubstringFromRange.
                         }
