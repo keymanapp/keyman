@@ -86,7 +86,7 @@
                     langId='';
                 }
 
-                kmw['KRS']({KN:keyboardName,KI:'Keyboard_'+internalName,KLC:langId,KL:languageName,KF:internalName+'-'+version+'.js',KFont:font,KOskFont:oskFont});
+                kmw.interface['registerStub']({KN:keyboardName,KI:'Keyboard_'+internalName,KLC:langId,KL:languageName,KF:internalName+'-'+version+'.js',KFont:font,KOskFont:oskFont});
                 kmw['setActiveKeyboard']('Keyboard_'+internalName,langId);
                 kmw['osk']['show'](true);
             }
