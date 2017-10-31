@@ -417,16 +417,17 @@ final class KMKeyboard extends WebView {
 
   }
 
-  // Converts a string from Unicode numbers (\\uxxxx) to character string
+  // Extract Unicode numbers (\\uxxxx) from a layer to character string.
+  // Ignores empty strings and layer names
   // Returns: String
   protected String convertKeyText(String ktext) {
     String title = "";
     String[] values = ktext.split("\\\\u");
     int length = values.length;
-    if (length > 1) {
-      // Skip the layer and parse text
-      for (int j = 1; j < length; j++) {
+    for (int j = 0; j < length; j++) {
+      if (!values[j].isEmpty() && !values[j].contains("-")) {
         int c = Integer.parseInt(values[j], 16);
+        // TODO: \\uxxxxxx will need to be handled with title.codePointAt(c)
         title += String.valueOf((char) c);
       }
     }
@@ -558,8 +559,7 @@ final class KMKeyboard extends WebView {
         public void onClick(View v) {
           int index = v.getId() - 1;
           String keyId = subKeysList.get(index).get("keyId");
-          String keyText = getKeyText(index);
-
+          String keyText = getSubkeyText(keyId, subKeysList.get(index).get("keyText"));
           String jsFormat = "javascript:executePopupKey('%s','%s')";
           String jsString = String.format(jsFormat, keyId, keyText);
           loadUrl(jsString);
@@ -567,9 +567,10 @@ final class KMKeyboard extends WebView {
       });
       button.setClickable(false);
 
-      String ktext = getKeyText(i);
-
-      String title = convertKeyText(ktext);
+      // Show existing text for subkeys. If subkey text is blank, get from id
+      String kId = subKeysList.get(i).get("keyId");
+      String kText = getSubkeyText(kId, subKeysList.get(i).get("keyText"));
+      String title = convertKeyText(kText);
 
       // Disable Android's default uppercasing transformation on buttons.
       button.setTransformationMethod(null);
@@ -665,13 +666,14 @@ final class KMKeyboard extends WebView {
     loadUrl(jsString);
   }
 
-  private String getKeyText(int i) {
-    String ktext = subKeysList.get(i).get("keyText");
-    if (ktext.isEmpty()) {
-      ktext = subKeysList.get(i).get("keyId");
-      ktext = ktext.replaceAll("U_", "\\\\u");
+  // Attempt to get the subkey text.
+  // If the subkey popup text is empty, parse the ID
+  private String getSubkeyText(String keyID, String keyText) {
+    String text = keyText;
+    if (text.isEmpty()) {
+      text = keyID.replaceAll("U_", "\\\\u");
     }
-    return ktext;
+    return text;
   }
 
   private String makeSvgOnlyFont(String font) {

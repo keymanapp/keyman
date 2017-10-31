@@ -743,7 +743,7 @@ if(!window['keyman']['initialized']) {
           if(keymanweb.isChiral()) {
             nextLayer = 'leftctrl-rightalt';
           } else {
-            nextLayer = 'ctrlalt';
+            nextLayer = 'ctrl-alt';
           }
           break;
         case 'K_CURRENCIES':
@@ -768,15 +768,16 @@ if(!window['keyman']['initialized']) {
     }
 
     /**
-     * Get the default key code from the virtual key code (physical keyboard mapping)
+     * Get the default key string. If keyName is U_xxxxxx, use that Unicode codepoint.
+     * Otherwise, lookup the  virtual key code (physical keyboard mapping)
      *
-     * @param   {string}  keyName
+     * @param   {string}  keyName Name of the key
      * @param   {number}  n
      * @param   {number}  keyShiftState
-     * @return  {number}
+     * @return  {string}
      */
     osk.defaultKeyOutput = function(keyName,n,keyShiftState) {
-      var ch = 0, checkCodes = false;
+      var ch = '', checkCodes = false;
 
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
       if(keyShiftState == 0) {
@@ -788,16 +789,21 @@ if(!window['keyman']['initialized']) {
 
       // TODO:  Refactor the overloading of the 'n' parameter here into separate methods.
 
-      // Test for fall back to U_xxxx key id - For this first test, we ignore the key code
-      // and use the keyName
-      if((keyName.substr(0,2) == 'U_')) { 
-        ch=String.fromCharCode(parseInt(keyName.substr(2,6),16));
-        if(ch <= 32 || (ch > 127 && ch < 160)) {
-          // 127 - 160 refer to Unicode control codes.
-          // Do not allow output of these codes via U_xxxx shortcuts.
-          ch = 0;
+      // Test for fall back to U_xxxxxx key id
+      // For this first test, we ignore the keyCode and use the keyName
+      if((keyName.substr(0,2) == 'U_')) {
+        var codePoint = parseInt(keyName.substr(2,6), 16);
+        if (((0x0 <= codePoint) && (codePoint <= 0x1F)) || ((0x80 <= codePoint) && (codePoint <= 0x9F))) {
+          // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
+          // Check the codePoint number and do not allow output of these codes via U_xxxxxx shortcuts.
+          console.log("Suppressing Unicode control code: U_00" + codePoint.toString(16));
+          return ch;
+        } else {
+          // String.fromCharCode() is inadequate to handle the entire range of Unicode
+          // Someday after upgrading to ES2015, can use String.fromCodePoint()
+          ch=String.kmwFromCharCode(codePoint);
         }
-        // Hereafter, we refer to keycodes.
+        // Hereafter, we refer to keyCodes.
       } else if(checkCodes) {
         if(n >= osk.keyCodes['K_0'] && n <= osk.keyCodes['K_9']) { // The number keys.
           ch = codesUS[keyShiftState][0][n-osk.keyCodes['K_0']];
@@ -1009,14 +1015,8 @@ if(!window['keyman']['initialized']) {
         // Test if this key has a non-default next layer
         if(typeof e.key != 'undefined' && e.key['nextlayer'] !== null) osk.nextLayer=e.key['nextlayer'];
 
-        // TODO: Verify the layer name is valid?
-
-        // Refresh the OSK if a different layer must be displayed
-        if(osk.nextLayer != osk.layerId)
-        {
-          osk.layerId=osk.nextLayer;
-          osk._Show();
-        }
+        // Swap layer as appropriate.
+        osk.selectLayer(keyName, nextLayer);
 
         /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
         Lelem._KeymanWebSelectionStart=null;
@@ -2931,11 +2931,12 @@ if(!window['keyman']['initialized']) {
     /**
      * Build a default layout for keyboards with no explicit layout
      *
-     * @param   {Object}  PVK     keyboard object (as loaded)
+     * @param   {Object}  PVK         keyboard object (as loaded)
+     * @param   {Number}  kbdBitmask  keyboard modifier bitmask
      * @param   {string}  formFactor
      * @return  {Object}
      */
-    osk.buildDefaultLayout = function(PVK,formFactor)
+    osk.buildDefaultLayout = function(PVK,kbdBitmask,formFactor)
     {
       var layout;
 
@@ -2947,11 +2948,6 @@ if(!window['keyman']['initialized']) {
 
       // Clone the default layout object for this device
       layout=util.deepCopy(dfltLayout[layoutType]);
-
-      var kbdBitmask = PVK['KMBM'];
-      if(typeof kbdBitmask == 'undefined' || !kbdBitmask) {
-        kbdBitmask = osk.modifierBitmasks.NON_CHIRAL;
-      }
 
       var n,layers=layout['layer'], keyLabels=PVK['KLS'], key102=PVK['K102'];
       var i, j, k, m, row, rows, key, keys;
@@ -3092,7 +3088,7 @@ if(!window['keyman']['initialized']) {
                 shiftKey['text']='*Ctrl*'; break;
               case 'alt':
                 shiftKey['text']='*Alt*'; break;
-              case 'ctrlalt':
+              case 'ctrl-alt':
                 shiftKey['text']='*AltGr*'; break;
             };
           }
@@ -3105,19 +3101,21 @@ if(!window['keyman']['initialized']) {
     /**
      * Function     _GenerateVisualKeyboard
      * Scope        Private
-     * @param       {Object}      PVK    Visual keyboard name
-     * @param       {Object}      Lhelp  true if OSK defined for this keyboard
+     * @param       {Object}      PVK         Visual keyboard name
+     * @param       {Object}      Lhelp       true if OSK defined for this keyboard
+     * @param       {Object}      layout0 
+     * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
      * @return      Nothing
      * Description  Generates the visual keyboard element and attaches it to KMW
      */
-    osk._GenerateVisualKeyboard = function(PVK,Lhelp,layout0)
+    osk._GenerateVisualKeyboard = function(PVK,Lhelp,layout0,kbdBitmask)
     {
       var Ldiv,LdivC,layout=layout0;
       var Lkbd=util._CreateElement('DIV'), oskWidth;//s=Lkbd.style,
 
       // Build a layout using the default for the device
       if(typeof layout != 'object' || layout == null)
-        layout=osk.buildDefaultLayout(PVK,device.formFactor);
+        layout=osk.buildDefaultLayout(PVK,kbdBitmask,device.formFactor);
 
       // Create the collection of HTML elements from the device-dependent layout object
       osk.layout=layout;
@@ -3203,7 +3201,7 @@ if(!window['keyman']['initialized']) {
 
       // Else get a default layout for the device for this keyboard
       if(layout == null && PVK != null)
-        layout=osk.buildDefaultLayout(PVK,formFactor);
+        layout=osk.buildDefaultLayout(PVK,keymanweb.getKeyboardModifierBitmask(PKbd),formFactor);
 
       // Cannot create an OSK if no layout defined, just return empty DIV
       if(layout != null)
@@ -4184,7 +4182,7 @@ if(!window['keyman']['initialized']) {
           // TODO: May want to define a default BK array here as well
           if(Lviskbd == null) Lviskbd={'F':'Tahoma','BK':dfltText}; //DDOSK
 
-          osk._GenerateVisualKeyboard(Lviskbd, Lhelp, layout);
+          osk._GenerateVisualKeyboard(Lviskbd, Lhelp, layout, keymanweb.getKeyboardModifierBitmask());
         }
 
         else //The following code applies only to preformatted 'help' such as European Latin
