@@ -9,7 +9,7 @@
 import AudioToolbox
 import UIKit
 
-public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate {
+public class TextField: UITextField, UITextFieldDelegate, KeymanWebDelegate {
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
@@ -61,8 +61,8 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
   // MARK: - Class Overrides
   public override var inputView: UIView? {
     get {
-      Manager.shared.webDelegate = self
-      return Manager.shared.inputView
+      Manager.shared.keymanWebDelegate = self
+      return Manager.shared.keymanWeb.view
     }
 
     set(inputView) {
@@ -110,7 +110,7 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
       "TextField: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
       checkDebugPrinting: true)
     resignFirstResponder()
-    Manager.shared.inputView.endEditing(true)
+    Manager.shared.keymanWeb.view.endEditing(true)
   }
 
   public override var text: String! {
@@ -133,22 +133,8 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
     }
   }
 
-  // MARK: - KMWebViewDelegate
-  func updatedFragment(_ fragment: String) {
-    if fragment.contains("insertText") {
-      processInsertText(fragment)
-    } else if fragment.contains("hideKeyboard") {
-      dismissKeyboard()
-    } else if fragment.contains("menuKeyUp") {
-      if let viewController = viewController {
-        Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
-      } else {
-        Manager.shared.switchToNextKeyboard()
-      }
-    }
-  }
-
-  private func processInsertText(_ fragment: String) {
+  // MARK: - KeymanWebViewDelegate
+  func insertText(_ view: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     if Manager.shared.isSubKeysMenuVisible {
       return
     }
@@ -161,54 +147,29 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
       perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
     }
 
-    // TODO: Refactor duplicate logic in InputViewController and TextView
-    let dnRange = fragment.range(of: "+dn=")!
-    let sRange = fragment.range(of: "+s=")!
-
-    let dn = Int(fragment[dnRange.upperBound..<sRange.lowerBound])!
-    let s = fragment[sRange.upperBound...]
-
-    let hexStrings: [String]
-    if !s.isEmpty {
-      hexStrings = s.components(separatedBy: ",")
-    } else {
-      hexStrings = []
-    }
-
-    let codeUnits = hexStrings.map { hexString -> UInt16 in
-      let scanner = Scanner(string: hexString)
-      var codeUnit: UInt32 = 0
-      scanner.scanHexInt32(&codeUnit)
-      return UInt16(codeUnit)
-    }
-
-    let text = String(utf16CodeUnits: codeUnits, count: codeUnits.count)
-
     let textRange = selectedTextRange!
     let selRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                            length: offset(from: textRange.start, to: textRange.end))
 
-    if dn <= 0 {
-      if selRange.length == 0 {
-        insertText(text)
-      } else {
-        self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: text)
-      }
+    if selRange.length != 0 {
+      self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: newText)
     } else {
-      if s.isEmpty {
-        for _ in 0..<dn {
-          deleteBackward()
-        }
-      } else {
-        if selRange.length == 0 {
-          for _ in 0..<dn {
-            deleteBackward()
-          }
-          insertText(text)
-        } else {
-          self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: text)
-        }
+      for _ in 0..<numCharsToDelete {
+        deleteBackward()
       }
+      insertText(newText)
+    }
+  }
+
+  func hideKeyboard(_ view: KeymanWebViewController) {
+    dismissKeyboard()
+  }
+
+  func menuKeyUp(_ view: KeymanWebViewController) {
+    if let viewController = viewController {
+      Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
+    } else {
+      Manager.shared.switchToNextKeyboard()
     }
   }
 
@@ -289,7 +250,7 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
   }
 
   public func textFieldDidBeginEditing(_ textField: UITextField) {
-    Manager.shared.webDelegate = self
+    Manager.shared.keymanWebDelegate = self
 
     let fontName: String?
     if let keyboardID = Manager.shared.keyboardID,
