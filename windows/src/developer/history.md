@@ -3,6 +3,7 @@
 ## 10.0 alpha
 * Keyman Developer moved to open source (#121)
 * KeymanWeb is now continuously integrated with Developer, ensuring that each update uses the most current version possible (#122)
+  - Additional KeymanWeb compatibility fixes (#349)
 * Keyman Developer compiler now generates keyboards that distinguish left and right ctrl/alt (#313)
 * Keyman Developer visual editors now supports keyboards that distinguish left and right ctrl/alt for web/mobile targets (#342)
 * The `&version` store is now optional and the compiler will determine and report on the minimum version required if it is not present (#334)
