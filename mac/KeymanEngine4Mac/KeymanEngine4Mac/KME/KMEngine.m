@@ -90,10 +90,10 @@ DWORD VKMap[0x80];
     
     if (!gp)
         return nil;
-    
+
     if (([event modifierFlags] & NSEventModifierFlagCommand) == NSEventModifierFlagCommand)
         return nil; // Engine should NEVER attempt to process characters when the Command key is pressed.
-    
+
     if (gp.fUsingKeys) {
         // Begin group using keys
         unsigned short keyCode = [event keyCode];
@@ -141,7 +141,7 @@ DWORD VKMap[0x80];
             mask |= LCTRLFLAG;
         else if (([event modifierFlags] & MK_RIGHT_CTRL_MASK) == MK_RIGHT_CTRL_MASK)
             mask |= RCTRLFLAG;
-        else if (([event modifierFlags] & NSControlKeyMask) == NSControlKeyMask)
+        else if (([event modifierFlags] & NSEventModifierFlagControl) == NSEventModifierFlagControl)
             mask |= K_CTRLFLAG;
         
         if (self.debugMode)

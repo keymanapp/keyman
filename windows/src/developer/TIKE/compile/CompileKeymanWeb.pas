@@ -2233,7 +2233,7 @@ function TCompileKeymanWeb.FormatKeyAsString(key: Integer): string;
 begin
   if (key <= 255) and (KMWVKeyNames[key] <> '')
     then Result := 'keyCodes.'+KMWVKeyNames[key]+ ' /* 0x' + IntToHex(key, 2) + ' */'
-    else Result := IntToHex(key, 2);
+    else Result := '0x' + IntToHex(key, 2);
 end;
 
 ///
@@ -2272,10 +2272,9 @@ begin
   begin
     ReportError(0, CWARN_DontMixChiralAndNonChiralModifiers, 'This keyboard contains Ctrl,Alt and LCtrl,LAlt,RCtrl,RAlt sets of modifiers. Use only one or the other set for web target.');
   end;
-  //TODO: Should FBitMask include the ISVIRTUALKEY bit?
 
   if FDebug
-    then Result := FormatModifierAsBitflags(FBitMask)
+    then Result := FormatModifierAsBitflags(FBitMask and KMX_MASK_KEYS) // Exclude KMX_ISVIRTUALKEY, KMX_VIRTUALCHARKEY
     else Result := '0x'+IntToHex(FBitMask, 4);
 end;
 

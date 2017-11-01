@@ -227,3 +227,5 @@
 # /test/wm_unichar/
 
 .DS_Store
+
+*.kpj.user

@@ -447,7 +447,7 @@
       <ComponentRef Id='xml_file80'/>
       <ComponentRef Id='xml_file81'/>
       <ComponentRef Id='xml_file_layoutbuilder_builder.css'/>
-      <ComponentRef Id='xml_file_layoutbuilder_builder.html'/>
+      <ComponentRef Id='xml_file_layoutbuilder_physical_keyboard_template' />
       <ComponentRef Id='xml_file_layoutbuilder_builder.js'/>
       <ComponentRef Id='xml_file_layoutbuilder_builder.xsl'/>
       <ComponentRef Id='xml_file_layoutbuilder_jquery_1.10.2.js'/>

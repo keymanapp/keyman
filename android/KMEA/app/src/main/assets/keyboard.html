@@ -183,8 +183,10 @@
 
     function executePopupKey(keyID, keyText) {
       var kmw=window['tavultesoft']['keymanweb'];
-      window.console.log('executePopupKey('+keyID+', ' + keyText + ');');
-      kmw['executePopupKey'](keyID, keyText);
+
+      // KMW only needs keyID to process the popup key. keyText merely logged to console
+      window.console.log('executePopupKey('+keyID+'); keyText: ' + keyText);
+      kmw['executePopupKey'](keyID);
     }
 
     function executeHardwareKeystroke(code, shift, lstates) {
@@ -210,10 +212,10 @@
         while (theHex.length < 4) {
           theHex = '0' + theHex;
         }
-        theHex = '0x' + theHex;
-        hexString += theHex + ',';
+        theHex = '\\u' + theHex;
+        hexString += theHex;
       }
-      return hexString.substr(0, hexString.length-1);
+      return hexString;
     }
 
   </script>

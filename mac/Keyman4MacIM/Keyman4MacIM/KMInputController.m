@@ -155,6 +155,8 @@ NSRange _previousSelRange;
             }
         }
     }
+    else if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand)
+        return NO; // We ignore any Command-key events.
     
     if ([self.AppDelegate debugMode]) {
         if (_clientSelectionCanChangeUnexpectedly)

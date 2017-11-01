@@ -71,6 +71,16 @@ Building these projects follow the same steps as KMAPro:
 3. `./build.sh`
 4. Open Android Studio to run the app
 
+### Tests: KeyboardHarness
+
+**android/Tests/KeyboardHarness** app is a test harness for developers to troubleshoot keyboards.
+
+1. Copy the keyboard js file to *android/Tests/KeyboardHarness/app/src/main/assets/languages*
+2. Add the keyboard in *android/Tests/KeyboardHarness/app/src/main/java/com/keyman/android/tests/keyboardHarness/MainActivity.java*
+3. cd to android/Tests/KeyboardHarness/
+4. `./build.sh`
+5. Open Android Studio to run the app
+
 --------------------------------------------------------------
 
 ## How to Build Keyman Engine for Android
