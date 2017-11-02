@@ -37,6 +37,7 @@ BOOL _legacyMode = NO;
 // checking at the start of the event processing to see if we're probably still in the same place where we
 // left off previously.
 BOOL _clientSelectionCanChangeUnexpectedly = NO;
+BOOL _insertCharactersIndividually = NO;
 // Because Google Docs can't report its context in any of the browsers (Safari, Chrome, Firefox), we want to
 // try to detect it and:
 // in Safari, switch to legacy mode
@@ -96,17 +97,40 @@ NSRange _previousSelRange;
         if ([self.AppDelegate debugMode])
             NSLog(@"Processing the special %hu code", kProcessPendingBuffer);
         
-        NSString* text = [self pendingBuffer];
-        
-        if ([text length] > 0) {
+        NSUInteger length = [self pendingBuffer].length;
+        if (length > 0) {
+            if ([self.AppDelegate debugMode]) {
+                for (NSUInteger ich = 0; ich < length; ich++)
+                    NSLog(@"Char %li: '%x'", ich, [[self pendingBuffer] characterAtIndex:ich]);
+            }
+            NSString* text;
+            if (length > 1 && _insertCharactersIndividually) {
+                if ([self.AppDelegate debugMode]) {
+                    NSLog(@"Using special Google Docs in Chrome logic");
+                }
+                unichar chars[1];
+                chars[0] = [[self pendingBuffer] characterAtIndex:0];
+                text = [[NSString alloc] initWithCharacters:chars length:1];
+            }
+            else {
+                text = [self pendingBuffer];
+            }
+            
             if ([self.AppDelegate debugMode])
-                NSLog(@"Inserting text from pending buffer: %@", text);
+                NSLog(@"Inserting text from pending buffer: \"%@\"", text);
             
             [sender insertText:text replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
             _previousSelRange.location += text.length;
             _previousSelRange.length = 0;
-
-            [self setPendingBuffer:@""];
+            
+            if (length > 1 && _insertCharactersIndividually) {
+                // Come back for more...
+                [_pendingBuffer deleteCharactersInRange:NSMakeRange(0, 1)];
+                [self performSelector:@selector(initiatePendingBufferProcessing:) withObject:sender afterDelay:0.1];
+            }
+            else {
+                [self setPendingBuffer:@""];
+            }
         }
         else {
             if ([self.AppDelegate debugMode])
@@ -151,6 +175,8 @@ NSRange _previousSelRange;
                 if (_clientSelectionCanChangeUnexpectedly) {
                     _cannnotTrustSelectionLength = YES;
                     _clientSelectionCanChangeUnexpectedly = NO;
+                    // Google docs in Chrome allows only a single character at a time :-(
+                    _insertCharactersIndividually = YES;
                 }
             }
         }
@@ -575,6 +601,7 @@ NSRange _previousSelRange;
     _clientSelectionCanChangeUnexpectedly = NO;
     _forceRemoveSelectionInGoogleDocs = NO;
     _cannnotTrustSelectionLength = NO;
+    _insertCharactersIndividually = NO;
     // REVIEW: Should this list be in a info.plist file
     // Use a table of known apps to decide whether or not to operate in legacy mode
     // and whether or not to follow calls to setMarkedText with calls to insertText.
