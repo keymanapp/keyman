@@ -314,6 +314,10 @@ NSRange _previousSelRange;
                     if ((preCharPos) >= 0) {
                         NSUInteger nbrOfPreCharacters;
                         NSString *preChar = nil;
+                        
+                        NSError *error = NULL;
+                        NSRegularExpression *regexNonCombiningMark = [NSRegularExpression regularExpressionWithPattern:@"\\P{M}" options:NSRegularExpressionCaseInsensitive error:&error];
+
                         for (nbrOfPreCharacters = 1; YES; nbrOfPreCharacters++, preCharPos--) {
                             preChar = [[sender attributedSubstringFromRange:NSMakeRange(preCharPos, nbrOfPreCharacters)] string];
                             if (!preChar) {
@@ -326,8 +330,10 @@ NSRange _previousSelRange;
                                 if (!preChar)
                                     break;
                             }
-                            
-                            if ([[self.AppDelegate regexStartsWithNonCombiningMark] numberOfMatchesInString:preChar options:0 range:NSMakeRange(0, [preChar length])] > 0)
+                            if ([self.AppDelegate debugMode])
+                                NSLog(@"Testing preChar: %@", preChar);
+
+                            if ([regexNonCombiningMark numberOfMatchesInString:preChar options:NSMatchingAnchored range:NSMakeRange(0, 1)] > 0)
                                 break;
                             if (preCharPos == 0) {
                                 if ([self.AppDelegate debugMode]) {
@@ -579,7 +585,8 @@ NSRange _previousSelRange;
         [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
         [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
         [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
-        [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"]
+        [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
+        [clientAppId isEqual: @"com.microsoft.Word"]
         /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */) {
         _legacyMode = YES;
         if ([self.AppDelegate debugMode])

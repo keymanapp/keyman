@@ -70,7 +70,6 @@ extern NSString *const kWebSite;
 @property (nonatomic, assign) BOOL alwaysShowOSK;
 @property (nonatomic, assign) BOOL useNullChar;
 @property (nonatomic, assign) BOOL debugMode;
-@property (nonatomic, assign) NSRegularExpression *regexStartsWithNonCombiningMark;
 
 - (NSMenu *)menu;
 - (void)saveActiveKeyboards;

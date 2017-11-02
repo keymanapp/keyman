@@ -69,9 +69,6 @@ typedef enum {
                                                          forEventClass:kInternetEventClass
                                                             andEventID:kAEGetURL];
     }
-    
-    NSError *error = NULL;
-    _regexStartsWithNonCombiningMark = [NSRegularExpression regularExpressionWithPattern:@"^\\P{M}" options:NSRegularExpressionCaseInsensitive error:&error];
 
     return self;
 }
