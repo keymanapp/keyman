@@ -36,7 +36,7 @@ BOOL _legacyMode = NO;
 // are able to report their current selection location (LibreOffice can't even do that!), we can do some
 // checking at the start of the event processing to see if we're probably still in the same place where we
 // left off previously.
-BOOL _clientSelectionCanChangeUnexpectedly = NO;
+BOOL _clientSelectionCanChangeUnexpectedly = YES;
 BOOL _insertCharactersIndividually = NO;
 // Because Google Docs can't report its context in any of the browsers (Safari, Chrome, Firefox), we want to
 // try to detect it and:
@@ -46,6 +46,7 @@ BOOL _insertCharactersIndividually = NO;
 // in Firefox, we're already in legacy mode and we do get mouse clicks, so we're already doing the best we can.
 NSUInteger _failuresToRetrieveExpectedContext = NSUIntegerMax;
 BOOL _forceRemoveSelectionInGoogleDocs = NO;
+BOOL _explicitlyDeleteExistingSelectionBeforeInserting = NO;
 BOOL _cannnotTrustSelectionLength = NO;
 NSRange _previousSelRange;
 
@@ -81,18 +82,30 @@ NSRange _previousSelRange;
         [self.AppDelegate handleKeyEvent:event];*/
     
     if (event.type == NSLeftMouseDown || event.type == NSLeftMouseUp ) {
-        if (_clientSelectionCanChangeUnexpectedly) {
-            if ([self.AppDelegate debugMode])
-                NSLog(@"WARNING: We are dealing with an app/context where we THINK we shouldn't be getting mouse events, but we just got one!");
-            _clientSelectionCanChangeUnexpectedly = NO;
-        }
+//        if (_clientSelectionCanChangeUnexpectedly) {
+//            if ([self.AppDelegate debugMode])
+//                NSLog(@"WARNING: We are dealing with an app/context where we THINK we shouldn't be getting mouse events, but we just got one!");
+//            _clientSelectionCanChangeUnexpectedly = NO;
+//        }
         _contextOutOfDate = YES;
         return NO;
     }
-    else if (event.type != NSKeyDown || ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand))
-        return NO; // We ignore NSLeftMouseDragged events and any Command-key events.
+    else if (event.type != NSKeyDown)
+        return NO; // We ignore NSLeftMouseDragged events (because we'll eventually get a mouse-up).
+    else if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
+        // There are a bunch of common navigation/selection command-key combinations, but individual
+        // apps may implement specifc commands that also chnage the selection. There is probably no
+        // situation where a user could reasonably hope that any dead-keys typed before using a
+        // command shortcut would be remembered, so other than an insignificant performance penalty,
+        // the only downside to treating all commands as having the potential to change the selection
+        // is that some "legacy" apps can't get their context at all.
+        if ([self.AppDelegate debugMode])
+            NSLog(@"Command key - context needs to be re-gotten.");
+        _contextOutOfDate = YES;
+        return NO; // We let the client app handle all Command-key events.
+    }
     
-    if (_legacyMode && event.type == NSKeyDown && event.keyCode == kProcessPendingBuffer)
+    if (_legacyMode && event.keyCode == kProcessPendingBuffer)
     {
         if ([self.AppDelegate debugMode])
             NSLog(@"Processing the special %hu code", kProcessPendingBuffer);
@@ -174,7 +187,7 @@ NSRange _previousSelRange;
                 _legacyMode = YES;
                 if (_clientSelectionCanChangeUnexpectedly) {
                     _cannnotTrustSelectionLength = YES;
-                    _clientSelectionCanChangeUnexpectedly = NO;
+                    _clientSelectionCanChangeUnexpectedly = NO; // This isn't true (it can change unexpectedly), but we can't get the context, so we pretend/hope it won't.
                     // Google docs in Chrome allows only a single character at a time :-(
                     _insertCharactersIndividually = YES;
                 }
@@ -252,6 +265,8 @@ NSRange _previousSelRange;
                 // Each null in the context buffer presumably corresponds to a space we inserted when
                 // processing the Q_BACK, which we now need to replace with the text we're inserting.
                 if (nc > 0) {
+                    if ([self.AppDelegate debugMode])
+                        NSLog(@"nc = %lu", nc);
                     NSRange selRange = [sender selectedRange];
                     NSUInteger pos = selRange.location;
                     if (pos >= nc && pos != NSNotFound) {
@@ -265,8 +280,27 @@ NSRange _previousSelRange;
                     }
                 }
                 else {
-                    if ([self.AppDelegate debugMode])
-                        NSLog(@"nc = %lu", nc);
+                    // The following commented out code is the code that would make it possible to type over an
+                    // existing selection in Word in Safari, but I don't know of a way to distinguish that case
+                    // from other contexts in Safari (wherein this code inserts an extra leading space).
+//                    if (_explicitlyDeleteExistingSelectionBeforeInserting) {
+//                        NSUInteger selLength = [sender selectedRange].length;
+//                        if (selLength > 0 && selLength != NSNotFound) {
+//                            if ([self.AppDelegate debugMode]) {
+//                                NSLog(@"Attempting to delete existing selection of length = %lu by replacing it with a space (which should not actually appear in the text).", selLength);
+//                            }
+//
+//                            [sender insertText:@" " replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+//
+//                            if ([self.AppDelegate debugMode])
+//                                NSLog(@"Re-posting original (unhandled) code: %d", (int)_keyCodeOfOriginalEvent);
+//
+//                            CGEventSourceRef sourceFromEvent = CGEventCreateSourceFromEvent([event CGEvent]);
+//                            [self postKeyPressToFrontProcess:event.keyCode from:sourceFromEvent];
+//                            CFRelease(sourceFromEvent);
+//                            return YES;
+//                        }
+//                    }
                     [sender insertText:output replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
                     _previousSelRange.location += output.length;
                     _previousSelRange.length = 0;
@@ -396,7 +430,7 @@ NSRange _previousSelRange;
                     if ([self.AppDelegate debugMode]) {
                         NSLog(@"Legacy mode: calling deleteBack");
                         if (_cannnotTrustSelectionLength)
-                            NSLog(@"Cannot trust cliebt to report accurate selection length - assuming no selection.");
+                            NSLog(@"Cannot trust client to report accurate selection length - assuming no selection.");
                     }
                     
                     // Note: If pos is "not found", most likely the client can't accurately report the location. This might be
@@ -498,7 +532,6 @@ NSRange _previousSelRange;
                             _keyCodeOfOriginalEvent = 0;
                             CFRelease(_sourceFromOriginalEvent);
                             _sourceFromOriginalEvent = nil;
-                            _keyCodeOfOriginalEvent = 0;
                         }
                         updateEngineContext = NO;
                     }
@@ -524,6 +557,8 @@ NSRange _previousSelRange;
 //                }
                 /* FALLTHROUGH */
             case kVK_RightArrow:
+            case kVK_UpArrow:
+            case kVK_DownArrow:
             case kVK_Home:
             case kVK_End:
             case kVK_PageUp:
@@ -598,8 +633,10 @@ NSRange _previousSelRange;
     NSString *clientAppId = [currApp bundleIdentifier];
     if ([self.AppDelegate debugMode])
         NSLog(@"New active app %@", clientAppId);
-    _clientSelectionCanChangeUnexpectedly = NO;
+    _previousSelRange = NSMakeRange(NSNotFound, NSNotFound);
+    _clientSelectionCanChangeUnexpectedly = YES;
     _forceRemoveSelectionInGoogleDocs = NO;
+    _explicitlyDeleteExistingSelectionBeforeInserting = NO;
     _cannnotTrustSelectionLength = NO;
     _insertCharactersIndividually = NO;
     // REVIEW: Should this list be in a info.plist file
@@ -623,16 +660,25 @@ NSRange _previousSelRange;
         _legacyMode = NO;
     }
     
-    if ([clientAppId isEqual: @"com.google.Chrome"] ||
-        [clientAppId isEqual: @"com.apple.Terminal"] ||
-        [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
-        _clientSelectionCanChangeUnexpectedly = YES;
-    }
+    //    if ([clientAppId isEqual: @"com.google.Chrome"] ||
+    //        [clientAppId isEqual: @"com.apple.Terminal"] ||
+    //        [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
+    //        _clientSelectionCanChangeUnexpectedly = YES;
+    //    }
+    
+        if ([clientAppId isEqual: @"com.github.atom"]) {
+            // This isn't true (the context can change unexpectedly), but we can't get the context,
+            // so we pretend/hope it won't.
+            _clientSelectionCanChangeUnexpectedly = NO;
+        }
     
     // Most things in Safari work well using the normal way, but Google Docs doesn't.
-    if ([clientAppId isEqual: @"com.google.Chrome"] || [clientAppId isEqual: @"com.apple.Safari"]) {
+    if ([clientAppId isEqual: @"com.google.Chrome"] ||
+        [clientAppId isEqual: @"com.apple.Safari"] ||
+        [clientAppId isEqual: @"org.mozilla.firefox"]) {
         _failuresToRetrieveExpectedContext = 0;
         _forceRemoveSelectionInGoogleDocs = [clientAppId isEqual: @"com.apple.Safari"];
+        //_explicitlyDeleteExistingSelectionBeforeInserting = [clientAppId isEqual: @"com.apple.Safari"];
     }
     else {
         _failuresToRetrieveExpectedContext = NSUIntegerMax;
