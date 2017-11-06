@@ -124,6 +124,6 @@
   function removeOnEnter(e)
   {                                       
     e = e || window.event;
-    removeKeyboard(); 
+    if(e.keyCode == 13) removeKeyboard(); 
   }
   
