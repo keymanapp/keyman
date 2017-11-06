@@ -1,12 +1,12 @@
 //
-//  KeymanTextViewDelegateProxy.swift
+//  TextViewDelegateProxy.swift
 //  KeymanEngine
 //
 //  Created by Gabriel Wong on 2017-10-06.
 //  Copyright © 2017 SIL International. All rights reserved.
 //
-//  Proxies delegate messages for a KeymanTextView.
-//    This allows the KeymanTextView to hook into these calls while allowing a developer to still
+//  Proxies delegate messages for a TextView.
+//    This allows the TextView to hook into these calls while allowing a developer to still
 //    use the delegate as normal (albeit with a different name: 'keymanDelegate')
 //
 //  This class is required because at the time of writing, setting a UITextView as it's
@@ -15,20 +15,20 @@
 
 import UIKit
 
-public protocol KeymanTextViewDelegate: UITextViewDelegate { }
+public protocol TextViewDelegate: UITextViewDelegate { }
 
-class KeymanTextViewDelegateProxy: NSObject, UITextViewDelegate {
-  weak var keymanDelegate: KeymanTextViewDelegate?
+class TextViewDelegateProxy: NSObject, UITextViewDelegate {
+  weak var keymanDelegate: TextViewDelegate?
   private unowned let textView: UITextViewDelegate
 
-  init(_ textView: KeymanTextView) {
+  init(_ textView: TextView) {
     self.textView = textView
     super.init()
   }
 
   // MARK: - UITextViewDelegate
 
-  // NOTE: Return values from the KeymanTextView hooks are ignored
+  // NOTE: Return values from the TextView hooks are ignored
   func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
     _ = self.textView.textViewShouldBeginEditing?(textView)
     return keymanDelegate?.textViewShouldBeginEditing?(textView) ?? true

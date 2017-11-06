@@ -1,5 +1,5 @@
 //
-//  KeymanTextField.swift
+//  TextField.swift
 //  KeymanEngine
 //
 //  Created by Gabriel Wong on 2017-10-05.
@@ -9,15 +9,15 @@
 import AudioToolbox
 import UIKit
 
-public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate {
+public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate {
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
-  // Sets Keyman custom font (if any) to KeymanTextField instance on keyboard change event
+  // Sets Keyman custom font (if any) to TextField instance on keyboard change event
   public var shouldSetCustomFontOnKeyboardChange = true
   public var isInputClickSoundEnabled = true
 
-  private var delegateProxy: KeymanTextFieldDelegateProxy!
+  private var delegateProxy: TextFieldDelegateProxy!
   private var shouldUpdateKMText = false
 
   // MARK: - Object Admin
@@ -41,7 +41,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
   }
 
   private func performCommonInit() {
-    delegateProxy = KeymanTextFieldDelegateProxy(self)
+    delegateProxy = TextFieldDelegateProxy(self)
     delegate = delegateProxy
 
     if #available(iOS 9.0, *) {
@@ -82,7 +82,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
 
       if delegate !== delegateProxy {
         Manager.shared.kmLog(
-          "Trying to set KeymanTextField's delegate directly. Use setKeymanDelegate() instead.",
+          "Trying to set TextField's delegate directly. Use setKeymanDelegate() instead.",
           checkDebugPrinting: true)
       }
       super.delegate = delegateProxy
@@ -91,12 +91,12 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
 
   // MARK: - Public Methods
 
-  // Use this KeymanTextFieldDelegate instead of the normal UITextFieldDelegate.
+  // Use this TextFieldDelegate instead of the normal UITextFieldDelegate.
   // All of the normal UITextFieldDelegate methods are supported.
-  public func setKeymanDelegate(_ keymanDelegate: KeymanTextFieldDelegate?) {
+  public func setKeymanDelegate(_ keymanDelegate: TextFieldDelegate?) {
     delegateProxy.keymanDelegate = keymanDelegate
     Manager.shared.kmLog(
-      "KeymanTextField: \(self.debugDescription) keymanDelegate set to: \(keymanDelegate.debugDescription)",
+      "TextField: \(self.debugDescription) keymanDelegate set to: \(keymanDelegate.debugDescription)",
       checkDebugPrinting: true)
   }
 
@@ -104,7 +104,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
   @objc public func dismissKeyboard() {
     Manager.shared.kmLog(
-      "KeymanTextField: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
+      "TextField: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
       checkDebugPrinting: true)
     resignFirstResponder()
     Manager.shared.inputView.endEditing(true)
@@ -158,7 +158,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
       perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
     }
 
-    // TODO: Refactor duplicate logic in KeymanInputViewController and KMTextView
+    // TODO: Refactor duplicate logic in InputViewController and TextView
     let dnRange = fragment.range(of: "+dn=")!
     let sRange = fragment.range(of: "+s=")!
 
@@ -312,7 +312,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
                            length: offset(from: textRange.start, to: textRange.end))
     Manager.shared.setSelectionRange(newRange, manually: false)
     Manager.shared.kmLog(
-      "KeymanTextField: \(self.debugDescription) Became first responder. Value: \(String(describing: text))",
+      "TextField: \(self.debugDescription) Became first responder. Value: \(String(describing: text))",
       checkDebugPrinting: true)
   }
 
@@ -346,7 +346,7 @@ public class KeymanTextField: UITextField, UITextFieldDelegate, KeymanWebViewDel
       becomeFirstResponder()
     }
     Manager.shared.kmLog(
-      "KeymanTextField \(self.debugDescription) setFont: \(font!.familyName)", checkDebugPrinting: true)
+      "TextField \(self.debugDescription) setFont: \(font!.familyName)", checkDebugPrinting: true)
   }
 
   @objc public func enableInputClickSound() {

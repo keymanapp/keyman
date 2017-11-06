@@ -2184,7 +2184,7 @@ UIGestureRecognizerDelegate {
 
   public var keyboardHeight: CGFloat {
     if isSystemKeyboard {
-      return keyboardHeight(isPortrait: KeymanInputViewController.isPortrait)
+      return keyboardHeight(isPortrait: InputViewController.isPortrait)
     } else {
       return keyboardHeight(isPortrait: UIDevice.current.orientation.isPortrait)
     }
@@ -2319,7 +2319,7 @@ UIGestureRecognizerDelegate {
   ///   - in: The current UIViewController (recommended) or the navigation controller
   ///   - shouldAddKeyboard: Whether to immediately open the view to add a new keyboard
   /// - SeeAlso:
-  /// KeymanTextView/KeymanTextField to enable/disable the keyboard picker
+  /// TextView/TextField to enable/disable the keyboard picker
   public func showKeyboardPicker(in viewController: UIViewController, shouldAddKeyboard: Bool) {
     let vc = KeyboardPickerViewController()
     let nc = UINavigationController(rootViewController: vc)
@@ -2424,7 +2424,7 @@ UIGestureRecognizerDelegate {
     // TODO: Refactor this out
     let isPortrait: Bool
     if isSystemKeyboard {
-      isPortrait = KeymanInputViewController.isPortrait
+      isPortrait = InputViewController.isPortrait
     } else {
       isPortrait = UIDevice.current.orientation.isPortrait
     }
@@ -2867,7 +2867,7 @@ UIGestureRecognizerDelegate {
   }
 
   // MARK: - InputViewController methods
-  // TODO: Manager should not have InputViewController methods. Move this into KeymanInputViewController.
+  // TODO: Manager should not have InputViewController methods. Move this into InputViewController.
   func updateViewConstraints() {
     dismissSubKeys()
     dismissKeyPreview()
@@ -2939,7 +2939,7 @@ UIGestureRecognizerDelegate {
     menuKeyFrame = frame
   }
 
-  func showKeyboardMenu(_ ic: KeymanInputViewController, closeButtonTitle: String?) {
+  func showKeyboardMenu(_ ic: InputViewController, closeButtonTitle: String?) {
     let parentView = ic.view ?? inputView
     inputView.evaluateJavaScript("langMenuPos();") { result, _ in
       let keyFrame = result as! String

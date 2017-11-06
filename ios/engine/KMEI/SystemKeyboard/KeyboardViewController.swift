@@ -8,7 +8,7 @@
 
 import KeymanEngine
 
-class KeyboardViewController: KeymanInputViewController {
+class KeyboardViewController: InputViewController {
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     Manager.applicationGroupIdentifier = "group.KMEI"
     Manager.shared.isDebugPrintingOn = true

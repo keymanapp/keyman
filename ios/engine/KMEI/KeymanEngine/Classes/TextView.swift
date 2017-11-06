@@ -1,5 +1,5 @@
 //
-//  KeymanTextView.swift
+//  TextView.swift
 //  KeymanEngine
 //
 //  Created by Gabriel Wong on 2017-10-06.
@@ -9,15 +9,15 @@
 import AudioToolbox
 import UIKit
 
-public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback, KeymanWebViewDelegate {
+public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback, KeymanWebViewDelegate {
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
-  // Sets Keyman custom font (if any) to KeymanTextView instance on keyboard change event
+  // Sets Keyman custom font (if any) to TextView instance on keyboard change event
   public var shouldSetCustomFontOnKeyboardChange = true
   public var isInputClickSoundEnabled = true
 
-  private var delegateProxy: KeymanTextViewDelegateProxy!
+  private var delegateProxy: TextViewDelegateProxy!
   private var shouldUpdateKMText = false
 
   // MARK: - Object Admin
@@ -45,7 +45,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   }
 
   private func performCommonInit() {
-    delegateProxy = KeymanTextViewDelegateProxy(self)
+    delegateProxy = TextViewDelegateProxy(self)
     delegate = delegateProxy
 
     if #available(iOS 9.0, *) {
@@ -84,7 +84,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
 
       if delegate !== delegateProxy {
         Manager.shared.kmLog(
-          "Trying to set KeymanTextView's delegate directly. Use setKeymanDelegate() instead.",
+          "Trying to set TextView's delegate directly. Use setKeymanDelegate() instead.",
           checkDebugPrinting: true)
       }
       super.delegate = delegateProxy
@@ -93,12 +93,12 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
 
   // MARK: - Public Methods
 
-  // Use this KeymanTextViewDelegate instead of the normal UITextViewDelegate.
+  // Use this TextViewDelegate instead of the normal UITextViewDelegate.
   //   - All of the normal UITextViewDelegate methods are supported.
-  public func setKeymanDelegate(_ keymanDelegate: KeymanTextViewDelegate?) {
+  public func setKeymanDelegate(_ keymanDelegate: TextViewDelegate?) {
     delegateProxy.keymanDelegate = keymanDelegate
     Manager.shared.kmLog(
-      "KeymanTextView: \(self.debugDescription) keymanDelegate set to: \(keymanDelegate.debugDescription)",
+      "TextView: \(self.debugDescription) keymanDelegate set to: \(keymanDelegate.debugDescription)",
       checkDebugPrinting: true)
   }
 
@@ -106,7 +106,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
   @objc public func dismissKeyboard() {
     Manager.shared.kmLog(
-      "KeymanTextView: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
+      "TextView: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
       checkDebugPrinting: true)
     resignFirstResponder()
     Manager.shared.inputView.endEditing(true)
@@ -290,7 +290,7 @@ public class KeymanTextView: UITextView, UITextViewDelegate, UIInputViewAudioFee
     Manager.shared.setText(text)
     Manager.shared.setSelectionRange(selectedRange, manually: false)
     Manager.shared.kmLog(
-      "KeymanTextView: \(self.debugDescription) Became first responder. Value: \(text.debugDescription)",
+      "TextView: \(self.debugDescription) Became first responder. Value: \(text.debugDescription)",
       checkDebugPrinting: true)
   }
 

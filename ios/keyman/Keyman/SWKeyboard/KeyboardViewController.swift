@@ -9,7 +9,7 @@
 import KeymanEngine
 import UIKit
 
-class KeyboardViewController: KeymanInputViewController {
+class KeyboardViewController: InputViewController {
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     Manager.applicationGroupIdentifier = "group.KM4I"
 
@@ -30,12 +30,12 @@ class KeyboardViewController: KeymanInputViewController {
       return
     }
 
-    setupTopBarImage(isPortrait: KeymanInputViewController.isPortrait)
+    setupTopBarImage(isPortrait: InputViewController.isPortrait)
   }
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    setupTopBarImage(isPortrait: KeymanInputViewController.isPortrait)
+    setupTopBarImage(isPortrait: InputViewController.isPortrait)
   }
 
   override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {

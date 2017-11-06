@@ -1,12 +1,12 @@
 //
-//  KeymanTextFieldDelegateProxy.swift
+//  TextFieldDelegateProxy.swift
 //  KeymanEngine
 //
 //  Created by Gabriel Wong on 2017-10-06.
 //  Copyright © 2017 SIL International. All rights reserved.
 //
-//  Proxies delegate messages for a KeymanTextField.
-//    This allows the KeymanTextField to hook into these calls while allowing a developer to still
+//  Proxies delegate messages for a TextField.
+//    This allows the TextField to hook into these calls while allowing a developer to still
 //    use the delegate as normal (albeit with a different name: 'keymanDelegate')
 //
 //  This class is required because at the time of writing, setting a UITextField as it's
@@ -15,20 +15,20 @@
 
 import UIKit
 
-public protocol KeymanTextFieldDelegate: UITextFieldDelegate { }
+public protocol TextFieldDelegate: UITextFieldDelegate { }
 
-class KeymanTextFieldDelegateProxy: NSObject, UITextFieldDelegate {
-  weak var keymanDelegate: KeymanTextFieldDelegate?
+class TextFieldDelegateProxy: NSObject, UITextFieldDelegate {
+  weak var keymanDelegate: TextFieldDelegate?
   private unowned let textField: UITextFieldDelegate
 
-  init(_ textField: KeymanTextField) {
+  init(_ textField: TextField) {
     self.textField = textField
     super.init()
   }
 
   // MARK: - UITextFieldDelegate
 
-  // NOTE: Return values from the KeymanTextField hooks are ignored
+  // NOTE: Return values from the TextField hooks are ignored
   func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
     _ = self.textField.textFieldShouldBeginEditing?(textField)
     return keymanDelegate?.textFieldShouldBeginEditing?(textField) ?? true

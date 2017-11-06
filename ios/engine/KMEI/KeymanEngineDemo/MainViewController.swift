@@ -10,10 +10,9 @@ import KeymanEngine
 import UIKit
 import QuartzCore
 
-class MainViewController: UIViewController, UIAlertViewDelegate,
-KeymanTextViewDelegate, KeymanTextFieldDelegate {
-  var textView1: KeymanTextView!
-  var textView2: KeymanTextField!
+class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegate, TextFieldDelegate {
+  var textView1: TextView!
+  var textView2: TextField!
   var textView3: UITextView!
 
   deinit {
@@ -90,8 +89,8 @@ KeymanTextViewDelegate, KeymanTextFieldDelegate {
     contentView.addSubview(normalLabel)
 
     // Text Views/Fields
-    textView1 = KeymanTextView()
-    textView2 = KeymanTextField()
+    textView1 = TextView()
+    textView2 = TextField()
     textView3 = UITextView()
     setTextViewStyle(textView1)
     setTextFieldStyle(textView2)

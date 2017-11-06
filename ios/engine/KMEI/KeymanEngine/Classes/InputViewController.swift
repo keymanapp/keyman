@@ -1,5 +1,5 @@
 //
-//  KeymanInputViewController.swift
+//  InputViewController.swift
 //  KMEI
 //
 //  Created by Gabriel Wong on 2017-09-29.
@@ -21,7 +21,7 @@ public enum MenuBehaviour: Int {
   case showNever
 }
 
-open class KeymanInputViewController: UIInputViewController, KeymanWebViewDelegate {
+open class InputViewController: UIInputViewController, KeymanWebViewDelegate {
   var menuCloseButtonTitle: String?
   var isInputClickSoundEnabled = true
   var globeKeyTapBehaviour = GlobeKeyTapBehaviour(rawValue: 0)!
@@ -42,7 +42,7 @@ open class KeymanInputViewController: UIInputViewController, KeymanWebViewDelega
   }
 
   @objc open class var topBarHeight: Int {
-    if KeymanInputViewController.isPortrait {
+    if InputViewController.isPortrait {
       return 41
     }
     return UIDevice.current.userInterfaceIdiom == .phone ? 34 : 39
@@ -60,7 +60,7 @@ open class KeymanInputViewController: UIInputViewController, KeymanWebViewDelega
 
   private var expandedHeight: CGFloat {
     return CGFloat(Int(kmInputView.frame.height) % 1000) +
-      (isTopBarEnabled ? CGFloat(KeymanInputViewController.topBarHeight) : 0)
+      (isTopBarEnabled ? CGFloat(InputViewController.topBarHeight) : 0)
   }
 
   public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
@@ -81,7 +81,7 @@ open class KeymanInputViewController: UIInputViewController, KeymanWebViewDelega
 
     Manager.shared.updateViewConstraints()
 
-    let topBarHeight = isTopBarEnabled ? CGFloat(KeymanInputViewController.topBarHeight) : 0
+    let topBarHeight = isTopBarEnabled ? CGFloat(InputViewController.topBarHeight) : 0
     barHeightConstraints[0].constant = topBarHeight
 
     for constraint in barHeightConstraints {
@@ -202,7 +202,7 @@ open class KeymanInputViewController: UIInputViewController, KeymanWebViewDelega
       let newContext = textDocumentProxy.documentContextBeforeInput ?? ""
       let unitsDeleted = oldContext.utf16.count - newContext.utf16.count
       if unitsDeleted > 1 {
-        if !KeymanInputViewController.isSurrogate(oldContext.utf16.last!) {
+        if !InputViewController.isSurrogate(oldContext.utf16.last!) {
           let lowerIndex = oldContext.utf16.index(oldContext.utf16.startIndex,
                                                   offsetBy: newContext.utf16.count)
           let upperIndex = oldContext.utf16.index(lowerIndex, offsetBy: unitsDeleted - 1)
@@ -253,7 +253,7 @@ open class KeymanInputViewController: UIInputViewController, KeymanWebViewDelega
   }
 
   private func setConstraints() {
-    let topBarHeight = isTopBarEnabled ? KeymanInputViewController.topBarHeight : 0
+    let topBarHeight = isTopBarEnabled ? InputViewController.topBarHeight : 0
     let viewsDict = ["bar": topBarImageView!, "container": containerView!]
     barHeightConstraints = NSLayoutConstraint.constraints(
       withVisualFormat: "V:[bar(\(topBarHeight))]", metrics: nil, views: viewsDict)

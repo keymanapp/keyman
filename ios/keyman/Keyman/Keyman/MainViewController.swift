@@ -22,14 +22,14 @@ let dontShowGetStartedKey = "DontShowGetStarted"
 let launchedFromUrlNotification = NSNotification.Name("LaunchedFromUrlNotification")
 let urlKey = "url"
 
-class MainViewController: UIViewController, KeymanTextViewDelegate, UIActionSheetDelegate, UIAlertViewDelegate {
+class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDelegate, UIAlertViewDelegate {
   private let minTextSize: CGFloat = 9.0
   private let maxTextSize: CGFloat = 72.0
   private let getStartedViewTag = 7183
   private let activityIndicatorViewTag = 6573
   private let dropDownListTag = 686876
 
-  var textView: KeymanTextView!
+  var textView: TextView!
   var textSize: CGFloat = 0.0
 
   private var getStartedVC: GetStartedViewController!
@@ -184,7 +184,7 @@ class MainViewController: UIViewController, KeymanTextViewDelegate, UIActionShee
 
     // Setup Keyman TextView
     textSize = 16.0
-    textView = KeymanTextView(frame: screenRect)
+    textView = TextView(frame: screenRect)
     textView.setKeymanDelegate(self)
     textView.viewController = self
     textView.backgroundColor = bgColor

@@ -9,7 +9,7 @@
 import KeymanEngine
 import UIKit
 
-class KeyboardViewController: KeymanInputViewController {
+class KeyboardViewController: InputViewController {
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     // Replace with your application group id. Must be set before call to super.init().
     Manager.applicationGroupIdentifier = "group.KMSample"
