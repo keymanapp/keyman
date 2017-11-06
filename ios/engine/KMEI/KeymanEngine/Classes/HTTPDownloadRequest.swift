@@ -6,37 +6,37 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
-@objc public enum DownloadType: Int {
+enum DownloadType {
   case downloadFile
   case downloadCachedData
 }
 
-public class HTTPDownloadRequest: NSObject {
-  @objc public let url: URL
-  @objc public let typeCode: DownloadType
+class HTTPDownloadRequest: NSObject {
+  let url: URL
+  let typeCode: DownloadType
   // TODO: Make values of this dict properties of the class
-  @objc public var userInfo: [String: Any]
+  var userInfo: [String: Any]
   var task: URLSessionTask?
-  @objc public var destinationFile: String?
-  @objc public var rawResponseData: Data?
-  @objc public var tag: Int = 0
+  var destinationFile: String?
+  var rawResponseData: Data?
+  var tag: Int = 0
 
-  @objc public init(url: URL, downloadType type: DownloadType, userInfo info: [String: Any]) {
+  init(url: URL, downloadType type: DownloadType, userInfo info: [String: Any]) {
     self.url = url
     typeCode = type
     userInfo = info
     super.init()
   }
 
-  @objc public convenience init(url: URL) {
+  convenience init(url: URL) {
     self.init(url: url, downloadType: DownloadType.downloadFile, userInfo: [:])
   }
 
-  @objc public convenience init(url: URL, userInfo info: [String: Any]) {
+  convenience init(url: URL, userInfo info: [String: Any]) {
     self.init(url: url, downloadType: DownloadType.downloadFile, userInfo: info)
   }
 
-  @objc public convenience init(url: URL, downloadType type: DownloadType) {
+  convenience init(url: URL, downloadType type: DownloadType) {
     self.init(url: url, downloadType: type, userInfo: [:])
   }
 
@@ -47,14 +47,14 @@ public class HTTPDownloadRequest: NSObject {
     return nil
   }
 
-  @objc public var responseStatusMessage: String? {
+  var responseStatusMessage: String? {
     guard let statusCode = responseStatusCode else {
       return nil
     }
     return HTTPURLResponse.localizedString(forStatusCode: statusCode)
   }
 
-  @objc public var error: Error? {
+  var error: Error? {
     return task?.error
   }
 }

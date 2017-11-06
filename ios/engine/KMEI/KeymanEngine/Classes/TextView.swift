@@ -104,7 +104,7 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
 
   // Dismisses the keyboard if this textview is the first responder.
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
-  @objc public func dismissKeyboard() {
+  public func dismissKeyboard() {
     Manager.shared.kmLog(
       "TextView: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
       checkDebugPrinting: true)
@@ -130,7 +130,7 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
   }
 
   // MARK: - KMWebViewDelegate
-  @objc public func updatedFragment(_ fragment: String) {
+  func updatedFragment(_ fragment: String) {
     if fragment.contains("insertText") {
       processInsertText(fragment)
     } else if fragment.contains("hideKeyboard") {

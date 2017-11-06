@@ -15,7 +15,7 @@ public class KeyboardPickerBarButtonItem: UIBarButtonItem {
   //   - since the keyboard picker is modal, a UIViewController must be supplied to display it
   //   - the button has default images for normal and landscape orientations
   //      - these can be overridden with other images or a title
-  @objc public init(presentingVC: UIViewController) {
+  public init(presentingVC: UIViewController) {
     super.init()
     style = .plain
     action = #selector(self.showKeyboardPicker)
@@ -43,7 +43,7 @@ public class KeyboardPickerBarButtonItem: UIBarButtonItem {
     presentingVC = nil
   }
 
-  @objc public func showKeyboardPicker() {
+  @objc func showKeyboardPicker() {
     if let presentingVC = presentingVC {
       Manager.shared.showKeyboardPicker(in: presentingVC, shouldAddKeyboard: false)
     }

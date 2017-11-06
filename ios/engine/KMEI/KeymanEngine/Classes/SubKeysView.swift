@@ -6,7 +6,7 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
-public class SubKeysView: UIView {
+class SubKeysView: UIView {
   private let borderRadius: CGFloat = 5.0
   private let strokeWidth: CGFloat = 1.0
 
@@ -20,9 +20,9 @@ public class SubKeysView: UIView {
   private let bgColor2 = UIColor.white
   private let borderColor = UIColor(red: 145.0 / 255.0, green: 148.0 / 255.0, blue: 152.0 / 255.0, alpha: 1.0)
 
-  @objc public let containerView: UIView
+  let containerView: UIView
 
-  @objc public init(keyFrame frame: CGRect, subKeys: [UIButton]) {
+  init(keyFrame frame: CGRect, subKeys: [UIButton]) {
     let isSystemKeyboard = Manager.shared.isSystemKeyboard
     var isPortrait = true
     if isSystemKeyboard {
@@ -147,11 +147,11 @@ public class SubKeysView: UIView {
 
   }
 
-  public required init?(coder aDecoder: NSCoder) {
+  required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
-  public override func draw(_ rect: CGRect) {
+  override func draw(_ rect: CGRect) {
     drawKeyPreviewUp(rect)
   }
 

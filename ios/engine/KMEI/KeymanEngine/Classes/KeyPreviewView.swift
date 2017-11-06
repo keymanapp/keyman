@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class KeyPreviewView: UIView {
+class KeyPreviewView: UIView {
   private let keyFrame: CGRect
   private let strokeWidth: CGFloat = 1.0
   private let borderRadius: CGFloat = 5.0
@@ -20,7 +20,7 @@ public class KeyPreviewView: UIView {
   private let bgColor2 = UIColor.white
   private let label: UILabel
 
-  @objc public override init(frame: CGRect) {
+  override init(frame: CGRect) {
     let isPortrait: Bool
     if Manager.shared.isSystemKeyboard {
       isPortrait = InputViewController.isPortrait
@@ -77,11 +77,11 @@ public class KeyPreviewView: UIView {
     addSubview(label)
   }
 
-  public required init?(coder aDecoder: NSCoder) {
+  required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
-  public override func draw(_ rect: CGRect) {
+  override func draw(_ rect: CGRect) {
     drawKeyPreviewUp(rect)
   }
 
@@ -165,11 +165,11 @@ public class KeyPreviewView: UIView {
     UIGraphicsPopContext()
   }
 
-  @objc public func setLabelText(_ text: String) {
+  func setLabelText(_ text: String) {
     label.text = text
   }
 
-  @objc public func setLabelFont(_ fontName: String?) {
+  func setLabelFont(_ fontName: String?) {
     let fontSize = label.font.pointSize
     if let fontName = fontName {
       label.font = UIFont(name: fontName, size: fontSize)
@@ -178,7 +178,7 @@ public class KeyPreviewView: UIView {
     }
   }
 
-  public override var backgroundColor: UIColor? {
+  override var backgroundColor: UIColor? {
     get {
       return super.backgroundColor
     }

@@ -6,23 +6,23 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
-@objc public protocol HTTPDownloadDelegate: class {
+protocol HTTPDownloadDelegate: class {
   func downloadRequestStarted(_ request: HTTPDownloadRequest)
   func downloadRequestFinished(_ request: HTTPDownloadRequest)
   func downloadRequestFailed(_ request: HTTPDownloadRequest)
   func downloadQueueFinished(_ queue: HTTPDownloader)
 }
 
-public class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDownloadDelegate,
+class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDownloadDelegate,
 URLSessionDataDelegate {
   var queue: [HTTPDownloadRequest] = []
   // TODO: Make unowned
   weak var handler: HTTPDownloadDelegate?
   var currentRequest: HTTPDownloadRequest?
   var downloadSession: URLSession!
-  @objc public var userInfo: [String: Any] = [:]
+  public var userInfo: [String: Any] = [:]
 
-  @objc public init(_ handler: HTTPDownloadDelegate?) {
+  init(_ handler: HTTPDownloadDelegate?) {
     super.init()
     self.handler = handler
 
@@ -30,7 +30,7 @@ URLSessionDataDelegate {
     downloadSession = URLSession(configuration: config, delegate: self, delegateQueue: nil)
   }
 
-  @objc public func addRequest(_ request: HTTPDownloadRequest) {
+  func addRequest(_ request: HTTPDownloadRequest) {
     queue.append(request)
   }
 
@@ -42,7 +42,7 @@ URLSessionDataDelegate {
   }
 
   // Starts the queue.  The queue is managed via event messages in order to process them sequentially.
-  @objc public func run() {
+  func run() {
     if !queue.isEmpty {
       runRequest()
     }
@@ -70,8 +70,8 @@ URLSessionDataDelegate {
   }
 
   // This is triggered before the 'didCompleteWithError' delegate method.
-  public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
-                         didFinishDownloadingTo location: URL) {
+  func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
+                  didFinishDownloadingTo location: URL) {
     guard let currentRequest = currentRequest else {
       return
     }
@@ -89,16 +89,16 @@ URLSessionDataDelegate {
     }
   }
 
-  public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask,
-                         willCacheResponse proposedResponse: CachedURLResponse,
-                         completionHandler: @escaping (CachedURLResponse?) -> Void) {
+  func urlSession(_ session: URLSession, dataTask: URLSessionDataTask,
+                  willCacheResponse proposedResponse: CachedURLResponse,
+                  completionHandler: @escaping (CachedURLResponse?) -> Void) {
     // We only evaluate one at a time, so the 'current request' holds the data task's original request data.
     currentRequest?.rawResponseData = proposedResponse.data
     completionHandler(proposedResponse)
     // With current internal settings, this will cache the data as we desire.
   }
 
-  public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+  func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
     let req = currentRequest
     currentRequest = nil
     if task.error != nil {
@@ -116,7 +116,7 @@ URLSessionDataDelegate {
     }
   }
 
-  @objc public func cancelAllOperations() {
+  func cancelAllOperations() {
     while !queue.isEmpty {
       _ = popRequest()
     }
@@ -127,7 +127,7 @@ URLSessionDataDelegate {
     }
   }
 
-  @objc public var requestsCount: Int {
+  var requestsCount: Int {
     return queue.count
   }
 }

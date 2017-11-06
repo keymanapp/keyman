@@ -6,6 +6,6 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
-public protocol KeymanWebViewDelegate: class {
+protocol KeymanWebViewDelegate: class {
   func updatedFragment(_ fragment: String)
 }

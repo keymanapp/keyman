@@ -12,7 +12,7 @@ import QuartzCore
 public class KeyboardPickerButton: UIButton {
   weak var presentingVC: UIViewController?
 
-  @objc public init(presentingVC: UIViewController) {
+  public init(presentingVC: UIViewController) {
     super.init(frame: .zero)
     self.presentingVC = presentingVC
 

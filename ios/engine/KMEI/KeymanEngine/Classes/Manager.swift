@@ -15,7 +15,7 @@ typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
 // MARK: - Constants
 
 // Possible states that a keyboard can be in
-public enum KeyboardState: Int {
+public enum KeyboardState {
   case needsDownload
   case needsUpdate
   case upToDate
@@ -1405,7 +1405,7 @@ UIGestureRecognizerDelegate {
 
   // MARK: - HTTPDownloadDelegate methods
 
-  public func downloadQueueFinished(_ queue: HTTPDownloader) {
+  func downloadQueueFinished(_ queue: HTTPDownloader) {
     if isDebugPrintingOn {
       if let fontDir = activeFontDirectory()?.path {
         let contents = try? FileManager.default.contentsOfDirectory(atPath: fontDir)
@@ -1418,7 +1418,7 @@ UIGestureRecognizerDelegate {
     }
   }
 
-  public func downloadRequestStarted(_ request: HTTPDownloadRequest) {
+  func downloadRequestStarted(_ request: HTTPDownloadRequest) {
     // If we're downloading a new keyboard.
     // The extra check is there to filter out other potential request types in the future.
     if request.tag == 0 && request.typeCode == .downloadFile {
@@ -1426,7 +1426,7 @@ UIGestureRecognizerDelegate {
     }
   }
 
-  public func downloadRequestFinished(_ request: HTTPDownloadRequest) {
+  func downloadRequestFinished(_ request: HTTPDownloadRequest) {
     switch request.typeCode {
     case .downloadFile:
       let kbInfo = request.userInfo[Key.keyboardInfo]
@@ -1523,7 +1523,7 @@ UIGestureRecognizerDelegate {
     }
   }
 
-  public func downloadRequestFailed(_ request: HTTPDownloadRequest) {
+  func downloadRequestFailed(_ request: HTTPDownloadRequest) {
     switch request.typeCode {
     case .downloadFile:
       downloadQueue = nil

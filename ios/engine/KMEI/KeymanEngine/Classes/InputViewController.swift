@@ -9,14 +9,14 @@
 import AudioToolbox
 import UIKit
 
-public enum GlobeKeyTapBehaviour: Int {
-  case switchToNextKeyboard = 0
+public enum GlobeKeyTapBehaviour {
+  case switchToNextKeyboard
   case switchToNextInputMethod
   case doNothing
 }
 
-public enum MenuBehaviour: Int {
-  case showAlways = 0
+public enum MenuBehaviour {
+  case showAlways
   case showIfMultipleKeyboards
   case showNever
 }
@@ -24,8 +24,8 @@ public enum MenuBehaviour: Int {
 open class InputViewController: UIInputViewController, KeymanWebViewDelegate {
   var menuCloseButtonTitle: String?
   var isInputClickSoundEnabled = true
-  var globeKeyTapBehaviour = GlobeKeyTapBehaviour(rawValue: 0)!
-  var menuBehaviour = MenuBehaviour(rawValue: 0)!
+  var globeKeyTapBehaviour = GlobeKeyTapBehaviour.switchToNextKeyboard
+  var menuBehaviour = MenuBehaviour.showAlways
 
   unowned var kmInputView: UIView
 
@@ -37,11 +37,11 @@ open class InputViewController: UIInputViewController, KeymanWebViewDelegate {
   var heightConstraint: NSLayoutConstraint!
   var isTopBarEnabled: Bool
 
-  @objc open class var isPortrait: Bool {
+  open class var isPortrait: Bool {
     return UIScreen.main.bounds.width < UIScreen.main.bounds.height
   }
 
-  @objc open class var topBarHeight: Int {
+  open class var topBarHeight: Int {
     if InputViewController.isPortrait {
       return 41
     }
@@ -216,7 +216,7 @@ open class InputViewController: UIInputViewController, KeymanWebViewDelegate {
     }
   }
 
-  @objc public func updatedFragment(_ fragment: String) {
+  func updatedFragment(_ fragment: String) {
     if fragment.isEmpty {
       return
     }
@@ -298,7 +298,7 @@ open class InputViewController: UIInputViewController, KeymanWebViewDelegate {
     heightConstraint.priority = UILayoutPriority(rawValue: 999)
   }
 
-  @objc public func enableInputClickSound() {
+  @objc func enableInputClickSound() {
     isInputClickSoundEnabled = true
   }
 

@@ -102,7 +102,7 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
 
   // Dismisses the keyboard if this textview is the first responder.
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
-  @objc public func dismissKeyboard() {
+  public func dismissKeyboard() {
     Manager.shared.kmLog(
       "TextField: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
       checkDebugPrinting: true)
@@ -131,7 +131,7 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
   }
 
   // MARK: - KMWebViewDelegate
-  @objc public func updatedFragment(_ fragment: String) {
+  func updatedFragment(_ fragment: String) {
     if fragment.contains("insertText") {
       processInsertText(fragment)
     } else if fragment.contains("hideKeyboard") {
@@ -227,7 +227,7 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
     return true
   }
 
-  @objc public func textFieldTextDidChange(_ notification: Notification) {
+  @objc func textFieldTextDidChange(_ notification: Notification) {
     if shouldUpdateKMText {
       // Catches copy/paste operations
       Manager.shared.setText(text)
@@ -325,7 +325,7 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
   }
 
   // MARK: - Keyman notifications
-  @objc public func keyboardChanged(_ notification: Notification) {
+  @objc func keyboardChanged(_ notification: Notification) {
     if !shouldSetCustomFontOnKeyboardChange {
       return
     }
@@ -349,7 +349,7 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
       "TextField \(self.debugDescription) setFont: \(font!.familyName)", checkDebugPrinting: true)
   }
 
-  @objc public func enableInputClickSound() {
+  @objc func enableInputClickSound() {
     isInputClickSoundEnabled = true
   }
 }
