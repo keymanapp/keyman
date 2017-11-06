@@ -1903,6 +1903,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       if(activeRemoved) {
         // Always reset to the first remaining keyboard
         keymanweb._SetActiveKeyboard(ss[0]['KI'],ss[0]['KLC'],true);
+        // This is likely to be triggered by a UI call of some sort, and we need to treat
+        // this call as such to properly maintain the globalKeyboard setting.
+        keymanweb._JustActivatedKeymanWebUI = 1;
       }
 
       if(anyRemoved) {
