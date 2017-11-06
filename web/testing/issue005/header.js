@@ -120,7 +120,7 @@
     console.log("Keyboard '" + sKbd + "' removal success: " + result);
   }
   
-  // Add keyboard on Enter (as well as pressing button)
+  // Removes keyboard on Enter (as well as pressing button)
   function removeOnEnter(e)
   {                                       
     e = e || window.event;
