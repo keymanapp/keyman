@@ -1874,26 +1874,34 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @param {string} x keyboard name string
      * 
      */  
-    keymanweb['removeKeyboards'] = function(x)
-    {
-      if(arguments.length == 0) return;
+    keymanweb['removeKeyboards'] = function(x) {
+      if(arguments.length == 0) {
+        return false;
+      }
 
-      var i,j,ss=keymanweb._KeyboardStubs; 
-      for(i=0; i<arguments.length; i++)
-      {           
-        for(j=ss.length-1; j>=0; j--)
-        {
-          if('Keyboard_'+arguments[i] == ss[j]['KI'] && ss.length > 1) 
-          {                 
-            ss.splice(j,1); break;
+      var i,j,ss=keymanweb._KeyboardStubs;
+      var success = false;
+
+      for(i=0; i<arguments.length; i++) {           
+        for(j=ss.length-1; j>=0; j--) {
+          if('Keyboard_'+arguments[i] == ss[j]['KI'] && ss.length > 1) {                 
+            ss.splice(j,1);
+            success = true;
+            break;
           }
         }
       } 
-      // Always reset to the first remaining keyboard
-      keymanweb._SetActiveKeyboard(ss[0]['KI'],ss[0]['KLC'],true);
-      
-      // then update the UI keyboard menu
-      keymanweb.doKeyboardUnregistered();
+
+      if(success) {
+        // Always reset to the first remaining keyboard
+        keymanweb._SetActiveKeyboard(ss[0]['KI'],ss[0]['KLC'],true);
+        
+        // then update the UI keyboard menu
+        keymanweb.doKeyboardUnregistered();
+        return true;
+      } else {
+        return false;
+      }
     }
 
 

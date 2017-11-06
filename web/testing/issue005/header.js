@@ -115,7 +115,9 @@
     var kmw=window['keyman'] ? keyman : tavultesoft.keymanweb;
     
     var sKbd = document.getElementById('kbd_id4').value;
-    kmw.removeKeyboards(sKbd);
+    var result = kmw.removeKeyboards(sKbd);
+    
+    console.log("Keyboard '" + sKbd + "' removal success: " + result);
   }
   
   // Add keyboard on Enter (as well as pressing button)
