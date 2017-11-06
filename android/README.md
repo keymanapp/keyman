@@ -96,11 +96,11 @@ Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imp
     b. If you choose to use your own build of the Keyman Engine, get the library from **android/Samples/KMSample1/app/libs/keyman-engine.aar**
 2. Open your project in Android Studio.
 3. Open **build.gradle** (Module: app) in "Gradle Scripts".
-4. include `compile(name:'keyman-engine', ext:'aar')` in dependencies.
+4. include `api (name:'keyman-engine', ext:'aar')` in dependencies.
 5. after dependencies, insert
 ````gradle
     repositories {
-        mavenCentral()
+        google()
         flatDir {
             dirs 'libs'
         }
