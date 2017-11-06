@@ -1880,27 +1880,35 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       }
 
       var i,j,ss=keymanweb._KeyboardStubs;
-      var success = true, anySuccess = false;
+      var success = true, activeRemoved = false, anyRemoved = false;;
 
       for(i=0; i<arguments.length; i++) {           
         for(j=ss.length-1; j>=0; j--) {
           if('Keyboard_'+arguments[i] == ss[j]['KI'] && ss.length > 1) {                 
+            if('Keyboard_'+arguments[i] == keymanweb['getActiveKeyboard']()) {
+              activeRemoved = true;
+            }
+
+            anyRemoved = true;
             ss.splice(j,1);
-            anySuccess = true;
             break;
           }
         }
 
-        success = false;
+        if(j < 0) {
+          success = false;
+        }
       } 
 
-      if(anySuccess) {
+      if(activeRemoved) {
         // Always reset to the first remaining keyboard
         keymanweb._SetActiveKeyboard(ss[0]['KI'],ss[0]['KLC'],true);
-        
-        // then update the UI keyboard menu
+      }
+
+      if(anyRemoved) {
+        // Update the UI keyboard menu
         keymanweb.doKeyboardUnregistered();
-      } 
+      }
         
       return success;
     }
