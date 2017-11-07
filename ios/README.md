@@ -7,7 +7,7 @@
 
 ## Keyman App
 
-This is the iOS app which is distributed. The source for the app is found in **keyman/**. This project only contains
+The source for our published iOS Keyman app is found within the **keyman/** subdirectory. This project only contains
 the views specific to the Keyman app, while the core functionality is found in KeymanEngine.framework.
 
 ### Building
@@ -17,7 +17,7 @@ complete the build for the final app.
 
 To run the app within a simulator after build.sh is completed,
 1. Open **keyman/Keyman/Keyman.xcodeproj** in Xcode.
-2. "Run" the Keyman target within Xcode.
+2. Run the Keyman target within Xcode.
 
 The Keyman app relies on KeymanEngine.framework. `build.sh` builds KeymanEngine.framework and so must be run in the
 initial build and whenever KeymanEngine is modified.
