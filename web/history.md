@@ -16,6 +16,7 @@
 * Set the default behavior of KMW to auto-attach for all devices, rather than only desktops. (#375)
 * Fixed key codes for longpress keys and handle default keys beyond U_FFFF
 * Enhanced the removeKeyboards API function (#5)
+* Fixed an issue with the Toolbar UI under certain scenarios (#271)
 
 ## 2017-07-10 2.0.473 stable
 * 2.0 stable release build.
