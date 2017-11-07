@@ -14,13 +14,13 @@ display_usage ( ) {
     echo "build.sh [-no-update] | [-lib-build] | [-lib-ignore] | [-clean]"
     echo
     echo "  -clean          Removes all previously-existing build products for this project before building."
-    echo "  -no-update      If an in-place copy of libKeyman exists, does not seek out an updated copy."
+    echo "  -no-update      If an in-place copy of KeymanEngine.framework exists, does not seek out an updated copy."
     echo "  -lib-build      Actively rebuilds KMEI before copying its build products to project resources."
-    echo "  -lib-nobuild    Prevents the build script from building libKeyman under any circumstances."
+    echo "  -lib-nobuild    Prevents the build script from building KeymanEngine under any circumstances."
     echo "  -no-codesign    Performs the build without code signing."
     echo "  -debug          Sets the configuration to debug mode instead of release."
     echo
-    echo "  If no settings are specified this script will grab a copy of the most recent build of libKeyman,"
+    echo "  If no settings are specified this script will grab a copy of the most recent build of KeymanEngine,"
     echo "  performing an initial build of it if necessary."
     exit 1
 }
@@ -95,23 +95,23 @@ if [ $DO_UPDATE = true ]; then
     verify_KMEI
 
     if [ $ALLOW_KMEI_BUILD = true ] && [ $FORCE_KMEI_BUILD = false ] && [ $KMEI_BUILD_EXISTS = false ]; then
-        echo "Previous libKeyman build information is unavailable."
+        echo "Previous KeymanEngine build information is unavailable."
         FORCE_KMEI_BUILD=true
     fi
 
     if [ $FORCE_KMEI_BUILD = true ]; then
-        echo "Building libKeyman..."
+        echo "Building KeymanEngine..."
         base_dir="$(pwd)"
 
         cd $KMEI_BUILD_DIR
-        ./build.sh -libKeyman $KMEI_FLAGS
+        ./build.sh -only-framework $KMEI_FLAGS
         cd $base_dir
     fi
 
     verify_KMEI
 
     if ! [ $KMEI_BUILD_EXISTS ]; then
-      echo "Build failed:  could not build required libKeyman resources."
+      echo "Build failed:  could not build required KeymanEngine resources."
       exit 1
     fi
 

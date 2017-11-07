@@ -7,11 +7,11 @@
 verify_on_mac
 
 display_usage ( ) {
-    echo "build.sh [-clean] [-no-kmw] [-libKeyman] [-no-codesign] [-no-archive] [-no-build]"
+    echo "build.sh [-clean] [-no-kmw] [-only-framework] [-no-codesign] [-no-archive] [-no-build]"
     echo
     echo "  -clean                  Removes all previously-existing build products for KMEI and the Keyman app before building."
     echo "  -no-kmw                 Uses existing keyman.js, doesn't try to build"
-    echo "  -libKeyman              Builds only KMEI for its libKeyman resources; does not attempt to build the app."
+    echo "  -only-framework         Builds only the KeymanEngine framework; does not attempt to build the app."
     echo "  -no-codesign            Disables code-signing for the Keyman application, allowing it to be performed separately later."
     echo "                          Will not construct the archive and .ipa.  (includes -no-archive)"
     echo "  -no-archive             Bypasses the archive and .ipa preparation stage."
@@ -60,7 +60,7 @@ while [[ $# -gt 0 ]] ; do
             display_usage
             exit 0
             ;;
-        -libKeyman)
+        -only-framework)
             DO_KEYMANAPP=false
             ;;
         -no-codesign)
