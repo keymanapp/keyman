@@ -47,7 +47,7 @@
     // The first keyboard added will be the default keyboard for touch devices.
     // For faster loading, it may be best for the default keybaord to be 
     // locally sourced.
-    kmw.addKeyboards({id:'us',name:'English',languages:{id:'eng',name:'English'},
+    kmw.addKeyboards({id:'us',name:'English',languages:{id:'eng',name:'English', region:'North America'},
       filename:'../us-1.0.js'});
       
     // Add more keyboards to the language menu, by keyboard name,
