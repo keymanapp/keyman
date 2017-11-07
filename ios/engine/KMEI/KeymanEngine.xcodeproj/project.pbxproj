@@ -24,23 +24,11 @@
 /* Begin PBXBuildFile section */
 		6CD5DFAA150F6DC8007A5DDE /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA8150F6DC8007A5DDE /* icon.png */; };
 		6CD5DFAB150F6DC8007A5DDE /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */; };
-		984FD3EF17B48C670026ADA7 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984FD3EC17B48BBC0026ADA7 /* CoreText.framework */; };
 		988B36B61ADF67290008752C /* inuktitut_pirurvik-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */; };
 		988B36B91ADF728A0008752C /* inuktitut_latin-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 988B36B71ADF728A0008752C /* inuktitut_latin-1.0.js */; };
 		988B36BA1ADF728A0008752C /* inuktitut_naqittaut-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 988B36B81ADF728A0008752C /* inuktitut_naqittaut-1.0.js */; };
-		98B34AB917F3B82000DF079E /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98B34AB817F3B82000DF079E /* AudioToolbox.framework */; };
 		98D4190C17695E58008D2FF3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98D4190B17695E58008D2FF3 /* Default-568h@2x.png */; };
 		98F9D6A01954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */; };
-		98F9D6A7195412620087AA43 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F26071FF158F8C6000F37184 /* libz.dylib */; };
-		98F9D6A81954126C0087AA43 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984FD3EC17B48BBC0026ADA7 /* CoreText.framework */; };
-		98F9D6A9195412720087AA43 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98B34AB817F3B82000DF079E /* AudioToolbox.framework */; };
-		98F9D6AA1954127F0087AA43 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2607203158F8CA200F37184 /* MobileCoreServices.framework */; };
-		98F9D6AB195412870087AA43 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2607201158F8C9600F37184 /* SystemConfiguration.framework */; };
-		98F9D6AC195412920087AA43 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F243888214BBD43100A3E055 /* UIKit.framework */; };
-		98F9D6AD1954129A0087AA43 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F243888614BBD43100A3E055 /* CoreGraphics.framework */; };
-		98F9D6AE195412A60087AA43 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F26071FD158F8C4600F37184 /* CFNetwork.framework */; };
-		98FFB3D41B67006F00289F0E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98FFB3D31B67006F00289F0E /* WebKit.framework */; };
-		98FFB3D51B67008000289F0E /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98FFB3D31B67006F00289F0E /* WebKit.framework */; };
 		C0324B8D1F87480700AF3785 /* TextFieldDelegateProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B8C1F87480700AF3785 /* TextFieldDelegateProxy.swift */; };
 		C0324B8F1F8750B700AF3785 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B8E1F8750B700AF3785 /* TextView.swift */; };
 		C0324B911F8763E100AF3785 /* TextViewDelegateProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B901F8763E100AF3785 /* TextViewDelegateProxy.swift */; };
@@ -77,12 +65,6 @@
 		C0A93A541F8B21240079948B /* Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A93A531F8B21240079948B /* Manager.swift */; };
 		C0CE581E1F877B4D00AE6A7E /* NSNotification.Name+Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CE581D1F877B4D00AE6A7E /* NSNotification.Name+Notifications.swift */; };
 		C0EF3E7B1F95B65300CE9BD4 /* KeymanWebViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EF3E7A1F95B65300CE9BD4 /* KeymanWebViewDelegate.swift */; };
-		F243888314BBD43100A3E055 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F243888214BBD43100A3E055 /* UIKit.framework */; };
-		F243888714BBD43100A3E055 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F243888614BBD43100A3E055 /* CoreGraphics.framework */; };
-		F26071FE158F8C4600F37184 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F26071FD158F8C4600F37184 /* CFNetwork.framework */; };
-		F2607200158F8C6000F37184 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F26071FF158F8C6000F37184 /* libz.dylib */; };
-		F2607202158F8C9600F37184 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2607201158F8C9600F37184 /* SystemConfiguration.framework */; };
-		F2607204158F8CA200F37184 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2607203158F8CA200F37184 /* MobileCoreServices.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -149,26 +131,20 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		6C0A13FC151EA2CA007FA4AD /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
 		6C0A140E151EA930007FA4AD /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		6C0A140F151EA930007FA4AD /* Keyman.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; lineEnding = 0; path = Keyman.xcconfig; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcconfig; };
 		6C0A1410151EA930007FA4AD /* Project.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; lineEnding = 0; path = Project.xcconfig; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcconfig; };
 		6C0A1411151EA930007FA4AD /* Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; lineEnding = 0; path = Release.xcconfig; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcconfig; };
 		6CD5DFA8150F6DC8007A5DDE /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
 		6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x.png"; sourceTree = "<group>"; };
-		98493BF71993370200845D28 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		984FA1F51974C0B30037EE5D /* Tavultesoft.KMEI.SystemKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Tavultesoft.KMEI.SystemKeyboard.entitlements; sourceTree = "<group>"; };
 		984FA1F61974C0EF0037EE5D /* KMEI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = KMEI.entitlements; sourceTree = "<group>"; };
-		984FD3EC17B48BBC0026ADA7 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_pirurvik-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_pirurvik-1.0.js"; sourceTree = SOURCE_ROOT; };
 		988B36B71ADF728A0008752C /* inuktitut_latin-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_latin-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_latin-1.0.js"; sourceTree = SOURCE_ROOT; };
 		988B36B81ADF728A0008752C /* inuktitut_naqittaut-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_naqittaut-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_naqittaut-1.0.js"; sourceTree = SOURCE_ROOT; };
-		98B34AB817F3B82000DF079E /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		98D4190B17695E58008D2FF3 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Tavultesoft.KMEI.SystemKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		98F9D69A1954112F0087AA43 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		98F9D6CA19541D220087AA43 /* libKeyman.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libKeyman.a; path = build/libKeyman/libKeyman.a; sourceTree = "<group>"; };
-		98FFB3D31B67006F00289F0E /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		C0324B8C1F87480700AF3785 /* TextFieldDelegateProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldDelegateProxy.swift; sourceTree = "<group>"; };
 		C0324B8E1F8750B700AF3785 /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		C0324B901F8763E100AF3785 /* TextViewDelegateProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewDelegateProxy.swift; sourceTree = "<group>"; };
@@ -205,15 +181,7 @@
 		CECB38931F2199BC0098882F /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = KeymanEngine/lib/Reachability/Reachability.h; sourceTree = SOURCE_ROOT; };
 		CECB38941F2199BC0098882F /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = KeymanEngine/lib/Reachability/Reachability.m; sourceTree = SOURCE_ROOT; };
 		F243887E14BBD43000A3E055 /* KeymanEngineDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeymanEngineDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		F243888214BBD43100A3E055 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		F243888614BBD43100A3E055 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		F243889014BBD43100A3E055 /* KeymanEngine-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KeymanEngine-Prefix.pch"; sourceTree = "<group>"; };
-		F26071FD158F8C4600F37184 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		F26071FF158F8C6000F37184 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		F2607201158F8C9600F37184 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		F2607203158F8CA200F37184 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		F27FCA7F157FB0DB00FBBA20 /* KME-iphoneos-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KME-iphoneos-Prefix.pch"; sourceTree = "<group>"; };
-		F27FCAC2157FD10A00FBBA20 /* KME-iphonesimulator-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KME-iphonesimulator-Prefix.pch"; sourceTree = "<group>"; };
 		F27FCAEE157FD59100FBBA20 /* Keyman-iphoneos.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphoneos.xcconfig"; sourceTree = "<group>"; };
 		F27FCAEF157FD59100FBBA20 /* Keyman-iphonesimulator.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphonesimulator.xcconfig"; sourceTree = "<group>"; };
 		F27FCAF6157FD95E00FBBA20 /* Keyman-lib.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; lineEnding = 0; path = "Keyman-lib.xcconfig"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcconfig; };
@@ -227,15 +195,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C06D375A1F82075A00F61AE0 /* KeymanEngine.framework in Frameworks */,
-				98FFB3D51B67008000289F0E /* WebKit.framework in Frameworks */,
-				98F9D6AC195412920087AA43 /* UIKit.framework in Frameworks */,
-				98F9D6AB195412870087AA43 /* SystemConfiguration.framework in Frameworks */,
-				98F9D6AA1954127F0087AA43 /* MobileCoreServices.framework in Frameworks */,
-				98F9D6A7195412620087AA43 /* libz.dylib in Frameworks */,
-				98F9D6A81954126C0087AA43 /* CoreText.framework in Frameworks */,
-				98F9D6AD1954129A0087AA43 /* CoreGraphics.framework in Frameworks */,
-				98F9D6AE195412A60087AA43 /* CFNetwork.framework in Frameworks */,
-				98F9D6A9195412720087AA43 /* AudioToolbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -251,15 +210,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C06D37571F82060900F61AE0 /* KeymanEngine.framework in Frameworks */,
-				98FFB3D41B67006F00289F0E /* WebKit.framework in Frameworks */,
-				98B34AB917F3B82000DF079E /* AudioToolbox.framework in Frameworks */,
-				984FD3EF17B48C670026ADA7 /* CoreText.framework in Frameworks */,
-				F2607204158F8CA200F37184 /* MobileCoreServices.framework in Frameworks */,
-				F2607202158F8C9600F37184 /* SystemConfiguration.framework in Frameworks */,
-				F2607200158F8C6000F37184 /* libz.dylib in Frameworks */,
-				F26071FE158F8C4600F37184 /* CFNetwork.framework in Frameworks */,
-				F243888314BBD43100A3E055 /* UIKit.framework in Frameworks */,
-				F243888714BBD43100A3E055 /* CoreGraphics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,8 +390,6 @@
 			children = (
 				C06D372C1F81F4E100F61AE0 /* KeymanEngine */,
 				F243888114BBD43000A3E055 /* Frameworks */,
-				F27FCA7D157FB0DB00FBBA20 /* KME-iphoneos */,
-				F27FCAC0157FD10A00FBBA20 /* KME-iphonesimulator */,
 				984FA1F61974C0EF0037EE5D /* KMEI.entitlements */,
 				F243887F14BBD43000A3E055 /* Products */,
 				F243888914BBD43100A3E055 /* Supporting Files */,
@@ -463,17 +411,6 @@
 		F243888114BBD43000A3E055 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				98B34AB817F3B82000DF079E /* AudioToolbox.framework */,
-				F26071FD158F8C4600F37184 /* CFNetwork.framework */,
-				F243888614BBD43100A3E055 /* CoreGraphics.framework */,
-				984FD3EC17B48BBC0026ADA7 /* CoreText.framework */,
-				98F9D6CA19541D220087AA43 /* libKeyman.a */,
-				F26071FF158F8C6000F37184 /* libz.dylib */,
-				F2607203158F8CA200F37184 /* MobileCoreServices.framework */,
-				98493BF71993370200845D28 /* QuartzCore.framework */,
-				F2607201158F8C9600F37184 /* SystemConfiguration.framework */,
-				F243888214BBD43100A3E055 /* UIKit.framework */,
-				98FFB3D31B67006F00289F0E /* WebKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -483,7 +420,6 @@
 			children = (
 				6C0A13FE151EA3CF007FA4AD /* Config */,
 				F243889014BBD43100A3E055 /* KeymanEngine-Prefix.pch */,
-				6C0A13FC151EA2CA007FA4AD /* TODO */,
 				F27FCB65157FF34800FBBA20 /* INSTRUCTIONS */,
 			);
 			name = "Supporting Files";
@@ -558,38 +494,6 @@
 				C0324B8C1F87480700AF3785 /* TextFieldDelegateProxy.swift */,
 			);
 			name = UITextField;
-			sourceTree = "<group>";
-		};
-		F27FCA7D157FB0DB00FBBA20 /* KME-iphoneos */ = {
-			isa = PBXGroup;
-			children = (
-				F27FCA7E157FB0DB00FBBA20 /* Supporting Files */,
-			);
-			path = "KME-iphoneos";
-			sourceTree = "<group>";
-		};
-		F27FCA7E157FB0DB00FBBA20 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				F27FCA7F157FB0DB00FBBA20 /* KME-iphoneos-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		F27FCAC0157FD10A00FBBA20 /* KME-iphonesimulator */ = {
-			isa = PBXGroup;
-			children = (
-				F27FCAC1157FD10A00FBBA20 /* Supporting Files */,
-			);
-			path = "KME-iphonesimulator";
-			sourceTree = "<group>";
-		};
-		F27FCAC1157FD10A00FBBA20 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				F27FCAC2157FD10A00FBBA20 /* KME-iphonesimulator-Prefix.pch */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

@@ -7,14 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		981AFA8519EF44DE006706BF /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98DE283417F50DBF00D6A496 /* AudioToolbox.framework */; };
-		981AFA8619EF44DE006706BF /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41903176952D0008D2FF3 /* CFNetwork.framework */; };
-		981AFA8719EF44DE006706BF /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41905176952E0008D2FF3 /* MobileCoreServices.framework */; };
-		981AFA8819EF44DE006706BF /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41907176952F5008D2FF3 /* libz.dylib */; };
-		981AFA8919EF44DE006706BF /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D4190917695302008D2FF3 /* SystemConfiguration.framework */; };
-		981AFA8B19EF44DE006706BF /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98CF0C3E17D99945001580BF /* CoreText.framework */; };
-		981AFA8C19EF44DE006706BF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABADB7176935E400B62590 /* CoreGraphics.framework */; };
-		981AFA8D19EF44DE006706BF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98CF0C4417D99A14001580BF /* UIKit.framework */; };
 		981AFA8F19EF44DE006706BF /* 724-info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725518E4F0930014DF0C /* 724-info@2x.png */; };
 		981AFA9019EF44DE006706BF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADBC176935E400B62590 /* InfoPlist.strings */; };
 		981AFA9619EF44DE006706BF /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */; };
@@ -148,17 +140,7 @@
 		985EA9E719E64A580006C017 /* banner-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DC19E64A580006C017 /* banner-Portrait@2x~ipad.png */; };
 		985EA9E819E64A580006C017 /* banner-Portrait@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DD19E64A580006C017 /* banner-Portrait@3x.png */; };
 		985EA9E919E64A580006C017 /* banner-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DE19E64A580006C017 /* banner-Portrait~ipad.png */; };
-		987728D01B7C0E6400DBC159 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C0D811994613E009D2A13 /* WebKit.framework */; };
-		987728D11B7C0E7300DBC159 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C0D811994613E009D2A13 /* WebKit.framework */; };
 		989E4DBC1B1EB85200A345FB /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 989E4DBA1B1EB85200A345FB /* Settings.bundle */; };
-		98CD126D19CA85B60089385F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98DE283417F50DBF00D6A496 /* AudioToolbox.framework */; };
-		98CD126E19CA85BF0089385F /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41903176952D0008D2FF3 /* CFNetwork.framework */; };
-		98CD126F19CA85C80089385F /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41905176952E0008D2FF3 /* MobileCoreServices.framework */; };
-		98CD127019CA85ED0089385F /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41907176952F5008D2FF3 /* libz.dylib */; };
-		98CD127119CA85F90089385F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D4190917695302008D2FF3 /* SystemConfiguration.framework */; };
-		98CD127219CA86040089385F /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98CF0C3E17D99945001580BF /* CoreText.framework */; };
-		98CD127319CA860D0089385F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABADB7176935E400B62590 /* CoreGraphics.framework */; };
-		98CD127419CA86130089385F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98CF0C4417D99A14001580BF /* UIKit.framework */; };
 		98CF00B81B461EDE00627DC6 /* browser-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B41B461EDE00627DC6 /* browser-icon.png */; };
 		98CF00B91B461EDE00627DC6 /* get-started.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B51B461EDE00627DC6 /* get-started.png */; };
 		98CF00BA1B461EDE00627DC6 /* info.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B61B461EDE00627DC6 /* info.png */; };
@@ -316,7 +298,6 @@
 		9845A8CA1A439F1000544E2E /* UIButtonBarRefresh@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIButtonBarRefresh@2x.png"; sourceTree = "<group>"; };
 		9845A8CB1A439F1000544E2E /* UIButtonBarStop@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIButtonBarStop@2x.png"; sourceTree = "<group>"; };
 		9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BookmarksViewController.xib; sourceTree = "<group>"; };
-		984C0D811994613E009D2A13 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		984FA1E21974B06C0037EE5D /* Keyman.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Keyman.entitlements; sourceTree = "<group>"; };
 		985EA9D419E64A580006C017 /* banner-Landscape-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape-568h@2x.png"; sourceTree = "<group>"; };
 		985EA9D519E64A580006C017 /* banner-Landscape-568h@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape-568h@3x.png"; sourceTree = "<group>"; };
@@ -334,7 +315,6 @@
 		987F3E9B19417F3D00209D4F /* textsize_selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_selected.png; path = "Keyman Icons/textsize_selected.png"; sourceTree = "<group>"; };
 		987F3E9C19417F3D00209D4F /* textsize_selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_selected@2x.png"; path = "Keyman Icons/textsize_selected@2x.png"; sourceTree = "<group>"; };
 		989E4DBA1B1EB85200A345FB /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
-		98ABADB7176935E400B62590 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		98ABADBB176935E400B62590 /* Keyman-Free-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Keyman-Free-Info.plist"; sourceTree = "<group>"; };
 		98ABADBD176935E400B62590 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		98ABADC1176935E400B62590 /* Keyman-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Prefix.pch"; sourceTree = "<group>"; };
@@ -350,17 +330,10 @@
 		98CF00B51B461EDE00627DC6 /* get-started.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "get-started.png"; sourceTree = "<group>"; };
 		98CF00B61B461EDE00627DC6 /* info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = info.png; sourceTree = "<group>"; };
 		98CF00B71B461EDE00627DC6 /* menu-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-icon.png"; sourceTree = "<group>"; };
-		98CF0C3E17D99945001580BF /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
-		98CF0C4417D99A14001580BF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		98D41903176952D0008D2FF3 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		98D41905176952E0008D2FF3 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		98D41907176952F5008D2FF3 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		98D4190917695302008D2FF3 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		98D55ED618480B6800104956 /* textsize_down.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_down.png; path = "Keyman Icons/textsize_down.png"; sourceTree = "<group>"; };
 		98D55ED718480B6800104956 /* textsize_down@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_down@2x.png"; path = "Keyman Icons/textsize_down@2x.png"; sourceTree = "<group>"; };
 		98D55EDC18480B6800104956 /* textsize_up.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_up.png; path = "Keyman Icons/textsize_up.png"; sourceTree = "<group>"; };
 		98D55EDD18480B6800104956 /* textsize_up@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_up@2x.png"; path = "Keyman Icons/textsize_up@2x.png"; sourceTree = "<group>"; };
-		98DE283417F50DBF00D6A496 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		C01AB5941F8343AE009B37D3 /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
 		C055F0B01F60E8D400140735 /* GetStartedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = GetStartedViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C055F0B21F60F7A400140735 /* DropDownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DropDownView.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -382,16 +355,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				981AFA8519EF44DE006706BF /* AudioToolbox.framework in Frameworks */,
-				981AFA8619EF44DE006706BF /* CFNetwork.framework in Frameworks */,
-				981AFA8C19EF44DE006706BF /* CoreGraphics.framework in Frameworks */,
 				C01AB5961F8343F7009B37D3 /* KeymanEngine.framework in Frameworks */,
-				981AFA8B19EF44DE006706BF /* CoreText.framework in Frameworks */,
-				981AFA8819EF44DE006706BF /* libz.dylib in Frameworks */,
-				981AFA8719EF44DE006706BF /* MobileCoreServices.framework in Frameworks */,
-				981AFA8919EF44DE006706BF /* SystemConfiguration.framework in Frameworks */,
-				981AFA8D19EF44DE006706BF /* UIKit.framework in Frameworks */,
-				987728D01B7C0E6400DBC159 /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -400,15 +364,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C01AB5951F8343AE009B37D3 /* KeymanEngine.framework in Frameworks */,
-				98CD126D19CA85B60089385F /* AudioToolbox.framework in Frameworks */,
-				98CD126E19CA85BF0089385F /* CFNetwork.framework in Frameworks */,
-				98CD127319CA860D0089385F /* CoreGraphics.framework in Frameworks */,
-				98CD127219CA86040089385F /* CoreText.framework in Frameworks */,
-				98CD127019CA85ED0089385F /* libz.dylib in Frameworks */,
-				98CD126F19CA85C80089385F /* MobileCoreServices.framework in Frameworks */,
-				98CD127119CA85F90089385F /* SystemConfiguration.framework in Frameworks */,
-				98CD127419CA86130089385F /* UIKit.framework in Frameworks */,
-				987728D11B7C0E7300DBC159 /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -610,15 +565,6 @@
 			isa = PBXGroup;
 			children = (
 				C01AB5941F8343AE009B37D3 /* KeymanEngine.framework */,
-				98DE283417F50DBF00D6A496 /* AudioToolbox.framework */,
-				98D41903176952D0008D2FF3 /* CFNetwork.framework */,
-				98ABADB7176935E400B62590 /* CoreGraphics.framework */,
-				98CF0C3E17D99945001580BF /* CoreText.framework */,
-				98D41907176952F5008D2FF3 /* libz.dylib */,
-				98D41905176952E0008D2FF3 /* MobileCoreServices.framework */,
-				98D4190917695302008D2FF3 /* SystemConfiguration.framework */,
-				98CF0C4417D99A14001580BF /* UIKit.framework */,
-				984C0D811994613E009D2A13 /* WebKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

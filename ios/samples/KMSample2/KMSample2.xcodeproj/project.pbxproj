@@ -7,30 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		987CC6921BAA71E30057459B /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 987CC6911BAA71E30057459B /* WebKit.framework */; };
-		987CC6931BAA720E0057459B /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 987CC6911BAA71E30057459B /* WebKit.framework */; };
 		98ABFD461AD3A047005534F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD441AD3A047005534F0 /* Main.storyboard */; };
 		98ABFD481AD3A047005534F0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD471AD3A047005534F0 /* Images.xcassets */; };
 		98ABFD4B1AD3A047005534F0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD491AD3A047005534F0 /* LaunchScreen.xib */; };
 		98ABFD741AD3A09E005534F0 /* aava1.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD631AD3A09E005534F0 /* aava1.ttf */; };
 		98ABFD751AD3A09E005534F0 /* tamil99m-1.1.js in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD641AD3A09E005534F0 /* tamil99m-1.1.js */; };
-		98ABFD7B1AD3A12E005534F0 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD781AD3A12D005534F0 /* CFNetwork.framework */; };
-		98ABFD7C1AD3A12E005534F0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD791AD3A12E005534F0 /* CoreGraphics.framework */; };
-		98ABFD7D1AD3A12E005534F0 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD7A1AD3A12E005534F0 /* CoreText.framework */; };
-		98ABFD7F1AD3A134005534F0 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD7E1AD3A134005534F0 /* AudioToolbox.framework */; };
-		98ABFD811AD3A144005534F0 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD801AD3A144005534F0 /* MobileCoreServices.framework */; };
-		98ABFD831AD3A153005534F0 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD821AD3A153005534F0 /* SystemConfiguration.framework */; };
-		98ABFD851AD3A15B005534F0 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD841AD3A15B005534F0 /* libz.dylib */; };
-		98ABFD871AD3A169005534F0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD861AD3A169005534F0 /* UIKit.framework */; };
 		98ABFD951AD3A232005534F0 /* SWKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 98ABFD8C1AD3A232005534F0 /* SWKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		98ABFD9C1AD3A2AB005534F0 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD7E1AD3A134005534F0 /* AudioToolbox.framework */; };
-		98ABFD9D1AD3A2B3005534F0 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD781AD3A12D005534F0 /* CFNetwork.framework */; };
-		98ABFD9E1AD3A2BC005534F0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD791AD3A12E005534F0 /* CoreGraphics.framework */; };
-		98ABFD9F1AD3A2BC005534F0 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD7A1AD3A12E005534F0 /* CoreText.framework */; };
-		98ABFDA01AD3A2C2005534F0 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD841AD3A15B005534F0 /* libz.dylib */; };
-		98ABFDA11AD3A2C8005534F0 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD801AD3A144005534F0 /* MobileCoreServices.framework */; };
-		98ABFDA21AD3A2CD005534F0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD861AD3A169005534F0 /* UIKit.framework */; };
-		98ABFDA31AD3A2D5005534F0 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD821AD3A153005534F0 /* SystemConfiguration.framework */; };
 		C01AB59F1F8346FC009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */; };
 		C01AB5A01F834706009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */; };
 		C01AB5A11F834706009B37D3 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -75,7 +57,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		987CC6911BAA71E30057459B /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		98ABFD371AD3A047005534F0 /* KMSample2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KMSample2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		98ABFD3B1AD3A047005534F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		98ABFD451AD3A047005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -83,14 +64,6 @@
 		98ABFD4A1AD3A047005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		98ABFD631AD3A09E005534F0 /* aava1.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = aava1.ttf; sourceTree = "<group>"; };
 		98ABFD641AD3A09E005534F0 /* tamil99m-1.1.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "tamil99m-1.1.js"; sourceTree = "<group>"; };
-		98ABFD781AD3A12D005534F0 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		98ABFD791AD3A12E005534F0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		98ABFD7A1AD3A12E005534F0 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
-		98ABFD7E1AD3A134005534F0 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		98ABFD801AD3A144005534F0 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		98ABFD821AD3A153005534F0 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		98ABFD841AD3A15B005534F0 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		98ABFD861AD3A169005534F0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		98ABFD8C1AD3A232005534F0 /* SWKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SWKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		98ABFD8F1AD3A232005534F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		98ABFDA41AD3A363005534F0 /* SWKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SWKeyboard.entitlements; sourceTree = "<group>"; };
@@ -106,16 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98ABFD7F1AD3A134005534F0 /* AudioToolbox.framework in Frameworks */,
-				98ABFD7B1AD3A12E005534F0 /* CFNetwork.framework in Frameworks */,
-				98ABFD7C1AD3A12E005534F0 /* CoreGraphics.framework in Frameworks */,
 				C01AB5A01F834706009B37D3 /* KeymanEngine.framework in Frameworks */,
-				98ABFD7D1AD3A12E005534F0 /* CoreText.framework in Frameworks */,
-				98ABFD851AD3A15B005534F0 /* libz.dylib in Frameworks */,
-				98ABFD811AD3A144005534F0 /* MobileCoreServices.framework in Frameworks */,
-				98ABFD831AD3A153005534F0 /* SystemConfiguration.framework in Frameworks */,
-				98ABFD871AD3A169005534F0 /* UIKit.framework in Frameworks */,
-				987CC6921BAA71E30057459B /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -124,15 +88,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C01AB59F1F8346FC009B37D3 /* KeymanEngine.framework in Frameworks */,
-				98ABFD9C1AD3A2AB005534F0 /* AudioToolbox.framework in Frameworks */,
-				98ABFD9D1AD3A2B3005534F0 /* CFNetwork.framework in Frameworks */,
-				98ABFD9E1AD3A2BC005534F0 /* CoreGraphics.framework in Frameworks */,
-				98ABFD9F1AD3A2BC005534F0 /* CoreText.framework in Frameworks */,
-				98ABFDA01AD3A2C2005534F0 /* libz.dylib in Frameworks */,
-				98ABFDA11AD3A2C8005534F0 /* MobileCoreServices.framework in Frameworks */,
-				98ABFDA31AD3A2D5005534F0 /* SystemConfiguration.framework in Frameworks */,
-				98ABFDA21AD3A2CD005534F0 /* UIKit.framework in Frameworks */,
-				987CC6931BAA720E0057459B /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,15 +140,6 @@
 			isa = PBXGroup;
 			children = (
 				C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */,
-				987CC6911BAA71E30057459B /* WebKit.framework */,
-				98ABFD7E1AD3A134005534F0 /* AudioToolbox.framework */,
-				98ABFD781AD3A12D005534F0 /* CFNetwork.framework */,
-				98ABFD791AD3A12E005534F0 /* CoreGraphics.framework */,
-				98ABFD7A1AD3A12E005534F0 /* CoreText.framework */,
-				98ABFD841AD3A15B005534F0 /* libz.dylib */,
-				98ABFD801AD3A144005534F0 /* MobileCoreServices.framework */,
-				98ABFD821AD3A153005534F0 /* SystemConfiguration.framework */,
-				98ABFD861AD3A169005534F0 /* UIKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
