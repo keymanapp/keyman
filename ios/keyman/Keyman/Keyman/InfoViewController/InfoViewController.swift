@@ -6,6 +6,7 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
+import KeymanEngine
 import UIKit
 
 class InfoViewController: UIViewController, UIWebViewDelegate {
@@ -43,11 +44,11 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
   }
 
   private func loadFromServer() {
-    let keyboardInfo = KMManager.sharedInstance().currentKeyboardInfo() as? [AnyHashable : String]
-    let currentKeyboardId = keyboardInfo?[kKeymanKeyboardIdKey] ?? kKeymanDefaultKeyboardID
+    let keyboardInfo = Manager.shared.currentKeyboardInfo
+    let currentKeyboardId = keyboardInfo?[Key.keyboardId] ?? DefaultKeyboard.keyboardID
     let userData = AppDelegate.activeUserDefaults()
-    let keyboards = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [NSDictionary]
-    let keyboardIds = keyboards?.flatMap { $0.object(forKey: kKeymanKeyboardIdKey) as? String }
+    let keyboards = userData.array(forKey: Key.userKeyboardsList) as? [NSDictionary]
+    let keyboardIds = keyboards?.flatMap { $0.object(forKey: Key.keyboardId) as? String }
     let installedKeyboards: String
     if let ids = keyboardIds, !ids.isEmpty {
       installedKeyboards = Array(Set(ids)).joined(separator: ",")

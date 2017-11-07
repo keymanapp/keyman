@@ -5,10 +5,10 @@ xcuserdata
 engine/KMEI/build
 keyman/Keyman/build
 keyman/Keyman/Release-universal
-keyman/Keyman/Keyman/libKeyman
-samples/KMSample1/libKeyman
+keyman/Keyman/KeymanEngine.framework
+samples/KMSample1/KeymanEngine.framework
 samples/KMSample1/build
-samples/KMSample2/libKeyman
+samples/KMSample2/KeymanEngine.framework
 samples/KMSample2/build
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keymanios.js
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keymanweb-osk.ttf

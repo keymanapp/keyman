@@ -6,9 +6,23 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
+import KeymanEngine
 import UIKit
 
-class KeyboardViewController: KMInputViewController {
+class KeyboardViewController: InputViewController {
+  override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    Manager.applicationGroupIdentifier = "group.KM4I"
+
+    #if DEBUG
+      Manager.shared.isDebugPrintingOn = true
+    #endif
+    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
   override func updateViewConstraints() {
     super.updateViewConstraints()
 
@@ -16,18 +30,12 @@ class KeyboardViewController: KMInputViewController {
       return
     }
 
-    setupTopBarImage(isPortrait: KMInputViewController.isPortrait())
+    setupTopBarImage(isPortrait: InputViewController.isPortrait)
   }
 
   override func viewDidLoad() {
-    KMManager.setApplicationGroupIdentifier("group.KM4I")
-
-    #if DEBUG
-      KMManager.sharedInstance().debugPrintingOn = true
-    #endif
-
     super.viewDidLoad()
-    setupTopBarImage(isPortrait: KMInputViewController.isPortrait())
+    setupTopBarImage(isPortrait: InputViewController.isPortrait)
   }
 
   override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -37,22 +45,22 @@ class KeyboardViewController: KMInputViewController {
 
   func setupTopBarImage(isPortrait: Bool) {
     if isPortrait {
-      topBarImageView.image = #imageLiteral(resourceName: "banner-Portrait.png")
+      topBarImageView?.image = #imageLiteral(resourceName: "banner-Portrait.png")
       return
     }
 
     // iPad
     if UIDevice.current.userInterfaceIdiom != UIUserInterfaceIdiom.phone {
-      topBarImageView.image = #imageLiteral(resourceName: "banner-Landscape.png")
+      topBarImageView?.image = #imageLiteral(resourceName: "banner-Landscape.png")
       return
     }
 
     // iPhone
     let screenRect = UIScreen.main.bounds
     if CGFloat.maximum(screenRect.height, screenRect.width) >= 568.0 {
-      topBarImageView.image = #imageLiteral(resourceName: "banner-Landscape-568h.png")
+      topBarImageView?.image = #imageLiteral(resourceName: "banner-Landscape-568h.png")
     } else {
-      topBarImageView.image = #imageLiteral(resourceName: "banner-Landscape.png")
+      topBarImageView?.image = #imageLiteral(resourceName: "banner-Landscape.png")
     }
   }
 }
