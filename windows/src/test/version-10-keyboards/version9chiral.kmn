@@ -1,0 +1,10 @@
+﻿c Should build with warnings or errors
+store(&VERSION) '9.0'
+store(&NAME) 'Version 9 Chiral'
+store(&TARGETS) 'any'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ [LALT K_A] > 'LALT K_A'

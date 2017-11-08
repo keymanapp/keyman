@@ -213,6 +213,8 @@ type
 
     function JavaScript_String(ch: DWord): string;  // I2242
 
+    function IsKeyboardVersion10OrLater: Boolean;
+
     procedure ReportError(line: Integer; msgcode: LongWord; const text: string);  // I1971
     function ExpandSentinel(pwsz: PWideChar): TSentinelRecord;
     function CallFunctionName(s: WideString): WideString;
@@ -243,6 +245,8 @@ type
     function FormatModifierAsBitflags(FBitMask: Cardinal): string;
     function FormatKeyAsString(key: Integer): string;
     function JavaScript_SetupDebug: string;
+    function JavaScript_SetupEpilog: string;
+    function JavaScript_SetupProlog: string;
   public
     function Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallback): Boolean;   // I3681   // I4140   // I4688   // I4866
     constructor Create;
@@ -889,7 +893,30 @@ begin
   if not FMnemonic then
   begin
     if (fkp.ShiftFlags and KMX_ISVIRTUALKEY) = KMX_ISVIRTUALKEY then
-      Result := fkp.ShiftFlags
+    begin
+      if IsKeyboardVersion10OrLater then
+      begin
+        // Full chiral modifier and state key support starts with KeymanWeb 10.0
+        Result := fkp.ShiftFlags;
+      end
+      else
+      begin
+        // Non-chiral support only and no support for state keys
+        if (fkp.ShiftFlags and (
+          KMX_LCTRLFLAG or KMX_RCTRLFLAG or KMX_LALTFLAG or KMX_RALTFLAG)) <> 0 then   // I4118
+        begin
+          ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags LALT, RALT, LCTRL, RCTRL are not supported in KeymanWeb');
+        end;
+
+        if (fkp.ShiftFlags and (
+          KMX_CAPITALFLAG or KMX_NOTCAPITALFLAG or KMX_NUMLOCKFLAG or KMX_NOTNUMLOCKFLAG or KMX_SCROLLFLAG or KMX_NOTSCROLLFLAG)) <> 0 then   // I4118
+        begin
+          ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags CAPS and NCAPS are not supported in KeymanWeb');
+        end;
+
+        Result := KMX_ISVIRTUALKEY or (Integer(fkp.ShiftFlags) and $70)
+      end;
+    end
     else
     begin
       Result := KMX_ISVIRTUALKEY;
@@ -1580,7 +1607,9 @@ begin
   fMnemonic := vMnemonic = 1;
 
   Result := Result + Format(
+    '%s%s'+
     'KeymanWeb.KR(new %s());%s'+
+    '%s%s'+
     'function %s()%s'+
     '{%s'+
     '%s%s%s'+
@@ -1592,7 +1621,10 @@ begin
     '%sthis.KBVER="%s";%s'+   // I4155
     '%sthis.KMBM=%s;%s'+
     '%s',
-    [sName, nl,
+    [
+    JavaScript_SetupProlog, nl,
+    sName, nl,
+    JavaScript_SetupEpilog, nl,
     sName, nl,
     nl,
     FTabStop, JavaScript_SetupDebug, nl,
@@ -1904,6 +1936,11 @@ begin
   Result := False;
 end;
 
+function TCompileKeymanWeb.IsKeyboardVersion10OrLater: Boolean;
+begin
+  Result := fk.version >= VERSION_100;
+end;
+
 procedure TCompileKeymanWeb.CheckStoreForInvalidFunctions(key: PFILE_KEY; store: PFILE_STORE);  // I1520
 var
   n: Integer;
@@ -2160,13 +2197,37 @@ end;
 ///
 function TCompileKeymanWeb.JavaScript_SetupDebug: string;
 begin
-  if FDebug then
-    Result := 'var modCodes = tavultesoft.keymanweb.osk.modifierCodes;'+nl+
-              FTabStop+'var keyCodes = tavultesoft.keymanweb.osk.keyCodes;'+nl
+  if IsKeyboardVersion10OrLater then
+  begin
+    if FDebug then
+      Result := 'var modCodes = tavultesoft.keymanweb.osk.modifierCodes;'+nl+
+                FTabStop+'var keyCodes = tavultesoft.keymanweb.osk.keyCodes;'+nl
+    else
+      Result := '';
+  end
   else
     Result := '';
 end;
 
+function TCompileKeymanWeb.JavaScript_SetupProlog: string;
+begin
+  if IsKeyboardVersion10OrLater then
+  begin
+    Result := 'if(parseFloat(tavultesoft.keymanweb.version) < 10) {'+nl+
+      FTabStop+'tavultesoft.keymanweb.util.alert("This keyboard requires KeymanWeb 10.0 or later");'+nl+
+      '} else {';
+  end
+  else
+    Result := '';
+end;
+
+function TCompileKeymanWeb.JavaScript_SetupEpilog: string;
+begin
+  if IsKeyboardVersion10OrLater then
+    Result := '}'
+  else
+    Result := '';
+end;
 ///
 /// Converts a modifier bit mask integer into its component bit flags
 ///
@@ -2205,21 +2266,27 @@ begin
   //TODO: We need to think about mnemonic layouts which are incompletely supported at present
   //tavultesoft.keymanweb.osk.
 
-  Result := '';
-
-  for i := 0 to High(mask) do
+  if IsKeyboardVersion10OrLater then
   begin
-    if FBitMask and (1 shl i) <> 0 then
+    // This depends on flags defined in KeymanWeb 10.0
+    Result := '';
+
+    for i := 0 to High(mask) do
     begin
-      if Result <> '' then Result := Result + ' | ';
-      Result := Result + 'modCodes.'+mask[i];
+      if FBitMask and (1 shl i) <> 0 then
+      begin
+        if Result <> '' then Result := Result + ' | ';
+        Result := Result + 'modCodes.'+mask[i];
+      end;
     end;
-  end;
 
-  if Result = '' then
-    Result := '0';
+    if Result = '' then
+      Result := '0';
 
-  Result := Result + ' /* 0x' + IntToHex(FBitMask, 4) + ' */';
+    Result := Result + ' /* 0x' + IntToHex(FBitMask, 4) + ' */'
+  end
+  else
+    Result := '0x'+IntToHex(FBitMask, 4);
 end;
 
 ///
@@ -2231,9 +2298,15 @@ end;
 ///
 function TCompileKeymanWeb.FormatKeyAsString(key: Integer): string;
 begin
-  if (key <= 255) and (KMWVKeyNames[key] <> '')
-    then Result := 'keyCodes.'+KMWVKeyNames[key]+ ' /* 0x' + IntToHex(key, 2) + ' */'
-    else Result := '0x' + IntToHex(key, 2);
+  if IsKeyboardVersion10OrLater then
+  begin
+    // Depends on flags defined in KeymanWeb 10.0
+    if (key <= 255) and (KMWVKeyNames[key] <> '')
+      then Result := 'keyCodes.'+KMWVKeyNames[key]+ ' /* 0x' + IntToHex(key, 2) + ' */'
+      else Result := '0x' + IntToHex(key, 2);
+  end
+  else
+    Result := '0x' + IntToHex(key, 2);
 end;
 
 ///
