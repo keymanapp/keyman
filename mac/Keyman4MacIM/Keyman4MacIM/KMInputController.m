@@ -36,7 +36,7 @@ BOOL _legacyMode = NO;
 // are able to report their current selection location (LibreOffice can't even do that!), we can do some
 // checking at the start of the event processing to see if we're probably still in the same place where we
 // left off previously.
-BOOL _clientSelectionCanChangeUnexpectedly = YES;
+BOOL _clientSelectionCanChangeUnexpectedly = YES; // REVIEW: Maybe we can get notification from these clients by handling mouseDownOnCharacterIndex.
 BOOL _insertCharactersIndividually = NO;
 // Because Google Docs can't report its context in any of the browsers (Safari, Chrome, Firefox), we want to
 // try to detect it and:
@@ -799,8 +799,13 @@ NSRange _previousSelRange;
     }
 
     NSString *preBuffer = [[sender attributedSubstringFromRange:NSMakeRange(0, len)] string];
-    if ([self.AppDelegate debugMode])
+    if ([self.AppDelegate debugMode]) {
         NSLog(@"preBuffer = \"%@\"", preBuffer);
+        if (preBuffer.length)
+            NSLog(@"First character: '%x'", [preBuffer characterAtIndex:0]);
+        else
+            NSLog(@"preBuffer has a length of 0");
+    }
     // REVIEW: If there is ever a situation where preBuffer gets some text but the client reports its
     // selectedRange as not found, we probably can't reliably assume that the current location is really
     // at the end of the "preBuffer", so maybe we just need to assume no context.
@@ -817,6 +822,16 @@ NSRange _previousSelRange;
     NSMenuItem *mItem = [sender objectForKey:kIMKCommandMenuItemName];
     NSInteger itag = mItem.tag;
     if (itag == 2) {
+//        if ([self.AppDelegate debugMode]) {
+//            if ([self conformsToProtocol:@protocol(IMKStateSetting)])
+//                NSLog(@"class conforms to protocol IMKStateSetting.");
+//            else
+//                NSLog(@"class does not conform to protocol IMKStateSetting.");
+//            if ([self respondsToSelector:@selector(showPreferences:)])
+//                NSLog(@"This class DOES respond to showPreferences. Calling it now...");
+//            else
+//                NSLog(@"This class does not respond to showPreferences, but we'll call it anyway...");
+//        }
         [self showPreferences:sender];
     }
     else if (itag == 3) {
