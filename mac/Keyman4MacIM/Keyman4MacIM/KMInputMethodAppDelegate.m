@@ -93,11 +93,10 @@ typedef enum {
                 _downloadFilename = [NSString stringWithString:[value substringFromIndex:index+9]];
             else if ((index = [value rangeOfString:@"url="].location) != NSNotFound) {
                 NSString *urlString = [NSString stringWithString:[value substringFromIndex:index+4]];
-                @try {
+                if ([urlString respondsToSelector:@selector(stringByRemovingPercentEncoding)])
                     urlString = [urlString stringByRemovingPercentEncoding];
-                }
-                @catch (NSException *e) {
-                    // Must be an OS version prior to 10.9 - try this (now deprecated) method instead:
+                else if ([urlString respondsToSelector:@selector(stringByReplacingPercentEscapesUsingEncoding:)]) {
+                    // OS version prior to 10.9 - use this (now deprecated) method instead:
                     urlString = [urlString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
                 }
                 downloadUrl = [NSURL URLWithString:urlString];
