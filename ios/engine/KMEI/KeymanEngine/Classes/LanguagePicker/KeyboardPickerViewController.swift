@@ -138,7 +138,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
     if Manager.shared.removeKeyboard(at: indexPath.row) {
       let userData = Manager.shared.activeUserDefaults()
-      userKeyboards = userData.array(forKey: Key.userKeyboardsList) as! [[String : String]]
+      userKeyboards = userData.array(forKey: Key.userKeyboardsList) as! [[String: String]]
       if isCurrentKB {
         let kbID = userKeyboards[0][Key.keyboardId]
         let langID = userKeyboards[0][Key.languageId]
