@@ -38,12 +38,12 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var textSizeController: UISlider!
   private var dropdownItems: [UIBarButtonItem]!
 
-  private var profiles2Install: [String] = []
+  private var profilesToInstall: [String] = []
   private var checkedProfiles: [String] = []
   private var profileName: String?
   private var launchUrl: URL?
   private var keyboardToDownload: InstallableKeyboard?
-  private var customKeyboard2Download: [String: Any] = [:]
+  private var customKeyboardToDownload: [String: Any] = [:]
   private var wasKeyboardVisible: Bool = false
 
   private var screenWidth: CGFloat = 0.0
@@ -155,10 +155,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let userData = AppDelegate.activeUserDefaults()
     checkedProfiles = userData.object(forKey: checkedProfilesKey) as? [String] ?? [String]()
 
-    profiles2Install = [String]()
+    profilesToInstall = [String]()
     for name in customFonts {
       if let profile = profilesByFontName[UIFont.fontNames(forFamilyName: name)[0]] {
-        profiles2Install.append(profile)
+        profilesToInstall.append(profile)
       }
     }
 
@@ -519,8 +519,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       let profile = profileName(withFont: font) else {
         return
     }
-    profiles2Install = profiles2Install.filter { $0 != profile }
-    profiles2Install.append(profile)
+    profilesToInstall = profilesToInstall.filter { $0 != profile }
+    profilesToInstall.append(profile)
     checkedProfiles = checkedProfiles.filter { $0 != profile }
     let userData = AppDelegate.activeUserDefaults()
     userData.set(checkedProfiles, forKey: checkedProfilesKey)
@@ -884,7 +884,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
         let isDirect = direct == "true"
 
-        customKeyboard2Download = [
+        customKeyboardToDownload = [
           "url": jsonUrl,
           "direct": isDirect
         ]
@@ -942,7 +942,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     var doInstall: Bool = false
     if doListCheck {
-      for value in profiles2Install where !checkedProfiles.contains(value) && profile == value {
+      for value in profilesToInstall where !checkedProfiles.contains(value) && profile == value {
         doInstall = true
         break
       }
@@ -992,8 +992,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         self.profileName = nil
       }
     case 2:
-      if let jsonUrl = customKeyboard2Download["url"] as? URL,
-        let isDirect = customKeyboard2Download["direct"] as? Bool {
+      if let jsonUrl = customKeyboardToDownload["url"] as? URL,
+        let isDirect = customKeyboardToDownload["direct"] as? Bool {
         Manager.shared.downloadKeyboard(from: jsonUrl, isDirect: isDirect)
       }
     default:
