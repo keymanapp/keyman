@@ -36,10 +36,7 @@ class ActivityItemProvider: UIActivityItemProvider {
     case UIActivityType.postToFacebook?:
       return "\(text)\n\n\(fbText)"
     case UIActivityType.postToTwitter?:
-        if text.characters.count > 140 {
-          return text[..<text.index(text.startIndex, offsetBy: 140)]
-        }
-        return text
+      return text.prefix(140)
     default:
       return text
     }
