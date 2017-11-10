@@ -1087,7 +1087,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
 
     let firstKB = userKbs[0]
-    return firstKB.id != Constants.defaultKeyboard.id || firstKB.languageID != Constants.defaultKeyboard.languageID
+    return firstKB.id == Constants.defaultKeyboard.id && firstKB.languageID == Constants.defaultKeyboard.languageID
   }
 
   @objc func showKMWebBrowserView(_ sender: Any) {
