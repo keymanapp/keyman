@@ -41,13 +41,16 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
     keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadStarted,
-      using: keyboardDownloadStarted)
+      observer: self,
+      function: KeyboardPickerViewController.keyboardDownloadStarted)
     keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadCompleted,
-      using: keyboardDownloadCompleted)
+      observer: self,
+      function: KeyboardPickerViewController.keyboardDownloadCompleted)
     keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadFailed,
-      using: keyboardDownloadFailed)
+      observer: self,
+      function: KeyboardPickerViewController.keyboardDownloadFailed)
   }
 
   override func viewWillAppear(_ animated: Bool) {

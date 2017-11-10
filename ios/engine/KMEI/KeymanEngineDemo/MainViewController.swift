@@ -34,16 +34,20 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
                                            name: .UIKeyboardWillHide, object: nil)
     keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadStarted,
-      using: keyboardDownloadStarted)
+      observer: self,
+      function: MainViewController.keyboardDownloadStarted)
     keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadCompleted,
-      using: keyboardDownloadCompleted)
+      observer: self,
+      function: MainViewController.keyboardDownloadCompleted)
     keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadFailed,
-      using: keyboardDownloadFailed)
+      observer: self,
+      function: MainViewController.keyboardDownloadFailed)
     keyboardPickerDismissedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardPickerDismissed,
-      using: keyboardPickerDismissed)
+      observer: self,
+      function: MainViewController.keyboardPickerDismissed)
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -215,11 +219,11 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
   }
 
   // MARK: - Responding to Keyman notifications
-  private func keyboardDownloadStarted(_ notification: KeyboardDownloadStartedNotification) {
+  private func keyboardDownloadStarted() {
     showActivityIndicator()
   }
 
-  private func keyboardDownloadCompleted(_ keyboards: KeyboardDownloadCompletedNotification) {
+  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
     // This is an example of responding to a Keyman event.
     //   - for a list of all events, see KMManager.h
 

@@ -39,10 +39,12 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
 
     keyboardChangedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardChanged,
-      using: keyboardChanged)
+      observer: self,
+      function: WebBrowserViewController.keyboardChanged)
     keyboardPickerDismissedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardPickerDismissed,
-      using: keyboardPickerDismissed)
+      observer: self,
+      function: WebBrowserViewController.keyboardPickerDismissed)
 
     webView.delegate = self
     webView.scalesPageToFit = true

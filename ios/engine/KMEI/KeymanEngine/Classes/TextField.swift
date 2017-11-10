@@ -54,7 +54,8 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
     NotificationCenter.default.addObserver(self, selector: #selector(self.textFieldTextDidChange),
                                            name: .UITextFieldTextDidChange, object: self)
     keyboardChangedObserver = NotificationCenter.default.addObserver(forName: Notifications.keyboardChanged,
-                                                                     using: keyboardChanged)
+                                                                     observer: self,
+                                                                     function: TextField.keyboardChanged)
   }
 
   // MARK: - Class Overrides

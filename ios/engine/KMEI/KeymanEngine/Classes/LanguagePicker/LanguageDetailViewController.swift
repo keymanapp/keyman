@@ -36,12 +36,14 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    keyboardDownloadStartedObserver =
-      NotificationCenter.default.addObserver(forName: Notifications.keyboardDownloadStarted,
-                                             using: keyboardDownloadStarted)
-    keyboardDownloadFailedObserver =
-      NotificationCenter.default.addObserver(forName: Notifications.keyboardDownloadFailed,
-                                             using: keyboardDownloadFailed)
+    keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadStarted,
+      observer: self,
+      function: LanguageDetailViewController.keyboardDownloadStarted)
+    keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadFailed,
+      observer: self,
+      function: LanguageDetailViewController.keyboardDownloadFailed)
   }
 
   override func numberOfSections(in tableView: UITableView) -> Int {
@@ -116,7 +118,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  private func keyboardDownloadStarted(_ notification: KeyboardDownloadStartedNotification) {
+  private func keyboardDownloadStarted() {
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
 
@@ -148,7 +150,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     navigationController?.setToolbarHidden(false, animated: true)
   }
 
-  private func keyboardDownloadFailed(_ notification: KeyboardDownloadFailedNotification) {
+  private func keyboardDownloadFailed() {
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }

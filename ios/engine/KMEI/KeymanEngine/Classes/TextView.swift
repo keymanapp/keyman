@@ -51,7 +51,8 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
     }
 
     keyboardChangedObserver = NotificationCenter.default.addObserver(forName: Notifications.keyboardChanged,
-                                                                     using: keyboardChanged)
+                                                                     observer: self,
+                                                                     function: TextView.keyboardChanged)
   }
 
   // MARK: - Class Overrides

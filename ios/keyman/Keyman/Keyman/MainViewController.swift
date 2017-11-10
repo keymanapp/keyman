@@ -86,31 +86,40 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         name: NSNotification.Name.UIKeyboardWillHide, object: nil)
     keyboardLoadedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardLoaded,
-      using: keyboardLoaded)
+      observer: self,
+      function: MainViewController.keyboardLoaded)
     keyboardChangedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardChanged,
-      using: keyboardChanged)
+      observer: self,
+      function: MainViewController.keyboardChanged)
     languagesUpdatedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.languagesUpdated,
-      using: languagesUpdated)
+      observer: self,
+      function: MainViewController.languagesUpdated)
     languagesDownloadFailedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.languagesDownloadFailed,
-      using: languagesDownloadFailed)
+      observer: self,
+      function: MainViewController.languagesDownloadFailed)
     keyboardPickerDismissedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardPickerDismissed,
-      using: keyboardPickerDismissed)
+      observer: self,
+      function: MainViewController.keyboardPickerDismissed)
     keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadStarted,
-      using: keyboardDownloadStarted)
+      observer: self,
+      function: MainViewController.keyboardDownloadStarted)
     keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadCompleted,
-      using: keyboardDownloadCompleted)
+      observer: self,
+      function: MainViewController.keyboardDownloadCompleted)
     keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadFailed,
-      using: keyboardDownloadFailed)
+      observer: self,
+      function: MainViewController.keyboardDownloadFailed)
     keyboardRemovedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardRemoved,
-      using: keyboardRemoved)
+      observer: self,
+      function: MainViewController.keyboardRemoved)
     NotificationCenter.default.addObserver(self, selector: #selector(self.launched),
         name: launchedFromUrlNotification, object: nil)
 
@@ -447,7 +456,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
   // MARK: - Keyman Notifications
 
-  private func keyboardLoaded(_ notification: KeyboardLoadedNotification) {
+  private func keyboardLoaded() {
     startTimer()
   }
 
@@ -461,7 +470,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     checkProfile(forKeyboardID: kb.id, languageID: kb.languageID, doListCheck: listCheck)
   }
 
-  private func keyboardDownloadStarted(_ notification: KeyboardDownloadStartedNotification) {
+  private func keyboardDownloadStarted() {
     if launchUrl != nil {
       showActivityIndicator()
     }
@@ -503,7 +512,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     updateStatus = 1
   }
 
-  private func languagesDownloadFailed(_ notification: LanguagesDownloadFailedNotification) {
+  private func languagesDownloadFailed() {
     updateStatus = -1
   }
 

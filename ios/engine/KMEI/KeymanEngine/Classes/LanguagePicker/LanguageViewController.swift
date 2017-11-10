@@ -40,16 +40,20 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     selectedSection = NSNotFound
     languagesUpdatedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.languagesUpdated,
-      using: languagesUpdated)
+      observer: self,
+      function: LanguageViewController.languagesUpdated)
     languagesDownloadFailedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.languagesDownloadFailed,
-      using: languagesDownloadFailed)
+      observer: self,
+      function: LanguageViewController.languagesDownloadFailed)
     keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadStarted,
-      using: keyboardDownloadStarted)
+      observer: self,
+      function: LanguageViewController.keyboardDownloadStarted)
     keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadFailed,
-      using: keyboardDownloadFailed)
+      observer: self,
+      function: LanguageViewController.keyboardDownloadFailed)
   }
 
   override func viewDidAppear(_ animated: Bool) {
@@ -209,12 +213,12 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  private func languagesDownloadFailed(_ notification: LanguagesDownloadFailedNotification) {
+  private func languagesDownloadFailed() {
     dismissActivityView()
     showConnectionErrorAlert()
   }
 
-  private func keyboardDownloadStarted(_ notification: KeyboardDownloadStartedNotification) {
+  private func keyboardDownloadStarted() {
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
 
@@ -249,7 +253,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     navigationController?.setToolbarHidden(false, animated: true)
   }
 
-  private func keyboardDownloadFailed(_ notification: KeyboardDownloadFailedNotification) {
+  private func keyboardDownloadFailed() {
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }
