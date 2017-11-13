@@ -7,62 +7,42 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		987CC6951BAA731A0057459B /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 987CC6941BAA731A0057459B /* WebKit.framework */; };
-		98ABFCE31AD39165005534F0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 98ABFCE21AD39165005534F0 /* main.m */; };
-		98ABFCE61AD39165005534F0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 98ABFCE51AD39165005534F0 /* AppDelegate.m */; };
-		98ABFCE91AD39165005534F0 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98ABFCE81AD39165005534F0 /* ViewController.m */; };
 		98ABFCEC1AD39165005534F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCEA1AD39165005534F0 /* Main.storyboard */; };
 		98ABFCEE1AD39165005534F0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCED1AD39165005534F0 /* Images.xcassets */; };
 		98ABFCF11AD39165005534F0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFCEF1AD39165005534F0 /* LaunchScreen.xib */; };
-		98ABFD151AD391A8005534F0 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD131AD391A8005534F0 /* Keyman.bundle */; };
-		98ABFD161AD391A8005534F0 /* libKeyman.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD141AD391A8005534F0 /* libKeyman.a */; };
-		98ABFD191AD391CB005534F0 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD181AD391CB005534F0 /* AudioToolbox.framework */; };
-		98ABFD1B1AD391D1005534F0 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD1A1AD391D1005534F0 /* CFNetwork.framework */; };
-		98ABFD1D1AD391D6005534F0 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD1C1AD391D6005534F0 /* CoreText.framework */; };
-		98ABFD1F1AD391DB005534F0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD1E1AD391DB005534F0 /* CoreGraphics.framework */; };
-		98ABFD211AD391E5005534F0 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD201AD391E5005534F0 /* SystemConfiguration.framework */; };
-		98ABFD231AD3920D005534F0 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD221AD3920D005534F0 /* MobileCoreServices.framework */; };
-		98ABFD251AD39212005534F0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD241AD39212005534F0 /* UIKit.framework */; };
-		98ABFD271AD3921B005534F0 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABFD261AD3921B005534F0 /* libz.dylib */; };
 		98ABFD2C1AD393AD005534F0 /* aava1.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD2A1AD393AD005534F0 /* aava1.ttf */; };
 		98ABFD2D1AD393AD005534F0 /* tamil99m-1.1.js in Resources */ = {isa = PBXBuildFile; fileRef = 98ABFD2B1AD393AD005534F0 /* tamil99m-1.1.js */; };
+		C01AB59A1F8345C5009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */; };
+		C01AB59C1F8345CB009B37D3 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C0324B801F87170600AF3785 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B7F1F87170600AF3785 /* AppDelegate.swift */; };
+		C0324B841F87172900AF3785 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B831F87172900AF3785 /* ViewController.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		C01AB59D1F8345CB009B37D3 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C01AB59C1F8345CB009B37D3 /* KeymanEngine.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		987CC6941BAA731A0057459B /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		98ABFCDD1AD39165005534F0 /* KMSample1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KMSample1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		98ABFCE11AD39165005534F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		98ABFCE21AD39165005534F0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		98ABFCE41AD39165005534F0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		98ABFCE51AD39165005534F0 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		98ABFCE71AD39165005534F0 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		98ABFCE81AD39165005534F0 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		98ABFCEB1AD39165005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		98ABFCED1AD39165005534F0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		98ABFCF01AD39165005534F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		98ABFD081AD391A8005534F0 /* CWLSynthesizeSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWLSynthesizeSingleton.h; sourceTree = "<group>"; };
-		98ABFD091AD391A8005534F0 /* Keyman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Keyman.h; sourceTree = "<group>"; };
-		98ABFD0A1AD391A8005534F0 /* KMInputViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMInputViewController.h; sourceTree = "<group>"; };
-		98ABFD0B1AD391A8005534F0 /* KMKeyboardPickerBarButtonItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMKeyboardPickerBarButtonItem.h; sourceTree = "<group>"; };
-		98ABFD0C1AD391A8005534F0 /* KMKeyboardPickerButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMKeyboardPickerButton.h; sourceTree = "<group>"; };
-		98ABFD0D1AD391A8005534F0 /* KMManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMManager.h; sourceTree = "<group>"; };
-		98ABFD0E1AD391A8005534F0 /* KMTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMTextField.h; sourceTree = "<group>"; };
-		98ABFD0F1AD391A8005534F0 /* KMTextFieldDelegateProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMTextFieldDelegateProxy.h; sourceTree = "<group>"; };
-		98ABFD101AD391A8005534F0 /* KMTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMTextView.h; sourceTree = "<group>"; };
-		98ABFD111AD391A8005534F0 /* KMTextViewDelegateProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMTextViewDelegateProxy.h; sourceTree = "<group>"; };
-		98ABFD121AD391A8005534F0 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
-		98ABFD131AD391A8005534F0 /* Keyman.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Keyman.bundle; sourceTree = "<group>"; };
-		98ABFD141AD391A8005534F0 /* libKeyman.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libKeyman.a; sourceTree = "<group>"; };
-		98ABFD181AD391CB005534F0 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		98ABFD1A1AD391D1005534F0 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		98ABFD1C1AD391D6005534F0 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
-		98ABFD1E1AD391DB005534F0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		98ABFD201AD391E5005534F0 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		98ABFD221AD3920D005534F0 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		98ABFD241AD39212005534F0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		98ABFD261AD3921B005534F0 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		98ABFD2A1AD393AD005534F0 /* aava1.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = aava1.ttf; sourceTree = "<group>"; };
 		98ABFD2B1AD393AD005534F0 /* tamil99m-1.1.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "tamil99m-1.1.js"; sourceTree = "<group>"; };
+		C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
+		C0324B7F1F87170600AF3785 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C0324B831F87172900AF3785 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,16 +50,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98ABFD191AD391CB005534F0 /* AudioToolbox.framework in Frameworks */,
-				98ABFD1B1AD391D1005534F0 /* CFNetwork.framework in Frameworks */,
-				98ABFD1F1AD391DB005534F0 /* CoreGraphics.framework in Frameworks */,
-				98ABFD1D1AD391D6005534F0 /* CoreText.framework in Frameworks */,
-				98ABFD161AD391A8005534F0 /* libKeyman.a in Frameworks */,
-				98ABFD271AD3921B005534F0 /* libz.dylib in Frameworks */,
-				98ABFD231AD3920D005534F0 /* MobileCoreServices.framework in Frameworks */,
-				98ABFD211AD391E5005534F0 /* SystemConfiguration.framework in Frameworks */,
-				98ABFD251AD39212005534F0 /* UIKit.framework in Frameworks */,
-				987CC6951BAA731A0057459B /* WebKit.framework in Frameworks */,
+				C01AB59A1F8345C5009B37D3 /* KeymanEngine.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,7 +63,6 @@
 				98ABFD171AD391B0005534F0 /* Frameworks */,
 				98ABFD281AD393AD005534F0 /* Keyboards */,
 				98ABFCDF1AD39165005534F0 /* KMSample1 */,
-				98ABFD061AD391A8005534F0 /* libKeyman */,
 				98ABFCDE1AD39165005534F0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -108,10 +78,8 @@
 		98ABFCDF1AD39165005534F0 /* KMSample1 */ = {
 			isa = PBXGroup;
 			children = (
-				98ABFCE41AD39165005534F0 /* AppDelegate.h */,
-				98ABFCE51AD39165005534F0 /* AppDelegate.m */,
-				98ABFCE71AD39165005534F0 /* ViewController.h */,
-				98ABFCE81AD39165005534F0 /* ViewController.m */,
+				C0324B7F1F87170600AF3785 /* AppDelegate.swift */,
+				C0324B831F87172900AF3785 /* ViewController.swift */,
 				98ABFCEA1AD39165005534F0 /* Main.storyboard */,
 				98ABFCED1AD39165005534F0 /* Images.xcassets */,
 				98ABFCEF1AD39165005534F0 /* LaunchScreen.xib */,
@@ -124,51 +92,14 @@
 			isa = PBXGroup;
 			children = (
 				98ABFCE11AD39165005534F0 /* Info.plist */,
-				98ABFCE21AD39165005534F0 /* main.m */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		98ABFD061AD391A8005534F0 /* libKeyman */ = {
-			isa = PBXGroup;
-			children = (
-				98ABFD071AD391A8005534F0 /* include */,
-				98ABFD131AD391A8005534F0 /* Keyman.bundle */,
-				98ABFD141AD391A8005534F0 /* libKeyman.a */,
-			);
-			path = libKeyman;
-			sourceTree = "<group>";
-		};
-		98ABFD071AD391A8005534F0 /* include */ = {
-			isa = PBXGroup;
-			children = (
-				98ABFD081AD391A8005534F0 /* CWLSynthesizeSingleton.h */,
-				98ABFD091AD391A8005534F0 /* Keyman.h */,
-				98ABFD0A1AD391A8005534F0 /* KMInputViewController.h */,
-				98ABFD0B1AD391A8005534F0 /* KMKeyboardPickerBarButtonItem.h */,
-				98ABFD0C1AD391A8005534F0 /* KMKeyboardPickerButton.h */,
-				98ABFD0D1AD391A8005534F0 /* KMManager.h */,
-				98ABFD0E1AD391A8005534F0 /* KMTextField.h */,
-				98ABFD0F1AD391A8005534F0 /* KMTextFieldDelegateProxy.h */,
-				98ABFD101AD391A8005534F0 /* KMTextView.h */,
-				98ABFD111AD391A8005534F0 /* KMTextViewDelegateProxy.h */,
-				98ABFD121AD391A8005534F0 /* Reachability.h */,
-			);
-			path = include;
 			sourceTree = "<group>";
 		};
 		98ABFD171AD391B0005534F0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				987CC6941BAA731A0057459B /* WebKit.framework */,
-				98ABFD181AD391CB005534F0 /* AudioToolbox.framework */,
-				98ABFD1A1AD391D1005534F0 /* CFNetwork.framework */,
-				98ABFD1E1AD391DB005534F0 /* CoreGraphics.framework */,
-				98ABFD1C1AD391D6005534F0 /* CoreText.framework */,
-				98ABFD261AD3921B005534F0 /* libz.dylib */,
-				98ABFD221AD3920D005534F0 /* MobileCoreServices.framework */,
-				98ABFD201AD391E5005534F0 /* SystemConfiguration.framework */,
-				98ABFD241AD39212005534F0 /* UIKit.framework */,
+				C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -200,6 +131,8 @@
 				98ABFCD91AD39165005534F0 /* Sources */,
 				98ABFCDA1AD39165005534F0 /* Frameworks */,
 				98ABFCDB1AD39165005534F0 /* Resources */,
+				C01AB59D1F8345CB009B37D3 /* Embed Frameworks */,
+				C0324B851F87233700AF3785 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -216,11 +149,12 @@
 		98ABFCD51AD39165005534F0 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0620;
-				ORGANIZATIONNAME = "Tavultesoft Pty Ltd";
+				LastUpgradeCheck = 0900;
+				ORGANIZATIONNAME = "SIL International";
 				TargetAttributes = {
 					98ABFCDC1AD39165005534F0 = {
 						CreatedOnToolsVersion = 6.2;
+						LastSwiftMigration = 0900;
 					};
 				};
 			};
@@ -250,7 +184,6 @@
 				98ABFD2C1AD393AD005534F0 /* aava1.ttf in Resources */,
 				98ABFCEC1AD39165005534F0 /* Main.storyboard in Resources */,
 				98ABFCF11AD39165005534F0 /* LaunchScreen.xib in Resources */,
-				98ABFD151AD391A8005534F0 /* Keyman.bundle in Resources */,
 				98ABFCEE1AD39165005534F0 /* Images.xcassets in Resources */,
 				98ABFD2D1AD393AD005534F0 /* tamil99m-1.1.js in Resources */,
 			);
@@ -258,14 +191,29 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		C0324B851F87233700AF3785 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		98ABFCD91AD39165005534F0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98ABFCE91AD39165005534F0 /* ViewController.m in Sources */,
-				98ABFCE61AD39165005534F0 /* AppDelegate.m in Sources */,
-				98ABFCE31AD39165005534F0 /* main.m in Sources */,
+				C0324B841F87172900AF3785 /* ViewController.swift in Sources */,
+				C0324B801F87170600AF3785 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -299,20 +247,30 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -328,10 +286,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = (
-					"-force_load",
-					libKeyman/libKeyman.a,
-				);
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -345,13 +300,21 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -359,6 +322,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -367,11 +331,9 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = (
-					"-force_load",
-					libKeyman/libKeyman.a,
-				);
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -380,28 +342,41 @@
 		98ABFD011AD39165005534F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = KMSample1/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/libKeyman",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Sample1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
 		98ABFD021AD39165005534F0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = KMSample1/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/libKeyman",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Sample1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};

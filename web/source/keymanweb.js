@@ -1437,18 +1437,23 @@ if(!window['keyman']['initialized']) {
               alert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');
             }
           } else {
-            lList=x[i]['language'];
+            if(x[i]['language']) {
+              console.warn("The 'language' property for keyboard stubs has been deprecated.  Please use the 'languages' property instead.");
+              x[i]['languages'] = x[i]['language'];
+            }
+
+            lList=x[i]['languages'];
                 
             //Array or single entry?
             if(typeof(lList.length) == 'number') {
               for(j=0; j<lList.length; j++) {
-                var tEntry = {'id':x[i]['id'],'language':x[i]['language'][j]['id']};
+                var tEntry = {'id':x[i]['id'],'language':x[i]['languages'][j]['id']};
                 if(isUniqueRequest(tEntry)) {
                   keymanweb.cloudList.push(tEntry);
                 }
               }
             } else { // Single language element
-              var tEntry = {'id':x[i]['id'],'language':x[i]['language'][j]['id']};
+              var tEntry = {'id':x[i]['id'],'language':x[i]['languages'][j]['id']};
               if(isUniqueRequest(tEntry)) {
                 keymanweb.cloudList.push(tEntry);
               }
@@ -1588,7 +1593,11 @@ if(!window['keyman']['initialized']) {
     keymanweb.addStub = function(arg)
     {                         
       if(typeof(arg['id']) != 'string') return false;
-      if(typeof(arg['language']) == 'undefined') return false;
+      if(typeof(arg['language']) != "undefined") {
+        console.warn("The 'language' property for keyboard stubs has been deprecated.  Please use the 'languages' property instead.");
+        arg['languages'] = arg['language'];
+      }
+      if(typeof(arg['languages']) == 'undefined') return false;
       
       // Default the keyboard name to its id, capitalized
       if(typeof(arg['name']) != 'string')
@@ -1597,7 +1606,7 @@ if(!window['keyman']['initialized']) {
         arg['name'] = arg['name'].substr(0,1).toUpperCase()+arg['name'].substr(1);
       }
 
-      var lgArg=arg['language'],lgList=[],i,lg;
+      var lgArg=arg['languages'],lgList=[],i,lg;
       if(typeof(lgArg.length) == 'undefined') lgList[0] = lgArg; else lgList = lgArg; 
 
       var localOptions={
@@ -1866,26 +1875,46 @@ if(!window['keyman']['initialized']) {
      * @param {string} x keyboard name string
      * 
      */  
-    keymanweb['removeKeyboards'] = function(x)
-    {
-      if(arguments.length == 0) return;
+    keymanweb['removeKeyboards'] = function(x) {
+      if(arguments.length == 0) {
+        return false;
+      }
 
-      var i,j,ss=keymanweb._KeyboardStubs; 
-      for(i=0; i<arguments.length; i++)
-      {           
-        for(j=ss.length-1; j>=0; j--)
-        {
-          if('Keyboard_'+arguments[i] == ss[j]['KI'] && ss.length > 1) 
-          {                 
-            ss.splice(j,1); break;
+      var i,j,ss=keymanweb._KeyboardStubs;
+      var success = true, activeRemoved = false, anyRemoved = false;;
+
+      for(i=0; i<arguments.length; i++) {           
+        for(j=ss.length-1; j>=0; j--) {
+          if('Keyboard_'+arguments[i] == ss[j]['KI'] && ss.length > 1) {                 
+            if('Keyboard_'+arguments[i] == keymanweb['getActiveKeyboard']()) {
+              activeRemoved = true;
+            }
+
+            anyRemoved = true;
+            ss.splice(j,1);
+            break;
           }
         }
+
+        if(j < 0) {
+          success = false;
+        }
       } 
-      // Always reset to the first remaining keyboard
-      keymanweb._SetActiveKeyboard(ss[0]['KI'],ss[0]['KLC'],true);
-      
-      // then update the UI keyboard menu
-      keymanweb.doKeyboardUnregistered();
+
+      if(activeRemoved) {
+        // Always reset to the first remaining keyboard
+        keymanweb._SetActiveKeyboard(ss[0]['KI'],ss[0]['KLC'],true);
+        // This is likely to be triggered by a UI call of some sort, and we need to treat
+        // this call as such to properly maintain the globalKeyboard setting.
+        keymanweb._JustActivatedKeymanWebUI = 1;
+      }
+
+      if(anyRemoved) {
+        // Update the UI keyboard menu
+        keymanweb.doKeyboardUnregistered();
+      }
+        
+      return success;
     }
 
 

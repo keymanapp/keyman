@@ -894,8 +894,8 @@ if(!window['keyman']['ui']['name']) {
      **/    
     ui.changeKeyboardEvent = function(p)
     {                   
-      if(p['indirect']) 
-      {          
+      //if(p['indirect']) 
+      //{          
         var kbName=p['internalName'],
             lgName=p['languageCode'];
         if(lgName != '' && kbName != '')
@@ -913,7 +913,7 @@ if(!window['keyman']['ui']['name']) {
             }
           }
         }
-      }
+      //}
       return true;
     }
     keymanweb['addEventListener']('keyboardchange',ui.changeKeyboardEvent);

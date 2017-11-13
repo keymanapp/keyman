@@ -4,7 +4,7 @@ function loadKeyboards()
 
   // A testing keyboard handwritten with chirality information.
   kmw.addKeyboards({id:'chirality',name:'Chirality Testing',
-    language:{
+    languages:{
     id:'eng',name:'English',region:'North America'
     },
     filename:'chirality.js'
@@ -14,7 +14,7 @@ function loadKeyboards()
   // without the 'shift' layer properly defined.
   // Add a fully-specified, locally-sourced, keyboard with custom font  
   kmw.addKeyboards({id:'halfDefined',name:'Undefined Shift Layer Keyboard',
-    language:{
+    languages:{
     id:'eng',name:'English',region:'North America'
     },
     filename:'halfDefined.js'
