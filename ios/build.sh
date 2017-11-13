@@ -38,6 +38,7 @@ do_clean ( ) {
   rm -rf $KMEI_BUILD_PATH
   rm -rf $APP_BUILD_PATH
   rm -rf $APP_BUNDLE_PATH
+  rm -rf $APP_FRAMEWORK_PATH
 }
 
 ### START OF THE BUILD ###
@@ -135,6 +136,11 @@ echo "Building KMEI..."
 rm -r $KMEI_BUILD_PATH/$CONFIG-universal 2>/dev/null
 xcodebuild -quiet -project engine/KMEI/KeymanEngine.xcodeproj -target KME-universal -configuration $CONFIG \
   $CODE_SIGN_IDENTITY $CODE_SIGNING_REQUIRED $DEV_TEAM
+
+if [ $? -ne 0 ]; then
+  fail "KMEI build failed."
+fi
+
 assertDirExists "$BUILD_FRAMEWORK_PATH"
 
 if [ $BUILD_NUMBER ]; then
