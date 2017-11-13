@@ -10,18 +10,16 @@
 /*                                                      */
 /********************************************************/
 
-(function()
-{
+(function() {
   // Declare KeymanWeb object
-  var keymanweb=window['tavultesoft']['keymanweb'];
+  var keymanweb=window['keyman'];
 
   // We don't want to instantly init() in case this code is used via bookmarklet.
   var readyStateCheckInterval = window.setInterval(function() {
-    if (document.readyState === "complete") 
-    {
+    if (document.readyState === "complete") {
       window.clearInterval(readyStateCheckInterval);
       keymanweb.init(null);
     }
-  }, 10);    
- 
+  }, 10);
+  
 })();

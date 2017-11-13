@@ -12,8 +12,8 @@
 function Keyboard_chirality() {
   this.KI = "Keyboard_chirality";
   this.KN = "Development Chirality Test Keyboard";
+  this.KMBM = 0x001F;
   this.KV = {
-      KMBM: 0x001F,
       F: ' 1em "Arial"',
       K102: 0,
       KLS: { 'default': new Array("`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "", "", "", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\", "", "", "", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'",  "", "", "", "", "", "", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/", "", "", "", "", "", ""),
@@ -42,6 +42,7 @@ function Keyboard_chirality() {
   };
   this.g0 = function (t, e) {
     var k = KeymanWeb, r = 0, m = 0;
+    var osk = keyman.osk;
     
     // Handwritten time!
     var kls = this.KV.KLS;
@@ -52,7 +53,7 @@ function Keyboard_chirality() {
     for(var i = 0; i < layers.length; i++) {
       // Obtain the modifier code to match for the selected layer.
       // The following uses a non-public property potentially subject to change in the future.
-      var modCode = k.osk.modifierCodes['VIRTUAL_KEY'] | k.osk.getModifierState(layers[i]);
+      var modCode = osk.modifierCodes['VIRTUAL_KEY'] | osk.getModifierState(layers[i]);
       var layer = layers[i];
       
       for(var key=0; key < kls[layer].length; key++) {
@@ -61,9 +62,9 @@ function Keyboard_chirality() {
         if(keySymbol == "K_*") {
           continue;
         } else if(kls[layer][key] != '') {
-          if (k.KKM(e, modCode, k.osk.keyCodes[keySymbol])) {
+          if (k.KKM(e, modCode, osk.keyCodes[keySymbol])) {
             r = m = 1;
-            if(k.KSM(e, k.osk.modifierCodes['CAPS'])) {
+            if(k.KSM(e, osk.modifierCodes['CAPS'])) {
               k.KO(0, t, kls[layer][key].toUpperCase());
             } else {
               k.KO(0, t, kls[layer][key]);

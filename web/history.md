@@ -10,6 +10,7 @@
 * Refactored code paths relating to KMW's embedding in the iOS and Android apps.  (#211)
 * Added support for L/R Alt and Ctrl modifiers for keyboards. (#9) (#52)
 * Added support for use of the Caps Lock state within keyboards if specified by a keyboard designer.
+* Reworked the keyboard-interfacing API calls and base layout of KeymanWeb (#349)
 * Fixed keyboard loading upon initialization, redundant cloud requests for keyboards.  (#103)
 * Fixed next-layer processing (#116) (#358)
 * Fixed auto-attaching mode bug. (#352)
