@@ -145,9 +145,6 @@
 		98CF00B91B461EDE00627DC6 /* get-started.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B51B461EDE00627DC6 /* get-started.png */; };
 		98CF00BA1B461EDE00627DC6 /* info.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B61B461EDE00627DC6 /* info.png */; };
 		98CF00BB1B461EDE00627DC6 /* menu-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B71B461EDE00627DC6 /* menu-icon.png */; };
-		C01AB5951F8343AE009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB5941F8343AE009B37D3 /* KeymanEngine.framework */; };
-		C01AB5961F8343F7009B37D3 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB5941F8343AE009B37D3 /* KeymanEngine.framework */; };
-		C01AB5971F8343F7009B37D3 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB5941F8343AE009B37D3 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B01F60E8D400140735 /* GetStartedViewController.swift */; };
 		C055F0B31F60F7A400140735 /* DropDownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B21F60F7A400140735 /* DropDownView.swift */; };
 		C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B41F610FB200140735 /* DropDownListView.swift */; };
@@ -160,6 +157,8 @@
 		C0E943FE1F61377900E7D98C /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E943FD1F61377900E7D98C /* MainViewController.swift */; };
 		C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
 		C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */; };
+		CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -180,7 +179,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				C01AB5971F8343F7009B37D3 /* KeymanEngine.framework in Embed Frameworks */,
+				CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -188,7 +187,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		371584771E5832EA00B93F37 /* Release-universal */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Release-universal"; sourceTree = "<group>"; };
 		9815725018E4F0930014DF0C /* 702-share.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "702-share.png"; path = "Keyman Icons/702-share.png"; sourceTree = "<group>"; };
 		9815725118E4F0930014DF0C /* 702-share@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "702-share@2x.png"; path = "Keyman Icons/702-share@2x.png"; sourceTree = "<group>"; };
 		9815725218E4F0930014DF0C /* 711-trash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "711-trash.png"; path = "Keyman Icons/711-trash.png"; sourceTree = "<group>"; };
@@ -334,7 +332,6 @@
 		98D55ED718480B6800104956 /* textsize_down@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_down@2x.png"; path = "Keyman Icons/textsize_down@2x.png"; sourceTree = "<group>"; };
 		98D55EDC18480B6800104956 /* textsize_up.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_up.png; path = "Keyman Icons/textsize_up.png"; sourceTree = "<group>"; };
 		98D55EDD18480B6800104956 /* textsize_up@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_up@2x.png"; path = "Keyman Icons/textsize_up@2x.png"; sourceTree = "<group>"; };
-		C01AB5941F8343AE009B37D3 /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
 		C055F0B01F60E8D400140735 /* GetStartedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = GetStartedViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C055F0B21F60F7A400140735 /* DropDownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DropDownView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C055F0B41F610FB200140735 /* DropDownListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DropDownListView.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -348,6 +345,8 @@
 		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = ActivityItemProvider.swift; sourceTree = "<group>"; tabWidth = 2; };
+		CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -355,7 +354,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C01AB5961F8343F7009B37D3 /* KeymanEngine.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -363,7 +361,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C01AB5951F8343AE009B37D3 /* KeymanEngine.framework in Frameworks */,
+				CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -543,7 +541,7 @@
 		98ABADA7176935E400B62590 = {
 			isa = PBXGroup;
 			children = (
-				371584771E5832EA00B93F37 /* Release-universal */,
+				CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */,
 				989E4DBA1B1EB85200A345FB /* Settings.bundle */,
 				98ABADB2176935E400B62590 /* Frameworks */,
 				98ABADB9176935E400B62590 /* Keyman */,
@@ -564,7 +562,7 @@
 		98ABADB2176935E400B62590 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C01AB5941F8343AE009B37D3 /* KeymanEngine.framework */,
+				CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1202,7 +1200,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_LDFLAGS = "";
 				PROVISIONING_PROFILE = "";
@@ -1257,6 +1255,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -1299,6 +1298,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

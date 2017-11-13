@@ -149,8 +149,9 @@ if [ $BUILD_NUMBER ]; then
   /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$BUILD_FRAMEWORK_PATH/Info.plist"
 fi
 
-rm -r "$APP_FRAMEWORK_PATH"
-cp -R "$BUILD_FRAMEWORK_PATH" "$APP_FRAMEWORK_PATH"
+# Can we get away without this now?
+# rm -r "$APP_FRAMEWORK_PATH"
+# cp -R "$BUILD_FRAMEWORK_PATH" "$APP_FRAMEWORK_PATH"
 
 echo "KMEI build complete."
 
