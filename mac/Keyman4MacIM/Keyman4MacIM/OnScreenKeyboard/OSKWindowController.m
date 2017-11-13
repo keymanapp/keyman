@@ -34,7 +34,7 @@
     NSSize size = self.window.frame.size;
     [self.window setMaxSize:NSMakeSize(size.width*1.6, size.height*1.6)];
     [self.window setMinSize:NSMakeSize(size.width*0.8, size.height*0.8)];
-    [self.window setBackgroundColor:[NSColor colorWithRed:241.0/255.0 green:242.0/255.0 blue:242.0/255.0 alpha:1.0]];
+    [self.window setBackgroundColor:[NSColor colorWithSRGBRed:241.0/255.0 green:242.0/255.0 blue:242.0/255.0 alpha:1.0]];
     
     _helpButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 17, 17)];
     [_helpButton setTitle:@""];
