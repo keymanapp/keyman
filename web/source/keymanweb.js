@@ -6,7 +6,7 @@
 // If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the 
 // KMW system, so we use the fact that 'initialized' is only 1 / true after all scripts are loaded for the initial
 // load of KMW.
-if(!window['tavultesoft']['keymanweb']['initialized']) { 
+if(!window['keyman']['initialized']) { 
 
   /******************************************************************
    *  Main Keyman Web Module    
@@ -18,7 +18,8 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
   (function() 
   { 
     // Declare KeymanWeb, OnScreen Keyboard and Util objects
-    var keymanweb=window['tavultesoft']['keymanweb'],osk=keymanweb['osk'],util=keymanweb['util'],device=util.device;
+    var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'],device=util.device;
+    var kbdInterface=keymanweb['interface'];
 
     /**
      * Function     debug
@@ -1510,7 +1511,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         tFlag,Lscript = util._CreateElement('SCRIPT');
       
       URL=URL+((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards')
-        +'?jsonp=tavultesoft.keymanweb.register';  
+        +'?jsonp=keyman.register';  
       
       // Set callback timer
       tFlag='&timerid='+window.setTimeout(
@@ -3133,14 +3134,14 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         
         // Support backspace in simulated input DIV from physical keyboard where not matched in rule  I3363 (Build 301)
         if(Levent.Lcode == 8 && !LeventMatched && Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
-          keymanweb.KO(1,keymanweb._LastActiveElement,"");
+          kbdInterface.output(1,keymanweb._LastActiveElement,"");
         }
       } else {
         // Mnemonic layout
         if(Levent.Lcode == 8) { // I1595 - Backspace for mnemonic
           keymanweb._KeyPressToSwallow = 1;
           if(!keymanweb.callKeyboardStartGroup(Levent.Ltarg,Levent)) {
-            keymanweb.KO(1,keymanweb._LastActiveElement,""); // I3363 (Build 301)
+            kbdInterface.output(1,keymanweb._LastActiveElement,""); // I3363 (Build 301)
           }
           return false;  //added 16/3/13 to fix double backspace on mnemonic layouts on desktop
         }
@@ -3158,7 +3159,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
         } else {
           Lch = Levent.Lcode-64;
         }
-        keymanweb.KO(0, Levent.Ltarg, String._kmwFromCharCode(Lch)); //I3319
+        kbdInterface.output(0, Levent.Ltarg, String._kmwFromCharCode(Lch)); //I3319
 
         LeventMatched = 1;
       }
@@ -4231,15 +4232,17 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
       keymanweb.addKeyboardArray(keymanweb.deferredStubs);
       
       // KRS stubs (legacy format registration)    
-      for(j=0; j<keymanweb.deferredKRS.length; j++)
-        keymanweb.KRS(keymanweb.deferredKRS[j]);
+      for(j=0; j<keymanweb.deferredKRS.length; j++) {
+        kbdInterface.registerStub(keymanweb.deferredKRS[j]);
+      }
     
       // Initialize the desktop UI
-      keymanweb.initializeUI()
+      keymanweb.initializeUI();
     
       // Register deferred keyboards 
-      for(j=0; j<keymanweb.deferredKR.length; j++)
-        keymanweb.KR(keymanweb.deferredKR[j]);
+      for(j=0; j<keymanweb.deferredKR.length; j++) {
+        kbdInterface.registerKeyboard(keymanweb.deferredKR[j]);
+      }
     
       // Exit initialization here if we're using an embedded code path.
       if(keymanweb.isEmbedded) {

@@ -3,24 +3,20 @@
    Copyright 2017 SIL International
 ***/
 
+var keyman = window['keyman'] || {};
+
+/** @define {number} build counter that gets set by the build environment */
+keyman.__BUILD__ = 299;
+
 /**  
- * Base code: Declare tavultesoft, major component namespaces and instances, utility functions 
+ * Base code: Declare major component namespaces, instances, and utility functions 
  */  
 
 // If a copy of the script is already loaded, detect this and prevent re-initialization / data reset.
-var tavultesoft = window['tavultesoft'] = window['tavultesoft'] || {}; 
+if(!window['keyman']['loaded']) {
 
-/** @define {number} build counter that gets set by the build environment */
-tavultesoft.__BUILD__ = 299;
-
-if(!tavultesoft['keymanweb']) {
-
-  (function() 
-  {
-    // Define exposed base object
-    var tavultesoft = window['tavultesoft'] = {}; 
-
-    var keymanweb = tavultesoft['keymanweb'] = {
+  (function() {
+    var keymanweb = window['keyman'] = {
       _TitleElement: null,      // I1972 - KeymanWeb Titlebar should not be a link
       _Enabled: 1,              // Is KeymanWeb running?
       _IE: 0,                   // browser version identification
@@ -70,18 +66,19 @@ if(!tavultesoft['keymanweb']) {
       modStateFlags: 0          // Tracks the present state of the physical keyboard's active modifier flags.  Needed for AltGr simulation.
     };
 
+    // Signals that a KMW load has occurred in order to prevent double-loading.
+    keymanweb['loaded'] = true;
+
     keymanweb['initialized'] = 0;
-    keymanweb['build'] = tavultesoft.__BUILD__;
+    keymanweb['build'] = keyman.__BUILD__;
     keymanweb['version'] = '10.0';
     keymanweb['helpURL'] = 'http://help.keyman.com/go'; 
-
-    // Expose (old) KeymanWeb object for use by compiled keyboards (replaces legacy object in earlier versions)
-    window['KeymanWeb'] = keymanweb;
     
     // Define public OSK, user interface and utility function objects 
     var util = keymanweb['util'] = {};
     var osk = keymanweb['osk'] = {ready:false};
     var ui = keymanweb['ui'] = {};
+    var kbdInterface = keymanweb['interface'] = {};
 
     // Stub functions (defined later in code only if required)
     keymanweb.setDefaultDeviceOptions = function(opt){}     

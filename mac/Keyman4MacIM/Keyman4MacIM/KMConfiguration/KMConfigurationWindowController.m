@@ -164,7 +164,7 @@
         [textField setBackgroundColor:[NSColor clearColor]];
         [textField setAlignment:NSLeftTextAlignment];
         [textField setFont:[NSFont systemFontOfSize:tableView.rowHeight*0.5]];
-        [textField setTextColor:[NSColor colorWithRed:0.0 green:0.0 blue:0.1 alpha:1.0]];
+        [textField setTextColor:[NSColor colorWithSRGBRed:0.0 green:0.0 blue:0.1 alpha:1.0]];
         [textField setStringValue:[info objectForKey:@"HeaderTitle"]];
         [rowView addSubview:textField];
         return rowView;
@@ -177,7 +177,7 @@
     NSDictionary *info = [self.tableContents objectAtIndex:row];
     BOOL isHeader = ([info objectForKey:@"HeaderTitle"] != nil);
     if (isHeader)
-        [rowView setBackgroundColor:[NSColor colorWithRed:186.0/255.0 green:211.0/255.0 blue:1.0 alpha:1.0]];
+        [rowView setBackgroundColor:[NSColor colorWithSRGBRed:186.0/255.0 green:211.0/255.0 blue:1.0 alpha:1.0]];
 }
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {

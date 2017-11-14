@@ -6,7 +6,7 @@
 // If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the 
 // KMW system, so we use the fact that 'initialized' is only 1 / true after all scripts are loaded for the initial
 // load of KMW.
-if(!window['tavultesoft']['keymanweb']['initialized']) { 
+if(!window['keyman']['initialized']) { 
   /*****************************************/
   /*                                       */
   /*   On-Screen (Visual) Keyboard Code    */
@@ -14,48 +14,50 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
   /*****************************************/
   (function() {
     // Declare KeymanWeb object
-    var keymanweb=window['tavultesoft']['keymanweb'],osk=keymanweb['osk'],util=keymanweb['util'],device=util.device;
+    var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'],device=util.device;
     var dbg=keymanweb.debug;
 
     // Force full initialization
-    keymanweb.isEmbedded = false;  
+    keymanweb.isEmbedded = false;
 
     /**
      * Set default device options
      * @param {Object}  opt device options object
-     */       
+     */
     keymanweb.setDefaultDeviceOptions=function(opt) {
-      // Element attachment type    
-      if(opt['attachType'] == '') opt['attachType'] = (device.touchable ? 'manual' : 'auto');  
+      // Element attachment type
+      if(opt['attachType'] == '') opt['attachType'] = (device.touchable ? 'manual' : 'auto');
     }
 
   /**
-     * Customized wait display 
-     *    
+     * Customized wait display
+     * 
      * @param   {string|boolean}   s       displayed text (or false)
-     */       
-    util.wait = function(s) {                    
+     */
+    util.wait = function(s) {
       // Keyboards loaded with page are initialized before the page is ready,
       // so cannot use the wait indicater (and don't need it, anyway)
       // Do not display if a blocking cloud server error has occurred (to prevent multiple errors)
       var bg=keymanweb.waiting;
-      if(typeof(bg) == 'undefined' || bg == null || keymanweb.warned) return;
+      if(typeof(bg) == 'undefined' || bg == null || keymanweb.warned) {
+        return;
+      }
       
       var nn=bg.firstChild.childNodes;
-      if(s) {      
+      if(s) {
         bg.pending=true;
-        window.setTimeout(function() {           
-            if(bg.pending) {            
-              window.scrollTo(0,0); 
+        window.setTimeout(function() {
+            if(bg.pending) {
+              window.scrollTo(0,0);
               nn[0].style.display='none';
-              nn[1].className='kmw-wait-text'; nn[1].innerHTML=s; 
+              nn[1].className='kmw-wait-text'; nn[1].innerHTML=s;
               nn[2].style.display='block';
               bg.style.display='block';
             }
           },1000);
-      } else {                
+      } else {
         if(bg.pending) {
-          nn[1].innerHTML=''; 
+          nn[1].innerHTML='';
           bg.pending=false; bg.style.display='none';
         }
       }
@@ -64,7 +66,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     // Get default style sheet path
     keymanweb.getStyleSheetPath=function(ssName) {
       var ssPath = util['getOption']('resources')+'osk/'+ssName;
-      return ssPath; 
+      return ssPath;
     }
 
     /**
@@ -97,7 +99,11 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      */    
     keymanweb.KC_ = function(n, ln, Pelem) {
       var Ldv, tempContext = '';
-      if(Pelem.body) var Ldoc=Pelem; else var Ldoc=Pelem.ownerDocument; // I1481 - use Ldoc to get the ownerDocument when no selection is found
+      if(Pelem.body) {
+        var Ldoc=Pelem; 
+      } else {
+        var Ldoc=Pelem.ownerDocument; // I1481 - use Ldoc to get the ownerDocument when no selection is found
+      }
 
       if(device.touchable) {
         tempContext = keymanweb.getTextBeforeCaret(Pelem);

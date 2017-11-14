@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_9572b9cbe3b74bafc127d47ca531dad4</ID>
+      <Filename>version10chiral.kmn</Filename>
+      <Filepath>version10chiral.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Version 10 Chiral</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_1743b3bf01d8aeb93df498c08ca4db46</ID>
+      <Filename>version10nonchiral.kmn</Filename>
+      <Filepath>version10nonchiral.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Version 10 Non-Chiral</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_9e738c3aaaf2c7c392b5c242c5682eeb</ID>
+      <Filename>version9chiral.kmn</Filename>
+      <Filepath>version9chiral.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Version 9 Chiral</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_491347ca21b6f633239efa7d7a0a1f8b</ID>
+      <Filename>version9nonchiral.kmn</Filename>
+      <Filepath>version9nonchiral.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Version 9 non-chiral</Name>
+      </Details>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

@@ -2,8 +2,8 @@
    KeymanWeb 10.0
    Copyright 2017 SIL International
 ***/
-if (!window['tavultesoft']['keymanweb']['initialized']) {
-    window['tavultesoft']['keymanweb']['dfltLayout'] = {
+if (!window['keyman']['initialized']) {
+    window['keyman']['dfltLayout'] = {
         "desktop":
         {
             "font": "Tahoma,Helvetica",

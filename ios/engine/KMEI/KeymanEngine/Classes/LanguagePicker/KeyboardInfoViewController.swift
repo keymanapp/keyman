@@ -68,7 +68,7 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if !isCustomKeyboard {
       if indexPath.row == 1 {
-        let url = URL(string:"http://help.keyman.com/keyboard/\(keyboardID)/\(keyboardVersion)/")!
+        let url = URL(string: "http://help.keyman.com/keyboard/\(keyboardID)/\(keyboardVersion)/")!
         if let openURL = Manager.shared.openURL {
           openURL(url)
         } else {

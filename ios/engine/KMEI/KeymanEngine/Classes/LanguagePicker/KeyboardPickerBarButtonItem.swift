@@ -30,7 +30,7 @@ public class KeyboardPickerBarButtonItem: UIBarButtonItem {
 
     if UIDevice.current.userInterfaceIdiom == .phone {
       let landscapeImagePath = keymanBundle.path(
-        forResource:"keyboard_icon_landscape\(retinaSuffix)", ofType: "png")!
+        forResource: "keyboard_icon_landscape\(retinaSuffix)", ofType: "png")!
       landscapeImagePhone = UIImage(contentsOfFile: landscapeImagePath)
     }
   }
