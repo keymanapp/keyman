@@ -899,7 +899,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   private func profileName(withKeyboardID kbID: String, languageID langID: String) -> String? {
-    guard let keyboard = Manager.shared.userKeyboard(withID: kbID, languageID: langID),
+    guard let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withID: kbID, languageID: langID),
           let font = keyboard.font else {
       return nil
     }
@@ -932,7 +932,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     if doInstall {
       profileName = profile
-      let keyboard = Manager.shared.userKeyboard(withID: kbID, languageID: langID)!
+      let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withID: kbID, languageID: langID)!
       let languageName = keyboard.languageName
       let title = "\(languageName) Font"
       let msg = "Touch Install to make \(languageName) display correctly in all your apps"

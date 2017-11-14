@@ -80,4 +80,8 @@ public extension UserDefaults {
       set(keyboard, forKey: Key.userCurrentKeyboard)
     }
   }
+
+  public func userKeyboard(withID keyboardID: String, languageID: String) -> InstallableKeyboard? {
+    return userKeyboards?.first { $0.id == keyboardID && $0.languageID == languageID }
+  }
 }

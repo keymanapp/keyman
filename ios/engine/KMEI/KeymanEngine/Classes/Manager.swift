@@ -243,7 +243,7 @@ UIGestureRecognizerDelegate {
   ///   - addKeyboard()
   /// - Returns: Whether the keyboard was set successfully
   public func setKeyboard(withID keyboardID: String, languageID: String) -> Bool {
-    if let keyboard = userKeyboard(withID: keyboardID, languageID: languageID) {
+    if let keyboard = activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID) {
       return setKeyboard(keyboard)
     }
     return false
@@ -350,7 +350,8 @@ UIGestureRecognizerDelegate {
   /// - Returns: The keyboard exists and was removed
   public func removeKeyboard(withID keyboardID: String, languageID: String) -> Bool {
     // Remove keyboard from the list if it exists
-    if let index = indexForUserKeyboard(withID: keyboardID, languageID: languageID) {
+    let index = activeUserDefaults().userKeyboards?.index { $0.id == keyboardID && $0.languageID == languageID }
+    if let index = index {
       return removeKeyboard(at: index)
     }
     return false
@@ -381,22 +382,6 @@ UIGestureRecognizerDelegate {
     return true
   }
 
-  /// - Returns: Whether the keyboard exists in the user keyboards list
-  public func userKeyboardExists(withID keyboardID: String?, languageID: String?) -> Bool {
-    return indexForUserKeyboard(withID: keyboardID, languageID: languageID) != nil
-  }
-
-  /// - Returns: The index of the keyboard if it exist in user keyboards list
-  public func indexForUserKeyboard(withID keyboardID: String?, languageID: String?) -> Int? {
-    let userKeyboards = activeUserDefaults().userKeyboards
-    return userKeyboards?.index { $0.id == keyboardID && $0.languageID == languageID }
-  }
-
-  public func userKeyboard(withID keyboardID: String, languageID: String) -> InstallableKeyboard? {
-    let userKeyboards = activeUserDefaults().userKeyboards
-    return userKeyboards?.first { $0.id == keyboardID && $0.languageID == languageID }
-  }
-
   public func repositoryKeyboard(withID keyboardID: String, languageID: String) -> InstallableKeyboard? {
     return keyboardsDictionary["\(languageID)_\(keyboardID)"]
   }
@@ -406,7 +391,7 @@ UIGestureRecognizerDelegate {
     guard let keyboardID = keyboardID, let languageID = languageID else {
       return nil
     }
-    return userKeyboard(withID: keyboardID, languageID: languageID)
+    return activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
   }
 
   /// Switch to the next keyboard.
@@ -434,7 +419,7 @@ UIGestureRecognizerDelegate {
   ///   - The keyboard doesn't have a font
   ///   - The keyboard info is not available in the user keyboards list or in keyboardsDictionary
   public func fontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
-    let kb = userKeyboard(withID: keyboardID, languageID: languageID)
+    let kb = activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
       ?? repositoryKeyboard(withID: keyboardID, languageID: languageID)
     if let filename =  kb?.font?.source.first(where: { $0.hasFontExtension }) {
       return keymanFonts[filename]?[Key.fontName] as? String
@@ -446,7 +431,7 @@ UIGestureRecognizerDelegate {
   ///   - The keyboard doesn't have an OSK font
   ///   - The keyboard info is not available in the user keyboards list or in keyboardsDictionary
   func oskFontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
-    let kb = userKeyboard(withID: keyboardID, languageID: languageID)
+    let kb = activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
       ?? repositoryKeyboard(withID: keyboardID, languageID: languageID)
     if let filename =  kb?.oskFont?.source.first(where: { $0.hasFontExtension }) {
       return keymanFonts[filename]?[Key.fontName] as? String
@@ -455,7 +440,7 @@ UIGestureRecognizerDelegate {
   }
 
   func isRTLKeyboard(withID keyboardID: String, languageID: String) -> Bool? {
-    let kb = userKeyboard(withID: keyboardID, languageID: languageID)
+    let kb = activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
       ?? repositoryKeyboard(withID: keyboardID, languageID: languageID)
     return kb?.isRTL
   }
@@ -1958,7 +1943,7 @@ UIGestureRecognizerDelegate {
       if let currentKb = userData.currentKeyboard {
         let kbID = currentKb.id
         let langID = currentKb.languageID
-        if userKeyboardExists(withID: kbID, languageID: langID) {
+        if activeUserDefaults().userKeyboard(withID: kbID, languageID: langID) != nil {
           newKb = currentKb
         }
       } else if let userKbs = activeUserDefaults().userKeyboards, !userKbs.isEmpty {
