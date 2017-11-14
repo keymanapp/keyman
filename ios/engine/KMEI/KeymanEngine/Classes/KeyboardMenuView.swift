@@ -36,7 +36,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     }
 
     let userData = Manager.shared.activeUserDefaults()
-    let keyboardList = userData.installableKeyboards(forKey: Key.userKeyboardsList)
+    let keyboardList = userData.userKeyboards
 
     let titleCloseButton: String
     if let closeButtonTitle = closeButtonTitle {

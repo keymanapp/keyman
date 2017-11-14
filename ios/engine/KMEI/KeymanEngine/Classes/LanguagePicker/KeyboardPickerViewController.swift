@@ -135,7 +135,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       let kb = userKeyboards[indexPath.row]
       if isCurrentKeyboard(languageID: kb.id, keyboardID: kb.languageID) {
         let userData = Manager.shared.activeUserDefaults()
-        userKeyboards = userData.installableKeyboards(forKey: Key.userKeyboardsList)!
+        userKeyboards = userData.userKeyboards!
         Manager.shared.setKeyboard(userKeyboards[0])
       }
       NotificationCenter.default.post(name: NSNotification.Name.keymanKeyboardRemoved,
@@ -295,11 +295,11 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   private func loadUserKeyboards() {
     let userData = Manager.shared.activeUserDefaults()
 
-    if let userKeyboards = userData.installableKeyboards(forKey: Key.userKeyboardsList) {
+    if let userKeyboards = userData.userKeyboards {
       self.userKeyboards = userKeyboards
     } else {
       userKeyboards = [Constants.defaultKeyboard]
-      userData.set(userKeyboards, forKey: Key.userKeyboardsList)
+      userData.userKeyboards = userKeyboards
       userData.synchronize()
     }
 

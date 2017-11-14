@@ -86,7 +86,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     if !bookmarks.isEmpty {
       userData.set(bookmarks, forKey: webBrowserBookmarksKey)
     } else {
-      userData.set(nil, forKey: webBrowserBookmarksKey)
+      userData.removeObject(forKey: webBrowserBookmarksKey)
     }
     userData.synchronize()
   }

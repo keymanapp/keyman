@@ -299,7 +299,7 @@ UIGestureRecognizerDelegate {
 
     let userData = isSystemKeyboard ? UserDefaults.standard : activeUserDefaults()
 
-    userData.set(kb, forKey: Key.userCurrentKeyboard)
+    userData.currentKeyboard = kb
     userData.synchronize()
 
     if isKeymanHelpOn {
@@ -332,7 +332,7 @@ UIGestureRecognizerDelegate {
 
     // Get keyboards list if it exists in user defaults, otherwise create a new one
     let userDefaults = activeUserDefaults()
-    var userKeyboards = userDefaults.installableKeyboards(forKey: Key.userKeyboardsList) ?? []
+    var userKeyboards = userDefaults.userKeyboards ?? []
 
     // Update keyboard if it exists
     if let index = userKeyboards.index(where: { $0.id == keyboard.id && $0.languageID == keyboard.languageID }) {
@@ -341,7 +341,7 @@ UIGestureRecognizerDelegate {
       userKeyboards.append(keyboard)
     }
 
-    userDefaults.set(userKeyboards, forKey: Key.userKeyboardsList)
+    userDefaults.userKeyboards = userKeyboards
     userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
     userDefaults.synchronize()
   }
@@ -362,7 +362,7 @@ UIGestureRecognizerDelegate {
     let userData = activeUserDefaults()
 
     // If user defaults for keyboards list does not exist, do nothing.
-    guard var userKeyboards = userData.installableKeyboards(forKey: Key.userKeyboardsList) else {
+    guard var userKeyboards = userData.userKeyboards else {
       return false
     }
 
@@ -372,7 +372,7 @@ UIGestureRecognizerDelegate {
 
     let kb = userKeyboards[index]
     userKeyboards.remove(at: index)
-    userData.set(userKeyboards, forKey: Key.userKeyboardsList)
+    userData.userKeyboards = userKeyboards
     userData.set([Date()], forKey: Key.synchronizeSWKeyboard)
     userData.synchronize()
 
@@ -388,12 +388,12 @@ UIGestureRecognizerDelegate {
 
   /// - Returns: The index of the keyboard if it exist in user keyboards list
   public func indexForUserKeyboard(withID keyboardID: String?, languageID: String?) -> Int? {
-    let userKeyboards = activeUserDefaults().installableKeyboards(forKey: Key.userKeyboardsList)
+    let userKeyboards = activeUserDefaults().userKeyboards
     return userKeyboards?.index { $0.id == keyboardID && $0.languageID == languageID }
   }
 
   public func userKeyboard(withID keyboardID: String, languageID: String) -> InstallableKeyboard? {
-    let userKeyboards = activeUserDefaults().installableKeyboards(forKey: Key.userKeyboardsList)
+    let userKeyboards = activeUserDefaults().userKeyboards
     return userKeyboards?.first { $0.id == keyboardID && $0.languageID == languageID }
   }
 
@@ -413,7 +413,7 @@ UIGestureRecognizerDelegate {
   /// - Returns: Index of the newly selected keyboard.
   public func switchToNextKeyboard() -> Int? {
     let userDefaults = activeUserDefaults()
-    guard let userKeyboards = userDefaults.installableKeyboards(forKey: Key.userKeyboardsList),
+    guard let userKeyboards = userDefaults.userKeyboards,
           let index = userKeyboards.index(where: { isCurrentKeyboard($0) }) else {
       return nil
     }
@@ -737,7 +737,7 @@ UIGestureRecognizerDelegate {
     }
     userData.set(sdkVersion, forKey: Key.engineVersion)
 
-    guard var userKbList = userData.installableKeyboards(forKey: Key.userKeyboardsList) else {
+    guard var userKbList = userData.userKeyboards else {
       kmLog("No user keyboards to update", checkDebugPrinting: true)
       return
     }
@@ -755,7 +755,7 @@ UIGestureRecognizerDelegate {
         userKbList[i] = kb
       }
     }
-    userData.set(userKbList, forKey: Key.userKeyboardsList)
+    userData.userKeyboards = userKbList
     userData.synchronize()
   }
 
@@ -1195,9 +1195,9 @@ UIGestureRecognizerDelegate {
           try? fileManager.removeItem(at: fileUrl)
 
           let userData = activeUserDefaults()
-          let curKB = userData.installableKeyboard(forKey: Key.userCurrentKeyboard)
+          let curKB = userData.currentKeyboard
           if curKB?.id == "us" {
-            userData.removeObject(forKey: Key.userCurrentKeyboard)
+            userData.currentKeyboard = nil
             userData.synchronize()
           }
         } else {
@@ -1522,7 +1522,7 @@ UIGestureRecognizerDelegate {
 
   func updateKeyboardVersion(forID kbID: String, newKeyboardVersion kbVersion: String) {
     let userData = activeUserDefaults()
-    guard var userKeyboards = userData.installableKeyboards(forKey: Key.userKeyboardsList) else {
+    guard var userKeyboards = userData.userKeyboards else {
       return
     }
 
@@ -1534,16 +1534,16 @@ UIGestureRecognizerDelegate {
         userKeyboards[i] = kb
       }
     }
-    userData.set(userKeyboards, forKey: Key.userKeyboardsList)
+    userData.userKeyboards = userKeyboards
     userData.synchronize()
 
     // Set version for current keyboard
     // TODO: Move this UserDefaults into a function
     let currentUserData = isSystemKeyboard ? UserDefaults.standard : activeUserDefaults()
-    if var userKb = currentUserData.installableKeyboard(forKey: Key.userCurrentKeyboard) {
+    if var userKb = currentUserData.currentKeyboard {
       if kbID == userKb.id {
         userKb.version = kbVersion
-        currentUserData.set(userKb, forKey: Key.userCurrentKeyboard)
+        currentUserData.currentKeyboard = userKb
         currentUserData.synchronize()
       }
     }
@@ -1744,7 +1744,7 @@ UIGestureRecognizerDelegate {
 
     if let keyboard = keyboard {
       setKeyboard(keyboard)
-    } else if let keyboard = activeUserDefaults().installableKeyboards(forKey: Key.userKeyboardsList)?[safe: 0] {
+    } else if let keyboard = activeUserDefaults().userKeyboards?[safe: 0] {
       setKeyboard(keyboard)
     } else {
       setKeyboard(Constants.defaultKeyboard)
@@ -1955,14 +1955,13 @@ UIGestureRecognizerDelegate {
       var newKb = Constants.defaultKeyboard
 
       let userData = isSystemKeyboard ? UserDefaults.standard : activeUserDefaults()
-      if let currentKb = userData.installableKeyboard(forKey: Key.userCurrentKeyboard) {
+      if let currentKb = userData.currentKeyboard {
         let kbID = currentKb.id
         let langID = currentKb.languageID
         if userKeyboardExists(withID: kbID, languageID: langID) {
           newKb = currentKb
         }
-      } else if let userKbs = activeUserDefaults().installableKeyboards(forKey: Key.userKeyboardsList),
-        !userKbs.isEmpty {
+      } else if let userKbs = activeUserDefaults().userKeyboards, !userKbs.isEmpty {
         newKb = userKbs[0]
       }
       setKeyboard(newKb)

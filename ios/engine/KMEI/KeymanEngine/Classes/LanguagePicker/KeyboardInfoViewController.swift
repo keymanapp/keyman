@@ -155,7 +155,7 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
 
     if alertView.tag == 1 {
       let userData = Manager.shared.activeUserDefaults()
-      let userKeyboards = userData.installableKeyboards(forKey: Key.userKeyboardsList)!
+      let userKeyboards = userData.userKeyboards!
       let kb = userKeyboards[keyboardIndex]
 
       if Manager.shared.removeKeyboard(at: keyboardIndex) {

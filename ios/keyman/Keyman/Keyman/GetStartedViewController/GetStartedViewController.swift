@@ -157,8 +157,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
 
   private func didAddKeyboard() -> Bool {
     let userData = AppDelegate.activeUserDefaults()
-    let userKbs = userData.installableKeyboards(forKey: Key.userKeyboardsList)
-    guard let userKeyboards = userKbs else {
+    guard let userKeyboards = userData.userKeyboards else {
       return false
     }
 

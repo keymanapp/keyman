@@ -47,7 +47,7 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
     let keyboardInfo = Manager.shared.currentKeyboardInfo
     let currentKeyboardId = keyboardInfo?.id ?? Constants.defaultKeyboard.id
     let userData = AppDelegate.activeUserDefaults()
-    let keyboards = userData.installableKeyboards(forKey: Key.userKeyboardsList)
+    let keyboards = userData.userKeyboards
     let keyboardIds = keyboards?.map { $0.id }
     let installedKeyboards: String
     if let ids = keyboardIds, !ids.isEmpty {

@@ -454,7 +454,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
 
     let userData = AppDelegate.activeUserDefaults()
-    let userKeyboards = userData.installableKeyboards(forKey: Key.userKeyboardsList)
+    let userKeyboards = userData.userKeyboards
     if userKeyboards == nil || userKeyboards!.isEmpty {
       Manager.shared.addKeyboard(Constants.defaultKeyboard)
     }
@@ -1076,7 +1076,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       return true
     }
 
-    guard let userKbs = userData.installableKeyboards(forKey: Key.userKeyboardsList) else {
+    guard let userKbs = userData.userKeyboards else {
       return true
     }
     if userKbs.isEmpty {

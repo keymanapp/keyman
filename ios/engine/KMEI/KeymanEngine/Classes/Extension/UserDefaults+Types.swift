@@ -22,7 +22,11 @@ public extension UserDefaults {
     }
   }
 
-  public func set(_ keyboards: [InstallableKeyboard], forKey key: String) {
+  public func set(_ keyboards: [InstallableKeyboard]?, forKey key: String) {
+    guard let keyboards = keyboards else {
+      removeObject(forKey: key)
+      return
+    }
     let encoder = PropertyListEncoder()
     do {
       let array = try keyboards.map { try encoder.encode($0) }
@@ -33,23 +37,47 @@ public extension UserDefaults {
   }
 
   public func installableKeyboard(forKey key: String) -> InstallableKeyboard? {
-    if let data = self.data(forKey: key) {
-      do {
-        return try PropertyListDecoder().decode(InstallableKeyboard.self, from: data)
-      } catch {
-        Manager.shared.kmLog("UserDefaults: Error decoding keyboard: \(error)", checkDebugPrinting: false)
-        return nil
-      }
+    guard let data = data(forKey: key) else {
+      return nil
     }
-    return nil
+    do {
+      return try PropertyListDecoder().decode(InstallableKeyboard.self, from: data)
+    } catch {
+      Manager.shared.kmLog("UserDefaults: Error decoding keyboard: \(error)", checkDebugPrinting: false)
+      return nil
+    }
   }
 
-  public func set(_ keyboard: InstallableKeyboard, forKey key: String) {
+  public func set(_ keyboard: InstallableKeyboard?, forKey key: String) {
+    guard let keyboard = keyboard else {
+      removeObject(forKey: key)
+      return
+    }
     do {
       let data = try PropertyListEncoder().encode(keyboard)
       set(data, forKey: key)
     } catch {
       Manager.shared.kmLog("UserDefaults: Error encoding keyboard: \(error)", checkDebugPrinting: false)
+    }
+  }
+
+  public var userKeyboards: [InstallableKeyboard]? {
+    get {
+      return installableKeyboards(forKey: Key.userKeyboardsList)
+    }
+
+    set(keyboards) {
+      set(keyboards, forKey: Key.userKeyboardsList)
+    }
+  }
+
+  public var currentKeyboard: InstallableKeyboard? {
+    get {
+      return installableKeyboard(forKey: Key.userCurrentKeyboard)
+    }
+
+    set(keyboard) {
+      set(keyboard, forKey: Key.userCurrentKeyboard)
     }
   }
 }

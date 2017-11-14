@@ -20,10 +20,10 @@ public struct Key {
   public static let keyboardInfo = "keyboardInfo"
 
   /// Array of user keyboards info list in UserDefaults
-  public static let userKeyboardsList = "UserKeyboardsList"
+  static let userKeyboardsList = "UserKeyboardsList"
 
   /// Currently/last selected keyboard info in UserDefaults
-  public static let userCurrentKeyboard = "UserCurrentKeyboard"
+  static let userCurrentKeyboard = "UserCurrentKeyboard"
 
   // Internal user defaults keys
   static let engineVersion = "KeymanEngineVersion"

@@ -154,7 +154,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
   private func loadUserKeyboards() {
     let userData = Manager.shared.activeUserDefaults()
-    guard let userKbList = userData.installableKeyboards(forKey: Key.userKeyboardsList), !userKbList.isEmpty else {
+    guard let userKbList = userData.userKeyboards, !userKbList.isEmpty else {
       userKeyboards = [:]
       return
     }
