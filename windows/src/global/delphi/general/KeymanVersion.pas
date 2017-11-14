@@ -29,9 +29,7 @@ const
 
   SKeymanVersion = SKeymanVersion100;
 
-  // At present, we have no features in version 10 of Keyman that are not in
-  // version 9, so we can force version 9 for keyboards for back-compat
-  SKeymanKeyboardVersion = SKeymanVersion90;
+  SKeymanKeyboardVersion = SKeymanVersion100;
 
   SKeymanInstallerComponentCode = '{C289B903-7EE8-49C7-B186-BE98259EC540}';
 implementation
