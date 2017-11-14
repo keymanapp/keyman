@@ -16,14 +16,13 @@ You will need to run with the command-line argument `-no-codesign` or establish 
 complete the build for the final app.
 
 To run the app within a simulator after build.sh is completed,
-1. Open **keyman/Keyman/Keyman.xcodeproj** in Xcode.
-2. Run the Keyman target within Xcode.
+1. Open the main workspace in Xcode.
+2. Run the Keyman target.
 
-The Keyman app relies on KeymanEngine.framework. `build.sh` builds KeymanEngine.framework and so must be run in the
-initial build and whenever KeymanEngine is modified.
+The Keyman app relies on KeymanEngine.framework, which will automatically be rebuilt by Xcode whenever it is changed.
 
 ### Running the app on a physical device
-In order to test any code changes on a physical device, Apple requires that an app be code-signed.  The quickest way to handle this for personal testing:
+In order to test any code changes on a physical device, Apple requires that an app be code-signed.  (Note that code-signing is not necessary for Simulator runs.)  The quickest way to handle this for personal testing:
 
 - Open Xcode and the settings for the Keyman target.
 - Establish personal code-signing permissions.

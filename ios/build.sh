@@ -37,7 +37,7 @@ set_version ( ) {
 KMEI_RESOURCES=engine/KMEI/KeymanEngine/resources
 KMEI_BUILD_PATH=engine/KMEI/build
 BUNDLE_PATH=$KMEI_RESOURCES/Keyman.bundle/contents/resources
-APP_BUILD_PATH=keyman/Keyman/build/
+APP_BUILD_PATH=keyman/Keyman/build
 KMW_SOURCE=../web/source
 
 do_clean ( ) {
@@ -90,7 +90,7 @@ while [[ $# -gt 0 ]] ; do
     shift # past argument
 done
 
-APP_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.app
+APP_BUNDLE_PATH=$APP_BUILD_PATH/Build/Products/${CONFIG}-iphoneos/Keyman.app
 KEYBOARD_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/SWKeyboard.appex
 ARCHIVE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
 BUILD_FRAMEWORK_PATH_UNIVERSAL=$KMEI_BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
@@ -160,22 +160,11 @@ if [ $DO_KEYMANAPP = true ]; then
       DEV_TEAM="DEVELOPMENT_TEAM=${DEVELOPMENT_TEAM}"
     fi
 
-    # To dynamically set the parameters in a way xcodebuild can use them, we need to construct the entire xcodebuild call as a string first.
-    BUILD_1="xcodebuild -quiet -project keyman/Keyman/Keyman.xcodeproj ${CODE_SIGN_IDENTITY} ${CODE_SIGNING_REQUIRED} ${DEV_TEAM} -target SWKeyboard -configuration ${CONFIG}"
-    BUILD_2="xcodebuild -quiet -project keyman/Keyman/Keyman.xcodeproj ${CODE_SIGN_IDENTITY} ${CODE_SIGNING_REQUIRED} ${DEV_TEAM} -target Keyman -configuration ${CONFIG}"
-
     if [ $DO_ARCHIVE = false ]; then
-      # Performs the actual build calls.
-#      $BUILD_1
-#
-#      if [ $? -ne 0 ]; then
-#        fail "SWKeyboard build failed."
-#      fi
-#
-#      # Pass the build number information along to the Plist file of the keyboard.  We want to intercept it before it's embedded into the app!
-#      set_version "$KEYBOARD_BUNDLE_PATH" "SWKeyboard"
+      # To dynamically set the parameters in a way xcodebuild can use them, we need to construct the entire xcodebuild call as a string first.
+      BUILD_CMD="xcodebuild -quiet -workspace keymanios.xcworkspace ${CODE_SIGN_IDENTITY} ${CODE_SIGNING_REQUIRED} ${DEV_TEAM} -configuration ${CONFIG} -derivedDataPath keyman/Keyman/build -scheme Keyman"
 
-      $BUILD_2
+      $BUILD_CMD
 
       if [ $? -ne 0 ]; then
         fail "Keyman app build failed."
@@ -183,6 +172,7 @@ if [ $DO_KEYMANAPP = true ]; then
 
       # Pass the build number information along to the Plist file of the app.
       set_version "$APP_BUNDLE_PATH" "Keyman"
+      set_version "$APP_BUNDLE_PATH/Plugins/SWKeyboard.appex"
     else
       # Time to prepare the deployment archive data.
       echo ""
