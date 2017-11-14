@@ -107,8 +107,8 @@ UIGestureRecognizerDelegate {
   /// The key format is $languageID_$keyboardID. For example, "eng_european2" returns the English EuroLatin2 keyboard
   public private(set) var keyboardsDictionary: [String: [String: String]] = [:]
 
-  /// Dictionary of available Keyman keyboard fonts
-  public private(set) var keymanFonts: [String: [String: Any]] = [:]
+  /// Dictionary of available Keyman keyboard fonts keyed by font filename
+  public private(set) var keymanFonts: [String: Font] = [:]
 
   /// Keyman system-wide keyboard
   public let isSystemKeyboard: Bool
@@ -788,7 +788,7 @@ UIGestureRecognizerDelegate {
       if let kb = userKeyboards.first(where: { isCurrentKeyboard($0) }) {
         let font = kb[Key.font]
         if let fontFilename = self.fontFilename(fromJSONFont: font!) {
-          return keymanFonts[fontFilename]?[Key.fontName] as? String
+          return keymanFonts[fontFilename]?.name
         }
         return nil
       }
@@ -797,7 +797,7 @@ UIGestureRecognizerDelegate {
     if let kb = keyboardsDictionary["\(languageID)_\(keyboardID)"] {
       let font = kb[Key.font]
       if let fontFilename = self.fontFilename(fromJSONFont: font!) {
-        return keymanFonts[fontFilename]?[Key.fontName] as? String
+        return keymanFonts[fontFilename]?.name
       }
       return nil
     }
@@ -816,7 +816,7 @@ UIGestureRecognizerDelegate {
       if let kb = userKeyboards.first(where: { isCurrentKeyboard($0) }) {
         if let font = kb[Key.oskFont] {
           let fontFilename = self.fontFilename(fromJSONFont: font)
-          return keymanFonts[fontFilename!]?[Key.fontName] as? String
+          return keymanFonts[fontFilename!]?.name
         }
       }
     }
@@ -824,7 +824,7 @@ UIGestureRecognizerDelegate {
     if let kb = keyboardsDictionary["\(languageID)_\(keyboardID)"] {
       if let font = kb[Key.oskFont] {
         let fontFilename = self.fontFilename(fromJSONFont: font)
-        return keymanFonts[fontFilename!]?[Key.fontName] as? String
+        return keymanFonts[fontFilename!]?.name
       }
     }
 
@@ -1647,15 +1647,13 @@ UIGestureRecognizerDelegate {
 
     for fontFilename in directoryContents where fontFilename.hasFontExtension {
       if let fontInfo = keymanFonts[fontFilename] {
-        if fontInfo[Key.fontRegistered] as? Int == 0 {
+        if !fontInfo.isRegistered {
           if let newFontInfo = registerFont(withFilename: fontFilename) {
             keymanFonts[fontFilename] = newFontInfo
           }
         }
-      } else {
-        if let fontInfo = registerFont(withFilename: fontFilename) {
-          keymanFonts[fontFilename] = fontInfo
-        }
+      } else if let fontInfo = registerFont(withFilename: fontFilename) {
+        keymanFonts[fontFilename] = fontInfo
       }
     }
   }
@@ -1671,16 +1669,16 @@ UIGestureRecognizerDelegate {
     }
 
     for fontFilename in directoryContents where fontFilename.hasFontExtension {
-      if var fontInfo = keymanFonts[fontFilename], fontInfo[Key.fontRegistered] as? Int != 0 {
+      if var fontInfo = keymanFonts[fontFilename], fontInfo.isRegistered {
         if unregisterFont(withFilename: fontFilename) {
-          fontInfo[Key.fontRegistered] = 0
+          fontInfo.isRegistered = false
           keymanFonts[fontFilename] = fontInfo
         }
       }
     }
   }
 
-  private func registerFont(withFilename fontFilename: String) -> [String: Any]? {
+  private func registerFont(withFilename fontFilename: String) -> Font? {
     guard let fontURL = activeFontDirectory()?.appendingPathComponent(fontFilename),
       FileManager.default.fileExists(atPath: fontURL.path) else {
         return nil
@@ -1690,13 +1688,14 @@ UIGestureRecognizerDelegate {
       kmLog("Failed to open \(fontURL)", checkDebugPrinting: false)
       return nil
     }
-    guard let font = CGFont(provider) else {
+    guard let font = CGFont(provider),
+          let cfFontName = font.postScriptName else {
       kmLog("Failed to read font at \(fontURL)", checkDebugPrinting: false)
       return nil
     }
 
-    var didRegister: Bool = false
-    let fontName = font.postScriptName! as String
+    var didRegister = false
+    let fontName = cfFontName as String
     if !fontExists(fontName) {
       var errorRef: Unmanaged<CFError>?
       didRegister = CTFontManagerRegisterFontsForURL(fontURL as CFURL, .none, &errorRef)
@@ -1708,11 +1707,7 @@ UIGestureRecognizerDelegate {
         kmLog("Registered font: \(fontURL)", checkDebugPrinting: true)
       }
     }
-    return [
-      Key.fontName: fontName,
-      // TODO: Check if didRegister should be true if font exists
-      Key.fontRegistered: didRegister ? 1 : 0
-    ]
+    return Font(name: fontName, isRegistered: didRegister)
   }
 
   private func unregisterFont(withFilename fontFilename: String) -> Bool {

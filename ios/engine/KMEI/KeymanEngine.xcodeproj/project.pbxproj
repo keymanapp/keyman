@@ -39,6 +39,7 @@
 		C040E5141F86108900901EE4 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E5131F86108900901EE4 /* MainViewController.swift */; };
 		C04514881F85D7F500D88416 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04514871F85D7F500D88416 /* KeyboardViewController.swift */; };
 		C045148A1F85DF9100D88416 /* InputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04514891F85DF9000D88416 /* InputViewController.swift */; };
+		C055E6EB1F99ED090035C2DD /* Font.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055E6EA1F99ED090035C2DD /* Font.swift */; };
 		C06085B41F9485E40057E5B9 /* UIButton+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */; };
 		C06D372F1F81F4E100F61AE0 /* KeymanEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = C06D372D1F81F4E100F61AE0 /* KeymanEngine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C06D37331F81F5C300F61AE0 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = CECB38941F2199BC0098882F /* Reachability.m */; };
@@ -158,6 +159,7 @@
 		C04514871F85D7F500D88416 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 		C04514891F85DF9000D88416 /* InputViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputViewController.swift; sourceTree = "<group>"; };
 		C04C2A6C1F6B7D9A00BA42B6 /* LanguageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LanguageViewController.swift; sourceTree = "<group>"; };
+		C055E6EA1F99ED090035C2DD /* Font.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Font.swift; sourceTree = "<group>"; };
 		C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Helpers.swift"; sourceTree = "<group>"; };
 		C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C06D372D1F81F4E100F61AE0 /* KeymanEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeymanEngine.h; sourceTree = "<group>"; };
@@ -364,6 +366,14 @@
 			path = Extension;
 			sourceTree = "<group>";
 		};
+		C055E6E91F99EA740035C2DD /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				C055E6EA1F99ED090035C2DD /* Font.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		C06D372C1F81F4E100F61AE0 /* KeymanEngine */ = {
 			isa = PBXGroup;
 			children = (
@@ -461,6 +471,7 @@
 			isa = PBXGroup;
 			children = (
 				C055E6E81F99EA320035C2DD /* Extension */,
+				C055E6E91F99EA740035C2DD /* Model */,
 				C0A93A531F8B21240079948B /* Manager.swift */,
 				CE25CCBB1F1DA72A005AA2BC /* HTTPRequest */,
 				987F00041AB8FCB700998116 /* KeyboardMenuView */,
@@ -730,6 +741,7 @@
 				C0EF3E7B1F95B65300CE9BD4 /* KeymanWebViewDelegate.swift in Sources */,
 				C06D37411F81F5C400F61AE0 /* LanguageViewController.swift in Sources */,
 				C06D37421F81F5C400F61AE0 /* KeyboardPickerButton.swift in Sources */,
+				C055E6EB1F99ED090035C2DD /* Font.swift in Sources */,
 				C0324B931F87689B00AF3785 /* KeymanURLProtocol.swift in Sources */,
 				C06D37431F81F5C400F61AE0 /* KeyboardPickerBarButtonItem.swift in Sources */,
 				C082CE151F90AFD400860F02 /* Collection+SafeAccess.swift in Sources */,

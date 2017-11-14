@@ -125,10 +125,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     // Check for configuration profiles/fonts to install
     let kmFonts = Manager.shared.keymanFonts
     var profilesByFontName = [String: String](minimumCapacity: kmFonts.count - 1)
-    for (key, value) in kmFonts where key != "keymanweb-osk.ttf" {
-      let fontName = value[Key.fontName] as! String
-      let type = key[key.range(of: ".", options: .backwards)!.lowerBound...]
-      profilesByFontName[fontName] = key.replacingOccurrences(of: type, with: ".mobileconfig")
+    for (filename, font) in kmFonts where filename != "keymanweb-osk.ttf" {
+      let fontName = font.name
+      let type = filename[filename.range(of: ".", options: .backwards)!.lowerBound...]
+      profilesByFontName[fontName] = filename.replacingOccurrences(of: type, with: ".mobileconfig")
     }
 
     let customFonts = UIFont.familyNames.filter { !systemFonts.contains($0) && !($0 == "KeymanwebOsk") }
