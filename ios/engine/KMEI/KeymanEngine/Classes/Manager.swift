@@ -96,7 +96,19 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   weak var keymanWebDelegate: KeymanWebDelegate?
   var currentRequest: HTTPDownloadRequest?
   var shouldReloadKeyboard = false
-  var keymanWeb: KeymanWebViewController! = nil
+  lazy var keymanWeb: KeymanWebViewController = {
+    let kmw = KeymanWebViewController(nibName: nil, bundle: nil)
+    kmw.frame = CGRect(origin: .zero, size: keyboardSize)
+    kmw.delegate = self
+
+    // Set UILongPressGestureRecognizer to show sub keys
+    // TODO: Move to KeymanWebViewController
+    let hold = UILongPressGestureRecognizer(target: self, action: #selector(self.holdAction))
+    hold.minimumPressDuration = 0.5
+    hold.delegate = self
+    kmw.view.addGestureRecognizer(hold)
+    return kmw
+  }()
 
   private var downloadQueue: HTTPDownloader?
   private var sharedQueue: HTTPDownloader!
@@ -172,18 +184,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                                            name: .UIKeyboardWillHide, object: nil)
 
     updateUserKeyboards(with: Defaults.keyboard)
-
-    keymanWeb = KeymanWebViewController(nibName: nil, bundle: nil)
-    keymanWeb.frame = CGRect(origin: .zero, size: keyboardSize)
-    keymanWeb.delegate = self
-    reloadKeyboard(in: keymanWeb)
-
-    // Set UILongPressGestureRecognizer to show sub keys
-    // TODO: Move to KeymanWebViewController
-    let hold = UILongPressGestureRecognizer(target: self, action: #selector(self.holdAction))
-    hold.minimumPressDuration = 0.5
-    hold.delegate = self
-    keymanWeb.view.addGestureRecognizer(hold)
 
     reachability = Reachability(hostName: keymanHostName)
     NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),
@@ -682,7 +682,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                                           value: keyboards)
           if isUpdate {
             shouldReloadKeyboard = true
-            reloadKeyboard(in: keymanWeb)
+            keymanWeb.reloadKeyboard()
           }
           let userDefaults = Storage.active.userDefaults
           userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
@@ -908,6 +908,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     return CGSize(width: keyboardWidth, height: keyboardHeight)
   }
 
+  public func loadKeyboard() {
+    _ = keymanWeb
+  }
+
   // Keyman interaction
   private func resizeKeyboard() {
     let newSize = keyboardSize
@@ -1002,21 +1006,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   public func dismissKeyboardPicker(_ viewController: UIViewController) {
     viewController.dismiss(animated: true)
     if shouldReloadKeyboard {
-      reloadKeyboard(in: keymanWeb)
+      keymanWeb.reloadKeyboard()
     }
     NotificationCenter.default.post(name: Notifications.keyboardPickerDismissed, object: self, value: ())
-  }
-
-  private func reloadKeyboard(in keymanWeb: KeymanWebViewController) {
-    if #available(iOS 9.0, *) {
-      keymanWeb.webView.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)
-    } else {
-      // WKWebView in iOS < 9 is missing loadFileURL().
-      let request = URLRequest(url: Storage.active.kmwURL,
-                               cachePolicy: .reloadIgnoringCacheData,
-                               timeoutInterval: 60.0)
-      keymanWeb.webView.load(request)
-    }
   }
 
   @objc func resetKeyboard() {
@@ -1451,7 +1443,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       synchronizeSWKeyboard()
       if keyboardID != nil && languageID != nil {
         shouldReloadKeyboard = true
-        reloadKeyboard(in: keymanWeb)
+        keymanWeb.reloadKeyboard()
       }
       didSynchronize = true
       standardUserDef.set(activeUserDef.object(forKey: Key.synchronizeSWKeyboard),

@@ -40,6 +40,8 @@ class KeymanWebViewController: UIViewController {
     webView.scrollView.isScrollEnabled = false
 
     view = webView
+
+    reloadKeyboard()
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -267,5 +269,20 @@ extension KeymanWebViewController: WKNavigationDelegate {
 
 // MARK: - KeymanWebDelegate
 extension KeymanWebViewController: KeymanWebDelegate {
+
+}
+
+extension KeymanWebViewController {
+  func reloadKeyboard() {
+    if #available(iOS 9.0, *) {
+      webView.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)
+    } else {
+      // WKWebView in iOS < 9 is missing loadFileURL().
+      let request = URLRequest(url: Storage.active.kmwURL,
+                               cachePolicy: .reloadIgnoringCacheData,
+                               timeoutInterval: 60.0)
+      webView.load(request)
+    }
+  }
 
 }

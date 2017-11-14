@@ -143,6 +143,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     // Setup Keyman Manager & fetch keyboards list
     Manager.shared.canRemoveDefaultKeyboard = true
     Manager.shared.apiKeyboardRepository.fetch()
+    Manager.shared.loadKeyboard()
 
     let bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
     view?.backgroundColor = bgColor
