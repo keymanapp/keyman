@@ -1,5 +1,7 @@
 #!/bin/sh
 
+BUILD_NUMBER="10.1.0"
+
 # Include our resource functions; they're pretty useful!
 . ../resources/shellHelperFunctions.sh
 
@@ -20,17 +22,21 @@ display_usage ( ) {
 exit 1
 }
 
-fetch ( ) {
-    name="${2##*/}"  # Extract just the filename.
-    echo "Downloading $name"
-    rm $2          2> /dev/null
-    curl -s $1 -o $2
+set_version ( ) {
+  PRODUCT_PATH=$1
+
+  if [ $BUILD_NUMBER ]; then
+    if [ $2 ]; then  # $2 = product name.
+      echo "Setting version numbers in $2 to $BUILD_NUMBER."
+    fi
+    /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" "$PRODUCT_PATH/Info.plist"
+    /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$PRODUCT_PATH/Info.plist"
+  fi
 }
 
 KMEI_RESOURCES=engine/KMEI/KeymanEngine/resources
 KMEI_BUILD_PATH=engine/KMEI/build
 BUNDLE_PATH=$KMEI_RESOURCES/Keyman.bundle/contents/resources
-APP_FRAMEWORK_PATH=keyman/Keyman/KeymanEngine.framework
 APP_BUILD_PATH=keyman/Keyman/build/
 KMW_SOURCE=../web/source
 
@@ -38,7 +44,6 @@ do_clean ( ) {
   rm -rf $KMEI_BUILD_PATH
   rm -rf $APP_BUILD_PATH
   rm -rf $APP_BUNDLE_PATH
-  rm -rf $APP_FRAMEWORK_PATH
 }
 
 ### START OF THE BUILD ###
@@ -88,7 +93,8 @@ done
 APP_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.app
 KEYBOARD_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/SWKeyboard.appex
 ARCHIVE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
-BUILD_FRAMEWORK_PATH=$KMEI_BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
+BUILD_FRAMEWORK_PATH_UNIVERSAL=$KMEI_BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
+BUILD_FRAMEWORK_PATH_IOS=$KMEI_BUILD_PATH/$CONFIG-iphoneos/KeymanEngine.framework
 
 if [ $CLEAN_ONLY = true ]; then
   exit 0
@@ -141,17 +147,10 @@ if [ $? -ne 0 ]; then
   fail "KMEI build failed."
 fi
 
-assertDirExists "$BUILD_FRAMEWORK_PATH"
+assertDirExists "$BUILD_FRAMEWORK_PATH_UNIVERSAL"
 
-if [ $BUILD_NUMBER ]; then
-  echo "Setting version number in KeymanEngine to $BUILD_NUMBER."
-  /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" "$BUILD_FRAMEWORK_PATH/Info.plist"
-  /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$BUILD_FRAMEWORK_PATH/Info.plist"
-fi
-
-# Can we get away without this now?
-# rm -r "$APP_FRAMEWORK_PATH"
-# cp -R "$BUILD_FRAMEWORK_PATH" "$APP_FRAMEWORK_PATH"
+set_version "$BUILD_FRAMEWORK_PATH_UNIVERSAL" "KeymanEngine"
+set_version "$BUILD_FRAMEWORK_PATH_IOS"
 
 echo "KMEI build complete."
 
@@ -167,23 +166,23 @@ if [ $DO_KEYMANAPP = true ]; then
 
     if [ $DO_ARCHIVE = false ]; then
       # Performs the actual build calls.
-      $BUILD_1
-
-      # Pass the build number information along to the Plist file of the keyboard.  We want to intercept it before it's embedded into the app!
-      if [ $BUILD_NUMBER ]; then
-        echo "Setting version number in SWKeyboard to $BUILD_NUMBER."
-        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" "$KEYBOARD_BUNDLE_PATH/Info.plist"
-        /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$KEYBOARD_BUNDLE_PATH/Info.plist"
-      fi
+#      $BUILD_1
+#
+#      if [ $? -ne 0 ]; then
+#        fail "SWKeyboard build failed."
+#      fi
+#
+#      # Pass the build number information along to the Plist file of the keyboard.  We want to intercept it before it's embedded into the app!
+#      set_version "$KEYBOARD_BUNDLE_PATH" "SWKeyboard"
 
       $BUILD_2
 
-      # Pass the build number information along to the Plist file of the app.
-      if [ $BUILD_NUMBER ]; then
-        echo "Setting version number in Keyman app to $BUILD_NUMBER."
-        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" "$APP_BUNDLE_PATH/Info.plist"
-        /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$APP_BUNDLE_PATH/Info.plist"
+      if [ $? -ne 0 ]; then
+        fail "Keyman app build failed."
       fi
+
+      # Pass the build number information along to the Plist file of the app.
+      set_version "$APP_BUNDLE_PATH" "Keyman"
     else
       # Time to prepare the deployment archive data.
       echo ""
@@ -197,10 +196,12 @@ if [ $DO_KEYMANAPP = true ]; then
         echo "Setting version numbers to $BUILD_NUMBER."
         /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleVersion $BUILD_NUMBER" "$ARCHIVE_PATH/Info.plist"
         /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleShortVersionString $BUILD_NUMBER" "$ARCHIVE_PATH/Info.plist"
-        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER"            "$ARCHIVE_PATH/Products/Applications/Keyman.app/Info.plist"
-        /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$ARCHIVE_PATH/Products/Applications/Keyman.app/Info.plist"
-        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER"            "$ARCHIVE_PATH/Products/Applications/Keyman.app/Plugins/SWKeyboard.appex/Info.plist"
-        /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$ARCHIVE_PATH/Products/Applications/Keyman.app/Plugins/SWKeyboard.appex/Info.plist"
+
+        ARCHIVE_APP="$ARCHIVE_PATH/Products/Applications/Keyman.app"
+        ARCHIVE_KBD="$ARCHIVE_APP/Plugins/SWKeyboard.appex"
+
+        set_version "$ARCHIVE_APP" "Keyman"
+        set_version "$ARCHIVE_KBD"
       fi
 
       xcodebuild -quiet -exportArchive -archivePath keyman/Keyman/build/${CONFIG}-iphoneos/Keyman.xcarchive -exportOptionsPlist exportAppStore.plist -exportPath keyman/keyman/build/${CONFIG}-iphoneos -configuration $CONFIG  -allowProvisioningUpdates
