@@ -914,7 +914,7 @@ begin
           ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags CAPS and NCAPS are not supported in KeymanWeb');
         end;
 
-        Result := KMX_ISVIRTUALKEY or (Integer(fkp.ShiftFlags) and $70)
+        Result := KMX_ISVIRTUALKEY or (Integer(fkp.ShiftFlags) and (KMX_SHIFTFLAG or KMX_CTRLFLAG or KMX_ALTFLAG));
       end;
     end
     else
