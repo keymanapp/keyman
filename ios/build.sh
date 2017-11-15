@@ -34,7 +34,6 @@ set_version ( ) {
 
 do_clean ( ) {
   rm -rf $BUILD_PATH
-  rm -rf engine/KMEI/build # Something's still getting put there for some reason.
   rm -rf $APP_BUNDLE_PATH
 }
 
