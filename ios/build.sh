@@ -1,7 +1,5 @@
 #!/bin/sh
 
-BUILD_NUMBER="10.1.0"
-
 # Include our resource functions; they're pretty useful!
 . ../resources/shellHelperFunctions.sh
 
@@ -161,10 +159,7 @@ if [ $DO_KEYMANAPP = true ]; then
     fi
 
     if [ $DO_ARCHIVE = false ]; then
-      # To dynamically set the parameters in a way xcodebuild can use them, we need to construct the entire xcodebuild call as a string first.
-      BUILD_CMD="xcodebuild -quiet -workspace keymanios.xcworkspace ${CODE_SIGN_IDENTITY} ${CODE_SIGNING_REQUIRED} ${DEV_TEAM} -configuration ${CONFIG} -derivedDataPath keyman/Keyman/build -scheme Keyman"
-
-      $BUILD_CMD
+      xcodebuild -quiet -workspace keymanios.xcworkspace ${CODE_SIGN_IDENTITY} ${CODE_SIGNING_REQUIRED} ${DEV_TEAM} -configuration ${CONFIG} -derivedDataPath keyman/Keyman/build -scheme Keyman
 
       if [ $? -ne 0 ]; then
         fail "Keyman app build failed."
