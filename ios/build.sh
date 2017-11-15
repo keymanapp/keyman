@@ -32,19 +32,17 @@ set_version ( ) {
   fi
 }
 
-KMEI_RESOURCES=engine/KMEI/KeymanEngine/resources
-KMEI_BUILD_PATH=engine/KMEI/build
-BUNDLE_PATH=$KMEI_RESOURCES/Keyman.bundle/contents/resources
-APP_BUILD_PATH=keyman/Keyman/build
-KMW_SOURCE=../web/source
-
 do_clean ( ) {
-  rm -rf $KMEI_BUILD_PATH
-  rm -rf $APP_BUILD_PATH
+  rm -rf $BUILD_PATH
+  rm -rf engine/KMEI/build # Something's still getting put there for some reason.
   rm -rf $APP_BUNDLE_PATH
 }
 
 ### START OF THE BUILD ###
+
+# Base definitions (must be before do_clean call)
+DERIVED_DATA=build
+BUILD_PATH=$DERIVED_DATA/Build/Products
 
 # Default is building and copying to assets
 DO_KMW_BUILD=true
@@ -70,6 +68,7 @@ while [[ $# -gt 0 ]] ; do
         -no-codesign)
             CODE_SIGN_IDENTITY="CODE_SIGN_IDENTITY="
             CODE_SIGNING_REQUIRED="CODE_SIGNING_REQUIRED=NO"
+            CODE_SIGN="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO $DEV_TEAM"
             DO_ARCHIVE=false
             ;;
         -no-archive)
@@ -88,11 +87,19 @@ while [[ $# -gt 0 ]] ; do
     shift # past argument
 done
 
-APP_BUNDLE_PATH=$APP_BUILD_PATH/Build/Products/${CONFIG}-iphoneos/Keyman.app
-KEYBOARD_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/SWKeyboard.appex
-ARCHIVE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
-BUILD_FRAMEWORK_PATH_UNIVERSAL=$KMEI_BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
-BUILD_FRAMEWORK_PATH_IOS=$KMEI_BUILD_PATH/$CONFIG-iphoneos/KeymanEngine.framework
+# Extended path definitions
+KMEI_RESOURCES=engine/KMEI/KeymanEngine/resources
+BUNDLE_PATH=$KMEI_RESOURCES/Keyman.bundle/contents/resources
+KMW_SOURCE=../web/source
+
+# Build product paths
+APP_BUNDLE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/Keyman.app
+KEYBOARD_BUNDLE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/SWKeyboard.appex
+ARCHIVE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
+FRAMEWORK_PATH_UNIVERSAL=$BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
+FRAMEWORK_PATH_IOS=$BUILD_PATH/$CONFIG-iphoneos/KeymanEngine.framework
+
+COMMON_CONFIG="-quiet -configuration $CONFIG -derivedDataPath $DERIVED_DATA"
 
 if [ $CLEAN_ONLY = true ]; then
   exit 0
@@ -135,20 +142,17 @@ update_bundle
 echo
 echo "Building KMEI..."
 
-#OTHER_CFLAGS=-fembed-bitcode is relied upon for building the samples by command-line.  They build fine within XCode itself without it, though.
-
-rm -r $KMEI_BUILD_PATH/$CONFIG-universal 2>/dev/null
-xcodebuild -quiet -project engine/KMEI/KeymanEngine.xcodeproj -target KME-universal -configuration $CONFIG \
-  $CODE_SIGN_IDENTITY $CODE_SIGNING_REQUIRED $DEV_TEAM
+rm -r $BUILD_PATH/$CONFIG-universal 2>/dev/null
+xcodebuild $COMMON_CONFIG -workspace keymanios.xcworkspace -scheme KME-universal $CODE_SIGN
 
 if [ $? -ne 0 ]; then
   fail "KMEI build failed."
 fi
 
-assertDirExists "$BUILD_FRAMEWORK_PATH_UNIVERSAL"
+assertDirExists "$FRAMEWORK_PATH_UNIVERSAL"
 
-set_version "$BUILD_FRAMEWORK_PATH_UNIVERSAL" "KeymanEngine"
-set_version "$BUILD_FRAMEWORK_PATH_IOS"
+set_version "$FRAMEWORK_PATH_UNIVERSAL" "KeymanEngine"
+set_version "$FRAMEWORK_PATH_IOS"
 
 echo "KMEI build complete."
 
@@ -159,7 +163,7 @@ if [ $DO_KEYMANAPP = true ]; then
     fi
 
     if [ $DO_ARCHIVE = false ]; then
-      xcodebuild -quiet -workspace keymanios.xcworkspace ${CODE_SIGN_IDENTITY} ${CODE_SIGNING_REQUIRED} ${DEV_TEAM} -configuration ${CONFIG} -derivedDataPath keyman/Keyman/build -scheme Keyman
+      xcodebuild $COMMON_CONFIG -workspace keymanios.xcworkspace -scheme Keyman $CODE_SIGN
 
       if [ $? -ne 0 ]; then
         fail "Keyman app build failed."
@@ -172,7 +176,7 @@ if [ $DO_KEYMANAPP = true ]; then
       # Time to prepare the deployment archive data.
       echo ""
       echo "Preparing .ipa file for deployment."
-      xcodebuild -quiet -workspace keymanios.xcworkspace -scheme Keyman -archivePath $ARCHIVE_PATH archive -configuration $CONFIG -allowProvisioningUpdates
+      xcodebuild $COMMON_CONFIG -workspace keymanios.xcworkspace -scheme Keyman -archivePath $ARCHIVE_PATH archive -allowProvisioningUpdates
 
       assertDirExists "$ARCHIVE_PATH"
 
@@ -189,10 +193,9 @@ if [ $DO_KEYMANAPP = true ]; then
         set_version "$ARCHIVE_KBD"
       fi
 
-      xcodebuild -quiet -exportArchive -archivePath keyman/Keyman/build/${CONFIG}-iphoneos/Keyman.xcarchive -exportOptionsPlist exportAppStore.plist -exportPath keyman/keyman/build/${CONFIG}-iphoneos -configuration $CONFIG  -allowProvisioningUpdates
+      xcodebuild -quiet -configuration $CONFIG -exportArchive -archivePath $BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive -exportOptionsPlist exportAppStore.plist -exportPath $BUILD_PATH/${CONFIG}-iphoneos  -allowProvisioningUpdates
     fi
 
-    #The resulting archives are placed in the keyman/Keyman/build/Release-iphoneos folder.
     echo ""
     if [ $? = 0 ]; then
         echo "Build succeeded."
