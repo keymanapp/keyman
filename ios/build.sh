@@ -34,7 +34,6 @@ set_version ( ) {
 
 do_clean ( ) {
   rm -rf $BUILD_PATH
-  rm -rf $APP_BUNDLE_PATH
 }
 
 ### START OF THE BUILD ###
@@ -65,8 +64,6 @@ while [[ $# -gt 0 ]] ; do
             DO_KEYMANAPP=false
             ;;
         -no-codesign)
-            CODE_SIGN_IDENTITY="CODE_SIGN_IDENTITY="
-            CODE_SIGNING_REQUIRED="CODE_SIGNING_REQUIRED=NO"
             CODE_SIGN="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO $DEV_TEAM"
             DO_ARCHIVE=false
             ;;
@@ -98,7 +95,8 @@ ARCHIVE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
 FRAMEWORK_PATH_UNIVERSAL=$BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
 FRAMEWORK_PATH_IOS=$BUILD_PATH/$CONFIG-iphoneos/KeymanEngine.framework
 
-COMMON_CONFIG="-quiet -configuration $CONFIG -derivedDataPath $DERIVED_DATA"
+XCODEFLAGS="-quiet -configuration $CONFIG"
+XCODEFLAGS_EXT="$XCODEFLAGS -derivedDataPath $DERIVED_DATA -workspace keymanios.xcworkspace"
 
 if [ $CLEAN_ONLY = true ]; then
   exit 0
@@ -142,7 +140,7 @@ echo
 echo "Building KMEI..."
 
 rm -r $BUILD_PATH/$CONFIG-universal 2>/dev/null
-xcodebuild $COMMON_CONFIG -workspace keymanios.xcworkspace -scheme KME-universal $CODE_SIGN
+xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal
 
 if [ $? -ne 0 ]; then
   fail "KMEI build failed."
@@ -162,7 +160,7 @@ if [ $DO_KEYMANAPP = true ]; then
     fi
 
     if [ $DO_ARCHIVE = false ]; then
-      xcodebuild $COMMON_CONFIG -workspace keymanios.xcworkspace -scheme Keyman $CODE_SIGN
+      xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman
 
       if [ $? -ne 0 ]; then
         fail "Keyman app build failed."
@@ -175,7 +173,7 @@ if [ $DO_KEYMANAPP = true ]; then
       # Time to prepare the deployment archive data.
       echo ""
       echo "Preparing .ipa file for deployment."
-      xcodebuild $COMMON_CONFIG -workspace keymanios.xcworkspace -scheme Keyman -archivePath $ARCHIVE_PATH archive -allowProvisioningUpdates
+      xcodebuild $XCODEFLAGS_EXT -scheme Keyman -archivePath $ARCHIVE_PATH archive -allowProvisioningUpdates
 
       assertDirExists "$ARCHIVE_PATH"
 
@@ -192,7 +190,7 @@ if [ $DO_KEYMANAPP = true ]; then
         set_version "$ARCHIVE_KBD"
       fi
 
-      xcodebuild -quiet -configuration $CONFIG -exportArchive -archivePath $BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive -exportOptionsPlist exportAppStore.plist -exportPath $BUILD_PATH/${CONFIG}-iphoneos  -allowProvisioningUpdates
+      xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
     fi
 
     echo ""

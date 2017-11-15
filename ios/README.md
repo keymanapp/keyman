@@ -16,7 +16,7 @@ You will need to run with the command-line argument `-no-codesign` or establish 
 complete the build for the final app.
 
 To run the app within a simulator after build.sh is completed,
-1. Open the **keymanios.xcworkspace** in Xcode.
+1. Open **keymanios.xcworkspace** in Xcode.
 2. Run the Keyman target.
 
 The Keyman app relies on KeymanEngine.framework, which will automatically be rebuilt by Xcode whenever it is changed.

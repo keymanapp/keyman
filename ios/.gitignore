@@ -3,9 +3,6 @@ DerivedData
 project.xcworkspace
 xcuserdata
 build
-engine/KMEI/build
-keyman/Keyman/build
-keyman/Keyman/Release-universal
 keyman/Keyman/KeymanEngine.framework
 samples/KMSample1/KeymanEngine.framework
 samples/KMSample1/build
