@@ -87,7 +87,7 @@ while [[ $# -gt 0 ]] ; do
     shift
 done
 
-KEYMAN_ENGINE_FRAMEWORK_SRC="../../engine/KMEI/build/$CONFIG-universal/KeymanEngine.framework"
+KEYMAN_ENGINE_FRAMEWORK_SRC="../../build/Build/Products/$CONFIG-universal/KeymanEngine.framework"
 KEYMAN_ENGINE_FRAMEWORK_DST=./
 
 if [ $DO_UPDATE = true ]; then
