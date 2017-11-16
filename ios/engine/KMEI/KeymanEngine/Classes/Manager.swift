@@ -678,20 +678,16 @@ UIGestureRecognizerDelegate {
     if keyboardIdForCurrentRequest() == keyboardID {
       return .downloading
     }
-    guard let latestVersion = latestKeyboardFileVersion(withID: keyboardID) else {
+    guard let latestDownloadedVersion = latestKeyboardFileVersion(withID: keyboardID) else {
       return .needsDownload
     }
 
     // Check version
-    guard let keyboardsInfo = keyboardsInfo else {
-      return .upToDate
-    }
-    let kbVersion = keyboardsInfo[keyboardID]!.version
-    if compareVersions(latestVersion, kbVersion) == .orderedDescending {
-      return .upToDate
-    } else {
+    if let latestRepositoryVersion = keyboardsInfo?[keyboardID]?.version,
+      compareVersions(latestDownloadedVersion, latestRepositoryVersion) == .orderedAscending {
       return .needsUpdate
     }
+    return .upToDate
   }
 
   /// - Precondition: `languages` is set.
