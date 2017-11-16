@@ -23,15 +23,17 @@ class ViewController: UIViewController, TextViewDelegate {
                                    shouldOverwrite: true)
     Manager.shared.registerCustomFonts()
 
-    Manager.shared.addKeyboard(withID: DefaultKeyboard.keyboardID,
-                               languageID: DefaultKeyboard.languageID,
-                               keyboardName: DefaultKeyboard.keyboardName,
-                               languageName: DefaultKeyboard.languageName,
-                               isRTL: false, isCustom: false,
-                               font: DefaultKeyboard.keyboardFont, oskFont: nil)
-    Manager.shared.addKeyboard(withID: "tamil99m", languageID: "tam",
-                               keyboardName: "Tamil 99M", languageName: "Tamil",
-                               isRTL: false, isCustom: true, font: "aava1.ttf", oskFont: nil)
+    Manager.shared.addKeyboard(Constants.defaultKeyboard)
+    let kb = InstallableKeyboard(id: "tamil99m",
+                                 name: "Tamil 99M",
+                                 languageID: "tam",
+                                 languageName: "Tamil",
+                                 version: "1.1",
+                                 isRTL: false,
+                                 font: Font(filename: "aava1.ttf"),
+                                 oskFont: nil,
+                                 isCustom: true)
+    Manager.shared.addKeyboard(kb)
 
     textView.setKeymanDelegate(self)
     textView.viewController = self

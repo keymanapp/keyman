@@ -13,12 +13,18 @@ private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
 
 class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
-  var languageIndex = 0
-  var languageName = ""
-  var languageID = ""
-  var keyboards: [[String: Any]] = []
-  private var userKeyboards: [String: [String: Any]] = [:]
+  private var userKeyboards: [String: InstallableKeyboard] = [:]
   private var isUpdate = false
+  private let language: Language
+
+  init(language: Language) {
+    self.language = language
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
   override func loadView() {
     super.loadView()
@@ -38,7 +44,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   override func numberOfSections(in tableView: UITableView) -> Int {
-    return keyboards.count
+    return language.keyboards!.count
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -59,11 +65,11 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    let keyboard = language.keyboards![indexPath.section]
     let cell = cell as! KeyboardNameTableViewCell
     cell.indexPath = indexPath
-    cell.textLabel?.text = (keyboards[indexPath.section][Key.name] as! String)
-    let keyboardID = keyboards[indexPath.section][Key.id] as! String
-    if isAdded(languageID: languageID, keyboardID: keyboardID) {
+    cell.textLabel?.text = keyboard.name
+    if isAdded(languageID: language.id, keyboardID: keyboard.id) {
       cell.accessoryType = .checkmark
       cell.isUserInteractionEnabled = false
       cell.textLabel?.isEnabled = false
@@ -75,16 +81,15 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
       cell.detailTextLabel?.isEnabled = true
     }
 
-    let kbState = Manager.shared.stateForKeyboard(withID: keyboardID)
+    let kbState = Manager.shared.stateForKeyboard(withID: keyboard.id)
     cell.setKeyboardState(kbState, selected: false, defaultAccessoryType: cell.accessoryType)
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.cellForRow(at: indexPath)?.isSelected = false
-    let kbID = keyboards[indexPath.section][Key.id] as! String
-    let kbName = keyboards[indexPath.section][Key.name]
+    let keyboard = language.keyboards![indexPath.section]
 
-    let state = Manager.shared.stateForKeyboard(withID: kbID)
+    let state = Manager.shared.stateForKeyboard(withID: keyboard.id)
     if state != .downloading {
       if state == .needsDownload {
         isUpdate = false
@@ -92,7 +97,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
         isUpdate = true
       }
 
-      let alert = UIAlertView(title: "\(languageName): \(kbName!)",
+      let alert = UIAlertView(title: "\(language.name): \(keyboard.name)",
                               message: "Would you like to download this keyboard?",
                               delegate: self,
                               cancelButtonTitle: "Cancel",
@@ -105,8 +110,8 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   func alertView(_ alertView: UIAlertView, clickedButtonAt buttonIndex: Int) {
     // Keyboard download confirmation alert (tag is used for keyboard index).
     if buttonIndex != alertView.cancelButtonIndex {
-      Manager.shared.downloadKeyboard(forLanguageIndex: languageIndex,
-                                      keyboardIndex: alertView.tag, isUpdate: isUpdate)
+      Manager.shared.downloadKeyboard(withID: language.keyboards![alertView.tag].id,
+                                      languageID: language.id, isUpdate: isUpdate)
     }
   }
 
@@ -149,17 +154,14 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
   private func loadUserKeyboards() {
     let userData = Manager.shared.activeUserDefaults()
-    guard let userKbList = userData.array(forKey: Key.userKeyboardsList) as? [[String: String]],
-      !userKbList.isEmpty else {
+    guard let userKbList = userData.userKeyboards, !userKbList.isEmpty else {
       userKeyboards = [:]
       return
     }
 
     userKeyboards = [:]
     for kb in userKbList {
-      let langID = kb[Key.languageId]
-      let kbID = kb[Key.keyboardId]
-      let dictKey = "\(langID!)_\(kbID!)"
+      let dictKey = "\(kb.languageID)_\(kb.id)"
       userKeyboards[dictKey] = kb
     }
   }

@@ -155,24 +155,16 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
 
     if alertView.tag == 1 {
       let userData = Manager.shared.activeUserDefaults()
-      let userKeyboards = userData.array(forKey: Key.userKeyboardsList) as! [[String: String]]
-      let kbDict = userKeyboards[keyboardIndex]
+      let userKeyboards = userData.userKeyboards!
+      let kb = userKeyboards[keyboardIndex]
 
       if Manager.shared.removeKeyboard(at: keyboardIndex) {
         if isCurrentKeyboard {
           // Select default keyboard
-
-          let kbID = userKeyboards[0][Key.keyboardId]!
-          let langID = userKeyboards[0][Key.languageId]!
-          let kbName = userKeyboards[0][Key.keyboardName]
-          let langName = userKeyboards[0][Key.languageName]
-          let font = userKeyboards[0][Key.font]
-          let oskFont = userKeyboards[0][Key.oskFont]
-          Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-                                     languageName: langName, font: font, oskFont: oskFont)
+          Manager.shared.setKeyboard(kb)
         }
         NotificationCenter.default.post(name: NSNotification.Name.keymanKeyboardRemoved,
-                                        object: self, userInfo: [Key.keyboardInfo: kbDict]
+                                        object: self, userInfo: [Key.keyboardInfo: kb]
         )
         navigationController?.popToRootViewController(animated: true)
       }

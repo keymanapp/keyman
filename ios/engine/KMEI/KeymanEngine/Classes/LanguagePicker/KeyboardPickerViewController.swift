@@ -14,8 +14,8 @@ private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
 
 class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
-  private var userKeyboards: [[String: String]] = []
-  private var updateQueue: [[String: String]]?
+  private var userKeyboards: [InstallableKeyboard] = []
+  private var updateQueue: [InstallableKeyboard]?
   private var _isDoneButtonEnabled = false
   private var isDidUpdateCheck = false
 
@@ -131,26 +131,15 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       return
     }
 
-    let kbDict = userKeyboards[indexPath.row]
-    let selKbID = kbDict[Key.keyboardId]
-    let selLangID = kbDict[Key.languageId]
-    let isCurrentKB = isCurrentKeyboard(languageID: selLangID, keyboardID: selKbID)
-
     if Manager.shared.removeKeyboard(at: indexPath.row) {
-      let userData = Manager.shared.activeUserDefaults()
-      userKeyboards = userData.array(forKey: Key.userKeyboardsList) as! [[String: String]]
-      if isCurrentKB {
-        let kbID = userKeyboards[0][Key.keyboardId]
-        let langID = userKeyboards[0][Key.languageId]
-        let kbName = userKeyboards[0][Key.keyboardName]
-        let langName = userKeyboards[0][Key.languageName]
-        let font = userKeyboards[0][Key.font]
-        let oskFont = userKeyboards[0][Key.oskFont]
-        Manager.shared.setKeyboard(withID: kbID!, languageID: langID!, keyboardName: kbName,
-                                   languageName: langName, font: font, oskFont: oskFont)
+      let kb = userKeyboards[indexPath.row]
+      if isCurrentKeyboard(languageID: kb.id, keyboardID: kb.languageID) {
+        let userData = Manager.shared.activeUserDefaults()
+        userKeyboards = userData.userKeyboards!
+        Manager.shared.setKeyboard(userKeyboards[0])
       }
       NotificationCenter.default.post(name: NSNotification.Name.keymanKeyboardRemoved,
-        object: self, userInfo: [Key.keyboardInfo: kbDict])
+        object: self, userInfo: [Key.keyboardInfo: kb])
       self.tableView.reloadData()
     }
     setIsDoneButtonEnabled(true)
@@ -163,22 +152,17 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
   func showKeyboardInfoView(with index: Int) {
     setIsDoneButtonEnabled(true)
-    let kbID  = userKeyboards[index][Key.keyboardId]!
-    let langID = userKeyboards[index][Key.languageId]!
-    let kbName = userKeyboards[index][Key.keyboardName]
-    let isCustom = userKeyboards[index][Key.customKeyboard] == "Y"
-    let kbVersion = userKeyboards[index][Key.keyboardVersion]
-      ?? Manager.shared.latestKeyboardFileVersion(withID: kbID)
-      ?? "1.0"
+    let kb = userKeyboards[index]
+    let version = kb.version
 
     let infoView = KeyboardInfoViewController()
-    infoView.title = kbName
+    infoView.title = kb.name
     infoView.keyboardCount = userKeyboards.count
     infoView.keyboardIndex = index
-    infoView.keyboardID = kbID
-    infoView.languageID = langID
-    infoView.keyboardVersion = kbVersion
-    infoView.isCustomKeyboard = isCustom
+    infoView.keyboardID = kb.id
+    infoView.languageID = kb.languageID
+    infoView.keyboardVersion = version
+    infoView.isCustomKeyboard = kb.isCustom
     navigationController?.pushViewController(infoView, animated: true)
   }
 
@@ -186,14 +170,13 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
                           willDisplay cell: UITableViewCell,
                           forRowAt indexPath: IndexPath) {
     cell.selectionStyle = .none
-    let languageID = userKeyboards[indexPath.row][Key.languageId]
-    let keyboardID = userKeyboards[indexPath.row][Key.keyboardId]
+    let kb = userKeyboards[indexPath.row]
 
-    cell.textLabel?.text = userKeyboards[indexPath.row][Key.languageName]
-    cell.detailTextLabel?.text = userKeyboards[indexPath.row][Key.keyboardName]
+    cell.textLabel?.text = kb.languageName
+    cell.detailTextLabel?.text = kb.name
     cell.tag = indexPath.row
 
-    if isCurrentKeyboard(languageID: languageID, keyboardID: keyboardID) {
+    if isCurrentKeyboard(languageID: kb.languageID, keyboardID: kb.id) {
       cell.selectionStyle = .blue
       cell.isSelected = true
       cell.accessoryType = .detailDisclosureButton
@@ -222,17 +205,17 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       Manager.shared.shouldReloadKeyboard = true
 
       // Update keyboard version
-      let downloadedKbInfo = notification.userInfo?[Key.keyboardInfo] as? [String: String]
-      if let kbID = downloadedKbInfo?[Key.keyboardId],
-         let currentKbInfo = Manager.shared.keyboardsInfo?[kbID],
-         let kbVersion = currentKbInfo[Key.keyboardVersion] {
-        Manager.shared.updateKeyboardVersion(forID: kbID, newKeyboardVersion: kbVersion)
+      let keyboards = notification.userInfo?[Key.keyboardInfo] as! [InstallableKeyboard]
+      for keyboard in keyboards {
+        if let currentKbInfo = Manager.shared.keyboardsInfo?[keyboard.id] {
+          Manager.shared.updateKeyboardVersion(forID: keyboard.id, newKeyboardVersion: currentKbInfo.version)
+        }
       }
 
       updateQueue!.remove(at: 0)
       if !updateQueue!.isEmpty {
-        let langID = updateQueue![0][Key.languageId]!
-        let kbID = updateQueue![0][Key.keyboardId]!
+        let langID = updateQueue![0].languageID
+        let kbID = updateQueue![0].id
         Manager.shared.downloadKeyboard(withID: kbID, languageID: langID, isUpdate: true)
       } else {
         loadUserKeyboards()
@@ -261,23 +244,13 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
         navigationItem.rightBarButtonItem?.isEnabled = true
       }
 
-      let kbInfo = notification.userInfo?[Key.keyboardInfo] as? [String: String]
-      let langID = kbInfo![Key.languageId]!
-      let kbID  = kbInfo![Key.keyboardId]!
-      let key  = "\(langID)_\(kbID)"
-      let keyboardDict = Manager.shared.keyboardsDictionary[key]
-      let langName  = keyboardDict![Key.languageName]!
-      let kbName  = keyboardDict![Key.keyboardName]!
-      let isRTL  = keyboardDict?[Key.keyboardRTL] == "Y"
-      let font  = keyboardDict?[Key.font]
-      let oskFont = keyboardDict?[Key.oskFont]
-
       // Add keyboard.
-      Manager.shared.addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-                                 languageName: langName, isRTL: isRTL, isCustom: false, font: font,
-                                 oskFont: oskFont)
-      Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-                                 languageName: langName, font: font, oskFont: oskFont)
+      let keyboards = notification.userInfo![Key.keyboardInfo] as! [InstallableKeyboard]
+      for keyboard in keyboards {
+        Manager.shared.addKeyboard(keyboard)
+        Manager.shared.setKeyboard(keyboard)
+      }
+
       navigationController?.popToRootViewController(animated: true)
     }
   }
@@ -310,15 +283,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
   private func switchKeyboard(_ index: Int) {
     // Switch keyboard and register to user defaults.
-    let langID = userKeyboards[index][Key.languageId]!
-    let kbID = userKeyboards[index][Key.keyboardId]!
-    let langName = userKeyboards[index][Key.languageName]
-    let kbName = userKeyboards[index][Key.keyboardName]
-    let font = userKeyboards[index][Key.font]
-    let oskFont = userKeyboards[index][Key.oskFont]
-
-    if Manager.shared.setKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-                                  languageName: langName, font: font, oskFont: oskFont) {
+    if Manager.shared.setKeyboard(userKeyboards[index]) {
       tableView.reloadData()
     }
 
@@ -330,21 +295,11 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   private func loadUserKeyboards() {
     let userData = Manager.shared.activeUserDefaults()
 
-    if let userKeyboards = userData.array(forKey: Key.userKeyboardsList) as? [[String: String]] {
+    if let userKeyboards = userData.userKeyboards {
       self.userKeyboards = userKeyboards
     } else {
-      let kbVersion = Manager.shared.latestKeyboardFileVersion(withID: DefaultKeyboard.keyboardID)
-      userKeyboards = [[
-        Key.keyboardId: DefaultKeyboard.keyboardID,
-        Key.languageId: DefaultKeyboard.languageID,
-        Key.keyboardName: DefaultKeyboard.keyboardName,
-        Key.languageName: DefaultKeyboard.languageName,
-        Key.keyboardVersion: kbVersion ?? "nil",
-        Key.keyboardRTL: DefaultKeyboard.keyboardRTL,
-        Key.font: DefaultKeyboard.keyboardFont
-      ]]
-
-      userData.set(userKeyboards, forKey: Key.userKeyboardsList)
+      userKeyboards = [Constants.defaultKeyboard]
+      userData.userKeyboards = userKeyboards
       userData.synchronize()
     }
 
@@ -352,11 +307,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func isAdded(languageID langID: String, keyboardID kbID: String) -> Bool {
-    return userKeyboards.contains { keyboard in
-      let languageID = keyboard[Key.languageId]
-      let keyboardID = keyboard[Key.keyboardId]
-      return languageID == langID && keyboardID == kbID
-    }
+    return userKeyboards.contains { kb in kb.languageID == langID && kb.id == kbID }
   }
 
   @objc func doneClicked(_ sender: Any) {
@@ -407,39 +358,34 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
     isDidUpdateCheck = true
     return userKeyboards.contains { keyboard in
-      let kbID = keyboard[Key.keyboardId]!
+      let kbID = keyboard.id
       return Manager.shared.stateForKeyboard(withID: kbID) == .needsUpdate
     }
   }
 
   private func updateKeyboards() {
-    updateQueue = [[String: String]]()
+    updateQueue = []
     var kbIDs = Set<String>()
     for kb in userKeyboards {
-      guard let kbID = kb[Key.keyboardId] else {
-        continue
-      }
-      let kbState = Manager.shared.stateForKeyboard(withID: kbID)
+      let kbState = Manager.shared.stateForKeyboard(withID: kb.id)
       if kbState == .needsUpdate {
-        if !kbIDs.contains(kbID) {
-          kbIDs.insert(kbID)
+        if !kbIDs.contains(kb.id) {
+          kbIDs.insert(kb.id)
           updateQueue!.append(kb)
         }
       }
     }
 
     if !updateQueue!.isEmpty {
-      let langID = updateQueue![0][Key.languageId]!
-      let kbID = updateQueue![0][Key.keyboardId]!
+      let langID = updateQueue![0].languageID
+      let kbID = updateQueue![0].id
       Manager.shared.downloadKeyboard(withID: kbID, languageID: langID, isUpdate: true)
     }
   }
 
   private func scroll(toSelectedKeyboard animated: Bool) {
     let index = userKeyboards.index { kb in
-      let langID = kb[Key.languageId]
-      let kbID = kb[Key.keyboardId]
-      return isCurrentKeyboard(languageID: langID, keyboardID: kbID)
+      return isCurrentKeyboard(languageID: kb.languageID, keyboardID: kb.id)
     }
 
     if let index = index {

@@ -254,7 +254,7 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
     let isRTL: Bool
     if let keyboardID = Manager.shared.keyboardID,
       let languageID = Manager.shared.languageID {
-      isRTL = Manager.shared.isRTLKeyboard(withID: keyboardID, languageID: languageID)
+      isRTL = Manager.shared.isRTLKeyboard(withID: keyboardID, languageID: languageID) ?? false
     } else {
       isRTL = false
     }
@@ -330,10 +330,9 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
       return
     }
 
-    let kbInfo = notification.userInfo?[Key.keyboardInfo] as? [AnyHashable: Any]
-    let keyboardID = kbInfo?[Key.keyboardId] as? String
-    let languageID = kbInfo?[Key.languageId] as? String
-    let fontName = Manager.shared.fontNameForKeyboard(withID: keyboardID!, languageID: languageID!)
+    // TODO: Get font name directly from keyboard object
+    let kb = notification.userInfo?[Key.keyboardInfo] as! InstallableKeyboard
+    let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID)
     let fontSize = font?.pointSize ?? UIFont.systemFontSize
     if let fontName = fontName {
       font = UIFont(name: fontName, size: fontSize)
