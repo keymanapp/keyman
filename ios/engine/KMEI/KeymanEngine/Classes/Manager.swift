@@ -309,9 +309,9 @@ UIGestureRecognizerDelegate {
       perform(showHelpBubble, with: nil, afterDelay: 1.5)
     }
 
-    NotificationCenter.default.post(name: .keymanKeyboardChanged,
+    NotificationCenter.default.post(name: Notifications.keyboardChanged,
                                     object: self,
-                                    userInfo: [Key.keyboardInfo: kb])
+                                    value: kb)
     return true
   }
 
@@ -377,8 +377,7 @@ UIGestureRecognizerDelegate {
     userData.set([Date()], forKey: Key.synchronizeSWKeyboard)
     userData.synchronize()
 
-    NotificationCenter.default.post(name: .keymanKeyboardRemoved, object: self,
-                                    userInfo: [Key.keyboardInfo: kb])
+    NotificationCenter.default.post(name: Notifications.keyboardRemoved, object: self, value: kb)
     return true
   }
 
@@ -479,7 +478,7 @@ UIGestureRecognizerDelegate {
   /// Asynchronously fetches the dictionary of possible languages/keyboards to be displayed in the keyboard picker.
   /// If not called before the picker is shown, the dictionary will be fetched automatically.
   /// This method allows you to fetch the info in advance at a time that's appropriate for your app.
-  /// See `NSNotification.Name+Notifications` for a list of relevant notifications.
+  /// See `Notifications` for a list of relevant notifications.
   ///
   /// To save bandwidth, a cached version is used if:
   /// - the Keyman server is unreachable
@@ -506,7 +505,7 @@ UIGestureRecognizerDelegate {
   }
 
   /// Asynchronously fetches the .js file for the keyboard with given IDs.
-  /// See `NSNotification+Notifications` for notification on success/failiure.
+  /// See `Notifications` for notification on success/failiure.
   /// - Parameters:
   ///   - isUpdate: Keep the keyboard files on failure
   public func downloadKeyboard(withID keyboardID: String, languageID: String, isUpdate: Bool) {
@@ -792,7 +791,9 @@ UIGestureRecognizerDelegate {
     // If we're downloading a new keyboard.
     // The extra check is there to filter out other potential request types in the future.
     if request.tag == 0 && request.typeCode == .downloadFile {
-      NotificationCenter.default.post(name: .keymanKeyboardDownloadStarted, object: self, userInfo: request.userInfo)
+      NotificationCenter.default.post(name: Notifications.keyboardDownloadStarted,
+                                      object: self,
+                                      value: request.userInfo[Key.keyboardInfo] as! [InstallableKeyboard])
     }
   }
 
@@ -813,8 +814,9 @@ UIGestureRecognizerDelegate {
           registerCustomFonts()
           kmLog("Downloaded keyboard: \(kbID).", checkDebugPrinting: true)
 
-          NotificationCenter.default.post(name: .keymanKeyboardDownloadCompleted, object: self,
-                                          userInfo: request.userInfo)
+          NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
+                                          object: self,
+                                          value: keyboards)
           if isUpdate {
             shouldReloadKeyboard = true
             reloadKeyboard(in: inputView)
@@ -861,8 +863,7 @@ UIGestureRecognizerDelegate {
           kmLog("Failed: \(error).", checkDebugPrinting: true)
           let error = NSError(domain: "Keyman", code: 0,
                               userInfo: [NSLocalizedDescriptionKey: error.localizedDescription])
-          NotificationCenter.default.post(name: .keymanLanguagesDownloadFailed, object: self,
-                                          userInfo: [NSUnderlyingErrorKey: error])
+          NotificationCenter.default.post(name: Notifications.languagesDownloadFailed, object: self, value: error)
           return
         }
 
@@ -879,7 +880,7 @@ UIGestureRecognizerDelegate {
           completionBlock(nil)
         }
 
-        NotificationCenter.default.post(name: .keymanLanguagesUpdated, object: self)
+        NotificationCenter.default.post(name: Notifications.languagesUpdated, object: self, value: ())
       }
     }
   }
@@ -923,18 +924,16 @@ UIGestureRecognizerDelegate {
         if let completionBlock = request.userInfo["completionBlock"] as? FetchKeyboardsBlock {
           completionBlock([NSUnderlyingErrorKey: error])
         }
-        NotificationCenter.default.post(name: .keymanLanguagesDownloadFailed, object: self,
-                                        userInfo: [NSUnderlyingErrorKey: error])
+        NotificationCenter.default.post(name: Notifications.languagesDownloadFailed, object: self, value: error)
       }
     }
   }
 
-  private func downloadFailed(forKeyboards keyboards: [InstallableKeyboard], error: NSError) {
-    let userInfo: [AnyHashable: Any] = [
-      NSUnderlyingErrorKey: error,
-      Key.keyboardInfo: keyboards
-    ]
-    NotificationCenter.default.post(name: .keymanKeyboardDownloadFailed, object: self, userInfo: userInfo)
+  private func downloadFailed(forKeyboards keyboards: [InstallableKeyboard], error: Error) {
+    let notification = KeyboardDownloadFailedNotification(keyboards: keyboards, error: error)
+    NotificationCenter.default.post(name: Notifications.keyboardDownloadFailed,
+                                    object: self,
+                                    value: notification)
   }
 
   // MARK: - Loading custom keyboards
@@ -1090,9 +1089,6 @@ UIGestureRecognizerDelegate {
       return
     }
     NSLog("%@", logStr)
-    // TODO: Remove this
-    NotificationCenter.default.post(name: .keymanDebugLog, object: self,
-                                    userInfo: ["log": logStr])
   }
 
   // MARK: - File system and UserData management
@@ -1653,7 +1649,7 @@ UIGestureRecognizerDelegate {
       subKeysView.subviews.forEach { $0.removeFromSuperview() }
       self.subKeysView = nil
       setPopupVisible(false)
-      NotificationCenter.default.post(name: .keymanSubKeysMenuDismissed, object: self, userInfo: nil)
+      NotificationCenter.default.post(name: Notifications.subKeysMenuDismissed, object: self, value: ())
     }
     subKeys.removeAll()
     subKeyIDs.removeAll()
@@ -1696,7 +1692,7 @@ UIGestureRecognizerDelegate {
     if shouldReloadKeyboard {
       reloadKeyboard(in: inputView)
     }
-    NotificationCenter.default.post(name: .keymanKeyboardPickerDismissed, object: self)
+    NotificationCenter.default.post(name: Notifications.keyboardPickerDismissed, object: self, value: ())
   }
 
   private func reloadKeyboard(in view: WKWebView) {
@@ -1931,9 +1927,9 @@ UIGestureRecognizerDelegate {
     resizeKeyboard()
     let deviceType = (UIDevice.current.userInterfaceIdiom == .phone) ? "AppleMobile" : "AppleTablet"
     webView.evaluateJavaScript("setDeviceType('\(deviceType)');", completionHandler: nil)
-    if (keyboardID == nil || languageID == nil) && !shouldReloadKeyboard {
-      var newKb = Constants.defaultKeyboard
 
+    var newKb = Constants.defaultKeyboard
+    if (keyboardID == nil || languageID == nil) && !shouldReloadKeyboard {
       let userData = isSystemKeyboard ? UserDefaults.standard : activeUserDefaults()
       if let currentKb = userData.currentKeyboard {
         let kbID = currentKb.id
@@ -1947,10 +1943,7 @@ UIGestureRecognizerDelegate {
       _ = setKeyboard(newKb)
     }
 
-    let kbInfo = [Key.keyboardId: keyboardID, Key.languageId: languageID]
-
-    NotificationCenter.default.post(name: .keymanKeyboardLoaded, object: self,
-                                    userInfo: [Key.keyboardInfo: kbInfo])
+    NotificationCenter.default.post(name: Notifications.keyboardLoaded, object: self, value: newKb)
     if shouldReloadKeyboard {
       NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.resetKeyboard), object: nil)
       perform(#selector(self.resetKeyboard), with: nil, afterDelay: 0.25)
@@ -2100,7 +2093,7 @@ UIGestureRecognizerDelegate {
         subKeysView.subviews.forEach { $0.removeFromSuperview() }
         self.subKeysView = nil
         setPopupVisible(false)
-        NotificationCenter.default.post(name: .keymanSubKeysMenuDismissed, object: self, userInfo: nil)
+        NotificationCenter.default.post(name: Notifications.subKeysMenuDismissed, object: self, value: ())
       }
       var buttonClicked = false
       for button in subKeys where button.isHighlighted {
@@ -2192,7 +2185,7 @@ UIGestureRecognizerDelegate {
 
     dismissKeyPreview()
     subKeysView = SubKeysView(keyFrame: keyFrame, subKeys: subKeys)
-    NotificationCenter.default.post(name: .keymanSubKeysMenuWillShow, object: self, userInfo: nil)
+    NotificationCenter.default.post(name: Notifications.subKeysMenuWillShow, object: self, value: ())
     inputView.addSubview(subKeysView!)
     setPopupVisible(true)
   }

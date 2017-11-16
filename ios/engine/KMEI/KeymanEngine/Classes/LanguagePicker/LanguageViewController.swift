@@ -21,6 +21,11 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   private var selectedSection = 0
   private var isUpdate = false
 
+  private var languagesUpdatedObserver: NotificationObserver?
+  private var languagesDownloadFailedObserver: NotificationObserver?
+  private var keyboardDownloadStartedObserver: NotificationObserver?
+  private var keyboardDownloadFailedObserver: NotificationObserver?
+
   override func loadView() {
     super.loadView()
     if Manager.shared.currentRequest == nil && Manager.shared.languages.isEmpty {
@@ -33,14 +38,22 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     super.viewDidLoad()
     title = "Add New Keyboard"
     selectedSection = NSNotFound
-    NotificationCenter.default.addObserver(self, selector: #selector(self.languageFetchFinished),
-                                           name: NSNotification.Name.keymanLanguagesUpdated, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.languageFetchFailed),
-                                           name: NSNotification.Name.keymanLanguagesDownloadFailed, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloadStarted),
-                                           name: NSNotification.Name.keymanKeyboardDownloadStarted, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloadFailed),
-                                           name: NSNotification.Name.keymanKeyboardDownloadFailed, object: nil)
+    languagesUpdatedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.languagesUpdated,
+      observer: self,
+      function: LanguageViewController.languagesUpdated)
+    languagesDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.languagesDownloadFailed,
+      observer: self,
+      function: LanguageViewController.languagesDownloadFailed)
+    keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadStarted,
+      observer: self,
+      function: LanguageViewController.keyboardDownloadStarted)
+    keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadFailed,
+      observer: self,
+      function: LanguageViewController.keyboardDownloadFailed)
   }
 
   override func viewDidAppear(_ animated: Bool) {
@@ -50,10 +63,6 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     if numberOfSections(in: tableView) == 0 {
       showActivityView()
     }
-  }
-
-  deinit {
-    NotificationCenter.default.removeObserver(self)
   }
 
   override func numberOfSections(in tableView: UITableView) -> Int {
@@ -196,7 +205,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  @objc func languageFetchFinished() {
+  private func languagesUpdated() {
     dismissActivityView()
     tableView.reloadData()
     if numberOfSections(in: tableView) == 0 {
@@ -204,12 +213,12 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  @objc func languageFetchFailed() {
+  private func languagesDownloadFailed() {
     dismissActivityView()
     showConnectionErrorAlert()
   }
 
-  @objc func keyboardDownloadStarted(_ notification: Notification) {
+  private func keyboardDownloadStarted() {
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
 
@@ -244,7 +253,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     navigationController?.setToolbarHidden(false, animated: true)
   }
 
-  @objc func keyboardDownloadFailed(_ notification: Notification) {
+  private func keyboardDownloadFailed() {
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }

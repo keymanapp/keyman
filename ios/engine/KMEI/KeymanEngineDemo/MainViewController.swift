@@ -15,6 +15,11 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
   var textView2: TextField!
   var textView3: UITextView!
 
+  private var keyboardDownloadStartedObserver: NotificationObserver?
+  private var keyboardDownloadCompletedObserver: NotificationObserver?
+  private var keyboardDownloadFailedObserver: NotificationObserver?
+  private var keyboardPickerDismissedObserver: NotificationObserver?
+
   deinit {
     NotificationCenter.default.removeObserver(self)
   }
@@ -27,20 +32,22 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
                                            name: .UIKeyboardWillShow, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(self.resizeView),
                                            name: .UIKeyboardWillHide, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloadStarted),
-                                           name: .keymanKeyboardDownloadStarted, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloaded),
-                                           name: .keymanKeyboardDownloadCompleted, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloadFailed),
-                                           name: .keymanKeyboardDownloadFailed, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.languagesUpdated),
-                                           name: .keymanLanguagesUpdated, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardLoaded),
-                                           name: .keymanKeyboardLoaded, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged),
-                                           name: .keymanKeyboardChanged, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardPickerDismissed),
-                                           name: .keymanKeyboardPickerDismissed, object: nil)
+    keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadStarted,
+      observer: self,
+      function: MainViewController.keyboardDownloadStarted)
+    keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadCompleted,
+      observer: self,
+      function: MainViewController.keyboardDownloadCompleted)
+    keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadFailed,
+      observer: self,
+      function: MainViewController.keyboardDownloadFailed)
+    keyboardPickerDismissedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardPickerDismissed,
+      observer: self,
+      function: MainViewController.keyboardPickerDismissed)
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -212,15 +219,14 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
   }
 
   // MARK: - Responding to Keyman notifications
-  @objc func keyboardDownloadStarted(_ notification: Notification) {
+  private func keyboardDownloadStarted() {
     showActivityIndicator()
   }
 
-  @objc func keyboardDownloaded(_ notification: Notification) {
+  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
     // This is an example of responding to a Keyman event.
     //   - for a list of all events, see KMManager.h
 
-    let keyboards = notification.userInfo![Key.keyboardInfo] as! [InstallableKeyboard]
     for keyboard in keyboards {
       Manager.shared.addKeyboard(keyboard)
       Manager.shared.setKeyboard(keyboard)
@@ -228,10 +234,8 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
     perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
   }
 
-  @objc func keyboardDownloadFailed(_ notification: Notification) {
-    guard let error = notification.userInfo?[NSUnderlyingErrorKey] as? Error else {
-      return
-    }
+  private func keyboardDownloadFailed(_ notification: KeyboardDownloadFailedNotification) {
+    let error = notification.error
     if error.localizedDescription != "Download queue is busy" {
       perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
       perform(#selector(self.showAlert), with: error.localizedDescription, afterDelay: 1.1)
@@ -240,13 +244,7 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
     }
   }
 
-  @objc func languagesUpdated(_ notification: Notification) { }
-
-  @objc func keyboardLoaded(_ notification: Notification) { }
-
-  @objc func keyboardChanged(_ notification: Notification) { }
-
-  @objc func keyboardPickerDismissed(_ notification: Notification) {
+  private func keyboardPickerDismissed() {
     textView1.becomeFirstResponder()
   }
 

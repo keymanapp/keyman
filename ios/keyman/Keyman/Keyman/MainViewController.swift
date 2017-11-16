@@ -38,12 +38,12 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var textSizeController: UISlider!
   private var dropdownItems: [UIBarButtonItem]!
 
-  private var profiles2Install: [String] = []
+  private var profilesToInstall: [String] = []
   private var checkedProfiles: [String] = []
   private var profileName: String?
   private var launchUrl: URL?
   private var keyboardToDownload: InstallableKeyboard?
-  private var customKeyboard2Download: [String: Any] = [:]
+  private var customKeyboardToDownload: [String: Any] = [:]
   private var wasKeyboardVisible: Bool = false
 
   private var screenWidth: CGFloat = 0.0
@@ -55,6 +55,16 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var loadTimer: Timer?
   private var updateStatus: Int = 0  // TODO: Make into enum
   private var didDownload: Bool = false
+
+  private var keyboardLoadedObserver: NotificationObserver?
+  private var languagesUpdatedObserver: NotificationObserver?
+  private var languagesDownloadFailedObserver: NotificationObserver?
+  private var keyboardPickerDismissedObserver: NotificationObserver?
+  private var keyboardChangedObserver: NotificationObserver?
+  private var keyboardDownloadStartedObserver: NotificationObserver?
+  private var keyboardDownloadCompletedObserver: NotificationObserver?
+  private var keyboardDownloadFailedObserver: NotificationObserver?
+  private var keyboardRemovedObserver: NotificationObserver?
 
   var appDelegate: AppDelegate! {
     return UIApplication.shared.delegate as? AppDelegate
@@ -74,24 +84,42 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         name: NSNotification.Name.UIKeyboardWillShow, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
         name: NSNotification.Name.UIKeyboardWillHide, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardLoaded),
-        name: NSNotification.Name.keymanKeyboardLoaded, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged),
-        name: NSNotification.Name.keymanKeyboardChanged, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.languagesUpdated),
-        name: NSNotification.Name.keymanLanguagesUpdated, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.languagesDownloadFailed),
-        name: NSNotification.Name.keymanLanguagesDownloadFailed, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardPickerDismissed),
-        name: NSNotification.Name.keymanKeyboardPickerDismissed, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloadStarted),
-        name: NSNotification.Name.keymanKeyboardDownloadStarted, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloadFinished),
-        name: NSNotification.Name.keymanKeyboardDownloadCompleted, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloadFailed),
-        name: NSNotification.Name.keymanKeyboardDownloadFailed, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardRemoved),
-        name: NSNotification.Name.keymanKeyboardRemoved, object: nil)
+    keyboardLoadedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardLoaded,
+      observer: self,
+      function: MainViewController.keyboardLoaded)
+    keyboardChangedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardChanged,
+      observer: self,
+      function: MainViewController.keyboardChanged)
+    languagesUpdatedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.languagesUpdated,
+      observer: self,
+      function: MainViewController.languagesUpdated)
+    languagesDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.languagesDownloadFailed,
+      observer: self,
+      function: MainViewController.languagesDownloadFailed)
+    keyboardPickerDismissedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardPickerDismissed,
+      observer: self,
+      function: MainViewController.keyboardPickerDismissed)
+    keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadStarted,
+      observer: self,
+      function: MainViewController.keyboardDownloadStarted)
+    keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadCompleted,
+      observer: self,
+      function: MainViewController.keyboardDownloadCompleted)
+    keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadFailed,
+      observer: self,
+      function: MainViewController.keyboardDownloadFailed)
+    keyboardRemovedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardRemoved,
+      observer: self,
+      function: MainViewController.keyboardRemoved)
     NotificationCenter.default.addObserver(self, selector: #selector(self.launched),
         name: launchedFromUrlNotification, object: nil)
 
@@ -136,10 +164,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let userData = AppDelegate.activeUserDefaults()
     checkedProfiles = userData.object(forKey: checkedProfilesKey) as? [String] ?? [String]()
 
-    profiles2Install = [String]()
+    profilesToInstall = [String]()
     for name in customFonts {
       if let profile = profilesByFontName[UIFont.fontNames(forFamilyName: name)[0]] {
-        profiles2Install.append(profile)
+        profilesToInstall.append(profile)
       }
     }
 
@@ -426,28 +454,29 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     resizeViews(withKeyboardVisible: false)
   }
 
-  @objc func keyboardLoaded(_ notification: Notification) {
+  // MARK: - Keyman Notifications
+
+  private func keyboardLoaded() {
     startTimer()
   }
 
-  @objc func keyboardChanged(_ notification: Notification) {
+  private func keyboardChanged(_ kb: InstallableKeyboard) {
     var listCheck: Bool = true
     if didDownload {
       listCheck = false
       didDownload = false
     }
 
-    let kb = notification.userInfo![Key.keyboardInfo] as! InstallableKeyboard
     checkProfile(forKeyboardID: kb.id, languageID: kb.languageID, doListCheck: listCheck)
   }
 
-  @objc func keyboardDownloadStarted(_ notification: Notification) {
+  private func keyboardDownloadStarted() {
     if launchUrl != nil {
       showActivityIndicator()
     }
   }
 
-  @objc func keyboardDownloadFinished(_ notification: Notification) {
+  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
     didDownload = true
     if launchUrl == nil {
       return
@@ -460,7 +489,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
 
     perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
-    let keyboards = notification.userInfo?[Key.keyboardInfo] as! [InstallableKeyboard]
 
     for keyboard in keyboards {
       Manager.shared.addKeyboard(keyboard)
@@ -470,30 +498,45 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     launchUrl = nil
   }
 
-  @objc func keyboardDownloadFailed(_ notification: Notification) {
+  private func keyboardDownloadFailed(_ notification: KeyboardDownloadFailedNotification) {
     if launchUrl != nil {
       perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
-      let error = notification.userInfo?[NSUnderlyingErrorKey] as! Error
+      let error = notification.error
       showAlert(withTitle: "Keyboard Download Error", message: error.localizedDescription,
                 cancelButtonTitle: "OK", otherButtonTitles: nil, tag: -1)
       launchUrl = nil
     }
   }
 
-  @objc func languagesUpdated(_ notification: Notification) {
+  private func languagesUpdated() {
     updateStatus = 1
   }
 
-  @objc func languagesDownloadFailed(_ notification: Notification) {
+  private func languagesDownloadFailed() {
     updateStatus = -1
   }
 
-  @objc func keyboardPickerDismissed(_ notification: Notification) {
+  private func keyboardPickerDismissed() {
     textView.becomeFirstResponder()
     if UIDevice.current.userInterfaceIdiom == .pad && shouldShowGetStarted {
       perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
     }
   }
+
+  private func keyboardRemoved(_ keyboard: InstallableKeyboard) {
+    guard let font = keyboard.font,
+      let profile = profileName(withFont: font) else {
+        return
+    }
+    profilesToInstall = profilesToInstall.filter { $0 != profile }
+    profilesToInstall.append(profile)
+    checkedProfiles = checkedProfiles.filter { $0 != profile }
+    let userData = AppDelegate.activeUserDefaults()
+    userData.set(checkedProfiles, forKey: checkedProfilesKey)
+    userData.synchronize()
+  }
+
+  // MARK: - View Actions
 
   @objc func launched(fromUrl notification: Notification) {
     if let url = notification.userInfo?[urlKey] as? URL, url.query != nil {
@@ -504,20 +547,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     } else {
       launchUrl = nil
     }
-  }
-
-  @objc func keyboardRemoved(_ notification: Notification) {
-    let kbInfo = notification.userInfo?[Key.keyboardInfo] as! InstallableKeyboard
-    guard let font = kbInfo.font,
-          let profile = profileName(withFont: font) else {
-      return
-    }
-    profiles2Install = profiles2Install.filter { $0 != profile }
-    profiles2Install.append(profile)
-    checkedProfiles = checkedProfiles.filter { $0 != profile }
-    let userData = AppDelegate.activeUserDefaults()
-    userData.set(checkedProfiles, forKey: checkedProfilesKey)
-    userData.synchronize()
   }
 
   @objc func infoButtonClick(_ sender: Any?) {
@@ -864,7 +893,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
         let isDirect = direct == "true"
 
-        customKeyboard2Download = [
+        customKeyboardToDownload = [
           "url": jsonUrl,
           "direct": isDirect
         ]
@@ -922,7 +951,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     var doInstall: Bool = false
     if doListCheck {
-      for value in profiles2Install where !checkedProfiles.contains(value) && profile == value {
+      for value in profilesToInstall where !checkedProfiles.contains(value) && profile == value {
         doInstall = true
         break
       }
@@ -972,8 +1001,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         self.profileName = nil
       }
     case 2:
-      if let jsonUrl = customKeyboard2Download["url"] as? URL,
-        let isDirect = customKeyboard2Download["direct"] as? Bool {
+      if let jsonUrl = customKeyboardToDownload["url"] as? URL,
+        let isDirect = customKeyboardToDownload["direct"] as? Bool {
         Manager.shared.downloadKeyboard(from: jsonUrl, isDirect: isDirect)
       }
     default:
