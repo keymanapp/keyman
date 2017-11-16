@@ -1631,7 +1631,6 @@ UIGestureRecognizerDelegate {
       subKeysView.subviews.forEach { $0.removeFromSuperview() }
       self.subKeysView = nil
       setPopupVisible(false)
-      NotificationCenter.default.post(name: Notifications.subKeysMenuDismissed, object: self, value: ())
     }
     subKeys.removeAll()
     subKeyIDs.removeAll()
@@ -2075,7 +2074,6 @@ UIGestureRecognizerDelegate {
         subKeysView.subviews.forEach { $0.removeFromSuperview() }
         self.subKeysView = nil
         setPopupVisible(false)
-        NotificationCenter.default.post(name: Notifications.subKeysMenuDismissed, object: self, value: ())
       }
       var buttonClicked = false
       for button in subKeys where button.isHighlighted {
@@ -2167,7 +2165,6 @@ UIGestureRecognizerDelegate {
 
     dismissKeyPreview()
     subKeysView = SubKeysView(keyFrame: keyFrame, subKeys: subKeys)
-    NotificationCenter.default.post(name: Notifications.subKeysMenuWillShow, object: self, value: ())
     inputView.addSubview(subKeysView!)
     setPopupVisible(true)
   }
