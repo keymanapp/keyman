@@ -580,24 +580,13 @@ UIGestureRecognizerDelegate {
 
   /// Downloads a custom keyboard from the URL
   /// - Parameters:
-  ///   - jsonUrl: URL to a JSON description of the keyboard
-  ///   - isDirect: The keyboard is downloaded directly instead of via Keyman Engine Cloud Services.
-  ///     Should normally be false to permit caching and prevent overloading a target server.
-  public func downloadKeyboard(from jsonUrl: URL, isDirect: Bool) {
+  ///   - url: URL to a JSON description of the keyboard
+  public func downloadKeyboard(from url: URL) {
     guard reachability.currentReachabilityStatus() != NotReachable else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "No connection"])
       downloadFailed(forKeyboards: [], error: error)
       return
-    }
-
-    let url: URL
-    if isDirect {
-      url = jsonUrl
-    } else {
-      let deviceParam = (UIDevice.current.userInterfaceIdiom == .phone) ? "iphone" : "ipad"
-      let encodedUrl = jsonUrl.absoluteString.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)!
-      url = URL(string: "\(apiRemoteURL)\(encodedUrl)&dateformat=seconds&device=\(deviceParam)")!
     }
 
     guard let data = try? Data(contentsOf: url) else {

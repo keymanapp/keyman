@@ -43,7 +43,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var profileName: String?
   private var launchUrl: URL?
   private var keyboardToDownload: InstallableKeyboard?
-  private var customKeyboardToDownload: [String: Any] = [:]
+  private var customKeyboardToDownload: URL?
   private var wasKeyboardVisible: Bool = false
 
   private var screenWidth: CGFloat = 0.0
@@ -892,10 +892,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         perform(#selector(self.infoButtonClick), with: nil)
       }
 
-      customKeyboardToDownload = [
-        "url": url,
-        "direct": params["direct"] == "true"
-      ]
+      customKeyboardToDownload = url
       let title = "Custom Keyboard: \(url.lastPathComponent)"
       showAlert(withTitle: title, message: "Would you like to install this keyboard?",
                 cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 2)
@@ -993,9 +990,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         self.profileName = nil
       }
     case 2:
-      if let jsonUrl = customKeyboardToDownload["url"] as? URL,
-        let isDirect = customKeyboardToDownload["direct"] as? Bool {
-        Manager.shared.downloadKeyboard(from: jsonUrl, isDirect: isDirect)
+      if let url = customKeyboardToDownload {
+        Manager.shared.downloadKeyboard(from: url)
       }
     default:
       break
