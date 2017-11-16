@@ -18,6 +18,10 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     NotificationCenter.default.removeObserver(self)
   }
 
+  convenience init() {
+    self.init(nibName: "GetStartedViewController", bundle: nil)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -141,7 +145,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
       Manager.shared.showKeyboardPicker(in: mainViewController, shouldAddKeyboard: true)
     case 1:
       mainViewController.dismissGetStartedView(nil)
-      let setUpVC = SetUpViewController(nibName: "SetUpViewController", bundle: nil)
+      let setUpVC = SetUpViewController()
       mainViewController.present(setUpVC, animated: true, completion: nil)
     case 2:
       mainViewController.dismissGetStartedView(nil)

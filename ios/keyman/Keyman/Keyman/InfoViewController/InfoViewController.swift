@@ -14,6 +14,14 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
 
   private var networkReachable: Reachability?
 
+  convenience init() {
+    if UIDevice.current.userInterfaceIdiom == .phone {
+      self.init(nibName: "InfoViewController_iPhone", bundle: nil)
+    } else {
+      self.init(nibName: "InfoViewController_iPad", bundle: nil)
+    }
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
     extendedLayoutIncludesOpaqueBars = true

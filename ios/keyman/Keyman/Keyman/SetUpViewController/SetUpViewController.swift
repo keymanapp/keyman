@@ -15,6 +15,10 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
 
   private var networkReachable: Reachability?
 
+  convenience init() {
+    self.init(nibName: "SetUpViewController", bundle: nil)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 

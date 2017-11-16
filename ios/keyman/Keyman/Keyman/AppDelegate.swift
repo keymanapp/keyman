@@ -32,11 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ = overlayWindow
 
     // Override point for customization after application launch.
-    if UIDevice.current.userInterfaceIdiom == .phone {
-      viewController = MainViewController(nibName: "MainViewController_iPhone", bundle: nil)
-    } else {
-      viewController = MainViewController(nibName: "MainViewController_iPad", bundle: nil)
-    }
+    viewController = MainViewController()
     let navigationController = UINavigationController(rootViewController: viewController)
 
     // Navigation bar became translucent by default in iOS7 SDK, however we don't want it to be translucent.
