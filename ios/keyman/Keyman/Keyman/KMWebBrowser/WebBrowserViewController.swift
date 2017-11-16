@@ -213,7 +213,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   }
 
   @IBAction func bookmarks(_ sender: Any) {
-    let bookmarksVC = BookmarksViewController()
+    let bookmarksVC = BookmarksViewController(nibName: "BookmarksViewController", bundle: nil)
     bookmarksVC.webBrowser = self
     present(bookmarksVC, animated: true, completion: nil)
   }

@@ -141,7 +141,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
       Manager.shared.showKeyboardPicker(in: mainViewController, shouldAddKeyboard: true)
     case 1:
       mainViewController.dismissGetStartedView(nil)
-      let setUpVC = SetUpViewController()
+      let setUpVC = SetUpViewController(nibName: "SetUpViewController", bundle: nil)
       mainViewController.present(setUpVC, animated: true, completion: nil)
     case 2:
       mainViewController.dismissGetStartedView(nil)

@@ -1065,7 +1065,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     popover?.dismiss(animated: false)
     _ = dismissDropDownMenu()
     overlayWindow.isHidden = false
-    getStartedVC = GetStartedViewController()
+    getStartedVC = GetStartedViewController(nibName: "GetStartedViewController", bundle: nil)
     getStartedVC.mainViewController = self
     let containerView: UIView! = getStartedVC.view
     let navBar = containerView?.viewWithTag(786586) as? UINavigationBar
@@ -1122,7 +1122,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   @objc func showKMWebBrowserView(_ sender: Any) {
     popover?.dismiss(animated: false)
     _ = dismissDropDownMenu()
-    let webBrowserVC = WebBrowserViewController()
+    let webBrowserVC = WebBrowserViewController(nibName: "WebBrowserViewController", bundle: nil)
     if let fontFamily = textView.font?.fontName {
       webBrowserVC.fontFamily = fontFamily
     }
