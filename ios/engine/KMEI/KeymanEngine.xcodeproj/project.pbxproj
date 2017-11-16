@@ -29,6 +29,7 @@
 		988B36BA1ADF728A0008752C /* inuktitut_naqittaut-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 988B36B81ADF728A0008752C /* inuktitut_naqittaut-1.0.js */; };
 		98D4190C17695E58008D2FF3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98D4190B17695E58008D2FF3 /* Default-568h@2x.png */; };
 		98F9D6A01954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */; };
+		C007C4651F9F52D8006461B9 /* LanguagesAPICall.swift in Sources */ = {isa = PBXBuildFile; fileRef = C007C4641F9F52D8006461B9 /* LanguagesAPICall.swift */; };
 		C0324B8D1F87480700AF3785 /* TextFieldDelegateProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B8C1F87480700AF3785 /* TextFieldDelegateProxy.swift */; };
 		C0324B8F1F8750B700AF3785 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B8E1F8750B700AF3785 /* TextView.swift */; };
 		C0324B911F8763E100AF3785 /* TextViewDelegateProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B901F8763E100AF3785 /* TextViewDelegateProxy.swift */; };
@@ -156,6 +157,7 @@
 		98D4190B17695E58008D2FF3 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Tavultesoft.KMEI.SystemKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		98F9D69A1954112F0087AA43 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C007C4641F9F52D8006461B9 /* LanguagesAPICall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagesAPICall.swift; sourceTree = "<group>"; };
 		C0324B8C1F87480700AF3785 /* TextFieldDelegateProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldDelegateProxy.swift; sourceTree = "<group>"; };
 		C0324B8E1F8750B700AF3785 /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		C0324B901F8763E100AF3785 /* TextViewDelegateProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewDelegateProxy.swift; sourceTree = "<group>"; };
@@ -176,8 +178,7 @@
 		C0452BAC1F9F21270064431A /* Keyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
 		C0452BAE1F9F22A80064431A /* Font.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Font.swift; sourceTree = "<group>"; };
 		C04C2A6C1F6B7D9A00BA42B6 /* LanguageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LanguageViewController.swift; sourceTree = "<group>"; };
-		C055E6EA1F99ED090035C2DD /* RegisteredFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift;
-path = RegisteredFont.swift; sourceTree = "<group>"; };
+		C055E6EA1F99ED090035C2DD /* RegisteredFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisteredFont.swift; sourceTree = "<group>"; };
 		C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Helpers.swift"; sourceTree = "<group>"; };
 		C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C06D372D1F81F4E100F61AE0 /* KeymanEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeymanEngine.h; sourceTree = "<group>"; };
@@ -1083,7 +1084,7 @@ path = RegisteredFont.swift; sourceTree = "<group>"; };
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				VALID_ARCHS = "arm64 armv7s armv7";
 			};

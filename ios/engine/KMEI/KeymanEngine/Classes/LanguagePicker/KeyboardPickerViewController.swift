@@ -132,7 +132,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       if isCurrentKeyboard(languageID: kb.id, keyboardID: kb.languageID) {
         let userData = Manager.shared.activeUserDefaults()
         userKeyboards = userData.userKeyboards!
-        Manager.shared.setKeyboard(userKeyboards[0])
+        _ = Manager.shared.setKeyboard(userKeyboards[0])
       }
       self.tableView.reloadData()
     }
@@ -240,7 +240,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       // Add keyboard.
       for keyboard in keyboards {
         Manager.shared.addKeyboard(keyboard)
-        Manager.shared.setKeyboard(keyboard)
+        _ = Manager.shared.setKeyboard(keyboard)
       }
 
       navigationController?.popToRootViewController(animated: true)
