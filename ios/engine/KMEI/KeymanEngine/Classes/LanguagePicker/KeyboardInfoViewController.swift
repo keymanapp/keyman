@@ -70,7 +70,7 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
       if indexPath.row == 1 {
         let url = URL(string: "http://help.keyman.com/keyboard/\(keyboardID)/\(keyboardVersion)/")!
         if let openURL = Manager.shared.openURL {
-          openURL(url)
+          _ = openURL(url)
         } else {
           Manager.shared.kmLog("openURL not set in Manager. Failed to open \(url)", checkDebugPrinting: false)
         }
@@ -161,7 +161,7 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
       if Manager.shared.removeKeyboard(at: keyboardIndex) {
         if isCurrentKeyboard {
           // Select default keyboard
-          Manager.shared.setKeyboard(kb)
+          _ = Manager.shared.setKeyboard(kb)
         }
         NotificationCenter.default.post(name: NSNotification.Name.keymanKeyboardRemoved,
                                         object: self, userInfo: [Key.keyboardInfo: kb]

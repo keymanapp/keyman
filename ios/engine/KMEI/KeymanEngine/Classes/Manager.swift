@@ -191,7 +191,7 @@ UIGestureRecognizerDelegate {
 
     if !isSystemKeyboard {
       copyUserDefaultsToSharedContainer()
-      copyKeymanFilesToSharedContainer()
+      _ = copyKeymanFilesToSharedContainer()
       let userData = activeUserDefaults()
       let isKPDisplayed = userData.bool(forKey: Key.keyboardPickerDisplayed)
       if isKPDisplayed {
@@ -403,7 +403,7 @@ UIGestureRecognizerDelegate {
       return nil
     }
     let newIndex = (index + 1) % userKeyboards.count
-    setKeyboard(userKeyboards[newIndex])
+    _ = setKeyboard(userKeyboards[newIndex])
     return newIndex
   }
 
@@ -951,7 +951,7 @@ UIGestureRecognizerDelegate {
         kmLog("File already exists at \(dstUrl) and not overwriting", checkDebugPrinting: true)
         return
       }
-      addSkipBackupAttribute(to: dstUrl)
+      _ = addSkipBackupAttribute(to: dstUrl)
     } catch {
       kmLog("Error copying file: \(error)", checkDebugPrinting: false)
     }
@@ -1141,7 +1141,7 @@ UIGestureRecognizerDelegate {
     let dstUrl = dstDir.appendingPathComponent(srcUrl.lastPathComponent)
 
     // FIXME: FileManager exceptions are swallowed.
-    copyAndExcludeFromBackup(at: srcUrl, to: dstUrl)
+    _ = copyAndExcludeFromBackup(at: srcUrl, to: dstUrl)
   }
 
   private func compareFileModDates(_ a: String, _ b: String) -> ComparisonResult? {
@@ -1347,7 +1347,7 @@ UIGestureRecognizerDelegate {
       return false
     }
 
-    addSkipBackupAttribute(to: dst)
+    _ = addSkipBackupAttribute(to: dst)
     return true
   }
 
@@ -1358,7 +1358,7 @@ UIGestureRecognizerDelegate {
     }
     let srcContents = try FileManager.default.contentsOfDirectory(at: srcDir, includingPropertiesForKeys: [])
     for srcFile in srcContents {
-      copyAndExcludeFromBackup(at: srcFile, to: dstDir.appendingPathComponent(srcFile.lastPathComponent))
+      _ = copyAndExcludeFromBackup(at: srcFile, to: dstDir.appendingPathComponent(srcFile.lastPathComponent))
     }
   }
 
@@ -1531,7 +1531,7 @@ UIGestureRecognizerDelegate {
 
   func synchronizeSWKeyboard() {
     copyUserDefaultsFromSharedContainer()
-    copyKeymanFilesFromSharedContainer()
+    _ = copyKeymanFilesFromSharedContainer()
   }
 
   // MARK: - View management
@@ -1723,11 +1723,11 @@ UIGestureRecognizerDelegate {
     languageID = nil
 
     if let keyboard = keyboard {
-      setKeyboard(keyboard)
+      _ = setKeyboard(keyboard)
     } else if let keyboard = activeUserDefaults().userKeyboards?[safe: 0] {
-      setKeyboard(keyboard)
+      _ = setKeyboard(keyboard)
     } else {
-      setKeyboard(Constants.defaultKeyboard)
+      _ = setKeyboard(Constants.defaultKeyboard)
     }
   }
 
@@ -1944,7 +1944,7 @@ UIGestureRecognizerDelegate {
       } else if let userKbs = activeUserDefaults().userKeyboards, !userKbs.isEmpty {
         newKb = userKbs[0]
       }
-      setKeyboard(newKb)
+      _ = setKeyboard(newKb)
     }
 
     let kbInfo = [Key.keyboardId: keyboardID, Key.languageId: languageID]

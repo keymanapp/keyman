@@ -464,7 +464,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     for keyboard in keyboards {
       Manager.shared.addKeyboard(keyboard)
-      Manager.shared.setKeyboard(keyboard)
+      _ = Manager.shared.setKeyboard(keyboard)
     }
 
     launchUrl = nil
@@ -890,7 +890,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                     cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 0)
         } else {
           Manager.shared.addKeyboard(keyboard)
-          Manager.shared.setKeyboard(keyboard)
+          _ = Manager.shared.setKeyboard(keyboard)
         }
       } else {
         launchUrl = nil

@@ -140,7 +140,7 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
       if let viewController = viewController {
         Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
       } else {
-        Manager.shared.switchToNextKeyboard()
+        _ = Manager.shared.switchToNextKeyboard()
       }
     }
   }
