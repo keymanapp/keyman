@@ -43,7 +43,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var profileName: String?
   private var launchUrl: URL?
   private var keyboardToDownload: InstallableKeyboard?
-  private var customKeyboardToDownload: [String: Any] = [:]
+  private var customKeyboardToDownload: URL?
   private var wasKeyboardVisible: Bool = false
 
   private var screenWidth: CGFloat = 0.0
@@ -867,7 +867,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
   }
 
-  // TODO: Refactor control flow
   private func performAction(from url: URL) {
     guard let query = url.query else {
       launchUrl = nil
@@ -879,51 +878,41 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
 
     let params = self.params(of: query)
-    if params["url"] == nil {
+    if let urlString = params["url"] {
       // Download and set custom keyboard
-
-      let jsonUrl = params["url"].flatMap { URL(string: $0) }
-      let direct = params["direct"]
-
-      if let jsonUrl = jsonUrl {
-        Manager.shared.dismissKeyboardPicker(self)
-        if !infoView.view.isHidden {
-          perform(#selector(self.infoButtonClick), with: nil)
-        }
-
-        let isDirect = direct == "true"
-
-        customKeyboardToDownload = [
-          "url": jsonUrl,
-          "direct": isDirect
-        ]
-        let title = "Custom Keyboard: \(jsonUrl.lastPathComponent)"
-        showAlert(withTitle: title, message: "Would you like to install this keyboard?",
-                  cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 2)
-      } else {
+      guard let url = URL(string: urlString) else {
         showAlert(withTitle: "Custom Keyboard", message: "The keyboard could not be installed: Invalid Url",
                   cancelButtonTitle: "OK", otherButtonTitles: nil, tag: -1)
         launchUrl = nil
+        return
+      }
+
+      Manager.shared.dismissKeyboardPicker(self)
+      if !infoView.view.isHidden {
+        perform(#selector(self.infoButtonClick), with: nil)
+      }
+
+      customKeyboardToDownload = url
+      let title = "Custom Keyboard: \(url.lastPathComponent)"
+      showAlert(withTitle: title, message: "Would you like to install this keyboard?",
+                cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 2)
+    } else if let kbID = params["keyboard"], let langID = params["language"] {
+      // Query should include keyboard and language IDs to set the keyboard (first download if not available)
+      guard let keyboard = Manager.shared.repositoryKeyboard(withID: kbID, languageID: langID) else {
+        return
+      }
+
+      if Manager.shared.stateForKeyboard(withID: kbID) == .needsDownload {
+        keyboardToDownload = keyboard
+        showAlert(withTitle: "\(keyboard.languageName): \(keyboard.name)",
+          message: "Would you like to install this keyboard?",
+                  cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 0)
+      } else {
+        Manager.shared.addKeyboard(keyboard)
+        Manager.shared.setKeyboard(keyboard)
       }
     } else {
-      // Query should include keyboard and language IDs to set the keyboard (first download if not available)
-      if let kbID = params["keyboard"], let langID = params["language"] {
-        guard let keyboard = Manager.shared.repositoryKeyboard(withID: kbID, languageID: langID) else {
-          return
-        }
-
-        if Manager.shared.stateForKeyboard(withID: kbID) == .needsDownload {
-          keyboardToDownload = keyboard
-          showAlert(withTitle: "\(keyboard.languageName): \(keyboard.name)",
-            message: "Would you like to install this keyboard?",
-                    cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 0)
-        } else {
-          Manager.shared.addKeyboard(keyboard)
-          Manager.shared.setKeyboard(keyboard)
-        }
-      } else {
-        launchUrl = nil
-      }
+      launchUrl = nil
     }
   }
 
@@ -1001,9 +990,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         self.profileName = nil
       }
     case 2:
-      if let jsonUrl = customKeyboardToDownload["url"] as? URL,
-        let isDirect = customKeyboardToDownload["direct"] as? Bool {
-        Manager.shared.downloadKeyboard(from: jsonUrl, isDirect: isDirect)
+      if let url = customKeyboardToDownload {
+        Manager.shared.downloadKeyboard(from: url)
       }
     default:
       break

@@ -29,7 +29,7 @@ public struct Keyboard: Codable {
   public let lastModified: Date
 
   /// Size of the keyboard file in bytes.
-  public let fileSize: Int
+  public let fileSize: Int?
 
   /// Dot-decimal version number of the keyboard.
   public let version: String
@@ -63,7 +63,7 @@ public struct Keyboard: Codable {
               isDefault: Bool?,
               isRTL: Bool?,
               lastModified: Date,
-              fileSize: Int,
+              fileSize: Int?,
               version: String,
               languages: [Language]?,
               font: Font?,
@@ -91,7 +91,7 @@ public struct Keyboard: Codable {
     let isRTL = try container.decodeIfPresent(Bool.self, forKey: .isRTL)
     // TODO: Handle both seconds and ISO 8601
     let lastModified = try container.decode(Date.self, forKey: .lastModified)
-    let fileSize = try container.decode(Int.self, forKey: .fileSize)
+    let fileSize = try container.decodeIfPresent(Int.self, forKey: .fileSize)
     let version = try container.decode(String.self, forKey: .version)
     let languages = try container.decodeIfPresent([Language].self, forKey: .languages)
     let font = try container.decodeIfPresent(Font.self, forKey: .font)

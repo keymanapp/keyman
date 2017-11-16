@@ -541,8 +541,8 @@ UIGestureRecognizerDelegate {
     let filename = keyboardsInfo[keyboardID]!.filename
     let keyboardURL = options!.keyboardBaseURL.appendingPathComponent(filename)
 
-    let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font) +
-                             keyboardFontURLs(forFont: keyboard.oskFont)))
+    let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options!) +
+                             keyboardFontURLs(forFont: keyboard.oskFont, options: options!)))
 
     // TODO: Better typing
     downloadQueue = HTTPDownloader(self)
@@ -570,38 +570,23 @@ UIGestureRecognizerDelegate {
     downloadQueue!.run()
   }
 
-  private func keyboardFontURLs(forFont font: Font?) -> [URL] {
+  private func keyboardFontURLs(forFont font: Font?, options: Options) -> [URL] {
     guard let font = font else {
       return []
     }
-    guard let baseURL = options?.fontBaseURL else {
-      kmLog("Options not yet loaded", checkDebugPrinting: false)
-      return []
-    }
     return font.source.filter({ $0.hasFontExtension })
-      .map({ baseURL.appendingPathComponent($0) })
+      .map({ options.fontBaseURL.appendingPathComponent($0) })
   }
 
   /// Downloads a custom keyboard from the URL
   /// - Parameters:
-  ///   - jsonUrl: URL to a JSON description of the keyboard
-  ///   - isDirect: The keyboard is downloaded directly instead of via Keyman Engine Cloud Services.
-  ///     Should normally be false to permit caching and prevent overloading a target server.
-  public func downloadKeyboard(from jsonUrl: URL, isDirect: Bool) {
+  ///   - url: URL to a JSON description of the keyboard
+  public func downloadKeyboard(from url: URL) {
     guard reachability.currentReachabilityStatus() != NotReachable else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "No connection"])
       downloadFailed(forKeyboards: [], error: error)
       return
-    }
-
-    let url: URL
-    if isDirect {
-      url = jsonUrl
-    } else {
-      let deviceParam = (UIDevice.current.userInterfaceIdiom == .phone) ? "iphone" : "ipad"
-      let encodedUrl = jsonUrl.absoluteString.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)!
-      url = URL(string: "\(apiRemoteURL)\(encodedUrl)&dateformat=seconds&device=\(deviceParam)")!
     }
 
     guard let data = try? Data(contentsOf: url) else {
@@ -612,27 +597,28 @@ UIGestureRecognizerDelegate {
     }
 
     let decoder = JSONDecoder()
-    decoder.dateDecodingStrategy = .secondsSince1970
+    decoder.dateDecodingStrategy = .ios8601WithFallback
     do {
-      let keyboard = try decoder.decode(Keyboard.self, from: data)
+      let keyboard = try decoder.decode(KeyboardAPICall.self, from: data)
       return downloadKeyboard(keyboard)
     } catch {
-      downloadFailed(forKeyboards: [], error: error as NSError)
+      downloadFailed(forKeyboards: [], error: error)
       return
     }
   }
 
   /// Assumes that Keyboard has font and oskFont set and ignores fonts contained in Language.
-  private func downloadKeyboard(_ keyboard: Keyboard) {
+  private func downloadKeyboard(_ keyboardAPI: KeyboardAPICall) {
+    let keyboard = keyboardAPI.keyboard
     let installableKeyboards = keyboard.languages!.map { language in
       InstallableKeyboard(keyboard: keyboard, language: language)
     }
 
     let filename = keyboard.filename
-    let keyboardURL = options!.keyboardBaseURL.appendingPathComponent(filename)
+    let keyboardURL = keyboardAPI.options.keyboardBaseURL.appendingPathComponent(filename)
 
-    let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font) +
-                             keyboardFontURLs(forFont: keyboard.oskFont)))
+    let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: keyboardAPI.options) +
+                             keyboardFontURLs(forFont: keyboard.oskFont, options: keyboardAPI.options)))
 
     if downloadQueue != nil {
       // Download queue is active.
