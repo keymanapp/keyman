@@ -20,27 +20,27 @@ display_usage ( ) {
 exit 1
 }
 
-fetch ( ) {
-    name="${2##*/}"  # Extract just the filename.
-    echo "Downloading $name"
-    rm $2          2> /dev/null
-    curl -s $1 -o $2
+set_version ( ) {
+  PRODUCT_PATH=$1
+
+  if [ $BUILD_NUMBER ]; then
+    if [ $2 ]; then  # $2 = product name.
+      echo "Setting version numbers in $2 to $BUILD_NUMBER."
+    fi
+    /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" "$PRODUCT_PATH/Info.plist"
+    /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$PRODUCT_PATH/Info.plist"
+  fi
 }
 
-KMEI_RESOURCES=engine/KMEI/KeymanEngine/resources
-KMEI_BUILD_PATH=engine/KMEI/build
-BUNDLE_PATH=$KMEI_RESOURCES/Keyman.bundle/contents/resources
-APP_FRAMEWORK_PATH=keyman/Keyman/KeymanEngine.framework
-APP_BUILD_PATH=keyman/Keyman/build/
-KMW_SOURCE=../web/source
-
 do_clean ( ) {
-  rm -rf $KMEI_BUILD_PATH
-  rm -rf $APP_BUILD_PATH
-  rm -rf $APP_BUNDLE_PATH
+  rm -rf $BUILD_PATH
 }
 
 ### START OF THE BUILD ###
+
+# Base definitions (must be before do_clean call)
+DERIVED_DATA=build
+BUILD_PATH=$DERIVED_DATA/Build/Products
 
 # Default is building and copying to assets
 DO_KMW_BUILD=true
@@ -64,8 +64,7 @@ while [[ $# -gt 0 ]] ; do
             DO_KEYMANAPP=false
             ;;
         -no-codesign)
-            CODE_SIGN_IDENTITY="CODE_SIGN_IDENTITY="
-            CODE_SIGNING_REQUIRED="CODE_SIGNING_REQUIRED=NO"
+            CODE_SIGN="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO $DEV_TEAM"
             DO_ARCHIVE=false
             ;;
         -no-archive)
@@ -84,10 +83,20 @@ while [[ $# -gt 0 ]] ; do
     shift # past argument
 done
 
-APP_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.app
-KEYBOARD_BUNDLE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/SWKeyboard.appex
-ARCHIVE_PATH=$APP_BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
-BUILD_FRAMEWORK_PATH=$KMEI_BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
+# Extended path definitions
+KMEI_RESOURCES=engine/KMEI/KeymanEngine/resources
+BUNDLE_PATH=$KMEI_RESOURCES/Keyman.bundle/contents/resources
+KMW_SOURCE=../web/source
+
+# Build product paths
+APP_BUNDLE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/Keyman.app
+KEYBOARD_BUNDLE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/SWKeyboard.appex
+ARCHIVE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/Keyman.xcarchive
+FRAMEWORK_PATH_UNIVERSAL=$BUILD_PATH/$CONFIG-universal/KeymanEngine.framework
+FRAMEWORK_PATH_IOS=$BUILD_PATH/$CONFIG-iphoneos/KeymanEngine.framework
+
+XCODEFLAGS="-quiet -configuration $CONFIG"
+XCODEFLAGS_EXT="$XCODEFLAGS -derivedDataPath $DERIVED_DATA -workspace keymanios.xcworkspace"
 
 if [ $CLEAN_ONLY = true ]; then
   exit 0
@@ -130,21 +139,17 @@ update_bundle
 echo
 echo "Building KMEI..."
 
-#OTHER_CFLAGS=-fembed-bitcode is relied upon for building the samples by command-line.  They build fine within XCode itself without it, though.
+rm -r $BUILD_PATH/$CONFIG-universal 2>/dev/null
+xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal
 
-rm -r $KMEI_BUILD_PATH/$CONFIG-universal 2>/dev/null
-xcodebuild -quiet -project engine/KMEI/KeymanEngine.xcodeproj -target KME-universal -configuration $CONFIG \
-  $CODE_SIGN_IDENTITY $CODE_SIGNING_REQUIRED $DEV_TEAM
-assertDirExists "$BUILD_FRAMEWORK_PATH"
-
-if [ $BUILD_NUMBER ]; then
-  echo "Setting version number in KeymanEngine to $BUILD_NUMBER."
-  /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" "$BUILD_FRAMEWORK_PATH/Info.plist"
-  /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$BUILD_FRAMEWORK_PATH/Info.plist"
+if [ $? -ne 0 ]; then
+  fail "KMEI build failed."
 fi
 
-rm -r "$APP_FRAMEWORK_PATH"
-cp -R "$BUILD_FRAMEWORK_PATH" "$APP_FRAMEWORK_PATH"
+assertDirExists "$FRAMEWORK_PATH_UNIVERSAL"
+
+set_version "$FRAMEWORK_PATH_UNIVERSAL" "KeymanEngine"
+set_version "$FRAMEWORK_PATH_IOS"
 
 echo "KMEI build complete."
 
@@ -154,34 +159,21 @@ if [ $DO_KEYMANAPP = true ]; then
       DEV_TEAM="DEVELOPMENT_TEAM=${DEVELOPMENT_TEAM}"
     fi
 
-    # To dynamically set the parameters in a way xcodebuild can use them, we need to construct the entire xcodebuild call as a string first.
-    BUILD_1="xcodebuild -quiet -project keyman/Keyman/Keyman.xcodeproj ${CODE_SIGN_IDENTITY} ${CODE_SIGNING_REQUIRED} ${DEV_TEAM} -target SWKeyboard -configuration ${CONFIG}"
-    BUILD_2="xcodebuild -quiet -project keyman/Keyman/Keyman.xcodeproj ${CODE_SIGN_IDENTITY} ${CODE_SIGNING_REQUIRED} ${DEV_TEAM} -target Keyman -configuration ${CONFIG}"
-
     if [ $DO_ARCHIVE = false ]; then
-      # Performs the actual build calls.
-      $BUILD_1
+      xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman
 
-      # Pass the build number information along to the Plist file of the keyboard.  We want to intercept it before it's embedded into the app!
-      if [ $BUILD_NUMBER ]; then
-        echo "Setting version number in SWKeyboard to $BUILD_NUMBER."
-        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" "$KEYBOARD_BUNDLE_PATH/Info.plist"
-        /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$KEYBOARD_BUNDLE_PATH/Info.plist"
+      if [ $? -ne 0 ]; then
+        fail "Keyman app build failed."
       fi
-
-      $BUILD_2
 
       # Pass the build number information along to the Plist file of the app.
-      if [ $BUILD_NUMBER ]; then
-        echo "Setting version number in Keyman app to $BUILD_NUMBER."
-        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" "$APP_BUNDLE_PATH/Info.plist"
-        /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$APP_BUNDLE_PATH/Info.plist"
-      fi
+      set_version "$APP_BUNDLE_PATH" "Keyman"
+      set_version "$APP_BUNDLE_PATH/Plugins/SWKeyboard.appex"
     else
       # Time to prepare the deployment archive data.
       echo ""
       echo "Preparing .ipa file for deployment."
-      xcodebuild -quiet -workspace keymanios.xcworkspace -scheme Keyman -archivePath $ARCHIVE_PATH archive -configuration $CONFIG -allowProvisioningUpdates
+      xcodebuild $XCODEFLAGS_EXT -scheme Keyman -archivePath $ARCHIVE_PATH archive -allowProvisioningUpdates
 
       assertDirExists "$ARCHIVE_PATH"
 
@@ -190,16 +182,17 @@ if [ $DO_KEYMANAPP = true ]; then
         echo "Setting version numbers to $BUILD_NUMBER."
         /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleVersion $BUILD_NUMBER" "$ARCHIVE_PATH/Info.plist"
         /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleShortVersionString $BUILD_NUMBER" "$ARCHIVE_PATH/Info.plist"
-        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER"            "$ARCHIVE_PATH/Products/Applications/Keyman.app/Info.plist"
-        /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$ARCHIVE_PATH/Products/Applications/Keyman.app/Info.plist"
-        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER"            "$ARCHIVE_PATH/Products/Applications/Keyman.app/Plugins/SWKeyboard.appex/Info.plist"
-        /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$ARCHIVE_PATH/Products/Applications/Keyman.app/Plugins/SWKeyboard.appex/Info.plist"
+
+        ARCHIVE_APP="$ARCHIVE_PATH/Products/Applications/Keyman.app"
+        ARCHIVE_KBD="$ARCHIVE_APP/Plugins/SWKeyboard.appex"
+
+        set_version "$ARCHIVE_APP" "Keyman"
+        set_version "$ARCHIVE_KBD"
       fi
 
-      xcodebuild -quiet -exportArchive -archivePath keyman/Keyman/build/${CONFIG}-iphoneos/Keyman.xcarchive -exportOptionsPlist exportAppStore.plist -exportPath keyman/keyman/build/${CONFIG}-iphoneos -configuration $CONFIG  -allowProvisioningUpdates
+      xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
     fi
 
-    #The resulting archives are placed in the keyman/Keyman/build/Release-iphoneos folder.
     echo ""
     if [ $? = 0 ]; then
         echo "Build succeeded."
