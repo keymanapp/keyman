@@ -128,7 +128,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     }
 
     if Manager.shared.removeKeyboard(at: indexPath.row) {
-      self.tableView.reloadData()
+      loadUserKeyboards()
     }
     setIsDoneButtonEnabled(true)
   }
