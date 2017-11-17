@@ -780,7 +780,7 @@ if(!window['keyman']['initialized']) {
      */
     osk.defaultKeyOutput = function(keyName,n,keyShiftState,usingOSK,Lelem) {
       var ch = '', checkCodes = false;
-
+      var touchAlias = (Lelem && typeof(Lelem.base) != 'undefined');
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
       if(keyShiftState == 0) {
         checkCodes = true;
@@ -790,7 +790,7 @@ if(!window['keyman']['initialized']) {
       }
 
       // If this was triggered by the OSK -or- if it was triggered within a touch-aliased DIV element.
-      if((Lelem && typeof(Lelem.base) != 'undefined') || usingOSK) {
+      if(touchAlias || usingOSK) {
         var code = osk.keyCodes[keyName];
         if(!code) {
           code = n;
@@ -828,6 +828,36 @@ if(!window['keyman']['initialized']) {
           case osk.keyCodes['K_SPACE']:
             return ' ';
             break;
+          // Problem:  clusters, and doing them right.
+          // The commented-out code below should be a decent starting point, but clusters make it complex.
+          //
+          // case osk.keyCodes['K_LEFT']:
+          //   if(touchAlias) {
+          //     var caretPos = keymanweb.getTextCaret(Lelem);
+          //     keymanweb.setTextCaret(Lelem, caretPos - 1 >= 0 ? caretPos - 1 : 0);
+          //   }
+          //   break;
+          // case osk.keyCodes['K_RIGHT']:
+          //   if(touchAlias) {
+          //     var caretPos = keymanweb.getTextCaret(Lelem);
+          //     keymanweb.setTextCaret(Lelem, caretPos + 1);
+          //   }
+          //   if(code == osk.keyCodes['K_RIGHT']) {
+          //     break;
+          //   }
+          // // Should we include this?  It could be tricky to do correctly...
+          // case osk.keyCodes['K_DEL']:
+          //   // Move caret right one unit, then backspace.
+          //   if(touchAlias) {
+          //     var caretPos = keymanweb.getTextCaret(Lelem);
+          //     keymanweb.setTextCaret(Lelem, caretPos + 1);
+          //     if(caretPos == keymanweb.getTextCaret(Lelem)) {
+          //       // Failed to move right - there's nothing to delete.
+          //       break;
+          //     }
+          //     kbdInterface.output(1, keymanweb._LastActiveElement,"");
+          //   }
+          //   break;
         }
       }
 
