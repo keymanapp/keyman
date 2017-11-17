@@ -1438,8 +1438,8 @@ UIGestureRecognizerDelegate {
       let version = String(filename[dashRange.upperBound..<extensionRange.lowerBound])
 
       if let previousMax = latestVersion {
-        if let result = compareVersions(previousMax, version), result == .orderedAscending {
-          latestVersion = previousMax
+        if compareVersions(previousMax, version) == .orderedAscending {
+          latestVersion = version
         }
       } else if compareVersions(version, version) != nil {  // Ensure that the version number is valid
         latestVersion = version
