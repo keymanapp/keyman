@@ -522,7 +522,7 @@
         kbdInterface.output(0, Lelem, '\n');
         return true;
     }
-    var ch = osk.defaultKeyOutput(keyName, code, shift);
+    var ch = osk.defaultKeyOutput(keyName, code, shift, false);
     if(ch) {
         kbdInterface.output(0, Lelem, ch);
         return true;

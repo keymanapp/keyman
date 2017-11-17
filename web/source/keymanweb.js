@@ -3193,6 +3193,16 @@ if(!window['keyman']['initialized']) {
           return false;
         }
       }
+
+      if(typeof(Levent.Ltarg.base) != 'undefined') {
+        // Simulated touch elements have no default text-processing - we need to rely on a strategy similar to
+        // that of the OSK here.
+        var ch = osk.defaultKeyOutput('',Levent.Lcode,Levent.Lmodifiers,false,Levent.Ltarg);
+        if(ch) {
+          kbdInterface.output(0, Levent.Ltarg, ch);
+          return false;
+        }
+      }
       return true;
     }                
 
@@ -3266,21 +3276,28 @@ if(!window['keyman']['initialized']) {
      * @return      {boolean}           
      * Description Processes keyup event and passes event data to keyboard
      */       
-    keymanweb._KeyUp = function(e)
-    {
+    keymanweb._KeyUp = function(e) {
       var Levent = keymanweb._GetKeyEventProperties(e, false);
-      if(Levent == null || !osk.ready) return true;
+      if(Levent == null || !osk.ready) {
+        return true;
+      }
 
-      switch(Levent.Lcode)
-      {
+      switch(Levent.Lcode) {
         case 13:  
-          if(Levent.Ltarg.nodeName == 'TEXTAREA') break;
+          if(Levent.Ltarg.nodeName == 'TEXTAREA') {
+            break;
+          }
         
+          if(Levent.Ltarg.base && Levent.Ltarg.base.nodeName == 'TEXTAREA') {
+            break;
+          }
+
           // For input fields, move to next input element
-          if(Levent.Ltarg.type == 'search' || Levent.Ltarg.type == 'submit')
+          if(Levent.Ltarg.type == 'search' || Levent.Ltarg.type == 'submit') {
             Levent.Ltarg.form.submit();
-          else
+          } else {
             keymanweb.moveToNext(false);
+          }
           return true;        
                   
         case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
@@ -3304,17 +3321,13 @@ if(!window['keyman']['initialized']) {
 
       // I736 start
       var Ldv;
-      if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  Ldv.type != 'control')   // I1479 - avoid createRange on controls
-      {
+      if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  Ldv.type != 'control') { // I1479 - avoid createRange on controls
         Ldv=Ldv.createRange();
         //if(Ldv.parentElement()==Levent.Ltarg) //I1505
         keymanweb._Selection = Ldv;
       }
       // I736 end
       
-      //if(document.selection  &&  document.selection.type=='Text') keymanweb._Selection=document.selection.createRange();
-      //if(!KeymanWeb._Enabled) return true;
-      //if (!e) e = window.event;
       return false;
     }
     
@@ -3329,51 +3342,52 @@ if(!window['keyman']['initialized']) {
     * 
     * @param      {number|boolean}  bBack     Direction to move (0 or 1)
     */
-    keymanweb.moveToNext=function(bBack)
-    {
-      var i,t=keymanweb.sortedInputs,
-        activeBase=keymanweb._ActiveElement;
+    keymanweb.moveToNext=function(bBack) {
+      var i,t=keymanweb.sortedInputs, activeBase=keymanweb._ActiveElement;
       
-      if(t.length == 0) return;
+      if(t.length == 0) {
+        return;
+      }
 
       // For touchable devices, get the base element of the DIV
-      if(device.touchable) activeBase=activeBase.base;
+      if(device.touchable) {
+        activeBase=activeBase.base;
+      }
 
       // Identify the active element in the list of inputs ordered by position
-      for(i=0; i<t.length; i++)
-      {          
+      for(i=0; i<t.length; i++) {          
         if(t[i] == activeBase) break;
       }   
 
       // Find the next (or previous) element in the list
-      if(bBack) i=i-1; else i=i+1; 
-      if(i >= t.length) i=i-t.length;
-      if(i < 0) i=i+t.length;
+      if(bBack) {
+        i=i-1;
+      } else {
+        i=i+1;
+      }
+      if(i >= t.length) {
+        i=i-t.length;
+      }
+      if(i < 0) {
+        i=i+t.length;
+      }
 
       // Move to the selected element
-      if(device.touchable)
-      {                     
+      if(device.touchable) {                     
         // Set focusing flag to prevent OSK disappearing 
         keymanweb.focusing=true;
         var target=t[i]['kmw_ip'];
 
         // Focus if next element is non-mapped
-        if(typeof(target) == 'undefined')
-        {
+        if(typeof(target) == 'undefined') {
           t[i].focus();
-        }
-        
-        // Or reposition the caret on the input DIV if mapped
-        else  
-        {
+        } else { // Or reposition the caret on the input DIV if mapped
           keymanweb._ActiveElement=keymanweb._LastActiveElement=target;    
           keymanweb.setTextCaret(target,10000);                            
-          keymanweb.scrollInput(target);                                   
+          keymanweb.scrollInput(target);   // mousedown check
+          target.focus();
         } 
-      }
-      // Behaviour for desktop browsers
-      else
-      {
+      } else { // Behaviour for desktop browsers
         t[i].focus();
       }    
     }          
