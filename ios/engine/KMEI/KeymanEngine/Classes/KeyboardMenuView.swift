@@ -85,7 +85,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     super.init(frame: mainFrame)
 
     let screenWidth = UIScreen.main.bounds.width
-    let maxWidth = CGFloat.maximum(getMaxWidth(), screenWidth)
+    let maxWidth = CGFloat.minimum(getMaxWidth(), screenWidth)
     let baseHeight = keyFrame.size.height
     let containerWidth = maxWidth - strokeWidth * 2
     var containerHeight = CGFloat(tableList.count) * rowHeight

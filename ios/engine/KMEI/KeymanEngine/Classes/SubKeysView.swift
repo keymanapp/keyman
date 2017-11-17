@@ -198,7 +198,7 @@ class SubKeysView: UIView {
     }
 
     if viewRight.rounded() == keyRight.rounded() || viewRight.rounded(.down) == keyRight.rounded(.down) {
-      keyRight = viewRight > keyRight ? viewRight : keyRight
+      keyRight = CGFloat.maximum(viewRight, keyRight)
       viewRight = keyRight
     }
 
