@@ -1326,6 +1326,21 @@ if(!window['keyman']['initialized']) {
     // End of I3363 (Build 301) additions
 
     /**
+     * Function     processKeystroke
+     * Scope        Private
+     * @param       {Object}        device      The device object properties to be utilized for this keystroke.
+     * @param       {Object}        element     The page element receiving input
+     * @param       {Object}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
+     * Description  Encapsulates calls to keyboard input processing.
+     * @returns     {number}        0 if no match is made, otherwise 1.
+     */
+    keymanweb.processKeystroke = function(device, element, keystroke) {
+      util.activeDevice = device;
+
+      return keymanweb._ActiveKeyboard['gs'](element, keystroke);
+    }
+
+    /**
      * Function     resetContext
      * Scope        Public
      * Description  Revert OSK to default layer and clear any deadkeys and modifiers
@@ -3190,7 +3205,10 @@ if(!window['keyman']['initialized']) {
       keymanweb._CachedSelectionStart = null; // I3319     
       keymanweb._DeadkeyResetMatched();       // I3318    
       keymanweb.cachedContext.reset();
-      return keymanweb._ActiveKeyboard['gs'](Ltarg, Levent);
+
+      // As this function should only be called for hardware keyboard input processing,
+      // this processes the keystroke through hardware-based rules.
+      return keymanweb.processKeystroke(util.physicalDevice, Ltarg, Levent);
     }
 
     /**

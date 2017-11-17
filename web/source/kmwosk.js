@@ -955,7 +955,7 @@ if(!window['keyman']['initialized']) {
         }
 
         // Pass this key code and state to the keyboard program
-        if(!keymanweb._ActiveKeyboard || (Lkc.Lcode != 0 && !keymanweb._ActiveKeyboard['gs'](Lelem, Lkc)))
+        if(!keymanweb._ActiveKeyboard || (Lkc.Lcode != 0 && !keymanweb.processKeystroke(util.device, Lelem, Lkc)))
         {
           // Restore the virtual key code if a mnemonic keyboard is being used
           Lkc.Lcode=Lkc.vkCode;
