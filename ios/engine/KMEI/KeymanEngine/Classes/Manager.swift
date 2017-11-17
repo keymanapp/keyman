@@ -202,7 +202,6 @@ UIGestureRecognizerDelegate {
     }
 
     copyWebFilesToLibrary()
-    renameOldKeyboardFiles()
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
                                            name: .UIKeyboardWillShow, object: nil)
@@ -1136,40 +1135,6 @@ UIGestureRecognizerDelegate {
       return .orderedAscending
     }
     return .orderedSame
-  }
-
-  func renameOldKeyboardFiles() {
-    let fileManager = FileManager.default
-    guard let langDir = activeLanguageDirectory(),
-          let dirContents = try? fileManager.contentsOfDirectory(atPath: langDir.path) else {
-      kmLog("renameOldKeyboardFiles(): Failed to list language directory", checkDebugPrinting: false)
-      return
-    }
-
-    for filename in dirContents {
-      if !filename.contains("-") {
-        if filename == "us.js" {
-          let fileUrl = langDir.appendingPathComponent(filename)
-          try? fileManager.removeItem(at: fileUrl)
-
-          let userData = activeUserDefaults()
-          let curKB = userData.currentKeyboard
-          if curKB?.id == "us" {
-            userData.currentKeyboard = nil
-            userData.synchronize()
-          }
-        } else {
-          let newFilename = "\(filename.dropLast(3))-1.0.js"
-          let fileUrl = langDir.appendingPathComponent(filename)
-          let newFileUrl = langDir.appendingPathComponent(newFilename)
-          try? fileManager.moveItem(at: fileUrl, to: newFileUrl)
-        }
-      } else {
-        let oldFilename = "\(filename[filename.startIndex..<filename.index(of: "-")!]).js"
-        let oldFileUrl = langDir.appendingPathComponent(oldFilename)
-        try? fileManager.removeItem(at: oldFileUrl)
-      }
-    }
   }
 
   // TODO: Consider making these lazy vars
