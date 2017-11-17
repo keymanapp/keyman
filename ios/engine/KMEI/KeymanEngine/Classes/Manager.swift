@@ -1797,12 +1797,12 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   // MARK: - KeymanWebViewDelegate methods
-  func keyboardLoaded(_ view: KeymanWebViewController) {
-    keymanWebDelegate?.keyboardLoaded(view)
+  func keyboardLoaded(_ keymanWeb: KeymanWebViewController) {
+    keymanWebDelegate?.keyboardLoaded(keymanWeb)
 
     kmLog("Loaded keyboard.", checkDebugPrinting: true)
     resizeKeyboard()
-    view.setDeviceType(UIDevice.current.userInterfaceIdiom)
+    keymanWeb.setDeviceType(UIDevice.current.userInterfaceIdiom)
 
     var newKb = Constants.defaultKeyboard
     if (keyboardID == nil || languageID == nil) && !shouldReloadKeyboard {
@@ -1827,15 +1827,15 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
   }
 
-  func insertText(_ view: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
-    keymanWebDelegate?.insertText(view, numCharsToDelete: numCharsToDelete, newText: newText)
+  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
+    keymanWebDelegate?.insertText(keymanWeb, numCharsToDelete: numCharsToDelete, newText: newText)
 
     dismissHelpBubble()
     isKeymanHelpOn = false
   }
 
-  func showKeyPreview(_ view: KeymanWebViewController, keyFrame: CGRect, preview: String) {
-    keymanWebDelegate?.showKeyPreview(view, keyFrame: keyFrame, preview: preview)
+  func showKeyPreview(_ keymanWeb: KeymanWebViewController, keyFrame: CGRect, preview: String) {
+    keymanWebDelegate?.showKeyPreview(keymanWeb, keyFrame: keyFrame, preview: preview)
 
     if UIDevice.current.userInterfaceIdiom == .pad
       || (isSystemKeyboard && !isSystemKeyboardTopBarEnabled)
@@ -1855,8 +1855,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     keymanWeb.view.addSubview(keyPreviewView!)
   }
 
-  func dismissKeyPreview(_ view: KeymanWebViewController) {
-    keymanWebDelegate?.dismissKeyPreview(view)
+  func dismissKeyPreview(_ keymanWeb: KeymanWebViewController) {
+    keymanWebDelegate?.dismissKeyPreview(keymanWeb)
 
     if UIDevice.current.userInterfaceIdiom == .pad || keyPreviewView == nil {
       return
@@ -1868,12 +1868,12 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     clearSubKeyArrays()
   }
 
-  func showSubkeys(_ view: KeymanWebViewController,
+  func showSubkeys(_ keymanWeb: KeymanWebViewController,
                    keyFrame: CGRect,
                    subkeyIDs: [String],
                    subkeyTexts: [String],
                    useSpecialFont: Bool) {
-    keymanWebDelegate?.showSubkeys(view,
+    keymanWebDelegate?.showSubkeys(keymanWeb,
                                    keyFrame: keyFrame,
                                    subkeyIDs: subkeyIDs,
                                    subkeyTexts: subkeyTexts,
@@ -1889,12 +1889,12 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     subKeyTexts = subkeyTexts
   }
 
-  func menuKeyDown(_ view: KeymanWebViewController) {
-    keymanWebDelegate?.menuKeyDown(view)
+  func menuKeyDown(_ keymanWeb: KeymanWebViewController) {
+    keymanWebDelegate?.menuKeyDown(keymanWeb)
   }
 
-  func menuKeyUp(_ view: KeymanWebViewController) {
-    keymanWebDelegate?.menuKeyUp(view)
+  func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
+    keymanWebDelegate?.menuKeyUp(keymanWeb)
 
     dismissHelpBubble()
     isKeymanHelpOn = false
@@ -1905,8 +1905,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
   }
 
-  func hideKeyboard(_ view: KeymanWebViewController) {
-    keymanWebDelegate?.hideKeyboard(view)
+  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
+    keymanWebDelegate?.hideKeyboard(keymanWeb)
 
     dismissHelpBubble()
     dismissSubKeys()

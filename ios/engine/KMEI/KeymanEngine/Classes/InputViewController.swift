@@ -157,7 +157,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     Manager.shared.setSelectionRange(NSRange(newRange, in: context), manually: false)
   }
 
-  func insertText(_ view: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
+  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     if Manager.shared.isSubKeysMenuVisible {
       return
     }
@@ -195,7 +195,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
   }
 
-  func menuKeyUp(_ view: KeymanWebViewController) {
+  func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
     if Manager.shared.isKeyboardMenuVisible {
       return
     }
@@ -212,7 +212,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
   }
 
-  func menuKeyHeld(_ view: KeymanWebViewController) {
+  func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
     switch menuBehaviour {
     case .showAlways,
          .showIfMultipleKeyboards where keyboardListCount > 1:
@@ -223,7 +223,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
   }
 
-  func hideKeyboard(_ view: KeymanWebViewController) {
+  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
     dismissKeyboard()
   }
 

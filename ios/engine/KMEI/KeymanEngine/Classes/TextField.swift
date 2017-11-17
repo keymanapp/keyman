@@ -134,7 +134,7 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebDelegate {
   }
 
   // MARK: - KeymanWebViewDelegate
-  func insertText(_ view: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
+  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     if Manager.shared.isSubKeysMenuVisible {
       return
     }
@@ -161,11 +161,11 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebDelegate {
     }
   }
 
-  func hideKeyboard(_ view: KeymanWebViewController) {
+  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
     dismissKeyboard()
   }
 
-  func menuKeyUp(_ view: KeymanWebViewController) {
+  func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
     if let viewController = viewController {
       Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
     } else {
