@@ -1153,15 +1153,10 @@ if(!window['keyman']['initialized']) {
           util.attachDOMEvent(baseElement,'focus', keymanweb._ControlFocus);
           util.attachDOMEvent(baseElement,'blur', keymanweb._ControlBlur);
 
-          // TODO:  Rework KMW to properly support physical keyboard use while in touch mode properly.
-          //        As not all the proper infrastructure exists (regarding certain keyboard stores/rules),
-          //        we leave physical keystroke input disabled when in touch mode.
-          if(!isAlias) {
-            // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
-            Pelem.onkeypress = keymanweb._KeyPress;
-            Pelem.onkeydown = keymanweb._KeyDown;
-            Pelem.onkeyup = keymanweb._KeyUp;      
-          }
+          // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
+          Pelem.onkeypress = keymanweb._KeyPress;
+          Pelem.onkeydown = keymanweb._KeyDown;
+          Pelem.onkeyup = keymanweb._KeyUp;      
         }
       } 
     }; 
@@ -3294,8 +3289,12 @@ if(!window['keyman']['initialized']) {
         case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
         case 144:
         case 145:
-          keymanweb._NotifyKeyboard(Levent.Lcode,Levent.Ltarg,0); 
-          return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1);  // I2187
+          keymanweb._NotifyKeyboard(Levent.Lcode,Levent.Ltarg,0);
+          if(!device.touchable) {
+            return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1);  // I2187
+          } else {
+            return true;
+          }
       }
       
       if(Levent.LmodifierChange){
