@@ -3360,17 +3360,9 @@ if(!window['keyman']['initialized']) {
       }   
 
       // Find the next (or previous) element in the list
-      if(bBack) {
-        i=i-1;
-      } else {
-        i=i+1;
-      }
-      if(i >= t.length) {
-        i=i-t.length;
-      }
-      if(i < 0) {
-        i=i+t.length;
-      }
+      i = bBack ? i-1 : i+1;
+      // Treat the list as circular, wrapping the index if necessary.
+      i = i >= t.length ? i-t.length : (i < 0 ? i+t.length : i) ;
 
       // Move to the selected element
       if(device.touchable) {                     
