@@ -14,6 +14,18 @@ private let keyboardChangeHelpText = "Tap here to change keyboard"
 private let subKeyColor = #colorLiteral(red: 244.0 / 255.0, green: 244.0 / 255.0, blue: 244.0 / 255.0, alpha: 1.0)
 private let subKeyColorHighlighted = #colorLiteral(red: 136.0 / 255.0, green: 136.0 / 255.0, blue: 1.0, alpha: 1.0)
 
+// UI In-App Keyboard Constants
+private let phonePortraitInAppKeyboardHeight: CGFloat = 183.0
+private let phoneLandscapeInAppKeyboardHeight: CGFloat = 183.0
+private let padPortraitInAppKeyboardHeight: CGFloat = 385.0
+private let padLandscapeInAppKeyboardHeight: CGFloat = 385.0
+
+// UI System Keyboard Constants
+private let phonePortraitSystemKeyboardHeight: CGFloat = 216.0
+private let phoneLandscapeSystemKeyboardHeight: CGFloat = 162.0
+private let padPortraitSystemKeyboardHeight: CGFloat = 264.0
+private let padLandscapeSystemKeyboardHeight: CGFloat = 352.0
+
 // MARK: - UIViewController
 class KeymanWebViewController: UIViewController {
   weak var delegate: KeymanWebDelegate?
@@ -32,14 +44,7 @@ class KeymanWebViewController: UIViewController {
   private var subKeys: [UIButton] = []
 
   private var subKeyAnchor = CGRect.zero
-
-  var frame: CGRect? {
-    didSet(frame) {
-      if let view = view, let frame = frame {
-        view.frame = frame
-      }
-    }
-  }
+  private var lastKeyboardSize: CGSize = .zero
 
   override func loadView() {
     let config = WKWebViewConfiguration()
@@ -52,7 +57,7 @@ class KeymanWebViewController: UIViewController {
     userContentController.add(self, name: "keyman")
     config.userContentController = userContentController
 
-    webView = WKWebView(frame: frame ?? .zero, configuration: config)
+    webView = WKWebView(frame: CGRect(origin: .zero, size: keyboardSize), configuration: config)
     webView.isOpaque = false
     webView.backgroundColor = UIColor.clear
     webView.navigationDelegate = self
@@ -69,9 +74,7 @@ class KeymanWebViewController: UIViewController {
   }
 
   override func viewWillAppear(_ animated: Bool) {
-    if let frame = frame {
-      view.frame = frame
-    }
+    view.frame = CGRect(origin: .zero, size: keyboardSize)
     super.viewWillAppear(animated)
   }
 }
@@ -480,6 +483,90 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
 
 // MARK: - Manage views
 extension KeymanWebViewController {
+  // MARK: - Sizing
+  public var keyboardHeight: CGFloat {
+    if Util.isSystemKeyboard {
+      return keyboardHeight(isPortrait: InputViewController.isPortrait)
+    } else {
+      return keyboardHeight(isPortrait: UIDevice.current.orientation.isPortrait)
+    }
+  }
+
+  func keyboardHeight(with orientation: UIInterfaceOrientation) -> CGFloat {
+    return keyboardHeight(isPortrait: orientation.isPortrait)
+  }
+
+  func keyboardHeight(isPortrait: Bool) -> CGFloat {
+    let isSystemKeyboard = Util.isSystemKeyboard
+    if UIDevice.current.userInterfaceIdiom == .pad {
+      if isPortrait {
+        return isSystemKeyboard ? padPortraitSystemKeyboardHeight : padPortraitInAppKeyboardHeight
+      } else {
+        return isSystemKeyboard ? padLandscapeSystemKeyboardHeight : padLandscapeInAppKeyboardHeight
+      }
+    } else {
+      if isPortrait {
+        return isSystemKeyboard ? phonePortraitSystemKeyboardHeight : phonePortraitInAppKeyboardHeight
+      } else {
+        return isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : phoneLandscapeInAppKeyboardHeight
+      }
+    }
+  }
+
+  var keyboardWidth: CGFloat {
+    return UIScreen.main.bounds.width
+  }
+
+  var keyboardSize: CGSize {
+    return CGSize(width: keyboardWidth, height: keyboardHeight)
+  }
+
+  func resizeKeyboard() {
+    let newSize = keyboardSize
+    if Util.isSystemKeyboard && lastKeyboardSize == newSize {
+      return
+    }
+    lastKeyboardSize = newSize
+
+    view.frame = CGRect(origin: .zero, size: newSize)
+
+    // Workaround for WKWebView bug with landscape orientation
+    // TODO: Check if still necessary and if there's a better solution
+    if Util.isSystemKeyboard {
+      perform(#selector(self.resizeDelay), with: self, afterDelay: 1.0)
+    }
+
+    var oskHeight = Int(newSize.height)
+    oskHeight -= oskHeight % (Util.isSystemKeyboard ? 10 : 20)
+
+    setOskWidth(Int(newSize.width))
+    setOskHeight(oskHeight)
+  }
+
+  @objc func resizeDelay() {
+    // + 1000 to work around iOS bug with resizing on landscape orientation. Technically we only
+    // need this for landscape but it doesn't hurt to do it with both. 1000 is a big number that
+    // should hopefully work on all devices.
+    let kbWidth = keyboardWidth
+    let kbHeight = keyboardHeight
+    view.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight + 1000)
+  }
+
+  func resizeKeyboard(with orientation: UIInterfaceOrientation) {
+    // TODO: Update to use new size instead of orientation since viewWillRotate() is deprecated
+    // TODO: Refactor to use resizeKeyboard()
+    let kbWidth = keyboardWidth
+    let kbHeight = keyboardHeight(with: orientation)
+    view.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
+
+    var oskHeight = Int(kbHeight)
+    oskHeight -= oskHeight % (Util.isSystemKeyboard ? 10 : 20)
+
+    setOskWidth(Int(kbWidth))
+    setOskHeight(oskHeight)
+  }
+
+  // MARK: - Show/hide views
   func reloadKeyboard() {
     if #available(iOS 9.0, *) {
       webView.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)

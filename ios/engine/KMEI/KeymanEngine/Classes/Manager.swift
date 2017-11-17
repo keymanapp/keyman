@@ -25,18 +25,6 @@ public enum KeyboardState {
 // URLs
 private let keymanHostName = "r.keymanweb.com"
 
-// UI In-App Keyboard Constants
-private let phonePortraitInAppKeyboardHeight: CGFloat = 183.0
-private let phoneLandscapeInAppKeyboardHeight: CGFloat = 183.0
-private let padPortraitInAppKeyboardHeight: CGFloat = 385.0
-private let padLandscapeInAppKeyboardHeight: CGFloat = 385.0
-
-// UI System Keyboard Constants
-private let phonePortraitSystemKeyboardHeight: CGFloat = 216.0
-private let phoneLandscapeSystemKeyboardHeight: CGFloat = 162.0
-private let padPortraitSystemKeyboardHeight: CGFloat = 264.0
-private let padLandscapeSystemKeyboardHeight: CGFloat = 352.0
-
 public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegate, KeymanWebDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
   public static var applicationGroupIdentifier: String?
@@ -91,19 +79,12 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   weak var keymanWebDelegate: KeymanWebDelegate?
   var currentRequest: HTTPDownloadRequest?
   var shouldReloadKeyboard = false
-  lazy var keymanWeb: KeymanWebViewController = {
-    let kmw = KeymanWebViewController(nibName: nil, bundle: nil)
-    kmw.frame = CGRect(origin: .zero, size: keyboardSize)
-    kmw.delegate = self
-    return kmw
-  }()
+  var keymanWeb: KeymanWebViewController!
 
   private var downloadQueue: HTTPDownloader?
   private var sharedQueue: HTTPDownloader!
   private var reachability: Reachability!
   private var didSynchronize = false
-  private var didResizeToOrientation = false
-  private var lastKeyboardSize: CGSize = .zero
 
   // MARK: - Object Admin
   deinit {
@@ -163,6 +144,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
      * set the queue running, this should be perfectly fine.
      */
     sharedQueue = HTTPDownloader.init(self)
+
+    keymanWeb = KeymanWebViewController()
+    keymanWeb.delegate = self
   }
 
   // MARK: - Keyboard management
@@ -837,69 +821,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   // MARK: - View management
-
-  public var keyboardHeight: CGFloat {
-    if Util.isSystemKeyboard {
-      return keyboardHeight(isPortrait: InputViewController.isPortrait)
-    } else {
-      return keyboardHeight(isPortrait: UIDevice.current.orientation.isPortrait)
-    }
-  }
-
-  func keyboardHeight(with orientation: UIInterfaceOrientation) -> CGFloat {
-    return keyboardHeight(isPortrait: orientation.isPortrait)
-  }
-
-  func keyboardHeight(isPortrait: Bool) -> CGFloat {
-    if UIDevice.current.userInterfaceIdiom == .pad {
-      if isPortrait {
-        return Util.isSystemKeyboard ? padPortraitSystemKeyboardHeight : padPortraitInAppKeyboardHeight
-      } else {
-        return Util.isSystemKeyboard ? padLandscapeSystemKeyboardHeight : padLandscapeInAppKeyboardHeight
-      }
-    } else {
-      if isPortrait {
-        return Util.isSystemKeyboard ? phonePortraitSystemKeyboardHeight : phonePortraitInAppKeyboardHeight
-      } else {
-        return Util.isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : phoneLandscapeInAppKeyboardHeight
-      }
-    }
-  }
-
-  var keyboardWidth: CGFloat {
-    return UIScreen.main.bounds.width
-  }
-
-  var keyboardSize: CGSize {
-    return CGSize(width: keyboardWidth, height: keyboardHeight)
-  }
-
   public func loadKeyboard() {
-    _ = keymanWeb
-  }
-
-  // Keyman interaction
-  private func resizeKeyboard() {
-    let newSize = keyboardSize
-    if didResizeToOrientation && Util.isSystemKeyboard && lastKeyboardSize == newSize {
-      didResizeToOrientation = false
-      return
-    }
-    lastKeyboardSize = newSize
-
-    keymanWeb.frame = CGRect(origin: .zero, size: newSize)
-
-    // Workaround for WKWebView bug with landscape orientation
-    // TODO: Check if still necessary and if there's a better solution
-    if Util.isSystemKeyboard {
-      perform(#selector(self.resizeDelay), with: self, afterDelay: 1.0)
-    }
-
-    var oskHeight = Int(newSize.height)
-    oskHeight -= oskHeight % (Util.isSystemKeyboard ? 10 : 20)
-
-    keymanWeb.setOskWidth(Int(newSize.width))
-    keymanWeb.setOskHeight(oskHeight)
+    _ = keymanWeb.view
   }
 
   /// Displays a list of available keyboards and allows a user to add/download new keyboards
@@ -949,38 +872,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
   }
 
-  @objc func resizeDelay() {
-    // + 1000 to work around iOS bug with resizing on landscape orientation. Technically we only
-    // need this for landscape but it doesn't hurt to do it with both. 1000 is a big number that
-    // should hopefully work on all devices.
-    let kbWidth = keyboardWidth
-    let kbHeight = keyboardHeight
-    keymanWeb.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight + 1000)
-  }
-
-  func resizeKeyboardIfNeeded() {
-    // TODO: Check if necessary since resizeKeyboard() checks old size
-    let newSize = keyboardSize
-    if newSize != lastKeyboardSize {
-      resizeKeyboard()
-      lastKeyboardSize = newSize
-    }
-  }
-
-  func resizeKeyboard(with orientation: UIInterfaceOrientation) {
-    // TODO: Update to use new size instead of orientation since viewWillRotate() is deprecated
-    // TODO: Refactor to use resizeKeyboard()
-    let kbWidth = keyboardWidth
-    let kbHeight = keyboardHeight(with: orientation)
-    keymanWeb.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
-
-    var oskHeight = Int(kbHeight)
-    oskHeight -= oskHeight % (Util.isSystemKeyboard ? 10 : 20)
-
-    keymanWeb.setOskWidth(Int(kbWidth))
-    keymanWeb.setOskHeight(oskHeight)
-  }
-
   // MARK: - Text
 
   // TODO: Switch from NSRange
@@ -1004,7 +895,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   @objc func keyboardWillShow(_ notification: Notification) {
     keymanWeb.dismissSubKeys()
     keymanWeb.dismissKeyPreview()
-    resizeKeyboard()
+    keymanWeb.resizeKeyboard()
 
     if isKeymanHelpOn {
       keymanWeb.showHelpBubble(afterDelay: 1.5)
@@ -1022,7 +913,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     keymanWebDelegate?.keyboardLoaded(keymanWeb)
 
     kmLog("Loaded keyboard.", checkDebugPrinting: true)
-    resizeKeyboard()
+    keymanWeb.resizeKeyboard()
     keymanWeb.setDeviceType(UIDevice.current.userInterfaceIdiom)
 
     var newKb = Defaults.keyboard
@@ -1090,14 +981,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     keymanWeb.dismissSubKeys()
     keymanWeb.dismissKeyPreview()
     keymanWeb.dismissKeyboardMenu()
-    resizeKeyboardIfNeeded()
+    keymanWeb.resizeKeyboard()
   }
 
   func inputViewDidLoad() {
     keymanWeb.dismissSubKeys()
     keymanWeb.dismissKeyPreview()
     keymanWeb.dismissKeyboardMenu()
-    resizeKeyboard()
+    keymanWeb.resizeKeyboard()
 
     let activeUserDef = Storage.active.userDefaults
     let standardUserDef = UserDefaults.standard
@@ -1132,11 +1023,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     keymanWeb.dismissSubKeys()
     keymanWeb.dismissKeyPreview()
     keymanWeb.dismissKeyboardMenu()
-    resizeKeyboard(with: toInterfaceOrientation)
+    keymanWeb.resizeKeyboard(with: toInterfaceOrientation)
     if isKeymanHelpOn {
       keymanWeb.showHelpBubble(afterDelay: 1.5)
     }
-    didResizeToOrientation = true
   }
 
   var isSystemKeyboardTopBarEnabled: Bool {

@@ -87,8 +87,8 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     let baseHeight = keyFrame.size.height
     let containerWidth = maxWidth - strokeWidth * 2
     var containerHeight = CGFloat(tableList.count) * rowHeight
-    let vHeight = Manager.shared.keyboardHeight + topBarHeight
-    let bY = Manager.shared.keyboardHeight - (keyFrame.origin.y + baseHeight)
+    let vHeight = Manager.shared.keymanWeb.keyboardHeight + topBarHeight
+    let bY = Manager.shared.keymanWeb.keyboardHeight - (keyFrame.origin.y + baseHeight)
 
     if containerHeight + baseHeight > vHeight - bY {
       let maxRows = (vHeight - baseHeight - bY) / rowHeight
