@@ -377,6 +377,11 @@ UIGestureRecognizerDelegate {
     userData.set([Date()], forKey: Key.synchronizeSWKeyboard)
     userData.synchronize()
 
+    // Set a new keyboard if deleting the current one
+    if kb.id == keyboardID && kb.languageID == languageID {
+      setKeyboard(userKeyboards[0])
+    }
+
     NotificationCenter.default.post(name: Notifications.keyboardRemoved, object: self, value: kb)
     return true
   }
