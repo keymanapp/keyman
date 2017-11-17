@@ -74,6 +74,14 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     return appDelegate?.overlayWindow
   }
 
+  convenience init() {
+    if UIDevice.current.userInterfaceIdiom == .phone {
+      self.init(nibName: "MainViewController_iPhone", bundle: nil)
+    } else {
+      self.init(nibName: "MainViewController_iPad", bundle: nil)
+    }
+  }
+
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
 
@@ -223,10 +231,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textView.isEditable = false
 
     // Setup Info View
-    if UIDevice.current.userInterfaceIdiom == .phone {
-      infoView = InfoViewController(nibName: "InfoViewController_iPhone", bundle: nil)
-    } else {
-      infoView = InfoViewController(nibName: "InfoViewController_iPad", bundle: nil)
+    infoView = InfoViewController()
+    if UIDevice.current.userInterfaceIdiom != .phone {
       textSize *= 2
       textView.font = textView?.font?.withSize(textSize)
     }

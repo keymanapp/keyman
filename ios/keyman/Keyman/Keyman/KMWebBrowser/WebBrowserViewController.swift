@@ -34,6 +34,10 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   private var keyboardChangedObserver: NotificationObserver?
   private var keyboardPickerDismissedObserver: NotificationObserver?
 
+  convenience init() {
+    self.init(nibName: "WebBrowserViewController", bundle: nil)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 

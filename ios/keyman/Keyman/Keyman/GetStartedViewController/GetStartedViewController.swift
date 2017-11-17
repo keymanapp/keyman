@@ -18,6 +18,10 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     NotificationCenter.default.removeObserver(self)
   }
 
+  convenience init() {
+    self.init(nibName: "GetStartedViewController", bundle: nil)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
