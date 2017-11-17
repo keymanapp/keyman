@@ -118,11 +118,6 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  private var isCurrentKeyboard: Bool {
-    return Manager.shared.keyboardID == keyboardID &&
-      Manager.shared.languageID == languageID
-  }
-
   private var canDeleteKeyboard: Bool {
     if !Manager.shared.canRemoveKeyboards {
       return false
@@ -156,14 +151,8 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     if alertView.tag == 1 {
       let userData = Manager.shared.activeUserDefaults()
       let userKeyboards = userData.userKeyboards!
-      let kb = userKeyboards[keyboardIndex]
 
       if Manager.shared.removeKeyboard(at: keyboardIndex) {
-        if isCurrentKeyboard {
-          // Select default keyboard
-          Manager.shared.setKeyboard(kb)
-        }
-        NotificationCenter.default.post(name: Notifications.keyboardRemoved, object: self, value: kb)
         navigationController?.popToRootViewController(animated: true)
       }
     }

@@ -128,12 +128,6 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     }
 
     if Manager.shared.removeKeyboard(at: indexPath.row) {
-      let kb = userKeyboards[indexPath.row]
-      if isCurrentKeyboard(languageID: kb.id, keyboardID: kb.languageID) {
-        let userData = Manager.shared.activeUserDefaults()
-        userKeyboards = userData.userKeyboards!
-        Manager.shared.setKeyboard(userKeyboards[0])
-      }
       self.tableView.reloadData()
     }
     setIsDoneButtonEnabled(true)
