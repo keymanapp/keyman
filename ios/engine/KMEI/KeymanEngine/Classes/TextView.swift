@@ -188,7 +188,7 @@ public class TextView: UITextView {
 // MARK: - KeymanWebDelegate
 extension TextView: KeymanWebDelegate {
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
-    if Manager.shared.isSubKeysMenuVisible {
+    if keymanWeb.isSubKeysMenuVisible {
       return
     }
 

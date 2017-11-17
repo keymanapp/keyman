@@ -164,7 +164,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
-    if Manager.shared.isSubKeysMenuVisible {
+    if keymanWeb.isSubKeysMenuVisible {
       return
     }
 
@@ -202,7 +202,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
-    if Manager.shared.isKeyboardMenuVisible {
+    if keymanWeb.isKeyboardMenuVisible {
       return
     }
 
@@ -222,7 +222,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     switch menuBehaviour {
     case .showAlways,
          .showIfMultipleKeyboards where keyboardListCount > 1:
-      Manager.shared.showKeyboardMenu(self, closeButtonTitle: menuCloseButtonTitle)
+      keymanWeb.showKeyboardMenu(self, closeButtonTitle: menuCloseButtonTitle)
     case .showIfMultipleKeyboards, // keyboardListCount() <= 1
     .showNever:
       break

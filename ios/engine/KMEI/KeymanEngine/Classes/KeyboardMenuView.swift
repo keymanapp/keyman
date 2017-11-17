@@ -239,7 +239,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
   }
 
   @objc func tapAction(_ sender: UITapGestureRecognizer) {
-    Manager.shared.dismissKeyboardMenu()
+    Manager.shared.keymanWeb.dismissKeyboardMenu()
   }
 
   func numberOfSections(in tableView: UITableView) -> Int {
@@ -297,7 +297,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     switchKeyboard(indexPath.row)
-    Manager.shared.dismissKeyboardMenu()
+    Manager.shared.keymanWeb.dismissKeyboardMenu()
   }
 
   func getMaxWidth() -> CGFloat {
