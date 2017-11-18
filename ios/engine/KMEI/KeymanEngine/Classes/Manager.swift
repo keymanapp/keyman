@@ -1841,11 +1841,6 @@ UIGestureRecognizerDelegate {
     inputView.evaluateJavaScript(jsString, completionHandler: nil)
   }
 
-  // TODO: Remove dependence on this since we have super retina screens.
-  var retinaScreen: Bool {
-    return UIScreen.main.scale == 2.0
-  }
-
   // MARK: - Keyboard Notifications
   @objc func keyboardWillShow(_ notification: Notification) {
     dismissSubKeys()
