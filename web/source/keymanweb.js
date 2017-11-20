@@ -2818,6 +2818,25 @@ if(!window['keyman']['initialized']) {
       window.addEventListener('focus', keymanweb._BubbledFocus, true);  
 
     /**
+     * Function     _GetEventKeyCode
+     * Scope        Private
+     * @param       {Event}       e         Event object
+     * Description  Finds the key code represented by the event, prioritizing modern methods over deprecated ones.
+     *              Necessary because the 'modern' methods aren't yet fully implemented across all browsers at this time.
+     */
+    keymanweb._GetEventKeyCode = function(e) {
+      if(e.code && keymanweb._codeToLcodeMap[e.code]) {  // Unfortunately, the former DOES NOT map to a nice integer code!
+        return keymanweb._codeToLcodeMap[e.code];
+      } else if (e.keyCode) {
+        return e.keyCode;
+      } else if (e.which) {
+        return e.which;
+      } else {
+        return null;
+      }
+    }
+
+    /**
      * Function     _GetKeyEventProperties
      * Scope        Private
      * @param       {Event}       e         Event object
@@ -2844,9 +2863,10 @@ if(!window['keyman']['initialized']) {
       if (s.Ltarg.nodeType == 3) // defeat Safari bug
         s.Ltarg = s.Ltarg.parentNode;
 
-      if (e.keyCode) s.Lcode = e.keyCode;
-      else if (e.which) s.Lcode = e.which;    
-      else return null;
+      s.Lcode = keymanweb._GetEventKeyCode(e);
+      if (s.Lcode == null) {
+        return null;
+      }
       
       // Stage 1 - track the true state of the keyboard's modifiers.
       var osk = keymanweb['osk'], prevModState = keymanweb.modStateFlags, curModState = 0x0000;
@@ -3003,17 +3023,26 @@ if(!window['keyman']['initialized']) {
     keymanweb._FindCaret = function(Pelem)     // I779
     {
       if(!Pelem.createTextRange && Pelem.selectionStart)
-      {      
-        var Levent=document.createEvent('KeyboardEvent');
-        if(Levent.initKeyEvent)
-        {
-          Levent.initKeyEvent('keypress',true,true,null,false,false,false,false,0,32);
+      {
+        var Levent = new KeyboardEvent('keypress', {
+          "code":"Space",
+          "bubbles":true,
+          "cancelable":true,
+        });
+        // Levent.charCode = 32;
+        
+        if(Levent) {
           Levent._kmw_block = true; // Tell keymanweb._KeyPress to ignore this simulated event.
           
           // Nasty problems arise from the simulated keystroke if we don't temporarily block the handler.
           Pelem.dispatchEvent(Levent);
-          Levent=document.createEvent('KeyboardEvent');
-          Levent.initKeyEvent('keypress',true,true,null,false,false,false,false,8,0);
+
+          Levent = new KeyboardEvent('keypress', {
+            "key":"Backspace",
+            "bubbles":true,
+            "cancelable":true
+          });
+          // Levent.keyCode = 8;
           Levent._kmw_block = true; // Tell keymanweb._KeyPress to ignore this simulated event.
           Pelem.dispatchEvent(Levent);
         }
@@ -3170,7 +3199,7 @@ if(!window['keyman']['initialized']) {
           e.preventDefault();
           e.stopPropagation();
         }
-        keymanweb._KeyPressToSwallow = (e?e.keyCode:0);
+        keymanweb._KeyPressToSwallow = (e?keymanweb._GetEventKeyCode(e):0);
         return false;
       } else {
         keymanweb._KeyPressToSwallow = 0;
@@ -4818,25 +4847,25 @@ if(!window['keyman']['initialized']) {
      * @param       {Event}       e       event
      * Description  Passes control to handlers according to the hotkey pressed
      */
-    keymanweb._ProcessHotKeys = function(e)
-    {
-      if(!e) e = window.event;
-      if (e.keyCode) var _Lcode = e.keyCode;
-      else if (e.which) var _Lcode = e.which;
-      else return 0;
+    keymanweb._ProcessHotKeys = function(e) {
+      if(!e) {
+        e = window.event;
+      }
+
+      _Lcode = keymanweb._GetEventKeyCode(e);
+      if(_Lcode == null) {
+        return null;
+      }
       
-    // Removed testing of e.shiftKey==null  I3363 (Build 301)
+      // Removed testing of e.shiftKey==null  I3363 (Build 301)
       var _Lmodifiers = 
         (e.shiftKey ? 0x10 : 0) |
         (e.ctrlKey ? (e.ctrlLeft ? 0x20 : 0x20) : 0) | 
         (e.altKey ? (e.altLeft ? 0x40 : 0x40) : 0);
 
-      for(var i=0; i<keymanweb._HotKeys.length; i++)
-      {  
-        if(_Lcode == keymanweb._HotKeys[i].Code)
-        { 
-          if(_Lmodifiers == keymanweb._HotKeys[i].Shift) 
-          { 
+      for(var i=0; i<keymanweb._HotKeys.length; i++) {  
+        if(_Lcode == keymanweb._HotKeys[i].Code) { 
+          if(_Lmodifiers == keymanweb._HotKeys[i].Shift) { 
             keymanweb._HotKeys[i].Handler(); 
             e.returnValue = 0; 
             if(e && e.preventDefault) e.preventDefault(); 
