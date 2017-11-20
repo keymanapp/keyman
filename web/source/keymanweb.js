@@ -3201,24 +3201,18 @@ if(!window['keyman']['initialized']) {
      * @returns     {number}        0 if no match is made, otherwise 1.
      */
     keymanweb.processKeystroke = function(device, element, keystroke) {
+      // Clear internal state tracking data from prior keystrokes.
       keymanweb._CachedSelectionStart = null; // I3319     
       keymanweb._DeadkeyResetMatched();       // I3318    
       keymanweb.cachedContext.reset();
 
+      // Ensure the settings are in place so that KIFS/ifState activates and deactivates
+      // the appropriate rule(s) for the modeled device.
       util.activeDevice = device;
 
+      // Calls the start-group of the active keyboard.
       return keymanweb._ActiveKeyboard['gs'](element, keystroke);
     }
-
-    // keymanweb.callKeyboardStartGroup = function(Ltarg, Levent) {
-    //   keymanweb._CachedSelectionStart = null; // I3319     
-    //   keymanweb._DeadkeyResetMatched();       // I3318    
-    //   keymanweb.cachedContext.reset();
-
-    //   // As this function should only be called for hardware keyboard input processing,
-    //   // this processes the keystroke through hardware-based rules.
-    //   return keymanweb.processKeystroke(util.physicalDevice, Ltarg, Levent);
-    // }
 
     /**
      * Function     _KeyPress
