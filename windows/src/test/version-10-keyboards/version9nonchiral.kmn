@@ -1,0 +1,9 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'Version 9 non-chiral'
+store(&TARGETS) 'any'
+begin Unicode > use(main)
+
+
+group(main) using keys
+
++ [ALT K_A] > 'ALT K_A'

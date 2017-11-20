@@ -2,6 +2,8 @@
 
 ## 10.0 alpha
 * Updated versioning scheme for uniformity across all Keyman products.
+* KeymanEngine is now built as a Swift 4.0 framework
+* Keyman app migrated to Swift 4.0
 
 ## 2017-08-26 2.6.4 stable
 * Fixed bug with blank keyboard on some devices (#218)

@@ -6,12 +6,21 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
+import KeymanEngine
 import UIKit
 
 class InfoViewController: UIViewController, UIWebViewDelegate {
   @IBOutlet var webView: UIWebView!
 
   private var networkReachable: Reachability?
+
+  convenience init() {
+    if UIDevice.current.userInterfaceIdiom == .phone {
+      self.init(nibName: "InfoViewController_iPhone", bundle: nil)
+    } else {
+      self.init(nibName: "InfoViewController_iPad", bundle: nil)
+    }
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -43,11 +52,11 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
   }
 
   private func loadFromServer() {
-    let keyboardInfo = KMManager.sharedInstance().currentKeyboardInfo() as? [AnyHashable : String]
-    let currentKeyboardId = keyboardInfo?[kKeymanKeyboardIdKey] ?? kKeymanDefaultKeyboardID
+    let keyboardInfo = Manager.shared.currentKeyboardInfo
+    let currentKeyboardId = keyboardInfo?.id ?? Constants.defaultKeyboard.id
     let userData = AppDelegate.activeUserDefaults()
-    let keyboards = userData.array(forKey: kKeymanUserKeyboardsListKey) as? [NSDictionary]
-    let keyboardIds = keyboards?.flatMap { $0.object(forKey: kKeymanKeyboardIdKey) as? String }
+    let keyboards = userData.userKeyboards
+    let keyboardIds = keyboards?.map { $0.id }
     let installedKeyboards: String
     if let ids = keyboardIds, !ids.isEmpty {
       installedKeyboards = Array(Set(ids)).joined(separator: ",")

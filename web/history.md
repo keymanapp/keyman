@@ -10,11 +10,14 @@
 * Refactored code paths relating to KMW's embedding in the iOS and Android apps.  (#211)
 * Added support for L/R Alt and Ctrl modifiers for keyboards. (#9) (#52)
 * Added support for use of the Caps Lock state within keyboards if specified by a keyboard designer.
+* Reworked the keyboard-interfacing API calls and base layout of KeymanWeb (#349)
 * Fixed keyboard loading upon initialization, redundant cloud requests for keyboards.  (#103)
 * Fixed next-layer processing (#116) (#358)
 * Fixed auto-attaching mode bug. (#352)
 * Set the default behavior of KMW to auto-attach for all devices, rather than only desktops. (#375)
 * Fixed key codes for longpress keys and handle default keys beyond U_FFFF
+* Enhanced the removeKeyboards API function (#5)
+* Fixed an issue with the Toolbar UI under certain scenarios (#271)
 
 ## 2017-07-10 2.0.473 stable
 * 2.0 stable release build.

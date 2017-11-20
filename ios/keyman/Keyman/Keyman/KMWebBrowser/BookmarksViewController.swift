@@ -21,6 +21,10 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
   // TODO: Create struct for bookmarks
   private var bookmarks = [[String: String]]()
 
+  convenience init() {
+    self.init(nibName: "BookmarksViewController", bundle: nil)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
     loadBookmarks()
@@ -86,7 +90,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     if !bookmarks.isEmpty {
       userData.set(bookmarks, forKey: webBrowserBookmarksKey)
     } else {
-      userData.set(nil, forKey: webBrowserBookmarksKey)
+      userData.removeObject(forKey: webBrowserBookmarksKey)
     }
     userData.synchronize()
   }

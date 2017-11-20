@@ -6,7 +6,7 @@
 
   function loadKeyboards() 
   { 
-    var kmw=tavultesoft.keymanweb;
+    var kmw=keyman;
     
     // We start by adding a keyboard correctly.  It's best to include a 'control' in our experiment.
     kmw.addKeyboards({id:'us',name:'English',languages:{id:'eng',name:'English'},

@@ -1,6 +1,6 @@
 function loadKeyboards() 
 { 
-  var kmw=tavultesoft.keymanweb;
+  var kmw=keyman;
 
   // A testing keyboard handwritten with chirality information.
   kmw.addKeyboards({id:'chirality',name:'Chirality Testing',

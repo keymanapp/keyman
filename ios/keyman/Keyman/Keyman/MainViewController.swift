@@ -6,6 +6,7 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
+import KeymanEngine
 import UIKit
 import QuartzCore
 
@@ -21,14 +22,14 @@ let dontShowGetStartedKey = "DontShowGetStarted"
 let launchedFromUrlNotification = NSNotification.Name("LaunchedFromUrlNotification")
 let urlKey = "url"
 
-class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDelegate, UIAlertViewDelegate {
+class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDelegate, UIAlertViewDelegate {
   private let minTextSize: CGFloat = 9.0
   private let maxTextSize: CGFloat = 72.0
   private let getStartedViewTag = 7183
   private let activityIndicatorViewTag = 6573
   private let dropDownListTag = 686876
 
-  var textView: KMTextView!
+  var textView: TextView!
   var textSize: CGFloat = 0.0
 
   private var getStartedVC: GetStartedViewController!
@@ -37,12 +38,12 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
   private var textSizeController: UISlider!
   private var dropdownItems: [UIBarButtonItem]!
 
-  private var profiles2Install: [String] = []
+  private var profilesToInstall: [String] = []
   private var checkedProfiles: [String] = []
   private var profileName: String?
   private var launchUrl: URL?
-  private var keyboard2Download: [String: Any] = [:]
-  private var customKeyboard2Download: [String: Any] = [:]
+  private var keyboardToDownload: InstallableKeyboard?
+  private var customKeyboardToDownload: URL?
   private var wasKeyboardVisible: Bool = false
 
   private var screenWidth: CGFloat = 0.0
@@ -55,12 +56,30 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
   private var updateStatus: Int = 0  // TODO: Make into enum
   private var didDownload: Bool = false
 
+  private var keyboardLoadedObserver: NotificationObserver?
+  private var languagesUpdatedObserver: NotificationObserver?
+  private var languagesDownloadFailedObserver: NotificationObserver?
+  private var keyboardPickerDismissedObserver: NotificationObserver?
+  private var keyboardChangedObserver: NotificationObserver?
+  private var keyboardDownloadStartedObserver: NotificationObserver?
+  private var keyboardDownloadCompletedObserver: NotificationObserver?
+  private var keyboardDownloadFailedObserver: NotificationObserver?
+  private var keyboardRemovedObserver: NotificationObserver?
+
   var appDelegate: AppDelegate! {
     return UIApplication.shared.delegate as? AppDelegate
   }
 
   var overlayWindow: UIWindow! {
     return appDelegate?.overlayWindow
+  }
+
+  convenience init() {
+    if UIDevice.current.userInterfaceIdiom == .phone {
+      self.init(nibName: "MainViewController_iPhone", bundle: nil)
+    } else {
+      self.init(nibName: "MainViewController_iPad", bundle: nil)
+    }
   }
 
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
@@ -73,24 +92,42 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
         name: NSNotification.Name.UIKeyboardWillShow, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
         name: NSNotification.Name.UIKeyboardWillHide, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardLoaded),
-        name: NSNotification.Name.keymanKeyboardLoaded, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged),
-        name: NSNotification.Name.keymanKeyboardChanged, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.languagesUpdated),
-        name: NSNotification.Name.keymanLanguagesUpdated, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.languagesDownloadFailed),
-        name: NSNotification.Name.keymanLanguagesDownloadFailed, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardPickerDismissed),
-        name: NSNotification.Name.keymanKeyboardPickerDismissed, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloadStarted),
-        name: NSNotification.Name.keymanKeyboardDownloadStarted, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloadFinished),
-        name: NSNotification.Name.keymanKeyboardDownloadCompleted, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDownloadFailed),
-        name: NSNotification.Name.keymanKeyboardDownloadFailed, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardRemoved),
-        name: NSNotification.Name.keymanKeyboardRemoved, object: nil)
+    keyboardLoadedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardLoaded,
+      observer: self,
+      function: MainViewController.keyboardLoaded)
+    keyboardChangedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardChanged,
+      observer: self,
+      function: MainViewController.keyboardChanged)
+    languagesUpdatedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.languagesUpdated,
+      observer: self,
+      function: MainViewController.languagesUpdated)
+    languagesDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.languagesDownloadFailed,
+      observer: self,
+      function: MainViewController.languagesDownloadFailed)
+    keyboardPickerDismissedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardPickerDismissed,
+      observer: self,
+      function: MainViewController.keyboardPickerDismissed)
+    keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadStarted,
+      observer: self,
+      function: MainViewController.keyboardDownloadStarted)
+    keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadCompleted,
+      observer: self,
+      function: MainViewController.keyboardDownloadCompleted)
+    keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadFailed,
+      observer: self,
+      function: MainViewController.keyboardDownloadFailed)
+    keyboardRemovedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardRemoved,
+      observer: self,
+      function: MainViewController.keyboardRemoved)
     NotificationCenter.default.addObserver(self, selector: #selector(self.launched),
         name: launchedFromUrlNotification, object: nil)
 
@@ -114,25 +151,20 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
 
     // Setup Keyman Manager & fetch keyboards list
     updateStatus = 0
-    KMManager.setApplicationGroupIdentifier("group.KM4I")
 
-    #if DEBUG
-      KMManager.sharedInstance().debugPrintingOn = true
-    #endif
-
-    KMManager.sharedInstance().canRemoveDefaultKeyboard = true
-    KMManager.sharedInstance().fetchKeyboardsList()
+    Manager.shared.canRemoveDefaultKeyboard = true
+    Manager.shared.fetchKeyboardsList()
 
     let bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
     view?.backgroundColor = bgColor
 
     // Check for configuration profiles/fonts to install
-    let kmFonts = KMManager.sharedInstance().keymanFonts as! [String: [String: Any]]
+    let kmFonts = Manager.shared.keymanFonts
     var profilesByFontName = [String: String](minimumCapacity: kmFonts.count - 1)
-    for (key, value) in kmFonts where key != "keymanweb-osk.ttf" {
-      let fontName = value[kKeymanFontNameKey] as! String
-      let type = key[key.range(of: ".", options: .backwards)!.lowerBound...]
-      profilesByFontName[fontName] = key.replacingOccurrences(of: type, with: ".mobileconfig")
+    for (filename, font) in kmFonts where filename != "keymanweb-osk.ttf" {
+      let fontName = font.name
+      let type = filename[filename.range(of: ".", options: .backwards)!.lowerBound...]
+      profilesByFontName[fontName] = filename.replacingOccurrences(of: type, with: ".mobileconfig")
     }
 
     let customFonts = UIFont.familyNames.filter { !systemFonts.contains($0) && !($0 == "KeymanwebOsk") }
@@ -140,10 +172,10 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     let userData = AppDelegate.activeUserDefaults()
     checkedProfiles = userData.object(forKey: checkedProfilesKey) as? [String] ?? [String]()
 
-    profiles2Install = [String]()
+    profilesToInstall = [String]()
     for name in customFonts {
       if let profile = profilesByFontName[UIFont.fontNames(forFamilyName: name)[0]] {
-        profiles2Install.append(profile)
+        profilesToInstall.append(profile)
       }
     }
 
@@ -188,7 +220,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
 
     // Setup Keyman TextView
     textSize = 16.0
-    textView = KMTextView(frame: screenRect)
+    textView = TextView(frame: screenRect)
     textView.setKeymanDelegate(self)
     textView.viewController = self
     textView.backgroundColor = bgColor
@@ -199,10 +231,8 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     textView.isEditable = false
 
     // Setup Info View
-    if UIDevice.current.userInterfaceIdiom == .phone {
-      infoView = InfoViewController(nibName: "InfoViewController_iPhone", bundle: nil)
-    } else {
-      infoView = InfoViewController(nibName: "InfoViewController_iPad", bundle: nil)
+    infoView = InfoViewController()
+    if UIDevice.current.userInterfaceIdiom != .phone {
       textSize *= 2
       textView.font = textView?.font?.withSize(textSize)
     }
@@ -430,121 +460,89 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     resizeViews(withKeyboardVisible: false)
   }
 
-  @objc func keyboardLoaded(_ notification: Notification) {
+  // MARK: - Keyman Notifications
+
+  private func keyboardLoaded() {
     startTimer()
   }
 
-  @objc func keyboardChanged(_ notification: Notification) {
+  private func keyboardChanged(_ kb: InstallableKeyboard) {
     var listCheck: Bool = true
     if didDownload {
       listCheck = false
       didDownload = false
     }
 
-    let kbInfo = notification.userInfo?[kKeymanKeyboardInfoKey] as? [AnyHashable: Any] ?? [AnyHashable: Any]()
-    let kbID: String = kbInfo[kKeymanKeyboardIdKey] as? String ?? ""
-    let langID: String = kbInfo[kKeymanLanguageIdKey] as? String ?? ""
-    checkProfile(forKeyboardID: kbID, languageID: langID, doListCheck: listCheck)
+    checkProfile(forKeyboardID: kb.id, languageID: kb.languageID, doListCheck: listCheck)
   }
 
-  @objc func keyboardDownloadStarted(_ notification: Notification) {
+  private func keyboardDownloadStarted() {
     if launchUrl != nil {
       showActivityIndicator()
     }
   }
 
-  @objc func keyboardDownloadFinished(_ notification: Notification) {
+  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
     didDownload = true
-    guard let url = launchUrl else {
+    if launchUrl == nil {
       return
     }
+
     let userData = AppDelegate.activeUserDefaults()
-    let userKeyboards: [Any]? = userData.array(forKey: kKeymanUserKeyboardsListKey)
+    let userKeyboards = userData.userKeyboards
     if userKeyboards == nil || userKeyboards!.isEmpty {
-      let isRTL = (kKeymanDefaultKeyboardRTL == "Y") ? true : false
-      KMManager.sharedInstance().addKeyboard(withID: kKeymanDefaultKeyboardID,
-                                             languageID: kKeymanDefaultLanguageID,
-                                             keyboardName: kKeymanDefaultKeyboardName,
-                                             languageName: kKeymanDefaultLanguageName,
-                                             isRTL: isRTL,
-                                             isCustom: false,
-                                             font: kKeymanDefaultKeyboardFont,
-                                             oskFont: nil)
+      Manager.shared.addKeyboard(Constants.defaultKeyboard)
     }
 
     perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
-    let kbInfo = notification.userInfo?[kKeymanKeyboardInfoKey]
 
-    if let info = kbInfo as? [String: Any] {
-      let kbID = info[kKeymanKeyboardIdKey] as! String
-      let langID = info[kKeymanLanguageIdKey] as! String
-      if url.query == nil || url.query!.range(of: "url=") == nil {
-        let dictKey = "\(langID)_\(kbID)"
-        if let kbDict = KMManager.sharedInstance().keyboardsDictionary[dictKey] as? [String: String] {
-          let kbName = kbDict[kKeymanKeyboardNameKey]!
-          let langName = kbDict[kKeymanLanguageNameKey]!
-          let isRTL = (kbDict[kKeymanKeyboardRTLKey]! == "Y") ? true : false
-          let font = kbDict[kKeymanFontKey]!
-          let oskFont = kbDict[kKeymanOskFontKey]!
-          KMManager.sharedInstance().addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-              languageName: langName, isRTL: isRTL, isCustom: false, font: font, oskFont: oskFont)
-          KMManager.sharedInstance().setKeyboardWithID(kbID, languageID: langID, keyboardName: kbName,
-              languageName: langName, font: font, oskFont: oskFont)
-        }
-      } else {
-        let kbName = info[kKeymanKeyboardNameKey] as! String
-        let langName = info[kKeymanLanguageNameKey] as! String
-        let isRTL = ((info[kKeymanKeyboardRTLKey] as! String) == "Y") ? true : false
-        let font = info[kKeymanFontKey] as! String
-        let oskFont = info[kKeymanOskFontKey] as! String
-        KMManager.sharedInstance().addKeyboard(withID: nil, languageID: nil, keyboardName: kbName,
-            languageName: langName, isRTL: isRTL, isCustom: false, font: font, oskFont: oskFont)
-        KMManager.sharedInstance().setKeyboardWithID(nil, languageID: nil, keyboardName: kbName,
-            languageName: langName, font: font, oskFont: oskFont)
-      }
-    } else if let infoArray = kbInfo as? [[String: Any]] {
-      for info in infoArray {
-        let kbID = info[kKeymanKeyboardIdKey] as! String
-        let langID = info[kKeymanLanguageIdKey] as! String
-        let kbName = info[kKeymanKeyboardNameKey] as! String
-        let langName = info[kKeymanLanguageNameKey] as! String
-        let isRTL = (info[kKeymanKeyboardRTLKey] as! String) == "Y"
-        let font = info[kKeymanFontKey] as! String
-        let oskFont = info[kKeymanOskFontKey] as! String
-        KMManager.sharedInstance().addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-            languageName: langName, isRTL: isRTL, isCustom: false, font: font, oskFont: oskFont)
-        KMManager.sharedInstance().setKeyboardWithID(kbID, languageID: langID, keyboardName: kbName,
-            languageName: langName, font: font, oskFont: oskFont)
-      }
+    for keyboard in keyboards {
+      Manager.shared.addKeyboard(keyboard)
+      Manager.shared.setKeyboard(keyboard)
     }
 
     launchUrl = nil
   }
 
-  @objc func keyboardDownloadFailed(_ notification: Notification) {
+  private func keyboardDownloadFailed(_ notification: KeyboardDownloadFailedNotification) {
     if launchUrl != nil {
       perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
-      let error = notification.userInfo?[NSUnderlyingErrorKey] as! Error
+      let error = notification.error
       showAlert(withTitle: "Keyboard Download Error", message: error.localizedDescription,
                 cancelButtonTitle: "OK", otherButtonTitles: nil, tag: -1)
       launchUrl = nil
     }
   }
 
-  @objc func languagesUpdated(_ notification: Notification) {
+  private func languagesUpdated() {
     updateStatus = 1
   }
 
-  @objc func languagesDownloadFailed(_ notification: Notification) {
+  private func languagesDownloadFailed() {
     updateStatus = -1
   }
 
-  @objc func keyboardPickerDismissed(_ notification: Notification) {
+  private func keyboardPickerDismissed() {
     textView.becomeFirstResponder()
     if UIDevice.current.userInterfaceIdiom == .pad && shouldShowGetStarted {
       perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
     }
   }
+
+  private func keyboardRemoved(_ keyboard: InstallableKeyboard) {
+    guard let font = keyboard.font,
+      let profile = profileName(withFont: font) else {
+        return
+    }
+    profilesToInstall = profilesToInstall.filter { $0 != profile }
+    profilesToInstall.append(profile)
+    checkedProfiles = checkedProfiles.filter { $0 != profile }
+    let userData = AppDelegate.activeUserDefaults()
+    userData.set(checkedProfiles, forKey: checkedProfilesKey)
+    userData.synchronize()
+  }
+
+  // MARK: - View Actions
 
   @objc func launched(fromUrl notification: Notification) {
     if let url = notification.userInfo?[urlKey] as? URL, url.query != nil {
@@ -555,24 +553,6 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     } else {
       launchUrl = nil
     }
-  }
-
-  @objc func keyboardRemoved(_ notification: Notification) {
-    guard let kbInfo = notification.userInfo?[kKeymanKeyboardInfoKey] as? [String: Any] else {
-      return
-    }
-    guard let font = kbInfo[kKeymanFontKey] as? String else {
-      return
-    }
-    guard let profile = profileNameWithJSONFont(font) else {
-      return
-    }
-    profiles2Install = profiles2Install.filter { $0 != profile }
-    profiles2Install.append(profile)
-    checkedProfiles = checkedProfiles.filter { $0 != profile }
-    let userData = AppDelegate.activeUserDefaults()
-    userData.set(checkedProfiles, forKey: checkedProfilesKey)
-    userData.synchronize()
   }
 
   @objc func infoButtonClick(_ sender: Any?) {
@@ -893,7 +873,6 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
   }
 
-  // TODO: Refactor control flow
   private func performAction(from url: URL) {
     guard let query = url.query else {
       launchUrl = nil
@@ -905,113 +884,69 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
 
     let params = self.params(of: query)
-    if params["url"] == nil {
+    if let urlString = params["url"] {
       // Download and set custom keyboard
-
-      let jsonUrl = params["url"].flatMap { URL(string: $0) }
-      let direct = params["direct"]
-
-      if let jsonUrl = jsonUrl {
-        KMManager.sharedInstance().dismissKeyboardPicker(self)
-        if !infoView.view.isHidden {
-          perform(#selector(self.infoButtonClick), with: nil)
-        }
-
-        let isDirect = direct == "true"
-
-        customKeyboard2Download = [
-          "url": jsonUrl,
-          "direct": isDirect
-        ]
-        let title = "Custom Keyboard: \(jsonUrl.lastPathComponent)"
-        showAlert(withTitle: title, message: "Would you like to install this keyboard?",
-                  cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 2)
-      } else {
+      guard let url = URL(string: urlString) else {
         showAlert(withTitle: "Custom Keyboard", message: "The keyboard could not be installed: Invalid Url",
                   cancelButtonTitle: "OK", otherButtonTitles: nil, tag: -1)
         launchUrl = nil
+        return
+      }
+
+      Manager.shared.dismissKeyboardPicker(self)
+      if !infoView.view.isHidden {
+        perform(#selector(self.infoButtonClick), with: nil)
+      }
+
+      customKeyboardToDownload = url
+      let title = "Custom Keyboard: \(url.lastPathComponent)"
+      showAlert(withTitle: title, message: "Would you like to install this keyboard?",
+                cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 2)
+    } else if let kbID = params["keyboard"], let langID = params["language"] {
+      // Query should include keyboard and language IDs to set the keyboard (first download if not available)
+      guard let keyboard = Manager.shared.repositoryKeyboard(withID: kbID, languageID: langID) else {
+        return
+      }
+
+      if Manager.shared.stateForKeyboard(withID: kbID) == .needsDownload {
+        keyboardToDownload = keyboard
+        showAlert(withTitle: "\(keyboard.languageName): \(keyboard.name)",
+          message: "Would you like to install this keyboard?",
+                  cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 0)
+      } else {
+        Manager.shared.addKeyboard(keyboard)
+        Manager.shared.setKeyboard(keyboard)
       }
     } else {
-      // Query should include keyboard and language IDs to set the keyboard (first download if not available)
-      if let kbID = params["keyboard"], let langID = params["language"] {
-        let dictKey = "\(langID)_\(kbID)"
-        let kbDict = KMManager.sharedInstance().keyboardsDictionary[dictKey] as? [String: String] ?? [String: String]()
-        let kbName = kbDict[kKeymanKeyboardNameKey] ?? ""
-        let langName = kbDict[kKeymanLanguageNameKey] ?? ""
-        let isRTL = kbDict[kKeymanKeyboardRTLKey] == "Y"
-        let font = kbDict[kKeymanFontKey]
-        let oskFont = kbDict[kKeymanOskFontKey]
-
-        if KMManager.sharedInstance().stateForKeyboard(withID: kbID) == kKMKeyboardStateNeedsDownload {
-          keyboard2Download = [
-            kKeymanLanguageIdKey: langID,
-            kKeymanKeyboardIdKey: kbID
-          ]
-          showAlert(withTitle: "\(langName): \(kbName)", message: "Would you like to install this keyboard?",
-                    cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 0)
-        } else {
-          KMManager.sharedInstance().addKeyboard(withID: kbID, languageID: langID, keyboardName: kbName,
-                                                 languageName: langName, isRTL: isRTL, isCustom: false,
-                                                 font: font, oskFont: oskFont)
-          KMManager.sharedInstance().setKeyboardWithID(kbID, languageID: langID, keyboardName: kbName,
-                                                       languageName: langName, font: font, oskFont: oskFont)
-        }
-      } else {
-        launchUrl = nil
-      }
+      launchUrl = nil
     }
   }
 
-  private func dictionaryWithKeyboardID(_ kbID: String, languageID langID: String) -> [String: String]? {
-    let index = KMManager.sharedInstance().indexForUserKeyboard(withID: kbID, languageID: langID)
-
-    if index < 0 {
+  private func profileName(withKeyboardID kbID: String, languageID langID: String) -> String? {
+    guard let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withID: kbID, languageID: langID),
+          let font = keyboard.font else {
       return nil
     }
 
-    let userKeyboards = AppDelegate.activeUserDefaults().array(forKey: kKeymanUserKeyboardsListKey)
-    return userKeyboards?[index] as? [String: String]
+    return profileName(withFont: font)
   }
 
-  private func profileNameWithKeyboardID(_ kbID: String, languageID langID: String) -> String? {
-    guard let kbDict = dictionaryWithKeyboardID(kbID, languageID: langID) else {
-      return nil
-    }
-    guard let jsonFont = kbDict[kKeymanFontKey] else {
-      return nil
-    }
-
-    return profileNameWithJSONFont(jsonFont)
-  }
-
-  private func profileNameWithJSONFont(_ jsonFont: String) -> String? {
-    guard let fontData = jsonFont.data(using: String.Encoding.utf8) else {
-      return nil
-    }
-    guard let fontDict = (try? JSONSerialization.jsonObject(with: fontData, options: .mutableContainers))
-      as? [String: Any] else {
-      return nil
-    }
-
-    let fontSource = fontDict[kKeymanFontFilesKey]
-    if let fontSource = fontSource as? [String] {
-      return fontSource.first { !($0.contains(".mobileconfig")) }
-    }
-    return nil
+  private func profileName(withFont font: Font) -> String? {
+    return font.source.first { !($0.contains(".mobileconfig")) }
   }
 
   private func checkProfile(forKeyboardID kbID: String, languageID langID: String, doListCheck: Bool) {
-    if (kbID == kKeymanDefaultKeyboardID) && (langID == kKeymanDefaultLanguageID) {
+    if kbID == Constants.defaultKeyboard.id && langID == Constants.defaultKeyboard.languageID {
       return
     }
 
-    guard let profile = profileNameWithKeyboardID(kbID, languageID: langID) else {
+    guard let profile = profileName(withKeyboardID: kbID, languageID: langID) else {
       return
     }
 
     var doInstall: Bool = false
     if doListCheck {
-      for value in profiles2Install where !checkedProfiles.contains(value) && profile == value {
+      for value in profilesToInstall where !checkedProfiles.contains(value) && profile == value {
         doInstall = true
         break
       }
@@ -1021,8 +956,8 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
 
     if doInstall {
       profileName = profile
-      let kbDict = dictionaryWithKeyboardID(kbID, languageID: langID)
-      let languageName = kbDict?[kKeymanLanguageNameKey] ?? ""
+      let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withID: kbID, languageID: langID)!
+      let languageName = keyboard.languageName
       let title = "\(languageName) Font"
       let msg = "Touch Install to make \(languageName) display correctly in all your apps"
       showAlert(withTitle: title, message: msg, cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 1)
@@ -1047,9 +982,9 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
   private func performAlertButtonClick(withTag tag: Int) {
     switch tag {
     case 0:
-      let langID = keyboard2Download[kKeymanLanguageIdKey] as? String
-      let kbID = keyboard2Download[kKeymanKeyboardIdKey] as? String
-      KMManager.sharedInstance().downloadKeyboard(withID: kbID, languageID: langID, isUpdate: false)
+      if let keyboard = keyboardToDownload {
+        Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: keyboard.languageID, isUpdate: false)
+      }
     case 1:
       if let profileName = profileName {
         checkedProfiles.append(profileName)
@@ -1061,9 +996,8 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
         self.profileName = nil
       }
     case 2:
-      if let jsonUrl = customKeyboard2Download["url"] as? URL,
-        let isDirect = customKeyboard2Download["direct"] as? Bool {
-        KMManager.sharedInstance().downloadKeyboard(from: jsonUrl, isDirect: isDirect)
+      if let url = customKeyboardToDownload {
+        Manager.shared.downloadKeyboard(from: url)
       }
     default:
       break
@@ -1165,7 +1099,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
       return true
     }
 
-    guard let userKbs = userData.object(forKey: kKeymanUserKeyboardsListKey) as? [[String: Any]] else {
+    guard let userKbs = userData.userKeyboards else {
       return true
     }
     if userKbs.isEmpty {
@@ -1176,12 +1110,7 @@ class MainViewController: UIViewController, KMTextViewDelegate, UIActionSheetDel
     }
 
     let firstKB = userKbs[0]
-    let kbID = firstKB[kKeymanKeyboardIdKey] as? String
-    let langID = firstKB[kKeymanLanguageIdKey] as? String
-    if (kbID == kKeymanDefaultKeyboardID) && (langID == kKeymanDefaultLanguageID) {
-      return true
-    }
-    return false
+    return firstKB.id == Constants.defaultKeyboard.id && firstKB.languageID == Constants.defaultKeyboard.languageID
   }
 
   @objc func showKMWebBrowserView(_ sender: Any) {
