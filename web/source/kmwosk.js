@@ -827,9 +827,10 @@ if(!window['keyman']['initialized']) {
             break;
           case osk.keyCodes['K_SPACE']:
             return ' ';
-            break;
-          // Problem:  clusters, and doing them right.
-          // The commented-out code below should be a decent starting point, but clusters make it complex.
+          // break;
+          //
+          // // Problem:  clusters, and doing them right.
+          // // The commented-out code below should be a decent starting point, but clusters make it complex.
           //
           // case osk.keyCodes['K_LEFT']:
           //   if(touchAlias) {
@@ -857,7 +858,6 @@ if(!window['keyman']['initialized']) {
           //     }
           //     kbdInterface.output(1, keymanweb._LastActiveElement,"");
           //   }
-          //   break;
         }
       }
 
