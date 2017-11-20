@@ -1254,7 +1254,9 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 	case TSS_VERSION:
 		if((fk->dwFlags & KF_AUTOMATICVERSION) == 0) return CERR_VersionAlreadyIncluded;
 		p = sp->dpString;
-		if(*p < '5') AddWarning(CWARN_OldVersion);
+    if (wcstof(p, NULL) < 5.0) {
+      AddWarning(CWARN_OldVersion);
+    }
 		
 		if(wcsncmp(p, L"3.0", 3) == 0)       fk->version = VERSION_50;   //0x0a0b000n= a.bn
 		else if(wcsncmp(p, L"3.1", 3) == 0)  fk->version = VERSION_50;   //all versions < 5.0
@@ -1266,7 +1268,8 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 		else if(wcsncmp(p, L"7.0", 3) == 0)  fk->version = VERSION_70;
 		else if(wcsncmp(p, L"8.0", 3) == 0)  fk->version = VERSION_80;
 		else if(wcsncmp(p, L"9.0", 3) == 0)  fk->version = VERSION_90;
-		else return CERR_InvalidVersion;
+    else if (wcsncmp(p, L"10.0", 4) == 0)  fk->version = VERSION_100;
+    else return CERR_InvalidVersion;
 
 		if(fk->version < VERSION_60) FOldCharPosMatching = TRUE;
 
@@ -2250,6 +2253,16 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 
         if ((sFlag & (LCTRLFLAG | LALTFLAG)) && (sFlag & (RCTRLFLAG | RALTFLAG))) {
           AddWarning(CWARN_MixingLeftAndRightModifiers);
+        }
+
+        // If we use chiral modifiers, or we use state keys, and we target web in the keyboard, and we don't manually specify a keyboard version, bump the minimum
+        // version to 10.0. This makes an assumption that if we are using these features in a keyboard and it has no version specified, that we want to use the features
+        // in the web target platform, even if there are platform() rules excluding this possibility. In that (rare) situation, the keyboard developer should simply specify
+        // the &version to be 9.0 or whatever to avoid this behaviour.
+        if (sFlag & (LCTRLFLAG | LALTFLAG | RCTRLFLAG | RALTFLAG | CAPITALFLAG | NOTCAPITALFLAG | NUMLOCKFLAG | NOTNUMLOCKFLAG | SCROLLFLAG | NOTSCROLLFLAG) && 
+            CompileTarget == CKF_KEYMANWEB &&
+            fk->dwFlags & KF_AUTOMATICVERSION) {
+          VERIFY_KEYBOARD_VERSION(fk, VERSION_100, 0);
         }
 			  //printf("sFlag: %x\n", sFlag);
 

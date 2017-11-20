@@ -6,6 +6,7 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
+import KeymanEngine
 import UIKit
 
 class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertViewDelegate {
@@ -30,13 +31,24 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
 
   private let webBrowserLastURLKey = "KMWebBrowserLastURL"
 
+  private var keyboardChangedObserver: NotificationObserver?
+  private var keyboardPickerDismissedObserver: NotificationObserver?
+
+  convenience init() {
+    self.init(nibName: "WebBrowserViewController", bundle: nil)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardChanged),
-        name: NSNotification.Name.keymanKeyboardChanged, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardPickerDismissed),
-        name: NSNotification.Name.keymanKeyboardPickerDismissed, object: nil)
+    keyboardChangedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardChanged,
+      observer: self,
+      function: WebBrowserViewController.keyboardChanged)
+    keyboardPickerDismissedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardPickerDismissed,
+      observer: self,
+      function: WebBrowserViewController.keyboardPickerDismissed)
 
     webView.delegate = self
     webView.scalesPageToFit = true
@@ -133,10 +145,6 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     navBarTopConstraint.constant = AppDelegate.statusBarHeight()
   }
 
-  deinit {
-    NotificationCenter.default.removeObserver(self)
-  }
-
   override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
     let orientation: UIInterfaceOrientation = toInterfaceOrientation
     if UIDevice.current.userInterfaceIdiom == .phone {
@@ -215,7 +223,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   }
 
   @IBAction func globe(_ sender: Any) {
-    KMManager.sharedInstance().showKeyboardPicker(in: self, shouldAddKeyboard: false)
+    Manager.shared.showKeyboardPicker(in: self, shouldAddKeyboard: false)
   }
 
   @objc func close(_ sender: Any?) {
@@ -266,16 +274,15 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     webView?.stringByEvaluatingJavaScript(from: jsStr)
   }
 
-  @objc func keyboardChanged(_ notification: Notification) {
-    let kbInfo = notification.userInfo?[kKeymanKeyboardInfoKey] as? [AnyHashable: Any] ?? [AnyHashable: Any]()
-    if let kbID = kbInfo[kKeymanKeyboardIdKey] as? String, let langID = kbInfo[kKeymanLanguageIdKey] as? String {
-      newFontFamily = KMManager.sharedInstance().fontNameForKeyboard(withID: kbID, languageID: langID)
+  private func keyboardChanged(_ kb: InstallableKeyboard) {
+    if let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID) {
+      newFontFamily = fontName
     } else {
       newFontFamily = UIFont.systemFont(ofSize: UIFont.systemFontSize).fontName
     }
   }
 
-  @objc func keyboardPickerDismissed(_ notification: Notification) {
+  private func keyboardPickerDismissed() {
     if newFontFamily != fontFamily {
       fontFamily = newFontFamily
       webView?.reload()

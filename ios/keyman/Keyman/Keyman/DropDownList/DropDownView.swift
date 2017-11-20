@@ -89,10 +89,8 @@ class DropDownView: UIView {
     let colorSpace = CGColorSpaceCreateDeviceRGB()
     let gradientColors = [bgColor.cgColor, backgroundColor2.cgColor] as CFArray
     let gradientLocations: [CGFloat] = [0, 1]
-    guard let gradient = CGGradient(colorsSpace: colorSpace, colors: gradientColors,
-        locations: gradientLocations) else {
-      return
-    }
+    let gradient = CGGradient(colorsSpace: colorSpace, colors: gradientColors,
+        locations: gradientLocations)!
 
     let startPoint = CGPoint(x: rect.midX, y: rect.minY)
     let endPoint = CGPoint(x: rect.midX, y: rect.maxY)

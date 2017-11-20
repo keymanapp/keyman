@@ -7,32 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		37BF5A361DE8404E0014AF19 /* KMInputViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 98035AC019E3A04000DCB1B1 /* KMInputViewController.h */; };
-		37BF5A371DE8404E0014AF19 /* Reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 98A880EB177BDECA00601A9E /* Reachability.h */; };
-		37BF5A381DE8404E0014AF19 /* CWLSynthesizeSingleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418F61769486C008D2FF3 /* CWLSynthesizeSingleton.h */; };
-		37BF5A391DE8404E0014AF19 /* Keyman.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418F71769486C008D2FF3 /* Keyman.h */; };
-		37BF5A3A1DE8404E0014AF19 /* KMKeyboardPickerBarButtonItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418F81769486C008D2FF3 /* KMKeyboardPickerBarButtonItem.h */; };
-		37BF5A3B1DE8404E0014AF19 /* KMKeyboardPickerButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418F91769486C008D2FF3 /* KMKeyboardPickerButton.h */; };
-		37BF5A3C1DE8404E0014AF19 /* KMManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418FA1769486C008D2FF3 /* KMManager.h */; };
-		37BF5A3D1DE8404E0014AF19 /* KMTextField.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418FB1769486C008D2FF3 /* KMTextField.h */; };
-		37BF5A3E1DE8404E0014AF19 /* KMTextFieldDelegateProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418FC1769486C008D2FF3 /* KMTextFieldDelegateProxy.h */; };
-		37BF5A3F1DE8404E0014AF19 /* KMTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418FD1769486C008D2FF3 /* KMTextView.h */; };
-		37BF5A401DE8404E0014AF19 /* KMTextViewDelegateProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418FE1769486C008D2FF3 /* KMTextViewDelegateProxy.h */; };
-		981AFA8519EF44DE006706BF /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98DE283417F50DBF00D6A496 /* AudioToolbox.framework */; };
-		981AFA8619EF44DE006706BF /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41903176952D0008D2FF3 /* CFNetwork.framework */; };
-		981AFA8719EF44DE006706BF /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41905176952E0008D2FF3 /* MobileCoreServices.framework */; };
-		981AFA8819EF44DE006706BF /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41907176952F5008D2FF3 /* libz.dylib */; };
-		981AFA8919EF44DE006706BF /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D4190917695302008D2FF3 /* SystemConfiguration.framework */; };
-		981AFA8A19EF44DE006706BF /* libKeyman.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D419001769486C008D2FF3 /* libKeyman.a */; };
-		981AFA8B19EF44DE006706BF /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98CF0C3E17D99945001580BF /* CoreText.framework */; };
-		981AFA8C19EF44DE006706BF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABADB7176935E400B62590 /* CoreGraphics.framework */; };
-		981AFA8D19EF44DE006706BF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98CF0C4417D99A14001580BF /* UIKit.framework */; };
 		981AFA8F19EF44DE006706BF /* 724-info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725518E4F0930014DF0C /* 724-info@2x.png */; };
 		981AFA9019EF44DE006706BF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADBC176935E400B62590 /* InfoPlist.strings */; };
 		981AFA9619EF44DE006706BF /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */; };
 		981AFA9819EF44DE006706BF /* 724-info.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725418E4F0930014DF0C /* 724-info.png */; };
 		981AFA9919EF44DE006706BF /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADD1176935E500B62590 /* MainViewController_iPad.xib */; };
-		981AFA9B19EF44DE006706BF /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 98D418FF1769486C008D2FF3 /* Keyman.bundle */; };
 		981AFA9E19EF44DE006706BF /* textsize.png in Resources */ = {isa = PBXBuildFile; fileRef = 98158A7518EE3681002E2517 /* textsize.png */; };
 		981AFAA219EF44DE006706BF /* navbar-Portrait@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9825527E19CBEC10009CDD83 /* navbar-Portrait@2x.png */; };
 		981AFAA519EF44DE006706BF /* 724-info-selected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815726318E4F2C20014DF0C /* 724-info-selected@2x.png */; };
@@ -150,7 +129,6 @@
 		9845A8D81A439F1000544E2E /* UIButtonBarRefresh@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8CA1A439F1000544E2E /* UIButtonBarRefresh@2x.png */; };
 		9845A8D91A439F1000544E2E /* UIButtonBarStop@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8CB1A439F1000544E2E /* UIButtonBarStop@2x.png */; };
 		9845A8DE1A439FB200544E2E /* BookmarksViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */; };
-		9846CC0C19EB5B8800F9AA03 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 98D418FF1769486C008D2FF3 /* Keyman.bundle */; };
 		985EA9DF19E64A580006C017 /* banner-Landscape-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D419E64A580006C017 /* banner-Landscape-568h@2x.png */; };
 		985EA9E019E64A580006C017 /* banner-Landscape-568h@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D519E64A580006C017 /* banner-Landscape-568h@3x.png */; };
 		985EA9E119E64A580006C017 /* banner-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D619E64A580006C017 /* banner-Landscape.png */; };
@@ -162,18 +140,7 @@
 		985EA9E719E64A580006C017 /* banner-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DC19E64A580006C017 /* banner-Portrait@2x~ipad.png */; };
 		985EA9E819E64A580006C017 /* banner-Portrait@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DD19E64A580006C017 /* banner-Portrait@3x.png */; };
 		985EA9E919E64A580006C017 /* banner-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DE19E64A580006C017 /* banner-Portrait~ipad.png */; };
-		987728D01B7C0E6400DBC159 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C0D811994613E009D2A13 /* WebKit.framework */; };
-		987728D11B7C0E7300DBC159 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C0D811994613E009D2A13 /* WebKit.framework */; };
 		989E4DBC1B1EB85200A345FB /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 989E4DBA1B1EB85200A345FB /* Settings.bundle */; };
-		98CD126D19CA85B60089385F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98DE283417F50DBF00D6A496 /* AudioToolbox.framework */; };
-		98CD126E19CA85BF0089385F /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41903176952D0008D2FF3 /* CFNetwork.framework */; };
-		98CD126F19CA85C80089385F /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41905176952E0008D2FF3 /* MobileCoreServices.framework */; };
-		98CD127019CA85ED0089385F /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D41907176952F5008D2FF3 /* libz.dylib */; };
-		98CD127119CA85F90089385F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D4190917695302008D2FF3 /* SystemConfiguration.framework */; };
-		98CD127219CA86040089385F /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98CF0C3E17D99945001580BF /* CoreText.framework */; };
-		98CD127319CA860D0089385F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98ABADB7176935E400B62590 /* CoreGraphics.framework */; };
-		98CD127419CA86130089385F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98CF0C4417D99A14001580BF /* UIKit.framework */; };
-		98CD127519CA86350089385F /* libKeyman.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98D419001769486C008D2FF3 /* libKeyman.a */; };
 		98CF00B81B461EDE00627DC6 /* browser-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B41B461EDE00627DC6 /* browser-icon.png */; };
 		98CF00B91B461EDE00627DC6 /* get-started.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B51B461EDE00627DC6 /* get-started.png */; };
 		98CF00BA1B461EDE00627DC6 /* info.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B61B461EDE00627DC6 /* info.png */; };
@@ -190,19 +157,11 @@
 		C0E943FE1F61377900E7D98C /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E943FD1F61377900E7D98C /* MainViewController.swift */; };
 		C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
 		C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */; };
-		CE06AA681F171CA0006D91C3 /* Keyman.h in Headers */ = {isa = PBXBuildFile; fileRef = 98D418F71769486C008D2FF3 /* Keyman.h */; };
+		CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		378F3C5F1DD9F2B5001101A9 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "${PROJECT_DIR}/Keyman/libKeyman";
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		981AFADC19EF44DE006706BF /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -214,12 +173,20 @@
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C01AB5981F8343F7009B37D3 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		371584751E57D3DA00B93F37 /* Keyman.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Keyman.h; path = "../../engine/KMEI/build/Debug-universal/include/Keyman.h"; sourceTree = "<group>"; };
-		371584771E5832EA00B93F37 /* Release-universal */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Release-universal"; sourceTree = "<group>"; };
-		98035AC019E3A04000DCB1B1 /* KMInputViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMInputViewController.h; sourceTree = "<group>"; };
 		9815725018E4F0930014DF0C /* 702-share.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "702-share.png"; path = "Keyman Icons/702-share.png"; sourceTree = "<group>"; };
 		9815725118E4F0930014DF0C /* 702-share@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "702-share@2x.png"; path = "Keyman Icons/702-share@2x.png"; sourceTree = "<group>"; };
 		9815725218E4F0930014DF0C /* 711-trash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "711-trash.png"; path = "Keyman Icons/711-trash.png"; sourceTree = "<group>"; };
@@ -329,7 +296,6 @@
 		9845A8CA1A439F1000544E2E /* UIButtonBarRefresh@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIButtonBarRefresh@2x.png"; sourceTree = "<group>"; };
 		9845A8CB1A439F1000544E2E /* UIButtonBarStop@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIButtonBarStop@2x.png"; sourceTree = "<group>"; };
 		9845A8DC1A439FB200544E2E /* BookmarksViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BookmarksViewController.xib; sourceTree = "<group>"; };
-		984C0D811994613E009D2A13 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		984FA1E21974B06C0037EE5D /* Keyman.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Keyman.entitlements; sourceTree = "<group>"; };
 		985EA9D419E64A580006C017 /* banner-Landscape-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape-568h@2x.png"; sourceTree = "<group>"; };
 		985EA9D519E64A580006C017 /* banner-Landscape-568h@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape-568h@3x.png"; sourceTree = "<group>"; };
@@ -347,8 +313,6 @@
 		987F3E9B19417F3D00209D4F /* textsize_selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_selected.png; path = "Keyman Icons/textsize_selected.png"; sourceTree = "<group>"; };
 		987F3E9C19417F3D00209D4F /* textsize_selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_selected@2x.png"; path = "Keyman Icons/textsize_selected@2x.png"; sourceTree = "<group>"; };
 		989E4DBA1B1EB85200A345FB /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
-		98A880EB177BDECA00601A9E /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
-		98ABADB7176935E400B62590 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		98ABADBB176935E400B62590 /* Keyman-Free-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Keyman-Free-Info.plist"; sourceTree = "<group>"; };
 		98ABADBD176935E400B62590 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		98ABADC1176935E400B62590 /* Keyman-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Prefix.pch"; sourceTree = "<group>"; };
@@ -364,28 +328,10 @@
 		98CF00B51B461EDE00627DC6 /* get-started.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "get-started.png"; sourceTree = "<group>"; };
 		98CF00B61B461EDE00627DC6 /* info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = info.png; sourceTree = "<group>"; };
 		98CF00B71B461EDE00627DC6 /* menu-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-icon.png"; sourceTree = "<group>"; };
-		98CF0C3E17D99945001580BF /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
-		98CF0C4417D99A14001580BF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		98D418F61769486C008D2FF3 /* CWLSynthesizeSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWLSynthesizeSingleton.h; sourceTree = "<group>"; };
-		98D418F71769486C008D2FF3 /* Keyman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Keyman.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		98D418F81769486C008D2FF3 /* KMKeyboardPickerBarButtonItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMKeyboardPickerBarButtonItem.h; sourceTree = "<group>"; };
-		98D418F91769486C008D2FF3 /* KMKeyboardPickerButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMKeyboardPickerButton.h; sourceTree = "<group>"; };
-		98D418FA1769486C008D2FF3 /* KMManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = KMManager.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		98D418FB1769486C008D2FF3 /* KMTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = KMTextField.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		98D418FC1769486C008D2FF3 /* KMTextFieldDelegateProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = KMTextFieldDelegateProxy.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		98D418FD1769486C008D2FF3 /* KMTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = KMTextView.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		98D418FE1769486C008D2FF3 /* KMTextViewDelegateProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = KMTextViewDelegateProxy.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		98D418FF1769486C008D2FF3 /* Keyman.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Keyman.bundle; sourceTree = "<group>"; };
-		98D419001769486C008D2FF3 /* libKeyman.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libKeyman.a; sourceTree = "<group>"; };
-		98D41903176952D0008D2FF3 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		98D41905176952E0008D2FF3 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		98D41907176952F5008D2FF3 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		98D4190917695302008D2FF3 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		98D55ED618480B6800104956 /* textsize_down.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_down.png; path = "Keyman Icons/textsize_down.png"; sourceTree = "<group>"; };
 		98D55ED718480B6800104956 /* textsize_down@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_down@2x.png"; path = "Keyman Icons/textsize_down@2x.png"; sourceTree = "<group>"; };
 		98D55EDC18480B6800104956 /* textsize_up.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_up.png; path = "Keyman Icons/textsize_up.png"; sourceTree = "<group>"; };
 		98D55EDD18480B6800104956 /* textsize_up@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_up@2x.png"; path = "Keyman Icons/textsize_up@2x.png"; sourceTree = "<group>"; };
-		98DE283417F50DBF00D6A496 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		C055F0B01F60E8D400140735 /* GetStartedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = GetStartedViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C055F0B21F60F7A400140735 /* DropDownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DropDownView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C055F0B41F610FB200140735 /* DropDownListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DropDownListView.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -396,10 +342,11 @@
 		C0E943F71F61234C00E7D98C /* UIImage+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = "UIImage+Helpers.swift"; sourceTree = "<group>"; tabWidth = 2; };
 		C0E943F91F6124E100E7D98C /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0E943FD1F61377900E7D98C /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
-		C0FF76991F5D368B00BD23C3 /* SWKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SWKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = ActivityItemProvider.swift; sourceTree = "<group>"; tabWidth = 2; };
+		CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -407,16 +354,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				981AFA8519EF44DE006706BF /* AudioToolbox.framework in Frameworks */,
-				981AFA8619EF44DE006706BF /* CFNetwork.framework in Frameworks */,
-				981AFA8C19EF44DE006706BF /* CoreGraphics.framework in Frameworks */,
-				981AFA8B19EF44DE006706BF /* CoreText.framework in Frameworks */,
-				981AFA8A19EF44DE006706BF /* libKeyman.a in Frameworks */,
-				981AFA8819EF44DE006706BF /* libz.dylib in Frameworks */,
-				981AFA8719EF44DE006706BF /* MobileCoreServices.framework in Frameworks */,
-				981AFA8919EF44DE006706BF /* SystemConfiguration.framework in Frameworks */,
-				981AFA8D19EF44DE006706BF /* UIKit.framework in Frameworks */,
-				987728D01B7C0E6400DBC159 /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -424,16 +361,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98CD126D19CA85B60089385F /* AudioToolbox.framework in Frameworks */,
-				98CD126E19CA85BF0089385F /* CFNetwork.framework in Frameworks */,
-				98CD127319CA860D0089385F /* CoreGraphics.framework in Frameworks */,
-				98CD127219CA86040089385F /* CoreText.framework in Frameworks */,
-				98CD127519CA86350089385F /* libKeyman.a in Frameworks */,
-				98CD127019CA85ED0089385F /* libz.dylib in Frameworks */,
-				98CD126F19CA85C80089385F /* MobileCoreServices.framework in Frameworks */,
-				98CD127119CA85F90089385F /* SystemConfiguration.framework in Frameworks */,
-				98CD127419CA86130089385F /* UIKit.framework in Frameworks */,
-				987728D11B7C0E7300DBC159 /* WebKit.framework in Frameworks */,
+				CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -613,8 +541,7 @@
 		98ABADA7176935E400B62590 = {
 			isa = PBXGroup;
 			children = (
-				371584771E5832EA00B93F37 /* Release-universal */,
-				371584751E57D3DA00B93F37 /* Keyman.h */,
+				CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */,
 				989E4DBA1B1EB85200A345FB /* Settings.bundle */,
 				98ABADB2176935E400B62590 /* Frameworks */,
 				98ABADB9176935E400B62590 /* Keyman */,
@@ -635,15 +562,7 @@
 		98ABADB2176935E400B62590 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				98DE283417F50DBF00D6A496 /* AudioToolbox.framework */,
-				98D41903176952D0008D2FF3 /* CFNetwork.framework */,
-				98ABADB7176935E400B62590 /* CoreGraphics.framework */,
-				98CF0C3E17D99945001580BF /* CoreText.framework */,
-				98D41907176952F5008D2FF3 /* libz.dylib */,
-				98D41905176952E0008D2FF3 /* MobileCoreServices.framework */,
-				98D4190917695302008D2FF3 /* SystemConfiguration.framework */,
-				98CF0C4417D99A14001580BF /* UIKit.framework */,
-				984C0D811994613E009D2A13 /* WebKit.framework */,
+				CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -657,7 +576,6 @@
 				984FA1E21974B06C0037EE5D /* Keyman.entitlements */,
 				9845A7B71A4398B200544E2E /* DropDownList */,
 				9845A79A1A43983300544E2E /* KMWebBrowser */,
-				98D418F41769486C008D2FF3 /* libKeyman */,
 				9822CB671A3A77D200D73CAA /* MainViewController_.xib */,
 				98ABADD1176935E500B62590 /* MainViewController_iPad.xib */,
 				98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */,
@@ -755,7 +673,6 @@
 				98CD127619CA866B0089385F /* SWKeyboard.entitlements */,
 				98CD125E19CA85710089385F /* Supporting Files */,
 				C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */,
-				C0FF76991F5D368B00BD23C3 /* SWKeyboard-Bridging-Header.h */,
 			);
 			path = SWKeyboard;
 			sourceTree = "<group>";
@@ -769,34 +686,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		98D418F41769486C008D2FF3 /* libKeyman */ = {
-			isa = PBXGroup;
-			children = (
-				98D418F51769486C008D2FF3 /* include */,
-				98D418FF1769486C008D2FF3 /* Keyman.bundle */,
-				98D419001769486C008D2FF3 /* libKeyman.a */,
-			);
-			path = libKeyman;
-			sourceTree = "<group>";
-		};
-		98D418F51769486C008D2FF3 /* include */ = {
-			isa = PBXGroup;
-			children = (
-				98035AC019E3A04000DCB1B1 /* KMInputViewController.h */,
-				98A880EB177BDECA00601A9E /* Reachability.h */,
-				98D418F61769486C008D2FF3 /* CWLSynthesizeSingleton.h */,
-				98D418F71769486C008D2FF3 /* Keyman.h */,
-				98D418F81769486C008D2FF3 /* KMKeyboardPickerBarButtonItem.h */,
-				98D418F91769486C008D2FF3 /* KMKeyboardPickerButton.h */,
-				98D418FA1769486C008D2FF3 /* KMManager.h */,
-				98D418FB1769486C008D2FF3 /* KMTextField.h */,
-				98D418FC1769486C008D2FF3 /* KMTextFieldDelegateProxy.h */,
-				98D418FD1769486C008D2FF3 /* KMTextView.h */,
-				98D418FE1769486C008D2FF3 /* KMTextViewDelegateProxy.h */,
-			);
-			path = include;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -804,7 +693,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE06AA681F171CA0006D91C3 /* Keyman.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -812,17 +700,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				37BF5A361DE8404E0014AF19 /* KMInputViewController.h in Headers */,
-				37BF5A371DE8404E0014AF19 /* Reachability.h in Headers */,
-				37BF5A381DE8404E0014AF19 /* CWLSynthesizeSingleton.h in Headers */,
-				37BF5A391DE8404E0014AF19 /* Keyman.h in Headers */,
-				37BF5A3A1DE8404E0014AF19 /* KMKeyboardPickerBarButtonItem.h in Headers */,
-				37BF5A3B1DE8404E0014AF19 /* KMKeyboardPickerButton.h in Headers */,
-				37BF5A3C1DE8404E0014AF19 /* KMManager.h in Headers */,
-				37BF5A3D1DE8404E0014AF19 /* KMTextField.h in Headers */,
-				37BF5A3E1DE8404E0014AF19 /* KMTextFieldDelegateProxy.h in Headers */,
-				37BF5A3F1DE8404E0014AF19 /* KMTextView.h in Headers */,
-				37BF5A401DE8404E0014AF19 /* KMTextViewDelegateProxy.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -839,6 +716,7 @@
 				981AFADC19EF44DE006706BF /* Embed App Extensions */,
 				989E4DB91B1EB5C200A345FB /* ShellScript */,
 				37BC8FF91DE83B40006AEBFF /* Headers */,
+				C01AB5981F8343F7009B37D3 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -854,7 +732,6 @@
 			buildConfigurationList = 98CD126819CA85710089385F /* Build configuration list for PBXNativeTarget "SWKeyboard" */;
 			buildPhases = (
 				CE06AA671F161422006D91C3 /* ShellScript */,
-				378F3C5F1DD9F2B5001101A9 /* CopyFiles */,
 				98CD125819CA85710089385F /* Sources */,
 				98CD125919CA85710089385F /* Frameworks */,
 				98CD125A19CA85710089385F /* Resources */,
@@ -934,7 +811,6 @@
 				9845A85E1A439B8F00544E2E /* confirm-dl-a.png in Resources */,
 				9845A87A1A439B8F00544E2E /* hide-keyboard.png in Resources */,
 				981AFA9919EF44DE006706BF /* MainViewController_iPad.xib in Resources */,
-				981AFA9B19EF44DE006706BF /* Keyman.bundle in Resources */,
 				982D149319FF462A007D4629 /* 724-info-selected@3x.png in Resources */,
 				982D149519FF462A007D4629 /* 724-info@3x.png in Resources */,
 				981AFA9E19EF44DE006706BF /* textsize.png in Resources */,
@@ -1063,7 +939,6 @@
 				985EA9DF19E64A580006C017 /* banner-Landscape-568h@2x.png in Resources */,
 				985EA9E619E64A580006C017 /* banner-Portrait@2x.png in Resources */,
 				985EA9E219E64A580006C017 /* banner-Landscape@2x.png in Resources */,
-				9846CC0C19EB5B8800F9AA03 /* Keyman.bundle in Resources */,
 				985EA9E919E64A580006C017 /* banner-Portrait~ipad.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1095,7 +970,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# For corresponding with the console build\nDESTINATION=Keyman/\nSOURCE=../../engine/KMEI/build/libKeyman\n\ncp -Rf \"$SOURCE\" \"$DESTINATION\"\n\nif which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
+			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1169,24 +1044,25 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = "Keyman-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/Keyman/libKeyman\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "Tavultesoft.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = Keyman;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "Keyman/Keyman-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
@@ -1208,23 +1084,24 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				INFOPLIST_FILE = "Keyman-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/Keyman/libKeyman\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "Tavultesoft.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = Keyman;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "Keyman/Keyman-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1261,6 +1138,7 @@
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1274,11 +1152,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = (
-					"-force_load",
-					Keyman/libKeyman/libKeyman.a,
-				);
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "";
 				"OTHER_SWIFT_FLAGS[arch=*]" = "-D DEBUG";
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -1315,6 +1190,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1326,10 +1202,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
-				OTHER_LDFLAGS = (
-					"-force_load",
-					Keyman/libKeyman/libKeyman.a,
-				);
+				OTHER_LDFLAGS = "";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -1352,6 +1225,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1364,22 +1241,21 @@
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Keyman/libKeyman",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = Tavultesoft.Keyman.SWKeyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "SWKeyboard/SWKeyboard-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -1398,6 +1274,10 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -1406,20 +1286,20 @@
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Keyman/libKeyman",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = Tavultesoft.Keyman.SWKeyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "SWKeyboard/SWKeyboard-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

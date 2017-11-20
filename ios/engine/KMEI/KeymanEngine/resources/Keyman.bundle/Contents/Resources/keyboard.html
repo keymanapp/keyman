@@ -30,7 +30,7 @@
             window.addEventListener('load', init, false);
             
             function init() {
-                var kmw=window['tavultesoft']['keymanweb'];
+                var kmw=window['keyman'];
                 kmw.init({'app':device,'fonts':'fonts/'});
                 kmw['util']['setOption']('attachType','manual');
                 kmw['oninserttext'] = insertText;
@@ -49,7 +49,7 @@
             
             function setOskHeight(height) {
                 oskHeight = height;
-                var kmw=window['tavultesoft']['keymanweb'];
+                var kmw=window['keyman'];
                 kmw['correctOSKTextSize']();
             }
         
@@ -73,7 +73,7 @@
             
             var keyboardOffset = 0;
             function setKeymanLanguage(keyboardName,internalName,languageName,langId,version,font,oskFont) {
-                var kmw=window['tavultesoft']['keymanweb'];
+                var kmw=window['keyman'];
                 // Defaults for mising arguments
                 switch(arguments.length)
                 {
@@ -86,7 +86,7 @@
                     langId='';
                 }
 
-                kmw['KRS']({KN:keyboardName,KI:'Keyboard_'+internalName,KLC:langId,KL:languageName,KF:internalName+'-'+version+'.js',KFont:font,KOskFont:oskFont});
+                kmw.interface['registerStub']({KN:keyboardName,KI:'Keyboard_'+internalName,KLC:langId,KL:languageName,KF:internalName+'-'+version+'.js',KFont:font,KOskFont:oskFont});
                 kmw['setActiveKeyboard']('Keyboard_'+internalName,langId);
                 kmw['osk']['show'](true);
             }
@@ -166,23 +166,14 @@
             }
         
             function langMenuPos() {
-                var kmw = window['tavultesoft']['keymanweb'];
+                var kmw = window['keyman'];
                 var pos = kmw['touchMenuPos']();
                 return pos;
             }
         
-            /*
-            function oskRowCount() {
-                var rowCount = 5;
-                if (typeof(tavultesoft.keymanweb.osk.layers[0]) != 'undefined')
-                    rowCount = tavultesoft.keymanweb.osk.layers[0].row.length;
-                
-                return rowCount;
-            }*/
-        
             function setCursorRange(pos, length) {
                 var ta = document.getElementById('ta');
-                var kmw = window['tavultesoft']['keymanweb'];
+                var kmw = window['keyman'];
                 ta.selectionStart = ta._KeymanWebSelectionStart = pos;
                 ta.selectionEnd = ta._KeymanWebSelectionEnd = pos + length;
                 kmw['setActiveElement'](ta);
@@ -192,19 +183,19 @@
             function setKeymanVal(text) {
                 if(undefined == text) text = '';
                 var ta = document.getElementById('ta');
-                var kmw = window['tavultesoft']['keymanweb'];
+                var kmw = window['keyman'];
                 ta.value = text;
                 kmw['setActiveElement'](ta);
                 return ta.value;
             }
             
             function executePopupKey(keyID, keyText) {
-                var kmw=window['tavultesoft']['keymanweb'];
+                var kmw=window['keyman'];
                 kmw['executePopupKey'](keyID, keyText);
             }
         
             function popupVisible(value) {
-                var kmw=window['tavultesoft']['keymanweb'];
+                var kmw=window['keyman'];
                 kmw['popupVisible'](value);
             }
         

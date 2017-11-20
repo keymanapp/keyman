@@ -6,7 +6,7 @@
 // If a UI module has been loaded, we can rely on the publically-published 'name' property
 // having been set as a way to short-out a UI reload.  Its parent object always exists by
 // this point in the build process.
-if(!window['tavultesoft']['keymanweb']['ui']['name']) { 
+if(!window['keyman']['ui']['name']) { 
   /********************************/
   /*                              */
   /* Floating User Interface      */
@@ -25,7 +25,7 @@ if(!window['tavultesoft']['keymanweb']['ui']['name']) {
   try {
 
     // Declare KeymanWeb, OnScreen keyboard and Util objects
-    var keymanweb=window['tavultesoft']['keymanweb'];
+    var keymanweb=window['keyman'];
     var util=keymanweb['util'];
     var osk=keymanweb['osk'];
     var dbg=keymanweb['debug'];

@@ -3,7 +3,7 @@ apply plugin: 'com.github.triplet.play'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    buildToolsVersion "26.0.2"
     playAccountConfigs {
         defaultAccountConfig {
             if (project.hasProperty("keys_json_file")) {
@@ -77,14 +77,16 @@ android {
 
 repositories {
     mavenCentral()
+    google()
     flatDir {
         dirs 'libs'
     }
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:25.4.0'
-    compile(name: 'keyman-engine', ext: 'aar')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:support-v4:25.4.0'
+    api (name: 'keyman-engine', ext: 'aar')
 }
 
 /*

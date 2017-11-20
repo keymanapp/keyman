@@ -119,7 +119,7 @@
       <a href='' id='install_link'>Install Keyboard into native Keyman</a>
     </div>
     <script> 
-      tavultesoft.keymanweb.init({
+      keyman.init({
         ui:'button',
         resources:'/resource/',
         keyboards:'/keyboard/',
@@ -127,20 +127,20 @@
         attachType:'auto'
       });
 
-      tavultesoft.keymanweb.addEventListener('keyboardchange',
+      keyman.addEventListener('keyboardchange',
         function (p) {
           //alert(p.internalName);
           var nm = p.internalName.substr('Keyboard_'.length);
           document.getElementById('install_link').href='keyman://localhost/open?direct=true&url='+location.protocol+'//'+location.host+'/kbinstall/'+nm+'-'+debugKeyboards[nm].version+'.json';
         });
         
-      //tavultesoft.keymanweb.addEventListener
+      //keyman.addEventListener
       
       window.onload = function() {
         window.setTimeout(
           function () {
             //document.getElementById('ta1').focus();
-            tavultesoft.keymanweb.moveToElement('ta1');
+            keyman.moveToElement('ta1');
           }, 10);
       }
     </script>

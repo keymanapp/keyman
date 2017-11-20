@@ -6,16 +6,15 @@
 // If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the 
 // KMW system, so we use the fact that 'initialized' is only 1 / true after all scripts are loaded for the initial
 // load of KMW.
-if(!window['tavultesoft']['keymanweb']['initialized']) { 
+if(!window['keyman']['initialized']) { 
   /**
    * Cross-browser compatibility keymaps    
    */    
-  (function() 
-  {
+  (function() {
     // Declare KeymanWeb object
-    var keymanweb=window['tavultesoft']['keymanweb'];
+    var keymanweb=window['keyman'];
 
-    /* I732 START - 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard #2 */ 
+    /* I732 START - 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard #2 */
     var ffie = keymanweb._VKMap_FF_IE = {};
     
     //ffie['k109'] = 189; // -    // These two number-pad VK rules are *not* correct for more recent FF! JMD 8/11/12
@@ -148,7 +147,7 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
     s1['k191'] = 63;
 
     keymanweb._USCharCode = [s0,s1];
-      
+    
     /**
      * Function     _USKeyCodeToCharCode
      * Scope        Private
@@ -156,10 +155,9 @@ if(!window['tavultesoft']['keymanweb']['initialized']) {
      * @return      {number}                Character code 
      * Description Translate keyboard codes to standard US layout codes
      */    
-    keymanweb._USKeyCodeToCharCode = function(Levent)
-    {
+    keymanweb._USKeyCodeToCharCode = function(Levent) {
       return keymanweb._USCharCode[Levent.Lmodifiers & 0x10 ? 1 : 0]['k'+Levent.Lcode];
     };
-    
-  })();  
+  
+  })();
 }
