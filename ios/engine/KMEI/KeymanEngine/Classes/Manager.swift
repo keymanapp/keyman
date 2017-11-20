@@ -128,11 +128,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       kmLog("Failed to copy KMW files from bundle: \(error)", checkDebugPrinting: false)
     }
 
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
-                                           name: .UIKeyboardWillShow, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
-                                           name: .UIKeyboardWillHide, object: nil)
-
     updateUserKeyboards(with: Defaults.keyboard)
 
     reachability = Reachability(hostName: keymanHostName)
@@ -821,6 +816,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   // MARK: - View management
+  // FIXME: Temporary
   public func loadKeyboard() {
     _ = keymanWeb.view
   }
@@ -889,23 +885,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   func setText(_ text: String?) {
     keymanWeb.setText(text)
-  }
-
-  // MARK: - Keyboard Notifications
-  @objc func keyboardWillShow(_ notification: Notification) {
-    keymanWeb.dismissSubKeys()
-    keymanWeb.dismissKeyPreview()
-    keymanWeb.resizeKeyboard()
-
-    if isKeymanHelpOn {
-      keymanWeb.showHelpBubble(afterDelay: 1.5)
-    }
-  }
-
-  @objc func keyboardWillHide(_ notification: Notification) {
-    keymanWeb.dismissHelpBubble()
-    keymanWeb.dismissSubKeys()
-    keymanWeb.dismissKeyPreview()
   }
 
   // MARK: - KeymanWebViewDelegate methods
