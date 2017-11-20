@@ -314,7 +314,7 @@
     NSMenuItem *mItem = [sender objectForKey:kIMKCommandMenuItemName];
     NSInteger itag = mItem.tag;
     if (itag == 2) {
-        [self showPreferences:sender];
+        [self.AppDelegate showConfigurationWindow];
     }
     else if (itag == 3) {
         [self.AppDelegate showOSK];

@@ -26,9 +26,10 @@
 }
 
 - (id)initWithWindowNibName:(NSString *)windowNibName {
+    NSLog(@"Initializing KMConfigurationWindowController with nib: %@", windowNibName);
     self = [super initWithWindowNibName:windowNibName];
     if (self) {
-        self.AppDelegate.configWindow = self;
+        //self.AppDelegate.configWindow = self;
         
         if (self.AppDelegate.infoWindow_.window != nil) {
             [self.window addChildWindow:self.AppDelegate.infoWindow_.window ordered:NSWindowAbove];
@@ -40,6 +41,8 @@
         }
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(timerAction:) name:kKeymanKeyboardDownloadCompletedNotification object:nil];
+        
+        NSLog(@"Initialization complete!");
     }
     
     return self;

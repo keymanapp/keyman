@@ -38,7 +38,9 @@
 }
 
 - (IBAction)configAction:(id)sender {
+    NSLog(@"Calling showPreferences from About window (i.e., the old way)...");
     [self.AppDelegate.inputController showPreferences:sender];
+    NSLog(@"Back from showPreferences. Closing About window...");
     [self close];
 }
 
