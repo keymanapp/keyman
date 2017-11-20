@@ -1321,21 +1321,6 @@ if(!window['keyman']['initialized']) {
     // End of I3363 (Build 301) additions
 
     /**
-     * Function     processKeystroke
-     * Scope        Private
-     * @param       {Object}        device      The device object properties to be utilized for this keystroke.
-     * @param       {Object}        element     The page element receiving input
-     * @param       {Object}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
-     * Description  Encapsulates calls to keyboard input processing.
-     * @returns     {number}        0 if no match is made, otherwise 1.
-     */
-    keymanweb.processKeystroke = function(device, element, keystroke) {
-      util.activeDevice = device;
-
-      return keymanweb._ActiveKeyboard['gs'](element, keystroke);
-    }
-
-    /**
      * Function     resetContext
      * Scope        Public
      * Description  Revert OSK to default layer and clear any deadkeys and modifiers
@@ -3135,12 +3120,12 @@ if(!window['keyman']['initialized']) {
         if(typeof(keymanweb._ActiveKeyboard['KM'])=='undefined'  &&  !(Levent.Lmodifiers & 0x60)) {
           // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
           var Levent2={Lcode:keymanweb._USKeyCodeToCharCode(Levent),Ltarg:Levent.Ltarg,Lmodifiers:0,LisVirtualKey:0};
-          if(keymanweb.callKeyboardStartGroup(Levent2.Ltarg,Levent2)) {
+          if(keymanweb.processKeystroke(util.physicalDevice, Levent2.Ltarg,Levent2)) {
             LeventMatched=1;
           }
         }
         
-        LeventMatched = LeventMatched || keymanweb.callKeyboardStartGroup(Levent.Ltarg,Levent);
+        LeventMatched = LeventMatched || keymanweb.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent);
         
         // Support backspace in simulated input DIV from physical keyboard where not matched in rule  I3363 (Build 301)
         if(Levent.Lcode == 8 && !LeventMatched && Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
@@ -3150,7 +3135,7 @@ if(!window['keyman']['initialized']) {
         // Mnemonic layout
         if(Levent.Lcode == 8) { // I1595 - Backspace for mnemonic
           keymanweb._KeyPressToSwallow = 1;
-          if(!keymanweb.callKeyboardStartGroup(Levent.Ltarg,Levent)) {
+          if(!keymanweb.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
             kbdInterface.output(1,keymanweb._LastActiveElement,""); // I3363 (Build 301)
           }
           return false;  //added 16/3/13 to fix double backspace on mnemonic layouts on desktop
@@ -3206,15 +3191,34 @@ if(!window['keyman']['initialized']) {
       return true;
     }                
 
-    keymanweb.callKeyboardStartGroup = function(Ltarg, Levent) {
+    /**
+     * Function     processKeystroke
+     * Scope        Private
+     * @param       {Object}        device      The device object properties to be utilized for this keystroke.
+     * @param       {Object}        element     The page element receiving input
+     * @param       {Object}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
+     * Description  Encapsulates calls to keyboard input processing.
+     * @returns     {number}        0 if no match is made, otherwise 1.
+     */
+    keymanweb.processKeystroke = function(device, element, keystroke) {
       keymanweb._CachedSelectionStart = null; // I3319     
       keymanweb._DeadkeyResetMatched();       // I3318    
       keymanweb.cachedContext.reset();
 
-      // As this function should only be called for hardware keyboard input processing,
-      // this processes the keystroke through hardware-based rules.
-      return keymanweb.processKeystroke(util.physicalDevice, Ltarg, Levent);
+      util.activeDevice = device;
+
+      return keymanweb._ActiveKeyboard['gs'](element, keystroke);
     }
+
+    // keymanweb.callKeyboardStartGroup = function(Ltarg, Levent) {
+    //   keymanweb._CachedSelectionStart = null; // I3319     
+    //   keymanweb._DeadkeyResetMatched();       // I3318    
+    //   keymanweb.cachedContext.reset();
+
+    //   // As this function should only be called for hardware keyboard input processing,
+    //   // this processes the keystroke through hardware-based rules.
+    //   return keymanweb.processKeystroke(util.physicalDevice, Ltarg, Levent);
+    // }
 
     /**
      * Function     _KeyPress
@@ -3256,7 +3260,7 @@ if(!window['keyman']['initialized']) {
       }
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
       
-      if(keymanweb._KeyPressToSwallow || keymanweb.callKeyboardStartGroup(Levent.Ltarg,Levent)) {
+      if(keymanweb._KeyPressToSwallow || keymanweb.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
         keymanweb._KeyPressToSwallow=0;
         if(e  &&  e.preventDefault) {
           e.preventDefault();
