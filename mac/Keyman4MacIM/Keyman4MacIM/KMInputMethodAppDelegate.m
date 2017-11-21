@@ -696,11 +696,9 @@ typedef enum {
 }
 
 - (void)showConfigurationWindow {
-    NSLog(@"At start of showConfigurationWindow");
     [self.configWindow.window centerInParent];
-    [[self.configWindow window] makeKeyAndOrderFront:nil];
-    [[self.configWindow window] setLevel:NSFloatingWindowLevel];
-    NSLog(@"At end of showConfigurationWindow");
+    [self.configWindow.window makeKeyAndOrderFront:nil];
+    [self.configWindow.window setLevel:NSFloatingWindowLevel];
 }
 
 - (void)showOSK {
@@ -721,10 +719,9 @@ typedef enum {
 
 - (NSWindowController *)configWindow {
     if (_configWindow.window == nil) {
-        NSLog(@"Config window was nil. Initializing...");
         _configWindow = [[KMConfigurationWindowController alloc] initWithWindowNibName:@"preferences"];
     }
-    
+
     return _configWindow;
 }
 

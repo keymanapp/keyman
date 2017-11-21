@@ -314,6 +314,8 @@
     NSMenuItem *mItem = [sender objectForKey:kIMKCommandMenuItemName];
     NSInteger itag = mItem.tag;
     if (itag == 2) {
+        // Using `showConfigurationWindow` instead of `showPreferences:` because `showPreferences:` is missing in
+        // High Sierra (confirmed missing up to 10.13.1).
         [self.AppDelegate showConfigurationWindow];
     }
     else if (itag == 3) {
