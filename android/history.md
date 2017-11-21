@@ -4,9 +4,10 @@
 * Refactor how longpress keys on touch layout are processed in KMW engine. This prevents key text 
   from being processed as key codes, and fixes the app crash when longpress with K_SPACE.
 * Added support for L/R Alt and Ctrl and Caps Lock modifiers for keyboards if specified by a keyboard designer
-* Add feature to reset keyboard to default layer when new input field focused (keymanapp/keyman#288)
-* Removed "Share to Facebook" feature (keymanapp/keyman#156)
-* Fix dual keyboards that appear when closing Keyman Browser (keymanapp/keyman#220)
+* Add feature to reset keyboard to default layer when new input field focused (#288)
+* Removed "Share to Facebook" feature (#156)
+* Fix dual keyboards that appear when closing Keyman Browser (#220)
+* Fix KMEA http:// to https:// redirects for downloading keyboard resources (#370)
 
 ## 2017-08-10 2.8.300 stable
 * No changes, just published latest beta as stable

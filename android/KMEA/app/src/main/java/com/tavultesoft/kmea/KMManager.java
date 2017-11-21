@@ -1260,10 +1260,25 @@ public final class KMManager {
         file = new File(dirPath, fileName);
         tmpFile = new File(dirPath, tmpFileName);
 
+        // TODO: Refactor urlConnection to utility method
+        HttpURLConnection.setFollowRedirects(false);
         urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestProperty("Cache-Control", "no-cache");
         urlConnection.setConnectTimeout(10000);
         urlConnection.setReadTimeout(10000);
+        urlConnection.connect();
+        int stat = urlConnection.getResponseCode();
+        Log.d("KMManager", "HttpURLConnection response code: " + stat);
+        // Handle HTTP Status Codes 3xx
+        if (HttpURLConnection.HTTP_MULT_CHOICE <= stat &&
+            stat <= HttpURLConnection.HTTP_USE_PROXY &&
+            stat != HttpURLConnection.HTTP_NOT_MODIFIED) {
+          url = new URL(urlConnection.getHeaderField("Location"));
+          Log.d("KMManager", "Redirecting to " + url);
+          // open the new connection again
+          urlConnection = (HttpURLConnection) url.openConnection();
+        }
+
         InputStream binStream = new BufferedInputStream(urlConnection.getInputStream(), 4096);
         byte[] buff = new byte[4096];
 

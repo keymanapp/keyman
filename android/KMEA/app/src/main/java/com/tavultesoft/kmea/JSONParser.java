@@ -30,11 +30,25 @@ final class JSONParser {
     HttpURLConnection urlConnection = null;
 
     try {
+      // TODO: Refactor urlConnection to utility method
       URL url = new URL(urlStr);
+      HttpURLConnection.setFollowRedirects(false);
       urlConnection = (HttpURLConnection) url.openConnection();
       urlConnection.setRequestProperty("Cache-Control", "no-cache");
       urlConnection.setConnectTimeout(10000);
       urlConnection.setReadTimeout(10000);
+      urlConnection.connect();
+      int status = urlConnection.getResponseCode();
+      Log.d("JSONParser", "HttpURLConnection response code: " + status);
+      // Handle HTTP Status Codes 3xx
+      if (HttpURLConnection.HTTP_MULT_CHOICE <= status &&
+        status <= HttpURLConnection.HTTP_USE_PROXY &&
+        status != HttpURLConnection.HTTP_NOT_MODIFIED) {
+        url = new URL(urlConnection.getHeaderField("Location"));
+        Log.d("JSONParser", "Redirecting to " + url);
+        // open the new connection again
+        urlConnection = (HttpURLConnection) url.openConnection();
+      }
 
       inputStream = urlConnection.getInputStream();
 
