@@ -69,6 +69,7 @@ public enum Constants {
 
   /// Keyman Web resources
   public static let keymanBundle: Bundle = {
-    return Bundle(path: Bundle(for: Manager.self).path(forResource: "Keyman", ofType: "bundle")!)!
+    let frameworkBundle =  Bundle(identifier: "org.sil.Keyman.ios.Engine")!
+    return Bundle(path: frameworkBundle.path(forResource: "Keyman", ofType: "bundle")!)!
   }()
 }
