@@ -61,7 +61,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
   }
 
   init(keyFrame frame: CGRect, inputViewController: InputViewController, closeButtonTitle: String?) {
-    let isSystemKeyboard = Manager.shared.isSystemKeyboard
+    let isSystemKeyboard = Constants.isSystemKeyboard
     let isPortrait: Bool
     if isSystemKeyboard {
       isPortrait = InputViewController.isPortrait

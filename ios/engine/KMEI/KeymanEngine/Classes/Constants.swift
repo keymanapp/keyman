@@ -6,7 +6,7 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
-public struct Key {
+public enum Key {
   public static let keyboardId = "kbId"
   public static let languageId = "langId"
 
@@ -40,7 +40,7 @@ public struct Key {
   static let update = "update"
 }
 
-public struct Constants {
+public enum Constants {
   private static let defaultFont = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
   public static let defaultKeyboard = InstallableKeyboard(id: "european2",
                                                           name: "EuroLatin2 Keyboard",
@@ -51,4 +51,12 @@ public struct Constants {
                                                           font: defaultFont,
                                                           oskFont: nil,
                                                           isCustom: false)
+
+  /// Is the process of a custom keyboard extension.
+  public static let isSystemKeyboard: Bool = {
+    let infoDict = Bundle.main.infoDictionary
+    let extensionInfo = infoDict?["NSExtension"] as? [AnyHashable: Any]
+    let extensionID = extensionInfo?["NSExtensionPointIdentifier"] as? String
+    return extensionID == "com.apple.keyboard-service"
+  }()
 }
