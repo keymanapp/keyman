@@ -835,17 +835,9 @@ NSRange _previousSelRange;
     NSMenuItem *mItem = [sender objectForKey:kIMKCommandMenuItemName];
     NSInteger itag = mItem.tag;
     if (itag == 2) {
-//        if ([self.AppDelegate debugMode]) {
-//            if ([self conformsToProtocol:@protocol(IMKStateSetting)])
-//                NSLog(@"class conforms to protocol IMKStateSetting.");
-//            else
-//                NSLog(@"class does not conform to protocol IMKStateSetting.");
-//            if ([self respondsToSelector:@selector(showPreferences:)])
-//                NSLog(@"This class DOES respond to showPreferences. Calling it now...");
-//            else
-//                NSLog(@"This class does not respond to showPreferences, but we'll call it anyway...");
-//        }
-        [self showPreferences:sender];
+        // Using `showConfigurationWindow` instead of `showPreferences:` because `showPreferences:` is missing in
+        // High Sierra (confirmed missing up to 10.13.1).
+        [self.AppDelegate showConfigurationWindow];
     }
     else if (itag == 3) {
         [self.AppDelegate showOSK];
