@@ -283,8 +283,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
 
   func loadUserKeyboards() {
     userKeyboards = [:]
-    let userData = Manager.shared.activeUserDefaults()
-    guard let userKbList = userData.userKeyboards else {
+    guard let userKbList = Storage.active.userDefaults.userKeyboards else {
       userKeyboards = [:]
       return
     }

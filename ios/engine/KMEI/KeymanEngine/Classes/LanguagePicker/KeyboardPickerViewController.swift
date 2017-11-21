@@ -275,7 +275,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func loadUserKeyboards() {
-    let userData = Manager.shared.activeUserDefaults()
+    let userData = Storage.active.userDefaults
 
     if let userKeyboards = userData.userKeyboards {
       self.userKeyboards = userKeyboards

@@ -192,7 +192,7 @@ UIGestureRecognizerDelegate {
     if !isSystemKeyboard {
       copyUserDefaultsToSharedContainer()
       copyKeymanFilesToSharedContainer()
-      let userData = activeUserDefaults()
+      let userData = Storage.active.userDefaults
       let isKPDisplayed = userData.bool(forKey: Key.keyboardPickerDisplayed)
       if isKPDisplayed {
         isKeymanHelpOn = false
@@ -242,7 +242,7 @@ UIGestureRecognizerDelegate {
   ///   - addKeyboard()
   /// - Returns: Whether the keyboard was set successfully
   public func setKeyboard(withID keyboardID: String, languageID: String) -> Bool {
-    if let keyboard = activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID) {
+    if let keyboard = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID) {
       return setKeyboard(keyboard)
     }
     return false
@@ -296,7 +296,7 @@ UIGestureRecognizerDelegate {
     kmLog("Evaluating JavaScript: \(jsString)", checkDebugPrinting: true)
     inputView.evaluateJavaScript(jsString, completionHandler: nil)
 
-    let userData = isSystemKeyboard ? UserDefaults.standard : activeUserDefaults()
+    let userData = isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
 
     userData.currentKeyboard = kb
     userData.synchronize()
@@ -330,7 +330,7 @@ UIGestureRecognizerDelegate {
     }
 
     // Get keyboards list if it exists in user defaults, otherwise create a new one
-    let userDefaults = activeUserDefaults()
+    let userDefaults = Storage.active.userDefaults
     var userKeyboards = userDefaults.userKeyboards ?? []
 
     // Update keyboard if it exists
@@ -349,7 +349,7 @@ UIGestureRecognizerDelegate {
   /// - Returns: The keyboard exists and was removed
   public func removeKeyboard(withID keyboardID: String, languageID: String) -> Bool {
     // Remove keyboard from the list if it exists
-    let index = activeUserDefaults().userKeyboards?.index { $0.id == keyboardID && $0.languageID == languageID }
+    let index = Storage.active.userDefaults.userKeyboards?.index { $0.id == keyboardID && $0.languageID == languageID }
     if let index = index {
       return removeKeyboard(at: index)
     }
@@ -359,7 +359,7 @@ UIGestureRecognizerDelegate {
   /// Removes the keyboard at index from the keyboards list if it exists.
   /// - Returns: The keyboard exists and was removed
   public func removeKeyboard(at index: Int) -> Bool {
-    let userData = activeUserDefaults()
+    let userData = Storage.active.userDefaults
 
     // If user defaults for keyboards list does not exist, do nothing.
     guard var userKeyboards = userData.userKeyboards else {
@@ -394,14 +394,13 @@ UIGestureRecognizerDelegate {
     guard let keyboardID = keyboardID, let languageID = languageID else {
       return nil
     }
-    return activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
+    return Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
   }
 
   /// Switch to the next keyboard.
   /// - Returns: Index of the newly selected keyboard.
   public func switchToNextKeyboard() -> Int? {
-    let userDefaults = activeUserDefaults()
-    guard let userKeyboards = userDefaults.userKeyboards,
+    guard let userKeyboards = Storage.active.userDefaults.userKeyboards,
           let index = userKeyboards.index(where: { isCurrentKeyboard($0) }) else {
       return nil
     }
@@ -422,7 +421,7 @@ UIGestureRecognizerDelegate {
   ///   - The keyboard doesn't have a font
   ///   - The keyboard info is not available in the user keyboards list or in keyboardsDictionary
   public func fontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
-    let kb = activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
+    let kb = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
       ?? repositoryKeyboard(withID: keyboardID, languageID: languageID)
     if let filename =  kb?.font?.source.first(where: { $0.hasFontExtension }) {
       return keymanFonts[filename]?.name
@@ -434,7 +433,7 @@ UIGestureRecognizerDelegate {
   ///   - The keyboard doesn't have an OSK font
   ///   - The keyboard info is not available in the user keyboards list or in keyboardsDictionary
   func oskFontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
-    let kb = activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
+    let kb = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
       ?? repositoryKeyboard(withID: keyboardID, languageID: languageID)
     if let filename =  kb?.oskFont?.source.first(where: { $0.hasFontExtension }) {
       return keymanFonts[filename]?.name
@@ -443,7 +442,7 @@ UIGestureRecognizerDelegate {
   }
 
   func isRTLKeyboard(withID keyboardID: String, languageID: String) -> Bool? {
-    let kb = activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
+    let kb = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
       ?? repositoryKeyboard(withID: keyboardID, languageID: languageID)
     return kb?.isRTL
   }
@@ -695,7 +694,7 @@ UIGestureRecognizerDelegate {
     if keyboardsDictionary.isEmpty {
       return
     }
-    let userData = activeUserDefaults()
+    let userData = Storage.active.userDefaults
 
     let lastVersion = userData.string(forKey: Key.engineVersion) ?? "1.0"
     if compareVersions(lastVersion, sdkVersion) == .orderedSame {
@@ -758,14 +757,10 @@ UIGestureRecognizerDelegate {
 
   func downloadQueueFinished(_ queue: HTTPDownloader) {
     if isDebugPrintingOn {
-      if let fontDir = activeFontDirectory()?.path {
-        let contents = try? FileManager.default.contentsOfDirectory(atPath: fontDir)
-        kmLog("Font Directory contents: \(String(describing: contents))", checkDebugPrinting: true)
-      }
-      if let langDir = activeLanguageDirectory()?.path {
-        let contents = try? FileManager.default.contentsOfDirectory(atPath: langDir)
-        kmLog("Language Directory contents: \(String(describing: contents))", checkDebugPrinting: true)
-      }
+      let fontContents = try? FileManager.default.contentsOfDirectory(atPath: Storage.active.fontDir.path)
+      kmLog("Font Directory contents: \(String(describing: fontContents))", checkDebugPrinting: true)
+      let langContents = try? FileManager.default.contentsOfDirectory(atPath: Storage.active.languageDir.path)
+      kmLog("Language Directory contents: \(String(describing: langContents))", checkDebugPrinting: true)
     }
   }
 
@@ -801,9 +796,9 @@ UIGestureRecognizerDelegate {
             shouldReloadKeyboard = true
             reloadKeyboard(in: inputView)
           }
-          let userData = activeUserDefaults()
-          userData.set([Date()], forKey: Key.synchronizeSWKeyboard)
-          userData.synchronize()
+          let userDefaults = Storage.active.userDefaults
+          userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
+          userDefaults.synchronize()
         }
       } else { // Possible request error (400 Bad Request, 404 Not Found, etc.)
         downloadQueue!.cancelAllOperations()
@@ -922,12 +917,8 @@ UIGestureRecognizerDelegate {
   ///   - The .js filename must remain the same as when obtained from Keyman.
   ///   - The .js file must be bundled in your application.
   public func preloadLanguageFile(atPath languagePath: String, shouldOverwrite: Bool) {
-    guard let languageDir = activeLanguageDirectory() else {
-      kmLog("Could not find/create the Keyman language directory", checkDebugPrinting: false)
-      return
-    }
     preloadFile(srcUrl: URL.init(fileURLWithPath: languagePath),
-                dstDir: languageDir,
+                dstDir: Storage.active.languageDir,
                 shouldOverwrite: shouldOverwrite)
   }
 
@@ -936,12 +927,8 @@ UIGestureRecognizerDelegate {
   ///   - The font file must be bundled in your application.
   /// - SeeAlso: `registerCustomFonts()`
   public func preloadFontFile(atPath fontPath: String, shouldOverwrite: Bool) {
-    guard let fontDir = activeFontDirectory() else {
-      kmLog("Could not find/create the Keyman font directory", checkDebugPrinting: false)
-      return
-    }
     preloadFile(srcUrl: URL.init(fileURLWithPath: fontPath),
-                dstDir: fontDir,
+                dstDir: Storage.active.fontDir,
                 shouldOverwrite: shouldOverwrite)
   }
 
@@ -950,7 +937,7 @@ UIGestureRecognizerDelegate {
   public func registerCustomFonts() {
     let directoryContents: [String]
     do {
-      directoryContents = try FileManager.default.contentsOfDirectory(atPath: activeFontDirectory().path)
+      directoryContents = try FileManager.default.contentsOfDirectory(atPath: Storage.active.fontDir.path)
     } catch {
       kmLog("Failed to list font dir contents: \(error)", checkDebugPrinting: false)
       return
@@ -973,7 +960,7 @@ UIGestureRecognizerDelegate {
   public func unregisterCustomFonts() {
     let directoryContents: [String]
     do {
-      directoryContents = try FileManager.default.contentsOfDirectory(atPath: activeFontDirectory().path)
+      directoryContents = try FileManager.default.contentsOfDirectory(atPath: Storage.active.fontDir.path)
     } catch {
       kmLog("Failed to list font dir contents: \(error)", checkDebugPrinting: false)
       return
@@ -990,9 +977,9 @@ UIGestureRecognizerDelegate {
   }
 
   private func registerFont(withFilename fontFilename: String) -> RegisteredFont? {
-    guard let fontURL = activeFontDirectory()?.appendingPathComponent(fontFilename),
-      FileManager.default.fileExists(atPath: fontURL.path) else {
-        return nil
+    let fontURL = Storage.active.fontDir.appendingPathComponent(fontFilename)
+    if !FileManager.default.fileExists(atPath: fontURL.path) {
+      return nil
     }
 
     guard let provider = CGDataProvider(url: fontURL as CFURL) else {
@@ -1022,9 +1009,9 @@ UIGestureRecognizerDelegate {
   }
 
   private func unregisterFont(withFilename fontFilename: String) -> Bool {
-    guard let fontURL = activeFontDirectory()?.appendingPathComponent(fontFilename),
-      FileManager.default.fileExists(atPath: fontURL.path) else {
-        return false
+    let fontURL = Storage.active.fontDir.appendingPathComponent(fontFilename)
+    if !FileManager.default.fileExists(atPath: fontURL.path) {
+      return false
     }
     var errorRef: Unmanaged<CFError>?
     let didUnregister = CTFontManagerUnregisterFontsForURL(fontURL as CFURL, .none, &errorRef)
@@ -1056,30 +1043,25 @@ UIGestureRecognizerDelegate {
 
   // Local file storage
   private func copyWebFilesToLibrary() {
-    guard let libraryDirectory = activeKeymanDirectory() else {
-      kmLog("Could not locate library directory! Could not copy Keyman files.", checkDebugPrinting: false)
-      return
-    }
-
     do {
       try copyFromBundle(resourceName: kmwFileName,
                          resourceExtension: kmwFileExtension,
-                         dstDir: libraryDirectory)
+                         dstDir: Storage.active.baseDir)
       try copyFromBundle(resourceName: iOSCodeFileName,
                          resourceExtension: nil,
-                         dstDir: libraryDirectory)
-      try copyFromBundle(resourceName: "\(Constants.defaultKeyboard.id)-1.6",
+                         dstDir: Storage.active.baseDir)
+      try copyFromBundle(resourceName: "\(Constants.defaultKeyboard.id)-\(Constants.defaultKeyboard.version)",
                          resourceExtension: "js",
-                         dstDir: activeLanguageDirectory())
+                         dstDir: Storage.active.languageDir)
       try copyFromBundle(resourceName: "DejaVuSans",
                          resourceExtension: "ttf",
-                         dstDir: activeFontDirectory())
+                         dstDir: Storage.active.fontDir)
       try copyFromBundle(resourceName: "kmwosk",
                          resourceExtension: "css",
-                         dstDir: libraryDirectory)
+                         dstDir: Storage.active.baseDir)
       try copyFromBundle(resourceName: "keymanweb-osk",
                          resourceExtension: "ttf",
-                         dstDir: libraryDirectory)
+                         dstDir: Storage.active.baseDir)
     } catch {
       kmLog("copyWebFilesToLibrary: \(error)", checkDebugPrinting: false)
     }
@@ -1117,117 +1099,35 @@ UIGestureRecognizerDelegate {
     return .orderedSame
   }
 
-  // TODO: Consider making these lazy vars
-  // FIXME: Check for errors when creating directory
-  private func createSubdirectory(baseDir: URL?, name: String) -> URL? {
-    guard let baseDir = baseDir else {
-      return nil
-    }
-    let newDir = baseDir.appendingPathComponent(name)
-    try? FileManager.default.createDirectory(at: newDir,
-                                             withIntermediateDirectories: true,
-                                             attributes: nil)
-    return newDir
-  }
-
-  private func defaultKeymanDirectory() -> URL? {
-    let paths = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
-    if paths.isEmpty {
-      return nil
-    }
-    return createSubdirectory(baseDir: URL(fileURLWithPath: paths[0]), name: "keyman")
-  }
-
-  private func defaultLanguageDirectory() -> URL? {
-    return createSubdirectory(baseDir: defaultKeymanDirectory(), name: "languages")
-  }
-
-  private func defaultFontDirectory() -> URL? {
-    return createSubdirectory(baseDir: defaultKeymanDirectory(), name: "fonts")
-  }
-
-  var sharedContainerURL: URL? {
-    guard let groupID = Manager.applicationGroupIdentifier else {
-      kmLog("applicationGroupIdentifier is unset", checkDebugPrinting: false)
-      return nil
-    }
-    return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupID)
-  }
-
-  func sharedKeymanDirectory() -> URL? {
-    return createSubdirectory(baseDir: sharedContainerURL, name: "keyman")
-  }
-
-  func sharedLanguageDirectory() -> URL? {
-    return createSubdirectory(baseDir: sharedKeymanDirectory(), name: "languages")
-  }
-
-  func sharedFontDirectory() -> URL? {
-    return createSubdirectory(baseDir: sharedKeymanDirectory(), name: "fonts")
-  }
-
-  func activeKeymanDirectory() -> URL! {
-    return canAccessSharedContainer() ? sharedKeymanDirectory() : defaultKeymanDirectory()
-  }
-
-  func activeLanguageDirectory() -> URL! {
-    return canAccessSharedContainer() ? sharedLanguageDirectory() : defaultLanguageDirectory()
-  }
-
-  func activeFontDirectory() -> URL! {
-    return canAccessSharedContainer() ? sharedFontDirectory() : defaultFontDirectory()
-  }
-
-  func activeUserDefaults() -> UserDefaults {
-    return canAccessSharedContainer() ? sharedUserDefaults! : UserDefaults.standard
-  }
-
-  var sharedUserDefaults: UserDefaults? {
-    guard let groupID = Manager.applicationGroupIdentifier else {
-      kmLog("applicationGroupIdentifier is unset", checkDebugPrinting: false)
-      return nil
-    }
-    return UserDefaults(suiteName: groupID)
-  }
-
-  func canAccessSharedContainer() -> Bool {
-    guard let sharedKeymanDir = sharedKeymanDirectory() else {
-      return false
-    }
-    if !isSystemKeyboard {
-      return true
-    }
-    let keymanFile = sharedKeymanDir.appendingPathComponent(kmwFullFileName)
-    return FileManager.default.fileExists(atPath: keymanFile.path)
-  }
-
   private func copyUserDefaultsToSharedContainer() {
-    guard let sharedUserData = sharedUserDefaults else {
+    guard let sharedUserDefaults = Storage.shared?.userDefaults,
+      let defaultUserDefaults = Storage.nonShared?.userDefaults
+    else {
       return
     }
-    let defaultUserData = UserDefaults.standard
     let keysToCopy = [Key.userKeyboardsList, Key.userCurrentKeyboard,
                       Key.engineVersion, Key.keyboardPickerDisplayed]
     for key in keysToCopy {
-      if sharedUserData.object(forKey: key) == nil {
-        sharedUserData.set(defaultUserData.object(forKey: key), forKey: key)
+      if sharedUserDefaults.object(forKey: key) == nil {
+        sharedUserDefaults.set(defaultUserDefaults.object(forKey: key), forKey: key)
       }
     }
-    sharedUserData.synchronize()
+    sharedUserDefaults.synchronize()
   }
 
   private func copyUserDefaultsFromSharedContainer() {
-    guard let sharedUserData = sharedUserDefaults else {
-      return
+    guard let sharedUserDefaults = Storage.shared?.userDefaults,
+      let defaultUserDefaults = Storage.nonShared?.userDefaults
+    else {
+        return
     }
-    let defaultUserData = UserDefaults.standard
     let keysToCopy = [Key.userKeyboardsList, Key.engineVersion]
     for key in keysToCopy {
-      if sharedUserData.object(forKey: key) != nil {
-        defaultUserData.set(sharedUserData.object(forKey: key), forKey: key)
+      if sharedUserDefaults.object(forKey: key) != nil {
+        defaultUserDefaults.set(sharedUserDefaults.object(forKey: key), forKey: key)
       }
     }
-    defaultUserData.synchronize()
+    defaultUserDefaults.synchronize()
   }
 
   private func addSkipBackupAttribute(to url: URL) -> Bool {
@@ -1286,10 +1186,15 @@ UIGestureRecognizerDelegate {
   }
 
   private func copyKeymanFilesToSharedContainer() -> Bool {
+    guard let nonShared = Storage.nonShared,
+      let shared = Storage.shared
+    else {
+      return false
+    }
     do {
-      try copyDirectoryContents(at: defaultKeymanDirectory(), to: sharedKeymanDirectory())
-      try copyDirectoryContents(at: defaultLanguageDirectory(), to: sharedLanguageDirectory())
-      try copyDirectoryContents(at: defaultFontDirectory(), to: sharedFontDirectory())
+      try copyDirectoryContents(at: nonShared.baseDir, to: shared.baseDir)
+      try copyDirectoryContents(at: nonShared.languageDir, to: shared.languageDir)
+      try copyDirectoryContents(at: nonShared.fontDir, to: shared.fontDir)
       return true
     } catch {
       kmLog("copyKeymanFilesToSharedContainer(): \(error)", checkDebugPrinting: false)
@@ -1298,10 +1203,15 @@ UIGestureRecognizerDelegate {
   }
 
   private func copyKeymanFilesFromSharedContainer() -> Bool {
+    guard let nonShared = Storage.nonShared,
+      let shared = Storage.shared
+      else {
+        return false
+    }
     do {
-      try copyDirectoryContents(at: sharedKeymanDirectory(), to: defaultKeymanDirectory())
-      try copyDirectoryContents(at: sharedLanguageDirectory(), to: defaultLanguageDirectory())
-      try copyDirectoryContents(at: sharedFontDirectory(), to: defaultFontDirectory())
+      try copyDirectoryContents(at: shared.baseDir, to: nonShared.baseDir)
+      try copyDirectoryContents(at: shared.languageDir, to: nonShared.languageDir)
+      try copyDirectoryContents(at: shared.fontDir, to: nonShared.fontDir)
     } catch {
       kmLog("copyKeymanFilesFromSharedContainer(): \(error)", checkDebugPrinting: false)
       return false
@@ -1319,9 +1229,9 @@ UIGestureRecognizerDelegate {
       try FileManager.default.createDirectory(at: tempKeymanDir, withIntermediateDirectories: true, attributes: nil)
       try FileManager.default.createDirectory(at: tempLangDir, withIntermediateDirectories: true, attributes: nil)
       try FileManager.default.createDirectory(at: tempFontDir, withIntermediateDirectories: true, attributes: nil)
-      try copyDirectoryContents(at: activeKeymanDirectory(), to: tempKeymanDir)
-      try copyDirectoryContents(at: activeLanguageDirectory(), to: tempLangDir)
-      try copyDirectoryContents(at: activeFontDirectory(), to: tempFontDir)
+      try copyDirectoryContents(at: Storage.active.baseDir, to: tempKeymanDir)
+      try copyDirectoryContents(at: Storage.active.languageDir, to: tempLangDir)
+      try copyDirectoryContents(at: Storage.active.fontDir, to: tempFontDir)
     } catch {
       kmLog("copyKeymanFilesToTemp(): \(error)", checkDebugPrinting: false)
       return false
@@ -1345,26 +1255,20 @@ UIGestureRecognizerDelegate {
     guard let version = keyboardVersion else {
       return nil
     }
-    return activeLanguageDirectory()?.appendingPathComponent("\(keyboardID)-\(version).js")
+    return Storage.active.languageDir.appendingPathComponent("\(keyboardID)-\(version).js")
   }
 
   func fontPath(forFilename filename: String) -> URL? {
-    return activeFontDirectory()?.appendingPathComponent(filename)
+    return Storage.active.fontDir.appendingPathComponent(filename)
   }
 
   func keyboardFileExists(withID keyboardID: String, version: String) -> Bool {
-    guard let langDir = activeLanguageDirectory() else {
-      return false
-    }
-    let path = langDir.appendingPathComponent("\(keyboardID)-\(version).js").path
+    let path = Storage.active.languageDir.appendingPathComponent("\(keyboardID)-\(version).js").path
     return FileManager.default.fileExists(atPath: path)
   }
 
   func latestKeyboardFileVersion(withID keyboardID: String) -> String? {
-    guard let langDirPath = activeLanguageDirectory()?.path else {
-      return nil
-    }
-    guard let dirContents = try? FileManager.default.contentsOfDirectory(atPath: langDirPath) else {
+    guard let dirContents = try? FileManager.default.contentsOfDirectory(atPath: Storage.active.languageDir.path) else {
       return nil
     }
 
@@ -1416,7 +1320,7 @@ UIGestureRecognizerDelegate {
   }
 
   func updateKeyboardVersion(forID kbID: String, newKeyboardVersion kbVersion: String) {
-    let userData = activeUserDefaults()
+    let userData = Storage.active.userDefaults
     guard var userKeyboards = userData.userKeyboards else {
       return
     }
@@ -1434,7 +1338,7 @@ UIGestureRecognizerDelegate {
 
     // Set version for current keyboard
     // TODO: Move this UserDefaults into a function
-    let currentUserData = isSystemKeyboard ? UserDefaults.standard : activeUserDefaults()
+    let currentUserData = isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
     if var userKb = currentUserData.currentKeyboard {
       if kbID == userKb.id {
         userKb.version = kbVersion
@@ -1598,7 +1502,7 @@ UIGestureRecognizerDelegate {
       if shouldAddKeyboard {
         vc.showAddKeyboard()
       } else {
-        let userData = self.activeUserDefaults()
+        let userData = Storage.active.userDefaults
         userData.set(true, forKey: Key.keyboardPickerDisplayed)
         userData.synchronize()
         self.isKeymanHelpOn = false
@@ -1616,9 +1520,7 @@ UIGestureRecognizerDelegate {
 
   private func reloadKeyboard(in view: WKWebView) {
     if #available(iOS 9.0, *) {
-      guard let codeURL = activeKeymanDirectory()?.appendingPathComponent(kmwFullFileName) else {
-        return
-      }
+      let codeURL = Storage.active.baseDir.appendingPathComponent(kmwFullFileName)
       view.loadFileURL(codeURL, allowingReadAccessTo: codeURL.deletingLastPathComponent())
     } else {
       // WKWebView in iOS < 9 is missing loadFileURL().
@@ -1639,7 +1541,7 @@ UIGestureRecognizerDelegate {
 
     if let keyboard = keyboard {
       setKeyboard(keyboard)
-    } else if let keyboard = activeUserDefaults().userKeyboards?[safe: 0] {
+    } else if let keyboard = Storage.active.userDefaults.userKeyboards?[safe: 0] {
       setKeyboard(keyboard)
     } else {
       setKeyboard(Constants.defaultKeyboard)
@@ -1844,14 +1746,14 @@ UIGestureRecognizerDelegate {
 
     var newKb = Constants.defaultKeyboard
     if (keyboardID == nil || languageID == nil) && !shouldReloadKeyboard {
-      let userData = isSystemKeyboard ? UserDefaults.standard : activeUserDefaults()
+      let userData = isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
       if let currentKb = userData.currentKeyboard {
         let kbID = currentKb.id
         let langID = currentKb.languageID
-        if activeUserDefaults().userKeyboard(withID: kbID, languageID: langID) != nil {
+        if Storage.active.userDefaults.userKeyboard(withID: kbID, languageID: langID) != nil {
           newKb = currentKb
         }
-      } else if let userKbs = activeUserDefaults().userKeyboards, !userKbs.isEmpty {
+      } else if let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
         newKb = userKbs[0]
       }
       setKeyboard(newKb)
@@ -2132,7 +2034,7 @@ UIGestureRecognizerDelegate {
     dismissKeyboardMenu()
     resizeKeyboard()
 
-    let activeUserDef = activeUserDefaults()
+    let activeUserDef = Storage.active.userDefaults
     let standardUserDef = UserDefaults.standard
     let activeDate = (activeUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[safe: 0]
     let standardDate = (standardUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[safe: 0]
@@ -2147,7 +2049,7 @@ UIGestureRecognizerDelegate {
       shouldSynchronize = true
     }
 
-    if (!didSynchronize || shouldSynchronize) && canAccessSharedContainer() {
+    if (!didSynchronize || shouldSynchronize) && Storage.shared != nil {
       synchronizeSWKeyboard()
       if keyboardID != nil && languageID != nil {
         shouldReloadKeyboard = true
