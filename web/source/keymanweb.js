@@ -3020,10 +3020,8 @@ if(!window['keyman']['initialized']) {
      * @param       {Object}    Pelem    element
      * Description  Work around a problem with scrolling text boxes and input boxes in Firefox, not needed for other browsers
      */
-    keymanweb._FindCaret = function(Pelem)     // I779
-    {
-      if(!Pelem.createTextRange && Pelem.selectionStart)
-      {
+    keymanweb._FindCaret = function(Pelem) {    // I779
+      if(!Pelem.createTextRange && Pelem.selectionStart) {
         var Levent = new KeyboardEvent('keypress', {
           "code":"Space",
           "bubbles":true,
@@ -4852,7 +4850,7 @@ if(!window['keyman']['initialized']) {
         e = window.event;
       }
 
-      _Lcode = keymanweb._GetEventKeyCode(e);
+      var _Lcode = keymanweb._GetEventKeyCode(e);
       if(_Lcode == null) {
         return null;
       }
