@@ -110,19 +110,6 @@ UIGestureRecognizerDelegate {
   /// Dictionary of available Keyman keyboard fonts keyed by font filename
   public private(set) var keymanFonts: [String: RegisteredFont] = [:]
 
-
-  /// The version of the Keyman SDK
-  public var sdkVersion: String {
-    let info = NSDictionary(contentsOfFile: keymanBundle.path(forResource: "KeymanEngine-Info",
-                                                              ofType: "plist")!)
-    return info!["CFBundleVersion"] as! String
-  }
-
-  /// Keyman Web resources
-  public var keymanBundle: Bundle {
-    return Bundle(path: Bundle(for: Manager.self).path(forResource: "Keyman", ofType: "bundle")!)!
-  }
-
   /// In keyboard extensions (system keyboard), `UIApplication.openURL(_:)` is unavailable. The API is not called in
   /// the system keyboard since `KeyboardInfoViewController` is never used. `openURL(:_)` is only used in applications,
   /// where it is safe. However, the entire Keyman Engine framework must be compiled with extension-safe APIs.
@@ -695,10 +682,10 @@ UIGestureRecognizerDelegate {
     let userData = activeUserDefaults()
 
     let lastVersion = userData.string(forKey: Key.engineVersion) ?? "1.0"
-    if compareVersions(lastVersion, sdkVersion) == .orderedSame {
+    if compareVersions(lastVersion, Constants.sdkVersion) == .orderedSame {
       return
     }
-    userData.set(sdkVersion, forKey: Key.engineVersion)
+    userData.set(Constants.sdkVersion, forKey: Key.engineVersion)
 
     guard var userKbList = userData.userKeyboards else {
       kmLog("No user keyboards to update", checkDebugPrinting: true)
@@ -1105,7 +1092,7 @@ UIGestureRecognizerDelegate {
 
   private func copyFromBundle(resourceName: String, resourceExtension: String?, dstDir: URL?) throws {
     let filenameForLog = "\(resourceName)\(resourceExtension.map { ".\($0)" } ?? "")"
-    guard let srcUrl = keymanBundle.url(forResource: resourceName, withExtension: resourceExtension) else {
+    guard let srcUrl = Constants.keymanBundle.url(forResource: resourceName, withExtension: resourceExtension) else {
       let message = "Could not locate \(filenameForLog) in the Keyman bundle for copying."
       throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
     }

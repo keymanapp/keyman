@@ -59,4 +59,16 @@ public enum Constants {
     let extensionID = extensionInfo?["NSExtensionPointIdentifier"] as? String
     return extensionID == "com.apple.keyboard-service"
   }()
+
+  /// The version of the Keyman SDK
+  public static let sdkVersion: String = {
+    let info = NSDictionary(contentsOfFile: keymanBundle.path(forResource: "KeymanEngine-Info",
+                                                              ofType: "plist")!)
+    return info!["CFBundleVersion"] as! String
+  }()
+
+  /// Keyman Web resources
+  public static let keymanBundle: Bundle = {
+    return Bundle(path: Bundle(for: Manager.self).path(forResource: "Keyman", ofType: "bundle")!)!
+  }()
 }
