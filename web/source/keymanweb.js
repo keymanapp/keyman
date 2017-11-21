@@ -2821,13 +2821,10 @@ if(!window['keyman']['initialized']) {
      * Function     _GetEventKeyCode
      * Scope        Private
      * @param       {Event}       e         Event object
-     * Description  Finds the key code represented by the event, prioritizing modern methods over deprecated ones.
-     *              Necessary because the 'modern' methods aren't yet fully implemented across all browsers at this time.
+     * Description  Finds the key code represented by the event.
      */
     keymanweb._GetEventKeyCode = function(e) {
-      if(e.code && keymanweb._codeToLcodeMap[e.code]) {  // Unfortunately, the former DOES NOT map to a nice integer code!
-        return keymanweb._codeToLcodeMap[e.code];
-      } else if (e.keyCode) {
+      if (e.keyCode) {
         return e.keyCode;
       } else if (e.which) {
         return e.which;
