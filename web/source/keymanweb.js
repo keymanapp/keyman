@@ -3009,41 +3009,6 @@ if(!window['keyman']['initialized']) {
       return true;
     }
     
-  // TODO: find out if _FindCaret is still needed for current FireFox, delete if not
-
-    /**
-     * Function     _FindCaret
-     * Scope        Private
-     * @param       {Object}    Pelem    element
-     * Description  Work around a problem with scrolling text boxes and input boxes in Firefox, not needed for other browsers
-     */
-    keymanweb._FindCaret = function(Pelem) {    // I779
-      if(!Pelem.createTextRange && Pelem.selectionStart) {
-        var Levent = new KeyboardEvent('keypress', {
-          "code":"Space",
-          "bubbles":true,
-          "cancelable":true,
-        });
-        // Levent.charCode = 32;
-        
-        if(Levent) {
-          Levent._kmw_block = true; // Tell keymanweb._KeyPress to ignore this simulated event.
-          
-          // Nasty problems arise from the simulated keystroke if we don't temporarily block the handler.
-          Pelem.dispatchEvent(Levent);
-
-          Levent = new KeyboardEvent('keypress', {
-            "key":"Backspace",
-            "bubbles":true,
-            "cancelable":true
-          });
-          // Levent.keyCode = 8;
-          Levent._kmw_block = true; // Tell keymanweb._KeyPress to ignore this simulated event.
-          Pelem.dispatchEvent(Levent);
-        }
-      }
-    }
-    
     /**
      * Function     _NotifyKeyboard
      * Scope        Private
@@ -3189,7 +3154,6 @@ if(!window['keyman']['initialized']) {
       }
     
       if(LeventMatched) {
-        keymanweb._FindCaret(Levent.Ltarg); //I779
         if(e  &&  e.preventDefault) {
           e.preventDefault();
           e.stopPropagation();
@@ -3263,7 +3227,6 @@ if(!window['keyman']['initialized']) {
           e.preventDefault();
           e.stopPropagation();
         }
-        keymanweb._FindCaret(Levent.Ltarg);  // I779
         return false;
       }
       keymanweb._KeyPressToSwallow=0;
