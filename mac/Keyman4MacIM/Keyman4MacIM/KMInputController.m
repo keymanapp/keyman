@@ -375,6 +375,19 @@ NSRange _previousSelRange;
                         NSUInteger nbrOfPreCharacters;
                         NSString *preChar = nil;
                         
+                        // This regex will look back through the context until it finds a *known* base
+                        // character because some (non-legacy) apps (e.g., Mail) do not properly handle sending
+                        // comining marks on there own via insertText. One potentially negative implication
+                        // of this is that if the script should happen to contain characters whose class is
+                        // not known, it will skip over them and keep looking, so it could end up using a
+                        // longer string of characters than otherwise necessary. This could result in a
+                        // mildly jarring visual experience for the user if the app refreshes the diplay
+                        // between the time the characters are removed and re-inserted. But presumbly this
+                        // algorithm will eventually find either a known base character or get all the way back
+                        // to the start of the context, so if it doesn't find a known base character, it will
+                        // fall back to just attempting the insert with whatever it does find. I believe this
+                        // will always work and should at least work as reliably as the old version of the code,
+                        // which always used just a single character regardless of its class.
                         NSError *error = NULL;
                         NSRegularExpression *regexNonCombiningMark = [NSRegularExpression regularExpressionWithPattern:@"\\P{M}" options:NSRegularExpressionCaseInsensitive error:&error];
 
