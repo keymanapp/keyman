@@ -38,7 +38,7 @@
 }
 
 - (IBAction)configAction:(id)sender {
-    [self.AppDelegate.inputController showPreferences:sender];
+    [self.AppDelegate showConfigurationWindow];
     [self close];
 }
 

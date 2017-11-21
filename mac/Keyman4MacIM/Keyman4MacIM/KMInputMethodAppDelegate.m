@@ -695,6 +695,12 @@ typedef enum {
     return _oskWindow;
 }
 
+- (void)showConfigurationWindow {
+    [self.configWindow.window centerInParent];
+    [self.configWindow.window makeKeyAndOrderFront:nil];
+    [self.configWindow.window setLevel:NSFloatingWindowLevel];
+}
+
 - (void)showOSK {
     [[self.oskWindow window] makeKeyAndOrderFront:nil];
     [[self.oskWindow window] setLevel:NSStatusWindowLevel];
@@ -709,6 +715,14 @@ typedef enum {
 
 - (NSWindowController *)aboutWindow_ {
     return _aboutWindow;
+}
+
+- (NSWindowController *)configWindow {
+    if (_configWindow.window == nil) {
+        _configWindow = [[KMConfigurationWindowController alloc] initWithWindowNibName:@"preferences"];
+    }
+
+    return _configWindow;
 }
 
 - (NSWindowController *)aboutWindow {
