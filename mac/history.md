@@ -1,6 +1,6 @@
 # Keyman for macOS Version History
 
-## 2017-11-21 1.2.15 beta
+## 2017-11-21 1.2.0 beta
 * Works around bug in macOS High Sierra so that Configuration dialog can be opened (#368)
 * Fix support for older versions of macOS below 10.9 (#393)
 
