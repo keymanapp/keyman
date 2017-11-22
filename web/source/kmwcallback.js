@@ -10,15 +10,6 @@ if(!window['keyman']['initialized']) {
     // Declare KeymanWeb and util objects
     var keymanweb=window['keyman'], kbdInterface=window['KeymanWeb']=keymanweb['interface'], KeymanWeb=kbdInterface,
       util=keymanweb['util'], osk=keymanweb['osk'],device=util.device,dbg=keymanweb.debug; //osk defined here, build 350
-    
-    // Consider moving the member definitions into a definition block within kmwbase.js, where the object is first declared?
-    kbdInterface.TSS_LAYER = 33;
-    kbdInterface.TSS_PLATFORM = 31;
-    
-    kbdInterface._AnyIndices = [],          // AnyIndex - array of any/index match indices
-    kbdInterface._BeepObjects=[];
-    kbdInterface._BeepTimeout=0;
-    kbdInterface._DeadKeys = [];            // DeadKeys - array of matched deadkeys
 
     /**
      * Function     KSF

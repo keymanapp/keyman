@@ -76,7 +76,17 @@ if(!window['keyman']['loaded']) {
     var util = keymanweb['util'] = {};
     var osk = keymanweb['osk'] = {ready:false};
     var ui = keymanweb['ui'] = {};
-    var kbdInterface = keymanweb['interface'] = {};
+    
+    var kbdInterface = keymanweb['interface'] = {
+      TSS_LAYER: 33,
+      TSS_PLATFORM: 31,
+
+      _AnyIndices: [],        // AnyIndex - array of any/index match indices
+      _BeepObjects: [],       // BeepObjects - maintains a list of active 'beep' visual feedback elements
+      _BeepTimeout: 0,        // BeepTimeout - a flag indicating if there is an active 'beep'. 
+                              // Set to 1 if there is an active 'beep', otherwise leave as '0'.
+      _DeadKeys: []           // DeadKeys - array of matched deadkeys
+    };
 
     // Stub functions (defined later in code only if required)
     keymanweb.setDefaultDeviceOptions = function(opt){}     
