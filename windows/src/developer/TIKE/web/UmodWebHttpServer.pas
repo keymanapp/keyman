@@ -312,7 +312,7 @@ var
     response :=
       'var debugKeyboards = [];'#13#10+
       '(function() {'#13#10+
-      '  var kmw=tavultesoft.keymanweb;'#13#10;
+      '  var kmw=KeymanWeb;'#13#10;
 
     FKeyboardsCS.Enter;   // I4036
     try
