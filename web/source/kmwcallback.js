@@ -505,8 +505,6 @@ if(!window['keyman']['initialized']) {
           var _CacheableCommands = kbdInterface._CacheCommands(Ldoc);
         }
 
-        var LselectionStart = 0; // Somehow, this was functioning as undefined before the addition of this line!
-    
         var Lrange = Ldv.createRange(), Ls1;
         if(Lrange.text != '') {
           Ldv.clear();
@@ -535,6 +533,10 @@ if(!window['keyman']['initialized']) {
         }
         // Adjust deadkey positions 
         if(dn >= 0) {
+          // Pelem.selectionStart seems to exist here in IE 9 and is valid... but is this the right approach?
+          // I'm probably missing something or other.
+          var LselectionStart = Pelem.selectionStart;
+
           kbdInterface._DeadkeyDeleteMatched();                                  // I3318
           kbdInterface._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318
         }
