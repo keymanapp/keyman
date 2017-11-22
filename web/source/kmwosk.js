@@ -774,17 +774,91 @@ if(!window['keyman']['initialized']) {
      * @param   {string}  keyName Name of the key
      * @param   {number}  n
      * @param   {number}  keyShiftState
+     * @param   {boolean} usingOSK
+     * @param   {Object=} Lelem
      * @return  {string}
      */
-    osk.defaultKeyOutput = function(keyName,n,keyShiftState) {
+    osk.defaultKeyOutput = function(keyName,n,keyShiftState,usingOSK,Lelem) {
       var ch = '', checkCodes = false;
-
+      var touchAlias = (Lelem && typeof(Lelem.base) != 'undefined');
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
       if(keyShiftState == 0) {
         checkCodes = true;
       } else if (keyShiftState == osk.modifierCodes['SHIFT']) {
         checkCodes = true; 
         keyShiftState = 1; // It's used as an index.
+      }
+
+      // If this was triggered by the OSK -or- if it was triggered within a touch-aliased DIV element.
+      if(touchAlias || usingOSK) {
+        var code = osk.keyCodes[keyName];
+        if(!code) {
+          code = n;
+        }
+
+        switch(code) {
+          case osk.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
+            kbdInterface.output(1,keymanweb._LastActiveElement,"");
+            break;
+          case osk.keyCodes['K_TAB']:
+            keymanweb.moveToNext(keyShiftState);
+            break;
+          case osk.keyCodes['K_TABBACK']:
+            keymanweb.moveToNext(true);
+            break;
+          case osk.keyCodes['K_TABFWD']:
+            keymanweb.moveToNext(false);
+            break;
+          case osk.keyCodes['K_ENTER']:
+            // Insert new line in text area fields
+            if(Lelem.nodeName == 'TEXTAREA' || (typeof Lelem.base != 'undefined' && Lelem.base.nodeName == 'TEXTAREA')) {
+              return '\n';
+            // Or move to next field from TEXT fields
+            } else if(usingOSK) {
+              if(Lelem.nodeName == 'INPUT' && (Lelem.type == 'search' || Lelem.type == 'submit')) {
+                Lelem.form.submit();
+              } else if(typeof(Lelem.base) != 'undefined' && (Lelem.base.type == 'search' || Lelem.base.type == 'submit')) {
+                Lelem.base.disabled=false;
+                Lelem.base.form.submit();
+              } else {
+                keymanweb.moveToNext(false);
+              }
+            }
+            break;
+          case osk.keyCodes['K_SPACE']:
+            return ' ';
+          // break;
+          //
+          // // Problem:  clusters, and doing them right.
+          // // The commented-out code below should be a decent starting point, but clusters make it complex.
+          //
+          // case osk.keyCodes['K_LEFT']:
+          //   if(touchAlias) {
+          //     var caretPos = keymanweb.getTextCaret(Lelem);
+          //     keymanweb.setTextCaret(Lelem, caretPos - 1 >= 0 ? caretPos - 1 : 0);
+          //   }
+          //   break;
+          // case osk.keyCodes['K_RIGHT']:
+          //   if(touchAlias) {
+          //     var caretPos = keymanweb.getTextCaret(Lelem);
+          //     keymanweb.setTextCaret(Lelem, caretPos + 1);
+          //   }
+          //   if(code == osk.keyCodes['K_RIGHT']) {
+          //     break;
+          //   }
+          // // Should we include this?  It could be tricky to do correctly...
+          // case osk.keyCodes['K_DEL']:
+          //   // Move caret right one unit, then backspace.
+          //   if(touchAlias) {
+          //     var caretPos = keymanweb.getTextCaret(Lelem);
+          //     keymanweb.setTextCaret(Lelem, caretPos + 1);
+          //     if(caretPos == keymanweb.getTextCaret(Lelem)) {
+          //       // Failed to move right - there's nothing to delete.
+          //       break;
+          //     }
+          //     kbdInterface.output(1, keymanweb._LastActiveElement,"");
+          //   }
+        }
       }
 
       // TODO:  Refactor the overloading of the 'n' parameter here into separate methods.
@@ -955,7 +1029,7 @@ if(!window['keyman']['initialized']) {
         }
 
         // Pass this key code and state to the keyboard program
-        if(!keymanweb._ActiveKeyboard || (Lkc.Lcode != 0 && !keymanweb._ActiveKeyboard['gs'](Lelem, Lkc)))
+        if(!keymanweb._ActiveKeyboard || (Lkc.Lcode != 0 && !keymanweb.processKeystroke(util.device, Lelem, Lkc)))
         {
           // Restore the virtual key code if a mnemonic keyboard is being used
           Lkc.Lcode=Lkc.vkCode;
@@ -963,40 +1037,6 @@ if(!window['keyman']['initialized']) {
           // Handle unmapped keys, including special keys
           switch(keyName)
           {
-            case 'K_BKSP':  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-              kbdInterface.output(1,keymanweb._LastActiveElement,"");
-              break;
-            case 'K_TAB':
-              var bBack=(osk.layerId == 'shift');
-              keymanweb.moveToNext(bBack);
-              break;
-            case 'K_TABBACK':
-              keymanweb.moveToNext(true);
-              break;
-            case 'K_TABFWD':
-              keymanweb.moveToNext(false);
-              break;
-            case 'K_ENTER':
-              // Insert new line in text area fields
-              if(Lelem.nodeName == 'TEXTAREA' || (typeof Lelem.base != 'undefined' && Lelem.base.nodeName == 'TEXTAREA'))
-                kbdInterface.output(0, Lelem, '\n');
-              // Or move to next field from TEXT fields
-              else
-              {
-                if(Lelem.nodeName == 'INPUT' && (Lelem.type == 'search' || Lelem.type == 'submit'))
-                  Lelem.form.submit();
-                else if(typeof(Lelem.base) != 'undefined' && (Lelem.base.type == 'search' || Lelem.base.type == 'submit'))
-                {
-                  Lelem.base.disabled=false;
-                  Lelem.base.form.submit();
-                }
-                else
-                  keymanweb.moveToNext(false);
-              }
-              break;
-            case 'K_SPACE':
-              kbdInterface.output(0, Lelem, ' ');
-              break;
             case 'K_CAPS':
             case 'K_NUMLOCK':
             case 'K_SCROLL':
@@ -1005,7 +1045,7 @@ if(!window['keyman']['initialized']) {
               break;
             default:
               // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
-              var ch = osk.defaultKeyOutput(keyName,Lkc.Lcode,keyShiftState);
+              var ch = osk.defaultKeyOutput(keyName,Lkc.Lcode,keyShiftState,true,Lelem);
               if(ch) {
                 kbdInterface.output(0, Lelem, ch);
               }

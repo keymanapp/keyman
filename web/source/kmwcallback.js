@@ -706,7 +706,7 @@ if(!window['keyman']['initialized']) {
           switch(constraint) {
             case 'touch':
             case 'hardware':
-              if(device.touchable != (constraint == 'touch')) {
+              if(util.activeDevice.touchable != (constraint == 'touch')) {
                 result=false;
               }
           }
@@ -717,7 +717,7 @@ if(!window['keyman']['initialized']) {
             case 'ios':
             case 'macosx':
             case 'linux':
-              if(device.OS.toLowerCase() != constraint) {
+              if(util.activeDevice.OS.toLowerCase() != constraint) {
                 result=false;
               }
           }
@@ -726,14 +726,14 @@ if(!window['keyman']['initialized']) {
             case 'tablet':
             case 'phone':
             case 'desktop':
-              if(device.formFactor != constraint) {
+              if(util.activeDevice.formFactor != constraint) {
                 result=false;
               }
           }
 
           switch(constraint) {
             case 'web':
-              if(device.browser == 'native') {
+              if(util.activeDevice.browser == 'native') {
                 result=false; // web matches anything other than 'native'
               }
               break;
@@ -743,7 +743,7 @@ if(!window['keyman']['initialized']) {
             case 'firefox':
             case 'safari':
             case 'opera':
-              if(device.browser != constraint) {
+              if(util.activeDevice.browser != constraint) {
                 result=false;
               }
           }
