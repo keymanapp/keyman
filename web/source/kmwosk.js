@@ -485,10 +485,11 @@ if(!window['keyman']['initialized']) {
      * Display touch-hold array of 'sub-keys' above the currently touched key
      * @param       {Object}    e      primary key element
      */
-    osk.showSubKeys = function(e)
-    {
+    osk.showSubKeys = function(e) {
       // Do not show subkeys if key already released
-      if(osk.keyPending == null) return;
+      if(osk.keyPending == null) {
+        return;
+      }
 
       // Create holder DIV for subkey array, and set styles.
       // A subkey array for Shift will only appear if extra layers exist
@@ -505,17 +506,25 @@ if(!window['keyman']['initialized']) {
       osk.popupBaseKey = e;
 
       // Does the popup array include the base key?   *** condition for phone only ***
-      if(device.formFactor == 'phone') osk.prependBaseKey(e);
+      if(device.formFactor == 'phone') {
+        osk.prependBaseKey(e);
+      }
       var idx = e.id.split('-'), baseId = idx[idx.length-1];
 
       // If not, insert at start
-      if(device.formFactor == 'phone' && e.subKeys[0].id != baseId)
-      {
+      if(device.formFactor == 'phone' && e.subKeys[0].id != baseId) {
         var eCopy={'id':baseId,'layer':''};
-        if(idx.length > 1) eCopy['layer'] = idx[0];
-        for(i=0; i<e.childNodes.length; i++)
-          if(osk.hasClass(e.childNodes[i],'kmw-key-text')) break;
-        if(i < e.childNodes.length) eCopy['text'] = e.childNodes[i].textContent;
+        if(idx.length > 1) {
+          eCopy['layer'] = idx[0];
+        }
+        for(i=0; i<e.childNodes.length; i++) {
+          if(osk.hasClass(e.childNodes[i],'kmw-key-text')) {
+            break;
+          }
+        }
+        if(i < e.childNodes.length) {
+          eCopy['text'] = e.childNodes[i].textContent;
+        }
         e.subKeys.splice(0,0,eCopy);
       }
 
@@ -534,37 +543,45 @@ if(!window['keyman']['initialized']) {
       var nKeys=e.subKeys.length,nRow,nRows,nCols;
       nRows=Math.min(Math.ceil(nKeys/9),2);
       nCols=Math.ceil(nKeys/nRows);
-      if(nRows > 1) ss.width=(nCols*e.offsetWidth+nCols*5)+'px';
+      if(nRows > 1) {
+        ss.width=(nCols*e.offsetWidth+nCols*5)+'px';
+      }
 
       // Add nested button elements for each sub-key
-      for(i=0; i<nKeys; i++)
-      {
+      for(i=0; i<nKeys; i++) {
         sk=e.subKeys[i];
         kDiv=document.createElement('DIV');
 
         for(var tp in tKey) {
-          if(typeof sk[tp] != 'string') sk[tp]=tKey[tp];
+          if(typeof sk[tp] != 'string') {
+            sk[tp]=tKey[tp];
+          }
         }
 
         kDiv.className='kmw-key-square-ex';
         kDiv.keyId=sk['id'];
         ks=kDiv.style;
         nRow=Math.floor(i/nCols);
-        if(nRows > 1 && nRow > 0) ks.marginTop='5px';
-        if(typeof sk['width'] != 'undefined')
+        if(nRows > 1 && nRow > 0) {
+          ks.marginTop='5px';
+        }
+
+        if(typeof sk['width'] != 'undefined') {
           kDiv.width=ks.width=(parseInt(sk['width'],10)*e.offsetWidth/100)+'px';
-        else
+        } else {
           kDiv.width=ks.width=e.offsetWidth+'px';
+        }
         ks.height=e.offsetHeight+'px';
 
         btn=document.createElement('DIV');
         osk.setButtonClass(sk,btn);
 
         // Create (temporarily) unique ID by prefixing 'popup-' to actual key ID
-        if(typeof(sk['layer']) == 'string' && sk['layer'] != '')
+        if(typeof(sk['layer']) == 'string' && sk['layer'] != '') {
           btn.id='popup-'+sk['layer']+'-'+sk['id'];
-        else
-          btn.id='popup-default-'+sk['id'];
+        } else {
+          btn.id='popup-' + osk.layerId + '-'+sk['id'];
+        }
 
         btn.key = sk;
 
@@ -575,22 +592,26 @@ if(!window['keyman']['initialized']) {
         bs.position='absolute';
         t=util._CreateElement('SPAN');
         t.className='kmw-key-text';
-        if(sk['text'] == null || sk['text'] == '')
-        {
+        if(sk['text'] == null || sk['text'] == '') {
           t.innerHTML='\xa0';
-          if(typeof sk['id'] == 'string')
-          {
-            if(/^U_[0-9A-F]{4}$/i.test(sk['id']))
+          if(typeof sk['id'] == 'string') {
+            if(/^U_[0-9A-F]{4}$/i.test(sk['id'])) {
               t.innerHTML=String.fromCharCode(parseInt(sk['id'].substr(2),16));
+            }
           }
+        } else {
+          t.innerHTML=sk['text'];
         }
-        else t.innerHTML=sk['text'];
 
         // Override the font name and size if set in the layout
         ts=t.style;
         ts.fontSize=osk.fontSize;     //Build 344, KMEW-90
-        if(typeof sk['font'] == 'string' && sk['font'] != '') ts.fontFamily=sk['font'];
-        if(typeof sk['fontsize'] == 'string' && sk['fontsize'] != 0) ts.fontSize=sk['fontsize'];
+        if(typeof sk['font'] == 'string' && sk['font'] != '') {
+          ts.fontFamily=sk['font'];
+        }
+        if(typeof sk['fontsize'] == 'string' && sk['fontsize'] != 0) {
+          ts.fontSize=sk['fontsize'];
+        }
 
         btn.appendChild(t);
         kDiv.appendChild(btn);
@@ -608,7 +629,13 @@ if(!window['keyman']['initialized']) {
       var x=util._GetAbsoluteX(e)+0.5*(e.offsetWidth-subKeys.offsetWidth), y,
         xMax=(util.landscapeView()?screen.height:screen.width)-subKeys.offsetWidth;
 
-      if(x > xMax) x=xMax; if(x < 0) x=0; ss.left=x+'px';
+      if(x > xMax) {
+        x=xMax;
+      }
+      if(x < 0) {
+        x=0;
+      }
+      ss.left=x+'px';
 
       // Add the callout
       osk.popupCallout = osk.addCallout(e);
@@ -622,8 +649,7 @@ if(!window['keyman']['initialized']) {
       osk._Box.appendChild(subKeys.shim);
 
       // Highlight the duplicated base key (if a phone)
-      if(device.formFactor == 'phone')
-      {
+      if(device.formFactor == 'phone') {
         var bk = subKeys.childNodes[0].firstChild;
         osk.keyPending = bk;
         osk.highlightKey(bk,true);//bk.className = bk.className+' kmw-key-touched';
