@@ -504,6 +504,8 @@ if(!window['keyman']['initialized']) {
         if(Ldoc.body.isContentEditable || Ldoc.designMode.toLowerCase()=='on') { // I1295 - isContentEditable
           var _CacheableCommands = kbdInterface._CacheCommands(Ldoc);
         }
+
+        var LselectionStart = 0; // Somehow, this was functioning as undefined before the addition of this line!
     
         var Lrange = Ldv.createRange(), Ls1;
         if(Lrange.text != '') {
@@ -863,10 +865,11 @@ if(!window['keyman']['initialized']) {
      * Scope        Private
      * Description  Clear all matched deadkey flags
      */       
-    kbdInterface._DeadkeyResetMatched = function()
-    {                   
+    kbdInterface._DeadkeyResetMatched = function() {                   
       var Li, _Dk = kbdInterface._DeadKeys;
-      for(Li = 0; Li < _Dk.length; Li++) _Dk[Li].matched = 0;
+      for(Li = 0; Li < _Dk.length; Li++) {
+        _Dk[Li].matched = 0;
+      }
     }
 
     /**
@@ -874,10 +877,13 @@ if(!window['keyman']['initialized']) {
      * Scope        Private
      * Description  Delete matched deadkeys from context
      */       
-    kbdInterface._DeadkeyDeleteMatched = function()
-    {              
+    kbdInterface._DeadkeyDeleteMatched = function() {              
       var Li, _Dk = kbdInterface._DeadKeys;
-      for(Li = 0; Li < _Dk.length; Li++) if(_Dk[Li].matched) _Dk.splice(Li,1);
+      for(Li = 0; Li < _Dk.length; Li++) {
+        if(_Dk[Li].matched) {
+          _Dk.splice(Li,1);
+        }
+      }
     }
 
     /**
@@ -887,10 +893,13 @@ if(!window['keyman']['initialized']) {
      * @param       {number}      Ldelta      characters to adjust by   
      * Description  Adjust saved positions of deadkeys in context
      */       
-    kbdInterface._DeadkeyAdjustPos = function(Lstart, Ldelta)
-    {
+    kbdInterface._DeadkeyAdjustPos = function(Lstart, Ldelta) {
       var Li, _Dk = kbdInterface._DeadKeys;
-      for(Li = 0; Li < _Dk.length; Li++) if(_Dk[Li].p > Lstart) _Dk[Li].p += Ldelta;
+      for(Li = 0; Li < _Dk.length; Li++) {
+        if(_Dk[Li].p > Lstart) {
+          _Dk[Li].p += Ldelta;
+        }
+      }
     }
     // I3318 - deadkey changes END
 
