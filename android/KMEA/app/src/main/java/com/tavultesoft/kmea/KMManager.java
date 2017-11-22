@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -56,6 +55,7 @@ import android.widget.RelativeLayout;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.util.Connection;
 
 public final class KMManager {
 
@@ -1226,7 +1226,6 @@ public final class KMManager {
 
     public static int download(Context context, String urlStr, String directory, String filename) {
       int ret = -1;
-      HttpURLConnection urlConnection = null;
       String fileName = "";
       String tmpFileName = "";
       File tmpFile = null;
@@ -1246,54 +1245,35 @@ public final class KMManager {
           dirPath = context.getDir("data", Context.MODE_PRIVATE).toString();
         }
 
-        URL url = new URL(urlStr);
-        filename = filename.trim();
-        if (filename == null || filename.isEmpty()) {
-          fileName = url.getFile().substring(url.getFile().lastIndexOf('/') + 1);
-          if (fileName.lastIndexOf(".js") > 0 && !fileName.contains("-")) {
-            fileName = fileName.substring(0, filename.lastIndexOf(".js")) + "-1.0.js";
+        if (Connection.initialize(urlStr)) {
+          InputStream binStream = new BufferedInputStream(Connection.getInputStream(), 4096);
+          byte[] buff = new byte[4096];
+
+          filename = filename.trim();
+          if (filename == null || filename.isEmpty()) {
+            fileName = Connection.getFile().substring(Connection.getFile().lastIndexOf('/') + 1);
+            if (fileName.lastIndexOf(".js") > 0 && !fileName.contains("-")) {
+              fileName = fileName.substring(0, filename.lastIndexOf(".js")) + "-1.0.js";
+            }
+          } else {
+            fileName = filename;
           }
-        } else {
-          fileName = filename;
+          tmpFileName = String.format("%s.tmp", fileName);
+          file = new File(dirPath, fileName);
+          tmpFile = new File(dirPath, tmpFileName);
+          FileOutputStream fos = new FileOutputStream(tmpFile);
+
+          int len;
+          while ((len = binStream.read(buff)) != -1) {
+            fos.write(buff, 0, len);
+          }
+
+          fos.flush();
+          fos.close();
+          binStream.close();
+
+          ret = 1;
         }
-        tmpFileName = String.format("%s.tmp", fileName);
-        file = new File(dirPath, fileName);
-        tmpFile = new File(dirPath, tmpFileName);
-
-        // TODO: Refactor urlConnection to utility method
-        HttpURLConnection.setFollowRedirects(false);
-        urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setRequestProperty("Cache-Control", "no-cache");
-        urlConnection.setConnectTimeout(10000);
-        urlConnection.setReadTimeout(10000);
-        urlConnection.connect();
-        int stat = urlConnection.getResponseCode();
-        Log.d("KMManager", "HttpURLConnection response code: " + stat);
-        // Handle HTTP Status Codes 3xx
-        if (HttpURLConnection.HTTP_MULT_CHOICE <= stat &&
-            stat <= HttpURLConnection.HTTP_USE_PROXY &&
-            stat != HttpURLConnection.HTTP_NOT_MODIFIED) {
-          url = new URL(urlConnection.getHeaderField("Location"));
-          Log.d("KMManager", "Redirecting to " + url);
-          // open the new connection again
-          urlConnection = (HttpURLConnection) url.openConnection();
-        }
-
-        InputStream binStream = new BufferedInputStream(urlConnection.getInputStream(), 4096);
-        byte[] buff = new byte[4096];
-
-        FileOutputStream fos = new FileOutputStream(tmpFile);
-
-        int len;
-        while ((len = binStream.read(buff)) != -1) {
-          fos.write(buff, 0, len);
-        }
-
-        fos.flush();
-        fos.close();
-        binStream.close();
-
-        ret = 1;
       } catch (Exception e) {
         ret = -1;
         Log.e("FD: Download failed!", "Error: " + e);
@@ -1323,9 +1303,7 @@ public final class KMManager {
           }
         }
 
-        if (urlConnection != null) {
-          urlConnection.disconnect();
-        }
+        Connection.disconnect();
       }
 
       return ret;
