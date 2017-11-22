@@ -31,8 +31,6 @@ if(!window['keyman']['loaded']) {
       _Keyboards: [],           // Keyboards - array of loaded keyboards
       _ActiveKeyboard: null,    // ActiveKeyboard - points to active keyboard in Keyboards array
       _ActiveStub: null,        // ActiveStub - points to active stub in KeyboardStubs  
-      _AnyIndices: [],          // AnyIndex - array of any/index match indices
-      _DeadKeys: [],            // DeadKeys - array of matched deadkeys
       _AttachedElements: [],    // I1596 - attach to controls dynamically
       _ActiveElement: null,     // Currently active (focused) element  I3363 (Build 301)
       _LastActiveElement: null, // LastElem - Last active element

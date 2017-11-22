@@ -959,8 +959,8 @@ if(!window['keyman']['initialized']) {
         keymanweb._CachedSelectionStart = null; // I3319
         // Deadkey matching continues to be troublesome.
         // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
-        keymanweb._DeadkeyDeleteMatched();      // Delete any matched deadkeys before continuing
-        //keymanweb._DeadkeyResetMatched();       // I3318   (Not needed if deleted first?)
+        kbdInterface._DeadkeyDeleteMatched();      // Delete any matched deadkeys before continuing
+        //kbdInterface._DeadkeyResetMatched();       // I3318   (Not needed if deleted first?)
 
 
 

@@ -164,9 +164,9 @@ if(!window['keyman']['initialized']) {
       if(document.selection)
       {
         // IE debug
-        for(Li = 0; Li < keymanweb._DeadKeys.length; Li++)
+        for(Li = 0; Li < kbdInterface._DeadKeys.length; Li++)
         {
-          if(keymanweb._DeadKeys[Li].p > Lp) Lp = keymanweb._DeadKeys[Li].p;
+          if(kbdInterface._DeadKeys[Li].p > Lp) Lp = kbdInterface._DeadKeys[Li].p;
         }
         Ls = kbdInterface.context(Lp+1, Lp+1, Pelem); Lt = '<span style="font-size: 12pt">';
         if(Ls !== false && Ls._kmwLength() > Lp)  //I3319
@@ -176,17 +176,17 @@ if(!window['keyman']['initialized']) {
         }
         for(Li = 0; Li <= Ls._kmwLength(); Li++) //I3319
         {
-          for(Lj = 0; Lj < keymanweb._DeadKeys.length; Lj++)
+          for(Lj = 0; Lj < kbdInterface._DeadKeys.length; Lj++)
           {
-            if(keymanweb._DeadKeys[Lj].p == Ls._kmwLength() - Li) Lt = Lt + '<span style="color: red">'+keymanweb._DeadKeys[Lj].d+'</span>'; //I3319
+            if(kbdInterface._DeadKeys[Lj].p == Ls._kmwLength() - Li) Lt = Lt + '<span style="color: red">'+kbdInterface._DeadKeys[Lj].d+'</span>'; //I3319
           }
           if(Li < Ls._kmwLength()) Lt = Lt + Ls._kmwCharAt(Li); //I3319
         }
         
         Lt = Lt + '</span> - ';
-        for(Li = 0; Li < keymanweb._DeadKeys.length; Li++)
+        for(Li = 0; Li < kbdInterface._DeadKeys.length; Li++)
         {
-          Lt = Lt + 'dk['+Li+'] = {pos: '+keymanweb._DeadKeys[Li].p+', deadKey: '+keymanweb._DeadKeys[Li].d+'} ';
+          Lt = Lt + 'dk['+Li+'] = {pos: '+kbdInterface._DeadKeys[Li].p+', deadKey: '+kbdInterface._DeadKeys[Li].d+'} ';
         }
         
         _Debug(Ps + ': ' + Lt);
@@ -201,30 +201,30 @@ if(!window['keyman']['initialized']) {
         for(Li = 0; Li <= Ls._kmwLength(); Li++) Lt += "<"+Ls._kmwCharAt(Li)+">"; //I3319
         for(Li = 0; Li <= Ls._kmwLength(); Li++)  //I3319
         {
-          for(var Lj = 0; Lj < keymanweb._DeadKeys.length; Lj++)
+          for(var Lj = 0; Lj < kbdInterface._DeadKeys.length; Lj++)
           {
-            Lt = Lt + '['+keymanweb._DeadKeys[Lj].p+':'+keymanweb._DeadKeys[Lj].d+']';
+            Lt = Lt + '['+kbdInterface._DeadKeys[Lj].p+':'+kbdInterface._DeadKeys[Lj].d+']';
           }
           if(Li < Ls._kmwLength()) Lt = Lt + Ls._kmwCharAt(Li);
         }
         
         //_Debug(Ps + ': ' + Lt);
-          //Lt = Lt + keymanweb._DebugDepth + ' &nbsp; dk['+Li+'] = {pos: '+keymanweb._DeadKeys[Li].p+', deadKey: '+keymanweb._DeadKeys[Li].d+'}<br>';
+          //Lt = Lt + keymanweb._DebugDepth + ' &nbsp; dk['+Li+'] = {pos: '+kbdInterface._DeadKeys[Li].p+', deadKey: '+kbdInterface._DeadKeys[Li].d+'}<br>';
       }
 
   /*
       var Lt = "", Li, Lp = 0;
-      for(Li = 0; Li < keymanweb._DeadKeys.length; Li++)
+      for(Li = 0; Li < kbdInterface._DeadKeys.length; Li++)
       {
-        if(keymanweb._DeadKeys[Li].p > Lp) Lp = keymanweb._DeadKeys[Li].p;
+        if(kbdInterface._DeadKeys[Li].p > Lp) Lp = kbdInterface._DeadKeys[Li].p;
       }
 
       var Ls = kbdInterface.context(Lp, Lp, Pelem);
       Lt = keymanweb._DebugDepth + ' &nbsp; Context='+Ls+'<br>';
       
-      for(Li = 0; Li < keymanweb._DeadKeys.length; Li++)
+      for(Li = 0; Li < kbdInterface._DeadKeys.length; Li++)
       {
-        Lt = Lt + keymanweb._DebugDepth + ' &nbsp; dk['+Li+'] = {pos: '+keymanweb._DeadKeys[Li].p+', deadKey: '+keymanweb._DeadKeys[Li].d+'}<br>';
+        Lt = Lt + keymanweb._DebugDepth + ' &nbsp; dk['+Li+'] = {pos: '+kbdInterface._DeadKeys[Li].p+', deadKey: '+kbdInterface._DeadKeys[Li].d+'}<br>';
       }
       _Debug(Ps + '<br>'+Lt);
   */

@@ -348,7 +348,7 @@ if(!window['keyman']['initialized']) {
     
         if(!keymanweb._JustActivatedKeymanWebUI)
         {
-          keymanweb._DeadKeys = [];
+          kbdInterface._DeadKeys = [];
           keymanweb._NotifyKeyboard(0,target,1);  // I2187
         }
       
@@ -1328,9 +1328,9 @@ if(!window['keyman']['initialized']) {
     keymanweb['resetContext'] = keymanweb.resetContext = function() {
       osk.layerId = 'default';
 
-      keymanweb._DeadkeyResetMatched();
-      keymanweb._DeadkeyDeleteMatched();
-      keymanweb.cachedContext.reset();
+      kbdInterface._DeadkeyResetMatched();
+      kbdInterface._DeadkeyDeleteMatched();
+      kbdInterface.resetContextCache();
       keymanweb._ResetVKShift();
 
       osk._Show();
@@ -2504,7 +2504,7 @@ if(!window['keyman']['initialized']) {
 
       if(!keymanweb._JustActivatedKeymanWebUI)
       {
-        keymanweb._DeadKeys = [];
+        kbdInterface._DeadKeys = [];
         keymanweb._NotifyKeyboard(0,Ltarg,1);  // I2187
       }
     
@@ -2997,7 +2997,7 @@ if(!window['keyman']['initialized']) {
             keymanweb._Selection = Lrange;
 
             /* Delete deadkeys for IE when certain keys pressed */
-            keymanweb._DeadKeys = [];
+            kbdInterface._DeadKeys = [];
           }
         }
       }
@@ -3056,7 +3056,7 @@ if(!window['keyman']['initialized']) {
 
       switch(Levent.Lcode) {
         case 8: 
-          keymanweb._DeadKeys = []; 
+          kbdInterface._DeadKeys = []; 
           break; // I3318 (always clear deadkeys after backspace) 
         case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
         case 17: 
@@ -3191,8 +3191,8 @@ if(!window['keyman']['initialized']) {
     keymanweb.processKeystroke = function(device, element, keystroke) {
       // Clear internal state tracking data from prior keystrokes.
       keymanweb._CachedSelectionStart = null; // I3319     
-      keymanweb._DeadkeyResetMatched();       // I3318    
-      keymanweb.cachedContext.reset();
+      kbdInterface._DeadkeyResetMatched();       // I3318    
+      kbdInterface.resetContextCache();
 
       // Ensure the settings are in place so that KIFS/ifState activates and deactivates
       // the appropriate rule(s) for the modeled device.
@@ -4703,43 +4703,6 @@ if(!window['keyman']['initialized']) {
       return {start: start, end: end}; 
     }
     // *** I3319 Supplementary Plane modifications - end new code
-
-    // I3318 - deadkey changes START
-    /**
-     * Function     _DeadkeyResetMatched
-     * Scope        Private
-     * Description  Clear all matched deadkey flags
-     */       
-    keymanweb._DeadkeyResetMatched = function()
-    {                   
-      var Li, _Dk = keymanweb._DeadKeys;
-      for(Li = 0; Li < _Dk.length; Li++) _Dk[Li].matched = 0;
-    }
-
-    /**
-     * Function     _DeadkeyDeleteMatched
-     * Scope        Private
-     * Description  Delete matched deadkeys from context
-     */       
-    keymanweb._DeadkeyDeleteMatched = function()
-    {              
-      var Li, _Dk = keymanweb._DeadKeys;
-      for(Li = 0; Li < _Dk.length; Li++) if(_Dk[Li].matched) _Dk.splice(Li,1);
-    }
-
-    /**
-     * Function     _DeadkeyAdjustPos
-     * Scope        Private
-     * @param       {number}      Lstart      start position in context
-     * @param       {number}      Ldelta      characters to adjust by   
-     * Description  Adjust saved positions of deadkeys in context
-     */       
-    keymanweb._DeadkeyAdjustPos = function(Lstart, Ldelta)
-    {
-      var Li, _Dk = keymanweb._DeadKeys;
-      for(Li = 0; Li < _Dk.length; Li++) if(_Dk[Li].p > Lstart) _Dk[Li].p += Ldelta;
-    }
-    // I3318 - deadkey changes END
   
     /**
      * Set target element text direction (LTR or RTL), but only if the element is empty
