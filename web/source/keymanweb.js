@@ -3109,12 +3109,12 @@ if(!window['keyman']['initialized']) {
         if(typeof(keymanweb._ActiveKeyboard['KM'])=='undefined'  &&  !(Levent.Lmodifiers & 0x60)) {
           // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
           var Levent2={Lcode:keymanweb._USKeyCodeToCharCode(Levent),Ltarg:Levent.Ltarg,Lmodifiers:0,LisVirtualKey:0};
-          if(keymanweb.processKeystroke(util.physicalDevice, Levent2.Ltarg,Levent2)) {
+          if(kbdInterface.processKeystroke(util.physicalDevice, Levent2.Ltarg,Levent2)) {
             LeventMatched=1;
           }
         }
         
-        LeventMatched = LeventMatched || keymanweb.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent);
+        LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent);
         
         // Support backspace in simulated input DIV from physical keyboard where not matched in rule  I3363 (Build 301)
         if(Levent.Lcode == 8 && !LeventMatched && Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
@@ -3124,7 +3124,7 @@ if(!window['keyman']['initialized']) {
         // Mnemonic layout
         if(Levent.Lcode == 8) { // I1595 - Backspace for mnemonic
           keymanweb._KeyPressToSwallow = 1;
-          if(!keymanweb.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
+          if(!kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
             kbdInterface.output(1,keymanweb._LastActiveElement,""); // I3363 (Build 301)
           }
           return false;  //added 16/3/13 to fix double backspace on mnemonic layouts on desktop
@@ -3180,29 +3180,6 @@ if(!window['keyman']['initialized']) {
     }                
 
     /**
-     * Function     processKeystroke
-     * Scope        Private
-     * @param       {Object}        device      The device object properties to be utilized for this keystroke.
-     * @param       {Object}        element     The page element receiving input
-     * @param       {Object}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
-     * Description  Encapsulates calls to keyboard input processing.
-     * @returns     {number}        0 if no match is made, otherwise 1.
-     */
-    keymanweb.processKeystroke = function(device, element, keystroke) {
-      // Clear internal state tracking data from prior keystrokes.
-      keymanweb._CachedSelectionStart = null; // I3319     
-      kbdInterface._DeadkeyResetMatched();       // I3318    
-      kbdInterface.resetContextCache();
-
-      // Ensure the settings are in place so that KIFS/ifState activates and deactivates
-      // the appropriate rule(s) for the modeled device.
-      util.activeDevice = device;
-
-      // Calls the start-group of the active keyboard.
-      return keymanweb._ActiveKeyboard['gs'](element, keystroke);
-    }
-
-    /**
      * Function     _KeyPress
      * Scope        Private
      * @param       {Event}       e     event
@@ -3242,7 +3219,7 @@ if(!window['keyman']['initialized']) {
       }
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
       
-      if(keymanweb._KeyPressToSwallow || keymanweb.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
+      if(keymanweb._KeyPressToSwallow || kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
         keymanweb._KeyPressToSwallow=0;
         if(e  &&  e.preventDefault) {
           e.preventDefault();

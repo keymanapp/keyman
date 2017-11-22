@@ -903,5 +903,28 @@ if(!window['keyman']['initialized']) {
     }
     // I3318 - deadkey changes END
 
+    /**
+     * Function     processKeystroke
+     * Scope        Private
+     * @param       {Object}        device      The device object properties to be utilized for this keystroke.
+     * @param       {Object}        element     The page element receiving input
+     * @param       {Object}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
+     * Description  Encapsulates calls to keyboard input processing.
+     * @returns     {number}        0 if no match is made, otherwise 1.
+     */
+    kbdInterface.processKeystroke = function(device, element, keystroke) {
+      // Clear internal state tracking data from prior keystrokes.
+      keymanweb._CachedSelectionStart = null; // I3319     
+      kbdInterface._DeadkeyResetMatched();       // I3318    
+      kbdInterface.resetContextCache();
+
+      // Ensure the settings are in place so that KIFS/ifState activates and deactivates
+      // the appropriate rule(s) for the modeled device.
+      util.activeDevice = device;
+
+      // Calls the start-group of the active keyboard.
+      return keymanweb._ActiveKeyboard['gs'](element, keystroke);
+    }
+
   })();  
 }
