@@ -367,8 +367,7 @@ begin
     if kfh.dwIdentifier <> FILEID_COMPILED then
       raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);
 
-    if (kfh.dwFileVersion = $0500) or (kfh.dwFileVersion = $0501) or (kfh.dwFileVersion = $0600) or (kfh.dwFileVersion = $0700) or (kfh.dwFileVersion = $0800) or  // I3377
-      (kfh.dwFileVersion = $0900) then  // I3377
+    if (kfh.dwFileVersion >= VERSION_50) and (kfh.dwFileVersion <= VERSION_MAX) then  // I3377
     begin
       ki.FileVersion := kfh.dwFileVersion;
       GetSystemStore(Memory, TSS_NAME, ki.KeyboardName);
@@ -383,10 +382,6 @@ begin
 
       ki.MnemonicLayout := GetSystemStore(Memory, TSS_MNEMONIC, smnemonic) and (smnemonic <> '0');
 
-      {GetSystemStore(Memory, TSS_LANGUAGE, lang);
-      if kfh.dwFileVersion = $0600
-        then ki.LanguageID := StrToIntDef(lang, 0)
-        else ki.LanguageID := 0;}
       ki.KeyboardID := kfh.KeyboardID;
       ki.DefaultHotKey := kfh.HotKey;
       ki.LogicalLayout := (kfh.dwFlags and KF_LOGICALLAYOUT) = KF_LOGICALLAYOUT;
@@ -405,7 +400,6 @@ begin
       ki.Bitmap := nil;
       if FReturnBitmap then
       begin
-//        KL.Log('Keyboard bitmap for %s is at %x', [ki.KeyboardName, kfh.dwBitmapOffset]);
         if (kfh.dwBitmapOffset > 0) and (kfh.dwBitmapSize > 0) then
         begin
           mem.Position := kfh.dwBitmapOffset;
@@ -426,10 +420,10 @@ begin
         end;
       end;
     end
-    else if kfh.dwFileVersion = $0400 then
+    else if kfh.dwFileVersion = VERSION_40 then
       raise EKMXError.Create(EKMX_OldKeyboardFile,
         'The keyboard file is from version 4.0 and is not supported in this version of Keyman.')
-    else if kfh.dwFileVersion > $0600 then
+    else if (kfh.dwFileVersion > VERSION_60) and (HIWORD(kfh.dwFileVersion) = 0) then
     begin
       if GetSystemStore(Memory, TSS_COMPILEDVERSION, ver) then
       begin

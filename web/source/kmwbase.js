@@ -577,12 +577,23 @@ if(!window['keyman']['loaded']) {
     
     END DEBUG */
 
-  /* If we've made it to this point of initialization and aren't anything else, KeymanWeb assumes 
-    * we're a desktop.  Since we don't yet support desktops with touch-based input, we disable it here.
-    */                     
-  if(device.formFactor == 'desktop') {
-    device.touchable = false;
-  }
+    /* If we've made it to this point of initialization and aren't anything else, KeymanWeb assumes 
+      * we're a desktop.  Since we don't yet support desktops with touch-based input, we disable it here.
+      */                     
+    if(device.formFactor == 'desktop') {
+      device.touchable = false;
+    }
+
+    /**
+     * Represents hardware-based keystrokes regardless of the 'true' device, facilitating hardware keyboard input
+     * whenever touch-based input is available.
+     */
+    util.physicalDevice = {
+      touchable: false,
+      browser: device.browser,
+      formFactor: 'desktop',
+      OS: device.OS
+    };
                         
     /**
      * Expose the touchable state for UIs - will disable external UIs entirely
