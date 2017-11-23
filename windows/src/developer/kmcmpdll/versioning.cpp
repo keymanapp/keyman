@@ -19,6 +19,10 @@ BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
   char buf[128];
 
   if (fk->dwFlags & KF_AUTOMATICVERSION) {
+    if (fk->version <= 0) {
+      fk->version = VERSION_60; // minimum version that we can be safe with
+    }
+
     wsprintf(buf, "The compiler has assigned a minimum engine version of %x.%x based on features used in this keyboard", (fk->version & 0xFF00) >> 8, fk->version & 0xFF);
     AddCompileString(buf);
   }
