@@ -1284,7 +1284,7 @@ public final class KMManager {
         Log.e("FD: Download failed!", "Error: " + e);
       } finally {
         if (ret > 0) {
-          if (tmpFile.exists()) {
+          if (tmpFile.exists() && tmpFile.length() > 0) {
             if (file.exists()) {
               file.delete();
             }
