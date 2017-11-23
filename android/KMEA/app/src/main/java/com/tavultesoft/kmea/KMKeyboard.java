@@ -44,6 +44,7 @@ import android.widget.GridLayout;
 import android.widget.PopupWindow;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
 final class KMKeyboard extends WebView {
   private final Context context;
@@ -236,6 +237,7 @@ final class KMKeyboard extends WebView {
     boolean retVal = true;
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
+      Toast.makeText(context, "Invalid keyboard! Loading default", Toast.LENGTH_LONG).show();
       keyboardID = KMManager.KMDefault_KeyboardID;
       languageID = KMManager.KMDefault_LanguageID;
       retVal = false;
@@ -323,6 +325,7 @@ final class KMKeyboard extends WebView {
     boolean retVal = true;
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
+      Toast.makeText(context, "Invalid keyboard! Loading default", Toast.LENGTH_LONG).show();
       keyboardID = KMManager.KMDefault_KeyboardID;
       languageID = KMManager.KMDefault_LanguageID;
       keyboardName = KMManager.KMDefault_KeyboardName;
