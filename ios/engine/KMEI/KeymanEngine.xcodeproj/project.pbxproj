@@ -44,6 +44,7 @@
 		C040E5101F8606E300901EE4 /* TextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E50F1F8606E300901EE4 /* TextField.swift */; };
 		C040E5121F86107E00901EE4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E5111F86107E00901EE4 /* AppDelegate.swift */; };
 		C040E5141F86108900901EE4 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E5131F86108900901EE4 /* MainViewController.swift */; };
+		C042ED5D1FC6A65A001D82F4 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = C042ED5C1FC6A65A001D82F4 /* Version.swift */; };
 		C04514881F85D7F500D88416 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04514871F85D7F500D88416 /* KeyboardViewController.swift */; };
 		C045148A1F85DF9100D88416 /* InputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04514891F85DF9000D88416 /* InputViewController.swift */; };
 		C0452BAB1F9F1FE10064431A /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0452BAA1F9F1FE10064431A /* Language.swift */; };
@@ -196,6 +197,7 @@
 		C040E50F1F8606E300901EE4 /* TextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextField.swift; sourceTree = "<group>"; };
 		C040E5111F86107E00901EE4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C040E5131F86108900901EE4 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		C042ED5C1FC6A65A001D82F4 /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		C04514861F85D7F500D88416 /* SystemKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SystemKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
 		C04514871F85D7F500D88416 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 		C04514891F85DF9000D88416 /* InputViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputViewController.swift; sourceTree = "<group>"; };
@@ -442,6 +444,7 @@
 				C055E6EA1F99ED090035C2DD /* RegisteredFont.swift */,
 				C007C4641F9F52D8006461B9 /* LanguagesAPICall.swift */,
 				C05F432C1FBD5A4C0058CBD4 /* KeyboardAPICall.swift */,
+				C042ED5C1FC6A65A001D82F4 /* Version.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -833,6 +836,7 @@
 				C06D37341F81F5C300F61AE0 /* HTTPDownloader.swift in Sources */,
 				C0452BAF1F9F22A80064431A /* Font.swift in Sources */,
 				C0D3F3601F9F3AD80055C7CF /* InstallableKeyboard.swift in Sources */,
+				C042ED5D1FC6A65A001D82F4 /* Version.swift in Sources */,
 				C0D3F35E1F9F33490055C7CF /* Options.swift in Sources */,
 				C06D37351F81F5C300F61AE0 /* HTTPDownloadRequest.swift in Sources */,
 				C0324B8F1F8750B700AF3785 /* TextView.swift in Sources */,

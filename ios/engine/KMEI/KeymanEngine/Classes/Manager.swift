@@ -555,8 +555,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
 
     // Check version
-    if let latestRepositoryVersion = apiKeyboardRepository.keyboards?[keyboardID]?.version,
-      compareVersions(latestDownloadedVersion, latestRepositoryVersion) == .orderedAscending {
+    if let latestRepositoryVersionString = apiKeyboardRepository.keyboards?[keyboardID]?.version,
+      let latestRepositoryVersion = Version(latestRepositoryVersionString),
+      latestDownloadedVersion < latestRepositoryVersion {
       return .needsUpdate
     }
     return .upToDate
@@ -710,56 +711,28 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   // MARK: - File system and UserData management
-  func latestKeyboardFileVersion(withID keyboardID: String) -> String? {
+  func latestKeyboardFileVersion(withID keyboardID: String) -> Version? {
     guard let dirContents = try? FileManager.default.contentsOfDirectory(atPath: Storage.active.languageDir.path) else {
       return nil
     }
 
-    var latestVersion: String?
+    var latestVersion: Version?
     for filename in dirContents where filename.hasPrefix("\(keyboardID)-") && filename.hasJavaScriptExtension {
       let dashRange = filename.range(of: "-", options: .backwards)!
       let extensionRange = filename.range(of: ".js", options: .backwards)!
-      let version = String(filename[dashRange.upperBound..<extensionRange.lowerBound])
+      guard let version = Version(String(filename[dashRange.upperBound..<extensionRange.lowerBound])) else {
+        continue
+      }
 
       if let previousMax = latestVersion {
-        if compareVersions(previousMax, version) == .orderedAscending {
+        if version > previousMax {
           latestVersion = version
         }
-      } else if compareVersions(version, version) != nil {  // Ensure that the version number is valid
+      } else {
         latestVersion = version
       }
     }
     return latestVersion
-  }
-
-  /// Compares version numbers in dotted numberic format.
-  /// - Returns: ComparisonResult if both version numbers are valid.
-  func compareVersions(_ v1: String, _ v2: String) -> ComparisonResult? {
-    if v1.isEmpty || v2.isEmpty {
-      return nil
-    }
-    let components1 = v1.components(separatedBy: ".")
-    let components2 = v2.components(separatedBy: ".")
-
-    let len = max(components1.count, components2.count)
-    for i in 0..<len {
-      // Shorter version number padded with trailing zero components
-      let component1 = components1[safe: i] ?? "0"
-      let component2 = components2[safe: i] ?? "0"
-      guard let val1 = Int(component1), val1 >= 0 else {
-        return nil
-      }
-      guard let val2 = Int(component2), val2 >= 0 else {
-        return nil
-      }
-      if val1 < val2 {
-        return .orderedAscending
-      }
-      if val1 > val2 {
-        return .orderedDescending
-      }
-    }
-    return .orderedSame
   }
 
   /// Updates the user's installed keyboards and current keyboard with information in newKeyboard.
