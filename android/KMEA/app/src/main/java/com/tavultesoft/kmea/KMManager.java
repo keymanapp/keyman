@@ -472,7 +472,7 @@ public final class KMManager {
         String langID = kbInfo.get(KMKey_LanguageID);
         String kbVersion = kbInfo.get(KMManager.KMKey_KeyboardVersion);
         String latestKbVersion = getLatestKeyboardFileVersion(context, kbID);
-        if (kbVersion == null || !kbVersion.equals(latestKbVersion)) {
+        if ((latestKbVersion != null) && (kbVersion == null || !kbVersion.equals(latestKbVersion))) {
           kbInfo.put(KMManager.KMKey_KeyboardVersion, latestKbVersion);
           kbList.set(i, kbInfo);
           shouldUpdateList = true;
@@ -1456,8 +1456,10 @@ public final class KMManager {
       return kbFileVersion;
 
     for (String file : files) {
-      if (!file.endsWith(".js"))
+      // Ensure keyboard file is JS and non-zero size
+      if (!file.endsWith(".js") || new File(path + file).length() == 0) {
         continue;
+      }
 
       String base = String.format("%s-", keyboardID);
       int index = file.indexOf(base);
