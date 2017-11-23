@@ -258,11 +258,6 @@ UIGestureRecognizerDelegate {
     }
 
     kmLog("Setting language: \(kb.languageID)_\(kb.id)", checkDebugPrinting: true)
-    if usingTempFolder {
-      if !copyKeymanFilesToTemp() {
-        return false
-      }
-    }
 
     // FIXME: kb.version is not respected. Ideally we should be able to trust that the version number in UserDefaults
     // is-to-date but it is sometimes not updated.
@@ -1220,32 +1215,6 @@ UIGestureRecognizerDelegate {
     return true
   }
 
-  private func copyKeymanFilesToTemp() -> Bool {
-    let tempKeymanDir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("keyman")
-    let tempLangDir = tempKeymanDir.appendingPathComponent("languages")
-    let tempFontDir = tempKeymanDir.appendingPathComponent("fonts")
-
-    do {
-      try FileManager.default.createDirectory(at: tempKeymanDir, withIntermediateDirectories: true, attributes: nil)
-      try FileManager.default.createDirectory(at: tempLangDir, withIntermediateDirectories: true, attributes: nil)
-      try FileManager.default.createDirectory(at: tempFontDir, withIntermediateDirectories: true, attributes: nil)
-      try copyDirectoryContents(at: Storage.active.baseDir, to: tempKeymanDir)
-      try copyDirectoryContents(at: Storage.active.languageDir, to: tempLangDir)
-      try copyDirectoryContents(at: Storage.active.fontDir, to: tempFontDir)
-    } catch {
-      kmLog("copyKeymanFilesToTemp(): \(error)", checkDebugPrinting: false)
-      return false
-    }
-    return true
-  }
-
-  private var usingTempFolder: Bool {
-    if #available(iOS 9.0, *) {
-      return false
-    }
-    return true
-  }
-
   // FIXME: The check for empty filename, etc was removed. Check whether that needs to be added back.
   private func keyboardPath(forID keyboardID: String, keyboardVersion: String?) -> URL? {
     var keyboardVersion = keyboardVersion
@@ -1519,18 +1488,12 @@ UIGestureRecognizerDelegate {
   }
 
   private func reloadKeyboard(in view: WKWebView) {
+    let codeURL = Storage.active.baseDir.appendingPathComponent(kmwFullFileName)
     if #available(iOS 9.0, *) {
-      let codeURL = Storage.active.baseDir.appendingPathComponent(kmwFullFileName)
       view.loadFileURL(codeURL, allowingReadAccessTo: codeURL.deletingLastPathComponent())
     } else {
       // WKWebView in iOS < 9 is missing loadFileURL().
-      // The files need to be copied to a temporary directory and loaded from there.
-      if copyKeymanFilesToTemp() {
-        let codeURL = URL(fileURLWithPath: NSTemporaryDirectory())
-          .appendingPathComponent("keyman")
-          .appendingPathComponent(kmwFullFileName)
-        view.load(URLRequest(url: codeURL, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
-      }
+      view.load(URLRequest(url: codeURL, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
     }
   }
 
