@@ -313,14 +313,7 @@ if(!window['keyman']['initialized']) {
          * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
          */  
         var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
-
-        if(keymanweb._LastActiveElement && keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
-          keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
-          keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
-        } else { 
-          keymanweb.globalKeyboard = keyboardID;
-          keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
-        }
+        keymanweb._BlurKeyboardSettings();
 
         // With the attachment API update, we now directly track the old legacy control behavior.
         keymanweb._LastActiveElement = target;
@@ -329,14 +322,7 @@ if(!window['keyman']['initialized']) {
          * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
          * If not, we need to activate the control's preferred keyboard.
          */
-        keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
-    
-        if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
-          keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
-            keymanweb._LastActiveElement._kmwAttachment.languageCode); 
-        } else { 
-          keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
-        }
+        keymanweb._FocusKeyboardSettings(false);
         
         //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
         //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
@@ -2476,21 +2462,10 @@ if(!window['keyman']['initialized']) {
 
       var keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
 
-      if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
-        if(!keymanweb._JustActivatedKeymanWebUI) {
-          keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard,
-            keymanweb._LastActiveElement._kmwAttachment.languageCode); 
-        } else {
-          keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
-          keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
-        }
-      } else if(priorElement) { // Avoids complications with initialization and recent detachments.
-        if(!keymanweb._JustActivatedKeymanWebUI) {
-          keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode); 
-        } else {
-          keymanweb.globalKeyboard = keyboardID;
-          keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
-        }
+      if(keymanweb._JustActivatedKeymanWebUI) {
+        keymanweb._BlurKeyboardSettings();
+      } else {
+        keymanweb._FocusKeyboardSettings(priorElement ? false : true);
       }
 
       //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
@@ -2549,7 +2524,36 @@ if(!window['keyman']['initialized']) {
       //    if(keymanweb._IE) keymanweb._LastActiveElement = null; // I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
         
       return true;
-    }                
+    }  
+    
+    /**
+     * Stores the last active element's keyboard settings.
+     */
+    keymanweb._BlurKeyboardSettings = function() {
+      var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
+      
+      if(keymanweb._LastActiveElement && keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
+        keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
+        keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
+      } else {
+        keymanweb.globalKeyboard = keyboardID;
+        keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
+      }
+    }
+
+    /**
+     * Restores the newly active element's keyboard settings.
+     */ 
+    keymanweb._FocusKeyboardSettings = function(blockGlobalChange) {
+      keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
+      
+      if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
+        keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
+          keymanweb._LastActiveElement._kmwAttachment.languageCode); 
+      } else if(!blockGlobalChange) { 
+        keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
+      }
+    }
     
     /**
      * Function     _IsIEEditableIframe
@@ -2620,13 +2624,7 @@ if(!window['keyman']['initialized']) {
       ////keymanweb._SelectionControl = null;    
       var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
 
-      if(keymanweb._LastActiveElement && keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
-        keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
-        keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
-      } else {
-        keymanweb.globalKeyboard = keyboardID;
-        keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
-      }
+      keymanweb._BlurKeyboardSettings();
 
       // Now that we've handled all prior-element maintenance, update the 'last active element'.
       keymanweb._LastActiveElement = Ltarg;
