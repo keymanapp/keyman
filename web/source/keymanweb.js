@@ -329,8 +329,6 @@ if(!window['keyman']['initialized']) {
          * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
          * If not, we need to activate the control's preferred keyboard.
          */
-        keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
-    
         if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
           keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
             keymanweb._LastActiveElement._kmwAttachment.languageCode); 
@@ -348,7 +346,7 @@ if(!window['keyman']['initialized']) {
     
         if(!keymanweb._JustActivatedKeymanWebUI)
         {
-          kbdInterface._DeadKeys = [];
+          kbdInterface.clearDeadkeys();
           keymanweb._NotifyKeyboard(0,target,1);  // I2187
         }
       
@@ -1328,8 +1326,7 @@ if(!window['keyman']['initialized']) {
     keymanweb['resetContext'] = keymanweb.resetContext = function() {
       osk.layerId = 'default';
 
-      kbdInterface._DeadkeyResetMatched();
-      kbdInterface._DeadkeyDeleteMatched();
+      kbdInterface.clearDeadkeys();
       kbdInterface.resetContextCache();
       keymanweb._ResetVKShift();
 
@@ -2504,7 +2501,7 @@ if(!window['keyman']['initialized']) {
 
       if(!keymanweb._JustActivatedKeymanWebUI)
       {
-        kbdInterface._DeadKeys = [];
+        kbdInterface.clearDeadkeys();
         keymanweb._NotifyKeyboard(0,Ltarg,1);  // I2187
       }
     
@@ -2997,7 +2994,7 @@ if(!window['keyman']['initialized']) {
             keymanweb._Selection = Lrange;
 
             /* Delete deadkeys for IE when certain keys pressed */
-            kbdInterface._DeadKeys = [];
+            kbdInterface.clearDeadkeys();
           }
         }
       }
@@ -3056,7 +3053,7 @@ if(!window['keyman']['initialized']) {
 
       switch(Levent.Lcode) {
         case 8: 
-          kbdInterface._DeadKeys = []; 
+          kbdInterface.clearDeadkeys();
           break; // I3318 (always clear deadkeys after backspace) 
         case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
         case 17: 

@@ -533,9 +533,13 @@ if(!window['keyman']['initialized']) {
         }
         // Adjust deadkey positions 
         if(dn >= 0) {
-          // Pelem.selectionStart seems to exist here in IE 9 and is valid... but is this the right approach?
-          // I'm probably missing something or other.
-          var LselectionStart = Pelem.selectionStart;
+          // Pelem.selectionStart seems to exist here in IE 9 and is valid.  This provides a possible approach, but may be wrong.
+          // It appears safe to model the deadkey adjustment based on the non-IE9 code path's calculations.
+          if(Pelem._KeymanWebSelectionStart != null) {// changed to allow a value of 0
+            LselectionStart = Pelem._KeymanWebSelectionStart;
+          } else {
+            LselectionStart = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionStart);  // I3319
+          }
 
           kbdInterface._DeadkeyDeleteMatched();                                  // I3318
           kbdInterface._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318
@@ -902,6 +906,10 @@ if(!window['keyman']['initialized']) {
           _Dk[Li].p += Ldelta;
         }
       }
+    }
+
+    kbdInterface.clearDeadkeys = function() {
+      kbdInterface._DeadKeys = [];
     }
     // I3318 - deadkey changes END
 
