@@ -939,6 +939,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if kbID == Constants.defaultKeyboard.id && langID == Constants.defaultKeyboard.languageID {
       return
     }
+    if profileName != nil {
+      return  // already installing a profile
+    }
 
     guard let profile = profileName(withKeyboardID: kbID, languageID: langID) else {
       return
