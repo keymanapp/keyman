@@ -167,47 +167,44 @@ if(!window['keyman']['initialized']) {
        *      
        * @param       {Event=}     e    event
        */       
-      keymanweb.setFocus=function(e)
-      {                     
+      keymanweb.setFocus=function(e) {                     
         //e.stopPropagation();  // not doing anything useful, no child elements
         //e.preventDefault();   // prevents user selection or scrolling, may be better if they are allowed?
         keymanweb.focusing=true;
         keymanweb.focusTimer=window.setTimeout(function(){keymanweb.focusing=false;},1000);
   
         var tEvent=e;      
-        if(e)
-        {
-          if(typeof e.touches == 'object') tEvent=e.touches[0];
-        }
-        
-        // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
-        else 
-        {
+        if(e) {
+          if(typeof e.touches == 'object') {
+            tEvent=e.touches[0];
+          }
+        } else { // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
           tEvent={clientX:0,clientY:0}
           // Will usually be called from setActiveElement, which should define _LastActiveElement
-          if(keymanweb._LastActiveElement) 
+          if(keymanweb._LastActiveElement) {
             tEvent.target = keymanweb._LastActiveElement['kmw_ip'];
           // but will default to first input or text area on page if _LastActiveElement is null
-          else 
+        } else {
             tEvent.target = keymanweb.sortedInputs[0]['kmw_ip'];
+          }
         }    
         
         var touchX=tEvent.clientX,touchY=tEvent.clientY,tTarg=tEvent.target,scroller;
     
         // Identify the scroller element
-        if(tTarg.nodeName == 'SPAN')
+        if(tTarg.nodeName == 'SPAN') {
           scroller=tTarg.parentNode;
-        else if(tTarg.className != null && tTarg.className.indexOf('keymanweb-input') >= 0) 
+        } else if(tTarg.className != null && tTarg.className.indexOf('keymanweb-input') >= 0) {
           scroller=tTarg.firstChild;
-        else
+        } else {
           scroller=tTarg;
+        }
 
         // And the actual target element        
         var target=scroller.parentNode;
 
         // Move the caret and refocus if necessary     
-        if(keymanweb._ActiveElement != target) 
-        {
+        if(keymanweb._ActiveElement != target) {
           // Hide the KMW caret
           keymanweb.hideCaret(); 
           keymanweb._ActiveElement=target;
@@ -227,27 +224,24 @@ if(!window['keyman']['initialized']) {
         keymanweb.useInternalKeyboard=false;
         
         // And display the OSK if not already visible
-        if(osk.ready && !osk._Visible) osk._Show();
+        if(osk.ready && !osk._Visible) {
+          osk._Show();
+        }
         
         // If clicked on DIV, set caret to end of text
-        if(tTarg.nodeName == 'DIV' )
-        { 
+        if(tTarg.nodeName == 'DIV' ) { 
           var x,cp;
           x=util._GetAbsoluteX(scroller.firstChild);        
-          if(target.dir == 'rtl')
-          { 
+          if(target.dir == 'rtl') { 
             x += scroller.firstChild.offsetWidth;        
             cp=(touchX > x ? 0 : 100000);
-          }        
-          else
+          } else {
             cp=(touchX<x ? 0 : 100000);
+          }
       
           keymanweb.setTextCaret(target,cp);
           keymanweb.scrollInput(target);        
-        }
-        // Otherwise, if clicked on text in SPAN, set at touch position
-        else  
-        { 
+        } else { // Otherwise, if clicked on text in SPAN, set at touch position
           var caret,cp,cpMin,cpMax,x,y,dy,yRow,iLoop;
           caret=scroller.childNodes[1]; //caret span
           cpMin=0;
@@ -273,26 +267,25 @@ if(!window['keyman']['initialized']) {
 
           // Caret repositioning for horizontal scrolling of RTL text
 
-          // snapFunc - 'snaps' the touch location in a manner corresponding to the 'ltr' vs 'rtl' orientation.
+          // snapOrder - 'snaps' the touch location in a manner corresponding to the 'ltr' vs 'rtl' orientation.
           // Think of it as performing a floor() function, but the floor depends on the origin's direction.
-          var snapFunc;
+          var snapOrder;
           if(target.dir == 'rtl') {  // I would use arrow functions, but IE doesn't like 'em.
-            snapFunc = function(a, b) {
+            snapOrder = function(a, b) {
               return a < b; 
             };
           } else {
-            snapFunc = function(a, b) { 
+            snapOrder = function(a, b) { 
               return a > b; 
             };
           }
 
-          for(iLoop=0; iLoop<16; iLoop++)
-          {
+          for(iLoop=0; iLoop<16; iLoop++) {
             x=util._GetAbsoluteX(caret);  //left of caret            
-            if(snapFunc(x, touchX) && cp > cpMin && cp != cpMax) {
+            if(snapOrder(x, touchX) && cp > cpMin && cp != cpMax) {
               cpMax=cp; 
               cp=Math.round((cp+cpMin)/2);
-            } else if(!snapFunc(x, touchX) && cp < cpMax && cp != cpMin) {
+            } else if(!snapOrder(x, touchX) && cp < cpMax && cp != cpMin) {
               cpMin=cp; 
               cp=Math.round((cp+cpMax)/2);
             } else {
@@ -301,10 +294,10 @@ if(!window['keyman']['initialized']) {
             keymanweb.setTextCaret(target,cp);
           }
 
-          while(snapFunc(util._GetAbsoluteX(caret), touchX) && cp > cpMin) {
+          while(snapOrder(util._GetAbsoluteX(caret), touchX) && cp > cpMin) {
             keymanweb.setTextCaret(target,--cp);
           }
-          while(!snapFunc(util._GetAbsoluteX(caret), touchX) && cp < cpMax) {
+          while(!snapOrder(util._GetAbsoluteX(caret), touchX) && cp < cpMax) {
             keymanweb.setTextCaret(target,++cp);
           }
         }
