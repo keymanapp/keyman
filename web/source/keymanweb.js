@@ -270,39 +270,42 @@ if(!window['keyman']['initialized']) {
             while(util._GetAbsoluteY(caret)-dy > touchY && cp > cpMin)keymanweb.setTextCaret(target,--cp);
             while(util._GetAbsoluteY(caret)-dy < touchY-yRow && cp < cpMax) keymanweb.setTextCaret(target,++cp);
           }
+
           // Caret repositioning for horizontal scrolling of RTL text
-          if(target.dir == 'rtl')
-          {
-            for(iLoop=0; iLoop<16; iLoop++)
-            {
-              x=util._GetAbsoluteX(caret);  //left of caret            
-              if(x < touchX && cp > cpMin && cp != cpMax) {cpMax=cp; cp=Math.round((cp+cpMin)/2);}
-              else if(x > touchX && cp < cpMax && cp != cpMin) {cpMin=cp; cp=Math.round((cp+cpMax)/2);}
-              else break;
-              keymanweb.setTextCaret(target,cp);
-            }
-            while(util._GetAbsoluteX(caret) < touchX && cp > cpMin) keymanweb.setTextCaret(target,--cp);
-            while(util._GetAbsoluteX(caret) > touchX && cp < cpMax) keymanweb.setTextCaret(target,++cp);
+
+          // snapFunc - 'snaps' the touch location in a manner corresponding to the 'ltr' vs 'rtl' orientation.
+          // Think of it as performing a floor() function, but the floor depends on the origin's direction.
+          var snapFunc;
+          if(target.dir == 'rtl') {  // I would use arrow functions, but IE doesn't like 'em.
+            snapFunc = function(a, b) {
+              return a < b; 
+            };
+          } else {
+            snapFunc = function(a, b) { 
+              return a > b; 
+            };
           }
-          // Caret repositioning for horizontal scrolling of standard (LTR) text
-          else
+
+          for(iLoop=0; iLoop<16; iLoop++)
           {
-            for(iLoop=0; iLoop<16; iLoop++) // assumes fields shorter than 2**16 characters
-            {
-              x=util._GetAbsoluteX(caret);  //left of caret            
-              if(x > touchX && cp > cpMin && cp != cpMax)
-              {
-                cpMax=cp; cp=Math.round((cp+cpMin)/2);
-              }
-              else if(x < touchX && cp < cpMax && cp != cpMin)
-              {
-                cpMin=cp; cp=Math.round((cp+cpMax)/2);
-              }
-              else break;
-              keymanweb.setTextCaret(target,cp);
+            x=util._GetAbsoluteX(caret);  //left of caret            
+            if(snapFunc(x, touchX) && cp > cpMin && cp != cpMax) {
+              cpMax=cp; 
+              cp=Math.round((cp+cpMin)/2);
+            } else if(!snapFunc(x, touchX) && cp < cpMax && cp != cpMin) {
+              cpMin=cp; 
+              cp=Math.round((cp+cpMax)/2);
+            } else {
+              break;
             }
-            while(util._GetAbsoluteX(caret) > touchX && cp > cpMin) keymanweb.setTextCaret(target,--cp);
-            while(util._GetAbsoluteX(caret) < touchX && cp < cpMax) keymanweb.setTextCaret(target,++cp);
+            keymanweb.setTextCaret(target,cp);
+          }
+
+          while(snapFunc(util._GetAbsoluteX(caret), touchX) && cp > cpMin) {
+            keymanweb.setTextCaret(target,--cp);
+          }
+          while(!snapFunc(util._GetAbsoluteX(caret), touchX) && cp < cpMax) {
+            keymanweb.setTextCaret(target,++cp);
           }
         }
 
@@ -323,26 +326,7 @@ if(!window['keyman']['initialized']) {
          * If not, we need to activate the control's preferred keyboard.
          */
         keymanweb._FocusKeyboardSettings(false);
-        
-        //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
-        //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
-        if(!keymanweb._IsIEEditableIframe(target,1) || !keymanweb._IsMozillaEditableIframe(target,1))
-        {
-          keymanweb._DisableInput = 1; return;
-        }
-        keymanweb._DisableInput = 0;
-    
-        if(!keymanweb._JustActivatedKeymanWebUI)
-        {
-          keymanweb._DeadKeys = [];
-          keymanweb._NotifyKeyboard(0,target,1);  // I2187
-        }
-      
-        if(!keymanweb._JustActivatedKeymanWebUI  &&  keymanweb._SelectionControl != target)
-          keymanweb._IsActivatingKeymanWebUI = 0;
-        keymanweb._JustActivatedKeymanWebUI = 0;
-    
-        keymanweb._SelectionControl = target;
+        keymanweb._CommonFocusHelper(target);
       }
 
       /**
@@ -2415,41 +2399,54 @@ if(!window['keyman']['initialized']) {
      * @param       {Event}       e       Event object
      * @return      {boolean}             always true  (?) 
      */    
-    keymanweb._ControlFocus = function(e)
-    {
+    keymanweb._ControlFocus = function(e) {
       var Ltarg, Ln;
-      if(!keymanweb._Enabled) return true;
+      if(!keymanweb._Enabled) {
+        return true;
+      }
       e = keymanweb._GetEventObject(e);     // I2404 - Manage IE events in IFRAMEs
-      if(!e) return true;
-      if (e.target) Ltarg = e.target;
-      else if (e.srcElement) Ltarg = e.srcElement;
-      else return true;
+      if(!e) {
+        return true;
+      }
+
+      if (e.target) {
+        Ltarg = e.target;
+      } else if (e.srcElement) {
+        Ltarg = e.srcElement;
+      } else {
+        return true;
+      }
     
       // Prevent any action if a protected input field
-      if(device.touchable && (Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0)) return true;
+      if(device.touchable && (Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0)) {
+        return true;
+      }
 
       // Or if not a remappable input field
       var en=Ltarg.nodeName.toLowerCase();
-      if(en == 'input')
-      {
+      if(en == 'input') {
         var et=Ltarg.type.toLowerCase();
-        if(!(et == 'text' || et == 'search')) return true;
+        if(!(et == 'text' || et == 'search')) {
+          return true;
+        }
       } else if((device.touchable || !Ltarg.isContentEditable) && en != 'textarea') {
         return true;
       }
 
       keymanweb._ActiveElement=Ltarg;  // I3363 (Build 301)  
 
-      if (Ltarg.nodeType == 3) // defeat Safari bug
+      if (Ltarg.nodeType == 3) { // defeat Safari bug
         Ltarg = Ltarg.parentNode;
+      }
         
       var LfocusTarg = Ltarg;
 
       // Ensure that focussed element is visible above the keyboard
-      if(device.touchable && (Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0)) keymanweb.scrollBody(Ltarg);
+      if(device.touchable && (Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0)) {
+        keymanweb.scrollBody(Ltarg);
+      }
           
-      if(Ltarg.tagName=='IFRAME') //**TODO: check case reference
-      {
+      if(Ltarg.tagName=='IFRAME') { //**TODO: check case reference
         keymanweb._AttachToIframe(Ltarg);
         Ltarg=Ltarg.contentWindow.document;
       }
@@ -2468,26 +2465,7 @@ if(!window['keyman']['initialized']) {
         keymanweb._FocusKeyboardSettings(priorElement ? false : true);
       }
 
-      //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
-      //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
-      if(!keymanweb._IsIEEditableIframe(Ltarg,1) || !keymanweb._IsMozillaEditableIframe(Ltarg,1))
-      {
-        keymanweb._DisableInput = 1; 
-        return true;
-      }
-      keymanweb._DisableInput = 0;
-
-      if(!keymanweb._JustActivatedKeymanWebUI)
-      {
-        keymanweb._DeadKeys = [];
-        keymanweb._NotifyKeyboard(0,Ltarg,1);  // I2187
-      }
-    
-      if(!keymanweb._JustActivatedKeymanWebUI  &&  keymanweb._SelectionControl != Ltarg)
-        keymanweb._IsActivatingKeymanWebUI = 0;
-      keymanweb._JustActivatedKeymanWebUI = 0;
-
-      keymanweb._SelectionControl = Ltarg;
+      keymanweb._CommonFocusHelper(Ltarg);
       Ltarg._KeymanWebSelectionStart = Ltarg._KeymanWebSelectionEnd = null; // I3363 (Build 301)
 
       // Set element directionality (but only if element is empty)
@@ -2497,32 +2475,22 @@ if(!window['keyman']['initialized']) {
       keymanweb.doControlFocused(LfocusTarg,keymanweb._LastActiveElement);
     
       // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
-      if(device.touchable)
-      {
+      if(device.touchable) {
         osk._Enabled=1;
-      }
-      else
-      {
+      } else {
         // Conditionally show the OSK when control receives the focus
-        if(osk.ready)
-        {
-          if(keymanweb.isCJK()) osk._Enabled=1;
-          if(osk._Enabled) osk._Show(); else osk._Hide(false);
+        if(osk.ready) {
+          if(keymanweb.isCJK()) {
+            osk._Enabled=1;
+          }
+          if(osk._Enabled) {
+            osk._Show();
+          } else {
+            osk._Hide(false)
+          };
         }
       }
-      // TODO: This is possibly the main sequencing issue, as ControlFocus may get called before other elements
-      // are ready, or keyboards downloaded.  Need some way to ensure that the OSK is displayed when everything is ready.
-      
-      
-      // We have slightly different focus management on IE to other browsers.  This is because
-      // IE has problems with loss of focus when clicking on another element.  This can probably
-      // be resolved in the future by using MouseDown and MouseUp events instead of Click events
-      // on the VK elements but for now we just use the smoother interaction on Firefox and Chrome,
-      // and let IE do the focus dance.  This means some careful management of the
-      // IsActivatingKeymanWebUI and LastActiveElement variables, so be careful with any changes
-      // to these.
-      //    if(keymanweb._IE) keymanweb._LastActiveElement = null; // I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
-        
+
       return true;
     }  
     
@@ -2545,7 +2513,7 @@ if(!window['keyman']['initialized']) {
      * Restores the newly active element's keyboard settings.
      */ 
     keymanweb._FocusKeyboardSettings = function(blockGlobalChange) {
-      keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
+      var keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
       
       if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
         keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
@@ -2553,6 +2521,28 @@ if(!window['keyman']['initialized']) {
       } else if(!blockGlobalChange) { 
         keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
       }
+    }
+
+    keymanweb._CommonFocusHelper = function(target) {
+      //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
+      //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
+      if(!keymanweb._IsIEEditableIframe(target,1) || !keymanweb._IsMozillaEditableIframe(target,1))
+      {
+        keymanweb._DisableInput = 1; return;
+      }
+      keymanweb._DisableInput = 0;
+  
+      if(!keymanweb._JustActivatedKeymanWebUI)
+      {
+        keymanweb._DeadKeys = [];
+        keymanweb._NotifyKeyboard(0,target,1);  // I2187
+      }
+    
+      if(!keymanweb._JustActivatedKeymanWebUI  &&  keymanweb._SelectionControl != target)
+        keymanweb._IsActivatingKeymanWebUI = 0;
+      keymanweb._JustActivatedKeymanWebUI = 0;
+  
+      keymanweb._SelectionControl = target;
     }
     
     /**
