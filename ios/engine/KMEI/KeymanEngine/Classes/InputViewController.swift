@@ -134,12 +134,13 @@ open class InputViewController: UIInputViewController, KeymanWebViewDelegate {
     super.viewDidAppear(animated)
     setConstraints()
     inputView?.setNeedsUpdateConstraints()
-    
+
     //TODO: find out why this is actually happening
-    if(self.containerView?.subviews.count == 0)
-    {
-      Manager.shared.inputDelegate = self
-      self.containerView?.addSubview(kmInputView)
+    if let containerView = self.containerView {
+      if containerView.subviews.isEmpty {
+        Manager.shared.inputDelegate = self
+        containerView.addSubview(kmInputView)
+      }
     }
   }
 
