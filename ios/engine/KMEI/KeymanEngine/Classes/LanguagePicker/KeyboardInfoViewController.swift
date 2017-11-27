@@ -149,8 +149,6 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     }
 
     if alertView.tag == 1 {
-      let userKeyboards = Storage.active.userDefaults.userKeyboards!
-
       if Manager.shared.removeKeyboard(at: keyboardIndex) {
         navigationController?.popToRootViewController(animated: true)
       }
