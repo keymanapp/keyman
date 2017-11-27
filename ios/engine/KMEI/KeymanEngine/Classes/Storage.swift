@@ -128,6 +128,15 @@ extension Storage {
     try Storage.copyDirectoryContents(at: fontDir, to: dst.fontDir)
   }
 
+  func copyUserDefaults(to dst: Storage, withKeys keys: [String], shouldOverwrite: Bool) {
+    for key in keys {
+      if shouldOverwrite || dst.userDefaults.object(forKey: key) == nil {
+        dst.userDefaults.set(userDefaults.object(forKey: key), forKey: key)
+      }
+    }
+    dst.userDefaults.synchronize()
+  }
+
   private static func copy(from bundle: Bundle, resourceName: String, dstDir: URL) throws {
     guard let srcURL = bundle.url(forResource: resourceName, withExtension: nil) else {
       let message = "Could not locate \(resourceName) in the Keyman bundle"

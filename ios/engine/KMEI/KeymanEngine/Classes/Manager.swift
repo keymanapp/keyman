@@ -186,9 +186,11 @@ UIGestureRecognizerDelegate {
     URLProtocol.registerClass(KeymanURLProtocol.self)
 
     if !isSystemKeyboard {
-      copyUserDefaultsToSharedContainer()
       if let shared = Storage.shared,
         let nonShared = Storage.nonShared {
+        let keysToCopy = [Key.userKeyboardsList, Key.userCurrentKeyboard,
+                          Key.engineVersion, Key.keyboardPickerDisplayed]
+        nonShared.copyUserDefaults(to: shared, withKeys: keysToCopy, shouldOverwrite: false)
         do {
           try nonShared.copyFiles(to: shared)
         } catch {
@@ -1019,37 +1021,6 @@ UIGestureRecognizerDelegate {
   }
 
   // MARK: - File system and UserData management
-  private func copyUserDefaultsToSharedContainer() {
-    guard let sharedUserDefaults = Storage.shared?.userDefaults,
-      let defaultUserDefaults = Storage.nonShared?.userDefaults
-    else {
-      return
-    }
-    let keysToCopy = [Key.userKeyboardsList, Key.userCurrentKeyboard,
-                      Key.engineVersion, Key.keyboardPickerDisplayed]
-    for key in keysToCopy {
-      if sharedUserDefaults.object(forKey: key) == nil {
-        sharedUserDefaults.set(defaultUserDefaults.object(forKey: key), forKey: key)
-      }
-    }
-    sharedUserDefaults.synchronize()
-  }
-
-  private func copyUserDefaultsFromSharedContainer() {
-    guard let sharedUserDefaults = Storage.shared?.userDefaults,
-      let defaultUserDefaults = Storage.nonShared?.userDefaults
-    else {
-        return
-    }
-    let keysToCopy = [Key.userKeyboardsList, Key.engineVersion]
-    for key in keysToCopy {
-      if sharedUserDefaults.object(forKey: key) != nil {
-        defaultUserDefaults.set(sharedUserDefaults.object(forKey: key), forKey: key)
-      }
-    }
-    defaultUserDefaults.synchronize()
-  }
-
   func latestKeyboardFileVersion(withID keyboardID: String) -> String? {
     guard let dirContents = try? FileManager.default.contentsOfDirectory(atPath: Storage.active.languageDir.path) else {
       return nil
@@ -1132,9 +1103,10 @@ UIGestureRecognizerDelegate {
   }
 
   func synchronizeSWKeyboard() {
-    copyUserDefaultsFromSharedContainer()
     if let shared = Storage.shared,
       let nonShared = Storage.nonShared {
+      let keysToCopy = [Key.userKeyboardsList, Key.engineVersion]
+      shared.copyUserDefaults(to: nonShared, withKeys: keysToCopy, shouldOverwrite: true)
       do {
         try shared.copyFiles(to: nonShared)
         registerCustomFonts()
