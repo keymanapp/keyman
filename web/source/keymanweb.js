@@ -308,7 +308,6 @@ if(!window['keyman']['initialized']) {
          *
          * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
          */  
-        var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
         keymanweb._BlurKeyboardSettings();
 
         // With the attachment API update, we now directly track the old legacy control behavior.
@@ -2450,8 +2449,6 @@ if(!window['keyman']['initialized']) {
       var priorElement = keymanweb._LastActiveElement;
       keymanweb._LastActiveElement = Ltarg;
 
-      var keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
-
       if(keymanweb._JustActivatedKeymanWebUI) {
         keymanweb._BlurKeyboardSettings();
       } else {
@@ -2505,9 +2502,7 @@ if(!window['keyman']['initialized']) {
     /**
      * Restores the newly active element's keyboard settings.
      */ 
-    keymanweb._FocusKeyboardSettings = function(blockGlobalChange) {
-      var keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
-      
+    keymanweb._FocusKeyboardSettings = function(blockGlobalChange) {      
       if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
         keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
           keymanweb._LastActiveElement._kmwAttachment.languageCode); 
@@ -2572,31 +2567,42 @@ if(!window['keyman']['initialized']) {
      * @param       {Event}       e       Event object
      * @return      {boolean}             Always true  (?) 
      */    
-    keymanweb._ControlBlur = function(e)
-    {
+    keymanweb._ControlBlur = function(e) {
       var Ltarg;  
 
-      if(!keymanweb._Enabled) return true;
+      if(!keymanweb._Enabled) {
+        return true;
+      }
 
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) return true;
-      if (e.target) Ltarg = e.target;
-      else if (e.srcElement) Ltarg = e.srcElement;
-      else return true;
+      if(!e) {
+        return true;
+      }
+
+      if (e.target) {
+        Ltarg = e.target;
+      } else if (e.srcElement) {
+        Ltarg = e.srcElement;
+      } else {
+        return true;
+      }
 
       keymanweb._ActiveElement = null; // I3363 (Build 301)
 
       // Hide the touch device input caret, if applicable  I3363 (Build 301)
-      if(device.touchable) keymanweb.hideCaret();
+      if(device.touchable) {
+        keymanweb.hideCaret();
+      }
           
-      if (Ltarg.nodeType == 3) // defeat Safari bug
+      if (Ltarg.nodeType == 3) { // defeat Safari bug
         Ltarg = Ltarg.parentNode;
+      }
 
-      if(Ltarg.tagName=='IFRAME')
+      if(Ltarg.tagName=='IFRAME') {
         Ltarg=Ltarg.contentWindow.document;
+      }
         
-      if (Ltarg.setSelectionRange)
-      {                                           
+      if (Ltarg.setSelectionRange) {                                           
         //Ltarg._KeymanWebSelectionStart = Ltarg.selectionStart;
         //Ltarg._KeymanWebSelectionEnd = Ltarg.selectionEnd;
         Ltarg._KeymanWebSelectionStart = Ltarg.value._kmwCodeUnitToCodePoint(Ltarg.selectionStart);  //I3319
@@ -2605,8 +2611,6 @@ if(!window['keyman']['initialized']) {
       }
       
       ////keymanweb._SelectionControl = null;    
-      var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
-
       keymanweb._BlurKeyboardSettings();
 
       // Now that we've handled all prior-element maintenance, update the 'last active element'.
@@ -2615,16 +2619,19 @@ if(!window['keyman']['initialized']) {
       /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects should be restrained to this control in case
       * the user is manually specifying languages on a per-control basis.
       */
-      
       keymanweb._JustActivatedKeymanWebUI = 0;
       
-      if(!keymanweb._IsActivatingKeymanWebUI) keymanweb._NotifyKeyboard(0,Ltarg,0);  // I2187
+      if(!keymanweb._IsActivatingKeymanWebUI) {
+        keymanweb._NotifyKeyboard(0,Ltarg,0);  // I2187
+      }
 
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs  //TODO: is this really needed again????
       keymanweb.doControlBlurred(Ltarg,e,keymanweb._IsActivatingKeymanWebUI);
 
       // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
-      if(osk.ready && !keymanweb._IsActivatingKeymanWebUI) osk._Hide(false);
+      if(osk.ready && !keymanweb._IsActivatingKeymanWebUI) {
+        osk._Hide(false);
+      }
 
       return true;
     }
