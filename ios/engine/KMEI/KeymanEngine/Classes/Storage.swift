@@ -24,13 +24,11 @@ extension Storage {
   ///   `Manager.applicationGroupIdentifier` will not be reflected here.
   static let shared: Storage? = {
     guard let groupID = Manager.applicationGroupIdentifier else {
-      Manager.shared.kmLog("applicationGroupIdentifier is unset", checkDebugPrinting: false)
       return nil
     }
     guard let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupID),
       let userDefaults = UserDefaults(suiteName: groupID)
     else {
-      Manager.shared.kmLog("Error initializing shared Storage for groupID: \(groupID)", checkDebugPrinting: false)
       return nil
     }
     return Storage(baseURL: url, userDefaults: userDefaults)
@@ -81,7 +79,6 @@ class Storage {
                                               attributes: nil)
       return newDir
     } catch {
-      Manager.shared.kmLog("Error creating subdirectory: \(error)", checkDebugPrinting: false)
       return nil
     }
   }
