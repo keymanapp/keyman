@@ -2397,15 +2397,8 @@ if(!window['keyman']['initialized']) {
         return true;
       }
       e = keymanweb._GetEventObject(e);     // I2404 - Manage IE events in IFRAMEs
-      if(!e) {
-        return true;
-      }
-
-      if (e.target) {
-        Ltarg = e.target;
-      } else if (e.srcElement) {
-        Ltarg = e.srcElement;
-      } else {
+      Ltarg = util.eventTarget(e);
+      if (Ltarg == null) {
         return true;
       }
     
@@ -2575,15 +2568,8 @@ if(!window['keyman']['initialized']) {
       }
 
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) {
-        return true;
-      }
-
-      if (e.target) {
-        Ltarg = e.target;
-      } else if (e.srcElement) {
-        Ltarg = e.srcElement;
-      } else {
+      Ltarg = util.eventTarget(e);
+      if (Ltarg == null) {
         return true;
       }
 
@@ -2829,19 +2815,20 @@ if(!window['keyman']['initialized']) {
      *                LisVirtualKeyCode e.g. ctrl/alt key
      *                LisVirtualKey     e.g. Virtual key or non-keypress event
      */    
-    keymanweb._GetKeyEventProperties = function(e, keyState)
-    {
+    keymanweb._GetKeyEventProperties = function(e, keyState) {
       var s = new Object();
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) return null;
-      
-      if(e.cancelBubble === true) return null; // I2457 - Facebook meta-event generation mess -- two events generated for a keydown in Facebook contentEditable divs
-      
-      if (e.target) s.Ltarg = e.target;
-      else if (e.srcElement) s.Ltarg = e.srcElement;
-      else return null;
-      if (s.Ltarg.nodeType == 3) // defeat Safari bug
+      s.Ltarg = util.eventTarget(e);
+      if (s.Ltarg == null) {
+        return null;
+      }
+      if(e.cancelBubble === true) {
+        return null; // I2457 - Facebook meta-event generation mess -- two events generated for a keydown in Facebook contentEditable divs
+      }      
+
+      if (s.Ltarg.nodeType == 3) {// defeat Safari bug
         s.Ltarg = s.Ltarg.parentNode;
+      }
 
       s.Lcode = keymanweb._GetEventKeyCode(e);
       if (s.Lcode == null) {
