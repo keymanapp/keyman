@@ -51,4 +51,6 @@ public struct Constants {
                                                           font: defaultFont,
                                                           oskFont: nil,
                                                           isCustom: false)
+
+  static let kmwFileName = "keyboard.html"
 }

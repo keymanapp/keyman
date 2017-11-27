@@ -28,13 +28,9 @@ public enum KeyboardState {
 // Strings
 private let keyboardChangeHelpText = "Tap here to change keyboard"
 
-// URLs and Filenames
+// URLs
 private let apiBaseURL = "https://r.keymanweb.com/api/4.0/"
 private let apiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url="
-private let kmwFileName = "keyboard"
-private let kmwFileExtension = "html"
-private let kmwFullFileName = "\(kmwFileName).\(kmwFileExtension)"
-private let iOSCodeFileName = "keymanios.js"
 private let keymanHostName = "r.keymanweb.com"
 
 // UI In-App Keyboard Constants
@@ -191,7 +187,14 @@ UIGestureRecognizerDelegate {
 
     if !isSystemKeyboard {
       copyUserDefaultsToSharedContainer()
-      copyKeymanFilesToSharedContainer()
+      if let shared = Storage.shared,
+        let nonShared = Storage.nonShared {
+        do {
+          try nonShared.copyFiles(to: shared)
+        } catch {
+          kmLog("Failed to copy files to shared container: \(error)", checkDebugPrinting: false)
+        }
+      }
       let userData = Storage.active.userDefaults
       let isKPDisplayed = userData.bool(forKey: Key.keyboardPickerDisplayed)
       if isKPDisplayed {
@@ -201,7 +204,11 @@ UIGestureRecognizerDelegate {
       isKeymanHelpOn = false
     }
 
-    copyWebFilesToLibrary()
+    do {
+      try Storage.active.copyKMWFiles(from: keymanBundle)
+    } catch {
+      kmLog("Failed to copy KMW files from bundle: \(error)", checkDebugPrinting: false)
+    }
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
                                            name: .UIKeyboardWillShow, object: nil)
@@ -318,7 +325,8 @@ UIGestureRecognizerDelegate {
   ///   - font: Custom font for text views as a JSON String (see keyboardsDictionary)
   ///   - oskFont: Font for the on-screen keyboard
   public func addKeyboard(_ keyboard: InstallableKeyboard) {
-    if !keyboardFileExists(withID: keyboard.id, version: keyboard.version) {
+    let keyboardPath = Storage.active.keyboardURL(for: keyboard).path
+    if !FileManager.default.fileExists(atPath: keyboardPath) {
       kmLog("Could not add keyboard with ID: \(keyboard.id) because the keyboard file does not exist",
         checkDebugPrinting: false)
       return
@@ -551,13 +559,13 @@ UIGestureRecognizerDelegate {
     downloadQueue!.userInfo = commonUserData
 
     var request = HTTPDownloadRequest(url: keyboardURL, userInfo: commonUserData)
-    request.destinationFile = keyboardPath(forID: keyboardID, keyboardVersion: keyboard.version)?.path
+    request.destinationFile = Storage.active.keyboardURL(for: keyboard).path
     request.tag = 0
     downloadQueue!.addRequest(request)
 
     for (i, url) in fontURLs.enumerated() {
       request = HTTPDownloadRequest(url: url, userInfo: commonUserData)
-      request.destinationFile = fontPath(forFilename: url.lastPathComponent)?.path
+      request.destinationFile = Storage.active.fontURL(forFilename: url.lastPathComponent).path
       request.tag = i + 1
       downloadQueue!.addRequest(request)
     }
@@ -628,7 +636,6 @@ UIGestureRecognizerDelegate {
       return
     }
 
-    let keyboardLocalPath = self.keyboardPath(forID: keyboard.id, keyboardVersion: keyboard.version)!
     let isUpdate = latestKeyboardFileVersion(withID: keyboard.id) != nil
 
     downloadQueue = HTTPDownloader.init(self)
@@ -639,14 +646,13 @@ UIGestureRecognizerDelegate {
     downloadQueue!.userInfo = commonUserData
 
     var request = HTTPDownloadRequest(url: keyboardURL, userInfo: commonUserData)
-    request.destinationFile = keyboardLocalPath.path
+    request.destinationFile = Storage.active.keyboardURL(forID: keyboard.id, version: keyboard.version).path
     request.tag = 0
 
     downloadQueue!.addRequest(request)
     for (i, url) in fontURLs.enumerated() {
-      let fontPath = self.fontPath(forFilename: url.lastPathComponent)!
       request = HTTPDownloadRequest(url: url, userInfo: commonUserData)
-      request.destinationFile = fontPath.path
+      request.destinationFile = Storage.active.fontURL(forFilename: url.lastPathComponent).path
       request.tag = i + 1
       downloadQueue!.addRequest(request)
     }
@@ -807,9 +813,7 @@ UIGestureRecognizerDelegate {
         if !isUpdate {
           // Clean up keyboard file if anything fails
           // TODO: Also clean up remaining fonts
-          if let kbPath = keyboardPath(forID: keyboard.id, keyboardVersion: keyboard.version) {
-            try? FileManager.default.removeItem(at: kbPath)
-          }
+          try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboard))
         }
         downloadFailed(forKeyboards: keyboards, error: error)
       }
@@ -860,9 +864,7 @@ UIGestureRecognizerDelegate {
       if !isUpdate {
         // Clean up keyboard file if anything fails
         // TODO: Also clean up remaining fonts
-        if let kbPath = keyboardPath(forID: keyboard.id, keyboardVersion: keyboard.version) {
-          try? FileManager.default.removeItem(at: kbPath)
-        }
+        try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboard))
       }
       downloadFailed(forKeyboards: keyboards, error: error as NSError)
     case .downloadCachedData:
@@ -889,42 +891,24 @@ UIGestureRecognizerDelegate {
 
   // MARK: - Loading custom keyboards
 
-  private func preloadFile(srcUrl: URL, dstDir dirUrl: URL, shouldOverwrite: Bool) {
-    let dstUrl = dirUrl.appendingPathComponent(srcUrl.lastPathComponent)
-    do {
-      if !FileManager.default.fileExists(atPath: dstUrl.path) {
-        try FileManager.default.copyItem(at: srcUrl, to: dstUrl)
-      } else if shouldOverwrite {
-        try FileManager.default.removeItem(at: dstUrl)
-        try FileManager.default.copyItem(at: srcUrl, to: dstUrl)
-      } else {
-        kmLog("File already exists at \(dstUrl) and not overwriting", checkDebugPrinting: true)
-        return
-      }
-      addSkipBackupAttribute(to: dstUrl)
-    } catch {
-      kmLog("Error copying file: \(error)", checkDebugPrinting: false)
-    }
-  }
-
   /// Preloads a .js file for a language so that the keyboard is available without downloading.
   /// - Precondition:
   ///   - The .js filename must remain the same as when obtained from Keyman.
   ///   - The .js file must be bundled in your application.
-  public func preloadLanguageFile(atPath languagePath: String, shouldOverwrite: Bool) {
-    preloadFile(srcUrl: URL.init(fileURLWithPath: languagePath),
-                dstDir: Storage.active.languageDir,
-                shouldOverwrite: shouldOverwrite)
+  public func preloadKeyboardFile(at url: URL, shouldOverwrite: Bool) throws {
+    try Storage.copyAndExcludeFromBackup(at: url,
+                                         to: Storage.active.languageDir.appendingPathComponent(url.lastPathComponent),
+                                         shouldOverwrite: shouldOverwrite)
   }
 
   /// Preloads a .ttf or .otf file to be available without downloading.
   /// - Precondition:
   ///   - The font file must be bundled in your application.
   /// - SeeAlso: `registerCustomFonts()`
-  public func preloadFontFile(atPath fontPath: String, shouldOverwrite: Bool) {
-    preloadFile(srcUrl: URL.init(fileURLWithPath: fontPath),
-                dstDir: Storage.active.fontDir,
-                shouldOverwrite: shouldOverwrite)
+  public func preloadFontFile(at url: URL, shouldOverwrite: Bool) throws {
+    try Storage.copyAndExcludeFromBackup(at: url,
+                                         to: Storage.active.fontDir.appendingPathComponent(url.lastPathComponent),
+                                         shouldOverwrite: shouldOverwrite)
   }
 
   /// Registers all new fonts found in the font path. Call this after you have preloaded all your font files
@@ -1035,65 +1019,6 @@ UIGestureRecognizerDelegate {
   }
 
   // MARK: - File system and UserData management
-
-  // Local file storage
-  private func copyWebFilesToLibrary() {
-    do {
-      try copyFromBundle(resourceName: kmwFileName,
-                         resourceExtension: kmwFileExtension,
-                         dstDir: Storage.active.baseDir)
-      try copyFromBundle(resourceName: iOSCodeFileName,
-                         resourceExtension: nil,
-                         dstDir: Storage.active.baseDir)
-      try copyFromBundle(resourceName: "\(Constants.defaultKeyboard.id)-\(Constants.defaultKeyboard.version)",
-                         resourceExtension: "js",
-                         dstDir: Storage.active.languageDir)
-      try copyFromBundle(resourceName: "DejaVuSans",
-                         resourceExtension: "ttf",
-                         dstDir: Storage.active.fontDir)
-      try copyFromBundle(resourceName: "kmwosk",
-                         resourceExtension: "css",
-                         dstDir: Storage.active.baseDir)
-      try copyFromBundle(resourceName: "keymanweb-osk",
-                         resourceExtension: "ttf",
-                         dstDir: Storage.active.baseDir)
-    } catch {
-      kmLog("copyWebFilesToLibrary: \(error)", checkDebugPrinting: false)
-    }
-  }
-
-  private func copyFromBundle(resourceName: String, resourceExtension: String?, dstDir: URL?) throws {
-    let filenameForLog = "\(resourceName)\(resourceExtension.map { ".\($0)" } ?? "")"
-    guard let srcUrl = keymanBundle.url(forResource: resourceName, withExtension: resourceExtension) else {
-      let message = "Could not locate \(filenameForLog) in the Keyman bundle for copying."
-      throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
-    }
-    guard let dstDir = dstDir else {
-      let message = "Destination directory for \(filenameForLog) is nil"
-      throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
-    }
-    let dstUrl = dstDir.appendingPathComponent(srcUrl.lastPathComponent)
-
-    // FIXME: FileManager exceptions are swallowed.
-    copyAndExcludeFromBackup(at: srcUrl, to: dstUrl)
-  }
-
-  private func compareFileModDates(_ a: String, _ b: String) -> ComparisonResult? {
-    guard let aAttrs = try? FileManager.default.attributesOfItem(atPath: a),
-          let bAttrs = try? FileManager.default.attributesOfItem(atPath: b),
-          let aModDate = aAttrs[.modificationDate] as? Date,
-          let bModDate = bAttrs[.modificationDate] as? Date else {
-      return nil
-    }
-    if aModDate > bModDate {
-      return .orderedDescending
-    }
-    if aModDate < bModDate {
-      return .orderedAscending
-    }
-    return .orderedSame
-  }
-
   private func copyUserDefaultsToSharedContainer() {
     guard let sharedUserDefaults = Storage.shared?.userDefaults,
       let defaultUserDefaults = Storage.nonShared?.userDefaults
@@ -1123,117 +1048,6 @@ UIGestureRecognizerDelegate {
       }
     }
     defaultUserDefaults.synchronize()
-  }
-
-  private func addSkipBackupAttribute(to url: URL) -> Bool {
-    var url = url
-    assert(FileManager.default.fileExists(atPath: url.path))
-    var resourceValues = URLResourceValues()
-    resourceValues.isExcludedFromBackup = true
-    do {
-      // Writes values to the backing store. It is not only mutating the URL in memory.
-      try url.setResourceValues(resourceValues)
-      return true
-    } catch {
-      kmLog("Error excluding \(url) from backup \(error)", checkDebugPrinting: false)
-      return false
-    }
-  }
-
-  private func copyAndExcludeFromBackup(at src: URL, to dst: URL) -> Bool {
-    let fm = FileManager.default
-
-    var isDirectory: ObjCBool = false
-    let fileExists = fm.fileExists(atPath: src.path, isDirectory: &isDirectory)
-
-    if !fileExists || isDirectory.boolValue {
-      return false
-    }
-
-    // copy if destination does not exist or replace if source is newer
-    do {
-      if !fm.fileExists(atPath: dst.path) {
-        try fm.copyItem(at: src, to: dst)
-      } else if compareFileModDates(src.path, dst.path) == .orderedDescending {
-        try fm.removeItem(at: dst)
-        try fm.copyItem(at: src, to: dst)
-      } else {
-        return false
-      }
-    } catch {
-      kmLog("copyAndExcludeFromBackup: \(error)", checkDebugPrinting: false)
-      return false
-    }
-
-    addSkipBackupAttribute(to: dst)
-    return true
-  }
-
-  private func copyDirectoryContents(at srcDir: URL?, to dstDir: URL?) throws {
-    guard let srcDir = srcDir,
-      let dstDir = dstDir else {
-        return
-    }
-    let srcContents = try FileManager.default.contentsOfDirectory(at: srcDir, includingPropertiesForKeys: [])
-    for srcFile in srcContents {
-      copyAndExcludeFromBackup(at: srcFile, to: dstDir.appendingPathComponent(srcFile.lastPathComponent))
-    }
-  }
-
-  private func copyKeymanFilesToSharedContainer() -> Bool {
-    guard let nonShared = Storage.nonShared,
-      let shared = Storage.shared
-    else {
-      return false
-    }
-    do {
-      try copyDirectoryContents(at: nonShared.baseDir, to: shared.baseDir)
-      try copyDirectoryContents(at: nonShared.languageDir, to: shared.languageDir)
-      try copyDirectoryContents(at: nonShared.fontDir, to: shared.fontDir)
-      return true
-    } catch {
-      kmLog("copyKeymanFilesToSharedContainer(): \(error)", checkDebugPrinting: false)
-      return false
-    }
-  }
-
-  private func copyKeymanFilesFromSharedContainer() -> Bool {
-    guard let nonShared = Storage.nonShared,
-      let shared = Storage.shared
-      else {
-        return false
-    }
-    do {
-      try copyDirectoryContents(at: shared.baseDir, to: nonShared.baseDir)
-      try copyDirectoryContents(at: shared.languageDir, to: nonShared.languageDir)
-      try copyDirectoryContents(at: shared.fontDir, to: nonShared.fontDir)
-    } catch {
-      kmLog("copyKeymanFilesFromSharedContainer(): \(error)", checkDebugPrinting: false)
-      return false
-    }
-    registerCustomFonts()
-    return true
-  }
-
-  // FIXME: The check for empty filename, etc was removed. Check whether that needs to be added back.
-  private func keyboardPath(forID keyboardID: String, keyboardVersion: String?) -> URL? {
-    var keyboardVersion = keyboardVersion
-    if keyboardVersion == nil {
-      keyboardVersion = latestKeyboardFileVersion(withID: keyboardID)
-    }
-    guard let version = keyboardVersion else {
-      return nil
-    }
-    return Storage.active.languageDir.appendingPathComponent("\(keyboardID)-\(version).js")
-  }
-
-  func fontPath(forFilename filename: String) -> URL? {
-    return Storage.active.fontDir.appendingPathComponent(filename)
-  }
-
-  func keyboardFileExists(withID keyboardID: String, version: String) -> Bool {
-    let path = Storage.active.languageDir.appendingPathComponent("\(keyboardID)-\(version).js").path
-    return FileManager.default.fileExists(atPath: path)
   }
 
   func latestKeyboardFileVersion(withID keyboardID: String) -> String? {
@@ -1319,7 +1133,15 @@ UIGestureRecognizerDelegate {
 
   func synchronizeSWKeyboard() {
     copyUserDefaultsFromSharedContainer()
-    copyKeymanFilesFromSharedContainer()
+    if let shared = Storage.shared,
+      let nonShared = Storage.nonShared {
+      do {
+        try shared.copyFiles(to: nonShared)
+        registerCustomFonts()
+      } catch {
+        kmLog("Failed to copy from shared container: \(error)", checkDebugPrinting: false)
+      }
+    }
   }
 
   // MARK: - View management
@@ -1488,12 +1310,11 @@ UIGestureRecognizerDelegate {
   }
 
   private func reloadKeyboard(in view: WKWebView) {
-    let codeURL = Storage.active.baseDir.appendingPathComponent(kmwFullFileName)
     if #available(iOS 9.0, *) {
-      view.loadFileURL(codeURL, allowingReadAccessTo: codeURL.deletingLastPathComponent())
+      view.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)
     } else {
       // WKWebView in iOS < 9 is missing loadFileURL().
-      view.load(URLRequest(url: codeURL, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
+      view.load(URLRequest(url: Storage.active.kmwURL, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
     }
   }
 
@@ -1698,7 +1519,7 @@ UIGestureRecognizerDelegate {
     guard let url = webView.url else {
       return
     }
-    guard url.lastPathComponent == kmwFullFileName && (url.fragment?.isEmpty ?? true) else {
+    guard url.lastPathComponent == Constants.kmwFileName && (url.fragment?.isEmpty ?? true) else {
       return
     }
 

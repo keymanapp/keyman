@@ -47,11 +47,13 @@ extension Storage {
   }()
 }
 
-public class Storage {
-  public let baseDir: URL
-  public let languageDir: URL
-  public let fontDir: URL
-  public let userDefaults: UserDefaults
+class Storage {
+  let baseDir: URL
+  let languageDir: URL
+  let fontDir: URL
+  let userDefaults: UserDefaults
+
+  let kmwURL: URL
 
   private init?(baseURL: URL, userDefaults: UserDefaults) {
     guard
@@ -65,6 +67,7 @@ public class Storage {
     self.languageDir = languageDir
     self.fontDir = fontDir
     self.userDefaults = userDefaults
+    kmwURL = baseDir.appendingPathComponent(Constants.kmwFileName)
   }
 
   private static func createSubdirectory(baseDir: URL?, name: String) -> URL? {
@@ -81,5 +84,101 @@ public class Storage {
       Manager.shared.kmLog("Error creating subdirectory: \(error)", checkDebugPrinting: false)
       return nil
     }
+  }
+
+  func keyboardURL(for keyboard: InstallableKeyboard) -> URL {
+    return keyboardURL(forID: keyboard.id, version: keyboard.version)
+  }
+
+  func keyboardURL(forID keyboardID: String, version: String) -> URL {
+    return languageDir.appendingPathComponent("\(keyboardID)-\(version).js")
+  }
+
+  func fontURL(forFilename filename: String) -> URL {
+    return fontDir.appendingPathComponent(filename)
+  }
+}
+
+// MARK: - Copying
+extension Storage {
+  func copyKMWFiles(from bundle: Bundle) throws {
+    try Storage.copy(from: bundle,
+                     resourceName: Constants.kmwFileName,
+                     dstDir: Storage.active.baseDir)
+    try Storage.copy(from: bundle,
+                     resourceName: "keymanios.js",
+                     dstDir: Storage.active.baseDir)
+    try Storage.copy(from: bundle,
+                     resourceName: "\(Constants.defaultKeyboard.id)-\(Constants.defaultKeyboard.version).js",
+                     dstDir: Storage.active.languageDir)
+    try Storage.copy(from: bundle,
+                     resourceName: "DejaVuSans.ttf",
+                     dstDir: Storage.active.fontDir)
+    try Storage.copy(from: bundle,
+                     resourceName: "kmwosk.css",
+                     dstDir: Storage.active.baseDir)
+    try Storage.copy(from: bundle,
+                     resourceName: "keymanweb-osk.ttf",
+                     dstDir: Storage.active.baseDir)
+  }
+
+  func copyFiles(to dst: Storage) throws {
+    try Storage.copyDirectoryContents(at: baseDir, to: dst.baseDir)
+    try Storage.copyDirectoryContents(at: languageDir, to: dst.languageDir)
+    try Storage.copyDirectoryContents(at: fontDir, to: dst.fontDir)
+  }
+
+  private static func copy(from bundle: Bundle, resourceName: String, dstDir: URL) throws {
+    guard let srcURL = bundle.url(forResource: resourceName, withExtension: nil) else {
+      let message = "Could not locate \(resourceName) in the Keyman bundle"
+      throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
+    }
+    let dstURL = dstDir.appendingPathComponent(srcURL.lastPathComponent)
+
+    return try Storage.copyAndExcludeFromBackup(at: srcURL, to: dstURL)
+  }
+
+  private static func copyDirectoryContents(at srcDir: URL, to dstDir: URL) throws {
+    let srcContents = try FileManager.default.contentsOfDirectory(at: srcDir, includingPropertiesForKeys: [])
+    for srcFile in srcContents {
+      try Storage.copyAndExcludeFromBackup(at: srcFile, to: dstDir.appendingPathComponent(srcFile.lastPathComponent))
+    }
+  }
+
+  private static func addSkipBackupAttribute(to url: URL) throws {
+    var url = url
+    var resourceValues = URLResourceValues()
+    resourceValues.isExcludedFromBackup = true
+
+    // Writes values to the backing store. It is not only mutating the URL in memory.
+    try url.setResourceValues(resourceValues)
+  }
+
+  /// Copy and exclude from iCloud backup if `src` is newer than `dst`. Does nothing for a directory.
+  static func copyAndExcludeFromBackup(at src: URL,
+                                       to dst: URL,
+                                       shouldOverwrite: Bool = true) throws {
+    let fm = FileManager.default
+
+    var isDirectory: ObjCBool = false
+    let fileExists = fm.fileExists(atPath: src.path, isDirectory: &isDirectory)
+    if isDirectory.boolValue {
+      return
+    }
+
+    if !fileExists {
+      let message = "Nothing to copy at \(src)"
+      throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
+    }
+
+    if !fm.fileExists(atPath: dst.path) {
+      try fm.copyItem(at: src, to: dst)
+    } else if shouldOverwrite {
+      try fm.removeItem(at: dst)
+      try fm.copyItem(at: src, to: dst)
+    } else {
+      return
+    }
+    try Storage.addSkipBackupAttribute(to: dst)
   }
 }
