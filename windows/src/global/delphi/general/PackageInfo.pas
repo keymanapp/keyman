@@ -38,7 +38,7 @@ interface
 
 uses
   System.Classes,
-  System.Contnrs,
+  System.Generics.Collections,
   System.IniFiles,
   System.Sysutils,
   Vcl.Graphics,
@@ -83,7 +83,7 @@ type
 
   TPackageBaseObject = class
   private
-    FNotifyObjects: TObjectList;
+    FNotifyObjects: TObjectList<TPackageNotifyEventWrapper>;
     FTag: Integer;
     function Notify(EventType: TPackageNotifyEventType): Boolean;
   public
@@ -122,11 +122,9 @@ type
     property ValueType: TPackageRegistryKeyValueType read FValueType write FValueType;
   end;
 
-  TPackageRegistryKeyList = class(TObjectList)
+  TPackageRegistryKeyList = class(TObjectList<TPackageRegistryKey>)
   private
     FPackage: TPackage;
-    function Get(Index: Integer): TPackageRegistryKey;
-    procedure Put(Index: Integer; const Value: TPackageRegistryKey);
   public
     constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageRegistryKeyList); virtual;
@@ -134,7 +132,6 @@ type
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
-    property Items[Index: Integer]: TPackageRegistryKey read Get write Put; default;
   end;
 
   { Package Options }
@@ -196,13 +193,10 @@ type
     property URL: WideString read FURL write SetURL;
   end;
 
-  TPackageInfoEntryList = class(TObjectList)
+  TPackageInfoEntryList = class(TObjectList<TPackageInfoEntry>)
   private
     FPackage: TPackage;
   protected
-    function Get(Index: Integer): TPackageInfoEntry;
-    procedure Put(Index: Integer; Item: TPackageInfoEntry);
-
     procedure SetDesc(Name, Desc: WideString);
     procedure SetURL(Name, URL: WideString);
     function DescIndexOf(Name: WideString): WideString;
@@ -214,8 +208,6 @@ type
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
-    property Items[Index: Integer]: TPackageInfoEntry read Get write Put; default;
-    function IndexOf(Item: TPackageInfoEntry): Integer; overload;
     function IndexOf(Name: WideString): Integer; overload;
 
 
@@ -242,12 +234,9 @@ type
     procedure Assign(Source: TPackageStartMenuEntry); virtual;
   end;
 
-  TPackageStartMenuEntryList = class(TObjectList)
+  TPackageStartMenuEntryList = class(TObjectList<TPackageStartMenuEntry>)
   private
     FPackage: TPackage;
-  protected
-    function Get(Index: Integer): TPackageStartMenuEntry;
-    procedure Put(Index: Integer; Item: TPackageStartMenuEntry);
   public
     constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageStartMenuEntryList); virtual;
@@ -255,9 +244,6 @@ type
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
-    property Items[Index: Integer]: TPackageStartMenuEntry read Get write Put; default;
-    function IndexOf(Item: TPackageStartMenuEntry): Integer;
-    function Add(Item: TPackageStartMenuEntry): Integer;
   end;
 
   TPackageStartMenu = class
@@ -301,12 +287,10 @@ type
     property Package: TPackage read FPackage;
   end;
 
-  TPackageContentFileList = class(TObjectList)
+  TPackageContentFileList = class(TObjectList<TPackageContentFile>)
   private
     FPackage: TPackage;
-  protected
-    function Get(Index: Integer): TPackageContentFile;
-    procedure Put(Index: Integer; Item: TPackageContentFile);
+
   public
     constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageContentFileList); virtual;
@@ -314,10 +298,8 @@ type
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
-    property Items[Index: Integer]: TPackageContentFile read Get write Put; default;
-    function IndexOf(Item: TPackageContentFile): Integer;
+
     function IndexOfFileType(FFileType: TKMFileType): Integer;
-    function Add(Item: TPackageContentFile): Integer;
     function FromFileName(Filename: WideString): TPackageContentFile;
     function FromFileNameEx(Filename: WideString): TPackageContentFile;
     procedure Delete(Index: Integer);
@@ -338,7 +320,6 @@ type
     StartMenu: TPackageStartMenu;
     Files: TPackageContentFileList;
     Info: TPackageInfoEntryList;
-
 
     property FileName: WideString read FFileName write FFileName;
     procedure Assign(Source: TPackage); virtual;
@@ -548,11 +529,6 @@ end;
  - TPackageInfoEntryList                                                       -
  ------------------------------------------------------------------------------}
 
-function TPackageInfoEntryList.Get(Index: Integer): TPackageInfoEntry;        begin Result := TPackageInfoEntry(inherited Get(Index)); end;
-procedure TPackageInfoEntryList.Put(Index: Integer; Item: TPackageInfoEntry); begin inherited Put(Index, Pointer(Item)); end;
-function TPackageInfoEntryList.Add(Item: TPackageInfoEntry): Integer;         begin Result := inherited Add(Pointer(Item)); end;
-function TPackageInfoEntryList.IndexOf(Item: TPackageInfoEntry): Integer;     begin Result := inherited IndexOf(Pointer(Item)); end;
-
 procedure TPackageInfoEntryList.LoadXML(ARoot: IXMLNode);
 var
   i: Integer;
@@ -724,11 +700,6 @@ end;
 {-------------------------------------------------------------------------------
  - TPackageStartMenuEntryList                                                  -
  ------------------------------------------------------------------------------}
-
-function TPackageStartMenuEntryList.Get(Index: Integer): TPackageStartMenuEntry;        begin Result := TPackageStartMenuEntry(inherited Get(Index)); end;
-procedure TPackageStartMenuEntryList.Put(Index: Integer; Item: TPackageStartMenuEntry); begin inherited Put(Index, Pointer(Item)); end;
-function TPackageStartMenuEntryList.Add(Item: TPackageStartMenuEntry): Integer;         begin Result := inherited Add(Pointer(Item)); end;
-function TPackageStartMenuEntryList.IndexOf(Item: TPackageStartMenuEntry): Integer;     begin Result := inherited IndexOf(Pointer(Item)); end;
 
 procedure TPackageStartMenuEntryList.LoadXML(ARoot: IXMLNode);
 
@@ -943,11 +914,6 @@ end;
 {-------------------------------------------------------------------------------
  - TPackageSubFileList                                                         -
  ------------------------------------------------------------------------------}
-
-function TPackageContentFileList.Get(Index: Integer): TPackageContentFile;        begin Result := TPackageContentFile(inherited Get(Index)); end;
-procedure TPackageContentFileList.Put(Index: Integer; Item: TPackageContentFile); begin inherited Put(Index, Pointer(Item)); end;
-function TPackageContentFileList.Add(Item: TPackageContentFile): Integer;         begin Result := inherited Add(Pointer(Item)); end;
-function TPackageContentFileList.IndexOf(Item: TPackageContentFile): Integer;     begin Result := inherited IndexOf(Pointer(Item)); end;
 
 function TPackageContentFileList.IndexOfFileType(FFileType: TKMFileType): Integer;
 var
@@ -1321,7 +1287,7 @@ end;
 constructor TPackageBaseObject.Create;
 begin
   inherited Create;
-  FNotifyObjects := TObjectList.Create;
+  FNotifyObjects := TObjectList<TPackageNotifyEventWrapper>.Create;
 end;
 
 destructor TPackageBaseObject.Destroy;
@@ -1339,7 +1305,7 @@ begin
   for i := 0 to FNotifyObjects.Count - 1 do
   begin
     fAllow := True;
-    (FNotifyObjects[i] as TPackageNotifyEventWrapper).FEvent(Self, EventType, fAllow);
+    FNotifyObjects[i].FEvent(Self, EventType, fAllow);
   end;
   Result := True;
 end;
@@ -1359,7 +1325,7 @@ var
   i: Integer;
 begin
   for i := 0 to FNotifyObjects.Count - 1 do
-    if @(FNotifyObjects[i] as TPackageNotifyEventWrapper).FEvent = @FEventHandler then
+    if @FNotifyObjects[i].FEvent = @FEventHandler then
     begin
       FNotifyObjects.Delete(i);
       Exit;
@@ -1386,17 +1352,6 @@ constructor TPackageRegistryKeyList.Create(APackage: TPackage);
 begin
   inherited Create;
   FPackage := APackage;
-end;
-
-function TPackageRegistryKeyList.Get(Index: Integer): TPackageRegistryKey;
-begin
-  Result := inherited GetItem(Index) as TPackageRegistryKey;
-end;
-
-procedure TPackageRegistryKeyList.Put(Index: Integer;
-  const Value: TPackageRegistryKey);
-begin
-  inherited SetItem(Index, Value);
 end;
 
 procedure TPackageRegistryKeyList.LoadIni(AIni: TIniFile);
