@@ -322,7 +322,7 @@ if(!window['keyman']['initialized']) {
         // Always do the common focus stuff, instantly returning if we're in an editable iframe.
         // This parallels the if-statement in _ControlFocus - it may be needed as this if-statement in the future,
         // despite its present redundancy.
-        if(keymanweb._CommonFocusHelper(Ltarg)) {
+        if(keymanweb._CommonFocusHelper(target)) {
           return;
         };
       }
