@@ -318,7 +318,13 @@ if(!window['keyman']['initialized']) {
          * If not, we need to activate the control's preferred keyboard.
          */
         keymanweb._FocusKeyboardSettings(false);
-        keymanweb._CommonFocusHelper(target);
+        
+        // Always do the common focus stuff, instantly returning if we're in an editable iframe.
+        // This parallels the if-statement in _ControlFocus - it may be needed as this if-statement in the future,
+        // despite its present redundancy.
+        if(keymanweb._CommonFocusHelper(Ltarg)) {
+          return;
+        };
       }
 
       /**
@@ -2448,7 +2454,11 @@ if(!window['keyman']['initialized']) {
         keymanweb._FocusKeyboardSettings(priorElement ? false : true);
       }
 
-      keymanweb._CommonFocusHelper(Ltarg);
+      // Always do the common focus stuff, instantly returning if we're in an editable iframe.
+      if(keymanweb._CommonFocusHelper(Ltarg)) {
+        return true;
+      };
+
       Ltarg._KeymanWebSelectionStart = Ltarg._KeymanWebSelectionEnd = null; // I3363 (Build 301)
 
       // Set element directionality (but only if element is empty)
@@ -2469,8 +2479,8 @@ if(!window['keyman']['initialized']) {
           if(osk._Enabled) {
             osk._Show();
           } else {
-            osk._Hide(false)
-          };
+            osk._Hide(false);
+          }
         }
       }
 
@@ -2478,7 +2488,9 @@ if(!window['keyman']['initialized']) {
     }  
     
     /**
-     * Stores the last active element's keyboard settings.
+     * Function             _BlurKeyboardSettings
+     * Description          Stores the last active element's keyboard settings.  Should be called
+     *                      whenever a KMW-enabled page element loses control.
      */
     keymanweb._BlurKeyboardSettings = function() {
       var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
@@ -2493,7 +2505,11 @@ if(!window['keyman']['initialized']) {
     }
 
     /**
-     * Restores the newly active element's keyboard settings.
+     * Function             _FocusKeyboardSettings
+     * @param   {boolean}   blockGlobalChange   A flag indicating if the global keyboard setting should be ignored for this call.
+     * Description          Restores the newly active element's keyboard settings.  Should be called
+     *                      whenever a KMW-enabled page element gains control, but only once the prior
+     *                      element's loss of control is guaranteed.
      */ 
     keymanweb._FocusKeyboardSettings = function(blockGlobalChange) {      
       if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
@@ -2504,26 +2520,35 @@ if(!window['keyman']['initialized']) {
       }
     }
 
+    /**
+     * Function             _CommonFocusHelper
+     * @param   {Element}   target 
+     * @returns {boolean}
+     * Description          Performs common state management for the various focus events of KeymanWeb.                      
+     *                      The return value indicates whether (true) or not (false) the calling event handler 
+     *                      should be terminated immediately after the call.
+     */
     keymanweb._CommonFocusHelper = function(target) {
       //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
       //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
-      if(!keymanweb._IsIEEditableIframe(target,1) || !keymanweb._IsMozillaEditableIframe(target,1))
-      {
-        keymanweb._DisableInput = 1; return;
+      if(!keymanweb._IsIEEditableIframe(target,1) || !keymanweb._IsMozillaEditableIframe(target,1)) {
+        keymanweb._DisableInput = 1; 
+        return true;
       }
       keymanweb._DisableInput = 0;
   
-      if(!keymanweb._JustActivatedKeymanWebUI)
-      {
+      if(!keymanweb._JustActivatedKeymanWebUI) {
         keymanweb._DeadKeys = [];
         keymanweb._NotifyKeyboard(0,target,1);  // I2187
       }
     
-      if(!keymanweb._JustActivatedKeymanWebUI  &&  keymanweb._SelectionControl != target)
+      if(!keymanweb._JustActivatedKeymanWebUI  &&  keymanweb._SelectionControl != target) {
         keymanweb._IsActivatingKeymanWebUI = 0;
+      }
       keymanweb._JustActivatedKeymanWebUI = 0;
   
       keymanweb._SelectionControl = target;
+      return false;
     }
     
     /**
