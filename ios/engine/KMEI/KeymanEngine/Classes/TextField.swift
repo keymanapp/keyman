@@ -9,7 +9,7 @@
 import AudioToolbox
 import UIKit
 
-public class TextField: UITextField, UITextFieldDelegate, KeymanWebDelegate {
+public class TextField: UITextField {
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
@@ -133,7 +133,59 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebDelegate {
     }
   }
 
-  // MARK: - KeymanWebViewDelegate
+  public override var selectedTextRange: UITextRange? {
+    didSet(range) {
+      guard let range = range else {
+        return
+      }
+      let newRange = NSRange(location: offset(from: beginningOfDocument, to: range.start),
+                             length: offset(from: range.start, to: range.end))
+      Manager.shared.setSelectionRange(newRange, manually: false)
+    }
+  }
+
+  // MARK: - Keyman notifications
+  private func keyboardChanged(_ kb: InstallableKeyboard) {
+    if !shouldSetCustomFontOnKeyboardChange {
+      return
+    }
+
+    // TODO: Get font name directly from keyboard object
+    let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID)
+    let fontSize = font?.pointSize ?? UIFont.systemFontSize
+    if let fontName = fontName {
+      font = UIFont(name: fontName, size: fontSize)
+    } else {
+      font = UIFont.systemFont(ofSize: fontSize)
+    }
+
+    if isFirstResponder {
+      resignFirstResponder()
+      becomeFirstResponder()
+    }
+    Manager.shared.kmLog(
+      "TextField \(self.debugDescription) setFont: \(font!.familyName)", checkDebugPrinting: true)
+  }
+
+  @objc func enableInputClickSound() {
+    isInputClickSoundEnabled = true
+  }
+
+  @objc func textFieldTextDidChange(_ notification: Notification) {
+    if shouldUpdateKMText {
+      // Catches copy/paste operations
+      Manager.shared.setText(text)
+      let textRange = selectedTextRange!
+      let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
+                             length: offset(from: textRange.start, to: textRange.end))
+      Manager.shared.setSelectionRange(newRange, manually: false)
+      shouldUpdateKMText = false
+    }
+  }
+}
+
+// MARK: - KeymanWebDelegate
+extension TextField: KeymanWebDelegate {
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     if Manager.shared.isSubKeysMenuVisible {
       return
@@ -172,35 +224,14 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebDelegate {
       Manager.shared.switchToNextKeyboard()
     }
   }
+}
 
-  // MARK: - UITextFieldDelegate Hooks
-  public override var selectedTextRange: UITextRange? {
-    didSet(range) {
-      guard let range = range else {
-        return
-      }
-      let newRange = NSRange(location: offset(from: beginningOfDocument, to: range.start),
-                             length: offset(from: range.start, to: range.end))
-      Manager.shared.setSelectionRange(newRange, manually: false)
-    }
-  }
-
+// MARK: - UITextFieldDelegate
+extension TextField: UITextFieldDelegate {
   public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
                         replacementString string: String) -> Bool {
     shouldUpdateKMText = true // Enable text update to catch copy/paste operations
     return true
-  }
-
-  @objc func textFieldTextDidChange(_ notification: Notification) {
-    if shouldUpdateKMText {
-      // Catches copy/paste operations
-      Manager.shared.setText(text)
-      let textRange = selectedTextRange!
-      let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
-                             length: offset(from: textRange.start, to: textRange.end))
-      Manager.shared.setSelectionRange(newRange, manually: false)
-      shouldUpdateKMText = false
-    }
   }
 
   public func textFieldShouldClear(_ textField: UITextField) -> Bool {
@@ -286,32 +317,5 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebDelegate {
     }
 
     return true
-  }
-
-  // MARK: - Keyman notifications
-  private func keyboardChanged(_ kb: InstallableKeyboard) {
-    if !shouldSetCustomFontOnKeyboardChange {
-      return
-    }
-
-    // TODO: Get font name directly from keyboard object
-    let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID)
-    let fontSize = font?.pointSize ?? UIFont.systemFontSize
-    if let fontName = fontName {
-      font = UIFont(name: fontName, size: fontSize)
-    } else {
-      font = UIFont.systemFont(ofSize: fontSize)
-    }
-
-    if isFirstResponder {
-      resignFirstResponder()
-      becomeFirstResponder()
-    }
-    Manager.shared.kmLog(
-      "TextField \(self.debugDescription) setFont: \(font!.familyName)", checkDebugPrinting: true)
-  }
-
-  @objc func enableInputClickSound() {
-    isInputClickSoundEnabled = true
   }
 }

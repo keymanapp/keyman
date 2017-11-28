@@ -9,7 +9,7 @@
 import AudioToolbox
 import UIKit
 
-public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback, KeymanWebDelegate {
+public class TextView: UITextView {
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
@@ -127,7 +127,66 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
     }
   }
 
-  // MARK: - KeymanWebDelegate
+  public override var selectedTextRange: UITextRange? {
+    didSet {
+      Manager.shared.setSelectionRange(selectedRange, manually: false)
+    }
+  }
+
+  // MARK: - Keyman notifications
+  private func keyboardChanged(_ kb: InstallableKeyboard) {
+    if !shouldSetCustomFontOnKeyboardChange {
+      return
+    }
+
+    // TODO: Get font name directly from keyboard
+    let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID)
+    let fontSize = font?.pointSize ?? UIFont.systemFontSize
+    if let fontName = fontName {
+      font = UIFont(name: fontName, size: fontSize)
+    } else {
+      font = UIFont.systemFont(ofSize: fontSize)
+    }
+
+    if isFirstResponder {
+      resignFirstResponder()
+      becomeFirstResponder()
+    }
+
+    Manager.shared.kmLog("TextView setFont: \(String(describing: font?.familyName))",
+      checkDebugPrinting: true)
+  }
+
+  // MARK: iOS 7 TextView Scroll bug fix
+  func scroll(toCarret textView: UITextView) {
+    guard let range = textView.selectedTextRange else {
+      return
+    }
+    var caretRect = textView.caretRect(for: range.end)
+    caretRect.size.height += textView.textContainerInset.bottom
+    textView.scrollRectToVisible(caretRect, animated: false)
+  }
+
+  @objc func scroll(toShowSelection textView: UITextView) {
+    if textView.selectedRange.location < textView.text.count {
+      return
+    }
+
+    var bottomOffset = CGPoint(x: 0, y: textView.contentSize.height - textView.bounds.size.height)
+    if bottomOffset.y < 0 {
+      bottomOffset.y = 0
+    }
+    textView.setContentOffset(bottomOffset, animated: true)
+  }
+
+  // MARK: - Private Methods
+  @objc func enableInputClickSound() {
+    isInputClickSoundEnabled = true
+  }
+}
+
+// MARK: - KeymanWebDelegate
+extension TextView: KeymanWebDelegate {
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     if Manager.shared.isSubKeysMenuVisible {
       return
@@ -171,14 +230,10 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
       Manager.shared.switchToNextKeyboard()
     }
   }
+}
 
-  // MARK: - UITextViewDelegate Hooks
-  public override var selectedTextRange: UITextRange? {
-    didSet {
-      Manager.shared.setSelectionRange(selectedRange, manually: false)
-    }
-  }
-
+// MARK: - UITextViewDelegate
+extension TextView: UITextViewDelegate {
   public func textViewDidChangeSelection(_ textView: UITextView) {
     // Workaround for iOS 7 UITextView scroll bug
     scroll(toCarret: textView)
@@ -275,56 +330,5 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
       resignFirstResponder()
     }
     return true
-  }
-
-  // MARK: - Keyman notifications
-  private func keyboardChanged(_ kb: InstallableKeyboard) {
-    if !shouldSetCustomFontOnKeyboardChange {
-      return
-    }
-
-    // TODO: Get font name directly from keyboard
-    let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID)
-    let fontSize = font?.pointSize ?? UIFont.systemFontSize
-    if let fontName = fontName {
-      font = UIFont(name: fontName, size: fontSize)
-    } else {
-      font = UIFont.systemFont(ofSize: fontSize)
-    }
-
-    if isFirstResponder {
-      resignFirstResponder()
-      becomeFirstResponder()
-    }
-
-    Manager.shared.kmLog("TextView setFont: \(String(describing: font?.familyName))",
-      checkDebugPrinting: true)
-  }
-
-  // MARK: iOS 7 TextView Scroll bug fix
-  func scroll(toCarret textView: UITextView) {
-    guard let range = textView.selectedTextRange else {
-      return
-    }
-    var caretRect = textView.caretRect(for: range.end)
-    caretRect.size.height += textView.textContainerInset.bottom
-    textView.scrollRectToVisible(caretRect, animated: false)
-  }
-
-  @objc func scroll(toShowSelection textView: UITextView) {
-    if textView.selectedRange.location < textView.text.count {
-      return
-    }
-
-    var bottomOffset = CGPoint(x: 0, y: textView.contentSize.height - textView.bounds.size.height)
-    if bottomOffset.y < 0 {
-      bottomOffset.y = 0
-    }
-    textView.setContentOffset(bottomOffset, animated: true)
-  }
-
-  // MARK: - Private Methods
-  @objc func enableInputClickSound() {
-    isInputClickSoundEnabled = true
   }
 }
