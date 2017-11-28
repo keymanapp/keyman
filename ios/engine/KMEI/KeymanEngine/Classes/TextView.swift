@@ -9,7 +9,7 @@
 import AudioToolbox
 import UIKit
 
-public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback, KeymanWebViewDelegate {
+public class TextView: UITextView {
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
@@ -58,8 +58,8 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
   // MARK: - Class Overrides
   public override var inputView: UIView? {
     get {
-      Manager.shared.webDelegate = self
-      return Manager.shared.inputView
+      Manager.shared.keymanWebDelegate = self
+      return Manager.shared.keymanWeb.view
     }
 
     set(inputView) {
@@ -107,7 +107,7 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
       "TextView: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
       checkDebugPrinting: true)
     resignFirstResponder()
-    Manager.shared.inputView.endEditing(true)
+    Manager.shared.keymanWeb.view.endEditing(true)
   }
 
   public override var text: String! {
@@ -127,192 +127,10 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
     }
   }
 
-  // MARK: - KMWebViewDelegate
-  func updatedFragment(_ fragment: String) {
-    if fragment.contains("insertText") {
-      processInsertText(fragment)
-    } else if fragment.contains("hideKeyboard") {
-      dismissKeyboard()
-    } else if fragment.contains("menuKeyUp") {
-      if let viewController = viewController {
-        Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
-      } else {
-        Manager.shared.switchToNextKeyboard()
-      }
-    }
-  }
-
-  private func processInsertText(_ fragment: String) {
-    if Manager.shared.isSubKeysMenuVisible {
-      return
-    }
-
-    if isInputClickSoundEnabled {
-      AudioServicesPlaySystemSound(0x450)
-
-      // Disable input click sound for 0.1 second to ensure it plays for single key stroke.
-      isInputClickSoundEnabled = false
-      perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
-    }
-
-    let dnRange = fragment.range(of: "+dn=")!
-    let sRange = fragment.range(of: "+s=")!
-
-    let dn = Int(fragment[dnRange.upperBound..<sRange.lowerBound])!
-    let s = fragment[sRange.upperBound...]
-
-    let hexStrings: [String]
-    if !s.isEmpty {
-      hexStrings = s.components(separatedBy: ",")
-    } else {
-      hexStrings = []
-    }
-
-    let codeUnits = hexStrings.map { hexString -> UInt16 in
-      let scanner = Scanner(string: hexString)
-      var codeUnit: UInt32 = 0
-      scanner.scanHexInt32(&codeUnit)
-      return UInt16(codeUnit)
-    }
-
-    let text = String(utf16CodeUnits: codeUnits, count: codeUnits.count)
-
-    let textRange = selectedTextRange ?? UITextRange()
-    let selRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
-                           length: offset(from: textRange.start, to: textRange.end))
-
-    if dn <= 0 {
-      if selRange.length == 0 {
-        insertText(text)
-      } else {
-        self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: text)
-      }
-    } else {
-      if s.isEmpty {
-        for _ in 0..<dn {
-          deleteBackward()
-        }
-      } else {
-        if selRange.length == 0 {
-          for _ in 0..<dn {
-            deleteBackward()
-          }
-          insertText(text)
-        } else {
-          self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: text)
-        }
-      }
-    }
-
-    // Workaround for iOS 7 UITextView scroll bug
-    // TODO check if fixed
-    perform(#selector(self.scroll(toShowSelection:)), with: self, afterDelay: 0.1)
-    // Smaller delays are unreliable.
-  }
-
-  // MARK: - UITextViewDelegate Hooks
   public override var selectedTextRange: UITextRange? {
     didSet {
       Manager.shared.setSelectionRange(selectedRange, manually: false)
     }
-  }
-
-  public func textViewDidChangeSelection(_ textView: UITextView) {
-    // Workaround for iOS 7 UITextView scroll bug
-    scroll(toCarret: textView)
-    scrollRangeToVisible(textView.selectedRange)
-  }
-
-  public func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
-    let leftToRightMark = "\u{200e}"
-    let rightToLeftMark = "\u{200f}" // or "\u{202e}"
-    let textWD = baseWritingDirection(for: beginningOfDocument, in: .forward)
-
-    let isRTL: Bool
-    if let keyboardID = Manager.shared.keyboardID,
-       let languageID = Manager.shared.languageID {
-      isRTL = Manager.shared.isRTLKeyboard(withID: keyboardID, languageID: languageID) ?? false
-    } else {
-      isRTL = false
-    }
-    if isRTL {
-      if textWD != .rightToLeft {
-        if text.hasPrefix(leftToRightMark) {
-          text = String(text.utf16.dropFirst())
-        }
-
-        if text.isEmpty || !text.hasPrefix(rightToLeftMark) {
-          text = "\(rightToLeftMark)\(text!)"
-        }
-        makeTextWritingDirectionRightToLeft(nil)
-      }
-    } else {
-      if textWD != .leftToRight {
-        if textWD != .leftToRight {
-          if text.hasPrefix(rightToLeftMark) {
-            text = String(text.utf16.dropFirst())
-          }
-
-          if text.isEmpty || !text.hasPrefix(leftToRightMark) {
-            text = "\(leftToRightMark)\(text!)"
-          }
-          makeTextWritingDirectionLeftToRight(nil)
-        }
-      }
-    }
-
-    return true
-  }
-
-  public func textViewDidBeginEditing(_ textView: UITextView) {
-    Manager.shared.webDelegate = self
-
-    let fontName: String?
-    if let keyboardID = Manager.shared.keyboardID,
-       let languageID = Manager.shared.languageID {
-      fontName = Manager.shared.fontNameForKeyboard(withID: keyboardID, languageID: languageID)
-    } else {
-      fontName = nil
-    }
-    let fontSize = font?.pointSize ?? UIFont.systemFontSize
-    if let fontName = fontName {
-      font = UIFont(name: fontName, size: fontSize)
-    } else {
-      font = UIFont.systemFont(ofSize: fontSize)
-    }
-
-    Manager.shared.kmLog("TextView setFont: \(String(describing: font?.familyName))",
-      checkDebugPrinting: true)
-
-    // copy this textView's text to the webview
-    Manager.shared.setText(text)
-    Manager.shared.setSelectionRange(selectedRange, manually: false)
-    Manager.shared.kmLog(
-      "TextView: \(self.debugDescription) Became first responder. Value: \(text.debugDescription)",
-      checkDebugPrinting: true)
-  }
-
-  public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
-                       replacementText text: String) -> Bool {
-    // Enable text update to catch copy/paste operations
-    shouldUpdateKMText = true
-    return true
-  }
-
-  public func textViewDidChange(_ textView: UITextView) {
-    if shouldUpdateKMText {
-      // Catches copy/paste operations
-      Manager.shared.setText(textView.text)
-      Manager.shared.setSelectionRange(textView.selectedRange, manually: false)
-      shouldUpdateKMText = false
-    }
-  }
-
-  public func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
-    if textView == self {
-      resignFirstResponder()
-    }
-    return true
   }
 
   // MARK: - Keyman notifications
@@ -364,5 +182,153 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
   // MARK: - Private Methods
   @objc func enableInputClickSound() {
     isInputClickSoundEnabled = true
+  }
+}
+
+// MARK: - KeymanWebDelegate
+extension TextView: KeymanWebDelegate {
+  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
+    if Manager.shared.isSubKeysMenuVisible {
+      return
+    }
+
+    if isInputClickSoundEnabled {
+      AudioServicesPlaySystemSound(0x450)
+
+      // Disable input click sound for 0.1 second to ensure it plays for single key stroke.
+      isInputClickSoundEnabled = false
+      perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
+    }
+
+    let textRange = selectedTextRange ?? UITextRange()
+    let selRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
+                           length: offset(from: textRange.start, to: textRange.end))
+
+    if selRange.length != 0 {
+      self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: newText)
+    } else {
+      for _ in 0..<numCharsToDelete {
+        deleteBackward()
+      }
+      insertText(newText)
+    }
+
+    // Workaround for iOS 7 UITextView scroll bug
+    // TODO check if fixed
+    perform(#selector(self.scroll(toShowSelection:)), with: self, afterDelay: 0.1)
+    // Smaller delays are unreliable.
+  }
+
+  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
+    dismissKeyboard()
+  }
+
+  func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
+    if let viewController = viewController {
+      Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
+    } else {
+      Manager.shared.switchToNextKeyboard()
+    }
+  }
+}
+
+// MARK: - UITextViewDelegate
+extension TextView: UITextViewDelegate {
+  public func textViewDidChangeSelection(_ textView: UITextView) {
+    // Workaround for iOS 7 UITextView scroll bug
+    scroll(toCarret: textView)
+    scrollRangeToVisible(textView.selectedRange)
+  }
+
+  public func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+    let leftToRightMark = "\u{200e}"
+    let rightToLeftMark = "\u{200f}" // or "\u{202e}"
+    let textWD = baseWritingDirection(for: beginningOfDocument, in: .forward)
+
+    let isRTL: Bool
+    if let keyboardID = Manager.shared.keyboardID,
+       let languageID = Manager.shared.languageID {
+      isRTL = Manager.shared.isRTLKeyboard(withID: keyboardID, languageID: languageID) ?? false
+    } else {
+      isRTL = false
+    }
+    if isRTL {
+      if textWD != .rightToLeft {
+        if text.hasPrefix(leftToRightMark) {
+          text = String(text.utf16.dropFirst())
+        }
+
+        if text.isEmpty || !text.hasPrefix(rightToLeftMark) {
+          text = "\(rightToLeftMark)\(text!)"
+        }
+        makeTextWritingDirectionRightToLeft(nil)
+      }
+    } else {
+      if textWD != .leftToRight {
+        if textWD != .leftToRight {
+          if text.hasPrefix(rightToLeftMark) {
+            text = String(text.utf16.dropFirst())
+          }
+
+          if text.isEmpty || !text.hasPrefix(leftToRightMark) {
+            text = "\(leftToRightMark)\(text!)"
+          }
+          makeTextWritingDirectionLeftToRight(nil)
+        }
+      }
+    }
+
+    return true
+  }
+
+  public func textViewDidBeginEditing(_ textView: UITextView) {
+    Manager.shared.keymanWebDelegate = self
+
+    let fontName: String?
+    if let keyboardID = Manager.shared.keyboardID,
+       let languageID = Manager.shared.languageID {
+      fontName = Manager.shared.fontNameForKeyboard(withID: keyboardID, languageID: languageID)
+    } else {
+      fontName = nil
+    }
+    let fontSize = font?.pointSize ?? UIFont.systemFontSize
+    if let fontName = fontName {
+      font = UIFont(name: fontName, size: fontSize)
+    } else {
+      font = UIFont.systemFont(ofSize: fontSize)
+    }
+
+    Manager.shared.kmLog("TextView setFont: \(String(describing: font?.familyName))",
+      checkDebugPrinting: true)
+
+    // copy this textView's text to the webview
+    Manager.shared.setText(text)
+    Manager.shared.setSelectionRange(selectedRange, manually: false)
+    Manager.shared.kmLog(
+      "TextView: \(self.debugDescription) Became first responder. Value: \(text.debugDescription)",
+      checkDebugPrinting: true)
+  }
+
+  public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
+                       replacementText text: String) -> Bool {
+    // Enable text update to catch copy/paste operations
+    shouldUpdateKMText = true
+    return true
+  }
+
+  public func textViewDidChange(_ textView: UITextView) {
+    if shouldUpdateKMText {
+      // Catches copy/paste operations
+      Manager.shared.setText(textView.text)
+      Manager.shared.setSelectionRange(textView.selectedRange, manually: false)
+      shouldUpdateKMText = false
+    }
+  }
+
+  public func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
+    if textView == self {
+      resignFirstResponder()
+    }
+    return true
   }
 }
