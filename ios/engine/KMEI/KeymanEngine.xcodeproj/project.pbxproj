@@ -71,7 +71,7 @@
 		C06D37601F82095200F61AE0 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F27FCB51157FE3CE00FBBA20 /* Keyman.bundle */; };
 		C075EB061F8EFF870041F4BD /* String+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C075EB051F8EFF870041F4BD /* String+Helpers.swift */; };
 		C07BCCC31FCC06CF00F3ECBB /* INIParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07BCCC21FCC06CF00F3ECBB /* INIParser.swift */; };
-		C07BCCC61FCC0B0700F3ECBB /* INIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07BCCC51FCC0B0700F3ECBB /* INIError.swift */; };
+		C07BCCC61FCC0B0700F3ECBB /* INIParsingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07BCCC51FCC0B0700F3ECBB /* INIParsingError.swift */; };
 		C07BCCCE1FCC10BB00F3ECBB /* INIParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07BCCCD1FCC10BB00F3ECBB /* INIParserTests.swift */; };
 		C07BCCD01FCC10BB00F3ECBB /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */; };
 		C082CE151F90AFD400860F02 /* Collection+SafeAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = C082CE141F90AFD400860F02 /* Collection+SafeAccess.swift */; };
@@ -200,7 +200,7 @@
 		C075EB051F8EFF870041F4BD /* String+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Helpers.swift"; sourceTree = "<group>"; };
 		C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubKeysView.swift; sourceTree = "<group>"; };
 		C07BCCC21FCC06CF00F3ECBB /* INIParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = INIParser.swift; sourceTree = "<group>"; };
-		C07BCCC51FCC0B0700F3ECBB /* INIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = INIError.swift; sourceTree = "<group>"; };
+		C07BCCC51FCC0B0700F3ECBB /* INIParsingError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = INIParsingError.swift; sourceTree = "<group>"; };
 		C07BCCCB1FCC10BA00F3ECBB /* KeymanEngineTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeymanEngineTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C07BCCCD1FCC10BB00F3ECBB /* INIParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = INIParserTests.swift; sourceTree = "<group>"; };
 		C07BCCCF1FCC10BB00F3ECBB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -459,7 +459,7 @@
 			isa = PBXGroup;
 			children = (
 				C07BCCC21FCC06CF00F3ECBB /* INIParser.swift */,
-				C07BCCC51FCC0B0700F3ECBB /* INIError.swift */,
+				C07BCCC51FCC0B0700F3ECBB /* INIParsingError.swift */,
 			);
 			name = INI;
 			sourceTree = "<group>";
@@ -883,7 +883,7 @@
 				C0324B8D1F87480700AF3785 /* TextFieldDelegateProxy.swift in Sources */,
 				C075EB061F8EFF870041F4BD /* String+Helpers.swift in Sources */,
 				C045148A1F85DF9100D88416 /* InputViewController.swift in Sources */,
-				C07BCCC61FCC0B0700F3ECBB /* INIError.swift in Sources */,
+				C07BCCC61FCC0B0700F3ECBB /* INIParsingError.swift in Sources */,
 				C06D37461F81F5C400F61AE0 /* PopoverView.swift in Sources */,
 				C007C4651F9F52D8006461B9 /* LanguagesAPICall.swift in Sources */,
 				C024C9941FA6EB470060583B /* NotificationName.swift in Sources */,

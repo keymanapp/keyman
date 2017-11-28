@@ -1,5 +1,5 @@
 //
-//  INIError.swift
+//  INIParsingError.swift
 //  KeymanEngine
 //
 //  Created by Gabriel Wong on 2017-11-27.
@@ -8,10 +8,15 @@
 
 import Foundation
 
-enum INIError: Error {
+enum INIParsingError: Error {
   case charactersAfterSectionHeader
   case duplicateSection
   case duplicateKey
   case missingSectionClosingBracket
   case missingEqualSignInProperty
+}
+
+enum INIValueParsingError: Error {
+  case unterminatedQuote
+  case invalidTextAdjacentToQuote
 }

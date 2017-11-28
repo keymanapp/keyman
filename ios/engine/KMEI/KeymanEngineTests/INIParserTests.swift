@@ -120,6 +120,18 @@ class INIParserTests: XCTestCase {
     XCTAssertEqual(expected as NSObject, actual as NSObject)
   }
 
+  func testEmpty() throws {
+    let actual = try parser.parse("")
+    let expected: [String: [String: String]] = [:]
+    XCTAssertEqual(expected as NSObject, actual as NSObject)
+  }
+
+  func testEmptyProperty() throws {
+    let actual = try parser.parse("foo=")
+    let expected = ["": ["foo": ""]]
+    XCTAssertEqual(expected as NSObject, actual as NSObject)
+  }
+
   func testCharactersAfterSectionHeader() {
     XCTAssertThrowsError(try parser.parse("[section]invalid"))
     XCTAssertThrowsError(try parser.parse("[section]]"))
@@ -172,5 +184,68 @@ class INIParserTests: XCTestCase {
       noequalsign
     """
     XCTAssertThrowsError(try parser.parse(string))
+  }
+
+  func testUnquoteUnquotedString() throws {
+    XCTAssertEqual("foo", try parser.unquotedString("foo"))
+  }
+
+  func testUnquoteQuotedString() throws {
+    XCTAssertEqual("foo", try parser.unquotedString("\"foo\""))
+  }
+
+  func testUnquoteWithoutClosingQuote() {
+    XCTAssertThrowsError(try parser.unquotedString("\"foo"))
+    XCTAssertThrowsError(try parser.unquotedString("\""))
+  }
+
+  func testUnquoteWithMultipleQuotes() {
+    XCTAssertThrowsError(try parser.unquotedString("\"foo\"\""))
+    XCTAssertThrowsError(try parser.unquotedString("\"\"foo\"\""))
+    XCTAssertThrowsError(try parser.unquotedString("\"foo\"bar\""))
+    XCTAssertThrowsError(try parser.unquotedString("\"foo\"\"bar\""))
+    XCTAssertThrowsError(try parser.unquotedString("\"foo\"baz\"bar\""))
+  }
+
+  func testUnquoteWithCharactersBeforeQuote() {
+    XCTAssertThrowsError(try parser.unquotedString("foo\"bar\""))
+    XCTAssertThrowsError(try parser.unquotedString("foo\""))
+  }
+
+  func testUnquoteWithCharactersAfterQuote() {
+    XCTAssertThrowsError(try parser.unquotedString("\"foo\"bar"))
+  }
+
+  func testComponents() throws {
+    XCTAssertEqual(["foo"], try parser.components("foo"))
+    XCTAssertEqual(["foo"], try parser.components("\"foo\""))
+    XCTAssertEqual(["foo", "bar"], try parser.components("foo,bar"))
+    XCTAssertEqual(["foo,bar"], try parser.components("\"foo,bar\""))
+    XCTAssertEqual(["foo", "bar"], try parser.components("\"foo\",bar"))
+    XCTAssertEqual(["foo", "bar"], try parser.components("foo,\"bar\""))
+  }
+
+  func testEmptyComponents() throws {
+    XCTAssertEqual([""], try parser.components(""))
+    XCTAssertEqual([""], try parser.components("\"\""))
+    XCTAssertEqual(["", ""], try parser.components(","))
+    XCTAssertEqual(["", ""], try parser.components("\"\","))
+    XCTAssertEqual(["", ""], try parser.components(",\"\""))
+    XCTAssertEqual(["foo", "", "bar"], try parser.components("foo,,bar"))
+    XCTAssertEqual(["foo", ""], try parser.components("foo,"))
+    XCTAssertEqual(["", "foo"], try parser.components(",foo"))
+  }
+
+  func testComponentsWithUnterminatedQuote() {
+    XCTAssertThrowsError(try parser.components("\""))
+    XCTAssertThrowsError(try parser.components("\"foo"))
+    XCTAssertThrowsError(try parser.components("\"foo,"))
+    XCTAssertThrowsError(try parser.components("\"foo\",\""))
+  }
+
+  func testComponentsWithTextAdjacentToQuote() {
+    XCTAssertThrowsError(try parser.components("foo\"bar\""))
+    XCTAssertThrowsError(try parser.components("\"foo\"bar"))
+    XCTAssertThrowsError(try parser.components("foo\"bar\"baz"))
   }
 }

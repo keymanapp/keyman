@@ -22,7 +22,7 @@ class INIParser {
     for line in lines {
       if let newSection = try parseHeader(line) {
         guard result[newSection] == nil else {
-          throw INIError.duplicateSection
+          throw INIParsingError.duplicateSection
         }
         result[newSection] = [:]
         section = newSection
@@ -32,7 +32,7 @@ class INIParser {
       let (key, value) = try parseProperty(line)
       var sectionProperties = result[section] ?? [:]
       guard sectionProperties[key] == nil else {
-        throw INIError.duplicateKey
+        throw INIParsingError.duplicateKey
       }
       sectionProperties[key] = value
       result[section] = sectionProperties
@@ -46,20 +46,71 @@ class INIParser {
       return nil
     }
     guard let closingBracketIndex = line.index(of: "]") else {
-      throw INIError.missingSectionClosingBracket
+      throw INIParsingError.missingSectionClosingBracket
     }
     guard line.index(after: closingBracketIndex) == line.endIndex else {
-      throw INIError.charactersAfterSectionHeader
+      throw INIParsingError.charactersAfterSectionHeader
     }
     return String(line[line.index(after: line.startIndex)..<closingBracketIndex])
   }
 
   private func parseProperty(_ line: String) throws -> (String, String) {
     guard let equalIndex = line.index(of: "=") else {
-      throw INIError.missingEqualSignInProperty
+      throw INIParsingError.missingEqualSignInProperty
     }
     let key = String(line[..<equalIndex])
     let value = String(line[line.index(after: equalIndex)...])
     return (key, value)
+  }
+
+  func unquotedString(_ string: String) throws -> String {
+    if string.hasPrefix("\"") {
+      let withoutOpeningQuote = string.dropFirst()
+      guard let closingQuoteIndex = withoutOpeningQuote.index(of: "\"") else {
+        throw INIValueParsingError.unterminatedQuote
+      }
+      guard withoutOpeningQuote.index(after: closingQuoteIndex) == withoutOpeningQuote.endIndex else {
+        throw INIValueParsingError.invalidTextAdjacentToQuote
+      }
+      return String(withoutOpeningQuote.dropLast())
+    }
+    guard string.index(of: "\"") == nil else {
+      throw INIValueParsingError.invalidTextAdjacentToQuote
+    }
+    return string
+  }
+
+  func components(_ string: String) throws -> [String] {
+    var components: [String] = []
+    var remaining = Substring(string)
+    var currentComponent: String?
+
+    while !remaining.isEmpty {
+      if remaining.hasPrefix(",") {
+        remaining = remaining.dropFirst()
+        components.append(currentComponent ?? "")
+        currentComponent = nil
+        continue
+      }
+
+      guard currentComponent == nil else {
+        throw INIValueParsingError.invalidTextAdjacentToQuote
+      }
+
+      if remaining.hasPrefix("\"") {
+        let withoutOpeningQuote = remaining.dropFirst()
+        guard let closingQuoteIndex = withoutOpeningQuote.index(of: "\"") else {
+          throw INIValueParsingError.unterminatedQuote
+        }
+        currentComponent = String(withoutOpeningQuote[..<closingQuoteIndex])
+        remaining = withoutOpeningQuote[withoutOpeningQuote.index(after: closingQuoteIndex)...]
+      } else {
+        let endIndex = remaining.index { $0 == "," || $0 == "\"" } ?? remaining.endIndex
+        currentComponent = String(remaining[..<endIndex])
+        remaining = remaining[endIndex...]
+      }
+    }
+    components.append(currentComponent ?? "")
+    return components
   }
 }
