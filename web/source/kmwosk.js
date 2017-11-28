@@ -2367,10 +2367,6 @@ if(!window['keyman']['initialized']) {
      **/
     osk.renameSpecialKey = function(oldText) {
       // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
-      var puaCode = osk.specialCharacters[oldText] ? 0XE000 + osk.specialCharacters[oldText] : oldText;
-      if(puaCode) {
-        console.log("Code: ", puaCode.toString(16), ", character: ", String.fromCharCode(puaCode));
-      }
       return osk.specialCharacters[oldText] ? String.fromCharCode(0XE000 + osk.specialCharacters[oldText]) : oldText;
     }
 
