@@ -100,8 +100,6 @@ begin
   inherited;
   for i := 0 to Files.Count - 1 do
     Files[i].FileName := ExpandFileNameEx(FileName, Files[i].FileName);
-  for i := 0 to Options.Buttons.Count - 1 do
-    Options.Buttons[i].UpdateButtonSize;
 end;
 
 procedure TKPSFile.DoLoadXML(ARoot: IXMLNode);
@@ -113,8 +111,6 @@ begin
   if FileName <> '' then
     for i := 0 to Files.Count - 1 do
       Files[i].FileName := ExpandFileNameEx(FileName, Files[i].FileName);
-  for i := 0 to Options.Buttons.Count - 1 do
-    Options.Buttons[i].UpdateButtonSize;
 
   FStrings.Clear;
   ANode := ARoot.ChildNodes['Strings'];

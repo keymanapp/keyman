@@ -99,65 +99,6 @@ type
   TPackageContentFile = class;
   TPackageContentFileList = class;
 
-  { Package Image Buttons }
-
-  TPackageImageButtonType = (pibtInstall, pibtCancel, pibtAbout, pibtCustom);
-
-  TPackageImageButton = class
-  private
-    FPackage: TPackage;
-    FURL: WideString;
-    FCaption: WideString;
-    FButtonType: TPackageImageButtonType;
-    FHoverImageFile: TPackageContentFile;
-    FDownImageFile: TPackageContentFile;
-    FStandardImageFile: TPackageContentFile;
-    FHeight: Integer;
-    FLeft: Integer;
-    FWidth: Integer;
-    FTop: Integer;
-    procedure StandardImageRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
-    procedure HoverImageRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
-    procedure DownImageRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
-    procedure SetButtonType(const Value: TPackageImageButtonType);
-    procedure SetDownImageFile(const Value: TPackageContentFile);
-    procedure SetHoverImageFile(const Value: TPackageContentFile);
-    procedure SetStandardImageFile(const Value: TPackageContentFile);
-  public
-    constructor Create(APackage: TPackage);
-    destructor Destroy; override;
-    procedure UpdateButtonSize;
-    procedure Assign(Source: TPackageImageButton);
-    property ButtonType: TPackageImageButtonType read FButtonType write SetButtonType;
-    property Caption: WideString read FCaption write FCaption;
-    property URL: WideString read FURL write FURL;
-    property Left: Integer read FLeft write FLeft;
-    property Top: Integer read FTop write FTop;
-    property Width: Integer read FWidth write FWidth;
-    property Height: Integer read FHeight write FHeight;
-    property StandardImageFile: TPackageContentFile read FStandardImageFile write SetStandardImageFile;
-    property HoverImageFile: TPackageContentFile read FHoverImageFile write SetHoverImageFile;
-    property DownImageFile: TPackageContentFile read FDownImageFile write SetDownImageFile;
-  end;
-
-  TPackageImageButtonList = class(TObjectList)
-  private
-    FPackage: TPackage;
-    procedure AddStandardButtons;
-  protected
-    function Get(Index: Integer): TPackageImageButton;
-    procedure Put(Index: Integer; Item: TPackageImageButton);
-  public
-    constructor Create(APackage: TPackage);
-    procedure Assign(Source: TPackageImageButtonList); virtual;
-    procedure LoadIni(AIni: TIniFile); virtual;
-    procedure SaveIni(AIni: TIniFile); virtual;
-    procedure LoadXML(ARoot: IXMLNode); virtual;
-    procedure SaveXML(ARoot: IXMLNode); virtual;
-    property Items[Index: Integer]: TPackageImageButton read Get write Put; default;
-    function Add(Item: TPackageImageButton): Integer;
-  end;
-
   { I2002 - Package registry keys }
 
   TPackageRegistryKeyValueType = (rkvtString, rkvtDWord);
@@ -205,7 +146,6 @@ type
     FExecuteProgram: WideString;
     FReadmeFile: TPackageContentFile;
     FGraphicFile: TPackageContentFile;
-    FButtons: TPackageImageButtonList;
     FLoadLegacy: Boolean;
     FRegistryKeys: TPackageRegistryKeyList;
     procedure SetReadmeFile(const Value: TPackageContentFile);
@@ -231,7 +171,6 @@ type
     property ExecuteProgram: WideString read FExecuteProgram write SetExecuteProgram;
     property ReadmeFile: TPackageContentFile read FReadmeFile write SetReadmeFile;
     property GraphicFile: TPackageContentFile read FGraphicFile write SetGraphicFile;
-    property Buttons: TPackageImageButtonList read FButtons;
     property RegistryKeys: TPackageRegistryKeyList read FRegistryKeys;
 
   end;
@@ -399,6 +338,8 @@ type
     StartMenu: TPackageStartMenu;
     Files: TPackageContentFileList;
     Info: TPackageInfoEntryList;
+
+
     property FileName: WideString read FFileName write FFileName;
     procedure Assign(Source: TPackage); virtual;
     constructor Create;
@@ -418,9 +359,6 @@ type
   end;
 
 const
-  PackageImageButtonTypeName: array[TPackageImageButtonType] of WideString = ('install', 'cancel', 'about', 'custom');
-  STooManyButtons = 'At most %d buttons are allowed in the dialog.';
-  MAX_PACKAGE_BUTTONS = 16;
   PackageStartMenuEntryLocationName: array[TPackageStartMenuEntryLocation] of WideString = ('Start Menu', 'Desktop'); //, 'Quick Launch Toolbar');
 
 implementation
@@ -454,7 +392,6 @@ begin
   if Assigned(Source.GraphicFile)
     then GraphicFile := FPackage.Files.FromFileName(Source.GraphicFile.FileName)
     else GraphicFile := nil;
-  FButtons.Assign(Source.Buttons);
   FRegistryKeys.Assign(Source.RegistryKeys);
 end;
 
@@ -463,7 +400,6 @@ begin
   inherited Create;
   FLoadLegacy := True;
   FPackage := APackage;
-  FButtons := TPackageImageButtonList.Create(FPackage);
   FRegistryKeys := TPackageRegistryKeyList.Create(FPackage);
   FFileVersion := SKeymanVersion;
 end;
@@ -472,7 +408,6 @@ destructor TPackageOptions.Destroy;
 begin
   ReadmeFile := nil;
   GraphicFile := nil;
-  FButtons.Free;
   FRegistryKeys.Free;
   inherited Destroy;
 end;
@@ -495,7 +430,6 @@ begin
   GraphicFile :=                FPackage.Files.FromFileName(VarToWideStr(ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
-  FButtons.LoadXML(ARoot);
   FRegistryKeys.LoadXML(ARoot);
 end;
 
@@ -507,7 +441,6 @@ begin
     ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue := ReadmeFile.RelativeFileName;
   if Assigned(GraphicFile) then
     ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue := GraphicFile.RelativeFileName;
-  FButtons.SaveXML(ARoot);
   FRegistryKeys.SaveXML(ARoot);
 end;
 
@@ -519,7 +452,6 @@ begin
   GraphicFile :=                FPackage.Files.FromFileName(AIni.ReadString('Package', 'GraphicFile', ''));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
-  if FLoadLegacy then FButtons.LoadIni(AIni);
   FRegistryKeys.LoadIni(AIni);
 end;
 
@@ -531,7 +463,6 @@ begin
     AIni.WriteString('Package', 'ReadMeFile', ReadmeFile.RelativeFileName);
   if Assigned(GraphicFile) then
     AIni.WriteString('Package', 'GraphicFile', GraphicFile.RelativeFileName);
-  FButtons.SaveIni(AIni);
   FRegistryKeys.SaveIni(AIni);
 end;
 
@@ -1433,354 +1364,6 @@ begin
       FNotifyObjects.Delete(i);
       Exit;
     end;
-end;
-
-{ TPackageImageButton }
-
-constructor TPackageImageButton.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
-end;
-
-destructor TPackageImageButton.Destroy;
-begin
-  StandardImageFile := nil;
-  DownImageFile := nil;
-  HoverImageFile := nil;
-  inherited Destroy;
-end;
-
-procedure TPackageImageButton.UpdateButtonSize;
-begin
-  if not Assigned(FStandardImageFile) or
-    not FileExists(FStandardImageFile.FileName) then
-  begin
-    FWidth := 64;
-    FHeight := 24;
-  end
-  else
-  begin
-    try
-      with Vcl.Graphics.TBitmap.Create do
-      try
-        LoadFromFile(FStandardImageFile.FileName);
-        FWidth := Width;
-        FHeight := Height;
-      finally
-        Free;
-      end;
-    except
-      FWidth := 64;
-      FHeight := 24;
-    end;
-  end;
-end;
-
-procedure TPackageImageButton.DownImageRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
-begin
-  FDownImageFile := nil;
-end;
-
-procedure TPackageImageButton.HoverImageRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
-begin
-  FHoverImageFile := nil;
-end;
-
-procedure TPackageImageButton.StandardImageRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
-begin
-  FStandardImageFile := nil;
-end;
-
-procedure TPackageImageButton.SetButtonType(const Value: TPackageImageButtonType);
-begin
-  FButtonType := Value;
-  case Value of
-    pibtInstall: Caption := '&Install';
-    pibtCancel:  Caption := 'Cancel';
-    pibtAbout:   Caption := '&About...';
-  end;
-end;
-
-procedure TPackageImageButton.SetDownImageFile(const Value: TPackageContentFile);
-begin
-  if Assigned(FDownImageFile) then FDownImageFile.RemoveNotifyObject(DownImageRemoved);
-  if not Assigned(Value) then
-    FDownImageFile := nil
-  else
-  begin
-    if Value.FPackage <> FPackage then raise EPackageInfo.CreateFmt(SFileNotOwnedCorrectly, [Value]);
-    FDownImageFile := Value;
-    FDownImageFile.AddNotifyObject(DownImageRemoved);
-  end;
-end;
-
-procedure TPackageImageButton.SetHoverImageFile(const Value: TPackageContentFile);
-begin
-  if Assigned(FHoverImageFile) then FHoverImageFile.RemoveNotifyObject(HoverImageRemoved);
-  if not Assigned(Value) then
-    FHoverImageFile := nil
-  else
-  begin
-    if Value.FPackage <> FPackage then raise EPackageInfo.CreateFmt(SFileNotOwnedCorrectly, [Value]);
-    FHoverImageFile := Value;
-    FHoverImageFile.AddNotifyObject(HoverImageRemoved);
-  end;
-end;
-
-procedure TPackageImageButton.SetStandardImageFile(const Value: TPackageContentFile);
-begin
-  if Assigned(FStandardImageFile) then FStandardImageFile.RemoveNotifyObject(StandardImageRemoved);
-  if not Assigned(Value) then
-    FStandardImageFile := nil
-  else
-  begin
-    if Value.FPackage <> FPackage then raise EPackageInfo.CreateFmt(SFileNotOwnedCorrectly, [Value]);
-    FStandardImageFile := Value;
-    FStandardImageFile.AddNotifyObject(StandardImageRemoved);
-  end;
-  UpdateButtonSize;
-end;
-
-procedure TPackageImageButton.Assign(Source: TPackageImageButton);
-begin
-  FButtonType := Source.ButtonType;
-  FCaption := Source.Caption;
-  FURL := Source.URL;
-  FLeft := Source.Left;
-  FTop := Source.Top;
-  FWidth := Source.Width;
-  FHeight := Source.Height;
-  if Assigned(Source.StandardImageFile)
-    then StandardImageFile := FPackage.Files.FromFileName(Source.StandardImageFile.FileName)
-    else StandardImageFile := nil;
-  if Assigned(Source.HoverImageFile)
-    then HoverImageFile := FPackage.Files.FromFileName(Source.HoverImageFile.FileName)
-    else HoverImageFile := nil;
-  if Assigned(Source.DownImageFile)
-    then DownImageFile := FPackage.Files.FromFileName(Source.DownImageFile.FileName)
-    else DownImageFile := nil;
-end;
-
-{ TPackageImageButtonList }
-
-function TPackageImageButtonList.Add(Item: TPackageImageButton): Integer;
-begin
-  Result := inherited Add(Item);
-end;
-
-function TPackageImageButtonList.Get(Index: Integer): TPackageImageButton;
-begin
-  Result := TPackageImageButton(inherited Get(Index));
-end;
-
-procedure TPackageImageButtonList.Put(Index: Integer; Item: TPackageImageButton);
-begin
-  inherited Put(Index, Item);
-end;
-
-procedure TPackageImageButtonList.Assign(Source: TPackageImageButtonList);
-var
-  i: Integer;
-  pib: TPackageImageButton;
-begin
-  Clear;
-  for i := 0 to Source.Count - 1 do
-  begin
-    pib := TPackageImageButton.Create(FPackage);
-    pib.Assign(Source[i]);
-    Add(pib);
-  end;
-end;
-
-constructor TPackageImageButtonList.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
-  AddStandardButtons;
-end;
-
-procedure TPackageImageButtonList.AddStandardButtons;
-var
-  pib: TPackageImageButton;
-  finstall, fcancel, fabout: Boolean;
-  i: Integer;
-begin
-  finstall := False;
-  fcancel := False;
-  fabout := False;
-  for i := 0 to Count - 1 do
-  begin
-    if Items[i].ButtonType = pibtInstall then finstall := True;
-    if Items[i].ButtonType = pibtCancel then fcancel := True;
-    if Items[i].ButtonType = pibtAbout then fabout := True;
-  end;
-
-  if not finstall then
-  begin
-    pib := TPackageImageButton.Create(FPackage);
-    pib.ButtonType := pibtInstall;
-    Add(pib);
-  end;
-
-  if not fcancel then
-  begin
-    pib := TPackageImageButton.Create(FPackage);
-    pib.ButtonType := pibtCancel;
-    Add(pib);
-  end;
-
-  if not fabout then
-  begin
-    pib := TPackageImageButton.Create(FPackage);
-    pib.ButtonType := pibtAbout;
-    Add(pib);
-  end;
-end;
-
-procedure TPackageImageButtonList.LoadXML(ARoot: IXMLNode);
-var
-  t: WideString;
-  i, j: Integer;
-  pib: TPackageImageButton;
-  pibt, FButtonType: TPackageImageButtonType;
-  AButtonNode, ANode: IXMLNode;
-begin
-  Clear;
-
-  ANode := ARoot.ChildNodes['Buttons'];
-  for i := 0 to ANode.ChildNodes.Count - 1 do
-  begin
-    AButtonNode := ANode.ChildNodes[i];
-    t := LowerCase(VarToWideStr(AButtonNode.ChildNodes['ButtonType'].NodeValue));
-
-    FButtonType := pibtCustom;
-    for pibt := Low(TPackageImageButtonType) to High(TPackageImageButtonType) do
-      if t = PackageImageButtonTypeName[pibt] then FButtonType := pibt;
-
-    pib := nil;
-    if FButtonType <> pibtCustom then
-      for j := 0 to Count - 1 do
-        if Items[j].ButtonType = FButtonType then
-        begin
-          pib := Items[j];
-          Break;
-        end;
-
-    if not Assigned(pib) then
-    begin
-      pib := TPackageImageButton.Create(FPackage);
-      pib.ButtonType := FButtonType;
-      Add(pib);
-    end;
-
-    pib.Caption := VarToWideStr(AButtonNode.ChildNodes['Caption'].NodeValue);
-    pib.URL := VarToWideStr(AButtonNode.ChildNodes['URL'].NodeValue);
-    pib.Left := StrToInt(VarToWideStr(AButtonNode.ChildNodes['Left'].NodeValue));
-    pib.Top := StrToInt(VarToWideStr(AButtonNode.ChildNodes['Top'].NodeValue));
-
-    pib.StandardImageFile := FPackage.Files.FromFileName(VarToWideStr(AButtonNode.ChildNodes['StandardImage'].NodeValue));
-    pib.HoverImageFile := FPackage.Files.FromFileName(VarToWideStr(AButtonNode.ChildNodes['HoverImage'].NodeValue));
-    pib.DownImageFile := FPackage.Files.FromFileName(VarToWideStr(AButtonNode.ChildNodes['DownImage'].NodeValue));
-  end;
-
-  AddStandardButtons; // Add the standard buttons if they are not there already
-end;
-
-procedure TPackageImageButtonList.SaveXML(ARoot: IXMLNode);
-var
-  i: Integer;
-  AButtonNode, ANode: IXMLNode;
-begin
-  ANode := ARoot.ChildNodes['Buttons'];
-  for i := 0 to Count - 1 do
-  begin
-    AButtonNode := ANode.AddChild('Button');
-    AButtonNode.ChildNodes['ButtonType'].NodeValue := PackageImageButtonTypeName[Items[i].ButtonType];
-    AButtonNode.ChildNodes['Caption'].NodeValue := Items[i].Caption;
-    AButtonNode.ChildNodes['URL'].NodeValue := Items[i].URL;
-    AButtonNode.ChildNodes['Left'].NodeValue := Items[i].Left;
-    AButtonNode.ChildNodes['Top'].NodeValue := Items[i].Top;
-
-    if Assigned(Items[i].StandardImageFile) then
-      AButtonNode.ChildNodes['StandardImage'].NodeValue := Items[i].StandardImageFile.RelativeFileName;
-    if Assigned(Items[i].HoverImageFile) then
-      AButtonNode.ChildNodes['HoverImage'].NodeValue := Items[i].HoverImageFile.RelativeFileName;
-    if Assigned(Items[i].DownImageFile) then
-      AButtonNode.ChildNodes['DownImage'].NodeValue := Items[i].DownImageFile.RelativeFileName;
-  end;
-end;
-
-procedure TPackageImageButtonList.LoadIni(AIni: TIniFile);
-var
-  t, FSection: WideString;
-  i, j, n: Integer;
-  pib: TPackageImageButton;
-  pibt, FButtonType: TPackageImageButtonType;
-begin
-  Clear;
-
-  n := StrToIntDef(AIni.ReadString('Buttons', 'Count', ''), 0);
-  for i := 0 to n - 1 do
-  begin
-    FSection := 'Button-'+IntToStr(i);
-    t := LowerCase(AIni.ReadString(FSection, 'ButtonType', ''));
-
-    FButtonType := pibtCustom;
-    for pibt := Low(TPackageImageButtonType) to High(TPackageImageButtonType) do
-      if t = PackageImageButtonTypeName[pibt] then FButtonType := pibt;
-
-    pib := nil;
-    if FButtonType <> pibtCustom then
-      for j := 0 to Count - 1 do
-        if Items[j].ButtonType = FButtonType then
-        begin
-          pib := Items[j];
-          Break;
-        end;
-
-    if not Assigned(pib) then
-    begin
-      pib := TPackageImageButton.Create(FPackage);
-      pib.ButtonType := FButtonType;
-      Add(pib);
-    end;
-
-    pib.Caption := AIni.ReadString(FSection, 'Caption', '');
-    pib.URL := AIni.ReadString(FSection, 'URL', '');
-    pib.Left := StrToIntDef(AIni.ReadString(FSection, 'Left', '0'), 0);
-    pib.Top := StrToIntDef(AIni.ReadString(FSection, 'Top', '0'), 0);
-
-    pib.StandardImageFile := FPackage.Files.FromFileName(AIni.ReadString(FSection, 'StandardImage', ''));
-    pib.HoverImageFile := FPackage.Files.FromFileName(AIni.ReadString(FSection, 'HoverImage', ''));
-    pib.DownImageFile := FPackage.Files.FromFileName(AIni.ReadString(FSection, 'DownImage', ''));
-  end;
-
-  AddStandardButtons; // Add the standard buttons if they are not there already
-end;
-
-procedure TPackageImageButtonList.SaveIni(AIni: TIniFile);
-var
-  i: Integer;
-  FSection: WideString;
-begin
-  AIni.WriteString('Buttons', 'Count', IntToStr(Count));
-  for i := 0 to Count - 1 do
-  begin
-    FSection := 'Button-'+IntToStr(i);
-    AIni.WriteString(FSection, 'ButtonType', PackageImageButtonTypeName[Items[i].ButtonType]);
-    AIni.WriteString(FSection, 'Caption', Items[i].Caption);
-    AIni.WriteString(FSection, 'URL', Items[i].URL);
-    AIni.WriteString(FSection, 'Left', IntToStr(Items[i].Left));
-    AIni.WriteString(FSection, 'Top', IntToStr(Items[i].Top));
-
-    if Assigned(Items[i].StandardImageFile) then
-      AIni.WriteString(FSection, 'StandardImage', Items[i].StandardImageFile.RelativeFileName);
-    if Assigned(Items[i].HoverImageFile) then
-      AIni.WriteString(FSection, 'HoverImage', Items[i].HoverImageFile.RelativeFileName);
-    if Assigned(Items[i].DownImageFile) then
-      AIni.WriteString(FSection, 'DownImage', Items[i].DownImageFile.RelativeFileName);
-  end;
 end;
 
 { TPackageRegistryKeyList }
