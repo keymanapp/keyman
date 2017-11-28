@@ -1,0 +1,5 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'version 9 keyboard'
+begin Unicode > use(main)
+
+group(main) using keys

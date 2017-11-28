@@ -38,7 +38,9 @@
 }
 
 - (IBAction)configAction:(id)sender {
-    [self.AppDelegate.inputController showPreferences:sender];
+    // Using `showConfigurationWindow` instead of `showPreferences:` because `showPreferences:` is missing in
+    // High Sierra (confirmed missing up to 10.13.1). See: https://bugreport.apple.com/web/?problemID=35422518
+    [self.AppDelegate showConfigurationWindow];
     [self close];
 }
 

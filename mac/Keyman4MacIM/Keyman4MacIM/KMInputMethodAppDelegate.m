@@ -59,18 +59,17 @@ typedef enum {
 @synthesize activeKeyboards = _activeKeyboards;
 @synthesize contextBuffer = _contextBuffer;
 @synthesize alwaysShowOSK = _alwaysShowOSK;
-@synthesize useNullChar = _useNullChar;
 
 - (id)init {
     self = [super init];
     if (self) {
-        // _debugMode = YES; // Disable before release
+        _debugMode = YES; // Disable before release
         [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
                                                            andSelector:@selector(handleURLEvent:withReplyEvent:)
                                                          forEventClass:kInternetEventClass
                                                             andEventID:kAEGetURL];
     }
-    
+
     return self;
 }
 
@@ -545,25 +544,6 @@ typedef enum {
     [self.kme setContextBuffer:self.contextBuffer];
 }
 
-- (void)setUseNullChar:(BOOL)useNullChar {
-    _useNullChar = YES;
-    /*
-    _useNullChar = useNullChar;
-    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    [userData setBool:_useNullChar forKey:@"KMUseNullCharKey"];
-    [userData synchronize];
-    */
-}
-
-- (BOOL)useNullChar {
-    return YES;
-    /*
-    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    _useNullChar = [userData boolForKey:@"KMUseNullCharKey"];
-    return _useNullChar;
-    */
-}
-
 - (void)awakeFromNib {
     [self setKeyboardsSubMenu];
     
@@ -695,6 +675,12 @@ typedef enum {
     return _oskWindow;
 }
 
+- (void)showConfigurationWindow {
+    [self.configWindow.window centerInParent];
+    [self.configWindow.window makeKeyAndOrderFront:nil];
+    [self.configWindow.window setLevel:NSFloatingWindowLevel];
+}
+
 - (void)showOSK {
     [[self.oskWindow window] makeKeyAndOrderFront:nil];
     [[self.oskWindow window] setLevel:NSStatusWindowLevel];
@@ -709,6 +695,14 @@ typedef enum {
 
 - (NSWindowController *)aboutWindow_ {
     return _aboutWindow;
+}
+
+- (NSWindowController *)configWindow {
+    if (_configWindow.window == nil) {
+        _configWindow = [[KMConfigurationWindowController alloc] initWithWindowNibName:@"preferences"];
+    }
+
+    return _configWindow;
 }
 
 - (NSWindowController *)aboutWindow {
@@ -882,7 +876,15 @@ typedef enum {
     }
     
     if (didUnzip) {
+        if (_debugMode) {
+            NSLog(@"Unzipped file: %@", filePath);
+        }
         [self installFontsAtPath:[self.keyboardsPath stringByAppendingPathComponent:folderName]];
+    }
+    else {
+        if (_debugMode) {
+            NSLog(@"Failed to unzip file: %@", filePath);
+        }
     }
     
     return didUnzip;

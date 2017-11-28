@@ -552,12 +552,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     ]
     downloadQueue!.userInfo = commonUserData
 
-    let kbVersion = keyboard.version
-    let keyboardPath = self.keyboardPath(forFilename: keyboardURL.lastPathComponent,
-                                         keyboardVersion: kbVersion)
-
     var request = HTTPDownloadRequest(url: keyboardURL, userInfo: commonUserData)
-    request.destinationFile = keyboardPath?.path
+    request.destinationFile = keyboardPath(forID: keyboardID, keyboardVersion: keyboard.version)?.path
     request.tag = 0
     downloadQueue!.addRequest(request)
 
@@ -634,7 +630,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
 
-    let keyboardLocalPath = self.keyboardPath(forFilename: filename, keyboardVersion: keyboard.version)!
+    let keyboardLocalPath = self.keyboardPath(forID: keyboard.id, keyboardVersion: keyboard.version)!
     let isUpdate = latestKeyboardFileVersion(withID: keyboard.id) != nil
 
     downloadQueue = HTTPDownloader.init(self)
@@ -784,8 +780,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     case .downloadFile:
       let keyboards = request.userInfo[Key.keyboardInfo] as! [InstallableKeyboard]
       let keyboard = keyboards[0]
-      let kbID = keyboard.id
-      let kbVersion = keyboard.version
       let isUpdate = request.userInfo[Key.update] as! Bool
 
       if let statusCode = request.responseStatusCode, statusCode == 200 {
@@ -794,7 +788,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
           // Download queue finished.
           downloadQueue = nil
           registerCustomFonts()
-          kmLog("Downloaded keyboard: \(kbID).", checkDebugPrinting: true)
+          kmLog("Downloaded keyboard: \(keyboard.id).", checkDebugPrinting: true)
 
           NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
                                           object: self,
@@ -817,19 +811,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         kmLog("Keyboard download failed: \(error).", checkDebugPrinting: true)
 
         if !isUpdate {
-          let fileName = request.url.lastPathComponent
-          if fileName.hasJavaScriptExtension {
-            if let kbPath = keyboardPath(forFilename: fileName, keyboardVersion: kbVersion) {
-              try? FileManager.default.removeItem(at: kbPath)
-            }
-          } else if fileName.hasFontExtension {
-            // TODO: Why do we delete a keyboard with that name?
-            if let kbPath = keyboardPath(forFilename: fileName, keyboardVersion: kbVersion) {
-              try? FileManager.default.removeItem(at: kbPath)
-            }
-            if let fontPath = activeFontDirectory()?.appendingPathComponent(fileName) {
-              try? FileManager.default.removeItem(at: fontPath)
-            }
+          // Clean up keyboard file if anything fails
+          // TODO: Also clean up remaining fonts
+          if let kbPath = keyboardPath(forID: keyboard.id, keyboardVersion: keyboard.version) {
+            try? FileManager.default.removeItem(at: kbPath)
           }
         }
         downloadFailed(forKeyboards: keyboards, error: error)
@@ -876,23 +861,13 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
       let keyboards = request.userInfo[Key.keyboardInfo] as! [InstallableKeyboard]
       let keyboard = keyboards[0]
-      let kbID = keyboard.id
-      let kbVersion = keyboard.version
       let isUpdate = request.userInfo[Key.update] as! Bool
 
       if !isUpdate {
-        let fileManager = FileManager.default
-        let fileName = request.url.lastPathComponent
-        if fileName.hasJavaScriptExtension {
-          if let kbPath = keyboardPath(forFilename: fileName, keyboardVersion: kbVersion) {
-            try? fileManager.removeItem(at: kbPath)
-          }
-        }
-        if fileName.hasFontExtension {
-          // TODO: Check why this doesn't match the error case in downloadRequestFinished().
-          if let kbPath = keyboardPath(forID: kbID, keyboardVersion: kbVersion) {
-            try? fileManager.removeItem(at: kbPath)
-          }
+        // Clean up keyboard file if anything fails
+        // TODO: Also clean up remaining fonts
+        if let kbPath = keyboardPath(forID: keyboard.id, keyboardVersion: keyboard.version) {
+          try? FileManager.default.removeItem(at: kbPath)
         }
       }
       downloadFailed(forKeyboards: keyboards, error: error as NSError)
@@ -1369,14 +1344,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     return activeLanguageDirectory()?.appendingPathComponent("\(keyboardID)-\(version).js")
   }
 
-  func keyboardPath(forFilename filename: String, keyboardVersion: String?) -> URL? {
-    if !filename.contains("-") {
-      let name = "\(filename.dropLast(3))-\(keyboardVersion ?? "1.0").js"
-      return activeLanguageDirectory()?.appendingPathComponent(name)
-    }
-    return activeLanguageDirectory()?.appendingPathComponent(filename)
-  }
-
   func fontPath(forFilename filename: String) -> URL? {
     return activeFontDirectory()?.appendingPathComponent(filename)
   }
@@ -1576,7 +1543,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       subKeysView.subviews.forEach { $0.removeFromSuperview() }
       self.subKeysView = nil
       keymanWeb.setPopupVisible(false)
-      NotificationCenter.default.post(name: Notifications.subKeysMenuDismissed, object: self, value: ())
     }
     subKeys.removeAll()
     subKeyIDs.removeAll()
@@ -1929,7 +1895,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         subKeysView.subviews.forEach { $0.removeFromSuperview() }
         self.subKeysView = nil
         keymanWeb.setPopupVisible(false)
-        NotificationCenter.default.post(name: Notifications.subKeysMenuDismissed, object: self, value: ())
       }
       var buttonClicked = false
       for button in subKeys where button.isHighlighted {
@@ -2018,7 +1983,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     dismissKeyPreview()
     subKeysView = SubKeysView(keyFrame: keyFrame, subKeys: subKeys)
-    NotificationCenter.default.post(name: Notifications.subKeysMenuWillShow, object: self, value: ())
     keymanWeb.view.addSubview(subKeysView!)
     keymanWeb.setPopupVisible(true)
   }

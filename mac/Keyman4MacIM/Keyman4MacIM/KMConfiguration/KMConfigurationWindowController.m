@@ -28,8 +28,6 @@
 - (id)initWithWindowNibName:(NSString *)windowNibName {
     self = [super initWithWindowNibName:windowNibName];
     if (self) {
-        self.AppDelegate.configWindow = self;
-        
         if (self.AppDelegate.infoWindow_.window != nil) {
             [self.window addChildWindow:self.AppDelegate.infoWindow_.window ordered:NSWindowAbove];
             [self.AppDelegate.infoWindow_.window centerInParent];
