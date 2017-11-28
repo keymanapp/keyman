@@ -78,6 +78,8 @@ if(!window['keyman']['loaded']) {
     var ui = keymanweb['ui'] = {};
     
     var kbdInterface = keymanweb['interface'] = {
+      // Cross-reference with /windows/src/global/inc/Compiler.h - these are the Developer codes for the respective system stores.
+      // They're named here identically to their use in that header file.
       TSS_LAYER: 33,
       TSS_PLATFORM: 31,
 
