@@ -96,6 +96,38 @@ if(!window['keyman']['initialized']) {
       'HIDDEN':'10'
     };
 
+    // Defines the PUA code mapping for the various 'special' modifier/control keys on keyboards.
+    osk.specialCharacters = {
+      '*Shift*':    8,
+      '*Enter*':    5,
+      '*Tab*':      6,
+      '*BkSp*':     4,
+      '*Menu*':     11,
+      '*Hide*':     10,
+      '*Alt*':      25,
+      '*Ctrl*':     1,
+      '*Caps*':     3,
+      '*ABC*':      16,
+      '*abc*':      17,
+      '*123*':      19,
+      '*Symbol*':   21,
+      '*Currency*': 20,
+      '*Shifted*':  8, // set SHIFTED->9 for filled arrow icon
+      '*AltGr*':    2,
+      '*TabLeft*':  7,
+      '*LAlt*':     0x56,
+      '*RAlt*':     0x57,
+      '*LCtrl*':    0x58,
+      '*RCtrl*':    0x59,
+      '*LAltLCtrl*':      0x60,
+      '*RAltRCtrl*':      0x61,
+      '*LAltCtrlShift*':  0x62,
+      '*RAltCtrlShift*':  0x63,
+      '*AltShift*':       0x64,
+      '*CtrlShift*':      0x65,
+      '*AltCtrlShift*':   0x66
+    };
+
     var codesUS=[['0123456789',';=,-./`','[\\]\''],[')!@#$%^&*(',':+<_>?~','{|}"']];
 
     var dfltCodes=["K_BKQUOTE","K_1","K_2","K_3","K_4","K_5","K_6","K_7","K_8","K_9","K_0",
@@ -2333,16 +2365,13 @@ if(!window['keyman']['initialized']) {
      *  @param    {string}  oldText
      *  @return {string}
      **/
-    osk.renameSpecialKey = function(oldText)
-    {
-      var specialText=['*Shift*','*Enter*','*Tab*','*BkSp*','*Menu*','*Hide*','*Alt*','*Ctrl*','*Caps*',
-        '*ABC*','*abc*','*123*','*Symbol*','*Currency*','*Shifted*','*AltGr*','*TabLeft*'];
-      var codePUA=[8,5,6,4,11,10,25,1,3,16,17,19,21,20,8,2,7]; // set SHIFTED->9 for filled arrow icon
-
-      //Note:  U+E000 *is* PUA but was not accepted by IE as a character in the EOT font, so Alt recoded as U+E019
-      for(var i=0; i<specialText.length; i++)
-        if(oldText == specialText[i]) return String.fromCharCode(0xE000+codePUA[i]);
-      return oldText;
+    osk.renameSpecialKey = function(oldText) {
+      // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
+      var puaCode = osk.specialCharacters[oldText] ? 0XE000 + osk.specialCharacters[oldText] : oldText;
+      if(puaCode) {
+        console.log("Code: ", puaCode.toString(16), ", character: ", String.fromCharCode(puaCode));
+      }
+      return osk.specialCharacters[oldText] ? String.fromCharCode(0XE000 + osk.specialCharacters[oldText]) : oldText;
     }
 
     osk.clearPopup = function()
