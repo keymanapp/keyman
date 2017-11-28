@@ -450,7 +450,7 @@
       if(!keymanweb._ActiveKeyboard ||  Lkc.Lcode == 0) return false;
       
       // If key is mapped, return true
-      if(keymanweb.processKeystroke(util.device, Lelem, Lkc)) return true;
+      if(kbdInterface.processKeystroke(util.device, Lelem, Lkc)) return true;
 
       keymanweb.processDefaultMapping(Lkc.Lcode, keyShiftState, Lelem, keyName);
 
@@ -493,7 +493,7 @@
     try {
       // Pass this key code and state to the keyboard program
       // If key is mapped, return true
-      if(keymanweb.processKeystroke(util.physicalDevice, Lelem, Lkc)) {
+      if(kbdInterface.processKeystroke(util.physicalDevice, Lelem, Lkc)) {
         return true;
       }
 
