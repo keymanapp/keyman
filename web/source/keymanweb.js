@@ -1723,7 +1723,7 @@ if(!window['keyman']['initialized']) {
       }           
 
       // Update the UI 
-      keymanweb.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC']);
+      keymanweb.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC'],sp['KP']);
     }
     
     /** 
@@ -2695,11 +2695,12 @@ if(!window['keyman']['initialized']) {
      * @param       {string}            _language
      * @param       {string}            _keyboardName
      * @param       {string}            _languageCode
-     * @return      {boolean}   
+     * @param       {string}            _packageID
+     * @return      {boolean}
      */       
-    keymanweb.doKeyboardRegistered = function(_internalName,_language,_keyboardName,_languageCode)
+    keymanweb.doKeyboardRegistered = function(_internalName,_language,_keyboardName,_languageCode, _packageID)
     {
-      var p={'internalName':_internalName,'language':_language,'keyboardName':_keyboardName,'languageCode':_languageCode};
+      var p={'internalName':_internalName,'language':_language,'keyboardName':_keyboardName,'languageCode':_languageCode,'package':_packageID};
       return util.callEvent('kmw.keyboardregistered',p);
     }
     
@@ -3570,6 +3571,7 @@ if(!window['keyman']['initialized']) {
       Lscript.charset="UTF-8";        // KMEW-89
       Lscript.type = 'text/javascript';
 
+      var pkgID   = kbdStub['KP'];
       var kbdFile = kbdStub['KF'];
       var kbdLang = kbdStub['KL'];
       var kbdName = kbdStub['KN'];
@@ -3637,7 +3639,7 @@ if(!window['keyman']['initialized']) {
 
       // IE likes to instantly start loading the file when assigned to an element, so we do this after the rest
       // of our setup.
-      Lscript.src = keymanweb.getKeyboardPath(kbdFile);  
+      Lscript.src = keymanweb.getKeyboardPath(pkgID, kbdFile);
 
       try {                                  
         document.body.appendChild(Lscript);  

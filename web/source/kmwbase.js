@@ -83,7 +83,7 @@ if(!window['keyman']['loaded']) {
     // Stub functions (defined later in code only if required)
     keymanweb.setDefaultDeviceOptions = function(opt){}     
     keymanweb.getStyleSheetPath = function(s){return s;}
-    keymanweb.getKeyboardPath=function(f){return f;}  
+    keymanweb.getKeyboardPath=function(p,f){return f;}
     keymanweb.KC_ = function(n, ln, Pelem){return '';} 
     keymanweb.handleRotationEvents = function(){}
     keymanweb.alignInputs = function(b){}

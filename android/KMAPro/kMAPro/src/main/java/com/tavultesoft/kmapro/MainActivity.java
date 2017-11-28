@@ -130,6 +130,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
             copyFile(inputStream, newFile);
             inputStream.close();
           } else if (filename.endsWith(".js")) {
+            // TODO: Fix these directories
             File langDir = new File(getDir("data", Context.MODE_PRIVATE) + "/languages");
             if (langDir.exists())
               langDir.mkdir();
@@ -166,13 +167,14 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   protected void onResume() {
     super.onResume();
     KMManager.onResume();
-    if (!KMManager.keyboardExists(this, KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID)) {
+    if (!KMManager.keyboardExists(this, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID)) {
       HashMap<String, String> kbInfo = new HashMap<String, String>();
+      kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_PackageID);
       kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
       kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
       kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
       kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
-      kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(this, KMManager.KMDefault_KeyboardID));
+      kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(this, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID));
       kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
       KMManager.addKeyboard(this, kbInfo);
     }
@@ -608,6 +610,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   @Override
   public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
     if (result > 0) {
+      String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
       String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
       String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
       String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
@@ -625,6 +628,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           if (i < names.length)
             langName = names[i];
           HashMap<String, String> kbInfo = new HashMap<String, String>();
+          kbInfo.put(KMManager.KMKey_PackageID, packageID);
           kbInfo.put(KMManager.KMKey_KeyboardID, keyboardID);
           kbInfo.put(KMManager.KMKey_LanguageID, langId);
           kbInfo.put(KMManager.KMKey_KeyboardName, keyboardName);
@@ -634,7 +638,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           kbInfo.put(KMManager.KMKey_OskFont, kOskFont);
           if (i == 0) {
             if (KMManager.addKeyboard(this, kbInfo)) {
-              KMManager.setKeyboard(keyboardID, langId, keyboardName, langName, kFont, kOskFont);
+              KMManager.setKeyboard(packageID, keyboardID, langId, keyboardName, langName, kFont, kOskFont);
             }
           } else {
             KMManager.addKeyboard(this, kbInfo);
@@ -642,7 +646,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         }
       } else {
         if (KMManager.addKeyboard(this, keyboardInfo)) {
-          KMManager.setKeyboard(keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+          KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
         }
       }
     } else {

@@ -41,8 +41,8 @@
   };
 
   // Get KMEI, KMEA keyboard path (overrides default function)
-  keymanweb.getKeyboardPath = function(Lfilename) {
-    return keymanweb.rootPath+'languages/' + Lfilename + "?v=" + (new Date()).getTime(); /*cache buster*/  
+  keymanweb.getKeyboardPath = function(packageID, Lfilename) {
+    return keymanweb.rootPath+'packages/' + packageID + '/' + Lfilename + "?v=" + (new Date()).getTime(); /*cache buster*/
   };
 
     /**

@@ -106,6 +106,7 @@ public final class KMManager {
   // Keyman public keys
   public static final String KMKey_ID = "id";
   public static final String KMKey_Name = "name";
+  public static final String KMKey_PackageID = "packageId";
   public static final String KMKey_LanguageID = "langId";
   public static final String KMKey_LanguageName = "langName";
   public static final String KMKey_KeyboardID = "kbId";
@@ -134,7 +135,13 @@ public final class KMManager {
   protected static final String KMKey_FontBaseURI = "fontBaseUri";
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
 
+  // Default Asset Paths
+  public static final String KMDefault_LegacyAssetLanguages = "languages";
+  public static final String KMDefault_LegacyAssetFonts = "fonts";
+  public static final String KMDefault_AssetPackages = "packages";
+
   // Default Keyboard Info
+  public static final String KMDefault_PackageID = "european";
   public static final String KMDefault_KeyboardID = "european2";
   public static final String KMDefault_LanguageID = "eng";
   public static final String KMDefault_KeyboardName = "EuroLatin2 Keyboard";
@@ -346,8 +353,8 @@ public final class KMManager {
 
   private static void copyAssets(Context context) {
     AssetManager assetManager = context.getAssets();
-    File file;
     try {
+      File file;
       // Copy main files
       copyAsset(context, KMFilename_KeyboardHtml, "", true);
       copyAsset(context, KMFilename_JSEngine, "", true);
@@ -355,22 +362,23 @@ public final class KMManager {
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
       copyAsset(context, KMFilename_Osk_Woff_Font, "", true);
 
-      // Copy languages
-      file = new File(context.getDir("data", Context.MODE_PRIVATE) + "/languages");
-      if (!file.exists())
+      // Copy default keyboard assets
+      String packagesDir = context.getDir("data", Context.MODE_PRIVATE) + File.separator + KMDefault_AssetPackages;
+      file = new File(packagesDir);
+      if (!file.exists()) {
         file.mkdir();
-      String[] languageFiles = assetManager.list("languages");
-      for (String filename : languageFiles) {
-        copyAsset(context, filename, "languages", true);
       }
-
-      // Copy fonts
-      file = new File(context.getDir("data", Context.MODE_PRIVATE) + "/fonts");
-      if (!file.exists())
-        file.mkdir();
-      String[] fontFiles = assetManager.list("fonts");
-      for (String filename : fontFiles) {
-        copyAsset(context, filename, "fonts", false);
+      String[] packageIDs = assetManager.list(KMDefault_AssetPackages);
+      for (String packageID : packageIDs) {
+        file = new File(packagesDir + File.separator + packageID);
+        if (!file.exists()) {
+          file.mkdir();
+        }
+        String packageDir = KMDefault_AssetPackages + File.separator + packageID;
+        String[] languageFiles = assetManager.list(packageDir);
+        for (String filename : languageFiles) {
+          copyAsset(context, filename, packageDir, true);
+        }
       }
     } catch (Exception e) {
       Log.e("Failed to copy assets", "Error: " + e);
@@ -388,8 +396,8 @@ public final class KMManager {
 
       String dirPath;
       if (directory.length() != 0) {
-        directory = directory + "/";
-        dirPath = context.getDir("data", Context.MODE_PRIVATE) + "/" + directory;
+        directory = directory + File.separator;
+        dirPath = context.getDir("data", Context.MODE_PRIVATE) + File.separator + directory;
       } else {
         dirPath = context.getDir("data", Context.MODE_PRIVATE).toString();
       }
@@ -419,25 +427,66 @@ public final class KMManager {
     }
   }
 
+  /**
+   * Renames legacy keyboard files which were installed in /languages directories or
+   * the keyboard filename is missing the version number.
+   * Since we don't know the original packageID for the installed keyboards, use
+   * legacy0, legacy1, ... for the new /packages/legacyX/ directories.
+   * Legacy default keyboards /languages/european2*.js can also be safely removed
+   * TODO: how to move legacy /fonts?
+   * Assumption: No legacy keyboards at /packages/*.js
+   * @param context
+   */
   private static void renameOldKeyboardFiles(Context context) {
-    String path = context.getDir("data", Context.MODE_PRIVATE) + "/languages/";
-    File dir = new File(path);
-    String[] files = dir.list();
-    for (String filename : files) {
-      if (filename.lastIndexOf("-") < 0) {
-        if (filename.equals("us.js")) {
-          File kbFile = new File(path, filename);
-          kbFile.delete();
+    String[] originalPaths = {
+      context.getDir("data", Context.MODE_PRIVATE) + File.separator + KMDefault_LegacyAssetLanguages + File.separator,
+      //context.getDir("data", Context.MODE_PRIVATE) + File.separator + KMDefault_AssetPackages + File.separator
+    };
+    int migratedKeyboards = 0;
+    for (String originalPath : originalPaths) {
+      File originalDir = new File(originalPath);
+      if (!originalDir.exists()) {
+        continue;
+      }
+      String[] files = originalDir.list();
+      for (String filename : files) {
+        String migratedPath = context.getDir("data", Context.MODE_PRIVATE) + File.separator + KMDefault_AssetPackages +
+          File.separator + "legacy" + String.valueOf(migratedKeyboards);
+        // Handle keyboards missing version number
+        if (filename.lastIndexOf("-") < 0) {
+          if (filename.equals("us.js")) {
+            File kbFile = new File(originalPath, filename);
+            kbFile.delete();
+          } else if (filename.endsWith(".js")) {
+            // Append default version number to keyboard and move
+            String newFilename = filename.substring(0, filename.lastIndexOf(".js")) + "-1.0.js";
+            File migratedDir = new File(migratedPath);
+            if (!migratedDir.exists()) {
+              migratedDir.mkdir();
+            }
+            File kbFile = new File(originalPath, filename);
+            kbFile.renameTo(new File(migratedDir, newFilename));
+            migratedKeyboards++;
+          }
         } else {
-          String newFilename = filename.substring(0, filename.lastIndexOf(".js")) + "-1.0.js";
-          File kbFile = new File(path, filename);
-          kbFile.renameTo(new File(path, newFilename));
+          // Remove legacy default keyboards
+          if (filename.startsWith(KMDefault_KeyboardID + "-")) {
+            File legacyKbFile = new File(originalDir, filename);
+            if (legacyKbFile.exists()) {
+              legacyKbFile.delete();
+              continue;
+            }
+          }
+
+          // Migrate /languages/*.js keyboards
+          File migratedDir = new File(migratedPath);
+          if (!migratedDir.exists()) {
+            migratedDir.mkdir();
+          }
+          File kbFile = new File(originalPath, filename);
+          kbFile.renameTo(new File(migratedDir, filename));
+          migratedKeyboards++;
         }
-      } else {
-        String oldFilename = filename.substring(0, filename.lastIndexOf("-")) + ".js";
-        File kbFile = new File(path, oldFilename);
-        if (kbFile.exists())
-          kbFile.delete();
       }
     }
   }
@@ -451,12 +500,13 @@ public final class KMManager {
       String kbID = kbInfo.get(KMKey_KeyboardID);
       if (kbID.equals("us")) {
         HashMap<String, String> newKbInfo = new HashMap<String, String>();
+        newKbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_PackageID);
         newKbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
         newKbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
         newKbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
         newKbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
         newKbInfo.put(KMManager.KMKey_KeyboardVersion,
-          getLatestKeyboardFileVersion(context, KMManager.KMDefault_KeyboardID));
+          getLatestKeyboardFileVersion(context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID));
         newKbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
         newKbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
         kbList.set(0, newKbInfo);
@@ -468,10 +518,12 @@ public final class KMManager {
       int kblCount = kbList.size();
       for (int i = 0; i < kblCount; i++) {
         kbInfo = kbList.get(i);
+
+        String pkgID = kbInfo.get(KMKey_PackageID);
         kbID = kbInfo.get(KMKey_KeyboardID);
         String langID = kbInfo.get(KMKey_LanguageID);
         String kbVersion = kbInfo.get(KMManager.KMKey_KeyboardVersion);
-        String latestKbVersion = getLatestKeyboardFileVersion(context, kbID);
+        String latestKbVersion = getLatestKeyboardFileVersion(context, pkgID, kbID);
         if ((latestKbVersion != null) && (kbVersion == null || !kbVersion.equals(latestKbVersion))) {
           kbInfo.put(KMManager.KMKey_KeyboardVersion, latestKbVersion);
           kbList.set(i, kbInfo);
@@ -562,6 +614,7 @@ public final class KMManager {
     public static void download(final Context context, final int languageIndex, final int keyboardIndex, final boolean showProgressDialog) {
       new AsyncTask<Void, Integer, Integer>() {
         private ProgressDialog progressDialog;
+        private String packageID = "";
         private String languageID = "";
         private String keyboardID = "";
         private String languageName = "";
@@ -607,6 +660,7 @@ public final class KMManager {
             JSONArray keyboards = language.getJSONArray(KMKey_LanguageKeyboards);
             JSONObject keyboard = keyboards.getJSONObject(keyboardIndex);
 
+            packageID = keyboard.getString(KMKey_PackageID);
             keyboardID = keyboard.getString(KMKey_ID);
             languageID = language.getString(KMKey_ID);
             keyboardName = keyboard.getString(KMKey_Name);
@@ -635,6 +689,7 @@ public final class KMManager {
             // Notify listeners: onDownloadStarted
             if (kbDownloadEventListeners != null) {
               HashMap<String, String> keyboardInfo = new HashMap<String, String>();
+              keyboardInfo.put(KMKey_PackageID, packageID);
               keyboardInfo.put(KMKey_KeyboardID, keyboardID);
               keyboardInfo.put(KMKey_LanguageID, languageID);
               keyboardInfo.put(KMKey_KeyboardName, keyboardName);
@@ -705,6 +760,7 @@ public final class KMManager {
           // Notify listeners: onDownloadFinished
           if (kbDownloadEventListeners != null) {
             HashMap<String, String> keyboardInfo = new HashMap<String, String>();
+            keyboardInfo.put(KMKey_PackageID, packageID);
             keyboardInfo.put(KMKey_KeyboardID, keyboardID);
             keyboardInfo.put(KMKey_LanguageID, languageID);
             keyboardInfo.put(KMKey_KeyboardName, keyboardName);
@@ -1318,28 +1374,28 @@ public final class KMManager {
     return KeyboardPickerActivity.removeKeyboard(context, position);
   }
 
-  public static boolean setKeyboard(String keyboardID, String languageID) {
+  public static boolean setKeyboard(String packageID, String keyboardID, String languageID) {
     boolean result1 = false;
     boolean result2 = false;
 
     if (InAppKeyboard != null && InAppKeyboardLoaded)
-      result1 = InAppKeyboard.setKeyboard(keyboardID, languageID);
+      result1 = InAppKeyboard.setKeyboard(packageID, keyboardID, languageID);
 
     if (SystemKeyboard != null && SystemKeyboardLoaded)
-      result2 = SystemKeyboard.setKeyboard(keyboardID, languageID);
+      result2 = SystemKeyboard.setKeyboard(packageID, keyboardID, languageID);
 
     return (result1 || result2);
   }
 
-  public static boolean setKeyboard(String keyboardID, String languageID, String keyboardName, String languageName, String kFont, String kOskFont) {
+  public static boolean setKeyboard(String packageID, String keyboardID, String languageID, String keyboardName, String languageName, String kFont, String kOskFont) {
     boolean result1 = false;
     boolean result2 = false;
 
     if (InAppKeyboard != null && InAppKeyboardLoaded)
-      result1 = InAppKeyboard.setKeyboard(keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+      result1 = InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
     if (SystemKeyboard != null && SystemKeyboardLoaded)
-      result2 = SystemKeyboard.setKeyboard(keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+      result2 = SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
     return (result1 || result2);
   }
@@ -1349,13 +1405,14 @@ public final class KMManager {
     if (keyboardInfo == null)
       return false;
 
+    String pkgId = keyboardInfo.get(KMManager.KMKey_PackageID);
     String kbId = keyboardInfo.get(KMManager.KMKey_KeyboardID);
     String langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
     String kbName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
     String langName = keyboardInfo.get(KMManager.KMKey_LanguageName);
     String kFont = keyboardInfo.get(KMManager.KMKey_Font);
     String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-    return setKeyboard(kbId, langId, kbName, langName, kFont, kOskFont);
+    return setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
   }
 
   public static void switchToNextKeyboard(Context context) {
@@ -1367,6 +1424,7 @@ public final class KMManager {
       kbInfo = KeyboardPickerActivity.getKeyboardInfo(context, index);
     }
 
+    String pkgId = kbInfo.get(KMManager.KMKey_PackageID);
     String kbId = kbInfo.get(KMManager.KMKey_KeyboardID);
     String langId = kbInfo.get(KMManager.KMKey_LanguageID);
     String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
@@ -1374,10 +1432,10 @@ public final class KMManager {
     String kFont = kbInfo.get(KMManager.KMKey_Font);
     String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
     if (InAppKeyboard != null) {
-      InAppKeyboard.setKeyboard(kbId, langId, kbName, langName, kFont, kOskFont);
+      InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
     }
     if (SystemKeyboard != null) {
-      SystemKeyboard.setKeyboard(kbId, langId, kbName, langName, kFont, kOskFont);
+      SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
     }
   }
 
@@ -1410,17 +1468,18 @@ public final class KMManager {
     return getFontTypeface(context, getKeyboardOskFontFilename());
   }
 
-  public static KeyboardState getKeyboardState(Context context, String keyboardID, String languageID) {
+  public static KeyboardState getKeyboardState(Context context, String packageID, String keyboardID, String languageID) {
     KeyboardState kbState = KeyboardState.KEYBOARD_STATE_UNDEFINED;
-    if (keyboardID == null || languageID == null)
+    if (packageID == null || keyboardID == null || languageID == null)
       return kbState;
 
+    packageID = packageID.trim();
     keyboardID = keyboardID.trim();
     languageID = languageID.trim();
     if (keyboardID.isEmpty() || languageID.isEmpty())
       return kbState;
 
-    String latestVersion = getLatestKeyboardFileVersion(context, keyboardID);
+    String latestVersion = getLatestKeyboardFileVersion(context, packageID, keyboardID);
     if (latestVersion == null) {
       kbState = KeyboardState.KEYBOARD_STATE_NEEDS_DOWNLOAD;
     } else {
@@ -1447,9 +1506,10 @@ public final class KMManager {
     return kbState;
   }
 
-  public static String getLatestKeyboardFileVersion(Context context, String keyboardID) {
+  public static String getLatestKeyboardFileVersion(Context context, String packageID, String keyboardID) {
     String kbFileVersion = null;
-    String path = context.getDir("data", Context.MODE_PRIVATE) + "/languages/";
+    String path = context.getDir("data", Context.MODE_PRIVATE) + File.separator + KMDefault_AssetPackages +
+      File.separator + packageID + File.separator;
     File dir = new File(path);
     String[] files = dir.list();
     if (files == null)
@@ -1655,7 +1715,7 @@ public final class KMManager {
   public static void setShouldAllowSetKeyboard(boolean value) {
     shouldAllowSetKeyboard = value;
     if (shouldAllowSetKeyboard == false) {
-      setKeyboard(KMDefault_KeyboardID, KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
+      setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID, KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
     }
   }
 
@@ -1779,10 +1839,10 @@ public final class KMManager {
     return KeyboardPickerActivity.getKeyboardInfo(context, index);
   }
 
-  public static boolean keyboardExists(Context context, String keyboardID, String languageID) {
+  public static boolean keyboardExists(Context context, String packageID, String keyboardID, String languageID) {
     boolean result = false;
 
-    if (keyboardID != null & languageID != null) {
+    if (packageID != null && keyboardID != null && languageID != null) {
       String kbKey = String.format("%s_%s", languageID, keyboardID);
       result = KeyboardPickerActivity.containsKeyboard(context, kbKey);
     }
@@ -1884,15 +1944,16 @@ public final class KMManager {
           }
           HashMap<String, String> keyboardInfo = KMManager.getKeyboardInfo(context, index);
           if (keyboardInfo != null) {
+            String pkgId = keyboardInfo.get(KMManager.KMKey_PackageID);
             String kbId = keyboardInfo.get(KMManager.KMKey_KeyboardID);
             String langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
             String kbName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
             String langName = keyboardInfo.get(KMManager.KMKey_LanguageName);
             String kFont = keyboardInfo.get(KMManager.KMKey_Font);
             String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-            InAppKeyboard.setKeyboard(kbId, langId, kbName, langName, kFont, kOskFont);
+            InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
           } else {
-            InAppKeyboard.setKeyboard(KMDefault_KeyboardID, KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
+            InAppKeyboard.setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID, KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
           }
         }
 
@@ -2060,15 +2121,16 @@ public final class KMManager {
           }
           HashMap<String, String> keyboardInfo = KMManager.getKeyboardInfo(context, index);
           if (keyboardInfo != null) {
+            String pkgId = keyboardInfo.get(KMManager.KMKey_PackageID);
             String kbId = keyboardInfo.get(KMManager.KMKey_KeyboardID);
             String langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
             String kbName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
             String langName = keyboardInfo.get(KMManager.KMKey_LanguageName);
             String kFont = keyboardInfo.get(KMManager.KMKey_Font);
             String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-            SystemKeyboard.setKeyboard(kbId, langId, kbName, langName, kFont, kOskFont);
+            SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
           } else {
-            SystemKeyboard.setKeyboard(KMDefault_KeyboardID, KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
+            SystemKeyboard.setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID, KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
           }
         }
 

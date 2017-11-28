@@ -230,12 +230,12 @@ final class KMKeyboard extends WebView {
     return oskFont;
   }
 
-  public boolean setKeyboard(String keyboardID, String languageID) {
-    if (keyboardID == null || languageID == null)
+  public boolean setKeyboard(String packageID, String keyboardID, String languageID) {
+    if (packageID == null || keyboardID == null || languageID == null)
       return false;
 
     boolean retVal = true;
-    String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), keyboardID);
+    String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
       Toast.makeText(context, "Invalid keyboard! Loading default", Toast.LENGTH_LONG).show();
       keyboardID = KMManager.KMDefault_KeyboardID;
@@ -249,7 +249,7 @@ final class KMKeyboard extends WebView {
 
     String keyboardName = "";
     String languageName = "";
-    keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), keyboardID);
+    keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
 
     String tFont = "''";
     String oFont = null;
@@ -293,8 +293,8 @@ final class KMKeyboard extends WebView {
     if (oFont.equals("''")) {
       oFont = "undefined";
     }
-    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s)";
-    String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardVersion, tFont, oFont);
+    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, %s)";
+    String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardVersion, tFont, oFont, packageID);
     loadUrl(jsString);
     if (KMManager.isDebugMode()) {
       Log.d("KMKeyboard", jsString);
@@ -317,15 +317,16 @@ final class KMKeyboard extends WebView {
     return retVal;
   }
 
-  public boolean setKeyboard(String keyboardID, String languageID, String keyboardName, String languageName, String kFont, String kOskFont) {
-    if (keyboardID == null || languageID == null || keyboardName == null || languageName == null) {
+  public boolean setKeyboard(String packageID, String keyboardID, String languageID, String keyboardName, String languageName, String kFont, String kOskFont) {
+    if (packageID == null || keyboardID == null || languageID == null || keyboardName == null || languageName == null) {
       return false;
     }
 
     boolean retVal = true;
-    String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), keyboardID);
+    String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
       Toast.makeText(context, "Invalid keyboard! Loading default", Toast.LENGTH_LONG).show();
+      packageID = KMManager.KMDefault_PackageID;
       keyboardID = KMManager.KMDefault_KeyboardID;
       languageID = KMManager.KMDefault_LanguageID;
       keyboardName = KMManager.KMDefault_KeyboardName;
@@ -339,7 +340,7 @@ final class KMKeyboard extends WebView {
     //if (kbKey.equals(currentKeyboard))
     //  return false;
 
-    keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), keyboardID);
+    keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
     String tFont = "''";
     String oFont = null;
     if (kFont == null) {
@@ -385,8 +386,8 @@ final class KMKeyboard extends WebView {
     if (oFont.equals("''")) {
       oFont = "undefined";
     }
-    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s)";
-    String jsString = String.format(jsFormat, keyboardName.replace("'", "\\'"), keyboardID, languageName.replace("'", "\\'"), languageID, keyboardVersion, tFont, oFont);
+    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, %s)";
+    String jsString = String.format(jsFormat, keyboardName.replace("'", "\\'"), keyboardID, languageName.replace("'", "\\'"), languageID, keyboardVersion, tFont, oFont, packageID);
     loadUrl(jsString);
     if (KMManager.isDebugMode()) {
       Log.d("KMKeyboard", jsString);
