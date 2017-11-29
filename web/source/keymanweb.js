@@ -3405,8 +3405,7 @@ if(!window['keyman']['initialized']) {
      * @param       {string=}    PLgCode
      * @param       {boolean=}   saveCookie   
      */    
-    keymanweb._SetActiveKeyboard = function(PInternalName,PLgCode,saveCookie)
-    {
+    keymanweb._SetActiveKeyboard = function(PInternalName,PLgCode,saveCookie) {
       var n,Ln;
 
       // Set default language code
@@ -4268,6 +4267,8 @@ if(!window['keyman']['initialized']) {
         if(keymanweb._KeyboardStubs.length > 0) {
           // Select the first stub as our active keyboard.  This is set later for 'native' KMW.
           keymanweb._SetActiveKeyboard(keymanweb._KeyboardStubs[0]['KI'], keymanweb._KeyboardStubs[0]['KLC']);     
+        } else {
+          console.error("No keyboard stubs exist - cannot initialize keyboard!");
         }
 
         return;
