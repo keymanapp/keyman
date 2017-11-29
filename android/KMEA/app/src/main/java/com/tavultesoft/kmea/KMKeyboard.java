@@ -293,7 +293,7 @@ final class KMKeyboard extends WebView {
     if (oFont.equals("''")) {
       oFont = "undefined";
     }
-    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, %s)";
+    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
     String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardVersion, tFont, oFont, packageID);
     loadUrl(jsString);
     if (KMManager.isDebugMode()) {
@@ -386,7 +386,7 @@ final class KMKeyboard extends WebView {
     if (oFont.equals("''")) {
       oFont = "undefined";
     }
-    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, %s)";
+    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
     String jsString = String.format(jsFormat, keyboardName.replace("'", "\\'"), keyboardID, languageName.replace("'", "\\'"), languageID, keyboardVersion, tFont, oFont, packageID);
     loadUrl(jsString);
     if (KMManager.isDebugMode()) {

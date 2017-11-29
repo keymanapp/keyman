@@ -487,7 +487,12 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
     }
 
     if (keyboardsList != null && index < keyboardsList.size()) {
-      return keyboardsList.get(index);
+      HashMap<String, String> kbInfo = keyboardsList.get(index);
+      String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
+      if (pkgID == null || pkgID.isEmpty()) {
+        kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_LegacyPackageID);
+      }
+      return kbInfo;
     }
 
     return null;
