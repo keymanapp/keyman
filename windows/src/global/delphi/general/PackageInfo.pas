@@ -41,7 +41,6 @@ uses
   System.Generics.Collections,
   System.IniFiles,
   System.Sysutils,
-  Vcl.Graphics,
   Winapi.Windows,
   Xml.XMLDoc,
   Xml.XMLIntf,
@@ -81,13 +80,27 @@ type
                               pfclInstallTemp,  // Used only for installation, temporary
                               pfclLocaleFolder); // For locale files
 
+
+  TPackage = class;
+
+  { Base Classes }
+
   TPackageBaseObject = class
+  strict private
+    FPackage: TPackage;
+  protected
+    property Package: TPackage read FPackage;
+  public
+    constructor Create(APackage: TPackage); virtual;
+  end;
+
+  TPackageBaseNotifyObject = class(TPackageBaseObject)
   private
     FNotifyObjects: TObjectList<TPackageNotifyEventWrapper>;
     FTag: Integer;
     function Notify(EventType: TPackageNotifyEventType): Boolean;
   public
-    constructor Create;
+    constructor Create(APackage: TPackage); override;
     destructor Destroy; override;
     procedure AddNotifyObject(FEventHandler: TPackageNotifyEvent);
     procedure RemoveNotifyObject(FEventHandler: TPackageNotifyEvent);
@@ -95,7 +108,16 @@ type
     property Tag: Integer read FTag write FTag;
   end;
 
-  TPackage = class;
+  TPackageObjectList<T: TPackageBaseObject> = class(TObjectList<T>)
+  strict private
+    FPackage: TPackage;
+  protected
+    property Package: TPackage read FPackage;
+  public
+    constructor Create(APackage: TPackage);
+  end;
+
+
   TPackageContentFile = class;
   TPackageContentFileList = class;
 
@@ -103,16 +125,15 @@ type
 
   TPackageRegistryKeyValueType = (rkvtString, rkvtDWord);
 
-  TPackageRegistryKey = class
+  TPackageRegistryKey = class(TPackageBaseObject)
   private
-    FPackage: TPackage;
     FKey: WideString;
     FValueType: TPackageRegistryKeyValueType;
     FValue: WideString;
     FRoot: HKEY;
     FName: WideString;
   public  // I3311
-    constructor Create(APackage: TPackage);
+    constructor Create(APackage: TPackage); override;
     destructor Destroy; override;
     procedure Assign(Source: TPackageRegistryKey);
     property Key: WideString read FKey write FKey;
@@ -122,11 +143,8 @@ type
     property ValueType: TPackageRegistryKeyValueType read FValueType write FValueType;
   end;
 
-  TPackageRegistryKeyList = class(TObjectList<TPackageRegistryKey>)
-  private
-    FPackage: TPackage;
+  TPackageRegistryKeyList = class(TPackageObjectList<TPackageRegistryKey>)
   public
-    constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageRegistryKeyList); virtual;
     procedure LoadIni(AIni: TIniFile); virtual;
     procedure SaveIni(AIni: TIniFile); virtual;
@@ -136,9 +154,8 @@ type
 
   { Package Options }
 
-  TPackageOptions = class
+  TPackageOptions = class(TPackageBaseObject)
   private
-    FPackage: TPackage;
     FFileVersion: WideString;
     FExecuteProgram: WideString;
     FReadmeFile: TPackageContentFile;
@@ -153,12 +170,10 @@ type
       EventType: TPackageNotifyEventType; var FAllow: Boolean);
     procedure ReadmeRemoved(Sender: TObject;
       EventType: TPackageNotifyEventType; var FAllow: Boolean);
-  protected
-    property Package: TPackage read FPackage;
   public
-    procedure Assign(Source: TPackageOptions); virtual;
-    constructor Create(APackage: TPackage); virtual;
+    constructor Create(APackage: TPackage); override;
     destructor Destroy; override;
+    procedure Assign(Source: TPackageOptions); virtual;
     procedure LoadIni(AIni: TIniFile); virtual;
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
@@ -174,9 +189,8 @@ type
 
   { Package Information }
 
-  TPackageInfoEntry = class
+  TPackageInfoEntry = class(TPackageBaseObject)
   private
-    FPackage: TPackage;
     FURL: WideString;
     FDescription: WideString;
     FName: WideString;
@@ -185,7 +199,6 @@ type
     procedure SetName(Value: WideString);
     procedure SetURL(Value: WideString);
   public
-    constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageInfoEntry); virtual;
     property InfoType: TPackageInfoEntryType read FInfoType;
     property Name: WideString read FName write SetName;
@@ -193,16 +206,13 @@ type
     property URL: WideString read FURL write SetURL;
   end;
 
-  TPackageInfoEntryList = class(TObjectList<TPackageInfoEntry>)
-  private
-    FPackage: TPackage;
+  TPackageInfoEntryList = class(TPackageObjectList<TPackageInfoEntry>)
   protected
     procedure SetDesc(Name, Desc: WideString);
     procedure SetURL(Name, URL: WideString);
     function DescIndexOf(Name: WideString): WideString;
     function UrlIndexOf(Name: WideString): WideString;
   public
-    constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageInfoEntryList); virtual;
     procedure LoadIni(AIni: TIniFile); virtual;
     procedure SaveIni(AIni: TIniFile); virtual;
@@ -213,32 +223,24 @@ type
 
     property Desc[Name: WideString]: WideString read DescIndexOf write SetDesc;
     property URL[Name: WideString]: WideString read URLIndexOf write SetURL;
-
-    function Add(Item: TPackageInfoEntry): Integer;
   end;
 
   { Package Start Menu Classes }
 
   TPackageStartMenuEntryLocation = (psmelStartMenu, psmelDesktop); //, psmelQuickLaunch);
 
-  TPackageStartMenuEntry = class
-  private
-    FPackage: TPackage;
+  TPackageStartMenuEntry = class(TPackageBaseObject)
   public
     Name: WideString;
     Prog: WideString;
     Params: WideString;
     Icon: WideString;
     Location: TPackageStartMenuEntryLocation;
-    constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageStartMenuEntry); virtual;
   end;
 
-  TPackageStartMenuEntryList = class(TObjectList<TPackageStartMenuEntry>)
-  private
-    FPackage: TPackage;
+  TPackageStartMenuEntryList = class(TPackageObjectList<TPackageStartMenuEntry>)
   public
-    constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageStartMenuEntryList); virtual;
     procedure LoadIni(AIni: TIniFile); virtual;
     procedure SaveIni(AIni: TIniFile); virtual;
@@ -246,15 +248,13 @@ type
     procedure SaveXML(ARoot: IXMLNode); virtual;
   end;
 
-  TPackageStartMenu = class
-  private
-    FPackage: TPackage;
+  TPackageStartMenu = class(TPackageBaseObject)
   public
     Path: WideString;
     DoCreate: Boolean;
     AddUninstallEntry: Boolean;
     Entries: TPackageStartMenuEntryList;
-    constructor Create(APackage: TPackage);
+    constructor Create(APackage: TPackage); override;
     destructor Destroy; override;
     procedure Assign(Source: TPackageStartMenu); virtual;
     procedure LoadIni(AIni: TIniFile); virtual;
@@ -265,9 +265,8 @@ type
 
   { Package contained files }
 
-  TPackageContentFile = class(TPackageBaseObject)
+  TPackageContentFile = class(TPackageBaseNotifyObject)
   private
-    FPackage: TPackage;
     FCopyLocation: TPackageFileCopyLocation;
     FDescription: WideString;
     FFileName: WideString;
@@ -277,22 +276,16 @@ type
     procedure SetFileType(const Value: TKMFileType);
     procedure SetCopyLocation(const Value: TPackageFileCopyLocation);
   public
-    constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageContentFile); virtual;
     function RelativeFileName: WideString;
     property FileName: WideString read FFileName write SetFileName;  // relative to .kps, or no path if inside .kmp or .exe
     property FileType: TKMFileType read FFileType write SetFileType;
     property Description: WideString read FDescription write SetDescription;
     property CopyLocation: TPackageFileCopyLocation read FCopyLocation write SetCopyLocation;
-    property Package: TPackage read FPackage;
   end;
 
-  TPackageContentFileList = class(TObjectList<TPackageContentFile>)
-  private
-    FPackage: TPackage;
-
+  TPackageContentFileList = class(TPackageObjectList<TPackageContentFile>)
   public
-    constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageContentFileList); virtual;
     procedure LoadIni(AIni: TIniFile); virtual;
     procedure SaveIni(AIni: TIniFile); virtual;
@@ -304,6 +297,57 @@ type
     function FromFileNameEx(Filename: WideString): TPackageContentFile;
     procedure Delete(Index: Integer);
   end;
+
+  { TPackageKeyboard }
+
+  TPackageKeyboard = class;
+  TPackageKeyboardList = class;
+  TPackageKeyboardLanguage = class;
+  TPackageKeyboardLanguageList = class;
+
+  TPackageKeyboard = class(TPackageBaseObject)
+  private
+    FName: string;
+    FOSKFont: TPackageContentFile;
+    FID: string;
+    FDisplayFont: TPackageContentFile;
+    FLanguages: TPackageKeyboardLanguageList;
+    FVersion: string;
+    procedure SetDisplayFont(const Value: TPackageContentFile);
+    procedure SetOSKFont(const Value: TPackageContentFile);
+    procedure DisplayFontRemoved(Sender: TObject;
+      EventType: TPackageNotifyEventType; var FAllow: Boolean);
+    procedure OSKFontRemoved(Sender: TObject;
+      EventType: TPackageNotifyEventType; var FAllow: Boolean);
+  public
+    constructor Create(APackage: TPackage); override;
+    destructor Destroy; override;
+    procedure Assign(Source: TPackageKeyboard); virtual;
+    property Name: string read FName write FName;
+    property ID: string read FID write FID;
+    property Version: string read FVersion write FVersion;
+    property Languages: TPackageKeyboardLanguageList read FLanguages;
+    property OSKFont: TPackageContentFile read FOSKFont write SetOSKFont;
+    property DisplayFont: TPackageContentFile read FDisplayFont write SetDisplayFont;
+  end;
+
+  TPackageKeyboardList = class(TPackageObjectList<TPackageKeyboard>)
+  public
+    procedure Assign(Source: TPackageKeyboardList); virtual;
+    procedure LoadIni(AIni: TIniFile); virtual;
+    procedure SaveIni(AIni: TIniFile); virtual;
+    procedure LoadXML(ARoot: IXMLNode); virtual;
+    procedure SaveXML(ARoot: IXMLNode); virtual;
+  end;
+
+  TPackageKeyboardLanguage = class(TPackageBaseObject)
+    ID: string;
+    Name: string;
+  end;
+
+  TPackageKeyboardLanguageList = class(TPackageObjectList<TPackageKeyboardLanguage>);
+
+  { TPackage }
 
   TPackage = class
   private
@@ -320,6 +364,7 @@ type
     StartMenu: TPackageStartMenu;
     Files: TPackageContentFileList;
     Info: TPackageInfoEntryList;
+    Keyboards: TPackageKeyboardList;
 
     property FileName: WideString read FFileName write FFileName;
     procedure Assign(Source: TPackage); virtual;
@@ -358,6 +403,8 @@ const
   SReadmeNotOwnedCorrectly = 'The readme file ''%s'' referred to is not part of the package.';
   SGraphicNotOwnedCorrectly = 'The graphic file ''%s'' referred to is not part of the package.';
   SFileNotOwnedCorrectly = 'The file ''%s'' referred to is not part of the package.';
+  SDisplayFontNotOwnedCorrectly = 'The display font file ''%s'' referred to is not part of the package.';
+  SOSKFontNotOwnedCorrectly = 'The OSK font file ''%s'' referred to is not part of the package.';
 
 {-------------------------------------------------------------------------------
  - TPackageOptions                                                             -
@@ -368,21 +415,20 @@ begin
   FFileVersion := Source.FileVersion;
   FExecuteProgram := Source.ExecuteProgram;
   if Assigned(Source.ReadmeFile)
-    then ReadmeFile := FPackage.Files.FromFileName(Source.ReadmeFile.FileName)
+    then ReadmeFile := Package.Files.FromFileName(Source.ReadmeFile.FileName)
     else ReadmeFile := nil;
   if Assigned(Source.GraphicFile)
-    then GraphicFile := FPackage.Files.FromFileName(Source.GraphicFile.FileName)
+    then GraphicFile := Package.Files.FromFileName(Source.GraphicFile.FileName)
     else GraphicFile := nil;
   FRegistryKeys.Assign(Source.RegistryKeys);
 end;
 
 constructor TPackageOptions.Create(APackage: TPackage);
 begin
-  inherited Create;
+  inherited Create(APackage);
   FLoadLegacy := True;
-  FPackage := APackage;
-  FRegistryKeys := TPackageRegistryKeyList.Create(FPackage);
-  FFileVersion := SKeymanVersion;
+  FRegistryKeys := TPackageRegistryKeyList.Create(Package);
+  FFileVersion := SKeymanVersion70;
 end;
 
 destructor TPackageOptions.Destroy;
@@ -407,8 +453,8 @@ procedure TPackageOptions.LoadXML(ARoot: IXMLNode);
 begin
   FileVersion :=                VarToWideStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
   ExecuteProgram :=             VarToWideStr(ARoot.ChildNodes['Options'].ChildNodes['ExecuteProgram'].NodeValue);
-  ReadmeFile :=                 FPackage.Files.FromFileName(VarToWideStr(ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue));
-  GraphicFile :=                FPackage.Files.FromFileName(VarToWideStr(ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue));
+  ReadmeFile :=                 Package.Files.FromFileName(VarToWideStr(ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue));
+  GraphicFile :=                Package.Files.FromFileName(VarToWideStr(ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
   FRegistryKeys.LoadXML(ARoot);
@@ -429,8 +475,8 @@ procedure TPackageOptions.LoadIni(AIni: TIniFile);
 begin
   FileVersion :=                AIni.ReadString('Package', 'Version',                  '');
   ExecuteProgram :=             AIni.ReadString('Package', 'ExecuteProgram',           '');
-  ReadmeFile :=                 FPackage.Files.FromFileName(AIni.ReadString('Package', 'ReadMeFile', ''));
-  GraphicFile :=                FPackage.Files.FromFileName(AIni.ReadString('Package', 'GraphicFile', ''));
+  ReadmeFile :=                 Package.Files.FromFileName(AIni.ReadString('Package', 'ReadMeFile', ''));
+  GraphicFile :=                Package.Files.FromFileName(AIni.ReadString('Package', 'GraphicFile', ''));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
   FRegistryKeys.LoadIni(AIni);
@@ -466,7 +512,7 @@ begin
     FGraphicFile := nil
   else
   begin
-    if Value.FPackage <> FPackage then raise EPackageInfo.CreateFmt(SGraphicNotOwnedCorrectly, [Value]);
+    if Value.Package <> Package then raise EPackageInfo.CreateFmt(SGraphicNotOwnedCorrectly, [Value]);
     FGraphicFile := Value;
     FGraphicFile.AddNotifyObject(GraphicRemoved);
   end;
@@ -479,7 +525,7 @@ begin
     FReadmeFile := nil
   else
   begin
-    if Value.FPackage <> FPackage then raise EPackageInfo.CreateFmt(SReadmeNotOwnedCorrectly, [Value]);
+    if Value.Package <> Package then raise EPackageInfo.CreateFmt(SReadmeNotOwnedCorrectly, [Value]);
     FReadmeFile := Value;
     FReadmeFile.AddNotifyObject(ReadmeRemoved);
   end;
@@ -495,12 +541,6 @@ begin
   FName := Source.Name;
   FURL := Source.URL;
   FInfoType := Source.InfoType;
-end;
-
-constructor TPackageInfoEntry.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
 end;
 
 procedure TPackageInfoEntry.SetDescription(Value: WideString);
@@ -540,7 +580,7 @@ begin
   for i := 0 to ARoot.ChildNodes.Count - 1 do
   begin
     ANode := ARoot.ChildNodes[i];
-    inf := TPackageInfoEntry.Create(FPackage);
+    inf := TPackageInfoEntry.Create(Package);
     inf.Name := ANode.NodeName;
     inf.Description := VarToWideStr(ANode.NodeValue);
     inf.URL := VarToWideStr(ANode.Attributes['URL']);
@@ -578,7 +618,7 @@ begin
       description := CommaToken(t);
       url := CommaToken(t);
 
-      inf := TPackageInfoEntry.Create(FPackage);
+      inf := TPackageInfoEntry.Create(Package);
       inf.Name := s[i];
       inf.Description := description;
       inf.URL := url;
@@ -623,7 +663,7 @@ begin
   i := IndexOf(Name);
   if i = -1 then
   begin
-    inf := TPackageInfoEntry.Create(FPackage);
+    inf := TPackageInfoEntry.Create(Package);
     inf.Name := Name;
     Add(inf);
   end
@@ -640,7 +680,7 @@ begin
   i := IndexOf(Name);
   if i = -1 then
   begin
-    inf := TPackageInfoEntry.Create(FPackage);
+    inf := TPackageInfoEntry.Create(Package);
     inf.Name := Name;
     Add(inf);
   end
@@ -658,12 +698,6 @@ begin
     if WideLowerCase(Items[i].Name) = WideLowerCase(Name) then Result := i;
 end;
 
-constructor TPackageInfoEntryList.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
-end;
-
 procedure TPackageInfoEntryList.Assign(Source: TPackageInfoEntryList);
 var
   i: Integer;
@@ -672,7 +706,7 @@ begin
   Clear;
   for i := 0 to Source.Count - 1 do
   begin
-    pie := TPackageInfoEntry.Create(FPackage);
+    pie := TPackageInfoEntry.Create(Package);
     pie.Assign(Source[i]);
     Add(pie);
   end;
@@ -689,12 +723,6 @@ begin
   Params := Source.Params;
   Icon := Source.Icon;
   Location := Source.Location;
-end;
-
-constructor TPackageStartMenuEntry.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
 end;
 
 {-------------------------------------------------------------------------------
@@ -722,7 +750,7 @@ begin
   begin
     with ANode.ChildNodes[i] do
     begin
-      sme := TPackageStartMenuEntry.Create(FPackage);
+      sme := TPackageStartMenuEntry.Create(Package);
       sme.Name := VarToWideStr(ChildNodes['Name'].NodeValue);
       sme.Prog := VarToWideStr(ChildNodes['FileName'].NodeValue);
       sme.Params := VarToWideStr(ChildNodes['Arguments'].NodeValue);
@@ -766,7 +794,7 @@ begin
       prog := CommaToken(t);
       params := CommaToken(t);
 
-      sme := TPackageStartMenuEntry.Create(FPackage);
+      sme := TPackageStartMenuEntry.Create(Package);
       sme.Name := s[i];
       sme.Prog := prog;
       sme.Params := params;
@@ -785,12 +813,6 @@ begin
     AIni.WriteString('StartMenuEntries', Items[i].Name, Format('"%s","%s"', [Items[i].Prog, Items[i].Params]));
 end;
 
-constructor TPackageStartMenuEntryList.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
-end;
-
 procedure TPackageStartMenuEntryList.Assign(Source: TPackageStartMenuEntryList);
 var
   i: Integer;
@@ -799,7 +821,7 @@ begin
   Clear;
   for i := 0 to Source.Count - 1 do
   begin
-    psme := TPackageStartMenuEntry.Create(FPackage);
+    psme := TPackageStartMenuEntry.Create(Package);
     psme.Assign(Source[i]);
     Add(psme);
   end;
@@ -819,9 +841,8 @@ end;
 
 constructor TPackageStartMenu.Create(APackage: TPackage);
 begin
-  inherited Create;
-  FPackage := APackage;
-  Entries := TPackageStartMenuEntryList.Create(FPackage);
+  inherited Create(APackage);
+  Entries := TPackageStartMenuEntryList.Create(Package);
 end;
 
 destructor TPackageStartMenu.Destroy;
@@ -879,15 +900,9 @@ begin
   FFileType := Source.FileType;
 end;
 
-constructor TPackageContentFile.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
-end;
-
 function TPackageContentFile.RelativeFileName: WideString;
 begin
-  Result := ExtractRelativePath(FPackage.FileName, FFileName);
+  Result := ExtractRelativePath(Package.FileName, FFileName);
 end;
 
 procedure TPackageContentFile.SetCopyLocation(const Value: TPackageFileCopyLocation);
@@ -946,7 +961,7 @@ begin
   begin
     with ANode.ChildNodes[i] do
     begin
-      subfile := TPackageContentFile.Create(FPackage);
+      subfile := TPackageContentFile.Create(Package);
       subfile.FileName := VarToWideStr(ChildNodes['Name'].NodeValue);
       subfile.Description := VarToWideStr(ChildNodes['Description'].NodeValue);
       subfile.FCopyLocation := TPackageFileCopyLocation(StrToIntDef(VarToWideStr(ChildNodes['Location'].NodeValue), 0));
@@ -991,7 +1006,7 @@ begin
       description := CommaToken(t);
       filename := CommaToken(t);
       copylocation := TPackageFileCopyLocation(StrToIntDef(CommaToken(t), 0));// CommaToken(t) = '1';
-      subfile := TPackageContentFile.Create(FPackage);
+      subfile := TPackageContentFile.Create(Package);
       subfile.FileName := filename;
       subfile.Description := description;
       subfile.FCopyLocation := copylocation;
@@ -1011,12 +1026,6 @@ begin
       Items[i].FileName, Ord(Items[i].CopyLocation)]));
 end;
 
-constructor TPackageContentFileList.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
-end;
-
 procedure TPackageContentFileList.Assign(Source: TPackageContentFileList);
 var
   i: Integer;
@@ -1025,7 +1034,7 @@ begin
   Clear;
   for i := 0 to Source.Count - 1 do
   begin
-    psf := TPackageContentFile.Create(FPackage);
+    psf := TPackageContentFile.Create(Package);
     psf.Assign(Source[i]);
     Add(psf);
   end;
@@ -1071,6 +1080,7 @@ begin
   Options.Assign(Source.Options);
   StartMenu.Assign(Source.StartMenu);
   Info.Assign(Source.Info);
+  Keyboards.Assign(Source.Keyboards);
 end;
 
 constructor TPackage.Create;
@@ -1080,6 +1090,8 @@ begin
   if not Assigned(Options)   then Options   := TPackageOptions.Create(Self);
   if not Assigned(StartMenu) then StartMenu := TPackageStartMenu.Create(Self);
   if not Assigned(Info)      then Info      := TPackageInfoEntryList.Create(Self);
+  if not Assigned(Keyboards) then Keyboards := TPackageKeyboardList.Create(Self);
+
 end;
 
 destructor TPackage.Destroy;
@@ -1088,6 +1100,7 @@ begin
   Options.Free;
   StartMenu.Free;
   Info.Free;
+  Keyboards.Free;
   inherited Destroy;
 end;
 
@@ -1111,6 +1124,7 @@ begin
     Files.LoadIni(ini);
     Options.LoadLegacy := FLoadLegacy;
     Options.LoadIni(ini);
+    Keyboards.LoadIni(ini);
   finally
     ini.Free;
   end;
@@ -1208,6 +1222,7 @@ begin
   Info.LoadXML(ARoot);
   Files.LoadXML(ARoot);
   Options.LoadXML(ARoot);
+  Keyboards.LoadXML(ARoot);
 end;
 
 procedure TPackage.DoSaveXML(ARoot: IXMLNode);
@@ -1217,6 +1232,7 @@ begin
   StartMenu.SaveXML(ARoot);
   Info.SaveXML(ARoot);
   Files.SaveXML(ARoot);
+  Keyboards.SaveXML(ARoot);
 end;
 
 procedure TPackage.SaveIni;
@@ -1231,6 +1247,7 @@ begin
     StartMenu.SaveIni(ini);
     Info.SaveIni(ini);
     Files.SaveIni(ini);
+    Keyboards.SaveIni(ini);
     ini.UpdateFile;
   finally
     ini.Free;
@@ -1284,20 +1301,20 @@ end;
 
 { TPackageBaseObject }
 
-constructor TPackageBaseObject.Create;
+constructor TPackageBaseNotifyObject.Create(APackage: TPackage);
 begin
-  inherited Create;
+  inherited Create(APackage);
   FNotifyObjects := TObjectList<TPackageNotifyEventWrapper>.Create;
 end;
 
-destructor TPackageBaseObject.Destroy;
+destructor TPackageBaseNotifyObject.Destroy;
 begin
   Notify(netDestroy);
   FNotifyObjects.Free;
   inherited Destroy;
 end;
 
-function TPackageBaseObject.Notify(EventType: TPackageNotifyEventType): Boolean;
+function TPackageBaseNotifyObject.Notify(EventType: TPackageNotifyEventType): Boolean;
 var
   i: Integer;
   fAllow: Boolean;
@@ -1310,7 +1327,7 @@ begin
   Result := True;
 end;
 
-procedure TPackageBaseObject.AddNotifyObject(FEventHandler: TPackageNotifyEvent);
+procedure TPackageBaseNotifyObject.AddNotifyObject(FEventHandler: TPackageNotifyEvent);
 var
   ev: TPackageNotifyEventWrapper;
 begin
@@ -1320,7 +1337,7 @@ begin
   FNotifyObjects.Add(ev);
 end;
 
-procedure TPackageBaseObject.RemoveNotifyObject(FEventHandler: TPackageNotifyEvent);
+procedure TPackageBaseNotifyObject.RemoveNotifyObject(FEventHandler: TPackageNotifyEvent);
 var
   i: Integer;
 begin
@@ -1330,6 +1347,14 @@ begin
       FNotifyObjects.Delete(i);
       Exit;
     end;
+end;
+
+{ TPackageBaseObject }
+
+constructor TPackageBaseObject.Create(APackage: TPackage);
+begin
+  inherited Create;
+  FPackage := APackage;
 end;
 
 { TPackageRegistryKeyList }
@@ -1342,16 +1367,10 @@ begin
   Clear;
   for i := 0 to Source.Count - 1 do
   begin
-    prk := TPackageRegistryKey.Create(FPackage);
+    prk := TPackageRegistryKey.Create(Package);
     prk.Assign(Source[i]);
     Add(prk);
   end;
-end;
-
-constructor TPackageRegistryKeyList.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
 end;
 
 procedure TPackageRegistryKeyList.LoadIni(AIni: TIniFile);
@@ -1371,7 +1390,7 @@ begin
     AIni.ReadSectionValues('Registry', FValues);
     for i := 0 to FValues.Count - 1 do
     begin
-      pkr := TPackageRegistryKey.Create(FPackage);
+      pkr := TPackageRegistryKey.Create(Package);
 
       name := FValues.Names[i];
       value := FValues.ValueFromIndex[i];
@@ -1436,7 +1455,7 @@ begin
   for i := 0 to ANode.ChildNodes.Count - 1 do
   begin
     AKeyNode := ANode.ChildNodes[i];
-    pkr := TPackageRegistryKey.Create(FPackage);
+    pkr := TPackageRegistryKey.Create(Package);
 
     name := VarToWideStr(AKeyNode.Attributes['Name']);
     value := VarToWideStr(AKeyNode.Attributes['Value']);
@@ -1501,8 +1520,7 @@ end;
 
 constructor TPackageRegistryKey.Create(APackage: TPackage);
 begin
-  inherited Create;
-  FPackage := APackage;
+  inherited Create(APackage);
   FRoot := HKEY_CURRENT_USER;
   FValueType := rkvtString;
 end;
@@ -1510,6 +1528,241 @@ end;
 destructor TPackageRegistryKey.Destroy;
 begin
   inherited Destroy;
+end;
+
+{ TPackageObjectList<T> }
+
+constructor TPackageObjectList<T>.Create(APackage: TPackage);
+begin
+  inherited Create;
+  FPackage := APackage;
+end;
+
+{ TPackageKeyboard }
+
+procedure TPackageKeyboard.Assign(Source: TPackageKeyboard);
+var
+  i: Integer;
+  FLanguage: TPackageKeyboardLanguage;
+begin
+  FName := Source.Name;
+  FID := Source.ID;
+  FVersion := Source.Version;
+  if Assigned(Source.OSKFont)
+    then FOSKFont := Package.Files.FromFileNameEx(Source.OSKFont.FileName)
+    else FOSKFont := nil;
+  if Assigned(Source.DisplayFont)
+    then FDisplayFont := Package.Files.FromFileNameEx(Source.DisplayFont.FileName)
+    else FDisplayFont := nil;
+  FLanguages.Clear;
+  for i := 0 to Source.Languages.Count - 1 do
+  begin
+    FLanguage := TPackageKeyboardLanguage.Create(Package);
+    FLanguage.ID := Source.Languages[i].ID;
+    FLanguage.Name := Source.Languages[i].Name;
+    FLanguages.Add(FLanguage);
+  end;
+end;
+
+procedure TPackageKeyboard.SetDisplayFont(const Value: TPackageContentFile);
+begin
+  if Assigned(FDisplayFont) then FDisplayFont.RemoveNotifyObject(DisplayFontRemoved);
+  if not Assigned(Value) then
+    FDisplayFont := nil
+  else
+  begin
+    if Value.Package <> Package then raise EPackageInfo.CreateFmt(SDisplayFontNotOwnedCorrectly, [Value]);
+    FDisplayFont := Value;
+    FDisplayFont.AddNotifyObject(DisplayFontRemoved);
+  end;
+end;
+
+constructor TPackageKeyboard.Create(APackage: TPackage);
+begin
+  inherited Create(APackage);
+  FLanguages := TPackageKeyboardLanguageList.Create(APackage);
+end;
+
+destructor TPackageKeyboard.Destroy;
+begin
+  FreeAndNil(FLanguages);
+  inherited Destroy;
+end;
+
+procedure TPackageKeyboard.DisplayFontRemoved(Sender: TObject;
+  EventType: TPackageNotifyEventType; var FAllow: Boolean);
+begin
+  FDisplayFont := nil;
+end;
+
+procedure TPackageKeyboard.SetOSKFont(const Value: TPackageContentFile);
+begin
+  if Assigned(FOSKFont) then FOSKFont.RemoveNotifyObject(OSKFontRemoved);
+  if not Assigned(Value) then
+    FOSKFont := nil
+  else
+  begin
+    if Value.Package <> Package then raise EPackageInfo.CreateFmt(SOSKFontNotOwnedCorrectly, [Value]);
+    FOSKFont := Value;
+    FOSKFont.AddNotifyObject(OSKFontRemoved);
+  end;
+end;
+
+procedure TPackageKeyboard.OSKFontRemoved(Sender: TObject;
+  EventType: TPackageNotifyEventType; var FAllow: Boolean);
+begin
+  FOSKFont := nil;
+end;
+
+{ TPackageKeyboardList }
+
+procedure TPackageKeyboardList.Assign(Source: TPackageKeyboardList);
+var
+  i: Integer;
+  pk: TPackageKeyboard;
+begin
+  Clear;
+  for i := 0 to Source.Count - 1 do
+  begin
+    pk := TPackageKeyboard.Create(Package);
+    pk.Assign(Source[i]);
+    Add(pk);
+  end;
+end;
+
+const
+  SPackageKeyboard_Name = 'Name';
+  SPackageKeyboard_ID = 'ID';
+  SPackageKeyboard_Version = 'Version';
+  SPackageKeyboard_OSKFont = 'OSKFont';
+  SPackageKeyboard_DisplayFont = 'DisplayFont';
+  SPackageKeyboard_Language = 'Language';
+
+procedure TPackageKeyboardList.LoadIni(AIni: TIniFile);
+var
+  s: TStringList;
+  ln: WideString;
+  i, j: Integer;
+  FSectionName: string;
+  keyboard: TPackageKeyboard;
+  FLanguage: TPackageKeyboardLanguage;
+begin
+  Clear;
+  s := TStringList.Create;
+  try
+    AIni.ReadSections(s);
+    for i := 0 to MaxInt do
+    begin
+      FSectionName := 'Keyboard'+IntToStr(i);
+      if s.IndexOf(FSectionName) < 0 then
+        Break;
+
+      keyboard := TPackageKeyboard.Create(Package);
+      keyboard.Name := AIni.ReadString(FSectionName, SPackageKeyboard_Name, '');
+      keyboard.ID := AIni.ReadString(FSectionName, SPackageKeyboard_ID, '');
+      keyboard.Version := AIni.ReadString(FSectionName, SPackageKeyboard_Version, '1.0');
+      keyboard.OSKFont := Package.Files.FromFileNameEx(AIni.ReadString(FSectionName, SPackageKeyboard_OSKFont, ''));
+      keyboard.DisplayFont := Package.Files.FromFileNameEx(AIni.ReadString(FSectionName, SPackageKeyboard_DisplayFont, ''));
+
+      for j := 0 to MaxInt do
+      begin
+        ln := AIni.ReadString(FSectionName, SPackageKeyboard_Language+IntToStr(j), '');
+        if ln = '' then
+          Break;
+        FLanguage := TPackageKeyboardLanguage.Create(Package);
+        FLanguage.ID := CommaToken(ln);
+        FLanguage.Name := CommaToken(ln);
+        keyboard.Languages.Add(FLanguage);
+      end;
+
+      Add(keyboard);
+    end;
+  finally
+    s.Free;
+  end;
+end;
+
+procedure TPackageKeyboardList.LoadXML(ARoot: IXMLNode);
+var
+  keyboard: TPackageKeyboard;
+  i, j: Integer;
+  ANode: IXMLNode;
+  FLanguage: TPackageKeyboardLanguage;
+  ln: WideString;
+  FSectionName: string;
+begin
+  Clear;
+  for i := 0 to MaxInt do
+  begin
+    FSectionName := 'Keyboard'+IntToStr(i);
+    if ARoot.ChildNodes.IndexOf(FSectionName) < 0 then
+      Break;
+    ANode := ARoot.ChildNodes[FSectionName];
+
+    keyboard := TPackageKeyboard.Create(Package);
+    keyboard.Name := VarToStr(ANode.ChildValues[SPackageKeyboard_Name]);
+    keyboard.ID := VarToStr(ANode.ChildValues[SPackageKeyboard_ID]);
+    keyboard.Version := VarToStr(ANode.ChildValues[SPackageKeyboard_Version]);
+    keyboard.OSKFont := Package.Files.FromFileNameEx(VarToStr(ANode.ChildValues[SPackageKeyboard_OSKFont]));
+    keyboard.DisplayFont := Package.Files.FromFileNameEx(VarToStr(ANode.ChildValues[SPackageKeyboard_DisplayFont]));
+
+    for j := 0 to MaxInt do
+    begin
+      ln := VarToStr(ANode.ChildValues[SPackageKeyboard_Language+IntToStr(j)]);
+      if ln = '' then
+        Break;
+      FLanguage := TPackageKeyboardLanguage.Create(Package);
+      FLanguage.ID := CommaToken(ln);
+      FLanguage.Name := CommaToken(ln);
+      keyboard.Languages.Add(FLanguage);
+    end;
+
+    Add(keyboard);
+  end;
+end;
+
+procedure TPackageKeyboardList.SaveIni(AIni: TIniFile);
+var
+  i, j: Integer;
+  FSectionName: string;
+begin
+  for i := 0 to Count-1 do
+  begin
+    FSectionName := 'Keyboard'+IntToStr(i);
+    AIni.WriteString(FSectionName, SPackageKeyboard_Name, Items[i].Name);
+    AIni.WriteString(FSectionName, SPackageKeyboard_ID, Items[i].ID);
+    AIni.WriteString(FSectionName, SPackageKeyboard_Version, Items[i].Version);
+    if Assigned(Items[i].OSKFont) then
+      AIni.WriteString(FSectionName, SPackageKeyboard_OSKFont, ExtractFileName(Items[i].OSKFont.FileName));
+    if Assigned(Items[i].DisplayFont) then
+      AIni.WriteString(FSectionName, SPackageKeyboard_DisplayFont, ExtractFileName(Items[i].DisplayFont.FileName));
+
+    for j := 0 to Items[i].Languages.Count-1 do
+    begin
+      AIni.WriteString(FSectionName, SPackageKeyboard_Language+IntToStr(j), Items[i].Languages[j].ID+','+Items[i].Languages[j].Name);
+    end;
+  end;
+end;
+
+procedure TPackageKeyboardList.SaveXML(ARoot: IXMLNode);
+var
+  i, j: Integer;
+begin
+  for i := 0 to Count - 1 do
+  begin
+    with ARoot.AddChild('Keyboard'+IntToStr(i)) do
+    begin
+      ChildNodes[SPackageKeyboard_Name].NodeValue := Items[i].Name;
+      ChildNodes[SPackageKeyboard_ID].NodeValue := Items[i].ID;
+      ChildNodes[SPackageKeyboard_Version].NodeValue := Items[i].Version;
+      if Assigned(Items[i].OSKFont) then
+        ChildNodes[SPackageKeyboard_OSKFont].NodeValue := ExtractFileName(Items[i].OSKFont.FileName);
+      if Assigned(Items[i].DisplayFont) then
+        ChildNodes[SPackageKeyboard_DisplayFont].NodeValue := ExtractFileName(Items[i].DisplayFont.FileName);
+      for j := 0 to Items[i].Languages.Count - 1 do
+        ChildNodes[SPackageKeyboard_Language+IntToStr(j)].NodeValue := Items[i].Languages[j].ID+','+Items[i].Languages[j].Name;
+    end;
+  end;
 end;
 
 end.
