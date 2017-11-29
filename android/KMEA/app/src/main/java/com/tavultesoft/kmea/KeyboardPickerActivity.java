@@ -299,11 +299,15 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
   private void switchKeyboard(int position) {
     setSelection(position);
     HashMap<String, String> kbInfo = keyboardsList.get(position);
+    String kbId = kbInfo.get(KMManager.KMKey_KeyboardID);
     String pkgId = kbInfo.get(KMManager.KMKey_PackageID);
     if (pkgId == null || pkgId.isEmpty()) {
-      pkgId = KMManager.KMDefault_LegacyPackageID;
+      if (kbId.equals(KMManager.KMDefault_KeyboardID)) {
+        pkgId = KMManager.KMDefault_PackageID;
+      } else {
+        pkgId = KMManager.KMDefault_LegacyPackageID;
+      }
     }
-    String kbId = kbInfo.get(KMManager.KMKey_KeyboardID);
     String langId = kbInfo.get(KMManager.KMKey_LanguageID);
     String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
     String langName = kbInfo.get(KMManager.KMKey_LanguageName);

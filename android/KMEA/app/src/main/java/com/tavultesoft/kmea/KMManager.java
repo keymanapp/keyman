@@ -533,8 +533,15 @@ public final class KMManager {
       for (int i = 0; i < kblCount; i++) {
         kbInfo = kbList.get(i);
 
-        String pkgID = kbInfo.get(KMKey_PackageID);
         kbID = kbInfo.get(KMKey_KeyboardID);
+        String pkgID = kbInfo.get(KMKey_PackageID);
+        if (pkgID == null || pkgID.isEmpty()) {
+          if (kbID.equals(KMDefault_KeyboardID)) {
+            pkgID = KMDefault_PackageID;
+          } else {
+            pkgID = KMDefault_LegacyPackageID;
+          }
+        }
         String langID = kbInfo.get(KMKey_LanguageID);
         String kbVersion = kbInfo.get(KMManager.KMKey_KeyboardVersion);
         String latestKbVersion = getLatestKeyboardFileVersion(context, pkgID, kbID);
