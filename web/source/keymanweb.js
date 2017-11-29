@@ -1296,9 +1296,8 @@ if(!window['keyman']['initialized']) {
     keymanweb['resetContext'] = keymanweb.resetContext = function() {
       osk.layerId = 'default';
 
-      keymanweb._DeadkeyResetMatched();
-      keymanweb._DeadkeyDeleteMatched();
-      keymanweb.cachedContext.reset();
+      kbdInterface.clearDeadkeys();
+      kbdInterface.resetContextCache();
       keymanweb._ResetVKShift();
 
       osk._Show();
@@ -2997,7 +2996,7 @@ if(!window['keyman']['initialized']) {
             keymanweb._Selection = Lrange;
 
             /* Delete deadkeys for IE when certain keys pressed */
-            keymanweb._DeadKeys = [];
+            kbdInterface.clearDeadkeys();
           }
         }
       }
@@ -3056,7 +3055,7 @@ if(!window['keyman']['initialized']) {
 
       switch(Levent.Lcode) {
         case 8: 
-          keymanweb._DeadKeys = []; 
+          kbdInterface.clearDeadkeys();
           break; // I3318 (always clear deadkeys after backspace) 
         case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
         case 17: 
@@ -3109,12 +3108,12 @@ if(!window['keyman']['initialized']) {
         if(typeof(keymanweb._ActiveKeyboard['KM'])=='undefined'  &&  !(Levent.Lmodifiers & 0x60)) {
           // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
           var Levent2={Lcode:keymanweb._USKeyCodeToCharCode(Levent),Ltarg:Levent.Ltarg,Lmodifiers:0,LisVirtualKey:0};
-          if(keymanweb.processKeystroke(util.physicalDevice, Levent2.Ltarg,Levent2)) {
+          if(kbdInterface.processKeystroke(util.physicalDevice, Levent2.Ltarg,Levent2)) {
             LeventMatched=1;
           }
         }
         
-        LeventMatched = LeventMatched || keymanweb.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent);
+        LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent);
         
         // Support backspace in simulated input DIV from physical keyboard where not matched in rule  I3363 (Build 301)
         if(Levent.Lcode == 8 && !LeventMatched && Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
@@ -3124,7 +3123,7 @@ if(!window['keyman']['initialized']) {
         // Mnemonic layout
         if(Levent.Lcode == 8) { // I1595 - Backspace for mnemonic
           keymanweb._KeyPressToSwallow = 1;
-          if(!keymanweb.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
+          if(!kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
             kbdInterface.output(1,keymanweb._LastActiveElement,""); // I3363 (Build 301)
           }
           return false;  //added 16/3/13 to fix double backspace on mnemonic layouts on desktop
@@ -3180,29 +3179,6 @@ if(!window['keyman']['initialized']) {
     }                
 
     /**
-     * Function     processKeystroke
-     * Scope        Private
-     * @param       {Object}        device      The device object properties to be utilized for this keystroke.
-     * @param       {Object}        element     The page element receiving input
-     * @param       {Object}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
-     * Description  Encapsulates calls to keyboard input processing.
-     * @returns     {number}        0 if no match is made, otherwise 1.
-     */
-    keymanweb.processKeystroke = function(device, element, keystroke) {
-      // Clear internal state tracking data from prior keystrokes.
-      keymanweb._CachedSelectionStart = null; // I3319     
-      keymanweb._DeadkeyResetMatched();       // I3318    
-      keymanweb.cachedContext.reset();
-
-      // Ensure the settings are in place so that KIFS/ifState activates and deactivates
-      // the appropriate rule(s) for the modeled device.
-      util.activeDevice = device;
-
-      // Calls the start-group of the active keyboard.
-      return keymanweb._ActiveKeyboard['gs'](element, keystroke);
-    }
-
-    /**
      * Function     _KeyPress
      * Scope        Private
      * @param       {Event}       e     event
@@ -3242,7 +3218,7 @@ if(!window['keyman']['initialized']) {
       }
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
       
-      if(keymanweb._KeyPressToSwallow || keymanweb.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
+      if(keymanweb._KeyPressToSwallow || kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
         keymanweb._KeyPressToSwallow=0;
         if(e  &&  e.preventDefault) {
           e.preventDefault();
@@ -4703,43 +4679,6 @@ if(!window['keyman']['initialized']) {
       return {start: start, end: end}; 
     }
     // *** I3319 Supplementary Plane modifications - end new code
-
-    // I3318 - deadkey changes START
-    /**
-     * Function     _DeadkeyResetMatched
-     * Scope        Private
-     * Description  Clear all matched deadkey flags
-     */       
-    keymanweb._DeadkeyResetMatched = function()
-    {                   
-      var Li, _Dk = keymanweb._DeadKeys;
-      for(Li = 0; Li < _Dk.length; Li++) _Dk[Li].matched = 0;
-    }
-
-    /**
-     * Function     _DeadkeyDeleteMatched
-     * Scope        Private
-     * Description  Delete matched deadkeys from context
-     */       
-    keymanweb._DeadkeyDeleteMatched = function()
-    {              
-      var Li, _Dk = keymanweb._DeadKeys;
-      for(Li = 0; Li < _Dk.length; Li++) if(_Dk[Li].matched) _Dk.splice(Li,1);
-    }
-
-    /**
-     * Function     _DeadkeyAdjustPos
-     * Scope        Private
-     * @param       {number}      Lstart      start position in context
-     * @param       {number}      Ldelta      characters to adjust by   
-     * Description  Adjust saved positions of deadkeys in context
-     */       
-    keymanweb._DeadkeyAdjustPos = function(Lstart, Ldelta)
-    {
-      var Li, _Dk = keymanweb._DeadKeys;
-      for(Li = 0; Li < _Dk.length; Li++) if(_Dk[Li].p > Lstart) _Dk[Li].p += Ldelta;
-    }
-    // I3318 - deadkey changes END
   
     /**
      * Set target element text direction (LTR or RTL), but only if the element is empty

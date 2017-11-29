@@ -139,7 +139,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     //TODO: find out why this is actually happening
     if let containerView = self.containerView {
       if containerView.subviews.isEmpty {
-        Manager.shared.inputDelegate = self
+        Manager.shared.keymanWebDelegate = self
         containerView.addSubview(kmInputView)
       }
     }
