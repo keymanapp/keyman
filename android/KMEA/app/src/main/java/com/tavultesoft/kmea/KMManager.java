@@ -674,7 +674,11 @@ public final class KMManager {
             JSONArray keyboards = language.getJSONArray(KMKey_LanguageKeyboards);
             JSONObject keyboard = keyboards.getJSONObject(keyboardIndex);
 
-            packageID = keyboard.getString(KMKey_PackageID);
+            if (keyboard.has(KMKey_PackageID)) {
+              packageID = keyboard.getString(KMKey_PackageID);
+            } else {
+              packageID = KMDefault_LegacyPackageID;
+            }
             keyboardID = keyboard.getString(KMKey_ID);
             languageID = language.getString(KMKey_ID);
             keyboardName = keyboard.getString(KMKey_Name);
@@ -719,10 +723,13 @@ public final class KMManager {
             ret = 1;
             int result = 0;
             for (String url : urls) {
-              String directory = "";
+              String directory = KMDefault_AssetPackages + File.separator + packageID;
+              File dir = new File(directory);
+              if (!dir.exists()) {
+                dir.mkdir();
+              }
               String filename = "";
               if (url.endsWith(".js")) {
-                directory = "languages";
                 int start = kbFilename.lastIndexOf("/");
                 if (start < 0) {
                   start = 0;
@@ -734,9 +741,6 @@ public final class KMManager {
                 } else {
                   filename = kbFilename.substring(start);
                 }
-              } else {
-                directory = "fonts";
-                filename = "";
               }
 
               result = FileDownloader.download(context, url, directory, filename);
@@ -790,7 +794,7 @@ public final class KMManager {
       }.execute();
     }
 
-    public static void download(final Context context, final String keyboardID, final String languageID, final boolean showProgressDialog) {
+    public static void download(final Context context, final String packageID, final String keyboardID, final String languageID, final boolean showProgressDialog) {
       new AsyncTask<Void, Integer, Integer>() {
         private ProgressDialog progressDialog;
         private String languageName = "";
@@ -826,7 +830,9 @@ public final class KMManager {
 
           try {
             String exceptionStr = "Invalid keyboard";
-            if (languageID == null || languageID.trim().isEmpty() || keyboardID == null || keyboardID.trim().isEmpty())
+            if (packageID == null || packageID.trim().isEmpty() ||
+                languageID == null || languageID.trim().isEmpty() ||
+                keyboardID == null || keyboardID.trim().isEmpty())
               throw new Exception(exceptionStr);
 
             String deviceType = context.getResources().getString(R.string.device_type);
@@ -891,6 +897,7 @@ public final class KMManager {
             // Notify listeners: onDownloadStarted
             if (kbDownloadEventListeners != null) {
               HashMap<String, String> keyboardInfo = new HashMap<String, String>();
+              keyboardInfo.put(KMKey_PackageID, packageID);
               keyboardInfo.put(KMKey_KeyboardID, keyboardID);
               keyboardInfo.put(KMKey_LanguageID, languageID);
               keyboardInfo.put(KMKey_KeyboardName, keyboardName);
@@ -906,10 +913,14 @@ public final class KMManager {
             ret = 1;
             int result = 0;
             for (String url : urls) {
-              String directory = "";
+              String directory = KMDefault_AssetPackages + File.separator + packageID;
+              File dir = new File(directory);
+              if (!dir.exists()) {
+                dir.mkdir();
+              }
               String filename = "";
               if (url.endsWith(".js")) {
-                directory = "languages";
+
                 int start = kbFilename.lastIndexOf("/");
                 if (start < 0) {
                   start = 0;
@@ -921,9 +932,6 @@ public final class KMManager {
                 } else {
                   filename = kbFilename.substring(start);
                 }
-              } else {
-                directory = "fonts";
-                filename = "";
               }
 
               result = FileDownloader.download(context, url, directory, filename);
@@ -1026,6 +1034,7 @@ public final class KMManager {
     public static void download(final Context context, final String jsonUrl, final boolean isDirect, final boolean showProgressDialog) {
       new AsyncTask<Void, Integer, Integer>() {
         private ProgressDialog progressDialog;
+        private String packageID = "";
         private String keyboardID = "";
         private String languageID = "";
         private String keyboardName = "";
@@ -1099,6 +1108,7 @@ public final class KMManager {
 
             JSONArray languages = keyboard.optJSONArray(KMKey_Languages);
 
+            packageID = keyboard.optString(KMKey_PackageID, "");
             keyboardID = keyboard.optString(KMKey_ID, "");
             keyboardName = keyboard.optString(KMKey_Name, "");
             kbVersion = keyboard.optString(KMKey_KeyboardVersion, "1.0");
@@ -1109,7 +1119,9 @@ public final class KMManager {
             }
             String kbFilename = keyboard.optString(KMKey_Filename, "");
 
-            if (languages == null || keyboardID.isEmpty() || keyboardName.isEmpty() || kbFilename.isEmpty()) {
+            if (packageID == null || packageID.isEmpty() ||
+                languages == null || keyboardID.isEmpty() ||
+                keyboardName.isEmpty() || kbFilename.isEmpty()) {
               throw new Exception(exceptionStr);
             }
 
@@ -1313,6 +1325,10 @@ public final class KMManager {
           dirPath = context.getDir("data", Context.MODE_PRIVATE) + "/" + directory;
         } else {
           dirPath = context.getDir("data", Context.MODE_PRIVATE).toString();
+        }
+        File dir = new File(dirPath);
+        if (!dir.exists()) {
+          dir.mkdir();
         }
 
         if (Connection.initialize(urlStr)) {

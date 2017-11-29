@@ -146,10 +146,12 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
       JSONObject language = languages.getJSONObject(languageIndex);
       String langID = language.getString(KMManager.KMKey_ID);
       String langName = language.getString(KMManager.KMKey_Name);
+      String pkgID;
 
       JSONArray keyboards = language.getJSONArray(KMManager.KMKey_LanguageKeyboards);
-      String pkgID = keyboards.getJSONObject(keyboardIndex).getString(KMManager.KMKey_PackageID);
-      if (pkgID == null || pkgID.isEmpty()) {
+      if (keyboards.getJSONObject(keyboardIndex).has(KMManager.KMKey_PackageID)) {
+        pkgID = keyboards.getJSONObject(keyboardIndex).getString(KMManager.KMKey_PackageID);
+      } else {
         pkgID = KMManager.KMDefault_LegacyPackageID;
       }
       String kbID = keyboards.getJSONObject(keyboardIndex).getString(KMManager.KMKey_ID);

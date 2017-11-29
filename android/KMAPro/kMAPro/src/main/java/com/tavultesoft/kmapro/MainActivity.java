@@ -546,7 +546,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         public void onClick(DialogInterface dialog, int which) {
           // Download keyboard
           if (KMManager.hasConnection(context)) {
-            KMManager.KMKeyboardDownloader.download(context, keyboard, language, true);
+            KMManager.KMKeyboardDownloader.download(context, KMManager.KMDefault_LegacyPackageID, keyboard, language, true);
           } else {
             Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
           }

@@ -300,6 +300,9 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
     setSelection(position);
     HashMap<String, String> kbInfo = keyboardsList.get(position);
     String pkgId = kbInfo.get(KMManager.KMKey_PackageID);
+    if (pkgId == null || pkgId.isEmpty()) {
+      pkgId = KMManager.KMDefault_LegacyPackageID;
+    }
     String kbId = kbInfo.get(KMManager.KMKey_KeyboardID);
     String langId = kbInfo.get(KMManager.KMKey_LanguageID);
     String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
@@ -608,6 +611,7 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
               if (KMManager.hasConnection(context)) {
                 int len = keyboardsList.size();
                 for (int i = 0; i < len; i++) {
+                  String packageID = keyboardsList.get(i).get(KMManager.KMKey_PackageID);
                   String languageID = keyboardsList.get(i).get(KMManager.KMKey_LanguageID);
                   String keyboardID = keyboardsList.get(i).get(KMManager.KMKey_KeyboardID);
                   String kbKey = String.format("%s_%s", languageID, keyboardID);
@@ -623,7 +627,7 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
                         updateProgress.show();
                       }
 
-                      KMManager.KMKeyboardDownloader.download(context, keyboardID, languageID, false);
+                      KMManager.KMKeyboardDownloader.download(context, packageID, keyboardID, languageID, false);
                     }
                   }
                 }
