@@ -136,8 +136,12 @@ public final class KMManager {
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
 
   // Default Asset Paths
+  // Previous keyboards installed from the cloud  went to /languages/ and /fonts/
+  // Keyboards now get installed into /packages/packageID.
+  // If a legacy keyboard has an undefined packageID, it will default to "cloud"
   public static final String KMDefault_LegacyAssetLanguages = "languages";
   public static final String KMDefault_LegacyAssetFonts = "fonts";
+  public static final String KMDefault_LegacyPackageID = "cloud";
   public static final String KMDefault_AssetPackages = "packages";
 
   // Default Keyboard Info
@@ -167,7 +171,7 @@ public final class KMManager {
 
     if (!didCopyAssets) {
       copyAssets(appContext);
-      renameOldKeyboardFiles(appContext);
+      migrateOldKeyboardFiles(appContext);
       updateOldKeyboardsList(appContext);
       didCopyAssets = true;
     }
@@ -428,66 +432,76 @@ public final class KMManager {
   }
 
   /**
-   * Renames legacy keyboard files which were installed in /languages directories or
-   * the keyboard filename is missing the version number.
-   * Since we don't know the original packageID for the installed keyboards, use
-   * legacy0, legacy1, ... for the new /packages/legacyX/ directories.
-   * Legacy default keyboards /languages/european2*.js can also be safely removed
-   * TODO: how to move legacy /fonts?
-   * Assumption: No legacy keyboards at /packages/*.js
+   * Migrates legacy keyboards in the /languages/ directory so that:
+   * 1) Default eurolatin2 or us.js keyboards are deleted
+   * 2) Keyboards missing a version number are assigned "-1.0"
+   * 3) Remaining keyboards are moved to /packages/cloud (default packageID of "cloud")
+   *
+   * Fonts used in legacy keyboards are also migrated from /fonts/ to /packages/cloud
+   *
+   * Assumption: No legacy keyboards exist in /packages/*.js
    * @param context
    */
-  private static void renameOldKeyboardFiles(Context context) {
-    String[] originalPaths = {
-      context.getDir("data", Context.MODE_PRIVATE) + File.separator + KMDefault_LegacyAssetLanguages + File.separator,
-      //context.getDir("data", Context.MODE_PRIVATE) + File.separator + KMDefault_AssetPackages + File.separator
-    };
-    int migratedKeyboards = 0;
-    for (String originalPath : originalPaths) {
-      File originalDir = new File(originalPath);
-      if (!originalDir.exists()) {
-        continue;
-      }
-      String[] files = originalDir.list();
-      for (String filename : files) {
-        String migratedPath = context.getDir("data", Context.MODE_PRIVATE) + File.separator + KMDefault_AssetPackages +
-          File.separator + "legacy" + String.valueOf(migratedKeyboards);
-        // Handle keyboards missing version number
-        if (filename.lastIndexOf("-") < 0) {
-          if (filename.equals("us.js")) {
-            File kbFile = new File(originalPath, filename);
-            kbFile.delete();
-          } else if (filename.endsWith(".js")) {
-            // Append default version number to keyboard and move
-            String newFilename = filename.substring(0, filename.lastIndexOf(".js")) + "-1.0.js";
-            File migratedDir = new File(migratedPath);
-            if (!migratedDir.exists()) {
-              migratedDir.mkdir();
-            }
-            File kbFile = new File(originalPath, filename);
-            kbFile.renameTo(new File(migratedDir, newFilename));
-            migratedKeyboards++;
-          }
-        } else {
-          // Remove legacy default keyboards
-          if (filename.startsWith(KMDefault_KeyboardID + "-")) {
-            File legacyKbFile = new File(originalDir, filename);
-            if (legacyKbFile.exists()) {
-              legacyKbFile.delete();
-              continue;
-            }
-          }
+  private static void migrateOldKeyboardFiles(Context context) {
+    String legacyLanguagesPath = context.getDir("data", Context.MODE_PRIVATE) + File.separator +
+      KMDefault_LegacyAssetLanguages + File.separator;
+    String legacyFontsPath = context.getDir("data", Context.MODE_PRIVATE) + File.separator +
+      KMDefault_LegacyAssetFonts + File.separator;
+    File legacyLanguagesDir = new File(legacyLanguagesPath);
+    File legacyFontsDir = new File(legacyFontsPath);
+    if (!legacyLanguagesDir.exists() && !legacyFontsDir.exists()) {
+      return;
+    }
 
-          // Migrate /languages/*.js keyboards
-          File migratedDir = new File(migratedPath);
-          if (!migratedDir.exists()) {
-            migratedDir.mkdir();
-          }
-          File kbFile = new File(originalPath, filename);
-          kbFile.renameTo(new File(migratedDir, filename));
-          migratedKeyboards++;
+    String migratedPath = context.getDir("data", Context.MODE_PRIVATE) + File.separator +
+      KMDefault_AssetPackages + File.separator + KMDefault_LegacyPackageID;
+    File migratedDir = new File(migratedPath);
+    if (!migratedDir.exists()) {
+      migratedDir.mkdir();
+    }
+
+    String[] files = legacyLanguagesDir.list();
+    for (String filename : files) {
+      // Handle keyboards missing version number
+      if (filename.lastIndexOf("-") < 0) {
+        if (filename.equals("us.js")) {
+          File kbFile = new File(legacyLanguagesPath, filename);
+          kbFile.delete();
+        } else if (filename.endsWith(".js")) {
+          // Append default version number to keyboard and move
+          String newFilename = filename.substring(0, filename.lastIndexOf(".js")) + "-1.0.js";
+          File kbFile = new File(legacyLanguagesPath, filename);
+          kbFile.renameTo(new File(migratedDir, newFilename));
         }
+      // Handle keyboards with version number
+      } else {
+        // Remove legacy default keyboards
+        if (filename.startsWith(KMDefault_KeyboardID + "-")) {
+          File legacyKbFile = new File(legacyLanguagesDir, filename);
+          if (legacyKbFile.exists()) {
+            legacyKbFile.delete();
+            continue;
+          }
+        }
+
+        // Migrate /languages/*.js keyboards
+        File kbFile = new File(legacyLanguagesPath, filename);
+        kbFile.renameTo(new File(migratedDir, filename));
       }
+    }
+
+    files = legacyFontsDir.list();
+    for (String filename : files) {
+      File fontFile = new File(legacyFontsPath, filename);
+      fontFile.renameTo(new File(migratedDir, filename));
+    }
+
+    // Cleanup empty directories
+    if (legacyLanguagesDir.list().length == 0) {
+      legacyLanguagesDir.delete();
+    }
+    if (legacyFontsDir.list().length == 0) {
+      legacyFontsDir.delete();
     }
   }
 
