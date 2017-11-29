@@ -541,6 +541,8 @@ public final class KMManager {
           } else {
             pkgID = KMDefault_LegacyPackageID;
           }
+          kbInfo.put(KMManager.KMKey_PackageID, pkgID);
+          shouldUpdateList = true;
         }
         String langID = kbInfo.get(KMKey_LanguageID);
         String kbVersion = kbInfo.get(KMManager.KMKey_KeyboardVersion);
