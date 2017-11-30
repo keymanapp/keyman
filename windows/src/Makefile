@@ -29,7 +29,7 @@ default:
     
 TARGETS=ext global buildtools developer engine desktop support
 RELEASE_TARGETS=desktop
-CLEANS=test cleanroot unit-tests
+CLEANS=test unit-tests cleanroot
 MANIFESTS=engine desktop developer
 
 EXCLUDEPATHDEFINES=1
