@@ -22,11 +22,11 @@ public class KeyboardPickerBarButtonItem: UIBarButtonItem {
     target = self
     self.presentingVC = presentingVC
 
-    image = UIImage(named: "keyboard_icon", in: Constants.keymanBundle, compatibleWith: nil)
+    image = UIImage(named: "keyboard_icon", in: Resources.bundle, compatibleWith: nil)
 
     if UIDevice.current.userInterfaceIdiom == .phone {
       landscapeImagePhone = UIImage(named: "keyboard_icon_landscape",
-                                    in: Constants.keymanBundle,
+                                    in: Resources.bundle,
                                     compatibleWith: nil)
     }
   }

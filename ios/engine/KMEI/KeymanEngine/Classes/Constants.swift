@@ -40,18 +40,28 @@ public enum Key {
   static let update = "update"
 }
 
-public enum Constants {
-  private static let defaultFont = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
-  public static let defaultKeyboard = InstallableKeyboard(id: "european2",
-                                                          name: "EuroLatin2 Keyboard",
-                                                          languageID: "eng",
-                                                          languageName: "English",
-                                                          version: "1.6",
-                                                          isRTL: false,
-                                                          font: defaultFont,
-                                                          oskFont: nil,
-                                                          isCustom: false)
+public enum Defaults {
+  private static let font = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
+  public static let keyboard = InstallableKeyboard(id: "european2",
+                                                   name: "EuroLatin2 Keyboard",
+                                                   languageID: "eng",
+                                                   languageName: "English",
+                                                   version: "1.6",
+                                                   isRTL: false,
+                                                   font: font,
+                                                   oskFont: nil,
+                                                   isCustom: false)
+}
 
+public enum Resources {
+  /// Keyman Web resources
+  public static let bundle: Bundle = {
+    let frameworkBundle =  Bundle(identifier: "org.sil.Keyman.ios.Engine")!
+    return Bundle(path: frameworkBundle.path(forResource: "Keyman", ofType: "bundle")!)!
+  }()
+}
+
+public enum Util {
   /// Is the process of a custom keyboard extension.
   public static let isSystemKeyboard: Bool = {
     let infoDict = Bundle.main.infoDictionary
@@ -62,14 +72,8 @@ public enum Constants {
 
   /// The version of the Keyman SDK
   public static let sdkVersion: String = {
-    let info = NSDictionary(contentsOfFile: keymanBundle.path(forResource: "KeymanEngine-Info",
-                                                              ofType: "plist")!)
-    return info!["CFBundleVersion"] as! String
-  }()
-
-  /// Keyman Web resources
-  public static let keymanBundle: Bundle = {
-    let frameworkBundle =  Bundle(identifier: "org.sil.Keyman.ios.Engine")!
-    return Bundle(path: frameworkBundle.path(forResource: "Keyman", ofType: "bundle")!)!
+    let url = Resources.bundle.url(forResource: "KeymanEngine-Info", withExtension: "plist")!
+    let info = NSDictionary(contentsOf: url)!
+    return info["CFBundleVersion"] as! String
   }()
 }
