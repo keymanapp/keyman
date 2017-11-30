@@ -734,9 +734,6 @@ public final class KMManager {
             for (String url : urls) {
               String directory = KMDefault_AssetPackages + File.separator + packageID;
               File dir = new File(directory);
-              if (!dir.exists()) {
-                dir.mkdir();
-              }
               String filename = "";
               if (url.endsWith(".js")) {
                 int start = kbFilename.lastIndexOf("/");
@@ -924,9 +921,6 @@ public final class KMManager {
             for (String url : urls) {
               String directory = KMDefault_AssetPackages + File.separator + packageID;
               File dir = new File(directory);
-              if (!dir.exists()) {
-                dir.mkdir();
-              }
               String filename = "";
               if (url.endsWith(".js")) {
 
@@ -1118,6 +1112,9 @@ public final class KMManager {
             JSONArray languages = keyboard.optJSONArray(KMKey_Languages);
 
             packageID = keyboard.optString(KMKey_PackageID, "");
+            if (packageID == null || packageID.isEmpty()) {
+              packageID = KMDefault_LegacyPackageID;
+            }
             keyboardID = keyboard.optString(KMKey_ID, "");
             keyboardName = keyboard.optString(KMKey_Name, "");
             kbVersion = keyboard.optString(KMKey_KeyboardVersion, "1.0");
@@ -1166,6 +1163,7 @@ public final class KMManager {
             // Notify listeners: onDownloadStarted
             if (kbDownloadEventListeners != null) {
               HashMap<String, String> keyboardInfo = new HashMap<String, String>();
+              keyboardInfo.put(KMKey_PackageID, packageID);
               keyboardInfo.put(KMKey_KeyboardID, keyboardID);
               keyboardInfo.put(KMKey_LanguageID, languageID);
               keyboardInfo.put(KMKey_KeyboardName, keyboardName);
@@ -1182,10 +1180,10 @@ public final class KMManager {
             ret = 1;
             int result = 0;
             for (String url : urls) {
-              String directory = "";
+              String directory = KMDefault_AssetPackages + File.separator + packageID;
+              File dir = new File(directory);
               String filename = "";
               if (url.endsWith(".js")) {
-                directory = "languages";
                 int start = kbFilename.lastIndexOf("/");
                 if (start < 0) {
                   start = 0;
@@ -1197,9 +1195,6 @@ public final class KMManager {
                 } else {
                   filename = kbFilename.substring(start);
                 }
-              } else {
-                directory = "fonts";
-                filename = "";
               }
 
               result = FileDownloader.download(context, url, directory, filename);
@@ -1238,6 +1233,7 @@ public final class KMManager {
           // Notify listeners: onDownloadFinished
           if (kbDownloadEventListeners != null) {
             HashMap<String, String> keyboardInfo = new HashMap<String, String>();
+            keyboardInfo.put(KMKey_PackageID, packageID);
             keyboardInfo.put(KMKey_KeyboardID, keyboardID);
             keyboardInfo.put(KMKey_LanguageID, languageID);
             keyboardInfo.put(KMKey_KeyboardName, keyboardName);
@@ -1315,6 +1311,14 @@ public final class KMManager {
 
   private static final class FileDownloader {
 
+    /**
+     * Utility to download a file from urlStr and store it at directory/filename
+     * @param context
+     * @param urlStr URL of the file to download
+     * @param directory Path to store the file. If directory does not exist, it will be created
+     * @param filename Destination filename. If blank, it will use the filename from the URL
+     * @return
+     */
     public static int download(Context context, String urlStr, String directory, String filename) {
       int ret = -1;
       String fileName = "";
@@ -1323,9 +1327,9 @@ public final class KMManager {
       File file = null;
 
       try {
-        if (directory == null)
+        if (directory == null) {
           directory = "";
-
+        }
         directory = directory.trim();
 
         String dirPath;
