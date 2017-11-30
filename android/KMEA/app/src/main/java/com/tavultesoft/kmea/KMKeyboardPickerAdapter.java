@@ -83,8 +83,15 @@ final class KMKeyboardPickerAdapter extends SimpleAdapter implements OnClickList
     HashMap<String, String> kbInfo = (HashMap<String, String>) v.getTag();
     Intent i = new Intent(context, KeyboardInfoActivity.class);
     i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-    String packageID = kbInfo.get(KMManager.KMKey_PackageID);
     String keyboardID = kbInfo.get(KMManager.KMKey_KeyboardID);
+    String packageID = kbInfo.get(KMManager.KMKey_PackageID);
+    if (packageID == null || packageID.isEmpty()) {
+      if (keyboardID.equals(KMManager.KMDefault_KeyboardID)) {
+        packageID = KMManager.KMDefault_PackageID;
+      } else {
+        packageID = KMManager.KMDefault_LegacyPackageID;
+      }
+    }
     i.putExtra(KMManager.KMKey_PackageID, packageID);
     i.putExtra(KMManager.KMKey_KeyboardID, keyboardID);
     i.putExtra(KMManager.KMKey_LanguageID, kbInfo.get(KMManager.KMKey_LanguageID));
