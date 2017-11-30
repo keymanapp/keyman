@@ -52,3 +52,10 @@ public struct Constants {
                                                           oskFont: nil,
                                                           isCustom: false)
 }
+
+public enum FileExtensions {
+  public static let javaScript = "js"
+  public static let trueTypeFont = "ttf"
+  public static let openTypeFont = "otf"
+  public static let configurationProfile = "mobileconfig"
+}

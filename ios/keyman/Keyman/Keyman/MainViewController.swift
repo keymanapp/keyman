@@ -932,7 +932,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   private func profileName(withFont font: Font) -> String? {
-    return font.source.first { $0.hasSuffix(".mobileconfig") }
+    return font.source.first { $0.lowercased().hasSuffix(FileExtensions.configurationProfile) }
   }
 
   private func checkProfile(forKeyboardID kbID: String, languageID langID: String, doListCheck: Bool) {
