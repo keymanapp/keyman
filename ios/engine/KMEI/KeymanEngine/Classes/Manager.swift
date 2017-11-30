@@ -106,9 +106,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// The key format is $languageID_$keyboardID. For example, "eng_european2" returns the English EuroLatin2 keyboard
   public private(set) var keyboardsDictionary: [String: InstallableKeyboard] = [:]
 
-  /// Dictionary of available Keyman keyboard fonts keyed by font filename
-  public private(set) var keymanFonts: [String: RegisteredFont] = [:]
-
   /// In keyboard extensions (system keyboard), `UIApplication.openURL(_:)` is unavailable. The API is not called in
   /// the system keyboard since `KeyboardInfoViewController` is never used. `openURL(:_)` is only used in applications,
   /// where it is safe. However, the entire Keyman Engine framework must be compiled with extension-safe APIs.
@@ -210,7 +207,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
      * set the queue running, this should be perfectly fine.
      */
     sharedQueue = HTTPDownloader.init(self)
-    registerCustomFonts()
+    // FontManager.shared.registerCustomFonts()
   }
 
   // MARK: - Keyboard management
@@ -400,8 +397,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   public func fontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
     let kb = activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
       ?? repositoryKeyboard(withID: keyboardID, languageID: languageID)
-    if let filename =  kb?.font?.source.first(where: { $0.hasFontExtension }) {
-      return keymanFonts[filename]?.name
+    if let filename = kb?.font?.source.first(where: { $0.hasFontExtension }),
+      let fontPath = fontPath(forFilename: filename) {
+      return FontManager.shared.fontName(at: fontPath)
     }
     return nil
   }
@@ -412,8 +410,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   func oskFontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
     let kb = activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
       ?? repositoryKeyboard(withID: keyboardID, languageID: languageID)
-    if let filename =  kb?.oskFont?.source.first(where: { $0.hasFontExtension }) {
-      return keymanFonts[filename]?.name
+    if let filename = kb?.oskFont?.source.first(where: { $0.hasFontExtension }),
+      let fontPath = fontPath(forFilename: filename) {
+      return FontManager.shared.fontName(at: fontPath)
     }
     return nil
   }
@@ -767,7 +766,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         if downloadQueue!.requestsCount == 0 {
           // Download queue finished.
           downloadQueue = nil
-          registerCustomFonts()
+          FontManager.shared.registerCustomFonts()
           kmLog("Downloaded keyboard: \(keyboard.id).", checkDebugPrinting: true)
 
           NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
@@ -919,104 +918,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     preloadFile(srcUrl: URL.init(fileURLWithPath: fontPath),
                 dstDir: fontDir,
                 shouldOverwrite: shouldOverwrite)
-  }
-
-  /// Registers all new fonts found in the font path. Call this after you have preloaded all your font files
-  /// with `preloadFontFile(atPath:shouldOverwrite:)`
-  public func registerCustomFonts() {
-    let directoryContents: [String]
-    do {
-      directoryContents = try FileManager.default.contentsOfDirectory(atPath: activeFontDirectory().path)
-    } catch {
-      kmLog("Failed to list font dir contents: \(error)", checkDebugPrinting: false)
-      return
-    }
-
-    for fontFilename in directoryContents where fontFilename.hasFontExtension {
-      if let fontInfo = keymanFonts[fontFilename] {
-        if !fontInfo.isRegistered {
-          if let newFontInfo = registerFont(withFilename: fontFilename) {
-            keymanFonts[fontFilename] = newFontInfo
-          }
-        }
-      } else if let fontInfo = registerFont(withFilename: fontFilename) {
-        keymanFonts[fontFilename] = fontInfo
-      }
-    }
-  }
-
-  /// Unregisters all registered fonts in the font path.
-  public func unregisterCustomFonts() {
-    let directoryContents: [String]
-    do {
-      directoryContents = try FileManager.default.contentsOfDirectory(atPath: activeFontDirectory().path)
-    } catch {
-      kmLog("Failed to list font dir contents: \(error)", checkDebugPrinting: false)
-      return
-    }
-
-    for fontFilename in directoryContents where fontFilename.hasFontExtension {
-      if var fontInfo = keymanFonts[fontFilename], fontInfo.isRegistered {
-        if unregisterFont(withFilename: fontFilename) {
-          fontInfo.isRegistered = false
-          keymanFonts[fontFilename] = fontInfo
-        }
-      }
-    }
-  }
-
-  private func registerFont(withFilename fontFilename: String) -> RegisteredFont? {
-    guard let fontURL = activeFontDirectory()?.appendingPathComponent(fontFilename),
-      FileManager.default.fileExists(atPath: fontURL.path) else {
-        return nil
-    }
-
-    guard let provider = CGDataProvider(url: fontURL as CFURL) else {
-      kmLog("Failed to open \(fontURL)", checkDebugPrinting: false)
-      return nil
-    }
-    guard let font = CGFont(provider),
-          let cfFontName = font.postScriptName else {
-      kmLog("Failed to read font at \(fontURL)", checkDebugPrinting: false)
-      return nil
-    }
-
-    var didRegister = false
-    let fontName = cfFontName as String
-    if !fontExists(fontName) {
-      var errorRef: Unmanaged<CFError>?
-      didRegister = CTFontManagerRegisterFontsForURL(fontURL as CFURL, .none, &errorRef)
-      let error = errorRef?.takeRetainedValue() // Releases errorRef
-      if !didRegister {
-        kmLog("Failed to register font: \(fontURL) reason: \(error!.localizedDescription)",
-          checkDebugPrinting: false)
-      } else {
-        kmLog("Registered font: \(fontURL)", checkDebugPrinting: true)
-      }
-    }
-    return RegisteredFont(name: fontName, isRegistered: didRegister)
-  }
-
-  private func unregisterFont(withFilename fontFilename: String) -> Bool {
-    guard let fontURL = activeFontDirectory()?.appendingPathComponent(fontFilename),
-      FileManager.default.fileExists(atPath: fontURL.path) else {
-        return false
-    }
-    var errorRef: Unmanaged<CFError>?
-    let didUnregister = CTFontManagerUnregisterFontsForURL(fontURL as CFURL, .none, &errorRef)
-    let error = errorRef?.takeRetainedValue() // Releases errorRef
-    if !didUnregister {
-      kmLog("Failed to unregister font: \(fontURL) reason: \(error!.localizedDescription)", checkDebugPrinting: false)
-    } else {
-      kmLog("Unregistered font: \(fontFilename)", checkDebugPrinting: true)
-    }
-    return didUnregister
-  }
-
-  private func fontExists(_ fontName: String) -> Bool {
-    return UIFont.familyNames.contains { familyName in
-      UIFont.fontNames(forFamilyName: familyName).contains(fontName)
-    }
   }
 
   // TODO: Use a logging library or have more than 2 log levels
@@ -1282,7 +1183,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       kmLog("copyKeymanFilesFromSharedContainer(): \(error)", checkDebugPrinting: false)
       return false
     }
-    registerCustomFonts()
+    FontManager.shared.registerCustomFonts()
     return true
   }
 

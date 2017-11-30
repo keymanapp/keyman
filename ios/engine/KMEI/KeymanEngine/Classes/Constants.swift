@@ -59,6 +59,8 @@ public enum Resources {
     let frameworkBundle =  Bundle(identifier: "org.sil.Keyman.ios.Engine")!
     return Bundle(path: frameworkBundle.path(forResource: "Keyman", ofType: "bundle")!)!
   }()
+
+  public static let oskFontFilename = "keymanweb-osk.ttf"
 }
 
 public enum Util {

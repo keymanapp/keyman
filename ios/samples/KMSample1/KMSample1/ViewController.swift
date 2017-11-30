@@ -21,9 +21,9 @@ class ViewController: UIViewController, TextViewDelegate {
                                        shouldOverwrite: true)
     Manager.shared.preloadFontFile(atPath: Bundle.main.path(forResource: "aava1", ofType: "ttf")!,
                                    shouldOverwrite: true)
-    Manager.shared.registerCustomFonts()
+    FontManager.shared.registerCustomFonts()
 
-    Manager.shared.addKeyboard(Constants.defaultKeyboard)
+    Manager.shared.addKeyboard(Defaults.keyboard)
     let kb = InstallableKeyboard(id: "tamil99m",
                                  name: "Tamil 99M",
                                  languageID: "tam",

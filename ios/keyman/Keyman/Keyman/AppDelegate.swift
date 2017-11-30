@@ -52,7 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func applicationDidEnterBackground(_ application: UIApplication) {
     _overlayWindow = nil
-    Manager.shared.unregisterCustomFonts()
+    FontManager.shared.unregisterCustomFonts()
     let userData = AppDelegate.activeUserDefaults()
     // TODO: Have viewController save its data
     userData.set(viewController?.textView?.text, forKey: userTextKey)
@@ -87,7 +87,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   @objc func registerCustomFonts() {
-    Manager.shared.registerCustomFonts()
+    FontManager.shared.registerCustomFonts()
   }
 
   class func activeUserDefaults() -> UserDefaults {
