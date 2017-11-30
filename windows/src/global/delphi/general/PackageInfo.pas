@@ -1637,6 +1637,7 @@ const
   SPackageKeyboard_OSKFont = 'OSKFont';
   SPackageKeyboard_DisplayFont = 'DisplayFont';
   SPackageKeyboard_Language = 'Language';
+  SPackageKeyboard_Language_ID = 'ID';
 
 procedure TPackageKeyboardList.LoadIni(AIni: TIniFile);
 var
@@ -1686,35 +1687,35 @@ procedure TPackageKeyboardList.LoadXML(ARoot: IXMLNode);
 var
   keyboard: TPackageKeyboard;
   i, j: Integer;
-  ANode: IXMLNode;
+  AKeyboard, ALanguage, ALanguages, ANode: IXMLNode;
   FLanguage: TPackageKeyboardLanguage;
-  ln: WideString;
-  FSectionName: string;
 begin
   Clear;
-  for i := 0 to MaxInt do
+
+  ANode := ARoot.ChildNodes['Keyboards'];
+  for i := 0 to ANode.ChildNodes.Count - 1 do
   begin
-    FSectionName := 'Keyboard'+IntToStr(i);
-    if ARoot.ChildNodes.IndexOf(FSectionName) < 0 then
-      Break;
-    ANode := ARoot.ChildNodes[FSectionName];
+    AKeyboard := ANode.ChildNodes[i];
 
     keyboard := TPackageKeyboard.Create(Package);
-    keyboard.Name := VarToStr(ANode.ChildValues[SPackageKeyboard_Name]);
-    keyboard.ID := VarToStr(ANode.ChildValues[SPackageKeyboard_ID]);
-    keyboard.Version := VarToStr(ANode.ChildValues[SPackageKeyboard_Version]);
-    keyboard.OSKFont := Package.Files.FromFileNameEx(VarToStr(ANode.ChildValues[SPackageKeyboard_OSKFont]));
-    keyboard.DisplayFont := Package.Files.FromFileNameEx(VarToStr(ANode.ChildValues[SPackageKeyboard_DisplayFont]));
+    keyboard.Name := VarToStr(AKeyboard.ChildValues[SPackageKeyboard_Name]);
+    keyboard.ID := VarToStr(AKeyboard.ChildValues[SPackageKeyboard_ID]);
+    keyboard.Version := VarToStr(AKeyboard.ChildValues[SPackageKeyboard_Version]);
+    keyboard.OSKFont := Package.Files.FromFileNameEx(VarToStr(AKeyboard.ChildValues[SPackageKeyboard_OSKFont]));
+    keyboard.DisplayFont := Package.Files.FromFileNameEx(VarToStr(AKeyboard.ChildValues[SPackageKeyboard_DisplayFont]));
 
-    for j := 0 to MaxInt do
+    ALanguages := AKeyboard.ChildNodes['Languages'];
+    if Assigned(ALanguages) then
     begin
-      ln := VarToStr(ANode.ChildValues[SPackageKeyboard_Language+IntToStr(j)]);
-      if ln = '' then
-        Break;
-      FLanguage := TPackageKeyboardLanguage.Create(Package);
-      FLanguage.ID := CommaToken(ln);
-      FLanguage.Name := CommaToken(ln);
-      keyboard.Languages.Add(FLanguage);
+      for j := 0 to ALanguages.ChildNodes.Count - 1 do
+      begin
+        ALanguage := ALanguages.ChildNodes[j];
+
+        FLanguage := TPackageKeyboardLanguage.Create(Package);
+        FLanguage.ID := ALanguage.Attributes[SPackageKeyboard_Language_ID];
+        FLanguage.Name := ALanguage.NodeValue;
+        keyboard.Languages.Add(FLanguage);
+      end;
     end;
 
     Add(keyboard);
@@ -1747,20 +1748,27 @@ end;
 procedure TPackageKeyboardList.SaveXML(ARoot: IXMLNode);
 var
   i, j: Integer;
+  AKeyboard, ANode: IXMLNode;
+  ALanguage, ALanguages: IXMLNode;
 begin
+  ANode := ARoot.AddChild('Keyboards');
   for i := 0 to Count - 1 do
   begin
-    with ARoot.AddChild('Keyboard'+IntToStr(i)) do
+    AKeyboard := ANode.AddChild('Keyboard');
+
+    AKeyboard.ChildNodes[SPackageKeyboard_Name].NodeValue := Items[i].Name;
+    AKeyboard.ChildNodes[SPackageKeyboard_ID].NodeValue := Items[i].ID;
+    AKeyboard.ChildNodes[SPackageKeyboard_Version].NodeValue := Items[i].Version;
+    if Assigned(Items[i].OSKFont) then
+      AKeyboard.ChildNodes[SPackageKeyboard_OSKFont].NodeValue := ExtractFileName(Items[i].OSKFont.FileName);
+    if Assigned(Items[i].DisplayFont) then
+      AKeyboard.ChildNodes[SPackageKeyboard_DisplayFont].NodeValue := ExtractFileName(Items[i].DisplayFont.FileName);
+    ALanguages := AKeyboard.AddChild('Languages');
+    for j := 0 to Items[i].Languages.Count - 1 do
     begin
-      ChildNodes[SPackageKeyboard_Name].NodeValue := Items[i].Name;
-      ChildNodes[SPackageKeyboard_ID].NodeValue := Items[i].ID;
-      ChildNodes[SPackageKeyboard_Version].NodeValue := Items[i].Version;
-      if Assigned(Items[i].OSKFont) then
-        ChildNodes[SPackageKeyboard_OSKFont].NodeValue := ExtractFileName(Items[i].OSKFont.FileName);
-      if Assigned(Items[i].DisplayFont) then
-        ChildNodes[SPackageKeyboard_DisplayFont].NodeValue := ExtractFileName(Items[i].DisplayFont.FileName);
-      for j := 0 to Items[i].Languages.Count - 1 do
-        ChildNodes[SPackageKeyboard_Language+IntToStr(j)].NodeValue := Items[i].Languages[j].ID+','+Items[i].Languages[j].Name;
+      ALanguage := ALanguages.AddChild('Language');
+      ALanguage.NodeValue := Items[i].Languages[j].Name;
+      ALanguage.Attributes[SPackageKeyboard_Language_ID] := Items[i].Languages[j].ID;
     end;
   end;
 end;

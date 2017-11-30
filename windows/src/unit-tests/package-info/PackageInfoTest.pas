@@ -68,7 +68,7 @@ begin
   p1 := TKpsFile.Create;
   p2 := TKpsFile.Create;
   try
-    p1.FileName := DataPath + 'test1.xml';
+    p1.FileName := DataPath + 'test.xml';
     p1.LoadXML;
     p2.Assign(p1);
     p2.FileName := DataPath + 'testAssign.out.xml';
@@ -78,7 +78,7 @@ begin
     p2.Free;
   end;
 
-  DoCompare(DataPath + 'test1.xml', DataPath + 'testAssign.out.xml');
+  DoCompare(DataPath + 'test.xml', DataPath + 'testAssign.out.xml');
 end;
 
 procedure TPackageInfoTest.TestInfInOut;
@@ -87,7 +87,7 @@ var
 begin
   p1 := TKpsFile.Create;
   try
-    p1.FileName := DataPath + 'test1.inf';
+    p1.FileName := DataPath + 'test.inf';
     p1.LoadIni;
     p1.FileName := DataPath + 'test1.out.inf';
     p1.SaveIni;
@@ -95,7 +95,7 @@ begin
     p1.Free;
   end;
 
-  DoCompare(DataPath + 'test1.inf', DataPath + 'test1.out.inf');
+  DoCompare(DataPath + 'test.inf', DataPath + 'test1.out.inf');
 end;
 
 procedure TPackageInfoTest.TestRoundTrip;
@@ -104,9 +104,9 @@ var
 begin
   p1 := TKpsFile.Create;
   try
-    p1.FileName := DataPath + 'test1.xml';
+    p1.FileName := DataPath + 'test.xml';
     p1.LoadXML;
-    p1.FileName := DataPath + 'test1.out.inf';
+    p1.FileName := DataPath + 'test2.out.inf';
     p1.SaveIni;
   finally
     p1.Free;
@@ -114,15 +114,15 @@ begin
 
   p1 := TKpsFile.Create;
   try
-    p1.FileName := DataPath + 'test1.out.inf';
+    p1.FileName := DataPath + 'test2.out.inf';
     p1.LoadIni;
-    p1.FileName := DataPath + 'test1.out.xml';
+    p1.FileName := DataPath + 'test2.out.xml';
     p1.SaveXML;
   finally
     p1.Free;
   end;
 
-  DoCompare(DataPath + 'test1.xml', DataPath + 'test1.out.xml');
+  DoCompare(DataPath + 'test.xml', DataPath + 'test2.out.xml');
 end;
 
 procedure TPackageInfoTest.TestRoundTripInf;
@@ -131,9 +131,9 @@ var
 begin
   p1 := TKpsFile.Create;
   try
-    p1.FileName := DataPath + 'test1.inf';
+    p1.FileName := DataPath + 'test.inf';
     p1.LoadIni;
-    p1.FileName := DataPath + 'test1.out.xml';
+    p1.FileName := DataPath + 'test3.out.xml';
     p1.SaveXML;
   finally
     p1.Free;
@@ -141,15 +141,15 @@ begin
 
   p1 := TKpsFile.Create;
   try
-    p1.FileName := DataPath + 'test1.out.xml';
+    p1.FileName := DataPath + 'test3.out.xml';
     p1.LoadXML;
-    p1.FileName := DataPath + 'test1.out.inf';
+    p1.FileName := DataPath + 'test3.out.inf';
     p1.SaveIni;
   finally
     p1.Free;
   end;
 
-  DoCompare(DataPath + 'test1.inf', DataPath + 'test1.out.inf');
+  DoCompare(DataPath + 'test.inf', DataPath + 'test3.out.inf');
 end;
 
 procedure TPackageInfoTest.TestXMLInOut;
@@ -158,15 +158,15 @@ var
 begin
   p1 := TKpsFile.Create;
   try
-    p1.FileName := DataPath + 'test1.xml';
+    p1.FileName := DataPath + 'test.xml';
     p1.LoadXML;
-    p1.FileName := DataPath + 'test1.out.xml';
+    p1.FileName := DataPath + 'test4.out.xml';
     p1.SaveXML;
   finally
     p1.Free;
   end;
 
-  DoCompare(DataPath + 'test1.xml', DataPath + 'test1.out.xml');
+  DoCompare(DataPath + 'test.xml', DataPath + 'test4.out.xml');
 end;
 
 procedure TPackageInfoTest.DoCompare(f1, f2: string);
