@@ -21,13 +21,15 @@ public enum MenuBehaviour {
   case showNever
 }
 
-open class InputViewController: UIInputViewController, KeymanWebViewDelegate {
+open class InputViewController: UIInputViewController, KeymanWebDelegate {
   var menuCloseButtonTitle: String?
   var isInputClickSoundEnabled = true
   var globeKeyTapBehaviour = GlobeKeyTapBehaviour.switchToNextKeyboard
   var menuBehaviour = MenuBehaviour.showAlways
 
-  unowned var kmInputView: UIView
+  var kmInputView: UIView! {
+    return Manager.shared.keymanWeb.view
+  }
 
   open var topBarImageView: UIImageView?
   var barHeightConstraints: [NSLayoutConstraint] = []
@@ -64,7 +66,6 @@ open class InputViewController: UIInputViewController, KeymanWebViewDelegate {
   }
 
   public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    kmInputView = Manager.shared.inputView
     isTopBarEnabled = Manager.shared.isSystemKeyboardTopBarEnabled
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
   }
@@ -113,7 +114,7 @@ open class InputViewController: UIInputViewController, KeymanWebViewDelegate {
     view.backgroundColor = bgColor
 
     Manager.shared.inputViewDidLoad()
-    Manager.shared.inputDelegate = self
+    Manager.shared.keymanWebDelegate = self
 
     topBarImageView?.removeFromSuperview()
     topBarImageView = UIImageView()
@@ -134,6 +135,14 @@ open class InputViewController: UIInputViewController, KeymanWebViewDelegate {
     super.viewDidAppear(animated)
     setConstraints()
     inputView?.setNeedsUpdateConstraints()
+
+    //TODO: find out why this is actually happening
+    if let containerView = self.containerView {
+      if containerView.subviews.isEmpty {
+        Manager.shared.keymanWebDelegate = self
+        containerView.addSubview(kmInputView)
+      }
+    }
   }
 
   open override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
@@ -156,7 +165,7 @@ open class InputViewController: UIInputViewController, KeymanWebViewDelegate {
     Manager.shared.setSelectionRange(NSRange(newRange, in: context), manually: false)
   }
 
-  private func processInsertText(_ fragment: String) {
+  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     if Manager.shared.isSubKeysMenuVisible {
       return
     }
@@ -169,34 +178,12 @@ open class InputViewController: UIInputViewController, KeymanWebViewDelegate {
       perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
     }
 
-    let dnRange = fragment.range(of: "+dn=")!
-    let sRange = fragment.range(of: "+s=")!
-
-    let dn = Int(fragment[dnRange.upperBound..<sRange.lowerBound])!
-    let s = fragment[sRange.upperBound...]
-
-    let hexStrings: [String]
-    if !s.isEmpty {
-      hexStrings = s.components(separatedBy: ",")
-    } else {
-      hexStrings = []
-    }
-
-    let codeUnits = hexStrings.map { hexString -> UInt16 in
-      let scanner = Scanner(string: hexString)
-      var codeUnit: UInt32 = 0
-      scanner.scanHexInt32(&codeUnit)
-      return UInt16(codeUnit)
-    }
-
-    let text = String(utf16CodeUnits: codeUnits, count: codeUnits.count)
-
-    if dn <= 0 {
-      textDocumentProxy.insertText(text)
+    if numCharsToDelete <= 0 {
+      textDocumentProxy.insertText(newText)
       return
     }
 
-    for _ in 0..<dn {
+    for _ in 0..<numCharsToDelete {
       let oldContext = textDocumentProxy.documentContextBeforeInput ?? ""
       textDocumentProxy.deleteBackward()
       let newContext = textDocumentProxy.documentContextBeforeInput ?? ""
@@ -211,45 +198,41 @@ open class InputViewController: UIInputViewController, KeymanWebViewDelegate {
       }
     }
 
-    if !text.isEmpty {
-      textDocumentProxy.insertText(text)
+    if !newText.isEmpty {
+      textDocumentProxy.insertText(newText)
     }
   }
 
-  func updatedFragment(_ fragment: String) {
-    if fragment.isEmpty {
+  func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
+    if Manager.shared.isKeyboardMenuVisible {
       return
     }
 
-    if fragment.contains("insertText") {
-      processInsertText(fragment)
-    } else if fragment.contains("menuKeyUp") {
-      if Manager.shared.isKeyboardMenuVisible {
-        return
-      }
-
-      switch globeKeyTapBehaviour {
-      case .switchToNextKeyboard:
-        if let nextIndex = Manager.shared.switchToNextKeyboard(), nextIndex <= 0 {
-          advanceToNextInputMode()
-        }
-      case .switchToNextInputMethod:
+    switch globeKeyTapBehaviour {
+    case .switchToNextKeyboard:
+      if let nextIndex = Manager.shared.switchToNextKeyboard(), nextIndex <= 0 {
         advanceToNextInputMode()
-      case .doNothing:
-        break
       }
-    } else if fragment.contains("showKeyboardMenu") {
-      switch menuBehaviour {
-      case .showAlways,
-           .showIfMultipleKeyboards where keyboardListCount > 1:
-        Manager.shared.showKeyboardMenu(self, closeButtonTitle: menuCloseButtonTitle)
-      case .showIfMultipleKeyboards, // keyboardListCount() <= 1
-           .showNever:
-        break
-      }
-    } else if fragment.contains("hideKeyboard") {
-      dismissKeyboard()
+    case .switchToNextInputMethod:
+      advanceToNextInputMode()
+    case .doNothing:
+      break
     }
+  }
+
+  func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
+    switch menuBehaviour {
+    case .showAlways,
+         .showIfMultipleKeyboards where keyboardListCount > 1:
+      Manager.shared.showKeyboardMenu(self, closeButtonTitle: menuCloseButtonTitle)
+    case .showIfMultipleKeyboards, // keyboardListCount() <= 1
+    .showNever:
+      break
+    }
+  }
+
+  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
+    dismissKeyboard()
   }
 
   private func setConstraints() {

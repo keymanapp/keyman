@@ -2093,15 +2093,7 @@ begin
 
   try
     FKeyboardParser.AddRequiredLines;
-    if FKeyboardParser.GetSystemStoreValue(ssVersion) < SKeymanVersion then
-    begin
-      case MessageDlg('The file '+FileName+' was originally created in an earlier version of Keyman Developer.  '+
-          'Do you want to update it to version '+SKeymanVersion+'?', mtConfirmation, mbYesNoCancel, 0) of   // I4558
-        mrYes: FKeyboardParser.SetSystemStoreValue(ssVersion, SKeymanVersion);
-        mrNo:  ;
-        mrCancel: Exit;
-      end;
-    end;
+
     sw := FKeyboardParser.KeyboardText;
 
     for FKey in FKeyboardParser.Features.Keys do

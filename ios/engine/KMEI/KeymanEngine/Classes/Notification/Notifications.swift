@@ -23,8 +23,6 @@ public typealias KeyboardChangedNotification = InstallableKeyboard
 public typealias KeyboardRemovedNotification = InstallableKeyboard
 
 public typealias KeyboardPickerDismissedNotification = Void
-public typealias SubKeysMenuWillShowNotification = Void
-public typealias SubKeysMenuDismissedNotification = Void
 
 public struct Notifications {
   public static let languagesUpdated =
@@ -48,8 +46,4 @@ public struct Notifications {
 
   public static let keyboardPickerDismissed =
     NotificationName<KeyboardPickerDismissedNotification>("KeymanKeyboardPickerDismissed")
-  public static let subKeysMenuWillShow =
-    NotificationName<SubKeysMenuWillShowNotification>("KeymanSubKeysMenuWillShow")
-  public static let subKeysMenuDismissed =
-    NotificationName<SubKeysMenuDismissedNotification>("KeymanSubKeysMenuDismissed")
 }

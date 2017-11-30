@@ -59,18 +59,17 @@ typedef enum {
 @synthesize activeKeyboards = _activeKeyboards;
 @synthesize contextBuffer = _contextBuffer;
 @synthesize alwaysShowOSK = _alwaysShowOSK;
-@synthesize useNullChar = _useNullChar;
 
 - (id)init {
     self = [super init];
     if (self) {
-        // _debugMode = YES; // Disable before release
+        _debugMode = YES; // Disable before release
         [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
                                                            andSelector:@selector(handleURLEvent:withReplyEvent:)
                                                          forEventClass:kInternetEventClass
                                                             andEventID:kAEGetURL];
     }
-    
+
     return self;
 }
 
@@ -545,25 +544,6 @@ typedef enum {
     [self.kme setContextBuffer:self.contextBuffer];
 }
 
-- (void)setUseNullChar:(BOOL)useNullChar {
-    _useNullChar = YES;
-    /*
-    _useNullChar = useNullChar;
-    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    [userData setBool:_useNullChar forKey:@"KMUseNullCharKey"];
-    [userData synchronize];
-    */
-}
-
-- (BOOL)useNullChar {
-    return YES;
-    /*
-    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    _useNullChar = [userData boolForKey:@"KMUseNullCharKey"];
-    return _useNullChar;
-    */
-}
-
 - (void)awakeFromNib {
     [self setKeyboardsSubMenu];
     
@@ -896,7 +876,15 @@ typedef enum {
     }
     
     if (didUnzip) {
+        if (_debugMode) {
+            NSLog(@"Unzipped file: %@", filePath);
+        }
         [self installFontsAtPath:[self.keyboardsPath stringByAppendingPathComponent:folderName]];
+    }
+    else {
+        if (_debugMode) {
+            NSLog(@"Failed to unzip file: %@", filePath);
+        }
     }
     
     return didUnzip;

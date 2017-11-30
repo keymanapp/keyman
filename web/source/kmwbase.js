@@ -31,8 +31,6 @@ if(!window['keyman']['loaded']) {
       _Keyboards: [],           // Keyboards - array of loaded keyboards
       _ActiveKeyboard: null,    // ActiveKeyboard - points to active keyboard in Keyboards array
       _ActiveStub: null,        // ActiveStub - points to active stub in KeyboardStubs  
-      _AnyIndices: [],          // AnyIndex - array of any/index match indices
-      _DeadKeys: [],            // DeadKeys - array of matched deadkeys
       _AttachedElements: [],    // I1596 - attach to controls dynamically
       _ActiveElement: null,     // Currently active (focused) element  I3363 (Build 301)
       _LastActiveElement: null, // LastElem - Last active element
@@ -78,7 +76,19 @@ if(!window['keyman']['loaded']) {
     var util = keymanweb['util'] = {};
     var osk = keymanweb['osk'] = {ready:false};
     var ui = keymanweb['ui'] = {};
-    var kbdInterface = keymanweb['interface'] = {};
+    
+    var kbdInterface = keymanweb['interface'] = {
+      // Cross-reference with /windows/src/global/inc/Compiler.h - these are the Developer codes for the respective system stores.
+      // They're named here identically to their use in that header file.
+      TSS_LAYER: 33,
+      TSS_PLATFORM: 31,
+
+      _AnyIndices: [],        // AnyIndex - array of any/index match indices
+      _BeepObjects: [],       // BeepObjects - maintains a list of active 'beep' visual feedback elements
+      _BeepTimeout: 0,        // BeepTimeout - a flag indicating if there is an active 'beep'. 
+                              // Set to 1 if there is an active 'beep', otherwise leave as '0'.
+      _DeadKeys: []           // DeadKeys - array of matched deadkeys
+    };
 
     // Stub functions (defined later in code only if required)
     keymanweb.setDefaultDeviceOptions = function(opt){}     
@@ -577,12 +587,23 @@ if(!window['keyman']['loaded']) {
     
     END DEBUG */
 
-  /* If we've made it to this point of initialization and aren't anything else, KeymanWeb assumes 
-    * we're a desktop.  Since we don't yet support desktops with touch-based input, we disable it here.
-    */                     
-  if(device.formFactor == 'desktop') {
-    device.touchable = false;
-  }
+    /* If we've made it to this point of initialization and aren't anything else, KeymanWeb assumes 
+      * we're a desktop.  Since we don't yet support desktops with touch-based input, we disable it here.
+      */                     
+    if(device.formFactor == 'desktop') {
+      device.touchable = false;
+    }
+
+    /**
+     * Represents hardware-based keystrokes regardless of the 'true' device, facilitating hardware keyboard input
+     * whenever touch-based input is available.
+     */
+    util.physicalDevice = {
+      touchable: false,
+      browser: device.browser,
+      formFactor: 'desktop',
+      OS: device.OS
+    };
                         
     /**
      * Expose the touchable state for UIs - will disable external UIs entirely

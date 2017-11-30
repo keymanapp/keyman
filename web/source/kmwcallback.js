@@ -10,12 +10,6 @@ if(!window['keyman']['initialized']) {
     // Declare KeymanWeb and util objects
     var keymanweb=window['keyman'], kbdInterface=window['KeymanWeb']=keymanweb['interface'], KeymanWeb=kbdInterface,
       util=keymanweb['util'], osk=keymanweb['osk'],device=util.device,dbg=keymanweb.debug; //osk defined here, build 350
-    
-    keymanweb.TSS_LAYER = 33;
-    keymanweb.TSS_PLATFORM = 31;
-    
-    keymanweb._BeepObjects=[];
-    keymanweb._BeepTimeout=0;
 
     /**
      * Function     KSF
@@ -35,7 +29,7 @@ if(!window['keyman']['initialized']) {
      * Description  Insert text into active control
      */    
     KeymanWeb['KT'] = kbdInterface['insertText'] = kbdInterface.insertText = function(Ptext,PdeadKey) {
-      keymanweb.cachedContext.reset();
+      kbdInterface.resetContextCache();
       //_DebugEnter('InsertText');
       var Lelem = keymanweb._LastActiveElement, Ls, Le, Lkc, Lsel, Lv=false;
       if(Lelem != null) {
@@ -190,13 +184,13 @@ if(!window['keyman']['initialized']) {
      */    
     
     KeymanWeb['KC'] = kbdInterface['context'] = kbdInterface.context = function(n, ln, Pelem) {
-      var v = keymanweb.cachedContext.get(n, ln);
+      var v = kbdInterface.cachedContext.get(n, ln);
       if(v !== null) {
         return v;
       }
       
       var r = keymanweb.KC_(n, ln, Pelem);
-      keymanweb.cachedContext.set(n, ln, r);
+      kbdInterface.cachedContext.set(n, ln, r);
       return r;
     }
     
@@ -236,7 +230,7 @@ if(!window['keyman']['initialized']) {
       if(cx === val) {
         return true; // I3318
       }
-      keymanweb._DeadkeyResetMatched(); // I3318
+      kbdInterface._DeadkeyResetMatched(); // I3318
       return false;
     }
 
@@ -282,7 +276,7 @@ if(!window['keyman']['initialized']) {
         retVal = (keyCode == Lrulekey); // I3318, I3555
       }
       if(!retVal) {
-        keymanweb._DeadkeyResetMatched();  // I3318
+        kbdInterface._DeadkeyResetMatched();  // I3318
       }
       return retVal != 0; // I3318
     };
@@ -323,19 +317,19 @@ if(!window['keyman']['initialized']) {
      * Description  Match deadkey at current cursor position
      */    
     KeymanWeb['KDM'] = kbdInterface['deadkeyMatch'] = kbdInterface.deadkeyMatch = function(n, Ptarg, d) {
-      if(keymanweb._DeadKeys.length == 0) {
+      if(kbdInterface._DeadKeys.length == 0) {
         return false; // I3318
       }
 
       var sp=keymanweb._SelPos(Ptarg);
       n = sp - n;
-      for(var i = 0; i < keymanweb._DeadKeys.length; i++) {
-        if(keymanweb._DeadKeys[i].p == n  &&  keymanweb._DeadKeys[i].d == d) {
-          keymanweb._DeadKeys[i].matched = 1;
+      for(var i = 0; i < kbdInterface._DeadKeys.length; i++) {
+        if(kbdInterface._DeadKeys[i].p == n  &&  kbdInterface._DeadKeys[i].d == d) {
+          kbdInterface._DeadKeys[i].matched = 1;
           return true; // I3318
         }
       }
-      keymanweb._DeadkeyResetMatched(); // I3318
+      kbdInterface._DeadkeyResetMatched(); // I3318
 
       return false;
     }
@@ -346,14 +340,14 @@ if(!window['keyman']['initialized']) {
      * Description  Reset/terminate beep or flash (not currently used: Aug 2011)
      */    
     KeymanWeb['KBR'] = kbdInterface['beepReset'] = kbdInterface.beepReset = function() {
-      keymanweb.cachedContext.reset();
+      kbdInterface.resetContextCache();
       
       var Lbo;
-      keymanweb._BeepTimeout = 0;
-      for(Lbo=0;Lbo<keymanweb._BeepObjects.length;Lbo++) { // I1511 - array prototype extended
-        keymanweb._BeepObjects[Lbo].e.style.backgroundColor = keymanweb._BeepObjects[Lbo].c;
+      kbdInterface._BeepTimeout = 0;
+      for(Lbo=0;Lbo<kbdInterface._BeepObjects.length;Lbo++) { // I1511 - array prototype extended
+        kbdInterface._BeepObjects[Lbo].e.style.backgroundColor = kbdInterface._BeepObjects[Lbo].c;
       }
-      keymanweb._BeepObjects = [];
+      kbdInterface._BeepObjects = [];
     }
       
     /**
@@ -363,7 +357,7 @@ if(!window['keyman']['initialized']) {
      * Description  Flash body as substitute for audible beep
      */    
     KeymanWeb['KB'] = kbdInterface['beep'] = kbdInterface.beep = function(Pelem) {
-      keymanweb.cachedContext.reset();
+      kbdInterface.resetContextCache();
       
       if(Pelem.body) {
         Pelem=Pelem.body; // I1446 - beep sometimes fails to flash when using OSK and rich control
@@ -373,17 +367,17 @@ if(!window['keyman']['initialized']) {
         return;
       }
 
-      for(var Lbo=0;Lbo<keymanweb._BeepObjects.length;Lbo++) { // I1446 - beep sometimes fails to return background color to normal
-                                                               // I1511 - array prototype extended
-        if(keymanweb._BeepObjects[Lbo].e == Pelem) {
+      for(var Lbo=0;Lbo<kbdInterface._BeepObjects.length;Lbo++) { // I1446 - beep sometimes fails to return background color to normal
+                                                                  // I1511 - array prototype extended
+        if(kbdInterface._BeepObjects[Lbo].e == Pelem) {
           return;
         }
       }
       
-      keymanweb._BeepObjects=keymanweb._push(keymanweb._BeepObjects,{e:Pelem, c:Pelem.style.backgroundColor});
+      kbdInterface._BeepObjects=keymanweb._push(kbdInterface._BeepObjects,{e:Pelem, c:Pelem.style.backgroundColor});
       Pelem.style.backgroundColor = '#000000';
-      if(keymanweb._BeepTimeout == 0) {
-        keymanweb._BeepTimeout = 1;
+      if(kbdInterface._BeepTimeout == 0) {
+        kbdInterface._BeepTimeout = 1;
         window.setTimeout(kbdInterface.beepReset, 50);
       }
     }
@@ -402,7 +396,7 @@ if(!window['keyman']['initialized']) {
         return false;
       }
       var Lix = s._kmwIndexOf(ch); //I3319
-      keymanweb._AnyIndices[n] = Lix;
+      kbdInterface._AnyIndices[n] = Lix;
       return Lix >= 0;
     }
     
@@ -415,7 +409,7 @@ if(!window['keyman']['initialized']) {
      * Description  Keyboard output
      */    
     KeymanWeb['KO'] = kbdInterface['output'] = kbdInterface.output = function(dn, Pelem, s) {
-      keymanweb.cachedContext.reset();
+      kbdInterface.resetContextCache();
       
       // KeymanTouch for Android uses direct insertion of the character string
       if('oninserttext' in keymanweb) {
@@ -452,7 +446,7 @@ if(!window['keyman']['initialized']) {
         /* Editable iframe and contentEditable elements for mozilla */
         var _IsEditableIframe = Ldoc.designMode.toLowerCase() == 'on';
         if(_IsEditableIframe) {
-          var _CacheableCommands = keymanweb._CacheCommands(Ldoc);
+          var _CacheableCommands = kbdInterface._CacheCommands(Ldoc);
         }
       
         var Lsel = Ldv.getSelection();
@@ -496,21 +490,21 @@ if(!window['keyman']['initialized']) {
         }
 
         if(_IsEditableIframe) {
-          keymanweb._CacheCommandsReset(Ldoc, _CacheableCommands, null);// I2457 - support contentEditable elements in mozilla, webkit
+          kbdInterface._CacheCommandsReset(Ldoc, _CacheableCommands, null);// I2457 - support contentEditable elements in mozilla, webkit
         }
         
         Lsel.collapseToEnd();
 
         // Adjust deadkey positions 
         if(dn >= 0) {
-          keymanweb._DeadkeyDeleteMatched();                                  // I3318
-          keymanweb._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318
+          kbdInterface._DeadkeyDeleteMatched();                                  // I3318
+          kbdInterface._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318
         } // Internet Explorer   (including IE9)   
       } else if(Ldoc  &&  (Ldv=Ldoc.selection)) { // build 77 - use elem.ownerDocument.selection
         if(Ldoc.body.isContentEditable || Ldoc.designMode.toLowerCase()=='on') { // I1295 - isContentEditable
-          var _CacheableCommands = keymanweb._CacheCommands(Ldoc);
+          var _CacheableCommands = kbdInterface._CacheCommands(Ldoc);
         }
-    
+
         var Lrange = Ldv.createRange(), Ls1;
         if(Lrange.text != '') {
           Ldv.clear();
@@ -533,14 +527,22 @@ if(!window['keyman']['initialized']) {
         if(Ldoc.body.isContentEditable || Ldoc.designMode.toLowerCase()=='on') { // I1295 - isContentEditable
           Lrange.moveStart('character',-s.length);
           
-          keymanweb._CacheCommandsReset(Ldoc, _CacheableCommands,Lrange.select);
+          kbdInterface._CacheCommandsReset(Ldoc, _CacheableCommands,Lrange.select);
           Lrange.moveStart('character',s.length);
           Lrange.select();
         }
         // Adjust deadkey positions 
         if(dn >= 0) {
-          keymanweb._DeadkeyDeleteMatched();                                  // I3318
-          keymanweb._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318
+          // Pelem.selectionStart seems to exist here in IE 9 and is valid.  This provides a possible approach, but may be wrong.
+          // It appears safe to model the deadkey adjustment based on the non-IE9 code path's calculations.
+          if(Pelem._KeymanWebSelectionStart != null) {// changed to allow a value of 0
+            LselectionStart = Pelem._KeymanWebSelectionStart;
+          } else {
+            LselectionStart = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionStart);  // I3319
+          }
+
+          kbdInterface._DeadkeyDeleteMatched();                                  // I3318
+          kbdInterface._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318
         }
   
         keymanweb._Selection = Ldv.createRange();
@@ -574,8 +576,8 @@ if(!window['keyman']['initialized']) {
 
         // Adjust deadkey positions 
         if(dn >= 0) {
-          keymanweb._DeadkeyDeleteMatched(); // I3318
-          keymanweb._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318,I3319
+          kbdInterface._DeadkeyDeleteMatched(); // I3318
+          kbdInterface._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318,I3319
         }
 
         if (typeof(LscrollTop) != 'undefined') {
@@ -604,14 +606,14 @@ if(!window['keyman']['initialized']) {
      * Description  Record a deadkey at current cursor position, deleting Pdn characters first
      */    
     KeymanWeb['KDO'] = kbdInterface['deadkeyOutput'] = kbdInterface.deadkeyOutput = function(Pdn,Pelem,Pd) {
-      keymanweb.cachedContext.reset();
+      kbdInterface.resetContextCache();
       var Lc = new Object();
       if(Pdn >= 0) {
         kbdInterface.output(Pdn,Pelem,"");  //I3318 corrected to >=
       }
       Lc.p=keymanweb._SelPos(Pelem); 
       Lc.d=Pd;
-      keymanweb._DeadKeys=keymanweb._push(keymanweb._DeadKeys,Lc);
+      kbdInterface._DeadKeys=keymanweb._push(kbdInterface._DeadKeys,Lc);
       
       //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
     }
@@ -626,9 +628,9 @@ if(!window['keyman']['initialized']) {
      * Description  Output a character selected from the string according to the offset in the index array
      */    
     KeymanWeb['KIO'] = kbdInterface['indexOutput'] = kbdInterface.indexOutput = function(Pdn,Ps,Pn,Pelem) {
-      keymanweb.cachedContext.reset();
-      if(keymanweb._AnyIndices[Pn-1] < Ps._kmwLength()) {                        //I3319
-        kbdInterface.output(Pdn,Pelem,Ps._kmwCharAt(keymanweb._AnyIndices[Pn-1]));  //I3319
+      kbdInterface.resetContextCache();
+      if(kbdInterface._AnyIndices[Pn-1] < Ps._kmwLength()) {                        //I3319
+        kbdInterface.output(Pdn,Pelem,Ps._kmwCharAt(kbdInterface._AnyIndices[Pn-1]));  //I3319
       }
     }
 
@@ -639,7 +641,7 @@ if(!window['keyman']['initialized']) {
      * @return      {Array.<string>}        List of style commands that are cacheable
      * Description  Build reate list of styles that can be applied in iframes
      */    
-    KeymanWeb._CacheCommands = function(_Document) { // I1204 - style application in IFRAMEs, I2192, I2134, I2192   
+    kbdInterface._CacheCommands = function(_Document) { // I1204 - style application in IFRAMEs, I2192, I2134, I2192   
       //var _CacheableBackColor=(_Document.selection?'hilitecolor':'backcolor');
       var _CacheableCommands=[
         ['backcolor',1],['fontname',1],['fontsize',1],['forecolor',1],['bold',0],
@@ -667,7 +669,7 @@ if(!window['keyman']['initialized']) {
      * @return      Nothing
      * Description  Restore styles in IFRAMEs (??)
      */    
-    KeymanWeb._CacheCommandsReset = function(_Document, _CacheableCommands, _func) {
+    kbdInterface._CacheCommandsReset = function(_Document, _CacheableCommands, _func) {
       for(var n=0;n < _CacheableCommands.length; n++) { // I1511 - array prototype extended
         //KeymanWeb._Debug('ResetCacheCommand:'+_CacheableCommands[n][0]+'='+_CacheableCommands[n][2]);
         if(_CacheableCommands[n][1]) {
@@ -697,16 +699,16 @@ if(!window['keyman']['initialized']) {
      */       
     KeymanWeb['KIFS'] = kbdInterface['ifStore'] = kbdInterface.ifStore = function(systemId,strValue,Pelem) {
       var result=true;
-      if(systemId == keymanweb.TSS_LAYER) {
+      if(systemId == kbdInterface.TSS_LAYER) {
         result = (osk.layerId === strValue);
-      } else if(systemId == keymanweb.TSS_PLATFORM) {
+      } else if(systemId == kbdInterface.TSS_PLATFORM) {
         var i,constraint,constraints=strValue.split(' ');
         for(i=0; i<constraints.length; i++) {
           constraint=constraints[i].toLowerCase();
           switch(constraint) {
             case 'touch':
             case 'hardware':
-              if(device.touchable != (constraint == 'touch')) {
+              if(util.activeDevice.touchable != (constraint == 'touch')) {
                 result=false;
               }
           }
@@ -717,7 +719,7 @@ if(!window['keyman']['initialized']) {
             case 'ios':
             case 'macosx':
             case 'linux':
-              if(device.OS.toLowerCase() != constraint) {
+              if(util.activeDevice.OS.toLowerCase() != constraint) {
                 result=false;
               }
           }
@@ -726,14 +728,14 @@ if(!window['keyman']['initialized']) {
             case 'tablet':
             case 'phone':
             case 'desktop':
-              if(device.formFactor != constraint) {
+              if(util.activeDevice.formFactor != constraint) {
                 result=false;
               }
           }
 
           switch(constraint) {
             case 'web':
-              if(device.browser == 'native') {
+              if(util.activeDevice.browser == 'native') {
                 result=false; // web matches anything other than 'native'
               }
               break;
@@ -743,7 +745,7 @@ if(!window['keyman']['initialized']) {
             case 'firefox':
             case 'safari':
             case 'opera':
-              if(device.browser != constraint) {
+              if(util.activeDevice.browser != constraint) {
                 result=false;
               }
           }
@@ -762,8 +764,8 @@ if(!window['keyman']['initialized']) {
      *                                        (i.e. for TSS_LAYER, if the layer is successfully selected)
      */    
     KeymanWeb['KSETS'] = kbdInterface['setStore'] = function(systemId,strValue,Pelem) {
-      keymanweb.cachedContext.reset();
-      if(systemId == keymanweb.TSS_LAYER) {
+      kbdInterface.resetContextCache();
+      if(systemId == kbdInterface.TSS_LAYER) {
         return osk.showLayer(strValue);     //Buld 350, osk reference now OK, so should work
       } else {
         return false;
@@ -779,7 +781,7 @@ if(!window['keyman']['initialized']) {
      * @return      {string}                  current or default option value   
      */    
     KeymanWeb['KLOAD'] = kbdInterface['loadStore'] = function(kbdName,storeName,dfltValue) {
-      keymanweb.cachedContext.reset();
+      kbdInterface.resetContextCache();
       var cName='KeymanWeb_'+kbdName+'_Option_'+storeName,cValue=util.loadCookie(cName);
       if(typeof cValue[storeName] != 'undefined') {
         return unescape(cValue[storeName]);
@@ -796,7 +798,7 @@ if(!window['keyman']['initialized']) {
      * @return      {boolean}                 true if save successful
      */    
     KeymanWeb['KSAVE'] = kbdInterface['saveStore'] = function(storeName,optValue) {
-      keymanweb.cachedContext.reset();
+      kbdInterface.resetContextCache();
       var kbd=keymanweb._ActiveKeyboard;
       if(!kbd || typeof kbd['KI'] == 'undefined' || kbd['KI'] == '') {
         return false;
@@ -837,7 +839,7 @@ if(!window['keyman']['initialized']) {
      * Must be reset prior to each keystroke and after any text changes
      * MCD 3/1/14   
      **/         
-    keymanweb.cachedContext = {
+    kbdInterface.cachedContext = {
       _cache: [],
       reset: function() { 
         this._cache = []; 
@@ -858,6 +860,81 @@ if(!window['keyman']['initialized']) {
         this._cache[n][ln] = val; 
       }
     };
+
+    kbdInterface.resetContextCache = function() {
+      kbdInterface.cachedContext.reset();
+    }
     
+    // I3318 - deadkey changes START
+    /**
+     * Function     _DeadkeyResetMatched
+     * Scope        Private
+     * Description  Clear all matched deadkey flags
+     */       
+    kbdInterface._DeadkeyResetMatched = function() {                   
+      var Li, _Dk = kbdInterface._DeadKeys;
+      for(Li = 0; Li < _Dk.length; Li++) {
+        _Dk[Li].matched = 0;
+      }
+    }
+
+    /**
+     * Function     _DeadkeyDeleteMatched
+     * Scope        Private
+     * Description  Delete matched deadkeys from context
+     */       
+    kbdInterface._DeadkeyDeleteMatched = function() {              
+      var Li, _Dk = kbdInterface._DeadKeys;
+      for(Li = 0; Li < _Dk.length; Li++) {
+        if(_Dk[Li].matched) {
+          _Dk.splice(Li,1);
+        }
+      }
+    }
+
+    /**
+     * Function     _DeadkeyAdjustPos
+     * Scope        Private
+     * @param       {number}      Lstart      start position in context
+     * @param       {number}      Ldelta      characters to adjust by   
+     * Description  Adjust saved positions of deadkeys in context
+     */       
+    kbdInterface._DeadkeyAdjustPos = function(Lstart, Ldelta) {
+      var Li, _Dk = kbdInterface._DeadKeys;
+      for(Li = 0; Li < _Dk.length; Li++) {
+        if(_Dk[Li].p > Lstart) {
+          _Dk[Li].p += Ldelta;
+        }
+      }
+    }
+
+    kbdInterface.clearDeadkeys = function() {
+      kbdInterface._DeadKeys = [];
+    }
+    // I3318 - deadkey changes END
+
+    /**
+     * Function     processKeystroke
+     * Scope        Private
+     * @param       {Object}        device      The device object properties to be utilized for this keystroke.
+     * @param       {Object}        element     The page element receiving input
+     * @param       {Object}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
+     * Description  Encapsulates calls to keyboard input processing.
+     * @returns     {number}        0 if no match is made, otherwise 1.
+     */
+    kbdInterface.processKeystroke = function(device, element, keystroke) {
+      // Clear internal state tracking data from prior keystrokes.
+      keymanweb._CachedSelectionStart = null; // I3319     
+      kbdInterface._DeadkeyResetMatched();       // I3318    
+      kbdInterface.resetContextCache();
+
+      // Ensure the settings are in place so that KIFS/ifState activates and deactivates
+      // the appropriate rule(s) for the modeled device.
+      util.activeDevice = device;
+
+      // Calls the start-group of the active keyboard.
+      return keymanweb._ActiveKeyboard['gs'](element, keystroke);
+    }
+
   })();  
 }

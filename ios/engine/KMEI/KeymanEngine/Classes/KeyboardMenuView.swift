@@ -79,7 +79,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
     var mainFrame = inputViewController.view.frame
     if mainFrame == CGRect.zero {
-      mainFrame = Manager.shared.inputView.frame
+      mainFrame = Manager.shared.keymanWeb.view.frame
     }
     super.init(frame: mainFrame)
 
