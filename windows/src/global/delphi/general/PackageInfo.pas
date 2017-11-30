@@ -40,6 +40,7 @@ uses
   System.Classes,
   System.Generics.Collections,
   System.IniFiles,
+  System.JSON,
   System.Sysutils,
   Winapi.Windows,
   Xml.XMLDoc,
@@ -49,6 +50,8 @@ uses
   utilstr;
 
 { Package Information Classes }
+
+function GetJsonValueString(o: TJSONObject; const n: string): string;
 
 type
   TPackageInfoEntryType = (pietName, pietVersion, pietCopyright, pietAuthor, pietWebsite, pietOther);
@@ -150,6 +153,8 @@ type
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
   end;
 
   { Package Options }
@@ -178,6 +183,8 @@ type
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
     property LoadLegacy: Boolean read FLoadLegacy write FLoadLegacy;
     property FileVersion: WideString read FFileVersion write SetFileVersion;
     property ExecuteProgram: WideString read FExecuteProgram write SetExecuteProgram;
@@ -218,6 +225,8 @@ type
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
     function IndexOf(Name: WideString): Integer; overload;
 
 
@@ -246,6 +255,8 @@ type
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
   end;
 
   TPackageStartMenu = class(TPackageBaseObject)
@@ -261,6 +272,8 @@ type
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
   end;
 
   { Package contained files }
@@ -291,6 +304,8 @@ type
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
 
     function IndexOfFileType(FFileType: TKMFileType): Integer;
     function FromFileName(Filename: WideString): TPackageContentFile;
@@ -338,6 +353,8 @@ type
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
   end;
 
   TPackageKeyboardLanguage = class(TPackageBaseObject)
@@ -359,6 +376,8 @@ type
     function XMLRootNode: WideString; virtual;
     procedure DoLoadXML(ARoot: IXMLNode); virtual;
     procedure DoSaveXML(ARoot: IXMLNode); virtual;
+    procedure DoLoadJSON(ARoot: TJSONObject); virtual;
+    procedure DoSaveJSON(ARoot: TJSONObject); virtual;
   public
     Options: TPackageOptions;
     StartMenu: TPackageStartMenu;
@@ -375,6 +394,9 @@ type
 
     procedure LoadXML; //virtual;
     procedure SaveXML; //virtual;
+
+    procedure LoadJSON;
+    procedure SaveJSON;
 
     function SaveXMLToText: WideString;
     procedure LoadXMLFromText(Text: WideString);
@@ -393,6 +415,7 @@ uses
   System.TypInfo,
   System.Variants,
 
+  JsonUtil,
   KeymanVersion,
   utildir,
   utilsystem,
@@ -405,6 +428,78 @@ const
   SFileNotOwnedCorrectly = 'The file ''%s'' referred to is not part of the package.';
   SDisplayFontNotOwnedCorrectly = 'The display font file ''%s'' referred to is not part of the package.';
   SOSKFontNotOwnedCorrectly = 'The OSK font file ''%s'' referred to is not part of the package.';
+
+
+
+
+const
+  SXML_PackageKeyboards = 'Keyboards';
+  SXML_PackageKeyboard_Name = 'Name';
+  SXML_PackageKeyboard_ID = 'ID';
+  SXML_PackageKeyboard_Version = 'Version';
+  SXML_PackageKeyboard_OSKFont = 'OSKFont';
+  SXML_PackageKeyboard_DisplayFont = 'DisplayFont';
+  SXML_PackageKeyboard_Languages = 'Languages';
+
+  SXML_PackageKeyboard_Language = 'Language';
+  SXML_PackageKeyboard_Language_ID = 'ID';
+  SXML_PackageKeyboard_Language_Name = 'Name';
+
+const
+  SJSON_System = 'system';
+  SJSON_System_KeymanDeveloperVersion = 'keymanDeveloperVersion';
+  SJSON_System_FileVersion = 'fileVersion';
+
+  SJSON_Options = 'options';
+  SJSON_Options_ExecuteProgram = 'executeProgram';
+  SJSON_Options_ReadMeFile = 'readmeFile';
+  SJSON_Options_GraphicFile = 'graphicFile';
+
+  SJSON_Registry = 'registry';
+  SJSON_Registry_Root = 'root';
+  SJSON_Registry_Key = 'key';
+  SJSON_Registry_Name = 'name';
+  SJSON_Registry_ValueType = 'valueType';
+  SJSON_Registry_Value = 'value';
+
+  SJSON_StartMenu = 'startMenu';
+  SJSON_StartMenu_Folder = 'folder';
+  SJSON_StartMenu_AddUninstallEntry = 'addUninstallEntry';
+  SJSON_StartMenu_Items = 'items';
+  SJSON_StartMenu_Items_Name = 'name';
+  SJSON_StartMenu_Items_Filename = 'filename';
+  SJSON_StartMenu_Items_Arguments = 'arguments';
+  SJSON_StartMenu_Items_Icon = 'icon';
+  SJSON_StartMenu_Items_Location = 'location';
+
+  SJSON_Info = 'info';
+  SJSON_Info__Description = 'description';
+  SJSON_Info__URL = 'url';
+
+  SJSON_Info_Website = 'website';
+  SJSON_Info_Version = 'version';
+  SJSON_Info_Name = 'name';
+  SJSON_Info_Copyright = 'copyright';
+  SJSON_Info_Author = 'author';
+
+  SJSON_PackageInfoEntryTypeNames: array[TPackageInfoEntryType] of string =
+    (SJSON_Info_Name, SJSON_Info_Version, SJSON_Info_Copyright, SJSON_Info_Author, SJSON_Info_Website, '');
+
+  SJSON_Files = 'files';
+  SJSON_Files_Name = 'name';
+  SJSON_Files_Description = 'description';
+  SJSON_Files_CopyLocation = 'copyLocation';
+
+  SJSON_Keyboards = 'keyboards';
+  SJSON_Keyboard_Name = 'name';
+  SJSON_Keyboard_ID = 'id';
+  SJSON_Keyboard_Version = 'version';
+  SJSON_Keyboard_OSKFont = 'oskFont';
+  SJSON_Keyboard_DisplayFont = 'displayFont';
+
+  SJSON_Keyboard_Languages = 'languages';
+  SJSON_Keyboard_Language_ID = 'id';
+  SJSON_Keyboard_Language_Name = 'name';
 
 {-------------------------------------------------------------------------------
  - TPackageOptions                                                             -
@@ -482,6 +577,22 @@ begin
   FRegistryKeys.LoadIni(AIni);
 end;
 
+procedure TPackageOptions.LoadJSON(ARoot: TJSONObject);
+var
+  FSystem, FOptions: TJSONObject;
+begin
+  FSystem := ARoot.Values[SJSON_System] as TJSONObject;
+  FOptions := ARoot.Values[SJSON_Options] as TJSONObject;
+
+  FileVersion :=                GetJsonValueString(FSystem, SJSON_System_FileVersion);
+  ExecuteProgram :=             GetJsonValueString(FOptions, SJSON_Options_ExecuteProgram);
+  ReadmeFile :=                 Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_ReadMeFile));
+  GraphicFile :=                Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_GraphicFile));
+  if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
+  if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
+  FRegistryKeys.LoadJSON(ARoot);
+end;
+
 procedure TPackageOptions.SaveIni(AIni: TIniFile);
 begin
   AIni.WriteString('Package', 'Version',                  FileVersion);
@@ -491,6 +602,26 @@ begin
   if Assigned(GraphicFile) then
     AIni.WriteString('Package', 'GraphicFile', GraphicFile.RelativeFileName);
   FRegistryKeys.SaveIni(AIni);
+end;
+
+procedure TPackageOptions.SaveJSON(ARoot: TJSONObject);
+var
+  FOptions, FSystem: TJSONObject;
+begin
+  FSystem := TJSONObject.Create;
+  ARoot.AddPair(SJSON_System, FSystem);
+  FSystem.AddPair(SJSON_System_KeymanDeveloperVersion, GetVersionString);
+  FSystem.AddPair(SJSON_System_FileVersion, FileVersion);
+
+  FOptions := TJSONObject.Create;
+  ARoot.AddPair(SJSON_Options, FOptions);
+  if ExecuteProgram <> '' then
+    FOptions.AddPair(SJSON_Options_ExecuteProgram, ExecuteProgram);
+  if Assigned(ReadmeFile) then
+    FOptions.AddPair(SJSON_Options_ReadMeFile, ReadmeFile.RelativeFileName);
+  if Assigned(GraphicFile) then
+    FOptions.AddPair(SJSON_Options_GraphicFile, GraphicFile.RelativeFileName);
+  FRegistryKeys.SaveJSON(ARoot);
 end;
 
 procedure TPackageOptions.SetExecuteProgram(Value: WideString);
@@ -556,7 +687,7 @@ begin
   FInfoType := pietOther;
 
   for piet := Low(PackageInfoEntryTypeNames) to High(PackageInfoEntryTypeNames) do
-    if PackageInfoEntryTypeNames[piet] = LowerCase(FName) then
+    if SameText(PackageInfoEntryTypeNames[piet], FName) then
       FInfoType := piet;
 end;
 
@@ -629,12 +760,60 @@ begin
   end;
 end;
 
+procedure TPackageInfoEntryList.LoadJSON(ARoot: TJSONObject);
+var
+  name: string;
+  i: Integer;
+  inf: TPackageInfoEntry;
+  FItems: TJSONObject;
+  FNode: TJSONObject;
+  v: TPackageInfoEntryType;
+begin
+  Clear;
+  FItems := ARoot.Values[SJSON_Info] as TJSONObject;
+  for i := 0 to FItems.Count - 1 do
+  begin
+    name := FItems.Pairs[i].JsonString.Value;
+    for v := Low(TPackageInfoEntryType) to High(TPackageInfoEntryType) do
+      if SJSON_PackageInfoEntryTypeNames[v] = name then
+      begin
+        FNode := FItems.Pairs[i].JsonValue as TJSONObject;
+        inf := TPackageInfoEntry.Create(Package);
+        inf.Name := name;
+        inf.Description := GetJsonValueString(FNode, SJSON_Info__Description);
+        inf.URL := GetJsonValueString(FNode, SJSON_Info__URL);
+        Add(inf);
+        Break;
+      end;
+  end;
+end;
+
 procedure TPackageInfoEntryList.SaveIni(AIni: TIniFile);
 var
   i: Integer;
 begin
   for i := 0 to Count - 1 do
     AIni.WriteString('Info', Items[i].Name, Format('"%s","%s"', [Items[i].Description, Items[i].URL]));
+end;
+
+procedure TPackageInfoEntryList.SaveJSON(ARoot: TJSONObject);
+var
+  i: Integer;
+  AInfoRoot, ANode: TJSONObject;
+begin
+  AInfoRoot := TJSONObject.Create;
+  ARoot.AddPair(SJSON_Info, AInfoRoot);
+  for i := 0 to Count - 1 do
+  begin
+    if SJSON_PackageInfoEntryTypeNames[Items[i].InfoType] <> '' then
+    begin
+      ANode := TJSONObject.Create;
+      AInfoRoot.AddPair(SJSON_PackageInfoEntryTypeNames[Items[i].InfoType], ANode);
+      ANode.AddPair(SJSON_Info__Description, Items[i].Description);
+      if Items[i].URL <> '' then
+        ANode.AddPair(SJSON_Info__URL, Items[i].URL);
+    end;
+  end;
 end;
 
 function TPackageInfoEntryList.DescIndexOf(Name: WideString): WideString;
@@ -729,16 +908,16 @@ end;
  - TPackageStartMenuEntryList                                                  -
  ------------------------------------------------------------------------------}
 
-procedure TPackageStartMenuEntryList.LoadXML(ARoot: IXMLNode);
+function StrToStartMenuEntryLocation(s: WideString): TPackageStartMenuEntryLocation;
+var
+  v: Integer;
+begin
+  v := System.TypInfo.GetEnumValue(TypeInfo(TPackageStartMenuEntryLocation), s);
+  if v = -1 then Result := psmelStartMenu
+  else Result := TPackageStartMenuEntryLocation(v);
+end;
 
-    function StrToStartMenuEntryLocation(s: WideString): TPackageStartMenuEntryLocation;
-    var
-      v: Integer;
-    begin
-      v := System.TypInfo.GetEnumValue(TypeInfo(TPackageStartMenuEntryLocation), s);
-      if v = -1 then Result := psmelStartMenu
-      else Result := TPackageStartMenuEntryLocation(v);
-    end;
+procedure TPackageStartMenuEntryList.LoadXML(ARoot: IXMLNode);
 var
   sme: TPackageStartMenuEntry;
   i: Integer;
@@ -805,12 +984,61 @@ begin
   end;
 end;
 
+procedure TPackageStartMenuEntryList.LoadJSON(ARoot: TJSONObject);
+var
+  i: Integer;
+  AItems: TJSONArray;
+  AItem: TJSONObject;
+  sme: TPackageStartMenuEntry;
+begin
+  AItems := ARoot.Values[SJSON_StartMenu_Items] as TJSONArray;
+  if not Assigned(AItems) then
+    Exit;
+
+  for i := 0 to AItems.Count - 1 do
+  begin
+    AItem := AItems.Items[i] as TJSONObject;
+
+    sme := TPackageStartMenuEntry.Create(Package);
+    sme.Name := GetJsonValueString(AItem, SJSON_StartMenu_Items_Name);
+    sme.Prog := GetJsonValueString(AItem, SJSON_StartMenu_Items_Filename);
+    sme.Params := GetJsonValueString(AItem, SJSON_StartMenu_Items_Arguments);
+    sme.Icon := GetJsonValueString(AItem, SJSON_StartMenu_Items_Icon);
+    sme.Location := StrToStartMenuEntryLocation(GetJsonValueString(AItem, SJSON_StartMenu_Items_Location));
+    Self.Add(sme);
+  end;
+end;
+
 procedure TPackageStartMenuEntryList.SaveIni(AIni: TIniFile);
 var
   i: Integer;
 begin
   for i := 0 to Count - 1 do
     AIni.WriteString('StartMenuEntries', Items[i].Name, Format('"%s","%s"', [Items[i].Prog, Items[i].Params]));
+end;
+
+procedure TPackageStartMenuEntryList.SaveJSON(ARoot: TJSONObject);
+var
+  i: Integer;
+  AItems: TJSONArray;
+  AItem: TJSONObject;
+begin
+  AItems := TJSONArray.Create;
+  ARoot.AddPair(SJSON_StartMenu_Items, AItems);
+  for i := 0 to Count - 1 do
+  begin
+    AItem := TJSONObject.Create;
+    AItems.Add(AItem);
+    AItem.AddPair(SJSON_StartMenu_Items_Name, Items[i].Name);
+    AItem.AddPair(SJSON_StartMenu_Items_Filename, Items[i].Prog);
+    if Items[i].Params <> '' then
+      AItem.AddPair(SJSON_StartMenu_Items_Arguments, Items[i].Params);
+    if Items[i].Icon <> '' then
+      AItem.AddPair(SJSON_StartMenu_Items_Icon, Items[i].Icon);
+    if Items[i].Location <> psmelStartMenu then
+      AItem.AddPair(SJSON_StartMenu_Items_Location,
+        System.TypInfo.GetEnumName(TypeInfo(TPackageStartMenuEntryLocation), Ord(Items[i].Location)));
+  end;
 end;
 
 procedure TPackageStartMenuEntryList.Assign(Source: TPackageStartMenuEntryList);
@@ -880,12 +1108,43 @@ begin
   Entries.LoadIni(AIni);
 end;
 
+procedure TPackageStartMenu.LoadJSON(ARoot: TJSONObject);
+var
+  ANode: TJSONObject;
+begin
+  ANode := ARoot.Values[SJSON_StartMenu] as TJSONObject;
+  if not Assigned(ANode) then
+    Exit;
+
+  Path := GetJsonValueString(ANode, SJSON_StartMenu_Folder);
+  DoCreate := Path <> '';
+  AddUninstallEntry := Assigned(ANode.Values[SJSON_StartMenu_AddUninstallEntry]) and
+    (ANode.Values[SJSON_StartMenu_AddUninstallEntry] is TJSONTrue);
+  Entries.LoadJSON(ANode);
+end;
+
 procedure TPackageStartMenu.SaveIni(AIni: TIniFile);
 begin
   AIni.WriteString('StartMenu', 'Path',              Path);
   AIni.WriteBool(  'StartMenu', 'Create',            DoCreate);
   AIni.WriteBool(  'StartMenu', 'AddUninstallEntry', AddUninstallEntry);
   Entries.SaveIni(AIni);
+end;
+
+procedure TPackageStartMenu.SaveJSON(ARoot: TJSONObject);
+var
+  ANode: TJSONObject;
+begin
+  if (Path = '') and (Entries.Count = 0) then
+    Exit;
+
+  ANode := TJSONObject.Create;
+  ARoot.AddPair(SJSON_StartMenu, ANode);
+  if Path <> '' then
+    ANode.AddPair(SJSON_StartMenu_Folder, Path);
+  if AddUninstallEntry then
+    ANode.AddPair(SJSON_StartMenu_AddUninstallEntry, TJSONBool.Create(True));
+  Entries.SaveJSON(ANode);
 end;
 
 {-------------------------------------------------------------------------------
@@ -983,7 +1242,7 @@ begin
       ChildNodes['Name'].NodeValue := Items[i].FileName;
       ChildNodes['Description'].NodeValue := Items[i].Description;
       ChildNodes['CopyLocation'].NodeValue := Ord(Items[i].CopyLocation);
-      ChildNodes['FileType'].NodeValue := ExtractFileExt(Items[i].FFileName); 
+      ChildNodes['FileType'].NodeValue := ExtractFileExt(Items[i].FFileName);
     end;
   end;
 end;
@@ -1017,6 +1276,28 @@ begin
   end;
 end;
 
+procedure TPackageContentFileList.LoadJSON(ARoot: TJSONObject);
+var
+  subfile: TPackageContentFile;
+  i: Integer;
+  FItems: TJSONArray;
+  FItem: TJSONObject;
+begin
+  Clear;
+  FItems := ARoot.Values[SJSON_Files] as TJSONArray;
+  for i := 0 to FItems.Count - 1 do
+  begin
+    FItem := FItems.Items[i] as TJSONObject;
+
+    subfile := TPackageContentFile.Create(Package);
+    subfile.FileName := GetJsonValueString(FItem, SJSON_Files_Name);
+    subfile.Description := GetJsonValueString(FItem, SJSON_Files_Description);
+    if Assigned(FItem.Values[SJSON_Files_CopyLocation]) then
+      subfile.FCopyLocation := TPackageFileCopyLocation((FItem.Values[SJSON_Files_CopyLocation] as TJSONNumber).AsInt);
+    Add(subfile);
+  end;
+end;
+
 procedure TPackageContentFileList.SaveIni(AIni: TIniFile);
 var
   i: Integer;
@@ -1024,6 +1305,28 @@ begin
   for i := 0 to Count - 1 do
     AIni.WriteString('Files', IntToStr(i), Format('"%s","%s",%d', [Items[i].Description,
       Items[i].FileName, Ord(Items[i].CopyLocation)]));
+end;
+
+procedure TPackageContentFileList.SaveJSON(ARoot: TJSONObject);
+var
+  i: Integer;
+  AItems: TJSONArray;
+  AItem: TJSONObject;
+begin
+  if Count = 0 then
+    Exit;
+
+  AItems := TJSONArray.Create;
+  ARoot.AddPair(SJSON_Files, AItems);
+  for i := 0 to Count - 1 do
+  begin
+    AItem := TJSONObject.Create;
+    AItems.Add(AItem);
+    AItem.AddPair(SJSON_Files_Name, Items[i].FileName);
+    AItem.AddPair(SJSON_Files_Description, Items[i].Description);
+    if Items[i].CopyLocation <> pfclPackage then
+      AItem.AddPair(SJSON_Files_CopyLocation, TJSONNumber.Create(Ord(Items[i].CopyLocation)));
+  end;
 end;
 
 procedure TPackageContentFileList.Assign(Source: TPackageContentFileList);
@@ -1130,6 +1433,21 @@ begin
   end;
 end;
 
+procedure TPackage.LoadJSON;
+var
+  FJSON: TJSONObject;
+begin
+  with TStringStream.Create('', TEncoding.UTF8) do
+  try
+    LoadFromFile(FileName);
+    FJSON := TJSONObject.ParseJSONValue(DataString) as TJSONObject;
+  finally
+    Free;
+  end;
+
+  DoLoadJSON(FJSON);
+end;
+
 procedure PackageLoadError(Message: WideString);
 begin
   raise EPackageInfo.Create(Message);
@@ -1209,13 +1527,21 @@ begin
   end;
 end;
 
+procedure TPackage.DoLoadJSON(ARoot: TJSONObject);
+begin
+  StartMenu.LoadJSON(ARoot);
+  Info.LoadJSON(ARoot);
+  Files.LoadJSON(ARoot);
+  Options.LoadJSON(ARoot);
+  Keyboards.LoadJSON(ARoot);
+end;
+
 procedure TPackage.DoLoadXML(ARoot: IXMLNode);
 var
   FVersion: WideString;
 begin
-
   FVersion := VarToWideStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
-  if (FVersion <> SKeymanVersion70) and (FVersion <> SKeymanVersion80) and (FVersion <> SKeymanVersion) then
+  if FVersion <> SKeymanVersion70 then
     PackageLoadError('Package file version '+FVersion+' is not recognised.');
 
   StartMenu.LoadXML(ARoot);
@@ -1223,6 +1549,15 @@ begin
   Files.LoadXML(ARoot);
   Options.LoadXML(ARoot);
   Keyboards.LoadXML(ARoot);
+end;
+
+procedure TPackage.DoSaveJSON(ARoot: TJSONObject);
+begin
+  Options.SaveJSON(ARoot);
+  StartMenu.SaveJSON(ARoot);
+  Info.SaveJSON(ARoot);
+  Files.SaveJSON(ARoot);
+  Keyboards.SaveJSON(ARoot);
 end;
 
 procedure TPackage.DoSaveXML(ARoot: IXMLNode);
@@ -1251,6 +1586,34 @@ begin
     ini.UpdateFile;
   finally
     ini.Free;
+  end;
+end;
+
+procedure TPackage.SaveJSON;
+var
+  FJSON: TJSONObject;
+  s: TStringList;
+begin
+  if FileExists(FileName) then DeleteFileCleanAttr(FileName);   // I4574
+
+  FJSON := TJSONObject.Create;
+  try
+    DoSaveJSON(FJSON);
+    s := TStringList.Create;
+    try
+      PrettyPrintJSON(FJSON, s);
+      with TStringStream.Create(s.Text, TEncoding.UTF8) do
+      try
+        // Use TStringStream to avoid BOM from TStringList
+        SaveToFile(FileName);
+      finally
+        Free;
+      end;
+    finally
+      s.Free;
+    end;
+  finally
+    FJSON.Free;
   end;
 end;
 
@@ -1418,6 +1781,48 @@ begin
   end;
 end;
 
+procedure TPackageRegistryKeyList.LoadJSON(ARoot: TJSONObject);
+var
+  i: Integer;
+  ANode: TJSONArray;
+  AKeyNode: TJSONObject;
+  pkr: TPackageRegistryKey;
+  name, value, root, key, valuetype: WideString;
+begin
+  Clear;
+
+  ANode := ARoot.Values[SJSON_Registry] as TJSONArray;
+  if not Assigned(ANode) then Exit;
+
+  for i := 0 to ANode.Count - 1 do
+  begin
+    AKeyNode := ANode.Items[i] as TJSONObject;
+    pkr := TPackageRegistryKey.Create(Package);
+
+    name := GetJsonValueString(AKeyNode, SJSON_Registry_Name);
+    value := GetJsonValueString(AKeyNode, SJSON_Registry_Value);
+    root := GetJsonValueString(AKeyNode, SJSON_Registry_Root);
+    key := GetJsonValueString(AKeyNode, SJSON_Registry_Key);
+
+    if root = 'HKCU' then pkr.Root := HKEY_CURRENT_USER
+    else if root = 'HKLM' then pkr.Root := HKEY_LOCAL_MACHINE
+    else if root = 'HKCR' then pkr.Root := HKEY_CLASSES_ROOT
+    else pkr.Root := HKEY_CURRENT_USER;
+
+    pkr.Name := name;
+    pkr.Key := key;
+
+    valuetype := GetJsonValueString(AKeyNode, SJSON_Registry_ValueType);
+    if valuetype = 'D'
+      then pkr.ValueType := rkvtDWord
+      else pkr.ValueType := rkvtString;
+
+    pkr.Value := value;
+
+    Add(pkr);
+  end;
+end;
+
 procedure TPackageRegistryKeyList.SaveIni(AIni: TIniFile);
 var
   pkr: TPackageRegistryKey;
@@ -1436,6 +1841,38 @@ begin
 
 
     AIni.WriteString('Registry', root+';'+pkr.Key+';'+pkr.Name, valuetype+';'+pkr.Value);
+  end;
+end;
+
+procedure TPackageRegistryKeyList.SaveJSON(ARoot: TJSONObject);
+var
+  i: Integer;
+  AKeyNode: TJSONObject;
+  ANode: TJSONArray;
+  pkr: TPackageRegistryKey;
+  root, valuetype: WideString;
+begin
+  if Count = 0 then
+    Exit;
+
+  ANode := TJSONArray.Create;
+  ARoot.AddPair(SJSON_Registry, ANode);
+  for i := 0 to Count - 1 do
+  begin
+    pkr := Items[i];
+    if pkr.Root = HKEY_CURRENT_USER then root := 'HKCU'
+    else if pkr.Root = HKEY_LOCAL_MACHINE then root := 'HKLM'
+    else if pkr.Root = HKEY_CLASSES_ROOT then root := 'HKCR'
+    else root := 'HKCU';
+
+    if pkr.ValueType = rkvtString then valuetype := 'S' else valuetype := 'D';
+    AKeyNode := TJSONObject.Create;
+    ANode.Add(AKeyNode);
+    AKeyNode.AddPair(SJSON_Registry_Root, root);
+    AKeyNode.AddPair(SJSON_Registry_Key, pkr.Key);
+    AKeyNode.AddPair(SJSON_Registry_Name, pkr.Name);
+    AKeyNode.AddPair(SJSON_Registry_ValueType, valuetype);
+    AKeyNode.AddPair(SJSON_Registry_Value, pkr.Value);
   end;
 end;
 
@@ -1630,15 +2067,6 @@ begin
   end;
 end;
 
-const
-  SPackageKeyboard_Name = 'Name';
-  SPackageKeyboard_ID = 'ID';
-  SPackageKeyboard_Version = 'Version';
-  SPackageKeyboard_OSKFont = 'OSKFont';
-  SPackageKeyboard_DisplayFont = 'DisplayFont';
-  SPackageKeyboard_Language = 'Language';
-  SPackageKeyboard_Language_ID = 'ID';
-
 procedure TPackageKeyboardList.LoadIni(AIni: TIniFile);
 var
   s: TStringList;
@@ -1659,15 +2087,15 @@ begin
         Break;
 
       keyboard := TPackageKeyboard.Create(Package);
-      keyboard.Name := AIni.ReadString(FSectionName, SPackageKeyboard_Name, '');
-      keyboard.ID := AIni.ReadString(FSectionName, SPackageKeyboard_ID, '');
-      keyboard.Version := AIni.ReadString(FSectionName, SPackageKeyboard_Version, '1.0');
-      keyboard.OSKFont := Package.Files.FromFileNameEx(AIni.ReadString(FSectionName, SPackageKeyboard_OSKFont, ''));
-      keyboard.DisplayFont := Package.Files.FromFileNameEx(AIni.ReadString(FSectionName, SPackageKeyboard_DisplayFont, ''));
+      keyboard.Name := AIni.ReadString(FSectionName, SXML_PackageKeyboard_Name, '');
+      keyboard.ID := AIni.ReadString(FSectionName, SXML_PackageKeyboard_ID, '');
+      keyboard.Version := AIni.ReadString(FSectionName, SXML_PackageKeyboard_Version, '1.0');
+      keyboard.OSKFont := Package.Files.FromFileNameEx(AIni.ReadString(FSectionName, SXML_PackageKeyboard_OSKFont, ''));
+      keyboard.DisplayFont := Package.Files.FromFileNameEx(AIni.ReadString(FSectionName, SXML_PackageKeyboard_DisplayFont, ''));
 
       for j := 0 to MaxInt do
       begin
-        ln := AIni.ReadString(FSectionName, SPackageKeyboard_Language+IntToStr(j), '');
+        ln := AIni.ReadString(FSectionName, SXML_PackageKeyboard_Language+IntToStr(j), '');
         if ln = '' then
           Break;
         FLanguage := TPackageKeyboardLanguage.Create(Package);
@@ -1680,6 +2108,49 @@ begin
     end;
   finally
     s.Free;
+  end;
+end;
+
+procedure TPackageKeyboardList.LoadJSON(ARoot: TJSONObject);
+var
+  keyboard: TPackageKeyboard;
+  i, j: Integer;
+  ALanguages, ANode: TJSONArray;
+  AKeyboard, ALanguage: TJSONObject;
+  FLanguage: TPackageKeyboardLanguage;
+begin
+  Clear;
+
+  ANode := ARoot.Values[SJSON_Keyboards] as TJSONArray;
+  if not Assigned(ANode) then
+    Exit;
+
+  for i := 0 to ANode.Count - 1 do
+  begin
+    AKeyboard := ANode.Items[i] as TJSONObject;
+
+    keyboard := TPackageKeyboard.Create(Package);
+    keyboard.Name := GetJsonValueString(AKeyboard, SJSON_Keyboard_Name);
+    keyboard.ID := GetJsonValueString(AKeyboard,SJSON_Keyboard_ID);
+    keyboard.Version := GetJsonValueString(AKeyboard, SJSON_Keyboard_Version);
+    keyboard.OSKFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_OSKFont));
+    keyboard.DisplayFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_DisplayFont));
+
+    ALanguages := AKeyboard.Values[SJSON_Keyboard_Languages] as TJSONArray;
+    if Assigned(ALanguages) then
+    begin
+      for j := 0 to ALanguages.Count - 1 do
+      begin
+        ALanguage := ALanguages.Items[j] as TJSONObject;
+
+        FLanguage := TPackageKeyboardLanguage.Create(Package);
+        FLanguage.ID := GetJsonValueString(ALanguage, SJSON_Keyboard_Language_ID);
+        FLanguage.Name := GetJsonValueString(ALanguage, SJSON_Keyboard_Language_Name);
+        keyboard.Languages.Add(FLanguage);
+      end;
+    end;
+
+    Add(keyboard);
   end;
 end;
 
@@ -1698,11 +2169,11 @@ begin
     AKeyboard := ANode.ChildNodes[i];
 
     keyboard := TPackageKeyboard.Create(Package);
-    keyboard.Name := VarToStr(AKeyboard.ChildValues[SPackageKeyboard_Name]);
-    keyboard.ID := VarToStr(AKeyboard.ChildValues[SPackageKeyboard_ID]);
-    keyboard.Version := VarToStr(AKeyboard.ChildValues[SPackageKeyboard_Version]);
-    keyboard.OSKFont := Package.Files.FromFileNameEx(VarToStr(AKeyboard.ChildValues[SPackageKeyboard_OSKFont]));
-    keyboard.DisplayFont := Package.Files.FromFileNameEx(VarToStr(AKeyboard.ChildValues[SPackageKeyboard_DisplayFont]));
+    keyboard.Name := VarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_Name]);
+    keyboard.ID := VarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_ID]);
+    keyboard.Version := VarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_Version]);
+    keyboard.OSKFont := Package.Files.FromFileNameEx(VarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_OSKFont]));
+    keyboard.DisplayFont := Package.Files.FromFileNameEx(VarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_DisplayFont]));
 
     ALanguages := AKeyboard.ChildNodes['Languages'];
     if Assigned(ALanguages) then
@@ -1712,7 +2183,7 @@ begin
         ALanguage := ALanguages.ChildNodes[j];
 
         FLanguage := TPackageKeyboardLanguage.Create(Package);
-        FLanguage.ID := ALanguage.Attributes[SPackageKeyboard_Language_ID];
+        FLanguage.ID := ALanguage.Attributes[SXML_PackageKeyboard_Language_ID];
         FLanguage.Name := ALanguage.NodeValue;
         keyboard.Languages.Add(FLanguage);
       end;
@@ -1730,17 +2201,54 @@ begin
   for i := 0 to Count-1 do
   begin
     FSectionName := 'Keyboard'+IntToStr(i);
-    AIni.WriteString(FSectionName, SPackageKeyboard_Name, Items[i].Name);
-    AIni.WriteString(FSectionName, SPackageKeyboard_ID, Items[i].ID);
-    AIni.WriteString(FSectionName, SPackageKeyboard_Version, Items[i].Version);
+    AIni.WriteString(FSectionName, SXML_PackageKeyboard_Name, Items[i].Name);
+    AIni.WriteString(FSectionName, SXML_PackageKeyboard_ID, Items[i].ID);
+    AIni.WriteString(FSectionName, SXML_PackageKeyboard_Version, Items[i].Version);
     if Assigned(Items[i].OSKFont) then
-      AIni.WriteString(FSectionName, SPackageKeyboard_OSKFont, ExtractFileName(Items[i].OSKFont.FileName));
+      AIni.WriteString(FSectionName, SXML_PackageKeyboard_OSKFont, Items[i].OSKFont.RelativeFileName);
     if Assigned(Items[i].DisplayFont) then
-      AIni.WriteString(FSectionName, SPackageKeyboard_DisplayFont, ExtractFileName(Items[i].DisplayFont.FileName));
+      AIni.WriteString(FSectionName, SXML_PackageKeyboard_DisplayFont, Items[i].DisplayFont.RelativeFileName);
 
     for j := 0 to Items[i].Languages.Count-1 do
     begin
-      AIni.WriteString(FSectionName, SPackageKeyboard_Language+IntToStr(j), Items[i].Languages[j].ID+','+Items[i].Languages[j].Name);
+      AIni.WriteString(FSectionName, SXML_PackageKeyboard_Language+IntToStr(j), Items[i].Languages[j].ID+','+Items[i].Languages[j].Name);
+    end;
+  end;
+end;
+
+procedure TPackageKeyboardList.SaveJSON(ARoot: TJSONObject);
+var
+  i, j: Integer;
+  AKeyboard, ALanguage: TJSONObject;
+  AKeyboards, ALanguages: TJSONArray;
+begin
+  if Count = 0 then
+    Exit;
+
+  AKeyboards := TJSONArray.Create;
+  ARoot.AddPair(SJSON_Keyboards, AKeyboards);
+
+  for i := 0 to Count - 1 do
+  begin
+    AKeyboard := TJSONObject.Create;
+    AKeyboards.Add(AKeyboard);
+
+    AKeyboard.AddPair(SJSON_Keyboard_Name, Items[i].Name);
+    AKeyboard.AddPair(SJSON_Keyboard_ID, Items[i].ID);
+    AKeyboard.AddPair(SJSON_Keyboard_Version, Items[i].Version);
+    if Assigned(Items[i].OSKFont) then
+      AKeyboard.AddPair(SJSON_Keyboard_OSKFont, Items[i].OSKFont.RelativeFileName);
+    if Assigned(Items[i].DisplayFont) then
+      AKeyboard.AddPair(SJSON_Keyboard_DisplayFont, Items[i].DisplayFont.RelativeFileName);
+
+    ALanguages := TJSONArray.Create;
+    AKeyboard.AddPair(SJSON_Keyboard_Languages, ALanguages);
+    for j := 0 to Items[i].Languages.Count - 1 do
+    begin
+      ALanguage := TJSONObject.Create;
+      ALanguages.Add(ALanguage);
+      ALanguage.AddPair(SJSON_Keyboard_Language_Name, Items[i].Languages[j].Name);
+      ALanguage.AddPair(SJSON_Keyboard_Language_ID, Items[i].Languages[j].ID);
     end;
   end;
 end;
@@ -1756,21 +2264,31 @@ begin
   begin
     AKeyboard := ANode.AddChild('Keyboard');
 
-    AKeyboard.ChildNodes[SPackageKeyboard_Name].NodeValue := Items[i].Name;
-    AKeyboard.ChildNodes[SPackageKeyboard_ID].NodeValue := Items[i].ID;
-    AKeyboard.ChildNodes[SPackageKeyboard_Version].NodeValue := Items[i].Version;
+    AKeyboard.ChildNodes[SXML_PackageKeyboard_Name].NodeValue := Items[i].Name;
+    AKeyboard.ChildNodes[SXML_PackageKeyboard_ID].NodeValue := Items[i].ID;
+    AKeyboard.ChildNodes[SXML_PackageKeyboard_Version].NodeValue := Items[i].Version;
     if Assigned(Items[i].OSKFont) then
-      AKeyboard.ChildNodes[SPackageKeyboard_OSKFont].NodeValue := ExtractFileName(Items[i].OSKFont.FileName);
+      AKeyboard.ChildNodes[SXML_PackageKeyboard_OSKFont].NodeValue := Items[i].OSKFont.RelativeFileName;
     if Assigned(Items[i].DisplayFont) then
-      AKeyboard.ChildNodes[SPackageKeyboard_DisplayFont].NodeValue := ExtractFileName(Items[i].DisplayFont.FileName);
+      AKeyboard.ChildNodes[SXML_PackageKeyboard_DisplayFont].NodeValue := Items[i].DisplayFont.RelativeFileName;
     ALanguages := AKeyboard.AddChild('Languages');
     for j := 0 to Items[i].Languages.Count - 1 do
     begin
       ALanguage := ALanguages.AddChild('Language');
       ALanguage.NodeValue := Items[i].Languages[j].Name;
-      ALanguage.Attributes[SPackageKeyboard_Language_ID] := Items[i].Languages[j].ID;
+      ALanguage.Attributes[SXML_PackageKeyboard_Language_ID] := Items[i].Languages[j].ID;
     end;
   end;
+end;
+
+function GetJsonValueString(o: TJSONObject; const n: string): string;
+var
+  v: TJSONValue;
+begin
+  v := o.Values[n];
+  if not Assigned(v)
+    then Result := ''
+    else Result := v.Value;
 end;
 
 end.

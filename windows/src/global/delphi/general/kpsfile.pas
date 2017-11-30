@@ -29,6 +29,7 @@ interface
 uses
   System.Classes,
   System.IniFiles,
+  System.JSON,
   System.SysUtils,
   Winapi.Windows,
   Xml.XMLIntf,
@@ -47,6 +48,8 @@ type
     procedure Assign(Source: TPackageOptions); override;
     procedure LoadXML(ARoot: IXMLNode); override;
     procedure SaveXML(ARoot: IXMLNode); override;
+    procedure LoadJSON(ARoot: TJSONObject); override;
+    procedure SaveJSON(ARoot: TJSONObject); override;
     property MSIFileName: WideString read FMSIFileName write FMSIFileName;
     property MSIOptions: WideString read FMSIOptions write FMSIOptions;  // I3126
   end;
@@ -58,6 +61,8 @@ type
     procedure Import(AIni: TIniFile); override;
     procedure DoLoadXML(ARoot: IXMLNode); override;
     procedure DoSaveXML(ARoot: IXMLNode); override;
+    procedure DoLoadJSON(ARoot: TJSONObject); override;
+    procedure DoSaveJSON(ARoot: TJSONObject); override;
   public
     function KPSOptions: TKPSOptions;
     constructor Create;
@@ -78,6 +83,12 @@ uses
   KeymanVersion,
   utilfiletypes,
   utilsystem;
+
+const
+  SJSON_Options = 'options';
+  SJSON_Options_MSIFileName = 'msiFilename';
+  SJSON_Options_MSIOptions = 'msiOptions';
+  SJSON_Strings = 'strings';
 
 { TKPSFile }
 
@@ -100,6 +111,24 @@ begin
   inherited;
   for i := 0 to Files.Count - 1 do
     Files[i].FileName := ExpandFileNameEx(FileName, Files[i].FileName);
+end;
+
+procedure TKPSFile.DoLoadJSON(ARoot: TJSONObject);
+var
+  i: Integer;
+  ANode: TJSONObject;
+begin
+  inherited;
+
+  if FileName <> '' then
+    for i := 0 to Files.Count - 1 do
+      Files[i].FileName := ExpandFileNameEx(FileName, Files[i].FileName);
+
+  FStrings.Clear;
+  ANode := ARoot.Values[SJSON_Strings] as TJSONObject;
+  if ANode <> nil then
+    for i := 0 to ANode.Count - 1 do
+      FStrings.Add(ANode.Pairs[i].JsonString.Value + '=' + ANode.Pairs[i].Value);
 end;
 
 procedure TKPSFile.DoLoadXML(ARoot: IXMLNode);
@@ -129,6 +158,32 @@ begin
   inherited;
   for i := 0 to Files.Count - 1 do
     Files[i].FileName := ExpandFileNameEx(FileName, Files[i].FileName);
+end;
+
+procedure TKPSFile.DoSaveJSON;
+var
+  i: Integer;
+  ANode: TJSONObject;
+begin
+  Options.FileVersion := SKeymanVersion70;
+
+  if FileName <> '' then
+    for i := 0 to Files.Count - 1 do
+      Files[i].FileName := ExtractRelativePath(FileName, Files[i].FileName);
+
+  inherited;
+
+  if FileName <> '' then
+    for i := 0 to Files.Count - 1 do
+      Files[i].FileName := ExpandFileNameEx(FileName, Files[i].FileName);
+
+  if FStrings.Count > 0 then
+  begin
+    ANode := TJSONObject.Create;
+    ARoot.AddPair(SJSON_Strings, ANode);
+    for i := 0 to FStrings.Count - 1 do
+      ANode.AddPair(FStrings.Names[i], FStrings.ValueFromIndex[i]);
+  end;
 end;
 
 procedure TKPSFile.DoSaveXML(ARoot: IXMLNode);
@@ -290,11 +345,33 @@ begin
   FMSIOptions := (Source as TKPSOptions).MSIOptions;  // I3126
 end;
 
+procedure TKPSOptions.LoadJSON(ARoot: TJSONObject);
+var
+  FOptions: TJSONObject;
+begin
+  inherited;
+  FOptions := ARoot.Values[SJSON_Options] as TJSONObject;
+  FMSIFileName := GetJsonValueString(FOptions, SJSON_Options_MSIFileName);
+  FMSIOptions := GetJsonValueString(FOptions, SJSON_Options_MSIOptions);
+end;
+
 procedure TKPSOptions.LoadXML(ARoot: IXMLNode);
 begin
   inherited;
   FMSIFileName := VarToWideStr(ARoot.ChildNodes['Options'].ChildNodes['MSIFileName'].NodeValue);
   FMSIOptions := VarToWideStr(ARoot.ChildNodes['Options'].ChildNodes['MSIOptions'].NodeValue);  // I3126
+end;
+
+procedure TKPSOptions.SaveJSON(ARoot: TJSONObject);
+var
+  FOptions: TJSONObject;
+begin
+  inherited;
+  FOptions := ARoot.Values[SJSON_Options] as TJSONObject;
+  if FMSIFileName <> '' then
+    FOptions.AddPair(SJSON_Options_MSIFileName, FMSIFileName);
+  if FMSIOptions <> '' then
+    FOptions.AddPair(SJSON_Options_MSIOptions, FMSIOptions);
 end;
 
 procedure TKPSOptions.SaveXML(ARoot: IXMLNode);

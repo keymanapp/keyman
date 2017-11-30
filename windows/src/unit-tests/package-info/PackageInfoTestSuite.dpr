@@ -8,7 +8,6 @@ uses
   {$IFDEF TESTINSIGHT}
   TestInsight.DUnitX,
   {$ENDIF }
-
   PackageInfo in '..\..\global\delphi\general\PackageInfo.pas',
   utilfiletypes in '..\..\global\delphi\general\utilfiletypes.pas',
   utilstr in '..\..\global\delphi\general\utilstr.pas',
@@ -23,11 +22,11 @@ uses
   GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
   kpsfile in '..\..\global\delphi\general\kpsfile.pas',
   PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',
-
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
-  PackageInfoTest in 'PackageInfoTest.pas';
+  PackageInfoTest in 'PackageInfoTest.pas',
+  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas';
 
 var
   runner : ITestRunner;

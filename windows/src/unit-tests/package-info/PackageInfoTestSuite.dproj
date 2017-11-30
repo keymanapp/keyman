@@ -89,21 +89,22 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\..\..\global\delphi\general\PackageInfo.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\utilfiletypes.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\utilstr.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\cust\StockFileNames.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\Unicode.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\VersionInfo.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\utilsystem.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\utilexecute.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\RegistryKeys.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\GetOsVersion.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\kpsfile.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\PackageFileFormats.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\PackageInfo.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilfiletypes.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilstr.pas"/>
+        <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilsystem.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\kpsfile.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
         <DCCReference Include="PackageInfoTest.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\JsonUtil.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -515,6 +516,7 @@
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <Platforms>
+                <Platform value="Linux64">False</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>

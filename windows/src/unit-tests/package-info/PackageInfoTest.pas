@@ -27,6 +27,9 @@ type
     procedure TestXMLInOut;
 
     [Test]
+    procedure TestJSONInOut;
+
+    [Test]
     procedure TestRoundTrip;
 
     [Test]
@@ -116,6 +119,16 @@ begin
   try
     p1.FileName := DataPath + 'test2.out.inf';
     p1.LoadIni;
+    p1.FileName := DataPath + 'test2.out.json';
+    p1.SaveJSON;
+  finally
+    p1.Free;
+  end;
+
+  p1 := TKpsFile.Create;
+  try
+    p1.FileName := DataPath + 'test2.out.json';
+    p1.LoadJSON;
     p1.FileName := DataPath + 'test2.out.xml';
     p1.SaveXML;
   finally
@@ -143,6 +156,16 @@ begin
   try
     p1.FileName := DataPath + 'test3.out.xml';
     p1.LoadXML;
+    p1.FileName := DataPath + 'test3.out.json';
+    p1.SaveJSON;
+  finally
+    p1.Free;
+  end;
+
+  p1 := TKpsFile.Create;
+  try
+    p1.FileName := DataPath + 'test3.out.json';
+    p1.LoadJSON;
     p1.FileName := DataPath + 'test3.out.inf';
     p1.SaveIni;
   finally
@@ -169,6 +192,23 @@ begin
   DoCompare(DataPath + 'test.xml', DataPath + 'test4.out.xml');
 end;
 
+procedure TPackageInfoTest.TestJSONInOut;
+var
+  p1: TPackage;
+begin
+  p1 := TKpsFile.Create;
+  try
+    p1.FileName := DataPath + 'test.json';
+    p1.LoadJSON;
+    p1.FileName := DataPath + 'test5.out.json';
+    p1.SaveJSON;
+  finally
+    p1.Free;
+  end;
+
+  DoCompare(DataPath + 'test.json', DataPath + 'test5.out.json');
+end;
+
 procedure TPackageInfoTest.DoCompare(f1, f2: string);
 var
   k1, k2: TKpsFile;
@@ -177,14 +217,14 @@ begin
   k2 := TKpsFile.Create;
   try
     k1.FileName := f1;
-    if SameText(ExtractFileExt(f1), '.xml')
-      then k1.LoadXml
-      else k1.LoadIni;
+    if SameText(ExtractFileExt(f1), '.xml') then k1.LoadXml
+    else if SameText(ExtractFileExt(f1), '.json') then k1.LoadJSON
+    else k1.LoadIni;
 
     k2.FileName := f2;
-    if SameText(ExtractFileExt(f2), '.xml')
-      then k2.LoadXml
-      else k2.LoadIni;
+    if SameText(ExtractFileExt(f2), '.xml') then k2.LoadXml
+    else if SameText(ExtractFileExt(f2), '.json') then k2.LoadJSON
+    else k2.LoadIni;
 
     DoCompareKpsFiles(f1, f2, k1, k2);
   finally
