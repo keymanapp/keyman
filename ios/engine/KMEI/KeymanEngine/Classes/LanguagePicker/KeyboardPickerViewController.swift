@@ -280,7 +280,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     if let userKeyboards = userData.userKeyboards {
       self.userKeyboards = userKeyboards
     } else {
-      userKeyboards = [Constants.defaultKeyboard]
+      userKeyboards = [Defaults.keyboard]
       userData.userKeyboards = userKeyboards
       userData.synchronize()
     }
