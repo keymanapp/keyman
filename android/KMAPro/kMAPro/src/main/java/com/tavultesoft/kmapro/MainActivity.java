@@ -129,19 +129,18 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
             File newFile = new File(getDir("userdata", Context.MODE_PRIVATE), filename);
             copyFile(inputStream, newFile);
             inputStream.close();
-          } else if (filename.endsWith(".js")) {
-            // TODO: Fix these directories
-            File langDir = new File(getDir("data", Context.MODE_PRIVATE) + "/languages");
-            if (langDir.exists())
-              langDir.mkdir();
-            File newFile = new File(langDir, filename);
-            copyFile(inputStream, newFile);
-            inputStream.close();
-          } else if (filename.endsWith(".ttf") || filename.endsWith(".otf")) {
-            File fontDir = new File(getDir("data", Context.MODE_PRIVATE) + "/fonts");
-            if (fontDir.exists())
-              fontDir.mkdir();
-            File newFile = new File(fontDir, filename);
+          } else if ((filename.endsWith(".js") || filename.endsWith(".ttf") || filename.endsWith(".otf"))) {
+            File packagesDir = new File(getDir("data", Context.MODE_PRIVATE) + File.separator +
+              KMManager.KMDefault_AssetPackages);
+            if (!packagesDir.exists()) {
+              packagesDir.mkdir();
+            }
+            File packageIDDir = new File(getDir("data", Context.MODE_PRIVATE) + File.separator +
+              KMManager.KMDefault_AssetPackages + File.separator + KMManager.KMDefault_LegacyPackageID);
+            if (!packageIDDir.exists()) {
+              packageIDDir.mkdir();
+            }
+            File newFile = new File(packageIDDir, filename);
             copyFile(inputStream, newFile);
             inputStream.close();
           }
