@@ -1094,14 +1094,18 @@ if(!window['keyman']['loaded']) {
      * @param       {Event}      e        event
      * @return      {Object}              HTML element
      */       
-    util.eventTarget = function(e)
-    {
-      if(e && e.target)        // most browsers
+    util.eventTarget = function(e) {
+      if(!e) {
+        return null;
+      } else if (e.target) {       // most browsers
         return e.target;
-      else if(window.event)     //IE 8 (and earlier)
+      } else if (e.srcElement) {
+        return e.srcElement;
+      } else if(window.event) { //IE 8 (and earlier)
         return window.event.srcElement;
-      else
+      } else {
         return null;            // shouldn't happen!
+      }
     }
 
     /**
