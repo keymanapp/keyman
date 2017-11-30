@@ -324,7 +324,7 @@ if(!window['keyman']['initialized']) {
         // despite its present redundancy.
         if(keymanweb._CommonFocusHelper(target)) {
           return;
-        };
+        }
       }
 
       /**
