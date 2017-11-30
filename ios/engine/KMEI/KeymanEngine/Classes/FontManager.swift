@@ -6,6 +6,7 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
+import CoreText
 import Foundation
 
 public class FontManager {
@@ -32,12 +33,7 @@ public class FontManager {
     }
 
     for fontURL in customFonts {
-      let isRegistered = fonts[fontURL]?.isRegistered ?? false
-      if !isRegistered {
-        if let font = registerFont(at: fontURL) {
-          fonts[fontURL] = font
-        }
-      }
+      _ = registerFont(at: fontURL)
     }
   }
 
@@ -48,12 +44,7 @@ public class FontManager {
     }
 
     for fontURL in customFonts {
-      if var font = fonts[fontURL], font.isRegistered {
-        if unregisterFont(at: fontURL) {
-          font.isRegistered = false
-          fonts[fontURL] = font
-        }
-      }
+      _ = unregisterFont(at: fontURL)
     }
   }
 
@@ -83,10 +74,23 @@ public class FontManager {
     return name as String
   }
 
-  private func registerFont(at url: URL) -> RegisteredFont? {
-    guard let fontName = readFontName(at: url) else {
-      return nil
+  /// - Parameters:
+  ///   - url: URL of the font to register
+  /// - Returns: Font is registered.
+  public func registerFont(at url: URL) -> Bool {
+    let fontName: String
+    if let font = fonts[url] {
+      if font.isRegistered {
+        return true
+      }
+      fontName = font.name
+    } else {
+      guard let name = readFontName(at: url) else {
+        return false
+      }
+      fontName = name
     }
+
     let didRegister: Bool
     if !fontExists(fontName) {
       var errorRef: Unmanaged<CFError>?
@@ -103,20 +107,39 @@ public class FontManager {
       Manager.shared.kmLog("Did not register font at \(url) because font name \(fontName) is already registered",
                            checkDebugPrinting: true)
     }
-    return RegisteredFont(name: fontName, isRegistered: didRegister)
+    let font = RegisteredFont(name: fontName, isRegistered: didRegister)
+    fonts[url] = font
+    return didRegister
   }
 
-  private func unregisterFont(at url: URL) -> Bool {
-    var errorRef: Unmanaged<CFError>?
-    let didUnregister = CTFontManagerUnregisterFontsForURL(url as CFURL, .none, &errorRef)
-    let error = errorRef?.takeRetainedValue() // Releases errorRef
-    if !didUnregister {
-      Manager.shared.kmLog("Failed to unregister font at \(url) reason: \(String(describing: error))",
-                           checkDebugPrinting: false)
-    } else {
-      Manager.shared.kmLog("Unregistered font at \(url)", checkDebugPrinting: true)
+  /// - Parameters:
+  ///   - url: URL of the font to unregister
+  ///   - fromSystemOnly: Do not remove the font from the list that `FontManager` maintains.
+  /// - Returns: Font is no longer registered.
+  public func unregisterFont(at url: URL, fromSystemOnly: Bool = true) -> Bool {
+    guard var font = fonts[url] else {
+      return true
     }
-    return didUnregister
+
+    if font.isRegistered {
+      var errorRef: Unmanaged<CFError>?
+      let didUnregister = CTFontManagerUnregisterFontsForURL(url as CFURL, .none, &errorRef)
+      let error = errorRef?.takeRetainedValue() // Releases errorRef
+      if didUnregister {
+        Manager.shared.kmLog("Unregistered font at \(url)", checkDebugPrinting: true)
+        font.isRegistered = false
+        fonts[url] = font
+      } else {
+        Manager.shared.kmLog("Failed to unregister font at \(url) reason: \(String(describing: error))",
+          checkDebugPrinting: false)
+      }
+    }
+
+    if !font.isRegistered && !fromSystemOnly {
+      fonts[url] = nil
+    }
+
+    return font.isRegistered
   }
 
   private func fontExists(_ fontName: String) -> Bool {

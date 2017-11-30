@@ -159,6 +159,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     view?.backgroundColor = bgColor
 
     // Check for configuration profiles/fonts to install
+    FontManager.shared.registerCustomFonts()
     let kmFonts = FontManager.shared.fonts
     var profilesByFontName: [String: String] = [:]
     for (url, font) in kmFonts where url.lastPathComponent != Resources.oskFontFilename {

@@ -6,7 +6,6 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
-import CoreText
 import UIKit
 import WebKit
 
@@ -207,7 +206,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
      * set the queue running, this should be perfectly fine.
      */
     sharedQueue = HTTPDownloader.init(self)
-    // FontManager.shared.registerCustomFonts()
   }
 
   // MARK: - Keyboard management
@@ -264,6 +262,13 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       jsOskFont = self.jsFont(fromFont: oskFont) ?? "undefined"
     } else {
       jsOskFont = jsFont
+    }
+
+    if let fontFilename = kb.font?.source.first(where: { $0.hasFontExtension }) {
+      _ = FontManager.shared.registerFont(at: activeFontDirectory().appendingPathComponent(fontFilename))
+    }
+    if let oskFontFilename = kb.oskFont?.source.first(where: { $0.hasFontExtension }) {
+      _ = FontManager.shared.registerFont(at: activeFontDirectory().appendingPathComponent(oskFontFilename))
     }
 
     keymanWeb.setKeyboard(id: kb.id, name: kb.name, languageID: kb.languageID, languageName: kb.languageName,
