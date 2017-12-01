@@ -1903,7 +1903,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     default:
       // Hold & Move
       guard let subKeysView = subKeysView else {
-        kmLog("Unexpected hold and move while subKeysView = nil", checkDebugPrinting: false)
         return
       }
       let touchPoint = sender.location(in: subKeysView.containerView)
