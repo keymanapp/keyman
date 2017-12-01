@@ -77,7 +77,7 @@ type
     ProductID: Integer;
     MnemonicLayout: Boolean;
     WindowsLanguages: WideString;
-    BCP47Languages: WideString;
+    ISO6393Languages: WideString;
     KeyboardVersion: WideString;   // I4136
   end;
 
@@ -375,7 +375,8 @@ begin
       GetSystemStore(Memory, TSS_MESSAGE, ki.MessageString);
 
       GetSystemStore(Memory, TSS_WINDOWSLANGUAGES, ki.WindowsLanguages);
-      GetSystemStore(Memory, TSS_ETHNOLOGUECODE, ki.BCP47Languages);
+      GetSystemStore(Memory, TSS_ETHNOLOGUECODE, ki.ISO6393Languages);
+      // TODO: BCP47 work belongs here for translation of
 
       if not GetSystemStore(Memory, TSS_KEYBOARDVERSION, ki.KeyboardVersion) then   // I4136
         ki.KeyboardVersion := '1.0';

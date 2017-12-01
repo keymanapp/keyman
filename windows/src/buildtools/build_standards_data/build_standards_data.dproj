@@ -89,7 +89,6 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="Keyman.System.BuildLanguageSubtagRegistry.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
         <DCCReference Include="Keyman.System.BuildISO6393Registry.pas"/>
         <DCCReference Include="Keyman.Console.BuildStandardsData.pas"/>
         <BuildConfiguration Include="Release">

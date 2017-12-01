@@ -17,6 +17,28 @@ class procedure TBuildISO6393Registry.Build(const ISO6393File, DestinationFile: 
 var
   FISO6393, FResult: TStringList;
   i: Integer;
+  s: string;
+  s6393: string;
+  s6391: string;
+
+  function GetField(var s: string): string;
+  var
+    i: Integer;
+  begin
+    i := 1;
+    while i <= Length(s) do
+    begin
+      if s[i] = #9 then
+      begin
+        Result := Copy(s, 1, i-1);
+        Delete(s, 1, i);
+        Exit;
+      end;
+      Inc(i);
+    end;
+    Result := s;
+    s := '';
+  end;
 begin
   FISO6393 := TStringList.Create;
   try
@@ -48,13 +70,23 @@ begin
       FResult.Add('class procedure TISO6393ToBCP47Map.Fill(dict: TDictionary<string, string>);');
       FResult.Add('begin');
 
-//      fo/r i := 0 to Count do
-        FResult.Add('  dict.Add(''eng'',''en'');');
+      // Ignore first line which is a header
+      for i := 1 to FISO6393.Count - 1 do
+      begin
+        s := FISO6393[i];
+        s6393 := GetField(s); // ID
+        GetField(s); // Part2B
+        GetField(s); // Part2T
+        s6391 := GetField(s); // Part1
+        if s6391 <> '' then
+          FResult.Add('  dict.Add('''+s6393+''','''+s6391+''');');
+      end;
 
       FResult.Add('end;');
       FResult.Add('');
       FResult.Add('end.');
 
+      FResult.SaveToFile(DestinationFile);
     finally
       FResult.Free;
     end;
