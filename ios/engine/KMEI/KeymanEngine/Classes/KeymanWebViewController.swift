@@ -196,19 +196,12 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       for key in keyArray {
         let values = key.components(separatedBy: ":")
         switch values.count {
+        case 1:
+          subkeyIDs.append(values[0])
+          subkeyTexts.append("")
         case 2:
           subkeyIDs.append(values[0])
           subkeyTexts.append(values[1].stringFromUTF16CodeUnits()!)
-        case 1:
-          subkeyIDs.append(values[0])
-          var text = values[0]
-          if let index = text.index(of: "-") {
-            text = String(text[text.index(after: index)...])
-          }
-          if let index = text.index(of: "_") {
-            text = String(text[text.index(after: index)...])
-          }
-          subkeyTexts.append(text.stringFromUTF16CodeUnits()!)
         default:
           Manager.shared.kmLog("Unexpected subkey key: \(key)", checkDebugPrinting: false)
         }
