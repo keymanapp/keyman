@@ -103,13 +103,14 @@ public final class KeyboardListActivity extends Activity implements OnKeyboardDo
         @Override
         public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
           HashMap<String, String> kbInfo = LanguageListActivity.getKeyboardInfo(langIndex, position);
+          String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
           String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
           String langID = kbInfo.get(KMManager.KMKey_LanguageID);
           String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
           String langName = kbInfo.get(KMManager.KMKey_LanguageName);
           String kFont = kbInfo.get(KMManager.KMKey_Font);
           String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
-          KMManager.KeyboardState kbState = KMManager.getKeyboardState(context, kbID, langID);
+          KMManager.KeyboardState kbState = KMManager.getKeyboardState(context, pkgID, kbID, langID);
           //if (kbState == KMManager.KeyboardState.KEYBOARD_STATE_NEEDS_DOWNLOAD) {
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
           dialogBuilder.setTitle(langName + ": " + kbName);
@@ -183,6 +184,7 @@ public final class KeyboardListActivity extends Activity implements OnKeyboardDo
   @Override
   public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
     if (result > 0) {
+      String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
       String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
       String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
       String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
@@ -191,9 +193,9 @@ public final class KeyboardListActivity extends Activity implements OnKeyboardDo
       String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
       KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
       if (KMManager.InAppKeyboard != null)
-        KMManager.InAppKeyboard.setKeyboard(keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+        KMManager.InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
       if (KMManager.SystemKeyboard != null)
-        KMManager.SystemKeyboard.setKeyboard(keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+        KMManager.SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
       finish();
     } else {
