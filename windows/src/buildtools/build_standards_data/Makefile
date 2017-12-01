@@ -7,16 +7,22 @@
 test: build
 
 STANDARDS_DATA_PATH=$(ROOT)\..\resources\standards-data
+STANDARDS_OUT_PATH=$(ROOT)\src\global\delphi\standards
 
 ISO6393_DATA=$(STANDARDS_DATA_PATH)\iso639-3\iso639-3.tab
-SUBTAG_DATA=$(STANDARDS_DATA_PATH)\language-subtag-registry\language-subtag-registry
+ISO6393_PAS=$(STANDARDS_OUT_PATH)\Keyman.System.Standards.ISO6393ToBCP47Registry.pas
 
-ISO6393_PAS=$(ROOT)\src\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas
-SUBTAG_PAS=$(ROOT)\src\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas
+SUBTAG_DATA=$(STANDARDS_DATA_PATH)\language-subtag-registry\language-subtag-registry
+SUBTAG_PAS=$(STANDARDS_OUT_PATH)\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas
+
+LCID_DATA=$(STANDARDS_DATA_PATH)\windows-lcid-to-bcp-47\map_clean_win.txt
+LCID_PAS=$(STANDARDS_OUT_PATH)\Keyman.System.Standards.LCIDToBCP47Registry.pas
 
 build: 
     $(DELPHI_MSBUILD) build_standards_data.dproj
-    Win32\Debug\build_standards_data.exe $(ISO6393_DATA) $(SUBTAG_DATA) $(ISO6393_PAS) $(SUBTAG_PAS)
+    Win32\Debug\build_standards_data.exe iso6393 $(ISO6393_DATA) $(ISO6393_PAS)
+    Win32\Debug\build_standards_data.exe subtag $(SUBTAG_DATA) $(SUBTAG_PAS)
+    Win32\Debug\build_standards_data.exe lcid $(LCID_DATA) $(LCID_PAS)
 
 clean: def-clean
     -rd /s/q Win32

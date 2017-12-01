@@ -8,7 +8,8 @@ uses
   System.SysUtils,
   Keyman.System.BuildLanguageSubtagRegistry in 'Keyman.System.BuildLanguageSubtagRegistry.pas',
   Keyman.System.BuildISO6393Registry in 'Keyman.System.BuildISO6393Registry.pas',
-  Keyman.Console.BuildStandardsData in 'Keyman.Console.BuildStandardsData.pas';
+  Keyman.Console.BuildStandardsData in 'Keyman.Console.BuildStandardsData.pas',
+  Keyman.System.BuildLCIDToBCP47Registry in 'Keyman.System.BuildLCIDToBCP47Registry.pas';
 
 begin
   try

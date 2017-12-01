@@ -1,9 +1,9 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{1AD91C23-D720-4EB6-8A90-1C60FFB2FAAD}</ProjectGuid>
+        <ProjectGuid>{214D9E7B-6D86-4488-8443-C0C2FA42E242}</ProjectGuid>
         <ProjectVersion>18.2</ProjectVersion>
         <FrameworkType>None</FrameworkType>
-        <MainSource>build_standards_data.dpr</MainSource>
+        <MainSource>locproc.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -11,6 +11,11 @@
         <AppType>Console</AppType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Base)'=='true') or '$(Base_Android)'!=''">
+        <Base_Android>true</Base_Android>
+        <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
@@ -49,7 +54,18 @@
         <DCC_K>false</DCC_K>
         <DCC_UsePackage>RESTComponents;FireDAC;FireDACSqliteDriver;soaprtl;FireDACIBDriver;soapmidas;FireDACCommon;RESTBackendComponents;soapserver;CloudService;FireDACCommonDriver;inet;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-        <SanitizedProjectName>build_standards_data</SanitizedProjectName>
+        <SanitizedProjectName>locproc</SanitizedProjectName>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Android)'!=''">
+        <Android_LauncherIcon36>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png</Android_LauncherIcon36>
+        <Android_LauncherIcon48>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png</Android_LauncherIcon48>
+        <Android_LauncherIcon72>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png</Android_LauncherIcon72>
+        <Android_LauncherIcon96>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png</Android_LauncherIcon96>
+        <Android_LauncherIcon144>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png</Android_LauncherIcon144>
+        <Android_SplashImage426>$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png</Android_SplashImage426>
+        <Android_SplashImage470>$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png</Android_SplashImage470>
+        <Android_SplashImage640>$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png</Android_SplashImage640>
+        <Android_SplashImage960>$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png</Android_SplashImage960>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;bindcompdbx;IndyIPCommon;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;vclFireDAC;IndySystem;tethering;svnui;mbColorLibD10;dsnapcon;FireDACADSDriver;scFontCombo;DCPdelphi2009;FireDACMSAccDriver;fmxFireDAC;vclimg;Jcl;vcltouch;JvCore;vcldb;bindcompfmx;svn;FireDACPgDriver;inetdb;DbxCommonDriver;fmx;fmxdae;xmlrtl;fmxobj;vclwinx;rtl;DbxClientDriver;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;bindcomp;appanalytics;dsnap;IndyIPClient;bindcompvcl;EmbeddedWebBrowser_XE;VCLRESTComponents;dbxcds;VclSmp;JvDocking;adortl;JclVcl;vclie;bindengine;DBXMySQLDriver;dsnapxml;FireDACMySQLDriver;dbrtl;inetdbxpress;IndyProtocols;keyman_components;FireDACCommonODBC;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
@@ -88,10 +104,9 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="Keyman.System.BuildLanguageSubtagRegistry.pas"/>
-        <DCCReference Include="Keyman.System.BuildISO6393Registry.pas"/>
-        <DCCReference Include="Keyman.Console.BuildStandardsData.pas"/>
-        <DCCReference Include="Keyman.System.BuildLCIDToBCP47Registry.pas"/>
+        <DCCReference Include="elp.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\utilstr.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -110,7 +125,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">build_standards_data.dpr</Source>
+                    <Source Name="MainSource">locproc.dpr</Source>
                 </Source>
             </Delphi.Personality>
             <Deployment Version="3">
@@ -134,9 +149,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Win32\Debug\build_standards_data.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Win32\Debug\locproc.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>build_standards_data.exe</RemoteName>
+                        <RemoteName>locproc.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -557,6 +572,7 @@
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <Platforms>
+                <Platform value="Android">False</Platform>
                 <Platform value="Linux64">False</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
