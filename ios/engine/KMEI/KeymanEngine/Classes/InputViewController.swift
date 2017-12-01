@@ -8,6 +8,7 @@
 
 import AudioToolbox
 import UIKit
+import WebKit
 
 public enum GlobeKeyTapBehaviour {
   case switchToNextKeyboard
@@ -34,6 +35,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   open var topBarImageView: UIImageView?
   var barHeightConstraints: [NSLayoutConstraint] = []
 
+  var currentTextDocumentProxy: UITextDocumentProxy? = nil
   var containerView: UIView?
   var containerHeightConstraints: [NSLayoutConstraint] = []
   var heightConstraint: NSLayoutConstraint!
@@ -163,6 +165,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     Manager.shared.setText(context)
     Manager.shared.setSelectionRange(NSRange(newRange, in: context), manually: false)
+
+    if let webView = self.kmInputView as? WKWebView {
+      webView.evaluateJavaScript("resetContext();")
+    }
+
   }
 
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
@@ -288,4 +295,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   private class func isSurrogate(_ c: unichar) -> Bool {
     return UTF16.isLeadSurrogate(c) || UTF16.isTrailSurrogate(c)
   }
+}
+
+extension CGFloat {
+    static func random() -> CGFloat {
+        return CGFloat(arc4random()) / CGFloat(UInt32.max)
+    }
 }
