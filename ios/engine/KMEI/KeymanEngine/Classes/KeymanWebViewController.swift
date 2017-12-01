@@ -151,9 +151,13 @@ extension KeymanWebViewController: WKScriptMessageHandler {
 
       let dn = Int(fragment[dnRange.upperBound..<sRange.lowerBound])!
       let s = fragment[sRange.upperBound...]
+
+      // KMW uses dn == -1 to perform special processing of deadkeys.
+      // This is handled outside of Swift so we don't delete any characters.
+      let numCharsToDelete = max(0, dn)
       let newText = String(s).stringFromUTF16CodeUnits() ?? ""
-      insertText(self, numCharsToDelete: dn, newText: newText)
-      delegate?.insertText(self, numCharsToDelete: dn, newText: newText)
+      insertText(self, numCharsToDelete: numCharsToDelete, newText: newText)
+      delegate?.insertText(self, numCharsToDelete: numCharsToDelete, newText: newText)
     } else if fragment.hasPrefix("#showKeyPreview-") {
       let xKey = fragment.range(of: "+x=")!
       let yKey = fragment.range(of: "+y=")!
