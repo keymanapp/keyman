@@ -204,8 +204,10 @@ extension KeymanWebViewController: WKScriptMessageHandler {
           let id = values[0]
           subkeyIDs.append(id)
           // id is in the form layer-keyID. We only process keyIDs with prefix U_.
-          if let index = id.range(of: "-U_", options: .backwards)?.upperBound {
-            subkeyTexts.append(String(id[index...]).stringFromUTF16CodeUnits() ?? "")
+          if let index = id.range(of: "-U_", options: .backwards)?.upperBound,
+            let codepoint = UInt32(id[index...], radix: 16),
+            let scalar = Unicode.Scalar(codepoint) {
+            subkeyTexts.append(String(Character(scalar)))
           } else {
             subkeyTexts.append("")
           }
