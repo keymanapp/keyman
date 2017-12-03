@@ -146,6 +146,26 @@ type
     cmdCompileInstaller: TButton;
     cmdInstallWith: TButton;
     editInstallerOutputFilename: TEdit;
+    tabKeyboards: TTabSheet;
+    Panel5: TPanel;
+    Label2: TLabel;
+    Label3: TLabel;
+    lblKeyboardTargets: TLabel;
+    lblKeyboardFilePath: TLabel;
+    lblKeyboardDescription: TLabel;
+    lbKeyboards: TListBox;
+    Edit1: TEdit;
+    Edit2: TEdit;
+    Memo1: TMemo;
+    lblKeyboardVersion: TLabel;
+    Edit3: TEdit;
+    lblKeyboardOSKFont: TLabel;
+    ComboBox1: TComboBox;
+    ComboBox2: TComboBox;
+    lblKeyboardDisplayFont: TLabel;
+    StringGrid1: TStringGrid;
+    Button1: TButton;
+    lblKeyboardLanguages: TLabel;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -208,6 +228,7 @@ type
     procedure SourceChanged(Sender: TObject);
     procedure MovePackageToSource;
     function MoveSourceToPackage: Boolean;
+    procedure RefreshKeyboardList;
 
   protected
     function DoOpenFile: Boolean; override;
@@ -237,6 +258,7 @@ uses
   CompilePackageInstaller,
   kpsProjectFile,
   OnlineConstants,
+  Keyman.System.PackageInfoRefreshKeyboards,
   Project,
   ProjectFileType,
   ShellApi,
@@ -548,6 +570,8 @@ begin
           finally
             ki.MemoryDump.Free;
           end;
+
+          RefreshKeyboardList;
         except
           f.Description := 'Damaged keyboard '+ChangeFileExt(ExtractFileName(FileName), '');
         end;
@@ -1035,6 +1059,8 @@ begin
     lbFilesClick(lbFiles);
 
     UpdateImagePreviews;   // I4814
+
+    RefreshKeyboardList;
   finally
     Dec(FSetup);
   end;
@@ -1160,6 +1186,28 @@ begin
   AddFile(FFileName);
 end;
 
+{-------------------------------------------------------------------------------
+ - Keyboards tab
+ -------------------------------------------------------------------------------}
+
+(**
+  Adds new keyboards to the Keyboards object in the kmp.inf and
+  removes any that are no longer in the list.
+
+  Note: if both a .js and a .kmx exist for a given keyboard id,
+  then both will be checked for version consistency, etc.??
+
+  Finally, updates the Keyboards tab
+*)
+procedure TfrmPackageEditor.RefreshKeyboardList;
+begin
+  with TPackageInfoRefreshKeyboards.Create(pack) do
+  try
+    Execute;
+  finally
+    Free;
+  end;
+end;
 
 end.
 

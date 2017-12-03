@@ -498,6 +498,8 @@
             <Form>frmCharacterMapDock</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas"/>
+        <DCCReference Include="..\..\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

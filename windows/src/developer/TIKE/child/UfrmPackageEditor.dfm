@@ -174,6 +174,7 @@ inherited frmPackageEditor: TfrmPackageEditor
   KeyPreview = True
   OnKeyDown = FormKeyDown
   ExplicitWidth = 681
+  ExplicitHeight = 447
   PixelsPerInch = 96
   TextHeight = 13
   object pages: TLeftTabbedPageControl
@@ -181,7 +182,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 681
     Height = 447
-    ActivePage = pageDetails
+    ActivePage = pageFiles
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -194,9 +195,6 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageFiles: TTabSheet
       Caption = 'Files'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel1: TPanel
         Left = 0
         Top = 0
@@ -350,12 +348,207 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
       end
     end
+    object tabKeyboards: TTabSheet
+      Caption = 'Keyboards'
+      ImageIndex = 5
+      object Panel5: TPanel
+        Left = 0
+        Top = 0
+        Width = 588
+        Height = 447
+        Align = alClient
+        BevelOuter = bvNone
+        Color = 14211288
+        ParentBackground = False
+        TabOrder = 0
+        DesignSize = (
+          588
+          447)
+        object Label2: TLabel
+          Left = 15
+          Top = 10
+          Width = 171
+          Height = 23
+          Caption = 'Keyboard Layouts'
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -19
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label3: TLabel
+          Left = 15
+          Top = 37
+          Width = 546
+          Height = 32
+          AutoSize = False
+          Caption = 'Configure language assignments and fonts for each keyboard'
+          WordWrap = True
+        end
+        object lblKeyboardTargets: TLabel
+          Left = 15
+          Top = 370
+          Width = 39
+          Height = 13
+          Caption = 'Targets:'
+          FocusControl = Edit2
+        end
+        object lblKeyboardFilePath: TLabel
+          Left = 15
+          Top = 306
+          Width = 47
+          Height = 13
+          Caption = 'File Path:'
+          FocusControl = Edit2
+        end
+        object lblKeyboardDescription: TLabel
+          Left = 15
+          Top = 338
+          Width = 62
+          Height = 13
+          Caption = 'Description:'
+          FocusControl = Edit2
+        end
+        object lblKeyboardVersion: TLabel
+          Left = 15
+          Top = 417
+          Width = 41
+          Height = 13
+          Caption = 'Version:'
+          FocusControl = Edit2
+        end
+        object lblKeyboardOSKFont: TLabel
+          Left = 260
+          Top = 75
+          Width = 73
+          Height = 13
+          Caption = 'Keyboard font'
+          FocusControl = Edit2
+        end
+        object lblKeyboardDisplayFont: TLabel
+          Left = 260
+          Top = 102
+          Width = 62
+          Height = 13
+          Caption = 'Display font'
+          FocusControl = Edit2
+        end
+        object lblKeyboardLanguages: TLabel
+          Left = 260
+          Top = 125
+          Width = 56
+          Height = 13
+          Caption = 'Languages'
+          FocusControl = Edit2
+        end
+        object lbKeyboards: TListBox
+          Left = 15
+          Top = 72
+          Width = 229
+          Height = 225
+          Anchors = [akLeft, akTop, akBottom]
+          ItemHeight = 13
+          TabOrder = 0
+          OnClick = lbFilesClick
+        end
+        object Edit1: TEdit
+          Left = 87
+          Top = 335
+          Width = 157
+          Height = 21
+          TabStop = False
+          Anchors = [akLeft, akTop, akRight]
+          ParentColor = True
+          ReadOnly = True
+          TabOrder = 2
+        end
+        object Edit2: TEdit
+          Left = 87
+          Top = 303
+          Width = 157
+          Height = 21
+          TabStop = False
+          Anchors = [akLeft, akTop, akRight]
+          ParentColor = True
+          ReadOnly = True
+          TabOrder = 3
+        end
+        object Memo1: TMemo
+          Left = 87
+          Top = 367
+          Width = 157
+          Height = 41
+          TabStop = False
+          Anchors = [akLeft, akTop, akRight]
+          ParentColor = True
+          ReadOnly = True
+          TabOrder = 1
+        end
+        object Edit3: TEdit
+          Left = 87
+          Top = 414
+          Width = 157
+          Height = 21
+          TabStop = False
+          Anchors = [akLeft, akTop, akRight]
+          ParentColor = True
+          ReadOnly = True
+          TabOrder = 4
+        end
+        object ComboBox1: TComboBox
+          Left = 339
+          Top = 72
+          Width = 230
+          Height = 21
+          TabOrder = 5
+          Text = 'ComboBox1'
+        end
+        object ComboBox2: TComboBox
+          Left = 339
+          Top = 99
+          Width = 230
+          Height = 21
+          TabOrder = 6
+          Text = 'ComboBox1'
+        end
+        object StringGrid1: TStringGrid
+          Left = 260
+          Top = 144
+          Width = 309
+          Height = 257
+          ColCount = 3
+          FixedCols = 0
+          RowCount = 9
+          TabOrder = 7
+          ColWidths = (
+            78
+            64
+            150)
+          RowHeights = (
+            24
+            24
+            24
+            24
+            24
+            24
+            24
+            24
+            24)
+        end
+        object Button1: TButton
+          Left = 436
+          Top = 412
+          Width = 133
+          Height = 25
+          Caption = 'Search for language...'
+          TabOrder = 8
+        end
+      end
+    end
     object pageDetails: TTabSheet
       Caption = 'Details'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel2: TPanel
         Left = 0
         Top = 0
@@ -587,9 +780,6 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageShortcuts: TTabSheet
       Caption = 'Shortcuts'
       ImageIndex = 8
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel3: TPanel
         Left = 0
         Top = 0
@@ -753,16 +943,10 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageSource: TTabSheet
       Caption = 'Source'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Compile'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel4: TPanel
         Left = 0
         Top = 0
@@ -905,19 +1089,22 @@ inherited frmPackageEditor: TfrmPackageEditor
     Filter = 'All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Add Files'
-    Top = 284
+    Left = 208
+    Top = 156
   end
   object dlgNewCustomisation: TSaveDialog
     DefaultExt = 'kct'
     Filter = 'Customisation file (*.kct)|*.kct|All files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
-    Top = 316
+    Left = 208
+    Top = 188
   end
   object dlgOpenProductInstaller: TOpenDialog
     DefaultExt = 'msi'
     Filter = 'Product Installer Files (*.msi)|*.msi|All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Select Product Installer'
-    Top = 248
+    Left = 208
+    Top = 120
   end
 end

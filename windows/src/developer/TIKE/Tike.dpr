@@ -255,7 +255,9 @@ uses
   UfrmTIKEDock in 'dockforms\UfrmTIKEDock.pas' {TIKEDockForm},
   KeymanDeveloperMemo in '..\..\global\delphi\comp\KeymanDeveloperMemo.pas',
   KeymanDeveloperDebuggerMemo in '..\..\global\delphi\comp\KeymanDeveloperDebuggerMemo.pas',
-  UfrmCharacterMapDock in 'dockforms\UfrmCharacterMapDock.pas' {frmCharacterMapDock};
+  UfrmCharacterMapDock in 'dockforms\UfrmCharacterMapDock.pas' {frmCharacterMapDock},
+  Keyman.System.PackageInfoRefreshKeyboards in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas',
+  Keyman.System.KMXFileLanguages in '..\..\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
