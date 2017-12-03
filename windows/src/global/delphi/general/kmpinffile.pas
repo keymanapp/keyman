@@ -162,11 +162,6 @@ begin
     //if LowerCase(AIni.ReadString('Install', 'StartMenuReadme', '')) = 'true' then -- already in [StartMenu]
     Options.ReadmeFile := Files.FromFileName(AIni.ReadString('Install', 'ReadmeFile', ''));
     Options.ExecuteProgram := AIni.ReadString('Install', 'ExecuteProgram', '');
-
-//    TODO
-//    Also remember to update version number if source files change
-//    Also do not permit different versions of same keyboard in compiled form!
-
   finally
     str.Free;
   end;
