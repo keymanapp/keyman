@@ -355,6 +355,7 @@ type
     procedure SaveXML(ARoot: IXMLNode); virtual;
     procedure LoadJSON(ARoot: TJSONObject); virtual;
     procedure SaveJSON(ARoot: TJSONObject); virtual;
+    function ItemByID(id: string): TPackageKeyboard;
   end;
 
   TPackageKeyboardLanguage = class(TPackageBaseObject)
@@ -2065,6 +2066,16 @@ begin
     pk.Assign(Source[i]);
     Add(pk);
   end;
+end;
+
+function TPackageKeyboardList.ItemByID(id: string): TPackageKeyboard;
+var
+  i: Integer;
+begin
+  for i := 0 to Count - 1 do
+    if SameText(id, Items[i].ID) then
+      Exit(Items[i]);
+  Result := nil;
 end;
 
 procedure TPackageKeyboardList.LoadIni(AIni: TIniFile);
