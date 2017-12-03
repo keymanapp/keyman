@@ -54,103 +54,103 @@
   },
   "files" : [
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\readme.htm",
+      "name" : "readme.htm",
       "description" : "File readme.htm"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\sideimage.bmp",
+      "name" : "sideimage.bmp",
       "description" : "File sideimage.bmp"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\gff\\gff_amh_7\\source\\AmharicTyping-Amharic.pdf",
+      "name" : "..\\..\\..\\gff\\gff_amh_7\\source\\AmharicTyping-Amharic.pdf",
       "description" : "File AmharicTyping-Amharic.pdf"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\gff\\gff_amh_7\\source\\AmharicTyping-English.pdf",
+      "name" : "..\\..\\..\\gff\\gff_amh_7\\source\\AmharicTyping-English.pdf",
       "description" : "File AmharicTyping-English.pdf"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\OFL.txt",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\OFL.txt",
       "description" : "File OFL.txt"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\GNU-GPLv2.txt",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\GNU-GPLv2.txt",
       "description" : "File GNU-GPLv2.txt"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\gff\\gff_amh_7\\source\\welcome.htm",
+      "name" : "..\\..\\..\\gff\\gff_amh_7\\source\\welcome.htm",
       "description" : "File Welcome.htm"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\AbyssinicaSIL-R.ttf",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\AbyssinicaSIL-R.ttf",
       "description" : "Font Abyssinica SIL"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\fantuwua.ttf",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\fantuwua.ttf",
       "description" : "Font Ethiopic Fantuwua"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\FreeSerif.otf",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\FreeSerif.otf",
       "description" : "Font Free Serif"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\goffer.ttf",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\goffer.ttf",
       "description" : "Font Ethiopic Yigezu Bisrat Goffer"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\hiwua.ttf",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\hiwua.ttf",
       "description" : "Font Ethiopic Hiwua"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\jiret.ttf",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\jiret.ttf",
       "description" : "Font Ethiopia Jiret"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\jiretsl.ttf",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\jiretsl.ttf",
       "description" : "Font Ethiopia Jiret Slant"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\tint.ttf",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\tint.ttf",
       "description" : "Font Ethiopic Tint"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\washrab.ttf",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\washrab.ttf",
       "description" : "Font Ethiopic WashRa Bold"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\washrabsl.ttf",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\washrabsl.ttf",
       "description" : "Font Ethiopic WashRa Bold Slant"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\washrasb.ttf",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\washrasb.ttf",
       "description" : "Font Ethiopic WashRa SemiBold"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\washrasbsl.ttf",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\washrasbsl.ttf",
       "description" : "Font Ethiopic WashRa SemiBold Slant"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\wookianos.ttf",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\wookianos.ttf",
       "description" : "Font Ethiopic Wookianos"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\shared\\fonts\\geez\\yebse.ttf",
+      "name" : "..\\..\\..\\shared\\fonts\\geez\\yebse.ttf",
       "description" : "Font Ethiopic Yebse"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\gff\\gff_amh_7\\build\\gff_amh_7.kvk",
+      "name" : "..\\..\\..\\gff\\gff_amh_7\\build\\gff_amh_7.kvk",
       "description" : "File gff_amh_7.kvk"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\gff\\gff_amh_7\\build\\gff_amh_7.kmx",
+      "name" : "..\\..\\..\\gff\\gff_amh_7\\build\\gff_amh_7.kmx",
       "description" : "Keyboard Amharic"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\gff\\gff_ethiopic_7\\build\\gff_ethiopic_7.kvk",
+      "name" : "..\\..\\..\\gff\\gff_ethiopic_7\\build\\gff_ethiopic_7.kvk",
       "description" : "File gff_ethiopic_7.kvk"
     },
     {
-      "name" : "C:\\Projects\\keyman\\open\\windows\\src\\unit-tests\\package-info\\Win32\\Debug\\..\\..\\test\\..\\..\\..\\gff\\gff_ethiopic_7\\build\\gff_ethiopic_7.kmx",
+      "name" : "..\\..\\..\\gff\\gff_ethiopic_7\\build\\gff_ethiopic_7.kmx",
       "description" : "Keyboard Ethiopic - (Language Neutral)"
     }
   ],
