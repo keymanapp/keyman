@@ -2,8 +2,14 @@
 
 ## 10.0 alpha
 * Updated versioning scheme for uniformity across all Keyman products.
-* KeymanEngine is now built as a Swift 4.0 framework
-* Keyman app migrated to Swift 4.0
+* Keyman app migrated to Swift 4.0 (#305)
+* KeymanEngine is now built as a Swift 4.0 framework (#378)
+* Refactored internal app data structures to be more strictly typed (#384, #388)
+* Add types to notifications posted by KeymanEngine (#389)
+* Refactor KeymanEngine's internal usage of KeymanWeb (#406)
+* Fixed bugs introduced by refactoring (#408, #413, #414, #416, #422, #443, #453, #463, #464, #465)
+* Removed notifications for subkey displayed, subkey dismissed and debug log messages (#389, #415)
+* Removed migration from old app data directory structure (#418)
 
 ## 2017-08-26 2.6.4 stable
 * Fixed bug with blank keyboard on some devices (#218)
