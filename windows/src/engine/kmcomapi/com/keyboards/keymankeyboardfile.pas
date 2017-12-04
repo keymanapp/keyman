@@ -179,7 +179,8 @@ end;
 
 function TKeymanKeyboardFile.Get_DefaultBCP47Languages: WideString;
 begin
-  Result := FKeyboardInfo.BCP47Languages;
+  // TODO: Support BCP47 Languages
+  Result := FKeyboardInfo.ISO6393Languages;
 end;
 
 function TKeymanKeyboardFile.Get_DefaultPrimaryLanguage: Integer;
