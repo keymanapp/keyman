@@ -47,8 +47,7 @@ private let phoneLandscapeSystemKeyboardHeight: CGFloat = 162.0
 private let padPortraitSystemKeyboardHeight: CGFloat = 264.0
 private let padLandscapeSystemKeyboardHeight: CGFloat = 352.0
 
-public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegate, KeymanWebDelegate,
-KeyboardRepositoryDelegate {
+public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegate, KeymanWebDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
   public static var applicationGroupIdentifier: String?
 
@@ -147,7 +146,6 @@ KeyboardRepositoryDelegate {
   private override init() {
     apiKeyboardRepository = APIKeyboardRepository()
     super.init()
-    apiKeyboardRepository.delegate = self
 
     URLProtocol.registerClass(KeymanURLProtocol.self)
 
@@ -448,14 +446,6 @@ KeyboardRepositoryDelegate {
   /// - the list has been recently fetched
   public func fetchKeyboardsList() {
     apiKeyboardRepository.fetch()
-  }
-
-  public func keyboardRepositoryDidFetch(_ repository: KeyboardRepository) {
-    NotificationCenter.default.post(name: Notifications.languagesUpdated, object: self, value: ())
-  }
-
-  public func keyboardRepository(_ repository: KeyboardRepository, didFailFetch error: Error) {
-    NotificationCenter.default.post(name: Notifications.languagesDownloadFailed, object: self, value: error)
   }
 
   /// Asynchronously fetches the .js file for the keyboard with given IDs.

@@ -400,7 +400,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   func showAddKeyboard() {
     let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
     button?.isEnabled = false
-    let vc = LanguageViewController()
+    let vc = LanguageViewController(Manager.shared.apiKeyboardRepository)
     navigationController?.pushViewController(vc, animated: true)
     setIsDoneButtonEnabled(true)
   }

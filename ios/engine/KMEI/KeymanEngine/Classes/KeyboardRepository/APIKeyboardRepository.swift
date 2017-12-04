@@ -35,10 +35,12 @@ public class APIKeyboardRepository: KeyboardRepository {
 
   private func apiCompletionHandler(_ data: Data?, _ response: URLResponse?, _ error: Error?) {
     if let error = error {
+      Manager.shared.kmLog("Network error fetching languages: \(error)", checkDebugPrinting: false)
       delegate?.keyboardRepository(self, didFailFetch: APIKeyboardFetchError.networkError(error))
       return
     }
     guard let data = data else {
+      Manager.shared.kmLog("Language API did not return data", checkDebugPrinting: false)
       delegate?.keyboardRepository(self, didFailFetch: APIKeyboardFetchError.noData)
       return
     }

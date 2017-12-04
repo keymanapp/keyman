@@ -21,18 +21,27 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   private var selectedSection = 0
   private var isUpdate = false
   private var languages: [Language] = []
+  private let keyboardRepository: KeyboardRepository
 
-  private var languagesUpdatedObserver: NotificationObserver?
-  private var languagesDownloadFailedObserver: NotificationObserver?
   private var keyboardDownloadStartedObserver: NotificationObserver?
   private var keyboardDownloadFailedObserver: NotificationObserver?
 
+  init(_ keyboardRepository: KeyboardRepository) {
+    self.keyboardRepository = keyboardRepository
+    super.init(nibName: nil, bundle: nil)
+    keyboardRepository.delegate = self
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
   override func loadView() {
     super.loadView()
-    if let languageDict = Manager.shared.apiKeyboardRepository.languages {
+    if let languageDict = keyboardRepository.languages {
       languages = languageList(languageDict)
     } else {
-      Manager.shared.fetchKeyboardsList()
+      keyboardRepository.fetch()
     }
 
     loadUserKeyboards()
@@ -42,14 +51,6 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     super.viewDidLoad()
     title = "Add New Keyboard"
     selectedSection = NSNotFound
-    languagesUpdatedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.languagesUpdated,
-      observer: self,
-      function: LanguageViewController.languagesUpdated)
-    languagesDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.languagesDownloadFailed,
-      observer: self,
-      function: LanguageViewController.languagesDownloadFailed)
     keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadStarted,
       observer: self,
@@ -208,28 +209,6 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  private func languageList(_ languageDict: [String: Language]) -> [Language] {
-    return languageDict.values.sorted { a, b -> Bool in
-      a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
-    }
-  }
-
-  private func languagesUpdated() {
-    dismissActivityView()
-    if let languageDict = Manager.shared.apiKeyboardRepository.languages {
-      languages = languageList(languageDict)
-    }
-    tableView.reloadData()
-    if numberOfSections(in: tableView) == 0 {
-      showConnectionErrorAlert()
-    }
-  }
-
-  private func languagesDownloadFailed() {
-    dismissActivityView()
-    showConnectionErrorAlert()
-  }
-
   private func keyboardDownloadStarted() {
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
@@ -321,5 +300,30 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
                             delegate: self, cancelButtonTitle: "OK", otherButtonTitles: "")
     alert.tag = errorAlertTag
     alert.show()
+  }
+}
+
+// MARK: - KeyboardRepositoryDelegate
+extension LanguageViewController: KeyboardRepositoryDelegate {
+  func keyboardRepositoryDidFetch(_ repository: KeyboardRepository) {
+    dismissActivityView()
+    if let languageDict = repository.languages {
+      languages = languageList(languageDict)
+    }
+    tableView.reloadData()
+    if numberOfSections(in: tableView) == 0 {
+      showConnectionErrorAlert()
+    }
+  }
+
+  func keyboardRepository(_ repository: KeyboardRepository, didFailFetch error: Error) {
+    dismissActivityView()
+    showConnectionErrorAlert()
+  }
+
+  private func languageList(_ languageDict: [String: Language]) -> [Language] {
+    return languageDict.values.sorted { a, b -> Bool in
+      a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
+    }
   }
 }
