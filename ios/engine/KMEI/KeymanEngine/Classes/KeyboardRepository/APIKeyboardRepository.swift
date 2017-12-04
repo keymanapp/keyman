@@ -39,17 +39,22 @@ public class APIKeyboardRepository: KeyboardRepository {
   private func apiCompletionHandler(data: Data?,
                                     response: URLResponse?,
                                     error: Error?,
-                                    fetchCompletionHandler: ((Error?) -> Void)?) {
+                                    fetchCompletionHandler: CompletionHandler?) {
+    let errorHandler = { (error: Error) -> Void in
+      DispatchQueue.main.async {
+        self.delegate?.keyboardRepository(self, didFailFetch: error)
+        fetchCompletionHandler?(error)
+      }
+    }
+
     if let error = error {
       Manager.shared.kmLog("Network error fetching languages: \(error)", checkDebugPrinting: false)
-      fetchCompletionHandler?(error)
-      delegate?.keyboardRepository(self, didFailFetch: APIKeyboardFetchError.networkError(error))
+      errorHandler(APIKeyboardFetchError.networkError(error))
       return
     }
     guard let data = data else {
       Manager.shared.kmLog("Language API did not return data", checkDebugPrinting: false)
-      fetchCompletionHandler?(error)
-      delegate?.keyboardRepository(self, didFailFetch: APIKeyboardFetchError.noData)
+      errorHandler(APIKeyboardFetchError.noData)
       return
     }
 
@@ -60,8 +65,7 @@ public class APIKeyboardRepository: KeyboardRepository {
       result = try decoder.decode(LanguagesAPICall.self, from: data)
     } catch {
       Manager.shared.kmLog("Failed parsing API languages: \(error)", checkDebugPrinting: false)
-      fetchCompletionHandler?(error)
-      delegate?.keyboardRepository(self, didFailFetch: APIKeyboardFetchError.parsingError(error))
+      errorHandler(APIKeyboardFetchError.parsingError(error))
       return
     }
 
@@ -85,7 +89,9 @@ public class APIKeyboardRepository: KeyboardRepository {
     }
 
     Manager.shared.kmLog("Request completed -- \(result.languages.count) languages.", checkDebugPrinting: true)
-    fetchCompletionHandler?(nil)
-    delegate?.keyboardRepositoryDidFetch(self)
+    DispatchQueue.main.async {
+      self.delegate?.keyboardRepositoryDidFetch(self)
+      fetchCompletionHandler?(nil)
+    }
   }
 }

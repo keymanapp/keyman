@@ -434,10 +434,12 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       let options = apiKeyboardRepository.options
     else {
       if fetchRepositoryIfNeeded {
+        kmLog("Fetching repository from API for keyboard download", checkDebugPrinting: true)
         apiKeyboardRepository.fetch { error in
           if let error = error {
             self.downloadFailed(forKeyboards: [], error: error)
           } else {
+            self.kmLog("Fetched repository. Continuing with keyboard download.", checkDebugPrinting: true)
             self.downloadKeyboard(withID: keyboardID,
                                   languageID: languageID,
                                   isUpdate: isUpdate,

@@ -309,12 +309,10 @@ extension LanguageViewController: KeyboardRepositoryDelegate {
     if let languageDict = repository.languages {
       languages = languageList(languageDict)
     }
-    DispatchQueue.main.async {
-      self.dismissActivityView()
-      self.tableView.reloadData()
-      if self.numberOfSections(in: self.tableView) == 0 {
-        self.showConnectionErrorAlert()
-      }
+    self.dismissActivityView()
+    self.tableView.reloadData()
+    if self.numberOfSections(in: self.tableView) == 0 {
+      self.showConnectionErrorAlert()
     }
   }
 
