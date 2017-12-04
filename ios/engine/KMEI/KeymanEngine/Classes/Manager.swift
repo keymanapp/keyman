@@ -421,28 +421,32 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   // MARK: - Downloading keyboards
 
-  /// Asynchronously fetches the dictionary of possible languages/keyboards to be displayed in the keyboard picker.
-  /// If not called before the picker is shown, the dictionary will be fetched automatically.
-  /// This method allows you to fetch the info in advance at a time that's appropriate for your app.
-  ///
-  /// To save bandwidth, a cached version is used if:
-  /// - the Keyman server is unreachable
-  /// - the list has been recently fetched
-  public func fetchKeyboardsList() {
-    apiKeyboardRepository.fetch()
-  }
-
   /// Asynchronously fetches the .js file for the keyboard with given IDs.
   /// See `Notifications` for notification on success/failiure.
-  /// - Precondition: `apiRepositoryKeyboard.fetch()` was called and the fetch was successful
-  /// (ie. `KeyboardRepositoryDelegate.keyboardRepositoryDidFetch(_:)` was called).
   /// - Parameters:
   ///   - isUpdate: Keep the keyboard files on failure
-  public func downloadKeyboard(withID keyboardID: String, languageID: String, isUpdate: Bool) {
+  ///   - fetchRepositoryIfNeeded: Fetch the list of keyboards from the API if necessary.
+  public func downloadKeyboard(withID keyboardID: String,
+                               languageID: String,
+                               isUpdate: Bool,
+                               fetchRepositoryIfNeeded: Bool = true) {
     guard let keyboards = apiKeyboardRepository.keyboards,
       let options = apiKeyboardRepository.options
     else {
-      let message = "Keyboard info has not yet been fetched. Call fetchKeyboardsList() first."
+      if fetchRepositoryIfNeeded {
+        apiKeyboardRepository.fetch { error in
+          if let error = error {
+            self.downloadFailed(forKeyboards: [], error: error)
+          } else {
+            self.downloadKeyboard(withID: keyboardID,
+                                  languageID: languageID,
+                                  isUpdate: isUpdate,
+                                  fetchRepositoryIfNeeded: false)
+          }
+        }
+        return
+      }
+      let message = "Keyboard repository not yet fetched"
       let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
       downloadFailed(forKeyboards: [], error: error)
       return
