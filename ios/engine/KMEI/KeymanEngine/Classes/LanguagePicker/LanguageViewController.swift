@@ -306,13 +306,15 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
 // MARK: - KeyboardRepositoryDelegate
 extension LanguageViewController: KeyboardRepositoryDelegate {
   func keyboardRepositoryDidFetch(_ repository: KeyboardRepository) {
-    dismissActivityView()
     if let languageDict = repository.languages {
       languages = languageList(languageDict)
     }
-    tableView.reloadData()
-    if numberOfSections(in: tableView) == 0 {
-      showConnectionErrorAlert()
+    DispatchQueue.main.async {
+      self.dismissActivityView()
+      self.tableView.reloadData()
+      if self.numberOfSections(in: self.tableView) == 0 {
+        self.showConnectionErrorAlert()
+      }
     }
   }
 
