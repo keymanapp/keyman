@@ -11,37 +11,37 @@ import Foundation
 /// Keyboard object for Keyman Cloud API 4.0.
 public struct Keyboard: Codable {
   /// Name of the keyboard.
-  public let name: String
+  public var name: String
 
   /// ID of the keyboard. Always matches the filename of the keyboard.
-  public let id: String
+  public var id: String
 
   /// Name of the keyboard `.js` file which should be appended to `Options.keyboardBaseURI`.
-  public let filename: String
+  public var filename: String
 
   /// The keyboard is the recommended default for the language.
-  public let isDefault: Bool
+  public var isDefault: Bool
 
   /// Keyboard targets a right-to-left script.
-  public let isRTL: Bool
+  public var isRTL: Bool
 
   /// Date the keyboard was last updated.
-  public let lastModified: Date
+  public var lastModified: Date
 
   /// Size of the keyboard file in bytes.
-  public let fileSize: Int?
+  public var fileSize: Int?
 
   /// Dot-decimal version number of the keyboard.
-  public let version: String
+  public var version: String
 
   /// Language objects linked to the keyboard.
-  public let languages: [Language]?
+  public var languages: [Language]?
 
   /// Font for input fields (and OSK if `oskFont` is not present).
-  public let font: Font?
+  public var font: Font?
 
   /// Font for the OSK.
-  public let oskFont: Font?
+  public var oskFont: Font?
 
   enum CodingKeys: String, CodingKey {
     case name

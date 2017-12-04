@@ -8,7 +8,6 @@
 
 enum DownloadType {
   case downloadFile
-  case downloadCachedData
 }
 
 class HTTPDownloadRequest: NSObject {

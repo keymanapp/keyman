@@ -194,9 +194,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
       // Update keyboard version
       for keyboard in keyboards {
-        if let currentKbInfo = Manager.shared.keyboardsInfo?[keyboard.id] {
-          Manager.shared.updateKeyboardVersion(forID: keyboard.id, newKeyboardVersion: currentKbInfo.version)
-        }
+        Manager.shared.updateKeyboardVersion(forID: keyboard.id, newKeyboardVersion: keyboard.version)
       }
 
       updateQueue!.remove(at: 0)
@@ -334,7 +332,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func checkUpdates() -> Bool {
-    if Manager.shared.keyboardsInfo == nil {
+    if Manager.shared.apiKeyboardRepository.languages == nil {
       return false
     }
 

@@ -20,6 +20,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   private var indices: [Int] = []
   private var selectedSection = 0
   private var isUpdate = false
+  private var languages: [Language] = []
 
   private var languagesUpdatedObserver: NotificationObserver?
   private var languagesDownloadFailedObserver: NotificationObserver?
@@ -28,9 +29,12 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
 
   override func loadView() {
     super.loadView()
-    if Manager.shared.currentRequest == nil && Manager.shared.languages.isEmpty {
-      Manager.shared.fetchKeyboards(completionBlock: nil)
+    if let languageDict = Manager.shared.apiKeyboardRepository.languages {
+      languages = languageList(languageDict)
+    } else {
+      Manager.shared.fetchKeyboardsList()
     }
+
     loadUserKeyboards()
   }
 
@@ -66,7 +70,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   override func numberOfSections(in tableView: UITableView) -> Int {
-    return Manager.shared.languages.count
+    return languages.count
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -76,7 +80,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cellIdentifierType1 = "CellType1"
     let cellIdentifierType2 = "CellType2"
-    let keyboards = Manager.shared.languages[indexPath.section].keyboards!
+    let keyboards = languages[indexPath.section].keyboards!
     let cellIdentifier = (keyboards.count < 2) ? cellIdentifierType1 : cellIdentifierType2
     let cell: UITableViewCell
     if let reusedCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
@@ -107,7 +111,6 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
       return sectionIndexTitles
     }
 
-    let languages = Manager.shared.languages
     sectionIndexTitles = []
     indices = []
     for (index, language) in languages.enumerated() {
@@ -125,7 +128,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    guard let language = Manager.shared.languages[safe: indexPath.section] else {
+    guard let language = languages[safe: indexPath.section] else {
       return
     }
 
@@ -165,7 +168,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
       return
     }
 
-    let language = Manager.shared.languages[indexPath.section]
+    let language = languages[indexPath.section]
     let keyboard = language.keyboards![0]
 
     let state = Manager.shared.stateForKeyboard(withID: keyboard.id)
@@ -185,28 +188,37 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func showLanguageDetailView(title: String, languageIndex: Int) {
-    let langDetailView = LanguageDetailViewController(language: Manager.shared.languages[languageIndex])
+    let langDetailView = LanguageDetailViewController(language: languages[languageIndex])
     langDetailView.title = title
     navigationController?.pushViewController(langDetailView, animated: true)
   }
 
   func alertView(_ alertView: UIAlertView, clickedButtonAt buttonIndex: Int) {
     if alertView.tag == errorAlertTag {
-      if !Manager.shared.languages.isEmpty {
+      if !languages.isEmpty {
         navigationController?.popToRootViewController(animated: true)
       }
     } else {
       // Keyboard download confirmation alert (tag is used for keyboard index).
       if buttonIndex != alertView.cancelButtonIndex {
-        let language = Manager.shared.languages[selectedSection]
+        let language = languages[selectedSection]
         let keyboard = language.keyboards![alertView.tag]
         Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: isUpdate)
       }
     }
   }
 
+  private func languageList(_ languageDict: [String: Language]) -> [Language] {
+    return languageDict.values.sorted { a, b -> Bool in
+      a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
+    }
+  }
+
   private func languagesUpdated() {
     dismissActivityView()
+    if let languageDict = Manager.shared.apiKeyboardRepository.languages {
+      languages = languageList(languageDict)
+    }
     tableView.reloadData()
     if numberOfSections(in: tableView) == 0 {
       showConnectionErrorAlert()
