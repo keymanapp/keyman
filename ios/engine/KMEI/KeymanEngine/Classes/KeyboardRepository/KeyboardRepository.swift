@@ -9,11 +9,13 @@
 import Foundation
 
 public protocol KeyboardRepository: class {
+  typealias CompletionHandler = (Error?) -> Void
+
   weak var delegate: KeyboardRepositoryDelegate? { get set }
   var languages: [String: Language]? { get }
 
   func installableKeyboard(withID keyboardID: String, languageID: String) -> InstallableKeyboard?
-  func fetch()
+  func fetch(completionHandler: CompletionHandler?)
 }
 
 public extension KeyboardRepository {
@@ -25,5 +27,9 @@ public extension KeyboardRepository {
       return nil
     }
     return InstallableKeyboard(keyboard: keyboard, language: language)
+  }
+
+  public func fetch(completionHandler: CompletionHandler? = nil) {
+    fetch(completionHandler: completionHandler)
   }
 }
