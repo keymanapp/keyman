@@ -35,6 +35,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   open var topBarImageView: UIImageView?
   var barHeightConstraints: [NSLayoutConstraint] = []
 
+  static var currentTextDocumentProxy: UITextDocumentProxy?
   var containerView: UIView?
   var containerHeightConstraints: [NSLayoutConstraint] = []
   var heightConstraint: NSLayoutConstraint!
@@ -162,14 +163,24 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       newRange = context.startIndex..<context.startIndex
     }
 
+    if let currentProxy = InputViewController.currentTextDocumentProxy {
+        
+      let cpHash = String(ObjectIdentifier(currentProxy).hashValue)
+      let tHash = String(ObjectIdentifier(textDocumentProxy).hashValue)
+
+      if cpHash != tHash {
+        Manager.shared.keymanWeb.resetContext()
+        textDocumentProxy.insertText("X")
+      }
+    } else {
+        Manager.shared.keymanWeb.resetContext()
+    }
+    
     Manager.shared.setText(context)
     Manager.shared.setSelectionRange(NSRange(newRange, in: context), manually: false)
-
-    if let webView = self.kmInputView as? WKWebView {
-      webView.evaluateJavaScript("resetContext();")
-    }
-
-  }
+    
+    InputViewController.currentTextDocumentProxy = textDocumentProxy
+}
 
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     if Manager.shared.isSubKeysMenuVisible {
