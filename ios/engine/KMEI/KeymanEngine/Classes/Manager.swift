@@ -63,8 +63,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   ///  - Default value is true.
   ///  - Setting this to false will also disable keyboard removal. To enable keyboard removal you should set
   ///    canRemoveKeyboards to true.
-  ///  - If set to false, calling fetchKeyboardList() is unnecessary and should be avoided unless you want to use auto
-  ///    keyboard update check feature of the keyboard picker.
   public var canAddNewKeyboards: Bool {
     get {
       return _canAddNewKeyboards
@@ -273,12 +271,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   /// Adds a new keyboard to the list in the keyboard picker if it doesn't already exist.
   /// The keyboard must be downloaded (see `downloadKeyboard()`) or preloaded (see `preloadLanguageFile()`)
-  ///
-  /// - Parameters:
-  ///   - isRTL: The writing direction is right to left
-  ///   - isCustom: The keyboard is not provided by Keyman
-  ///   - font: Custom font for text views as a JSON String (see keyboardsDictionary)
-  ///   - oskFont: Font for the on-screen keyboard
   public func addKeyboard(_ keyboard: InstallableKeyboard) {
     if !keyboardFileExists(withID: keyboard.id, version: keyboard.version) {
       kmLog("Could not add keyboard with ID: \(keyboard.id) because the keyboard file does not exist",
@@ -342,10 +334,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     return true
   }
 
-  public func repositoryKeyboard(withID keyboardID: String, languageID: String) -> InstallableKeyboard? {
-    return apiKeyboardRepository.installableKeyboard(withID: keyboardID, languageID: languageID)
-  }
-
   /// - Returns: Info for the current keyboard, if a keyboard is set
   public var currentKeyboardInfo: InstallableKeyboard? {
     guard let keyboardID = keyboardID, let languageID = languageID else {
@@ -377,10 +365,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   /// - Returns: The font name for the given keyboard ID and languageID, or returns nil if
   ///   - The keyboard doesn't have a font
-  ///   - The keyboard info is not available in the user keyboards list or in keyboardsDictionary
+  ///   - The keyboard info is not available in the user keyboards list
   public func fontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
     let kb = activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
-      ?? repositoryKeyboard(withID: keyboardID, languageID: languageID)
     if let filename =  kb?.font?.source.first(where: { $0.hasFontExtension }) {
       return keymanFonts[filename]?.name
     }
@@ -389,10 +376,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   /// - Returns: the OSK font name for the given keyboard ID and languageID, or returns nil if
   ///   - The keyboard doesn't have an OSK font
-  ///   - The keyboard info is not available in the user keyboards list or in keyboardsDictionary
+  ///   - The keyboard info is not available in the user keyboards list
   func oskFontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
     let kb = activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
-      ?? repositoryKeyboard(withID: keyboardID, languageID: languageID)
     if let filename =  kb?.oskFont?.source.first(where: { $0.hasFontExtension }) {
       return keymanFonts[filename]?.name
     }
@@ -401,7 +387,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   func isRTLKeyboard(withID keyboardID: String, languageID: String) -> Bool? {
     let kb = activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
-      ?? repositoryKeyboard(withID: keyboardID, languageID: languageID)
     return kb?.isRTL
   }
 
@@ -439,7 +424,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// Asynchronously fetches the dictionary of possible languages/keyboards to be displayed in the keyboard picker.
   /// If not called before the picker is shown, the dictionary will be fetched automatically.
   /// This method allows you to fetch the info in advance at a time that's appropriate for your app.
-  /// See `Notifications` for a list of relevant notifications.
   ///
   /// To save bandwidth, a cached version is used if:
   /// - the Keyman server is unreachable
@@ -450,6 +434,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   /// Asynchronously fetches the .js file for the keyboard with given IDs.
   /// See `Notifications` for notification on success/failiure.
+  /// - Precondition: `apiRepositoryKeyboard.fetch()` was called and the fetch was successful
+  /// (ie. `KeyboardRepositoryDelegate.keyboardRepositoryDidFetch(_:)` was called).
   /// - Parameters:
   ///   - isUpdate: Keep the keyboard files on failure
   public func downloadKeyboard(withID keyboardID: String, languageID: String, isUpdate: Bool) {
@@ -462,7 +448,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
 
-    guard let keyboard = repositoryKeyboard(withID: keyboardID, languageID: languageID),
+    guard let keyboard = apiKeyboardRepository.installableKeyboard(withID: keyboardID, languageID: languageID),
       let filename = keyboards[keyboardID]?.filename
     else {
       let message = "Keyboard not found with id: \(keyboardID), languageID: \(languageID)"

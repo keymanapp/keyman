@@ -249,7 +249,8 @@ extension TextField: UITextFieldDelegate {
     let isRTL: Bool
     if let keyboardID = Manager.shared.keyboardID,
       let languageID = Manager.shared.languageID {
-      isRTL = Manager.shared.isRTLKeyboard(withID: keyboardID, languageID: languageID) ?? false
+      let keyboard = Manager.shared.activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
+      isRTL = keyboard?.isRTL ?? false
     } else {
       isRTL = false
     }

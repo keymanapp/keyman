@@ -850,7 +850,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                 cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 2)
     } else if let kbID = params["keyboard"], let langID = params["language"] {
       // Query should include keyboard and language IDs to set the keyboard (first download if not available)
-      guard let keyboard = Manager.shared.repositoryKeyboard(withID: kbID, languageID: langID) else {
+      guard let keyboard = Manager.shared.apiKeyboardRepository.installableKeyboard(withID: kbID,
+                                                                                    languageID: langID) else {
         return
       }
 
