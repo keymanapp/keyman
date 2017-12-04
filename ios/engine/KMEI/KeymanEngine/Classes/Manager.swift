@@ -170,8 +170,7 @@ KeyboardRepositoryDelegate {
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
                                            name: .UIKeyboardWillHide, object: nil)
 
-    let kbVersion = latestKeyboardFileVersion(withID: Defaults.keyboard.id)
-    updateKeyboardVersion(forID: Defaults.keyboard.id, newKeyboardVersion: kbVersion!)
+    updateUserKeyboards(with: Defaults.keyboard)
 
     keymanWeb = KeymanWebViewController(nibName: nil, bundle: nil)
     keymanWeb.frame = CGRect(origin: .zero, size: keyboardSize)
@@ -452,7 +451,6 @@ KeyboardRepositoryDelegate {
   }
 
   public func keyboardRepositoryDidFetch(_ repository: KeyboardRepository) {
-    updateUserKeyboardsList()
     NotificationCenter.default.post(name: Notifications.languagesUpdated, object: self, value: ())
   }
 
@@ -629,37 +627,6 @@ KeyboardRepositoryDelegate {
       return .needsUpdate
     }
     return .upToDate
-  }
-
-  private func updateUserKeyboardsList() {
-    let userData = activeUserDefaults()
-
-    let lastVersion = userData.string(forKey: Key.engineVersion) ?? "1.0"
-    if compareVersions(lastVersion, Util.sdkVersion) == .orderedSame {
-      return
-    }
-    userData.set(Util.sdkVersion, forKey: Key.engineVersion)
-
-    guard var userKbList = userData.userKeyboards else {
-      kmLog("No user keyboards to update", checkDebugPrinting: true)
-      return
-    }
-
-    for i in userKbList.indices {
-      let kbID = userKbList[i].id
-      let langID = userKbList[i].languageID
-      if var kb = repositoryKeyboard(withID: kbID, languageID: langID) {
-        kb.version = latestKeyboardFileVersion(withID: kbID)!
-        kb.isCustom = false
-        userKbList[i] = kb
-      } else {
-        var kb = userKbList[i]
-        kb.isCustom = true
-        userKbList[i] = kb
-      }
-    }
-    userData.userKeyboards = userKbList
-    userData.synchronize()
   }
 
   func keyboardIdForCurrentRequest() -> String? {
@@ -1310,7 +1277,9 @@ KeyboardRepositoryDelegate {
     return .orderedSame
   }
 
-  func updateKeyboardVersion(forID kbID: String, newKeyboardVersion kbVersion: String) {
+  /// Updates the user's installed keyboards and current keyboard with information in newKeyboard.
+  /// - Parameter newKeyboard: Info for updated keyboard.
+  func updateUserKeyboards(with newKeyboard: InstallableKeyboard) {
     let userData = activeUserDefaults()
     guard var userKeyboards = userData.userKeyboards else {
       return
@@ -1319,8 +1288,12 @@ KeyboardRepositoryDelegate {
     // Set version in user keyboards list
     for i in userKeyboards.indices {
       var kb = userKeyboards[i]
-      if kbID == kb.id {
-        kb.version = kbVersion
+      if kb.id == newKeyboard.id {
+        if kb.languageID == newKeyboard.languageID {
+          kb = newKeyboard
+        } else {
+          kb.version = newKeyboard.id
+        }
         userKeyboards[i] = kb
       }
     }
@@ -1328,12 +1301,15 @@ KeyboardRepositoryDelegate {
     userData.synchronize()
 
     // Set version for current keyboard
-    // TODO: Move this UserDefaults into a function
     let currentUserData = Util.isSystemKeyboard ? UserDefaults.standard : activeUserDefaults()
-    if var userKb = currentUserData.currentKeyboard {
-      if kbID == userKb.id {
-        userKb.version = kbVersion
-        currentUserData.currentKeyboard = userKb
+    if var kb = currentUserData.currentKeyboard {
+      if kb.id == newKeyboard.id {
+        if kb.languageID == newKeyboard.languageID {
+          kb = newKeyboard
+        } else {
+          kb.version = newKeyboard.id
+        }
+        currentUserData.currentKeyboard = kb
         currentUserData.synchronize()
       }
     }

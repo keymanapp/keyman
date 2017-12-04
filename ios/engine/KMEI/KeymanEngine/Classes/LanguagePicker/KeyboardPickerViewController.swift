@@ -194,7 +194,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
       // Update keyboard version
       for keyboard in keyboards {
-        Manager.shared.updateKeyboardVersion(forID: keyboard.id, newKeyboardVersion: keyboard.version)
+        Manager.shared.updateUserKeyboards(with: keyboard)
       }
 
       updateQueue!.remove(at: 0)
