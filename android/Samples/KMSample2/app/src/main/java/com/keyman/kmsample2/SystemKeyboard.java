@@ -38,6 +38,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
     // Add a custom keyboard
     HashMap<String, String> kbInfo = new HashMap<String, String>();
+    kbInfo.put(KMManager.KMKey_PackageID, "tamil99m");
     kbInfo.put(KMManager.KMKey_KeyboardID, "tamil99m");
     kbInfo.put(KMManager.KMKey_LanguageID, "tam");
     kbInfo.put(KMManager.KMKey_KeyboardName, "Tamil 99M");
