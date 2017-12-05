@@ -65,7 +65,7 @@ class Storage {
     self.languageDir = languageDir
     self.fontDir = fontDir
     self.userDefaults = userDefaults
-    kmwURL = baseDir.appendingPathComponent(Constants.kmwFileName)
+    kmwURL = baseDir.appendingPathComponent(Resources.kmwFileName)
   }
 
   private static func createSubdirectory(baseDir: URL?, name: String) -> URL? {
@@ -100,13 +100,13 @@ class Storage {
 extension Storage {
   func copyKMWFiles(from bundle: Bundle) throws {
     try Storage.copy(from: bundle,
-                     resourceName: Constants.kmwFileName,
+                     resourceName: Resources.kmwFileName,
                      dstDir: Storage.active.baseDir)
     try Storage.copy(from: bundle,
                      resourceName: "keymanios.js",
                      dstDir: Storage.active.baseDir)
     try Storage.copy(from: bundle,
-                     resourceName: "\(Constants.defaultKeyboard.id)-\(Constants.defaultKeyboard.version).js",
+                     resourceName: "\(Defaults.keyboard.id)-\(Defaults.keyboard.version).js",
                      dstDir: Storage.active.languageDir)
     try Storage.copy(from: bundle,
                      resourceName: "DejaVuSans.ttf",

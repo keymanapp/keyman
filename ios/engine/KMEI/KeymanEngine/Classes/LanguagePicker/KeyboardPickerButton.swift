@@ -21,7 +21,7 @@ public class KeyboardPickerButton: UIButton {
     setColor(UIColor(red: 0.62, green: 0.68, blue: 0.76, alpha: 1.0))
     addTarget(self, action: #selector(self.showKeyboardPicker), for: .touchUpInside)
 
-    setImage(UIImage(named: "keyboard_icon", in: Manager.shared.keymanBundle, compatibleWith: nil), for: .normal)
+    setImage(UIImage(named: "keyboard_icon", in: Resources.bundle, compatibleWith: nil), for: .normal)
     sizeToFit()
     frame = frame.insetBy(dx: -15.0, dy: -3.0)
   }

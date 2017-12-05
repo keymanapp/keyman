@@ -491,7 +491,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let userData = AppDelegate.activeUserDefaults()
     let userKeyboards = userData.userKeyboards
     if userKeyboards == nil || userKeyboards!.isEmpty {
-      Manager.shared.addKeyboard(Constants.defaultKeyboard)
+      Manager.shared.addKeyboard(Defaults.keyboard)
     }
 
     perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
@@ -932,12 +932,15 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   private func profileName(withFont font: Font) -> String? {
-    return font.source.first { !($0.contains(".mobileconfig")) }
+    return font.source.first { $0.lowercased().hasSuffix(FileExtensions.configurationProfile) }
   }
 
   private func checkProfile(forKeyboardID kbID: String, languageID langID: String, doListCheck: Bool) {
-    if kbID == Constants.defaultKeyboard.id && langID == Constants.defaultKeyboard.languageID {
+    if kbID == Defaults.keyboard.id && langID == Defaults.keyboard.languageID {
       return
+    }
+    if profileName != nil {
+      return  // already installing a profile
     }
 
     guard let profile = profileName(withKeyboardID: kbID, languageID: langID) else {
@@ -1110,7 +1113,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
 
     let firstKB = userKbs[0]
-    return firstKB.id == Constants.defaultKeyboard.id && firstKB.languageID == Constants.defaultKeyboard.languageID
+    return firstKB.id == Defaults.keyboard.id && firstKB.languageID == Defaults.keyboard.languageID
   }
 
   @objc func showKMWebBrowserView(_ sender: Any) {

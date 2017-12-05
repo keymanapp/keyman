@@ -428,17 +428,19 @@ if(!window['keyman']['initialized']) {
      * @return      {Object}          Target element for key in OSK
      * Description  Identify the OSK key clicked
      */
-    osk._VKeyGetTarget = function(e)
-    {
+    osk._VKeyGetTarget = function(e) {
       var Ltarg;
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) return null;
-      if (e.target) Ltarg = e.target;
-      else if (e.srcElement) Ltarg = e.srcElement;
-      else return null;
-      if (Ltarg.nodeType == 3) // defeat Safari bug
+      Ltarg = util.eventTarget(e);
+      if (Ltarg == null) {
+        return null;
+      }
+      if (Ltarg.nodeType == 3) { // defeat Safari bug
         Ltarg = Ltarg.parentNode;
-      if (Ltarg.tagName == 'SPAN') Ltarg = Ltarg.parentNode;
+      }
+      if (Ltarg.tagName == 'SPAN') {
+        Ltarg = Ltarg.parentNode;
+      }
       return Ltarg;
     }
 
@@ -985,8 +987,8 @@ if(!window['keyman']['initialized']) {
         keymanweb._CachedSelectionStart = null; // I3319
         // Deadkey matching continues to be troublesome.
         // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
-        keymanweb._DeadkeyDeleteMatched();      // Delete any matched deadkeys before continuing
-        //keymanweb._DeadkeyResetMatched();       // I3318   (Not needed if deleted first?)
+        kbdInterface._DeadkeyDeleteMatched();      // Delete any matched deadkeys before continuing
+        //kbdInterface._DeadkeyResetMatched();       // I3318   (Not needed if deleted first?)
 
 
 
@@ -1055,7 +1057,7 @@ if(!window['keyman']['initialized']) {
         }
 
         // Pass this key code and state to the keyboard program
-        if(!keymanweb._ActiveKeyboard || (Lkc.Lcode != 0 && !keymanweb.processKeystroke(util.device, Lelem, Lkc)))
+        if(!keymanweb._ActiveKeyboard || (Lkc.Lcode != 0 && !kbdInterface.processKeystroke(util.device, Lelem, Lkc)))
         {
           // Restore the virtual key code if a mnemonic keyboard is being used
           Lkc.Lcode=Lkc.vkCode;

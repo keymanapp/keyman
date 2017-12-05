@@ -45,8 +45,7 @@ private let phoneLandscapeSystemKeyboardHeight: CGFloat = 162.0
 private let padPortraitSystemKeyboardHeight: CGFloat = 264.0
 private let padLandscapeSystemKeyboardHeight: CGFloat = 352.0
 
-public class Manager: NSObject, WKNavigationDelegate, WKScriptMessageHandler, HTTPDownloadDelegate,
-UIGestureRecognizerDelegate {
+public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegate, KeymanWebDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
   public static var applicationGroupIdentifier: String?
 
@@ -106,21 +105,6 @@ UIGestureRecognizerDelegate {
   /// Dictionary of available Keyman keyboard fonts keyed by font filename
   public private(set) var keymanFonts: [String: RegisteredFont] = [:]
 
-  /// Keyman system-wide keyboard
-  public let isSystemKeyboard: Bool
-
-  /// The version of the Keyman SDK
-  public var sdkVersion: String {
-    let info = NSDictionary(contentsOfFile: keymanBundle.path(forResource: "KeymanEngine-Info",
-                                                              ofType: "plist")!)
-    return info!["CFBundleVersion"] as! String
-  }
-
-  /// Keyman Web resources
-  public var keymanBundle: Bundle {
-    return Bundle(path: Bundle(for: Manager.self).path(forResource: "Keyman", ofType: "bundle")!)!
-  }
-
   /// In keyboard extensions (system keyboard), `UIApplication.openURL(_:)` is unavailable. The API is not called in
   /// the system keyboard since `KeyboardInfoViewController` is never used. `openURL(:_)` is only used in applications,
   /// where it is safe. However, the entire Keyman Engine framework must be compiled with extension-safe APIs.
@@ -130,12 +114,11 @@ UIGestureRecognizerDelegate {
 
   var keyboardID: String?
   var languageID: String?
-  weak var webDelegate: KeymanWebViewDelegate?
-  weak var inputDelegate: KeymanWebViewDelegate?
+  weak var keymanWebDelegate: KeymanWebDelegate?
   var currentRequest: HTTPDownloadRequest?
   var keyboardsInfo: [String: Keyboard]?
   var shouldReloadKeyboard = false
-  var inputView: WKWebView! = nil
+  var keymanWeb: KeymanWebViewController! = nil
 
   private var downloadQueue: HTTPDownloader?
   private var sharedQueue: HTTPDownloader!
@@ -176,16 +159,11 @@ UIGestureRecognizerDelegate {
   }
 
   private override init() {
-    let infoDict = Bundle.main.infoDictionary
-    let extensionInfo = infoDict?["NSExtension"] as? [AnyHashable: Any]
-    let extensionID = extensionInfo?["NSExtensionPointIdentifier"] as? String
-    isSystemKeyboard = extensionID == "com.apple.keyboard-service"
-
     super.init()
 
     URLProtocol.registerClass(KeymanURLProtocol.self)
 
-    if !isSystemKeyboard {
+    if !Util.isSystemKeyboard {
       if let shared = Storage.shared,
         let nonShared = Storage.nonShared {
         let keysToCopy = [Key.userKeyboardsList, Key.userCurrentKeyboard,
@@ -207,7 +185,7 @@ UIGestureRecognizerDelegate {
     }
 
     do {
-      try Storage.active.copyKMWFiles(from: keymanBundle)
+      try Storage.active.copyKMWFiles(from: Resources.bundle)
     } catch {
       kmLog("Failed to copy KMW files from bundle: \(error)", checkDebugPrinting: false)
     }
@@ -217,16 +195,20 @@ UIGestureRecognizerDelegate {
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
                                            name: .UIKeyboardWillHide, object: nil)
 
-    let kbVersion = latestKeyboardFileVersion(withID: Constants.defaultKeyboard.id)
-    updateKeyboardVersion(forID: Constants.defaultKeyboard.id, newKeyboardVersion: kbVersion!)
+    let kbVersion = latestKeyboardFileVersion(withID: Defaults.keyboard.id)
+    updateKeyboardVersion(forID: Defaults.keyboard.id, newKeyboardVersion: kbVersion!)
 
-    inputView = createInputView() // Pre-load keyboard
+    keymanWeb = KeymanWebViewController(nibName: nil, bundle: nil)
+    keymanWeb.frame = CGRect(origin: .zero, size: keyboardSize)
+    keymanWeb.delegate = self
+    reloadKeyboard(in: keymanWeb)
 
     // Set UILongPressGestureRecognizer to show sub keys
+    // TODO: Move to KeymanWebViewController
     let hold = UILongPressGestureRecognizer(target: self, action: #selector(self.holdAction))
     hold.minimumPressDuration = 0.5
     hold.delegate = self
-    inputView.addGestureRecognizer(hold)
+    keymanWeb.view.addGestureRecognizer(hold)
 
     reachability = Reachability(hostName: keymanHostName)
     NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),
@@ -274,8 +256,8 @@ UIGestureRecognizerDelegate {
       kmLog("Could not set keyboardID to \(kb.id) because the keyboard file does not exist",
         checkDebugPrinting: false)
       // Fallback to default keyboard if no keyboard is currently set.
-      if (self.keyboardID == nil || self.languageID == nil) && kb.id != Constants.defaultKeyboard.id {
-        _ = setKeyboard(Constants.defaultKeyboard)
+      if (self.keyboardID == nil || self.languageID == nil) && kb.id != Defaults.keyboard.id {
+        _ = setKeyboard(Defaults.keyboard)
       }
       return false
     }
@@ -291,16 +273,10 @@ UIGestureRecognizerDelegate {
       jsOskFont = jsFont
     }
 
-    let escapedLangName = kb.languageName.replacingOccurrences(of: "'", with: "\\'")
-    let escapedKbName = kb.name.replacingOccurrences(of: "'", with: "\\'")
-    let jsString = """
-      setKeymanLanguage('\(escapedKbName)','\(kb.id)','\(escapedLangName)',\
-      '\(kb.languageID)','\(kbVersion)',\(jsFont),\(jsOskFont))
-      """
-    kmLog("Evaluating JavaScript: \(jsString)", checkDebugPrinting: true)
-    inputView.evaluateJavaScript(jsString, completionHandler: nil)
+    keymanWeb.setKeyboard(id: kb.id, name: kb.name, languageID: kb.languageID, languageName: kb.languageName,
+                          version: kbVersion, font: jsFont, oskFont: jsOskFont)
 
-    let userData = isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
+    let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
 
     userData.currentKeyboard = kb
     userData.synchronize()
@@ -700,10 +676,10 @@ UIGestureRecognizerDelegate {
     let userData = Storage.active.userDefaults
 
     let lastVersion = userData.string(forKey: Key.engineVersion) ?? "1.0"
-    if compareVersions(lastVersion, sdkVersion) == .orderedSame {
+    if compareVersions(lastVersion, Util.sdkVersion) == .orderedSame {
       return
     }
-    userData.set(sdkVersion, forKey: Key.engineVersion)
+    userData.set(Util.sdkVersion, forKey: Key.engineVersion)
 
     guard var userKbList = userData.userKeyboards else {
       kmLog("No user keyboards to update", checkDebugPrinting: true)
@@ -797,7 +773,7 @@ UIGestureRecognizerDelegate {
                                           value: keyboards)
           if isUpdate {
             shouldReloadKeyboard = true
-            reloadKeyboard(in: inputView)
+            reloadKeyboard(in: keymanWeb)
           }
           let userDefaults = Storage.active.userDefaults
           userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
@@ -1092,7 +1068,7 @@ UIGestureRecognizerDelegate {
 
     // Set version for current keyboard
     // TODO: Move this UserDefaults into a function
-    let currentUserData = isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
+    let currentUserData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
     if var userKb = currentUserData.currentKeyboard {
       if kbID == userKb.id {
         userKb.version = kbVersion
@@ -1119,7 +1095,7 @@ UIGestureRecognizerDelegate {
   // MARK: - View management
 
   public var keyboardHeight: CGFloat {
-    if isSystemKeyboard {
+    if Util.isSystemKeyboard {
       return keyboardHeight(isPortrait: InputViewController.isPortrait)
     } else {
       return keyboardHeight(isPortrait: UIDevice.current.orientation.isPortrait)
@@ -1133,15 +1109,15 @@ UIGestureRecognizerDelegate {
   func keyboardHeight(isPortrait: Bool) -> CGFloat {
     if UIDevice.current.userInterfaceIdiom == .pad {
       if isPortrait {
-        return isSystemKeyboard ? padPortraitSystemKeyboardHeight : padPortraitInAppKeyboardHeight
+        return Util.isSystemKeyboard ? padPortraitSystemKeyboardHeight : padPortraitInAppKeyboardHeight
       } else {
-        return isSystemKeyboard ? padLandscapeSystemKeyboardHeight : padLandscapeInAppKeyboardHeight
+        return Util.isSystemKeyboard ? padLandscapeSystemKeyboardHeight : padLandscapeInAppKeyboardHeight
       }
     } else {
       if isPortrait {
-        return isSystemKeyboard ? phonePortraitSystemKeyboardHeight : phonePortraitInAppKeyboardHeight
+        return Util.isSystemKeyboard ? phonePortraitSystemKeyboardHeight : phonePortraitInAppKeyboardHeight
       } else {
-        return isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : phoneLandscapeInAppKeyboardHeight
+        return Util.isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : phoneLandscapeInAppKeyboardHeight
       }
     }
   }
@@ -1157,50 +1133,29 @@ UIGestureRecognizerDelegate {
   // Keyman interaction
   private func resizeKeyboard() {
     let newSize = keyboardSize
-    if didResizeToOrientation && isSystemKeyboard && lastKeyboardSize == newSize {
+    if didResizeToOrientation && Util.isSystemKeyboard && lastKeyboardSize == newSize {
       didResizeToOrientation = false
       return
     }
     lastKeyboardSize = newSize
 
-    inputView!.frame = CGRect(origin: .zero, size: newSize)
+    keymanWeb.frame = CGRect(origin: .zero, size: newSize)
 
     // Workaround for WKWebView bug with landscape orientation
     // TODO: Check if still necessary and if there's a better solution
-    if isSystemKeyboard {
+    if Util.isSystemKeyboard {
       perform(#selector(self.resizeDelay), with: self, afterDelay: 1.0)
     }
 
     var oskHeight = Int(newSize.height)
-    oskHeight -= oskHeight % (isSystemKeyboard ? 10 : 20)
+    oskHeight -= oskHeight % (Util.isSystemKeyboard ? 10 : 20)
 
-    inputView.evaluateJavaScript("setOskWidth(\(Int(newSize.width)));", completionHandler: nil)
-    inputView.evaluateJavaScript("setOskHeight(\(Int(oskHeight)));", completionHandler: nil)
+    keymanWeb.setOskWidth(Int(newSize.width))
+    keymanWeb.setOskHeight(oskHeight)
   }
 
   private var keymanScrollView: UIScrollView {
-    return inputView.scrollView
-  }
-
-  // TODO: Move to separate class
-  private func createInputView() -> WKWebView {
-    let config = WKWebViewConfiguration()
-    let prefs = WKPreferences()
-    prefs.javaScriptEnabled = true
-    config.preferences = prefs
-    config.suppressesIncrementalRendering = false
-    let userContentController = WKUserContentController()
-    userContentController.add(self, name: "keyman")
-    config.userContentController = userContentController
-    let frame = CGRect(origin: .zero, size: keyboardSize)
-    let view = WKWebView(frame: frame, configuration: config)
-    view.isOpaque = false
-    view.backgroundColor = UIColor.clear
-    view.navigationDelegate = self
-
-    view.scrollView.isScrollEnabled = false
-    reloadKeyboard(in: view)
-    return view
+    return keymanWeb.webView.scrollView
   }
 
   @objc func clearSubKeyArrays() {
@@ -1234,18 +1189,11 @@ UIGestureRecognizerDelegate {
       subKeysView.removeFromSuperview()
       subKeysView.subviews.forEach { $0.removeFromSuperview() }
       self.subKeysView = nil
-      setPopupVisible(false)
-      NotificationCenter.default.post(name: Notifications.subKeysMenuDismissed, object: self, value: ())
+      keymanWeb.setPopupVisible(false)
     }
     subKeys.removeAll()
     subKeyIDs.removeAll()
     subKeyTexts.removeAll()
-  }
-
-  private func setPopupVisible(_ visible: Bool) {
-    // FIXME: Looking at KMW, the parameter should be a bool
-    let jsString = "popupVisible(\(visible ? "1" : "0"));"
-    inputView.evaluateJavaScript(jsString, completionHandler: nil)
   }
 
   /// Displays a list of available keyboards and allows a user to add/download new keyboards
@@ -1276,17 +1224,20 @@ UIGestureRecognizerDelegate {
   public func dismissKeyboardPicker(_ viewController: UIViewController) {
     viewController.dismiss(animated: true)
     if shouldReloadKeyboard {
-      reloadKeyboard(in: inputView)
+      reloadKeyboard(in: keymanWeb)
     }
     NotificationCenter.default.post(name: Notifications.keyboardPickerDismissed, object: self, value: ())
   }
 
-  private func reloadKeyboard(in view: WKWebView) {
+  private func reloadKeyboard(in keymanWeb: KeymanWebViewController) {
     if #available(iOS 9.0, *) {
-      view.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)
+      keymanWeb.webView.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)
     } else {
       // WKWebView in iOS < 9 is missing loadFileURL().
-      view.load(URLRequest(url: Storage.active.kmwURL, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
+      let request = URLRequest(url: Storage.active.kmwURL,
+                               cachePolicy: .reloadIgnoringCacheData,
+                               timeoutInterval: 60.0)
+      keymanWeb.webView.load(request)
     }
   }
 
@@ -1300,28 +1251,18 @@ UIGestureRecognizerDelegate {
     } else if let keyboard = Storage.active.userDefaults.userKeyboards?[safe: 0] {
       setKeyboard(keyboard)
     } else {
-      setKeyboard(Constants.defaultKeyboard)
+      setKeyboard(Defaults.keyboard)
     }
   }
 
   @objc func showHelpBubble() {
     // Help bubble is always disabled for system-wide keyboard
-    if isSystemKeyboard || keyboardMenuView != nil {
+    if Util.isSystemKeyboard || keyboardMenuView != nil {
       return
     }
 
-    let jsString = "langMenuPos();"
-    inputView.evaluateJavaScript(jsString) { result, _ in
-      guard let result = result else {
-        return
-      }
-      let langMenuKeyPos = String(describing: result)
-      let pos = langMenuKeyPos.components(separatedBy: ",")
-      guard let px = Float(pos[0]), let py = Float(pos[1]) else {
-        self.kmLog("Unexpected result for langMenuPos(): \(langMenuKeyPos)", checkDebugPrinting: false)
-        return
-      }
-      self.showHelpBubble(at: CGPoint(x: CGFloat(px), y: CGFloat(py)))
+    keymanWeb.languageMenuPosition { keyFrame in
+      self.showHelpBubble(at: keyFrame.origin)
     }
   }
 
@@ -1342,12 +1283,12 @@ UIGestureRecognizerDelegate {
     let frameHeight = (40.0 + helpBubbleView.arrowHeight) * sizeMultiplier
     let fontSize = 10.0 * sizeMultiplier
 
-    let inputViewFrame = inputView.frame
+    let inputViewFrame = keymanWeb.view.frame
     let screenWidth = inputViewFrame.size.width
 
     // TODO: Refactor this out
     let isPortrait: Bool
-    if isSystemKeyboard {
+    if Util.isSystemKeyboard {
       isPortrait = InputViewController.isPortrait
     } else {
       isPortrait = UIDevice.current.orientation.isPortrait
@@ -1355,9 +1296,9 @@ UIGestureRecognizerDelegate {
 
     let adjY: CGFloat
     if isPortrait {
-      adjY = isSystemKeyboard ? 9.0 : 4.0
+      adjY = Util.isSystemKeyboard ? 9.0 : 4.0
     } else {
-      adjY = isSystemKeyboard ? 3.0 : 4.0
+      adjY = Util.isSystemKeyboard ? 3.0 : 4.0
     }
     let px = point.x
     let py = point.y + adjY + (isPad ? 2.0 : 1.0)
@@ -1388,7 +1329,7 @@ UIGestureRecognizerDelegate {
     helpText.numberOfLines = 0
     helpText.text = keyboardChangeHelpText
     helpBubbleView.addSubview(helpText)
-    inputView.addSubview(helpBubbleView)
+    keymanWeb.view.addSubview(helpBubbleView)
   }
 
   @objc func resizeDelay() {
@@ -1397,7 +1338,7 @@ UIGestureRecognizerDelegate {
     // should hopefully work on all devices.
     let kbWidth = keyboardWidth
     let kbHeight = keyboardHeight
-    inputView?.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight + 1000)
+    keymanWeb.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight + 1000)
   }
 
   func resizeKeyboardIfNeeded() {
@@ -1414,31 +1355,13 @@ UIGestureRecognizerDelegate {
     // TODO: Refactor to use resizeKeyboard()
     let kbWidth = keyboardWidth
     let kbHeight = keyboardHeight(with: orientation)
-    inputView?.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
+    keymanWeb.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
 
     var oskHeight = Int(kbHeight)
-    oskHeight -= oskHeight % (isSystemKeyboard ? 10 : 20)
+    oskHeight -= oskHeight % (Util.isSystemKeyboard ? 10 : 20)
 
-    inputView?.evaluateJavaScript("setOskWidth(\(Int(kbWidth)));", completionHandler: nil)
-    inputView?.evaluateJavaScript("setOskHeight(\(Int(oskHeight)));", completionHandler: nil)
-  }
-
-  // MARK: - WKScriptMessageHandler methods
-  public func userContentController(_ userContentController: WKUserContentController,
-                                    didReceive message: WKScriptMessage) {
-    guard let fragment = message.body as? String else {
-      return
-    }
-
-    if fragment.hasPrefix("ios-log:") {
-      let requestString = fragment.removingPercentEncoding ?? fragment
-      let logString = requestString.components(separatedBy: ":#iOS#")[1]
-      kmLog("WebView: \(logString)", checkDebugPrinting: false)
-    } else {
-      webDelegate?.updatedFragment(fragment)
-      inputDelegate?.updatedFragment(fragment)
-      updatedFragment(fragment)
-    }
+    keymanWeb.setOskWidth(Int(kbWidth))
+    keymanWeb.setOskHeight(oskHeight)
   }
 
   // MARK: - Text
@@ -1446,8 +1369,7 @@ UIGestureRecognizerDelegate {
   // TODO: Switch from NSRange
   func setSelectionRange(_ range: NSRange, manually: Bool) {
     if range.location != NSNotFound {
-      let jsString = "setCursorRange(\(range.location),\(range.length))"
-      inputView.evaluateJavaScript(jsString, completionHandler: nil)
+      keymanWeb.setCursorRange(range)
     }
   }
 
@@ -1458,12 +1380,7 @@ UIGestureRecognizerDelegate {
   }
 
   func setText(_ text: String?) {
-    var text = text ?? ""
-    text = text.replacingOccurrences(of: "\\", with: "\\\\")
-    text = text.replacingOccurrences(of: "'", with: "\\'")
-    text = text.replacingOccurrences(of: "\n", with: "\\n")
-    let jsString = "setKeymanVal('\(text)');"
-    inputView.evaluateJavaScript(jsString, completionHandler: nil)
+    keymanWeb.setText(text)
   }
 
   // MARK: - Keyboard Notifications
@@ -1486,23 +1403,17 @@ UIGestureRecognizerDelegate {
     dismissKeyPreview()
   }
 
-  // MARK: - WKNavigationDelegate methods
-  public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-    guard let url = webView.url else {
-      return
-    }
-    guard url.lastPathComponent == Constants.kmwFileName && (url.fragment?.isEmpty ?? true) else {
-      return
-    }
+  // MARK: - KeymanWebViewDelegate methods
+  func keyboardLoaded(_ keymanWeb: KeymanWebViewController) {
+    keymanWebDelegate?.keyboardLoaded(keymanWeb)
 
     kmLog("Loaded keyboard.", checkDebugPrinting: true)
     resizeKeyboard()
-    let deviceType = (UIDevice.current.userInterfaceIdiom == .phone) ? "AppleMobile" : "AppleTablet"
-    webView.evaluateJavaScript("setDeviceType('\(deviceType)');", completionHandler: nil)
+    keymanWeb.setDeviceType(UIDevice.current.userInterfaceIdiom)
 
-    var newKb = Constants.defaultKeyboard
+    var newKb = Defaults.keyboard
     if (keyboardID == nil || languageID == nil) && !shouldReloadKeyboard {
-      let userData = isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
+      let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
       if let currentKb = userData.currentKeyboard {
         let kbID = currentKb.id
         let langID = currentKb.languageID
@@ -1523,130 +1434,90 @@ UIGestureRecognizerDelegate {
     }
   }
 
-  // MARK: - Keyman Web Events
-  func updatedFragment(_ fragment: String) {
-    if fragment.isEmpty {
-      return
-    }
+  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
+    keymanWebDelegate?.insertText(keymanWeb, numCharsToDelete: numCharsToDelete, newText: newText)
 
-    // TODO: Parse the fragment into an enum of possible commands with parameters parsed.
-    // updatedFragment() will take this enum instead of a String.
-    if fragment.contains("showKeyPreview") {
-      processShowKeyPreview(fragment)
-    } else if fragment.contains("dismissKeyPreview") {
-      let isPad = UIDevice.current.userInterfaceIdiom == .pad
-      if isPad || keyPreviewView == nil {
-        return
-      }
-      NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.dismissKeyPreview), object: nil)
-      perform(#selector(self.dismissKeyPreview), with: nil, afterDelay: 0.1)
-      clearSubKeyArrays()
-    } else if fragment.contains("insertText") {
-      dismissHelpBubble()
-      isKeymanHelpOn = false
-    } else if fragment.contains("menuKeyUp") {
-      dismissHelpBubble()
-      isKeymanHelpOn = false
-      if isSystemKeyboard {
-        let userData = UserDefaults.standard
-        userData.set(true, forKey: Key.keyboardPickerDisplayed)
-        userData.synchronize()
-      }
-    } else if fragment.contains("hideKeyboard") {
-      dismissHelpBubble()
-      dismissSubKeys()
-      dismissKeyboardMenu()
-    } else if fragment.contains("showMore") {
-      processShowMore(fragment)
-    }
+    dismissHelpBubble()
+    isKeymanHelpOn = false
   }
 
-  private func getKeyFrameWith(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat) -> CGRect {
-    let isPad: Bool = UIDevice.current.userInterfaceIdiom == .pad
-    let adjY: CGFloat = isPad ? -0.5 : -1.0
-    let frame = CGRect(x: x - w / 2.0, y: y - adjY, width: w, height: h)
-    return frame
-  }
+  func showKeyPreview(_ keymanWeb: KeymanWebViewController, keyFrame: CGRect, preview: String) {
+    keymanWebDelegate?.showKeyPreview(keymanWeb, keyFrame: keyFrame, preview: preview)
 
-  private func processShowKeyPreview(_ fragment: String) {
-    if UIDevice.current.userInterfaceIdiom == .pad || (isSystemKeyboard && !isSystemKeyboardTopBarEnabled) ||
-      subKeysView != nil {
+    if UIDevice.current.userInterfaceIdiom == .pad
+      || (Util.isSystemKeyboard && !isSystemKeyboardTopBarEnabled)
+      || subKeysView != nil {
       return
     }
 
     dismissKeyPreview()
     clearSubKeyArrays()
 
-    // Fragment in the form "showKeyPreview-\(fragmentToggle)+x=\(x)+y=\(y)+w=\(w)+h=\(h)+t=\(t)"
-    let xKey = fragment.range(of: "+x=")!
-    let yKey = fragment.range(of: "+y=")!
-    let wKey = fragment.range(of: "+w=")!
-    let hKey = fragment.range(of: "+h=")!
-    let tKey = fragment.range(of: "+t=")!
-    let x = CGFloat(Float(fragment[xKey.upperBound..<yKey.lowerBound])!)
-    let y = CGFloat(Float(fragment[yKey.upperBound..<wKey.lowerBound])!)
-    let w = CGFloat(Float(fragment[wKey.upperBound..<hKey.lowerBound])!)
-    let h = CGFloat(Float(fragment[hKey.upperBound..<tKey.lowerBound])!)
-    let t = String(fragment[tKey.upperBound...])
-
-    keyFrame = getKeyFrameWith(x: x, y: y, w: w, h: h)
     keyPreviewView = KeyPreviewView(frame: keyFrame)
 
-    let text = t.stringFromUTF16CodeUnits()
-
-    keyPreviewView!.setLabelText(text!)
+    keyPreviewView!.setLabelText(preview)
     var oskFontName = oskFontNameForKeyboard(withID: keyboardID!, languageID: languageID!)
     oskFontName = oskFontName ?? fontNameForKeyboard(withID: keyboardID!, languageID: languageID!)
     keyPreviewView!.setLabelFont(oskFontName)
-    inputView.addSubview(keyPreviewView!)
+    keymanWeb.view.addSubview(keyPreviewView!)
   }
 
-  private func processShowMore(_ fragment: String) {
+  func dismissKeyPreview(_ keymanWeb: KeymanWebViewController) {
+    keymanWebDelegate?.dismissKeyPreview(keymanWeb)
+
+    if UIDevice.current.userInterfaceIdiom == .pad || keyPreviewView == nil {
+      return
+    }
+
+    let dismissKeyPreview = #selector(self.dismissKeyPreview as () -> Void)
+    NSObject.cancelPreviousPerformRequests(withTarget: self, selector: dismissKeyPreview, object: nil)
+    perform(dismissKeyPreview, with: nil, afterDelay: 0.1)
+    clearSubKeyArrays()
+  }
+
+  func showSubkeys(_ keymanWeb: KeymanWebViewController,
+                   keyFrame: CGRect,
+                   subkeyIDs: [String],
+                   subkeyTexts: [String],
+                   useSpecialFont: Bool) {
+    keymanWebDelegate?.showSubkeys(keymanWeb,
+                                   keyFrame: keyFrame,
+                                   subkeyIDs: subkeyIDs,
+                                   subkeyTexts: subkeyTexts,
+                                   useSpecialFont: useSpecialFont)
+
     dismissHelpBubble()
     isKeymanHelpOn = false
     dismissSubKeys()
     dismissKeyboardMenu()
 
-    // Fragment in the form "showMore-\(fragmentToggle)+baseFrame=\(baseFrame)+keys=\(keys)+font=\(font)"
-    // Font parameter is optional
-    let baseFrameKey = fragment.range(of: "+baseFrame=")!
-    let keysKey = fragment.range(of: "+keys=")!
-    let fontKey = fragment.range(of: "+font=")
-    let baseFrame = fragment[baseFrameKey.upperBound..<keysKey.lowerBound]
-    let keys = fragment[keysKey.upperBound..<(fontKey?.lowerBound ?? fragment.endIndex)]
-    specialOSKFont = fontKey.map { String(fragment[$0.upperBound...]) }
+    self.keyFrame = keyFrame
+    subKeyIDs = subkeyIDs
+    subKeyTexts = subkeyTexts
+  }
 
-    let frameComponents = baseFrame.components(separatedBy: ",")
-    let x = CGFloat(Float(frameComponents[0])!)
-    let y = CGFloat(Float(frameComponents[1])!)
-    let w = CGFloat(Float(frameComponents[2])!)
-    let h = CGFloat(Float(frameComponents[3])!)
-    keyFrame = getKeyFrameWith(x: x, y: y, w: w, h: h)
+  func menuKeyDown(_ keymanWeb: KeymanWebViewController) {
+    keymanWebDelegate?.menuKeyDown(keymanWeb)
+  }
 
-    let keyArray = keys.components(separatedBy: ";")
-    subKeyIDs = keyArray
-    subKeyTexts = keyArray
-    for i in keyArray.indices {
-      let values = keyArray[i].components(separatedBy: ":")
-      if values.count == 2 {
-        subKeyIDs[i] = values[0]
-        subKeyTexts[i] = values[1]
-      } else if values.count == 1 {
-        subKeyIDs[i] = values[0]
-        var subKeyText = values[0]
-        if let index = subKeyText.index(of: "-") {
-          subKeyText = String(subKeyText[subKeyText.index(after: index)...])
-        }
-        if let index = subKeyText.index(of: "_") {
-          subKeyText = String(subKeyText[subKeyText.index(after: index)...])
-        }
-        let unicode = "0x\(subKeyText)"
-        subKeyTexts[i] = unicode
-      } else {
-        subKeyIDs[i] = ""
-        subKeyTexts[i] = ""
-      }
+  func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
+    keymanWebDelegate?.menuKeyUp(keymanWeb)
+
+    dismissHelpBubble()
+    isKeymanHelpOn = false
+    if Util.isSystemKeyboard {
+      let userData = UserDefaults.standard
+      userData.set(true, forKey: Key.keyboardPickerDisplayed)
+      userData.synchronize()
     }
+  }
+
+  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
+    keymanWebDelegate?.hideKeyboard(keymanWeb)
+
+    dismissHelpBubble()
+    dismissSubKeys()
+    dismissKeyboardMenu()
   }
 
   // MARK: - UIGestureRecognizer
@@ -1664,8 +1535,7 @@ UIGestureRecognizerDelegate {
         subKeysView.removeFromSuperview()
         subKeysView.subviews.forEach { $0.removeFromSuperview() }
         self.subKeysView = nil
-        setPopupVisible(false)
-        NotificationCenter.default.post(name: Notifications.subKeysMenuDismissed, object: self, value: ())
+        keymanWeb.setPopupVisible(false)
       }
       var buttonClicked = false
       for button in subKeys where button.isHighlighted {
@@ -1683,11 +1553,10 @@ UIGestureRecognizerDelegate {
       // Touch & Hold Began
       let touchPoint = sender.location(in: sender.view)
       // Check if touch was for language menu button
-      inputView.evaluateJavaScript("langMenuPos();") { result, _ in
-        let keyFrame = result as! String
-        self.setMenuKeyFrame(keyFrame)
-        if self.menuKeyFrame.contains(touchPoint) {
-          self.inputDelegate?.updatedFragment("showKeyboardMenu")
+      keymanWeb.languageMenuPosition { keyFrame in
+        self.menuKeyFrame = keyFrame
+        if keyFrame.contains(touchPoint) {
+          self.keymanWebDelegate?.menuKeyHeld(self.keymanWeb)
           return
         }
         self.touchHoldBegan()
@@ -1746,10 +1615,8 @@ UIGestureRecognizerDelegate {
         button.setTitleColor(.gray, for: .disabled)
       }
 
-      let buttonTitle = subKeyText.contains("0x") ? subKeyText.stringFromUTF16CodeUnits()! : subKeyText
-
       button.addTarget(self, action: #selector(subKeyButtonClick), for: .touchUpInside)
-      button.setTitle(buttonTitle, for: .normal)
+      button.setTitle(subKeyText, for: .normal)
       button.tintColor = UIColor(red: 181.0 / 255.0, green: 181.0 / 255.0, blue: 181.0 / 255.0, alpha: 1.0)
       button.isEnabled = false
       return button
@@ -1757,9 +1624,8 @@ UIGestureRecognizerDelegate {
 
     dismissKeyPreview()
     subKeysView = SubKeysView(keyFrame: keyFrame, subKeys: subKeys)
-    NotificationCenter.default.post(name: Notifications.subKeysMenuWillShow, object: self, value: ())
-    inputView.addSubview(subKeysView!)
-    setPopupVisible(true)
+    keymanWeb.view.addSubview(subKeysView!)
+    keymanWeb.setPopupVisible(true)
   }
 
   @objc func subKeyButtonClick(_ sender: UIButton) {
@@ -1767,8 +1633,7 @@ UIGestureRecognizerDelegate {
     if keyIndex < subKeyIDs.count && keyIndex < subKeyTexts.count {
       let subKeyID = subKeyIDs[keyIndex]
       let subKeyText = subKeyTexts[keyIndex]
-      let jsString = "executePopupKey('\(subKeyID)','\(subKeyText)');"
-      inputView.evaluateJavaScript(jsString, completionHandler: nil)
+      keymanWeb.executePopupKey(id: subKeyID, text: subKeyText)
     }
     subKeys.removeAll()
     subKeyIDs.removeAll()
@@ -1809,7 +1674,7 @@ UIGestureRecognizerDelegate {
       synchronizeSWKeyboard()
       if keyboardID != nil && languageID != nil {
         shouldReloadKeyboard = true
-        reloadKeyboard(in: inputView)
+        reloadKeyboard(in: keymanWeb)
       }
       didSynchronize = true
       standardUserDef.set(activeUserDef.object(forKey: Key.synchronizeSWKeyboard),
@@ -1833,27 +1698,11 @@ UIGestureRecognizerDelegate {
     didResizeToOrientation = true
   }
 
-  private func setMenuKeyFrame(_ frameStr: String) {
-    var frame = CGRect.zero
-    if !frameStr.isEmpty {
-      let values = frameStr.components(separatedBy: ",")
-      let x = CGFloat(Float(values[0])!)
-      let y = CGFloat(Float(values[1])!)
-      let w = CGFloat(Float(values[2])!)
-      let h = CGFloat(Float(values[3])!)
-      let isPad = UIDevice.current.userInterfaceIdiom == .pad
-      let adjY: CGFloat = isPad ? -0.5 : -1.0
-      frame = CGRect(x: x - w / 2.0, y: y - adjY, width: w, height: h)
-    }
-    menuKeyFrame = frame
-  }
-
   func showKeyboardMenu(_ ic: InputViewController, closeButtonTitle: String?) {
-    let parentView = ic.view ?? inputView
-    inputView.evaluateJavaScript("langMenuPos();") { result, _ in
-      let keyFrame = result as! String
-      self.setMenuKeyFrame(keyFrame)
-      if self.menuKeyFrame != .zero {
+    let parentView = ic.view ?? keymanWeb.view
+    keymanWeb.languageMenuPosition { keyFrame in
+      self.menuKeyFrame = keyFrame
+      if keyFrame != .zero {
         self.keyboardMenuView?.removeFromSuperview()
         self.keyboardMenuView = KeyboardMenuView(keyFrame: self.menuKeyFrame, inputViewController: ic,
                                                  closeButtonTitle: closeButtonTitle)

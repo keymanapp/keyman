@@ -49,8 +49,8 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       _tableList = keyboardList
       _tableList!.append(titleCloseButton)
     } else {
-      var keyboard = Constants.defaultKeyboard
-      if let version = Manager.shared.latestKeyboardFileVersion(withID: Constants.defaultKeyboard.id) {
+      var keyboard = Defaults.keyboard
+      if let version = Manager.shared.latestKeyboardFileVersion(withID: Defaults.keyboard.id) {
         keyboard.version = version
       }
       _tableList = [keyboard]
@@ -60,9 +60,8 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
   }
 
   init(keyFrame frame: CGRect, inputViewController: InputViewController, closeButtonTitle: String?) {
-    let isSystemKeyboard = Manager.shared.isSystemKeyboard
     let isPortrait: Bool
-    if isSystemKeyboard {
+    if Util.isSystemKeyboard {
       isPortrait = InputViewController.isPortrait
     } else {
       isPortrait = UIDevice.current.orientation.isPortrait
@@ -79,7 +78,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
     var mainFrame = inputViewController.view.frame
     if mainFrame == CGRect.zero {
-      mainFrame = Manager.shared.inputView.frame
+      mainFrame = Manager.shared.keymanWeb.view.frame
     }
     super.init(frame: mainFrame)
 
