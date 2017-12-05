@@ -8,9 +8,6 @@
 
 import Foundation
 
-public typealias LanguagesUpdatedNotification = Void
-public typealias LanguagesDownloadFailedNotification = Error
-
 public typealias KeyboardDownloadStartedNotification = [InstallableKeyboard]
 public typealias KeyboardDownloadCompletedNotification = [InstallableKeyboard]
 public struct KeyboardDownloadFailedNotification {
@@ -25,11 +22,6 @@ public typealias KeyboardRemovedNotification = InstallableKeyboard
 public typealias KeyboardPickerDismissedNotification = Void
 
 public struct Notifications {
-  public static let languagesUpdated =
-    NotificationName<LanguagesUpdatedNotification>("KeymanLanguagesUpdated")
-  public static let languagesDownloadFailed =
-    NotificationName<LanguagesDownloadFailedNotification>("KeymanLanguagesDownloadFailed")
-
   public static let keyboardDownloadStarted =
     NotificationName<KeyboardDownloadStartedNotification>("KeymanKeyboardDownloadStarted")
   public static let keyboardDownloadCompleted =

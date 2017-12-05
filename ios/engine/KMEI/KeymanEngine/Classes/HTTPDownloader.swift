@@ -58,8 +58,6 @@ URLSessionDataDelegate {
       if req.typeCode == .downloadFile {
         req.task = downloadSession.downloadTask(with: req.url)
         handler?.downloadRequestStarted(req)
-      } else if req.typeCode == .downloadCachedData {
-        req.task = downloadSession.dataTask(with: req.url)
       }
       req?.task?.resume()
     } else {
