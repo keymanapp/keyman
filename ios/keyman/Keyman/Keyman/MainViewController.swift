@@ -932,12 +932,15 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   private func profileName(withFont font: Font) -> String? {
-    return font.source.first { !($0.contains(".mobileconfig")) }
+    return font.source.first { $0.lowercased().hasSuffix(FileExtensions.configurationProfile) }
   }
 
   private func checkProfile(forKeyboardID kbID: String, languageID langID: String, doListCheck: Bool) {
     if kbID == Defaults.keyboard.id && langID == Defaults.keyboard.languageID {
       return
+    }
+    if profileName != nil {
+      return  // already installing a profile
     }
 
     guard let profile = profileName(withKeyboardID: kbID, languageID: langID) else {

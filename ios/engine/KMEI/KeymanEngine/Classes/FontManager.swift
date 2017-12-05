@@ -51,7 +51,7 @@ public class FontManager {
   private func customFonts() -> [URL]? {
     let urls: [URL]
     do {
-      urls = try FileManager.default.contentsOfDirectory(at: Manager.shared.activeFontDirectory(),
+      urls = try FileManager.default.contentsOfDirectory(at: Storage.active.fontDir,
                                                          includingPropertiesForKeys: nil)
     } catch {
       Manager.shared.kmLog("Failed to list font dir contents: \(error)", checkDebugPrinting: false)

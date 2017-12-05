@@ -39,10 +39,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func applicationDidEnterBackground(_ application: UIApplication) {
-    Manager.shared.unregisterCustomFonts()
+    FontManager.shared.unregisterCustomFonts()
   }
 
   func applicationWillEnterForeground(_ application: UIApplication) {
-    Manager.shared.registerCustomFonts()
+    FontManager.shared.registerCustomFonts()
   }
 }

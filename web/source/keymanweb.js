@@ -1690,7 +1690,7 @@ if(!window['keyman']['initialized']) {
       }           
 
       // Update the UI 
-      keymanweb.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC']);
+      keymanweb.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC'],sp['KP']);
     }
     
     /** 
@@ -2693,11 +2693,17 @@ if(!window['keyman']['initialized']) {
      * @param       {string}            _language
      * @param       {string}            _keyboardName
      * @param       {string}            _languageCode
-     * @return      {boolean}   
+     * @param       {string=}           _packageID        Used by KMEA/KMEI to track .kmp related info.
+     * @return      {boolean}
      */       
-    keymanweb.doKeyboardRegistered = function(_internalName,_language,_keyboardName,_languageCode)
+    keymanweb.doKeyboardRegistered = function(_internalName,_language,_keyboardName,_languageCode, _packageID)
     {
       var p={'internalName':_internalName,'language':_language,'keyboardName':_keyboardName,'languageCode':_languageCode};
+      
+      // Utilized only by our embedded codepaths.
+      if(_packageID) {
+        p['package'] = _packageID;
+      }
       return util.callEvent('kmw.keyboardregistered',p);
     }
     
@@ -3375,8 +3381,7 @@ if(!window['keyman']['initialized']) {
      * @param       {string=}    PLgCode
      * @param       {boolean=}   saveCookie   
      */    
-    keymanweb._SetActiveKeyboard = function(PInternalName,PLgCode,saveCookie)
-    {
+    keymanweb._SetActiveKeyboard = function(PInternalName,PLgCode,saveCookie) {
       var n,Ln;
 
       // Set default language code
@@ -3490,14 +3495,25 @@ if(!window['keyman']['initialized']) {
 
               // Setup our default error-messaging callback if it should be implemented.
               if(!keymanweb.isEmbedded) {  // No error messaging if we're in embedded mode.
-                loadingStub.asyncLoader.callback = function(altString) {
+                loadingStub.asyncLoader.callback = function(altString, msgType) {
+                  var msg = altString || 'Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available.';
                   
                   // Thanks, Closure errors.  
                   if(!keymanweb.isEmbedded) {
                     util.wait(false);
-                    util.alert(altString || 'Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available.', function() {
+                    util.alert(altString || msg, function() {
                       keymanweb['setActiveKeyboard']('');
                     });
+                  }
+
+                  switch(msgType) { // in case we extend this later.
+                    case 'err':
+                      console.error(msg);
+                      break;
+                    case 'warn':
+                    default:
+                      console.warn(msg);
+                      break;
                   }
 
                   if(Ln > 0) {
@@ -3540,16 +3556,15 @@ if(!window['keyman']['initialized']) {
    *  @param  {Object}  kbdStub   keyboard stub to be loaded.
    *    
    **/      
-    keymanweb.installKeyboard = function(kbdStub)
-    {
+    keymanweb.installKeyboard = function(kbdStub) {
       var Lscript = util._CreateElement('SCRIPT');
       Lscript.charset="UTF-8";        // KMEW-89
       Lscript.type = 'text/javascript';
 
+      var pkgID   = kbdStub['KP'];    // Used by KMEA/KMEI (embedded).  We're fine if it's undefined and not embedded.
       var kbdFile = kbdStub['KF'];
       var kbdLang = kbdStub['KL'];
       var kbdName = kbdStub['KN'];
-
 
       // Add a handler for cases where the new <script> block fails to load.
       Lscript.addEventListener('error', function() {
@@ -3559,12 +3574,8 @@ if(!window['keyman']['initialized']) {
           kbdStub.asyncLoader.timer = null;
         }
 
-        // Do not output error messages when embedded.  (KMEA/KMEI)
-        if(!keymanweb.isEmbedded) {
-          // We already know the load has failed... why wait?
-          kbdStub.asyncLoader.callback('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '.');
-          console.log('Error:  cannot find the', kbdName, 'keyboard for', kbdLang, 'at', kbdFile + '.');
-        }
+        // We already know the load has failed... why wait?
+        kbdStub.asyncLoader.callback('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '.', 'warn');
         kbdStub.asyncLoader = null;
       }, false);
 
@@ -3587,8 +3598,7 @@ if(!window['keyman']['initialized']) {
             keymanweb.doBeforeKeyboardChange(kbd['KI'],kbdStub['KLC']);
             keymanweb._ActiveKeyboard=kbd;
 
-            if(keymanweb._LastActiveElement != null) 
-            {
+            if(keymanweb._LastActiveElement != null) {
               keymanweb._JustActivatedKeymanWebUI = 1;
               keymanweb._SetTargDir(keymanweb._LastActiveElement);            
             }
@@ -3604,23 +3614,22 @@ if(!window['keyman']['initialized']) {
               util.wait(false);
             }
           } // A handler portion for cases where the new <script> block loads, but fails to process.
-        } else if(!keymanweb.isEmbedded) {  // Do not output error messages when embedded.  (KMEA/KMEI)
-            kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.');
-            console.log('Error registering the', kbdName, 'keyboard for', kbdLang + '.');
+        } else {  // Output error messages even when embedded - they're useful when debugging the apps and KMEA/KMEI engines.
+            kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.', 'error');
         }
         kbdStub.asyncLoader = null; 
       }, false);
 
       // IE likes to instantly start loading the file when assigned to an element, so we do this after the rest
       // of our setup.
-      Lscript.src = keymanweb.getKeyboardPath(kbdFile);  
+      Lscript.src = keymanweb.getKeyboardPath(kbdFile, pkgID);
 
       try {                                  
         document.body.appendChild(Lscript);  
-        }
+      }
       catch(ex) {                                                     
         document.getElementsByTagName('head')[0].appendChild(Lscript);
-        }            
+      }            
     }
 
     /**
@@ -4234,6 +4243,8 @@ if(!window['keyman']['initialized']) {
         if(keymanweb._KeyboardStubs.length > 0) {
           // Select the first stub as our active keyboard.  This is set later for 'native' KMW.
           keymanweb._SetActiveKeyboard(keymanweb._KeyboardStubs[0]['KI'], keymanweb._KeyboardStubs[0]['KLC']);     
+        } else {
+          console.error("No keyboard stubs exist - cannot initialize keyboard!");
         }
 
         return;

@@ -9,8 +9,6 @@
 import UIKit
 import WebKit
 
-private let kmwFileName = "keyboard.html"
-
 // MARK: - UIViewController
 class KeymanWebViewController: UIViewController {
   weak var delegate: KeymanWebDelegate?
@@ -151,9 +149,13 @@ extension KeymanWebViewController: WKScriptMessageHandler {
 
       let dn = Int(fragment[dnRange.upperBound..<sRange.lowerBound])!
       let s = fragment[sRange.upperBound...]
+
+      // KMW uses dn == -1 to perform special processing of deadkeys.
+      // This is handled outside of Swift so we don't delete any characters.
+      let numCharsToDelete = max(0, dn)
       let newText = String(s).stringFromUTF16CodeUnits() ?? ""
-      insertText(self, numCharsToDelete: dn, newText: newText)
-      delegate?.insertText(self, numCharsToDelete: dn, newText: newText)
+      insertText(self, numCharsToDelete: numCharsToDelete, newText: newText)
+      delegate?.insertText(self, numCharsToDelete: numCharsToDelete, newText: newText)
     } else if fragment.hasPrefix("#showKeyPreview-") {
       let xKey = fragment.range(of: "+x=")!
       let yKey = fragment.range(of: "+y=")!
@@ -196,19 +198,12 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       for key in keyArray {
         let values = key.components(separatedBy: ":")
         switch values.count {
+        case 1:
+          subkeyIDs.append(values[0])
+          subkeyTexts.append("")
         case 2:
           subkeyIDs.append(values[0])
           subkeyTexts.append(values[1].stringFromUTF16CodeUnits()!)
-        case 1:
-          subkeyIDs.append(values[0])
-          var text = values[0]
-          if let index = text.index(of: "-") {
-            text = String(text[text.index(after: index)...])
-          }
-          if let index = text.index(of: "_") {
-            text = String(text[text.index(after: index)...])
-          }
-          subkeyTexts.append(text.stringFromUTF16CodeUnits()!)
         default:
           Manager.shared.kmLog("Unexpected subkey key: \(key)", checkDebugPrinting: false)
         }
@@ -254,7 +249,7 @@ extension KeymanWebViewController: WKNavigationDelegate {
     guard let url = webView.url else {
       return
     }
-    guard url.lastPathComponent == kmwFileName && (url.fragment?.isEmpty ?? true) else {
+    guard url.lastPathComponent == Resources.kmwFileName && (url.fragment?.isEmpty ?? true) else {
       return
     }
     keyboardLoaded(self)

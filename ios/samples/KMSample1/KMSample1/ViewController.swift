@@ -17,10 +17,14 @@ class ViewController: UIViewController, TextViewDelegate {
     Manager.shared.openURL = UIApplication.shared.openURL
     Manager.shared.isDebugPrintingOn = true
     Manager.shared.isKeymanHelpOn = false
-    Manager.shared.preloadLanguageFile(atPath: Bundle.main.path(forResource: "tamil99m-1.1", ofType: "js")!,
-                                       shouldOverwrite: true)
-    Manager.shared.preloadFontFile(atPath: Bundle.main.path(forResource: "aava1", ofType: "ttf")!,
-                                   shouldOverwrite: true)
+    do {
+      try Manager.shared.preloadKeyboardFile(at: Bundle.main.url(forResource: "tamil99m-1.1", withExtension: "js")!,
+                                             shouldOverwrite: true)
+      try Manager.shared.preloadFontFile(at: Bundle.main.url(forResource: "aava1", withExtension: "ttf")!,
+                                         shouldOverwrite: true)
+    } catch {
+      Manager.shared.kmLog("Error preloading: \(error)", checkDebugPrinting: false)
+    }
     FontManager.shared.registerCustomFonts()
 
     Manager.shared.addKeyboard(Defaults.keyboard)

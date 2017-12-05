@@ -61,6 +61,7 @@ public enum Resources {
   }()
 
   public static let oskFontFilename = "keymanweb-osk.ttf"
+  static let kmwFileName = "keyboard.html"
 }
 
 public enum Util {
@@ -78,4 +79,11 @@ public enum Util {
     let info = NSDictionary(contentsOf: url)!
     return info["CFBundleVersion"] as! String
   }()
+}
+
+public enum FileExtensions {
+  public static let javaScript = "js"
+  public static let trueTypeFont = "ttf"
+  public static let openTypeFont = "otf"
+  public static let configurationProfile = "mobileconfig"
 }
