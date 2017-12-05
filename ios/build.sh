@@ -137,6 +137,10 @@ update_bundle ( ) {
 update_bundle
 
 echo
+echo "Load dependencies with Carthage"
+carthage update --platform iOS
+
+echo
 echo "Building KMEI..."
 
 rm -r $BUILD_PATH/$CONFIG-universal 2>/dev/null
