@@ -142,6 +142,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     keymanWeb = KeymanWebViewController()
     keymanWeb.delegate = self
+    _ = keymanWeb.view
   }
 
   // MARK: - Keyboard management
@@ -816,10 +817,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   // MARK: - View management
-  // FIXME: Temporary
-  public func loadKeyboard() {
-    _ = keymanWeb.view
-  }
 
   /// Displays a list of available keyboards and allows a user to add/download new keyboards
   /// or remove existing ones.

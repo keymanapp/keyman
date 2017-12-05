@@ -26,7 +26,6 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
 
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    Manager.shared.loadKeyboard()
     title = "Keyman Demo"
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.resizeView),
