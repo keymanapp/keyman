@@ -2193,8 +2193,8 @@ begin
         ALanguage := ALanguages.ChildNodes[j];
 
         FLanguage := TPackageKeyboardLanguage.Create(Package);
-        FLanguage.ID := ALanguage.Attributes[SXML_PackageKeyboard_Language_ID];
-        FLanguage.Name := ALanguage.NodeValue;
+        FLanguage.ID := VarToStr(ALanguage.Attributes[SXML_PackageKeyboard_Language_ID]);
+        FLanguage.Name := VarToStr(ALanguage.NodeValue);
         keyboard.Languages.Add(FLanguage);
       end;
     end;

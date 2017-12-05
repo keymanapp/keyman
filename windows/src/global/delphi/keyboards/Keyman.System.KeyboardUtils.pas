@@ -23,7 +23,7 @@ var
   s: string;
 begin
   s := ChangeFileExt(ExtractFileName(FileName), '');
-  Result := TRegEx.IsMatch(s, '/^[a-z0-9_]+-([0-9]+)(\.[0-9+])+$/', [roIgnoreCase]);
+  Result := TRegEx.IsMatch(s, '^[a-z0-9_]+-([0-9]+)(\.[0-9+])+$', [roIgnoreCase]);
 end;
 
 class function TKeyboardUtils.KeyboardFileNameToID(filename: string): string;
@@ -33,12 +33,10 @@ begin
   ext := ExtractFileExt(FileName);
   if SameText(ext, '.kmx') or SameText(ext, '.kmp') then
     Result := ChangeFileExt(ExtractFileName(FileName), '')
-  else if SameText(ext, '.js') then
+  else if SameText(ext, '.js') and CouldJavascriptFileBeAKeyboardFile(FileName) then
   begin
     Result := ChangeFileExt(ExtractFileName(FileName), '');
-    if CouldJavascriptFileBeAKeyboardFile(Result)
-      then Result := Copy(Result, 1, Pos('-', Result)-1)
-      else Result := '';
+    Result := Copy(Result, 1, Pos('-', Result)-1);
   end
   else
     Result := '';

@@ -182,7 +182,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 681
     Height = 447
-    ActivePage = tabKeyboards
+    ActivePage = pageFiles
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -348,7 +348,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
       end
     end
-    object tabKeyboards: TTabSheet
+    object pageKeyboards: TTabSheet
       Caption = 'Keyboards'
       ImageIndex = 5
       object Panel5: TPanel
@@ -388,7 +388,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object lblKeyboardFiles: TLabel
           Left = 15
-          Top = 370
+          Top = 365
           Width = 26
           Height = 13
           Anchors = [akLeft, akBottom]
@@ -454,9 +454,9 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object memoKeyboardFiles: TMemo
           Left = 87
-          Top = 367
+          Top = 362
           Width = 157
-          Height = 41
+          Height = 46
           TabStop = False
           Anchors = [akLeft, akBottom]
           ParentColor = True
