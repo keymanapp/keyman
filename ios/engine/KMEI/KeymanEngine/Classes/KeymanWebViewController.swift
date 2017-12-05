@@ -374,7 +374,11 @@ extension KeymanWebViewController: KeymanWebDelegate {
 
 // MARK: - UIGestureRecognizerDelegate
 extension KeymanWebViewController: UIGestureRecognizerDelegate {
-  // UILongPressGestureRecognizer implementation to show sub keys in a subview
+  public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                                shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
+  }
+
   @objc func holdAction(_ sender: UILongPressGestureRecognizer) {
     switch sender.state {
     case .ended:
