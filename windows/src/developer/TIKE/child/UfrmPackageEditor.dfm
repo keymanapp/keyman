@@ -182,7 +182,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 681
     Height = 447
-    ActivePage = pageFiles
+    ActivePage = tabKeyboards
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -386,37 +386,29 @@ inherited frmPackageEditor: TfrmPackageEditor
           Caption = 'Configure language assignments and fonts for each keyboard'
           WordWrap = True
         end
-        object lblKeyboardTargets: TLabel
+        object lblKeyboardFiles: TLabel
           Left = 15
           Top = 370
-          Width = 39
+          Width = 26
           Height = 13
-          Caption = 'Targets:'
-          FocusControl = Edit2
-        end
-        object lblKeyboardFilePath: TLabel
-          Left = 15
-          Top = 306
-          Width = 47
-          Height = 13
-          Caption = 'File Path:'
-          FocusControl = Edit2
+          Anchors = [akLeft, akBottom]
+          Caption = 'Files:'
         end
         object lblKeyboardDescription: TLabel
           Left = 15
           Top = 338
           Width = 62
           Height = 13
+          Anchors = [akLeft, akBottom]
           Caption = 'Description:'
-          FocusControl = Edit2
         end
         object lblKeyboardVersion: TLabel
           Left = 15
           Top = 417
           Width = 41
           Height = 13
+          Anchors = [akLeft, akBottom]
           Caption = 'Version:'
-          FocusControl = Edit2
         end
         object lblKeyboardOSKFont: TLabel
           Left = 260
@@ -424,7 +416,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 73
           Height = 13
           Caption = 'Keyboard font'
-          FocusControl = Edit2
         end
         object lblKeyboardDisplayFont: TLabel
           Left = 260
@@ -432,7 +423,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 62
           Height = 13
           Caption = 'Display font'
-          FocusControl = Edit2
         end
         object lblKeyboardLanguages: TLabel
           Left = 260
@@ -440,87 +430,74 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 56
           Height = 13
           Caption = 'Languages'
-          FocusControl = Edit2
         end
         object lbKeyboards: TListBox
           Left = 15
           Top = 72
           Width = 229
-          Height = 225
+          Height = 249
           Anchors = [akLeft, akTop, akBottom]
           ItemHeight = 13
           TabOrder = 0
-          OnClick = lbFilesClick
+          OnClick = lbKeyboardsClick
         end
-        object Edit1: TEdit
+        object editKeyboardDescription: TEdit
           Left = 87
           Top = 335
           Width = 157
           Height = 21
           TabStop = False
-          Anchors = [akLeft, akTop, akRight]
+          Anchors = [akLeft, akBottom]
           ParentColor = True
           ReadOnly = True
           TabOrder = 2
         end
-        object Edit2: TEdit
-          Left = 87
-          Top = 303
-          Width = 157
-          Height = 21
-          TabStop = False
-          Anchors = [akLeft, akTop, akRight]
-          ParentColor = True
-          ReadOnly = True
-          TabOrder = 3
-        end
-        object Memo1: TMemo
+        object memoKeyboardFiles: TMemo
           Left = 87
           Top = 367
           Width = 157
           Height = 41
           TabStop = False
-          Anchors = [akLeft, akTop, akRight]
+          Anchors = [akLeft, akBottom]
           ParentColor = True
           ReadOnly = True
           TabOrder = 1
         end
-        object Edit3: TEdit
+        object editKeyboardVersion: TEdit
           Left = 87
           Top = 414
           Width = 157
           Height = 21
           TabStop = False
-          Anchors = [akLeft, akTop, akRight]
+          Anchors = [akLeft, akBottom]
           ParentColor = True
           ReadOnly = True
-          TabOrder = 4
+          TabOrder = 3
         end
-        object ComboBox1: TComboBox
+        object cbKeyboardOSKFont: TComboBox
           Left = 339
           Top = 72
           Width = 230
           Height = 21
-          TabOrder = 5
-          Text = 'ComboBox1'
+          TabOrder = 4
         end
-        object ComboBox2: TComboBox
+        object cbKeyboardDisplayFont: TComboBox
           Left = 339
           Top = 99
           Width = 230
           Height = 21
-          TabOrder = 6
-          Text = 'ComboBox1'
+          TabOrder = 5
         end
-        object StringGrid1: TStringGrid
+        object gridKeyboardLanguages: TStringGrid
           Left = 260
           Top = 144
           Width = 309
           Height = 257
+          Anchors = [akLeft, akTop, akRight, akBottom]
           ColCount = 3
           FixedCols = 0
           RowCount = 9
-          TabOrder = 7
+          TabOrder = 6
           ColWidths = (
             78
             64
@@ -536,13 +513,14 @@ inherited frmPackageEditor: TfrmPackageEditor
             24
             24)
         end
-        object Button1: TButton
+        object cmdKeyboardSearchForLanguage: TButton
           Left = 436
           Top = 412
           Width = 133
           Height = 25
+          Anchors = [akRight, akBottom]
           Caption = 'Search for language...'
-          TabOrder = 8
+          TabOrder = 7
         end
       end
     end

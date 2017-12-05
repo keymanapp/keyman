@@ -91,10 +91,9 @@ type
   TPackageBaseObject = class
   strict private
     FPackage: TPackage;
-  protected
-    property Package: TPackage read FPackage;
   public
     constructor Create(APackage: TPackage); virtual;
+    property Package: TPackage read FPackage;
   end;
 
   TPackageBaseNotifyObject = class(TPackageBaseObject)

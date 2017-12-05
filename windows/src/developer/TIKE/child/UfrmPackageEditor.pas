@@ -150,21 +150,19 @@ type
     Panel5: TPanel;
     Label2: TLabel;
     Label3: TLabel;
-    lblKeyboardTargets: TLabel;
-    lblKeyboardFilePath: TLabel;
+    lblKeyboardFiles: TLabel;
     lblKeyboardDescription: TLabel;
     lbKeyboards: TListBox;
-    Edit1: TEdit;
-    Edit2: TEdit;
-    Memo1: TMemo;
+    editKeyboardDescription: TEdit;
+    memoKeyboardFiles: TMemo;
     lblKeyboardVersion: TLabel;
-    Edit3: TEdit;
+    editKeyboardVersion: TEdit;
     lblKeyboardOSKFont: TLabel;
-    ComboBox1: TComboBox;
-    ComboBox2: TComboBox;
+    cbKeyboardOSKFont: TComboBox;
+    cbKeyboardDisplayFont: TComboBox;
     lblKeyboardDisplayFont: TLabel;
-    StringGrid1: TStringGrid;
-    Button1: TButton;
+    gridKeyboardLanguages: TStringGrid;
+    cmdKeyboardSearchForLanguage: TButton;
     lblKeyboardLanguages: TLabel;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
@@ -204,6 +202,7 @@ type
       var AllowChange: Boolean);
     procedure pagesChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure lbKeyboardsClick(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -259,6 +258,7 @@ uses
   kpsProjectFile,
   OnlineConstants,
   Keyman.System.PackageInfoRefreshKeyboards,
+  Keyman.System.KeyboardUtils,
   Project,
   ProjectFileType,
   ShellApi,
@@ -716,6 +716,55 @@ begin
       editFileType.Text := '';
       editFilePath.Text := '';
     end;
+  finally
+    Dec(FSetup);
+  end;
+end;
+
+procedure TfrmPackageEditor.lbKeyboardsClick(Sender: TObject);
+var
+  e: Boolean;
+  k: TPackageKeyboard;
+  i: Integer;
+begin
+  Inc(FSetup);
+  try
+    e := lbKeyboards.ItemIndex >= 0;
+    lblKeyboardDescription.Enabled := e;
+    editKeyboardDescription.Enabled := e;
+    lblKeyboardFiles.Enabled := e;
+    memoKeyboardFiles.Enabled := e;
+    lblKeyboardVersion.Enabled := e;
+    editKeyboardVersion.Enabled := e;
+    lblKeyboardOSKFont.Enabled := e;
+    cbKeyboardOSKFont.Enabled := e;
+    lblKeyboardDisplayFont.Enabled := e;
+    cbKeyboardDisplayFont.Enabled := e;
+    lblKeyboardLanguages.Enabled := e;
+    gridKeyboardLanguages.Enabled := e;
+    cmdKeyboardSearchForLanguage.Enabled := e;
+
+    if not e then
+    begin
+      editKeyboardDescription.Text := '';
+      editKeyboardVersion.Text := '';
+      memoKeyboardFiles.Text := '';
+      cbKeyboardOSKFont.ItemIndex := -1;
+      cbKeyboardDisplayFont.ItemIndex := -1;
+      gridKeyboardLanguages.RowCount := 1;
+      Exit;
+    end;
+
+    k := lbKeyboards.Items.Objects[lbKeyboards.ItemIndex] as TPackageKeyboard;
+    memoKeyboardFiles.Text := '';
+    editKeyboardDescription.Text := k.Name;
+    editKeyboardVersion.Text := k.Version;
+
+    for i := 0 to pack.Files.Count - 1 do
+      if SameText(TKeyboardUtils.KeyboardFileNameToID(pack.Files[i].FileName), k.ID) then
+      begin
+        memoKeyboardFiles.Lines.Add(ExtractFileName(pack.Files[i].FileName));
+      end;
   finally
     Dec(FSetup);
   end;
@@ -1200,12 +1249,20 @@ end;
   Finally, updates the Keyboards tab
 *)
 procedure TfrmPackageEditor.RefreshKeyboardList;
+var
+  i: Integer;
 begin
   with TPackageInfoRefreshKeyboards.Create(pack) do
   try
     Execute;
   finally
     Free;
+  end;
+
+  lbKeyboards.Clear;
+  for i := 0 to pack.Keyboards.Count - 1 do
+  begin
+    lbKeyboards.Items.AddObject(pack.Keyboards[i].ID, pack.Keyboards[i]);
   end;
 end;
 

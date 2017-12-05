@@ -25,10 +25,14 @@ type
 implementation
 
 uses
+  System.Classes,
   System.RegularExpressions,
   System.SysUtils,
+  System.Types,
 
   Keyman.System.KMXFileLanguages,
+  Keyman.System.KeyboardJSInfo,
+  Keyman.System.KeyboardUtils,
   kmxfile;
 
 constructor TPackageInfoRefreshKeyboards.Create(Apack: TPackage);
@@ -49,12 +53,6 @@ var
   i: Integer;
   k: TPackageKeyboard;
 begin
-  with TPackageInfoRefreshKeyboards.Create(pack) do
-  try
-    Execute;
-  finally
-    Free;
-  end;
   // Remove keyboards that do not have corresponding files
   for i := pack.Keyboards.Count - 1 downto 0 do
   begin
@@ -105,22 +103,62 @@ end;
 
 class procedure TPackageInfoRefreshKeyboards.FillKeyboardLanguages(f: TPackageContentFile; k: TPackageKeyboard);
 var
-  ki: TKeyboardInfo;
-  FEthnologueCodes: WideString;
+  codes: TStringDynArray;
+  lang: TPackageKeyboardLanguage;
+  i: Integer;
 begin
   //
   k.Languages.Clear;
   if f.FileType = ftKeymanFile then
   begin
-    // ...
+    try
+      codes := TKMXFileLanguages.GetKMXFileBCP47Codes(f.FileName);
+      for i := 0 to High(codes) do
+      begin
+        lang := TPackageKeyboardLanguage.Create(f.Package);
+        lang.ID := codes[i];
+        k.Languages.Add(lang);
+      end;
+    except
+      on E:EKMXError do ;
+    end;
+  end
+  else if f.FileType = ftJavascript then
+  begin
+    // There's nothing we can extract from the Javascript
   end;
 end;
 
 class procedure TPackageInfoRefreshKeyboards.FillKeyboardDetails(f: TPackageContentFile; k: TPackageKeyboard);
+var
+  ki: TKeyboardInfo;
 begin
-  //
-      k.Name := ;;
-      k.Version := ;;
+  k.ID := TKeyboardUtils.KeyboardFileNameToID(f.FileName);
+
+  if f.FileType = ftKeymanFile then
+  begin
+    try
+      GetKeyboardInfo(f.FileName, False, ki, False);
+      k.Name := ki.KeyboardName;
+      k.Version := ki.KeyboardVersion;
+    except
+      on E:EKMXError do ;
+    end;
+  end
+  else if f.FileType = ftJavascript then
+  begin
+    try
+      with TKeyboardJSInfo.Create(f.FileName) do
+      try
+        k.Name := Name;
+        k.Version := Version;
+      finally
+        Free;
+      end;
+    except
+      on E:EFOpenError do ;
+    end;
+  end;
 end;
 
 (**
@@ -145,10 +183,13 @@ begin
       Exit(pack.Files[i]);
 
     // If filename matches id-version.js
-    if SameText(ExtractFileExt(pack.Files[i].FileName), '.js') and
-        SameText(Copy(f, 1, Length(id)), id) and
-        (Copy(f, Length(id)+1, 1) = '-') then
-      Exit(pack.Files[i]);
+    if (pack.Files[i].FileType = ftJavascript) then
+    begin
+      if SameText(ExtractFileExt(pack.Files[i].FileName), '.js') and
+          SameText(Copy(f, 1, Length(id)), id) and
+          (Copy(f, Length(id)+1, 1) = '-') then
+        Exit(pack.Files[i]);
+    end;
   end;
 
   Result := nil;
@@ -157,17 +198,8 @@ end;
 function TPackageInfoRefreshKeyboards.FindKeyboardByFileName(const name: string): TPackageKeyboard;
 var
   s: string;
-  i: Integer;
 begin
-  s := ExtractFileName(name);
-  if SameText(ExtractFileExt(s), '.js') then
-  begin
-    s := ChangeFileExt(s, '');
-    s := Copy(s, 1, Pos('-', s)-1);
-  end
-  else
-    s := ChangeFileExt(s, '');
-
+  s := TKeyboardUtils.KeyboardFileNameToID(name);
   Result := pack.Keyboards.ItemByID(s);
 end;
 
