@@ -77,3 +77,10 @@ public enum Util {
     return info["CFBundleVersion"] as! String
   }()
 }
+
+public enum FileExtensions {
+  public static let javaScript = "js"
+  public static let trueTypeFont = "ttf"
+  public static let openTypeFont = "otf"
+  public static let configurationProfile = "mobileconfig"
+}
