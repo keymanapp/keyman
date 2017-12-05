@@ -9,8 +9,6 @@
 import UIKit
 import WebKit
 
-private let kmwFileName = "keyboard.html"
-
 // MARK: - UIViewController
 class KeymanWebViewController: UIViewController {
   weak var delegate: KeymanWebDelegate?
@@ -251,7 +249,7 @@ extension KeymanWebViewController: WKNavigationDelegate {
     guard let url = webView.url else {
       return
     }
-    guard url.lastPathComponent == kmwFileName && (url.fragment?.isEmpty ?? true) else {
+    guard url.lastPathComponent == Resources.kmwFileName && (url.fragment?.isEmpty ?? true) else {
       return
     }
     keyboardLoaded(self)

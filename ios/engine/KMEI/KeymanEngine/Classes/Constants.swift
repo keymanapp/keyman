@@ -59,6 +59,8 @@ public enum Resources {
     let frameworkBundle =  Bundle(identifier: "org.sil.Keyman.ios.Engine")!
     return Bundle(path: frameworkBundle.path(forResource: "Keyman", ofType: "bundle")!)!
   }()
+
+  static let kmwFileName = "keyboard.html"
 }
 
 public enum Util {
