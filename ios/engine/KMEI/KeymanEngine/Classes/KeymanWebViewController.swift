@@ -199,11 +199,19 @@ extension KeymanWebViewController: WKScriptMessageHandler {
         let values = key.components(separatedBy: ":")
         switch values.count {
         case 1:
-          subkeyIDs.append(values[0])
-          subkeyTexts.append("")
+          let id = values[0]
+          subkeyIDs.append(id)
+          // id is in the form layer-keyID. We only process keyIDs with prefix U_.
+          if let index = id.range(of: "-U_", options: .backwards)?.upperBound,
+            let codepoint = UInt32(id[index...], radix: 16),
+            let scalar = Unicode.Scalar(codepoint) {
+            subkeyTexts.append(String(Character(scalar)))
+          } else {
+            subkeyTexts.append("")
+          }
         case 2:
           subkeyIDs.append(values[0])
-          subkeyTexts.append(values[1].stringFromUTF16CodeUnits()!)
+          subkeyTexts.append(values[1].stringFromUTF16CodeUnits() ?? "")
         default:
           Manager.shared.kmLog("Unexpected subkey key: \(key)", checkDebugPrinting: false)
         }
