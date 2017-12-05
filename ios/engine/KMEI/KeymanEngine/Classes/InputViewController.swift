@@ -51,13 +51,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open override var hasFullAccess: Bool {
-    return Manager.shared.canAccessSharedContainer()
+    return Storage.shared != nil
   }
 
   private var keyboardListCount: Int {
-    let userData = Manager.shared.activeUserDefaults()
-    let keyboardList = userData.userKeyboards
-    return keyboardList?.count ?? 0
+    return Storage.active.userDefaults.userKeyboards?.count ?? 0
   }
 
   private var expandedHeight: CGFloat {

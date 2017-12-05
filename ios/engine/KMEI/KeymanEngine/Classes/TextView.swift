@@ -248,7 +248,7 @@ extension TextView: UITextViewDelegate {
     let isRTL: Bool
     if let keyboardID = Manager.shared.keyboardID,
        let languageID = Manager.shared.languageID {
-      let keyboard = Manager.shared.activeUserDefaults().userKeyboard(withID: keyboardID, languageID: languageID)
+      let keyboard = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
       isRTL = keyboard?.isRTL ?? false
     } else {
       isRTL = false

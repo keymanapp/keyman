@@ -148,12 +148,12 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     view?.backgroundColor = bgColor
 
     // Check for configuration profiles/fonts to install
-    let kmFonts = Manager.shared.keymanFonts
-    var profilesByFontName = [String: String](minimumCapacity: kmFonts.count - 1)
-    for (filename, font) in kmFonts where filename != "keymanweb-osk.ttf" {
-      let fontName = font.name
-      let type = filename[filename.range(of: ".", options: .backwards)!.lowerBound...]
-      profilesByFontName[fontName] = filename.replacingOccurrences(of: type, with: ".mobileconfig")
+    FontManager.shared.registerCustomFonts()
+    let kmFonts = FontManager.shared.fonts
+    var profilesByFontName: [String: String] = [:]
+    for (url, font) in kmFonts where url.lastPathComponent != Resources.oskFontFilename {
+      let profile = url.deletingPathExtension().appendingPathExtension("mobileconfig").lastPathComponent
+      profilesByFontName[font.name] = profile
     }
 
     let customFonts = UIFont.familyNames.filter { !systemFonts.contains($0) && !($0 == "KeymanwebOsk") }
@@ -879,12 +879,15 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   private func profileName(withFont font: Font) -> String? {
-    return font.source.first { !($0.contains(".mobileconfig")) }
+    return font.source.first { $0.lowercased().hasSuffix(FileExtensions.configurationProfile) }
   }
 
   private func checkProfile(forKeyboardID kbID: String, languageID langID: String, doListCheck: Bool) {
     if kbID == Defaults.keyboard.id && langID == Defaults.keyboard.languageID {
       return
+    }
+    if profileName != nil {
+      return  // already installing a profile
     }
 
     guard let profile = profileName(withKeyboardID: kbID, languageID: langID) else {
