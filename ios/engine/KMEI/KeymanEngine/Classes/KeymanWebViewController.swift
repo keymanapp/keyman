@@ -118,18 +118,17 @@ extension KeymanWebViewController {
                    name: String,
                    languageID: String,
                    languageName: String,
-                   version: String,
+                   fileURL: URL,
                    font: String,
                    oskFont: String) {
     let escapedID = id.replacingOccurrences(of: "'", with: "\\'")
     let escapedName = name.replacingOccurrences(of: "'", with: "\\'")
     let escapedLanguageID = languageID.replacingOccurrences(of: "'", with: "\\'")
     let escapedLanguageName = languageName.replacingOccurrences(of: "'", with: "\\'")
-    let escapedVersion = version.replacingOccurrences(of: "'", with: "\\'")
 
     let jsString = """
     setKeymanLanguage('\(escapedName)','\(escapedID)','\(escapedLanguageName)','\(escapedLanguageID)',\
-    '\(escapedVersion)',\(font),\(oskFont));
+    '\(fileURL.absoluteString)',\(font),\(oskFont));
     """
     webView.evaluateJavaScript(jsString, completionHandler: nil)
   }

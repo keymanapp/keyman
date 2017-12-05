@@ -255,7 +255,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
 
     keymanWeb.setKeyboard(id: kb.id, name: kb.name, languageID: kb.languageID, languageName: kb.languageName,
-                          version: kbVersion, font: jsFont, oskFont: jsOskFont)
+                          fileURL: Storage.active.keyboardURL(for: kb), font: jsFont, oskFont: jsOskFont)
 
     let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
 

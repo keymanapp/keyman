@@ -39,6 +39,9 @@
                 kmw['getOskHeight'] = getOskHeight;
                 kmw['getOskWidth'] = getOskWidth;
                 kmw['setActiveElement']('ta');
+                kmw.getKeyboardPath = function(filename, package) {
+                    return filename;
+                };
             }
             
             function setDeviceType(deviceType) {
@@ -72,23 +75,20 @@
             }
             
             var keyboardOffset = 0;
-            function setKeymanLanguage(keyboardName,internalName,languageName,langId,version,font,oskFont) {
-                var kmw=window['keyman'];
-                // Defaults for mising arguments
-                switch(arguments.length)
-                {
-                    case 1:
-                    internalName=keyboardName;
-                    if(keyboardName == 'English')internalName='us';
-                    case 2:
-                    languageName=keyboardName;
-                    case 3:
-                    langId='';
-                }
+            function setKeymanLanguage(keyboardName, keyboardId, languageName, languageId, fileUrl, font, oskFont) {
+                var kmw = window.keyman;
 
-                kmw.interface['registerStub']({KN:keyboardName,KI:'Keyboard_'+internalName,KLC:langId,KL:languageName,KF:internalName+'-'+version+'.js',KFont:font,KOskFont:oskFont});
-                kmw['setActiveKeyboard']('Keyboard_'+internalName,langId);
-                kmw['osk']['show'](true);
+                kmw.interface.registerStub({
+                    KN: keyboardName,
+                    KI: 'Keyboard_' + keyboardId,
+                    KLC: languageId,
+                    KL: languageName,
+                    KF: fileUrl,
+                    KFont: font,
+                    KOskFont: oskFont
+                });
+                kmw.setActiveKeyboard('Keyboard_' + keyboardId, languageId);
+                kmw.osk.show(true);
             }
             
             var fragmentToggle = 0;
