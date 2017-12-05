@@ -224,28 +224,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     kmLog("Setting language: \(kb.languageID)_\(kb.id)", checkDebugPrinting: true)
 
-    // FIXME: kb.version is not respected. Ideally we should be able to trust that the version number in UserDefaults
-    // is-to-date but it is sometimes not updated.
-    guard let kbVersion = latestKeyboardFileVersion(withID: kb.id) else {
-      kmLog("Could not set keyboardID to \(kb.id) because the keyboard file does not exist",
-        checkDebugPrinting: false)
-      // Fallback to default keyboard if no keyboard is currently set.
-      if (self.keyboardID == nil || self.languageID == nil) && kb.id != Defaults.keyboard.id {
-        _ = setKeyboard(Defaults.keyboard)
-      }
-      return false
-    }
-
     self.languageID = kb.languageID
     self.keyboardID = kb.id
-
-    let jsFont = self.jsFont(fromFont: kb.font) ?? "undefined"
-    let jsOskFont: String
-    if let oskFont = kb.oskFont {
-      jsOskFont = self.jsFont(fromFont: oskFont) ?? "undefined"
-    } else {
-      jsOskFont = jsFont
-    }
 
     if let fontFilename = kb.font?.source.first(where: { $0.hasFontExtension }) {
       _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forFilename: fontFilename))
@@ -255,7 +235,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
 
     keymanWeb.setKeyboard(id: kb.id, name: kb.name, languageID: kb.languageID, languageName: kb.languageName,
-                          fileURL: Storage.active.keyboardURL(for: kb), font: jsFont, oskFont: jsOskFont)
+                          fileURL: Storage.active.keyboardURL(for: kb), font: kb.font, oskFont: kb.oskFont)
 
     let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
 
@@ -391,35 +371,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return FontManager.shared.fontName(at: fontURL)
     }
     return nil
-  }
-
-  func jsFont(fromFont font: Font?) -> String? {
-    guard let font = font else {
-      return jsFont(fromFontDictionary: nil)
-    }
-    return jsFont(fromFontDictionary: [
-      Key.fontFamily: font.family,
-      Key.fontSource: font.source,
-      "size": font.size
-    ])
-  }
-
-  func jsFont(fromFontDictionary fontDict: [AnyHashable: Any]?) -> String? {
-    guard let fontDict = fontDict, !fontDict.isEmpty else {
-      return nil
-    }
-
-    let data: Data
-    do {
-      data = try JSONSerialization.data(withJSONObject: fontDict, options: [])
-    } catch {
-      kmLog("Failed to encode font dictionary as JSON: \(String(describing: fontDict))", checkDebugPrinting: false)
-      return nil
-    }
-
-    return String(data: data, encoding: .ascii)!
-      .replacingOccurrences(of: Key.fontFilename, with: Key.fontFiles)
-      .replacingOccurrences(of: Key.fontSource, with: Key.fontFiles)
   }
 
   // MARK: - Downloading keyboards

@@ -114,23 +114,53 @@ extension KeymanWebViewController {
     webView.evaluateJavaScript("setDeviceType('\(type)');", completionHandler: nil)
   }
 
+  private func fontObject(from font: Font?, keyboardID: String, isOsk: Bool) -> [String: Any]? {
+    guard let font = font else {
+      return nil
+    }
+    // family does not have to match the name in the font file. It only has to be unique.
+    return [
+      "family": "\(keyboardID)__\(isOsk ? "osk" : "display")",
+      "files": font.source
+    ]
+  }
+
   func setKeyboard(id: String,
                    name: String,
                    languageID: String,
                    languageName: String,
                    fileURL: URL,
-                   font: String,
-                   oskFont: String) {
-    let escapedID = id.replacingOccurrences(of: "'", with: "\\'")
-    let escapedName = name.replacingOccurrences(of: "'", with: "\\'")
-    let escapedLanguageID = languageID.replacingOccurrences(of: "'", with: "\\'")
-    let escapedLanguageName = languageName.replacingOccurrences(of: "'", with: "\\'")
+                   font: Font?,
+                   oskFont: Font?) {
+    var stub: [String: Any] = [
+      "KI": "Keyboard_\(id)",
+      "KN": name,
+      "KLC": languageID,
+      "KL": languageName,
+      "KF": fileURL.absoluteString,
+    ]
+    let displayFont = fontObject(from: font, keyboardID: id, isOsk: false)
+    let oskFont = fontObject(from: oskFont, keyboardID: id, isOsk: true) ?? displayFont
+    if let displayFont = displayFont {
+      stub["KFont"] = displayFont
+    }
+    if let oskFont = oskFont {
+      stub["KOskFont"] = oskFont
+    }
 
-    let jsString = """
-    setKeymanLanguage('\(escapedName)','\(escapedID)','\(escapedLanguageName)','\(escapedLanguageID)',\
-    '\(fileURL.absoluteString)',\(font),\(oskFont));
-    """
-    webView.evaluateJavaScript(jsString, completionHandler: nil)
+    let data: Data
+    do {
+      data = try JSONSerialization.data(withJSONObject: stub, options: [])
+    } catch {
+      Manager.shared.kmLog("Failed to serialize keyboard stub: \(error)", checkDebugPrinting: false)
+      return
+    }
+    guard let stubString = String(data: data, encoding: .utf8) else {
+      Manager.shared.kmLog("Failed to create stub string", checkDebugPrinting: false)
+      return
+    }
+
+    webView.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
   }
 }
 

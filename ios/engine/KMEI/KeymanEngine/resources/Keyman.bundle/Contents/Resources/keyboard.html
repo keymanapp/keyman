@@ -75,19 +75,11 @@
             }
             
             var keyboardOffset = 0;
-            function setKeymanLanguage(keyboardName, keyboardId, languageName, languageId, fileUrl, font, oskFont) {
+            function setKeymanLanguage(stub) {
                 var kmw = window.keyman;
 
-                kmw.interface.registerStub({
-                    KN: keyboardName,
-                    KI: 'Keyboard_' + keyboardId,
-                    KLC: languageId,
-                    KL: languageName,
-                    KF: fileUrl,
-                    KFont: font,
-                    KOskFont: oskFont
-                });
-                kmw.setActiveKeyboard('Keyboard_' + keyboardId, languageId);
+                kmw.interface.registerStub(stub);
+                kmw.setActiveKeyboard(stub.KI, stub.KLC);
                 kmw.osk.show(true);
             }
             
