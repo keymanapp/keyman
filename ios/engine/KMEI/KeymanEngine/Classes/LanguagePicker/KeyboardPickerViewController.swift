@@ -194,9 +194,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
       // Update keyboard version
       for keyboard in keyboards {
-        if let currentKbInfo = Manager.shared.keyboardsInfo?[keyboard.id] {
-          Manager.shared.updateKeyboardVersion(forID: keyboard.id, newKeyboardVersion: currentKbInfo.version)
-        }
+        Manager.shared.updateUserKeyboards(with: keyboard)
       }
 
       updateQueue!.remove(at: 0)
@@ -275,7 +273,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func loadUserKeyboards() {
-    let userData = Manager.shared.activeUserDefaults()
+    let userData = Storage.active.userDefaults
 
     if let userKeyboards = userData.userKeyboards {
       self.userKeyboards = userKeyboards
@@ -334,7 +332,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func checkUpdates() -> Bool {
-    if Manager.shared.keyboardsInfo == nil {
+    if Manager.shared.apiKeyboardRepository.languages == nil {
       return false
     }
 
@@ -402,7 +400,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   func showAddKeyboard() {
     let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
     button?.isEnabled = false
-    let vc = LanguageViewController()
+    let vc = LanguageViewController(Manager.shared.apiKeyboardRepository)
     navigationController?.pushViewController(vc, animated: true)
     setIsDoneButtonEnabled(true)
   }
