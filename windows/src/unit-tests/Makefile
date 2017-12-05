@@ -4,7 +4,7 @@
 
 # ----------------------------------------------------------------------
 
-TARGETS=package-info kmx-file-languages
+TARGETS=package-info kmx-file-languages keyboard-js-info
 
 test: 
     $(MAKE) -DTARGET=test $(TARGETS)
@@ -19,6 +19,10 @@ package-info:
 
 kmx-file-languages:
     cd $(ROOT)\src\unit-tests\kmx-file-languages
+    $(MAKE) $(TARGET)
+
+keyboard-js-info:
+    cd $(ROOT)\src\unit-tests\keyboard-js-info
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
