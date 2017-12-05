@@ -60,6 +60,7 @@ public enum Resources {
     return Bundle(path: frameworkBundle.path(forResource: "Keyman", ofType: "bundle")!)!
   }()
 
+  public static let oskFontFilename = "keymanweb-osk.ttf"
   static let kmwFileName = "keyboard.html"
 }
 

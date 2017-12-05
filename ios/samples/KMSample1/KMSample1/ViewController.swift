@@ -25,9 +25,9 @@ class ViewController: UIViewController, TextViewDelegate {
     } catch {
       Manager.shared.kmLog("Error preloading: \(error)", checkDebugPrinting: false)
     }
-    Manager.shared.registerCustomFonts()
+    FontManager.shared.registerCustomFonts()
 
-    Manager.shared.addKeyboard(Constants.defaultKeyboard)
+    Manager.shared.addKeyboard(Defaults.keyboard)
     let kb = InstallableKeyboard(id: "tamil99m",
                                  name: "Tamil 99M",
                                  languageID: "tam",
