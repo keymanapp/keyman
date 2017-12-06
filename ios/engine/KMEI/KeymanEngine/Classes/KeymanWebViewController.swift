@@ -92,6 +92,10 @@ extension KeymanWebViewController {
     }
   }
 
+  func resetContext() {
+    webView.evaluateJavaScript("resetContext();")
+  }
+
   func setText(_ text: String?) {
     var text = text ?? ""
     text = text.replacingOccurrences(of: "\\", with: "\\\\")
