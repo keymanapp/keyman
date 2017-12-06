@@ -8,33 +8,9 @@
         <ExecuteProgram></ExecuteProgram>
         <ReadMeFile>readme.htm</ReadMeFile>
         <GraphicFile>sideimage.bmp</GraphicFile>
-        <MSIFileName></MSIFileName>
-        <MSIOptions></MSIOptions>
+        <MSIFileName>keyman.msi</MSIFileName>
+        <MSIOptions>(none)</MSIOptions>
     </Options>
-    <Buttons>
-        <Button>
-            <ButtonType>install</ButtonType>
-            <Caption>&amp;Install</Caption>
-            <URL></URL>
-            <Left>0</Left>
-            <Top>0</Top>
-        </Button>
-        <Button>
-            <ButtonType>cancel</ButtonType>
-            <Caption>Cancel</Caption>
-            <URL></URL>
-            <Left>0</Left>
-            <Top>0</Top>
-        </Button>
-        <Button>
-            <ButtonType>about</ButtonType>
-            <Caption>&amp;About...</Caption>
-            <URL></URL>
-            <Left>0</Left>
-            <Top>0</Top>
-        </Button>
-    </Buttons>
-    <Registry />
     <StartMenu>
         <Folder>GFF Amharic Keyboard</Folder>
         <AddUninstallEntry />
@@ -42,8 +18,8 @@
             <Item>
                 <Name>Welcome</Name>
                 <FileName>..\..\..\gff\gff_amh_7\source\welcome.htm</FileName>
-                <Arguments></Arguments>
-                <Icon></Icon>
+                <Arguments>(arguments)</Arguments>
+                <Icon>(icon)</Icon>
                 <Location>psmelStartMenu</Location>
             </Item>
             <Item>
@@ -235,5 +211,40 @@
             <FileType>.kmx</FileType>
         </File>
     </Files>
-    <Strings />
+    <Strings>
+      <String Name="ssFontSize_Dialog" Value="16"/>
+      <String Name="ssFontSize_Title" Value="24"/>
+      <String Name="ssFontSize_InstallButton" Value="18"/>
+      <String Name="ssFontName_Dialog" Value=""/>
+      <String Name="ssFontName_Title" Value=""/>
+      <String Name="ssFontName_InstallButton" Value=""/>
+      <String Name="ssApplicationTitle" Value="Tavulteoft Keyman Desktop Setup"/>
+      <String Name="ssTitle" Value="%0:s Setup"/>
+      <String Name="ssWelcome_Keyboards" Value="Setup will install %0:s and the following keyboards:"/>
+      <String Name="ssWelcome_Plain" Value="Setup will install %0:s"/>
+      <String Name="ssCheckForUpdates" Value="Check for &amp;updates online before installing"/>
+      <String Name="ssInstallButton" Value="&amp;Install Keyman Desktop"/>
+      <String Name="ssExitButton" Value="E&amp;xit"/>
+      <String Name="ssPackageMissing" Value="Package %0:s (%1:s) is missing.  Setup can continue but will not install this package."/>
+      <String Name="ssErrorDownloadingUpdate" Value="Error %0:d downloading update from server"/>
+      <String Name="ssErrorUnableToContactServer" Value="Unable to contact server"/>
+      <String Name="ssErrorUnableToContactServerDetailed" Value="Unable to contact server, error was: %0:s"/>
+      <String Name="ssStatusCheckingWindowsInstaller" Value="Checking Windows Installer version"/>
+      <String Name="ssStatusCheckingInternetExplorer" Value="Checking Internet Explorer version"/>
+      <String Name="ssStatusCheckingMSXML" Value="Checking MSXML version"/>
+      <String Name="ssStatusCheckingForUpdates" Value="Checking for updates online"/>
+      <String Name="ssStatusInstalling" Value="Installing Keyman Desktop"/>
+      <String Name="ssStatusInstallingPackage" Value="Installing package %0:s"/>
+      <String Name="ssStatusComplete" Value="Installation Complete"/>
+      <String Name="ssQueryUpdateWindowsInstaller" Value="An updated version of Windows Installer is required to install Keyman Desktop.  Do you want to download and install it now?"/>
+      <String Name="ssQueryUpdateInternetExplorer" Value="Internet Explorer 5.5 or later is required to install Keyman Desktop.  Do you want to download it now?"/>
+      <String Name="ssQueryUpdateMSXML" Value="MSXML 3.0 is required to install Keyman Desktop.  Do you want to download it now?"/>
+      <String Name="ssQueryUpdateVersion" Value="Version %1:s of Keyman Desktop has been released and is available for download.  This update is %0:dKB.  Do you want to download and install the updated version (recommended)?"/>
+      <String Name="ssQueryUpdatePackage" Value="The package %0:s is already installed.  Do you wish to update it now?"/>
+      <String Name="ssQueryRestart" Value="You must restart Windows before Setup can complete.  When you restart Windows, Setup will continue.  Restart now?"/>
+      <String Name="ssErrorUnableToAutomaticallyRestart" Value="Windows was not able to be automatically restarted.  You should restart Windows before you try and start Keyman."/>
+      <String Name="ssRedistIEUpdateRequired" Value="Internet Explorer 5.5 or later is required to install Keyman Desktop."/>
+      <String Name="ssMustRestart" Value="You must restart Windows to complete Setup.  When you restart Windows, Setup will finish."/>
+      <String Name="ssRedistRequired" Value="A redistributable %0:s is required but is not available in the install path.  This redistributable can be downloaded from the Keyman website."/>
+    </Strings>
 </Package>

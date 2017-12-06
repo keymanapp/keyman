@@ -291,6 +291,26 @@ begin
       )
     );
   end;
+
+  Assert.AreEqual(k1.Strings.Count, k2.Strings.Count);
+  for i := 0 to k1.Strings.Count - 1 do
+    Assert.AreEqual(k1.Strings[i], k2.Strings[i]);
+
+  Assert.AreEqual(k1.StartMenu.Path, k2.StartMenu.Path);
+  Assert.AreEqual(k1.StartMenu.DoCreate, k2.StartMenu.DoCreate);
+  Assert.AreEqual(k1.StartMenu.AddUninstallEntry, k2.StartMenu.AddUninstallEntry);
+  Assert.AreEqual(k1.StartMenu.Entries.Count, k2.StartMenu.Entries.Count);
+  for i := 0 to k1.StartMenu.Entries.Count - 1 do
+  begin
+    Assert.AreEqual(k1.StartMenu.Entries[i].Name, k2.StartMenu.Entries[i].Name);
+    Assert.AreEqual(k1.StartMenu.Entries[i].Prog, k2.StartMenu.Entries[i].Prog);
+    Assert.AreEqual(k1.StartMenu.Entries[i].Params, k2.StartMenu.Entries[i].Params);
+    Assert.AreEqual(k1.StartMenu.Entries[i].Icon, k2.StartMenu.Entries[i].Icon);
+    Assert.AreEqual(k1.StartMenu.Entries[i].Location, k2.StartMenu.Entries[i].Location);
+  end;
+
+  Assert.AreEqual(k1.KPSOptions.MSIFileName, k2.KPSOptions.MSIFileName);
+  Assert.AreEqual(k1.KPSOptions.MSIOptions, k2.KPSOptions.MSIOptions);
 end;
 
 
