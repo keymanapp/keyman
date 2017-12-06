@@ -166,18 +166,30 @@ begin
 
   kmpinf := TKMPInfFile.Create;
   try
-    { Create KMP.INF }
+    { Create KMP.INF and KMP.JSON }
 
     kmpinf.Assign(pack);
     kmpinf.RemoveFilePaths;
-    kmpinf.FileName := FTempPath + '\kmp.inf';
 
     psf := TPackageContentFile.Create(kmpinf);
     psf.FileName := 'kmp.inf';
     psf.Description := 'Package information';
     psf.CopyLocation := pfclPackage;
+
     kmpinf.Files.Add(psf);
+
+    psf := TPackageContentFile.Create(kmpinf);
+    psf.FileName := 'kmp.json';
+    psf.Description := 'Package information (JSON)';
+    psf.CopyLocation := pfclPackage;
+
+    kmpinf.Files.Add(psf);
+
+    kmpinf.FileName := FTempPath + '\kmp.inf';
     kmpinf.SaveIni;
+
+    kmpinf.FileName := FTempPath + '\kmp.json';
+    kmpinf.SaveJSON;
   finally
     kmpinf.Free;
   end;
@@ -194,6 +206,7 @@ begin
       try
         Open(FOutputFilename, TZipMode.zmWrite);
         Add(FTempPath + '\kmp.inf');
+        Add(FTempPath + '\kmp.json');
         for i := 0 to pack.Files.Count - 1 do
         begin
           if not FileExists(pack.Files[i].FileName) then
