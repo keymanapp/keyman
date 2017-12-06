@@ -12,7 +12,6 @@ build:
 
 clean: def-clean
     -rd /s/q Win32
-    -del dunitx-results.xml
     -del test\*.out.*
 
 !include ..\..\Target.mak
