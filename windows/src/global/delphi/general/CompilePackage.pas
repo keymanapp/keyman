@@ -166,7 +166,7 @@ begin
 
   kmpinf := TKMPInfFile.Create;
   try
-    { Create KMP.INF }
+    { Create KMP.INF and KMP.JSON }
 
     kmpinf.Assign(pack);
     kmpinf.RemoveFilePaths;

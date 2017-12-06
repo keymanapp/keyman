@@ -140,6 +140,9 @@ if(!window['keyman']['initialized']) {
       }
 
       // If no language code has been defined, and no stub has been registered for this keyboard, register with empty string as the language code
+      if(typeof(Pstub['KP']) == 'undefined') {
+        Pstub['KP'] = '';
+      }
       if(typeof(Pstub['KLC']) == 'undefined') {
         Pstub['KLC'] = '';
       }
@@ -164,7 +167,7 @@ if(!window['keyman']['initialized']) {
       // Reload this keyboard if it was the last active keyboard and 
       // make any changes needed by UI for new keyboard stub
       // (Uncommented for Build 360)
-      keymanweb.doKeyboardRegistered(Pstub['KI'],Pstub['KL'],Pstub['KN'],Pstub['KLC']);
+      keymanweb.doKeyboardRegistered(Pstub['KI'],Pstub['KL'],Pstub['KN'],Pstub['KLC'],Pstub['KP']);
 
       return null;
     }

@@ -35,8 +35,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       return tableList
     }
 
-    let userData = Manager.shared.activeUserDefaults()
-    let keyboardList = userData.userKeyboards
+    let keyboardList = Storage.active.userDefaults.userKeyboards
 
     let titleCloseButton: String
     if let closeButtonTitle = closeButtonTitle {
@@ -50,8 +49,8 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       _tableList = keyboardList
       _tableList!.append(titleCloseButton)
     } else {
-      var keyboard = Constants.defaultKeyboard
-      if let version = Manager.shared.latestKeyboardFileVersion(withID: Constants.defaultKeyboard.id) {
+      var keyboard = Defaults.keyboard
+      if let version = Manager.shared.latestKeyboardFileVersion(withID: Defaults.keyboard.id) {
         keyboard.version = version
       }
       _tableList = [keyboard]
@@ -61,9 +60,8 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
   }
 
   init(keyFrame frame: CGRect, inputViewController: InputViewController, closeButtonTitle: String?) {
-    let isSystemKeyboard = Manager.shared.isSystemKeyboard
     let isPortrait: Bool
-    if isSystemKeyboard {
+    if Util.isSystemKeyboard {
       isPortrait = InputViewController.isPortrait
     } else {
       isPortrait = UIDevice.current.orientation.isPortrait

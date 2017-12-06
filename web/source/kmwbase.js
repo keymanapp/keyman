@@ -93,7 +93,7 @@ if(!window['keyman']['loaded']) {
     // Stub functions (defined later in code only if required)
     keymanweb.setDefaultDeviceOptions = function(opt){}     
     keymanweb.getStyleSheetPath = function(s){return s;}
-    keymanweb.getKeyboardPath=function(f){return f;}  
+    keymanweb.getKeyboardPath=function(f, p){return f;}
     keymanweb.KC_ = function(n, ln, Pelem){return '';} 
     keymanweb.handleRotationEvents = function(){}
     keymanweb.alignInputs = function(b){}
@@ -1094,14 +1094,18 @@ if(!window['keyman']['loaded']) {
      * @param       {Event}      e        event
      * @return      {Object}              HTML element
      */       
-    util.eventTarget = function(e)
-    {
-      if(e && e.target)        // most browsers
+    util.eventTarget = function(e) {
+      if(!e) {
+        return null;
+      } else if (e.target) {       // most browsers
         return e.target;
-      else if(window.event)     //IE 8 (and earlier)
+      } else if (e.srcElement) {
+        return e.srcElement;
+      } else if(window.event) { //IE 8 (and earlier)
         return window.event.srcElement;
-      else
+      } else {
         return null;            // shouldn't happen!
+      }
     }
 
     /**

@@ -71,12 +71,13 @@ uses
   System.Win.ComObj,
   Winapi.ActiveX,
 
+  Keyman.System.Standards.BCP47SuppressScriptRegistry,
+
   input_installlayoutortip,
   isadmin,
   keymanerrorcodes,
   KeymanPaths,
   RegistryKeys,
-  BCP47SuppressScriptRegistry,
   BCP47Tag,
   TempFileManager,
   utilexecute,

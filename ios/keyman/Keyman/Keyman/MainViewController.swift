@@ -52,9 +52,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var portRightMargin: CGFloat = 0.0
   private var lscpeLeftMargin: CGFloat = 0.0
   private var lscpeRightMargin: CGFloat = 0.0
-  private var loadTimer: Timer?
-  private var updateStatus: Int = 0  // TODO: Make into enum
-  private var didDownload: Bool = false
+  private var didDownload = false
+  private var didKeyboardLoad = false
 
   private var keyboardLoadedObserver: NotificationObserver?
   private var languagesUpdatedObserver: NotificationObserver?
@@ -100,14 +99,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       forName: Notifications.keyboardChanged,
       observer: self,
       function: MainViewController.keyboardChanged)
-    languagesUpdatedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.languagesUpdated,
-      observer: self,
-      function: MainViewController.languagesUpdated)
-    languagesDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.languagesDownloadFailed,
-      observer: self,
-      function: MainViewController.languagesDownloadFailed)
     keyboardPickerDismissedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardPickerDismissed,
       observer: self,
@@ -150,21 +141,19 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     screenHeight = screenRect.size.height
 
     // Setup Keyman Manager & fetch keyboards list
-    updateStatus = 0
-
     Manager.shared.canRemoveDefaultKeyboard = true
-    Manager.shared.fetchKeyboardsList()
+    Manager.shared.apiKeyboardRepository.fetch()
 
     let bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
     view?.backgroundColor = bgColor
 
     // Check for configuration profiles/fonts to install
-    let kmFonts = Manager.shared.keymanFonts
-    var profilesByFontName = [String: String](minimumCapacity: kmFonts.count - 1)
-    for (filename, font) in kmFonts where filename != "keymanweb-osk.ttf" {
-      let fontName = font.name
-      let type = filename[filename.range(of: ".", options: .backwards)!.lowerBound...]
-      profilesByFontName[fontName] = filename.replacingOccurrences(of: type, with: ".mobileconfig")
+    FontManager.shared.registerCustomFonts()
+    let kmFonts = FontManager.shared.fonts
+    var profilesByFontName: [String: String] = [:]
+    for (url, font) in kmFonts where url.lastPathComponent != Resources.oskFontFilename {
+      let profile = url.deletingPathExtension().appendingPathExtension("mobileconfig").lastPathComponent
+      profilesByFontName[font.name] = profile
     }
 
     let customFonts = UIFont.familyNames.filter { !systemFonts.contains($0) && !($0 == "KeymanwebOsk") }
@@ -228,7 +217,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textView.isUserInteractionEnabled = true
     textView.font = textView.font?.withSize(textSize)
     view?.addSubview(textView!)
-    textView.isEditable = false
 
     // Setup Info View
     infoView = InfoViewController()
@@ -256,6 +244,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textSizeController.addTarget(self, action: #selector(self.sliderValueChanged), for: .valueChanged)
 
     setNavBarButtons()
+    loadSavedUserText()
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -367,7 +356,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       textView.becomeFirstResponder()
     }
 
-    if !textView.isEditable {
+    if !didKeyboardLoad {
       showActivityIndicator()
     } else if shouldShowGetStarted {
       perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
@@ -461,9 +450,17 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   // MARK: - Keyman Notifications
-
   private func keyboardLoaded() {
-    startTimer()
+    didKeyboardLoad = true
+    dismissActivityIndicator()
+    textView.becomeFirstResponder()
+    if let launchUrl = launchUrl {
+      performAction(from: launchUrl)
+    } else {
+      if shouldShowGetStarted {
+        perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
+      }
+    }
   }
 
   private func keyboardChanged(_ kb: InstallableKeyboard) {
@@ -491,7 +488,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let userData = AppDelegate.activeUserDefaults()
     let userKeyboards = userData.userKeyboards
     if userKeyboards == nil || userKeyboards!.isEmpty {
-      Manager.shared.addKeyboard(Constants.defaultKeyboard)
+      Manager.shared.addKeyboard(Defaults.keyboard)
     }
 
     perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
@@ -512,14 +509,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                 cancelButtonTitle: "OK", otherButtonTitles: nil, tag: -1)
       launchUrl = nil
     }
-  }
-
-  private func languagesUpdated() {
-    updateStatus = 1
-  }
-
-  private func languagesDownloadFailed() {
-    updateStatus = -1
   }
 
   private func keyboardPickerDismissed() {
@@ -547,7 +536,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   @objc func launched(fromUrl notification: Notification) {
     if let url = notification.userInfo?[urlKey] as? URL, url.query != nil {
       launchUrl = url
-      if updateStatus > 0 {
+      if didKeyboardLoad {
         performAction(from: url)
       }
     } else {
@@ -792,49 +781,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     return view?.frame ?? CGRect.zero
   }
 
-  private func startTimer() {
-    if loadTimer == nil {
-      loadTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self,
-                                       selector: #selector(self.timerAction), userInfo: nil, repeats: true)
-    }
-  }
-
-  private func stopTimer() {
-    if let timer = loadTimer {
-      timer.invalidate()
-      loadTimer = nil
-    }
-  }
-
-  @objc func timerAction() {
-    if updateStatus == 1 {
-      stopTimer()
-
-      dismissActivityIndicator()
-
-      textView.isEditable = true
-      textView.becomeFirstResponder()
-
-      if let launchUrl = launchUrl {
-        performAction(from: launchUrl)
-      } else {
-        loadSavedUserText()
-        if shouldShowGetStarted {
-          perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
-        }
-      }
-    } else if updateStatus == -1 {
-      stopTimer()
-      dismissActivityIndicator()
-      loadSavedUserText()
-      textView.isEditable = true
-      textView.becomeFirstResponder()
-      if shouldShowGetStarted {
-        perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
-      }
-    }
-  }
-
   private func resetTextViewCursor() {
     textView.selectedRange = NSRange(location: 0, length: 0)
 
@@ -904,7 +850,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                 cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 2)
     } else if let kbID = params["keyboard"], let langID = params["language"] {
       // Query should include keyboard and language IDs to set the keyboard (first download if not available)
-      guard let keyboard = Manager.shared.repositoryKeyboard(withID: kbID, languageID: langID) else {
+      guard let keyboard = Manager.shared.apiKeyboardRepository.installableKeyboard(withID: kbID,
+                                                                                    languageID: langID) else {
         return
       }
 
@@ -932,12 +879,15 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   private func profileName(withFont font: Font) -> String? {
-    return font.source.first { !($0.contains(".mobileconfig")) }
+    return font.source.first { $0.lowercased().hasSuffix(FileExtensions.configurationProfile) }
   }
 
   private func checkProfile(forKeyboardID kbID: String, languageID langID: String, doListCheck: Bool) {
-    if kbID == Constants.defaultKeyboard.id && langID == Constants.defaultKeyboard.languageID {
+    if kbID == Defaults.keyboard.id && langID == Defaults.keyboard.languageID {
       return
+    }
+    if profileName != nil {
+      return  // already installing a profile
     }
 
     guard let profile = profileName(withKeyboardID: kbID, languageID: langID) else {
@@ -1110,7 +1060,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
 
     let firstKB = userKbs[0]
-    return firstKB.id == Constants.defaultKeyboard.id && firstKB.languageID == Constants.defaultKeyboard.languageID
+    return firstKB.id == Defaults.keyboard.id && firstKB.languageID == Defaults.keyboard.languageID
   }
 
   @objc func showKMWebBrowserView(_ sender: Any) {

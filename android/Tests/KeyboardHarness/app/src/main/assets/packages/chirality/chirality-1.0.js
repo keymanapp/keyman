@@ -12,6 +12,7 @@
 function Keyboard_chirality() {
   this.KI = "Keyboard_chirality";
   this.KN = "Development Chirality Test Keyboard";
+  this.KBVER = "1.0";
   this.KMBM = 0x001F;
   this.KV = {
       F: ' 1em "Arial"',
