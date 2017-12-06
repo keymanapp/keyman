@@ -1,14 +1,14 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{662A6FEA-4D2E-42E8-9292-1B3EE5A1E480}</ProjectGuid>
-        <MainSource>buildpkg.dpr</MainSource>
+        <ProjectGuid>{D450A640-6394-4474-BBBA-69C83A571086}</ProjectGuid>
+        <ProjectVersion>18.2</ProjectVersion>
+        <FrameworkType>None</FrameworkType>
+        <MainSource>PackageInfoTestSuite.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Console</AppType>
-        <FrameworkType>None</FrameworkType>
-        <ProjectVersion>18.2</ProjectVersion>
-        <Platform Condition="'$(Platform)'==''">Win32</Platform>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -18,194 +18,118 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
         <Cfg_1>true</Cfg_1>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
         <Cfg_2>true</Cfg_2>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
-        <Cfg_2_Win32>true</Cfg_2_Win32>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <SanitizedProjectName>buildpkg</SanitizedProjectName>
+        <DCC_E>false</DCC_E>
+        <DCC_N>false</DCC_N>
+        <DCC_S>false</DCC_S>
+        <DCC_F>false</DCC_F>
+        <DCC_K>false</DCC_K>
+        <DCC_UsePackage>RESTComponents;FireDAC;FireDACSqliteDriver;soaprtl;FireDACIBDriver;soapmidas;FireDACCommon;RESTBackendComponents;soapserver;CloudService;FireDACCommonDriver;inet;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <UsingDelphiRTL>true</UsingDelphiRTL>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
-        <DCC_RemoteDebug>true</DCC_RemoteDebug>
-        <VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
-        <DCC_UnitSearchPath>C:\keyman\9.0\src\ext\vclzip;c:\keyman\9.0\src\ext\jedi\jwa\branches\2.3\common;c:\keyman\9.0\src\ext\jedi\jwa\branches\2.3\win32api;c:\keyman\9.0\src\ext\dcpcrypt;c:\keyman\9.0\src\ext\dcpcrypt\ciphers;c:\keyman\9.0\src\ext\dcpcrypt\hashes;$(DELPHI)\lib;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-        <DCC_IOChecking>false</DCC_IOChecking>
-        <VerInfo_Build>28</VerInfo_Build>
-        <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
-        <VerInfo_MajorVer>5</VerInfo_MajorVer>
-        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Winapi;Vcl;System.Win;Vcl.Imaging;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_WriteableConstants>true</DCC_WriteableConstants>
-        <DCC_Define>VISUALKEYBOARD_NOCUSTOMBITMAP;VERSION_KEYMAN_REDIST;RELEASE_KEYMAN;EXCMAGIC_GUI;$(DCC_Define)</DCC_Define>
-        <DCC_Alignment>1</DCC_Alignment>
-        <DCC_MapFile>3</DCC_MapFile>
-        <DCC_F>false</DCC_F>
-        <DCC_E>false</DCC_E>
-        <VerInfo_Locale>3081</VerInfo_Locale>
-        <DCC_S>false</DCC_S>
-        <DCC_N>true</DCC_N>
-        <DCC_K>false</DCC_K>
-        <VerInfo_Keys>CompanyName=;FileDescription=Tavultesoft Keyboard Manager;FileVersion=5.0.0.28;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <DCC_UsePackage>Vcl40;Vclx40;vcljpg40;comp51;VCLZipD4;dclkmn;Vcl50;Vclx50;vclie50;Inetdb50;Inet50;Vcldb50;$(DCC_UsePackage)</DCC_UsePackage>
-        <DCC_ImageBase>2C400000</DCC_ImageBase>
-        <DCC_AssertionsAtRuntime>false</DCC_AssertionsAtRuntime>
-        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
-        <Manifest_File>None</Manifest_File>
+        <DCC_UnitSearchPath>$(DUnitX);$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <SanitizedProjectName>PackageInfoTestSuite</SanitizedProjectName>
+        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_Define>$(CI);$(USE_PLUSMEMO);$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
-        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <DCC_UsePackage>DBXSqliteDriver;bindcompdbx;IndyIPCommon;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;vclFireDAC;IndySystem;tethering;svnui;mbColorLibD10;dsnapcon;FireDACADSDriver;scFontCombo;DCPdelphi2009;FireDACMSAccDriver;fmxFireDAC;vclimg;Jcl;vcltouch;JvCore;vcldb;bindcompfmx;svn;FireDACPgDriver;inetdb;DbxCommonDriver;fmx;fmxdae;xmlrtl;fmxobj;vclwinx;rtl;DbxClientDriver;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;bindcomp;appanalytics;dsnap;IndyIPClient;bindcompvcl;EmbeddedWebBrowser_XE;VCLRESTComponents;dbxcds;VclSmp;JvDocking;adortl;JclVcl;vclie;bindengine;DBXMySQLDriver;dsnapxml;FireDACMySQLDriver;dbrtl;inetdbxpress;IndyProtocols;keyman_components;FireDACCommonODBC;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_UsePackage>DBXSqliteDriver;bindcompdbx;IndyIPCommon;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;vclFireDAC;IndySystem;tethering;dsnapcon;FireDACADSDriver;FireDACMSAccDriver;fmxFireDAC;vclimg;Jcl;vcltouch;vcldb;bindcompfmx;FireDACPgDriver;inetdb;DbxCommonDriver;fmx;fmxdae;xmlrtl;fmxobj;vclwinx;rtl;DbxClientDriver;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;bindcomp;appanalytics;dsnap;IndyIPClient;bindcompvcl;VCLRESTComponents;dbxcds;VclSmp;adortl;JclVcl;vclie;bindengine;DBXMySQLDriver;dsnapxml;FireDACMySQLDriver;dbrtl;inetdbxpress;IndyProtocols;FireDACCommonODBC;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
-        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
-        <DCC_DebugInformation>0</DCC_DebugInformation>
-        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
-        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_RemoteDebug>false</DCC_RemoteDebug>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>(None)</Manifest_File>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
-        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
-        <DCC_Optimize>false</DCC_Optimize>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_RunParams>-m c:\temp\xx\keymandesktop90.msi -l c:\temp\xx\license.html -n &quot;GFF Amharic&quot; -s c:\temp\xx\ c:\temp\xx\gff-amh-powerpack-7.kmp</Debugger_RunParams>
-        <Debugger_CWD>c:\temp\xx\</Debugger_CWD>
-        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
-        <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="buildpkgmain.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\CompilePackageInstaller.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\utilsystem.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\CompilePackage.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kmpinffile.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kpsfile.pas"/>
         <DCCReference Include="..\..\global\delphi\general\PackageInfo.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="..\..\global\delphi\productactivation\OnlineConstants.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilfiletypes.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
-        <DCCReference Include="..\..\developer\TIKE\main\KeymanDeveloperOptions.pas"/>
-        <DCCReference Include="..\..\developer\TIKE\main\RedistFiles.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\CustomisationStorage.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\httpuploader.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Upload_Settings.pas"/>
-        <DCCReference Include="..\..\developer\TIKE\main\UfrmTike.pas">
-            <Form>TikeForm</Form>
-            <DesignClass>TTntForm</DesignClass>
-        </DCCReference>
-        <DCCReference Include="..\..\global\delphi\general\utilhttp.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kmxfile.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\utilkeyboard.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\CRC32.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\KeyNames.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\SystemDebugPath.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
-        <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Glossary.pas"/>
-        <DCCReference Include="..\..\developer\TIKE\project\ProjectLog.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\UMD5Hash.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboard.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
-        <DCCReference Include="..\..\global\delphi\comp\ExtShiftState.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\VKeys.pas"/>
-        <DCCReference Include="..\..\ext\dcpcrypt\DCPcrypt2.pas"/>
-        <DCCReference Include="..\..\ext\dcpcrypt\DCPbase64.pas"/>
-        <DCCReference Include="..\..\ext\dcpcrypt\DCPconst.pas"/>
-        <DCCReference Include="..\..\ext\dcpcrypt\Ciphers\DCPrc4.pas"/>
-        <DCCReference Include="..\..\ext\dcpcrypt\Hashes\DCPmd5.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilsystem.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\kpsfile.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
+        <DCCReference Include="PackageInfoTest.pas"/>
         <DCCReference Include="..\..\global\delphi\general\JsonUtil.pas"/>
-        <BuildConfiguration Include="Debug">
+        <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
         </BuildConfiguration>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
-        <BuildConfiguration Include="Release">
+        <BuildConfiguration Include="Debug">
             <Key>Cfg_1</Key>
             <CfgParent>Base</CfgParent>
         </BuildConfiguration>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Delphi.Personality.12</Borland.Personality>
-        <Borland.ProjectType/>
+        <Borland.ProjectType>Console</Borland.ProjectType>
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">buildpkg.dpr</Source>
+                    <Source Name="MainSource">PackageInfoTestSuite.dpr</Source>
                 </Source>
-                <Language>
-                    <Language Name="ProjectLang">$00000C09</Language>
-                </Language>
-                <VersionInfo>
-                    <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
-                    <VersionInfo Name="AutoIncBuild">True</VersionInfo>
-                    <VersionInfo Name="MajorVer">5</VersionInfo>
-                    <VersionInfo Name="MinorVer">0</VersionInfo>
-                    <VersionInfo Name="Release">0</VersionInfo>
-                    <VersionInfo Name="Build">32</VersionInfo>
-                    <VersionInfo Name="Debug">False</VersionInfo>
-                    <VersionInfo Name="PreRelease">False</VersionInfo>
-                    <VersionInfo Name="Special">False</VersionInfo>
-                    <VersionInfo Name="Private">False</VersionInfo>
-                    <VersionInfo Name="DLL">False</VersionInfo>
-                    <VersionInfo Name="Locale">3081</VersionInfo>
-                    <VersionInfo Name="CodePage">1252</VersionInfo>
-                </VersionInfo>
-                <VersionInfoKeys>
-                    <VersionInfoKeys Name="CompanyName"/>
-                    <VersionInfoKeys Name="FileDescription">Tavultesoft Keyboard Manager</VersionInfoKeys>
-                    <VersionInfoKeys Name="FileVersion">5.0.0.32</VersionInfoKeys>
-                    <VersionInfoKeys Name="InternalName"/>
-                    <VersionInfoKeys Name="LegalCopyright"/>
-                    <VersionInfoKeys Name="LegalTrademarks"/>
-                    <VersionInfoKeys Name="OriginalFilename"/>
-                    <VersionInfoKeys Name="ProductName"/>
-                    <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
-                    <VersionInfoKeys Name="Comments"/>
-                </VersionInfoKeys>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k250.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp250.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
-            <Platforms>
-                <Platform value="Linux64">False</Platform>
-                <Platform value="Win32">True</Platform>
-                <Platform value="Win64">False</Platform>
-            </Platforms>
             <Deployment Version="3">
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
@@ -227,9 +151,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="buildpkg.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Win32\Debug\PackageInfoTestSuite.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>buildpkg.exe</RemoteName>
+                        <RemoteName>PackageInfoTestSuite.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -591,10 +515,15 @@
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
             </Deployment>
+            <Platforms>
+                <Platform value="Linux64">False</Platform>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>
-    <Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
-    <Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
     <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
 </Project>

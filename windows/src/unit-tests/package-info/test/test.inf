@@ -1,0 +1,62 @@
+[Package]
+Version=7.0
+ExecuteProgram=
+ReadMeFile=readme.htm
+GraphicFile=sideimage.bmp
+[StartMenu]
+Path=GFF Amharic Keyboard
+Create=1
+AddUninstallEntry=1
+[StartMenuEntries]
+Welcome="..\..\..\gff\gff_amh_7\source\welcome.htm",""
+Amharic Keyboard Manual (Amharic)="AmharicTyping-Amharic.pdf",""
+Amharic Keyboard Manual (English)="AmharicTyping-English.pdf",""
+OFL (Abyssinica SIL Licence)="OFL.txt",""
+GPL (WashRa + Free Serif Licence)="GNU-GPLv2.txt",""
+[Info]
+WebSite="http://keyboards.ethiopic.org","http://keyboards.ethiopic.org"
+Version="8.0.0",""
+Name="GFF Amharic Keyboard",""
+Copyright="Creative Commons Attribution 3.0",""
+Author="The Ge'ez Frontier Foundation","mailto:keyboards@ethiopic.org"
+[Files]
+0="File readme.htm","readme.htm",0
+1="File sideimage.bmp","sideimage.bmp",0
+2="File AmharicTyping-Amharic.pdf","..\..\..\gff\gff_amh_7\source\AmharicTyping-Amharic.pdf",0
+3="File AmharicTyping-English.pdf","..\..\..\gff\gff_amh_7\source\AmharicTyping-English.pdf",0
+4="File OFL.txt","..\..\..\shared\fonts\geez\OFL.txt",0
+5="File GNU-GPLv2.txt","..\..\..\shared\fonts\geez\GNU-GPLv2.txt",0
+6="File Welcome.htm","..\..\..\gff\gff_amh_7\source\welcome.htm",0
+7="Font Abyssinica SIL","..\..\..\shared\fonts\geez\AbyssinicaSIL-R.ttf",0
+8="Font Ethiopic Fantuwua","..\..\..\shared\fonts\geez\fantuwua.ttf",0
+9="Font Free Serif","..\..\..\shared\fonts\geez\FreeSerif.otf",0
+10="Font Ethiopic Yigezu Bisrat Goffer","..\..\..\shared\fonts\geez\goffer.ttf",0
+11="Font Ethiopic Hiwua","..\..\..\shared\fonts\geez\hiwua.ttf",0
+12="Font Ethiopia Jiret","..\..\..\shared\fonts\geez\jiret.ttf",0
+13="Font Ethiopia Jiret Slant","..\..\..\shared\fonts\geez\jiretsl.ttf",0
+14="Font Ethiopic Tint","..\..\..\shared\fonts\geez\tint.ttf",0
+15="Font Ethiopic WashRa Bold","..\..\..\shared\fonts\geez\washrab.ttf",0
+16="Font Ethiopic WashRa Bold Slant","..\..\..\shared\fonts\geez\washrabsl.ttf",0
+17="Font Ethiopic WashRa SemiBold","..\..\..\shared\fonts\geez\washrasb.ttf",0
+18="Font Ethiopic WashRa SemiBold Slant","..\..\..\shared\fonts\geez\washrasbsl.ttf",0
+19="Font Ethiopic Wookianos","..\..\..\shared\fonts\geez\wookianos.ttf",0
+20="Font Ethiopic Yebse","..\..\..\shared\fonts\geez\yebse.ttf",0
+21="File gff_amh_7.kvk","..\..\..\gff\gff_amh_7\build\gff_amh_7.kvk",0
+22="Keyboard Amharic","..\..\..\gff\gff_amh_7\build\gff_amh_7.kmx",0
+23="File gff_ethiopic_7.kvk","..\..\..\gff\gff_ethiopic_7\build\gff_ethiopic_7.kvk",0
+24="Keyboard Ethiopic - (Language Neutral)","..\..\..\gff\gff_ethiopic_7\build\gff_ethiopic_7.kmx",0
+
+[Keyboard0]
+Name=Amharic
+ID=gff_amh_7
+Version=8.0
+OSKFont=wookianos.ttf
+DisplayFont=fantuwua.ttf
+Language0=amh,Amharic
+Language1=gez,Ge'ez
+
+[Keyboard1]
+Name=Ethiopic Language Neutral
+ID=gff_ethiopic_7
+Version=8.0
+Language0=gez,Ge'ez

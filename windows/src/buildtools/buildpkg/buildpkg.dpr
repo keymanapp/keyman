@@ -57,7 +57,8 @@ uses
   DCPbase64 in '..\..\ext\dcpcrypt\DCPbase64.pas',
   DCPconst in '..\..\ext\dcpcrypt\DCPconst.pas',
   DCPrc4 in '..\..\ext\dcpcrypt\Ciphers\DCPrc4.pas',
-  DCPmd5 in '..\..\ext\dcpcrypt\Hashes\DCPmd5.pas';
+  DCPmd5 in '..\..\ext\dcpcrypt\Hashes\DCPmd5.pas',
+  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas';
 
 begin
   Run;
