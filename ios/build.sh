@@ -77,7 +77,7 @@ while [[ $# -gt 0 ]] ; do
         -no-build)
             CLEAN_ONLY=true
             ;;
-		-no-carthage)
+        -no-carthage)
             DO_CARTHAGE=false
             ;;
         -debug)
