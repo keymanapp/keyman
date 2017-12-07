@@ -163,8 +163,9 @@ type
     cbKeyboardDisplayFont: TComboBox;
     lblKeyboardDisplayFont: TLabel;
     gridKeyboardLanguages: TStringGrid;
-    cmdKeyboardSearchForLanguage: TButton;
     lblKeyboardLanguages: TLabel;
+    cmdKeyboardAddLanguage: TButton;
+    cmdKeyboardRemoveLanguage: TButton;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -204,6 +205,13 @@ type
     procedure pagesChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure lbKeyboardsClick(Sender: TObject);
+    procedure cbKeyboardOSKFontClick(Sender: TObject);
+    procedure cbKeyboardDisplayFontClick(Sender: TObject);
+    procedure gridKeyboardLanguagesClick(Sender: TObject);
+    procedure gridKeyboardLanguagesSetEditText(Sender: TObject; ACol,
+      ARow: Integer; const Value: string);
+    procedure cmdKeyboardRemoveLanguageClick(Sender: TObject);
+    procedure cmdKeyboardAddLanguageClick(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -229,6 +237,11 @@ type
     procedure MovePackageToSource;
     function MoveSourceToPackage: Boolean;
     procedure RefreshKeyboardList;
+    function SelectedKeyboard: TPackageKeyboard;
+    procedure EnableKeyboardTabControls;
+    function SelectedKeyboardLanguage: TPackageKeyboardLanguage;
+    function LookupLanguageName(bcp47id: string): string;
+    procedure RefreshKeyboardLanguageList(k: TPackageKeyboard);
 
   protected
     function DoOpenFile: Boolean; override;
@@ -268,6 +281,7 @@ uses
   utilsystem,
   UfrmMain,
   UfrmMessages,
+  Keyman.Developer.UI.UfrmSelectBCP47Language,
   xmldoc;
 
 {$R *.DFM}
@@ -327,7 +341,8 @@ end;
 
 procedure TfrmPackageEditor.SourceChanged(Sender: TObject);
 begin
-  if FSetup = 0 then Modified := True;
+  if FSetup = 0 then
+    Modified := True;
 end;
 
 procedure TfrmPackageEditor.cmdCompileInstallerClick(Sender: TObject);
@@ -825,12 +840,15 @@ var
   desc, prog, params: WideString;
 begin
   Inc(FSetup);  // I1756
-  GetStartMenuEntries(desc, prog, params);
-  editStartMenuDescription.Text := desc;
-  cbStartMenuProgram.Text := prog;
-  editStartMenuParameters.Text := params;
-  EnableStartMenuControls;
-  Dec(FSetup);  // I1756
+  try
+    GetStartMenuEntries(desc, prog, params);
+    editStartMenuDescription.Text := desc;
+    cbStartMenuProgram.Text := prog;
+    editStartMenuParameters.Text := params;
+    EnableStartMenuControls;
+  finally
+    Dec(FSetup);  // I1756
+  end;
 end;
 
 procedure TfrmPackageEditor.pagesChange(Sender: TObject);
@@ -1212,8 +1230,10 @@ end;
 *)
 procedure TfrmPackageEditor.RefreshKeyboardList;
 var
-  i: Integer;
+  n, i: Integer;
 begin
+  n := lbKeyboards.ItemIndex;
+
   with TPackageInfoRefreshKeyboards.Create(pack) do
   try
     Execute;
@@ -1225,36 +1245,51 @@ begin
   for i := 0 to pack.Keyboards.Count - 1 do
     lbKeyboards.Items.AddObject(pack.Keyboards[i].ID, pack.Keyboards[i]);
 
+  if lbKeyboards.Count = 0 then
+    n := -1
+  else if n >= lbKeyboards.Count then
+    n := lbKeyboards.Count - 1
+  else if (n < 0) and (lbKeyboards.Count > 0) then
+    n := 0;
+  lbKeyboards.ItemIndex := n;
   lbKeyboardsClick(lbKeyboards);
+end;
+
+function TfrmPackageEditor.SelectedKeyboard: TPackageKeyboard;
+begin
+  if lbKeyboards.ItemIndex < 0
+    then Result := nil
+    else Result := lbKeyboards.Items.Objects[lbKeyboards.ItemIndex] as TPackageKeyboard;
+end;
+
+function TfrmPackageEditor.SelectedKeyboardLanguage: TPackageKeyboardLanguage;
+var
+  k: TPackageKeyboard;
+begin
+  k := SelectedKeyboard;
+  if not Assigned(k) then
+    Exit(nil);
+
+  if gridKeyboardLanguages.Row = 0 then
+    Exit(nil);
+
+  Result := gridKeyboardLanguages.Objects[0, gridKeyboardLanguages.Row] as TPackageKeyboardLanguage;
 end;
 
 procedure TfrmPackageEditor.lbKeyboardsClick(Sender: TObject);
 var
-  e: Boolean;
   k: TPackageKeyboard;
   i: Integer;
 begin
   Inc(FSetup);
   try
-    gridKeyboardLanguages.Cells[0, 0] := 'ID';
-    gridKeyboardLanguages.Cells[1, 0] := 'Name';
+    gridKeyboardLanguages.Cells[0, 0] := 'BCP 47 tag';
+    gridKeyboardLanguages.Cells[1, 0] := 'Language name';
+    gridKeyboardLanguages.ColWidths[0] := 120;
+    gridKeyboardLanguages.ColWidths[1] := 10;
 
-    e := lbKeyboards.ItemIndex >= 0;
-    lblKeyboardDescription.Enabled := e;
-    editKeyboardDescription.Enabled := e;
-    lblKeyboardFiles.Enabled := e;
-    memoKeyboardFiles.Enabled := e;
-    lblKeyboardVersion.Enabled := e;
-    editKeyboardVersion.Enabled := e;
-    lblKeyboardOSKFont.Enabled := e;
-    cbKeyboardOSKFont.Enabled := e;
-    lblKeyboardDisplayFont.Enabled := e;
-    cbKeyboardDisplayFont.Enabled := e;
-    lblKeyboardLanguages.Enabled := e;
-    gridKeyboardLanguages.Enabled := e;
-    cmdKeyboardSearchForLanguage.Enabled := e;
-
-    if not e then
+    k := SelectedKeyboard;
+    if not Assigned(k) then
     begin
       editKeyboardDescription.Text := '';
       editKeyboardVersion.Text := '';
@@ -1262,12 +1297,12 @@ begin
       cbKeyboardOSKFont.ItemIndex := -1;
       cbKeyboardDisplayFont.ItemIndex := -1;
       gridKeyboardLanguages.RowCount := 1;
+      EnableKeyboardTabControls;
       Exit;
     end;
 
     // Details
 
-    k := lbKeyboards.Items.Objects[lbKeyboards.ItemIndex] as TPackageKeyboard;
     memoKeyboardFiles.Text := '';
     editKeyboardDescription.Text := k.Name;
     editKeyboardVersion.Text := k.Version;
@@ -1285,7 +1320,22 @@ begin
 
     // Languages
 
+    RefreshKeyboardLanguageList(k);
+    EnableKeyboardTabControls;
+  finally
+    Dec(FSetup);
+  end;
+end;
+
+procedure TfrmPackageEditor.RefreshKeyboardLanguageList(k: TPackageKeyboard);
+var
+  i: Integer;
+begin
+  Inc(FSetup);
+  try
     gridKeyboardLanguages.RowCount := k.Languages.Count + 1;
+    gridKeyboardLanguages.ColWidths[1] := gridKeyboardLanguages.ClientWidth - 120 - 1;
+
     if k.Languages.Count > 0 then
     begin
       gridKeyboardLanguages.FixedRows := 1;
@@ -1294,12 +1344,144 @@ begin
       gridKeyboardLanguages.Enabled := False;
     for i := 0 to k.Languages.Count - 1 do
     begin
+      gridKeyboardLanguages.Objects[0, i+1] := k.Languages[i];
       gridKeyboardLanguages.Cells[0, i+1] := k.Languages[i].ID;
       gridKeyboardLanguages.Cells[1, i+1] := k.Languages[i].Name;
     end;
   finally
     Dec(FSetup);
   end;
+end;
+
+procedure TfrmPackageEditor.cbKeyboardDisplayFontClick(Sender: TObject);
+var
+  k: TPackageKeyboard;
+begin
+  if FSetup > 0 then Exit;
+  k := SelectedKeyboard;
+  Assert(Assigned(k));
+
+  if cbKeyboardDisplayFont.ItemIndex <= 0
+    then k.DisplayFont := nil
+    else k.DisplayFont := cbKeyboardDisplayFont.Items.Objects[cbKeyboardDisplayFont.ItemIndex] as TPackageContentFile;
+  Modified := True;
+end;
+
+procedure TfrmPackageEditor.cbKeyboardOSKFontClick(Sender: TObject);
+var
+  k: TPackageKeyboard;
+begin
+  if FSetup > 0 then Exit;
+  k := SelectedKeyboard;
+  Assert(Assigned(k));
+  if cbKeyboardOSKFont.ItemIndex <= 0
+    then k.OSKFont := nil
+    else k.OSKFont := cbKeyboardOSKFont.Items.Objects[cbKeyboardOSKFont.ItemIndex] as TPackageContentFile;
+  Modified := True;
+end;
+
+procedure TfrmPackageEditor.EnableKeyboardTabControls;
+var
+  e: Boolean;
+begin
+  e := lbKeyboards.ItemIndex >= 0;
+  lblKeyboardDescription.Enabled := e;
+  editKeyboardDescription.Enabled := e;
+  lblKeyboardFiles.Enabled := e;
+  memoKeyboardFiles.Enabled := e;
+  lblKeyboardVersion.Enabled := e;
+  editKeyboardVersion.Enabled := e;
+  lblKeyboardOSKFont.Enabled := e;
+  cbKeyboardOSKFont.Enabled := e;
+  lblKeyboardDisplayFont.Enabled := e;
+  cbKeyboardDisplayFont.Enabled := e;
+  lblKeyboardLanguages.Enabled := e;
+  cmdKeyboardAddLanguage.Enabled := e;
+
+  e := e and (gridKeyboardLanguages.Row > 0);
+  gridKeyboardLanguages.Enabled := e;
+  cmdKeyboardRemoveLanguage.Enabled := e;
+end;
+
+procedure TfrmPackageEditor.gridKeyboardLanguagesClick(Sender: TObject);
+begin
+  EnableKeyboardTabControls;
+end;
+
+function TfrmPackageEditor.LookupLanguageName(bcp47id: string): string;
+begin
+  // TODO: BCP47: HERE GOETH THE MAGIC
+  Result := bcp47id;
+end;
+
+procedure TfrmPackageEditor.gridKeyboardLanguagesSetEditText(Sender: TObject;
+  ACol, ARow: Integer; const Value: string);
+var
+  lang: TPackageKeyboardLanguage;
+begin
+  if FSetup > 0 then Exit;
+
+  lang := SelectedKeyboardLanguage;
+  Assert(Assigned(lang));
+
+  if ACol = 0 then
+  begin
+    lang.ID := Value;
+    if lang.Name='' then
+    begin
+      lang.Name := LookupLanguageName(lang.ID);
+      gridKeyboardLanguages.Cells[1, ARow] := lang.Name;
+    end;
+  end
+  else if ACol = 1 then
+  begin
+    lang.Name := Value;
+  end;
+
+  Modified := True;
+end;
+
+procedure TfrmPackageEditor.cmdKeyboardAddLanguageClick(Sender: TObject);
+var
+  k: TPackageKeyboard;
+  lang: TPackageKeyboardLanguage;
+  frm: TfrmSelectBCP47Language;
+begin
+  k := SelectedKeyboard;
+  Assert(Assigned(k));
+
+  frm := TfrmSelectBCP47Language.Create(Application.MainForm);
+  try
+    if frm.ShowModal = mrOk then
+    begin
+      lang := TPackageKeyboardLanguage.Create(pack);
+      lang.ID := frm.LanguageID;
+      lang.Name := frm.LanguageName;
+      k.Languages.Add(lang);
+      RefreshKeyboardLanguageList(k);
+      gridKeyboardLanguages.Row := gridKeyboardLanguages.RowCount - 1;
+      gridKeyboardLanguagesClick(gridKeyboardLanguages);
+      Modified := True;
+    end;
+  finally
+    frm.Free;
+  end;
+end;
+
+procedure TfrmPackageEditor.cmdKeyboardRemoveLanguageClick(Sender: TObject);
+var
+  k: TPackageKeyboard;
+  lang: TPackageKeyboardLanguage;
+begin
+  k := SelectedKeyboard;
+  Assert(Assigned(k));
+  lang := SelectedKeyboardLanguage;
+  Assert(Assigned(lang));
+
+  k.Languages.Remove(lang);
+  RefreshKeyboardLanguageList(k);
+  EnableKeyboardTabControls;
+  Modified := True;
 end;
 
 end.

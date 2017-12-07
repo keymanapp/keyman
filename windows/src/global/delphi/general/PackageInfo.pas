@@ -106,7 +106,6 @@ type
     destructor Destroy; override;
     procedure AddNotifyObject(FEventHandler: TPackageNotifyEvent);
     procedure RemoveNotifyObject(FEventHandler: TPackageNotifyEvent);
-  {TODO:   if Items[Index] = FPackage.Options.ReadmeFile then FPackage.Options.ReadmeFile := nil;}
     property Tag: Integer read FTag write FTag;
   end;
 

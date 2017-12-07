@@ -163,7 +163,7 @@ uses
   kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
   kmxfileutils in '..\..\global\delphi\general\kmxfileutils.pas',
   UfrmSelectWindowsLanguages in 'dialogs\languages\UfrmSelectWindowsLanguages.pas' {frmSelectWindowsLanguages: TTntForm},
-  UfrmSelectISOLanguages in 'dialogs\languages\UfrmSelectISOLanguages.pas' {frmSelectISOLanguages: TTntForm},
+  Keyman.Developer.UI.UfrmSelectBCP47Language in 'dialogs\languages\Keyman.Developer.UI.UfrmSelectBCP47Language.pas' {frmSelectBCP47Language: TTntForm},
   WindowsLanguages in '..\..\global\delphi\general\WindowsLanguages.pas',
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   TextFileTemplates in 'main\TextFileTemplates.pas',
@@ -257,11 +257,12 @@ uses
   KeymanDeveloperDebuggerMemo in '..\..\global\delphi\comp\KeymanDeveloperDebuggerMemo.pas',
   UfrmCharacterMapDock in 'dockforms\UfrmCharacterMapDock.pas' {frmCharacterMapDock},
   Keyman.System.PackageInfoRefreshKeyboards in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas',
-  Keyman.System.KMXFileLanguages in '..\..\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas',
   Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
   Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   Keyman.System.KeyboardJSInfo in '..\..\global\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas',
-  Keyman.System.KeyboardUtils in '..\..\global\delphi\keyboards\Keyman.System.KeyboardUtils.pas';
+  Keyman.System.KeyboardUtils in '..\..\global\delphi\keyboards\Keyman.System.KeyboardUtils.pas',
+  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
+  Keyman.System.KMXFileLanguages in '..\..\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

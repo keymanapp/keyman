@@ -117,6 +117,8 @@ begin
       begin
         lang := TPackageKeyboardLanguage.Create(f.Package);
         lang.ID := codes[i];
+        // TODO: BCP47: Lookup default names
+        lang.Name := codes[i];
         k.Languages.Add(lang);
       end;
     except

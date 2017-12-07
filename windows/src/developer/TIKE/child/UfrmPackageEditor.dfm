@@ -450,7 +450,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Anchors = [akLeft, akBottom]
           ParentColor = True
           ReadOnly = True
-          TabOrder = 2
+          TabOrder = 1
         end
         object memoKeyboardFiles: TMemo
           Left = 87
@@ -461,7 +461,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Anchors = [akLeft, akBottom]
           ParentColor = True
           ReadOnly = True
-          TabOrder = 1
+          TabOrder = 2
         end
         object editKeyboardVersion: TEdit
           Left = 87
@@ -479,14 +479,18 @@ inherited frmPackageEditor: TfrmPackageEditor
           Top = 72
           Width = 230
           Height = 21
+          Style = csDropDownList
           TabOrder = 4
+          OnClick = cbKeyboardOSKFontClick
         end
         object cbKeyboardDisplayFont: TComboBox
           Left = 339
           Top = 99
           Width = 230
           Height = 21
+          Style = csDropDownList
           TabOrder = 5
+          OnClick = cbKeyboardDisplayFontClick
         end
         object gridKeyboardLanguages: TStringGrid
           Left = 260
@@ -494,33 +498,37 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 309
           Height = 257
           Anchors = [akLeft, akTop, akRight, akBottom]
-          ColCount = 3
+          ColCount = 2
+          DefaultRowHeight = 16
           FixedCols = 0
           RowCount = 9
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goTabs]
           TabOrder = 6
+          OnClick = gridKeyboardLanguagesClick
+          OnSetEditText = gridKeyboardLanguagesSetEditText
           ColWidths = (
             78
-            64
-            150)
-          RowHeights = (
-            24
-            24
-            24
-            24
-            24
-            24
-            24
-            24
-            24)
+            64)
         end
-        object cmdKeyboardSearchForLanguage: TButton
-          Left = 436
+        object cmdKeyboardAddLanguage: TButton
+          Left = 260
           Top = 412
-          Width = 133
+          Width = 73
           Height = 25
-          Anchors = [akRight, akBottom]
-          Caption = 'Search for language...'
+          Anchors = [akLeft, akBottom]
+          Caption = '&Add...'
           TabOrder = 7
+          OnClick = cmdKeyboardAddLanguageClick
+        end
+        object cmdKeyboardRemoveLanguage: TButton
+          Left = 339
+          Top = 412
+          Width = 72
+          Height = 25
+          Anchors = [akLeft, akBottom]
+          Caption = '&Remove'
+          TabOrder = 8
+          OnClick = cmdKeyboardRemoveLanguageClick
         end
       end
     end

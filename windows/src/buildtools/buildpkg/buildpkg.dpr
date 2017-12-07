@@ -58,7 +58,13 @@ uses
   DCPconst in '..\..\ext\dcpcrypt\DCPconst.pas',
   DCPrc4 in '..\..\ext\dcpcrypt\Ciphers\DCPrc4.pas',
   DCPmd5 in '..\..\ext\dcpcrypt\Hashes\DCPmd5.pas',
-  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas';
+  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
+  Keyman.System.PackageInfoRefreshKeyboards in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas',
+  Keyman.System.KMXFileLanguages in '..\..\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas',
+  Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
+  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
+  Keyman.System.KeyboardJSInfo in '..\..\global\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas',
+  Keyman.System.KeyboardUtils in '..\..\global\delphi\keyboards\Keyman.System.KeyboardUtils.pas';
 
 begin
   Run;
