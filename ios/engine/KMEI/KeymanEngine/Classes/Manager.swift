@@ -715,8 +715,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     if checkDebugPrinting && !isDebugPrintingOn {
       return
     }
-    //NSLog("%@", logStr)
-    XCGLogger.default.debug(logStr)
+    log.debug(logStr)
   }
 
   // MARK: - File system and UserData management
