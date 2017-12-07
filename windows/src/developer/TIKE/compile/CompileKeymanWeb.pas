@@ -2349,7 +2349,7 @@ begin
 
   if FDebug
     then Result := FormatModifierAsBitflags(FBitMask and KMX_MASK_KEYS) // Exclude KMX_ISVIRTUALKEY, KMX_VIRTUALCHARKEY
-    else Result := '0x'+IntToHex(FBitMask, 4);
+    else Result := '0x'+IntToHex(FBitMask and KMX_MASK_KEYS, 4);
 end;
 
 end.
