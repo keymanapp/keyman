@@ -255,7 +255,7 @@ type
   public
     function GetPack: TKPSFile;
 
-    procedure CreateFromKMX(FFileName: WideString);
+    procedure CreateFromCompiledKeyboard(FKMXFilename, FJSFilename: string);
 
     procedure FindError(const Filename: string; s: string); override;   // I4081
 
@@ -1210,9 +1210,10 @@ begin
   end;
 end;
 
-procedure TfrmPackageEditor.CreateFromKMX(FFileName: WideString);
+procedure TfrmPackageEditor.CreateFromCompiledKeyboard(FKMXFilename, FJSFilename: string);
 begin
-  AddFile(FFileName);
+  if FKMXFilename <> '' then AddFile(FKMXFilename);
+  if FJSFilename <> '' then AddFile(FJSFilename);
 end;
 
 {-------------------------------------------------------------------------------
