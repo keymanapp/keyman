@@ -19,6 +19,11 @@
 		C0324B871F87245200AF3785 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B861F87245200AF3785 /* AppDelegate.swift */; };
 		C0324B891F87245B00AF3785 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B881F87245B00AF3785 /* ViewController.swift */; };
 		C045148D1F85E33300D88416 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C045148C1F85E33300D88416 /* KeyboardViewController.swift */; };
+		C05B142C1FD8F45E0082A316 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14271FD8F4510082A316 /* ObjcExceptionBridging.framework */; };
+		C05B142D1FD8F45E0082A316 /* ObjcExceptionBridging.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14271FD8F4510082A316 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C05B142E1FD8F45E0082A316 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14281FD8F4510082A316 /* XCGLogger.framework */; };
+		C05B142F1FD8F45E0082A316 /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14281FD8F4510082A316 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C05B14311FD8F45E0082A316 /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14261FD8F4510082A316 /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,7 +54,10 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				C05B14311FD8F45E0082A316 /* Zip.framework in Embed Frameworks */,
+				C05B142D1FD8F45E0082A316 /* ObjcExceptionBridging.framework in Embed Frameworks */,
 				C01AB5A11F834706009B37D3 /* KeymanEngine.framework in Embed Frameworks */,
+				C05B142F1FD8F45E0082A316 /* XCGLogger.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -72,6 +80,9 @@
 		C0324B861F87245200AF3785 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C0324B881F87245B00AF3785 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		C045148C1F85E33300D88416 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
+		C05B14261FD8F4510082A316 /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = ../../Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
+		C05B14271FD8F4510082A316 /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = ../../Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
+		C05B14281FD8F4510082A316 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = ../../Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +91,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				C01AB5A01F834706009B37D3 /* KeymanEngine.framework in Frameworks */,
+				C05B142C1FD8F45E0082A316 /* ObjcExceptionBridging.framework in Frameworks */,
+				C05B142E1FD8F45E0082A316 /* XCGLogger.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -139,6 +152,9 @@
 		98ABFD601AD3A087005534F0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C05B14271FD8F4510082A316 /* ObjcExceptionBridging.framework */,
+				C05B14281FD8F4510082A316 /* XCGLogger.framework */,
+				C05B14261FD8F4510082A316 /* Zip.framework */,
 				C01AB59E1F8346FC009B37D3 /* KeymanEngine.framework */,
 			);
 			name = Frameworks;
@@ -484,6 +500,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(SRCROOT)/../../Carthage/Build/iOS/",
 				);
 				INFOPLIST_FILE = KMSample2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -509,6 +526,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(SRCROOT)/../../Carthage/Build/iOS/",
 				);
 				INFOPLIST_FILE = KMSample2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
