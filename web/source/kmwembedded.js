@@ -40,9 +40,9 @@
     return keymanweb.rootPath+ssName;
   };
 
-  // Get KMEI, KMEA keyboard path (overrides default function)
+  // Get KMEI, KMEA keyboard path (overrides default function, allows direct app control of paths)
   keymanweb.getKeyboardPath = function(Lfilename, packageID) {
-    return keymanweb.rootPath+'packages/' + packageID + '/' + Lfilename + "?v=" + (new Date()).getTime(); /*cache buster*/
+    return Lfilename + "?v=" + (new Date()).getTime(); /*cache buster*/
   };
 
     /**

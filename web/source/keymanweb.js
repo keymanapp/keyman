@@ -3494,35 +3494,33 @@ if(!window['keyman']['initialized']) {
               kbdName = kbdName.replace(/\s*keyboard\s*/i, '');
 
               // Setup our default error-messaging callback if it should be implemented.
-              if(!keymanweb.isEmbedded) {  // No error messaging if we're in embedded mode.
-                loadingStub.asyncLoader.callback = function(altString, msgType) {
-                  var msg = altString || 'Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available.';
-                  
-                  // Thanks, Closure errors.  
-                  if(!keymanweb.isEmbedded) {
-                    util.wait(false);
-                    util.alert(altString || msg, function() {
-                      keymanweb['setActiveKeyboard']('');
-                    });
-                  }
-
-                  switch(msgType) { // in case we extend this later.
-                    case 'err':
-                      console.error(msg);
-                      break;
-                    case 'warn':
-                    default:
-                      console.warn(msg);
-                      break;
-                  }
-
-                  if(Ln > 0) {
-                    var Ps = keymanweb._KeyboardStubs[0];
-                    keymanweb._SetActiveKeyboard(Ps['KI'], Ps['KLC'], true);
-                  }
+              loadingStub.asyncLoader.callback = function(altString, msgType) {
+                var msg = altString || 'Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available.';
+                
+                // Thanks, Closure errors.  
+                if(!keymanweb.isEmbedded) {
+                  util.wait(false);
+                  util.alert(altString || msg, function() {
+                    keymanweb['setActiveKeyboard']('');
+                  });
                 }
-                loadingStub.asyncLoader.timer = window.setTimeout(loadingStub.asyncLoader.callback, 10000);
+
+                switch(msgType) { // in case we extend this later.
+                  case 'err':
+                    console.error(msg);
+                    break;
+                  case 'warn':
+                  default:
+                    console.warn(msg);
+                    break;
+                }
+
+                if(Ln > 0) {
+                  var Ps = keymanweb._KeyboardStubs[0];
+                  keymanweb._SetActiveKeyboard(Ps['KI'], Ps['KLC'], true);
+                }
               }
+              loadingStub.asyncLoader.timer = window.setTimeout(loadingStub.asyncLoader.callback, 10000);
 
               //Display the loading delay bar (Note: only append 'keyboard' if not included in name.) 
               if(!keymanweb.isEmbedded) {
@@ -3561,7 +3559,6 @@ if(!window['keyman']['initialized']) {
       Lscript.charset="UTF-8";        // KMEW-89
       Lscript.type = 'text/javascript';
 
-      var pkgID   = kbdStub['KP'];    // Used by KMEA/KMEI (embedded).  We're fine if it's undefined and not embedded.
       var kbdFile = kbdStub['KF'];
       var kbdLang = kbdStub['KL'];
       var kbdName = kbdStub['KN'];
@@ -3622,7 +3619,7 @@ if(!window['keyman']['initialized']) {
 
       // IE likes to instantly start loading the file when assigned to an element, so we do this after the rest
       // of our setup.
-      Lscript.src = keymanweb.getKeyboardPath(kbdFile, pkgID);
+      Lscript.src = keymanweb.getKeyboardPath(kbdFile);
 
       try {                                  
         document.body.appendChild(Lscript);  

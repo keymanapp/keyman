@@ -7,14 +7,6 @@
 //
 
 public enum Key {
-  public static let keyboardId = "kbId"
-  public static let languageId = "langId"
-
-  public static let fontFamily = "family"
-  public static let fontSource = "source"
-  public static let fontFiles = "files"
-  // Font filename is deprecated
-  public static let fontFilename = "filename"
   public static let keyboardInfo = "keyboardInfo"
 
   /// Array of user keyboards info list in UserDefaults
