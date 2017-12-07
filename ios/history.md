@@ -10,6 +10,7 @@
 * Fixed bugs introduced by refactoring (#408, #413, #414, #416, #422, #443, #453, #463, #464, #465)
 * Removed notifications for subkey displayed, subkey dismissed and debug log messages (#389, #415)
 * Removed migration from old app data directory structure (#418)
+* Implemented Carthage as a dependency manager and include 3rd party libraries for unzipping and logging (#475)
 
 ## 2017-08-26 2.6.4 stable
 * Fixed bug with blank keyboard on some devices (#218)

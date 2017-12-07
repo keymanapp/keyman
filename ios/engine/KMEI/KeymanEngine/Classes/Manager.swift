@@ -8,6 +8,8 @@
 
 import UIKit
 import WebKit
+import XCGLogger
+import Zip
 
 typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
 
@@ -762,7 +764,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     if checkDebugPrinting && !isDebugPrintingOn {
       return
     }
-    NSLog("%@", logStr)
+    //NSLog("%@", logStr)
+    XCGLogger.default.debug(logStr)
   }
 
   // MARK: - File system and UserData management

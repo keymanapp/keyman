@@ -4,6 +4,7 @@
 * Xcode 9.1
 * iOS 8+
 * SwiftLint (`brew install swiftlint`)
+* Carthage (`brew install carthage`)
 
 ## Keyman App
 
