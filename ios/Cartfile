@@ -1,2 +1,2 @@
 github "marmelroy/Zip"
-github "CocoaLumberjack/CocoaLumberjack"
+github "DaveWoodCom/XCGLogger" ~> 6.0.2
