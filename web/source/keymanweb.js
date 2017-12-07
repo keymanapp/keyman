@@ -3561,7 +3561,6 @@ if(!window['keyman']['initialized']) {
       Lscript.charset="UTF-8";        // KMEW-89
       Lscript.type = 'text/javascript';
 
-      var pkgID   = kbdStub['KP'];    // Used by KMEA/KMEI (embedded).  We're fine if it's undefined and not embedded.
       var kbdFile = kbdStub['KF'];
       var kbdLang = kbdStub['KL'];
       var kbdName = kbdStub['KN'];
@@ -3622,7 +3621,7 @@ if(!window['keyman']['initialized']) {
 
       // IE likes to instantly start loading the file when assigned to an element, so we do this after the rest
       // of our setup.
-      Lscript.src = keymanweb.getKeyboardPath(kbdFile, pkgID);
+      Lscript.src = keymanweb.getKeyboardPath(kbdFile);
 
       try {                                  
         document.body.appendChild(Lscript);  
