@@ -81,9 +81,7 @@ public class TextView: UITextView {
       }
 
       if delegate !== delegateProxy {
-        Manager.shared.kmLog(
-          "Trying to set TextView's delegate directly. Use setKeymanDelegate() instead.",
-          checkDebugPrinting: true)
+        log.error("Trying to set TextView's delegate directly. Use setKeymanDelegate() instead.")
       }
       super.delegate = delegateProxy
     }
@@ -95,17 +93,13 @@ public class TextView: UITextView {
   //   - All of the normal UITextViewDelegate methods are supported.
   public func setKeymanDelegate(_ keymanDelegate: TextViewDelegate?) {
     delegateProxy.keymanDelegate = keymanDelegate
-    Manager.shared.kmLog(
-      "TextView: \(self.debugDescription) keymanDelegate set to: \(keymanDelegate.debugDescription)",
-      checkDebugPrinting: true)
+    log.debug("TextView: \(self.hashValue) keymanDelegate set to: \(keymanDelegate.debugDescription)")
   }
 
   // Dismisses the keyboard if this textview is the first responder.
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
   public func dismissKeyboard() {
-    Manager.shared.kmLog(
-      "TextView: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
-      checkDebugPrinting: true)
+    log.debug("TextView: \(self.hashValue) Dismissing keyboard. Was first responder:\(isFirstResponder)")
     resignFirstResponder()
     Manager.shared.keymanWeb.view.endEditing(true)
   }
@@ -153,8 +147,7 @@ public class TextView: UITextView {
       becomeFirstResponder()
     }
 
-    Manager.shared.kmLog("TextView setFont: \(String(describing: font?.familyName))",
-      checkDebugPrinting: true)
+    log.debug("TextView: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
   }
 
   // MARK: iOS 7 TextView Scroll bug fix
@@ -299,15 +292,12 @@ extension TextView: UITextViewDelegate {
       font = UIFont.systemFont(ofSize: fontSize)
     }
 
-    Manager.shared.kmLog("TextView setFont: \(String(describing: font?.familyName))",
-      checkDebugPrinting: true)
+    log.debug("TextView: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
 
     // copy this textView's text to the webview
     Manager.shared.setText(text)
     Manager.shared.setSelectionRange(selectedRange, manually: false)
-    Manager.shared.kmLog(
-      "TextView: \(self.debugDescription) Became first responder. Value: \(text.debugDescription)",
-      checkDebugPrinting: true)
+    log.debug("TextView: \(self.hashValue) Became first responder. Value: \(String(describing: text))")
   }
 
   public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,

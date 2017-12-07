@@ -54,7 +54,7 @@ public class FontManager {
       urls = try FileManager.default.contentsOfDirectory(at: Storage.active.fontDir,
                                                          includingPropertiesForKeys: nil)
     } catch {
-      Manager.shared.kmLog("Failed to list font dir contents: \(error)", checkDebugPrinting: false)
+      log.error("Failed to list font dir contents: \(error)")
       return nil
     }
     return urls.filter { $0.lastPathComponent.hasFontExtension }
@@ -62,13 +62,13 @@ public class FontManager {
 
   private func readFontName(at url: URL) -> String? {
     guard let provider = CGDataProvider(url: url as CFURL) else {
-      Manager.shared.kmLog("Failed to open \(url)", checkDebugPrinting: false)
+      log.error("Failed to open \(url)")
       return nil
     }
     guard let font = CGFont(provider),
       let name = font.postScriptName
     else {
-      Manager.shared.kmLog("Failed to read font at \(url)", checkDebugPrinting: false)
+      log.error("Failed to read font at \(url)")
       return nil
     }
     return name as String
@@ -97,15 +97,13 @@ public class FontManager {
       didRegister = CTFontManagerRegisterFontsForURL(url as CFURL, .none, &errorRef)
       let error = errorRef?.takeRetainedValue() // Releases errorRef
       if !didRegister {
-        Manager.shared.kmLog("Failed to register font at \(url) reason: \(String(describing: error))",
-                             checkDebugPrinting: false)
+        log.error("Failed to register font at \(url) reason: \(String(describing: error))")
       } else {
-        Manager.shared.kmLog("Registered font: \(url)", checkDebugPrinting: true)
+        log.info("Registered font at \(url)")
       }
     } else {
       didRegister = false
-      Manager.shared.kmLog("Did not register font at \(url) because font name \(fontName) is already registered",
-                           checkDebugPrinting: true)
+      log.info("Did not register font at \(url) because font name \(fontName) is already registered")
     }
     let font = RegisteredFont(name: fontName, isRegistered: didRegister)
     fonts[url] = font
@@ -126,12 +124,11 @@ public class FontManager {
       let didUnregister = CTFontManagerUnregisterFontsForURL(url as CFURL, .none, &errorRef)
       let error = errorRef?.takeRetainedValue() // Releases errorRef
       if didUnregister {
-        Manager.shared.kmLog("Unregistered font at \(url)", checkDebugPrinting: true)
+        log.info("Unregistered font at \(url)")
         font.isRegistered = false
         fonts[url] = font
       } else {
-        Manager.shared.kmLog("Failed to unregister font at \(url) reason: \(String(describing: error))",
-          checkDebugPrinting: false)
+        log.error("Failed to unregister font at \(url) reason: \(String(describing: error))")
       }
     }
 

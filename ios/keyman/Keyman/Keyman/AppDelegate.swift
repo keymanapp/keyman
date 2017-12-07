@@ -20,10 +20,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]? = nil) -> Bool {
-    Manager.applicationGroupIdentifier = "group.KM4I"
     #if DEBUG
-      Manager.shared.isDebugPrintingOn = true
+      KeymanEngine.log.outputLevel = .debug
+      KeymanEngine.log.logAppDetails()
+    #else
+      KeymanEngine.log.outputLevel = .warning
     #endif
+    Manager.applicationGroupIdentifier = "group.KM4I"
     Manager.shared.openURL = UIApplication.shared.openURL
 
     window = UIWindow(frame: UIScreen.main.bounds)

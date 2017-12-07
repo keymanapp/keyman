@@ -108,7 +108,7 @@ extension KeymanWebViewController {
     case .pad:
       type = "AppleTablet"
     default:
-      Manager.shared.kmLog("Unexpected interface idiom: \(idiom)", checkDebugPrinting: false)
+      log.error("Unexpected interface idiom: \(idiom)")
       return
     }
     webView.evaluateJavaScript("setDeviceType('\(type)');", completionHandler: nil)
@@ -137,7 +137,7 @@ extension KeymanWebViewController {
       "KN": name,
       "KLC": languageID,
       "KL": languageName,
-      "KF": fileURL.absoluteString,
+      "KF": fileURL.absoluteString
     ]
     let displayFont = fontObject(from: font, keyboardID: id, isOsk: false)
     let oskFont = fontObject(from: oskFont, keyboardID: id, isOsk: true) ?? displayFont
@@ -152,11 +152,11 @@ extension KeymanWebViewController {
     do {
       data = try JSONSerialization.data(withJSONObject: stub, options: [])
     } catch {
-      Manager.shared.kmLog("Failed to serialize keyboard stub: \(error)", checkDebugPrinting: false)
+      log.error("Failed to serialize keyboard stub: \(error)")
       return
     }
     guard let stubString = String(data: data, encoding: .utf8) else {
-      Manager.shared.kmLog("Failed to create stub string", checkDebugPrinting: false)
+      log.error("Failed to create stub string")
       return
     }
 
@@ -242,7 +242,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
           subkeyIDs.append(values[0])
           subkeyTexts.append(values[1].stringFromUTF16CodeUnits() ?? "")
         default:
-          Manager.shared.kmLog("Unexpected subkey key: \(key)", checkDebugPrinting: false)
+          log.warning("Unexpected subkey key: \(key)")
         }
       }
 
@@ -267,9 +267,9 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       delegate?.hideKeyboard(self)
     } else if fragment.hasPrefix("ios-log:#iOS#") {
       let message = fragment.dropFirst(13)
-      Manager.shared.kmLog("KMW Log: \(message)", checkDebugPrinting: true)
+      log.info("KMW Log: \(message)")
     } else {
-      Manager.shared.kmLog("Unexpected KMW event: \(fragment)", checkDebugPrinting: false)
+      log.error("Unexpected KMW event: \(fragment)")
     }
   }
 

@@ -13,9 +13,7 @@ class ViewController: UIViewController, TextViewDelegate {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-
     Manager.shared.openURL = UIApplication.shared.openURL
-    Manager.shared.isDebugPrintingOn = true
     Manager.shared.isKeymanHelpOn = false
     do {
       try Manager.shared.preloadKeyboardFile(at: Bundle.main.url(forResource: "tamil99m-1.1", withExtension: "js")!,
@@ -23,7 +21,7 @@ class ViewController: UIViewController, TextViewDelegate {
       try Manager.shared.preloadFontFile(at: Bundle.main.url(forResource: "aava1", withExtension: "ttf")!,
                                          shouldOverwrite: true)
     } catch {
-      Manager.shared.kmLog("Error preloading: \(error)", checkDebugPrinting: false)
+      print("Error preloading: \(error)")
     }
     FontManager.shared.registerCustomFonts()
 

@@ -16,6 +16,7 @@
 		C01AB59C1F8345CB009B37D3 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C0324B801F87170600AF3785 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B7F1F87170600AF3785 /* AppDelegate.swift */; };
 		C0324B841F87172900AF3785 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B831F87172900AF3785 /* ViewController.swift */; };
+		C059FCB61FD9245300BD1A64 /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E41FD8F21500D2F3C7 /* Zip.framework */; };
 		C05B14201FD8F2B10082A316 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E51FD8F21500D2F3C7 /* ObjcExceptionBridging.framework */; };
 		C05B14211FD8F2B10082A316 /* ObjcExceptionBridging.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E51FD8F21500D2F3C7 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C05B14221FD8F2B10082A316 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E61FD8F21500D2F3C7 /* XCGLogger.framework */; };
@@ -64,6 +65,7 @@
 				C01AB59A1F8345C5009B37D3 /* KeymanEngine.framework in Frameworks */,
 				C05B14201FD8F2B10082A316 /* ObjcExceptionBridging.framework in Frameworks */,
 				C05B14221FD8F2B10082A316 /* XCGLogger.framework in Frameworks */,
+				C059FCB61FD9245300BD1A64 /* Zip.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

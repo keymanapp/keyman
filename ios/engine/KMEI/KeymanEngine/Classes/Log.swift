@@ -8,4 +8,4 @@
 
 import XCGLogger
 
-let log = XCGLogger(identifier: "KeymanEngine", includeDefaultDestinations: true)
+public let log = XCGLogger(identifier: "KeymanEngine", includeDefaultDestinations: true)

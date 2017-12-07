@@ -50,8 +50,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   public static let shared = Manager()
 
-  public var isDebugPrintingOn = false
-
   /// Display the help bubble on first use.
   public var isKeymanHelpOn = true
 
@@ -150,7 +148,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         do {
           try nonShared.copyFiles(to: shared)
         } catch {
-          kmLog("Failed to copy files to shared container: \(error)", checkDebugPrinting: false)
+          log.error("Failed to copy files to shared container: \(error)")
         }
       }
       let userData = Storage.active.userDefaults
@@ -165,7 +163,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     do {
       try Storage.active.copyKMWFiles(from: Resources.bundle)
     } catch {
-      kmLog("Failed to copy KMW files from bundle: \(error)", checkDebugPrinting: false)
+      log.error("Failed to copy KMW files from bundle: \(error)")
     }
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
@@ -220,11 +218,11 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - Returns: Whether the keyboard was set successfully
   public func setKeyboard(_ kb: InstallableKeyboard) -> Bool {
     if kb.languageID == self.languageID && kb.id == self.keyboardID {
-      kmLog("Keyboard unchanged: \(kb.languageID)_\(kb.id)", checkDebugPrinting: true)
+      log.info("Keyboard unchanged: \(kb.languageID)_\(kb.id)")
       return false
     }
 
-    kmLog("Setting language: \(kb.languageID)_\(kb.id)", checkDebugPrinting: true)
+    log.info("Setting language: \(kb.languageID)_\(kb.id)")
 
     self.languageID = kb.languageID
     self.keyboardID = kb.id
@@ -262,8 +260,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   public func addKeyboard(_ keyboard: InstallableKeyboard) {
     let keyboardPath = Storage.active.keyboardURL(for: keyboard).path
     if !FileManager.default.fileExists(atPath: keyboardPath) {
-      kmLog("Could not add keyboard with ID: \(keyboard.id) because the keyboard file does not exist",
-        checkDebugPrinting: false)
+      log.error("Could not add keyboard with ID: \(keyboard.id) because the keyboard file does not exist")
       return
     }
 
@@ -390,12 +387,12 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       let options = apiKeyboardRepository.options
     else {
       if fetchRepositoryIfNeeded {
-        kmLog("Fetching repository from API for keyboard download", checkDebugPrinting: true)
+        log.info("Fetching repository from API for keyboard download")
         apiKeyboardRepository.fetch { error in
           if let error = error {
             self.downloadFailed(forKeyboards: [], error: error)
           } else {
-            self.kmLog("Fetched repository. Continuing with keyboard download.", checkDebugPrinting: true)
+            log.info("Fetched repository. Continuing with keyboard download.")
             self.downloadKeyboard(withID: keyboardID,
                                   languageID: languageID,
                                   isUpdate: isUpdate,
@@ -581,27 +578,30 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   @objc func reachabilityChanged(_ notification: Notification) {
-    if isDebugPrintingOn {
-      var reachStr = "Not Reachable"
-      let status: NetworkStatus = reachability.currentReachabilityStatus()
-      if status == ReachableViaWiFi {
+    log.debug {
+      let reachStr: String
+      switch reachability.currentReachabilityStatus() {
+      case ReachableViaWiFi:
         reachStr = "Reachable Via WiFi"
-      }
-      if status == ReachableViaWWAN {
+      case ReachableViaWWAN:
         reachStr = "Reachable Via WWan"
+      default:
+        reachStr = "Not Reachable"
       }
-      kmLog("Reachability changed to '\(reachStr)'", checkDebugPrinting: true)
+      return "Reachability changed to '\(reachStr)'"
     }
   }
 
   // MARK: - HTTPDownloadDelegate methods
 
   func downloadQueueFinished(_ queue: HTTPDownloader) {
-    if isDebugPrintingOn {
+    log.debug {
       let fontContents = try? FileManager.default.contentsOfDirectory(atPath: Storage.active.fontDir.path)
-      kmLog("Font Directory contents: \(String(describing: fontContents))", checkDebugPrinting: true)
+      return "Font Directory contents: \(fontContents ?? [])"
+    }
+    log.debug {
       let langContents = try? FileManager.default.contentsOfDirectory(atPath: Storage.active.languageDir.path)
-      kmLog("Language Directory contents: \(String(describing: langContents))", checkDebugPrinting: true)
+      return "Language Directory contents: \(langContents ?? [])"
     }
   }
 
@@ -628,7 +628,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
           // Download queue finished.
           downloadQueue = nil
           FontManager.shared.registerCustomFonts()
-          kmLog("Downloaded keyboard: \(keyboard.id).", checkDebugPrinting: true)
+          log.info("Downloaded keyboard: \(keyboard.id).")
 
           NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
                                           object: self,
@@ -648,7 +648,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         let errorMessage = "\(request.responseStatusMessage ?? ""): \(request.url)"
         let error = NSError(domain: "Keyman", code: 0,
                             userInfo: [NSLocalizedDescriptionKey: errorMessage])
-        kmLog("Keyboard download failed: \(error).", checkDebugPrinting: true)
+        log.error("Keyboard download failed: \(error).")
 
         if !isUpdate {
           // Clean up keyboard file if anything fails
@@ -665,7 +665,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     case .downloadFile:
       downloadQueue = nil
       let error = request.error!
-      kmLog("Keyboard download failed: \(error).", checkDebugPrinting: true)
+      log.error("Keyboard download failed: \(error).")
 
       let keyboards = request.userInfo[Key.keyboardInfo] as! [InstallableKeyboard]
       let keyboard = keyboards[0]
@@ -707,15 +707,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     try Storage.copyAndExcludeFromBackup(at: url,
                                          to: Storage.active.fontDir.appendingPathComponent(url.lastPathComponent),
                                          shouldOverwrite: shouldOverwrite)
-  }
-
-  // TODO: Use a logging library or have more than 2 log levels
-  // Facilitates KeymanEngine internal logging.
-  public func kmLog(_ logStr: String, checkDebugPrinting: Bool) {
-    if checkDebugPrinting && !isDebugPrintingOn {
-      return
-    }
-    log.debug(logStr)
   }
 
   // MARK: - File system and UserData management
@@ -818,7 +809,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         try shared.copyFiles(to: nonShared)
         FontManager.shared.registerCustomFonts()
       } catch {
-        kmLog("Failed to copy from shared container: \(error)", checkDebugPrinting: false)
+        log.error("Failed to copy from shared container: \(error)")
       }
     }
   }
@@ -1107,7 +1098,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   func clearText() {
     setText(nil)
     setSelectionRange(NSRange(location: 0, length: 0), manually: true)
-    kmLog("Cleared text.", checkDebugPrinting: true)
+    log.info("Cleared text.")
   }
 
   func setText(_ text: String?) {
@@ -1138,7 +1129,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   func keyboardLoaded(_ keymanWeb: KeymanWebViewController) {
     keymanWebDelegate?.keyboardLoaded(keymanWeb)
 
-    kmLog("Loaded keyboard.", checkDebugPrinting: true)
+    log.info("Loaded keyboard.")
     resizeKeyboard()
     keymanWeb.setDeviceType(UIDevice.current.userInterfaceIdiom)
 

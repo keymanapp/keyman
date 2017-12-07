@@ -48,12 +48,12 @@ public class APIKeyboardRepository: KeyboardRepository {
     }
 
     if let error = error {
-      Manager.shared.kmLog("Network error fetching languages: \(error)", checkDebugPrinting: false)
+      log.error("Network error fetching languages: \(error)")
       errorHandler(APIKeyboardFetchError.networkError(error))
       return
     }
     guard let data = data else {
-      Manager.shared.kmLog("Language API did not return data", checkDebugPrinting: false)
+      log.error("Language API did not return data")
       errorHandler(APIKeyboardFetchError.noData)
       return
     }
@@ -64,7 +64,7 @@ public class APIKeyboardRepository: KeyboardRepository {
     do {
       result = try decoder.decode(LanguagesAPICall.self, from: data)
     } catch {
-      Manager.shared.kmLog("Failed parsing API languages: \(error)", checkDebugPrinting: false)
+      log.error("Failed parsing API languages: \(error)")
       errorHandler(APIKeyboardFetchError.parsingError(error))
       return
     }
@@ -88,7 +88,7 @@ public class APIKeyboardRepository: KeyboardRepository {
       return kb
     }
 
-    Manager.shared.kmLog("Request completed -- \(result.languages.count) languages.", checkDebugPrinting: true)
+    log.info("Request completed -- \(result.languages.count) languages.")
     DispatchQueue.main.async {
       self.delegate?.keyboardRepositoryDidFetch(self)
       fetchCompletionHandler?(nil)
