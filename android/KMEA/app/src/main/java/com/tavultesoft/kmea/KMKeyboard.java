@@ -4,6 +4,7 @@
 
 package com.tavultesoft.kmea;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -45,6 +46,8 @@ import android.widget.PopupWindow;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import static com.tavultesoft.kmea.KMManager.KMDefault_AssetPackages;
 
 final class KMKeyboard extends WebView {
   private final Context context;
@@ -293,8 +296,13 @@ final class KMKeyboard extends WebView {
     if (oFont.equals("''")) {
       oFont = "undefined";
     }
-    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
-    String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardVersion, tFont, oFont, packageID);
+
+    String kmwRootPath = context.getDir("data", Context.MODE_PRIVATE) + File.separator;
+    String keyboardPath = kmwRootPath + KMDefault_AssetPackages + File.separator + packageID +
+      File.separator + keyboardID + "-" + keyboardVersion + ".js";
+
+    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s)";
+    String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont);
     loadUrl(jsString);
     if (KMManager.isDebugMode()) {
       Log.d("KMKeyboard", jsString);
@@ -386,8 +394,12 @@ final class KMKeyboard extends WebView {
     if (oFont.equals("''")) {
       oFont = "undefined";
     }
-    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
-    String jsString = String.format(jsFormat, keyboardName.replace("'", "\\'"), keyboardID, languageName.replace("'", "\\'"), languageID, keyboardVersion, tFont, oFont, packageID);
+    String kmwRootPath = context.getDir("data", Context.MODE_PRIVATE) + File.separator;
+    String keyboardPath = kmwRootPath + KMDefault_AssetPackages + File.separator + packageID +
+      File.separator + keyboardID + "-" + keyboardVersion + ".js";
+
+    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s)";
+    String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont);
     loadUrl(jsString);
     if (KMManager.isDebugMode()) {
       Log.d("KMKeyboard", jsString);
