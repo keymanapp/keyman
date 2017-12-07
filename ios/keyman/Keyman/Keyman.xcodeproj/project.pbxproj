@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1687ACC61FD8269C00926D69 /* CocoaLumberjack.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B971FD822D500D4A78D /* CocoaLumberjack.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		1687ACC81FD8269C00926D69 /* CocoaLumberjackSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B901FD8221800D4A78D /* CocoaLumberjackSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1687ACCA1FD8269C00926D69 /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8F1FD8221800D4A78D /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1687ACD41FD8DE8000926D69 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */; };
+		1687ACD51FD8DE8000926D69 /* ObjcExceptionBridging.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1687ACD61FD8DE8000926D69 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD01FD8DE7600926D69 /* XCGLogger.framework */; };
+		1687ACD71FD8DE8000926D69 /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD01FD8DE7600926D69 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		981AFA8F19EF44DE006706BF /* 724-info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725518E4F0930014DF0C /* 724-info@2x.png */; };
 		981AFA9019EF44DE006706BF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADBC176935E400B62590 /* InfoPlist.strings */; };
 		981AFA9619EF44DE006706BF /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */; };
@@ -183,9 +185,9 @@
 			dstSubfolderSpec = 10;
 			files = (
 				1687ACCA1FD8269C00926D69 /* Zip.framework in Embed Frameworks */,
-				1687ACC61FD8269C00926D69 /* CocoaLumberjack.framework in Embed Frameworks */,
+				1687ACD71FD8DE8000926D69 /* XCGLogger.framework in Embed Frameworks */,
 				CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */,
-				1687ACC81FD8269C00926D69 /* CocoaLumberjackSwift.framework in Embed Frameworks */,
+				1687ACD51FD8DE8000926D69 /* ObjcExceptionBridging.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -194,8 +196,8 @@
 
 /* Begin PBXFileReference section */
 		165C8B8F1FD8221800D4A78D /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = ../../Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
-		165C8B901FD8221800D4A78D /* CocoaLumberjackSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjackSwift.framework; path = ../../Carthage/Build/iOS/CocoaLumberjackSwift.framework; sourceTree = "<group>"; };
-		165C8B971FD822D500D4A78D /* CocoaLumberjack.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaLumberjack.framework; path = ../../Carthage/Build/iOS/CocoaLumberjack.framework; sourceTree = "<group>"; };
+		1687ACD01FD8DE7600926D69 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = ../../Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
+		1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = ../../Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
 		9815725018E4F0930014DF0C /* 702-share.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "702-share.png"; path = "Keyman Icons/702-share.png"; sourceTree = "<group>"; };
 		9815725118E4F0930014DF0C /* 702-share@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "702-share@2x.png"; path = "Keyman Icons/702-share@2x.png"; sourceTree = "<group>"; };
 		9815725218E4F0930014DF0C /* 711-trash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "711-trash.png"; path = "Keyman Icons/711-trash.png"; sourceTree = "<group>"; };
@@ -363,6 +365,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1687ACD41FD8DE8000926D69 /* ObjcExceptionBridging.framework in Frameworks */,
+				1687ACD61FD8DE8000926D69 /* XCGLogger.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -571,8 +575,8 @@
 		98ABADB2176935E400B62590 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				165C8B971FD822D500D4A78D /* CocoaLumberjack.framework */,
-				165C8B901FD8221800D4A78D /* CocoaLumberjackSwift.framework */,
+				1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */,
+				1687ACD01FD8DE7600926D69 /* XCGLogger.framework */,
 				165C8B8F1FD8221800D4A78D /* Zip.framework */,
 				CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */,
 			);
@@ -965,14 +969,14 @@
 			files = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/../../Carthage/Build/iOS/CocoaLumberjackSwift.framework",
-				"$(SRCROOT)/../../Carthage/Build/iOS/CocoaLumberjack.framework",
 				"$(SRCROOT)/../../Carthage/Build/iOS/Zip.framework",
+				"$(SRCROOT)/../../Carthage/Build/iOS/ObjcExceptionBridging.framework",
+				"$(SRCROOT)/../../Carthage/Build/iOS/XCGLogger.framework",
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/CocoaLumberjackSwift.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/CocoaLumberjack.framework",
 				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Zip.framework",
+				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/ObjcExceptionBridging.framework",
+				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/XCGLogger.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

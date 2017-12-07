@@ -8,7 +8,7 @@
 
 import UIKit
 import WebKit
-import CocoaLumberjackSwift
+import XCGLogger
 import Zip
 
 typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
@@ -765,7 +765,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
     //NSLog("%@", logStr)
-    DDLogInfo(logStr)
+    XCGLogger.default.debug(logStr)
   }
 
   // MARK: - File system and UserData management
