@@ -34,6 +34,7 @@ set_version ( ) {
 
 do_clean ( ) {
   rm -rf $BUILD_PATH
+  rm -rf Carthage
 }
 
 ### START OF THE BUILD ###
