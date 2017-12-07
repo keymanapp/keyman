@@ -22,9 +22,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                    didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]? = nil) -> Bool {
     #if DEBUG
       KeymanEngine.log.outputLevel = .debug
+      log.outputLevel = .debug
       KeymanEngine.log.logAppDetails()
     #else
       KeymanEngine.log.outputLevel = .warning
+      log.outputLevel = .warning
     #endif
     Manager.applicationGroupIdentifier = "group.KM4I"
     Manager.shared.openURL = UIApplication.shared.openURL

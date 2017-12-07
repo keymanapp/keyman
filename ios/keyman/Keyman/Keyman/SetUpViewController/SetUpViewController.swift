@@ -71,9 +71,7 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
     let url = "http://keyman.com/iphone-and-ipad/app/systemkeyboard/index.php" +
         "?active=\(currentKeyboardId)&installed=\(installedKeyboards)"
     webView.loadRequest(URLRequest(url: URL(string: url)!))
-    #if DEBUG
-      NSLog("Set up page URL: %@", url)
-    #endif
+    log.debug("Set up page URL: \(url)")
   }
 
   func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest,
