@@ -1,5 +1,8 @@
 package com.tavultesoft.kmea.packages;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.JSONParser;
 
@@ -17,6 +20,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,22 +70,9 @@ public class PackageProcessor {
     }
   }
 
-  static boolean clearDirectory(File path) {
-    // Java won't allow deleting non-empty directories, so we need recursion to perform a full delete.
-    if(path.isDirectory()) {
-      File[] children = path.listFiles();
-
-      for(File child:children) {
-        boolean resultFlag = clearDirectory(child);
-        if(!resultFlag) {
-          return false;
-        }
-      }
-    }
-
-    return path.delete();
-  }
-
+  // A default, managed mapping for package installation, handling both temp directory
+  // and perm directory locations.  No need to relocate the downloaded .kmp file itself.
+  @NonNull
   static File constructPath(File path, boolean temp) {
     String filename = path.getName();
     String kmpBaseName;
@@ -149,24 +140,54 @@ public class PackageProcessor {
     return json.getJSONObject("system").getString("fileVersion");
   }
 
+  // Returns 1 if newer, 0 if equal, and -1 if older or invalid.  If no prior version exists, returns 1.
+  public static int comparePackageDirectories(File newPath, File oldPath) throws IOException, JSONException {
+    JSONObject newInfoJSON = loadPackageInfo(newPath);
+    String newVersion = getVersion(newInfoJSON);
+
+    if(oldPath.exists()) {
+      JSONObject oldInfoJSON = loadPackageInfo(oldPath);
+      String originalVersion = getVersion(oldInfoJSON);
+
+      if(KMManager.compareVersions(newVersion, originalVersion) == 1) {
+        return 1;
+      } else if(KMManager.compareVersions(newVersion, originalVersion) == 0){
+        return 0;
+      } else {
+        return -1;
+      }
+    } else {
+      return 1;
+    }
+  }
+
+  @Nullable
   public static List<Map<String, String>> processKMP(File path) throws IOException, JSONException {
     File tempPath = unzipKMP(path);
     JSONObject newInfoJSON = loadPackageInfo(tempPath);
-    String newVersion = getVersion(newInfoJSON);
 
     File permPath = constructPath(path, false);
     if(permPath.exists()) {
-      JSONObject oldInfoJSON = loadPackageInfo(permPath);
-      String originalVersion = getVersion(oldInfoJSON);
-
-      // TODO:  Compare versions.
-      // if(newer) then overwrite
-      // else cancel package install, erase temp directory
-      return null;
-    } else {
-      // No version conflict!  Proceed with the install!
-      // Is within else 'cause there's no need to overwrite.
+      if(comparePackageDirectories(tempPath, permPath) != -1) {
+        // Abort!  The current installation is newer or as up-to-date.
+        FileUtils.deleteDirectory(tempPath);
+        return null;
+      } else {
+        // Out with the old.  "In with the new" is identical to a new package installation.
+        FileUtils.deleteDirectory(permPath);
+      }
     }
+
+    // No version conflict!  Proceed with the install!
+    // A nice, recursive method provided by Apache Commons-IO's FileUtils class.
+    FileUtils.moveDirectory(tempPath, permPath);
+
+
+//    How to retrieve other interesting bits of JSON, with pretty-printing:
+//    System.out.println("System: " + json.getJSONObject("system").toString(2));
+//    System.out.println("Options: " + json.getJSONObject("options").toString(2));
+//    System.out.println("Info: " + json.getJSONObject("info").toString(2));
+//    System.out.println("Files: " + json.getJSONArray("files").toString(2));
 
     // newInfoJSON holds all the newly downloaded/updated keyboard data.
     JSONArray keyboards = newInfoJSON.getJSONArray("keyboards");

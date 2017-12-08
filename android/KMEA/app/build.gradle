@@ -43,6 +43,7 @@ android {
 
 dependencies {
     implementation 'com.android.support:support-v4:25.4.0'
+    implementation 'commons-io:commons-io:2.6'
     testImplementation 'junit:junit:4.12'
     testImplementation "org.robolectric:robolectric:3.5.1"
 }

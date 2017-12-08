@@ -2,9 +2,12 @@ package com.tavultesoft.kmea.packages;
 
 import com.tavultesoft.kmea.KMManager;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +26,8 @@ public class PackageProcessorTest {
 
   public static final String TEST_GFF_KMP_NAME = "gff_amh_7_test_json";
   public static final File TEST_GFF_KMP_FILE = new File(TEST_RESOURCE_ROOT, TEST_GFF_KMP_NAME + ".kmp");
+  public static final File TEST_GFF_KMP_TARGET = new File(TEST_EXTRACTION_ROOT, "packages" +
+    File.separator + TEST_GFF_KMP_NAME);
 
   /* TODO:  Create an alternate version with a different package version; perform package overwrite tests
    * in both directions.
@@ -30,8 +35,8 @@ public class PackageProcessorTest {
 
   private static File tempPkg;
 
-  @BeforeClass
-  public static void extractTestPackages() {
+  @Before
+  public void extractTestPackages() {
     PackageProcessor.initialize(TEST_EXTRACTION_ROOT);
     try {
 
@@ -53,20 +58,20 @@ public class PackageProcessorTest {
     JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
 
     Assert.assertNotNull(json);
-
-    // Test pretty-print, for visual inspection if desired.
-    System.out.println();
-    System.out.println("Package version: " + json.getJSONObject("system").get("fileVersion"));
-    System.out.println();
-    System.out.println("System: " + json.getJSONObject("system").toString(2));
-    System.out.println();
-    System.out.println("Options: " + json.getJSONObject("options").toString(2));
-    System.out.println();
-    System.out.println("Info: " + json.getJSONObject("info").toString(2));
-    System.out.println();
-    System.out.println("Files: " + json.getJSONArray("files").toString(2));
-    System.out.println();
-    System.out.println("Keyboards: " + json.getJSONArray("keyboards").toString(2));
+//
+//    // Test pretty-print, for visual inspection if desired.
+//    System.out.println();
+//    System.out.println("Package version: " + json.getJSONObject("system").get("fileVersion"));
+//    System.out.println();
+//    System.out.println("System: " + json.getJSONObject("system").toString(2));
+//    System.out.println();
+//    System.out.println("Options: " + json.getJSONObject("options").toString(2));
+//    System.out.println();
+//    System.out.println("Info: " + json.getJSONObject("info").toString(2));
+//    System.out.println();
+//    System.out.println("Files: " + json.getJSONArray("files").toString(2));
+//    System.out.println();
+//    System.out.println("Keyboards: " + json.getJSONArray("keyboards").toString(2));
   }
 
   @Test
@@ -109,8 +114,16 @@ public class PackageProcessorTest {
     Assert.assertNotEquals(new File(permPath), PackageProcessor.constructPath(TEST_GFF_KMP_FILE, true));
   }
 
-  @AfterClass
-  public static void eraseTestPackages() {
-    PackageProcessor.clearDirectory(tempPkg);
+  @Test
+  public void test_installKMP() throws Exception {
+    PackageProcessor.processKMP(TEST_GFF_KMP_FILE);
+
+    Assert.assertTrue(TEST_GFF_KMP_TARGET.exists());
+  }
+
+  @After
+  public void eraseTestPackages() throws IOException {
+    FileUtils.deleteDirectory(tempPkg);
+    FileUtils.deleteDirectory(TEST_GFF_KMP_TARGET);
   }
 }
