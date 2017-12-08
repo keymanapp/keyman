@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>10.0.967.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <MSIFileName></MSIFileName>
+    <MSIOptions></MSIOptions>
+  </Options>
+  <Buttons>
+    <Button>
+      <ButtonType>install</ButtonType>
+      <Caption>&amp;Install</Caption>
+      <URL></URL>
+      <Left>0</Left>
+      <Top>0</Top>
+    </Button>
+    <Button>
+      <ButtonType>cancel</ButtonType>
+      <Caption>Cancel</Caption>
+      <URL></URL>
+      <Left>0</Left>
+      <Top>0</Top>
+    </Button>
+    <Button>
+      <ButtonType>about</ButtonType>
+      <Caption>&amp;About...</Caption>
+      <URL></URL>
+      <Left>0</Left>
+      <Top>0</Top>
+    </Button>
+  </Buttons>
+  <Registry/>
+  <StartMenu>
+    <Folder></Folder>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Version URL="">1.0</Version>
+    <Name URL="">Multi Keyboard Package Keyboard #1</Name>
+  </Info>
+  <Files>
+    <File>
+      <Name>mkp1.kmx</Name>
+      <Description>Keyboard Multi Keyboard Package Keyboard #1</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+    <File>
+      <Name>mkp2.kmx</Name>
+      <Description>Keyboard Multi Keyboard Package Keyboard #2</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+  </Files>
+  <Strings/>
+</Package>

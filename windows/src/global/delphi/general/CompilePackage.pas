@@ -50,6 +50,9 @@ uses
   RegistryKeys,
   kmxfile,
   KeymanDeveloperOptions,
+
+  Keyman.System.PackageInfoRefreshKeyboards,
+
   RedistFiles,
   TempFileManager;
 
@@ -169,7 +172,23 @@ begin
     { Create KMP.INF and KMP.JSON }
 
     kmpinf.Assign(pack);
+
+    // Add keyboard information to the package 'for free'
+    // Note: this does not get us very far for mobile keyboards as
+    // they still require the .js to be added by the developer at this stage.
+    // But it ensures that all keyboards in the package are listed in the
+    // {Keyboards} section
+
+    with TPackageInfoRefreshKeyboards.Create(kmpinf) do
+    try
+      Execute;
+    finally
+      Free;
+    end;
+
     kmpinf.RemoveFilePaths;
+
+    // TODO: BCP47: Validate BCP-47 codes
 
     psf := TPackageContentFile.Create(kmpinf);
     psf.FileName := 'kmp.inf';

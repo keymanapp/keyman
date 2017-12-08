@@ -587,7 +587,6 @@ uses
   UfrmSelectSystemKeyboard,
   UfrmSelectTouchLayoutTemplate,
   UfrmSelectWindowsLanguages,
-  UfrmSelectISOLanguages,
   UfrmSendURLsToEmail,
   Upload_Settings,
   utildir,

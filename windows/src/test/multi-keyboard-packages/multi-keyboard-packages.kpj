@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_02e0df25ff8af26564d66743912e6cdc</ID>
+      <Filename>mkp1.kmn</Filename>
+      <Filepath>mkp1.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Multi Keyboard Package Keyboard #1</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_c0b51abf67f4661db7d56affd77e80aa</ID>
+      <Filename>mkp2.kmn</Filename>
+      <Filepath>mkp2.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Multi Keyboard Package Keyboard #2</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_ad080fca7cdc1684e454c6952c2d3ba4</ID>
+      <Filename>mkp_package_1.kps</Filename>
+      <Filepath>mkp_package_1.kps</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kps</FileType>
+      <Details>
+        <Name>Multi Keyboard Package #1</Name>
+        <Version>1.0</Version>
+      </Details>
+    </File>
+    <File>
+      <ID>id_63d9fed0818db7cc52a6c4fccf470cf7</ID>
+      <Filename>mkp_package_1_a.kps</Filename>
+      <Filepath>mkp_package_1_a.kps</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kps</FileType>
+      <Details>
+        <Name>Multi Keyboard Package #1a</Name>
+        <Version>1.0</Version>
+      </Details>
+    </File>
+    <File>
+      <ID>id_09af86c635570f099d7a3e535fc816bb</ID>
+      <Filename>mkp_package_1_2.kps</Filename>
+      <Filepath>mkp_package_1_2.kps</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kps</FileType>
+      <Details>
+        <Name>Multi Keyboard Package #1 and #2</Name>
+        <Version>1.0</Version>
+      </Details>
+    </File>
+    <File>
+      <ID>id_09064bdb63acd8ca4871562ce30de92b</ID>
+      <Filename>mkp_package_1_2_a.kps</Filename>
+      <Filepath>mkp_package_1_2_a.kps</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kps</FileType>
+      <Details>
+        <Name>Multi Keyboard Package Keyboard #1</Name>
+        <Version>1.0</Version>
+      </Details>
+    </File>
+    <File>
+      <ID>id_7cfba96944516669a8f2fc1a907fa403</ID>
+      <Filename>mkp1.kmx</Filename>
+      <Filepath>mkp1.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_ad080fca7cdc1684e454c6952c2d3ba4</ParentFileID>
+    </File>
+    <File>
+      <ID>id_e8483ce2482572d6767a8145c0648526</ID>
+      <Filename>mkp2.kmx</Filename>
+      <Filepath>mkp2.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_09af86c635570f099d7a3e535fc816bb</ParentFileID>
+    </File>
+  </Files>
+</KeymanDeveloperProject>
