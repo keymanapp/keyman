@@ -47,6 +47,8 @@ public class PackageProcessorTest {
 
     // Test pretty-print, for visual inspection if desired.
     System.out.println();
+    System.out.println("Package version: " + json.getJSONObject("system").get("fileVersion"));
+    System.out.println();
     System.out.println("System: " + json.getJSONObject("system").toString(2));
     System.out.println();
     System.out.println("Options: " + json.getJSONObject("options").toString(2));
@@ -60,6 +62,6 @@ public class PackageProcessorTest {
 
   @AfterClass
   public static void eraseTestPackages() {
-    //PackageProcessor.clearDirectory(tempPkg);
+    PackageProcessor.clearDirectory(tempPkg);
   }
 }

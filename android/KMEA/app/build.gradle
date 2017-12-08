@@ -26,7 +26,17 @@ android {
 
     testOptions {
         unitTests {
+            // Allows use of a simulated Android API for tests.  (Thanks, roboelectric!)
             includeAndroidResources = true
+        }
+        unitTests.all {
+            testLogging {
+                // May also add "passed", "skipped".
+                events "failed"//, "standardOut", "standardError" if we want them to show in builds.
+                outputs.upToDateWhen {false}
+                //showStandardStreams = true // If we want test console log output to show during builds.
+            }
+            workingDir = "../" // Defaults to the `app` subdirectory, which is different from Android Studio's default.
         }
     }
 }
@@ -34,6 +44,5 @@ android {
 dependencies {
     implementation 'com.android.support:support-v4:25.4.0'
     testImplementation 'junit:junit:4.12'
-    //testCompile 'org.mockito:mockito-core:2.13.0'
     testImplementation "org.robolectric:robolectric:3.5.1"
 }

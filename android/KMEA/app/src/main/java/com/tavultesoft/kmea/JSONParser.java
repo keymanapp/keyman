@@ -114,11 +114,7 @@ public final class JSONParser {
       Log.e("Encoding Error", (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
       jsonObj = null;
       System.err.println(e);
-    } catch (IOException e) {
-      Log.e("IO Error", (e.getMessage() == null) ? "IOException" : e.getMessage());
-      jsonObj = null;
-      System.err.println(e);
-    }  catch (Exception e) {
+    } catch (Exception e) {
       Log.e("JSON Parser Error", (e.getMessage() == null) ? "Exception" : e.getMessage());
       jsonObj = null;
       System.err.println(e);

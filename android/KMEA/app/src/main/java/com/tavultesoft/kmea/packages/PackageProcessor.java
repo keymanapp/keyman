@@ -76,7 +76,7 @@ public class PackageProcessor {
     return path.delete();
   }
 
-  static File constructTempPath(File path) {
+  static File constructPath(File path, boolean temp) {
     String filename = path.getName();
     String kmpBaseName;
 
@@ -97,13 +97,13 @@ public class PackageProcessor {
 
     // Extract our best-guess name for the package and construct the temporary package name.
     kmpBaseName = filename.substring(0, filename.lastIndexOf('.'));
-    String kmpTempFolderName = "." + kmpBaseName + ".temp";
+    String kmpFolderName = temp ? "." + kmpBaseName + ".temp" : kmpBaseName;
 
-    return new File(resourceRoot,KMManager.KMDefault_AssetPackages + File.separator + kmpTempFolderName + File.separator);
+    return new File(resourceRoot,KMManager.KMDefault_AssetPackages + File.separator + kmpFolderName + File.separator);
   }
 
   static File unzipKMP(File path) throws IOException {
-    File tempKeyboardPath = constructTempPath(path);
+    File tempKeyboardPath = constructPath(path, true);
     unzip(path, tempKeyboardPath);
 
     return tempKeyboardPath;
