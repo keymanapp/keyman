@@ -17,7 +17,7 @@ public extension UserDefaults {
     do {
       return try array.map { try decoder.decode(InstallableKeyboard.self, from: $0) }
     } catch {
-      Manager.shared.kmLog("UserDefaults: Error decoding keyboards: \(error)", checkDebugPrinting: false)
+      log.error("UserDefaults: Error decoding keyboards: \(error)")
       return nil
     }
   }
@@ -32,7 +32,7 @@ public extension UserDefaults {
       let array = try keyboards.map { try encoder.encode($0) }
       set(array, forKey: key)
     } catch {
-      Manager.shared.kmLog("UserDefaults: Error encoding keyboards: \(error)", checkDebugPrinting: false)
+      log.error("UserDefaults: Error encoding keyboards: \(error)")
     }
   }
 
@@ -43,7 +43,7 @@ public extension UserDefaults {
     do {
       return try PropertyListDecoder().decode(InstallableKeyboard.self, from: data)
     } catch {
-      Manager.shared.kmLog("UserDefaults: Error decoding keyboard: \(error)", checkDebugPrinting: false)
+      log.error("UserDefaults: Error decoding keyboard: \(error)")
       return nil
     }
   }
@@ -57,7 +57,7 @@ public extension UserDefaults {
       let data = try PropertyListEncoder().encode(keyboard)
       set(data, forKey: key)
     } catch {
-      Manager.shared.kmLog("UserDefaults: Error encoding keyboard: \(error)", checkDebugPrinting: false)
+      log.error("UserDefaults: Error encoding keyboard: \(error)")
     }
   }
 

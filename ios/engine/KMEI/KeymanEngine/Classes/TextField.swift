@@ -84,9 +84,7 @@ public class TextField: UITextField {
       }
 
       if delegate !== delegateProxy {
-        Manager.shared.kmLog(
-          "Trying to set TextField's delegate directly. Use setKeymanDelegate() instead.",
-          checkDebugPrinting: true)
+        log.error("Trying to set TextField's delegate directly. Use setKeymanDelegate() instead.")
       }
       super.delegate = delegateProxy
     }
@@ -98,17 +96,13 @@ public class TextField: UITextField {
   // All of the normal UITextFieldDelegate methods are supported.
   public func setKeymanDelegate(_ keymanDelegate: TextFieldDelegate?) {
     delegateProxy.keymanDelegate = keymanDelegate
-    Manager.shared.kmLog(
-      "TextField: \(self.debugDescription) keymanDelegate set to: \(keymanDelegate.debugDescription)",
-      checkDebugPrinting: true)
+    log.debug("TextField: \(self.hashValue) keymanDelegate set to: \(keymanDelegate.debugDescription)")
   }
 
   // Dismisses the keyboard if this textview is the first responder.
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
   public func dismissKeyboard() {
-    Manager.shared.kmLog(
-      "TextField: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
-      checkDebugPrinting: true)
+    log.debug("TextField: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)")
     resignFirstResponder()
     Manager.shared.keymanWeb.view.endEditing(true)
   }
@@ -163,8 +157,7 @@ public class TextField: UITextField {
       resignFirstResponder()
       becomeFirstResponder()
     }
-    Manager.shared.kmLog(
-      "TextField \(self.debugDescription) setFont: \(font!.familyName)", checkDebugPrinting: true)
+    log.debug("TextField \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
   }
 
   @objc func enableInputClickSound() {
@@ -298,8 +291,7 @@ extension TextField: UITextFieldDelegate {
       font = UIFont.systemFont(ofSize: fontSize)
     }
 
-    Manager.shared.kmLog("TextField setFont: \(String(describing: font?.familyName))",
-      checkDebugPrinting: true)
+    log.debug("TextField: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
 
     // copy this textField's text to the webview
     Manager.shared.setText(text)
@@ -307,9 +299,7 @@ extension TextField: UITextFieldDelegate {
     let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                            length: offset(from: textRange.start, to: textRange.end))
     Manager.shared.setSelectionRange(newRange, manually: false)
-    Manager.shared.kmLog(
-      "TextField: \(self.debugDescription) Became first responder. Value: \(String(describing: text))",
-      checkDebugPrinting: true)
+    log.debug("TextField: \(self.hashValue) Became first responder. Value: \(String(describing: text))")
   }
 
   public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {

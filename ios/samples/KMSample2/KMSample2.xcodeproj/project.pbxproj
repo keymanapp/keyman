@@ -19,6 +19,10 @@
 		C0324B871F87245200AF3785 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B861F87245200AF3785 /* AppDelegate.swift */; };
 		C0324B891F87245B00AF3785 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B881F87245B00AF3785 /* ViewController.swift */; };
 		C045148D1F85E33300D88416 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C045148C1F85E33300D88416 /* KeyboardViewController.swift */; };
+		C059FCB21FD9231D00BD1A64 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14271FD8F4510082A316 /* ObjcExceptionBridging.framework */; };
+		C059FCB31FD9231D00BD1A64 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14281FD8F4510082A316 /* XCGLogger.framework */; };
+		C059FCB41FD9231D00BD1A64 /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14261FD8F4510082A316 /* Zip.framework */; };
+		C059FCB51FD923E900BD1A64 /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14261FD8F4510082A316 /* Zip.framework */; };
 		C05B142C1FD8F45E0082A316 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14271FD8F4510082A316 /* ObjcExceptionBridging.framework */; };
 		C05B142D1FD8F45E0082A316 /* ObjcExceptionBridging.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14271FD8F4510082A316 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C05B142E1FD8F45E0082A316 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14281FD8F4510082A316 /* XCGLogger.framework */; };
@@ -93,6 +97,7 @@
 				C01AB5A01F834706009B37D3 /* KeymanEngine.framework in Frameworks */,
 				C05B142C1FD8F45E0082A316 /* ObjcExceptionBridging.framework in Frameworks */,
 				C05B142E1FD8F45E0082A316 /* XCGLogger.framework in Frameworks */,
+				C059FCB51FD923E900BD1A64 /* Zip.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,6 +106,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				C01AB59F1F8346FC009B37D3 /* KeymanEngine.framework in Frameworks */,
+				C059FCB21FD9231D00BD1A64 /* ObjcExceptionBridging.framework in Frameworks */,
+				C059FCB31FD9231D00BD1A64 /* XCGLogger.framework in Frameworks */,
+				C059FCB41FD9231D00BD1A64 /* Zip.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -416,6 +424,10 @@
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
+					"$(SRCROOT)/../../Carthage/Build/iOS/",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -470,6 +482,10 @@
 				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
+					"$(SRCROOT)/../../Carthage/Build/iOS/",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -497,11 +513,6 @@
 				CODE_SIGN_ENTITLEMENTS = KMSample2/KMSample2.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)",
-					"$(SRCROOT)/../../Carthage/Build/iOS/",
-				);
 				INFOPLIST_FILE = KMSample2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
@@ -523,11 +534,6 @@
 				CODE_SIGN_ENTITLEMENTS = KMSample2/KMSample2.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)",
-					"$(SRCROOT)/../../Carthage/Build/iOS/",
-				);
 				INFOPLIST_FILE = KMSample2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
@@ -547,10 +553,6 @@
 				CODE_SIGN_ENTITLEMENTS = SWKeyboard/SWKeyboard.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -576,10 +578,6 @@
 				CODE_SIGN_ENTITLEMENTS = SWKeyboard/SWKeyboard.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)",
-				);
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";

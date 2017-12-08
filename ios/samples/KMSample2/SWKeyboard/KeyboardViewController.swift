@@ -11,11 +11,12 @@ import UIKit
 
 class KeyboardViewController: InputViewController {
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    // Replace with your application group id. Must be set before call to super.init().
-    Manager.applicationGroupIdentifier = "group.KMSample"
+    // Set desired level before release
+    KeymanEngine.log.outputLevel = .debug
+    KeymanEngine.log.logAppDetails()
 
-    // Disable before release
-    Manager.shared.isDebugPrintingOn = true
+    // Replace with your application group id
+    Manager.applicationGroupIdentifier = "group.KMSample"
 
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
   }

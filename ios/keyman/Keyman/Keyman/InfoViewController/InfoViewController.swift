@@ -65,8 +65,6 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
     }
     let url = "http://keyman.com/iphone-and-ipad/app/?active=\(currentKeyboardId)&installed=\(installedKeyboards)"
     webView.loadRequest(URLRequest(url: URL(string: url)!))
-    #if DEBUG
-      NSLog("Info page URL: %@", url)
-    #endif
+    log.debug("Info page URL: \(url)")
   }
 }
