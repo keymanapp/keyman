@@ -164,7 +164,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     cell.detailTextLabel?.text = kb.name
     cell.tag = indexPath.row
 
-    if isCurrentKeyboard(languageID: kb.languageID, keyboardID: kb.id) {
+    if Manager.shared.currentKeyboardID == kb.fullID {
       cell.selectionStyle = .blue
       cell.isSelected = true
       cell.accessoryType = .detailDisclosureButton
@@ -365,7 +365,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
   private func scroll(toSelectedKeyboard animated: Bool) {
     let index = userKeyboards.index { kb in
-      return isCurrentKeyboard(languageID: kb.languageID, keyboardID: kb.id)
+      return Manager.shared.currentKeyboardID == kb.fullID
     }
 
     if let index = index {
@@ -386,11 +386,6 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
                                          action: #selector(self.cancelClicked))
       navigationItem.leftBarButtonItem = cancelButton
     }
-  }
-
-  private func isCurrentKeyboard(languageID: String?, keyboardID: String?) -> Bool {
-    return Manager.shared.keyboardID == keyboardID &&
-      Manager.shared.languageID == languageID
   }
 
   @objc func hideToolbarDelayed(_ timer: Timer) {
