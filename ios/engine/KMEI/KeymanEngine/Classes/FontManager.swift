@@ -28,39 +28,21 @@ public class FontManager {
   /// Registers all new fonts found in the font path. Call this after you have preloaded all your font files
   /// with `preloadFontFile(atPath:shouldOverwrite:)`
   public func registerCustomFonts() {
-    guard let customFonts = customFonts() else {
+    guard let keyboardDirs = Storage.active.keyboardDirs else {
       return
     }
-
-    for fontURL in customFonts {
-      _ = registerFont(at: fontURL)
+    for dir in keyboardDirs {
+      registerFonts(in: dir)
     }
   }
 
   /// Unregisters all registered fonts in the font path.
   public func unregisterCustomFonts() {
-    guard let customFonts = customFonts() else {
+    guard let keyboardDirs = Storage.active.keyboardDirs else {
       return
     }
-
-    for fontURL in customFonts {
-      _ = unregisterFont(at: fontURL)
-    }
-  }
-
-  private func customFonts() -> [URL]? {
-    guard let keyboardDirs = Storage.active.keyboardDirs else {
-      return nil
-    }
-
-    do {
-      let urls = try keyboardDirs.flatMap {
-        return try FileManager.default.contentsOfDirectory(at: $0, includingPropertiesForKeys: nil)
-      }
-      return urls.filter { $0.lastPathComponent.hasFontExtension }
-    } catch {
-      log.error("Failed to list font dir contents: \(error)")
-      return nil
+    for dir in keyboardDirs {
+      unregisterFonts(in: dir)
     }
   }
 
@@ -141,6 +123,26 @@ public class FontManager {
     }
 
     return font.isRegistered
+  }
+
+  public func registerFonts(in directory: URL) {
+    guard let urls = try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) else {
+      log.error("Could not list contents of directory \(directory)")
+      return
+    }
+    for url in urls where url.lastPathComponent.hasFontExtension {
+      _ = registerFont(at: url)
+    }
+  }
+
+  public func unregisterFonts(in directory: URL, fromSystemOnly: Bool = true) {
+    guard let urls = try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) else {
+      log.error("Could not list contents of directory \(directory)")
+      return
+    }
+    for url in urls where url.lastPathComponent.hasFontExtension {
+      _ = unregisterFont(at: url, fromSystemOnly: fromSystemOnly)
+    }
   }
 
   private func fontExists(_ fontName: String) -> Bool {

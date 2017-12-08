@@ -16,6 +16,7 @@ fileprivate enum MigrationLevel {
 enum Migrations {
   static func migrateForKMP(storage: Storage) {
     guard storage.userDefaults.migrationLevel < MigrationLevel.migratedForKMP else {
+      log.info("KMP directory migration already performed. Skipping.")
       return
     }
 

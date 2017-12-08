@@ -295,9 +295,22 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     userData.set([Date()], forKey: Key.synchronizeSWKeyboard)
     userData.synchronize()
 
+    log.info("Removing keyboard with ID \(kb.id) and languageID \(kb.languageID)")
+
     // Set a new keyboard if deleting the current one
     if kb.id == keyboardID && kb.languageID == languageID {
       setKeyboard(userKeyboards[0])
+    }
+
+    if !userKeyboards.contains(where: { $0.id == kb.id }) {
+      let keyboardDir = Storage.active.keyboardDir(forID: kb.id)
+      FontManager.shared.unregisterFonts(in: keyboardDir, fromSystemOnly: false)
+      log.info("Deleting directory \(keyboardDir)")
+      if (try? FileManager.default.removeItem(at: keyboardDir)) == nil {
+        log.error("Failed to delete \(keyboardDir)")
+      }
+    } else {
+      log.info("User has another language installed. Skipping delete of keyboard files.")
     }
 
     NotificationCenter.default.post(name: Notifications.keyboardRemoved, object: self, value: kb)
