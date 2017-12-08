@@ -224,7 +224,7 @@ begin
     Exit;
 
   if (FJSTarget <> '') and not TestKeyboardState(FJSTarget, FSilent) then
-    Exit(False);
+    Exit;
 
   with TfrmPackageEditor.Create(frmKeymanDeveloper) do
     CreateFromCompiledKeyboard(FKMXTarget, FJSTarget);
