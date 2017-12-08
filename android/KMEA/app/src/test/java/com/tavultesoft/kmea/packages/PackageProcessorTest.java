@@ -14,7 +14,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 //import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,17 +31,41 @@ public class PackageProcessorTest {
   public static final File TEST_GFF_KMP_TARGET = new File(TEST_EXTRACTION_ROOT, "packages" +
     File.separator + TEST_GFF_KMP_NAME);
 
+  public static final String TEST_GFF_KMP_NAME_ALT = "gff_amh_7_test_json_alt";
+  public static final File TEST_GFF_KMP_FILE_ALT = new File(TEST_RESOURCE_ROOT, TEST_GFF_KMP_NAME_ALT + ".kmp");
+  public static final File TEST_GFF_KMP_TARGET_ALT = new File(TEST_EXTRACTION_ROOT, "packages" +
+    File.separator + TEST_GFF_KMP_NAME_ALT);
+
   /* TODO:  Create an alternate version with a different package version; perform package overwrite tests
    * in both directions.
    */
 
-  private static File tempPkg;
+  private static File tempPkg, tempPkgAlt;
+
+  private static void createAlternateKMP() throws Exception {
+    FileUtils.copyFile(TEST_GFF_KMP_FILE, TEST_GFF_KMP_FILE_ALT);
+    try {
+      tempPkgAlt = PackageProcessor.unzipKMP(TEST_GFF_KMP_FILE_ALT);
+
+      JSONObject json = PackageProcessor.loadPackageInfo(tempPkgAlt);
+      json.getJSONObject("system").put("fileVersion", "8.0"); // Make it look newer!
+
+      // Write out the JSON file.
+      File jsonFile = new File(tempPkgAlt, "kmp.json");
+      BufferedWriter writer = new BufferedWriter(new FileWriter(jsonFile, false));
+      writer.write(json.toString(2));
+      writer.close();
+
+      // Write the JSON file.
+    } catch (IOException e) {
+      System.err.println(e);
+    }
+  }
 
   @Before
   public void extractTestPackages() {
     PackageProcessor.initialize(TEST_EXTRACTION_ROOT);
     try {
-
       tempPkg = PackageProcessor.unzipKMP(TEST_GFF_KMP_FILE);
     } catch (IOException e) {
       System.err.println(e);
@@ -115,6 +141,18 @@ public class PackageProcessorTest {
   }
 
   @Test
+  public void test_versionCompare() throws Exception {
+    createAlternateKMP();
+
+    Assert.assertEquals(1, PackageProcessor.comparePackageDirectories(tempPkgAlt, tempPkg));
+    Assert.assertEquals(-1, PackageProcessor.comparePackageDirectories(tempPkg, tempPkgAlt));
+
+    // Test for when there is no pre-existing package.
+    FileUtils.deleteDirectory(tempPkgAlt);
+    Assert.assertEquals(1, PackageProcessor.comparePackageDirectories(tempPkg, tempPkgAlt));
+  }
+
+  @Test
   public void test_installKMP() throws Exception {
     PackageProcessor.processKMP(TEST_GFF_KMP_FILE);
 
@@ -125,5 +163,7 @@ public class PackageProcessorTest {
   public void eraseTestPackages() throws IOException {
     FileUtils.deleteDirectory(tempPkg);
     FileUtils.deleteDirectory(TEST_GFF_KMP_TARGET);
+
+    FileUtils.deleteQuietly(TEST_GFF_KMP_FILE_ALT);
   }
 }
