@@ -415,8 +415,15 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
 
-    let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
+    do {
+      try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboardID),
+                                              withIntermediateDirectories: true)
+    } catch {
+      log.error("Could not create dir for download: \(error)")
+      return
+    }
 
+    let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
     let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options) +
                              keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
 
@@ -506,9 +513,17 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
 
+    do {
+      try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboard.id),
+                                              withIntermediateDirectories: true)
+    } catch {
+      log.error("Could not create dir for download: \(error)")
+      return
+    }
+
     let isUpdate = Storage.active.userDefaults.userKeyboards?.contains { $0.id == keyboard.id } ?? false
 
-    downloadQueue = HTTPDownloader.init(self)
+    downloadQueue = HTTPDownloader(self)
     let commonUserData: [String: Any] = [
       Key.keyboardInfo: installableKeyboards,
       Key.update: isUpdate
