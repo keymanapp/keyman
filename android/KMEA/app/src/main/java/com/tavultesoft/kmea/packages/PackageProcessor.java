@@ -9,9 +9,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -111,14 +117,67 @@ public class PackageProcessor {
 
   static JSONObject loadPackageInfo(File packagePath) {
     File infoFile = new File(packagePath, "kmp.json");
-    System.out.println("Attempting load of file: " + infoFile);
 
     JSONParser parser = new JSONParser();
     return parser.getJSONObjectFromFile(infoFile);
   }
 
-  public static void /*eventually -> Package*/ processKMP(File path) throws IOException {
-    System.out.println("File size: " + path.length());
-    System.out.println("Absolute path: " + path.getAbsolutePath());
+  // Call this once per each entry of the JSON `keyboards` array, then concatenate the resulting arrays for a full list.
+  public static Map<String, String>[] processKeyboardsEntry(JSONObject jsonKeyboard) throws JSONException {
+    JSONArray languages = jsonKeyboard.getJSONArray("languages");
+
+    HashMap<String, String>[] keyboards = new HashMap[languages.length()];
+
+    // This output spec is designed to mirror the `download` method output of KMKeyboardDownloader as closely as practical.
+    for(int i=0; i < languages.length(); i++) {
+      keyboards[i] = new HashMap<>();
+      keyboards[i].put(KMManager.KMKey_KeyboardName, jsonKeyboard.getString("name"));
+      keyboards[i].put(KMManager.KMKey_KeyboardID, jsonKeyboard.getString("id"));
+      keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
+      keyboards[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
+      keyboards[i].put(KMManager.KMKey_KeyboardVersion, jsonKeyboard.getString("version"));
+      keyboards[i].put(KMManager.KMKey_Font, jsonKeyboard.getString("displayFont"));
+      if (jsonKeyboard.has("oskFont")) {
+        keyboards[i].put(KMManager.KMKey_OskFont, jsonKeyboard.getString("oskFont"));
+      }
+    }
+
+    return keyboards;
+  }
+
+  public static String getVersion(JSONObject json) throws JSONException {
+    return json.getJSONObject("system").getString("fileVersion");
+  }
+
+  public static List<Map<String, String>> processKMP(File path) throws IOException, JSONException {
+    File tempPath = unzipKMP(path);
+    JSONObject newInfoJSON = loadPackageInfo(tempPath);
+    String newVersion = getVersion(newInfoJSON);
+
+    File permPath = constructPath(path, false);
+    if(permPath.exists()) {
+      JSONObject oldInfoJSON = loadPackageInfo(permPath);
+      String originalVersion = getVersion(oldInfoJSON);
+
+      // TODO:  Compare versions.
+      // if(newer) then overwrite
+      // else cancel package install, erase temp directory
+      return null;
+    } else {
+      // No version conflict!  Proceed with the install!
+      // Is within else 'cause there's no need to overwrite.
+    }
+
+    // newInfoJSON holds all the newly downloaded/updated keyboard data.
+    JSONArray keyboards = newInfoJSON.getJSONArray("keyboards");
+    ArrayList<Map<String, String>> keyboardSpecs = new ArrayList<>();
+
+    for(int i=0; i < keyboards.length(); i++) {
+      Map<String, String>[] kbds = processKeyboardsEntry(keyboards.getJSONObject(i));
+
+      keyboardSpecs.addAll(Arrays.asList(kbds));
+    }
+
+    return keyboardSpecs;
   }
 }
