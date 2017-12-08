@@ -10,6 +10,8 @@ import Foundation
 
 /// Dotted-decimal version.
 public struct Version: Comparable {
+  public static let fallback = Version("1.0")!
+
   private let components: [Int]
   public let string: String
 

@@ -49,6 +49,7 @@ class Storage {
   let baseDir: URL
   let languageDir: URL
   let fontDir: URL
+  let keyboardDir: URL
   let userDefaults: UserDefaults
 
   let kmwURL: URL
@@ -57,21 +58,21 @@ class Storage {
     guard
       let baseDir = Storage.createSubdirectory(baseDir: baseURL, name: "keyman"),
       let languageDir = Storage.createSubdirectory(baseDir: baseDir, name: "languages"),
-      let fontDir = Storage.createSubdirectory(baseDir: baseDir, name: "fonts") else {
+      let fontDir = Storage.createSubdirectory(baseDir: baseDir, name: "fonts"),
+      let keyboardDir = Storage.createSubdirectory(baseDir: baseDir, name: "keyboards")
+    else {
       return nil
     }
 
     self.baseDir = baseDir
     self.languageDir = languageDir
     self.fontDir = fontDir
+    self.keyboardDir = keyboardDir
     self.userDefaults = userDefaults
     kmwURL = baseDir.appendingPathComponent(Resources.kmwFileName)
   }
 
-  private static func createSubdirectory(baseDir: URL?, name: String) -> URL? {
-    guard let baseDir = baseDir else {
-      return nil
-    }
+  private static func createSubdirectory(baseDir: URL, name: String) -> URL? {
     let newDir = baseDir.appendingPathComponent(name)
     do {
       try FileManager.default.createDirectory(at: newDir,
@@ -79,6 +80,7 @@ class Storage {
                                               attributes: nil)
       return newDir
     } catch {
+      log.error("Failed to create subdirectory at \(newDir)")
       return nil
     }
   }
@@ -93,6 +95,10 @@ class Storage {
 
   func fontURL(forFilename filename: String) -> URL {
     return fontDir.appendingPathComponent(filename)
+  }
+
+  func keyboardDir(forID keyboardID: String) -> URL {
+    return keyboardDir.appendingPathComponent(keyboardID)
   }
 }
 

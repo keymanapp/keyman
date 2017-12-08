@@ -49,11 +49,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       _tableList = keyboardList
       _tableList!.append(titleCloseButton)
     } else {
-      var keyboard = Defaults.keyboard
-      if let version = Manager.shared.latestKeyboardFileVersion(withID: Defaults.keyboard.id) {
-        keyboard.version = version
-      }
-      _tableList = [keyboard]
+      _tableList = [Defaults.keyboard]
       _tableList!.append(titleCloseButton)
     }
     return _tableList!

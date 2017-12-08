@@ -522,7 +522,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
 
-    let isUpdate = latestKeyboardFileVersion(withID: keyboard.id) != nil
+    let isUpdate = Storage.active.userDefaults.userKeyboards?.contains { $0.id == keyboard.id } ?? false
 
     downloadQueue = HTTPDownloader.init(self)
     let commonUserData: [String: Any] = [
@@ -550,15 +550,18 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     if keyboardIdForCurrentRequest() == keyboardID {
       return .downloading
     }
-    guard let latestDownloadedVersion = latestKeyboardFileVersion(withID: keyboardID) else {
+    let userKeyboards = Storage.active.userDefaults.userKeyboards
+    guard let userKeyboard = userKeyboards?.first(where: { $0.id == keyboardID }) else {
       return .needsDownload
     }
 
     // Check version
-    if let latestRepositoryVersionString = apiKeyboardRepository.keyboards?[keyboardID]?.version,
-      let latestRepositoryVersion = Version(latestRepositoryVersionString),
-      latestDownloadedVersion < latestRepositoryVersion {
-      return .needsUpdate
+    if let repositoryVersionString = apiKeyboardRepository.keyboards?[keyboardID]?.version {
+      let downloadedVersion = Version(userKeyboard.version) ?? Version.fallback
+      let repositoryVersion = Version(repositoryVersionString) ?? Version.fallback
+      if downloadedVersion < repositoryVersion {
+        return .needsUpdate
+      }
     }
     return .upToDate
   }
@@ -711,29 +714,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   // MARK: - File system and UserData management
-  func latestKeyboardFileVersion(withID keyboardID: String) -> Version? {
-    guard let dirContents = try? FileManager.default.contentsOfDirectory(atPath: Storage.active.languageDir.path) else {
-      return nil
-    }
-
-    var latestVersion: Version?
-    for filename in dirContents where filename.hasPrefix("\(keyboardID)-") && filename.hasJavaScriptExtension {
-      let dashRange = filename.range(of: "-", options: .backwards)!
-      let extensionRange = filename.range(of: ".js", options: .backwards)!
-      guard let version = Version(String(filename[dashRange.upperBound..<extensionRange.lowerBound])) else {
-        continue
-      }
-
-      if let previousMax = latestVersion {
-        if version > previousMax {
-          latestVersion = version
-        }
-      } else {
-        latestVersion = version
-      }
-    }
-    return latestVersion
-  }
 
   /// Updates the user's installed keyboards and current keyboard with information in newKeyboard.
   /// - Parameter newKeyboard: Info for updated keyboard.
