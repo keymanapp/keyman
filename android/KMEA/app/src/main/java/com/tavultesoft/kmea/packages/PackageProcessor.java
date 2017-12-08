@@ -1,6 +1,7 @@
 package com.tavultesoft.kmea.packages;
 
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.JSONParser;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -10,6 +11,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by joshua on 12/7/2017.
@@ -105,7 +109,15 @@ public class PackageProcessor {
     return tempKeyboardPath;
   }
 
-  static void /*eventually -> Package*/ processKMP(File path) throws IOException {
+  static JSONObject loadPackageInfo(File packagePath) {
+    File infoFile = new File(packagePath, "kmp.json");
+    System.out.println("Attempting load of file: " + infoFile);
+
+    JSONParser parser = new JSONParser();
+    return parser.getJSONObjectFromFile(infoFile);
+  }
+
+  public static void /*eventually -> Package*/ processKMP(File path) throws IOException {
     System.out.println("File size: " + path.length());
     System.out.println("Absolute path: " + path.getAbsolutePath());
   }
