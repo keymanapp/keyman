@@ -185,6 +185,10 @@ public final class KMManager {
     }
   }
 
+  public static File getResourceRoot() {
+    return new File(appContext.getDir("data", Context.MODE_PRIVATE) + File.separator);
+  }
+
   public static void setInputMethodService(InputMethodService service) {
     IMService = service;
   }
