@@ -139,24 +139,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     URLProtocol.registerClass(KeymanURLProtocol.self)
 
-    if !Util.isSystemKeyboard {
-      if let shared = Storage.shared,
-        let nonShared = Storage.nonShared {
-        let keysToCopy = [Key.userKeyboardsList, Key.userCurrentKeyboard,
-                          Key.engineVersion, Key.keyboardPickerDisplayed]
-        nonShared.copyUserDefaults(to: shared, withKeys: keysToCopy, shouldOverwrite: false)
-        do {
-          try nonShared.copyFiles(to: shared)
-        } catch {
-          log.error("Failed to copy files to shared container: \(error)")
-        }
-      }
-      let userData = Storage.active.userDefaults
-      let isKPDisplayed = userData.bool(forKey: Key.keyboardPickerDisplayed)
-      if isKPDisplayed {
-        isKeymanHelpOn = false
-      }
-    } else {
+    Migrations.migrateForKMP(storage: Storage.active)
+
+    if Util.isSystemKeyboard || Storage.active.userDefaults.bool(forKey: Key.keyboardPickerDisplayed) {
       isKeymanHelpOn = false
     }
 
@@ -173,7 +158,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     updateUserKeyboards(with: Defaults.keyboard)
 
-    keymanWeb = KeymanWebViewController(nibName: nil, bundle: nil)
+    keymanWeb = KeymanWebViewController(storage: Storage.active)
     keymanWeb.frame = CGRect(origin: .zero, size: keyboardSize)
     keymanWeb.delegate = self
     reloadKeyboard(in: keymanWeb)
@@ -228,14 +213,13 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     self.keyboardID = kb.id
 
     if let fontFilename = kb.font?.source.first(where: { $0.hasFontExtension }) {
-      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forFilename: fontFilename))
+      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forKeyboardID: kb.id, filename: fontFilename))
     }
     if let oskFontFilename = kb.oskFont?.source.first(where: { $0.hasFontExtension }) {
-      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forFilename: oskFontFilename))
+      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forKeyboardID: kb.id, filename: oskFontFilename))
     }
 
-    keymanWeb.setKeyboard(id: kb.id, name: kb.name, languageID: kb.languageID, languageName: kb.languageName,
-                          fileURL: Storage.active.keyboardURL(for: kb), font: kb.font, oskFont: kb.oskFont)
+    keymanWeb.setKeyboard(kb)
 
     let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
 
@@ -354,7 +338,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   public func fontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
     let kb = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
     if let filename = kb?.font?.source.first(where: { $0.hasFontExtension }) {
-      let fontURL = Storage.active.fontURL(forFilename: filename)
+      let fontURL = Storage.active.fontURL(forKeyboardID: keyboardID, filename: filename)
       return FontManager.shared.fontName(at: fontURL)
     }
     return nil
@@ -366,7 +350,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   func oskFontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
     let kb = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
     if let filename = kb?.oskFont?.source.first(where: { $0.hasFontExtension }) {
-      let fontURL = Storage.active.fontURL(forFilename: filename)
+      let fontURL = Storage.active.fontURL(forKeyboardID: keyboardID, filename: filename)
       return FontManager.shared.fontName(at: fontURL)
     }
     return nil
@@ -451,7 +435,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     for (i, url) in fontURLs.enumerated() {
       request = HTTPDownloadRequest(url: url, userInfo: commonUserData)
-      request.destinationFile = Storage.active.fontURL(forFilename: url.lastPathComponent).path
+      request.destinationFile = Storage.active.fontURL(forKeyboardID: keyboardID, filename: url.lastPathComponent).path
       request.tag = i + 1
       downloadQueue!.addRequest(request)
     }
@@ -538,7 +522,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     downloadQueue!.addRequest(request)
     for (i, url) in fontURLs.enumerated() {
       request = HTTPDownloadRequest(url: url, userInfo: commonUserData)
-      request.destinationFile = Storage.active.fontURL(forFilename: url.lastPathComponent).path
+      request.destinationFile = Storage.active.fontURL(forKeyboardID: keyboard.id, filename: url.lastPathComponent).path
       request.tag = i + 1
       downloadQueue!.addRequest(request)
     }
@@ -598,16 +582,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   // MARK: - HTTPDownloadDelegate methods
 
-  func downloadQueueFinished(_ queue: HTTPDownloader) {
-    log.debug {
-      let fontContents = try? FileManager.default.contentsOfDirectory(atPath: Storage.active.fontDir.path)
-      return "Font Directory contents: \(fontContents ?? [])"
-    }
-    log.debug {
-      let langContents = try? FileManager.default.contentsOfDirectory(atPath: Storage.active.languageDir.path)
-      return "Language Directory contents: \(langContents ?? [])"
-    }
-  }
+  func downloadQueueFinished(_ queue: HTTPDownloader) { }
 
   func downloadRequestStarted(_ request: HTTPDownloadRequest) {
     // If we're downloading a new keyboard.
@@ -692,25 +667,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   // MARK: - Loading custom keyboards
-
-  /// Preloads a .js file for a language so that the keyboard is available without downloading.
-  /// - Precondition:
-  ///   - The .js filename must remain the same as when obtained from Keyman.
-  ///   - The .js file must be bundled in your application.
-  public func preloadKeyboardFile(at url: URL, shouldOverwrite: Bool) throws {
-    try Storage.copyAndExcludeFromBackup(at: url,
-                                         to: Storage.active.languageDir.appendingPathComponent(url.lastPathComponent),
-                                         shouldOverwrite: shouldOverwrite)
-  }
-
-  /// Preloads a .ttf or .otf file to be available without downloading.
-  /// - Precondition:
-  ///   - The font file must be bundled in your application.
-  /// - SeeAlso: `registerCustomFonts()`
-  public func preloadFontFile(at url: URL, shouldOverwrite: Bool) throws {
-    try Storage.copyAndExcludeFromBackup(at: url,
-                                         to: Storage.active.fontDir.appendingPathComponent(url.lastPathComponent),
-                                         shouldOverwrite: shouldOverwrite)
+  /// Preloads the JS and font files required for a keyboard.
+  public func preloadFiles(forKeyboardID keyboardID: String, at urls: [URL], shouldOverwrite: Bool) throws {
+    let keyboardDir = Storage.active.keyboardDir(forID: keyboardID)
+    for url in urls {
+      try Storage.copyAndExcludeFromBackup(at: url,
+                                           to: keyboardDir.appendingPathComponent(url.lastPathComponent),
+                                           shouldOverwrite: shouldOverwrite)
+    }
   }
 
   // MARK: - File system and UserData management

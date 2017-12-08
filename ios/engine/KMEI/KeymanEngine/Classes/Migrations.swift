@@ -10,7 +10,10 @@ import Foundation
 
 enum Migrations {
   static func migrateForKMP(storage: Storage) {
-    log.verbose("Migrating from base directory: \(storage.baseDir)")
+    let languageDir = storage.baseDir.appendingPathComponent("languages")
+    let fontDir = storage.baseDir.appendingPathComponent("fonts")
+
+    log.info("Migrating from base directory: \(storage.baseDir)")
 
     guard var userKeyboards = storage.userDefaults.userKeyboards else {
       log.info("No user keyboards to migrate")
@@ -20,12 +23,12 @@ enum Migrations {
     var urlsForKeyboard: [String: Set<URL>] = [:]
     for i in userKeyboards.indices {
       let keyboard = userKeyboards[i]
-      guard let version = latestKeyboardFileVersion(withID: keyboard.id, dirPath: storage.languageDir.path) else {
-        log.warning("Could not find JS file for keyboard \(keyboard.id) in \(storage.languageDir.path)")
+      guard let version = latestKeyboardFileVersion(withID: keyboard.id, dirPath: languageDir.path) else {
+        log.warning("Could not find JS file for keyboard \(keyboard.id) in \(languageDir.path)")
         continue
       }
       var urls = urlsForKeyboard[keyboard.id] ?? Set()
-      urls.insert(storage.languageDir.appendingPathComponent("\(keyboard.id)-\(version.string).js"))
+      urls.insert(languageDir.appendingPathComponent("\(keyboard.id)-\(version.string).js"))
 
       let fontFiles = (keyboard.font?.source ?? []) + (keyboard.oskFont?.source ?? [])
       for file in fontFiles {
@@ -33,7 +36,7 @@ enum Migrations {
           log.info("Skipping copy of \(file) for keyboard \(keyboard.id) since it is not a font file.")
           continue
         }
-        let url = storage.fontDir.appendingPathComponent(file)
+        let url = fontDir.appendingPathComponent(file)
         guard FileManager.default.fileExists(atPath: url.path) else {
           log.warning("Font file \(url) for keyboard \(keyboard.id) does not exist")
           continue

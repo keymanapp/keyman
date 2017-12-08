@@ -49,15 +49,19 @@ public class FontManager {
   }
 
   private func customFonts() -> [URL]? {
-    let urls: [URL]
+    guard let keyboardDirs = Storage.active.keyboardDirs else {
+      return nil
+    }
+
     do {
-      urls = try FileManager.default.contentsOfDirectory(at: Storage.active.fontDir,
-                                                         includingPropertiesForKeys: nil)
+      let urls = try keyboardDirs.flatMap {
+        return try FileManager.default.contentsOfDirectory(at: $0, includingPropertiesForKeys: nil)
+      }
+      return urls.filter { $0.lastPathComponent.hasFontExtension }
     } catch {
       log.error("Failed to list font dir contents: \(error)")
       return nil
     }
-    return urls.filter { $0.lastPathComponent.hasFontExtension }
   }
 
   private func readFontName(at url: URL) -> String? {
