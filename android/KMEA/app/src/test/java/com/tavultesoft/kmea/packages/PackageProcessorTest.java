@@ -14,6 +14,7 @@ import org.robolectric.RobolectricTestRunner;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 @RunWith(RobolectricTestRunner.class)
 public class PackageProcessorTest {
@@ -74,7 +75,7 @@ public class PackageProcessorTest {
 
     Assert.assertNotNull(json);
 
-    HashMap<String, String>[] keyboards = PackageProcessor.processKeyboardsEntry(json.getJSONArray("keyboards").getJSONObject(0));
+    Map<String, String>[] keyboards = PackageProcessor.processKeyboardsEntry(json.getJSONArray("keyboards").getJSONObject(0));
     Assert.assertEquals(2, keyboards.length);
 
     HashMap<String, String> amharic = new HashMap<String, String>();
