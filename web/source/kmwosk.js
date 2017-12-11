@@ -125,7 +125,11 @@ if(!window['keyman']['initialized']) {
       '*RAltCtrlShift*':  0x63,
       '*AltShift*':       0x64,
       '*CtrlShift*':      0x65,
-      '*AltCtrlShift*':   0x66
+      '*AltCtrlShift*':   0x66,
+      '*LAltShift*':      0x67,
+      '*RAltShift*':      0x68,
+      '*LCtrlShift*':     0x69,
+      '*RCtrlShift*':     0x70
     };
 
     var codesUS=[['0123456789',';=,-./`','[\\]\''],[')!@#$%^&*(',':+<_>?~','{|}"']];
