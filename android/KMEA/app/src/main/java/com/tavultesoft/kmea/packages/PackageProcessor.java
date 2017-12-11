@@ -5,20 +5,15 @@ import android.support.annotation.Nullable;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.JSONParser;
+import com.tavultesoft.kmea.util.ZipUtils;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
@@ -29,45 +24,16 @@ import org.json.JSONObject;
  * Created by joshua on 12/7/2017.
  */
 
+/**
+ * A class of static methods for use in handling Keyman's .kmp file format, as it relates to the
+ * KMEA engine.  Only `processKMP` and `initialize` should see regular use; the rest are helper
+ * methods designed to facilitate unit testing for this class's functionality.
+ */
 public class PackageProcessor {
   private static File resourceRoot = null;
 
   public static void initialize(File resourceRoot) {
     PackageProcessor.resourceRoot = resourceRoot;
-  }
-
-  // Credit to zapi's answer at https://stackoverflow.com/questions/3382996/how-to-unzip-files-programmatically-in-android.
-  static void unzip(File zipFile, File targetDirectory) throws IOException {
-    ZipInputStream zis = new ZipInputStream(
-      new BufferedInputStream(new FileInputStream(zipFile)));
-    try {
-      ZipEntry ze;
-      int count;
-      byte[] buffer = new byte[8192];
-      while ((ze = zis.getNextEntry()) != null) {
-        File file = new File(targetDirectory, ze.getName());
-        File dir = ze.isDirectory() ? file : file.getParentFile();
-        if (!dir.isDirectory() && !dir.mkdirs())
-          throw new FileNotFoundException("Failed to ensure directory: " +
-            dir.getAbsolutePath());
-        if (ze.isDirectory())
-          continue;
-        FileOutputStream fout = new FileOutputStream(file);
-        try {
-          while ((count = zis.read(buffer)) != -1)
-            fout.write(buffer, 0, count);
-        } finally {
-          fout.close();
-        }
-            /* if time should be restored as well
-            long time = ze.getTime();
-            if (time > 0)
-                file.setLastModified(time);
-            */
-      }
-    } finally {
-      zis.close();
-    }
   }
 
   // A default, managed mapping for package installation, handling both temp directory
@@ -85,7 +51,7 @@ public class PackageProcessor {
       String ext = "";
       ext = filename.substring(filename.lastIndexOf('.'));
 
-      if(!ext.equals(".kmp")) {
+      if(!ext.toLowerCase().equals(".kmp")) {
         throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
       }
     } else {
@@ -94,18 +60,32 @@ public class PackageProcessor {
 
     // Extract our best-guess name for the package and construct the temporary package name.
     kmpBaseName = filename.substring(0, filename.lastIndexOf('.'));
+    // Feel free to change this as desired - simply ensure it is unique enough to never be used as
+    // a legitimate package name.
     String kmpFolderName = temp ? "." + kmpBaseName + ".temp" : kmpBaseName;
 
     return new File(resourceRoot,KMManager.KMDefault_AssetPackages + File.separator + kmpFolderName + File.separator);
   }
 
+  /**
+   * Unzips the package.kmp file to its mapped temporary directory location.
+   * @param path The file path of the .kmp file, file name included.
+   * @return The mapped temporary file path for the .kmp file's contents.
+   * @throws IOException
+   */
   static File unzipKMP(File path) throws IOException {
     File tempKeyboardPath = constructPath(path, true);
-    unzip(path, tempKeyboardPath);
+    ZipUtils.unzip(path, tempKeyboardPath);
 
     return tempKeyboardPath;
   }
 
+  /**
+   * Given a directory location for an extracted KMP file, extracts its kmp.json information
+   * into a JSON object.  Works on temporary directories and the installed package directory.
+   * @param packagePath The extracted location information to retrieve information for.
+   * @return A metadata JSONObject for the package version.
+   */
   static JSONObject loadPackageInfo(File packagePath) {
     File infoFile = new File(packagePath, "kmp.json");
 
@@ -114,12 +94,19 @@ public class PackageProcessor {
   }
 
   // Call this once per each entry of the JSON `keyboards` array, then concatenate the resulting arrays for a full list.
+
+  /**
+   * Generates a list of keyboard data maps designed to mirror the `download` method output of
+   * KMKeyboardDownloader as closely as practical.
+   * @param jsonKeyboard  One entry of the master JSONArray of the top-level "keyboards" property.
+   * @return A list of maps defining one keyboard-language pairing each.
+   * @throws JSONException
+   */
   public static Map<String, String>[] processKeyboardsEntry(JSONObject jsonKeyboard) throws JSONException {
     JSONArray languages = jsonKeyboard.getJSONArray("languages");
 
     HashMap<String, String>[] keyboards = new HashMap[languages.length()];
 
-    // This output spec is designed to mirror the `download` method output of KMKeyboardDownloader as closely as practical.
     for(int i=0; i < languages.length(); i++) {
       keyboards[i] = new HashMap<>();
       keyboards[i].put(KMManager.KMKey_KeyboardName, jsonKeyboard.getString("name"));
@@ -136,11 +123,25 @@ public class PackageProcessor {
     return keyboards;
   }
 
+  /**
+   * Simply extracts the package's version number.
+   * @param json The metadata JSONObject for the package.
+   * @return The version number (via String)
+   * @throws JSONException
+   */
   public static String getVersion(JSONObject json) throws JSONException {
     return json.getJSONObject("system").getString("fileVersion");
   }
 
-  // Returns 1 if newer, 0 if equal, and -1 if older or invalid.  If no prior version exists, returns 1.
+  /**
+   * Compares version information, ideally between the temporary extraction path of a package and its
+   * desired installation path, to ensure that no accidental downgrade or side-grade overwrite occurs.
+   * @param newPath The path for the (temporarily) extracted, newly downloaded version of the package.
+   * @param oldPath The path to which the package should be installed.  May not actually exist yet.
+   * @return Returns 1 if newer, 0 if equal, and -1 if older or invalid.  If no prior version exists, returns 1.
+   * @throws IOException
+   * @throws JSONException
+   */
   public static int comparePackageDirectories(File newPath, File oldPath) throws IOException, JSONException {
     JSONObject newInfoJSON = loadPackageInfo(newPath);
     String newVersion = getVersion(newInfoJSON);
@@ -161,7 +162,17 @@ public class PackageProcessor {
     }
   }
 
-  @Nullable
+  /**
+   * The master KMP processing method; use after a .kmp download to fully install within the filesystem.
+   * @param path Filepath of a newly downloaded .kmp file.
+   * @return A list of data maps of the newly installed and/or newly upgraded keyboards found in the package.
+   * May be empty if the package file is actually an old version.
+   * <br/><br/>
+   * The format for each map matches those of the current `download` method output of KMKeyboardDownloader
+   * as closely as practical.
+   * @throws IOException
+   * @throws JSONException
+   */
   public static List<Map<String, String>> processKMP(File path) throws IOException, JSONException {
     File tempPath = unzipKMP(path);
     JSONObject newInfoJSON = loadPackageInfo(tempPath);
@@ -171,7 +182,7 @@ public class PackageProcessor {
       if(comparePackageDirectories(tempPath, permPath) != -1) {
         // Abort!  The current installation is newer or as up-to-date.
         FileUtils.deleteDirectory(tempPath);
-        return null;
+        return new ArrayList<Map<String, String>>();  // It's empty; avoids dealing directly with null ptrs.
       } else {
         // Out with the old.  "In with the new" is identical to a new package installation.
         FileUtils.deleteDirectory(permPath);

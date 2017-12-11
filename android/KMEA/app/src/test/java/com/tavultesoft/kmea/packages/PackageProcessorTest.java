@@ -5,14 +5,11 @@ import com.tavultesoft.kmea.KMManager;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-//import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -36,12 +33,14 @@ public class PackageProcessorTest {
   public static final File TEST_GFF_KMP_TARGET_ALT = new File(TEST_EXTRACTION_ROOT, "packages" +
     File.separator + TEST_GFF_KMP_NAME_ALT);
 
-  /* TODO:  Create an alternate version with a different package version; perform package overwrite tests
-   * in both directions.
-   */
-
   private static File tempPkg, tempPkgAlt;
 
+  /**
+   * Uses the existing sample KMP's kmp.info file as a base, constructing a second, altered KMP package
+   * for use in version tests between same-id packages.  Does not reconstruct the .zip for actual installation
+   * tests.
+   * @throws Exception
+   */
   private static void createAlternateKMP() throws Exception {
     FileUtils.copyFile(TEST_GFF_KMP_FILE, TEST_GFF_KMP_FILE_ALT);
     try {
@@ -62,6 +61,7 @@ public class PackageProcessorTest {
     }
   }
 
+  // Each test gets a fresh version of the extracted package.
   @Before
   public void extractTestPackages() {
     PackageProcessor.initialize(TEST_EXTRACTION_ROOT);
@@ -140,6 +140,12 @@ public class PackageProcessorTest {
     Assert.assertNotEquals(new File(permPath), PackageProcessor.constructPath(TEST_GFF_KMP_FILE, true));
   }
 
+  /**
+   * Rather than actually attempt to maintain two identically-named package files, this white-box test
+   * simply relies upon an altered kmp.info to test the central version comparison logic used to
+   * determine if an old package version should be replaced.
+   * @throws Exception
+   */
   @Test
   public void test_versionCompare() throws Exception {
     createAlternateKMP();
@@ -159,6 +165,11 @@ public class PackageProcessorTest {
     Assert.assertTrue(TEST_GFF_KMP_TARGET.exists());
   }
 
+  /**
+   * Post-test cleanup.  While the temp/ directory is .gitignore'd, this provides an extra layer
+   * of safety from polluting the repo file path.
+   * @throws IOException
+   */
   @After
   public void eraseTestPackages() throws IOException {
     FileUtils.deleteDirectory(tempPkg);
