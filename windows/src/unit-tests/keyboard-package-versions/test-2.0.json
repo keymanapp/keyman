@@ -1,0 +1,16 @@
+{
+  "options" : {
+    "device" : "any",
+    "keyboardBaseUri" : "http://your-host-here/keyboard-path/",
+    "fontBaseUri" : "http://your-host-here/font-path/"
+  },
+  "keyboard" : {
+    "id" : "test",
+    "name" : "Keyboard Version Test",
+    "filename" : "test-2.0.js",
+    "version" : "2.0",
+    "lastModified" : "2017-12-11T19:19:30+00:00",
+    "languages" : [
+    ]
+  }
+}
