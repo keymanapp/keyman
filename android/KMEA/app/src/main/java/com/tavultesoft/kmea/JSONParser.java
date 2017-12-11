@@ -30,6 +30,7 @@ public final class JSONParser {
   private JSONObject getJSONObjectFromReader(BufferedReader reader) {
     String jsonStr = "";
     JSONObject jsonObj = null;
+    String logTag = "JSONObjectFromReader";
 
     try {
       StringBuilder strBuilder = new StringBuilder();
@@ -40,19 +41,19 @@ public final class JSONParser {
       jsonStr = strBuilder.toString();
       jsonObj = new JSONObject(jsonStr);
     } catch (UnsupportedEncodingException e) {
-      Log.e("Encoding Error", (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
+      Log.e(logTag, (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
       jsonObj = null;
       System.err.println(e);
     } catch (IOException e) {
-      Log.e("IO Error", (e.getMessage() == null) ? "IOException" : e.getMessage());
+      Log.e(logTag, (e.getMessage() == null) ? "IOException" : e.getMessage());
       jsonObj = null;
       System.err.println(e);
     } catch (JSONException e) {
-      Log.e("JSON Parser Error", (e.getMessage() == null) ? "JSONException" : e.getMessage());
+      Log.e(logTag, (e.getMessage() == null) ? "JSONException" : e.getMessage());
       jsonObj = null;
       System.err.println(e);
     } catch (Exception e) {
-      Log.e("JSON Parser Error", (e.getMessage() == null) ? "Exception" : e.getMessage());
+      Log.e(logTag, (e.getMessage() == null) ? "Exception" : e.getMessage());
       jsonObj = null;
       System.err.println(e);
     }
@@ -68,7 +69,7 @@ public final class JSONParser {
       reader = new BufferedReader(new FileReader(path));
       jsonObj = getJSONObjectFromReader(reader);
     } catch (FileNotFoundException e) {
-      Log.e("FileNotFound Error", (e.getMessage() == null) ? "FileNotFoundException" : e.getMessage());
+      Log.e("JSONObjectFromFile", (e.getMessage() == null) ? "FileNotFoundException" : e.getMessage());
       jsonObj = null;
       System.err.println(e);
     } finally {
@@ -87,6 +88,7 @@ public final class JSONParser {
     BufferedReader reader = null;
     JSONObject jsonObj = null;
     InputStream inputStream = null;
+    String logTag = "JSONObjectFromUrl";
 
     try {
       if (Connection.initialize(urlStr)) {
@@ -111,11 +113,11 @@ public final class JSONParser {
         jsonObj = getJSONObjectFromReader(reader);
       }
     } catch (UnsupportedEncodingException e) {
-      Log.e("Encoding Error", (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
+      Log.e(logTag, (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
       jsonObj = null;
       System.err.println(e);
     } catch (Exception e) {
-      Log.e("JSON Parser Error", (e.getMessage() == null) ? "Exception" : e.getMessage());
+      Log.e(logTag, (e.getMessage() == null) ? "Exception" : e.getMessage());
       jsonObj = null;
       System.err.println(e);
     } finally {
