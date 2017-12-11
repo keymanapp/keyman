@@ -10,18 +10,119 @@ import Foundation
 
 private enum MigrationLevel {
   static let initial = 0
-  static let migratedForKMP = 10
+  static let migratedUserDefaultsToStructs = 10
+  static let migratedForKMP = 20
 }
 
 enum Migrations {
   static func migrate(storage: Storage) {
+    if storage.userDefaults.migrationLevel < MigrationLevel.migratedUserDefaultsToStructs {
+      migrateUserDefaultsToStructs(storage: storage)
+      storage.userDefaults.migrationLevel = MigrationLevel.migratedUserDefaultsToStructs
+    } else {
+      log.info("UserDefaults migration to structs already performed. Skipping.")
+    }
     if storage.userDefaults.migrationLevel < MigrationLevel.migratedForKMP {
       migrateForKMP(storage: storage)
       storage.userDefaults.migrationLevel = MigrationLevel.migratedForKMP
-      storage.userDefaults.synchronize()
     } else {
-      log.debug("KMP directory migration already performed. Skipping.")
+      log.info("KMP directory migration already performed. Skipping.")
     }
+    storage.userDefaults.synchronize()
+  }
+
+  static func migrateUserDefaultsToStructs(storage: Storage) {
+    guard let userKeyboardObject = storage.userDefaults.object(forKey: Key.userKeyboardsList),
+      let currentKeyboardObject = storage.userDefaults.object(forKey: Key.userCurrentKeyboard)
+    else {
+      log.info("User keyboard list or current keyboard missing. Skipping migration.")
+      return
+    }
+    guard let oldUserKeyboards = userKeyboardObject as? [[String: String]],
+      let oldCurrentKeyboard = currentKeyboardObject as? [String: String]
+    else {
+      log.error("User keyboard list or current keyboard has an unexpected type")
+      return
+    }
+
+    let userKeyboards = oldUserKeyboards.flatMap { installableKeyboard(from: $0) }
+    let currentKeyboardID = fullKeyboardID(from: oldCurrentKeyboard)
+
+    storage.userDefaults.userKeyboards = userKeyboards
+    if userKeyboards.contains(where: { $0.fullID == currentKeyboardID }) {
+      storage.userDefaults.currentKeyboardID = currentKeyboardID
+    } else {
+      storage.userDefaults.currentKeyboardID = nil
+    }
+  }
+
+  private static func installableKeyboard(from kbDict: [String: String]) -> InstallableKeyboard? {
+    log.debug("Migrating keyboard dictionary: \(kbDict)")
+    guard let id = kbDict["kbId"],
+      let name = kbDict["kbName"],
+      let languageID = kbDict["langId"],
+      let languageName = kbDict["langName"],
+      let version = kbDict["version"]
+    else {
+      log.error("Missing required fields in keyboard dictionary: \(kbDict)")
+      return nil
+    }
+    let rtl = kbDict["rtl"] == "Y"
+    let isCustom = kbDict["CustomKeyboard"] == "Y"
+    let displayFont = font(from: kbDict["font"])
+    let oskFont = font(from: kbDict["oskFont"])
+    let kb = InstallableKeyboard(id: id,
+                                 name: name,
+                                 languageID: languageID,
+                                 languageName: languageName,
+                                 version: version,
+                                 isRTL: rtl,
+                                 font: displayFont,
+                                 oskFont: oskFont,
+                                 isCustom: isCustom)
+    log.debug("Migrated keyboard dictionary to keyboard \(kb)")
+    return kb
+  }
+
+  private static func fullKeyboardID(from kbDict: [String: String]) -> FullKeyboardID? {
+    log.debug("Migrating keyboard dictionary to FullKeyboardID: \(kbDict)")
+    guard let keyboardID = kbDict["kbId"],
+      let languageID = kbDict["langId"]
+    else {
+      log.error("Missing required fields in keyboard dictionary for FullKeyboardID: \(kbDict)")
+      return nil
+    }
+    let id = FullKeyboardID(keyboardID: keyboardID, languageID: languageID)
+    log.debug("Migrated keyboard dictionary to \(id)")
+    return id
+  }
+
+  private static func font(from jsonString: String?) -> Font? {
+    guard let jsonString = jsonString else {
+      return nil
+    }
+    guard let data = jsonString.data(using: .utf8) else {
+      log.error("Failed to encode string: \(jsonString)")
+      return nil
+    }
+    guard let fontDict = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] else {
+      log.error("Error parsing String as JSON: \(jsonString)")
+      return nil
+    }
+    guard let family = fontDict["family"] as? String else {
+      log.error("Missing 'family' String: \(fontDict)")
+      return nil
+    }
+    let files: [String]
+    if let filesString = fontDict["files"] as? String {
+      files = [filesString]
+    } else if let filesArray = fontDict["files"] as? [String] {
+      files = filesArray
+    } else {
+      log.error("Missing 'files': \(fontDict)")
+      return nil
+    }
+    return Font(family: family, source: files)
   }
 
   static func migrateForKMP(storage: Storage) {
