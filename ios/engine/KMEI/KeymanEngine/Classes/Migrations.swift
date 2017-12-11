@@ -8,18 +8,23 @@
 
 import Foundation
 
-fileprivate enum MigrationLevel {
+private enum MigrationLevel {
   static let initial = 0
   static let migratedForKMP = 10
 }
 
 enum Migrations {
-  static func migrateForKMP(storage: Storage) {
-    guard storage.userDefaults.migrationLevel < MigrationLevel.migratedForKMP else {
-      log.info("KMP directory migration already performed. Skipping.")
-      return
+  static func migrate(storage: Storage) {
+    if storage.userDefaults.migrationLevel < MigrationLevel.migratedForKMP {
+      migrateForKMP(storage: storage)
+      storage.userDefaults.migrationLevel = MigrationLevel.migratedForKMP
+      storage.userDefaults.synchronize()
+    } else {
+      log.debug("KMP directory migration already performed. Skipping.")
     }
+  }
 
+  static func migrateForKMP(storage: Storage) {
     let languageDir = storage.baseDir.appendingPathComponent("languages")
     let fontDir = storage.baseDir.appendingPathComponent("fonts")
 
@@ -90,8 +95,6 @@ enum Migrations {
     // Remove keyboards that were not copied successfully
     let filteredUserKeyboards = userKeyboards.filter { successfulKeyboards.contains($0.id) }
     storage.userDefaults.userKeyboards = filteredUserKeyboards
-    storage.userDefaults.migrationLevel = MigrationLevel.migratedForKMP
-    storage.userDefaults.synchronize()
 
     // TODO: Remove old directory
   }

@@ -139,7 +139,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     URLProtocol.registerClass(KeymanURLProtocol.self)
 
-    Migrations.migrateForKMP(storage: Storage.active)
+    Migrations.migrate(storage: Storage.active)
 
     if Util.isSystemKeyboard || Storage.active.userDefaults.bool(forKey: Key.keyboardPickerDisplayed) {
       isKeymanHelpOn = false
