@@ -5,6 +5,9 @@
 package com.tavultesoft.kmea;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,16 +22,73 @@ import com.tavultesoft.kmea.util.Connection;
 
 import android.util.Log;
 
-final class JSONParser {
-
-  private static InputStream inputStream = null;
-  private static JSONObject jsonObj = null;
-  private static String jsonStr = "";
+public final class JSONParser {
 
   public JSONParser() {
   }
 
+  private JSONObject getJSONObjectFromReader(BufferedReader reader) {
+    String jsonStr = "";
+    JSONObject jsonObj = null;
+    String logTag = "JSONObjectFromReader";
+
+    try {
+      StringBuilder strBuilder = new StringBuilder();
+      String line = null;
+      while ((line = reader.readLine()) != null) {
+        strBuilder.append(line + "\n");
+      }
+      jsonStr = strBuilder.toString();
+      jsonObj = new JSONObject(jsonStr);
+    } catch (UnsupportedEncodingException e) {
+      Log.e(logTag, (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
+      jsonObj = null;
+      System.err.println(e);
+    } catch (IOException e) {
+      Log.e(logTag, (e.getMessage() == null) ? "IOException" : e.getMessage());
+      jsonObj = null;
+      System.err.println(e);
+    } catch (JSONException e) {
+      Log.e(logTag, (e.getMessage() == null) ? "JSONException" : e.getMessage());
+      jsonObj = null;
+      System.err.println(e);
+    } catch (Exception e) {
+      Log.e(logTag, (e.getMessage() == null) ? "Exception" : e.getMessage());
+      jsonObj = null;
+      System.err.println(e);
+    }
+
+    return jsonObj;
+  }
+
+  public JSONObject getJSONObjectFromFile(File path) {
+    BufferedReader reader = null;
+    JSONObject jsonObj = null;
+
+    try {
+      reader = new BufferedReader(new FileReader(path));
+      jsonObj = getJSONObjectFromReader(reader);
+    } catch (FileNotFoundException e) {
+      Log.e("JSONObjectFromFile", (e.getMessage() == null) ? "FileNotFoundException" : e.getMessage());
+      jsonObj = null;
+      System.err.println(e);
+    } finally {
+      try {
+        reader.close();
+      } catch (IOException e) {
+        // Ignore.
+      }
+    }
+
+    return jsonObj;
+  }
+
+  // Doesn't work for directly-hosted files, hence the separate method above.
   public JSONObject getJSONObjectFromUrl(String urlStr) {
+    BufferedReader reader = null;
+    JSONObject jsonObj = null;
+    InputStream inputStream = null;
+    String logTag = "JSONObjectFromUrl";
 
     try {
       if (Connection.initialize(urlStr)) {
@@ -49,29 +109,27 @@ final class JSONParser {
         if (charSet == null)
           charSet = "utf-8";
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, charSet), 4096);
-        StringBuilder strBuilder = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null)
-          strBuilder.append(line + "\n");
-        inputStream.close();
-        jsonStr = strBuilder.toString();
+        reader = new BufferedReader(new InputStreamReader(inputStream, charSet), 4096);
+        jsonObj = getJSONObjectFromReader(reader);
       }
-      jsonObj = new JSONObject(jsonStr);
     } catch (UnsupportedEncodingException e) {
-      Log.e("Encoding Error", (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
+      Log.e(logTag, (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
       jsonObj = null;
-    } catch (IOException e) {
-      Log.e("IO Error", (e.getMessage() == null) ? "IOException" : e.getMessage());
-      jsonObj = null;
-    } catch (JSONException e) {
-      Log.e("JSON Parser Error", (e.getMessage() == null) ? "JSONException" : e.getMessage());
-      jsonObj = null;
+      System.err.println(e);
     } catch (Exception e) {
-      Log.e("JSON Parser Error", (e.getMessage() == null) ? "Exception" : e.getMessage());
+      Log.e(logTag, (e.getMessage() == null) ? "Exception" : e.getMessage());
       jsonObj = null;
+      System.err.println(e);
     } finally {
       Connection.disconnect();
+
+      if(reader != null) {
+        try {
+          reader.close();
+        } catch(IOException e) {
+          // Ignore.
+        }
+      }
     }
 
     return jsonObj;
