@@ -23,6 +23,9 @@ interface
 type
   TProjectLogState = (plsInfo, plsWarning, plsError, plsFatal);
 
+type
+  TCompilePackageMessageEvent = procedure(Sender: TObject; msg: string; State: TProjectLogState) of object;
+
 implementation
 
 end.
