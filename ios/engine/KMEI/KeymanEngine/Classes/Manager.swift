@@ -698,6 +698,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// Preloads the JS and font files required for a keyboard.
   public func preloadFiles(forKeyboardID keyboardID: String, at urls: [URL], shouldOverwrite: Bool) throws {
     let keyboardDir = Storage.active.keyboardDir(forID: keyboardID)
+    try FileManager.default.createDirectory(at: keyboardDir, withIntermediateDirectories: true)
     for url in urls {
       try Storage.copyAndExcludeFromBackup(at: url,
                                            to: keyboardDir.appendingPathComponent(url.lastPathComponent),
