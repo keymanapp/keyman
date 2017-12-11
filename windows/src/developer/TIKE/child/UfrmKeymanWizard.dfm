@@ -198,9 +198,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageDetails: TTabSheet
       Caption = 'Details'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object sbDetails: TScrollBox
         Left = 0
         Top = 0
@@ -1024,7 +1021,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         end
         inherited ilCmds: TImageList
           Bitmap = {
-            494C01010C000E00CC0110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+            494C01010C000E00D40110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
             0000000000003600000028000000400000004000000001002000000000000040
             0000000000000000000000000000000000000000000000000000000000000000
             0000000000000000000000000000000000000000000000000000000000000000

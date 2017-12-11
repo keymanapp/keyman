@@ -58,8 +58,6 @@ URLSessionDataDelegate {
       if req.typeCode == .downloadFile {
         req.task = downloadSession.downloadTask(with: req.url)
         handler?.downloadRequestStarted(req)
-      } else if req.typeCode == .downloadCachedData {
-        req.task = downloadSession.dataTask(with: req.url)
       }
       req?.task?.resume()
     } else {
@@ -75,8 +73,8 @@ URLSessionDataDelegate {
     guard let currentRequest = currentRequest else {
       return
     }
-    Manager.shared.kmLog("Downloaded file \(currentRequest.url) as \(location), " +
-      "to be copied to \(currentRequest.destinationFile ?? "nil")", checkDebugPrinting: false)
+    log.debug("Downloaded file \(currentRequest.url) as \(location), " +
+      "to be copied to \(currentRequest.destinationFile ?? "nil")")
 
     // If a destination file for the download has already been specified, let's go ahead and copy it over.
     if let destFile = currentRequest.destinationFile {
@@ -84,7 +82,7 @@ URLSessionDataDelegate {
         try FileManager.default.copyItem(at: location,
                                          to: URL(fileURLWithPath: destFile))
       } catch {
-        Manager.shared.kmLog("Error saving the download: \(error)", checkDebugPrinting: false)
+        log.error("Error saving the download: \(error)")
       }
     }
   }

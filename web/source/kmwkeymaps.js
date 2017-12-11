@@ -158,6 +158,5 @@ if(!window['keyman']['initialized']) {
     keymanweb._USKeyCodeToCharCode = function(Levent) {
       return keymanweb._USCharCode[Levent.Lmodifiers & 0x10 ? 1 : 0]['k'+Levent.Lcode];
     };
-  
   })();
 }

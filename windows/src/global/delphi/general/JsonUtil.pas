@@ -84,7 +84,7 @@ begin
       if i < JSONValue.Count - 1 then
         OutputStrings[OutputStrings.Count-1] := OutputStrings[OutputStrings.Count-1] + ',';   // I4440
    end;
-   OutputStrings.add(StringOfChar(' ', indent * INDENT_SIZE) + ']');
+   OutputStrings.add(StringOfChar(' ', (indent-1) * INDENT_SIZE) + ']');
 end;
 
 procedure PrettyPrintJSON(JSONValue: TJSONValue; OutputStrings: TStrings; indent: integer = 0);

@@ -146,7 +146,8 @@ uses
   VisualKeyboardSaverBinary in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas',
   VisualKeyboardSaverXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
   UtilWaitForTSF in 'util\UtilWaitForTSF.pas',
-  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas';
+  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
+  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

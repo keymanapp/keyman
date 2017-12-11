@@ -8,11 +8,15 @@
 
 extension String {
   var hasFontExtension: Bool {
-    return self.hasSuffix(".ttf") || self.hasSuffix(".otf")
+    return hasExtension(FileExtensions.trueTypeFont) || hasSuffix(FileExtensions.openTypeFont)
   }
 
   var hasJavaScriptExtension: Bool {
-    return self.hasSuffix(".js")
+    return hasExtension(FileExtensions.javaScript)
+  }
+
+  func hasExtension(_ ext: String) -> Bool {
+    return lowercased().hasSuffix(".\(ext)")
   }
 
   /// - Parameter separator: The separator between code units.

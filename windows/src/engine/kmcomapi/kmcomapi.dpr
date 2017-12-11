@@ -144,8 +144,9 @@ uses
   VisualKeyboardSaverXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
   VKeys in '..\..\global\delphi\general\VKeys.pas',
   Windows8LanguageList in '..\..\global\delphi\general\Windows8LanguageList.pas',
-  BCP47SuppressScriptRegistry in '..\..\global\delphi\general\BCP47SuppressScriptRegistry.pas',
-  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas';
+  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
+  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
+  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas';
 
 {$R *.TLB}
 

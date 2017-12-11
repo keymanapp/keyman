@@ -34,6 +34,7 @@ set_version ( ) {
 
 do_clean ( ) {
   rm -rf $BUILD_PATH
+  rm -rf Carthage
 }
 
 ### START OF THE BUILD ###
@@ -46,6 +47,7 @@ BUILD_PATH=$DERIVED_DATA/Build/Products
 DO_KMW_BUILD=true
 DO_KEYMANAPP=true
 DO_ARCHIVE=true
+DO_CARTHAGE=true
 CLEAN_ONLY=false
 CONFIG=Release
 
@@ -75,6 +77,9 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -no-build)
             CLEAN_ONLY=true
+            ;;
+        -no-carthage)
+            DO_CARTHAGE=false
             ;;
         -debug)
             CONFIG=Debug
@@ -135,6 +140,12 @@ update_bundle ( ) {
 
 # First things first - update our dependencies.
 update_bundle
+
+if [ $DO_CARTHAGE = true ]; then
+    echo
+    echo "Load dependencies with Carthage"
+    carthage bootstrap --platform iOS || fail "carthage boostrap failed"
+fi
 
 echo
 echo "Building KMEI..."

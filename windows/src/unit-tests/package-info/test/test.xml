@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+    <System>
+        <KeymanDeveloperVersion>9.0.500.0</KeymanDeveloperVersion>
+        <FileVersion>7.0</FileVersion>
+    </System>
+    <Options>
+        <ExecuteProgram></ExecuteProgram>
+        <ReadMeFile>readme.htm</ReadMeFile>
+        <GraphicFile>sideimage.bmp</GraphicFile>
+        <MSIFileName>keyman.msi</MSIFileName>
+        <MSIOptions>(none)</MSIOptions>
+    </Options>
+    <StartMenu>
+        <Folder>GFF Amharic Keyboard</Folder>
+        <AddUninstallEntry />
+        <Items>
+            <Item>
+                <Name>Welcome</Name>
+                <FileName>..\..\..\gff\gff_amh_7\source\welcome.htm</FileName>
+                <Arguments>(arguments)</Arguments>
+                <Icon>(icon)</Icon>
+                <Location>psmelStartMenu</Location>
+            </Item>
+            <Item>
+                <Name>Amharic Keyboard Manual (Amharic)</Name>
+                <FileName>AmharicTyping-Amharic.pdf</FileName>
+                <Arguments></Arguments>
+                <Icon></Icon>
+                <Location>psmelStartMenu</Location>
+            </Item>
+            <Item>
+                <Name>Amharic Keyboard Manual (English)</Name>
+                <FileName>AmharicTyping-English.pdf</FileName>
+                <Arguments></Arguments>
+                <Icon></Icon>
+                <Location>psmelStartMenu</Location>
+            </Item>
+            <Item>
+                <Name>OFL (Abyssinica SIL Licence)</Name>
+                <FileName>OFL.txt</FileName>
+                <Arguments></Arguments>
+                <Icon></Icon>
+                <Location>psmelStartMenu</Location>
+            </Item>
+            <Item>
+                <Name>GPL (WashRa + Free Serif Licence) </Name>
+                <FileName>GNU-GPLv2.txt</FileName>
+                <Arguments></Arguments>
+                <Icon></Icon>
+                <Location>psmelStartMenu</Location>
+            </Item>
+        </Items>
+    </StartMenu>
+    <Info>
+        <WebSite URL="http://keyboards.ethiopic.org">http://keyboards.ethiopic.org</WebSite>
+        <Version URL="">8.0.0</Version>
+        <Name URL="">GFF Amharic Keyboard</Name>
+        <Copyright URL="">Creative Commons Attribution 3.0</Copyright>
+        <Author URL="mailto:keyboards@ethiopic.org">The Ge'ez Frontier Foundation</Author>
+    </Info>
+    <Files>
+        <File>
+            <Name>readme.htm</Name>
+            <Description>File readme.htm</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.htm</FileType>
+        </File>
+        <File>
+            <Name>sideimage.bmp</Name>
+            <Description>File sideimage.bmp</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.bmp</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\gff\gff_amh_7\source\AmharicTyping-Amharic.pdf</Name>
+            <Description>File AmharicTyping-Amharic.pdf</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.pdf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\gff\gff_amh_7\source\AmharicTyping-English.pdf</Name>
+            <Description>File AmharicTyping-English.pdf</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.pdf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\OFL.txt</Name>
+            <Description>File OFL.txt</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.txt</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\GNU-GPLv2.txt</Name>
+            <Description>File GNU-GPLv2.txt</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.txt</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\gff\gff_amh_7\source\welcome.htm</Name>
+            <Description>File Welcome.htm</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.htm</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\AbyssinicaSIL-R.ttf</Name>
+            <Description>Font Abyssinica SIL</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.ttf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\fantuwua.ttf</Name>
+            <Description>Font Ethiopic Fantuwua</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.ttf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\FreeSerif.otf</Name>
+            <Description>Font Free Serif</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.otf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\goffer.ttf</Name>
+            <Description>Font Ethiopic Yigezu Bisrat Goffer</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.ttf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\hiwua.ttf</Name>
+            <Description>Font Ethiopic Hiwua</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.ttf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\jiret.ttf</Name>
+            <Description>Font Ethiopia Jiret</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.ttf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\jiretsl.ttf</Name>
+            <Description>Font Ethiopia Jiret Slant</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.ttf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\tint.ttf</Name>
+            <Description>Font Ethiopic Tint</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.ttf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\washrab.ttf</Name>
+            <Description>Font Ethiopic WashRa Bold</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.ttf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\washrabsl.ttf</Name>
+            <Description>Font Ethiopic WashRa Bold Slant</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.ttf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\washrasb.ttf</Name>
+            <Description>Font Ethiopic WashRa SemiBold</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.ttf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\washrasbsl.ttf</Name>
+            <Description>Font Ethiopic WashRa SemiBold Slant</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.ttf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\wookianos.ttf</Name>
+            <Description>Font Ethiopic Wookianos</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.ttf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\shared\fonts\geez\yebse.ttf</Name>
+            <Description>Font Ethiopic Yebse</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.ttf</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\gff\gff_amh_7\build\gff_amh_7.kvk</Name>
+            <Description>File gff_amh_7.kvk</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.kvk</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\gff\gff_amh_7\build\gff_amh_7.kmx</Name>
+            <Description>Keyboard Amharic</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.kmx</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\gff\gff_ethiopic_7\build\gff_ethiopic_7.kvk</Name>
+            <Description>File gff_ethiopic_7.kvk</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.kvk</FileType>
+        </File>
+        <File>
+            <Name>..\..\..\gff\gff_ethiopic_7\build\gff_ethiopic_7.kmx</Name>
+            <Description>Keyboard Ethiopic - (Language Neutral)</Description>
+            <CopyLocation>0</CopyLocation>
+            <FileType>.kmx</FileType>
+        </File>
+    </Files>
+    <Strings>
+      <String Name="ssFontSize_Dialog" Value="16"/>
+      <String Name="ssFontSize_Title" Value="24"/>
+      <String Name="ssFontSize_InstallButton" Value="18"/>
+      <String Name="ssFontName_Dialog" Value=""/>
+      <String Name="ssFontName_Title" Value=""/>
+      <String Name="ssFontName_InstallButton" Value=""/>
+      <String Name="ssApplicationTitle" Value="Tavulteoft Keyman Desktop Setup"/>
+      <String Name="ssTitle" Value="%0:s Setup"/>
+      <String Name="ssWelcome_Keyboards" Value="Setup will install %0:s and the following keyboards:"/>
+      <String Name="ssWelcome_Plain" Value="Setup will install %0:s"/>
+      <String Name="ssCheckForUpdates" Value="Check for &amp;updates online before installing"/>
+      <String Name="ssInstallButton" Value="&amp;Install Keyman Desktop"/>
+      <String Name="ssExitButton" Value="E&amp;xit"/>
+      <String Name="ssPackageMissing" Value="Package %0:s (%1:s) is missing.  Setup can continue but will not install this package."/>
+      <String Name="ssErrorDownloadingUpdate" Value="Error %0:d downloading update from server"/>
+      <String Name="ssErrorUnableToContactServer" Value="Unable to contact server"/>
+      <String Name="ssErrorUnableToContactServerDetailed" Value="Unable to contact server, error was: %0:s"/>
+      <String Name="ssStatusCheckingWindowsInstaller" Value="Checking Windows Installer version"/>
+      <String Name="ssStatusCheckingInternetExplorer" Value="Checking Internet Explorer version"/>
+      <String Name="ssStatusCheckingMSXML" Value="Checking MSXML version"/>
+      <String Name="ssStatusCheckingForUpdates" Value="Checking for updates online"/>
+      <String Name="ssStatusInstalling" Value="Installing Keyman Desktop"/>
+      <String Name="ssStatusInstallingPackage" Value="Installing package %0:s"/>
+      <String Name="ssStatusComplete" Value="Installation Complete"/>
+      <String Name="ssQueryUpdateWindowsInstaller" Value="An updated version of Windows Installer is required to install Keyman Desktop.  Do you want to download and install it now?"/>
+      <String Name="ssQueryUpdateInternetExplorer" Value="Internet Explorer 5.5 or later is required to install Keyman Desktop.  Do you want to download it now?"/>
+      <String Name="ssQueryUpdateMSXML" Value="MSXML 3.0 is required to install Keyman Desktop.  Do you want to download it now?"/>
+      <String Name="ssQueryUpdateVersion" Value="Version %1:s of Keyman Desktop has been released and is available for download.  This update is %0:dKB.  Do you want to download and install the updated version (recommended)?"/>
+      <String Name="ssQueryUpdatePackage" Value="The package %0:s is already installed.  Do you wish to update it now?"/>
+      <String Name="ssQueryRestart" Value="You must restart Windows before Setup can complete.  When you restart Windows, Setup will continue.  Restart now?"/>
+      <String Name="ssErrorUnableToAutomaticallyRestart" Value="Windows was not able to be automatically restarted.  You should restart Windows before you try and start Keyman."/>
+      <String Name="ssRedistIEUpdateRequired" Value="Internet Explorer 5.5 or later is required to install Keyman Desktop."/>
+      <String Name="ssMustRestart" Value="You must restart Windows to complete Setup.  When you restart Windows, Setup will finish."/>
+      <String Name="ssRedistRequired" Value="A redistributable %0:s is required but is not available in the install path.  This redistributable can be downloaded from the Keyman website."/>
+    </Strings>
+</Package>

@@ -40,9 +40,9 @@
     return keymanweb.rootPath+ssName;
   };
 
-  // Get KMEI, KMEA keyboard path (overrides default function)
-  keymanweb.getKeyboardPath = function(Lfilename) {
-    return keymanweb.rootPath+'languages/' + Lfilename + "?v=" + (new Date()).getTime(); /*cache buster*/  
+  // Get KMEI, KMEA keyboard path (overrides default function, allows direct app control of paths)
+  keymanweb.getKeyboardPath = function(Lfilename, packageID) {
+    return Lfilename + "?v=" + (new Date()).getTime(); /*cache buster*/
   };
 
     /**
@@ -450,7 +450,7 @@
       if(!keymanweb._ActiveKeyboard ||  Lkc.Lcode == 0) return false;
       
       // If key is mapped, return true
-      if(keymanweb._ActiveKeyboard['gs'](Lelem, Lkc)) return true;
+      if(kbdInterface.processKeystroke(util.device, Lelem, Lkc)) return true;
 
       keymanweb.processDefaultMapping(Lkc.Lcode, keyShiftState, Lelem, keyName);
 
@@ -469,57 +469,39 @@
     if(!keymanweb._ActiveKeyboard || code == 0) {
       return false;
     }
-    var cachedTouchable = device.touchable, cachedFormFactor = device.formFactor;
-    var result = false; // Signals if we successfully handled the keystroke.
-    device.touchable = false;
-    device.formFactor = 'desktop'; 
-    try {
-      result = keymanweb.executeHardwareKeystrokeInternal(code, shift, lstates);
-    } catch (err) {
-      console.error(err.message, err);
-    }
-    device.touchable = cachedTouchable; 
-    device.formFactor = cachedFormFactor;
-    return result;
-  };
-  
-  /**
-   *  Process the hardware key to the keyboard mapping
-   *  
-   *  @param  {number}  code   key identifier
-   *  @param  {number}  shift  shift state (0x01=left ctrl 0x02=right ctrl 0x04=left alt 0x08=right alt
-   *                                        0x10=shift 0x20=ctrl 0x40=alt)
-   *  @param  {number}  lstates lock state (0x0200=no caps 0x0400=num 0x0800=no num 0x1000=scroll 0x2000=no scroll locks)
-   **/            
-  keymanweb.executeHardwareKeystrokeInternal = function(code, shift, lstates) {
-    
-      // Clear any pending (non-popup) key
-      osk.keyPending = null;
-              
-      var Lelem = keymanweb._LastActiveElement;
-      
-      if(keymanweb._ActiveElement == null) {
-        keymanweb._ActiveElement = Lelem;
-      }
 
-      // Check the virtual key 
-      var Lkc = {
-        Ltarg: keymanweb._ActiveElement,
-        Lmodifiers: shift,
-        vkCode: code,
-        Lcode: code,
-        Lstates: lstates,
-        LisVirtualKey: true,
-        LisVirtualKeyCode: false
-      }; 
-      
+    // Clear any pending (non-popup) key
+    osk.keyPending = null;
+            
+    var Lelem = keymanweb._LastActiveElement;
+    
+    if(keymanweb._ActiveElement == null) {
+      keymanweb._ActiveElement = Lelem;
+    }
+
+    // Check the virtual key 
+    var Lkc = {
+      Ltarg: keymanweb._ActiveElement,
+      Lmodifiers: shift,
+      vkCode: code,
+      Lcode: code,
+      Lstates: lstates,
+      LisVirtualKey: true,
+      LisVirtualKeyCode: false
+    }; 
+
+    try {
       // Pass this key code and state to the keyboard program
       // If key is mapped, return true
-      if(keymanweb._ActiveKeyboard['gs'](Lelem, Lkc)) {
+      if(kbdInterface.processKeystroke(util.physicalDevice, Lelem, Lkc)) {
         return true;
       }
 
       return keymanweb.processDefaultMapping(Lkc.Lcode, shift, Lelem, '');
+    } catch (err) {
+      console.error(err.message, err);
+      return false;
+    }
   };
 
   /**
@@ -540,7 +522,7 @@
         kbdInterface.output(0, Lelem, '\n');
         return true;
     }
-    var ch = osk.defaultKeyOutput(keyName, code, shift);
+    var ch = osk.defaultKeyOutput(keyName, code, shift, false);
     if(ch) {
         kbdInterface.output(0, Lelem, ch);
         return true;

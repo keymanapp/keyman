@@ -1,5 +1,5 @@
 // Adapted from https://github.com/gagle/node-bcp47 [MIT]
-// TODO: Does not do full canonicalization
+// TODO: BCP47: Does not do full canonicalization
 unit BCP47Tag;
 
 interface
@@ -36,6 +36,9 @@ type
     constructor Create(tag: string);
 
     procedure Clear;
+
+    function IsValid: Boolean; overload;
+    function IsValid(var msg: string): Boolean; overload;
 
     property Language: string read FLanguage write SetLanguage;
     property ExtLang: string read FExtLang write SetExtLang;
@@ -98,6 +101,27 @@ begin
     if FLangTag_PrivateUse <> '' then
       Result := Result + '-x-' + FLangTag_PrivateUse;
   end;
+end;
+
+function TBCP47Tag.IsValid(var msg: string): Boolean;
+begin
+  with TBCP47Tag.Create(Self.Tag) do
+  try
+    Result := Self.Tag = Tag;
+    if not Result then
+    begin
+      msg := 'This is not a valid BCP 47 tag';
+    end;
+  finally
+    Free;
+  end;
+end;
+
+function TBCP47Tag.IsValid: Boolean;
+var
+  msg: string;
+begin
+  Result := IsValid(msg);
 end;
 
 procedure TBCP47Tag.SetExtension(const Value: string);

@@ -9,7 +9,7 @@
 import AudioToolbox
 import UIKit
 
-public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate {
+public class TextField: UITextField {
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
@@ -61,8 +61,8 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
   // MARK: - Class Overrides
   public override var inputView: UIView? {
     get {
-      Manager.shared.webDelegate = self
-      return Manager.shared.inputView
+      Manager.shared.keymanWebDelegate = self
+      return Manager.shared.keymanWeb.view
     }
 
     set(inputView) {
@@ -84,9 +84,7 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
       }
 
       if delegate !== delegateProxy {
-        Manager.shared.kmLog(
-          "Trying to set TextField's delegate directly. Use setKeymanDelegate() instead.",
-          checkDebugPrinting: true)
+        log.error("Trying to set TextField's delegate directly. Use setKeymanDelegate() instead.")
       }
       super.delegate = delegateProxy
     }
@@ -98,19 +96,15 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
   // All of the normal UITextFieldDelegate methods are supported.
   public func setKeymanDelegate(_ keymanDelegate: TextFieldDelegate?) {
     delegateProxy.keymanDelegate = keymanDelegate
-    Manager.shared.kmLog(
-      "TextField: \(self.debugDescription) keymanDelegate set to: \(keymanDelegate.debugDescription)",
-      checkDebugPrinting: true)
+    log.debug("TextField: \(self.hashValue) keymanDelegate set to: \(keymanDelegate.debugDescription)")
   }
 
   // Dismisses the keyboard if this textview is the first responder.
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
   public func dismissKeyboard() {
-    Manager.shared.kmLog(
-      "TextField: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
-      checkDebugPrinting: true)
+    log.debug("TextField: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)")
     resignFirstResponder()
-    Manager.shared.inputView.endEditing(true)
+    Manager.shared.keymanWeb.view.endEditing(true)
   }
 
   public override var text: String! {
@@ -133,86 +127,6 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
     }
   }
 
-  // MARK: - KMWebViewDelegate
-  func updatedFragment(_ fragment: String) {
-    if fragment.contains("insertText") {
-      processInsertText(fragment)
-    } else if fragment.contains("hideKeyboard") {
-      dismissKeyboard()
-    } else if fragment.contains("menuKeyUp") {
-      if let viewController = viewController {
-        Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
-      } else {
-        Manager.shared.switchToNextKeyboard()
-      }
-    }
-  }
-
-  private func processInsertText(_ fragment: String) {
-    if Manager.shared.isSubKeysMenuVisible {
-      return
-    }
-
-    if isInputClickSoundEnabled {
-      AudioServicesPlaySystemSound(0x450)
-
-      // Disable input click sound for 0.1 second to ensure it plays for single key stroke.
-      isInputClickSoundEnabled = false
-      perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
-    }
-
-    // TODO: Refactor duplicate logic in InputViewController and TextView
-    let dnRange = fragment.range(of: "+dn=")!
-    let sRange = fragment.range(of: "+s=")!
-
-    let dn = Int(fragment[dnRange.upperBound..<sRange.lowerBound])!
-    let s = fragment[sRange.upperBound...]
-
-    let hexStrings: [String]
-    if !s.isEmpty {
-      hexStrings = s.components(separatedBy: ",")
-    } else {
-      hexStrings = []
-    }
-
-    let codeUnits = hexStrings.map { hexString -> UInt16 in
-      let scanner = Scanner(string: hexString)
-      var codeUnit: UInt32 = 0
-      scanner.scanHexInt32(&codeUnit)
-      return UInt16(codeUnit)
-    }
-
-    let text = String(utf16CodeUnits: codeUnits, count: codeUnits.count)
-
-    let textRange = selectedTextRange!
-    let selRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
-                           length: offset(from: textRange.start, to: textRange.end))
-
-    if dn <= 0 {
-      if selRange.length == 0 {
-        insertText(text)
-      } else {
-        self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: text)
-      }
-    } else {
-      if s.isEmpty {
-        for _ in 0..<dn {
-          deleteBackward()
-        }
-      } else {
-        if selRange.length == 0 {
-          for _ in 0..<dn {
-            deleteBackward()
-          }
-          insertText(text)
-        } else {
-          self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: text)
-        }
-      }
-    }
-  }
-
-  // MARK: - UITextFieldDelegate Hooks
   public override var selectedTextRange: UITextRange? {
     didSet(range) {
       guard let range = range else {
@@ -224,10 +138,30 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
     }
   }
 
-  public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
-                        replacementString string: String) -> Bool {
-    shouldUpdateKMText = true // Enable text update to catch copy/paste operations
-    return true
+  // MARK: - Keyman notifications
+  private func keyboardChanged(_ kb: InstallableKeyboard) {
+    if !shouldSetCustomFontOnKeyboardChange {
+      return
+    }
+
+    // TODO: Get font name directly from keyboard object
+    let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID)
+    let fontSize = font?.pointSize ?? UIFont.systemFontSize
+    if let fontName = fontName {
+      font = UIFont(name: fontName, size: fontSize)
+    } else {
+      font = UIFont.systemFont(ofSize: fontSize)
+    }
+
+    if isFirstResponder {
+      resignFirstResponder()
+      becomeFirstResponder()
+    }
+    log.debug("TextField \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
+  }
+
+  @objc func enableInputClickSound() {
+    isInputClickSoundEnabled = true
   }
 
   @objc func textFieldTextDidChange(_ notification: Notification) {
@@ -240,6 +174,57 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
       Manager.shared.setSelectionRange(newRange, manually: false)
       shouldUpdateKMText = false
     }
+  }
+}
+
+// MARK: - KeymanWebDelegate
+extension TextField: KeymanWebDelegate {
+  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
+    if Manager.shared.isSubKeysMenuVisible {
+      return
+    }
+
+    if isInputClickSoundEnabled {
+      AudioServicesPlaySystemSound(0x450)
+
+      // Disable input click sound for 0.1 second to ensure it plays for single key stroke.
+      isInputClickSoundEnabled = false
+      perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
+    }
+
+    let textRange = selectedTextRange!
+    let selRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
+                           length: offset(from: textRange.start, to: textRange.end))
+
+    if selRange.length != 0 {
+      self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: newText)
+    } else {
+      for _ in 0..<numCharsToDelete {
+        deleteBackward()
+      }
+      insertText(newText)
+    }
+  }
+
+  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
+    dismissKeyboard()
+  }
+
+  func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
+    if let viewController = viewController {
+      Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
+    } else {
+      Manager.shared.switchToNextKeyboard()
+    }
+  }
+}
+
+// MARK: - UITextFieldDelegate
+extension TextField: UITextFieldDelegate {
+  public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
+                        replacementString string: String) -> Bool {
+    shouldUpdateKMText = true // Enable text update to catch copy/paste operations
+    return true
   }
 
   public func textFieldShouldClear(_ textField: UITextField) -> Bool {
@@ -257,7 +242,8 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
     let isRTL: Bool
     if let keyboardID = Manager.shared.keyboardID,
       let languageID = Manager.shared.languageID {
-      isRTL = Manager.shared.isRTLKeyboard(withID: keyboardID, languageID: languageID) ?? false
+      let keyboard = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
+      isRTL = keyboard?.isRTL ?? false
     } else {
       isRTL = false
     }
@@ -289,7 +275,7 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
   }
 
   public func textFieldDidBeginEditing(_ textField: UITextField) {
-    Manager.shared.webDelegate = self
+    Manager.shared.keymanWebDelegate = self
 
     let fontName: String?
     if let keyboardID = Manager.shared.keyboardID,
@@ -305,8 +291,7 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
       font = UIFont.systemFont(ofSize: fontSize)
     }
 
-    Manager.shared.kmLog("TextField setFont: \(String(describing: font?.familyName))",
-      checkDebugPrinting: true)
+    log.debug("TextField: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
 
     // copy this textField's text to the webview
     Manager.shared.setText(text)
@@ -314,9 +299,7 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
     let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                            length: offset(from: textRange.start, to: textRange.end))
     Manager.shared.setSelectionRange(newRange, manually: false)
-    Manager.shared.kmLog(
-      "TextField: \(self.debugDescription) Became first responder. Value: \(String(describing: text))",
-      checkDebugPrinting: true)
+    log.debug("TextField: \(self.hashValue) Became first responder. Value: \(String(describing: text))")
   }
 
   public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
@@ -325,32 +308,5 @@ public class TextField: UITextField, UITextFieldDelegate, KeymanWebViewDelegate 
     }
 
     return true
-  }
-
-  // MARK: - Keyman notifications
-  private func keyboardChanged(_ kb: InstallableKeyboard) {
-    if !shouldSetCustomFontOnKeyboardChange {
-      return
-    }
-
-    // TODO: Get font name directly from keyboard object
-    let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID)
-    let fontSize = font?.pointSize ?? UIFont.systemFontSize
-    if let fontName = fontName {
-      font = UIFont(name: fontName, size: fontSize)
-    } else {
-      font = UIFont.systemFont(ofSize: fontSize)
-    }
-
-    if isFirstResponder {
-      resignFirstResponder()
-      becomeFirstResponder()
-    }
-    Manager.shared.kmLog(
-      "TextField \(self.debugDescription) setFont: \(font!.familyName)", checkDebugPrinting: true)
-  }
-
-  @objc func enableInputClickSound() {
-    isInputClickSoundEnabled = true
   }
 }

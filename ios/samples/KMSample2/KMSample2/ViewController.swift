@@ -15,22 +15,20 @@ class ViewController: UIViewController, TextViewDelegate {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    // Replace with your application group id
-    Manager.applicationGroupIdentifier = "group.KMSample"
-
     Manager.shared.openURL = UIApplication.shared.openURL
 
-    // Disable before release
-    Manager.shared.isDebugPrintingOn = true
-
     Manager.shared.isKeymanHelpOn = false
-    Manager.shared.preloadLanguageFile(atPath: Bundle.main.path(forResource: "tamil99m-1.1", ofType: "js")!,
-                                       shouldOverwrite: true)
-    Manager.shared.preloadFontFile(atPath: Bundle.main.path(forResource: "aava1", ofType: "ttf")!,
-                                   shouldOverwrite: true)
-    Manager.shared.registerCustomFonts()
+    do {
+      try Manager.shared.preloadKeyboardFile(at: Bundle.main.url(forResource: "tamil99m-1.1", withExtension: "js")!,
+                                             shouldOverwrite: true)
+      try Manager.shared.preloadFontFile(at: Bundle.main.url(forResource: "aava1", withExtension: "ttf")!,
+                                         shouldOverwrite: true)
+    } catch {
+      print("Error preloading: \(error)")
+    }
+    FontManager.shared.registerCustomFonts()
 
-    Manager.shared.addKeyboard(Constants.defaultKeyboard)
+    Manager.shared.addKeyboard(Defaults.keyboard)
     let kb = InstallableKeyboard(id: "tamil99m",
                                  name: "Tamil 99M",
                                  languageID: "tam",

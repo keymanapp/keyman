@@ -29,7 +29,7 @@ default:
     
 TARGETS=ext global buildtools developer engine desktop support
 RELEASE_TARGETS=desktop
-CLEANS=test cleanroot
+CLEANS=test unit-tests cleanroot
 MANIFESTS=engine desktop developer
 
 EXCLUDEPATHDEFINES=1
@@ -83,6 +83,11 @@ test:
     $(MAKE) $(TARGET)
     cd $(ROOT)\src
 
+unit-tests:
+    cd $(ROOT)\src\unit-tests
+    $(MAKE) $(TARGET)
+    cd $(ROOT)\src
+    
 # ----------------------------------------------------------------------
 # release
 # ----------------------------------------------------------------------
@@ -161,7 +166,7 @@ update-version: build-tools mkver-app
 build-release-wrapper: clean-output update-version
     $(MAKE) dirs
     $(MAKE) build-tools
-    $(MAKE) build
+    $(MAKE) build unit-tests
     $(MAKE) build-release
     $(MAKE) signcode
     $(MAKE) -DTARGET=test test

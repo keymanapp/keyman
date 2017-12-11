@@ -16,6 +16,12 @@
 		C01AB59C1F8345CB009B37D3 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C0324B801F87170600AF3785 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B7F1F87170600AF3785 /* AppDelegate.swift */; };
 		C0324B841F87172900AF3785 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B831F87172900AF3785 /* ViewController.swift */; };
+		C059FCB61FD9245300BD1A64 /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E41FD8F21500D2F3C7 /* Zip.framework */; };
+		C05B14201FD8F2B10082A316 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E51FD8F21500D2F3C7 /* ObjcExceptionBridging.framework */; };
+		C05B14211FD8F2B10082A316 /* ObjcExceptionBridging.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E51FD8F21500D2F3C7 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C05B14221FD8F2B10082A316 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E61FD8F21500D2F3C7 /* XCGLogger.framework */; };
+		C05B14231FD8F2B10082A316 /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E61FD8F21500D2F3C7 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C05B14251FD8F2B10082A316 /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E41FD8F21500D2F3C7 /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,7 +31,10 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				C05B14251FD8F2B10082A316 /* Zip.framework in Embed Frameworks */,
+				C05B14211FD8F2B10082A316 /* ObjcExceptionBridging.framework in Embed Frameworks */,
 				C01AB59C1F8345CB009B37D3 /* KeymanEngine.framework in Embed Frameworks */,
+				C05B14231FD8F2B10082A316 /* XCGLogger.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -43,6 +52,9 @@
 		C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
 		C0324B7F1F87170600AF3785 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C0324B831F87172900AF3785 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		C07705E41FD8F21500D2F3C7 /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = ../../Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
+		C07705E51FD8F21500D2F3C7 /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = ../../Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
+		C07705E61FD8F21500D2F3C7 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = ../../Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +63,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				C01AB59A1F8345C5009B37D3 /* KeymanEngine.framework in Frameworks */,
+				C05B14201FD8F2B10082A316 /* ObjcExceptionBridging.framework in Frameworks */,
+				C05B14221FD8F2B10082A316 /* XCGLogger.framework in Frameworks */,
+				C059FCB61FD9245300BD1A64 /* Zip.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,6 +115,9 @@
 			isa = PBXGroup;
 			children = (
 				C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */,
+				C07705E51FD8F21500D2F3C7 /* ObjcExceptionBridging.framework */,
+				C07705E61FD8F21500D2F3C7 /* XCGLogger.framework */,
+				C07705E41FD8F21500D2F3C7 /* Zip.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -349,6 +367,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(SRCROOT)/../../Carthage/Build/iOS/",
 				);
 				INFOPLIST_FILE = KMSample1/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -370,6 +389,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(SRCROOT)/../../Carthage/Build/iOS/",
 				);
 				INFOPLIST_FILE = KMSample1/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

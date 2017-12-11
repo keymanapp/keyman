@@ -167,47 +167,44 @@ if(!window['keyman']['initialized']) {
        *      
        * @param       {Event=}     e    event
        */       
-      keymanweb.setFocus=function(e)
-      {                     
+      keymanweb.setFocus=function(e) {                     
         //e.stopPropagation();  // not doing anything useful, no child elements
         //e.preventDefault();   // prevents user selection or scrolling, may be better if they are allowed?
         keymanweb.focusing=true;
         keymanweb.focusTimer=window.setTimeout(function(){keymanweb.focusing=false;},1000);
   
         var tEvent=e;      
-        if(e)
-        {
-          if(typeof e.touches == 'object') tEvent=e.touches[0];
-        }
-        
-        // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
-        else 
-        {
+        if(e) {
+          if(typeof e.touches == 'object') {
+            tEvent=e.touches[0];
+          }
+        } else { // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
           tEvent={clientX:0,clientY:0}
           // Will usually be called from setActiveElement, which should define _LastActiveElement
-          if(keymanweb._LastActiveElement) 
+          if(keymanweb._LastActiveElement) {
             tEvent.target = keymanweb._LastActiveElement['kmw_ip'];
           // but will default to first input or text area on page if _LastActiveElement is null
-          else 
+        } else {
             tEvent.target = keymanweb.sortedInputs[0]['kmw_ip'];
+          }
         }    
         
         var touchX=tEvent.clientX,touchY=tEvent.clientY,tTarg=tEvent.target,scroller;
     
         // Identify the scroller element
-        if(tTarg.nodeName == 'SPAN')
+        if(tTarg.nodeName == 'SPAN') {
           scroller=tTarg.parentNode;
-        else if(tTarg.className != null && tTarg.className.indexOf('keymanweb-input') >= 0) 
+        } else if(tTarg.className != null && tTarg.className.indexOf('keymanweb-input') >= 0) {
           scroller=tTarg.firstChild;
-        else
+        } else {
           scroller=tTarg;
+        }
 
         // And the actual target element        
         var target=scroller.parentNode;
 
         // Move the caret and refocus if necessary     
-        if(keymanweb._ActiveElement != target) 
-        {
+        if(keymanweb._ActiveElement != target) {
           // Hide the KMW caret
           keymanweb.hideCaret(); 
           keymanweb._ActiveElement=target;
@@ -227,27 +224,24 @@ if(!window['keyman']['initialized']) {
         keymanweb.useInternalKeyboard=false;
         
         // And display the OSK if not already visible
-        if(osk.ready && !osk._Visible) osk._Show();
+        if(osk.ready && !osk._Visible) {
+          osk._Show();
+        }
         
         // If clicked on DIV, set caret to end of text
-        if(tTarg.nodeName == 'DIV' )
-        { 
+        if(tTarg.nodeName == 'DIV' ) { 
           var x,cp;
           x=util._GetAbsoluteX(scroller.firstChild);        
-          if(target.dir == 'rtl')
-          { 
+          if(target.dir == 'rtl') { 
             x += scroller.firstChild.offsetWidth;        
             cp=(touchX > x ? 0 : 100000);
-          }        
-          else
+          } else {
             cp=(touchX<x ? 0 : 100000);
+          }
       
           keymanweb.setTextCaret(target,cp);
           keymanweb.scrollInput(target);        
-        }
-        // Otherwise, if clicked on text in SPAN, set at touch position
-        else  
-        { 
+        } else { // Otherwise, if clicked on text in SPAN, set at touch position
           var caret,cp,cpMin,cpMax,x,y,dy,yRow,iLoop;
           caret=scroller.childNodes[1]; //caret span
           cpMin=0;
@@ -270,39 +264,41 @@ if(!window['keyman']['initialized']) {
             while(util._GetAbsoluteY(caret)-dy > touchY && cp > cpMin)keymanweb.setTextCaret(target,--cp);
             while(util._GetAbsoluteY(caret)-dy < touchY-yRow && cp < cpMax) keymanweb.setTextCaret(target,++cp);
           }
+
           // Caret repositioning for horizontal scrolling of RTL text
-          if(target.dir == 'rtl')
-          {
-            for(iLoop=0; iLoop<16; iLoop++)
-            {
-              x=util._GetAbsoluteX(caret);  //left of caret            
-              if(x < touchX && cp > cpMin && cp != cpMax) {cpMax=cp; cp=Math.round((cp+cpMin)/2);}
-              else if(x > touchX && cp < cpMax && cp != cpMin) {cpMin=cp; cp=Math.round((cp+cpMax)/2);}
-              else break;
-              keymanweb.setTextCaret(target,cp);
-            }
-            while(util._GetAbsoluteX(caret) < touchX && cp > cpMin) keymanweb.setTextCaret(target,--cp);
-            while(util._GetAbsoluteX(caret) > touchX && cp < cpMax) keymanweb.setTextCaret(target,++cp);
+
+          // snapOrder - 'snaps' the touch location in a manner corresponding to the 'ltr' vs 'rtl' orientation.
+          // Think of it as performing a floor() function, but the floor depends on the origin's direction.
+          var snapOrder;
+          if(target.dir == 'rtl') {  // I would use arrow functions, but IE doesn't like 'em.
+            snapOrder = function(a, b) {
+              return a < b; 
+            };
+          } else {
+            snapOrder = function(a, b) { 
+              return a > b; 
+            };
           }
-          // Caret repositioning for horizontal scrolling of standard (LTR) text
-          else
-          {
-            for(iLoop=0; iLoop<16; iLoop++) // assumes fields shorter than 2**16 characters
-            {
-              x=util._GetAbsoluteX(caret);  //left of caret            
-              if(x > touchX && cp > cpMin && cp != cpMax)
-              {
-                cpMax=cp; cp=Math.round((cp+cpMin)/2);
-              }
-              else if(x < touchX && cp < cpMax && cp != cpMin)
-              {
-                cpMin=cp; cp=Math.round((cp+cpMax)/2);
-              }
-              else break;
-              keymanweb.setTextCaret(target,cp);
+
+          for(iLoop=0; iLoop<16; iLoop++) {
+            x=util._GetAbsoluteX(caret);  //left of caret            
+            if(snapOrder(x, touchX) && cp > cpMin && cp != cpMax) {
+              cpMax=cp; 
+              cp=Math.round((cp+cpMin)/2);
+            } else if(!snapOrder(x, touchX) && cp < cpMax && cp != cpMin) {
+              cpMin=cp; 
+              cp=Math.round((cp+cpMax)/2);
+            } else {
+              break;
             }
-            while(util._GetAbsoluteX(caret) > touchX && cp > cpMin) keymanweb.setTextCaret(target,--cp);
-            while(util._GetAbsoluteX(caret) < touchX && cp < cpMax) keymanweb.setTextCaret(target,++cp);
+            keymanweb.setTextCaret(target,cp);
+          }
+
+          while(snapOrder(util._GetAbsoluteX(caret), touchX) && cp > cpMin) {
+            keymanweb.setTextCaret(target,--cp);
+          }
+          while(!snapOrder(util._GetAbsoluteX(caret), touchX) && cp < cpMax) {
+            keymanweb.setTextCaret(target,++cp);
           }
         }
 
@@ -312,15 +308,7 @@ if(!window['keyman']['initialized']) {
          *
          * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
          */  
-        var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
-
-        if(keymanweb._LastActiveElement && keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
-          keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
-          keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
-        } else { 
-          keymanweb.globalKeyboard = keyboardID;
-          keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
-        }
+        keymanweb._BlurKeyboardSettings();
 
         // With the attachment API update, we now directly track the old legacy control behavior.
         keymanweb._LastActiveElement = target;
@@ -329,34 +317,14 @@ if(!window['keyman']['initialized']) {
          * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
          * If not, we need to activate the control's preferred keyboard.
          */
-        keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
-    
-        if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
-          keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
-            keymanweb._LastActiveElement._kmwAttachment.languageCode); 
-        } else { 
-          keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
-        }
+        keymanweb._FocusKeyboardSettings(false);
         
-        //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
-        //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
-        if(!keymanweb._IsIEEditableIframe(target,1) || !keymanweb._IsMozillaEditableIframe(target,1))
-        {
-          keymanweb._DisableInput = 1; return;
+        // Always do the common focus stuff, instantly returning if we're in an editable iframe.
+        // This parallels the if-statement in _ControlFocus - it may be needed as this if-statement in the future,
+        // despite its present redundancy.
+        if(keymanweb._CommonFocusHelper(target)) {
+          return;
         }
-        keymanweb._DisableInput = 0;
-    
-        if(!keymanweb._JustActivatedKeymanWebUI)
-        {
-          keymanweb._DeadKeys = [];
-          keymanweb._NotifyKeyboard(0,target,1);  // I2187
-        }
-      
-        if(!keymanweb._JustActivatedKeymanWebUI  &&  keymanweb._SelectionControl != target)
-          keymanweb._IsActivatingKeymanWebUI = 0;
-        keymanweb._JustActivatedKeymanWebUI = 0;
-    
-        keymanweb._SelectionControl = target;
       }
 
       /**
@@ -1153,15 +1121,10 @@ if(!window['keyman']['initialized']) {
           util.attachDOMEvent(baseElement,'focus', keymanweb._ControlFocus);
           util.attachDOMEvent(baseElement,'blur', keymanweb._ControlBlur);
 
-          // TODO:  Rework KMW to properly support physical keyboard use while in touch mode properly.
-          //        As not all the proper infrastructure exists (regarding certain keyboard stores/rules),
-          //        we leave physical keystroke input disabled when in touch mode.
-          if(!isAlias) {
-            // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
-            Pelem.onkeypress = keymanweb._KeyPress;
-            Pelem.onkeydown = keymanweb._KeyDown;
-            Pelem.onkeyup = keymanweb._KeyUp;      
-          }
+          // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
+          Pelem.onkeypress = keymanweb._KeyPress;
+          Pelem.onkeydown = keymanweb._KeyDown;
+          Pelem.onkeyup = keymanweb._KeyUp;      
         }
       } 
     }; 
@@ -1333,9 +1296,8 @@ if(!window['keyman']['initialized']) {
     keymanweb['resetContext'] = keymanweb.resetContext = function() {
       osk.layerId = 'default';
 
-      keymanweb._DeadkeyResetMatched();
-      keymanweb._DeadkeyDeleteMatched();
-      keymanweb.cachedContext.reset();
+      kbdInterface.clearDeadkeys();
+      kbdInterface.resetContextCache();
       keymanweb._ResetVKShift();
 
       osk._Show();
@@ -1728,7 +1690,7 @@ if(!window['keyman']['initialized']) {
       }           
 
       // Update the UI 
-      keymanweb.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC']);
+      keymanweb.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC'],sp['KP']);
     }
     
     /** 
@@ -2434,41 +2396,47 @@ if(!window['keyman']['initialized']) {
      * @param       {Event}       e       Event object
      * @return      {boolean}             always true  (?) 
      */    
-    keymanweb._ControlFocus = function(e)
-    {
+    keymanweb._ControlFocus = function(e) {
       var Ltarg, Ln;
-      if(!keymanweb._Enabled) return true;
+      if(!keymanweb._Enabled) {
+        return true;
+      }
       e = keymanweb._GetEventObject(e);     // I2404 - Manage IE events in IFRAMEs
-      if(!e) return true;
-      if (e.target) Ltarg = e.target;
-      else if (e.srcElement) Ltarg = e.srcElement;
-      else return true;
+      Ltarg = util.eventTarget(e);
+      if (Ltarg == null) {
+        return true;
+      }
     
       // Prevent any action if a protected input field
-      if(device.touchable && (Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0)) return true;
+      if(device.touchable && (Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0)) {
+        return true;
+      }
 
       // Or if not a remappable input field
       var en=Ltarg.nodeName.toLowerCase();
-      if(en == 'input')
-      {
+      if(en == 'input') {
         var et=Ltarg.type.toLowerCase();
-        if(!(et == 'text' || et == 'search')) return true;
+        if(!(et == 'text' || et == 'search')) {
+          return true;
+        }
       } else if((device.touchable || !Ltarg.isContentEditable) && en != 'textarea') {
         return true;
       }
 
       keymanweb._ActiveElement=Ltarg;  // I3363 (Build 301)  
 
-      if (Ltarg.nodeType == 3) // defeat Safari bug
+      if (Ltarg.nodeType == 3) { // defeat Safari bug
         Ltarg = Ltarg.parentNode;
+      }
         
       var LfocusTarg = Ltarg;
 
       // Ensure that focussed element is visible above the keyboard
-      if(device.touchable && (Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0)) keymanweb.scrollBody(Ltarg);
+      if(device.touchable && (Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0)) {
+        keymanweb.scrollBody(Ltarg);
+      }
           
-      if(Ltarg.tagName=='IFRAME') //**TODO: check case reference
-      {
+      if(Ltarg.tagName=='IFRAME') { //**TODO: check case reference
         keymanweb._AttachToIframe(Ltarg);
         Ltarg=Ltarg.contentWindow.document;
       }
@@ -2479,45 +2447,17 @@ if(!window['keyman']['initialized']) {
       var priorElement = keymanweb._LastActiveElement;
       keymanweb._LastActiveElement = Ltarg;
 
-      var keyboardID = keymanweb._ActiveKeyboard == null ? '' : keymanweb._ActiveKeyboard['KI'];
-
-      if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
-        if(!keymanweb._JustActivatedKeymanWebUI) {
-          keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard,
-            keymanweb._LastActiveElement._kmwAttachment.languageCode); 
-        } else {
-          keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
-          keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
-        }
-      } else if(priorElement) { // Avoids complications with initialization and recent detachments.
-        if(!keymanweb._JustActivatedKeymanWebUI) {
-          keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode); 
-        } else {
-          keymanweb.globalKeyboard = keyboardID;
-          keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
-        }
+      if(keymanweb._JustActivatedKeymanWebUI) {
+        keymanweb._BlurKeyboardSettings();
+      } else {
+        keymanweb._FocusKeyboardSettings(priorElement ? false : true);
       }
 
-      //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
-      //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
-      if(!keymanweb._IsIEEditableIframe(Ltarg,1) || !keymanweb._IsMozillaEditableIframe(Ltarg,1))
-      {
-        keymanweb._DisableInput = 1; 
+      // Always do the common focus stuff, instantly returning if we're in an editable iframe.
+      if(keymanweb._CommonFocusHelper(Ltarg)) {
         return true;
-      }
-      keymanweb._DisableInput = 0;
+      };
 
-      if(!keymanweb._JustActivatedKeymanWebUI)
-      {
-        keymanweb._DeadKeys = [];
-        keymanweb._NotifyKeyboard(0,Ltarg,1);  // I2187
-      }
-    
-      if(!keymanweb._JustActivatedKeymanWebUI  &&  keymanweb._SelectionControl != Ltarg)
-        keymanweb._IsActivatingKeymanWebUI = 0;
-      keymanweb._JustActivatedKeymanWebUI = 0;
-
-      keymanweb._SelectionControl = Ltarg;
       Ltarg._KeymanWebSelectionStart = Ltarg._KeymanWebSelectionEnd = null; // I3363 (Build 301)
 
       // Set element directionality (but only if element is empty)
@@ -2527,34 +2467,88 @@ if(!window['keyman']['initialized']) {
       keymanweb.doControlFocused(LfocusTarg,keymanweb._LastActiveElement);
     
       // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
-      if(device.touchable)
-      {
+      if(device.touchable) {
         osk._Enabled=1;
-      }
-      else
-      {
+      } else {
         // Conditionally show the OSK when control receives the focus
-        if(osk.ready)
-        {
-          if(keymanweb.isCJK()) osk._Enabled=1;
-          if(osk._Enabled) osk._Show(); else osk._Hide(false);
+        if(osk.ready) {
+          if(keymanweb.isCJK()) {
+            osk._Enabled=1;
+          }
+          if(osk._Enabled) {
+            osk._Show();
+          } else {
+            osk._Hide(false);
+          }
         }
       }
-      // TODO: This is possibly the main sequencing issue, as ControlFocus may get called before other elements
-      // are ready, or keyboards downloaded.  Need some way to ensure that the OSK is displayed when everything is ready.
-      
-      
-      // We have slightly different focus management on IE to other browsers.  This is because
-      // IE has problems with loss of focus when clicking on another element.  This can probably
-      // be resolved in the future by using MouseDown and MouseUp events instead of Click events
-      // on the VK elements but for now we just use the smoother interaction on Firefox and Chrome,
-      // and let IE do the focus dance.  This means some careful management of the
-      // IsActivatingKeymanWebUI and LastActiveElement variables, so be careful with any changes
-      // to these.
-      //    if(keymanweb._IE) keymanweb._LastActiveElement = null; // I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
-        
+
       return true;
-    }                
+    }  
+    
+    /**
+     * Function             _BlurKeyboardSettings
+     * Description          Stores the last active element's keyboard settings.  Should be called
+     *                      whenever a KMW-enabled page element loses control.
+     */
+    keymanweb._BlurKeyboardSettings = function() {
+      var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
+      
+      if(keymanweb._LastActiveElement && keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
+        keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
+        keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
+      } else {
+        keymanweb.globalKeyboard = keyboardID;
+        keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
+      }
+    }
+
+    /**
+     * Function             _FocusKeyboardSettings
+     * @param   {boolean}   blockGlobalChange   A flag indicating if the global keyboard setting should be ignored for this call.
+     * Description          Restores the newly active element's keyboard settings.  Should be called
+     *                      whenever a KMW-enabled page element gains control, but only once the prior
+     *                      element's loss of control is guaranteed.
+     */ 
+    keymanweb._FocusKeyboardSettings = function(blockGlobalChange) {      
+      if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
+        keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
+          keymanweb._LastActiveElement._kmwAttachment.languageCode); 
+      } else if(!blockGlobalChange) { 
+        keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
+      }
+    }
+
+    /**
+     * Function             _CommonFocusHelper
+     * @param   {Element}   target 
+     * @returns {boolean}
+     * Description          Performs common state management for the various focus events of KeymanWeb.                      
+     *                      The return value indicates whether (true) or not (false) the calling event handler 
+     *                      should be terminated immediately after the call.
+     */
+    keymanweb._CommonFocusHelper = function(target) {
+      //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
+      //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
+      if(!keymanweb._IsIEEditableIframe(target,1) || !keymanweb._IsMozillaEditableIframe(target,1)) {
+        keymanweb._DisableInput = 1; 
+        return true;
+      }
+      keymanweb._DisableInput = 0;
+  
+      if(!keymanweb._JustActivatedKeymanWebUI) {
+        keymanweb._DeadKeys = [];
+        keymanweb._NotifyKeyboard(0,target,1);  // I2187
+      }
+    
+      if(!keymanweb._JustActivatedKeymanWebUI  &&  keymanweb._SelectionControl != target) {
+        keymanweb._IsActivatingKeymanWebUI = 0;
+      }
+      keymanweb._JustActivatedKeymanWebUI = 0;
+  
+      keymanweb._SelectionControl = target;
+      return false;
+    }
     
     /**
      * Function     _IsIEEditableIframe
@@ -2590,31 +2584,35 @@ if(!window['keyman']['initialized']) {
      * @param       {Event}       e       Event object
      * @return      {boolean}             Always true  (?) 
      */    
-    keymanweb._ControlBlur = function(e)
-    {
+    keymanweb._ControlBlur = function(e) {
       var Ltarg;  
 
-      if(!keymanweb._Enabled) return true;
+      if(!keymanweb._Enabled) {
+        return true;
+      }
 
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) return true;
-      if (e.target) Ltarg = e.target;
-      else if (e.srcElement) Ltarg = e.srcElement;
-      else return true;
+      Ltarg = util.eventTarget(e);
+      if (Ltarg == null) {
+        return true;
+      }
 
       keymanweb._ActiveElement = null; // I3363 (Build 301)
 
       // Hide the touch device input caret, if applicable  I3363 (Build 301)
-      if(device.touchable) keymanweb.hideCaret();
+      if(device.touchable) {
+        keymanweb.hideCaret();
+      }
           
-      if (Ltarg.nodeType == 3) // defeat Safari bug
+      if (Ltarg.nodeType == 3) { // defeat Safari bug
         Ltarg = Ltarg.parentNode;
+      }
 
-      if(Ltarg.tagName=='IFRAME')
+      if(Ltarg.tagName=='IFRAME') {
         Ltarg=Ltarg.contentWindow.document;
+      }
         
-      if (Ltarg.setSelectionRange)
-      {                                           
+      if (Ltarg.setSelectionRange) {                                           
         //Ltarg._KeymanWebSelectionStart = Ltarg.selectionStart;
         //Ltarg._KeymanWebSelectionEnd = Ltarg.selectionEnd;
         Ltarg._KeymanWebSelectionStart = Ltarg.value._kmwCodeUnitToCodePoint(Ltarg.selectionStart);  //I3319
@@ -2623,15 +2621,7 @@ if(!window['keyman']['initialized']) {
       }
       
       ////keymanweb._SelectionControl = null;    
-      var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
-
-      if(keymanweb._LastActiveElement && keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
-        keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
-        keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
-      } else {
-        keymanweb.globalKeyboard = keyboardID;
-        keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
-      }
+      keymanweb._BlurKeyboardSettings();
 
       // Now that we've handled all prior-element maintenance, update the 'last active element'.
       keymanweb._LastActiveElement = Ltarg;
@@ -2639,16 +2629,19 @@ if(!window['keyman']['initialized']) {
       /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects should be restrained to this control in case
       * the user is manually specifying languages on a per-control basis.
       */
-      
       keymanweb._JustActivatedKeymanWebUI = 0;
       
-      if(!keymanweb._IsActivatingKeymanWebUI) keymanweb._NotifyKeyboard(0,Ltarg,0);  // I2187
+      if(!keymanweb._IsActivatingKeymanWebUI) {
+        keymanweb._NotifyKeyboard(0,Ltarg,0);  // I2187
+      }
 
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs  //TODO: is this really needed again????
       keymanweb.doControlBlurred(Ltarg,e,keymanweb._IsActivatingKeymanWebUI);
 
       // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
-      if(osk.ready && !keymanweb._IsActivatingKeymanWebUI) osk._Hide(false);
+      if(osk.ready && !keymanweb._IsActivatingKeymanWebUI) {
+        osk._Hide(false);
+      }
 
       return true;
     }
@@ -2700,11 +2693,17 @@ if(!window['keyman']['initialized']) {
      * @param       {string}            _language
      * @param       {string}            _keyboardName
      * @param       {string}            _languageCode
-     * @return      {boolean}   
+     * @param       {string=}           _packageID        Used by KMEA/KMEI to track .kmp related info.
+     * @return      {boolean}
      */       
-    keymanweb.doKeyboardRegistered = function(_internalName,_language,_keyboardName,_languageCode)
+    keymanweb.doKeyboardRegistered = function(_internalName,_language,_keyboardName,_languageCode, _packageID)
     {
       var p={'internalName':_internalName,'language':_language,'keyboardName':_keyboardName,'languageCode':_languageCode};
+      
+      // Utilized only by our embedded codepaths.
+      if(_packageID) {
+        p['package'] = _packageID;
+      }
       return util.callEvent('kmw.keyboardregistered',p);
     }
     
@@ -2818,6 +2817,22 @@ if(!window['keyman']['initialized']) {
       window.addEventListener('focus', keymanweb._BubbledFocus, true);  
 
     /**
+     * Function     _GetEventKeyCode
+     * Scope        Private
+     * @param       {Event}       e         Event object
+     * Description  Finds the key code represented by the event.
+     */
+    keymanweb._GetEventKeyCode = function(e) {
+      if (e.keyCode) {
+        return e.keyCode;
+      } else if (e.which) {
+        return e.which;
+      } else {
+        return null;
+      }
+    }
+
+    /**
      * Function     _GetKeyEventProperties
      * Scope        Private
      * @param       {Event}       e         Event object
@@ -2830,23 +2845,25 @@ if(!window['keyman']['initialized']) {
      *                LisVirtualKeyCode e.g. ctrl/alt key
      *                LisVirtualKey     e.g. Virtual key or non-keypress event
      */    
-    keymanweb._GetKeyEventProperties = function(e, keyState)
-    {
+    keymanweb._GetKeyEventProperties = function(e, keyState) {
       var s = new Object();
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      if(!e) return null;
-      
-      if(e.cancelBubble === true) return null; // I2457 - Facebook meta-event generation mess -- two events generated for a keydown in Facebook contentEditable divs
-      
-      if (e.target) s.Ltarg = e.target;
-      else if (e.srcElement) s.Ltarg = e.srcElement;
-      else return null;
-      if (s.Ltarg.nodeType == 3) // defeat Safari bug
-        s.Ltarg = s.Ltarg.parentNode;
+      s.Ltarg = util.eventTarget(e);
+      if (s.Ltarg == null) {
+        return null;
+      }
+      if(e.cancelBubble === true) {
+        return null; // I2457 - Facebook meta-event generation mess -- two events generated for a keydown in Facebook contentEditable divs
+      }      
 
-      if (e.keyCode) s.Lcode = e.keyCode;
-      else if (e.which) s.Lcode = e.which;    
-      else return null;
+      if (s.Ltarg.nodeType == 3) {// defeat Safari bug
+        s.Ltarg = s.Ltarg.parentNode;
+      }
+
+      s.Lcode = keymanweb._GetEventKeyCode(e);
+      if (s.Lcode == null) {
+        return null;
+      }
       
       // Stage 1 - track the true state of the keyboard's modifiers.
       var osk = keymanweb['osk'], prevModState = keymanweb.modStateFlags, curModState = 0x0000;
@@ -2985,39 +3002,11 @@ if(!window['keyman']['initialized']) {
             keymanweb._Selection = Lrange;
 
             /* Delete deadkeys for IE when certain keys pressed */
-            keymanweb._DeadKeys = [];
+            kbdInterface.clearDeadkeys();
           }
         }
       }
       return true;
-    }
-    
-  // TODO: find out if _FindCaret is still needed for current FireFox, delete if not
-
-    /**
-     * Function     _FindCaret
-     * Scope        Private
-     * @param       {Object}    Pelem    element
-     * Description  Work around a problem with scrolling text boxes and input boxes in Firefox, not needed for other browsers
-     */
-    keymanweb._FindCaret = function(Pelem)     // I779
-    {
-      if(!Pelem.createTextRange && Pelem.selectionStart)
-      {      
-        var Levent=document.createEvent('KeyboardEvent');
-        if(Levent.initKeyEvent)
-        {
-          Levent.initKeyEvent('keypress',true,true,null,false,false,false,false,0,32);
-          Levent._kmw_block = true; // Tell keymanweb._KeyPress to ignore this simulated event.
-          
-          // Nasty problems arise from the simulated keystroke if we don't temporarily block the handler.
-          Pelem.dispatchEvent(Levent);
-          Levent=document.createEvent('KeyboardEvent');
-          Levent.initKeyEvent('keypress',true,true,null,false,false,false,false,8,0);
-          Levent._kmw_block = true; // Tell keymanweb._KeyPress to ignore this simulated event.
-          Pelem.dispatchEvent(Levent);
-        }
-      }
     }
     
     /**
@@ -3072,7 +3061,7 @@ if(!window['keyman']['initialized']) {
 
       switch(Levent.Lcode) {
         case 8: 
-          keymanweb._DeadKeys = []; 
+          kbdInterface.clearDeadkeys();
           break; // I3318 (always clear deadkeys after backspace) 
         case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
         case 17: 
@@ -3125,12 +3114,12 @@ if(!window['keyman']['initialized']) {
         if(typeof(keymanweb._ActiveKeyboard['KM'])=='undefined'  &&  !(Levent.Lmodifiers & 0x60)) {
           // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
           var Levent2={Lcode:keymanweb._USKeyCodeToCharCode(Levent),Ltarg:Levent.Ltarg,Lmodifiers:0,LisVirtualKey:0};
-          if(keymanweb.callKeyboardStartGroup(Levent2.Ltarg,Levent2)) {
+          if(kbdInterface.processKeystroke(util.physicalDevice, Levent2.Ltarg,Levent2)) {
             LeventMatched=1;
           }
         }
         
-        LeventMatched = LeventMatched || keymanweb.callKeyboardStartGroup(Levent.Ltarg,Levent);
+        LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent);
         
         // Support backspace in simulated input DIV from physical keyboard where not matched in rule  I3363 (Build 301)
         if(Levent.Lcode == 8 && !LeventMatched && Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
@@ -3140,7 +3129,7 @@ if(!window['keyman']['initialized']) {
         // Mnemonic layout
         if(Levent.Lcode == 8) { // I1595 - Backspace for mnemonic
           keymanweb._KeyPressToSwallow = 1;
-          if(!keymanweb.callKeyboardStartGroup(Levent.Ltarg,Levent)) {
+          if(!kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
             kbdInterface.output(1,keymanweb._LastActiveElement,""); // I3363 (Build 301)
           }
           return false;  //added 16/3/13 to fix double backspace on mnemonic layouts on desktop
@@ -3165,12 +3154,11 @@ if(!window['keyman']['initialized']) {
       }
     
       if(LeventMatched) {
-        keymanweb._FindCaret(Levent.Ltarg); //I779
         if(e  &&  e.preventDefault) {
           e.preventDefault();
           e.stopPropagation();
         }
-        keymanweb._KeyPressToSwallow = (e?e.keyCode:0);
+        keymanweb._KeyPressToSwallow = (e?keymanweb._GetEventKeyCode(e):0);
         return false;
       } else {
         keymanweb._KeyPressToSwallow = 0;
@@ -3183,15 +3171,18 @@ if(!window['keyman']['initialized']) {
           return false;
         }
       }
+
+      if(typeof(Levent.Ltarg.base) != 'undefined') {
+        // Simulated touch elements have no default text-processing - we need to rely on a strategy similar to
+        // that of the OSK here.
+        var ch = osk.defaultKeyOutput('',Levent.Lcode,Levent.Lmodifiers,false,Levent.Ltarg);
+        if(ch) {
+          kbdInterface.output(0, Levent.Ltarg, ch);
+          return false;
+        }
+      }
       return true;
     }                
-
-    keymanweb.callKeyboardStartGroup = function(Ltarg, Levent) {
-      keymanweb._CachedSelectionStart = null; // I3319     
-      keymanweb._DeadkeyResetMatched();       // I3318    
-      keymanweb.cachedContext.reset();
-      return keymanweb._ActiveKeyboard['gs'](Ltarg, Levent);
-    }
 
     /**
      * Function     _KeyPress
@@ -3233,13 +3224,12 @@ if(!window['keyman']['initialized']) {
       }
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
       
-      if(keymanweb._KeyPressToSwallow || keymanweb.callKeyboardStartGroup(Levent.Ltarg,Levent)) {
+      if(keymanweb._KeyPressToSwallow || kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
         keymanweb._KeyPressToSwallow=0;
         if(e  &&  e.preventDefault) {
           e.preventDefault();
           e.stopPropagation();
         }
-        keymanweb._FindCaret(Levent.Ltarg);  // I779
         return false;
       }
       keymanweb._KeyPressToSwallow=0;
@@ -3253,21 +3243,28 @@ if(!window['keyman']['initialized']) {
      * @return      {boolean}           
      * Description Processes keyup event and passes event data to keyboard
      */       
-    keymanweb._KeyUp = function(e)
-    {
+    keymanweb._KeyUp = function(e) {
       var Levent = keymanweb._GetKeyEventProperties(e, false);
-      if(Levent == null || !osk.ready) return true;
+      if(Levent == null || !osk.ready) {
+        return true;
+      }
 
-      switch(Levent.Lcode)
-      {
+      switch(Levent.Lcode) {
         case 13:  
-          if(Levent.Ltarg.nodeName == 'TEXTAREA') break;
+          if(Levent.Ltarg.nodeName == 'TEXTAREA') {
+            break;
+          }
         
+          if(Levent.Ltarg.base && Levent.Ltarg.base.nodeName == 'TEXTAREA') {
+            break;
+          }
+
           // For input fields, move to next input element
-          if(Levent.Ltarg.type == 'search' || Levent.Ltarg.type == 'submit')
+          if(Levent.Ltarg.type == 'search' || Levent.Ltarg.type == 'submit') {
             Levent.Ltarg.form.submit();
-          else
+          } else {
             keymanweb.moveToNext(false);
+          }
           return true;        
                   
         case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
@@ -3276,8 +3273,12 @@ if(!window['keyman']['initialized']) {
         case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
         case 144:
         case 145:
-          keymanweb._NotifyKeyboard(Levent.Lcode,Levent.Ltarg,0); 
-          return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1);  // I2187
+          keymanweb._NotifyKeyboard(Levent.Lcode,Levent.Ltarg,0);
+          if(!device.touchable) {
+            return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1);  // I2187
+          } else {
+            return true;
+          }
       }
       
       if(Levent.LmodifierChange){
@@ -3287,17 +3288,13 @@ if(!window['keyman']['initialized']) {
 
       // I736 start
       var Ldv;
-      if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  Ldv.type != 'control')   // I1479 - avoid createRange on controls
-      {
+      if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  Ldv.type != 'control') { // I1479 - avoid createRange on controls
         Ldv=Ldv.createRange();
         //if(Ldv.parentElement()==Levent.Ltarg) //I1505
         keymanweb._Selection = Ldv;
       }
       // I736 end
       
-      //if(document.selection  &&  document.selection.type=='Text') keymanweb._Selection=document.selection.createRange();
-      //if(!KeymanWeb._Enabled) return true;
-      //if (!e) e = window.event;
       return false;
     }
     
@@ -3312,51 +3309,45 @@ if(!window['keyman']['initialized']) {
     * 
     * @param      {number|boolean}  bBack     Direction to move (0 or 1)
     */
-    keymanweb.moveToNext=function(bBack)
-    {
-      var i,t=keymanweb.sortedInputs,
-        activeBase=keymanweb._ActiveElement;
+    keymanweb.moveToNext=function(bBack) {
+      var i,t=keymanweb.sortedInputs, activeBase=keymanweb._ActiveElement;
       
-      if(t.length == 0) return;
+      if(t.length == 0) {
+        return;
+      }
 
       // For touchable devices, get the base element of the DIV
-      if(device.touchable) activeBase=activeBase.base;
+      if(device.touchable) {
+        activeBase=activeBase.base;
+      }
 
       // Identify the active element in the list of inputs ordered by position
-      for(i=0; i<t.length; i++)
-      {          
+      for(i=0; i<t.length; i++) {          
         if(t[i] == activeBase) break;
       }   
 
       // Find the next (or previous) element in the list
-      if(bBack) i=i-1; else i=i+1; 
-      if(i >= t.length) i=i-t.length;
-      if(i < 0) i=i+t.length;
+      i = bBack ? i-1 : i+1;
+      // Treat the list as circular, wrapping the index if necessary.
+      i = i >= t.length ? i-t.length : i;
+      i = i < 0 ? i+t.length : i;
 
       // Move to the selected element
-      if(device.touchable)
-      {                     
+      if(device.touchable) {                     
         // Set focusing flag to prevent OSK disappearing 
         keymanweb.focusing=true;
         var target=t[i]['kmw_ip'];
 
         // Focus if next element is non-mapped
-        if(typeof(target) == 'undefined')
-        {
+        if(typeof(target) == 'undefined') {
           t[i].focus();
-        }
-        
-        // Or reposition the caret on the input DIV if mapped
-        else  
-        {
+        } else { // Or reposition the caret on the input DIV if mapped
           keymanweb._ActiveElement=keymanweb._LastActiveElement=target;    
           keymanweb.setTextCaret(target,10000);                            
-          keymanweb.scrollInput(target);                                   
+          keymanweb.scrollInput(target);   // mousedown check
+          target.focus();
         } 
-      }
-      // Behaviour for desktop browsers
-      else
-      {
+      } else { // Behaviour for desktop browsers
         t[i].focus();
       }    
     }          
@@ -3390,8 +3381,7 @@ if(!window['keyman']['initialized']) {
      * @param       {string=}    PLgCode
      * @param       {boolean=}   saveCookie   
      */    
-    keymanweb._SetActiveKeyboard = function(PInternalName,PLgCode,saveCookie)
-    {
+    keymanweb._SetActiveKeyboard = function(PInternalName,PLgCode,saveCookie) {
       var n,Ln;
 
       // Set default language code
@@ -3504,24 +3494,33 @@ if(!window['keyman']['initialized']) {
               kbdName = kbdName.replace(/\s*keyboard\s*/i, '');
 
               // Setup our default error-messaging callback if it should be implemented.
-              if(!keymanweb.isEmbedded) {  // No error messaging if we're in embedded mode.
-                loadingStub.asyncLoader.callback = function(altString) {
-                  
-                  // Thanks, Closure errors.  
-                  if(!keymanweb.isEmbedded) {
-                    util.wait(false);
-                    util.alert(altString || 'Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available.', function() {
-                      keymanweb['setActiveKeyboard']('');
-                    });
-                  }
-
-                  if(Ln > 0) {
-                    var Ps = keymanweb._KeyboardStubs[0];
-                    keymanweb._SetActiveKeyboard(Ps['KI'], Ps['KLC'], true);
-                  }
+              loadingStub.asyncLoader.callback = function(altString, msgType) {
+                var msg = altString || 'Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available.';
+                
+                // Thanks, Closure errors.  
+                if(!keymanweb.isEmbedded) {
+                  util.wait(false);
+                  util.alert(altString || msg, function() {
+                    keymanweb['setActiveKeyboard']('');
+                  });
                 }
-                loadingStub.asyncLoader.timer = window.setTimeout(loadingStub.asyncLoader.callback, 10000);
+
+                switch(msgType) { // in case we extend this later.
+                  case 'err':
+                    console.error(msg);
+                    break;
+                  case 'warn':
+                  default:
+                    console.warn(msg);
+                    break;
+                }
+
+                if(Ln > 0) {
+                  var Ps = keymanweb._KeyboardStubs[0];
+                  keymanweb._SetActiveKeyboard(Ps['KI'], Ps['KLC'], true);
+                }
               }
+              loadingStub.asyncLoader.timer = window.setTimeout(loadingStub.asyncLoader.callback, 10000);
 
               //Display the loading delay bar (Note: only append 'keyboard' if not included in name.) 
               if(!keymanweb.isEmbedded) {
@@ -3555,8 +3554,7 @@ if(!window['keyman']['initialized']) {
    *  @param  {Object}  kbdStub   keyboard stub to be loaded.
    *    
    **/      
-    keymanweb.installKeyboard = function(kbdStub)
-    {
+    keymanweb.installKeyboard = function(kbdStub) {
       var Lscript = util._CreateElement('SCRIPT');
       Lscript.charset="UTF-8";        // KMEW-89
       Lscript.type = 'text/javascript';
@@ -3564,7 +3562,6 @@ if(!window['keyman']['initialized']) {
       var kbdFile = kbdStub['KF'];
       var kbdLang = kbdStub['KL'];
       var kbdName = kbdStub['KN'];
-
 
       // Add a handler for cases where the new <script> block fails to load.
       Lscript.addEventListener('error', function() {
@@ -3574,12 +3571,8 @@ if(!window['keyman']['initialized']) {
           kbdStub.asyncLoader.timer = null;
         }
 
-        // Do not output error messages when embedded.  (KMEA/KMEI)
-        if(!keymanweb.isEmbedded) {
-          // We already know the load has failed... why wait?
-          kbdStub.asyncLoader.callback('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '.');
-          console.log('Error:  cannot find the', kbdName, 'keyboard for', kbdLang, 'at', kbdFile + '.');
-        }
+        // We already know the load has failed... why wait?
+        kbdStub.asyncLoader.callback('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '.', 'warn');
         kbdStub.asyncLoader = null;
       }, false);
 
@@ -3602,8 +3595,7 @@ if(!window['keyman']['initialized']) {
             keymanweb.doBeforeKeyboardChange(kbd['KI'],kbdStub['KLC']);
             keymanweb._ActiveKeyboard=kbd;
 
-            if(keymanweb._LastActiveElement != null) 
-            {
+            if(keymanweb._LastActiveElement != null) {
               keymanweb._JustActivatedKeymanWebUI = 1;
               keymanweb._SetTargDir(keymanweb._LastActiveElement);            
             }
@@ -3619,23 +3611,22 @@ if(!window['keyman']['initialized']) {
               util.wait(false);
             }
           } // A handler portion for cases where the new <script> block loads, but fails to process.
-        } else if(!keymanweb.isEmbedded) {  // Do not output error messages when embedded.  (KMEA/KMEI)
-            kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.');
-            console.log('Error registering the', kbdName, 'keyboard for', kbdLang + '.');
+        } else {  // Output error messages even when embedded - they're useful when debugging the apps and KMEA/KMEI engines.
+            kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.', 'error');
         }
         kbdStub.asyncLoader = null; 
       }, false);
 
       // IE likes to instantly start loading the file when assigned to an element, so we do this after the rest
       // of our setup.
-      Lscript.src = keymanweb.getKeyboardPath(kbdFile);  
+      Lscript.src = keymanweb.getKeyboardPath(kbdFile);
 
       try {                                  
         document.body.appendChild(Lscript);  
-        }
+      }
       catch(ex) {                                                     
         document.getElementsByTagName('head')[0].appendChild(Lscript);
-        }            
+      }            
     }
 
     /**
@@ -4249,6 +4240,8 @@ if(!window['keyman']['initialized']) {
         if(keymanweb._KeyboardStubs.length > 0) {
           // Select the first stub as our active keyboard.  This is set later for 'native' KMW.
           keymanweb._SetActiveKeyboard(keymanweb._KeyboardStubs[0]['KI'], keymanweb._KeyboardStubs[0]['KLC']);     
+        } else {
+          console.error("No keyboard stubs exist - cannot initialize keyboard!");
         }
 
         return;
@@ -4694,43 +4687,6 @@ if(!window['keyman']['initialized']) {
       return {start: start, end: end}; 
     }
     // *** I3319 Supplementary Plane modifications - end new code
-
-    // I3318 - deadkey changes START
-    /**
-     * Function     _DeadkeyResetMatched
-     * Scope        Private
-     * Description  Clear all matched deadkey flags
-     */       
-    keymanweb._DeadkeyResetMatched = function()
-    {                   
-      var Li, _Dk = keymanweb._DeadKeys;
-      for(Li = 0; Li < _Dk.length; Li++) _Dk[Li].matched = 0;
-    }
-
-    /**
-     * Function     _DeadkeyDeleteMatched
-     * Scope        Private
-     * Description  Delete matched deadkeys from context
-     */       
-    keymanweb._DeadkeyDeleteMatched = function()
-    {              
-      var Li, _Dk = keymanweb._DeadKeys;
-      for(Li = 0; Li < _Dk.length; Li++) if(_Dk[Li].matched) _Dk.splice(Li,1);
-    }
-
-    /**
-     * Function     _DeadkeyAdjustPos
-     * Scope        Private
-     * @param       {number}      Lstart      start position in context
-     * @param       {number}      Ldelta      characters to adjust by   
-     * Description  Adjust saved positions of deadkeys in context
-     */       
-    keymanweb._DeadkeyAdjustPos = function(Lstart, Ldelta)
-    {
-      var Li, _Dk = keymanweb._DeadKeys;
-      for(Li = 0; Li < _Dk.length; Li++) if(_Dk[Li].p > Lstart) _Dk[Li].p += Ldelta;
-    }
-    // I3318 - deadkey changes END
   
     /**
      * Set target element text direction (LTR or RTL), but only if the element is empty
@@ -4818,25 +4774,25 @@ if(!window['keyman']['initialized']) {
      * @param       {Event}       e       event
      * Description  Passes control to handlers according to the hotkey pressed
      */
-    keymanweb._ProcessHotKeys = function(e)
-    {
-      if(!e) e = window.event;
-      if (e.keyCode) var _Lcode = e.keyCode;
-      else if (e.which) var _Lcode = e.which;
-      else return 0;
+    keymanweb._ProcessHotKeys = function(e) {
+      if(!e) {
+        e = window.event;
+      }
+
+      var _Lcode = keymanweb._GetEventKeyCode(e);
+      if(_Lcode == null) {
+        return null;
+      }
       
-    // Removed testing of e.shiftKey==null  I3363 (Build 301)
+      // Removed testing of e.shiftKey==null  I3363 (Build 301)
       var _Lmodifiers = 
         (e.shiftKey ? 0x10 : 0) |
         (e.ctrlKey ? (e.ctrlLeft ? 0x20 : 0x20) : 0) | 
         (e.altKey ? (e.altLeft ? 0x40 : 0x40) : 0);
 
-      for(var i=0; i<keymanweb._HotKeys.length; i++)
-      {  
-        if(_Lcode == keymanweb._HotKeys[i].Code)
-        { 
-          if(_Lmodifiers == keymanweb._HotKeys[i].Shift) 
-          { 
+      for(var i=0; i<keymanweb._HotKeys.length; i++) {  
+        if(_Lcode == keymanweb._HotKeys[i].Code) { 
+          if(_Lmodifiers == keymanweb._HotKeys[i].Shift) { 
             keymanweb._HotKeys[i].Handler(); 
             e.returnValue = 0; 
             if(e && e.preventDefault) e.preventDefault(); 

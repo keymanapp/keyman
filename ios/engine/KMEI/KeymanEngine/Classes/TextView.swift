@@ -9,7 +9,7 @@
 import AudioToolbox
 import UIKit
 
-public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback, KeymanWebViewDelegate {
+public class TextView: UITextView {
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
@@ -58,8 +58,8 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
   // MARK: - Class Overrides
   public override var inputView: UIView? {
     get {
-      Manager.shared.webDelegate = self
-      return Manager.shared.inputView
+      Manager.shared.keymanWebDelegate = self
+      return Manager.shared.keymanWeb.view
     }
 
     set(inputView) {
@@ -81,9 +81,7 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
       }
 
       if delegate !== delegateProxy {
-        Manager.shared.kmLog(
-          "Trying to set TextView's delegate directly. Use setKeymanDelegate() instead.",
-          checkDebugPrinting: true)
+        log.error("Trying to set TextView's delegate directly. Use setKeymanDelegate() instead.")
       }
       super.delegate = delegateProxy
     }
@@ -95,19 +93,15 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
   //   - All of the normal UITextViewDelegate methods are supported.
   public func setKeymanDelegate(_ keymanDelegate: TextViewDelegate?) {
     delegateProxy.keymanDelegate = keymanDelegate
-    Manager.shared.kmLog(
-      "TextView: \(self.debugDescription) keymanDelegate set to: \(keymanDelegate.debugDescription)",
-      checkDebugPrinting: true)
+    log.debug("TextView: \(self.hashValue) keymanDelegate set to: \(keymanDelegate.debugDescription)")
   }
 
   // Dismisses the keyboard if this textview is the first responder.
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
   public func dismissKeyboard() {
-    Manager.shared.kmLog(
-      "TextView: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
-      checkDebugPrinting: true)
+    log.debug("TextView: \(self.hashValue) Dismissing keyboard. Was first responder:\(isFirstResponder)")
     resignFirstResponder()
-    Manager.shared.inputView.endEditing(true)
+    Manager.shared.keymanWeb.view.endEditing(true)
   }
 
   public override var text: String! {
@@ -127,22 +121,66 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
     }
   }
 
-  // MARK: - KMWebViewDelegate
-  func updatedFragment(_ fragment: String) {
-    if fragment.contains("insertText") {
-      processInsertText(fragment)
-    } else if fragment.contains("hideKeyboard") {
-      dismissKeyboard()
-    } else if fragment.contains("menuKeyUp") {
-      if let viewController = viewController {
-        Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
-      } else {
-        Manager.shared.switchToNextKeyboard()
-      }
+  public override var selectedTextRange: UITextRange? {
+    didSet {
+      Manager.shared.setSelectionRange(selectedRange, manually: false)
     }
   }
 
-  private func processInsertText(_ fragment: String) {
+  // MARK: - Keyman notifications
+  private func keyboardChanged(_ kb: InstallableKeyboard) {
+    if !shouldSetCustomFontOnKeyboardChange {
+      return
+    }
+
+    // TODO: Get font name directly from keyboard
+    let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID)
+    let fontSize = font?.pointSize ?? UIFont.systemFontSize
+    if let fontName = fontName {
+      font = UIFont(name: fontName, size: fontSize)
+    } else {
+      font = UIFont.systemFont(ofSize: fontSize)
+    }
+
+    if isFirstResponder {
+      resignFirstResponder()
+      becomeFirstResponder()
+    }
+
+    log.debug("TextView: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
+  }
+
+  // MARK: iOS 7 TextView Scroll bug fix
+  func scroll(toCarret textView: UITextView) {
+    guard let range = textView.selectedTextRange else {
+      return
+    }
+    var caretRect = textView.caretRect(for: range.end)
+    caretRect.size.height += textView.textContainerInset.bottom
+    textView.scrollRectToVisible(caretRect, animated: false)
+  }
+
+  @objc func scroll(toShowSelection textView: UITextView) {
+    if textView.selectedRange.location < textView.text.count {
+      return
+    }
+
+    var bottomOffset = CGPoint(x: 0, y: textView.contentSize.height - textView.bounds.size.height)
+    if bottomOffset.y < 0 {
+      bottomOffset.y = 0
+    }
+    textView.setContentOffset(bottomOffset, animated: true)
+  }
+
+  // MARK: - Private Methods
+  @objc func enableInputClickSound() {
+    isInputClickSoundEnabled = true
+  }
+}
+
+// MARK: - KeymanWebDelegate
+extension TextView: KeymanWebDelegate {
+  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     if Manager.shared.isSubKeysMenuVisible {
       return
     }
@@ -155,53 +193,17 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
       perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
     }
 
-    let dnRange = fragment.range(of: "+dn=")!
-    let sRange = fragment.range(of: "+s=")!
-
-    let dn = Int(fragment[dnRange.upperBound..<sRange.lowerBound])!
-    let s = fragment[sRange.upperBound...]
-
-    let hexStrings: [String]
-    if !s.isEmpty {
-      hexStrings = s.components(separatedBy: ",")
-    } else {
-      hexStrings = []
-    }
-
-    let codeUnits = hexStrings.map { hexString -> UInt16 in
-      let scanner = Scanner(string: hexString)
-      var codeUnit: UInt32 = 0
-      scanner.scanHexInt32(&codeUnit)
-      return UInt16(codeUnit)
-    }
-
-    let text = String(utf16CodeUnits: codeUnits, count: codeUnits.count)
-
     let textRange = selectedTextRange ?? UITextRange()
     let selRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                            length: offset(from: textRange.start, to: textRange.end))
 
-    if dn <= 0 {
-      if selRange.length == 0 {
-        insertText(text)
-      } else {
-        self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: text)
-      }
+    if selRange.length != 0 {
+      self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: newText)
     } else {
-      if s.isEmpty {
-        for _ in 0..<dn {
-          deleteBackward()
-        }
-      } else {
-        if selRange.length == 0 {
-          for _ in 0..<dn {
-            deleteBackward()
-          }
-          insertText(text)
-        } else {
-          self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: text)
-        }
+      for _ in 0..<numCharsToDelete {
+        deleteBackward()
       }
+      insertText(newText)
     }
 
     // Workaround for iOS 7 UITextView scroll bug
@@ -210,13 +212,21 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
     // Smaller delays are unreliable.
   }
 
-  // MARK: - UITextViewDelegate Hooks
-  public override var selectedTextRange: UITextRange? {
-    didSet {
-      Manager.shared.setSelectionRange(selectedRange, manually: false)
-    }
+  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
+    dismissKeyboard()
   }
 
+  func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
+    if let viewController = viewController {
+      Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
+    } else {
+      Manager.shared.switchToNextKeyboard()
+    }
+  }
+}
+
+// MARK: - UITextViewDelegate
+extension TextView: UITextViewDelegate {
   public func textViewDidChangeSelection(_ textView: UITextView) {
     // Workaround for iOS 7 UITextView scroll bug
     scroll(toCarret: textView)
@@ -231,7 +241,8 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
     let isRTL: Bool
     if let keyboardID = Manager.shared.keyboardID,
        let languageID = Manager.shared.languageID {
-      isRTL = Manager.shared.isRTLKeyboard(withID: keyboardID, languageID: languageID) ?? false
+      let keyboard = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
+      isRTL = keyboard?.isRTL ?? false
     } else {
       isRTL = false
     }
@@ -265,7 +276,7 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
   }
 
   public func textViewDidBeginEditing(_ textView: UITextView) {
-    Manager.shared.webDelegate = self
+    Manager.shared.keymanWebDelegate = self
 
     let fontName: String?
     if let keyboardID = Manager.shared.keyboardID,
@@ -281,15 +292,12 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
       font = UIFont.systemFont(ofSize: fontSize)
     }
 
-    Manager.shared.kmLog("TextView setFont: \(String(describing: font?.familyName))",
-      checkDebugPrinting: true)
+    log.debug("TextView: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
 
     // copy this textView's text to the webview
     Manager.shared.setText(text)
     Manager.shared.setSelectionRange(selectedRange, manually: false)
-    Manager.shared.kmLog(
-      "TextView: \(self.debugDescription) Became first responder. Value: \(text.debugDescription)",
-      checkDebugPrinting: true)
+    log.debug("TextView: \(self.hashValue) Became first responder. Value: \(String(describing: text))")
   }
 
   public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
@@ -313,56 +321,5 @@ public class TextView: UITextView, UITextViewDelegate, UIInputViewAudioFeedback,
       resignFirstResponder()
     }
     return true
-  }
-
-  // MARK: - Keyman notifications
-  private func keyboardChanged(_ kb: InstallableKeyboard) {
-    if !shouldSetCustomFontOnKeyboardChange {
-      return
-    }
-
-    // TODO: Get font name directly from keyboard
-    let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID)
-    let fontSize = font?.pointSize ?? UIFont.systemFontSize
-    if let fontName = fontName {
-      font = UIFont(name: fontName, size: fontSize)
-    } else {
-      font = UIFont.systemFont(ofSize: fontSize)
-    }
-
-    if isFirstResponder {
-      resignFirstResponder()
-      becomeFirstResponder()
-    }
-
-    Manager.shared.kmLog("TextView setFont: \(String(describing: font?.familyName))",
-      checkDebugPrinting: true)
-  }
-
-  // MARK: iOS 7 TextView Scroll bug fix
-  func scroll(toCarret textView: UITextView) {
-    guard let range = textView.selectedTextRange else {
-      return
-    }
-    var caretRect = textView.caretRect(for: range.end)
-    caretRect.size.height += textView.textContainerInset.bottom
-    textView.scrollRectToVisible(caretRect, animated: false)
-  }
-
-  @objc func scroll(toShowSelection textView: UITextView) {
-    if textView.selectedRange.location < textView.text.count {
-      return
-    }
-
-    var bottomOffset = CGPoint(x: 0, y: textView.contentSize.height - textView.bounds.size.height)
-    if bottomOffset.y < 0 {
-      bottomOffset.y = 0
-    }
-    textView.setContentOffset(bottomOffset, animated: true)
-  }
-
-  // MARK: - Private Methods
-  @objc func enableInputClickSound() {
-    isInputClickSoundEnabled = true
   }
 }

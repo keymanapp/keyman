@@ -1111,26 +1111,21 @@ procedure TKeyboardParser.AddRequiredLines;
 var
   i: Integer;
   FLastSystemStore: Integer;
-  FVersionLine, FGroupLine, FBeginLine: Integer;
+  FGroupLine, FBeginLine: Integer;
   FCommentEnd: Integer;
 begin
   {
-    store(&version)
     begin > use(main)
     group(main) using keys
   }
 
   FGroupLine := FLines.IndexOfClass(TKeyboardParser_Group);
 
-  FCommentEnd := -1; FBeginLine := -1; FLastSystemStore := -1; FVersionLine := -1;
+  FCommentEnd := -1; FBeginLine := -1; FLastSystemStore := -1;
   for i := 0 to FLines.Count - 1 do
   begin
     if FLines[i] is TKeyboardParser_SystemStore then
-    begin
-      FLastSystemStore := i;
-      if (FLines[i] as TKeyboardParser_SystemStore).SystemStoreType = ssVersion then
-        FVersionLine := i;
-    end
+      FLastSystemStore := i
     else if (Lines[i] is TKeyboardParser_Begin) and (FBeginLine < 0) then
       FBeginLine := i
     else if not (Lines[i] is TKeyboardParser_Comment) and (FCommentEnd < 0) then
@@ -1152,13 +1147,6 @@ begin
   begin
     FLines.Insert(i, TKeyboardParser_Begin.CreateNew(True, 'main'));
     FLines.Insert(i, TKeyboardParser_BlankLine.CreateNew);
-  end;
-
-  if FVersionLine < 0 then
-  begin
-    FLines.Insert(i, TKeyboardParser_SystemStore.CreateNew(ssVersion, SKeymanKeyboardVersion));
-    FLines.Insert(i, TKeyboardParser_BlankLine.CreateNew);
-    MoveVersionLineToStart;
   end;
 end;
 

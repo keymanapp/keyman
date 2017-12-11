@@ -5,6 +5,9 @@
 package com.tavultesoft.kmea;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,68 +18,118 @@ import java.net.URL;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.tavultesoft.kmea.util.Connection;
+
 import android.util.Log;
 
-final class JSONParser {
-
-  private static InputStream inputStream = null;
-  private static JSONObject jsonObj = null;
-  private static String jsonStr = "";
+public final class JSONParser {
 
   public JSONParser() {
   }
 
-  public JSONObject getJSONObjectFromUrl(String urlStr) {
-    HttpURLConnection urlConnection = null;
+  private JSONObject getJSONObjectFromReader(BufferedReader reader) {
+    String jsonStr = "";
+    JSONObject jsonObj = null;
+    String logTag = "JSONObjectFromReader";
 
     try {
-      URL url = new URL(urlStr);
-      urlConnection = (HttpURLConnection) url.openConnection();
-      urlConnection.setRequestProperty("Cache-Control", "no-cache");
-      urlConnection.setConnectTimeout(10000);
-      urlConnection.setReadTimeout(10000);
-
-      inputStream = urlConnection.getInputStream();
-
-      // get charset
-      String charSet = null;
-      String contentType = urlConnection.getContentType();
-      String[] values = contentType.split(";");
-      for (String value : values) {
-        value = value.trim();
-        if (value.toLowerCase().startsWith("charset=")) {
-          charSet = value.substring("charset=".length());
-        }
-      }
-
-      // if cannot get charset, use utf-8
-      if (charSet == null)
-        charSet = "utf-8";
-
-      BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, charSet), 4096);
       StringBuilder strBuilder = new StringBuilder();
       String line = null;
-      while ((line = reader.readLine()) != null)
+      while ((line = reader.readLine()) != null) {
         strBuilder.append(line + "\n");
-      inputStream.close();
+      }
       jsonStr = strBuilder.toString();
-
       jsonObj = new JSONObject(jsonStr);
     } catch (UnsupportedEncodingException e) {
-      Log.e("Encoding Error", (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
+      Log.e(logTag, (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
       jsonObj = null;
+      System.err.println(e);
     } catch (IOException e) {
-      Log.e("IO Error", (e.getMessage() == null) ? "IOException" : e.getMessage());
+      Log.e(logTag, (e.getMessage() == null) ? "IOException" : e.getMessage());
       jsonObj = null;
+      System.err.println(e);
     } catch (JSONException e) {
-      Log.e("JSON Parser Error", (e.getMessage() == null) ? "JSONException" : e.getMessage());
+      Log.e(logTag, (e.getMessage() == null) ? "JSONException" : e.getMessage());
       jsonObj = null;
+      System.err.println(e);
     } catch (Exception e) {
-      Log.e("JSON Parser Error", (e.getMessage() == null) ? "Exception" : e.getMessage());
+      Log.e(logTag, (e.getMessage() == null) ? "Exception" : e.getMessage());
       jsonObj = null;
+      System.err.println(e);
+    }
+
+    return jsonObj;
+  }
+
+  public JSONObject getJSONObjectFromFile(File path) {
+    BufferedReader reader = null;
+    JSONObject jsonObj = null;
+
+    try {
+      reader = new BufferedReader(new FileReader(path));
+      jsonObj = getJSONObjectFromReader(reader);
+    } catch (FileNotFoundException e) {
+      Log.e("JSONObjectFromFile", (e.getMessage() == null) ? "FileNotFoundException" : e.getMessage());
+      jsonObj = null;
+      System.err.println(e);
     } finally {
-      if (urlConnection != null)
-        urlConnection.disconnect();
+      try {
+        reader.close();
+      } catch (IOException e) {
+        // Ignore.
+      }
+    }
+
+    return jsonObj;
+  }
+
+  // Doesn't work for directly-hosted files, hence the separate method above.
+  public JSONObject getJSONObjectFromUrl(String urlStr) {
+    BufferedReader reader = null;
+    JSONObject jsonObj = null;
+    InputStream inputStream = null;
+    String logTag = "JSONObjectFromUrl";
+
+    try {
+      if (Connection.initialize(urlStr)) {
+        inputStream = Connection.getInputStream();
+
+        // get charset
+        String charSet = null;
+        String contentType = Connection.getContentType();
+        String[] values = contentType.split(";");
+        for (String value : values) {
+          value = value.trim();
+          if (value.toLowerCase().startsWith("charset=")) {
+            charSet = value.substring("charset=".length());
+          }
+        }
+
+        // if cannot get charset, use utf-8
+        if (charSet == null)
+          charSet = "utf-8";
+
+        reader = new BufferedReader(new InputStreamReader(inputStream, charSet), 4096);
+        jsonObj = getJSONObjectFromReader(reader);
+      }
+    } catch (UnsupportedEncodingException e) {
+      Log.e(logTag, (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
+      jsonObj = null;
+      System.err.println(e);
+    } catch (Exception e) {
+      Log.e(logTag, (e.getMessage() == null) ? "Exception" : e.getMessage());
+      jsonObj = null;
+      System.err.println(e);
+    } finally {
+      Connection.disconnect();
+
+      if(reader != null) {
+        try {
+          reader.close();
+        } catch(IOException e) {
+          // Ignore.
+        }
+      }
     }
 
     return jsonObj;

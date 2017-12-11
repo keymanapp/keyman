@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_d1b7c430e7070465be63867b4c35074b</ID>
+      <Filename>new-blank-keyboard.kmn</Filename>
+      <Filepath>new-blank-keyboard.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>New Blank Keyboard</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_a7c4e31c012cc8cc9a15b7130992a37c</ID>
+      <Filename>version-9-keyboard.kmn</Filename>
+      <Filepath>version-9-keyboard.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>version 9 keyboard</Name>
+      </Details>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

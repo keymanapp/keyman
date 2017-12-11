@@ -25,7 +25,7 @@ type
   TKMFileType = (ftKeymanSource, ftPackageSource, ftKeymanFile, ftPackageFile,
     ftFont, ftReadme, ftTextFile,
     ftKeymanWizard, ftOther, ftBitmap,
-    ftVisualKeyboard, ftXMLFile, ftHTMLFile);
+    ftVisualKeyboard, ftXMLFile, ftHTMLFile, ftJavascript);
 const
   {FileTypes: array[TKMFileType] of string = ('ftKeymanSource', 'ftPackageSource',
     'ftKeymanFile', 'ftPackageFile', 'ftFont', 'ftReadme', 'ftTextFile',
@@ -36,7 +36,7 @@ const
   FileTypeNames: array[TKMFileType] of string = ('Keyman Source File', 'Package Source File',
     'Keyman Keyboard File', 'Keyman Package File', 'Font', 'Readme File', 'Text File',
     'Keyman Wizard File', 'Other File', 'Bitmap File',
-    'Keyman Visual Keyboard File', 'XML File', 'HTML File');
+    'Keyman Visual Keyboard File', 'XML File', 'HTML File', 'Javascript File');
 
 
 type
@@ -49,7 +49,7 @@ const
   Ext_KeymanFile = '.kmx';
   Ext_PackageFile = '.kmp';
 
-const ExtFileTypes: array[0..9] of TKMFileTypeInfo = (
+const ExtFileTypes: array[0..10] of TKMFileTypeInfo = (
   (Ext: '.kmn'; FileType: ftKeymanSource),
   (Ext: '.kps'; FileType: ftPackageSource),
   (Ext: '.kmx'; FileType: ftKeymanFile),
@@ -59,6 +59,7 @@ const ExtFileTypes: array[0..9] of TKMFileTypeInfo = (
   (Ext: '.fon'; FileType: ftFont),
   (Ext: '.ttc'; FileType: ftFont),
   (Ext: '.kvk'; FileType: ftVisualKeyboard),
+  (Ext: '.js'; FileType: ftJavascript),
   (Ext: ''; FileType: ftOther));
 
 function GetFileTypeFromFileName(const FileName: string): TKMFileType;
