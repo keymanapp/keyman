@@ -2326,19 +2326,25 @@ var
 begin
   FBitMask := 0;
   gp := fk.dpGroupArray;
-  for i := 0 to fk.cxGroupArray-1 do
+  if fk.cxGroupArray > 0 then
   begin
-    if gp.fUsingKeys then
+    for i := 0 to fk.cxGroupArray-1 do
     begin
-      kp := gp.dpKeyArray;
-      for j := 0 to gp.cxKeyArray-1 do
+      if gp.fUsingKeys then
       begin
-        if not RuleIsExcludedByPlatform(kp) then
-          FBitMask := FBitMask or JavaScript_Shift(kp, fMnemonic);
-        Inc(kp);
+        kp := gp.dpKeyArray;
+        if gp.cxKeyArray > 0 then
+        begin
+          for j := 0 to gp.cxKeyArray-1 do
+          begin
+            if not RuleIsExcludedByPlatform(kp) then
+              FBitMask := FBitMask or JavaScript_Shift(kp, fMnemonic);
+            Inc(kp);
+          end;
+        end;
       end;
+      Inc(gp);
     end;
-    Inc(gp);
   end;
 
   if ((FBitMask and KMX_MASK_MODIFIER_CHIRAL) <> 0) and

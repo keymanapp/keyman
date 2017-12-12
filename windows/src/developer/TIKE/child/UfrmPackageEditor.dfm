@@ -195,6 +195,9 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageFiles: TTabSheet
       Caption = 'Files'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel1: TPanel
         Left = 0
         Top = 0
@@ -351,6 +354,9 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageKeyboards: TTabSheet
       Caption = 'Keyboards'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel5: TPanel
         Left = 0
         Top = 0
@@ -535,6 +541,9 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageDetails: TTabSheet
       Caption = 'Details'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel2: TPanel
         Left = 0
         Top = 0
@@ -766,6 +775,9 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageShortcuts: TTabSheet
       Caption = 'Shortcuts'
       ImageIndex = 8
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel3: TPanel
         Left = 0
         Top = 0
@@ -929,10 +941,16 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageSource: TTabSheet
       Caption = 'Source'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Compile'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel4: TPanel
         Left = 0
         Top = 0

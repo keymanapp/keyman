@@ -61,7 +61,7 @@ uses
   Buttons, ComCtrls, ExtCtrls, Dialogs, CommDlg, kmxfile, kpsfile,
   ImgList, UfrmMDIChild, ProjectFile, PackageInfo,
   UfrmMDIEditor, Grids, dmActionsMain,
-  UserMessages,
+  UserMessages, ProjectLog,
   UframeTextEditor, LeftTabbedPageControl, ProjectFileUI,
   utilfiletypes;
 
@@ -242,6 +242,8 @@ type
     function SelectedKeyboardLanguage: TPackageKeyboardLanguage;
     function LookupLanguageName(bcp47id: string): string;
     procedure RefreshKeyboardLanguageList(k: TPackageKeyboard);
+    procedure HandlePackageRefreshError(Sender: TObject; msg: string;
+      State: TProjectLogState);
 
   protected
     function DoOpenFile: Boolean; override;
@@ -271,6 +273,7 @@ uses
   CompilePackageInstaller,
   kpsProjectFile,
   OnlineConstants,
+  KeymanVersion,
   Keyman.System.PackageInfoRefreshKeyboards,
   Keyman.System.KeyboardUtils,
   Project,
@@ -395,7 +398,7 @@ begin
   if pack.WasIni then
   begin
     if MessageDlg('The file '+FileName+' was originally created in Keyman Developer 6.2 or an earlier version.  '+
-        'Saving it in Keyman Developer 7 changes the file format and it will no longer be editable in '+
+        'Saving it in Keyman Developer '+SKeymanVersion+' changes the file format and it will no longer be editable in '+
         'Keyman Developer 6.2.'#13#10#13#10+'Continue save?', mtWarning, mbOkCancel, 0) = mrCancel then
       Exit;
   end;
@@ -1229,15 +1232,25 @@ end;
 
   Finally, updates the Keyboards tab
 *)
+
+procedure TfrmPackageEditor.HandlePackageRefreshError(Sender: TObject; msg: string; State: TProjectLogState);
+begin
+  Self.ProjectFile.Project.Log(State, Filename, Msg);
+end;
+
 procedure TfrmPackageEditor.RefreshKeyboardList;
 var
   n, i: Integer;
 begin
+  frmMessages.Clear;
+
   n := lbKeyboards.ItemIndex;
 
   with TPackageInfoRefreshKeyboards.Create(pack) do
   try
-    Execute;
+    OnError := Self.HandlePackageRefreshError;
+    if not Execute then
+      frmMessages.Show;
   finally
     Free;
   end;

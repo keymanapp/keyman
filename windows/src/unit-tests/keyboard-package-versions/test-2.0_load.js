@@ -1,0 +1,1 @@
+KeymanWeb.KRS(new Stub_Keyboard_test()); function Stub_Keyboard_test() {this.KF="test-2.0.js";this.KI="Keyboard_test";this.KN="Keyboard Version Test";}
