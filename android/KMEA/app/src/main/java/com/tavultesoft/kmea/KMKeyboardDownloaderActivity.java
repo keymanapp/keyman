@@ -39,8 +39,11 @@ public class KMKeyboardDownloaderActivity extends Activity {
   public static final String kKeymanApiBaseURL = "https://r.keymanweb.com/api/3.0/";
   public static final String kKeymanApiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url=";
   public static final String KMKey_KeyboardBaseURI = "keyboardBaseUri";
+  public static final String KMKey_Keyboard = "keyboard";
+  public static final String KMKey_Language = "language";
   public static final String KMKey_FontBaseURI = "fontBaseUri";
   public static final String KMKey_Direct = "direct";
+  public static final String KMKey_URL = "url";
 
   private static String pkgID;
   private static String kbID;
@@ -76,6 +79,9 @@ public class KMKeyboardDownloaderActivity extends Activity {
       isDirect = bundle.getBoolean(ARG_IS_DIRECT);
       url = bundle.getString(ARG_URL);
       jsonUrl = bundle.getString(ARG_JSON_URL);
+      if (jsonUrl == null) {
+        jsonUrl = "unknown";
+      }
     } else {
       return;
     }
@@ -83,13 +89,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
     Bundle args = new Bundle();
     String title = "";
     if (url != null) {
-      int index = url.lastIndexOf("/") + 1;
-      String jsonFilename = "unknown";
-      if (index >= 0 && index <= url.length()) {
-        jsonFilename = url.substring(index);
-      }
-
-      title = "Custom Keyboard: " + jsonFilename;
+      title = "Custom Keyboard: " + jsonUrl;
     } else if (customKeyboard != null && customLanguage != null &&
         !customKeyboard.trim().isEmpty() && !customLanguage.trim().isEmpty()) {
       int kbIndex = KMManager.getKeyboardIndex(getApplicationContext(), customKeyboard, customLanguage);
@@ -168,7 +168,6 @@ public class KMKeyboardDownloaderActivity extends Activity {
             deviceType = "androidphone";
           }
 
-          // Formerly from KMManager.KMCustomKeyboardDownloader
           JSONParser jsonParser = new JSONParser();
           JSONObject kbData = null;
           String remoteUrl = "";
@@ -180,11 +179,12 @@ public class KMKeyboardDownloaderActivity extends Activity {
               remoteUrl = String.format("%s%s&device=%s", kKeymanApiRemoteURL, encodedUrl, deviceType);
             }
           } else {
+            // Keyman cloud
             remoteUrl = String.format("%slanguages/%s/%s?device=%s", kKeymanApiBaseURL, langID, kbID, deviceType);
           }
           kbData = jsonParser.getJSONObjectFromUrl(remoteUrl);
 
-          exceptionStr = "Could not reach Keyman server";
+          exceptionStr = "Could not reach server";
           if (kbData == null) {
             throw new Exception(exceptionStr);
           }
@@ -319,7 +319,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
     boolean ret = false;
     if (u != null && !u.contains(KMKeyboardDownloaderActivity.kKeymanApiBaseURL) &&
       !u.contains(KMKeyboardDownloaderActivity.kKeymanApiRemoteURL)) {
-      isCustom = true;
+      ret = true;
     }
     return ret;
   }

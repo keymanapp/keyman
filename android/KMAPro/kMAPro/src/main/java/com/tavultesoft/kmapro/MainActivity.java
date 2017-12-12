@@ -192,7 +192,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         isDirect = true;
       }
 
-      String url = data.getQueryParameter(KMKeyboardDownloaderActivity.ARG_URL);
+      String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
       if (url != null) {
         boolean isCustom = KMKeyboardDownloaderActivity.isCustom(url);
 
@@ -204,13 +204,12 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
         Bundle bundle = new Bundle();
         bundle.putString(KMKeyboardDownloaderActivity.ARG_KEYBOARD,
-          data.getQueryParameter(KMKeyboardDownloaderActivity.ARG_KEYBOARD));
+          data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Keyboard));
         bundle.putString(KMKeyboardDownloaderActivity.ARG_LANGUAGE,
-          data.getQueryParameter(KMKeyboardDownloaderActivity.ARG_LANGUAGE));
+          data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Language));
         bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom);
         bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_DIRECT, isDirect);
-        bundle.putString(KMKeyboardDownloaderActivity.ARG_URL,
-          data.getQueryParameter(KMKeyboardDownloaderActivity.ARG_URL));
+        bundle.putString(KMKeyboardDownloaderActivity.ARG_URL, url);
         bundle.putString(KMKeyboardDownloaderActivity.ARG_JSON_URL, jsonFilename);
         Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
         i.putExtras(bundle);
