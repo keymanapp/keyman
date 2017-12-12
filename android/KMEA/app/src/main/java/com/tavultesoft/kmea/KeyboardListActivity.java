@@ -14,9 +14,8 @@ import org.json.JSONObject;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -103,45 +102,23 @@ public final class KeyboardListActivity extends Activity implements OnKeyboardDo
         @Override
         public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
           HashMap<String, String> kbInfo = LanguageListActivity.getKeyboardInfo(langIndex, position);
-          String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
-          String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
-          String langID = kbInfo.get(KMManager.KMKey_LanguageID);
+          final String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
+          final String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
+          final String langID = kbInfo.get(KMManager.KMKey_LanguageID);
           String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
           String langName = kbInfo.get(KMManager.KMKey_LanguageName);
-          String kFont = kbInfo.get(KMManager.KMKey_Font);
-          String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
-          KMManager.KeyboardState kbState = KMManager.getKeyboardState(context, pkgID, kbID, langID);
-          //if (kbState == KMManager.KeyboardState.KEYBOARD_STATE_NEEDS_DOWNLOAD) {
-          AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-          dialogBuilder.setTitle(langName + ": " + kbName);
-          dialogBuilder.setMessage("Would you like to download this keyboard?");
-          dialogBuilder.setPositiveButton("Download", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-              // Download keyboard
-              if (KMManager.hasConnection(context)) {
-                KMManager.KMKeyboardDownloader.download(context, langIndex, position, true);
-              } else {
-                Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
-              }
-            }
-          });
 
-          dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-              // Cancel
-            }
-          });
+          Bundle args = new Bundle();
+          args.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
+          args.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
+          args.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
+          args.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
+          args.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
+          args.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
+          Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
+          i.putExtras(args);
+          startActivity(i);
 
-          AlertDialog dialog = dialogBuilder.create();
-          dialog.show();
-          /*} else {
-            KeyboardPickerActivity.addKeyboard(context, kbInfo);
-            if (KMManager.InAppKeyboard != null)
-              KMManager.InAppKeyboard.setKeyboard(kbID, langID, kbName, langName, kFont, kOskFont);
-            if (KMManager.SystemKeyboard != null)
-              KMManager.SystemKeyboard.setKeyboard(kbID, langID, kbName, langName, kFont, kOskFont);
-              finish();
-            }*/
         }
       });
     } catch (JSONException e) {
@@ -152,13 +129,13 @@ public final class KeyboardListActivity extends Activity implements OnKeyboardDo
   @Override
   protected void onResume() {
     super.onResume();
-    KMManager.addKeyboardDownloadEventListener(this);
+    KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
   }
 
   @Override
   protected void onPause() {
     super.onPause();
-    KMManager.removeKeyboardDownloadEventListener(this);
+    KMKeyboardDownloaderActivity.removeKeyboardDownloadEventListener(this);
   }
 
   @Override
