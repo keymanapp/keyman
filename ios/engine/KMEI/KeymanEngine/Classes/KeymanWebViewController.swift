@@ -62,10 +62,7 @@ extension KeymanWebViewController {
       let y = CGFloat(Float(components[1])!)
       let w = CGFloat(Float(components[2])!)
       let h = CGFloat(Float(components[3])!)
-      let isPad = UIDevice.current.userInterfaceIdiom == .pad
-      let adjY: CGFloat = isPad ? -0.5 : -1.0
-      let frame = CGRect(x: x - w / 2.0, y: y - adjY, width: w, height: h)
-      completion(frame)
+      completion(KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h))
     }
   }
 
@@ -198,7 +195,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       let h = CGFloat(Float(fragment[hKey.upperBound..<tKey.lowerBound])!)
       let t = String(fragment[tKey.upperBound...])
 
-      let frame = keyFrame(x: x, y: y, w: w, h: h)
+      let frame = KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h)
       let preview = t.stringFromUTF16CodeUnits() ?? ""
       showKeyPreview(self, keyFrame: frame, preview: preview)
       delegate?.showKeyPreview(self, keyFrame: frame, preview: preview)
@@ -218,7 +215,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       let y = CGFloat(Float(frameComponents[1])!)
       let w = CGFloat(Float(frameComponents[2])!)
       let h = CGFloat(Float(frameComponents[3])!)
-      let frame = keyFrame(x: x, y: y, w: w, h: h)
+      let frame = KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h)
 
       let keyArray = keys.components(separatedBy: ";")
       var subkeyIDs: [String] = []
@@ -273,10 +270,9 @@ extension KeymanWebViewController: WKScriptMessageHandler {
     }
   }
 
-  private func keyFrame(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat) -> CGRect {
-    let isPad = UIDevice.current.userInterfaceIdiom == .pad
-    let adjY: CGFloat = isPad ? -0.5 : -1.0
-    return CGRect(x: x - w / 2.0, y: y - adjY, width: w, height: h)
+  private static func keyFrame(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat) -> CGRect {
+    // kmw adds w/2 to x.
+    return CGRect(x: x - w / 2.0, y: y, width: w, height: h)
   }
 }
 
