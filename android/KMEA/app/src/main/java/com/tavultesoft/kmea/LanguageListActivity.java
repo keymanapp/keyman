@@ -105,7 +105,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
   @Override
   protected void onPause() {
     super.onPause();
-    KMKeyboardDownloaderActivity.removeKeyboardDownloadEventListener(this);
+    //KMKeyboardDownloaderActivity.removeKeyboardDownloadEventListener(this);
   }
 
   @Override

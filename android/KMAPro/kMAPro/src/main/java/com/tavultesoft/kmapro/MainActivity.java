@@ -197,9 +197,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         boolean isCustom = KMKeyboardDownloaderActivity.isCustom(url);
 
         int index = url.lastIndexOf("/") + 1;
-        String jsonFilename = "unknown:";
+        String filename = "unknown:";
         if (index >= 0 && index <= url.length()) {
-          jsonFilename = url.substring(index);
+          filename = url.substring(index);
         }
 
         Bundle bundle = new Bundle();
@@ -210,7 +210,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom);
         bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_DIRECT, isDirect);
         bundle.putString(KMKeyboardDownloaderActivity.ARG_URL, url);
-        bundle.putString(KMKeyboardDownloaderActivity.ARG_JSON_URL, jsonFilename);
+        bundle.putString(KMKeyboardDownloaderActivity.ARG_FILENAME, filename);
         Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
         i.putExtras(bundle);
         startActivity(i);
@@ -224,7 +224,8 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     super.onPause();
     KMManager.onPause();
     KMManager.removeKeyboardEventListener(this);
-    KMKeyboardDownloaderActivity.removeKeyboardDownloadEventListener(this);
+    // TODO: Investigate if it's proper to not remove this listener
+    // KMKeyboardDownloaderActivity.removeKeyboardDownloadEventListener(this);
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putString(userTextKey, textView.getText().toString());

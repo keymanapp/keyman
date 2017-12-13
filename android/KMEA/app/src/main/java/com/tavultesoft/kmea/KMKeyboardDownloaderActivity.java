@@ -34,7 +34,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
   public static final String ARG_LANGUAGE = "KMKeyboardActivity.language";
   public static final String ARG_IS_DIRECT = "KMKeyboardActivity.isDirect";
   public static final String ARG_URL = "KMKeyboardActivity.url";
-  public static final String ARG_JSON_URL = "KMKeyboardActivity.jsonUrl";
+  public static final String ARG_FILENAME = "KMKeyboardActivity.filename";
 
   public static final String kKeymanApiBaseURL = "https://r.keymanweb.com/api/3.0/";
   public static final String kKeymanApiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url=";
@@ -56,7 +56,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
   private static String customLanguage;
   private static Boolean isDirect;
   private static String url;
-  private static String jsonUrl;
+  private static String filename;
 
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
 
@@ -67,6 +67,9 @@ public class KMKeyboardDownloaderActivity extends Activity {
     Bundle bundle = getIntent().getExtras();
     if (bundle != null) {
       pkgID = bundle.getString(ARG_PKG_ID);
+      if (pkgID == null || pkgID.isEmpty()) {
+        pkgID = KMManager.KMDefault_LegacyPackageID;
+      }
       kbID = bundle.getString(ARG_KB_ID);
       langID = bundle.getString(ARG_LANG_ID);
       kbName = bundle.getString(ARG_KB_NAME);
@@ -78,9 +81,9 @@ public class KMKeyboardDownloaderActivity extends Activity {
       customLanguage = bundle.getString(ARG_LANGUAGE);
       isDirect = bundle.getBoolean(ARG_IS_DIRECT);
       url = bundle.getString(ARG_URL);
-      jsonUrl = bundle.getString(ARG_JSON_URL);
-      if (jsonUrl == null) {
-        jsonUrl = "unknown";
+      filename = bundle.getString(ARG_FILENAME);
+      if (filename == null || filename.isEmpty()) {
+        filename = "unknown";
       }
     } else {
       return;
@@ -89,7 +92,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
     Bundle args = new Bundle();
     String title = "";
     if (url != null) {
-      title = "Custom Keyboard: " + jsonUrl;
+      title = "Custom Keyboard: " + filename;
     } else if (customKeyboard != null && customLanguage != null &&
         !customKeyboard.trim().isEmpty() && !customLanguage.trim().isEmpty()) {
       int kbIndex = KMManager.getKeyboardIndex(getApplicationContext(), customKeyboard, customLanguage);
@@ -123,8 +126,8 @@ public class KMKeyboardDownloaderActivity extends Activity {
 
     new AsyncTask<Void, Integer, Integer>() {
       private ProgressDialog progressDialog;
-      private String languageName = "";
-      private String keyboardName = "";
+      //private String languageName = "";
+      //private String keyboardName = "";
       private String kbVersion = "1.0";
       private String kbIsCustom = isCustom ? "Y" : "N";
       private String font = "";
@@ -157,9 +160,9 @@ public class KMKeyboardDownloaderActivity extends Activity {
         try {
           String exceptionStr = "Invalid keyboard";
           if (pkgID == null || pkgID.trim().isEmpty() ||
-            langID == null || langID.trim().isEmpty() ||
-            kbID == null || kbID.trim().isEmpty())
+            (!isCustom && (langID == null || langID.trim().isEmpty() || kbID == null || kbID.trim().isEmpty()))) {
             throw new Exception(exceptionStr);
+          }
 
           String deviceType = context.getResources().getString(R.string.device_type);
           if (deviceType.equals("AndroidTablet")) {
@@ -173,15 +176,16 @@ public class KMKeyboardDownloaderActivity extends Activity {
           String remoteUrl = "";
           if (isCustom) {
             if (isDirect) {
-              remoteUrl = jsonUrl;
+              remoteUrl = url;
             } else {
-              String encodedUrl = URLEncoder.encode(jsonUrl, "utf-8");
+              String encodedUrl = URLEncoder.encode(filename, "utf-8");
               remoteUrl = String.format("%s%s&device=%s", kKeymanApiRemoteURL, encodedUrl, deviceType);
             }
           } else {
             // Keyman cloud
             remoteUrl = String.format("%slanguages/%s/%s?device=%s", kKeymanApiBaseURL, langID, kbID, deviceType);
           }
+
           kbData = jsonParser.getJSONObjectFromUrl(remoteUrl);
 
           exceptionStr = "Could not reach server";
@@ -189,32 +193,75 @@ public class KMKeyboardDownloaderActivity extends Activity {
             throw new Exception(exceptionStr);
           }
 
-          JSONObject options = kbData.optJSONObject(KMManager.KMKey_Options);
-          JSONObject language = kbData.optJSONObject(KMManager.KMKey_Language);
           exceptionStr = "The keyboard could not be installed";
-          if (options == null || language == null) {
+          JSONObject options = kbData.optJSONObject(KMManager.KMKey_Options);
+          if (options == null) {
+            throw new Exception(exceptionStr);
+          }
+          String kbBaseUri = options.optString(KMKey_KeyboardBaseURI, "");
+          if (kbBaseUri.isEmpty()) {
             throw new Exception(exceptionStr);
           }
 
-          JSONArray keyboards = language.getJSONArray(KMManager.KMKey_LanguageKeyboards);
-          String kbBaseUri = options.optString(KMKey_KeyboardBaseURI, "");
           String fontBaseUri = options.optString(KMKey_FontBaseURI, "");
+          JSONObject language, keyboard;
+          if (!isCustom) {
+            // JSON from Keyman cloud server
+            language = kbData.optJSONObject(KMManager.KMKey_Language);
+            if (language == null) {
+              throw new Exception(exceptionStr);
+            }
 
-          if (keyboards == null || kbBaseUri.isEmpty())
-            throw new Exception(exceptionStr);
+            langName = language.optString(KMManager.KMKey_Name, "");
 
-          JSONObject keyboard = keyboards.getJSONObject(0);
-          if (keyboard == null)
-            throw new Exception(exceptionStr);
+            JSONArray keyboards = language.getJSONArray(KMManager.KMKey_LanguageKeyboards);
+            if (keyboards == null ) {
+              throw new Exception(exceptionStr);
+            }
 
-          languageName = language.optString(KMManager.KMKey_Name, "");
-          keyboardName = keyboard.optString(KMManager.KMKey_Name, "");
+            keyboard = keyboards.getJSONObject(0);
+            if (keyboard == null) {
+              throw new Exception(exceptionStr);
+            }
+
+
+          } else {
+            // JSON from custom URL
+            keyboard = kbData.optJSONObject(KMManager.KMKey_Keyboard);
+            if (keyboard == null) {
+              throw new Exception(exceptionStr);
+            }
+
+            JSONArray languages = keyboard.optJSONArray(KMManager.KMKey_Languages);
+            if (languages == null) {
+              throw new Exception(exceptionStr);
+            }
+
+            // Concatenate langID and langName
+            langID = "";
+            langName = "";
+            int langCount = languages.length();
+            for (int i=0; i < langCount; i++) {
+              langID += languages.getJSONObject(i).getString(KMManager.KMKey_ID);
+              langName += languages.getJSONObject(i).getString(KMManager.KMKey_Name);
+              if (i < langCount -1) {
+                langID += ";";
+                langName += ";";
+              }
+            }
+            pkgID = keyboard.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_LegacyPackageID);
+            kbID = keyboard.optString(KMManager.KMKey_ID, "");
+
+          }
+
+          kbName = keyboard.optString(KMManager.KMKey_Name, "");
           kbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
+          // TODO: replace?
           font = keyboard.optString(KMManager.KMKey_Font, "");
           oskFont = keyboard.optString(KMManager.KMKey_OskFont, null);
           String kbFilename = keyboard.optString(KMManager.KMKey_Filename, "");
 
-          if (keyboardName.isEmpty() || languageName.isEmpty() || kbFilename.isEmpty())
+          if (kbName.isEmpty() || langName.isEmpty() || kbFilename.isEmpty())
             throw new Exception(exceptionStr);
 
           String kbUrl = kbBaseUri + kbFilename;
@@ -288,7 +335,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
         }
 
         notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
-        super.onPostExecute(result);
+        //super.onPostExecute(result);
       }
 
       /**
@@ -302,8 +349,8 @@ public class KMKeyboardDownloaderActivity extends Activity {
           keyboardInfo.put(KMManager.KMKey_PackageID, pkgID);
           keyboardInfo.put(KMManager.KMKey_KeyboardID, kbID);
           keyboardInfo.put(KMManager.KMKey_LanguageID, langID);
-          keyboardInfo.put(KMManager.KMKey_KeyboardName, keyboardName);
-          keyboardInfo.put(KMManager.KMKey_LanguageName, languageName);
+          keyboardInfo.put(KMManager.KMKey_KeyboardName, kbName);
+          keyboardInfo.put(KMManager.KMKey_LanguageName, langName);
           keyboardInfo.put(KMManager.KMKey_KeyboardVersion, kbVersion);
           keyboardInfo.put(KMManager.KMKey_CustomKeyboard, kbIsCustom);
           keyboardInfo.put(KMManager.KMKey_Font, font);
