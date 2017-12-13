@@ -13,7 +13,7 @@
         "description": { "type": "string" },
         "license": { "type": "string", "enum": ["freeware", "shareware", "commercial", "mit", "other"] },
         "languages": { "anyOf": [
-          { "type": "array", "items": { "type": "string" } },
+          { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
           { "$ref": "#/definitions/KeyboardLanguageInfo" }
         ]},
         "lastModifiedDate": { "type": "string", "format": "date-time" },
@@ -153,6 +153,7 @@
       "type": "object",
       "properties": {
         "deprecates": { "type": "boolean" },
+        "deprecatedBy": { "type": "boolean" },
         "note": { "type": "string" }
       },
       "required": [],
