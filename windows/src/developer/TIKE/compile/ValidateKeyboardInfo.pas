@@ -17,7 +17,7 @@ type
     constructor Create(AJsonFile: string; ASilent: Boolean);
     function Failed(message: string): Boolean;
   public
-    class function Execute(JsonFile: string; FDistribution, FSilent: Boolean; FCallback: TCompilerCallback): Boolean;
+    class function Execute(JsonFile, JsonSchemaPath: string; FDistribution, FSilent: Boolean; FCallback: TCompilerCallback): Boolean;
   end;
 
 implementation
@@ -132,15 +132,15 @@ begin
   Result := Assigned(json);
 end;
 
-class function TValidateKeyboardInfo.Execute(JsonFile: string; FDistribution, FSilent: Boolean; FCallback: TCompilerCallback): Boolean;
+class function TValidateKeyboardInfo.Execute(JsonFile, JsonSchemaPath: string; FDistribution, FSilent: Boolean; FCallback: TCompilerCallback): Boolean;
 var
   SchemaFile: string;
   t: TValidateKeyboardInfo;
 begin
   GCallback := FCallback;
   if FDistribution
-    then SchemaFile := ExtractFilePath(ParamStr(0)) + SKeyboardInfoDistSchemaJson
-    else SchemaFile := ExtractFilePath(ParamStr(0)) + SKeyboardInfoSourceSchemaJson;
+    then SchemaFile := JsonSchemaPath + SKeyboardInfoDistSchemaJson
+    else SchemaFile := JsonSchemaPath + SKeyboardInfoSourceSchemaJson;
   Result := ValidateJsonFile(PWideChar(SchemaFile), PWideChar(JsonFile), ValidateMessageProc);
 
   if Result then
