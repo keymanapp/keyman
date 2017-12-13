@@ -55,7 +55,7 @@ end;
 const INDENT_SIZE = 2;
 
 procedure PrettyPrintPair(JSONValue: TJSONPair; OutputStrings: TStrings; last: boolean; indent: integer);
-const TEMPLATE = '%s : %s';
+const TEMPLATE = '%s: %s';
 var
   line: string;
   newList: TStringList;
