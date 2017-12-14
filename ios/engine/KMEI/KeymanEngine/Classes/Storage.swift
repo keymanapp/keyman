@@ -52,6 +52,7 @@ class Storage {
   let userDefaults: UserDefaults
 
   let kmwURL: URL
+  let specialOSKFontURL: URL
 
   private init?(baseURL: URL, userDefaults: UserDefaults) {
     guard
@@ -66,6 +67,7 @@ class Storage {
     self.fontDir = fontDir
     self.userDefaults = userDefaults
     kmwURL = baseDir.appendingPathComponent(Resources.kmwFileName)
+    specialOSKFontURL = baseDir.appendingPathComponent(Resources.oskFontFilename)
   }
 
   private static func createSubdirectory(baseDir: URL?, name: String) -> URL? {
@@ -115,7 +117,7 @@ extension Storage {
                      resourceName: "kmwosk.css",
                      dstDir: Storage.active.baseDir)
     try Storage.copy(from: bundle,
-                     resourceName: "keymanweb-osk.ttf",
+                     resourceName: Resources.oskFontFilename,
                      dstDir: Storage.active.baseDir)
   }
 
