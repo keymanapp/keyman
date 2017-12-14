@@ -11,7 +11,7 @@
 	"kmwosk.js", 
 	"kmwnative.js", 
 	"kmwcallback.js",
-	"kmwkeymaps.js",
+	"kmwkeymaps.ts",
 	"kmwlayout.ts",
 	"kmwinit.ts"
   ]
