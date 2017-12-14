@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+	"allowJs": true,
+	"module": "system",
+	"outFile": "../output/keymanweb.js",
+	"sourceMap": true
+  },
+  "files": [
+	"kmwbase.js",
+	"keymanweb.js",
+	"kmwosk.js", 
+	"kmwnative.js", 
+	"kmwcallback.js",
+	"kmwkeymaps.js",
+	"kmwlayout.ts",
+	"kmwinit.ts"
+  ]
+}

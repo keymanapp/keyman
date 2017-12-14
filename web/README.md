@@ -1,7 +1,11 @@
 # Keyman Web
 The Original Code is (C) 2017 SIL International
 
-## Minimum Web Requirements
+## Minimum Web Compilation Requirements
+
+* A local installation of [Node.js](https://nodejs.org/).
+* Typescript (`npm install -g typescript`)
+
 Google Closures Compiler is used to compile the JavaScript modules into a single module. Java must be installed to run the compiler, which is stored in the tools folder.
 
 **********************************************************************
