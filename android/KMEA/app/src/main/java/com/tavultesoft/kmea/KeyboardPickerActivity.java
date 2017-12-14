@@ -234,7 +234,7 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
   @Override
   protected void onPause() {
     super.onPause();
-    KMKeyboardDownloaderActivity.removeKeyboardDownloadEventListener(this);
+    //KMKeyboardDownloaderActivity.removeKeyboardDownloadEventListener(this);
     if (didUpdate) {
       if (KMManager.InAppKeyboard != null) {
         KMManager.InAppKeyboard.loadKeyboard();
@@ -619,6 +619,8 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
                   String kbID = keyboardsList.get(i).get(KMManager.KMKey_KeyboardID);
                   String langID = keyboardsList.get(i).get(KMManager.KMKey_LanguageID);
                   String kbKey = String.format("%s_%s", langID, kbID);
+                  String langName = keyboardsList.get(i).get(KMManager.KMKey_LanguageName);
+                  String kbName = keyboardsList.get(i).get(KMManager.KMKey_KeyboardName);
                   String kbVersion = keyboardsList.get(i).get(KMManager.KMKey_KeyboardVersion);
                   String newKbVersion = keyboardVersions.get(kbKey);
                   if (newKbVersion != null) {
@@ -635,6 +637,8 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
                       bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
                       bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
                       bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
+                      bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
+                      bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
                       bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
                       Intent intent = new Intent(context, KMKeyboardDownloaderActivity.class);
                       intent.putExtras(bundle);
@@ -744,6 +748,9 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
         editor.commit();
         checkingUpdates = false;
       }
+    }
+    if (updateProgress != null && updateProgress.isShowing()) {
+      updateProgress.dismiss();
     }
   }
 }

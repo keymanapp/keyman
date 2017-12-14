@@ -182,7 +182,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     KMManager.addKeyboardEventListener(this);
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
 
-    // If URL provided, start KMKEeyboardDownloaderActivity
+    // If URL provided, start KMKeyboardDownloaderActivity
     Intent intent = getIntent();
     Uri data = intent.getData();
     if (data != null) {
