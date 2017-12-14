@@ -72,7 +72,7 @@ public final class KeyboardListActivity extends Activity implements OnKeyboardDo
       final String langName = language.getString(KMManager.KMKey_Name);
       textView.setText(langName);
 
-      keyboards = language.getJSONArray(KMManager.KMKey_LanguageKeyboards);
+      keyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
       keyboardsArrayList = new ArrayList<HashMap<String, String>>();
 
       int length = keyboards.length();

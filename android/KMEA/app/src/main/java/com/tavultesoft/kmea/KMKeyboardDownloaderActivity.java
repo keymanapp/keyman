@@ -21,7 +21,8 @@ import com.tavultesoft.kmea.util.FileDownloader;
 import static com.tavultesoft.kmea.KMManager.KMDefault_AssetPackages;
 
 public class KMKeyboardDownloaderActivity extends Activity {
-  // Keys for cloud keyboard
+  // Bundle Keys
+  // Cloud
   public static final String ARG_PKG_ID = "KMKeyboardActivity.pkgID";
   public static final String ARG_KB_ID = "KMKeyboardActivity.kbID";
   public static final String ARG_LANG_ID = "KMKeyboardActivity.langID";
@@ -29,7 +30,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
   public static final String ARG_LANG_NAME = "KMKeyboardActivity.langName";
   public static final String ARG_IS_CUSTOM = "KMKeyboardActivity.isCustom";
 
-  // Keys for custom keyboard
+  // custom keyboard
   public static final String ARG_KEYBOARD = "KMKeyboardActivity.keyboard";
   public static final String ARG_LANGUAGE = "KMKeyboardActivity.language";
   public static final String ARG_IS_DIRECT = "KMKeyboardActivity.isDirect";
@@ -38,12 +39,20 @@ public class KMKeyboardDownloaderActivity extends Activity {
 
   public static final String kKeymanApiBaseURL = "https://r.keymanweb.com/api/3.0/";
   public static final String kKeymanApiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url=";
-  public static final String KMKey_KeyboardBaseURI = "keyboardBaseUri";
-  public static final String KMKey_Keyboard = "keyboard";
-  public static final String KMKey_Language = "language";
-  public static final String KMKey_FontBaseURI = "fontBaseUri";
+
+  // Keyman public keys
   public static final String KMKey_Direct = "direct";
   public static final String KMKey_URL = "url";
+  public static final String KMKey_Keyboard = "keyboard";
+  public static final String KMKey_LanguageKeyboards = "keyboards";
+  public static final String KMKey_Options = "options";
+  public static final String KMKey_Language = "language";
+  public static final String KMKey_Languages = "languages";
+  public static final String KMKey_Filename = "filename";
+
+  // Keyman internal keys
+  public static final String KMKey_KeyboardBaseURI = "keyboardBaseUri";
+  public static final String KMKey_FontBaseURI = "fontBaseUri";
 
   private static String pkgID;
   private static String kbID;
@@ -112,9 +121,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
   DialogFragment dialog = new ConfirmDialogFragment();
     args.putString(ConfirmDialogFragment.ARG_TITLE, title);
     dialog.setArguments(args);
-    dialog.show(
-
-  getFragmentManager(), "dialog");
+    dialog.show(getFragmentManager(), "dialog");
 }
 
   /**
@@ -171,6 +178,10 @@ public class KMKeyboardDownloaderActivity extends Activity {
             deviceType = "androidphone";
           }
 
+          // Placeholder here to attempt to process .kmp keyboard first:
+
+          ////
+
           JSONParser jsonParser = new JSONParser();
           JSONObject kbData = null;
           String remoteUrl = "";
@@ -194,7 +205,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
           }
 
           exceptionStr = "The keyboard could not be installed";
-          JSONObject options = kbData.optJSONObject(KMManager.KMKey_Options);
+          JSONObject options = kbData.optJSONObject(KMKey_Options);
           if (options == null) {
             throw new Exception(exceptionStr);
           }
@@ -207,14 +218,14 @@ public class KMKeyboardDownloaderActivity extends Activity {
           JSONObject language, keyboard;
           if (!isCustom) {
             // JSON from Keyman cloud server
-            language = kbData.optJSONObject(KMManager.KMKey_Language);
+            language = kbData.optJSONObject(KMKey_Language);
             if (language == null) {
               throw new Exception(exceptionStr);
             }
 
             langName = language.optString(KMManager.KMKey_Name, "");
 
-            JSONArray keyboards = language.getJSONArray(KMManager.KMKey_LanguageKeyboards);
+            JSONArray keyboards = language.getJSONArray(KMKey_LanguageKeyboards);
             if (keyboards == null ) {
               throw new Exception(exceptionStr);
             }
@@ -227,12 +238,12 @@ public class KMKeyboardDownloaderActivity extends Activity {
 
           } else {
             // JSON from custom URL
-            keyboard = kbData.optJSONObject(KMManager.KMKey_Keyboard);
+            keyboard = kbData.optJSONObject(KMKey_Keyboard);
             if (keyboard == null) {
               throw new Exception(exceptionStr);
             }
 
-            JSONArray languages = keyboard.optJSONArray(KMManager.KMKey_Languages);
+            JSONArray languages = keyboard.optJSONArray(KMKey_Languages);
             if (languages == null) {
               throw new Exception(exceptionStr);
             }
@@ -256,10 +267,12 @@ public class KMKeyboardDownloaderActivity extends Activity {
 
           kbName = keyboard.optString(KMManager.KMKey_Name, "");
           kbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
-          // TODO: replace?
+          // TODO: Investigate why previous KMMManager.KMCustomKeyboardDownloader() had the following
+          // font = keyboard.optString(KMKey_Font, "").replace("\"" + KMManager.KMKey_Filename + "\"", "\"" + KMManager.KMKey_FontSource + "\"");
+          // oskFont = keyboard.optString(KMKey_OskFont, "").replace("\"" + KMManager.KMKey_Filename + "\"", "\"" + KMManager.KMKey_FontSource + "\"");
           font = keyboard.optString(KMManager.KMKey_Font, "");
           oskFont = keyboard.optString(KMManager.KMKey_OskFont, null);
-          String kbFilename = keyboard.optString(KMManager.KMKey_Filename, "");
+          String kbFilename = keyboard.optString(KMKey_Filename, "");
 
           if (kbName.isEmpty() || langName.isEmpty() || kbFilename.isEmpty())
             throw new Exception(exceptionStr);
@@ -335,7 +348,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
         }
 
         notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
-        //super.onPostExecute(result);
+        super.onPostExecute(result);
       }
 
       /**

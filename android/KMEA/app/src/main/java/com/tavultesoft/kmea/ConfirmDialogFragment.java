@@ -13,9 +13,6 @@ import android.widget.Toast;
 public class ConfirmDialogFragment extends DialogFragment {
   public static String ARG_TITLE = "ConfirmDialogFragment.title";
 
-  public ConfirmDialogFragment() {
-  }
-
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
     Bundle args = getArguments();
@@ -37,7 +34,7 @@ public class ConfirmDialogFragment extends DialogFragment {
       })
       .setNegativeButton("Cancel",  new DialogInterface.OnClickListener() {
        public void onClick(DialogInterface dialog, int which) {
-          // Cancel
+         // Cancel
        }
       })
       .create();

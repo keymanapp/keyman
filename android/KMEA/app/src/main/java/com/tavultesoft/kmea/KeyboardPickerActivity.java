@@ -565,8 +565,8 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
               String kbVersion = keyboardsList.get(i).get(KMManager.KMKey_KeyboardVersion);
               String url = String.format("%slanguages/%s/%s?device=%s", KMKeyboardDownloaderActivity.kKeymanApiBaseURL, languageID, keyboardID, deviceType);
               JSONObject kbData = jsonParser.getJSONObjectFromUrl(url);
-              JSONObject language = kbData.optJSONObject(KMManager.KMKey_Language);
-              JSONArray keyboards = language.getJSONArray(KMManager.KMKey_LanguageKeyboards);
+              JSONObject language = kbData.optJSONObject(KMKeyboardDownloaderActivity.KMKey_Language);
+              JSONArray keyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
               JSONObject keyboard = keyboards.getJSONObject(0);
               String newKbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
               String kbKey = String.format("%s_%s", languageID, keyboardID);

@@ -146,7 +146,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
       String langName = language.getString(KMManager.KMKey_Name);
       String pkgID;
 
-      JSONArray keyboards = language.getJSONArray(KMManager.KMKey_LanguageKeyboards);
+      JSONArray keyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
       if (keyboards.getJSONObject(keyboardIndex).has(KMManager.KMKey_PackageID)) {
         pkgID = keyboards.getJSONObject(keyboardIndex).getString(KMManager.KMKey_PackageID);
       } else {
@@ -185,8 +185,8 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
           return null;
         }
 
-        languages = jsonObj.getJSONObject(KMManager.KMKey_Languages).getJSONArray(KMManager.KMKey_Languages);
-        options = jsonObj.getJSONObject(KMManager.KMKey_Options);
+        languages = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
+        options = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Options);
         keyboardsInfo = new HashMap<String, HashMap<String, String>>();
         keyboardModifiedDates = new HashMap<String, String>();
 
@@ -202,7 +202,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
           String kbVersion = "1.0";
           String isCustom = "N";
           String kbFont = "";
-          JSONArray langKeyboards = language.getJSONArray(KMManager.KMKey_LanguageKeyboards);
+          JSONArray langKeyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
           JSONObject keyboard = null;
 
           int kbLength = langKeyboards.length();
@@ -390,8 +390,8 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
       }
 
       try {
-        languages = jsonObj.getJSONObject(KMManager.KMKey_Languages).getJSONArray(KMManager.KMKey_Languages);
-        options = jsonObj.getJSONObject(KMManager.KMKey_Options);
+        languages = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
+        options = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Options);
         keyboardsInfo = new HashMap<String, HashMap<String, String>>();
         keyboardModifiedDates = new HashMap<String, String>();
 
@@ -409,7 +409,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
           String kbFont = "";
           String icon = "0";
           String isEnabled = "true";
-          JSONArray langKeyboards = language.getJSONArray(KMManager.KMKey_LanguageKeyboards);
+          JSONArray langKeyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
           JSONObject keyboard = null;
 
           int kbLength = langKeyboards.length();
