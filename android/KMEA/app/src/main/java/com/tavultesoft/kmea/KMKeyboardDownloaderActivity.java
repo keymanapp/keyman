@@ -267,11 +267,12 @@ public class KMKeyboardDownloaderActivity extends Activity {
 
           kbName = keyboard.optString(KMManager.KMKey_Name, "");
           kbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
-          // TODO: Investigate why previous KMMManager.KMCustomKeyboardDownloader() had the following
-          // font = keyboard.optString(KMKey_Font, "").replace("\"" + KMManager.KMKey_Filename + "\"", "\"" + KMManager.KMKey_FontSource + "\"");
-          // oskFont = keyboard.optString(KMKey_OskFont, "").replace("\"" + KMManager.KMKey_Filename + "\"", "\"" + KMManager.KMKey_FontSource + "\"");
-          font = keyboard.optString(KMManager.KMKey_Font, "");
-          oskFont = keyboard.optString(KMManager.KMKey_OskFont, null);
+          font = keyboard.optString(KMManager.KMKey_Font, "").replace(
+            "\"" + KMKeyboardDownloaderActivity.KMKey_Filename + "\"",
+            "\"" + KMManager.KMKey_FontSource + "\"");
+          oskFont = keyboard.optString(KMManager.KMKey_OskFont, "").replace(
+            "\"" + KMKeyboardDownloaderActivity.KMKey_Filename + "\"",
+            "\"" + KMManager.KMKey_FontSource + "\"");
           String kbFilename = keyboard.optString(KMKey_Filename, "");
 
           if (kbName.isEmpty() || langName.isEmpty() || kbFilename.isEmpty())
