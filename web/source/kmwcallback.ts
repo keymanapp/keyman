@@ -2,6 +2,11 @@
    KeymanWeb 10.0
    Copyright 2017 SIL International
 ***/
+
+interface Document {
+  selection: any
+}
+
 // If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the 
 // KMW system, so we use the fact that 'initialized' is only 1 / true after all scripts are loaded for the initial
 // load of KMW.
@@ -262,7 +267,7 @@ if(!window['keyman']['initialized']) {
      * Description  Test keystroke with modifiers against rule
      */    
     KeymanWeb['KKM'] = kbdInterface['keyMatch'] = kbdInterface.keyMatch = function(e,Lruleshift,Lrulekey) {
-      var retVal = 0; // I3318
+      var retVal = false; // I3318
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
       var bitmask = keymanweb.getKeyboardModifierBitmask();
@@ -281,7 +286,7 @@ if(!window['keyman']['initialized']) {
       if(!retVal) {
         kbdInterface._DeadkeyResetMatched();  // I3318
       }
-      return retVal != 0; // I3318
+      return retVal; // I3318
     };
 
     /**
@@ -610,12 +615,15 @@ if(!window['keyman']['initialized']) {
      */    
     KeymanWeb['KDO'] = kbdInterface['deadkeyOutput'] = kbdInterface.deadkeyOutput = function(Pdn,Pelem,Pd) {
       kbdInterface.resetContextCache();
-      var Lc = new Object();
       if(Pdn >= 0) {
         kbdInterface.output(Pdn,Pelem,"");  //I3318 corrected to >=
       }
-      Lc.p=keymanweb._SelPos(Pelem); 
-      Lc.d=Pd;
+
+      var Lc = {
+        p: keymanweb._SelPos(Pelem),
+        d: Pd
+      };
+
       kbdInterface._DeadKeys=keymanweb._push(kbdInterface._DeadKeys,Lc);
       
       //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
@@ -787,7 +795,7 @@ if(!window['keyman']['initialized']) {
       kbdInterface.resetContextCache();
       var cName='KeymanWeb_'+kbdName+'_Option_'+storeName,cValue=util.loadCookie(cName);
       if(typeof cValue[storeName] != 'undefined') {
-        return unescape(cValue[storeName]);
+        return decodeURI(cValue[storeName]);
       } else {
         return dfltValue;
       }
@@ -807,7 +815,7 @@ if(!window['keyman']['initialized']) {
         return false;
       }
       
-      var cName='KeymanWeb_'+kbd['KI']+'_Option_'+storeName, cValue=escape(optValue);
+      var cName='KeymanWeb_'+kbd['KI']+'_Option_'+storeName, cValue=encodeURI(optValue);
 
       util.saveCookie(cName,cValue);
       return true;
