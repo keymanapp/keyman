@@ -3,6 +3,31 @@
    Copyright 2017 SIL International
 ***/
 
+interface StringConstructor {
+  kmwFromCharCode(cp0: number): string,
+}
+
+interface String {
+  kmwCharCodeAt(codePointIndex: number): number,
+  kmwCharAt(codePointIndex: number) : string,
+  kmwIndexOf(searchValue: string, fromIndex?: number) : number,
+  kmwLastIndexOf(searchValue: string, fromIndex?: number) : number,
+  kmwSlice(beginSlice: number, endSlice: number) : string,
+  kmwSubstring(start: number, length: number) : string,
+  kmwSubstr(start: number, length: number) : string,
+  kmwBMPSubstr(start: number, length: number) : string,
+  kmwLength(): number,
+  kmwBMPLength(): number,
+  kmwNextChar(codeUnitIndex: number): number,
+  kmwBMPNextChar(codeUnitIndex: number): number,
+  kmwPrevChar(codeUnitIndex: number): number,
+  kmwBMPPrevChar(codeUnitIndex: number): number,
+  kmwCodePointToCodeUnit(codePointIndex: number) : number,
+  kmwBMPCodePointToCodeUnit(codePointIndex: number) : number,
+  kmwCodeUnitToCodePoint(codeUnitIndex: number) : number,
+  kmwBMPCodeUnitToCodePoint(codeUnitIndex: number) : number
+}
+
 /**
  * Constructs a string from one or more Unicode character codepoint values 
  * passed as integer parameters.
@@ -400,6 +425,26 @@ String.prototype.kmwBMPSubstr = function(n,ln)
     return str.substr(n,ln);
   else
     return str.substr(str.length+n,-n);  
+}
+
+interface StringConstructor {
+  _kmwFromCharCode(cp0: number): string,
+  kmwEnableSupplementaryPlane(bEnable: boolean)
+}
+
+interface String {
+  _kmwCharCodeAt(codePointIndex: number): number,
+  _kmwCharAt(codePointIndex: number) : string,
+  _kmwIndexOf(searchValue: string, fromIndex?: number) : number,
+  _kmwLastIndexOf(searchValue: string, fromIndex?: number) : number,
+  _kmwSlice(beginSlice: number, endSlice: number) : string,
+  _kmwSubstring(start: number, length: number) : string,
+  _kmwSubstr(start: number, length: number) : string,
+  _kmwLength(): number,
+  _kmwNextChar(codeUnitIndex: number): number,
+  _kmwPrevChar(codeUnitIndex: number): number,
+  _kmwCodePointToCodeUnit(codePointIndex: number) : number,
+  _kmwCodeUnitToCodePoint(codeUnitIndex: number) : number,
 }
 
 /**
