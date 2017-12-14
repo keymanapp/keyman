@@ -10,7 +10,7 @@
 	"kmwbase.js",
 	"keymanweb.js",
 	"kmwosk.js", 
-	"kmwnative.js", 
+	"kmwnative.ts", 
 	"kmwcallback.ts",
 	"kmwkeymaps.ts",
 	"kmwlayout.ts",
