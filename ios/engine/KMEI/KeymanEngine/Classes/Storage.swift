@@ -66,7 +66,7 @@ class Storage {
     self.languageDir = languageDir
     self.fontDir = fontDir
     self.userDefaults = userDefaults
-    kmwURL = baseDir.appendingPathComponent(Resources.kmwFileName)
+    kmwURL = baseDir.appendingPathComponent(Resources.kmwFilename)
     specialOSKFontURL = baseDir.appendingPathComponent(Resources.oskFontFilename)
   }
 
@@ -102,7 +102,7 @@ class Storage {
 extension Storage {
   func copyKMWFiles(from bundle: Bundle) throws {
     try Storage.copy(from: bundle,
-                     resourceName: Resources.kmwFileName,
+                     resourceName: Resources.kmwFilename,
                      dstDir: Storage.active.baseDir)
     try Storage.copy(from: bundle,
                      resourceName: "keymanios.js",

@@ -286,7 +286,7 @@ extension KeymanWebViewController: WKNavigationDelegate {
     guard let url = webView.url else {
       return
     }
-    guard url.lastPathComponent == Resources.kmwFileName && (url.fragment?.isEmpty ?? true) else {
+    guard url.lastPathComponent == Resources.kmwFilename && (url.fragment?.isEmpty ?? true) else {
       return
     }
     keyboardLoaded(self)
