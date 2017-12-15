@@ -20,6 +20,10 @@ public struct InstallableKeyboard: Codable {
   public var oskFont: Font?
   public var isCustom: Bool
 
+  public var fullID: FullKeyboardID {
+    return FullKeyboardID(keyboardID: id, languageID: languageID)
+  }
+
   public init(id: String,
               name: String,
               languageID: String,

@@ -43,7 +43,7 @@ type
     function FontDialog(FSilent: Boolean): Boolean;   // I4057
     function InstallKeyboard: Boolean;
     function UninstallKeyboard: Boolean;
-    function PackageFile(FSilent: BOolean): Boolean;
+    function PackageFile(FSilent: Boolean): Boolean;
     function GetProjectFile: TkmnProjectFile;
 
     procedure ReloadJSON;
@@ -212,15 +212,22 @@ begin
   Result := FOwner as TkmnProjectFile;
 end;
 
-function TkmnProjectFileUI.PackageFile(FSilent: BOolean): Boolean;
+function TkmnProjectFileUI.PackageFile(FSilent: Boolean): Boolean;
 var
-  FCompiledName: string;
+  FKMXTarget, FJSTarget: string;
 begin
   Result := False;
-  FCompiledName := ProjectFile.TargetFilename;
-  if not TestKeyboardState(FCompiledName, FSilent) then Exit;
+  FKMXTarget := ProjectFile.TargetFilename;
+  FJSTarget := ProjectFile.JSTargetFilename;
+
+  if (FKMXTarget <> '') and not TestKeyboardState(FKMXTarget, FSilent) then
+    Exit;
+
+  if (FJSTarget <> '') and not TestKeyboardState(FJSTarget, FSilent) then
+    Exit;
+
   with TfrmPackageEditor.Create(frmKeymanDeveloper) do
-    CreateFromKMX(FCompiledName);
+    CreateFromCompiledKeyboard(FKMXTarget, FJSTarget);
   Result := True;
 end;
 

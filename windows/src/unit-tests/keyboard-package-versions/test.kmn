@@ -1,0 +1,6 @@
+﻿store(&NAME) 'Keyboard Version Test'
+store(&KEYBOARDVERSION) '2.0'
+store(&TARGETS) 'any'
+begin Unicode > use(main)
+
+group(main) using keys

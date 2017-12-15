@@ -91,10 +91,9 @@ type
   TPackageBaseObject = class
   strict private
     FPackage: TPackage;
-  protected
-    property Package: TPackage read FPackage;
   public
     constructor Create(APackage: TPackage); virtual;
+    property Package: TPackage read FPackage;
   end;
 
   TPackageBaseNotifyObject = class(TPackageBaseObject)
@@ -107,7 +106,6 @@ type
     destructor Destroy; override;
     procedure AddNotifyObject(FEventHandler: TPackageNotifyEvent);
     procedure RemoveNotifyObject(FEventHandler: TPackageNotifyEvent);
-  {TODO:   if Items[Index] = FPackage.Options.ReadmeFile then FPackage.Options.ReadmeFile := nil;}
     property Tag: Integer read FTag write FTag;
   end;
 
@@ -1937,8 +1935,8 @@ begin
         ALanguage := ALanguages.ChildNodes[j];
 
         FLanguage := TPackageKeyboardLanguage.Create(Package);
-        FLanguage.ID := ALanguage.Attributes[SXML_PackageKeyboard_Language_ID];
-        FLanguage.Name := ALanguage.NodeValue;
+        FLanguage.ID := VarToStr(ALanguage.Attributes[SXML_PackageKeyboard_Language_ID]);
+        FLanguage.Name := VarToStr(ALanguage.NodeValue);
         keyboard.Languages.Add(FLanguage);
       end;
     end;

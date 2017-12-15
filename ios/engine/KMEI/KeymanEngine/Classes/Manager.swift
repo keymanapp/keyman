@@ -91,8 +91,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// Set this to `UIApplication.shared.openURL` in your application.
   public var openURL: ((URL) -> Bool)?
 
-  var keyboardID: String?
-  var languageID: String?
+  var currentKeyboardID: FullKeyboardID?
   weak var keymanWebDelegate: KeymanWebDelegate?
   var currentRequest: HTTPDownloadRequest?
   var shouldReloadKeyboard = false
@@ -191,8 +190,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - SeeAlso:
   ///   - addKeyboard()
   /// - Returns: Whether the keyboard was set successfully
-  public func setKeyboard(withID keyboardID: String, languageID: String) -> Bool {
-    if let keyboard = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID) {
+  public func setKeyboard(withFullID fullID: FullKeyboardID) -> Bool {
+    if let keyboard = Storage.active.userDefaults.userKeyboard(withFullID: fullID) {
       return setKeyboard(keyboard)
     }
     return false
@@ -202,15 +201,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   ///
   /// - Returns: Whether the keyboard was set successfully
   public func setKeyboard(_ kb: InstallableKeyboard) -> Bool {
-    if kb.languageID == self.languageID && kb.id == self.keyboardID {
-      log.info("Keyboard unchanged: \(kb.languageID)_\(kb.id)")
+    if kb.fullID == currentKeyboardID {
+      log.info("Keyboard unchanged: \(kb.fullID)")
       return false
     }
 
-    log.info("Setting language: \(kb.languageID)_\(kb.id)")
+    log.info("Setting language: \(kb.fullID)")
 
-    self.languageID = kb.languageID
-    self.keyboardID = kb.id
+    currentKeyboardID = kb.fullID
 
     if let fontFilename = kb.font?.source.first(where: { $0.hasFontExtension }) {
       _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forKeyboardID: kb.id, filename: fontFilename))
@@ -222,8 +220,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     keymanWeb.setKeyboard(kb)
 
     let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
-
-    userData.currentKeyboard = kb
+    userData.currentKeyboardID = kb.fullID
     userData.synchronize()
 
     if isKeymanHelpOn {
@@ -253,7 +250,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     var userKeyboards = userDefaults.userKeyboards ?? []
 
     // Update keyboard if it exists
-    if let index = userKeyboards.index(where: { $0.id == keyboard.id && $0.languageID == keyboard.languageID }) {
+    if let index = userKeyboards.index(where: { $0.fullID == keyboard.fullID }) {
       userKeyboards[index] = keyboard
     } else {
       userKeyboards.append(keyboard)
@@ -266,9 +263,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   /// Removes a keyboard from the list in the keyboard picker if it exists.
   /// - Returns: The keyboard exists and was removed
-  public func removeKeyboard(withID keyboardID: String, languageID: String) -> Bool {
+  public func removeKeyboard(withFullID fullID: FullKeyboardID) -> Bool {
     // Remove keyboard from the list if it exists
-    let index = Storage.active.userDefaults.userKeyboards?.index { $0.id == keyboardID && $0.languageID == languageID }
+    let index = Storage.active.userDefaults.userKeyboards?.index { $0.fullID == fullID }
     if let index = index {
       return removeKeyboard(at: index)
     }
@@ -298,7 +295,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     log.info("Removing keyboard with ID \(kb.id) and languageID \(kb.languageID)")
 
     // Set a new keyboard if deleting the current one
-    if kb.id == keyboardID && kb.languageID == languageID {
+    if kb.fullID == currentKeyboardID {
       setKeyboard(userKeyboards[0])
     }
 
@@ -318,18 +315,19 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   /// - Returns: Info for the current keyboard, if a keyboard is set
-  public var currentKeyboardInfo: InstallableKeyboard? {
-    guard let keyboardID = keyboardID, let languageID = languageID else {
+  public var currentKeyboard: InstallableKeyboard? {
+    guard let fullID = currentKeyboardID else {
       return nil
     }
-    return Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
+    return Storage.active.userDefaults.userKeyboard(withFullID: fullID)
   }
 
   /// Switch to the next keyboard.
   /// - Returns: Index of the newly selected keyboard.
   public func switchToNextKeyboard() -> Int? {
     guard let userKeyboards = Storage.active.userDefaults.userKeyboards,
-          let index = userKeyboards.index(where: { isCurrentKeyboard($0) }) else {
+      let index = userKeyboards.index(where: { self.currentKeyboardID == $0.fullID })
+    else {
       return nil
     }
     let newIndex = (index + 1) % userKeyboards.count
@@ -337,21 +335,13 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     return newIndex
   }
 
-  func isCurrentKeyboard(withID keyboardID: String?, languageID: String?) -> Bool {
-    return self.keyboardID == keyboardID && self.languageID == languageID
-  }
-
-  func isCurrentKeyboard(_ keyboard: InstallableKeyboard) -> Bool {
-    return keyboard.id == self.keyboardID && keyboard.languageID == self.languageID
-  }
-
   /// - Returns: The font name for the given keyboard ID and languageID, or returns nil if
   ///   - The keyboard doesn't have a font
   ///   - The keyboard info is not available in the user keyboards list
-  public func fontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
-    let kb = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
+  public func fontNameForKeyboard(withFullID fullID: FullKeyboardID) -> String? {
+    let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID)
     if let filename = kb?.font?.source.first(where: { $0.hasFontExtension }) {
-      let fontURL = Storage.active.fontURL(forKeyboardID: keyboardID, filename: filename)
+      let fontURL = Storage.active.fontURL(forKeyboardID: fullID.keyboardID, filename: filename)
       return FontManager.shared.fontName(at: fontURL)
     }
     return nil
@@ -360,10 +350,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - Returns: the OSK font name for the given keyboard ID and languageID, or returns nil if
   ///   - The keyboard doesn't have an OSK font
   ///   - The keyboard info is not available in the user keyboards list
-  func oskFontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
-    let kb = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
+  func oskFontNameForKeyboard(withFullID fullID: FullKeyboardID) -> String? {
+    let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID)
     if let filename = kb?.oskFont?.source.first(where: { $0.hasFontExtension }) {
-      let fontURL = Storage.active.fontURL(forKeyboardID: keyboardID, filename: filename)
+      let fontURL = Storage.active.fontURL(forKeyboardID: fullID.keyboardID, filename: filename)
       return FontManager.shared.fontName(at: fontURL)
     }
     return nil
@@ -723,27 +713,13 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         if kb.languageID == newKeyboard.languageID {
           kb = newKeyboard
         } else {
-          kb.version = newKeyboard.id
+          kb.version = newKeyboard.version
         }
         userKeyboards[i] = kb
       }
     }
     userData.userKeyboards = userKeyboards
     userData.synchronize()
-
-    // Set version for current keyboard
-    let currentUserData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
-    if var kb = currentUserData.currentKeyboard {
-      if kb.id == newKeyboard.id {
-        if kb.languageID == newKeyboard.languageID {
-          kb = newKeyboard
-        } else {
-          kb.version = newKeyboard.id
-        }
-        currentUserData.currentKeyboard = kb
-        currentUserData.synchronize()
-      }
-    }
   }
 
   func synchronizeSWKeyboard() {
@@ -910,9 +886,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   @objc func resetKeyboard() {
-    let keyboard = currentKeyboardInfo
-    keyboardID = nil
-    languageID = nil
+    let keyboard = currentKeyboard
+    currentKeyboardID = nil
 
     if let keyboard = keyboard {
       setKeyboard(keyboard)
@@ -1080,13 +1055,11 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     keymanWeb.setDeviceType(UIDevice.current.userInterfaceIdiom)
 
     var newKb = Defaults.keyboard
-    if (keyboardID == nil || languageID == nil) && !shouldReloadKeyboard {
+    if currentKeyboardID == nil && !shouldReloadKeyboard {
       let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
-      if let currentKb = userData.currentKeyboard {
-        let kbID = currentKb.id
-        let langID = currentKb.languageID
-        if Storage.active.userDefaults.userKeyboard(withID: kbID, languageID: langID) != nil {
-          newKb = currentKb
+      if let id = userData.currentKeyboardID {
+        if let kb = Storage.active.userDefaults.userKeyboard(withFullID: id) {
+          newKb = kb
         }
       } else if let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
         newKb = userKbs[0]
@@ -1124,8 +1097,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     keyPreviewView = KeyPreviewView(frame: keyFrame)
 
     keyPreviewView!.setLabelText(preview)
-    var oskFontName = oskFontNameForKeyboard(withID: keyboardID!, languageID: languageID!)
-    oskFontName = oskFontName ?? fontNameForKeyboard(withID: keyboardID!, languageID: languageID!)
+    var oskFontName = oskFontNameForKeyboard(withFullID: currentKeyboardID!)
+    oskFontName = oskFontName ?? fontNameForKeyboard(withFullID: currentKeyboardID!)
     keyPreviewView!.setLabelFont(oskFontName)
     keymanWeb.view.addSubview(keyPreviewView!)
   }
@@ -1253,9 +1226,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     let isPad = UIDevice.current.userInterfaceIdiom == .pad
     let fontSize = isPad ? UIFont.buttonFontSize * 2 : UIFont.buttonFontSize
 
-    var oskFontName = oskFontNameForKeyboard(withID: keyboardID!, languageID: languageID!)
+    var oskFontName = oskFontNameForKeyboard(withFullID: currentKeyboardID!)
     if oskFontName == nil {
-      oskFontName = fontNameForKeyboard(withID: keyboardID!, languageID: languageID!)
+      oskFontName = fontNameForKeyboard(withFullID: currentKeyboardID!)
     }
 
     if subKeyIDs.isEmpty {
@@ -1339,7 +1312,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     if (!didSynchronize || shouldSynchronize) && Storage.shared != nil {
       synchronizeSWKeyboard()
-      if keyboardID != nil && languageID != nil {
+      if currentKeyboardID != nil {
         shouldReloadKeyboard = true
         reloadKeyboard(in: keymanWeb)
       }

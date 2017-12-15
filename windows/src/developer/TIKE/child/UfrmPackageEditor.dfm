@@ -174,6 +174,7 @@ inherited frmPackageEditor: TfrmPackageEditor
   KeyPreview = True
   OnKeyDown = FormKeyDown
   ExplicitWidth = 681
+  ExplicitHeight = 447
   PixelsPerInch = 96
   TextHeight = 13
   object pages: TLeftTabbedPageControl
@@ -181,7 +182,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 681
     Height = 447
-    ActivePage = pageDetails
+    ActivePage = pageFiles
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -347,6 +348,193 @@ inherited frmPackageEditor: TfrmPackageEditor
           Caption = '&Open Containing Folder'
           TabOrder = 7
           OnClick = cmdOpenContainingFolderClick
+        end
+      end
+    end
+    object pageKeyboards: TTabSheet
+      Caption = 'Keyboards'
+      ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object Panel5: TPanel
+        Left = 0
+        Top = 0
+        Width = 588
+        Height = 447
+        Align = alClient
+        BevelOuter = bvNone
+        Color = 14211288
+        ParentBackground = False
+        TabOrder = 0
+        DesignSize = (
+          588
+          447)
+        object Label2: TLabel
+          Left = 15
+          Top = 10
+          Width = 171
+          Height = 23
+          Caption = 'Keyboard Layouts'
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -19
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label3: TLabel
+          Left = 15
+          Top = 37
+          Width = 546
+          Height = 32
+          AutoSize = False
+          Caption = 'Configure language assignments and fonts for each keyboard'
+          WordWrap = True
+        end
+        object lblKeyboardFiles: TLabel
+          Left = 15
+          Top = 365
+          Width = 26
+          Height = 13
+          Anchors = [akLeft, akBottom]
+          Caption = 'Files:'
+        end
+        object lblKeyboardDescription: TLabel
+          Left = 15
+          Top = 338
+          Width = 62
+          Height = 13
+          Anchors = [akLeft, akBottom]
+          Caption = 'Description:'
+        end
+        object lblKeyboardVersion: TLabel
+          Left = 15
+          Top = 417
+          Width = 41
+          Height = 13
+          Anchors = [akLeft, akBottom]
+          Caption = 'Version:'
+        end
+        object lblKeyboardOSKFont: TLabel
+          Left = 260
+          Top = 75
+          Width = 73
+          Height = 13
+          Caption = 'Keyboard font'
+        end
+        object lblKeyboardDisplayFont: TLabel
+          Left = 260
+          Top = 102
+          Width = 62
+          Height = 13
+          Caption = 'Display font'
+        end
+        object lblKeyboardLanguages: TLabel
+          Left = 260
+          Top = 125
+          Width = 56
+          Height = 13
+          Caption = 'Languages'
+        end
+        object lbKeyboards: TListBox
+          Left = 15
+          Top = 72
+          Width = 229
+          Height = 249
+          Anchors = [akLeft, akTop, akBottom]
+          ItemHeight = 13
+          TabOrder = 0
+          OnClick = lbKeyboardsClick
+        end
+        object editKeyboardDescription: TEdit
+          Left = 87
+          Top = 335
+          Width = 157
+          Height = 21
+          TabStop = False
+          Anchors = [akLeft, akBottom]
+          ParentColor = True
+          ReadOnly = True
+          TabOrder = 1
+        end
+        object memoKeyboardFiles: TMemo
+          Left = 87
+          Top = 362
+          Width = 157
+          Height = 46
+          TabStop = False
+          Anchors = [akLeft, akBottom]
+          ParentColor = True
+          ReadOnly = True
+          TabOrder = 2
+        end
+        object editKeyboardVersion: TEdit
+          Left = 87
+          Top = 414
+          Width = 157
+          Height = 21
+          TabStop = False
+          Anchors = [akLeft, akBottom]
+          ParentColor = True
+          ReadOnly = True
+          TabOrder = 3
+        end
+        object cbKeyboardOSKFont: TComboBox
+          Left = 339
+          Top = 72
+          Width = 230
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 4
+          OnClick = cbKeyboardOSKFontClick
+        end
+        object cbKeyboardDisplayFont: TComboBox
+          Left = 339
+          Top = 99
+          Width = 230
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 5
+          OnClick = cbKeyboardDisplayFontClick
+        end
+        object gridKeyboardLanguages: TStringGrid
+          Left = 260
+          Top = 144
+          Width = 309
+          Height = 257
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          ColCount = 2
+          DefaultRowHeight = 16
+          FixedCols = 0
+          RowCount = 9
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goTabs]
+          TabOrder = 6
+          OnClick = gridKeyboardLanguagesClick
+          OnSetEditText = gridKeyboardLanguagesSetEditText
+          ColWidths = (
+            78
+            64)
+        end
+        object cmdKeyboardAddLanguage: TButton
+          Left = 260
+          Top = 412
+          Width = 73
+          Height = 25
+          Anchors = [akLeft, akBottom]
+          Caption = '&Add...'
+          TabOrder = 7
+          OnClick = cmdKeyboardAddLanguageClick
+        end
+        object cmdKeyboardRemoveLanguage: TButton
+          Left = 339
+          Top = 412
+          Width = 72
+          Height = 25
+          Anchors = [akLeft, akBottom]
+          Caption = '&Remove'
+          TabOrder = 8
+          OnClick = cmdKeyboardRemoveLanguageClick
         end
       end
     end
@@ -905,19 +1093,22 @@ inherited frmPackageEditor: TfrmPackageEditor
     Filter = 'All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Add Files'
-    Top = 284
+    Left = 208
+    Top = 156
   end
   object dlgNewCustomisation: TSaveDialog
     DefaultExt = 'kct'
     Filter = 'Customisation file (*.kct)|*.kct|All files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
-    Top = 316
+    Left = 208
+    Top = 188
   end
   object dlgOpenProductInstaller: TOpenDialog
     DefaultExt = 'msi'
     Filter = 'Product Installer Files (*.msi)|*.msi|All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Select Product Installer'
-    Top = 248
+    Left = 208
+    Top = 120
   end
 end

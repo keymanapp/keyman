@@ -200,7 +200,7 @@ begin
         // Then enumerate all defined languages to try next   // I4607
         //
         GetSystemStore(ki.MemoryDump.Memory, TSS_WINDOWSLANGUAGES, FAllLanguagesW);
-        // TODO: use Keyman.System.KMXFileLanguages
+        // TODO: BCP47: use Keyman.System.KMXFileLanguages
         FAllLanguages := FAllLanguagesW;
         while FAllLanguages <> '' do
         begin
