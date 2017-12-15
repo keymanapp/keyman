@@ -84,4 +84,14 @@ public extension UserDefaults {
   public func userKeyboard(withFullID fullID: FullKeyboardID) -> InstallableKeyboard? {
     return userKeyboards?.first { $0.fullID == fullID }
   }
+
+  var migrationLevel: Int {
+    get {
+      return integer(forKey: Key.migrationLevel)
+    }
+
+    set(level) {
+      set(level, forKey: Key.migrationLevel)
+    }
+  }
 }

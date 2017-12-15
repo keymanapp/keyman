@@ -19,6 +19,7 @@ public enum Key {
   static let engineVersion = "KeymanEngineVersion"
   static let keyboardPickerDisplayed = "KeyboardPickerDisplayed"
   static let synchronizeSWKeyboard = "KeymanSynchronizeSWKeyboard"
+  static let migrationLevel = "KeymanEngineMigrationLevel"
 
   // JSON keys for language REST calls
   static let options = "options"
