@@ -224,8 +224,10 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     super.onPause();
     KMManager.onPause();
     KMManager.removeKeyboardEventListener(this);
-    // TODO: Investigate if it's proper to not remove this listener
-    // KMKeyboardDownloaderActivity.removeKeyboardDownloadEventListener(this);
+
+    // Intentionally not removing KeyboardDownloadEventListener to
+    // ensure onKeyboardDownloadFinished() gets called
+
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putString(userTextKey, textView.getText().toString());

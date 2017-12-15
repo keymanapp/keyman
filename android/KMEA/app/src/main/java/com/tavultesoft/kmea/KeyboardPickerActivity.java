@@ -234,7 +234,10 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
   @Override
   protected void onPause() {
     super.onPause();
-    //KMKeyboardDownloaderActivity.removeKeyboardDownloadEventListener(this);
+
+    // Intentionally not removing KeyboardDownloadEventListener to
+    // ensure onKeyboardDownloadFinished() gets called
+
     if (didUpdate) {
       if (KMManager.InAppKeyboard != null) {
         KMManager.InAppKeyboard.loadKeyboard();
