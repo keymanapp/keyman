@@ -284,7 +284,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       let keyboard = tableList[indexPath.row] as! InstallableKeyboard
       cell.textLabel?.text = keyboard.name
       cell.tag = indexPath.row
-      if (Manager.shared.languageID == keyboard.languageID) && (Manager.shared.keyboardID == keyboard.id) {
+      if Manager.shared.currentKeyboardID == keyboard.fullID {
         cell.selectionStyle = .none
         cell.isSelected = true
         cell.accessoryType = .checkmark
