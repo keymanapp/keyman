@@ -64,7 +64,7 @@ implementation
 uses
   System.RegularExpressions,
 
-  Keyman.System.KMXFileLanguages;
+  Keyman.System.LanguageCodeUtils;
 
 { TBCP47Tag }
 
@@ -133,7 +133,7 @@ begin
   // Assumes that the tag is valid.
 
   // Test language subtag for canonical value
-  c := TKMXFileLanguages.TranslateISO6393ToBCP47(Language);
+  c := TLanguageCodeUtils.TranslateISO6393ToBCP47(Language);
   Result := SameText(c, Language);
   if not Result then
   begin
