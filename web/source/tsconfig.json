@@ -9,7 +9,7 @@
   "files": [
 	"kmwbase.js",
 	"keymanweb.js",
-	"kmwosk.js", 
+	"kmwosk.ts", 
 	"kmwnative.ts", 
 	"kmwcallback.ts",
 	"kmwkeymaps.ts",

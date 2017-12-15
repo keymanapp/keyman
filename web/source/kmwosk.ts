@@ -1,3 +1,6 @@
+/// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
+/// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
+
 /***
    KeymanWeb 10.0
    Copyright 2017 SIL International
@@ -292,18 +295,15 @@ if(!window['keyman']['initialized']) {
      * @return      {Object.<string,number>}   Array object with position and size of OSK container
      * Description  Get rectangle containing KMW Virtual Keyboard
      */
-    osk['getRect'] = osk.getRect = function()			// I2405
-    {
-      var p={};
-      if(osk._DivVKbd)
-      {
+    osk['getRect'] = osk.getRect = function() {		// I2405
+      var p: any;
+
+      if(osk._DivVKbd) {
         p['left'] = p.left = util._GetAbsoluteX(osk._DivVKbd);
         p['top']  = p.top  = util._GetAbsoluteY(osk._DivVKbd);
         p['width']  = p.width  = util._GetAbsoluteX(osk._DivVKbdHelp) - util._GetAbsoluteX(osk._DivVKbd) + osk._DivVKbdHelp.offsetWidth;
         p['height'] = p.height = util._GetAbsoluteY(osk._DivVKbdHelp) - util._GetAbsoluteY(osk._DivVKbd) + osk._DivVKbdHelp.offsetHeight;
-      }
-      else
-      {
+      } else {
         p['left'] = p.left = util._GetAbsoluteX(osk._Box);
         p['top']  = p.top  = util._GetAbsoluteY(osk._Box);
         p['width']  = p.width  = util._GetAbsoluteX(osk._Box) + osk._Box.offsetWidth;
@@ -384,11 +384,12 @@ if(!window['keyman']['initialized']) {
      *
      * @return      {Object.<string,number>}     Array object with OSK window position
     **/
-    osk.getPos = function()
-    {
-      var Lkbd=osk._Box, p={};
-      p.left = osk._Visible ? Lkbd.offsetLeft : osk.x;
-      p.top = osk._Visible ? Lkbd.offsetTop : osk.y;
+    osk.getPos = function() {
+      var Lkbd=osk._Box, p={
+        left: osk._Visible ? Lkbd.offsetLeft : osk.x,
+        top:osk._Visible ? Lkbd.offsetTop : osk.y
+      };
+
       return p;
     }
 
