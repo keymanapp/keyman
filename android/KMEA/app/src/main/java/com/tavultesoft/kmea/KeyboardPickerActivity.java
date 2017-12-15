@@ -716,6 +716,11 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
       String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
       String kbKey = String.format("%s_%s", languageID, keyboardID);
       int index = getKeyboardIndex(this, kbKey);
+      if (index == -1) {
+        // Add the downloaded keyboard if not found
+        addKeyboard(this, keyboardInfo);
+        index = getKeyboardIndex(this, kbKey);
+      }
       keyboardsList.set(index, keyboardInfo);
       saveKeyboardsList(this);
     } else if (result < 0) {
