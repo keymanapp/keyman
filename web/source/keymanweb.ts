@@ -989,15 +989,16 @@ if(!window['keyman']['initialized']) {
         if('webkitTapHighlightColor' in xs) {
           xs.webkitTapHighlightColor='rgba(0,0,0,0)';
         }
-        
+
         if(x.base.nodeName.toLowerCase() == 'textarea') {
           // Correct rows value if defaulted and box height set by CSS
           // The rows value is used when setting the caret vertically
-          if(x.base.rows == 2) { // 2 is default value
+          var baseArea = <HTMLTextAreaElement> x.base;
+          if(baseArea.rows == 2) { // 2 is default value
             var h=parseInt(bs.height,10)-parseInt(bs.paddingTop,10)-parseInt(bs.paddingBottom,10),
               dh=parseInt(bs.fontSize,10),calcRows=Math.round(h/dh);
-            if(calcRows > x.base.rows+1) {
-              x.base.rows=calcRows;
+            if(calcRows > baseArea.rows+1) {
+              baseArea.rows=calcRows;
             }
           }
           ds.width=xs.width; ds.minHeight=xs.height;
@@ -1025,9 +1026,21 @@ if(!window['keyman']['initialized']) {
 
           xx.base.addEventListener('resize', xx._kmwResizeHandler, false);
         })(x);
+
+        var textValue: string;
+
+        switch(x.base.nodeName.toLowerCase()) {
+          case 'textarea':
+          case 'input':
+            textValue = (<HTMLInputElement> x.base).value;
+            break;
+          default:
+            textValue = x.base.textContent;
+            break;
+        }
           
         // And copy the text content
-        keymanweb.setText(x,x.base.value,null);  
+        keymanweb.setText(x, textValue, null);  
 
         return true;
       }
@@ -1186,17 +1199,27 @@ if(!window['keyman']['initialized']) {
      **/                 
     keymanweb.getBaseFont = function()
     {
-      var ipInput=document.getElementsByTagName('INPUT'),
+      var ipInput = document.getElementsByTagName('INPUT'),
           ipTextArea=document.getElementsByTagName('TEXTAREA'),
           n=0,fs,fsDefault='Arial,sans-serif';
       
       if(ipInput.length == 0 && ipTextArea.length == 0) n=0;
       else if(ipInput.length > 0 && ipTextArea.length == 0) n=1;
-      else if(ipInput.length == 0 && ipTextArea.length > 0) n=2;    
-      else if(ipInput[0].offsetTop < ipTextArea[0].offsetTop) n=1;    
-      else if(ipInput[0].offsetTop > ipTextArea[0].offsetTop) n=2;
-      else if(ipInput[0].offsetLeft < ipTextArea[0].offsetLeft) n=1;    
-      else if(ipInput[0].offsetLeft > ipTextArea[0].offsetLeft) n=2;
+      else if(ipInput.length == 0 && ipTextArea.length > 0) n=2;
+      else {
+        var firstInput = <HTMLInputElement>(<any>ipInput[0]);
+        var firstTextArea = <HTMLTextAreaElement>(<any>ipTextArea[0]);
+
+        if(firstInput.offsetTop < firstTextArea.offsetTop) {
+          n=1;    
+        } else if(firstInput.offsetTop > firstTextArea.offsetTop) {
+          n=2;
+        } else if(firstInput.offsetLeft < firstTextArea.offsetLeft) {
+          n=1;    
+        } else if(firstInput.offsetLeft > firstTextArea.offsetLeft) {
+          n=2;
+        }
+      }
       
       switch(n)
       {
@@ -4513,21 +4536,20 @@ if(!window['keyman']['initialized']) {
         t1=document.getElementsByTagName('INPUT'),
         t2=document.getElementsByTagName('TEXTAREA');
 
-      for(i=0; i<t1.length; i++)
-      { 
-        switch(t1[i].type)
-        {
+      for(i=0; i<t1.length; i++) { 
+        var inputElement = <HTMLInputElement><any> t1[i];
+        switch(inputElement.type) {
           case 'text':
           case 'search':
           case 'email':
           case 'url':
-            if(t1[i].className.indexOf('kmw-disabled') < 0)
+            if(t1[i].className.indexOf('kmw-disabled') < 0) {
               eList.push({ip:t1[i],x:util._GetAbsoluteX(t1[i]),y:util._GetAbsoluteY(t1[i])});
+            }
             break;    
         }
       }
-      for(i=0; i<t2.length; i++)
-      { 
+      for(i=0; i<t2.length; i++) { 
         if(t2[i].className.indexOf('kmw-disabled') < 0)
           eList.push({ip:t2[i],x:util._GetAbsoluteX(t2[i]),y:util._GetAbsoluteY(t2[i])});
       }
