@@ -45,6 +45,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     kbInfo.put(KMManager.KMKey_LanguageName, "Tamil");
     kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.1");
     kbInfo.put(KMManager.KMKey_Font, "aava1.ttf");
+    //kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont); // Use the default font
     KMManager.addKeyboard(this, kbInfo);
   }
 
