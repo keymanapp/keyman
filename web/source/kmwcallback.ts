@@ -440,13 +440,7 @@ if(!window['keyman']['initialized']) {
         return;
       }
     
-      if (keymanweb.legacy) {
-        if(dn>0) {
-          Pelem.value=Pelem.value._kmwSubstr(0,Pelem.value._kmwLength()-dn)+s;  //I3319
-        } else {
-          Pelem.value=Pelem.value+s;
-        }
-      } else if (Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&  
+      if (Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&  
           (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')      
         ) { // I2457 - support contentEditable elements in mozilla, webkit
         /* Editable iframe and contentEditable elements for mozilla */

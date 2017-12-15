@@ -1,3 +1,6 @@
+/// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
+/// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
+
 /***
    KeymanWeb 10.0
    Copyright 2017 SIL International
@@ -930,7 +933,7 @@ if(!window['keyman']['initialized']) {
         
         // Set the tabindex to 0 to allow a DIV to accept focus and keyboard input 
         // c.f. http://www.w3.org/WAI/GL/WCAG20/WD-WCAG20-TECHS/SCR29.html
-        x.tabIndex='0'; 
+        x.tabIndex=0; 
 
         // Disable (internal) pan and zoom on KMW input elements for IE10
         x.style.msTouchAction='none';
@@ -1348,7 +1351,7 @@ if(!window['keyman']['initialized']) {
        * Description    Checks to ensure that the stub isn't already loaded within KMW or subject
        *                to an already-pending request.
        */
-      var isUniqueRequest = function(tEntry) {
+      var isUniqueRequest = function(tEntry: {'id': any, 'language': any}) {
         var k;
 
         if(keymanweb.findStub(tEntry['id'], tEntry['language']) == null) {
@@ -1409,15 +1412,15 @@ if(!window['keyman']['initialized']) {
             //Array or single entry?
             if(typeof(lList.length) == 'number') {
               for(j=0; j<lList.length; j++) {
-                var tEntry = {'id':x[i]['id'],'language':x[i]['languages'][j]['id']};
-                if(isUniqueRequest(tEntry)) {
-                  keymanweb.cloudList.push(tEntry);
+                var tEntryAlt = {'id':x[i]['id'],'language':x[i]['languages'][j]['id']};
+                if(isUniqueRequest(tEntryAlt)) {
+                  keymanweb.cloudList.push(tEntryAlt);
                 }
               }
             } else { // Single language element
-              var tEntry = {'id':x[i]['id'],'language':x[i]['languages'][j]['id']};
-              if(isUniqueRequest(tEntry)) {
-                keymanweb.cloudList.push(tEntry);
+              var tEntryAlt = {'id':x[i]['id'],'language':x[i]['languages'][j]['id']};
+              if(isUniqueRequest(tEntryAlt)) {
+                keymanweb.cloudList.push(tEntryAlt);
               }
             }
           }
@@ -1888,9 +1891,7 @@ if(!window['keyman']['initialized']) {
     {
       var appVer=navigator.appVersion;
     // Legacy support variables
-      if(typeof(document.createEventObject)=='undefined'  &&  (appVer.indexOf('MSIE 5.0') >= 0 
-        || appVer.indexOf('MSIE 4.0') >= 0 || appVer.indexOf('MSIE 3.0') >= 0)) keymanweb.legacy=1;
-      else if(appVer.indexOf('MSIE 6.0') >= 0) keymanweb._IE = 6;
+      if(appVer.indexOf('MSIE 6.0') >= 0) keymanweb._IE = 6;
       else if(appVer.indexOf('MSIE 7.0') >= 0) keymanweb._IE = 7;
       else if(appVer.indexOf('MSIE 8.0') >= 0) keymanweb._IE = 8;
       if(keymanweb._IE && document.compatMode=='BackCompat') keymanweb._IE = 6;
@@ -2029,12 +2030,11 @@ if(!window['keyman']['initialized']) {
               util.attachDOMEvent(Lelem,'keypress', keymanweb._KeyPress);
               util.attachDOMEvent(Lelem,'keyup', keymanweb._KeyUp);
               
-              if(!keymanweb.legacy)
-              { // I1481 - Attach to the selectionchange in the iframe (and do a selchange to get the new selection)
-                /* IE: call _SelectionChange when the user changes the selection */
-                util.attachDOMEvent(Lelem, 'selectionchange', keymanweb._SelectionChange);
-                keymanweb._SelectionChange();
-              }
+              // I1481 - Attach to the selectionchange in the iframe (and do a selchange to get the new selection)
+              /* IE: call _SelectionChange when the user changes the selection */
+              util.attachDOMEvent(Lelem, 'selectionchange', keymanweb._SelectionChange);
+              keymanweb._SelectionChange();
+              
             }
             else {
               // Lelem is the IFrame's internal document; set 'er up!
@@ -2092,12 +2092,10 @@ if(!window['keyman']['initialized']) {
               util.detachDOMEvent(Lelem,'keypress', keymanweb._KeyPress);
               util.detachDOMEvent(Lelem,'keyup', keymanweb._KeyUp);
               
-              if(!keymanweb.legacy)
-              { // I1481 - Attach to the selectionchange in the iframe (and do a selchange to get the new selection)
-                /* IE: call _SelectionChange when the user changes the selection */
-                util.detachDOMEvent(Lelem, 'selectionchange', keymanweb._SelectionChange);
-                keymanweb._SelectionChange();
-              }
+              // I1481 - Attach to the selectionchange in the iframe (and do a selchange to get the new selection)
+              /* IE: call _SelectionChange when the user changes the selection */
+              util.detachDOMEvent(Lelem, 'selectionchange', keymanweb._SelectionChange);
+              keymanweb._SelectionChange();
             }
             else {
               // Lelem is the IFrame's internal document; set 'er up!
@@ -2370,11 +2368,13 @@ if(!window['keyman']['initialized']) {
      *                activationPending (bool):   KMW being activated
      *                activated         (bool):   KMW active    
      */    
-    keymanweb['getUIState'] = keymanweb.getUIState = function()
-    {
-      var p={};
-      p['activationPending'] = p.activationPending = keymanweb._IsActivatingKeymanWebUI;
-      p['activated'] = p.activated = keymanweb._JustActivatedKeymanWebUI;
+    keymanweb['getUIState'] = keymanweb.getUIState = function() {
+      var p={
+        activationPending: keymanweb._IsActivatingKeymanWebUI,
+        activated: keymanweb._JustActivatedKeymanWebUI
+      };
+      p['activationPending'] = p.activationPending;
+      p['activated'] = p.activated;
       return p;
     }
 
@@ -2846,7 +2846,18 @@ if(!window['keyman']['initialized']) {
      *                LisVirtualKey     e.g. Virtual key or non-keypress event
      */    
     keymanweb._GetKeyEventProperties = function(e, keyState) {
-      var s = new Object();
+      class KeyEvent {
+        Ltarg: any;
+        Lcode: any;
+        Lstates: any;
+        LmodifierChange: any;
+        Lmodifiers: any;
+        LisVirtualKeyCode: any;
+        LisVirtualKey: any;
+      };
+
+      var s = new KeyEvent();
+
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
       s.Ltarg = util.eventTarget(e);
       if (s.Ltarg == null) {
@@ -4344,7 +4355,7 @@ if(!window['keyman']['initialized']) {
       //document.body.appendChild(keymanweb._StyleBlock);
 
       // IE: call _SelectionChange when the user changes the selection 
-      if(document.selection  &&  !keymanweb.legacy)
+      if(document.selection)
         util.attachDOMEvent(document, 'selectionchange', keymanweb._SelectionChange);
     
       // Restore and reload the currently selected keyboard, selecting a default keyboard if necessary.

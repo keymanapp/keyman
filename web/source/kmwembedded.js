@@ -87,11 +87,7 @@
     var Ldv, Ldoc;
     if(Pelem.body) Ldoc=Pelem; else Ldoc=Pelem.ownerDocument; // I1481 - use Ldoc to get the ownerDocument when no selection is found
    
-    if(keymanweb.legacy)
-    {
-      return Pelem.value._kmwSubstr(Pelem.length-n, ln); //I3319
-    }
-    else if(Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&
+    if(Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&
       (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')) //  &&  Pelem.tagName == 'HTML')  &&  Pelem.tagName == 'HTML')
       // I2457 - support contentEditable elements in mozilla, webkit
     {

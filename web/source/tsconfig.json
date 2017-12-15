@@ -8,7 +8,7 @@
   },
   "files": [
 	"kmwbase.js",
-	"keymanweb.js",
+	"keymanweb.ts",
 	"kmwosk.ts", 
 	"kmwnative.ts", 
 	"kmwcallback.ts",

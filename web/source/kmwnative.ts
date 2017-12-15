@@ -109,8 +109,6 @@ if(!window['keyman']['initialized']) {
 
       if(device.touchable) {
         tempContext = keymanweb.getTextBeforeCaret(Pelem);
-      } else if(keymanweb.legacy) {
-        tempContext = Pelem.value;
       } else if(Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&
         (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')) {
         // I2457 - support contentEditable elements in mozilla, webkit
