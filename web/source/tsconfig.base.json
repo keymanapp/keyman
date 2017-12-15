@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+	"allowJs": true,
+	"module": "system",
+	"outDir": "../output/",
+	"sourceMap": true,
+	"target": "es5"
+  }
+}

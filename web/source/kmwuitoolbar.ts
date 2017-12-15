@@ -326,7 +326,7 @@ if(!window['keyman']['ui']['name']) {
           languageCode = Keyboards[j]['LanguageCode'];
           max++;
         }   
-        max = ((max+3)/4).toFixed(0);   // Get number of entries per column
+        max = Number(((max+3)/4).toFixed(0));   // Get number of entries per column
   
         // Add language list to columns for the region
         languageCode='';

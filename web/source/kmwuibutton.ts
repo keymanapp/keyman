@@ -412,13 +412,13 @@ if(!window['keyman']['ui']['name']) {
       if(!ui.init) return;
   
       // Clear existing list first (first two nodes must be preserved)
-      for(var i=ui._KeymanWeb_KbdList.childNodes.length; i>2; i--)
+      for(var i:number=ui._KeymanWeb_KbdList.childNodes.length; i>2; i--)
         ui._KeymanWeb_KbdList.removeChild(ui._KeymanWeb_KbdList.childNodes[i-1]);
       
       var kbds=keymanweb['getKeyboards']();
       if(kbds.length > 0)
       {
-        for(var i=0; i<kbds.length; i++)
+        for(var i:number=0; i<kbds.length; i++)
           ui.registerKeyboard(kbds[i]['InternalName'],kbds[i]['LanguageName'],kbds[i]['Name'],kbds[i]['LanguageCode'],kbds[i]['RegionCode']);
       }
     } 

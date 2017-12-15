@@ -1,3 +1,8 @@
+interface Window {
+    attachEvent: (eventNameWithOn:string, callback: () => void) => void,
+    clientWidth: number
+}
+
 interface Document {
     selection: any                      // Is IE only; TS ignores it because of this.
 }

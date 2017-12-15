@@ -1,3 +1,5 @@
+/// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
+
 /***
    KeymanWeb 10.0
    Copyright 2017 SIL International

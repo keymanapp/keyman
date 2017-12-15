@@ -1,3 +1,5 @@
+/// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
+
 /***
    KeymanWeb 10.0
    Copyright 2017 SIL International
@@ -32,7 +34,7 @@ if(!window['keyman']['ui']['name']) {
     if(util['isTouchDevice']()) throw '';
 
     // Initialize user interface common variables       
-    var ui=keymanweb['ui'] = {
+    var ui:any=keymanweb['ui'] = {
       name: 'toggle',
       initialized: false,
       controller: null,
@@ -460,7 +462,7 @@ if(!window['keyman']['ui']['name']) {
       if(_kbds.length > 1)
       {
         // Multiple keyboards
-        var _kmw_ctrl_img=document.getElementById('KMW_Controller_Img')
+        var _kmw_ctrl_img=<HTMLImageElement> document.getElementById('KMW_Controller_Img')
         _kmw_ctrl_img.src = imgPath+'kmw_logo_16_down.gif';
         _kmw_ctrl_img.style.width = '100%';
             
@@ -482,7 +484,7 @@ if(!window['keyman']['ui']['name']) {
       // Single keyboard
       else if(_kbds.length == 1)
       {
-        var _kmw_ctrl_img=document.getElementById('KMW_Controller_Img')
+        var _kmw_ctrl_img=<HTMLImageElement> document.getElementById('KMW_Controller_Img')
         _kmw_ctrl_img.src = imgPath+'kmw_logo_16.gif';
         
         ui.kbdButton.getElem().id = 'kmwico';
