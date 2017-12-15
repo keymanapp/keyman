@@ -82,7 +82,7 @@ BUILD=$BUILD_COUNTER
 readonly BUILD
 
 compiler=tsc
-compilecmd="tsc"
+compilecmd="$compiler"
 
 # Establish default build parameters
 
