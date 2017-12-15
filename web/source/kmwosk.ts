@@ -297,6 +297,7 @@ if(!window['keyman']['initialized']) {
      */
     osk['getRect'] = osk.getRect = function() {		// I2405
       var p: any;
+      p = {};
 
       if(osk._DivVKbd) {
         p['left'] = p.left = util._GetAbsoluteX(osk._DivVKbd);

@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-		"outFile": "../output/keymanweb.js"
+		"outFile": "../build/keymanweb.js"
   },
   "files": [
 		"kmwbase.ts",

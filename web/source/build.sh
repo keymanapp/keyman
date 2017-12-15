@@ -25,9 +25,50 @@ assert ( ) {
     fi
 }
 
+: ${CLOSURECOMPILERPATH:=../tools}
+: ${JAVA:=java}
+
+minifier="$CLOSURECOMPILERPATH/compiler.jar"
+minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables"
+minifycmd="$JAVA -jar $minifier $minifier_warnings"
+
+if ! [ -f $minifier ];
+then
+    echo File $minifier does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?
+    exit 1
+fi
+
+readonly minifier
+readonly minifycmd
+
+# $1 - base file name
+# $2 - output path
+# $3 - optimization level
+# $4 - defines
+# $5 - additional output wrapper
+minify ( ) {
+    if [ "$4" ]; then
+        defines="--define $4"
+    else
+        defines=
+    fi
+
+    if [ "$5" ]; then
+        wrapper=$5
+    else
+        wrapper="%output%"
+    fi
+
+    $minifycmd $defines --source_map_input "$INTERMEDIATE/$1|$INTERMEDIATE/$1.map" \
+        --create_source_map $2/$1.map --js $INTERMEDIATE/$1 --compilation_level $3 \
+        --js_output_file $2/$1 --warning_level VERBOSE --output_wrapper "$wrapper
+//# sourceMappingURL=$1.map"
+}
+
 # Definition of global compile constants
 WEB_OUTPUT="../output"
 EMBED_OUTPUT="../embedded"
+INTERMEDIATE="../build"
 SOURCE="."
 
 readonly WEB_OUTPUT
@@ -40,21 +81,8 @@ BUILD=$BUILD_COUNTER
 
 readonly BUILD
 
-: ${CLOSURECOMPILERPATH:=../tools}
-: ${JAVA:=java}
-
-compiler="$CLOSURECOMPILERPATH/compiler.jar"
-compiler_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables"
-compilecmd="$JAVA -jar $compiler $compiler_warnings"
-
-if ! [ -f $compiler ];
-then
-    echo File $compiler does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?
-    exit 1
-fi
-
-readonly compiler
-readonly compilecmd
+compiler=tsc
+compilecmd="tsc"
 
 # Establish default build parameters
 
@@ -127,19 +155,10 @@ if [ $BUILD_EMBED = true ]; then
         mkdir -p "$EMBED_OUTPUT/resources"  # Includes base folder, is recursive.
     fi
 
-    # Compile supplementary plane string handing extensions
-    echo Compile SMP string extensions
-    rm $EMBED_OUTPUT/kmw-smpstring.js 2>/dev/null
-    $compilecmd --js $SOURCE/kmwstring.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file $EMBED_OUTPUT/kmw-smpstring.js --warning_level VERBOSE
-    assert $EMBED_OUTPUT/kmw-smpstring.js
-
-    rm kmwtemp.js 2>/dev/null
-    $compilecmd --define keyman.__BUILD__=$BUILD --externs $SOURCE/kmwreleasestub.js --js $SOURCE/kmwbase.js --js $SOURCE/keymanweb.js --js $SOURCE/kmwosk.js --js $SOURCE/kmwembedded.js --js $SOURCE/kmwcallback.js --js $SOURCE/kmwkeymaps.js --js $SOURCE/kmwlayout.js --js $SOURCE/kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file kmwtemp.js --warning_level VERBOSE
-    assert kmwtemp.js 
-
-    echo Append SMP extensions
-    cat $EMBED_OUTPUT/kmw-smpstring.js kmwtemp.js > $EMBED_OUTPUT/keyman.js
-    rm kmwtemp.js
+    rm $EMBED_OUTPUT/keyman.js 2>/dev/null
+    $compilecmd -p $SOURCE/tsconfig.embedded.json
+    minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
+    assert $EMBED_OUTPUT/keyman.js 
 
     echo Compiled embedded application saved as $EMBED_OUTPUT/keyman.js
 
@@ -170,21 +189,12 @@ if [ $BUILD_COREWEB = true ]; then
         mkdir -p "$WEB_OUTPUT/src/osk" 
     fi
 
-    # Compile supplementary plane string handing extensions
-    echo Compile SMP string extensions
-    rm $WEB_OUTPUT/kmw-smpstring.js 2>/dev/null
-    $compilecmd --js $SOURCE/kmwstring.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file $WEB_OUTPUT/kmw-smpstring.js --warning_level VERBOSE
-    assert $WEB_OUTPUT/kmw-smpstring.js 
-
     # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
-    echo Compile Keymanweb    
-    rm $WEB_OUTPUT/kmwtemp.js 2>/dev/null
-    $compilecmd --define keyman.__BUILD__=$BUILD --externs $SOURCE/kmwreleasestub.js --js $SOURCE/kmwbase.js --js $SOURCE/keymanweb.js --js $SOURCE/kmwosk.js --js $SOURCE/kmwnative.js --js $SOURCE/kmwcallback.js --js $SOURCE/kmwkeymaps.js --js $SOURCE/kmwlayout.js --js $SOURCE/kmwinit.js --compilation_level SIMPLE_OPTIMIZATIONS  --js_output_file $WEB_OUTPUT/kmwtemp.js --warning_level VERBOSE
-    assert $WEB_OUTPUT/kmwtemp.js
-
-    echo Append SMP string extensions to Keymanweb
-    cat $WEB_OUTPUT/kmw-smpstring.js $WEB_OUTPUT/kmwtemp.js > $WEB_OUTPUT/keymanweb.js
-    rm $WEB_OUTPUT/kmwtemp.js
+    echo Compile Keymanweb
+    rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
+    $compilecmd -p $SOURCE/tsconfig.web.json
+    minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
+    assert $WEB_OUTPUT/keymanweb.js
 
     echo Compiled KeymanWeb application saved as $WEB_OUTPUT/keymanweb.js
 fi
@@ -198,6 +208,7 @@ if [ $BUILD_FULLWEB = true ]; then
 
     echo Copy source to $WEB_OUTPUT/src
     cp -Rf $SOURCE/*.js $WEB_OUTPUT/src
+    cp -Rf $SOURCE/*.ts $WEB_OUTPUT/src
     echo $BUILD > $WEB_OUTPUT/src/version.txt
 
     cp -Rf $SOURCE/resources/ui  $WEB_OUTPUT/src/ >/dev/null
@@ -210,31 +221,38 @@ if [ $BUILD_FULLWEB = true ]; then
 fi
 
 if [ $BUILD_UI = true ]; then
+    echo Compile UI Modules
+    $compilecmd -p $SOURCE/tsconfig.ui.json
 
-    echo Compile ToolBar UI
+    echo Minify ToolBar UI
     del $WEB_OUTPUT/kmuitoolbar.js 2>/dev/null
-    $compilecmd --js $SOURCE/kmwuitoolbar.js --externs $SOURCE/kmwreleasestub.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file $WEB_OUTPUT/kmwuitoolbar.js --warning_level VERBOSE --output_wrapper "(function() {%output%}());"
+    minify kmwuitoolbar.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "" "(function() {%output%}());"
     assert $WEB_OUTPUT/kmwuitoolbar.js
 
-    echo Compile Toggle UI
+    echo Minify Toggle UI
     del $WEB_OUTPUT/kmuitoggle.js 2>/dev/null
-    $compilecmd --js $SOURCE/kmwuitoggle.js --externs $SOURCE/kmwreleasestub.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file $WEB_OUTPUT/kmwuitoggle.js --warning_level VERBOSE --output_wrapper "(function() {%output%}());"
+    minify kmwuitoggle.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "" "(function() {%output%}());"
     assert $WEB_OUTPUT/kmwuitoggle.js
 
-    echo Compile Float UI
+    echo Minify Float UI
     del $WEB_OUTPUT/kmuifloat.js 2>/dev/null
-    $compilecmd --js $SOURCE/kmwuifloat.js --externs $SOURCE/kmwreleasestub.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file $WEB_OUTPUT/kmwuifloat.js --warning_level VERBOSE --output_wrapper "(function() {%output%}());"
+    minify kmwuifloat.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "" "(function() {%output%}());"
     assert $WEB_OUTPUT/kmwuifloat.js
 
-    echo Compile Button UI
+    echo Minify Button UI
     del $WEB_OUTPUT/kmuibutton.js 2>/dev/null
-    $compilecmd --js $SOURCE/kmwuibutton.js --externs $SOURCE/kmwreleasestub.js --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file $WEB_OUTPUT/kmwuibutton.js --warning_level VERBOSE --output_wrapper "(function() {%output%}());"
+    minify kmwuibutton.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "" "(function() {%output%}());"
     assert $WEB_OUTPUT/kmwuibutton.js
 
     echo User interface modules compiled and saved under $WEB_OUTPUT
 fi
 
 if [ $BUILD_DEBUG_EMBED = true ]; then
-    cat $SOURCE/kmwstring.js $SOURCE/kmwbase.js $SOURCE/keymanweb.js $SOURCE/kmwcallback.js $SOURCE/kmwosk.js $SOURCE/kmwembedded.js $SOURCE/kmwkeymaps.js $SOURCE/kmwlayout.js $SOURCE/kmwinit.js > $EMBED_OUTPUT/keymanios.js
+    cp $INTERMEDIATE/keyman.js $EMBED_OUTPUT/keymanios.js
+    # Problem - must correct the resulting map location!
+    sed -i 's/\/\/# sourceMappingURL=keyman.js.map/\/\/# sourceMappingURL=keymanios.js.map/g' $EMBED_OUTPUT/keymanios.js
+    
+    # Copy the actual sourcemap.
+    cp $INTERMEDIATE/keyman.js.map $EMBED_OUTPUT/keymanios.js.map
     echo Uncompiled embedded application saved as keymanios.js
 fi
