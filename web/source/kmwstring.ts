@@ -5,6 +5,8 @@
 
 interface StringConstructor {
   kmwFromCharCode(cp0: number): string,
+  _kmwFromCharCode(cp0: number): string,
+  kmwEnableSupplementaryPlane(bEnable: boolean)
 }
 
 interface String {
@@ -25,7 +27,19 @@ interface String {
   kmwCodePointToCodeUnit(codePointIndex: number) : number,
   kmwBMPCodePointToCodeUnit(codePointIndex: number) : number,
   kmwCodeUnitToCodePoint(codeUnitIndex: number) : number,
-  kmwBMPCodeUnitToCodePoint(codeUnitIndex: number) : number
+  kmwBMPCodeUnitToCodePoint(codeUnitIndex: number) : number,
+  _kmwCharCodeAt(codePointIndex: number): number,
+  _kmwCharAt(codePointIndex: number) : string,
+  _kmwIndexOf(searchValue: string, fromIndex?: number) : number,
+  _kmwLastIndexOf(searchValue: string, fromIndex?: number) : number,
+  _kmwSlice(beginSlice: number, endSlice: number) : string,
+  _kmwSubstring(start: number, length?: number) : string,
+  _kmwSubstr(start: number, length?: number) : string,
+  _kmwLength(): number,
+  _kmwNextChar(codeUnitIndex: number): number,
+  _kmwPrevChar(codeUnitIndex: number): number,
+  _kmwCodePointToCodeUnit(codePointIndex: number) : number,
+  _kmwCodeUnitToCodePoint(codeUnitIndex: number) : number,
 }
 
 /**
@@ -425,26 +439,6 @@ String.prototype.kmwBMPSubstr = function(n,ln)
     return str.substr(n,ln);
   else
     return str.substr(str.length+n,-n);  
-}
-
-interface StringConstructor {
-  _kmwFromCharCode(cp0: number): string,
-  kmwEnableSupplementaryPlane(bEnable: boolean)
-}
-
-interface String {
-  _kmwCharCodeAt(codePointIndex: number): number,
-  _kmwCharAt(codePointIndex: number) : string,
-  _kmwIndexOf(searchValue: string, fromIndex?: number) : number,
-  _kmwLastIndexOf(searchValue: string, fromIndex?: number) : number,
-  _kmwSlice(beginSlice: number, endSlice: number) : string,
-  _kmwSubstring(start: number, length: number) : string,
-  _kmwSubstr(start: number, length: number) : string,
-  _kmwLength(): number,
-  _kmwNextChar(codeUnitIndex: number): number,
-  _kmwPrevChar(codeUnitIndex: number): number,
-  _kmwCodePointToCodeUnit(codePointIndex: number) : number,
-  _kmwCodeUnitToCodePoint(codeUnitIndex: number) : number,
 }
 
 /**

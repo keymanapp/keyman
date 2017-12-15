@@ -1,12 +1,9 @@
+/// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
+
 /***
    KeymanWeb 10.0
    Copyright 2017 SIL International
 ***/
-
-interface String {
-  _kmwLength: () => number,
-  _kmwSubstr: (a, b?) => String // Should give this better type declaration stuff.
-}
 
 // If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the 
 // KMW system, so we use the fact that 'initialized' is only 1 / true after all scripts are loaded for the initial
