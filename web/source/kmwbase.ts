@@ -1,3 +1,5 @@
+/// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
+
 /***
    KeymanWeb 10.0
    Copyright 2017 SIL International
@@ -16,7 +18,8 @@ keyman.__BUILD__ = 299;
 if(!window['keyman']['loaded']) {
 
   (function() {
-    var keymanweb = window['keyman'] = {
+    var keymanweb: any;
+    keymanweb = window['keyman'] = {
       _TitleElement: null,      // I1972 - KeymanWeb Titlebar should not be a link
       _Enabled: 1,              // Is KeymanWeb running?
       _IE: 0,                   // browser version identification
@@ -73,9 +76,12 @@ if(!window['keyman']['loaded']) {
     keymanweb['helpURL'] = 'http://help.keyman.com/go'; 
     
     // Define public OSK, user interface and utility function objects 
-    var util = keymanweb['util'] = {};
-    var osk = keymanweb['osk'] = {ready:false};
-    var ui = keymanweb['ui'] = {};
+    var util: any;
+    util = keymanweb['util'] = {};
+    var osk: any;
+    osk = keymanweb['osk'] = {ready:false};
+    var ui: any;
+    ui = keymanweb['ui'] = {};
     
     var kbdInterface = keymanweb['interface'] = {
       // Cross-reference with /windows/src/global/inc/Compiler.h - these are the Developer codes for the respective system stores.
@@ -510,7 +516,8 @@ if(!window['keyman']['loaded']) {
      * Set device parameters according to platform 
      *    TODO: put into separate function (?) 
      */
-    var device=util.device={
+    var device: any;
+    device=util.device={
       touchable:!!('ontouchstart' in window),OS:'',
       formFactor:'desktop',
       dyPortrait:0,
@@ -634,7 +641,7 @@ if(!window['keyman']['loaded']) {
       if(typeof(window.orientation) == 'undefined') return false;
       
       // Else landscape for +/-90, portrait for 0, +/-180   
-      return (Math.abs(window.orientation/90) == 1); 
+      return (Math.abs(<number>window.orientation/90) == 1); 
     }
     
     /**
@@ -962,7 +969,7 @@ if(!window['keyman']['loaded']) {
         { 
           if(t == cn) 
           {
-            var d = unescape(cx[t]).split(';');
+            var d = decodeURI(cx[t]).split(';');
             for(var i=0; i<d.length; i++)
             {
               var xc = d[i].split('=');
@@ -999,8 +1006,8 @@ if(!window['keyman']['loaded']) {
       for(var v in cv)
         s = s + v+'='+cv[v]+";";    
 
-      var d = new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 30).toGMTString();
-      document.cookie = cn+'='+escape(s)+'; path=/; expires='+d;//Fri, 31 Dec 2099 23:59:59 GMT;';
+      var d = new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 30).toUTCString();
+      document.cookie = cn+'='+encodeURI(s)+'; path=/; expires='+d;//Fri, 31 Dec 2099 23:59:59 GMT;';
     }
     
     /**

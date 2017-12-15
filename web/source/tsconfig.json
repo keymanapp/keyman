@@ -7,7 +7,7 @@
 	"target": "es5"
   },
   "files": [
-	"kmwbase.js",
+	"kmwbase.ts",
 	"keymanweb.ts",
 	"kmwosk.ts", 
 	"kmwnative.ts", 
