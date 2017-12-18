@@ -94,6 +94,26 @@ goto main
       
   EXIT /B 0
 
+rem Credit to https://stackoverflow.com/questions/23075953/batch-script-to-find-and-replace-a-string-in-text-file-without-creating-an-extra
+rem It's not the most efficient thing ever, but it gets the job done.  The shell script's version is WAY faster due to available tools.
+:replace_in_file
+@echo off 
+    setlocal enableextensions disabledelayedexpansion
+
+    set "search=%1"
+    set "replace=%2"
+
+    set "textFile=%3"
+
+    for /f "delims=" %%i in ('type "%textFile%" ^& break ^> "%textFile%" ') do (
+        set "line=%%i"
+        setlocal enabledelayedexpansion
+        >>"%textFile%" echo(!line:%search%=%replace%!
+        endlocal
+    )
+
+    EXIT /B 0
+
 :main
 
 if "%1" == "-ui"   goto ui
@@ -221,8 +241,15 @@ echo Build failed
 exit /B 2
 
 :debug_embedded
-REM copy /B /Y %SOURCE%\kmwstring.js+%SOURCE%\kmwbase.js+%SOURCE%\keymanweb.js+%SOURCE%\kmwcallback.js+%SOURCE%\kmwosk.js+kmwembedded.js+%SOURCE%\kmwkeymaps.js+%SOURCE%\kmwlayout.js+%SOURCE%\kmwinit.js %EMBED_OUTPUT%\keymanios.js
-REM echo Uncompiled embedded application saved as keymanios.js
+copy %INTERMEDIATE%\keyman.js %EMBED_OUTPUT%\keymanios.js
+
+copy %INTERMEDIATE%\keyman.js.map %EMBED_OUTPUT%\keymanios.js.map
+
+rem Problem - must correct the resulting map location!
+echo Correcting source map link.  This may take a while; using the shell script or manually correcting the link will be faster.
+call :replace_in_file keyman.js.map keymanios.js.map %EMBED_OUTPUT%\keymanios.js
+
+echo Uncompiled embedded application saved as keymanios.js
 
 goto done
 
