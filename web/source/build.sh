@@ -235,6 +235,6 @@ if [ $BUILD_UI = true ]; then
 fi
 
 if [ $BUILD_DEBUG_EMBED = true ]; then
-    cat $SOURCE/kmwstring.js $SOURCE/kmwbase.js $SOURCE/keymanweb.js $SOURCE/kmwcallback.js $SOURCE/kmwosk.js $SOURCE/kmwembedded.js $SOURCE/kmwkeymaps.js $SOURCE/kmwlayout.js $SOURCE/kmwinit.js > $EMBED_OUTPUT/keymanios.js
-    echo Uncompiled embedded application saved as keymanios.js
+    cat $SOURCE/kmwstring.js $SOURCE/kmwbase.js $SOURCE/keymanweb.js $SOURCE/kmwcallback.js $SOURCE/kmwosk.js $SOURCE/kmwembedded.js $SOURCE/kmwkeymaps.js $SOURCE/kmwlayout.js $SOURCE/kmwinit.js > $EMBED_OUTPUT/keyman.js
+    echo Uncompiled embedded application saved as keyman.js
 fi
