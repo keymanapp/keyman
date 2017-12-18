@@ -1,5 +1,6 @@
 /// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
+/// <reference path="kmwtypedefs.ts" /> // Includes type definitions for basic KMW types.
 
 /***
    KeymanWeb 10.0
@@ -2868,17 +2869,7 @@ if(!window['keyman']['initialized']) {
      *                LisVirtualKeyCode e.g. ctrl/alt key
      *                LisVirtualKey     e.g. Virtual key or non-keypress event
      */    
-    keymanweb._GetKeyEventProperties = function(e, keyState) {
-      class KeyEvent {
-        Ltarg: any;
-        Lcode: any;
-        Lstates: any;
-        LmodifierChange: any;
-        Lmodifiers: any;
-        LisVirtualKeyCode: any;
-        LisVirtualKey: any;
-      };
-
+    keymanweb._GetKeyEventProperties = function(e: KeyboardEvent, keyState:boolean) {
       var s = new KeyEvent();
 
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs

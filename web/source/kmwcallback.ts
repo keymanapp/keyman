@@ -1,4 +1,5 @@
 /// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
+/// <reference path="kmwtypedefs.ts" /> // Includes type definitions for basic KMW types.
 
 /***
    KeymanWeb 10.0
@@ -14,12 +15,38 @@ if(!window['keyman']['initialized']) {
     var keymanweb=window['keyman'], kbdInterface=window['KeymanWeb']=keymanweb['interface'], KeymanWeb=kbdInterface,
       util=keymanweb['util'], osk=keymanweb['osk'],device=util.device,dbg=keymanweb.debug; //osk defined here, build 350
 
+    class Deadkey {
+      p: number;  // Position of deadkey
+      d: number;  // Numerical id of the deadkey
+      matched: number;
+
+      constructor(pos: number, id: number) {
+        this.p = pos;
+        this.d = id;
+      }
+
+      match(p: number, d: number): boolean {
+        var result:boolean = (this.p == p && this.d == d);
+        this.matched = result ? 1 : 0;
+
+        return result;
+      }
+
+      set(): void {
+        this.matched = 1;
+      }
+
+      reset(): void {
+        this.matched = 0;
+      }
+    }
+
     /**
      * Function     KSF
      * Scope        Public
      * Description  Save keyboard focus
      */    
-    KeymanWeb['KSF'] = kbdInterface['saveFocus'] = kbdInterface.saveFocus = function() {
+    KeymanWeb['KSF'] = kbdInterface['saveFocus'] = kbdInterface.saveFocus = function(): void {
       keymanweb._IgnoreNextSelChange = 1;
     }
       
@@ -31,7 +58,7 @@ if(!window['keyman']['initialized']) {
      * @return      {boolean}               true if inserted
      * Description  Insert text into active control
      */    
-    KeymanWeb['KT'] = kbdInterface['insertText'] = kbdInterface.insertText = function(Ptext,PdeadKey) {
+    KeymanWeb['KT'] = kbdInterface['insertText'] = kbdInterface.insertText = function(Ptext: string, PdeadKey:number): boolean {
       kbdInterface.resetContextCache();
       //_DebugEnter('InsertText');
       var Lelem = keymanweb._LastActiveElement, Ls, Le, Lkc, Lsel, Lv=false;
@@ -72,7 +99,7 @@ if(!window['keyman']['initialized']) {
      * @param       {Object}      Pk      Keyboard  object
      * Description  Register and load the keyboard
      */    
-    KeymanWeb['KR'] = kbdInterface['registerKeyboard'] = kbdInterface.registerKeyboard = function(Pk) {
+    KeymanWeb['KR'] = kbdInterface['registerKeyboard'] = kbdInterface.registerKeyboard = function(Pk): void {
       // If initialization not yet complete, list the keyboard to be registered on completion of initialization
       if(!keymanweb['initialized']) {
         keymanweb.deferredKR.push(Pk); return;
@@ -127,7 +154,7 @@ if(!window['keyman']['initialized']) {
      * @return      {?number}               1 if already registered, else null
      */    
   //var ts0=new Date().toTimeString().substr(3,5);
-    KeymanWeb['KRS'] = kbdInterface['registerStub'] = kbdInterface.registerStub = function(Pstub) {
+    KeymanWeb['KRS'] = kbdInterface['registerStub'] = kbdInterface.registerStub = function(Pstub): number {
       var Lk;
       
       // In initialization not complete, list the stub to be registered on completion of initialization
@@ -189,7 +216,7 @@ if(!window['keyman']['initialized']) {
      *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
      */    
     
-    KeymanWeb['KC'] = kbdInterface['context'] = kbdInterface.context = function(n, ln, Pelem) {
+    KeymanWeb['KC'] = kbdInterface['context'] = kbdInterface.context = function(n: number, ln:number, Pelem:HTMLElement): string {
       var v = kbdInterface.cachedContext.get(n, ln);
       if(v !== null) {
         return v;
@@ -213,7 +240,7 @@ if(!window['keyman']['initialized']) {
      *             KN(2,Pelem) == FALSE
      *             KN(4,Pelem) == TRUE
      */    
-    KeymanWeb['KN'] = kbdInterface['nul'] = kbdInterface.nul = function(n, Ptarg) {
+    KeymanWeb['KN'] = kbdInterface['nul'] = kbdInterface.nul = function(n:number, Ptarg:HTMLElement): boolean {
       var cx=kbdInterface.context(n+1, 1, Ptarg);
       
       // With #31, the result will be a replacement character if context is empty.
@@ -230,7 +257,8 @@ if(!window['keyman']['initialized']) {
      * @return      {boolean}             True if selected context matches val
      * Description  Test keyboard context for match
      */    
-    KeymanWeb['KCM'] = kbdInterface['contextMatch'] = kbdInterface.contextMatch = function(n, Ptarg, val, ln) {
+    KeymanWeb['KCM'] = kbdInterface['contextMatch'] = kbdInterface.contextMatch = 
+        function(n:number, Ptarg:HTMLElement, val:string, ln:number): boolean {
       //KeymanWeb._Debug('KeymanWeb.KCM(n='+n+', Ptarg, val='+val+', ln='+ln+'): return '+(kbdInterface.context(n,ln,Ptarg)==val)); 
       var cx=kbdInterface.context(n, ln, Ptarg);
       if(cx === val) {
@@ -247,7 +275,7 @@ if(!window['keyman']['initialized']) {
      * @return      {boolean}     true if keypress event
      * Description  Test if event as a keypress event
      */    
-    KeymanWeb['KIK'] = kbdInterface['isKeypress'] = kbdInterface.isKeypress = function(e) {
+    KeymanWeb['KIK'] = kbdInterface['isKeypress'] = kbdInterface.isKeypress = function(e: KeyEvent):boolean {
       if(keymanweb._ActiveKeyboard['KM']) {   // I1380 - support KIK for positional layouts
         return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
       } else {
@@ -264,7 +292,8 @@ if(!window['keyman']['initialized']) {
      * @return      {boolean}                 True if key matches rule
      * Description  Test keystroke with modifiers against rule
      */    
-    KeymanWeb['KKM'] = kbdInterface['keyMatch'] = kbdInterface.keyMatch = function(e,Lruleshift,Lrulekey) {
+    KeymanWeb['KKM'] = kbdInterface['keyMatch'] = kbdInterface.keyMatch = 
+        function(e: KeyEvent, Lruleshift:number, Lrulekey:number): boolean {
       var retVal = false; // I3318
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
@@ -294,7 +323,7 @@ if(!window['keyman']['initialized']) {
      * @param       {number}      Lstate  
      * Description  Test keystroke against state key rules
      */
-    KeymanWeb['KSM'] = kbdInterface['stateMatch'] = kbdInterface.stateMatch = function(e, Lstate) {
+    KeymanWeb['KSM'] = kbdInterface['stateMatch'] = kbdInterface.stateMatch = function(e: KeyEvent, Lstate:number) {
       return ((Lstate & e.Lstates) == Lstate);
     }
 
@@ -305,8 +334,8 @@ if(!window['keyman']['initialized']) {
      * @return      {Object}              Object with event's virtual key flag, key code, and modifiers
      * Description  Get object with extended key event information
      */    
-    KeymanWeb['KKI'] = kbdInterface['keyInformation'] = kbdInterface.keyInformation = function(e) {
-      var ei = {};
+    KeymanWeb['KKI'] = kbdInterface['keyInformation'] = kbdInterface.keyInformation = function(e: KeyEvent): KeyInformation {
+      var ei = new KeyInformation();
       ei['vk'] = e.LisVirtualKey;
       ei['code'] = e.Lcode;
       ei['modifiers'] = e.Lmodifiers;
@@ -322,7 +351,8 @@ if(!window['keyman']['initialized']) {
      * @return      {boolean}             True if deadkey found selected context matches val
      * Description  Match deadkey at current cursor position
      */    
-    KeymanWeb['KDM'] = kbdInterface['deadkeyMatch'] = kbdInterface.deadkeyMatch = function(n, Ptarg, d) {
+    KeymanWeb['KDM'] = kbdInterface['deadkeyMatch'] = kbdInterface.deadkeyMatch = 
+        function(n: number, Ptarg: HTMLElement, d: number): boolean {
       if(kbdInterface._DeadKeys.length == 0) {
         return false; // I3318
       }
@@ -330,8 +360,8 @@ if(!window['keyman']['initialized']) {
       var sp=keymanweb._SelPos(Ptarg);
       n = sp - n;
       for(var i = 0; i < kbdInterface._DeadKeys.length; i++) {
-        if(kbdInterface._DeadKeys[i].p == n  &&  kbdInterface._DeadKeys[i].d == d) {
-          kbdInterface._DeadKeys[i].matched = 1;
+        if(kbdInterface._DeadKeys[i].match(n, d)) {
+          kbdInterface._DeadKeys[i].set();
           return true; // I3318
         }
       }
@@ -345,7 +375,7 @@ if(!window['keyman']['initialized']) {
      * Scope        Public
      * Description  Reset/terminate beep or flash (not currently used: Aug 2011)
      */    
-    KeymanWeb['KBR'] = kbdInterface['beepReset'] = kbdInterface.beepReset = function() {
+    KeymanWeb['KBR'] = kbdInterface['beepReset'] = kbdInterface.beepReset = function(): void {
       kbdInterface.resetContextCache();
       
       var Lbo;
@@ -362,10 +392,10 @@ if(!window['keyman']['initialized']) {
      * @param       {Object}      Pelem     element to flash
      * Description  Flash body as substitute for audible beep
      */    
-    KeymanWeb['KB'] = kbdInterface['beep'] = kbdInterface.beep = function(Pelem) {
+    KeymanWeb['KB'] = kbdInterface['beep'] = kbdInterface.beep = function(Pelem: HTMLElement|Document): void {
       kbdInterface.resetContextCache();
       
-      if(Pelem.body) {
+      if(Pelem instanceof Document) {
         Pelem=Pelem.body; // I1446 - beep sometimes fails to flash when using OSK and rich control
       }
       
@@ -397,7 +427,7 @@ if(!window['keyman']['initialized']) {
      * @return      {boolean}           True if character found in 'any' string, sets index accordingly
      * Description  Test for character matching
      */    
-    KeymanWeb['KA'] = kbdInterface['any'] = kbdInterface.any = function(n,ch,s) {
+    KeymanWeb['KA'] = kbdInterface['any'] = kbdInterface.any = function(n: number, ch:string, s:string): boolean {
       if(ch == '') {
         return false;
       }
@@ -414,7 +444,7 @@ if(!window['keyman']['initialized']) {
      * @param       {string}      s       string to output   
      * Description  Keyboard output
      */    
-    KeymanWeb['KO'] = kbdInterface['output'] = kbdInterface.output = function(dn, Pelem, s) {
+    KeymanWeb['KO'] = kbdInterface['output'] = kbdInterface.output = function(dn: number, Pelem, s:string): void {
       kbdInterface.resetContextCache();
       
       // KeymanTouch for Android uses direct insertion of the character string
@@ -605,19 +635,16 @@ if(!window['keyman']['initialized']) {
      * @param       {number}      Pd      deadkey id
      * Description  Record a deadkey at current cursor position, deleting Pdn characters first
      */    
-    KeymanWeb['KDO'] = kbdInterface['deadkeyOutput'] = kbdInterface.deadkeyOutput = function(Pdn,Pelem,Pd) {
+    KeymanWeb['KDO'] = kbdInterface['deadkeyOutput'] = kbdInterface.deadkeyOutput = function(Pdn: number, Pelem: HTMLElement, Pd: number): void {
       kbdInterface.resetContextCache();
+
       if(Pdn >= 0) {
         kbdInterface.output(Pdn,Pelem,"");  //I3318 corrected to >=
       }
 
-      var Lc = {
-        p: keymanweb._SelPos(Pelem),
-        d: Pd
-      };
+      var Lc: Deadkey = new Deadkey(keymanweb._SelPos(Pelem), Pd);
 
-      kbdInterface._DeadKeys=keymanweb._push(kbdInterface._DeadKeys,Lc);
-      
+      kbdInterface._DeadKeys=keymanweb._push(kbdInterface._DeadKeys,Lc);      
       //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
     }
 
@@ -630,7 +657,8 @@ if(!window['keyman']['initialized']) {
      * @param       {Object}      Pelem   element to output to 
      * Description  Output a character selected from the string according to the offset in the index array
      */    
-    KeymanWeb['KIO'] = kbdInterface['indexOutput'] = kbdInterface.indexOutput = function(Pdn,Ps,Pn,Pelem) {
+    KeymanWeb['KIO'] = kbdInterface['indexOutput'] = kbdInterface.indexOutput = 
+        function(Pdn:number, Ps:string, Pn:number, Pelem:HTMLElement): void {
       kbdInterface.resetContextCache();
       if(kbdInterface._AnyIndices[Pn-1] < Ps._kmwLength()) {                        //I3319
         kbdInterface.output(Pdn,Pelem,Ps._kmwCharAt(kbdInterface._AnyIndices[Pn-1]));  //I3319
@@ -644,11 +672,14 @@ if(!window['keyman']['initialized']) {
      * @return      {Array.<string>}        List of style commands that are cacheable
      * Description  Build reate list of styles that can be applied in iframes
      */    
-    kbdInterface._CacheCommands = function(_Document) { // I1204 - style application in IFRAMEs, I2192, I2134, I2192   
+    kbdInterface._CacheCommands = function(_Document: Document): StyleCommand[] { // I1204 - style application in IFRAMEs, I2192, I2134, I2192   
       //var _CacheableBackColor=(_Document.selection?'hilitecolor':'backcolor');
+
       var _CacheableCommands=[
-        ['backcolor',1],['fontname',1],['fontsize',1],['forecolor',1],['bold',0],
-        ['italic',0],['strikethrough',0],['subscript',0],['superscript',0],['underline',0]
+        new StyleCommand('backcolor',1), new StyleCommand('fontname',1), new StyleCommand('fontsize',1), 
+        new StyleCommand('forecolor',1), new StyleCommand('bold',0), new StyleCommand('italic',0), 
+        new StyleCommand('strikethrough',0), new StyleCommand('subscript',0),
+        new StyleCommand('superscript',0), new StyleCommand('underline',0)
       ];
       if(_Document.defaultView) {
         keymanweb._push(_CacheableCommands,['hilitecolor',1]);
@@ -656,7 +687,7 @@ if(!window['keyman']['initialized']) {
         
       for(var n=0;n < _CacheableCommands.length; n++) { // I1511 - array prototype extended
         //KeymanWeb._Debug('Command:'+_CacheableCommands[n][0]);
-        keymanweb._push(_CacheableCommands[n],_CacheableCommands[n][1] ?
+        keymanweb._push(_CacheableCommands[n], _CacheableCommands[n][1] ?
             _Document.queryCommandValue(_CacheableCommands[n][0]) :
             _Document.queryCommandState(_CacheableCommands[n][0]));
       }
@@ -671,7 +702,7 @@ if(!window['keyman']['initialized']) {
      *             _func      
      * Description  Restore styles in IFRAMEs (??)
      */    
-    kbdInterface._CacheCommandsReset = function(_Document, _CacheableCommands, _func) {
+    kbdInterface._CacheCommandsReset = function(_Document: HTMLDocument, _CacheableCommands: StyleCommand[], _func: () => void): void {
       for(var n=0;n < _CacheableCommands.length; n++) { // I1511 - array prototype extended
         //KeymanWeb._Debug('ResetCacheCommand:'+_CacheableCommands[n][0]+'='+_CacheableCommands[n][2]);
         if(_CacheableCommands[n][1]) {
@@ -699,7 +730,8 @@ if(!window['keyman']['initialized']) {
      * @param       {Object}      Pelem       Currently active element (may be needed by future tests)     
      * @return      {boolean}                 True if the test succeeds 
      */       
-    KeymanWeb['KIFS'] = kbdInterface['ifStore'] = kbdInterface.ifStore = function(systemId,strValue,Pelem) {
+    KeymanWeb['KIFS'] = kbdInterface['ifStore'] = kbdInterface.ifStore = 
+        function(systemId: number, strValue:string, Pelem: HTMLElement): boolean {
       var result=true;
       if(systemId == kbdInterface.TSS_LAYER) {
         result = (osk.layerId === strValue);
@@ -765,7 +797,7 @@ if(!window['keyman']['initialized']) {
      * @return      {boolean}                 True if command succeeds
      *                                        (i.e. for TSS_LAYER, if the layer is successfully selected)
      */    
-    KeymanWeb['KSETS'] = kbdInterface['setStore'] = function(systemId,strValue,Pelem) {
+    KeymanWeb['KSETS'] = kbdInterface['setStore'] = function(systemId: number, strValue: string, Pelem:HTMLElement): boolean {
       kbdInterface.resetContextCache();
       if(systemId == kbdInterface.TSS_LAYER) {
         return osk.showLayer(strValue);     //Buld 350, osk reference now OK, so should work
@@ -782,7 +814,7 @@ if(!window['keyman']['initialized']) {
      * @param       {string}      dfltValue   default value
      * @return      {string}                  current or default option value   
      */    
-    KeymanWeb['KLOAD'] = kbdInterface['loadStore'] = function(kbdName,storeName,dfltValue) {
+    KeymanWeb['KLOAD'] = kbdInterface['loadStore'] = function(kbdName: string, storeName:string, dfltValue:string): string {
       kbdInterface.resetContextCache();
       var cName='KeymanWeb_'+kbdName+'_Option_'+storeName,cValue=util.loadCookie(cName);
       if(typeof cValue[storeName] != 'undefined') {
@@ -799,7 +831,7 @@ if(!window['keyman']['initialized']) {
      * @param       {string}      optValue    option value to save
      * @return      {boolean}                 true if save successful
      */    
-    KeymanWeb['KSAVE'] = kbdInterface['saveStore'] = function(storeName,optValue) {
+    KeymanWeb['KSAVE'] = kbdInterface['saveStore'] = function(storeName:string, optValue:string): boolean {
       kbdInterface.resetContextCache();
       var kbd=keymanweb._ActiveKeyboard;
       if(!kbd || typeof kbd['KI'] == 'undefined' || kbd['KI'] == '') {
@@ -815,25 +847,26 @@ if(!window['keyman']['initialized']) {
   /**
     * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
     */
-    KeymanWeb['GetLastActiveElement'] = function() {
+    KeymanWeb['GetLastActiveElement'] = function(): HTMLElement {
       return keymanweb._LastActiveElement; 
     }
 
-    KeymanWeb['FocusLastActiveElement'] = function() { 
+    KeymanWeb['FocusLastActiveElement'] = function(): void { 
       keymanweb._FocusLastActiveElement(); 
     }
 
     //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
-    KeymanWeb['HideHelp'] = function() {
+    KeymanWeb['HideHelp'] = function(): void {
       osk._Hide(true);
     }
 
-    KeymanWeb['ShowHelp'] = function(Px,Py) {
+    KeymanWeb['ShowHelp'] = function(Px: number, Py: number): void {
       osk._Show(Px,Py);
     }
 
-    KeymanWeb['ShowPinnedHelp'] = function() {
-      osk.userPositioned=true; osk._Show(-1,-1);
+    KeymanWeb['ShowPinnedHelp'] = function(): void {
+      osk.userPositioned=true; 
+      osk._Show(-1,-1);
     }
     
     /**
@@ -841,12 +874,14 @@ if(!window['keyman']['initialized']) {
      * Must be reset prior to each keystroke and after any text changes
      * MCD 3/1/14   
      **/         
-    kbdInterface.cachedContext = {
-      _cache: [],
-      reset: function() { 
+    class CachedContext {
+      _cache: string[][] = [];
+      
+      reset(): void { 
         this._cache = []; 
-      },
-      get: function(n, ln) { 
+      }
+
+      get(n: number, ln: number): string { 
         // return null; // uncomment this line to disable context caching
         if(typeof this._cache[n] == 'undefined') {
           return null;
@@ -854,8 +889,9 @@ if(!window['keyman']['initialized']) {
           return null;
         }
         return this._cache[n][ln];
-      },
-      set: function(n, ln, val) { 
+      }
+
+      set(n: number, ln: number, val: string): void { 
         if(typeof this._cache[n] == 'undefined') { 
           this._cache[n] = []; 
         } 
@@ -863,7 +899,9 @@ if(!window['keyman']['initialized']) {
       }
     };
 
-    kbdInterface.resetContextCache = function() {
+    kbdInterface.cachedContext = new CachedContext();
+
+    kbdInterface.resetContextCache = function(): void {
       kbdInterface.cachedContext.reset();
     }
     
@@ -873,10 +911,10 @@ if(!window['keyman']['initialized']) {
      * Scope        Private
      * Description  Clear all matched deadkey flags
      */       
-    kbdInterface._DeadkeyResetMatched = function() {                   
+    kbdInterface._DeadkeyResetMatched = function(): void {                   
       var Li, _Dk = kbdInterface._DeadKeys;
       for(Li = 0; Li < _Dk.length; Li++) {
-        _Dk[Li].matched = 0;
+        (<Deadkey>_Dk[Li]).reset();
       }
     }
 
@@ -885,7 +923,7 @@ if(!window['keyman']['initialized']) {
      * Scope        Private
      * Description  Delete matched deadkeys from context
      */       
-    kbdInterface._DeadkeyDeleteMatched = function() {              
+    kbdInterface._DeadkeyDeleteMatched = function(): void {              
       var Li, _Dk = kbdInterface._DeadKeys;
       for(Li = 0; Li < _Dk.length; Li++) {
         if(_Dk[Li].matched) {
@@ -901,7 +939,7 @@ if(!window['keyman']['initialized']) {
      * @param       {number}      Ldelta      characters to adjust by   
      * Description  Adjust saved positions of deadkeys in context
      */       
-    kbdInterface._DeadkeyAdjustPos = function(Lstart, Ldelta) {
+    kbdInterface._DeadkeyAdjustPos = function(Lstart: number, Ldelta: number): void {
       var Li, _Dk = kbdInterface._DeadKeys;
       for(Li = 0; Li < _Dk.length; Li++) {
         if(_Dk[Li].p > Lstart) {
@@ -910,7 +948,7 @@ if(!window['keyman']['initialized']) {
       }
     }
 
-    kbdInterface.clearDeadkeys = function() {
+    kbdInterface.clearDeadkeys = function(): void {
       kbdInterface._DeadKeys = [];
     }
     // I3318 - deadkey changes END
@@ -924,7 +962,7 @@ if(!window['keyman']['initialized']) {
      * Description  Encapsulates calls to keyboard input processing.
      * @returns     {number}        0 if no match is made, otherwise 1.
      */
-    kbdInterface.processKeystroke = function(device, element, keystroke) {
+    kbdInterface.processKeystroke = function(device, element: HTMLElement, keystroke:KeyEvent) {
       // Clear internal state tracking data from prior keystrokes.
       keymanweb._CachedSelectionStart = null; // I3319     
       kbdInterface._DeadkeyResetMatched();       // I3318    
