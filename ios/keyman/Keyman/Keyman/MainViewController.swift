@@ -470,7 +470,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       didDownload = false
     }
 
-    checkProfile(forKeyboardID: kb.id, languageID: kb.languageID, doListCheck: listCheck)
+    checkProfile(forFullID: kb.fullID, doListCheck: listCheck)
   }
 
   private func keyboardDownloadStarted() {
@@ -869,8 +869,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
   }
 
-  private func profileName(withKeyboardID kbID: String, languageID langID: String) -> String? {
-    guard let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withID: kbID, languageID: langID),
+  private func profileName(withFullID fullID: FullKeyboardID) -> String? {
+    guard let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withFullID: fullID),
           let font = keyboard.font else {
       return nil
     }
@@ -882,15 +882,15 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     return font.source.first { $0.lowercased().hasSuffix(FileExtensions.configurationProfile) }
   }
 
-  private func checkProfile(forKeyboardID kbID: String, languageID langID: String, doListCheck: Bool) {
-    if kbID == Defaults.keyboard.id && langID == Defaults.keyboard.languageID {
+  private func checkProfile(forFullID fullID: FullKeyboardID, doListCheck: Bool) {
+    if fullID == Defaults.keyboard.fullID {
       return
     }
     if profileName != nil {
       return  // already installing a profile
     }
 
-    guard let profile = profileName(withKeyboardID: kbID, languageID: langID) else {
+    guard let profile = profileName(withFullID: fullID) else {
       return
     }
 
@@ -906,7 +906,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     if doInstall {
       profileName = profile
-      let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withID: kbID, languageID: langID)!
+      let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withFullID: fullID)!
       let languageName = keyboard.languageName
       let title = "\(languageName) Font"
       let msg = "Touch Install to make \(languageName) display correctly in all your apps"

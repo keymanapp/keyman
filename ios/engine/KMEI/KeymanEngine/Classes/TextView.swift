@@ -133,8 +133,7 @@ public class TextView: UITextView {
       return
     }
 
-    // TODO: Get font name directly from keyboard
-    let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID)
+    let fontName = Manager.shared.fontNameForKeyboard(withFullID: kb.fullID)
     let fontSize = font?.pointSize ?? UIFont.systemFontSize
     if let fontName = fontName {
       font = UIFont(name: fontName, size: fontSize)
@@ -239,10 +238,8 @@ extension TextView: UITextViewDelegate {
     let textWD = baseWritingDirection(for: beginningOfDocument, in: .forward)
 
     let isRTL: Bool
-    if let keyboardID = Manager.shared.keyboardID,
-       let languageID = Manager.shared.languageID {
-      let keyboard = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
-      isRTL = keyboard?.isRTL ?? false
+    if let keyboard = Manager.shared.currentKeyboard {
+      isRTL = keyboard.isRTL
     } else {
       isRTL = false
     }
@@ -279,9 +276,8 @@ extension TextView: UITextViewDelegate {
     Manager.shared.keymanWebDelegate = self
 
     let fontName: String?
-    if let keyboardID = Manager.shared.keyboardID,
-       let languageID = Manager.shared.languageID {
-      fontName = Manager.shared.fontNameForKeyboard(withID: keyboardID, languageID: languageID)
+    if let id = Manager.shared.currentKeyboardID {
+      fontName = Manager.shared.fontNameForKeyboard(withFullID: id)
     } else {
       fontName = nil
     }

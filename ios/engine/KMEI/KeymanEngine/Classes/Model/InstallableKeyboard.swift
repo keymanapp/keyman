@@ -20,6 +20,10 @@ public struct InstallableKeyboard: Codable {
   public var oskFont: Font?
   public var isCustom: Bool
 
+  public var fullID: FullKeyboardID {
+    return FullKeyboardID(keyboardID: id, languageID: languageID)
+  }
+
   public init(id: String,
               name: String,
               languageID: String,
@@ -40,7 +44,7 @@ public struct InstallableKeyboard: Codable {
     self.isCustom = isCustom
   }
 
-  public init(keyboard: Keyboard, language: Language) {
+  public init(keyboard: Keyboard, language: Language, isCustom: Bool) {
     self.id = keyboard.id
     self.name = keyboard.name
     self.languageID = language.id
@@ -49,6 +53,6 @@ public struct InstallableKeyboard: Codable {
     self.isRTL = keyboard.isRTL
     self.font = keyboard.font
     self.oskFont = keyboard.oskFont
-    self.isCustom = false
+    self.isCustom = isCustom
   }
 }

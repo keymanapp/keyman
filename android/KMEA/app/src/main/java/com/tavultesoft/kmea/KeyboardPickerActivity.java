@@ -180,7 +180,7 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
   @Override
   protected void onResume() {
     super.onResume();
-    KMManager.addKeyboardDownloadEventListener(this);
+    KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     BaseAdapter adapter = (BaseAdapter) listAdapter;
     adapter.notifyDataSetChanged();
     int curKbPos = getCurrentKeyboardIndex();
@@ -234,7 +234,10 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
   @Override
   protected void onPause() {
     super.onPause();
-    KMManager.removeKeyboardDownloadEventListener(this);
+
+    // Intentionally not removing KeyboardDownloadEventListener to
+    // ensure onKeyboardDownloadFinished() gets called
+
     if (didUpdate) {
       if (KMManager.InAppKeyboard != null) {
         KMManager.InAppKeyboard.loadKeyboard();
@@ -400,7 +403,7 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
         list = (ArrayList<HashMap<String, String>>) inputStream.readObject();
         inputStream.close();
       } catch (Exception e) {
-        Log.e("Failed to read keyboards list", "Error: " + e);
+        Log.e("KeyboardPickerActivity", "Failed to read keyboards list. Error: " + e);
         list = null;
       }
     }
@@ -563,10 +566,10 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
               String languageID = keyboardsList.get(i).get(KMManager.KMKey_LanguageID);
               String keyboardID = keyboardsList.get(i).get(KMManager.KMKey_KeyboardID);
               String kbVersion = keyboardsList.get(i).get(KMManager.KMKey_KeyboardVersion);
-              String url = String.format("%slanguages/%s/%s?device=%s", KMManager.kKeymanApiBaseURL, languageID, keyboardID, deviceType);
+              String url = String.format("%slanguages/%s/%s?device=%s", KMKeyboardDownloaderActivity.kKeymanApiBaseURL, languageID, keyboardID, deviceType);
               JSONObject kbData = jsonParser.getJSONObjectFromUrl(url);
-              JSONObject language = kbData.optJSONObject(KMManager.KMKey_Language);
-              JSONArray keyboards = language.getJSONArray(KMManager.KMKey_LanguageKeyboards);
+              JSONObject language = kbData.optJSONObject(KMKeyboardDownloaderActivity.KMKey_Language);
+              JSONArray keyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
               JSONObject keyboard = keyboards.getJSONObject(0);
               String newKbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
               String kbKey = String.format("%s_%s", languageID, keyboardID);
@@ -615,10 +618,12 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
               if (KMManager.hasConnection(context)) {
                 int len = keyboardsList.size();
                 for (int i = 0; i < len; i++) {
-                  String packageID = keyboardsList.get(i).get(KMManager.KMKey_PackageID);
-                  String languageID = keyboardsList.get(i).get(KMManager.KMKey_LanguageID);
-                  String keyboardID = keyboardsList.get(i).get(KMManager.KMKey_KeyboardID);
-                  String kbKey = String.format("%s_%s", languageID, keyboardID);
+                  String pkgID = keyboardsList.get(i).get(KMManager.KMKey_PackageID);
+                  String kbID = keyboardsList.get(i).get(KMManager.KMKey_KeyboardID);
+                  String langID = keyboardsList.get(i).get(KMManager.KMKey_LanguageID);
+                  String kbKey = String.format("%s_%s", langID, kbID);
+                  String langName = keyboardsList.get(i).get(KMManager.KMKey_LanguageName);
+                  String kbName = keyboardsList.get(i).get(KMManager.KMKey_KeyboardName);
                   String kbVersion = keyboardsList.get(i).get(KMManager.KMKey_KeyboardVersion);
                   String newKbVersion = keyboardVersions.get(kbKey);
                   if (newKbVersion != null) {
@@ -631,7 +636,16 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
                         updateProgress.show();
                       }
 
-                      KMManager.KMKeyboardDownloader.download(context, packageID, keyboardID, languageID, false);
+                      Bundle bundle = new Bundle();
+                      bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
+                      bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
+                      bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
+                      bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
+                      bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
+                      bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
+                      Intent intent = new Intent(context, KMKeyboardDownloaderActivity.class);
+                      intent.putExtras(bundle);
+                      context.startActivity(intent);
                     }
                   }
                 }
@@ -702,6 +716,11 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
       String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
       String kbKey = String.format("%s_%s", languageID, keyboardID);
       int index = getKeyboardIndex(this, kbKey);
+      if (index == -1) {
+        // Add the downloaded keyboard if not found
+        addKeyboard(this, keyboardInfo);
+        index = getKeyboardIndex(this, kbKey);
+      }
       keyboardsList.set(index, keyboardInfo);
       saveKeyboardsList(this);
     } else if (result < 0) {
@@ -737,6 +756,9 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
         editor.commit();
         checkingUpdates = false;
       }
+    }
+    if (updateProgress != null && updateProgress.isShowing()) {
+      updateProgress.dismiss();
     }
   }
 }

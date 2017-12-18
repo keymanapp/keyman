@@ -47,8 +47,7 @@ extension Storage {
 
 class Storage {
   let baseDir: URL
-  let languageDir: URL
-  let fontDir: URL
+  let keyboardDir: URL
   let userDefaults: UserDefaults
 
   let kmwURL: URL
@@ -57,23 +56,19 @@ class Storage {
   private init?(baseURL: URL, userDefaults: UserDefaults) {
     guard
       let baseDir = Storage.createSubdirectory(baseDir: baseURL, name: "keyman"),
-      let languageDir = Storage.createSubdirectory(baseDir: baseDir, name: "languages"),
-      let fontDir = Storage.createSubdirectory(baseDir: baseDir, name: "fonts") else {
+      let keyboardDir = Storage.createSubdirectory(baseDir: baseDir, name: "keyboards")
+    else {
       return nil
     }
 
     self.baseDir = baseDir
-    self.languageDir = languageDir
-    self.fontDir = fontDir
+    self.keyboardDir = keyboardDir
     self.userDefaults = userDefaults
     kmwURL = baseDir.appendingPathComponent(Resources.kmwFilename)
     specialOSKFontURL = baseDir.appendingPathComponent(Resources.oskFontFilename)
   }
 
-  private static func createSubdirectory(baseDir: URL?, name: String) -> URL? {
-    guard let baseDir = baseDir else {
-      return nil
-    }
+  private static func createSubdirectory(baseDir: URL, name: String) -> URL? {
     let newDir = baseDir.appendingPathComponent(name)
     do {
       try FileManager.default.createDirectory(at: newDir,
@@ -81,8 +76,13 @@ class Storage {
                                               attributes: nil)
       return newDir
     } catch {
+      log.error("Failed to create subdirectory at \(newDir)")
       return nil
     }
+  }
+
+  func keyboardDir(forID keyboardID: String) -> URL {
+    return keyboardDir.appendingPathComponent(keyboardID)
   }
 
   func keyboardURL(for keyboard: InstallableKeyboard) -> URL {
@@ -90,11 +90,31 @@ class Storage {
   }
 
   func keyboardURL(forID keyboardID: String, version: String) -> URL {
-    return languageDir.appendingPathComponent("\(keyboardID)-\(version).js")
+    return keyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID)-\(version).js")
   }
 
-  func fontURL(forFilename filename: String) -> URL {
-    return fontDir.appendingPathComponent(filename)
+  func fontURL(forKeyboardID keyboardID: String, filename: String) -> URL {
+    return keyboardDir(forID: keyboardID).appendingPathComponent(filename)
+  }
+
+  var keyboardDirs: [URL]? {
+    let contents: [URL]
+    do {
+      contents = try FileManager.default.contentsOfDirectory(at: keyboardDir,
+                                                             includingPropertiesForKeys: [.isDirectoryKey])
+    } catch {
+      log.error("Failed to list contents at \(keyboardDir) with error \(error)")
+      return nil
+    }
+    return contents.filter { url in
+      do {
+        let values = try url.resourceValues(forKeys: [.isDirectoryKey])
+        return values.isDirectory ?? false
+      } catch {
+        log.error(error)
+        return false
+      }
+    }
   }
 }
 
@@ -103,28 +123,32 @@ extension Storage {
   func copyKMWFiles(from bundle: Bundle) throws {
     try Storage.copy(from: bundle,
                      resourceName: Resources.kmwFilename,
-                     dstDir: Storage.active.baseDir)
+                     dstDir: baseDir)
     try Storage.copy(from: bundle,
                      resourceName: "keymanios.js",
-                     dstDir: Storage.active.baseDir)
-    try Storage.copy(from: bundle,
-                     resourceName: "\(Defaults.keyboard.id)-\(Defaults.keyboard.version).js",
-                     dstDir: Storage.active.languageDir)
-    try Storage.copy(from: bundle,
-                     resourceName: "DejaVuSans.ttf",
-                     dstDir: Storage.active.fontDir)
+                     dstDir: baseDir)
     try Storage.copy(from: bundle,
                      resourceName: "kmwosk.css",
-                     dstDir: Storage.active.baseDir)
+                     dstDir: baseDir)
     try Storage.copy(from: bundle,
-                     resourceName: Resources.oskFontFilename,
-                     dstDir: Storage.active.baseDir)
+                     resourceName: "keymanweb-osk.ttf",
+                     dstDir: baseDir)
+    let defaultKeyboardDir = self.keyboardDir(forID: Defaults.keyboard.id)
+    try FileManager.default.createDirectory(at: defaultKeyboardDir, withIntermediateDirectories: true)
+    try Storage.copy(from: bundle,
+                     resourceName: "\(Defaults.keyboard.id)-\(Defaults.keyboard.version).js",
+                     dstDir: defaultKeyboardDir)
+    try Storage.copy(from: bundle,
+                     resourceName: "DejaVuSans.ttf",
+                     dstDir: defaultKeyboardDir)
   }
 
   func copyFiles(to dst: Storage) throws {
-    try Storage.copyDirectoryContents(at: baseDir, to: dst.baseDir)
-    try Storage.copyDirectoryContents(at: languageDir, to: dst.languageDir)
-    try Storage.copyDirectoryContents(at: fontDir, to: dst.fontDir)
+    if FileManager.default.fileExists(atPath: dst.baseDir.path) {
+      log.info("Deleting \(dst.baseDir) for copy from \(baseDir) to \(dst.baseDir)")
+      try FileManager.default.removeItem(at: dst.baseDir)
+    }
+    try FileManager.default.copyItem(at: baseDir, to: dst.baseDir)
   }
 
   func copyUserDefaults(to dst: Storage, withKeys keys: [String], shouldOverwrite: Bool) {
