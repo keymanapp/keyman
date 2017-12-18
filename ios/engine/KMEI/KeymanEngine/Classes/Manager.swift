@@ -908,12 +908,12 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
 
     keymanWeb.languageMenuPosition { keyFrame in
-      self.showHelpBubble(at: keyFrame.origin)
+      self.showHelpBubble(for: keyFrame)
     }
   }
 
   // TODO: The bulk of this should be moved to PopoverView
-  func showHelpBubble(at point: CGPoint) {
+  func showHelpBubble(for keyFrame: CGRect) {
     self.helpBubbleView?.removeFromSuperview()
     let helpBubbleView = PopoverView(frame: CGRect.zero)
     self.helpBubbleView = helpBubbleView
@@ -925,48 +925,24 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     let isPad = UIDevice.current.userInterfaceIdiom == .pad
     let sizeMultiplier = CGFloat(isPad ? 1.5 : 1.0)
-    let frameWidth = 90.0 * sizeMultiplier
-    let frameHeight = (40.0 + helpBubbleView.arrowHeight) * sizeMultiplier
+    let popupWidth = 90.0 * sizeMultiplier
+    let popupHeight = 40.0 * sizeMultiplier + helpBubbleView.arrowHeight
     let fontSize = 10.0 * sizeMultiplier
 
     let inputViewFrame = keymanWeb.view.frame
     let screenWidth = inputViewFrame.size.width
 
-    // TODO: Refactor this out
-    let isPortrait: Bool
-    if Util.isSystemKeyboard {
-      isPortrait = InputViewController.isPortrait
-    } else {
-      isPortrait = UIDevice.current.orientation.isPortrait
-    }
+    let x = CGFloat.maximum(0, CGFloat.minimum(screenWidth - popupWidth, keyFrame.midX - popupWidth / 2))
+    let adjY = CGFloat(3.0)  // Tweak the positioning of the popup
+    let y = keyFrame.minY - popupHeight + adjY
 
-    let adjY: CGFloat
-    if isPortrait {
-      adjY = Util.isSystemKeyboard ? 9.0 : 4.0
-    } else {
-      adjY = Util.isSystemKeyboard ? 3.0 : 4.0
-    }
-    let px = point.x
-    let py = point.y + adjY + (isPad ? 2.0 : 1.0)
-    var x = px - frameWidth / 2
-    let y = py - frameHeight
-    if x < 0 {
-      x = 0
-    } else if x + frameWidth > screenWidth {
-      x = screenWidth - frameWidth
-    }
+    helpBubbleView.frame = CGRect(x: x, y: y, width: popupWidth, height: popupHeight)
+    helpBubbleView.arrowPosX = keyFrame.midX - x
 
-    helpBubbleView.frame = CGRect(x: x, y: y, width: frameWidth, height: frameHeight)
-    if x == 0 {
-      helpBubbleView.arrowPosX = px
-    } else if x == screenWidth - frameWidth {
-      helpBubbleView.arrowPosX = (px - x)
-    } else {
-      helpBubbleView.arrowPosX = frameWidth / 2
-    }
-
-    let helpText = UILabel(frame: CGRect(x: 5, y: 0,
-                                         width: frameWidth - 10, height: frameHeight - helpBubbleView.arrowHeight))
+    let helpText = UILabel(frame: CGRect(x: 5,
+                                         y: 0,
+                                         width: popupWidth - 10,
+                                         height: popupHeight - helpBubbleView.arrowHeight))
     helpText.backgroundColor = UIColor.clear
     helpText.font = helpText.font.withSize(fontSize)
     helpText.textAlignment = .center
