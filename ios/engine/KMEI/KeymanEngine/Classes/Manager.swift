@@ -496,7 +496,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   private func downloadKeyboard(_ keyboardAPI: KeyboardAPICall) {
     let keyboard = keyboardAPI.keyboard
     let installableKeyboards = keyboard.languages!.map { language in
-      InstallableKeyboard(keyboard: keyboard, language: language)
+      InstallableKeyboard(keyboard: keyboard, language: language, isCustom: true)
     }
 
     let filename = keyboard.filename
