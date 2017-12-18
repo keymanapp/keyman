@@ -54,7 +54,7 @@ public enum Resources {
   }()
 
   public static let oskFontFilename = "keymanweb-osk.ttf"
-  static let kmwFileName = "keyboard.html"
+  static let kmwFilename = "keyboard.html"
 }
 
 public enum Util {

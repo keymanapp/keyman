@@ -103,7 +103,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   private var didSynchronize = false
   private var didResizeToOrientation = false
   private var lastKeyboardSize: CGSize = .zero
-  private var specialOSKFont: String?
+  private var useSpecialFontForSubkeys = false
 
   private let subKeyColor = #colorLiteral(red: 244.0 / 255.0, green: 244.0 / 255.0, blue: 244.0 / 255.0, alpha: 1.0)
   private let subKeyColorHighlighted = #colorLiteral(red: 136.0 / 255.0, green: 136.0 / 255.0, blue: 1.0, alpha: 1.0)
@@ -1114,6 +1114,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     self.keyFrame = keyFrame
     subKeyIDs = subkeyIDs
     subKeyTexts = subkeyTexts
+    useSpecialFontForSubkeys = useSpecialFont
   }
 
   func menuKeyDown(_ keymanWeb: KeymanWebViewController) {
@@ -1229,8 +1230,11 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         button.titleLabel?.font = UIFont.systemFont(ofSize: fontSize)
       }
 
-      if specialOSKFont != nil {
-        button.titleLabel?.font = UIFont(name: "KeymanwebOsk", size: fontSize)
+      if useSpecialFontForSubkeys {
+        if FontManager.shared.registerFont(at: Storage.active.specialOSKFontURL),
+          let fontName = FontManager.shared.fontName(at: Storage.active.specialOSKFontURL) {
+          button.titleLabel?.font = UIFont(name: fontName, size: fontSize)
+        }
         button.setTitleColor(.gray, for: .disabled)
       }
 

@@ -83,9 +83,9 @@ public class FontManager {
       didRegister = CTFontManagerRegisterFontsForURL(url as CFURL, .none, &errorRef)
       let error = errorRef?.takeRetainedValue() // Releases errorRef
       if !didRegister {
-        log.error("Failed to register font at \(url) reason: \(String(describing: error))")
+        log.error("Failed to register font \(fontName) at \(url) reason: \(String(describing: error))")
       } else {
-        log.info("Registered font at \(url)")
+        log.info("Registered font \(fontName) at \(url)")
       }
     } else {
       didRegister = false
@@ -110,11 +110,11 @@ public class FontManager {
       let didUnregister = CTFontManagerUnregisterFontsForURL(url as CFURL, .none, &errorRef)
       let error = errorRef?.takeRetainedValue() // Releases errorRef
       if didUnregister {
-        log.info("Unregistered font at \(url)")
+        log.info("Unregistered font \(font.name) at \(url)")
         font.isRegistered = false
         fonts[url] = font
       } else {
-        log.error("Failed to unregister font at \(url) reason: \(String(describing: error))")
+        log.error("Failed to unregister font \(font.name) at \(url) reason: \(String(describing: error))")
       }
     }
 

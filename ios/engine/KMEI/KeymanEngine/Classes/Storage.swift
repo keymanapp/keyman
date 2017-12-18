@@ -51,6 +51,7 @@ class Storage {
   let userDefaults: UserDefaults
 
   let kmwURL: URL
+  let specialOSKFontURL: URL
 
   private init?(baseURL: URL, userDefaults: UserDefaults) {
     guard
@@ -63,7 +64,8 @@ class Storage {
     self.baseDir = baseDir
     self.keyboardDir = keyboardDir
     self.userDefaults = userDefaults
-    kmwURL = baseDir.appendingPathComponent(Resources.kmwFileName)
+    kmwURL = baseDir.appendingPathComponent(Resources.kmwFilename)
+    specialOSKFontURL = baseDir.appendingPathComponent(Resources.oskFontFilename)
   }
 
   private static func createSubdirectory(baseDir: URL, name: String) -> URL? {
@@ -120,7 +122,7 @@ class Storage {
 extension Storage {
   func copyKMWFiles(from bundle: Bundle) throws {
     try Storage.copy(from: bundle,
-                     resourceName: Resources.kmwFileName,
+                     resourceName: Resources.kmwFilename,
                      dstDir: baseDir)
     try Storage.copy(from: bundle,
                      resourceName: "keymanios.js",
