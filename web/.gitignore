@@ -1,6 +1,7 @@
 output/
 build/
 embedded/
+node_modules/
 **/.idea/**/*.xml
 **/*.iml
 **/*.kpj.user

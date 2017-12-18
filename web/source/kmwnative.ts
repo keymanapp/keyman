@@ -82,7 +82,7 @@ if(!window['keyman']['initialized']) {
      * @param {string}  Lfilename  keyboard file name with optional prefix                     
      */   
     keymanweb.getKeyboardPath=function(Lfilename) {           
-      var rx=RegExp('^(([\.]/)|([\.][\.]/)|(/))|(:)');   
+      var rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');   
       return (rx.test(Lfilename) ? '' : keymanweb.options['keyboards']) + Lfilename;
     }
     

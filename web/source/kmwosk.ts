@@ -1759,7 +1759,7 @@ if(!window['keyman']['initialized']) {
      * @param       {Object}            e     OSK event
      * @param       {number}            v     keyboard shift state
      * @param       {(boolean|number)}  d     set (1) or clear(0) shift state bits
-     * @return                                Always true
+     * @return      {boolean}                 Always true
      * Description  Update the current shift state within KMW
      */
     osk._UpdateVKShift = function(e, v, d) {
@@ -3175,7 +3175,6 @@ if(!window['keyman']['initialized']) {
      * @param       {Object}      Lhelp       true if OSK defined for this keyboard
      * @param       {Object}      layout0 
      * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
-     * @return      Nothing
      * Description  Generates the visual keyboard element and attaches it to KMW
      */
     osk._GenerateVisualKeyboard = function(PVK,Lhelp,layout0,kbdBitmask)
@@ -3232,7 +3231,7 @@ if(!window['keyman']['initialized']) {
      *  @param  {number}          Pstatic         static keyboard flag  (unselectable elements)
      *  @param  {string=}         argFormFactor   layout form factor, defaulting to 'desktop'
      *  @param  {(string|number)=}  argLayerId    name or index of layer to show, defaulting to 'default'
-     *  @return [Object}                          DIV object with filled keyboard layer content
+     *  @return {Object}                          DIV object with filled keyboard layer content
      */
     keymanweb['BuildVisualKeyboard'] = keymanweb.buildOSK = function(PInternalName,Pstatic,argFormFactor,argLayerId)  // I777
     {
@@ -4347,7 +4346,7 @@ if(!window['keyman']['initialized']) {
       fn = fn.replace(/\u0022/g,'');
 
       // Set font family chain for mapped elements and remove any double quotes
-      var rx=new RegExp('\s?'+fn+',?'), ff=keymanweb.appliedFont.replace(/\u0022/g,'');
+      var rx=new RegExp('\\s?'+fn+',?'), ff=keymanweb.appliedFont.replace(/\u0022/g,'');
 
       // Remove base font name from chain if present
       ff = ff.replace(rx,''); ff = ff.replace(/,$/,'');

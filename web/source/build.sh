@@ -25,7 +25,7 @@ assert ( ) {
     fi
 }
 
-: ${CLOSURECOMPILERPATH:=../tools}
+: ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler}
 : ${JAVA:=java}
 
 minifier="$CLOSURECOMPILERPATH/compiler.jar"
@@ -65,11 +65,20 @@ minify ( ) {
 //# sourceMappingURL=$1.map"
 }
 
+# Ensure the dependencies are downloaded.
+echo "Node.js + dependencies check"
+npm install
+
+if [ $? -ne 0 ]; then
+    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+fi
+
 # Definition of global compile constants
 WEB_OUTPUT="../output"
 EMBED_OUTPUT="../embedded"
 INTERMEDIATE="../build"
 SOURCE="."
+NODE_SOURCE="source"
 
 readonly WEB_OUTPUT
 readonly EMBED_OUTPUT
@@ -81,7 +90,11 @@ BUILD=$BUILD_COUNTER
 
 readonly BUILD
 
-compiler=tsc
+# Ensures that we rely first upon the local npm-based install of Typescript.
+# (Facilitates automated setup for build agents.)
+PATH="../node_modules/.bin:$PATH"
+
+compiler="npm run tsc --"
 compilecmd="$compiler"
 
 # Establish default build parameters
@@ -156,7 +169,7 @@ if [ $BUILD_EMBED = true ]; then
     fi
 
     rm $EMBED_OUTPUT/keyman.js 2>/dev/null
-    $compilecmd -p $SOURCE/tsconfig.embedded.json
+    $compilecmd -p $NODE_SOURCE/tsconfig.embedded.json
     minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
     assert $EMBED_OUTPUT/keyman.js 
 
@@ -192,7 +205,7 @@ if [ $BUILD_COREWEB = true ]; then
     # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
     echo Compile Keymanweb
     rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
-    $compilecmd -p $SOURCE/tsconfig.web.json
+    $compilecmd -p $NODE_SOURCE/tsconfig.web.json
     minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
     assert $WEB_OUTPUT/keymanweb.js
 
@@ -222,7 +235,7 @@ fi
 
 if [ $BUILD_UI = true ]; then
     echo Compile UI Modules
-    $compilecmd -p $SOURCE/tsconfig.ui.json
+    $compilecmd -p $NODE_SOURCE/tsconfig.ui.json
 
     echo Minify ToolBar UI
     del $WEB_OUTPUT/kmuitoolbar.js 2>/dev/null

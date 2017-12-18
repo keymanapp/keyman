@@ -51,7 +51,7 @@
    * Force reload of resource
    * 
    *  @param  {string}  s unmodified URL
-   *  @return             modified URL
+   *  @return {string}    modified URL
    */
   util.unCached = function(s) {
     var t=(new Date().getTime());

@@ -5,11 +5,17 @@ rem
 rem Note: any changes to this script should be replicated in build.sh
 rem
 
+echo Node.js + dependencies check
+call npm install
+
+if %errorlevel% neq 0 exit %errorlevel%
+
 rem Definition of global compile constants
 set WEB_OUTPUT="..\output"
 set EMBED_OUTPUT="..\embedded"
 set INTERMEDIATE="..\build"
 set SOURCE="."
+set NODE_SOURCE="source"
 
 rem Get build version -- if not building in TeamCity, then always use 300
 
@@ -19,7 +25,7 @@ if "%BUILD_COUNTER%"=="" (
   set BUILD=%BUILD_COUNTER%
 )
 
-if "%CLOSURECOMPILERPATH%"=="" set CLOSURECOMPILERPATH=..\tools
+if "%CLOSURECOMPILERPATH%"=="" set CLOSURECOMPILERPATH=..\node_modules\google-closure-compiler
 if "%JAVA%"=="" set JAVA=java
 
 set minifier=%CLOSURECOMPILERPATH%\compiler.jar
@@ -36,8 +42,19 @@ setlocal EnableDelayedExpansion
 %=Do not remove this line=%
 )
 
-set compiler=tsc
-set compilecmd="%compiler%"
+set REL_TSC_PATH=..\node_modules\.bin
+set ABS_TSC_PATH=
+
+rem // Obtain absolute path to local Typescript installation.
+pushd %REL_TSC_PATH%
+set ABS_TSC_PATH=%CD%
+popd
+
+set PATH=%ABS_TSC_PATH%;%PATH%
+set NODE_PATH=%ABS_TSC_PATH%
+
+set compiler=npm run tsc --
+set compilecmd=%compiler%
 
 goto main
 
@@ -70,13 +87,12 @@ goto main
   set wrapper=%wrapper:"=%
   set wrapper="%wrapper%//# sourceMappingURL=%mapfile%"
 
-  echo "%intermed%\%basefile%|%intermed%\%mapfile%"
-  echo %outPath%\%mapfile%
-
+  rem The --source_map_input path argument's formatting requires double-quotes.
   %minifycmd% %defines% --source_map_input "%intermed%\%basefile%|%intermed%\%mapfile%" ^
-      --create_source_map "%outPath%\%mapfile%" --js "%intermed%\%basefile%" --compilation_level %3 ^
-      --js_output_file "%outPath%\%basefile%" --warning_level VERBOSE --output_wrapper %wrapper%
-EXIT /B 0
+      --create_source_map %outPath%\%mapfile% --js %intermed%\%basefile% --compilation_level %3 ^
+      --js_output_file %outPath%\%basefile% --warning_level VERBOSE --output_wrapper %wrapper%
+      
+  EXIT /B 0
 
 :main
 
@@ -108,7 +124,7 @@ if not exist %EMBED_OUTPUT%\resources mkdir %EMBED_OUTPUT%\resources
 endlocal
 
 del %EMBED_OUTPUT%\keyman.js 2>nul
-%compilecmd% -p %SOURCE%\tsconfig.embedded.json
+CALL %compilecmd% -p %NODE_SOURCE%\tsconfig.embedded.json
 CALL :minify "keyman.js" %EMBED_OUTPUT% SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=%BUILD%"
 if not exist %EMBED_OUTPUT%\keyman.js goto fail
 
@@ -144,7 +160,7 @@ rem Compile KeymanWeb code modules for native keymanweb use, stubbing out and re
 echo Compile Keymanweb    
 
 del %WEB_OUTPUT%\keymanweb.js 2>nul
-%compilecmd% -p %SOURCE%\tsconfig.web.json
+CALL %compilecmd% -p %NODE_SOURCE%\tsconfig.web.json || true
 CALL :minify "keymanweb.js" %WEB_OUTPUT% SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=%BUILD%"
 if not exist %WEB_OUTPUT%\keymanweb.js goto fail
 
@@ -174,7 +190,7 @@ rem Compile UI code modules (TODO: add date testing, only recompile if needed)
 
 :ui
 
-%compilecmd% -p %SOURCE%\tsconfig.ui.json
+CALL %compilecmd% -p %NODE_SOURCE%\tsconfig.ui.json
 
 echo Compile ToolBar UI
 del %WEB_OUTPUT%\kmuitoolbar.js 2>nul

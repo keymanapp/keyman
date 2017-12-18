@@ -1,0 +1,27 @@
+{
+  "name": "keyman",
+  "version": "10.0.0",
+  "description": "Facilitates text input in any language.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "keywords": [
+    "input",
+    "languages",
+    "keyboards"
+  ],
+  "author": "SIL International",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "homepage": "https://github.com/keymanapp/keyman#readme",
+  "devDependencies": {
+    "google-closure-compiler": "^20171203.0.0",
+    "typescript": "^2.6.2"
+  },
+  "scripts": {
+    "tsc": "tsc"
+  }
+}

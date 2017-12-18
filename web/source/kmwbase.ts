@@ -945,7 +945,7 @@ if(!window['keyman']['loaded']) {
      * Allow forced reload if necessary (stub only here)
      *    
      *  @param  {string}  s unmodified URL
-     *  @return             modified URL         
+     *  @return {string}    modified URL         
      */
     util.unCached = function(s)
     {

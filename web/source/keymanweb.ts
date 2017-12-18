@@ -1370,7 +1370,7 @@ if(!window['keyman']['initialized']) {
       /**
        * Function       isUniqueRequest
        * Scope          Private
-       * @param         tEntry      {object} 
+       * @param         {Object}    tEntry
        * Description    Checks to ensure that the stub isn't already loaded within KMW or subject
        *                to an already-pending request.
        */
@@ -1672,7 +1672,7 @@ if(!window['keyman']['initialized']) {
       if(typeof(sp['KN']) == 'undefined')  sp['KN'] = kp['name'];
       if(typeof(sp['KF']) == 'undefined')  
       {
-        rx=RegExp('^(([\.]/)|([\.][\.]/)|(/))|(:)');
+        rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
         sp['KF'] = kp['filename'];   
         if(!rx.test(sp['KF'])) sp['KF'] = options['keyboardBaseUri']+sp['KF'];
       } 
@@ -1684,7 +1684,7 @@ if(!window['keyman']['initialized']) {
       if(keymanweb.options['fonts'] != '') 
       {                                   
         fontPath=keymanweb.options['fonts'];      
-        rx=new RegExp('^https?\:');
+        rx=new RegExp('^https?\\:');
         if(!rx.test(fontPath)) 
         {                                                   
           if(fontPath.substr(0,2) == '//') 
@@ -1933,7 +1933,7 @@ if(!window['keyman']['initialized']) {
      * Function     _GetEventObject
      * Scope        Private   
      * @param       {Event=}     e     Event object if passed by browser
-     * @return                          Event object              
+     * @return      {Event|null}       Event object              
      * Description Gets the event object from the window when using Internet Explorer
      *             and handles getting the event correctly in frames 
      */     

@@ -666,10 +666,9 @@ if(!window['keyman']['initialized']) {
     /**
      * Function     _CacheCommandReset
      * Scope        Private
-     * @param       _Document
+     * @param       {Object} _Document
      *             _CacheableCommands
      *             _func      
-     * @return      Nothing
      * Description  Restore styles in IFRAMEs (??)
      */    
     kbdInterface._CacheCommandsReset = function(_Document, _CacheableCommands, _func) {
