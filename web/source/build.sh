@@ -29,6 +29,8 @@ assert ( ) {
 : ${JAVA:=java}
 
 minifier="$CLOSURECOMPILERPATH/compiler.jar"
+# We'd love to add the argument --source_map_include_content for distribution in the future,
+# but Closure doesn't include the TS sources properly at this time.
 minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables"
 minifycmd="$JAVA -jar $minifier $minifier_warnings"
 

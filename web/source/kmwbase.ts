@@ -1,5 +1,7 @@
 /// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="Util.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
+// Allows proper minification handling.
+/// <reference path="../node_modules/google-closure-library/closure/goog/base.js" />
 
 /***
    KeymanWeb 10.0
@@ -8,6 +10,9 @@
 
 declare var keyman: any
 var keyman = window['keyman'] || {};
+
+goog.exportSymbol("keyman", keyman);
+
 
 /** @define {number} build counter that gets set by the build environment */
 keyman.__BUILD__ = 299;
@@ -79,8 +84,8 @@ if(!window['keyman']['loaded']) {
     
     // Define public OSK, user interface and utility function objects 
 
-    var util: Util;
-    util = keymanweb['util'] = new Util(keymanweb);
+    var util: Keyman.Util;
+    util = keymanweb['util'] = new Keyman.Util(keymanweb);
     var osk: any;
     osk = keymanweb['osk'] = {ready:false};
     var ui: any;

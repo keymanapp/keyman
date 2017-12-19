@@ -3,6 +3,7 @@
 	"allowJs": true,
 	"module": "system",
 	"outDir": "../build/",
+	"inlineSources": true,
 	"sourceMap": true,
 	"target": "es5"
   }
