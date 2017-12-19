@@ -357,6 +357,8 @@ class Util {
     return Lcurleft;
   }
 
+  getAbsoluteX = this._GetAbsoluteX;
+
   /**
    * Function     getAbsoluteY
    * Scope        Public
@@ -399,6 +401,8 @@ class Util {
     return Lcurtop;
   }
 
+  getAbsoluteY = this._GetAbsoluteY;
+
   /**
    * Function     getAbsolute
    * Scope        Public
@@ -414,6 +418,8 @@ class Util {
     };
     return p;
   }
+
+  getAbsolute = this._GetAbsolute;
   
   /**
    * Select start handler (to replace multiple inline handlers) (Build 360)  
@@ -431,7 +437,7 @@ class Util {
     }
   }
   
-  _CreateElement(nodeName:string): HTMLElement { 
+  private _CreateElement(nodeName:string): HTMLElement { 
     // Needs export/preservation!
     var e = <HTMLElement>document.createElement(nodeName);
 
@@ -447,6 +453,8 @@ class Util {
     }    
     return e;
   }
+
+  createElement = this._CreateElement;
               
   /**
    * Function     getIEVersion
@@ -494,6 +502,8 @@ class Util {
   
     return 999;
   }
+
+  getIEVersion = this._GetIEVersion;
 
   /**
    * Get device horizontal DPI for touch devices, to set actual size of active regions
