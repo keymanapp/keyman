@@ -170,6 +170,8 @@ if [ $BUILD_EMBED = true ]; then
 
     rm $EMBED_OUTPUT/keyman.js 2>/dev/null
     $compilecmd -p $NODE_SOURCE/tsconfig.embedded.json
+    echo Typescript compiled.
+
     minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
     assert $EMBED_OUTPUT/keyman.js 
 
@@ -206,6 +208,8 @@ if [ $BUILD_COREWEB = true ]; then
     echo Compile Keymanweb
     rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
     $compilecmd -p $NODE_SOURCE/tsconfig.web.json
+    echo Typescript compiled.
+    
     minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
     assert $WEB_OUTPUT/keymanweb.js
 

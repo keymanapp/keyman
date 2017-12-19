@@ -4,6 +4,7 @@ interface Window {
 }
 
 interface Document {
+    parentWindow: any                   // Thanks again, IE.
     selection: any                      // Is IE only; TS ignores it because of this.
 }
 
@@ -12,6 +13,10 @@ interface Element {
     shim: HTMLElement,                  // Used in subkey elements for smooth fading.
 
     styleSheet: CSSStyleDeclaration,    // Extension of IE.  TS ignores it because of this.
+    attachEvent: any,
+    detachEvent: any,
+    unSelectable: string,
+    currentStyle: any,
 
     // Touch element extensions
     base: HTMLElement,                  // Refers to the aliased element.  Is a property of the alias.
@@ -22,5 +27,14 @@ interface Element {
 }
 
 interface CSSStyleDeclaration {
-    MozBoxSizing: any
+    MozBoxSizing: any,
+    MozUserSelect: any,
+    KhtmlUserSelect: any,
+    UserSelect: any,
+    WebkitUserSelect: any
+}
+
+interface HTMLStyleElement {
+    filter: any,                        // More IE-specific fields.
+    zoom: any
 }
