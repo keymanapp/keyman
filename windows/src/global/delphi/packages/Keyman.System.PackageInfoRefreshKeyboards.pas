@@ -79,7 +79,6 @@ function TPackageInfoRefreshKeyboards.Execute: Boolean;
 var
   i: Integer;
   k: TPackageKeyboard;
-  k0: TPackageKeyboard;
   ids: TIntegerDynArray;
   pki: TPackageKeyboardInfo;
   j: Integer;
