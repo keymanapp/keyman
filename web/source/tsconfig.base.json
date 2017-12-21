@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
 	"allowJs": true,
-	"module": "system",
+	"module": "none",
 	"outDir": "../build/",
 	"inlineSources": true,
 	"sourceMap": true,

@@ -98,21 +98,58 @@ rem Credit to https://stackoverflow.com/questions/23075953/batch-script-to-find-
 rem It's not the most efficient thing ever, but it gets the job done.  The shell script's version is WAY faster due to available tools.
 :replace_in_file
 @echo off 
-    setlocal enableextensions disabledelayedexpansion
+  setlocal enableextensions disabledelayedexpansion
 
-    set "search=%1"
-    set "replace=%2"
+  set "search=%1"
+  set "replace=%2"
 
-    set "textFile=%3"
+  set "textFile=%3"
 
-    for /f "delims=" %%i in ('type "%textFile%" ^& break ^> "%textFile%" ') do (
-        set "line=%%i"
-        setlocal enabledelayedexpansion
-        >>"%textFile%" echo(!line:%search%=%replace%!
-        endlocal
-    )
+  for /f "delims=" %%i in ('type "%textFile%" ^& break ^> "%textFile%" ') do (
+      set "line=%%i"
+      setlocal enabledelayedexpansion
+      >>"%textFile%" echo(!line:%search%=%replace%!
+      endlocal
+  )
 
-    EXIT /B 0
+  EXIT /B 0
+
+:copy_resources
+  echo 
+  echo Copy resources to %1/ui, .../osk
+
+  rem Create our entire compilation results path.  Can't one-line them due to shell-script parsing errors.
+
+  rem Extended mkdir functionality - can recursively create directories as long as command extensions are enabled.
+  rem They usually are, but... just in case.
+
+  @echo off
+  setlocal enableextensions
+  if not exist %1 mkdir %1
+  if not exist %1\ui mkdir %1\ui
+  if not exist %1\osk mkdir %1\osk
+  if not exist %1\src mkdir %1\src
+  if not exist %1\src\ui mkdir %1\src\ui
+  if not exist %1\src\osk mkdir %1\src\osk
+  endlocal
+
+  echo Copy resources to %1\ui, ...\osk
+  xcopy %SOURCE%\resources\ui\* %1\ui /E /Y  >nul
+  xcopy %SOURCE%\resources\osk\* %1\osk /E /Y  >nul
+
+  echo Copy source to %1/src
+  xcopy %SOURCE%\*.js %1\src /Y 
+  xcopy %SOURCE%\*.ts %1\src /Y
+  echo %BUILD% > %1\src\version.txt
+
+  xcopy %SOURCE%\resources\ui\* %1\src\ui /E /Y  >nul
+  xcopy %SOURCE%\resources\osk\* %1\src\osk /E /Y  >nul
+
+  rem Update build number if successful
+  echo
+  echo KeymanWeb resources saved under %1
+  echo
+  EXIT /B 0
 
 :main
 
@@ -145,6 +182,8 @@ endlocal
 
 del %EMBED_OUTPUT%\keyman.js 2>nul
 CALL %compilecmd% -p %NODE_SOURCE%\tsconfig.embedded.json
+echo Typescript compiled.
+
 CALL :minify "keyman.js" %EMBED_OUTPUT% SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=%BUILD%"
 if not exist %EMBED_OUTPUT%\keyman.js goto fail
 
@@ -164,23 +203,16 @@ if "%1" == "-embed" goto done
 
 :web
 
-rem Extended mkdir functionality - can recursively create directories as long as command extensions are enabled.
-rem They usually are, but... just in case.
-@echo off
-setlocal enableextensions
-if not exist %WEB_OUTPUT% mkdir %WEB_OUTPUT%
-if not exist %WEB_OUTPUT%\ui mkdir %WEB_OUTPUT%\ui
-if not exist %WEB_OUTPUT%\osk mkdir %WEB_OUTPUT%\osk
-if not exist %WEB_OUTPUT%\src mkdir %WEB_OUTPUT%\src
-if not exist %WEB_OUTPUT%\src\ui mkdir %WEB_OUTPUT%\src\ui
-if not exist %WEB_OUTPUT%\src\osk mkdir %WEB_OUTPUT%\src\osk
-endlocal
-
 rem Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
-echo Compile Keymanweb    
+echo Compile Keymanweb...   
 
 del %WEB_OUTPUT%\keymanweb.js 2>nul
 CALL %compilecmd% -p %NODE_SOURCE%\tsconfig.web.json || true
+echo Typescript compiled.
+
+call :copy_resources %INTERMEDIATE%
+
+echo Minifying KeymanWeb...
 CALL :minify "keymanweb.js" %WEB_OUTPUT% SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=%BUILD%"
 if not exist %WEB_OUTPUT%\keymanweb.js goto fail
 
@@ -188,16 +220,7 @@ if "%1" == "-test" goto done
 
 rem Update any changed resources
 
-echo Copy resources to %WEB_OUTPUT%\ui, ...\osk
-xcopy %SOURCE%\resources\ui\* %WEB_OUTPUT%\ui /E /Y  >nul
-xcopy %SOURCE%\resources\osk\* %WEB_OUTPUT%\osk /E /Y  >nul
-
-echo Copy source to %WEB_OUTPUT%\src
-xcopy %SOURCE%\*.js %WEB_OUTPUT%\src /Y 
-xcopy %SOURCE%\*.ts %WEB_OUTPUT%\src /Y
-echo %BUILD% > %WEB_OUTPUT%\src\version.txt
-xcopy %SOURCE%\resources\ui\* %WEB_OUTPUT%\src\ui /E /Y  >nul
-xcopy %SOURCE%\resources\osk\* %WEB_OUTPUT%\src\osk /E /Y  >nul
+call :copy_resources %WEB_OUTPUT%
 
 rem Update build number if successful
 echo.
@@ -210,24 +233,25 @@ rem Compile UI code modules (TODO: add date testing, only recompile if needed)
 
 :ui
 
+echo Compile UI Modules...
 CALL %compilecmd% -p %NODE_SOURCE%\tsconfig.ui.json
 
-echo Compile ToolBar UI
+echo Minify ToolBar UI
 del %WEB_OUTPUT%\kmuitoolbar.js 2>nul
 CALL :minify "kmwuitoolbar.js" %WEB_OUTPUT% ADVANCED_OPTIMIZATIONS "" "(function() {%%%%output%%%%}());"
 if not exist %WEB_OUTPUT%\kmwuitoolbar.js goto fail
 
-echo Compile Toggle UI
+echo Minify Toggle UI
 del %WEB_OUTPUT%\kmuitoggle.js 2>nul
 CALL :minify "kmwuitoggle.js" %WEB_OUTPUT% SIMPLE_OPTIMIZATIONS "" "(function() {%%%%output%%%%}());"
 if not exist %WEB_OUTPUT%\kmwuitoggle.js goto fail
 
-echo Compile Float UI
+echo Minify Float UI
 del %WEB_OUTPUT%\kmuifloat.js 2>nul
 CALL :minify "kmwuifloat.js" %WEB_OUTPUT% ADVANCED_OPTIMIZATIONS "" "(function() {%%%%output%%%%}());"
 if not exist %WEB_OUTPUT%\kmwuifloat.js goto fail
 
-echo Compile Button UI
+echo Minify Button UI
 del %WEB_OUTPUT%\kmuibutton.js 2>nul
 CALL :minify "kmwuibutton.js" %WEB_OUTPUT% ADVANCED_OPTIMIZATIONS "" "(function() {%%%%output%%%%}());"
 if not exist %WEB_OUTPUT%\kmwuibutton.js goto fail

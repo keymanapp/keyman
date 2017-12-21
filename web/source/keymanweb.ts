@@ -4215,7 +4215,9 @@ if(!window['keyman']['initialized']) {
       keymanweb.setDefaultDeviceOptions(opt);   
       
       // Only do remainder of initialization once!  
-      if(keymanweb['initialized']) return;
+      if(keymanweb.initialized) {
+        return;
+      }
 
       // Do not initialize until the document has been fully loaded
       if(document.readyState !== 'complete')
@@ -4245,7 +4247,7 @@ if(!window['keyman']['initialized']) {
         window.removeEventListener('focus', keymanweb._BubbledFocus, true);
     
       // Set exposed initialization flag member for UI (and other) code to use 
-      keymanweb['initialized'] = 1;
+      keymanweb.setInitialized(1);
   
       // Finish keymanweb and OSK initialization once all necessary resources are available
       osk.prepare();
@@ -4406,7 +4408,7 @@ if(!window['keyman']['initialized']) {
       new MutationObserver(keymanweb._EnablementMutationObserverCore).observe(observationTarget, observationConfig);
 
       // Set exposed initialization flag to 2 to indicate deferred initialization also complete
-      keymanweb['initialized']=2;
+      keymanweb.setInitialized(2);
     }
 
     keymanweb._EnablementMutationObserverCore = function(mutations) {
