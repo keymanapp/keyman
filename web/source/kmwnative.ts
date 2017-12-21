@@ -40,7 +40,7 @@ if(!window['keyman']['initialized']) {
       // Keyboards loaded with page are initialized before the page is ready,
       // so cannot use the wait indicater (and don't need it, anyway)
       // Do not display if a blocking cloud server error has occurred (to prevent multiple errors)
-      var bg=keymanweb.waiting;
+      var bg=this.waiting;
       if(typeof(bg) == 'undefined' || bg == null || keymanweb.warned) {
         return;
       }

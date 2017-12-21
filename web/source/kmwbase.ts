@@ -2,6 +2,7 @@
 /// <reference path="kmwexthtml.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwutils.ts" />
+/// <reference path="kmwcallback.ts" />
 
 /***
    KeymanWeb 10.0
@@ -9,6 +10,8 @@
 ***/
 
 declare var keyman: any
+declare var KeymanWeb: any
+
 var keyman = window['keyman'] || {};
 window['keyman'] = keyman; // To preserve the name _here_ in case of minification.
 
@@ -43,7 +46,6 @@ class KeymanBase {
   deferredStubs = [];        // Array of pending keyboard stubs from addKeyboard(), to register after initialization
   deferredKRS = [];          // Array of pending keyboard stubs from KRS, to register afterf initialization
   deferredKR = [];           // Array of pending keyboards, to be installed at end of initialization
-  waiting = null;            // Element displayed during keyboard load time
   warned = false;            // Warning flag (to prevent multiple warnings)
   baseFont = 'sans-serif';   // Default font for mapped input elements
   appliedFont = '';          // Chain of fonts to be applied to mapped input elements
@@ -74,6 +76,7 @@ class KeymanBase {
   util: Util;
   osk: any;
   ui: any;
+  interface: KeyboardInterface;
 
   // Defines option-tracking object as a string map.
   options: { [name: string]: string; } = {
@@ -85,24 +88,13 @@ class KeymanBase {
     'ui':null
   };;
 
-  // Stub functions (defined later in code only if required)
-  setDefaultDeviceOptions(opt){}     
-  getStyleSheetPath(s){return s;}
-  getKeyboardPath(f, p){return f;}
-  KC_(n, ln, Pelem){return '';} 
-  handleRotationEvents(){}
-  alignInputs(b){}
-
-  setInitialized(val: number) {
-    this.initialized = this['initialized'] = val;
-  }
-
-  refreshElementContent = null;
-
   // -------------
 
   constructor() {
     this.util = this['util'] = new Util(this);
+    window['KeymanWeb'] = this.interface = this['interface'] = new KeyboardInterface(this);
+
+    this.osk = {ready:false}; // Temporary.
 
     // Load properties from their static variants.
     this.__BUILD__ = KeymanBase.__BUILD__;
@@ -128,6 +120,62 @@ class KeymanBase {
   isFontAvailable(fName: string): boolean {
     return this.util.checkFont({'family':fName});
   }
+
+  /**
+  * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
+  */
+  getLastActiveElement(): HTMLElement {
+    return this._LastActiveElement; 
+  }
+
+  focusLastActiveElement(): void { 
+    (<any>this)._FocusLastActiveElement(); 
+  }
+
+  //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
+  hideHelp(): void {
+    this.osk._Hide(true);
+  }
+
+  showHelp(Px: number, Py: number): void {
+    this.osk._Show(Px,Py);
+  }
+
+  showPinnedHelp(): void {
+    this.osk.userPositioned=true; 
+    this.osk._Show(-1,-1);
+  }
+
+  // Stub functions (defined later in code only if required)
+  setDefaultDeviceOptions(opt){}     
+  getStyleSheetPath(s){return s;}
+  getKeyboardPath(f, p){return f;}
+  KC_(n, ln, Pelem){return '';} 
+  handleRotationEvents(){}
+  alignInputs(b){}
+
+  /**
+   * Function     _push
+   * Scope        Private   
+   * @param       {Array}     Parray    Array   
+   * @param       {*}         Pval      Value to be pushed or appended to array   
+   * @return      {Array}               Returns extended array
+   * Description  Push (if possible) or append a value to an array 
+   */  
+  _push<T>(Parray: T[], Pval: T) {
+    if(Parray.push) {
+      Parray.push(Pval);
+    } else {
+      Parray=Parray.concat(Pval);
+    }
+    return Parray;
+  }
+
+  setInitialized(val: number) {
+    this.initialized = this['initialized'] = val;
+  }
+
+  refreshElementContent = null;
 }
 
 /**
@@ -158,27 +206,18 @@ KeymanBase.__BUILD__ = keyman.__BUILD__;
 if(!window['keyman']['loaded']) {
 
   (function() {
+    /* We only recreate the 'keyman' object if it's not been loaded.
+     * As this is the base object, not creating it prevents a KMW system reset.
+     */
+
     var keymanweb = window['keyman'] = new KeymanBase();
     
     // Define public OSK, user interface and utility function objects 
 
     var osk: any;
-    osk = keymanweb['osk'] = {ready:false};
+    osk = keymanweb['osk'];
     var ui: any;
     ui = keymanweb['ui'] = {};
-    
-    var kbdInterface = keymanweb['interface'] = {
-      // Cross-reference with /windows/src/global/inc/Compiler.h - these are the Developer codes for the respective system stores.
-      // They're named here identically to their use in that header file.
-      TSS_LAYER: 33,
-      TSS_PLATFORM: 31,
-
-      _AnyIndices: [],        // AnyIndex - array of any/index match indices
-      _BeepObjects: [],       // BeepObjects - maintains a list of active 'beep' visual feedback elements
-      _BeepTimeout: 0,        // BeepTimeout - a flag indicating if there is an active 'beep'. 
-                              // Set to 1 if there is an active 'beep', otherwise leave as '0'.
-      _DeadKeys: []           // DeadKeys - array of matched deadkeys
-    };
     
     osk.highlightSubKeys = function(k,x,y){}
     osk.createKeyTip = function(){}

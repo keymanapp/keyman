@@ -1958,21 +1958,6 @@ if(!window['keyman']['initialized']) {
       }
       return e;    
     }
-
-    /**
-     * Function     _push
-     * Scope        Private   
-     * @param       {Array}     Parray    Array   
-     * @param       {*}         Pval      Value to be pushed or appended to array   
-     * @return      {Array}               Returns extended array
-     * Description  Push (if possible) or append a value to an array 
-     */  
-    keymanweb._push = function(Parray, Pval)
-    {
-      if(Parray.push) Parray.push(Pval);
-      else Parray=Parray.concat(Pval);
-      return Parray;
-    }
     
     /**
      * Function     attachToControl

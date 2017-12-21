@@ -108,7 +108,10 @@ class Device {
 class Util {
   // Generalized component event registration
   device: Device;
+  activeDevice: Device;
   physicalDevice: Device;
+
+  waiting: HTMLDivElement;                  // The element displayed for util.wait and util.alert.
 
   // An object mapping event names to individual event lists.  Maps strings to arrays.
   private events: { [name: string]: ((Object) => boolean)[];} = {};
@@ -129,6 +132,7 @@ class Util {
   initDevices(): void {
     this.device = new Device();
     this.physicalDevice = new Device();
+    this.activeDevice = this.device;
 
     // Initialize the true device values.
     this.device.detect(this._GetIEVersion());
@@ -1108,11 +1112,12 @@ class Util {
    * @param     {function()=}   fn      function to call when alert dismissed
    */       
   alert(s: string, fn: () => void): void {
-    var bg = this.keyman.waiting, nn=bg.firstChild.childNodes;
-    nn[0].style.display='block';
-    nn[1].className='kmw-alert-text'; 
-    nn[1].innerHTML=s;
-    nn[2].style.display='none';
+    var bg = this.waiting;
+    var nn=bg.firstChild.childNodes;
+    (<HTMLElement>nn[0]).style.display='block';
+    (<HTMLElement>nn[1]).className='kmw-alert-text'; 
+    (<HTMLElement>nn[1]).innerHTML=s;
+    (<HTMLElement>nn[2]).style.display='none';
     bg.style.display='block';
     if(arguments.length > 1) {
       bg.dismiss=fn;
@@ -1126,7 +1131,7 @@ class Util {
    *  Should not be called before options are defined during initialization
    **/           
   prepareWait(): void { 
-    var bg=document.createElement('DIV'),
+    var bg: HTMLDivElement = <HTMLDivElement>document.createElement('DIV'),
         lb=document.createElement('DIV'),
         lt=document.createElement('DIV'),    
         gr=document.createElement('DIV'),
@@ -1162,7 +1167,7 @@ class Util {
     lb.appendChild(gr);
     bg.appendChild(lb);
     document.body.appendChild(bg);
-    this.keyman.waiting=bg;    
+    this.waiting=bg;    
   }
 
   /**
