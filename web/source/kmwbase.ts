@@ -24,7 +24,6 @@ class KeymanBase {
   _IgnoreNextSelChange = 0;  // when a visual keyboard key is mouse-down, ignore the next sel change because this stuffs up our history  
   _Selection = null;
   _SelectionControl = null;
-  dfltStub = null;           // First keyboard stub loaded - default for touch-screen devices, ignored on desktops
   _AttachedElements = [];    // I1596 - attach to controls dynamically
   _ActiveElement = null;     // Currently active (focused) element  I3363 (Build 301)
   _LastActiveElement = null; // LastElem - Last active element
@@ -36,8 +35,6 @@ class KeymanBase {
   resizing = false;          // Flag to control resize events when resetting viewport parameters
   sortedInputs = [];         // List of all INPUT and TEXTAREA elements ordered top to bottom, left to right
   inputList = [];            // List of simulated input divisions for touch-devices   I3363 (Build 301)
-  deferredKRS = [];          // Array of pending keyboard stubs from KRS, to register afterf initialization
-  deferredKR = [];           // Array of pending keyboards, to be installed at end of initialization
   waiting = null;            // Element displayed during keyboard load time
   warned = false;            // Warning flag (to prevent multiple warnings)
   baseFont = 'sans-serif';   // Default font for mapped input elements

@@ -1277,23 +1277,19 @@ if(!window['keyman']['initialized']) {
     /**
      * Indicate the current language and keyboard on the space bar
      **/
-    osk.showLanguage = function()
-    {
+    osk.showLanguage = function() {
       var lgName='',kbdName='';
+      var activeStub = keymanweb.keyboardManager.activeStub;
 
-      if((<KeymanBase>keymanweb).keyboardManager.activeStub)
-      {
-        lgName=(<KeymanBase>keymanweb).keyboardManager.activeStub['KL'];
-        kbdName=(<KeymanBase>keymanweb).keyboardManager.activeStub['KN'];
-      }
-      else if(keymanweb._ActiveLanguage)
-      {
+      if(activeStub) {
+        lgName=activeStub['KL'];
+        kbdName=activeStub['KN'];
+      } else if(keymanweb._ActiveLanguage) {
         lgName=keymanweb._ActiveLanguage['KN'];
-      }
-      else
-      {
+      } else {
         lgName='English';
       }
+
       try
       {
         var t=osk.spaceBar.firstChild.firstChild;
@@ -3243,14 +3239,14 @@ if(!window['keyman']['initialized']) {
           formFactor=(typeof(argFormFactor) == 'undefined' ? 'desktop' : argFormFactor),
           layerId=(typeof(argLayerId) == 'undefined' ? 'default' : argLayerId);
 
-      if(PInternalName != null)
-      {
+      var keyboardsList = keymanweb.keyboardManager.keyboards;
+
+      if(PInternalName != null) {
         var p=PInternalName.toLowerCase().replace('keyboard_','');
-        for(Ln=0; Ln<keymanweb.keyboardManager.keyboards.length; Ln++)
-        {
-          if(p == keymanweb.keyboardManager.keyboards[Ln]['KI'].toLowerCase().replace('keyboard_',''))
-          {
-            PKbd=keymanweb.keyboardManager.keyboards[Ln]; break;
+
+        for(Ln=0; Ln<keyboardsList.length; Ln++) {
+          if(p == keyboardsList[Ln]['KI'].toLowerCase().replace('keyboard_','')) {
+            PKbd=keyboardsList[Ln]; break;
           }
         }
       }
@@ -4306,17 +4302,21 @@ if(!window['keyman']['initialized']) {
      *  or to re-apply the default element font
      *
      **/
-    osk.appendStyleSheet = function()
-    {
+    osk.appendStyleSheet = function() {
       var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
+      var activeStub: KeyboardStub = keymanweb.keyboardManager.activeStub;
 
       // Do not do anything if a null stub
-      if((<KeymanBase>keymanweb).keyboardManager.activeStub == null) return;
+      if(activeStub == null) {
+        return;
+      }
 
       // First remove any existing keyboard style sheet
-      if(osk.styleSheet) util.removeStyleSheet(osk.styleSheet);
+      if(osk.styleSheet) {
+        util.removeStyleSheet(osk.styleSheet);
+      }
 
-      var i,ks=(<KeymanBase>keymanweb).keyboardManager.activeStub,kfd=ks['KFont'],ofd=ks['KOskFont'];
+      var i, kfd=activeStub['KFont'], ofd=activeStub['KOskFont'];
 
       // Add style sheets for embedded fonts if necessary (each font-face style will only be added once)
       util.addFontFaceStyleSheet(kfd); util.addFontFaceStyleSheet(ofd);
