@@ -44,9 +44,14 @@ class KeyboardManager {
 
   activeStub: KeyboardStub = null;
   keyboardStubs: KeyboardStub[] = [];
+  deferredStubs: any[] = []; // The list of user-provided keyboard stub registration objects.
 
   activeKeyboard: any; // We might can define a more precise def, though...
   keyboards: any[] = [];
+
+  
+  languageList: any[] = null; // List of keyboard languages available for KeymanCloud
+  languagesPending: any[] = [];     // Array of languages waiting to be registered
 
   constructor(kmw: KeymanBase) {
     this.keymanweb = kmw;
@@ -613,4 +618,384 @@ class KeyboardManager {
 
     return null;
   }
+
+  /* ------------------------------------------------------------
+   *  Definitions for adding, removing, and requesting keyboards.
+   *  ------------------------------------------------------------ 
+   */
+
+  /**
+   * Function       isUniqueRequest
+   * Scope          Private
+   * @param         {Object}    tEntry
+   * Description    Checks to ensure that the stub isn't already loaded within KMW or subject
+   *                to an already-pending request.
+   */
+  isUniqueRequest(cloudList: {id: string, language?: string}[], tEntry: {id: string, language?: string}) {
+    var k;
+
+    if(this.findStub(tEntry.id, tEntry.language) == null) {
+      for(k=0; k < cloudList.length; k++) {
+        if(cloudList[k].id == tEntry['id'] && cloudList[k].language == tEntry.language) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  /**
+   * Build 362: addKeyboardArray() link to Cloud. One or more arguments may be used
+   * 
+   * @param {string|Object} x keyboard name string or keyboard metadata JSON object
+   * 
+   */  
+  addKeyboardArray(x: any[]): void {
+    // Store all keyboard meta-data for registering later if called before initialization
+    if(!this.keymanweb.initialized) {
+      for(var k=0; k<x.length; k++) {
+        this.deferredStubs.push(x[k]);
+      }
+      return;
+    }
+
+    // Ignore empty array passed as argument
+    if(x.length == 0) {
+      return;
+    }
+  
+    // Create a temporary array of metadata objects from the arguments used
+    var i,j,kp,kbid,lgid,kvid,cmd='',comma='';
+    var cloudList: {
+      id: string;
+      language?: string;
+      version?: string;
+    }[] = [];
+
+    var tEntry: {
+      id: string;
+      language?: string;
+      version?: string;
+    }
+
+    for(i=0; i<x.length; i++) {
+      if(typeof(x[i]) == 'string' && (<string>x[i]).length > 0) {
+        var pList=(<string>x[i]).split('@'),lList=[''];
+        if(pList[0].toLowerCase() == 'english') {
+          pList[0] = 'us';
+        }
+
+        if(pList.length > 1) {
+          lList=pList[1].split(',');
+        }
+
+        for(j=0; j<lList.length; j++) {
+          tEntry={
+            id: pList[0]
+          };
+          if(lList[j] != '') {
+            tEntry.language=lList[j];
+          }
+          if(pList.length > 2) {
+            tEntry.version=pList[2];
+          }
+
+          // If we've already registered or requested a stub for this keyboard-language pairing,
+          // don't bother with a cloud request.
+          if(this.isUniqueRequest(cloudList, tEntry)) {
+            cloudList.push(tEntry);
+          }
+        }
+      }
+      if(typeof(x[i]) == 'object' && x[i] != null) {
+        // Register any local keyboards immediately:
+        // - must specify filename, keyboard name, language codes, region codes
+        // - no request will be sent to cloud
+        var stub: KeyboardStub = <KeyboardStub> x[i];
+
+        if(typeof(x[i]['filename']) == 'string') {                                                   
+          if(!this.addStub(x[i])) {
+            alert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');
+          }
+        } else {
+          if(x[i]['language']) {
+            console.warn("The 'language' property for keyboard stubs has been deprecated.  Please use the 'languages' property instead.");
+            x[i]['languages'] = x[i]['language'];
+          }
+
+          lList=x[i]['languages'];
+              
+          //Array or single entry?
+          if(typeof(lList.length) == 'number') {
+            for(j=0; j<lList.length; j++) {
+              tEntry = {id:x[i]['id'],language:x[i]['languages'][j]['id']};
+              if(this.isUniqueRequest(cloudList, tEntry)) {
+                cloudList.push(tEntry);
+              }
+            }
+          } else { // Single language element
+            tEntry = {id:x[i]['id'],language:x[i]['languages'][j]['id']};
+            if(this.isUniqueRequest(cloudList, tEntry)) {
+              cloudList.push(tEntry);
+            }
+          }
+        }
+      }
+    }
+    
+    // Return if all keyboards being registered are local and fully specified
+    if(cloudList.length == 0) {
+      return;
+    }
+
+    // Update the keyboard metadata list from keyman.com - build the command
+    cmd='&keyboardid=';
+    for(i=0; i<cloudList.length; i++) {      
+      kp=cloudList[i];
+      kbid=kp['id']; lgid=''; kvid='';  
+      if(typeof(kp['language']) == 'string' && kp['language'] != '') {
+        lgid=kp['language'];
+      }
+      if(typeof(kp['version']) == 'string' && kp['version'] != '') {
+        kvid=kp['version'];
+      }
+      if(lgid != '') {
+        kbid=kbid+'@'+lgid;
+        if(kvid != '') {
+          kbid=kbid+'@'+kvid;
+        }
+      } else {
+        if(kvid != '') {
+          kbid=kbid+'@@'+kvid;
+        }
+      }
+
+      //TODO: add specifier validation...        
+              
+      cmd=cmd+comma+kbid;
+      comma=',';
+    }  
+    
+    // Request keyboard metadata from the Keyman Cloud keyboard metadata server
+    this.keymanCloudRequest(cmd,false);
+  }
+
+  /** 
+   *  Register a keyboard for each associated language
+   *  
+   *  @param  {Object}  kp  Keyboard Object or Object array      
+   *  @param  {Object}  options   keymanCloud callback options
+   *  @param  {number}  nArg  keyboard index in argument array   
+   *       
+   **/   
+  registerLanguagesForKeyboard(kp, options, nArg:number) {
+    var i,j,id,nDflt=0,kbId='';
+    
+    // Do not attempt to process badly formatted requests
+    if(typeof(kp) == 'undefined') {
+      return;
+    }
+    
+    if(typeof(options['keyboardid']) == 'string') {
+      kbId = options['keyboardid'].split(',')[nArg];
+    }
+
+    // When keyboards requested by language code, several keyboards may be returned as an array
+    if(typeof(kp.length) == 'number') {
+      // If language code is suffixed by $, register all keyboards for this language
+      if(kp.length == 1 || kbId.substr(-1,1) == '$' || kbId == '') {      
+        for(i=0; i<kp.length; i++) {
+          this.registerLanguagesForKeyboard(kp[i],options,nArg);
+        }
+      }
+      // Register the default keyboard for the language code
+      // Until a default is defined, the default will be the Windows keyboard, 
+      // that is, the keyboard named for the language (exception: English:US), or the
+      // first keyboard found.
+      else {
+        for(i=0; i<kp.length; i++) {
+          id=kp[i].id.toLowerCase();
+          if(id == 'us') {
+            id='english';
+          }
+
+          for(j=0; j<kp[i]['languages'].length; j++) {
+            if(id == kp[i]['languages'][j]['name'].toLowerCase()) {
+              nDflt = i;
+              break;
+            }
+          }          
+        }
+
+        this.registerLanguagesForKeyboard(kp[nDflt],options,nArg);
+      }
+    } else { // Otherwise, process a single keyboard for the specified languages 
+      // May need to filter returned stubs by language
+      var lgCode=kbId.split('@')[1];
+      if(typeof(lgCode) == 'string') {
+        lgCode=lgCode.replace(/\$$/,'');
+      }
+      
+      // Can only add keyboard stubs for defined languages
+      var ll=kp['languages'];
+      if(typeof(ll) != 'undefined') {
+        if(typeof(ll.length) == 'number') {
+          for(i=0; i<ll.length; i++) {
+            if(typeof(lgCode) == 'undefined' || ll[i]['id'] == lgCode) {
+              this.mergeStub(kp,ll[i],options);
+            }
+          }
+        } else {
+          this.mergeStub(kp,ll,options);
+        }
+      }
+    }                              
+  }
+
+  /**
+   * Call back from cloud for adding keyboard metadata
+   * 
+   * @param {Object}    x   metadata object
+   **/                  
+  register(x) {
+    var options=x['options'];
+  
+    // Always clear the timer associated with this callback
+    if(x['timerid']) {
+      window.clearTimeout(x['timerid']);
+    }
+    
+    // Indicate if unable to register keyboard
+    if(typeof(x['error']) == 'string') {
+      var badName='';
+      if(typeof(x['keyboardid']) == 'string') {
+        badName = x['keyboardid'].substr(0,1).toUpperCase()+x['keyboardid'].substr(1);
+      }
+
+      (<any>this.keymanweb).serverUnavailable(badName+' keyboard not found.');
+      return;
+    }
+    
+    // Ignore callback unless the context is defined
+    if(typeof(options) == 'undefined' || typeof(options['context']) == 'undefined') {
+      return;
+    }
+
+    // Register each keyboard for the specified language codes
+    if(options['context'] == 'keyboard') {
+      var i,kp=x['keyboard'];
+      // Process array of keyboard definitions
+      if(typeof(kp.length) == 'number') {
+        for(i=0; i<kp.length; i++) {
+          this.registerLanguagesForKeyboard(kp[i],options,i);
+        }
+      } else { // Process a single keyboard definition
+        this.registerLanguagesForKeyboard(kp,options,0);
+      }
+    } else if(options['context'] == 'language') { // Download the full list of supported keyboard languages
+      this.languageList = x['languages'];
+      if(this.languagesPending) {
+        this.addLanguageKeyboards(this.languagesPending);
+      }
+      this.languagesPending = [];      
+    }
+  }
+
+  /**
+   *  Add default or all keyboards for a given language
+   *  
+   *  @param  {Object}   languages    Array of language names
+   **/           
+  addLanguageKeyboards(languages) {
+    var i, j, lgName, cmd, first, addAll;
+    
+    // Defer registering keyboards by language until the language list has been loaded
+    if(this.languageList == null) {                       
+      first = (this.languagesPending.length == 0);
+
+      for(i=0; i<languages.length; i++) {
+        this.languagesPending.push(languages[i]);
+      }
+
+      if(first) {
+        this.keymanCloudRequest('',true);
+      }   
+    } else { // Identify and register each keyboard by language name
+      cmd = '';
+      for(i=0; i<languages.length; i++) {
+        lgName = languages[i].toLowerCase();
+        addAll = (lgName.substr(-1,1) == '$'); 
+        if(addAll) {
+          lgName = lgName.substr(0,lgName.length-1);
+        }
+
+        for(j=0; j<this.languageList.length; j++) {
+          if(lgName == this.languageList[j]['name'].toLowerCase()) {
+            if(cmd != '') {
+              cmd = cmd + ',';
+            }
+
+            cmd = cmd+'@'+this.languageList[j]['id'];
+            if(addAll) {
+              cmd = cmd + '$';
+            }
+
+            break;
+          }
+        }
+      }
+
+      if(cmd == '') {
+        this.keymanweb.util.alert('No keyboards are available for '+languages[0]+'. '
+          +'Does it have another language name?');
+      } else {
+        this.keymanCloudRequest('&keyboardid='+cmd,false);
+      }
+    }
+  }
+
+  /**
+   *  Request keyboard metadata from the Keyman Cloud keyboard metadata server
+   *   
+   *  @param  {string}   cmd        command string
+   *  @param  {boolean?} byLanguage if true, context=languages, else context=keyboards 
+   **/
+  keymanCloudRequest(cmd: string, byLanguage?: boolean) {         
+    var URL='https://r.keymanweb.com/api/4.0/', tFlag, 
+      Lscript = <HTMLScriptElement> this.keymanweb.util._CreateElement('SCRIPT');
+    
+    URL = URL + ((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards')
+      +'?jsonp=keyman.register';  
+    
+    // Set callback timer
+    tFlag='&timerid='+window.setTimeout(
+      function(){
+        this.serverUnavailable(cmd);
+      }
+      ,10000);    
+  
+    Lscript.charset="UTF-8";                     
+    Lscript.src = URL+cmd+tFlag;       
+    Lscript.type = 'text/javascript';       
+    try {                                  
+      document.body.appendChild(Lscript);  
+      }
+    catch(ex) {                                                     
+      document.getElementsByTagName('head')[0].appendChild(Lscript);
+      }                  
+  }
+
+  /**
+   *  Display warning if Keyman Cloud server fails to respond
+   * 
+   *  @param  {string}  cmd command string sent to Cloud
+   *          
+   **/       
+  private serverUnavailable(cmd) {
+    this.keymanweb.util.alert(cmd == '' ? 'Unable to connect to Keyman Cloud server!' : cmd);
+    this.keymanweb.warned=true;
+  }  
+
 }

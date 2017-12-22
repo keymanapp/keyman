@@ -36,9 +36,6 @@ class KeymanBase {
   resizing = false;          // Flag to control resize events when resetting viewport parameters
   sortedInputs = [];         // List of all INPUT and TEXTAREA elements ordered top to bottom, left to right
   inputList = [];            // List of simulated input divisions for touch-devices   I3363 (Build 301)
-  languageList = null;       // List of keyboard languages available for KeymanCloud
-  languagesPending = [];     // Array of languages waiting to be registered
-  deferredStubs: Object[] = [];        // Array of pending keyboard stubs from addKeyboard(), to register after initialization
   deferredKRS = [];          // Array of pending keyboard stubs from KRS, to register afterf initialization
   deferredKR = [];           // Array of pending keyboards, to be installed at end of initialization
   waiting = null;            // Element displayed during keyboard load time

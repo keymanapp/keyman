@@ -433,7 +433,7 @@ class Util {
     }
   }
   
-  private _CreateElement(nodeName:string): HTMLElement { 
+  _CreateElement(nodeName:string): HTMLElement { 
     var e = <HTMLElement>document.createElement(nodeName);
 
     // Make element unselectable (Internet Explorer)
@@ -1107,7 +1107,7 @@ class Util {
    * @param     {string}        s       alert text
    * @param     {function()=}   fn      function to call when alert dismissed
    */       
-  alert(s: string, fn: () => void): void {
+  alert(s: string, fn?: () => void): void {
     var bg = this.keyman.waiting, nn=bg.firstChild.childNodes;
     nn[0].style.display='block';
     nn[1].className='kmw-alert-text'; 
