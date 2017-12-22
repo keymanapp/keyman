@@ -219,7 +219,7 @@ class Util {
    * @return     {boolean}         
    * Description Invoke an event using any function with up to four arguments 
    */    
-  callEvent(event: string, params: Object[]): boolean {
+  callEvent(event: string, params: Object|Object[]): boolean {
     if(typeof this.events[event] == 'undefined') {
       return true;
     }

@@ -267,7 +267,7 @@ class KeyboardManager {
     }           
 
     // Update the UI 
-    (<any>this.keymanweb).doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC'],sp['KP']);
+    this.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC'],sp['KP']);
   }
 
   /**
@@ -297,6 +297,29 @@ class KeyboardManager {
     } else {
       return false;
     }
+  }
+
+  /**
+   * Allow to change active keyboard by (internal) keyboard name
+   * 
+   * @param       {string}    PInternalName   Internal name
+   * @param       {string}    PLgCode         Language code
+   */    
+  setActiveKeyboard(PInternalName: string, PLgCode: string) {
+    //TODO: This does not make sense: the callbacks should be in _SetActiveKeyboard, not here,
+    //      since this is always called FROM the UI, which should not need notification.
+    //      If UI callbacks are needed at all, they should be within _SetActiveKeyboard  
+    this.doBeforeKeyboardChange(PInternalName,PLgCode);     
+    this._SetActiveKeyboard(PInternalName,PLgCode,true);    
+    if(this.keymanweb._LastActiveElement != null) {
+      (<any>this.keymanweb)._FocusLastActiveElement();
+    }
+    // If we ever allow PLgCode to be set by default, we can auto-detect the language code
+    // after the _SetActiveKeyboard call.
+    // if(!PLgCode && (<KeymanBase>keymanweb).keyboardManager.activeStub) {
+    //   PLgCode = (<KeymanBase>keymanweb).keyboardManager.activeStub['KLC'];
+    // }
+    this.doKeyboardChange(PInternalName, PLgCode);
   }
 
   /**
@@ -532,7 +555,7 @@ class KeyboardManager {
         
         //Activate keyboard, if it's still the active stub.
         if(kbdStub == manager.activeStub) {
-          (<any>manager.keymanweb).doBeforeKeyboardChange(kbd['KI'],kbdStub['KLC']);
+          manager.doBeforeKeyboardChange(kbd['KI'],kbdStub['KLC']);
           manager.activeKeyboard=kbd;
 
           if((<any>manager.keymanweb)._LastActiveElement != null) {
@@ -615,7 +638,7 @@ class KeyboardManager {
       this.keymanweb.globalKeyboard = t[0];
       this.keymanweb.globalLanguageCode = t[1];
 
-      (<any>this.keymanweb).doKeyboardChange(t[0],t[1]);        // And update the UI if necessary
+      this.doKeyboardChange(t[0],t[1]);        // And update the UI if necessary
     }
   }
 
@@ -1121,7 +1144,7 @@ class KeyboardManager {
 
     if(anyRemoved) {
       // Update the UI keyboard menu
-      (<any>this.keymanweb).doKeyboardUnregistered();
+      this.doKeyboardUnregistered();
     }
       
     return success;
@@ -1177,7 +1200,7 @@ class KeyboardManager {
     this.keyboards=(<any>this.keymanweb)._push(this.keyboards, Pk);
 
     // Execute any external (UI) code needed after loading keyboard
-    (<any>this.keymanweb).doKeyboardLoaded(Pk['KI']);
+    this.doKeyboardLoaded(Pk['KI']);
 
     // Restore the originally-active stub to its prior state.  No need to change it permanently.
     this.activeStub = savedActiveStub;
@@ -1235,9 +1258,92 @@ class KeyboardManager {
     // Reload this keyboard if it was the last active keyboard and 
     // make any changes needed by UI for new keyboard stub
     // (Uncommented for Build 360)
-    (<any>this.keymanweb).doKeyboardRegistered(Pstub['KI'],Pstub['KL'],Pstub['KN'],Pstub['KLC'],Pstub['KP']);
+    this.doKeyboardRegistered(Pstub['KI'],Pstub['KL'],Pstub['KN'],Pstub['KLC'],Pstub['KP']);
 
     return null;
   }
 
+  /*
+   * Last part - the events.
+   */
+
+  /**
+   * Execute external (UI) code needed on registering keyboard, used
+   * to update each UIs language menu   
+   *    
+   * Note that the argument object is not at present used by any UI,
+   * since the menu is always fully recreated when needed, but the arguments   
+   * remain defined to allow for possible use in future (Aug 2014)
+   *    
+   * @param       {string}            _internalName
+   * @param       {string}            _language
+   * @param       {string}            _keyboardName
+   * @param       {string}            _languageCode
+   * @param       {string=}           _packageID        Used by KMEA/KMEI to track .kmp related info.
+   * @return      {boolean}
+   */       
+  doKeyboardRegistered(_internalName: string, _language: string, _keyboardName: string,
+      _languageCode: string, _packageID?: string): boolean {
+    var p={'internalName':_internalName,'language':_language,'keyboardName':_keyboardName,'languageCode':_languageCode};
+    
+    // Utilized only by our embedded codepaths.
+    if(_packageID) {
+      p['package'] = _packageID;
+    }
+    return this.keymanweb.util.callEvent('kmw.keyboardregistered',p);
+  }
+  
+  /**
+   * Execute external (UI) code to rebuild menu when deregistering keyboard
+   *    
+   * @return      {boolean}   
+   */       
+
+  doKeyboardUnregistered(): boolean {
+    var p={};     
+    return this.keymanweb.util.callEvent('kmw.keyboardregistered',p);    
+  }
+  
+  /**
+   * Execute external (UI) code needed on loading keyboard
+   * 
+   * @param       {string}            _internalName
+   * @return      {boolean}   
+   */       
+  doKeyboardLoaded(_internalName: string): boolean {
+    var p={};
+    p['keyboardName']=_internalName; 
+    return this.keymanweb.util.callEvent('kmw.keyboardloaded', p);
+  }
+    
+  /**
+   * Function     doBeforeKeyboardChange
+   * Scope        Private
+   * @param       {string}            _internalName
+   * @param       {string}            _languageCode
+   * @return      {boolean}   
+   * Description  Execute external (UI) code needed before changing keyboard
+   */       
+  doBeforeKeyboardChange(_internalName: string, _languageCode: string): boolean {
+    var p={};
+    p['internalName']=_internalName;
+    p['languageCode']=_languageCode;
+    return this.keymanweb.util.callEvent('kmw.beforekeyboardchange',p);
+  }
+
+  /**
+   * Execute external (UI) code needed *after* changing keyboard
+   * 
+   * @param       {string}            _internalName
+   * @param       {string}            _languageCode
+   * @param       {boolean=}           _indirect
+   * @return      {boolean}   
+   */       
+  doKeyboardChange(_internalName: string, _languageCode: string, _indirect?:boolean): boolean {                      
+    var p={};
+    p['internalName']=_internalName;
+    p['languageCode']=_languageCode; 
+    p['indirect']=(arguments.length > 2 ? _indirect : false);
+    return this.keymanweb.util.callEvent('kmw.keyboardchange', p);
+  }
 }

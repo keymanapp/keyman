@@ -1695,7 +1695,7 @@ if(!window['keyman']['initialized']) {
       if(keymanweb.isAttached(Pelem)) { // Only operate on attached elements!  
         if(keymanweb._LastActiveElement == Pelem || keymanweb._LastActiveElement == Pelem['kmw_ip']) {
           keymanweb._LastActiveElement = null;
-          keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
+          keymanweb.keyboardManager.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
           keymanweb['osk']._Hide();
         }
         
@@ -1786,7 +1786,7 @@ if(!window['keyman']['initialized']) {
             && keymanweb._LastActiveElement) {
             
           if(Pkbd != null && Plc != null) { // Second part necessary for Closure.
-            keymanweb.setActiveKeyboard(Pkbd, Plc);
+            keymanweb.keyboardManager.setActiveKeyboard(Pkbd, Plc);
           } 
         }
       }
@@ -2002,10 +2002,10 @@ if(!window['keyman']['initialized']) {
      */ 
     keymanweb._FocusKeyboardSettings = function(blockGlobalChange) {      
       if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
-        keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
+        keymanweb.keyboardManager.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
           keymanweb._LastActiveElement._kmwAttachment.languageCode); 
       } else if(!blockGlobalChange) { 
-        keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
+        keymanweb.keyboardManager.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
       }
     }
 
@@ -2169,85 +2169,6 @@ if(!window['keyman']['initialized']) {
     {
       var p={}; p['target']=_target; p['activeControl']=_activeControl;  
       return util.callEvent('kmw.controlfocused',p);
-    }
-    
-    /**
-     * Execute external (UI) code needed on registering keyboard, used
-     * to update each UIs language menu   
-     *    
-     * Note that the argument object is not at present used by any UI,
-     * since the menu is always fully recreated when needed, but the arguments   
-     * remain defined to allow for possible use in future (Aug 2014)
-     *    
-     * @param       {string}            _internalName
-     * @param       {string}            _language
-     * @param       {string}            _keyboardName
-     * @param       {string}            _languageCode
-     * @param       {string=}           _packageID        Used by KMEA/KMEI to track .kmp related info.
-     * @return      {boolean}
-     */       
-    keymanweb.doKeyboardRegistered = function(_internalName,_language,_keyboardName,_languageCode, _packageID)
-    {
-      var p={'internalName':_internalName,'language':_language,'keyboardName':_keyboardName,'languageCode':_languageCode};
-      
-      // Utilized only by our embedded codepaths.
-      if(_packageID) {
-        p['package'] = _packageID;
-      }
-      return util.callEvent('kmw.keyboardregistered',p);
-    }
-    
-    /**
-     * Execute external (UI) code to rebuild menu when deregistering keyboard
-     *    
-     * @return      {boolean}   
-     */       
-
-    keymanweb.doKeyboardUnregistered = function()
-    {
-      var p={};     
-      return util.callEvent('kmw.keyboardregistered',p);    
-    }
-    
-    /**
-     * Execute external (UI) code needed on loading keyboard
-     * 
-     * @param       {string}            _internalName
-     * @return      {boolean}   
-     */       
-    keymanweb.doKeyboardLoaded = function(_internalName)
-    {
-      var p={}; p['keyboardName']=_internalName; 
-      return util.callEvent('kmw.keyboardloaded',p);
-    }
-      
-    /**
-     * Function     doBeforeKeyboardChange
-     * Scope        Private
-     * @param       {string}            _internalName
-     * @param       {string}            _languageCode
-     * @return      {boolean}   
-     * Description  Execute external (UI) code needed before changing keyboard
-     */       
-    keymanweb.doBeforeKeyboardChange = function(_internalName,_languageCode)
-    {
-      var p={}; p['internalName']=_internalName; p['languageCode']=_languageCode;
-      return util.callEvent('kmw.beforekeyboardchange',p);
-    }
-
-    /**
-     * Execute external (UI) code needed *after* changing keyboard
-     * 
-     * @param       {string}            _internalName
-     * @param       {string}            _languageCode
-     * @param       {boolean=}           _indirect
-     * @return      {boolean}   
-     */       
-    keymanweb.doKeyboardChange = function(_internalName,_languageCode,_indirect)
-    {                      
-      var p={}; p['internalName']=_internalName; p['languageCode']=_languageCode; 
-      p['indirect']=(arguments.length > 2 ? _indirect : false);
-      return util.callEvent('kmw.keyboardchange',p);
     }
 
     /**
@@ -2933,19 +2854,8 @@ if(!window['keyman']['initialized']) {
      * @param       {string}    PInternalName   Internal name
      * @param       {string}    PLgCode         Language code
      */    
-    keymanweb['setActiveKeyboard'] = keymanweb.setActiveKeyboard = function(PInternalName,PLgCode) {
-      //TODO: This does not make sense: the callbacks should be in _SetActiveKeyboard, not here,
-      //      since this is always called FROM the UI, which should not need notification.
-      //      If UI callbacks are needed at all, they should be within _SetActiveKeyboard  
-      keymanweb.doBeforeKeyboardChange(PInternalName,PLgCode);     
-      keymanweb.keyboardManager._SetActiveKeyboard(PInternalName,PLgCode,true);    
-      if(keymanweb._LastActiveElement != null) keymanweb._FocusLastActiveElement();
-      // If we ever allow PLgCode to be set by default, we can auto-detect the language code
-      // after the _SetActiveKeyboard call.
-      // if(!PLgCode && (<KeymanBase>keymanweb).keyboardManager.activeStub) {
-      //   PLgCode = (<KeymanBase>keymanweb).keyboardManager.activeStub['KLC'];
-      // }
-      keymanweb.doKeyboardChange(PInternalName,PLgCode);
+    keymanweb['setActiveKeyboard'] = function(PInternalName,PLgCode) {
+      keymanweb.keyboardManager.setActiveKeyboard(PInternalName,PLgCode);
     }
     
     /**
