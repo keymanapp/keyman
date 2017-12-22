@@ -2907,16 +2907,16 @@ if(!window['keyman']['initialized']) {
         case osk.keyCodes['K_CTRL']:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
         case osk.keyCodes['K_LCTRL']:
         case osk.keyCodes['K_RCTRL']:
-        case osk.keyCodes.K_CONTROL:
-        case osk.keyCodes.K_LCONTROL:
-        case osk.keyCodes.K_RCONTROL:
+        case osk.keyCodes['K_CONTROL']:
+        case osk.keyCodes['K_LCONTROL']:
+        case osk.keyCodes['K_RCONTROL']:
           ctrlEvent = true;
           break;
         case osk.keyCodes['K_LMENU']:     // The 2 "K_*MENU" entries exist in some legacy keyboards.
         case osk.keyCodes['K_RMENU']:
-        case osk.keyCodes.K_ALT:
-        case osk.keyCodes.K_LALT:
-        case osk.keyCodes.K_RALT:
+        case osk.keyCodes['K_ALT']:
+        case osk.keyCodes['K_LALT']:
+        case osk.keyCodes['K_RALT']:
           altEvent = true;
           break;
       }
@@ -2940,12 +2940,12 @@ if(!window['keyman']['initialized']) {
 
       if(e.ctrlKey) {
         curModState |= ((e.location != 0 && ctrlEvent) ? 
-          (e.location == 1 ? osk.modifierCodes.LCTRL : osk.modifierCodes.RCTRL) : // Condition 1
+          (e.location == 1 ? osk.modifierCodes['LCTRL'] : osk.modifierCodes['RCTRL']) : // Condition 1
           prevModState & 0x0003);                                                       // Condition 2
       }
       if(e.altKey) {
         curModState |= ((e.location != 0 && altEvent) ? 
-          (e.location == 1 ? osk.modifierCodes.LALT : osk.modifierCodes.RALT) :   // Condition 1
+          (e.location == 1 ? osk.modifierCodes['LALT'] : osk.modifierCodes['RALT']) :   // Condition 1
           prevModState & 0x000C);                                                       // Condition 2
       }
 
@@ -2953,21 +2953,21 @@ if(!window['keyman']['initialized']) {
       s.Lstates = 0;
       
       if(e.getModifierState("CapsLock")) {
-        s.Lstates = osk.modifierCodes.CAPS;
+        s.Lstates = osk.modifierCodes['CAPS'];
       } else {
-        s.Lstates = osk.modifierCodes.NO_CAPS;
+        s.Lstates = osk.modifierCodes['NO_CAPS'];
       }
 
       if(e.getModifierState("NumLock")) {
-        s.Lstates |= osk.modifierCodes.NUM_LOCK;
+        s.Lstates |= osk.modifierCodes['NUM_LOCK'];
       } else {
-        s.Lstates |= osk.modifierCodes.NO_NUM_LOCK;
+        s.Lstates |= osk.modifierCodes['NO_NUM_LOCK'];
       }
 
       if(e.getModifierState("ScrollLock") || e.getModifierState("Scroll")) {  // "Scroll" for IE9.
-        s.Lstates |= osk.modifierCodes.SCROLL_LOCK;
+        s.Lstates |= osk.modifierCodes['SCROLL_LOCK'];
       } else {
-        s.Lstates |= osk.modifierCodes.NO_SCROLL_LOCK;
+        s.Lstates |= osk.modifierCodes['NO_SCROLL_LOCK'];
       }
 
       // We need these states to be tracked as well for proper OSK updates.
@@ -2978,14 +2978,14 @@ if(!window['keyman']['initialized']) {
       keymanweb.modStateFlags = curModState;
 
       // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
-      var altGrMask = osk.modifierCodes.RALT | osk.modifierCodes.LCTRL;
+      var altGrMask = osk.modifierCodes['RALT'] | osk.modifierCodes['LCTRL'];
       if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
         // We just released AltGr - make sure it's all released.
         curModState &= ~ altGrMask;
       }
       // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
-      if(curModState & osk.modifierCodes.RALT) {
-        curModState &= ~osk.modifierCodes.LCTRL;
+      if(curModState & osk.modifierCodes['RALT']) {
+        curModState &= ~osk.modifierCodes['LCTRL'];
       }
 
       // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
@@ -2994,16 +2994,16 @@ if(!window['keyman']['initialized']) {
 
         // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
         // AltGr / Right-alt simulation.
-        if(osk.emulatesAltGr() && (s.Lmodifiers & osk.modifierBitmasks.ALT_GR_SIM) == osk.modifierBitmasks.ALT_GR_SIM) {
-          s.Lmodifiers ^= osk.modifierBitmasks.ALT_GR_SIM;
-          s.Lmodifiers |= osk.modifierCodes.RALT;
+        if(osk.emulatesAltGr() && (s.Lmodifiers & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
+          s.Lmodifiers ^= osk.modifierBitmasks['ALT_GR_SIM'];
+          s.Lmodifiers |= osk.modifierCodes['RALT'];
         }
       } else {
         // No need to sim AltGr here; we don't need chiral ALTs.
         s.Lmodifiers = 
           (e.shiftKey ? 0x10 : 0) |
-          ((curModState & (osk.modifierCodes.LCTRL | osk.modifierCodes.RCTRL)) ? 0x20 : 0) | 
-          ((curModState & (osk.modifierCodes.LALT | osk.modifierCodes.RALT))   ? 0x40 : 0); 
+          ((curModState & (osk.modifierCodes['LCTRL'] | osk.modifierCodes['RCTRL'])) ? 0x20 : 0) | 
+          ((curModState & (osk.modifierCodes['LALT'] | osk.modifierCodes['RALT']))   ? 0x40 : 0); 
       }
 
       // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
