@@ -1112,25 +1112,25 @@ if(!window['keyman']['initialized']) {
       if(m == 0) {
         return 'default';
       } else {
-        if(m & osk.modifierCodes.LCTRL) {
+        if(m & osk.modifierCodes['LCTRL']) {
           s = (s.length > 0 ? s + '-' : '') + 'leftctrl';
         }
-        if(m & osk.modifierCodes.RCTRL) {
+        if(m & osk.modifierCodes['RCTRL']) {
           s = (s.length > 0 ? s + '-' : '') + 'rightctrl';
         }
-        if(m & osk.modifierCodes.LALT) {
+        if(m & osk.modifierCodes['LALT']) {
           s = (s.length > 0 ? s + '-' : '') + 'leftalt';
         }
-        if(m & osk.modifierCodes.RALT) {
+        if(m & osk.modifierCodes['RALT']) {
           s = (s.length > 0 ? s + '-' : '') + 'rightalt';
         }
-        if(m & osk.modifierCodes.SHIFT) {
+        if(m & osk.modifierCodes['SHIFT']) {
           s = (s.length > 0 ? s + '-' : '') + 'shift';
         }
-        if(m & osk.modifierCodes.CTRL) {
+        if(m & osk.modifierCodes['CTRL']) {
           s = (s.length > 0 ? s + '-' : '') + 'ctrl';
         }
-        if(m & osk.modifierCodes.ALT) {
+        if(m & osk.modifierCodes['ALT']) {
           s = (s.length > 0 ? s + '-' : '') + 'alt';
         }
         return s;
@@ -1774,9 +1774,9 @@ if(!window['keyman']['initialized']) {
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
         if(keymanweb.isChiral() && osk.emulatesAltGr() && 
-            (keymanweb.modStateFlags & osk.modifierBitmasks.ALT_GR_SIM) == osk.modifierBitmasks.ALT_GR_SIM) {
-          keyShiftState |= osk.modifierBitmasks.ALT_GR_SIM;
-          keyShiftState &= ~osk.modifierCodes.RALT;
+            (keymanweb.modStateFlags & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
+          keyShiftState |= osk.modifierBitmasks['ALT_GR_SIM'];
+          keyShiftState &= ~osk.modifierCodes['RALT'];
         }
 
         for(i=0; i < lockNames.length; i++) {
@@ -2820,7 +2820,7 @@ if(!window['keyman']['initialized']) {
       layout=layout||osk.layout;
 
       // Apply an overriding class for 5-row layouts
-      var nRows=layout.layer[0].row.length;
+      var nRows=layout['layer'][0]['row'].length;
       if(nRows > 4 && util.device.formFactor == 'phone') {
         btn.className='kmw-key kmw-5rows kmw-key-'+keyTypes[n];
       } else {
@@ -2994,7 +2994,7 @@ if(!window['keyman']['initialized']) {
      * @return  {boolean}
      */
     osk.emulatesAltGr = function(keyLabels) {
-      return !(keyLabels ? keyLabels : osk.layers)[osk.getLayerId(osk.modifierCodes.LCTRL | osk.modifierCodes.LALT)];
+      return !(keyLabels ? keyLabels : osk.layers)[osk.getLayerId(osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])];
     }
 
     /**
