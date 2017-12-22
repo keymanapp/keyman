@@ -25,9 +25,6 @@ class KeymanBase {
   _Selection = null;
   _SelectionControl = null;
   dfltStub = null;           // First keyboard stub loaded - default for touch-screen devices, ignored on desktops
-  _Keyboards = [];           // Keyboards - array of loaded keyboards
-  _ActiveKeyboard = null;    // ActiveKeyboard - points to active keyboard in Keyboards array
-  _ActiveStub = null;        // ActiveStub - points to active stub in KeyboardStubs  
   _AttachedElements = [];    // I1596 - attach to controls dynamically
   _ActiveElement = null;     // Currently active (focused) element  I3363 (Build 301)
   _LastActiveElement = null; // LastElem - Last active element
@@ -90,7 +87,7 @@ class KeymanBase {
   // Stub functions (defined later in code only if required)
   setDefaultDeviceOptions(opt){}     
   getStyleSheetPath(s){return s;}
-  getKeyboardPath(f, p){return f;}
+  getKeyboardPath(f, p?){return f;}
   KC_(n, ln, Pelem){return '';} 
   handleRotationEvents(){}
   alignInputs(b){}
@@ -105,6 +102,7 @@ class KeymanBase {
 
   constructor() {
     this.util = this['util'] = new Util(this);
+    this.osk = this['osk'] = {ready:false};
     this.keyboardManager = new KeyboardManager(this);
 
     // Load properties from their static variants.
@@ -165,10 +163,8 @@ if(!window['keyman']['loaded']) {
     
     // Define public OSK, user interface and utility function objects 
 
-    var osk: any;
-    osk = keymanweb['osk'] = {ready:false};
-    var ui: any;
-    ui = keymanweb['ui'] = {};
+    var osk: any = keymanweb['osk'];
+    var ui: any = keymanweb['ui'] = {};
     
     var kbdInterface = keymanweb['interface'] = {
       // Cross-reference with /windows/src/global/inc/Compiler.h - these are the Developer codes for the respective system stores.

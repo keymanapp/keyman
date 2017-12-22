@@ -1120,6 +1120,11 @@ class Util {
       bg.dismiss=null;
     }
   }
+
+  // Stub definition to be fleshed out depending upon native/embedded mode.
+  wait(s: string|boolean): void {
+
+  }
   
   /**
    *  Prepare the background and keyboard loading wait message box

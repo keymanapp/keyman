@@ -390,7 +390,7 @@
    **/            
   keymanweb['executePopupKey'] = function(keyName)
   {              
-      if(!keymanweb._ActiveKeyboard) return false;
+      if(!keymanweb.keyboardManager.activeKeyboard) return false;
 
       /* Clear any pending (non-popup) key */
       osk.keyPending = null;
@@ -445,7 +445,7 @@
       Lkc.vkCode=Lkc.Lcode;
 
       // Pass this key code and state to the keyboard program
-      if(!keymanweb._ActiveKeyboard ||  Lkc.Lcode == 0) return false;
+      if(!keymanweb.keyboardManager.activeKeyboard ||  Lkc.Lcode == 0) return false;
       
       // If key is mapped, return true
       if(kbdInterface.processKeystroke(util.device, Lelem, Lkc)) return true;
@@ -464,7 +464,7 @@
    *  @param  {number}  lstates lock state (0x0200=no caps 0x0400=num 0x0800=no num 0x1000=scroll 0x2000=no scroll locks)
    **/            
   keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0) {
-    if(!keymanweb._ActiveKeyboard || code == 0) {
+    if(!keymanweb.keyboards.activeKeyboard || code == 0) {
       return false;
     }
 
