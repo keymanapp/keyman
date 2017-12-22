@@ -2,6 +2,8 @@
 /// <reference path="kmwexthtml.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwutils.ts" />
+// Defines keyboard data & management classes.
+/// <reference path="kmwkeyboards.ts" />
 
 /***
    KeymanWeb 10.0
@@ -22,7 +24,6 @@ class KeymanBase {
   _IgnoreNextSelChange = 0;  // when a visual keyboard key is mouse-down, ignore the next sel change because this stuffs up our history  
   _Selection = null;
   _SelectionControl = null;
-  _KeyboardStubs = [];       // KeyboardStubs - array of available keyboards
   dfltStub = null;           // First keyboard stub loaded - default for touch-screen devices, ignored on desktops
   _Keyboards = [];           // Keyboards - array of loaded keyboards
   _ActiveKeyboard = null;    // ActiveKeyboard - points to active keyboard in Keyboards array
@@ -40,7 +41,7 @@ class KeymanBase {
   inputList = [];            // List of simulated input divisions for touch-devices   I3363 (Build 301)
   languageList = null;       // List of keyboard languages available for KeymanCloud
   languagesPending = [];     // Array of languages waiting to be registered
-  deferredStubs = [];        // Array of pending keyboard stubs from addKeyboard(), to register after initialization
+  deferredStubs: Object[] = [];        // Array of pending keyboard stubs from addKeyboard(), to register after initialization
   deferredKRS = [];          // Array of pending keyboard stubs from KRS, to register afterf initialization
   deferredKR = [];           // Array of pending keyboards, to be installed at end of initialization
   waiting = null;            // Element displayed during keyboard load time
@@ -74,6 +75,7 @@ class KeymanBase {
   util: Util;
   osk: any;
   ui: any;
+  keyboardManager: KeyboardManager;
 
   // Defines option-tracking object as a string map.
   options: { [name: string]: string; } = {
@@ -103,6 +105,7 @@ class KeymanBase {
 
   constructor() {
     this.util = this['util'] = new Util(this);
+    this.keyboardManager = new KeyboardManager(this);
 
     // Load properties from their static variants.
     this.__BUILD__ = KeymanBase.__BUILD__;

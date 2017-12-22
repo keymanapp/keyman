@@ -85,8 +85,8 @@ if(!window['keyman']['initialized']) {
       var Ps=keymanweb._ActiveStub, savedActiveStub = keymanweb._ActiveStub;
       if(!Ps || !('KI' in Ps) || (Ps['KI'] != Pk['KI'])) {         
         // Find the first stub for this keyboard
-        for(Lstub=0;Lstub < keymanweb._KeyboardStubs.length; Lstub++) { // I1511 - array prototype extended
-          Ps=keymanweb._KeyboardStubs[Lstub];
+        for(Lstub=0;Lstub < keymanweb.length; Lstub++) { // I1511 - array prototype extended
+          Ps=(<KeymanBase>keymanweb).keyboardManager.keyboardStubs[Lstub];
           if(Pk['KI'] == Ps['KI'])break;
           Ps=null;
         }
@@ -154,16 +154,16 @@ if(!window['keyman']['initialized']) {
       }
 
       // If language code already defined (or not specified in stub), check to see if stub already registered
-      for(Lk=0; Lk<keymanweb._KeyboardStubs.length; Lk++) {
-        if(keymanweb._KeyboardStubs[Lk]['KI'] == Pstub['KI']) {
-          if(Pstub['KLC'] == '' || (keymanweb._KeyboardStubs[Lk]['KLC'] == Pstub['KLC'])) {
+      for(Lk=0; Lk<(<KeymanBase>keymanweb).keyboardManager.keyboardStubs.length; Lk++) {
+        if((<KeymanBase>keymanweb).keyboardManager.keyboardStubs[Lk]['KI'] == Pstub['KI']) {
+          if(Pstub['KLC'] == '' || ((<KeymanBase>keymanweb).keyboardManager.keyboardStubs[Lk]['KLC'] == Pstub['KLC'])) {
             return 1; // no need to register
           }
         }
       }
     
       // Register stub (add to KeyboardStubs array)
-      keymanweb._KeyboardStubs=keymanweb._push(keymanweb._KeyboardStubs,Pstub);
+      (<KeymanBase>keymanweb).keyboardManager.keyboardStubs=keymanweb._push((<KeymanBase>keymanweb).keyboardManager.keyboardStubs,Pstub);
 
       // TODO: Need to distinguish between initial loading of a large number of stubs and any subsequent loading.
       //   UI initialization should not be needed for each registration, only at end.
