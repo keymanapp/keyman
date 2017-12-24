@@ -68,7 +68,7 @@ begin
     with TRegistryErrorControlled.Create do  // I2890
     try
       RootKey := HKEY_LOCAL_MACHINE;
-      if OpenKey(SRegKey_NTFontList, False) and ValueExists(fontnm + ' (TrueType)') then
+      if OpenKey(SRegKey_NTFontList_LM, False) and ValueExists(fontnm + ' (TrueType)') then
       begin
         if LowerCase(ReadString(fontnm + ' (TrueType)')) = LowerCase(ExtractFileName(FileName)) then
         begin

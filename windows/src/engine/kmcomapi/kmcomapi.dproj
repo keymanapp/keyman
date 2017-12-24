@@ -4,11 +4,11 @@
         <MainSource>kmcomapi.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <TargetedPlatforms>1</TargetedPlatforms>
+        <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Library</AppType>
         <FrameworkType>None</FrameworkType>
         <ProjectVersion>18.2</ProjectVersion>
-        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <Platform Condition="'$(Platform)'==''">Win64</Platform>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -45,6 +45,12 @@
         <Cfg_2>true</Cfg_2>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
+        <Cfg_2_Win64>true</Cfg_2_Win64>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
         <SanitizedProjectName>kmcomapi</SanitizedProjectName>
         <Manifest_File>None</Manifest_File>
@@ -73,6 +79,8 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DebugSourcePath>C:\keyman\7.0\src\keyman\kmshell\startup\;$(DebugSourcePath)</DebugSourcePath>
         <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
@@ -80,6 +88,10 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <Icon_MainIcon>kmcomapi_Icon.ico</Icon_MainIcon>
+        <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -102,6 +114,12 @@
         <Debugger_HostApplication>..\..\desktop\kmshell\kmshell.exe</Debugger_HostApplication>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <Debugger_RunParams>-c</Debugger_RunParams>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_MajorVer>1</VerInfo_MajorVer>
+        <VerInfo_Build>0</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -158,7 +176,6 @@
         <DCCReference Include="..\..\global\delphi\general\RegKeyboards.pas"/>
         <DCCReference Include="..\..\global\delphi\general\HotkeyUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Glossary.pas"/>
-        <DCCReference Include="util\olepro32.pas"/>
         <DCCReference Include="processes\kpbase.pas"/>
         <DCCReference Include="processes\keyboard\kpinstallkeyboard.pas"/>
         <DCCReference Include="util\utilunicode.pas"/>
@@ -308,42 +325,13 @@
                     <VersionInfoKeys Name="Comments">www.greatis.com</VersionInfoKeys>
                 </VersionInfoKeys>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvAppFrmDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvAppFrmDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvBandsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvBandsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCmpDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCmpDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCryptDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCryptDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCustomDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCustomDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDotNetCtrlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDotNetCtrlsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvGlobusDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvGlobusDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvHMIDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvHMIDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvJansDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvJansDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvManagedThreadsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvManagedThreadsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvMMDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvMMDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvNetDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvNetDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPascalInterpreterDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPascalInterpreterDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPrintPreviewDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPrintPreviewDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvRuntimeDesignDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvRuntimeDesignDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvSystemDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvSystemDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvTimeFrameworkDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvTimeFrameworkDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvWizardsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvWizardsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvXPCtrlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvXPCtrlsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="c:\keyman\10.0\lib\DragDropD2011.bpl">File c:\keyman\10.0\lib\DragDropD2011.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="c:\keyman\10.0\lib\tb2kdsgn_d12.bpl">File c:\keyman\10.0\lib\tb2kdsgn_d12.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="c:\keyman\10.0\lib\SpTBXLibDsgn_d16.bpl">File c:\keyman\10.0\lib\SpTBXLibDsgn_d16.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k240.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp240.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvControlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvControlsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDBDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDBDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDlgsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDlgsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPageCompsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPageCompsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPluginSystemDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPluginSystemDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvStdCtrlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvStdCtrlsDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k250.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp250.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>
-                <Platform value="Linux64">False</Platform>
                 <Platform value="Win32">True</Platform>
-                <Platform value="Win64">False</Platform>
+                <Platform value="Win64">True</Platform>
             </Platforms>
             <ActiveXProjectInfo>
                 <version>1</version>

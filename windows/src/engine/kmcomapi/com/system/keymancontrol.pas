@@ -173,6 +173,9 @@ var
   wm_keyman_refresh: Integer = 0;
   wm_keyman: Integer = 0;
 
+const
+  SKeyman32Filename = 'keyman32.dll';
+
 function TKeymanControl.GetAutoApply: Boolean;
 begin
   Result := FAutoApply;
@@ -428,7 +431,7 @@ procedure TKeymanControl.LoadKeyman32;
       with TRegistryErrorControlled.Create do  // I2890
       try
         RootKey := HKEY_LOCAL_MACHINE;
-        if OpenKeyReadOnly(SRegKey_KeymanEngine) and ValueExists(SRegValue_RootPath) then
+        if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_RootPath) then
             RootPath := ReadString(SRegValue_RootPath);
       finally
         Free;
@@ -457,9 +460,9 @@ begin
   if hlibKeyman32 = 0 then
   begin
 
-    s := GetKeymanInstallPath+'keyman32.dll';   // I3598
+    s := GetKeymanInstallPath+SKeyman32Filename;   // I3598
     if not FileExists(s) then
-      ErrorFmt(KMN_E_KeymanControl_CannotLoadKeyman32, VarArrayOf([Integer(GetLastError), 'Failed to find keyman32.dll at "'+s+'", '+SysErrorMessage(GetLastError)]));
+      ErrorFmt(KMN_E_KeymanControl_CannotLoadKeyman32, VarArrayOf([Integer(GetLastError), 'Failed to find '+SKeyman32Filename+' at "'+s+'", '+SysErrorMessage(GetLastError)]));
 
     hlibKeyman32 := LoadLibrary(PChar(s));
     if hlibKeyman32 = 0 then

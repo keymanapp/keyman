@@ -294,7 +294,7 @@ begin
 
   with TRegistry.Create do
   try
-    if OpenKey(SRegKey_DelphiProjectManager, True) and ValueExists(SRegValue_CallbackWindow)
+    if OpenKey(SRegKey_DelphiProjectManager_CU, True) and ValueExists(SRegValue_CallbackWindow)
       then h := ReadInteger(SRegValue_CallbackWindow)
       else h := 0;
   finally
@@ -330,7 +330,7 @@ var
 begin
   with TRegistry.Create do
   try
-    if OpenKey(SRegKey_DelphiProjectManager, True) and ValueExists(SRegValue_CallbackWindow)
+    if OpenKey(SRegKey_DelphiProjectManager_CU, True) and ValueExists(SRegValue_CallbackWindow)
       then h := ReadInteger(SRegValue_CallbackWindow)
       else h := 0;
   finally

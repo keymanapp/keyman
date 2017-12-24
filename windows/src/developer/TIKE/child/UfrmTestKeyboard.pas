@@ -29,7 +29,8 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, StdCtrls, ComCtrls, Buttons, int_kmdebug, Menus, ErrorControlledRegistry, 
-  RegistryKeys, UfrmMDIChild, KeymanDeveloperDebuggerMemo;
+  RegistryKeys, UfrmMDIChild, KeymanDeveloperDebuggerMemo, PlusMemo,
+  KeymanDeveloperMemo;
 
 type
   TfrmTestKeyboard = class(TfrmTikeChild)
@@ -243,7 +244,7 @@ begin
 
     FAnsiFont := '';
 
-    if OpenKeyReadOnly('\'+SRegKey_IDEEditFonts) then
+    if OpenKeyReadOnly('\'+SRegKey_IDEEditFonts_CU) then
     try
       FAnsiFont := ReadString('');
     except
@@ -251,7 +252,7 @@ begin
 
     FUnicodeFont := FAnsiFont;
 
-    if OpenKeyReadOnly('\'+SRegKey_IDETestFonts) then
+    if OpenKeyReadOnly('\'+SRegKey_IDETestFonts_CU) then
     try
       if ValueExists(FKeyboardName+',A') then
       begin
@@ -284,7 +285,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if not OpenKey(SRegKey_IDETestFonts, True) then  // I2890
+    if not OpenKey(SRegKey_IDETestFonts_CU, True) then  // I2890
       RaiseLastRegistryError;
     s := ReadString('');
 
@@ -343,7 +344,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if not OpenKey(SRegKey_IDETestFonts, True) then  // I2890
+    if not OpenKey(SRegKey_IDETestFonts_CU, True) then  // I2890
       RaiseLastRegistryError;
     try
       if ValueExists(FKeyboardName+',A') then DeleteValue(FKeyboardName+',A');

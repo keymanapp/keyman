@@ -107,7 +107,7 @@ type
 implementation
 
 uses
-  ComServ, olepro32, SysUtils, KPUninstallKeyboard, isadmin,
+  ComServ, SysUtils, KPUninstallKeyboard, isadmin,
   OnlineConstants, kmxfile,
   ErrorControlledRegistry, RegistryKeys, custinterfaces,
   KPInstallVisualKeyboard,

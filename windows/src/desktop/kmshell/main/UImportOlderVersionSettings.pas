@@ -79,7 +79,7 @@ begin
 
     with TRegistryErrorControlled.Create do  // I2890
     try
-      if OpenKeyReadOnly(SRegKey_UpgradeBackupPath + SRegKey_KeymanEngine70) then
+      if OpenKeyReadOnly(SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine70_CU) then
       begin
         kmcom.Options['koKeyboardHotkeysAreToggle'].Value := ValueExists(SRegValue_KeyboardHotKeysAreToggle) and ReadBool(SRegValue_KeyboardHotKeysAreToggle);
         kmcom.Options['koAltGrCtrlAlt'].Value := ValueExists(SRegValue_AltGrCtrlAlt) and ReadBool(SRegValue_AltGrCtrlAlt);
@@ -90,7 +90,7 @@ begin
         kmcom.Options['koReleaseShiftKeysAfterKeyPress'].Value := ValueExists(SRegValue_ReleaseShiftKeysAfterKeyPress) and ReadBool(SRegValue_ReleaseShiftKeysAfterKeyPress);
         kmcom.Options['koAutoSwitchOSKPages'].Value := not ValueExists(SRegValue_AutoSwitchOSKPages) or ReadBool(SRegValue_AutoSwitchOSKPages);
 
-        if OpenKeyReadOnly(SRegKey_UpgradeBackupPath + SRegKey_KeymanEngine70+'\hotkeys\1') or OpenKeyReadOnly(SRegKey_UpgradeBackupPath + SRegKey_KeymanEngine70+'\hotkeys\8') then
+        if OpenKeyReadOnly(SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine70_CU+'\hotkeys\1') or OpenKeyReadOnly(SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine70_CU+'\hotkeys\8') then
         begin
           for I := 1 to 5 do
             if ValueExists(IntToStr(i)) then
@@ -99,7 +99,7 @@ begin
             end;
         end;
       end
-      else if OpenKeyReadOnly(SRegKey_UpgradeBackupPath + SRegKey_Keyman60) then
+      else if OpenKeyReadOnly(SRegKey_UpgradeBackupPath_CU + SRegKey_Keyman60_CU) then
       begin
         kmcom.Options['koKeyboardHotkeysAreToggle'].Value := ValueExists(SRegValue_KeyboardHotKeysAreToggle) and ReadBool(SRegValue_KeyboardHotKeysAreToggle);
         kmcom.Options['koAltGrCtrlAlt'].Value := ValueExists(SRegValue_AltGrCtrlAlt) and ReadBool(SRegValue_AltGrCtrlAlt);

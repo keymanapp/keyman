@@ -25,7 +25,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ImgList;
+  StdCtrls, ImgList, System.ImageList;
 
 type
   TfrmVisualKeyboardExportBMPParams = class(TForm)
@@ -104,7 +104,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_IDEVisualKeyboard) then
+    if OpenKeyReadOnly(SRegKey_IDEVisualKeyboard_CU) then
     begin
       if ValueExists(SRegValue_IDEVKbd_ExportBMPMulti)
         then b := ReadString(SRegValue_IDEVKbd_ExportBMPMulti) = '1'
@@ -131,7 +131,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKey(SRegKey_IDEVisualKeyboard, True) then
+    if OpenKey(SRegKey_IDEVisualKeyboard_CU, True) then
     begin
       if rbMulti.Checked
         then WriteString(SRegValue_IDEVKbd_ExportBMPMulti, '1')

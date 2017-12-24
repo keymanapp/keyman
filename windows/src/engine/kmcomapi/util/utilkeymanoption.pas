@@ -226,7 +226,7 @@ begin
   reg := TRegistryErrorControlled.Create;  // I2890
   try
     reg.RootKey := HKEY_CURRENT_USER;
-    if reg.OpenKeyReadOnly(SRegKey_KeymanEngine) then
+    if reg.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) then
       for i := 0 to FOptions.Count - 1 do
         FOptions[i].Load(reg);
 
@@ -244,7 +244,7 @@ begin
   reg := TRegistryErrorControlled.Create;  // I2890
   try
     reg.RootKey := HKEY_CURRENT_USER;
-    if reg.OpenKey(SRegKey_KeymanEngine, True) then
+    if reg.OpenKey(SRegKey_KeymanEngine_CU, True) then
       for i := 0 to FOptions.Count - 1 do
         FOptions[i].Save(reg);
 
@@ -303,7 +303,7 @@ begin
   begin
     with TRegistryErrorControlled.Create do  // I2890
     try
-      FBoolValue := OpenKeyReadOnly('\'+SRegKey_WindowsRun) and ValueExists(SRegValue_WindowsRun_Keyman);
+      FBoolValue := OpenKeyReadOnly('\'+SRegKey_WindowsRun_CU) and ValueExists(SRegValue_WindowsRun_Keyman);
     finally
       Free;
     end;
@@ -316,7 +316,7 @@ begin
   begin
     with TRegistryErrorControlled.Create do  // I2890
     try
-      if OpenKey('\'+SRegKey_WindowsRun, True) then
+      if OpenKey('\'+SRegKey_WindowsRun_CU, True) then
       begin
         if FBoolValue then
           WriteString(SRegValue_WindowsRun_Keyman, '"'+TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell)+'" -s')

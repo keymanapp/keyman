@@ -94,8 +94,8 @@ begin
     FProfiles := TStringList.Create;
     with TRegistryErrorControlled.Create do
     try
-      RootKey := HKEY_LOCAL_MACHINE;
-      RootPath := GetRegistryKeyboardInstallKey(FOwner.ID) + SRegKey_LanguageProfiles;
+      RootKey := HKEY_LOCAL_MACHINE;  /// TODO: Is this correct? Do we ever have any
+      RootPath := GetRegistryKeyboardInstallKey_LM(FOwner.ID) + SRegSubKey_LanguageProfiles;
       if OpenKeyReadOnly(RootPath) then
       begin
         GetKeyNames(FProfiles);

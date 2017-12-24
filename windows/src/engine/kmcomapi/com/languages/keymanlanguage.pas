@@ -104,7 +104,7 @@ begin
   try
     RootKey := HKEY_LOCAL_MACHINE;
     v := HKLToKeyboardID(FProfile.HKL);   // I4712
-    if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts+'\'+IntToHex(v, 8)) then
+    if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts_LM+'\'+IntToHex(v, 8)) then
     begin
       if ValueExists(SRegValue_LayoutDisplayName) then
       begin
@@ -154,7 +154,7 @@ begin
       then ValueName := IntToHex(Get_HKL, 8)
       else ValueName := GUIDToString(Get_ProfileGUID);
 
-    if OpenKey(SRegKey_LanguageHotkeys, True) and ValueExists(ValueName)
+    if OpenKey(SRegKey_LanguageHotkeys_CU, True) and ValueExists(ValueName)
       then FHotkeyValue := StrToIntDef(ReadString(ValueName), 0)
       else FHotkeyValue := 0;
   finally

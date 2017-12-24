@@ -477,7 +477,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_IDEOptions) then
+    if OpenKeyReadOnly(SRegKey_IDEOptions_CU) then
     begin
       if ValueExists(SRegValue_IDEOptToolbarVisible) and (ReadString(SRegValue_IDEOptToolbarVisible) = '0') then
         barTools.Visible := False;
@@ -578,7 +578,7 @@ begin
         else FGlobalProject.Save;   // I4691
         
       RootKey := HKEY_CURRENT_USER;
-      if OpenKey(SRegKey_IDEOptions, True) then
+      if OpenKey(SRegKey_IDEOptions_CU, True) then
       begin
         WriteString(SRegValue_ActiveProject, FGlobalProject.FileName);
       end;
@@ -682,7 +682,7 @@ begin
 
   if True then //FKeymanDeveloperOptions.AutoCheckForUpdates then
   begin
-    with TOnlineUpdateCheck.Create(SRegKey_KeymanDeveloper, OnlineProductID_KeymanDeveloper_100, False, True, True, GetProxySettings.Server, GetProxySettings.Port, GetProxySettings.Username, GetProxySettings.Password) do  // I3377
+    with TOnlineUpdateCheck.Create(SRegKey_KeymanDeveloper_CU, OnlineProductID_KeymanDeveloper_100, False, True, True, GetProxySettings.Server, GetProxySettings.Port, GetProxySettings.Username, GetProxySettings.Password) do  // I3377
       Run;
   end;
 end;
@@ -705,7 +705,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if not OpenKey(SRegKey_IDEFiles, True) then  // I2890
+    if not OpenKey(SRegKey_IDEFiles_CU, True) then  // I2890
       RaiseLastRegistryError;
 
     GetValueNames(s);
@@ -862,7 +862,7 @@ end;
 procedure TfrmKeymanDeveloper.InitDock;
 begin
   AppStorage := TJvAppRegistryStorage.Create(self);
-  AppStorage.Path := SRegKey_IDEDock;
+  AppStorage.Path := SRegKey_IDEDock_CU;
   AppStorage.AutoFlush := True;
   AppStorage.AutoReload := True;
 end;
@@ -927,7 +927,7 @@ begin
 
   with TRegistryErrorControlled.Create do
   try
-    if OpenKeyReadOnly(SRegKey_IDEDock) then
+    if OpenKeyReadOnly(SRegKey_IDEDock_CU) then
     begin
       BeginDockLoading;
       try
@@ -1436,7 +1436,7 @@ const
 begin
   with TRegistryErrorControlled.Create do   // I3887
   try
-    if OpenKey(SRegKey_InternetExplorerFeatureBrowserEmulation, True) then   // I4436
+    if OpenKey(SRegKey_InternetExplorerFeatureBrowserEmulation_CU, True) then   // I4436
       WriteInteger('tike.exe', 9000);   // I4874
   finally
     Free;

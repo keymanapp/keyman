@@ -609,8 +609,9 @@ procedure TfrmRunDesktop.BackupKey(Root: HKEY; Path: WideString); // I2642
 var
   regRead: TRegistryErrorControlled;  // I2890
   regWrite: TRegistryErrorControlled;  // I2890
+  FBackupPath: string;
 
-    procedure CopyKey(rr, rw: TRegistryErrorControlled; p: WideString);  // I2890
+    procedure CopyKey(p: WideString);  // I2890
     var
       s: TStringList;
       i: Integer;
@@ -619,7 +620,7 @@ var
     begin
       s := TStringList.Create;
       try
-        if regRead.OpenKeyReadOnly('\'+p) and regWrite.OpenKey(SRegKey_UpgradeBackupPath + p, True) then
+        if regRead.OpenKeyReadOnly('\'+p) and regWrite.OpenKey(FBackupPath + p, True) then
         begin
           regRead.GetValueNames(s);
           for i := 0 to s.Count - 1 do
@@ -640,7 +641,7 @@ var
           end;
           regRead.GetKeyNames(s);
           for i := 0 to s.Count - 1 do
-            CopyKey(rr, rw, p + '\' + s[i]);
+            CopyKey(p + '\' + s[i]);
         end;
       finally
         s.Free;
@@ -651,15 +652,17 @@ begin
   begin
     regRead := CreateHKCURegistry;
     regWrite := CreateHKCURegistry;
+    FBackupPath := SRegKey_UpgradeBackupPath_CU;
   end
   else
   begin
     regRead := CreateHKLMRegistry;
     regWrite := CreateHKLMRegistry;
+    FBackupPath := SRegKey_UpgradeBackupPath_LM;
   end;
 
   try
-    CopyKey(regRead, regWrite, Path);
+    CopyKey(Path);
   finally
     regRead.Free;
     regWrite.Free;
@@ -678,7 +681,7 @@ begin
   n := 0;
   with CreateHKCURegistry do  // I2749
   try
-    if OpenKeyReadOnly(SRegKey_Keyman60_InstalledKeyboards) then
+    if OpenKeyReadOnly(SRegKey_Keyman60_InstalledKeyboards_CU) then
     begin
       GetKeyNames(str);
       n := str.Count;
@@ -691,7 +694,7 @@ begin
 
   with CreateHKLMRegistry do  // I2749
   try
-    if OpenKeyReadOnly(SRegKey_Keyman60_InstalledKeyboards) then
+    if OpenKeyReadOnly(SRegKey_Keyman60_InstalledKeyboards_LM) then
     begin
       GetKeyNames(str);
       Inc(n, str.Count);
@@ -705,9 +708,9 @@ begin
   begin
     FRunUpgrade6 := True;
     FCanUpgrade6 := True;
-    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_Keyman60_InstalledKeyboards); // I2642
-    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_Keyman60_InstalledPackages);
-    BackupKey(HKEY_CURRENT_USER, SRegKey_Keyman60);  // I2749
+    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_Keyman60_InstalledKeyboards_LM); // I2642
+    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_Keyman60_InstalledPackages_LM);
+    BackupKey(HKEY_CURRENT_USER, SRegKey_Keyman60_CU);  // I2749
   end;
 end;
 
@@ -723,7 +726,7 @@ begin
   n := 0;
   with CreateHKCURegistry do  // I2749
   try
-    if OpenKeyReadOnly(SRegKey_KeymanEngine70_InstalledKeyboards) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine70_InstalledKeyboards_CU) then
     begin
       GetKeyNames(str);
       n := str.Count;
@@ -736,7 +739,7 @@ begin
 
   with CreateHKLMRegistry do  // I2749
   try
-    if OpenKeyReadOnly(SRegKey_KeymanEngine70_InstalledKeyboards) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine70_InstalledKeyboards_LM) then
     begin
       GetKeyNames(str);
       Inc(n, str.Count);
@@ -750,9 +753,9 @@ begin
   begin
     FRunUpgrade7 := True;
     FCanUpgrade7 := True;
-    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine70_InstalledKeyboards); // I2642
-    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine70_InstalledPackages);
-    BackupKey(HKEY_CURRENT_USER, SRegKey_KeymanEngine70);
+    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine70_InstalledKeyboards_LM); // I2642
+    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine70_InstalledPackages_LM);
+    BackupKey(HKEY_CURRENT_USER, SRegKey_KeymanEngine70_CU);
   end;
 end;
 
@@ -768,7 +771,7 @@ begin
   n := 0;
   with CreateHKCURegistry do  // I2749
   try
-    if OpenKeyReadOnly(SRegKey_KeymanEngine80_InstalledKeyboards) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine80_InstalledKeyboards_CU) then
     begin
       GetKeyNames(str);
       n := str.Count;
@@ -781,7 +784,7 @@ begin
 
   with CreateHKLMRegistry do  // I2749
   try
-    if OpenKeyReadOnly(SRegKey_KeymanEngine80_InstalledKeyboards) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine80_InstalledKeyboards_LM) then
     begin
       GetKeyNames(str);
       Inc(n, str.Count);
@@ -795,9 +798,9 @@ begin
   begin
     FRunUpgrade8 := True;
     FCanUpgrade8 := True;
-    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine80_InstalledKeyboards); // I2642
-    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine80_InstalledPackages);
-    BackupKey(HKEY_CURRENT_USER, SRegKey_KeymanEngine80);
+    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine80_InstalledKeyboards_LM); // I2642
+    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine80_InstalledPackages_LM);
+    BackupKey(HKEY_CURRENT_USER, SRegKey_KeymanEngine80_CU);
   end;
 end;
 
@@ -814,7 +817,7 @@ begin
 
   with CreateHKLMRegistry do  // I2749
   try
-    if OpenKeyReadOnly(SRegKey_KeymanEngine90_InstalledKeyboards) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine90_InstalledKeyboards_LM) then
     begin
       GetKeyNames(str);
       Inc(n, str.Count);
@@ -828,9 +831,9 @@ begin
   begin
     FRunUpgrade9 := True;
     FCanUpgrade9 := True;
-    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine90_InstalledKeyboards); // I2642
-    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine90_InstalledPackages);
-    BackupKey(HKEY_CURRENT_USER, SRegKey_KeymanEngine90);
+    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine90_InstalledKeyboards_LM); // I2642
+    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine90_InstalledPackages_LM);
+    BackupKey(HKEY_CURRENT_USER, SRegKey_KeymanEngine90_CU);
   end;
 end;
 
@@ -871,35 +874,35 @@ begin
   try
     with CreateHKCURegistry do  // I2749
     try
-      if OpenKeyReadOnly(SRegKey_KeymanDesktop) then
+      if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
       begin
         FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
-        FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun) and ValueExists(SRegValue_WindowsRun_Keyman);
+        FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists(SRegValue_WindowsRun_Keyman);
       end
-      else if FCanUpgrade9 and OpenKeyReadOnly(SRegKey_KeymanEngine90_ProductOptions_Desktop_Pro) then   // I4293
+      else if FCanUpgrade9 and OpenKeyReadOnly(SRegKey_KeymanEngine90_ProductOptions_Desktop_Pro_CU) then   // I4293
       begin
         FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
-        FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun) and ValueExists('desktop_pro.pxx');
+        FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists('desktop_pro.pxx');
       end
-      else if FCanUpgrade8 and OpenKeyReadOnly(SRegKey_KeymanEngine80_ProductOptions_Desktop_Pro) then   // I4293
+      else if FCanUpgrade8 and OpenKeyReadOnly(SRegKey_KeymanEngine80_ProductOptions_Desktop_Pro_CU) then   // I4293
       begin
         FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
-        FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun) and ValueExists('desktop_pro.pxx');
+        FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists('desktop_pro.pxx');
       end
-      else if FCanUpgrade7 and OpenKeyReadOnly(SRegKey_KeymanEngine70_ProductOptions_Desktop_Pro) then
+      else if FCanUpgrade7 and OpenKeyReadOnly(SRegKey_KeymanEngine70_ProductOptions_Desktop_Pro_CU) then
       begin
         FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
-        FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun) and ValueExists('desktop_pro.pxx');
+        FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists('desktop_pro.pxx');
       end
-      else if FCanUpgrade7 and OpenKeyReadOnly(SRegKey_KeymanEngine70_ProductOptions_Desktop_Light) then
+      else if FCanUpgrade7 and OpenKeyReadOnly(SRegKey_KeymanEngine70_ProductOptions_Desktop_Light_CU) then
       begin
         FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
-        FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun) and ValueExists('desktop_light.pxx');
+        FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists('desktop_light.pxx');
       end
-      else if FCanUpgrade6 and OpenKeyReadOnly(SRegKey_Keyman60) then
+      else if FCanUpgrade6 and OpenKeyReadOnly(SRegKey_Keyman60_CU) then
       begin
         FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
-        FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun) and ValueExists('keyman.exe');
+        FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists('keyman.exe');
       end;
     finally
       Free;

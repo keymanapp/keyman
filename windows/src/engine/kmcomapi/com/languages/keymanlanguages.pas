@@ -196,7 +196,7 @@ begin
   try
     RootKey := HKEY_CURRENT_USER;
 
-    if OpenKey('\'+SRegKey_LanguageHotkeys, True) then
+    if OpenKey('\'+SRegKey_LanguageHotkeys_CU, True) then
     begin
       GetValueNames(str);
       for i := 0 to str.Count - 1 do DeleteValue(str[i]);
