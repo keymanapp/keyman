@@ -1,6 +1,6 @@
 **/*.aps
 
-# Delphi target folders -- by including Debug/ and Release/ we avoid accidentally matching folders that we might create otherwise
+# Delphi target folders -- by including Debug/ and Release/ we avoid accidentally matching folders that we might create otherwise 
 **/Win64/Debug/
 **/Win64/Release/
 **/Win32/Debug/
