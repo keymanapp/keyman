@@ -48,7 +48,6 @@ type
 implementation
 
 uses
-//  ComServ,
   System.Win.Registry,
   RegistryKeys,
   utilxml;

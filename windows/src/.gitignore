@@ -4,7 +4,7 @@
 **/Win64/Debug/
 **/Win64/Release/
 **/Win32/Debug/
-**/Win64/Release/
+**/Win32/Release/
 
 # KeymanWeb is copied from /web/src during Developer build
 developer/TIKE/xml/kmw/resource
