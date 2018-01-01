@@ -40,6 +40,7 @@ uses
   System.Win.ComObj,
   Winapi.ActiveX,
   Winapi.msctf,
+  keyman_msctf,
   keymanapi_TLB,
   KeymanContext,
   keymanautoobject,
@@ -52,7 +53,7 @@ const
 type
   TKeymanLanguage = class(TKeymanAutoObject, IKeymanLanguage)
   private
-    FProfile: TF_INPUTPROCESSORPROFILE;
+    FProfile: keyman_msctf.TF_INPUTPROCESSORPROFILE;
     FBCP47Code: string;
     FLayoutName: WideString;
     FLocaleName: string;
@@ -74,7 +75,7 @@ type
     function Get_ProfileGUID: TGUID; safecall;
     function Get_ClassID: TGUID; safecall;
   public
-    constructor Create(AContext: TKeymanContext; AWin8Language: TWindows8Language; AProfile: TF_INPUTPROCESSORPROFILE; ALayoutName: string = '');
+    constructor Create(AContext: TKeymanContext; AWin8Language: TWindows8Language; AProfile: keyman_msctf.TF_INPUTPROCESSORPROFILE; ALayoutName: string = '');
   end;
 
 
@@ -121,7 +122,7 @@ begin
   end;
 end;
 
-constructor TKeymanLanguage.Create(AContext: TKeymanContext; AWin8Language: TWindows8Language; AProfile: TF_INPUTPROCESSORPROFILE; ALayoutName: string = '');
+constructor TKeymanLanguage.Create(AContext: TKeymanContext; AWin8Language: TWindows8Language; AProfile: keyman_msctf.TF_INPUTPROCESSORPROFILE; ALayoutName: string = '');
 var
   FHotkeyValue: Integer;
   ValueName: string;

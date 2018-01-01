@@ -199,9 +199,9 @@ end;
 function TKeymanControl.Get_ActiveLanguage: IKeymanLanguage;
 var
   pInputProcessorProfiles: ITfInputProcessorProfiles;
-  pInputProcessorProfileMgr: ITfInputProcessorProfileMgr;
+  pInputProcessorProfileMgr: keyman_msctf.ITfInputProcessorProfileMgr;
   i: Integer;
-  profile: TF_INPUTPROCESSORPROFILE;
+  profile: keyman_msctf.TF_INPUTPROCESSORPROFILE;
 begin
   OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,
                           IID_ITfInputProcessorProfiles, pInputProcessorProfiles));

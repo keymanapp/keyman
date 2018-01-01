@@ -81,7 +81,7 @@ begin
   with TRegistry.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) and ValueExists(SRegValue_RootPath) then
+    if OpenKeyReadOnly(SRegKey_KeymanDesktop_LM) and ValueExists(SRegValue_RootPath) then
       Result := ReadString(SRegValue_RootPath);
   finally
     Free;

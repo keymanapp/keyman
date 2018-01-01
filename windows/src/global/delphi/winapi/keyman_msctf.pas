@@ -21,6 +21,12 @@ unit keyman_msctf;
 
 interface
 
+uses
+  System.Win.ComObj,
+  System.Types,
+  Winapi.ActiveX,
+  Winapi.Windows;
+
 const
 
   CLASS_TF_InputProcessorProfiles: TGUID = '{33C53A50-F456-4884-B049-85FD643ECFED}';
@@ -145,8 +151,74 @@ GUID_TFCAT_TIPCAP_WOW16: TGUID = '{364215DA-75BC-11D7-A6EF-00065B84435C}';
 GUID_TFCAT_TIPCAP_IMMERSIVESUPPORT: TGUID = '{13A016DF-560B-46CD-947A-4C3AF1E0E35D}';
 GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT: TGUID = '{25504FB4-7BAB-4BC1-9C69-CF81890F0EF5}';
 
-implementation
+//
+// This redefinition of TF_INPUTPROCESSORPROFILE and interfaces that use it, from
+// Winapi.MsCTF, is here because the Winapi.MsCTF version has the wrong alignment
+// for Win64, resulting in an 80-byte instead of an 88-byte structure. This has
+// been reported at https://quality.embarcadero.com/browse/RSP-19669
+//
+// The corresponding issue in the Keyman issue tracker is #508:
+//   https://github.com/keymanapp/keyman/issues/508
+//
+// Once this has been corrected by Embarcadero, we should remove this redefinition.
+//
 
-uses ComObj;
+{$ALIGN 8}
+type
+  TF_INPUTPROCESSORPROFILE = record
+    dwProfileType: LongWord;
+    langid: Word;
+    clsid: TGUID;
+    guidProfile: TGUID;
+    catid: TGUID;
+    hklSubstitute: HKL;
+    dwCaps: LongWord;
+    HKL: HKL;
+    dwFlags: LongWord;
+  end;
+
+
+// *********************************************************************//
+// Interface: IEnumTfInputProcessorProfiles
+// Flags:     (0)
+// GUID:      {71C6E74D-0F28-11D8-A82A-00065B84435C}
+// *********************************************************************//
+  IEnumTfInputProcessorProfiles = interface(IUnknown)
+    ['{71C6E74D-0F28-11D8-A82A-00065B84435C}']
+    function Clone(out ppenum: IEnumTfInputProcessorProfiles): HResult; stdcall;
+    function Next(ulCount: LongWord; out pProfile: TF_INPUTPROCESSORPROFILE; out pcFetch: LongWord): HResult; stdcall;
+    function Reset: HResult; stdcall;
+    function Skip(ulCount: LongWord): HResult; stdcall;
+  end;
+  {$EXTERNALSYM IEnumTfInputProcessorProfiles}
+
+// *********************************************************************//
+// Interface: ITfInputProcessorProfileMgr
+// Flags:     (0)
+// GUID:      {71C6E74C-0F28-11D8-A82A-00065B84435C}
+// *********************************************************************//
+  ITfInputProcessorProfileMgr = interface(IUnknown)
+    ['{71C6E74C-0F28-11D8-A82A-00065B84435C}']
+    function ActivateProfile(dwProfileType: LongWord; langid: Word; var clsid: TGUID;
+                             var guidProfile: TGUID; HKL: HKL; dwFlags: LongWord): HResult; stdcall;
+    function DeactivateProfile(dwProfileType: LongWord; langid: Word; var clsid: TGUID;
+                               var guidProfile: TGUID; HKL: HKL; dwFlags: LongWord): HResult; stdcall;
+    function GetProfile(dwProfileType: LongWord; langid: Word; var clsid: TGUID;
+                        var guidProfile: TGUID; HKL: HKL; out pProfile: TF_INPUTPROCESSORPROFILE): HResult; stdcall;
+    function EnumProfiles(langid: Word; out ppenum: IEnumTfInputProcessorProfiles): HResult; stdcall;
+    function ReleaseInputProcessor(var rclsid: TGUID; dwFlags: LongWord): HResult; stdcall;
+// !! "var word" -> PWideChar
+    function RegisterProfile(var rclsid: TGUID; langid: Word; var guidProfile: TGUID;
+                             pchDesc: PWideChar; cchDesc: LongWord; pchIconFile: PWideChar;
+                             cchFile: LongWord; uIconIndex: LongWord; hklSubstitute: HKL;
+                             dwPreferredLayout: LongWord; bEnabledByDefault: Integer;
+                             dwFlags: LongWord): HResult; stdcall;
+    function UnregisterProfile(var rclsid: TGUID; langid: Word; var guidProfile: TGUID;
+                               dwFlags: LongWord): HResult; stdcall;
+    function GetActiveProfile(var catid: TGUID; out pProfile: TF_INPUTPROCESSORPROFILE): HResult; stdcall;
+  end;
+  {$EXTERNALSYM ITfInputProcessorProfileMgr}
+
+implementation
 
 end.

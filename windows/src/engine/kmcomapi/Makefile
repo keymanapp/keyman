@@ -15,6 +15,8 @@ build: version.res manifest.res kbd_noicon.res dirs
 
 !IFNDEF DELPHI_STARTER
     $(DELPHI_MSBUILD) kmcomapi.dproj /p:Platform=Win64
+
+    if exist $(WIN64_TARGET_PATH)\kmcomapi.x64.dll del $(WIN64_TARGET_PATH)\kmcomapi.x64.dll
     $(MAKEJCLDBG) $(WIN64_TARGET_PATH)\kmcomapi.map
     # Delphi does not allow us to build to a different target filename so we rename after build
     ren $(WIN64_TARGET_PATH)\kmcomapi.dll kmcomapi.x64.dll
