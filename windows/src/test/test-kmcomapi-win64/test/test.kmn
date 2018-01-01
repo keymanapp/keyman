@@ -1,0 +1,14 @@
+﻿c This keyboard is a blank template to test the metadata read in Keyman COM API
+store(&NAME) 'Test Keyboard'
+store(&ETHNOLOGUECODE) 'eng'
+store(&COPYRIGHT) '(C) 2017 SIL International'
+store(&MESSAGE) 'Test Message'
+store(&KEYBOARDVERSION) '1.2.3'
+store(&LANGUAGE) 'x040C'
+store(&WINDOWSLANGUAGES) 'x040C'
+store(&HOTKEY) '[Ctrl Alt K_T]'
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(random) U+0E01 U+0E02 U+0E03
