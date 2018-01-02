@@ -7,6 +7,7 @@ store(&KEYBOARDVERSION) '1.2.3'
 store(&LANGUAGE) 'x040C'
 store(&WINDOWSLANGUAGES) 'x040C'
 store(&HOTKEY) '[Ctrl Alt K_T]'
+store(&VISUALKEYBOARD) 'test.kvks'
 begin Unicode > use(main)
 
 group(main) using keys

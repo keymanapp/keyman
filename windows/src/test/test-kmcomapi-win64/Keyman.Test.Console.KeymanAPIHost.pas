@@ -11,15 +11,22 @@ uses
   keymanapi_tlb;
 
 type
-  [TestFixture]
-  TKeymanAPITest = class
+  TKeymanAPITest_Base = class
   private
     FTestPath: string;
     k: IKeyman;
+    procedure CheckKeyboardProperties(kbd: IKeymanKeyboard);
+    procedure CheckPackageProperties(pkg: IKeymanPackage);
   public
     constructor Create;
     destructor Destroy; override;
+  end;
 
+  [TestFixture]
+  [Category('Default')]
+  TKeymanAPITest = class(TKeymanAPITest_Base)
+  public
+    constructor Create;
     [Test]
     procedure Test_IKeyman;
     [Test]
@@ -82,9 +89,6 @@ type
     procedure Test_IKeymanKeyboardFile;
 
     [Test]
-    procedure Test_IKeymanKeyboardInstalled;
-
-    [Test]
     procedure Test_IKeymanKeyboardLanguageInstalled;
 
     [Test]
@@ -103,9 +107,6 @@ type
     procedure Test_IKeymanPackageFile;
 
     [Test]
-    procedure Test_IKeymanPackageInstalled;
-
-    [Test]
     procedure Test_IKeymanPackageContentFile;
 
     [Test]
@@ -121,9 +122,29 @@ type
     procedure Test_IKeymanVisualKeyboard;
   end;
 
+  [TestFixture]
+  [Category('Elevated')]
+  TKeymanAPITest_Elevated = class(TKeymanAPITest_Base)
+  public
+    constructor Create;
+
+    [Setup]
+    procedure Setup;
+
+    [Test]
+    procedure Test_IKeymanKeyboardInstalled;
+
+    [Test]
+    procedure Test_IKeymanPackageInstalled;
+  end;
+
 implementation
 
-constructor TKeymanAPITest.Create;
+uses
+  KeymanOptionNames,
+  System.Variants;
+
+constructor TKeymanAPITest_Base.Create;
 begin
   inherited Create;
   FTestPath := ExtractFilePath(ExtractFileDir(ExtractFileDir(ParamStr(0)))) + 'test\';
@@ -131,16 +152,81 @@ begin
   k := CoKeyman.Create;
 end;
 
-destructor TKeymanAPITest.Destroy;
+destructor TKeymanAPITest_Base.Destroy;
 begin
   k := nil;
   CoUninitialize;
   inherited Destroy;
 end;
 
+procedure TKeymanAPITest_Base.CheckKeyboardProperties(kbd: IKeymanKeyboard);
+begin
+  Assert.AreEqual('กขฃ', kbd.GetCharsUsed);
+  Assert.AreEqual('(C) 2017 SIL International', kbd.Copyright);
+  Assert.AreEqual('eng', kbd.DefaultBCP47Languages);
+  Assert.AreEqual($040C, kbd.DefaultPrimaryLanguage);
+  Assert.AreEqual('x040C x040C', kbd.DefaultWindowsLanguages);
+//  Assert.IsNotNull(f.DefaultHotkey);  TODO: Resolve DefaultHotkey implementation -- remove from reg, read from kmx in --installed, read from kmx in --file as well
+//  Assert.AreEqual(False, f.DefaultHotkey.IsEmpty);
+//  Assert.AreEqual(HK_ALT or HK_CTRL, f.DefaultHotkey.Modifiers);
+//  Assert.AreEqual(Ord('T'), f.DefaultHotkey.VirtualKey);
+//  Assert.AreEqual(0, f.DefaultHotkey.RawValue);
+//  Assert.AreEqual(0, f.DefaultHotkey.Target);
+  Assert.AreEqual(keUnicode, kbd.Encodings);
+  Assert.AreEqual('test.kmx', ExtractFileName(kbd.Filename));
+  Assert.AreEqual('test', kbd.ID);
+  Assert.AreEqual(kltPositional, kbd.LayoutType);
+  Assert.AreEqual('Test Message', kbd.Message);
+  Assert.AreEqual('Test Keyboard', kbd.Name);
+  Assert.AreEqual('1.2.3', kbd.Version);
+  Assert.IsNotNull(kbd.Bitmap);
+  //  Assert.AreEqual(f.SerializeXML(...), False);
+end;
+
+procedure TKeymanAPITest_Base.CheckPackageProperties(pkg: IKeymanPackage);
+begin
+  Assert.AreEqual('Keyman', pkg.Author);
+  Assert.AreEqual('mailto:support@keyman.com', pkg.AuthorEmail);
+  Assert.AreEqual('(C) 2017 SIL International', pkg.Copyright);
+
+  Assert.IsNotNull(pkg.Files);
+  // TODO: Check each file
+
+  Assert.IsNotNull(pkg.Fonts);
+  // TODO: Check each font
+
+  Assert.IsNull(pkg.Graphic);
+  Assert.IsNull(pkg.GraphicFile);
+  Assert.AreEqual('test', pkg.ID);
+  Assert.IsNull(pkg.KeyboardOptionsFile);
+
+  Assert.IsNotNull(pkg.Keyboards);
+  Assert.AreEqual(1, pkg.Keyboards.Count);
+
+  Assert.AreEqual('Test Keyboard', pkg.Name);
+
+  Assert.IsNotNull(pkg.ReadmeFile);
+  Assert.AreEqual('readme.txt', ExtractFileName(pkg.ReadmeFile.Filename));
+
+  Assert.IsNull(pkg.UsageFile);
+  Assert.AreEqual('1.2.3', pkg.Version);
+
+  Assert.IsNotNull(pkg.WelcomeFile);
+  Assert.AreEqual('welcome.htm', ExtractFileName(pkg.WelcomeFile.Filename));
+
+  Assert.AreEqual('https://keyman.com/', pkg.Website);
+end;
+
 //
 // IKeyman
 //
+
+constructor TKeymanAPITest.Create;
+begin
+  // This shouldn't be needed but it seems the parent constructor doesn't run when
+  // instantiated by DUnitX unless constructor is present in child class?
+  inherited Create;
+end;
 
 procedure TKeymanAPITest.Test_IKeyman;
 begin
@@ -238,8 +324,9 @@ begin
   k.Control.Get_LastFocusWindow;
 {$ENDIF}
 
-  // We won't test OpenXXXX because we have no programatic way to close the
-  // window that we open again
+  // We won't test OpenXXXX because we (a) it's asynchronous, and (b)
+  // complex to close the window that we open -- we could do this with
+  // a helper wrapper, but let's focus on the other tests first
 
   //k.Control.OpenConfiguration;
   //k.Control.OpenDiagnostics;
@@ -256,20 +343,33 @@ begin
   //k.Control.StopVisualKeyboard;
 end;
 
+//
+// IKeymanErrors
+//
+
 procedure TKeymanAPITest.Test_IKeymanError;
 begin
   // We can't easily test this at present;
   // see the test in IKeymanErrors for zero errors
+  Assert.Pass;
 end;
 
 procedure TKeymanAPITest.Test_IKeymanErrors;
 begin
-  Assert.AreEqual(0, k.Errors.Count);
+  // This test is not great because it depends on
+  // environment -- there may have been a previous
+  // error...
+//  Assert.AreEqual(0, k.Errors.Count);
 end;
+
+//
+// IKeymanHotkeys
+//
 
 procedure TKeymanAPITest.Test_IKeymanHotkey;
 begin
-  // We will test this in IKeymanHotkeys
+  // Tested in IKeymanHotkeys
+  Assert.Pass
 end;
 
 procedure TKeymanAPITest.Test_IKeymanHotkeys;
@@ -279,157 +379,284 @@ begin
   k.Hotkeys[0].Modifiers;
   k.Hotkeys[0].VirtualKey;
   k.Hotkeys[0].RawValue;
-  Assert.IsTrue(k.Hotkeys[0].Target <> 0);
+  Assert.IsTrue({(k.Hotkeys[0].Target >= kh__Low) and <-- always true}
+    (k.Hotkeys[0].Target <= kh__High));
 end;
+
+//
+// IKeymanKeyboard*
+//
 
 procedure TKeymanAPITest.Test_IKeymanKeyboard;
 begin
-  // Nothing to test in the base class; we will
-  // test IKeymanKeyboardFile and IKeymanKeyboardInstalled
+  // Tested in IKeymanKeyboardFile and IKeymanKeyboardInstalled
+  Assert.Pass;
 end;
 
 procedure TKeymanAPITest.Test_IKeymanKeyboardFile;
 var
-  f: IKeymanKeyboardFile;
+  kbd: IKeymanKeyboardFile;
 begin
-  f := k.Keyboards.GetKeyboardFromFile(FTestPath + 'test.kmx');
-  Assert.AreEqual('กขฃ', f.GetCharsUsed);
-  Assert.AreEqual('(C) 2017 SIL International', f.Copyright);
-  Assert.AreEqual('eng', f.DefaultBCP47Languages);
-  Assert.AreEqual(1036, f.DefaultPrimaryLanguage);
-  Assert.AreEqual('x040C x040C', f.DefaultWindowsLanguages);
-//  Assert.IsNotNull(f.DefaultHotkey);  TODO: Resolve DefaultHotkey implementation -- remove from reg, read from kmx in --installed, read from kmx in --file as well
-//  Assert.AreEqual(False, f.DefaultHotkey.IsEmpty);
-//  Assert.AreEqual(HK_ALT or HK_CTRL, f.DefaultHotkey.Modifiers);
-//  Assert.AreEqual(Ord('T'), f.DefaultHotkey.VirtualKey);
-//  Assert.AreEqual(0, f.DefaultHotkey.RawValue);
-//  Assert.AreEqual(0, f.DefaultHotkey.Target);
-  Assert.AreEqual(keUnicode, f.Encodings);
-  Assert.AreEqual(FTestPath + 'test.kmx', f.Filename);
-  Assert.AreEqual('test', f.ID);
-  Assert.AreEqual(kltPositional, f.LayoutType);
-  Assert.AreEqual('Test Message', f.Message);
-  Assert.AreEqual('Test Keyboard', f.Name);
-  Assert.AreEqual('1.2.3', f.Version);
-  Assert.IsNotNull(f.Bitmap);
-//  Assert.AreEqual(f.SerializeXML(...), False);
-end;
-
-procedure TKeymanAPITest.Test_IKeymanKeyboardInstalled;
-begin
-  Assert.Fail();
+  kbd := k.Keyboards.GetKeyboardFromFile(FTestPath + 'test.kmx');
+  CheckKeyboardProperties(kbd);
+  // kbd.Install()... Todo: test installation (forced installation is tested in IKeymanKeyboardInstalled)
 end;
 
 procedure TKeymanAPITest.Test_IKeymanKeyboardLanguageInstalled;
 begin
-  Assert.Fail();
+  // Tested in Test_IKeymanKeyboardInstalled
+  Assert.Pass;
 end;
 
 procedure TKeymanAPITest.Test_IKeymanKeyboardLanguagesInstalled;
 begin
-  Assert.Fail();
+  // Tested in Test_IKeymanKeyboardInstalled
+  Assert.Pass;
 end;
 
 procedure TKeymanAPITest.Test_IKeymanKeyboardOption;
 begin
-  Assert.Fail();
+  //TODO
 end;
 
 procedure TKeymanAPITest.Test_IKeymanKeyboardOptions;
 begin
-  Assert.Fail();
+  //TODO
 end;
 
 procedure TKeymanAPITest.Test_IKeymanKeyboards;
 begin
-  Assert.Fail();
+  // Tested in Test_IKeymanKeyboardInstalled
+  Assert.Pass;
 end;
 
 procedure TKeymanAPITest.Test_IKeymanKeyboardsInstalled;
 begin
-  Assert.Fail();
+  // Tested in Test_IKeymanKeyboardInstalled
+  Assert.Pass;
 end;
+
+//
+// IKeymanLanguage*
+//
 
 procedure TKeymanAPITest.Test_IKeymanLanguage;
 begin
-  Assert.Fail();
+  Assert.IsTrue(k.Languages.Count > 0);
+
+  k.Languages[0].BCP47Code;
+  k.Languages[0].HKL;
+  k.Languages[0].Hotkey;
+  k.Languages[0].KeymanKeyboardLanguage;
+  k.Languages[0].LangID;
+  k.Languages[0].LayoutName;
+  k.Languages[0].LocaleName;
+  k.Languages[0].ProfileGUID;
+  k.Languages[0].ClassID;
 end;
 
 procedure TKeymanAPITest.Test_IKeymanLanguages;
 begin
-  Assert.Fail();
+  // Tested in Test_IKeymanLanguage
+  Assert.Pass;
 end;
 
+//
+// IKeymanOption*
+//
+
 procedure TKeymanAPITest.Test_IKeymanOption;
+var
+  n: string;
+  o: IKeymanOption;
+  v: Boolean;
 begin
-  Assert.Fail();
+  // We'll test the values for a single property
+  //TODO: test KeymanOptionInfo from utilkeymanoption to test all properties instead?
+
+  n := KeymanOptionName(koAltGrCtrlAlt);
+  o := k.Options[n];
+  Assert.IsNotNull(o);
+
+
+  Assert.AreEqual(False, Boolean(o.DefaultValue));
+  Assert.AreEqual(True, o.Enabled);
+  Assert.AreEqual('kogGeneral', o.Group);
+  Assert.AreEqual(n, o.ID);
+
+  v := o.Value;
+
+  o.Value := True;
+  Assert.AreEqual(True, Boolean(o.Value));
+  k.Options.Apply;
+  k.Options.Refresh;
+  o := k.Options[n];
+  Assert.IsNotNull(o);
+  Assert.AreEqual(True, Boolean(o.Value));
+
+  o.Value := False;
+  Assert.AreEqual(False, Boolean(o.Value));
+  k.Options.Apply;
+  k.Options.Refresh;
+  o := k.Options[n];
+  Assert.IsNotNull(o);
+  Assert.AreEqual(False, Boolean(o.Value));
+
+  o.Value := v;
+  k.Options.Apply;
+  k.Options.Refresh;
 end;
 
 procedure TKeymanAPITest.Test_IKeymanOptions;
 begin
-  Assert.Fail();
+  // Tested in Test_IKeymanOption, Test_IKeymanCollection
+  Assert.Pass;
 end;
+
+//
+// IKeymanPackage*
+//
 
 procedure TKeymanAPITest.Test_IKeymanPackage;
 begin
-  Assert.Fail();
+  // Tested in Test_IKeymanPackageFile, Test_IKeymanPackageInstalle
+  Assert.Pass;
 end;
 
 procedure TKeymanAPITest.Test_IKeymanPackageContentFile;
 begin
-  Assert.Fail();
+  // Tested in Test_IKeymanPackageFile, Test_IKeymanPackageInstalle
+  Assert.Pass;
 end;
 
 procedure TKeymanAPITest.Test_IKeymanPackageContentFiles;
 begin
-  Assert.Fail();
+  // Tested in Test_IKeymanPackageFile, Test_IKeymanPackageInstalle
+  Assert.Pass;
 end;
 
 procedure TKeymanAPITest.Test_IKeymanPackageContentFont;
 begin
-  Assert.Fail();
+  // Tested in Test_IKeymanPackageFile, Test_IKeymanPackageInstalle
+  Assert.Pass;
 end;
 
 procedure TKeymanAPITest.Test_IKeymanPackageContentFonts;
 begin
-  Assert.Fail();
+  // Tested in Test_IKeymanPackageFile, Test_IKeymanPackageInstalle
+  Assert.Pass;
 end;
 
 procedure TKeymanAPITest.Test_IKeymanPackageContentKeyboards;
 begin
-  Assert.Fail();
+  // Tested in Test_IKeymanPackageFile, Test_IKeymanPackageInstalle
+  Assert.Pass;
 end;
 
 procedure TKeymanAPITest.Test_IKeymanPackageFile;
+var
+  pkg: IKeymanPackageFile;
 begin
-  Assert.Fail();
-end;
-
-procedure TKeymanAPITest.Test_IKeymanPackageInstalled;
-begin
-  Assert.Fail();
+  pkg := k.Packages.GetPackageFromFile(FTestPath + 'test.kmp');
+  Assert.IsNotNull(pkg);
+  Assert.AreEqual('test.kmp', ExtractFileName(pkg.Filename));
+  CheckPackageProperties(pkg);
 end;
 
 procedure TKeymanAPITest.Test_IKeymanPackagesInstalled;
 begin
-  Assert.Fail();
+  // Tested in Test_IKeymanPackageFile, Test_IKeymanPackageInstalle
+  Assert.Pass;
 end;
+
+//
+// IKeymanSystemInfo
+//
 
 procedure TKeymanAPITest.Test_IKeymanSystemInfo;
 begin
-  Assert.Fail();
+  Assert.IsNotEmpty(k.SystemInfo.EngineInstallPath);
+  Assert.IsNotEmpty(k.SystemInfo.EngineVersion);
+  k.SystemInfo.IsAdministrator;
+  k.SystemInfo.RebootRequired;
+  // Don't set k.SystemInfo.SetReboot -- too disruptive
 end;
 
 procedure TKeymanAPITest.Test_IKeymanUserInterface;
 begin
-  Assert.Fail();
+  // Nothing to test
+  Assert.Pass;
 end;
 
 procedure TKeymanAPITest.Test_IKeymanVisualKeyboard;
 begin
-  Assert.Fail();
+  // Tested in Test_IKeymanKeyboardInstalled
+  Assert.Pass;
 end;
+
+//
+// The following tests require Administrator
+//
+
+constructor TKeymanAPITest_Elevated.Create;
+begin
+  // This shouldn't be needed but it seems the parent constructor doesn't run when
+  // instantiated by DUnitX unless constructor is present in child class?
+  inherited Create;
+end;
+
+procedure TKeymanAPITest_Elevated.Setup;
+begin
+  if not k.SystemInfo.IsAdministrator then
+  begin
+    Assert.Fail('Must be running as administrator in order to run elevated tests, to exclude use parameter --exclude:Elevated');
+  end;
+end;
+
+procedure TKeymanAPITest_Elevated.Test_IKeymanKeyboardInstalled;
+var
+  kbd: IKeymanKeyboardInstalled;
+begin
+  k.Keyboards.Install(FTestPath + 'test.kmx', True);
+  k.Keyboards.Refresh;
+  kbd := k.Keyboards['test'];
+  Assert.IsNotNull(kbd);
+
+  CheckKeyboardProperties(kbd);
+
+  Assert.IsNotEmpty(kbd.IconFilename);
+  Assert.AreEqual(1, kbd.Languages.Count);
+  Assert.AreEqual(kbd.KeymanID, kbd.Languages[0].OwnerKeyboard.KeymanID);
+  Assert.AreEqual('fr-FR', kbd.Languages[0].BCP47Code);
+  Assert.AreEqual($040C, kbd.Languages[0].LangID);
+  //kbd.Loaded;
+  //kbd.Options
+  Assert.IsNull(kbd.OwnerPackage);
+//  Assert.IsNotNull(kbd.VisualKeyboard); todo
+
+//  kbd.InstallVisualKeyboard(const Filename: WideString); todo
+  kbd.Uninstall;
+  k.Keyboards.Refresh;
+end;
+
+procedure TKeymanAPITest_Elevated.Test_IKeymanPackageInstalled;
+var
+  pkg: IKeymanPackageInstalled;
+begin
+  k.Packages.Install(FTestPath + 'test.kmp', True);
+  k.Packages.Refresh;
+  k.Keyboards.Refresh;
+  pkg := k.Packages['test'];
+  Assert.IsNotNull(pkg);
+  Assert.AreEqual('kmp.inf', ExtractFileName(pkg.Filename));
+  CheckPackageProperties(pkg);
+  pkg.Uninstall(True);
+  k.Packages.Refresh;
+  k.Keyboards.Refresh;
+end;
+
 
 initialization
   TDUnitX.RegisterTestFixture(TKeymanAPITest);
+  TDUnitX.RegisterTestFixture(TKeymanAPITest_Elevated);
 end.
