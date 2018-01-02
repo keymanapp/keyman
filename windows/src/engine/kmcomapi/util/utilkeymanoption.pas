@@ -156,8 +156,6 @@ uses
   System.TypInfo,
   GetOSVersion,
   KeymanPaths,
-  utildir,
-  utiltsf,
   SysUtils,
   Windows;
 

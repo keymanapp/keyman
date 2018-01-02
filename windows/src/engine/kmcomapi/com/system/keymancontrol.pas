@@ -502,7 +502,8 @@ begin
 {$IFDEF WIN64}
   Error(Cardinal(E_NOTIMPL));
 {$ELSE}
-  (Context.Keyboards as IIntKeymanKeyboardsInstalled).StopKeyboards;   // I4381
+  if Context.Keyboards <> nil then
+    (Context.Keyboards as IIntKeymanKeyboardsInstalled).StopKeyboards;   // I4381
 {$ENDIF}
 end;
 
