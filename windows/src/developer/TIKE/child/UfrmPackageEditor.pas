@@ -1215,8 +1215,8 @@ end;
 
 procedure TfrmPackageEditor.CreateFromCompiledKeyboard(FKMXFilename, FJSFilename: string);
 begin
-  if FKMXFilename <> '' then AddFile(FKMXFilename);
-  if FJSFilename <> '' then AddFile(FJSFilename);
+  if (FKMXFilename <> '') and FileExists(FKMXFilename) then AddFile(FKMXFilename);
+  if (FJSFilename <> '') and FileExists(FJSFilename) then AddFile(FJSFilename);
 end;
 
 {-------------------------------------------------------------------------------
@@ -1235,7 +1235,8 @@ end;
 
 procedure TfrmPackageEditor.HandlePackageRefreshError(Sender: TObject; msg: string; State: TProjectLogState);
 begin
-  Self.ProjectFile.Project.Log(State, Filename, Msg);
+  if Assigned(Self.ProjectFile.Project) then
+    Self.ProjectFile.Project.Log(State, Filename, Msg);
 end;
 
 procedure TfrmPackageEditor.RefreshKeyboardList;
