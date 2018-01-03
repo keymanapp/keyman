@@ -29,7 +29,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, StdCtrls, ComCtrls, Buttons, int_kmdebug, Menus, ErrorControlledRegistry, 
-  RegistryKeys, UfrmMDIChild, KeymanDeveloperDebuggerMemo, PlusMemo,
+  RegistryKeys, UfrmMDIChild, KeymanDeveloperDebuggerMemo, 
   KeymanDeveloperMemo;
 
 type

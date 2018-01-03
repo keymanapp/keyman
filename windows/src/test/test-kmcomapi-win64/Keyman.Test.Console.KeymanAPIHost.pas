@@ -379,8 +379,7 @@ begin
   k.Hotkeys[0].Modifiers;
   k.Hotkeys[0].VirtualKey;
   k.Hotkeys[0].RawValue;
-  Assert.IsTrue({(k.Hotkeys[0].Target >= kh__Low) and <-- always true}
-    (k.Hotkeys[0].Target <= kh__High));
+  Assert.IsTrue(k.Hotkeys[0].Target <= kh__High);
 end;
 
 //
@@ -632,16 +631,18 @@ begin
   //kbd.Loaded;
   //kbd.Options
   Assert.IsNull(kbd.OwnerPackage);
-//  Assert.IsNotNull(kbd.VisualKeyboard); todo
+//  Assert.IsNull(kbd.VisualKeyboard);
 
-//  kbd.InstallVisualKeyboard(const Filename: WideString); todo
+//  kbd.InstallVisualKeyboard(const Filename: WideString); //todo
   kbd.Uninstall;
   k.Keyboards.Refresh;
+  k.Keyboards.Apply;
 end;
 
 procedure TKeymanAPITest_Elevated.Test_IKeymanPackageInstalled;
 var
   pkg: IKeymanPackageInstalled;
+  kbd: IKeymanKeyboardInstalled;
 begin
   k.Packages.Install(FTestPath + 'test.kmp', True);
   k.Packages.Refresh;
@@ -650,9 +651,18 @@ begin
   Assert.IsNotNull(pkg);
   Assert.AreEqual('kmp.inf', ExtractFileName(pkg.Filename));
   CheckPackageProperties(pkg);
+
+  kbd := k.Keyboards['test'];
+  Assert.IsNotNull(kbd);
+  CheckKeyboardProperties(kbd);
+  Assert.IsNotNull(kbd.OwnerPackage);
+  Assert.AreEqual('test', kbd.OwnerPackage.ID);
+  Assert.IsNotNull(kbd.VisualKeyboard);
+
   pkg.Uninstall(True);
   k.Packages.Refresh;
   k.Keyboards.Refresh;
+  k.Keyboards.Apply;
 end;
 
 
