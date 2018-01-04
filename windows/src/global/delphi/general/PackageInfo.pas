@@ -38,10 +38,10 @@ interface
 
 uses
   System.Classes,
-  System.Contnrs,
+  System.Generics.Collections,
   System.IniFiles,
+  System.JSON,
   System.Sysutils,
-  Vcl.Graphics,
   Winapi.Windows,
   Xml.XMLDoc,
   Xml.XMLIntf,
@@ -50,6 +50,8 @@ uses
   utilstr;
 
 { Package Information Classes }
+
+function GetJsonValueString(o: TJSONObject; const n: string): string;
 
 type
   TPackageInfoEntryType = (pietName, pietVersion, pietCopyright, pietAuthor, pietWebsite, pietOther);
@@ -81,133 +83,54 @@ type
                               pfclInstallTemp,  // Used only for installation, temporary
                               pfclLocaleFolder); // For locale files
 
+
+  TPackage = class;
+
+  { Base Classes }
+
   TPackageBaseObject = class
+  strict private
+    FPackage: TPackage;
+  public
+    constructor Create(APackage: TPackage); virtual;
+    property Package: TPackage read FPackage;
+  end;
+
+  TPackageBaseNotifyObject = class(TPackageBaseObject)
   private
-    FNotifyObjects: TObjectList;
+    FNotifyObjects: TObjectList<TPackageNotifyEventWrapper>;
     FTag: Integer;
     function Notify(EventType: TPackageNotifyEventType): Boolean;
   public
-    constructor Create;
+    constructor Create(APackage: TPackage); override;
     destructor Destroy; override;
     procedure AddNotifyObject(FEventHandler: TPackageNotifyEvent);
     procedure RemoveNotifyObject(FEventHandler: TPackageNotifyEvent);
-  {TODO:   if Items[Index] = FPackage.Options.ReadmeFile then FPackage.Options.ReadmeFile := nil;}
     property Tag: Integer read FTag write FTag;
   end;
 
-  TPackage = class;
+  TPackageObjectList<T: TPackageBaseObject> = class(TObjectList<T>)
+  strict private
+    FPackage: TPackage;
+  protected
+    property Package: TPackage read FPackage;
+  public
+    constructor Create(APackage: TPackage);
+  end;
+
+
   TPackageContentFile = class;
   TPackageContentFileList = class;
 
-  { Package Image Buttons }
-
-  TPackageImageButtonType = (pibtInstall, pibtCancel, pibtAbout, pibtCustom);
-
-  TPackageImageButton = class
-  private
-    FPackage: TPackage;
-    FURL: WideString;
-    FCaption: WideString;
-    FButtonType: TPackageImageButtonType;
-    FHoverImageFile: TPackageContentFile;
-    FDownImageFile: TPackageContentFile;
-    FStandardImageFile: TPackageContentFile;
-    FHeight: Integer;
-    FLeft: Integer;
-    FWidth: Integer;
-    FTop: Integer;
-    procedure StandardImageRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
-    procedure HoverImageRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
-    procedure DownImageRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
-    procedure SetButtonType(const Value: TPackageImageButtonType);
-    procedure SetDownImageFile(const Value: TPackageContentFile);
-    procedure SetHoverImageFile(const Value: TPackageContentFile);
-    procedure SetStandardImageFile(const Value: TPackageContentFile);
-  public
-    constructor Create(APackage: TPackage);
-    destructor Destroy; override;
-    procedure UpdateButtonSize;
-    procedure Assign(Source: TPackageImageButton);
-    property ButtonType: TPackageImageButtonType read FButtonType write SetButtonType;
-    property Caption: WideString read FCaption write FCaption;
-    property URL: WideString read FURL write FURL;
-    property Left: Integer read FLeft write FLeft;
-    property Top: Integer read FTop write FTop;
-    property Width: Integer read FWidth write FWidth;
-    property Height: Integer read FHeight write FHeight;
-    property StandardImageFile: TPackageContentFile read FStandardImageFile write SetStandardImageFile;
-    property HoverImageFile: TPackageContentFile read FHoverImageFile write SetHoverImageFile;
-    property DownImageFile: TPackageContentFile read FDownImageFile write SetDownImageFile;
-  end;
-
-  TPackageImageButtonList = class(TObjectList)
-  private
-    FPackage: TPackage;
-    procedure AddStandardButtons;
-  protected
-    function Get(Index: Integer): TPackageImageButton;
-    procedure Put(Index: Integer; Item: TPackageImageButton);
-  public
-    constructor Create(APackage: TPackage);
-    procedure Assign(Source: TPackageImageButtonList); virtual;
-    procedure LoadIni(AIni: TIniFile); virtual;
-    procedure SaveIni(AIni: TIniFile); virtual;
-    procedure LoadXML(ARoot: IXMLNode); virtual;
-    procedure SaveXML(ARoot: IXMLNode); virtual;
-    property Items[Index: Integer]: TPackageImageButton read Get write Put; default;
-    function Add(Item: TPackageImageButton): Integer;
-  end;
-
-  { I2002 - Package registry keys }
-
-  TPackageRegistryKeyValueType = (rkvtString, rkvtDWord);
-
-  TPackageRegistryKey = class
-  private
-    FPackage: TPackage;
-    FKey: WideString;
-    FValueType: TPackageRegistryKeyValueType;
-    FValue: WideString;
-    FRoot: HKEY;
-    FName: WideString;
-  public  // I3311
-    constructor Create(APackage: TPackage);
-    destructor Destroy; override;
-    procedure Assign(Source: TPackageRegistryKey);
-    property Key: WideString read FKey write FKey;
-    property Name: WideString read FName write FName;
-    property Root: HKEY read FRoot write FRoot; { HKCU, HKLM, HKCR }
-    property Value: WideString read FValue write FValue;
-    property ValueType: TPackageRegistryKeyValueType read FValueType write FValueType;
-  end;
-
-  TPackageRegistryKeyList = class(TObjectList)
-  private
-    FPackage: TPackage;
-    function Get(Index: Integer): TPackageRegistryKey;
-    procedure Put(Index: Integer; const Value: TPackageRegistryKey);
-  public
-    constructor Create(APackage: TPackage);
-    procedure Assign(Source: TPackageRegistryKeyList); virtual;
-    procedure LoadIni(AIni: TIniFile); virtual;
-    procedure SaveIni(AIni: TIniFile); virtual;
-    procedure LoadXML(ARoot: IXMLNode); virtual;
-    procedure SaveXML(ARoot: IXMLNode); virtual;
-    property Items[Index: Integer]: TPackageRegistryKey read Get write Put; default;
-  end;
-
   { Package Options }
 
-  TPackageOptions = class
+  TPackageOptions = class(TPackageBaseObject)
   private
-    FPackage: TPackage;
     FFileVersion: WideString;
     FExecuteProgram: WideString;
     FReadmeFile: TPackageContentFile;
     FGraphicFile: TPackageContentFile;
-    FButtons: TPackageImageButtonList;
     FLoadLegacy: Boolean;
-    FRegistryKeys: TPackageRegistryKeyList;
     procedure SetReadmeFile(const Value: TPackageContentFile);
     procedure SetExecuteProgram(Value: WideString);
     procedure SetFileVersion(Value: WideString);
@@ -216,31 +139,28 @@ type
       EventType: TPackageNotifyEventType; var FAllow: Boolean);
     procedure ReadmeRemoved(Sender: TObject;
       EventType: TPackageNotifyEventType; var FAllow: Boolean);
-  protected
-    property Package: TPackage read FPackage;
   public
-    procedure Assign(Source: TPackageOptions); virtual;
-    constructor Create(APackage: TPackage); virtual;
+    constructor Create(APackage: TPackage); override;
     destructor Destroy; override;
+    procedure Assign(Source: TPackageOptions); virtual;
     procedure LoadIni(AIni: TIniFile); virtual;
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
     property LoadLegacy: Boolean read FLoadLegacy write FLoadLegacy;
     property FileVersion: WideString read FFileVersion write SetFileVersion;
     property ExecuteProgram: WideString read FExecuteProgram write SetExecuteProgram;
     property ReadmeFile: TPackageContentFile read FReadmeFile write SetReadmeFile;
     property GraphicFile: TPackageContentFile read FGraphicFile write SetGraphicFile;
-    property Buttons: TPackageImageButtonList read FButtons;
-    property RegistryKeys: TPackageRegistryKeyList read FRegistryKeys;
 
   end;
 
   { Package Information }
 
-  TPackageInfoEntry = class
+  TPackageInfoEntry = class(TPackageBaseObject)
   private
-    FPackage: TPackage;
     FURL: WideString;
     FDescription: WideString;
     FName: WideString;
@@ -249,7 +169,6 @@ type
     procedure SetName(Value: WideString);
     procedure SetURL(Value: WideString);
   public
-    constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageInfoEntry); virtual;
     property InfoType: TPackageInfoEntryType read FInfoType;
     property Name: WideString read FName write SetName;
@@ -257,92 +176,73 @@ type
     property URL: WideString read FURL write SetURL;
   end;
 
-  TPackageInfoEntryList = class(TObjectList)
-  private
-    FPackage: TPackage;
+  TPackageInfoEntryList = class(TPackageObjectList<TPackageInfoEntry>)
   protected
-    function Get(Index: Integer): TPackageInfoEntry;
-    procedure Put(Index: Integer; Item: TPackageInfoEntry);
-
     procedure SetDesc(Name, Desc: WideString);
     procedure SetURL(Name, URL: WideString);
     function DescIndexOf(Name: WideString): WideString;
     function UrlIndexOf(Name: WideString): WideString;
   public
-    constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageInfoEntryList); virtual;
     procedure LoadIni(AIni: TIniFile); virtual;
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
-    property Items[Index: Integer]: TPackageInfoEntry read Get write Put; default;
-    function IndexOf(Item: TPackageInfoEntry): Integer; overload;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
     function IndexOf(Name: WideString): Integer; overload;
 
 
     property Desc[Name: WideString]: WideString read DescIndexOf write SetDesc;
     property URL[Name: WideString]: WideString read URLIndexOf write SetURL;
-
-    function Add(Item: TPackageInfoEntry): Integer;
   end;
 
   { Package Start Menu Classes }
 
   TPackageStartMenuEntryLocation = (psmelStartMenu, psmelDesktop); //, psmelQuickLaunch);
 
-  TPackageStartMenuEntry = class
-  private
-    FPackage: TPackage;
+  TPackageStartMenuEntry = class(TPackageBaseObject)
   public
     Name: WideString;
     Prog: WideString;
     Params: WideString;
     Icon: WideString;
     Location: TPackageStartMenuEntryLocation;
-    constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageStartMenuEntry); virtual;
   end;
 
-  TPackageStartMenuEntryList = class(TObjectList)
-  private
-    FPackage: TPackage;
-  protected
-    function Get(Index: Integer): TPackageStartMenuEntry;
-    procedure Put(Index: Integer; Item: TPackageStartMenuEntry);
+  TPackageStartMenuEntryList = class(TPackageObjectList<TPackageStartMenuEntry>)
   public
-    constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageStartMenuEntryList); virtual;
     procedure LoadIni(AIni: TIniFile); virtual;
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
-    property Items[Index: Integer]: TPackageStartMenuEntry read Get write Put; default;
-    function IndexOf(Item: TPackageStartMenuEntry): Integer;
-    function Add(Item: TPackageStartMenuEntry): Integer;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
   end;
 
-  TPackageStartMenu = class
-  private
-    FPackage: TPackage;
+  TPackageStartMenu = class(TPackageBaseObject)
   public
     Path: WideString;
     DoCreate: Boolean;
     AddUninstallEntry: Boolean;
     Entries: TPackageStartMenuEntryList;
-    constructor Create(APackage: TPackage);
+    constructor Create(APackage: TPackage); override;
     destructor Destroy; override;
     procedure Assign(Source: TPackageStartMenu); virtual;
     procedure LoadIni(AIni: TIniFile); virtual;
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
   end;
 
   { Package contained files }
 
-  TPackageContentFile = class(TPackageBaseObject)
+  TPackageContentFile = class(TPackageBaseNotifyObject)
   private
-    FPackage: TPackage;
     FCopyLocation: TPackageFileCopyLocation;
     FDescription: WideString;
     FFileName: WideString;
@@ -352,37 +252,83 @@ type
     procedure SetFileType(const Value: TKMFileType);
     procedure SetCopyLocation(const Value: TPackageFileCopyLocation);
   public
-    constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageContentFile); virtual;
     function RelativeFileName: WideString;
     property FileName: WideString read FFileName write SetFileName;  // relative to .kps, or no path if inside .kmp or .exe
     property FileType: TKMFileType read FFileType write SetFileType;
     property Description: WideString read FDescription write SetDescription;
     property CopyLocation: TPackageFileCopyLocation read FCopyLocation write SetCopyLocation;
-    property Package: TPackage read FPackage;
   end;
 
-  TPackageContentFileList = class(TObjectList)
-  private
-    FPackage: TPackage;
-  protected
-    function Get(Index: Integer): TPackageContentFile;
-    procedure Put(Index: Integer; Item: TPackageContentFile);
+  TPackageContentFileList = class(TPackageObjectList<TPackageContentFile>)
   public
-    constructor Create(APackage: TPackage);
     procedure Assign(Source: TPackageContentFileList); virtual;
     procedure LoadIni(AIni: TIniFile); virtual;
     procedure SaveIni(AIni: TIniFile); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
-    property Items[Index: Integer]: TPackageContentFile read Get write Put; default;
-    function IndexOf(Item: TPackageContentFile): Integer;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
+
     function IndexOfFileType(FFileType: TKMFileType): Integer;
-    function Add(Item: TPackageContentFile): Integer;
     function FromFileName(Filename: WideString): TPackageContentFile;
     function FromFileNameEx(Filename: WideString): TPackageContentFile;
     procedure Delete(Index: Integer);
   end;
+
+  { TPackageKeyboard }
+
+  TPackageKeyboard = class;
+  TPackageKeyboardList = class;
+  TPackageKeyboardLanguage = class;
+  TPackageKeyboardLanguageList = class;
+
+  TPackageKeyboard = class(TPackageBaseObject)
+  private
+    FName: string;
+    FOSKFont: TPackageContentFile;
+    FID: string;
+    FDisplayFont: TPackageContentFile;
+    FLanguages: TPackageKeyboardLanguageList;
+    FVersion: string;
+    procedure SetDisplayFont(const Value: TPackageContentFile);
+    procedure SetOSKFont(const Value: TPackageContentFile);
+    procedure DisplayFontRemoved(Sender: TObject;
+      EventType: TPackageNotifyEventType; var FAllow: Boolean);
+    procedure OSKFontRemoved(Sender: TObject;
+      EventType: TPackageNotifyEventType; var FAllow: Boolean);
+  public
+    constructor Create(APackage: TPackage); override;
+    destructor Destroy; override;
+    procedure Assign(Source: TPackageKeyboard); virtual;
+    property Name: string read FName write FName;
+    property ID: string read FID write FID;
+    property Version: string read FVersion write FVersion;
+    property Languages: TPackageKeyboardLanguageList read FLanguages;
+    property OSKFont: TPackageContentFile read FOSKFont write SetOSKFont;
+    property DisplayFont: TPackageContentFile read FDisplayFont write SetDisplayFont;
+  end;
+
+  TPackageKeyboardList = class(TPackageObjectList<TPackageKeyboard>)
+  public
+    procedure Assign(Source: TPackageKeyboardList); virtual;
+    procedure LoadIni(AIni: TIniFile); virtual;
+    procedure SaveIni(AIni: TIniFile); virtual;
+    procedure LoadXML(ARoot: IXMLNode); virtual;
+    procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
+    function ItemByID(id: string): TPackageKeyboard;
+  end;
+
+  TPackageKeyboardLanguage = class(TPackageBaseObject)
+    ID: string;
+    Name: string;
+  end;
+
+  TPackageKeyboardLanguageList = class(TPackageObjectList<TPackageKeyboardLanguage>);
+
+  { TPackage }
 
   TPackage = class
   private
@@ -394,20 +340,30 @@ type
     function XMLRootNode: WideString; virtual;
     procedure DoLoadXML(ARoot: IXMLNode); virtual;
     procedure DoSaveXML(ARoot: IXMLNode); virtual;
+    procedure DoLoadJSON(ARoot: TJSONObject); virtual;
+    procedure DoSaveJSON(ARoot: TJSONObject); virtual;
+    procedure DoLoadIni(ini: TIniFile); virtual;
+    procedure DoSaveIni(ini: TIniFile); virtual;
   public
     Options: TPackageOptions;
     StartMenu: TPackageStartMenu;
     Files: TPackageContentFileList;
     Info: TPackageInfoEntryList;
+    Keyboards: TPackageKeyboardList;
+
     property FileName: WideString read FFileName write FFileName;
     procedure Assign(Source: TPackage); virtual;
     constructor Create;
     destructor Destroy; override;
-    procedure LoadIni; virtual;
-    procedure SaveIni; virtual;
 
-    procedure LoadXML; //virtual;
-    procedure SaveXML; //virtual;
+    procedure LoadIni;
+    procedure SaveIni;
+
+    procedure LoadXML;
+    procedure SaveXML;
+
+    procedure LoadJSON;
+    procedure SaveJSON;
 
     function SaveXMLToText: WideString;
     procedure LoadXMLFromText(Text: WideString);
@@ -418,9 +374,6 @@ type
   end;
 
 const
-  PackageImageButtonTypeName: array[TPackageImageButtonType] of WideString = ('install', 'cancel', 'about', 'custom');
-  STooManyButtons = 'At most %d buttons are allowed in the dialog.';
-  MAX_PACKAGE_BUTTONS = 16;
   PackageStartMenuEntryLocationName: array[TPackageStartMenuEntryLocation] of WideString = ('Start Menu', 'Desktop'); //, 'Quick Launch Toolbar');
 
 implementation
@@ -429,6 +382,7 @@ uses
   System.TypInfo,
   System.Variants,
 
+  JsonUtil,
   KeymanVersion,
   utildir,
   utilsystem,
@@ -439,6 +393,85 @@ const
   SReadmeNotOwnedCorrectly = 'The readme file ''%s'' referred to is not part of the package.';
   SGraphicNotOwnedCorrectly = 'The graphic file ''%s'' referred to is not part of the package.';
   SFileNotOwnedCorrectly = 'The file ''%s'' referred to is not part of the package.';
+  SDisplayFontNotOwnedCorrectly = 'The display font file ''%s'' referred to is not part of the package.';
+  SOSKFontNotOwnedCorrectly = 'The OSK font file ''%s'' referred to is not part of the package.';
+
+
+
+
+const
+  SXML_PackageKeyboards = 'Keyboards';
+  SXML_PackageKeyboard_Name = 'Name';
+  SXML_PackageKeyboard_ID = 'ID';
+  SXML_PackageKeyboard_Version = 'Version';
+  SXML_PackageKeyboard_OSKFont = 'OSKFont';
+  SXML_PackageKeyboard_DisplayFont = 'DisplayFont';
+  SXML_PackageKeyboard_Languages = 'Languages';
+
+  SXML_PackageKeyboard_Language = 'Language';
+  SXML_PackageKeyboard_Language_ID = 'ID';
+  SXML_PackageKeyboard_Language_Name = 'Name';
+
+const
+  SJSON_System = 'system';
+  SJSON_System_KeymanDeveloperVersion = 'keymanDeveloperVersion';
+  SJSON_System_FileVersion = 'fileVersion';
+
+  SJSON_Options = 'options';
+  SJSON_Options_ExecuteProgram = 'executeProgram';
+  SJSON_Options_ReadMeFile = 'readmeFile';
+  SJSON_Options_GraphicFile = 'graphicFile';
+
+  SJSON_Registry = 'registry';
+  SJSON_Registry_Root = 'root';
+  SJSON_Registry_Key = 'key';
+  SJSON_Registry_Name = 'name';
+  SJSON_Registry_ValueType = 'valueType';
+  SJSON_Registry_Value = 'value';
+
+  SJSON_StartMenu = 'startMenu';
+  SJSON_StartMenu_Folder = 'folder';
+  SJSON_StartMenu_AddUninstallEntry = 'addUninstallEntry';
+  SJSON_StartMenu_Items = 'items';
+  SJSON_StartMenu_Items_Name = 'name';
+  SJSON_StartMenu_Items_Filename = 'filename';
+  SJSON_StartMenu_Items_Arguments = 'arguments';
+  SJSON_StartMenu_Items_Icon = 'icon';
+  SJSON_StartMenu_Items_Location = 'location';
+
+  SJSON_Info = 'info';
+  SJSON_Info__Description = 'description';
+  SJSON_Info__URL = 'url';
+
+  SJSON_Info_Website = 'website';
+  SJSON_Info_Version = 'version';
+  SJSON_Info_Name = 'name';
+  SJSON_Info_Copyright = 'copyright';
+  SJSON_Info_Author = 'author';
+
+  SJSON_PackageInfoEntryTypeNames: array[TPackageInfoEntryType] of string =
+    (SJSON_Info_Name, SJSON_Info_Version, SJSON_Info_Copyright, SJSON_Info_Author, SJSON_Info_Website, '');
+
+  SJSON_Files = 'files';
+  SJSON_Files_Name = 'name';
+  SJSON_Files_Description = 'description';
+  SJSON_Files_CopyLocation = 'copyLocation';
+
+  SJSON_Keyboards = 'keyboards';
+  SJSON_Keyboard_Name = 'name';
+  SJSON_Keyboard_ID = 'id';
+  SJSON_Keyboard_Version = 'version';
+  SJSON_Keyboard_OSKFont = 'oskFont';
+  SJSON_Keyboard_DisplayFont = 'displayFont';
+
+  SJSON_Keyboard_Languages = 'languages';
+  SJSON_Keyboard_Language_ID = 'id';
+  SJSON_Keyboard_Language_Name = 'name';
+
+function XmlVarToStr(v: OleVariant): string;
+begin
+  Result := Trim(VarToStr(v));
+end;
 
 {-------------------------------------------------------------------------------
  - TPackageOptions                                                             -
@@ -449,31 +482,24 @@ begin
   FFileVersion := Source.FileVersion;
   FExecuteProgram := Source.ExecuteProgram;
   if Assigned(Source.ReadmeFile)
-    then ReadmeFile := FPackage.Files.FromFileName(Source.ReadmeFile.FileName)
+    then ReadmeFile := Package.Files.FromFileName(Source.ReadmeFile.FileName)
     else ReadmeFile := nil;
   if Assigned(Source.GraphicFile)
-    then GraphicFile := FPackage.Files.FromFileName(Source.GraphicFile.FileName)
+    then GraphicFile := Package.Files.FromFileName(Source.GraphicFile.FileName)
     else GraphicFile := nil;
-  FButtons.Assign(Source.Buttons);
-  FRegistryKeys.Assign(Source.RegistryKeys);
 end;
 
 constructor TPackageOptions.Create(APackage: TPackage);
 begin
-  inherited Create;
+  inherited Create(APackage);
   FLoadLegacy := True;
-  FPackage := APackage;
-  FButtons := TPackageImageButtonList.Create(FPackage);
-  FRegistryKeys := TPackageRegistryKeyList.Create(FPackage);
-  FFileVersion := SKeymanVersion;
+  FFileVersion := SKeymanVersion70;
 end;
 
 destructor TPackageOptions.Destroy;
 begin
   ReadmeFile := nil;
   GraphicFile := nil;
-  FButtons.Free;
-  FRegistryKeys.Free;
   inherited Destroy;
 end;
 
@@ -489,14 +515,12 @@ end;
 
 procedure TPackageOptions.LoadXML(ARoot: IXMLNode);
 begin
-  FileVersion :=                VarToWideStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
-  ExecuteProgram :=             VarToWideStr(ARoot.ChildNodes['Options'].ChildNodes['ExecuteProgram'].NodeValue);
-  ReadmeFile :=                 FPackage.Files.FromFileName(VarToWideStr(ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue));
-  GraphicFile :=                FPackage.Files.FromFileName(VarToWideStr(ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue));
+  FileVersion :=                XmlVarToStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
+  ExecuteProgram :=             XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['ExecuteProgram'].NodeValue);
+  ReadmeFile :=                 Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue));
+  GraphicFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
-  FButtons.LoadXML(ARoot);
-  FRegistryKeys.LoadXML(ARoot);
 end;
 
 procedure TPackageOptions.SaveXML(ARoot: IXMLNode);
@@ -507,20 +531,31 @@ begin
     ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue := ReadmeFile.RelativeFileName;
   if Assigned(GraphicFile) then
     ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue := GraphicFile.RelativeFileName;
-  FButtons.SaveXML(ARoot);
-  FRegistryKeys.SaveXML(ARoot);
 end;
 
 procedure TPackageOptions.LoadIni(AIni: TIniFile);
 begin
   FileVersion :=                AIni.ReadString('Package', 'Version',                  '');
   ExecuteProgram :=             AIni.ReadString('Package', 'ExecuteProgram',           '');
-  ReadmeFile :=                 FPackage.Files.FromFileName(AIni.ReadString('Package', 'ReadMeFile', ''));
-  GraphicFile :=                FPackage.Files.FromFileName(AIni.ReadString('Package', 'GraphicFile', ''));
+  ReadmeFile :=                 Package.Files.FromFileName(AIni.ReadString('Package', 'ReadMeFile', ''));
+  GraphicFile :=                Package.Files.FromFileName(AIni.ReadString('Package', 'GraphicFile', ''));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
-  if FLoadLegacy then FButtons.LoadIni(AIni);
-  FRegistryKeys.LoadIni(AIni);
+end;
+
+procedure TPackageOptions.LoadJSON(ARoot: TJSONObject);
+var
+  FSystem, FOptions: TJSONObject;
+begin
+  FSystem := ARoot.Values[SJSON_System] as TJSONObject;
+  FOptions := ARoot.Values[SJSON_Options] as TJSONObject;
+
+  FileVersion :=                GetJsonValueString(FSystem, SJSON_System_FileVersion);
+  ExecuteProgram :=             GetJsonValueString(FOptions, SJSON_Options_ExecuteProgram);
+  ReadmeFile :=                 Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_ReadMeFile));
+  GraphicFile :=                Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_GraphicFile));
+  if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
+  if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
 end;
 
 procedure TPackageOptions.SaveIni(AIni: TIniFile);
@@ -531,8 +566,25 @@ begin
     AIni.WriteString('Package', 'ReadMeFile', ReadmeFile.RelativeFileName);
   if Assigned(GraphicFile) then
     AIni.WriteString('Package', 'GraphicFile', GraphicFile.RelativeFileName);
-  FButtons.SaveIni(AIni);
-  FRegistryKeys.SaveIni(AIni);
+end;
+
+procedure TPackageOptions.SaveJSON(ARoot: TJSONObject);
+var
+  FOptions, FSystem: TJSONObject;
+begin
+  FSystem := TJSONObject.Create;
+  ARoot.AddPair(SJSON_System, FSystem);
+  FSystem.AddPair(SJSON_System_KeymanDeveloperVersion, GetVersionString);
+  FSystem.AddPair(SJSON_System_FileVersion, FileVersion);
+
+  FOptions := TJSONObject.Create;
+  ARoot.AddPair(SJSON_Options, FOptions);
+  if ExecuteProgram <> '' then
+    FOptions.AddPair(SJSON_Options_ExecuteProgram, ExecuteProgram);
+  if Assigned(ReadmeFile) then
+    FOptions.AddPair(SJSON_Options_ReadMeFile, ReadmeFile.RelativeFileName);
+  if Assigned(GraphicFile) then
+    FOptions.AddPair(SJSON_Options_GraphicFile, GraphicFile.RelativeFileName);
 end;
 
 procedure TPackageOptions.SetExecuteProgram(Value: WideString);
@@ -554,7 +606,7 @@ begin
     FGraphicFile := nil
   else
   begin
-    if Value.FPackage <> FPackage then raise EPackageInfo.CreateFmt(SGraphicNotOwnedCorrectly, [Value]);
+    if Value.Package <> Package then raise EPackageInfo.CreateFmt(SGraphicNotOwnedCorrectly, [Value]);
     FGraphicFile := Value;
     FGraphicFile.AddNotifyObject(GraphicRemoved);
   end;
@@ -567,7 +619,7 @@ begin
     FReadmeFile := nil
   else
   begin
-    if Value.FPackage <> FPackage then raise EPackageInfo.CreateFmt(SReadmeNotOwnedCorrectly, [Value]);
+    if Value.Package <> Package then raise EPackageInfo.CreateFmt(SReadmeNotOwnedCorrectly, [Value]);
     FReadmeFile := Value;
     FReadmeFile.AddNotifyObject(ReadmeRemoved);
   end;
@@ -585,12 +637,6 @@ begin
   FInfoType := Source.InfoType;
 end;
 
-constructor TPackageInfoEntry.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
-end;
-
 procedure TPackageInfoEntry.SetDescription(Value: WideString);
 begin
   FDescription := Value;
@@ -604,7 +650,7 @@ begin
   FInfoType := pietOther;
 
   for piet := Low(PackageInfoEntryTypeNames) to High(PackageInfoEntryTypeNames) do
-    if PackageInfoEntryTypeNames[piet] = LowerCase(FName) then
+    if SameText(PackageInfoEntryTypeNames[piet], FName) then
       FInfoType := piet;
 end;
 
@@ -617,11 +663,6 @@ end;
  - TPackageInfoEntryList                                                       -
  ------------------------------------------------------------------------------}
 
-function TPackageInfoEntryList.Get(Index: Integer): TPackageInfoEntry;        begin Result := TPackageInfoEntry(inherited Get(Index)); end;
-procedure TPackageInfoEntryList.Put(Index: Integer; Item: TPackageInfoEntry); begin inherited Put(Index, Pointer(Item)); end;
-function TPackageInfoEntryList.Add(Item: TPackageInfoEntry): Integer;         begin Result := inherited Add(Pointer(Item)); end;
-function TPackageInfoEntryList.IndexOf(Item: TPackageInfoEntry): Integer;     begin Result := inherited IndexOf(Pointer(Item)); end;
-
 procedure TPackageInfoEntryList.LoadXML(ARoot: IXMLNode);
 var
   i: Integer;
@@ -633,10 +674,10 @@ begin
   for i := 0 to ARoot.ChildNodes.Count - 1 do
   begin
     ANode := ARoot.ChildNodes[i];
-    inf := TPackageInfoEntry.Create(FPackage);
+    inf := TPackageInfoEntry.Create(Package);
     inf.Name := ANode.NodeName;
-    inf.Description := VarToWideStr(ANode.NodeValue);
-    inf.URL := VarToWideStr(ANode.Attributes['URL']);
+    inf.Description := XmlVarToStr(ANode.NodeValue);
+    inf.URL := XmlVarToStr(ANode.Attributes['URL']);
     Add(inf);
   end;
 end;
@@ -671,7 +712,7 @@ begin
       description := CommaToken(t);
       url := CommaToken(t);
 
-      inf := TPackageInfoEntry.Create(FPackage);
+      inf := TPackageInfoEntry.Create(Package);
       inf.Name := s[i];
       inf.Description := description;
       inf.URL := url;
@@ -682,12 +723,60 @@ begin
   end;
 end;
 
+procedure TPackageInfoEntryList.LoadJSON(ARoot: TJSONObject);
+var
+  name: string;
+  i: Integer;
+  inf: TPackageInfoEntry;
+  FItems: TJSONObject;
+  FNode: TJSONObject;
+  v: TPackageInfoEntryType;
+begin
+  Clear;
+  FItems := ARoot.Values[SJSON_Info] as TJSONObject;
+  for i := 0 to FItems.Count - 1 do
+  begin
+    name := FItems.Pairs[i].JsonString.Value;
+    for v := Low(TPackageInfoEntryType) to High(TPackageInfoEntryType) do
+      if SJSON_PackageInfoEntryTypeNames[v] = name then
+      begin
+        FNode := FItems.Pairs[i].JsonValue as TJSONObject;
+        inf := TPackageInfoEntry.Create(Package);
+        inf.Name := name;
+        inf.Description := GetJsonValueString(FNode, SJSON_Info__Description);
+        inf.URL := GetJsonValueString(FNode, SJSON_Info__URL);
+        Add(inf);
+        Break;
+      end;
+  end;
+end;
+
 procedure TPackageInfoEntryList.SaveIni(AIni: TIniFile);
 var
   i: Integer;
 begin
   for i := 0 to Count - 1 do
     AIni.WriteString('Info', Items[i].Name, Format('"%s","%s"', [Items[i].Description, Items[i].URL]));
+end;
+
+procedure TPackageInfoEntryList.SaveJSON(ARoot: TJSONObject);
+var
+  i: Integer;
+  AInfoRoot, ANode: TJSONObject;
+begin
+  AInfoRoot := TJSONObject.Create;
+  ARoot.AddPair(SJSON_Info, AInfoRoot);
+  for i := 0 to Count - 1 do
+  begin
+    if SJSON_PackageInfoEntryTypeNames[Items[i].InfoType] <> '' then
+    begin
+      ANode := TJSONObject.Create;
+      AInfoRoot.AddPair(SJSON_PackageInfoEntryTypeNames[Items[i].InfoType], ANode);
+      ANode.AddPair(SJSON_Info__Description, Items[i].Description);
+      if Items[i].URL <> '' then
+        ANode.AddPair(SJSON_Info__URL, Items[i].URL);
+    end;
+  end;
 end;
 
 function TPackageInfoEntryList.DescIndexOf(Name: WideString): WideString;
@@ -716,7 +805,7 @@ begin
   i := IndexOf(Name);
   if i = -1 then
   begin
-    inf := TPackageInfoEntry.Create(FPackage);
+    inf := TPackageInfoEntry.Create(Package);
     inf.Name := Name;
     Add(inf);
   end
@@ -733,7 +822,7 @@ begin
   i := IndexOf(Name);
   if i = -1 then
   begin
-    inf := TPackageInfoEntry.Create(FPackage);
+    inf := TPackageInfoEntry.Create(Package);
     inf.Name := Name;
     Add(inf);
   end
@@ -751,12 +840,6 @@ begin
     if WideLowerCase(Items[i].Name) = WideLowerCase(Name) then Result := i;
 end;
 
-constructor TPackageInfoEntryList.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
-end;
-
 procedure TPackageInfoEntryList.Assign(Source: TPackageInfoEntryList);
 var
   i: Integer;
@@ -765,7 +848,7 @@ begin
   Clear;
   for i := 0 to Source.Count - 1 do
   begin
-    pie := TPackageInfoEntry.Create(FPackage);
+    pie := TPackageInfoEntry.Create(Package);
     pie.Assign(Source[i]);
     Add(pie);
   end;
@@ -784,31 +867,20 @@ begin
   Location := Source.Location;
 end;
 
-constructor TPackageStartMenuEntry.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
-end;
-
 {-------------------------------------------------------------------------------
  - TPackageStartMenuEntryList                                                  -
  ------------------------------------------------------------------------------}
 
-function TPackageStartMenuEntryList.Get(Index: Integer): TPackageStartMenuEntry;        begin Result := TPackageStartMenuEntry(inherited Get(Index)); end;
-procedure TPackageStartMenuEntryList.Put(Index: Integer; Item: TPackageStartMenuEntry); begin inherited Put(Index, Pointer(Item)); end;
-function TPackageStartMenuEntryList.Add(Item: TPackageStartMenuEntry): Integer;         begin Result := inherited Add(Pointer(Item)); end;
-function TPackageStartMenuEntryList.IndexOf(Item: TPackageStartMenuEntry): Integer;     begin Result := inherited IndexOf(Pointer(Item)); end;
+function StrToStartMenuEntryLocation(s: WideString): TPackageStartMenuEntryLocation;
+var
+  v: Integer;
+begin
+  v := System.TypInfo.GetEnumValue(TypeInfo(TPackageStartMenuEntryLocation), s);
+  if v = -1 then Result := psmelStartMenu
+  else Result := TPackageStartMenuEntryLocation(v);
+end;
 
 procedure TPackageStartMenuEntryList.LoadXML(ARoot: IXMLNode);
-
-    function StrToStartMenuEntryLocation(s: WideString): TPackageStartMenuEntryLocation;
-    var
-      v: Integer;
-    begin
-      v := System.TypInfo.GetEnumValue(TypeInfo(TPackageStartMenuEntryLocation), s);
-      if v = -1 then Result := psmelStartMenu
-      else Result := TPackageStartMenuEntryLocation(v);
-    end;
 var
   sme: TPackageStartMenuEntry;
   i: Integer;
@@ -820,12 +892,12 @@ begin
   begin
     with ANode.ChildNodes[i] do
     begin
-      sme := TPackageStartMenuEntry.Create(FPackage);
-      sme.Name := VarToWideStr(ChildNodes['Name'].NodeValue);
-      sme.Prog := VarToWideStr(ChildNodes['FileName'].NodeValue);
-      sme.Params := VarToWideStr(ChildNodes['Arguments'].NodeValue);
-      sme.Icon := VarToWideStr(ChildNodes['Icon'].NodeValue);
-      sme.Location := StrToStartMenuEntryLocation(VarToWideStr(ChildNodes['Location'].NodeValue));
+      sme := TPackageStartMenuEntry.Create(Package);
+      sme.Name := XmlVarToStr(ChildNodes['Name'].NodeValue);
+      sme.Prog := XmlVarToStr(ChildNodes['FileName'].NodeValue);
+      sme.Params := XmlVarToStr(ChildNodes['Arguments'].NodeValue);
+      sme.Icon := XmlVarToStr(ChildNodes['Icon'].NodeValue);
+      sme.Location := StrToStartMenuEntryLocation(XmlVarToStr(ChildNodes['Location'].NodeValue));
       Self.Add(sme);
     end;
   end;
@@ -864,14 +936,45 @@ begin
       prog := CommaToken(t);
       params := CommaToken(t);
 
-      sme := TPackageStartMenuEntry.Create(FPackage);
+      sme := TPackageStartMenuEntry.Create(Package);
       sme.Name := s[i];
       sme.Prog := prog;
       sme.Params := params;
+
+      // For backward compatibility, we need these to go in another section.
+      // Earlier versions of Keyman ignored these values
+      sme.Icon := AIni.ReadString('StartMenuEntries_Icon', s[i], '');
+      sme.Location := TPackageStartMenuEntryLocation(StrToIntDef(AIni.ReadString('StartMenuEntries_Location', s[i], ''), 0));
+
       Add(sme);
     end;
   finally
     s.Free;
+  end;
+end;
+
+procedure TPackageStartMenuEntryList.LoadJSON(ARoot: TJSONObject);
+var
+  i: Integer;
+  AItems: TJSONArray;
+  AItem: TJSONObject;
+  sme: TPackageStartMenuEntry;
+begin
+  AItems := ARoot.Values[SJSON_StartMenu_Items] as TJSONArray;
+  if not Assigned(AItems) then
+    Exit;
+
+  for i := 0 to AItems.Count - 1 do
+  begin
+    AItem := AItems.Items[i] as TJSONObject;
+
+    sme := TPackageStartMenuEntry.Create(Package);
+    sme.Name := GetJsonValueString(AItem, SJSON_StartMenu_Items_Name);
+    sme.Prog := GetJsonValueString(AItem, SJSON_StartMenu_Items_Filename);
+    sme.Params := GetJsonValueString(AItem, SJSON_StartMenu_Items_Arguments);
+    sme.Icon := GetJsonValueString(AItem, SJSON_StartMenu_Items_Icon);
+    sme.Location := StrToStartMenuEntryLocation(GetJsonValueString(AItem, SJSON_StartMenu_Items_Location));
+    Self.Add(sme);
   end;
 end;
 
@@ -880,13 +983,41 @@ var
   i: Integer;
 begin
   for i := 0 to Count - 1 do
+  begin
     AIni.WriteString('StartMenuEntries', Items[i].Name, Format('"%s","%s"', [Items[i].Prog, Items[i].Params]));
+
+    // For backward compatibility, we need these to go in another section.
+    // Earlier versions of Keyman ignored these values
+    if Items[i].Icon <> '' then
+      AIni.WriteString('StartMenuEntries_Icon', Items[i].Name, Items[i].Icon);
+
+    if Items[i].Location <> psmelStartMenu then
+      AIni.WriteString('StartMenuEntries_Location', Items[i].Name, IntToStr(Ord(Items[i].Location)));
+  end;
 end;
 
-constructor TPackageStartMenuEntryList.Create(APackage: TPackage);
+procedure TPackageStartMenuEntryList.SaveJSON(ARoot: TJSONObject);
+var
+  i: Integer;
+  AItems: TJSONArray;
+  AItem: TJSONObject;
 begin
-  inherited Create;
-  FPackage := APackage;
+  AItems := TJSONArray.Create;
+  ARoot.AddPair(SJSON_StartMenu_Items, AItems);
+  for i := 0 to Count - 1 do
+  begin
+    AItem := TJSONObject.Create;
+    AItems.Add(AItem);
+    AItem.AddPair(SJSON_StartMenu_Items_Name, Items[i].Name);
+    AItem.AddPair(SJSON_StartMenu_Items_Filename, Items[i].Prog);
+    if Items[i].Params <> '' then
+      AItem.AddPair(SJSON_StartMenu_Items_Arguments, Items[i].Params);
+    if Items[i].Icon <> '' then
+      AItem.AddPair(SJSON_StartMenu_Items_Icon, Items[i].Icon);
+    if Items[i].Location <> psmelStartMenu then
+      AItem.AddPair(SJSON_StartMenu_Items_Location,
+        System.TypInfo.GetEnumName(TypeInfo(TPackageStartMenuEntryLocation), Ord(Items[i].Location)));
+  end;
 end;
 
 procedure TPackageStartMenuEntryList.Assign(Source: TPackageStartMenuEntryList);
@@ -897,7 +1028,7 @@ begin
   Clear;
   for i := 0 to Source.Count - 1 do
   begin
-    psme := TPackageStartMenuEntry.Create(FPackage);
+    psme := TPackageStartMenuEntry.Create(Package);
     psme.Assign(Source[i]);
     Add(psme);
   end;
@@ -917,9 +1048,8 @@ end;
 
 constructor TPackageStartMenu.Create(APackage: TPackage);
 begin
-  inherited Create;
-  FPackage := APackage;
-  Entries := TPackageStartMenuEntryList.Create(FPackage);
+  inherited Create(APackage);
+  Entries := TPackageStartMenuEntryList.Create(Package);
 end;
 
 destructor TPackageStartMenu.Destroy;
@@ -933,7 +1063,7 @@ var
   ANode: IXMLNode;
 begin
   ANode := ARoot.ChildNodes['StartMenu'];
-  Path := VarToWideStr(ANode.ChildNodes['Folder'].NodeValue);
+  Path := XmlVarToStr(ANode.ChildNodes['Folder'].NodeValue);
   DoCreate := Path <> '';
   AddUninstallEntry := ANode.ChildNodes.IndexOf('AddUninstallEntry') >= 0;
   Entries.LoadXML(ARoot);
@@ -957,12 +1087,43 @@ begin
   Entries.LoadIni(AIni);
 end;
 
+procedure TPackageStartMenu.LoadJSON(ARoot: TJSONObject);
+var
+  ANode: TJSONObject;
+begin
+  ANode := ARoot.Values[SJSON_StartMenu] as TJSONObject;
+  if not Assigned(ANode) then
+    Exit;
+
+  Path := GetJsonValueString(ANode, SJSON_StartMenu_Folder);
+  DoCreate := Path <> '';
+  AddUninstallEntry := Assigned(ANode.Values[SJSON_StartMenu_AddUninstallEntry]) and
+    (ANode.Values[SJSON_StartMenu_AddUninstallEntry] is TJSONTrue);
+  Entries.LoadJSON(ANode);
+end;
+
 procedure TPackageStartMenu.SaveIni(AIni: TIniFile);
 begin
   AIni.WriteString('StartMenu', 'Path',              Path);
   AIni.WriteBool(  'StartMenu', 'Create',            DoCreate);
   AIni.WriteBool(  'StartMenu', 'AddUninstallEntry', AddUninstallEntry);
   Entries.SaveIni(AIni);
+end;
+
+procedure TPackageStartMenu.SaveJSON(ARoot: TJSONObject);
+var
+  ANode: TJSONObject;
+begin
+  if (Path = '') and (Entries.Count = 0) then
+    Exit;
+
+  ANode := TJSONObject.Create;
+  ARoot.AddPair(SJSON_StartMenu, ANode);
+  if Path <> '' then
+    ANode.AddPair(SJSON_StartMenu_Folder, Path);
+  if AddUninstallEntry then
+    ANode.AddPair(SJSON_StartMenu_AddUninstallEntry, TJSONBool.Create(True));
+  Entries.SaveJSON(ANode);
 end;
 
 {-------------------------------------------------------------------------------
@@ -977,15 +1138,9 @@ begin
   FFileType := Source.FileType;
 end;
 
-constructor TPackageContentFile.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
-end;
-
 function TPackageContentFile.RelativeFileName: WideString;
 begin
-  Result := ExtractRelativePath(FPackage.FileName, FFileName);
+  Result := ExtractRelativePath(Package.FileName, FFileName);
 end;
 
 procedure TPackageContentFile.SetCopyLocation(const Value: TPackageFileCopyLocation);
@@ -1012,11 +1167,6 @@ end;
 {-------------------------------------------------------------------------------
  - TPackageSubFileList                                                         -
  ------------------------------------------------------------------------------}
-
-function TPackageContentFileList.Get(Index: Integer): TPackageContentFile;        begin Result := TPackageContentFile(inherited Get(Index)); end;
-procedure TPackageContentFileList.Put(Index: Integer; Item: TPackageContentFile); begin inherited Put(Index, Pointer(Item)); end;
-function TPackageContentFileList.Add(Item: TPackageContentFile): Integer;         begin Result := inherited Add(Pointer(Item)); end;
-function TPackageContentFileList.IndexOf(Item: TPackageContentFile): Integer;     begin Result := inherited IndexOf(Pointer(Item)); end;
 
 function TPackageContentFileList.IndexOfFileType(FFileType: TKMFileType): Integer;
 var
@@ -1049,10 +1199,10 @@ begin
   begin
     with ANode.ChildNodes[i] do
     begin
-      subfile := TPackageContentFile.Create(FPackage);
-      subfile.FileName := VarToWideStr(ChildNodes['Name'].NodeValue);
-      subfile.Description := VarToWideStr(ChildNodes['Description'].NodeValue);
-      subfile.FCopyLocation := TPackageFileCopyLocation(StrToIntDef(VarToWideStr(ChildNodes['Location'].NodeValue), 0));
+      subfile := TPackageContentFile.Create(Package);
+      subfile.FileName := XmlVarToStr(ChildNodes['Name'].NodeValue);
+      subfile.Description := XmlVarToStr(ChildNodes['Description'].NodeValue);
+      subfile.FCopyLocation := TPackageFileCopyLocation(StrToIntDef(XmlVarToStr(ChildNodes['Location'].NodeValue), 0));
       Add(subfile);
     end;
   end;
@@ -1071,7 +1221,7 @@ begin
       ChildNodes['Name'].NodeValue := Items[i].FileName;
       ChildNodes['Description'].NodeValue := Items[i].Description;
       ChildNodes['CopyLocation'].NodeValue := Ord(Items[i].CopyLocation);
-      ChildNodes['FileType'].NodeValue := ExtractFileExt(Items[i].FFileName); 
+      ChildNodes['FileType'].NodeValue := ExtractFileExt(Items[i].FFileName);
     end;
   end;
 end;
@@ -1094,7 +1244,7 @@ begin
       description := CommaToken(t);
       filename := CommaToken(t);
       copylocation := TPackageFileCopyLocation(StrToIntDef(CommaToken(t), 0));// CommaToken(t) = '1';
-      subfile := TPackageContentFile.Create(FPackage);
+      subfile := TPackageContentFile.Create(Package);
       subfile.FileName := filename;
       subfile.Description := description;
       subfile.FCopyLocation := copylocation;
@@ -1102,6 +1252,28 @@ begin
     end;
   finally
     s.Free;
+  end;
+end;
+
+procedure TPackageContentFileList.LoadJSON(ARoot: TJSONObject);
+var
+  subfile: TPackageContentFile;
+  i: Integer;
+  FItems: TJSONArray;
+  FItem: TJSONObject;
+begin
+  Clear;
+  FItems := ARoot.Values[SJSON_Files] as TJSONArray;
+  for i := 0 to FItems.Count - 1 do
+  begin
+    FItem := FItems.Items[i] as TJSONObject;
+
+    subfile := TPackageContentFile.Create(Package);
+    subfile.FileName := GetJsonValueString(FItem, SJSON_Files_Name);
+    subfile.Description := GetJsonValueString(FItem, SJSON_Files_Description);
+    if Assigned(FItem.Values[SJSON_Files_CopyLocation]) then
+      subfile.FCopyLocation := TPackageFileCopyLocation((FItem.Values[SJSON_Files_CopyLocation] as TJSONNumber).AsInt);
+    Add(subfile);
   end;
 end;
 
@@ -1114,10 +1286,26 @@ begin
       Items[i].FileName, Ord(Items[i].CopyLocation)]));
 end;
 
-constructor TPackageContentFileList.Create(APackage: TPackage);
+procedure TPackageContentFileList.SaveJSON(ARoot: TJSONObject);
+var
+  i: Integer;
+  AItems: TJSONArray;
+  AItem: TJSONObject;
 begin
-  inherited Create;
-  FPackage := APackage;
+  if Count = 0 then
+    Exit;
+
+  AItems := TJSONArray.Create;
+  ARoot.AddPair(SJSON_Files, AItems);
+  for i := 0 to Count - 1 do
+  begin
+    AItem := TJSONObject.Create;
+    AItems.Add(AItem);
+    AItem.AddPair(SJSON_Files_Name, Items[i].FileName);
+    AItem.AddPair(SJSON_Files_Description, Items[i].Description);
+    if Items[i].CopyLocation <> pfclPackage then
+      AItem.AddPair(SJSON_Files_CopyLocation, TJSONNumber.Create(Ord(Items[i].CopyLocation)));
+  end;
 end;
 
 procedure TPackageContentFileList.Assign(Source: TPackageContentFileList);
@@ -1128,7 +1316,7 @@ begin
   Clear;
   for i := 0 to Source.Count - 1 do
   begin
-    psf := TPackageContentFile.Create(FPackage);
+    psf := TPackageContentFile.Create(Package);
     psf.Assign(Source[i]);
     Add(psf);
   end;
@@ -1174,6 +1362,7 @@ begin
   Options.Assign(Source.Options);
   StartMenu.Assign(Source.StartMenu);
   Info.Assign(Source.Info);
+  Keyboards.Assign(Source.Keyboards);
 end;
 
 constructor TPackage.Create;
@@ -1183,6 +1372,8 @@ begin
   if not Assigned(Options)   then Options   := TPackageOptions.Create(Self);
   if not Assigned(StartMenu) then StartMenu := TPackageStartMenu.Create(Self);
   if not Assigned(Info)      then Info      := TPackageInfoEntryList.Create(Self);
+  if not Assigned(Keyboards) then Keyboards := TPackageKeyboardList.Create(Self);
+
 end;
 
 destructor TPackage.Destroy;
@@ -1191,6 +1382,7 @@ begin
   Options.Free;
   StartMenu.Free;
   Info.Free;
+  Keyboards.Free;
   inherited Destroy;
 end;
 
@@ -1209,14 +1401,35 @@ begin
       Exit;
     end;
 
-    StartMenu.LoadIni(ini);
-    Info.LoadIni(ini);
-    Files.LoadIni(ini);
-    Options.LoadLegacy := FLoadLegacy;
-    Options.LoadIni(ini);
+    DoLoadIni(ini);
   finally
     ini.Free;
   end;
+end;
+
+procedure TPackage.DoLoadIni(ini: TIniFile);
+begin
+  StartMenu.LoadIni(ini);
+  Info.LoadIni(ini);
+  Files.LoadIni(ini);
+  Options.LoadLegacy := FLoadLegacy;
+  Options.LoadIni(ini);
+  Keyboards.LoadIni(ini);
+end;
+
+procedure TPackage.LoadJSON;
+var
+  FJSON: TJSONObject;
+begin
+  with TStringStream.Create('', TEncoding.UTF8) do
+  try
+    LoadFromFile(FileName);
+    FJSON := TJSONObject.ParseJSONValue(DataString) as TJSONObject;
+  finally
+    Free;
+  end;
+
+  DoLoadJSON(FJSON);
 end;
 
 procedure PackageLoadError(Message: WideString);
@@ -1298,19 +1511,46 @@ begin
   end;
 end;
 
+procedure TPackage.DoLoadJSON(ARoot: TJSONObject);
+begin
+  StartMenu.LoadJSON(ARoot);
+  Info.LoadJSON(ARoot);
+  Files.LoadJSON(ARoot);
+  Options.LoadJSON(ARoot);
+  Keyboards.LoadJSON(ARoot);
+end;
+
 procedure TPackage.DoLoadXML(ARoot: IXMLNode);
 var
   FVersion: WideString;
 begin
-
-  FVersion := VarToWideStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
-  if (FVersion <> SKeymanVersion70) and (FVersion <> SKeymanVersion80) and (FVersion <> SKeymanVersion) then
+  FVersion := XmlVarToStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
+  if FVersion <> SKeymanVersion70 then
     PackageLoadError('Package file version '+FVersion+' is not recognised.');
 
   StartMenu.LoadXML(ARoot);
   Info.LoadXML(ARoot);
   Files.LoadXML(ARoot);
   Options.LoadXML(ARoot);
+  Keyboards.LoadXML(ARoot);
+end;
+
+procedure TPackage.DoSaveIni(ini: TIniFile);
+begin
+  Options.SaveIni(ini);
+  StartMenu.SaveIni(ini);
+  Info.SaveIni(ini);
+  Files.SaveIni(ini);
+  Keyboards.SaveIni(ini);
+end;
+
+procedure TPackage.DoSaveJSON(ARoot: TJSONObject);
+begin
+  Options.SaveJSON(ARoot);
+  StartMenu.SaveJSON(ARoot);
+  Info.SaveJSON(ARoot);
+  Files.SaveJSON(ARoot);
+  Keyboards.SaveJSON(ARoot);
 end;
 
 procedure TPackage.DoSaveXML(ARoot: IXMLNode);
@@ -1320,6 +1560,7 @@ begin
   StartMenu.SaveXML(ARoot);
   Info.SaveXML(ARoot);
   Files.SaveXML(ARoot);
+  Keyboards.SaveXML(ARoot);
 end;
 
 procedure TPackage.SaveIni;
@@ -1330,13 +1571,38 @@ begin
 
   ini := TIniFile.Create(FileName);
   try
-    Options.SaveIni(ini);
-    StartMenu.SaveIni(ini);
-    Info.SaveIni(ini);
-    Files.SaveIni(ini);
+    DoSaveIni(ini);
     ini.UpdateFile;
   finally
     ini.Free;
+  end;
+end;
+
+procedure TPackage.SaveJSON;
+var
+  FJSON: TJSONObject;
+  s: TStringList;
+begin
+  if FileExists(FileName) then DeleteFileCleanAttr(FileName);   // I4574
+
+  FJSON := TJSONObject.Create;
+  try
+    DoSaveJSON(FJSON);
+    s := TStringList.Create;
+    try
+      PrettyPrintJSON(FJSON, s);
+      with TStringStream.Create(s.Text, TEncoding.UTF8) do
+      try
+        // Use TStringStream to avoid BOM from TStringList
+        SaveToFile(FileName);
+      finally
+        Free;
+      end;
+    finally
+      s.Free;
+    end;
+  finally
+    FJSON.Free;
   end;
 end;
 
@@ -1387,20 +1653,20 @@ end;
 
 { TPackageBaseObject }
 
-constructor TPackageBaseObject.Create;
+constructor TPackageBaseNotifyObject.Create(APackage: TPackage);
 begin
-  inherited Create;
-  FNotifyObjects := TObjectList.Create;
+  inherited Create(APackage);
+  FNotifyObjects := TObjectList<TPackageNotifyEventWrapper>.Create;
 end;
 
-destructor TPackageBaseObject.Destroy;
+destructor TPackageBaseNotifyObject.Destroy;
 begin
   Notify(netDestroy);
   FNotifyObjects.Free;
   inherited Destroy;
 end;
 
-function TPackageBaseObject.Notify(EventType: TPackageNotifyEventType): Boolean;
+function TPackageBaseNotifyObject.Notify(EventType: TPackageNotifyEventType): Boolean;
 var
   i: Integer;
   fAllow: Boolean;
@@ -1408,12 +1674,12 @@ begin
   for i := 0 to FNotifyObjects.Count - 1 do
   begin
     fAllow := True;
-    (FNotifyObjects[i] as TPackageNotifyEventWrapper).FEvent(Self, EventType, fAllow);
+    FNotifyObjects[i].FEvent(Self, EventType, fAllow);
   end;
   Result := True;
 end;
 
-procedure TPackageBaseObject.AddNotifyObject(FEventHandler: TPackageNotifyEvent);
+procedure TPackageBaseNotifyObject.AddNotifyObject(FEventHandler: TPackageNotifyEvent);
 var
   ev: TPackageNotifyEventWrapper;
 begin
@@ -1423,555 +1689,358 @@ begin
   FNotifyObjects.Add(ev);
 end;
 
-procedure TPackageBaseObject.RemoveNotifyObject(FEventHandler: TPackageNotifyEvent);
+procedure TPackageBaseNotifyObject.RemoveNotifyObject(FEventHandler: TPackageNotifyEvent);
 var
   i: Integer;
 begin
   for i := 0 to FNotifyObjects.Count - 1 do
-    if @(FNotifyObjects[i] as TPackageNotifyEventWrapper).FEvent = @FEventHandler then
+    if @FNotifyObjects[i].FEvent = @FEventHandler then
     begin
       FNotifyObjects.Delete(i);
       Exit;
     end;
 end;
 
-{ TPackageImageButton }
+{ TPackageBaseObject }
 
-constructor TPackageImageButton.Create(APackage: TPackage);
+constructor TPackageBaseObject.Create(APackage: TPackage);
 begin
   inherited Create;
   FPackage := APackage;
 end;
 
-destructor TPackageImageButton.Destroy;
+{ TPackageObjectList<T> }
+
+constructor TPackageObjectList<T>.Create(APackage: TPackage);
 begin
-  StandardImageFile := nil;
-  DownImageFile := nil;
-  HoverImageFile := nil;
+  inherited Create;
+  FPackage := APackage;
+end;
+
+{ TPackageKeyboard }
+
+procedure TPackageKeyboard.Assign(Source: TPackageKeyboard);
+var
+  i: Integer;
+  FLanguage: TPackageKeyboardLanguage;
+begin
+  FName := Source.Name;
+  FID := Source.ID;
+  FVersion := Source.Version;
+  if Assigned(Source.OSKFont)
+    then FOSKFont := Package.Files.FromFileNameEx(Source.OSKFont.FileName)
+    else FOSKFont := nil;
+  if Assigned(Source.DisplayFont)
+    then FDisplayFont := Package.Files.FromFileNameEx(Source.DisplayFont.FileName)
+    else FDisplayFont := nil;
+  FLanguages.Clear;
+  for i := 0 to Source.Languages.Count - 1 do
+  begin
+    FLanguage := TPackageKeyboardLanguage.Create(Package);
+    FLanguage.ID := Source.Languages[i].ID;
+    FLanguage.Name := Source.Languages[i].Name;
+    FLanguages.Add(FLanguage);
+  end;
+end;
+
+procedure TPackageKeyboard.SetDisplayFont(const Value: TPackageContentFile);
+begin
+  if Assigned(FDisplayFont) then FDisplayFont.RemoveNotifyObject(DisplayFontRemoved);
+  if not Assigned(Value) then
+    FDisplayFont := nil
+  else
+  begin
+    if Value.Package <> Package then raise EPackageInfo.CreateFmt(SDisplayFontNotOwnedCorrectly, [Value]);
+    FDisplayFont := Value;
+    FDisplayFont.AddNotifyObject(DisplayFontRemoved);
+  end;
+end;
+
+constructor TPackageKeyboard.Create(APackage: TPackage);
+begin
+  inherited Create(APackage);
+  FLanguages := TPackageKeyboardLanguageList.Create(APackage);
+end;
+
+destructor TPackageKeyboard.Destroy;
+begin
+  FreeAndNil(FLanguages);
   inherited Destroy;
 end;
 
-procedure TPackageImageButton.UpdateButtonSize;
+procedure TPackageKeyboard.DisplayFontRemoved(Sender: TObject;
+  EventType: TPackageNotifyEventType; var FAllow: Boolean);
 begin
-  if not Assigned(FStandardImageFile) or
-    not FileExists(FStandardImageFile.FileName) then
-  begin
-    FWidth := 64;
-    FHeight := 24;
-  end
-  else
-  begin
-    try
-      with Vcl.Graphics.TBitmap.Create do
-      try
-        LoadFromFile(FStandardImageFile.FileName);
-        FWidth := Width;
-        FHeight := Height;
-      finally
-        Free;
-      end;
-    except
-      FWidth := 64;
-      FHeight := 24;
-    end;
-  end;
+  FDisplayFont := nil;
 end;
 
-procedure TPackageImageButton.DownImageRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
+procedure TPackageKeyboard.SetOSKFont(const Value: TPackageContentFile);
 begin
-  FDownImageFile := nil;
-end;
-
-procedure TPackageImageButton.HoverImageRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
-begin
-  FHoverImageFile := nil;
-end;
-
-procedure TPackageImageButton.StandardImageRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
-begin
-  FStandardImageFile := nil;
-end;
-
-procedure TPackageImageButton.SetButtonType(const Value: TPackageImageButtonType);
-begin
-  FButtonType := Value;
-  case Value of
-    pibtInstall: Caption := '&Install';
-    pibtCancel:  Caption := 'Cancel';
-    pibtAbout:   Caption := '&About...';
-  end;
-end;
-
-procedure TPackageImageButton.SetDownImageFile(const Value: TPackageContentFile);
-begin
-  if Assigned(FDownImageFile) then FDownImageFile.RemoveNotifyObject(DownImageRemoved);
+  if Assigned(FOSKFont) then FOSKFont.RemoveNotifyObject(OSKFontRemoved);
   if not Assigned(Value) then
-    FDownImageFile := nil
+    FOSKFont := nil
   else
   begin
-    if Value.FPackage <> FPackage then raise EPackageInfo.CreateFmt(SFileNotOwnedCorrectly, [Value]);
-    FDownImageFile := Value;
-    FDownImageFile.AddNotifyObject(DownImageRemoved);
+    if Value.Package <> Package then raise EPackageInfo.CreateFmt(SOSKFontNotOwnedCorrectly, [Value]);
+    FOSKFont := Value;
+    FOSKFont.AddNotifyObject(OSKFontRemoved);
   end;
 end;
 
-procedure TPackageImageButton.SetHoverImageFile(const Value: TPackageContentFile);
+procedure TPackageKeyboard.OSKFontRemoved(Sender: TObject;
+  EventType: TPackageNotifyEventType; var FAllow: Boolean);
 begin
-  if Assigned(FHoverImageFile) then FHoverImageFile.RemoveNotifyObject(HoverImageRemoved);
-  if not Assigned(Value) then
-    FHoverImageFile := nil
-  else
-  begin
-    if Value.FPackage <> FPackage then raise EPackageInfo.CreateFmt(SFileNotOwnedCorrectly, [Value]);
-    FHoverImageFile := Value;
-    FHoverImageFile.AddNotifyObject(HoverImageRemoved);
-  end;
+  FOSKFont := nil;
 end;
 
-procedure TPackageImageButton.SetStandardImageFile(const Value: TPackageContentFile);
-begin
-  if Assigned(FStandardImageFile) then FStandardImageFile.RemoveNotifyObject(StandardImageRemoved);
-  if not Assigned(Value) then
-    FStandardImageFile := nil
-  else
-  begin
-    if Value.FPackage <> FPackage then raise EPackageInfo.CreateFmt(SFileNotOwnedCorrectly, [Value]);
-    FStandardImageFile := Value;
-    FStandardImageFile.AddNotifyObject(StandardImageRemoved);
-  end;
-  UpdateButtonSize;
-end;
+{ TPackageKeyboardList }
 
-procedure TPackageImageButton.Assign(Source: TPackageImageButton);
-begin
-  FButtonType := Source.ButtonType;
-  FCaption := Source.Caption;
-  FURL := Source.URL;
-  FLeft := Source.Left;
-  FTop := Source.Top;
-  FWidth := Source.Width;
-  FHeight := Source.Height;
-  if Assigned(Source.StandardImageFile)
-    then StandardImageFile := FPackage.Files.FromFileName(Source.StandardImageFile.FileName)
-    else StandardImageFile := nil;
-  if Assigned(Source.HoverImageFile)
-    then HoverImageFile := FPackage.Files.FromFileName(Source.HoverImageFile.FileName)
-    else HoverImageFile := nil;
-  if Assigned(Source.DownImageFile)
-    then DownImageFile := FPackage.Files.FromFileName(Source.DownImageFile.FileName)
-    else DownImageFile := nil;
-end;
-
-{ TPackageImageButtonList }
-
-function TPackageImageButtonList.Add(Item: TPackageImageButton): Integer;
-begin
-  Result := inherited Add(Item);
-end;
-
-function TPackageImageButtonList.Get(Index: Integer): TPackageImageButton;
-begin
-  Result := TPackageImageButton(inherited Get(Index));
-end;
-
-procedure TPackageImageButtonList.Put(Index: Integer; Item: TPackageImageButton);
-begin
-  inherited Put(Index, Item);
-end;
-
-procedure TPackageImageButtonList.Assign(Source: TPackageImageButtonList);
+procedure TPackageKeyboardList.Assign(Source: TPackageKeyboardList);
 var
   i: Integer;
-  pib: TPackageImageButton;
+  pk: TPackageKeyboard;
 begin
   Clear;
   for i := 0 to Source.Count - 1 do
   begin
-    pib := TPackageImageButton.Create(FPackage);
-    pib.Assign(Source[i]);
-    Add(pib);
+    pk := TPackageKeyboard.Create(Package);
+    pk.Assign(Source[i]);
+    Add(pk);
   end;
 end;
 
-constructor TPackageImageButtonList.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
-  AddStandardButtons;
-end;
-
-procedure TPackageImageButtonList.AddStandardButtons;
+function TPackageKeyboardList.ItemByID(id: string): TPackageKeyboard;
 var
-  pib: TPackageImageButton;
-  finstall, fcancel, fabout: Boolean;
   i: Integer;
 begin
-  finstall := False;
-  fcancel := False;
-  fabout := False;
   for i := 0 to Count - 1 do
-  begin
-    if Items[i].ButtonType = pibtInstall then finstall := True;
-    if Items[i].ButtonType = pibtCancel then fcancel := True;
-    if Items[i].ButtonType = pibtAbout then fabout := True;
-  end;
-
-  if not finstall then
-  begin
-    pib := TPackageImageButton.Create(FPackage);
-    pib.ButtonType := pibtInstall;
-    Add(pib);
-  end;
-
-  if not fcancel then
-  begin
-    pib := TPackageImageButton.Create(FPackage);
-    pib.ButtonType := pibtCancel;
-    Add(pib);
-  end;
-
-  if not fabout then
-  begin
-    pib := TPackageImageButton.Create(FPackage);
-    pib.ButtonType := pibtAbout;
-    Add(pib);
-  end;
+    if SameText(id, Items[i].ID) then
+      Exit(Items[i]);
+  Result := nil;
 end;
 
-procedure TPackageImageButtonList.LoadXML(ARoot: IXMLNode);
+procedure TPackageKeyboardList.LoadIni(AIni: TIniFile);
 var
-  t: WideString;
+  s: TStringList;
+  ln: WideString;
   i, j: Integer;
-  pib: TPackageImageButton;
-  pibt, FButtonType: TPackageImageButtonType;
-  AButtonNode, ANode: IXMLNode;
+  FSectionName: string;
+  keyboard: TPackageKeyboard;
+  FLanguage: TPackageKeyboardLanguage;
 begin
   Clear;
-
-  ANode := ARoot.ChildNodes['Buttons'];
-  for i := 0 to ANode.ChildNodes.Count - 1 do
-  begin
-    AButtonNode := ANode.ChildNodes[i];
-    t := LowerCase(VarToWideStr(AButtonNode.ChildNodes['ButtonType'].NodeValue));
-
-    FButtonType := pibtCustom;
-    for pibt := Low(TPackageImageButtonType) to High(TPackageImageButtonType) do
-      if t = PackageImageButtonTypeName[pibt] then FButtonType := pibt;
-
-    pib := nil;
-    if FButtonType <> pibtCustom then
-      for j := 0 to Count - 1 do
-        if Items[j].ButtonType = FButtonType then
-        begin
-          pib := Items[j];
-          Break;
-        end;
-
-    if not Assigned(pib) then
-    begin
-      pib := TPackageImageButton.Create(FPackage);
-      pib.ButtonType := FButtonType;
-      Add(pib);
-    end;
-
-    pib.Caption := VarToWideStr(AButtonNode.ChildNodes['Caption'].NodeValue);
-    pib.URL := VarToWideStr(AButtonNode.ChildNodes['URL'].NodeValue);
-    pib.Left := StrToInt(VarToWideStr(AButtonNode.ChildNodes['Left'].NodeValue));
-    pib.Top := StrToInt(VarToWideStr(AButtonNode.ChildNodes['Top'].NodeValue));
-
-    pib.StandardImageFile := FPackage.Files.FromFileName(VarToWideStr(AButtonNode.ChildNodes['StandardImage'].NodeValue));
-    pib.HoverImageFile := FPackage.Files.FromFileName(VarToWideStr(AButtonNode.ChildNodes['HoverImage'].NodeValue));
-    pib.DownImageFile := FPackage.Files.FromFileName(VarToWideStr(AButtonNode.ChildNodes['DownImage'].NodeValue));
-  end;
-
-  AddStandardButtons; // Add the standard buttons if they are not there already
-end;
-
-procedure TPackageImageButtonList.SaveXML(ARoot: IXMLNode);
-var
-  i: Integer;
-  AButtonNode, ANode: IXMLNode;
-begin
-  ANode := ARoot.ChildNodes['Buttons'];
-  for i := 0 to Count - 1 do
-  begin
-    AButtonNode := ANode.AddChild('Button');
-    AButtonNode.ChildNodes['ButtonType'].NodeValue := PackageImageButtonTypeName[Items[i].ButtonType];
-    AButtonNode.ChildNodes['Caption'].NodeValue := Items[i].Caption;
-    AButtonNode.ChildNodes['URL'].NodeValue := Items[i].URL;
-    AButtonNode.ChildNodes['Left'].NodeValue := Items[i].Left;
-    AButtonNode.ChildNodes['Top'].NodeValue := Items[i].Top;
-
-    if Assigned(Items[i].StandardImageFile) then
-      AButtonNode.ChildNodes['StandardImage'].NodeValue := Items[i].StandardImageFile.RelativeFileName;
-    if Assigned(Items[i].HoverImageFile) then
-      AButtonNode.ChildNodes['HoverImage'].NodeValue := Items[i].HoverImageFile.RelativeFileName;
-    if Assigned(Items[i].DownImageFile) then
-      AButtonNode.ChildNodes['DownImage'].NodeValue := Items[i].DownImageFile.RelativeFileName;
-  end;
-end;
-
-procedure TPackageImageButtonList.LoadIni(AIni: TIniFile);
-var
-  t, FSection: WideString;
-  i, j, n: Integer;
-  pib: TPackageImageButton;
-  pibt, FButtonType: TPackageImageButtonType;
-begin
-  Clear;
-
-  n := StrToIntDef(AIni.ReadString('Buttons', 'Count', ''), 0);
-  for i := 0 to n - 1 do
-  begin
-    FSection := 'Button-'+IntToStr(i);
-    t := LowerCase(AIni.ReadString(FSection, 'ButtonType', ''));
-
-    FButtonType := pibtCustom;
-    for pibt := Low(TPackageImageButtonType) to High(TPackageImageButtonType) do
-      if t = PackageImageButtonTypeName[pibt] then FButtonType := pibt;
-
-    pib := nil;
-    if FButtonType <> pibtCustom then
-      for j := 0 to Count - 1 do
-        if Items[j].ButtonType = FButtonType then
-        begin
-          pib := Items[j];
-          Break;
-        end;
-
-    if not Assigned(pib) then
-    begin
-      pib := TPackageImageButton.Create(FPackage);
-      pib.ButtonType := FButtonType;
-      Add(pib);
-    end;
-
-    pib.Caption := AIni.ReadString(FSection, 'Caption', '');
-    pib.URL := AIni.ReadString(FSection, 'URL', '');
-    pib.Left := StrToIntDef(AIni.ReadString(FSection, 'Left', '0'), 0);
-    pib.Top := StrToIntDef(AIni.ReadString(FSection, 'Top', '0'), 0);
-
-    pib.StandardImageFile := FPackage.Files.FromFileName(AIni.ReadString(FSection, 'StandardImage', ''));
-    pib.HoverImageFile := FPackage.Files.FromFileName(AIni.ReadString(FSection, 'HoverImage', ''));
-    pib.DownImageFile := FPackage.Files.FromFileName(AIni.ReadString(FSection, 'DownImage', ''));
-  end;
-
-  AddStandardButtons; // Add the standard buttons if they are not there already
-end;
-
-procedure TPackageImageButtonList.SaveIni(AIni: TIniFile);
-var
-  i: Integer;
-  FSection: WideString;
-begin
-  AIni.WriteString('Buttons', 'Count', IntToStr(Count));
-  for i := 0 to Count - 1 do
-  begin
-    FSection := 'Button-'+IntToStr(i);
-    AIni.WriteString(FSection, 'ButtonType', PackageImageButtonTypeName[Items[i].ButtonType]);
-    AIni.WriteString(FSection, 'Caption', Items[i].Caption);
-    AIni.WriteString(FSection, 'URL', Items[i].URL);
-    AIni.WriteString(FSection, 'Left', IntToStr(Items[i].Left));
-    AIni.WriteString(FSection, 'Top', IntToStr(Items[i].Top));
-
-    if Assigned(Items[i].StandardImageFile) then
-      AIni.WriteString(FSection, 'StandardImage', Items[i].StandardImageFile.RelativeFileName);
-    if Assigned(Items[i].HoverImageFile) then
-      AIni.WriteString(FSection, 'HoverImage', Items[i].HoverImageFile.RelativeFileName);
-    if Assigned(Items[i].DownImageFile) then
-      AIni.WriteString(FSection, 'DownImage', Items[i].DownImageFile.RelativeFileName);
-  end;
-end;
-
-{ TPackageRegistryKeyList }
-
-procedure TPackageRegistryKeyList.Assign(Source: TPackageRegistryKeyList);
-var
-  i: Integer;
-  prk: TPackageRegistryKey;
-begin
-  Clear;
-  for i := 0 to Source.Count - 1 do
-  begin
-    prk := TPackageRegistryKey.Create(FPackage);
-    prk.Assign(Source[i]);
-    Add(prk);
-  end;
-end;
-
-constructor TPackageRegistryKeyList.Create(APackage: TPackage);
-begin
-  inherited Create;
-  FPackage := APackage;
-end;
-
-function TPackageRegistryKeyList.Get(Index: Integer): TPackageRegistryKey;
-begin
-  Result := inherited GetItem(Index) as TPackageRegistryKey;
-end;
-
-procedure TPackageRegistryKeyList.Put(Index: Integer;
-  const Value: TPackageRegistryKey);
-begin
-  inherited SetItem(Index, Value);
-end;
-
-procedure TPackageRegistryKeyList.LoadIni(AIni: TIniFile);
-var
-  i: Integer;
-  pkr: TPackageRegistryKey;
-  FValues: TStringList;
-  name, value: string;
-  root: string;
-  key: string;
-  valuetype: string;
-begin
-  Clear;
-
-  FValues := TStringList.Create;
+  s := TStringList.Create;
   try
-    AIni.ReadSectionValues('Registry', FValues);
-    for i := 0 to FValues.Count - 1 do
+    AIni.ReadSections(s);
+    for i := 0 to MaxInt do
     begin
-      pkr := TPackageRegistryKey.Create(FPackage);
+      FSectionName := 'Keyboard'+IntToStr(i);
+      if s.IndexOf(FSectionName) < 0 then
+        Break;
 
-      name := FValues.Names[i];
-      value := FValues.ValueFromIndex[i];
-      root := UpperCase(StrToken(name, ';'));
-      key := StrToken(name, ';');
-      if root = 'HKCU' then pkr.Root := HKEY_CURRENT_USER
-      else if root = 'HKLM' then pkr.Root := HKEY_LOCAL_MACHINE
-      else if root = 'HKCR' then pkr.Root := HKEY_CLASSES_ROOT
-      else pkr.Root := HKEY_CURRENT_USER;
+      keyboard := TPackageKeyboard.Create(Package);
+      keyboard.Name := AIni.ReadString(FSectionName, SXML_PackageKeyboard_Name, '');
+      keyboard.ID := AIni.ReadString(FSectionName, SXML_PackageKeyboard_ID, '');
+      keyboard.Version := AIni.ReadString(FSectionName, SXML_PackageKeyboard_Version, '1.0');
+      keyboard.OSKFont := Package.Files.FromFileNameEx(AIni.ReadString(FSectionName, SXML_PackageKeyboard_OSKFont, ''));
+      keyboard.DisplayFont := Package.Files.FromFileNameEx(AIni.ReadString(FSectionName, SXML_PackageKeyboard_DisplayFont, ''));
 
-      pkr.Name := name;
-      pkr.Key := key;
+      for j := 0 to MaxInt do
+      begin
+        ln := AIni.ReadString(FSectionName, SXML_PackageKeyboard_Language+IntToStr(j), '');
+        if ln = '' then
+          Break;
+        FLanguage := TPackageKeyboardLanguage.Create(Package);
+        FLanguage.ID := CommaToken(ln);
+        FLanguage.Name := CommaToken(ln);
+        keyboard.Languages.Add(FLanguage);
+      end;
 
-      valuetype := UpperCase(StrToken(value, ';'));
-      if valuetype = 'D'
-        then pkr.ValueType := rkvtDWord
-        else pkr.ValueType := rkvtString;
-
-      pkr.Value := value;
-
-      Add(pkr);
+      Add(keyboard);
     end;
   finally
-    FValues.Free;
+    s.Free;
   end;
 end;
 
-procedure TPackageRegistryKeyList.SaveIni(AIni: TIniFile);
+procedure TPackageKeyboardList.LoadJSON(ARoot: TJSONObject);
 var
-  pkr: TPackageRegistryKey;
-  i: Integer;
-  valuetype, root: string;
-begin
-  for i := 0 to Count - 1 do
-  begin
-    pkr := Items[i];
-    if pkr.Root = HKEY_CURRENT_USER then root := 'HKCU'
-    else if pkr.Root = HKEY_LOCAL_MACHINE then root := 'HKLM'
-    else if pkr.Root = HKEY_CLASSES_ROOT then root := 'HKCR'
-    else root := 'HKCU';
-
-    if pkr.ValueType = rkvtString then valuetype := 'S' else valuetype := 'D';
-
-
-    AIni.WriteString('Registry', root+';'+pkr.Key+';'+pkr.Name, valuetype+';'+pkr.Value);
-  end;
-end;
-
-procedure TPackageRegistryKeyList.LoadXML(ARoot: IXMLNode);
-var
-  i: Integer;
-  ANode: IXMLNode;
-  AKeyNode: IXMLNode;
-  pkr: TPackageRegistryKey;
-  name, value, root, key, valuetype: WideString;
+  keyboard: TPackageKeyboard;
+  i, j: Integer;
+  ALanguages, ANode: TJSONArray;
+  AKeyboard, ALanguage: TJSONObject;
+  FLanguage: TPackageKeyboardLanguage;
 begin
   Clear;
 
-  ANode := ARoot.ChildNodes.FindNode('Registry');
-  if not Assigned(ANode) then Exit;
+  ANode := ARoot.Values[SJSON_Keyboards] as TJSONArray;
+  if not Assigned(ANode) then
+    Exit;
 
+  for i := 0 to ANode.Count - 1 do
+  begin
+    AKeyboard := ANode.Items[i] as TJSONObject;
+
+    keyboard := TPackageKeyboard.Create(Package);
+    keyboard.Name := GetJsonValueString(AKeyboard, SJSON_Keyboard_Name);
+    keyboard.ID := GetJsonValueString(AKeyboard,SJSON_Keyboard_ID);
+    keyboard.Version := GetJsonValueString(AKeyboard, SJSON_Keyboard_Version);
+    keyboard.OSKFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_OSKFont));
+    keyboard.DisplayFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_DisplayFont));
+
+    ALanguages := AKeyboard.Values[SJSON_Keyboard_Languages] as TJSONArray;
+    if Assigned(ALanguages) then
+    begin
+      for j := 0 to ALanguages.Count - 1 do
+      begin
+        ALanguage := ALanguages.Items[j] as TJSONObject;
+
+        FLanguage := TPackageKeyboardLanguage.Create(Package);
+        FLanguage.ID := GetJsonValueString(ALanguage, SJSON_Keyboard_Language_ID);
+        FLanguage.Name := GetJsonValueString(ALanguage, SJSON_Keyboard_Language_Name);
+        keyboard.Languages.Add(FLanguage);
+      end;
+    end;
+
+    Add(keyboard);
+  end;
+end;
+
+procedure TPackageKeyboardList.LoadXML(ARoot: IXMLNode);
+var
+  keyboard: TPackageKeyboard;
+  i, j: Integer;
+  AKeyboard, ALanguage, ALanguages, ANode: IXMLNode;
+  FLanguage: TPackageKeyboardLanguage;
+begin
+  Clear;
+
+  ANode := ARoot.ChildNodes['Keyboards'];
   for i := 0 to ANode.ChildNodes.Count - 1 do
   begin
-    AKeyNode := ANode.ChildNodes[i];
-    pkr := TPackageRegistryKey.Create(FPackage);
+    AKeyboard := ANode.ChildNodes[i];
 
-    name := VarToWideStr(AKeyNode.Attributes['Name']);
-    value := VarToWideStr(AKeyNode.Attributes['Value']);
-    root := VarToWideStr(AKeyNode.Attributes['Root']);
-    key := VarToWideStr(AKeyNode.Attributes['Key']);
-    if root = 'HKCU' then pkr.Root := HKEY_CURRENT_USER
-    else if root = 'HKLM' then pkr.Root := HKEY_LOCAL_MACHINE
-    else if root = 'HKCR' then pkr.Root := HKEY_CLASSES_ROOT
-    else pkr.Root := HKEY_CURRENT_USER;
+    keyboard := TPackageKeyboard.Create(Package);
+    keyboard.Name := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_Name]);
+    keyboard.ID := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_ID]);
+    keyboard.Version := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_Version]);
+    keyboard.OSKFont := Package.Files.FromFileNameEx(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_OSKFont]));
+    keyboard.DisplayFont := Package.Files.FromFileNameEx(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_DisplayFont]));
 
-    pkr.Name := name;
-    pkr.Key := key;
+    ALanguages := AKeyboard.ChildNodes['Languages'];
+    if Assigned(ALanguages) then
+    begin
+      for j := 0 to ALanguages.ChildNodes.Count - 1 do
+      begin
+        ALanguage := ALanguages.ChildNodes[j];
 
-    valuetype := VarToWideStr(AKeyNode.Attributes['ValueType']);
-    if valuetype = 'D'
-      then pkr.ValueType := rkvtDWord
-      else pkr.ValueType := rkvtString;
+        FLanguage := TPackageKeyboardLanguage.Create(Package);
+        FLanguage.ID := VarToStr(ALanguage.Attributes[SXML_PackageKeyboard_Language_ID]);
+        FLanguage.Name := VarToStr(ALanguage.NodeValue);
+        keyboard.Languages.Add(FLanguage);
+      end;
+    end;
 
-    pkr.Value := value;
-
-    Add(pkr);
+    Add(keyboard);
   end;
 end;
 
-
-procedure TPackageRegistryKeyList.SaveXML(ARoot: IXMLNode);
+procedure TPackageKeyboardList.SaveIni(AIni: TIniFile);
 var
-  i: Integer;
-  AKeyNode, ANode: IXMLNode;
-  pkr: TPackageRegistryKey;
-  root, valuetype: WideString;
+  i, j: Integer;
+  FSectionName: string;
 begin
-  ANode := ARoot.ChildNodes['Registry'];
+  for i := 0 to Count-1 do
+  begin
+    FSectionName := 'Keyboard'+IntToStr(i);
+    AIni.WriteString(FSectionName, SXML_PackageKeyboard_Name, Items[i].Name);
+    AIni.WriteString(FSectionName, SXML_PackageKeyboard_ID, Items[i].ID);
+    AIni.WriteString(FSectionName, SXML_PackageKeyboard_Version, Items[i].Version);
+    if Assigned(Items[i].OSKFont) then
+      AIni.WriteString(FSectionName, SXML_PackageKeyboard_OSKFont, Items[i].OSKFont.RelativeFileName);
+    if Assigned(Items[i].DisplayFont) then
+      AIni.WriteString(FSectionName, SXML_PackageKeyboard_DisplayFont, Items[i].DisplayFont.RelativeFileName);
+
+    for j := 0 to Items[i].Languages.Count-1 do
+    begin
+      AIni.WriteString(FSectionName, SXML_PackageKeyboard_Language+IntToStr(j), Items[i].Languages[j].ID+','+Items[i].Languages[j].Name);
+    end;
+  end;
+end;
+
+procedure TPackageKeyboardList.SaveJSON(ARoot: TJSONObject);
+var
+  i, j: Integer;
+  AKeyboard, ALanguage: TJSONObject;
+  AKeyboards, ALanguages: TJSONArray;
+begin
+  if Count = 0 then
+    Exit;
+
+  AKeyboards := TJSONArray.Create;
+  ARoot.AddPair(SJSON_Keyboards, AKeyboards);
+
   for i := 0 to Count - 1 do
   begin
-    pkr := Items[i];
-    if pkr.Root = HKEY_CURRENT_USER then root := 'HKCU'
-    else if pkr.Root = HKEY_LOCAL_MACHINE then root := 'HKLM'
-    else if pkr.Root = HKEY_CLASSES_ROOT then root := 'HKCR'
-    else root := 'HKCU';
+    AKeyboard := TJSONObject.Create;
+    AKeyboards.Add(AKeyboard);
 
-    if pkr.ValueType = rkvtString then valuetype := 'S' else valuetype := 'D';
-    AKeyNode := ANode.AddChild('RegistryKey');
-    AKeyNode.Attributes['Root'] := root;
-    AKeyNode.Attributes['Key'] := pkr.Key;
-    AKeyNode.Attributes['Name'] := pkr.Name;
-    AKeyNode.Attributes['ValueType'] := valuetype;
-    AKeyNode.Attributes['Value'] := pkr.Value;
+    AKeyboard.AddPair(SJSON_Keyboard_Name, Items[i].Name);
+    AKeyboard.AddPair(SJSON_Keyboard_ID, Items[i].ID);
+    AKeyboard.AddPair(SJSON_Keyboard_Version, Items[i].Version);
+    if Assigned(Items[i].OSKFont) then
+      AKeyboard.AddPair(SJSON_Keyboard_OSKFont, Items[i].OSKFont.RelativeFileName);
+    if Assigned(Items[i].DisplayFont) then
+      AKeyboard.AddPair(SJSON_Keyboard_DisplayFont, Items[i].DisplayFont.RelativeFileName);
+
+    ALanguages := TJSONArray.Create;
+    AKeyboard.AddPair(SJSON_Keyboard_Languages, ALanguages);
+    for j := 0 to Items[i].Languages.Count - 1 do
+    begin
+      ALanguage := TJSONObject.Create;
+      ALanguages.Add(ALanguage);
+      ALanguage.AddPair(SJSON_Keyboard_Language_Name, Items[i].Languages[j].Name);
+      ALanguage.AddPair(SJSON_Keyboard_Language_ID, Items[i].Languages[j].ID);
+    end;
   end;
 end;
 
-{ TPackageRegistryKey }
-
-procedure TPackageRegistryKey.Assign(Source: TPackageRegistryKey);
+procedure TPackageKeyboardList.SaveXML(ARoot: IXMLNode);
+var
+  i, j: Integer;
+  AKeyboard, ANode: IXMLNode;
+  ALanguage, ALanguages: IXMLNode;
 begin
-  FKey := Source.FKey;
-  FValueType := Source.FValueType;
-  FValue := Source.FValue;
-  FRoot := Source.FRoot;
-  FName := Source.FName;
+  ANode := ARoot.AddChild('Keyboards');
+  for i := 0 to Count - 1 do
+  begin
+    AKeyboard := ANode.AddChild('Keyboard');
+
+    AKeyboard.ChildNodes[SXML_PackageKeyboard_Name].NodeValue := Items[i].Name;
+    AKeyboard.ChildNodes[SXML_PackageKeyboard_ID].NodeValue := Items[i].ID;
+    AKeyboard.ChildNodes[SXML_PackageKeyboard_Version].NodeValue := Items[i].Version;
+    if Assigned(Items[i].OSKFont) then
+      AKeyboard.ChildNodes[SXML_PackageKeyboard_OSKFont].NodeValue := Items[i].OSKFont.RelativeFileName;
+    if Assigned(Items[i].DisplayFont) then
+      AKeyboard.ChildNodes[SXML_PackageKeyboard_DisplayFont].NodeValue := Items[i].DisplayFont.RelativeFileName;
+    ALanguages := AKeyboard.AddChild('Languages');
+    for j := 0 to Items[i].Languages.Count - 1 do
+    begin
+      ALanguage := ALanguages.AddChild('Language');
+      ALanguage.NodeValue := Items[i].Languages[j].Name;
+      ALanguage.Attributes[SXML_PackageKeyboard_Language_ID] := Items[i].Languages[j].ID;
+    end;
+  end;
 end;
 
-constructor TPackageRegistryKey.Create(APackage: TPackage);
+function GetJsonValueString(o: TJSONObject; const n: string): string;
+var
+  v: TJSONValue;
 begin
-  inherited Create;
-  FPackage := APackage;
-  FRoot := HKEY_CURRENT_USER;
-  FValueType := rkvtString;
-end;
-
-destructor TPackageRegistryKey.Destroy;
-begin
-  inherited Destroy;
+  v := o.Values[n];
+  if not Assigned(v)
+    then Result := ''
+    else Result := Trim(v.Value);
 end;
 
 end.

@@ -374,11 +374,24 @@ end;
 
 function TkmnProjectFile.GetJSTargetFilename: string;
 begin
+  if FTargets = [] then
+    GetFileParameters;
+
+  // There is no JS target if no target is specified
+  if FTargets * KMWKeymanTargets = [] then
+    Exit('');
   Result := OwnerProject.GetTargetFilename(GetKeymanWebCompiledFileName(FileName, FileVersion), FileName, FileVersion);
 end;
 
 function TkmnProjectFile.GetOutputFilename: string;
 begin
+  if FTargets = [] then
+    GetFileParameters;
+
+  // If no target is specified, we'll fall back to .kmx
+  // so we always have at least one target filename
+  if (FTargets <> []) and (FTargets * KMXKeymanTargets = []) then
+    Exit('');
   Result := ChangeFileExt(FileName, '.kmx');
 end;
 

@@ -180,9 +180,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
 
   @objc func loadAddress(_ sender: Any, event: UIEvent) {
     guard let urlString = addressField?.text, var url = URL(string: urlString) else {
-      #if DEBUG
-        NSLog("Attempting to load invalid URL: %@", addressField?.text ?? "nil")
-      #endif
+      log.debug("Attempting to load invalid URL: \(addressField?.text ?? "nil")")
       return
     }
     if url.scheme == nil {
@@ -275,7 +273,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   }
 
   private func keyboardChanged(_ kb: InstallableKeyboard) {
-    if let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID) {
+    if let fontName = Manager.shared.fontNameForKeyboard(withFullID: kb.fullID) {
       newFontFamily = fontName
     } else {
       newFontFamily = UIFont.systemFont(ofSize: UIFont.systemFontSize).fontName

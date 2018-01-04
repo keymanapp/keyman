@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -34,6 +35,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
     // Chirality test keyboard
     HashMap<String, String> chiralityKBInfo = new HashMap<String, String>();
+    chiralityKBInfo.put(KMManager.KMKey_PackageID, "chirality");
     chiralityKBInfo.put(KMManager.KMKey_KeyboardID, "chirality");
     chiralityKBInfo.put(KMManager.KMKey_LanguageID, "eng");
     chiralityKBInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
@@ -44,6 +46,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
     // Longpress test keyboard
     HashMap<String, String> longpressKBbInfo = new HashMap<String, String>();
+    longpressKBbInfo.put(KMManager.KMKey_PackageID, "longpress");
     longpressKBbInfo.put(KMManager.KMKey_KeyboardID, "longpress");
     longpressKBbInfo.put(KMManager.KMKey_LanguageID, "eng");
     longpressKBbInfo.put(KMManager.KMKey_KeyboardName, "Longpress Keyboard");
@@ -80,7 +83,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     super.onResume();
     KMManager.onResume();
     KMManager.addKeyboardEventListener(this);
-    KMManager.addKeyboardDownloadEventListener(this);
+    KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
   }
 
   @Override
@@ -88,7 +91,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     super.onPause();
     KMManager.onPause();
     KMManager.removeKeyboardEventListener(this);
-    KMManager.removeKeyboardDownloadEventListener(this);
+
+    // Intentionally not removing KeyboardDownloadEventListener to
+    // ensure onKeyboardDownloadFinished() gets called
   }
 
   @Override

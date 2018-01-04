@@ -72,7 +72,7 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
         if let openURL = Manager.shared.openURL {
           openURL(url)
         } else {
-          Manager.shared.kmLog("openURL not set in Manager. Failed to open \(url)", checkDebugPrinting: false)
+          log.error("openURL not set in Manager. Failed to open \(url)")
         }
       } else if indexPath.row == 2 {
         showDeleteKeyboard()
@@ -149,9 +149,6 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     }
 
     if alertView.tag == 1 {
-      let userData = Manager.shared.activeUserDefaults()
-      let userKeyboards = userData.userKeyboards!
-
       if Manager.shared.removeKeyboard(at: keyboardIndex) {
         navigationController?.popToRootViewController(animated: true)
       }

@@ -19,7 +19,7 @@
       window.console.log('Device type = '+device);
       window.console.log('Keyboard height = '+oskHeight);
       var kmw=window['keyman'];
-      kmw.init({'app':device,'fonts':'fonts/'});
+      kmw.init({'app':device,'fonts':'packages/'});
       kmw['util']['setOption']('attachType','manual');
       kmw['oninserttext'] = insertText;
       kmw['showKeyboardList'] = showMenu;
@@ -72,7 +72,7 @@
       return true;
     }
 
-    function setKeymanLanguage(keyboardName, internalName, languageName, langId, version, font, oskFont) {
+    function setKeymanLanguage(keyboardName, internalName, languageName, langId, kbdFile, font, oskFont) {
       //oskFont.files = ['NotoSansSyriacWestern-Regular.svg#NotoSansSyriacWesternRegular'];
       //window.console.log('oskFonts = '+JSON.stringify(oskFont));
       var kmw=window['keyman'];
@@ -98,7 +98,7 @@
       }
 
       kbdInterface.registerStub({KN:keyboardName,KI:'Keyboard_'+internalName,KLC:langId,KL:languageName,
-        KF:internalName+'-'+version+'.js',KFont:font,KOskFont:oskFont});
+        KF:kbdFile,KFont:font,KOskFont:oskFont});
       kmw['setActiveKeyboard']('Keyboard_'+internalName,langId);
       kmw['osk']['show'](true);
     }

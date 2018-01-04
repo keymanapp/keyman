@@ -87,7 +87,7 @@ type
     FKeyboardLanguageID: Cardinal;
     FIconFileName: string;   // I3581
     FKeyboardVersion: string;
-    FBCP47Languages: WideString;   // I4136
+    FISO6393Languages: WideString;   // I4136
 
 //    procedure InstallLanguage;
 
@@ -127,7 +127,7 @@ type
     property ProductID: Integer read FProductID;
     property MnemonicLayout: Boolean read FMnemonicLayout;
     property WindowsLanguages: WideString read FWindowsLanguages;
-    property BC47Languages: WideString read FBCP47Languages;
+    property BC47Languages: WideString read FISO6393Languages;
     property KeyboardLanguageID: Cardinal read FKeyboardLanguageID;
     property KeyboardVersion: string read FKeyboardVersion;   // I4136
 
@@ -407,7 +407,7 @@ begin
     FMessage := ki.MessageString;
     FCopyright := ki.CopyrightString;
     FWindowsLanguages := ki.WindowsLanguages;
-    FBCP47Languages := ki.BCP47Languages;
+    FISO6393Languages := ki.ISO6393Languages;
     FKeyboardLanguageID := ki.KeyboardID;
     FKeyboardVersion := ki.KeyboardVersion;   // I4136
 

@@ -72,23 +72,12 @@
             }
             
             var keyboardOffset = 0;
-            function setKeymanLanguage(keyboardName,internalName,languageName,langId,version,font,oskFont) {
-                var kmw=window['keyman'];
-                // Defaults for mising arguments
-                switch(arguments.length)
-                {
-                    case 1:
-                    internalName=keyboardName;
-                    if(keyboardName == 'English')internalName='us';
-                    case 2:
-                    languageName=keyboardName;
-                    case 3:
-                    langId='';
-                }
+            function setKeymanLanguage(stub) {
+                var kmw = window.keyman;
 
-                kmw.interface['registerStub']({KN:keyboardName,KI:'Keyboard_'+internalName,KLC:langId,KL:languageName,KF:internalName+'-'+version+'.js',KFont:font,KOskFont:oskFont});
-                kmw['setActiveKeyboard']('Keyboard_'+internalName,langId);
-                kmw['osk']['show'](true);
+                kmw.interface.registerStub(stub);
+                kmw.setActiveKeyboard(stub.KI, stub.KLC);
+                kmw.osk.show(true);
             }
             
             var fragmentToggle = 0;

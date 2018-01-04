@@ -29,9 +29,6 @@ interface
 uses
   kpsfile, kmpinffile, PackageInfo, ProjectLog;
 
-type
-  TCompilePackageMessageEvent = procedure(Sender: TObject; msg: string; State: TProjectLogState) of object;
-
 function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent: Boolean; const AOutputFileName: string): Boolean;   // I4688
 
 implementation
@@ -50,6 +47,9 @@ uses
   RegistryKeys,
   kmxfile,
   KeymanDeveloperOptions,
+
+  Keyman.System.PackageInfoRefreshKeyboards,
+
   RedistFiles,
   TempFileManager;
 
@@ -127,7 +127,7 @@ begin
   end;
 
   CheckForDangerousFiles;
-  CheckKeyboardVersions;   // I4690
+  CheckKeyboardVersions;
 
   GetTempPath(260, buf);
   FTempPath := buf;
@@ -166,18 +166,51 @@ begin
 
   kmpinf := TKMPInfFile.Create;
   try
-    { Create KMP.INF }
+    { Create KMP.INF and KMP.JSON }
 
     kmpinf.Assign(pack);
+
+    // Add keyboard information to the package 'for free'
+    // Note: this does not get us very far for mobile keyboards as
+    // they still require the .js to be added by the developer at this stage.
+    // But it ensures that all keyboards in the package are listed in the
+    // {Keyboards} section
+
+    with TPackageInfoRefreshKeyboards.Create(kmpinf) do
+    try
+      OnError := Self.FOnMessage;
+      if not Execute then
+      begin
+        WriteMessage(plsError, 'The package build was not successful.');
+        Exit;
+      end;
+    finally
+      Free;
+    end;
+
     kmpinf.RemoveFilePaths;
-    kmpinf.FileName := FTempPath + '\kmp.inf';
+
+    // TODO: BCP47: Validate BCP-47 codes
 
     psf := TPackageContentFile.Create(kmpinf);
     psf.FileName := 'kmp.inf';
     psf.Description := 'Package information';
     psf.CopyLocation := pfclPackage;
+
     kmpinf.Files.Add(psf);
+
+    psf := TPackageContentFile.Create(kmpinf);
+    psf.FileName := 'kmp.json';
+    psf.Description := 'Package information (JSON)';
+    psf.CopyLocation := pfclPackage;
+
+    kmpinf.Files.Add(psf);
+
+    kmpinf.FileName := FTempPath + '\kmp.inf';
     kmpinf.SaveIni;
+
+    kmpinf.FileName := FTempPath + '\kmp.json';
+    kmpinf.SaveJSON;
   finally
     kmpinf.Free;
   end;
@@ -194,6 +227,7 @@ begin
       try
         Open(FOutputFilename, TZipMode.zmWrite);
         Add(FTempPath + '\kmp.inf');
+        Add(FTempPath + '\kmp.json');
         for i := 0 to pack.Files.Count - 1 do
         begin
           if not FileExists(pack.Files[i].FileName) then
@@ -290,6 +324,7 @@ var
   ki: TKeyboardInfo;
 begin
   n := 0;
+
   for i := 0 to pack.Files.Count - 1 do
     if pack.Files[i].FileType = ftKeymanFile then Inc(n);
 

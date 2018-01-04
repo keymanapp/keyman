@@ -90,7 +90,16 @@ uses
   kccompilekvk in 'kccompilekvk.pas',
   ValidateKeyboardInfo in '..\TIKE\compile\ValidateKeyboardInfo.pas',
   MergeKeyboardInfo in '..\TIKE\compile\MergeKeyboardInfo.pas',
-  JsonExtractKeyboardInfo in '..\TIKE\compile\JsonExtractKeyboardInfo.pas';
+  JsonExtractKeyboardInfo in '..\TIKE\compile\JsonExtractKeyboardInfo.pas',
+  Keyman.System.PackageInfoRefreshKeyboards in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas',
+  Keyman.System.KeyboardJSInfo in '..\..\global\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas',
+  Keyman.System.KeyboardUtils in '..\..\global\delphi\keyboards\Keyman.System.KeyboardUtils.pas',
+  Keyman.System.KMXFileLanguages in '..\..\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas',
+  Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
+  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
+  Keyman.System.KeyboardInfoFile in '..\..\global\delphi\keyboards\Keyman.System.KeyboardInfoFile.pas',
+  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
+  Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas';
 
 {$R icons.RES}
 {$R version.res}

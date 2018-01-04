@@ -2200,8 +2200,8 @@ begin
   if IsKeyboardVersion10OrLater then
   begin
     if FDebug then
-      Result := 'var modCodes = tavultesoft.keymanweb.osk.modifierCodes;'+nl+
-                FTabStop+'var keyCodes = tavultesoft.keymanweb.osk.keyCodes;'+nl
+      Result := 'var modCodes = keyman.osk.modifierCodes;'+nl+
+                FTabStop+'var keyCodes = keyman.osk.keyCodes;'+nl
     else
       Result := '';
   end
@@ -2213,8 +2213,9 @@ function TCompileKeymanWeb.JavaScript_SetupProlog: string;
 begin
   if IsKeyboardVersion10OrLater then
   begin
-    Result := 'if(parseFloat(tavultesoft.keymanweb.version) < 10) {'+nl+
-      FTabStop+'tavultesoft.keymanweb.util.alert("This keyboard requires KeymanWeb 10.0 or later");'+nl+
+    Result := 'if(typeof keyman === ''undefined'') {'+nl+
+      FTabStop+'console.log(''Keyboard requires KeymanWeb 10.0 or later'');'+nl+
+      FTabStop+'if(typeof tavultesoft !== ''undefined'') tavultesoft.keymanweb.util.alert("This keyboard requires KeymanWeb 10.0 or later");'+nl+
       '} else {';
   end
   else
@@ -2325,19 +2326,25 @@ var
 begin
   FBitMask := 0;
   gp := fk.dpGroupArray;
-  for i := 0 to fk.cxGroupArray-1 do
+  if fk.cxGroupArray > 0 then
   begin
-    if gp.fUsingKeys then
+    for i := 0 to fk.cxGroupArray-1 do
     begin
-      kp := gp.dpKeyArray;
-      for j := 0 to gp.cxKeyArray-1 do
+      if gp.fUsingKeys then
       begin
-        if not RuleIsExcludedByPlatform(kp) then
-          FBitMask := FBitMask or JavaScript_Shift(kp, fMnemonic);
-        Inc(kp);
+        kp := gp.dpKeyArray;
+        if gp.cxKeyArray > 0 then
+        begin
+          for j := 0 to gp.cxKeyArray-1 do
+          begin
+            if not RuleIsExcludedByPlatform(kp) then
+              FBitMask := FBitMask or JavaScript_Shift(kp, fMnemonic);
+            Inc(kp);
+          end;
+        end;
       end;
+      Inc(gp);
     end;
-    Inc(gp);
   end;
 
   if ((FBitMask and KMX_MASK_MODIFIER_CHIRAL) <> 0) and
@@ -2348,7 +2355,7 @@ begin
 
   if FDebug
     then Result := FormatModifierAsBitflags(FBitMask and KMX_MASK_KEYS) // Exclude KMX_ISVIRTUALKEY, KMX_VIRTUALCHARKEY
-    else Result := '0x'+IntToHex(FBitMask, 4);
+    else Result := '0x'+IntToHex(FBitMask and KMX_MASK_KEYS, 4);
 end;
 
 end.

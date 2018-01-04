@@ -11,11 +11,14 @@ import UIKit
 
 class KeyboardViewController: InputViewController {
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    #if DEBUG
+      KeymanEngine.log.outputLevel = .debug
+      KeymanEngine.log.logAppDetails()
+    #else
+      KeymanEngine.log.outputLevel = .warning
+    #endif
     Manager.applicationGroupIdentifier = "group.KM4I"
 
-    #if DEBUG
-      Manager.shared.isDebugPrintingOn = true
-    #endif
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
   }
 

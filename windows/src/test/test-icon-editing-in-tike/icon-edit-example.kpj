@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_16cfc6d95db71d1204f8289e5b8eb117</ID>
+      <Filename>example.kmn</Filename>
+      <Filepath>example.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_df1083260452065b8ac07627142c6c20</ID>
+      <Filename>example_writeable.kmn</Filename>
+      <Filepath>example_writeable.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_ef6e19a3011e3aa0ce625887d37308e2</ID>
+      <Filename>test-final-2.ico</Filename>
+      <Filepath>test-final-2.ico</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.ico</FileType>
+      <ParentFileID>id_16cfc6d95db71d1204f8289e5b8eb117</ParentFileID>
+    </File>
+    <File>
+      <ID>id_d98530bfce6330e78078bea452547f5c</ID>
+      <Filename>example_writeable.ico</Filename>
+      <Filepath>example_writeable.ico</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.ico</FileType>
+      <ParentFileID>id_df1083260452065b8ac07627142c6c20</ParentFileID>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

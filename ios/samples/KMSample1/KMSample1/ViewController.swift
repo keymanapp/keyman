@@ -13,17 +13,9 @@ class ViewController: UIViewController, TextViewDelegate {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-
     Manager.shared.openURL = UIApplication.shared.openURL
-    Manager.shared.isDebugPrintingOn = true
     Manager.shared.isKeymanHelpOn = false
-    Manager.shared.preloadLanguageFile(atPath: Bundle.main.path(forResource: "tamil99m-1.1", ofType: "js")!,
-                                       shouldOverwrite: true)
-    Manager.shared.preloadFontFile(atPath: Bundle.main.path(forResource: "aava1", ofType: "ttf")!,
-                                   shouldOverwrite: true)
-    Manager.shared.registerCustomFonts()
 
-    Manager.shared.addKeyboard(Constants.defaultKeyboard)
     let kb = InstallableKeyboard(id: "tamil99m",
                                  name: "Tamil 99M",
                                  languageID: "tam",
@@ -33,6 +25,18 @@ class ViewController: UIViewController, TextViewDelegate {
                                  font: Font(filename: "aava1.ttf"),
                                  oskFont: nil,
                                  isCustom: true)
+    let urls = [
+      Bundle.main.url(forResource: "tamil99m-1.1", withExtension: "js")!,
+      Bundle.main.url(forResource: "aava1", withExtension: "ttf")!
+    ]
+    do {
+      try Manager.shared.preloadFiles(forKeyboardID: kb.id, at: urls, shouldOverwrite: true)
+    } catch {
+      print("Error preloading: \(error)")
+    }
+    FontManager.shared.registerCustomFonts()
+
+    Manager.shared.addKeyboard(Defaults.keyboard)
     Manager.shared.addKeyboard(kb)
 
     textView.setKeymanDelegate(self)

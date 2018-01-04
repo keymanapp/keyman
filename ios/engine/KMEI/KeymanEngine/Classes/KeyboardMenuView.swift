@@ -35,8 +35,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       return tableList
     }
 
-    let userData = Manager.shared.activeUserDefaults()
-    let keyboardList = userData.userKeyboards
+    let keyboardList = Storage.active.userDefaults.userKeyboards
 
     let titleCloseButton: String
     if let closeButtonTitle = closeButtonTitle {
@@ -50,20 +49,15 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       _tableList = keyboardList
       _tableList!.append(titleCloseButton)
     } else {
-      var keyboard = Constants.defaultKeyboard
-      if let version = Manager.shared.latestKeyboardFileVersion(withID: Constants.defaultKeyboard.id) {
-        keyboard.version = version
-      }
-      _tableList = [keyboard]
+      _tableList = [Defaults.keyboard]
       _tableList!.append(titleCloseButton)
     }
     return _tableList!
   }
 
   init(keyFrame frame: CGRect, inputViewController: InputViewController, closeButtonTitle: String?) {
-    let isSystemKeyboard = Manager.shared.isSystemKeyboard
     let isPortrait: Bool
-    if isSystemKeyboard {
+    if Util.isSystemKeyboard {
       isPortrait = InputViewController.isPortrait
     } else {
       isPortrait = UIDevice.current.orientation.isPortrait
@@ -80,7 +74,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
     var mainFrame = inputViewController.view.frame
     if mainFrame == CGRect.zero {
-      mainFrame = Manager.shared.inputView.frame
+      mainFrame = Manager.shared.keymanWeb.view.frame
     }
     super.init(frame: mainFrame)
 
@@ -286,7 +280,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       let keyboard = tableList[indexPath.row] as! InstallableKeyboard
       cell.textLabel?.text = keyboard.name
       cell.tag = indexPath.row
-      if (Manager.shared.languageID == keyboard.languageID) && (Manager.shared.keyboardID == keyboard.id) {
+      if Manager.shared.currentKeyboardID == keyboard.fullID {
         cell.selectionStyle = .none
         cell.isSelected = true
         cell.accessoryType = .checkmark

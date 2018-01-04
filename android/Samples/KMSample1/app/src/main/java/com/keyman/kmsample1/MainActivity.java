@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -31,12 +32,14 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
     // Add a custom keyboard
     HashMap<String, String> kbInfo = new HashMap<String, String>();
+    kbInfo.put(KMManager.KMKey_PackageID, "tamil99m");
     kbInfo.put(KMManager.KMKey_KeyboardID, "tamil99m");
     kbInfo.put(KMManager.KMKey_LanguageID, "tam");
     kbInfo.put(KMManager.KMKey_KeyboardName, "Tamil 99M");
     kbInfo.put(KMManager.KMKey_LanguageName, "Tamil");
     kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.1");
     kbInfo.put(KMManager.KMKey_Font, "aava1.ttf");
+    //kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont); // Use the default font
     KMManager.addKeyboard(this, kbInfo);
   }
 
@@ -67,7 +70,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     super.onResume();
     KMManager.onResume();
     KMManager.addKeyboardEventListener(this);
-    KMManager.addKeyboardDownloadEventListener(this);
+    KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
   }
 
   @Override
@@ -75,7 +78,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     super.onPause();
     KMManager.onPause();
     KMManager.removeKeyboardEventListener(this);
-    KMManager.removeKeyboardDownloadEventListener(this);
+
+    // Intentionally not removing KeyboardDownloadEventListener to
+    // ensure onKeyboardDownloadFinished() gets called
   }
 
   @Override

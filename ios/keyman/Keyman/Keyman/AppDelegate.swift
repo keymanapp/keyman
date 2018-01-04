@@ -20,10 +20,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]? = nil) -> Bool {
-    Manager.applicationGroupIdentifier = "group.KM4I"
     #if DEBUG
-      Manager.shared.isDebugPrintingOn = true
+      KeymanEngine.log.outputLevel = .debug
+      log.outputLevel = .debug
+      KeymanEngine.log.logAppDetails()
+    #else
+      KeymanEngine.log.outputLevel = .warning
+      log.outputLevel = .warning
     #endif
+    Manager.applicationGroupIdentifier = "group.KM4I"
     Manager.shared.openURL = UIApplication.shared.openURL
 
     window = UIWindow(frame: UIScreen.main.bounds)
@@ -52,7 +57,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func applicationDidEnterBackground(_ application: UIApplication) {
     _overlayWindow = nil
-    Manager.shared.unregisterCustomFonts()
+    FontManager.shared.unregisterCustomFonts()
     let userData = AppDelegate.activeUserDefaults()
     // TODO: Have viewController save its data
     userData.set(viewController?.textView?.text, forKey: userTextKey)
@@ -87,7 +92,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   @objc func registerCustomFonts() {
-    Manager.shared.registerCustomFonts()
+    FontManager.shared.registerCustomFonts()
   }
 
   class func activeUserDefaults() -> UserDefaults {
