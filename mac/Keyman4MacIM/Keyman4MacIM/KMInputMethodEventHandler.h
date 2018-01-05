@@ -7,12 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "KMInputMethodAppDelegate.h"
 
 #ifndef KMInputMethodEventHandler_h
 #define KMInputMethodEventHandler_h
 
 @interface KMInputMethodEventHandler : NSObject
 
+- (instancetype)initWithClient:(NSString *)clientAppId;
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender;
 - (void)deactivate;
 

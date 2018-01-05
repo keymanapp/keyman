@@ -3,17 +3,11 @@
 //  Keyman4MacIM
 //
 //  Created by Tom Bogle on 11/22/17.
-//  Copyright © 2017 SIL International. All rights reserved.
+//  Copyright © 2017-2018 SIL International. All rights reserved.
 //
-#import "KMInputMethodAppDelegate.h"
 #import "KMInputMethodEventHandler.h"
+#import "KMInputMethodEventHandlerProtected.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
-
-@interface KMInputMethodEventHandler ()
-//@property (nonatomic, strong) NSMutableDictionary *kbData;
-//@property (nonatomic, strong) NSDictionary *kmModes;
-@property (assign) BOOL willDeleteNullChar;
-@end
 
 @implementation KMInputMethodEventHandler
 
@@ -24,90 +18,52 @@ NSMutableString* _pendingBuffer;
 NSUInteger _numberOfPostedDeletesToExpect = 0;
 CGKeyCode _keyCodeOfOriginalEvent;
 CGEventSourceRef _sourceFromOriginalEvent = nil;
-BOOL _contextOutOfDate = YES;
 
-// This flag indicates which mode is being used for replacing already typed text when composing characters
-// (i.e., when not using deadkeys). Some apps (and some javascript-based websites, such as Google Docs) do
-// not properly deal with calls to insertText calls that replace a range of characters. So for these "legacy"
-// apps, we post one or more deletes (i.e., backspace), followed by a special code that tells us we're now
-// ready to insert the composed text.
-BOOL _legacyMode = NO;
-// Some clients (e.g. Chrome) handle the mouse down events before we get a crack at them. For such apps that
-// are able to report their current selection location (LibreOffice can't even do that!), we can do some
-// checking at the start of the event processing to see if we're probably still in the same place where we
-// left off previously.
-BOOL _clientSelectionCanChangeUnexpectedly = YES; // REVIEW: Maybe we can get notification from these clients by handling mouseDownOnCharacterIndex.
-BOOL _insertCharactersIndividually = NO;
-// Because Google Docs can't report its context in any of the browsers (Safari, Chrome, Firefox), we want to
-// try to detect it and:
-// in Safari, switch to legacy mode
-// in Chrome, NOT assume that it needs to re-get the context every time around (which means that if the user
-// does mouse-click somewhere else, it could lead to bad behaviour).
-// in Firefox, we're already in legacy mode and we do get mouse clicks, so we're already doing the best we can.
-NSUInteger _failuresToRetrieveExpectedContext = NSUIntegerMax;
-BOOL _forceRemoveSelectionInGoogleDocs = NO;
-BOOL _explicitlyDeleteExistingSelectionBeforeInserting = NO;
-BOOL _cannnotTrustSelectionLength = NO;
 NSRange _previousSelRange;
 
-- (id)init {
-    NSRunningApplication *currApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
-    NSString *clientAppId = [currApp bundleIdentifier];
-    if ([self.AppDelegate debugMode])
-        NSLog(@"New active app %@", clientAppId);
-    _previousSelRange = NSMakeRange(NSNotFound, NSNotFound);
-    _clientSelectionCanChangeUnexpectedly = YES;
-    _forceRemoveSelectionInGoogleDocs = NO;
-    _explicitlyDeleteExistingSelectionBeforeInserting = NO;
-    _cannnotTrustSelectionLength = NO;
-    _insertCharactersIndividually = NO;
-    // REVIEW: Should this list be in a info.plist file
-    // Use a table of known apps to decide whether or not to operate in legacy mode
-    // and whether or not to follow calls to setMarkedText with calls to insertText.
-    if ([clientAppId isEqual: @"com.google.Chrome"] ||
-        [clientAppId isEqual: @"org.mozilla.firefox"] ||
-        [clientAppId isEqual: @"com.github.atom"] ||
-        [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
-        [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
-        [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
-        [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
-        [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
-        [clientAppId isEqual: @"com.microsoft.Word"]
-        /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */) {
-        _legacyMode = YES;
-        if ([self.AppDelegate debugMode])
-            NSLog(@"Using legacy mode for this app.");
-    }
-    else {
-        _legacyMode = NO;
-    }
+- (instancetype)initWithClient:(NSString *)clientAppId {
     
-    //    if ([clientAppId isEqual: @"com.google.Chrome"] ||
-    //        [clientAppId isEqual: @"com.apple.Terminal"] ||
-    //        [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
-    //        _clientSelectionCanChangeUnexpectedly = YES;
-    //    }
-    
-    if ([clientAppId isEqual: @"com.github.atom"]) {
-        // This isn't true (the context can change unexpectedly), but we can't get the context,
-        // so we pretend/hope it won't.
-        _clientSelectionCanChangeUnexpectedly = NO;
+    self = [super init];
+    if (self) {
+        _previousSelRange = NSMakeRange(NSNotFound, NSNotFound);
+        _clientSelectionCanChangeUnexpectedly = YES;
+        _cannnotTrustSelectionLength = NO;
+        _insertCharactersIndividually = NO;
+        // REVIEW: Should this list be in a info.plist file
+        // Use a table of known apps to decide whether or not to operate in legacy mode
+        // and whether or not to follow calls to setMarkedText with calls to insertText.
+        if ([clientAppId isEqual: @"com.google.Chrome"] ||
+            [clientAppId isEqual: @"org.mozilla.firefox"] ||
+            [clientAppId isEqual: @"com.github.atom"] ||
+            [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
+            [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
+            [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
+            [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
+            [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
+            [clientAppId isEqual: @"com.microsoft.Word"]
+            /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */) {
+            _legacyMode = YES;
+            if ([self.AppDelegate debugMode])
+                NSLog(@"Using legacy mode for this app.");
+        }
+        else {
+            _legacyMode = NO;
+        }
+        
+        //    if ([clientAppId isEqual: @"com.google.Chrome"] ||
+        //        [clientAppId isEqual: @"com.apple.Terminal"] ||
+        //        [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
+        //        _clientSelectionCanChangeUnexpectedly = YES;
+        //    }
+        
+        if ([clientAppId isEqual: @"com.github.atom"]) {
+            // This isn't true (the context can change unexpectedly), but we can't get the context,
+            // so we pretend/hope it won't.
+            _clientSelectionCanChangeUnexpectedly = NO;
+        }
+        
+        _contextOutOfDate = YES;
     }
-    
-    // Most things in Safari work well using the normal way, but Google Docs doesn't.
-    if ([clientAppId isEqual: @"com.google.Chrome"] ||
-        [clientAppId isEqual: @"com.apple.Safari"] ||
-        [clientAppId isEqual: @"org.mozilla.firefox"]) {
-        _failuresToRetrieveExpectedContext = 0;
-        _forceRemoveSelectionInGoogleDocs = [clientAppId isEqual: @"com.apple.Safari"];
-        //_explicitlyDeleteExistingSelectionBeforeInserting = [clientAppId isEqual: @"com.apple.Safari"];
-    }
-    else {
-        _failuresToRetrieveExpectedContext = NSUIntegerMax;
-    }
-    
-    _contextOutOfDate = YES;
-    
     return self;
 }
 
@@ -132,6 +88,16 @@ NSRange _previousSelRange;
         CFRelease(_sourceFromOriginalEvent);
         _sourceFromOriginalEvent = nil;
     }
+}
+
+- (void)checkContextIn:(id)client {
+    // Base implementation is no-op
+}
+
+- (void)replaceExistingSelectionIn:(id)client with:(NSString *) text {
+    [client insertText:text replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+    _previousSelRange.location += text.length;
+    _previousSelRange.length = 0;
 }
 
 - (KMInputMethodAppDelegate *)AppDelegate {
@@ -296,50 +262,7 @@ NSRange _previousSelRange;
         return YES;
     }
     
-    if (!self.willDeleteNullChar && !_contextOutOfDate && _failuresToRetrieveExpectedContext < 3) {
-        if ([self AppDelegate].debugMode) {
-            NSLog(@"Checking to see if we're in Google Docs (or some other site that can't give context).");
-        }
-        NSUInteger bufferLength = self.contextBuffer.length;
-        if (bufferLength) {
-            NSUInteger location = [sender selectedRange].location;
-            
-            if (location != NSNotFound && location > 0) {
-                NSString *clientContext = [[sender attributedSubstringFromRange:NSMakeRange(0, location)] string];
-                if (clientContext == nil || !clientContext.length ||
-                    [clientContext characterAtIndex:clientContext.length - 1] !=
-                    [self.contextBuffer characterAtIndex:bufferLength - 1]) {
-                    _failuresToRetrieveExpectedContext++;
-                }
-                else {
-                    if ([self AppDelegate].debugMode) {
-                        NSLog(@"We got what we were expecting from the client. We can stop checking.");
-                    }
-                    _failuresToRetrieveExpectedContext = NSUIntegerMax;
-                }
-            }
-            else {
-                _failuresToRetrieveExpectedContext++;
-            }
-            
-            if (_failuresToRetrieveExpectedContext == 3)
-            {
-                if ([self AppDelegate].debugMode) {
-                    NSLog(@"Detected Google Docs or some other editor that can't provide context. Using legacy mode.");
-                }
-                _failuresToRetrieveExpectedContext = NSUIntegerMax;
-                _legacyMode = YES;
-                if (_clientSelectionCanChangeUnexpectedly) {
-                    _cannnotTrustSelectionLength = YES;
-                    _clientSelectionCanChangeUnexpectedly = NO; // This isn't true (it can change unexpectedly), but we can't get the context, so we pretend/hope it won't.
-                    // Google docs in Chrome allows only a single character at a time :-(
-                    _insertCharactersIndividually = YES;
-                }
-            }
-        }
-    }
-    else if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand)
-        return NO; // We ignore any Command-key events.
+    [self checkContextIn:sender];
     
     if ([self.AppDelegate debugMode]) {
         if (_clientSelectionCanChangeUnexpectedly)
@@ -424,50 +347,7 @@ NSRange _previousSelRange;
                     }
                 }
                 else {
-                    // The following commented out code is the code that would make it possible to type over an
-                    // existing selection in Word in Safari, but I don't know of a way to distinguish that case
-                    // from other contexts in Safari (wherein this code inserts an extra leading space).
-                    //                    if (_explicitlyDeleteExistingSelectionBeforeInserting) {
-                    //                        NSUInteger selLength = [sender selectedRange].length;
-                    //                        if (selLength > 0 && selLength != NSNotFound) {
-                    //                            if ([self.AppDelegate debugMode]) {
-                    //                                NSLog(@"Attempting to delete existing selection of length = %lu by replacing it with a space (which should not actually appear in the text).", selLength);
-                    //                            }
-                    //
-                    //                            [sender insertText:@" " replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
-                    //
-                    //                            if ([self.AppDelegate debugMode])
-                    //                                NSLog(@"Re-posting original (unhandled) code: %d", (int)_keyCodeOfOriginalEvent);
-                    //
-                    //                            CGEventSourceRef sourceFromEvent = CGEventCreateSourceFromEvent([event CGEvent]);
-                    //                            [self postKeyPressToFrontProcess:event.keyCode from:sourceFromEvent];
-                    //                            CFRelease(sourceFromEvent);
-                    //                            return YES;
-                    //                        }
-                    //                    }
-                    [sender insertText:output replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
-                    _previousSelRange.location += output.length;
-                    _previousSelRange.length = 0;
-                    
-                    // In Google Docs in Safari when there is an existing selection, the inserted characters
-                    // stays selected. The following clears the selection.
-                    if (_legacyMode && _forceRemoveSelectionInGoogleDocs) {
-                        if ([self.AppDelegate debugMode])
-                            NSLog(@"Sending Command-Shift-A to clear selection in Google Docs");
-                        ProcessSerialNumber psn;
-                        GetFrontProcess(&psn);
-                        
-                        CGEventRef event = CGEventCreateKeyboardEvent(NULL, kVK_ANSI_A, true);
-                        //set shift and command keys down for above event
-                        CGEventSetFlags(event, kCGEventFlagMaskShift | kCGEventFlagMaskCommand);
-                        CGEventPostToPSN(&psn, event);
-                        CFRelease(event);
-                        
-                        event = CGEventCreateKeyboardEvent(NULL, kVK_ANSI_A, false);
-                        CGEventSetFlags(event, kCGEventFlagMaskShift | kCGEventFlagMaskCommand);
-                        CGEventPostToPSN(&psn, event);
-                        CFRelease(event);
-                    }
+                    [self replaceExistingSelectionIn:sender with:output];
                 }
             }
             

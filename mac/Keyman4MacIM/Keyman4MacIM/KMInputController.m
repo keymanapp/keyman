@@ -8,13 +8,8 @@
 
 #import "KMInputController.h"
 #import "KMInputMethodEventHandler.h"
+#import "KMInputMethodBrowserClientEventHandler.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
-
-//@interface KMInputController ()
-//@property (nonatomic, strong) NSMutableDictionary *kbData;
-//@property (nonatomic, strong) NSDictionary *kmModes;
-//@property (assign) BOOL willDeleteNullChar;
-//@end
 
 @implementation KMInputController
 
@@ -57,7 +52,19 @@ KMInputMethodEventHandler* _eventHandler;
         [_eventHandler deactivate];
     }
     
-    _eventHandler = [KMInputMethodEventHandler new];
+    NSRunningApplication *currApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
+    NSString *clientAppId = [currApp bundleIdentifier];
+    if ([self.AppDelegate debugMode])
+        NSLog(@"New active app %@", clientAppId);
+    
+    // Most things in Safari work well using the normal way, but Google Docs doesn't.
+    if ([clientAppId isEqual: @"com.google.Chrome"] ||
+        [clientAppId isEqual: @"com.apple.Safari"] ||
+        [clientAppId isEqual: @"org.mozilla.firefox"]) {
+        _eventHandler = [[KMInputMethodBrowserClientEventHandler alloc] initWithClient:clientAppId];
+    }
+    else
+        _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId];
 }
 
 - (void)deactivateServer:(id)sender {

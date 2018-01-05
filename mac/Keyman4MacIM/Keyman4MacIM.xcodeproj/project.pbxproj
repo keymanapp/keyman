@@ -52,6 +52,7 @@
 		98FE10641B4DEE5600525F54 /* KMInfoWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98FE10621B4DEE5600525F54 /* KMInfoWindowController.xib */; };
 		E21799051FC5B7BC00F2D66A /* KMInputMethodEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */; };
 		E21799061FC5B7BC00F2D66A /* KMInputMethodEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */; };
+		E24C79EA1FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E24C79E91FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -149,6 +150,9 @@
 		98FE10621B4DEE5600525F54 /* KMInfoWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = KMInfoWindowController.xib; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.xib; sourceTree = "<group>"; };
 		E21799031FC5B74D00F2D66A /* KMInputMethodEventHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodEventHandler.h; sourceTree = "<group>"; };
 		E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodEventHandler.m; sourceTree = "<group>"; };
+		E24C79E91FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodBrowserClientEventHandler.m; sourceTree = "<group>"; };
+		E24C79EB1FFFCE3000D8E46F /* KMInputMethodBrowserClientEventHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodBrowserClientEventHandler.h; sourceTree = "<group>"; };
+		E24C79EC1FFFEA6B00D8E46F /* KMInputMethodEventHandlerProtected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodEventHandlerProtected.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -279,7 +283,10 @@
 				98A778C21A8C53BF00CF809D /* KMInputMethodAppDelegate.h */,
 				98A778C31A8C53BF00CF809D /* KMInputMethodAppDelegate.m */,
 				E21799031FC5B74D00F2D66A /* KMInputMethodEventHandler.h */,
+				E24C79EC1FFFEA6B00D8E46F /* KMInputMethodEventHandlerProtected.h */,
 				E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */,
+				E24C79EB1FFFCE3000D8E46F /* KMInputMethodBrowserClientEventHandler.h */,
+				E24C79E91FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m */,
 				98E672961B532DE000DBDE2F /* KMKeyboardHelpWindow */,
 				989C9C141A7876DE00A20425 /* MainMenu.xib */,
 				984B8F3E1AF1C2F400E096A8 /* OnScreenKeyboard */,
@@ -536,6 +543,7 @@
 				98FE10631B4DEE5600525F54 /* KMInfoWindowController.m in Sources */,
 				9836B3721AE5F11D00780482 /* unzip.c in Sources */,
 				9832472E1A9EABC70010B90C /* KMConfigColumn1CellView.m in Sources */,
+				E24C79EA1FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m in Sources */,
 				98FE105E1B4DE8F400525F54 /* NSWindow+SuppMethods.m in Sources */,
 				9836B3741AE5F11D00780482 /* ZipArchive.mm in Sources */,
 				983247B21A9EB9690010B90C /* KMConfigColumn3CellView.m in Sources */,
