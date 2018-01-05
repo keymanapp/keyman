@@ -11,5 +11,11 @@
 #ifndef KMInputMethodEventHandler_h
 #define KMInputMethodEventHandler_h
 
+@interface KMInputMethodEventHandler : NSObject
+
+- (BOOL)handleEvent:(NSEvent *)event client:(id)sender;
+- (void)deactivate;
+
+@end
 
 #endif /* KMInputMethodEventHandler_h */
