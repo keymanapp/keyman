@@ -1,4 +1,4 @@
-program kmcomapi_win64_host;
+program keymanapi_test;
 
 {$IFNDEF TESTINSIGHT}
 {$APPTYPE CONSOLE}
@@ -16,8 +16,8 @@ uses
   DUnitX.TestFramework,
   Winapi.ActiveX,
   Keyman.Test.Console.KeymanAPIHost in 'Keyman.Test.Console.KeymanAPIHost.pas',
-  keymanapi_TLB in '..\..\engine\kmcomapi\keymanapi_TLB.pas',
-  KeymanOptionNames in '..\..\global\delphi\general\KeymanOptionNames.pas';
+  keymanapi_TLB in '..\..\..\engine\kmcomapi\keymanapi_TLB.pas',
+  KeymanOptionNames in '..\..\..\global\delphi\general\KeymanOptionNames.pas';
 
 var
   runner : ITestRunner;
