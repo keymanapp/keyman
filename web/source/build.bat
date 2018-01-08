@@ -182,7 +182,7 @@ endlocal
 
 del %EMBED_OUTPUT%\keyman.js 2>nul
 CALL %compilecmd% -p %NODE_SOURCE%\tsconfig.embedded.json
-echo Typescript compiled.
+echo Embedded TypeScript compiled.
 
 CALL :minify "keyman.js" %EMBED_OUTPUT% SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=%BUILD%"
 if not exist %EMBED_OUTPUT%\keyman.js goto fail
@@ -208,7 +208,7 @@ echo Compile Keymanweb...
 
 del %WEB_OUTPUT%\keymanweb.js 2>nul
 CALL %compilecmd% -p %NODE_SOURCE%\tsconfig.web.json || true
-echo Typescript compiled.
+echo Native TypeScript compiled.
 
 call :copy_resources %INTERMEDIATE%
 
