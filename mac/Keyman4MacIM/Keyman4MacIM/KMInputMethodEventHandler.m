@@ -100,6 +100,25 @@ NSRange _previousSelRange;
     _previousSelRange.length = 0;
 }
 
+- (void)insertPendingBufferTextIn:(id)client {
+    NSUInteger length = [self pendingBuffer].length;
+    if (!length) {
+        if ([self.AppDelegate debugMode])
+            NSLog(@"Error - expected text in pending buffer!");
+        return;
+    }
+    NSString* text = [self pendingBuffer];
+    
+    if ([self.AppDelegate debugMode])
+        NSLog(@"Inserting text from pending buffer: \"%@\"", text);
+        
+    [client insertText:text replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+    _previousSelRange.location += text.length;
+    _previousSelRange.length = 0;
+    
+    [self setPendingBuffer:@""];
+}
+
 - (KMInputMethodAppDelegate *)AppDelegate {
     return (KMInputMethodAppDelegate *)[NSApp delegate];
 }
@@ -217,48 +236,17 @@ NSRange _previousSelRange;
     
     if (_legacyMode && event.keyCode == kProcessPendingBuffer)
     {
-        if ([self.AppDelegate debugMode])
+        if ([self.AppDelegate debugMode]) {
             NSLog(@"Processing the special %hu code", kProcessPendingBuffer);
-        
-        NSUInteger length = [self pendingBuffer].length;
-        if (length > 0) {
-            if ([self.AppDelegate debugMode]) {
+            
+            NSUInteger length = [self pendingBuffer].length;
+            if (length > 0) {
                 for (NSUInteger ich = 0; ich < length; ich++)
                     NSLog(@"Char %li: '%x'", ich, [[self pendingBuffer] characterAtIndex:ich]);
             }
-            NSString* text;
-            if (length > 1 && _insertCharactersIndividually) {
-                if ([self.AppDelegate debugMode]) {
-                    NSLog(@"Using special Google Docs in Chrome logic");
-                }
-                unichar chars[1];
-                chars[0] = [[self pendingBuffer] characterAtIndex:0];
-                text = [[NSString alloc] initWithCharacters:chars length:1];
-            }
-            else {
-                text = [self pendingBuffer];
-            }
-            
-            if ([self.AppDelegate debugMode])
-                NSLog(@"Inserting text from pending buffer: \"%@\"", text);
-            
-            [sender insertText:text replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
-            _previousSelRange.location += text.length;
-            _previousSelRange.length = 0;
-            
-            if (length > 1 && _insertCharactersIndividually) {
-                // Come back for more...
-                [_pendingBuffer deleteCharactersInRange:NSMakeRange(0, 1)];
-                [self performSelector:@selector(initiatePendingBufferProcessing:) withObject:sender afterDelay:0.1];
-            }
-            else {
-                [self setPendingBuffer:@""];
-            }
         }
-        else {
-            if ([self.AppDelegate debugMode])
-                NSLog(@"Error - expected text in pending buffer!");
-        }
+
+        [self insertPendingBufferTextIn:sender];
         return YES;
     }
     

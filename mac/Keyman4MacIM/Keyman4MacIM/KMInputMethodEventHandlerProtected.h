@@ -30,8 +30,13 @@
 
 - (void)checkContextIn:(id)client;
 - (void)replaceExistingSelectionIn:(id)client with:(NSString *) text;
+- (void)insertPendingBufferTextIn:(id)client;
 - (KMInputMethodAppDelegate *)AppDelegate;
 - (NSMutableString *)contextBuffer;
+// Return the pending buffer.  If it is NIL create it.
+-(NSMutableString*)pendingBuffer;
+-(void)setPendingBuffer:(NSString*)string;
+- (void)initiatePendingBufferProcessing:(id)sender;
 @end
 
 #endif /* KMInputMethodEventHandlerProtected_h */

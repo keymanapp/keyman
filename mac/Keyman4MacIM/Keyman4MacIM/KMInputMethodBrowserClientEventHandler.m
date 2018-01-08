@@ -19,15 +19,21 @@
 NSUInteger _failuresToRetrieveExpectedContext;
 BOOL _forceRemoveSelectionInGoogleDocs;
 //BOOL _explicitlyDeleteExistingSelectionBeforeInserting = NO;
+BOOL _googleChrome;
+BOOL _insertCharactersIndividually;
 
 - (instancetype)initWithClient:(NSString *)clientAppId {
     
     self = [super initWithClient:clientAppId];
     if (self) {
+        BOOL safari = [clientAppId isEqual: @"com.apple.Safari"];
+        _googleChrome = [clientAppId isEqual: @"com.google.Chrome"];
         _failuresToRetrieveExpectedContext = 0;
-        _forceRemoveSelectionInGoogleDocs =
-            //_explicitlyDeleteExistingSelectionBeforeInserting =
-            [clientAppId isEqual: @"com.apple.Safari"];
+        _forceRemoveSelectionInGoogleDocs = safari;
+        self.insertCharactersIndividually = NO;
+        //_explicitlyDeleteExistingSelectionBeforeInserting = safari;
+        if (safari)
+            self.clientSelectionCanChangeUnexpectedly = NO;
     }
     return self;
 }
@@ -70,7 +76,7 @@ BOOL _forceRemoveSelectionInGoogleDocs;
                     self.cannnotTrustSelectionLength = YES;
                     self.clientSelectionCanChangeUnexpectedly = NO; // This isn't true (it can change unexpectedly), but we can't get the context, so we pretend/hope it won't.
                     // Google docs in Chrome allows only a single character at a time :-(
-                    self.insertCharactersIndividually = YES;
+                    _insertCharactersIndividually = _googleChrome;
                 }
             }
         }
@@ -102,7 +108,7 @@ BOOL _forceRemoveSelectionInGoogleDocs;
     [super replaceExistingSelectionIn:client with:text];
     
     // In Google Docs in Safari when there is an existing selection, the inserted characters
-    // stays selected. The following clears the selection.
+    // stay selected. The following clears the selection.
     if (self.legacyMode && _forceRemoveSelectionInGoogleDocs) {
         if ([self.AppDelegate debugMode])
             NSLog(@"Sending Command-Shift-A to clear selection in Google Docs");
@@ -120,5 +126,28 @@ BOOL _forceRemoveSelectionInGoogleDocs;
         CGEventPostToPSN(&psn, event);
         CFRelease(event);
     }
+}
+
+- (void)insertPendingBufferTextIn:(id)client {
+    NSUInteger length = 0;
+    
+    if (!_insertCharactersIndividually) {
+        length = [self pendingBuffer].length;
+        if (length > 1) {
+            [super insertPendingBufferTextIn:client];
+            return;
+        }
+    }
+    if ([self.AppDelegate debugMode]) {
+        NSLog(@"Using special Google Docs in Chrome logic");
+    }
+    NSString* remainingText = [self.pendingBuffer substringFromIndex:1];
+    [self.pendingBuffer deleteLastNChars:length - 1];
+    
+    [super insertPendingBufferTextIn:client];
+        
+    // Reset the pending buffer to contain remaining characters and issue call to come back for more...
+    [self setPendingBuffer:remainingText];
+    [self performSelector:@selector(initiatePendingBufferProcessing:) withObject:client afterDelay:0.1];
 }
 @end
