@@ -62,7 +62,7 @@ class KeymanBase {
   modStateFlags = 0;         // Tracks the present state of the physical keyboard's active modifier flags.  Needed for AltGr simulation.
 
   initialized: number;       // Signals the initialization state of the KeymanWeb system.
-  __BUILD__ = 300;           // TS needs this to be defined within the class.
+  'build' = 300;           // TS needs this to be defined within the class.
 
   // Used as placeholders during initialization.
   // The corresponding class properties should be dropped after a refactor;
@@ -97,7 +97,7 @@ class KeymanBase {
     this.osk = {ready:false}; // Temporary.
 
     // Load properties from their static variants.
-    this.__BUILD__ = KeymanBase.__BUILD__;
+    this['build'] = KeymanBase.__BUILD__;
     this.srcPath = KeymanBase._srcPath;
     this.rootPath = KeymanBase._rootPath;
     this.protocol = KeymanBase._protocol;

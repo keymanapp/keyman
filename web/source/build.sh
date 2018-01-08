@@ -25,6 +25,10 @@ assert ( ) {
     fi
 }
 
+# Ensure the dependencies are downloaded.
+echo "Node.js + dependencies check"
+npm install
+
 : ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler}
 : ${JAVA:=java}
 
@@ -101,10 +105,6 @@ copy_resources ( ) {
     echo KeymanWeb resources saved under $1
     echo
 }
-
-# Ensure the dependencies are downloaded.
-echo "Node.js + dependencies check"
-npm install
 
 if [ $? -ne 0 ]; then
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
