@@ -25,6 +25,10 @@ assert ( ) {
     fi
 }
 
+# Ensure the dependencies are downloaded.
+echo "Node.js + dependencies check"
+npm install
+
 : ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler}
 : ${JAVA:=java}
 
@@ -64,10 +68,6 @@ minify ( ) {
         --js_output_file $2/$1 --warning_level VERBOSE --output_wrapper "$wrapper
 //# sourceMappingURL=$1.map"
 }
-
-# Ensure the dependencies are downloaded.
-echo "Node.js + dependencies check"
-npm install
 
 if [ $? -ne 0 ]; then
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
