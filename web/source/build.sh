@@ -33,8 +33,10 @@ npm install
 : ${JAVA:=java}
 
 minifier="$CLOSURECOMPILERPATH/compiler.jar"
+# We'd love to add the argument --source_map_include_content for distribution in the future,
+# but Closure doesn't include the TS sources properly at this time.
 minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables"
-minifycmd="$JAVA -jar $minifier $minifier_warnings"
+minifycmd="$JAVA -jar $minifier $minifier_warnings --generate_exports"
 
 if ! [ -f $minifier ];
 then
@@ -67,6 +69,41 @@ minify ( ) {
         --create_source_map $2/$1.map --js $INTERMEDIATE/$1 --compilation_level $3 \
         --js_output_file $2/$1 --warning_level VERBOSE --output_wrapper "$wrapper
 //# sourceMappingURL=$1.map"
+}
+
+copy_resources ( ) {
+    echo 
+    echo Copy resources to $1/ui, .../osk
+
+    # Create our entire compilation results path.  Can't one-line them due to shell-script parsing errors.
+    if ! [ -d $1/ui ];      then 
+        mkdir -p "$1/ui"      
+    fi
+    if ! [ -d $1/osk ];     then 
+        mkdir -p "$1/osk"     
+    fi
+    if ! [ -d $1/src/ui ];  then 
+        mkdir -p "$1/src/ui"  
+    fi
+    if ! [ -d $1/src/osk ]; then 
+        mkdir -p "$1/src/osk" 
+    fi
+
+    cp -Rf $SOURCE/resources/ui  $1/  >/dev/null
+    cp -Rf $SOURCE/resources/osk $1/  >/dev/null
+
+    echo Copy source to $1/src
+    cp -Rf $SOURCE/*.js $1/src
+    cp -Rf $SOURCE/*.ts $1/src
+    echo $BUILD > $1/src/version.txt
+
+    cp -Rf $SOURCE/resources/ui  $1/src/ >/dev/null
+    cp -Rf $SOURCE/resources/osk $1/src/ >/dev/null
+
+    # Update build number if successful
+    echo
+    echo KeymanWeb resources saved under $1
+    echo
 }
 
 if [ $? -ne 0 ]; then
@@ -170,6 +207,8 @@ if [ $BUILD_EMBED = true ]; then
 
     rm $EMBED_OUTPUT/keyman.js 2>/dev/null
     $compilecmd -p $NODE_SOURCE/tsconfig.embedded.json
+    echo Typescript compiled.
+
     minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
     assert $EMBED_OUTPUT/keyman.js 
 
@@ -188,24 +227,15 @@ if [ $BUILD_EMBED = true ]; then
 fi
 
 if [ $BUILD_COREWEB = true ]; then
-    # Create our entire compilation results path.  Can't one-line them due to shell-script parsing errors.
-    if ! [ -d $WEB_OUTPUT/ui ];      then 
-        mkdir -p "$WEB_OUTPUT/ui"      
-    fi
-    if ! [ -d $WEB_OUTPUT/osk ];     then 
-        mkdir -p "$WEB_OUTPUT/osk"     
-    fi
-    if ! [ -d $WEB_OUTPUT/src/ui ];  then 
-        mkdir -p "$WEB_OUTPUT/src/ui"  
-    fi
-    if ! [ -d $WEB_OUTPUT/src/osk ]; then 
-        mkdir -p "$WEB_OUTPUT/src/osk" 
-    fi
-
     # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
-    echo Compile Keymanweb
+    echo Compile Keymanweb...
     rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
     $compilecmd -p $NODE_SOURCE/tsconfig.web.json
+    echo Typescript compiled.
+    
+    copy_resources "$INTERMEDIATE"
+
+    echo Minifying KeymanWeb...
     minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
     assert $WEB_OUTPUT/keymanweb.js
 
@@ -213,20 +243,7 @@ if [ $BUILD_COREWEB = true ]; then
 fi
 
 if [ $BUILD_FULLWEB = true ]; then
-    echo 
-    echo Copy resources to $WEB_OUTPUT/ui, .../osk
-
-    cp -Rf $SOURCE/resources/ui  $WEB_OUTPUT/  >/dev/null
-    cp -Rf $SOURCE/resources/osk $WEB_OUTPUT/  >/dev/null
-
-    echo Copy source to $WEB_OUTPUT/src
-    cp -Rf $SOURCE/*.js $WEB_OUTPUT/src
-    cp -Rf $SOURCE/*.ts $WEB_OUTPUT/src
-    echo $BUILD > $WEB_OUTPUT/src/version.txt
-
-    cp -Rf $SOURCE/resources/ui  $WEB_OUTPUT/src/ >/dev/null
-    cp -Rf $SOURCE/resources/osk $WEB_OUTPUT/src/ >/dev/null
-
+    copy_resources "$WEB_OUTPUT"
     # Update build number if successful
     echo
     echo KeymanWeb 2 build $BUILD compiled and saved under $WEB_OUTPUT
@@ -234,7 +251,7 @@ if [ $BUILD_FULLWEB = true ]; then
 fi
 
 if [ $BUILD_UI = true ]; then
-    echo Compile UI Modules
+    echo Compile UI Modules...
     $compilecmd -p $NODE_SOURCE/tsconfig.ui.json
 
     echo Minify ToolBar UI
