@@ -110,38 +110,6 @@ copy_resources ( ) {
     echo
 }
 
-
-    # Create our entire compilation results path.  Can't one-line them due to shell-script parsing errors.
-    if ! [ -d $1/ui ];      then 
-        mkdir -p "$1/ui"      
-    fi
-    if ! [ -d $1/osk ];     then 
-        mkdir -p "$1/osk"     
-    fi
-    if ! [ -d $1/src/ui ];  then 
-        mkdir -p "$1/src/ui"  
-    fi
-    if ! [ -d $1/src/osk ]; then 
-        mkdir -p "$1/src/osk" 
-    fi
-
-    cp -Rf $SOURCE/resources/ui  $1/  >/dev/null
-    cp -Rf $SOURCE/resources/osk $1/  >/dev/null
-
-    echo Copy source to $1/src
-    cp -Rf $SOURCE/*.js $1/src
-    cp -Rf $SOURCE/*.ts $1/src
-    echo $BUILD > $1/src/version.txt
-
-    cp -Rf $SOURCE/resources/ui  $1/src/ >/dev/null
-    cp -Rf $SOURCE/resources/osk $1/src/ >/dev/null
-
-    # Update build number if successful
-    echo
-    echo KeymanWeb resources saved under $1
-    echo
-}
-
 # Definition of global compile constants
 WEB_OUTPUT="../output"
 EMBED_OUTPUT="../embedded"
