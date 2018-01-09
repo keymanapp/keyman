@@ -24,6 +24,11 @@ if(!window['keyman']['initialized']) {
 
   keyman = window['keyman'];
 
+  // -------------------------------------------------------------------------
+  
+  /**
+   * Declares an interface for implementation of touch-based alias event handlers and state functions.
+   */
   interface AliasElementHandlers {
     /**
      * Handle receiving focus by simulated input field
@@ -96,10 +101,20 @@ if(!window['keyman']['initialized']) {
      * @param       {Object}        x     element
      */       
     updateInput(x: HTMLElement);
+
+    /** 
+     * Handles touch-based loss of focus events.
+     */
+    setBlur(e: FocusEvent);
   
     // End of I3363 (Build 301) additions
   }
 
+  // -------------------------------------------------------------------------
+
+  /**
+   * Defines numerous functions for handling and modeling touch-based aliases.
+   */
   class TouchHandlers implements AliasElementHandlers {
 
     // TODO:  resolve/refactor out!
@@ -236,7 +251,7 @@ if(!window['keyman']['initialized']) {
         }
     
         this.setTextCaret(target,cp);
-        this.keymanweb.scrollInput(target);        
+        this.scrollInput(target);        
       } else { // Otherwise, if clicked on text in SPAN, set at touch position
         var caret,cp,cpMin,cpMax,x,y,dy,yRow,iLoop;
         caret=scroller.childNodes[1]; //caret span
@@ -412,7 +427,7 @@ if(!window['keyman']['initialized']) {
       
       // Update the base element then scroll into view if necessary      
       this.updateBaseElement(e,tLen); //KMW-3, KMW-29      
-      this.keymanweb.scrollInput(e); 
+      this.scrollInput(e); 
     }
  
     getTextCaret(e: HTMLElement): number {
@@ -496,10 +511,10 @@ if(!window['keyman']['initialized']) {
       cs.visibility='hidden';   // best to wait for timer to display caret
       
       // Scroll into view if required
-      this.keymanweb.scrollBody(e);
+      this.scrollBody(e);
     
       // Display and position the scrollbar if necessary
-      this.keymanweb.setScrollBar(e);
+      this.setScrollBar(e);
     }
           
     updateInput(x: HTMLDivElement) {
@@ -597,7 +612,216 @@ if(!window['keyman']['initialized']) {
         e.base.style.visibility=(n==0?'visible':'hidden');
       }
     }
+
+    /**
+     * Close OSK and remove simulated caret on losing focus
+     */          
+    cancelInput(): void { 
+      this.keymanweb._ActiveElement=null; 
+      this.hideCaret(); 
+      this.keymanweb.osk.hideNow();
+    };
+
+    /**
+     * Handle losing focus from simulated input field 
+     *
+     * @param       {Event}      e    event
+     */
+    setBlur(e: FocusEvent) {
+      (<TouchHandlers>keyman.touchAliasing)._setBlur(e);
+    }
+
+    _setBlur(e: FocusEvent) {
+      // This works OK for iOS, but may need something else for other platforms
+      if(('relatedTarget' in e) && e.relatedTarget) {
+        var elem: HTMLElement = <HTMLElement> e.relatedTarget;
+        if(elem.nodeName != 'DIV' || elem.className.indexOf('keymanweb-input') == -1) {
+          this.cancelInput(); return;
+        }
+      }
+
+      //Hide the OSK
+      if(!this.keymanweb.focusing) {
+        this.cancelInput();
+      }
+    }
+
+    /**
+     * Display and position a scrollbar in the input field if needed
+     * 
+     * @param   {Object}  e   input DIV element (copy of INPUT or TEXTAREA)
+     */
+    setScrollBar(e: HTMLElement) {
+      // Display the scrollbar if necessary.  Added TEXTAREA condition to correct rotation issue KMW-5.  Fixed for 310 beta.
+      var scroller=<HTMLElement>e.childNodes[0], sbs=(<HTMLElement>e.childNodes[1]).style;
+      if((scroller.offsetWidth > e.offsetWidth || scroller.offsetLeft < 0) && (e.base.nodeName != 'TEXTAREA')) {
+        sbs.height='4px';
+        sbs.width=100*(e.offsetWidth/scroller.offsetWidth)+'%';
+        sbs.left=100*(-scroller.offsetLeft/scroller.offsetWidth)+'%';
+        sbs.top='0';
+        sbs.visibility='visible';  
+      } else if(scroller.offsetHeight > e.offsetHeight || scroller.offsetTop < 0) {
+        sbs.width='4px';
+        sbs.height=100*(e.offsetHeight/scroller.offsetHeight)+'%';
+        sbs.top=100*(-scroller.offsetTop/scroller.offsetHeight)+'%';
+        sbs.left='0';    
+        sbs.visibility='visible';        
+      } else {
+        sbs.visibility='hidden';
+      }
+    }                    
+
+    /**
+     * Handle the touch move event for an input element
+     * 
+     * @param       {Event}           e     touchmove event
+     */         
+    dragInput(e: TouchEvent|MouseEvent) {
+      (<TouchHandlers> keyman.touchAliasing)._dragInput(e);
+    }
+
+    _dragInput(e: TouchEvent|MouseEvent) {
+      // Prevent dragging window 
+      e.preventDefault();
+      e.stopPropagation();      
+
+      // Identify the target from the touch list or the event argument (IE 10 only)
+      var target: HTMLElement;
+      
+      if(e instanceof TouchEvent) {
+        target =<HTMLElement>(typeof e.targetTouches == 'object' ? e.targetTouches[0].target : e.target);
+      } else {
+        target = <HTMLElement>e.target;
+      }
+      if(target == null) {
+        return;
+      }
+      
+      // Identify the input element from the touch event target (touched element may be contained by input)
+      if(target.className == null || target.className.indexOf('keymanweb-input') < 0) target=<HTMLElement> target.parentNode;
+      if(target.className == null || target.className.indexOf('keymanweb-input') < 0) target=<HTMLElement> target.parentNode;
+      if(target.className == null || target.className.indexOf('keymanweb-input') < 0) return;
+      
+      var x, y;
+
+      if(e instanceof TouchEvent) {
+        x = e.touches[0].screenX;
+        y = e.touches[0].screenY;
+      } else {
+        x = e.screenX;
+        y = e.screenY;
+      }
+                
+      // Allow content of input elements to be dragged horizontally or vertically
+      if(typeof this.keymanweb.firstTouch == 'undefined' || this.keymanweb.firstTouch == null) {
+        this.keymanweb.firstTouch={x:x,y:y};
+      } else {
+        var x0=this.keymanweb.firstTouch.x,y0=this.keymanweb.firstTouch.y,
+          scroller=<HTMLElement>target.firstChild,dx,dy,x1;
+        
+        if(target.base.nodeName == 'TEXTAREA') {
+          var yOffset=parseInt(scroller.style.top,10);
+          if(isNaN(yOffset)) yOffset=0;
+          dy=y0-y;
+          if(dy < -4 || dy > 4) {
+            scroller.style.top=(yOffset<dy?yOffset-dy:0)+'px';
+            this.keymanweb.firstTouch.y=y;  
+          } 
+        } else {
+          var xOffset=parseInt(scroller.style.left,10);
+          if(isNaN(xOffset)) xOffset=0;
+          dx=x0-x;
+          if(dx < -4 || dx > 4)
+          {
+            // Limit dragging beyond the defined text (to avoid dragging the text completely out of view)
+            var xMin=0,xMax=this.keymanweb.util._GetAbsoluteX(target)+target.offsetWidth-scroller.offsetWidth-32;
+            if(target.base.dir == 'rtl')xMin=16; else xMax=xMax-24;            
+            x1=xOffset-dx;
+            if(x1 > xMin) x1=xMin;
+            if(x1 < xMax) x1=xMax;
+            scroller.style.left=x1+'px';
+            this.keymanweb.firstTouch.x=x;       
+          }    
+        }
+      }
+      this.setScrollBar(target);
+    }
+
+    /**
+     * Scroll the input field horizontally (INPUT base element) or 
+     * vertically (TEXTAREA base element) to bring the caret into view
+     * as text is entered or deleted form an element     
+     *      
+     * @param       {Object}      e        simulated input field object with focus
+     */         
+    scrollInput(e: HTMLElement) {
+      if(!e || !e.firstChild || e.className == null || e.className.indexOf('keymanweb-input') < 0 ) {
+        return;
+      }
+
+      var scroller=<HTMLElement>e.firstChild;
+      if(scroller.childNodes.length < 3) {
+        return;
+      }
+
+      var util = this.keymanweb.util;
+
+      // Get the actual absolute position of the caret and the element 
+      var s2=scroller.childNodes[1],
+        cx=util._GetAbsoluteX(s2),cy=util._GetAbsoluteY(s2),
+        ex=util._GetAbsoluteX(e),ey=util._GetAbsoluteY(e),
+        x=parseInt(scroller.style.left,10),
+        y=parseInt(scroller.style.top,10),
+        dx=0,dy=0; 
+      
+      // Scroller offsets must default to zero
+      if(isNaN(x)) x=0; if(isNaN(y)) y=0;
+
+      // Scroll input field vertically if necessary
+      if(e.base.nodeName == 'TEXTAREA') { 
+        var rowHeight=Math.round(e.offsetHeight/(<HTMLTextAreaElement>e.base).rows);
+        if(cy < ey) dy=cy-ey;
+        if(cy > ey+e.offsetHeight-rowHeight) dy=cy-ey-e.offsetHeight+rowHeight;   
+        if(dy != 0)scroller.style.top=(y<dy?y-dy:0)+'px';
+      } else { // or scroll horizontally if needed
+        if(cx < ex+8) dx=cx-ex-12;
+        if(cx > ex+e.offsetWidth-12) dx=cx-ex-e.offsetWidth+12;   
+        if(dx != 0)scroller.style.left=(x<dx?x-dx:0)+'px';
+      }    
+
+      // Display the caret (and scroll into view if necessary)
+      this.showCaret(e);
+    }
+
+    /**
+     * Scroll the document body vertically to bring the active input into view
+     * 
+     * @param       {Object}      e        simulated input field object being focussed
+     */         
+    scrollBody(e: HTMLElement): void {
+      var osk = this.keymanweb.osk;
+      var util = this.keymanweb.util;
+
+      if(!e || e.className == null || e.className.indexOf('keymanweb-input') < 0 || !osk.ready) {
+        return;
+      }
+
+      // Get the absolute position of the caret
+      var s2=<HTMLElement>e.firstChild.childNodes[1], y=util._GetAbsoluteY(s2), t=window.pageYOffset,dy=0;
+      if(y < t) {
+        dy=y-t;
+      } else {
+        dy=y-t-(window.innerHeight-osk._Box.offsetHeight-s2.offsetHeight-2);
+        if(dy < 0) dy=0;
+      }    
+      // Hide OSK, then scroll, then re-anchor OSK with absolute position (on end of scroll event)
+      if(dy != 0) {
+        window.scrollTo(0,dy+window.pageYOffset);
+      }
+    }
   }
+
+  // -------------------------------------------------------------------------
 
   /**
    * Stub function equivalents to alias element handling, for use with desktop mode.  Dummies out
@@ -640,8 +864,13 @@ if(!window['keyman']['initialized']) {
 
     updateInput(x: HTMLElement) {
     }
+
+    setBlur(e: FocusEvent) {
+    }
   }
 
+  // -------------------------------------------------------------------------
+  
   (function() 
   {
 
@@ -762,198 +991,6 @@ if(!window['keyman']['initialized']) {
        */
 
       keymanweb.touchAliasing = keyman.touchAliasing = new TouchHandlers(keymanweb);
-
-      /**
-       * Close OSK and remove simulated caret on losing focus
-       */          
-      keymanweb.cancelInput = function()
-      { 
-        keymanweb._ActiveElement=null; 
-        keymanweb.touchAliasing.hideCaret(); 
-        osk.hideNow();
-      };
-
-      /**
-       * Handle losing focus from simulated input field 
-       *
-       * @param       {Event}      e    event
-       */
-      keymanweb.setBlur = function(e)
-      {
-        // This works OK for iOS, but may need something else for other platforms
-        if(('relatedTarget' in e) && e.relatedTarget)
-        {
-          if(e.relatedTarget.nodeName != 'DIV' || e.relatedTarget.className.indexOf('keymanweb-input') == -1)
-          {
-            keymanweb.cancelInput(); return;
-          }
-        }
-        //Hide the OSK
-        if(!keymanweb.focusing) keymanweb.cancelInput();
-      }
-
-      /**
-       * Display and position a scrollbar in the input field if needed
-       * 
-       * @param   {Object}  e   input DIV element (copy of INPUT or TEXTAREA)
-       */
-      keymanweb.setScrollBar=function(e)
-      {
-        // Display the scrollbar if necessary.  Added TEXTAREA condition to correct rotation issue KMW-5.  Fixed for 310 beta.
-        var scroller=e.childNodes[0],sbs=e.childNodes[1].style;
-        if((scroller.offsetWidth > e.offsetWidth || scroller.offsetLeft < 0) && (e.base.nodeName != 'TEXTAREA')) 
-        {
-          sbs.height='4px';
-          sbs.width=100*(e.offsetWidth/scroller.offsetWidth)+'%';
-          sbs.left=100*(-scroller.offsetLeft/scroller.offsetWidth)+'%';
-          sbs.top='0';
-          sbs.visibility='visible';  
-        }
-        else if(scroller.offsetHeight > e.offsetHeight || scroller.offsetTop < 0)
-        {
-          sbs.width='4px';
-          sbs.height=100*(e.offsetHeight/scroller.offsetHeight)+'%';
-          sbs.top=100*(-scroller.offsetTop/scroller.offsetHeight)+'%';
-          sbs.left='0';    
-          sbs.visibility='visible';        
-        }
-        else
-        {
-          sbs.visibility='hidden';
-        }
-      }                    
-
-      /**
-       * Handle the touch move event for an input element
-       * 
-       * @param       {Event}           e     touchmove event
-       */         
-      keymanweb.dragInput=function(e)
-      {    
-        // Prevent dragging window 
-        e.preventDefault();  e.stopPropagation();      
-
-        // Identify the target from the touch list or the event argument (IE 10 only) 
-        var target=(typeof e.targetTouches == 'object' ? e.targetTouches[0].target : e.target);     
-        if(target == null) return;
-        
-        // Identify the input element from the touch event target (touched element may be contained by input)
-        if(target.className == null || target.className.indexOf('keymanweb-input') < 0) target=target.parentNode;
-        if(target.className == null || target.className.indexOf('keymanweb-input') < 0) target=target.parentNode;
-        if(target.className == null || target.className.indexOf('keymanweb-input') < 0) return;
-        
-        var x=(typeof e.touches == 'object' ? e.touches[0].screenX : e.screenX),       
-            y=(typeof e.touches == 'object' ? e.touches[0].screenY : e.screenY);
-                  
-        // Allow content of input elements to be dragged horizontally or vertically
-        if(typeof keymanweb.firstTouch == 'undefined' || keymanweb.firstTouch == null)
-          keymanweb.firstTouch={x:x,y:y};
-        else
-        {
-          var x0=keymanweb.firstTouch.x,y0=keymanweb.firstTouch.y,
-            scroller=target.firstChild,dx,dy,x1;
-          
-          if(target.base.nodeName == 'TEXTAREA')
-          {
-            var yOffset=parseInt(scroller.style.top,10);
-            if(isNaN(yOffset)) yOffset=0;
-            dy=y0-y;
-            if(dy < -4 || dy > 4)
-            {
-              scroller.style.top=(yOffset<dy?yOffset-dy:0)+'px';
-              keymanweb.firstTouch.y=y;  
-            } 
-          }
-          else
-          {
-            var xOffset=parseInt(scroller.style.left,10);
-            if(isNaN(xOffset)) xOffset=0;
-            dx=x0-x;
-            if(dx < -4 || dx > 4)
-            {
-              // Limit dragging beyond the defined text (to avoid dragging the text completely out of view)
-              var xMin=0,xMax=util._GetAbsoluteX(target)+target.offsetWidth-scroller.offsetWidth-32;
-              if(target.base.dir == 'rtl')xMin=16; else xMax=xMax-24;            
-              x1=xOffset-dx;
-              if(x1 > xMin) x1=xMin;
-              if(x1 < xMax) x1=xMax;
-              scroller.style.left=x1+'px';
-              keymanweb.firstTouch.x=x;       
-            }    
-          }
-        }
-        keymanweb.setScrollBar(target);
-      }
-
-      /**
-       * Scroll the input field horizontally (INPUT base element) or 
-       * vertically (TEXTAREA base element) to bring the caret into view
-       * as text is entered or deleted form an element     
-       *      
-       * @param       {Object}      e        simulated input field object with focus
-       */         
-      keymanweb.scrollInput=function(e)
-      {
-        if(!e || !e.firstChild || e.className == null || e.className.indexOf('keymanweb-input') < 0 ) return;
-
-        var scroller=e.firstChild;
-        if(scroller.childNodes.length < 3) return;
-  
-        // Get the actual absolute position of the caret and the element 
-        var s2=scroller.childNodes[1],
-          cx=util._GetAbsoluteX(s2),cy=util._GetAbsoluteY(s2),
-          ex=util._GetAbsoluteX(e),ey=util._GetAbsoluteY(e),
-          x=parseInt(scroller.style.left,10),
-          y=parseInt(scroller.style.top,10),
-          dx=0,dy=0; 
-        
-        // Scroller offsets must default to zero
-        if(isNaN(x)) x=0; if(isNaN(y)) y=0;
-  
-        // Scroll input field vertically if necessary
-        if(e.base.nodeName == 'TEXTAREA')
-        { 
-          var rowHeight=Math.round(e.offsetHeight/e.base.rows);
-          if(cy < ey) dy=cy-ey;
-          if(cy > ey+e.offsetHeight-rowHeight) dy=cy-ey-e.offsetHeight+rowHeight;   
-          if(dy != 0)scroller.style.top=(y<dy?y-dy:0)+'px';
-        } 
-        // or scroll horizontally if needed
-        else
-        {
-          if(cx < ex+8) dx=cx-ex-12;
-          if(cx > ex+e.offsetWidth-12) dx=cx-ex-e.offsetWidth+12;   
-          if(dx != 0)scroller.style.left=(x<dx?x-dx:0)+'px';
-        }    
-
-        // Display the caret (and scroll into view if necessary)
-        keymanweb.touchAliasing.showCaret(e);
-      }
-
-      /**
-       * Scroll the document body vertically to bring the active input into view
-       * 
-       * @param       {Object}      e        simulated input field object being focussed
-       */         
-      keymanweb.scrollBody=function(e)
-      { 
-        if(!e || e.className == null || e.className.indexOf('keymanweb-input') < 0 || !osk.ready) return;
-
-        // Get the absolute position of the caret
-        var s2=e.firstChild.childNodes[1],y=util._GetAbsoluteY(s2),t=window.pageYOffset,dy=0;
-        if(y < t) 
-        {
-          dy=y-t;
-        }
-        else
-        {
-          dy=y-t-(window.innerHeight-osk._Box.offsetHeight-s2.offsetHeight-2);
-          if(dy < 0) dy=0;
-        }    
-        // Hide OSK, then scroll, then re-anchor OSK with absolute position (on end of scroll event)
-        if(dy != 0) 
-          window.scrollTo(0,dy+window.pageYOffset);
-      }
 
       /**
        * Function     enableTouchElement
@@ -1118,8 +1155,8 @@ if(!window['keyman']['initialized']) {
         };
         
         // Disable internal scroll when input element in focus 
-        x.addEventListener('touchmove', keymanweb.dragInput, false);
-        x.onmspointermove=keymanweb.dragInput;
+        x.addEventListener('touchmove', keymanweb.touchAliasing.dragInput, false);
+        x.onmspointermove=keymanweb.touchAliasing.dragInput;
         
         // Hide keyboard and caret when losing focus from simulated input field
         x.onblur=keymanweb.setBlur;
@@ -2012,7 +2049,7 @@ if(!window['keyman']['initialized']) {
 
       // Ensure that focussed element is visible above the keyboard
       if(device.touchable && (Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0)) {
-        keymanweb.scrollBody(Ltarg);
+        keymanweb.touchAliasing.scrollBody(Ltarg);
       }
           
       if(Ltarg.tagName=='IFRAME') { //**TODO: check case reference
@@ -2859,7 +2896,7 @@ if(!window['keyman']['initialized']) {
         } else { // Or reposition the caret on the input DIV if mapped
           keymanweb._ActiveElement=keymanweb._LastActiveElement=target;    
           keymanweb.touchAliasing.setTextCaret(target,10000);                            
-          keymanweb.scrollInput(target);   // mousedown check
+          keymanweb.touchAliasing.scrollInput(target);   // mousedown check
           target.focus();
         } 
       } else { // Behaviour for desktop browsers
