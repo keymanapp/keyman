@@ -34,8 +34,10 @@ BOOL _preserveContextForNextCmdA;
         self.insertCharactersIndividually = NO;
         _preserveContextForNextCmdA = NO;
         //_explicitlyDeleteExistingSelectionBeforeInserting = safari;
-        if (safari)
+        if (safari /*||
+            [clientAppId isEqual: @"org.mozilla.firefox"]*/) {
             self.clientSelectionCanChangeUnexpectedly = NO;
+        }
     }
     return self;
 }
