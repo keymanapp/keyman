@@ -29,6 +29,10 @@ assert ( ) {
 echo "Node.js + dependencies check"
 npm install
 
+if [ $? -ne 0 ]; then
+    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+fi
+
 : ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler}
 : ${JAVA:=java}
 
@@ -105,10 +109,6 @@ copy_resources ( ) {
     echo KeymanWeb resources saved under $1
     echo
 }
-
-if [ $? -ne 0 ]; then
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
-fi
 
 # Definition of global compile constants
 WEB_OUTPUT="../output"
