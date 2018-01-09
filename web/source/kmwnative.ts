@@ -108,7 +108,7 @@ if(!window['keyman']['initialized']) {
       }
 
       if(device.touchable) {
-        tempContext = keymanweb.getTextBeforeCaret(Pelem);
+        tempContext = keymanweb.touchAliasing.getTextBeforeCaret(Pelem);
       } else if(Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&
         (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')) {
         // I2457 - support contentEditable elements in mozilla, webkit
@@ -165,7 +165,7 @@ if(!window['keyman']['initialized']) {
         {
           if(align) 
           {     
-            keymanweb.updateInput(keymanweb.inputList[i]);
+            keymanweb.touchAliasing.updateInput(keymanweb.inputList[i]);
             keymanweb.inputList[i].style.visibility='visible';
             if(keymanweb.inputList[i].base.textContent.length > 0)
               keymanweb.inputList[i].base.style.visibility='hidden';
@@ -217,7 +217,7 @@ if(!window['keyman']['initialized']) {
         else if(keyName.indexOf('K_ROPT') >= 0)
         {
           keymanweb._IsActivatingKeymanWebUI=0; osk._Hide(true); 
-          keymanweb.hideCaret(); keymanweb._LastActiveElement = 0;
+          keymanweb.touchAliasing.hideCaret(); keymanweb._LastActiveElement = 0;
         }
       }
     }

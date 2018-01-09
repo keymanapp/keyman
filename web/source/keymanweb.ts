@@ -1,10 +1,14 @@
-/// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
-/// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
+// Includes KMW-added property declaration extensions for HTML elements.
+/// <reference path="kmwexthtml.ts" />
+// Includes KMW string extension declarations.
+/// <reference path="kmwstring.ts" />
 
 /***
    KeymanWeb 10.0
    Copyright 2017 SIL International
 ***/
+
+declare var keyman: any;
 
 // If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the 
 // KMW system, so we use the fact that 'initialized' is only 1 / true after all scripts are loaded for the initial
@@ -18,8 +22,629 @@ if(!window['keyman']['initialized']) {
    *    
    ******************************************************************/
 
+  keyman = window['keyman'];
+
+  interface AliasElementHandlers {
+    /**
+     * Handle receiving focus by simulated input field
+     *    
+     * @param       {Event=}        e     event
+     */       
+    setFocus(e?: TouchEvent): void;
+    
+    /**
+     * Get simulated input field content
+     *    
+     * @param       {Object}        e     element (object) of simulated input field
+     * @return      {string}              entire text in simulated input field
+     */       
+    getText(e: HTMLElement): string;
+    
+    /**
+     *Insert text into simulated input field at indicated character position
+     * 
+     * @param       {Object}      e     simulated input field DIV
+     * @param       {?string}     t     text to insert in element
+     * @param       {?number}     cp    caret position (characters)     
+     */       
+    setText(e: HTMLElement, t?: string, cp?: number): void;
+    
+    /**
+     * Get text up to the caret from simulated input field 
+     *    
+     * @return      {string}   
+     */       
+    getTextBeforeCaret(e: HTMLElement): string;
+
+    /**
+     * Replace text up to the caret in the simulated input field 
+     *    
+     * @param       {Object}        e     element (object) of simulated input field
+     * @param       {string}        t     Context for simulated input field
+     */       
+    setTextBeforeCaret(e: HTMLElement, t: string): void;
+
+    /**
+     * Description  Get current position of caret in simulated input field 
+     *    
+     * @param       {Object}        e     element (object) of simulated input field
+     * @return      {number}              caret character position in simulated input field
+     */       
+    getTextCaret(e: HTMLElement): number;
+    
+    /**
+     * Set current position of caret in simulated input field then display the caret 
+     *    
+     * @param       {Object}        e     element (object) of simulated input field
+     * @param       {number}        cp    caret character position in simulated input field
+     */       
+    setTextCaret(e: HTMLElement, cp: number): void;
+    
+    /**
+     * Hides the simulated caret for touch-aliased elements.
+     */       
+    hideCaret(): void;
+    
+    /**
+     * Toggle state of caret in simulated input field
+     */       
+    flashCaret(): void;
+
+    /**
+     * Correct the position and size of a duplicated input element
+     *    
+     * @param       {Object}        x     element
+     */       
+    updateInput(x: HTMLElement);
+  
+    // End of I3363 (Build 301) additions
+  }
+
+  class TouchHandlers implements AliasElementHandlers {
+
+    // TODO:  resolve/refactor out!
+    keymanweb: any;
+
+    // Stores the simulated caret element.
+    caret: HTMLDivElement;
+    caretTimerId: number;
+    
+    constructor(keyman: any) {
+      this.keymanweb = keyman;
+      this.initCaret();
+    }
+
+    initCaret(): void {
+      /**
+       * Create a caret to be appended to the scroller of the focussed input field. 
+       * The caret is appended to the scroller so that it will automatically be clipped 
+       * when the user manually scrolls it outside the element boundaries.          
+       * It is positioned exactly over the hidden span that is inserted between the
+       * text spans before and after the insertion point.          
+       */
+      this.caret=<HTMLDivElement> document.createElement('DIV');
+      var cs=this.caret.style;
+      cs.position='absolute';
+      cs.height='16px';           // default height, actual height set from element properties
+      cs.width='2px';
+      cs.backgroundColor='blue';
+      cs.border='none';
+      cs.left=cs.top='0px';           // actual position set relative to parent when displayed
+      cs.display='block';         
+      cs.visibility='hidden';
+      cs.zIndex='9998';           // immediately below the OSK
+
+      // Start the caret flash timer
+      this.caretTimerId = window.setInterval(this.flashCaret,500);
+    }
+
+    /**
+     * Handle receiving focus by simulated input field 
+     *      
+     * @param       {Event=}     e    event
+     */       
+    setFocus(e?: TouchEvent): void {                     
+      //e.stopPropagation();  // not doing anything useful, no child elements
+      //e.preventDefault();   // prevents user selection or scrolling, may be better if they are allowed?
+
+      // Warning:  Event handlers can change the reference of 'this', so we need to re-resolve it.
+      (<TouchHandlers>keyman.touchAliasing)._setFocus(e);
+    }
+
+    /**
+     * Handles the actual _setFocus details, now with 'this' as our touch-handling interface.
+     */
+    _setFocus(e?: TouchEvent): void {
+      var kmw = this.keymanweb;
+      var osk = this.keymanweb.osk;
+      var util = this.keymanweb.util;
+
+      this.keymanweb.focusing=true;
+      this.keymanweb.focusTimer=window.setTimeout(function(){
+        kmw.focusing=false;
+      }, 1000);
+
+      var tEvent: {
+        clientX: number;
+        clientY: number;
+        target?: any;
+      };
+
+      if(e) {
+        if(typeof e.touches == 'object') {
+          tEvent=e.touches[0];
+        }
+      } else { // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
+        tEvent={clientX:0, clientY:0}
+        // Will usually be called from setActiveElement, which should define _LastActiveElement
+        if(this.keymanweb._LastActiveElement) {
+          tEvent.target = this.keymanweb._LastActiveElement['kmw_ip'];
+        // but will default to first input or text area on page if _LastActiveElement is null
+        } else {
+          tEvent.target = this.keymanweb.sortedInputs[0]['kmw_ip'];
+        }
+      }    
+      
+      var touchX=tEvent.clientX,touchY=tEvent.clientY,tTarg=tEvent.target,scroller;
+  
+      // Identify the scroller element
+      if(tTarg.nodeName == 'SPAN') {
+        scroller=tTarg.parentNode;
+      } else if(tTarg.className != null && tTarg.className.indexOf('keymanweb-input') >= 0) {
+        scroller=tTarg.firstChild;
+      } else {
+        scroller=tTarg;
+      }
+
+      // And the actual target element        
+      var target=scroller.parentNode;
+
+      // Move the caret and refocus if necessary     
+      if(this.keymanweb._ActiveElement != target) {
+        // Hide the KMW caret
+        this.hideCaret(); 
+        this.keymanweb._ActiveElement=target;
+        // The issue here is that touching a DIV does not actually set the focus for iOS, even when enabled to accept focus (by setting tabIndex=0)
+        // We must explicitly set the focus in order to remove focus from any non-KMW input
+        target.focus();  //Android native browsers may not like this, but it is needed for Chrome, Safari
+      }  
+      
+      // Correct element directionality if required
+      this.keymanweb._SetTargDir(target);  
+      // What we really want to do is to blur any active element that is not a KMW input, 
+      // but the following line does not work as might be expected, even though the correct element is referenced.
+      // It is as though blur is ignored if focus is supposed to have been moved, even if it has not in fact been moved?
+      //if(document.activeElement.nodeName != 'DIV' && document.activeElement.nodeName != 'BODY') document.activeElement.blur();
+      
+      // Refresh the internal keyboard flag state
+      this.keymanweb.useInternalKeyboard=false;
+      
+      // And display the OSK if not already visible
+      if(osk.ready && !osk._Visible) {
+        osk._Show();
+      }
+      
+      // If clicked on DIV, set caret to end of text
+      if(tTarg.nodeName == 'DIV' ) { 
+        var x,cp;
+        x=util._GetAbsoluteX(scroller.firstChild);        
+        if(target.dir == 'rtl') { 
+          x += scroller.firstChild.offsetWidth;        
+          cp=(touchX > x ? 0 : 100000);
+        } else {
+          cp=(touchX<x ? 0 : 100000);
+        }
+    
+        this.setTextCaret(target,cp);
+        this.keymanweb.scrollInput(target);        
+      } else { // Otherwise, if clicked on text in SPAN, set at touch position
+        var caret,cp,cpMin,cpMax,x,y,dy,yRow,iLoop;
+        caret=scroller.childNodes[1]; //caret span
+        cpMin=0;
+        cpMax=this.getText(target)._kmwLength();
+        cp=this.getTextCaret(target);
+        dy=document.body.scrollTop;
+
+        // Vertical scrolling
+        if(target.base.nodeName == 'TEXTAREA') {
+          yRow=Math.round(target.base.offsetHeight/target.base.rows);     
+          for(iLoop=0; iLoop<16; iLoop++)
+          {
+            y=util._GetAbsoluteY(caret)-dy;  //top of caret            
+            if(y > touchY && cp > cpMin && cp != cpMax) {cpMax=cp; cp=Math.round((cp+cpMin)/2);}
+            else if(y < touchY-yRow && cp < cpMax && cp != cpMin) {cpMin=cp; cp=Math.round((cp+cpMax)/2);}
+            else break;
+            this.setTextCaret(target,cp);
+          }
+
+          while(util._GetAbsoluteY(caret)-dy > touchY && cp > cpMin) {
+            this.setTextCaret(target,--cp);
+          }
+
+          while(util._GetAbsoluteY(caret)-dy < touchY-yRow && cp < cpMax) {
+            this.setTextCaret(target,++cp);
+          }
+        }
+
+        // Caret repositioning for horizontal scrolling of RTL text
+
+        // snapOrder - 'snaps' the touch location in a manner corresponding to the 'ltr' vs 'rtl' orientation.
+        // Think of it as performing a floor() function, but the floor depends on the origin's direction.
+        var snapOrder;
+        if(target.dir == 'rtl') {  // I would use arrow functions, but IE doesn't like 'em.
+          snapOrder = function(a, b) {
+            return a < b; 
+          };
+        } else {
+          snapOrder = function(a, b) { 
+            return a > b; 
+          };
+        }
+
+        for(iLoop=0; iLoop<16; iLoop++) {
+          x=util._GetAbsoluteX(caret);  //left of caret            
+          if(snapOrder(x, touchX) && cp > cpMin && cp != cpMax) {
+            cpMax=cp; 
+            cp=Math.round((cp+cpMin)/2);
+          } else if(!snapOrder(x, touchX) && cp < cpMax && cp != cpMin) {
+            cpMin=cp; 
+            cp=Math.round((cp+cpMax)/2);
+          } else {
+            break;
+          }
+          this.setTextCaret(target,cp);
+        }
+
+        while(snapOrder(util._GetAbsoluteX(caret), touchX) && cp > cpMin) {
+          this.setTextCaret(target,--cp);
+        }
+        while(!snapOrder(util._GetAbsoluteX(caret), touchX) && cp < cpMax) {
+          this.setTextCaret(target,++cp);
+        }
+      }
+
+      /**
+       * This event will trigger before keymanweb.setBlur is triggered.  Now that we're allowing independent keyboard settings
+       * for controls, we have to act here to preserve the outgoing control's keyboard settings.
+       *
+       * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
+       */  
+      this.keymanweb._BlurKeyboardSettings();
+
+      // With the attachment API update, we now directly track the old legacy control behavior.
+      this.keymanweb._LastActiveElement = target;
+
+      /**
+       * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
+       * If not, we need to activate the control's preferred keyboard.
+       */
+      this.keymanweb._FocusKeyboardSettings(false);
+      
+      // Always do the common focus stuff, instantly returning if we're in an editable iframe.
+      // This parallels the if-statement in _ControlFocus - it may be needed as this if-statement in the future,
+      // despite its present redundancy.
+      if(this.keymanweb._CommonFocusHelper(target)) {
+        return;
+      }
+    }
+        
+    getText(e: HTMLElement): string {
+      if(e == null) {
+        return '';
+      }
+
+      return (typeof(e.textContent) == 'string' ? e.textContent : e.innerText);
+    } 
+
+    setText(e: HTMLElement, t?: string, cp?: number): void {
+      if(e && e.childNodes.length > 0) {
+        var d=e.firstChild,tLen=0;
+        if(d.childNodes.length >= 3) {
+          var s1=<HTMLElement> d.childNodes[0], s2=<HTMLElement> d.childNodes[2],t1,t2;
+          
+          // Read current text if null passed (for caret positioning)
+          if(t === null) {
+            t1=(typeof(s1.textContent) == 'string' ? s1.textContent : s1.innerText);
+            t2=(typeof(s2.textContent) == 'string' ? s2.textContent : s2.innerText);
+            t=t1+t2;        
+          }
+
+          if(cp < 0) {
+            cp = 0;    //if(typeof t._kmwLength == 'undefined') return;
+          }
+          tLen=t._kmwLength();
+          
+          if(cp === null || cp > tLen) {
+            cp=tLen;
+          }
+          t1=t._kmwSubstr(0,cp);
+          t2=t._kmwSubstr(cp);
+                              
+          if(typeof(s1.textContent) == 'string') {
+            s1.textContent=t1;
+          } else {
+            s1.innerText=t1;
+          }
+
+          if(typeof(s2.textContent) == 'string') {
+            s2.textContent=t2;
+          } else {
+            s2.innerText=t2;
+          }  
+        }
+      }
+
+      this.updateBaseElement(e,tLen); // KMW-3, KMW-29
+    }
+  
+    getTextBeforeCaret(e: HTMLElement) {
+      if(e && e.childNodes.length > 1) {
+        var d=e.firstChild;
+        if(d.childNodes.length > 0) {
+          var s1=<HTMLElement> d.childNodes[0];
+          if('textContent' in s1) {
+            return s1.textContent;
+          }
+          if('innerText' in s1) {
+            return s1.innerText;
+          }
+        }
+      }
+
+      return '';    
+    }
+       
+    setTextBeforeCaret(e: HTMLElement, t: string): void {
+      if(e && e.childNodes.length > 0) {
+        var d=e.firstChild,tLen=0;
+        if(d.childNodes.length > 1) {
+          var s1=<HTMLElement> d.childNodes[0], s2=<HTMLElement> d.childNodes[2];
+          // Collapse (trailing) whitespace to a single space for INPUT fields (also prevents wrapping)
+          if(e.base.nodeName != 'TEXTAREA') t=t.replace(/\s+$/,' ');
+          if('textContent' in s1) s1.textContent=t;
+          else if('innerText' in s1) s1.innerText=t; 
+          // Test total length in order to control base element visibility 
+          tLen=t.length;
+          if('textContent' in s2) tLen=tLen+s2.textContent.length;
+          else if('innerText' in s2) tLen=tLen+s2.innerText.length;            
+        }
+      }
+      
+      // Update the base element then scroll into view if necessary      
+      this.updateBaseElement(e,tLen); //KMW-3, KMW-29      
+      this.keymanweb.scrollInput(e); 
+    }
+ 
+    getTextCaret(e: HTMLElement): number {
+      return this.getTextBeforeCaret(e)._kmwLength();
+    }
+   
+    setTextCaret(e: HTMLElement, cp: number): void {
+      this.setText(e,null,cp);
+      this.showCaret(e);
+    }
+
+    hideCaret() {
+      var e=this.keymanweb._LastActiveElement, s=null;
+      if(e && e.className != null && e.className.indexOf('keymanweb-input') >= 0) {
+        // Always copy text back to underlying field on blur
+        e.base.value = this.getText(e);
+        
+        // And set the scroller caret to the end of the element content
+        this.setText(e, null, 100000);
+        
+        // Set the element scroll to zero (or max for RTL INPUT)
+        var ss=e.firstChild.style;
+        if(e.base.nodeName == 'TEXTAREA') {
+          ss.top='0'; 
+        } else {
+          if(e.base.dir == 'rtl') {
+            ss.left=(e.offsetWidth-e.firstChild.offsetWidth-8)+'px';
+          } else {
+            ss.left='0';
+          }
+        }
+        
+        
+        // And hide the caret and scrollbar       
+        if(this.caret.parentNode) {
+          this.caret.parentNode.removeChild(this.caret);
+        }
+
+        this.caret.style.visibility='hidden';
+        if(e.childNodes.length > 1 ) {
+          e.childNodes[1].style.visibility='hidden';
+        }
+      }    
+    }
+ 
+    flashCaret(): void {
+      // Is typically accessed via timer, so 'this' is not valid.
+      (<TouchHandlers> keyman.touchAliasing)._flashCaret();
+    }
+
+    /**
+     * Handles the actual _flashCaret details, now with 'this' as our touch-handling interface.
+     */
+    _flashCaret(): void {
+      if(this.keymanweb.util.device.touchable && this.keymanweb._ActiveElement != null) {
+        var cs=this.caret.style;
+        cs.visibility = cs.visibility != 'visible' ? 'visible' : 'hidden';
+      }
+    }
+
+    /**
+     * Position the caret at the start of the second span within the scroller
+     *      
+     * @param   {Object}  e   input DIV element (copy of INPUT or TEXTAREA)
+     */
+    showCaret(e: HTMLElement) {                          
+      if(!e || !e.firstChild || (e.firstChild.childNodes.length<3)) {
+        return;
+      }
+
+      var scroller=e.firstChild, cs=this.caret.style, sp2=<HTMLElement>scroller.childNodes[1];
+      
+      // Attach the caret to this scroller and position it over the caret span
+      if(this.caret.parentNode != scroller) {
+        scroller.appendChild(this.caret);
+      }
+
+      cs.left=sp2.offsetLeft+'px'; 
+      cs.top=sp2.offsetTop+'px';
+      cs.height=(sp2.offsetHeight-1)+'px';
+      cs.visibility='hidden';   // best to wait for timer to display caret
+      
+      // Scroll into view if required
+      this.keymanweb.scrollBody(e);
+    
+      // Display and position the scrollbar if necessary
+      this.keymanweb.setScrollBar(e);
+    }
+          
+    updateInput(x: HTMLDivElement) {
+      var util = this.keymanweb.util;
+
+      var xs=x.style,b=x.base,
+          s=window.getComputedStyle(b,null),
+          mLeft=parseInt(s.marginLeft,10),
+          mTop=parseInt(s.marginTop,10),
+          x1=util._GetAbsoluteX(b), y1=util._GetAbsoluteY(b);
+
+      var p=x.offsetParent;
+      if(p) {
+        x1=x1-util._GetAbsoluteX(p);
+        y1=y1-util._GetAbsoluteY(p);
+      }
+      
+      if(isNaN(mLeft)) {
+        mLeft=0;
+      }
+      if(isNaN(mTop)) {
+        mTop=0;
+      }
+      
+      xs.left=(x1-mLeft)+'px';
+      xs.top=(y1-mTop)+'px';
+
+      // FireFox does not want the offset!
+      if(typeof(s.MozBoxSizing) != 'undefined') {
+        xs.left=x1+'px';
+        xs.top=y1+'px';
+      }     
+
+      var w=b.offsetWidth, h=b.offsetHeight,
+          pLeft=parseInt(s.paddingLeft,10), pRight=parseInt(s.paddingRight,10),      
+          pTop=parseInt(s.paddingTop,10), pBottom=parseInt(s.paddingBottom,10),
+          bLeft=parseInt(s.borderLeft,10), bRight=parseInt(s.borderRight,10),    
+          bTop=parseInt(s.borderTop,10), bBottom=parseInt(s.borderBottom,10);
+    
+      // If using content-box model, must subtract the padding and border, 
+      // but *not* for border-box (as for WordPress PlugIn)
+      var boxSizing='undefined';
+      if(typeof(s.boxSizing) != 'undefined') {
+        boxSizing=s.boxSizing;
+      } else if(typeof(s.MozBoxSizing) != 'undefined') {
+        boxSizing=s.MozBoxSizing;
+      }
+
+      if(boxSizing == 'content-box') {
+        if(!isNaN(pLeft)) w -= pLeft;
+        if(!isNaN(pRight)) w -= pRight;
+        if(!isNaN(bLeft)) w -= bLeft;
+        if(!isNaN(bRight)) w -= bRight;
+        
+        if(!isNaN(pTop)) h -= pTop;
+        if(!isNaN(pBottom)) h -= pBottom;
+        if(!isNaN(bTop)) h -= bTop;
+        if(!isNaN(bBottom)) h -= bBottom;
+      }
+    
+      if(util.device.OS == 'Android') {
+        // FireFox - adjust padding to match input and text area defaults 
+        if(typeof(s.MozBoxSizing) != 'undefined') {
+          xs.paddingTop=(pTop+1)+'px';
+          xs.paddingLeft=pLeft+'px';
+          
+          if(x.base.nodeName == 'TEXTAREA') {
+            xs.marginTop='1px';
+          } else {
+            xs.marginLeft='1px';
+          }
+  
+          w--;
+          h--;
+        } else { // Chrome, Opera, native browser (?)
+          w++;
+          h++;
+        }
+      }
+
+      xs.width=w+'px';
+      xs.height=h+'px';   
+    }
+
+    /**
+     * Set content, visibility, background and borders of input and base elements (KMW-3,KMW-29) 
+     *
+     * @param       {Object}        e     input element 
+     * @param       {number}        n     length of text in field
+     */                      
+    updateBaseElement(e: HTMLElement, n: number) {
+      (<HTMLInputElement>e.base).value=this.getText(e); //KMW-29
+      e.style.backgroundColor=(n==0?'transparent':window.getComputedStyle(e.base,null).backgroundColor);
+      if(this.keymanweb.util.device.OS == 'iOS') {
+        e.base.style.visibility=(n==0?'visible':'hidden');
+      }
+    }
+  }
+
+  /**
+   * Stub function equivalents to alias element handling, for use with desktop mode.  Dummies out
+   * the aliasing behaviors for internal system logic consistency.
+   */
+  class AliasStubs implements AliasElementHandlers {
+    /**
+     * Input element stub functions, serving as empty alternates for non-aliased elements.
+     */  
+          
+    setFocus(e?: Event): void {
+    };
+    
+    getText(e: HTMLElement): string {
+      return '';
+    }
+    
+    setText(e: HTMLElement, t?: string, cp?: number): void {
+    }
+    
+    getTextBeforeCaret(): string {
+      return '';
+    }
+
+    setTextBeforeCaret(e: HTMLElement, t: string): void {
+    }
+
+    getTextCaret(e: HTMLElement): number {
+      return 0;
+    }
+    
+    setTextCaret(e: HTMLElement, cp: number) {
+    }
+    
+    hideCaret(): void {
+    }
+       
+    flashCaret(): void {
+    }
+
+    updateInput(x: HTMLElement) {
+    }
+  }
+
   (function() 
-  { 
+  {
+
     // Declare KeymanWeb, OnScreen Keyboard and Util objects
     var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'],device=util.device;
     var kbdInterface=keymanweb['interface'];
@@ -134,7 +759,9 @@ if(!window['keyman']['initialized']) {
        * All of this may be better if we can reliably get the y-offset 
        * from the CSS transform and apply that to repositioning the OSK
        * using a timed event loop.           
-       */  
+       */
+
+      keymanweb.touchAliasing = keyman.touchAliasing = new TouchHandlers(keymanweb);
 
       /**
        * Close OSK and remove simulated caret on losing focus
@@ -142,7 +769,7 @@ if(!window['keyman']['initialized']) {
       keymanweb.cancelInput = function()
       { 
         keymanweb._ActiveElement=null; 
-        keymanweb.hideCaret(); 
+        keymanweb.touchAliasing.hideCaret(); 
         osk.hideNow();
       };
 
@@ -163,215 +790,6 @@ if(!window['keyman']['initialized']) {
         }
         //Hide the OSK
         if(!keymanweb.focusing) keymanweb.cancelInput();
-      }
-      
-      /**
-       * Handle receiving focus by simulated input field 
-       *      
-       * @param       {Event=}     e    event
-       */       
-      keymanweb.setFocus=function(e) {                     
-        //e.stopPropagation();  // not doing anything useful, no child elements
-        //e.preventDefault();   // prevents user selection or scrolling, may be better if they are allowed?
-        keymanweb.focusing=true;
-        keymanweb.focusTimer=window.setTimeout(function(){keymanweb.focusing=false;},1000);
-  
-        var tEvent=e;      
-        if(e) {
-          if(typeof e.touches == 'object') {
-            tEvent=e.touches[0];
-          }
-        } else { // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
-          tEvent={clientX:0,clientY:0}
-          // Will usually be called from setActiveElement, which should define _LastActiveElement
-          if(keymanweb._LastActiveElement) {
-            tEvent.target = keymanweb._LastActiveElement['kmw_ip'];
-          // but will default to first input or text area on page if _LastActiveElement is null
-        } else {
-            tEvent.target = keymanweb.sortedInputs[0]['kmw_ip'];
-          }
-        }    
-        
-        var touchX=tEvent.clientX,touchY=tEvent.clientY,tTarg=tEvent.target,scroller;
-    
-        // Identify the scroller element
-        if(tTarg.nodeName == 'SPAN') {
-          scroller=tTarg.parentNode;
-        } else if(tTarg.className != null && tTarg.className.indexOf('keymanweb-input') >= 0) {
-          scroller=tTarg.firstChild;
-        } else {
-          scroller=tTarg;
-        }
-
-        // And the actual target element        
-        var target=scroller.parentNode;
-
-        // Move the caret and refocus if necessary     
-        if(keymanweb._ActiveElement != target) {
-          // Hide the KMW caret
-          keymanweb.hideCaret(); 
-          keymanweb._ActiveElement=target;
-          // The issue here is that touching a DIV does not actually set the focus for iOS, even when enabled to accept focus (by setting tabIndex=0)
-          // We must explicitly set the focus in order to remove focus from any non-KMW input
-          target.focus();  //Android native browsers may not like this, but it is needed for Chrome, Safari
-        }  
-        
-        // Correct element directionality if required
-        keymanweb._SetTargDir(target);  
-        // What we really want to do is to blur any active element that is not a KMW input, 
-        // but the following line does not work as might be expected, even though the correct element is referenced.
-        // It is as though blur is ignored if focus is supposed to have been moved, even if it has not in fact been moved?
-        //if(document.activeElement.nodeName != 'DIV' && document.activeElement.nodeName != 'BODY') document.activeElement.blur();
-        
-        // Refresh the internal keyboard flag state
-        keymanweb.useInternalKeyboard=false;
-        
-        // And display the OSK if not already visible
-        if(osk.ready && !osk._Visible) {
-          osk._Show();
-        }
-        
-        // If clicked on DIV, set caret to end of text
-        if(tTarg.nodeName == 'DIV' ) { 
-          var x,cp;
-          x=util._GetAbsoluteX(scroller.firstChild);        
-          if(target.dir == 'rtl') { 
-            x += scroller.firstChild.offsetWidth;        
-            cp=(touchX > x ? 0 : 100000);
-          } else {
-            cp=(touchX<x ? 0 : 100000);
-          }
-      
-          keymanweb.setTextCaret(target,cp);
-          keymanweb.scrollInput(target);        
-        } else { // Otherwise, if clicked on text in SPAN, set at touch position
-          var caret,cp,cpMin,cpMax,x,y,dy,yRow,iLoop;
-          caret=scroller.childNodes[1]; //caret span
-          cpMin=0;
-          cpMax=keymanweb.getText(target)._kmwLength();
-          cp=keymanweb.getTextCaret(target);
-          dy=document.body.scrollTop;
-
-          // Vertical scrolling
-          if(target.base.nodeName == 'TEXTAREA')
-          {
-            yRow=Math.round(target.base.offsetHeight/target.base.rows);     
-            for(iLoop=0; iLoop<16; iLoop++)
-            {
-              y=util._GetAbsoluteY(caret)-dy;  //top of caret            
-              if(y > touchY && cp > cpMin && cp != cpMax) {cpMax=cp; cp=Math.round((cp+cpMin)/2);}
-              else if(y < touchY-yRow && cp < cpMax && cp != cpMin) {cpMin=cp; cp=Math.round((cp+cpMax)/2);}
-              else break;
-              keymanweb.setTextCaret(target,cp);
-            }
-            while(util._GetAbsoluteY(caret)-dy > touchY && cp > cpMin)keymanweb.setTextCaret(target,--cp);
-            while(util._GetAbsoluteY(caret)-dy < touchY-yRow && cp < cpMax) keymanweb.setTextCaret(target,++cp);
-          }
-
-          // Caret repositioning for horizontal scrolling of RTL text
-
-          // snapOrder - 'snaps' the touch location in a manner corresponding to the 'ltr' vs 'rtl' orientation.
-          // Think of it as performing a floor() function, but the floor depends on the origin's direction.
-          var snapOrder;
-          if(target.dir == 'rtl') {  // I would use arrow functions, but IE doesn't like 'em.
-            snapOrder = function(a, b) {
-              return a < b; 
-            };
-          } else {
-            snapOrder = function(a, b) { 
-              return a > b; 
-            };
-          }
-
-          for(iLoop=0; iLoop<16; iLoop++) {
-            x=util._GetAbsoluteX(caret);  //left of caret            
-            if(snapOrder(x, touchX) && cp > cpMin && cp != cpMax) {
-              cpMax=cp; 
-              cp=Math.round((cp+cpMin)/2);
-            } else if(!snapOrder(x, touchX) && cp < cpMax && cp != cpMin) {
-              cpMin=cp; 
-              cp=Math.round((cp+cpMax)/2);
-            } else {
-              break;
-            }
-            keymanweb.setTextCaret(target,cp);
-          }
-
-          while(snapOrder(util._GetAbsoluteX(caret), touchX) && cp > cpMin) {
-            keymanweb.setTextCaret(target,--cp);
-          }
-          while(!snapOrder(util._GetAbsoluteX(caret), touchX) && cp < cpMax) {
-            keymanweb.setTextCaret(target,++cp);
-          }
-        }
-
-        /**
-         * This event will trigger before keymanweb.setBlur is triggered.  Now that we're allowing independent keyboard settings
-         * for controls, we have to act here to preserve the outgoing control's keyboard settings.
-         *
-         * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
-         */  
-        keymanweb._BlurKeyboardSettings();
-
-        // With the attachment API update, we now directly track the old legacy control behavior.
-        keymanweb._LastActiveElement = target;
-
-        /**
-         * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
-         * If not, we need to activate the control's preferred keyboard.
-         */
-        keymanweb._FocusKeyboardSettings(false);
-        
-        // Always do the common focus stuff, instantly returning if we're in an editable iframe.
-        // This parallels the if-statement in _ControlFocus - it may be needed as this if-statement in the future,
-        // despite its present redundancy.
-        if(keymanweb._CommonFocusHelper(target)) {
-          return;
-        }
-      }
-
-      /**
-       * Create a caret to be appended to the scroller of the focussed input field. 
-       * The caret is appended to the scroller so that it will automatically be clipped 
-       * when the user manually scrolls it outside the element boundaries.          
-       * It is positioned exactly over the hidden span that is inserted between the
-       * text spans before and after the insertion point.          
-       */
-      keymanweb.caret=document.createElement('DIV');
-      var cs=keymanweb.caret.style;
-      cs.position='absolute';
-      cs.height='16px';           // default height, actual height set from element properties
-      cs.width='2px';
-      cs.backgroundColor='blue';
-      cs.border='none';
-      cs.left=cs.top='0px';           // actual position set relative to parent when displayed
-      cs.display='block';         
-      cs.visibility='hidden';
-      cs.zIndex='9998';           // immediately below the OSK
-      
-      /**
-       * Position the caret at the start of the second span within the scroller
-       *      
-       * @param   {Object}  e   input DIV element (copy of INPUT or TEXTAREA)
-       */
-      keymanweb.showCaret=function(e)
-      {                          
-        if(!e || !e.firstChild || (e.firstChild.childNodes.length<3)) return;
-
-        var scroller=e.firstChild,cs=keymanweb.caret.style,sp2=scroller.childNodes[1];
-        
-        // Attach the caret to this scroller and position it over the caret span
-        if(keymanweb.caret.parentNode != scroller) scroller.appendChild(keymanweb.caret);
-        cs.left=sp2.offsetLeft+'px'; 
-        cs.top=sp2.offsetTop+'px';
-        cs.height=(sp2.offsetHeight-1)+'px';
-        cs.visibility='hidden';   // best to wait for timer to display caret
-        
-        // Scroll into view if required
-        keymanweb.scrollBody(e);
-      
-        // Display and position the scrollbar if necessary
-        keymanweb.setScrollBar(e);
       }
 
       /**
@@ -404,194 +822,6 @@ if(!window['keyman']['initialized']) {
           sbs.visibility='hidden';
         }
       }                    
-
-      /**
-       * Description Toggle state of caret in simulated input field
-       */         
-      keymanweb.flashCaret = function()
-      {
-        if(device.touchable && keymanweb._ActiveElement != null)
-        {
-          var cs=keymanweb.caret.style;
-          if(cs.visibility != 'visible') cs.visibility='visible'; else cs.visibility='hidden';
-        }
-      }
-    
-      /**
-       * Hide caret in simulated input field, update underlying INPUT or TEXTAREA
-       */         
-      keymanweb.hideCaret = function()
-      {
-        var e=keymanweb._LastActiveElement,s=null;
-        if(e && e.className != null && e.className.indexOf('keymanweb-input') >= 0)
-        {
-          // Always copy text back to underlying field on blur
-          e.base.value = keymanweb.getText(e);
-          
-          // And set the scroller caret to the end of the element content
-          keymanweb.setText(e,null,100000);
-          
-          // Set the element scroll to zero (or max for RTL INPUT)
-          var ss=e.firstChild.style;
-          if(e.base.nodeName == 'TEXTAREA')
-            ss.top='0'; 
-          else
-          {
-            if(e.base.dir == 'rtl') ss.left=(e.offsetWidth-e.firstChild.offsetWidth-8)+'px';
-            else ss.left='0';
-          }
-          
-          
-          // And hide the caret and scrollbar       
-          if(keymanweb.caret.parentNode) keymanweb.caret.parentNode.removeChild(keymanweb.caret);
-          keymanweb.caret.style.visibility='hidden';
-          if(e.childNodes.length > 1 ) e.childNodes[1].style.visibility='hidden';
-        }    
-      }
-      
-      // Start the caret flash timer
-      keymanweb.timerId = window.setInterval(keymanweb.flashCaret,500);
-
-      /**
-       * Insert text into simulated input field at indicated character position
-       * 
-       * @param       {Object}      e     simulated input field DIV
-       * @param       {?string}     t     text to insert in element
-       * @param       {?number}     cp    caret position (characters)     
-       */         
-      keymanweb.setText = function(e,t,cp)
-      {
-        if(e && e.childNodes.length > 0)
-        {
-          var d=e.firstChild,tLen=0;
-          if(d.childNodes.length >= 3)
-          {
-            var s1=d.childNodes[0],s2=d.childNodes[2],t1,t2;
-            
-            // Read current text if null passed (for caret positioning)
-            if(t === null)
-            {
-              t1=(typeof(s1.textContent) == 'string' ? s1.textContent : s1.innerText);
-              t2=(typeof(s2.textContent) == 'string' ? s2.textContent : s2.innerText);
-              t=t1+t2;        
-            }
-            if(cp < 0) cp = 0;    //if(typeof t._kmwLength == 'undefined') return; 
-            tLen=t._kmwLength();
-            
-            if(cp === null || cp > tLen) cp=tLen;
-            t1=t._kmwSubstr(0,cp); t2=t._kmwSubstr(cp);
-                                
-            if(typeof(s1.textContent) == 'string') s1.textContent=t1; else s1.innerText=t1;
-            if(typeof(s2.textContent) == 'string') s2.textContent=t2; else s2.innerText=t2;          
-          }
-        }
-        keymanweb.updateBaseElement(e,tLen); // KMW-3, KMW-29
-      }
-
-      /**
-       * Set content, visibility, background and borders of input and base elements (KMW-3,KMW-29) 
-       *
-       * @param       {Object}        e     input element 
-       * @param       {number}        n     length of text in field
-       */                      
-      keymanweb.updateBaseElement=function(e,n)
-      {
-        e.base.value=keymanweb.getText(e); //KMW-29
-        e.style.backgroundColor=(n==0?'transparent':window.getComputedStyle(e.base,null).backgroundColor);
-        if(device.OS == 'iOS')
-        {
-          e.base.style.visibility=(n==0?'visible':'hidden');
-        }
-      }
-      
-      /**
-       * Get simulated input field content
-       * 
-       * @param       {Object}        e     simulated input field DIV
-       * @return      {string}              entire text in simulated input field
-       */         
-      keymanweb.getText=function(e)
-      {
-        if(e == null) return '';
-        return (typeof(e.textContent) == 'string' ? e.textContent : e.innerText);
-      } 
-    
-      /**
-       * Get text up to the caret from simulated input field 
-       * 
-       * @param       {Object}        e     simulated input field DIV
-       * @return      {string}              Context for simulated input field
-       */         
-      keymanweb.getTextBeforeCaret=function(e)
-      {
-        if(e && e.childNodes.length > 1) 
-        {
-          var d=e.firstChild;
-          if(d.childNodes.length > 0) 
-          {
-            var s1=d.childNodes[0];
-            if('textContent' in s1)
-              return s1.textContent;
-            if('innerText' in s1)
-              return s1.innerText;
-          }
-        }
-        return '';    
-      }
-    
-      /**
-       * Replace text up to the caret in the simulated input field 
-       * 
-       * @param       {Object}        e     simulated input field DIV
-       * @param       {string}        t     string to insert 
-       */         
-      keymanweb.setTextBeforeCaret=function(e,t)
-      {
-        if(e && e.childNodes.length > 0) 
-        {
-          var d=e.firstChild,tLen=0;
-          if(d.childNodes.length > 1) 
-          {
-            var s1=d.childNodes[0],s2=d.childNodes[2];
-            // Collapse (trailing) whitespace to a single space for INPUT fields (also prevents wrapping)
-            if(e.base.nodeName != 'TEXTAREA') t=t.replace(/\s+$/,' ');
-            if('textContent' in s1) s1.textContent=t;
-            else if('innerText' in s1) s1.innerText=t; 
-            // Test total length in order to control base element visibility 
-            tLen=t.length;
-            if('textContent' in s2) tLen=tLen+s2.textContent.length;
-            else if('innerText' in s2) tLen=tLen+s2.innerText.length;            
-          }
-        }
-        
-        // Update the base element then scroll into view if necessary      
-        keymanweb.updateBaseElement(e,tLen); //KMW-3, KMW-29      
-        keymanweb.scrollInput(e); 
-            
-      }
-      
-      /**
-       * Description  Get current position of caret in simulated input field 
-       * 
-       * @param       {Object}        e     simulated input field DIV
-       * @return      {number}              caret character position in simulated input field
-       */         
-      keymanweb.getTextCaret=function(e)
-      {
-        return keymanweb.getTextBeforeCaret(e)._kmwLength();
-      }
-
-      /**
-       * Set current position of caret in simulated input field then display the caret 
-       * 
-       * @param       {Object}        e     element (object) or element id (string) of simulated input field
-       * @param       {number}        cp    caret position (character index)
-       */         
-      keymanweb.setTextCaret=function(e,cp)
-      {
-        keymanweb.setText(e,null,cp);
-        keymanweb.showCaret(e);
-      }
 
       /**
        * Handle the touch move event for an input element
@@ -697,7 +927,7 @@ if(!window['keyman']['initialized']) {
         }    
 
         // Display the caret (and scroll into view if necessary)
-        keymanweb.showCaret(e);
+        keymanweb.touchAliasing.showCaret(e);
       }
 
       /**
@@ -723,75 +953,6 @@ if(!window['keyman']['initialized']) {
         // Hide OSK, then scroll, then re-anchor OSK with absolute position (on end of scroll event)
         if(dy != 0) 
           window.scrollTo(0,dy+window.pageYOffset);
-      }
-
-      /**
-       *  Correct the position and size of a duplicated input element
-       *  @param  {Element}  x   simulated input element
-       **/              
-      keymanweb.updateInput = function(x)
-      {
-        var xs=x.style,b=x.base,
-            s=window.getComputedStyle(b,null),
-            mLeft=parseInt(s.marginLeft,10),
-            mTop=parseInt(s.marginTop,10),
-            x1=util._GetAbsoluteX(b),y1=util._GetAbsoluteY(b);
-  
-        var p=x.offsetParent;
-        if(p)
-        {
-          x1=x1-util._GetAbsoluteX(p); y1=y1-util._GetAbsoluteY(p);
-        }
-        
-        if(isNaN(mLeft)) mLeft=0; if(isNaN(mTop)) mTop=0;
-        
-        xs.left=(x1-mLeft)+'px'; xs.top=(y1-mTop)+'px';
-
-        // FireFox does not want the offset!
-        if(typeof(s.MozBoxSizing) != 'undefined') {xs.left=x1+'px'; xs.top=y1+'px';}     
-
-        var w=b.offsetWidth,h=b.offsetHeight,
-            pLeft=parseInt(s.paddingLeft,10),pRight=parseInt(s.paddingRight,10),      
-            pTop=parseInt(s.paddingTop,10),pBottom=parseInt(s.paddingBottom,10),
-            bLeft=parseInt(s.borderLeft,10),bRight=parseInt(s.borderRight,10),    
-            bTop=parseInt(s.borderTop,10),bBottom=parseInt(s.borderBottom,10);
-      
-        // If using content-box model, must subtract the padding and border, 
-        // but *not* for border-box (as for WordPress PlugIn)
-        var boxSizing='undefined';
-        if(typeof(s.boxSizing) != 'undefined') boxSizing=s.boxSizing;
-        else if(typeof(s.MozBoxSizing) != 'undefined') boxSizing=s.MozBoxSizing;
-        if(boxSizing == 'content-box')
-        {
-          if(!isNaN(pLeft)) w -= pLeft; if(!isNaN(pRight)) w -= pRight;
-          if(!isNaN(bLeft)) w -= bLeft; if(!isNaN(bRight)) w -= bRight;
-          
-          if(!isNaN(pTop)) h -= pTop; if(!isNaN(pBottom)) h -= pBottom;
-          if(!isNaN(bTop)) h -= bTop; if(!isNaN(bBottom)) h -= bBottom;
-        }
-      
-        if(device.OS == 'Android') 
-        {
-          // FireFox - adjust padding to match input and text area defaults 
-          if(typeof(s.MozBoxSizing) != 'undefined') 
-          {
-            xs.paddingTop=(pTop+1)+'px';
-            xs.paddingLeft=pLeft+'px';
-            
-            if(x.base.nodeName == 'TEXTAREA')
-              xs.marginTop='1px';
-            else
-              xs.marginLeft='1px';
-    
-            w--;h--;
-          }
-          // Chrome, Opera, native browser (?)
-          else
-          {
-            w++;h++;
-          }
-        }
-        xs.width=w+'px'; xs.height=h+'px';   
       }
 
       /**
@@ -941,11 +1102,11 @@ if(!window['keyman']['initialized']) {
         // On touch event, reposition the text caret and prepare for OSK input
         // Removed 'onfocus=' as that resulted in handling the event twice (on iOS, anyway) 
         
-        x.addEventListener('touchstart', keymanweb.setFocus);
+        x.addEventListener('touchstart', keymanweb.touchAliasing.setFocus);
         x.onmspointerdown=function(e) {
           e.preventDefault();
           e.stopPropagation();
-          return keymanweb.setFocus(e);
+          return keymanweb.touchAliasing.setFocus(e);
         };
 
         x.addEventListener('touchend', function(e) {
@@ -975,7 +1136,7 @@ if(!window['keyman']['initialized']) {
         x.base.parentNode.appendChild(x);
       
         // Refresh style pointers, and match the field sizes
-        keymanweb.updateInput(x);
+        keymanweb.touchAliasing.updateInput(x);
         xs=x.style; 
         xs.color=bs.color; //xs.backgroundColor=bs.backgroundColor; 
         xs.fontFamily=bs.fontFamily; xs.fontSize=bs.fontSize;
@@ -1020,7 +1181,7 @@ if(!window['keyman']['initialized']) {
             * changing languages to a text with greater height.
             */
             window.setTimeout(function (){
-              keymanweb.updateInput(xx);
+              keymanweb.touchAliasing.updateInput(xx);
             }, 1);
           };
 
@@ -1040,7 +1201,7 @@ if(!window['keyman']['initialized']) {
         }
           
         // And copy the text content
-        keymanweb.setText(x, textValue, null);  
+        keymanweb.touchAliasing.setText(x, textValue, null);  
 
         return true;
       }
@@ -1107,6 +1268,8 @@ if(!window['keyman']['initialized']) {
           x._kmwAttachment.touchEnabled = false;
         }
       }
+
+
     }
     
     /*********************************************************
@@ -1114,6 +1277,8 @@ if(!window['keyman']['initialized']) {
      * End of main touch-device initialization.
      *     
      *********************************************************/
+
+    keymanweb.touchAliasing = new AliasStubs();
     
     /**
      * Function     enableInputElement
@@ -1234,85 +1399,9 @@ if(!window['keyman']['initialized']) {
       
       return fs;
     }
-  
-    /**
-     * Input element stub functions, redefined when a touch device is initialized
-     */  
-      
-    /**
-     * Function stub, for desktop browsers
-     *    
-     * @param       {Event=}        e     event
-     */       
-    keymanweb.setFocus = function(e){};
+
+    // Probably should relocate this definition somewhere.
     keymanweb.timerID = null;
-    
-    /**
-     * Function stub, for desktop browsers
-     *    
-     * @param       {Object}        e     element (object) or element id (string) of simulated input field
-     * @return      {string}              entire text in simulated input field
-     */       
-    keymanweb.getText = function(e){return '';};
-    
-    /**
-     * Function stub, for desktop browsers
-     *    
-     * @param       {Object}        e     element (object) or element id (string) of simulated input field
-     * @param       {?string}       t     text to insert in element
-     * @param       {?number}       cp    caret position (characters)     
-     */       
-    keymanweb.setText = function(e,t,cp){};
-    
-    /**
-     * Function stub, for desktop browsers
-     *    
-     * @return      {string}   
-     */       
-    keymanweb.getTextBeforeCaret = function(){return '';};
-
-    /**
-     * Function stub, for desktop browsers
-     *    
-     * @param       {Object}        e     element (object) or element id (string) of simulated input field
-     * @return      {string}              Context for simulated input field
-     */       
-    keymanweb.setTextBeforeCaret = function(e){};
-
-    /**
-     * Function stub, for desktop browsers
-     *    
-     * @param       {Object}        e     element (object) or element id (string) of simulated input field
-     * @return      {number}              caret character position in simulated input field
-     */       
-    keymanweb.getTextCaret = function(e){return 0;};
-    
-    /**
-     * Function stub, for desktop browsers
-     *    
-     * @param       {Object}        e     element (object) or element id (string) of simulated input field
-     * @param       {number}        cp    caret character position in simulated input field
-     */       
-    keymanweb.setTextCaret = function(e,cp){};
-    
-    /**
-     * Function stub, for desktop browser    
-     */       
-    keymanweb.hideCaret = function(){};
-    
-    /**
-     * Function stub, for desktop browsers    
-     */       
-    keymanweb.flashCaret = function(){};
-
-    /**
-     * Function stub, for desktop browsers
-     *    
-     * @param       {Object}        x     element
-     */       
-    keymanweb.updateInput=function(x){};
-  
-    // End of I3363 (Build 301) additions
 
     /**
      * Function     resetContext
@@ -1709,7 +1798,7 @@ if(!window['keyman']['initialized']) {
 
             for(var k = 0; k < keymanweb.sortedInputs.length; k++) {
               if(keymanweb.sortedInputs[k]['kmw_ip']) {
-                keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
+                keymanweb.touchAliasing.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
               }
             }
           }, 1);
@@ -1739,7 +1828,7 @@ if(!window['keyman']['initialized']) {
 
             for(var k = 0; k < keymanweb.sortedInputs.length; k++) {
               if(keymanweb.sortedInputs[k]['kmw_ip']) {
-                keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
+                keymanweb.touchAliasing.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
               }
             }
           }, 1);
@@ -1845,7 +1934,7 @@ if(!window['keyman']['initialized']) {
       // Allow external focusing KMEW-123
       if(arguments.length > 1 && setFocus)
       {
-        if(device.touchable) keymanweb.setFocus();
+        if(device.touchable) keymanweb.touchAliasing.setFocus();
         else keymanweb['focusLastActiveElement']();
       }
     }
@@ -2091,7 +2180,7 @@ if(!window['keyman']['initialized']) {
 
       // Hide the touch device input caret, if applicable  I3363 (Build 301)
       if(device.touchable) {
-        keymanweb.hideCaret();
+        keymanweb.touchAliasing.hideCaret();
       }
           
       if (Ltarg.nodeType == 3) { // defeat Safari bug
@@ -2769,7 +2858,7 @@ if(!window['keyman']['initialized']) {
           t[i].focus();
         } else { // Or reposition the caret on the input DIV if mapped
           keymanweb._ActiveElement=keymanweb._LastActiveElement=target;    
-          keymanweb.setTextCaret(target,10000);                            
+          keymanweb.touchAliasing.setTextCaret(target,10000);                            
           keymanweb.scrollInput(target);   // mousedown check
           target.focus();
         } 
@@ -3514,7 +3603,7 @@ if(!window['keyman']['initialized']) {
 
             for(var k = 0; k < keymanweb.sortedInputs.length; k++) {
               if(keymanweb.sortedInputs[k]['kmw_ip']) {
-                keymanweb.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
+                keymanweb.touchAliasing.updateInput(keymanweb.sortedInputs[k]['kmw_ip']);
               }
             }
           }, 1);
@@ -3773,7 +3862,7 @@ if(!window['keyman']['initialized']) {
         if(device.touchable) {
           if(Ptarg.textContent.length == 0) {
             Ptarg.base.dir=Ptarg.dir=elDir;
-            keymanweb.setTextCaret(Ptarg,10000);
+            keymanweb.touchAliasing.setTextCaret(Ptarg,10000);
           }
         } else {
           if(typeof Ptarg.value == "string") {

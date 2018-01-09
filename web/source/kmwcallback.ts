@@ -344,13 +344,13 @@ if(!window['keyman']['initialized']) {
       var Li, Ldv;
     
       if(Pelem.className.indexOf('keymanweb-input') >= 0) {
-        var t=keymanweb.getTextBeforeCaret(Pelem);
+        var t=keymanweb.touchAliasing.getTextBeforeCaret(Pelem);
         if(dn > 0) {
           t=t._kmwSubstr(0,t._kmwLength()-dn)+s; 
         } else {
           t=t+s;
         }
-        keymanweb.setTextBeforeCaret(Pelem,t);
+        keymanweb.touchAliasing.setTextBeforeCaret(Pelem,t);
         return;
       }
     
