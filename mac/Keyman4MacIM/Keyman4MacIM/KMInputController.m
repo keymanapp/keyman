@@ -9,6 +9,8 @@
 #import "KMInputController.h"
 #import "KMInputMethodEventHandler.h"
 #import "KMInputMethodBrowserClientEventHandler.h"
+#import "KMInputMethodSafariClientEventHandler.h"
+#import "KMInputMethodChromeClientEventHandler.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
 
 @implementation KMInputController
@@ -58,10 +60,14 @@ KMInputMethodEventHandler* _eventHandler;
         NSLog(@"New active app %@", clientAppId);
     
     // Most things in Safari work well using the normal way, but Google Docs doesn't.
-    if ([clientAppId isEqual: @"com.google.Chrome"] ||
-        [clientAppId isEqual: @"com.apple.Safari"] ||
-        [clientAppId isEqual: @"org.mozilla.firefox"]) {
-        _eventHandler = [[KMInputMethodBrowserClientEventHandler alloc] initWithClient:clientAppId];
+    if ([clientAppId isEqual: @"com.apple.Safari"]) {
+        _eventHandler = [[KMInputMethodSafariClientEventHandler alloc] init];
+    }
+    else if ([clientAppId isEqual: @"org.mozilla.firefox"]) {
+        _eventHandler = [[KMInputMethodBrowserClientEventHandler alloc] init];
+    }
+    else if ([clientAppId isEqual: @"com.google.Chrome"]) {
+        _eventHandler = [[KMInputMethodChromeClientEventHandler alloc] init];
     }
     else
         _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId];

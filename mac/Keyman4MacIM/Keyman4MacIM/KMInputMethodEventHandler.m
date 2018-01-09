@@ -21,50 +21,54 @@ CGEventSourceRef _sourceFromOriginalEvent = nil;
 
 NSRange _previousSelRange;
 
-- (instancetype)initWithClient:(NSString *)clientAppId {
-    
+// Protected initializer for use by subclasses
+- (instancetype)initWithLegacyMode:(BOOL)legacy clientSelectionCanChangeUnexpectedly:(BOOL) flagClientSelectionCanChangeUnexpectedly {
     self = [super init];
     if (self) {
         _previousSelRange = NSMakeRange(NSNotFound, NSNotFound);
-        _clientSelectionCanChangeUnexpectedly = YES;
+        _clientSelectionCanChangeUnexpectedly = flagClientSelectionCanChangeUnexpectedly;
         _cannnotTrustSelectionLength = NO;
         _insertCharactersIndividually = NO;
-        // REVIEW: Should this list be in a info.plist file
-        // Use a table of known apps to decide whether or not to operate in legacy mode
-        // and whether or not to follow calls to setMarkedText with calls to insertText.
-        if ([clientAppId isEqual: @"com.google.Chrome"] ||
-            [clientAppId isEqual: @"org.mozilla.firefox"] ||
-            [clientAppId isEqual: @"com.github.atom"] ||
+        _legacyMode = NO;
+        _contextOutOfDate = YES;
+        if (legacy) {
+            [self switchToLegacyMode];
+        }
+    }
+    return self;
+}
+
+// This is the public initializer.
+- (instancetype)initWithClient:(NSString *)clientAppId {
+    BOOL legacy = ([clientAppId isEqual: @"com.github.atom"] ||
             [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
             [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
             [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
             [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
             [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
             [clientAppId isEqual: @"com.microsoft.Word"]
-            /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */) {
-            _legacyMode = YES;
-            if ([self.AppDelegate debugMode])
-                NSLog(@"Using legacy mode for this app.");
-        }
-        else {
-            _legacyMode = NO;
-        }
-        
-        //    if ([clientAppId isEqual: @"com.google.Chrome"] ||
-        //        [clientAppId isEqual: @"com.apple.Terminal"] ||
-        //        [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
-        //        _clientSelectionCanChangeUnexpectedly = YES;
-        //    }
-        
-        if ([clientAppId isEqual: @"com.github.atom"]) {
-            // This isn't true (the context can change unexpectedly), but we can't get the context,
-            // so we pretend/hope it won't.
-            _clientSelectionCanChangeUnexpectedly = NO;
-        }
-        
-        _contextOutOfDate = YES;
-    }
-    return self;
+               /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */);
+    
+    // We used to default to NO, so these were the obvious exceptions. But then we realized that
+    // in any app, command keys can change the selection, so now we default to YES, and only have
+    // a few situations where we pretend it can't. This flag should probably be renamed to something
+    // like "disregardPossibleSelectionChanges".
+    //    if ([clientAppId isEqual: @"com.google.Chrome"] ||
+    //        [clientAppId isEqual: @"com.apple.Terminal"] ||
+    //        [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
+    //        _clientSelectionCanChangeUnexpectedly = YES;
+    //    }
+    
+    // For the Atom editor, this isn't really true (the context CAN change unexpectedly), but we can't get
+    // the context, so we pretend/hope it won't.
+    BOOL selectionCanChangeUnexpectedly = (![clientAppId isEqual: @"com.github.atom"]);
+    return [self initWithLegacyMode:legacy clientSelectionCanChangeUnexpectedly:selectionCanChangeUnexpectedly];
+}
+
+- (void)switchToLegacyMode {
+    _legacyMode = YES;
+    if ([self.AppDelegate debugMode])
+        NSLog(@"Using legacy mode for this app.");
 }
 
 - (void)deactivate {

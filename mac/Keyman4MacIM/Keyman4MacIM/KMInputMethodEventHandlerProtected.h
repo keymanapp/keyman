@@ -19,7 +19,7 @@
 // not properly deal with calls to insertText calls that replace a range of characters. So for these "legacy"
 // apps, we post one or more deletes (i.e., backspace), followed by a special code that tells us we're now
 // ready to insert the composed text.
-@property (assign) BOOL legacyMode;
+@property BOOL legacyMode;
 // Some clients (e.g. Chrome) handle the mouse down events before we get a crack at them. For such apps that
 // are able to report their current selection location (LibreOffice can't even do that!), we can do some
 // checking at the start of the event processing to see if we're probably still in the same place where we
@@ -28,7 +28,10 @@
 @property (assign) BOOL insertCharactersIndividually;
 @property (assign) BOOL cannnotTrustSelectionLength;
 
+- (instancetype)initWithLegacyMode:(BOOL)legacy clientSelectionCanChangeUnexpectedly:(BOOL) flagClientSelectionCanChangeUnexpectedly;
 - (void)handleCommand:(NSEvent *)event;
+// This just sets the legacyMode property to true and spits out a debug message to that effect.
+- (void)switchToLegacyMode;
 - (void)checkContextIn:(id)client;
 - (void)replaceExistingSelectionIn:(id)client with:(NSString *) text;
 - (void)insertPendingBufferTextIn:(id)client;
