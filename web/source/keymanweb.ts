@@ -123,6 +123,12 @@ if(!window['keyman']['initialized']) {
     // Stores the simulated caret element.
     caret: HTMLDivElement;
     caretTimerId: number;
+
+    firstTouch: {
+      x: number;
+      y: number;
+    };
+
     
     constructor(keyman: any) {
       this.keymanweb = keyman;
@@ -163,7 +169,7 @@ if(!window['keyman']['initialized']) {
       //e.preventDefault();   // prevents user selection or scrolling, may be better if they are allowed?
 
       // Warning:  Event handlers can change the reference of 'this', so we need to re-resolve it.
-      (<TouchHandlers>keyman.touchAliasing)._setFocus(e);
+      (<TouchHandlers> keyman.touchAliasing)._setFocus(e);
     }
 
     /**
@@ -713,10 +719,10 @@ if(!window['keyman']['initialized']) {
       }
                 
       // Allow content of input elements to be dragged horizontally or vertically
-      if(typeof this.keymanweb.firstTouch == 'undefined' || this.keymanweb.firstTouch == null) {
-        this.keymanweb.firstTouch={x:x,y:y};
+      if(typeof this.firstTouch == 'undefined' || this.firstTouch == null) {
+        this.firstTouch={x:x,y:y};
       } else {
-        var x0=this.keymanweb.firstTouch.x,y0=this.keymanweb.firstTouch.y,
+        var x0=this.firstTouch.x,y0=this.firstTouch.y,
           scroller=<HTMLElement>target.firstChild,dx,dy,x1;
         
         if(target.base.nodeName == 'TEXTAREA') {
@@ -725,7 +731,7 @@ if(!window['keyman']['initialized']) {
           dy=y0-y;
           if(dy < -4 || dy > 4) {
             scroller.style.top=(yOffset<dy?yOffset-dy:0)+'px';
-            this.keymanweb.firstTouch.y=y;  
+            this.firstTouch.y=y;  
           } 
         } else {
           var xOffset=parseInt(scroller.style.left,10);
@@ -740,7 +746,7 @@ if(!window['keyman']['initialized']) {
             if(x1 > xMin) x1=xMin;
             if(x1 < xMax) x1=xMax;
             scroller.style.left=x1+'px';
-            this.keymanweb.firstTouch.x=x;       
+            this.firstTouch.x=x;       
           }    
         }
       }
