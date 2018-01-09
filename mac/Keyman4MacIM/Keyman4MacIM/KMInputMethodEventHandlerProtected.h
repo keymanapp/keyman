@@ -28,6 +28,7 @@
 @property (assign) BOOL insertCharactersIndividually;
 @property (assign) BOOL cannnotTrustSelectionLength;
 
+- (void)handleCommand:(NSEvent *)event;
 - (void)checkContextIn:(id)client;
 - (void)replaceExistingSelectionIn:(id)client with:(NSString *) text;
 - (void)insertPendingBufferTextIn:(id)client;

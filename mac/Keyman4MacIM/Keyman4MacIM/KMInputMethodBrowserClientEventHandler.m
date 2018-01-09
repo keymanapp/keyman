@@ -21,6 +21,7 @@ BOOL _forceRemoveSelectionInGoogleDocs;
 //BOOL _explicitlyDeleteExistingSelectionBeforeInserting = NO;
 BOOL _googleChrome;
 BOOL _insertCharactersIndividually;
+BOOL _preserveContextForNextCmdA;
 
 - (instancetype)initWithClient:(NSString *)clientAppId {
     
@@ -31,11 +32,21 @@ BOOL _insertCharactersIndividually;
         _failuresToRetrieveExpectedContext = 0;
         _forceRemoveSelectionInGoogleDocs = safari;
         self.insertCharactersIndividually = NO;
+        _preserveContextForNextCmdA = NO;
         //_explicitlyDeleteExistingSelectionBeforeInserting = safari;
         if (safari)
             self.clientSelectionCanChangeUnexpectedly = NO;
     }
     return self;
+}
+
+- (void)handleCommand:(NSEvent *)event {
+    // If Safari issued a Cmd-A to remove the selection, we know what the
+    // context should be, so keep it.
+    if ([event.characters isEqualTo:@"a"] && _preserveContextForNextCmdA)
+        _preserveContextForNextCmdA = NO;
+    else
+        [super handleCommand:event];
 }
 
 - (void)checkContextIn:(id) client {
@@ -112,6 +123,7 @@ BOOL _insertCharactersIndividually;
     if (self.legacyMode && _forceRemoveSelectionInGoogleDocs) {
         if ([self.AppDelegate debugMode])
             NSLog(@"Sending Command-Shift-A to clear selection in Google Docs");
+        _preserveContextForNextCmdA = YES;
         ProcessSerialNumber psn;
         GetFrontProcess(&psn);
         
@@ -129,25 +141,24 @@ BOOL _insertCharactersIndividually;
 }
 
 - (void)insertPendingBufferTextIn:(id)client {
-    NSUInteger length = 0;
     
+    NSString* remainingText = @"";
     if (!_insertCharactersIndividually) {
-        length = [self pendingBuffer].length;
+        NSUInteger length = [self pendingBuffer].length;
         if (length > 1) {
-            [super insertPendingBufferTextIn:client];
-            return;
+            if ([self.AppDelegate debugMode])
+                NSLog(@"Using special Google Docs in Chrome logic (length = %lu)", length);
+            remainingText = [self.pendingBuffer substringFromIndex:1];
+            [self.pendingBuffer deleteLastNChars:length - 1];
         }
     }
-    if ([self.AppDelegate debugMode]) {
-        NSLog(@"Using special Google Docs in Chrome logic");
-    }
-    NSString* remainingText = [self.pendingBuffer substringFromIndex:1];
-    [self.pendingBuffer deleteLastNChars:length - 1];
-    
+
     [super insertPendingBufferTextIn:client];
-        
-    // Reset the pending buffer to contain remaining characters and issue call to come back for more...
-    [self setPendingBuffer:remainingText];
-    [self performSelector:@selector(initiatePendingBufferProcessing:) withObject:client afterDelay:0.1];
+    
+    if ([remainingText length] > 0) {
+        // Reset the pending buffer to contain remaining characters and issue call to come back for more...
+        [self setPendingBuffer:remainingText];
+        [self performSelector:@selector(initiatePendingBufferProcessing:) withObject:client afterDelay:0.1];
+    }
 }
 @end

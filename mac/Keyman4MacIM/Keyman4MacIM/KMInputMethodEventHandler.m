@@ -90,6 +90,19 @@ NSRange _previousSelRange;
     }
 }
 
+- (void)handleCommand:(NSEvent *)event {
+    // There are a bunch of common navigation/selection command-key combinations, but individual
+    // apps may implement specific commands that also change the selection. There is probably no
+    // situation where a user could reasonably hope that any dead-keys typed before using a
+    // command shortcut would be remembered, so other than an insignificant performance penalty,
+    // the only downside to treating all commands as having the potential to change the selection
+    // is that some "legacy" apps can't get their context at all. This can be overridden so that
+    // legacy apps can mitigate this problem as appropriate.
+    if ([self.AppDelegate debugMode])
+        NSLog(@"Command key - context needs to be re-gotten.");
+    _contextOutOfDate = YES;
+}
+
 - (void)checkContextIn:(id)client {
     // Base implementation is no-op
 }
@@ -222,15 +235,7 @@ NSRange _previousSelRange;
     else if (event.type != NSKeyDown)
         return NO; // We ignore NSLeftMouseDragged events (because we'll eventually get a mouse-up).
     else if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
-        // There are a bunch of common navigation/selection command-key combinations, but individual
-        // apps may implement specifc commands that also chnage the selection. There is probably no
-        // situation where a user could reasonably hope that any dead-keys typed before using a
-        // command shortcut would be remembered, so other than an insignificant performance penalty,
-        // the only downside to treating all commands as having the potential to change the selection
-        // is that some "legacy" apps can't get their context at all.
-        if ([self.AppDelegate debugMode])
-            NSLog(@"Command key - context needs to be re-gotten.");
-        _contextOutOfDate = YES;
+        [self handleCommand:event];
         return NO; // We let the client app handle all Command-key events.
     }
     
