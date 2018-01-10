@@ -207,7 +207,9 @@ if [ $BUILD_EMBED = true ]; then
 
     rm $EMBED_OUTPUT/keyman.js 2>/dev/null
     $compilecmd -p $NODE_SOURCE/tsconfig.embedded.json
+    assert $INTERMEDIATE/keyman.js
     echo Embedded TypeScript compiled.
+
 
     minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
     assert $EMBED_OUTPUT/keyman.js 
@@ -231,7 +233,9 @@ if [ $BUILD_COREWEB = true ]; then
     echo Compile Keymanweb...
     rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
     $compilecmd -p $NODE_SOURCE/tsconfig.web.json
+    assert $INTERMEDIATE/keymanweb.js
     echo Native TypeScript compiled.
+
     
     copy_resources "$INTERMEDIATE"
 
@@ -253,6 +257,10 @@ fi
 if [ $BUILD_UI = true ]; then
     echo Compile UI Modules...
     $compilecmd -p $NODE_SOURCE/tsconfig.ui.json
+    assert $INTERMEDIATE/kmwuitoolbar.js
+    assert $INTERMEDIATE/kmwuitoggle.js
+    assert $INTERMEDIATE/kmwuifloat.js
+    assert $INTERMEDIATE/kmwuibutton.js
 
     echo Minify ToolBar UI
     del $WEB_OUTPUT/kmuitoolbar.js 2>/dev/null

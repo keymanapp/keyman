@@ -1194,15 +1194,15 @@ if(!window['keyman']['initialized']) {
           xs.webkitTapHighlightColor='rgba(0,0,0,0)';
         }
 
-        if(x.base.nodeName.toLowerCase() == 'textarea') {
+        if(x.base instanceof HTMLTextAreaElement) {
           // Correct rows value if defaulted and box height set by CSS
           // The rows value is used when setting the caret vertically
-          var baseArea = <HTMLTextAreaElement> x.base;
-          if(baseArea.rows == 2) { // 2 is default value
+
+          if(x.base.rows == 2) { // 2 is default value
             var h=parseInt(bs.height,10)-parseInt(bs.paddingTop,10)-parseInt(bs.paddingBottom,10),
               dh=parseInt(bs.fontSize,10),calcRows=Math.round(h/dh);
-            if(calcRows > baseArea.rows+1) {
-              baseArea.rows=calcRows;
+            if(calcRows > x.base.rows+1) {
+              x.base.rows=calcRows;
             }
           }
           ds.width=xs.width; ds.minHeight=xs.height;
@@ -1233,14 +1233,10 @@ if(!window['keyman']['initialized']) {
 
         var textValue: string;
 
-        switch(x.base.nodeName.toLowerCase()) {
-          case 'textarea':
-          case 'input':
-            textValue = (<HTMLInputElement> x.base).value;
-            break;
-          default:
-            textValue = x.base.textContent;
-            break;
+        if(x.base instanceof HTMLTextAreaElement || x.base instanceof HTMLInputElement) {
+          textValue = x.base.value;
+        } else {
+          textValue = x.base.textContent;
         }
           
         // And copy the text content
@@ -1407,16 +1403,16 @@ if(!window['keyman']['initialized']) {
      **/                 
     keymanweb.getBaseFont = function()
     {
-      var ipInput = document.getElementsByTagName('INPUT'),
-          ipTextArea=document.getElementsByTagName('TEXTAREA'),
+      var ipInput = document.getElementsByTagName<"input">('input'),
+          ipTextArea=document.getElementsByTagName<'textarea'>('textarea'),
           n=0,fs,fsDefault='Arial,sans-serif';
       
       if(ipInput.length == 0 && ipTextArea.length == 0) n=0;
       else if(ipInput.length > 0 && ipTextArea.length == 0) n=1;
       else if(ipInput.length == 0 && ipTextArea.length > 0) n=2;
       else {
-        var firstInput = <HTMLInputElement>(<any>ipInput[0]);
-        var firstTextArea = <HTMLTextAreaElement>(<any>ipTextArea[0]);
+        var firstInput = ipInput[0];
+        var firstTextArea = ipTextArea[0];
 
         if(firstInput.offsetTop < firstTextArea.offsetTop) {
           n=1;    
@@ -3699,15 +3695,13 @@ if(!window['keyman']['initialized']) {
     // Create an ordered list of all text and search input elements and textarea elements
     // except any tagged with class 'kmw-disabled'
     // TODO: email and url types should perhaps use default keyboard only
-    keymanweb.listInputs = function()
-    {
+    keymanweb.listInputs = function() {
       var i,eList=[],
-        t1=document.getElementsByTagName('INPUT'),
-        t2=document.getElementsByTagName('TEXTAREA');
+        t1=document.getElementsByTagName<'input'>('input'),
+        t2=document.getElementsByTagName<'textarea'>('textarea');
 
-      for(i=0; i<t1.length; i++) { 
-        var inputElement = <HTMLInputElement><any> t1[i];
-        switch(inputElement.type) {
+      for(i=0; i<t1.length; i++) {
+        switch(t1[i].type) {
           case 'text':
           case 'search':
           case 'email':
@@ -3718,6 +3712,7 @@ if(!window['keyman']['initialized']) {
             break;    
         }
       }
+
       for(i=0; i<t2.length; i++) { 
         if(t2[i].className.indexOf('kmw-disabled') < 0)
           eList.push({ip:t2[i],x:util._GetAbsoluteX(t2[i]),y:util._GetAbsoluteY(t2[i])});
