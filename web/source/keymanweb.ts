@@ -612,7 +612,12 @@ if(!window['keyman']['initialized']) {
      * @param       {number}        n     length of text in field
      */                      
     updateBaseElement(e: HTMLElement, n: number) {
-      (<HTMLInputElement>e.base).value=this.getText(e); //KMW-29
+      if(e.base instanceof HTMLInputElement || e.base instanceof HTMLTextAreaElement) {
+        e.base.value = this.getText(e); //KMW-29
+      } else {
+        e.base.textContent = this.getText(e);
+      }
+      
       e.style.backgroundColor=(n==0?'transparent':window.getComputedStyle(e.base,null).backgroundColor);
       if(this.keymanweb.util.device.OS == 'iOS') {
         e.base.style.visibility=(n==0?'visible':'hidden');
@@ -640,7 +645,7 @@ if(!window['keyman']['initialized']) {
     _setBlur(e: FocusEvent) {
       // This works OK for iOS, but may need something else for other platforms
       if(('relatedTarget' in e) && e.relatedTarget) {
-        var elem: HTMLElement = <HTMLElement> e.relatedTarget;
+        var elem: HTMLElement = e.relatedTarget as HTMLElement;
         if(elem.nodeName != 'DIV' || elem.className.indexOf('keymanweb-input') == -1) {
           this.cancelInput(); return;
         }
@@ -695,9 +700,9 @@ if(!window['keyman']['initialized']) {
       var target: HTMLElement;
       
       if(e instanceof TouchEvent) {
-        target =<HTMLElement>(typeof e.targetTouches == 'object' ? e.targetTouches[0].target : e.target);
+        target = e.targetTouches[0].target as HTMLElement;
       } else {
-        target = <HTMLElement>e.target;
+        target = e.target as HTMLElement;
       }
       if(target == null) {
         return;
@@ -723,7 +728,7 @@ if(!window['keyman']['initialized']) {
         this.firstTouch={x:x,y:y};
       } else {
         var x0=this.firstTouch.x,y0=this.firstTouch.y,
-          scroller=<HTMLElement>target.firstChild,dx,dy,x1;
+          scroller=target.firstChild as HTMLElement,dx,dy,x1;
         
         if(target.base.nodeName == 'TEXTAREA') {
           var yOffset=parseInt(scroller.style.top,10);
@@ -765,7 +770,7 @@ if(!window['keyman']['initialized']) {
         return;
       }
 
-      var scroller=<HTMLElement>e.firstChild;
+      var scroller=e.firstChild as HTMLElement;
       if(scroller.childNodes.length < 3) {
         return;
       }
