@@ -43,7 +43,8 @@ type
   TKPSOptions = class(TPackageOptions)
   private
     FMSIFileName: WideString;
-    FMSIOptions: WideString;  // I3126
+    FMSIOptions: WideString;
+    FFollowKeyboardVersion: Boolean;  // I3126
   public
     procedure Assign(Source: TPackageOptions); override;
     procedure LoadXML(ARoot: IXMLNode); override;
@@ -54,6 +55,7 @@ type
     procedure SaveIni(AIni: TIniFile); override;
     property MSIFileName: WideString read FMSIFileName write FMSIFileName;
     property MSIOptions: WideString read FMSIOptions write FMSIOptions;  // I3126
+    property FollowKeyboardVersion: Boolean read FFollowKeyboardVersion write FFollowKeyboardVersion;
   end;
 
   TKPSFile = class(TPackage)
@@ -92,7 +94,11 @@ const
   SJSON_Options = 'options';
   SJSON_Options_MSIFileName = 'msiFilename';
   SJSON_Options_MSIOptions = 'msiOptions';
+  SJSON_Options_FollowKeyboardVersion = 'followKeyboardVersion';
+
   SJSON_Strings = 'strings';
+
+  SXML_PackageOptions_FollowKeyboardVersion = 'FollowKeyboardVersion';
 
 { TKPSFile }
 
@@ -362,6 +368,7 @@ begin
   inherited;
   FMSIFileName := (Source as TKPSOptions).MSIFileName;
   FMSIOptions := (Source as TKPSOptions).MSIOptions;  // I3126
+  FFollowKeyboardVersion := (Source as TKPSOptions).FollowKeyboardVersion;
 end;
 
 procedure TKPSOptions.LoadIni(AIni: TIniFile);
@@ -379,6 +386,7 @@ begin
   FOptions := ARoot.Values[SJSON_Options] as TJSONObject;
   FMSIFileName := GetJsonValueString(FOptions, SJSON_Options_MSIFileName);
   FMSIOptions := GetJsonValueString(FOptions, SJSON_Options_MSIOptions);
+  FollowKeyboardVersion :=      GetJsonValueBool(FOptions, SJSON_Options_FollowKeyboardVersion);
 end;
 
 procedure TKPSOptions.LoadXML(ARoot: IXMLNode);
@@ -386,6 +394,7 @@ begin
   inherited;
   FMSIFileName := VarToWideStr(ARoot.ChildNodes['Options'].ChildNodes['MSIFileName'].NodeValue);
   FMSIOptions := VarToWideStr(ARoot.ChildNodes['Options'].ChildNodes['MSIOptions'].NodeValue);  // I3126
+  FFollowKeyboardVersion := ARoot.ChildNodes['Options'].ChildNodes.IndexOf(SXML_PackageOptions_FollowKeyboardVersion) >= 0;
 end;
 
 procedure TKPSOptions.SaveIni(AIni: TIniFile);
@@ -395,6 +404,8 @@ begin
     AIni.WriteString('Options', 'MSIFileName', FMSIFileName);
   if FMSIOptions <> '' then
     AIni.WriteString('Options', 'MSIOptions', FMSIOptions);
+  if FollowKeyboardVersion then
+    AIni.WriteBool('Options', 'FollowKeyboardVersion', FollowKeyboardVersion);
 end;
 
 procedure TKPSOptions.SaveJSON(ARoot: TJSONObject);
@@ -407,6 +418,8 @@ begin
     FOptions.AddPair(SJSON_Options_MSIFileName, FMSIFileName);
   if FMSIOptions <> '' then
     FOptions.AddPair(SJSON_Options_MSIOptions, FMSIOptions);
+  if FollowKeyboardVersion then
+    FOptions.AddPair(SJSON_Options_FollowKeyboardVersion, TJSONTrue.Create);
 end;
 
 procedure TKPSOptions.SaveXML(ARoot: IXMLNode);
@@ -414,6 +427,8 @@ begin
   inherited;
   ARoot.ChildNodes['Options'].ChildNodes['MSIFileName'].NodeValue := FMSIFileName;
   ARoot.ChildNodes['Options'].ChildNodes['MSIOptions'].NodeValue := FMSIOptions;  // I3126
+  if FollowKeyboardVersion then
+    ARoot.ChildNodes['Options'].AddChild(SXML_PackageOptions_FollowKeyboardVersion);
 end;
 
 end.

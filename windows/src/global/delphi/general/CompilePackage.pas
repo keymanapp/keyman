@@ -64,6 +64,7 @@ type
 
     FOutputFileName: string;
     FTempFiles: TTempFiles;
+    FPackageVersion: string;
 
     procedure FatalMessage(const msg: string);
     procedure WriteMessage(AState: TProjectLogState; const msg: string);   // I4706
@@ -109,6 +110,7 @@ var
   buf: array[0..260] of Char;
   n: Integer;
   f: TSearchRec;
+  i: Integer;
 begin
   Result := False;
 
@@ -120,7 +122,7 @@ begin
 
   WriteMessage(plsInfo, 'Compiling package ' + ExtractFileName(pack.FileName) + '...');
 
-  if pack.Info.Desc['Name'] = '' then
+  if Trim(pack.Info.Desc[PackageInfo_Name]) = '' then
   begin
     FatalMessage('You need to fill in the package name before building.');
     Exit;
@@ -128,6 +130,28 @@ begin
 
   CheckForDangerousFiles;
   CheckKeyboardVersions;
+
+  if pack.KPSOptions.FollowKeyboardVersion then
+  begin
+    if pack.Keyboards.Count = 0 then
+    begin
+      FatalMessage('The option "Follow Keyboard Version" is set but there are no keyboards in the package.');
+      Exit;
+    end;
+
+    FPackageVersion := pack.Keyboards[0].Version;
+
+    for i := 1 to pack.Keyboards.Count - 1 do
+      if pack.Keyboards[i].Version <> FPackageVersion then
+      begin
+        FatalMessage(
+          'The option "Follow Keyboard Version" is set but there the package contains more than one keyboard, '+
+          'and the keyboards have mismatching versions.');
+        Exit;
+      end;
+  end
+  else
+    FPackageVersion := pack.Info.Desc[PackageInfo_Version];
 
   GetTempPath(260, buf);
   FTempPath := buf;
@@ -169,6 +193,13 @@ begin
     { Create KMP.INF and KMP.JSON }
 
     kmpinf.Assign(pack);
+
+    //
+    // The package version has been checked earlier at the start of the
+    // build. So now copy it into the kmp.inf/kmp.json data
+    //
+
+    kmpinf.Info.Desc[PackageInfo_Version] := FPackageVersion;
 
     // Add keyboard information to the package 'for free'
     // Note: this does not get us very far for mobile keyboards as
@@ -324,6 +355,11 @@ var
   ki: TKeyboardInfo;
 begin
   n := 0;
+
+  // The version information is checked separately if we use
+  // 'follow keyboard version'
+  if pack.KPSOptions.FollowKeyboardVersion then
+    Exit;
 
   for i := 0 to pack.Files.Count - 1 do
     if pack.Files[i].FileType = ftKeymanFile then Inc(n);
