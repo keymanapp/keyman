@@ -12,6 +12,7 @@ The Original Code is (C) 2017 SIL International
 The following folders contain the distribution for KeymanWeb:
 
 	source			Source code
+	build			Intermediate compiled code; TypeScript source is compiled here before it is minified.
 	output			Fully-compiled KeymanWeb modules for testing
 	embedded		Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
 	samples			Sample pages demonstrating ways to link with KeymanWeb

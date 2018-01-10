@@ -29,6 +29,10 @@ assert ( ) {
 echo "Node.js + dependencies check"
 npm install
 
+if [ $? -ne 0 ]; then
+    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+fi
+
 : ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler}
 : ${JAVA:=java}
 
@@ -105,10 +109,6 @@ copy_resources ( ) {
     echo KeymanWeb resources saved under $1
     echo
 }
-
-if [ $? -ne 0 ]; then
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
-fi
 
 # Definition of global compile constants
 WEB_OUTPUT="../output"
@@ -207,6 +207,7 @@ if [ $BUILD_EMBED = true ]; then
 
     rm $EMBED_OUTPUT/keyman.js 2>/dev/null
     $compilecmd -p $NODE_SOURCE/tsconfig.embedded.json
+    assert $INTERMEDIATE/keyman.js
     echo Embedded TypeScript compiled.
 
     minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
@@ -231,7 +232,9 @@ if [ $BUILD_COREWEB = true ]; then
     echo Compile Keymanweb...
     rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
     $compilecmd -p $NODE_SOURCE/tsconfig.web.json
+    assert $INTERMEDIATE/keymanweb.js
     echo Native TypeScript compiled.
+
     
     copy_resources "$INTERMEDIATE"
 
@@ -253,6 +256,10 @@ fi
 if [ $BUILD_UI = true ]; then
     echo Compile UI Modules...
     $compilecmd -p $NODE_SOURCE/tsconfig.ui.json
+    assert $INTERMEDIATE/kmwuitoolbar.js
+    assert $INTERMEDIATE/kmwuitoggle.js
+    assert $INTERMEDIATE/kmwuifloat.js
+    assert $INTERMEDIATE/kmwuibutton.js
 
     echo Minify ToolBar UI
     del $WEB_OUTPUT/kmuitoolbar.js 2>/dev/null
