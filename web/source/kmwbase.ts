@@ -789,8 +789,7 @@ if(!window['keyman']['loaded']) {
      **/      
     util['addStyleSheet'] = util.addStyleSheet = function(s)
     {        
-      var _ElemStyle: HTMLStyleElement;
-      _ElemStyle = <HTMLStyleElement>document.createElement('STYLE'); 
+      var _ElemStyle: HTMLStyleElement = document.createElement<'style'>('style'); 
 
       _ElemStyle.type = 'text/css';
       if(_ElemStyle.styleSheet) // IE only
