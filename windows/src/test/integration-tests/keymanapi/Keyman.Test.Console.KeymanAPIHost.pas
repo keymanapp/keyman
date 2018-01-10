@@ -27,6 +27,13 @@ type
   TKeymanAPITest = class(TKeymanAPITest_Base)
   public
     constructor Create;
+
+    [Setup]
+    procedure Setup;
+
+    [Teardown]
+    procedure Teardown;
+
     [Test]
     procedure Test_IKeyman;
     [Test]
@@ -131,6 +138,9 @@ type
     [Setup]
     procedure Setup;
 
+    [Teardown]
+    procedure Teardown;
+
     [Test]
     procedure Test_IKeymanKeyboardInstalled;
 
@@ -149,12 +159,10 @@ begin
   inherited Create;
   FTestPath := ExtractFilePath(ExtractFileDir(ExtractFileDir(ParamStr(0)))) + 'test\';
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
-  k := CoKeyman.Create;
 end;
 
 destructor TKeymanAPITest_Base.Destroy;
 begin
-  k := nil;
   CoUninitialize;
   inherited Destroy;
 end;
@@ -226,6 +234,16 @@ begin
   // This shouldn't be needed but it seems the parent constructor doesn't run when
   // instantiated by DUnitX unless constructor is present in child class?
   inherited Create;
+end;
+
+procedure TKeymanAPITest.Setup;
+begin
+  k := CoKeyman.Create;
+end;
+
+procedure TKeymanAPITest.Teardown;
+begin
+  k := nil;
 end;
 
 procedure TKeymanAPITest.Test_IKeyman;
@@ -606,10 +624,16 @@ end;
 
 procedure TKeymanAPITest_Elevated.Setup;
 begin
+  k := CoKeyman.Create;
   if not k.SystemInfo.IsAdministrator then
   begin
     Assert.Fail('Must be running as administrator in order to run elevated tests, to exclude use parameter --exclude:Elevated');
   end;
+end;
+
+procedure TKeymanAPITest_Elevated.Teardown;
+begin
+  k := nil;
 end;
 
 procedure TKeymanAPITest_Elevated.Test_IKeymanKeyboardInstalled;

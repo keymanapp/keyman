@@ -3,7 +3,7 @@
 ## 10.0 alpha
 * Keyman Desktop moved to open source (#121)
 * Support for custom BCP-47 language codes: you can now associate a keyboard with any valid language code in Windows 8 and later
-* Keyman API: extensively rewritten and improved consistency
+* Keyman API: extensively rewritten with improved consistency
 * Additional user interface language - Turkish (translation done by Stevan Vanderwerf)
 * Support for Unicode 10.0
 * Fix for sticky shift key when using Alt+Left Shift to switch languages (#315, #144, #129)
