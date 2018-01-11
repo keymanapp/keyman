@@ -376,6 +376,7 @@ begin
   inherited;
   FMSIFileName := AIni.ReadString('Options', 'MSIFileName', '');
   FMSIOptions := AIni.ReadString('Options', 'MSIOptions', '');
+  FollowKeyboardVersion := AIni.ReadBool('Options', 'FollowKeyboardVersion', False);
 end;
 
 procedure TKPSOptions.LoadJSON(ARoot: TJSONObject);
