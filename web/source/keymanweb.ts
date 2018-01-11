@@ -617,7 +617,7 @@ if(!window['keyman']['initialized']) {
       } else {
         e.base.textContent = this.getText(e);
       }
-      
+
       e.style.backgroundColor=(n==0?'transparent':window.getComputedStyle(e.base,null).backgroundColor);
       if(this.keymanweb.util.device.OS == 'iOS') {
         e.base.style.visibility=(n==0?'visible':'hidden');
@@ -968,19 +968,6 @@ if(!window['keyman']['initialized']) {
     var dbg=keymanweb.debug;
         
     /**
-     * Function     addEventListener
-     * Scope        Public
-     * @param       {string}            event     event to handle
-     * @param       {function(Event)}   func      event handler function
-     * @return      {boolean}                     value returned by util.addEventListener
-     * Description  Wrapper function to add and identify KeymanWeb-specific event handlers
-     */       
-    keymanweb['addEventListener'] = keymanweb.addEventListener = function(event, func)
-    {
-      return util.addEventListener('kmw.'+event, func);
-    }
-
-    /**
      * Function    setUpTouchDevice
      * Scope       Private
      * Description Initialize event handling and duplicate input fields for touch-input devices
@@ -1056,7 +1043,7 @@ if(!window['keyman']['initialized']) {
         }
 
         // The simulated touch element doesn't already exist?  Time to initialize it.
-        var x=document.createElement('DIV'); 
+        var x=document.createElement<'div'>('div'); 
         x['base']=x.base=Pelem;
         x._kmwAttachment = Pelem._kmwAttachment; // It's an object reference we need to alias.
         
@@ -1070,13 +1057,13 @@ if(!window['keyman']['initialized']) {
         // Superimpose custom input fields for each input or textarea, unless readonly or disabled 
 
         // Copy essential styles from each base element to the new DIV      
-        var d,s1,s2,s3,bs,xs,ds,ss1,ss2,ss3,x1,y1;
+        var d,bs,xs,ds,ss1,ss2,ss3,x1,y1;
 
         x.className='keymanweb-input';
         x.dir=x.base.dir;
         
         // Add a scrollable interior div 
-        d=document.createElement('DIV'); 
+        d=document.createElement<'div'>('div'); 
         bs=window.getComputedStyle(x.base,null);
         xs=x.style;
         xs.overflow='hidden';
@@ -1087,7 +1074,7 @@ if(!window['keyman']['initialized']) {
         xs.borderRadius='5px';
 
         // Add a scroll bar (horizontal for INPUT elements, vertical for TEXTAREA elements)
-        var sb=document.createElement('DIV'), sbs=sb.style;
+        var sb=document.createElement<'div'>('div'), sbs=sb.style;
         sbs.position='absolute';
         sbs.height=sbs.width='4px';
         sbs.left=sbs.top='0';
@@ -1096,17 +1083,23 @@ if(!window['keyman']['initialized']) {
         sbs.backgroundColor='#808080';
         sbs.borderRadius='2px';
         
+        var s1: HTMLSpanElement, s2: HTMLSpanElement, s3: HTMLSpanElement;
+
         // And add two spans for the text content before and after the caret, and a caret span
-        s1=document.createElement('SPAN');
-        s2=document.createElement('SPAN');
-        s3=document.createElement('SPAN');      
+        s1=document.createElement<'span'>('span');
+        s2=document.createElement<'span'>('span');
+        s3=document.createElement<'span'>('span');      
         s1.innerHTML=s2.innerHTML=s3.innerHTML='';
         s1.className=s2.className=s3.className='keymanweb-font';
-        d.appendChild(s1);d.appendChild(s3);d.appendChild(s2);
-        x.appendChild(d); x.appendChild(sb);
+        d.appendChild(s1);
+        d.appendChild(s3);
+        d.appendChild(s2);
+        x.appendChild(d);
+        x.appendChild(sb);
 
         // Adjust input element properties so that it matches the base element as closely as possible
-        ds=d.style; ds.position='absolute'; 
+        ds=d.style;
+        ds.position='absolute'; 
 
         ss1=s1.style;ss2=s2.style;ss3=s3.style;ss1.border=ss2.border='none';
         //ss1.backgroundColor='rgb(220,220,255)';ss2.backgroundColor='rgb(220,255,220)'; //only for testing 
@@ -1408,7 +1401,7 @@ if(!window['keyman']['initialized']) {
      **/                 
     keymanweb.getBaseFont = function()
     {
-      var ipInput = document.getElementsByTagName<"input">('input'),
+      var ipInput = document.getElementsByTagName<'input'>('input'),
           ipTextArea=document.getElementsByTagName<'textarea'>('textarea'),
           n=0,fs,fsDefault='Arial,sans-serif';
       

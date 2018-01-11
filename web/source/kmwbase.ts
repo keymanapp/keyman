@@ -123,6 +123,18 @@ class KeymanBase {
   ['isFontAvailable'](fName: string): boolean {
     return this.util.checkFont({'family':fName});
   }
+
+  /**
+   * Function     addEventListener
+   * Scope        Public
+   * @param       {string}            event     event to handle
+   * @param       {function(Event)}   func      event handler function
+   * @return      {boolean}                     value returned by util.addEventListener
+   * Description  Wrapper function to add and identify KeymanWeb-specific event handlers
+   */       
+  addEventListener(event: string, func): boolean {
+    return this.util.addEventListener('kmw.'+event, func);
+  }
 }
 
 /**

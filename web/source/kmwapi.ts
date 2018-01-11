@@ -14,7 +14,10 @@
  * code lines.
  */
 
-// Util.ts
+// kmwbase.ts
+goog.exportSymbol("KeymanBase.prototype.addEventListener", KeymanBase.prototype.addEventListener);
+
+// kmwutils.ts
 
 goog.exportSymbol("Device", Device);
 goog.exportSymbol("Util", Util);
