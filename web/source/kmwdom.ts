@@ -2,6 +2,8 @@
 /// <reference path="kmwexthtml.ts" />
 // References the base KMW object.
 /// <reference path="kmwbase.ts" />
+// Includes KMW string extension declarations.
+/// <reference path="kmwstring.ts" />
 
 /**
  * Declares an interface for implementation of touch-based alias event handlers and state functions.
@@ -1203,7 +1205,7 @@ class DOMManager {
     x.addEventListener('touchstart', this.nonKMWTouchHandler, false);
 
     // Signify that touch isn't enabled on the control.
-    if((<any>this.keyman).isAttached(x)) {
+    if(this.isAttached(x)) {
       x._kmwAttachment.touchEnabled = false;
     }
   }
@@ -1302,5 +1304,127 @@ class DOMManager {
     }
 
     return false;     
+  }
+
+  /**
+   * Function     attachToControl
+   * Scope        Public
+   * @param       {Element}    Pelem       Element to which KMW will be attached
+   * Description  Attaches KMW to control (or IFrame) 
+   */  
+  attachToControl(Pelem: HTMLElement) {
+    var touchable = this.keyman.util.device.touchable;
+
+    if(this.isAttached(Pelem)) {
+      return; // We're already attached.
+    }
+
+    if(this.isKMWInput(Pelem)) {
+      this.setupElementAttachment(Pelem);
+      if(!this.isKMWDisabled(Pelem)) {
+        if(touchable) {
+          this.enableTouchElement(Pelem);
+        } else {
+          this.enableInputElement(Pelem);
+        }
+      } else {
+        if(touchable) {
+          this.setupNonKMWTouchElement(Pelem);
+        }
+      }
+    } else if(touchable) {
+      this.setupNonKMWTouchElement(Pelem);
+    }
+  }
+
+  /**
+   * Function     detachFromControl
+   * Scope        Public
+   * @param       {Element}    Pelem       Element from which KMW will detach
+   * Description  Detaches KMW from a control (or IFrame) 
+   */  
+  detachFromControl(Pelem: HTMLElement) {
+    if(!this.isAttached(Pelem)) {
+      return;  // We never were attached.
+    }
+
+    // #1 - if element is enabled, disable it.  But don't manipulate the 'kmw-disabled' tag.
+    if(this.isKMWInput(Pelem)) {
+      // Is it already disabled?
+      if(!this.isKMWDisabled(Pelem)) {
+        (<any>this.keyman)._DisableControl(Pelem);
+      } 
+    }
+
+    // #2 - clear attachment data.      
+    this.clearElementAttachment(Pelem);
+  }
+
+  /**
+   * Function     isAttached
+   * Scope        Private
+   * @param       {Element}   x   An element from the page.
+   * @return      {boolean}       true if KMW is attached to the element, otherwise false.
+   */
+  isAttached(x: HTMLElement) {
+    return x._kmwAttachment ? true : false;
+  }
+
+  /**
+   * Function     isKMWInput
+   * Scope        Private
+   * @param       {Element}   x   An element from the page.
+   * @return      {boolean}      true if the element is viable for KMW attachment.
+   * Description  Examines potential input elements to determine whether or not they are viable for KMW attachment.
+   *              Also filters elements not supported for touch devices when device.touchable == true.
+   */ 
+  isKMWInput(x: HTMLElement): boolean {
+    var touchable = this.keyman.util.device.touchable;
+
+    if(x instanceof HTMLTextAreaElement) {
+        return true;
+    } else if(x instanceof HTMLInputElement && (x.type == 'text' || x.type == 'search')) {
+        return true;  
+    } else if(x instanceof HTMLIFrameElement && !touchable) { // Do not allow iframe attachment if in 'touch' mode.
+      try {
+        if(x.contentWindow.document) {  // Only allow attachment if the iframe's internal document is valid.
+          return true;
+        }
+      }
+      catch(err) { /* Do not attempt to access iframes outside this site */ }
+    } else if(x.isContentEditable && !touchable) { // Only allow contentEditable attachment outside of 'touch' mode.
+      return true;
+    }
+
+    return false;     
+  }
+
+  /**
+   * Function     setupElementAttachment
+   * Scope        Private
+   * @param       {Element}   x   An element from the page valid for KMW attachment
+   * Description  Establishes the base KeymanWeb data for newly-attached elements.
+   *              Does not establish input hooks, which are instead handled during enablement.  
+   */
+  setupElementAttachment(x: HTMLElement) {
+    // The `_kmwAttachment` property tag maintains all relevant KMW-maintained data regarding the element.
+    // It is disgarded upon de-attachment.
+    x._kmwAttachment = {
+      keyboard:       null,               // Tracks the control's independent keyboard selection, when applicable.
+      touchEnabled:   this.keyman.util.device.touchable    // Tracks if the control has an aliased control for touch functionality.
+                                          // (Necessary for managing the touch/non-touch event handlers.)
+    };
+  }
+
+  /**
+   * Function     clearElementAttachment
+   * Scope        Private
+   * @param       {Element}   x   An element from the page valid for KMW attachment
+   * Description  Establishes the base KeymanWeb data for newly-attached elements.
+   *              Does not establish input hooks, which are instead handled during enablement.  
+   */
+  clearElementAttachment(x: HTMLElement) {
+    // We need to clear the object when de-attaching; helps prevent memory leaks.
+    x._kmwAttachment = null;
   }
 }

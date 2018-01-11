@@ -318,28 +318,8 @@ if(!window['keyman']['initialized']) {
      * @param       {Element}    Pelem       Element to which KMW will be attached
      * Description  Attaches KMW to control (or IFrame) 
      */  
-    keymanweb['attachToControl'] = keymanweb.attachToControl = function(Pelem)
-    {
-      if(keymanweb.isAttached(Pelem)) {
-        return; // We're already attached.
-      }
-
-      if(keymanweb.isKMWInput(Pelem)) {
-        keymanweb.setupElementAttachment(Pelem);
-        if(!keymanweb.domManager.isKMWDisabled(Pelem)) {
-          if(device.touchable) {
-            keymanweb.domManager.enableTouchElement(Pelem);
-          } else {
-            keymanweb.domManager.enableInputElement(Pelem);
-          }
-        } else {
-          if(device.touchable) {
-            keymanweb.domManager.setupNonKMWTouchElement(Pelem);
-          }
-        }
-      } else if(device.touchable) {
-        keymanweb.domManager.setupNonKMWTouchElement(Pelem);
-      }
+    keymanweb['attachToControl'] = function(Pelem: HTMLElement) {
+      keymanweb.domManager.attachToControl(Pelem);
     }
 
     /**
@@ -348,22 +328,8 @@ if(!window['keyman']['initialized']) {
      * @param       {Element}    Pelem       Element from which KMW will detach
      * Description  Detaches KMW from a control (or IFrame) 
      */  
-    keymanweb['detachFromControl'] = keymanweb.detachFromControl = function(Pelem)
-    {
-      if(!keymanweb.isAttached(Pelem)) {
-        return;  // We never were attached.
-      }
-
-      // #1 - if element is enabled, disable it.  But don't manipulate the 'kmw-disabled' tag.
-      if(keymanweb.isKMWInput(Pelem)) {
-        // Is it already disabled?
-        if(!keymanweb.domManager.isKMWDisabled(Pelem)) {
-          keymanweb._DisableControl(Pelem);
-        } 
-      }
-
-      // #2 - clear attachment data.      
-      keymanweb.clearElementAttachment(Pelem);
+    keymanweb['detachFromControl'] = function(Pelem: HTMLElement) {
+      keymanweb.domManager.detachFromControl(Pelem);
     }
         
     /**
@@ -523,7 +489,7 @@ if(!window['keyman']['initialized']) {
      * Description  Disables a KMW control element 
      */    
     keymanweb['disableControl'] = keymanweb.disableControl = function(Pelem) {
-      if(!keymanweb.isAttached(Pelem)) {
+      if(!keymanweb.domManager.isAttached(Pelem)) {
         console.warn("KeymanWeb is not attached to element " + Pelem);
       } 
 
@@ -543,7 +509,7 @@ if(!window['keyman']['initialized']) {
      * Description  Disables a KMW control element 
      */    
     keymanweb['enableControl'] = keymanweb.enableControl = function(Pelem) {
-      if(!keymanweb.isAttached(Pelem)) {
+      if(!keymanweb.domManager.isAttached(Pelem)) {
         console.warn("KeymanWeb is not attached to element " + Pelem);
       } 
 
@@ -564,7 +530,7 @@ if(!window['keyman']['initialized']) {
      * Description  Disable KMW control element 
      */    
     keymanweb._DisableControl = function(Pelem) {
-      if(keymanweb.isAttached(Pelem)) { // Only operate on attached elements!  
+      if(keymanweb.domManager.isAttached(Pelem)) { // Only operate on attached elements!  
         if(keymanweb._LastActiveElement == Pelem || keymanweb._LastActiveElement == Pelem['kmw_ip']) {
           keymanweb._LastActiveElement = null;
           keymanweb.keyboardManager.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
@@ -600,7 +566,7 @@ if(!window['keyman']['initialized']) {
      * Description  Enable KMW control element 
      */    
     keymanweb._EnableControl = function(Pelem) {
-      if(keymanweb.isAttached(Pelem)) { // Only operate on attached elements!
+      if(keymanweb.domManager.isAttached(Pelem)) { // Only operate on attached elements!
         if(device.touchable) {
           keymanweb.domManager.enableTouchElement(Pelem);
 
@@ -645,7 +611,7 @@ if(!window['keyman']['initialized']) {
         return;
       }
 
-      if(!keymanweb.isAttached(Pelem)) {
+      if(!keymanweb.domManager.isAttached(Pelem)) {
         console.error("KeymanWeb is not attached to element " + Pelem);
         return;
       } else {
@@ -673,7 +639,7 @@ if(!window['keyman']['initialized']) {
      *              If it is currently following the global keyboard setting, returns null instead.
      */
     keymanweb['getKeyboardForControl'] = keymanweb.getKeyboardForControl = function(Pelem) {
-      if(!keymanweb.isAttached(Pelem)) {
+      if(!keymanweb.domManager.isAttached(Pelem)) {
         console.error("KeymanWeb is not attached to element " + Pelem);
         return null;
       } else {
@@ -1824,76 +1790,6 @@ if(!window['keyman']['initialized']) {
     util.attachDOMEvent(window, 'unload', keymanweb._WindowUnload,false);  // added fourth argument (default value)
 
     /**
-     * Function     isKMWInput
-     * Scope        Private
-     * @param       {Element}   x   An element from the page.
-     * @return      {boolean}      true if the element is viable for KMW attachment.
-     * Description  Examines potential input elements to determine whether or not they are viable for KMW attachment.
-     *              Also filters elements not supported for touch devices when device.touchable == true.
-     */ 
-    keymanweb.isKMWInput = function(x) {
-      var c, lcTagName = x.tagName.toLowerCase();
-
-      if(lcTagName == 'textarea') {
-          return true;
-      } else if(lcTagName == 'input' && x.type.toLowerCase() == 'text') {
-        if(x.type == 'text' || x.type == 'search') {
-          return true;  
-        } 
-      } else if(lcTagName == 'iframe' && !device.touchable) { // Do not allow iframe attachment if in 'touch' mode.
-        try {
-          if(x.contentWindow.document) {  // Only allow attachment if the iframe's internal document is valid.
-            return true;
-          }
-        }
-        catch(err) { /* Do not attempt to access iframes outside this site */ }
-      } else if(x.isContentEditable && !device.touchable) { // Only allow contentEditable attachment outside of 'touch' mode.
-        return true;
-      }
-
-      return false;     
-    }
-
-    /**
-     * Function     isAttached
-     * Scope        Private
-     * @param       {Element}   x   An element from the page.
-     * @return      {boolean}       true if KMW is attached to the element, otherwise false.
-     */
-    keymanweb.isAttached = function(x) {
-      return x._kmwAttachment ? true : false;
-    }
-
-    /**
-     * Function     setupElementAttachment
-     * Scope        Private
-     * @param       {Element}   x   An element from the page valid for KMW attachment
-     * Description  Establishes the base KeymanWeb data for newly-attached elements.
-     *              Does not establish input hooks, which are instead handled during enablement.  
-     */
-    keymanweb.setupElementAttachment = function(x) {
-      // The `_kmwAttachment` property tag maintains all relevant KMW-maintained data regarding the element.
-      // It is disgarded upon de-attachment.
-      x._kmwAttachment = {
-        keyboard:       null,               // Tracks the control's independent keyboard selection, when applicable.
-        touchEnabled:   device.touchable    // Tracks if the control has an aliased control for touch functionality.
-                                            // (Necessary for managing the touch/non-touch event handlers.)
-      };
-    }
-
-    /**
-     * Function     clearElementAttachment
-     * Scope        Private
-     * @param       {Element}   x   An element from the page valid for KMW attachment
-     * Description  Establishes the base KeymanWeb data for newly-attached elements.
-     *              Does not establish input hooks, which are instead handled during enablement.  
-     */
-    keymanweb.clearElementAttachment = function(x) {
-      // We need to clear the object when de-attaching; helps prevent memory leaks.
-      x._kmwAttachment = null;
-    }
-
-    /**
      * Function     _GetDocumentEditables
      * Scope        Private
      * @param       {Element}     Pelem     HTML element
@@ -1954,7 +1850,7 @@ if(!window['keyman']['initialized']) {
         var input = possibleInputs[Li];
 
         // It knows how to handle pre-loaded iframes appropriately.
-        keymanweb.attachToControl(possibleInputs[Li]);
+        keymanweb.domManager.attachToControl(possibleInputs[Li]);
       }
     }
 
@@ -1972,7 +1868,7 @@ if(!window['keyman']['initialized']) {
         var input = possibleInputs[Li];
 
         // It knows how to handle pre-loaded iframes appropriately.
-        keymanweb.detachFromControl(possibleInputs[Li]);
+        keymanweb.domManager.detachFromControl(possibleInputs[Li]);
       }
     }
     
@@ -2344,13 +2240,13 @@ if(!window['keyman']['initialized']) {
       }
 
       for(var k = 0; k < inputElementAdditions.length; k++) {
-        if(keymanweb.isKMWInput(inputElementAdditions[k])) { // Apply standard element filtering!
+        if(keymanweb.domManager.isKMWInput(inputElementAdditions[k])) { // Apply standard element filtering!
           keymanweb._MutationAdditionObserved(inputElementAdditions[k]);
         }
       }
 
       for(k = 0; k < inputElementRemovals.length; k++) {
-        if(keymanweb.isKMWInput(inputElementRemovals[k])) { // Apply standard element filtering!
+        if(keymanweb.domManager.isKMWInput(inputElementRemovals[k])) { // Apply standard element filtering!
           keymanweb._MutationRemovalObserved(inputElementRemovals[k]);
         }
       }
@@ -2387,7 +2283,7 @@ if(!window['keyman']['initialized']) {
         //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
 
         var attachFunctor = function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
-          keymanweb.attachToControl(Pelem);
+          keymanweb.domManager.attachToControl(Pelem);
         };
 
         Pelem.addEventListener('load', attachFunctor);
@@ -2395,14 +2291,14 @@ if(!window['keyman']['initialized']) {
         /* If the iframe has somehow already loaded, we can't expect the onload event to be raised.  We ought just
         * go ahead and perform our callback's contents.
         * 
-        * keymanweb.attachToControl() is now idempotent, so even if our call 'whiffs', it won't cause long-lasting
+        * keymanweb.domManager.attachToControl() is now idempotent, so even if our call 'whiffs', it won't cause long-lasting
         * problems.
         */
         if(Pelem.contentDocument.readyState == 'complete') {
           attachFunctor();
         }
       } else {
-        keymanweb.attachToControl(Pelem);
+        keymanweb.domManager.attachToControl(Pelem);
       }  
     }
 
@@ -2414,7 +2310,7 @@ if(!window['keyman']['initialized']) {
       }
 
       keymanweb.domManager.disableInputElement(Pelem); // Remove all KMW event hooks, styling.
-      keymanweb.clearElementAttachment(element);  // Memory management & auto de-attachment upon removal.
+      keymanweb.domManager.clearElementAttachment(element);  // Memory management & auto de-attachment upon removal.
     }
 
     // Create an ordered list of all text and search input elements and textarea elements

@@ -165,7 +165,7 @@ if(!window['keyman']['initialized']) {
         {
           if(align) 
           {     
-            keymanweb.touchAliasing.updateInput(keymanweb.inputList[i]);
+            keymanweb.domManager.touchHandlers.updateInput(keymanweb.inputList[i]);
             keymanweb.inputList[i].style.visibility='visible';
             if(keymanweb.inputList[i].base.textContent.length > 0)
               keymanweb.inputList[i].base.style.visibility='hidden';
@@ -217,7 +217,8 @@ if(!window['keyman']['initialized']) {
         else if(keyName.indexOf('K_ROPT') >= 0)
         {
           keymanweb._IsActivatingKeymanWebUI=0; osk._Hide(true); 
-          keymanweb.touchAliasing.hideCaret(); keymanweb._LastActiveElement = 0;
+          keymanweb.touchAliasing.hideCaret();
+          keymanweb._LastActiveElement = 0;
         }
       }
     }

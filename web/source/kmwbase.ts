@@ -167,6 +167,9 @@ KeymanBase.__BUILD__ = 299;
 if(!window['keyman']['loaded']) {
 
   (function() {
+    // The base object call may need to be moved into a separate, later file eventually.
+    // It will be necessary to override methods with kmwnative.ts and kmwembedded.ts before the
+    // affected objects are initialized.
     var keymanweb = window['keyman'] = new KeymanBase();
     
     // Define public OSK, user interface and utility function objects 
