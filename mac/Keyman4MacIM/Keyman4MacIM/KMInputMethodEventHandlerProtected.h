@@ -25,7 +25,6 @@
 // checking at the start of the event processing to see if we're probably still in the same place where we
 // left off previously.
 @property (assign) BOOL clientSelectionCanChangeUnexpectedly; // REVIEW: Maybe we can get notification from these clients by handling mouseDownOnCharacterIndex.
-@property (assign) BOOL insertCharactersIndividually;
 @property (assign) BOOL cannnotTrustSelectionLength;
 
 - (instancetype)initWithLegacyMode:(BOOL)legacy clientSelectionCanChangeUnexpectedly:(BOOL) flagClientSelectionCanChangeUnexpectedly;
