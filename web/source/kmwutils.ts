@@ -255,7 +255,7 @@ class Util {
    * @param       {boolean=}  PuseCapture True only if event to be handled on way to target element      
    * Description  Attaches event handler to element DOM event
    */  
-  attachDOMEvent(Pelem: HTMLElement, Peventname: string, Phandler: (Object) => boolean, PuseCapture: boolean): void {
+  attachDOMEvent(Pelem: HTMLElement, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
     this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
     if(Pelem.attachEvent) {
       // IE
@@ -275,7 +275,7 @@ class Util {
    * @param       {boolean=}  PuseCapture True if event was being handled on way to target element      
    * Description Detaches event handler from element [to prevent memory leaks]
    */  
-  detachDOMEvent(Pelem: HTMLElement, Peventname: string, Phandler: (Object) => boolean, PuseCapture: boolean): void {
+  detachDOMEvent(Pelem: HTMLElement, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
     if(Pelem.detachEvent) {
       Pelem.detachEvent('on'+Peventname, Phandler);
     } else if(Pelem.removeEventListener) {

@@ -211,7 +211,7 @@ if [ $BUILD_EMBED = true ]; then
     echo Embedded TypeScript compiled.
 
 
-    minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
+    minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "KeymanBase.__BUILD__=$BUILD"
     assert $EMBED_OUTPUT/keyman.js 
 
     echo Compiled embedded application saved as $EMBED_OUTPUT/keyman.js
@@ -240,7 +240,7 @@ if [ $BUILD_COREWEB = true ]; then
     copy_resources "$INTERMEDIATE"
 
     echo Minifying KeymanWeb...
-    minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
+    minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "KeymanBase.__BUILD__=$BUILD"
     assert $WEB_OUTPUT/keymanweb.js
 
     echo Compiled KeymanWeb application saved as $WEB_OUTPUT/keymanweb.js

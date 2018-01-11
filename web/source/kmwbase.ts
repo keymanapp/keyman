@@ -1,5 +1,7 @@
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwexthtml.ts" />
+// Defines the web-page interface object.
+/// <reference path="kmwdom.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwutils.ts" />
 // Defines keyboard data & management classes.
@@ -10,9 +12,9 @@
    Copyright 2017 SIL International
 ***/
 
-declare var keyman: any
-var keyman = window['keyman'] || {};
-window['keyman'] = keyman; // To preserve the name _here_ in case of minification.
+declare var keyman: KeymanBase;
+var keyman: KeymanBase = window['keyman'] || {};
+// window['keyman'] = keyman; // To preserve the name _here_ in case of minification.
 
 class KeymanBase {
   _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
@@ -67,6 +69,7 @@ class KeymanBase {
   osk: any;
   ui: any;
   keyboardManager: KeyboardManager;
+  domManager: DOMManager;
 
   // Defines option-tracking object as a string map.
   options: { [name: string]: string; } = {
@@ -98,6 +101,7 @@ class KeymanBase {
     this.util = this['util'] = new Util(this);
     this.osk = this['osk'] = {ready:false};
     this.keyboardManager = new KeyboardManager(this);
+    this.domManager = new DOMManager(this);
 
     // Load properties from their static variants.
     this['build'] = KeymanBase.__BUILD__;
@@ -153,9 +157,7 @@ KeymanBase._rootPath = sPath.replace(/(https?:\/\/)([^\/]*)(.*)/,'$1$2/');
 KeymanBase._protocol = sPath.replace(/(.{3,5}:)(.*)/,'$1');
 
 /** @define {number} build counter that gets set by the build environment */
-keyman.__BUILD__ = 299;
-// A static-variable redirect to preserve the value for initialization.
-KeymanBase.__BUILD__ = keyman.__BUILD__;
+KeymanBase.__BUILD__ = 299;
 
 /**  
  * Base code: Declare major component namespaces, instances, and utility functions 

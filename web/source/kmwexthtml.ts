@@ -20,6 +20,8 @@ interface Element {
 
     // Touch element extensions
     base: HTMLElement,                  // Refers to the aliased element.  Is a property of the alias.
+    disabled: boolean,
+    kmwInput: boolean,
     _kmwResizeHandler: (e: any) => void,
 
     // Used by our util.wait / util.alert system

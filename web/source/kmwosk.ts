@@ -1715,7 +1715,7 @@ if(!window['keyman']['initialized']) {
 
           osk.lgList.style.display='none'; //still allows blank menu momentarily on selection
           keymanweb.keyboardManager._SetActiveKeyboard(this.kn,this.kc,true);
-          keymanweb.doKeyboardChange(this.kn,this.kc);
+          keymanweb.keyboardManager.doKeyboardChange(this.kn,this.kc);
           keymanweb._FocusLastActiveElement();
           osk.hideLanguageList();
 
