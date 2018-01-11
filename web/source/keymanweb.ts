@@ -200,51 +200,6 @@ if(!window['keyman']['initialized']) {
 
       osk._Show();
     };
-
-    /**
-     * Exposed function to load keyboards by name. One or more arguments may be used
-     * 
-     * @param {string|Object} x keyboard name string or keyboard metadata JSON object
-     * 
-     */  
-    keymanweb['addKeyboards'] = function(x) {                       
-      if(arguments.length == 0) {
-        keymanweb.keyboardManager.keymanCloudRequest('',false);
-      } else {
-        keymanweb.keyboardManager.addKeyboardArray(arguments);
-      }
-    }
-    
-    /**
-     *  Add default or all keyboards for a given language
-     *  
-     *  @param  {string}   arg    Language name (multiple arguments allowed)
-     **/           
-    keymanweb['addKeyboardsForLanguage'] = function(arg)
-    {
-      keymanweb.keyboardManager.addLanguageKeyboards(arguments);
-    }
-    
-    /**
-     * Call back from cloud for adding keyboard metadata
-     * 
-     * @param {Object}    x   metadata object
-     **/                  
-    keymanweb['register'] = function(x) {                     
-      keymanweb.keyboardManager.register(x);
-    }
-
-    /**
-     * Build 362: removeKeyboards() remove keyboard from list of available keyboards
-     * 
-     * @param {string} x keyboard name string
-     * 
-     */  
-    keymanweb['removeKeyboards'] = function(x) {
-      return keymanweb.keyboardManager.removeKeyboards(x);
-    }
-
-
     
     /**
      * Browser dependent initialization
@@ -310,26 +265,6 @@ if(!window['keyman']['initialized']) {
       if(Parray.push) Parray.push(Pval);
       else Parray=Parray.concat(Pval);
       return Parray;
-    }
-    
-    /**
-     * Function     attachToControl
-     * Scope        Public
-     * @param       {Element}    Pelem       Element to which KMW will be attached
-     * Description  Attaches KMW to control (or IFrame) 
-     */  
-    keymanweb['attachToControl'] = function(Pelem: HTMLElement) {
-      keymanweb.domManager.attachToControl(Pelem);
-    }
-
-    /**
-     * Function     detachFromControl
-     * Scope        Public
-     * @param       {Element}    Pelem       Element from which KMW will detach
-     * Description  Detaches KMW from a control (or IFrame) 
-     */  
-    keymanweb['detachFromControl'] = function(Pelem: HTMLElement) {
-      keymanweb.domManager.detachFromControl(Pelem);
     }
         
     /**

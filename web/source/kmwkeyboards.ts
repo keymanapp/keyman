@@ -788,7 +788,7 @@ class KeyboardManager {
    * @param {string|Object} x keyboard name string or keyboard metadata JSON object
    * 
    */  
-  addKeyboardArray(x: any[]): void {
+  addKeyboardArray(x: any[] | IArguments): void {
     // Store all keyboard meta-data for registering later if called before initialization
     if(!this.keymanweb.initialized) {
       for(var k=0; k<x.length; k++) {
