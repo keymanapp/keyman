@@ -1,5 +1,37 @@
 /// <reference path="kmwbase.ts" />
 
+class CloudRequestEntry {
+  id: string;
+  language?: string;
+  version?: string;
+
+  constructor(id: string, language?: string) {
+    this.id = id;
+    this.language = language;
+  }
+
+  toString(): string {
+    var kbid=this.id; 
+    var lgid=''; 
+    var kvid='';  
+
+    if(this.language) {
+      kbid=kbid+'@'+this.language;
+      if(this.version) {
+        kbid=kbid+'@'+this.version;
+      }
+    } else {
+      if(this.version) {
+        kbid=kbid+'@@'+this.version;
+      }
+    }
+
+    //TODO: add specifier validation... 
+
+    return kbid;
+  }
+}
+
 class KeyboardFont {
   'family': string;
   'files': string;
@@ -735,7 +767,7 @@ class KeyboardManager {
    * Description    Checks to ensure that the stub isn't already loaded within KMW or subject
    *                to an already-pending request.
    */
-  isUniqueRequest(cloudList: {id: string, language?: string}[], tEntry: {id: string, language?: string}) {
+  isUniqueRequest(cloudList: {id: string, language?: string}[], tEntry: CloudRequestEntry) {
     var k;
 
     if(this.findStub(tEntry.id, tEntry.language) == null) {
@@ -772,17 +804,9 @@ class KeyboardManager {
   
     // Create a temporary array of metadata objects from the arguments used
     var i,j,kp,kbid,lgid,kvid,cmd='',comma='';
-    var cloudList: {
-      id: string;
-      language?: string;
-      version?: string;
-    }[] = [];
+    var cloudList: CloudRequestEntry[] = [];
 
-    var tEntry: {
-      id: string;
-      language?: string;
-      version?: string;
-    }
+    var tEntry: CloudRequestEntry;
 
     for(i=0; i<x.length; i++) {
       if(typeof(x[i]) == 'string' && (<string>x[i]).length > 0) {
@@ -796,12 +820,12 @@ class KeyboardManager {
         }
 
         for(j=0; j<lList.length; j++) {
-          tEntry={
-            id: pList[0]
-          };
+          tEntry = new CloudRequestEntry(pList[0]);
+
           if(lList[j] != '') {
             tEntry.language=lList[j];
           }
+
           if(pList.length > 2) {
             tEntry.version=pList[2];
           }
@@ -834,13 +858,13 @@ class KeyboardManager {
           //Array or single entry?
           if(typeof(lList.length) == 'number') {
             for(j=0; j<lList.length; j++) {
-              tEntry = {id:x[i]['id'],language:x[i]['languages'][j]['id']};
+              tEntry = new CloudRequestEntry(x[i]['id'], x[i]['languages'][j]['id']);
               if(this.isUniqueRequest(cloudList, tEntry)) {
                 cloudList.push(tEntry);
               }
             }
           } else { // Single language element
-            tEntry = {id:x[i]['id'],language:x[i]['languages'][j]['id']};
+            tEntry = new CloudRequestEntry(x[i]['id'], x[i]['languages'][j]['id']);
             if(this.isUniqueRequest(cloudList, tEntry)) {
               cloudList.push(tEntry);
             }
@@ -857,28 +881,7 @@ class KeyboardManager {
     // Update the keyboard metadata list from keyman.com - build the command
     cmd='&keyboardid=';
     for(i=0; i<cloudList.length; i++) {      
-      kp=cloudList[i];
-      kbid=kp['id']; lgid=''; kvid='';  
-      if(typeof(kp['language']) == 'string' && kp['language'] != '') {
-        lgid=kp['language'];
-      }
-      if(typeof(kp['version']) == 'string' && kp['version'] != '') {
-        kvid=kp['version'];
-      }
-      if(lgid != '') {
-        kbid=kbid+'@'+lgid;
-        if(kvid != '') {
-          kbid=kbid+'@'+kvid;
-        }
-      } else {
-        if(kvid != '') {
-          kbid=kbid+'@@'+kvid;
-        }
-      }
-
-      //TODO: add specifier validation...        
-              
-      cmd=cmd+comma+kbid;
+      cmd=cmd+comma+cloudList[i].toString();
       comma=',';
     }  
     
@@ -978,7 +981,7 @@ class KeyboardManager {
         badName = x['keyboardid'].substr(0,1).toUpperCase()+x['keyboardid'].substr(1);
       }
 
-      (<any>this.keymanweb).serverUnavailable(badName+' keyboard not found.');
+      this.serverUnavailable(badName+' keyboard not found.');
       return;
     }
     
@@ -1072,11 +1075,13 @@ class KeyboardManager {
     
     URL = URL + ((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards')
       +'?jsonp=keyman.register';  
+
+    var kbdManager = this;
     
     // Set callback timer
     tFlag='&timerid='+window.setTimeout(
       function(){
-        this.serverUnavailable(cmd);
+        kbdManager.serverUnavailable(cmd);
       }
       ,10000);    
   
