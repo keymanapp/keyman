@@ -34,7 +34,7 @@ BOOL _insertCharactersIndividually;
 - (void)insertPendingBufferTextIn:(id)client {
     
     NSString* remainingText = @"";
-    if (!_insertCharactersIndividually) {
+    if (_insertCharactersIndividually) {
         NSUInteger length = [self pendingBuffer].length;
         if (length > 1) {
             if ([self.AppDelegate debugMode])
