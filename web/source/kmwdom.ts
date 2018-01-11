@@ -328,16 +328,11 @@ class DOMManager {
    * Scope        Private
    * Description  A handler for KMW-touch-disabled elements when operating on touch devices.
    */
-  nonKMWTouchHandler(x) {
-    var keyman: KeymanBase = window['keyman'];
-    keyman.domManager._nonKMWTouchHandler(x);
-  }
-  
-  _nonKMWTouchHandler(x) {
+  nonKMWTouchHandler = function(x) {
     this.keyman.focusing=false;
     clearTimeout(this.keyman.focusTimer);
     this.keyman.osk.hideNow();
-  }
+  }.bind(this);
 
   /**
    * Function     setupNonKMWTouchElement

@@ -127,7 +127,7 @@ if(!window['keyman']['initialized']) {
        * using a timed event loop.           
        */
 
-      keymanweb.touchAliasing = new TouchHandlers(keymanweb);
+      keymanweb.touchAliasing = keymanweb.domManager.touchHandlers;
 
     }
     

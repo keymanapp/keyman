@@ -141,21 +141,8 @@ class TouchHandlers implements AliasElementHandlers {
   /**
    * Handle receiving focus by simulated input field 
    *      
-   * @param       {Event=}     e    event
    */       
-  setFocus(e?: TouchEvent|MSPointerEvent): void {                     
-    //e.stopPropagation();  // not doing anything useful, no child elements
-    //e.preventDefault();   // prevents user selection or scrolling, may be better if they are allowed?
-
-    // Warning:  Event handlers can change the reference of 'this', so we need to re-resolve it.
-    var keyman: KeymanBase = window['keyman'];
-    keyman.domManager.touchHandlers._setFocus(e);
-  }
-
-  /**
-   * Handles the actual _setFocus details, now with 'this' as our touch-handling interface.
-   */
-  _setFocus(e?: TouchEvent|MSPointerEvent): void {
+  setFocus: (e?: TouchEvent|MSPointerEvent) => void = function(e?: TouchEvent|MSPointerEvent): void {
     var kmw = this.keymanweb;
     var osk = this.keymanweb.osk;
     var util = this.keymanweb.util;
@@ -168,7 +155,7 @@ class TouchHandlers implements AliasElementHandlers {
     var tEvent: {
       clientX: number;
       clientY: number;
-      target?: any;
+      target?: EventTarget;
     };
 
     if(e instanceof TouchEvent) {
@@ -184,10 +171,10 @@ class TouchHandlers implements AliasElementHandlers {
       }
     }    
     
-    var touchX=tEvent.clientX,touchY=tEvent.clientY,tTarg=tEvent.target,scroller;
+    var touchX=tEvent.clientX,touchY=tEvent.clientY,tTarg=tEvent.target as HTMLElement, scroller;
 
     // Identify the scroller element
-    if(tTarg.nodeName == 'SPAN') {
+    if(tTarg instanceof HTMLSpanElement) {
       scroller=tTarg.parentNode;
     } else if(tTarg.className != null && tTarg.className.indexOf('keymanweb-input') >= 0) {
       scroller=tTarg.firstChild;
@@ -224,7 +211,7 @@ class TouchHandlers implements AliasElementHandlers {
     }
     
     // If clicked on DIV, set caret to end of text
-    if(tTarg.nodeName == 'DIV' ) { 
+    if(tTarg instanceof HTMLDivElement) { 
       var x,cp;
       x=util._GetAbsoluteX(scroller.firstChild);        
       if(target.dir == 'rtl') { 
@@ -245,7 +232,7 @@ class TouchHandlers implements AliasElementHandlers {
       dy=document.body.scrollTop;
 
       // Vertical scrolling
-      if(target.base.nodeName == 'TEXTAREA') {
+      if(target.base instanceof HTMLTextAreaElement) {
         yRow=Math.round(target.base.offsetHeight/target.base.rows);     
         for(iLoop=0; iLoop<16; iLoop++)
         {
@@ -325,7 +312,7 @@ class TouchHandlers implements AliasElementHandlers {
     if(this.keymanweb._CommonFocusHelper(target)) {
       return;
     }
-  }
+  }.bind(this);
       
   getText(e: HTMLElement): string {
     if(e == null) {
@@ -457,21 +444,12 @@ class TouchHandlers implements AliasElementHandlers {
     }    
   }
 
-  flashCaret(): void {
-    // Is typically accessed via timer, so 'this' is not valid.
-    var keyman: KeymanBase = window['keyman'];
-    keyman.domManager.touchHandlers._flashCaret();
-  }
-
-  /**
-   * Handles the actual _flashCaret details, now with 'this' as our touch-handling interface.
-   */
-  _flashCaret(): void {
+  flashCaret: () => void = function(): void {
     if(this.keymanweb.util.device.touchable && this.keymanweb._ActiveElement != null) {
       var cs=this.caret.style;
       cs.visibility = cs.visibility != 'visible' ? 'visible' : 'hidden';
     }
-  }
+  }.bind(this);
 
   /**
    * Position the caret at the start of the second span within the scroller
@@ -617,12 +595,7 @@ class TouchHandlers implements AliasElementHandlers {
    *
    * @param       {Event}      e    event
    */
-  setBlur(e: FocusEvent) {
-    var keyman: KeymanBase = window['keyman'];
-    keyman.domManager.touchHandlers._setBlur(e);
-  }
-
-  _setBlur(e: FocusEvent) {
+  setBlur: (e: FocusEvent) => void = function(e: FocusEvent) {
     // This works OK for iOS, but may need something else for other platforms
     if(('relatedTarget' in e) && e.relatedTarget) {
       var elem: HTMLElement = e.relatedTarget as HTMLElement;
@@ -635,7 +608,7 @@ class TouchHandlers implements AliasElementHandlers {
     if(!this.keymanweb.focusing) {
       this.cancelInput();
     }
-  }
+  }.bind(this);
 
   /**
    * Display and position a scrollbar in the input field if needed
@@ -667,12 +640,7 @@ class TouchHandlers implements AliasElementHandlers {
    * 
    * @param       {Event}           e     touchmove event
    */         
-  dragInput(e: TouchEvent|MouseEvent) {
-    var keyman: KeymanBase = window['keyman'];
-    keyman.domManager.touchHandlers._dragInput(e);
-  }
-
-  _dragInput(e: TouchEvent|MouseEvent) {
+  dragInput: (e: TouchEvent|MouseEvent) => void = function(e: TouchEvent|MouseEvent) {
     // Prevent dragging window 
     e.preventDefault();
     e.stopPropagation();      
@@ -737,7 +705,7 @@ class TouchHandlers implements AliasElementHandlers {
       }
     }
     this.setScrollBar(target);
-  }
+  }.bind(this);
 
   /**
    * Scroll the input field horizontally (INPUT base element) or 
@@ -770,8 +738,8 @@ class TouchHandlers implements AliasElementHandlers {
     if(isNaN(x)) x=0; if(isNaN(y)) y=0;
 
     // Scroll input field vertically if necessary
-    if(e.base.nodeName == 'TEXTAREA') { 
-      var rowHeight=Math.round(e.offsetHeight/(<HTMLTextAreaElement>e.base).rows);
+    if(e.base instanceof HTMLTextAreaElement) { 
+      var rowHeight=Math.round(e.offsetHeight/e.base.rows);
       if(cy < ey) dy=cy-ey;
       if(cy > ey+e.offsetHeight-rowHeight) dy=cy-ey-e.offsetHeight+rowHeight;   
       if(dy != 0)scroller.style.top=(y<dy?y-dy:0)+'px';
