@@ -19,7 +19,7 @@ The following folders contain the distribution for KeymanWeb:
   testing     Test-case web-pages for various aspects of KeymanWeb functionality
 
 ## Usage
-Open **index.html** or **samples/index.html** in your browser. The pages using uncompiled KeymanWeb should work as-is.
+Open **index.html** or **samples/index.html** in your browser. Be sure to compile KeymanWeb before viewing the pages.
 
 To view pages using compiled KeymanWeb,
 1. cd to **keyman/web/source**
