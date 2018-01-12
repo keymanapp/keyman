@@ -145,7 +145,7 @@ begin
       if pack.Keyboards[i].Version <> FPackageVersion then
       begin
         FatalMessage(
-          'The option "Follow Keyboard Version" is set but there the package contains more than one keyboard, '+
+          'The option "Follow Keyboard Version" is set but the package contains more than one keyboard, '+
           'and the keyboards have mismatching versions.');
         Exit;
       end;
