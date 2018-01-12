@@ -63,11 +63,9 @@ KMInputMethodEventHandler* _eventHandler;
     if ([clientAppId isEqual: @"com.apple.Safari"]) {
         _eventHandler = [[KMInputMethodSafariClientEventHandler alloc] init];
     }
-    else if ([clientAppId isEqual: @"org.mozilla.firefox"]) {
+    else if ([clientAppId isEqual: @"org.mozilla.firefox"] ||
+        [clientAppId isEqual: @"com.google.Chrome"]) {
         _eventHandler = [[KMInputMethodBrowserClientEventHandler alloc] init];
-    }
-    else if ([clientAppId isEqual: @"com.google.Chrome"]) {
-        _eventHandler = [[KMInputMethodChromeClientEventHandler alloc] init];
     }
     else
         _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId];

@@ -23,7 +23,7 @@ NSUInteger _failuresToRetrieveExpectedContext;
 - (instancetype)initWithLegacyMode:(BOOL)legacy clientSelectionCanChangeUnexpectedly:(BOOL) flagClientSelectionCanChangeUnexpectedly {
     self = [super initWithLegacyMode:legacy clientSelectionCanChangeUnexpectedly: flagClientSelectionCanChangeUnexpectedly];
     if (self) {
-        _couldBeInGoogleDocs = NO;
+//        _couldBeInGoogleDocs = YES;
         _failuresToRetrieveExpectedContext = 0;
     }
     return self;
@@ -48,27 +48,41 @@ NSUInteger _failuresToRetrieveExpectedContext;
                 {
                     // Client is failing to provide useful response to attributedSubstringFromRange.
                     // Word (in MS Live) occasionally does this, but (apparently) Google Docs doesn't.
-                    _couldBeInGoogleDocs = NO;
+                    //_couldBeInGoogleDocs = NO;
                     [self setInSiteThatDoesNotGiveContext];
                 }
-                else if (!clientContext.length ||
-                    [clientContext characterAtIndex:clientContext.length - 1] !=
-                    [self.contextBuffer characterAtIndex:bufferLength - 1]) {
+                else if (!clientContext.length) {
                     if ([self AppDelegate].debugMode) {
                         NSLog(@"Expected context = '%@'", self.contextBuffer);
-                        NSLog(@"Actual clientContext = '%@'", (clientContext == nil ? @"{nil}" : clientContext));
-                        uint32_t codepoint = [clientContext characterAtIndex:clientContext.length - 1];
-                        NSLog(@"Last character in clientContext = '%lu'", (unsigned long)codepoint);
-                        codepoint = [self.contextBuffer characterAtIndex:bufferLength - 1];
-                        NSLog(@"Last character in contextBuffer = '%lu'", (unsigned long)codepoint);
+                        NSLog(@"Actual clientContext was empty");
                     }
                     _failuresToRetrieveExpectedContext++;
                 }
-                else {
-                    if ([self AppDelegate].debugMode) {
-                        NSLog(@"We got what we were expecting from the client. We can stop checking.");
+                else
+                {
+                    unichar lastCodepointExpected = [self.contextBuffer characterAtIndex:bufferLength - 1];
+                    unichar lastCodepointInClient = [clientContext characterAtIndex:clientContext.length - 1];
+                    if (lastCodepointExpected != lastCodepointInClient) {
+                        if ([self AppDelegate].debugMode) {
+                            NSLog(@"Expected context = '%@'", self.contextBuffer);
+                            NSLog(@"Actual clientContext = '%@'", (clientContext == nil ? @"{nil}" : clientContext));
+                            NSLog(@"Last character expected (in contextBuffer) = '%lu'", (unsigned long)lastCodepointExpected);
+                            NSLog(@"Last character in clientContext = '%lu'", (unsigned long)lastCodepointInClient);
+                        }
+                        // MS Word converts/reports plain spaces (32) as non-breaking spaces (160). If we
+                        // get this kind of mismatch, we don't want to count this as a definite match, but
+                        // we also don't want to count it as a failure to match. So just wait for a more
+                        // reliable character to test.
+                        if (lastCodepointInClient != 160 || lastCodepointExpected != 32) {
+                            _failuresToRetrieveExpectedContext++;
+                        }
                     }
-                    _failuresToRetrieveExpectedContext = NSUIntegerMax;
+                    else {
+                        if ([self AppDelegate].debugMode) {
+                            NSLog(@"We got what we were expecting from the client. We can stop checking.");
+                        }
+                        _failuresToRetrieveExpectedContext = NSUIntegerMax;
+                    }
                 }
             }
             else {
@@ -86,9 +100,9 @@ NSUInteger _failuresToRetrieveExpectedContext;
 
 - (void)setInSiteThatDoesNotGiveContext {
     if ([self AppDelegate].debugMode) {
-        if (_couldBeInGoogleDocs)
-            NSLog(@"Detected Google Docs or some other editor that can't provide context.");
-        else
+//        if (_couldBeInGoogleDocs)
+//            NSLog(@"Detected Google Docs or some other editor that can't provide context.");
+//        else
             NSLog(@"Detected some editor that can't provide context (not Google Docs).");
     }
     _failuresToRetrieveExpectedContext = NSUIntegerMax;
