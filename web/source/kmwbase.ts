@@ -267,6 +267,79 @@ class KeymanBase {
   ['isAttached'](x: HTMLElement): boolean {
     return this.domManager.isAttached(x);
   }
+
+  /**
+   * Function    isCJK
+   * Scope       Public
+   * @param      {Object=}  k0 
+   * @return     {boolean}
+   * Description Tests if active keyboard (or optional argument) uses a pick list (Chinese, Japanese, Korean, etc.)
+   *             (This function accepts either keyboard structure.)   
+   */    
+  ['isCJK'](k0) { 
+    return this.keyboardManager.isCJK(k0);
+  }
+
+  /**
+   * Function     isChiral
+   * Scope        Public
+   * @param       {string|Object=}   k0
+   * @return      {boolean}
+   * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
+   */
+  ['isChiral'](k0?) {
+    return this.keyboardManager.isChiral(k0);
+  }
+
+  /**
+   * Get keyboard meta data for the selected keyboard and language
+   * 
+   * @param       {string}    PInternalName     Internal name of keyboard
+   * @param       {string=}   PlgCode           language code
+   * @return      {Object}                      Details of named keyboard 
+   *                                            
+   **/    
+  ['getKeyboard'](PInternalName: string, PlgCode?: string) {
+    var Ln, Lrn;
+
+    var kbdList = this.keyboardManager.getDetailedKeyboards();
+
+    for(Ln=0; Ln < kbdList.length; Ln++) {
+      Lrn = kbdList[Ln];
+
+      if(Lrn['InternalName'] == PInternalName || Lrn['InternalName'] == "Keyboard_" + PInternalName) { 
+        if(arguments.length < 2) {
+          return Lrn;
+        }
+
+        if(Lrn['LanguageCode'] == PlgCode) {
+          return Lrn;
+        }
+      } 
+    }
+
+    return null;
+  }
+  
+  /**
+   * Get array of available keyboard stubs 
+   * 
+   * @return   {Array}     Array of available keyboards
+   * 
+   */    
+  ['getKeyboards']() {
+    return this.keyboardManager.getDetailedKeyboards();
+  }
+
+  /**
+   * Function     Initialization
+   * Scope        Public
+   * @param       {Object}  arg     object array of user-defined properties
+   * Description  KMW window initialization  
+   */    
+  ['init'](arg) {
+    this.domManager.init(arg);
+  }
 }
 
 /**

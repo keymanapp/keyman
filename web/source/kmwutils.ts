@@ -25,6 +25,27 @@ class Device {
     this.browser='';
   }
 
+  /**
+   * Get device horizontal DPI for touch devices, to set actual size of active regions
+   * Note that the actual physical DPI may be somewhat different.
+   * 
+   * @return      {number}               
+   */       
+  getDPI(): number {
+    var t=document.createElement('DIV') ,s=t.style,dpi=96;
+    if(document.readyState !== 'complete') {
+      return dpi;
+    }
+    
+    t.id='calculateDPI';
+    s.position='absolute'; s.display='block';s.visibility='hidden';
+    s.left='10px'; s.top='10px'; s.width='1in'; s.height='10px';
+    document.body.appendChild(t);
+    dpi=(typeof window.devicePixelRatio == 'undefined') ? t.offsetWidth : t.offsetWidth * window.devicePixelRatio;
+    document.body.removeChild(t);
+    return dpi;    
+  }
+
   detect(IEVersion: number) : void {
     if(navigator && navigator.userAgent) {
       var agent=navigator.userAgent;
@@ -498,27 +519,6 @@ class Util {
   }
 
   getIEVersion = this._GetIEVersion;
-
-  /**
-   * Get device horizontal DPI for touch devices, to set actual size of active regions
-   * Note that the actual physical DPI may be somewhat different.
-   * 
-   * @return      {number}               
-   */       
-  getDPI(): number {
-    var t=document.createElement('DIV') ,s=t.style,dpi=96;
-    if(document.readyState !== 'complete') {
-      return dpi;
-    }
-    
-    t.id='calculateDPI';
-    s.position='absolute'; s.display='block';s.visibility='hidden';
-    s.left='10px'; s.top='10px'; s.width='1in'; s.height='10px';
-    document.body.appendChild(t);
-    dpi=(typeof window.devicePixelRatio == 'undefined') ? t.offsetWidth : t.offsetWidth * window.devicePixelRatio;
-    document.body.removeChild(t);
-    return dpi;    
-  }
 
   /**
    * Get browser-independent computed style value for element
