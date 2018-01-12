@@ -249,15 +249,15 @@ class Util {
   /**
    * Function     attachDOMEvent: Note for most browsers, adds an event to a chain, doesn't stop existing events  
    * Scope        Public
-   * @param       {Object}    Pelem       Element to which event is being attached
+   * @param       {Object}    Pelem       Element (or IFrame-internal Document) to which event is being attached
    * @param       {string}    Peventname  Name of event without 'on' prefix
    * @param       {function(Object)}  Phandler    Event handler for event
    * @param       {boolean=}  PuseCapture True only if event to be handled on way to target element      
    * Description  Attaches event handler to element DOM event
    */  
-  attachDOMEvent(Pelem: HTMLElement, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+  attachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
     this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
-    if(Pelem.attachEvent) {
+    if(Pelem instanceof HTMLElement && Pelem.attachEvent) {
       // IE
       Pelem.attachEvent('on'+Peventname, Phandler);
     } else if(Pelem.addEventListener) {
@@ -275,8 +275,8 @@ class Util {
    * @param       {boolean=}  PuseCapture True if event was being handled on way to target element      
    * Description Detaches event handler from element [to prevent memory leaks]
    */  
-  detachDOMEvent(Pelem: HTMLElement, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
-    if(Pelem.detachEvent) {
+  detachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+    if(Pelem instanceof HTMLElement && Pelem.detachEvent) {
       Pelem.detachEvent('on'+Peventname, Phandler);
     } else if(Pelem.removeEventListener) {
       Pelem.removeEventListener(Peventname, Phandler, PuseCapture);      
@@ -343,7 +343,7 @@ class Util {
     if(Lobj instanceof Document) {
     // The following two lines are old code and may or may not still be needed - possibly should be conditioned similalry to above    
       if(Lobj && Lobj.parentWindow && Lobj.parentWindow.frameElement) { // Legacy IE.
-        return Lcurleft + this._GetAbsoluteX(Lobj.parentWindow.frameElement) - Lobj.documentElement.scrollLeft;
+        return Lcurleft + this._GetAbsoluteX(Lobj.parentWindow.frameElement as HTMLElement) - Lobj.documentElement.scrollLeft;
       }
 
       if(Lobj && Lobj.defaultView && Lobj.defaultView.frameElement) {
@@ -387,7 +387,7 @@ class Util {
     if(Lobj instanceof Document) {
       // The following two lines are old code and may or may not still be needed - possibly should be conditioned similalry to above    
       if(Lobj && Lobj.parentWindow && Lobj.parentWindow.frameElement) {
-        return Lcurtop + this._GetAbsoluteY(Lobj.parentWindow.frameElement) - Lobj.documentElement.scrollTop;
+        return Lcurtop + this._GetAbsoluteY(Lobj.parentWindow.frameElement as HTMLElement) - Lobj.documentElement.scrollTop;
       }
       if(Lobj && Lobj.defaultView && Lobj.defaultView.frameElement) {
         return Lcurtop + this._GetAbsoluteY(<HTMLElement>Lobj.defaultView.frameElement) - Lobj.documentElement.scrollTop;

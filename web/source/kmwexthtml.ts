@@ -4,13 +4,19 @@ interface Window {
 }
 
 interface Document {
-    parentWindow: any                   // Thanks again, IE.
-    selection: any                      // Is IE only; TS ignores it because of this.
+    parentWindow: Window,                  // Thanks again, IE.
+    selection: any,                     // Is IE only; TS ignores it because of this.
+
+    _KeymanWebSelectionStart: number,
+    _KeymanWebSelectionEnd: number
 }
 
 interface Element {
     _kmwAttachment: any,                // Used to track each input element's attachment data.
     shim: HTMLElement,                  // Used in subkey elements for smooth fading.
+
+    _KeymanWebSelectionStart: number,
+    _KeymanWebSelectionEnd: number,
 
     styleSheet: CSSStyleDeclaration,    // Extension of IE.  TS ignores it because of this.
     attachEvent: any,

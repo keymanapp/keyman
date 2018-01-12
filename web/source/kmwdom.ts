@@ -16,21 +16,37 @@ class DOMManager {
   /**
    * Implements the AliasElementHandlers interface for touch interaction.
    */
-  touchHandlers?: TouchHandlers;
+  touchHandlers?: DOMTouchHandlers;
 
   /**
    * Implements stubs for the AliasElementHandlers interface for non-touch interaction.
    */
-  aliasHandlers: AliasStubs;
+  nonTouchHandlers: DOMEventHandlers;
 
   constructor(keyman: KeymanBase) {
     this.keyman = keyman;
     
     if(keyman.util.device.touchable) {
-      this.touchHandlers = new TouchHandlers(keyman);
+      this.touchHandlers = new DOMTouchHandlers(keyman);
     }
 
-    this.aliasHandlers = new AliasStubs();
+    this.nonTouchHandlers = new DOMEventHandlers(keyman);
+  }
+
+  /**
+   * Function     getHandlers
+   * Scope        Private
+   * @param       {Element}   Pelem  An input, textarea, or touch-alias element from the page.
+   * @returns     {Object}    
+   */
+  getHandlers(Pelem: HTMLElement): DOMEventHandlers {
+    var _attachObj = Pelem.base ? Pelem.base._kmwAttachment : Pelem._kmwAttachment;
+
+    if(_attachObj) {
+      return _attachObj.touchable ? this.touchHandlers : this.nonTouchHandlers;
+    } else {
+      return null;
+    }
   }
 
   /**
@@ -185,6 +201,7 @@ class DOMManager {
     // On touch event, reposition the text caret and prepare for OSK input
     // Removed 'onfocus=' as that resulted in handling the event twice (on iOS, anyway) 
 
+    // We know this to be the correct set of handlers because we're setting up a touch element.
     var touchHandlers = this.touchHandlers;
     
     x.addEventListener('touchstart', touchHandlers.setFocus);
@@ -362,14 +379,14 @@ class DOMManager {
   enableInputElement(Pelem: HTMLElement, isAlias?: boolean) { 
     var baseElement = isAlias ? Pelem['base'] : Pelem;
     if(!this.isKMWDisabled(baseElement)) {
-      if(Pelem.tagName.toLowerCase() == 'iframe') {
-        (<any>this.keyman)._AttachToIframe(Pelem);
+      if(Pelem instanceof HTMLIFrameElement) {
+        this._AttachToIframe(Pelem);
       } else { 
         baseElement.className = baseElement.className ? baseElement.className + ' keymanweb-font' : 'keymanweb-font';
         this.keyman.inputList.push(Pelem);
 
-        this.keyman.util.attachDOMEvent(baseElement,'focus', (<any>this.keyman)._ControlFocus);
-        this.keyman.util.attachDOMEvent(baseElement,'blur', (<any>this.keyman)._ControlBlur);
+        this.keyman.util.attachDOMEvent(baseElement,'focus', this.getHandlers(Pelem)._ControlFocus);
+        this.keyman.util.attachDOMEvent(baseElement,'blur', this.getHandlers(Pelem)._ControlBlur);
 
         // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
         Pelem.onkeypress = (<any>this.keyman)._KeyPress;
@@ -390,8 +407,8 @@ class DOMManager {
   disableInputElement(Pelem: HTMLElement, isAlias?: boolean) { 
     var baseElement = isAlias ? Pelem['base'] : Pelem;
     // Do NOT test for pre-disabledness - we also use this to fully detach without officially 'disabling' via kmw-disabled.
-    if(Pelem.tagName.toLowerCase() == 'iframe') {
-      (<any>this.keyman)._DetachFromIframe(Pelem);
+    if(Pelem instanceof HTMLIFrameElement) {
+      this._DetachFromIframe(Pelem);
     } else { 
       var cnIndex = baseElement.className.indexOf('keymanweb-font');
       if(cnIndex > 0 && !isAlias) { // See note about the alias below.
@@ -405,8 +422,8 @@ class DOMManager {
       }
 
       if(!isAlias) { // See note about the alias below.
-        this.keyman.util.detachDOMEvent(baseElement,'focus', (<any>this.keyman)._ControlFocus);
-        this.keyman.util.detachDOMEvent(baseElement,'blur', (<any>this.keyman)._ControlBlur);
+        this.keyman.util.detachDOMEvent(baseElement,'focus', this.getHandlers(Pelem)._ControlFocus);
+        this.keyman.util.detachDOMEvent(baseElement,'blur', this.getHandlers(Pelem)._ControlBlur);
       }
       // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
       Pelem.onkeypress = null;
@@ -565,5 +582,225 @@ class DOMManager {
   clearElementAttachment(x: HTMLElement) {
     // We need to clear the object when de-attaching; helps prevent memory leaks.
     x._kmwAttachment = null;
+  }
+
+  /**
+   * Function     _AttachToIframe
+   * Scope        Private
+   * @param       {Element}      Pelem       IFrame to which KMW will be attached
+   * Description  Attaches KeymanWeb to IFrame 
+   */  
+  _AttachToIframe(Pelem: HTMLIFrameElement) {
+    var util = this.keyman.util;
+    
+    try {
+      var Lelem=Pelem.contentWindow.document;
+      /* editable Iframe */
+      if(Lelem) {
+        if(Lelem.parentWindow) {
+          // Internet Explorer
+          if(Lelem.designMode.toLowerCase() == 'on' || Lelem.body.isContentEditable) {  // I1295 - fix non-attachment for some forms of IFRAMEs
+            // I1480 - Attach to IFRAME instead of document
+            util.attachDOMEvent(Pelem,'focus', this.getHandlers(Pelem)._ControlFocus);
+            util.attachDOMEvent(Pelem,'blur', this.getHandlers(Pelem)._ControlBlur);
+            util.attachDOMEvent(Lelem,'keydown', (<any>this.keyman)._KeyDown);   // I2404 - Update for attaching to elements within IFRAMEs, don't attach to read-only IFRAMEs
+            util.attachDOMEvent(Lelem,'keypress', (<any>this.keyman)._KeyPress);
+            util.attachDOMEvent(Lelem,'keyup', (<any>this.keyman)._KeyUp);
+            
+            // I1481 - Attach to the selectionchange in the iframe (and do a selchange to get the new selection)
+            /* IE: call _SelectionChange when the user changes the selection */
+            util.attachDOMEvent(Lelem, 'selectionchange', this.getHandlers(Pelem)._SelectionChange);
+            this.getHandlers(Pelem)._SelectionChange();
+            
+          } else {
+            // Lelem is the IFrame's internal document; set 'er up!
+            this._SetupDocument(Lelem);
+          }
+        } else {
+          if(Lelem.designMode.toLowerCase() == 'on') {
+            // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
+            util.attachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
+            util.attachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
+            util.attachDOMEvent(Lelem,'keydown', (<any>this.keyman)._KeyDown);
+            util.attachDOMEvent(Lelem,'keypress', (<any>this.keyman)._KeyPress);
+            util.attachDOMEvent(Lelem,'keyup', (<any>this.keyman)._KeyUp);
+          } else {
+            // Lelem is the IFrame's internal document; set 'er up!
+            this._SetupDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
+          }
+        }
+      }
+    }
+    catch(err)
+    {
+      // do not attempt to attach to the iframe as it is from another domain - XSS denied!
+    }  
+  }
+
+      /**
+   * Function     _DetachFromIframe
+   * Scope        Private
+   * @param       {Element}      Pelem       IFrame to which KMW will be attached
+   * Description  Detaches KeymanWeb from an IFrame 
+   */  
+  _DetachFromIframe(Pelem: HTMLIFrameElement) {
+    var util = this.keyman.util;
+
+    try {
+      var Lelem=Pelem.contentWindow.document;
+      /* editable Iframe */
+      if(Lelem) {
+        if(Lelem.parentWindow) {
+          // Internet Explorer
+          if(Lelem.designMode.toLowerCase() == 'on' || Lelem.body.isContentEditable) { // I1295 - fix non-attachment for some forms of IFRAMEs
+            // I1480 - Attach to IFRAME instead of document
+            util.detachDOMEvent(Pelem,'focus', this.getHandlers(Pelem)._ControlFocus);
+            util.detachDOMEvent(Pelem,'blur', this.getHandlers(Pelem)._ControlBlur);
+            util.detachDOMEvent(Lelem,'keydown', (<any>this.keyman)._KeyDown);   // I2404 - Update for attaching to elements within IFRAMEs, don't attach to read-only IFRAMEs
+            util.detachDOMEvent(Lelem,'keypress', (<any>this.keyman)._KeyPress);
+            util.detachDOMEvent(Lelem,'keyup', (<any>this.keyman)._KeyUp);
+            
+            // I1481 - Attach to the selectionchange in the iframe (and do a selchange to get the new selection)
+            /* IE: call _SelectionChange when the user changes the selection */
+            util.detachDOMEvent(Lelem, 'selectionchange', this.getHandlers(Pelem)._SelectionChange);
+            this.getHandlers(Pelem)._SelectionChange();
+          } else {
+            // Lelem is the IFrame's internal document; set 'er up!
+            this._ClearDocument(Lelem);
+          }
+        } else {
+          if(Lelem.designMode.toLowerCase() == 'on') {
+            // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
+            util.detachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
+            util.detachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
+            util.detachDOMEvent(Lelem,'keydown', (<any>this.keyman)._KeyDown);
+            util.detachDOMEvent(Lelem,'keypress', (<any>this.keyman)._KeyPress);
+            util.detachDOMEvent(Lelem,'keyup', (<any>this.keyman)._KeyUp);
+          } else {
+            // Lelem is the IFrame's internal document; set 'er up!
+            this._ClearDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
+          }
+        }
+      }
+    }
+    catch(err)
+    {
+      // do not attempt to attach to the iframe as it is from another domain - XSS denied!
+    }  
+  }
+
+  /**
+   * Function     _GetDocumentEditables
+   * Scope        Private
+   * @param       {Element}     Pelem     HTML element
+   * @return      {Array<Element>}        A list of potentially-editable controls.  Further filtering [as with isKMWInput() and
+   *                                      isKMWDisabled()] is required.
+   */
+  _GetDocumentEditables(Pelem: HTMLElement|Document) {
+    var util = this.keyman.util;
+
+    var possibleInputs = [];
+
+    if(Pelem instanceof HTMLElement) {
+      var tagName = Pelem.tagName.toLowerCase();
+      if(tagName == 'input' || tagName == 'textarea' || tagName == 'iframe') {
+        possibleInputs.push(Pelem);
+      }
+    } else if(Pelem.nodeName == "#text") {
+      return [];
+    }
+
+    // Constructing it like this also allows for individual element filtering for the auto-attach MutationObserver without errors.
+    if(Pelem.getElementsByTagName) {
+      /**
+       * Function     LiTmp
+       * Scope        Private
+       * @param       {string}    _colon    type of element
+       * @return      {Array<Element>}  array of elements of specified type                       
+       * Description  Local function to get list of editable controls
+       */    
+      var LiTmp = function(_colon){
+        return util.arrayFromNodeList(Pelem.getElementsByTagName(_colon));
+      };
+
+      // Note that isKMWInput() will block IFRAME elements as necessary for touch-based devices.
+      possibleInputs = possibleInputs.concat(LiTmp('INPUT'), LiTmp('TEXTAREA'), LiTmp('IFRAME'));
+    }
+    
+    // Not all active browsers may support the method, but only those that do would work with contenteditables anyway.
+    if(Pelem.querySelectorAll) {
+      possibleInputs = possibleInputs.concat(util.arrayFromNodeList(Pelem.querySelectorAll('[contenteditable]')));
+    }
+    
+    if(Pelem instanceof HTMLElement && Pelem.isContentEditable) {
+      possibleInputs.push(Pelem);
+    }
+
+    return possibleInputs;
+  }
+
+  /**
+   * Function     _SetupDocument
+   * Scope        Private
+   * @param       {Element}     Pelem - the root element of a document, including IFrame documents.
+   * Description  Used to automatically attach KMW to editable controls, regardless of control path.
+   */
+  _SetupDocument(Pelem: HTMLElement|Document) { // I1961
+    var possibleInputs = this._GetDocumentEditables(Pelem);
+
+    for(var Li = 0; Li < possibleInputs.length; Li++) {
+      var input = possibleInputs[Li];
+
+      // It knows how to handle pre-loaded iframes appropriately.
+      this.attachToControl(possibleInputs[Li]);
+    }
+  }
+
+      /**
+   * Function     _ClearDocument
+   * Scope        Private
+   * @param       {Element}     Pelem - the root element of a document, including IFrame documents.
+   * Description  Used to automatically detach KMW from editable controls, regardless of control path.
+   *              Mostly used to clear out all controls of a detached IFrame.
+   */
+  _ClearDocument(Pelem: HTMLElement|Document) { // I1961
+    var possibleInputs = this._GetDocumentEditables(Pelem);
+
+    for(var Li = 0; Li < possibleInputs.length; Li++) {
+      var input = possibleInputs[Li];
+
+      // It knows how to handle pre-loaded iframes appropriately.
+      this.detachFromControl(possibleInputs[Li]);
+    }
+  }
+
+  /**
+   * Set target element text direction (LTR or RTL), but only if the element is empty
+   *    
+   * If the element base directionality is changed after it contains content, unless all the text
+   * has the same directionality, text runs will be re-ordered which is confusing and causes
+   * incorrect caret positioning
+   *    
+   * @param       {Object}      Ptarg      Target element
+   */    
+  _SetTargDir(Ptarg: HTMLElement) {  
+    var elDir=((this.keyman.keyboardManager.activeKeyboard != null) && (this.keyman.keyboardManager.activeKeyboard['KRTL'])) ? 'rtl' : 'ltr';
+
+    if(Ptarg) {
+      if(this.keyman.util.device.touchable) {
+        if(Ptarg.textContent.length == 0) {
+          Ptarg.base.dir=Ptarg.dir=elDir;
+          this.getHandlers(Ptarg).setTextCaret(Ptarg,10000);
+        }
+      } else {
+        if(Ptarg instanceof HTMLInputElement || Ptarg instanceof HTMLTextAreaElement) {
+          if(Ptarg.value.length == 0) {
+            Ptarg.dir=elDir;
+          }
+        } else if(typeof Ptarg.textContent == "string" && Ptarg.textContent.length == 0) { // As with contenteditable DIVs, for example.
+          Ptarg.dir=elDir;
+        }
+      }
+    }
   }
 }

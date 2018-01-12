@@ -137,7 +137,7 @@ if(!window['keyman']['initialized']) {
      *     
      *********************************************************/
 
-    keymanweb.touchAliasing = new AliasStubs();
+    keymanweb.touchAliasing = keymanweb.domManager.nonTouchHandlers;
 
     /**
      * Get the user-specified (or default) font for the first mapped input or textarea element
@@ -224,35 +224,6 @@ if(!window['keyman']['initialized']) {
     keymanweb._BrowserIsSafari = (navigator.userAgent.indexOf('AppleWebKit') >= 0);  // I732 END - Support for European underlying keyboards #1 
 
     /**
-     * Function     _GetEventObject
-     * Scope        Private   
-     * @param       {Event=}     e     Event object if passed by browser
-     * @return      {Event|null}       Event object              
-     * Description Gets the event object from the window when using Internet Explorer
-     *             and handles getting the event correctly in frames 
-     */     
-    keymanweb._GetEventObject=function(e)   // I2404 - Attach to controls in IFRAMEs
-    {
-      if (!e) {
-        e = window.event;
-        if(!e) {
-          var elem = keymanweb._GetLastActiveElement();
-          if(elem) {
-            elem = elem.ownerDocument;
-            if(elem) {
-              elem = elem.parentWindow;
-            }
-            if(!elem) {
-              return null;
-            }
-            e = elem.event;
-          }
-        }
-      }
-      return e;    
-    }
-
-    /**
      * Function     _push
      * Scope        Private   
      * @param       {Array}     Parray    Array   
@@ -265,129 +236,6 @@ if(!window['keyman']['initialized']) {
       if(Parray.push) Parray.push(Pval);
       else Parray=Parray.concat(Pval);
       return Parray;
-    }
-        
-    /**
-     * Function     _AttachToIframe
-     * Scope        Private
-     * @param       {Element}      Pelem       IFrame to which KMW will be attached
-     * Description  Attaches KeymanWeb to IFrame 
-     */  
-    keymanweb._AttachToIframe = function(Pelem)
-    {      
-      try
-      {
-        var Lelem=Pelem.contentWindow.document;
-        /* editable Iframe */
-        if(Lelem)
-        {
-          if(Lelem.parentWindow)
-          {
-            // Internet Explorer
-            if(Lelem.designMode.toLowerCase() == 'on' || Lelem.body.isContentEditable)   // I1295 - fix non-attachment for some forms of IFRAMEs
-            {
-              // I1480 - Attach to IFRAME instead of document
-              util.attachDOMEvent(Pelem,'focus', keymanweb._ControlFocus);
-              util.attachDOMEvent(Pelem,'blur', keymanweb._ControlBlur);
-              util.attachDOMEvent(Lelem,'keydown', keymanweb._KeyDown);   // I2404 - Update for attaching to elements within IFRAMEs, don't attach to read-only IFRAMEs
-              util.attachDOMEvent(Lelem,'keypress', keymanweb._KeyPress);
-              util.attachDOMEvent(Lelem,'keyup', keymanweb._KeyUp);
-              
-              // I1481 - Attach to the selectionchange in the iframe (and do a selchange to get the new selection)
-              /* IE: call _SelectionChange when the user changes the selection */
-              util.attachDOMEvent(Lelem, 'selectionchange', keymanweb._SelectionChange);
-              keymanweb._SelectionChange();
-              
-            }
-            else {
-              // Lelem is the IFrame's internal document; set 'er up!
-              keymanweb._SetupDocument(Lelem);
-            }
-          }
-          else
-          {
-            if(Lelem.designMode.toLowerCase() == 'on')
-            {
-              // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
-              util.attachDOMEvent(Lelem,'focus', keymanweb._ControlFocus);
-              util.attachDOMEvent(Lelem,'blur', keymanweb._ControlBlur);
-              util.attachDOMEvent(Lelem,'keydown', keymanweb._KeyDown);
-              util.attachDOMEvent(Lelem,'keypress', keymanweb._KeyPress);
-              util.attachDOMEvent(Lelem,'keyup', keymanweb._KeyUp);
-            }
-            else
-            {
-              // Lelem is the IFrame's internal document; set 'er up!
-              keymanweb._SetupDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
-            }
-          }
-        }
-      }
-      catch(err)
-      {
-        // do not attempt to attach to the iframe as it is from another domain - XSS denied!
-      }  
-    }
-
-        /**
-     * Function     _DetachFromIframe
-     * Scope        Private
-     * @param       {Element}      Pelem       IFrame to which KMW will be attached
-     * Description  Detaches KeymanWeb from an IFrame 
-     */  
-    keymanweb._DetachFromIframe = function(Pelem)
-    {      
-      try
-      {
-        var Lelem=Pelem.contentWindow.document;
-        /* editable Iframe */
-        if(Lelem)
-        {
-          if(Lelem.parentWindow)
-          {
-            // Internet Explorer
-            if(Lelem.designMode.toLowerCase() == 'on' || Lelem.body.isContentEditable)   // I1295 - fix non-attachment for some forms of IFRAMEs
-            {
-              // I1480 - Attach to IFRAME instead of document
-              util.detachDOMEvent(Pelem,'focus', keymanweb._ControlFocus);
-              util.detachDOMEvent(Pelem,'blur', keymanweb._ControlBlur);
-              util.detachDOMEvent(Lelem,'keydown', keymanweb._KeyDown);   // I2404 - Update for attaching to elements within IFRAMEs, don't attach to read-only IFRAMEs
-              util.detachDOMEvent(Lelem,'keypress', keymanweb._KeyPress);
-              util.detachDOMEvent(Lelem,'keyup', keymanweb._KeyUp);
-              
-              // I1481 - Attach to the selectionchange in the iframe (and do a selchange to get the new selection)
-              /* IE: call _SelectionChange when the user changes the selection */
-              util.detachDOMEvent(Lelem, 'selectionchange', keymanweb._SelectionChange);
-              keymanweb._SelectionChange();
-            }
-            else {
-              // Lelem is the IFrame's internal document; set 'er up!
-              keymanweb._ClearDocument(Lelem);
-            }
-          }
-          else
-          {
-            if(Lelem.designMode.toLowerCase() == 'on')
-            {
-              // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
-              util.detachDOMEvent(Lelem,'focus', keymanweb._ControlFocus);
-              util.detachDOMEvent(Lelem,'blur', keymanweb._ControlBlur);
-              util.detachDOMEvent(Lelem,'keydown', keymanweb._KeyDown);
-              util.detachDOMEvent(Lelem,'keypress', keymanweb._KeyPress);
-              util.detachDOMEvent(Lelem,'keyup', keymanweb._KeyUp);
-            }
-            else
-            {
-              // Lelem is the IFrame's internal document; set 'er up!
-              keymanweb._ClearDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
-            }
-          }
-        }
-      }
-      catch(err)
-      {
-        // do not attempt to attach to the iframe as it is from another domain - XSS denied!
-      }  
     }
       
     /**
@@ -652,166 +500,6 @@ if(!window['keyman']['initialized']) {
     }      
 
   //TODO: add more complete description of what ControlFocus really does
-
-    /**
-     * Respond to KeymanWeb-aware input element receiving focus 
-     * 
-     * @param       {Event}       e       Event object
-     * @return      {boolean}             always true  (?) 
-     */    
-    keymanweb._ControlFocus = function(e) {
-      var Ltarg, Ln;
-      if(!keymanweb._Enabled) {
-        return true;
-      }
-      e = keymanweb._GetEventObject(e);     // I2404 - Manage IE events in IFRAMEs
-      Ltarg = util.eventTarget(e);
-      if (Ltarg == null) {
-        return true;
-      }
-    
-      // Prevent any action if a protected input field
-      if(device.touchable && (Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0)) {
-        return true;
-      }
-
-      // Or if not a remappable input field
-      var en=Ltarg.nodeName.toLowerCase();
-      if(en == 'input') {
-        var et=Ltarg.type.toLowerCase();
-        if(!(et == 'text' || et == 'search')) {
-          return true;
-        }
-      } else if((device.touchable || !Ltarg.isContentEditable) && en != 'textarea') {
-        return true;
-      }
-
-      keymanweb._ActiveElement=Ltarg;  // I3363 (Build 301)  
-
-      if (Ltarg.nodeType == 3) { // defeat Safari bug
-        Ltarg = Ltarg.parentNode;
-      }
-        
-      var LfocusTarg = Ltarg;
-
-      // Ensure that focussed element is visible above the keyboard
-      if(device.touchable && (Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0)) {
-        keymanweb.touchAliasing.scrollBody(Ltarg);
-      }
-          
-      if(Ltarg.tagName=='IFRAME') { //**TODO: check case reference
-        keymanweb._AttachToIframe(Ltarg);
-        Ltarg=Ltarg.contentWindow.document;
-      }
-          
-      //??keymanweb._Selection = null;
-
-      // We condition on 'priorElement' below as a check to allow KMW to set a default active keyboard.
-      var priorElement = keymanweb._LastActiveElement;
-      keymanweb._LastActiveElement = Ltarg;
-
-      if(keymanweb._JustActivatedKeymanWebUI) {
-        keymanweb._BlurKeyboardSettings();
-      } else {
-        keymanweb._FocusKeyboardSettings(priorElement ? false : true);
-      }
-
-      // Always do the common focus stuff, instantly returning if we're in an editable iframe.
-      if(keymanweb._CommonFocusHelper(Ltarg)) {
-        return true;
-      };
-
-      Ltarg._KeymanWebSelectionStart = Ltarg._KeymanWebSelectionEnd = null; // I3363 (Build 301)
-
-      // Set element directionality (but only if element is empty)
-      keymanweb._SetTargDir(Ltarg); 
-
-      //Execute external (UI) code needed on focus if required
-      keymanweb.doControlFocused(LfocusTarg,keymanweb._LastActiveElement);
-    
-      // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
-      if(device.touchable) {
-        osk._Enabled=1;
-      } else {
-        // Conditionally show the OSK when control receives the focus
-        if(osk.ready) {
-          if(keymanweb.keyboardManager.isCJK()) {
-            osk._Enabled=1;
-          }
-          if(osk._Enabled) {
-            osk._Show();
-          } else {
-            osk._Hide(false);
-          }
-        }
-      }
-
-      return true;
-    }  
-    
-    /**
-     * Function             _BlurKeyboardSettings
-     * Description          Stores the last active element's keyboard settings.  Should be called
-     *                      whenever a KMW-enabled page element loses control.
-     */
-    keymanweb._BlurKeyboardSettings = function() {
-      var keyboardID = keymanweb.keyboardManager.activeKeyboard ? keymanweb.keyboardManager.activeKeyboard['KI'] : '';
-      
-      if(keymanweb._LastActiveElement && keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
-        keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
-        keymanweb._LastActiveElement._kmwAttachment.languageCode = keymanweb.getActiveLanguage();
-      } else {
-        keymanweb.globalKeyboard = keyboardID;
-        keymanweb.globalLanguageCode = keymanweb.getActiveLanguage();
-      }
-    }
-
-    /**
-     * Function             _FocusKeyboardSettings
-     * @param   {boolean}   blockGlobalChange   A flag indicating if the global keyboard setting should be ignored for this call.
-     * Description          Restores the newly active element's keyboard settings.  Should be called
-     *                      whenever a KMW-enabled page element gains control, but only once the prior
-     *                      element's loss of control is guaranteed.
-     */ 
-    keymanweb._FocusKeyboardSettings = function(blockGlobalChange) {      
-      if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
-        keymanweb.keyboardManager.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
-          keymanweb._LastActiveElement._kmwAttachment.languageCode); 
-      } else if(!blockGlobalChange) { 
-        keymanweb.keyboardManager.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
-      }
-    }
-
-    /**
-     * Function             _CommonFocusHelper
-     * @param   {Element}   target 
-     * @returns {boolean}
-     * Description          Performs common state management for the various focus events of KeymanWeb.                      
-     *                      The return value indicates whether (true) or not (false) the calling event handler 
-     *                      should be terminated immediately after the call.
-     */
-    keymanweb._CommonFocusHelper = function(target) {
-      //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
-      //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
-      if(!keymanweb._IsIEEditableIframe(target,1) || !keymanweb._IsMozillaEditableIframe(target,1)) {
-        keymanweb._DisableInput = 1; 
-        return true;
-      }
-      keymanweb._DisableInput = 0;
-  
-      if(!keymanweb._JustActivatedKeymanWebUI) {
-        keymanweb._DeadKeys = [];
-        keymanweb._NotifyKeyboard(0,target,1);  // I2187
-      }
-    
-      if(!keymanweb._JustActivatedKeymanWebUI  &&  keymanweb._SelectionControl != target) {
-        keymanweb._IsActivatingKeymanWebUI = 0;
-      }
-      keymanweb._JustActivatedKeymanWebUI = 0;
-  
-      keymanweb._SelectionControl = target;
-      return false;
-    }
     
     /**
      * Function     _IsIEEditableIframe
@@ -839,109 +527,6 @@ if(!window['keyman']['initialized']) {
     {
       var Ldv, Lvalid = Pelem  &&  (Ldv=Pelem.defaultView)  &&  Ldv.frameElement;
       return (!PtestOn  &&  Lvalid) || (PtestOn  &&  (!Lvalid || Ldv.document.designMode.toLowerCase()=='on'));
-    }
-      
-    /**
-     * Respond to KMW losing focus on event
-     * 
-     * @param       {Event}       e       Event object
-     * @return      {boolean}             Always true  (?) 
-     */    
-    keymanweb._ControlBlur = function(e) {
-      var Ltarg;  
-
-      if(!keymanweb._Enabled) {
-        return true;
-      }
-
-      e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      Ltarg = util.eventTarget(e);
-      if (Ltarg == null) {
-        return true;
-      }
-
-      keymanweb._ActiveElement = null; // I3363 (Build 301)
-
-      // Hide the touch device input caret, if applicable  I3363 (Build 301)
-      if(device.touchable) {
-        keymanweb.touchAliasing.hideCaret();
-      }
-          
-      if (Ltarg.nodeType == 3) { // defeat Safari bug
-        Ltarg = Ltarg.parentNode;
-      }
-
-      if(Ltarg.tagName=='IFRAME') {
-        Ltarg=Ltarg.contentWindow.document;
-      }
-        
-      if (Ltarg.setSelectionRange) {                                           
-        //Ltarg._KeymanWebSelectionStart = Ltarg.selectionStart;
-        //Ltarg._KeymanWebSelectionEnd = Ltarg.selectionEnd;
-        Ltarg._KeymanWebSelectionStart = Ltarg.value._kmwCodeUnitToCodePoint(Ltarg.selectionStart);  //I3319
-        Ltarg._KeymanWebSelectionEnd = Ltarg.value._kmwCodeUnitToCodePoint(Ltarg.selectionEnd);  //I3319
-        
-      }
-      
-      ////keymanweb._SelectionControl = null;    
-      keymanweb._BlurKeyboardSettings();
-
-      // Now that we've handled all prior-element maintenance, update the 'last active element'.
-      keymanweb._LastActiveElement = Ltarg;
-
-      /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects should be restrained to this control in case
-      * the user is manually specifying languages on a per-control basis.
-      */
-      keymanweb._JustActivatedKeymanWebUI = 0;
-      
-      if(!keymanweb._IsActivatingKeymanWebUI) {
-        keymanweb._NotifyKeyboard(0,Ltarg,0);  // I2187
-      }
-
-      e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs  //TODO: is this really needed again????
-      keymanweb.doControlBlurred(Ltarg,e,keymanweb._IsActivatingKeymanWebUI);
-
-      // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
-      if(osk.ready && !keymanweb._IsActivatingKeymanWebUI) {
-        osk._Hide(false);
-      }
-
-      return true;
-    }
-
-    /****************************************************************
-     *  
-     * Provide for external processing on events
-     *    
-     ***************************************************************/     
-    
-    /**
-     * Function     doControlBlurred
-     * Scope        Private
-     * @param       {Object}            _target       element losing focus
-     * @param       {Event}             _event        event object
-     * @param       {(boolean|number)}  _isActivating activation state
-     * @return      {boolean}      
-     * Description  Execute external (UI) code needed on blur
-     */       
-    keymanweb.doControlBlurred = function(_target,_event,_isActivating)
-    {
-      var p={}; p['target']=_target; p['event']=_event; p['isActivating']=_isActivating;
-      return util.callEvent('kmw.controlblurred',p);
-    }
-
-    /**
-     * Function     doControlFocused
-     * Scope        Private
-     * @param       {Object}            _target         element gaining focus
-     * @param       {Object}            _activeControl  currently active control
-     * @return      {boolean}   
-     * Description  Execute external (UI) code needed on focus
-     */       
-    keymanweb.doControlFocused = function(_target,_activeControl)
-    {
-      var p={}; p['target']=_target; p['activeControl']=_activeControl;  
-      return util.callEvent('kmw.controlfocused',p);
     }
 
     /**
@@ -1173,53 +758,6 @@ if(!window['keyman']['initialized']) {
       
       return s;
     }
-
-    /**
-     * Function   _SelectionChange
-     * Scope      Private
-     * @return    {boolean} 
-     * Description Respond to selection change event 
-     */
-    keymanweb._SelectionChange = function()
-    {
-      if(keymanweb._IgnoreNextSelChange)
-      {
-        keymanweb._IgnoreNextSelChange--;
-      }
-      else
-      {
-        var Ls=document.selection;
-        if(Ls.type.toLowerCase()!='control') //  &&  document.selection.createRange().parentElement() == keymanweb._SelectionControl) //  &&  window.event.srcElement == keymanweb._SelectionControl)
-        {
-          var Lrange=Ls.createRange();
-          if(!keymanweb._Selection || !keymanweb._Selection.isEqual(Lrange))
-          {
-            keymanweb._Selection = Lrange;
-
-            /* Delete deadkeys for IE when certain keys pressed */
-            kbdInterface.clearDeadkeys();
-          }
-        }
-      }
-      return true;
-    }
-    
-    /**
-     * Function     _NotifyKeyboard
-     * Scope        Private
-     * @param       {number}    _PCommand     event code (16,17,18) or 0
-     * @param       {Object}    _PTarget      target element
-     * @param       {number}    _PData        1 or 0    
-     * Description  Notifies keyboard of keystroke or other event
-     */    
-    keymanweb._NotifyKeyboard = function(_PCommand,_PTarget,_PData) { // I2187
-      var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
-
-      if(activeKeyboard != null && typeof(activeKeyboard['KNS']) == 'function') {
-        activeKeyboard['KNS'](_PCommand,_PTarget,_PData);
-      }
-    }
-    
     
     /**
      * Function     _KeyDown
@@ -1269,7 +807,7 @@ if(!window['keyman']['initialized']) {
         case 144:
         case 145:
           // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-          keymanweb._NotifyKeyboard(Levent.Lcode,Levent.Ltarg,1); 
+          keymanweb.keyboardManager.notifyKeyboard(Levent.Lcode,Levent.Ltarg,1); 
           if(!device.touchable) {
             return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
           } else {
@@ -1278,7 +816,7 @@ if(!window['keyman']['initialized']) {
       }
 
       if(Levent.LmodifierChange) {
-        keymanweb._NotifyKeyboard(0,Levent.Ltarg,1); 
+        keymanweb.keyboardManager.notifyKeyboard(0,Levent.Ltarg,1); 
         osk._UpdateVKShift(Levent, 0, 1);
       }
       
@@ -1472,7 +1010,7 @@ if(!window['keyman']['initialized']) {
         case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
         case 144:
         case 145:
-          keymanweb._NotifyKeyboard(Levent.Lcode,Levent.Ltarg,0);
+          keymanweb.keyboardManager.notifyKeyboard(Levent.Lcode,Levent.Ltarg,0);
           if(!device.touchable) {
             return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1);  // I2187
           } else {
@@ -1481,7 +1019,7 @@ if(!window['keyman']['initialized']) {
       }
       
       if(Levent.LmodifierChange){
-        keymanweb._NotifyKeyboard(0,Levent.Ltarg,0); 
+        keymanweb.keyboardManager.notifyKeyboard(0,Levent.Ltarg,0); 
         osk._UpdateVKShift(Levent, 0, 1);  // I2187
       }
 
@@ -1620,38 +1158,6 @@ if(!window['keyman']['initialized']) {
 
       return osk.modifierBitmasks['NON_CHIRAL'];
     }
-    
-    /**
-     * Allow to change active keyboard by (internal) keyboard name
-     * 
-     * @param       {string}    PInternalName   Internal name
-     * @param       {string}    PLgCode         Language code
-     */    
-    keymanweb['setActiveKeyboard'] = function(PInternalName,PLgCode) {
-      keymanweb.keyboardManager.setActiveKeyboard(PInternalName,PLgCode);
-    }
-    
-    /**
-     * Function     getActiveKeyboard
-     * Scope        Public
-     * @return      {string}      Name of active keyboard
-     * Description  Return internal name of currently active keyboard
-     */    
-    keymanweb['getActiveKeyboard'] = function() {
-      return keymanweb.keyboardManager.getActiveKeyboardName();
-    }
-
-    /**
-     * Function    getActiveLanguage
-     * Scope       Public
-     * @return     {string}         language code
-     * Description Return language code for currently selected language
-     */    
-    keymanweb['getActiveLanguage'] = keymanweb.getActiveLanguage = function()
-    {
-      if((<KeymanBase>keymanweb).keyboardManager.activeStub == null) return '';
-      return (<KeymanBase>keymanweb).keyboardManager.activeStub['KLC'];
-    }
 
   //TODO: find all references to next three routines and disambiguate!!
     
@@ -1723,89 +1229,6 @@ if(!window['keyman']['initialized']) {
     
     // Attach this handler to window unload event  
     util.attachDOMEvent(window, 'unload', keymanweb._WindowUnload,false);  // added fourth argument (default value)
-
-    /**
-     * Function     _GetDocumentEditables
-     * Scope        Private
-     * @param       {Element}     Pelem     HTML element
-     * @return      {Array<Element>}        A list of potentially-editable controls.  Further filtering [as with isKMWInput() and
-     *                                      isKMWDisabled()] is required.
-     */
-    keymanweb._GetDocumentEditables = function(Pelem) {
-      var possibleInputs = [];
-
-      if(Pelem.tagName) {
-        var tagName = Pelem.tagName.toLowerCase();
-        if(tagName == 'input' || tagName == 'textarea' || tagName == 'iframe') {
-          possibleInputs.push(Pelem);
-        }
-      } else if(Pelem.nodeName == "#text") {
-        return [];
-      }
-
-      // Constructing it like this also allows for individual element filtering for the auto-attach MutationObserver without errors.
-      if(Pelem.getElementsByTagName) {
-        /**
-         * Function     LiTmp
-         * Scope        Private
-         * @param       {string}    _colon    type of element
-         * @return      {Array<Element>}  array of elements of specified type                       
-         * Description  Local function to get list of editable controls
-         */    
-        var LiTmp = function(_colon){
-          return util.arrayFromNodeList(Pelem.getElementsByTagName(_colon));
-        };
-
-        // Note that isKMWInput() will block IFRAME elements as necessary for touch-based devices.
-        possibleInputs = possibleInputs.concat(LiTmp('INPUT'), LiTmp('TEXTAREA'), LiTmp('IFRAME'));
-      }
-      
-      // Not all active browsers may support the method, but only those that do would work with contenteditables anyway.
-      if(Pelem.querySelectorAll) {
-        possibleInputs = possibleInputs.concat(util.arrayFromNodeList(Pelem.querySelectorAll('[contenteditable]')));
-      }
-      
-      if(Pelem.isContentEditable) {
-        possibleInputs.push(Pelem);
-      }
-
-      return possibleInputs;
-    }
-
-    /**
-     * Function     _SetupDocument
-     * Scope        Private
-     * @param       {Element}     Pelem - the root element of a document, including IFrame documents.
-     * Description  Used to automatically attach KMW to editable controls, regardless of control path.
-     */
-    keymanweb._SetupDocument = function(Pelem) { // I1961
-      var possibleInputs = keymanweb._GetDocumentEditables(Pelem);
-
-      for(var Li = 0; Li < possibleInputs.length; Li++) {
-        var input = possibleInputs[Li];
-
-        // It knows how to handle pre-loaded iframes appropriately.
-        keymanweb.domManager.attachToControl(possibleInputs[Li]);
-      }
-    }
-
-        /**
-     * Function     _ClearDocument
-     * Scope        Private
-     * @param       {Element}     Pelem - the root element of a document, including IFrame documents.
-     * Description  Used to automatically detach KMW from editable controls, regardless of control path.
-     *              Mostly used to clear out all controls of a detached IFrame.
-     */
-    keymanweb._ClearDocument = function(Pelem) { // I1961
-      var possibleInputs = keymanweb._GetDocumentEditables(Pelem);
-
-      for(var Li = 0; Li < possibleInputs.length; Li++) {
-        var input = possibleInputs[Li];
-
-        // It knows how to handle pre-loaded iframes appropriately.
-        keymanweb.domManager.detachFromControl(possibleInputs[Li]);
-      }
-    }
     
     /**
      * Return a path that has is always terminated by a slash
@@ -2014,7 +1437,7 @@ if(!window['keyman']['initialized']) {
       // Initialize browser interface
 
       if(keymanweb.options['attachType'] != 'manual') {
-        keymanweb._SetupDocument(document.documentElement);
+        keymanweb.domManager._SetupDocument(document.documentElement);
       }
 
       // Create an ordered list of all input and textarea fields
@@ -2099,8 +1522,9 @@ if(!window['keyman']['initialized']) {
       //document.body.appendChild(keymanweb._StyleBlock);
 
       // IE: call _SelectionChange when the user changes the selection 
-      if(document.selection)
-        util.attachDOMEvent(document, 'selectionchange', keymanweb._SelectionChange);
+      if(document.selection) {
+        util.attachDOMEvent(document, 'selectionchange', keymanweb.domManager.nonTouchHandlers._SelectionChange);
+      }
     
       // Restore and reload the currently selected keyboard, selecting a default keyboard if necessary.
       keymanweb.keyboardManager.restoreCurrentKeyboard(); 
@@ -2166,11 +1590,11 @@ if(!window['keyman']['initialized']) {
         var mutation = mutations[i];
         
         for(var j=0; j < mutation.addedNodes.length; j++) {
-          inputElementAdditions = inputElementAdditions.concat(keymanweb._GetDocumentEditables(mutation.addedNodes[j]));
+          inputElementAdditions = inputElementAdditions.concat(keymanweb.domManager._GetDocumentEditables(mutation.addedNodes[j]));
         }          
 
         for(j = 0; j < mutation.removedNodes.length; j++) {
-          inputElementRemovals = inputElementRemovals.concat(keymanweb._GetDocumentEditables(mutation.removedNodes[j]));
+          inputElementRemovals = inputElementRemovals.concat(keymanweb.domManager._GetDocumentEditables(mutation.removedNodes[j]));
         }
       }
 
@@ -2440,35 +1864,6 @@ if(!window['keyman']['initialized']) {
       return {start: start, end: end}; 
     }
     // *** I3319 Supplementary Plane modifications - end new code
-  
-    /**
-     * Set target element text direction (LTR or RTL), but only if the element is empty
-     *    
-     * If the element base directionality is changed after it contains content, unless all the text
-     * has the same directionality, text runs will be re-ordered which is confusing and causes
-     * incorrect caret positioning
-     *    
-     * @param       {Object}      Ptarg      Target element
-     */    
-    keymanweb._SetTargDir = function(Ptarg) {  
-      var elDir=((keymanweb.keyboardManager.activeKeyboard != null) && (keymanweb.keyboardManager.activeKeyboard['KRTL'])) ? 'rtl' : 'ltr';  
-      if(Ptarg) {
-        if(device.touchable) {
-          if(Ptarg.textContent.length == 0) {
-            Ptarg.base.dir=Ptarg.dir=elDir;
-            keymanweb.touchAliasing.setTextCaret(Ptarg,10000);
-          }
-        } else {
-          if(typeof Ptarg.value == "string") {
-            if(Ptarg.value.length == 0) {
-              Ptarg.dir=elDir;
-            }
-          } else if(typeof Ptarg.textContent == "string" && Ptarg.textContent.length == 0) { // As with contenteditable DIVs, for example.
-            Ptarg.dir=elDir;
-          }
-        }
-      }
-    }
     
     /**
      * Reset OSK shift states when entering or exiting the active element

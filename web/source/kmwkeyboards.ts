@@ -100,6 +100,13 @@ class KeyboardManager {
     return this.activeKeyboard ? this.activeKeyboard['KI'] : '';
   }
 
+  getActiveLanguage(): string {
+    if(this.activeStub == null) {
+      return '';
+    } else {
+      return this.activeStub['KLC'];
+    }
+  }
       
   /**
    * Get an associative array of keyboard identification strings
@@ -438,7 +445,7 @@ class KeyboardManager {
     for(Ln=0; Ln<this.keyboards.length; Ln++) { // I1511 - array prototype extended
       if(this.keyboards[Ln]['KI'] == PInternalName) {
         this.activeKeyboard = this.keyboards[Ln];
-        (<any>this.keymanweb)._SetTargDir(this.keymanweb._LastActiveElement);  // I2077 - LTR/RTL timing
+        this.keymanweb.domManager._SetTargDir(this.keymanweb._LastActiveElement);  // I2077 - LTR/RTL timing
       
         // and update the active stub
         for(var Ls=0; Ls<this.keyboardStubs.length; Ls++) {
@@ -527,7 +534,7 @@ class KeyboardManager {
           return;
         }
       }
-      (<any>this.keymanweb)._SetTargDir(this.keymanweb._LastActiveElement);  // I2077 - LTR/RTL timing
+      this.keymanweb.domManager._SetTargDir(this.keymanweb._LastActiveElement);  // I2077 - LTR/RTL timing
     } 
 
     var Pk=this.activeKeyboard;  // I3319
@@ -592,7 +599,7 @@ class KeyboardManager {
 
           if((<any>manager.keymanweb)._LastActiveElement != null) {
             (<any>manager.keymanweb)._JustActivatedKeymanWebUI = 1;
-            (<any>manager.keymanweb)._SetTargDir(manager.keymanweb._LastActiveElement);            
+            <any>manager.keymanweb.domManager._SetTargDir(manager.keymanweb._LastActiveElement);            
           }
 
           String.kmwEnableSupplementaryPlane(kbdStub && ((kbdStub['KS'] && (kbdStub['KS'] == 1)) || (kbd['KN'] == 'Hieroglyphic'))); // I3319 - SMP extension, I3363 (Build 301)
@@ -1350,5 +1357,22 @@ class KeyboardManager {
     p['languageCode']=_languageCode; 
     p['indirect']=(arguments.length > 2 ? _indirect : false);
     return this.keymanweb.util.callEvent('kmw.keyboardchange', p);
+  }
+
+      
+  /**
+   * Function     _NotifyKeyboard
+   * Scope        Private
+   * @param       {number}    _PCommand     event code (16,17,18) or 0
+   * @param       {Object}    _PTarget      target element
+   * @param       {number}    _PData        1 or 0    
+   * Description  Notifies keyboard of keystroke or other event
+   */    
+  notifyKeyboard = function(_PCommand: number, _PTarget: HTMLElement|Document, _PData: number) { // I2187
+    var activeKeyboard = this.activeKeyboard;
+
+    if(activeKeyboard != null && typeof(activeKeyboard['KNS']) == 'function') {
+      activeKeyboard['KNS'](_PCommand, _PTarget, _PData);
+    }
   }
 }

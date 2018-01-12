@@ -166,7 +166,7 @@
    *    
    * @param       {Object}      Ptarg      Target element
    */    
-  keymanweb._SetTargDir = function(Ptarg){};
+  keymanweb.domManager._SetTargDir = function(Ptarg){};
   
   /**
    * Align input fields (should not be needed with KMEI, KMEA)

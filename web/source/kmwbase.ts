@@ -19,6 +19,7 @@ var keyman: KeymanBase = window['keyman'] || {};
 class KeymanBase {
   _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
   _Enabled = 1;              // Is KeymanWeb running?
+  _DisableInput = 0;         // Should input be disabled?
   _IE = 0;                   // browser version identification
   legacy = 0;                // set true for IE 3,4,5 (I2186 - multiple IE tweaks needed)
   _IsActivatingKeymanWebUI = 0;    // ActivatingKeymanWebUI - is the KeymanWeb DIV in process of being clicked on?
@@ -140,6 +141,37 @@ class KeymanBase {
     return this.util.addEventListener('kmw.'+event, func);
   }
 
+    /**
+   * Function     _GetEventObject
+   * Scope        Private   
+   * @param       {Event=}     e     Event object if passed by browser
+   * @return      {Event|null}       Event object              
+   * Description Gets the event object from the window when using Internet Explorer
+   *             and handles getting the event correctly in frames 
+   */     
+  _GetEventObject<E extends Event>(e: E) {  // I2404 - Attach to controls in IFRAMEs
+    if (!e) {
+      e = window.event as E;
+      if(!e) {
+        var elem: HTMLElement|Document = (<any>this)._GetLastActiveElement();
+        if(elem) {
+          elem = elem.ownerDocument;
+          var win: Window;
+          if(elem) {
+            win = elem.parentWindow;
+          }
+          if(!win) {
+            return null;
+          }
+          
+          e = win.event as E;
+        }
+      }
+    }
+    
+    return e;    
+  }
+
   // Base object API definitions
 
   /**
@@ -202,6 +234,36 @@ class KeymanBase {
    */  
   ['removeKeyboards'](x) {
     return this.keyboardManager.removeKeyboards(x);
+  }
+
+  /**
+   * Allow to change active keyboard by (internal) keyboard name
+   * 
+   * @param       {string}    PInternalName   Internal name
+   * @param       {string}    PLgCode         Language code
+   */    
+  ['setActiveKeyboard'](PInternalName: string, PLgCode: string) {
+    this.keyboardManager.setActiveKeyboard(PInternalName,PLgCode);
+  }
+  
+  /**
+   * Function     getActiveKeyboard
+   * Scope        Public
+   * @return      {string}      Name of active keyboard
+   * Description  Return internal name of currently active keyboard
+   */    
+  ['getActiveKeyboard'](): string {
+    return this.keyboardManager.getActiveKeyboardName();
+  }
+
+  /**
+   * Function    getActiveLanguage
+   * Scope       Public
+   * @return     {string}         language code
+   * Description Return language code for currently selected language
+   */    
+  ['getActiveLanguage'](): string {
+    return this.keyboardManager.getActiveLanguage();
   }
 }
 
