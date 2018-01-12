@@ -23,6 +23,7 @@ NSUInteger _failuresToRetrieveExpectedContext;
 - (instancetype)initWithLegacyMode:(BOOL)legacy clientSelectionCanChangeUnexpectedly:(BOOL) flagClientSelectionCanChangeUnexpectedly {
     self = [super initWithLegacyMode:legacy clientSelectionCanChangeUnexpectedly: flagClientSelectionCanChangeUnexpectedly];
     if (self) {
+        _couldBeInGoogleDocs = NO;
         _failuresToRetrieveExpectedContext = 0;
     }
     return self;
@@ -38,10 +39,29 @@ NSUInteger _failuresToRetrieveExpectedContext;
             NSUInteger location = [client selectedRange].location;
             
             if (location != NSNotFound && location > 0) {
-                NSString *clientContext = [[client attributedSubstringFromRange:NSMakeRange(0, location)] string];
-                if (clientContext == nil || !clientContext.length ||
+                if ([self AppDelegate].debugMode)
+                    NSLog(@"Trying to get context up to location %lu", location);
+                NSString* clientContext = nil;
+                if ([client respondsToSelector:@selector(attributedSubstringFromRange:)])
+                    clientContext = [[client attributedSubstringFromRange:NSMakeRange(0, location)] string];
+                if (clientContext == nil)
+                {
+                    // Client is failing to provide useful response to attributedSubstringFromRange.
+                    // Word (in MS Live) occasionally does this, but (apparently) Google Docs doesn't.
+                    _couldBeInGoogleDocs = NO;
+                    [self setInSiteThatDoesNotGiveContext];
+                }
+                else if (!clientContext.length ||
                     [clientContext characterAtIndex:clientContext.length - 1] !=
                     [self.contextBuffer characterAtIndex:bufferLength - 1]) {
+                    if ([self AppDelegate].debugMode) {
+                        NSLog(@"Expected context = '%@'", self.contextBuffer);
+                        NSLog(@"Actual clientContext = '%@'", (clientContext == nil ? @"{nil}" : clientContext));
+                        uint32_t codepoint = [clientContext characterAtIndex:clientContext.length - 1];
+                        NSLog(@"Last character in clientContext = '%lu'", (unsigned long)codepoint);
+                        codepoint = [self.contextBuffer characterAtIndex:bufferLength - 1];
+                        NSLog(@"Last character in contextBuffer = '%lu'", (unsigned long)codepoint);
+                    }
                     _failuresToRetrieveExpectedContext++;
                 }
                 else {
@@ -52,22 +72,27 @@ NSUInteger _failuresToRetrieveExpectedContext;
                 }
             }
             else {
+                if ([self AppDelegate].debugMode) {
+                    NSLog(@"bufferLength is %lu, but location was %lu.", bufferLength, location);
+                }
                 _failuresToRetrieveExpectedContext++;
             }
             
             if (_failuresToRetrieveExpectedContext == 3)
-            {
-                if ([self AppDelegate].debugMode) {
-                    NSLog(@"Detected Google Docs or some other editor that can't provide context.");
-                }
-                _failuresToRetrieveExpectedContext = NSUIntegerMax;
-                [self setInGoogleDocs];
-            }
+                [self setInSiteThatDoesNotGiveContext];
         }
     }
 }
 
-- (void)setInGoogleDocs {
+- (void)setInSiteThatDoesNotGiveContext {
+    if ([self AppDelegate].debugMode) {
+        if (_couldBeInGoogleDocs)
+            NSLog(@"Detected Google Docs or some other editor that can't provide context.");
+        else
+            NSLog(@"Detected some editor that can't provide context (not Google Docs).");
+    }
+    _failuresToRetrieveExpectedContext = NSUIntegerMax;
+    
     if (self.clientSelectionCanChangeUnexpectedly) {
         self.cannnotTrustSelectionLength = YES;
         self.clientSelectionCanChangeUnexpectedly = NO; // This isn't true (it can change unexpectedly), but we can't get the context, so we pretend/hope it won't.

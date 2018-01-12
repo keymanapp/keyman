@@ -34,7 +34,7 @@ BOOL _preserveContextForNextCmdA;
         [super handleCommand:event];
 }
 
-- (void)setInGoogleDocs {
+- (void)setInSiteThatDoesNotGiveContext {
     [self switchToLegacyMode];
 }
 

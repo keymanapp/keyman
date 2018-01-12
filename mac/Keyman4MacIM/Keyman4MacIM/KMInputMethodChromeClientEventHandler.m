@@ -25,10 +25,12 @@ BOOL _insertCharactersIndividually;
     return self;
 }
 
-- (void)setInGoogleDocs {
-    [super setInGoogleDocs];
-    // Google docs in Chrome allows only a single character at a time :-(
-    _insertCharactersIndividually = YES;
+- (void)setInSiteThatDoesNotGiveContext {
+    [super setInSiteThatDoesNotGiveContext];
+    if ([self couldBeInGoogleDocs]) {
+        // Google docs in Chrome allows only a single character at a time :-(
+        _insertCharactersIndividually = YES;
+    }
 }
 
 - (void)insertPendingBufferTextIn:(id)client {
