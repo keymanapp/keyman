@@ -46,3 +46,7 @@ interface HTMLStyleElement {
     filter: any,                        // More IE-specific fields.
     zoom: any
 }
+
+interface KeyboardEvent {
+    _kmw_block: boolean                 // Needed to prevent an old Firefox bug.
+}

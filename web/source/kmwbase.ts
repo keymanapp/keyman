@@ -18,10 +18,8 @@ var keyman: KeymanBase = window['keyman'] || {};
 
 class KeymanBase {
   _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
-  _Enabled = 1;              // Is KeymanWeb running?
   _DisableInput = 0;         // Should input be disabled?
   _IE = 0;                   // browser version identification
-  legacy = 0;                // set true for IE 3,4,5 (I2186 - multiple IE tweaks needed)
   _IsActivatingKeymanWebUI = 0;    // ActivatingKeymanWebUI - is the KeymanWeb DIV in process of being clicked on?
   _JustActivatedKeymanWebUI = 0;   // JustActivatedKeymanWebUI - focussing back to control after KeymanWeb UI interaction  
   _IgnoreNextSelChange = 0;  // when a visual keyboard key is mouse-down, ignore the next sel change because this stuffs up our history  
@@ -264,6 +262,10 @@ class KeymanBase {
    */    
   ['getActiveLanguage'](): string {
     return this.keyboardManager.getActiveLanguage();
+  }
+
+  ['isAttached'](x: HTMLElement): boolean {
+    return this.domManager.isAttached(x);
   }
 }
 

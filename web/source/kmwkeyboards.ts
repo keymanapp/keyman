@@ -555,7 +555,7 @@ class KeyboardManager {
     var util = this.keymanweb.util;
     var osk = this.keymanweb.osk;
 
-    var Lscript = <HTMLScriptElement>(<any>util)._CreateElement('SCRIPT');
+    var Lscript = util._CreateElement('SCRIPT') as HTMLScriptElement;
     Lscript.charset="UTF-8";        // KMEW-89
     Lscript.type = 'text/javascript';
 
@@ -742,6 +742,46 @@ class KeyboardManager {
     }
     
     return ((lg == 'cmn') || (lg == 'jpn') || (lg == 'kor'));
+  }
+
+  /**
+   * Function     isChiral
+   * Scope        Public
+   * @param       {string|Object=}   k0
+   * @return      {boolean}
+   * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
+   */
+  isChiral(k0?) {
+    if(typeof(k0) == "string") {
+      k0 = this.getKeyboardByID(k0);
+    }
+
+    return !!(this.getKeyboardModifierBitmask(k0) & this.keymanweb.osk.modifierBitmasks.IS_CHIRAL);
+  }
+
+  /**
+   * Function     getKeyboardModifierBitmask
+   * Scope        Private
+   * @param       {Object=}   k0
+   * @return      {number}
+   * Description  Obtains the currently-active modifier bitmask for the active keyboard.
+   */
+  getKeyboardModifierBitmask(k0?) {
+    var k=this.activeKeyboard;
+    
+    if(arguments.length > 0 && typeof k0 != 'undefined') {
+      k = k0;
+    }
+
+    if(!k) {
+      return 0x0000;
+    }
+
+    if(k['KMBM']) {
+      return k['KMBM'];
+    }
+
+    return this.keymanweb.osk.modifierBitmasks['NON_CHIRAL'];
   }
 
   /**

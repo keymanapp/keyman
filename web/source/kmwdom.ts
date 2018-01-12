@@ -389,9 +389,9 @@ class DOMManager {
         this.keyman.util.attachDOMEvent(baseElement,'blur', this.getHandlers(Pelem)._ControlBlur);
 
         // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
-        Pelem.onkeypress = (<any>this.keyman)._KeyPress;
-        Pelem.onkeydown = (<any>this.keyman)._KeyDown;
-        Pelem.onkeyup = (<any>this.keyman)._KeyUp;      
+        Pelem.onkeypress = this.getHandlers(Pelem)._KeyPress;
+        Pelem.onkeydown = this.getHandlers(Pelem)._KeyDown;
+        Pelem.onkeyup = this.getHandlers(Pelem)._KeyUp;      
       }
     } 
   }; 
@@ -435,9 +435,9 @@ class DOMManager {
     if(isAlias) {
       this.keyman.inputList.push(baseElement);
 
-      baseElement.onkeypress = (<any>this.keyman)._KeyPress;
-      baseElement.onkeydown = (<any>this.keyman)._KeyDown;
-      baseElement.onkeyup = (<any>this.keyman)._KeyUp;  
+      baseElement.onkeypress = this.getHandlers(Pelem)._KeyPress;
+      baseElement.onkeydown = this.getHandlers(Pelem)._KeyDown;
+      baseElement.onkeyup = this.getHandlers(Pelem)._KeyUp;  
     }
     return;
   };
@@ -508,7 +508,7 @@ class DOMManager {
     if(this.isKMWInput(Pelem)) {
       // Is it already disabled?
       if(!this.isKMWDisabled(Pelem)) {
-        (<any>this.keyman)._DisableControl(Pelem);
+        this._DisableControl(Pelem);
       } 
     }
 
@@ -603,9 +603,9 @@ class DOMManager {
             // I1480 - Attach to IFRAME instead of document
             util.attachDOMEvent(Pelem,'focus', this.getHandlers(Pelem)._ControlFocus);
             util.attachDOMEvent(Pelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-            util.attachDOMEvent(Lelem,'keydown', (<any>this.keyman)._KeyDown);   // I2404 - Update for attaching to elements within IFRAMEs, don't attach to read-only IFRAMEs
-            util.attachDOMEvent(Lelem,'keypress', (<any>this.keyman)._KeyPress);
-            util.attachDOMEvent(Lelem,'keyup', (<any>this.keyman)._KeyUp);
+            util.attachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);   // I2404 - Update for attaching to elements within IFRAMEs, don't attach to read-only IFRAMEs
+            util.attachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
+            util.attachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
             
             // I1481 - Attach to the selectionchange in the iframe (and do a selchange to get the new selection)
             /* IE: call _SelectionChange when the user changes the selection */
@@ -621,9 +621,9 @@ class DOMManager {
             // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
             util.attachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
             util.attachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-            util.attachDOMEvent(Lelem,'keydown', (<any>this.keyman)._KeyDown);
-            util.attachDOMEvent(Lelem,'keypress', (<any>this.keyman)._KeyPress);
-            util.attachDOMEvent(Lelem,'keyup', (<any>this.keyman)._KeyUp);
+            util.attachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);
+            util.attachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
+            util.attachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
           } else {
             // Lelem is the IFrame's internal document; set 'er up!
             this._SetupDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
@@ -656,9 +656,9 @@ class DOMManager {
             // I1480 - Attach to IFRAME instead of document
             util.detachDOMEvent(Pelem,'focus', this.getHandlers(Pelem)._ControlFocus);
             util.detachDOMEvent(Pelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-            util.detachDOMEvent(Lelem,'keydown', (<any>this.keyman)._KeyDown);   // I2404 - Update for attaching to elements within IFRAMEs, don't attach to read-only IFRAMEs
-            util.detachDOMEvent(Lelem,'keypress', (<any>this.keyman)._KeyPress);
-            util.detachDOMEvent(Lelem,'keyup', (<any>this.keyman)._KeyUp);
+            util.detachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);   // I2404 - Update for attaching to elements within IFRAMEs, don't attach to read-only IFRAMEs
+            util.detachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
+            util.detachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
             
             // I1481 - Attach to the selectionchange in the iframe (and do a selchange to get the new selection)
             /* IE: call _SelectionChange when the user changes the selection */
@@ -673,9 +673,9 @@ class DOMManager {
             // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
             util.detachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
             util.detachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-            util.detachDOMEvent(Lelem,'keydown', (<any>this.keyman)._KeyDown);
-            util.detachDOMEvent(Lelem,'keypress', (<any>this.keyman)._KeyPress);
-            util.detachDOMEvent(Lelem,'keyup', (<any>this.keyman)._KeyUp);
+            util.detachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);
+            util.detachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
+            util.detachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
           } else {
             // Lelem is the IFrame's internal document; set 'er up!
             this._ClearDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
@@ -800,6 +800,74 @@ class DOMManager {
         } else if(typeof Ptarg.textContent == "string" && Ptarg.textContent.length == 0) { // As with contenteditable DIVs, for example.
           Ptarg.dir=elDir;
         }
+      }
+    }
+  }
+
+  /**
+   * Function     _DisableControl
+   * Scope        Private
+   * @param       {Element}      Pelem       Element to be disabled
+   * Description  Disable KMW control element 
+   */    
+  _DisableControl(Pelem: HTMLElement) {
+    if(this.isAttached(Pelem)) { // Only operate on attached elements!  
+      if(this.keyman._LastActiveElement == Pelem || this.keyman._LastActiveElement == Pelem['kmw_ip']) {
+        this.keyman._LastActiveElement = null;
+        this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
+        this.keyman.osk._Hide();
+      }
+      
+      if(this.keyman.util.device.touchable) {
+        this.disableTouchElement(Pelem);
+        this.setupNonKMWTouchElement(Pelem);
+
+        var keyman = this.keyman;
+      
+        // If a touch alias was removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
+        window.setTimeout(function() {
+          (<any>keyman).listInputs();
+
+          for(var k = 0; k < keyman.sortedInputs.length; k++) {
+            if(keyman.sortedInputs[k]['kmw_ip']) {
+              this.getHandlers(Pelem).updateInput(keyman.sortedInputs[k]['kmw_ip']);
+            }
+          }
+        }, 1);
+      } else {
+        (<any>this.keyman).listInputs(); // Fix up our internal input ordering scheme.
+      }
+      
+      this.disableInputElement(Pelem);
+    }
+  }
+
+  /**
+   * Function     _EnableControl
+   * Scope        Private
+   * @param       {Element}    Pelem   Element to be enabled
+   * Description  Enable KMW control element 
+   */    
+  _EnableControl(Pelem: HTMLElement) {
+    if(this.isAttached(Pelem)) { // Only operate on attached elements!
+      if(this.keyman.util.device.touchable) {
+        this.enableTouchElement(Pelem);
+
+        var keyman = this.keyman;
+
+        // If we just added a new input alias, some languages will mess up our touch-based layout scheme
+        // if we don't update the touch elements.
+        window.setTimeout(function() {
+          (<any>keyman).listInputs();
+
+          for(var k = 0; k < keyman.sortedInputs.length; k++) {
+            if(keyman.sortedInputs[k]['kmw_ip']) {
+              this.getHandlers(Pelem).updateInput(keyman.sortedInputs[k]['kmw_ip']);
+            }
+          }
+        }, 1);
+      } else {
+        this.enableInputElement(Pelem);
       }
     }
   }

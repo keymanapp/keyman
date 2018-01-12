@@ -182,7 +182,7 @@ if(!window['keyman']['initialized']) {
       var retVal = false; // I3318
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
-      var bitmask = keymanweb.getKeyboardModifierBitmask();
+      var bitmask = keymanweb.keyboardManager.getKeyboardModifierBitmask();
 
       if(e.vkCode > 255) {
         keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts

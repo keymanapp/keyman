@@ -731,6 +731,7 @@ if(!window['keyman']['initialized']) {
     osk.selectLayer = function(keyName,nextLayerIn)
     {
       var nextLayer = arguments.length < 2 ? null : nextLayerIn;
+      var isChiral = keymanweb.keyboardManager.isChiral();
 
       // Layer must be identified by name, not number (27/08/2015)
       if(typeof nextLayer == 'number')  nextLayer = osk.getLayerId(nextLayer * 0x10);
@@ -744,13 +745,13 @@ if(!window['keyman']['initialized']) {
           nextLayer = 'shift'; break;
         case 'K_LCONTROL':
         case 'K_LCTRL':
-          if(keymanweb.isChiral()) {
+          if(isChiral) {
             nextLayer = 'leftctrl';
             break;
           }
         case 'K_RCONTROL':
         case 'K_RCTRL':
-          if(keymanweb.isChiral()) {
+          if(isChiral) {
             nextLayer = 'rightctrl';
             break;
           }
@@ -758,20 +759,20 @@ if(!window['keyman']['initialized']) {
           nextLayer = 'ctrl'; break;
         case 'K_LMENU':
         case 'K_LALT':
-          if(keymanweb.isChiral()) {
+          if(isChiral) {
             nextLayer = 'leftalt';
             break;
           }
         case 'K_RMENU':
         case 'K_RALT':
-          if(keymanweb.isChiral()) {
+          if(isChiral) {
             nextLayer = 'rightalt';
             break;
           }
         case 'K_ALT':
           nextLayer = 'alt'; break;
         case 'K_ALTGR':
-          if(keymanweb.isChiral()) {
+          if(isChiral) {
             nextLayer = 'leftctrl-rightalt';
           } else {
             nextLayer = 'ctrl-alt';
@@ -1773,7 +1774,7 @@ if(!window['keyman']['initialized']) {
         lockStates = e.Lstates;
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
-        if(keymanweb.isChiral() && osk.emulatesAltGr() && 
+        if(keymanweb.keyboardManager.isChiral() && osk.emulatesAltGr() && 
             (keymanweb.modStateFlags & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
           keyShiftState |= osk.modifierBitmasks['ALT_GR_SIM'];
           keyShiftState &= ~osk.modifierCodes['RALT'];
@@ -3270,7 +3271,7 @@ if(!window['keyman']['initialized']) {
 
       // Else get a default layout for the device for this keyboard
       if(layout == null && PVK != null)
-        layout=osk.buildDefaultLayout(PVK,keymanweb.getKeyboardModifierBitmask(PKbd),formFactor);
+        layout=osk.buildDefaultLayout(PVK,keymanweb.keyboardManager.getKeyboardModifierBitmask(PKbd),formFactor);
 
       // Cannot create an OSK if no layout defined, just return empty DIV
       if(layout != null)
@@ -4255,7 +4256,7 @@ if(!window['keyman']['initialized']) {
           // TODO: May want to define a default BK array here as well
           if(Lviskbd == null) Lviskbd={'F':'Tahoma','BK':dfltText}; //DDOSK
 
-          osk._GenerateVisualKeyboard(Lviskbd, Lhelp, layout, keymanweb.getKeyboardModifierBitmask());
+          osk._GenerateVisualKeyboard(Lviskbd, Lhelp, layout, keymanweb.keyboardManager.getKeyboardModifierBitmask());
         }
 
         else //The following code applies only to preformatted 'help' such as European Latin
