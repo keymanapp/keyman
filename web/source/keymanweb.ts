@@ -298,7 +298,7 @@ if(!window['keyman']['initialized']) {
         Plc = null;
       }
 
-      if(Pelem.tagName.toLowerCase() == "iframe") {
+      if(Pelem instanceof HTMLIFrameElement) {
         console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
         return;
       }
@@ -312,9 +312,8 @@ if(!window['keyman']['initialized']) {
 
         // If Pelem is the focused element/active control, we should set the keyboard in place now.
         // 'kmw_ip' is the touch-alias for the original page's control.
-        if((keymanweb._LastActiveElement == Pelem || keymanweb._LastActiveElement == Pelem['kmw_ip']) 
-            && keymanweb._LastActiveElement) {
-            
+        if(keymanweb._LastActiveElement && (keymanweb._LastActiveElement == Pelem || keymanweb._LastActiveElement == Pelem['kmw_ip'])) {
+
           if(Pkbd != null && Plc != null) { // Second part necessary for Closure.
             keymanweb.keyboardManager.setActiveKeyboard(Pkbd, Plc);
           } 

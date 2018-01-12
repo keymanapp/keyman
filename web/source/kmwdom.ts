@@ -766,7 +766,7 @@ class DOMManager {
     }
   }
 
-      /**
+  /**
    * Function     _ClearDocument
    * Scope        Private
    * @param       {Element}     Pelem - the root element of a document, including IFrame documents.
@@ -1223,14 +1223,17 @@ class DOMManager {
     //osk._Load(false);
     
     // I3363 (Build 301)
-    if(device.touchable)
-    {
+    if(device.touchable) {
       // Handle OSK touchend events (prevent propagation)
-      osk._Box.addEventListener('touchend',function(e){e.stopPropagation();},false);
+      osk._Box.addEventListener('touchend',function(e){
+        e.stopPropagation();
+      }, false);
 
       // Add a blank DIV to the bottom of the page to allow the bottom of the page to be shown
-      dTrailer=document.createElement('DIV'); ds=dTrailer.style;
-      ds.width='100%';ds.height=(screen.width/2)+'px';
+      dTrailer=document.createElement('DIV');
+      ds=dTrailer.style;
+      ds.width='100%';
+      ds.height=(screen.width/2)+'px';
       document.body.appendChild(dTrailer);  
       
       // On Chrome, scrolling up or down causes the URL bar to be shown or hidden 
@@ -1241,10 +1244,8 @@ class DOMManager {
       // the touch end event after a move. c.f. http://code.google.com/p/chromium/issues/detail?id=152913
       // The best compromise behaviour is simply to hide the OSK whenever any 
       // non-input and non-OSK element is touched.
-      if(device.OS == 'Android' && navigator.userAgent.indexOf('Chrome') > 0)
-      {
-        (<any>this.keyman).hideOskWhileScrolling=function(e)
-        {           
+      if(device.OS == 'Android' && navigator.userAgent.indexOf('Chrome') > 0) {
+        (<any>this.keyman).hideOskWhileScrolling=function(e) {           
           if(typeof(osk._Box) == 'undefined') return;
           if(typeof(osk._Box.style) == 'undefined') return;
 
@@ -1253,8 +1254,7 @@ class DOMManager {
           if(typeof(p) != 'undefined' && p != null) {
             if(p.className.indexOf('keymanweb-input') >= 0) return; 
             if(p.className.indexOf('kmw-key-') >= 0) return; 
-            if(typeof(p.parentNode) != 'undefined')
-            {
+            if(typeof(p.parentNode) != 'undefined') {
               p=p.parentNode;
               if(p.className.indexOf('keymanweb-input') >= 0) return; 
               if(p.className.indexOf('kmw-key-') >= 0) return; 
@@ -1262,24 +1262,22 @@ class DOMManager {
           }          
           osk.hideNow(); 
         }        
-        document.body.addEventListener('touchstart', (<any>this.keyman).hideOskWhileScrolling,false);
+        document.body.addEventListener('touchstart', (<any>this.keyman).hideOskWhileScrolling, false);
       } else {
-        (<any>this.keyman).conditionallyHideOsk = function()
-        {
+        (<any>this.keyman).conditionallyHideOsk = function() {
           // Should not hide OSK if simply closing the language menu (30/4/15)
           if((<any>keyman).hideOnRelease && !osk.lgList) osk.hideNow();
           (<any>keyman).hideOnRelease=false;
         };
-        (<any>this.keyman).hideOskIfOnBody = function(e)
-        {
+        (<any>this.keyman).hideOskIfOnBody = function(e) {
           (<any>keyman).touchY=e.touches[0].screenY;
           (<any>keyman).hideOnRelease=true;
         };
-        (<any>this.keyman).cancelHideIfScrolling = function(e)
-        {
+        (<any>this.keyman).cancelHideIfScrolling = function(e) {
           var y=e.touches[0].screenY,y0=(<any>keyman).touchY;    
           if(y-y0 > 5 || y0-y < 5) (<any>keyman).hideOnRelease = false;
         };
+
         document.body.addEventListener('touchstart',(<any>this.keyman).hideOskIfOnBody,false);      
         document.body.addEventListener('touchmove',(<any>this.keyman).cancelHideIfScrolling,false);      
         document.body.addEventListener('touchend',(<any>this.keyman).conditionallyHideOsk,false);      
@@ -1303,7 +1301,7 @@ class DOMManager {
       * Of course, we only want to dynamically add elements if the user hasn't enabled the manual attachment option.
       */
 
-    var observationTarget = document.querySelector('body'), observationConfig;
+    var observationTarget = document.querySelector('body'), observationConfig: MutationObserverInit;
     if(this.keyman.options['attachType'] != 'manual') { //I1961
       observationConfig = { childList: true, subtree: true};
       this.attachmentObserver = new MutationObserver(this._AutoAttachObserverCore);
