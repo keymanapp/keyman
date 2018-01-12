@@ -10,7 +10,6 @@
 #import "KMInputMethodEventHandler.h"
 #import "KMInputMethodBrowserClientEventHandler.h"
 #import "KMInputMethodSafariClientEventHandler.h"
-#import "KMInputMethodChromeClientEventHandler.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
 
 @implementation KMInputController

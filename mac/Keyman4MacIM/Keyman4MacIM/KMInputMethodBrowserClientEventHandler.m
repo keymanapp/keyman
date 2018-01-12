@@ -12,8 +12,8 @@
 
 @implementation KMInputMethodBrowserClientEventHandler
 
-// Because Google Docs can't report its context in any of the browsers (Safari, Chrome, Firefox), we want to
-// try to detect it so each browser can respond appropriatey.
+// Because Google Docs can't report its context in any of the browsers (Safari, Chrome, Firefox) and Word sometimes
+// has trouble doing this in Chrome, we want to try to detect it so each browser can respond appropriately.
 NSUInteger _failuresToRetrieveExpectedContext;
 
 - (instancetype)init {
@@ -23,7 +23,6 @@ NSUInteger _failuresToRetrieveExpectedContext;
 - (instancetype)initWithLegacyMode:(BOOL)legacy clientSelectionCanChangeUnexpectedly:(BOOL) flagClientSelectionCanChangeUnexpectedly {
     self = [super initWithLegacyMode:legacy clientSelectionCanChangeUnexpectedly: flagClientSelectionCanChangeUnexpectedly];
     if (self) {
-//        _couldBeInGoogleDocs = YES;
         _failuresToRetrieveExpectedContext = 0;
     }
     return self;
@@ -47,8 +46,7 @@ NSUInteger _failuresToRetrieveExpectedContext;
                 if (clientContext == nil)
                 {
                     // Client is failing to provide useful response to attributedSubstringFromRange.
-                    // Word (in MS Live) occasionally does this, but (apparently) Google Docs doesn't.
-                    //_couldBeInGoogleDocs = NO;
+                    // Word (in MS Live) occasionally does this.
                     [self setInSiteThatDoesNotGiveContext];
                 }
                 else if (!clientContext.length) {
@@ -100,10 +98,7 @@ NSUInteger _failuresToRetrieveExpectedContext;
 
 - (void)setInSiteThatDoesNotGiveContext {
     if ([self AppDelegate].debugMode) {
-//        if (_couldBeInGoogleDocs)
-//            NSLog(@"Detected Google Docs or some other editor that can't provide context.");
-//        else
-            NSLog(@"Detected some editor that can't provide context (not Google Docs).");
+        NSLog(@"Detected some editor (e.g., Google Docs) that can't provide context.");
     }
     _failuresToRetrieveExpectedContext = NSUIntegerMax;
     

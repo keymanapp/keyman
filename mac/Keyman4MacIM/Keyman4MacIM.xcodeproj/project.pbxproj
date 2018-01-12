@@ -53,7 +53,6 @@
 		E21799051FC5B7BC00F2D66A /* KMInputMethodEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */; };
 		E21799061FC5B7BC00F2D66A /* KMInputMethodEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */; };
 		E22020F6200506F300B74FAC /* KMInputMethodSafariClientEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E22020F5200506F300B74FAC /* KMInputMethodSafariClientEventHandler.m */; };
-		E22020F8200508F100B74FAC /* KMInputMethodChromeClientEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E22020F7200508F100B74FAC /* KMInputMethodChromeClientEventHandler.m */; };
 		E24C79EA1FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E24C79E91FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m */; };
 /* End PBXBuildFile section */
 
@@ -153,9 +152,7 @@
 		E21799031FC5B74D00F2D66A /* KMInputMethodEventHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodEventHandler.h; sourceTree = "<group>"; };
 		E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodEventHandler.m; sourceTree = "<group>"; };
 		E22020F3200505EF00B74FAC /* KMInputMethodSafariClientEventHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodSafariClientEventHandler.h; sourceTree = "<group>"; };
-		E22020F42005069300B74FAC /* KMInputMethodChromeClientEventHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMInputMethodChromeClientEventHandler.h; sourceTree = "<group>"; };
 		E22020F5200506F300B74FAC /* KMInputMethodSafariClientEventHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodSafariClientEventHandler.m; sourceTree = "<group>"; };
-		E22020F7200508F100B74FAC /* KMInputMethodChromeClientEventHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodChromeClientEventHandler.m; sourceTree = "<group>"; };
 		E22020F920050D6300B74FAC /* KMInputMethodBrowserClientEventHandlerProtected.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMInputMethodBrowserClientEventHandlerProtected.h; sourceTree = "<group>"; };
 		E24C79E91FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodBrowserClientEventHandler.m; sourceTree = "<group>"; };
 		E24C79EB1FFFCE3000D8E46F /* KMInputMethodBrowserClientEventHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodBrowserClientEventHandler.h; sourceTree = "<group>"; };
@@ -295,9 +292,7 @@
 				E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */,
 				E24C79EB1FFFCE3000D8E46F /* KMInputMethodBrowserClientEventHandler.h */,
 				E22020F3200505EF00B74FAC /* KMInputMethodSafariClientEventHandler.h */,
-				E22020F42005069300B74FAC /* KMInputMethodChromeClientEventHandler.h */,
 				E24C79E91FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m */,
-				E22020F7200508F100B74FAC /* KMInputMethodChromeClientEventHandler.m */,
 				E22020F5200506F300B74FAC /* KMInputMethodSafariClientEventHandler.m */,
 				98E672961B532DE000DBDE2F /* KMKeyboardHelpWindow */,
 				989C9C141A7876DE00A20425 /* MainMenu.xib */,
@@ -558,7 +553,6 @@
 				E22020F6200506F300B74FAC /* KMInputMethodSafariClientEventHandler.m in Sources */,
 				E24C79EA1FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m in Sources */,
 				98FE105E1B4DE8F400525F54 /* NSWindow+SuppMethods.m in Sources */,
-				E22020F8200508F100B74FAC /* KMInputMethodChromeClientEventHandler.m in Sources */,
 				9836B3741AE5F11D00780482 /* ZipArchive.mm in Sources */,
 				983247B21A9EB9690010B90C /* KMConfigColumn3CellView.m in Sources */,
 				98BF92521BF03D4D0002126A /* KMAboutBGView.m in Sources */,

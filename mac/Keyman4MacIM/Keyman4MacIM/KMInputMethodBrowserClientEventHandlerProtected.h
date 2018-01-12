@@ -11,8 +11,6 @@
 
 @interface KMInputMethodBrowserClientEventHandler ()
 
-//@property (assign) BOOL couldBeInGoogleDocs;
-
 - (void)setInSiteThatDoesNotGiveContext;
 
 @end
