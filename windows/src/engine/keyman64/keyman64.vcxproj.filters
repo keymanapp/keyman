@@ -108,6 +108,12 @@
     <ClCompile Include="..\keyman32\hookutils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\keyman32\AbstractKeymanRuleProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\keyman32\KmnKeymanRuleProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Keyman64.RC">
@@ -230,6 +236,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\keyman32\vkscancodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\AbstractKeymanRuleProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\KmnKeymanRuleProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

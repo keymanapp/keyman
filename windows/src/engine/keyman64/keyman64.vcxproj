@@ -97,8 +97,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <StringPooling>true</StringPooling>
-      <ExceptionHandling>
-      </ExceptionHandling>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -159,8 +158,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MinimalRebuild>true</MinimalRebuild>
-      <ExceptionHandling>
-      </ExceptionHandling>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>keyman64.h</PrecompiledHeaderFile>
@@ -206,6 +204,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\global\vc\xstring.cpp" />
+    <ClCompile Include="..\keyman32\AbstractKeymanRuleProcessor.cpp" />
     <ClCompile Include="..\keyman32\addins.cpp" />
     <ClCompile Include="..\keyman32\appint\aiTIP.cpp" />
     <ClCompile Include="..\keyman32\appint\aiWin2000Unicode.cpp" />
@@ -261,6 +260,7 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
     </ClCompile>
+    <ClCompile Include="..\keyman32\KmnKeymanRuleProcessor.cpp" />
     <ClCompile Include="..\keyman32\kmprocess.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
@@ -301,6 +301,7 @@
     <ResourceCompile Include="Keyman64.RC" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\keyman32\AbstractKeymanRuleProcessor.h" />
     <ClInclude Include="..\keyman32\addins.h" />
     <ClInclude Include="..\keyman32\appint\aiTIP.h" />
     <ClInclude Include="..\keyman32\appint\aiWin2000Unicode.h" />
@@ -329,6 +330,7 @@
     <ClInclude Include="..\..\global\inc\Kl95api.h" />
     <ClInclude Include="..\..\global\inc\Km95api.h" />
     <ClInclude Include="..\..\global\inc\Kmnreg.h" />
+    <ClInclude Include="..\keyman32\KmnKeymanRuleProcessor.h" />
     <ClInclude Include="..\keyman32\kmprot.h" />
     <ClInclude Include="..\..\global\inc\kmprot_hwkey.h" />
     <ClInclude Include="..\..\global\inc\kmprot_licencenumber.h" />

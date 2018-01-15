@@ -904,6 +904,8 @@ void ReleaseKeyboards(BOOL Lock)
 	{
 		if(Lock) UnloadDLLs(&_td->lpKeyboards[i]);
     FreeKeyboardOptions(&_td->lpKeyboards[i]);
+    delete _td->lpKeyboards[i].ruleProcessor;
+
 		ReleaseKeyboardMemory(_td->lpKeyboards[i].Keyboard);
     if(_td->lpKeyboards[i].Profiles) delete _td->lpKeyboards[i].Profiles;   // I3581
 	}

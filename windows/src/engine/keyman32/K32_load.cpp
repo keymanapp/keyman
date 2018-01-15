@@ -29,6 +29,7 @@
 */
 
 #include "keyman64.h"
+#include "KmnKeymanRuleProcessor.h"
 
 HBITMAP LoadBitmapFile(LPBYTE data, DWORD sz);
 BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz);
@@ -92,6 +93,8 @@ BOOL LoadlpKeyboard(int i)
 
   LoadKeyboardOptions(&_td->lpKeyboards[i]);
 	
+  _td->lpKeyboards[i].ruleProcessor = new KmnKeymanRuleProcessor(_td->lpKeyboards[i].Keyboard);
+
 	return TRUE;
 }
 

@@ -142,39 +142,39 @@ BOOL LoadNewLibrary_x64()
 	if(hKbdLibrary_x64) FreeLibrary(hKbdLibrary_x64);
 
 	RegistryReadOnly *r = new RegistryReadOnly(HKEY_LOCAL_MACHINE);
-	__try
-	{
-  	GetKeyboardLayoutName(buf2);
-		wsprintf(buf, "System\\CurrentControlSet\\Control\\keyboard layouts\\%s", buf2);
-		if(r->OpenKeyReadOnly(buf))
-		{
-			if(r->ReadString("Layout File", buf, 32))
-			{
-				hKbdLibrary_x64 = LoadLibrary(buf);
-				if(!hKbdLibrary_x64) 
-				{ 	
-					SendDebugMessageFormat(GetFocus(), sdmKeyboard, 0, "LoadNewLibrary_x64: Exit -- could not load library");
-					return FALSE; 
-				}
-				PKBDLAYERDESCRIPTORFUNC KbdLayerDescriptorFunc = (PKBDLAYERDESCRIPTORFUNC) GetProcAddress(hKbdLibrary_x64, "KbdLayerDescriptor");
-				if(KbdLayerDescriptorFunc)
-				{
-					KbdTables_x64 = (*KbdLayerDescriptorFunc)();
-					if(KbdTables_x64) 
-						return TRUE;
-				}
-				
-				FreeLibrary(hKbdLibrary_x64);
-			}
-		}
 
-		hKbdLibrary_x64 = NULL;
-		KbdTables_x64 = NULL;
-	}
-	__finally
+  GetKeyboardLayoutName(buf2);
+	wsprintf(buf, "System\\CurrentControlSet\\Control\\keyboard layouts\\%s", buf2);
+	if(r->OpenKeyReadOnly(buf))
 	{
-		delete r;
+		if(r->ReadString("Layout File", buf, 32))
+		{
+			hKbdLibrary_x64 = LoadLibrary(buf);
+			if(!hKbdLibrary_x64) 
+			{ 	
+				SendDebugMessageFormat(GetFocus(), sdmKeyboard, 0, "LoadNewLibrary_x64: Exit -- could not load library");
+        delete r;
+				return FALSE; 
+			}
+			PKBDLAYERDESCRIPTORFUNC KbdLayerDescriptorFunc = (PKBDLAYERDESCRIPTORFUNC) GetProcAddress(hKbdLibrary_x64, "KbdLayerDescriptor");
+			if(KbdLayerDescriptorFunc)
+			{
+				KbdTables_x64 = (*KbdLayerDescriptorFunc)();
+        if (KbdTables_x64) {
+          delete r;
+          return TRUE;
+        }
+			}
+				
+			FreeLibrary(hKbdLibrary_x64);
+		}
 	}
+
+	hKbdLibrary_x64 = NULL;
+	KbdTables_x64 = NULL;
+
+  delete r;
+
 	SendDebugMessageFormat(GetFocus(), sdmKeyboard, 0, "LoadNewLibrary_x64: Exit -- failed to find function");
 	return FALSE;
 }

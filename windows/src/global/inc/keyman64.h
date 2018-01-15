@@ -76,6 +76,7 @@
 #include <assert.h>
 #include <msctf.h>
 #include "compiler.h"
+#include "AbstractKeymanRuleProcessor.h"
 
 #ifdef _WIN64
 #define LIBRARY_NAME "KEYMAN64"
@@ -211,6 +212,7 @@ typedef struct tagINTKEYBOARDINFO
   LPINTKEYBOARDOPTIONS KeyboardOptions;
   int        nProfiles;
   LPINTKEYBOARDPROFILE Profiles;
+  AbstractKeymanRuleProcessor *ruleProcessor;
 } INTKEYBOARDINFO, *LPINTKEYBOARDINFO;
 
 typedef struct tagINI

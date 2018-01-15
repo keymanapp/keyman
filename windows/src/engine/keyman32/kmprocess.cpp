@@ -67,6 +67,7 @@
                     28 Mar 2016 - mcdurdin - I4933 - Compat issue with Firefox 42 and IE and Keyman 9 TSF
 */
 #include "keyman64.h"   // I4575
+#include "AbstractKeymanRuleProcessor.h"
 
 BOOL fOutputKeystroke;
 
@@ -102,8 +103,26 @@ char *getcontext_debug() {
 *	process, and checks the state of Windows for the keyboard handling.
 */
 
+AbstractKeymanRuleProcessor *GetCurrentKeymanRuleProcessor() {
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) return NULL;
+  if (!_td->lpActiveKeyboard) return NULL;
+  return _td->lpActiveKeyboard->ruleProcessor;
+}
+
 BOOL ProcessHook()
 {
+  AbstractKeymanRuleProcessor *krp = GetCurrentKeymanRuleProcessor();
+  if (!krp) return FALSE;
+
+  KeymanRuleEvent event;
+  KeymanRuleActionList actions;
+
+  BOOL r = krp->ProcessEvent(&event, &actions);
+
+  return r;
+}
+/*
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
 
@@ -152,7 +171,7 @@ BOOL ProcessHook()
 	_td->app->QueueDebugInformation(QID_END, NULL, NULL, NULL, NULL, 0);
 
 	return !fOutputKeystroke;
-}
+}*/
 
 /*
 *	PRIVATE BOOL ProcessGroup(LPGROUP gp);
