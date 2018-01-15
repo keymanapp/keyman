@@ -21,7 +21,6 @@ char *KmnKeymanRuleProcessor::getcontext_debug() {
 }
 
 BOOL KmnKeymanRuleProcessor::ProcessEvent(const KeymanRuleEvent *event, KeymanRuleActionList *actions) {
-  UNREFERENCED_PARAMETER(event);
   UNREFERENCED_PARAMETER(actions);
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
@@ -36,7 +35,7 @@ BOOL KmnKeymanRuleProcessor::ProcessEvent(const KeymanRuleEvent *event, KeymanRu
   //
 
   if (_td->app->DebugControlled() && !_td->TIPFUpdateable) {   // I4287
-    if (_td->state.vkey == VK_ESCAPE || (_td->state.vkey >= VK_PRIOR && _td->state.vkey <= VK_DOWN) || (_td->state.vkey == VK_DELETE)) return FALSE;   // I4033   // I4826   // I4845
+    if (event->vk == VK_ESCAPE || (event->vk >= VK_PRIOR && event->vk <= VK_DOWN) || (event->vk == VK_DELETE)) return FALSE;   // I4033   // I4826   // I4845
     else return TRUE;
   }
 
@@ -45,12 +44,12 @@ BOOL KmnKeymanRuleProcessor::ProcessEvent(const KeymanRuleEvent *event, KeymanRu
   if (_td->state.msg.message == wm_keymankeydown) {   // I4827
     if (ShouldDebug(sdmKeyboard)) {
       SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %s Context '%s'",
-        Debug_VirtualKey(_td->state.vkey), getcontext_debug());
+        Debug_VirtualKey(event->vk), getcontext_debug());
     }
 
     AIDEBUGKEYINFO keyinfo;
     keyinfo.shiftFlags = Globals::get_ShiftState();
-    keyinfo.VirtualKey = _td->state.vkey;
+    keyinfo.VirtualKey = event->vk;
     keyinfo.Character = _td->state.charCode;
     keyinfo.DeadKeyCharacter = 0;   // I4582
     keyinfo.IsUp = _td->state.msg.message == wm_keymankeyup;
@@ -60,7 +59,11 @@ BOOL KmnKeymanRuleProcessor::ProcessEvent(const KeymanRuleEvent *event, KeymanRu
       _td->app->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR)&keyinfo);
   }
 
+  this->currentEvent = event;
+  this->currentActions = actions;
   ProcessGroup(gp);
+  this->currentEvent = NULL;
+  this->currentActions = NULL;
 
   if (*Globals::hwndIM() == 0 || *Globals::hwndIMAlways())
   {
@@ -108,11 +111,11 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
 
   sdmfI = -1;
 
-  for (i = 0; i < _td->state.lpkb->cxGroupArray; i++)
-    if (gp == &_td->state.lpkb->dpGroupArray[i])
+  for (i = 0; i < keyboard->cxGroupArray; i++)
+    if (gp == &keyboard->dpGroupArray[i])
     {
       if (_td->state.msg.message == wm_keymankeydown && ShouldDebug(sdmKeyboard))
-        SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Entering group %d of %d, context '%s'", i + 1, _td->state.lpkb->cxGroupArray, getcontext_debug());
+        SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Entering group %d of %d, context '%s'", i + 1, keyboard->cxGroupArray, getcontext_debug());
       sdmfI = i;
       break;
     }
@@ -141,8 +144,8 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
   */
 
   if (ShouldDebug(sdmKeyboard))
-    SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "state.vkey: %s shiftFlags: %x; charCode: %X",
-      Debug_VirtualKey(_td->state.vkey), Globals::get_ShiftState(), _td->state.charCode);   // I4582
+    SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "event->vk: %s event->shiftState: %x; charCode: %X",
+      Debug_VirtualKey(currentEvent->vk), currentEvent->shiftState, _td->state.charCode);   // I4582
 
   if (gp)
   {
@@ -154,15 +157,11 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
         if (kkp->dpContext[0] != 0) break; else continue;
       }
 
-      //if(kkp->Key == state.vkey)
-      //SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, 0, "kkp->Key: %d kkp->ShiftFlags: %x", 
-      //	kkp->Key, kkp->ShiftFlags);
-
       /* Keyman 6.0: support Virtual Characters */
       if (IsEquivalentShift(kkp->ShiftFlags, Globals::get_ShiftState()))
       {
-        if (kkp->Key > VK__MAX && kkp->Key == _td->state.vkey) break;	// I3438   // I4582
-        else if (kkp->Key == _td->state.vkey) break;   // I4169
+        if (kkp->Key > VK__MAX && kkp->Key == currentEvent->vk) break;	// I3438   // I4582
+        else if (kkp->Key == currentEvent->vk) break;   // I4169
       }
       else if (kkp->ShiftFlags == 0 && kkp->Key == _td->state.charCode && _td->state.charCode != 0) break;
     }
@@ -182,12 +181,12 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
     */
 
     if (_td->state.msg.message == wm_keymankeydown && ShouldDebug(sdmKeyboard)) SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0,
-      "No match was found in group %d of %d", sdmfI, _td->state.lpkb->cxGroupArray);
+      "No match was found in group %d of %d", sdmfI, keyboard->cxGroupArray);
 
     if (!gp || (_td->state.charCode == 0 && gp->fUsingKeys))   // I4585
                                                                // 7.0.241.0: I1133 - Fix mismatched parentheses on state.charCode - ie. we don't want to output this letter if !gp->fUsingKeys
     {
-      BOOL fIsBackspace = _td->state.vkey == VK_BACK && (Globals::get_ShiftState() & (LCTRLFLAG | RCTRLFLAG | LALTFLAG | RALTFLAG)) == 0;   // I4128
+      BOOL fIsBackspace = currentEvent->vk == VK_BACK && (Globals::get_ShiftState() & (LCTRLFLAG | RCTRLFLAG | LALTFLAG | RALTFLAG)) == 0;   // I4128
 
       if (/*_td->app->DebugControlled() &&*/ fIsBackspace) {   // I4838   // I4933
                                                                //if(_td->state.msg.message == wm_keymankeydown) 
@@ -231,7 +230,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
       {
         //app->NoSetShift = FALSE;
 
-        DWORD dw = _td->state.vkey;
+        DWORD dw = currentEvent->vk;
         if (dw == 0x05) dw = VK_RETURN;    // I649 - VK_ENTER and K_NPENTER
 
         if (_td->state.msg.lParam & (1 << 24)) dw |= QVK_EXTENDED;	// Extended key flag  // I3438
@@ -263,7 +262,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
     {
       /* NoMatch rule found, and is a character key */
       _td->app->QueueDebugInformation(QID_NOMATCH_ENTER, gp, NULL, NULL, gp->dpNoMatch, 0);
-      PostString(gp->dpNoMatch, &_td->state.msg, _td->state.lpkb, NULL);
+      PostString(gp->dpNoMatch, &_td->state.msg, keyboard, NULL);
       _td->app->QueueDebugInformation(QID_NOMATCH_EXIT, gp, NULL, NULL, gp->dpNoMatch, 0);
     }
     else if (_td->state.charCode != 0 && _td->state.charCode != 0xFFFF && _td->state.msg.message != wm_keymankeyup && gp->fUsingKeys)
@@ -339,14 +338,14 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
 
                       /* Use PostString to post the rest of the output string. */
 
-  if (PostString(p, &_td->state.msg, _td->state.lpkb, NULL) == psrCheckMatches)
+  if (PostString(p, &_td->state.msg, keyboard, NULL) == psrCheckMatches)
   {
     _td->app->QueueDebugInformation(QID_RULE_EXIT, gp, kkp, _td->miniContext, NULL, 0);
 
     if (gp->dpMatch && *gp->dpMatch)
     {
       _td->app->QueueDebugInformation(QID_MATCH_ENTER, gp, NULL, NULL, gp->dpMatch, 0);
-      PostString(gp->dpMatch, &_td->state.msg, _td->state.lpkb, NULL);
+      PostString(gp->dpMatch, &_td->state.msg, keyboard, NULL);
       _td->app->QueueDebugInformation(QID_MATCH_EXIT, gp, NULL, NULL, gp->dpMatch, 0);
     }
   }

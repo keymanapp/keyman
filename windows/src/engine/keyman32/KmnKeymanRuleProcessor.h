@@ -5,6 +5,10 @@ class KmnKeymanRuleProcessor :
 {
 private:
   LPKEYBOARD keyboard;
+  
+  const KeymanRuleEvent *currentEvent;
+  KeymanRuleActionList *currentActions;
+
   BOOL ContextMatch(LPKEY kkp);
   BOOL IsMatchingPlatform(LPSTORE s); // I3432
   BOOL IsMatchingBaseLayout(PWCHAR layoutName);  // I3432
@@ -17,6 +21,5 @@ protected:
 public:
   KmnKeymanRuleProcessor(LPKEYBOARD keyboard);
   ~KmnKeymanRuleProcessor();
-
 };
 
