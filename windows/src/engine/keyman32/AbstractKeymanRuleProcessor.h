@@ -23,7 +23,10 @@ struct KeymanRuleAction {
   // Use current action items?
 };
 
-typedef std::list<KeymanRuleAction> KeymanRuleActionList;
+class KeymanRuleActionList : public std::list<KeymanRuleAction> {
+public:
+  BOOL QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR fcontext, PWSTR foutput, DWORD_PTR dwExtraFlags);
+};
 
 class AbstractKeymanRuleProcessor
 {

@@ -100,6 +100,8 @@ BOOL ProcessHook()
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
+  _td->app->ReadContext();
+
   event.vk = _td->state.vkey;
   event.shiftState = Globals::get_ShiftState();
   event.charCode = _td->state.charCode;

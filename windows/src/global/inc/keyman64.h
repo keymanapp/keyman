@@ -76,7 +76,6 @@
 #include <assert.h>
 #include <msctf.h>
 #include "compiler.h"
-#include "AbstractKeymanRuleProcessor.h"
 
 #ifdef _WIN64
 #define LIBRARY_NAME "KEYMAN64"
@@ -197,6 +196,9 @@ typedef struct tagINTKEYBOARDPROFILE
   LANGID LangID;
   GUID Guid;
 } INTKEYBOARDPROFILE, *LPINTKEYBOARDPROFILE;
+
+// Not ideal to recursively include, but will do while we refactor
+#include "AbstractKeymanRuleProcessor.h"
 
 // The members of this structure, from first through to IMDLLs, must match KEYBOARDINFO from keymanapi.h
 typedef struct tagINTKEYBOARDINFO

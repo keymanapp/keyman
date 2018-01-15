@@ -39,8 +39,6 @@ BOOL KmnKeymanRuleProcessor::ProcessEvent(const KeymanRuleEvent *event, KeymanRu
     else return TRUE;
   }
 
-  _td->app->ReadContext();
-
   if (event->isKeyDown) {   // I4827
     if (ShouldDebug(sdmKeyboard)) {
       DebugLogFormat("Key pressed: %s Context '%s'", Debug_VirtualKey(event->vk), getcontext_debug());
@@ -53,9 +51,9 @@ BOOL KmnKeymanRuleProcessor::ProcessEvent(const KeymanRuleEvent *event, KeymanRu
     keyinfo.DeadKeyCharacter = 0;   // I4582
     keyinfo.IsUp = !event->isKeyDown;
     if (_td->app->IsUnicode())
-      _td->app->QueueDebugInformation(QID_BEGIN_UNICODE, NULL, NULL, NULL, NULL, (DWORD_PTR)&keyinfo);
+      actions->QueueDebugInformation(QID_BEGIN_UNICODE, NULL, NULL, NULL, NULL, (DWORD_PTR)&keyinfo);
     else
-      _td->app->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR)&keyinfo);
+      actions->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR)&keyinfo);
   }
 
   stackDepth = 0;
@@ -73,7 +71,7 @@ BOOL KmnKeymanRuleProcessor::ProcessEvent(const KeymanRuleEvent *event, KeymanRu
     _td->app->SendActions();   // I4196
   }
 
-  _td->app->QueueDebugInformation(QID_END, NULL, NULL, NULL, NULL, 0);
+  actions->QueueDebugInformation(QID_END, NULL, NULL, NULL, NULL, 0);
 
   return !fOutputKeystroke;
 }
@@ -109,7 +107,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
 
-  _td->app->QueueDebugInformation(QID_GROUP_ENTER, gp, NULL, NULL, NULL, 0);
+  currentActions->QueueDebugInformation(QID_GROUP_ENTER, gp, NULL, NULL, NULL, 0);
 
   sdmfI = -1;
 
@@ -126,7 +124,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
   {
     if (currentEvent->isKeyDown) DebugLogFormat("Aborting output: stackDepth exceeded.");
     stopOutput = TRUE;
-    _td->app->QueueDebugInformation(QID_GROUP_EXIT, gp, NULL, NULL, NULL, QID_FLAG_RECURSIVE_OVERFLOW);
+    currentActions->QueueDebugInformation(QID_GROUP_EXIT, gp, NULL, NULL, NULL, QID_FLAG_RECURSIVE_OVERFLOW);
     return FALSE;
   }
 
@@ -261,9 +259,9 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
     else if (gp->dpNoMatch != NULL && *gp->dpNoMatch != 0 && currentEvent->isKeyDown)
     {
       /* NoMatch rule found, and is a character key */
-      _td->app->QueueDebugInformation(QID_NOMATCH_ENTER, gp, NULL, NULL, gp->dpNoMatch, 0);
+      currentActions->QueueDebugInformation(QID_NOMATCH_ENTER, gp, NULL, NULL, gp->dpNoMatch, 0);
       PostString(gp->dpNoMatch, NULL);
-      _td->app->QueueDebugInformation(QID_NOMATCH_EXIT, gp, NULL, NULL, gp->dpNoMatch, 0);
+      currentActions->QueueDebugInformation(QID_NOMATCH_EXIT, gp, NULL, NULL, gp->dpNoMatch, 0);
     }
     else if (currentEvent->charCode != 0 && currentEvent->charCode != 0xFFFF && currentEvent->isKeyDown && gp->fUsingKeys)
     {
@@ -274,7 +272,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
       _td->app->QueueAction(QIT_CHAR, currentEvent->charCode);
     }
 
-    _td->app->QueueDebugInformation(QID_GROUP_EXIT, gp, NULL, NULL, NULL, QID_FLAG_NOMATCH);
+    currentActions->QueueDebugInformation(QID_GROUP_EXIT, gp, NULL, NULL, NULL, QID_FLAG_NOMATCH);
     return TRUE;
   }
 
@@ -298,7 +296,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
 
   _td->miniContext[GLOBAL_ContextStackSize - 1] = 0;
 
-  _td->app->QueueDebugInformation(QID_RULE_ENTER, gp, kkp, _td->miniContext, NULL, 0);
+  currentActions->QueueDebugInformation(QID_RULE_ENTER, gp, kkp, _td->miniContext, NULL, 0);
 
   /*
   The next section includes several optimizations that make the code a little harder
@@ -338,18 +336,18 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
 
   if (PostString(p, NULL) == psrCheckMatches)
   {
-    _td->app->QueueDebugInformation(QID_RULE_EXIT, gp, kkp, _td->miniContext, NULL, 0);
+    currentActions->QueueDebugInformation(QID_RULE_EXIT, gp, kkp, _td->miniContext, NULL, 0);
 
     if (gp->dpMatch && *gp->dpMatch)
     {
-      _td->app->QueueDebugInformation(QID_MATCH_ENTER, gp, NULL, NULL, gp->dpMatch, 0);
+      currentActions->QueueDebugInformation(QID_MATCH_ENTER, gp, NULL, NULL, gp->dpMatch, 0);
       PostString(gp->dpMatch, NULL);
-      _td->app->QueueDebugInformation(QID_MATCH_EXIT, gp, NULL, NULL, gp->dpMatch, 0);
+      currentActions->QueueDebugInformation(QID_MATCH_EXIT, gp, NULL, NULL, gp->dpMatch, 0);
     }
   }
   else
-    _td->app->QueueDebugInformation(QID_RULE_EXIT, gp, kkp, _td->miniContext, NULL, 0);
-  _td->app->QueueDebugInformation(QID_GROUP_EXIT, gp, NULL, NULL, NULL, 0);
+    currentActions->QueueDebugInformation(QID_RULE_EXIT, gp, kkp, _td->miniContext, NULL, 0);
+  currentActions->QueueDebugInformation(QID_GROUP_EXIT, gp, NULL, NULL, NULL, 0);
 
   return TRUE;
 }
@@ -451,7 +449,7 @@ int KmnKeymanRuleProcessor::PostString(PWSTR str, PWSTR endstr)
         break;
       case CODE_INDEX:
         p++;
-        s = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[*p - 1];
+        s = &keyboard->dpStoreArray[*p - 1];
         p++;
 
         n = _td->IndexStack[*p - 1];
@@ -604,8 +602,8 @@ BOOL KmnKeymanRuleProcessor::ContextMatch(LPKEY kkp)
   {
     if (*pp == UC_SENTINEL && *(pp + 1) == CODE_IFOPT)
     {
-      s = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(pp + 2)) - 1];  // I2590
-      t = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(pp + 4)) - 1];  // I2590
+      s = &keyboard->dpStoreArray[(*(pp + 2)) - 1];  // I2590
+      t = &keyboard->dpStoreArray[(*(pp + 4)) - 1];  // I2590
 
       bEqual = wcscmp(s->dpString, t->dpString) == 0;
       if (*(pp + 3) == 1 && bEqual) return FALSE;  // I2590
@@ -614,7 +612,7 @@ BOOL KmnKeymanRuleProcessor::ContextMatch(LPKEY kkp)
     else if (*pp == UC_SENTINEL && *(pp + 1) == CODE_IFSYSTEMSTORE)  // I3432
     {
       DWORD dwSystemID = *(pp + 2) - 1;
-      t = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(pp + 4)) - 1];  // I2590
+      t = &keyboard->dpStoreArray[(*(pp + 4)) - 1];  // I2590
       switch (dwSystemID)
       {
       case TSS_PLATFORM_MATCH:  // Cached platform result - a matching platform
@@ -631,7 +629,7 @@ BOOL KmnKeymanRuleProcessor::ContextMatch(LPKEY kkp)
         break;
       default:
       {
-        PWCHAR ss = GetSystemStore(_td->lpActiveKeyboard->Keyboard, dwSystemID);
+        PWCHAR ss = GetSystemStore(keyboard, dwSystemID);
         if (ss == NULL) return FALSE;
         bEqual = wcscmp(ss, t->dpString) == 0;
       }
@@ -671,7 +669,7 @@ BOOL KmnKeymanRuleProcessor::ContextMatch(LPKEY kkp)
         }
         break;
       case CODE_ANY:
-        s = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(p + 2)) - 1];
+        s = &keyboard->dpStoreArray[(*(p + 2)) - 1];
 
         temp = xstrchr(s->dpString, q);
 
@@ -692,7 +690,7 @@ BOOL KmnKeymanRuleProcessor::ContextMatch(LPKEY kkp)
           return FALSE;
         break;
       case CODE_NOTANY:
-        s = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(p + 2)) - 1];
+        s = &keyboard->dpStoreArray[(*(p + 2)) - 1];
 
         if ((temp = xstrchr(s->dpString, q)) != NULL)   // I1622
           return FALSE;
@@ -701,7 +699,7 @@ BOOL KmnKeymanRuleProcessor::ContextMatch(LPKEY kkp)
         //  return FALSE;
         break;
       case CODE_INDEX:
-        s = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(p + 2)) - 1];
+        s = &keyboard->dpStoreArray[(*(p + 2)) - 1];
         *indexp = n = _td->IndexStack[(*(p + 3)) - 1];
 
         for (temp = s->dpString; *temp && n > 0; temp = incxstr(temp), n--);
