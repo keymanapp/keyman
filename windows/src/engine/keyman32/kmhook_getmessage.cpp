@@ -376,7 +376,6 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
 
       SelectApplicationIntegration();
       if(!_td->app->IsWindowHandled(hwnd)) _td->app->HandleWindow(hwnd);
-      _td->state.windowunicode = _td->app->IsUnicode();
 
       if(IsFocusedThread())
 		  {

@@ -185,12 +185,6 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 	_td->state.msg.message = wm_keymankeydown;
 	_td->state.vkey = (WORD) wParam;
 
-  _td->state.windowunicode = TRUE;
-
-	_td->state.NoMatches = TRUE;
-	_td->state.LoopTimes = 0;
-	_td->state.StopOutput = FALSE;
-
   _td->state.charCode = CharFromVK(&_td->state.vkey, Globals::get_ShiftState());   // I4582
 
 	_td->TIPProcessOutput = outfunc;

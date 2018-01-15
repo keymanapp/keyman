@@ -225,15 +225,9 @@ typedef struct tagINI
 
 typedef struct tagKMSTATE
 {
-	BOOL NoMatches;
-	BOOL StopOutput;
-	int LoopTimes;
 	MSG msg;
 	WORD vkey; // I934
 	WCHAR charCode;   // I4582
-	BOOL windowunicode;   // I4287
-	//LPKEYBOARD lpkb;
-	//LPGROUP startgroup;
 } KMSTATE;
    // I3616
 enum ProcessStringReturn {psrPostMessages, psrCheckMatches};

@@ -58,6 +58,9 @@ BOOL KmnKeymanRuleProcessor::ProcessEvent(const KeymanRuleEvent *event, KeymanRu
       _td->app->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR)&keyinfo);
   }
 
+  stackDepth = 0;
+  stopOutput = FALSE;
+
   this->currentEvent = event;
   this->currentActions = actions;
   ProcessGroup(gp);
@@ -119,15 +122,13 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
       break;
     }
 
-  if (++_td->state.LoopTimes > 50)
+  if (++stackDepth > 50)
   {
-    if (currentEvent->isKeyDown) DebugLogFormat("Aborting output: state.LoopTimes exceeded.");
-    _td->state.StopOutput = TRUE;
+    if (currentEvent->isKeyDown) DebugLogFormat("Aborting output: stackDepth exceeded.");
+    stopOutput = TRUE;
     _td->app->QueueDebugInformation(QID_GROUP_EXIT, gp, NULL, NULL, NULL, QID_FLAG_RECURSIVE_OVERFLOW);
     return FALSE;
   }
-
-  _td->state.NoMatches = TRUE;
 
   /*
   The rule matching loop.
@@ -282,8 +283,6 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
 
   DebugLogFormat("match found in rule %d", i);
 
-  _td->state.NoMatches = FALSE;
-
   /*
   Save the context that will be used for output when the 'context' keyword is used.
   For each deadkey, we need to add 2 characters; look in related stores as well...
@@ -431,19 +430,19 @@ int KmnKeymanRuleProcessor::PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWS
         }
         break;
       case CODE_RETURN:				// stop processing and start PostAllKeys
-        _td->state.StopOutput = TRUE;
+        stopOutput = TRUE;
         return psrPostMessages;
 
       case CODE_CALL:
         p++;
         CallDLL(_td->lpActiveKeyboard, *p - 1);
-        if (_td->state.StopOutput) return psrPostMessages;
+        if (stopOutput) return psrPostMessages;
         FoundUse = TRUE;
         break;
       case CODE_USE:					// use another group
         p++;
         ProcessGroup(&lpkb->dpGroupArray[*p - 1]);
-        if (_td->state.StopOutput) return psrPostMessages;
+        if (stopOutput) return psrPostMessages;
         FoundUse = TRUE;
         break;
       case CODE_CLEARCONTEXT:

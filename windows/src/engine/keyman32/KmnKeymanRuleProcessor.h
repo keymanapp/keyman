@@ -5,6 +5,10 @@ class KmnKeymanRuleProcessor :
 {
 private:
   LPKEYBOARD keyboard;
+
+  // State variables
+  int stackDepth;
+  BOOL stopOutput;
   
   const KeymanRuleEvent *currentEvent;
   KeymanRuleActionList *currentActions;
