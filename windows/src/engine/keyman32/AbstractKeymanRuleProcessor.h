@@ -24,6 +24,9 @@ typedef std::list<KeymanRuleAction> KeymanRuleActionList;
 
 class AbstractKeymanRuleProcessor
 {
+protected:
+  void DebugLogFormat(char *fmt, ...);
+  void DebugLog(char *msg);
 public:
   virtual BOOL ProcessEvent(const KeymanRuleEvent *event, KeymanRuleActionList *actions) = 0;
 };

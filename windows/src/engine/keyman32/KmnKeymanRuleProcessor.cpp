@@ -43,8 +43,7 @@ BOOL KmnKeymanRuleProcessor::ProcessEvent(const KeymanRuleEvent *event, KeymanRu
 
   if (_td->state.msg.message == wm_keymankeydown) {   // I4827
     if (ShouldDebug(sdmKeyboard)) {
-      SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %s Context '%s'",
-        Debug_VirtualKey(event->vk), getcontext_debug());
+      DebugLogFormat("Key pressed: %s Context '%s'", Debug_VirtualKey(event->vk), getcontext_debug());
     }
 
     AIDEBUGKEYINFO keyinfo;
@@ -115,14 +114,14 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
     if (gp == &keyboard->dpGroupArray[i])
     {
       if (_td->state.msg.message == wm_keymankeydown && ShouldDebug(sdmKeyboard))
-        SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Entering group %d of %d, context '%s'", i + 1, keyboard->cxGroupArray, getcontext_debug());
+        DebugLogFormat("Entering group %d of %d, context '%s'", i + 1, keyboard->cxGroupArray, getcontext_debug());
       sdmfI = i;
       break;
     }
 
   if (++_td->state.LoopTimes > 50)
   {
-    if (_td->state.msg.message == wm_keymankeydown) SendDebugMessage(_td->state.msg.hwnd, sdmKeyboard, 0, "Aborting output: state.LoopTimes exceeded.");
+    if (_td->state.msg.message == wm_keymankeydown) DebugLogFormat("Aborting output: state.LoopTimes exceeded.");
     _td->state.StopOutput = TRUE;
     _td->app->QueueDebugInformation(QID_GROUP_EXIT, gp, NULL, NULL, NULL, QID_FLAG_RECURSIVE_OVERFLOW);
     return FALSE;
@@ -144,7 +143,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
   */
 
   if (ShouldDebug(sdmKeyboard))
-    SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "event->vk: %s event->shiftState: %x; charCode: %X",
+    DebugLogFormat("event->vk: %s event->shiftState: %x; charCode: %X",
       Debug_VirtualKey(currentEvent->vk), currentEvent->shiftState, currentEvent->charCode);   // I4582
 
   if (gp)
@@ -180,8 +179,8 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
     Context is not kept for virtual keys being output.
     */
 
-    if (_td->state.msg.message == wm_keymankeydown && ShouldDebug(sdmKeyboard)) SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0,
-      "No match was found in group %d of %d", sdmfI, keyboard->cxGroupArray);
+    if (_td->state.msg.message == wm_keymankeydown && ShouldDebug(sdmKeyboard)) 
+      DebugLogFormat("No match was found in group %d of %d", sdmfI, keyboard->cxGroupArray);
 
     if (!gp || (currentEvent->charCode == 0 && gp->fUsingKeys))   // I4585
                                                                // 7.0.241.0: I1133 - Fix mismatched parentheses on state.charCode - ie. we don't want to output this letter if !gp->fUsingKeys
@@ -204,13 +203,13 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
         }
       }
       else if ((!_td->app->IsLegacy() || !fIsBackspace) && !_td->TIPFPreserved) {   // I4024   // I4128   // I4287   // I4290
-        SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, " ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
+        DebugLogFormat(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
         if (currentEvent->charCode == 0) _td->app->ResetContext();    // I3573   // I3577   // I4585
         fOutputKeystroke = TRUE;
         return FALSE;
       }
       //fOutputKeystroke = TRUE; return FALSE; // Don't swallow keystroke   // I3577
-      ///SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, " ... IsLegacy = TRUE; IsTIP = TRUE");
+      ///DebugLogFormat(" ... IsLegacy = TRUE; IsTIP = TRUE");
 
       /*
       If the key is not a character key (white keys), or not processing, then we must init the stack -
@@ -281,7 +280,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
   if (_td->state.msg.message == wm_keymankeyup)
     return TRUE;
 
-  SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "match found in rule %d", i);
+  DebugLogFormat("match found in rule %d", i);
 
   _td->state.NoMatches = FALSE;
 
@@ -578,7 +577,7 @@ BOOL KmnKeymanRuleProcessor::ContextMatch(LPKEY kkp)
   LPSTORE s, t;
   BOOL bEqual;
 
-  //SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: ENTER [%d]", kkp->Line);
+  //DebugLogFormat("ContextMatch: ENTER [%d]", kkp->Line);
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
 
@@ -588,7 +587,7 @@ BOOL KmnKeymanRuleProcessor::ContextMatch(LPKEY kkp)
 
   if (*p == 0)
   {
-    //SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT TRUE -> no rule context");
+    //DebugLogFormat("ContextMatch: EXIT TRUE -> no rule context");
     return TRUE;
   }
 
@@ -647,17 +646,17 @@ BOOL KmnKeymanRuleProcessor::ContextMatch(LPKEY kkp)
   q = qbuf = _td->app->ContextBuf(xstrlen_ignoreifopt(p));
   if (!q)
   {
-    //SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT FALSE -> context too short");
+    //DebugLogFormat("ContextMatch: EXIT FALSE -> context too short");
     return FALSE;	// context buf is too short!
   }
   indexp = _td->IndexStack;
 
-  //SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: [%d] Rule: %s", kkp->Line, format_unicode_debug(kkp->dpContext));
-  //SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: [%d] Test: %s", kkp->Line, format_unicode_debug(q));
+  //DebugLogFormat("ContextMatch: [%d] Rule: %s", kkp->Line, format_unicode_debug(kkp->dpContext));
+  //DebugLogFormat("ContextMatch: [%d] Test: %s", kkp->Line, format_unicode_debug(q));
 
   for (; *p && *q; p = incxstr(p))
   {
-    //SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: p:%x q:%x", *p, *q);
+    //DebugLogFormat("ContextMatch: p:%x q:%x", *p, *q);
     *indexp = 0;
 
     if (*p == UC_SENTINEL)
@@ -667,7 +666,7 @@ BOOL KmnKeymanRuleProcessor::ContextMatch(LPKEY kkp)
       case CODE_DEADKEY:
         if (*q != UC_SENTINEL || *(q + 1) != CODE_DEADKEY || *(q + 2) != *(p + 2))
         {
-          //	SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT FALSE -> deadkeys don't match %x %x %x != %x %x %x",
+          //	DebugLogFormat("ContextMatch: EXIT FALSE -> deadkeys don't match %x %x %x != %x %x %x",
           //				*p, *(p+1), *(p+2), *q, *(q+1), *(q+2));
           return FALSE;
         }
@@ -677,7 +676,7 @@ BOOL KmnKeymanRuleProcessor::ContextMatch(LPKEY kkp)
 
         temp = xstrchr(s->dpString, q);
 
-        /*SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard ,kkp->Line, "ContextMatch: CODE_ANY [%x %x %x %x %x %x %x %x %x %x] [%x %x %x] %d",
+        /*DebugLogFormat("ContextMatch: CODE_ANY [%x %x %x %x %x %x %x %x %x %x] [%x %x %x] %d",
         s->dpString[0], s->dpString[1], s->dpString[2],
         s->dpString[3], s->dpString[4], s->dpString[5],
         s->dpString[6], s->dpString[7], s->dpString[8],
@@ -728,9 +727,9 @@ BOOL KmnKeymanRuleProcessor::ContextMatch(LPKEY kkp)
     }
     else if (xchrcmp(p, q) != 0) //GetSuppChar(p) != GetSuppChar(q)) 
     {
-      //SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: [%d] FAIL: %s", kkp->Line, format_unicode_debug(p));
-      //SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: [%d] FAIL: %s", kkp->Line, format_unicode_debug(q));
-      //SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT FALSE -> chrs don't match");
+      //DebugLogFormat("ContextMatch: [%d] FAIL: %s", kkp->Line, format_unicode_debug(p));
+      //DebugLogFormat("ContextMatch: [%d] FAIL: %s", kkp->Line, format_unicode_debug(q));
+      //DebugLogFormat("ContextMatch: EXIT FALSE -> chrs don't match");
       return FALSE;
     }
     indexp++;
@@ -739,7 +738,6 @@ BOOL KmnKeymanRuleProcessor::ContextMatch(LPKEY kkp)
 
   while (*p == UC_SENTINEL && (*(p + 1) == CODE_IFOPT || *(p + 1) == CODE_IFSYSTEMSTORE)) p = incxstr(p); // already tested  // I3432
 
-                                                                                                          //SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT %s -> END OF FUNCTION",
-                                                                                                          //	*p == *q ? "TRUE" : "FALSE");
+  //DebugLogFormat("ContextMatch: EXIT %s -> END OF FUNCTION", *p == *q ? "TRUE" : "FALSE");
   return *p == *q; /*at least one must ==0 at this point*/
 }
