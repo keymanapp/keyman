@@ -265,10 +265,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 	 If the keyboard needs to be activated, select it: messaging from the main application
 	*/
 
-	if(_td->lpActiveKeyboard)
-	{
-		_td->state.lpkb = _td->lpActiveKeyboard->Keyboard;
-	}
    // I4412
 	if(mp->message == wm_keymanshift)
 	{
@@ -378,10 +374,6 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
     {
       hwnd = GetFocus();
 
-		  if(_td->lpActiveKeyboard) {
-			  _td->state.lpkb = _td->lpActiveKeyboard->Keyboard;
-		  }
-      
       SelectApplicationIntegration();
       if(!_td->app->IsWindowHandled(hwnd)) _td->app->HandleWindow(hwnd);
       _td->state.windowunicode = _td->app->IsUnicode();

@@ -185,10 +185,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 	_td->state.msg.message = wm_keymankeydown;
 	_td->state.vkey = (WORD) wParam;
 
-	_td->state.lpkb = _td->lpActiveKeyboard->Keyboard;
-
   _td->state.windowunicode = TRUE;
-	_td->state.startgroup = &_td->state.lpkb->dpGroupArray[_td->state.lpkb->StartGroup[BEGIN_UNICODE]];
 
 	_td->state.NoMatches = TRUE;
 	_td->state.LoopTimes = 0;

@@ -232,8 +232,8 @@ typedef struct tagKMSTATE
 	WORD vkey; // I934
 	WCHAR charCode;   // I4582
 	BOOL windowunicode;   // I4287
-	LPKEYBOARD lpkb;
-	LPGROUP startgroup;
+	//LPKEYBOARD lpkb;
+	//LPGROUP startgroup;
 } KMSTATE;
    // I3616
 enum ProcessStringReturn {psrPostMessages, psrCheckMatches};
@@ -248,16 +248,7 @@ LRESULT CALLBACK kmnLowLevelKeyboardProc(   // I4124
 
 BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd);
 
-void PostGETNEXT(HWND hwnd);
-BOOL CompareMsg(LPMSG MsgA, LPMSG MsgB);
 BOOL ProcessHook();	// returns FALSE on error or key not matched [only for AITip]
-BOOL ProcessMessage( LPMSG mp );
-BOOL ProcessGroup(LPGROUP gp);
-BOOL ContextMatch(LPKEY kkp);
-int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr);
-//void PostKey( int keystroke, int msgflags, LPMSG msg );
-//void GetINIAdvanced( void );
-BOOL LoadAllKeymanKeyboards(DWORD layout);
 void UpdateKeymanUI();
 
 BOOL IsSysTrayWindow(HWND hwnd);
