@@ -236,7 +236,7 @@ void CallDLL(LPINTKEYBOARDINFO lpkbi, DWORD storenum)
   if(!_td) return;
 
   if(_td->TIPFUpdateable) {   // I4452
-	  (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
+	  (*imdh->function)(GetFocus(), _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
   }
 
 	//SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDll: Exit");

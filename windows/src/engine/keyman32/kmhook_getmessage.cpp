@@ -200,21 +200,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
     return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
 
-#if 0  // I2908
-  if(_td->state.PreviousNoRemove && IsMessageEquivalent(&_td->state.msg, mp))
-	{
-		/*
-		  Was the previous message the same as this one.  If so, don't process it again.
-		 */
-		_td->state.PreviousNoRemove = (wParam & PM_REMOVE) == 0;
-		_td->state.msg = *mp;
-		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-	}
-#endif
-
-	_td->state.msg = *mp;
-	/*_td->state.PreviousNoRemove = (wParam & PM_REMOVE) == 0; I2908 */
-
   // 16 April 2005, 7 May 2007 - mcdurdin - Check if Keyman is receiving messages (reimplement from v6.2) */
 	if(mp->message == wm_test_keyman_functioning && mp->wParam == TKF_PING)
 	{

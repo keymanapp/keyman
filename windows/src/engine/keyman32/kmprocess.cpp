@@ -104,6 +104,7 @@ BOOL ProcessHook()
   event.shiftState = Globals::get_ShiftState();
   event.charCode = _td->state.charCode;
   event.isKeyDown = _td->state.msg.message == wm_keymankeydown;
+  event.isExtended = _td->state.msg.lParam & (1 << 24) ? TRUE : FALSE;
   BOOL r = krp->ProcessEvent(&event, &actions);
 
   return r;

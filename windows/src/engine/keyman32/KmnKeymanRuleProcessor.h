@@ -17,7 +17,7 @@ private:
   BOOL IsMatchingPlatform(LPSTORE s); // I3432
   BOOL IsMatchingBaseLayout(PWCHAR layoutName);  // I3432
   BOOL IsMatchingPlatformString(PWCHAR platform);  // I3432
-  int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr);
+  int PostString(PWSTR str, PWSTR endstr);
   BOOL ProcessGroup(LPGROUP gp);
   char *getcontext_debug();
 protected:

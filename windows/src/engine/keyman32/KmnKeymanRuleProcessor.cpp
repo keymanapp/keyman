@@ -233,7 +233,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
         DWORD dw = currentEvent->vk;
         if (dw == 0x05) dw = VK_RETURN;    // I649 - VK_ENTER and K_NPENTER
 
-        if (_td->state.msg.lParam & (1 << 24)) dw |= QVK_EXTENDED;	// Extended key flag  // I3438
+        if (currentEvent->isExtended) dw |= QVK_EXTENDED;	// Extended key flag  // I3438
 
         if (currentEvent->charCode == 0) {
           _td->app->ResetContext();
@@ -262,7 +262,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
     {
       /* NoMatch rule found, and is a character key */
       _td->app->QueueDebugInformation(QID_NOMATCH_ENTER, gp, NULL, NULL, gp->dpNoMatch, 0);
-      PostString(gp->dpNoMatch, &_td->state.msg, keyboard, NULL);
+      PostString(gp->dpNoMatch, NULL);
       _td->app->QueueDebugInformation(QID_NOMATCH_EXIT, gp, NULL, NULL, gp->dpNoMatch, 0);
     }
     else if (currentEvent->charCode != 0 && currentEvent->charCode != 0xFFFF && currentEvent->isKeyDown && gp->fUsingKeys)
@@ -278,7 +278,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
     return TRUE;
   }
 
-  if (_td->state.msg.message == wm_keymankeyup)
+  if (!currentEvent->isKeyDown)
     return TRUE;
 
   DebugLogFormat("match found in rule %d", i);
@@ -336,14 +336,14 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
 
                       /* Use PostString to post the rest of the output string. */
 
-  if (PostString(p, &_td->state.msg, keyboard, NULL) == psrCheckMatches)
+  if (PostString(p, NULL) == psrCheckMatches)
   {
     _td->app->QueueDebugInformation(QID_RULE_EXIT, gp, kkp, _td->miniContext, NULL, 0);
 
     if (gp->dpMatch && *gp->dpMatch)
     {
       _td->app->QueueDebugInformation(QID_MATCH_ENTER, gp, NULL, NULL, gp->dpMatch, 0);
-      PostString(gp->dpMatch, &_td->state.msg, keyboard, NULL);
+      PostString(gp->dpMatch, NULL);
       _td->app->QueueDebugInformation(QID_MATCH_EXIT, gp, NULL, NULL, gp->dpMatch, 0);
     }
   }
@@ -355,7 +355,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
 }
 
 /*
-*	int PostString( LPSTR str, BOOL *useMode, LPMSG mp,
+*	int PostString( LPSTR str, BOOL *useMode,
 *	LPKEYBOARD lpkb );
 *
 *	Parameters:	str		Pointer to string to send
@@ -371,7 +371,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
 *	to the active application, via the Keyman PostKey buffer.
 */
 
-int KmnKeymanRuleProcessor::PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr)
+int KmnKeymanRuleProcessor::PostString(PWSTR str, PWSTR endstr)
 {
   PWSTR p, q, temp;
   LPSTORE s;
@@ -441,7 +441,7 @@ int KmnKeymanRuleProcessor::PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWS
         break;
       case CODE_USE:					// use another group
         p++;
-        ProcessGroup(&lpkb->dpGroupArray[*p - 1]);
+        ProcessGroup(&keyboard->dpGroupArray[*p - 1]);
         if (stopOutput) return psrPostMessages;
         FoundUse = TRUE;
         break;
@@ -456,7 +456,7 @@ int KmnKeymanRuleProcessor::PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWS
 
         n = _td->IndexStack[*p - 1];
         for (temp = s->dpString; *temp && n > 0; temp = incxstr(temp), n--);
-        PostString(temp, mp, lpkb, incxstr(temp));
+        PostString(temp, incxstr(temp));
         break;
       case CODE_SETOPT:
         p++;

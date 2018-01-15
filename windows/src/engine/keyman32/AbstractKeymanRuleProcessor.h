@@ -9,6 +9,7 @@ struct KeymanRuleEvent {
   DWORD shiftState;
   WCHAR charCode;
   BOOL isKeyDown;
+  BOOL isExtended;
   MSG msg;  //TODO: refactor into a keyDownState and other properties?
 
   // Context data
