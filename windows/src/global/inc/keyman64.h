@@ -225,7 +225,6 @@ typedef struct tagINI
 
 typedef struct tagKMSTATE
 {
-	MSG msg;
 	WORD vkey; // I934
 	WCHAR charCode;   // I4582
 } KMSTATE;

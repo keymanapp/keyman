@@ -103,8 +103,8 @@ BOOL ProcessHook()
   event.vk = _td->state.vkey;
   event.shiftState = Globals::get_ShiftState();
   event.charCode = _td->state.charCode;
-  event.isKeyDown = _td->state.msg.message == wm_keymankeydown;
-  event.isExtended = _td->state.msg.lParam & (1 << 24) ? TRUE : FALSE;
+  event.isKeyDown = TRUE;  //TODO: Do we need the keyup code paths any longer? _td->state.msg.message == wm_keymankeydown;
+  event.isExtended = TRUE;  //TODO: Do we need this data, and if so how do we collect it? _td->state.msg.lParam & (1 << 24) ? TRUE : FALSE;
   BOOL r = krp->ProcessEvent(&event, &actions);
 
   return r;
