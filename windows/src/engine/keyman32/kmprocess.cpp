@@ -102,6 +102,7 @@ BOOL ProcessHook()
   if (!_td) return FALSE;
   event.vk = _td->state.vkey;
   event.shiftState = Globals::get_ShiftState();
+  event.charCode = _td->state.charCode;
   BOOL r = krp->ProcessEvent(&event, &actions);
 
   return r;

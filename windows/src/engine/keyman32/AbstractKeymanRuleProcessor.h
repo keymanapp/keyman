@@ -7,6 +7,7 @@ struct KeymanRuleEvent {
   // Keystroke event properties
   WORD vk;
   DWORD shiftState;
+  WCHAR charCode;
 
   // Context data
   WCHAR *context; // up to 256 elements?
