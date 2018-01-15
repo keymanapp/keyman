@@ -8,6 +8,8 @@ struct KeymanRuleEvent {
   WORD vk;
   DWORD shiftState;
   WCHAR charCode;
+  BOOL isKeyDown;
+  MSG msg;  //TODO: refactor into a keyDownState and other properties?
 
   // Context data
   WCHAR *context; // up to 256 elements?

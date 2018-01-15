@@ -103,6 +103,7 @@ BOOL ProcessHook()
   event.vk = _td->state.vkey;
   event.shiftState = Globals::get_ShiftState();
   event.charCode = _td->state.charCode;
+  event.isKeyDown = _td->state.msg.message == wm_keymankeydown;
   BOOL r = krp->ProcessEvent(&event, &actions);
 
   return r;

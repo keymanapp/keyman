@@ -41,7 +41,7 @@ BOOL KmnKeymanRuleProcessor::ProcessEvent(const KeymanRuleEvent *event, KeymanRu
 
   _td->app->ReadContext();
 
-  if (_td->state.msg.message == wm_keymankeydown) {   // I4827
+  if (event->isKeyDown) {   // I4827
     if (ShouldDebug(sdmKeyboard)) {
       DebugLogFormat("Key pressed: %s Context '%s'", Debug_VirtualKey(event->vk), getcontext_debug());
     }
@@ -51,7 +51,7 @@ BOOL KmnKeymanRuleProcessor::ProcessEvent(const KeymanRuleEvent *event, KeymanRu
     keyinfo.VirtualKey = event->vk;
     keyinfo.Character = event->charCode;
     keyinfo.DeadKeyCharacter = 0;   // I4582
-    keyinfo.IsUp = _td->state.msg.message == wm_keymankeyup;
+    keyinfo.IsUp = !event->isKeyDown;
     if (_td->app->IsUnicode())
       _td->app->QueueDebugInformation(QID_BEGIN_UNICODE, NULL, NULL, NULL, NULL, (DWORD_PTR)&keyinfo);
     else
@@ -113,7 +113,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
   for (i = 0; i < keyboard->cxGroupArray; i++)
     if (gp == &keyboard->dpGroupArray[i])
     {
-      if (_td->state.msg.message == wm_keymankeydown && ShouldDebug(sdmKeyboard))
+      if (currentEvent->isKeyDown && ShouldDebug(sdmKeyboard))
         DebugLogFormat("Entering group %d of %d, context '%s'", i + 1, keyboard->cxGroupArray, getcontext_debug());
       sdmfI = i;
       break;
@@ -121,7 +121,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
 
   if (++_td->state.LoopTimes > 50)
   {
-    if (_td->state.msg.message == wm_keymankeydown) DebugLogFormat("Aborting output: state.LoopTimes exceeded.");
+    if (currentEvent->isKeyDown) DebugLogFormat("Aborting output: state.LoopTimes exceeded.");
     _td->state.StopOutput = TRUE;
     _td->app->QueueDebugInformation(QID_GROUP_EXIT, gp, NULL, NULL, NULL, QID_FLAG_RECURSIVE_OVERFLOW);
     return FALSE;
@@ -179,7 +179,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
     Context is not kept for virtual keys being output.
     */
 
-    if (_td->state.msg.message == wm_keymankeydown && ShouldDebug(sdmKeyboard)) 
+    if (currentEvent->isKeyDown && ShouldDebug(sdmKeyboard))
       DebugLogFormat("No match was found in group %d of %d", sdmfI, keyboard->cxGroupArray);
 
     if (!gp || (currentEvent->charCode == 0 && gp->fUsingKeys))   // I4585
@@ -188,9 +188,9 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
       BOOL fIsBackspace = currentEvent->vk == VK_BACK && (currentEvent->shiftState & (LCTRLFLAG | RCTRLFLAG | LALTFLAG | RALTFLAG)) == 0;   // I4128
 
       if (/*_td->app->DebugControlled() &&*/ fIsBackspace) {   // I4838   // I4933
-                                                               //if(_td->state.msg.message == wm_keymankeydown) 
+                                                               //if(currentEvent->isKeyDown) 
                                                                //	_td->app->QueueAction(QIT_BACK, BK_BACKSPACE);
-        if (_td->state.msg.message == wm_keymankeydown) {   // I4933
+        if (currentEvent->isKeyDown) {   // I4933
           if (!_td->app->IsLegacy()) {   // I4933
             PWCHAR pdeletecontext = _td->app->ContextBuf(1);   // I4933
             if (!pdeletecontext || *pdeletecontext == 0) {   // I4933
@@ -222,7 +222,7 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
         This only fires if the keyboard has no rule for backspace.
         */
 
-        //				if(_td->state.msg.message == wm_keymankeydown)    // I4933
+        //				if(currentEvent->isKeyDown)    // I4933
         //				_td->app->QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
       }
       else
@@ -244,27 +244,27 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
           }
         }
         else {
-          if (_td->state.msg.message == wm_keymankeydown)
+          if (currentEvent->isKeyDown)
           {
             _td->app->QueueAction(QIT_VSHIFTDOWN, currentEvent->shiftState);  // 15/05/2001 - fixing I201 -- enabled line
             _td->app->QueueAction(QIT_VKEYDOWN, dw);
           }
 
-          if (_td->state.msg.message == wm_keymankeyup) {
+          if (!currentEvent->isKeyDown) {
             _td->app->QueueAction(QIT_VKEYUP, dw);
             _td->app->QueueAction(QIT_VSHIFTUP, currentEvent->shiftState);
           }
         }
       }
     }
-    else if (gp->dpNoMatch != NULL && *gp->dpNoMatch != 0 && _td->state.msg.message != wm_keymankeyup)
+    else if (gp->dpNoMatch != NULL && *gp->dpNoMatch != 0 && currentEvent->isKeyDown)
     {
       /* NoMatch rule found, and is a character key */
       _td->app->QueueDebugInformation(QID_NOMATCH_ENTER, gp, NULL, NULL, gp->dpNoMatch, 0);
       PostString(gp->dpNoMatch, &_td->state.msg, keyboard, NULL);
       _td->app->QueueDebugInformation(QID_NOMATCH_EXIT, gp, NULL, NULL, gp->dpNoMatch, 0);
     }
-    else if (currentEvent->charCode != 0 && currentEvent->charCode != 0xFFFF && _td->state.msg.message != wm_keymankeyup && gp->fUsingKeys)
+    else if (currentEvent->charCode != 0 && currentEvent->charCode != 0xFFFF && currentEvent->isKeyDown && gp->fUsingKeys)
     {
       /* No rule found, is a character key */
       // 7.0.239.0: I994 - Workaround output order issues - we will use the TSF to output all characters...
