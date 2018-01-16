@@ -102,12 +102,22 @@ BOOL ProcessHook()
   if (!_td) return FALSE;
   _td->app->ReadContext();
 
+  // Current event data
+
   event.vk = _td->state.vkey;
   event.shiftState = Globals::get_ShiftState();
   event.charCode = _td->state.charCode;
   event.isKeyDown = TRUE;  //TODO: Do we need the keyup code paths any longer? _td->state.msg.message == wm_keymankeydown;
   event.isExtended = TRUE;  //TODO: Do we need this data, and if so how do we collect it? _td->state.msg.lParam & (1 << 24) ? TRUE : FALSE;
+
+  // Environmental data
+
+  event.baseKeyboardName = Globals::get_BaseKeyboardName();
+  event.baseKeyboardNameAlt = Globals::get_BaseKeyboardNameAlt();
+
   BOOL r = krp->ProcessEvent(&event, &actions);
+
+  // Post actions
 
   return r;
 }

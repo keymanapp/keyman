@@ -50,10 +50,12 @@ BOOL KmnKeymanRuleProcessor::ProcessEvent(const KeymanRuleEvent *event, KeymanRu
     keyinfo.Character = event->charCode;
     keyinfo.DeadKeyCharacter = 0;   // I4582
     keyinfo.IsUp = !event->isKeyDown;
-    if (_td->app->IsUnicode())
+    if (_td->app->IsUnicode()) {
       actions->QueueDebugInformation(QID_BEGIN_UNICODE, NULL, NULL, NULL, NULL, (DWORD_PTR)&keyinfo);
-    else
+    }
+    else {
       actions->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR)&keyinfo);
+    }
   }
 
   stackDepth = 0;
@@ -97,13 +99,6 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
   PWSTR p;
   int sdmfI;
 
-  /*
-  If the number of nested groups goes higher than 50, then break out - this is
-  a limitation of stack size.  This is basically a catch-all for freaky apps that
-  cause message loopbacks and nasty things like that.  Okay, it's really a catch all
-  for bugs!  This means the user's system shouldn't hang.
-  */
-
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
 
@@ -119,6 +114,13 @@ BOOL KmnKeymanRuleProcessor::ProcessGroup(LPGROUP gp)
       sdmfI = i;
       break;
     }
+
+  /*
+  If the number of nested groups goes higher than 50, then break out - this is
+  a limitation of stack size.  This is basically a catch-all for freaky apps that
+  cause message loopbacks and nasty things like that.  Okay, it's really a catch all
+  for bugs!  This means the user's system shouldn't hang.
+  */
 
   if (++stackDepth > 50)
   {
@@ -489,8 +491,8 @@ int KmnKeymanRuleProcessor::PostString(PWSTR str, PWSTR endstr)
 
 BOOL KmnKeymanRuleProcessor::IsMatchingBaseLayout(PWCHAR layoutName)  // I3432
 {
-  BOOL bEqual = _wcsicmp(layoutName, Globals::get_BaseKeyboardName()) == 0 ||   // I4583
-    _wcsicmp(layoutName, Globals::get_BaseKeyboardNameAlt()) == 0;   // I4583
+  BOOL bEqual = _wcsicmp(layoutName, currentEvent->baseKeyboardName) == 0 ||   // I4583
+    _wcsicmp(layoutName, currentEvent->baseKeyboardNameAlt) == 0;   // I4583
 
   return bEqual;
 }
