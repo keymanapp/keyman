@@ -16,7 +16,8 @@ struct KeymanRuleEvent {
   WCHAR *context; // up to 256 elements?
 
   // Environmental data
-
+  WCHAR *baseKeyboardName;    // e.g. "kbdus.dll"
+  WCHAR *baseKeyboardNameAlt; // e.g. "en-US"
 };
 
 struct KeymanRuleAction {
