@@ -29,6 +29,8 @@
 #ifndef _KEYMANAPI_H
 #define _KEYMANAPI_H
 
+#include "imdll.h"
+
 // The members of this structure, from first through to IMDLLs, must match INTKEYBOARDINFO from keyman64.h   // I4462
 typedef struct tagKEYBOARDINFO
 {
@@ -42,6 +44,8 @@ typedef struct tagKEYBOARDINFO
 } KEYBOARDINFO, *LPKEYBOARDINFO;
 
 extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_BuildKeyboardList(LPKEYBOARDINFO kbd, int *n);
+
+
 extern "C" HWND  _declspec(dllexport) WINAPI Keyman_GetLastActiveWindow();
 extern "C" HWND  _declspec(dllexport) WINAPI Keyman_GetLastFocusWindow();
 

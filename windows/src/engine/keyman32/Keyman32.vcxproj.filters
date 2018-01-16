@@ -216,5 +216,8 @@
     <ClInclude Include="KmnKeymanRuleProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IntKeyboardInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

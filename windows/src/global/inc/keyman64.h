@@ -167,55 +167,6 @@ typedef struct tagKEYBOARD
 	HBITMAP	hBitmap;		// handle to the bitmap in the file;
 } KEYBOARD, *LPKEYBOARD;
 
-typedef BOOL (WINAPI *IMDLLHOOKProc)(HWND hwndFocus, WORD KeyStroke, WCHAR KeyChar, DWORD shiftFlags);
-
-typedef struct tagIMDLLHOOK
-{
-	char name[32];
-	DWORD storeno;
-	IMDLLHOOKProc function;
-} IMDLLHOOK, *LPIMDLLHOOK;
-	
-typedef struct tagIMDLL
-{
-	char        Filename[256];
-	HMODULE		hModule;
-	DWORD       nHooks;
-	LPIMDLLHOOK Hooks;
-} IMDLL, *LPIMDLL;
-
-typedef struct tagINTKEYBOARDOPTIONS
-{
-  PWCHAR Value;
-  PWCHAR OriginalStore;
-} INTKEYBOARDOPTIONS, *LPINTKEYBOARDOPTIONS;
-
-typedef struct tagINTKEYBOARDPROFILE
-{
-  WCHAR Locale[LOCALE_NAME_MAX_LENGTH];
-  LANGID LangID;
-  GUID Guid;
-} INTKEYBOARDPROFILE, *LPINTKEYBOARDPROFILE;
-
-// Not ideal to recursively include, but will do while we refactor
-#include "AbstractKeymanRuleProcessor.h"
-
-// The members of this structure, from first through to IMDLLs, must match KEYBOARDINFO from keymanapi.h
-typedef struct tagINTKEYBOARDINFO
-{
-	DWORD      KeymanID;
-	DWORD      __filler_Hotkey;
-  DWORD      __filler; // makes same as KEYBOARDINFO   // I4462
-	char       Name[256];
-	LPKEYBOARD Keyboard;
-	DWORD      nIMDLLs;
-	LPIMDLL    IMDLLs;
-	int        __filler2; // makes same as KEYBOARDINFO
-  LPINTKEYBOARDOPTIONS KeyboardOptions;
-  int        nProfiles;
-  LPINTKEYBOARDPROFILE Profiles;
-  AbstractKeymanRuleProcessor *ruleProcessor;
-} INTKEYBOARDINFO, *LPINTKEYBOARDINFO;
 
 typedef struct tagINI
 {

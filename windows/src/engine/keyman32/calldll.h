@@ -19,6 +19,8 @@
 #ifndef __CALLDLL_H
 #define __CALLDLL_H
 
+#include "IntKeyboardInfo.h"
+
 BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi);
 BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi);
 BOOL DeactivateDLLs(LPINTKEYBOARDINFO lpkbi);

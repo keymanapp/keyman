@@ -363,6 +363,7 @@
     <ClInclude Include="..\..\global\inc\Compiler.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="hotkeys.h" />
+    <ClInclude Include="IntKeyboardInfo.h" />
     <ClInclude Include="k32_tsf.h" />
     <ClInclude Include="KBD.H" />
     <ClInclude Include="keyboardoptions.h" />

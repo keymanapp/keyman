@@ -25,6 +25,8 @@
 #ifndef _APPINT_H
 #define _APPINT_H
 
+#include "IntKeyboardInfo.h"
+
 typedef struct
 {
 	int ItemType;
