@@ -83,7 +83,6 @@ procedure TKPInstallKeyboard.Execute(const FileName, PackageName: string; FInsta
 var
   ki: TKeyboardInfo;
   FDestPath: string;
-  FRootKey: HKey;
   kbdname: string;
   FInstByAdmin: Boolean;
   FDestFileName: string;
@@ -118,10 +117,6 @@ begin
     end;
 
     try
-      { Determine where the keyboard will be installed }
-
-        FRootKey := HKEY_LOCAL_MACHINE;
-
       { Uninstall existing keyboard }
 
       if KeyboardInstalled(kbdname, FInstByAdmin) and not Force then
@@ -173,8 +168,8 @@ begin
       try
         { Write Installed Keyboards entry }
 
-        RootKey := FRootKey;
-        if not OpenKey('\'+GetRegistryKeyboardInstallKey(FileName), True) then  // I2890
+        RootKey := HKEY_LOCAL_MACHINE;
+        if not OpenKey('\'+GetRegistryKeyboardInstallKey_LM(FileName), True) then  // I2890
           RaiseLastRegistryError;
 
         WriteString(SRegValue_KeymanFile, FDestFileName);

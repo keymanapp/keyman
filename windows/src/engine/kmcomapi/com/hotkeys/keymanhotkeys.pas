@@ -78,7 +78,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKey(SRegKey_KeymanHotkeys,True) then
+    if OpenKey(SRegKey_KeymanHotkeys_CU,True) then
     begin
       for i := 0 to FHotkeys.Count - 1 do
       begin
@@ -126,7 +126,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    HasRegItems := OpenKeyReadOnly(SRegKey_KeymanHotkeys);
+    HasRegItems := OpenKeyReadOnly(SRegKey_KeymanHotkeys_CU);
     for i := kh__Low to kh__High do
     begin
       if HasRegItems and ValueExists(IntToStr(i))

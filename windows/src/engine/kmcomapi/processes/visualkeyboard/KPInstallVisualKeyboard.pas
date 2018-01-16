@@ -47,6 +47,7 @@ procedure TKPInstallVisualKeyboard.Execute(FileName, KeyboardName: string);
 var
   SDest: string;
   FIsAdmin: Boolean;
+  Path: string;
 begin
   with TVisualKeyboard.Create do
   try
@@ -59,11 +60,18 @@ begin
     begin
       with TRegistryErrorControlled.Create do  // I2890
       try
-        if FIsAdmin
-          then RootKey := HKEY_LOCAL_MACHINE
-          else RootKey := HKEY_CURRENT_USER;
+        if FIsAdmin then
+        begin
+          RootKey := HKEY_LOCAL_MACHINE;
+          Path := GetRegistryKeyboardInstallKey_LM(KeyboardName);
+        end
+        else
+        begin
+          RootKey := HKEY_CURRENT_USER;
+          Path := GetRegistryKeyboardInstallKey_CU(KeyboardName);
+        end;
 
-        if OpenKey(GetRegistryKeyboardInstallKey(KeyboardName), True) then
+        if OpenKey(Path, True) then
         begin
           if not ValueExists(SRegValue_KeymanFile) then Exit;
           SDest := ExtractFilePath(ReadString(SRegValue_KeymanFile));

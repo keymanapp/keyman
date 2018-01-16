@@ -62,6 +62,7 @@ type
     function Get_DefaultBCP47Languages: WideString; override; safecall;
     function Get_DefaultWindowsLanguages: WideString; override; safecall;
     function Get_DefaultPrimaryLanguage: Integer; override; safecall;
+    function Get_Version: WideString; override; safecall;
   public
     constructor Create(AContext: TKeymanContext; const Filename: Widestring);
     destructor Destroy; override;
@@ -158,6 +159,11 @@ end;
 function TKeymanKeyboardFile.Get_Name: WideString;
 begin
   Result := FKeyboardInfo.KeyboardName;
+end;
+
+function TKeymanKeyboardFile.Get_Version: WideString;
+begin
+  Result := FKeyboardInfo.KeyboardVersion;
 end;
 
 function TKeymanKeyboardFile.Get_LayoutType: KeymanKeyboardLayoutType;

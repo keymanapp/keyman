@@ -120,7 +120,7 @@ begin
     with TRegistryErrorControlled.Create do  // I2890
     try
       try   // I4565
-        if OpenKey(SRegKey_KeymanRegisteredWindows, True) then
+        if OpenKey(SRegKey_KeymanRegisteredWindows_CU, True) then
           if ValueExists(RegisteredName) then
             DeleteValue(RegisteredName);
       except
@@ -136,7 +136,7 @@ class function TfrmKeymanBase.GetRegisteredHandle: HWND;  // I2720
 begin
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKeyReadOnly(SRegKey_KeymanRegisteredWindows) and ValueExists(RegisteredName)
+    if OpenKeyReadOnly(SRegKey_KeymanRegisteredWindows_CU) and ValueExists(RegisteredName)
       then Result := ReadInteger(RegisteredName)
       else Result := 0;
   finally
@@ -151,7 +151,7 @@ begin
     with TRegistryErrorControlled.Create do  // I2890
     try
       try   // I4565
-        if OpenKey(SRegKey_KeymanRegisteredWindows, True) then
+        if OpenKey(SRegKey_KeymanRegisteredWindows_CU, True) then
           WriteInteger(RegisteredName, Handle);
       except
         on E:ERegistryException do ;  // Minor issue   // I4565

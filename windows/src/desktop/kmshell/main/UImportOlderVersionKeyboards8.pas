@@ -152,18 +152,19 @@ begin
     if FAdmin then  // I2361
     begin
       regRead.RootKey := HKEY_LOCAL_MACHINE;
-      regWrite.RootKey := HKEY_LOCAL_MACHINE;
+      rootRead := SRegKey_UpgradeBackupPath_LM + SRegKey_KeymanEngine80_InstalledPackages_CU;  // I2642
     end
     else
     begin
       regRead.RootKey := HKEY_CURRENT_USER;
-      regWrite.RootKey := HKEY_LOCAL_MACHINE;
+      rootRead := SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine80_InstalledPackages_CU;  // I2642
     end;
 
     { Copy Installed Keyboards }
 
-    rootRead := SRegKey_UpgradeBackupPath + SRegKey_KeymanEngine80_InstalledPackages;  // I2642
-    rootWrite := '\'+SRegKey_InstalledPackages; // '\Software\...\Keyman Engine\x.x\Installed Packages';
+
+    regWrite.RootKey := HKEY_LOCAL_MACHINE;
+    rootWrite := '\'+SRegKey_InstalledPackages_LM; // '\Software\...\Keyman Engine\x.x\Installed Packages';
 
     if regRead.OpenKeyReadOnly(rootRead) then
     begin
@@ -178,8 +179,10 @@ begin
       end;
     end;
 
-    rootRead := SRegKey_UpgradeBackupPath + SRegKey_KeymanEngine80_InstalledKeyboards;  // I2642
-    rootWrite := '\'+SRegKey_InstalledKeyboards;  // '\Software\...\Keyman Engine\x.x\Installed Keyboards';
+    if FAdmin
+      then rootRead := SRegKey_UpgradeBackupPath_LM + SRegKey_KeymanEngine80_InstalledKeyboards_CU  // I2642
+      else rootRead := SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine80_InstalledKeyboards_CU;  // I2642
+    rootWrite := '\'+SRegKey_InstalledKeyboards_LM;  // '\Software\...\Keyman Engine\x.x\Installed Keyboards';
 
     if regRead.OpenKeyReadOnly(rootRead) then
     begin
@@ -193,8 +196,8 @@ begin
     if not FAdmin then  // I2361
     begin
       regWrite.RootKey := HKEY_CURRENT_USER;   // I4297
-      rootRead := SRegKey_UpgradeBackupPath + SRegKey_KeymanEngine80_ActiveKeyboards;  // I2642
-      rootWrite := '\'+SRegKey_ActiveKeyboards; //'\Software\...\Keyman Engine\x.x\Active Keyboards';
+      rootRead := SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine80_ActiveKeyboards_CU;  // I2642
+      rootWrite := '\'+SRegKey_ActiveKeyboards_CU; //'\Software\...\Keyman Engine\x.x\Active Keyboards';
 
       if regRead.OpenKeyReadOnly(rootRead) and regWrite.OpenKey(rootWrite, True) then
       begin
@@ -228,7 +231,7 @@ begin
 
       { Copy language associations -- registration of language profiles }
 
-      rootRead := SRegKey_UpgradeBackupPath + SRegKey_KeymanEngine80_ActiveLanguages;
+      rootRead := SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine80_ActiveLanguages_CU;
 
       //
       //  1. For each language entry in the Active Languages list, register the keyboard profile
@@ -323,7 +326,7 @@ begin
     Exit;
   end;
 
-  rootWrite := TImportOlderKeyboardUtils.GetRegistryKeyboardInstallKey(AKeyboardName);
+  rootWrite := TImportOlderKeyboardUtils.GetRegistryKeyboardInstallKey_LM(AKeyboardName);
 
   with TRegistryErrorControlled.Create do
   try
@@ -388,7 +391,7 @@ begin
     localRegWrite := TRegistryErrorControlled.Create;  // I2890   // I4296
     try
       localRegWrite.RootKey := HKEY_LOCAL_MACHINE;   // I4297
-      localRegWrite.OpenKey('\' + rootWrite + '\' + SRegKey_LanguageProfiles + '\' + FLocale, True);   // I4296
+      localRegWrite.OpenKey('\' + rootWrite + '\' + SRegSubKey_LanguageProfiles + '\' + FLocale, True);   // I4296
       localRegWrite.WriteInteger(SRegValue_LanguageProfileLangID, FLangID);
       localRegWrite.WriteString(SRegValue_LanguageProfileLocale, FLocale);
 
