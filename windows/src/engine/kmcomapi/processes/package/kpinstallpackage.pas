@@ -182,7 +182,7 @@ begin
         try
           RootKey := HKEY_LOCAL_MACHINE;
 
-          if not OpenKey(SRegKey_InstalledPackages+'\'+PackageName, True) then  // I2890
+          if not OpenKey(SRegKey_InstalledPackages_LM+'\'+PackageName, True) then  // I2890
             RaiseLastRegistryError;
 
           WriteString(SRegValue_PackageFile, dest + 'kmp.inf');

@@ -54,10 +54,10 @@ end;
 procedure UnregisterTIPAndItsProfiles(AClsid: TGUID);
 var
   pInputProcessorProfiles: ITfInputProcessorProfiles;
-  pInputProcessorProfileMgr: ITfInputProcessorProfileMgr;
+  pInputProcessorProfileMgr: keyman_msctf.ITfInputProcessorProfileMgr;
   ippEnum: IEnumTfInputProcessorProfiles;
   pcFetch: Cardinal;
-  profile: TF_INPUTPROCESSORPROFILE;
+  profile: keyman_msctf.TF_INPUTPROCESSORPROFILE;
   FLayoutInstallString: string;
 begin
   OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,

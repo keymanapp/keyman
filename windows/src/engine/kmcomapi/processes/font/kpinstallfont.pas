@@ -55,7 +55,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if not OpenKeyReadOnly(SRegKey_NTFontList) then
+    if not OpenKeyReadOnly(SRegKey_NTFontList_LM) then
     begin
       WarnFmt(KMN_W_InstallFont_CannotInstallFont,
         VarArrayOf([ExtractFileName(filename), SysErrorMessage(GetLastError), Integer(GetLastError)]));
@@ -78,7 +78,7 @@ begin
     try
       RootKey := HKEY_LOCAL_MACHINE;
 
-      if not OpenKey(SRegKey_NTFontList, False) then
+      if not OpenKey(SRegKey_NTFontList_LM, False) then
       begin
         WarnFmt(KMN_W_InstallFont_CannotInstallFontAdmin, VarArrayOf([ExtractFileName(filename)]));
         Exit;

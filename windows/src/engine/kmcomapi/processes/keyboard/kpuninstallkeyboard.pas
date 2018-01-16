@@ -56,14 +56,16 @@ procedure TKPUninstallKeyboard.Execute(KeyboardName: string; FOptions: TKPUninst
 var
   FileName, VisualKeyboardFileName, KeyboardFullName, PackageName: string;
   FInstByAdmin: Boolean;
-  FIconFileName: string;
+  Path, FIconFileName: string;
 begin
   KeyboardName := GetShortKeyboardName(KeyboardName);
 
   if not KeyboardInstalled(KeyboardName, FInstByAdmin) then
     ErrorFmt(KMN_E_Uninstall_InvalidKeyboard, VarArrayOf([KeyboardName]));
 
-  KeyboardFullName := GetKeyboardFullName(FInstByAdmin, KeyboardName);
+  if FInstByAdmin
+    then KeyboardFullName := GetKeyboardFullName_LM(KeyboardName)
+    else KeyboardFullName := GetKeyboardFullName_CU(KeyboardName);
 
   if not (upPartOfPackage in FOptions) and KeyboardIsPartOfPackage(KeyboardName, PackageName) then
     ErrorFmt(KMN_E_Uninstall_KeyboardPartOfPackage, VarArrayOf([KeyboardFullName, PackageName]));
@@ -77,11 +79,18 @@ begin
 
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if FInstByAdmin // as determined by where the keyboard was installed
-      then RootKey := HKEY_LOCAL_MACHINE
-      else RootKey := HKEY_CURRENT_USER;
+    if FInstByAdmin then // as determined by where the keyboard was installed
+    begin
+      RootKey := HKEY_LOCAL_MACHINE;
+      Path := '\'+SRegKey_InstalledKeyboards_LM+'\'+KeyboardName;
+    end
+    else
+    begin
+      RootKey := HKEY_CURRENT_USER;
+      Path := '\'+SRegKey_InstalledKeyboards_CU+'\'+KeyboardName;
+    end;
 
-    if OpenKey('\'+SRegKey_InstalledKeyboards+'\'+KeyboardName, False) and
+    if OpenKey(Path, False) and
         ValueExists(SRegValue_KeymanFile) then
       FileName := ReadString(SRegValue_KeymanFile)
     else
@@ -137,13 +146,21 @@ begin
 
     { Delete kmx details from registry }
 
-    if FInstByAdmin // as determined by where the keyboard was installed
-      then RootKey := HKEY_LOCAL_MACHINE
-      else RootKey := HKEY_CURRENT_USER;
+    if FInstByAdmin then // as determined by where the keyboard was installed
+    begin
+      RootKey := HKEY_LOCAL_MACHINE;
+      Path := GetRegistryKeyboardInstallKey_LM(KeyboardName);
+    end
+    else
+    begin
+      RootKey := HKEY_CURRENT_USER;
+      Path := GetRegistryKeyboardInstallKey_CU(KeyboardName);
+    end;
+
    // I3613
-    if not DeleteKey(GetRegistryKeyboardInstallKey(KeyboardName)) then
+    if not DeleteKey(Path) then
       WarnFmt(KMN_W_UninstallError_UnableToDeleteKeyboardRegistrySetting,
-        VarArrayOf([KeyboardFullName, GetRegistryKeyboardInstallKey(KeyboardName)]));
+        VarArrayOf([KeyboardFullName, Path]));
   finally
     Free;
   end;

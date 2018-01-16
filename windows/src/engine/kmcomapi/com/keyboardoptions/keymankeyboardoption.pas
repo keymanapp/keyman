@@ -48,7 +48,6 @@ type
 implementation
 
 uses
-//  ComServ,
   System.Win.Registry,
   RegistryKeys,
   utilxml;
@@ -58,10 +57,10 @@ begin
   FValue := Value;
   with TRegistry.Create do  // I2890
   try
-    if OpenKey(BuildKeyboardOptionKey(FKeyboardID), True) then
+    if OpenKey(BuildKeyboardOptionKey_CU(FKeyboardID), True) then
     begin
       WriteString(FName, Value);
-      if OpenKey(SRegKey_SharedOptionsSubKey, False) then
+      if OpenKey(SRegSubKey_SharedOptions, False) then
         WriteString(FName, Value);
     end;
   finally

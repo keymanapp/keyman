@@ -223,7 +223,7 @@ begin
 
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKeyReadOnly(SRegKey_KeymanDesktop) and ValueExists(SRegValue_ConfigurationState)
+    if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) and ValueExists(SRegValue_ConfigurationState)
       then FState := ReadString(SRegValue_ConfigurationState)
       else FState := '0';
   finally
@@ -265,7 +265,7 @@ procedure TfrmMain.TntFormDestroy(Sender: TObject);
 begin
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKey(SRegKey_KeymanDesktop, True) then
+    if OpenKey(SRegKey_KeymanDesktop_CU, True) then
       WriteString(SRegValue_ConfigurationState, FState);
   finally
     Free;

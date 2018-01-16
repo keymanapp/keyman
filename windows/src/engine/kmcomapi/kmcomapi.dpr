@@ -54,7 +54,6 @@ uses
   RegKeyboards in '..\..\global\delphi\general\RegKeyboards.pas',
   HotkeyUtils in '..\..\global\delphi\general\HotkeyUtils.pas',
   Glossary in '..\..\global\delphi\general\Glossary.pas',
-  olepro32 in 'util\olepro32.pas',
   kpbase in 'processes\kpbase.pas',
   kpinstallkeyboard in 'processes\keyboard\kpinstallkeyboard.pas',
   utilunicode in 'util\utilunicode.pas',

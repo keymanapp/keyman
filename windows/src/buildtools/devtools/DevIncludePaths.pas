@@ -62,6 +62,7 @@ const
 {$ELSE}
 {$IFDEF VER320}
   SKey_DelphiLibrary = 'Software\Embarcadero\BDS\19.0\Library\Win32';
+  SKey_DelphiLibrary64 = 'Software\Embarcadero\BDS\19.0\Library\Win64';
   SFile_DelphiEnvironmentProject = '%AppData%\Embarcadero\BDS\19.0\EnvOptions.proj';
 {$ENDIF VER320}
 {$ENDIF VER310}
@@ -109,6 +110,8 @@ begin
   Result := AddPathToPathDefinesMak(Path);
   Result := Result and AddToPath(SKey_DelphiLibrary, SValue_DelphiSearchPath, Path);
   Result := Result and AddToPath(SKey_DelphiLibrary, SValue_DelphiBrowsingPath, Path);
+  Result := Result and AddToPath(SKey_DelphiLibrary64, SValue_DelphiSearchPath, Path);
+  Result := Result and AddToPath(SKey_DelphiLibrary64, SValue_DelphiBrowsingPath, Path);
   Result := Result and AddPathToProjectXML(ExpandEnvStrings(SFile_DelphiEnvironmentProject), Path);
 end;
 
@@ -166,7 +169,8 @@ begin
     sn := node.ChildNodes[I];
     if (sn.NodeName = 'PropertyGroup') and
       not VarIsNull(sn.Attributes['Condition']) and
-      (Pos('Win32', sn.Attributes['Condition']) > 0) then
+      ((Pos('Win32', sn.Attributes['Condition']) > 0) or
+      (Pos('Win64', sn.Attributes['Condition']) > 0)) then
     begin
       IncludePath := sn.ChildNodes['DelphiBrowsingPath'].NodeValue;
       if AddPathToIncludePath(IncludePath, Path) then
@@ -302,7 +306,8 @@ begin
       sn := node.ChildNodes[I];
       if (sn.NodeName = 'PropertyGroup') and
         not VarIsNull(sn.Attributes['Condition']) and
-        (Pos('Win32', sn.Attributes['Condition']) > 0) then
+        ((Pos('Win32', sn.Attributes['Condition']) > 0) or
+        (Pos('Win64', sn.Attributes['Condition']) > 0)) then
       begin
         sn.ChildNodes['DelphiBrowsingPath'].NodeValue := SDefault_DelphiBrowsingPath;
         sn.ChildNodes['DelphiLibraryPath'].NodeValue := SDefault_DelphiSearchPath;

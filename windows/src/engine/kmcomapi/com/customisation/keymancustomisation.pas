@@ -271,7 +271,7 @@ begin
   if Assigned(FCust) and Assigned(FCust.FMessages) then
     with TRegistryErrorControlled.Create do
     try
-      if OpenKeyReadOnly(SRegKey_KeymanEngine) and ValueExists(SRegValue_CurrentLanguage)
+      if OpenKeyReadOnly(SRegKey_KeymanEngine_CU) and ValueExists(SRegValue_CurrentLanguage)
         then FCust.FMessages.LanguageCode := ReadString(SRegValue_CurrentLanguage)
         else FCust.FMessages.LanguageCode := '';
     finally
@@ -308,7 +308,7 @@ begin
 
     with TRegistryErrorControlled.Create do    // I1093, I1039 - 'Failed to set data for current language'
     try
-      if not OpenKey(SRegKey_KeymanEngine, True) then
+      if not OpenKey(SRegKey_KeymanEngine_CU, True) then
         RaiseLastOSError(Integer(LastError));    // I1093, I1039 - 'Failed to set data for current language'
       WriteString(SRegValue_CurrentLanguage, string(Value));
     finally
