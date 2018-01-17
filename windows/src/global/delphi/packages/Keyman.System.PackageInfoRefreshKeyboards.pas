@@ -270,7 +270,7 @@ begin
   begin
     if SameText(ExtractFileExt(f.FileName), '.js') and
         SameText(Copy(fn, 1, Length(id)), id) and
-        (Copy(fn, Length(id)+1, 1) = '-') then
+        TRegEx.IsMatch(fn, '^[a-z0-9_]+-([0-9]+)(\.[0-9+])*$', [roIgnoreCase]) then
       Exit(True);
   end;
 
