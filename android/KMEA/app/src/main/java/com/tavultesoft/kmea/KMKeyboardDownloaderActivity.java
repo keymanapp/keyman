@@ -26,6 +26,7 @@ import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.ZipUtils;
 
 import static com.tavultesoft.kmea.KMManager.KMDefault_AssetPackages;
+import static com.tavultesoft.kmea.KMManager.KMDefault_UndefinedPackageID;
 import static com.tavultesoft.kmea.KMManager.KMKey_FontSource;
 
 public class KMKeyboardDownloaderActivity extends Activity {
@@ -276,7 +277,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
             kmpFile.delete();
           }
           if (tempPackageDirectory != null && tempPackageDirectory.exists()) {
-            FileUtils.delete(tempPackageDirectory);
+            FileUtils.deleteDirectory(tempPackageDirectory);
           }
         } catch (Exception e) {
           Log.e("Keyboard download", "Error: " + e);
@@ -324,11 +325,6 @@ public class KMKeyboardDownloaderActivity extends Activity {
           throw new Exception(exceptionStr);
         }
 
-        String packagesDirStr = context.getDir("data", Context.MODE_PRIVATE).toString() +
-          File.separator + KMDefault_AssetPackages + File.separator;
-        String packageDirStr = packagesDirStr + pkgID + File.separator;
-        String tempPackageDirStr = packagesDirStr + pkgID  + "tmp" + File.separator;
-
         kmpFile = File.createTempFile(sourceKMPFilename, null);
         ret = FileUtils.download(context, remoteUrl,
           kmpFile.getParent() + File.separator, kmpFile.getName());
@@ -345,7 +341,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
         packageDirectory = new File(packageDirStr);
         tempPackageDirectory = new File(tempPackageDirStr);
         if (tempPackageDirectory.exists()) {
-          FileUtils.delete(tempPackageDirectory);
+          FileUtils.deleteDirectory(tempPackageDirectory);
         }
         ZipUtils.unzip(kmpFile, tempPackageDirectory);
 
@@ -370,7 +366,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
           }
 
           // Verify namespace isn't reserved
-          if (pkgID.equals(KMManager.KMDefault_PackageID) && kbID.equals(KMManager.KMDefault_KeyboardID)) {
+          if (KMManager.isReservedNamespace(pkgID, kbID)) {
             continue;
           }
 
@@ -504,9 +500,8 @@ public class KMKeyboardDownloaderActivity extends Activity {
 
         notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_STARTED, 0);
 
-        String namespace = pkgID;
         String destination = context.getDir("data", Context.MODE_PRIVATE).toString() +
-          File.separator + KMDefault_AssetPackages + File.separator + namespace + File.separator;
+          File.separator + KMDefault_UndefinedPackageID + File.separator + File.separator;
 
         ret = 1;
         int result = 0;
@@ -550,7 +545,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
         // Replace older package directory
         // TODO: we're comparing keyboard versions, but there's a package version - Don't want to move package directory multiple times
         if (packageDirectory.exists() && tempPackageDirectory.exists()) {
-          FileUtils.delete(packageDirectory);
+          FileUtils.deleteDirectory(packageDirectory);
         }
         if (tempPackageDirectory.exists()) {
           tempPackageDirectory.renameTo(packageDirectory);

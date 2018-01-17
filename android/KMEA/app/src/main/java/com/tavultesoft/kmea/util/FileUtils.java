@@ -174,16 +174,15 @@ public final class FileUtils {
    * @param fileOrDirectory File
    * @throws IOException
    */
-  public static boolean delete (File fileOrDirectory) throws IOException {
-    boolean status = false;
+  public static void deleteDirectory (File fileOrDirectory) throws IOException {
     if (fileOrDirectory.exists()) {
       if (fileOrDirectory.isDirectory()) {
         for (File file : fileOrDirectory.listFiles()) {
-          delete(file);
+          deleteDirectory(file);
         }
       }
 
-      status = fileOrDirectory.delete();
+      fileOrDirectory.delete();
     }
   }
 

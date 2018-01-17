@@ -94,13 +94,13 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
     } else {
       keyboardsList = new ArrayList<HashMap<String, String>>();
       HashMap<String, String> kbInfo = new HashMap<String, String>();
-      kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_PackageID);
+      kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
       kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
       kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
       kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
       kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
       kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(
-        context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID));
+        context, KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID));
       kbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
       kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
       keyboardsList.add(kbInfo);
@@ -304,7 +304,6 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
   private void switchKeyboard(int position) {
     setSelection(position);
     HashMap<String, String> kbInfo = keyboardsList.get(position);
-    String kbId = kbInfo.get(KMManager.KMKey_KeyboardID);
     String pkgId = kbInfo.get(KMManager.KMKey_PackageID);
     if (pkgId == null || pkgId.isEmpty()) {
       pkgId = KMManager.KMDefault_UndefinedPackageID;
@@ -366,39 +365,6 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
     }
 
     if (keyboardsList != null && position >= 0 && position < keyboardsList.size()) {
-      // Remove all versions of associated JS files
-      final HashMap<String, String> kbInfo = keyboardsList.get(position);
-      final String packageID = kbInfo.get(KMManager.KMKey_PackageID);
-      final String keyboardID = kbInfo.get(KMManager.KMKey_KeyboardID);
-      String namespace = packageID + "." + keyboardID;
-
-      // Prevent keyboard in reserved namespace from being deleted
-      if (namespace.equals(KMManager.KMDefault_ReservedNamespace)) {
-        return false;
-      }
-
-      String packageStr = context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator +
-        KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator;
-      File packageDir = new File(packageStr);
-
-      FilenameFilter keyboardFilter = new FilenameFilter() {
-        @Override
-        public boolean accept(File dir, String name) {
-          String lowercaseName = name.toLowerCase();
-          if (lowercaseName.startsWith(keyboardID + "-") && lowercaseName.endsWith(".js")) {
-            return true;
-          }
-          return false;
-        }
-      };
-
-      File[] files = packageDir.listFiles(keyboardFilter);
-      for (File file : files) {
-        if (!file.isDirectory() && file.exists()) {
-          file.delete();
-        }
-      }
-
       keyboardsList.remove(position);
       result = saveKeyboardsList(context);
     }

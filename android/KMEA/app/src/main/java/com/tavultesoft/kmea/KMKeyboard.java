@@ -297,8 +297,13 @@ final class KMKeyboard extends WebView {
       oFont = makeSvgOnlyFont(oskFont);
     }
 
-    setKeyboardRoot(context.getDir("data", Context.MODE_PRIVATE).toString() +
-      File.separator + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator);
+    if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+      setKeyboardRoot(context.getDir("data", Context.MODE_PRIVATE).toString() +
+        File.separator + KMManager.KMDefault_UndefinedPackageID + File.separator);
+    } else {
+      setKeyboardRoot(context.getDir("data", Context.MODE_PRIVATE).toString() +
+        File.separator + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator);
+    }
     String keyboardPath = keyboardRoot + keyboardID + "-" + keyboardVersion + ".js";
 
     // Add full paths to fonts
@@ -353,7 +358,7 @@ final class KMKeyboard extends WebView {
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
       Toast.makeText(context, "Invalid keyboard! Loading default", Toast.LENGTH_LONG).show();
-      packageID = KMManager.KMDefault_PackageID;
+      packageID = KMManager.KMDefault_UndefinedPackageID;
       keyboardID = KMManager.KMDefault_KeyboardID;
       languageID = KMManager.KMDefault_LanguageID;
       keyboardName = KMManager.KMDefault_KeyboardName;
@@ -408,8 +413,13 @@ final class KMKeyboard extends WebView {
       oFont = makeSvgOnlyFont(oFont);
     }
 
-    setKeyboardRoot(context.getDir("data", Context.MODE_PRIVATE).toString() +
-      File.separator + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator);
+    if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+      setKeyboardRoot(context.getDir("data", Context.MODE_PRIVATE).toString() +
+        File.separator + KMManager.KMDefault_UndefinedPackageID + File.separator);
+    } else {
+      setKeyboardRoot(context.getDir("data", Context.MODE_PRIVATE).toString() +
+        File.separator + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator);
+    }
     String keyboardPath = keyboardRoot + keyboardID + "-" + keyboardVersion + ".js";
 
     // Add full paths to fonts

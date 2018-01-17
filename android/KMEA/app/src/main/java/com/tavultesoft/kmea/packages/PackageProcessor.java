@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.JSONParser;
+import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.ZipUtils;
 
 import java.io.File;
@@ -15,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -109,6 +109,7 @@ public class PackageProcessor {
 
     for(int i=0; i < languages.length(); i++) {
       keyboards[i] = new HashMap<>();
+      // TODO: Add KMManager.KMKey_PackageID from the package ID
       keyboards[i].put(KMManager.KMKey_KeyboardName, jsonKeyboard.getString("name"));
       keyboards[i].put(KMManager.KMKey_KeyboardID, jsonKeyboard.getString("id"));
       keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
@@ -190,9 +191,9 @@ public class PackageProcessor {
     }
 
     // No version conflict!  Proceed with the install!
-    // A nice, recursive method provided by Apache Commons-IO's FileUtils class.
-    FileUtils.moveDirectory(tempPath, permPath);
-
+    // Unfortunately, the nice recursive method provided by Apache Commons-IO's FileUtils class
+    // isn't available at Android runtime.
+    tempPath.renameTo(permPath);
 
 //    How to retrieve other interesting bits of JSON, with pretty-printing:
 //    System.out.println("System: " + json.getJSONObject("system").toString(2));
