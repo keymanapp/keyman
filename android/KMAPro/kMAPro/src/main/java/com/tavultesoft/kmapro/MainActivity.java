@@ -136,12 +136,16 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
             if (!packagesDir.exists()) {
               packagesDir.mkdir();
             }
-            File packageIDDir = new File(getDir("data", Context.MODE_PRIVATE) + File.separator +
-              KMManager.KMDefault_AssetPackages + File.separator + KMManager.KMDefault_LegacyPackageID);
-            if (!packageIDDir.exists()) {
-              packageIDDir.mkdir();
+
+            boolean versionNumberMissing = filename.lastIndexOf("-") < 0;
+            String keyboardID = (versionNumberMissing) ? filename.substring(0, filename.length() - 4) :
+              filename.substring(0, filename.indexOf("-"));
+            File namespaceDir = new File(getDir("data", Context.MODE_PRIVATE) + File.separator +
+              KMManager.KMDefault_AssetPackages + File.separator + KMManager.KMDefault_UndefinedPackageID);
+            if (!namespaceDir.exists()) {
+              namespaceDir.mkdir();
             }
-            File newFile = new File(packageIDDir, filename);
+            File newFile = new File(namespaceDir, filename);
             copyFile(inputStream, newFile);
             inputStream.close();
           }
@@ -167,14 +171,16 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   protected void onResume() {
     super.onResume();
     KMManager.onResume();
-    if (!KMManager.keyboardExists(this, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID)) {
+    if (!KMManager.keyboardExists(this, KMManager.KMDefault_PackageID,
+      KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID)) {
       HashMap<String, String> kbInfo = new HashMap<String, String>();
       kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_PackageID);
       kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
       kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
       kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
       kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
-      kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(this, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID));
+      kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(
+        this, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID));
       kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
       KMManager.addKeyboard(this, kbInfo);
     }
@@ -589,6 +595,8 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
         }
       }
+    } else if (result == 0) {
+      Toast.makeText(this, "Keyboard already exists", Toast.LENGTH_SHORT).show();
     } else {
       Toast.makeText(this, "Keyboard download failed", Toast.LENGTH_SHORT).show();
     }

@@ -44,6 +44,7 @@ import android.widget.RelativeLayout;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.util.FileUtils;
 
 public final class KMManager {
 
@@ -99,6 +100,7 @@ public final class KMManager {
   public static final String KMKey_KeyboardFileSize = "fileSize";
   public static final String KMKey_Font = "font";
   public static final String KMKey_OskFont = "oskFont";
+  public static final String KMKey_DisplayFont = "displayFont";
   public static final String KMKey_FontFamily = "family";
   public static final String KMKey_FontSource = "source";
   public static final String KMKey_FontFiles = "files";
@@ -113,11 +115,11 @@ public final class KMManager {
 
   // Default Asset Paths
   // Previous keyboards installed from the cloud  went to /languages/ and /fonts/
-  // Keyboards now get installed into /packages/packageID.
-  // If a legacy keyboard has an undefined packageID, it will default to "cloud"
+  // Keyboards now get installed into a namespace /packages/packageID
+  // Keyboards that have an undefined packageID will use "cloud"
   public static final String KMDefault_LegacyAssetLanguages = "languages";
   public static final String KMDefault_LegacyAssetFonts = "fonts";
-  public static final String KMDefault_LegacyPackageID = "cloud";
+  public static final String KMDefault_UndefinedPackageID = "cloud";
   public static final String KMDefault_AssetPackages = "packages";
 
   // Default Keyboard Info
@@ -127,6 +129,9 @@ public final class KMManager {
   public static final String KMDefault_KeyboardName = "EuroLatin2 Keyboard";
   public static final String KMDefault_LanguageName = "English";
   public static final String KMDefault_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
+
+  // Namespace to default keyboard is reserved so it can't be deleted
+  public static final String KMDefault_ReservedNamespace = KMDefault_UndefinedPackageID + "." + KMDefault_KeyboardID;
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
@@ -440,34 +445,60 @@ public final class KMManager {
       migratedDir.mkdir();
     }
 
-    String[] files = legacyLanguagesDir.list();
-    if (files != null) {
-      for (String filename : files) {
-        // Handle keyboards missing version number
-        if (filename.lastIndexOf("-") < 0) {
-          if (filename.equals("us.js")) {
-            File kbFile = new File(legacyLanguagesPath, filename);
-            kbFile.delete();
-          } else if (filename.endsWith(".js")) {
-            // Append default version number to keyboard and move
-            String newFilename = filename.substring(0, filename.lastIndexOf(".js")) + "-1.0.js";
-            File kbFile = new File(legacyLanguagesPath, filename);
-            kbFile.renameTo(new File(migratedDir, newFilename));
-          }
-          // Handle keyboards with version number
-        } else {
-          // Remove legacy default keyboards
-          if (filename.startsWith(KMDefault_KeyboardID + "-")) {
-            File legacyKbFile = new File(legacyLanguagesDir, filename);
-            if (legacyKbFile.exists()) {
-              legacyKbFile.delete();
-              continue;
+        return false;
+      }
+    };
+
+    String migratedPath = context.getDir("data", Context.MODE_PRIVATE) + File.separator +
+      KMDefault_AssetPackages + File.separator + KMDefault_UndefinedPackageID;
+    File migratedDir = new File(migratedPath);
+    if (!migratedDir.exists()) {
+      migratedDir.mkdir();
+    }
+
+    File[] fontFiles = legacyFontsDir.listFiles();
+    try {
+      if (legacyLanguagesDir.exists()) {
+
+        File[] files = legacyLanguagesDir.listFiles(keyboardFilter);
+        for (File file : files) {
+          String filename = file.getName();
+
+          // Keyboards can have filenames "keyboardID.js" or "keyboardID-version.js"
+          boolean versionNumberMissing = filename.lastIndexOf("-") < 0;
+          String keyboardID = (versionNumberMissing) ? filename.substring(0, filename.length() - 4) :
+            filename.substring(0, filename.indexOf("-"));
+
+          // Handle keyboards missing version number
+          if (versionNumberMissing) {
+            if (filename.equals("us.js")) {
+              file.delete();
+            } else {
+              // Append default version number to keyboard and move
+              filename = filename.substring(0, filename.lastIndexOf(".js")) + "-1.0.js";
+              File migratedFile = new File(migratedDir, filename);
+              if (!migratedFile.exists()) {
+                file.renameTo(new File(migratedDir, filename));
+              }
+            }
+            // Handle keyboards with version number
+          } else {
+            // Remove legacy default keyboards
+            if (filename.startsWith(KMDefault_KeyboardID + "-")) {
+              File legacyKbFile = new File(legacyLanguagesDir, filename);
+              if (legacyKbFile.exists()) {
+                legacyKbFile.delete();
+                continue;
+              }
+            }
+
+            // Migrate /languages/*.js keyboards
+            File migratedFile = new File(migratedDir, filename);
+            if (!migratedFile.exists()) {
+              file.renameTo(new File(migratedDir, filename));
             }
           }
 
-          // Migrate /languages/*.js keyboards
-          File kbFile = new File(legacyLanguagesPath, filename);
-          kbFile.renameTo(new File(migratedDir, filename));
         }
       }
 
@@ -477,11 +508,10 @@ public final class KMManager {
       }
     }
 
-    files = legacyFontsDir.list();
-    if (files != null) {
-      for (String filename : files) {
-        File fontFile = new File(legacyFontsPath, filename);
-        fontFile.renameTo(new File(migratedDir, filename));
+      // Migrate legacy fonts
+      if (legacyFontsDir.exists()) {
+        FileUtils.copyDirectory(legacyFontsDir, migratedDir);
+        FileUtils.deleteDirectory(legacyFontsDir);
       }
 
       // Cleanup empty directory
@@ -506,7 +536,8 @@ public final class KMManager {
         newKbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
         newKbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
         newKbInfo.put(KMManager.KMKey_KeyboardVersion,
-          getLatestKeyboardFileVersion(context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID));
+          getLatestKeyboardFileVersion(context, KMManager.KMDefault_PackageID,
+            KMManager.KMDefault_KeyboardID));
         newKbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
         newKbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
         kbList.set(0, newKbInfo);
@@ -522,11 +553,7 @@ public final class KMManager {
         kbID = kbInfo.get(KMKey_KeyboardID);
         String pkgID = kbInfo.get(KMKey_PackageID);
         if (pkgID == null || pkgID.isEmpty()) {
-          if (kbID.equals(KMDefault_KeyboardID)) {
-            pkgID = KMDefault_PackageID;
-          } else {
-            pkgID = KMDefault_LegacyPackageID;
-          }
+          pkgID = KMDefault_UndefinedPackageID;
           kbInfo.put(KMManager.KMKey_PackageID, pkgID);
           shouldUpdateList = true;
         }
@@ -597,12 +624,18 @@ public final class KMManager {
     return isCustom;
   }
 
+  /**
+   * Get the font typeface from a fully pathed font name
+   * @param context
+   * @param fontFilename String - full path to the font file
+   * @return Typeface
+   */
   public static Typeface getFontTypeface(Context context, String fontFilename) {
     Typeface font = null;
 
     if (fontFilename != null) {
       if (fontFilename.endsWith(".ttf") || fontFilename.endsWith(".otf")) {
-        File file = new File(context.getDir("data", Context.MODE_PRIVATE) + "/fonts/" + fontFilename);
+        File file = new File(fontFilename);
         if (file.exists()) {
           font = Typeface.createFromFile(file);
         } else {
@@ -758,9 +791,17 @@ public final class KMManager {
     return kbState;
   }
 
+  /**
+   * Search through /packages/packageID/ for the JS keyboard file and determine
+   * the latest (greatest) version number
+   * @param context
+   * @param packageID
+   * @param keyboardID
+   * @return kbFileVersion String. null if the keyboard doesn't exist
+   */
   public static String getLatestKeyboardFileVersion(Context context, String packageID, String keyboardID) {
     String kbFileVersion = null;
-    String path = context.getDir("data", Context.MODE_PRIVATE) + File.separator + KMDefault_AssetPackages +
+    String path = context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator + KMDefault_AssetPackages +
       File.separator + packageID + File.separator;
     File dir = new File(path);
     String[] files = dir.list();
@@ -792,12 +833,18 @@ public final class KMManager {
     return kbFileVersion;
   }
 
+  /**
+   * Compare two version strings
+   * @param v1 String
+   * @param v2 String
+   * @return int
+   *   -2 if v1 or v2 is invalid
+   *    0 if v1 = v2
+   *   -1 if v1 < v2
+   *    1 if v1 > v2
+   */
   public static int compareVersions(String v1, String v2) {
     // returns;
-    // -2 if v1 or v2 is invalid
-    // 0 if v1 = v2
-    // -1 if v1 < v2
-    // 1 if v1 > v2
 
     if (v1 == null || v2 == null) {
       return -2;
@@ -951,7 +998,8 @@ public final class KMManager {
   public static void setShouldAllowSetKeyboard(boolean value) {
     shouldAllowSetKeyboard = value;
     if (shouldAllowSetKeyboard == false) {
-      setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID, KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
+      setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID,
+        KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
     }
   }
 
@@ -1189,7 +1237,8 @@ public final class KMManager {
             String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
             InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
           } else {
-            InAppKeyboard.setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID, KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
+            InAppKeyboard.setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID,
+              KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
           }
         }
 
@@ -1366,7 +1415,8 @@ public final class KMManager {
             String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
             SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
           } else {
-            SystemKeyboard.setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID, KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
+            SystemKeyboard.setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID,
+              KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
           }
         }
 

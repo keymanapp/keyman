@@ -7,6 +7,7 @@ package com.tavultesoft.kmea;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.tavultesoft.kmea.util.FileUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -305,12 +307,9 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
     String kbId = kbInfo.get(KMManager.KMKey_KeyboardID);
     String pkgId = kbInfo.get(KMManager.KMKey_PackageID);
     if (pkgId == null || pkgId.isEmpty()) {
-      if (kbId.equals(KMManager.KMDefault_KeyboardID)) {
-        pkgId = KMManager.KMDefault_PackageID;
-      } else {
-        pkgId = KMManager.KMDefault_LegacyPackageID;
-      }
+      pkgId = KMManager.KMDefault_UndefinedPackageID;
     }
+    String kbId = kbInfo.get(KMManager.KMKey_KeyboardID);
     String langId = kbInfo.get(KMManager.KMKey_LanguageID);
     String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
     String langName = kbInfo.get(KMManager.KMKey_LanguageName);
@@ -367,6 +366,39 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
     }
 
     if (keyboardsList != null && position >= 0 && position < keyboardsList.size()) {
+      // Remove all versions of associated JS files
+      final HashMap<String, String> kbInfo = keyboardsList.get(position);
+      final String packageID = kbInfo.get(KMManager.KMKey_PackageID);
+      final String keyboardID = kbInfo.get(KMManager.KMKey_KeyboardID);
+      String namespace = packageID + "." + keyboardID;
+
+      // Prevent keyboard in reserved namespace from being deleted
+      if (namespace.equals(KMManager.KMDefault_ReservedNamespace)) {
+        return false;
+      }
+
+      String packageStr = context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator +
+        KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator;
+      File packageDir = new File(packageStr);
+
+      FilenameFilter keyboardFilter = new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+          String lowercaseName = name.toLowerCase();
+          if (lowercaseName.startsWith(keyboardID + "-") && lowercaseName.endsWith(".js")) {
+            return true;
+          }
+          return false;
+        }
+      };
+
+      File[] files = packageDir.listFiles(keyboardFilter);
+      for (File file : files) {
+        if (!file.isDirectory() && file.exists()) {
+          file.delete();
+        }
+      }
+
       keyboardsList.remove(position);
       result = saveKeyboardsList(context);
     }
@@ -500,7 +532,7 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
       HashMap<String, String> kbInfo = keyboardsList.get(index);
       String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
       if (pkgID == null || pkgID.isEmpty()) {
-        kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_LegacyPackageID);
+        kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
       }
       return kbInfo;
     }

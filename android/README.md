@@ -75,7 +75,7 @@ Building these projects follow the same steps as KMAPro:
 
 **android/Tests/KeyboardHarness** app is a test harness for developers to troubleshoot keyboards.
 
-1. Copy the keyboard js file and applicable ttf fonts to *android/Tests/KeyboardHarness/app/src/main/assets/packages/packageID* (replace "packageID" with the name of your actual keyboard package.
+1. Copy the keyboard js file and applicable ttf fonts to *android/Tests/KeyboardHarness/app/src/main/assets/packages/cloud.keyboardID* (replacing "keyboardID" with the name of your keyboard).
 
    For users of Keyman Engine pre 10.0, use the folders
 *android/Tests/KeyboardHarness/app/src/main/assets/languages/* and
