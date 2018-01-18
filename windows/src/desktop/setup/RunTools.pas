@@ -715,7 +715,7 @@ procedure TRunTools.PrepareForReboot(res: Cardinal);
 begin
   with CreateHKCURegistry do  // I2749
   try
-    if OpenKey(SRegKey_WindowsRunOnce, True) then
+    if OpenKey(SRegKey_WindowsRunOnce_CU, True) then
       WriteString(SRegValue_WindowsRunOnce_Setup, '"'+ParamStr(0)+'" -c');
   finally
     Free;
@@ -848,14 +848,14 @@ procedure TRunTools.DeleteBackupPath;  // I2747
 begin
   with CreateHKLMRegistry do  // I2749
   try
-    if KeyExists(SRegKey_UpgradeBackupPath) then DeleteKey(SRegKey_UpgradeBackupPath);
+    if KeyExists(SRegKey_UpgradeBackupPath_LM) then DeleteKey(SRegKey_UpgradeBackupPath_LM);
   finally
     Free;
   end;
 
   with CreateHKCURegistry do  // I2748, I2749
   try
-    if KeyExists(SRegKey_UpgradeBackupPath) then DeleteKey(SRegKey_UpgradeBackupPath);
+    if KeyExists(SRegKey_UpgradeBackupPath_CU) then DeleteKey(SRegKey_UpgradeBackupPath_CU);
   finally
     Free;
   end;

@@ -38,6 +38,7 @@ procedure TKPUninstallVisualKeyboard.Execute(KeyboardName: string);
 var
   FInstByAdmin: Boolean;
   KeyboardFullName, Filename: string;
+  Path: string;
 begin
   Filename := '';
 
@@ -46,7 +47,9 @@ begin
   if not KeyboardInstalled(KeyboardName, FInstByAdmin) then
     ErrorFmt(KMN_E_Uninstall_InvalidKeyboard, VarArrayOf([KeyboardName]));
 
-  KeyboardFullName := GetKeyboardFullName(FInstByAdmin, KeyboardName);
+  if FInstByAdmin
+    then KeyboardFullName := GetKeyboardFullName_LM(KeyboardName)
+    else KeyboardFullName := GetKeyboardFullName_CU(KeyboardName);
 
   { Check if keyboard was installed by administrator, and if user has permission to delete it }
 
@@ -57,11 +60,18 @@ begin
 
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if FInstByAdmin // as determined by where the keyboard was installed
-      then RootKey := HKEY_LOCAL_MACHINE
-      else RootKey := HKEY_CURRENT_USER;
+    if FInstByAdmin then // as determined by where the keyboard was installed
+    begin
+      RootKey := HKEY_LOCAL_MACHINE;
+      Path := '\'+SRegKey_InstalledKeyboards_LM+'\'+KeyboardName;
+    end
+    else
+    begin
+      RootKey := HKEY_CURRENT_USER;
+      Path := '\'+SRegKey_InstalledKeyboards_CU+'\'+KeyboardName;
+    end;
 
-    if OpenKey('\'+SRegKey_InstalledKeyboards+'\'+KeyboardName, False) and
+    if OpenKey(Path, False) and
         ValueExists(SRegValue_VisualKeyboard) then
       FileName := ReadString(SRegValue_VisualKeyboard)
     else

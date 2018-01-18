@@ -97,14 +97,14 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if not OpenKey(SRegKey_KeyboardLayouts, False) then
+    if not OpenKey(SRegKey_KeyboardLayouts_LM, False) then
     begin
       Result := 'NotAdmin - Could not open HKLM\System\CurrentControlSet\Control\keyboard layouts';
       Exit;
     end;
 
     CloseKey;
-    if not OpenKey(SRegKey_Software, False) then
+    if not OpenKey(SRegKey_Software_LM, False) then
     begin
       Result := 'NotAdmin - Could not open HKLM\Software';
       Exit;
@@ -146,12 +146,12 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if not OpenKey(SRegKey_KeyboardLayouts, False)
+    if not OpenKey(SRegKey_KeyboardLayouts_LM, False)
       then Result := Result + '   1. NotAdmin - Could not open HKLM\System\CurrentControlSet\Control\keyboard layouts'#13#10
       else Result := Result + '   1. IsAdmin  - Opened HKLM\System\CurrentControlSet\Control\keyboard layouts successfully'#13#10;
 
     CloseKey;
-    if not OpenKey(SRegKey_Software, False)
+    if not OpenKey(SRegKey_Software_LM, False)
       then Result := Result + '   2. NotAdmin - Could not open HKLM\Software'#13#10
       else Result := Result + '   2. IsAdmin  - Opened HKLM\Software successfully'#13#10;
 

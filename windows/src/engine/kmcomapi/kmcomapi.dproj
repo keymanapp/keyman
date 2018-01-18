@@ -4,10 +4,10 @@
         <MainSource>kmcomapi.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <TargetedPlatforms>1</TargetedPlatforms>
+        <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Library</AppType>
         <FrameworkType>None</FrameworkType>
-        <ProjectVersion>18.2</ProjectVersion>
+        <ProjectVersion>18.3</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -34,6 +34,12 @@
         <Cfg_1>true</Cfg_1>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
+        <Cfg_1_Win64>true</Cfg_1_Win64>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
         <Cfg_2>true</Cfg_2>
         <CfgParent>Base</CfgParent>
@@ -45,13 +51,19 @@
         <Cfg_2>true</Cfg_2>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
+        <Cfg_2_Win64>true</Cfg_2_Win64>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
         <SanitizedProjectName>kmcomapi</SanitizedProjectName>
         <Manifest_File>None</Manifest_File>
         <ImageDebugInfo>true</ImageDebugInfo>
         <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
         <DCC_UnitSearchPath>\keyman\8.0\src\global\delphi\jedi;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-        <DCC_Define>KLOG;MAKESMALL;KPSMALL;$(DCC_Define)</DCC_Define>
+        <DCC_Define>MAKESMALL;KPSMALL;$(DCC_Define)</DCC_Define>
         <DCC_ImageBase>2F400000</DCC_ImageBase>
         <VerInfo_Build>1</VerInfo_Build>
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
@@ -73,13 +85,20 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DebugSourcePath>C:\keyman\7.0\src\keyman\kmshell\startup\;$(DebugSourcePath)</DebugSourcePath>
         <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <Icon_MainIcon>kmcomapi_Icon.ico</Icon_MainIcon>
+        <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_MajorVer>1</VerInfo_MajorVer>
+        <VerInfo_Build>0</VerInfo_Build>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -92,8 +111,14 @@
         <DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_MajorVer>1</VerInfo_MajorVer>
+        <VerInfo_Build>0</VerInfo_Build>
+        <DCC_DebugInfoInExe>false</DCC_DebugInfoInExe>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
-        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_Define>DEBUG;KLOG;$(DCC_Define)</DCC_Define>
         <DCC_Optimize>false</DCC_Optimize>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
@@ -102,6 +127,14 @@
         <Debugger_HostApplication>..\..\desktop\kmshell\kmshell.exe</Debugger_HostApplication>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <Debugger_RunParams>-c</Debugger_RunParams>
+        <DCC_UseMSBuildExternally>false</DCC_UseMSBuildExternally>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
+        <VerInfo_MajorVer>1</VerInfo_MajorVer>
+        <VerInfo_Build>0</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <Debugger_HostApplication>C:\Projects\keyman\open\windows\src\test\test-kmcomapi-win64\Win64\Debug\kmcomapi_win64_host.exe</Debugger_HostApplication>
+        <Debugger_RunParams>-r:Keyman.Test.Console.KeymanAPIHost.TKeymanAPITest.Test_IKeymanPackageInstalled,Keyman.Test.Console.KeymanAPIHost.TKeymanAPITest.Test_IKeymanPackageFile</Debugger_RunParams>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -158,7 +191,6 @@
         <DCCReference Include="..\..\global\delphi\general\RegKeyboards.pas"/>
         <DCCReference Include="..\..\global\delphi\general\HotkeyUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Glossary.pas"/>
-        <DCCReference Include="util\olepro32.pas"/>
         <DCCReference Include="processes\kpbase.pas"/>
         <DCCReference Include="processes\keyboard\kpinstallkeyboard.pas"/>
         <DCCReference Include="util\utilunicode.pas"/>
@@ -308,42 +340,13 @@
                     <VersionInfoKeys Name="Comments">www.greatis.com</VersionInfoKeys>
                 </VersionInfoKeys>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvAppFrmDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvAppFrmDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvBandsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvBandsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCmpDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCmpDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCryptDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCryptDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCustomDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvCustomDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDotNetCtrlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDotNetCtrlsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvGlobusDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvGlobusDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvHMIDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvHMIDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvJansDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvJansDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvManagedThreadsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvManagedThreadsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvMMDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvMMDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvNetDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvNetDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPascalInterpreterDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPascalInterpreterDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPrintPreviewDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPrintPreviewDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvRuntimeDesignDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvRuntimeDesignDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvSystemDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvSystemDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvTimeFrameworkDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvTimeFrameworkDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvWizardsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvWizardsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvXPCtrlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvXPCtrlsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="c:\keyman\10.0\lib\DragDropD2011.bpl">File c:\keyman\10.0\lib\DragDropD2011.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="c:\keyman\10.0\lib\tb2kdsgn_d12.bpl">File c:\keyman\10.0\lib\tb2kdsgn_d12.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="c:\keyman\10.0\lib\SpTBXLibDsgn_d16.bpl">File c:\keyman\10.0\lib\SpTBXLibDsgn_d16.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k240.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp240.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvControlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvControlsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDBDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDBDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDlgsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvDlgsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPageCompsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPageCompsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPluginSystemDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvPluginSystemDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvStdCtrlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvStdCtrlsDesign240.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k250.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp250.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>
-                <Platform value="Linux64">False</Platform>
                 <Platform value="Win32">True</Platform>
-                <Platform value="Win64">False</Platform>
+                <Platform value="Win64">True</Platform>
             </Platforms>
             <ActiveXProjectInfo>
                 <version>1</version>

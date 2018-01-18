@@ -9,7 +9,7 @@
 !include ..\..\Defines.mak
 
 test: build
-    Win32\Debug\keyboardpackageversionstestsuite.exe -b
+    $(WIN32_TARGET_PATH)\keyboardpackageversionstestsuite.exe -b
   
 build: 
     $(DELPHI_MSBUILD) /p:CI=CI keyboardpackageversionstestsuite.dproj

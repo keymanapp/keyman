@@ -141,7 +141,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly('\'+SRegKey_InstalledPackages) then
+    if OpenKeyReadOnly(SRegKey_InstalledPackages_LM) then
     begin
       GetKeyNames(keys);
       for i := 0 to keys.Count - 1 do FPackages.Add(TKeymanPackageInstalled.Create(Context, keys[i]));

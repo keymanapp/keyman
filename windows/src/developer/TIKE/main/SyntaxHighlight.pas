@@ -208,7 +208,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_IDEColours) then
+    if OpenKeyReadOnly(SRegKey_IDEColours_CU) then
     begin
       for i := Low(TSyntaxType) to High(TSyntaxType) do
       begin
@@ -217,7 +217,7 @@ begin
       end;
       CloseKey;
     end;
-    if OpenKeyReadOnly(SRegKey_IDEOptions) then
+    if OpenKeyReadOnly(SRegKey_IDEOptions_CU) then
     begin
       if ValueExists(SRegValue_IDEOptUseSyntaxHighlighting)
         then FUseSyntaxHighlighting := ReadString(SRegValue_IDEOptUseSyntaxHighlighting) = '1'
@@ -235,13 +235,13 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKey(SRegKey_IDEColours, True) then
+    if OpenKey(SRegKey_IDEColours_CU, True) then
     begin
       for i := Low(TSyntaxType) to High(TSyntaxType) do
         WriteString(FSyntaxTypeInfo[i].Name, SyntaxTypeInfoToString(i));
       CloseKey;
     end;
-    if OpenKey(SRegKey_IDEOptions, True) then
+    if OpenKey(SRegKey_IDEOptions_CU, True) then
     begin
       if FUseSyntaxHighlighting
         then WriteString(SRegValue_IDEOptUseSyntaxHighlighting, '1')

@@ -40,6 +40,7 @@ uses
   System.Win.ComObj,
   Winapi.ActiveX,
   Winapi.msctf,
+  keyman_msctf,
   keymanapi_TLB,
   KeymanContext,
   keymanautoobject,
@@ -52,7 +53,7 @@ const
 type
   TKeymanLanguage = class(TKeymanAutoObject, IKeymanLanguage)
   private
-    FProfile: TF_INPUTPROCESSORPROFILE;
+    FProfile: keyman_msctf.TF_INPUTPROCESSORPROFILE;
     FBCP47Code: string;
     FLayoutName: WideString;
     FLocaleName: string;
@@ -74,7 +75,7 @@ type
     function Get_ProfileGUID: TGUID; safecall;
     function Get_ClassID: TGUID; safecall;
   public
-    constructor Create(AContext: TKeymanContext; AWin8Language: TWindows8Language; AProfile: TF_INPUTPROCESSORPROFILE; ALayoutName: string = '');
+    constructor Create(AContext: TKeymanContext; AWin8Language: TWindows8Language; AProfile: keyman_msctf.TF_INPUTPROCESSORPROFILE; ALayoutName: string = '');
   end;
 
 
@@ -104,7 +105,7 @@ begin
   try
     RootKey := HKEY_LOCAL_MACHINE;
     v := HKLToKeyboardID(FProfile.HKL);   // I4712
-    if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts+'\'+IntToHex(v, 8)) then
+    if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts_LM+'\'+IntToHex(v, 8)) then
     begin
       if ValueExists(SRegValue_LayoutDisplayName) then
       begin
@@ -121,7 +122,7 @@ begin
   end;
 end;
 
-constructor TKeymanLanguage.Create(AContext: TKeymanContext; AWin8Language: TWindows8Language; AProfile: TF_INPUTPROCESSORPROFILE; ALayoutName: string = '');
+constructor TKeymanLanguage.Create(AContext: TKeymanContext; AWin8Language: TWindows8Language; AProfile: keyman_msctf.TF_INPUTPROCESSORPROFILE; ALayoutName: string = '');
 var
   FHotkeyValue: Integer;
   ValueName: string;
@@ -154,7 +155,7 @@ begin
       then ValueName := IntToHex(Get_HKL, 8)
       else ValueName := GUIDToString(Get_ProfileGUID);
 
-    if OpenKey(SRegKey_LanguageHotkeys, True) and ValueExists(ValueName)
+    if OpenKey(SRegKey_LanguageHotkeys_CU, True) and ValueExists(ValueName)
       then FHotkeyValue := StrToIntDef(ReadString(ValueName), 0)
       else FHotkeyValue := 0;
   finally

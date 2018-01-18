@@ -136,6 +136,7 @@ begin
   KL.MethodEnter(Self, 'Destroy', []);
   try
     FInitialized := False;
+    FControl := nil; // Destruction of FControl likes to use FKeyboards
     FKeyboards := nil;  // I2750
     FPackages := nil;
     FSystemInfo := nil;
@@ -143,7 +144,6 @@ begin
     FOptions := nil;
     FLanguages := nil;
     FHotkeys := nil;
-    FControl := nil;
 
     FContext.Free; FContext := nil;
     inherited Destroy;

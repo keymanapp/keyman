@@ -140,11 +140,17 @@ begin
 
   reg := TRegistry.Create;
   try
-    if FIsAdmin
-      then reg.RootKey := HKEY_LOCAL_MACHINE
-      else reg.RootKey := HKEY_CURRENT_USER;
+    if FIsAdmin then
+    begin
+      reg.RootKey := HKEY_LOCAL_MACHINE;
+      RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardName) + SRegSubKey_LanguageProfiles;
+    end
+    else
+    begin
+      reg.RootKey := HKEY_CURRENT_USER;
+      RootPath := GetRegistryKeyboardInstallKey_CU(KeyboardName) + SRegSubKey_LanguageProfiles;
+    end;
 
-    RootPath := GetRegistryKeyboardInstallKey(KeyboardName) + SRegKey_LanguageProfiles;
     if reg.OpenKey(RootPath, True) then
     begin
       for i := 0 to High(LangIDs) do
@@ -170,11 +176,17 @@ begin
 
   reg := TRegistry.Create;
   try
-    if FIsAdmin
-      then reg.RootKey := HKEY_LOCAL_MACHINE
-      else reg.RootKey := HKEY_CURRENT_USER;
+    if FIsAdmin then
+    begin
+      reg.RootKey := HKEY_LOCAL_MACHINE;
+      RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardName) + SRegSubKey_LanguageProfiles;
+    end
+    else
+    begin
+      reg.RootKey := HKEY_CURRENT_USER;
+      RootPath := GetRegistryKeyboardInstallKey_CU(KeyboardName) + SRegSubKey_LanguageProfiles;
+    end;
 
-    RootPath := GetRegistryKeyboardInstallKey(KeyboardName) + SRegKey_LanguageProfiles;
     if reg.OpenKey(RootPath, True) then
       RegisterLocale(KeyboardDescription, BCP47Tag, 0, IconFileName);   // I3707   // I3768   // I4607
   finally
