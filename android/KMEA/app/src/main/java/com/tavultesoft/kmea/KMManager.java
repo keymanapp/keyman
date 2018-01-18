@@ -45,6 +45,7 @@ import android.widget.RelativeLayout;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONArray;
@@ -148,8 +149,8 @@ public final class KMManager {
   }
 
   // Check if a keyboard namespace is reserved
-  public static boolean isReservedNamespace(String packageID, String keyboardID) {
-    if (packageID.equals(KMDefault_UndefinedPackageID) && keyboardID.equals(KMDefault_KeyboardID)) {
+  public static boolean isReservedNamespace(String packageID) {
+    if (packageID.equals(KMDefault_UndefinedPackageID)) {
       return true;
     }
     return false;
@@ -172,6 +173,10 @@ public final class KMManager {
     } else {
       Log.w("KMManager", "Cannot initialize: Invalid keyboard type");
     }
+
+    // Initializes the PackageProcessor with the base resource directory, which is the parent directory
+    // for the final location corresponding to KMDefault_AssetPackages.
+    PackageProcessor.initialize(new File(context.getDir("data", Context.MODE_PRIVATE).toString()));
   }
 
   public static File getResourceRoot() {

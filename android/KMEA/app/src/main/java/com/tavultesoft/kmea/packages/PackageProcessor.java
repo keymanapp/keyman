@@ -36,10 +36,7 @@ public class PackageProcessor {
     PackageProcessor.resourceRoot = resourceRoot;
   }
 
-  // A default, managed mapping for package installation, handling both temp directory
-  // and perm directory locations.  No need to relocate the downloaded .kmp file itself.
-  @NonNull
-  static File constructPath(File path, boolean temp) {
+  public static String getPackageName(File path) {
     String filename = path.getName();
     String kmpBaseName;
 
@@ -48,18 +45,23 @@ public class PackageProcessor {
     }
 
     if(filename.lastIndexOf('.') != -1) {
-      String ext = "";
-      ext = filename.substring(filename.lastIndexOf('.'));
-
-      if(!ext.toLowerCase().equals(".kmp")) {
+      // Android's temp downloads attach a suffix to the extension; .kmp isn't the end of the filename.
+      if(filename.lastIndexOf(".kmp") == -1) {
         throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
       }
+
+      // Extract our best-guess name for the package and construct the temporary package name.
+      return filename.substring(0, filename.lastIndexOf(".kmp"));
     } else {
       throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
     }
+  }
 
-    // Extract our best-guess name for the package and construct the temporary package name.
-    kmpBaseName = filename.substring(0, filename.lastIndexOf('.'));
+  // A default, managed mapping for package installation, handling both temp directory
+  // and perm directory locations.  No need to relocate the downloaded .kmp file itself.
+  @NonNull
+  static File constructPath(File path, boolean temp) {
+    String kmpBaseName = getPackageName(path);
     // Feel free to change this as desired - simply ensure it is unique enough to never be used as
     // a legitimate package name.
     String kmpFolderName = temp ? "." + kmpBaseName + ".temp" : kmpBaseName;
@@ -102,14 +104,14 @@ public class PackageProcessor {
    * @return A list of maps defining one keyboard-language pairing each.
    * @throws JSONException
    */
-  public static Map<String, String>[] processKeyboardsEntry(JSONObject jsonKeyboard) throws JSONException {
+  public static Map<String, String>[] processKeyboardsEntry(JSONObject jsonKeyboard, String packageId) throws JSONException {
     JSONArray languages = jsonKeyboard.getJSONArray("languages");
 
     HashMap<String, String>[] keyboards = new HashMap[languages.length()];
 
     for(int i=0; i < languages.length(); i++) {
       keyboards[i] = new HashMap<>();
-      // TODO: Add KMManager.KMKey_PackageID from the package ID
+      keyboards[i].put(KMManager.KMKey_PackageID, packageId);
       keyboards[i].put(KMManager.KMKey_KeyboardName, jsonKeyboard.getString("name"));
       keyboards[i].put(KMManager.KMKey_KeyboardID, jsonKeyboard.getString("id"));
       keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
@@ -148,6 +150,17 @@ public class PackageProcessor {
     return json.getJSONObject("system").getString("fileVersion");
   }
 
+  public static String getPackageVersion(File kmpPath, boolean installed) throws IOException, JSONException {
+    if(installed) {
+      return getPackageVersion(loadPackageInfo(constructPath(kmpPath, false)));
+    } else {
+      File tempPath = unzipKMP(kmpPath);
+      String version = getPackageVersion(loadPackageInfo(tempPath));
+      FileUtils.deleteDirectory(tempPath);
+      return version;
+    }
+  }
+
   /**
    * Compares version information, ideally between the temporary extraction path of a package and its
    * desired installation path, to ensure that no accidental downgrade or side-grade overwrite occurs.
@@ -175,6 +188,69 @@ public class PackageProcessor {
     } else {
       return 1;
     }
+  }
+
+  /**
+   * Determines if installing the .kmp would result in a downgrade.
+   * @param kmpPath The path to the .kmp to be installed.
+   * @return <code><b>true</b></code> if installing would be a downgrade, otherwise <code><b>false</b></code>.
+   * @throws IOException
+   * @throws JSONException
+   */
+  public static boolean isDowngrade(File kmpPath) throws IOException, JSONException {
+    return internalCompareKMPVersion(kmpPath, false,-1);
+  }
+
+  /**
+   * Determines if installing the .kmp would result in a downgrade.  For testing only.
+   * @param kmpPath The path to the .kmp to be installed.
+   * @param preExtracted Indicates use of a temporary testing 'kmp' that is pre-extracted.
+   * @return <code><b>true</b></code> if installing would be a downgrade, otherwise <code><b>false</b></code>.
+   * @throws IOException
+   * @throws JSONException
+   */
+  static boolean isDowngrade(File kmpPath, boolean preExtracted) throws IOException, JSONException {
+    return internalCompareKMPVersion(kmpPath, preExtracted,-1);
+  }
+
+  /**
+   * Determines if installing the .kmp would result in a downgrade.  For testing only.
+   * @param kmpPath The path to the .kmp to be installed.
+   * @return <code><b>true</b></code> if installing would be a downgrade, otherwise <code><b>false</b></code>.
+   * @throws IOException
+   * @throws JSONException
+   */
+  public static boolean isSameVersion(File kmpPath) throws IOException, JSONException {
+    return internalCompareKMPVersion(kmpPath, false,0);
+  }
+
+  /**
+   * Determines if installing the .kmp would result in a downgrade.  For testing only.
+   * @param kmpPath The path to the .kmp to be installed.
+   * @param preExtracted Indicates use of a temporary testing 'kmp' that is pre-extracted.
+   * @return <code><b>true</b></code> if installing would be a downgrade, otherwise <code><b>false</b></code>.
+   * @throws IOException
+   * @throws JSONException
+   */
+  static boolean isSameVersion(File kmpPath, boolean preExtracted) throws IOException, JSONException {
+    return internalCompareKMPVersion(kmpPath, preExtracted,0);
+  }
+
+  static boolean internalCompareKMPVersion(File kmpPath, boolean preExtracted, int compValue) throws IOException, JSONException {
+    File tempPath;
+    if(preExtracted) {
+      tempPath = constructPath(kmpPath, true);
+    } else {
+      tempPath = unzipKMP(kmpPath);
+    }
+
+    int compRes = comparePackageDirectories(tempPath, constructPath(kmpPath, false));
+
+    if(!preExtracted) {
+      FileUtils.deleteDirectory(tempPath);
+    }
+
+    return compRes == compValue;
   }
 
   /**
@@ -222,6 +298,12 @@ public class PackageProcessor {
    * @throws JSONException
    */
   static List<Map<String, String>> processKMP(File path, boolean force, boolean preExtracted) throws IOException, JSONException {
+    // Block reserved namespaces, like /cloud/.
+    // TODO:  Consider throwing an exception instead?
+    if(KMManager.isReservedNamespace(getPackageName(path))) {
+      return new ArrayList<>();
+    }
+
     File tempPath;
     if(!preExtracted) {
       tempPath = unzipKMP(path);
@@ -230,13 +312,14 @@ public class PackageProcessor {
     }
 
     JSONObject newInfoJSON = loadPackageInfo(tempPath);
+    String packageId = getPackageName(path);
 
     File permPath = constructPath(path, false);
     if(permPath.exists()) {
-      if(!force && comparePackageDirectories(tempPath, permPath) == -1) {
+      if(!force && comparePackageDirectories(tempPath, permPath) != 1) {
         // Abort!  The current installation is newer or as up-to-date.
         FileUtils.deleteDirectory(tempPath);
-        return new ArrayList<Map<String, String>>();  // It's empty; avoids dealing directly with null ptrs.
+        return new ArrayList<>();  // It's empty; avoids dealing directly with null ptrs.
       } else {
         // Out with the old.  "In with the new" is identical to a new package installation.
         FileUtils.deleteDirectory(permPath);
@@ -259,7 +342,7 @@ public class PackageProcessor {
     ArrayList<Map<String, String>> keyboardSpecs = new ArrayList<>();
 
     for(int i=0; i < keyboards.length(); i++) {
-      Map<String, String>[] kbds = processKeyboardsEntry(keyboards.getJSONObject(i));
+      Map<String, String>[] kbds = processKeyboardsEntry(keyboards.getJSONObject(i), packageId);
 
       keyboardSpecs.addAll(Arrays.asList(kbds));
     }

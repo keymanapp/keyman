@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -135,6 +137,11 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
     } else {
       Toast.makeText(this, "Keyboard download failed", Toast.LENGTH_SHORT).show();
     }
+  }
+
+  @Override
+  public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
+    // Do nothing.
   }
 
   protected static HashMap<String, String> getKeyboardInfo(int languageIndex, int keyboardIndex) {

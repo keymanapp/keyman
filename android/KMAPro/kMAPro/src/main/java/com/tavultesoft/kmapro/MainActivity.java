@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
@@ -596,6 +597,28 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
       Toast.makeText(this, "Keyboard already exists", Toast.LENGTH_SHORT).show();
     } else {
       Toast.makeText(this, "Keyboard download failed", Toast.LENGTH_SHORT).show();
+    }
+  }
+
+  @Override
+  public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
+    // TODO:  Stuff for automatic updates.
+    for(int i=0; i < keyboardsInstalled.size(); i++) {
+      HashMap<String, String> keyboardInfo = new HashMap<>(keyboardsInstalled.get(i));
+      if (i == 0) {
+        if (KMManager.addKeyboard(this, keyboardInfo)) {
+          String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
+          String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
+          String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
+          String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
+          String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
+          String kFont = keyboardInfo.get(KMManager.KMKey_Font);
+          String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
+          KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+        }
+      } else {
+        KMManager.addKeyboard(this, keyboardInfo);
+      }
     }
   }
 
