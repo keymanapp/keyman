@@ -297,14 +297,16 @@ final class KMKeyboard extends WebView {
       oFont = makeSvgOnlyFont(oskFont);
     }
 
+    String keyboardPath = "";
     if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
       setKeyboardRoot(context.getDir("data", Context.MODE_PRIVATE).toString() +
         File.separator + KMManager.KMDefault_UndefinedPackageID + File.separator);
+      keyboardPath = keyboardRoot + keyboardID + "-" + keyboardVersion + ".js";
     } else {
       setKeyboardRoot(context.getDir("data", Context.MODE_PRIVATE).toString() +
         File.separator + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator);
+      keyboardPath = keyboardRoot + keyboardID + ".js";
     }
-    String keyboardPath = keyboardRoot + keyboardID + "-" + keyboardVersion + ".js";
 
     // Add full paths to fonts
     if (tFont.equals("''")) {
@@ -413,14 +415,16 @@ final class KMKeyboard extends WebView {
       oFont = makeSvgOnlyFont(oFont);
     }
 
+    String keyboardPath = "";
     if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
       setKeyboardRoot(context.getDir("data", Context.MODE_PRIVATE).toString() +
         File.separator + KMManager.KMDefault_UndefinedPackageID + File.separator);
+      keyboardPath = keyboardRoot + keyboardID + "-" + keyboardVersion + ".js";
     } else {
       setKeyboardRoot(context.getDir("data", Context.MODE_PRIVATE).toString() +
         File.separator + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator);
+      keyboardPath = keyboardRoot + keyboardID + ".js";
     }
-    String keyboardPath = keyboardRoot + keyboardID + "-" + keyboardVersion + ".js";
 
     // Add full paths to fonts
     if (tFont.equals("''")) {

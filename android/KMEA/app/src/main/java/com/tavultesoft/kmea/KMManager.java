@@ -843,8 +843,10 @@ public final class KMManager {
         KMDefault_AssetPackages + File.separator + packageID + File.separator + "kmp.json";
 
       try {
-
         File kmpJSONFile = new File(path);
+        if (!kmpJSONFile.exists()) {
+          return null;
+        }
         JSONParser jsonParser = new JSONParser();
         JSONObject kbData = jsonParser.getJSONObjectFromFile(kmpJSONFile);
 
