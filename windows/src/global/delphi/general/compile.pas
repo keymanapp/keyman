@@ -132,6 +132,12 @@ const
 function CompileKeyboardFile(kmnFile, kmxFile: PChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback): Integer; cdecl;   // I4865   // I4866
 function CompileKeyboardFileToBuffer(kmnFile: PChar; buf: PFILE_KEYBOARD; CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback; Target: Integer): Integer; cdecl;   // I4865   // I4866
 
+//
+// For unit tests, point to a known-current version of kmcmpdll.dll
+//
+var
+  FUnitTestKMCmpDllPath: string = '';
+
 implementation
 
 uses
@@ -145,7 +151,7 @@ var
 
 type
   TCompileKeyboardFile = function (kmnFile, kmxFile: PAnsiChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL;  // I3310   // I4865   // I4866
-    CallBack: TCompilerCallback): Integer; cdecl;        // TODO: K9: Convert to Unicode 
+    CallBack: TCompilerCallback): Integer; cdecl;        // TODO: K9: Convert to Unicode
 
   TCompileKeyboardFileToBuffer = function (kmnFile: PAnsiChar; buf: PFILE_KEYBOARD;  // I3310
     CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL;   // I4865   // I4866
@@ -160,17 +166,21 @@ begin
 
   if HKMCmpDll = 0 then
   begin
-    s := GetDebugKMCmpDllPath;
-    if (s <> '') and not FileExists(s +'kmcmpdll.dll') then   // I4770
-      s := '';
+    s := FUnitTestKMCmpDllPath;
     if s = '' then
     begin
-      try
-        s := GetDeveloperRootPath;
-      except
+      s := GetDebugKMCmpDllPath;
+      if (s <> '') and not FileExists(s +'kmcmpdll.dll') then   // I4770
         s := '';
+      if s = '' then
+      begin
+        try
+          s := GetDeveloperRootPath;
+        except
+          s := '';
+        end;
+        if s = '' then s := ExtractFilePath(ParamStr(0));
       end;
-      if s = '' then s := ExtractFilePath(ParamStr(0));
     end;
 
     HKMCmpDll := LoadLibrary(PChar(s+'kmcmpdll.dll'));

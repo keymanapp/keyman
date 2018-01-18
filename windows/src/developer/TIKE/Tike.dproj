@@ -453,10 +453,6 @@
         <DCCReference Include="dialogs\UfrmSendURLsToEmail.pas">
             <Form>frmSendURLsToEmail</Form>
         </DCCReference>
-        <DCCReference Include="web\UframeJSONEditor.pas">
-            <Form>frameJSONEditor</Form>
-        </DCCReference>
-        <DCCReference Include="..\..\global\delphi\kmw\JSONKeyboardInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\MSXMLDomCreate.pas"/>
         <DCCReference Include="help\webhelp.pas"/>
         <DCCReference Include="project\UfrmProjectSettings.pas">

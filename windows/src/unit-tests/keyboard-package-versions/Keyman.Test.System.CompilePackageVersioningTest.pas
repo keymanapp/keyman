@@ -36,6 +36,7 @@ implementation
 
 uses
   System.SysUtils,
+  compile,
   CompilePackage,
   kmnProjectFile,
   ProjectFile,
@@ -55,29 +56,35 @@ type
   end;
 
 procedure TCompilePackageVersioningTest.Setup;
-{$IFDEF DEBUG_PROJECT}
 var
   p: TProjectConsole;
-  f: TProjectFile;
   i: Integer;
-{$ENDIF}
 begin
   FRoot := ExtractFileDir(ExtractFileDir(ExtractFileDir(ParamStr(0))));
-{$IFDEF DEBUG_PROJECT}
-  // We only need this to compile a keyboard, but we keep the compiled versions in the test folders
-  // because they have different version numbers. Simpler than rebuilding them each time
-  p := TProjectConsole.Create(FRoot+'\keyboard-package-versions.kpj', False);
+
+  //
+  // Force load development version of kmcmpdll
+  // Assumes it has already been built, of course...
+  //
+  FUnitTestKMCmpDllPath := FRoot + '\..\..\developer\kmcmpdll\';
+
+  p := TProjectConsole.Create(FRoot+'\test-1.0\test-1.0.kpj', False);
   try
-    f := nil;
     for i := 0 to p.Files.Count - 1 do
-      if SameText(ExtractFileName(p.Files[i].Name), 'test.kmn') then
-        f := p.Files[i];
-    Assert.IsTrue(Assigned(f));
-    Assert.IsTrue((f as TkmnProjectFile).CompileKeyboard);
+      if p.Files[i] is TkmnProjectFile then
+        Assert.IsTrue((p.Files[i] as TkmnProjectFile).CompileKeyboard, 'Could not compile keyboard');
   finally
     p.Free;
   end;
-{$ENDIF}
+
+  p := TProjectConsole.Create(FRoot+'\test-2.0\test-2.0.kpj', False);
+  try
+    for i := 0 to p.Files.Count - 1 do
+      if p.Files[i] is TkmnProjectFile then
+        Assert.IsTrue((p.Files[i] as TkmnProjectFile).CompileKeyboard, 'Could not compile keyboard');
+  finally
+    p.Free;
+  end;
 end;
 
 procedure TCompilePackageVersioningTest.TearDown;
