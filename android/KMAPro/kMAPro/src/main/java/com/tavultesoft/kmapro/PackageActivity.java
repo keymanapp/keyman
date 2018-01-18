@@ -16,7 +16,7 @@ public class PackageActivity extends Activity{
     final Context context = this;
 
     final ActionBar actionBar = getActionBar();
-    actionBar.setLogo(null);
+    actionBar.setLogo(R.drawable.keyman_logo);
     actionBar.setDisplayShowHomeEnabled(false);
     actionBar.setDisplayShowTitleEnabled(false);
     actionBar.setDisplayShowCustomEnabled(true);
