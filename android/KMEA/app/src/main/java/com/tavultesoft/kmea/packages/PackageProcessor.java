@@ -124,13 +124,27 @@ public class PackageProcessor {
     return keyboards;
   }
 
+  public static String getKeyboardVersion(JSONObject json, String kbdId) throws JSONException {
+    JSONArray keyboards = json.getJSONArray("keyboards");
+
+    for(int i=0; i < keyboards.length(); i++) {
+      JSONObject keyboard = keyboards.getJSONObject(i);
+
+      if(keyboard.getString("id").equals(kbdId)) {
+        return keyboard.getString("version");
+      }
+    }
+
+    return null;
+  }
+
   /**
    * Simply extracts the package's version number.
    * @param json The metadata JSONObject for the package.
    * @return The version number (via String)
    * @throws JSONException
    */
-  public static String getVersion(JSONObject json) throws JSONException {
+  public static String getPackageVersion(JSONObject json) throws JSONException {
     return json.getJSONObject("system").getString("fileVersion");
   }
 
@@ -145,11 +159,11 @@ public class PackageProcessor {
    */
   public static int comparePackageDirectories(File newPath, File oldPath) throws IOException, JSONException {
     JSONObject newInfoJSON = loadPackageInfo(newPath);
-    String newVersion = getVersion(newInfoJSON);
+    String newVersion = getPackageVersion(newInfoJSON);
 
     if(oldPath.exists()) {
       JSONObject oldInfoJSON = loadPackageInfo(oldPath);
-      String originalVersion = getVersion(oldInfoJSON);
+      String originalVersion = getPackageVersion(oldInfoJSON);
 
       if(KMManager.compareVersions(newVersion, originalVersion) == 1) {
         return 1;
@@ -175,12 +189,51 @@ public class PackageProcessor {
    * @throws JSONException
    */
   public static List<Map<String, String>> processKMP(File path) throws IOException, JSONException {
-    File tempPath = unzipKMP(path);
+    return processKMP(path, false);
+  }
+
+  /**
+   * The master KMP processing method; use after a .kmp download to fully install within the filesystem.
+   * @param path Filepath of a newly downloaded .kmp file.
+   * @param force A <code><b>true</b></code> value indicates that attempts to downgrade should proceed/be forced.
+   * @return A list of data maps of the newly installed and/or newly upgraded keyboards found in the package.
+   * May be empty if the package file is actually an old version.
+   * <br/><br/>
+   * The format for each map matches those of the current `download` method output of KMKeyboardDownloader
+   * as closely as practical.
+   * @throws IOException
+   * @throws JSONException
+   */
+  public static List<Map<String, String>> processKMP(File path, boolean force) throws IOException, JSONException {
+    return processKMP(path, force, false);
+  }
+
+  /**
+   * The master KMP processing method; use after a .kmp download to fully install within the filesystem.
+   * @param path Filepath of a newly downloaded .kmp file.
+   * @param force A <code><b>true</b></code> value indicates that attempts to downgrade should proceed/be forced.
+   * @param preExtracted Indicates that the specified file has already been unzipped.  Only of use for testing.
+   * @return A list of data maps of the newly installed and/or newly upgraded keyboards found in the package.
+   * May be empty if the package file is actually an old version.
+   * <br/><br/>
+   * The format for each map matches those of the current `download` method output of KMKeyboardDownloader
+   * as closely as practical.
+   * @throws IOException
+   * @throws JSONException
+   */
+  static List<Map<String, String>> processKMP(File path, boolean force, boolean preExtracted) throws IOException, JSONException {
+    File tempPath;
+    if(!preExtracted) {
+      tempPath = unzipKMP(path);
+    } else {
+      tempPath = constructPath(path, true);
+    }
+
     JSONObject newInfoJSON = loadPackageInfo(tempPath);
 
     File permPath = constructPath(path, false);
     if(permPath.exists()) {
-      if(comparePackageDirectories(tempPath, permPath) != -1) {
+      if(!force && comparePackageDirectories(tempPath, permPath) == -1) {
         // Abort!  The current installation is newer or as up-to-date.
         FileUtils.deleteDirectory(tempPath);
         return new ArrayList<Map<String, String>>();  // It's empty; avoids dealing directly with null ptrs.

@@ -1,6 +1,7 @@
 package com.tavultesoft.kmea.packages;
 
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.util.ZipUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
@@ -17,6 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 @RunWith(RobolectricTestRunner.class)
 public class PackageProcessorTest {
@@ -28,10 +30,13 @@ public class PackageProcessorTest {
   public static final File TEST_GFF_KMP_TARGET = new File(TEST_EXTRACTION_ROOT, "packages" +
     File.separator + TEST_GFF_KMP_NAME);
 
-  public static final String TEST_GFF_KMP_NAME_ALT = "gff_amh_7_test_json_alt";
-  public static final File TEST_GFF_KMP_FILE_ALT = new File(TEST_RESOURCE_ROOT, TEST_GFF_KMP_NAME_ALT + ".kmp");
+  public static final String TEST_GFF_KMP_NAME_ALT = TEST_GFF_KMP_NAME;
+  public static final File TEST_GFF_KMP_FILE_ALT = new File(TEST_RESOURCE_ROOT, "temp" + File.separator + TEST_GFF_KMP_NAME_ALT + ".kmp");
   public static final File TEST_GFF_KMP_TARGET_ALT = new File(TEST_EXTRACTION_ROOT, "packages" +
     File.separator + TEST_GFF_KMP_NAME_ALT);
+
+  public static final int TEST_GFF_KBD_COUNT = 2;
+  public static final String TEST_GFF_KBD_ID = "gff_amh_7";
 
   private static File tempPkg, tempPkgAlt;
 
@@ -58,6 +63,10 @@ public class PackageProcessorTest {
       // Write the JSON file.
     } catch (IOException e) {
       System.err.println(e);
+    }
+
+    if(!TEST_GFF_KMP_TARGET.equals(TEST_GFF_KMP_TARGET_ALT)) {
+      throw new RuntimeException("Generated alternate test KMP not configured properly!");
     }
   }
 
@@ -140,29 +149,54 @@ public class PackageProcessorTest {
     Assert.assertNotEquals(new File(permPath), PackageProcessor.constructPath(TEST_GFF_KMP_FILE, true));
   }
 
-  /**
-   * Rather than actually attempt to maintain two identically-named package files, this white-box test
-   * simply relies upon an altered kmp.info to test the central version comparison logic used to
-   * determine if an old package version should be replaced.
-   * @throws Exception
-   */
   @Test
-  public void test_versionCompare() throws Exception {
-    createAlternateKMP();
+  public void test_installKMP() throws Exception {
+    List<Map<String, String>> installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE);
 
-    Assert.assertEquals(1, PackageProcessor.comparePackageDirectories(tempPkgAlt, tempPkg));
-    Assert.assertEquals(-1, PackageProcessor.comparePackageDirectories(tempPkg, tempPkgAlt));
-
-    // Test for when there is no pre-existing package.
-    FileUtils.deleteDirectory(tempPkgAlt);
-    Assert.assertEquals(1, PackageProcessor.comparePackageDirectories(tempPkg, tempPkgAlt));
+    Assert.assertTrue(TEST_GFF_KMP_TARGET.exists());
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
   }
 
   @Test
-  public void test_installKMP() throws Exception {
-    PackageProcessor.processKMP(TEST_GFF_KMP_FILE);
+  public void test_upgradeInstall() throws Exception {
+    File installedKMP = PackageProcessor.constructPath(TEST_GFF_KMP_FILE, false);
+    List<Map<String, String>> installedKbds;
+    String version;
 
-    Assert.assertTrue(TEST_GFF_KMP_TARGET.exists());
+    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE);
+    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
+    Assert.assertEquals("7.0", version);
+
+    createAlternateKMP();
+    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT, false, true);
+    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
+    Assert.assertEquals("8.0", version);
+  }
+
+  @Test
+  public void test_downgradeInstall() throws Exception {
+    File installedKMP = PackageProcessor.constructPath(TEST_GFF_KMP_FILE, false);
+    List<Map<String, String>> installedKbds;
+    String version;
+
+    createAlternateKMP();
+    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT, false, true);
+    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
+    Assert.assertEquals("8.0", version);
+
+    // Blocked downgrade attempt.
+    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE, false);
+    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    Assert.assertEquals(0, installedKbds.size());
+    Assert.assertEquals("8.0", version);
+
+    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE, true);
+    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
+    Assert.assertEquals("7.0", version);
   }
 
   /**
@@ -176,5 +210,12 @@ public class PackageProcessorTest {
     FileUtils.deleteDirectory(TEST_GFF_KMP_TARGET);
 
     FileUtils.deleteQuietly(TEST_GFF_KMP_FILE_ALT);
+  }
+
+  @Test
+  public void test_keyboardVersion() throws Exception {
+    JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
+
+    Assert.assertEquals("1.4", PackageProcessor.getKeyboardVersion(json, TEST_GFF_KBD_ID));
   }
 }
