@@ -5,6 +5,8 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="version_label_width">100dp</dimen>
     <dimen name="version_label_textsize">4.5sp</dimen>
+    <dimen name="package_label_width">200dp</dimen>
+    <dimen name="package_label_textsize">4.5sp</dimen>
     <dimen name="keyman_bar_height">6dp</dimen>
 
 </resources>

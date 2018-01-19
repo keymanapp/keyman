@@ -3,25 +3,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".PackageActivity" >
 
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_above="@+id/toolbar" android:layout_alignParentStart="true"/>
+        android:layout_above="@+id/buttonBar"/>
 
     <LinearLayout
-        android:id="@+id/toolbar"
+        android:id="@+id/buttonBar"
+        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:weightSum="5"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
+
+        <!-- Spacer to pad buttons to the right -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <Button
             android:id="@+id/installButton"
@@ -30,11 +32,10 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="15dp"
-            android:layout_weight="1"
             android:text="@string/label_install"
             android:background="@color/keyman_blue"
-            android:textColor="@color/keyman_white"
-            android:layout_marginStart="10dp" android:layout_marginEnd="15dp"/>
+            android:textColor="@color/android:white"
+            android:layout_marginStart="10dp" android:layout_marginEnd="15dp" />
 
         <Button
             android:id="@+id/cancelButton"
@@ -43,11 +44,10 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="15dp"
-            android:layout_weight="1"
             android:text="@string/label_cancel"
             android:background="@color/keyman_blue"
-            android:textColor="@color/keyman_white"
-            android:layout_marginStart="10dp" android:layout_marginEnd="15dp"/>
+            android:textColor="@color/android:white"
+            android:layout_marginStart="10dp" android:layout_marginEnd="15dp" />
 
     </LinearLayout>
 
