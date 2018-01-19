@@ -3559,6 +3559,11 @@ if(!window['keyman']['initialized']) {
       Lscript.charset="UTF-8";        // KMEW-89
       Lscript.type = 'text/javascript';
 
+      // Preserve any namespaced IDs by use of the script's id tag attribute!
+      if(keymanweb.isEmbedded) {
+        Lscript.id = kbdStub['KI'];
+      }
+
       var kbdFile = kbdStub['KF'];
       var kbdLang = kbdStub['KL'];
       var kbdName = kbdStub['KN'];

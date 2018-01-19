@@ -72,13 +72,13 @@
       return true;
     }
 
-    function setKeymanLanguage(keyboardName, internalName, languageName, langId, kbdFile, font, oskFont) {
+    function setKeymanLanguage(keyboardName, internalName, languageName, langId, kbdFile, font, oskFont, package) {
       //oskFont.files = ['NotoSansSyriacWestern-Regular.svg#NotoSansSyriacWesternRegular'];
       //window.console.log('oskFonts = '+JSON.stringify(oskFont));
       var kmw=window['keyman'];
       var kbdInterface=kmw['interface'];
 
-      // Defaults for mising arguments
+      // Defaults for missing arguments
       switch (arguments.length) {
         case 1:
           internalName = keyboardName;
@@ -98,8 +98,8 @@
       }
 
       kbdInterface.registerStub({KN:keyboardName,KI:'Keyboard_'+internalName,KLC:langId,KL:languageName,
-        KF:kbdFile,KFont:font,KOskFont:oskFont});
-      kmw['setActiveKeyboard']('Keyboard_'+internalName,langId);
+        KF:kbdFile,KFont:font,KOskFont:oskFont,KP:package});
+      kmw['setActiveKeyboard'](package + '::Keyboard_'+internalName,langId);
       kmw['osk']['show'](true);
     }
 

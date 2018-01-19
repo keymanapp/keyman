@@ -77,6 +77,29 @@ if(!window['keyman']['initialized']) {
       
       var Li,Lstub;
 
+      // For package namespacing with KMEA/KMEI.
+      if(keymanweb.isEmbedded) {
+        var trueID;
+
+        // Find the currently-executing script tag; KR is called directly from each keyboard's definition script.
+        if(document.currentScript) {
+          trueID = document.currentScript.id;
+        } else {
+          var scripts = document.getElementsByTagName('script');
+          var currentScript = scripts[scripts.length-1];
+
+          trueID = currentScript.id;
+        }
+
+        // Final check that the script tag is valid and appropriate for the loading keyboard.
+        if(trueID.indexOf(Pk['KI']) != -1) {
+          Pk['KI'] = trueID;  // Take the script's version of the ID, which may include package namespacing.
+          //console.log("Attempting to register keyboard with base ID '" + Pk['KI'] + ", namespaced ID " + trueID);
+        } else {
+          console.error("Error when registering keyboard:  current SCRIPT tag's ID does not match!");
+        }
+      }
+
       // Check if the active stub refers to this keyboard, else find applicable stub
 
       var Ps=keymanweb._ActiveStub, savedActiveStub = keymanweb._ActiveStub;
@@ -140,9 +163,10 @@ if(!window['keyman']['initialized']) {
       }
 
       // If no language code has been defined, and no stub has been registered for this keyboard, register with empty string as the language code
-      if(typeof(Pstub['KP']) == 'undefined') {
-        Pstub['KP'] = '';
-      }
+      if(typeof(Pstub['KP']) != 'undefined') {
+        // An embedded use case wants to utilize package-namespacing.
+        Pstub['KI'] = Pstub['KP'] + "::" + Pstub['KI'];
+      } // else leave undefined.  It's nice to condition upon.
       if(typeof(Pstub['KLC']) == 'undefined') {
         Pstub['KLC'] = '';
       }

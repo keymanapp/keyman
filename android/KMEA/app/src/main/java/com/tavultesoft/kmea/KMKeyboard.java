@@ -111,8 +111,10 @@ final class KMKeyboard extends WebView {
 
     setWebChromeClient(new WebChromeClient() {
       public boolean onConsoleMessage(ConsoleMessage cm) {
-        if (KMManager.isDebugMode())
-          Log.d("Keyman JS Log: Line " + cm.lineNumber(), cm.message());
+        if (KMManager.isDebugMode()) {
+          Log.d("Keyman JS Log: Line " + cm.lineNumber(), cm.sourceId() + ":" + cm.message());
+          Log.d("Keyman JS Log: Line " + cm.lineNumber(), cm.sourceId());
+        }
         return true;
       }
     });
@@ -247,7 +249,11 @@ final class KMKeyboard extends WebView {
     boolean retVal = true;
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
-      Toast.makeText(context, "Invalid keyboard! Loading default", Toast.LENGTH_LONG).show();
+      if(keyboardVersion == null) {
+        Toast.makeText(context, "Invalid keyboard - no version specified! Loading default", Toast.LENGTH_LONG).show();
+      } else {
+        Toast.makeText(context, "Invalid keyboard! Loading default", Toast.LENGTH_LONG).show();
+      }
       keyboardID = KMManager.KMDefault_KeyboardID;
       languageID = KMManager.KMDefault_LanguageID;
       retVal = false;
@@ -325,10 +331,12 @@ final class KMKeyboard extends WebView {
 
       // Escape single-quoted names for javascript call
     keyboardName = keyboardName.replaceAll("\'", "\\'");
+    Log.v("KMEA", "Unescaped language name: " + languageName);
     languageName = languageName.replaceAll("\'", "\\'");
+    Log.v("KMEA", "Escaped language name: " + languageName);
 
-    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s)";
-    String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont);
+    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
+    String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
     loadUrl(jsString);
     if (KMManager.isDebugMode()) {
       Log.d("KMKeyboard", jsString);
@@ -359,7 +367,11 @@ final class KMKeyboard extends WebView {
     boolean retVal = true;
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
-      Toast.makeText(context, "Invalid keyboard! Loading default", Toast.LENGTH_LONG).show();
+      if(keyboardVersion == null) {
+        Toast.makeText(context, "Invalid keyboard - no version specified! Loading default", Toast.LENGTH_LONG).show();
+      } else {
+        Toast.makeText(context, "Invalid keyboard! Loading default", Toast.LENGTH_LONG).show();
+      }
       packageID = KMManager.KMDefault_UndefinedPackageID;
       keyboardID = KMManager.KMDefault_KeyboardID;
       languageID = KMManager.KMDefault_LanguageID;
@@ -441,11 +453,14 @@ final class KMKeyboard extends WebView {
     }
 
     // Escape single-quoted names for javascript call
-    keyboardName = keyboardName.replaceAll("\'", "\\'");
-    languageName = languageName.replaceAll("\'", "\\'");
+    keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
+    Log.v("KMEA", "Unescaped language name: " + languageName);
+    languageName = languageName.replaceAll("\'", "\\\\'");
+    Log.v("KMEA", "Escaped language name: " + languageName);
+    Log.v("KMEA", "Escaped quote character? \\'");
 
-    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s)";
-    String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont);
+    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
+    String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
     loadUrl(jsString);
     if (KMManager.isDebugMode()) {
       Log.d("KMKeyboard", jsString);
