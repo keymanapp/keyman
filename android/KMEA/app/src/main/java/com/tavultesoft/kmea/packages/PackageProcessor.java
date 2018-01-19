@@ -2,6 +2,7 @@ package com.tavultesoft.kmea.packages;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.JSONParser;
@@ -91,8 +92,12 @@ public class PackageProcessor {
   static JSONObject loadPackageInfo(File packagePath) {
     File infoFile = new File(packagePath, "kmp.json");
 
-    JSONParser parser = new JSONParser();
-    return parser.getJSONObjectFromFile(infoFile);
+    if(infoFile.exists()) {
+      JSONParser parser = new JSONParser();
+      return parser.getJSONObjectFromFile(infoFile);
+    } else {
+      return null;
+    }
   }
 
   // Call this once per each entry of the JSON `keyboards` array, then concatenate the resulting arrays for a full list.
@@ -147,7 +152,11 @@ public class PackageProcessor {
    * @throws JSONException
    */
   public static String getPackageVersion(JSONObject json) throws JSONException {
-    return json.getJSONObject("system").getString("fileVersion");
+    if(json == null) {
+      return null;
+    } else {
+      return json.getJSONObject("info").getJSONObject("version").getString("description");
+    }
   }
 
   public static String getPackageVersion(File kmpPath, boolean installed) throws IOException, JSONException {
@@ -303,14 +312,12 @@ public class PackageProcessor {
     if(KMManager.isReservedNamespace(getPackageName(path))) {
       return new ArrayList<>();
     }
-
     File tempPath;
     if(!preExtracted) {
       tempPath = unzipKMP(path);
     } else {
       tempPath = constructPath(path, true);
     }
-
     JSONObject newInfoJSON = loadPackageInfo(tempPath);
     String packageId = getPackageName(path);
 

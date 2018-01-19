@@ -52,7 +52,7 @@ public class PackageProcessorTest {
       File tempPkgAlt = PackageProcessor.unzipKMP(TEST_GFF_KMP_FILE_ALT);
 
       JSONObject json = PackageProcessor.loadPackageInfo(tempPkgAlt);
-      json.getJSONObject("system").put("fileVersion", "8.0"); // Make it look newer!
+      json.getJSONObject("info").getJSONObject("version").put("description", "1.5"); // Make it look newer!
 
       // Write out the JSON file.
       File jsonFile = new File(tempPkgAlt, "kmp.json");
@@ -181,13 +181,13 @@ public class PackageProcessorTest {
     installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE);
     version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
-    Assert.assertEquals("7.0", version);
+    Assert.assertEquals("1.4", version);
 
     createAlternateKMP();
     installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT, false, true);
     version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
-    Assert.assertEquals("8.0", version);
+    Assert.assertEquals("1.5", version);
   }
 
   @Test
@@ -200,18 +200,18 @@ public class PackageProcessorTest {
     installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT, false, true);
     version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
-    Assert.assertEquals("8.0", version);
+    Assert.assertEquals("1.5", version);
 
     // Blocked downgrade attempt.
     installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE, false);
     version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
     Assert.assertEquals(0, installedKbds.size());
-    Assert.assertEquals("8.0", version);
+    Assert.assertEquals("1.5", version);
 
     installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE, true);
     version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
-    Assert.assertEquals("7.0", version);
+    Assert.assertEquals("1.4", version);
   }
 
   @Test
@@ -248,7 +248,7 @@ public class PackageProcessorTest {
     createAlternateKMP();
     PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT, false, true);
 
-    Assert.assertEquals("8.0", PackageProcessor.getPackageVersion(TEST_GFF_KMP_FILE, true));
-    Assert.assertEquals("7.0", PackageProcessor.getPackageVersion(TEST_GFF_KMP_FILE, false));
+    Assert.assertEquals("1.5", PackageProcessor.getPackageVersion(TEST_GFF_KMP_FILE, true));
+    Assert.assertEquals("1.4", PackageProcessor.getPackageVersion(TEST_GFF_KMP_FILE, false));
   }
 }

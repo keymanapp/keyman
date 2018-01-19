@@ -194,14 +194,14 @@ public class KMKeyboardDownloaderActivity extends Activity {
             public void onClick(DialogInterface dialog, int which) {
               try {
                 // Downgrade/reinstall package
-                List<Map<String, String>> installedKbds = PackageProcessor.processKMP(packagePath, true);
-
+                installedPackageKeyboards = PackageProcessor.processKMP(packagePath, true);
                 // Do the notifications!
-                boolean success = installedKbds.size() == 0;
+                boolean success = installedPackageKeyboards.size() != 0;
                 if(success) {
-                  notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedKbds, 1);
+                  notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
+                } else {
+                  Log.d("KMEA", "Forced install of a package returned no updated keyboards!");
                 }
-
                 finishTask(success ? -2 : 1);
               } catch (Exception e) {
                 Log.e("Package installation", "Error: " + e);
@@ -313,9 +313,10 @@ public class KMKeyboardDownloaderActivity extends Activity {
         pendingDialogSpec.show();
       } else if(this.installedPackageKeyboards != null) {
         notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, this.installedPackageKeyboards, 1);
+        finishTask(result);
       } else {
-          // Normal scenario after package has been downloaded and installed
-          finishTask(result);
+        // Normal scenario after package has been downloaded and installed
+        finishTask(result);
       }
     }
 
@@ -340,7 +341,9 @@ public class KMKeyboardDownloaderActivity extends Activity {
       }
 
       ((Activity) context).finish();
-      notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
+      if(this.installedPackageKeyboards == null) {
+        notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
+      }
     }
 
     private void dismissProgressDialog() {
@@ -367,6 +370,8 @@ public class KMKeyboardDownloaderActivity extends Activity {
     protected int downloadKMPKeyboard(String remoteUrl) throws Exception {
       int ret = -2;
 
+      Log.d("KMEA", "Downloading .kmp from " + remoteUrl);
+
       // Use the KMP filename for the package ID.
       // Expect last 4 characters in filename to end in ".kmp"
       String sourceKMPFilename = FileUtils.getFilename(remoteUrl);
@@ -387,6 +392,8 @@ public class KMKeyboardDownloaderActivity extends Activity {
       if (ret < 0) {
         return ret;
       }
+
+      String version = PackageProcessor.getPackageVersion(kmpFile, true);
 
       List<Map<String, String>> installedKbds = PackageProcessor.processKMP(kmpFile);
       if (installedKbds.size() == 0) {
