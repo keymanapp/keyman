@@ -206,6 +206,14 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           filename = url.substring(index);
         }
 
+        Intent i;
+        if (url.endsWith(".kmp")) {
+          // i = new Intent(getApplicationContext(), PackageActivity.class); // wip activity
+          i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
+        } else {
+          i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
+        }
+
         Bundle bundle = new Bundle();
         bundle.putString(KMKeyboardDownloaderActivity.ARG_KEYBOARD,
           data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Keyboard));
@@ -215,7 +223,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_DIRECT, isDirect);
         bundle.putString(KMKeyboardDownloaderActivity.ARG_URL, url);
         bundle.putString(KMKeyboardDownloaderActivity.ARG_FILENAME, filename);
-        Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
         i.putExtras(bundle);
         startActivity(i);
       }

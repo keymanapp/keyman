@@ -24,6 +24,11 @@
     <string name="title_bookmarks" translatable="false">Bookmarks</string>
     <string name="no_bookmarks" translatable="false">No Bookmarks</string>
     <string name="hint_title" translatable="false">Title</string>
-    <string name="hint_url" translatable="false">Url</string>   
-    
+    <string name="hint_url" translatable="false">Url</string>
+
+    <!-- Keyboard Package strings -->
+    <string name="title_install_package" translatable="false">Install Keyboard/Package</string>
+    <string name="label_cancel" translatable="false">Cancel</string>
+    <string name="label_install" translatable="false">Install</string>
+
 </resources>
