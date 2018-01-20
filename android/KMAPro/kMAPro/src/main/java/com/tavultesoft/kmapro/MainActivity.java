@@ -21,6 +21,7 @@ import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.util.FileUtils;
 
 import android.app.FragmentManager;
 import android.net.Uri;
@@ -207,14 +208,17 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         }
 
         Intent i;
+        Bundle bundle = new Bundle();
         if (url.endsWith(".kmp")) {
           // i = new Intent(getApplicationContext(), PackageActivity.class); // wip activity
           i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
+          String packageID = FileUtils.getFilename(url);
+          packageID = packageID.substring(0, packageID.length()-4);
+          bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, packageID);
         } else {
           i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
         }
 
-        Bundle bundle = new Bundle();
         bundle.putString(KMKeyboardDownloaderActivity.ARG_KEYBOARD,
           data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Keyboard));
         bundle.putString(KMKeyboardDownloaderActivity.ARG_LANGUAGE,
