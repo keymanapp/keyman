@@ -17,6 +17,11 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
+import com.tavultesoft.kmea.KMManager;
+
+import java.io.File;
+
 public class PackageActivity extends Activity{
 
   private WebView webView;
@@ -26,6 +31,7 @@ public class PackageActivity extends Activity{
   private boolean didFinishLoading = false;
   private String kmpPath;
   private String packageID;
+  private String keyboardRoot;
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
@@ -35,8 +41,15 @@ public class PackageActivity extends Activity{
 
     Bundle bundle = getIntent().getExtras();
     if (bundle != null) {
-      kmpPath = bundle.getString("kmpPath");
-      packageID = bundle.getString("packageID");
+      kmpPath = bundle.getString("filePath");
+      packageID = bundle.getString(KMKeyboardDownloaderActivity.ARG_PKG_ID);
+    }
+    if (packageID == KMManager.KMDefault_UndefinedPackageID) {
+      keyboardRoot = context.getDir("data", Context.MODE_PRIVATE).toString() +
+        File.separator + KMManager.KMDefault_UndefinedPackageID + File.separator;
+    } else {
+      keyboardRoot = context.getDir("data", Context.MODE_PRIVATE).toString() +
+        File.separator + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator;
     }
 
     final ActionBar actionBar = getActionBar();
@@ -66,6 +79,9 @@ public class PackageActivity extends Activity{
     webView.getSettings().setLoadWithOverviewMode(true);
     webView.getSettings().setBuiltInZoomControls(true);
     webView.getSettings().setSupportZoom(true);
+    webView.getSettings().setTextZoom(2);
+    webView.setVerticalScrollBarEnabled(true);
+    webView.setHorizontalScrollBarEnabled(true);
     webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
     webView.setWebChromeClient(new WebChromeClient() {
@@ -98,10 +114,14 @@ public class PackageActivity extends Activity{
       }
     });
 
-    // TODO: loadURL(welcome.htm) after KMP is processed
-    String url = "https://www.google.com/";
-    //webView.loadUrl(url);
-
+    File welcome = new File(keyboardRoot, "Welcome.htm");
+    if (welcome.exists()) {
+      webView.loadUrl("file:///" + welcome.getAbsolutePath());
+    } else {
+      // TODO: loadURL(welcome.htm) after KMP is processed
+      String url = "https://www.google.com/";
+      webView.loadUrl(url);
+    }
 
     installButton.setOnClickListener(new OnClickListener() {
       @Override

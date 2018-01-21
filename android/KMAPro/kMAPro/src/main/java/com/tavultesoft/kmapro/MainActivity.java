@@ -21,9 +21,11 @@ import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
 
+import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -77,6 +79,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   protected static final String didCheckUserDataKey = "DidCheckUserData";
   private Menu menu;
   DownloadResultReceiver resultReceiver;
+  private ProgressDialog progressDialog;
 
   private class DownloadResultReceiver extends ResultReceiver {
     public DownloadResultReceiver(Handler handler) {
@@ -85,6 +88,10 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
     @Override
     protected void onReceiveResult(int resultCode, Bundle resultData) {
+      if (progressDialog != null && progressDialog.isShowing()) {
+        progressDialog.dismiss();
+      };
+      progressDialog = null;
       switch(resultCode) {
         case FileUtils.DOWNLOAD_ERROR :
           Toast.makeText(getApplicationContext(), "Download failed",
@@ -93,6 +100,16 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         case FileUtils.DOWNLOAD_SUCCESS :
           String filename = resultData.getString("filename");
           String kmpPath = resultData.getString("destination") + File.separator + filename;
+
+          File kmpFile = new File(kmpPath);
+          try {
+            String oldVersion, newVersion;
+            oldVersion = PackageProcessor.getPackageVersion(kmpFile, true);
+            newVersion = PackageProcessor.getPackageVersion(kmpFile, false);
+            List<Map<String, String>> installedKbds = PackageProcessor.processKMP(kmpFile);
+          } catch (Exception e) {
+
+          }
           Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
 
           Bundle bundle = new Bundle();
@@ -251,8 +268,18 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
               i.putExtra("url", url);
               i.putExtra("destination", MainActivity.this.getCacheDir().toString());
               i.putExtra("receiver", resultReceiver);
+
+              progressDialog = new ProgressDialog(MainActivity.this);
+              progressDialog.setMessage("Downloading keyboard package...");
+              progressDialog.setCancelable(false);
+              progressDialog.show();
+
               startService(i);
             } catch (Exception e) {
+              if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+              }
+              progressDialog = null;
               intent.setData(null);
               return;
             }
