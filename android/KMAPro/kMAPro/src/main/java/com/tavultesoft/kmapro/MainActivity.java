@@ -22,11 +22,12 @@ import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.DownloadIntentService;
 
-import android.app.FragmentManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
 import android.annotation.SuppressLint;
@@ -50,6 +51,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.ResultReceiver;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -74,10 +76,41 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   protected static final String dontShowGetStartedKey = "DontShowGetStarted";
   protected static final String didCheckUserDataKey = "DidCheckUserData";
   private Menu menu;
+  DownloadResultReceiver resultReceiver;
+
+  private class DownloadResultReceiver extends ResultReceiver {
+    public DownloadResultReceiver(Handler handler) {
+      super(handler);
+    }
+
+    @Override
+    protected void onReceiveResult(int resultCode, Bundle resultData) {
+      switch(resultCode) {
+        case FileUtils.DOWNLOAD_ERROR :
+          Toast.makeText(getApplicationContext(), "Download failed",
+            Toast.LENGTH_SHORT).show();
+          break;
+        case FileUtils.DOWNLOAD_SUCCESS :
+          String filename = resultData.getString("filename");
+          String kmpPath = resultData.getString("destination") + File.separator + filename;
+          Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
+
+          Bundle bundle = new Bundle();
+          String packageID = filename.substring(0, filename.length()-4);
+          bundle.putString("filePath", kmpPath);
+          bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, packageID);
+          packageIntent.putExtras(bundle);
+          startActivity(packageIntent);
+          break;
+      }
+      super.onReceiveResult(resultCode, resultData);
+    }
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    resultReceiver = new DownloadResultReceiver(new Handler());
     final ActionBar actionBar = getActionBar();
     actionBar.setLogo(R.drawable.keyman_logo);
     actionBar.setDisplayShowTitleEnabled(false);
@@ -210,25 +243,52 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         Intent i;
         Bundle bundle = new Bundle();
         if (url.endsWith(".kmp")) {
-          // i = new Intent(getApplicationContext(), PackageActivity.class); // wip activity
-          i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
-          String packageID = FileUtils.getFilename(url);
-          packageID = packageID.substring(0, packageID.length()-4);
-          bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, packageID);
+          boolean useNewActivity = false;
+          if (useNewActivity) {
+            try {
+              // Download the KMP to app cache
+              i = new Intent(MainActivity.this, DownloadIntentService.class);
+              i.putExtra("url", url);
+              i.putExtra("destination", MainActivity.this.getCacheDir().toString());
+              i.putExtra("receiver", resultReceiver);
+              startService(i);
+            } catch (Exception e) {
+              intent.setData(null);
+              return;
+            }
+          } else {
+            // TODO: Temporarily using KMKeyboardDownloadActivity to install kmp.
+            i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
+
+            String packageID = FileUtils.getFilename(url);
+            packageID = packageID.substring(0, packageID.length()-4);
+
+            bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, packageID);
+            bundle.putString(KMKeyboardDownloaderActivity.ARG_KEYBOARD,
+              data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Keyboard));
+            bundle.putString(KMKeyboardDownloaderActivity.ARG_LANGUAGE,
+              data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Language));
+            bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom);
+            bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_DIRECT, isDirect);
+            bundle.putString(KMKeyboardDownloaderActivity.ARG_URL, url);
+            bundle.putString(KMKeyboardDownloaderActivity.ARG_FILENAME, filename);
+            i.putExtras(bundle);
+            startActivity(i);
+          }
         } else {
           i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
-        }
 
-        bundle.putString(KMKeyboardDownloaderActivity.ARG_KEYBOARD,
-          data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Keyboard));
-        bundle.putString(KMKeyboardDownloaderActivity.ARG_LANGUAGE,
-          data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Language));
-        bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom);
-        bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_DIRECT, isDirect);
-        bundle.putString(KMKeyboardDownloaderActivity.ARG_URL, url);
-        bundle.putString(KMKeyboardDownloaderActivity.ARG_FILENAME, filename);
-        i.putExtras(bundle);
-        startActivity(i);
+          bundle.putString(KMKeyboardDownloaderActivity.ARG_KEYBOARD,
+            data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Keyboard));
+          bundle.putString(KMKeyboardDownloaderActivity.ARG_LANGUAGE,
+            data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Language));
+          bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom);
+          bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_DIRECT, isDirect);
+          bundle.putString(KMKeyboardDownloaderActivity.ARG_URL, url);
+          bundle.putString(KMKeyboardDownloaderActivity.ARG_FILENAME, filename);
+          i.putExtras(bundle);
+          startActivity(i);
+        }
       }
     }
     intent.setData(null);

@@ -21,6 +21,9 @@ import java.io.OutputStream;
  */
 public final class FileUtils {
 
+  public static final int DOWNLOAD_ERROR = -1;
+  public static final int DOWNLOAD_SUCCESS = 1;
+
   /**
    * Utility to download a file from urlStr and store it at destinationDir/destinationFilename.
    * If the destination directory does not exist, it will be created.
@@ -32,7 +35,7 @@ public final class FileUtils {
    */
   public static int download(Context context, String urlStr, String destinationDir, String destinationFilename) {
     final int BUFFER_SIZE = 4096;
-    int ret = -1;
+    int ret = DOWNLOAD_ERROR;
     String directoryStr = "";
     String filename = "";
     String tmpFilename = "";
@@ -80,7 +83,7 @@ public final class FileUtils {
         fos.close();
         binStream.close();
 
-        ret = 1;
+        ret = DOWNLOAD_SUCCESS;
       }
     } catch (Exception e) {
       ret = -1;
@@ -92,12 +95,12 @@ public final class FileUtils {
             file.delete();
           }
           if (!tmpFile.renameTo(file)) {
-            ret = -1;
+            ret = DOWNLOAD_ERROR;
           } else if (KMManager.isDebugMode()) {
             Log.d("FileUtils", "Download finished for filename " + file.toString());
           }
         } else {
-          ret = -1;
+          ret = DOWNLOAD_ERROR;
         }
       } else {
         if (file.exists()) {

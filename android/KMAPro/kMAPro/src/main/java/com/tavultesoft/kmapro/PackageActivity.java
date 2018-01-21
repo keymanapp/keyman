@@ -24,7 +24,8 @@ public class PackageActivity extends Activity{
   private String loadedFont;
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
-  private static String url;
+  private String kmpPath;
+  private String packageID;
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
@@ -34,7 +35,8 @@ public class PackageActivity extends Activity{
 
     Bundle bundle = getIntent().getExtras();
     if (bundle != null) {
-      url = bundle.getString("url");
+      kmpPath = bundle.getString("kmpPath");
+      packageID = bundle.getString("packageID");
     }
 
     final ActionBar actionBar = getActionBar();
