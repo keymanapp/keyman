@@ -23,7 +23,7 @@
     </style> 
  
     <!-- Insert uncompiled KeymanWeb source scripts -->              
-    <script src="../../build/keymanweb.js" type="application/javascript"></script>           
+    <script src="../../intermediate/keymanweb.js" type="application/javascript"></script>           
 
     <!-- 
       For desktop browsers, a script for the user interface must be inserted here.
@@ -32,7 +32,7 @@
       The toolbar UI is best for any page designed to support keyboards for 
       a large number of languages.
     -->
-    <script src="../../build/kmwuitoggle.js"></script>                                                                                                 
+    <script src="../../intermediate/kmwuitoggle.js"></script>                                                                                                 
  
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
@@ -49,7 +49,7 @@
 
 <!-- Sample page HTML -->  
   <body onload='loadKeyboards();'> 
-    <h2>KeymanWeb Testing Page - Mismatched Layer Rows</h2>
+    <h2>KeymanWeb:  Tests layering transitions for keyboards with variable layer sizes.</h2>
     <p>This test should be run from mobile devices or with Chrome's mobile device emulation settings available within Developer Mode.</p>
     <div>
     <!-- 

@@ -129,7 +129,7 @@ update_bundle ( ) {
         fi
 
         #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
-        cd ../embedded
+        cd ../release/embedded
         cp resources/osk/kmwosk.css        "$base_dir/$BUNDLE_PATH/kmwosk.css"
         cp resources/osk/keymanweb-osk.ttf "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
         cp keyman.js                       "$base_dir/$BUNDLE_PATH/keymanios.js"
