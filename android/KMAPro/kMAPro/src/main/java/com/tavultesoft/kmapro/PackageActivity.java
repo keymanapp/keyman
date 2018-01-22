@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
@@ -48,7 +49,7 @@ public class PackageActivity extends Activity{
       kmpFile = new File(bundle.getString("kmpFile"));
     }
 
-    String pkgId = PackageProcessor.getPackageName(kmpFile);
+    final String pkgId = PackageProcessor.getPackageName(kmpFile);
     String version = PackageProcessor.getPackageVersion(kmpFile, false);
 
     try {
@@ -129,6 +130,12 @@ public class PackageActivity extends Activity{
       @Override
       public void onClick(View v) {
         try {
+          // Remove currently installed package and then install
+          File currentPackage = new File(context.getDir("data", MODE_PRIVATE).toString() +
+            File.separator + KMManager.KMDefault_AssetPackages + File.separator + pkgId);
+          if (currentPackage.exists()) {
+            FileUtils.deleteDirectory(currentPackage);
+          }
           installedPackageKeyboards = PackageProcessor.processKMP(kmpFile);
           // Do the notifications!
           boolean success = installedPackageKeyboards.size() != 0;
