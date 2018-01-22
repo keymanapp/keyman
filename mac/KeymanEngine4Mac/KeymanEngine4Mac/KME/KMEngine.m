@@ -36,7 +36,7 @@ DWORD VKMap[0x80];
 - (id)initWithKMX:(KMXFile *)kmx contextBuffer:(NSString *)ctxBuf {
     self = [super init];
     if (self) {
-        self.debugMode = YES;
+        self.debugMode = NO;
         _kmx = kmx;
         _tmpCtxBuf = [[NSMutableString alloc] initWithString:ctxBuf];
         [_tmpCtxBuf removeAllNullChars];
@@ -86,18 +86,41 @@ DWORD VKMap[0x80];
 }
 
 - (NSArray *)processGroup:(KMCompGroup *)gp event:(NSEvent *)event {
-    NSArray *actions = nil;
-    
     if (!gp)
+        return nil;
+    
+    if (![event respondsToSelector:@selector(keyCode)])
         return nil;
 
     if (([event modifierFlags] & NSEventModifierFlagCommand) == NSEventModifierFlagCommand)
         return nil; // Engine should NEVER attempt to process characters when the Command key is pressed.
+    
+    @try {
+        return [self processGroupInternal: gp event:event];
+    }
+    @catch (NSException *e) {
+        NSLog(@"Error = %@", e.description);
+        return nil;
+    }
+}
 
+- (NSArray *)processGroupInternal:(KMCompGroup *)gp event:(NSEvent *)event {
+    NSArray *actions = nil;
+    
+    // REVIEW: Probably need to use charactersIgnoringModifiers instead of characters to avoid
+    // getting Mac predefined subsitutions for Option + ??? keystrokes
+    NSString *characters = [event characters];
+    //NSString *characters = [event charactersIgnoringModifiers];
+    if (self.debugMode) {
+        NSLog(@"####### ENGINE INFO #######");
+        NSLog(@"%lu characters = %@", [[event characters] length], characters);
+        NSLog(@"%lu characters ignoring modifiers = %@", [[event charactersIgnoringModifiers] length], [event charactersIgnoringModifiers]);
+    }
+    
     if (gp.fUsingKeys) {
         // Begin group using keys
         unsigned short keyCode = [event keyCode];
-        unichar vChar = [[event characters] characterAtIndex:0];
+        unichar vChar = [characters characterAtIndex:0];
         DWORD vkCode = VKMap[keyCode];
         NSMutableArray *mKeys = [NSMutableArray arrayWithCapacity:0];
         for (KMCompKey *kmKey in gp.keys) {
@@ -124,26 +147,48 @@ DWORD VKMap[0x80];
             NSLog(@"[event modifierFlags] = %lX", [event modifierFlags]);
         }
         DWORD mask = 0;
-        if (([event modifierFlags] & NSEventModifierFlagShift) == NSEventModifierFlagShift)
+        if (([event modifierFlags] & NSEventModifierFlagShift) == NSEventModifierFlagShift) {
+            if (self.debugMode)
+                NSLog(@"Adding SHIFT flag to mask.");
             mask |= K_SHIFTFLAG;
+        }
         
-        if (([event modifierFlags] & NSEventModifierFlagCapsLock) == NSEventModifierFlagCapsLock)
+        if (([event modifierFlags] & NSEventModifierFlagCapsLock) == NSEventModifierFlagCapsLock) {
+            if (self.debugMode)
+                NSLog(@"Adding CAPITAL flag to mask.");
             mask |= CAPITALFLAG;
-
-        if (([event modifierFlags] & MK_LEFT_ALT_MASK) == MK_LEFT_ALT_MASK)
+        }
+        
+        if (([event modifierFlags] & MK_LEFT_ALT_MASK) == MK_LEFT_ALT_MASK) {
+            if (self.debugMode)
+                NSLog(@"Adding LEFT ALT flag to mask.");
             mask |= LALTFLAG;
-        else if (([event modifierFlags] & MK_RIGHT_ALT_MASK) == MK_RIGHT_ALT_MASK)
+        }
+        else if (([event modifierFlags] & MK_RIGHT_ALT_MASK) == MK_RIGHT_ALT_MASK) {
+            if (self.debugMode)
+                NSLog(@"Adding RIGHT ALT flag to mask.");
             mask |= RALTFLAG;
-        else if (([event modifierFlags] & NSEventModifierFlagOption) == NSEventModifierFlagOption)
+        }
+        else if (([event modifierFlags] & NSEventModifierFlagOption) == NSEventModifierFlagOption) {
+            if (self.debugMode)
+                NSLog(@"Adding ALT flag to mask.");
             mask |= K_ALTFLAG;
-        
-        if (([event modifierFlags] & MK_LEFT_CTRL_MASK) == MK_LEFT_CTRL_MASK)
+        }
+        if (([event modifierFlags] & MK_LEFT_CTRL_MASK) == MK_LEFT_CTRL_MASK) {
+            if (self.debugMode)
+                NSLog(@"Adding LCTRL flag to mask.");
             mask |= LCTRLFLAG;
-        else if (([event modifierFlags] & MK_RIGHT_CTRL_MASK) == MK_RIGHT_CTRL_MASK)
+        }
+        else if (([event modifierFlags] & MK_RIGHT_CTRL_MASK) == MK_RIGHT_CTRL_MASK) {
+            if (self.debugMode)
+                NSLog(@"Adding RCTRL flag to mask.");
             mask |= RCTRLFLAG;
-        else if (([event modifierFlags] & NSEventModifierFlagControl) == NSEventModifierFlagControl)
+        }
+        else if (([event modifierFlags] & NSEventModifierFlagControl) == NSEventModifierFlagControl) {
+            if (self.debugMode)
+                NSLog(@"Adding CTRL flag to mask.");
             mask |= K_CTRLFLAG;
-        
+        }
         if (self.debugMode)
             NSLog(@"Mask = %X", mask);
         
@@ -151,8 +196,8 @@ DWORD VKMap[0x80];
         for (KMCompKey *key in mKeys) {
             if (key.shiftFlags & ISVIRTUALKEY) {
                 DWORD kMask = mask;
-                //if (self.debugMode)
-                    //NSLog(@"Has shift flags: %X", key.shiftFlags);
+                if (self.debugMode)
+                    NSLog(@"Has shift flags: %X", key.shiftFlags);
                 //DWORD flags = key.shiftFlags & 0x0FFF;
                 if ((key.shiftFlags & NOTCAPITALFLAG) && !(kMask & CAPITALFLAG))
                     kMask |= NOTCAPITALFLAG;
