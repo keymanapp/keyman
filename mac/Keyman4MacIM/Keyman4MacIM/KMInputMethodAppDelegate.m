@@ -68,6 +68,22 @@ typedef enum {
                                                            andSelector:@selector(handleURLEvent:withReplyEvent:)
                                                          forEventClass:kInternetEventClass
                                                             andEventID:kAEGetURL];
+        
+        CFMachPortRef eventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask, (CGEventTapCallBack)eventTapFunction, nil);
+        
+        if (!eventTap)
+            NSLog(@"Can't tap into flags changed event!");
+        else
+            CFRelease(eventTap);
+                  
+        CFRunLoopSourceRef flagsChangedEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0);
+        if (flagsChangedEventSrc ) {
+
+            CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+            if (runLoop) {
+                CFRunLoopAddSource(runLoop,  flagsChangedEventSrc, kCFRunLoopDefaultMode);
+            }
+        }
     }
 
     return self;
@@ -132,6 +148,24 @@ typedef enum {
             }
         }
     }
+}
+
++ (KMInputMethodAppDelegate *)AppDelegate {
+    return (KMInputMethodAppDelegate *)[NSApp delegate];
+}
+
+CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
+    if (type == kCGEventFlagsChanged) {
+        KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
+        KMEngine *engine = appDelegate ? appDelegate.kme : nil;
+        KMXFile *kmx = engine ? engine.kmx : nil;
+        if (kmx != nil && kmx.) {
+            NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
+            NSLog(@"System Event: %@", sysEvent);
+            //NotificationCenter.default.post(name: NSNotification.Name("modifier"), object: nil)
+        }
+    }
+    return event;
 }
 
 - (NSMenu *)menu {
