@@ -17,39 +17,45 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
-import com.tavultesoft.kmea.KMManager;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.tavultesoft.kmea.KeyboardEventHandler;
+import com.tavultesoft.kmea.packages.PackageProcessor;
+import com.tavultesoft.kmea.util.FileUtils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class PackageActivity extends Activity{
 
   private WebView webView;
-  private static final String fontBaseUri = "https://s.keyman.com/font/deploy/";
-  private String loadedFont;
-  private boolean isLoading = false;
-  private boolean didFinishLoading = false;
-  private String kmpPath;
-  private String packageID;
-  private String keyboardRoot;
+  private File kmpFile;
+  private File tempPackagePath;
+  private List<Map<String, String>> installedPackageKeyboards;
+
+  private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     final Context context = this;
-
     Bundle bundle = getIntent().getExtras();
     if (bundle != null) {
-      kmpPath = bundle.getString("filePath");
-      packageID = bundle.getString(KMKeyboardDownloaderActivity.ARG_PKG_ID);
+      kmpFile = new File(bundle.getString("kmpFile"));
     }
-    if (packageID == KMManager.KMDefault_UndefinedPackageID) {
-      keyboardRoot = context.getDir("data", Context.MODE_PRIVATE).toString() +
-        File.separator + KMManager.KMDefault_UndefinedPackageID + File.separator;
-    } else {
-      keyboardRoot = context.getDir("data", Context.MODE_PRIVATE).toString() +
-        File.separator + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator;
+
+    String pkgId = PackageProcessor.getPackageName(kmpFile);
+    String version = PackageProcessor.getPackageVersion(kmpFile, false);
+
+    try {
+      tempPackagePath = PackageProcessor.unzipKMP(kmpFile);
+    } catch (Exception e) {
+      Log.e("PackageActivity", "Failed to extract " + kmpFile.getAbsolutePath());
+      finish();
     }
 
     final ActionBar actionBar = getActionBar();
@@ -58,14 +64,17 @@ public class PackageActivity extends Activity{
     actionBar.setDisplayShowTitleEnabled(false);
     actionBar.setDisplayShowCustomEnabled(true);
     actionBar.setBackgroundDrawable(MainActivity.getActionBarDrawable(this));
-    TextView packageName = new TextView(this);
-    packageName.setWidth((int) getResources().getDimension(R.dimen.package_label_width));
-    packageName.setTextSize(getResources().getDimension(R.dimen.package_label_textsize));
-    packageName.setGravity(Gravity.CENTER);
+    TextView packgeActivityTitle = new TextView(this);
+    packgeActivityTitle.setWidth((int) getResources().getDimension(R.dimen.package_label_width));
+    packgeActivityTitle.setTextSize(getResources().getDimension(R.dimen.package_label_textsize));
+    packgeActivityTitle.setGravity(Gravity.CENTER);
 
-    String packageStr = "Install Keyboard Package";
-    packageName.setText(packageStr);
-    actionBar.setCustomView(packageName);
+    String titleStr = "Install Keyboard Package";
+    if (version != null) {
+      titleStr += " v." + version;
+    }
+    packgeActivityTitle.setText(titleStr);
+    actionBar.setCustomView(packgeActivityTitle);
 
     setContentView(R.layout.activity_package_installer);
 
@@ -79,7 +88,7 @@ public class PackageActivity extends Activity{
     webView.getSettings().setLoadWithOverviewMode(true);
     webView.getSettings().setBuiltInZoomControls(true);
     webView.getSettings().setSupportZoom(true);
-    webView.getSettings().setTextZoom(2);
+    webView.getSettings().setTextZoom(200);
     webView.setVerticalScrollBarEnabled(true);
     webView.setHorizontalScrollBarEnabled(true);
     webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -89,8 +98,6 @@ public class PackageActivity extends Activity{
     webView.setWebViewClient(new WebViewClient() {
       @Override
       public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-        didFinishLoading = true;
-        isLoading = false;
       }
 
       @Override
@@ -103,37 +110,62 @@ public class PackageActivity extends Activity{
 
       @Override
       public void onPageStarted(WebView view, String url, Bitmap favicon) {
-        isLoading = true;
-        didFinishLoading = false;
       }
 
       @Override
       public void onPageFinished(WebView view, String url) {
-        didFinishLoading = true;
-        isLoading = false;
       }
     });
 
-    File welcome = new File(keyboardRoot, "Welcome.htm");
+    File welcome = new File(tempPackagePath.getPath(), "Welcome.htm");
     if (welcome.exists()) {
       webView.loadUrl("file:///" + welcome.getAbsolutePath());
     } else {
-      // TODO: loadURL(welcome.htm) after KMP is processed
-      String url = "https://www.google.com/";
-      webView.loadUrl(url);
+      String htmlString = "<div id='welcome'><H1>Package: " + pkgId + "</H1></div>";
+      webView.loadData(htmlString, "text/html; charset=utf-8", "UTF-8");
     }
 
     installButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        // Process KMP package
+        try {
+          installedPackageKeyboards = PackageProcessor.processKMP(kmpFile);
+          // Do the notifications!
+          boolean success = installedPackageKeyboards.size() != 0;
+          if(success) {
+            notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
+            ((Activity) context).finish();
+            if(installedPackageKeyboards != null) {
+              notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
+            }
+          } else {
+            Toast.makeText(context, "No new keyboards installed", Toast.LENGTH_SHORT).show();
+            ((Activity) context).finish();
+            Log.d("PackageActivity", "Package install returned no updated keyboards!");
+          }
+
+        } catch (Exception e) {
+          Log.e("PackageActivity", "Error " + e);
+        }
       }
     });
 
     cancelButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        finish();
+        // Cleanup
+        try {
+          if (kmpFile.exists()) {
+            kmpFile.delete();
+          }
+          if (tempPackagePath.exists()) {
+            FileUtils.deleteDirectory(tempPackagePath);
+          }
+        } catch (Exception e) {
+
+        } finally {
+          finish();
+        }
       }
     });
   }
@@ -147,6 +179,28 @@ public class PackageActivity extends Activity{
   public void onBackPressed() {
     finish();
     overridePendingTransition(0, android.R.anim.fade_out);
+  }
+
+  void notifyPackageInstallListeners(KeyboardEventHandler.EventType eventType, List<Map<String, String>> keyboards, int result) {
+    if (kbDownloadEventListeners != null) {
+      KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, eventType, keyboards, result);
+    }
+  }
+
+  public static void addKeyboardDownloadEventListener(KeyboardEventHandler.OnKeyboardDownloadEventListener listener) {
+    if (kbDownloadEventListeners == null) {
+      kbDownloadEventListeners = new ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener>();
+    }
+
+    if (listener != null && !kbDownloadEventListeners.contains(listener)) {
+      kbDownloadEventListeners.add(listener);
+    }
+  }
+
+  public static void removeKeyboardDownloadEventListener(KeyboardEventHandler.OnKeyboardDownloadEventListener listener) {
+    if (kbDownloadEventListeners != null) {
+      kbDownloadEventListeners.remove(listener);
+    }
   }
 
 }

@@ -99,23 +99,11 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           break;
         case FileUtils.DOWNLOAD_SUCCESS :
           String filename = resultData.getString("filename");
-          String kmpPath = resultData.getString("destination") + File.separator + filename;
-
-          File kmpFile = new File(kmpPath);
-          try {
-            String oldVersion, newVersion;
-            oldVersion = PackageProcessor.getPackageVersion(kmpFile, true);
-            newVersion = PackageProcessor.getPackageVersion(kmpFile, false);
-            List<Map<String, String>> installedKbds = PackageProcessor.processKMP(kmpFile);
-          } catch (Exception e) {
-
-          }
-          Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
+          String kmpFile = resultData.getString("destination") + File.separator + filename;
 
           Bundle bundle = new Bundle();
-          String packageID = filename.substring(0, filename.length()-4);
-          bundle.putString("filePath", kmpPath);
-          bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, packageID);
+          bundle.putString("kmpFile", kmpFile);
+          Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
           packageIntent.putExtras(bundle);
           startActivity(packageIntent);
           break;
@@ -236,6 +224,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
     KMManager.addKeyboardEventListener(this);
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
+    PackageActivity.addKeyboardDownloadEventListener(this);
 
     // If URL provided, start KMKeyboardDownloaderActivity
     Intent intent = getIntent();
@@ -260,7 +249,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         Intent i;
         Bundle bundle = new Bundle();
         if (url.endsWith(".kmp")) {
-          boolean useNewActivity = false;
+          boolean useNewActivity = true;
           if (useNewActivity) {
             try {
               // Download the KMP to app cache
@@ -270,7 +259,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
               i.putExtra("receiver", resultReceiver);
 
               progressDialog = new ProgressDialog(MainActivity.this);
-              progressDialog.setMessage("Downloading keyboard package...");
+              progressDialog.setMessage("Downloading keyboard package\n" + filename + "...");
               progressDialog.setCancelable(false);
               progressDialog.show();
 

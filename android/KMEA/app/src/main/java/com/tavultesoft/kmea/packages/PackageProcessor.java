@@ -76,8 +76,11 @@ public class PackageProcessor {
    * @return The mapped temporary file path for the .kmp file's contents.
    * @throws IOException
    */
-  static File unzipKMP(File path) throws IOException {
+  public static File unzipKMP(File path) throws IOException {
     File tempKeyboardPath = constructPath(path, true);
+    if (!tempKeyboardPath.exists()) {
+      tempKeyboardPath.mkdir();
+    }
     ZipUtils.unzip(path, tempKeyboardPath);
 
     return tempKeyboardPath;
@@ -126,6 +129,9 @@ public class PackageProcessor {
       if (jsonKeyboard.has("oskFont")) {
         keyboards[i].put(KMManager.KMKey_OskFont, jsonKeyboard.getString("oskFont"));
       }
+
+      // For now, all KMP distributed keyboards are custom
+      keyboards[i].put(KMManager.KMKey_CustomKeyboard, "Y");
     }
 
     return keyboards;
@@ -159,14 +165,18 @@ public class PackageProcessor {
     }
   }
 
-  public static String getPackageVersion(File kmpPath, boolean installed) throws IOException, JSONException {
-    if(installed) {
-      return getPackageVersion(loadPackageInfo(constructPath(kmpPath, false)));
-    } else {
-      File tempPath = unzipKMP(kmpPath);
-      String version = getPackageVersion(loadPackageInfo(tempPath));
-      FileUtils.deleteDirectory(tempPath);
-      return version;
+  public static String getPackageVersion(File kmpPath, boolean installed) {
+    try {
+      if (installed) {
+        return getPackageVersion(loadPackageInfo(constructPath(kmpPath, false)));
+      } else {
+        File tempPath = unzipKMP(kmpPath);
+        String version = getPackageVersion(loadPackageInfo(tempPath));
+        FileUtils.deleteDirectory(tempPath);
+        return version;
+      }
+    } catch (Exception e) {
+      return null;
     }
   }
 
