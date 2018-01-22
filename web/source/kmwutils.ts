@@ -219,7 +219,7 @@ class Util {
    * @return     {boolean}         
    * Description Invoke an event using any function with up to four arguments 
    */    
-  callEvent(event: string, params: Object[]): boolean {
+  callEvent(event: string, params: Object|Object[]): boolean {
     if(typeof this.events[event] == 'undefined') {
       return true;
     }
@@ -433,7 +433,7 @@ class Util {
     }
   }
   
-  private _CreateElement(nodeName:string): HTMLElement { 
+  _CreateElement(nodeName:string): HTMLElement { 
     var e = <HTMLElement>document.createElement(nodeName);
 
     // Make element unselectable (Internet Explorer)
@@ -1106,7 +1106,7 @@ class Util {
    * @param     {string}        s       alert text
    * @param     {function()=}   fn      function to call when alert dismissed
    */       
-  alert(s: string, fn: () => void): void {
+  alert(s: string, fn?: () => void): void {
     var bg = this.keyman.waiting, nn=bg.firstChild.childNodes;
     nn[0].style.display='block';
     nn[1].className='kmw-alert-text'; 
@@ -1118,6 +1118,11 @@ class Util {
     } else {
       bg.dismiss=null;
     }
+  }
+
+  // Stub definition to be fleshed out depending upon native/embedded mode.
+  wait(s: string|boolean): void {
+
   }
   
   /**
