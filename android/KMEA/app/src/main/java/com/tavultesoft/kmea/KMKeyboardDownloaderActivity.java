@@ -1,32 +1,25 @@
 package com.tavultesoft.kmea;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.ContextWrapper;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.ZipUtils;
 
 import static com.tavultesoft.kmea.KMManager.KMDefault_AssetPackages;
 import static com.tavultesoft.kmea.KMManager.KMDefault_UndefinedPackageID;
@@ -61,11 +54,6 @@ public class KMKeyboardDownloaderActivity extends Activity {
   public static final String KMKey_Language = "language";
   public static final String KMKey_Languages = "languages";
   public static final String KMKey_Filename = "filename";
-
-  public static final String KMKey_Files = "files";
-  public static final String KMKey_KBName = "name";
-  public static final String KMKey_KBID = "id";
-  public static final String KMKey_KBVersion = "version";
 
   // Keyman internal keys
   public static final String KMKey_KeyboardBaseURI = "keyboardBaseUri";
@@ -146,90 +134,11 @@ public class KMKeyboardDownloaderActivity extends Activity {
    * packages and keyboards.
    */
   static class DownloadTask extends AsyncTask<Void, Integer, Integer> {
-    class PackageConfirmDialogSpec {
-      private String title;
-      private String text;
-      private String confirmText;
-
-      private boolean isDowngrade;
-      private File packagePath;
-
-      PackageConfirmDialogSpec(File kmpPath, boolean isDowngrade) {
-        this.title = PackageProcessor.getPackageName(kmpFile) + " package already exists.";
-        this.isDowngrade = isDowngrade;
-        this.packagePath = kmpPath;
-
-        String oldVersion, newVersion;
-
-        try {
-          oldVersion = PackageProcessor.getPackageVersion(packagePath, true);
-          newVersion = PackageProcessor.getPackageVersion(packagePath, false);
-
-          if(isDowngrade) {
-            this.text = "Downgrade from version " + oldVersion + " to " + newVersion + "?";
-            this.confirmText = "Downgrade";
-          } else {
-            this.text = "Reinstall package version " + oldVersion + "?";
-            this.confirmText = "Reinstall";
-          }
-        } catch (Exception e) {
-          // Mysterious error when retrieving version Strings.  Meh, we'll just leave 'em out then.
-
-          if(isDowngrade) {
-            this.text = "Downgrade package version?";
-            this.confirmText = "Downgrade";
-          } else {
-            this.text = "Reinstall package?";
-            this.confirmText = "Reinstall";
-          }
-        }
-      }
-
-      public void show() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(title)
-          .setMessage(text)
-          .setPositiveButton(confirmText, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-              try {
-                // Downgrade/reinstall package
-                installedPackageKeyboards = PackageProcessor.processKMP(packagePath, true);
-                // Do the notifications!
-                boolean success = installedPackageKeyboards.size() != 0;
-                if(success) {
-                  notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
-                } else {
-                  Log.d("KMEA", "Forced install of a package returned no updated keyboards!");
-                }
-                finishTask(success ? -2 : 1);
-              } catch (Exception e) {
-                Log.e("Package installation", "Error: " + e);
-              }
-            }
-          })
-          .setNegativeButton("Cancel",  new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-              // Cancel
-              finishTask(-1);
-            }
-          });
-        AlertDialog confirmDowngrade = builder.create();
-        confirmDowngrade.show();
-      }
-    }
-
     private ProgressDialog progressDialog;
     private String kbVersion = "1.0";
     private String kbIsCustom = isCustom ? "Y" : "N";
     private String font = "";
     private String oskFont = "";
-
-    private File packageDirectory, tempPackageDirectory, kmpFile;
-    private JSONObject keyboard;
-
-    private PackageConfirmDialogSpec pendingDialogSpec;
-    private List<Map<String, String>> installedPackageKeyboards;
 
     private Context context;
     private boolean showProgressDialog;
@@ -284,10 +193,6 @@ public class KMKeyboardDownloaderActivity extends Activity {
             String encodedUrl = URLEncoder.encode(filename, "utf-8");
             remoteUrl = String.format("%s%s&device=%s", kKeymanApiRemoteURL, encodedUrl, deviceType);
           }
-          if (remoteUrl.endsWith(".kmp")) {
-            ret = downloadKMPKeyboard(remoteUrl);
-            return ret;
-          }
         } else {
           // Keyman cloud
           remoteUrl = String.format("%slanguages/%s/%s?device=%s", kKeymanApiBaseURL, langID, kbID, deviceType);
@@ -309,44 +214,6 @@ public class KMKeyboardDownloaderActivity extends Activity {
 
     @Override
     protected void onPostExecute(Integer result) {
-      if (result == -1 && pendingDialogSpec != null) {
-        pendingDialogSpec.show();
-      } else if(this.installedPackageKeyboards != null) {
-        notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, this.installedPackageKeyboards, 1);
-        finishTask(result);
-      } else {
-        // Normal scenario after package has been downloaded and installed
-        finishTask(result);
-      }
-    }
-
-    /**
-     * Cleanup to do when AsyncTask is done: dismiss all dialogs, delete temporary .kmp files,
-     * and notify listeners keyboard download is finished
-     * @param result int
-     */
-    private void finishTask(int result) {
-      dismissProgressDialog();
-
-      try {
-        // Cleanup .kmp file and temporary package directory
-        if (kmpFile != null && kmpFile.exists()) {
-          kmpFile.delete();
-        }
-        if (tempPackageDirectory != null && tempPackageDirectory.exists()) {
-          FileUtils.deleteDirectory(tempPackageDirectory);
-        }
-      } catch (Exception e) {
-        Log.e("Keyboard download", "Error: " + e);
-      }
-
-      ((Activity) context).finish();
-      if(this.installedPackageKeyboards == null) {
-        notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
-      }
-    }
-
-    private void dismissProgressDialog() {
       try {
         if (progressDialog != null && progressDialog.isShowing()) {
           progressDialog.dismiss();
@@ -355,74 +222,9 @@ public class KMKeyboardDownloaderActivity extends Activity {
       } catch (Exception e) {
         progressDialog = null;
       }
-    }
 
-    /**
-     * Download an ad-hoc KMP Keyman keyboard
-     * @param remoteUrl
-     * @return ret int
-     *   -2 for fail
-     *   -1 for confirming version downgrade
-     *    0 for no change because keyboard already exists
-     *    1 for success
-     * @throws Exception
-     */
-    protected int downloadKMPKeyboard(String remoteUrl) throws Exception {
-      int ret = -2;
-
-      Log.d("KMEA", "Downloading .kmp from " + remoteUrl);
-
-      // Use the KMP filename for the package ID.
-      // Expect last 4 characters in filename to end in ".kmp"
-      String sourceKMPFilename = FileUtils.getFilename(remoteUrl);
-      String exceptionStr = "Invalid KMP filename";
-      if (sourceKMPFilename == null || sourceKMPFilename.length() < 5) {
-        throw new Exception(exceptionStr);
-      }
-      pkgID = sourceKMPFilename.substring(0, sourceKMPFilename.length() - 4);
-      exceptionStr = "Invalid package ID";
-      // Ensure pkgID is valid
-      if (pkgID == null || pkgID.isEmpty()) {
-        throw new Exception(exceptionStr);
-      }
-
-      kmpFile = File.createTempFile(sourceKMPFilename, null);
-      ret = FileUtils.download(context, remoteUrl,
-        kmpFile.getParent() + File.separator, kmpFile.getName());
-      if (ret < 0) {
-        return ret;
-      }
-
-      String version = PackageProcessor.getPackageVersion(kmpFile, true);
-
-      List<Map<String, String>> installedKbds = PackageProcessor.processKMP(kmpFile);
-      if (installedKbds.size() == 0) {
-        // Install probably failed - shouldn't have an empty package.
-        if (PackageProcessor.isDowngrade(kmpFile)) {
-          // Set up info for downgrade confirm dialog in postExecute.
-          this.pendingDialogSpec = new PackageConfirmDialogSpec(kmpFile, true);
-          return -1;
-        } else if (PackageProcessor.isSameVersion(kmpFile)) {
-          // Set up info for re-install confirm dialog in postExecute.
-          // Or, we could just plain block it / "toast notification."
-          this.pendingDialogSpec = new PackageConfirmDialogSpec(kmpFile, false);
-          return -1;
-        } else {
-          // Is there a different error type to check for?
-          return -2;
-        }
-      } else {
-        // Denote our newly-downloaded keyboards for later notification!
-        this.installedPackageKeyboards = installedKbds;
-
-        return 1;
-      }
-    }
-
-    void notifyPackageInstallListeners(KeyboardEventHandler.EventType eventType, List<Map<String, String>> keyboards, int result) {
-      if (kbDownloadEventListeners != null) {
-        KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, eventType, keyboards, result);
-      }
+      ((Activity) context).finish();
+      notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
     }
 
     /**

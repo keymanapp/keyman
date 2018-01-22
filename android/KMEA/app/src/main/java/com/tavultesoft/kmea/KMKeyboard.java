@@ -510,7 +510,7 @@ final class KMKeyboard extends WebView {
         }
       }
     } catch (JSONException e) {
-      font = "";
+      font = "undefined";
     }
 
     return font;

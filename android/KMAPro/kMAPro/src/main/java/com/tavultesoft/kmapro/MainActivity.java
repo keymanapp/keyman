@@ -21,7 +21,6 @@ import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
-import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
 
@@ -249,47 +248,26 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         Intent i;
         Bundle bundle = new Bundle();
         if (url.endsWith(".kmp")) {
-          boolean useNewActivity = true;
-          if (useNewActivity) {
-            try {
-              // Download the KMP to app cache
-              i = new Intent(MainActivity.this, DownloadIntentService.class);
-              i.putExtra("url", url);
-              i.putExtra("destination", MainActivity.this.getCacheDir().toString());
-              i.putExtra("receiver", resultReceiver);
+          try {
+            // Download the KMP to app cache
+            i = new Intent(MainActivity.this, DownloadIntentService.class);
+            i.putExtra("url", url);
+            i.putExtra("destination", MainActivity.this.getCacheDir().toString());
+            i.putExtra("receiver", resultReceiver);
 
-              progressDialog = new ProgressDialog(MainActivity.this);
-              progressDialog.setMessage("Downloading keyboard package\n" + filename + "...");
-              progressDialog.setCancelable(false);
-              progressDialog.show();
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setMessage("Downloading keyboard package\n" + filename + "...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
 
-              startService(i);
-            } catch (Exception e) {
-              if (progressDialog != null && progressDialog.isShowing()) {
-                progressDialog.dismiss();
-              }
-              progressDialog = null;
-              intent.setData(null);
-              return;
+            startService(i);
+          } catch (Exception e) {
+            if (progressDialog != null && progressDialog.isShowing()) {
+              progressDialog.dismiss();
             }
-          } else {
-            // TODO: Temporarily using KMKeyboardDownloadActivity to install kmp.
-            i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
-
-            String packageID = FileUtils.getFilename(url);
-            packageID = packageID.substring(0, packageID.length()-4);
-
-            bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, packageID);
-            bundle.putString(KMKeyboardDownloaderActivity.ARG_KEYBOARD,
-              data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Keyboard));
-            bundle.putString(KMKeyboardDownloaderActivity.ARG_LANGUAGE,
-              data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Language));
-            bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom);
-            bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_DIRECT, isDirect);
-            bundle.putString(KMKeyboardDownloaderActivity.ARG_URL, url);
-            bundle.putString(KMKeyboardDownloaderActivity.ARG_FILENAME, filename);
-            i.putExtras(bundle);
-            startActivity(i);
+            progressDialog = null;
+            intent.setData(null);
+            return;
           }
         } else {
           i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
