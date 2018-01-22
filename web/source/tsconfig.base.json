@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
 	"allowJs": true,
-	"module": "system",
+	"module": "none",
 	"outDir": "../intermediate/",
+	"inlineSources": true,
 	"sourceMap": true,
 	"target": "es5"
   }

@@ -1333,184 +1333,10 @@ if(!window['keyman']['initialized']) {
      */  
     keymanweb['addKeyboards'] = function(x) {                       
       if(arguments.length == 0) {
-        keymanweb.keymanCloudRequest('',false);
+        keymanweb.keyboardManager.keymanCloudRequest('',false);
       } else {
-        keymanweb.addKeyboardArray(arguments);
+        keymanweb.keyboardManager.addKeyboardArray(arguments);
       }
-    }
-    
-    /**
-     * Build 362: addKeyboardArray() link to Cloud. One or more arguments may be used
-     * 
-     * @param {string|Object} x keyboard name string or keyboard metadata JSON object
-     * 
-     */  
-    keymanweb.addKeyboardArray = function(x) {
-      // Store all keyboard meta-data for registering later if called before initialization
-      if(!keymanweb['initialized']) {
-        for(var k=0; k<x.length; k++) {
-          keymanweb.deferredStubs.push(x[k]);
-        }
-        return;
-      }
-  
-      // Ignore empty array passed as argument
-      if(x.length == 0) {
-        return;
-      }
-    
-      // Create a temporary array of metadata objects from the arguments used
-      var i,j,kp,kbid,lgid,kvid,cmd='',comma='';
-      keymanweb.cloudList=[];
-
-      /**
-       * Function       isUniqueRequest
-       * Scope          Private
-       * @param         {Object}    tEntry
-       * Description    Checks to ensure that the stub isn't already loaded within KMW or subject
-       *                to an already-pending request.
-       */
-      var isUniqueRequest = function(tEntry: {'id': any, 'language': any}) {
-        var k;
-
-        if(keymanweb.findStub(tEntry['id'], tEntry['language']) == null) {
-          for(k=0; k < keymanweb.cloudList.length; k++) {
-            if(keymanweb.cloudList[k]['id'] == tEntry['id'] && keymanweb.cloudList[k]['language'] == tEntry['language']) {
-              return false;
-            }
-          }
-          return true;
-        } else {
-          return false;
-        }
-      };
-
-      for(i=0; i<x.length; i++) {
-        if(typeof(x[i]) == 'string' && x[i].length > 0) {
-          var pList=x[i].split('@'),lList=[''],tEntry;
-          if(pList[0].toLowerCase() == 'english') {
-            pList[0] = 'us';
-          }
-
-          if(pList.length > 1) {
-            lList=pList[1].split(',');
-          }
-
-          for(j=0; j<lList.length; j++) {
-            tEntry={'id':pList[0]};
-            if(lList[j] != '') {
-              tEntry['language']=lList[j];
-            }
-            if(pList.length > 2) {
-              tEntry['version']=pList[2];
-            }
-
-            // If we've already registered or requested a stub for this keyboard-language pairing,
-            // don't bother with a cloud request.
-            if(isUniqueRequest(tEntry)) {
-              keymanweb.cloudList.push(tEntry);
-            }
-          }
-        }
-        if(typeof(x[i]) == 'object' && x[i] != null) {
-          // Register any local keyboards immediately:
-          // - must specify filename, keyboard name, language codes, region codes
-          // - no request will be sent to cloud
-          if(typeof(x[i]['filename']) == 'string') {                                                   
-            if(!keymanweb.addStub(x[i])) {
-              alert('To use a custom keyboard, you must specify file name, keyboard name, language, language code and region code.');
-            }
-          } else {
-            if(x[i]['language']) {
-              console.warn("The 'language' property for keyboard stubs has been deprecated.  Please use the 'languages' property instead.");
-              x[i]['languages'] = x[i]['language'];
-            }
-
-            lList=x[i]['languages'];
-                
-            //Array or single entry?
-            if(typeof(lList.length) == 'number') {
-              for(j=0; j<lList.length; j++) {
-                var tEntryAlt = {'id':x[i]['id'],'language':x[i]['languages'][j]['id']};
-                if(isUniqueRequest(tEntryAlt)) {
-                  keymanweb.cloudList.push(tEntryAlt);
-                }
-              }
-            } else { // Single language element
-              var tEntryAlt = {'id':x[i]['id'],'language':x[i]['languages'][j]['id']};
-              if(isUniqueRequest(tEntryAlt)) {
-                keymanweb.cloudList.push(tEntryAlt);
-              }
-            }
-          }
-        }
-      }
-      
-      // Return if all keyboards being registered are local and fully specified
-      if(keymanweb.cloudList.length == 0) {
-        return;
-      }
-
-      // Update the keyboard metadata list from keyman.com - build the command
-      cmd='&keyboardid=';
-      for(i=0; i<keymanweb.cloudList.length; i++) {      
-        kp=keymanweb.cloudList[i];
-        kbid=kp['id']; lgid=''; kvid='';  
-        if(typeof(kp['language']) == 'string' && kp['language'] != '') {
-          lgid=kp['language'];
-        }
-        if(typeof(kp['version']) == 'string' && kp['version'] != '') {
-          kvid=kp['version'];
-        }
-        if(lgid != '') {
-          kbid=kbid+'@'+lgid;
-          if(kvid != '') {
-            kbid=kbid+'@'+kvid;
-          }
-        } else {
-          if(kvid != '') {
-            kbid=kbid+'@@'+kvid;
-          }
-        }
-
-  //TODO: add specifier validation...        
-                
-        cmd=cmd+comma+kbid;
-        comma=',';
-      }  
-      
-      // Request keyboard metadata from the Keyman Cloud keyboard metadata server
-      keymanweb.keymanCloudRequest(cmd,false);
-    }
-
-    /**
-     *  Request keyboard metadata from the Keyman Cloud keyboard metadata server
-     *   
-     *  @param  {string}   cmd        command string
-     *  @param  {boolean?} byLanguage if true, context=languages, else context=keyboards 
-     **/
-    keymanweb.keymanCloudRequest = function(cmd,byLanguage)
-    {         
-      var URL='https://r.keymanweb.com/api/4.0/', 
-        tFlag,Lscript = util._CreateElement('SCRIPT');
-      
-      URL=URL+((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards')
-        +'?jsonp=keyman.register';  
-      
-      // Set callback timer
-      tFlag='&timerid='+window.setTimeout(
-        function(){keymanweb.serverUnavailable(cmd);}
-        ,10000);    
-    
-      Lscript.charset="UTF-8";                     
-      Lscript.src = URL+cmd+tFlag;       
-      Lscript.type = 'text/javascript';       
-      try {                                  
-        document.body.appendChild(Lscript);  
-        }
-      catch(ex) {                                                     
-        document.getElementsByTagName('head')[0].appendChild(Lscript);
-        }                  
     }
     
     /**
@@ -1520,273 +1346,7 @@ if(!window['keyman']['initialized']) {
      **/           
     keymanweb['addKeyboardsForLanguage'] = function(arg)
     {
-      keymanweb.addLanguageKeyboards(arguments);
-    }
-    
-    /**
-     *  Add default or all keyboards for a given language
-     *  
-     *  @param  {Object}   languages    Array of language names
-     **/           
-    keymanweb.addLanguageKeyboards = function(languages)
-    {
-      var i,j,lgName,ll=keymanweb.languageList,cmd,first,addAll;
-      
-      // Defer registering keyboards by language until the language list has been loaded
-      if(ll == null) 
-      {                       
-        first = (keymanweb.languagesPending.length == 0);    
-        for(i=0; i<languages.length; i++)
-          keymanweb.languagesPending.push(languages[i]);
-        if(first) keymanweb.keymanCloudRequest('',true);        
-      }
-      
-      // Identify and register each keyboard by language name
-      else
-      {    
-        cmd = '';
-        for(i=0; i<languages.length; i++)
-        {                
-          lgName = languages[i].toLowerCase();
-          addAll = (lgName.substr(-1,1) == '$'); 
-          if(addAll) lgName = lgName.substr(0,lgName.length-1);
-          for(j=0; j<ll.length; j++)
-          {
-            if(lgName == ll[j]['name'].toLowerCase()) 
-            {
-              if(cmd != '') cmd = cmd + ',';
-              cmd = cmd+'@'+ll[j]['id'];
-              if(addAll) cmd = cmd + '$';
-              break;
-            }
-          }
-        }
-        if(cmd == '')
-          util.alert('No keyboards are available for '+languages[0]+'. '
-            +'Does it have another language name?');
-        else
-          keymanweb.keymanCloudRequest('&keyboardid='+cmd,false);
-      }
-    }
-      
-    /**
-     * Register a fully specified keyboard (add meta-data for each language) immediately 
-     * 
-     *  @param  {Object}  arg   
-     **/              
-    keymanweb.addStub = function(arg)
-    {                         
-      if(typeof(arg['id']) != 'string') return false;
-      if(typeof(arg['language']) != "undefined") {
-        console.warn("The 'language' property for keyboard stubs has been deprecated.  Please use the 'languages' property instead.");
-        arg['languages'] = arg['language'];
-      }
-      if(typeof(arg['languages']) == 'undefined') return false;
-      
-      // Default the keyboard name to its id, capitalized
-      if(typeof(arg['name']) != 'string')
-      {
-        arg['name'] = arg['id'].replace('_',' ');
-        arg['name'] = arg['name'].substr(0,1).toUpperCase()+arg['name'].substr(1);
-      }
-
-      var lgArg=arg['languages'],lgList=[],i,lg;
-      if(typeof(lgArg.length) == 'undefined') lgList[0] = lgArg; else lgList = lgArg; 
-
-      var localOptions={
-        'keyboardBaseUri':keymanweb.options['keyboards'],
-        'fontBaseUri':keymanweb.options['fonts']
-        };
-
-      // Add a stub for each correctly specified language
-      for(i=0; i<lgList.length; i++)
-        keymanweb.mergeStub(arg,lgList[i],localOptions);
-
-      return true;
-    }
-    
-    /**
-     *  Find a keyboard stub by id in the registered keyboards list
-     *  
-     *  @param  {string}  kid   internal keyboard id (without 'Keyboard_' prefix)
-     *  @param  {string}  lgid  language code
-     *  
-     **/                 
-    keymanweb.findStub = function(kid,lgid) 
-    {                
-      var i,ss=keymanweb._KeyboardStubs; 
-      for(i=0; i<ss.length; i++) 
-      {     
-        if((ss[i]['KI'] == 'Keyboard_'+kid) && (ss[i]['KLC'] == lgid))
-          return ss[i];
-      }     
-      return null;
-    }
-    
-    // Language regions as defined by cloud server
-    keymanweb.regions = ['World','Africa','Asia','Europe','South America','North America','Oceania','Central America','Middle East'];
-    keymanweb.regionCodes = ['un','af','as','eu','sa','na','oc','ca','me'];
-    
-    /**
-     *  Create or update a keyboard meta-data 'stub' during keyboard registration
-     *  
-     *  @param  {Object}  kp  (partial) keyboard meta-data object
-     *  @param  {Object}  lp  language object
-     *  @param  {Object}  options   KeymanCloud callback options
-     *  
-     **/                    
-    keymanweb.mergeStub = function(kp,lp,options)
-    {                                           
-      var sp=keymanweb.findStub(kp['id'],lp['id']);       
-      if(sp == null)
-      {                           
-        sp={'KI':'Keyboard_'+kp['id'],'KLC':lp['id']};
-        keymanweb._KeyboardStubs.push(sp);
-      }
-
-      // Accept region as number (from Cloud server), code, or name
-      var region=lp['region'],rIndex=0;
-      if(typeof(region) == 'number')
-      {
-        if(region < 1 || region > 9) rIndex = 0; else rIndex = region-1;
-      }
-      else if(typeof(region) == 'string')
-      {
-        var list = (region.length == 2 ? keymanweb.regionCodes : keymanweb.regions);
-        for(var i=0; i<list.length; i++)
-        {
-          if(region.toLowerCase() == list[i].toLowerCase()) 
-          {
-            rIndex=i; break;
-          }
-        }
-      }
-      var rx=null;
-      if(typeof(sp['KL']) == 'undefined')  sp['KL'] = lp['name'];
-      if(typeof(sp['KR']) == 'undefined')  sp['KR'] = keymanweb.regions[rIndex];
-      if(typeof(sp['KRC']) == 'undefined') sp['KRC'] = keymanweb.regionCodes[rIndex];
-      if(typeof(sp['KN']) == 'undefined')  sp['KN'] = kp['name'];
-      if(typeof(sp['KF']) == 'undefined')  
-      {
-        rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
-        sp['KF'] = kp['filename'];   
-        if(!rx.test(sp['KF'])) sp['KF'] = options['keyboardBaseUri']+sp['KF'];
-      } 
-      
-      // Font path defined by cloud entry   
-      var fp,fontPath=options['fontBaseUri'];      
-        
-      // or overridden locally, in page source
-      if(keymanweb.options['fonts'] != '') 
-      {                                   
-        fontPath=keymanweb.options['fonts'];      
-        rx=new RegExp('^https?\\:');
-        if(!rx.test(fontPath)) 
-        {                                                   
-          if(fontPath.substr(0,2) == '//') 
-            fontPath = keymanweb.protocol + fontPath;
-          else if(fontPath.substr(0,1) == '/') 
-            fontPath = keymanweb.rootPath + fontPath.substr(1);
-          else 
-            fontPath = keymanweb.rootPath + fontPath;
-        }
-      }
-      else
-      {
-        keymanweb.options.fonts=fontPath;
-      }
-      
-      // Add font specifiers where necessary and not overridden by user 
-      if(typeof(sp['KFont']) == 'undefined' && typeof(lp['font']) != 'undefined') 
-      {           
-        fp=sp['KFont']=lp['font'];        
-        fp['files']=fp['source'];                  
-        fp['path']=fontPath;                     
-      }     
-      // Fixed OSK font issue Github #7 (9/1/2015)     
-      if(typeof(sp['KOskFont']) == 'undefined' && typeof(lp['oskFont']) != 'undefined') 
-      {
-        fp=sp['KOskFont']=lp['oskFont'];   
-        fp['files']=fp['source'];
-        fp['path']=fontPath;            
-      }           
-
-      // Update the UI 
-      keymanweb.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC'],sp['KP']);
-    }
-    
-    /** 
-     *  Register a keyboard for each associated language
-     *  
-     *  @param  {Object}  kp  Keyboard Object or Object array      
-     *  @param  {Object}  options   keymanCloud callback options
-     *  @param  {number}  nArg  keyboard index in argument array   
-     *       
-     **/   
-    keymanweb.registerLanguagesForKeyboard = function(kp,options,nArg)
-    {      
-      var i,j,id,nDflt=0,kbId='';
-      
-      // Do not attempt to process badly formatted requests
-      if(typeof(kp) == 'undefined') return;
-      
-      if(typeof(options['keyboardid']) == 'string') 
-        kbId=options['keyboardid'].split(',')[nArg];
-
-      // When keyboards requested by language code, several keyboards may be returned as an array
-      if(typeof(kp.length) == 'number')
-      {        
-        // If language code is suffixed by $, register all keyboards for this language
-        if(kp.length == 1 || kbId.substr(-1,1) == '$' || kbId == '')
-        {      
-          for(i=0; i<kp.length; i++)
-            keymanweb.registerLanguagesForKeyboard(kp[i],options,nArg);
-        }
-        // Register the default keyboard for the language code
-        // Until a default is defined, the default will be the Windows keyboard, 
-        // that is, the keyboard named for the languge (exception: English:US), or the
-        // first keyboard found.
-        else
-        {      
-          for(i=0; i<kp.length; i++)
-          {                 
-            id=kp[i].id.toLowerCase(); if(id == 'us') id='english';
-            for(j=0; j<kp[i]['languages'].length; j++)
-            {            
-              if(id == kp[i]['languages'][j]['name'].toLowerCase()) 
-              {
-                nDflt = i; break;
-              }
-            }          
-          }
-          keymanweb.registerLanguagesForKeyboard(kp[nDflt],options,nArg);
-        }
-      }
-      // Otherwise, process a single keyboard for the specified languages 
-      else 
-      {                                        
-        // May need to filter returned stubs by language
-        var lgCode=kbId.split('@')[1];  
-        if(typeof(lgCode) == 'string') lgCode=lgCode.replace(/\$$/,'');
-        
-        // Can only add keyboard stubs for defined languages
-        var ll=kp['languages'];
-        if(typeof(ll) != 'undefined')
-        {           
-          if(typeof(ll.length) == 'number')
-          {
-            for(i=0; i<ll.length; i++)
-            {
-              if(typeof(lgCode) == 'undefined' || ll[i]['id'] == lgCode) 
-                keymanweb.mergeStub(kp,ll[i],options);
-            }
-          }
-          else
-          {
-            keymanweb.mergeStub(kp,ll,options);
-          }      
-        }
-      }                              
+      keymanweb.keyboardManager.addLanguageKeyboards(arguments);
     }
     
     /**
@@ -1794,64 +1354,9 @@ if(!window['keyman']['initialized']) {
      * 
      * @param {Object}    x   metadata object
      **/                  
-    keymanweb['register'] = function(x)
-    {                     
-      var options=x['options']; 
-    
-      // Always clear the timer associated with this callback
-      if(x['timerid']) window.clearTimeout(x['timerid']);
-      
-      // Indicate if unable to register keyboard
-      if(typeof(x['error']) == 'string')
-      {
-        var badName='';
-        if(typeof(x['keyboardid']) == 'string') 
-          badName = x['keyboardid'].substr(0,1).toUpperCase()+x['keyboardid'].substr(1);
-        keymanweb.serverUnavailable(badName+' keyboard not found.');
-        return;
-      }
-      
-      // Ignore callback unless the context is defined
-      if(typeof(options) == 'undefined' || typeof(options['context']) == 'undefined') return;
-  
-      // Register each keyboard for the specified language codes
-      if(options['context'] == 'keyboard')
-      {
-        var i,kp=x['keyboard'];         
-        // Process array of keyboard definitions
-        if(typeof(kp.length) == 'number')
-        {                            
-          for(i=0; i<kp.length; i++)
-          {  
-            keymanweb.registerLanguagesForKeyboard(kp[i],options,i);
-          }
-        }
-        // Process a single keyboard definition
-        else
-        {    
-          keymanweb.registerLanguagesForKeyboard(kp,options,0);
-        }
-      }
-      // Download the full list of supported keyboard languages
-      else if(options['context'] == 'language')  
-      {                           
-        keymanweb.languageList = x['languages'];    
-        if(keymanweb.languagesPending) 
-          keymanweb.addLanguageKeyboards(keymanweb.languagesPending);
-        keymanweb.languagesPending = [];      
-      }
+    keymanweb['register'] = function(x) {                     
+      keymanweb.keyboardManager.register(x);
     }
-    /**
-     *  Display warning if Keyman Cloud server fails to respond
-     * 
-     *  @param  {string}  cmd command string sent to Cloud
-     *          
-     **/       
-    keymanweb.serverUnavailable = function(cmd)
-    {
-      util.alert(cmd == '' ? 'Unable to connect to Keyman Cloud server!' : cmd);
-      keymanweb.warned=true;
-    }  
 
     /**
      * Build 362: removeKeyboards() remove keyboard from list of available keyboards
@@ -1860,45 +1365,7 @@ if(!window['keyman']['initialized']) {
      * 
      */  
     keymanweb['removeKeyboards'] = function(x) {
-      if(arguments.length == 0) {
-        return false;
-      }
-
-      var i,j,ss=keymanweb._KeyboardStubs;
-      var success = true, activeRemoved = false, anyRemoved = false;;
-
-      for(i=0; i<arguments.length; i++) {           
-        for(j=ss.length-1; j>=0; j--) {
-          if('Keyboard_'+arguments[i] == ss[j]['KI'] && ss.length > 1) {                 
-            if('Keyboard_'+arguments[i] == keymanweb['getActiveKeyboard']()) {
-              activeRemoved = true;
-            }
-
-            anyRemoved = true;
-            ss.splice(j,1);
-            break;
-          }
-        }
-
-        if(j < 0) {
-          success = false;
-        }
-      } 
-
-      if(activeRemoved) {
-        // Always reset to the first remaining keyboard
-        keymanweb._SetActiveKeyboard(ss[0]['KI'],ss[0]['KLC'],true);
-        // This is likely to be triggered by a UI call of some sort, and we need to treat
-        // this call as such to properly maintain the globalKeyboard setting.
-        keymanweb._JustActivatedKeymanWebUI = 1;
-      }
-
-      if(anyRemoved) {
-        // Update the UI keyboard menu
-        keymanweb.doKeyboardUnregistered();
-      }
-        
-      return success;
+      return keymanweb.keyboardManager.removeKeyboards(x);
     }
 
 
@@ -2224,7 +1691,7 @@ if(!window['keyman']['initialized']) {
       if(keymanweb.isAttached(Pelem)) { // Only operate on attached elements!  
         if(keymanweb._LastActiveElement == Pelem || keymanweb._LastActiveElement == Pelem['kmw_ip']) {
           keymanweb._LastActiveElement = null;
-          keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
+          keymanweb.keyboardManager.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
           keymanweb['osk']._Hide();
         }
         
@@ -2315,7 +1782,7 @@ if(!window['keyman']['initialized']) {
             && keymanweb._LastActiveElement) {
             
           if(Pkbd != null && Plc != null) { // Second part necessary for Closure.
-            keymanweb.setActiveKeyboard(Pkbd, Plc);
+            keymanweb.keyboardManager.setActiveKeyboard(Pkbd, Plc);
           } 
         }
       }
@@ -2491,7 +1958,7 @@ if(!window['keyman']['initialized']) {
       } else {
         // Conditionally show the OSK when control receives the focus
         if(osk.ready) {
-          if(keymanweb.isCJK()) {
+          if(keymanweb.keyboardManager.isCJK()) {
             osk._Enabled=1;
           }
           if(osk._Enabled) {
@@ -2511,7 +1978,7 @@ if(!window['keyman']['initialized']) {
      *                      whenever a KMW-enabled page element loses control.
      */
     keymanweb._BlurKeyboardSettings = function() {
-      var keyboardID = keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'] : '';
+      var keyboardID = keymanweb.keyboardManager.activeKeyboard ? keymanweb.keyboardManager.activeKeyboard['KI'] : '';
       
       if(keymanweb._LastActiveElement && keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {
         keymanweb._LastActiveElement._kmwAttachment.keyboard = keyboardID;
@@ -2531,10 +1998,10 @@ if(!window['keyman']['initialized']) {
      */ 
     keymanweb._FocusKeyboardSettings = function(blockGlobalChange) {      
       if(keymanweb._LastActiveElement._kmwAttachment.keyboard != null) {      
-        keymanweb.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
+        keymanweb.keyboardManager.setActiveKeyboard(keymanweb._LastActiveElement._kmwAttachment.keyboard, 
           keymanweb._LastActiveElement._kmwAttachment.languageCode); 
       } else if(!blockGlobalChange) { 
-        keymanweb.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
+        keymanweb.keyboardManager.setActiveKeyboard(keymanweb.globalKeyboard, keymanweb.globalLanguageCode);
       }
     }
 
@@ -2699,85 +2166,6 @@ if(!window['keyman']['initialized']) {
       var p={}; p['target']=_target; p['activeControl']=_activeControl;  
       return util.callEvent('kmw.controlfocused',p);
     }
-    
-    /**
-     * Execute external (UI) code needed on registering keyboard, used
-     * to update each UIs language menu   
-     *    
-     * Note that the argument object is not at present used by any UI,
-     * since the menu is always fully recreated when needed, but the arguments   
-     * remain defined to allow for possible use in future (Aug 2014)
-     *    
-     * @param       {string}            _internalName
-     * @param       {string}            _language
-     * @param       {string}            _keyboardName
-     * @param       {string}            _languageCode
-     * @param       {string=}           _packageID        Used by KMEA/KMEI to track .kmp related info.
-     * @return      {boolean}
-     */       
-    keymanweb.doKeyboardRegistered = function(_internalName,_language,_keyboardName,_languageCode, _packageID)
-    {
-      var p={'internalName':_internalName,'language':_language,'keyboardName':_keyboardName,'languageCode':_languageCode};
-      
-      // Utilized only by our embedded codepaths.
-      if(_packageID) {
-        p['package'] = _packageID;
-      }
-      return util.callEvent('kmw.keyboardregistered',p);
-    }
-    
-    /**
-     * Execute external (UI) code to rebuild menu when deregistering keyboard
-     *    
-     * @return      {boolean}   
-     */       
-
-    keymanweb.doKeyboardUnregistered = function()
-    {
-      var p={};     
-      return util.callEvent('kmw.keyboardregistered',p);    
-    }
-    
-    /**
-     * Execute external (UI) code needed on loading keyboard
-     * 
-     * @param       {string}            _internalName
-     * @return      {boolean}   
-     */       
-    keymanweb.doKeyboardLoaded = function(_internalName)
-    {
-      var p={}; p['keyboardName']=_internalName; 
-      return util.callEvent('kmw.keyboardloaded',p);
-    }
-      
-    /**
-     * Function     doBeforeKeyboardChange
-     * Scope        Private
-     * @param       {string}            _internalName
-     * @param       {string}            _languageCode
-     * @return      {boolean}   
-     * Description  Execute external (UI) code needed before changing keyboard
-     */       
-    keymanweb.doBeforeKeyboardChange = function(_internalName,_languageCode)
-    {
-      var p={}; p['internalName']=_internalName; p['languageCode']=_languageCode;
-      return util.callEvent('kmw.beforekeyboardchange',p);
-    }
-
-    /**
-     * Execute external (UI) code needed *after* changing keyboard
-     * 
-     * @param       {string}            _internalName
-     * @param       {string}            _languageCode
-     * @param       {boolean=}           _indirect
-     * @return      {boolean}   
-     */       
-    keymanweb.doKeyboardChange = function(_internalName,_languageCode,_indirect)
-    {                      
-      var p={}; p['internalName']=_internalName; p['languageCode']=_languageCode; 
-      p['indirect']=(arguments.length > 2 ? _indirect : false);
-      return util.callEvent('kmw.keyboardchange',p);
-    }
 
     /**
      * Function     doUnloadOSK
@@ -2903,16 +2291,16 @@ if(!window['keyman']['initialized']) {
         case osk.keyCodes['K_CTRL']:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
         case osk.keyCodes['K_LCTRL']:
         case osk.keyCodes['K_RCTRL']:
-        case osk.keyCodes.K_CONTROL:
-        case osk.keyCodes.K_LCONTROL:
-        case osk.keyCodes.K_RCONTROL:
+        case osk.keyCodes['K_CONTROL']:
+        case osk.keyCodes['K_LCONTROL']:
+        case osk.keyCodes['K_RCONTROL']:
           ctrlEvent = true;
           break;
         case osk.keyCodes['K_LMENU']:     // The 2 "K_*MENU" entries exist in some legacy keyboards.
         case osk.keyCodes['K_RMENU']:
-        case osk.keyCodes.K_ALT:
-        case osk.keyCodes.K_LALT:
-        case osk.keyCodes.K_RALT:
+        case osk.keyCodes['K_ALT']:
+        case osk.keyCodes['K_LALT']:
+        case osk.keyCodes['K_RALT']:
           altEvent = true;
           break;
       }
@@ -2936,12 +2324,12 @@ if(!window['keyman']['initialized']) {
 
       if(e.ctrlKey) {
         curModState |= ((e.location != 0 && ctrlEvent) ? 
-          (e.location == 1 ? osk.modifierCodes.LCTRL : osk.modifierCodes.RCTRL) : // Condition 1
+          (e.location == 1 ? osk.modifierCodes['LCTRL'] : osk.modifierCodes['RCTRL']) : // Condition 1
           prevModState & 0x0003);                                                       // Condition 2
       }
       if(e.altKey) {
         curModState |= ((e.location != 0 && altEvent) ? 
-          (e.location == 1 ? osk.modifierCodes.LALT : osk.modifierCodes.RALT) :   // Condition 1
+          (e.location == 1 ? osk.modifierCodes['LALT'] : osk.modifierCodes['RALT']) :   // Condition 1
           prevModState & 0x000C);                                                       // Condition 2
       }
 
@@ -2949,21 +2337,21 @@ if(!window['keyman']['initialized']) {
       s.Lstates = 0;
       
       if(e.getModifierState("CapsLock")) {
-        s.Lstates = osk.modifierCodes.CAPS;
+        s.Lstates = osk.modifierCodes['CAPS'];
       } else {
-        s.Lstates = osk.modifierCodes.NO_CAPS;
+        s.Lstates = osk.modifierCodes['NO_CAPS'];
       }
 
       if(e.getModifierState("NumLock")) {
-        s.Lstates |= osk.modifierCodes.NUM_LOCK;
+        s.Lstates |= osk.modifierCodes['NUM_LOCK'];
       } else {
-        s.Lstates |= osk.modifierCodes.NO_NUM_LOCK;
+        s.Lstates |= osk.modifierCodes['NO_NUM_LOCK'];
       }
 
       if(e.getModifierState("ScrollLock") || e.getModifierState("Scroll")) {  // "Scroll" for IE9.
-        s.Lstates |= osk.modifierCodes.SCROLL_LOCK;
+        s.Lstates |= osk.modifierCodes['SCROLL_LOCK'];
       } else {
-        s.Lstates |= osk.modifierCodes.NO_SCROLL_LOCK;
+        s.Lstates |= osk.modifierCodes['NO_SCROLL_LOCK'];
       }
 
       // We need these states to be tracked as well for proper OSK updates.
@@ -2974,14 +2362,14 @@ if(!window['keyman']['initialized']) {
       keymanweb.modStateFlags = curModState;
 
       // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
-      var altGrMask = osk.modifierCodes.RALT | osk.modifierCodes.LCTRL;
+      var altGrMask = osk.modifierCodes['RALT'] | osk.modifierCodes['LCTRL'];
       if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
         // We just released AltGr - make sure it's all released.
         curModState &= ~ altGrMask;
       }
       // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
-      if(curModState & osk.modifierCodes.RALT) {
-        curModState &= ~osk.modifierCodes.LCTRL;
+      if(curModState & osk.modifierCodes['RALT']) {
+        curModState &= ~osk.modifierCodes['LCTRL'];
       }
 
       // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
@@ -2990,16 +2378,16 @@ if(!window['keyman']['initialized']) {
 
         // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
         // AltGr / Right-alt simulation.
-        if(osk.emulatesAltGr() && (s.Lmodifiers & osk.modifierBitmasks.ALT_GR_SIM) == osk.modifierBitmasks.ALT_GR_SIM) {
-          s.Lmodifiers ^= osk.modifierBitmasks.ALT_GR_SIM;
-          s.Lmodifiers |= osk.modifierCodes.RALT;
+        if(osk.emulatesAltGr() && (s.Lmodifiers & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
+          s.Lmodifiers ^= osk.modifierBitmasks['ALT_GR_SIM'];
+          s.Lmodifiers |= osk.modifierCodes['RALT'];
         }
       } else {
         // No need to sim AltGr here; we don't need chiral ALTs.
         s.Lmodifiers = 
           (e.shiftKey ? 0x10 : 0) |
-          ((curModState & (osk.modifierCodes.LCTRL | osk.modifierCodes.RCTRL)) ? 0x20 : 0) | 
-          ((curModState & (osk.modifierCodes.LALT | osk.modifierCodes.RALT))   ? 0x40 : 0); 
+          ((curModState & (osk.modifierCodes['LCTRL'] | osk.modifierCodes['RCTRL'])) ? 0x20 : 0) | 
+          ((curModState & (osk.modifierCodes['LALT'] | osk.modifierCodes['RALT']))   ? 0x40 : 0); 
       }
 
       // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
@@ -3047,9 +2435,12 @@ if(!window['keyman']['initialized']) {
      * @param       {number}    _PData        1 or 0    
      * Description  Notifies keyboard of keystroke or other event
      */    
-    keymanweb._NotifyKeyboard = function(_PCommand,_PTarget,_PData)  // I2187
-    {
-      if(keymanweb._ActiveKeyboard != null && typeof(keymanweb._ActiveKeyboard['KNS']) == 'function') keymanweb._ActiveKeyboard['KNS'](_PCommand,_PTarget,_PData);
+    keymanweb._NotifyKeyboard = function(_PCommand,_PTarget,_PData) { // I2187
+      var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
+
+      if(activeKeyboard != null && typeof(activeKeyboard['KNS']) == 'function') {
+        activeKeyboard['KNS'](_PCommand,_PTarget,_PData);
+      }
     }
     
     
@@ -3061,10 +2452,11 @@ if(!window['keyman']['initialized']) {
      * Description  Processes keydown event and passes data to keyboard. 
      */ 
     keymanweb._KeyDown = function(e) {
-      var Ldv,eClass=''; 
+      var Ldv,eClass='';
+      var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
 
       keymanweb._KeyPressToSwallow = 0;
-      if(!keymanweb._Enabled || keymanweb._DisableInput || keymanweb._ActiveKeyboard == null) {
+      if(!keymanweb._Enabled || keymanweb._DisableInput || activeKeyboard == null) {
         return true;
       }
 
@@ -3130,7 +2522,7 @@ if(!window['keyman']['initialized']) {
       // Safari, IE, Opera?
       //}
       
-      if(!keymanweb._ActiveKeyboard['KM']) {
+      if(!activeKeyboard['KM']) {
         // Positional Layout
 
         var LeventMatched=0;
@@ -3141,7 +2533,7 @@ if(!window['keyman']['initialized']) {
         }
         /* 13/03/2007 MCD: Swedish: End mapping of keystroke to US keyboard */
         
-        if(typeof(keymanweb._ActiveKeyboard['KM'])=='undefined'  &&  !(Levent.Lmodifiers & 0x60)) {
+        if(typeof(activeKeyboard['KM'])=='undefined'  &&  !(Levent.Lmodifiers & 0x60)) {
           // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
           var Levent2={Lcode:keymanweb._USKeyCodeToCharCode(Levent),Ltarg:Levent.Ltarg,Lmodifiers:0,LisVirtualKey:0};
           if(kbdInterface.processKeystroke(util.physicalDevice, Levent2.Ltarg,Levent2)) {
@@ -3227,7 +2619,7 @@ if(!window['keyman']['initialized']) {
       }
 
       var Levent;
-      if(!keymanweb._Enabled || keymanweb._DisableInput || keymanweb._ActiveKeyboard == null) {
+      if(!keymanweb._Enabled || keymanweb._DisableInput || keymanweb.keyboardManager.activeKeyboard == null) {
         return true;
       }
 
@@ -3239,7 +2631,7 @@ if(!window['keyman']['initialized']) {
   //    _Debug('KeyPress code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
 
       /* I732 START - 13/03/2007 MCD: Swedish: Start positional keyboard layout code: prevent keystroke */
-      if(!keymanweb._ActiveKeyboard['KM']) {
+      if(!keymanweb.keyboardManager.activeKeyboard['KM']) {
         if(!keymanweb._KeyPressToSwallow) {
           return true;
         }
@@ -3401,283 +2793,6 @@ if(!window['keyman']['initialized']) {
     }
 
     /**
-     * Change active keyboard to keyboard selected by (internal) name and language code
-     * 
-     *  Test if selected keyboard already loaded, and simply update active stub if so.
-     *  Otherwise, insert a script to download and insert the keyboard from the repository
-     *  or user-indicated file location. 
-     * 
-     * @param       {string}    PInternalName
-     * @param       {string=}    PLgCode
-     * @param       {boolean=}   saveCookie   
-     */    
-    keymanweb._SetActiveKeyboard = function(PInternalName,PLgCode,saveCookie) {
-      var n,Ln;
-
-      // Set default language code
-      if(arguments.length < 2 || (!PLgCode)) {
-        PLgCode='---'; 
-      }
-
-      // Check that the saved keyboard is currently registered
-      for(n=0; n<keymanweb._KeyboardStubs.length; n++) {
-        if(PInternalName == keymanweb._KeyboardStubs[n]['KI']) {
-          if(PLgCode == keymanweb._KeyboardStubs[n]['KLC'] || PLgCode == '---') break;
-        }
-      }
-
-      // Mobile device addition: force selection of the first keyboard if none set
-      if(device.touchable && (PInternalName == '' || PInternalName == null || n >= keymanweb._KeyboardStubs.length))
-      {
-        PInternalName=keymanweb._KeyboardStubs[0]['KI']; PLgCode=keymanweb._KeyboardStubs[0]['KLC'];   
-      }
-
-      // Save name of keyboard (with language code) as a cookie
-      if(arguments.length > 2 && saveCookie) keymanweb.saveCurrentKeyboard(PInternalName,PLgCode);
-
-      // Check if requested keyboard and stub are currently active
-      if(keymanweb._ActiveStub && keymanweb._ActiveKeyboard 
-        && keymanweb._ActiveKeyboard['KI'] == PInternalName 
-        && keymanweb._ActiveStub['KI'] == PInternalName     //this part of test should not be necessary, but keep anyway
-        && keymanweb._ActiveStub['KLC'] == PLgCode
-        && !keymanweb.mustReloadKeyboard                                 
-        ) return;   
-
-      // Check if current keyboard matches requested keyboard, but not stub
-      if(keymanweb._ActiveKeyboard && (keymanweb._ActiveKeyboard['KI'] == PInternalName))
-      {
-        // If so, simply update the active stub
-        for(Ln=0; Ln<keymanweb._KeyboardStubs.length; Ln++)
-        {
-          if((keymanweb._KeyboardStubs[Ln]['KI'] == PInternalName) && (keymanweb._KeyboardStubs[Ln]['KLC'] == PLgCode))
-          {
-            keymanweb._ActiveStub = keymanweb._KeyboardStubs[Ln]; 
-            
-            // Append a stylesheet for this keyboard for keyboard specific styles 
-            // or if needed to specify an embedded font
-            osk.appendStyleSheet();
-            
-            // Re-initializate OSK before returning if required
-            if(keymanweb.mustReloadKeyboard) osk._Load();
-            return;
-          }
-        }      
-      } 
-      keymanweb._ActiveKeyboard = null; keymanweb._ActiveStub = null;
-
-      // Hide OSK and do not update keyboard list if using internal keyboard (desktops)
-      if(PInternalName == '') {
-        osk._Hide(false); 
-
-        if(!keymanweb.isEmbedded) {
-          util.wait(false);
-        }
-
-        return;
-      }
-
-      // Determine if the keyboard was previously loaded but is not active and use the prior load if so.
-      for(Ln=0; Ln<keymanweb._Keyboards.length; Ln++)  // I1511 - array prototype extended
-      {
-        if(keymanweb._Keyboards[Ln]['KI'] == PInternalName)
-        {
-          keymanweb._ActiveKeyboard = keymanweb._Keyboards[Ln];
-          keymanweb._SetTargDir(keymanweb._LastActiveElement);  // I2077 - LTR/RTL timing
-        
-          // and update the active stub
-          for(var Ls=0; Ls<keymanweb._KeyboardStubs.length; Ls++)
-          {
-            if((keymanweb._KeyboardStubs[Ls]['KI'] == PInternalName) && 
-              (keymanweb._KeyboardStubs[Ls]['KLC'] == PLgCode || PLgCode == '---'))
-            {
-              keymanweb._ActiveStub = keymanweb._KeyboardStubs[Ls]; break;
-            }
-          }
-          break;
-        }
-      }
-
-      if(keymanweb._ActiveKeyboard == null)
-      {
-        for(Ln=0; Ln<keymanweb._KeyboardStubs.length; Ln++)  // I1511 - array prototype extended
-        {   
-          if((keymanweb._KeyboardStubs[Ln]['KI'] == PInternalName) 
-            && ((keymanweb._KeyboardStubs[Ln]['KLC'] == PLgCode) || (PLgCode == '---')))
-          {
-            // Force OSK display for CJK keyboards (keyboards using a pick list)
-            if(keymanweb.isCJK(keymanweb._KeyboardStubs[Ln]) || device.touchable) osk._Enabled = 1;    
-  
-            // Create a script to load from the server - when it finishes loading, it will register itself, 
-            //  detect that it is active, and focus as appropriate. The second test is needed to allow recovery from a failed script load
-
-            // Ensure we're not already loading the keyboard.
-            if(!keymanweb._KeyboardStubs[Ln].asyncLoader) {   
-              // Always (temporarily) hide the OSK when loading a new keyboard, to ensure that a failure to load doesn't leave the current OSK displayed
-              if(osk.ready) osk._Hide(false);
-  
-              var loadingStub = keymanweb._KeyboardStubs[Ln];
-              // Tag the stub so that we don't double-load the keyboard!
-              loadingStub.asyncLoader = {};
-
-              var kbdName = loadingStub['KN'];
-              var lngName = loadingStub['KL'];
-              kbdName = kbdName.replace(/\s*keyboard\s*/i, '');
-
-              // Setup our default error-messaging callback if it should be implemented.
-              loadingStub.asyncLoader.callback = function(altString, msgType) {
-                var msg = altString || 'Sorry, the '+kbdName+' keyboard for '+lngName+' is not currently available.';
-                
-                // Thanks, Closure errors.  
-                if(!keymanweb.isEmbedded) {
-                  util.wait(false);
-                  util.alert(altString || msg, function() {
-                    keymanweb['setActiveKeyboard']('');
-                  });
-                }
-
-                switch(msgType) { // in case we extend this later.
-                  case 'err':
-                    console.error(msg);
-                    break;
-                  case 'warn':
-                  default:
-                    console.warn(msg);
-                    break;
-                }
-
-                if(Ln > 0) {
-                  var Ps = keymanweb._KeyboardStubs[0];
-                  keymanweb._SetActiveKeyboard(Ps['KI'], Ps['KLC'], true);
-                }
-              }
-              loadingStub.asyncLoader.timer = window.setTimeout(loadingStub.asyncLoader.callback, 10000);
-
-              //Display the loading delay bar (Note: only append 'keyboard' if not included in name.) 
-              if(!keymanweb.isEmbedded) {
-                util.wait('Installing keyboard<br/>' + kbdName);
-              }
-              
-              // Installing the script immediately does not work reliably if two keyboards are
-              // loaded in succession if there is any delay in downloading the script.
-              // It works much more reliably if deferred (KMEW-101, build 356)
-              // The effect of a delay can also be tested, for example, by setting the timeout to 5000
-              window.setTimeout(function(){keymanweb.installKeyboard(loadingStub);},0);
-            }          
-            keymanweb._ActiveStub=keymanweb._KeyboardStubs[Ln];
-            return;
-          }
-        }
-        keymanweb._SetTargDir(keymanweb._LastActiveElement);  // I2077 - LTR/RTL timing
-      } 
-
-      var Pk=keymanweb._ActiveKeyboard;  // I3319
-      if(Pk !== null)  // I3363 (Build 301)
-        String.kmwEnableSupplementaryPlane(Pk && ((Pk['KS'] && (Pk['KS'] == 1)) || (Pk['KN'] == 'Hieroglyphic'))); // I3319
-      
-      // Initialize the OSK (provided that the base code has been loaded)
-      osk._Load();
-    }
-
-  /**
-   * Install a keyboard script that has been downloaded from a keyboard server
-   * 
-   *  @param  {Object}  kbdStub   keyboard stub to be loaded.
-   *    
-   **/      
-    keymanweb.installKeyboard = function(kbdStub) {
-      var Lscript = util._CreateElement('SCRIPT');
-      Lscript.charset="UTF-8";        // KMEW-89
-      Lscript.type = 'text/javascript';
-
-      var kbdFile = kbdStub['KF'];
-      var kbdLang = kbdStub['KL'];
-      var kbdName = kbdStub['KN'];
-
-      // Add a handler for cases where the new <script> block fails to load.
-      Lscript.addEventListener('error', function() {
-        if(kbdStub.asyncLoader.timer !== null) {
-          // Clear the timeout timer.
-          window.clearTimeout(kbdStub.asyncLoader.timer);
-          kbdStub.asyncLoader.timer = null;
-        }
-
-        // We already know the load has failed... why wait?
-        kbdStub.asyncLoader.callback('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '.', 'warn');
-        kbdStub.asyncLoader = null;
-      }, false);
-
-      
-      // The load event will activate a newly-loaded keyboard if successful and report an error if it is not.
-      Lscript.addEventListener('load', function() {
-        if(kbdStub.asyncLoader.timer !== null) {
-          // Clear the timeout timer.
-          window.clearTimeout(kbdStub.asyncLoader.timer);
-          kbdStub.asyncLoader.timer = null;
-        }
-
-        // To determine if the load was successful, we'll need to check the keyboard array for our desired keyboard.
-        // Test if keyboard already loaded
-        var kbd = keymanweb._getKeyboardByID(kbdStub['KI']), Li;
-        if(kbd) {  // Is cleared upon a successful load.
-          
-          //Activate keyboard, if it's still the active stub.
-          if(kbdStub == keymanweb._ActiveStub) {
-            keymanweb.doBeforeKeyboardChange(kbd['KI'],kbdStub['KLC']);
-            keymanweb._ActiveKeyboard=kbd;
-
-            if(keymanweb._LastActiveElement != null) {
-              keymanweb._JustActivatedKeymanWebUI = 1;
-              keymanweb._SetTargDir(keymanweb._LastActiveElement);            
-            }
-
-            String.kmwEnableSupplementaryPlane(kbdStub && ((kbdStub['KS'] && (kbdStub['KS'] == 1)) || (kbd['KN'] == 'Hieroglyphic'))); // I3319 - SMP extension, I3363 (Build 301)
-            keymanweb.saveCurrentKeyboard(kbd['KI'],kbdStub['KLC']);
-          
-            // Prepare and show the OSK for this keyboard
-            osk._Load();
-
-            // Remove the wait message, if defined
-            if(!keymanweb.isEmbedded) {
-              util.wait(false);
-            }
-          } // A handler portion for cases where the new <script> block loads, but fails to process.
-        } else {  // Output error messages even when embedded - they're useful when debugging the apps and KMEA/KMEI engines.
-            kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.', 'error');
-        }
-        kbdStub.asyncLoader = null; 
-      }, false);
-
-      // IE likes to instantly start loading the file when assigned to an element, so we do this after the rest
-      // of our setup.
-      Lscript.src = keymanweb.getKeyboardPath(kbdFile);
-
-      try {                                  
-        document.body.appendChild(Lscript);  
-      }
-      catch(ex) {                                                     
-        document.getElementsByTagName('head')[0].appendChild(Lscript);
-      }            
-    }
-
-    /**
-     * Function     _getKeyboardByID
-     * Scope        Private
-     * @param       {string}  keyboardID
-     * @return      {Object|null}
-     * Description  Returns the internal, registered keyboard object - not the stub, but the keyboard itself.
-     */
-    keymanweb._getKeyboardByID = function(keyboardID) {
-      var Li;
-      for(Li=0; Li<keymanweb._Keyboards.length; Li++) {
-        if(keyboardID == keymanweb._Keyboards[Li]['KI']) {
-          return keymanweb._Keyboards[Li];
-        }
-      }
-
-      return null;
-    }
-
-    /**
      * Function    isCJK
      * Scope       Public
      * @param      {Object=}  k0 
@@ -3685,21 +2800,9 @@ if(!window['keyman']['initialized']) {
      * Description Tests if active keyboard (or optional argument) uses a pick list (Chinese, Japanese, Korean, etc.)
      *             (This function accepts either keyboard structure.)   
      */    
-    keymanweb['isCJK'] = function(k0)
-    { 
-      var k=keymanweb._ActiveKeyboard, lg=''; 
-
-      if(arguments.length > 0) k = k0; 
-      
-      if(k)
-      {
-        if(typeof(k['KLC']) != 'undefined') lg = k['KLC'];
-        else if(typeof(k['LanguageCode']) != 'undefined') lg = k['LanguageCode'];
-      }
-      
-      return ((lg == 'cmn') || (lg == 'jpn') || (lg == 'kor'));
+    keymanweb['isCJK'] = function(k0) { 
+      return keymanweb.keyboardManager.isCJK(k0);
     }
-    keymanweb.isCJK = keymanweb['isCJK']; // I3363 (Build 301)
 
     /**
      * Function     isChiral
@@ -3710,7 +2813,7 @@ if(!window['keyman']['initialized']) {
      */
     keymanweb.isChiral = keymanweb['isChiral'] = function(k0) {
       if(typeof(k0) == "string") {
-        k0 = keymanweb._getKeyboardByID(k0);
+        k0 = keymanweb.keyboardManager.getKeyboardByID(k0);
       }
 
       return !!(keymanweb.getKeyboardModifierBitmask(k0) & keymanweb['osk'].modifierBitmasks.IS_CHIRAL);
@@ -3724,7 +2827,7 @@ if(!window['keyman']['initialized']) {
      * Description  Obtains the currently-active modifier bitmask for the active keyboard.
      */
     keymanweb.getKeyboardModifierBitmask = function(k0) {
-      var k=keymanweb._ActiveKeyboard;
+      var k=keymanweb.keyboardManager.activeKeyboard;
       
       if(arguments.length > 0 && typeof k0 != 'undefined') {
         k = k0;
@@ -3747,19 +2850,8 @@ if(!window['keyman']['initialized']) {
      * @param       {string}    PInternalName   Internal name
      * @param       {string}    PLgCode         Language code
      */    
-    keymanweb['setActiveKeyboard'] = keymanweb.setActiveKeyboard = function(PInternalName,PLgCode) {
-      //TODO: This does not make sense: the callbacks should be in _SetActiveKeyboard, not here,
-      //      since this is always called FROM the UI, which should not need notification.
-      //      If UI callbacks are needed at all, they should be within _SetActiveKeyboard  
-      keymanweb.doBeforeKeyboardChange(PInternalName,PLgCode);     
-      keymanweb._SetActiveKeyboard(PInternalName,PLgCode,true);    
-      if(keymanweb._LastActiveElement != null) keymanweb._FocusLastActiveElement();
-      // If we ever allow PLgCode to be set by default, we can auto-detect the language code
-      // after the _SetActiveKeyboard call.
-      // if(!PLgCode && keymanweb._ActiveStub) {
-      //   PLgCode = keymanweb._ActiveStub['KLC'];
-      // }
-      keymanweb.doKeyboardChange(PInternalName,PLgCode);
+    keymanweb['setActiveKeyboard'] = function(PInternalName,PLgCode) {
+      keymanweb.keyboardManager.setActiveKeyboard(PInternalName,PLgCode);
     }
     
     /**
@@ -3768,10 +2860,8 @@ if(!window['keyman']['initialized']) {
      * @return      {string}      Name of active keyboard
      * Description  Return internal name of currently active keyboard
      */    
-    keymanweb['getActiveKeyboard'] = function()
-    {
-      if(keymanweb._ActiveKeyboard == null) return '';
-      return keymanweb._ActiveKeyboard['KI'];
+    keymanweb['getActiveKeyboard'] = function() {
+      return keymanweb.keyboardManager.getActiveKeyboardName();
     }
 
     /**
@@ -3780,10 +2870,9 @@ if(!window['keyman']['initialized']) {
      * @return     {string}         language code
      * Description Return language code for currently selected language
      */    
-    keymanweb['getActiveLanguage'] = keymanweb.getActiveLanguage = function()
-    {
-      if(keymanweb._ActiveStub == null) return '';
-      return keymanweb._ActiveStub['KLC'];
+    keymanweb['getActiveLanguage'] = keymanweb.getActiveLanguage = function() {
+      if(keymanweb.keyboardManager.activeStub == null) return '';
+      return keymanweb.keyboardManager.activeStub['KLC'];
     }
 
   //TODO: find all references to next three routines and disambiguate!!
@@ -3796,61 +2885,26 @@ if(!window['keyman']['initialized']) {
      * @return      {Object}                      Details of named keyboard 
      *                                            
      **/    
-    keymanweb['getKeyboard'] = function(PInternalName,PlgCode)
-    {
+    keymanweb['getKeyboard'] = function(PInternalName, PlgCode?) {
       var Ln, Lrn;
-      for(Ln=0; Ln<keymanweb._KeyboardStubs.length; Ln++)  
-      {    
-        Lrn = keymanweb._GetKeyboardDetail(keymanweb._KeyboardStubs[Ln]);
-        if(Lrn['InternalName'] == PInternalName)
-        { 
-          if(arguments.length < 2) return Lrn;
-          if(Lrn['LanguageCode'] == PlgCode) return Lrn;
+
+      var kbdList = keymanweb.keyboardManager.getDetailedKeyboards();
+
+      for(Ln=0; Ln < kbdList.length; Ln++) {
+        Lrn = kbdList[Ln];
+
+        if(Lrn['InternalName'] == PInternalName || Lrn['InternalName'] == "Keyboard_" + PInternalName) { 
+          if(arguments.length < 2) {
+            return Lrn;
+          }
+
+          if(Lrn['LanguageCode'] == PlgCode) {
+            return Lrn;
+          }
         } 
       }
-      return null;
-    }
 
-    /**
-     * Function     GetKeyboardDetail
-     * Scope        Private
-     * @param       {string}    PInternalName     Internal name of keyboard
-     * @return      {Object}                       Details of named keyboard 
-     *
-     * Description  Return keyboard details object
-     */    
-    keymanweb.GetKeyboardDetail = function(PInternalName)  // I2079 - GetKeyboardDetail function
-    {
-      var Lr=keymanweb['getKeyboards']();
-      for(var Ln=0; Ln<Lr.length; Ln++)
-        if(Lr[Ln]['InternalName'] == PInternalName) return Lr[Ln];
       return null;
-    }
-    
-    /**
-     * Get an associative array of keyboard identification strings
-     *   This was defined as an array, so is kept that way, but  
-     *   Javascript treats it as an object anyway 
-     *    
-     * @param       {Object}    Lkbd       Keyboard object
-     * @return      {Object}               Copy of keyboard identification strings
-     * 
-     */    
-    keymanweb._GetKeyboardDetail = function(Lkbd)   // I2078 - Full keyboard detail
-    {
-      var Lr={};  
-      Lr['Name'] = Lkbd['KN'];
-      Lr['InternalName'] =  Lkbd['KI'];
-      Lr['LanguageName'] = Lkbd['KL'];  // I1300 - Add support for language names
-      Lr['LanguageCode'] = Lkbd['KLC']; // I1702 - Add support for language codes, region names, region codes, country names and country codes
-      Lr['RegionName'] = Lkbd['KR'];
-      Lr['RegionCode'] = Lkbd['KRC'];
-      Lr['CountryName'] = Lkbd['KC'];
-      Lr['CountryCode'] = Lkbd['KCC'];
-      Lr['KeyboardID'] = Lkbd['KD'];
-      Lr['Font'] = Lkbd['KFont'];
-      Lr['OskFont'] = Lkbd['KOskFont'];  
-      return Lr;
     }
     
     /**
@@ -3859,17 +2913,8 @@ if(!window['keyman']['initialized']) {
      * @return   {Array}     Array of available keyboards
      * 
      */    
-    keymanweb['getKeyboards'] = function()
-    {
-      var Lr = [], Ln, Lstub, Lrn;
-
-      for(Ln=0; Ln<keymanweb._KeyboardStubs.length; Ln++)  // I1511 - array prototype extended
-      {    
-        Lstub = keymanweb._KeyboardStubs[Ln];
-        Lrn = keymanweb._GetKeyboardDetail(Lstub);  // I2078 - Full keyboard detail
-        Lr=keymanweb._push(Lr,Lrn);
-      } 
-      return Lr;
+    keymanweb['getKeyboards'] = function() {
+      return keymanweb.keyboardManager.getDetailedKeyboards();
     }
     
     /**
@@ -4211,7 +3256,9 @@ if(!window['keyman']['initialized']) {
       keymanweb.setDefaultDeviceOptions(opt);   
       
       // Only do remainder of initialization once!  
-      if(keymanweb['initialized']) return;
+      if(keymanweb.initialized) {
+        return;
+      }
 
       // Do not initialize until the document has been fully loaded
       if(document.readyState !== 'complete')
@@ -4241,7 +3288,7 @@ if(!window['keyman']['initialized']) {
         window.removeEventListener('focus', keymanweb._BubbledFocus, true);
     
       // Set exposed initialization flag member for UI (and other) code to use 
-      keymanweb['initialized'] = 1;
+      keymanweb.setInitialized(1);
   
       // Finish keymanweb and OSK initialization once all necessary resources are available
       osk.prepare();
@@ -4250,30 +3297,19 @@ if(!window['keyman']['initialized']) {
       util.prepareWait();
 
       // Register deferred keyboard stubs (addKeyboards() format)
-      keymanweb.addKeyboardArray(keymanweb.deferredStubs);
-      
-      // KRS stubs (legacy format registration)    
-      for(j=0; j<keymanweb.deferredKRS.length; j++) {
-        kbdInterface.registerStub(keymanweb.deferredKRS[j]);
-      }
+      keymanweb.keyboardManager.registerDeferredStubs();
     
       // Initialize the desktop UI
       keymanweb.initializeUI();
     
       // Register deferred keyboards 
-      for(j=0; j<keymanweb.deferredKR.length; j++) {
-        kbdInterface.registerKeyboard(keymanweb.deferredKR[j]);
-      }
+      keymanweb.keyboardManager.registerDeferredKeyboards();
     
       // Exit initialization here if we're using an embedded code path.
       if(keymanweb.isEmbedded) {
-        if(keymanweb._KeyboardStubs.length > 0) {
-          // Select the first stub as our active keyboard.  This is set later for 'native' KMW.
-          keymanweb._SetActiveKeyboard(keymanweb._KeyboardStubs[0]['KI'], keymanweb._KeyboardStubs[0]['KLC']);     
-        } else {
+        if(!keymanweb.keyboardManager.setDefaultKeyboard()) {
           console.error("No keyboard stubs exist - cannot initialize keyboard!");
         }
-
         return;
       }
 
@@ -4378,7 +3414,7 @@ if(!window['keyman']['initialized']) {
         util.attachDOMEvent(document, 'selectionchange', keymanweb._SelectionChange);
     
       // Restore and reload the currently selected keyboard, selecting a default keyboard if necessary.
-      keymanweb.restoreCurrentKeyboard(); 
+      keymanweb.keyboardManager.restoreCurrentKeyboard(); 
 
       /* Setup of handlers for dynamically-added and (eventually) dynamically-removed elements.
         * Reference: https://developer.mozilla.org/en/docs/Web/API/MutationObserver
@@ -4402,7 +3438,7 @@ if(!window['keyman']['initialized']) {
       new MutationObserver(keymanweb._EnablementMutationObserverCore).observe(observationTarget, observationConfig);
 
       // Set exposed initialization flag to 2 to indicate deferred initialization also complete
-      keymanweb['initialized']=2;
+      keymanweb.setInitialized(2);
     }
 
     keymanweb._EnablementMutationObserverCore = function(mutations) {
@@ -4726,7 +3762,7 @@ if(!window['keyman']['initialized']) {
      * @param       {Object}      Ptarg      Target element
      */    
     keymanweb._SetTargDir = function(Ptarg) {  
-      var elDir=((keymanweb._ActiveKeyboard != null) && (keymanweb._ActiveKeyboard['KRTL'])) ? 'rtl' : 'ltr';  
+      var elDir=((keymanweb.keyboardManager.activeKeyboard != null) && (keymanweb.keyboardManager.activeKeyboard['KRTL'])) ? 'rtl' : 'ltr';  
       if(Ptarg) {
         if(device.touchable) {
           if(Ptarg.textContent.length == 0) {
@@ -4834,58 +3870,6 @@ if(!window['keyman']['initialized']) {
 
     util.attachDOMEvent(document, 'keyup', keymanweb._ProcessHotKeys,false);  
 
-  /* TODO: why not use util.loadCookie and saveCookie?? */  
-    
-    /**
-     * Function     saveCurrentKeyboard
-     * Scope        Private
-     * @param       {string}    PInternalName       name of keyboard
-     * @param       {string}    PLgCode             language code   
-     * Description Saves current keyboard as a cookie
-     */    
-    keymanweb.saveCurrentKeyboard = function(PInternalName,PLgCode)
-    {        
-      var s = "current="+PInternalName+":"+PLgCode; 
-      util.saveCookie('KeymanWeb_Keyboard',{'current':PInternalName+':'+PLgCode});
-    }
-
-    /**
-     * Restore the most recently used keyboard, if still available
-     */    
-    keymanweb.restoreCurrentKeyboard = function()
-    {
-      var stubs=keymanweb._KeyboardStubs,i,n=stubs.length;
-
-      // Do nothing if no stubs loaded
-      if(stubs.length < 1) return;
-
-      // If no saved keyboard, default to US English, else first loaded stub
-      var d=keymanweb.getSavedKeyboard();            
-      var t=d.split(':'); 
-
-      // Identify the stub with the saved keyboard
-      t=d.split(':'); 
-      if(t.length < 2) t[1]='';
-
-      // This loop is needed to select the correct stub when several apply to a given keyboard
-      // TODO: There should be a better way!
-      for(i=0; i<n; i++)
-      {
-        if(stubs[i]['KI'] == t[0] && (stubs[i]['KLC'] == t[1] || t[1] == '')) break;
-      }
-    
-      // Sets the default stub (as specified above with the `getSavedKeyboard` call) as active.
-      // if((i < n) || (device.touchable && (keymanweb._ActiveKeyboard == null)))
-      if((i < n) || (keymanweb._ActiveKeyboard == null))
-      {
-        keymanweb._SetActiveKeyboard(t[0],t[1],false);
-        keymanweb.globalKeyboard = t[0];
-        keymanweb.globalLanguageCode = t[1];
-
-        keymanweb.doKeyboardChange(t[0],t[1]);        // And update the UI if necessary
-      }
-    } 
-
     /**
      * Gets the cookie for the name and language code of the most recently active keyboard
      * 
@@ -4893,31 +3877,8 @@ if(!window['keyman']['initialized']) {
      * 
      * @return      {string}          InternalName:LanguageCode 
      **/    
-    keymanweb['getSavedKeyboard'] = keymanweb.getSavedKeyboard = function()
-    {  
-      var v=util.loadCookie('KeymanWeb_Keyboard');
-      
-      if(typeof(v['current']) != 'string') return 'Keyboard_us:eng';    
-      
-      // Check that the requested keyboard is included in the available keyboard stubs
-      var n,stubs=keymanweb._KeyboardStubs,kd;
-      for(n=0; n<stubs.length; n++)
-      {
-        kd=stubs[n]['KI']+':'+stubs[n]['KLC'];
-        if(kd == v['current']) return kd;
-      }
-      // Default to US English if available (but don't assume it is first)
-      for(n=0; n<stubs.length; n++)
-      {
-        kd=stubs[n]['KI']+':'+stubs[n]['KLC'];
-        if(kd == 'Keyboard_us:eng') return kd;
-      }
-      
-      // Otherwise use the first keyboard stub
-      if(stubs.length > 0) return stubs[0]['KI']+':'+stubs[0]['KLC'];
-      
-      // Or US English if no stubs loaded (should never happen)
-      return 'Keyboard_us:eng';    
+    keymanweb['getSavedKeyboard'] = function() {
+      return keymanweb.keyboardManager.getSavedKeyboard();  
     }
 
     util.attachDOMEvent(window, 'focus', keymanweb._ResetVKShift,false);  // I775
