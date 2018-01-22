@@ -1901,22 +1901,11 @@ if(!window['keyman']['initialized']) {
       return success;
     }
 
-
-    
     /**
      * Browser dependent initialization
      */       
-    if(document.selection)          // only defined for IE
-    {
-      var appVer=navigator.appVersion;
-    // Legacy support variables
-      if(appVer.indexOf('MSIE 6.0') >= 0) keymanweb._IE = 6;
-      else if(appVer.indexOf('MSIE 7.0') >= 0) keymanweb._IE = 7;
-      else if(appVer.indexOf('MSIE 8.0') >= 0) keymanweb._IE = 8;
-      if(keymanweb._IE && document.compatMode=='BackCompat') keymanweb._IE = 6;
-    }
 
-    // I732 START - Support for European underlying keyboards #1
+     // I732 START - Support for European underlying keyboards #1
     if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') 
       osk._BaseLayout = window['KeymanWeb_BaseLayout'];
     else
@@ -2047,13 +2036,7 @@ if(!window['keyman']['initialized']) {
               util.attachDOMEvent(Pelem,'blur', keymanweb._ControlBlur);
               util.attachDOMEvent(Lelem,'keydown', keymanweb._KeyDown);   // I2404 - Update for attaching to elements within IFRAMEs, don't attach to read-only IFRAMEs
               util.attachDOMEvent(Lelem,'keypress', keymanweb._KeyPress);
-              util.attachDOMEvent(Lelem,'keyup', keymanweb._KeyUp);
-              
-              // I1481 - Attach to the selectionchange in the iframe (and do a selchange to get the new selection)
-              /* IE: call _SelectionChange when the user changes the selection */
-              util.attachDOMEvent(Lelem, 'selectionchange', keymanweb._SelectionChange);
-              keymanweb._SelectionChange();
-              
+              util.attachDOMEvent(Lelem,'keyup', keymanweb._KeyUp);              
             }
             else {
               // Lelem is the IFrame's internal document; set 'er up!
@@ -2110,11 +2093,6 @@ if(!window['keyman']['initialized']) {
               util.detachDOMEvent(Lelem,'keydown', keymanweb._KeyDown);   // I2404 - Update for attaching to elements within IFRAMEs, don't attach to read-only IFRAMEs
               util.detachDOMEvent(Lelem,'keypress', keymanweb._KeyPress);
               util.detachDOMEvent(Lelem,'keyup', keymanweb._KeyUp);
-              
-              // I1481 - Attach to the selectionchange in the iframe (and do a selchange to get the new selection)
-              /* IE: call _SelectionChange when the user changes the selection */
-              util.detachDOMEvent(Lelem, 'selectionchange', keymanweb._SelectionChange);
-              keymanweb._SelectionChange();
             }
             else {
               // Lelem is the IFrame's internal document; set 'er up!
@@ -2459,8 +2437,6 @@ if(!window['keyman']['initialized']) {
         keymanweb._AttachToIframe(Ltarg);
         Ltarg=Ltarg.contentWindow.document;
       }
-          
-      //??keymanweb._Selection = null;
 
       // We condition on 'priorElement' below as a check to allow KMW to set a default active keyboard.
       var priorElement = keymanweb._LastActiveElement;
@@ -3007,36 +2983,6 @@ if(!window['keyman']['initialized']) {
       s.LisVirtualKey = s.LisVirtualKeyCode || e.type != 'keypress';
       
       return s;
-    }
-
-    /**
-     * Function   _SelectionChange
-     * Scope      Private
-     * @return    {boolean} 
-     * Description Respond to selection change event 
-     */
-    keymanweb._SelectionChange = function()
-    {
-      if(keymanweb._IgnoreNextSelChange)
-      {
-        keymanweb._IgnoreNextSelChange--;
-      }
-      else
-      {
-        var Ls=document.selection;
-        if(Ls.type.toLowerCase()!='control') //  &&  document.selection.createRange().parentElement() == keymanweb._SelectionControl) //  &&  window.event.srcElement == keymanweb._SelectionControl)
-        {
-          var Lrange=Ls.createRange();
-          if(!keymanweb._Selection || !keymanweb._Selection.isEqual(Lrange))
-          {
-            keymanweb._Selection = Lrange;
-
-            /* Delete deadkeys for IE when certain keys pressed */
-            kbdInterface.clearDeadkeys();
-          }
-        }
-      }
-      return true;
     }
     
     /**
@@ -4374,10 +4320,6 @@ if(!window['keyman']['initialized']) {
       }
 
       //document.body.appendChild(keymanweb._StyleBlock);
-
-      // IE: call _SelectionChange when the user changes the selection 
-      if(document.selection)
-        util.attachDOMEvent(document, 'selectionchange', keymanweb._SelectionChange);
     
       // Restore and reload the currently selected keyboard, selecting a default keyboard if necessary.
       keymanweb.restoreCurrentKeyboard(); 
@@ -4675,7 +4617,9 @@ if(!window['keyman']['initialized']) {
      * @return      {Object.<string,number>}  selection start
      * Description Get input selection for all(?) browsers, per Tim Down
      *            http://stackoverflow.com/questions/3053542/how-to-get-the-start-and-end-points-of-selection-in-text-area/3053640#3053640 
-     *            But only works for input fields, not for content editable fields!!!  
+     *            But only works for input fields, not for content editable fields!!!
+     * 
+     *            Abbreviated now that we no longer support IE8-, removing the need for document.selection
      **/            
     keymanweb.getInputSelection = function(el)
     { 
@@ -4683,36 +4627,6 @@ if(!window['keyman']['initialized']) {
   
       if(typeof el.selectionStart == "number" && typeof el.selectionEnd == "number") { 
         start = el.selectionStart; end = el.selectionEnd; 
-      } else { 
-        range = document.selection.createRange(); 
-  
-        if(range && range.parentElement() == el) { 
-          len = el.value.length; 
-          normalizedValue = el.value.replace(/\r\n/g, "\n"); 
-              
-          // Create a working TextRange that lives only in the input 
-          textInputRange = el.createTextRange(); 
-          textInputRange.moveToBookmark(range.getBookmark()); 
-  
-          // Check if the start and end of the selection are at the very end of the input,
-          // since moveStart/moveEnd doesn't return what we want in those cases 
-          endRange = el.createTextRange(); 
-          endRange.collapse(false); 
-  
-          if(textInputRange.compareEndPoints("StartToEnd", endRange) > -1) { 
-            start = end = len; 
-          } else { 
-            start = -textInputRange.moveStart("character", -len); 
-            start += normalizedValue.slice(0, start).split("\n").length - 1; 
-  
-            if(textInputRange.compareEndPoints("EndToEnd", endRange) > -1) { 
-              end = len; 
-            } else { 
-              end = -textInputRange.moveEnd("character", -len); 
-              end += normalizedValue.slice(0, end).split("\n").length - 1; 
-            } 
-          } 
-        } 
       } 
       return {start: start, end: end}; 
     }

@@ -929,7 +929,7 @@ if(!window['keyman']['initialized']) {
      */
     osk.clickKey = function(e)
     {
-      var Lelem = keymanweb._LastActiveElement, Ls, Le, Lkc, Lsel;
+      var Lelem = keymanweb._LastActiveElement, Ls, Le, Lkc;
 
       // Each button id is of the form <layer>-<keyCode>, e.g. 'shift-ctrl-K_Q' or 'popup-shift-K_501', etc.
       var t=e.id.split('-');
@@ -976,12 +976,10 @@ if(!window['keyman']['initialized']) {
 
         Ls=Lelem._KeymanWebSelectionStart;
         Le=Lelem._KeymanWebSelectionEnd;
-        Lsel=keymanweb._Selection;
         keymanweb._IsActivatingKeymanWebUI = 1;
         keymanweb._IgnoreNextSelChange = 100;
         keymanweb._FocusLastActiveElement();
         if(keymanweb._IsMozillaEditableIframe(Lelem,0)) Lelem = Lelem.documentElement;
-        if(document.selection && Lsel != null) Lsel.select();
         Lelem._KeymanWebSelectionStart=Ls;
         Lelem._KeymanWebSelectionEnd=Le;
         keymanweb._IgnoreNextSelChange = 0;

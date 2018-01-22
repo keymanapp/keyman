@@ -5,7 +5,6 @@ interface Window {
 
 interface Document {
     parentWindow: any                   // Thanks again, IE.
-    selection: any                      // Is IE only; TS ignores it because of this.
 }
 
 interface Element {
@@ -13,10 +12,7 @@ interface Element {
     shim: HTMLElement,                  // Used in subkey elements for smooth fading.
 
     styleSheet: CSSStyleDeclaration,    // Extension of IE.  TS ignores it because of this.
-    attachEvent: any,
-    detachEvent: any,
     unSelectable: string,
-    currentStyle: any,
 
     // Touch element extensions
     base: HTMLElement,                  // Refers to the aliased element.  Is a property of the alias.

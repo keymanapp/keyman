@@ -34,20 +34,16 @@ if(!window['keyman']['initialized']) {
     KeymanWeb['KT'] = kbdInterface['insertText'] = kbdInterface.insertText = function(Ptext,PdeadKey) {
       kbdInterface.resetContextCache();
       //_DebugEnter('InsertText');
-      var Lelem = keymanweb._LastActiveElement, Ls, Le, Lkc, Lsel, Lv=false;
+      var Lelem = keymanweb._LastActiveElement, Ls, Le, Lkc, Lv=false;
       if(Lelem != null) {
         Ls=Lelem._KeymanWebSelectionStart;
         Le=Lelem._KeymanWebSelectionEnd;
-        Lsel=keymanweb._Selection;
 
         keymanweb._IsActivatingKeymanWebUI = 1;
         keymanweb._IgnoreNextSelChange = 100;
         keymanweb._FocusLastActiveElement();
         if(keymanweb._IsMozillaEditableIframe(Lelem,0)) {
           Lelem = Lelem.documentElement;  // I3363 (Build 301)
-        }
-        if(document.selection  &&  Lsel != null) {
-          Lsel.select();
         }
         Lelem._KeymanWebSelectionStart=Ls;
         Lelem._KeymanWebSelectionEnd=Le;

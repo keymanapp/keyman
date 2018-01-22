@@ -257,10 +257,7 @@ class Util {
    */  
   attachDOMEvent(Pelem: HTMLElement, Peventname: string, Phandler: (Object) => boolean, PuseCapture: boolean): void {
     this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
-    if(Pelem.attachEvent) {
-      // IE
-      Pelem.attachEvent('on'+Peventname, Phandler);
-    } else if(Pelem.addEventListener) {
+    if(Pelem.addEventListener) {
       // Firefox + standards
       Pelem.addEventListener(Peventname, Phandler, PuseCapture?true:false);
     }
@@ -276,9 +273,7 @@ class Util {
    * Description Detaches event handler from element [to prevent memory leaks]
    */  
   detachDOMEvent(Pelem: HTMLElement, Peventname: string, Phandler: (Object) => boolean, PuseCapture: boolean): void {
-    if(Pelem.detachEvent) {
-      Pelem.detachEvent('on'+Peventname, Phandler);
-    } else if(Pelem.removeEventListener) {
+    if(Pelem.removeEventListener) {
       Pelem.removeEventListener(Peventname, Phandler, PuseCapture);      
     }
   }    
@@ -527,17 +522,15 @@ class Util {
    * @param       {string}      s             CSS style name 
    * @return      {*}               
    */       
-  getStyleValue(e:HTMLElement, s:string)
-  { 
+  getStyleValue(e:HTMLElement, s:string) { 
     // Build 349: error trap added, since on iOS, getPropertyValue may fail 
     // and crash in some cases, possibly if passed a text node 
     try  
     {
-      if(e && (typeof(window.getComputedStyle) != 'undefined'))
+      if(e && (typeof(window.getComputedStyle) != 'undefined')) {
           return window.getComputedStyle(e,'').getPropertyValue(s);
-      else if(e && (typeof(e.currentStyle) != 'undefined'))    //IE 8 and earlier
-        return e.currentStyle[s];
-  }    
+      }
+    }    
     catch(ex){}
     
     // Return empty string if unable to get style value
