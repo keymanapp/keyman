@@ -2,8 +2,6 @@
 # 
 # Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 #
-# Note: any changes to this script should be replicated in build.bat
-#
 
 display_usage ( ) {
     echo "build.sh [-ui | -test | -embed | -web | -debug_embedded]"
@@ -120,9 +118,9 @@ copy_resources ( ) {
 }
 
 # Definition of global compile constants
-WEB_OUTPUT="../output"
-EMBED_OUTPUT="../embedded"
-INTERMEDIATE="../build"
+WEB_OUTPUT="../release/web"
+EMBED_OUTPUT="../release/embedded"
+INTERMEDIATE="../intermediate"
 SOURCE="."
 NODE_SOURCE="source"
 
