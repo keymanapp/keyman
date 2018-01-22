@@ -15,6 +15,8 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends Activity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener {
 
@@ -130,5 +132,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   @Override
   public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
     // Handle Keyman keyboard download finished event here if needed
+  }
+
+  @Override
+  public void onPackageInstalled(List<Map<String, String>> keyboardInfo) {
   }
 }

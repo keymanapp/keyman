@@ -386,7 +386,7 @@ final class KMKeyboard extends WebView {
     } else {
       if (kFont.endsWith(".ttf") || kFont.endsWith(".otf")) {
         txtFont = kFont;
-        tFont = String.format("{\"family\":\"font_family_%s\",\"files\":[\"%s\"]}", kFont.substring(0, kFont.length() - 4), kFont);
+        tFont = String.format("{\"family\":\"font_family_%s\",\"files\":[\"%s%s\"]}", kFont.substring(0, kFont.length() - 4), keyboardRoot, kFont);
       } else {
         txtFont = getFontFilename(kFont);
         if (!txtFont.isEmpty())
@@ -399,7 +399,7 @@ final class KMKeyboard extends WebView {
     } else {
       if (kOskFont.endsWith(".ttf") || kOskFont.endsWith(".otf")) {
         oskFont = kOskFont;
-        oFont = String.format("{\"family\":\"font_family_%s\",\"files\":[\"%s\"]}", kOskFont.substring(0, kOskFont.length() - 4), kOskFont);
+        oFont = String.format("{\"family\":\"font_family_%s\",\"files\":[\"%s%s\"]}", kOskFont.substring(0, kOskFont.length() - 4), keyboardRoot, kOskFont);
       } else {
         oskFont = getFontFilename(kOskFont);
         if (!oskFont.isEmpty()) {
