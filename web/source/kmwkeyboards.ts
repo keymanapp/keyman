@@ -139,7 +139,7 @@ class KeyboardManager {
     {    
       Lstub = this.keyboardStubs[Ln];
       Lrn = this._GetKeyboardDetail(Lstub);  // I2078 - Full keyboard detail
-      Lr=(<any>this.keymanweb)._push(Lr,Lrn); // TODO:  Resolve without need for the cast.
+      Lr=this.keymanweb._push(Lr,Lrn); // TODO:  Resolve without need for the cast.
     } 
     return Lr;
   }
@@ -1212,7 +1212,7 @@ class KeyboardManager {
     }
   
     // Append to keyboards array
-    this.keyboards=(<any>this.keymanweb)._push(this.keyboards, Pk); // TODO:  Resolve without need for the cast.
+    this.keyboards=this.keymanweb._push(this.keyboards, Pk); // TODO:  Resolve without need for the cast.
 
     // Execute any external (UI) code needed after loading keyboard
     this.doKeyboardLoaded(Pk['KI']);
@@ -1266,7 +1266,7 @@ class KeyboardManager {
     }
   
     // Register stub (add to KeyboardStubs array)
-    this.keyboardStubs=(<any>this.keymanweb)._push(this.keyboardStubs, Pstub); // TODO:  Resolve without need for the cast.
+    this.keyboardStubs=this.keymanweb._push(this.keyboardStubs, Pstub); // TODO:  Resolve without need for the cast.
 
     // TODO: Need to distinguish between initial loading of a large number of stubs and any subsequent loading.
     //   UI initialization should not be needed for each registration, only at end.
