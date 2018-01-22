@@ -1177,7 +1177,7 @@ class KeyboardManager {
 
     // For package namespacing with KMEA/KMEI.
     if(this.keymanweb.isEmbedded) {
-      (<any>this.keymanweb).preserveID(Pk);
+      this.keymanweb.preserveID(Pk);
     }
 
     // Check if the active stub refers to this keyboard, else find applicable stub
@@ -1247,7 +1247,7 @@ class KeyboardManager {
 
     // If no language code has been defined, and no stub has been registered for this keyboard, register with empty string as the language code
     if(this.keymanweb.isEmbedded) {
-      (<any>this.keymanweb).namespaceID(Pstub);
+      this.keymanweb.namespaceID(Pstub);
     } // else leave undefined.  It's nice to condition upon.
     if(typeof(Pstub['KLC']) == 'undefined') {
       Pstub['KLC'] = '';
