@@ -2870,10 +2870,9 @@ if(!window['keyman']['initialized']) {
      * @return     {string}         language code
      * Description Return language code for currently selected language
      */    
-    keymanweb['getActiveLanguage'] = keymanweb.getActiveLanguage = function()
-    {
-      if((<KeymanBase>keymanweb).keyboardManager.activeStub == null) return '';
-      return (<KeymanBase>keymanweb).keyboardManager.activeStub['KLC'];
+    keymanweb['getActiveLanguage'] = keymanweb.getActiveLanguage = function() {
+      if(keymanweb.keyboardManager.activeStub == null) return '';
+      return keymanweb.keyboardManager.activeStub['KLC'];
     }
 
   //TODO: find all references to next three routines and disambiguate!!
