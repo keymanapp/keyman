@@ -702,21 +702,22 @@ if(!window['keyman']['initialized']) {
      */
     osk.getVKDictionaryCode = function(keyName)
     {
-      if(!keymanweb._ActiveKeyboard['VKDictionary'])
+      var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
+      if(!activeKeyboard['VKDictionary'])
       {
         var a=[];
-        if(typeof keymanweb._ActiveKeyboard['KVKD'] == 'string')
+        if(typeof activeKeyboard['KVKD'] == 'string')
         {
           // Build the VK dictionary
           // TODO: Move the dictionary build into the compiler -- so compiler generates code such as following.  Makes the VKDictionary member unnecessary
           //       this.KVKD={"K_ABC":256,"K_DEF":257,...};
-          var s=keymanweb._ActiveKeyboard['KVKD'].split(' ');
+          var s=activeKeyboard['KVKD'].split(' ');
           for(var i=0; i<s.length; i++) a[s[i]]=i+256;
         }
-        keymanweb._ActiveKeyboard['VKDictionary']=a;
+        activeKeyboard['VKDictionary']=a;
       }
 
-      var res=keymanweb._ActiveKeyboard['VKDictionary'][keyName];
+      var res=activeKeyboard['VKDictionary'][keyName];
       return res ? res : 0;
     }
     /**
@@ -730,6 +731,7 @@ if(!window['keyman']['initialized']) {
     osk.selectLayer = function(keyName,nextLayerIn)
     {
       var nextLayer = arguments.length < 2 ? null : nextLayerIn;
+      var isChiral = keymanweb.keyboardManager.isChiral();
 
       // Layer must be identified by name, not number (27/08/2015)
       if(typeof nextLayer == 'number')  nextLayer = osk.getLayerId(nextLayer * 0x10);
@@ -743,13 +745,13 @@ if(!window['keyman']['initialized']) {
           nextLayer = 'shift'; break;
         case 'K_LCONTROL':
         case 'K_LCTRL':
-          if(keymanweb.isChiral()) {
+          if(isChiral) {
             nextLayer = 'leftctrl';
             break;
           }
         case 'K_RCONTROL':
         case 'K_RCTRL':
-          if(keymanweb.isChiral()) {
+          if(isChiral) {
             nextLayer = 'rightctrl';
             break;
           }
@@ -757,20 +759,20 @@ if(!window['keyman']['initialized']) {
           nextLayer = 'ctrl'; break;
         case 'K_LMENU':
         case 'K_LALT':
-          if(keymanweb.isChiral()) {
+          if(isChiral) {
             nextLayer = 'leftalt';
             break;
           }
         case 'K_RMENU':
         case 'K_RALT':
-          if(keymanweb.isChiral()) {
+          if(isChiral) {
             nextLayer = 'rightalt';
             break;
           }
         case 'K_ALT':
           nextLayer = 'alt'; break;
         case 'K_ALTGR':
-          if(keymanweb.isChiral()) {
+          if(isChiral) {
             nextLayer = 'leftctrl-rightalt';
           } else {
             nextLayer = 'ctrl-alt';
@@ -931,6 +933,8 @@ if(!window['keyman']['initialized']) {
     {
       var Lelem = keymanweb._LastActiveElement, Ls, Le, Lkc;
 
+      var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
+
       // Each button id is of the form <layer>-<keyCode>, e.g. 'shift-ctrl-K_Q' or 'popup-shift-K_501', etc.
       var t=e.id.split('-');
       if(t.length < 2) return true; //shouldn't happen, but...
@@ -1033,7 +1037,7 @@ if(!window['keyman']['initialized']) {
         }
 
         // Include *limited* support for mnemonic keyboards (Sept 2012)
-        if(keymanweb._ActiveKeyboard && (keymanweb._ActiveKeyboard['KM']))
+        if(activeKeyboard && (activeKeyboard['KM']))
         {
           var keyText=e.firstChild.firstChild.wholeText;
           Lkc.LisVirtualKey=false; Lkc.LisVirtualKeyCode=false;
@@ -1051,13 +1055,13 @@ if(!window['keyman']['initialized']) {
         else Lkc.vkCode=Lkc.Lcode;
 
         // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-        if(typeof keymanweb._ActiveKeyboard['KM'] == 'undefined')
+        if(typeof activeKeyboard['KM'] == 'undefined')
         {
           Lkc.Lcode=keymanweb._USKeyCodeToCharCode(Lkc); Lkc.LisVirtualKey=false;
         }
 
         // Pass this key code and state to the keyboard program
-        if(!keymanweb._ActiveKeyboard || (Lkc.Lcode != 0 && !kbdInterface.processKeystroke(util.device, Lelem, Lkc)))
+        if(!activeKeyboard || (Lkc.Lcode != 0 && !kbdInterface.processKeystroke(util.device, Lelem, Lkc)))
         {
           // Restore the virtual key code if a mnemonic keyboard is being used
           Lkc.Lcode=Lkc.vkCode;
@@ -1272,23 +1276,19 @@ if(!window['keyman']['initialized']) {
     /**
      * Indicate the current language and keyboard on the space bar
      **/
-    osk.showLanguage = function()
-    {
+    osk.showLanguage = function() {
       var lgName='',kbdName='';
+      var activeStub = keymanweb.keyboardManager.activeStub;
 
-      if(keymanweb._ActiveStub)
-      {
-        lgName=keymanweb._ActiveStub['KL'];
-        kbdName=keymanweb._ActiveStub['KN'];
-      }
-      else if(keymanweb._ActiveLanguage)
-      {
+      if(activeStub) {
+        lgName=activeStub['KL'];
+        kbdName=activeStub['KN'];
+      } else if(keymanweb._ActiveLanguage) {
         lgName=keymanweb._ActiveLanguage['KN'];
-      }
-      else
-      {
+      } else {
         lgName='English';
       }
+
       try
       {
         var t=osk.spaceBar.firstChild.firstChild;
@@ -1320,7 +1320,7 @@ if(!window['keyman']['initialized']) {
      **/
     osk.showLanguageMenu = function()
     {
-      var n=0,kbdList=keymanweb._KeyboardStubs,nKbds=kbdList.length;
+      var n=0,kbdList=(<KeymanBase>keymanweb).keyboardManager.keyboardStubs,nKbds=kbdList.length;
       if(nKbds < 1) return;
 
       // Create the menu list container element
@@ -1578,7 +1578,7 @@ if(!window['keyman']['initialized']) {
         dx.appendChild(lgBar);
         menu.appendChild(dx);
 
-        if(langs[k] == keymanweb._ActiveStub['KL']) activeLanguageIndex=k;
+        if(langs[k] == (<KeymanBase>keymanweb).keyboardManager.activeStub['KL']) activeLanguageIndex=k;
 
         // Several keyboards for this language
         if(lgBar.kList.length > 1)
@@ -1713,8 +1713,8 @@ if(!window['keyman']['initialized']) {
           keymanweb.focusTimer=window.setTimeout(function(){keymanweb.focusing=false;},1000);
 
           osk.lgList.style.display='none'; //still allows blank menu momentarily on selection
-          keymanweb._SetActiveKeyboard(this.kn,this.kc,true);
-          keymanweb.doKeyboardChange(this.kn,this.kc);
+          keymanweb.keyboardManager._SetActiveKeyboard(this.kn,this.kc,true);
+          keymanweb.keyboardManager.doKeyboardChange(this.kn,this.kc);
           keymanweb._FocusLastActiveElement();
           osk.hideLanguageList();
 
@@ -1772,7 +1772,7 @@ if(!window['keyman']['initialized']) {
         lockStates = e.Lstates;
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
-        if(keymanweb.isChiral() && osk.emulatesAltGr() && 
+        if(keymanweb.keyboardManager.isChiral() && osk.emulatesAltGr() && 
             (keymanweb.modStateFlags & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
           keyShiftState |= osk.modifierBitmasks['ALT_GR_SIM'];
           keyShiftState &= ~osk.modifierCodes['RALT'];
@@ -1877,7 +1877,7 @@ if(!window['keyman']['initialized']) {
      */
     osk.showLayer = function(id)
     {
-      if(keymanweb._ActiveKeyboard)
+      if(keymanweb.keyboardManager.activeKeyboard)
       {
         for(var i=0; i<osk.layers.length; i++)
         {
@@ -3179,6 +3179,7 @@ if(!window['keyman']['initialized']) {
     {
       var Ldiv,LdivC,layout=layout0;
       var Lkbd=util._CreateElement('DIV'), oskWidth;//s=Lkbd.style,
+      var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
 
       // Build a layout using the default for the device
       if(typeof layout != 'object' || layout == null)
@@ -3192,7 +3193,7 @@ if(!window['keyman']['initialized']) {
       if('font' in layout) osk.fontFamily=layout['font']; else osk.fontFamily='';
 
       // Set flag to add default (US English) key label if specified by keyboard
-      layout.keyLabels=keymanweb._ActiveKeyboard && ((typeof(keymanweb._ActiveKeyboard['KDU']) != 'undefined') && keymanweb._ActiveKeyboard['KDU']);
+      layout.keyLabels=activeKeyboard && ((typeof(activeKeyboard['KDU']) != 'undefined') && activeKeyboard['KDU']);
       LdivC=osk.deviceDependentLayout(layout,device.formFactor);
 
       osk.ddOSK = true;
@@ -3233,18 +3234,18 @@ if(!window['keyman']['initialized']) {
      */
     keymanweb['BuildVisualKeyboard'] = keymanweb.buildOSK = function(PInternalName,Pstatic,argFormFactor,argLayerId)  // I777
     {
-      var PKbd=keymanweb._ActiveKeyboard,Ln,kbd=null,
+      var PKbd=keymanweb.keyboardManager.activeKeyboard,Ln,kbd=null,
           formFactor=(typeof(argFormFactor) == 'undefined' ? 'desktop' : argFormFactor),
           layerId=(typeof(argLayerId) == 'undefined' ? 'default' : argLayerId);
 
-      if(PInternalName != null)
-      {
+      var keyboardsList = keymanweb.keyboardManager.keyboards;
+
+      if(PInternalName != null) {
         var p=PInternalName.toLowerCase().replace('keyboard_','');
-        for(Ln=0; Ln<keymanweb._Keyboards.length; Ln++)
-        {
-          if(p == keymanweb._Keyboards[Ln]['KI'].toLowerCase().replace('keyboard_',''))
-          {
-            PKbd=keymanweb._Keyboards[Ln]; break;
+
+        for(Ln=0; Ln<keyboardsList.length; Ln++) {
+          if(p == keyboardsList[Ln]['KI'].toLowerCase().replace('keyboard_','')) {
+            PKbd=keyboardsList[Ln]; break;
           }
         }
       }
@@ -3268,7 +3269,7 @@ if(!window['keyman']['initialized']) {
 
       // Else get a default layout for the device for this keyboard
       if(layout == null && PVK != null)
-        layout=osk.buildDefaultLayout(PVK,keymanweb.getKeyboardModifierBitmask(PKbd),formFactor);
+        layout=osk.buildDefaultLayout(PVK,keymanweb.keyboardManager.getKeyboardModifierBitmask(PKbd),formFactor);
 
       // Cannot create an OSK if no layout defined, just return empty DIV
       if(layout != null)
@@ -3386,7 +3387,9 @@ if(!window['keyman']['initialized']) {
       bar.className='kmw-title-bar';
       bar.onmousedown=osk._VMoveMouseDown;
 
-      if(keymanweb._ActiveKeyboard) title=keymanweb._ActiveKeyboard['KN'];
+      if(keymanweb.keyboardManager.activeKeyboard) {
+        title=keymanweb.keyboardManager.activeKeyboard['KN'];
+      }
       var Ltitle=util._CreateElement('SPAN');
       Ltitle.className='kmw-title-bar-caption';
       Ltitle.innerHTML=title;
@@ -3644,7 +3647,7 @@ if(!window['keyman']['initialized']) {
       osk._VMoveX = Lposx - osk._Box.offsetLeft;
       osk._VMoveY = Lposy - osk._Box.offsetTop;
 
-      if(keymanweb.isCJK()) osk.pinImg.style.left='15px';
+      if(keymanweb.keyboardManager.isCJK()) osk.pinImg.style.left='15px';
 
       document.onmousemove = osk._VMoveMouseMove;
       document.onmouseup = osk._VResizeMoveMouseUp;
@@ -3799,7 +3802,7 @@ if(!window['keyman']['initialized']) {
       if(osk._Box == null || keymanweb._ActiveElement == null) return;
 
       // Never display the OSK for desktop browsers unless KMW element is focused, and a keyboard selected
-      if((!device.touchable) && (keymanweb._ActiveKeyboard == null || !osk._Enabled)) return;
+      if((!device.touchable) && (keymanweb.keyboardManager.activeKeyboard == null || !osk._Enabled)) return;
 
       var Ls = osk._Box.style;
 
@@ -4031,7 +4034,7 @@ if(!window['keyman']['initialized']) {
       if(hiddenByUser)
       {
         //osk.loadCookie(); // preserve current offset and userlocated state
-        osk._Enabled = ((keymanweb.isCJK() || device.touchable)?1:0); // I3363 (Build 301)
+        osk._Enabled = ((keymanweb.keyboardManager.isCJK() || device.touchable)?1:0); // I3363 (Build 301)
         osk.saveCookie();  // Save current OSK state, size and position (desktop only)
       }
       else if(device.formFactor == 'desktop')
@@ -4154,6 +4157,8 @@ if(!window['keyman']['initialized']) {
      */
     osk._Load = function()   // Load Help
     {
+      var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
+
       // If _Load called before OSK is ready, must wait and call again
       if(osk._Box == null)
       {
@@ -4188,7 +4193,7 @@ if(!window['keyman']['initialized']) {
       // TODO: find out and document why this should not be done for touch devices!!
       // (Probably to avoid having a null keyboard. But maybe that *is* an option, if there remains a way to get the language menu,
       //  such as a minimized menu button?)
-      if(keymanweb._ActiveKeyboard == null && !device.touchable)
+      if(activeKeyboard == null && !device.touchable)
       {
         var Ldiv=util._CreateElement('DIV');
         Ldiv.className = "kmw-title-bar";
@@ -4204,12 +4209,12 @@ if(!window['keyman']['initialized']) {
       {
         var Lviskbd=null,layouts=null,layout=null,Lhelp='';
         osk._Box.className = "";
-        if(keymanweb._ActiveKeyboard != null)
+        if(activeKeyboard != null)
         {
-          Lviskbd=keymanweb._ActiveKeyboard['KV']; Lhelp=keymanweb._ActiveKeyboard['KH'];
+          Lviskbd=activeKeyboard['KV']; Lhelp=activeKeyboard['KH'];
 
           // Check if dynamic layout is defined within keyboard
-          layouts=keymanweb._ActiveKeyboard['KVKL'];
+          layouts=activeKeyboard['KVKL'];
 
           // If any keyboard layout file is provided, use that to override the generated layout
           if(typeof layouts != 'undefined' && layouts != null)
@@ -4249,7 +4254,7 @@ if(!window['keyman']['initialized']) {
           // TODO: May want to define a default BK array here as well
           if(Lviskbd == null) Lviskbd={'F':'Tahoma','BK':dfltText}; //DDOSK
 
-          osk._GenerateVisualKeyboard(Lviskbd, Lhelp, layout, keymanweb.getKeyboardModifierBitmask());
+          osk._GenerateVisualKeyboard(Lviskbd, Lhelp, layout, keymanweb.keyboardManager.getKeyboardModifierBitmask());
         }
 
         else //The following code applies only to preformatted 'help' such as European Latin
@@ -4266,12 +4271,12 @@ if(!window['keyman']['initialized']) {
           Ldiv.className='kmw-osk-static';
           Ldiv.innerHTML = Lhelp;
           osk._Box.appendChild(Ldiv);
-          if(keymanweb._ActiveKeyboard['KHF']) keymanweb._ActiveKeyboard['KHF'](osk._Box);
+          if(activeKeyboard['KHF']) activeKeyboard['KHF'](osk._Box);
         }
         if(keymanweb._TitleElement)
         {
           keymanweb._TitleElement.innerHTML = "<span style='font-weight:bold'>"
-            + keymanweb._ActiveKeyboard['KN'] + '</span> - ' + keymanweb._TitleElement.innerHTML; // I1972  // I2186
+            + activeKeyboard['KN'] + '</span> - ' + keymanweb._TitleElement.innerHTML; // I1972  // I2186
           keymanweb._TitleElement.className=''; keymanweb._TitleElement.style.color='#fff';
         }
       }
@@ -4281,7 +4286,7 @@ if(!window['keyman']['initialized']) {
 
       // Correct the classname for the (inner) OSK frame (Build 360)
       var innerFrame=osk._Box.firstChild,
-        kbdClass=' kmw-keyboard-'+(keymanweb._ActiveKeyboard ? keymanweb._ActiveKeyboard['KI'].replace('Keyboard_','') : '');
+        kbdClass=' kmw-keyboard-'+(activeKeyboard ? activeKeyboard['KI'].replace('Keyboard_','') : '');
       if(innerFrame.id == 'keymanweb_title_bar') innerFrame=innerFrame.nextSibling;
       innerFrame.className='kmw-osk-inner-frame'+kbdClass;
 
@@ -4296,15 +4301,21 @@ if(!window['keyman']['initialized']) {
      *  or to re-apply the default element font
      *
      **/
-    osk.appendStyleSheet = function()
-    {
+    osk.appendStyleSheet = function() {
+      var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
+      var activeStub: KeyboardStub = keymanweb.keyboardManager.activeStub;
+
       // Do not do anything if a null stub
-      if(keymanweb._ActiveStub == null) return;
+      if(activeStub == null) {
+        return;
+      }
 
       // First remove any existing keyboard style sheet
-      if(osk.styleSheet) util.removeStyleSheet(osk.styleSheet);
+      if(osk.styleSheet) {
+        util.removeStyleSheet(osk.styleSheet);
+      }
 
-      var i,ks=keymanweb._ActiveStub,kfd=ks['KFont'],ofd=ks['KOskFont'];
+      var i, kfd=activeStub['KFont'], ofd=activeStub['KOskFont'];
 
       // Add style sheets for embedded fonts if necessary (each font-face style will only be added once)
       util.addFontFaceStyleSheet(kfd); util.addFontFaceStyleSheet(ofd);
@@ -4317,8 +4328,8 @@ if(!window['keyman']['initialized']) {
       //       so must apply style before testing for font availability
       // Extended to allow keyboard-specific custom styles for Build 360
       var customStyle=osk.addFontStyle(kfd,ofd);
-      if( keymanweb._ActiveKeyboard != null && typeof(keymanweb._ActiveKeyboard['KCSS']) == 'string')  // KMEW-129
-        customStyle=customStyle+keymanweb._ActiveKeyboard['KCSS'];
+      if( activeKeyboard != null && typeof(activeKeyboard['KCSS']) == 'string')  // KMEW-129
+        customStyle=customStyle+activeKeyboard['KCSS'];
 
       osk.styleSheet = util.addStyleSheet(customStyle); //Build 360
 

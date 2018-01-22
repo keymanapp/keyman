@@ -19,7 +19,10 @@
  *       It should be a method of the same object, however, due to how 'this' works in JS.
  */
 
-// Util.ts
+// kmwbase.ts
+goog.exportSymbol("KeymanBase.prototype.addEventListener", KeymanBase.prototype.addEventListener);
+
+// kmwutils.ts
 
 goog.exportSymbol("Device", Device);
 goog.exportSymbol("Util", Util);

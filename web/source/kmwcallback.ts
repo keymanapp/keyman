@@ -69,48 +69,7 @@ if(!window['keyman']['initialized']) {
      * Description  Register and load the keyboard
      */    
     KeymanWeb['KR'] = kbdInterface['registerKeyboard'] = kbdInterface.registerKeyboard = function(Pk) {
-      // If initialization not yet complete, list the keyboard to be registered on completion of initialization
-      if(!keymanweb['initialized']) {
-        keymanweb.deferredKR.push(Pk); return;
-      }
-      
-      var Li,Lstub;
-
-      // Check if the active stub refers to this keyboard, else find applicable stub
-
-      var Ps=keymanweb._ActiveStub, savedActiveStub = keymanweb._ActiveStub;
-      if(!Ps || !('KI' in Ps) || (Ps['KI'] != Pk['KI'])) {         
-        // Find the first stub for this keyboard
-        for(Lstub=0;Lstub < keymanweb._KeyboardStubs.length; Lstub++) { // I1511 - array prototype extended
-          Ps=keymanweb._KeyboardStubs[Lstub];
-          if(Pk['KI'] == Ps['KI'])break;
-          Ps=null;
-        }
-      } 
-      
-      // Build 369: ensure active stub defined when loading local keyboards 
-      if(keymanweb._ActiveStub == null && Ps != null) {
-        keymanweb._ActiveStub = Ps;
-      }
-      
-      // Register the stub for this language (unless it is already registered)
-      // keymanweb.KRS(Ps?Ps:Pk); 
-
-      // Test if keyboard already loaded
-      for(Li=0; Li<keymanweb._Keyboards.length; Li++) {
-        if(Pk['KI'] == keymanweb._Keyboards[Li]['KI']) {
-          return;
-        }
-      }
-    
-      // Append to keyboards array
-      keymanweb._Keyboards=keymanweb._push(keymanweb._Keyboards,Pk);
-
-      // Execute any external (UI) code needed after loading keyboard
-      keymanweb.doKeyboardLoaded(Pk['KI']);
-
-      // Restore the originally-active stub to its prior state.  No need to change it permanently.
-      keymanweb._ActiveStub = savedActiveStub;
+      keymanweb.keyboardManager._RegisterKeyboard(Pk);
     }
 
     /**
@@ -121,54 +80,9 @@ if(!window['keyman']['initialized']) {
      * 
      * @param       {Object}      Pstub     Keyboard stub object
      * @return      {?number}               1 if already registered, else null
-     */    
-  //var ts0=new Date().toTimeString().substr(3,5);
+     */
     KeymanWeb['KRS'] = kbdInterface['registerStub'] = kbdInterface.registerStub = function(Pstub) {
-      var Lk;
-      
-      // In initialization not complete, list the stub to be registered on completion of initialization
-      if(!keymanweb['initialized']) {
-        keymanweb.deferredKRS.push(Pstub);
-        return null;
-      }
-
-      // The default stub is always the first keyboard stub loaded [and will be ignored by desktop browsers - not for beta, anyway]
-      if(keymanweb.dfltStub == null) {
-        keymanweb.dfltStub=Pstub;
-        //if(device.formFactor == 'desktop') return 1;    //Needs further thought before release
-      }
-
-      // If no language code has been defined, and no stub has been registered for this keyboard, register with empty string as the language code
-      if(typeof(Pstub['KP']) == 'undefined') {
-        Pstub['KP'] = '';
-      }
-      if(typeof(Pstub['KLC']) == 'undefined') {
-        Pstub['KLC'] = '';
-      }
-      if(typeof(Pstub['KL']) == 'undefined') {
-        Pstub['KL'] = 'undefined';
-      }
-
-      // If language code already defined (or not specified in stub), check to see if stub already registered
-      for(Lk=0; Lk<keymanweb._KeyboardStubs.length; Lk++) {
-        if(keymanweb._KeyboardStubs[Lk]['KI'] == Pstub['KI']) {
-          if(Pstub['KLC'] == '' || (keymanweb._KeyboardStubs[Lk]['KLC'] == Pstub['KLC'])) {
-            return 1; // no need to register
-          }
-        }
-      }
-    
-      // Register stub (add to KeyboardStubs array)
-      keymanweb._KeyboardStubs=keymanweb._push(keymanweb._KeyboardStubs,Pstub);
-
-      // TODO: Need to distinguish between initial loading of a large number of stubs and any subsequent loading.
-      //   UI initialization should not be needed for each registration, only at end.
-      // Reload this keyboard if it was the last active keyboard and 
-      // make any changes needed by UI for new keyboard stub
-      // (Uncommented for Build 360)
-      keymanweb.doKeyboardRegistered(Pstub['KI'],Pstub['KL'],Pstub['KN'],Pstub['KLC'],Pstub['KP']);
-
-      return null;
+      return keymanweb.keyboardManager._RegisterStub(Pstub);
     }
 
     /**
@@ -244,7 +158,7 @@ if(!window['keyman']['initialized']) {
      * Description  Test if event as a keypress event
      */    
     KeymanWeb['KIK'] = kbdInterface['isKeypress'] = kbdInterface.isKeypress = function(e) {
-      if(keymanweb._ActiveKeyboard['KM']) {   // I1380 - support KIK for positional layouts
+      if(keymanweb.keyboardManager.activeKeyboard['KM']) {   // I1380 - support KIK for positional layouts
         return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
       } else {
         return keymanweb._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts
@@ -264,7 +178,7 @@ if(!window['keyman']['initialized']) {
       var retVal = false; // I3318
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
-      var bitmask = keymanweb.getKeyboardModifierBitmask();
+      var bitmask = keymanweb.keyboardManager.getKeyboardModifierBitmask();
 
       if(e.vkCode > 255) {
         keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
@@ -426,13 +340,13 @@ if(!window['keyman']['initialized']) {
       var Li, Ldv;
     
       if(Pelem.className.indexOf('keymanweb-input') >= 0) {
-        var t=keymanweb.getTextBeforeCaret(Pelem);
+        var t=keymanweb.touchAliasing.getTextBeforeCaret(Pelem);
         if(dn > 0) {
           t=t._kmwSubstr(0,t._kmwLength()-dn)+s; 
         } else {
           t=t+s;
         }
-        keymanweb.setTextBeforeCaret(Pelem,t);
+        keymanweb.touchAliasing.setTextBeforeCaret(Pelem,t);
         return;
       }
     
@@ -797,7 +711,7 @@ if(!window['keyman']['initialized']) {
      */    
     KeymanWeb['KSAVE'] = kbdInterface['saveStore'] = function(storeName,optValue) {
       kbdInterface.resetContextCache();
-      var kbd=keymanweb._ActiveKeyboard;
+      var kbd=keymanweb.keyboardManager.activeKeyboard;
       if(!kbd || typeof kbd['KI'] == 'undefined' || kbd['KI'] == '') {
         return false;
       }
@@ -931,7 +845,7 @@ if(!window['keyman']['initialized']) {
       util.activeDevice = device;
 
       // Calls the start-group of the active keyboard.
-      return keymanweb._ActiveKeyboard['gs'](element, keystroke);
+      return keymanweb.keyboardManager.activeKeyboard['gs'](element, keystroke);
     }
 
   })();  

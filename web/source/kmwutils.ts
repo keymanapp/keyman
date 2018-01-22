@@ -25,6 +25,27 @@ class Device {
     this.browser='';
   }
 
+  /**
+   * Get device horizontal DPI for touch devices, to set actual size of active regions
+   * Note that the actual physical DPI may be somewhat different.
+   * 
+   * @return      {number}               
+   */       
+  getDPI(): number {
+    var t=document.createElement('DIV') ,s=t.style,dpi=96;
+    if(document.readyState !== 'complete') {
+      return dpi;
+    }
+    
+    t.id='calculateDPI';
+    s.position='absolute'; s.display='block';s.visibility='hidden';
+    s.left='10px'; s.top='10px'; s.width='1in'; s.height='10px';
+    document.body.appendChild(t);
+    dpi=(typeof window.devicePixelRatio == 'undefined') ? t.offsetWidth : t.offsetWidth * window.devicePixelRatio;
+    document.body.removeChild(t);
+    return dpi;    
+  }
+
   detect(IEVersion: number) : void {
     if(navigator && navigator.userAgent) {
       var agent=navigator.userAgent;
@@ -219,7 +240,7 @@ class Util {
    * @return     {boolean}         
    * Description Invoke an event using any function with up to four arguments 
    */    
-  callEvent(event: string, params: Object[]): boolean {
+  callEvent(event: string, params: Object|Object[]): boolean {
     if(typeof this.events[event] == 'undefined') {
       return true;
     }
@@ -249,13 +270,13 @@ class Util {
   /**
    * Function     attachDOMEvent: Note for most browsers, adds an event to a chain, doesn't stop existing events  
    * Scope        Public
-   * @param       {Object}    Pelem       Element to which event is being attached
+   * @param       {Object}    Pelem       Element (or IFrame-internal Document) to which event is being attached
    * @param       {string}    Peventname  Name of event without 'on' prefix
    * @param       {function(Object)}  Phandler    Event handler for event
    * @param       {boolean=}  PuseCapture True only if event to be handled on way to target element      
    * Description  Attaches event handler to element DOM event
    */  
-  attachDOMEvent(Pelem: HTMLElement, Peventname: string, Phandler: (Object) => boolean, PuseCapture: boolean): void {
+  attachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
     this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
     if(Pelem.addEventListener) {
       // Firefox + standards
@@ -272,7 +293,7 @@ class Util {
    * @param       {boolean=}  PuseCapture True if event was being handled on way to target element      
    * Description Detaches event handler from element [to prevent memory leaks]
    */  
-  detachDOMEvent(Pelem: HTMLElement, Peventname: string, Phandler: (Object) => boolean, PuseCapture: boolean): void {
+  detachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
     if(Pelem.removeEventListener) {
       Pelem.removeEventListener(Peventname, Phandler, PuseCapture);      
     }
@@ -338,7 +359,7 @@ class Util {
     if(Lobj instanceof Document) {
     // The following two lines are old code and may or may not still be needed - possibly should be conditioned similalry to above    
       if(Lobj && Lobj.parentWindow && Lobj.parentWindow.frameElement) { // Legacy IE.
-        return Lcurleft + this._GetAbsoluteX(Lobj.parentWindow.frameElement) - Lobj.documentElement.scrollLeft;
+        return Lcurleft + this._GetAbsoluteX(Lobj.parentWindow.frameElement as HTMLElement) - Lobj.documentElement.scrollLeft;
       }
 
       if(Lobj && Lobj.defaultView && Lobj.defaultView.frameElement) {
@@ -382,7 +403,7 @@ class Util {
     if(Lobj instanceof Document) {
       // The following two lines are old code and may or may not still be needed - possibly should be conditioned similalry to above    
       if(Lobj && Lobj.parentWindow && Lobj.parentWindow.frameElement) {
-        return Lcurtop + this._GetAbsoluteY(Lobj.parentWindow.frameElement) - Lobj.documentElement.scrollTop;
+        return Lcurtop + this._GetAbsoluteY(Lobj.parentWindow.frameElement as HTMLElement) - Lobj.documentElement.scrollTop;
       }
       if(Lobj && Lobj.defaultView && Lobj.defaultView.frameElement) {
         return Lcurtop + this._GetAbsoluteY(<HTMLElement>Lobj.defaultView.frameElement) - Lobj.documentElement.scrollTop;
@@ -428,7 +449,7 @@ class Util {
     }
   }
   
-  private _CreateElement(nodeName:string): HTMLElement { 
+  _CreateElement(nodeName:string): HTMLElement { 
     var e = <HTMLElement>document.createElement(nodeName);
 
     // Make element unselectable (Internet Explorer)
@@ -493,27 +514,6 @@ class Util {
   }
 
   getIEVersion = this._GetIEVersion;
-
-  /**
-   * Get device horizontal DPI for touch devices, to set actual size of active regions
-   * Note that the actual physical DPI may be somewhat different.
-   * 
-   * @return      {number}               
-   */       
-  getDPI(): number {
-    var t=document.createElement('DIV') ,s=t.style,dpi=96;
-    if(document.readyState !== 'complete') {
-      return dpi;
-    }
-    
-    t.id='calculateDPI';
-    s.position='absolute'; s.display='block';s.visibility='hidden';
-    s.left='10px'; s.top='10px'; s.width='1in'; s.height='10px';
-    document.body.appendChild(t);
-    dpi=(typeof window.devicePixelRatio == 'undefined') ? t.offsetWidth : t.offsetWidth * window.devicePixelRatio;
-    document.body.removeChild(t);
-    return dpi;    
-  }
 
   /**
    * Get browser-independent computed style value for element
@@ -1099,7 +1099,7 @@ class Util {
    * @param     {string}        s       alert text
    * @param     {function()=}   fn      function to call when alert dismissed
    */       
-  alert(s: string, fn: () => void): void {
+  alert(s: string, fn?: () => void): void {
     var bg = this.keyman.waiting, nn=bg.firstChild.childNodes;
     nn[0].style.display='block';
     nn[1].className='kmw-alert-text'; 
@@ -1111,6 +1111,11 @@ class Util {
     } else {
       bg.dismiss=null;
     }
+  }
+
+  // Stub definition to be fleshed out depending upon native/embedded mode.
+  wait(s: string|boolean): void {
+
   }
   
   /**

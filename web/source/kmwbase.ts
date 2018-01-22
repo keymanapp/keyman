@@ -1,32 +1,30 @@
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwexthtml.ts" />
+// Defines the web-page interface object.
+/// <reference path="kmwdom.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwutils.ts" />
+// Defines keyboard data & management classes.
+/// <reference path="kmwkeyboards.ts" />
 
 /***
    KeymanWeb 10.0
    Copyright 2017 SIL International
 ***/
 
-declare var keyman: any
-var keyman = window['keyman'] || {};
-window['keyman'] = keyman; // To preserve the name _here_ in case of minification.
+declare var keyman: KeymanBase;
+var keyman: KeymanBase = window['keyman'] || {};
+// window['keyman'] = keyman; // To preserve the name _here_ in case of minification.
 
 class KeymanBase {
   _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
-  _Enabled = 1;              // Is KeymanWeb running?
+  _DisableInput = 0;         // Should input be disabled?
   _IE = 0;                   // browser version identification
-  legacy = 0;                // set true for IE 3,4,5 (I2186 - multiple IE tweaks needed)
   _IsActivatingKeymanWebUI = 0;    // ActivatingKeymanWebUI - is the KeymanWeb DIV in process of being clicked on?
   _JustActivatedKeymanWebUI = 0;   // JustActivatedKeymanWebUI - focussing back to control after KeymanWeb UI interaction  
   _IgnoreNextSelChange = 0;  // when a visual keyboard key is mouse-down, ignore the next sel change because this stuffs up our history  
   _Selection = null;
   _SelectionControl = null;
-  _KeyboardStubs = [];       // KeyboardStubs - array of available keyboards
-  dfltStub = null;           // First keyboard stub loaded - default for touch-screen devices, ignored on desktops
-  _Keyboards = [];           // Keyboards - array of loaded keyboards
-  _ActiveKeyboard = null;    // ActiveKeyboard - points to active keyboard in Keyboards array
-  _ActiveStub = null;        // ActiveStub - points to active stub in KeyboardStubs  
   _AttachedElements = [];    // I1596 - attach to controls dynamically
   _ActiveElement = null;     // Currently active (focused) element  I3363 (Build 301)
   _LastActiveElement = null; // LastElem - Last active element
@@ -38,11 +36,6 @@ class KeymanBase {
   resizing = false;          // Flag to control resize events when resetting viewport parameters
   sortedInputs = [];         // List of all INPUT and TEXTAREA elements ordered top to bottom, left to right
   inputList = [];            // List of simulated input divisions for touch-devices   I3363 (Build 301)
-  languageList = null;       // List of keyboard languages available for KeymanCloud
-  languagesPending = [];     // Array of languages waiting to be registered
-  deferredStubs = [];        // Array of pending keyboard stubs from addKeyboard(), to register after initialization
-  deferredKRS = [];          // Array of pending keyboard stubs from KRS, to register afterf initialization
-  deferredKR = [];           // Array of pending keyboards, to be installed at end of initialization
   waiting = null;            // Element displayed during keyboard load time
   warned = false;            // Warning flag (to prevent multiple warnings)
   baseFont = 'sans-serif';   // Default font for mapped input elements
@@ -74,6 +67,8 @@ class KeymanBase {
   util: Util;
   osk: any;
   ui: any;
+  keyboardManager: KeyboardManager;
+  domManager: DOMManager;
 
   // Defines option-tracking object as a string map.
   options: { [name: string]: string; } = {
@@ -88,7 +83,7 @@ class KeymanBase {
   // Stub functions (defined later in code only if required)
   setDefaultDeviceOptions(opt){}     
   getStyleSheetPath(s){return s;}
-  getKeyboardPath(f, p){return f;}
+  getKeyboardPath(f, p?){return f;}
   KC_(n, ln, Pelem){return '';} 
   handleRotationEvents(){}
   alignInputs(b){}
@@ -103,6 +98,9 @@ class KeymanBase {
 
   constructor() {
     this.util = this['util'] = new Util(this);
+    this.osk = this['osk'] = {ready:false};
+    this.keyboardManager = new KeyboardManager(this);
+    this.domManager = new DOMManager(this);
 
     // Load properties from their static variants.
     this['build'] = KeymanBase.__BUILD__;
@@ -128,6 +126,220 @@ class KeymanBase {
   ['isFontAvailable'](fName: string): boolean {
     return this.util.checkFont({'family':fName});
   }
+
+  /**
+   * Function     addEventListener
+   * Scope        Public
+   * @param       {string}            event     event to handle
+   * @param       {function(Event)}   func      event handler function
+   * @return      {boolean}                     value returned by util.addEventListener
+   * Description  Wrapper function to add and identify KeymanWeb-specific event handlers
+   */       
+  addEventListener(event: string, func): boolean {
+    return this.util.addEventListener('kmw.'+event, func);
+  }
+
+    /**
+   * Function     _GetEventObject
+   * Scope        Private   
+   * @param       {Event=}     e     Event object if passed by browser
+   * @return      {Event|null}       Event object              
+   * Description Gets the event object from the window when using Internet Explorer
+   *             and handles getting the event correctly in frames 
+   */     
+  _GetEventObject<E extends Event>(e: E) {  // I2404 - Attach to controls in IFRAMEs
+    if (!e) {
+      e = window.event as E;
+      if(!e) {
+        var elem: HTMLElement|Document = (<any>this)._GetLastActiveElement();
+        if(elem) {
+          elem = elem.ownerDocument;
+          var win: Window;
+          if(elem) {
+            win = elem.parentWindow;
+          }
+          if(!win) {
+            return null;
+          }
+          
+          e = win.event as E;
+        }
+      }
+    }
+    
+    return e;    
+  }
+
+  // Base object API definitions
+
+  /**
+   * Function     attachToControl
+   * Scope        Public
+   * @param       {Element}    Pelem       Element to which KMW will be attached
+   * Description  Attaches KMW to control (or IFrame) 
+   */  
+  ['attachToControl'](Pelem: HTMLElement) {
+    this.domManager.attachToControl(Pelem);
+  }
+
+  /**
+   * Function     detachFromControl
+   * Scope        Public
+   * @param       {Element}    Pelem       Element from which KMW will detach
+   * Description  Detaches KMW from a control (or IFrame) 
+   */  
+  ['detachFromControl'](Pelem: HTMLElement) {
+    this.domManager.detachFromControl(Pelem);
+  }
+
+  /**
+   * Exposed function to load keyboards by name. One or more arguments may be used
+   * 
+   * @param {string|Object} x keyboard name string or keyboard metadata JSON object
+   * 
+   */  
+  ['addKeyboards'](x) {                       
+    if(arguments.length == 0) {
+      this.keyboardManager.keymanCloudRequest('',false);
+    } else {
+      this.keyboardManager.addKeyboardArray(arguments);
+    }
+  }
+  
+  /**
+   *  Add default or all keyboards for a given language
+   *  
+   *  @param  {string}   arg    Language name (multiple arguments allowed)
+   **/           
+  ['addKeyboardsForLanguage'](arg) {
+    this.keyboardManager.addLanguageKeyboards(arguments);
+  }
+  
+  /**
+   * Call back from cloud for adding keyboard metadata
+   * 
+   * @param {Object}    x   metadata object
+   **/                  
+  ['register'](x) {                     
+    this.keyboardManager.register(x);
+  }
+
+  /**
+   * Build 362: removeKeyboards() remove keyboard from list of available keyboards
+   * 
+   * @param {string} x keyboard name string
+   * 
+   */  
+  ['removeKeyboards'](x) {
+    return this.keyboardManager.removeKeyboards(x);
+  }
+
+  /**
+   * Allow to change active keyboard by (internal) keyboard name
+   * 
+   * @param       {string}    PInternalName   Internal name
+   * @param       {string}    PLgCode         Language code
+   */    
+  ['setActiveKeyboard'](PInternalName: string, PLgCode: string) {
+    this.keyboardManager.setActiveKeyboard(PInternalName,PLgCode);
+  }
+  
+  /**
+   * Function     getActiveKeyboard
+   * Scope        Public
+   * @return      {string}      Name of active keyboard
+   * Description  Return internal name of currently active keyboard
+   */    
+  ['getActiveKeyboard'](): string {
+    return this.keyboardManager.getActiveKeyboardName();
+  }
+
+  /**
+   * Function    getActiveLanguage
+   * Scope       Public
+   * @return     {string}         language code
+   * Description Return language code for currently selected language
+   */    
+  ['getActiveLanguage'](): string {
+    return this.keyboardManager.getActiveLanguage();
+  }
+
+  ['isAttached'](x: HTMLElement): boolean {
+    return this.domManager.isAttached(x);
+  }
+
+  /**
+   * Function    isCJK
+   * Scope       Public
+   * @param      {Object=}  k0 
+   * @return     {boolean}
+   * Description Tests if active keyboard (or optional argument) uses a pick list (Chinese, Japanese, Korean, etc.)
+   *             (This function accepts either keyboard structure.)   
+   */    
+  ['isCJK'](k0) { 
+    return this.keyboardManager.isCJK(k0);
+  }
+
+  /**
+   * Function     isChiral
+   * Scope        Public
+   * @param       {string|Object=}   k0
+   * @return      {boolean}
+   * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
+   */
+  ['isChiral'](k0?) {
+    return this.keyboardManager.isChiral(k0);
+  }
+
+  /**
+   * Get keyboard meta data for the selected keyboard and language
+   * 
+   * @param       {string}    PInternalName     Internal name of keyboard
+   * @param       {string=}   PlgCode           language code
+   * @return      {Object}                      Details of named keyboard 
+   *                                            
+   **/    
+  ['getKeyboard'](PInternalName: string, PlgCode?: string) {
+    var Ln, Lrn;
+
+    var kbdList = this.keyboardManager.getDetailedKeyboards();
+
+    for(Ln=0; Ln < kbdList.length; Ln++) {
+      Lrn = kbdList[Ln];
+
+      if(Lrn['InternalName'] == PInternalName || Lrn['InternalName'] == "Keyboard_" + PInternalName) { 
+        if(arguments.length < 2) {
+          return Lrn;
+        }
+
+        if(Lrn['LanguageCode'] == PlgCode) {
+          return Lrn;
+        }
+      } 
+    }
+
+    return null;
+  }
+  
+  /**
+   * Get array of available keyboard stubs 
+   * 
+   * @return   {Array}     Array of available keyboards
+   * 
+   */    
+  ['getKeyboards']() {
+    return this.keyboardManager.getDetailedKeyboards();
+  }
+
+  /**
+   * Function     Initialization
+   * Scope        Public
+   * @param       {Object}  arg     object array of user-defined properties
+   * Description  KMW window initialization  
+   */    
+  ['init'](arg) {
+    this.domManager.init(arg);
+  }
 }
 
 /**
@@ -146,9 +358,7 @@ KeymanBase._rootPath = sPath.replace(/(https?:\/\/)([^\/]*)(.*)/,'$1$2/');
 KeymanBase._protocol = sPath.replace(/(.{3,5}:)(.*)/,'$1');
 
 /** @define {number} build counter that gets set by the build environment */
-keyman.__BUILD__ = 299;
-// A static-variable redirect to preserve the value for initialization.
-KeymanBase.__BUILD__ = keyman.__BUILD__;
+KeymanBase.__BUILD__ = 299;
 
 /**  
  * Base code: Declare major component namespaces, instances, and utility functions 
@@ -158,14 +368,15 @@ KeymanBase.__BUILD__ = keyman.__BUILD__;
 if(!window['keyman']['loaded']) {
 
   (function() {
+    // The base object call may need to be moved into a separate, later file eventually.
+    // It will be necessary to override methods with kmwnative.ts and kmwembedded.ts before the
+    // affected objects are initialized.
     var keymanweb = window['keyman'] = new KeymanBase();
     
     // Define public OSK, user interface and utility function objects 
 
-    var osk: any;
-    osk = keymanweb['osk'] = {ready:false};
-    var ui: any;
-    ui = keymanweb['ui'] = {};
+    var osk: any = keymanweb['osk'];
+    var ui: any = keymanweb['ui'] = {};
     
     var kbdInterface = keymanweb['interface'] = {
       // Cross-reference with /windows/src/global/inc/Compiler.h - these are the Developer codes for the respective system stores.
