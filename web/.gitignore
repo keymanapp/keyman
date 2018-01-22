@@ -1,6 +1,13 @@
+# Legacy build folders.
 output/
 build/
 embedded/
+
+# Current build folders.
+intermediate/
+release/
+
+# Other local files.
 node_modules/
 **/.idea/**/*.xml
 **/*.iml

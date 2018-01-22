@@ -73,7 +73,7 @@ if(!window['keyman']['initialized']) {
      * Description  Register and load the keyboard
      */    
     KeymanWeb['KR'] = kbdInterface['registerKeyboard'] = kbdInterface.registerKeyboard = function(Pk) {
-      keymanweb.keyboardManager._RegisterKeyboard(Pk);
+      keymanweb.keyboardManager._registerKeyboard(Pk);
     }
 
     /**
@@ -86,7 +86,7 @@ if(!window['keyman']['initialized']) {
      * @return      {?number}               1 if already registered, else null
      */
     KeymanWeb['KRS'] = kbdInterface['registerStub'] = kbdInterface.registerStub = function(Pstub) {
-      return keymanweb.keyboardManager._RegisterStub(Pstub);
+      return keymanweb.keyboardManager._registerStub(Pstub);
     }
 
     /**

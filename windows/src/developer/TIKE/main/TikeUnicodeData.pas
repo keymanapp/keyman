@@ -24,7 +24,7 @@ begin
   with TRegistryErrorControlled.Create do  // I3463
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeymanDeveloper) and ValueExists(SRegValue_RootPath)
+    if OpenKeyReadOnly(SRegKey_KeymanDeveloper_LM) and ValueExists(SRegValue_RootPath)
       then FUnicodePath := IncludeTrailingPathDelimiter(ReadString(SRegValue_RootPath))
       else FUnicodePath := '';
   finally

@@ -57,17 +57,17 @@ begin
   KL.MethodEnter(nil, 'Uninstall', []);
   try
     { I985: desktop_xxx.pxx not removed from registry at uninstall }
-    if RegOpenKeyEx(HKEY_CURRENT_USER, PChar(SRegKey_WindowsRun), 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then
+    if RegOpenKeyEx(HKEY_CURRENT_USER, PChar(SRegKey_WindowsRun_CU), 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then
     begin
       RegDeleteValue(hk, PChar(SRegValue_WindowsRun_Keyman));
       RegCloseKey(hk);
     end
     else
-      KL.LogError('Uninstall: unable to delete startup entry '+SRegValue_WindowsRun_Keyman+' in '+SRegKey_WindowsRun+': '+SysErrorMessage(GetLastError));
+      KL.LogError('Uninstall: unable to delete startup entry '+SRegValue_WindowsRun_Keyman+' in '+SRegKey_WindowsRun_CU+': '+SysErrorMessage(GetLastError));
 
-    if RegOpenKeyEx(HKEY_CURRENT_USER, SRegKey_ActiveKeyboards, 0, KEY_READ, hkey) = ERROR_SUCCESS then  // I1729
+    if RegOpenKeyEx(HKEY_CURRENT_USER, SRegKey_ActiveKeyboards_CU, 0, KEY_READ, hkey) = ERROR_SUCCESS then  // I1729
     begin
-      if RegCreateKeyEx(HKEY_CURRENT_USER, SRegKey_UninstallBackupKeyboards, 0, nil, 0, KEY_ALL_ACCESS, nil, hkeyBackup, nil) = ERROR_SUCCESS then
+      if RegCreateKeyEx(HKEY_CURRENT_USER, SRegKey_UninstallBackupKeyboards_CU, 0, nil, 0, KEY_ALL_ACCESS, nil, hkeyBackup, nil) = ERROR_SUCCESS then
       begin
         cValueName := SizeOf(szValueName) div SizeOf(szValueName[0]);
         cbData := SizeOf(szData);
@@ -85,7 +85,7 @@ begin
       RegCloseKey(hkey);
     end;
 
-    if RegOpenKeyEx(HKEY_CURRENT_USER, SRegKey_InternetExplorerFeatureBrowserEmulation, 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then   // I4436
+    if RegOpenKeyEx(HKEY_CURRENT_USER, SRegKey_InternetExplorerFeatureBrowserEmulation_CU, 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then   // I4436
     begin
       RegDeleteValue(hk, Pchar(TKeymanPaths.S_KMShell));
       RegDeleteValue(hk, Pchar(TKeymanPaths.S_KeymanExe));
@@ -98,24 +98,19 @@ end;
 
 procedure RollbackCU;
 begin
-  RegDeleteKey(HKEY_CURRENT_USER, PChar(SregKey_KeymanHotkeys));
-  RegDeleteKey(HKEY_CURRENT_USER, PChar(SRegKey_LanguageHotkeys));
-  RegDeleteKey(HKEY_CURRENT_USER, PChar(SRegKey_KeymanEngine));
-  RegDeleteKey(HKEY_CURRENT_USER, PChar(SRegKey_KeymanEngineRoot));
-  RegDeleteKey(HKEY_CURRENT_USER, PChar(SRegKey_KeymanRoot));
+  RegDeleteKey(HKEY_CURRENT_USER, PChar(SregKey_KeymanHotkeys_CU));
+  RegDeleteKey(HKEY_CURRENT_USER, PChar(SRegKey_LanguageHotkeys_CU));
+  RegDeleteKey(HKEY_CURRENT_USER, PChar(SRegKey_KeymanEngine_CU));
+  RegDeleteKey(HKEY_CURRENT_USER, PChar(SRegKey_KeymanEngineRoot_CU));
+  RegDeleteKey(HKEY_CURRENT_USER, PChar(SRegKey_KeymanRoot_CU));
 end;
 
 procedure RollbackLM;
 begin
-  RegDeleteKey(HKEY_CURRENT_USER, PChar(SregKey_KeymanHotkeys));
-  RegDeleteKey(HKEY_CURRENT_USER, PChar(SRegKey_LanguageHotkeys));
-  RegDeleteKey(HKEY_CURRENT_USER, PChar(SRegKey_KeymanEngine));
-  RegDeleteKey(HKEY_CURRENT_USER, PChar(SRegKey_KeymanEngineRoot));
-  RegDeleteKey(HKEY_CURRENT_USER, PChar(SRegKey_KeymanRoot));
-
-  RegDeleteKey(HKEY_LOCAL_MACHINE, PChar(SRegKey_KeymanEngine));
-  RegDeleteKey(HKEY_LOCAL_MACHINE, PChar(SRegKey_KeymanEngineRoot));
-  RegDeleteKey(HKEY_LOCAL_MACHINE, PChar(SRegKey_KeymanRoot));
+  RollbackCU; // Because we could be in a different user context, we'll clean CU as well as LM now
+  RegDeleteKey(HKEY_LOCAL_MACHINE, PChar(SRegKey_KeymanEngine_LM));
+  RegDeleteKey(HKEY_LOCAL_MACHINE, PChar(SRegKey_KeymanEngineRoot_LM));
+  RegDeleteKey(HKEY_LOCAL_MACHINE, PChar(SRegKey_KeymanRoot_LM));
 end;
 
 procedure Run;

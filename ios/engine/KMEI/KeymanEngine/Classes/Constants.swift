@@ -19,6 +19,7 @@ public enum Key {
   static let engineVersion = "KeymanEngineVersion"
   static let keyboardPickerDisplayed = "KeyboardPickerDisplayed"
   static let synchronizeSWKeyboard = "KeymanSynchronizeSWKeyboard"
+  static let migrationLevel = "KeymanEngineMigrationLevel"
 
   // JSON keys for language REST calls
   static let options = "options"
@@ -53,7 +54,7 @@ public enum Resources {
   }()
 
   public static let oskFontFilename = "keymanweb-osk.ttf"
-  static let kmwFileName = "keyboard.html"
+  static let kmwFilename = "keyboard.html"
 }
 
 public enum Util {

@@ -37,11 +37,15 @@ function GetShortPackageName(const FileName: string): string;
 function GetPackageInstallPath(const FileName: string): string;
 function GetKeyboardInstallPath(const FileName: string; FPackage: Boolean = False): string;
 
-function GetRegistryKeyboardInstallKey(const FileName: string): string;
-function GetRegistryPackageInstallKey(const FileName: string): string;
-function GetRegistryKeyboardActiveKey(const FileName: string): string;
+function GetRegistryKeyboardInstallKey_CU(const FileName: string): string;
+function GetRegistryKeyboardInstallKey_LM(const FileName: string): string;
+function GetRegistryPackageInstallKey_CU(const FileName: string): string;
+function GetRegistryPackageInstallKey_LM(const FileName: string): string;
 
-function GetKeyboardFullName(InstByAdmin: Boolean; const KeyboardName: string): string;
+function GetRegistryKeyboardActiveKey_CU(const FileName: string): string;
+
+function GetKeyboardFullName_LM(const KeyboardName: string): string;
+function GetKeyboardFullName_CU(const KeyboardName: string): string;
 
 function KeyboardInstalled(const KeyboardName: string; var FIsAdmin: Boolean): Boolean;
 function KeyboardIsPartOfPackage(KeyboardName: string; out PackageName: string): Boolean;
@@ -102,22 +106,32 @@ begin
   Result := TKeymanPaths.KeyboardsInstallPath(s);
 end;
 
-function GetRegistryKeyboardInstallKey(const FileName: string): string;
+function GetRegistryKeyboardInstallKey_CU(const FileName: string): string;
 begin
-  Result := SRegKey_InstalledKeyboards+'\'+GetShortKeyboardName(FileName);
+  Result := SRegKey_InstalledKeyboards_CU+'\'+GetShortKeyboardName(FileName);
 end;
 
-function GetRegistryPackageInstallKey(const FileName: string): string;
+function GetRegistryKeyboardInstallKey_LM(const FileName: string): string;
 begin
-  Result := SRegKey_InstalledPackages+'\'+GetShortKeyboardName(FileName);
+  Result := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(FileName);
 end;
 
-function GetRegistryKeyboardActiveKey(const FileName: string): string;
+function GetRegistryPackageInstallKey_CU(const FileName: string): string;
 begin
-  Result := SRegKey_ActiveKeyboards+'\'+GetShortKeyboardName(FileName);
+  Result := SRegKey_InstalledPackages_CU+'\'+GetShortKeyboardName(FileName);
 end;
 
-function GetKeyboardFullName(InstByAdmin: Boolean; const KeyboardName: string): string;
+function GetRegistryPackageInstallKey_LM(const FileName: string): string;
+begin
+  Result := SRegKey_InstalledPackages_LM+'\'+GetShortKeyboardName(FileName);
+end;
+
+function GetRegistryKeyboardActiveKey_CU(const FileName: string): string;
+begin
+  Result := SRegKey_ActiveKeyboards_CU+'\'+GetShortKeyboardName(FileName);
+end;
+
+function GetKeyboardFullName_CU(const KeyboardName: string): string;
 var
   s: string;
   ki: TKeyboardInfo;
@@ -125,11 +139,9 @@ begin
   Result := KeyboardName;
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if InstByAdmin // as determined by where the keyboard was installed
-      then RootKey := HKEY_LOCAL_MACHINE
-      else RootKey := HKEY_CURRENT_USER;
+    RootKey := HKEY_CURRENT_USER;
 
-    if OpenKeyReadOnly(SRegKey_InstalledKeyboards+'\'+KeyboardName) and ValueExists(SRegValue_KeymanFile) then
+    if OpenKeyReadOnly(SRegKey_InstalledKeyboards_CU+'\'+KeyboardName) and ValueExists(SRegValue_KeymanFile) then
     begin
       s := ReadString(SRegValue_KeymanFile);
       try
@@ -144,6 +156,30 @@ begin
   end;
 end;
 
+function GetKeyboardFullName_LM(const KeyboardName: string): string;
+var
+  s: string;
+  ki: TKeyboardInfo;
+begin
+  Result := KeyboardName;
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    RootKey := HKEY_LOCAL_MACHINE;
+
+    if OpenKeyReadOnly(SRegKey_InstalledKeyboards_LM+'\'+KeyboardName) and ValueExists(SRegValue_KeymanFile) then
+    begin
+      s := ReadString(SRegValue_KeymanFile);
+      try
+        GetKeyboardInfo(s, False, ki);
+        Result := ki.KeyboardName;
+      except
+        ;
+      end;
+    end;
+  finally
+    Free;
+  end;
+end;
 
 function KeyboardInstalled(const KeyboardName: string; var FIsAdmin: Boolean): Boolean;
 var
@@ -156,14 +192,14 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(GetRegistryKeyboardInstallKey(s)) then
+    if OpenKeyReadOnly(GetRegistryKeyboardInstallKey_LM(s)) then
     begin
       FIsAdmin := True;
       Result := True;
       Exit;
     end;
     RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(GetRegistryKeyboardInstallKey(s)) then
+    if OpenKeyReadOnly(GetRegistryKeyboardInstallKey_CU(s)) then
     begin
       FIsAdmin := False;
       Result := True;
@@ -180,6 +216,7 @@ end;
 function KeyboardIsPartOfPackage(KeyboardName: string; out PackageName: string): Boolean;
 var
   FIsAdmin: Boolean;
+  Path: string;
 begin
   Result := False;
 
@@ -188,11 +225,18 @@ begin
 
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if FIsAdmin
-      then RootKey := HKEY_LOCAL_MACHINE
-      else RootKey := HKEY_CURRENT_USER;
+    if FIsAdmin then
+    begin
+      RootKey := HKEY_LOCAL_MACHINE;
+      Path := GetRegistryKeyboardInstallKey_LM(KeyboardName);
+    end
+    else
+    begin
+      RootKey := HKEY_CURRENT_USER;
+      Path := GetRegistryKeyboardInstallKey_CU(KeyboardName);
+    end;
 
-    if not OpenKeyReadOnly(GetRegistryKeyboardInstallKey(KeyboardName)) or not ValueExists(SRegValue_PackageName) then
+    if not OpenKeyReadOnly(Path) or not ValueExists(SRegValue_PackageName) then
       Exit;
 
     PackageName := ReadString(SRegValue_PackageName);
@@ -210,14 +254,14 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(GetRegistryPackageInstallKey(s)) then
+    if OpenKeyReadOnly(GetRegistryPackageInstallKey_LM(s)) then
     begin
       FIsAdmin := True;
       Result := True;
       Exit;
     end;
     RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(GetRegistryPackageInstallKey(s)) then
+    if OpenKeyReadOnly(GetRegistryPackageInstallKey_CU(s)) then
     begin
       FIsAdmin := False;
       Result := True;
@@ -238,7 +282,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeymanEngine) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) then
       if ValueExists(SRegValue_RootPath) then
         RootPath := ReadString(SRegValue_RootPath);
   finally

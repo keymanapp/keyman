@@ -87,6 +87,8 @@ class KeymanBase {
   KC_(n, ln, Pelem){return '';} 
   handleRotationEvents(){}
   alignInputs(b){}
+  namespaceID(Pstub) {};
+  preserveID(Pk) {};
 
   setInitialized(val: number) {
     this.initialized = this['initialized'] = val;

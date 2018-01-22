@@ -109,7 +109,7 @@ Keyman can be built from the command line with Delphi Starter Edition. You will 
 to set the environment variable `DELPHI_STARTER` to enable a command line build with
 Delphi Starter Edition.
 
-However, there are three limitations:
+However, there are four limitations:
 
 1. As the command line compiler is not included in Delphi Starter Edition, the build 
    launches an instance of the IDE to run the build. This means that while you are doing
@@ -118,11 +118,14 @@ However, there are three limitations:
    full build from the command line, you should be able to build individual projects 
    within the IDE.
    
-2. Delphi Starter Edition does not include the x64 compiler, so tsysinfox64 will be 
-   copied from a binary already in the repository. tsysinfox64 is the only 64-bit
-   Delphi component.
+2. Delphi Starter Edition does not include the x64 compiler, impacting tsysinfo and
+   kmcomapi. tsysinfox64 will be copied from a binary already in the repository. 
+   The x64 version of kmcomapi.dll will not be skipped.
 
 3. The encumbered components cannot be built with Delphi Starter Edition.
+
+4. You cannot make a release build with Delphi Starter due to the missing x64 
+   components.
 
 ### USERDEFINES - User Defines
 

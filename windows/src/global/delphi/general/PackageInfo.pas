@@ -52,6 +52,7 @@ uses
 { Package Information Classes }
 
 function GetJsonValueString(o: TJSONObject; const n: string): string;
+function GetJsonValueBool(o: TJSONObject; const n: string): Boolean;
 
 type
   TPackageInfoEntryType = (pietName, pietVersion, pietCopyright, pietAuthor, pietWebsite, pietOther);
@@ -154,7 +155,6 @@ type
     property ExecuteProgram: WideString read FExecuteProgram write SetExecuteProgram;
     property ReadmeFile: TPackageContentFile read FReadmeFile write SetReadmeFile;
     property GraphicFile: TPackageContentFile read FGraphicFile write SetGraphicFile;
-
   end;
 
   { Package Information }
@@ -1097,8 +1097,7 @@ begin
 
   Path := GetJsonValueString(ANode, SJSON_StartMenu_Folder);
   DoCreate := Path <> '';
-  AddUninstallEntry := Assigned(ANode.Values[SJSON_StartMenu_AddUninstallEntry]) and
-    (ANode.Values[SJSON_StartMenu_AddUninstallEntry] is TJSONTrue);
+  AddUninstallEntry := GetJsonValueBool(ANode, SJSON_StartMenu_AddUninstallEntry);
   Entries.LoadJSON(ANode);
 end;
 
@@ -2041,6 +2040,11 @@ begin
   if not Assigned(v)
     then Result := ''
     else Result := Trim(v.Value);
+end;
+
+function GetJsonValueBool(o: TJSONObject; const n: string): Boolean;
+begin
+  Result := Assigned(o.Values[n]) and (o.Values[n] is TJSONTrue);
 end;
 
 end.

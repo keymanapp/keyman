@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{7A8E88E4-B407-442B-9A53-DE6F43F1C0F1}</ProjectGuid>
-        <ProjectVersion>18.2</ProjectVersion>
+        <ProjectVersion>18.3</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <MainSource>KeyboardPackageVersionsTestSuite.dpr</MainSource>
         <Base>True</Base>
@@ -155,7 +155,6 @@
         <DCCReference Include="..\..\global\delphi\general\UKeymanTargets.pas"/>
         <DCCReference Include="..\..\developer\TIKE\compile\CompileKeymanWeb.pas"/>
         <DCCReference Include="..\..\global\delphi\general\CompileErrorCodes.pas"/>
-        <DCCReference Include="..\..\global\delphi\kmw\JSONKeyboardInfo.pas"/>
         <DCCReference Include="..\..\developer\TIKE\main\KeyboardParser.pas"/>
         <DCCReference Include="..\..\global\delphi\general\WindowsLanguages.pas"/>
         <DCCReference Include="..\..\developer\TIKE\compile\KeymanWebKeyCodes.pas"/>
@@ -173,6 +172,7 @@
         <DCCReference Include="..\..\global\delphi\general\CompilePackageInstaller.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilhttp.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UMD5Hash.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

@@ -52,8 +52,6 @@ type
 
 implementation
 
-uses Windows, ComServ, ErrorControlledRegistry, RegistryKeys, SysUtils, keymanerrorcodes, Variants;
-
 constructor TKeymanHotkey.Create(AContext: TKeymanContext;
   AHotkeyValue: Integer; ATarget: KeymanHotkeyTarget);
 begin

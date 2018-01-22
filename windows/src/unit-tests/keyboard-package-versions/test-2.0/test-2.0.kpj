@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_945bdc45239ebff24e692e6aa5a615ca</ID>
+      <Filename>test.kmn</Filename>
+      <Filepath>test.kmn</Filepath>
+      <FileVersion>2.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Keyboard Version Test</Name>
+      </Details>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

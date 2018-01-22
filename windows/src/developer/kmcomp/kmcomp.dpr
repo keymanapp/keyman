@@ -82,7 +82,6 @@ uses
   ProjectLog in '..\TIKE\project\ProjectLog.pas',
   UMD5Hash in '..\..\global\delphi\general\UMD5Hash.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
-  JSONKeyboardInfo in '..\..\global\delphi\kmw\JSONKeyboardInfo.pas',
   VisualKeyboardLoaderBinary in '..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas',
   VisualKeyboardLoaderXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas',
   VisualKeyboardSaverBinary in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas',
@@ -96,7 +95,10 @@ uses
   Keyman.System.KeyboardUtils in '..\..\global\delphi\keyboards\Keyman.System.KeyboardUtils.pas',
   Keyman.System.KMXFileLanguages in '..\..\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas',
   Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
-  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas';
+  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
+  Keyman.System.KeyboardInfoFile in '..\..\global\delphi\keyboards\Keyman.System.KeyboardInfoFile.pas',
+  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
+  Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas';
 
 {$R icons.RES}
 {$R version.res}

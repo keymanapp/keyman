@@ -124,7 +124,7 @@ begin
   node := xmlAddChild(rootnode,'Languages');
   subnode := xmlAddChild(node,'Registry');
   regnode := xmlAddChild(subnode,'LocalMachine');
-  AddRegistry(regnode, HKEY_LOCAL_MACHINE, SRegKey_KeyboardLayouts);
+  AddRegistry(regnode, HKEY_LOCAL_MACHINE, SRegKey_KeyboardLayouts_LM);
   AddRegistry(regnode, HKEY_LOCAL_MACHINE, 'Software\Microsoft\CTF');
   AddRegistry(regnode, HKEY_LOCAL_MACHINE, 'System\CurrentControlSet\Control\Nls');
 
@@ -144,7 +144,7 @@ begin
   FLocaleNode := nil;
 
   regnode := xmlAddChild(subnode,'CurrentUser');
-  AddRegistry(regnode, HKEY_CURRENT_USER, SRegKey_KeyboardLayout);
+  AddRegistry(regnode, HKEY_CURRENT_USER, SRegKey_KeyboardLayout_CU);
   subnode := xmlAddChild(node,'Uniscribe');
   AddFileVersion(subnode, GetFolderPath(CSIDL_SYSTEM) + 'usp10.dll');
   str := TStringList.Create;

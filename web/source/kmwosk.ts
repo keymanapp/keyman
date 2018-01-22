@@ -1322,7 +1322,7 @@ if(!window['keyman']['initialized']) {
      **/
     osk.showLanguageMenu = function()
     {
-      var n=0,kbdList=(<KeymanBase>keymanweb).keyboardManager.keyboardStubs,nKbds=kbdList.length;
+      var n=0,kbdList=keymanweb.keyboardManager.keyboardStubs,nKbds=kbdList.length;
       if(nKbds < 1) return;
 
       // Create the menu list container element

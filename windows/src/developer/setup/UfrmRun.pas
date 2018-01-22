@@ -752,7 +752,7 @@ procedure TfrmRun.PrepareForReboot(res: Cardinal);
 begin
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKey(SRegKey_WindowsRunOnce, True) then
+    if OpenKey(SRegKey_WindowsRunOnce_CU, True) then
       WriteString(SRegValue_WindowsRunOnce_Setup, '"'+ParamStr(0)+'" -c');
   finally
     Free;

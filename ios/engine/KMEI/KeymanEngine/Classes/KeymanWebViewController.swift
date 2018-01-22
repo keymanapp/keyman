@@ -11,6 +11,7 @@ import WebKit
 
 // MARK: - UIViewController
 class KeymanWebViewController: UIViewController {
+  let storage: Storage
   weak var delegate: KeymanWebDelegate?
   var webView: WKWebView!
 
@@ -20,6 +21,15 @@ class KeymanWebViewController: UIViewController {
         view.frame = frame
       }
     }
+  }
+
+  init(storage: Storage) {
+    self.storage = storage
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func loadView() {
@@ -62,10 +72,7 @@ extension KeymanWebViewController {
       let y = CGFloat(Float(components[1])!)
       let w = CGFloat(Float(components[2])!)
       let h = CGFloat(Float(components[3])!)
-      let isPad = UIDevice.current.userInterfaceIdiom == .pad
-      let adjY: CGFloat = isPad ? -0.5 : -1.0
-      let frame = CGRect(x: x - w / 2.0, y: y - adjY, width: w, height: h)
-      completion(frame)
+      completion(KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h))
     }
   }
 
@@ -121,26 +128,20 @@ extension KeymanWebViewController {
     // family does not have to match the name in the font file. It only has to be unique.
     return [
       "family": "\(keyboardID)__\(isOsk ? "osk" : "display")",
-      "files": font.source
+      "files": font.source.map { storage.fontURL(forKeyboardID: keyboardID, filename: $0).absoluteString }
     ]
   }
 
-  func setKeyboard(id: String,
-                   name: String,
-                   languageID: String,
-                   languageName: String,
-                   fileURL: URL,
-                   font: Font?,
-                   oskFont: Font?) {
+  func setKeyboard(_ keyboard: InstallableKeyboard) {
     var stub: [String: Any] = [
-      "KI": "Keyboard_\(id)",
-      "KN": name,
-      "KLC": languageID,
-      "KL": languageName,
-      "KF": fileURL.absoluteString
+      "KI": "Keyboard_\(keyboard.id)",
+      "KN": keyboard.name,
+      "KLC": keyboard.languageID,
+      "KL": keyboard.languageName,
+      "KF": storage.keyboardURL(for: keyboard).absoluteString
     ]
-    let displayFont = fontObject(from: font, keyboardID: id, isOsk: false)
-    let oskFont = fontObject(from: oskFont, keyboardID: id, isOsk: true) ?? displayFont
+    let displayFont = fontObject(from: keyboard.font, keyboardID: keyboard.id, isOsk: false)
+    let oskFont = fontObject(from: keyboard.oskFont, keyboardID: keyboard.id, isOsk: true) ?? displayFont
     if let displayFont = displayFont {
       stub["KFont"] = displayFont
     }
@@ -160,6 +161,7 @@ extension KeymanWebViewController {
       return
     }
 
+    log.debug("Keyboard stub: \(stubString)")
     webView.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
   }
 }
@@ -198,7 +200,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       let h = CGFloat(Float(fragment[hKey.upperBound..<tKey.lowerBound])!)
       let t = String(fragment[tKey.upperBound...])
 
-      let frame = keyFrame(x: x, y: y, w: w, h: h)
+      let frame = KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h)
       let preview = t.stringFromUTF16CodeUnits() ?? ""
       showKeyPreview(self, keyFrame: frame, preview: preview)
       delegate?.showKeyPreview(self, keyFrame: frame, preview: preview)
@@ -218,7 +220,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       let y = CGFloat(Float(frameComponents[1])!)
       let w = CGFloat(Float(frameComponents[2])!)
       let h = CGFloat(Float(frameComponents[3])!)
-      let frame = keyFrame(x: x, y: y, w: w, h: h)
+      let frame = KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h)
 
       let keyArray = keys.components(separatedBy: ";")
       var subkeyIDs: [String] = []
@@ -273,10 +275,9 @@ extension KeymanWebViewController: WKScriptMessageHandler {
     }
   }
 
-  private func keyFrame(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat) -> CGRect {
-    let isPad = UIDevice.current.userInterfaceIdiom == .pad
-    let adjY: CGFloat = isPad ? -0.5 : -1.0
-    return CGRect(x: x - w / 2.0, y: y - adjY, width: w, height: h)
+  private static func keyFrame(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat) -> CGRect {
+    // kmw adds w/2 to x.
+    return CGRect(x: x - w / 2.0, y: y, width: w, height: h)
   }
 }
 
@@ -286,7 +287,7 @@ extension KeymanWebViewController: WKNavigationDelegate {
     guard let url = webView.url else {
       return
     }
-    guard url.lastPathComponent == Resources.kmwFileName && (url.fragment?.isEmpty ?? true) else {
+    guard url.lastPathComponent == Resources.kmwFilename && (url.fragment?.isEmpty ?? true) else {
       return
     }
     keyboardLoaded(self)
