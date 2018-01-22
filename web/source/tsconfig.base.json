@@ -2,7 +2,7 @@
   "compilerOptions": {
 	"allowJs": true,
 	"module": "system",
-	"outDir": "../build/",
+	"outDir": "../intermediate/",
 	"sourceMap": true,
 	"target": "es5"
   }

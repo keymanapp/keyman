@@ -109,9 +109,9 @@ copy_resources ( ) {
 }
 
 # Definition of global compile constants
-WEB_OUTPUT="../output"
-EMBED_OUTPUT="../embedded"
-INTERMEDIATE="../build"
+WEB_OUTPUT="../release/web"
+EMBED_OUTPUT="../release/embedded"
+INTERMEDIATE="../intermediate"
 SOURCE="."
 NODE_SOURCE="source"
 
