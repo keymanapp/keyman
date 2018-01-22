@@ -25,6 +25,15 @@ assert ( ) {
     fi
 }
 
+fail() {
+    FAILURE_MSG="$1"
+    if [[ "$FAILURE_MSG" == "" ]]; then
+        FAILURE_MSG="Unknown failure"
+    fi
+    echo "${ERROR_RED}$FAILURE_MSG${NORMAL}"
+    exit 1
+}
+
 # Ensure the dependencies are downloaded.
 echo "Node.js + dependencies check"
 npm install
