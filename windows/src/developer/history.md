@@ -8,6 +8,8 @@
 * Keyman Developer visual editors now supports keyboards that distinguish left and right ctrl/alt for web/mobile targets (#342)
 * The `&version` store is now optional and the compiler will determine and report on the minimum version required if it is not present (#334)
 * Add support for processing `.keyboard_info` files to command line compiler (#331)
+* Packages can now include .js files for deployment to iOS and Android (#461)
+* The keyboard compiler now generates .js files that do not include version numbers in the filename (#528)
 
 ## 9.0.523 stable
 * Fix: When a longpress popup is being edited, selecting another primary key can copy the details to that key's popup (additional scenario, I4926)
