@@ -486,9 +486,9 @@ begin
   // in the keyboards repository
   if FMergingValidateIds then
   begin
-    if ChangeFileExt(FFilename, '') <> FBaseName+'-'+FVersion then
-      raise EInvalidKeyboardInfo.CreateFmt('jsFilename field is "%s" but should be "%s-%s.js"',
-        [FFilename, FVersion, FBaseName]);
+    if ChangeFileExt(FFilename, '') <> FBaseName then
+      raise EInvalidKeyboardInfo.CreateFmt('jsFilename field is "%s" but should be "%s.js"',
+        [FFilename, FBaseName]);
   end;
 end;
 
