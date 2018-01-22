@@ -9,5 +9,10 @@
 #ifndef KeymanEngineTestsStaticHelperMethods_h
 #define KeymanEngineTestsStaticHelperMethods_h
 
+#import "KMXFile.h"
+
+@interface KeymanEngineTestsStaticHelperMethods : NSObject
++ (KMXFile *)getKmxFileTestMacEngine;
+@end
 
 #endif /* KeymanEngineTestsStaticHelperMethods_h */

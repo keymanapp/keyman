@@ -7,3 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "KeymanEngineTestsStaticHelperMethods.h"
+
+@implementation KeymanEngineTestsStaticHelperMethods
+
++ (KMXFile *)getKmxFileTestMacEngine {
+    NSString *path = [[NSBundle bundleForClass:[KeymanEngineTestsStaticHelperMethods class]] pathForResource:@"TestMacEngine.kmx" ofType:nil];
+    KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
+    return kmxFile;
+}
+@end
