@@ -117,6 +117,7 @@ uses
   kmxfile,
   KeyboardFonts,
   KeymanDeveloperOptions,
+  Keyman.System.KeyboardUtils,
   ProjectLog,
   utilsystem,
   VisualKeyboard;
@@ -153,7 +154,7 @@ begin
 
   if FTargets * KMWKeymanTargets <> [] then
   begin
-    FJS := GetKeymanWebCompiledFileName(FileName, FileVersion);
+    FJS := TKeyboardUtils.GetKeymanWebCompiledFileName(FileName);
     CleanFile(FJS); // keyboard-x.y.js
     CleanFile(ChangeFileExt(FJS, '') + '_load.js'); // keyboard-x.y_load.js
     CleanFile(ChangeFileExt(FJS, '.json'), True); // keyboard-x.y_load.js
@@ -380,7 +381,7 @@ begin
   // There is no JS target if no target is specified
   if FTargets * KMWKeymanTargets = [] then
     Exit('');
-  Result := OwnerProject.GetTargetFilename(GetKeymanWebCompiledFileName(FileName, FileVersion), FileName, FileVersion);
+  Result := OwnerProject.GetTargetFilename(TKeyboardUtils.GetKeymanWebCompiledFileName(FileName), FileName, FileVersion);
 end;
 
 function TkmnProjectFile.GetOutputFilename: string;

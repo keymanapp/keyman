@@ -17,5 +17,9 @@ build:
 clean: def-clean
     -rd /s/q Win32
     -del *.kmp
+    -del test-1.0\*.kmx
+    -del test-2.0\*.kmx
+    -del test-1.0\*.js
+    -del test-2.0\*.js
 
 !include ..\..\Target.mak

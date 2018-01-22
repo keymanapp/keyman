@@ -10,11 +10,9 @@
       <ID>id_40ba94fbf72e9d4b1e17ea3cbc6e4287</ID>
       <Filename>test.kmn</Filename>
       <Filepath>test.kmn</Filepath>
-      <FileVersion>2.0</FileVersion>
+      <FileVersion>1.0</FileVersion>
       <FileType>.kmn</FileType>
-      <Details>
-        <Name>Keyboard Version Test</Name>
-      </Details>
+      <Details/>
     </File>
     <File>
       <ID>id_c2b8dd5a01247eb02a5e04810c683aa8</ID>
@@ -113,6 +111,14 @@
       <FileVersion></FileVersion>
       <FileType>.js</FileType>
       <ParentFileID>id_72fd974190b0a2c3f15f1b007f59a5dc</ParentFileID>
+    </File>
+    <File>
+      <ID>id_18c5220d18dc8ff0bcdbbf0794c7eb71</ID>
+      <Filename>test.js</Filename>
+      <Filepath>test-1.0\test.js</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.js</FileType>
+      <ParentFileID>id_bd45ee54943a72d5487db3299e7495a9</ParentFileID>
     </File>
   </Files>
 </KeymanDeveloperProject>

@@ -7,7 +7,7 @@
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Console</AppType>
         <FrameworkType>None</FrameworkType>
-        <ProjectVersion>18.2</ProjectVersion>
+        <ProjectVersion>18.3</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -184,7 +184,6 @@
         <DCCReference Include="..\TIKE\project\ProjectLog.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UMD5Hash.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
-        <DCCReference Include="..\..\global\delphi\kmw\JSONKeyboardInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>

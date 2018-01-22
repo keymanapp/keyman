@@ -222,8 +222,6 @@ uses
   UKeymanTargets in '..\..\global\delphi\general\UKeymanTargets.pas',
   UfrmSMTPSetup in 'dialogs\UfrmSMTPSetup.pas' {frmSMTPSetup},
   UfrmSendURLsToEmail in 'dialogs\UfrmSendURLsToEmail.pas' {frmSendURLsToEmail},
-  UframeJSONEditor in 'web\UframeJSONEditor.pas' {frameJSONEditor},
-  JSONKeyboardInfo in '..\..\global\delphi\kmw\JSONKeyboardInfo.pas',
   MSXMLDomCreate in '..\..\global\delphi\general\MSXMLDomCreate.pas',
   webhelp in 'help\webhelp.pas',
   UfrmProjectSettings in 'project\UfrmProjectSettings.pas' {frmProjectSettings},
