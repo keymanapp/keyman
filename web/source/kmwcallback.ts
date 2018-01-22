@@ -154,48 +154,7 @@ class KeyboardInterface {
    * Description  Register and load the keyboard
    */    
   registerKeyboard(Pk): void {
-    // If initialization not yet complete, list the keyboard to be registered on completion of initialization
-    if(!this.keymanweb['initialized']) {
-      this.keymanweb.deferredKR.push(Pk); return;
-    }
-    
-    var Li,Lstub;
-
-    // Check if the active stub refers to this keyboard, else find applicable stub
-
-    var Ps=this.keymanweb._ActiveStub, savedActiveStub = this.keymanweb._ActiveStub;
-    if(!Ps || !('KI' in Ps) || (Ps['KI'] != Pk['KI'])) {         
-      // Find the first stub for this keyboard
-      for(Lstub=0;Lstub < this.keymanweb._KeyboardStubs.length; Lstub++) { // I1511 - array prototype extended
-        Ps=this.keymanweb._KeyboardStubs[Lstub];
-        if(Pk['KI'] == Ps['KI'])break;
-        Ps=null;
-      }
-    } 
-    
-    // Build 369: ensure active stub defined when loading local keyboards 
-    if(this.keymanweb._ActiveStub == null && Ps != null) {
-      this.keymanweb._ActiveStub = Ps;
-    }
-    
-    // Register the stub for this language (unless it is already registered)
-    // keymanweb.KRS(Ps?Ps:Pk); 
-
-    // Test if keyboard already loaded
-    for(Li=0; Li<this.keymanweb._Keyboards.length; Li++) {
-      if(Pk['KI'] == this.keymanweb._Keyboards[Li]['KI']) {
-        return;
-      }
-    }
-  
-    // Append to keyboards array
-    this.keymanweb._Keyboards=this.keymanweb._push(this.keymanweb._Keyboards,Pk);
-
-    // Execute any external (UI) code needed after loading keyboard
-    (<any>this.keymanweb).doKeyboardLoaded(Pk['KI']);
-
-    // Restore the originally-active stub to its prior state.  No need to change it permanently.
-    this.keymanweb._ActiveStub = savedActiveStub;
+    this.keymanweb.keyboardManager._registerKeyboard(Pk);
   }
 
   /**
@@ -207,53 +166,8 @@ class KeyboardInterface {
    * @param       {Object}      Pstub     Keyboard stub object
    * @return      {?number}               1 if already registered, else null
    */    
-//var ts0=new Date().toTimeString().substr(3,5);
   registerStub(Pstub): number {
-    var Lk;
-    
-    // In initialization not complete, list the stub to be registered on completion of initialization
-    if(!this.keymanweb['initialized']) {
-      this.keymanweb.deferredKRS.push(Pstub);
-      return null;
-    }
-
-    // The default stub is always the first keyboard stub loaded [and will be ignored by desktop browsers - not for beta, anyway]
-    if(this.keymanweb.dfltStub == null) {
-      this.keymanweb.dfltStub=Pstub;
-      //if(device.formFactor == 'desktop') return 1;    //Needs further thought before release
-    }
-
-    // If no language code has been defined, and no stub has been registered for this keyboard, register with empty string as the language code
-    if(typeof(Pstub['KP']) == 'undefined') {
-      Pstub['KP'] = '';
-    }
-    if(typeof(Pstub['KLC']) == 'undefined') {
-      Pstub['KLC'] = '';
-    }
-    if(typeof(Pstub['KL']) == 'undefined') {
-      Pstub['KL'] = 'undefined';
-    }
-
-    // If language code already defined (or not specified in stub), check to see if stub already registered
-    for(Lk=0; Lk<this.keymanweb._KeyboardStubs.length; Lk++) {
-      if(this.keymanweb._KeyboardStubs[Lk]['KI'] == Pstub['KI']) {
-        if(Pstub['KLC'] == '' || (this.keymanweb._KeyboardStubs[Lk]['KLC'] == Pstub['KLC'])) {
-          return 1; // no need to register
-        }
-      }
-    }
-  
-    // Register stub (add to KeyboardStubs array)
-    this.keymanweb._KeyboardStubs=this.keymanweb._push(this.keymanweb._KeyboardStubs,Pstub);
-
-    // TODO: Need to distinguish between initial loading of a large number of stubs and any subsequent loading.
-    //   UI initialization should not be needed for each registration, only at end.
-    // Reload this keyboard if it was the last active keyboard and 
-    // make any changes needed by UI for new keyboard stub
-    // (Uncommented for Build 360)
-    (<any>this.keymanweb).doKeyboardRegistered(Pstub['KI'],Pstub['KL'],Pstub['KN'],Pstub['KLC'],Pstub['KP']);
-
-    return null;
+    return this.keymanweb.keyboardManager._registerStub(Pstub);
   }
 
   /**
@@ -329,7 +243,7 @@ class KeyboardInterface {
    * Description  Test if event as a keypress event
    */    
   isKeypress(e: KeyEvent):boolean {
-    if(this.keymanweb._ActiveKeyboard['KM']) {   // I1380 - support KIK for positional layouts
+    if(this.keymanweb.keyboardManager.activeKeyboard['KM']) {   // I1380 - support KIK for positional layouts
       return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
     } else {
       return (<any>this.keymanweb)._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts
@@ -882,7 +796,7 @@ class KeyboardInterface {
    */    
   saveStore(storeName:string, optValue:string): boolean {
     this.resetContextCache();
-    var kbd=this.keymanweb._ActiveKeyboard;
+    var kbd=this.keymanweb.keyboardManager.activeKeyboard;
     if(!kbd || typeof kbd['KI'] == 'undefined' || kbd['KI'] == '') {
       return false;
     }
@@ -954,9 +868,9 @@ class KeyboardInterface {
    * Description  Encapsulates calls to keyboard input processing.
    * @returns     {number}        0 if no match is made, otherwise 1.
    */
-  processKeystroke = function(device, element: HTMLElement, keystroke:KeyEvent) {
+  processKeystroke(device, element: HTMLElement, keystroke:KeyEvent) {
     // Clear internal state tracking data from prior keystrokes.
-    this.keymanweb._CachedSelectionStart = null; // I3319     
+    (<any>this.keymanweb)._CachedSelectionStart = null; // I3319     
     this._DeadkeyResetMatched();       // I3318    
     this.resetContextCache();
 
@@ -965,7 +879,7 @@ class KeyboardInterface {
     this.keymanweb.util.activeDevice = device;
 
     // Calls the start-group of the active keyboard.
-    return this.keymanweb._ActiveKeyboard['gs'](element, keystroke);
+    return this.keymanweb.keyboardManager.activeKeyboard['gs'](element, keystroke);
   }
   
 }

@@ -287,7 +287,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_IDEEditFonts) then  // I2890
+    if OpenKeyReadOnly(SRegKey_IDEEditFonts_CU) then  // I2890
     try
       SplitString(ReadString(''), deffont, altfont, #13);
       SetFontFromString(FDefaultFont, deffont);
@@ -353,7 +353,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if not OpenKey(SRegKey_IDEEditFonts, True) then  // I2890
+    if not OpenKey(SRegKey_IDEEditFonts_CU, True) then  // I2890
       RaiseLastRegistryError;
     WriteString('', FontAsString(FDefaultFont)+#13+FontAsString(FQuotedFont));
   finally

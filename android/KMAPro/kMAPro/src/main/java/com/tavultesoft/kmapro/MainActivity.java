@@ -14,13 +14,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
-
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 
+import android.app.FragmentManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -179,10 +180,43 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     }
 
     KMManager.addKeyboardEventListener(this);
-    KMManager.addKeyboardDownloadEventListener(this);
+    KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
 
-    checkUrl();
-    getIntent().setData(null);
+    // If URL provided, start KMKeyboardDownloaderActivity
+    Intent intent = getIntent();
+    Uri data = intent.getData();
+    if (data != null) {
+      String directStr = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Direct);
+      boolean isDirect = false;
+      if (directStr != null && directStr.equals("true")) {
+        isDirect = true;
+      }
+
+      String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
+      if (url != null) {
+        boolean isCustom = KMKeyboardDownloaderActivity.isCustom(url);
+
+        int index = url.lastIndexOf("/") + 1;
+        String filename = "unknown:";
+        if (index >= 0 && index <= url.length()) {
+          filename = url.substring(index);
+        }
+
+        Bundle bundle = new Bundle();
+        bundle.putString(KMKeyboardDownloaderActivity.ARG_KEYBOARD,
+          data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Keyboard));
+        bundle.putString(KMKeyboardDownloaderActivity.ARG_LANGUAGE,
+          data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Language));
+        bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom);
+        bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_DIRECT, isDirect);
+        bundle.putString(KMKeyboardDownloaderActivity.ARG_URL, url);
+        bundle.putString(KMKeyboardDownloaderActivity.ARG_FILENAME, filename);
+        Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
+        i.putExtras(bundle);
+        startActivity(i);
+      }
+    }
+    intent.setData(null);
   }
 
   @Override
@@ -190,7 +224,10 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     super.onPause();
     KMManager.onPause();
     KMManager.removeKeyboardEventListener(this);
-    KMManager.removeKeyboardDownloadEventListener(this);
+
+    // Intentionally not removing KeyboardDownloadEventListener to
+    // ensure onKeyboardDownloadFinished() gets called
+
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putString(userTextKey, textView.getText().toString());
@@ -468,102 +505,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   private void showGetStarted() {
     Intent getStartedIntent = new Intent(this, GetStartedActivity.class);
     startActivity(getStartedIntent);
-  }
-
-  private boolean checkUrl() {
-    // return true if requires user action (e.g. Download dialog)
-    Intent i = getIntent();
-    Uri data = i.getData();
-    if (data == null)
-      return false;
-
-    final Context context = this;
-    final String keyboard = data.getQueryParameter("keyboard");
-    final String language = data.getQueryParameter("language");
-    final String url = data.getQueryParameter("url");
-
-    if (url != null) {
-      /*
-      int kbIndex = -1;
-      if (keyboard != null && language != null)
-        kbIndex = KMManager.getKeyboardIndex(this, keyboard, language);
-
-      if (kbIndex >= 0) {
-        KMManager.setKeyboard(context, kbIndex);
-        return false;
-      }*/
-
-      String direct = data.getQueryParameter("direct");
-      final boolean isDirect;
-      if (direct != null && direct.equals("true")) {
-        isDirect = true;
-      } else {
-        isDirect = false;
-      }
-
-      int index = url.lastIndexOf("/") + 1;
-      String jsonFilename = "unknown";
-      if (index >= 0 && index <= url.length()) {
-        jsonFilename = url.substring(index);
-      }
-      AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-      dialogBuilder.setTitle("Custom Keyboard: " + jsonFilename);
-      dialogBuilder.setMessage("Would you like to download this keyboard?");
-      dialogBuilder.setPositiveButton("Download", new DialogInterface.OnClickListener() {
-        public void onClick(DialogInterface dialog, int which) {
-          // Download custom keyboard
-          if (KMManager.hasConnection(context)) {
-            KMManager.KMCustomKeyboardDownloader.download(context, url, isDirect, true);
-          } else {
-            Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
-          }
-        }
-      });
-      dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-        public void onClick(DialogInterface dialog, int which) {
-          // Cancel
-        }
-      });
-
-      AlertDialog dialog = dialogBuilder.create();
-      dialog.show();
-
-      return true;
-    } else if (keyboard != null && language != null && !keyboard.trim().isEmpty() && !language.trim().isEmpty()) {
-      int kbIndex = KMManager.getKeyboardIndex(this, keyboard, language);
-
-      if (kbIndex >= 0) {
-        KMManager.setKeyboard(context, kbIndex);
-        return false;
-      }
-
-      String kbKey = String.format("%s_%s", language, keyboard);
-      AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-      dialogBuilder.setTitle("Keyboard: " + kbKey);
-      dialogBuilder.setMessage("Would you like to download this keyboard?");
-      dialogBuilder.setPositiveButton("Download", new DialogInterface.OnClickListener() {
-        public void onClick(DialogInterface dialog, int which) {
-          // Download keyboard
-          if (KMManager.hasConnection(context)) {
-            KMManager.KMKeyboardDownloader.download(context, KMManager.KMDefault_LegacyPackageID, keyboard, language, true);
-          } else {
-            Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
-          }
-        }
-      });
-      dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-        public void onClick(DialogInterface dialog, int which) {
-          // Cancel
-        }
-      });
-
-      AlertDialog dialog = dialogBuilder.create();
-      dialog.show();
-
-      return true;
-    }
-
-    return false;
   }
 
   public static Drawable getActionBarDrawable(Context context) {

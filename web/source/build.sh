@@ -2,8 +2,6 @@
 # 
 # Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 #
-# Note: any changes to this script should be replicated in build.bat
-#
 
 display_usage ( ) {
     echo "build.sh [-ui | -test | -embed | -web | -debug_embedded]"
@@ -25,9 +23,22 @@ assert ( ) {
     fi
 }
 
+fail() {
+    FAILURE_MSG="$1"
+    if [[ "$FAILURE_MSG" == "" ]]; then
+        FAILURE_MSG="Unknown failure"
+    fi
+    echo "${ERROR_RED}$FAILURE_MSG${NORMAL}"
+    exit 1
+}
+
 # Ensure the dependencies are downloaded.
 echo "Node.js + dependencies check"
 npm install
+
+if [ $? -ne 0 ]; then
+    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+fi
 
 : ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler}
 : ${JAVA:=java}
@@ -106,14 +117,10 @@ copy_resources ( ) {
     echo
 }
 
-if [ $? -ne 0 ]; then
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
-fi
-
 # Definition of global compile constants
-WEB_OUTPUT="../output"
-EMBED_OUTPUT="../embedded"
-INTERMEDIATE="../build"
+WEB_OUTPUT="../release/web"
+EMBED_OUTPUT="../release/embedded"
+INTERMEDIATE="../intermediate"
 SOURCE="."
 NODE_SOURCE="source"
 
@@ -207,7 +214,11 @@ if [ $BUILD_EMBED = true ]; then
 
     rm $EMBED_OUTPUT/keyman.js 2>/dev/null
     $compilecmd -p $NODE_SOURCE/tsconfig.embedded.json
-    echo Typescript compiled.
+    if [ $? -ne 0 ]; then
+        fail "Typescript compilation failed."
+    fi
+    assert $INTERMEDIATE/keyman.js
+    echo Embedded TypeScript compiled.
 
     minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
     assert $EMBED_OUTPUT/keyman.js 
@@ -231,7 +242,12 @@ if [ $BUILD_COREWEB = true ]; then
     echo Compile Keymanweb...
     rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
     $compilecmd -p $NODE_SOURCE/tsconfig.web.json
-    echo Typescript compiled.
+    if [ $? -ne 0 ]; then
+        fail "Typescript compilation failed."
+    fi
+    assert $INTERMEDIATE/keymanweb.js
+    echo Native TypeScript compiled.
+
     
     copy_resources "$INTERMEDIATE"
 
@@ -253,6 +269,10 @@ fi
 if [ $BUILD_UI = true ]; then
     echo Compile UI Modules...
     $compilecmd -p $NODE_SOURCE/tsconfig.ui.json
+    assert $INTERMEDIATE/kmwuitoolbar.js
+    assert $INTERMEDIATE/kmwuitoggle.js
+    assert $INTERMEDIATE/kmwuifloat.js
+    assert $INTERMEDIATE/kmwuibutton.js
 
     echo Minify ToolBar UI
     del $WEB_OUTPUT/kmuitoolbar.js 2>/dev/null

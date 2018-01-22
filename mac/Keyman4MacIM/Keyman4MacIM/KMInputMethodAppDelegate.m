@@ -63,7 +63,7 @@ typedef enum {
 - (id)init {
     self = [super init];
     if (self) {
-        _debugMode = YES; // Disable before release
+        _debugMode = NO; // Disable before release
         [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
                                                            andSelector:@selector(handleURLEvent:withReplyEvent:)
                                                          forEventClass:kInternetEventClass

@@ -223,7 +223,7 @@ class Util {
    * @return     {boolean}         
    * Description Invoke an event using any function with up to four arguments 
    */    
-  callEvent(event: string, params: Object[]): boolean {
+  callEvent(event: string, params: Object|Object[]): boolean {
     if(typeof this.events[event] == 'undefined') {
       return true;
     }
@@ -437,7 +437,7 @@ class Util {
     }
   }
   
-  private _CreateElement(nodeName:string): HTMLElement { 
+  _CreateElement(nodeName:string): HTMLElement { 
     var e = <HTMLElement>document.createElement(nodeName);
 
     // Make element unselectable (Internet Explorer)
@@ -740,8 +740,7 @@ class Util {
    * @return      {Object}                      returns the object reference
    **/      
   addStyleSheet(s: string): HTMLStyleElement {
-    var _ElemStyle: HTMLStyleElement;
-    _ElemStyle = <HTMLStyleElement>document.createElement('STYLE'); 
+    var _ElemStyle: HTMLStyleElement = <HTMLStyleElement>document.createElement<'style'>('style'); 
 
     _ElemStyle.type = 'text/css';
     if(_ElemStyle.styleSheet) { // IE only
@@ -1111,19 +1110,23 @@ class Util {
    * @param     {string}        s       alert text
    * @param     {function()=}   fn      function to call when alert dismissed
    */       
-  alert(s: string, fn: () => void): void {
-    var bg = this.waiting;
-    var nn=bg.firstChild.childNodes;
-    (<HTMLElement>nn[0]).style.display='block';
-    (<HTMLElement>nn[1]).className='kmw-alert-text'; 
-    (<HTMLElement>nn[1]).innerHTML=s;
-    (<HTMLElement>nn[2]).style.display='none';
+  alert(s: string, fn?: () => void): void {
+    var bg = this.keyman.waiting, nn=bg.firstChild.childNodes;
+    nn[0].style.display='block';
+    nn[1].className='kmw-alert-text'; 
+    nn[1].innerHTML=s;
+    nn[2].style.display='none';
     bg.style.display='block';
     if(arguments.length > 1) {
       bg.dismiss=fn;
     } else {
       bg.dismiss=null;
     }
+  }
+
+  // Stub definition to be fleshed out depending upon native/embedded mode.
+  wait(s: string|boolean): void {
+
   }
   
   /**

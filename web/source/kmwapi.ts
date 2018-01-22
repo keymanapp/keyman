@@ -13,6 +13,11 @@
  * Note that in general, class fields in need of exposure cannot have their minification blocked;
  * maintenance of those must be performed manually, hence certain setters and this['propertyName']
  * code lines.
+ * 
+ * Format:  goog.exportSymbol("<API name>", <actual function name>);
+ *     - <API name> - not minified, must match published API.
+ *     - <actual function name> - may be renamed by Closure, no need to directly match the API name.  
+ *       It should be a method of the same object, however, due to how 'this' works in JS.
  */
 
 // kmwbase.ts

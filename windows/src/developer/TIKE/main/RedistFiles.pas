@@ -147,7 +147,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if not OpenKeyReadOnly(SRegKey_KeymanDeveloper) then  // I2890
+    if not OpenKeyReadOnly(SRegKey_KeymanDeveloper_LM) then  // I2890
       RaiseLastRegistryError;
     Result := ReadString(SRegValue_RootPath);
     if Result = '' then

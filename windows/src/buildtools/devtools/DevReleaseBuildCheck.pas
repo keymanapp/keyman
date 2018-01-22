@@ -19,9 +19,9 @@ class function TReleaseBuildCheck.Run: Boolean;
 begin
   with TRegistry.Create do
   try
-    if KeyExists(SRegKey_KeymanDebug) then
+    if KeyExists(SRegKey_KeymanDebug_CU) then
     begin
-      writeln('HKCU\'+SRegKey_KeymanDebug+' key exists.  Rename or delete before build.');
+      writeln('HKCU\'+SRegKey_KeymanDebug_CU+' key exists.  Rename or delete before build.');
       Result := False;
     end
     else

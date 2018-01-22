@@ -273,7 +273,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   }
 
   private func keyboardChanged(_ kb: InstallableKeyboard) {
-    if let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID) {
+    if let fontName = Manager.shared.fontNameForKeyboard(withFullID: kb.fullID) {
       newFontFamily = fontName
     } else {
       newFontFamily = UIFont.systemFont(ofSize: UIFont.systemFontSize).fontName

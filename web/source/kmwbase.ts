@@ -2,7 +2,10 @@
 /// <reference path="kmwexthtml.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwutils.ts" />
+// Defines the keyboard callback object.
 /// <reference path="kmwcallback.ts" />
+// Defines keyboard data & management classes.
+/// <reference path="kmwkeyboards.ts" />
 
 /***
    KeymanWeb 10.0
@@ -25,11 +28,6 @@ class KeymanBase {
   _IgnoreNextSelChange = 0;  // when a visual keyboard key is mouse-down, ignore the next sel change because this stuffs up our history  
   _Selection = null;
   _SelectionControl = null;
-  _KeyboardStubs = [];       // KeyboardStubs - array of available keyboards
-  dfltStub = null;           // First keyboard stub loaded - default for touch-screen devices, ignored on desktops
-  _Keyboards = [];           // Keyboards - array of loaded keyboards
-  _ActiveKeyboard = null;    // ActiveKeyboard - points to active keyboard in Keyboards array
-  _ActiveStub = null;        // ActiveStub - points to active stub in KeyboardStubs  
   _AttachedElements = [];    // I1596 - attach to controls dynamically
   _ActiveElement = null;     // Currently active (focused) element  I3363 (Build 301)
   _LastActiveElement = null; // LastElem - Last active element
@@ -41,11 +39,7 @@ class KeymanBase {
   resizing = false;          // Flag to control resize events when resetting viewport parameters
   sortedInputs = [];         // List of all INPUT and TEXTAREA elements ordered top to bottom, left to right
   inputList = [];            // List of simulated input divisions for touch-devices   I3363 (Build 301)
-  languageList = null;       // List of keyboard languages available for KeymanCloud
-  languagesPending = [];     // Array of languages waiting to be registered
-  deferredStubs = [];        // Array of pending keyboard stubs from addKeyboard(), to register after initialization
-  deferredKRS = [];          // Array of pending keyboard stubs from KRS, to register afterf initialization
-  deferredKR = [];           // Array of pending keyboards, to be installed at end of initialization
+  waiting = null;            // Element displayed during keyboard load time
   warned = false;            // Warning flag (to prevent multiple warnings)
   baseFont = 'sans-serif';   // Default font for mapped input elements
   appliedFont = '';          // Chain of fonts to be applied to mapped input elements
@@ -77,6 +71,7 @@ class KeymanBase {
   osk: any;
   ui: any;
   interface: KeyboardInterface;
+  keyboardManager: KeyboardManager;
 
   // Defines option-tracking object as a string map.
   options: { [name: string]: string; } = {
@@ -88,13 +83,31 @@ class KeymanBase {
     'ui':null
   };;
 
+
+  // Stub functions (defined later in code only if required)
+  setDefaultDeviceOptions(opt){}     
+  getStyleSheetPath(s){return s;}
+  getKeyboardPath(f, p?){return f;}
+  KC_(n, ln, Pelem){return '';} 
+  handleRotationEvents(){}
+  alignInputs(b){}
+  namespaceID(Pstub) {};
+  preserveID(Pk) {};
+
+  setInitialized(val: number) {
+    this.initialized = this['initialized'] = val;
+  }
+
+  refreshElementContent = null;
+
   // -------------
 
   constructor() {
     this.util = this['util'] = new Util(this);
     window['KeymanWeb'] = this.interface = this['interface'] = new KeyboardInterface(this);
 
-    this.osk = {ready:false}; // Temporary.
+    this.osk = this['osk'] = {ready:false};
+    this.keyboardManager = new KeyboardManager(this);
 
     // Load properties from their static variants.
     this['build'] = KeymanBase.__BUILD__;
@@ -146,14 +159,6 @@ class KeymanBase {
     this.osk._Show(-1,-1);
   }
 
-  // Stub functions (defined later in code only if required)
-  setDefaultDeviceOptions(opt){}     
-  getStyleSheetPath(s){return s;}
-  getKeyboardPath(f, p){return f;}
-  KC_(n, ln, Pelem){return '';} 
-  handleRotationEvents(){}
-  alignInputs(b){}
-
   /**
    * Function     _push
    * Scope        Private   
@@ -170,12 +175,6 @@ class KeymanBase {
     }
     return Parray;
   }
-
-  setInitialized(val: number) {
-    this.initialized = this['initialized'] = val;
-  }
-
-  refreshElementContent = null;
 }
 
 /**
@@ -214,10 +213,8 @@ if(!window['keyman']['loaded']) {
     
     // Define public OSK, user interface and utility function objects 
 
-    var osk: any;
-    osk = keymanweb['osk'];
-    var ui: any;
-    ui = keymanweb['ui'] = {};
+    var osk: any = keymanweb['osk'];
+    var ui: any = keymanweb['ui'] = {};
     
     osk.highlightSubKeys = function(k,x,y){}
     osk.createKeyTip = function(){}

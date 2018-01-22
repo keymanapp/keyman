@@ -59,7 +59,7 @@ begin
   if not Force then
     with TRegistryErrorControlled.Create do
     try
-      if OpenKeyReadOnly(SRegKey_KeymanDesktop) then
+      if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
       begin
         if ValueExists(SRegValue_KeepInTouchShown) and ReadBool(SRegValue_KeepInTouchShown) then
           Exit;
@@ -72,7 +72,7 @@ begin
 
   with TRegistryErrorControlled.Create do
   try
-    if OpenKey(SRegKey_KeymanDesktop, True) then
+    if OpenKey(SRegKey_KeymanDesktop_CU, True) then
     begin
       WriteBool(SRegValue_KeepInTouchShown, True);
     end;

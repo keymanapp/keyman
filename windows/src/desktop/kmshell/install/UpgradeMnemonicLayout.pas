@@ -62,7 +62,7 @@ begin
   with TRegistry.Create do
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeymanEngine) and ValueExists(SRegValue_MnemonicLayoutVersion) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_MnemonicLayoutVersion) then
       if ReadInteger(SRegValue_MnemonicLayoutVersion) >= CurrentMnemonicLayoutVersion then
         Exit;
   finally
@@ -89,7 +89,7 @@ begin
   try
     RootKey := HKEY_LOCAL_MACHINE;
     try
-      OpenKey(SRegKey_KeymanEngine, True);
+      OpenKey(SRegKey_KeymanEngine_LM, True);
       WriteInteger(SRegValue_MnemonicLayoutVersion, CurrentMnemonicLayoutVersion);
     except
       on E:ERegistryException do
@@ -121,7 +121,7 @@ begin
   with TRegistry.Create do
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeyboardLayouts+'\'+IntToHex(id,8)) and ValueExists(SRegValue_KeyboardLayoutFile) then
+    if OpenKeyReadOnly(SRegKey_KeyboardLayouts_LM+'\'+IntToHex(id,8)) and ValueExists(SRegValue_KeyboardLayoutFile) then
     begin
       Exit(ReadString(SRegValue_KeyboardLayoutFile));
     end;
@@ -143,9 +143,9 @@ begin
     else Result := FileName;
 end;
 
-function GetRegistryKeyboardInstallKey(const FileName: string): string;
+function GetRegistryKeyboardInstallKey_LM(const FileName: string): string;
 begin
-  Result := SRegKey_InstalledKeyboards+'\'+GetShortKeyboardName(FileName);
+  Result := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(FileName);
 end;
 
 
@@ -192,7 +192,7 @@ begin
   with TRegistry.Create do   // I4552
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKey('\'+GetRegistryKeyboardInstallKey(Keyboard.Filename), True) then
+    if OpenKey('\'+GetRegistryKeyboardInstallKey_LM(Keyboard.Filename), True) then
     begin
       WriteString(SRegValue_KeymanFile_MnemonicOverride, IncludeTrailingPathDelimiter(FDestPath)+FDestFileName);
       WriteString(SRegValue_KeymanFile_MnemonicOverride_Deadkey, IncludeTrailingPathDelimiter(FDestPath)+FDestDeadkeyFileName);

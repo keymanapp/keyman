@@ -65,7 +65,7 @@ begin
   begin
     with TRegistryErrorControlled.Create do  // I2890
     try
-      if OpenKeyReadOnly(SRegKey_KeymanEngine) and ValueExists(SRegValue_Transparency) then
+      if OpenKeyReadOnly(SRegKey_KeymanEngine_CU) and ValueExists(SRegValue_Transparency) then
       begin
         FValue := ReadInteger(SRegValue_Transparency);
         if (FValue < 0) or (FValue > 2) then FValue := 0;

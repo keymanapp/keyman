@@ -840,11 +840,66 @@ object frameBitmapEditor: TframeBitmapEditor
     TabOrder = 6
     OnClick = cmdExportClick
   end
+  object panReadOnlyIcons: TPanel
+    Left = 0
+    Top = 0
+    Width = 535
+    Height = 285
+    Align = alClient
+    BevelOuter = bvNone
+    TabOrder = 7
+    ExplicitTop = 7
+    object ppReadOnlyIcons: TPaintPanel
+      Left = 0
+      Top = 154
+      Width = 535
+      Height = 131
+      OnPaint = ppReadOnlyIconsPaint
+      Align = alClient
+      TabOrder = 0
+      ExplicitLeft = 10
+      ExplicitTop = 146
+      ExplicitWidth = 519
+      ExplicitHeight = 101
+    end
+    object panReadOnlyIconsTop: TPanel
+      Left = 0
+      Top = 0
+      Width = 535
+      Height = 154
+      Align = alTop
+      BevelEdges = [beBottom]
+      BevelInner = bvSpace
+      BevelKind = bkFlat
+      BevelOuter = bvNone
+      TabOrder = 1
+      object lblReadOnlyIcons: TLabel
+        Left = 10
+        Top = 13
+        Width = 492
+        Height = 41
+        AutoSize = False
+        Caption = 
+          'This icon file is read only because it either contains multiple ' +
+          'image resources, has a size other than 16x16 pixels, or a colour' +
+          ' depth > 256 pixels'
+        WordWrap = True
+      end
+      object memoReadOnlyIcons: TMemo
+        Left = 10
+        Top = 45
+        Width = 185
+        Height = 89
+        ReadOnly = True
+        TabOrder = 0
+      end
+    end
+  end
   object ilCmds: TImageList
     Left = 84
     Top = 36
     Bitmap = {
-      494C01010C000E00380010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010C000E003C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1398,7 +1453,7 @@ object frameBitmapEditor: TframeBitmapEditor
     Filter = 'JASC PAL (*.pal)|*.pal|Photoshop (*.act; *.aco)|*.act;*.aco'
     Title = 'Open Palette'
     Left = 376
-    Top = 100
+    Top = 108
   end
   object dlgImport: TOpenPictureDialog
     Left = 84

@@ -47,6 +47,37 @@
     return Lfilename + "?v=" + (new Date()).getTime(); /*cache buster*/
   };
 
+  // Establishes keyboard namespacing.
+  keymanweb.namespaceID = function(Pstub) {
+    if(typeof(Pstub['KP']) != 'undefined') {
+      // An embedded use case wants to utilize package-namespacing.
+      Pstub['KI'] = Pstub['KP'] + "::" + Pstub['KI'];
+    }
+  }
+
+  // In conjunction with the KeyboardManager's installKeyboard method and script IDs, preserves a keyboard's
+  // namespaced ID.
+  keymanweb.preserveID = function(Pk) {
+    var trueID;
+
+    // Find the currently-executing script tag; KR is called directly from each keyboard's definition script.
+    if(document.currentScript) {
+      trueID = document.currentScript.id;
+    } else {
+      var scripts = document.getElementsByTagName('script');
+      var currentScript = scripts[scripts.length-1];
+
+      trueID = currentScript.id;
+    }
+
+    // Final check that the script tag is valid and appropriate for the loading keyboard.
+    if(trueID.indexOf(Pk['KI']) != -1) {
+      Pk['KI'] = trueID;  // Take the script's version of the ID, which may include package namespacing.
+    } else {
+      console.error("Error when registering keyboard:  current SCRIPT tag's ID does not match!");
+    }
+  }
+
     /**
    * Force reload of resource
    * 
@@ -390,7 +421,7 @@
    **/            
   keymanweb['executePopupKey'] = function(keyName)
   {              
-      if(!keymanweb._ActiveKeyboard) return false;
+      if(!keymanweb.keyboardManager.activeKeyboard) return false;
 
       /* Clear any pending (non-popup) key */
       osk.keyPending = null;
@@ -445,7 +476,7 @@
       Lkc.vkCode=Lkc.Lcode;
 
       // Pass this key code and state to the keyboard program
-      if(!keymanweb._ActiveKeyboard ||  Lkc.Lcode == 0) return false;
+      if(!keymanweb.keyboardManager.activeKeyboard ||  Lkc.Lcode == 0) return false;
       
       // If key is mapped, return true
       if(kbdInterface.processKeystroke(util.device, Lelem, Lkc)) return true;
@@ -464,7 +495,7 @@
    *  @param  {number}  lstates lock state (0x0200=no caps 0x0400=num 0x0800=no num 0x1000=scroll 0x2000=no scroll locks)
    **/            
   keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0) {
-    if(!keymanweb._ActiveKeyboard || code == 0) {
+    if(!keymanweb.keyboards.activeKeyboard || code == 0) {
       return false;
     }
 

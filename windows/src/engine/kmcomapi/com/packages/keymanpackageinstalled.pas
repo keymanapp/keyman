@@ -114,7 +114,7 @@ begin
   try
     RootKey := HKEY_LOCAL_MACHINE;
 
-    if OpenKeyReadOnly(SRegKey_InstalledPackages + '\' + FName) then
+    if OpenKeyReadOnly(SRegKey_InstalledPackages_LM + '\' + FName) then
     begin
       FDescription := ReadString(SRegValue_PackageDescription);
       FFileName := ReadString(SRegValue_PackageFile);

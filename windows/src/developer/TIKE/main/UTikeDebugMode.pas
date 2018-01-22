@@ -37,7 +37,7 @@ begin
   if not FTikeDebugModeInit then
     with TRegistryErrorControlled.Create do  // I2890
     try
-      FTikeDebugMode := OpenKeyReadOnly(SRegKey_KeymanDebug) and ValueExists(SRegValue_Debug_TikeDebugMode) and ReadBool(SRegValue_Debug_TikeDebugMode);
+      FTikeDebugMode := OpenKeyReadOnly(SRegKey_KeymanDebug_CU) and ValueExists(SRegValue_Debug_TikeDebugMode) and ReadBool(SRegValue_Debug_TikeDebugMode);
       FTikeDebugModeInit := True;
     finally
       Free;

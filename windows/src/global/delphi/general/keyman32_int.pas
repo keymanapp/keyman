@@ -51,7 +51,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeymanEngine) and ValueExists(SRegValue_RootPath) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_RootPath) then
         RootPath := ReadString(SRegValue_RootPath);
   finally
     Free;

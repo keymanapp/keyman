@@ -57,7 +57,7 @@ begin
   with TRegistry.Create do
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeyboardLayouts+'\'+IntToHex(id,8)) and ValueExists(SRegValue_KeyboardLayoutFile) then
+    if OpenKeyReadOnly(SRegKey_KeyboardLayouts_LM+'\'+IntToHex(id,8)) and ValueExists(SRegValue_KeyboardLayoutFile) then
     begin
       Exit(ReadString(SRegValue_KeyboardLayoutFile));
     end;
@@ -143,7 +143,7 @@ begin
     { Write Installed Keyboards entry }
 
     RootKey := HKEY_LOCAL_MACHINE;  // Only supporting HKLM for KM9 and later
-    if not OpenKey('\'+GetRegistryKeyboardInstallKey(FileName), True) then  // I2890
+    if not OpenKey('\'+GetRegistryKeyboardInstallKey_LM(FileName), True) then  // I2890
       RaiseLastRegistryError;
 
     WriteString(SRegValue_KeymanFile_MnemonicOverride, FDestFileName);
