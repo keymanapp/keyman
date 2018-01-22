@@ -47,6 +47,37 @@
     return Lfilename + "?v=" + (new Date()).getTime(); /*cache buster*/
   };
 
+  // Establishes keyboard namespacing.
+  keymanweb.namespaceID = function(Pstub) {
+    if(typeof(Pstub['KP']) != 'undefined') {
+      // An embedded use case wants to utilize package-namespacing.
+      Pstub['KI'] = Pstub['KP'] + "::" + Pstub['KI'];
+    }
+  }
+
+  // In conjunction with the KeyboardManager's installKeyboard method and script IDs, preserves a keyboard's
+  // namespaced ID.
+  keymanweb.preserveID = function(Pk) {
+    var trueID;
+
+    // Find the currently-executing script tag; KR is called directly from each keyboard's definition script.
+    if(document.currentScript) {
+      trueID = document.currentScript.id;
+    } else {
+      var scripts = document.getElementsByTagName('script');
+      var currentScript = scripts[scripts.length-1];
+
+      trueID = currentScript.id;
+    }
+
+    // Final check that the script tag is valid and appropriate for the loading keyboard.
+    if(trueID.indexOf(Pk['KI']) != -1) {
+      Pk['KI'] = trueID;  // Take the script's version of the ID, which may include package namespacing.
+    } else {
+      console.error("Error when registering keyboard:  current SCRIPT tag's ID does not match!");
+    }
+  }
+
     /**
    * Force reload of resource
    * 
