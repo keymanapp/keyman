@@ -89,23 +89,11 @@ DWORD VKMap[0x80];
     if (!gp)
         return nil;
     
-    if (![event respondsToSelector:@selector(keyCode)])
+    if (event.type != NSKeyDown || ![event respondsToSelector:@selector(keyCode)])
         return nil;
 
     if (([event modifierFlags] & NSEventModifierFlagCommand) == NSEventModifierFlagCommand)
         return nil; // Engine should NEVER attempt to process characters when the Command key is pressed.
-    
-    @try {
-        return [self processGroupInternal: gp event:event];
-    }
-    @catch (NSException *e) {
-        NSLog(@"Error = %@", e.description);
-        return nil;
-    }
-}
-
-- (NSArray *)processGroupInternal:(KMCompGroup *)gp event:(NSEvent *)event {
-    NSArray *actions = nil;
     
     // REVIEW: Probably need to use charactersIgnoringModifiers instead of characters to avoid
     // getting Mac predefined subsitutions for Option + ??? keystrokes
@@ -116,6 +104,8 @@ DWORD VKMap[0x80];
         NSLog(@"%lu characters = %@", [[event characters] length], characters);
         NSLog(@"%lu characters ignoring modifiers = %@", [[event charactersIgnoringModifiers] length], [event charactersIgnoringModifiers]);
     }
+    
+    NSArray *actions = nil;
     
     if (gp.fUsingKeys) {
         // Begin group using keys
@@ -240,7 +230,7 @@ DWORD VKMap[0x80];
             }
             else {
                 //if (self.debugMode)
-                    //NSLog(@"No shift flags!");
+                //NSLog(@"No shift flags!");
                 if (!key.context.length) {
                     mKey = key;
                     break;
@@ -253,23 +243,23 @@ DWORD VKMap[0x80];
         }
         
         /*
-        // Fall back if no match
-        if (!mKey && mKeys.count == 1) {
-            mKey = [mKeys objectAtIndex:0];
-        }
-        else if (!mKey && mKeys.count > 1) {
-            for (KMCompKey *key in mKeys) {
-                if (!key.context.length) {
-                    mKey = key;
-                }
-                else {
-                    if ([self contextMatch:key]) {
-                        mKey = key;
-                        break;
-                    }
-                }
-            }
-        }*/
+         // Fall back if no match
+         if (!mKey && mKeys.count == 1) {
+         mKey = [mKeys objectAtIndex:0];
+         }
+         else if (!mKey && mKeys.count > 1) {
+         for (KMCompKey *key in mKeys) {
+         if (!key.context.length) {
+         mKey = key;
+         }
+         else {
+         if ([self contextMatch:key]) {
+         mKey = key;
+         break;
+         }
+         }
+         }
+         }*/
         
         if (self.debugMode)
             NSLog(@"mKey = %@", mKey);
