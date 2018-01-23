@@ -907,4 +907,14 @@ class KeyboardInterface {
     this.keymanweb.osk.userPositioned=true; 
     this.keymanweb.osk._Show(-1,-1);
   }
+  
+  resetContext() {
+    this.keymanweb.osk.layerId = 'default';
+
+    this.clearDeadkeys();
+    this.resetContextCache();
+    (<any>this.keymanweb)._ResetVKShift();
+
+    this.keymanweb.osk._Show();
+  };
 }

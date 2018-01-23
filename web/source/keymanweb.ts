@@ -114,32 +114,7 @@ if(!window['keyman']['initialized']) {
      * Scope       Private
      * Description Initialize event handling and duplicate input fields for touch-input devices
      */       
-    keymanweb.setupTouchDevice = function() { 
-      /**
-       * Ideally, OSK behaviour should emulate internal keyboard, but 
-       * it is not possible to do that while allowing native scrolling.
-       * The compromise adopted is that a touchstart or touchmove event
-       * on any part of the page other than an input element or the OSK 
-       * itself will temporarily hide the OSK until the touchend or 
-       * window.scroll event is fired. Hiding the OSK in this way seems
-       * less disturbing than having it move as the page is scrolled.
-       * 
-       * All of this may be better if we can reliably get the y-offset 
-       * from the CSS transform and apply that to repositioning the OSK
-       * using a timed event loop.           
-       */
-
-      keymanweb.touchAliasing = keymanweb.domManager.touchHandlers;
-
-    }
-    
-    /*********************************************************
-     *  
-     * End of main touch-device initialization.
-     *     
-     *********************************************************/
-
-    keymanweb.touchAliasing = keymanweb.domManager.nonTouchHandlers;
+    keymanweb.delayedInit();
 
     /**
      * Get the user-specified (or default) font for the first mapped input or textarea element
@@ -147,8 +122,7 @@ if(!window['keyman']['initialized']) {
      * 
      *  @return   {string}
      **/                 
-    keymanweb.getBaseFont = function()
-    {
+    keymanweb.getBaseFont = function() {
       var ipInput = document.getElementsByTagName<'input'>('input'),
           ipTextArea=document.getElementsByTagName<'textarea'>('textarea'),
           n=0,fs,fsDefault='Arial,sans-serif';
@@ -188,34 +162,6 @@ if(!window['keyman']['initialized']) {
     // Probably should relocate this definition somewhere.
     keymanweb.timerID = null;
 
-    /**
-     * Function     resetContext
-     * Scope        Public
-     * Description  Revert OSK to default layer and clear any deadkeys and modifiers
-     */
-    keymanweb['resetContext'] = keymanweb.resetContext = function() {
-      osk.layerId = 'default';
-
-      kbdInterface.clearDeadkeys();
-      kbdInterface.resetContextCache();
-      keymanweb._ResetVKShift();
-
-      osk._Show();
-    };
-    
-    /**
-     * Browser dependent initialization
-     */       
-    if(document.selection)          // only defined for IE
-    {
-      var appVer=navigator.appVersion;
-    // Legacy support variables
-      if(appVer.indexOf('MSIE 6.0') >= 0) keymanweb._IE = 6;
-      else if(appVer.indexOf('MSIE 7.0') >= 0) keymanweb._IE = 7;
-      else if(appVer.indexOf('MSIE 8.0') >= 0) keymanweb._IE = 8;
-      if(keymanweb._IE && document.compatMode=='BackCompat') keymanweb._IE = 6;
-    }
-
     // I732 START - Support for European underlying keyboards #1
     if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') 
       osk._BaseLayout = window['KeymanWeb_BaseLayout'];
@@ -224,162 +170,6 @@ if(!window['keyman']['initialized']) {
     
     
     keymanweb._BrowserIsSafari = (navigator.userAgent.indexOf('AppleWebKit') >= 0);  // I732 END - Support for European underlying keyboards #1 
-
-    /**
-     * Function     _push
-     * Scope        Private   
-     * @param       {Array}     Parray    Array   
-     * @param       {*}         Pval      Value to be pushed or appended to array   
-     * @return      {Array}               Returns extended array
-     * Description  Push (if possible) or append a value to an array 
-     */  
-    keymanweb._push = function(Parray, Pval)
-    {
-      if(Parray.push) Parray.push(Pval);
-      else Parray=Parray.concat(Pval);
-      return Parray;
-    }
-
-    /**
-     * Function     disableControl
-     * Scope        Public
-     * @param       {Element}      Pelem       Element to be disabled
-     * Description  Disables a KMW control element 
-     */    
-    keymanweb['disableControl'] = keymanweb.disableControl = function(Pelem) {
-      if(!keymanweb.domManager.isAttached(Pelem)) {
-        console.warn("KeymanWeb is not attached to element " + Pelem);
-      } 
-
-      var cn = Pelem.className;
-      if(cn.indexOf('kmw-disabled') < 0) { // if not already explicitly disabled...
-        Pelem.className = cn ? cn + ' kmw-disabled' : 'kmw-disabled';
-      }
-
-      // The rest is triggered within MutationObserver code.
-      // See keymanweb._EnablementMutationObserverCore.
-    }
-
-    /**
-     * Function     enableControl
-     * Scope        Public
-     * @param       {Element}      Pelem       Element to be disabled
-     * Description  Disables a KMW control element 
-     */    
-    keymanweb['enableControl'] = keymanweb.enableControl = function(Pelem) {
-      if(!keymanweb.domManager.isAttached(Pelem)) {
-        console.warn("KeymanWeb is not attached to element " + Pelem);
-      } 
-
-      var cn = Pelem.className;
-      var tagIndex = cn.indexOf('kmw-disabled');
-      if(tagIndex >= 0) { // if already explicitly disabled...
-        Pelem.className = cn.replace('kmw-disabled', '').trim();
-      }
-
-      // The rest is triggered within MutationObserver code.
-      // See keymanweb._EnablementMutationObserverCore.
-    }
-    
-    /**
-     * Function     setKeyboardForControl
-     * Scope        Public   
-     * @param       {Element}    Pelem    Control element 
-     * @param       {string|null=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)  
-     * @param       {string|null=}     Plc      Language Code
-     * Description  Set default keyboard for the control 
-     */    
-    keymanweb['setKeyboardForControl'] = keymanweb.setKeyboardForControl = function(Pelem, Pkbd, Plc) {
-      /* pass null for kbd to specify no default, or '' to specify the default system keyboard. */
-      if(Pkbd !== null && Pkbd !== undefined) {
-        var index = Pkbd.indexOf("Keyboard_");
-        if(index < 0 && Pkbd != '') {
-          Pkbd = "Keyboard_" + Pkbd;
-        }
-      } else {
-        Plc = null;
-      }
-
-      if(Pelem instanceof HTMLIFrameElement) {
-        console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
-        return;
-      }
-
-      if(!keymanweb.domManager.isAttached(Pelem)) {
-        console.error("KeymanWeb is not attached to element " + Pelem);
-        return;
-      } else {
-        Pelem._kmwAttachment.keyboard = Pkbd;
-        Pelem._kmwAttachment.languageCode = Plc;
-
-        // If Pelem is the focused element/active control, we should set the keyboard in place now.
-        // 'kmw_ip' is the touch-alias for the original page's control.
-        if(keymanweb._LastActiveElement && (keymanweb._LastActiveElement == Pelem || keymanweb._LastActiveElement == Pelem['kmw_ip'])) {
-
-          if(Pkbd != null && Plc != null) { // Second part necessary for Closure.
-            keymanweb.keyboardManager.setActiveKeyboard(Pkbd, Plc);
-          } 
-        }
-      }
-    }
-
-    /**
-     * Function     getKeyboardForControl
-     * Scope        Public   
-     * @param       {Element}    Pelem    Control element 
-     * @return      {string|null}         The independently-managed keyboard for the control.
-     * Description  Returns the keyboard ID of the current independently-managed keyboard for this control.
-     *              If it is currently following the global keyboard setting, returns null instead.
-     */
-    keymanweb['getKeyboardForControl'] = keymanweb.getKeyboardForControl = function(Pelem) {
-      if(!keymanweb.domManager.isAttached(Pelem)) {
-        console.error("KeymanWeb is not attached to element " + Pelem);
-        return null;
-      } else {
-        return Pelem._kmwAttachment.keyboard;  // Should we have a version for the language code, too?
-      }
-    }
-      
-    /**
-     * Set focus to last active target element (browser-dependent)
-     */    
-    keymanweb['focusLastActiveElement'] = keymanweb._FocusLastActiveElement = function()
-    {
-      if(!keymanweb._LastActiveElement) return;
-
-      keymanweb._JustActivatedKeymanWebUI = 1;
-      if(keymanweb._IsMozillaEditableIframe(keymanweb._LastActiveElement,0))
-        keymanweb._LastActiveElement.defaultView.focus(); // I3363 (Build 301)
-      else if(keymanweb._LastActiveElement.focus) keymanweb._LastActiveElement.focus();
-    }
-    
-    /**
-     * Get the last active target element *before* KMW activated (I1297)
-     * 
-     * @return      {Object}        
-     */    
-    keymanweb['getLastActiveElement'] = keymanweb._GetLastActiveElement = function()
-    {
-      return keymanweb._LastActiveElement;
-    }
-
-    /**
-     *  Set the active input element directly optionally setting focus 
-     * 
-     *  @param  {Object|string} e         element id or element
-     *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123) 
-     **/
-    keymanweb['setActiveElement']=keymanweb.setActiveElement=function(e,setFocus)
-    {
-      if(typeof(e) == 'string') e=document.getElementById(e);
-      keymanweb._ActiveElement=keymanweb._LastActiveElement=e; 
-      // Allow external focusing KMEW-123
-      if(arguments.length > 1 && setFocus)
-      {
-        if(device.touchable) keymanweb.touchAliasing.setFocus();
-        else keymanweb['focusLastActiveElement']();
-      }
-    }
     
     /**
      * Function     getUIState
@@ -611,22 +401,7 @@ if(!window['keyman']['initialized']) {
       if(q == '/' || q == '\\') return p;
       return p+'/'; 
     }          
-    
-    /**
-     * Initialize the desktop user interface as soon as it is ready
-    **/       
-    keymanweb.initializeUI = function()
-    {
-      if(typeof(keymanweb['ui']['initialize'])=='function')
-      {
-        keymanweb['ui']['initialize']();
-        // Display the OSK (again) if enabled, in order to set its position correctly after
-        // adding the UI to the page 
-        osk._Show();     
-      }
-      else
-        window.setTimeout(keymanweb.initializeUI,1000);
-    }      
+        
     /**
      * Test if caret position is determined from the active element, or 
      * from the synthesized overlay element (touch devices)
@@ -667,24 +442,6 @@ if(!window['keyman']['initialized']) {
           return Lsel.focusNode.substringData(0,Lsel.focusOffset)._kmwLength(); 
       }
       
-      // IE8 and earlier
-      else if(isMSIE)
-      { 
-        // Get position within input or textarea element       
-        if(typeof(Pelem.value) == 'string') {
-          var ss=keymanweb.getInputSelection(Pelem);               
-          return Pelem.value.substr(0,ss.start)._kmwLength();        
-        }
-        
-        // Get position within content-editable region
-        if(Pelem.body) Ldoc=Pelem; else Ldoc=Pelem.ownerDocument;	// I1481 - integration with rich editors not working 100%
-
-        if(Ldoc) Ldv=Ldoc.selection; else return 0;
-            
-        var Lrange = Ldv.createRange();
-        Lrange.moveStart('textedit',-1);
-        return Lrange.text._kmwLength();    
-      }
       return 0;
     }  
 

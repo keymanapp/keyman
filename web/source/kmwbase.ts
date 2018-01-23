@@ -74,6 +74,8 @@ class KeymanBase {
   keyboardManager: KeyboardManager;
   domManager: DOMManager;
 
+  touchAliasing: DOMEventHandlers;
+
   // Defines option-tracking object as a string map.
   options: { [name: string]: string; } = {
     'root':'',
@@ -123,6 +125,11 @@ class KeymanBase {
 
     // Signals that a KMW load has occurred in order to prevent double-loading.
     this['loaded'] = true;
+  }
+
+  delayedInit() {
+    // Track the selected Event-handling object.
+    this.touchAliasing = this.util.device.touchable ? this.domManager.touchHandlers : this.domManager.nonTouchHandlers;
   }
 
   /**
@@ -177,6 +184,23 @@ class KeymanBase {
     }
     
     return e;    
+  }
+
+  /**
+   * Function     _push
+   * Scope        Private   
+   * @param       {Array}     Parray    Array   
+   * @param       {*}         Pval      Value to be pushed or appended to array   
+   * @return      {Array}               Returns extended array
+   * Description  Push (if possible) or append a value to an array 
+   */  
+  _push<T>(Parray: T[], Pval: T) {
+    if(Parray.push) {
+      Parray.push(Pval);
+    } else {
+      Parray=Parray.concat(Pval);
+    }
+    return Parray;
   }
 
   // Base object API definitions
@@ -351,20 +375,94 @@ class KeymanBase {
   }
 
   /**
-   * Function     _push
-   * Scope        Private   
-   * @param       {Array}     Parray    Array   
-   * @param       {*}         Pval      Value to be pushed or appended to array   
-   * @return      {Array}               Returns extended array
-   * Description  Push (if possible) or append a value to an array 
-   */  
-  _push<T>(Parray: T[], Pval: T) {
-    if(Parray.push) {
-      Parray.push(Pval);
-    } else {
-      Parray=Parray.concat(Pval);
-    }
-    return Parray;
+   * Function     resetContext
+   * Scope        Public
+   * Description  Revert OSK to default layer and clear any deadkeys and modifiers
+   */
+  ['resetContext']() {
+    this.interface.resetContext();
+  };
+
+  /**
+   * Function     disableControl
+   * Scope        Public
+   * @param       {Element}      Pelem       Element to be disabled
+   * Description  Disables a KMW control element 
+   */    
+  ['disableControl'](Pelem: HTMLElement) {
+    this.domManager.disableControl(Pelem);
+  }
+
+  /**
+   * Function     enableControl
+   * Scope        Public
+   * @param       {Element}      Pelem       Element to be disabled
+   * Description  Disables a KMW control element 
+   */    
+  ['enableControl'](Pelem: HTMLMapElement) {
+    this.domManager.enableControl(Pelem);
+  }
+  
+  /**
+   * Function     setKeyboardForControl
+   * Scope        Public   
+   * @param       {Element}    Pelem    Control element 
+   * @param       {string|null=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)  
+   * @param       {string|null=}     Plc      Language Code
+   * Description  Set default keyboard for the control 
+   */    
+  ['setKeyboardForControl'](Pelem: HTMLElement, Pkbd?: string, Plc?: string) {
+    this.domManager.setKeyboardForControl(Pelem, Pkbd, Plc);
+  }
+
+  /**
+   * Function     getKeyboardForControl
+   * Scope        Public   
+   * @param       {Element}    Pelem    Control element 
+   * @return      {string|null}         The independently-managed keyboard for the control.
+   * Description  Returns the keyboard ID of the current independently-managed keyboard for this control.
+   *              If it is currently following the global keyboard setting, returns null instead.
+   */
+  ['getKeyboardForControl'](Pelem) {
+    this.domManager.getKeyboardForControl(Pelem);
+  }
+
+  /**
+   * Function     getLanguageForControl
+   * Scope        Public   
+   * @param       {Element}    Pelem    Control element 
+   * @return      {string|null}         The independently-managed keyboard for the control.
+   * Description  Returns the language code used with the current independently-managed keyboard for this control.
+   *              If it is currently following the global keyboard setting, returns null instead.
+   */
+  ['getLanguageForControl'](Pelem) {
+    this.domManager.getLanguageForControl(Pelem);
+  }
+
+  /**
+   * Set focus to last active target element (browser-dependent)
+   */    
+  ['focusLastActiveElement']() {
+    this.domManager.focusLastActiveElement();
+  }
+  
+  /**
+   * Get the last active target element *before* KMW activated (I1297)
+   * 
+   * @return      {Object}        
+   */    
+  ['getLastActiveElement']() {
+    return this.domManager.getLastActiveElement();
+  }
+
+  /**
+   *  Set the active input element directly optionally setting focus 
+   * 
+   *  @param  {Object|string} e         element id or element
+   *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123) 
+   **/
+  ['setActiveElement'](e: string|HTMLElement, setFocus: boolean) {
+    return this.domManager.setActiveElement(e, setFocus);
   }
 }
 
