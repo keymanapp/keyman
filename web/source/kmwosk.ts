@@ -232,7 +232,7 @@ if(!window['keyman']['initialized']) {
       {
         if(osk._Visible)
         {
-          keymanweb._FocusLastActiveElement();  // I2036 - OSK does not unpin to correct location
+          keymanweb.domManager.focusLastActiveElement();  // I2036 - OSK does not unpin to correct location
           osk.loadCookie(); osk.userPositioned=false; osk.saveCookie();
           osk._Show();
           osk.doResizeMove(); //allow the UI to respond to OSK movements
@@ -830,16 +830,16 @@ if(!window['keyman']['initialized']) {
 
         switch(code) {
           case osk.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-            kbdInterface.output(1,keymanweb._LastActiveElement,"");
+            kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
             break;
           case osk.keyCodes['K_TAB']:
-            keymanweb.moveToNext(keyShiftState);
+            keymanweb.domManager.moveToNext(keyShiftState);
             break;
           case osk.keyCodes['K_TABBACK']:
-            keymanweb.moveToNext(true);
+            keymanweb.domManager.moveToNext(true);
             break;
           case osk.keyCodes['K_TABFWD']:
-            keymanweb.moveToNext(false);
+            keymanweb.domManager.moveToNext(false);
             break;
           case osk.keyCodes['K_ENTER']:
             // Insert new line in text area fields
@@ -853,7 +853,7 @@ if(!window['keyman']['initialized']) {
                 Lelem.base.disabled=false;
                 Lelem.base.form.submit();
               } else {
-                keymanweb.moveToNext(false);
+                keymanweb.domManager.moveToNext(false);
               }
             }
             break;
@@ -888,7 +888,7 @@ if(!window['keyman']['initialized']) {
           //       // Failed to move right - there's nothing to delete.
           //       break;
           //     }
-          //     kbdInterface.output(1, keymanweb._LastActiveElement,"");
+          //     kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
           //   }
         }
       }
@@ -931,7 +931,7 @@ if(!window['keyman']['initialized']) {
      */
     osk.clickKey = function(e)
     {
-      var Lelem = keymanweb._LastActiveElement, Ls, Le, Lkc, Lsel;
+      var Lelem = keymanweb.domManager.getLastActiveElement(), Ls, Le, Lkc, Lsel;
 
       var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
 
@@ -953,7 +953,7 @@ if(!window['keyman']['initialized']) {
         }
 
         if(typeof(e.key) != 'undefined') nextLayer=e.key['nextlayer'];
-        if(keymanweb._ActiveElement == null) keymanweb._ActiveElement=Lelem;
+        keymanweb.domManager.initActiveElement(Lelem);
 
         // Exclude menu and OSK hide keys from normal click processing
         if(keyName == 'K_LOPT' || keyName == 'K_ROPT')
@@ -983,8 +983,8 @@ if(!window['keyman']['initialized']) {
         Lsel=keymanweb._Selection;
         keymanweb._IsActivatingKeymanWebUI = 1;
         keymanweb._IgnoreNextSelChange = 100;
-        keymanweb._FocusLastActiveElement();
-        if(keymanweb._IsMozillaEditableIframe(Lelem,0)) Lelem = Lelem.documentElement;
+        keymanweb.domManager.focusLastActiveElement();
+        if(keymanweb.domManager._IsMozillaEditableIframe(Lelem,0)) Lelem = Lelem.documentElement;
         if(document.selection && Lsel != null) Lsel.select();
         Lelem._KeymanWebSelectionStart=Ls;
         Lelem._KeymanWebSelectionEnd=Le;
@@ -1717,7 +1717,7 @@ if(!window['keyman']['initialized']) {
           osk.lgList.style.display='none'; //still allows blank menu momentarily on selection
           keymanweb.keyboardManager._SetActiveKeyboard(this.kn,this.kc,true);
           keymanweb.keyboardManager.doKeyboardChange(this.kn,this.kc);
-          keymanweb._FocusLastActiveElement();
+          keymanweb.domManager.focusLastActiveElement();
           osk.hideLanguageList();
 
           // Update the OSK with the new keyboard
@@ -2485,7 +2485,7 @@ if(!window['keyman']['initialized']) {
       }
       // Also backspace, to allow delete to repeat while key held
       else if(keyName == 'K_BKSP') {
-        kbdInterface.output(1,keymanweb._LastActiveElement,"");
+        kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
         osk.deleting = window.setTimeout(osk.repeatDelete,500);
         osk.keyPending = null;
       } else {
@@ -2792,7 +2792,7 @@ if(!window['keyman']['initialized']) {
      **/
     osk.repeatDelete = function() {
       if(osk.deleting) {
-        kbdInterface.output(1,keymanweb._LastActiveElement,"");
+        kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
         osk.deleting = window.setTimeout(osk.repeatDelete,100);
       }
     }
@@ -3712,7 +3712,7 @@ if(!window['keyman']['initialized']) {
       document.onmousemove = osk._VPreviousMouseMove;
       document.onmouseup = osk._VPreviousMouseUp;
       if(document.body.style.cursor) document.body.style.cursor = osk._VPreviousCursor;
-      keymanweb._FocusLastActiveElement();
+      keymanweb.domManager.focusLastActiveElement();
       if(e  &&  e.preventDefault) e.preventDefault();
       keymanweb._JustActivatedKeymanWebUI = 0;
       keymanweb._IsActivatingKeymanWebUI = 0;
@@ -3801,7 +3801,7 @@ if(!window['keyman']['initialized']) {
     osk._Show = function(Px, Py)
     {
       // Do not try to display OSK if undefined, or no active element
-      if(osk._Box == null || keymanweb._ActiveElement == null) return;
+      if(osk._Box == null || keymanweb.domManager.getActiveElement() == null) return;
 
       // Never display the OSK for desktop browsers unless KMW element is focused, and a keyboard selected
       if((!device.touchable) && (keymanweb.keyboardManager.activeKeyboard == null || !osk._Enabled)) return;
@@ -3889,7 +3889,7 @@ if(!window['keyman']['initialized']) {
           }
           else
           {
-            var el=keymanweb._ActiveElement;
+            var el=keymanweb.domManager.getActiveElement();
             if(osk.dfltX != '')
               Ls.left=osk.dfltX;
             else if(typeof el != 'undefined' && el != null)
@@ -4091,7 +4091,7 @@ if(!window['keyman']['initialized']) {
       osk.doHide(p);
 
       // If hidden by the UI, be sure to restore the focus
-      if(hiddenByUser) keymanweb._FocusLastActiveElement();
+      if(hiddenByUser) keymanweb.domManager.focusLastActiveElement();
     }
 
     /**

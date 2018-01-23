@@ -7,6 +7,8 @@
 
  class CommonDOMStates {
   _KeyPressToSwallow: number;
+  activeElement: any;       // TODO:  Add type and fix resulting bugs!
+  lastActiveElement: any;   // TODO:  Add type and fix resulting bugs!
 }
 
 /**
@@ -15,7 +17,7 @@
 class DOMEventHandlers {
   // TODO:  resolve/refactor out!
   protected keyman: KeymanBase;
-  protected static states: CommonDOMStates = new CommonDOMStates();
+  static states: CommonDOMStates = new CommonDOMStates();
 
   constructor(keyman: KeymanBase) {
     this.keyman = keyman;
@@ -155,7 +157,7 @@ class DOMEventHandlers {
       return true;
     }
 
-    this.keyman._ActiveElement=Ltarg;  // I3363 (Build 301)  
+    DOMTouchHandlers.states.activeElement = Ltarg;  // I3363 (Build 301)  
 
     if (Ltarg.nodeType == 3) { // defeat Safari bug
       Ltarg = Ltarg.parentNode as HTMLElement;
@@ -174,12 +176,12 @@ class DOMEventHandlers {
       this.keyman.domManager._AttachToIframe(Ltarg);
       Ltarg=Ltarg.contentWindow.document;
     }
-        
+
     //??keymanweb._Selection = null;
 
     // We condition on 'priorElement' below as a check to allow KMW to set a default active keyboard.
-    var priorElement = this.keyman._LastActiveElement;
-    this.keyman._LastActiveElement = Ltarg;
+    var priorElement = DOMEventHandlers.states.lastActiveElement;
+    DOMEventHandlers.states.lastActiveElement = Ltarg;
 
     if(this.keyman._JustActivatedKeymanWebUI) {
       this._BlurKeyboardSettings();
@@ -200,7 +202,7 @@ class DOMEventHandlers {
     }
 
     //Execute external (UI) code needed on focus if required
-    this.doControlFocused(LfocusTarg, this.keyman._LastActiveElement);
+    this.doControlFocused(LfocusTarg, DOMEventHandlers.states.lastActiveElement);
   
     // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
     if(device.touchable) {
@@ -250,7 +252,7 @@ class DOMEventHandlers {
       return true;
     }
 
-    this.keyman._ActiveElement = null; // I3363 (Build 301)
+    DOMEventHandlers.states.activeElement = null; // I3363 (Build 301)
 
     // Hide the touch device input caret, if applicable  I3363 (Build 301)
     if(this instanceof DOMTouchHandlers) {
@@ -276,7 +278,7 @@ class DOMEventHandlers {
     this._BlurKeyboardSettings();
 
     // Now that we've handled all prior-element maintenance, update the 'last active element'.
-    this.keyman._LastActiveElement = Ltarg;
+    DOMEventHandlers.states.lastActiveElement = Ltarg;
 
     /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects should be restrained to this control in case
     * the user is manually specifying languages on a per-control basis.
@@ -324,9 +326,10 @@ class DOMEventHandlers {
   _BlurKeyboardSettings() {
     var keyboardID = this.keyman.keyboardManager.activeKeyboard ? this.keyman.keyboardManager.activeKeyboard['KI'] : '';
     
-    if(this.keyman._LastActiveElement && this.keyman._LastActiveElement._kmwAttachment.keyboard != null) {
-      this.keyman._LastActiveElement._kmwAttachment.keyboard = keyboardID;
-      this.keyman._LastActiveElement._kmwAttachment.languageCode = this.keyman.keyboardManager.getActiveLanguage();
+    var lastElem = DOMEventHandlers.states.lastActiveElement;
+    if(lastElem && lastElem._kmwAttachment.keyboard != null) {
+      lastElem._kmwAttachment.keyboard = keyboardID;
+      lastElem._kmwAttachment.languageCode = this.keyman.keyboardManager.getActiveLanguage();
     } else {
       this.keyman.globalKeyboard = keyboardID;
       this.keyman.globalLanguageCode = this.keyman.keyboardManager.getActiveLanguage();
@@ -340,10 +343,11 @@ class DOMEventHandlers {
    *                      whenever a KMW-enabled page element gains control, but only once the prior
    *                      element's loss of control is guaranteed.
    */ 
-  _FocusKeyboardSettings(blockGlobalChange: boolean) {      
-    if(this.keyman._LastActiveElement._kmwAttachment.keyboard != null) {      
-      this.keyman.keyboardManager.setActiveKeyboard(this.keyman._LastActiveElement._kmwAttachment.keyboard, 
-        this.keyman._LastActiveElement._kmwAttachment.languageCode); 
+  _FocusKeyboardSettings(blockGlobalChange: boolean) {
+    var lastElem = DOMEventHandlers.states.lastActiveElement;
+    if(lastElem._kmwAttachment.keyboard != null) {      
+      this.keyman.keyboardManager.setActiveKeyboard(lastElem._kmwAttachment.keyboard, 
+        lastElem._kmwAttachment.languageCode); 
     } else if(!blockGlobalChange) { 
       this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
     }
@@ -360,9 +364,11 @@ class DOMEventHandlers {
   _CommonFocusHelper(target: HTMLElement|Document): boolean {
     //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
     //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
-    if(!(<any>this.keyman)._IsIEEditableIframe(target,1) || !(<any>this.keyman)._IsMozillaEditableIframe(target,1)) {
-      this.keyman._DisableInput = 1; 
-      return true;
+    if(target instanceof HTMLIFrameElement) {
+      if(!this.keyman.domManager._IsIEEditableIframe(target, 1) || !this.keyman.domManager._IsMozillaEditableIframe(target,1)) {
+        this.keyman._DisableInput = 1; 
+        return true;
+      }
     }
     this.keyman._DisableInput = 0;
 
@@ -682,14 +688,14 @@ class DOMEventHandlers {
       
       // Support backspace in simulated input DIV from physical keyboard where not matched in rule  I3363 (Build 301)
       if(Levent.Lcode == 8 && !LeventMatched && Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
-        kbdInterface.output(1,this.keyman._LastActiveElement,"");
+        kbdInterface.output(1, DOMEventHandlers.states.lastActiveElement, "");
       }
     } else {
       // Mnemonic layout
       if(Levent.Lcode == 8) { // I1595 - Backspace for mnemonic
         DOMEventHandlers.states._KeyPressToSwallow = 1;
         if(!kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
-          kbdInterface.output(1, this.keyman._LastActiveElement,""); // I3363 (Build 301)
+          kbdInterface.output(1, DOMEventHandlers.states.lastActiveElement, ""); // I3363 (Build 301)
         }
         return false;  //added 16/3/13 to fix double backspace on mnemonic layouts on desktop
       }
@@ -822,7 +828,7 @@ class DOMEventHandlers {
           if(Levent.Ltarg.type == 'search' || Levent.Ltarg.type == 'submit') {
             Levent.Ltarg.form.submit();
           } else {
-            (<any>this.keyman).moveToNext(false);
+            this.keyman.domManager.moveToNext(false);
           }
         }
         return true;        
@@ -929,10 +935,10 @@ class DOMTouchHandlers extends DOMEventHandlers {
         tEvent=e.touches[0];
     } else { // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
       tEvent={clientX:0, clientY:0}
-      // Will usually be called from setActiveElement, which should define _LastActiveElement
-      if(this.keyman._LastActiveElement) {
-        tEvent.target = this.keyman._LastActiveElement['kmw_ip'];
-      // but will default to first input or text area on page if _LastActiveElement is null
+      // Will usually be called from setActiveElement, which should define DOMEventHandlers.states.lastActiveElement
+      if(DOMEventHandlers.states.lastActiveElement) {
+        tEvent.target = DOMEventHandlers.states.lastActiveElement['kmw_ip'];
+      // but will default to first input or text area on page if DOMEventHandlers.states.lastActiveElement is null
       } else {
         tEvent.target = this.keyman.sortedInputs[0]['kmw_ip'];
       }
@@ -953,10 +959,10 @@ class DOMTouchHandlers extends DOMEventHandlers {
     var target=scroller.parentNode;
 
     // Move the caret and refocus if necessary     
-    if(this.keyman._ActiveElement != target) {
+    if(DOMEventHandlers.states.activeElement != target) {
       // Hide the KMW caret
       this.hideCaret(); 
-      this.keyman._ActiveElement=target;
+      DOMEventHandlers.states.activeElement=target;
       // The issue here is that touching a DIV does not actually set the focus for iOS, even when enabled to accept focus (by setting tabIndex=0)
       // We must explicitly set the focus in order to remove focus from any non-KMW input
       target.focus();  //Android native browsers may not like this, but it is needed for Chrome, Safari
@@ -1062,7 +1068,7 @@ class DOMTouchHandlers extends DOMEventHandlers {
     this._BlurKeyboardSettings();
 
     // With the attachment API update, we now directly track the old legacy control behavior.
-    this.keyman._LastActiveElement = target;
+    DOMEventHandlers.states.lastActiveElement = target;
 
     /**
      * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
@@ -1175,21 +1181,23 @@ class DOMTouchHandlers extends DOMEventHandlers {
   }
 
   hideCaret() {
-    var e=this.keyman._LastActiveElement, s=null;
+    var e=DOMEventHandlers.states.lastActiveElement, s=null;
     if(e && e.className != null && e.className.indexOf('keymanweb-input') >= 0) {
       // Always copy text back to underlying field on blur
-      e.base.value = this.getText(e);
+      if(e.base instanceof HTMLTextAreaElement || e.base instanceof HTMLInputElement) {
+        e.base.value = this.getText(e);
+      }
       
       // And set the scroller caret to the end of the element content
       this.setText(e, null, 100000);
       
       // Set the element scroll to zero (or max for RTL INPUT)
-      var ss=e.firstChild.style;
+      var ss=(e.firstChild as HTMLElement).style;
       if(e.base.nodeName == 'TEXTAREA') {
         ss.top='0'; 
       } else {
         if(e.base.dir == 'rtl') {
-          ss.left=(e.offsetWidth-e.firstChild.offsetWidth-8)+'px';
+          ss.left=(e.offsetWidth-(e.firstChild as HTMLElement).offsetWidth-8)+'px';
         } else {
           ss.left='0';
         }
@@ -1203,13 +1211,13 @@ class DOMTouchHandlers extends DOMEventHandlers {
 
       this.caret.style.visibility='hidden';
       if(e.childNodes.length > 1 ) {
-        e.childNodes[1].style.visibility='hidden';
+        (e.childNodes[1] as HTMLElement).style.visibility='hidden';
       }
     }    
   }
 
   flashCaret: () => void = function(this: DOMTouchHandlers): void {
-    if(this.keyman.util.device.touchable && this.keyman._ActiveElement != null) {
+    if(this.keyman.util.device.touchable && DOMEventHandlers.states.activeElement != null) {
       var cs=this.caret.style;
       cs.visibility = cs.visibility != 'visible' ? 'visible' : 'hidden';
     }
@@ -1349,7 +1357,7 @@ class DOMTouchHandlers extends DOMEventHandlers {
    * Close OSK and remove simulated caret on losing focus
    */          
   cancelInput(): void { 
-    this.keyman._ActiveElement=null; 
+    DOMEventHandlers.states.activeElement=null; 
     this.hideCaret(); 
     this.keyman.osk.hideNow();
   };

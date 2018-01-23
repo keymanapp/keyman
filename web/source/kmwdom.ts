@@ -817,9 +817,10 @@ class DOMManager {
    * Description  Disable KMW control element 
    */    
   _DisableControl(Pelem: HTMLElement) {
-    if(this.isAttached(Pelem)) { // Only operate on attached elements!  
-      if(this.keyman._LastActiveElement == Pelem || this.keyman._LastActiveElement == Pelem['kmw_ip']) {
-        this.keyman._LastActiveElement = null;
+    if(this.isAttached(Pelem)) { // Only operate on attached elements!
+      var lastElem = this.getLastActiveElement();
+      if(lastElem == Pelem || lastElem == Pelem['kmw_ip']) {
+        this.clearLastActiveElement();
         this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
         this.keyman.osk._Hide();
       }
@@ -1130,7 +1131,9 @@ class DOMManager {
 
       // If Pelem is the focused element/active control, we should set the keyboard in place now.
       // 'kmw_ip' is the touch-alias for the original page's control.
-      if(this.keyman._LastActiveElement && (this.keyman._LastActiveElement == Pelem || this.keyman._LastActiveElement == Pelem['kmw_ip'])) {
+
+      var lastElem = this.getLastActiveElement();
+      if(lastElem && (lastElem == Pelem || lastElem == Pelem['kmw_ip'])) {
 
         if(Pkbd != null && Plc != null) { // Second part necessary for Closure.
           this.keyman.keyboardManager.setActiveKeyboard(Pkbd, Plc);
@@ -1179,15 +1182,16 @@ class DOMManager {
    * Set focus to last active target element (browser-dependent)
    */    
   focusLastActiveElement() {
-    if(!this.keyman._LastActiveElement) {
+    var lastElem = this.getLastActiveElement();
+    if(!lastElem) {
       return;
     }
 
     this.keyman._JustActivatedKeymanWebUI = 1;
-    if((<any>this.keyman)._IsMozillaEditableIframe(this.keyman._LastActiveElement,0)) {
-      this.keyman._LastActiveElement.defaultView.focus(); // I3363 (Build 301)
-    } else if(this.keyman._LastActiveElement.focus) {
-      this.keyman._LastActiveElement.focus();
+    if(lastElem instanceof HTMLIFrameElement && this.keyman.domManager._IsMozillaEditableIframe(lastElem,0)) {
+      (<any>lastElem).defaultView.focus(); // I3363 (Build 301)
+    } else if(lastElem.focus) {
+      lastElem.focus();
     }
   }
 
@@ -1197,7 +1201,19 @@ class DOMManager {
    * @return      {Element}        
    */    
   getLastActiveElement(): HTMLElement {
-    return this.keyman._LastActiveElement;
+    return DOMEventHandlers.states.lastActiveElement;
+  }
+
+  clearLastActiveElement() {
+    DOMEventHandlers.states.lastActiveElement = null;
+  }
+
+  getActiveElement(): HTMLElement {
+    return DOMEventHandlers.states.activeElement;
+  }
+
+  _setActiveElement(Pelem: HTMLElement) {
+    DOMEventHandlers.states.activeElement = Pelem;
   }
 
   /**
@@ -1206,12 +1222,12 @@ class DOMManager {
    *  @param  {Object|string} e         element id or element
    *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123) 
    **/
-  setActiveElement(e: string|HTMLElement, setFocus: boolean) {
+  setActiveElement(e: string|HTMLElement, setFocus?: boolean) {
     if(e instanceof String) {
       e=document.getElementById(e);
     }
 
-    this.keyman._ActiveElement=this.keyman._LastActiveElement=e;
+    DOMEventHandlers.states.activeElement = DOMEventHandlers.states.lastActiveElement=e;
 
     // Allow external focusing KMEW-123
     if(arguments.length > 1 && setFocus) {
@@ -1222,6 +1238,119 @@ class DOMManager {
       }
     }
   }
+
+  /** Sets the active input element only if it is presently null.
+   * 
+   * @param  {Element}
+   */
+  initActiveElement(Lelem: HTMLElement) {
+    if(DOMEventHandlers.states.activeElement == null) {
+      DOMEventHandlers.states.activeElement = Lelem;
+    }
+  }
+
+  /**
+   * Move focus to next (or previous) input or text area element on TAB
+   *   Uses list of actual input elements
+   *     
+   *   Note that activeElement() on touch devices returns the DIV that overlays
+   *   the input element, not the element itself.
+   * 
+   * @param      {number|boolean}  bBack     Direction to move (0 or 1)
+   */
+  moveToNext(bBack: number|boolean) {
+    var i,t=this.keyman.sortedInputs, activeBase=this.getActiveElement();
+    var touchable = this.keyman.util.device.touchable;
+    
+    if(t.length == 0) {
+      return;
+    }
+
+    // For touchable devices, get the base element of the DIV
+    if(touchable) {
+      activeBase=activeBase.base;
+    }
+
+    // Identify the active element in the list of inputs ordered by position
+    for(i=0; i<t.length; i++) {
+      if(t[i] == activeBase) break;
+    }
+
+    // Find the next (or previous) element in the list
+    i = bBack ? i-1 : i+1;
+    // Treat the list as circular, wrapping the index if necessary.
+    i = i >= t.length ? i-t.length : i;
+    i = i < 0 ? i+t.length : i;
+
+    // Move to the selected element
+    if(touchable) {
+      // Set focusing flag to prevent OSK disappearing 
+      this.keyman.focusing=true;
+      var target=t[i]['kmw_ip'];
+
+      // Focus if next element is non-mapped
+      if(typeof(target) == 'undefined') {
+        t[i].focus();
+      } else { // Or reposition the caret on the input DIV if mapped
+        this.keyman.domManager.setActiveElement(target); // Handles both `lastActive` + `active`.
+        this.touchHandlers.setTextCaret(target,10000); // Safe b/c touchable == true.
+        this.touchHandlers.scrollInput(target);   // mousedown check
+        target.focus();
+      }
+    } else { // Behaviour for desktop browsers
+      t[i].focus();
+    }
+  }
+
+  /**
+   * Move focus to user-specified element
+   * 
+   *  @param  {string|Object}   e   element or element id
+   *           
+   **/
+  moveToElement(e:string|HTMLElement) {
+    var i;
+    
+    if(e instanceof String) {
+      e=document.getElementById(e);
+    }
+    
+    if(this.keyman.util.device.touchable && e['kmw_ip']) {
+      e['kmw_ip'].focus();
+    } else {
+      e.focus();
+    }
+  }
+
+  /* ----------------------- Editable IFrame methods ------------------- */
+
+  /**
+   * Function     _IsIEEditableIframe
+   * Scope        Private
+   * @param       {Object}          Pelem         Iframe element
+   *              {boolean|number}  PtestOn       1 to test if frame content is editable (TODO: unclear exactly what this is doing!)   
+   * @return      {boolean}
+   * Description  Test if element is an IE editable IFrame 
+   */    
+  _IsIEEditableIframe(Pelem: HTMLIFrameElement, PtestOn?: number) {
+    var Ldv, Lvalid = Pelem  &&  (Ldv=Pelem.tagName)  &&  Ldv.toLowerCase() == 'body'  &&  (Ldv=Pelem.ownerDocument)  &&  Ldv.parentWindow;
+    return (!PtestOn  &&  Lvalid) || (PtestOn  &&  (!Lvalid || Pelem.isContentEditable));
+  }
+
+  /**
+   * Function     _IsMozillaEditableIframe
+   * Scope        Private
+   * @param       {Object}           Pelem    Iframe element
+   * @param       {boolean|number}   PtestOn  1 to test if 'designMode' is 'ON'    
+   * @return      {boolean} 
+   * Description  Test if element is a Mozilla editable IFrame 
+   */    
+  _IsMozillaEditableIframe(Pelem: HTMLIFrameElement, PtestOn?: number) {
+    var Ldv, Lvalid = Pelem  &&  (Ldv=(<any>Pelem).defaultView)  &&  Ldv.frameElement;  // Probable bug!
+    return (!PtestOn  &&  Lvalid) || (PtestOn  &&  (!Lvalid || Ldv.document.designMode.toLowerCase()=='on'));
+  }
+
+  /* ----------------------- Initialization methods ------------------ */
   
   /**
    * Function     Initialization
@@ -1367,7 +1496,6 @@ class DOMManager {
     // Initialize touch-screen device interface  I3363 (Build 301)
     if(device.touchable) {
       this.keyman.handleRotationEvents();
-      (<any>this.keyman).setupTouchDevice();
     }    
     // Initialize browser interface
 

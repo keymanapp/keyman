@@ -218,7 +218,7 @@ if(!window['keyman']['initialized']) {
         {
           keymanweb._IsActivatingKeymanWebUI=0; osk._Hide(true); 
           keymanweb.touchAliasing.hideCaret();
-          keymanweb._LastActiveElement = 0;
+          keymanweb.domManager.clearLastActiveElement();
         }
       }
     }

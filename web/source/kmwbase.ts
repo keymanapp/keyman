@@ -28,9 +28,6 @@ class KeymanBase {
   _IgnoreNextSelChange = 0;  // when a visual keyboard key is mouse-down, ignore the next sel change because this stuffs up our history  
   _Selection = null;
   _SelectionControl = null;
-  _AttachedElements = [];    // I1596 - attach to controls dynamically
-  _ActiveElement = null;     // Currently active (focused) element  I3363 (Build 301)
-  _LastActiveElement = null; // LastElem - Last active element
   _DfltStyle = '';           // Default styles
   _MasterDocument = null;    // Document with controller (to allow iframes to distinguish local/master control)
   _HotKeys = [];             // Array of document-level hotkey objects
@@ -167,7 +164,7 @@ class KeymanBase {
     if (!e) {
       e = window.event as E;
       if(!e) {
-        var elem: HTMLElement|Document = (<any>this)._GetLastActiveElement();
+        var elem: HTMLElement|Document = this.domManager.getLastActiveElement();
         if(elem) {
           elem = elem.ownerDocument;
           var win: Window;
@@ -365,6 +362,17 @@ class KeymanBase {
   }
 
   /**
+   * Gets the cookie for the name and language code of the most recently active keyboard
+   * 
+   *  Defaults to US English, but this needs to be user-set in later revision (TODO)      
+   * 
+   * @return      {string}          InternalName:LanguageCode 
+   */    
+  ['getSavedKeyboard']() {
+    return this.keyboardManager.getSavedKeyboard();  
+  }
+
+  /**
    * Function     Initialization
    * Scope        Public
    * @param       {Object}  arg     object array of user-defined properties
@@ -463,6 +471,16 @@ class KeymanBase {
    **/
   ['setActiveElement'](e: string|HTMLElement, setFocus: boolean) {
     return this.domManager.setActiveElement(e, setFocus);
+  }
+
+  /**
+   * Move focus to user-specified element
+   * 
+   *  @param  {string|Object}   e   element or element id
+   *           
+   **/
+  ['moveToElement'](e: string|HTMLElement) {
+    this.domManager.moveToElement(e);
   }
 }
 

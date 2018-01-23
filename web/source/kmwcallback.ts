@@ -115,7 +115,7 @@ class KeyboardInterface {
   insertText(Ptext: string, PdeadKey:number): boolean {
     this.resetContextCache();
     //_DebugEnter('InsertText');
-    var Lelem = this.keymanweb._LastActiveElement, Ls, Le, Lkc, Lsel, Lv=false;
+    var Lelem = this.keymanweb.domManager.getLastActiveElement(), Ls, Le, Lkc, Lsel, Lv=false;
     if(Lelem != null) {
       Ls=Lelem._KeymanWebSelectionStart;
       Le=Lelem._KeymanWebSelectionEnd;
@@ -123,9 +123,10 @@ class KeyboardInterface {
 
       this.keymanweb._IsActivatingKeymanWebUI = 1;
       this.keymanweb._IgnoreNextSelChange = 100;
-      (<any>this.keymanweb)._FocusLastActiveElement();
-      if((<any>this.keymanweb)._IsMozillaEditableIframe(Lelem,0)) {
-        Lelem = Lelem.documentElement;  // I3363 (Build 301)
+      this.keymanweb.domManager.focusLastActiveElement();
+      
+      if(Lelem instanceof HTMLIFrameElement && this.keymanweb.domManager._IsMozillaEditableIframe(Lelem,0)) {
+        Lelem = (<any>Lelem).documentElement;  // I3363 (Build 301)
       }
       if(document.selection  &&  Lsel != null) {
         Lsel.select();
@@ -887,11 +888,11 @@ class KeyboardInterface {
    * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
    */
   ['getLastActiveElement'](): HTMLElement {
-    return this.keymanweb._LastActiveElement; 
+    return this.keymanweb.domManager.getLastActiveElement(); 
   }
 
   ['focusLastActiveElement'](): void { 
-    (<any>this)._FocusLastActiveElement(); 
+    this.keymanweb.domManager.focusLastActiveElement(); 
   }
 
   //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
@@ -907,7 +908,7 @@ class KeyboardInterface {
     this.keymanweb.osk.userPositioned=true; 
     this.keymanweb.osk._Show(-1,-1);
   }
-  
+
   resetContext() {
     this.keymanweb.osk.layerId = 'default';
 

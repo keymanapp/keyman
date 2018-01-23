@@ -200,34 +200,6 @@ if(!window['keyman']['initialized']) {
     }      
 
   //TODO: add more complete description of what ControlFocus really does
-    
-    /**
-     * Function     _IsIEEditableIframe
-     * Scope        Private
-     * @param       {Object}          Pelem         Iframe element
-     *              {boolean|number}  PtestOn       1 to test if frame content is editable (TODO: unclear exactly what this is doing!)   
-     * @return      {boolean}
-     * Description  Test if element is an IE editable IFrame 
-     */    
-    keymanweb._IsIEEditableIframe = function(Pelem,PtestOn)
-    {
-      var Ldv, Lvalid = Pelem  &&  (Ldv=Pelem.tagName)  &&  Ldv.toLowerCase() == 'body'  &&  (Ldv=Pelem.ownerDocument)  &&  Ldv.parentWindow;
-      return (!PtestOn  &&  Lvalid) || (PtestOn  &&  (!Lvalid || Pelem.isContentEditable));
-    }
-
-    /**
-     * Function     _IsMozillaEditableIframe
-     * Scope        Private
-     * @param       {Object}           Pelem    Iframe element
-     * @param       {boolean|number}   PtestOn  1 to test if 'designMode' is 'ON'    
-     * @return      {boolean} 
-     * Description  Test if element is a Mozilla editable IFrame 
-     */    
-    keymanweb._IsMozillaEditableIframe = function(Pelem,PtestOn)
-    {
-      var Ldv, Lvalid = Pelem  &&  (Ldv=Pelem.defaultView)  &&  Ldv.frameElement;
-      return (!PtestOn  &&  Lvalid) || (PtestOn  &&  (!Lvalid || Ldv.document.designMode.toLowerCase()=='on'));
-    }
 
     /**
      * Function     doUnloadOSK
@@ -285,77 +257,7 @@ if(!window['keyman']['initialized']) {
     if (window.addEventListener)
       window.addEventListener('focus', keymanweb._BubbledFocus, true);
     
-  //TODO: check return of _KeyUp - what happens if returning true or false ?? what if null returned?
-
-    /**
-    * Move focus to next (or previous) input or text area element on TAB
-    *   Uses list of actual input elements
-    *     
-    *   Note that _ActiveElement on touch devices returns the DIV that overlays
-    *   the input element, not the element itself.
-    * 
-    * @param      {number|boolean}  bBack     Direction to move (0 or 1)
-    */
-    keymanweb.moveToNext=function(bBack) {
-      var i,t=keymanweb.sortedInputs, activeBase=keymanweb._ActiveElement;
-      
-      if(t.length == 0) {
-        return;
-      }
-
-      // For touchable devices, get the base element of the DIV
-      if(device.touchable) {
-        activeBase=activeBase.base;
-      }
-
-      // Identify the active element in the list of inputs ordered by position
-      for(i=0; i<t.length; i++) {          
-        if(t[i] == activeBase) break;
-      }   
-
-      // Find the next (or previous) element in the list
-      i = bBack ? i-1 : i+1;
-      // Treat the list as circular, wrapping the index if necessary.
-      i = i >= t.length ? i-t.length : i;
-      i = i < 0 ? i+t.length : i;
-
-      // Move to the selected element
-      if(device.touchable) {                     
-        // Set focusing flag to prevent OSK disappearing 
-        keymanweb.focusing=true;
-        var target=t[i]['kmw_ip'];
-
-        // Focus if next element is non-mapped
-        if(typeof(target) == 'undefined') {
-          t[i].focus();
-        } else { // Or reposition the caret on the input DIV if mapped
-          keymanweb._ActiveElement=keymanweb._LastActiveElement=target;    
-          keymanweb.touchAliasing.setTextCaret(target,10000);                            
-          keymanweb.touchAliasing.scrollInput(target);   // mousedown check
-          target.focus();
-        } 
-      } else { // Behaviour for desktop browsers
-        t[i].focus();
-      }    
-    }          
-
-    /**
-     * Move focus to user-specified element
-     * 
-     *  @param  {string|Object}   e   element or element id
-     *           
-     **/
-    keymanweb['moveToElement'] = function(e)
-    {
-      var i;
-      
-      if(typeof(e) == 'string') e=document.getElementById(e);
-      
-      if(device.touchable && e['kmw_ip'])
-        e['kmw_ip'].focus();
-      else
-        e.focus();
-    }
+  //TODO: check return of _KeyUp - what happens if returning true or false ?? what if null returned?       
 
   //TODO: find all references to next three routines and disambiguate!!
     
@@ -372,7 +274,7 @@ if(!window['keyman']['initialized']) {
       // Allow the OSK to release its own resources
       if(osk.ready) osk._Unload(); // I3363 (Build 301)
       
-      keymanweb._LastActiveElement = 0;
+      keymanweb.domManager.clearLastActiveElement();
     }
     
       // Complete page initialization only after the page is fully loaded, including any embedded fonts
@@ -599,17 +501,6 @@ if(!window['keyman']['initialized']) {
     }
 
     util.attachDOMEvent(document, 'keyup', keymanweb._ProcessHotKeys,false);  
-
-    /**
-     * Gets the cookie for the name and language code of the most recently active keyboard
-     * 
-     *  Defaults to US English, but this needs to be user-set in later revision (TODO)      
-     * 
-     * @return      {string}          InternalName:LanguageCode 
-     **/    
-    keymanweb['getSavedKeyboard'] = function() {
-      return keymanweb.keyboardManager.getSavedKeyboard();  
-    }
 
     util.attachDOMEvent(window, 'focus', keymanweb._ResetVKShift,false);  // I775
     util.attachDOMEvent(window, 'blur', keymanweb._ResetVKShift,false);   // I775

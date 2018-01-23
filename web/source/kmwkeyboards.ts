@@ -350,8 +350,8 @@ class KeyboardManager {
     //      If UI callbacks are needed at all, they should be within _SetActiveKeyboard  
     this.doBeforeKeyboardChange(PInternalName,PLgCode);     
     this._SetActiveKeyboard(PInternalName,PLgCode,true);    
-    if(this.keymanweb._LastActiveElement != null) {
-      (<any>this.keymanweb)._FocusLastActiveElement(); // TODO:  Resolve without need for the cast.
+    if(this.keymanweb.domManager.getLastActiveElement() != null) {
+      this.keymanweb.domManager.focusLastActiveElement(); // TODO:  Resolve without need for the cast.
     }
     // If we ever allow PLgCode to be set by default, we can auto-detect the language code
     // after the _SetActiveKeyboard call.
@@ -445,7 +445,7 @@ class KeyboardManager {
     for(Ln=0; Ln<this.keyboards.length; Ln++) { // I1511 - array prototype extended
       if(this.keyboards[Ln]['KI'] == PInternalName) {
         this.activeKeyboard = this.keyboards[Ln];
-        this.keymanweb.domManager._SetTargDir(this.keymanweb._LastActiveElement);  // I2077 - LTR/RTL timing
+        this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
       
         // and update the active stub
         for(var Ls=0; Ls<this.keyboardStubs.length; Ls++) {
@@ -534,7 +534,7 @@ class KeyboardManager {
           return;
         }
       }
-      this.keymanweb.domManager._SetTargDir(this.keymanweb._LastActiveElement);  // I2077 - LTR/RTL timing
+      this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
     } 
 
     var Pk=this.activeKeyboard;  // I3319
@@ -602,9 +602,9 @@ class KeyboardManager {
           manager.doBeforeKeyboardChange(kbd['KI'],kbdStub['KLC']);
           manager.activeKeyboard=kbd;
 
-          if((<any>manager.keymanweb)._LastActiveElement != null) { // TODO:  Resolve without need for the cast.
+          if(manager.keymanweb.domManager.getLastActiveElement() != null) { // TODO:  Resolve without need for the cast.
             (<any>manager.keymanweb)._JustActivatedKeymanWebUI = 1; // TODO:  Resolve without need for the cast.
-            manager.keymanweb.domManager._SetTargDir(manager.keymanweb._LastActiveElement);
+            manager.keymanweb.domManager._SetTargDir(manager.keymanweb.domManager.getLastActiveElement());
           }
 
           String.kmwEnableSupplementaryPlane(kbdStub && ((kbdStub['KS'] && (kbdStub['KS'] == 1)) || (kbd['KN'] == 'Hieroglyphic'))); // I3319 - SMP extension, I3363 (Build 301)
