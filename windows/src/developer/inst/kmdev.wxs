@@ -153,23 +153,18 @@
                   </Component>
 
                   <Directory Id='xmlkmwresource' Name='resource' DiskId='1'>
-                      <Component><File Id='xml_kmw_resource_keymanweb.js' Name='keymanweb.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwbase.js' Name='kmwbase.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwcallback.js' Name='kmwcallback.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwdebug.js' Name='kmwdebug.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwinit.js' Name='kmwinit.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwkeymaps.js' Name='kmwkeymaps.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwlayout.js' Name='kmwlayout.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwnative.js' Name='kmwnative.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwosk.js' Name='kmwosk.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwreleasestub.js' Name='kmwreleasestub.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwstring.js' Name='kmwstring.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwuibutton.js' Name='kmwuibutton.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwuifloat.js' Name='kmwuifloat.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwuitoggle.js' Name='kmwuitoggle.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_kmwuitoolbar.js' Name='kmwuitoolbar.js' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_license' Name='LICENSE' KeyPath="yes" /></Component>
-                      <Component><File Id='xml_kmw_resource_readme_md' Name='README.md' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_kmw_resource_keymanweb.js' Name='keymanweb.js' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_kmw_resource_kmwuibutton.js' Name='kmwuibutton.js' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_kmw_resource_kmwuifloat.js' Name='kmwuifloat.js' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_kmw_resource_kmwuitoggle.js' Name='kmwuitoggle.js' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_kmw_resource_kmwuitoolbar.js' Name='kmwuitoolbar.js' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_kmw_resource_keymanweb.js.map' Name='keymanweb.js.map' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_kmw_resource_kmwuibutton.js.map' Name='kmwuibutton.js.map' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_kmw_resource_kmwuifloat.js.map' Name='kmwuifloat.js.map' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_kmw_resource_kmwuitoggle.js.map' Name='kmwuitoggle.js.map' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_kmw_resource_kmwuitoolbar.js.map' Name='kmwuitoolbar.js.map' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_kmw_resource_license' Name='LICENSE' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_kmw_resource_readme_md' Name='README.md' KeyPath="yes" /></Component>
                     
                     <Directory Id='xmlkmwresourceosk' Name='osk' FileSource='..\..\developer\tike\xml\kmw\resource\osk\' DiskId='1'>
                         <Component><File Id='xml_kmw_resource_osk_ajax_loader.gif'             Name='ajax-loader.gif'               KeyPath="yes" /></Component>
