@@ -26,6 +26,7 @@ import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -118,9 +119,20 @@ public class PackageActivity extends Activity{
       }
     });
 
-    File welcome = new File(tempPackagePath.getPath(), "Welcome.htm");
-    if (welcome.exists()) {
-      webView.loadUrl("file:///" + welcome.getAbsolutePath());
+    // Determine if KMP contains welcome.htm (case-insensitive) to display
+    FileFilter welcomeFilter = new FileFilter() {
+      @Override
+      public boolean accept(File pathname) {
+        if (pathname.isFile() && pathname.getName().equalsIgnoreCase("welcome.htm")) {
+          return true;
+        }
+        return false;
+      }
+    };
+
+    File[] files = tempPackagePath.listFiles(welcomeFilter);
+    if (files.length > 0 && files[0].exists() && files[0].length() > 0) {
+      webView.loadUrl("file:///" + files[0].getAbsolutePath());
     } else {
       String htmlString = "<div id='welcome'><H1>Package: " + pkgId + "</H1></div>";
       webView.loadData(htmlString, "text/html; charset=utf-8", "UTF-8");
