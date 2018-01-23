@@ -24,11 +24,6 @@
 goog.exportProperty(keyman, "build", keyman); // Only works on individual instances.
 goog.exportSymbol("KeymanBase.prototype.addEventListener", KeymanBase.prototype.addEventListener);
 goog.exportSymbol("KeymanBase.prototype.isFontAvailable", KeymanBase.prototype.isFontAvailable);
-goog.exportSymbol("KeymanBase.prototype.GetLastActiveElement", KeymanBase.prototype.getLastActiveElement);
-goog.exportSymbol("KeymanBase.prototype.FocusLastActiveElement", KeymanBase.prototype.focusLastActiveElement);
-goog.exportSymbol("KeymanBase.prototype.HideHelp", KeymanBase.prototype.hideHelp);
-goog.exportSymbol("KeymanBase.prototype.ShowHelp", KeymanBase.prototype.showHelp);
-goog.exportSymbol("KeymanBase.prototype.ShowPinnedHelp", KeymanBase.prototype.showPinnedHelp);
 
 // Util.ts
 
