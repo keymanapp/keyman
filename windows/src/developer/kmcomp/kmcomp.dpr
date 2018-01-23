@@ -82,7 +82,6 @@ uses
   ProjectLog in '..\TIKE\project\ProjectLog.pas',
   UMD5Hash in '..\..\global\delphi\general\UMD5Hash.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
-  JSONKeyboardInfo in '..\..\global\delphi\kmw\JSONKeyboardInfo.pas',
   VisualKeyboardLoaderBinary in '..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas',
   VisualKeyboardLoaderXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas',
   VisualKeyboardSaverBinary in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas',

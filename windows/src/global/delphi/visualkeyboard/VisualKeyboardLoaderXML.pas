@@ -166,7 +166,7 @@ begin
   { kbdname }
   node := FindNode('kbdname', header);
   if Assigned(node) then
-    FKbd.Header.AssociatedKeyboard := node.NodeValue;
+    FKbd.Header.AssociatedKeyboard := VarToStr(node.NodeValue);
 
   { flags }
   FKbd.Header.Flags := [];
