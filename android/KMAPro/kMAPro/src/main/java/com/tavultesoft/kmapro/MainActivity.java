@@ -225,18 +225,24 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     PackageActivity.addKeyboardDownloadEventListener(this);
 
-    // If URL provided, start KMKeyboardDownloaderActivity
     Intent intent = getIntent();
     Uri data = intent.getData();
+
     if (data != null) {
-      String directStr = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Direct);
       boolean isDirect = false;
+      File kmpFile = new File(data.getPath());
+      String url = null;
+      String directStr = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Direct);
       if (directStr != null && directStr.equals("true")) {
         isDirect = true;
+        url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
+      } else {
+        url = data.toString();
       }
 
-      String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
       if (url != null) {
+        // This could be from keyman://, http://, or https:// protocols
+        // URL contains KMP to download in background.
         boolean isCustom = KMKeyboardDownloaderActivity.isCustom(url);
 
         int index = url.lastIndexOf("/") + 1;
@@ -247,7 +253,25 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
         Intent i;
         Bundle bundle = new Bundle();
-        if (url.endsWith(".kmp")) {
+        if (data.getScheme().equals("file") && kmpFile.exists()) {
+          // KMP is already local. Copy KMP to app cache and start PackageActivity
+          File cacheKmpFile = new File(MainActivity.this.getCacheDir().toString(), kmpFile.getName());
+          if (cacheKmpFile.exists()) {
+            cacheKmpFile.delete();
+          }
+          try {
+            FileUtils.copy(kmpFile, cacheKmpFile);
+          } catch (Exception e) {
+            Log.e("onResume", "Copy failed: " + e);
+            intent.setData(null);
+            return;
+          }
+
+          bundle.putString("kmpFile", cacheKmpFile.getAbsolutePath());
+          Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
+          packageIntent.putExtras(bundle);
+          startActivity(packageIntent);
+        } else if (url.endsWith(".kmp")) {
           try {
             // Download the KMP to app cache
             i = new Intent(MainActivity.this, DownloadIntentService.class);
@@ -270,6 +294,8 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
             return;
           }
         } else {
+          // Legacy ad-hoc keyboard distribution
+          // Intending to deprecate keyman:// protocol in https://github.com/keymanapp/keyman/issues/538
           i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
 
           bundle.putString(KMKeyboardDownloaderActivity.ARG_KEYBOARD,
