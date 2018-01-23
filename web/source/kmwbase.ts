@@ -135,31 +135,6 @@ class KeymanBase {
   }
 
   /**
-  * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
-  */
-  getLastActiveElement(): HTMLElement {
-    return this._LastActiveElement; 
-  }
-
-  focusLastActiveElement(): void { 
-    (<any>this)._FocusLastActiveElement(); 
-  }
-
-  //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
-  hideHelp(): void {
-    this.osk._Hide(true);
-  }
-
-  showHelp(Px: number, Py: number): void {
-    this.osk._Show(Px,Py);
-  }
-
-  showPinnedHelp(): void {
-    this.osk.userPositioned=true; 
-    this.osk._Show(-1,-1);
-  }
-
-  /**
    * Function     _push
    * Scope        Private   
    * @param       {Array}     Parray    Array   

@@ -882,4 +882,28 @@ class KeyboardInterface {
     return this.keymanweb.keyboardManager.activeKeyboard['gs'](element, keystroke);
   }
   
+  /**
+   * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
+   */
+  ['getLastActiveElement'](): HTMLElement {
+    return this.keymanweb._LastActiveElement; 
+  }
+
+  ['focusLastActiveElement'](): void { 
+    (<any>this)._FocusLastActiveElement(); 
+  }
+
+  //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
+  ['hideHelp'](): void {
+    this.keymanweb.osk._Hide(true);
+  }
+
+  ['showHelp'](Px: number, Py: number): void {
+    this.keymanweb.osk._Show(Px,Py);
+  }
+
+  ['showPinnedHelp'](): void {
+    this.keymanweb.osk.userPositioned=true; 
+    this.keymanweb.osk._Show(-1,-1);
+  }
 }
