@@ -426,14 +426,14 @@ class KeyboardInterface {
     var Li, Ldv;
   
     if(Pelem.className.indexOf('keymanweb-input') >= 0) {
-      var t=(<any>this.keymanweb).touchAliasing.getTextBeforeCaret(Pelem);
+      var t=this.keymanweb.touchAliasing.getTextBeforeCaret(Pelem);
       if(dn > 0) {
         t=t._kmwSubstr(0,t._kmwLength()-dn)+s; 
       } else {
         t=t+s;
       }
       
-      (<any>this.keymanweb).touchAliasing.setTextBeforeCaret(Pelem,t);
+      this.keymanweb.touchAliasing.setTextBeforeCaret(Pelem,t);
       return;
     }
   

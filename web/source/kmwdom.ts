@@ -33,6 +33,11 @@ class DOMManager {
    */
   enablementObserver: MutationObserver;
 
+  /**
+   * Tracks a visually-sorted list of elements that are KMW-enabled.
+   */
+  sortedInputs: HTMLElement[] = [];   // List of all INPUT and TEXTAREA elements ordered top to bottom, left to right
+
   constructor(keyman: KeymanBase) {
     this.keyman = keyman;
     
@@ -833,14 +838,14 @@ class DOMManager {
       
         // If a touch alias was removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
         window.setTimeout(function() {
-          keyman.domManager.listInputs();
+          this.listInputs();
 
-          for(var k = 0; k < keyman.sortedInputs.length; k++) {
-            if(keyman.sortedInputs[k]['kmw_ip']) {
-              this.getHandlers(Pelem).updateInput(keyman.sortedInputs[k]['kmw_ip']);
+          for(var k = 0; k < this.sortedInputs.length; k++) {
+            if(DOMEventHandlers.states[k]['kmw_ip']) {
+              this.getHandlers(Pelem).updateInput(DOMEventHandlers.states[k]['kmw_ip']);
             }
           }
-        }, 1);
+        }.bind(this), 1);
       } else {
         this.listInputs(); // Fix up our internal input ordering scheme.
       }
@@ -867,9 +872,9 @@ class DOMManager {
         window.setTimeout(function() {
           keyman.domManager.listInputs();
 
-          for(var k = 0; k < keyman.sortedInputs.length; k++) {
-            if(keyman.sortedInputs[k]['kmw_ip']) {
-              this.getHandlers(Pelem).updateInput(keyman.sortedInputs[k]['kmw_ip']);
+          for(var k = 0; k < this.sortedInputs.length; k++) {
+            if(this.sortedInputs[k]['kmw_ip']) {
+              this.getHandlers(Pelem).updateInput(this.sortedInputs[k]['kmw_ip']);
             }
           }
         }, 1);
@@ -929,7 +934,7 @@ class DOMManager {
       tList.push(eList[i].ip);
   
     // Return the sorted element list
-    this.keyman.sortedInputs=tList;
+    this.sortedInputs=tList;
   }
 
   _EnablementMutationObserverCore = function(mutations: MutationRecord[]) {
@@ -1001,9 +1006,9 @@ class DOMManager {
         window.setTimeout(function() {
           domManager.listInputs();
 
-          for(var k = 0; k < this.keyman.sortedInputs.length; k++) {
-            if(this.keyman.sortedInputs[k]['kmw_ip']) {
-              this.keyman.touchAliasing.updateInput(this.keyman.sortedInputs[k]['kmw_ip']);
+          for(var k = 0; k < this.sortedInputs.length; k++) {
+            if(this.sortedInputs[k]['kmw_ip']) {
+              this.touchAliasing.updateInput(this.sortedInputs[k]['kmw_ip']);
             }
           }
         }, 1);
@@ -1259,7 +1264,7 @@ class DOMManager {
    * @param      {number|boolean}  bBack     Direction to move (0 or 1)
    */
   moveToNext(bBack: number|boolean) {
-    var i,t=this.keyman.sortedInputs, activeBase=this.getActiveElement();
+    var i,t=this.sortedInputs, activeBase=this.getActiveElement();
     var touchable = this.keyman.util.device.touchable;
     
     if(t.length == 0) {

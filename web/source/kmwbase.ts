@@ -34,7 +34,6 @@ class KeymanBase {
   focusTimer = null;         // Timer to manage loss of focus to unmapped input
   focusing = false;          // Flag to manage movement of focus
   resizing = false;          // Flag to control resize events when resetting viewport parameters
-  sortedInputs = [];         // List of all INPUT and TEXTAREA elements ordered top to bottom, left to right
   inputList = [];            // List of simulated input divisions for touch-devices   I3363 (Build 301)
   waiting = null;            // Element displayed during keyboard load time
   warned = false;            // Warning flag (to prevent multiple warnings)

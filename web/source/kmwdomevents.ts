@@ -940,7 +940,7 @@ class DOMTouchHandlers extends DOMEventHandlers {
         tEvent.target = DOMEventHandlers.states.lastActiveElement['kmw_ip'];
       // but will default to first input or text area on page if DOMEventHandlers.states.lastActiveElement is null
       } else {
-        tEvent.target = this.keyman.sortedInputs[0]['kmw_ip'];
+        tEvent.target = this.keyman.domManager.sortedInputs[0]['kmw_ip'];
       }
     }    
     
