@@ -129,7 +129,10 @@ class Device {
 class Util {
   // Generalized component event registration
   device: Device;
+  activeDevice: Device;
   physicalDevice: Device;
+
+  waiting: HTMLDivElement;                  // The element displayed for util.wait and util.alert.
 
   // An object mapping event names to individual event lists.  Maps strings to arrays.
   private events: { [name: string]: ((Object) => boolean)[];} = {};
@@ -150,6 +153,7 @@ class Util {
   initDevices(): void {
     this.device = new Device();
     this.physicalDevice = new Device();
+    this.activeDevice = this.device;
 
     // Initialize the true device values.
     this.device.detect(this._GetIEVersion());
@@ -1130,7 +1134,7 @@ class Util {
    *  Should not be called before options are defined during initialization
    **/           
   prepareWait(): void { 
-    var bg=document.createElement('DIV'),
+    var bg: HTMLDivElement = <HTMLDivElement>document.createElement('DIV'),
         lb=document.createElement('DIV'),
         lt=document.createElement('DIV'),    
         gr=document.createElement('DIV'),
@@ -1166,7 +1170,7 @@ class Util {
     lb.appendChild(gr);
     bg.appendChild(lb);
     document.body.appendChild(bg);
-    this.keyman.waiting=bg;    
+    this.waiting=bg;    
   }
 
   /**

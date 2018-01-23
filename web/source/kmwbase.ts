@@ -4,6 +4,8 @@
 /// <reference path="kmwdom.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwutils.ts" />
+// Defines the keyboard callback object.
+/// <reference path="kmwcallback.ts" />
 // Defines keyboard data & management classes.
 /// <reference path="kmwkeyboards.ts" />
 
@@ -13,8 +15,9 @@
 ***/
 
 declare var keyman: KeymanBase;
+declare var KeymanWeb: KeyboardInterface;
 var keyman: KeymanBase = window['keyman'] || {};
-// window['keyman'] = keyman; // To preserve the name _here_ in case of minification.
+window['keyman'] = keyman; // To preserve the name _here_ in case of minification.
 
 class KeymanBase {
   _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
@@ -67,6 +70,7 @@ class KeymanBase {
   util: Util;
   osk: any;
   ui: any;
+  interface: KeyboardInterface;
   keyboardManager: KeyboardManager;
   domManager: DOMManager;
 
@@ -79,6 +83,7 @@ class KeymanBase {
     'attachType':'',
     'ui':null
   };;
+
 
   // Stub functions (defined later in code only if required)
   setDefaultDeviceOptions(opt){}     
@@ -100,6 +105,8 @@ class KeymanBase {
 
   constructor() {
     this.util = this['util'] = new Util(this);
+    window['KeymanWeb'] = this.interface = this['interface'] = new KeyboardInterface(this);
+
     this.osk = this['osk'] = {ready:false};
     this.keyboardManager = new KeyboardManager(this);
     this.domManager = new DOMManager(this);
@@ -125,7 +132,7 @@ class KeymanBase {
    *  @param  {string}  fName   font-family name
    *  @return {boolean}         true if available
    **/         
-  ['isFontAvailable'](fName: string): boolean {
+  isFontAvailable(fName: string): boolean {
     return this.util.checkFont({'family':fName});
   }
 
@@ -342,6 +349,49 @@ class KeymanBase {
   ['init'](arg) {
     this.domManager.init(arg);
   }
+  
+  /*
+   * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
+   */
+
+  getLastActiveElement(): HTMLElement {
+    return this._LastActiveElement; 
+  }
+
+  focusLastActiveElement(): void {
+    (<any>this)._FocusLastActiveElement(); 
+  }
+
+  //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
+  hideHelp(): void {
+    this.osk._Hide(true);
+  }
+
+  showHelp(Px: number, Py: number): void {
+    this.osk._Show(Px,Py);
+  }
+
+  showPinnedHelp(): void {
+    this.osk.userPositioned=true; 
+    this.osk._Show(-1,-1);
+  }
+
+  /**
+   * Function     _push
+   * Scope        Private   
+   * @param       {Array}     Parray    Array   
+   * @param       {*}         Pval      Value to be pushed or appended to array   
+   * @return      {Array}               Returns extended array
+   * Description  Push (if possible) or append a value to an array 
+   */  
+  _push<T>(Parray: T[], Pval: T) {
+    if(Parray.push) {
+      Parray.push(Pval);
+    } else {
+      Parray=Parray.concat(Pval);
+    }
+    return Parray;
+  }
 }
 
 /**
@@ -370,28 +420,19 @@ KeymanBase.__BUILD__ = 299;
 if(!window['keyman']['loaded']) {
 
   (function() {
-    // The base object call may need to be moved into a separate, later file eventually.
-    // It will be necessary to override methods with kmwnative.ts and kmwembedded.ts before the
-    // affected objects are initialized.
+    /* The base object call may need to be moved into a separate, later file eventually.
+     * It will be necessary to override methods with kmwnative.ts and kmwembedded.ts before the
+     * affected objects are initialized.
+     * 
+     * We only recreate the 'keyman' object if it's not been loaded.
+     * As this is the base object, not creating it prevents a KMW system reset.
+     */
     var keymanweb = window['keyman'] = new KeymanBase();
     
     // Define public OSK, user interface and utility function objects 
 
     var osk: any = keymanweb['osk'];
     var ui: any = keymanweb['ui'] = {};
-    
-    var kbdInterface = keymanweb['interface'] = {
-      // Cross-reference with /windows/src/global/inc/Compiler.h - these are the Developer codes for the respective system stores.
-      // They're named here identically to their use in that header file.
-      TSS_LAYER: 33,
-      TSS_PLATFORM: 31,
-
-      _AnyIndices: [],        // AnyIndex - array of any/index match indices
-      _BeepObjects: [],       // BeepObjects - maintains a list of active 'beep' visual feedback elements
-      _BeepTimeout: 0,        // BeepTimeout - a flag indicating if there is an active 'beep'. 
-                              // Set to 1 if there is an active 'beep', otherwise leave as '0'.
-      _DeadKeys: []           // DeadKeys - array of matched deadkeys
-    };
     
     osk.highlightSubKeys = function(k,x,y){}
     osk.createKeyTip = function(){}

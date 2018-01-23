@@ -2,6 +2,8 @@
 /// <reference path="kmwexthtml.ts" />
 // Includes KMW string extension declarations.
 /// <reference path="kmwstring.ts" />
+// Includes type definitions for basic KMW types.
+/// <reference path="kmwtypedefs.ts" />
 
 /***
    KeymanWeb 10.0

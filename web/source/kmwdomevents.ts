@@ -5,17 +5,7 @@
  * 
  */
 
-class KeyEvent {
-  Ltarg: HTMLElement;
-  Lcode: number;
-  Lstates: number;
-  LmodifierChange: boolean;
-  Lmodifiers: number;
-  LisVirtualKeyCode: boolean;
-  LisVirtualKey: boolean;
-};
-
-class CommonDOMStates {
+ class CommonDOMStates {
   _KeyPressToSwallow: number;
 }
 
@@ -676,14 +666,14 @@ class DOMEventHandlers {
       
       if(typeof(activeKeyboard['KM'])=='undefined'  &&  !(Levent.Lmodifiers & 0x60)) {
         // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-        var Levent2={
-          Lcode:(<any>this.keyman)._USKeyCodeToCharCode(Levent),
+        var Levent2: LegacyKeyEvent = {
+          Lcode:(<any>this.keyman)._USKeyCodeToCharCode(Levent) as number,
           Ltarg:Levent.Ltarg,
           Lmodifiers:0,
           LisVirtualKey:0
         };
 
-        if(kbdInterface.processKeystroke(util.physicalDevice, Levent2.Ltarg,Levent2)) {
+        if(kbdInterface.processKeystroke(util.physicalDevice, Levent2.Ltarg, Levent2)) {
           LeventMatched=1;
         }
       }
