@@ -141,18 +141,18 @@ public class PackageActivity extends Activity{
           boolean success = installedPackageKeyboards.size() != 0;
           if(success) {
             notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
-            ((Activity) context).finish();
             if(installedPackageKeyboards != null) {
               notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
             }
           } else {
             Toast.makeText(context, "No new keyboards installed", Toast.LENGTH_SHORT).show();
-            ((Activity) context).finish();
             Log.d("PackageActivity", "Package install returned no updated keyboards!");
           }
 
         } catch (Exception e) {
           Log.e("PackageActivity", "Error " + e);
+        } finally {
+          cleanup();
         }
       }
     });
@@ -160,21 +160,26 @@ public class PackageActivity extends Activity{
     cancelButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        // Cleanup
-        try {
-          if (kmpFile.exists()) {
-            kmpFile.delete();
-          }
-          if (tempPackagePath.exists()) {
-            FileUtils.deleteDirectory(tempPackagePath);
-          }
-        } catch (Exception e) {
-
-        } finally {
-          finish();
-        }
+        cleanup();
       }
     });
+
+
+  }
+
+  private void cleanup() {
+    try {
+      if (kmpFile.exists()) {
+        kmpFile.delete();
+      }
+      if (tempPackagePath.exists()) {
+        FileUtils.deleteDirectory(tempPackagePath);
+      }
+    } catch (Exception e) {
+
+    } finally {
+      finish();
+    }
   }
 
   @Override
