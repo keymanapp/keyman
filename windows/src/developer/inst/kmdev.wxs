@@ -402,20 +402,15 @@
       <ComponentRef Id="xml_project.css"/>
 
       <ComponentRef Id='xml_kmw_resource_keymanweb.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwbase.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwcallback.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwdebug.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwinit.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwkeymaps.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwlayout.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwnative.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwosk.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwreleasestub.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwstring.js'/>
       <ComponentRef Id='xml_kmw_resource_kmwuibutton.js'/>
       <ComponentRef Id='xml_kmw_resource_kmwuifloat.js'/>
       <ComponentRef Id='xml_kmw_resource_kmwuitoggle.js'/>
       <ComponentRef Id='xml_kmw_resource_kmwuitoolbar.js'/>
+      <ComponentRef Id='xml_kmw_resource_keymanweb.js.map' />
+      <ComponentRef Id='xml_kmw_resource_kmwuibutton.js.map' />
+      <ComponentRef Id='xml_kmw_resource_kmwuifloat.js.map'  />
+      <ComponentRef Id='xml_kmw_resource_kmwuitoggle.js.map' />
+      <ComponentRef Id='xml_kmw_resource_kmwuitoolbar.js.map' />
       <ComponentRef Id='xml_kmw_resource_license'/>
       <ComponentRef Id='xml_kmw_resource_readme_md'/>
 
