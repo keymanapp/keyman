@@ -1108,6 +1108,34 @@ class DOMManager {
     // See _EnablementMutationObserverCore.
   }
 
+  /* ------------- Page and document-level management events ------------------ */
+
+  _WindowLoad: (e: Event) => void = function(e: Event) {
+    //keymanweb.completeInitialization();
+    // Always return to top of page after a page reload
+    document.body.scrollTop=0;
+    if(typeof document.documentElement != 'undefined') {
+      document.documentElement.scrollTop=0;
+    }
+  }.bind(this);
+
+  /**
+   * Function     _WindowUnload
+   * Scope        Private
+   * Description  Remove handlers before detaching KMW window  
+   */    
+  _WindowUnload: () => void = function() {
+    // Allow the UI to release its own resources
+    this.doUnloadUI();
+    
+    // Allow the OSK to release its own resources
+    if(this.keyman.osk.ready) {
+      this.keyman.osk._Unload(); // I3363 (Build 301)
+    }
+    
+    this.clearLastActiveElement();
+  }.bind(this);
+
   /* ------ Defines independent, per-control keyboard setting behavior for the API. ------ */
 
   /**
@@ -1365,6 +1393,56 @@ class DOMManager {
   /* ----------------------- Initialization methods ------------------ */
   
   /**
+   * Get the user-specified (or default) font for the first mapped input or textarea element
+   * before applying any keymanweb styles or classes
+   * 
+   *  @return   {string}
+   **/                 
+  getBaseFont() {
+    var util = this.keyman.util;
+    var ipInput = document.getElementsByTagName<'input'>('input'),
+        ipTextArea=document.getElementsByTagName<'textarea'>('textarea'),
+        n=0,fs,fsDefault='Arial,sans-serif';
+    
+    // Find the first input element (if it exists)
+    if(ipInput.length == 0 && ipTextArea.length == 0) {
+      n=0;
+    } else if(ipInput.length > 0 && ipTextArea.length == 0) {
+      n=1;
+    } else if(ipInput.length == 0 && ipTextArea.length > 0) {
+      n=2;
+    } else {
+      var firstInput = ipInput[0];
+      var firstTextArea = ipTextArea[0];
+
+      if(firstInput.offsetTop < firstTextArea.offsetTop) {
+        n=1;
+      } else if(firstInput.offsetTop > firstTextArea.offsetTop) {
+        n=2;
+      } else if(firstInput.offsetLeft < firstTextArea.offsetLeft) {
+        n=1;
+      } else if(firstInput.offsetLeft > firstTextArea.offsetLeft) {
+        n=2;
+      }
+    }
+    
+    // Grab that font!
+    switch(n) {
+      case 0:
+        fs=fsDefault;
+      case 1:
+        fs=util.getStyleValue(ipInput[0],'font-family');
+      case 2:
+        fs=util.getStyleValue(ipTextArea[0],'font-family');
+    }
+    if(typeof(fs) == 'undefined' || fs == 'monospace') {
+      fs=fsDefault;
+    }
+    
+    return fs;
+  }
+
+  /**
    * Function     Initialization
    * Scope        Public
    * @param       {Object}  arg     object array of user-defined properties
@@ -1471,9 +1549,6 @@ class DOMManager {
       var dpi = device.getDPI(); //TODO: this will not work when called from HEAD!!
       device.formFactor=((screen.height < 4.0 * dpi) || (screen.width < 4.0 * dpi)) ? 'phone' : 'tablet';
     }
-
-    if (window.removeEventListener)
-      window.removeEventListener('focus', (<any>this.keyman)._BubbledFocus, true);
   
     // Set exposed initialization flag member for UI (and other) code to use 
     this.keyman.setInitialized(1);
@@ -1502,7 +1577,7 @@ class DOMManager {
     }
 
     // Determine the default font for mapped elements
-    this.keyman.appliedFont=this.keyman.baseFont=(<any>this.keyman).getBaseFont();
+    this.keyman.appliedFont=this.keyman.baseFont=this.getBaseFont();
 
     // Add orientationchange event handler to manage orientation changes on mobile devices
     // Initialize touch-screen device interface  I3363 (Build 301)
@@ -1636,5 +1711,5 @@ class DOMManager {
     } else {
       window.setTimeout(this.initializeUI.bind(this),1000);
     }
-  }  
+  }
 }

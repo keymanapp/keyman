@@ -323,7 +323,7 @@ class KeyboardInterface {
       return false; // I3318
     }
 
-    var sp=(<any>this.keymanweb)._SelPos(Ptarg);
+    var sp=this._SelPos(Ptarg);
     n = sp - n;
     for(var i = 0; i < this._DeadKeys.length; i++) {
       if(this._DeadKeys[i].match(n, d)) {
@@ -609,7 +609,7 @@ class KeyboardInterface {
       this.output(Pdn,Pelem,"");  //I3318 corrected to >=
     }
 
-    var Lc: Deadkey = new Deadkey((<any>this.keymanweb)._SelPos(Pelem), Pd);
+    var Lc: Deadkey = new Deadkey(this._SelPos(Pelem), Pd);
 
     this._DeadKeys=this.keymanweb._push(this._DeadKeys,Lc);      
     //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
@@ -918,4 +918,35 @@ class KeyboardInterface {
 
     this.keymanweb.osk._Show();
   };
+
+  /**
+   * Function     _SelPos
+   * Scope        Private
+   * @param       {Object}  Pelem   Element
+   * @return      {number}          Selection start
+   * Description  Get start of selection (with supplementary plane modifications)
+   */   
+  _SelPos(Pelem: HTMLElement) {
+    var Ldoc, Ldv, isMSIE=(this.keymanweb.util._GetIEVersion()<999); // I3363 (Build 301)
+
+    if((<any>this.keymanweb).isPositionSynthesized())
+      return this.keymanweb.touchAliasing.getTextCaret(Pelem);
+
+    if(Pelem._KeymanWebSelectionStart) 
+      return Pelem._KeymanWebSelectionStart;
+    
+    // Mozilla, IE9 
+    else if ((Pelem instanceof HTMLInputElement || Pelem instanceof HTMLTextAreaElement) && Pelem.setSelectionRange)  
+      return Pelem.value.substr(0,Pelem.selectionStart)._kmwLength();        
+  
+    // contentEditable elements, Mozilla midas
+    else if((Ldv=Pelem.ownerDocument)  &&  (Ldv=Ldv.defaultView)  &&  Ldv.getSelection
+      &&  Pelem.ownerDocument.designMode.toLowerCase() == 'on') {
+      var Lsel = Ldv.getSelection();
+      if(Lsel.focusNode.nodeType == 3) 
+        return Lsel.focusNode.substringData(0,Lsel.focusOffset)._kmwLength(); 
+    }
+    
+    return 0;
+  } 
 }

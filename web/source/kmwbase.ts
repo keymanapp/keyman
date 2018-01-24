@@ -8,6 +8,8 @@
 /// <reference path="kmwcallback.ts" />
 // Defines keyboard data & management classes.
 /// <reference path="kmwkeyboards.ts" />
+// Defines KMW's hotkey management object.
+/// <reference path="kmwhotkeys.ts" />
 
 /***
    KeymanWeb 10.0
@@ -52,12 +54,13 @@ class KeymanBase {
   static __BUILD__: number;
 
   // Internal objects
-  util: Util;
-  osk: any;
-  ui: any;
-  interface: KeyboardInterface;
+  ['util']: Util;
+  ['osk']: any;
+  ['ui']: any;
+  ['interface']: KeyboardInterface;
   keyboardManager: KeyboardManager;
   domManager: DOMManager;
+  hotkeyManager: HotkeyManager;
 
   touchAliasing: DOMEventHandlers;
 
@@ -91,12 +94,15 @@ class KeymanBase {
   // -------------
 
   constructor() {
+    // Allow internal minification of the public modules.
     this.util = this['util'] = new Util(this);
     window['KeymanWeb'] = this.interface = this['interface'] = new KeyboardInterface(this);
-
     this.osk = this['osk'] = {ready:false};
+    this.ui = this['ui'] = null;
+
     this.keyboardManager = new KeyboardManager(this);
     this.domManager = new DOMManager(this);
+    this.hotkeyManager = new HotkeyManager(this);
 
     // Load properties from their static variants.
     this['build'] = KeymanBase.__BUILD__;
@@ -470,6 +476,29 @@ class KeymanBase {
   ['moveToElement'](e: string|HTMLElement) {
     this.domManager.moveToElement(e);
   }
+
+  /**
+   * Function     addHotkey
+   * Scope        Public
+   * @param       {number}            keyCode
+   * @param       {number}            shiftState
+   * @param       {function(Object)}  handler
+   * Description  Add hot key handler to array of document-level hotkeys triggered by key up event
+   */
+  ['addHotKey'](keyCode: number, shiftState: number, handler: () => void) {
+    this.hotkeyManager.addHotKey(keyCode, shiftState, handler);
+  }
+
+  /**
+   * Function     removeHotkey
+   * Scope        Public
+   * @param       {number}        keyCode
+   * @param       {number}        shiftState
+   * Description  Remove a hot key handler from array of document-level hotkeys triggered by key up event
+   */
+  ['removeHotKey'](keyCode: number, shiftState: number) {
+    this.hotkeyManager.removeHotkey(keyCode, shiftState);
+  }
 }
 
 /**
@@ -517,31 +546,6 @@ if(!window['keyman']['loaded']) {
     osk.optionKey = function(e,keyName,keyDown){}
     osk.showKeyTip = function(key,on){}  
     osk.waitForFonts = function(kfd,ofd){return true;}
-                 
-  /*  
-
-  osk.positionChanged = function(newPosition)
-    {
-      return util.callEvent('osk.positionChanged', newPosition);
-    }
-    
-    osk['setPosition'] = function(newPosition)
-    {
-      divOsk.left = newPosition.left;
-      ...
-      osk.positionChanged({left: divOsk.left, top: divOsk.top, ...});
-    }
-    
-    ui.oskPositionChanged = function(newPosition)
-    {
-      // do something with the osk
-    }
-    
-    ui.init = function()
-    {
-      osk.addEventListener('positionChanged', ui.oskPositionChanged);
-    }
-    */
 
     /**
     * Extend Array function by adding indexOf array member if undefined (IE < IE9)

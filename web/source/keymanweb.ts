@@ -116,52 +116,6 @@ if(!window['keyman']['initialized']) {
      */       
     keymanweb.delayedInit();
 
-    /**
-     * Get the user-specified (or default) font for the first mapped input or textarea element
-     * before applying any keymanweb styles or classes
-     * 
-     *  @return   {string}
-     **/                 
-    keymanweb.getBaseFont = function() {
-      var ipInput = document.getElementsByTagName<'input'>('input'),
-          ipTextArea=document.getElementsByTagName<'textarea'>('textarea'),
-          n=0,fs,fsDefault='Arial,sans-serif';
-      
-      if(ipInput.length == 0 && ipTextArea.length == 0) n=0;
-      else if(ipInput.length > 0 && ipTextArea.length == 0) n=1;
-      else if(ipInput.length == 0 && ipTextArea.length > 0) n=2;
-      else {
-        var firstInput = ipInput[0];
-        var firstTextArea = ipTextArea[0];
-
-        if(firstInput.offsetTop < firstTextArea.offsetTop) {
-          n=1;    
-        } else if(firstInput.offsetTop > firstTextArea.offsetTop) {
-          n=2;
-        } else if(firstInput.offsetLeft < firstTextArea.offsetLeft) {
-          n=1;    
-        } else if(firstInput.offsetLeft > firstTextArea.offsetLeft) {
-          n=2;
-        }
-      }
-      
-      switch(n)
-      {
-        case 0:
-          fs=fsDefault;
-        case 1:     
-          fs=util.getStyleValue(ipInput[0],'font-family');
-        case 2:       
-          fs=util.getStyleValue(ipTextArea[0],'font-family');
-      }
-      if(typeof(fs) == 'undefined' || fs == 'monospace') fs=fsDefault;
-      
-      return fs;
-    }
-
-    // Probably should relocate this definition somewhere.
-    keymanweb.timerID = null;
-
     // I732 START - Support for European underlying keyboards #1
     if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') 
       osk._BaseLayout = window['KeymanWeb_BaseLayout'];
@@ -194,8 +148,7 @@ if(!window['keyman']['initialized']) {
      * 
      * @param       {(boolean|number)}  state  Activate (true,false)
      */
-    keymanweb['activatingUI'] = function(state)
-    {
+    keymanweb['activatingUI'] = function(state) {
       keymanweb._IsActivatingKeymanWebUI = (state ? 1 : 0);
     }      
 
@@ -207,8 +160,7 @@ if(!window['keyman']['initialized']) {
      * @return      {boolean}   
      * Description  Execute external (UI) code if any needed after unloading OSK (probably not required)
      */       
-    keymanweb.doUnloadOSK = function()
-    {
+    keymanweb.doUnloadOSK = function() {
       var p={};
       return util.callEvent('kmw.unloadosk',p);
     }
@@ -219,8 +171,7 @@ if(!window['keyman']['initialized']) {
      * @return      {boolean}   
      * Description  Execute UI initialization code after loading the UI
      */       
-    keymanweb.doLoadUI = function()
-    {
+    keymanweb.doLoadUI = function() {
       var p={};
       return util.callEvent('kmw.loaduserinterface',p);
     }
@@ -231,8 +182,7 @@ if(!window['keyman']['initialized']) {
      * @return      {boolean}   
      * Description  Execute UI cleanup code before unloading the UI (may not be required?)
      */       
-    keymanweb.doUnloadUI = function()
-    {
+    keymanweb.doUnloadUI = function() {
       var p={};
       return util.callEvent('kmw.unloaduserinterface',p);
     }
@@ -245,64 +195,16 @@ if(!window['keyman']['initialized']) {
      * so trap that and run it through to the page 
      * 
      *****************************************************************************/
-
-    /**
-     * Function     _BubbledFocus
-     * Scope        Private
-     * @param       {Event}       e         Event object
-     * Description  Respond to KMW receiving bubbled focus on event (TODO: may not be needed, not currently doing anything) 
-     */    
-    keymanweb._BubbledFocus = function(e) { /*KeymanWeb._WindowLoad(e);*/ }
-      
-    if (window.addEventListener)
-      window.addEventListener('focus', keymanweb._BubbledFocus, true);
     
   //TODO: check return of _KeyUp - what happens if returning true or false ?? what if null returned?       
 
   //TODO: find all references to next three routines and disambiguate!!
     
-    /**
-     * Function     _WindowUnload
-     * Scope        Private
-     * Description  Remove handlers before detaching KMW window  
-     */    
-    keymanweb._WindowUnload = function()
-    {
-      // Allow the UI to release its own resources
-      keymanweb.doUnloadUI();
-      
-      // Allow the OSK to release its own resources
-      if(osk.ready) osk._Unload(); // I3363 (Build 301)
-      
-      keymanweb.domManager.clearLastActiveElement();
-    }
-    
-      // Complete page initialization only after the page is fully loaded, including any embedded fonts
+    // Complete page initialization only after the page is fully loaded, including any embedded fonts
     // This avoids the need to use a timer to test for the fonts
     
-    util.attachDOMEvent(window, 'load', function(e){
-      //keymanweb.completeInitialization();
-      // Always return to top of page after a page reload
-      document.body.scrollTop=0;
-      if(typeof document.documentElement != 'undefined') document.documentElement.scrollTop=0;
-      },false);
-    
-    // Attach this handler to window unload event  
-    util.attachDOMEvent(window, 'unload', keymanweb._WindowUnload,false);  // added fourth argument (default value)
-    
-    /**
-     * Return a path that has is always terminated by a slash
-     *    
-     * @param   {string}  p folder path   
-     * @return  {string}   
-    **/      
-    keymanweb.fixPath = function(p)
-    {
-      if(p.length == 0) return p;
-      var q=p.substr(p.length-1,1);
-      if(q == '/' || q == '\\') return p;
-      return p+'/'; 
-    }          
+    util.attachDOMEvent(window, 'load', keyman.domManager._WindowLoad,false);
+    util.attachDOMEvent(window, 'unload', keymanweb.domManager._WindowUnload,false);  // added fourth argument (default value)       
         
     /**
      * Test if caret position is determined from the active element, or 
@@ -310,197 +212,23 @@ if(!window['keyman']['initialized']) {
      * 
      * @return  {boolean}
      **/          
-    keymanweb.isPositionSynthesized = function()
-    {
+    keymanweb.isPositionSynthesized = function() {
       return device.touchable;
     }
     
-    /**
-     * Function     _SelPos
-     * Scope        Private
-     * @param       {Object}  Pelem   Element
-     * @return      {number}          Selection start
-     * Description  Get start of selection (with supplementary plane modifications)
-     */   
-    keymanweb._SelPos = function(Pelem)
-    {
-      var Ldoc, Ldv, isMSIE=(util._GetIEVersion()<999); // I3363 (Build 301)
-
-      if(keymanweb.isPositionSynthesized())
-        return keymanweb.touchAliasing.getTextCaret(Pelem);
-
-      if(Pelem._KeymanWebSelectionStart) 
-        return Pelem._KeymanWebSelectionStart;
-      
-      // Mozilla, IE9 
-      else if (Pelem.setSelectionRange)  
-        return Pelem.value.substr(0,Pelem.selectionStart)._kmwLength();        
-    
-      // contentEditable elements, Mozilla midas
-      else if((Ldv=Pelem.ownerDocument)  &&  (Ldv=Ldv.defaultView)  &&  Ldv.getSelection
-        &&  Pelem.ownerDocument.designMode.toLowerCase() == 'on') {
-        var Lsel = Ldv.getSelection();
-        if(Lsel.focusNode.nodeType == 3) 
-          return Lsel.focusNode.substringData(0,Lsel.focusOffset)._kmwLength(); 
-      }
-      
-      return 0;
-    }  
-
-    /*    Old code without SMP mods
-    
-    keymanweb._SelPos = function(Pelem)
-    {
-      var Ldv;
-      if(Pelem._KeymanWebSelectionStart) return Pelem._KeymanWebSelectionStart;
-      else if (Pelem.setSelectionRange)
-        return Pelem.selectionStart;
-      else if((Ldv=Pelem.ownerDocument)  &&  (Ldv=Ldv.defaultView)  &&  Ldv.getSelection  &&  Pelem.ownerDocument.designMode.toLowerCase() == 'on') //  &&  Pelem.tagName == 'HTML')
-      {
-        var Lsel = Ldv.getSelection();
-        if(Lsel.focusNode.nodeType == 3) return Lsel.focusOffset;
-      }
-      return 0;
-    }*/   
-    
-    /**
-     * Function     getInputSelection
-     * Scope        Private
-     * @param       {Object}      el          element
-     * @return      {Object.<string,number>}  selection start
-     * Description Get input selection for all(?) browsers, per Tim Down
-     *            http://stackoverflow.com/questions/3053542/how-to-get-the-start-and-end-points-of-selection-in-text-area/3053640#3053640 
-     *            But only works for input fields, not for content editable fields!!!  
-     **/            
-    keymanweb.getInputSelection = function(el)
-    { 
-      var start = 0, end = 0, normalizedValue = '', range, textInputRange, len = 0, endRange; 
-  
-      if(typeof el.selectionStart == "number" && typeof el.selectionEnd == "number") { 
-        start = el.selectionStart; end = el.selectionEnd; 
-      } else { 
-        range = document.selection.createRange(); 
-  
-        if(range && range.parentElement() == el) { 
-          len = el.value.length; 
-          normalizedValue = el.value.replace(/\r\n/g, "\n"); 
-              
-          // Create a working TextRange that lives only in the input 
-          textInputRange = el.createTextRange(); 
-          textInputRange.moveToBookmark(range.getBookmark()); 
-  
-          // Check if the start and end of the selection are at the very end of the input,
-          // since moveStart/moveEnd doesn't return what we want in those cases 
-          endRange = el.createTextRange(); 
-          endRange.collapse(false); 
-  
-          if(textInputRange.compareEndPoints("StartToEnd", endRange) > -1) { 
-            start = end = len; 
-          } else { 
-            start = -textInputRange.moveStart("character", -len); 
-            start += normalizedValue.slice(0, start).split("\n").length - 1; 
-  
-            if(textInputRange.compareEndPoints("EndToEnd", endRange) > -1) { 
-              end = len; 
-            } else { 
-              end = -textInputRange.moveEnd("character", -len); 
-              end += normalizedValue.slice(0, end).split("\n").length - 1; 
-            } 
-          } 
-        } 
-      } 
-      return {start: start, end: end}; 
-    }
     // *** I3319 Supplementary Plane modifications - end new code
     
     /**
      * Reset OSK shift states when entering or exiting the active element
      **/    
-    keymanweb._ResetVKShift = function()
-    {
+    keymanweb._ResetVKShift = function() {
       if(!keymanweb._IsActivatingKeymanWebUI) 
       {
         if(osk._UpdateVKShift) osk._UpdateVKShift(null,15,0);  //this should be enabled !!!!! TODO
       }
     }
 
-    /**
-     * Function     addHotKey
-     * Scope        Public
-     * @param       {number}            keyCode
-     * @param       {number}            shiftState
-     * @param       {function(Object)}  handler
-     * Description  Add hot key handler to array of document-level hotkeys triggered by key up event
-     */
-    keymanweb['addHotKey'] = keymanweb.addHotKey = function(keyCode,shiftState,handler)
-    {
-      // Test if existing handler for this code and replace it if so
-      for(var i=0; i<keymanweb._HotKeys.length; i++)
-      {
-        if(keymanweb._HotKeys[i].Code == keyCode && keymanweb._HotKeys[i].Shift == shiftState)
-        {
-          keymanweb._HotKeys[i].Handler = handler; return;
-        }
-      }
-      // Otherwise add it to the array
-      keymanweb._HotKeys.push({Code:keyCode,Shift:shiftState,Handler:handler});
-    }              
-
-    /**
-     * Function     removeHotKey
-     * Scope        Public
-     * @param       {number}        keyCode
-     * @param       {number}        shiftState
-     * Description  Remove a hot key handler from array of document-level hotkeys triggered by key up event
-     */
-    keymanweb['removeHotKey'] = keymanweb.removeHotKey = function(keyCode,shiftState)
-    {
-      for(var i=0; i<keymanweb._HotKeys.length; i++)
-      {
-        if(keymanweb._HotKeys[i].Code == keyCode && keymanweb._HotKeys[i].Shift == shiftState)
-        {
-          keymanweb._HotKeys.splice(i,1); return;
-        }
-      }
-    }
-                  
-    /**
-     * Function     _ProcessHotKeys
-     * Scope        Private
-     * @param       {Event}       e       event
-     * Description  Passes control to handlers according to the hotkey pressed
-     */
-    keymanweb._ProcessHotKeys = function(e) {
-      if(!e) {
-        e = window.event;
-      }
-
-      var _Lcode = keymanweb.domManager.nonTouchHandlers._GetEventKeyCode(e);
-      if(_Lcode == null) {
-        return null;
-      }
-      
-      // Removed testing of e.shiftKey==null  I3363 (Build 301)
-      var _Lmodifiers = 
-        (e.shiftKey ? 0x10 : 0) |
-        (e.ctrlKey ? (e.ctrlLeft ? 0x20 : 0x20) : 0) | 
-        (e.altKey ? (e.altLeft ? 0x40 : 0x40) : 0);
-
-      for(var i=0; i<keymanweb._HotKeys.length; i++) {  
-        if(_Lcode == keymanweb._HotKeys[i].Code) { 
-          if(_Lmodifiers == keymanweb._HotKeys[i].Shift) { 
-            keymanweb._HotKeys[i].Handler(); 
-            e.returnValue = 0; 
-            if(e && e.preventDefault) e.preventDefault(); 
-            e.cancelBubble = true; 
-            return false; 
-          }
-        }
-      }
-      return true;
-    }
-
-    util.attachDOMEvent(document, 'keyup', keymanweb._ProcessHotKeys,false);  
+    util.attachDOMEvent(document, 'keyup', keymanweb.hotkeyProcessor._Process, false);  
 
     util.attachDOMEvent(window, 'focus', keymanweb._ResetVKShift,false);  // I775
     util.attachDOMEvent(window, 'blur', keymanweb._ResetVKShift,false);   // I775
