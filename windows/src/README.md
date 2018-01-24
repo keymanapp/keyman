@@ -5,10 +5,12 @@
 1. Install [VS2017 Community Edition](#visual-studio-2017-community-edition-setup-requirements).
 2. Install [Delphi 10.2](#delphi-setup-requirements).
 3. Install [git](https://git-scm.com/download/win).
-4. Add the Keyman root folder to antivirus exclusions for performance and file lock reasons (optional - but highly recommended).
-5. Start Delphi 10.2 IDE once after installation to create default environment files and ensure registration is complete.
-6. Set environment variables per [notes below](#environment-variables): `KEYMAN_ROOT`, `DELPHI_STARTER`, `USERDEFINES`, (`USE_PLUSMEMO`, `KEYMAN_ENCUMBERED_ROOT`).
-7. Add the **windows/lib** folder in the Keyman repository to your `PATH` environment variable (required for packages in Delphi).
+4. Follow steps in /web/README.md to install prerequisites for building KeymanWeb (included in Keyman Developer)
+5. Add the Keyman root folder to antivirus exclusions for performance and file lock reasons (optional - but highly recommended).
+6. Start Delphi 10.2 IDE once after installation to create default environment files and ensure registration is complete.
+7. Set environment variables per [notes below](#environment-variables): `KEYMAN_ROOT`, `DELPHI_STARTER`, `USERDEFINES`, 
+   `GIT_BASH_FOR_KEYMAN`, (`USE_PLUSMEMO`, `KEYMAN_ENCUMBERED_ROOT`).
+8. Add the **windows/lib** folder in the Keyman repository to your `PATH` environment variable (required for packages in Delphi).
 
 ### Release build prerequisites
 
@@ -102,6 +104,19 @@ work without changes. Otherwise, you will need to set an environment variable
 ```
 SET KEYMAN_ROOT=c:\projects\keyman
 ```
+
+### GIT_BASH_FOR_KEYMAN
+
+This environment variable is optional: the build will run bash in a separate window
+in order to build KeymanWeb if it isn't present, but you'll lose logging and have 
+the annoyance of a window popping up halfway through the build. To resolve both of
+those issues, set the environment variable to:
+
+```
+SET GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Program Files\Git\etc\profile" -l
+```
+
+You should verify the install location of Git on your computer as it may vary.
 
 ### DELPHI_STARTER - Building with Delphi Starter Edition
 
