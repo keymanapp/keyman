@@ -15,19 +15,11 @@
 // load of KMW.
 if(!window['keyman']['initialized']) { 
 
-  /******************************************************************
-   *  Main Keyman Web Module    
-   *   
-   *  Code enclosed as an anonymous function to protect name space                          
-   *    
-   ******************************************************************/
-
-  // -------------------------------------------------------------------------
-  
+  // Continued KeymanWeb initialization.
   (function() 
   {
 
-    // Declare KeymanWeb, OnScreen Keyboard and Util objects
+    // Declare KeymanWeb, OnScreen Keyboard and Util object variables
     var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'], device=util.device;
     var kbdInterface=keymanweb['interface'];
 
@@ -106,14 +98,14 @@ if(!window['keyman']['initialized']) {
         
       }
     }
+
+    /*
+     * The following code existed here as part of the original pre-conversion JavaScript source, performing some inline initialization.
+     * Ideally, this will be refactored once proper object-orientation of the codebase within TypeScript is complete.
+     */
     keymanweb.debugElement=null;
     var dbg=keymanweb.debug;
         
-    /**
-     * Function    setUpTouchDevice
-     * Scope       Private
-     * Description Initialize event handling and duplicate input fields for touch-input devices
-     */       
     keymanweb.delayedInit();
 
     // I732 START - Support for European underlying keyboards #1
