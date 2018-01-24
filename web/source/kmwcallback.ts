@@ -101,7 +101,7 @@ class KeyboardInterface {
    * Description  Save keyboard focus
    */    
   saveFocus(): void {
-    this.keymanweb._IgnoreNextSelChange = 1;
+    DOMEventHandlers.states._IgnoreNextSelChange = 1;
   }
     
   /**
@@ -119,10 +119,10 @@ class KeyboardInterface {
     if(Lelem != null) {
       Ls=Lelem._KeymanWebSelectionStart;
       Le=Lelem._KeymanWebSelectionEnd;
-      Lsel=this.keymanweb._Selection;
+      Lsel=DOMEventHandlers.states._Selection;
 
       this.keymanweb._IsActivatingKeymanWebUI = 1;
-      this.keymanweb._IgnoreNextSelChange = 100;
+      DOMEventHandlers.states._IgnoreNextSelChange = 100;
       this.keymanweb.domManager.focusLastActiveElement();
       
       if(Lelem instanceof HTMLIFrameElement && this.keymanweb.domManager._IsMozillaEditableIframe(Lelem,0)) {
@@ -133,7 +133,7 @@ class KeyboardInterface {
       }
       Lelem._KeymanWebSelectionStart=Ls;
       Lelem._KeymanWebSelectionEnd=Le;
-      this.keymanweb._IgnoreNextSelChange = 0;
+      DOMEventHandlers.states._IgnoreNextSelChange = 0;
       if(Ptext!=null) {
         this.output(0, Lelem, Ptext);
       }
@@ -542,9 +542,9 @@ class KeyboardInterface {
         this._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318
       }
 
-      this.keymanweb._Selection = Ldv.createRange();
-      this.keymanweb._Selection.select();
-      this.keymanweb._Selection.scrollIntoView();
+      DOMEventHandlers.states._Selection = Ldv.createRange();
+      DOMEventHandlers.states._Selection.select();
+      DOMEventHandlers.states._Selection.scrollIntoView();
       // Mozilla et al; IE9+ also recognizes setSelectionRange, but does not seem to work in exactly the same way as Mozilla
     } else if (Pelem.setSelectionRange) {                                        
       var LselectionStart, LselectionEnd;

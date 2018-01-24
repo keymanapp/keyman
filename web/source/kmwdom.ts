@@ -34,6 +34,13 @@ class DOMManager {
   enablementObserver: MutationObserver;
 
   /**
+   * Tracks a list of event-listening elements.  
+   * 
+   * In touch mode, this should contain touch-aliasing DIVs, but will contain other elements in non-touch mode.
+   */
+  inputList: HTMLElement[] = [];            // List of simulated input divisions for touch-devices   I3363 (Build 301)
+
+  /**
    * Tracks a visually-sorted list of elements that are KMW-enabled.
    */
   sortedInputs: HTMLElement[] = [];   // List of all INPUT and TEXTAREA elements ordered top to bottom, left to right
@@ -104,11 +111,11 @@ class DOMManager {
     */
     if(Pelem['kmw_ip']) {
 
-      if(this.keyman.inputList.indexOf(Pelem['kmw_ip']) != -1) {
+      if(this.inputList.indexOf(Pelem['kmw_ip']) != -1) {
         return false;
       }
 
-      this.keyman.inputList.push(Pelem['kmw_ip']);
+      this.inputList.push(Pelem['kmw_ip']);
       
       console.log("Unexpected state - this element's simulated input DIV should have been removed from the page!");
 
@@ -335,9 +342,9 @@ class DOMManager {
     }
 
     if(Pelem['kmw_ip']) {
-      var index = this.keyman.inputList.indexOf(Pelem['kmw_ip']);
+      var index = this.inputList.indexOf(Pelem['kmw_ip']);
       if(index != -1) {
-        this.keyman.inputList.splice(index, 1);
+        this.inputList.splice(index, 1);
       }
 
       Pelem.style.visibility='visible'; // hide by default: KMW-3
@@ -361,8 +368,8 @@ class DOMManager {
    * Description  A handler for KMW-touch-disabled elements when operating on touch devices.
    */
   nonKMWTouchHandler = function(x) {
-    this.keyman.focusing=false;
-    clearTimeout(this.keyman.focusTimer);
+    DOMEventHandlers.states.focusing=false;
+    clearTimeout(DOMEventHandlers.states.focusTimer);
     this.keyman.osk.hideNow();
   }.bind(this);
 
@@ -398,7 +405,7 @@ class DOMManager {
         this._AttachToIframe(Pelem);
       } else { 
         baseElement.className = baseElement.className ? baseElement.className + ' keymanweb-font' : 'keymanweb-font';
-        this.keyman.inputList.push(Pelem);
+        this.inputList.push(Pelem);
 
         this.keyman.util.attachDOMEvent(baseElement,'focus', this.getHandlers(Pelem)._ControlFocus);
         this.keyman.util.attachDOMEvent(baseElement,'blur', this.getHandlers(Pelem)._ControlBlur);
@@ -431,9 +438,9 @@ class DOMManager {
       }
 
       // Remove the element from our internal input tracking.
-      var index = this.keyman.inputList.indexOf(Pelem);
+      var index = this.inputList.indexOf(Pelem);
       if(index > -1) {
-        this.keyman.inputList.splice(index, 1);
+        this.inputList.splice(index, 1);
       }
 
       if(!isAlias) { // See note about the alias below.
@@ -448,7 +455,7 @@ class DOMManager {
 
     // If we're disabling an alias, we should fully enable the base version.  (Thinking ahead to toggleable-touch mode.)
     if(isAlias) {
-      this.keyman.inputList.push(baseElement);
+      this.inputList.push(baseElement);
 
       baseElement.onkeypress = this.getHandlers(Pelem)._KeyPress;
       baseElement.onkeydown = this.getHandlers(Pelem)._KeyDown;
@@ -1290,7 +1297,7 @@ class DOMManager {
     // Move to the selected element
     if(touchable) {
       // Set focusing flag to prevent OSK disappearing 
-      this.keyman.focusing=true;
+      DOMEventHandlers.states.focusing=true;
       var target=t[i]['kmw_ip'];
 
       // Focus if next element is non-mapped

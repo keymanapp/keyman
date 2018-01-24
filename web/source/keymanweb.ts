@@ -327,7 +327,7 @@ if(!window['keyman']['initialized']) {
       var Ldoc, Ldv, isMSIE=(util._GetIEVersion()<999); // I3363 (Build 301)
 
       if(keymanweb.isPositionSynthesized())
-        return keymanweb.getTextCaret(Pelem);
+        return keymanweb.touchAliasing.getTextCaret(Pelem);
 
       if(Pelem._KeymanWebSelectionStart) 
         return Pelem._KeymanWebSelectionStart;

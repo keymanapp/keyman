@@ -7,8 +7,28 @@
 
  class CommonDOMStates {
   _KeyPressToSwallow: number;
+  _DisableInput: boolean = false;         // Should input be disabled?
+  _IgnoreNextSelChange: number = 0;       // when a visual keyboard key is mouse-down, ignore the next sel change because this stuffs up our history  
+  _Selection = null;
+  _SelectionControl: any = null;   // Type behavior is as with activeElement and the like.
+  
+  modStateFlags: number = 0;         // Tracks the present state of the physical keyboard's active modifier flags.  Needed for AltGr simulation.
+
   activeElement: any;       // TODO:  Add type and fix resulting bugs!
   lastActiveElement: any;   // TODO:  Add type and fix resulting bugs!
+
+  focusing: boolean;
+  focusTimer: number;
+
+  /* ----------------------- Static event-related methods ------------------------ */
+
+  setFocusTimer(): void {
+    this.focusing=true;
+
+    this.focusTimer = window.setTimeout(function() {
+      this.focusing=false;
+    }.bind(this), 1000)
+  }
 }
 
 /**
@@ -366,11 +386,11 @@ class DOMEventHandlers {
     //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
     if(target instanceof HTMLIFrameElement) {
       if(!this.keyman.domManager._IsIEEditableIframe(target, 1) || !this.keyman.domManager._IsMozillaEditableIframe(target,1)) {
-        this.keyman._DisableInput = 1; 
+        DOMEventHandlers.states._DisableInput = true; 
         return true;
       }
     }
-    this.keyman._DisableInput = 0;
+    DOMEventHandlers.states._DisableInput = false; 
 
     if(!this.keyman._JustActivatedKeymanWebUI) {
       // Needs refactor when the Callbacks interface PR goes through!
@@ -378,12 +398,12 @@ class DOMEventHandlers {
       this.keyman.keyboardManager.notifyKeyboard(0,target,1);  // I2187
     }
   
-    if(!this.keyman._JustActivatedKeymanWebUI  &&  this.keyman._SelectionControl != target) {
+    if(!this.keyman._JustActivatedKeymanWebUI  &&  DOMEventHandlers.states._SelectionControl != target) {
       this.keyman._IsActivatingKeymanWebUI = 0;
     }
     this.keyman._JustActivatedKeymanWebUI = 0;
 
-    this.keyman._SelectionControl = target;
+    DOMEventHandlers.states._SelectionControl = target;
     return false;
   }
 
@@ -393,19 +413,16 @@ class DOMEventHandlers {
    * Description Respond to selection change event 
    */
   _SelectionChange: () => boolean = function(this: DOMEventHandlers): boolean {
-    if(this.keyman._IgnoreNextSelChange)
-    {
-      this.keyman._IgnoreNextSelChange--;
-    }
-    else
-    {
+    if(DOMEventHandlers.states._IgnoreNextSelChange) {
+      DOMEventHandlers.states._IgnoreNextSelChange--;
+    } else {
       var Ls=document.selection;
       if(Ls.type.toLowerCase()!='control') //  &&  document.selection.createRange().parentElement() == keymanweb._SelectionControl) //  &&  window.event.srcElement == keymanweb._SelectionControl)
       {
         var Lrange=Ls.createRange();
-        if(!this.keyman._Selection || !this.keyman._Selection.isEqual(Lrange))
+        if(!DOMEventHandlers.states._Selection || !DOMEventHandlers.states._Selection.isEqual(Lrange))
         {
-          this.keyman._Selection = Lrange;
+          DOMEventHandlers.states._Selection = Lrange;
 
           /* Delete deadkeys for IE when certain keys pressed */
           this.keyman['interface'].clearDeadkeys();
@@ -467,7 +484,7 @@ class DOMEventHandlers {
     }
     
     // Stage 1 - track the true state of the keyboard's modifiers.
-    var osk = this.keyman.osk, prevModState = this.keyman.modStateFlags, curModState = 0x0000;
+    var osk = this.keyman.osk, prevModState = DOMEventHandlers.states.modStateFlags, curModState = 0x0000;
     var ctrlEvent = false, altEvent = false;
     
     switch(s.Lcode) {
@@ -541,8 +558,8 @@ class DOMEventHandlers {
     curModState |= s.Lstates;
 
     // Stage 3 - Set our modifier state tracking variable and perform basic AltGr-related management.
-    s.LmodifierChange = this.keyman.modStateFlags != curModState;
-    this.keyman.modStateFlags = curModState;
+    s.LmodifierChange = DOMEventHandlers.states.modStateFlags != curModState;
+    DOMEventHandlers.states.modStateFlags = curModState;
 
     // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
     var altGrMask = osk.modifierCodes['RALT'] | osk.modifierCodes['LCTRL'];
@@ -593,7 +610,7 @@ class DOMEventHandlers {
     var kbdInterface = this.keyman['interface'];
 
     DOMEventHandlers.states._KeyPressToSwallow = 0;
-    if(this.keyman._DisableInput || activeKeyboard == null) {
+    if(DOMEventHandlers.states._DisableInput || activeKeyboard == null) {
       return true;
     }
 
@@ -760,7 +777,7 @@ class DOMEventHandlers {
     }
 
     var Levent;
-    if(this.keyman._DisableInput || this.keyman.keyboardManager.activeKeyboard == null) {
+    if(DOMEventHandlers.states._DisableInput || this.keyman.keyboardManager.activeKeyboard == null) {
       return true;
     }
 
@@ -857,7 +874,7 @@ class DOMEventHandlers {
     if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  Ldv.type != 'control') { // I1479 - avoid createRange on controls
       Ldv=Ldv.createRange();
       //if(Ldv.parentElement()==Levent.Ltarg) //I1505
-      this.keyman._Selection = Ldv;
+      DOMEventHandlers.states._Selection = Ldv;
     }
     // I736 end
     
@@ -920,10 +937,7 @@ class DOMTouchHandlers extends DOMEventHandlers {
     var osk = this.keyman.osk;
     var util = this.keyman.util;
 
-    this.keyman.focusing=true;
-    this.keyman.focusTimer=window.setTimeout(function(){
-      kmw.focusing=false;
-    }, 1000);
+    DOMEventHandlers.states.setFocusTimer();
 
     var tEvent: {
       clientX: number;
@@ -1375,7 +1389,7 @@ class DOMTouchHandlers extends DOMEventHandlers {
     }
 
     //Hide the OSK
-    if(!this.keyman.focusing) {
+    if(!DOMEventHandlers.states.focusing) {
       this.cancelInput();
     }
   }.bind(this);

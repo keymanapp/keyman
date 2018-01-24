@@ -157,23 +157,18 @@ if(!window['keyman']['initialized']) {
      *  @param  {boolean}   align    align and make visible, else hide
      * 
      **/
-    keymanweb.alignInputs = function(align)
-    {                 
-      if(device.touchable)
-      {
-        for(var i=0; i<keymanweb.inputList.length; i++)
-        {
-          if(align) 
-          {     
-            keymanweb.domManager.touchHandlers.updateInput(keymanweb.inputList[i]);
-            keymanweb.inputList[i].style.visibility='visible';
-            if(keymanweb.inputList[i].base.textContent.length > 0)
-              keymanweb.inputList[i].base.style.visibility='hidden';
-          }
-          else
-          {
-            keymanweb.inputList[i].style.visibility='hidden';
-            keymanweb.inputList[i].base.style.visibility='visible';
+    keymanweb.alignInputs = function(align) {
+      var domManager = keymanweb.domManager;
+      if(device.touchable) {
+        for(var i=0; i<domManager.inputList.length; i++) {
+          if(align) {     
+            domManager.touchHandlers.updateInput(domManager.inputList[i]);
+            domManager.inputList[i].style.visibility='visible';
+            if(domManager.inputList[i].base.textContent.length > 0)
+              domManager.inputList[i].base.style.visibility='hidden';
+          } else {
+            domManager.inputList[i].style.visibility='hidden';
+            domManager.inputList[i].base.style.visibility='visible';
           }
         }        
       }

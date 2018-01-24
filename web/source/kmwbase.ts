@@ -21,21 +21,11 @@ window['keyman'] = keyman; // To preserve the name _here_ in case of minificatio
 
 class KeymanBase {
   _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
-  _DisableInput = 0;         // Should input be disabled?
   _IE = 0;                   // browser version identification
   _IsActivatingKeymanWebUI = 0;    // ActivatingKeymanWebUI - is the KeymanWeb DIV in process of being clicked on?
-  _JustActivatedKeymanWebUI = 0;   // JustActivatedKeymanWebUI - focussing back to control after KeymanWeb UI interaction  
-  _IgnoreNextSelChange = 0;  // when a visual keyboard key is mouse-down, ignore the next sel change because this stuffs up our history  
-  _Selection = null;
-  _SelectionControl = null;
-  _DfltStyle = '';           // Default styles
+  _JustActivatedKeymanWebUI = 0;   // JustActivatedKeymanWebUI - focussing back to control after KeymanWeb UI interaction
   _MasterDocument = null;    // Document with controller (to allow iframes to distinguish local/master control)
   _HotKeys = [];             // Array of document-level hotkey objects
-  focusTimer = null;         // Timer to manage loss of focus to unmapped input
-  focusing = false;          // Flag to manage movement of focus
-  resizing = false;          // Flag to control resize events when resetting viewport parameters
-  inputList = [];            // List of simulated input divisions for touch-devices   I3363 (Build 301)
-  waiting = null;            // Element displayed during keyboard load time
   warned = false;            // Warning flag (to prevent multiple warnings)
   baseFont = 'sans-serif';   // Default font for mapped input elements
   appliedFont = '';          // Chain of fonts to be applied to mapped input elements
@@ -49,7 +39,6 @@ class KeymanBase {
   isEmbedded = false;        // Indicates if the KeymanWeb instance is embedded within a mobile app.
                               // Blocks full page initialization when set to `true`.
   refocusTimer = 0;          // Tracks a timeout event that aids of OSK modifier/state key tracking when the document loses focus.
-  modStateFlags = 0;         // Tracks the present state of the physical keyboard's active modifier flags.  Needed for AltGr simulation.
 
   initialized: number;       // Signals the initialization state of the KeymanWeb system.
   'build' = 300;           // TS needs this to be defined within the class.

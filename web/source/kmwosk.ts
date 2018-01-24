@@ -980,15 +980,15 @@ if(!window['keyman']['initialized']) {
 
         Ls=Lelem._KeymanWebSelectionStart;
         Le=Lelem._KeymanWebSelectionEnd;
-        Lsel=keymanweb._Selection;
+        Lsel=DOMEventHandlers.states._Selection;
         keymanweb._IsActivatingKeymanWebUI = 1;
-        keymanweb._IgnoreNextSelChange = 100;
+        DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keymanweb.domManager.focusLastActiveElement();
         if(keymanweb.domManager._IsMozillaEditableIframe(Lelem,0)) Lelem = Lelem.documentElement;
         if(document.selection && Lsel != null) Lsel.select();
         Lelem._KeymanWebSelectionStart=Ls;
         Lelem._KeymanWebSelectionEnd=Le;
-        keymanweb._IgnoreNextSelChange = 0;
+        DOMEventHandlers.states._IgnoreNextSelChange = 0;
         // ...end I3363 (Build 301)
         keymanweb._CachedSelectionStart = null; // I3319
         // Deadkey matching continues to be troublesome.
@@ -1711,8 +1711,7 @@ if(!window['keyman']['initialized']) {
         }
         else
         {
-          keymanweb.focusing=true;
-          keymanweb.focusTimer=window.setTimeout(function(){keymanweb.focusing=false;},1000);
+          DOMEventHandlers.states.setFocusTimer();
 
           osk.lgList.style.display='none'; //still allows blank menu momentarily on selection
           keymanweb.keyboardManager._SetActiveKeyboard(this.kn,this.kc,true);
@@ -1775,7 +1774,7 @@ if(!window['keyman']['initialized']) {
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
         if(keymanweb.keyboardManager.isChiral() && osk.emulatesAltGr() && 
-            (keymanweb.modStateFlags & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
+            ( DOMEventHandlers.states.modStateFlags & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
           keyShiftState |= osk.modifierBitmasks['ALT_GR_SIM'];
           keyShiftState &= ~osk.modifierCodes['RALT'];
         }
