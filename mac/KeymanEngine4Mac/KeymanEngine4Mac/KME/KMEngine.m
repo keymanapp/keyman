@@ -36,7 +36,11 @@ DWORD VKMap[0x80];
 - (id)initWithKMX:(KMXFile *)kmx contextBuffer:(NSString *)ctxBuf {
     self = [super init];
     if (self) {
+#ifdef DEBUG
+        self.debugMode = YES;
+#else
         self.debugMode = NO;
+#endif
         _kmx = kmx;
         _tmpCtxBuf = [[NSMutableString alloc] initWithString:ctxBuf];
         [_tmpCtxBuf removeAllNullChars];
