@@ -121,7 +121,7 @@ class KeyboardInterface {
       Le=Lelem._KeymanWebSelectionEnd;
       Lsel=DOMEventHandlers.states._Selection;
 
-      this.keymanweb._IsActivatingKeymanWebUI = 1;
+      this.keymanweb.uiManager.setActivatingUI(true);
       DOMEventHandlers.states._IgnoreNextSelChange = 100;
       this.keymanweb.domManager.focusLastActiveElement();
       
@@ -914,7 +914,7 @@ class KeyboardInterface {
 
     this.clearDeadkeys();
     this.resetContextCache();
-    (<any>this.keymanweb)._ResetVKShift();
+    this.resetVKShift();
 
     this.keymanweb.osk._Show();
   };
@@ -948,5 +948,17 @@ class KeyboardInterface {
     }
     
     return 0;
-  } 
+  }
+
+  /**
+   * Reset OSK shift states when entering or exiting the active element
+   **/    
+  resetVKShift() {
+    if(!this.keymanweb.uiManager.isActivating) 
+    {
+      if(this.keymanweb.osk._UpdateVKShift) {
+        this.keymanweb.osk._UpdateVKShift(null,15,0);  //this should be enabled !!!!! TODO
+      }
+    }
+  }
 }

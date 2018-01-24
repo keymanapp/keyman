@@ -174,6 +174,16 @@ if(!window['keyman']['initialized']) {
       }
     }    
 
+    /**
+     * Test if caret position is determined from the active element, or 
+     * from the synthesized overlay element (touch devices)
+     * 
+     * @return  {boolean}
+     **/          
+    keymanweb.isPositionSynthesized = function() {
+      return device.touchable;
+    }
+
     // Manage popup key highlighting 
     osk.highlightSubKeys=function(k,x,y)
     {      
@@ -211,7 +221,8 @@ if(!window['keyman']['initialized']) {
         if(keyName.indexOf('K_LOPT') >= 0) osk.showLanguageMenu();
         else if(keyName.indexOf('K_ROPT') >= 0)
         {
-          keymanweb._IsActivatingKeymanWebUI=0; osk._Hide(true); 
+          keymanweb.uiManager.setActivatingUI(false);
+          osk._Hide(true); 
           keymanweb.touchAliasing.hideCaret();
           keymanweb.domManager.clearLastActiveElement();
         }

@@ -123,80 +123,7 @@ if(!window['keyman']['initialized']) {
       osk._BaseLayout = 'us';    
     
     
-    keymanweb._BrowserIsSafari = (navigator.userAgent.indexOf('AppleWebKit') >= 0);  // I732 END - Support for European underlying keyboards #1 
-    
-    /**
-     * Function     getUIState
-     * Scope        Public   
-     * @return      {Object.<string,(boolean|number)>}
-     * Description  Return object with activation state of UI:
-     *                activationPending (bool):   KMW being activated
-     *                activated         (bool):   KMW active    
-     */    
-    keymanweb['getUIState'] = keymanweb.getUIState = function() {
-      var p={
-        activationPending: keymanweb._IsActivatingKeymanWebUI,
-        activated: keymanweb._JustActivatedKeymanWebUI
-      };
-      p['activationPending'] = p.activationPending;
-      p['activated'] = p.activated;
-      return p;
-    }
-
-    /**
-     * Set or clear the IsActivatingKeymanWebUI flag (exposed function)
-     * 
-     * @param       {(boolean|number)}  state  Activate (true,false)
-     */
-    keymanweb['activatingUI'] = function(state) {
-      keymanweb._IsActivatingKeymanWebUI = (state ? 1 : 0);
-    }      
-
-  //TODO: add more complete description of what ControlFocus really does
-
-    /**
-     * Function     doUnloadOSK
-     * Scope        Private
-     * @return      {boolean}   
-     * Description  Execute external (UI) code if any needed after unloading OSK (probably not required)
-     */       
-    keymanweb.doUnloadOSK = function() {
-      var p={};
-      return util.callEvent('kmw.unloadosk',p);
-    }
-
-    /**
-     * Function     doLoadUI
-     * Scope        Private
-     * @return      {boolean}   
-     * Description  Execute UI initialization code after loading the UI
-     */       
-    keymanweb.doLoadUI = function() {
-      var p={};
-      return util.callEvent('kmw.loaduserinterface',p);
-    }
-
-    /**
-     * Function     doUnloadUI
-     * Scope        Private
-     * @return      {boolean}   
-     * Description  Execute UI cleanup code before unloading the UI (may not be required?)
-     */       
-    keymanweb.doUnloadUI = function() {
-      var p={};
-      return util.callEvent('kmw.unloaduserinterface',p);
-    }
-
-    /*****************************************************************************
-     *  
-     * Provide for handling the initial focus event differently
-     * The first focus event can happen before we get the WindowLoad, 
-     * e.g. if the page activates a control on WindowLoad itself,
-     * so trap that and run it through to the page 
-     * 
-     *****************************************************************************/
-    
-  //TODO: check return of _KeyUp - what happens if returning true or false ?? what if null returned?       
+    keymanweb._BrowserIsSafari = (navigator.userAgent.indexOf('AppleWebKit') >= 0);  // I732 END - Support for European underlying keyboards #1      
 
   //TODO: find all references to next three routines and disambiguate!!
     
@@ -205,37 +132,16 @@ if(!window['keyman']['initialized']) {
     
     util.attachDOMEvent(window, 'load', keyman.domManager._WindowLoad,false);
     util.attachDOMEvent(window, 'unload', keymanweb.domManager._WindowUnload,false);  // added fourth argument (default value)       
-        
-    /**
-     * Test if caret position is determined from the active element, or 
-     * from the synthesized overlay element (touch devices)
-     * 
-     * @return  {boolean}
-     **/          
-    keymanweb.isPositionSynthesized = function() {
-      return device.touchable;
-    }
     
     // *** I3319 Supplementary Plane modifications - end new code
-    
-    /**
-     * Reset OSK shift states when entering or exiting the active element
-     **/    
-    keymanweb._ResetVKShift = function() {
-      if(!keymanweb._IsActivatingKeymanWebUI) 
-      {
-        if(osk._UpdateVKShift) osk._UpdateVKShift(null,15,0);  //this should be enabled !!!!! TODO
-      }
-    }
 
-    util.attachDOMEvent(document, 'keyup', keymanweb.hotkeyProcessor._Process, false);  
+    util.attachDOMEvent(document, 'keyup', keymanweb.hotkeyManager._Process, false);  
 
-    util.attachDOMEvent(window, 'focus', keymanweb._ResetVKShift,false);  // I775
-    util.attachDOMEvent(window, 'blur', keymanweb._ResetVKShift,false);   // I775
+    util.attachDOMEvent(window, 'focus', keymanweb.interface.resetVKShift.bind(keymanweb.interface), false);  // I775
+    util.attachDOMEvent(window, 'blur', keymanweb.interface.resetVKShift.bind(keymanweb.interface), false);   // I775
     
     // Initialize supplementary plane string extensions
     String.kmwEnableSupplementaryPlane(false);    
 
   })();
 }
-

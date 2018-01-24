@@ -10,6 +10,8 @@
 /// <reference path="kmwkeyboards.ts" />
 // Defines KMW's hotkey management object.
 /// <reference path="kmwhotkeys.ts" />
+// Defines the ui management code that tracks UI activation and such.
+/// <reference path="kmwuimanager.ts" />
 
 /***
    KeymanWeb 10.0
@@ -24,8 +26,6 @@ window['keyman'] = keyman; // To preserve the name _here_ in case of minificatio
 class KeymanBase {
   _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
   _IE = 0;                   // browser version identification
-  _IsActivatingKeymanWebUI = 0;    // ActivatingKeymanWebUI - is the KeymanWeb DIV in process of being clicked on?
-  _JustActivatedKeymanWebUI = 0;   // JustActivatedKeymanWebUI - focussing back to control after KeymanWeb UI interaction
   _MasterDocument = null;    // Document with controller (to allow iframes to distinguish local/master control)
   _HotKeys = [];             // Array of document-level hotkey objects
   warned = false;            // Warning flag (to prevent multiple warnings)
@@ -61,6 +61,7 @@ class KeymanBase {
   keyboardManager: KeyboardManager;
   domManager: DOMManager;
   hotkeyManager: HotkeyManager;
+  uiManager: UIManager;
 
   touchAliasing: DOMEventHandlers;
 
@@ -103,6 +104,7 @@ class KeymanBase {
     this.keyboardManager = new KeyboardManager(this);
     this.domManager = new DOMManager(this);
     this.hotkeyManager = new HotkeyManager(this);
+    this.uiManager = new UIManager(this);
 
     // Load properties from their static variants.
     this['build'] = KeymanBase.__BUILD__;
@@ -499,6 +501,27 @@ class KeymanBase {
   ['removeHotKey'](keyCode: number, shiftState: number) {
     this.hotkeyManager.removeHotkey(keyCode, shiftState);
   }
+
+  /**
+   * Function     getUIState
+   * Scope        Public   
+   * @return      {Object.<string,(boolean|number)>}
+   * Description  Return object with activation state of UI:
+   *                activationPending (bool):   KMW being activated
+   *                activated         (bool):   KMW active    
+   */    
+  ['getUIState'](): UIState {
+    return this.uiManager.getUIState();
+  }
+
+  /**
+   * Set or clear the IsActivatingKeymanWebUI flag (exposed function)
+   * 
+   * @param       {(boolean|number)}  state  Activate (true,false)
+   */
+  ['activatingUI'](state: boolean) {
+    this.uiManager.setActivatingUI(state);
+  } 
 }
 
 /**

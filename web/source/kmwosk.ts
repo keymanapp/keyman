@@ -981,7 +981,7 @@ if(!window['keyman']['initialized']) {
         Ls=Lelem._KeymanWebSelectionStart;
         Le=Lelem._KeymanWebSelectionEnd;
         Lsel=DOMEventHandlers.states._Selection;
-        keymanweb._IsActivatingKeymanWebUI = 1;
+        keymanweb.uiManager.setActivatingUI(true);
         DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keymanweb.domManager.focusLastActiveElement();
         if(keymanweb.domManager._IsMozillaEditableIframe(Lelem,0)) Lelem = Lelem.documentElement;
@@ -1096,7 +1096,7 @@ if(!window['keyman']['initialized']) {
         Lelem._KeymanWebSelectionStart=null;
         Lelem._KeymanWebSelectionEnd=null;
       }
-      keymanweb._IsActivatingKeymanWebUI = 0;	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
+      keymanweb.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
       return true;
     }
 
@@ -3498,7 +3498,7 @@ if(!window['keyman']['initialized']) {
      */
     osk._VKbdMouseOver = function(e)
     {
-      keymanweb._IsActivatingKeymanWebUI = 1;
+      keymanweb.uiManager.setActivatingUI(true);
     }
 
     /**
@@ -3509,7 +3509,7 @@ if(!window['keyman']['initialized']) {
      */
     osk._VKbdMouseOut = function(e)
     {
-      keymanweb._IsActivatingKeymanWebUI = 0;
+      keymanweb.uiManager.setActivatingUI(false);
     }
 
     /**
@@ -3537,7 +3537,7 @@ if(!window['keyman']['initialized']) {
      */
     osk._VResizeMouseDown = function(e)
     {
-      keymanweb._JustActivatedKeymanWebUI = 1;
+      keymanweb.uiManager.justActivated = true;
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
       if(!e) return true;
       osk.resizing = 1;
@@ -3627,7 +3627,7 @@ if(!window['keyman']['initialized']) {
     osk._VMoveMouseDown = function(e)
     {
       var Lposx, Lposy;
-      keymanweb._JustActivatedKeymanWebUI = 1;
+      keymanweb.uiManager.justActivated = true;
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
       if(!e) return true;
 
@@ -3713,8 +3713,8 @@ if(!window['keyman']['initialized']) {
       if(document.body.style.cursor) document.body.style.cursor = osk._VPreviousCursor;
       keymanweb.domManager.focusLastActiveElement();
       if(e  &&  e.preventDefault) e.preventDefault();
-      keymanweb._JustActivatedKeymanWebUI = 0;
-      keymanweb._IsActivatingKeymanWebUI = 0;
+      keymanweb.uiManager.justActivated = false;
+      keymanweb.uiManager.setActivatingUI(false);
       if(osk._DivVKbd) {
         osk._VOriginalWidth = osk._DivVKbd.offsetWidth;
         osk._VOriginalHeight = osk._DivVKbd.offsetHeight;
@@ -4133,13 +4133,13 @@ if(!window['keyman']['initialized']) {
         util.linkStyleSheet(keymanweb.getStyleSheetPath('kmwosk.css'));
 
         // For mouse click to prevent loss of focus
-        util.attachDOMEvent(osk._Box,'mousedown', function(){keymanweb._IsActivatingKeymanWebUI=1;});
+        util.attachDOMEvent(osk._Box,'mousedown', function(){keymanweb.uiManager.setActivatingUI(true);});
 
         // And to prevent touch event default behaviour on mobile devices
         // TODO: are these needed, or do they interfere with other OSK event handling ????
         if(device.touchable) // I3363 (Build 301)
         {
-          util.attachDOMEvent(osk._Box,'touchstart',function(e){keymanweb._IsActivatingKeymanWebUI=1; e.preventDefault();e.stopPropagation();});
+          util.attachDOMEvent(osk._Box,'touchstart',function(e){keymanweb.uiManager.setActivatingUI(true); e.preventDefault();e.stopPropagation();});
           util.attachDOMEvent(osk._Box,'touchend',function(e){e.preventDefault(); e.stopPropagation();});
           util.attachDOMEvent(osk._Box,'touchmove',function(e){e.preventDefault();e.stopPropagation();});
           util.attachDOMEvent(osk._Box,'touchcancel',function(e){e.preventDefault();e.stopPropagation();});

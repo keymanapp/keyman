@@ -147,6 +147,7 @@ class DOMEventHandlers {
 
   // Universal DOM event handlers (both desktop + touch)
 
+  //TODO: add more complete description of what ControlFocus really does
   /**
    * Respond to KeymanWeb-aware input element receiving focus 
    */    
@@ -203,7 +204,7 @@ class DOMEventHandlers {
     var priorElement = DOMEventHandlers.states.lastActiveElement;
     DOMEventHandlers.states.lastActiveElement = Ltarg;
 
-    if(this.keyman._JustActivatedKeymanWebUI) {
+    if(this.keyman.uiManager.justActivated) {
       this._BlurKeyboardSettings();
     } else {
       this._FocusKeyboardSettings(priorElement ? false : true);
@@ -303,17 +304,18 @@ class DOMEventHandlers {
     /* If the KeymanWeb UI is active as a user changes controls, all UI-based effects should be restrained to this control in case
     * the user is manually specifying languages on a per-control basis.
     */
-    this.keyman._JustActivatedKeymanWebUI = 0;
+    this.keyman.uiManager.justActivated = false;
     
-    if(!this.keyman._IsActivatingKeymanWebUI) {
+    var isActivating = this.keyman.uiManager.isActivating;
+    if(!isActivating) {
       this.keyman.keyboardManager.notifyKeyboard(0, Ltarg, 0);  // I2187
     }
 
     //e = this.keyman._GetEventObject<FocusEvent>(e);   // I2404 - Manage IE events in IFRAMEs  //TODO: is this really needed again????
-    this.doControlBlurred(Ltarg, e, this.keyman._IsActivatingKeymanWebUI);
+    this.doControlBlurred(Ltarg, e, isActivating);
 
     // Hide the OSK when the control is blurred, unless the UI is being temporarily selected
-    if(this.keyman.osk.ready && !this.keyman._IsActivatingKeymanWebUI) {
+    if(this.keyman.osk.ready && !isActivating) {
       this.keyman.osk._Hide(false);
     }
 
@@ -382,6 +384,7 @@ class DOMEventHandlers {
    *                      should be terminated immediately after the call.
    */
   _CommonFocusHelper(target: HTMLElement|Document): boolean {
+    var uiManager = this.keyman.uiManager;
     //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
     //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
     if(target instanceof HTMLIFrameElement) {
@@ -392,16 +395,16 @@ class DOMEventHandlers {
     }
     DOMEventHandlers.states._DisableInput = false; 
 
-    if(!this.keyman._JustActivatedKeymanWebUI) {
+    if(!uiManager.justActivated) {
       // Needs refactor when the Callbacks interface PR goes through!
       this.keyman['interface']._DeadKeys = [];
       this.keyman.keyboardManager.notifyKeyboard(0,target,1);  // I2187
     }
   
-    if(!this.keyman._JustActivatedKeymanWebUI  &&  DOMEventHandlers.states._SelectionControl != target) {
-      this.keyman._IsActivatingKeymanWebUI = 0;
+    if(!uiManager.justActivated && DOMEventHandlers.states._SelectionControl != target) {
+      uiManager.isActivating = false;
     }
-    this.keyman._JustActivatedKeymanWebUI = 0;
+    uiManager.justActivated = false;
 
     DOMEventHandlers.states._SelectionControl = target;
     return false;
@@ -723,7 +726,7 @@ class DOMEventHandlers {
 
     if(!LeventMatched  &&  Levent.Lcode >= 96  &&  Levent.Lcode <= 111) {
       // Number pad, numlock on
-//      _Debug('KeyPress NumPad code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
+      //      _Debug('KeyPress NumPad code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
 
       if(Levent.Lcode < 106) {
         var Lch = Levent.Lcode-48;

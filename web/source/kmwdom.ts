@@ -1126,7 +1126,7 @@ class DOMManager {
    */    
   _WindowUnload: () => void = function() {
     // Allow the UI to release its own resources
-    this.doUnloadUI();
+    this.keyman.uiManager.doUnload();
     
     // Allow the OSK to release its own resources
     if(this.keyman.osk.ready) {
@@ -1227,7 +1227,7 @@ class DOMManager {
       return;
     }
 
-    this.keyman._JustActivatedKeymanWebUI = 1;
+    this.keyman.uiManager.justActivated = true;
     if(lastElem instanceof HTMLIFrameElement && this.keyman.domManager._IsMozillaEditableIframe(lastElem,0)) {
       (<any>lastElem).defaultView.focus(); // I3363 (Build 301)
     } else if(lastElem.focus) {

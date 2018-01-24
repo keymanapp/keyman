@@ -603,7 +603,7 @@ class KeyboardManager {
           manager.activeKeyboard=kbd;
 
           if(manager.keymanweb.domManager.getLastActiveElement() != null) { // TODO:  Resolve without need for the cast.
-            (<any>manager.keymanweb)._JustActivatedKeymanWebUI = 1; // TODO:  Resolve without need for the cast.
+            manager.keymanweb.uiManager.justActivated = true; // TODO:  Resolve without need for the cast.
             manager.keymanweb.domManager._SetTargDir(manager.keymanweb.domManager.getLastActiveElement());
           }
 
@@ -1196,7 +1196,7 @@ class KeyboardManager {
       this._SetActiveKeyboard(this.keyboardStubs[0]['KI'],this.keyboardStubs[0]['KLC'],true);
       // This is likely to be triggered by a UI call of some sort, and we need to treat
       // this call as such to properly maintain the globalKeyboard setting.
-      this.keymanweb._JustActivatedKeymanWebUI = 1;
+      this.keymanweb.uiManager.justActivated = true;
     }
 
     if(anyRemoved) {
