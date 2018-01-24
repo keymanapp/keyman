@@ -25,6 +25,9 @@ import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
 
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -53,6 +56,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.ResultReceiver;
+import android.provider.OpenableColumns;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -230,7 +234,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
     if (data != null) {
       boolean isDirect = false;
-      File kmpFile = new File(data.getPath());
       String url = null;
       String directStr = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Direct);
       if (directStr != null && directStr.equals("true")) {
@@ -241,7 +244,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
       }
 
       if (url != null) {
-        // This could be from keyman://, http://, or https:// protocols
+        // Set of protocols: {"keyman://", "content://", "file://", "http://", "https://"}
         // URL contains KMP to download in background.
         boolean isCustom = KMKeyboardDownloaderActivity.isCustom(url);
 
@@ -253,7 +256,22 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
         Intent i;
         Bundle bundle = new Bundle();
-        if (data.getScheme().equals("file") && kmpFile.exists()) {
+        if (data.getScheme().equals("content")) {
+          Cursor query = getContentResolver().query(data, null, null, null, null);
+          DatabaseUtils.dumpCursor(query);
+          int nameIndex = query.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+          query.moveToFirst();
+          String name = query.getString(nameIndex);
+
+          File cacheKmpFile = new File(MainActivity.this.getCacheDir().toString(), name);
+          if (cacheKmpFile.exists()) {
+            cacheKmpFile.delete();
+          }
+
+        }
+        else if (data.getScheme().equals("file")) {
+          File kmpFile = new File(data.getPath());
+
           // KMP is already local. Copy KMP to app cache and start PackageActivity
           File cacheKmpFile = new File(MainActivity.this.getCacheDir().toString(), kmpFile.getName());
           if (cacheKmpFile.exists()) {

@@ -63,7 +63,10 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <!-- local kmp file -->
-                <data android:scheme="file" android:host="*" android:mimeType="*/*" android:pathPattern=".*\\.kmp" />
+                <data android:scheme="file" android:host="*" android:mimeType="application/octet-stream" android:pathPattern=".*\\.kmp" />
+
+                <!-- reference https://stackoverflow.com/questions/27947881/intent-with-wrong-filename-in-intents-data-from-downloaded-files -->
+                <data android:scheme="content" android:host="*" android:mimeType="application/octet-stream" android:pathPattern=".*" />
             </intent-filter>
 
             <intent-filter>
