@@ -23,6 +23,6 @@ Open **index.html** or **samples/index.html** in your browser. Be sure to compil
 
 To view pages using compiled KeymanWeb,
 1. cd to **keyman/web/source**
-2. Run `/.build.sh`
+2. Run `./build.sh`
 
 Refer to the samples for usage details.
