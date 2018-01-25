@@ -63,7 +63,11 @@ typedef enum {
 - (id)init {
     self = [super init];
     if (self) {
-        _debugMode = NO; // Disable before release
+#ifdef DEBUG
+        _debugMode = YES;
+#else
+        _debugMode = NO;
+#endif
         [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
                                                            andSelector:@selector(handleURLEvent:withReplyEvent:)
                                                          forEventClass:kInternetEventClass
@@ -155,14 +159,12 @@ typedef enum {
 }
 
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
-    if (type == kCGEventFlagsChanged) {
+    if (type == kCGEventFlagsChanged) { // This should always be true; it's the only event type we're trying to tap
         KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
-        KMEngine *engine = appDelegate ? appDelegate.kme : nil;
-        KMXFile *kmx = engine ? engine.kmx : nil;
-        if (kmx != nil && kmx.) {
+        if (appDelegate != nil) {
             NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
             NSLog(@"System Event: %@", sysEvent);
-            //NotificationCenter.default.post(name: NSNotification.Name("modifier"), object: nil)
+            appDelegate.currentModifierFlags = sysEvent.modifierFlags;
         }
     }
     return event;
