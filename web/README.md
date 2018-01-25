@@ -5,7 +5,7 @@ The Original Code is (C) 2017 SIL International
 
 * A local installation of [Node.js](https://nodejs.org/).
 	* Builds will call `npm install` to automatically install further necessary build dependencies.
-* Java 7+ (required by the Google Closure Compiler)
+* Java 7+ (required by the Google Closure Compiler for minification builds)
 
 **********************************************************************
 
@@ -21,8 +21,25 @@ The following folders contain the distribution for KeymanWeb:
 ## Usage
 Open **index.html** or **samples/index.html** in your browser. Be sure to compile KeymanWeb before viewing the pages.
 
+Refer to the samples for usage details.
+
 To view pages using compiled KeymanWeb,
 1. cd to **keyman/web/source**
 2. Run `/.build.sh`
 
-Refer to the samples for usage details.
+### `build.sh` options:
+
+*  `-ui`
+    - to compile desktop user interface modules to output folder
+*  `-test`
+    - to compile for testing without copying resources or updating the saved version number.
+*  `-embed`
+    - to compile only the KMEA/KMEI embedded engine.
+*  `-web`
+    - to compile only the KeymanWeb engine.
+*  `-debug_embedded`
+    - to compile a readable version of the embedded KMEA/KMEI code
+*  `-no_minify`
+    - to disable the minification '/release/' build sections
+	
+If more than one target is specified, the last one will take precedence.

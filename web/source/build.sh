@@ -4,7 +4,7 @@
 #
 
 display_usage ( ) {
-    echo "build.sh [-ui | -test | -embed | -web | -debug_embedded]"
+    echo "build.sh [-ui | -test | -embed | -web | -debug_embedded] [-no_minify]"
     echo
     echo "  -ui               to compile desktop user interface modules to output folder"
     echo "  -test             to compile for testing without copying resources or" 
@@ -13,6 +13,8 @@ display_usage ( ) {
     echo "  -web              to compile only the KeymanWeb engine."
     echo "  -debug_embedded   to compile a readable version of the embedded KMEA/KMEI code"
     echo "  -no_minify        to disable the minification '/release/' build sections"
+    echo ""
+    echo "  If more than one target is specified, the last one will take precedence."
     exit 1
 }
 
@@ -147,13 +149,16 @@ compiler="npm run tsc --"
 compilecmd="$compiler"
 
 # Establish default build parameters
+set_default_vars ( ) {
+    BUILD_UI=true
+    BUILD_EMBED=true
+    BUILD_FULLWEB=true
+    BUILD_DEBUG_EMBED=false
+    BUILD_COREWEB=true
+    DO_MINIFY=true
+}
 
-BUILD_UI=true
-BUILD_EMBED=true
-BUILD_FULLWEB=true
-BUILD_DEBUG_EMBED=false
-BUILD_COREWEB=true
-DO_MINIFY=true
+set_default_vars
 
 if [[ $# = 0 ]]; then
     FULL_BUILD=true
@@ -166,25 +171,30 @@ while [[ $# -gt 0 ]] ; do
     key="$1"
     case $key in
         -ui)
+            set_default_vars
             BUILD_EMBED=false
             BUILD_FULLWEB=false
             BUILD_COREWEB=false
             ;;
         -test)
+            set_default_vars
             BUILD_TEST=true
             BUILD_UI=false
             BUILD_EMBED=false
             BUILD_FULLWEB=false
             ;;
         -embed)
+            set_default_vars
             BUILD_FULLWEB=false
             BUILD_UI=false
             BUILD_COREWEB=false
             ;;
         -web)
+            set_default_vars
             BUILD_EMBED=false
             ;;
         -debug_embedded)
+            set_default_vars
             BUILD_EMBED=false
             BUILD_UI=false
             BUILD_COREWEB=false
