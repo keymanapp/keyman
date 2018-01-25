@@ -11,6 +11,14 @@
 
 #import "KMXFile.h"
 
+// See KMEngine.m - these can be bitwise OR'd
+#define LEFT_SHIFT_FLAG  0x20002
+#define RIGHT_SHIFT_FLAG 0x20004
+#define LEFT_CTRL_FLAG   0x40001
+#define RIGHT_CTRL_FLAG  0x42000
+#define LEFT_ALT_FLAG    0x80020
+#define RIGHT_ALT_FLAG   0x80040
+
 @interface KeymanEngineTestsStaticHelperMethods : NSObject
 + (KMXFile *)getKmxFileTestMacEngine;
 @end

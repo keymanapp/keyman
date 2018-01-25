@@ -259,7 +259,8 @@ NSRange _previousSelRange;
     BOOL deleteBackPosted = NO;
     NSArray *actions = nil;
     if (![self willDeleteNullChar]) {
-        actions = [self.kme processEvent:event];
+        NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.AppDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
+        actions = [self.kme processEvent:eventWithOriginalModifierFlags];
         if (actions.count == 0)
             return NO;
     }
@@ -491,8 +492,10 @@ NSRange _previousSelRange;
                 
             default:
             {
+                // NOTE: Although ch is usually the same as keyCode, when the option key is depressed (and
+                // perhaps in some other cases) it may not be (keyCode can be 0). Likewise, the option key
+                // can generate more than one character in event.characters.
                 unichar ch = [event.characters characterAtIndex:0];
-                // REVIEW: Is ch ever != keyCode? Is there ever more than one character in event.characters?
                 if (keyCode < 0x33 || (ch >= 0x2A && ch <= 0x39)) { // Main keys, Numpad char range, normal punctuation
                     charactersToAppend = event.characters;
                 }

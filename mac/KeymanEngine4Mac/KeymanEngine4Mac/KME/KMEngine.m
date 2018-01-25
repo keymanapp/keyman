@@ -99,7 +99,7 @@ DWORD VKMap[0x80];
     if (([event modifierFlags] & NSEventModifierFlagCommand) == NSEventModifierFlagCommand)
         return nil; // Engine should NEVER attempt to process characters when the Command key is pressed.
     
-    // REVIEW: Probably need to use charactersIgnoringModifiers instead of characters to avoid
+    // REVIEW: Might need to use charactersIgnoringModifiers instead of characters to avoid
     // getting Mac predefined subsitutions for Option + ??? keystrokes
     NSString *characters = [event characters];
     //NSString *characters = [event charactersIgnoringModifiers];
@@ -127,6 +127,7 @@ DWORD VKMap[0x80];
                 if (chars.length && ((kmKey.key == [chars characterAtIndex:0]) || (kmKey.key == [[chars uppercaseString] characterAtIndex:0])))
                     [mKeys addObject:kmKey];
             }
+            // TODO: Need tests remainder of this logic
             else if ((flags & ISVIRTUALKEY) == ISVIRTUALKEY) {
                 if (kmKey.key == vkCode)
                     [mKeys addObject:kmKey];
