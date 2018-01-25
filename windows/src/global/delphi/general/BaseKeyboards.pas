@@ -67,7 +67,7 @@ begin
     with TRegistry.Create do
     try
       RootKey := HKEY_LOCAL_MACHINE;
-      if OpenKeyReadOnly(SRegKey_LatinKeyboardCache) then
+      if OpenKeyReadOnly(SRegKey_LatinKeyboardCache_LM) then
       begin
         GetValueNames(FLatinKeyboardIDs);
         for i := 0 to FLatinKeyboardIDs.Count - 1 do
@@ -80,13 +80,13 @@ begin
     with TRegistry.Create do
     try
       RootKey := HKEY_LOCAL_MACHINE;
-      if OpenKeyReadOnly(SRegKey_KeyboardLayouts) then
+      if OpenKeyReadOnly(SRegKey_KeyboardLayouts_LM) then
       begin
         GetKeyNames(FKeyNames);
         for I := 0 to FKeyNames.Count - 1 do
         begin
           if TryStrToInt('$'+FKeyNames[i], FKeyboardID) and
-             OpenKeyReadOnly('\' + SRegKey_KeyboardLayouts + '\' + FKeyNames[i]) then
+             OpenKeyReadOnly('\' + SRegKey_KeyboardLayouts_LM + '\' + FKeyNames[i]) then
           begin
             if not IsLatinKeyboard(FKeyNames[i], FLatinKeyboardIDs) then
               Continue;
@@ -143,7 +143,7 @@ begin
   with TRegistry.Create do
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeyboardLayouts + '\' + FKeyboardIDString) then
+    if OpenKeyReadOnly(SRegKey_KeyboardLayouts_LM + '\' + FKeyboardIDString) then
     begin
       if ValueExists(SRegValue_LayoutDisplayName) then
       begin
@@ -267,7 +267,7 @@ begin
   with TRegistry.Create do
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKey(SRegKey_LatinKeyboardCache, True) then
+    if OpenKey(SRegKey_LatinKeyboardCache_LM, True) then
     begin
       WriteString(KeyboardID, IntToStr(FIsLatin));
     end;

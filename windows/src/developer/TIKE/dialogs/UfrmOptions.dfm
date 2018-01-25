@@ -64,7 +64,7 @@ inherited frmOptions: TfrmOptions
         Width = 237
         Height = 45
         Caption = '&External Editor Path'
-        TabOrder = 3
+        TabOrder = 2
         object editExternalEditorPath: TEdit
           Left = 8
           Top = 16
@@ -87,7 +87,7 @@ inherited frmOptions: TfrmOptions
         Width = 125
         Height = 25
         Caption = 'S&MTP Settings...'
-        TabOrder = 6
+        TabOrder = 4
         OnClick = cmdSMTPSettingsClick
       end
       object chkOpenKeyboardFilesInSourceView: TCheckBox
@@ -104,12 +104,16 @@ inherited frmOptions: TfrmOptions
         Width = 125
         Height = 25
         Caption = '&Reset tool windows'
-        TabOrder = 4
+        TabOrder = 3
         OnClick = cmdResetToolWindowsClick
       end
     end
     object tabEditor: TTabSheet
       Caption = 'Editor'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblIndentSize: TLabel
         Left = 8
         Top = 60
@@ -181,6 +185,10 @@ inherited frmOptions: TfrmOptions
     object tabColours: TTabSheet
       Caption = 'Colours'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object panCol1: TPaintPanel
         Left = 176
         Top = 8
@@ -613,6 +621,10 @@ inherited frmOptions: TfrmOptions
     object tabDebugger: TTabSheet
       Caption = 'Debugger'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object gbDebuggerSettings: TGroupBox
         Left = 8
         Top = 8
@@ -689,6 +701,10 @@ inherited frmOptions: TfrmOptions
     object tabCharMap: TTabSheet
       Caption = 'Character Map'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object gbCharMapCharacterLookups: TGroupBox
         Left = 8
         Top = 8

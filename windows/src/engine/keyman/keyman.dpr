@@ -131,7 +131,10 @@ uses
   VisualKeyboardSaverBinary in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas',
   VisualKeyboardSaverXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
   Windows8LanguageList in '..\..\global\delphi\general\Windows8LanguageList.pas',
-  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas';
+  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
+  Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
+  Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
+  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas';
 
 {$R ICONS.RES}
 {$R VERSION.RES}

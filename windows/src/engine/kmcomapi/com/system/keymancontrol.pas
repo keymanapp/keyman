@@ -76,6 +76,7 @@ type
 
   TKeymanControl = class(TKeymanAutoObject, IKeymanCustomisationAccess, IIntKeymanControl, IKeymanControl, IKeymanEngineControl)
   private
+{$IFNDEF WIN64}
     hlibKeyman32: THandle;
     FStartedKeyman32, FMustExitKeyman32: Boolean;
     FKeyman_Initialise: TKeyman32InitialiseFunction;
@@ -91,24 +92,30 @@ type
     FKeyman_PostMasterController: TKeyman32ControllerPostMessageFunction;
     FKeyman_PostControllers: TKeyman32ControllerPostMessageFunction;
     FKeyman_StartExit: TKeyman32ExitFunction;  // I3092
+    procedure LoadKeyman32;
+    procedure StartKeyman32;
+    procedure Do_Keyman_Exit;
+    procedure Keyman32Bit_Destroy;
+{$ENDIF}
 
+  private
     wm_keyman_control: UINT;
     wm_kmselectlang: UINT;
     RefreshHandle: THandle;
     FAutoApply: Boolean;
     FKeymanCustomisation: IKeymanCustomisation;
-    procedure LoadKeyman32;
-    procedure StartKeyman32;
+
     procedure RefreshWndProc(var Message: TMessage);
-    procedure Do_Keyman_Exit;
-    procedure ApplyToRunningKeymanEngine;
     function RunKeymanConfiguration(const filename: string): Boolean;
+    procedure ApplyToRunningKeymanEngine;
+    function FindMasterControllerWindow: THandle;
   protected
     { IKeymanControl }
     function Get_ActiveLanguage: IKeymanLanguage; safecall;
     procedure Set_ActiveLanguage(const Value: IKeymanLanguage); safecall;
-    function Get_LastActiveWindow: LongWord; safecall;
-    function Get_LastFocusWindow: LongWord; safecall;
+
+    function Get_LastActiveWindow: LongWord; safecall;    // 32 bit only
+    function Get_LastFocusWindow: LongWord; safecall;    // 32 bit only
 
     function IsConfigurationOpen: WordBool; safecall;
     function IsKeymanRunning: WordBool; safecall;
@@ -127,13 +134,13 @@ type
     procedure StopVisualKeyboard; safecall;
 
     { IKeymanControlRestart }
-    procedure RestartEngine; safecall;
-    procedure ShutdownKeyman32Engine; safecall;
-    procedure StartKeyman32Engine; safecall;   // I5133
-    procedure StopKeyman32Engine; safecall;   // I5133
-    procedure ResetKeyman32Engine; safecall;   // I5133
-    procedure RegisterControllerWindow(Value: LongWord); safecall;
-    procedure UnregisterControllerWindow(Value: LongWord); safecall;
+    procedure RestartEngine; safecall;    // 32 bit only
+    procedure ShutdownKeyman32Engine; safecall;    // 32 bit only
+    procedure StartKeyman32Engine; safecall;    // 32 bit only
+    procedure StopKeyman32Engine; safecall;    // 32 bit only
+    procedure ResetKeyman32Engine; safecall;    // 32 bit only
+    procedure RegisterControllerWindow(Value: LongWord); safecall;     // 32 bit only
+    procedure UnregisterControllerWindow(Value: LongWord); safecall;    // 32 bit only
     procedure DisableUserInterface; safecall;
     procedure EnableUserInterface; safecall;
 
@@ -173,6 +180,17 @@ var
   wm_keyman_refresh: Integer = 0;
   wm_keyman: Integer = 0;
 
+{$IFNDEF WIN64}
+const
+  SKeyman32Filename = 'keyman32.dll';
+{$ENDIF}
+
+const
+  SWnd_MasterController = 'TfrmKeyman7Main';
+  SWnd_VisualKeyboard = 'TfrmVisualKeyboard';
+  SWnd_OnlineUpdateIcon = 'TfrmOnlineUpdateIcon';
+  SWnd_OnlineUpdateNewVersion = 'TfrmOnlineUpdateNewVersion';
+
 function TKeymanControl.GetAutoApply: Boolean;
 begin
   Result := FAutoApply;
@@ -181,9 +199,9 @@ end;
 function TKeymanControl.Get_ActiveLanguage: IKeymanLanguage;
 var
   pInputProcessorProfiles: ITfInputProcessorProfiles;
-  pInputProcessorProfileMgr: ITfInputProcessorProfileMgr;
+  pInputProcessorProfileMgr: keyman_msctf.ITfInputProcessorProfileMgr;
   i: Integer;
-  profile: TF_INPUTPROCESSORPROFILE;
+  profile: keyman_msctf.TF_INPUTPROCESSORPROFILE;
 begin
   OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,
                           IID_ITfInputProcessorProfiles, pInputProcessorProfiles));
@@ -257,13 +275,13 @@ end;
 
 function TKeymanControl.IsKeymanRunning: WordBool;
 begin
-  Result := (FindWindow('TfrmKeyman7Main', nil) <> 0);
+  Result := (FindMasterControllerWindow <> 0);
 end;
 
 function TKeymanControl.IsOnlineUpdateCheckOpen: WordBool;
 begin
-  Result := (FindWindow('TfrmOnlineUpdateIcon', nil) <> 0) or
-    (FindWindow('TfrmOnlineUpdateNewVersion', nil) <> 0);
+  Result := (FindWindow(SWnd_OnlineUpdateIcon, nil) <> 0) or
+    (FindWindow(SWnd_OnlineUpdateNewVersion, nil) <> 0);
 end;
 
 function TKeymanControl.IsTextEditorOpen: WordBool;
@@ -278,7 +296,12 @@ end;
 
 function TKeymanControl.IsVisualKeyboardOpen: WordBool;
 begin
-  Result := (FindWindow('TfrmVisualKeyboard', nil) <> 0);
+  Result := (FindWindow(SWnd_VisualKeyboard, nil) <> 0);
+end;
+
+function TKeymanControl.FindMasterControllerWindow: THandle;
+begin
+  Result := FindWindow(SWnd_MasterController, nil);
 end;
 
 function TKeymanControl.KeymanCustomisation: IKeymanCustomisation;
@@ -290,33 +313,28 @@ begin
 end;
 
 procedure TKeymanControl.StartVisualKeyboard;
+var
+  h: THandle;
 begin
-  FKeyman_PostMasterController(wm_keyman_control, KMC_ONSCREENKEYBOARD, 1); // := ProcAddr('Keyman_PostMasterController');
+  h := FindMasterControllerWindow;
+  if h <> 0 then
+    PostMessage(h, wm_keyman_control, KMC_ONSCREENKEYBOARD, 1); // := ProcAddr('Keyman_PostMasterController');
   //(Context as TKeymanContext).Controller.ShowVisualKeyboard;
 end;
 
 procedure TKeymanControl.StopVisualKeyboard;
+var
+  h: THandle;
 begin
-  FKeyman_PostMasterController(wm_keyman_control, KMC_ONSCREENKEYBOARD, 0); // := ProcAddr('Keyman_PostMasterController');
+  h := FindMasterControllerWindow;
+  if h <> 0 then
+    PostMessage(h, wm_keyman_control, KMC_ONSCREENKEYBOARD, 0); // := ProcAddr('Keyman_PostMasterController');
   //(Context as TKeymanContext).Controller.HideVisualKeyboard;
-end;
-
-procedure TKeymanControl.StartKeyman32Engine;   // I5133
-begin
-  LoadKeyman32;
-
-  StartKeyman32;
-  (Context.Keyboards as IIntKeymanKeyboardsInstalled).StartKeyboards;   // I4381
 end;
 
 procedure TKeymanControl.StopKeyman;
 begin
   Context.Controller.StopKeyman;
-end;
-
-procedure TKeymanControl.StopKeyman32Engine;   // I5133
-begin
-  (Context.Keyboards as IIntKeymanKeyboardsInstalled).StopKeyboards;   // I4381
 end;
 
 procedure TKeymanControl.AutoApplyKeyman;
@@ -362,13 +380,231 @@ end;
 
 destructor TKeymanControl.Destroy;
 begin
+{$IFNDEF WIN64}
+  Keyman32Bit_Destroy;
+{$ENDIF}
+  inherited Destroy;
+end;
+
+procedure TKeymanControl.OpenConfiguration;
+begin
+  RunKeymanConfiguration('');
+end;
+
+procedure TKeymanControl.OpenDiagnostics;
+var
+  msg, path: string;
+begin
+  path := TKeymanPaths.KeymanEngineInstallPath(TKeymanPaths.S_TSysInfoExe);
+  ExecuteProgram('"'+path+'"', ExtractFileDir(path), msg);
+end;
+
+procedure TKeymanControl.OpenHelp(const Topic: WideString);
+begin
+  RunKeymanConfiguration('-h "'+Topic+'"');
+end;
+
+procedure TKeymanControl.OpenTextEditor;
+begin
+  RunKeymanConfiguration('-t');
+end;
+
+procedure TKeymanControl.OpenUpdateCheck;
+begin
+  RunKeymanConfiguration('-ouc');
+end;
+
+procedure TKeymanControl.StartKeyman;
+begin
+  Context.Controller.StartKeyman;
+end;
+
+function TKeymanControl.RunKeymanConfiguration(const filename: string): boolean;
+var
+  err: string;
+begin
+  Result := ExecuteProgram('"'+TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell)+'" '+filename,
+    TKeymanPaths.KeymanDesktopInstallDir, err);
+end;
+
+procedure TKeymanControl.Refresh;
+begin
+  if Assigned(FKeymanCustomisation) then
+    FKeymanCustomisation.Refresh;
+end;
+
+procedure TKeymanControl.RefreshWndProc(var Message: TMessage);
+begin
+  with Message do
+    Result := DefWindowProc(RefreshHandle, Msg, WParam, LParam);
+end;
+
+procedure TKeymanControl.DisableUserInterface;
+const
+  KM_DISABLEUI = 1;
+begin
+  if wm_keyman = 0 then
+    wm_keyman := RegisterWindowMessage('wm_keyman');
+  PostMessage(HWND_BROADCAST, wm_keyman, KM_DISABLEUI, 0);
+end;
+
+procedure TKeymanControl.EnableUserInterface;
+const
+  KM_ENABLEUI = 2;
+begin
+  if wm_keyman = 0 then
+    wm_keyman := RegisterWindowMessage('wm_keyman');
+  PostMessage(HWND_BROADCAST, wm_keyman, KM_ENABLEUI, 0);
+end;
+
+procedure TKeymanControl.ShowKeyboardWelcome(const Keyboard: IKeymanKeyboardInstalled);
+var
+  pkg: IKeymanPackageInstalled;
+begin
+  pkg := Keyboard.OwnerPackage;
+  if Assigned(pkg) then
+    RunKeymanConfiguration('-kw "'+pkg.ID+'"');
+end;
+
+
+{procedure TKeymanVisualKeyboard.Print;  // I2329
+var
+  pkg: IKeymanPackageInstalled;
+  kbd: IKeymanKeyboardInstalled;
+begin
+  kbd := GetOwnerKeyboard;
+  if not Assigned(kbd) then Exit;
+  pkg := kbd.Get_OwnerPackage;
+  if Assigned(pkg) then
+    Context.Control.RunKeymanConfiguration('-kp "'+kbd.ID+'"');
+end;}
+
+
+{**
+  Control of startup and shutdown of keyman32.dll -- implemented only by 32 bit;
+  generally these functions are intended to be used only by keyman.exe.
+*}
+
+procedure TKeymanControl.StartKeyman32Engine;   // I5133
+begin
+{$IFDEF WIN64}
+  Error(Cardinal(E_NOTIMPL));
+{$ELSE}
+  LoadKeyman32;
+
+  StartKeyman32;
+  (Context.Keyboards as IIntKeymanKeyboardsInstalled).StartKeyboards;   // I4381
+{$ENDIF}
+end;
+
+procedure TKeymanControl.StopKeyman32Engine;   // I5133
+begin
+{$IFDEF WIN64}
+  Error(Cardinal(E_NOTIMPL));
+{$ELSE}
+  if Context.Keyboards <> nil then
+    (Context.Keyboards as IIntKeymanKeyboardsInstalled).StopKeyboards;   // I4381
+{$ENDIF}
+end;
+
+function TKeymanControl.Get_LastActiveWindow: LongWord;
+begin
+{$IFDEF WIN64}
+  Error(Cardinal(E_NOTIMPL));
+{$ELSE}
+  LoadKeyman32;
+  Result := FKeyman_GetLastActiveWindow;
+{$ENDIF}
+end;
+
+function TKeymanControl.Get_LastFocusWindow: LongWord;
+begin
+{$IFDEF WIN64}
+  Error(Cardinal(E_NOTIMPL));
+{$ELSE}
+  LoadKeyman32;
+  Result := FKeyman_GetLastFocusWindow;
+{$ENDIF}
+end;
+
+procedure TKeymanControl.RegisterControllerWindow(Value: LongWord);
+begin
+{$IFDEF WIN64}
+  Error(Cardinal(E_NOTIMPL));
+{$ELSE}
+  LoadKeyman32;
+  if not FKeyman_RegisterControllerWindow(Value) then
+    Error(KMN_E_KeymanControl_CannotRegisterControllerWindow);
+{$ENDIF}
+end;
+
+procedure TKeymanControl.ResetKeyman32Engine;   // I5133
+begin
+{$IFDEF WIN64}
+  Error(Cardinal(E_NOTIMPL));
+{$ELSE}
+  LoadKeyman32;
+  FKeyman_ResetInitialisation;
+{$ENDIF}
+end;
+
+procedure TKeymanControl.RestartEngine;
+begin
+{$IFDEF WIN64}
+  Error(Cardinal(E_NOTIMPL));
+{$ELSE}
+  LoadKeyman32;
+  if not FKeyman_RestartEngine then
+    ErrorFmt(KMN_E_KeymanControl_CannotLoadKeyman32, VarArrayOf([Integer(GetLastError), 'Failed to restart Keyman Engine: '+SysErrorMessage(GetLastError)]));
+{$ENDIF}
+end;
+
+procedure TKeymanControl.UnregisterControllerWindow(Value: LongWord);
+begin
+{$IFDEF WIN64}
+  Error(Cardinal(E_NOTIMPL));
+{$ELSE}
+  LoadKeyman32;
+  if not FKeyman_UnregisterControllerWindow(Value) then
+    Error(KMN_E_KeymanControl_CannotUnregisterControllerWindow);
+{$ENDIF}
+end;
+
+procedure TKeymanControl.ShutdownKeyman32Engine;
+begin
+{$IFDEF WIN64}
+  Error(Cardinal(E_NOTIMPL));
+{$ELSE}
+  KL.MethodEnter(Self, 'ShutdownKeyman32Engine', [FMustExitKeyman32]);
+  if FMustExitKeyman32 then
+  begin
+    StopKeyman32Engine;   // I5133
+    Do_Keyman_Exit;
+    if hlibKeyman32 <> 0 then   // I5018
+    begin
+      FreeLibrary(hlibKeyman32);   // I5018
+      hlibKeyman32 := 0;
+    end;
+    FMustExitKeyman32 := False;
+    FStartedKeyman32 := False;
+  end;
+  KL.MethodExit(Self, 'ShutdownKeyman32Engine');
+{$ENDIF}
+end;
+
+{**
+  32-bit helper functions for initialising keyman32.dll.
+*}
+
+{$IFNDEF WIN64}
+procedure TKeymanControl.Keyman32Bit_Destroy;
+begin
   if hlibKeyman32 <> 0 then
   begin
     StopKeyman32Engine;   // I5133
     if FMustExitKeyman32 then
       Do_Keyman_Exit;
   end;
-  inherited Destroy;
 end;
 
 procedure TKeymanControl.Do_Keyman_Exit;
@@ -414,7 +650,7 @@ begin
     until not Thread32Next(hSnap, &te);
   end;
   CloseHandle(hSnap);
-  
+
 end;
 
 procedure TKeymanControl.LoadKeyman32;
@@ -428,7 +664,7 @@ procedure TKeymanControl.LoadKeyman32;
       with TRegistryErrorControlled.Create do  // I2890
       try
         RootKey := HKEY_LOCAL_MACHINE;
-        if OpenKeyReadOnly(SRegKey_KeymanEngine) and ValueExists(SRegValue_RootPath) then
+        if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_RootPath) then
             RootPath := ReadString(SRegValue_RootPath);
       finally
         Free;
@@ -457,9 +693,9 @@ begin
   if hlibKeyman32 = 0 then
   begin
 
-    s := GetKeymanInstallPath+'keyman32.dll';   // I3598
+    s := GetKeymanInstallPath+SKeyman32Filename;   // I3598
     if not FileExists(s) then
-      ErrorFmt(KMN_E_KeymanControl_CannotLoadKeyman32, VarArrayOf([Integer(GetLastError), 'Failed to find keyman32.dll at "'+s+'", '+SysErrorMessage(GetLastError)]));
+      ErrorFmt(KMN_E_KeymanControl_CannotLoadKeyman32, VarArrayOf([Integer(GetLastError), 'Failed to find '+SKeyman32Filename+' at "'+s+'", '+SysErrorMessage(GetLastError)]));
 
     hlibKeyman32 := LoadLibrary(PChar(s));
     if hlibKeyman32 = 0 then
@@ -482,39 +718,6 @@ begin
   end;
 end;
 
-procedure TKeymanControl.OpenConfiguration;
-begin
-  RunKeymanConfiguration('');
-end;
-
-procedure TKeymanControl.OpenDiagnostics;
-var
-  msg, path: string;
-begin
-  path := TKeymanPaths.KeymanEngineInstallPath(TKeymanPaths.S_TSysInfoExe);
-  ExecuteProgram('"'+path+'"', ExtractFileDir(path), msg);
-end;
-
-procedure TKeymanControl.OpenHelp(const Topic: WideString);
-begin
-  RunKeymanConfiguration('-h "'+Topic+'"');
-end;
-
-procedure TKeymanControl.OpenTextEditor;
-begin
-  RunKeymanConfiguration('-t');
-end;
-
-procedure TKeymanControl.OpenUpdateCheck;
-begin
-  RunKeymanConfiguration('-ouc');
-end;
-
-procedure TKeymanControl.StartKeyman;
-begin
-  Context.Controller.StartKeyman;
-end;
-
 procedure TKeymanControl.StartKeyman32;
 var
   FSingleApp: BOOL;
@@ -534,121 +737,6 @@ begin
     KL.MethodExit(Self, 'StartKeyman32');
   end;
 end;
-
-function TKeymanControl.Get_LastActiveWindow: LongWord;
-begin
-  LoadKeyman32;
-  Result := FKeyman_GetLastActiveWindow;
-end;
-
-function TKeymanControl.Get_LastFocusWindow: LongWord;
-begin
-  LoadKeyman32;
-  Result := FKeyman_GetLastFocusWindow;
-end;
-
-procedure TKeymanControl.RegisterControllerWindow(Value: LongWord);
-begin
-  LoadKeyman32;
-  if not FKeyman_RegisterControllerWindow(Value) then
-    Error(KMN_E_KeymanControl_CannotRegisterControllerWindow);
-end;
-
-procedure TKeymanControl.ResetKeyman32Engine;   // I5133
-begin
-  LoadKeyman32;
-  FKeyman_ResetInitialisation;
-end;
-
-procedure TKeymanControl.RestartEngine;
-begin
-  LoadKeyman32;
-  if not FKeyman_RestartEngine then
-    ErrorFmt(KMN_E_KeymanControl_CannotLoadKeyman32, VarArrayOf([Integer(GetLastError), 'Failed to restart Keyman Engine: '+SysErrorMessage(GetLastError)]));
-end;
-
-function TKeymanControl.RunKeymanConfiguration(const filename: string): boolean;
-var
-  err: string;
-begin
-  Result := ExecuteProgram('"'+TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell)+'" '+filename,
-    TKeymanPaths.KeymanDesktopInstallDir, err);
-end;
-
-procedure TKeymanControl.UnregisterControllerWindow(Value: LongWord);
-begin
-  LoadKeyman32;
-  if not FKeyman_UnregisterControllerWindow(Value) then
-    Error(KMN_E_KeymanControl_CannotUnregisterControllerWindow);
-end;
-
-procedure TKeymanControl.Refresh;
-begin
-  if Assigned(FKeymanCustomisation) then
-    FKeymanCustomisation.Refresh;
-end;
-
-procedure TKeymanControl.RefreshWndProc(var Message: TMessage);
-begin
-  with Message do
-    Result := DefWindowProc(RefreshHandle, Msg, WParam, LParam);
-end;
-
-procedure TKeymanControl.DisableUserInterface;
-const
-  KM_DISABLEUI = 1;
-begin
-  if wm_keyman = 0 then
-    wm_keyman := RegisterWindowMessage('wm_keyman');
-  PostMessage(HWND_BROADCAST, wm_keyman, KM_DISABLEUI, 0);
-end;
-
-procedure TKeymanControl.EnableUserInterface;
-const
-  KM_ENABLEUI = 2;
-begin
-  if wm_keyman = 0 then
-    wm_keyman := RegisterWindowMessage('wm_keyman');
-  PostMessage(HWND_BROADCAST, wm_keyman, KM_ENABLEUI, 0);
-end;
-
-procedure TKeymanControl.ShowKeyboardWelcome(const Keyboard: IKeymanKeyboardInstalled);
-var
-  pkg: IKeymanPackageInstalled;
-begin
-  pkg := Keyboard.OwnerPackage;
-  if Assigned(pkg) then
-    RunKeymanConfiguration('-kw "'+pkg.ID+'"');
-end;
-
-procedure TKeymanControl.ShutdownKeyman32Engine;
-begin
-  KL.MethodEnter(Self, 'ShutdownKeyman32Engine', [FMustExitKeyman32]);
-  if FMustExitKeyman32 then
-  begin
-    StopKeyman32Engine;   // I5133
-    Do_Keyman_Exit;
-    if hlibKeyman32 <> 0 then   // I5018
-    begin
-      FreeLibrary(hlibKeyman32);   // I5018
-      hlibKeyman32 := 0;
-    end;
-    FMustExitKeyman32 := False;
-    FStartedKeyman32 := False;
-  end;
-  KL.MethodExit(Self, 'ShutdownKeyman32Engine');
-end;
-
-{procedure TKeymanVisualKeyboard.Print;  // I2329
-var
-  pkg: IKeymanPackageInstalled;
-  kbd: IKeymanKeyboardInstalled;
-begin
-  kbd := GetOwnerKeyboard;
-  if not Assigned(kbd) then Exit;
-  pkg := kbd.Get_OwnerPackage;
-  if Assigned(pkg) then
-    Context.Control.RunKeymanConfiguration('-kp "'+kbd.ID+'"');
-end;}
+{$ENDIF}
 
 end.

@@ -1,3 +1,6 @@
+// Defines a number of KMW objects.
+/// <reference path="kmwtypedefs.ts"/>
+
 interface Window {
     attachEvent: (eventNameWithOn:string, callback: () => void) => void,
     clientWidth: number
@@ -11,7 +14,7 @@ interface Document {
 }
 
 interface Element {
-    _kmwAttachment: any,                // Used to track each input element's attachment data.
+    _kmwAttachment: AttachmentInfo,                // Used to track each input element's attachment data.
     shim: HTMLElement,                  // Used in subkey elements for smooth fading.
 
     _KeymanWebSelectionStart: number,

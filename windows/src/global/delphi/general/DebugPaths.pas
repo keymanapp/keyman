@@ -33,7 +33,7 @@ function GetDebugPath(const RegValue, Default: WideString; TerminateInSlash: Boo
 begin
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKeyReadOnly(SRegKey_KeymanDebug) and ValueExists(RegValue)
+    if OpenKeyReadOnly(SRegKey_KeymanDebug_CU) and ValueExists(RegValue)
       then Result := ReadString(RegValue)
       else Result := Default;
   finally

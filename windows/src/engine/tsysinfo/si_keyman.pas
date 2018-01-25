@@ -110,9 +110,9 @@ begin
 
   subnode := xmlAddChild(node,'Registry');
   regnode := xmlAddChild(subnode,'LocalMachine');
-  AddRegistry(regnode, HKEY_LOCAL_MACHINE, SRegKey_KeymanRoot);
+  AddRegistry(regnode, HKEY_LOCAL_MACHINE, SRegKey_KeymanRoot_LM);
   regnode := xmlAddChild(subnode,'CurrentUser');
-  AddRegistry(regnode, HKEY_CURRENT_USER, SRegKey_KeymanRoot);
+  AddRegistry(regnode, HKEY_CURRENT_USER, SRegKey_KeymanRoot_CU);
 
   { Get file versions }
 

@@ -147,7 +147,10 @@ uses
   VisualKeyboardSaverXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
   UtilWaitForTSF in 'util\UtilWaitForTSF.pas',
   BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
-  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas';
+  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
+  Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
+  Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
+  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

@@ -232,7 +232,7 @@ if(!window['keyman']['initialized']) {
       {
         if(osk._Visible)
         {
-          keymanweb._FocusLastActiveElement();  // I2036 - OSK does not unpin to correct location
+          keymanweb.domManager.focusLastActiveElement();  // I2036 - OSK does not unpin to correct location
           osk.loadCookie(); osk.userPositioned=false; osk.saveCookie();
           osk._Show();
           osk.doResizeMove(); //allow the UI to respond to OSK movements
@@ -830,16 +830,16 @@ if(!window['keyman']['initialized']) {
 
         switch(code) {
           case osk.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-            kbdInterface.output(1,keymanweb._LastActiveElement,"");
+            kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
             break;
           case osk.keyCodes['K_TAB']:
-            keymanweb.moveToNext(keyShiftState);
+            keymanweb.domManager.moveToNext(keyShiftState);
             break;
           case osk.keyCodes['K_TABBACK']:
-            keymanweb.moveToNext(true);
+            keymanweb.domManager.moveToNext(true);
             break;
           case osk.keyCodes['K_TABFWD']:
-            keymanweb.moveToNext(false);
+            keymanweb.domManager.moveToNext(false);
             break;
           case osk.keyCodes['K_ENTER']:
             // Insert new line in text area fields
@@ -853,7 +853,7 @@ if(!window['keyman']['initialized']) {
                 Lelem.base.disabled=false;
                 Lelem.base.form.submit();
               } else {
-                keymanweb.moveToNext(false);
+                keymanweb.domManager.moveToNext(false);
               }
             }
             break;
@@ -888,7 +888,7 @@ if(!window['keyman']['initialized']) {
           //       // Failed to move right - there's nothing to delete.
           //       break;
           //     }
-          //     kbdInterface.output(1, keymanweb._LastActiveElement,"");
+          //     kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
           //   }
         }
       }
@@ -931,7 +931,7 @@ if(!window['keyman']['initialized']) {
      */
     osk.clickKey = function(e)
     {
-      var Lelem = keymanweb._LastActiveElement, Ls, Le, Lkc;
+      var Lelem = keymanweb.domManager.getLastActiveElement(), Ls, Le, Lkc;
 
       var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
 
@@ -953,7 +953,7 @@ if(!window['keyman']['initialized']) {
         }
 
         if(typeof(e.key) != 'undefined') nextLayer=e.key['nextlayer'];
-        if(keymanweb._ActiveElement == null) keymanweb._ActiveElement=Lelem;
+        keymanweb.domManager.initActiveElement(Lelem);
 
         // Exclude menu and OSK hide keys from normal click processing
         if(keyName == 'K_LOPT' || keyName == 'K_ROPT')
@@ -980,13 +980,13 @@ if(!window['keyman']['initialized']) {
 
         Ls=Lelem._KeymanWebSelectionStart;
         Le=Lelem._KeymanWebSelectionEnd;
-        keymanweb._IsActivatingKeymanWebUI = 1;
-        keymanweb._IgnoreNextSelChange = 100;
-        keymanweb._FocusLastActiveElement();
-        if(keymanweb._IsMozillaEditableIframe(Lelem,0)) Lelem = Lelem.documentElement;
+        keymanweb.uiManager.setActivatingUI(true);
+        DOMEventHandlers.states._IgnoreNextSelChange = 100;
+        keymanweb.domManager.focusLastActiveElement();
+        if(keymanweb.domManager._IsMozillaEditableIframe(Lelem,0)) Lelem = Lelem.documentElement;
         Lelem._KeymanWebSelectionStart=Ls;
         Lelem._KeymanWebSelectionEnd=Le;
-        keymanweb._IgnoreNextSelChange = 0;
+        DOMEventHandlers.states._IgnoreNextSelChange = 0;
         // ...end I3363 (Build 301)
         keymanweb._CachedSelectionStart = null; // I3319
         // Deadkey matching continues to be troublesome.
@@ -1094,7 +1094,7 @@ if(!window['keyman']['initialized']) {
         Lelem._KeymanWebSelectionStart=null;
         Lelem._KeymanWebSelectionEnd=null;
       }
-      keymanweb._IsActivatingKeymanWebUI = 0;	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
+      keymanweb.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
       return true;
     }
 
@@ -1320,7 +1320,7 @@ if(!window['keyman']['initialized']) {
      **/
     osk.showLanguageMenu = function()
     {
-      var n=0,kbdList=(<KeymanBase>keymanweb).keyboardManager.keyboardStubs,nKbds=kbdList.length;
+      var n=0,kbdList=keymanweb.keyboardManager.keyboardStubs,nKbds=kbdList.length;
       if(nKbds < 1) return;
 
       // Create the menu list container element
@@ -1709,13 +1709,12 @@ if(!window['keyman']['initialized']) {
         }
         else
         {
-          keymanweb.focusing=true;
-          keymanweb.focusTimer=window.setTimeout(function(){keymanweb.focusing=false;},1000);
+          DOMEventHandlers.states.setFocusTimer();
 
           osk.lgList.style.display='none'; //still allows blank menu momentarily on selection
           keymanweb.keyboardManager._SetActiveKeyboard(this.kn,this.kc,true);
           keymanweb.keyboardManager.doKeyboardChange(this.kn,this.kc);
-          keymanweb._FocusLastActiveElement();
+          keymanweb.domManager.focusLastActiveElement();
           osk.hideLanguageList();
 
           // Update the OSK with the new keyboard
@@ -1773,7 +1772,7 @@ if(!window['keyman']['initialized']) {
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
         if(keymanweb.keyboardManager.isChiral() && osk.emulatesAltGr() && 
-            (keymanweb.modStateFlags & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
+            ( DOMEventHandlers.states.modStateFlags & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
           keyShiftState |= osk.modifierBitmasks['ALT_GR_SIM'];
           keyShiftState &= ~osk.modifierCodes['RALT'];
         }
@@ -2483,7 +2482,7 @@ if(!window['keyman']['initialized']) {
       }
       // Also backspace, to allow delete to repeat while key held
       else if(keyName == 'K_BKSP') {
-        kbdInterface.output(1,keymanweb._LastActiveElement,"");
+        kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
         osk.deleting = window.setTimeout(osk.repeatDelete,500);
         osk.keyPending = null;
       } else {
@@ -2790,7 +2789,7 @@ if(!window['keyman']['initialized']) {
      **/
     osk.repeatDelete = function() {
       if(osk.deleting) {
-        kbdInterface.output(1,keymanweb._LastActiveElement,"");
+        kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
         osk.deleting = window.setTimeout(osk.repeatDelete,100);
       }
     }
@@ -3497,7 +3496,7 @@ if(!window['keyman']['initialized']) {
      */
     osk._VKbdMouseOver = function(e)
     {
-      keymanweb._IsActivatingKeymanWebUI = 1;
+      keymanweb.uiManager.setActivatingUI(true);
     }
 
     /**
@@ -3508,7 +3507,7 @@ if(!window['keyman']['initialized']) {
      */
     osk._VKbdMouseOut = function(e)
     {
-      keymanweb._IsActivatingKeymanWebUI = 0;
+      keymanweb.uiManager.setActivatingUI(false);
     }
 
     /**
@@ -3536,7 +3535,7 @@ if(!window['keyman']['initialized']) {
      */
     osk._VResizeMouseDown = function(e)
     {
-      keymanweb._JustActivatedKeymanWebUI = 1;
+      keymanweb.uiManager.justActivated = true;
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
       if(!e) return true;
       osk.resizing = 1;
@@ -3626,7 +3625,7 @@ if(!window['keyman']['initialized']) {
     osk._VMoveMouseDown = function(e)
     {
       var Lposx, Lposy;
-      keymanweb._JustActivatedKeymanWebUI = 1;
+      keymanweb.uiManager.justActivated = true;
       e = keymanweb._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
       if(!e) return true;
 
@@ -3710,10 +3709,10 @@ if(!window['keyman']['initialized']) {
       document.onmousemove = osk._VPreviousMouseMove;
       document.onmouseup = osk._VPreviousMouseUp;
       if(document.body.style.cursor) document.body.style.cursor = osk._VPreviousCursor;
-      keymanweb._FocusLastActiveElement();
+      keymanweb.domManager.focusLastActiveElement();
       if(e  &&  e.preventDefault) e.preventDefault();
-      keymanweb._JustActivatedKeymanWebUI = 0;
-      keymanweb._IsActivatingKeymanWebUI = 0;
+      keymanweb.uiManager.justActivated = false;
+      keymanweb.uiManager.setActivatingUI(false);
       if(osk._DivVKbd) {
         osk._VOriginalWidth = osk._DivVKbd.offsetWidth;
         osk._VOriginalHeight = osk._DivVKbd.offsetHeight;
@@ -3799,7 +3798,7 @@ if(!window['keyman']['initialized']) {
     osk._Show = function(Px, Py)
     {
       // Do not try to display OSK if undefined, or no active element
-      if(osk._Box == null || keymanweb._ActiveElement == null) return;
+      if(osk._Box == null || keymanweb.domManager.getActiveElement() == null) return;
 
       // Never display the OSK for desktop browsers unless KMW element is focused, and a keyboard selected
       if((!device.touchable) && (keymanweb.keyboardManager.activeKeyboard == null || !osk._Enabled)) return;
@@ -3887,7 +3886,7 @@ if(!window['keyman']['initialized']) {
           }
           else
           {
-            var el=keymanweb._ActiveElement;
+            var el=keymanweb.domManager.getActiveElement();
             if(osk.dfltX != '')
               Ls.left=osk.dfltX;
             else if(typeof el != 'undefined' && el != null)
@@ -4089,7 +4088,7 @@ if(!window['keyman']['initialized']) {
       osk.doHide(p);
 
       // If hidden by the UI, be sure to restore the focus
-      if(hiddenByUser) keymanweb._FocusLastActiveElement();
+      if(hiddenByUser) keymanweb.domManager.focusLastActiveElement();
     }
 
     /**
@@ -4132,13 +4131,13 @@ if(!window['keyman']['initialized']) {
         util.linkStyleSheet(keymanweb.getStyleSheetPath('kmwosk.css'));
 
         // For mouse click to prevent loss of focus
-        util.attachDOMEvent(osk._Box,'mousedown', function(){keymanweb._IsActivatingKeymanWebUI=1;});
+        util.attachDOMEvent(osk._Box,'mousedown', function(){keymanweb.uiManager.setActivatingUI(true);});
 
         // And to prevent touch event default behaviour on mobile devices
         // TODO: are these needed, or do they interfere with other OSK event handling ????
         if(device.touchable) // I3363 (Build 301)
         {
-          util.attachDOMEvent(osk._Box,'touchstart',function(e){keymanweb._IsActivatingKeymanWebUI=1; e.preventDefault();e.stopPropagation();});
+          util.attachDOMEvent(osk._Box,'touchstart',function(e){keymanweb.uiManager.setActivatingUI(true); e.preventDefault();e.stopPropagation();});
           util.attachDOMEvent(osk._Box,'touchend',function(e){e.preventDefault(); e.stopPropagation();});
           util.attachDOMEvent(osk._Box,'touchmove',function(e){e.preventDefault();e.stopPropagation();});
           util.attachDOMEvent(osk._Box,'touchcancel',function(e){e.preventDefault();e.stopPropagation();});

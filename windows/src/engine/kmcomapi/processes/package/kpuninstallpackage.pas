@@ -57,14 +57,13 @@ var
   FIsAdmin: Boolean;
   inf: TKMPInfFile;
   FAutoApply: Boolean;
+  Path: string;
 begin
   FAutoApply := Context.Control.AutoApply;
   try
     Context.Control.AutoApply := False;
 
     { Get package registry path }
-
-    SUninstallKey := GetRegistryPackageInstallKey(PackageName);
 
     if not PackageInstalled(PackageName, FIsAdmin) then
       Error(KMN_E_PackageUninstall_NotFound);
@@ -74,9 +73,16 @@ begin
 
     with TRegistryErrorControlled.Create do  // I2890
     try
-      if FIsAdmin
-        then RootKey := HKEY_LOCAL_MACHINE
-        else RootKey := HKEY_CURRENT_USER;
+      if FIsAdmin then
+      begin
+        RootKey := HKEY_LOCAL_MACHINE;
+        SUninstallKey := GetRegistryPackageInstallKey_LM(PackageName);
+      end
+      else
+      begin
+        RootKey := HKEY_CURRENT_USER;
+        SUninstallKey := GetRegistryPackageInstallKey_CU(PackageName);
+      end;
 
       if not OpenKey(SUninstallKey, False) then
         Error(KMN_E_PackageUninstall_NotFound);
@@ -170,8 +176,18 @@ begin
         FileName := GetPackageInstallPath(PackageName) + '\kmp.inf';
       end;
 
-      if FIsAdmin then RootKey := HKEY_LOCAL_MACHINE else RootKey := HKEY_CURRENT_USER;
-      DeleteKey('\'+SRegKey_InstalledPackages+'\'+GetShortPackageName(PackageName));
+      if FIsAdmin then
+      begin
+        RootKey := HKEY_LOCAL_MACHINE;
+        Path := '\'+SRegKey_InstalledPackages_LM+'\'+GetShortPackageName(PackageName);
+      end
+      else
+      begin
+        RootKey := HKEY_CURRENT_USER;
+        Path := '\'+SRegKey_InstalledPackages_CU+'\'+GetShortPackageName(PackageName);
+      end;
+
+      DeleteKey(Path);
 
       if not RecursiveDelete(ExtractFileDir(FileName)) then   // I4173   // I4181
       begin

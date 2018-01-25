@@ -240,6 +240,7 @@ object frmVisualKeyboard: TfrmVisualKeyboard
         Height = 21
         Align = alClient
         TabOrder = 0
+        Silent = False
         DisableCtrlShortcuts = 'N'
         UserInterfaceOptions = [DisableTextSelect, DontUse3DBorders, EnablesFormsAutoComplete, EnableThemes]
         About = ' EmbeddedWB http://bsalsa.com/'

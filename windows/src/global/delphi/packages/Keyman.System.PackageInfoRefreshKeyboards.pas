@@ -22,6 +22,7 @@ type
     procedure DoError(msg: string; State: TProjectLogState);
     function DoesFileMatchKeyboardID(f: TPackageContentFile;
       const id: string): Boolean;
+    function IsKeyboardFileByContent(f: TPackageContentFile): Boolean;
   public
     type TPackageKeyboardInfo = record
       Name, ID, Version: string;
@@ -79,7 +80,6 @@ function TPackageInfoRefreshKeyboards.Execute: Boolean;
 var
   i: Integer;
   k: TPackageKeyboard;
-  k0: TPackageKeyboard;
   ids: TIntegerDynArray;
   pki: TPackageKeyboardInfo;
   j: Integer;
@@ -153,9 +153,22 @@ begin
   Result := True;
 end;
 
-function TPackageInfoRefreshKeyboards.IsKeyboardFileByName(f: TPackageContentFile): TKMFileType;
+function TPackageInfoRefreshKeyboards.IsKeyboardFileByContent(f: TPackageContentFile): Boolean;
 var
-  s: string;
+  id: string;
+begin
+  id := TKeyboardUtils.GetKeymanWebCompiledNameFromFileName(f.FileName);
+  // Look for Keyboard_<id>
+  with TStringStream.Create('', TEncoding.UTF8) do
+  try
+    LoadFromFile(f.FileName);
+    Result := TRegEx.IsMatch(DataString, '\bKeyboard_'+id+'\b', []);
+  finally
+    Free;
+  end;
+end;
+
+function TPackageInfoRefreshKeyboards.IsKeyboardFileByName(f: TPackageContentFile): TKMFileType;
 begin
   if f.FileType = ftKeymanFile then
   begin
@@ -165,8 +178,9 @@ begin
   if f.FileType <> ftJavascript then
     Exit(ftOther);
 
-  s := ChangeFileExt(ExtractFileName(f.FileName), '');
-  if TRegEx.IsMatch(s, '^[a-z0-9_]+-([0-9]+)(\.[0-9+])*$', [roIgnoreCase]) then
+  // Need to test if the JS is a valid keyboard file.
+  // This is a bit of a pain... but we have to stick with .js for compat
+  if IsKeyboardFileByContent(f) then
     Exit(ftJavascript);
 
   Exit(ftOther);
@@ -266,14 +280,9 @@ begin
   if (f.FileType = ftKeymanFile) and SameText(fn, id) then
     Exit(True);
 
-  // If filename matches id-version.js
-  if (f.FileType = ftJavascript) then
-  begin
-    if SameText(ExtractFileExt(f.FileName), '.js') and
-        SameText(Copy(fn, 1, Length(id)), id) and
-        (Copy(fn, Length(id)+1, 1) = '-') then
-      Exit(True);
-  end;
+  // If filename matches id.js
+  if (f.FileType = ftJavascript) and SameText(fn, id) then
+    Exit(True);
 
   Result := False;
 end;

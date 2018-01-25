@@ -4,8 +4,14 @@
 /// <reference path="kmwdom.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwutils.ts" />
+// Defines the keyboard callback object.
+/// <reference path="kmwcallback.ts" />
 // Defines keyboard data & management classes.
 /// <reference path="kmwkeyboards.ts" />
+// Defines KMW's hotkey management object.
+/// <reference path="kmwhotkeys.ts" />
+// Defines the ui management code that tracks UI activation and such.
+/// <reference path="kmwuimanager.ts" />
 
 /***
    KeymanWeb 10.0
@@ -13,30 +19,15 @@
 ***/
 
 declare var keyman: KeymanBase;
+declare var KeymanWeb: KeyboardInterface;
 var keyman: KeymanBase = window['keyman'] || {};
-// window['keyman'] = keyman; // To preserve the name _here_ in case of minification.
+window['keyman'] = keyman; // To preserve the name _here_ in case of minification.
 
 class KeymanBase {
   _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
-  _DisableInput = 0;         // Should input be disabled?
   _IE = 0;                   // browser version identification
-  _IsActivatingKeymanWebUI = 0;    // ActivatingKeymanWebUI - is the KeymanWeb DIV in process of being clicked on?
-  _JustActivatedKeymanWebUI = 0;   // JustActivatedKeymanWebUI - focussing back to control after KeymanWeb UI interaction  
-  _IgnoreNextSelChange = 0;  // when a visual keyboard key is mouse-down, ignore the next sel change because this stuffs up our history  
-  _Selection = null;
-  _SelectionControl = null;
-  _AttachedElements = [];    // I1596 - attach to controls dynamically
-  _ActiveElement = null;     // Currently active (focused) element  I3363 (Build 301)
-  _LastActiveElement = null; // LastElem - Last active element
-  _DfltStyle = '';           // Default styles
   _MasterDocument = null;    // Document with controller (to allow iframes to distinguish local/master control)
   _HotKeys = [];             // Array of document-level hotkey objects
-  focusTimer = null;         // Timer to manage loss of focus to unmapped input
-  focusing = false;          // Flag to manage movement of focus
-  resizing = false;          // Flag to control resize events when resetting viewport parameters
-  sortedInputs = [];         // List of all INPUT and TEXTAREA elements ordered top to bottom, left to right
-  inputList = [];            // List of simulated input divisions for touch-devices   I3363 (Build 301)
-  waiting = null;            // Element displayed during keyboard load time
   warned = false;            // Warning flag (to prevent multiple warnings)
   baseFont = 'sans-serif';   // Default font for mapped input elements
   appliedFont = '';          // Chain of fonts to be applied to mapped input elements
@@ -50,7 +41,6 @@ class KeymanBase {
   isEmbedded = false;        // Indicates if the KeymanWeb instance is embedded within a mobile app.
                               // Blocks full page initialization when set to `true`.
   refocusTimer = 0;          // Tracks a timeout event that aids of OSK modifier/state key tracking when the document loses focus.
-  modStateFlags = 0;         // Tracks the present state of the physical keyboard's active modifier flags.  Needed for AltGr simulation.
 
   initialized: number;       // Signals the initialization state of the KeymanWeb system.
   'build' = 300;           // TS needs this to be defined within the class.
@@ -64,11 +54,16 @@ class KeymanBase {
   static __BUILD__: number;
 
   // Internal objects
-  util: Util;
-  osk: any;
-  ui: any;
+  ['util']: Util;
+  ['osk']: any;
+  ['ui']: any;
+  ['interface']: KeyboardInterface;
   keyboardManager: KeyboardManager;
   domManager: DOMManager;
+  hotkeyManager: HotkeyManager;
+  uiManager: UIManager;
+
+  touchAliasing: DOMEventHandlers;
 
   // Defines option-tracking object as a string map.
   options: { [name: string]: string; } = {
@@ -80,6 +75,7 @@ class KeymanBase {
     'ui':null
   };;
 
+
   // Stub functions (defined later in code only if required)
   setDefaultDeviceOptions(opt){}     
   getStyleSheetPath(s){return s;}
@@ -87,6 +83,8 @@ class KeymanBase {
   KC_(n, ln, Pelem){return '';} 
   handleRotationEvents(){}
   alignInputs(b){}
+  namespaceID(Pstub) {};
+  preserveID(Pk) {};
 
   setInitialized(val: number) {
     this.initialized = this['initialized'] = val;
@@ -97,10 +95,16 @@ class KeymanBase {
   // -------------
 
   constructor() {
+    // Allow internal minification of the public modules.
     this.util = this['util'] = new Util(this);
+    window['KeymanWeb'] = this.interface = this['interface'] = new KeyboardInterface(this);
     this.osk = this['osk'] = {ready:false};
+    this.ui = this['ui'] = null;
+
     this.keyboardManager = new KeyboardManager(this);
     this.domManager = new DOMManager(this);
+    this.hotkeyManager = new HotkeyManager(this);
+    this.uiManager = new UIManager(this);
 
     // Load properties from their static variants.
     this['build'] = KeymanBase.__BUILD__;
@@ -116,6 +120,11 @@ class KeymanBase {
     this['loaded'] = true;
   }
 
+  delayedInit() {
+    // Track the selected Event-handling object.
+    this.touchAliasing = this.util.device.touchable ? this.domManager.touchHandlers : this.domManager.nonTouchHandlers;
+  }
+
   /**
    * Expose font testing to allow checking that SpecialOSK or custom font has
    * been correctly loaded by browser
@@ -123,7 +132,7 @@ class KeymanBase {
    *  @param  {string}  fName   font-family name
    *  @return {boolean}         true if available
    **/         
-  ['isFontAvailable'](fName: string): boolean {
+  isFontAvailable(fName: string): boolean {
     return this.util.checkFont({'family':fName});
   }
 
@@ -151,7 +160,7 @@ class KeymanBase {
     if (!e) {
       e = window.event as E;
       if(!e) {
-        var elem: HTMLElement|Document = (<any>this)._GetLastActiveElement();
+        var elem: HTMLElement|Document = this.domManager.getLastActiveElement();
         if(elem) {
           elem = elem.ownerDocument;
           var win: Window;
@@ -168,6 +177,23 @@ class KeymanBase {
     }
     
     return e;    
+  }
+
+  /**
+   * Function     _push
+   * Scope        Private   
+   * @param       {Array}     Parray    Array   
+   * @param       {*}         Pval      Value to be pushed or appended to array   
+   * @return      {Array}               Returns extended array
+   * Description  Push (if possible) or append a value to an array 
+   */  
+  _push<T>(Parray: T[], Pval: T) {
+    if(Parray.push) {
+      Parray.push(Pval);
+    } else {
+      Parray=Parray.concat(Pval);
+    }
+    return Parray;
   }
 
   // Base object API definitions
@@ -332,6 +358,17 @@ class KeymanBase {
   }
 
   /**
+   * Gets the cookie for the name and language code of the most recently active keyboard
+   * 
+   *  Defaults to US English, but this needs to be user-set in later revision (TODO)      
+   * 
+   * @return      {string}          InternalName:LanguageCode 
+   */    
+  ['getSavedKeyboard']() {
+    return this.keyboardManager.getSavedKeyboard();  
+  }
+
+  /**
    * Function     Initialization
    * Scope        Public
    * @param       {Object}  arg     object array of user-defined properties
@@ -340,6 +377,151 @@ class KeymanBase {
   ['init'](arg) {
     this.domManager.init(arg);
   }
+
+  /**
+   * Function     resetContext
+   * Scope        Public
+   * Description  Revert OSK to default layer and clear any deadkeys and modifiers
+   */
+  ['resetContext']() {
+    this.interface.resetContext();
+  };
+
+  /**
+   * Function     disableControl
+   * Scope        Public
+   * @param       {Element}      Pelem       Element to be disabled
+   * Description  Disables a KMW control element 
+   */    
+  ['disableControl'](Pelem: HTMLElement) {
+    this.domManager.disableControl(Pelem);
+  }
+
+  /**
+   * Function     enableControl
+   * Scope        Public
+   * @param       {Element}      Pelem       Element to be disabled
+   * Description  Disables a KMW control element 
+   */    
+  ['enableControl'](Pelem: HTMLMapElement) {
+    this.domManager.enableControl(Pelem);
+  }
+  
+  /**
+   * Function     setKeyboardForControl
+   * Scope        Public   
+   * @param       {Element}    Pelem    Control element 
+   * @param       {string|null=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)  
+   * @param       {string|null=}     Plc      Language Code
+   * Description  Set default keyboard for the control 
+   */    
+  ['setKeyboardForControl'](Pelem: HTMLElement, Pkbd?: string, Plc?: string) {
+    this.domManager.setKeyboardForControl(Pelem, Pkbd, Plc);
+  }
+
+  /**
+   * Function     getKeyboardForControl
+   * Scope        Public   
+   * @param       {Element}    Pelem    Control element 
+   * @return      {string|null}         The independently-managed keyboard for the control.
+   * Description  Returns the keyboard ID of the current independently-managed keyboard for this control.
+   *              If it is currently following the global keyboard setting, returns null instead.
+   */
+  ['getKeyboardForControl'](Pelem) {
+    this.domManager.getKeyboardForControl(Pelem);
+  }
+
+  /**
+   * Function     getLanguageForControl
+   * Scope        Public   
+   * @param       {Element}    Pelem    Control element 
+   * @return      {string|null}         The independently-managed keyboard for the control.
+   * Description  Returns the language code used with the current independently-managed keyboard for this control.
+   *              If it is currently following the global keyboard setting, returns null instead.
+   */
+  ['getLanguageForControl'](Pelem) {
+    this.domManager.getLanguageForControl(Pelem);
+  }
+
+  /**
+   * Set focus to last active target element (browser-dependent)
+   */    
+  ['focusLastActiveElement']() {
+    this.domManager.focusLastActiveElement();
+  }
+  
+  /**
+   * Get the last active target element *before* KMW activated (I1297)
+   * 
+   * @return      {Object}        
+   */    
+  ['getLastActiveElement']() {
+    return this.domManager.getLastActiveElement();
+  }
+
+  /**
+   *  Set the active input element directly optionally setting focus 
+   * 
+   *  @param  {Object|string} e         element id or element
+   *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123) 
+   **/
+  ['setActiveElement'](e: string|HTMLElement, setFocus: boolean) {
+    return this.domManager.setActiveElement(e, setFocus);
+  }
+
+  /**
+   * Move focus to user-specified element
+   * 
+   *  @param  {string|Object}   e   element or element id
+   *           
+   **/
+  ['moveToElement'](e: string|HTMLElement) {
+    this.domManager.moveToElement(e);
+  }
+
+  /**
+   * Function     addHotkey
+   * Scope        Public
+   * @param       {number}            keyCode
+   * @param       {number}            shiftState
+   * @param       {function(Object)}  handler
+   * Description  Add hot key handler to array of document-level hotkeys triggered by key up event
+   */
+  ['addHotKey'](keyCode: number, shiftState: number, handler: () => void) {
+    this.hotkeyManager.addHotKey(keyCode, shiftState, handler);
+  }
+
+  /**
+   * Function     removeHotkey
+   * Scope        Public
+   * @param       {number}        keyCode
+   * @param       {number}        shiftState
+   * Description  Remove a hot key handler from array of document-level hotkeys triggered by key up event
+   */
+  ['removeHotKey'](keyCode: number, shiftState: number) {
+    this.hotkeyManager.removeHotkey(keyCode, shiftState);
+  }
+
+  /**
+   * Function     getUIState
+   * Scope        Public   
+   * @return      {Object.<string,(boolean|number)>}
+   * Description  Return object with activation state of UI:
+   *                activationPending (bool):   KMW being activated
+   *                activated         (bool):   KMW active    
+   */    
+  ['getUIState'](): UIState {
+    return this.uiManager.getUIState();
+  }
+
+  /**
+   * Set or clear the IsActivatingKeymanWebUI flag (exposed function)
+   * 
+   * @param       {(boolean|number)}  state  Activate (true,false)
+   */
+  ['activatingUI'](state: boolean) {
+    this.uiManager.setActivatingUI(state);
+  } 
 }
 
 /**
@@ -368,9 +550,13 @@ KeymanBase.__BUILD__ = 299;
 if(!window['keyman']['loaded']) {
 
   (function() {
-    // The base object call may need to be moved into a separate, later file eventually.
-    // It will be necessary to override methods with kmwnative.ts and kmwembedded.ts before the
-    // affected objects are initialized.
+    /* The base object call may need to be moved into a separate, later file eventually.
+     * It will be necessary to override methods with kmwnative.ts and kmwembedded.ts before the
+     * affected objects are initialized.
+     * 
+     * We only recreate the 'keyman' object if it's not been loaded.
+     * As this is the base object, not creating it prevents a KMW system reset.
+     */
     var keymanweb = window['keyman'] = new KeymanBase();
     
     // Define public OSK, user interface and utility function objects 
@@ -378,49 +564,11 @@ if(!window['keyman']['loaded']) {
     var osk: any = keymanweb['osk'];
     var ui: any = keymanweb['ui'] = {};
     
-    var kbdInterface = keymanweb['interface'] = {
-      // Cross-reference with /windows/src/global/inc/Compiler.h - these are the Developer codes for the respective system stores.
-      // They're named here identically to their use in that header file.
-      TSS_LAYER: 33,
-      TSS_PLATFORM: 31,
-
-      _AnyIndices: [],        // AnyIndex - array of any/index match indices
-      _BeepObjects: [],       // BeepObjects - maintains a list of active 'beep' visual feedback elements
-      _BeepTimeout: 0,        // BeepTimeout - a flag indicating if there is an active 'beep'. 
-                              // Set to 1 if there is an active 'beep', otherwise leave as '0'.
-      _DeadKeys: []           // DeadKeys - array of matched deadkeys
-    };
-    
     osk.highlightSubKeys = function(k,x,y){}
     osk.createKeyTip = function(){}
     osk.optionKey = function(e,keyName,keyDown){}
     osk.showKeyTip = function(key,on){}  
     osk.waitForFonts = function(kfd,ofd){return true;}
-                 
-  /*  
-
-  osk.positionChanged = function(newPosition)
-    {
-      return util.callEvent('osk.positionChanged', newPosition);
-    }
-    
-    osk['setPosition'] = function(newPosition)
-    {
-      divOsk.left = newPosition.left;
-      ...
-      osk.positionChanged({left: divOsk.left, top: divOsk.top, ...});
-    }
-    
-    ui.oskPositionChanged = function(newPosition)
-    {
-      // do something with the osk
-    }
-    
-    ui.init = function()
-    {
-      osk.addEventListener('positionChanged', ui.oskPositionChanged);
-    }
-    */
 
     /**
     * Extend Array function by adding indexOf array member if undefined (IE < IE9)

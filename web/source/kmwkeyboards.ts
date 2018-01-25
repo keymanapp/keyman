@@ -146,7 +146,7 @@ class KeyboardManager {
     {    
       Lstub = this.keyboardStubs[Ln];
       Lrn = this._GetKeyboardDetail(Lstub);  // I2078 - Full keyboard detail
-      Lr=(<any>this.keymanweb)._push(Lr,Lrn);
+      Lr=this.keymanweb._push(Lr,Lrn); // TODO:  Resolve without need for the cast.
     } 
     return Lr;
   }
@@ -156,13 +156,13 @@ class KeyboardManager {
       
     // KRS stubs (legacy format registration)    
     for(var j=0; j<this.deferredKRS.length; j++) {
-      this._RegisterStub(this.deferredKRS[j]);
+      this._registerStub(this.deferredKRS[j]);
     }
   }
 
   registerDeferredKeyboards() {
     for(var j=0; j<this.deferredKR.length; j++) {
-      this._RegisterKeyboard(this.deferredKR[j]);
+      this._registerKeyboard(this.deferredKR[j]);
     }
   }
 
@@ -350,8 +350,8 @@ class KeyboardManager {
     //      If UI callbacks are needed at all, they should be within _SetActiveKeyboard  
     this.doBeforeKeyboardChange(PInternalName,PLgCode);     
     this._SetActiveKeyboard(PInternalName,PLgCode,true);    
-    if(this.keymanweb._LastActiveElement != null) {
-      (<any>this.keymanweb)._FocusLastActiveElement();
+    if(this.keymanweb.domManager.getLastActiveElement() != null) {
+      this.keymanweb.domManager.focusLastActiveElement(); // TODO:  Resolve without need for the cast.
     }
     // If we ever allow PLgCode to be set by default, we can auto-detect the language code
     // after the _SetActiveKeyboard call.
@@ -445,7 +445,7 @@ class KeyboardManager {
     for(Ln=0; Ln<this.keyboards.length; Ln++) { // I1511 - array prototype extended
       if(this.keyboards[Ln]['KI'] == PInternalName) {
         this.activeKeyboard = this.keyboards[Ln];
-        this.keymanweb.domManager._SetTargDir(this.keymanweb._LastActiveElement);  // I2077 - LTR/RTL timing
+        this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
       
         // and update the active stub
         for(var Ls=0; Ls<this.keyboardStubs.length; Ls++) {
@@ -534,7 +534,7 @@ class KeyboardManager {
           return;
         }
       }
-      this.keymanweb.domManager._SetTargDir(this.keymanweb._LastActiveElement);  // I2077 - LTR/RTL timing
+      this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
     } 
 
     var Pk=this.activeKeyboard;  // I3319
@@ -558,6 +558,11 @@ class KeyboardManager {
     var Lscript = util._CreateElement('SCRIPT') as HTMLScriptElement;
     Lscript.charset="UTF-8";        // KMEW-89
     Lscript.type = 'text/javascript';
+
+    // Preserve any namespaced IDs by use of the script's id tag attribute!
+    if(this.keymanweb.isEmbedded) {
+      Lscript.id = kbdStub['KI'];
+    }
 
     var kbdFile = kbdStub['KF'];
     var kbdLang = kbdStub['KL'];
@@ -597,9 +602,9 @@ class KeyboardManager {
           manager.doBeforeKeyboardChange(kbd['KI'],kbdStub['KLC']);
           manager.activeKeyboard=kbd;
 
-          if((<any>manager.keymanweb)._LastActiveElement != null) {
-            (<any>manager.keymanweb)._JustActivatedKeymanWebUI = 1;
-            <any>manager.keymanweb.domManager._SetTargDir(manager.keymanweb._LastActiveElement);            
+          if(manager.keymanweb.domManager.getLastActiveElement() != null) { // TODO:  Resolve without need for the cast.
+            manager.keymanweb.uiManager.justActivated = true; // TODO:  Resolve without need for the cast.
+            manager.keymanweb.domManager._SetTargDir(manager.keymanweb.domManager.getLastActiveElement());
           }
 
           String.kmwEnableSupplementaryPlane(kbdStub && ((kbdStub['KS'] && (kbdStub['KS'] == 1)) || (kbd['KN'] == 'Hieroglyphic'))); // I3319 - SMP extension, I3363 (Build 301)
@@ -1191,7 +1196,7 @@ class KeyboardManager {
       this._SetActiveKeyboard(this.keyboardStubs[0]['KI'],this.keyboardStubs[0]['KLC'],true);
       // This is likely to be triggered by a UI call of some sort, and we need to treat
       // this call as such to properly maintain the globalKeyboard setting.
-      this.keymanweb._JustActivatedKeymanWebUI = 1;
+      this.keymanweb.uiManager.justActivated = true;
     }
 
     if(anyRemoved) {
@@ -1203,12 +1208,12 @@ class KeyboardManager {
   }
 
   /**
-   * Function     registerKeyboard  KR                    
+   * Function     _registerKeyboard  KR                    
    * Scope        Public
    * @param       {Object}      Pk      Keyboard  object
    * Description  Register and load the keyboard
    */    
-  _RegisterKeyboard(Pk) {
+  _registerKeyboard(Pk) {
     // If initialization not yet complete, list the keyboard to be registered on completion of initialization
     if(!this.keymanweb.initialized) {
       this.deferredKR.push(Pk);
@@ -1216,6 +1221,11 @@ class KeyboardManager {
     }
     
     var Li,Lstub;
+
+    // For package namespacing with KMEA/KMEI.
+    if(this.keymanweb.isEmbedded) {
+      this.keymanweb.preserveID(Pk);
+    }
 
     // Check if the active stub refers to this keyboard, else find applicable stub
 
@@ -1249,7 +1259,7 @@ class KeyboardManager {
     }
   
     // Append to keyboards array
-    this.keyboards=(<any>this.keymanweb)._push(this.keyboards, Pk);
+    this.keyboards=this.keymanweb._push(this.keyboards, Pk); // TODO:  Resolve without need for the cast.
 
     // Execute any external (UI) code needed after loading keyboard
     this.doKeyboardLoaded(Pk['KI']);
@@ -1267,7 +1277,7 @@ class KeyboardManager {
    * @param       {Object}      Pstub     Keyboard stub object
    * @return      {?number}               1 if already registered, else null
    */
-  _RegisterStub(Pstub): number {
+  _registerStub(Pstub): number {
     var Lk;
     
     // In initialization not complete, list the stub to be registered on completion of initialization
@@ -1283,9 +1293,9 @@ class KeyboardManager {
     }
 
     // If no language code has been defined, and no stub has been registered for this keyboard, register with empty string as the language code
-    if(typeof(Pstub['KP']) == 'undefined') {
-      Pstub['KP'] = '';
-    }
+    if(this.keymanweb.isEmbedded) {
+      this.keymanweb.namespaceID(Pstub);
+    } // else leave undefined.  It's nice to condition upon.
     if(typeof(Pstub['KLC']) == 'undefined') {
       Pstub['KLC'] = '';
     }
@@ -1303,7 +1313,7 @@ class KeyboardManager {
     }
   
     // Register stub (add to KeyboardStubs array)
-    this.keyboardStubs=(<any>this.keymanweb)._push(this.keyboardStubs, Pstub);
+    this.keyboardStubs=this.keymanweb._push(this.keyboardStubs, Pstub); // TODO:  Resolve without need for the cast.
 
     // TODO: Need to distinguish between initial loading of a large number of stubs and any subsequent loading.
     //   UI initialization should not be needed for each registration, only at end.

@@ -33,6 +33,18 @@ class DOMManager {
    */
   enablementObserver: MutationObserver;
 
+  /**
+   * Tracks a list of event-listening elements.  
+   * 
+   * In touch mode, this should contain touch-aliasing DIVs, but will contain other elements in non-touch mode.
+   */
+  inputList: HTMLElement[] = [];            // List of simulated input divisions for touch-devices   I3363 (Build 301)
+
+  /**
+   * Tracks a visually-sorted list of elements that are KMW-enabled.
+   */
+  sortedInputs: HTMLElement[] = [];   // List of all INPUT and TEXTAREA elements ordered top to bottom, left to right
+
   constructor(keyman: KeymanBase) {
     this.keyman = keyman;
     
@@ -53,7 +65,7 @@ class DOMManager {
     var _attachObj = Pelem.base ? Pelem.base._kmwAttachment : Pelem._kmwAttachment;
 
     if(_attachObj) {
-      return _attachObj.touchable ? this.touchHandlers : this.nonTouchHandlers;
+      return _attachObj.touchEnabled ? this.touchHandlers : this.nonTouchHandlers;
     } else {
       return null;
     }
@@ -99,11 +111,11 @@ class DOMManager {
     */
     if(Pelem['kmw_ip']) {
 
-      if(this.keyman.inputList.indexOf(Pelem['kmw_ip']) != -1) {
+      if(this.inputList.indexOf(Pelem['kmw_ip']) != -1) {
         return false;
       }
 
-      this.keyman.inputList.push(Pelem['kmw_ip']);
+      this.inputList.push(Pelem['kmw_ip']);
       
       console.log("Unexpected state - this element's simulated input DIV should have been removed from the page!");
 
@@ -330,9 +342,9 @@ class DOMManager {
     }
 
     if(Pelem['kmw_ip']) {
-      var index = this.keyman.inputList.indexOf(Pelem['kmw_ip']);
+      var index = this.inputList.indexOf(Pelem['kmw_ip']);
       if(index != -1) {
-        this.keyman.inputList.splice(index, 1);
+        this.inputList.splice(index, 1);
       }
 
       Pelem.style.visibility='visible'; // hide by default: KMW-3
@@ -356,8 +368,8 @@ class DOMManager {
    * Description  A handler for KMW-touch-disabled elements when operating on touch devices.
    */
   nonKMWTouchHandler = function(x) {
-    this.keyman.focusing=false;
-    clearTimeout(this.keyman.focusTimer);
+    DOMEventHandlers.states.focusing=false;
+    clearTimeout(DOMEventHandlers.states.focusTimer);
     this.keyman.osk.hideNow();
   }.bind(this);
 
@@ -393,7 +405,7 @@ class DOMManager {
         this._AttachToIframe(Pelem);
       } else { 
         baseElement.className = baseElement.className ? baseElement.className + ' keymanweb-font' : 'keymanweb-font';
-        this.keyman.inputList.push(Pelem);
+        this.inputList.push(Pelem);
 
         this.keyman.util.attachDOMEvent(baseElement,'focus', this.getHandlers(Pelem)._ControlFocus);
         this.keyman.util.attachDOMEvent(baseElement,'blur', this.getHandlers(Pelem)._ControlBlur);
@@ -426,9 +438,9 @@ class DOMManager {
       }
 
       // Remove the element from our internal input tracking.
-      var index = this.keyman.inputList.indexOf(Pelem);
+      var index = this.inputList.indexOf(Pelem);
       if(index > -1) {
-        this.keyman.inputList.splice(index, 1);
+        this.inputList.splice(index, 1);
       }
 
       if(!isAlias) { // See note about the alias below.
@@ -443,7 +455,7 @@ class DOMManager {
 
     // If we're disabling an alias, we should fully enable the base version.  (Thinking ahead to toggleable-touch mode.)
     if(isAlias) {
-      this.keyman.inputList.push(baseElement);
+      this.inputList.push(baseElement);
 
       baseElement.onkeypress = this.getHandlers(Pelem)._KeyPress;
       baseElement.onkeydown = this.getHandlers(Pelem)._KeyDown;
@@ -575,11 +587,7 @@ class DOMManager {
   setupElementAttachment(x: HTMLElement) {
     // The `_kmwAttachment` property tag maintains all relevant KMW-maintained data regarding the element.
     // It is disgarded upon de-attachment.
-    x._kmwAttachment = {
-      keyboard:       null,               // Tracks the control's independent keyboard selection, when applicable.
-      touchEnabled:   this.keyman.util.device.touchable    // Tracks if the control has an aliased control for touch functionality.
-                                          // (Necessary for managing the touch/non-touch event handlers.)
-    };
+    x._kmwAttachment = new AttachmentInfo(null, this.keyman.util.device.touchable);
   }
 
   /**
@@ -810,9 +818,10 @@ class DOMManager {
    * Description  Disable KMW control element 
    */    
   _DisableControl(Pelem: HTMLElement) {
-    if(this.isAttached(Pelem)) { // Only operate on attached elements!  
-      if(this.keyman._LastActiveElement == Pelem || this.keyman._LastActiveElement == Pelem['kmw_ip']) {
-        this.keyman._LastActiveElement = null;
+    if(this.isAttached(Pelem)) { // Only operate on attached elements!
+      var lastElem = this.getLastActiveElement();
+      if(lastElem == Pelem || lastElem == Pelem['kmw_ip']) {
+        this.clearLastActiveElement();
         this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
         this.keyman.osk._Hide();
       }
@@ -825,14 +834,14 @@ class DOMManager {
       
         // If a touch alias was removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
         window.setTimeout(function() {
-          keyman.domManager.listInputs();
+          this.listInputs();
 
-          for(var k = 0; k < keyman.sortedInputs.length; k++) {
-            if(keyman.sortedInputs[k]['kmw_ip']) {
-              this.getHandlers(Pelem).updateInput(keyman.sortedInputs[k]['kmw_ip']);
+          for(var k = 0; k < this.sortedInputs.length; k++) {
+            if(DOMEventHandlers.states[k]['kmw_ip']) {
+              this.getHandlers(Pelem).updateInput(DOMEventHandlers.states[k]['kmw_ip']);
             }
           }
-        }, 1);
+        }.bind(this), 1);
       } else {
         this.listInputs(); // Fix up our internal input ordering scheme.
       }
@@ -859,9 +868,9 @@ class DOMManager {
         window.setTimeout(function() {
           keyman.domManager.listInputs();
 
-          for(var k = 0; k < keyman.sortedInputs.length; k++) {
-            if(keyman.sortedInputs[k]['kmw_ip']) {
-              this.getHandlers(Pelem).updateInput(keyman.sortedInputs[k]['kmw_ip']);
+          for(var k = 0; k < this.sortedInputs.length; k++) {
+            if(this.sortedInputs[k]['kmw_ip']) {
+              this.getHandlers(Pelem).updateInput(this.sortedInputs[k]['kmw_ip']);
             }
           }
         }, 1);
@@ -921,7 +930,7 @@ class DOMManager {
       tList.push(eList[i].ip);
   
     // Return the sorted element list
-    this.keyman.sortedInputs=tList;
+    this.sortedInputs=tList;
   }
 
   _EnablementMutationObserverCore = function(mutations: MutationRecord[]) {
@@ -993,9 +1002,9 @@ class DOMManager {
         window.setTimeout(function() {
           domManager.listInputs();
 
-          for(var k = 0; k < this.keyman.sortedInputs.length; k++) {
-            if(this.keyman.sortedInputs[k]['kmw_ip']) {
-              this.keyman.touchAliasing.updateInput(this.keyman.sortedInputs[k]['kmw_ip']);
+          for(var k = 0; k < this.sortedInputs.length; k++) {
+            if(this.sortedInputs[k]['kmw_ip']) {
+              this.touchAliasing.updateInput(this.sortedInputs[k]['kmw_ip']);
             }
           }
         }, 1);
@@ -1045,6 +1054,381 @@ class DOMManager {
 
     this.disableInputElement(Pelem); // Remove all KMW event hooks, styling.
     this.clearElementAttachment(element);  // Memory management & auto de-attachment upon removal.
+  }
+
+  /**
+   * Function     disableControl
+   * Scope        Public
+   * @param       {Element}      Pelem       Element to be disabled
+   * Description  Disables a KMW control element 
+   */    
+  disableControl(Pelem: HTMLElement) {
+    if(!this.isAttached(Pelem)) {
+      console.warn("KeymanWeb is not attached to element " + Pelem);
+    } 
+
+    var cn = Pelem.className;
+    if(cn.indexOf('kmw-disabled') < 0) { // if not already explicitly disabled...
+      Pelem.className = cn ? cn + ' kmw-disabled' : 'kmw-disabled';
+    }
+
+    // The rest is triggered within MutationObserver code.
+    // See _EnablementMutationObserverCore.
+  }
+
+  /**
+   * Function     enableControl
+   * Scope        Public
+   * @param       {Element}      Pelem       Element to be disabled
+   * Description  Disables a KMW control element 
+   */    
+  enableControl = function(Pelem: HTMLElement) {
+    if(!this.isAttached(Pelem)) {
+      console.warn("KeymanWeb is not attached to element " + Pelem);
+    } 
+
+    var cn = Pelem.className;
+    var tagIndex = cn.indexOf('kmw-disabled');
+    if(tagIndex >= 0) { // if already explicitly disabled...
+      Pelem.className = cn.replace('kmw-disabled', '').trim();
+    }
+
+    // The rest is triggered within MutationObserver code.
+    // See _EnablementMutationObserverCore.
+  }
+
+  /* ------------- Page and document-level management events ------------------ */
+
+  _WindowLoad: (e: Event) => void = function(e: Event) {
+    //keymanweb.completeInitialization();
+    // Always return to top of page after a page reload
+    document.body.scrollTop=0;
+    if(typeof document.documentElement != 'undefined') {
+      document.documentElement.scrollTop=0;
+    }
+  }.bind(this);
+
+  /**
+   * Function     _WindowUnload
+   * Scope        Private
+   * Description  Remove handlers before detaching KMW window  
+   */    
+  _WindowUnload: () => void = function() {
+    // Allow the UI to release its own resources
+    this.keyman.uiManager.doUnload();
+    
+    // Allow the OSK to release its own resources
+    if(this.keyman.osk.ready) {
+      this.keyman.osk._Unload(); // I3363 (Build 301)
+    }
+    
+    this.clearLastActiveElement();
+  }.bind(this);
+
+  /* ------ Defines independent, per-control keyboard setting behavior for the API. ------ */
+
+  /**
+   * Function     setKeyboardForControl
+   * Scope        Public   
+   * @param       {Element}    Pelem    Control element 
+   * @param       {string|null=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)  
+   * @param       {string|null=}     Plc      Language Code
+   * Description  Set default keyboard for the control 
+   */    
+  setKeyboardForControl(Pelem: HTMLElement, Pkbd?: string, Plc?: string) {
+    /* pass null for kbd to specify no default, or '' to specify the default system keyboard. */
+    if(Pkbd !== null && Pkbd !== undefined) {
+      var index = Pkbd.indexOf("Keyboard_");
+      if(index < 0 && Pkbd != '') {
+        Pkbd = "Keyboard_" + Pkbd;
+      }
+    } else {
+      Plc = null;
+    }
+
+    if(Pelem instanceof HTMLIFrameElement) {
+      console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
+      return;
+    }
+
+    if(!this.isAttached(Pelem)) {
+      console.error("KeymanWeb is not attached to element " + Pelem);
+      return;
+    } else {
+      Pelem._kmwAttachment.keyboard = Pkbd;
+      Pelem._kmwAttachment.languageCode = Plc;
+
+      // If Pelem is the focused element/active control, we should set the keyboard in place now.
+      // 'kmw_ip' is the touch-alias for the original page's control.
+
+      var lastElem = this.getLastActiveElement();
+      if(lastElem && (lastElem == Pelem || lastElem == Pelem['kmw_ip'])) {
+
+        if(Pkbd != null && Plc != null) { // Second part necessary for Closure.
+          this.keyman.keyboardManager.setActiveKeyboard(Pkbd, Plc);
+        } 
+      }
+    }
+  }
+
+  /**
+   * Function     getKeyboardForControl
+   * Scope        Public   
+   * @param       {Element}    Pelem    Control element 
+   * @return      {string|null}         The independently-managed keyboard for the control.
+   * Description  Returns the keyboard ID of the current independently-managed keyboard for this control.
+   *              If it is currently following the global keyboard setting, returns null instead.
+   */
+  getKeyboardForControl(Pelem: HTMLElement): string {
+    if(!this.isAttached(Pelem)) {
+      console.error("KeymanWeb is not attached to element " + Pelem);
+      return null;
+    } else {
+      return Pelem._kmwAttachment.keyboard;
+    }
+  }
+  
+  /**
+   * Function     getLanguageForControl
+   * Scope        Public   
+   * @param       {Element}    Pelem    Control element 
+   * @return      {string|null}         The independently-managed keyboard for the control.
+   * Description  Returns the language code used with the current independently-managed keyboard for this control.
+   *              If it is currently following the global keyboard setting, returns null instead.
+   */
+  getLanguageForControl(Pelem: HTMLElement): string {
+    if(!this.isAttached(Pelem)) {
+      console.error("KeymanWeb is not attached to element " + Pelem);
+      return null;
+    } else {
+      return Pelem._kmwAttachment.languageCode;  // Should we have a version for the language code, too?
+    }
+  }
+
+  /* ------ End independent, per-control keyboard setting behavior definitions. ------ */
+
+  /**
+   * Set focus to last active target element (browser-dependent)
+   */    
+  focusLastActiveElement() {
+    var lastElem = this.getLastActiveElement();
+    if(!lastElem) {
+      return;
+    }
+
+    this.keyman.uiManager.justActivated = true;
+    if(lastElem instanceof HTMLIFrameElement && this.keyman.domManager._IsMozillaEditableIframe(lastElem,0)) {
+      (<any>lastElem).defaultView.focus(); // I3363 (Build 301)
+    } else if(lastElem.focus) {
+      lastElem.focus();
+    }
+  }
+
+  /**
+   * Get the last active target element *before* KMW activated (I1297)
+   * 
+   * @return      {Element}        
+   */    
+  getLastActiveElement(): HTMLElement {
+    return DOMEventHandlers.states.lastActiveElement;
+  }
+
+  clearLastActiveElement() {
+    DOMEventHandlers.states.lastActiveElement = null;
+  }
+
+  getActiveElement(): HTMLElement {
+    return DOMEventHandlers.states.activeElement;
+  }
+
+  _setActiveElement(Pelem: HTMLElement) {
+    DOMEventHandlers.states.activeElement = Pelem;
+  }
+
+  /**
+   *  Set the active input element directly optionally setting focus 
+   * 
+   *  @param  {Object|string} e         element id or element
+   *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123) 
+   **/
+  setActiveElement(e: string|HTMLElement, setFocus?: boolean) {
+    if(e instanceof String) {
+      e=document.getElementById(e);
+    }
+
+    DOMEventHandlers.states.activeElement = DOMEventHandlers.states.lastActiveElement=e;
+
+    // Allow external focusing KMEW-123
+    if(arguments.length > 1 && setFocus) {
+      if(this.keyman.util.device.touchable) {
+        this.keyman.touchAliasing.setFocus();
+      } else {
+        this.focusLastActiveElement();
+      }
+    }
+  }
+
+  /** Sets the active input element only if it is presently null.
+   * 
+   * @param  {Element}
+   */
+  initActiveElement(Lelem: HTMLElement) {
+    if(DOMEventHandlers.states.activeElement == null) {
+      DOMEventHandlers.states.activeElement = Lelem;
+    }
+  }
+
+  /**
+   * Move focus to next (or previous) input or text area element on TAB
+   *   Uses list of actual input elements
+   *     
+   *   Note that activeElement() on touch devices returns the DIV that overlays
+   *   the input element, not the element itself.
+   * 
+   * @param      {number|boolean}  bBack     Direction to move (0 or 1)
+   */
+  moveToNext(bBack: number|boolean) {
+    var i,t=this.sortedInputs, activeBase=this.getActiveElement();
+    var touchable = this.keyman.util.device.touchable;
+    
+    if(t.length == 0) {
+      return;
+    }
+
+    // For touchable devices, get the base element of the DIV
+    if(touchable) {
+      activeBase=activeBase.base;
+    }
+
+    // Identify the active element in the list of inputs ordered by position
+    for(i=0; i<t.length; i++) {
+      if(t[i] == activeBase) break;
+    }
+
+    // Find the next (or previous) element in the list
+    i = bBack ? i-1 : i+1;
+    // Treat the list as circular, wrapping the index if necessary.
+    i = i >= t.length ? i-t.length : i;
+    i = i < 0 ? i+t.length : i;
+
+    // Move to the selected element
+    if(touchable) {
+      // Set focusing flag to prevent OSK disappearing 
+      DOMEventHandlers.states.focusing=true;
+      var target=t[i]['kmw_ip'];
+
+      // Focus if next element is non-mapped
+      if(typeof(target) == 'undefined') {
+        t[i].focus();
+      } else { // Or reposition the caret on the input DIV if mapped
+        this.keyman.domManager.setActiveElement(target); // Handles both `lastActive` + `active`.
+        this.touchHandlers.setTextCaret(target,10000); // Safe b/c touchable == true.
+        this.touchHandlers.scrollInput(target);   // mousedown check
+        target.focus();
+      }
+    } else { // Behaviour for desktop browsers
+      t[i].focus();
+    }
+  }
+
+  /**
+   * Move focus to user-specified element
+   * 
+   *  @param  {string|Object}   e   element or element id
+   *           
+   **/
+  moveToElement(e:string|HTMLElement) {
+    var i;
+    
+    if(e instanceof String) {
+      e=document.getElementById(e);
+    }
+    
+    if(this.keyman.util.device.touchable && e['kmw_ip']) {
+      e['kmw_ip'].focus();
+    } else {
+      e.focus();
+    }
+  }
+
+  /* ----------------------- Editable IFrame methods ------------------- */
+
+  /**
+   * Function     _IsIEEditableIframe
+   * Scope        Private
+   * @param       {Object}          Pelem         Iframe element
+   *              {boolean|number}  PtestOn       1 to test if frame content is editable (TODO: unclear exactly what this is doing!)   
+   * @return      {boolean}
+   * Description  Test if element is an IE editable IFrame 
+   */    
+  _IsIEEditableIframe(Pelem: HTMLIFrameElement, PtestOn?: number) {
+    var Ldv, Lvalid = Pelem  &&  (Ldv=Pelem.tagName)  &&  Ldv.toLowerCase() == 'body'  &&  (Ldv=Pelem.ownerDocument)  &&  Ldv.parentWindow;
+    return (!PtestOn  &&  Lvalid) || (PtestOn  &&  (!Lvalid || Pelem.isContentEditable));
+  }
+
+  /**
+   * Function     _IsMozillaEditableIframe
+   * Scope        Private
+   * @param       {Object}           Pelem    Iframe element
+   * @param       {boolean|number}   PtestOn  1 to test if 'designMode' is 'ON'    
+   * @return      {boolean} 
+   * Description  Test if element is a Mozilla editable IFrame 
+   */    
+  _IsMozillaEditableIframe(Pelem: HTMLIFrameElement, PtestOn?: number) {
+    var Ldv, Lvalid = Pelem  &&  (Ldv=(<any>Pelem).defaultView)  &&  Ldv.frameElement;  // Probable bug!
+    return (!PtestOn  &&  Lvalid) || (PtestOn  &&  (!Lvalid || Ldv.document.designMode.toLowerCase()=='on'));
+  }
+
+  /* ----------------------- Initialization methods ------------------ */
+  
+  /**
+   * Get the user-specified (or default) font for the first mapped input or textarea element
+   * before applying any keymanweb styles or classes
+   * 
+   *  @return   {string}
+   **/                 
+  getBaseFont() {
+    var util = this.keyman.util;
+    var ipInput = document.getElementsByTagName<'input'>('input'),
+        ipTextArea=document.getElementsByTagName<'textarea'>('textarea'),
+        n=0,fs,fsDefault='Arial,sans-serif';
+    
+    // Find the first input element (if it exists)
+    if(ipInput.length == 0 && ipTextArea.length == 0) {
+      n=0;
+    } else if(ipInput.length > 0 && ipTextArea.length == 0) {
+      n=1;
+    } else if(ipInput.length == 0 && ipTextArea.length > 0) {
+      n=2;
+    } else {
+      var firstInput = ipInput[0];
+      var firstTextArea = ipTextArea[0];
+
+      if(firstInput.offsetTop < firstTextArea.offsetTop) {
+        n=1;
+      } else if(firstInput.offsetTop > firstTextArea.offsetTop) {
+        n=2;
+      } else if(firstInput.offsetLeft < firstTextArea.offsetLeft) {
+        n=1;
+      } else if(firstInput.offsetLeft > firstTextArea.offsetLeft) {
+        n=2;
+      }
+    }
+    
+    // Grab that font!
+    switch(n) {
+      case 0:
+        fs=fsDefault;
+      case 1:
+        fs=util.getStyleValue(ipInput[0],'font-family');
+      case 2:
+        fs=util.getStyleValue(ipTextArea[0],'font-family');
+    }
+    if(typeof(fs) == 'undefined' || fs == 'monospace') {
+      fs=fsDefault;
+    }
+    
+    return fs;
   }
 
   /**
@@ -1154,9 +1538,6 @@ class DOMManager {
       var dpi = device.getDPI(); //TODO: this will not work when called from HEAD!!
       device.formFactor=((screen.height < 4.0 * dpi) || (screen.width < 4.0 * dpi)) ? 'phone' : 'tablet';
     }
-
-    if (window.removeEventListener)
-      window.removeEventListener('focus', (<any>this.keyman)._BubbledFocus, true);
   
     // Set exposed initialization flag member for UI (and other) code to use 
     this.keyman.setInitialized(1);
@@ -1171,7 +1552,7 @@ class DOMManager {
     this.keyman.keyboardManager.registerDeferredStubs();
   
     // Initialize the desktop UI
-    (<any>this.keyman).initializeUI();
+    this.initializeUI();
   
     // Register deferred keyboards 
     this.keyman.keyboardManager.registerDeferredKeyboards();
@@ -1185,13 +1566,12 @@ class DOMManager {
     }
 
     // Determine the default font for mapped elements
-    this.keyman.appliedFont=this.keyman.baseFont=(<any>this.keyman).getBaseFont();
+    this.keyman.appliedFont=this.keyman.baseFont=this.getBaseFont();
 
     // Add orientationchange event handler to manage orientation changes on mobile devices
     // Initialize touch-screen device interface  I3363 (Build 301)
     if(device.touchable) {
       this.keyman.handleRotationEvents();
-      (<any>this.keyman).setupTouchDevice();
     }    
     // Initialize browser interface
 
@@ -1301,5 +1681,19 @@ class DOMManager {
 
     // Set exposed initialization flag to 2 to indicate deferred initialization also complete
     this.keyman.setInitialized(2);
+  }
+
+  /**
+   * Initialize the desktop user interface as soon as it is ready
+  **/       
+  initializeUI() {
+    if(this.keyman.ui && this.keyman.ui['initialize'] instanceof Function) {
+      this.keyman.ui['initialize']();
+      // Display the OSK (again) if enabled, in order to set its position correctly after
+      // adding the UI to the page 
+      this.keyman.osk._Show();     
+    } else {
+      window.setTimeout(this.initializeUI.bind(this),1000);
+    }
   }
 }

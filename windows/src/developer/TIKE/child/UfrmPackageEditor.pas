@@ -166,6 +166,7 @@ type
     lblKeyboardLanguages: TLabel;
     cmdKeyboardAddLanguage: TButton;
     cmdKeyboardRemoveLanguage: TButton;
+    chkFollowKeyboardVersion: TCheckBox;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -212,6 +213,7 @@ type
       ARow: Integer; const Value: string);
     procedure cmdKeyboardRemoveLanguageClick(Sender: TObject);
     procedure cmdKeyboardAddLanguageClick(Sender: TObject);
+    procedure chkFollowKeyboardVersionClick(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -224,6 +226,7 @@ type
     procedure WMUserFormShown(var Message: TMessage); message WM_User_FormShown;
     procedure WMSysCommand(var Message: TWMSysCommand); message WM_SYSCOMMAND;
     procedure EnableStartMenuControls;
+    procedure EnableDetailsTabControls;
     function DoAction(action: TProjectFileAction): Boolean;
     procedure UpdateReadme;
     procedure UpdateImageFiles;
@@ -318,6 +321,7 @@ begin
     pages.ActivePage := pageFiles;
     pack := TKPSFile.Create;
     EnableStartMenuControls;
+    EnableDetailsTabControls;
     UpdateStartMenuPrograms;
     UpdateReadme;
     UpdateImageFiles;
@@ -802,6 +806,14 @@ begin
   Modified := True;
 end;
 
+procedure TfrmPackageEditor.chkFollowKeyboardVersionClick(Sender: TObject);
+begin
+  if FSetup > 0 then Exit;
+  pack.KPSOptions.FollowKeyboardVersion := chkFollowKeyboardVersion.Checked;
+  EnableDetailsTabControls;
+  Modified := True;
+end;
+
 procedure TfrmPackageEditor.chkStartMenuUninstallClick(Sender: TObject);
 begin
   pack.StartMenu.AddUninstallEntry := chkStartMenuUninstall.Checked;
@@ -1070,6 +1082,8 @@ begin
 
     for i := 0 to pack.Info.Count - 1 do
       UpdateInfo(pack.Info[i].Name, pack.Info[i].Description, pack.Info[i].URL);
+    chkFollowKeyboardVersion.Checked := pack.KPSOptions.FollowKeyboardVersion;
+    EnableDetailsTabControls;
 
     lbStartMenuEntries.Clear;
     
@@ -1215,8 +1229,8 @@ end;
 
 procedure TfrmPackageEditor.CreateFromCompiledKeyboard(FKMXFilename, FJSFilename: string);
 begin
-  if FKMXFilename <> '' then AddFile(FKMXFilename);
-  if FJSFilename <> '' then AddFile(FJSFilename);
+  if (FKMXFilename <> '') and FileExists(FKMXFilename) then AddFile(FKMXFilename);
+  if (FJSFilename <> '') and FileExists(FJSFilename) then AddFile(FJSFilename);
 end;
 
 {-------------------------------------------------------------------------------
@@ -1235,7 +1249,8 @@ end;
 
 procedure TfrmPackageEditor.HandlePackageRefreshError(Sender: TObject; msg: string; State: TProjectLogState);
 begin
-  Self.ProjectFile.Project.Log(State, Filename, Msg);
+  if Assigned(Self.ProjectFile.Project) then
+    Self.ProjectFile.Project.Log(State, Filename, Msg);
 end;
 
 procedure TfrmPackageEditor.RefreshKeyboardList;
@@ -1392,6 +1407,16 @@ begin
     then k.OSKFont := nil
     else k.OSKFont := cbKeyboardOSKFont.Items.Objects[cbKeyboardOSKFont.ItemIndex] as TPackageContentFile;
   Modified := True;
+end;
+
+procedure TfrmPackageEditor.EnableDetailsTabControls;
+var
+  e: Boolean;
+begin
+  e := not chkFollowKeyboardVersion.Checked;
+  editInfoVersion.Enabled := e;
+  lblStep2C.Enabled := e;
+  lblVersionHint.Enabled := e;
 end;
 
 procedure TfrmPackageEditor.EnableKeyboardTabControls;

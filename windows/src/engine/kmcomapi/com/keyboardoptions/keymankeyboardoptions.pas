@@ -113,7 +113,7 @@ begin
   s := TStringList.Create;
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKeyReadOnly(BuildKeyboardOptionKey(FKeyboardID)) then
+    if OpenKeyReadOnly(BuildKeyboardOptionKey_CU(FKeyboardID)) then
     begin
       GetValueNames(s);
       for i := 0 to s.Count - 1 do

@@ -114,7 +114,7 @@ begin
   begin
     with TRegistryErrorControlled.Create do  // I2890
     try
-      if OpenKeyReadOnly(SRegKey_KeymanEngine) and ValueExists(SRegValue_KeymanDebug)
+      if OpenKeyReadOnly(SRegKey_KeymanEngine_CU) and ValueExists(SRegValue_KeymanDebug)
         then FShouldDebug := ReadBool(SRegValue_KeymanDebug)
         else FShouldDebug := False;
     finally

@@ -44,16 +44,16 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if not OpenKey(SRegKey_KeyboardLayouts, true) then Exit;
+    if not OpenKey(SRegKey_KeyboardLayouts_LM, true) then Exit;
 
     GetKeyNames(Keys);
 
     for I := 0 to Keys.Count - 1 do
       if SameText(Copy(Keys[i], 6, 3), '5FE') and
-        OpenKey('\'+SRegKey_KeyboardLayouts+'\'+Keys[i], True) and
+        OpenKey('\'+SRegKey_KeyboardLayouts_LM+'\'+Keys[i], True) and
         ValueExists(SRegValue_Legacy_KeyboardKeymanInstall) then
       begin
-        if OpenKey('\'+SRegKey_KeyboardLayouts, True) then  // I2890
+        if OpenKey('\'+SRegKey_KeyboardLayouts_LM, True) then  // I2890
           DeleteKey(Keys[i]);
       end;
 

@@ -738,7 +738,7 @@ begin
 //      v := HIWORD(kbd)
 //    else
       v := kbd;   // I4713
-    if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts+'\'+IntToHex(v, 8)) then
+    if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts_LM+'\'+IntToHex(v, 8)) then
     begin
       FValid := True;   // I4207
       if ValueExists(SRegValue_LayoutDisplayName) then
