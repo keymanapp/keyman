@@ -230,22 +230,23 @@ if [ $BUILD_EMBED = true ]; then
     assert $INTERMEDIATE/keyman.js
     echo Embedded TypeScript compiled as $INTERMEDIATE/keyman.js
 
+    copy_resources "$INTERMEDIATE"  # In case some build ever wants them with an unminified, embedded-only build
+
     if [ $DO_MINIFY = true ]; then
         minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "KeymanBase.__BUILD__=$BUILD"
         assert $EMBED_OUTPUT/keyman.js
         echo Compiled embedded application saved as $EMBED_OUTPUT/keyman.js
+
+        # Update any changed resources
+        # echo Copy or update resources
+
+        copy_resources "$EMBED_OUTPUT"
+
+        # Update build number if successful
+        echo
+        echo KMEA/KMEI build $BUILD compiled and saved under $EMBED_OUTPUT
+        echo
     fi
-
-    # Update any changed resources
-
-    # echo Copy or update resources
-
-    cp -Rf $SOURCE/resources $EMBED_OUTPUT/ >/dev/null
-
-    # Update build number if successful
-    echo
-    echo KMEA/KMEI build $BUILD compiled and saved under $EMBED_OUTPUT
-    echo
 fi
 
 if [ $BUILD_COREWEB = true ]; then
@@ -259,7 +260,6 @@ if [ $BUILD_COREWEB = true ]; then
     assert $INTERMEDIATE/keymanweb.js
     echo Native TypeScript compiled as $INTERMEDIATE/keymanweb.js
 
-    
     copy_resources "$INTERMEDIATE"
 
     if [ $DO_MINIFY = true ]; then
