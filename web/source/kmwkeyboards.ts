@@ -100,6 +100,13 @@ class KeyboardManager {
     return this.activeKeyboard ? this.activeKeyboard['KI'] : '';
   }
 
+  getActiveLanguage(): string {
+    if(this.activeStub == null) {
+      return '';
+    } else {
+      return this.activeStub['KLC'];
+    }
+  }
       
   /**
    * Get an associative array of keyboard identification strings
@@ -139,7 +146,7 @@ class KeyboardManager {
     {    
       Lstub = this.keyboardStubs[Ln];
       Lrn = this._GetKeyboardDetail(Lstub);  // I2078 - Full keyboard detail
-      Lr=(<any>this.keymanweb)._push(Lr,Lrn); // TODO:  Resolve without need for the cast.
+      Lr=this.keymanweb._push(Lr,Lrn); // TODO:  Resolve without need for the cast.
     } 
     return Lr;
   }
@@ -343,8 +350,8 @@ class KeyboardManager {
     //      If UI callbacks are needed at all, they should be within _SetActiveKeyboard  
     this.doBeforeKeyboardChange(PInternalName,PLgCode);     
     this._SetActiveKeyboard(PInternalName,PLgCode,true);    
-    if(this.keymanweb._LastActiveElement != null) {
-      (<any>this.keymanweb)._FocusLastActiveElement(); // TODO:  Resolve without need for the cast.
+    if(this.keymanweb.domManager.getLastActiveElement() != null) {
+      this.keymanweb.domManager.focusLastActiveElement(); // TODO:  Resolve without need for the cast.
     }
     // If we ever allow PLgCode to be set by default, we can auto-detect the language code
     // after the _SetActiveKeyboard call.
@@ -438,7 +445,7 @@ class KeyboardManager {
     for(Ln=0; Ln<this.keyboards.length; Ln++) { // I1511 - array prototype extended
       if(this.keyboards[Ln]['KI'] == PInternalName) {
         this.activeKeyboard = this.keyboards[Ln];
-        (<any>this.keymanweb)._SetTargDir(this.keymanweb._LastActiveElement);  // I2077 - LTR/RTL timing // TODO:  Resolve without need for the cast.
+        this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
       
         // and update the active stub
         for(var Ls=0; Ls<this.keyboardStubs.length; Ls++) {
@@ -527,7 +534,7 @@ class KeyboardManager {
           return;
         }
       }
-      (<any>this.keymanweb)._SetTargDir(this.keymanweb._LastActiveElement);  // I2077 - LTR/RTL timing // TODO:  Resolve without need for the cast.
+      this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
     } 
 
     var Pk=this.activeKeyboard;  // I3319
@@ -548,7 +555,7 @@ class KeyboardManager {
     var util = this.keymanweb.util;
     var osk = this.keymanweb.osk;
 
-    var Lscript = <HTMLScriptElement>util._CreateElement('SCRIPT');
+    var Lscript = util._CreateElement('SCRIPT') as HTMLScriptElement;
     Lscript.charset="UTF-8";        // KMEW-89
     Lscript.type = 'text/javascript';
 
@@ -595,9 +602,9 @@ class KeyboardManager {
           manager.doBeforeKeyboardChange(kbd['KI'],kbdStub['KLC']);
           manager.activeKeyboard=kbd;
 
-          if((<any>manager.keymanweb)._LastActiveElement != null) { // TODO:  Resolve without need for the cast.
-            (<any>manager.keymanweb)._JustActivatedKeymanWebUI = 1; // TODO:  Resolve without need for the cast.
-            (<any>manager.keymanweb)._SetTargDir(manager.keymanweb._LastActiveElement); // TODO:  Resolve without need for the cast.    
+          if(manager.keymanweb.domManager.getLastActiveElement() != null) { // TODO:  Resolve without need for the cast.
+            manager.keymanweb.uiManager.justActivated = true; // TODO:  Resolve without need for the cast.
+            manager.keymanweb.domManager._SetTargDir(manager.keymanweb.domManager.getLastActiveElement());
           }
 
           String.kmwEnableSupplementaryPlane(kbdStub && ((kbdStub['KS'] && (kbdStub['KS'] == 1)) || (kbd['KN'] == 'Hieroglyphic'))); // I3319 - SMP extension, I3363 (Build 301)
@@ -743,6 +750,46 @@ class KeyboardManager {
   }
 
   /**
+   * Function     isChiral
+   * Scope        Public
+   * @param       {string|Object=}   k0
+   * @return      {boolean}
+   * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
+   */
+  isChiral(k0?) {
+    if(typeof(k0) == "string") {
+      k0 = this.getKeyboardByID(k0);
+    }
+
+    return !!(this.getKeyboardModifierBitmask(k0) & this.keymanweb.osk.modifierBitmasks.IS_CHIRAL);
+  }
+
+  /**
+   * Function     getKeyboardModifierBitmask
+   * Scope        Private
+   * @param       {Object=}   k0
+   * @return      {number}
+   * Description  Obtains the currently-active modifier bitmask for the active keyboard.
+   */
+  getKeyboardModifierBitmask(k0?) {
+    var k=this.activeKeyboard;
+    
+    if(arguments.length > 0 && typeof k0 != 'undefined') {
+      k = k0;
+    }
+
+    if(!k) {
+      return 0x0000;
+    }
+
+    if(k['KMBM']) {
+      return k['KMBM'];
+    }
+
+    return this.keymanweb.osk.modifierBitmasks['NON_CHIRAL'];
+  }
+
+  /**
    * Function     _getKeyboardByID
    * Scope        Private
    * @param       {string}  keyboardID
@@ -793,7 +840,7 @@ class KeyboardManager {
    * @param {string|Object} x keyboard name string or keyboard metadata JSON object
    * 
    */  
-  addKeyboardArray(x: any[]): void {
+  addKeyboardArray(x: any[] | IArguments): void {
     // Store all keyboard meta-data for registering later if called before initialization
     if(!this.keymanweb.initialized) {
       for(var k=0; k<x.length; k++) {
@@ -1149,7 +1196,7 @@ class KeyboardManager {
       this._SetActiveKeyboard(this.keyboardStubs[0]['KI'],this.keyboardStubs[0]['KLC'],true);
       // This is likely to be triggered by a UI call of some sort, and we need to treat
       // this call as such to properly maintain the globalKeyboard setting.
-      this.keymanweb._JustActivatedKeymanWebUI = 1;
+      this.keymanweb.uiManager.justActivated = true;
     }
 
     if(anyRemoved) {
@@ -1212,7 +1259,7 @@ class KeyboardManager {
     }
   
     // Append to keyboards array
-    this.keyboards=(<any>this.keymanweb)._push(this.keyboards, Pk); // TODO:  Resolve without need for the cast.
+    this.keyboards=this.keymanweb._push(this.keyboards, Pk); // TODO:  Resolve without need for the cast.
 
     // Execute any external (UI) code needed after loading keyboard
     this.doKeyboardLoaded(Pk['KI']);
@@ -1266,7 +1313,7 @@ class KeyboardManager {
     }
   
     // Register stub (add to KeyboardStubs array)
-    this.keyboardStubs=(<any>this.keymanweb)._push(this.keyboardStubs, Pstub); // TODO:  Resolve without need for the cast.
+    this.keyboardStubs=this.keymanweb._push(this.keyboardStubs, Pstub); // TODO:  Resolve without need for the cast.
 
     // TODO: Need to distinguish between initial loading of a large number of stubs and any subsequent loading.
     //   UI initialization should not be needed for each registration, only at end.
@@ -1360,5 +1407,22 @@ class KeyboardManager {
     p['languageCode']=_languageCode; 
     p['indirect']=(arguments.length > 2 ? _indirect : false);
     return this.keymanweb.util.callEvent('kmw.keyboardchange', p);
+  }
+
+      
+  /**
+   * Function     _NotifyKeyboard
+   * Scope        Private
+   * @param       {number}    _PCommand     event code (16,17,18) or 0
+   * @param       {Object}    _PTarget      target element
+   * @param       {number}    _PData        1 or 0    
+   * Description  Notifies keyboard of keystroke or other event
+   */    
+  notifyKeyboard = function(_PCommand: number, _PTarget: HTMLElement|Document, _PData: number) { // I2187
+    var activeKeyboard = this.activeKeyboard;
+
+    if(activeKeyboard != null && typeof(activeKeyboard['KNS']) == 'function') {
+      activeKeyboard['KNS'](_PCommand, _PTarget, _PData);
+    }
   }
 }

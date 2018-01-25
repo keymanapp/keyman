@@ -1,6 +1,7 @@
 /// <reference path="closure.ts" />
 /// <reference path="kmwbase.ts" />
 /// <reference path="kmwutils.ts" />
+/// <reference path="kmwcallback.ts" />
 
 // Allows proper minification handling.
 /// <reference path="../node_modules/google-closure-library/closure/goog/base.js" />
@@ -18,6 +19,11 @@
  *     - <actual function name> - may be renamed by Closure, no need to directly match the API name.  
  *       It should be a method of the same object, however, due to how 'this' works in JS.
  */
+
+// kmwbase.ts
+goog.exportProperty(keyman, "build", keyman); // Only works on individual instances.
+goog.exportSymbol("KeymanBase.prototype.addEventListener", KeymanBase.prototype.addEventListener);
+goog.exportSymbol("KeymanBase.prototype.isFontAvailable", KeymanBase.prototype.isFontAvailable);
 
 // Util.ts
 
@@ -47,3 +53,40 @@ goog.exportSymbol("Util.prototype.toNumber", Util.prototype.toNumber);
 goog.exportSymbol("Util.prototype.toFloat", Util.prototype.toFloat);
 goog.exportSymbol("Util.prototype.toNzString", Util.prototype.nzString);
 goog.exportSymbol("Util.prototype.alert", Util.prototype.alert);
+
+// kmwcallback.ts
+(function() {
+  var exportKBCallback = function(miniName: string, longName: string, func:() => any) {
+    goog.exportSymbol("KeyboardInterface.prototype." + longName, func);
+    goog.exportSymbol("KeyboardInterface.prototype." + miniName, func);
+  }
+
+  var exportKBCallbackWithArgs = function(miniName: string, longName: string, func:(...args: any[]) => any) {
+    goog.exportSymbol("KeyboardInterface.prototype." + longName, func);
+    goog.exportSymbol("KeyboardInterface.prototype." + miniName, func);
+  }
+
+  exportKBCallback('KSF', 'saveFocus', KeyboardInterface.prototype.saveFocus);
+  exportKBCallback('KBR', 'beepReset', KeyboardInterface.prototype.beepReset);
+
+  exportKBCallbackWithArgs('KT', 'insertText', KeyboardInterface.prototype.insertText);
+  exportKBCallbackWithArgs('KR', 'registerKeyboard', KeyboardInterface.prototype.registerKeyboard);
+  exportKBCallbackWithArgs('KRS', 'registerStub', KeyboardInterface.prototype.registerStub);
+  exportKBCallbackWithArgs('KC', 'context', KeyboardInterface.prototype.context);
+  exportKBCallbackWithArgs('KN', 'nul', KeyboardInterface.prototype.nul);
+  exportKBCallbackWithArgs('KCM', 'contextMatch', KeyboardInterface.prototype.contextMatch);
+  exportKBCallbackWithArgs('KIK', 'isKeypress', KeyboardInterface.prototype.isKeypress);
+  exportKBCallbackWithArgs('KKM', 'keyMatch', KeyboardInterface.prototype.keyMatch);
+  exportKBCallbackWithArgs('KSM', 'stateMatch', KeyboardInterface.prototype.stateMatch);
+  exportKBCallbackWithArgs('KKI', 'keyInformation', KeyboardInterface.prototype.keyInformation);
+  exportKBCallbackWithArgs('KDM', 'deadkeyMatch', KeyboardInterface.prototype.deadkeyMatch);
+  exportKBCallbackWithArgs('KB', 'beep', KeyboardInterface.prototype.beep);
+  exportKBCallbackWithArgs('KA', 'any', KeyboardInterface.prototype.any);
+  exportKBCallbackWithArgs('KO', 'output', KeyboardInterface.prototype.output);
+  exportKBCallbackWithArgs('KDO', 'deadkeyOutput', KeyboardInterface.prototype.deadkeyOutput);
+  exportKBCallbackWithArgs('KIO', 'indexOutput', KeyboardInterface.prototype.indexOutput);
+  exportKBCallbackWithArgs('KIFS', 'ifStore', KeyboardInterface.prototype.ifStore);
+  exportKBCallbackWithArgs('KSETS', 'setStore', KeyboardInterface.prototype.setStore);
+  exportKBCallbackWithArgs('KLOAD', 'loadStore', KeyboardInterface.prototype.loadStore);
+  exportKBCallbackWithArgs('KSAVE', 'saveStore', KeyboardInterface.prototype.saveStore);
+}());

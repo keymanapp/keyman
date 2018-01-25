@@ -47,7 +47,11 @@ fi
 minifier="$CLOSURECOMPILERPATH/compiler.jar"
 # We'd love to add the argument --source_map_include_content for distribution in the future,
 # but Closure doesn't include the TS sources properly at this time.
-minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables"
+#
+# `checkTypes` is blocked b/c TypeScript can perform our type checking... and it causes an error
+# with TypeScript's `extend` implementation (it doesn't recognize a constructor without manual edits).
+# We also get a global `this` warning from the same.
+minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables --jscomp_off=globalThis --jscomp_off=checkTypes"
 minifycmd="$JAVA -jar $minifier $minifier_warnings --generate_exports"
 
 if ! [ -f $minifier ];
@@ -227,7 +231,7 @@ if [ $BUILD_EMBED = true ]; then
     echo Embedded TypeScript compiled as $INTERMEDIATE/keyman.js
 
     if [ $DO_MINIFY = true ]; then
-        minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
+        minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "KeymanBase.__BUILD__=$BUILD"
         assert $EMBED_OUTPUT/keyman.js
         echo Compiled embedded application saved as $EMBED_OUTPUT/keyman.js
     fi
@@ -259,8 +263,8 @@ if [ $BUILD_COREWEB = true ]; then
     copy_resources "$INTERMEDIATE"
 
     if [ $DO_MINIFY = true ]; then
-    echo Minifying KeymanWeb...
-        minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "keyman.__BUILD__=$BUILD"
+        echo Minifying KeymanWeb...
+        minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "KeymanBase.__BUILD__=$BUILD"
         assert $WEB_OUTPUT/keymanweb.js
 
         echo Compiled KeymanWeb application saved as $WEB_OUTPUT/keymanweb.js

@@ -40,7 +40,7 @@ if(!window['keyman']['initialized']) {
       // Keyboards loaded with page are initialized before the page is ready,
       // so cannot use the wait indicater (and don't need it, anyway)
       // Do not display if a blocking cloud server error has occurred (to prevent multiple errors)
-      var bg=keymanweb.waiting;
+      var bg=this.waiting;
       if(typeof(bg) == 'undefined' || bg == null || keymanweb.warned) {
         return;
       }
@@ -108,7 +108,7 @@ if(!window['keyman']['initialized']) {
       }
 
       if(device.touchable) {
-        tempContext = keymanweb.getTextBeforeCaret(Pelem);
+        tempContext = keymanweb.touchAliasing.getTextBeforeCaret(Pelem);
       } else if(Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&
         (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')) {
         // I2457 - support contentEditable elements in mozilla, webkit
@@ -157,27 +157,32 @@ if(!window['keyman']['initialized']) {
      *  @param  {boolean}   align    align and make visible, else hide
      * 
      **/
-    keymanweb.alignInputs = function(align)
-    {                 
-      if(device.touchable)
-      {
-        for(var i=0; i<keymanweb.inputList.length; i++)
-        {
-          if(align) 
-          {     
-            keymanweb.updateInput(keymanweb.inputList[i]);
-            keymanweb.inputList[i].style.visibility='visible';
-            if(keymanweb.inputList[i].base.textContent.length > 0)
-              keymanweb.inputList[i].base.style.visibility='hidden';
-          }
-          else
-          {
-            keymanweb.inputList[i].style.visibility='hidden';
-            keymanweb.inputList[i].base.style.visibility='visible';
+    keymanweb.alignInputs = function(align) {
+      var domManager = keymanweb.domManager;
+      if(device.touchable) {
+        for(var i=0; i<domManager.inputList.length; i++) {
+          if(align) {     
+            domManager.touchHandlers.updateInput(domManager.inputList[i]);
+            domManager.inputList[i].style.visibility='visible';
+            if(domManager.inputList[i].base.textContent.length > 0)
+              domManager.inputList[i].base.style.visibility='hidden';
+          } else {
+            domManager.inputList[i].style.visibility='hidden';
+            domManager.inputList[i].base.style.visibility='visible';
           }
         }        
       }
     }    
+
+    /**
+     * Test if caret position is determined from the active element, or 
+     * from the synthesized overlay element (touch devices)
+     * 
+     * @return  {boolean}
+     **/          
+    keymanweb.isPositionSynthesized = function() {
+      return device.touchable;
+    }
 
     // Manage popup key highlighting 
     osk.highlightSubKeys=function(k,x,y)
@@ -216,8 +221,10 @@ if(!window['keyman']['initialized']) {
         if(keyName.indexOf('K_LOPT') >= 0) osk.showLanguageMenu();
         else if(keyName.indexOf('K_ROPT') >= 0)
         {
-          keymanweb._IsActivatingKeymanWebUI=0; osk._Hide(true); 
-          keymanweb.hideCaret(); keymanweb._LastActiveElement = 0;
+          keymanweb.uiManager.setActivatingUI(false);
+          osk._Hide(true); 
+          keymanweb.touchAliasing.hideCaret();
+          keymanweb.domManager.clearLastActiveElement();
         }
       }
     }

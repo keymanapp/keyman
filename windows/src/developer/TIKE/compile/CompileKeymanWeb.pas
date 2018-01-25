@@ -304,6 +304,7 @@ var
 begin
   FCallback := Callback;
   FInFile := InFile;
+  FOutFile := OutFile;   // I4140   // I4155   // I4154
   FDebug := Debug;   // I3681
   FError := False;  // I1971
 
@@ -338,7 +339,6 @@ begin
     begin
       with TStringStream.Create(WriteCompiledKeyboard, TEncoding.UTF8) do
       try
-        FOutFile := OutFile;   // I4140   // I4155   // I4154
         SaveToFile(OutFile);
       finally
         Free;
@@ -1504,7 +1504,11 @@ begin
   if sVisualKeyboard <> '' then
   begin
     try
-      sVisualKeyboard := VisualKeyboardFromFile(ExtractFilePath(FInFile) + sVisualKeyboard);
+      // The Keyman .kmx compiler will change the value of this store from a
+      // .kvks to a .kvk during the build. Earlier in the build, the visual keyboard
+      // would have been compiled, so we need to account for that and use that file.
+
+      sVisualKeyboard := VisualKeyboardFromFile(ExtractFilePath(FOutFile) + sVisualKeyboard);
     except
       on E:EFOpenError do   // I3947
       begin

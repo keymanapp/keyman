@@ -11,6 +11,7 @@
 		"kmwcallback.ts",
 		"kmwkeymaps.ts",
 		"kmwlayout.ts",
-		"kmwinit.ts"
+		"kmwinit.ts",
+		"kmwapi.ts"
   ]
 }
