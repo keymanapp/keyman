@@ -197,7 +197,7 @@
    *    
    * @param       {Object}      Ptarg      Target element
    */    
-  keymanweb._SetTargDir = function(Ptarg){};
+  keymanweb.domManager._SetTargDir = function(Ptarg){};
   
   /**
    * Align input fields (should not be needed with KMEI, KMEA)
@@ -433,9 +433,9 @@
       keyName=t[t.length-1];
       if(layer == 'undefined') layer=osk.layerId;
               
-      var Lelem=keymanweb._LastActiveElement,Lkc,keyShiftState=osk.getModifierState(layer);
+      var Lelem=keymanweb.domManager.getLastActiveElement(),Lkc,keyShiftState=osk.getModifierState(layer);
       
-      if(keymanweb._ActiveElement == null) keymanweb._ActiveElement=Lelem;    
+      keymanweb.domManager.initActiveElement(Lelem);
       
       // Process modifier key action
       if(osk.selectLayer(keyName,null)) return true;      
@@ -502,15 +502,13 @@
     // Clear any pending (non-popup) key
     osk.keyPending = null;
             
-    var Lelem = keymanweb._LastActiveElement;
+    var Lelem = keymanweb.domManager.getLastActiveElement();
     
-    if(keymanweb._ActiveElement == null) {
-      keymanweb._ActiveElement = Lelem;
-    }
+    keymanweb.domManager.initActiveElement(Lelem);
 
     // Check the virtual key 
     var Lkc = {
-      Ltarg: keymanweb._ActiveElement,
+      Ltarg: keymanweb.domManager.getActiveElement(),
       Lmodifiers: shift,
       vkCode: code,
       Lcode: code,

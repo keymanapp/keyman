@@ -475,7 +475,7 @@ if(!window['keyman']['ui']['name']) {
         {
           /*if(keymanweb._IsIEEditableIframe(Ltarg))
             Ltarg = Ltarg.ownerDocument.parentWindow.frameElement;
-          else if(keymanweb._IsMozillaEditableIframe(Ltarg))
+          else if(keymanweb.domManager._IsMozillaEditableIframe(Ltarg))
             Ltarg = Ltarg.defaultView.frameElement;*/
           if(ui.floatRight)   // I1296
             ui.ShowInterface(util['getAbsoluteX'](params.target) + params.target.offsetWidth + 1, util['getAbsoluteY'](params.target) + 1);

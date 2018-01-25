@@ -22,6 +22,7 @@
 
 // kmwbase.ts
 goog.exportProperty(keyman, "build", keyman); // Only works on individual instances.
+goog.exportSymbol("KeymanBase.prototype.addEventListener", KeymanBase.prototype.addEventListener);
 goog.exportSymbol("KeymanBase.prototype.isFontAvailable", KeymanBase.prototype.isFontAvailable);
 
 // Util.ts

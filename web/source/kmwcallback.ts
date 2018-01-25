@@ -101,7 +101,7 @@ class KeyboardInterface {
    * Description  Save keyboard focus
    */    
   saveFocus(): void {
-    this.keymanweb._IgnoreNextSelChange = 1;
+    DOMEventHandlers.states._IgnoreNextSelChange = 1;
   }
     
   /**
@@ -115,24 +115,25 @@ class KeyboardInterface {
   insertText(Ptext: string, PdeadKey:number): boolean {
     this.resetContextCache();
     //_DebugEnter('InsertText');
-    var Lelem = this.keymanweb._LastActiveElement, Ls, Le, Lkc, Lsel, Lv=false;
+    var Lelem = this.keymanweb.domManager.getLastActiveElement(), Ls, Le, Lkc, Lsel, Lv=false;
     if(Lelem != null) {
       Ls=Lelem._KeymanWebSelectionStart;
       Le=Lelem._KeymanWebSelectionEnd;
-      Lsel=this.keymanweb._Selection;
+      Lsel=DOMEventHandlers.states._Selection;
 
-      this.keymanweb._IsActivatingKeymanWebUI = 1;
-      this.keymanweb._IgnoreNextSelChange = 100;
-      (<any>this.keymanweb)._FocusLastActiveElement();
-      if((<any>this.keymanweb)._IsMozillaEditableIframe(Lelem,0)) {
-        Lelem = Lelem.documentElement;  // I3363 (Build 301)
+      this.keymanweb.uiManager.setActivatingUI(true);
+      DOMEventHandlers.states._IgnoreNextSelChange = 100;
+      this.keymanweb.domManager.focusLastActiveElement();
+      
+      if(Lelem instanceof HTMLIFrameElement && this.keymanweb.domManager._IsMozillaEditableIframe(Lelem,0)) {
+        Lelem = (<any>Lelem).documentElement;  // I3363 (Build 301)
       }
       if(document.selection  &&  Lsel != null) {
         Lsel.select();
       }
       Lelem._KeymanWebSelectionStart=Ls;
       Lelem._KeymanWebSelectionEnd=Le;
-      this.keymanweb._IgnoreNextSelChange = 0;
+      DOMEventHandlers.states._IgnoreNextSelChange = 0;
       if(Ptext!=null) {
         this.output(0, Lelem, Ptext);
       }
@@ -263,7 +264,7 @@ class KeyboardInterface {
     var retVal = false; // I3318
     var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
-    var bitmask = (<any>this.keymanweb).getKeyboardModifierBitmask();
+    var bitmask = this.keymanweb.keyboardManager.getKeyboardModifierBitmask();
 
     if(e.vkCode > 255) {
       keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
@@ -322,7 +323,7 @@ class KeyboardInterface {
       return false; // I3318
     }
 
-    var sp=(<any>this.keymanweb)._SelPos(Ptarg);
+    var sp=this._SelPos(Ptarg);
     n = sp - n;
     for(var i = 0; i < this._DeadKeys.length; i++) {
       if(this._DeadKeys[i].match(n, d)) {
@@ -342,7 +343,7 @@ class KeyboardInterface {
    */    
   beepReset(): void {
     this.resetContextCache();
-    
+
     var Lbo;
     this._BeepTimeout = 0;
     for(Lbo=0;Lbo<this._BeepObjects.length;Lbo++) { // I1511 - array prototype extended
@@ -379,7 +380,7 @@ class KeyboardInterface {
     Pelem.style.backgroundColor = '#000000';
     if(this._BeepTimeout == 0) {
       this._BeepTimeout = 1;
-      window.setTimeout(this.beepReset, 50);
+      window.setTimeout(this.beepReset.bind(this), 50);
     }
   }
   
@@ -425,13 +426,14 @@ class KeyboardInterface {
     var Li, Ldv;
   
     if(Pelem.className.indexOf('keymanweb-input') >= 0) {
-      var t=(<any>this.keymanweb).getTextBeforeCaret(Pelem);
+      var t=this.keymanweb.touchAliasing.getTextBeforeCaret(Pelem);
       if(dn > 0) {
         t=t._kmwSubstr(0,t._kmwLength()-dn)+s; 
       } else {
         t=t+s;
       }
-      (<any>this.keymanweb).setTextBeforeCaret(Pelem,t);
+      
+      this.keymanweb.touchAliasing.setTextBeforeCaret(Pelem,t);
       return;
     }
   
@@ -540,9 +542,9 @@ class KeyboardInterface {
         this._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318
       }
 
-      this.keymanweb._Selection = Ldv.createRange();
-      this.keymanweb._Selection.select();
-      this.keymanweb._Selection.scrollIntoView();
+      DOMEventHandlers.states._Selection = Ldv.createRange();
+      DOMEventHandlers.states._Selection.select();
+      DOMEventHandlers.states._Selection.scrollIntoView();
       // Mozilla et al; IE9+ also recognizes setSelectionRange, but does not seem to work in exactly the same way as Mozilla
     } else if (Pelem.setSelectionRange) {                                        
       var LselectionStart, LselectionEnd;
@@ -607,7 +609,7 @@ class KeyboardInterface {
       this.output(Pdn,Pelem,"");  //I3318 corrected to >=
     }
 
-    var Lc: Deadkey = new Deadkey((<any>this.keymanweb)._SelPos(Pelem), Pd);
+    var Lc: Deadkey = new Deadkey(this._SelPos(Pelem), Pd);
 
     this._DeadKeys=this.keymanweb._push(this._DeadKeys,Lc);      
     //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
@@ -868,7 +870,7 @@ class KeyboardInterface {
    * Description  Encapsulates calls to keyboard input processing.
    * @returns     {number}        0 if no match is made, otherwise 1.
    */
-  processKeystroke(device, element: HTMLElement, keystroke:KeyEvent) {
+  processKeystroke(device, element: HTMLElement, keystroke:KeyEvent|LegacyKeyEvent) {
     // Clear internal state tracking data from prior keystrokes.
     (<any>this.keymanweb)._CachedSelectionStart = null; // I3319     
     this._DeadkeyResetMatched();       // I3318    
@@ -886,11 +888,11 @@ class KeyboardInterface {
    * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
    */
   ['getLastActiveElement'](): HTMLElement {
-    return this.keymanweb._LastActiveElement; 
+    return this.keymanweb.domManager.getLastActiveElement(); 
   }
 
   ['focusLastActiveElement'](): void { 
-    (<any>this)._FocusLastActiveElement(); 
+    this.keymanweb.domManager.focusLastActiveElement(); 
   }
 
   //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
@@ -905,5 +907,58 @@ class KeyboardInterface {
   ['showPinnedHelp'](): void {
     this.keymanweb.osk.userPositioned=true; 
     this.keymanweb.osk._Show(-1,-1);
+  }
+
+  resetContext() {
+    this.keymanweb.osk.layerId = 'default';
+
+    this.clearDeadkeys();
+    this.resetContextCache();
+    this.resetVKShift();
+
+    this.keymanweb.osk._Show();
+  };
+
+  /**
+   * Function     _SelPos
+   * Scope        Private
+   * @param       {Object}  Pelem   Element
+   * @return      {number}          Selection start
+   * Description  Get start of selection (with supplementary plane modifications)
+   */   
+  _SelPos(Pelem: HTMLElement) {
+    var Ldoc, Ldv, isMSIE=(this.keymanweb.util._GetIEVersion()<999); // I3363 (Build 301)
+
+    if((<any>this.keymanweb).isPositionSynthesized())
+      return this.keymanweb.touchAliasing.getTextCaret(Pelem);
+
+    if(Pelem._KeymanWebSelectionStart) 
+      return Pelem._KeymanWebSelectionStart;
+    
+    // Mozilla, IE9 
+    else if ((Pelem instanceof HTMLInputElement || Pelem instanceof HTMLTextAreaElement) && Pelem.setSelectionRange)  
+      return Pelem.value.substr(0,Pelem.selectionStart)._kmwLength();        
+  
+    // contentEditable elements, Mozilla midas
+    else if((Ldv=Pelem.ownerDocument)  &&  (Ldv=Ldv.defaultView)  &&  Ldv.getSelection
+      &&  Pelem.ownerDocument.designMode.toLowerCase() == 'on') {
+      var Lsel = Ldv.getSelection();
+      if(Lsel.focusNode.nodeType == 3) 
+        return Lsel.focusNode.substringData(0,Lsel.focusOffset)._kmwLength(); 
+    }
+    
+    return 0;
+  }
+
+  /**
+   * Reset OSK shift states when entering or exiting the active element
+   **/    
+  resetVKShift() {
+    if(!this.keymanweb.uiManager.isActivating) 
+    {
+      if(this.keymanweb.osk._UpdateVKShift) {
+        this.keymanweb.osk._UpdateVKShift(null,15,0);  //this should be enabled !!!!! TODO
+      }
+    }
   }
 }
