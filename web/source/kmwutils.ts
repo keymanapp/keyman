@@ -25,6 +25,27 @@ class Device {
     this.browser='';
   }
 
+  /**
+   * Get device horizontal DPI for touch devices, to set actual size of active regions
+   * Note that the actual physical DPI may be somewhat different.
+   * 
+   * @return      {number}               
+   */       
+  getDPI(): number {
+    var t=document.createElement('DIV') ,s=t.style,dpi=96;
+    if(document.readyState !== 'complete') {
+      return dpi;
+    }
+    
+    t.id='calculateDPI';
+    s.position='absolute'; s.display='block';s.visibility='hidden';
+    s.left='10px'; s.top='10px'; s.width='1in'; s.height='10px';
+    document.body.appendChild(t);
+    dpi=(typeof window.devicePixelRatio == 'undefined') ? t.offsetWidth : t.offsetWidth * window.devicePixelRatio;
+    document.body.removeChild(t);
+    return dpi;    
+  }
+
   detect(IEVersion: number) : void {
     if(navigator && navigator.userAgent) {
       var agent=navigator.userAgent;
@@ -108,7 +129,10 @@ class Device {
 class Util {
   // Generalized component event registration
   device: Device;
+  activeDevice: Device;
   physicalDevice: Device;
+
+  waiting: HTMLDivElement;                  // The element displayed for util.wait and util.alert.
 
   // An object mapping event names to individual event lists.  Maps strings to arrays.
   private events: { [name: string]: ((Object) => boolean)[];} = {};
@@ -129,6 +153,7 @@ class Util {
   initDevices(): void {
     this.device = new Device();
     this.physicalDevice = new Device();
+    this.activeDevice = this.device;
 
     // Initialize the true device values.
     this.device.detect(this._GetIEVersion());
@@ -249,15 +274,15 @@ class Util {
   /**
    * Function     attachDOMEvent: Note for most browsers, adds an event to a chain, doesn't stop existing events  
    * Scope        Public
-   * @param       {Object}    Pelem       Element to which event is being attached
+   * @param       {Object}    Pelem       Element (or IFrame-internal Document) to which event is being attached
    * @param       {string}    Peventname  Name of event without 'on' prefix
    * @param       {function(Object)}  Phandler    Event handler for event
    * @param       {boolean=}  PuseCapture True only if event to be handled on way to target element      
    * Description  Attaches event handler to element DOM event
    */  
-  attachDOMEvent(Pelem: HTMLElement, Peventname: string, Phandler: (Object) => boolean, PuseCapture: boolean): void {
+  attachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
     this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
-    if(Pelem.attachEvent) {
+    if(Pelem instanceof HTMLElement && Pelem.attachEvent) {
       // IE
       Pelem.attachEvent('on'+Peventname, Phandler);
     } else if(Pelem.addEventListener) {
@@ -275,8 +300,8 @@ class Util {
    * @param       {boolean=}  PuseCapture True if event was being handled on way to target element      
    * Description Detaches event handler from element [to prevent memory leaks]
    */  
-  detachDOMEvent(Pelem: HTMLElement, Peventname: string, Phandler: (Object) => boolean, PuseCapture: boolean): void {
-    if(Pelem.detachEvent) {
+  detachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+    if(Pelem instanceof HTMLElement && Pelem.detachEvent) {
       Pelem.detachEvent('on'+Peventname, Phandler);
     } else if(Pelem.removeEventListener) {
       Pelem.removeEventListener(Peventname, Phandler, PuseCapture);      
@@ -343,7 +368,7 @@ class Util {
     if(Lobj instanceof Document) {
     // The following two lines are old code and may or may not still be needed - possibly should be conditioned similalry to above    
       if(Lobj && Lobj.parentWindow && Lobj.parentWindow.frameElement) { // Legacy IE.
-        return Lcurleft + this._GetAbsoluteX(Lobj.parentWindow.frameElement) - Lobj.documentElement.scrollLeft;
+        return Lcurleft + this._GetAbsoluteX(Lobj.parentWindow.frameElement as HTMLElement) - Lobj.documentElement.scrollLeft;
       }
 
       if(Lobj && Lobj.defaultView && Lobj.defaultView.frameElement) {
@@ -387,7 +412,7 @@ class Util {
     if(Lobj instanceof Document) {
       // The following two lines are old code and may or may not still be needed - possibly should be conditioned similalry to above    
       if(Lobj && Lobj.parentWindow && Lobj.parentWindow.frameElement) {
-        return Lcurtop + this._GetAbsoluteY(Lobj.parentWindow.frameElement) - Lobj.documentElement.scrollTop;
+        return Lcurtop + this._GetAbsoluteY(Lobj.parentWindow.frameElement as HTMLElement) - Lobj.documentElement.scrollTop;
       }
       if(Lobj && Lobj.defaultView && Lobj.defaultView.frameElement) {
         return Lcurtop + this._GetAbsoluteY(<HTMLElement>Lobj.defaultView.frameElement) - Lobj.documentElement.scrollTop;
@@ -498,27 +523,6 @@ class Util {
   }
 
   getIEVersion = this._GetIEVersion;
-
-  /**
-   * Get device horizontal DPI for touch devices, to set actual size of active regions
-   * Note that the actual physical DPI may be somewhat different.
-   * 
-   * @return      {number}               
-   */       
-  getDPI(): number {
-    var t=document.createElement('DIV') ,s=t.style,dpi=96;
-    if(document.readyState !== 'complete') {
-      return dpi;
-    }
-    
-    t.id='calculateDPI';
-    s.position='absolute'; s.display='block';s.visibility='hidden';
-    s.left='10px'; s.top='10px'; s.width='1in'; s.height='10px';
-    document.body.appendChild(t);
-    dpi=(typeof window.devicePixelRatio == 'undefined') ? t.offsetWidth : t.offsetWidth * window.devicePixelRatio;
-    document.body.removeChild(t);
-    return dpi;    
-  }
 
   /**
    * Get browser-independent computed style value for element
@@ -1130,7 +1134,7 @@ class Util {
    *  Should not be called before options are defined during initialization
    **/           
   prepareWait(): void { 
-    var bg=document.createElement('DIV'),
+    var bg: HTMLDivElement = <HTMLDivElement>document.createElement('DIV'),
         lb=document.createElement('DIV'),
         lt=document.createElement('DIV'),    
         gr=document.createElement('DIV'),
@@ -1166,7 +1170,7 @@ class Util {
     lb.appendChild(gr);
     bg.appendChild(lb);
     document.body.appendChild(bg);
-    this.keyman.waiting=bg;    
+    this.waiting=bg;    
   }
 
   /**
