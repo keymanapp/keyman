@@ -134,13 +134,6 @@ if(!window['keyman']['initialized']) {
           LselectionEnd = keymanweb._CachedSelectionEnd;     // I3319           
         }
         tempContext = Pelem.value._kmwSubstr(0, LselectionStart);
-      } else if(Ldoc  &&  (Ldv=Ldoc.selection)) { // build 77 - use elem.ownerDocument instead of document
-                                              // I1481 - use Ldoc to get the ownerDocument when no selection is found
-        /* IE */
-        var Lrange = Ldv.createRange();
-        //if (Lrange.parentElement() == Pelem) {  // build 77 - ignore parent of selection
-        Lrange.moveStart('character',-2*n); // allows for supp chars        //I3319
-        tempContext = Lrange.text;
       }
 
       if(tempContext._kmwLength() < n) {

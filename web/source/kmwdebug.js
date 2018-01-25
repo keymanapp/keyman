@@ -140,9 +140,6 @@ if(!window['keyman']['initialized']) {
         }
         //Lelem.scrollIntoView(); //***temporarily disabled, JMD 23/12/11
         //keymanweb._DivDebug.innerHTML = keymanweb._DivDebug.innerHTML + '<br>'+keymanweb._DebugDepth+Ps;
-      //if(!document.selection)
-      //    keymanweb._DivDebug.scrollTop = (keymanweb._DivDebug.scrollHeight - keymanweb._DivDebug.clientHeight<0 ? 0 :
-        //    keymanweb._DivDebug.scrollHeight - keymanweb._DivDebug.clientHeight);
       }
     }
     
@@ -161,56 +158,25 @@ if(!window['keyman']['initialized']) {
     _DebugDeadKeys = function(Pelem, Ps)
     {
       var Lt = "", Li, Lp = 0, Ls, Lj;
-      if(document.selection)
+      
+      // if(!keymanweb._IE) return true; //added test to avoid compiler warning 27/8 JMD // Commented-out after removal of document.selection 25/01/18 JAH
+      
+      // Mozilla debug (table formatting removed)
+      if(Pelem.tagName == 'HTML') Ls = Pelem.innerHTML; else Ls = Pelem.value; Lt = ''; //span style="font-size: 12pt">';
+      if(typeof(Ls) === 'undefined') return;
+      for(Li = 0; Li <= Ls._kmwLength(); Li++) Lt += "<"+Ls._kmwCharAt(Li)+">"; //I3319
+      for(Li = 0; Li <= Ls._kmwLength(); Li++)  //I3319
       {
-        // IE debug
-        for(Li = 0; Li < kbdInterface._DeadKeys.length; Li++)
+        for(var Lj = 0; Lj < kbdInterface._DeadKeys.length; Lj++)
         {
-          if(kbdInterface._DeadKeys[Li].p > Lp) Lp = kbdInterface._DeadKeys[Li].p;
+          Lt = Lt + '['+kbdInterface._DeadKeys[Lj].p+':'+kbdInterface._DeadKeys[Lj].d+']';
         }
-        Ls = kbdInterface.context(Lp+1, Lp+1, Pelem); Lt = '<span style="font-size: 12pt">';
-        if(Ls !== false && Ls._kmwLength() > Lp)  //I3319
-        {
-          /* We want to show the previous character in the context */
-          Lt = Lt + Ls._kmwSubstr(0,1); Ls = Ls._kmwSlice(1); //I3319
-        }
-        for(Li = 0; Li <= Ls._kmwLength(); Li++) //I3319
-        {
-          for(Lj = 0; Lj < kbdInterface._DeadKeys.length; Lj++)
-          {
-            if(kbdInterface._DeadKeys[Lj].p == Ls._kmwLength() - Li) Lt = Lt + '<span style="color: red">'+kbdInterface._DeadKeys[Lj].d+'</span>'; //I3319
-          }
-          if(Li < Ls._kmwLength()) Lt = Lt + Ls._kmwCharAt(Li); //I3319
-        }
-        
-        Lt = Lt + '</span> - ';
-        for(Li = 0; Li < kbdInterface._DeadKeys.length; Li++)
-        {
-          Lt = Lt + 'dk['+Li+'] = {pos: '+kbdInterface._DeadKeys[Li].p+', deadKey: '+kbdInterface._DeadKeys[Li].d+'} ';
-        }
-        
-        _Debug(Ps + ': ' + Lt);
+        if(Li < Ls._kmwLength()) Lt = Lt + Ls._kmwCharAt(Li);
       }
-      else
-      {
-        if(!keymanweb._IE) return true; //added test to avoid compiler warning 27/8 JMD
-        
-        // Mozilla debug (table formatting removed)
-        if(Pelem.tagName == 'HTML') Ls = Pelem.innerHTML; else Ls = Pelem.value; Lt = ''; //span style="font-size: 12pt">';
-        if(typeof(Ls) === 'undefined') return;
-        for(Li = 0; Li <= Ls._kmwLength(); Li++) Lt += "<"+Ls._kmwCharAt(Li)+">"; //I3319
-        for(Li = 0; Li <= Ls._kmwLength(); Li++)  //I3319
-        {
-          for(var Lj = 0; Lj < kbdInterface._DeadKeys.length; Lj++)
-          {
-            Lt = Lt + '['+kbdInterface._DeadKeys[Lj].p+':'+kbdInterface._DeadKeys[Lj].d+']';
-          }
-          if(Li < Ls._kmwLength()) Lt = Lt + Ls._kmwCharAt(Li);
-        }
-        
-        //_Debug(Ps + ': ' + Lt);
-          //Lt = Lt + keymanweb._DebugDepth + ' &nbsp; dk['+Li+'] = {pos: '+kbdInterface._DeadKeys[Li].p+', deadKey: '+kbdInterface._DeadKeys[Li].d+'}<br>';
-      }
+      
+      //_Debug(Ps + ': ' + Lt);
+        //Lt = Lt + keymanweb._DebugDepth + ' &nbsp; dk['+Li+'] = {pos: '+kbdInterface._DeadKeys[Li].p+', deadKey: '+kbdInterface._DeadKeys[Li].d+'}<br>';
+    
 
   /*
       var Lt = "", Li, Lp = 0;

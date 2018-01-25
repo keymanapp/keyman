@@ -593,7 +593,7 @@ class DOMEventHandlers {
    * Description  Processes keydown event and passes data to keyboard. 
    */ 
   _KeyDown: (e: KeyboardEvent) => boolean = function(this: DOMEventHandlers, e: KeyboardEvent): boolean {
-    var Ldv, eClass='';
+    var Ldv: Document, eClass='';
     var activeKeyboard = this.keyman.keyboardManager.activeKeyboard;
     var osk = this.keyman.osk;
     var util = this.keyman.util;
@@ -647,11 +647,6 @@ class DOMEventHandlers {
     if(Levent.LmodifierChange) {
       this.keyman.keyboardManager.notifyKeyboard(0,Levent.Ltarg,1); 
       osk._UpdateVKShift(Levent, 0, 1);
-    }
-    
-    // I1207
-    if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  (Levent.Lcode<33 || Levent.Lcode>40)) {
-      Ldv.createRange().select();
     }
 
     if(!window.event) {
@@ -858,15 +853,6 @@ class DOMEventHandlers {
       keyboardManager.notifyKeyboard(0,Levent.Ltarg,0); 
       osk._UpdateVKShift(Levent, 0, 1);  // I2187
     }
-
-    // I736 start
-    var Ldv;
-    if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  Ldv.type != 'control') { // I1479 - avoid createRange on controls
-      Ldv=Ldv.createRange();
-      //if(Ldv.parentElement()==Levent.Ltarg) //I1505
-      DOMEventHandlers.states._Selection = Ldv;
-    }
-    // I736 end
     
     return false;
   }.bind(this);
