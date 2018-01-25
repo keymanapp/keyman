@@ -65,7 +65,7 @@
                 <!-- local kmp file -->
                 <data android:scheme="file" android:host="*" android:mimeType="application/octet-stream" android:pathPattern=".*\\.kmp" />
 
-                <!-- reference https://stackoverflow.com/questions/27947881/intent-with-wrong-filename-in-intents-data-from-downloaded-files -->
+                <!-- Android DownloadManager doesn't have ".kmp" in the names it passes to the intent -->
                 <data android:scheme="content" android:host="*" android:mimeType="application/octet-stream" android:pathPattern=".*" />
             </intent-filter>
 
