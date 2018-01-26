@@ -248,11 +248,8 @@ final class KMKeyboard extends WebView {
     boolean retVal = true;
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
-      if(keyboardVersion == null) {
-        Toast.makeText(context, "Invalid keyboard - no version specified! Loading default", Toast.LENGTH_LONG).show();
-      } else {
-        Toast.makeText(context, "Invalid keyboard! Loading default", Toast.LENGTH_LONG).show();
-      }
+      Toast.makeText(context, "Can't set " + packageID + ":" + keyboardID + " for " +
+        languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
       keyboardID = KMManager.KMDefault_KeyboardID;
       languageID = KMManager.KMDefault_LanguageID;
       retVal = false;
@@ -346,11 +343,8 @@ final class KMKeyboard extends WebView {
     boolean retVal = true;
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
-      if(keyboardVersion == null) {
-        Toast.makeText(context, "Invalid keyboard - no version specified! Loading default", Toast.LENGTH_LONG).show();
-      } else {
-        Toast.makeText(context, "Invalid keyboard! Loading default", Toast.LENGTH_LONG).show();
-      }
+      Toast.makeText(context, "Can't set " + packageID + ":" + keyboardID + " for " +
+        languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
       packageID = KMManager.KMDefault_UndefinedPackageID;
       keyboardID = KMManager.KMDefault_KeyboardID;
       languageID = KMManager.KMDefault_LanguageID;
