@@ -361,11 +361,6 @@ class Util {
     }
     
     if(Lobj instanceof Document) {
-    // The following two lines are old code and may or may not still be needed - possibly should be conditioned similalry to above    
-      if(Lobj && Lobj.parentWindow && Lobj.parentWindow.frameElement) { // Legacy IE.
-        return Lcurleft + this._GetAbsoluteX(Lobj.parentWindow.frameElement as HTMLElement) - Lobj.documentElement.scrollLeft;
-      }
-
       if(Lobj && Lobj.defaultView && Lobj.defaultView.frameElement) {
         return Lcurleft + this._GetAbsoluteX(<HTMLElement>Lobj.defaultView.frameElement) - Lobj.documentElement.scrollLeft;
       }
@@ -405,10 +400,6 @@ class Util {
     }
     
     if(Lobj instanceof Document) {
-      // The following two lines are old code and may or may not still be needed - possibly should be conditioned similalry to above    
-      if(Lobj && Lobj.parentWindow && Lobj.parentWindow.frameElement) {
-        return Lcurtop + this._GetAbsoluteY(Lobj.parentWindow.frameElement as HTMLElement) - Lobj.documentElement.scrollTop;
-      }
       if(Lobj && Lobj.defaultView && Lobj.defaultView.frameElement) {
         return Lcurtop + this._GetAbsoluteY(<HTMLElement>Lobj.defaultView.frameElement) - Lobj.documentElement.scrollTop;
       }
@@ -453,8 +444,8 @@ class Util {
     }
   }
   
-  _CreateElement(nodeName:string): HTMLElement { 
-    var e = <HTMLElement>document.createElement(nodeName);
+  _CreateElement<Ele extends HTMLElement>(nodeName:string): Ele { 
+    var e = document.createElement(nodeName) as Ele;
 
     // Make element unselectable (Internet Explorer)
     if (typeof e.onselectstart != 'undefined') { //IE route

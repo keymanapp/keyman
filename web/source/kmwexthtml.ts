@@ -7,7 +7,7 @@ interface Window {
 }
 
 interface Document {
-    parentWindow: any                   // Thanks again, IE.
+    //parentWindow: any                   // Thanks again, IE.
 
     _KeymanWebSelectionStart: number,
     _KeymanWebSelectionEnd: number

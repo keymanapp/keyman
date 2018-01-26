@@ -615,31 +615,16 @@ class DOMManager {
       var Lelem=Pelem.contentWindow.document;
       /* editable Iframe */
       if(Lelem) {
-        if(Lelem.parentWindow) {
-          // Internet Explorer
-          if(Lelem.designMode.toLowerCase() == 'on' || Lelem.body.isContentEditable) {  // I1295 - fix non-attachment for some forms of IFRAMEs
-            // I1480 - Attach to IFRAME instead of document
-            util.attachDOMEvent(Pelem,'focus', this.getHandlers(Pelem)._ControlFocus);
-            util.attachDOMEvent(Pelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-            util.attachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);   // I2404 - Update for attaching to elements within IFRAMEs, don't attach to read-only IFRAMEs
-            util.attachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
-            util.attachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
-          } else {
-            // Lelem is the IFrame's internal document; set 'er up!
-            this._SetupDocument(Lelem);
-          }
+        if(Lelem.designMode.toLowerCase() == 'on') {
+          // I2404 - Attach to IFRAMEs child objects, only editable IFRAMEs here
+          util.attachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
+          util.attachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
+          util.attachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);
+          util.attachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
+          util.attachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
         } else {
-          if(Lelem.designMode.toLowerCase() == 'on') {
-            // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
-            util.attachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
-            util.attachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-            util.attachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);
-            util.attachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
-            util.attachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
-          } else {
-            // Lelem is the IFrame's internal document; set 'er up!
-            this._SetupDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
-          }
+          // Lelem is the IFrame's internal document; set 'er up!
+          this._SetupDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
         }
       }
     }
@@ -662,31 +647,16 @@ class DOMManager {
       var Lelem=Pelem.contentWindow.document;
       /* editable Iframe */
       if(Lelem) {
-        if(Lelem.parentWindow) {
-          // Internet Explorer
-          if(Lelem.designMode.toLowerCase() == 'on' || Lelem.body.isContentEditable) { // I1295 - fix non-attachment for some forms of IFRAMEs
-            // I1480 - Attach to IFRAME instead of document
-            util.detachDOMEvent(Pelem,'focus', this.getHandlers(Pelem)._ControlFocus);
-            util.detachDOMEvent(Pelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-            util.detachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);   // I2404 - Update for attaching to elements within IFRAMEs, don't attach to read-only IFRAMEs
-            util.detachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
-            util.detachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
-          } else {
-            // Lelem is the IFrame's internal document; set 'er up!
-            this._ClearDocument(Lelem);
-          }
+        if(Lelem.designMode.toLowerCase() == 'on') {
+          // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
+          util.detachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
+          util.detachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
+          util.detachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);
+          util.detachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
+          util.detachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
         } else {
-          if(Lelem.designMode.toLowerCase() == 'on') {
-            // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
-            util.detachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
-            util.detachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-            util.detachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);
-            util.detachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
-            util.detachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
-          } else {
-            // Lelem is the IFrame's internal document; set 'er up!
-            this._ClearDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
-          }
+          // Lelem is the IFrame's internal document; set 'er up!
+          this._ClearDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
         }
       }
     }

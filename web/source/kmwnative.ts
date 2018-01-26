@@ -231,7 +231,7 @@ if(!window['keyman']['initialized']) {
       {
         if(osk.keytip == null)
         {  
-          osk.keytip=util._CreateElement('DIV'); 
+          osk.keytip=(<Util>util)._CreateElement<HTMLDivElement>('DIV'); 
           osk.keytip.className='kmw-keytip';
           osk.keytip.id = 'kmw-keytip';
           
@@ -239,8 +239,8 @@ if(!window['keyman']['initialized']) {
           osk.keytip.style.pointerEvents='none'; 
           
           // Add CANVAS element for outline and SPAN for key label
-          osk.keytip.appendChild(util._CreateElement('CANVAS'));
-          osk.keytip.appendChild(util._CreateElement('SPAN'));   
+          osk.keytip.appendChild((<Util>util)._CreateElement<HTMLCanvasElement>('CANVAS'));
+          osk.keytip.appendChild((<Util>util)._CreateElement<HTMLSpanElement>('SPAN'));   
           osk.keytip.key = null;
           osk.keytip.state = false;     
         }
@@ -422,7 +422,7 @@ if(!window['keyman']['initialized']) {
     {   
       if(device.formFactor != 'phone' || device.OS != 'iOS') return null;
         
-      var cc = util._CreateElement('DIV'),ccs = cc.style;
+      var cc = (<Util>util)._CreateElement<HTMLDivElement>('DIV'),ccs = cc.style;
       cc.id = 'kmw-popup-callout';
       osk._Box.appendChild(cc);
       

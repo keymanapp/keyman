@@ -81,12 +81,7 @@ if(!window['keyman']['ui']['name']) {
       var x, y, w, h, p;
     
       p = util['getAbsolute'](someElement); x = p['x']; y=p['y'];
-      if(someElement.parentWindow && someElement.parentWindow.frameElement)
-      {
-        w = someElement.parentWindow.frameElement.clientWidth;
-        h = someElement.parentWindow.frameElement.clientHeight;
-      }
-      else if(someElement.defaultView && someElement.defaultView.frameElement)
+      if(someElement.defaultView && someElement.defaultView.frameElement)
       { 
         w = someElement.defaultView.frameElement.clientWidth;
         h = someElement.defaultView.frameElement.clientHeight;
