@@ -26,12 +26,8 @@ interface Element {
 interface CSSStyleDeclaration {
     MozBoxSizing: any,
     // For legacy 'selection' management.
-    MozUserSelect: any,
-    KhtmlUserSelect: any,
+    MozUserSelect: any, // Not necessary with Firefox 52+, which was released... in 2017.
+    KhtmlUserSelect: any, // No dating information for the rest at present.
     UserSelect: any,
     WebkitUserSelect: any
-}
-
-interface KeyboardEvent {
-    _kmw_block: boolean                 // Needed to prevent an old Firefox bug.
 }

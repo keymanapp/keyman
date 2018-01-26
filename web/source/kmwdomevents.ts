@@ -759,10 +759,6 @@ class DOMEventHandlers {
    * Description Processes keypress event (does not pass data to keyboard)
    */       
   _KeyPress: (e: KeyboardEvent) => boolean = function(this: DOMEventHandlers, e: KeyboardEvent): boolean {
-    if(e._kmw_block) { // A custom event property added for bugfix-oriented simulated keypress events.
-      return false;
-    }
-
     var Levent;
     if(DOMEventHandlers.states._DisableInput || this.keyman.keyboardManager.activeKeyboard == null) {
       return true;
