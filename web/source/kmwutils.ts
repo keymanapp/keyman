@@ -1345,7 +1345,7 @@ class Util {
       scopedClass = Pelem['defaultView'][className];
     } else if(Pelem['ownerDocument']) {
       scopedClass = (Pelem as Node).ownerDocument.defaultView[className];
-    } else  {
+    } else if(Pelem['target']) {
       scopedClass = ((Pelem as Event).target as Element).ownerDocument.defaultView[className];
     }
 
