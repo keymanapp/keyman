@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0830"
+   LastUpgradeVersion = "0920"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -20,6 +20,20 @@
                ReferencedContainer = "container:Keyman4MacIM.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E29F22F0201A59B1005EA234"
+               BuildableName = "KeymanTests.xctest"
+               BlueprintName = "KeymanTests"
+               ReferencedContainer = "container:Keyman4MacIM.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -33,7 +47,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "989C9C1A1A7876DE00A20425"
+               BlueprintIdentifier = "E29F22F0201A59B1005EA234"
                BuildableName = "KeymanTests.xctest"
                BlueprintName = "KeymanTests"
                ReferencedContainer = "container:Keyman4MacIM.xcodeproj">
