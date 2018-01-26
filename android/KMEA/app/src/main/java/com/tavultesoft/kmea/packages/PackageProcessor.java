@@ -99,6 +99,7 @@ public class PackageProcessor {
       JSONParser parser = new JSONParser();
       return parser.getJSONObjectFromFile(infoFile);
     } else {
+      Log.d("PackageProcessor", infoFile.toString() + " does not exist.");
       return null;
     }
   }

@@ -823,8 +823,9 @@ public final class KMManager {
       };
 
       File[] files = dir.listFiles(keyboardFilter);
-      if (files == null)
+      if (files.length == 0) {
         return kbFileVersion;
+      }
 
       for (File file : files) {
         String filename = file.getName();
@@ -853,25 +854,9 @@ public final class KMManager {
           return null;
         }
         JSONParser jsonParser = new JSONParser();
-        JSONObject kbData = jsonParser.getJSONObjectFromFile(kmpJSONFile);
+        JSONObject kmpObject = jsonParser.getJSONObjectFromFile(kmpJSONFile);
 
-        // Iterate each keyboard in the kmp package
-        JSONArray files = kbData.getJSONArray("files");
-        JSONArray keyboards = kbData.getJSONArray("keyboards");
-        for (int i = 0; i < keyboards.length(); i++) {
-          JSONObject keyboard = keyboards.getJSONObject(i);
-          String kbID = keyboard.getString("id");
-          if (kbID == null || kbID.isEmpty()) {
-            continue;
-          }
-
-          if (kbID.equals(keyboardID)) {
-            kbFileVersion = keyboard.getString("version");
-            if (kbFileVersion != null & !kbFileVersion.isEmpty()) {
-              return kbFileVersion;
-            }
-          }
-        }
+        return PackageProcessor.getKeyboardVersion(kmpObject, keyboardID);
       } catch (Exception e) {
         return null;
       }

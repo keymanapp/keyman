@@ -112,8 +112,7 @@ final class KMKeyboard extends WebView {
     setWebChromeClient(new WebChromeClient() {
       public boolean onConsoleMessage(ConsoleMessage cm) {
         if (KMManager.isDebugMode()) {
-          Log.d("Keyman JS Log: Line " + cm.lineNumber(), cm.sourceId() + ":" + cm.message());
-          Log.d("Keyman JS Log: Line " + cm.lineNumber(), cm.sourceId());
+          Log.d("KMEA", "Keyman JS Log: Line " + cm.lineNumber() + ", " + cm.sourceId() + ":" + cm.message());
         }
         return true;
       }

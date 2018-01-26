@@ -644,9 +644,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
   @Override
   public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
+    String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
     if (result > 0) {
       String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
-      String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
       String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
       String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
       String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
@@ -684,10 +684,8 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
         }
       }
-    } else if (result == 0) {
-      Toast.makeText(this, "Keyboard already exists", Toast.LENGTH_SHORT).show();
     } else {
-      Toast.makeText(this, "Keyboard download failed", Toast.LENGTH_SHORT).show();
+      Toast.makeText(this, "Keyboard " + keyboardID + " download failed", Toast.LENGTH_SHORT).show();
     }
   }
 

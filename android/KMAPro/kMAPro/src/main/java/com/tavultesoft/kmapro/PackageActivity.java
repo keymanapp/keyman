@@ -52,11 +52,19 @@ public class PackageActivity extends Activity{
 
     final String pkgId = PackageProcessor.getPackageName(kmpFile);
     String version = PackageProcessor.getPackageVersion(kmpFile, false);
+    if (version == null || version.isEmpty()) {
+      String errorStr = "Invalid package version in " + kmpFile.getName();
+      Toast.makeText(context, errorStr, Toast.LENGTH_SHORT).show();
+      Log.d("PackageActivity", errorStr);
+      finish();
+    }
 
     try {
       tempPackagePath = PackageProcessor.unzipKMP(kmpFile);
     } catch (Exception e) {
-      Log.e("PackageActivity", "Failed to extract " + kmpFile.getAbsolutePath());
+      String errorStr = "Failed to extract\n" + kmpFile.getAbsolutePath();
+      Toast.makeText(context, errorStr, Toast.LENGTH_SHORT).show();
+      Log.e("PackageActivity", errorStr);
       finish();
     }
 
@@ -73,7 +81,7 @@ public class PackageActivity extends Activity{
 
     String titleStr = "Install Keyboard Package";
     if (version != null) {
-      titleStr += " v." + version;
+      titleStr += " " + version;
     }
     packgeActivityTitle.setText(titleStr);
     actionBar.setCustomView(packgeActivityTitle);
@@ -188,7 +196,7 @@ public class PackageActivity extends Activity{
         FileUtils.deleteDirectory(tempPackagePath);
       }
     } catch (Exception e) {
-
+      Log.e("PackageActivity", "cleanup() failed with error " + e);
     } finally {
       finish();
     }
