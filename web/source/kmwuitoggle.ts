@@ -91,7 +91,7 @@ if(!window['keyman']['ui']['name']) {
         w = someElement.offsetWidth;
         h = someElement.offsetHeight;
       }
-      if(x + w > (window.clientWidth?window.clientWidth:window.innerWidth) + document.documentElement.scrollLeft - ui.controller.offsetWidth - 1)
+      if(x + w > window.innerWidth + document.documentElement.scrollLeft - ui.controller.offsetWidth - 1)
         y += h;
       else
       {

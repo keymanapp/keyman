@@ -1,27 +1,17 @@
 // Defines a number of KMW objects.
 /// <reference path="kmwtypedefs.ts"/>
 
-interface Window {
-    attachEvent: (eventNameWithOn:string, callback: () => void) => void,
-    clientWidth: number
-}
-
 interface Document {
-    //parentWindow: any                   // Thanks again, IE.
-
     _KeymanWebSelectionStart: number,
     _KeymanWebSelectionEnd: number
 }
 
 interface Element {
-    _kmwAttachment: AttachmentInfo,                // Used to track each input element's attachment data.
+    _kmwAttachment: AttachmentInfo,     // Used to track each input element's attachment data.
     shim: HTMLElement,                  // Used in subkey elements for smooth fading.
 
     _KeymanWebSelectionStart: number,
     _KeymanWebSelectionEnd: number,
-
-    styleSheet: CSSStyleDeclaration,    // Extension of IE.  TS ignores it because of this.
-    unSelectable: string,
 
     // Touch element extensions
     base: HTMLElement,                  // Refers to the aliased element.  Is a property of the alias.
@@ -35,15 +25,11 @@ interface Element {
 
 interface CSSStyleDeclaration {
     MozBoxSizing: any,
+    // For legacy 'selection' management.
     MozUserSelect: any,
     KhtmlUserSelect: any,
     UserSelect: any,
     WebkitUserSelect: any
-}
-
-interface HTMLStyleElement {
-    filter: any,                        // More IE-specific fields.
-    zoom: any
 }
 
 interface KeyboardEvent {

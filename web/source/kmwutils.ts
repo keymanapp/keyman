@@ -440,7 +440,7 @@ class Util {
   /**
    * Default mouse down event handler (to replace multiple inline handlers) (Build 360)   
    */
-  mouseDownPreventDefaultHandler = function(e: MouseEvent) {
+  mouseDownPreventDefaultHandler(e: MouseEvent) {
     if(e) {
       e.preventDefault();
     }
@@ -449,11 +449,10 @@ class Util {
   _CreateElement<Ele extends HTMLElement>(nodeName:string): Ele { 
     var e = document.createElement(nodeName) as Ele;
 
-    // Make element unselectable (Internet Explorer)
-    if (typeof e.onselectstart != 'undefined') { //IE route
-      e.unSelectable='on';
-      e.onselectstart=this.selectStartHandler; // Build 360
-    } else { // And for well-behaved browsers (may also work for IE9+, but not necessary)
+    // Make element unselectable (modern route)
+    if (typeof e.onselectstart != 'undefined') {
+      e.onselectstart=this.selectStartHandler; // Build 360, works with IE 9+.
+    } else { // And for legacy browsers
       e.style.MozUserSelect="none";
       e.style.KhtmlUserSelect="none";
       e.style.UserSelect="none";
@@ -700,21 +699,11 @@ class Util {
    */       
   rgba(s: HTMLStyleElement, r:number, g:number, b:number, a:number): string {
     var bgColor='transparent';
-    if(this._GetIEVersion() < 9) {
-      var pcOpacity=Math.floor(100*a), rs=r.toString(16), gs=g.toString(16), bs=b.toString(16), hexColor;
-      rs=('00'+rs).substr(-2);
-      gs=('00'+gs).substr(-2);
-      bs=('00'+bs).substr(-2);
-      hexColor=pcOpacity+rs+gs+bs;
-      s.filter='progid:DXImageTransform.Microsoft.gradient(startColorstr=#'+hexColor+',endColorstr=#'+hexColor+')';
-      s.zoom='1';
-    } else {
-      try {
-        bgColor='rgba('+r+','+g+','+b+','+a+')';
-      } catch(ex) {
-        bgColor='rgb('+r+','+g+','+b+')';
-      }
-    }
+    try {
+      bgColor='rgba('+r+','+g+','+b+','+a+')';
+    } catch(ex) {
+      bgColor='rgb('+r+','+g+','+b+')';
+    }    
 
     return bgColor;
   }
@@ -729,11 +718,7 @@ class Util {
     var _ElemStyle: HTMLStyleElement = <HTMLStyleElement>document.createElement<'style'>('style'); 
 
     _ElemStyle.type = 'text/css';
-    if(_ElemStyle.styleSheet) { // IE only
-      _ElemStyle.styleSheet.cssText = s;
-    } else {                    // all other browsers
-      _ElemStyle.appendChild(document.createTextNode(s));
-    }
+    _ElemStyle.appendChild(document.createTextNode(s));
 
     var _ElemHead=document.getElementsByTagName('HEAD'); 
     if(_ElemHead.length > 0) {
