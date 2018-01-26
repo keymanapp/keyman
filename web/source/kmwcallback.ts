@@ -124,7 +124,7 @@ class KeyboardInterface {
       DOMEventHandlers.states._IgnoreNextSelChange = 100;
       this.keymanweb.domManager.focusLastActiveElement();
       
-      if(Lelem instanceof HTMLIFrameElement && this.keymanweb.domManager._IsMozillaEditableIframe(Lelem,0)) {
+      if(Util.instanceof(Lelem, "HTMLIFrameElement") && this.keymanweb.domManager._IsMozillaEditableIframe(Lelem as HTMLIFrameElement,0)) {
         Lelem = (<any>Lelem).documentElement;  // I3363 (Build 301)
       }
 
@@ -358,9 +358,11 @@ class KeyboardInterface {
   beep(Pelem: HTMLElement|Document): void {
     this.resetContextCache();
     
-    if(Pelem instanceof Document) {
-      Pelem=Pelem.body; // I1446 - beep sometimes fails to flash when using OSK and rich control
+    if(Util.instanceof(Pelem, "Document")) {
+      Pelem=(Pelem as Document).body; // I1446 - beep sometimes fails to flash when using OSK and rich control
     }
+
+    Pelem = Pelem as HTMLElement; // After previous block, true.
     
     if(!Pelem.style || typeof(Pelem.style.backgroundColor)=='undefined') {
       return;
@@ -885,8 +887,12 @@ class KeyboardInterface {
       return Pelem._KeymanWebSelectionStart;
     
     // Mozilla, IE9 
-    else if ((Pelem instanceof HTMLInputElement || Pelem instanceof HTMLTextAreaElement) && Pelem.setSelectionRange)  
-      return Pelem.value.substr(0,Pelem.selectionStart)._kmwLength();        
+    else if (Util.instanceof(Pelem, "HTMLInputElement") || Util.instanceof(Pelem, "HTMLTextAreaElement")) {
+      var inputEle = Pelem as HTMLInputElement|HTMLTextAreaElement;
+      if(inputEle.setSelectionRange) {
+        return inputEle.value.substr(0, inputEle.selectionStart)._kmwLength();
+      }
+    }
   
     // contentEditable elements, Mozilla midas
     else if((Ldv=Pelem.ownerDocument)  &&  (Ldv=Ldv.defaultView)  &&  Ldv.getSelection

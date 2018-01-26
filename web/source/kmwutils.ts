@@ -361,8 +361,9 @@ class Util {
     }
     
     if(Lobj instanceof Document) {
-      if(Lobj && Lobj.defaultView && Lobj.defaultView.frameElement) {
-        return Lcurleft + this._GetAbsoluteX(<HTMLElement>Lobj.defaultView.frameElement) - Lobj.documentElement.scrollLeft;
+      var Ldoc = Lobj as Document;
+      if(Ldoc && Ldoc.defaultView && Ldoc.defaultView.frameElement) {
+        return Lcurleft + this._GetAbsoluteX(<HTMLElement>Ldoc.defaultView.frameElement) - Ldoc.documentElement.scrollLeft;
       }
     }
     return Lcurleft;
@@ -386,7 +387,7 @@ class Util {
     var Lcurtop = Pobj.offsetTop ? Pobj.offsetTop : 0;
     Lobj = Pobj;  // I2404 - Support for IFRAMEs
 
-    if (Lobj instanceof HTMLElement) {
+    if (Util.instanceof(Lobj, "HTMLElement")) {
       var ele = <HTMLElement> Lobj;
       while (ele.offsetParent) {
         Lobj = ele = <HTMLElement>ele.offsetParent;
@@ -400,8 +401,9 @@ class Util {
     }
     
     if(Lobj instanceof Document) {
-      if(Lobj && Lobj.defaultView && Lobj.defaultView.frameElement) {
-        return Lcurtop + this._GetAbsoluteY(<HTMLElement>Lobj.defaultView.frameElement) - Lobj.documentElement.scrollTop;
+      var Ldoc = Lobj as Document;
+      if(Ldoc && Ldoc.defaultView && Ldoc.defaultView.frameElement) {
+        return Lcurtop + this._GetAbsoluteY(<HTMLElement>Ldoc.defaultView.frameElement) - Ldoc.documentElement.scrollTop;
       }
     }
     return Lcurtop;
@@ -1305,5 +1307,36 @@ class Util {
     }
 
     return this.checkFont(fd);
+  }
+
+  /**
+   * Checks the type of an input DOM-related object while ensuring that it is checked against the correct prototype,
+   * as class prototypes are (by specification) scoped upon the owning Window.
+   * 
+   * See https://stackoverflow.com/questions/43587286/why-does-instanceof-return-false-on-chrome-safari-and-edge-and-true-on-firefox
+   * for more details.
+   * 
+   * @param {Element|Event}   Pelem       An element of the web page or one of its IFrame-based subdocuments.
+   * @param {string}          className   The plain-text name of the expected Element type.
+   * @return {boolean}
+   */
+  static instanceof(Pelem: Node|Event|Window, className: string): boolean {
+    var scopedClass;
+
+    if (Pelem['Window']) { // Window objects contain the class definitions for types held within them.  So, we can check for those.
+      return className == 'Window';
+    } else if (Pelem['defaultView']) { // Covers Document.
+      scopedClass = Pelem['defaultView'][className];
+    } else if(Pelem['ownerDocument']) {
+      scopedClass = (Pelem as Node).ownerDocument.defaultView[className];
+    } else if(Pelem['target']) {
+      scopedClass = ((Pelem as Event).target as Element).ownerDocument.defaultView[className];
+    }
+
+    if(scopedClass) {
+      return Pelem instanceof scopedClass;
+    } else {
+      return false;
+    }
   }
 }

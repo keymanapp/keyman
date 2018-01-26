@@ -275,15 +275,16 @@ class DOMManager {
       xs.webkitTapHighlightColor='rgba(0,0,0,0)';
     }
 
-    if(x.base instanceof HTMLTextAreaElement) {
+    if(Util.instanceof(x.base, "HTMLTextAreaElement")) {
       // Correct rows value if defaulted and box height set by CSS
       // The rows value is used when setting the caret vertically
+      var baseEle = x.base as HTMLTextAreaElement;
 
-      if(x.base.rows == 2) { // 2 is default value
+      if(baseEle.rows == 2) { // 2 is default value
         var h=parseInt(bs.height,10)-parseInt(bs.paddingTop,10)-parseInt(bs.paddingBottom,10),
           dh=parseInt(bs.fontSize,10),calcRows=Math.round(h/dh);
-        if(calcRows > x.base.rows+1) {
-          x.base.rows=calcRows;
+        if(calcRows > baseEle.rows+1) {
+          baseEle.rows=calcRows;
         }
       }
       ds.width=xs.width; ds.minHeight=xs.height;
@@ -314,8 +315,9 @@ class DOMManager {
 
     var textValue: string;
 
-    if(x.base instanceof HTMLTextAreaElement || x.base instanceof HTMLInputElement) {
-      textValue = x.base.value;
+    if(Util.instanceof(x.base, "HTMLTextAreaElement") || Util.instanceof(x.base, "HTMLInputElement")) {
+      var baseEleWithVal = x.base as HTMLTextAreaElement|HTMLInputElement;
+      textValue = baseEleWithVal.value;
     } else {
       textValue = x.base.textContent;
     }
@@ -401,8 +403,8 @@ class DOMManager {
   enableInputElement(Pelem: HTMLElement, isAlias?: boolean) { 
     var baseElement = isAlias ? Pelem['base'] : Pelem;
     if(!this.isKMWDisabled(baseElement)) {
-      if(Pelem instanceof HTMLIFrameElement) {
-        this._AttachToIframe(Pelem);
+      if(Util.instanceof(Pelem, "HTMLIFrameElement")) {
+        this._AttachToIframe(Pelem as HTMLIFrameElement);
       } else { 
         baseElement.className = baseElement.className ? baseElement.className + ' keymanweb-font' : 'keymanweb-font';
         this.inputList.push(Pelem);
@@ -429,8 +431,8 @@ class DOMManager {
   disableInputElement(Pelem: HTMLElement, isAlias?: boolean) { 
     var baseElement = isAlias ? Pelem['base'] : Pelem;
     // Do NOT test for pre-disabledness - we also use this to fully detach without officially 'disabling' via kmw-disabled.
-    if(Pelem instanceof HTMLIFrameElement) {
-      this._DetachFromIframe(Pelem);
+    if(Util.instanceof(Pelem, "HTMLIFrameElement")) {
+      this._DetachFromIframe(Pelem as HTMLIFrameElement);
     } else { 
       var cnIndex = baseElement.className.indexOf('keymanweb-font');
       if(cnIndex > 0 && !isAlias) { // See note about the alias below.
@@ -559,13 +561,17 @@ class DOMManager {
   isKMWInput(x: HTMLElement): boolean {
     var touchable = this.keyman.util.device.touchable;
 
-    if(x instanceof HTMLTextAreaElement) {
+    if(Util.instanceof(x, "HTMLTextAreaElement")) {
+      return true;
+    } else if(Util.instanceof(x, "HTMLInputElement")) { 
+      var inputEle = x as HTMLInputElement;  
+      if (inputEle.type == 'text' || inputEle.type == 'search') {
         return true;
-    } else if(x instanceof HTMLInputElement && (x.type == 'text' || x.type == 'search')) {
-        return true;  
-    } else if(x instanceof HTMLIFrameElement && !touchable) { // Do not allow iframe attachment if in 'touch' mode.
+      }
+    } else if(Util.instanceof(x, "HTMLIFrameElement") && !touchable) { // Do not allow iframe attachment if in 'touch' mode.
+      var iframeEle = x as HTMLIFrameElement;
       try {
-        if(x.contentWindow.document) {  // Only allow attachment if the iframe's internal document is valid.
+        if(iframeEle.contentWindow.document) {  // Only allow attachment if the iframe's internal document is valid.
           return true;
         }
       }
@@ -678,11 +684,10 @@ class DOMManager {
 
     var possibleInputs = [];
 
-    if(Pelem instanceof HTMLElement) {
-      var tagName = Pelem.tagName.toLowerCase();
-      if(tagName == 'input' || tagName == 'textarea' || tagName == 'iframe') {
-        possibleInputs.push(Pelem);
-      }
+    if(Util.instanceof(Pelem, "HTMLInputElement") || Util.instanceof(Pelem, "HTMLTextAreaElement")) {
+      possibleInputs.push(Pelem);
+    } else if(Util.instanceof(Pelem, "HTMLIFrameElement")) {
+      possibleInputs.push(Pelem);
     } else if(Pelem.nodeName == "#text") {
       return [];
     }
@@ -709,7 +714,7 @@ class DOMManager {
       possibleInputs = possibleInputs.concat(util.arrayFromNodeList(Pelem.querySelectorAll('[contenteditable]')));
     }
     
-    if(Pelem instanceof HTMLElement && Pelem.isContentEditable) {
+    if(Util.instanceof(Pelem, "HTMLElement") && (Pelem as HTMLElement).isContentEditable) {
       possibleInputs.push(Pelem);
     }
 
@@ -770,8 +775,8 @@ class DOMManager {
           this.getHandlers(Ptarg).setTextCaret(Ptarg,10000);
         }
       } else {
-        if(Ptarg instanceof HTMLInputElement || Ptarg instanceof HTMLTextAreaElement) {
-          if(Ptarg.value.length == 0) {
+        if(Util.instanceof(Ptarg, "HTMLInputElement") || Util.instanceof(Ptarg, "HTMLTextAreaElement")) {
+          if((Ptarg as HTMLInputElement|HTMLTextAreaElement).value.length == 0) {
             Ptarg.dir=elDir;
           }
         } else if(typeof Ptarg.textContent == "string" && Ptarg.textContent.length == 0) { // As with contenteditable DIVs, for example.
@@ -920,8 +925,8 @@ class DOMManager {
       // 'readonly' triggers on whether or not the attribute exists, not its value.
       if(!disabledAfter && mutation.attributeName == "readonly") {
         var readonlyBefore = mutation.oldValue ? mutation.oldValue != null : false;
-        if(mutation.target instanceof HTMLInputElement || mutation.target instanceof HTMLTextAreaElement) {
-          var readonlyAfter = mutation.target.readOnly;
+        if(Util.instanceof(mutation.target, "HTMLInputElement") || Util.instanceof(mutation.target, "HTMLTextAreaElement")) {
+          var readonlyAfter = (mutation.target as HTMLInputElement|HTMLTextAreaElement).readOnly;
 
           if(readonlyBefore && !readonlyAfter) {
             this._EnableControl(mutation.target);
@@ -990,7 +995,7 @@ class DOMManager {
    * 
    */
   _MutationAdditionObserved = function(Pelem: HTMLElement) {
-    if(Pelem instanceof HTMLIFrameElement && !this.keyman.util.device.touchable) {
+    if(Util.instanceof(Pelem, "HTMLIFrameElement") && !this.keyman.util.device.touchable) {
       //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
 
       var domManager = this;
@@ -1007,7 +1012,7 @@ class DOMManager {
       * keymanweb.domManager.attachToControl() is now idempotent, so even if our call 'whiffs', it won't cause long-lasting
       * problems.
       */
-      if(Pelem.contentDocument.readyState == 'complete') {
+      if((Pelem as HTMLIFrameElement).contentDocument.readyState == 'complete') {
         attachFunctor();
       }
     } else {
@@ -1116,7 +1121,7 @@ class DOMManager {
       Plc = null;
     }
 
-    if(Pelem instanceof HTMLIFrameElement) {
+    if(Util.instanceof(Pelem, "HTMLIFrameElement")) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
     }
@@ -1187,7 +1192,8 @@ class DOMManager {
     }
 
     this.keyman.uiManager.justActivated = true;
-    if(lastElem instanceof HTMLIFrameElement && this.keyman.domManager._IsMozillaEditableIframe(lastElem,0)) {
+    if(Util.instanceof(lastElem, "HTMLIFrameElement") && 
+        this.keyman.domManager._IsMozillaEditableIframe(lastElem as HTMLIFrameElement,0)) {
       (<any>lastElem).defaultView.focus(); // I3363 (Build 301)
     } else if(lastElem.focus) {
       lastElem.focus();
