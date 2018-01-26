@@ -360,7 +360,7 @@ class Util {
       Lobj=Lobj.ownerDocument;   // I2404 - Support for IFRAMEs
     }
     
-    if(Lobj instanceof Document) {
+    if(Util.instanceof(Lobj, "Document")) {
       var Ldoc = Lobj as Document;
       if(Ldoc && Ldoc.defaultView && Ldoc.defaultView.frameElement) {
         return Lcurleft + this._GetAbsoluteX(<HTMLElement>Ldoc.defaultView.frameElement) - Ldoc.documentElement.scrollLeft;
@@ -400,7 +400,7 @@ class Util {
       Lobj=Lobj.ownerDocument;   // I2404 - Support for IFRAMEs
     }
     
-    if(Lobj instanceof Document) {
+    if(Util.instanceof(Lobj, "Document")) {
       var Ldoc = Lobj as Document;
       if(Ldoc && Ldoc.defaultView && Ldoc.defaultView.frameElement) {
         return Lcurtop + this._GetAbsoluteY(<HTMLElement>Ldoc.defaultView.frameElement) - Ldoc.documentElement.scrollTop;
