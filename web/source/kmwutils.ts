@@ -1326,8 +1326,8 @@ class Util {
   }
 
   /**
-   * Checks the type of an input HTMLElement while ensuring that it is checked against the correct prototype,
-   * as class prototypes are (by specification) scoped upon the owning document.
+   * Checks the type of an input DOM-related object while ensuring that it is checked against the correct prototype,
+   * as class prototypes are (by specification) scoped upon the owning Window.
    * 
    * See https://stackoverflow.com/questions/43587286/why-does-instanceof-return-false-on-chrome-safari-and-edge-and-true-on-firefox
    * for more details.
