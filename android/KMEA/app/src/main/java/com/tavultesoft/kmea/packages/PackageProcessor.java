@@ -10,6 +10,7 @@ import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.ZipUtils;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -116,26 +117,33 @@ public class PackageProcessor {
   public static Map<String, String>[] processKeyboardsEntry(JSONObject jsonKeyboard, String packageId) throws JSONException {
     JSONArray languages = jsonKeyboard.getJSONArray("languages");
 
-    HashMap<String, String>[] keyboards = new HashMap[languages.length()];
 
-    for(int i=0; i < languages.length(); i++) {
-      keyboards[i] = new HashMap<>();
-      keyboards[i].put(KMManager.KMKey_PackageID, packageId);
-      keyboards[i].put(KMManager.KMKey_KeyboardName, jsonKeyboard.getString("name"));
-      keyboards[i].put(KMManager.KMKey_KeyboardID, jsonKeyboard.getString("id"));
-      keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
-      keyboards[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
-      keyboards[i].put(KMManager.KMKey_KeyboardVersion, jsonKeyboard.getString("version"));
-      keyboards[i].put(KMManager.KMKey_Font, jsonKeyboard.getString("displayFont"));
-      if (jsonKeyboard.has("oskFont")) {
-        keyboards[i].put(KMManager.KMKey_OskFont, jsonKeyboard.getString("oskFont"));
+    String keyboardId = jsonKeyboard.getString("id");
+    if (touchKeyboardExists(packageId, keyboardId)) {
+      HashMap<String, String>[] keyboards = new HashMap[languages.length()];
+
+      for (int i = 0; i < languages.length(); i++) {
+        keyboards[i] = new HashMap<>();
+        keyboards[i].put(KMManager.KMKey_PackageID, packageId);
+        keyboards[i].put(KMManager.KMKey_KeyboardName, jsonKeyboard.getString("name"));
+        keyboards[i].put(KMManager.KMKey_KeyboardID, jsonKeyboard.getString("id"));
+        keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
+        keyboards[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
+        keyboards[i].put(KMManager.KMKey_KeyboardVersion, jsonKeyboard.getString("version"));
+        if (jsonKeyboard.has("displayFont")) {
+          keyboards[i].put(KMManager.KMKey_Font, jsonKeyboard.getString("displayFont"));
+        }
+        if (jsonKeyboard.has("oskFont")) {
+          keyboards[i].put(KMManager.KMKey_OskFont, jsonKeyboard.getString("oskFont"));
+        }
+
+        // For now, all KMP distributed keyboards are custom
+        keyboards[i].put(KMManager.KMKey_CustomKeyboard, "Y");
       }
-
-      // For now, all KMP distributed keyboards are custom
-      keyboards[i].put(KMManager.KMKey_CustomKeyboard, "Y");
+      return keyboards;
+    } else {
+      return null;
     }
-
-    return keyboards;
   }
 
   public static String getKeyboardVersion(JSONObject json, String kbdId) throws JSONException {
@@ -273,6 +281,29 @@ public class PackageProcessor {
     return compRes == compValue;
   }
 
+  static boolean touchKeyboardExists(final String packageId, final String keyboardId) {
+    if (resourceRoot != null) {
+      FileFilter touchKeyboardFilter = new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+          if (pathname.isFile() && pathname.getName().startsWith(keyboardId) && pathname.getName().endsWith(".js")) {
+            return true;
+          }
+          return false;
+        }
+      };
+
+      File kmpFile = new File(packageId + ".kmp");
+      File packageDir = constructPath(kmpFile, false);
+      File[] files = packageDir.listFiles(touchKeyboardFilter);
+      if (files.length > 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   /**
    * The master KMP processing method; use after a .kmp download to fully install within the filesystem.
    * @param path Filepath of a newly downloaded .kmp file.
@@ -361,8 +392,9 @@ public class PackageProcessor {
 
     for(int i=0; i < keyboards.length(); i++) {
       Map<String, String>[] kbds = processKeyboardsEntry(keyboards.getJSONObject(i), packageId);
-
-      keyboardSpecs.addAll(Arrays.asList(kbds));
+      if (kbds != null) {
+        keyboardSpecs.addAll(Arrays.asList(kbds));
+      }
     }
 
     return keyboardSpecs;

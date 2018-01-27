@@ -125,14 +125,15 @@ public class PackageProcessorTest {
   @Test
   public void test_load_GFF_KMP_keyboards() throws Exception {
     JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
+    FileUtils.moveDirectory(tempPkg, TEST_GFF_KMP_TARGET);
 
     Assert.assertNotNull(json);
 
-    Map<String, String>[] keyboards = PackageProcessor.processKeyboardsEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test");
+    Map<String, String>[] keyboards = PackageProcessor.processKeyboardsEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json");
     Assert.assertEquals(2, keyboards.length);
 
     HashMap<String, String> amharic = new HashMap<String, String>();
-    amharic.put(KMManager.KMKey_PackageID, "gff_amh_7_test");
+    amharic.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");
     amharic.put(KMManager.KMKey_KeyboardName, "Amharic");
     amharic.put(KMManager.KMKey_KeyboardID, "gff_amh_7");
     amharic.put(KMManager.KMKey_LanguageID, "am");
@@ -145,7 +146,7 @@ public class PackageProcessorTest {
     Assert.assertEquals(amharic, keyboards[0]);
 
     HashMap<String, String> geez = new HashMap<String, String>();
-    geez.put(KMManager.KMKey_PackageID, "gff_amh_7_test");
+    geez.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");
     geez.put(KMManager.KMKey_KeyboardName, "Amharic");
     geez.put(KMManager.KMKey_KeyboardID, "gff_amh_7");
     geez.put(KMManager.KMKey_LanguageID, "gez");

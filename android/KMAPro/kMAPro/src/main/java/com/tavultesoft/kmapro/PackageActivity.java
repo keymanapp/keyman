@@ -3,7 +3,9 @@ package com.tavultesoft.kmapro;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -18,7 +20,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardEventHandler;
@@ -31,13 +32,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class PackageActivity extends Activity{
+public class PackageActivity extends Activity {
 
   private WebView webView;
+  private AlertDialog alertDialog;
   private File kmpFile;
   private File tempPackagePath;
   private List<Map<String, String>> installedPackageKeyboards;
-
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
@@ -53,19 +54,15 @@ public class PackageActivity extends Activity{
     final String pkgId = PackageProcessor.getPackageName(kmpFile);
     String version = PackageProcessor.getPackageVersion(kmpFile, false);
     if (version == null || version.isEmpty()) {
-      String errorStr = "Invalid package version in " + kmpFile.getName();
-      Toast.makeText(context, errorStr, Toast.LENGTH_SHORT).show();
-      Log.d("PackageActivity", errorStr);
-      finish();
+      String message = "Invalid package version in " + kmpFile.getName();
+      showErrorDialog(context, pkgId, message);
     }
 
     try {
       tempPackagePath = PackageProcessor.unzipKMP(kmpFile);
     } catch (Exception e) {
-      String errorStr = "Failed to extract\n" + kmpFile.getAbsolutePath();
-      Toast.makeText(context, errorStr, Toast.LENGTH_SHORT).show();
-      Log.e("PackageActivity", errorStr);
-      finish();
+      String message = "Failed to extract\n" + kmpFile.getAbsolutePath();
+      showErrorDialog(context, pkgId, message);
     }
 
     final ActionBar actionBar = getActionBar();
@@ -74,17 +71,17 @@ public class PackageActivity extends Activity{
     actionBar.setDisplayShowTitleEnabled(false);
     actionBar.setDisplayShowCustomEnabled(true);
     actionBar.setBackgroundDrawable(MainActivity.getActionBarDrawable(this));
-    TextView packgeActivityTitle = new TextView(this);
-    packgeActivityTitle.setWidth((int) getResources().getDimension(R.dimen.package_label_width));
-    packgeActivityTitle.setTextSize(getResources().getDimension(R.dimen.package_label_textsize));
-    packgeActivityTitle.setGravity(Gravity.CENTER);
+    TextView packageActivityTitle = new TextView(this);
+    packageActivityTitle.setWidth((int) getResources().getDimension(R.dimen.package_label_width));
+    packageActivityTitle.setTextSize(getResources().getDimension(R.dimen.package_label_textsize));
+    packageActivityTitle.setGravity(Gravity.CENTER);
 
     String titleStr = "Install Keyboard Package";
     if (version != null) {
       titleStr += " " + version;
     }
-    packgeActivityTitle.setText(titleStr);
-    actionBar.setCustomView(packgeActivityTitle);
+    packageActivityTitle.setText(titleStr);
+    actionBar.setCustomView(packageActivityTitle);
 
     setContentView(R.layout.activity_package_installer);
 
@@ -159,20 +156,19 @@ public class PackageActivity extends Activity{
           installedPackageKeyboards = PackageProcessor.processKMP(kmpFile);
           // Do the notifications!
           boolean success = installedPackageKeyboards.size() != 0;
-          if(success) {
+          if (success) {
             notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
-            if(installedPackageKeyboards != null) {
+            if (installedPackageKeyboards != null) {
               notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
             }
+            cleanup();
           } else {
-            Toast.makeText(context, "No new keyboards installed", Toast.LENGTH_SHORT).show();
-            Log.d("PackageActivity", "Package install returned no updated keyboards!");
+            showErrorDialog(context, pkgId, "No new touch-optimized keyboards to install");
           }
 
         } catch (Exception e) {
           Log.e("PackageActivity", "Error " + e);
-        } finally {
-          cleanup();
+          showErrorDialog(context, pkgId, "No valid touch-optimized keyboards to install");
         }
       }
     });
@@ -183,8 +179,14 @@ public class PackageActivity extends Activity{
         cleanup();
       }
     });
+  }
 
-
+  @Override
+  public void onDestroy(){
+    super.onDestroy();
+    if ( alertDialog !=null && alertDialog.isShowing() ){
+      alertDialog.dismiss();
+    }
   }
 
   private void cleanup() {
@@ -211,6 +213,26 @@ public class PackageActivity extends Activity{
   public void onBackPressed() {
     finish();
     overridePendingTransition(0, android.R.anim.fade_out);
+  }
+
+  private void showErrorDialog(Context context, String pkgId, String message) {
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+
+    alertDialogBuilder.setTitle("Package " + pkgId + " failed to install");
+    alertDialogBuilder
+      .setMessage(message)
+      .setCancelable(false)
+      .setNeutralButton("Close",new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog,int id) {
+          if (dialog != null) {
+            dialog.dismiss();
+          }
+          cleanup();
+        }
+      });
+
+    alertDialog = alertDialogBuilder.create();
+    alertDialog.show();
   }
 
   void notifyPackageInstallListeners(KeyboardEventHandler.EventType eventType, List<Map<String, String>> keyboards, int result) {

@@ -27,7 +27,6 @@
     <string name="hint_url" translatable="false">Url</string>
 
     <!-- Keyboard Package strings -->
-    <string name="title_install_package" translatable="false">Install Keyboard/Package</string>
     <string name="label_cancel" translatable="false">Cancel</string>
     <string name="label_install" translatable="false">Install</string>
 
