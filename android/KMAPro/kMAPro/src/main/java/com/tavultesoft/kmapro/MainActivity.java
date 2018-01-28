@@ -262,7 +262,10 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           try {
             FileUtils.copy(kmpFile, cacheKmpFile);
           } catch (Exception e) {
-            Log.e("onResume", "Copy failed: " + e);
+            String message = "Access denied to " + kmpFile.getName() +
+              ".\nCheck Android Settings --> Apps --> Keyman to grant storage permissions";
+            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            Log.e("onResume", message + ". Error: " + e);
             intent.setData(null);
             return;
           }
