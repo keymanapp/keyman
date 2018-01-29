@@ -56,12 +56,13 @@ type
     FKMXFiles: array of TKeyboardInfoMap;
     FJSFileData: string;
     FVersion: string;
+    FSourcePath: string;
     function Failed(message: string): Boolean;
     function Execute: Boolean; overload;
     function LoadJsonFile: Boolean;
     function LoadKMPFile: Boolean;
     function LoadJSFile: Boolean;
-    constructor Create(AJsFile, AKmpFile, AJsonFile: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback);
+    constructor Create(ASourcePath, AJsFile, AKmpFile, AJsonFile: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback);
     procedure AddAuthor;
     procedure AddAuthorEmail;
     procedure CheckOrAddEncodings;
@@ -78,9 +79,10 @@ type
     function SaveJsonFile: Boolean;
     procedure CheckKMXFilenames;
     procedure AddIsRTL;
+    procedure AddSourcePath;
   public
     destructor Destroy; override;
-    class function Execute(AJsFile, AKmpFile, AJsonFile: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean; overload;
+    class function Execute(ASourcePath, AJsFile, AKmpFile, AJsonFile: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean; overload;
   end;
 
 implementation
@@ -102,10 +104,10 @@ type
 
 { TMergeKeyboardInfo }
 
-class function TMergeKeyboardInfo.Execute(AJsFile, AKmpFile, AJsonFile: string;
+class function TMergeKeyboardInfo.Execute(ASourcePath, AJsFile, AKmpFile, AJsonFile: string;
   AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean;
 begin
-  with TMergeKeyboardInfo.Create(AJsFile, AKmpFile, AJsonFile, AMergingValidateIds, ASilent, ACallback) do
+  with TMergeKeyboardInfo.Create(ASourcePath, AJsFile, AKmpFile, AJsonFile, AMergingValidateIds, ASilent, ACallback) do
   try
     Result := Execute;
   finally
@@ -113,11 +115,12 @@ begin
   end;
 end;
 
-constructor TMergeKeyboardInfo.Create(AJsFile, AKmpFile, AJsonFile: string;
+constructor TMergeKeyboardInfo.Create(ASourcePath, AJsFile, AKmpFile, AJsonFile: string;
   AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback);
 begin
   inherited Create;
 
+  FSourcePath := ASourcePath;
   FMergingValidateIds := AMergingValidateIds;
   FSilent := ASilent;
   FCallback := ACallback;
@@ -165,6 +168,7 @@ begin
     AddAuthor;
     AddAuthorEmail;
     AddLastModifiedDate;
+    AddSourcePath;
 
     CheckOrAddVersion;  // must be called before CheckOrAddJsFilename
 
@@ -726,6 +730,20 @@ begin
   end;
 
   json.AddPair('platformSupport', v);
+end;
+
+//
+// Add sourcePath field, from commandline parameter
+//
+procedure TMergeKeyboardInfo.AddSourcePath;
+begin
+  if FSourcePath = '' then
+    Exit;
+
+  if not TRegEx.IsMatch(FSourcePath, '^(release|legacy|experimental)\/.+\/.+$') then
+    raise EInvalidKeyboardInfo.CreateFmt('The source path "%s" is an invalid format, '+
+      'expecting "(release|legacy|experimental)/n/name".', [FSourcePath]);
+  json.AddPair('sourcePath', FSourcePath);
 end;
 
 procedure TMergeKeyboardInfo.CheckKMXFilenames;
