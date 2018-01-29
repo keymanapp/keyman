@@ -6,6 +6,9 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+#ifndef KMCompStore_h
+#define KMCompStore_h
+
 #import <Foundation/Foundation.h>
 #import "KMBinaryFileFormat.h"
 
@@ -19,3 +22,5 @@
 - (void)setDwSystemID:(DWORD)dwID;
 
 @end
+
+#endif /* KMCompStore_h */

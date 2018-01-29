@@ -6,6 +6,9 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+#ifndef KMXFile_h
+#define KMXFile_h
+
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 #import "KMBinaryFileFormat.h"
@@ -44,3 +47,5 @@ extern NSString *const kKMVisualKeyboardKey;
 + (NSDictionary *)infoDictionaryFromFilePath:(NSString *)path;
 
 @end
+
+#endif /* KMXFile_h */

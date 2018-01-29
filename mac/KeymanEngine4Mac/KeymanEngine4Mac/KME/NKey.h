@@ -6,6 +6,9 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+#ifndef NKey_h
+#define NKey_h
+
 #import <Foundation/Foundation.h>
 #import "KMBinaryFileFormat.h"
 
@@ -18,3 +21,5 @@
 @property (strong, nonatomic) NSImage *bitmap;
 
 @end
+
+#endif /* NKey_h */

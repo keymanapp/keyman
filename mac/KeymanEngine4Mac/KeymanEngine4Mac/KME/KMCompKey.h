@@ -6,6 +6,9 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+#ifndef KMCompKey_h
+#define KMCompKey_h
+
 #import <Foundation/Foundation.h>
 #import "KMBinaryFileFormat.h"
 
@@ -18,3 +21,5 @@
 @property (strong, nonatomic) NSString *context;
 
 @end
+
+#endif /* KMCompKey_h */
