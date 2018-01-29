@@ -18,13 +18,35 @@ display_usage ( ) {
     echo ""
     echo "  -? | -h | -help   to display this help information"
     echo ""
-    echo "                    Specifying no option will perform a simple, single run of the test cases."
+    echo "                    Specifying no option will perform a simple, single run of the test cases on"
+    echo "                    the dominant set of browsers for the currently-detected active OS."
     echo ""
     exit 0
 }
 
+# Designed to determine which set of browsers should be available for local testing,
+# based upon the current system OS.
+get_config_OS_id ( ) {
+  # Subject to change with future improvements.
+  if [[ "${OSTYPE}" = "darwin"* ]]; then
+    config_os_id="mac"
+  elif [[ "${OSTYPE}" = "msys" ]]; then
+    config_os_id="win"
+  elif [[ "${OSTYPE}" = "cygwin" ]]; then
+    config_os_id="win"
+  fi
+  
+  # We mostly care about platform-independent browser coverage with Linux;
+  # this will look for just Chrome and Firefox.
+  if [ -z $OSTYPE ]; then
+    config_os_id="linux"
+  fi
+}
+
 # Defaults
-CONFIG=manual.conf.js  # TODO - get/make OS-specific version
+get_config_OS_id
+
+CONFIG=manual.${config_os_id}.conf.js  # TODO - get/make OS-specific version
 DEBUG=false
 FLAGS=
 

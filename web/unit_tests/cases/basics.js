@@ -1,6 +1,6 @@
 var assert = chai.assert;
 
-describe('KeymanWeb Initialization', function() {
+describe('Basic KeymanWeb', function() {
 
   beforeEach(function(done) {
     this.timeout(10000);
@@ -31,7 +31,7 @@ describe('KeymanWeb Initialization', function() {
 
 Modernizr.on('touchevents', function(result) {
   if(!result) {
-    describe('Toggle UI Initialization', function() {
+    describe('Basic Toggle UI', function() {
 
       beforeEach(function(done) {
         this.timeout(10000);
@@ -66,7 +66,7 @@ Modernizr.on('touchevents', function(result) {
       })
     });
 
-    describe('Button UI Initialization', function() {
+    describe('Basic Button UI', function() {
 
       beforeEach(function(done) {
         this.timeout(10000);
@@ -88,7 +88,7 @@ Modernizr.on('touchevents', function(result) {
       })
     });
 
-    describe('Float UI Initialization', function() {
+    describe('Basic Float UI', function() {
 
       beforeEach(function(done) {
         this.timeout(10000);
@@ -123,7 +123,7 @@ Modernizr.on('touchevents', function(result) {
       })
     });
 
-    describe('Toolbar UI Initialization', function() {
+    describe('Basic Toolbar UI', function() {
 
       beforeEach(function(done) {
         this.timeout(10000);
