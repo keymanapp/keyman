@@ -7,9 +7,8 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "KMInputMethodEventHandler.h"
-#import "KMInputMethodEventHandlerProtected.h"
 #import "KMInputMethodBrowserClientEventHandler.h"
+#import "KMInputMethodEventHandlerProtected.h"
 
 @interface KeymanTests : XCTestCase
 
