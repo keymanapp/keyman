@@ -41,7 +41,7 @@ extern NSString *const kKMVisualKeyboardKey;
 
 /*!
 * Provides an info dictionary from a KMX file which includes keyboard name, version, copyright information and keyboard icon.
-* \param path: KMX file path
+* \param 'path': KMX file path
 * \returns NSDictionary with keyboard name, version, copyright & icon.
 */
 + (NSDictionary *)infoDictionaryFromFilePath:(NSString *)path;
