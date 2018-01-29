@@ -5,10 +5,12 @@
 1. Install [VS2017 Community Edition](#visual-studio-2017-community-edition-setup-requirements).
 2. Install [Delphi 10.2](#delphi-setup-requirements).
 3. Install [git](https://git-scm.com/download/win).
-4. Add the Keyman root folder to antivirus exclusions for performance and file lock reasons (optional - but highly recommended).
-5. Start Delphi 10.2 IDE once after installation to create default environment files and ensure registration is complete.
-6. Set environment variables per [notes below](#environment-variables): `KEYMAN_ROOT`, `DELPHI_STARTER`, `USERDEFINES`, (`USE_PLUSMEMO`, `KEYMAN_ENCUMBERED_ROOT`).
-7. Add the **windows/lib** folder in the Keyman repository to your `PATH` environment variable (required for packages in Delphi).
+4. Follow steps in /web/README.md to install prerequisites for building KeymanWeb (included in Keyman Developer)
+5. Add the Keyman root folder to antivirus exclusions for performance and file lock reasons (optional - but highly recommended).
+6. Start Delphi 10.2 IDE once after installation to create default environment files and ensure registration is complete.
+7. Set environment variables per [notes below](#environment-variables): `KEYMAN_ROOT`, `DELPHI_STARTER`, `USERDEFINES`, 
+   `GIT_BASH_FOR_KEYMAN`, (`USE_PLUSMEMO`, `KEYMAN_ENCUMBERED_ROOT`).
+8. Add the **windows/lib** folder in the Keyman repository to your `PATH` environment variable (required for packages in Delphi).
 
 ### Release build prerequisites
 
@@ -103,13 +105,26 @@ work without changes. Otherwise, you will need to set an environment variable
 SET KEYMAN_ROOT=c:\projects\keyman
 ```
 
+### GIT_BASH_FOR_KEYMAN
+
+This environment variable is optional: the build will run bash in a separate window
+in order to build KeymanWeb if it isn't present, but you'll lose logging and have 
+the annoyance of a window popping up halfway through the build. To resolve both of
+those issues, set the environment variable to:
+
+```
+SET GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Program Files\Git\etc\profile" -l
+```
+
+You should verify the install location of Git on your computer as it may vary.
+
 ### DELPHI_STARTER - Building with Delphi Starter Edition
 
 Keyman can be built from the command line with Delphi Starter Edition. You will need
 to set the environment variable `DELPHI_STARTER` to enable a command line build with
 Delphi Starter Edition.
 
-However, there are three limitations:
+However, there are four limitations:
 
 1. As the command line compiler is not included in Delphi Starter Edition, the build 
    launches an instance of the IDE to run the build. This means that while you are doing
@@ -118,11 +133,14 @@ However, there are three limitations:
    full build from the command line, you should be able to build individual projects 
    within the IDE.
    
-2. Delphi Starter Edition does not include the x64 compiler, so tsysinfox64 will be 
-   copied from a binary already in the repository. tsysinfox64 is the only 64-bit
-   Delphi component.
+2. Delphi Starter Edition does not include the x64 compiler, impacting tsysinfo and
+   kmcomapi. tsysinfox64 will be copied from a binary already in the repository. 
+   The x64 version of kmcomapi.dll will not be skipped.
 
 3. The encumbered components cannot be built with Delphi Starter Edition.
+
+4. You cannot make a release build with Delphi Starter due to the missing x64 
+   components.
 
 ### USERDEFINES - User Defines
 

@@ -19,12 +19,30 @@ xml: pull-keymanweb
     cd $(ROOT)\src\developer\tike
 
 pull-keymanweb:
+    #
+    # Requires us to build KMW in order to get the output files
+    # If GIT_BASH_FOR_KEYMAN variable is not defined, then will just throw up
+    # a new window to do the build. This means we lose logging and 
+    # potentially exit values as well. So GIT_BASH should be set for
+    # build agents, etc, to something like
+    #
+    # GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Program Files\Git\etc\profile" -l    
+    #
+    cd $(ROOT)\..\web\source
+!ifdef GIT_BASH_FOR_KEYMAN
+    $(GIT_BASH_FOR_KEYMAN) build.sh
+!else
+    start /wait ./build.sh
+!endif
+
     -rd /s/q $(ROOT)\src\developer\tike\xml\kmw\resource
     mkdir $(ROOT)\src\developer\tike\xml\kmw\resource
-    xcopy /y $(ROOT)\..\web\source\*.js $(ROOT)\src\developer\tike\xml\kmw\resource\ #
+    xcopy /y $(ROOT)\..\web\release\web\*.js $(ROOT)\src\developer\tike\xml\kmw\resource\ #
+    xcopy /y $(ROOT)\..\web\release\web\*.js.map $(ROOT)\src\developer\tike\xml\kmw\resource\ #
     xcopy /y $(ROOT)\..\web\LICENSE $(ROOT)\src\developer\tike\xml\kmw\resource\ #
     xcopy /y $(ROOT)\..\web\README.md $(ROOT)\src\developer\tike\xml\kmw\resource\ #
-    xcopy /s /y $(ROOT)\..\web\source\resources\* $(ROOT)\src\developer\tike\xml\kmw\resource\ #
+    xcopy /s /y $(ROOT)\..\web\release\web\osk\* $(ROOT)\src\developer\tike\xml\kmw\resource\osk\ #
+    xcopy /s /y $(ROOT)\..\web\release\web\ui\* $(ROOT)\src\developer\tike\xml\kmw\resource\ui\ #
 
 icons:
     rc icons.rc

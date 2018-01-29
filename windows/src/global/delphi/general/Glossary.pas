@@ -109,7 +109,7 @@ begin
     // Look up the HKL in the registry to get substitutes
     with TRegistryErrorControlled.Create do  // I2890
     try
-      if OpenKeyReadOnly('\'+SRegKey_KeyboardLayoutSubstitutes) and
+      if OpenKeyReadOnly('\'+SRegKey_KeyboardLayoutSubstitutes_CU) and
         ValueExists(IntToHex(HIWORD(ahkl), 8)) then
       begin
         Result := StrToIntDef('$'+ReadString(IntToHex(HIWORD(ahkl), 8)), 0);
@@ -133,7 +133,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if not OpenKeyReadOnly(SRegKey_KeyboardLayouts) then
+    if not OpenKeyReadOnly(SRegKey_KeyboardLayouts_LM) then
     begin
       Result := LOWORD(ahkl);
       Exit;
@@ -141,7 +141,7 @@ begin
 
     GetKeyNames(str);
     for i := 0 to str.Count - 1 do
-      if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts+'\'+str[i]) and
+      if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts_LM+'\'+str[i]) and
         ValueExists(SRegValue_KeyboardLayoutID) then
       begin
         if StrToIntDef('$'+ReadString(SRegValue_KeyboardLayoutID), 0) = LayoutID then
@@ -179,10 +179,10 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if not OpenKeyReadOnly(SRegKey_KeyboardLayouts) then Exit;
+    if not OpenKeyReadOnly(SRegKey_KeyboardLayouts_LM) then Exit;
     GetKeyNames(str);
     for i := 0 to str.Count - 1 do
-      if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts+'\'+str[i]) and
+      if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts_LM+'\'+str[i]) and
         ValueExists(SRegValue_KeyboardLayoutID) then
           if StrToIntDef('$' + ReadString(SRegValue_KeyboardLayoutID), 0) = LayoutID then
         begin

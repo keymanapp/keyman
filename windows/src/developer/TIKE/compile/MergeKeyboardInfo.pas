@@ -16,7 +16,11 @@
   # authorEmail -- from kmp.inf
   # lastModifiedDate -- build time: this only gets refreshed when the version num increments so it's close enough then
   # packageFilename -- from $keyboard_info_packageFilename
+  # packageFileSize -- get from the size of the file
   # jsFilename -- from $keyboard_info_jsFilename
+  # jsFileSize -- get from the size of the file
+  # documentationFileSize -- get from the size of the file
+  # isRTL -- from .js, KRTL\s*=\s*1
   # encodings -- from .kmx (existence of .js implies unicode)
   # packageIncludes -- from kmp.inf?
   # version -- from kmp.inf, js
@@ -61,6 +65,7 @@ type
     procedure AddAuthor;
     procedure AddAuthorEmail;
     procedure CheckOrAddEncodings;
+    procedure CheckOrAddFileSizes;
     procedure CheckOrAddID;
     procedure CheckOrAddJsFilename;
     procedure AddLastModifiedDate;
@@ -71,8 +76,8 @@ type
     procedure AddPlatformSupport;
     procedure CheckOrAddVersion;
     function SaveJsonFile: Boolean;
-    function LoadKMXFile: Boolean;
     procedure CheckKMXFilenames;
+    procedure AddIsRTL;
   public
     destructor Destroy; override;
     class function Execute(AJsFile, AKmpFile, AJsonFile: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean; overload;
@@ -156,6 +161,7 @@ begin
 
     CheckOrAddID;
     AddName;
+    AddIsRTL;
     AddAuthor;
     AddAuthorEmail;
     AddLastModifiedDate;
@@ -165,6 +171,7 @@ begin
     CheckOrAddPackageFilename;
     CheckOrAddJsFilename;
     CheckOrAddEncodings;
+    CheckOrAddFileSizes;
     AddPackageIncludes;
     CheckOrAddMinKeymanDesktopVersion;
     AddPlatformSupport;
@@ -205,14 +212,6 @@ begin
   Result := Assigned(json);
 end;
 
-function TMergeKeyboardInfo.LoadKMXFile: Boolean;
-begin
-  SetLength(FKMXFiles, 1);
-  FKMXFiles[0].Filename := FKMPFile;
-  GetKeyboardInfo(FKMPFile, False, FKMXFiles[0].Info, False);
-  Result := True;
-end;
-
 function TMergeKeyboardInfo.LoadKMPFile: Boolean;
 var
   FKMXTempFile, FKMPInfTempFile: TTempFile;
@@ -241,8 +240,8 @@ begin
   if FKMPFile = '' then
     Exit(True);
 
-  if SameText(ExtractFileExt(FKMPFile), '.kmx') then
-    Exit(LoadKMXFile);
+  if not SameText(ExtractFileExt(FKMPFile), '.kmp') then
+    Exit(Failed('packageFile must be a .kmp file '+FKMPFile));
 
   try
     Zip := TZipFile.Create;
@@ -375,6 +374,26 @@ begin
 end;
 
 //
+// isRTL -- from js
+//
+procedure TMergeKeyboardInfo.AddIsRTL;
+begin
+  if json.GetValue('isRTL') <> nil then Exit;
+
+  if FJSFileData <> '' then
+  begin
+    with TRegEx.Match(FJsFileData, 'this\.KRTL=1') do
+    begin
+      if not Success then Exit;
+    end;
+  end
+  else
+    Exit;
+
+  json.AddPair('isRTL', TJsonTrue.Create);
+end;
+
+//
 //  authorName -- from kmp.inf
 //
 procedure TMergeKeyboardInfo.AddAuthor;
@@ -486,9 +505,9 @@ begin
   // in the keyboards repository
   if FMergingValidateIds then
   begin
-    if ChangeFileExt(FFilename, '') <> FBaseName+'-'+FVersion then
-      raise EInvalidKeyboardInfo.CreateFmt('jsFilename field is "%s" but should be "%s-%s.js"',
-        [FFilename, FVersion, FBaseName]);
+    if ChangeFileExt(FFilename, '') <> FBaseName then
+      raise EInvalidKeyboardInfo.CreateFmt('jsFilename field is "%s" but should be "%s.js"',
+        [FFilename, FBaseName]);
   end;
 end;
 
@@ -530,6 +549,39 @@ begin
   end
   else
     json.AddPair('encodings', v);
+end;
+
+//
+// packageFileSize, jsFileSize, documentationFileSize, all from the actual files
+//
+procedure TMergeKeyboardInfo.CheckOrAddFileSizes;
+  procedure DoFileSize(prefix: string);
+  var
+    vs, v: TJSONValue;
+    f: TSearchRec;
+  begin
+    v := json.GetValue(prefix+'Filename');
+    if v <> nil then
+    begin
+      if FindFirst(ExtractFilePath(FJsonFile)+v.Value, 0, f) <> 0 then
+        raise EInvalidKeyboardInfo.CreateFmt('Unable to locate file %s to check its size', [v.Value]);
+      FindClose(f);
+      vs := json.GetValue(prefix+'FileSize');
+      if vs = nil then
+        json.AddPair(prefix+'FileSize', TJSONNumber.Create(f.Size))
+      else
+      begin
+        if f.Size <> (vs as TJSONNumber).AsInt64 then
+          raise EInvalidKeyboardInfo.CreateFmt('File size for %s is recorded as %d but should be %d.',
+            [v.Value, (vs as TJSONNumber).AsInt64, f.Size]);
+      end;
+    end;
+  end;
+
+begin
+  DoFileSize('js');
+  DoFileSize('package');
+  DoFileSize('documentation');
 end;
 
 //

@@ -142,7 +142,6 @@ uses
   kmnProjectFileUI,
   UserMessages,
   UframeTouchLayoutBuilder,
-  UframeJSONEditor,
   CheckboxGridHelper,
   Vcl.Grids, KeyboardFonts,
   TempFileManager,
@@ -234,12 +233,6 @@ type
     lblISOLang: TLabel;
     editEthnologueCode: TEdit;
     cmdISOLang_Lookup: TButton;
-    pageMetadata: TTabSheet;
-    panJSONHost: TPanel;
-    panJSONTop: TPanel;
-    cbJSON: TComboBox;
-    cmdAddJSON: TButton;
-    cmdDeleteJSON: TButton;
     Panel1: TPanel;
     lblCongrats: TLabel;
     cmdCompile: TButton;
@@ -328,8 +321,6 @@ type
     procedure editKeyboardVersionChange(Sender: TObject);
     procedure clbTargetsClickCheck(Sender: TObject);
     procedure cmdSendURLsToEmailClick(Sender: TObject);
-    procedure cmdAddJSONClick(Sender: TObject);
-    procedure cbJSONClick(Sender: TObject);
     procedure pagesLayoutChange(Sender: TObject);
     procedure pagesLayoutChanging(Sender: TObject; var AllowChange: Boolean);
     procedure pagesTouchLayoutChange(Sender: TObject);
@@ -464,9 +455,6 @@ type
     function GetTargetsFromListBox: TKeymanTargets;   // I4504
     function GetCompileTargets: TKeymanTargets;   // I4504
 
-    procedure FocusTabJSON;   // I4505
-    procedure InitTabJSON;   // I4505
-    procedure SaveJSON;   // I4505
     function IsInParserMode: Boolean;
     procedure ShowKeyboardComplexDesignMessage;
     function GetIsDebugVisible: Boolean;   // I4557
@@ -508,8 +496,6 @@ type
 
     function CanChangeView(FView: TCodeDesignView): Boolean; override;   // I4678
     procedure ChangeView(FView: TCodeDesignView); override;   // I4678
-
-    procedure LoadJSON;   // I4505
 
     { IKMDPrintActions }
     function PrintFile: Boolean;
@@ -563,7 +549,6 @@ uses
   compile,
   CompileKeymanWeb,
   dmActionsMain,
-  JSONKeyboardInfo,
   KeymanDeveloperOptions,
   KeymanVersion,
   KMDevResourceStrings,
@@ -637,7 +622,6 @@ begin
 
   pages.ActivePage := pageDetails;
   InitTabIntro;
-  InitTabJSON;   // I4505
   InitTabLanguages;
   InitTabDetails;
   InitSystemKeyboard;
@@ -731,8 +715,6 @@ begin
 
   if pages.ActivePage = pageDetails then
     FocusTabIntro
-  else if pages.ActivePage = pageMetadata then
-    FocusTabJSON   // I4505
   else if pages.ActivePage = pageLayout then
     FocusTabLayout
   else if pages.ActivePage = pageIcon then
@@ -836,7 +818,6 @@ begin
   panWebHelp.Visible := FTargets * KMWKeymanTargets <> [];
   panBuildWindows.Visible := ktWindows in FTargets;
   panBuildKMW.Visible := FTargets * KMWKeymanTargets <> [];
-  pageMetadata.TabVisible := FTargets * KMWKeymanTargets <> [];   // I4811
 end;
 
 function TfrmKeymanWizard.GetTargetsFromListBox: TKeymanTargets;   // I4504
@@ -1706,117 +1687,6 @@ begin
   FFeature[kfIcon].Modified := frameBitmap.Modified;
 end;
 
-{-----------------------------------------------------------------------------}
-{ JSON Page                                                                   }
-{-----------------------------------------------------------------------------}
-
-procedure TfrmKeymanWizard.InitTabJSON;   // I4505
-begin
-end;
-
-procedure TfrmKeymanWizard.FocusTabJSON;   // I4505
-begin
-  LoadJSON;
-  DoFocus(panJSONHost);
-end;
-
-procedure TfrmKeymanWizard.LoadJSON;   // I4505
-var
-  f: TSearchRec;
-  i: Integer;
-begin
-  for i := cbJSON.Items.Count - 1 downto 0 do
-  begin
-    if not FileExists(ExtractFilePath(FileName)+cbJSON.Items[i]) then
-    begin
-      if MessageDlg('The file '+cbJSON.Items[i]+' no longer exists.  Remove from editor?', mtConfirmation, mbYesNoCancel, 0) = mrYes then
-      begin
-        cbJSON.Items.Objects[i].Free;
-        cbJSON.Items.Delete(i);
-      end;
-    end;
-  end;
-
-  if FindFirst(ExtractFilePath(FileName)+GetKeymanWebCompiledNameFromFileName(FileName) + '-*.json', 0, f) = 0 then   // I4508
-  begin
-    repeat
-      if cbJSON.Items.IndexOf(f.Name) < 0 then
-        cbJSON.Items.Add(f.Name);
-    until FindNext(f) <> 0;
-    FindClose(f);
-  end;
-
-  if (cbJSON.Items.Count > 0) and (cbJSON.ItemIndex < 0) then
-  begin
-    cbJSON.ItemIndex := 0;
-    cbJSONClick(cbJSON);
-  end;
-end;
-
-procedure TfrmKeymanWizard.SaveJSON;   // I4505
-var
-  i: Integer;
-begin
-  for i := 0 to cbJSON.Items.Count - 1 do
-  begin
-    if cbJSON.Items.Objects[i] <> nil then
-    begin
-      (cbJSON.Items.Objects[i] as TframeJSONEditor).Save;
-    end;
-  end;
-end;
-
-procedure TfrmKeymanWizard.cmdAddJSONClick(Sender: TObject);   // I4505
-var
-  FName: string;
-begin
-  // create a new JSON file.
-  FName := ChangeFileExt(FileName,'') + '-';
-  if not InputQuery('Name of new JSON', 'Name of new JSON', FName) then
-    Exit;
-
-  FName := ChangeFileExt(FName, '.json');
-
-  if not FileExists(FName) then
-  begin
-    with TStringList.Create do
-    try
-      Add('{}');
-      SaveToFile(FName);
-    finally
-      Free;
-    end;
-  end;
-
-  LoadJSON;
-  cbJSON.ItemIndex := cbJSON.Items.IndexOf(ExtractFileName(FName));
-  cbJSONClick(cbJSON);
-end;
-
-procedure TfrmKeymanWizard.cbJSONClick(Sender: TObject);   // I4505
-var
-  FJSONEditorFrame: TframeJSONEditor;
-  i: Integer;
-begin
-  for i := 0 to panJSONHost.ControlCount - 1 do
-    panJSONHost.Controls[i].Visible := False;
-
-  if cbJSON.ItemIndex < 0 then
-    Exit;
-
-  if cbJSON.Items.Objects[cbJSON.ItemIndex] = nil then
-  begin
-    FJSONEditorFrame := TframeJSONEditor.Create(Self);
-    FJSONEditorFrame.FileName := ExtractFilePath(FileName) + cbJSON.Items[cbJSON.ItemIndex];
-    cbJSON.Items.Objects[cbJSON.ItemIndex] := FJSONEditorFrame;
-  end;
-
-  FJSONEditorFrame := cbJSON.Items.Objects[cbJSON.ItemIndex] as TframeJSONEditor;
-  FJSONEditorFrame.Parent := panJSONHost;
-  FJSONEditorFrame.Align := alClient;
-  FJSONEditorFrame.Visible := True;
-end;
-
 { ----------------------------------------------------------------------------- }
 { Finish Page }
 { ----------------------------------------------------------------------------- }
@@ -2064,8 +1934,6 @@ begin
     pagesLayout.ActivePage := pageLayoutCode;
   end;
 
-  LoadJSON;   // I4505
-
   // if pages.ActivePage <> pageSource then
   // UpdateControls;
   FLoading := False;
@@ -2099,8 +1967,6 @@ begin
     begin
       SaveFeature(FKey);
     end;
-
-    SaveJSON;   // I4505
 
     try
       case FTextFileFormat of
@@ -2477,7 +2343,6 @@ function TfrmKeymanWizard.CanChangeView(FView: TCodeDesignView): Boolean;   // I
 begin
   Result :=
     (pages.ActivePage = pageLayout) or
-    ((pages.ActivePage = pageMetadata) and (cbJSON.Items.Count > 0)) or
     (pages.ActivePage = pageTouchLayout);
 end;
 
@@ -2487,8 +2352,6 @@ begin
 end;
 
 procedure TfrmKeymanWizard.ChangeView(FView: TCodeDesignView);   // I4678
-var
-  FJSONEditorFrame: TframeJSONEditor;
 begin
   if pages.ActivePage = pageLayout then
   begin
@@ -2498,13 +2361,7 @@ begin
       cdvCode: if pagesLayout.ActivePage <> pageLayoutCode then pagesLayout.SelectNextPage(True);
     end
   end
-  else if pages.ActivePage = pageMetadata then
-  begin
-    FJSONEditorFrame := cbJSON.Items.Objects[cbJSON.ItemIndex] as TframeJSONEditor;
-    FJSONEditorFrame.ChangeView(FView);
-  end
   else if pages.ActivePage = pageTouchLayout then
-
     case FView of
       cdvDesign: if pagesTouchLayout.ActivePage <> pageTouchLayoutDesign then pagesTouchLayout.SelectNextPage(False);
       cdvCode:   if pagesTouchLayout.ActivePage <> pageTouchLayoutCode then pagesTouchLayout.SelectNextPage(True);

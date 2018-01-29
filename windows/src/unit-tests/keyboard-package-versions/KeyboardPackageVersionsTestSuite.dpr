@@ -68,7 +68,6 @@ uses
   UKeymanTargets in '..\..\global\delphi\general\UKeymanTargets.pas',
   CompileKeymanWeb in '..\..\developer\TIKE\compile\CompileKeymanWeb.pas',
   CompileErrorCodes in '..\..\global\delphi\general\CompileErrorCodes.pas',
-  JSONKeyboardInfo in '..\..\global\delphi\kmw\JSONKeyboardInfo.pas',
   KeyboardParser in '..\..\developer\TIKE\main\KeyboardParser.pas',
   WindowsLanguages in '..\..\global\delphi\general\WindowsLanguages.pas',
   KeymanWebKeyCodes in '..\..\developer\TIKE\compile\KeymanWebKeyCodes.pas',
@@ -85,7 +84,8 @@ uses
   kpsProjectFile in '..\..\developer\TIKE\project\kpsProjectFile.pas',
   CompilePackageInstaller in '..\..\global\delphi\general\CompilePackageInstaller.pas',
   utilhttp in '..\..\global\delphi\general\utilhttp.pas',
-  UMD5Hash in '..\..\global\delphi\general\UMD5Hash.pas';
+  UMD5Hash in '..\..\global\delphi\general\UMD5Hash.pas',
+  Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas';
 
 var
   runner : ITestRunner;

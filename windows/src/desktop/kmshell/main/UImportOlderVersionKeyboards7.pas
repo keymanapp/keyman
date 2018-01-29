@@ -115,7 +115,7 @@ begin
     if not FAdmin then  // I2361
     begin
       rootRead := SRegKey_UpgradeBackupPath + SRegKey_KeymanEngine70_ActiveKeyboards;  // I2642
-      rootWrite := '\'+SRegKey_ActiveKeyboards; //'\Software\...\Keyman Engine\x.x\Active Keyboards';
+      rootWrite := '\'+SRegKey_ActiveKeyboards_CU; //'\Software\...\Keyman Engine\x.x\Active Keyboards';
 
       if regRead.OpenKeyReadOnly(rootRead) and regWrite.OpenKey(rootWrite, True) then
       begin

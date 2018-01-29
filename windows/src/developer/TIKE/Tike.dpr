@@ -222,8 +222,6 @@ uses
   UKeymanTargets in '..\..\global\delphi\general\UKeymanTargets.pas',
   UfrmSMTPSetup in 'dialogs\UfrmSMTPSetup.pas' {frmSMTPSetup},
   UfrmSendURLsToEmail in 'dialogs\UfrmSendURLsToEmail.pas' {frmSendURLsToEmail},
-  UframeJSONEditor in 'web\UframeJSONEditor.pas' {frameJSONEditor},
-  JSONKeyboardInfo in '..\..\global\delphi\kmw\JSONKeyboardInfo.pas',
   MSXMLDomCreate in '..\..\global\delphi\general\MSXMLDomCreate.pas',
   webhelp in 'help\webhelp.pas',
   UfrmProjectSettings in 'project\UfrmProjectSettings.pas' {frmProjectSettings},
@@ -262,7 +260,8 @@ uses
   Keyman.System.KeyboardJSInfo in '..\..\global\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas',
   Keyman.System.KeyboardUtils in '..\..\global\delphi\keyboards\Keyman.System.KeyboardUtils.pas',
   BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
-  Keyman.System.KMXFileLanguages in '..\..\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas';
+  Keyman.System.KMXFileLanguages in '..\..\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas',
+  Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

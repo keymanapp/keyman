@@ -346,7 +346,7 @@ begin
       with TRegistryErrorControlled.Create do
       try
         RootKey := HKEY_LOCAL_MACHINE;
-        if OpenKeyReadOnly(BuildKeyboardLanguageProfilesKey(keyboardname)) then
+        if OpenKeyReadOnly(BuildKeyboardLanguageProfilesKey_LM(keyboardname)) then
         begin
           GetKeyNames(FProfiles);
           if FProfiles.Count > 0 then
@@ -365,7 +365,7 @@ begin
       if s <> '' then
         with TRegistryErrorControlled.Create do
         try
-          if OpenKey(SRegKey_LanguageHotkeys, True) then
+          if OpenKey(SRegKey_LanguageHotkeys_CU, True) then
             WriteString(s, regRead.ReadString(SRegValue_Legacy_KeymanActiveHotkey));
         finally
           Free;

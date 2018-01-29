@@ -535,7 +535,7 @@ begin
 
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKey(SRegKey_KeymanOSK, True) then
+    if OpenKey(SRegKey_KeymanOSK_CU, True) then
       WriteBool(SRegValue_OSK_ShowVisualKeyboard, VisualKeyboardVisible);
   finally
     Free;
@@ -1223,7 +1223,7 @@ begin
 
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKeyReadOnly(SRegKey_KeymanOSK) and ValueExists(SRegValue_OSK_ShowVisualKeyboard) and ReadBool(SRegValue_OSK_ShowVisualKeyboard) then
+    if OpenKeyReadOnly(SRegKey_KeymanOSK_CU) and ValueExists(SRegValue_OSK_ShowVisualKeyboard) and ReadBool(SRegValue_OSK_ShowVisualKeyboard) then
       ShowVisualKeyboard;
   finally
     Free;
@@ -1726,7 +1726,7 @@ procedure TfrmKeyman7Main.tmrOnlineUpdateCheckTimer(Sender: TObject);
 begin
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKeyReadOnly(SRegKey_KeymanDesktop) then
+    if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
     begin
       if ValueExists(SRegValue_CheckForUpdates) and not ReadBool(SRegValue_CheckForUpdates) then Exit;
       if ValueExists(SRegValue_LastUpdateCheckTime) and (Now - ReadDateTime(SRegValue_LastUpdateCheckTime) < 7) then Exit;

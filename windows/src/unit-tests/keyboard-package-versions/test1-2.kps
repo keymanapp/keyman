@@ -19,8 +19,8 @@
   </Info>
   <Files>
     <File>
-      <Name>test-2.0\test-2.0.js</Name>
-      <Description>File test-2.0.js</Description>
+      <Name>test-2.0\test.js</Name>
+      <Description>File test.js</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.js</FileType>
     </File>

@@ -74,7 +74,7 @@ begin
       writeln('  -dcc ...             : wrap a call to DCC32');    // I3339
       writeln('  -dccx dpr [dcp-target] [bpl-target] : Delphi Starter support - BDS.EXE -b ...');
       writeln('  -dccq ...            : wrap a call to DCC32, ignoring hints and warnings');    // I3339  // I3378
-      writeln('  -rt                  : check release build prereqs, e.g. HKCU\'+SRegKey_KeymanDebug);   // I3726
+      writeln('  -rt                  : check release build prereqs, e.g. HKCU\'+SRegKey_KeymanDebug_CU);   // I3726
       writeln('  -git                 : check git repository commit/update status');   // I3726   // I5087
       ExitCode := 1;
       Exit;

@@ -5,7 +5,7 @@
 !include ..\..\Defines.mak
 
 test: build
-    Win32\Debug\packageinfotestsuite.exe -b
+    $(WIN32_TARGET_PATH)\packageinfotestsuite.exe -b
   
 build: 
     $(DELPHI_MSBUILD) /p:CI=CI packageinfotestsuite.dproj

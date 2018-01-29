@@ -77,7 +77,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if not OpenKeyReadOnly(SRegKey_KeymanEngine) then
+    if not OpenKeyReadOnly(SRegKey_KeymanEngine_LM) then
       raise EIsAdminError.Create(E_IsAdmin_NotInstalledCorrectly, 'Keyman does not appear to be installed correctly: '+
         'the Keyman registry settings are missing.  Please reinstall Keyman.');
   finally
@@ -89,9 +89,9 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if not OpenKey(SRegKey_KeyboardLayouts, False) then Exit;
+    if not OpenKey(SRegKey_KeyboardLayouts_LM, False) then Exit;
     CloseKey;
-    if not OpenKey(SRegKey_KeymanEngine, False) then Exit;  //!!!
+    if not OpenKey(SRegKey_KeymanEngine_LM, False) then Exit;  //!!!
   finally
     Free;
   end;

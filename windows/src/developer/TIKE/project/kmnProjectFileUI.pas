@@ -46,7 +46,6 @@ type
     function PackageFile(FSilent: Boolean): Boolean;
     function GetProjectFile: TkmnProjectFile;
 
-    procedure ReloadJSON;
     function GetDebug: Boolean;
     procedure SetDebug(const Value: Boolean);
     function CompileKeyboard(FSilent: Boolean): Boolean;
@@ -154,9 +153,6 @@ begin
     frmMessages.Show;
 
   Result := ProjectFile.CompileKeyboard;
-
-  ReloadJSON; // Always reload even if compile fails, because it may still
-              // be modified
 end;
 
 function TkmnProjectFileUI.FontDialog(FSilent: Boolean): Boolean;   // I4057
@@ -251,14 +247,6 @@ end;
 procedure TkmnProjectFileUI.MenuEventDebug(Sender: TObject);
 begin
   DebugKeyboard(False);
-end;
-
-procedure TkmnProjectFileUI.ReloadJSON;
-begin
-  if (MDIChild <> nil) and (MDIChild is TfrmKeymanWizard) then
-  begin
-    (MDIChild as TfrmKeymanWizard).LoadJSON;
-  end;
 end;
 
 procedure TkmnProjectFileUI.SetDebug(const Value: Boolean);

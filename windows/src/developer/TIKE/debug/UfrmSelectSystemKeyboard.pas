@@ -113,12 +113,12 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeyboardLayouts) then
+    if OpenKeyReadOnly(SRegKey_KeyboardLayouts_LM) then
     begin
       GetKeyNames(str);
 
       for i := str.Count - 1 downto 0 do
-        if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts + '\' + str[i]) then
+        if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts_LM + '\' + str[i]) then
           if not ValueExists('Layout Text') then   // I3613
             str.Delete(i)
           else
@@ -300,12 +300,12 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeyboardLayouts) then
+    if OpenKeyReadOnly(SRegKey_KeyboardLayouts_LM) then
     begin
       GetKeyNames(str);
 
       for i := str.Count - 1 downto 0 do
-        if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts + '\' + str[i]) then
+        if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts_LM + '\' + str[i]) then
           if not ValueExists('Layout Text') then   // I3613
             str.Delete(i)
           else

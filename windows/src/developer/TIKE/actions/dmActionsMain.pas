@@ -423,7 +423,7 @@ end;
 
 procedure TmodActionsMain.actHelpCheckForUpdatesExecute(Sender: TObject);
 begin
-  with TOnlineUpdateCheck.Create(SRegKey_KeymanDeveloper, OnlineProductID_KeymanDeveloper_100, True, False, False, GetProxySettings.Server, GetProxySettings.Port, GetProxySettings.Username, GetProxySettings.Password) do  // I3377
+  with TOnlineUpdateCheck.Create(SRegKey_KeymanDeveloper_CU, OnlineProductID_KeymanDeveloper_100, True, False, False, GetProxySettings.Server, GetProxySettings.Port, GetProxySettings.Username, GetProxySettings.Password) do  // I3377
   try
     if Run = oucShutDown then
       frmKeymanDeveloper.Close;

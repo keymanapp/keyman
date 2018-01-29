@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+		"outFile": "../intermediate/keymanweb.js"
+  },
+  "files": [
+		"kmwbase.ts",
+		"keymanweb.ts",
+		"kmwosk.ts", 
+		"kmwnative.ts", 
+		"kmwcallback.ts",
+		"kmwkeymaps.ts",
+		"kmwlayout.ts",
+		"kmwinit.ts",
+		"kmwapi.ts"
+  ]
+}
