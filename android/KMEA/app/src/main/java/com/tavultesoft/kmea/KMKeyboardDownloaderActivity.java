@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +40,6 @@ public class KMKeyboardDownloaderActivity extends Activity {
   // custom keyboard
   public static final String ARG_KEYBOARD = "KMKeyboardActivity.keyboard";
   public static final String ARG_LANGUAGE = "KMKeyboardActivity.language";
-  public static final String ARG_IS_DIRECT = "KMKeyboardActivity.isDirect";
   public static final String ARG_URL = "KMKeyboardActivity.url";
   public static final String ARG_FILENAME = "KMKeyboardActivity.filename";
 
@@ -93,7 +94,6 @@ public class KMKeyboardDownloaderActivity extends Activity {
       // URL parameters for custom keyboard (if they exist)
       customKeyboard = bundle.getString(ARG_KEYBOARD);
       customLanguage = bundle.getString(ARG_LANGUAGE);
-      isDirect = bundle.getBoolean(ARG_IS_DIRECT);
       url = bundle.getString(ARG_URL);
       filename = bundle.getString(ARG_FILENAME);
       if (filename == null || filename.isEmpty()) {
@@ -187,12 +187,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
 
         String remoteUrl = "";
         if (isCustom) {
-          if (isDirect) {
-            remoteUrl = url;
-          } else {
-            String encodedUrl = URLEncoder.encode(filename, "utf-8");
-            remoteUrl = String.format("%s%s&device=%s", kKeymanApiRemoteURL, encodedUrl, deviceType);
-          }
+          remoteUrl = url;
         } else {
           // Keyman cloud
           remoteUrl = String.format("%slanguages/%s/%s?device=%s", kKeymanApiBaseURL, langID, kbID, deviceType);
@@ -224,7 +219,9 @@ public class KMKeyboardDownloaderActivity extends Activity {
       }
 
       ((Activity) context).finish();
-      notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
+      if (result > 0) {
+        notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
+      }
     }
 
     /**

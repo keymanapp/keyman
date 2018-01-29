@@ -229,16 +229,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     Uri data = intent.getData();
 
     if (data != null) {
-      boolean isDirect = false;
       File kmpFile = new File(data.getPath());
-      String url = null;
-      String directStr = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Direct);
-      if (directStr != null && directStr.equals("true")) {
-        isDirect = true;
-        url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
-      } else {
-        url = data.toString();
-      }
+      // Using non-direct remote URLs is deprecated, so always use direct.
+      String url = data.toString();
 
       if (url != null) {
         // This could be from keyman://, http://, or https:// protocols
@@ -306,7 +299,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           bundle.putString(KMKeyboardDownloaderActivity.ARG_LANGUAGE,
             data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Language));
           bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom);
-          bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_DIRECT, isDirect);
           bundle.putString(KMKeyboardDownloaderActivity.ARG_URL, url);
           bundle.putString(KMKeyboardDownloaderActivity.ARG_FILENAME, filename);
           i.putExtras(bundle);
