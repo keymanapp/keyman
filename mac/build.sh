@@ -22,7 +22,7 @@ display_usage() {
     echo "                  the deploy option is used to specify preprelease, in which configuration will be"
     echo "                  Release (i.e., -config option is ignored)."
     echo "  -clean          Removes all previously-existing build products for anything to be built before building."
-    echo "  -test           Runs unit tests"
+    echo "  -test           Runs unit tests (not applicable to 'testapp' target)"
     echo "  -no-codesign    Disables code-signing for Keyman4MacIM, allowing it to be performed separately later"
     echo "                  (ignored if a deploy option other than 'none' is specified)."
     echo "  -quiet          Do not display any output except for warnings and errors."
@@ -104,7 +104,7 @@ DO_KEYMANTESTAPP=false
 CODESIGNING_SUPPRESSION=""
 BUILD_OPTIONS=""
 BUILD_ACTIONS="build"
-#TEST_ACTIONS=""
+TEST_ACTION=""
 CLEAN=false
 QUIET=false
 SKIP_BUILD=false
@@ -173,7 +173,7 @@ while [[ $# -gt 0 ]] ; do
             BUILD_ACTIONS="clean $BUILD_ACTIONS"
             ;;
         -test)
-            BUILD_ACTIONS="$BUILD_ACTIONS test"
+            TEST_ACTION="test"
             ;;
         -no-codesign)
             if $LOCALDEPLOY || $PREPRELEASE ; then
@@ -217,7 +217,7 @@ if $SKIP_BUILD ; then
     DO_KEYMANIM=false
     DO_KEYMANTESTAPP=false
     BUILD_ACTIONS=""
-   #  TEST_ACTIONS=""
+    TEST_ACTION=""
     BUILD_OPTIONS=""
     CODESIGNING_SUPPRESSION=""
 fi
@@ -235,7 +235,7 @@ displayInfo "" \
     "CODESIGNING_SUPPRESSION: $CODESIGNING_SUPPRESSION" \
     "BUILD_OPTIONS: $BUILD_OPTIONS" \
     "BUILD_ACTIONS: $BUILD_ACTIONS" \
-   # "TEST_ACTIONS: $TEST_ACTIONS" \
+    "TEST_ACTION: $TEST_ACTION" \
     ""
 
 ### START OF THE BUILD ###
@@ -277,17 +277,17 @@ updatePlist() {
 
 if $DO_KEYMANENGINE ; then
     updatePlist "$KME4M_BASE_PATH" "$ENGINE_NAME"
-    execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS -scheme $ENGINE_NAME"
+    execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS $TEST_ACTION -scheme $ENGINE_NAME"
 fi
 
 if $DO_KEYMANIM ; then
     updatePlist "$KM4MIM_BASE_PATH" "$IM_NAME"
-    execBuildCommand $IM_NAME "xcodebuild -project \"$KMIM_PROJECT_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman"
+    execBuildCommand $IM_NAME "xcodebuild -project \"$KMIM_PROJECT_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $TEST_ACTION -scheme Keyman"
 fi
 
 if $DO_KEYMANTESTAPP ; then
     updatePlist "$KMTESTAPP_BASE_PATH" "$TESTAPP_NAME"
-    execBuildCommand $TESTAPP_NAME "xcodebuild -project \"$KMTESTAPP_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS -scheme $TESTAPP_NAME"
+    execBuildCommand $TESTAPP_NAME "xcodebuild -project \"$KMTESTAPP_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS"
 fi
 
 # Deploy as requested
