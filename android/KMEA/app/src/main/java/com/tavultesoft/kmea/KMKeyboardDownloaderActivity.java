@@ -240,7 +240,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
         throw new Exception(exceptionStr);
       }
 
-      exceptionStr = "The keyboard could not be installed";
+      exceptionStr = "JSON file does not contain a valid \"options\" object";
       JSONObject options = kbData.optJSONObject(KMKey_Options);
       if (options == null) {
         throw new Exception(exceptionStr);
