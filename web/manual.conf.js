@@ -58,7 +58,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Firefox', 'IE', 'Chrome'], // Can be specified at run-time instead!
+    browsers: ['Firefox', 'IE', 'Chrome', 'Edge'], // Can be specified at run-time instead!
 	// Future note for us:  https://www.npmjs.com/package/karma-browserstack-launcher
 
 
