@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mocha</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- <script src="../node_modules/requirejs/require.js"></script> -->
+	<!-- <script> -->
+		<!-- requirejs.config({ -->
+			<!-- //Pass the top-level main.js/index.js require -->
+			<!-- //function to requirejs so that node modules -->
+			<!-- //are loaded relative to the top-level JS file. -->
+			<!-- nodeRequire: require -->
+		<!-- }); -->
+	<!-- </script> -->
+    <link rel="stylesheet" href="mocha.css" />
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <script src="mocha.js"></script> <!-- JS Testing framework - does not include assertion library. -->
+	<script src="http://chaijs.com/chai.js"></script> <!-- Browser-compatible assertion library. -->
+    <script>mocha.setup('bdd');</script>
+	<script>console.log("Ready to load the tests.");</script>
+    <script src="webtests.js"></script>
+    <script>
+      mocha.run();
+    </script>
+  </body>
+</html>
