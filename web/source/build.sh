@@ -35,6 +35,11 @@ fail() {
     exit 1
 }
 
+# Build products for each main target.
+WEB_TARGET=( "keymanweb.js" )
+UI_TARGET=( "kmwuibutton.js" "kmwuifloat.js" "kmwuitoggle.js" "kmwuitoolbar.js" )
+EMBED_TARGET=( "keyman.js" )
+
 # Ensure the dependencies are downloaded.
 echo "Node.js + dependencies check"
 npm install
@@ -89,6 +94,30 @@ minify ( ) {
 //# sourceMappingURL=$1.map"
 }
 
+# $1 - target (WEB, EMBEDDED)
+# $2+ - build target array (one of WEB_TARGET, FULL_WEB_TARGET, or EMBED_TARGET)
+finish_nominify ( ) {
+    args=("$@")
+    if [ $1 = $WEB ] || [ $1 = $UI ]; then
+        dest=$WEB_OUTPUT_NO_MINI
+        resourceDest=$dest
+    else
+        dest=$EMBED_OUTPUT_NO_MINI
+        resourceDest=$dest/resources
+    fi
+
+    echo "Copying unminified $1 build products to $dest."
+
+    for (( n=1; n<$#; n++ ))  # Apparently, args ends up zero-based, meaning $2 => n=1.
+    do
+        target=${args[$n]}
+        cp -f $INTERMEDIATE/$target $dest/$target
+        cp -f $INTERMEDIATE/$target.map $dest/$target.map
+    done
+
+    copy_resources $resourceDest
+}
+
 copy_resources ( ) {
     echo 
     echo Copy resources to $1/ui, .../osk
@@ -125,8 +154,14 @@ copy_resources ( ) {
 }
 
 # Definition of global compile constants
+UI="ui"
+WEB="web"
+EMBEDDED="embedded"
+
 WEB_OUTPUT="../release/web"
 EMBED_OUTPUT="../release/embedded"
+WEB_OUTPUT_NO_MINI="../release/unminified/web"
+EMBED_OUTPUT_NO_MINI="../release/unminified/embedded"
 INTERMEDIATE="../intermediate"
 SOURCE="."
 NODE_SOURCE="source"
@@ -158,13 +193,13 @@ set_default_vars ( ) {
     DO_MINIFY=true
 }
 
-set_default_vars
-
 if [[ $# = 0 ]]; then
     FULL_BUILD=true
 else
     FULL_BUILD=false
 fi
+
+set_default_vars
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -240,7 +275,9 @@ if [ $BUILD_EMBED = true ]; then
     assert $INTERMEDIATE/keyman.js
     echo Embedded TypeScript compiled as $INTERMEDIATE/keyman.js
 
-    copy_resources "$INTERMEDIATE"  # In case some build ever wants them with an unminified, embedded-only build
+    copy_resources "$INTERMEDIATE"  # Very useful for local testing.
+
+    finish_nominify $EMBEDDED $EMBED_TARGET
 
     if [ $DO_MINIFY = true ]; then
         minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "KeymanBase.__BUILD__=$BUILD"
@@ -250,7 +287,7 @@ if [ $BUILD_EMBED = true ]; then
         # Update any changed resources
         # echo Copy or update resources
 
-        copy_resources "$EMBED_OUTPUT"
+        copy_resources "$EMBED_OUTPUT/resources"
 
         # Update build number if successful
         echo
@@ -271,6 +308,8 @@ if [ $BUILD_COREWEB = true ]; then
     echo Native TypeScript compiled as $INTERMEDIATE/keymanweb.js
 
     copy_resources "$INTERMEDIATE"
+
+    finish_nominify $WEB $WEB_TARGET
 
     if [ $DO_MINIFY = true ]; then
         echo Minifying KeymanWeb...
@@ -297,6 +336,8 @@ if [ $BUILD_UI = true ]; then
     assert $INTERMEDIATE/kmwuifloat.js
     assert $INTERMEDIATE/kmwuibutton.js
 
+    finish_nominify $UI "${UI_TARGET[@]}"
+
     echo \'Native\' UI TypeScript has been compiled into the $INTERMEDIATE/ folder 
 
     if [ $DO_MINIFY = true ]; then
@@ -320,7 +361,7 @@ if [ $BUILD_UI = true ]; then
         minify kmwuibutton.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "" "(function() {%output%}());"
         assert $WEB_OUTPUT/kmwuibutton.js
 
-        echo User interface modules compiled and saved under $WEB_OUTPUT
+        echo "User interface modules compiled and saved under $WEB_OUTPUT"
     fi
 fi
 
