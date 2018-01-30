@@ -120,8 +120,6 @@ public class PackageProcessorTest {
     amharic.put(KMManager.KMKey_LanguageID, "am");
     amharic.put(KMManager.KMKey_LanguageName, "Amharic");
     amharic.put(KMManager.KMKey_KeyboardVersion, "1.4");
-    amharic.put(KMManager.KMKey_Font, "fantuwua.ttf");
-    amharic.put(KMManager.KMKey_OskFont, "wookianos.ttf");
     amharic.put(KMManager.KMKey_CustomKeyboard, "Y");
 
     Assert.assertEquals(amharic, keyboards[0]);
@@ -133,8 +131,6 @@ public class PackageProcessorTest {
     geez.put(KMManager.KMKey_LanguageID, "gez");
     geez.put(KMManager.KMKey_LanguageName, "Ge'ez");
     geez.put(KMManager.KMKey_KeyboardVersion, "1.4");
-    geez.put(KMManager.KMKey_Font, "fantuwua.ttf");
-    geez.put(KMManager.KMKey_OskFont, "wookianos.ttf");
     geez.put(KMManager.KMKey_CustomKeyboard, "Y");
 
     Assert.assertEquals(geez, keyboards[1]);
