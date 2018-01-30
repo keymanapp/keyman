@@ -17,7 +17,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'unit_tests/**/*.js'
+      'unit_tests/**/*.js',
+      {pattern: 'unit_tests/**/*.html', watched: true}
     ],
 
 
@@ -29,7 +30,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-		'**/*.html'	: ['html2js']
+      '**/*.html'	: ['html2js']
     },
 
 
