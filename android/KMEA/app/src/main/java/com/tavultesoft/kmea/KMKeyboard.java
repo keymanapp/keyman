@@ -297,10 +297,10 @@ final class KMKeyboard extends WebView {
       return false;
     }
 
-      // Escape single-quoted names for javascript call
-    keyboardName = keyboardName.replaceAll("\'", "\\'");
+    // Escape single-quoted names for javascript call
+    keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     Log.v("KMEA", "Unescaped language name: " + languageName);
-    languageName = languageName.replaceAll("\'", "\\'");
+    languageName = languageName.replaceAll("\'", "\\\\'");
     Log.v("KMEA", "Escaped language name: " + languageName);
 
     String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
@@ -396,7 +396,6 @@ final class KMKeyboard extends WebView {
     Log.v("KMEA", "Unescaped language name: " + languageName);
     languageName = languageName.replaceAll("\'", "\\\\'");
     Log.v("KMEA", "Escaped language name: " + languageName);
-    Log.v("KMEA", "Escaped quote character? \\'");
 
     String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
     String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
