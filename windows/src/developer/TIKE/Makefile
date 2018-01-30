@@ -37,12 +37,12 @@ pull-keymanweb:
 
     -rd /s/q $(ROOT)\src\developer\tike\xml\kmw\resource
     mkdir $(ROOT)\src\developer\tike\xml\kmw\resource
-    xcopy /y $(ROOT)\..\web\intermediate\*.js $(ROOT)\src\developer\tike\xml\kmw\resource\ #
-    xcopy /y $(ROOT)\..\web\intermediate\*.js.map $(ROOT)\src\developer\tike\xml\kmw\resource\ #
+    xcopy /y $(ROOT)\..\web\release\unminified\web\*.js $(ROOT)\src\developer\tike\xml\kmw\resource\ #
+    xcopy /y $(ROOT)\..\web\release\unminified\web\*.js.map $(ROOT)\src\developer\tike\xml\kmw\resource\ #
     xcopy /y $(ROOT)\..\web\LICENSE $(ROOT)\src\developer\tike\xml\kmw\resource\ #
     xcopy /y $(ROOT)\..\web\README.md $(ROOT)\src\developer\tike\xml\kmw\resource\ #
-    xcopy /s /y $(ROOT)\..\web\intermediate\osk\* $(ROOT)\src\developer\tike\xml\kmw\resource\osk\ #
-    xcopy /s /y $(ROOT)\..\web\intermediate\ui\* $(ROOT)\src\developer\tike\xml\kmw\resource\ui\ #
+    xcopy /s /y $(ROOT)\..\web\release\unminified\web\osk\* $(ROOT)\src\developer\tike\xml\kmw\resource\osk\ #
+    xcopy /s /y $(ROOT)\..\web\release\unminified\web\ui\* $(ROOT)\src\developer\tike\xml\kmw\resource\ui\ #
 
 icons:
     rc icons.rc
