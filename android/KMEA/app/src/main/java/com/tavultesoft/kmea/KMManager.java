@@ -9,7 +9,6 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -407,7 +406,7 @@ public final class KMManager {
       if (!file.exists() || overwrite) {
         InputStream inputStream = assetManager.open(directory + filename);
         FileOutputStream outputStream = new FileOutputStream(file);
-        copyFile(inputStream, outputStream);
+        FileUtils.copy(inputStream, outputStream);
 
         result = 1;
       } else {
@@ -418,14 +417,6 @@ public final class KMManager {
       result = -1;
     }
     return result;
-  }
-
-  private static void copyFile(InputStream inputStream, OutputStream outputStream) throws IOException {
-    byte[] buffer = new byte[1024];
-    int read;
-    while ((read = inputStream.read(buffer)) != -1) {
-      outputStream.write(buffer, 0, read);
-    }
   }
 
   /**
