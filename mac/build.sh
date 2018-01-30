@@ -246,7 +246,7 @@ if $CLEAN ; then
  do_clean
 fi
 
-carthage update
+carthage bootstrap
 
 execBuildCommand() {
     typeset component="$1"
