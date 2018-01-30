@@ -62,8 +62,9 @@ assertOptionsPrecedeTargets() {
 }
 
 do_clean ( ) {
-  rm -rf $KME4M_BUILD_PATH
-  rm -rf $APP_BUILD_PATH
+#  rm -rf $KME4M_BUILD_PATH
+#  rm -rf $APP_BUILD_PATH
+  rm -rf $KEYMAN_MAC_BASE_PATH/Carthage
 }
 
 ### SET PATHS ###
@@ -229,6 +230,7 @@ displayInfo "" \
     "KM_TIER: $KM_TIER" \
     "LOCALDEPLOY: $LOCALDEPLOY" \
     "PREPRELEASE: $PREPRELEASE" \
+    "CLEAN: $CLEAN" \
     "DO_KEYMANENGINE: $DO_KEYMANENGINE" \
     "DO_KEYMANIM: $DO_KEYMANIM" \
     "DO_KEYMANTESTAPP: $DO_KEYMANTESTAPP" \
@@ -240,11 +242,11 @@ displayInfo "" \
 
 ### START OF THE BUILD ###
 
-#if $CLEAN ; then
-# if ! [ -d "${KME4M_OUTPUT_FOLDER}" ]; then
-#     mkdir -p "${KME4M_OUTPUT_FOLDER}"
-# fi
-#fi
+if $CLEAN ; then
+ do_clean
+fi
+
+carthage update
 
 execBuildCommand() {
     typeset component="$1"

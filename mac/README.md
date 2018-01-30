@@ -1,12 +1,12 @@
 # Keyman for macOS
 
-## Minimum Mac Requirements
-Xcode 8.3.3 (it might also work to use an older version)
-[Carthage](https://github.com/Carthage/Carthage/blob/master/README.md) - easiest method is to install using Homebrew.
-Unfortunately, using Homebrew seems to mess up the command-line tools, so you will probably get this error from xcodebuild:
-    Error: xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory is a command line tools instance
-To fix it run this command:
-   sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+## Mac Tools Requirements/Setup
+Install Xcode 8.3.3 or later (it might also work to use an older version)
+[Carthage](https://github.com/Carthage/Carthage/blob/master/README.md) *see Homebrew note below
+
+You should manually run the command "carthage update" in the keyman/mac folder. This will
+pull down the correct version of the OCMocks framework. Homebrew will probably prompt you to
+allow it access to your github credentials, but there is no need for this - just click Deny.
 
 ## Keyman for macOS Development
 Keyman for macOS can be built from a command line (preferred) or Xcode.
@@ -44,3 +44,12 @@ The Keyman4Mac project builds a test-bed app that can be used to test keyboards 
 It can also be used as reference for the usage of Keyman Engine.
 
 Keyman4Mac tests are run using `./build.sh -test -no-codesign`.
+
+*note about Homebrew:
+Installing Carthage directly from the pkg file is simple. Homebrew seemed simple, but it
+changes a lot of settings and I think it messed up the build in a way that took me a long
+time to sort out. One specific problem is that using Homebrew seems to mess up the
+command-line tools, so you will probably get this error from xcodebuild:
+    Error: xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory is a command line tools instance
+To fix it run this command:
+   sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
