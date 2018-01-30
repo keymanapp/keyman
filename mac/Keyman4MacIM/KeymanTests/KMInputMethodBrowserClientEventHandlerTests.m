@@ -9,6 +9,7 @@
 #import <XCTest/XCTest.h>
 #import "KMInputMethodBrowserClientEventHandler.h"
 #import "KMInputMethodEventHandlerProtected.h"
+#import <OCMock/OCMock.h>
 
 @interface KeymanTests : XCTestCase
 
@@ -34,8 +35,11 @@ KMInputMethodBrowserClientEventHandler * _im;
     // repeatedly has no effect (i.e., it does not set clientSelectionCanChangeUnexpectedly to false).
     // Therefore a subsequent key down event *should* reult in a call to the client to inquire about
     // the current selection.
-    // TODO replace this meaningless client with a mock object so we can set results and query it afterwards.
-    id client;
+    id client = OCMStrictProtocolMock(@protocol(IMKTextInput));
+    OCMStub([client selectedRange]).andReturn(NSMakeRange(0, 0));
+    NSAttributedString *attrSubstring = [[NSAttributedString alloc] init];
+    OCMStub([client attributedSubstringFromRange:(NSMakeRange(0, 0))]).andReturn(attrSubstring);
+    OCMExpect([client insertText:@"Ç" replacementRange:NSMakeRange(NSNotFound, NSNotFound)]);
     for (int i = 0; i < 8; i++)
     {
         [_im checkContextIn:client];
