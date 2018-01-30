@@ -2,6 +2,11 @@
 
 ## Minimum Mac Requirements
 Xcode 8.3.3 (it might also work to use an older version)
+[Carthage](https://github.com/Carthage/Carthage/blob/master/README.md) - easiest method is to install using Homebrew.
+Unfortunately, using Homebrew seems to mess up the command-line tools, so you will probably get this error from xcodebuild:
+    Error: xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory is a command line tools instance
+To fix it run this command:
+   sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
 
 ## Keyman for macOS Development
 Keyman for macOS can be built from a command line (preferred) or Xcode.

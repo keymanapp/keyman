@@ -21,6 +21,9 @@ KMInputMethodBrowserClientEventHandler * _im;
 - (void)setUp {
     [super setUp];
     // Put setup code here. This method is called before the invocation of each test method in the class.
+    NSString *path = [[NSBundle bundleForClass:[KeymanTests class]] pathForResource:@"SimpleTest.kmx" ofType:nil];
+    KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
+    [((KMInputMethodAppDelegate *)[NSApp delegate]) setKmx:kmxFile];
     _im = [[KMInputMethodBrowserClientEventHandler alloc] init];
 }
 
@@ -39,7 +42,7 @@ KMInputMethodBrowserClientEventHandler * _im;
     OCMStub([client selectedRange]).andReturn(NSMakeRange(0, 0));
     NSAttributedString *attrSubstring = [[NSAttributedString alloc] init];
     OCMStub([client attributedSubstringFromRange:(NSMakeRange(0, 0))]).andReturn(attrSubstring);
-    OCMExpect([client insertText:@"Ç" replacementRange:NSMakeRange(NSNotFound, NSNotFound)]);
+    OCMExpect([client insertText:@"a" replacementRange:NSMakeRange(NSNotFound, NSNotFound)]);
     for (int i = 0; i < 8; i++)
     {
         [_im checkContextIn:client];
