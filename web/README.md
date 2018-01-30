@@ -42,6 +42,9 @@ To view pages using compiled KeymanWeb,
 *  `-debug_embedded`
     - to compile a readable version of the embedded KMEA/KMEI code
 *  `-no_minify`
-    - to disable the minification '/release/' build sections
+    - to disable the minified '/release/web' and '/release/embedded' build sections.
+	- the '/release/unminified/web' and '/release/unminified/embedded' folders will still be built.
+*  `-clean`
+    - to erase pre-existing build products before the build.
 	
 If more than one target is specified, the last one will take precedence.
