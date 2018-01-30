@@ -26,12 +26,12 @@ public class PackageProcessorTest {
   private static final File TEST_EXTRACTION_ROOT = new File(TEST_RESOURCE_ROOT, "temp");
 
   private static final String TEST_GFF_KMP_NAME = "gff_amh_7_test_json";
-  private static final File TEST_GFF_KMP_FILE = new File(TEST_RESOURCE_ROOT, TEST_GFF_KMP_NAME + ".kmp");
+  private static final File TEST_GFF_KMP_FILE = new File(TEST_RESOURCE_ROOT, "v14" + File.separator + TEST_GFF_KMP_NAME + ".kmp");
   private static final File TEST_GFF_KMP_TARGET = new File(TEST_EXTRACTION_ROOT, "packages" +
     File.separator + TEST_GFF_KMP_NAME);
 
   private static final String TEST_GFF_KMP_NAME_ALT = TEST_GFF_KMP_NAME;
-  private static final File TEST_GFF_KMP_FILE_ALT = new File(TEST_RESOURCE_ROOT, "temp" + File.separator + TEST_GFF_KMP_NAME_ALT + ".kmp");
+  private static final File TEST_GFF_KMP_FILE_ALT = new File(TEST_RESOURCE_ROOT, "v15" + File.separator + TEST_GFF_KMP_NAME_ALT + ".kmp");
   private static final File TEST_GFF_KMP_TARGET_ALT = new File(TEST_EXTRACTION_ROOT, "packages" +
     File.separator + TEST_GFF_KMP_NAME_ALT);
 
@@ -39,40 +39,11 @@ public class PackageProcessorTest {
   private static final String TEST_GFF_KBD_ID = "gff_amh_7";
 
   private static File tempPkg;
-
-  /**
-   * Uses the existing sample KMP's kmp.info file as a base, constructing a second, altered KMP package
-   * for use in version tests between same-id packages.  Does not reconstruct the .zip for actual installation
-   * tests.
-   * @throws Exception
-   */
-  private static void createAlternateKMP() throws Exception {
-    FileUtils.copyFile(TEST_GFF_KMP_FILE, TEST_GFF_KMP_FILE_ALT);
-    try {
-      File tempPkgAlt = PackageProcessor.unzipKMP(TEST_GFF_KMP_FILE_ALT);
-
-      JSONObject json = PackageProcessor.loadPackageInfo(tempPkgAlt);
-      json.getJSONObject("info").getJSONObject("version").put("description", "1.5"); // Make it look newer!
-
-      // Write out the JSON file.
-      File jsonFile = new File(tempPkgAlt, "kmp.json");
-      BufferedWriter writer = new BufferedWriter(new FileWriter(jsonFile, false));
-      writer.write(json.toString(2));
-      writer.close();
-
-      // Write the JSON file.
-    } catch (IOException e) {
-      System.err.println(e);
-    }
-
-    if(!TEST_GFF_KMP_TARGET.equals(TEST_GFF_KMP_TARGET_ALT)) {
-      throw new RuntimeException("Generated alternate test KMP not configured properly!");
-    }
-  }
+  private static File tempPkgAlt;
 
   // Each test gets a fresh version of the extracted package.
   @Before
-  public void extractTestPackages() {
+  public void extractBaseTestPackage() {
     PackageProcessor.initialize(TEST_EXTRACTION_ROOT);
     try {
       tempPkg = PackageProcessor.unzipKMP(TEST_GFF_KMP_FILE);
@@ -80,6 +51,17 @@ public class PackageProcessorTest {
       System.err.println(e);
     }
   }
+
+  // Some tests wish to utilize an alternate package..
+  public void extractAltTestPackage() {
+    PackageProcessor.initialize(TEST_EXTRACTION_ROOT);
+    try {
+      tempPkgAlt = PackageProcessor.unzipKMP(TEST_GFF_KMP_FILE_ALT);
+    } catch (IOException e) {
+      System.err.println(e);
+    }
+  }
+
 
   /**
    * Post-test cleanup.  While the temp/ directory is .gitignore'd, this provides an extra layer
@@ -89,9 +71,8 @@ public class PackageProcessorTest {
   @After
   public void eraseTestPackages() throws IOException {
     FileUtils.deleteDirectory(tempPkg);
+    FileUtils.deleteQuietly(tempPkgAlt);
     FileUtils.deleteDirectory(TEST_GFF_KMP_TARGET);
-
-    FileUtils.deleteQuietly(TEST_GFF_KMP_FILE_ALT);
   }
 
   @Test
@@ -186,8 +167,8 @@ public class PackageProcessorTest {
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.4", version);
 
-    createAlternateKMP();
-    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT, false, true);
+    extractAltTestPackage();
+    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT);
     version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.5", version);
@@ -199,8 +180,8 @@ public class PackageProcessorTest {
     List<Map<String, String>> installedKbds;
     String version;
 
-    createAlternateKMP();
-    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT, false, true);
+    extractAltTestPackage();
+    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT, false);
     version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.5", version);
@@ -229,8 +210,8 @@ public class PackageProcessorTest {
     Assert.assertFalse(PackageProcessor.isDowngrade(TEST_GFF_KMP_FILE));
     Assert.assertFalse(PackageProcessor.isSameVersion(TEST_GFF_KMP_FILE));
 
-    createAlternateKMP();
-    PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT, false, true);
+    extractAltTestPackage();
+    PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT);
 
     Assert.assertTrue(PackageProcessor.isDowngrade(TEST_GFF_KMP_FILE));
     Assert.assertFalse(PackageProcessor.isSameVersion(TEST_GFF_KMP_FILE));
@@ -241,15 +222,15 @@ public class PackageProcessorTest {
     Assert.assertTrue(PackageProcessor.isSameVersion(TEST_GFF_KMP_FILE));
 
     // Test 3 - when it's an upgrade.
-    createAlternateKMP();
-    Assert.assertFalse(PackageProcessor.isDowngrade(TEST_GFF_KMP_FILE_ALT, true));
-    Assert.assertFalse(PackageProcessor.isSameVersion(TEST_GFF_KMP_FILE_ALT, true));
+    extractAltTestPackage();
+    Assert.assertFalse(PackageProcessor.isDowngrade(TEST_GFF_KMP_FILE_ALT));
+    Assert.assertFalse(PackageProcessor.isSameVersion(TEST_GFF_KMP_FILE_ALT));
   }
 
   @Test
   public void test_kmpVersionCheck() throws Exception {
-    createAlternateKMP();
-    PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT, false, true);
+    extractAltTestPackage();
+    PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT);
 
     Assert.assertEquals("1.5", PackageProcessor.getPackageVersion(TEST_GFF_KMP_FILE, true));
     Assert.assertEquals("1.4", PackageProcessor.getPackageVersion(TEST_GFF_KMP_FILE, false));
