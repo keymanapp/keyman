@@ -47,7 +47,6 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public final class KMManager {
@@ -147,6 +146,18 @@ public final class KMManager {
     return KMEngineVersion;
   }
 
+  protected static String getResourceRoot() {
+    return appContext.getDir("data", Context.MODE_PRIVATE).toString() + File.separator;
+  }
+
+  protected static String getPackagesDir() {
+    return getResourceRoot() + KMDefault_AssetPackages + File.separator;
+  }
+
+  protected static String getCloudDir() {
+    return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
+  }
+
   // Check if a keyboard namespace is reserved
   public static boolean isReservedNamespace(String packageID) {
     if (packageID.equals(KMDefault_UndefinedPackageID)) {
@@ -175,11 +186,7 @@ public final class KMManager {
 
     // Initializes the PackageProcessor with the base resource directory, which is the parent directory
     // for the final location corresponding to KMDefault_AssetPackages.
-    PackageProcessor.initialize(new File(context.getDir("data", Context.MODE_PRIVATE).toString()));
-  }
-
-  public static File getResourceRoot() {
-    return new File(appContext.getDir("data", Context.MODE_PRIVATE) + File.separator);
+    PackageProcessor.initialize(new File(getResourceRoot()));
   }
 
   public static void setInputMethodService(InputMethodService service) {
@@ -362,17 +369,13 @@ public final class KMManager {
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
       copyAsset(context, KMFilename_Osk_Woff_Font, "", true);
 
-      String packagesDirStr = context.getDir("data", Context.MODE_PRIVATE).toString() +
-        File.separator + KMDefault_AssetPackages + File.separator;
-      File packagesDir = new File(packagesDirStr);
+      File packagesDir = new File(getPackagesDir());
       if (!packagesDir.exists()) {
         packagesDir.mkdir();
       }
 
       // Copy default cloud keyboard
-      String cloudDirStr = context.getDir("data", Context.MODE_PRIVATE).toString() +
-        File.separator + KMDefault_UndefinedPackageID + File.separator;
-      File cloudDir = new File(cloudDirStr);
+      File cloudDir = new File(getCloudDir());
       if (!cloudDir.exists()) {
         cloudDir.mkdir();
       }
@@ -397,9 +400,9 @@ public final class KMManager {
       String dirPath;
       if (directory.length() != 0) {
         directory = directory + File.separator;
-        dirPath = context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator + directory;
+        dirPath = getResourceRoot() + directory;
       } else {
-        dirPath = context.getDir("data", Context.MODE_PRIVATE).toString();
+        dirPath = getResourceRoot();
       }
 
       File file = new File(dirPath, filename);
@@ -432,19 +435,15 @@ public final class KMManager {
    * @param context
    */
   private static void migrateOldKeyboardFiles(Context context) {
-    String legacyLanguagesPath = context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator +
-      KMDefault_LegacyAssetLanguages + File.separator;
-    String legacyFontsPath = context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator +
-      KMDefault_LegacyAssetFonts + File.separator;
+    String legacyLanguagesPath = getResourceRoot() + KMDefault_LegacyAssetLanguages + File.separator;
+    String legacyFontsPath = getResourceRoot() + KMDefault_LegacyAssetFonts + File.separator;
     File legacyLanguagesDir = new File(legacyLanguagesPath);
     File legacyFontsDir = new File(legacyFontsPath);
     if (!legacyLanguagesDir.exists() && !legacyFontsDir.exists()) {
       return;
     }
 
-    String migratedPath = context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator +
-      KMDefault_UndefinedPackageID;
-    File migratedDir = new File(migratedPath);
+    File migratedDir = new File(getCloudDir());
     if (!migratedDir.exists()) {
       migratedDir.mkdir();
     }
@@ -795,8 +794,7 @@ public final class KMManager {
     String kbFileVersion = null;
     String path;
     if (packageID.equals(KMDefault_UndefinedPackageID)) {
-      path = context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator +
-        KMDefault_UndefinedPackageID + File.separator;
+      path = getCloudDir();
 
       File dir = new File(path);
       FileFilter keyboardFilter = new FileFilter() {
@@ -836,8 +834,7 @@ public final class KMManager {
         }
       }
     } else {
-      path = context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator +
-        KMDefault_AssetPackages + File.separator + packageID + File.separator + "kmp.json";
+      path = getPackagesDir() + packageID + File.separator + "kmp.json";
 
       try {
         File kmpJSONFile = new File(path);

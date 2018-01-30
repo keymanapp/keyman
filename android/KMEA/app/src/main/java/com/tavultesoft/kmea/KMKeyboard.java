@@ -263,16 +263,8 @@ final class KMKeyboard extends WebView {
     String languageName = "";
     keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
 
-    String keyboardPath = "";
-    if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
-      setKeyboardRoot(context.getDir("data", Context.MODE_PRIVATE).toString() +
-        File.separator + KMManager.KMDefault_UndefinedPackageID + File.separator);
-      keyboardPath = keyboardRoot + keyboardID + "-" + keyboardVersion + ".js";
-    } else {
-      setKeyboardRoot(context.getDir("data", Context.MODE_PRIVATE).toString() +
-        File.separator + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator);
-      keyboardPath = keyboardRoot + keyboardID + ".js";
-    }
+    setKeyboardRoot(packageID);
+    String keyboardPath = makeKeyboardPath(packageID, keyboardID, keyboardVersion);
 
     String tFont = "''";
     String oFont = null;
@@ -361,16 +353,8 @@ final class KMKeyboard extends WebView {
 
     keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
 
-    String keyboardPath = "";
-    if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
-      setKeyboardRoot(context.getDir("data", Context.MODE_PRIVATE).toString() +
-        File.separator + KMManager.KMDefault_UndefinedPackageID + File.separator);
-      keyboardPath = keyboardRoot + keyboardID + "-" + keyboardVersion + ".js";
-    } else {
-      setKeyboardRoot(context.getDir("data", Context.MODE_PRIVATE).toString() +
-        File.separator + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator);
-      keyboardPath = keyboardRoot + keyboardID + ".js";
-    }
+    setKeyboardRoot(packageID);
+    String keyboardPath = makeKeyboardPath(packageID, keyboardID, keyboardVersion);
 
     String tFont = "''";
     String oFont = null;
@@ -449,10 +433,29 @@ final class KMKeyboard extends WebView {
 
   }
 
-  public void setKeyboardRoot(String root) { this.keyboardRoot = root; }
+  // Set the base path of the keyboard depending on the package ID
+  private void setKeyboardRoot(String packageID) {
+    if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+      this.keyboardRoot = (context.getDir("data", Context.MODE_PRIVATE).toString() +
+        File.separator + KMManager.KMDefault_UndefinedPackageID + File.separator);
+    } else {
+      this.keyboardRoot = (context.getDir("data", Context.MODE_PRIVATE).toString() +
+        File.separator + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator);
+    }
+  }
 
   public String getKeyboardRoot() {
     return this.keyboardRoot;
+  }
+
+  private String makeKeyboardPath(String packageID, String keyboardID, String keyboardVersion) {
+    String keyboardPath;
+    if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+      keyboardPath = getKeyboardRoot() + keyboardID + "-" + keyboardVersion + ".js";
+    } else {
+      keyboardPath = getKeyboardRoot() + keyboardID + ".js";
+    }
+    return keyboardPath;
   }
 
   // Extract Unicode numbers (\\uxxxx) from a layer to character string.
