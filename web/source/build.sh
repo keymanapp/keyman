@@ -13,6 +13,7 @@ display_usage ( ) {
     echo "  -web              to compile only the KeymanWeb engine."
     echo "  -debug_embedded   to compile a readable version of the embedded KMEA/KMEI code"
     echo "  -no_minify        to disable the minification '/release/' build sections"
+    echo "  -clean            to erase pre-existing build products before the build."
     echo ""
     echo "  If more than one target is specified, the last one will take precedence."
     exit 1
@@ -106,6 +107,10 @@ finish_nominify ( ) {
         resourceDest=$dest/resources
     fi
 
+    # Create our entire embedded compilation results path.
+    if ! [ -d $dest ]; then
+        mkdir -p "$dest"  # Includes base folder, is recursive.
+    fi
     echo "Copying unminified $1 build products to $dest."
 
     for (( n=1; n<$#; n++ ))  # Apparently, args ends up zero-based, meaning $2 => n=1.
@@ -151,6 +156,11 @@ copy_resources ( ) {
     echo
     echo KeymanWeb resources saved under $1
     echo
+}
+
+clean ( ) {
+    rm -rf "../release"
+    rm -rf "../intermediate"
 }
 
 # Definition of global compile constants
@@ -242,6 +252,9 @@ while [[ $# -gt 0 ]] ; do
         -no_minify)
             DO_MINIFY=false
             ;;
+        -clean)
+            clean
+            ;;
     esac
     shift # past argument
 done
@@ -262,12 +275,6 @@ fi
 if [ $BUILD_EMBED = true ]; then
     echo Compile KMEI/KMEA build $BUILD
 
-    # Create our entire embedded compilation results path.
-    if ! [ -d $EMBED_OUTPUT/resources ]; then
-        mkdir -p "$EMBED_OUTPUT/resources"  # Includes base folder, is recursive.
-    fi
-
-    rm $EMBED_OUTPUT/keyman.js 2>/dev/null
     $compilecmd -p $NODE_SOURCE/tsconfig.embedded.json
     if [ $? -ne 0 ]; then
         fail "Typescript compilation failed."
@@ -280,6 +287,13 @@ if [ $BUILD_EMBED = true ]; then
     finish_nominify $EMBEDDED $EMBED_TARGET
 
     if [ $DO_MINIFY = true ]; then
+        # Create our entire embedded compilation results path.
+        if ! [ -d $EMBED_OUTPUT/resources ]; then
+            mkdir -p "$EMBED_OUTPUT/resources"  # Includes base folder, is recursive.
+        fi
+
+        rm $EMBED_OUTPUT/keyman.js 2>/dev/null
+
         minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "KeymanBase.__BUILD__=$BUILD"
         assert $EMBED_OUTPUT/keyman.js
         echo Compiled embedded application saved as $EMBED_OUTPUT/keyman.js
@@ -299,7 +313,6 @@ fi
 if [ $BUILD_COREWEB = true ]; then
     # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
     echo Compile Keymanweb...
-    rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
     $compilecmd -p $NODE_SOURCE/tsconfig.web.json
     if [ $? -ne 0 ]; then
         fail "Typescript compilation failed."
@@ -312,6 +325,8 @@ if [ $BUILD_COREWEB = true ]; then
     finish_nominify $WEB $WEB_TARGET
 
     if [ $DO_MINIFY = true ]; then
+        rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
+
         echo Minifying KeymanWeb...
         minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "KeymanBase.__BUILD__=$BUILD"
         assert $WEB_OUTPUT/keymanweb.js
@@ -320,7 +335,7 @@ if [ $BUILD_COREWEB = true ]; then
     fi
 fi
 
-if [ $BUILD_FULLWEB = true ]; then
+if [ $BUILD_FULLWEB = true ] && [ $DO_MINIFY = true ]; then
     copy_resources "$WEB_OUTPUT"
     # Update build number if successful
     echo
