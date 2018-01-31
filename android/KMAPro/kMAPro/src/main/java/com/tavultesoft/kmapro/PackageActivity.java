@@ -147,13 +147,8 @@ public class PackageActivity extends Activity {
       @Override
       public void onClick(View v) {
         try {
-          // Remove currently installed package and then install
-          File currentPackage = new File(context.getDir("data", MODE_PRIVATE).toString() +
-            File.separator + KMManager.KMDefault_AssetPackages + File.separator + pkgId);
-          if (currentPackage.exists()) {
-            FileUtils.deleteDirectory(currentPackage);
-          }
-          installedPackageKeyboards = PackageProcessor.processKMP(kmpFile);
+          // processKMP will remove currently installed package and install
+          installedPackageKeyboards = PackageProcessor.processKMP(kmpFile, true);
           // Do the notifications!
           boolean success = installedPackageKeyboards.size() != 0;
           if (success) {

@@ -764,19 +764,6 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
 
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
-    // TODO:  Stuff for automatic updates.
-    for(Map<String, String> keyboardInfo: keyboardsInstalled) {
-      String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-      String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-      String kbKey = String.format("%s_%s", languageID, keyboardID);
-      int index = getKeyboardIndex(this, kbKey);
-      if (index == -1) {
-        // Add the downloaded keyboard if not found
-        addKeyboard(this, new HashMap<>(keyboardInfo));
-        index = getKeyboardIndex(this, kbKey);
-      }
-      keyboardsList.set(index, new HashMap<>(keyboardInfo));
-      saveKeyboardsList(this);
-    }
+    // Do nothing
   }
 }

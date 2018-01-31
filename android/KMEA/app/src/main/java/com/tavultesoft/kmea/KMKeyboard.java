@@ -248,7 +248,7 @@ final class KMKeyboard extends WebView {
     boolean retVal = true;
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
-      Toast.makeText(context, "Can't set " + packageID + ":" + keyboardID + " for " +
+      Toast.makeText(context, "Can't set " + packageID + "::" + keyboardID + " for " +
         languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
       keyboardID = KMManager.KMDefault_KeyboardID;
       languageID = KMManager.KMDefault_LanguageID;
@@ -335,7 +335,7 @@ final class KMKeyboard extends WebView {
     boolean retVal = true;
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
-      Toast.makeText(context, "Can't set " + packageID + ":" + keyboardID + " for " +
+      Toast.makeText(context, "Can't set " + packageID + "::" + keyboardID + " for " +
         languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
       packageID = KMManager.KMDefault_UndefinedPackageID;
       keyboardID = KMManager.KMDefault_KeyboardID;

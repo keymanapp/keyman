@@ -732,7 +732,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
-    // TODO:  Stuff for automatic updates.
     for(int i=0; i < keyboardsInstalled.size(); i++) {
       HashMap<String, String> keyboardInfo = new HashMap<>(keyboardsInstalled.get(i));
       if (i == 0) {
