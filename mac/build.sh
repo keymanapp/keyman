@@ -243,10 +243,12 @@ displayInfo "" \
 ### START OF THE BUILD ###
 
 if $CLEAN ; then
- do_clean
+    do_clean
 fi
 
-carthage bootstrap
+if [ "$TEST_ACTION" == "test" ]; then
+	carthage bootstrap
+fi
 
 execBuildCommand() {
     typeset component="$1"
