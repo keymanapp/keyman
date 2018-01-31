@@ -111,11 +111,33 @@ begin
 end;
 
 function TBCP47Tag.IsValid(var msg: string): Boolean;
+var
+  NewTag: TBCP47Tag;
 begin
-  Result := SameText(OriginalTag, Tag);
+  NewTag := TBCP47Tag.Create(Tag);
+  try
+    // Test each component, because we want to clarify that a tag constructed with
+    // wrong components shouldn't be treated as valid, even though it might form
+    // a 'valid' string. e.g. if we set .Language to "LO" and .Script to "LA", that
+    // will construct to LO-LA, which is valid, but the component "LA" is actually
+    // only valid as a region, and not a script, resulting in incorrect assumptions.
+    Result :=
+      SameText(NewTag.Language, Language) and
+      SameText(NewTag.ExtLang, ExtLang) and
+      SameText(NewTag.Script, Script) and
+      SameText(NewTag.Region, Region) and
+      SameText(NewTag.Variant, Variant) and
+      SameText(NewTag.Extension, Extension) and
+      SameText(NewTag.PrivateUse, PrivateUse) and
+      SameText(NewTag.Grandfathered, Grandfathered) and
+      SameText(NewTag.LangTag_PrivateUse, LangTag_PrivateUse);
+  finally
+    NewTag.Free;
+  end;
+
   if not Result then
   begin
-    msg := '''' + OriginalTag + ''' is not a valid BCP 47 tag';
+    msg := '''' + Tag + ''' is not a valid BCP 47 tag';
   end;
 end;
 
