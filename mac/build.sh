@@ -180,7 +180,7 @@ while [[ $# -gt 0 ]] ; do
             if $LOCALDEPLOY || $PREPRELEASE ; then
                 warn "Code-signing is required for selected deployment option."
             else
-                CODESIGNING_SUPPRESSION="CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO"
+                CODESIGNING_SUPPRESSION="CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO"
             fi
             ;;
         -quiet)
