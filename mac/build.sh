@@ -247,6 +247,8 @@ if $CLEAN ; then
 fi
 
 if [ "$TEST_ACTION" == "test" ]; then
+    #temporary:
+    which carthage
 	carthage bootstrap
 fi
 
