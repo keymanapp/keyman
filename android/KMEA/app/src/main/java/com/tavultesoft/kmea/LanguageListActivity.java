@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -137,6 +139,11 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
     }
   }
 
+  @Override
+  public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
+    // Do nothing.
+  }
+
   protected static HashMap<String, String> getKeyboardInfo(int languageIndex, int keyboardIndex) {
     if (languages == null)
       return null;
@@ -146,14 +153,9 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
       JSONObject language = languages.getJSONObject(languageIndex);
       String langID = language.getString(KMManager.KMKey_ID);
       String langName = language.getString(KMManager.KMKey_Name);
-      String pkgID;
 
       JSONArray keyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
-      if (keyboards.getJSONObject(keyboardIndex).has(KMManager.KMKey_PackageID)) {
-        pkgID = keyboards.getJSONObject(keyboardIndex).getString(KMManager.KMKey_PackageID);
-      } else {
-        pkgID = KMManager.KMDefault_LegacyPackageID;
-      }
+      String pkgID = keyboards.getJSONObject(keyboardIndex).optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
       String kbID = keyboards.getJSONObject(keyboardIndex).getString(KMManager.KMKey_ID);
       String kbName = keyboards.getJSONObject(keyboardIndex).getString(KMManager.KMKey_Name);
       String kbVersion = keyboards.getJSONObject(keyboardIndex).optString(KMManager.KMKey_KeyboardVersion, "1.0");

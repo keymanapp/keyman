@@ -6,6 +6,8 @@ package com.tavultesoft.kmea;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -180,5 +182,10 @@ public final class KeyboardListActivity extends Activity implements OnKeyboardDo
     } else {
       Toast.makeText(this, "Keyboard download failed", Toast.LENGTH_SHORT).show();
     }
+  }
+
+  @Override
+  public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
+    // Do nothing.
   }
 }

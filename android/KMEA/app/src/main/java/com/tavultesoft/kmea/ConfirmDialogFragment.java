@@ -1,5 +1,6 @@
 package com.tavultesoft.kmea;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -35,6 +36,8 @@ public class ConfirmDialogFragment extends DialogFragment {
       .setNegativeButton("Cancel",  new DialogInterface.OnClickListener() {
        public void onClick(DialogInterface dialog, int which) {
          // Cancel
+         dialog.dismiss();
+         ((Activity)getContext()).finish();
        }
       })
       .create();
