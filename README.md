@@ -1,4 +1,4 @@
-![Keyman](https://s.keyman.com/kmc/deploy/img/logo2.ba10b4af03869e69115ce84380e980aa.png) 
+![Keyman](https://keyman.com/cdn/dev/img/logo2.png) 
 
 Open Source
 
@@ -35,6 +35,6 @@ Each platform maintains multiple types of releases:
 
 # License
 
-Copyright (c) SIL International. All rights reserved.
+Copyright (c) 2018 SIL International. All rights reserved.
 
 Licensed under the [MIT](./windows/src/LICENSE.md) License.

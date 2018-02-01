@@ -1,6 +1,11 @@
 #!/bin/sh
 # Build KeyboardHarness test app
 
+#
+# Prevents 'clear' on exit of mingw64 bash shell
+#
+SHLVL=0
+
 echo Build KMEA
 cd ../../KMEA
 ./build.sh
