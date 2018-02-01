@@ -4,7 +4,7 @@
 #
 
 display_usage ( ) {
-    echo "build.sh [-ui | -test | -embed | -web | -debug_embedded] [-no_minify]"
+    echo "build.sh [-ui | -test | -embed | -web | -debug_embedded] [-no_minify] [-clean]"
     echo
     echo "  -ui               to compile desktop user interface modules to output folder"
     echo "  -test             to compile for testing without copying resources or" 
