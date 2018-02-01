@@ -27,7 +27,7 @@ Refer to the samples for usage details.
 
 To view pages using compiled KeymanWeb,
 1. cd to **keyman/web/source**
-2. Run `/.build.sh`
+2. Run `./build.sh`
 
 ### `build.sh` options:
 
