@@ -4,7 +4,7 @@
 #
 
 display_usage ( ) {
-    echo "build.sh [-ui | -test | -embed | -web | -debug_embedded]"
+    echo "build.sh [-ui | -test | -embed | -web | -debug_embedded] [-no_minify] [-clean]"
     echo
     echo "  -ui               to compile desktop user interface modules to output folder"
     echo "  -test             to compile for testing without copying resources or" 
@@ -12,13 +12,18 @@ display_usage ( ) {
     echo "  -embed            to compile only the KMEA/KMEI embedded engine."
     echo "  -web              to compile only the KeymanWeb engine."
     echo "  -debug_embedded   to compile a readable version of the embedded KMEA/KMEI code"
+    echo "  -no_minify        to disable the minification '/release/' build sections -"  
+    echo "                      the '/release/unminified' subfolders will still be built."
+    echo "  -clean            to erase pre-existing build products before the build."
+    echo ""
+    echo "  If more than one target is specified, the last one will take precedence."
     exit 1
 }
 
 # Fails the build if a specified file does not exist.
 assert ( ) {
     if ! [ -f $1 ]; then
-        echo "Build failed."
+        fail "Build failed."
         exit 1
     fi
 }
@@ -31,6 +36,11 @@ fail() {
     echo "${ERROR_RED}$FAILURE_MSG${NORMAL}"
     exit 1
 }
+
+# Build products for each main target.
+WEB_TARGET=( "keymanweb.js" )
+UI_TARGET=( "kmwuibutton.js" "kmwuifloat.js" "kmwuitoggle.js" "kmwuitoolbar.js" )
+EMBED_TARGET=( "keyman.js" )
 
 # Ensure the dependencies are downloaded.
 echo "Node.js + dependencies check"
@@ -86,6 +96,34 @@ minify ( ) {
 //# sourceMappingURL=$1.map"
 }
 
+# $1 - target (WEB, EMBEDDED)
+# $2+ - build target array (one of WEB_TARGET, FULL_WEB_TARGET, or EMBED_TARGET)
+finish_nominify ( ) {
+    args=("$@")
+    if [ $1 = $WEB ] || [ $1 = $UI ]; then
+        dest=$WEB_OUTPUT_NO_MINI
+        resourceDest=$dest
+    else
+        dest=$EMBED_OUTPUT_NO_MINI
+        resourceDest=$dest/resources
+    fi
+
+    # Create our entire embedded compilation results path.
+    if ! [ -d $dest ]; then
+        mkdir -p "$dest"  # Includes base folder, is recursive.
+    fi
+    echo "Copying unminified $1 build products to $dest."
+
+    for (( n=1; n<$#; n++ ))  # Apparently, args ends up zero-based, meaning $2 => n=1.
+    do
+        target=${args[$n]}
+        cp -f $INTERMEDIATE/$target $dest/$target
+        cp -f $INTERMEDIATE/$target.map $dest/$target.map
+    done
+
+    copy_resources $resourceDest
+}
+
 copy_resources ( ) {
     echo 
     echo Copy resources to $1/ui, .../osk
@@ -121,9 +159,20 @@ copy_resources ( ) {
     echo
 }
 
+clean ( ) {
+    rm -rf "../release"
+    rm -rf "../intermediate"
+}
+
 # Definition of global compile constants
+UI="ui"
+WEB="web"
+EMBEDDED="embedded"
+
 WEB_OUTPUT="../release/web"
 EMBED_OUTPUT="../release/embedded"
+WEB_OUTPUT_NO_MINI="../release/unminified/web"
+EMBED_OUTPUT_NO_MINI="../release/unminified/embedded"
 INTERMEDIATE="../intermediate"
 SOURCE="."
 NODE_SOURCE="source"
@@ -146,12 +195,14 @@ compiler="npm run tsc --"
 compilecmd="$compiler"
 
 # Establish default build parameters
-
-BUILD_UI=true
-BUILD_EMBED=true
-BUILD_FULLWEB=true
-BUILD_DEBUG_EMBED=false
-BUILD_COREWEB=true
+set_default_vars ( ) {
+    BUILD_UI=true
+    BUILD_EMBED=true
+    BUILD_FULLWEB=true
+    BUILD_DEBUG_EMBED=false
+    BUILD_COREWEB=true
+    DO_MINIFY=true
+}
 
 if [[ $# = 0 ]]; then
     FULL_BUILD=true
@@ -159,30 +210,37 @@ else
     FULL_BUILD=false
 fi
 
+set_default_vars
+
 # Parse args
-if [[ $# -gt 0 ]] ; then
+while [[ $# -gt 0 ]] ; do
     key="$1"
     case $key in
         -ui)
+            set_default_vars
             BUILD_EMBED=false
             BUILD_FULLWEB=false
             BUILD_COREWEB=false
             ;;
         -test)
+            set_default_vars
             BUILD_TEST=true
             BUILD_UI=false
             BUILD_EMBED=false
             BUILD_FULLWEB=false
             ;;
         -embed)
+            set_default_vars
             BUILD_FULLWEB=false
             BUILD_UI=false
             BUILD_COREWEB=false
             ;;
         -web)
+            set_default_vars
             BUILD_EMBED=false
             ;;
         -debug_embedded)
+            set_default_vars
             BUILD_EMBED=false
             BUILD_UI=false
             BUILD_COREWEB=false
@@ -192,15 +250,22 @@ if [[ $# -gt 0 ]] ; then
         -h|-?)
             display_usage
             ;;
+        -no_minify)
+            DO_MINIFY=false
+            ;;
+        -clean)
+            clean
+            ;;
     esac
     shift # past argument
-fi
+done
 
 readonly BUILD_UI
 readonly BUILD_EMBED
 readonly BUILD_FULLWEB
 readonly BUILD_DEBUG_EMBED
 readonly BUILD_COREWEB
+readonly DO_MINIFY
 
 if [ $FULL_BUILD = true ]; then
     echo Compiling build $BUILD
@@ -211,59 +276,67 @@ fi
 if [ $BUILD_EMBED = true ]; then
     echo Compile KMEI/KMEA build $BUILD
 
-    # Create our entire embedded compilation results path.
-    if ! [ -d $EMBED_OUTPUT/resources ]; then
-        mkdir -p "$EMBED_OUTPUT/resources"  # Includes base folder, is recursive.
-    fi
-
-    rm $EMBED_OUTPUT/keyman.js 2>/dev/null
     $compilecmd -p $NODE_SOURCE/tsconfig.embedded.json
     if [ $? -ne 0 ]; then
         fail "Typescript compilation failed."
     fi
     assert $INTERMEDIATE/keyman.js
-    echo Embedded TypeScript compiled.
+    echo Embedded TypeScript compiled as $INTERMEDIATE/keyman.js
 
+    copy_resources "$INTERMEDIATE"  # Very useful for local testing.
 
-    minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "KeymanBase.__BUILD__=$BUILD"
-    assert $EMBED_OUTPUT/keyman.js 
+    finish_nominify $EMBEDDED $EMBED_TARGET
 
-    echo Compiled embedded application saved as $EMBED_OUTPUT/keyman.js
+    if [ $DO_MINIFY = true ]; then
+        # Create our entire embedded compilation results path.
+        if ! [ -d $EMBED_OUTPUT/resources ]; then
+            mkdir -p "$EMBED_OUTPUT/resources"  # Includes base folder, is recursive.
+        fi
 
-    # Update any changed resources
+        rm $EMBED_OUTPUT/keyman.js 2>/dev/null
 
-    # echo Copy or update resources
+        minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "KeymanBase.__BUILD__=$BUILD"
+        assert $EMBED_OUTPUT/keyman.js
+        echo Compiled embedded application saved as $EMBED_OUTPUT/keyman.js
 
-    cp -Rf $SOURCE/resources $EMBED_OUTPUT/ >/dev/null
+        # Update any changed resources
+        # echo Copy or update resources
 
-    # Update build number if successful
-    echo
-    echo KMEA/KMEI build $BUILD compiled and saved under $EMBED_OUTPUT
-    echo
+        copy_resources "$EMBED_OUTPUT/resources"
+
+        # Update build number if successful
+        echo
+        echo KMEA/KMEI build $BUILD compiled and saved under $EMBED_OUTPUT
+        echo
+    fi
 fi
 
 if [ $BUILD_COREWEB = true ]; then
     # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
     echo Compile Keymanweb...
-    rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
     $compilecmd -p $NODE_SOURCE/tsconfig.web.json
     if [ $? -ne 0 ]; then
         fail "Typescript compilation failed."
     fi
     assert $INTERMEDIATE/keymanweb.js
-    echo Native TypeScript compiled.
+    echo Native TypeScript compiled as $INTERMEDIATE/keymanweb.js
 
-    
     copy_resources "$INTERMEDIATE"
 
-    echo Minifying KeymanWeb...
-    minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "KeymanBase.__BUILD__=$BUILD"
-    assert $WEB_OUTPUT/keymanweb.js
+    finish_nominify $WEB $WEB_TARGET
 
-    echo Compiled KeymanWeb application saved as $WEB_OUTPUT/keymanweb.js
+    if [ $DO_MINIFY = true ]; then
+        rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
+
+        echo Minifying KeymanWeb...
+        minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "KeymanBase.__BUILD__=$BUILD"
+        assert $WEB_OUTPUT/keymanweb.js
+
+        echo Compiled KeymanWeb application saved as $WEB_OUTPUT/keymanweb.js
+    fi
 fi
 
-if [ $BUILD_FULLWEB = true ]; then
+if [ $BUILD_FULLWEB = true ] && [ $DO_MINIFY = true ]; then
     copy_resources "$WEB_OUTPUT"
     # Update build number if successful
     echo
@@ -279,27 +352,33 @@ if [ $BUILD_UI = true ]; then
     assert $INTERMEDIATE/kmwuifloat.js
     assert $INTERMEDIATE/kmwuibutton.js
 
-    echo Minify ToolBar UI
-    del $WEB_OUTPUT/kmuitoolbar.js 2>/dev/null
-    minify kmwuitoolbar.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "" "(function() {%output%}());"
-    assert $WEB_OUTPUT/kmwuitoolbar.js
+    finish_nominify $UI "${UI_TARGET[@]}"
 
-    echo Minify Toggle UI
-    del $WEB_OUTPUT/kmuitoggle.js 2>/dev/null
-    minify kmwuitoggle.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "" "(function() {%output%}());"
-    assert $WEB_OUTPUT/kmwuitoggle.js
+    echo \'Native\' UI TypeScript has been compiled into the $INTERMEDIATE/ folder 
 
-    echo Minify Float UI
-    del $WEB_OUTPUT/kmuifloat.js 2>/dev/null
-    minify kmwuifloat.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "" "(function() {%output%}());"
-    assert $WEB_OUTPUT/kmwuifloat.js
+    if [ $DO_MINIFY = true ]; then
+        echo Minify ToolBar UI
+        del $WEB_OUTPUT/kmuitoolbar.js 2>/dev/null
+        minify kmwuitoolbar.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "" "(function() {%output%}());"
+        assert $WEB_OUTPUT/kmwuitoolbar.js
 
-    echo Minify Button UI
-    del $WEB_OUTPUT/kmuibutton.js 2>/dev/null
-    minify kmwuibutton.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "" "(function() {%output%}());"
-    assert $WEB_OUTPUT/kmwuibutton.js
+        echo Minify Toggle UI
+        del $WEB_OUTPUT/kmuitoggle.js 2>/dev/null
+        minify kmwuitoggle.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "" "(function() {%output%}());"
+        assert $WEB_OUTPUT/kmwuitoggle.js
 
-    echo User interface modules compiled and saved under $WEB_OUTPUT
+        echo Minify Float UI
+        del $WEB_OUTPUT/kmuifloat.js 2>/dev/null
+        minify kmwuifloat.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "" "(function() {%output%}());"
+        assert $WEB_OUTPUT/kmwuifloat.js
+
+        echo Minify Button UI
+        del $WEB_OUTPUT/kmuibutton.js 2>/dev/null
+        minify kmwuibutton.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "" "(function() {%output%}());"
+        assert $WEB_OUTPUT/kmwuibutton.js
+
+        echo "User interface modules compiled and saved under $WEB_OUTPUT"
+    fi
 fi
 
 if [ $BUILD_DEBUG_EMBED = true ]; then
