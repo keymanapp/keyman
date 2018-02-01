@@ -8,6 +8,11 @@ die () {
     exit 1
 }
 
+#
+# Prevents 'clear' on exit of mingw64 bash shell
+#
+SHLVL=0
+
 echo Build KMEA and KMAPro:
 cd KMEA
 ./build.sh $@
