@@ -6,6 +6,7 @@ The Original Code is (C) 2017 SIL International
 * A local installation of [Node.js](https://nodejs.org/).
 	* Builds will call `npm install` to automatically install further necessary build dependencies.
 * Java 7+ (required by the Google Closure Compiler)
+    * This can be ignored for Keyman Developer builds.
 
 **********************************************************************
 
