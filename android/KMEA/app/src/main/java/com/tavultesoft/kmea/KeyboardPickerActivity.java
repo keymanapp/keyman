@@ -7,17 +7,21 @@ package com.tavultesoft.kmea;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.tavultesoft.kmea.util.FileUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -92,13 +96,13 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
     } else {
       keyboardsList = new ArrayList<HashMap<String, String>>();
       HashMap<String, String> kbInfo = new HashMap<String, String>();
-      kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_PackageID);
+      kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
       kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
       kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
       kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
       kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
       kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(
-        context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID));
+        context, KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID));
       kbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
       kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
       keyboardsList.add(kbInfo);
@@ -302,15 +306,11 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
   private void switchKeyboard(int position) {
     setSelection(position);
     HashMap<String, String> kbInfo = keyboardsList.get(position);
-    String kbId = kbInfo.get(KMManager.KMKey_KeyboardID);
     String pkgId = kbInfo.get(KMManager.KMKey_PackageID);
     if (pkgId == null || pkgId.isEmpty()) {
-      if (kbId.equals(KMManager.KMDefault_KeyboardID)) {
-        pkgId = KMManager.KMDefault_PackageID;
-      } else {
-        pkgId = KMManager.KMDefault_LegacyPackageID;
-      }
+      pkgId = KMManager.KMDefault_UndefinedPackageID;
     }
+    String kbId = kbInfo.get(KMManager.KMKey_KeyboardID);
     String langId = kbInfo.get(KMManager.KMKey_LanguageID);
     String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
     String langName = kbInfo.get(KMManager.KMKey_LanguageName);
@@ -500,7 +500,7 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
       HashMap<String, String> kbInfo = keyboardsList.get(index);
       String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
       if (pkgID == null || pkgID.isEmpty()) {
-        kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_LegacyPackageID);
+        kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
       }
       return kbInfo;
     }
@@ -760,5 +760,10 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
     if (updateProgress != null && updateProgress.isShowing()) {
       updateProgress.dismiss();
     }
+  }
+
+  @Override
+  public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
+    // Do nothing
   }
 }

@@ -15,6 +15,8 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends Activity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener {
 
@@ -35,7 +37,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
     // Chirality test keyboard
     HashMap<String, String> chiralityKBInfo = new HashMap<String, String>();
-    chiralityKBInfo.put(KMManager.KMKey_PackageID, "chirality");
+    chiralityKBInfo.put(KMManager.KMKey_PackageID, "cloud");
     chiralityKBInfo.put(KMManager.KMKey_KeyboardID, "chirality");
     chiralityKBInfo.put(KMManager.KMKey_LanguageID, "eng");
     chiralityKBInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
@@ -46,7 +48,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
     // Longpress test keyboard
     HashMap<String, String> longpressKBbInfo = new HashMap<String, String>();
-    longpressKBbInfo.put(KMManager.KMKey_PackageID, "longpress");
+    longpressKBbInfo.put(KMManager.KMKey_PackageID, "cloud");
     longpressKBbInfo.put(KMManager.KMKey_KeyboardID, "longpress");
     longpressKBbInfo.put(KMManager.KMKey_LanguageID, "eng");
     longpressKBbInfo.put(KMManager.KMKey_KeyboardName, "Longpress Keyboard");
@@ -130,5 +132,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   @Override
   public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
     // Handle Keyman keyboard download finished event here if needed
+  }
+
+  @Override
+  public void onPackageInstalled(List<Map<String, String>> keyboardInfo) {
   }
 }

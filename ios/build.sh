@@ -123,7 +123,14 @@ update_bundle ( ) {
         base_dir="$(pwd)"
 
         cd $KMW_SOURCE
-        ./build.sh -embed
+
+        if [ "$CONFIG" == "Debug" ]; then
+          KMWFLAGS="-debug_embedded"
+        else
+          KMWFLAGS="-embed"
+        fi
+
+        ./build.sh $KMWFLAGS
         if [ $? -ne 0 ]; then
             fail "ERROR:  KeymanWeb's build.sh failed."
         fi
