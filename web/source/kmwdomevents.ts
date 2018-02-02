@@ -1179,7 +1179,7 @@ class DOMTouchHandlers extends DOMEventHandlers {
     if(e && e.className != null && e.className.indexOf('keymanweb-input') >= 0) {
       // Always copy text back to underlying field on blur
       if(e.base instanceof e.base.ownerDocument.defaultView.HTMLTextAreaElement
-          ||e.base instanceof e.base.ownerDocument.default.HTMLInputElement) {
+          ||e.base instanceof e.base.ownerDocument.defaultView.HTMLInputElement) {
         e.base.value = this.getText(e);
       }
       

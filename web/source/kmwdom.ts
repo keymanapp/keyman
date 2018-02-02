@@ -690,8 +690,6 @@ class DOMManager {
       } else if(Pelem instanceof dv.HTMLIFrameElement) {
         possibleInputs.push(Pelem);
       }
-    } else if(Pelem.nodeName == "#text") {
-      return [];
     }
 
     // Constructing it like this also allows for individual element filtering for the auto-attach MutationObserver without errors.
