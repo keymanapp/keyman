@@ -61,7 +61,9 @@ if(!window['keyman']['ui']['name']) {
         return;
       }
       
-      if(window.event) {
+      // We don't want to shift the controller to something that's not an input element,
+      // but do want to account for window.event's data when legitimate.
+      if(window.event && keymanweb['isAttached'](window.event.srcElement)) {
         someElement=window.event.srcElement;
       }
 
@@ -81,6 +83,7 @@ if(!window['keyman']['ui']['name']) {
       var x, y, w, h, p;
     
       p = util['getAbsolute'](someElement); x = p['x']; y=p['y'];
+
       if(someElement.defaultView && someElement.defaultView.frameElement)
       { 
         w = someElement.defaultView.frameElement.clientWidth;
