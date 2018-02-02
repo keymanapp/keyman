@@ -24,8 +24,10 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.Uri;
@@ -57,6 +59,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.ResultReceiver;
 import android.provider.OpenableColumns;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -70,8 +74,14 @@ import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener {
+public class MainActivity extends Activity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
+  ActivityCompat.OnRequestPermissionsResultCallback {
 
+  // Fields used for installing kmp packages
+  private static final int PERMISSION_REQUEST_STORAGE = 0;
+  Uri data;
+
+  private static final String TAG = "MainActivity";
   private KMTextView textView;
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
@@ -101,11 +111,11 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
             Toast.LENGTH_SHORT).show();
           break;
         case FileUtils.DOWNLOAD_SUCCESS :
-          String filename = resultData.getString("filename");
-          String kmpFile = resultData.getString("destination") + File.separator + filename;
+          String downloadedFilename = resultData.getString("filename");
+          String kmpFilename = resultData.getString("destination") + File.separator + downloadedFilename;
 
           Bundle bundle = new Bundle();
-          bundle.putString("kmpFile", kmpFile);
+          bundle.putString("kmpFile", kmpFilename);
           Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
           packageIntent.putExtras(bundle);
           startActivity(packageIntent);
@@ -191,7 +201,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           }
         } catch (Exception e) {
           didFail = true;
-          Log.e("onActivityResult", e.getMessage());
+          Log.e(TAG, e.getMessage());
         }
       }
 
@@ -230,87 +240,38 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     PackageActivity.addKeyboardDownloadEventListener(this);
 
     Intent intent = getIntent();
-    Uri data = intent.getData();
+    data = intent.getData();
 
     if (data != null) {
-      File kmpFile = new File(data.getPath());
-      String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
-      if (url == null) {
-        url = data.toString();
-      }
-      if (url != null) {
-        // Set of protocols: {"keyman://", "content://", "file://", "http://", "https://"}
-        // URL contains KMP to download in background.
-        boolean isCustom = KMKeyboardDownloaderActivity.isCustom(url);
 
-        int index = url.lastIndexOf("/") + 1;
-        String filename = "unknown:";
-        if (index >= 0 && index <= url.length()) {
-          filename = url.substring(index);
-        }
+      switch (data.getScheme().toLowerCase()) {
+        // Android DownloadManager
+        case "content":
+          checkStoragePermission(data);
+          break;
+        // Chrome downloads and Filebrowsers
+        case "file":
+          checkStoragePermission(data);
+          break;
+        // Intending to deprecate keyman:// protocol in https://github.com/keymanapp/keyman/issues/538
+        case "keyman" :
+        case "http" :
+        case "https" :
+          Intent downloadIntent;
+          String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
+          if (url == null) {
+            url = data.toString();
+          }
+          if (url != null) {
+            // URL contains KMP to download in background.
+            boolean isCustom = KMKeyboardDownloaderActivity.isCustom(url);
 
-        Intent downloadIntent, packageIntent;
-        Bundle bundle = new Bundle();
-        File cacheKmpFile;
-        switch (data.getScheme().toLowerCase()) {
-          // Android DownloadManager
-          case "content":
-            // DownloadManager passes a path "/document/number" so we need to extract the .kmp filename
-            Cursor cursor = getContentResolver().query(data, null, null, null, null);
-            cursor.moveToFirst();
-            int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-            filename = cursor.getString(nameIndex);
-            if (!filename.endsWith(".kmp")) {
-              break;
+            int index = url.lastIndexOf("/") + 1;
+            String filename = "unknown:";
+            if (index >= 0 && index <= url.length()) {
+              filename = url.substring(index);
             }
 
-            cacheKmpFile = new File(MainActivity.this.getCacheDir().toString(), filename);
-            if (cacheKmpFile.exists()) {
-              cacheKmpFile.delete();
-            }
-            try {
-              Log.d("onResume", "Copying " + filename + " from " + data.toString() + " to app cache");
-              FileUtils.copy(getContentResolver().openInputStream(data), new FileOutputStream(cacheKmpFile));
-            } catch (Exception e) {
-              Log.e("onResume", "Unable to copy " + filename + " to app cache");
-            }
-
-            bundle.putString("kmpFile", cacheKmpFile.getAbsolutePath());
-            packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
-            packageIntent.putExtras(bundle);
-            startActivity(packageIntent);
-            break;
-
-          // Chrome downloads and Filebrowsers
-          case "file":
-            if (url.endsWith(".kmp")) {
-              // KMP already exists locally. Copy KMP to app cache and start PackageActivity
-              cacheKmpFile = new File(MainActivity.this.getCacheDir().toString(), kmpFile.getName());
-              if (cacheKmpFile.exists()) {
-                cacheKmpFile.delete();
-              }
-              try {
-                Log.d("onResume", "Copying " + data.toString() + " to app cache");
-                FileUtils.copy(kmpFile, cacheKmpFile);
-              } catch (Exception e) {
-                String message = "Access denied to " + kmpFile.getName() +
-                  ".\nCheck Android Settings --> Apps --> Keyman to grant storage permissions";
-                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                Log.e("onResume", message + ". Error: " + e);
-                intent.setData(null);
-                return;
-              }
-
-              bundle.putString("kmpFile", cacheKmpFile.getAbsolutePath());
-              packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
-              packageIntent.putExtras(bundle);
-              startActivity(packageIntent);
-            }
-            break;
-          // Intending to deprecate keyman:// protocol in https://github.com/keymanapp/keyman/issues/538
-          case "keyman" :
-          case "http" :
-          case "https" :
             if (url.endsWith(".kmp")) {
               try {
                 // Download the KMP to app cache
@@ -333,9 +294,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
                 break;
               }
             } else {
-              // Legacy ad-hoc keyboard distribution
+              // Legacy ad-hoc keyboard (JSON) distribution
               downloadIntent = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
-
+              Bundle bundle = new Bundle();
               bundle.putString(KMKeyboardDownloaderActivity.ARG_KEYBOARD,
                 data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Keyboard));
               bundle.putString(KMKeyboardDownloaderActivity.ARG_LANGUAGE,
@@ -346,10 +307,10 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
               downloadIntent.putExtras(bundle);
               startActivity(downloadIntent);
             }
-            break;
-          default :
-            Log.d("onResume", "Unrecognized protocol " + data.getScheme());
-        }
+          }
+          break;
+        default :
+          Log.d(TAG, "Unrecognized protocol " + data.getScheme());
       }
     }
     intent.setData(null);
@@ -635,6 +596,120 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
       if (shouldShowGetStarted)
         showGetStarted();
+    }
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    if (requestCode == PERMISSION_REQUEST_STORAGE) {
+      // Request for storage permission
+      Log.d(TAG, "Received response for Storage permission request");
+      if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        // Permission has been granted. Resume task needing this permission
+        Log.d(TAG, "Permission: " + permissions[0] + " was " + grantResults[0]);
+        useLocalKMP(data);
+      } else {
+        // Permission request denied
+        String message = "Storage permission request was denied. Unable to install keyboard package";
+        Log.d(TAG, message);
+        Toast.makeText(getApplicationContext(), message,
+          Toast.LENGTH_SHORT).show();
+      }
+    }
+  }
+
+  private void checkStoragePermission(Uri data) {
+    // Check if the Storage permission has been granted
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) ==
+        PackageManager.PERMISSION_GRANTED) {
+        Log.d(TAG, "Read external storage permission granted");
+        useLocalKMP(data);
+      } else {
+        Log.d(TAG, "Read external storage permission denied");
+        // Permission is missing and must be requested
+        requestStoragePermission();
+      }
+    } else {
+      // Permission automatically granted on older Android versions
+      Log.d(TAG, "Read external storage permission granted");
+      useLocalKMP(data);
+    }
+  }
+
+  /**
+   * Requests the {@link android.Manifest.permission#READ_EXTERNAL_STORAGE} permission
+   */
+  private void requestStoragePermission() {
+    if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+        Manifest.permission.READ_EXTERNAL_STORAGE)) {
+      // Provide additional rationale to the user if the permission was not granted
+      String message = "To install keyboard package, allow Keyman permission to read storage.";
+      Toast.makeText(getApplicationContext(), message ,
+        Toast.LENGTH_LONG).show();
+      ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+        PERMISSION_REQUEST_STORAGE);
+    } else {
+      // Request the permission. The result will be received in onRequestPermissionResult().
+      ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+        PERMISSION_REQUEST_STORAGE);
+    }
+  }
+
+  private void useLocalKMP(Uri data) {
+    String filename = "";
+    File cacheKmpFile = null;
+    Bundle bundle = new Bundle();
+    try {
+      switch (data.getScheme().toLowerCase()) {
+        case "content":
+          // DownloadManager passes a path "/document/number" so we need to extract the .kmp filename
+          Cursor cursor = getContentResolver().query(data, null, null, null, null);
+          cursor.moveToFirst();
+          int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+          filename = cursor.getString(nameIndex);
+          if (!filename.endsWith(".kmp")) {
+            break;
+          }
+
+          cacheKmpFile = new File(MainActivity.this.getCacheDir().toString(), filename);
+          if (cacheKmpFile.exists()) {
+            cacheKmpFile.delete();
+          }
+
+          Log.d(TAG, "Copying " + filename + " from " + data.toString() + " to app cache");
+          FileUtils.copy(getContentResolver().openInputStream(data), new FileOutputStream(cacheKmpFile));
+          break;
+
+        case "file":
+          File kmpFile = new File(data.getPath());
+          filename = kmpFile.getName();
+          if (data.toString().endsWith(".kmp")) {
+            // KMP already exists locally. Copy KMP to app cache and start PackageActivity
+            cacheKmpFile = new File(MainActivity.this.getCacheDir().toString(), kmpFile.getName());
+            if (cacheKmpFile.exists()) {
+              cacheKmpFile.delete();
+            }
+
+            Log.d(TAG, "Copying " + filename + " to app cache");
+            FileUtils.copy(new FileInputStream(kmpFile), new FileOutputStream(cacheKmpFile));
+          }
+          break;
+      }
+    } catch (Exception e) {
+      String message = "Access denied to " + filename +
+        ".\nCheck Android Settings --> Apps --> Keyman to grant storage permissions";
+      Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+      Log.e(TAG, "Unable to copy " + filename + " to app cache");
+      return;
+    }
+
+    if (cacheKmpFile != null) {
+      bundle.putString("kmpFile", cacheKmpFile.getAbsolutePath());
+
+      Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
+      packageIntent.putExtras(bundle);
+      startActivity(packageIntent);
     }
   }
 
