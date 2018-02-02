@@ -134,13 +134,6 @@ if(!window['keyman']['initialized']) {
           LselectionEnd = keymanweb._CachedSelectionEnd;     // I3319           
         }
         tempContext = Pelem.value._kmwSubstr(0, LselectionStart);
-      } else if(Ldoc  &&  (Ldv=Ldoc.selection)) { // build 77 - use elem.ownerDocument instead of document
-                                              // I1481 - use Ldoc to get the ownerDocument when no selection is found
-        /* IE */
-        var Lrange = Ldv.createRange();
-        //if (Lrange.parentElement() == Pelem) {  // build 77 - ignore parent of selection
-        Lrange.moveStart('character',-2*n); // allows for supp chars        //I3319
-        tempContext = Lrange.text;
       }
 
       if(tempContext._kmwLength() < n) {
@@ -238,7 +231,7 @@ if(!window['keyman']['initialized']) {
       {
         if(osk.keytip == null)
         {  
-          osk.keytip=util._CreateElement('DIV'); 
+          osk.keytip=(<Util>util)._CreateElement('div'); 
           osk.keytip.className='kmw-keytip';
           osk.keytip.id = 'kmw-keytip';
           
@@ -246,8 +239,8 @@ if(!window['keyman']['initialized']) {
           osk.keytip.style.pointerEvents='none'; 
           
           // Add CANVAS element for outline and SPAN for key label
-          osk.keytip.appendChild(util._CreateElement('CANVAS'));
-          osk.keytip.appendChild(util._CreateElement('SPAN'));   
+          osk.keytip.appendChild((<Util>util)._CreateElement('canvas'));
+          osk.keytip.appendChild((<Util>util)._CreateElement('span'));   
           osk.keytip.key = null;
           osk.keytip.state = false;     
         }
@@ -429,7 +422,7 @@ if(!window['keyman']['initialized']) {
     {   
       if(device.formFactor != 'phone' || device.OS != 'iOS') return null;
         
-      var cc = util._CreateElement('DIV'),ccs = cc.style;
+      var cc = (<Util>util)._CreateElement('div'),ccs = cc.style;
       cc.id = 'kmw-popup-callout';
       osk._Box.appendChild(cc);
       

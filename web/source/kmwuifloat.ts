@@ -518,8 +518,6 @@ if(!window['keyman']['ui']['name']) {
     
     if(window.addEventListener)
       window.addEventListener('resize', ui._Resize, false);
-    else
-      window.attachEvent('onresize', ui._Resize);
 
     // Initialize after KMW is fully initialized, if UI already loaded
     keymanweb['addEventListener']('loaduserinterface',ui.Initialize);
