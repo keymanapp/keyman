@@ -26,7 +26,8 @@
       kmw['hideKeyboard'] = hideKeyboard;
       kmw['getOskHeight'] = getOskHeight;
       kmw['getOskWidth'] = getOskWidth;
-      kmw['setActiveElement']('ta');
+      var ta = document.getElementById('ta');
+      kmw['setActiveElement'](ta);
 
       ta.readOnly = false;
 
