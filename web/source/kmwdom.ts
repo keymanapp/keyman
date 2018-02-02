@@ -67,7 +67,8 @@ class DOMManager {
     if(_attachObj) {
       return _attachObj.touchEnabled ? this.touchHandlers : this.nonTouchHandlers;
     } else {
-      return null;
+      // Best guess solution.
+      return this.keyman.touchAliasing;
     }
   }
 
@@ -1027,7 +1028,7 @@ class DOMManager {
   // Used by the mutation event handler to properly decouple any elements dynamically removed from the document.
   _MutationRemovalObserved = function(Pelem: HTMLElement) {
     var element = Pelem;
-    if(this.keyman.utildevice.touchable) {
+    if(this.keyman.util.device.touchable) {
       this.disableTouchElement(Pelem);
     }
 

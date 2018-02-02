@@ -18,6 +18,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'cases/**/*.js',
+      '../release/unminified/web/*.js',
       {pattern: 'fixtures/**/*.html', watched: true}
     ],
 
@@ -65,7 +66,7 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-	// if false, it generates the pages and acts as a persistent server.
+	  // if false, it generates the pages and acts as a persistent server.
     singleRun: true,
 
     // Concurrency level

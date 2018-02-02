@@ -18,7 +18,8 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'cases/**/*.js',
-      {pattern: 'fixtures/**/*.html', watched=true}
+      '../release/unminified/web/*.js',
+      {pattern: 'fixtures/**/*.html', watched: true}
     ],
 
 
