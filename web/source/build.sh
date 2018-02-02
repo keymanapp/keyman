@@ -382,11 +382,7 @@ if [ $BUILD_UI = true ]; then
 fi
 
 if [ $BUILD_DEBUG_EMBED = true ]; then
-    cp $INTERMEDIATE/keyman.js $EMBED_OUTPUT/keymanios.js
-    # Problem - must correct the resulting map location!
-    sed -i 's/\/\/# sourceMappingURL=keyman.js.map/\/\/# sourceMappingURL=keymanios.js.map/g' $EMBED_OUTPUT/keymanios.js
-    
-    # Copy the actual sourcemap.
-    cp $INTERMEDIATE/keyman.js.map $EMBED_OUTPUT/keymanios.js.map
-    echo Uncompiled embedded application saved as keymanios.js
+    # Copy the sourcemap.
+    cp $INTERMEDIATE/keyman.js.map $EMBED_OUTPUT/keyman.js.map
+    echo Uncompiled embedded application saved as keyman.js
 fi
