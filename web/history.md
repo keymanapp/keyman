@@ -22,6 +22,7 @@
   * Note that hardware-based keyboard input will always follow 'hardware' and 'desktop' platform rules to ensure consistency.
 * Fixed behavior of longpress subkeys specifying (layer-default) modifier settings. (#161)
 * Converted KeymanWeb (largely) to TypeScript and streamlined the code to reflect new minimum requirements.
+* Fixed styling of "Special" keys on touch layouts
 
 ## 2017-07-10 2.0.473 stable
 * 2.0 stable release build.
