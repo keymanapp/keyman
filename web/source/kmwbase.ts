@@ -159,22 +159,22 @@ class KeymanBase {
   _GetEventObject<E extends Event>(e: E) {  // I2404 - Attach to controls in IFRAMEs
     if (!e) {
       e = window.event as E;
-      // if(!e) {
-      //   var elem: HTMLElement|Document = this.domManager.getLastActiveElement();
-      //   if(elem) {
-      //     console.log("Hello world.");
-      //     elem = elem.ownerDocument;
-      //     var win: Window;
-      //     if(elem) {
-      //       win = elem.parentWindow;
-      //     }
-      //     if(!win) {
-      //       return null;
-      //     }
+      if(!e) {
+        var elem: HTMLElement|Document = this.domManager.getLastActiveElement();
+        if(elem) {
+          console.log("Hello world.");
+          elem = elem.ownerDocument;
+          var win: Window;
+          if(elem) {
+            win = elem.defaultView;
+          }
+          if(!win) {
+            return null;
+          }
           
-      //     e = win.event as E;
-      //   }
-      // }
+          e = win.event as E;
+        }
+      }
     }
     
     return e;    

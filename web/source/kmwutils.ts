@@ -282,10 +282,7 @@ class Util {
    */  
   attachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
     this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
-    if(Pelem.addEventListener) {
-      // Firefox + standards
-      Pelem.addEventListener(Peventname, Phandler, PuseCapture?true:false);
-    }
+    Pelem.addEventListener(Peventname, Phandler, PuseCapture?true:false);
   }
 
   /**
@@ -298,9 +295,7 @@ class Util {
    * Description Detaches event handler from element [to prevent memory leaks]
    */  
   detachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
-    if(Pelem.removeEventListener) {
       Pelem.removeEventListener(Peventname, Phandler, PuseCapture);      
-    }
   }    
 
   /**
