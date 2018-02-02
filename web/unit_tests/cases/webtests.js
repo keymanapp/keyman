@@ -13,7 +13,7 @@ describe('Array', function() {
 
 describe('Hello World', function() {
   before(function() {
-    fixture.setBase('unit_tests');
+    fixture.setBase('fixtures');
   });
   
   beforeEach(function() {
