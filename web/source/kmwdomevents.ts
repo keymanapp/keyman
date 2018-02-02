@@ -657,8 +657,8 @@ class DOMEventHandlers {
     if(!window.event) {
       // I1466 - Convert the - keycode on mnemonic as well as positional layouts
       // FireFox, Mozilla Suite
-      if((<any>this.keyman)._VKMap_FF_IE['k'+Levent.Lcode]) {
-        Levent.Lcode=(<any>this.keyman)._VKMap_FF_IE['k'+Levent.Lcode];
+      if(this.keyman.keyMapManager.browserMap.FF['k'+Levent.Lcode]) {
+        Levent.Lcode=this.keyman.keyMapManager.browserMap.FF['k'+Levent.Lcode];
       }
     }
     //else 
@@ -671,7 +671,7 @@ class DOMEventHandlers {
 
       var LeventMatched=0;
       /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
-      var Lbase=(<any>this.keyman)._VKMap[osk._BaseLayout];
+      var Lbase=this.keyman.keyMapManager.languageMap[osk._BaseLayout];
       if(Lbase && Lbase['k'+Levent.Lcode]) {
         Levent.Lcode=Lbase['k'+Levent.Lcode];
       }
@@ -680,7 +680,7 @@ class DOMEventHandlers {
       if(typeof(activeKeyboard['KM'])=='undefined'  &&  !(Levent.Lmodifiers & 0x60)) {
         // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
         var Levent2: LegacyKeyEvent = {
-          Lcode:(<any>this.keyman)._USKeyCodeToCharCode(Levent) as number,
+          Lcode:this.keyman.keyMapManager._USKeyCodeToCharCode(Levent),
           Ltarg:Levent.Ltarg,
           Lmodifiers:0,
           LisVirtualKey:0
