@@ -282,13 +282,7 @@ class Util {
    */  
   attachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
     this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
-    if(Pelem instanceof HTMLElement && Pelem.attachEvent) {
-      // IE
-      Pelem.attachEvent('on'+Peventname, Phandler);
-    } else if(Pelem.addEventListener) {
-      // Firefox + standards
-      Pelem.addEventListener(Peventname, Phandler, PuseCapture?true:false);
-    }
+    Pelem.addEventListener(Peventname, Phandler, PuseCapture?true:false);
   }
 
   /**
@@ -301,11 +295,7 @@ class Util {
    * Description Detaches event handler from element [to prevent memory leaks]
    */  
   detachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
-    if(Pelem instanceof HTMLElement && Pelem.detachEvent) {
-      Pelem.detachEvent('on'+Peventname, Phandler);
-    } else if(Pelem.removeEventListener) {
       Pelem.removeEventListener(Peventname, Phandler, PuseCapture);      
-    }
   }    
 
   /**
@@ -345,7 +335,7 @@ class Util {
    * Description  Returns x-coordinate of Pobj element absolute position with respect to page
    */
   _GetAbsoluteX(Pobj: HTMLElement): number { // I1476 - Handle SELECT overlapping END
-    var Lobj: HTMLElement|Document
+    var Lobj: HTMLElement
 
     if(!Pobj) {
       return 0;
@@ -356,23 +346,16 @@ class Util {
 
     if (Lobj.offsetParent) {
       while (Lobj.offsetParent) {
-        Lobj = <HTMLElement>Lobj.offsetParent;
+        Lobj = Lobj.offsetParent as HTMLElement;
         Lcurleft += Lobj.offsetLeft;
       }
     }
     // Correct position if element is within a frame (but not if the controller is in document within that frame)
     if(Lobj && Lobj.ownerDocument && (Pobj.ownerDocument != this.keyman._MasterDocument)) {
-      Lobj=Lobj.ownerDocument;   // I2404 - Support for IFRAMEs
-    }
-    
-    if(Lobj instanceof Document) {
-    // The following two lines are old code and may or may not still be needed - possibly should be conditioned similalry to above    
-      if(Lobj && Lobj.parentWindow && Lobj.parentWindow.frameElement) { // Legacy IE.
-        return Lcurleft + this._GetAbsoluteX(Lobj.parentWindow.frameElement as HTMLElement) - Lobj.documentElement.scrollLeft;
-      }
+      var Ldoc=Lobj.ownerDocument;   // I2404 - Support for IFRAMEs
 
-      if(Lobj && Lobj.defaultView && Lobj.defaultView.frameElement) {
-        return Lcurleft + this._GetAbsoluteX(<HTMLElement>Lobj.defaultView.frameElement) - Lobj.documentElement.scrollLeft;
+      if(Ldoc && Ldoc.defaultView && Ldoc.defaultView.frameElement) {
+        return Lcurleft + this._GetAbsoluteX(<HTMLElement>Ldoc.defaultView.frameElement) - Ldoc.documentElement.scrollLeft;
       }
     }
     return Lcurleft;
@@ -388,7 +371,7 @@ class Util {
    * Description  Returns y-coordinate of Pobj element absolute position with respect to page
    */  
   _GetAbsoluteY(Pobj: HTMLElement): number {
-    var Lobj: HTMLElement|Document
+    var Lobj: HTMLElement
 
     if(!Pobj) {
       return 0;
@@ -396,26 +379,19 @@ class Util {
     var Lcurtop = Pobj.offsetTop ? Pobj.offsetTop : 0;
     Lobj = Pobj;  // I2404 - Support for IFRAMEs
 
-    if (Lobj instanceof HTMLElement) {
-      var ele = <HTMLElement> Lobj;
-      while (ele.offsetParent) {
-        Lobj = ele = <HTMLElement>ele.offsetParent;
-        Lcurtop += ele.offsetTop;
+    if (Lobj.ownerDocument && Lobj instanceof Lobj.ownerDocument.defaultView.HTMLElement) {
+      while (Lobj.offsetParent) {
+        Lobj = Lobj.offsetParent as HTMLElement;
+        Lcurtop += Lobj.offsetTop;
       }
     }
 
     // Correct position if element is within a frame (but not if the controller is in document within that frame)
     if(Lobj && Lobj.ownerDocument && (Pobj.ownerDocument != this.keyman._MasterDocument)) {
-      Lobj=Lobj.ownerDocument;   // I2404 - Support for IFRAMEs
-    }
-    
-    if(Lobj instanceof Document) {
-      // The following two lines are old code and may or may not still be needed - possibly should be conditioned similalry to above    
-      if(Lobj && Lobj.parentWindow && Lobj.parentWindow.frameElement) {
-        return Lcurtop + this._GetAbsoluteY(Lobj.parentWindow.frameElement as HTMLElement) - Lobj.documentElement.scrollTop;
-      }
-      if(Lobj && Lobj.defaultView && Lobj.defaultView.frameElement) {
-        return Lcurtop + this._GetAbsoluteY(<HTMLElement>Lobj.defaultView.frameElement) - Lobj.documentElement.scrollTop;
+      var Ldoc=Lobj.ownerDocument;   // I2404 - Support for IFRAMEs
+
+      if(Ldoc && Ldoc.defaultView && Ldoc.defaultView.frameElement) {
+        return Lcurtop + this._GetAbsoluteY(<HTMLElement>Ldoc.defaultView.frameElement) - Ldoc.documentElement.scrollTop;
       }
     }
     return Lcurtop;
@@ -452,18 +428,18 @@ class Util {
   /**
    * Default mouse down event handler (to replace multiple inline handlers) (Build 360)   
    */
-  mouseDownPreventDefaultHandler = function(e: MouseEvent) {
+  mouseDownPreventDefaultHandler(e: MouseEvent) {
     if(e) {
       e.preventDefault();
     }
   }
-  
-  _CreateElement(nodeName:string): HTMLElement { 
-    var e = <HTMLElement>document.createElement(nodeName);
+
+  // Found a bit of magic formatting that allows dynamic return typing for a specified element tag!
+  _CreateElement<E extends "style"|"script"|"div"|"canvas"|"span">(nodeName:E) {
+    var e = document.createElement<E>(nodeName);
 
     // Make element unselectable (Internet Explorer)
     if (typeof e.onselectstart != 'undefined') { //IE route
-      e.unSelectable='on';
       e.onselectstart=this.selectStartHandler; // Build 360
     } else { // And for well-behaved browsers (may also work for IE9+, but not necessary)
       e.style.MozUserSelect="none";
@@ -531,17 +507,15 @@ class Util {
    * @param       {string}      s             CSS style name 
    * @return      {*}               
    */       
-  getStyleValue(e:HTMLElement, s:string)
-  { 
+  getStyleValue(e:HTMLElement, s:string) { 
     // Build 349: error trap added, since on iOS, getPropertyValue may fail 
     // and crash in some cases, possibly if passed a text node 
     try  
     {
-      if(e && (typeof(window.getComputedStyle) != 'undefined'))
+      if(e && (typeof(window.getComputedStyle) != 'undefined')) {
           return window.getComputedStyle(e,'').getPropertyValue(s);
-      else if(e && (typeof(e.currentStyle) != 'undefined'))    //IE 8 and earlier
-        return e.currentStyle[s];
-  }    
+      }
+    }    
     catch(ex){}
     
     // Return empty string if unable to get style value
@@ -714,21 +688,11 @@ class Util {
    */       
   rgba(s: HTMLStyleElement, r:number, g:number, b:number, a:number): string {
     var bgColor='transparent';
-    if(this._GetIEVersion() < 9) {
-      var pcOpacity=Math.floor(100*a), rs=r.toString(16), gs=g.toString(16), bs=b.toString(16), hexColor;
-      rs=('00'+rs).substr(-2);
-      gs=('00'+gs).substr(-2);
-      bs=('00'+bs).substr(-2);
-      hexColor=pcOpacity+rs+gs+bs;
-      s.filter='progid:DXImageTransform.Microsoft.gradient(startColorstr=#'+hexColor+',endColorstr=#'+hexColor+')';
-      s.zoom='1';
-    } else {
-      try {
-        bgColor='rgba('+r+','+g+','+b+','+a+')';
-      } catch(ex) {
-        bgColor='rgb('+r+','+g+','+b+')';
-      }
-    }
+    try {
+      bgColor='rgba('+r+','+g+','+b+','+a+')';
+    } catch(ex) {
+      bgColor='rgb('+r+','+g+','+b+')';
+    }    
 
     return bgColor;
   }
@@ -743,11 +707,7 @@ class Util {
     var _ElemStyle: HTMLStyleElement = <HTMLStyleElement>document.createElement<'style'>('style'); 
 
     _ElemStyle.type = 'text/css';
-    if(_ElemStyle.styleSheet) { // IE only
-      _ElemStyle.styleSheet.cssText = s;
-    } else {                    // all other browsers
-      _ElemStyle.appendChild(document.createTextNode(s));
-    }
+    _ElemStyle.appendChild(document.createTextNode(s));
 
     var _ElemHead=document.getElementsByTagName('HEAD'); 
     if(_ElemHead.length > 0) {
@@ -1321,5 +1281,44 @@ class Util {
     }
 
     return this.checkFont(fd);
+  }
+
+  /**
+   * Checks the type of an input DOM-related object while ensuring that it is checked against the correct prototype,
+   * as class prototypes are (by specification) scoped upon the owning Window.
+   * 
+   * See https://stackoverflow.com/questions/43587286/why-does-instanceof-return-false-on-chrome-safari-and-edge-and-true-on-firefox
+   * for more details.
+   * 
+   * @param {Element|Event}   Pelem       An element of the web page or one of its IFrame-based subdocuments.
+   * @param {string}          className   The plain-text name of the expected Element type.
+   * @return {boolean}
+   */
+  static instanceof(Pelem: Event|EventTarget, className: string): boolean {
+    var scopedClass;
+
+    if (Pelem['Window']) { // Window objects contain the class definitions for types held within them.  So, we can check for those.
+      return className == 'Window';
+    } else if (Pelem['defaultView']) { // Covers Document.
+      scopedClass = Pelem['defaultView'][className];
+    } else if(Pelem['ownerDocument']) {
+      scopedClass = (Pelem as Node).ownerDocument.defaultView[className];
+    } else if(Pelem['target']) {
+      var event = Pelem as Event;
+
+      if(this.instanceof(event.target, 'Window')) {
+        scopedClass = event.target[className]; 
+      } else if(this.instanceof(event.target, 'Document')) {
+        scopedClass = (event.target as Document).defaultView[className];
+      } else if(this.instanceof(event.target, 'HTMLElement')) {
+        scopedClass = (event.target as HTMLElement).ownerDocument.defaultView[className];
+      }
+    }
+
+    if(scopedClass) {
+      return Pelem instanceof scopedClass;
+    } else {
+      return false;
+    }
   }
 }

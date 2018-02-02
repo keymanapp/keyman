@@ -169,12 +169,13 @@ class DOMEventHandlers {
 
     // Or if not a remappable input field
     var en=Ltarg.nodeName.toLowerCase();
-    if(Ltarg instanceof HTMLInputElement) {
+    if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLInputElement) {
       var et=Ltarg.type.toLowerCase();
       if(!(et == 'text' || et == 'search')) {
         return true;
       }
-    } else if((device.touchable || !Ltarg.isContentEditable) && !(Ltarg instanceof HTMLTextAreaElement)) {
+    } else if((device.touchable || !Ltarg.isContentEditable) 
+        && !(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLTextAreaElement)) {
       return true;
     }
 
@@ -193,8 +194,8 @@ class DOMEventHandlers {
       }
     }
         
-    if(Ltarg instanceof HTMLIFrameElement) { //**TODO: check case reference
-      this.keyman.domManager._AttachToIframe(Ltarg);
+    if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLIFrameElement) { //**TODO: check case reference
+      this.keyman.domManager._AttachToIframe(Ltarg as HTMLIFrameElement);
       Ltarg=Ltarg.contentWindow.document;
     }
 
@@ -218,7 +219,7 @@ class DOMEventHandlers {
     Ltarg._KeymanWebSelectionStart = Ltarg._KeymanWebSelectionEnd = null; // I3363 (Build 301)
 
     // Set element directionality (but only if element is empty)
-    if(Ltarg instanceof HTMLElement) {
+    if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLElement) {
       this.keyman.domManager._SetTargDir(Ltarg);
     }
 
@@ -284,15 +285,18 @@ class DOMEventHandlers {
       Ltarg = Ltarg.parentNode as HTMLElement;
     }
 
-    if(Ltarg instanceof HTMLIFrameElement) {
-      Ltarg=Ltarg.contentWindow.document;
-    }
-      
-    if (Ltarg instanceof HTMLInputElement || Ltarg instanceof HTMLTextAreaElement) {
-      //Ltarg._KeymanWebSelectionStart = Ltarg.selectionStart;
-      //Ltarg._KeymanWebSelectionEnd = Ltarg.selectionEnd;
-      Ltarg._KeymanWebSelectionStart = Ltarg.value._kmwCodeUnitToCodePoint(Ltarg.selectionStart);  //I3319
-      Ltarg._KeymanWebSelectionEnd = Ltarg.value._kmwCodeUnitToCodePoint(Ltarg.selectionEnd);  //I3319
+    if(Ltarg.ownerDocument) {
+      if(Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLIFrameElement) {
+        Ltarg=Ltarg.contentWindow.document;
+      }
+        
+      if (Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLInputElement 
+          || Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLTextAreaElement) {
+        //Ltarg._KeymanWebSelectionStart = Ltarg.selectionStart;
+        //Ltarg._KeymanWebSelectionEnd = Ltarg.selectionEnd;
+        Ltarg._KeymanWebSelectionStart = Ltarg.value._kmwCodeUnitToCodePoint(Ltarg.selectionStart);  //I3319
+        Ltarg._KeymanWebSelectionEnd = Ltarg.value._kmwCodeUnitToCodePoint(Ltarg.selectionEnd);  //I3319
+      }
     }
     
     ////keymanweb._SelectionControl = null;    
@@ -387,8 +391,9 @@ class DOMEventHandlers {
     var uiManager = this.keyman.uiManager;
     //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
     //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
-    if(target instanceof HTMLIFrameElement) {
-      if(!this.keyman.domManager._IsIEEditableIframe(target, 1) || !this.keyman.domManager._IsMozillaEditableIframe(target,1)) {
+    if(target.ownerDocument && target instanceof target.ownerDocument.defaultView.HTMLIFrameElement) {
+      if(!this.keyman.domManager._IsIEEditableIframe(target, 1) ||
+          !this.keyman.domManager._IsMozillaEditableIframe(target, 1)) {
         DOMEventHandlers.states._DisableInput = true; 
         return true;
       }
@@ -418,20 +423,7 @@ class DOMEventHandlers {
   _SelectionChange: () => boolean = function(this: DOMEventHandlers): boolean {
     if(DOMEventHandlers.states._IgnoreNextSelChange) {
       DOMEventHandlers.states._IgnoreNextSelChange--;
-    } else {
-      var Ls=document.selection;
-      if(Ls.type.toLowerCase()!='control') //  &&  document.selection.createRange().parentElement() == keymanweb._SelectionControl) //  &&  window.event.srcElement == keymanweb._SelectionControl)
-      {
-        var Lrange=Ls.createRange();
-        if(!DOMEventHandlers.states._Selection || !DOMEventHandlers.states._Selection.isEqual(Lrange))
-        {
-          DOMEventHandlers.states._Selection = Lrange;
-
-          /* Delete deadkeys for IE when certain keys pressed */
-          this.keyman['interface'].clearDeadkeys();
-        }
-      }
-    }
+    } 
     return true;
   }.bind(this);
 
@@ -606,7 +598,7 @@ class DOMEventHandlers {
    * Description  Processes keydown event and passes data to keyboard. 
    */ 
   _KeyDown: (e: KeyboardEvent) => boolean = function(this: DOMEventHandlers, e: KeyboardEvent): boolean {
-    var Ldv, eClass='';
+    var Ldv: Document, eClass='';
     var activeKeyboard = this.keyman.keyboardManager.activeKeyboard;
     var osk = this.keyman.osk;
     var util = this.keyman.util;
@@ -660,11 +652,6 @@ class DOMEventHandlers {
     if(Levent.LmodifierChange) {
       this.keyman.keyboardManager.notifyKeyboard(0,Levent.Ltarg,1); 
       osk._UpdateVKShift(Levent, 0, 1);
-    }
-    
-    // I1207
-    if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  (Levent.Lcode<33 || Levent.Lcode>40)) {
-      Ldv.createRange().select();
     }
 
     if(!window.event) {
@@ -775,10 +762,6 @@ class DOMEventHandlers {
    * Description Processes keypress event (does not pass data to keyboard)
    */       
   _KeyPress: (e: KeyboardEvent) => boolean = function(this: DOMEventHandlers, e: KeyboardEvent): boolean {
-    if(e._kmw_block) { // A custom event property added for bugfix-oriented simulated keypress events.
-      return false;
-    }
-
     var Levent;
     if(DOMEventHandlers.states._DisableInput || this.keyman.keyboardManager.activeKeyboard == null) {
       return true;
@@ -835,18 +818,19 @@ class DOMEventHandlers {
 
     switch(Levent.Lcode) {
       case 13:  
-        if(Levent.Ltarg instanceof HTMLTextAreaElement) {
+        if(Levent.Ltarg instanceof Levent.Ltarg.ownerDocument.defaultView.HTMLTextAreaElement) {
           break;
         }
       
-        if(Levent.Ltarg.base && Levent.Ltarg.base instanceof HTMLTextAreaElement) {
+        if(Levent.Ltarg.base && Levent.Ltarg.base instanceof Levent.Ltarg.base.ownerDocument.defaultView.HTMLTextAreaElement) {
           break;
         }
 
         // For input fields, move to next input element
-        if(Levent.Ltarg instanceof HTMLInputElement) {
-          if(Levent.Ltarg.type == 'search' || Levent.Ltarg.type == 'submit') {
-            Levent.Ltarg.form.submit();
+        if(Levent.Ltarg instanceof Levent.Ltarg.ownerDocument.defaultView.HTMLInputElement) {
+          var inputEle = Levent.Ltarg;
+          if(inputEle.type == 'search' || inputEle.type == 'submit') {
+            inputEle.form.submit();
           } else {
             this.keyman.domManager.moveToNext(false);
           }
@@ -871,15 +855,6 @@ class DOMEventHandlers {
       keyboardManager.notifyKeyboard(0,Levent.Ltarg,0); 
       osk._UpdateVKShift(Levent, 0, 1);  // I2187
     }
-
-    // I736 start
-    var Ldv;
-    if((Ldv=Levent.Ltarg.ownerDocument)  &&  (Ldv=Ldv.selection)  &&  Ldv.type != 'control') { // I1479 - avoid createRange on controls
-      Ldv=Ldv.createRange();
-      //if(Ldv.parentElement()==Levent.Ltarg) //I1505
-      DOMEventHandlers.states._Selection = Ldv;
-    }
-    // I736 end
     
     return false;
   }.bind(this);
@@ -948,8 +923,8 @@ class DOMTouchHandlers extends DOMEventHandlers {
       target?: EventTarget;
     };
 
-    if(e instanceof TouchEvent) {
-        tEvent=e.touches[0];
+    if(Util.instanceof(e, "TouchEvent")) {
+        tEvent=(e as TouchEvent).touches[0];
     } else { // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
       tEvent={clientX:0, clientY:0}
       // Will usually be called from setActiveElement, which should define DOMEventHandlers.states.lastActiveElement
@@ -961,19 +936,21 @@ class DOMTouchHandlers extends DOMEventHandlers {
       }
     }    
     
-    var touchX=tEvent.clientX,touchY=tEvent.clientY,tTarg=tEvent.target as HTMLElement, scroller;
+    var touchX=tEvent.clientX,touchY=tEvent.clientY;
+    var tTarg=tEvent.target as HTMLElement;
+    var scroller: HTMLElement;
 
     // Identify the scroller element
-    if(tTarg instanceof HTMLSpanElement) {
-      scroller=tTarg.parentNode;
+    if(Util.instanceof(tTarg, "HTMLSpanElement")) {
+      scroller=tTarg.parentNode as HTMLElement;
     } else if(tTarg.className != null && tTarg.className.indexOf('keymanweb-input') >= 0) {
-      scroller=tTarg.firstChild;
+      scroller=tTarg.firstChild as HTMLElement;
     } else {
       scroller=tTarg;
     }
 
     // And the actual target element        
-    var target=scroller.parentNode;
+    var target=scroller.parentNode as HTMLElement;
 
     // Move the caret and refocus if necessary     
     if(DOMEventHandlers.states.activeElement != target) {
@@ -998,11 +975,11 @@ class DOMTouchHandlers extends DOMEventHandlers {
     }
     
     // If clicked on DIV, set caret to end of text
-    if(tTarg instanceof HTMLDivElement) { 
+    if(Util.instanceof(tTarg, "HTMLDivElement")) { 
       var x,cp;
-      x=util._GetAbsoluteX(scroller.firstChild);        
+      x=util._GetAbsoluteX(scroller.firstChild as HTMLElement);        
       if(target.dir == 'rtl') { 
-        x += scroller.firstChild.offsetWidth;        
+        x += (scroller.firstChild as HTMLElement).offsetWidth;        
         cp=(touchX > x ? 0 : 100000);
       } else {
         cp=(touchX<x ? 0 : 100000);
@@ -1019,8 +996,8 @@ class DOMTouchHandlers extends DOMEventHandlers {
       dy=document.body.scrollTop;
 
       // Vertical scrolling
-      if(target.base instanceof HTMLTextAreaElement) {
-        yRow=Math.round(target.base.offsetHeight/target.base.rows);     
+      if(target.base instanceof target.base.ownerDocument.defaultView.HTMLTextAreaElement) {
+        yRow=Math.round(target.base.offsetHeight/(target.base as HTMLTextAreaElement).rows);     
         for(iLoop=0; iLoop<16; iLoop++)
         {
           y=util._GetAbsoluteY(caret)-dy;  //top of caret            
@@ -1201,7 +1178,8 @@ class DOMTouchHandlers extends DOMEventHandlers {
     var e=DOMEventHandlers.states.lastActiveElement, s=null;
     if(e && e.className != null && e.className.indexOf('keymanweb-input') >= 0) {
       // Always copy text back to underlying field on blur
-      if(e.base instanceof HTMLTextAreaElement || e.base instanceof HTMLInputElement) {
+      if(e.base instanceof e.base.ownerDocument.defaultView.HTMLTextAreaElement
+          ||e.base instanceof e.base.ownerDocument.defaultView.HTMLInputElement) {
         e.base.value = this.getText(e);
       }
       
@@ -1358,7 +1336,8 @@ class DOMTouchHandlers extends DOMEventHandlers {
    * @param       {number}        n     length of text in field
    */                      
   updateBaseElement(e: HTMLElement, n: number) {
-    if(e.base instanceof HTMLInputElement || e.base instanceof HTMLTextAreaElement) {
+    var Ldv = e.base.ownerDocument.defaultView;
+    if(e.base instanceof Ldv.HTMLInputElement ||e.base instanceof Ldv.HTMLTextAreaElement) {
       e.base.value = this.getText(e); //KMW-29
     } else {
       e.base.textContent = this.getText(e);
@@ -1433,8 +1412,8 @@ class DOMTouchHandlers extends DOMEventHandlers {
     // Identify the target from the touch list or the event argument (IE 10 only)
     var target: HTMLElement;
     
-    if(e instanceof TouchEvent) {
-      target = e.targetTouches[0].target as HTMLElement;
+    if(Util.instanceof(e, "TouchEvent")) {
+      target = (e as TouchEvent).targetTouches[0].target as HTMLElement;
     } else {
       target = e.target as HTMLElement;
     }
@@ -1449,12 +1428,12 @@ class DOMTouchHandlers extends DOMEventHandlers {
     
     var x, y;
 
-    if(e instanceof TouchEvent) {
-      x = e.touches[0].screenX;
-      y = e.touches[0].screenY;
+    if(Util.instanceof(e, "TouchEvent")) {
+      x = (e as TouchEvent).touches[0].screenX;
+      y = (e as TouchEvent).touches[0].screenY;
     } else {
-      x = e.screenX;
-      y = e.screenY;
+      x = (e as MouseEvent).screenX;
+      y = (e as MouseEvent).screenY;
     }
               
     // Allow content of input elements to be dragged horizontally or vertically
@@ -1523,7 +1502,7 @@ class DOMTouchHandlers extends DOMEventHandlers {
     if(isNaN(x)) x=0; if(isNaN(y)) y=0;
 
     // Scroll input field vertically if necessary
-    if(e.base instanceof HTMLTextAreaElement) { 
+    if(e.base instanceof e.base.ownerDocument.defaultView.HTMLTextAreaElement) { 
       var rowHeight=Math.round(e.offsetHeight/e.base.rows);
       if(cy < ey) dy=cy-ey;
       if(cy > ey+e.offsetHeight-rowHeight) dy=cy-ey-e.offsetHeight+rowHeight;   
