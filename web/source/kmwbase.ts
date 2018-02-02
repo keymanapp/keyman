@@ -8,6 +8,8 @@
 /// <reference path="kmwcallback.ts" />
 // Defines keyboard data & management classes.
 /// <reference path="kmwkeyboards.ts" />
+// Defines built-in keymapping.
+/// <reference path="kmwkeymaps.ts" />
 // Defines KMW's hotkey management object.
 /// <reference path="kmwhotkeys.ts" />
 // Defines the ui management code that tracks UI activation and such.
@@ -62,6 +64,7 @@ class KeymanBase {
   domManager: DOMManager;
   hotkeyManager: HotkeyManager;
   uiManager: UIManager;
+  keyMapManager: KeyMapManager;
 
   touchAliasing: DOMEventHandlers;
 
@@ -105,6 +108,7 @@ class KeymanBase {
     this.domManager = new DOMManager(this);
     this.hotkeyManager = new HotkeyManager(this);
     this.uiManager = new UIManager(this);
+    this.keyMapManager = new KeyMapManager();
 
     // Load properties from their static variants.
     this['build'] = KeymanBase.__BUILD__;
@@ -165,7 +169,7 @@ class KeymanBase {
           elem = elem.ownerDocument;
           var win: Window;
           if(elem) {
-            win = elem.parentWindow;
+            win = elem.defaultView;
           }
           if(!win) {
             return null;

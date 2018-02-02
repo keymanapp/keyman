@@ -3,52 +3,59 @@
    Copyright 2017 SIL International
 ***/
 
-// If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the 
-// KMW system, so we use the fact that 'initialized' is only 1 / true after all scripts are loaded for the initial
-// load of KMW.
-if(!window['keyman']['initialized']) { 
-  /**
-   * Cross-browser compatibility keymaps    
-   */    
-  (function() {
-    // Declare KeymanWeb object
-    var keymanweb=window['keyman'];
+class KeyMap {
+  [keycode: string]: number;
+}
 
-    /* I732 START - 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard #2 */
-    var ffie = keymanweb._VKMap_FF_IE = {};
-    
+class BrowserKeyMaps {
+  FF:     KeyMap = new KeyMap();
+  Safari: KeyMap = new KeyMap();
+  Opera:  KeyMap = new KeyMap();
+
+  constructor() {
     //ffie['k109'] = 189; // -    // These two number-pad VK rules are *not* correct for more recent FF! JMD 8/11/12
     //ffie['k107'] = 187; // =    // FF 3.0 // I2062
-    ffie['k61'] = 187;  // =      // FF 2.0
-    ffie['k59'] = 186;  // ;
-    
-    keymanweb._VKMap_Opera_IE = {};
-    
-    keymanweb._VKMap_Safari_IE = {};
-      
+    this.FF['k61'] = 187;  // =   // FF 2.0
+    this.FF['k59'] = 186;  // ;
+  }
+}
+
+class LanguageKeyMaps {
+  [languageCode: string]: KeyMap;
+
+  constructor() {
+    /* I732 START - 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard #2 */
     // Swedish key map
-    var kmap = keymanweb._VKMap = {};
-  
-    kmap['se'] = {};
-    kmap['se']['k220'] =  192; // `
-    kmap['se']['k187'] =  189; // -
-    kmap['se']['k219'] =  187; // =
-    kmap['se']['k221'] =  219; // [
-    kmap['se']['k186'] =  221; // ]
-    kmap['se']['k191'] =  220; // \
-    kmap['se']['k192'] =  186; // ;
-    kmap['se']['k189'] =  191; // /
+    this['se'] = new KeyMap();
+    this['se']['k220'] =  192; // `
+    this['se']['k187'] =  189; // -
+    this['se']['k219'] =  187; // =
+    this['se']['k221'] =  219; // [
+    this['se']['k186'] =  221; // ]
+    this['se']['k191'] =  220; // \
+    this['se']['k192'] =  186; // ;
+    this['se']['k189'] =  191; // /
 
-    kmap['uk'] = {};  // I1299
-    kmap['uk']['k223'] =  192; // // ` U+00AC (logical not) =>  ` ~
-    kmap['uk']['k192'] =  222; // ' @  =>  ' "
-    kmap['uk']['k222'] =  226; // # ~  => K_oE2     // I1504 - UK keyboard mixup #, \
-    kmap['uk']['k220'] =  220; // \ |  => \ |       // I1504 - UK keyboard mixup #, \
-  
-    /* I732 END - 13/03/2007 MCD: Swedish: mapping of keystroke to US keyboard #2 */
+    this['uk'] = new KeyMap();  // I1299
+    this['uk']['k223'] =  192; // // ` U+00AC (logical not) =>  ` ~
+    this['uk']['k192'] =  222; // ' @  =>  ' "
+    this['uk']['k222'] =  226; // # ~  => K_oE2     // I1504 - UK keyboard mixup #, \
+    this['uk']['k220'] =  220; // \ |  => \ |       // I1504 - UK keyboard mixup #, \
+  }
+}
 
-    /* 13/03/2007 MCD: Swedish: Legacy keyboards - map US Key Code to Character Code */  
-    var s0={},s1={};
+class KeyMapManager {
+  browserMap: BrowserKeyMaps = new BrowserKeyMaps();
+  languageMap: LanguageKeyMaps = new LanguageKeyMaps();
+
+  _usCharCodes: KeyMap[];
+
+  constructor() {
+    this._usCodeInit();
+  }
+
+  _usCodeInit() {
+    var s0=new KeyMap(),s1=new KeyMap();
 
     s0['k192'] = 96;
     s0['k49'] = 49;
@@ -146,17 +153,17 @@ if(!window['keyman']['initialized']) {
     s1['k190'] = 62;
     s1['k191'] = 63;
 
-    keymanweb._USCharCode = [s0,s1];
-    
-    /**
-     * Function     _USKeyCodeToCharCode
-     * Scope        Private
-     * @param       {Event}     Levent      KMW event object
-     * @return      {number}                Character code 
-     * Description Translate keyboard codes to standard US layout codes
-     */    
-    keymanweb._USKeyCodeToCharCode = function(Levent) {
-      return keymanweb._USCharCode[Levent.Lmodifiers & 0x10 ? 1 : 0]['k'+Levent.Lcode];
-    };
-  })();
+    this._usCharCodes = [s0,s1];
+  }
+
+  /**
+   * Function     _USKeyCodeToCharCode
+   * Scope        Private
+   * @param       {Event}     Levent      KMW event object
+   * @return      {number}                Character code 
+   * Description Translate keyboard codes to standard US layout codes
+   */    
+  _USKeyCodeToCharCode(Levent: KeyEvent) {
+    return this._usCharCodes[Levent.Lmodifiers & 0x10 ? 1 : 0]['k'+Levent.Lcode];
+  };
 }

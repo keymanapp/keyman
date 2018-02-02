@@ -985,7 +985,6 @@ if(!window['keyman']['initialized']) {
         DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keymanweb.domManager.focusLastActiveElement();
         if(keymanweb.domManager._IsMozillaEditableIframe(Lelem,0)) Lelem = Lelem.documentElement;
-        if(document.selection && Lsel != null) Lsel.select();
         Lelem._KeymanWebSelectionStart=Ls;
         Lelem._KeymanWebSelectionEnd=Le;
         DOMEventHandlers.states._IgnoreNextSelChange = 0;
@@ -1059,7 +1058,8 @@ if(!window['keyman']['initialized']) {
         // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
         if(typeof activeKeyboard['KM'] == 'undefined')
         {
-          Lkc.Lcode=keymanweb._USKeyCodeToCharCode(Lkc); Lkc.LisVirtualKey=false;
+          Lkc.Lcode=keymanweb.keyMapManager._USKeyCodeToCharCode(Lkc);
+          Lkc.LisVirtualKey=false;
         }
 
         // Pass this key code and state to the keyboard program
