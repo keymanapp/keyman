@@ -115,11 +115,10 @@ class KeyboardInterface {
   insertText(Ptext: string, PdeadKey:number): boolean {
     this.resetContextCache();
     //_DebugEnter('InsertText');
-    var Lelem = this.keymanweb.domManager.getLastActiveElement(), Ls, Le, Lkc, Lsel, Lv=false;
+    var Lelem = this.keymanweb.domManager.getLastActiveElement(), Ls, Le, Lkc, Lv=false;
     if(Lelem != null) {
       Ls=Lelem._KeymanWebSelectionStart;
       Le=Lelem._KeymanWebSelectionEnd;
-      Lsel=DOMEventHandlers.states._Selection;
 
       this.keymanweb.uiManager.setActivatingUI(true);
       DOMEventHandlers.states._IgnoreNextSelChange = 100;
@@ -128,9 +127,7 @@ class KeyboardInterface {
       if(Util.instanceof(Lelem, "HTMLIFrameElement") && this.keymanweb.domManager._IsMozillaEditableIframe(Lelem as HTMLIFrameElement,0)) {
         Lelem = (<any>Lelem).documentElement;  // I3363 (Build 301)
       }
-      if(document.selection  &&  Lsel != null) {
-        Lsel.select();
-      }
+
       Lelem._KeymanWebSelectionStart=Ls;
       Lelem._KeymanWebSelectionEnd=Le;
       DOMEventHandlers.states._IgnoreNextSelChange = 0;
@@ -420,10 +417,11 @@ class KeyboardInterface {
       this.keymanweb['oninserttext'](dn,s);
     }
 
+    var Ldoc: Document;
     if(Pelem.body) {
-      var Ldoc=Pelem;
+      Ldoc=Pelem;
     } else {
-      var Ldoc=Pelem.ownerDocument;	// I1481 - integration with rich editors not working 100%
+      Ldoc=Pelem.ownerDocument;	// I1481 - integration with rich editors not working 100%
     }
     var Li, Ldv;
   
@@ -499,55 +497,6 @@ class KeyboardInterface {
         this._DeadkeyDeleteMatched();                                  // I3318
         this._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318
       } // Internet Explorer   (including IE9)   
-    } else if(Ldoc  &&  (Ldv=Ldoc.selection)) { // build 77 - use elem.ownerDocument.selection
-      if(Ldoc.body.isContentEditable || Ldoc.designMode.toLowerCase()=='on') { // I1295 - isContentEditable
-        var _CacheableCommands = this._CacheCommands(Ldoc);
-      }
-
-      var Lrange = Ldv.createRange(), Ls1;
-      if(Lrange.text != '') {
-        Ldv.clear();
-        dn = 0;
-      } else {
-        Lrange.collapse(true);
-      }
-
-      if(dn > 0) {              
-        Lrange.moveStart('character',-2*dn);  // I3319 (next four lines
-        var s0=Lrange.text,s1=s0._kmwSubstr(-dn);
-        Lrange.collapse(false); //move start back to end
-        Lrange.moveStart('character',-s1.length);
-      } else {
-        dn = 0;
-      }
-
-      Lrange.text = s;
-
-      if(Ldoc.body.isContentEditable || Ldoc.designMode.toLowerCase()=='on') { // I1295 - isContentEditable
-        Lrange.moveStart('character',-s.length);
-        
-        this._CacheCommandsReset(Ldoc, _CacheableCommands,Lrange.select);
-        Lrange.moveStart('character',s.length);
-        Lrange.select();
-      }
-      // Adjust deadkey positions 
-      if(dn >= 0) {
-        // Pelem.selectionStart seems to exist here in IE 9 and is valid.  This provides a possible approach, but may be wrong.
-        // It appears safe to model the deadkey adjustment based on the non-IE9 code path's calculations.
-        if(Pelem._KeymanWebSelectionStart != null) {// changed to allow a value of 0
-          LselectionStart = Pelem._KeymanWebSelectionStart;
-        } else {
-          LselectionStart = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionStart);  // I3319
-        }
-
-        this._DeadkeyDeleteMatched();                                  // I3318
-        this._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318
-      }
-
-      DOMEventHandlers.states._Selection = Ldv.createRange();
-      DOMEventHandlers.states._Selection.select();
-      DOMEventHandlers.states._Selection.scrollIntoView();
-      // Mozilla et al; IE9+ also recognizes setSelectionRange, but does not seem to work in exactly the same way as Mozilla
     } else if (Pelem.setSelectionRange) {                                        
       var LselectionStart, LselectionEnd;
             
@@ -641,7 +590,7 @@ class KeyboardInterface {
    * Description  Build reate list of styles that can be applied in iframes
    */    
   private _CacheCommands = function(_Document: Document): StyleCommand[] { // I1204 - style application in IFRAMEs, I2192, I2134, I2192   
-    //var _CacheableBackColor=(_Document.selection?'hilitecolor':'backcolor');
+    //var _CacheableBackColor='backcolor';
 
     var _CacheableCommands=[
       new StyleCommand('backcolor',1), new StyleCommand('fontname',1), new StyleCommand('fontsize',1), 

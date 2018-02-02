@@ -162,10 +162,11 @@ class KeymanBase {
       if(!e) {
         var elem: HTMLElement|Document = this.domManager.getLastActiveElement();
         if(elem) {
+          console.log("Hello world.");
           elem = elem.ownerDocument;
           var win: Window;
           if(elem) {
-            win = elem.parentWindow;
+            win = elem.defaultView;
           }
           if(!win) {
             return null;

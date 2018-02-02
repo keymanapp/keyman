@@ -282,13 +282,7 @@ class Util {
    */  
   attachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
     this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
-    if(Util.instanceof(Pelem, "HTMLElement") && (Pelem as HTMLElement).attachEvent) {
-      // IE
-      (Pelem as HTMLElement).attachEvent('on'+Peventname, Phandler);
-    } else if(Pelem.addEventListener) {
-      // Firefox + standards
-      Pelem.addEventListener(Peventname, Phandler, PuseCapture?true:false);
-    }
+    Pelem.addEventListener(Peventname, Phandler, PuseCapture?true:false);
   }
 
   /**
@@ -301,11 +295,7 @@ class Util {
    * Description Detaches event handler from element [to prevent memory leaks]
    */  
   detachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
-    if(Util.instanceof(Pelem, "HTMLElement") && (Pelem as HTMLElement).detachEvent) {
-      (Pelem as HTMLElement).detachEvent('on'+Peventname, Phandler);
-    } else if(Pelem.removeEventListener) {
       Pelem.removeEventListener(Peventname, Phandler, PuseCapture);      
-    }
   }    
 
   /**
@@ -366,12 +356,7 @@ class Util {
     }
     
     if(Util.instanceof(Lobj, "Document")) {
-      var Ldoc: Document = Lobj as Document;
-    // The following two lines are old code and may or may not still be needed - possibly should be conditioned similalry to above    
-      if(Ldoc && Ldoc.parentWindow && Ldoc.parentWindow.frameElement) { // Legacy IE.
-        return Lcurleft + this._GetAbsoluteX(Ldoc.parentWindow.frameElement as HTMLElement) - Ldoc.documentElement.scrollLeft;
-      }
-
+      var Ldoc = Lobj as Document;
       if(Ldoc && Ldoc.defaultView && Ldoc.defaultView.frameElement) {
         return Lcurleft + this._GetAbsoluteX(<HTMLElement>Ldoc.defaultView.frameElement) - Ldoc.documentElement.scrollLeft;
       }
@@ -412,11 +397,7 @@ class Util {
     
     if(Util.instanceof(Lobj, "Document")) {
       var Ldoc = Lobj as Document;
-      // The following two lines are old code and may or may not still be needed - possibly should be conditioned similalry to above    
-      if(Ldoc && Ldoc.parentWindow && Ldoc.parentWindow.frameElement) {
-        return Lcurtop + this._GetAbsoluteY(Ldoc.parentWindow.frameElement as HTMLElement) - Ldoc.documentElement.scrollTop;
-      }
-      if(Lobj && Ldoc.defaultView && Ldoc.defaultView.frameElement) {
+      if(Ldoc && Ldoc.defaultView && Ldoc.defaultView.frameElement) {
         return Lcurtop + this._GetAbsoluteY(<HTMLElement>Ldoc.defaultView.frameElement) - Ldoc.documentElement.scrollTop;
       }
     }
@@ -454,20 +435,19 @@ class Util {
   /**
    * Default mouse down event handler (to replace multiple inline handlers) (Build 360)   
    */
-  mouseDownPreventDefaultHandler = function(e: MouseEvent) {
+  mouseDownPreventDefaultHandler(e: MouseEvent) {
     if(e) {
       e.preventDefault();
     }
   }
   
-  _CreateElement(nodeName:string): HTMLElement { 
-    var e = <HTMLElement>document.createElement(nodeName);
+  _CreateElement<Ele extends HTMLElement>(nodeName:string): Ele { 
+    var e = document.createElement(nodeName) as Ele;
 
-    // Make element unselectable (Internet Explorer)
-    if (typeof e.onselectstart != 'undefined') { //IE route
-      e.unSelectable='on';
-      e.onselectstart=this.selectStartHandler; // Build 360
-    } else { // And for well-behaved browsers (may also work for IE9+, but not necessary)
+    // Make element unselectable (modern route)
+    if (typeof e.onselectstart != 'undefined') {
+      e.onselectstart=this.selectStartHandler; // Build 360, works with IE 9+.
+    } else { // And for legacy browsers
       e.style.MozUserSelect="none";
       e.style.KhtmlUserSelect="none";
       e.style.UserSelect="none";
@@ -533,17 +513,15 @@ class Util {
    * @param       {string}      s             CSS style name 
    * @return      {*}               
    */       
-  getStyleValue(e:HTMLElement, s:string)
-  { 
+  getStyleValue(e:HTMLElement, s:string) { 
     // Build 349: error trap added, since on iOS, getPropertyValue may fail 
     // and crash in some cases, possibly if passed a text node 
     try  
     {
-      if(e && (typeof(window.getComputedStyle) != 'undefined'))
+      if(e && (typeof(window.getComputedStyle) != 'undefined')) {
           return window.getComputedStyle(e,'').getPropertyValue(s);
-      else if(e && (typeof(e.currentStyle) != 'undefined'))    //IE 8 and earlier
-        return e.currentStyle[s];
-  }    
+      }
+    }    
     catch(ex){}
     
     // Return empty string if unable to get style value
@@ -716,21 +694,11 @@ class Util {
    */       
   rgba(s: HTMLStyleElement, r:number, g:number, b:number, a:number): string {
     var bgColor='transparent';
-    if(this._GetIEVersion() < 9) {
-      var pcOpacity=Math.floor(100*a), rs=r.toString(16), gs=g.toString(16), bs=b.toString(16), hexColor;
-      rs=('00'+rs).substr(-2);
-      gs=('00'+gs).substr(-2);
-      bs=('00'+bs).substr(-2);
-      hexColor=pcOpacity+rs+gs+bs;
-      s.filter='progid:DXImageTransform.Microsoft.gradient(startColorstr=#'+hexColor+',endColorstr=#'+hexColor+')';
-      s.zoom='1';
-    } else {
-      try {
-        bgColor='rgba('+r+','+g+','+b+','+a+')';
-      } catch(ex) {
-        bgColor='rgb('+r+','+g+','+b+')';
-      }
-    }
+    try {
+      bgColor='rgba('+r+','+g+','+b+','+a+')';
+    } catch(ex) {
+      bgColor='rgb('+r+','+g+','+b+')';
+    }    
 
     return bgColor;
   }
@@ -745,11 +713,7 @@ class Util {
     var _ElemStyle: HTMLStyleElement = <HTMLStyleElement>document.createElement<'style'>('style'); 
 
     _ElemStyle.type = 'text/css';
-    if(_ElemStyle.styleSheet) { // IE only
-      _ElemStyle.styleSheet.cssText = s;
-    } else {                    // all other browsers
-      _ElemStyle.appendChild(document.createTextNode(s));
-    }
+    _ElemStyle.appendChild(document.createTextNode(s));
 
     var _ElemHead=document.getElementsByTagName('HEAD'); 
     if(_ElemHead.length > 0) {

@@ -166,18 +166,6 @@
 //dbg(n+' '+ln+' '+Pelem.value._kmwSubstring(LselectionStart-n,LselectionStart-n+ln));
       return Pelem.value._kmwSubstring(LselectionStart-n,LselectionStart-n+ln); //I3319, KMW-1
     }
-    
-    else if(Ldoc  &&  (Ldv=Ldoc.selection)) // build 77 - use elem.ownerDocument instead of document
-                                            // I1481 - use Ldoc to get the ownerDocument when no selection is found
-    {  
-      /* IE */
-      var Lrange = Ldv.createRange();
-      //if (Lrange.parentElement() == Pelem) {  // build 77 - ignore parent of selection
-      Lrange.moveStart('character',-2*n);                     //I3319
-
-      return Lrange.text._kmwSubstr(-n)._kmwSubstring(0,ln);  //I3319
-      //}
-    }
 
     return "";
   };

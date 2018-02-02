@@ -18,7 +18,7 @@ display_usage ( ) {
 # Fails the build if a specified file does not exist.
 assert ( ) {
     if ! [ -f $1 ]; then
-        echo "Build failed."
+        fail "Build failed."
         exit 1
     fi
 }

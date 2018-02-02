@@ -931,7 +931,7 @@ if(!window['keyman']['initialized']) {
      */
     osk.clickKey = function(e)
     {
-      var Lelem = keymanweb.domManager.getLastActiveElement(), Ls, Le, Lkc, Lsel;
+      var Lelem = keymanweb.domManager.getLastActiveElement(), Ls, Le, Lkc;
 
       var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
 
@@ -980,12 +980,10 @@ if(!window['keyman']['initialized']) {
 
         Ls=Lelem._KeymanWebSelectionStart;
         Le=Lelem._KeymanWebSelectionEnd;
-        Lsel=DOMEventHandlers.states._Selection;
         keymanweb.uiManager.setActivatingUI(true);
         DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keymanweb.domManager.focusLastActiveElement();
         if(keymanweb.domManager._IsMozillaEditableIframe(Lelem,0)) Lelem = Lelem.documentElement;
-        if(document.selection && Lsel != null) Lsel.select();
         Lelem._KeymanWebSelectionStart=Ls;
         Lelem._KeymanWebSelectionEnd=Le;
         DOMEventHandlers.states._IgnoreNextSelChange = 0;
