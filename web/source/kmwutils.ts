@@ -335,7 +335,7 @@ class Util {
    * Description  Returns x-coordinate of Pobj element absolute position with respect to page
    */
   _GetAbsoluteX(Pobj: HTMLElement): number { // I1476 - Handle SELECT overlapping END
-    var Lobj: HTMLElement|Document
+    var Lobj: HTMLElement
 
     if(!Pobj) {
       return 0;
@@ -346,17 +346,14 @@ class Util {
 
     if (Lobj.offsetParent) {
       while (Lobj.offsetParent) {
-        Lobj = <HTMLElement>Lobj.offsetParent;
+        Lobj = Lobj.offsetParent as HTMLElement;
         Lcurleft += Lobj.offsetLeft;
       }
     }
     // Correct position if element is within a frame (but not if the controller is in document within that frame)
     if(Lobj && Lobj.ownerDocument && (Pobj.ownerDocument != this.keyman._MasterDocument)) {
-      Lobj=Lobj.ownerDocument;   // I2404 - Support for IFRAMEs
-    }
-    
-    if(Util.instanceof(Lobj, "Document")) {
-      var Ldoc = Lobj as Document;
+      var Ldoc=Lobj.ownerDocument;   // I2404 - Support for IFRAMEs
+
       if(Ldoc && Ldoc.defaultView && Ldoc.defaultView.frameElement) {
         return Lcurleft + this._GetAbsoluteX(<HTMLElement>Ldoc.defaultView.frameElement) - Ldoc.documentElement.scrollLeft;
       }
@@ -374,7 +371,7 @@ class Util {
    * Description  Returns y-coordinate of Pobj element absolute position with respect to page
    */  
   _GetAbsoluteY(Pobj: HTMLElement): number {
-    var Lobj: HTMLElement|Document
+    var Lobj: HTMLElement
 
     if(!Pobj) {
       return 0;
@@ -382,21 +379,17 @@ class Util {
     var Lcurtop = Pobj.offsetTop ? Pobj.offsetTop : 0;
     Lobj = Pobj;  // I2404 - Support for IFRAMEs
 
-    if (Util.instanceof(Lobj, "HTMLElement")) {
-      var ele = <HTMLElement> Lobj;
-      while (ele.offsetParent) {
-        Lobj = ele = <HTMLElement>ele.offsetParent;
-        Lcurtop += ele.offsetTop;
+    if (Lobj.ownerDocument && Lobj instanceof Lobj.ownerDocument.defaultView.HTMLElement) {
+      while (Lobj.offsetParent) {
+        Lobj = Lobj.offsetParent as HTMLElement;
+        Lcurtop += Lobj.offsetTop;
       }
     }
 
     // Correct position if element is within a frame (but not if the controller is in document within that frame)
     if(Lobj && Lobj.ownerDocument && (Pobj.ownerDocument != this.keyman._MasterDocument)) {
-      Lobj=Lobj.ownerDocument;   // I2404 - Support for IFRAMEs
-    }
-    
-    if(Util.instanceof(Lobj, "Document")) {
-      var Ldoc = Lobj as Document;
+      var Ldoc=Lobj.ownerDocument;   // I2404 - Support for IFRAMEs
+
       if(Ldoc && Ldoc.defaultView && Ldoc.defaultView.frameElement) {
         return Lcurtop + this._GetAbsoluteY(<HTMLElement>Ldoc.defaultView.frameElement) - Ldoc.documentElement.scrollTop;
       }
@@ -440,14 +433,15 @@ class Util {
       e.preventDefault();
     }
   }
-  
-  _CreateElement<Ele extends HTMLElement>(nodeName:string): Ele { 
-    var e = document.createElement(nodeName) as Ele;
 
-    // Make element unselectable (modern route)
-    if (typeof e.onselectstart != 'undefined') {
-      e.onselectstart=this.selectStartHandler; // Build 360, works with IE 9+.
-    } else { // And for legacy browsers
+  // Found a bit of magic formatting that allows dynamic return typing for a specified element tag!
+  _CreateElement<E extends "style"|"script"|"div"|"canvas"|"span">(nodeName:E) {
+    var e = document.createElement<E>(nodeName);
+
+    // Make element unselectable (Internet Explorer)
+    if (typeof e.onselectstart != 'undefined') { //IE route
+      e.onselectstart=this.selectStartHandler; // Build 360
+    } else { // And for well-behaved browsers (may also work for IE9+, but not necessary)
       e.style.MozUserSelect="none";
       e.style.KhtmlUserSelect="none";
       e.style.UserSelect="none";
@@ -1300,7 +1294,7 @@ class Util {
    * @param {string}          className   The plain-text name of the expected Element type.
    * @return {boolean}
    */
-  static instanceof(Pelem: Node|Event|Window, className: string): boolean {
+  static instanceof(Pelem: Event|EventTarget, className: string): boolean {
     var scopedClass;
 
     if (Pelem['Window']) { // Window objects contain the class definitions for types held within them.  So, we can check for those.
@@ -1310,7 +1304,15 @@ class Util {
     } else if(Pelem['ownerDocument']) {
       scopedClass = (Pelem as Node).ownerDocument.defaultView[className];
     } else if(Pelem['target']) {
-      scopedClass = ((Pelem as Event).target as Element).ownerDocument.defaultView[className];
+      var event = Pelem as Event;
+
+      if(this.instanceof(event.target, 'Window')) {
+        scopedClass = event.target[className]; 
+      } else if(this.instanceof(event.target, 'Document')) {
+        scopedClass = (event.target as Document).defaultView[className];
+      } else if(this.instanceof(event.target, 'HTMLElement')) {
+        scopedClass = (event.target as HTMLElement).ownerDocument.defaultView[className];
+      }
     }
 
     if(scopedClass) {

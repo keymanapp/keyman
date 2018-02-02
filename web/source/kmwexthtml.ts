@@ -1,6 +1,18 @@
 // Defines a number of KMW objects.
 /// <reference path="kmwtypedefs.ts"/>
 
+interface Window {
+    // DOM type prototypes
+    HTMLElement:         typeof HTMLElement;
+    HTMLTextAreaElement: typeof HTMLTextAreaElement;
+    HTMLInputElement:    typeof HTMLInputElement;
+    HTMLIFrameElement:   typeof HTMLIFrameElement;
+    Document:            typeof Document;
+    Event:               typeof Event;
+    MouseEvent:          typeof MouseEvent;
+    TouchEvent:          typeof TouchEvent;
+}
+
 interface Document {
     _KeymanWebSelectionStart: number,
     _KeymanWebSelectionEnd: number

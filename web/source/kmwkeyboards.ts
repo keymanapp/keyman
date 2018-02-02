@@ -555,7 +555,7 @@ class KeyboardManager {
     var util = this.keymanweb.util;
     var osk = this.keymanweb.osk;
 
-    var Lscript = util._CreateElement<HTMLScriptElement>('SCRIPT');
+    var Lscript = util._CreateElement('script');
     Lscript.charset="UTF-8";        // KMEW-89
     Lscript.type = 'text/javascript';
 
@@ -1123,7 +1123,7 @@ class KeyboardManager {
    **/
   keymanCloudRequest(cmd: string, byLanguage?: boolean) {         
     var URL='https://r.keymanweb.com/api/4.0/', tFlag, 
-      Lscript = this.keymanweb.util._CreateElement<HTMLScriptElement>('SCRIPT');
+      Lscript = this.keymanweb.util._CreateElement('script');
     
     URL = URL + ((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards')
       +'?jsonp=keyman.register';  

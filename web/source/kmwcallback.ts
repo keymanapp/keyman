@@ -115,7 +115,7 @@ class KeyboardInterface {
   insertText(Ptext: string, PdeadKey:number): boolean {
     this.resetContextCache();
     //_DebugEnter('InsertText');
-    var Lelem = this.keymanweb.domManager.getLastActiveElement(), Ls, Le, Lkc, Lv=false;
+    var Lelem: Document|HTMLElement = this.keymanweb.domManager.getLastActiveElement(), Ls, Le, Lkc, Lv=false;
     if(Lelem != null) {
       Ls=Lelem._KeymanWebSelectionStart;
       Le=Lelem._KeymanWebSelectionEnd;
@@ -124,7 +124,8 @@ class KeyboardInterface {
       DOMEventHandlers.states._IgnoreNextSelChange = 100;
       this.keymanweb.domManager.focusLastActiveElement();
       
-      if(Util.instanceof(Lelem, "HTMLIFrameElement") && this.keymanweb.domManager._IsMozillaEditableIframe(Lelem as HTMLIFrameElement,0)) {
+      if(Lelem.ownerDocument && Lelem instanceof Lelem.ownerDocument.defaultView.HTMLIFrameElement 
+          && this.keymanweb.domManager._IsMozillaEditableIframe(Lelem, 0)) {
         Lelem = (<any>Lelem).documentElement;  // I3363 (Build 301)
       }
 
@@ -358,8 +359,9 @@ class KeyboardInterface {
   beep(Pelem: HTMLElement|Document): void {
     this.resetContextCache();
     
-    if(Util.instanceof(Pelem, "Document")) {
-      Pelem=(Pelem as Document).body; // I1446 - beep sometimes fails to flash when using OSK and rich control
+    var Pdoc = Pelem as Document;  // Shorthand for following if, which verifies if it actually IS a Document.
+    if(Pdoc.defaultView && Pelem instanceof Pdoc.defaultView.Document) {
+      Pelem=Pdoc.body; // I1446 - beep sometimes fails to flash when using OSK and rich control
     }
 
     Pelem = Pelem as HTMLElement; // After previous block, true.
@@ -553,14 +555,14 @@ class KeyboardInterface {
    * @param       {number}      Pd      deadkey id
    * Description  Record a deadkey at current cursor position, deleting Pdn characters first
    */    
-  deadkeyOutput(Pdn: number, Pelem: HTMLElement, Pd: number): void {
+  deadkeyOutput(Pdn: number, Pelem: HTMLElement|Document, Pd: number): void {
     this.resetContextCache();
 
     if(Pdn >= 0) {
       this.output(Pdn,Pelem,"");  //I3318 corrected to >=
     }
 
-    var Lc: Deadkey = new Deadkey(this._SelPos(Pelem), Pd);
+    var Lc: Deadkey = new Deadkey(this._SelPos(Pelem as HTMLElement), Pd);
 
     this._DeadKeys=this.keymanweb._push(this._DeadKeys,Lc);      
     //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
@@ -878,29 +880,28 @@ class KeyboardInterface {
    * Description  Get start of selection (with supplementary plane modifications)
    */   
   _SelPos(Pelem: HTMLElement) {
-    var Ldoc, Ldv, isMSIE=(this.keymanweb.util._GetIEVersion()<999); // I3363 (Build 301)
+    var Ldoc: Document, Ldv: Window, isMSIE=(this.keymanweb.util._GetIEVersion()<999); // I3363 (Build 301)
 
     if((<any>this.keymanweb).isPositionSynthesized())
       return this.keymanweb.touchAliasing.getTextCaret(Pelem);
 
-    if(Pelem._KeymanWebSelectionStart) 
+    if(Pelem._KeymanWebSelectionStart) {
       return Pelem._KeymanWebSelectionStart;
-    
-    // Mozilla, IE9 
-    else if (Util.instanceof(Pelem, "HTMLInputElement") || Util.instanceof(Pelem, "HTMLTextAreaElement")) {
-      var inputEle = Pelem as HTMLInputElement|HTMLTextAreaElement;
-      if(inputEle.setSelectionRange) {
-        return inputEle.value.substr(0, inputEle.selectionStart)._kmwLength();
+    } else if ((Ldoc = Pelem.ownerDocument) && (Ldv=Ldoc.defaultView)) {
+      // Mozilla, IE9 
+      if(Pelem instanceof Ldv.HTMLInputElement || Pelem instanceof Ldv.HTMLTextAreaElement) {
+        if(Pelem.setSelectionRange) {
+          return Pelem.value.substr(0, Pelem.selectionStart)._kmwLength();
+        } // contentEditable elements, Mozilla midas
+      } else if(Ldv.getSelection &&  Pelem.ownerDocument.designMode.toLowerCase() == 'on') {
+        var Lsel = Ldv.getSelection();
+        if(Lsel.focusNode.nodeType == 3) 
+          return (Lsel.focusNode as Text).substringData(0,Lsel.focusOffset)._kmwLength(); 
       }
     }
+    
+
   
-    // contentEditable elements, Mozilla midas
-    else if((Ldv=Pelem.ownerDocument)  &&  (Ldv=Ldv.defaultView)  &&  Ldv.getSelection
-      &&  Pelem.ownerDocument.designMode.toLowerCase() == 'on') {
-      var Lsel = Ldv.getSelection();
-      if(Lsel.focusNode.nodeType == 3) 
-        return Lsel.focusNode.substringData(0,Lsel.focusOffset)._kmwLength(); 
-    }
     
     return 0;
   }
