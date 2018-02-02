@@ -42,6 +42,7 @@ final class KMKeyboardPickerAdapter extends SimpleAdapter implements OnClickList
       int length = data.size();
       for (int i = 0; i < length; i++) {
         HashMap<String, String> kbInfo = new HashMap<String, String>();
+        kbInfo.put(KMManager.KMKey_PackageID, data.get(i).get(KMManager.KMKey_PackageID).toString());
         kbInfo.put(KMManager.KMKey_KeyboardID, data.get(i).get(KMManager.KMKey_KeyboardID).toString());
         kbInfo.put(KMManager.KMKey_LanguageID, data.get(i).get(KMManager.KMKey_LanguageID).toString());
         kbInfo.put(KMManager.KMKey_KeyboardName, data.get(i).get(KMManager.KMKey_KeyboardName).toString());
@@ -83,14 +84,10 @@ final class KMKeyboardPickerAdapter extends SimpleAdapter implements OnClickList
     HashMap<String, String> kbInfo = (HashMap<String, String>) v.getTag();
     Intent i = new Intent(context, KeyboardInfoActivity.class);
     i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-    String keyboardID = kbInfo.get(KMManager.KMKey_KeyboardID);
     String packageID = kbInfo.get(KMManager.KMKey_PackageID);
+    String keyboardID = kbInfo.get(KMManager.KMKey_KeyboardID);
     if (packageID == null || packageID.isEmpty()) {
-      if (keyboardID.equals(KMManager.KMDefault_KeyboardID)) {
-        packageID = KMManager.KMDefault_PackageID;
-      } else {
-        packageID = KMManager.KMDefault_LegacyPackageID;
-      }
+      packageID = KMManager.KMDefault_UndefinedPackageID;
     }
     i.putExtra(KMManager.KMKey_PackageID, packageID);
     i.putExtra(KMManager.KMKey_KeyboardID, keyboardID);

@@ -123,7 +123,9 @@ begin
   for i := 0 to pack.Keyboards.Count - 1 do
   begin
     ids := FindKeyboardFilesByID(pack.Keyboards[i].ID);
-    Assert(Length(ids) > 0);
+    if Length(ids) = 0 then
+      // This can happen if a keyboard file is invalid
+      Continue;
 
     if Length(ids) = 1 then
       Continue;
@@ -208,6 +210,7 @@ begin
       end;
     except
       on E:EKMXError do ;
+      on E:EFOpenError do ;
     end;
   end
   else if f.FileType = ftJavascript then
@@ -231,6 +234,7 @@ begin
       pki.Version := ki.KeyboardVersion;
     except
       on E:EKMXError do Result := False;
+      on E:EFOpenError do Result := False;
     end;
   end
   else if f.FileType = ftJavascript then

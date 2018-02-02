@@ -49,7 +49,7 @@ public class WebBrowserActivity extends Activity {
   private ImageButton stopButton;
   private ImageButton reloadButton;
   private ProgressBar progressBar;
-  private static final String fontBaseUri = "https://az416209.vo.msecnd.net/font/deploy/";
+  private static final String fontBaseUri = "https://s.keyman.com/font/deploy/";
   private String loadedFont;
   private boolean isLoading = false;
   private boolean didFinishLoading = false;

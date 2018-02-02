@@ -31,27 +31,29 @@
         border:solid 2px #999999;
         box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;
         }
- 
+
 .phone.windows .kmw-key-row{max-width:80%;}
 .phone.windows .kmw-key {position:static;}
 
 .phone .kmw-5rows {padding-top: 0;}
 .phone .kmw-key-label{position:absolute;left:5%;top:1%;font:0.5em Arial;color:#aaa; background-color:transparent;z-index:10000;}
- 
-.phone .kmw-key-row {-webkit-touch-callout:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}  
+
+.phone .kmw-key-row {-webkit-touch-callout:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
 
 .phone.ios .kmw-key-layer-group {background-color: #cfd3d9}
 .phone.ios .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 5px;}
 .phone.ios .kmw-key.kmw-key-default {color:#000;background-color:#fdfdfe;} 
 .phone.ios .kmw-key.kmw-key-shift {color:#fff;background-color:#b2b9c5;} 
-.phone.ios .kmw-key.kmw-key-shift-on {color:#000;background-color:#fdfdfe;} 
+.phone.ios .kmw-key.kmw-key-shift-on {color:#000;background-color:#fdfdfe;}
+.phone.ios .kmw-key.kmw-key-special {color:#fff;background-color:#b2b9c5;}
 .phone.ios .kmw-key.kmw-key-touched {background-color:#88f;}
  
 .phone.android .kmw-key-layer-group {background-color: #333;}  
 .phone.android .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 3px;}
-.phone.android .kmw-key.kmw-key-default {color:#fff;background-color:#777;} 
-.phone.android .kmw-key.kmw-key-shift {color:#fff;background-color:#555;} 
-.phone.android .kmw-key.kmw-key-shift-on {color:#000;background-color:#ddd;} 
+.phone.android .kmw-key.kmw-key-default {color:#fff;background-color:#777;}
+.phone.android .kmw-key.kmw-key-shift {color:#fff;background-color:#555;}
+.phone.android .kmw-key.kmw-key-shift-on {color:#000;background-color:#ddd;}
+.phone.android .kmw-key.kmw-key-special {color:#fff;background-color:#555;}
 .phone.android .kmw-key.kmw-key-touched {background-color:#bbb;}
 .phone.android .kmw-key.kmw-spacebar {background-color: #555;}
 .phone.android .kmw-key.kmw-spacebar.kmw-key-touched {background-color: #bbb;}
@@ -77,7 +79,8 @@
 .tablet.ios .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 5px;}
 .tablet.ios .kmw-key.kmw-key-default {color:#000;background-color:#fdfdfe;} 
 .tablet.ios .kmw-key.kmw-key-shift {color:#fff;background-color:#b2b9c5;} 
-.tablet.ios .kmw-key.kmw-key-shift-on {color:#000;background-color:#fdfdfe;} 
+.tablet.ios .kmw-key.kmw-key-shift-on {color:#000;background-color:#fdfdfe;}
+.tablet.ios .kmw-key.kmw-key-special {color:#fff;background-color:#b2b9c5;}
 .tablet.ios .kmw-key.kmw-key-touched {background-color:#88f;}
 
 .tablet .kmw-key-row {-webkit-touch-callout:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
@@ -86,7 +89,8 @@
 .tablet.android .kmw-key {border: none; border: solid 1px #111; box-shadow:0px 2px 5px #888; border-radius: 3px;}
 .tablet.android .kmw-key.kmw-key-default {color:#000;background-color:#ddd;} 
 .tablet.android .kmw-key.kmw-key-shift {color:#77f;background-color:#a8a8a8;} 
-.tablet.android .kmw-key.kmw-key-shift-on {color:#000;background-color:#77f;} 
+.tablet.android .kmw-key.kmw-key-shift-on {color:#000;background-color:#77f;}
+.tablet.android .kmw-key.kmw-key-special {color:#77f;background-color:#a8a8a8;}
 .tablet.android .kmw-key.kmw-key-touched {background-color:#777;}
 .tablet.android .kmw-key.kmw-spacebar {background-color: #d8d8d8;}
 .tablet.android .kmw-key.kmw-spacebar.kmw-key-touched {background-color: #777;}

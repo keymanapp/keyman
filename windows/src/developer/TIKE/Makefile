@@ -30,19 +30,19 @@ pull-keymanweb:
     #
     cd $(ROOT)\..\web\source
 !ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) build.sh
+    $(GIT_BASH_FOR_KEYMAN) build.sh -no_minify
 !else
-    start /wait ./build.sh
+    start /wait ./build.sh -no_minify
 !endif
 
     -rd /s/q $(ROOT)\src\developer\tike\xml\kmw\resource
     mkdir $(ROOT)\src\developer\tike\xml\kmw\resource
-    xcopy /y $(ROOT)\..\web\release\web\*.js $(ROOT)\src\developer\tike\xml\kmw\resource\ #
-    xcopy /y $(ROOT)\..\web\release\web\*.js.map $(ROOT)\src\developer\tike\xml\kmw\resource\ #
+    xcopy /y $(ROOT)\..\web\release\unminified\web\*.js $(ROOT)\src\developer\tike\xml\kmw\resource\ #
+    xcopy /y $(ROOT)\..\web\release\unminified\web\*.js.map $(ROOT)\src\developer\tike\xml\kmw\resource\ #
     xcopy /y $(ROOT)\..\web\LICENSE $(ROOT)\src\developer\tike\xml\kmw\resource\ #
     xcopy /y $(ROOT)\..\web\README.md $(ROOT)\src\developer\tike\xml\kmw\resource\ #
-    xcopy /s /y $(ROOT)\..\web\release\web\osk\* $(ROOT)\src\developer\tike\xml\kmw\resource\osk\ #
-    xcopy /s /y $(ROOT)\..\web\release\web\ui\* $(ROOT)\src\developer\tike\xml\kmw\resource\ui\ #
+    xcopy /s /y $(ROOT)\..\web\release\unminified\web\osk\* $(ROOT)\src\developer\tike\xml\kmw\resource\osk\ #
+    xcopy /s /y $(ROOT)\..\web\release\unminified\web\ui\* $(ROOT)\src\developer\tike\xml\kmw\resource\ui\ #
 
 icons:
     rc icons.rc

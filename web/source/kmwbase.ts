@@ -165,7 +165,7 @@ class KeymanBase {
           elem = elem.ownerDocument;
           var win: Window;
           if(elem) {
-            win = elem.parentWindow;
+            win = elem.defaultView;
           }
           if(!win) {
             return null;

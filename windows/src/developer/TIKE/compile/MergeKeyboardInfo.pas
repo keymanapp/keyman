@@ -16,7 +16,11 @@
   # authorEmail -- from kmp.inf
   # lastModifiedDate -- build time: this only gets refreshed when the version num increments so it's close enough then
   # packageFilename -- from $keyboard_info_packageFilename
+  # packageFileSize -- get from the size of the file
   # jsFilename -- from $keyboard_info_jsFilename
+  # jsFileSize -- get from the size of the file
+  # documentationFileSize -- get from the size of the file
+  # isRTL -- from .js, KRTL\s*=\s*1
   # encodings -- from .kmx (existence of .js implies unicode)
   # packageIncludes -- from kmp.inf?
   # version -- from kmp.inf, js
@@ -52,15 +56,17 @@ type
     FKMXFiles: array of TKeyboardInfoMap;
     FJSFileData: string;
     FVersion: string;
+    FSourcePath: string;
     function Failed(message: string): Boolean;
     function Execute: Boolean; overload;
     function LoadJsonFile: Boolean;
     function LoadKMPFile: Boolean;
     function LoadJSFile: Boolean;
-    constructor Create(AJsFile, AKmpFile, AJsonFile: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback);
+    constructor Create(ASourcePath, AJsFile, AKmpFile, AJsonFile: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback);
     procedure AddAuthor;
     procedure AddAuthorEmail;
     procedure CheckOrAddEncodings;
+    procedure CheckOrAddFileSizes;
     procedure CheckOrAddID;
     procedure CheckOrAddJsFilename;
     procedure AddLastModifiedDate;
@@ -71,11 +77,12 @@ type
     procedure AddPlatformSupport;
     procedure CheckOrAddVersion;
     function SaveJsonFile: Boolean;
-    function LoadKMXFile: Boolean;
     procedure CheckKMXFilenames;
+    procedure AddIsRTL;
+    procedure AddSourcePath;
   public
     destructor Destroy; override;
-    class function Execute(AJsFile, AKmpFile, AJsonFile: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean; overload;
+    class function Execute(ASourcePath, AJsFile, AKmpFile, AJsonFile: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean; overload;
   end;
 
 implementation
@@ -97,10 +104,10 @@ type
 
 { TMergeKeyboardInfo }
 
-class function TMergeKeyboardInfo.Execute(AJsFile, AKmpFile, AJsonFile: string;
+class function TMergeKeyboardInfo.Execute(ASourcePath, AJsFile, AKmpFile, AJsonFile: string;
   AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean;
 begin
-  with TMergeKeyboardInfo.Create(AJsFile, AKmpFile, AJsonFile, AMergingValidateIds, ASilent, ACallback) do
+  with TMergeKeyboardInfo.Create(ASourcePath, AJsFile, AKmpFile, AJsonFile, AMergingValidateIds, ASilent, ACallback) do
   try
     Result := Execute;
   finally
@@ -108,11 +115,12 @@ begin
   end;
 end;
 
-constructor TMergeKeyboardInfo.Create(AJsFile, AKmpFile, AJsonFile: string;
+constructor TMergeKeyboardInfo.Create(ASourcePath, AJsFile, AKmpFile, AJsonFile: string;
   AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback);
 begin
   inherited Create;
 
+  FSourcePath := ASourcePath;
   FMergingValidateIds := AMergingValidateIds;
   FSilent := ASilent;
   FCallback := ACallback;
@@ -156,15 +164,18 @@ begin
 
     CheckOrAddID;
     AddName;
+    AddIsRTL;
     AddAuthor;
     AddAuthorEmail;
     AddLastModifiedDate;
+    AddSourcePath;
 
     CheckOrAddVersion;  // must be called before CheckOrAddJsFilename
 
     CheckOrAddPackageFilename;
     CheckOrAddJsFilename;
     CheckOrAddEncodings;
+    CheckOrAddFileSizes;
     AddPackageIncludes;
     CheckOrAddMinKeymanDesktopVersion;
     AddPlatformSupport;
@@ -205,14 +216,6 @@ begin
   Result := Assigned(json);
 end;
 
-function TMergeKeyboardInfo.LoadKMXFile: Boolean;
-begin
-  SetLength(FKMXFiles, 1);
-  FKMXFiles[0].Filename := FKMPFile;
-  GetKeyboardInfo(FKMPFile, False, FKMXFiles[0].Info, False);
-  Result := True;
-end;
-
 function TMergeKeyboardInfo.LoadKMPFile: Boolean;
 var
   FKMXTempFile, FKMPInfTempFile: TTempFile;
@@ -241,8 +244,8 @@ begin
   if FKMPFile = '' then
     Exit(True);
 
-  if SameText(ExtractFileExt(FKMPFile), '.kmx') then
-    Exit(LoadKMXFile);
+  if not SameText(ExtractFileExt(FKMPFile), '.kmp') then
+    Exit(Failed('packageFile must be a .kmp file '+FKMPFile));
 
   try
     Zip := TZipFile.Create;
@@ -372,6 +375,26 @@ begin
     Exit;
 
   json.AddPair('name', FName);
+end;
+
+//
+// isRTL -- from js
+//
+procedure TMergeKeyboardInfo.AddIsRTL;
+begin
+  if json.GetValue('isRTL') <> nil then Exit;
+
+  if FJSFileData <> '' then
+  begin
+    with TRegEx.Match(FJsFileData, 'this\.KRTL=1') do
+    begin
+      if not Success then Exit;
+    end;
+  end
+  else
+    Exit;
+
+  json.AddPair('isRTL', TJsonTrue.Create);
 end;
 
 //
@@ -533,6 +556,39 @@ begin
 end;
 
 //
+// packageFileSize, jsFileSize, documentationFileSize, all from the actual files
+//
+procedure TMergeKeyboardInfo.CheckOrAddFileSizes;
+  procedure DoFileSize(prefix: string);
+  var
+    vs, v: TJSONValue;
+    f: TSearchRec;
+  begin
+    v := json.GetValue(prefix+'Filename');
+    if v <> nil then
+    begin
+      if FindFirst(ExtractFilePath(FJsonFile)+v.Value, 0, f) <> 0 then
+        raise EInvalidKeyboardInfo.CreateFmt('Unable to locate file %s to check its size', [v.Value]);
+      FindClose(f);
+      vs := json.GetValue(prefix+'FileSize');
+      if vs = nil then
+        json.AddPair(prefix+'FileSize', TJSONNumber.Create(f.Size))
+      else
+      begin
+        if f.Size <> (vs as TJSONNumber).AsInt64 then
+          raise EInvalidKeyboardInfo.CreateFmt('File size for %s is recorded as %d but should be %d.',
+            [v.Value, (vs as TJSONNumber).AsInt64, f.Size]);
+      end;
+    end;
+  end;
+
+begin
+  DoFileSize('js');
+  DoFileSize('package');
+  DoFileSize('documentation');
+end;
+
+//
 //  packageIncludes -- from kmp.inf?
 //
 procedure TMergeKeyboardInfo.AddPackageIncludes;
@@ -674,6 +730,20 @@ begin
   end;
 
   json.AddPair('platformSupport', v);
+end;
+
+//
+// Add sourcePath field, from commandline parameter
+//
+procedure TMergeKeyboardInfo.AddSourcePath;
+begin
+  if FSourcePath = '' then
+    Exit;
+
+  if not TRegEx.IsMatch(FSourcePath, '^(release|legacy|experimental)\/.+\/.+$') then
+    raise EInvalidKeyboardInfo.CreateFmt('The source path "%s" is an invalid format, '+
+      'expecting "(release|legacy|experimental)/n/name".', [FSourcePath]);
+  json.AddPair('sourcePath', FSourcePath);
 end;
 
 procedure TMergeKeyboardInfo.CheckKMXFilenames;

@@ -262,7 +262,7 @@ begin
         for i := 0 to pack.Files.Count - 1 do
         begin
           if not FileExists(pack.Files[i].FileName) then
-            WriteMessage(plsWarning, 'Warning: File '+pack.Files[i].FileName+' does not exist.')
+            WriteMessage(plsWarning, 'File '+pack.Files[i].FileName+' does not exist.')
           else
           begin
             // When compiling the package, save the kvk keyboard into binary for delivery
@@ -291,7 +291,7 @@ begin
               Add(pack.Files[i].FileName);
           end;
         end;
-        if FileCount < pack.Files.Count + 1 then
+        if FileCount < pack.Files.Count + 2 then
           WriteMessage(plsError, 'The build was not successful. Some files were skipped.')
         else
         begin

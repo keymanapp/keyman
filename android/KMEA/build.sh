@@ -18,6 +18,11 @@ display_usage ( ) {
 
 echo Build KMEA
 
+#
+# Prevents 'clear' on exit of mingw64 bash shell
+#
+SHLVL=0
+
 # Path definitions
 KM_ROOT="$(cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 KMA_ROOT="$KM_ROOT/android"
