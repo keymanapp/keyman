@@ -30,13 +30,14 @@
     "karma-html2js-preprocessor": "^1.1.0",
     "karma-ie-launcher": "^1.0.0",
     "karma-mocha": "^1.3.0",
+    "karma-mocha-reporter": "^2.2.5",
     "karma-safari-launcher": "^1.0.0",
     "mocha": "^5.0.0",
     "typescript": "^2.6.2"
   },
   "scripts": {
     "tsc": "tsc",
-    "test": "mocha --recursive unit_tests",
+    "test": "bash ./unit_tests/test.sh",
     "karma": "karma"
   }
 }

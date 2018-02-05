@@ -7,7 +7,7 @@ module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '',
+    basePath: '..',
 
 
     // frameworks to use
@@ -17,10 +17,18 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'cases/**/*.js',
-      '../release/unminified/web/*.js',
-      {pattern: 'fixtures/**/*.html', watched: true}
+      'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
+      'unit_tests/cases/**/*.js', // Where the tests actually reside.
+      {pattern: 'release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources
+      {pattern: 'release/unminified/web/**/*.gif', watched: false, served: true, included: false}, // OSK resources
+      {pattern: 'release/unminified/web/*.js', watched: true, served: true, included: false},  // The actual KMW code.
+      {pattern: 'release/unminified/web/*.map', watched: true, served: true, included: false}, // + sourcemaps.
+      {pattern: 'unit_tests/fixtures/**/*.html', watched: true} // HTML structures useful for testing.
     ],
+
+    proxies: {
+      "/source/": "/base/release/unminified/web/"
+    },
 
 
     // list of files / patterns to exclude
@@ -38,8 +46,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
-
+    reporters: ['mocha'],
 
     // web server port
     port: 9876,
@@ -66,8 +73,8 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-	// if false, it generates the pages and acts as a persistent server.
-    singleRun: false,
+	  // if false, it generates the pages and acts as a persistent server.
+    singleRun: true,
 
     // Concurrency level
     // how many browser should be started simultaneous
