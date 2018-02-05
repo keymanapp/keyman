@@ -1,16 +1,16 @@
 var assert = chai.assert;
 
 describe('KeymanWeb Initialization', function() {
-  beforeEach(function(done) {
-    fixture.setBase('unit_tests/fixtures');
 
+  beforeEach(function(done) {
+    this.timeout(5000);
+
+    fixture.setBase('unit_tests/fixtures');
     fixture.load("singleInput.html");
     setupKMW();
 
-    setTimeout(function() {
-      // Special Mocha trick - this forces Mocha to allow a page initialization time.
-      done();
-    }, 1000);
+    // Pass the initTimer method our 'done' callback so it can handle our initialization delays for us.
+    initTimer(done);
   });
   
   afterEach(function() {
@@ -19,9 +19,6 @@ describe('KeymanWeb Initialization', function() {
   });
   
   describe('Initialization', function() {
-    it('window.keyman should exist.', function() {
-      assert.isNotNull(window.keyman, "KeymanWeb's base object doesn't exist!");
-    });
     it('KMW should attach to the input element.', function() {
       var singleton = document.getElementById('singleton');
       assert.isTrue(keyman.isAttached(singleton), "KeymanWeb did not automatically attach to the element!");
@@ -41,10 +38,7 @@ describe('Toggle UI Initialization', function() {
 
     setupKMW('toggle');
 
-    setTimeout(function() {
-      // Special Mocha trick - this forces Mocha to allow a page initialization time.
-      done();
-    }, 1500); // Set high to ensure KMW has time to fully initialize.  We do have a 1 sec delay in the initializer.
+    initTimer(done);
   });
   
   afterEach(function() {
@@ -79,10 +73,7 @@ describe('Button UI Initialization', function() {
 
     setupKMW('button');
 
-    setTimeout(function() {
-      // Special Mocha trick - this forces Mocha to allow a page initialization time.
-      done();
-    }, 1500); // Set high to ensure KMW has time to fully initialize.  We do have a 1 sec delay in the initializer.
+    initTimer(done);
   });
   
   afterEach(function() {
@@ -104,10 +95,7 @@ describe('Float UI Initialization', function() {
 
     setupKMW('float');
 
-    setTimeout(function() {
-      // Special Mocha trick - this forces Mocha to allow a page initialization time.
-      done();
-    }, 1500); // Set high to ensure KMW has time to fully initialize.  We do have a 1 sec delay in the initializer.
+    initTimer(done);
   });
   
   afterEach(function() {
@@ -130,5 +118,33 @@ describe('Float UI Initialization', function() {
     }
 
     assert(match, 'Floating controller element has not been added to the page!');
+  })
+});
+
+describe('Toolbar UI Initialization', function() {
+
+  beforeEach(function(done) {
+    this.timeout(5000);
+    fixture.setBase('unit_tests/fixtures');
+    fixture.load('singleInput.html');
+
+    setupKMW('toolbar');
+
+    initTimer(done);
+  });
+  
+  afterEach(function() {
+    fixture.cleanup();
+    teardownKMW();
+  });
+
+  it('The Toolbar UI initializes correctly.', function() {
+    assert(keyman.ui.init, 'Initialization flag is set to false!');
+    
+    var kwc = document.getElementById('KeymanWebControl');
+    assert.isNotNull(kwc, 'Toolbar DIV was not added to the page!');
+
+    var toolbar = document.getElementById('kmw_controls');
+    assert.isNotNull(toolbar, 'The main toolbar element was not added to the page!');
   })
 });

@@ -357,7 +357,9 @@ class DOMManager {
       this.disableInputElement(Pelem['kmw_ip']);
       
       // We get weird repositioning errors if we don't remove our simulated input element - and permanently.
-      Pelem.parentNode.removeChild(Pelem['kmw_ip']);
+      if(Pelem.parentNode) {
+        Pelem.parentNode.removeChild(Pelem['kmw_ip']);
+      }
       delete Pelem['kmw_ip'];
     }
 
@@ -984,10 +986,10 @@ class DOMManager {
 
           for(var k = 0; k < this.sortedInputs.length; k++) {
             if(this.sortedInputs[k]['kmw_ip']) {
-              this.touchAliasing.updateInput(this.sortedInputs[k]['kmw_ip']);
+              this.keyman.touchAliasing.updateInput(this.sortedInputs[k]['kmw_ip']);
             }
           }
-        }, 1);
+        }.bind(this), 1);
       }
     }
   }.bind(this);
@@ -1645,20 +1647,25 @@ class DOMManager {
       * We place it here so that it loads after most of the other UI loads, reducing the MutationObserver's overhead.
       * Of course, we only want to dynamically add elements if the user hasn't enabled the manual attachment option.
       */
+    
+    if(MutationObserver) {
+      var observationTarget = document.querySelector('body'), observationConfig: MutationObserverInit;
+      if(this.keyman.options['attachType'] != 'manual') { //I1961
+        observationConfig = { childList: true, subtree: true};
+        this.attachmentObserver = new MutationObserver(this._AutoAttachObserverCore);
+        this.attachmentObserver.observe(observationTarget, observationConfig);
+      }
 
-    var observationTarget = document.querySelector('body'), observationConfig: MutationObserverInit;
-    if(this.keyman.options['attachType'] != 'manual') { //I1961
-      observationConfig = { childList: true, subtree: true};
-      this.attachmentObserver = new MutationObserver(this._AutoAttachObserverCore);
-      this.attachmentObserver.observe(observationTarget, observationConfig);
+      /**
+       * Setup of handlers for dynamic detection of the kmw-disabled class tag that controls enablement.
+       */
+      observationConfig = { subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'readonly']};
+      this.enablementObserver = new MutationObserver(this._EnablementMutationObserverCore);
+      this.enablementObserver.observe(observationTarget, observationConfig);
+    } else {
+      console.warn("Your browser is outdated and does not support MutationObservers, a web feature " + 
+        "needed by KeymanWeb to support dynamically-added elements.");
     }
-
-    /**
-     * Setup of handlers for dynamic detection of the kmw-disabled class tag that controls enablement.
-     */
-    observationConfig = { subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'readonly']};
-    this.enablementObserver = new MutationObserver(this._EnablementMutationObserverCore);
-    this.enablementObserver.observe(observationTarget, observationConfig);
 
     // Set exposed initialization flag to 2 to indicate deferred initialization also complete
     this.keyman.setInitialized(2);

@@ -48,3 +48,17 @@ var teardownKMW = function() {
   delete window.keyman;
   window["keyman"] = undefined;
 }
+
+// Make sure the main script loads...
+var initTimer = function(done) {
+  window.setTimeout(function() {
+    if(window['keyman']) {
+      // ... and then give KMW and the UI a bit more time to init and attach.
+      window.setTimeout(function() {
+        done();
+      }, 1000);
+    } else {
+      initTimer(done);
+    }
+  }, 50);
+};
