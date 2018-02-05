@@ -33,12 +33,15 @@
     "karma-mocha": "^1.3.0",
     "karma-mocha-reporter": "^2.2.5",
     "karma-safari-launcher": "^1.0.0",
+    "karma-teamcity-reporter": "^1.1.0",
     "mocha": "^5.0.0",
+    "modernizr": "^3.5.0",
     "typescript": "^2.6.2"
   },
   "scripts": {
     "tsc": "tsc",
     "test": "bash ./unit_tests/test.sh",
-    "karma": "karma"
+    "karma": "karma",
+    "modernizr": "modernizr"
   }
 }

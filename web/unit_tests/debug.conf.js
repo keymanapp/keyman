@@ -18,9 +18,11 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
+      'unit_tests/modernizr.js', // A dependency-managed utility script that helps with browser feature detection.
       'unit_tests/cases/**/*.js', // Where the tests actually reside.
       {pattern: 'release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources
       {pattern: 'release/unminified/web/**/*.gif', watched: false, served: true, included: false}, // OSK resources
+      {pattern: 'release/unminified/web/**/*.png', watched: false, served: true, included: false}, // OSK resources
       {pattern: 'release/unminified/web/*.js', watched: true, served: true, included: false},  // The actual KMW code.
       {pattern: 'release/unminified/web/*.map', watched: true, served: true, included: false}, // + sourcemaps.
       {pattern: 'unit_tests/fixtures/**/*.html', watched: true} // HTML structures useful for testing.

@@ -29,122 +29,126 @@ describe('KeymanWeb Initialization', function() {
   });
 });
 
-describe('Toggle UI Initialization', function() {
+Modernizr.on('touchevents', function(result) {
+  if(!result) {
+    describe('Toggle UI Initialization', function() {
 
-  beforeEach(function(done) {
-    this.timeout(5000);
-    fixture.setBase('unit_tests/fixtures');
-    fixture.load('singleInput.html');
+      beforeEach(function(done) {
+        this.timeout(5000);
+        fixture.setBase('unit_tests/fixtures');
+        fixture.load('singleInput.html');
 
-    setupKMW('toggle');
+        setupKMW('toggle');
 
-    initTimer(done);
-  });
-  
-  afterEach(function() {
-    fixture.cleanup();
-    teardownKMW();
-  });
+        initTimer(done);
+      });
+      
+      afterEach(function() {
+        fixture.cleanup();
+        teardownKMW();
+      });
 
-  it('The Toggle UI initializes correctly.', function() {
-    assert(keyman.ui.initialized, 'Initialization flag is set to false!');
-    
-    assert.isNotNull(keyman.ui.controller, 'Failed to create the controller element!');
+      it('The Toggle UI initializes correctly.', function() {
+        assert(keyman.ui.initialized, 'Initialization flag is set to false!');
+        
+        assert.isNotNull(keyman.ui.controller, 'Failed to create the controller element!');
 
-    var divs = document.getElementsByTagName("div");
-    var match = false;
+        var divs = document.getElementsByTagName("div");
+        var match = false;
 
-    for(var i=0; i < divs.length; i++) {
-      if(divs[i] == keyman.ui.controller) {
-        match = true;
-      }
-    }
+        for(var i=0; i < divs.length; i++) {
+          if(divs[i] == keyman.ui.controller) {
+            match = true;
+          }
+        }
 
-    assert(match, 'Controller element has not been added to the page!');
-  })
-});
+        assert(match, 'Controller element has not been added to the page!');
+      })
+    });
 
-describe('Button UI Initialization', function() {
+    describe('Button UI Initialization', function() {
 
-  beforeEach(function(done) {
-    this.timeout(5000);
-    fixture.setBase('unit_tests/fixtures');
-    fixture.load('singleInput.html');
+      beforeEach(function(done) {
+        this.timeout(5000);
+        fixture.setBase('unit_tests/fixtures');
+        fixture.load('singleInput.html');
 
-    setupKMW('button');
+        setupKMW('button');
 
-    initTimer(done);
-  });
-  
-  afterEach(function() {
-    fixture.cleanup();
-    teardownKMW();
-  });
+        initTimer(done);
+      });
+      
+      afterEach(function() {
+        fixture.cleanup();
+        teardownKMW();
+      });
 
-  it('The Button UI initializes correctly.', function() {
-    assert(keyman.ui.init, 'Initialization flag is set to false!');
-  })
-});
+      it('The Button UI initializes correctly.', function() {
+        assert(keyman.ui.init, 'Initialization flag is set to false!');
+      })
+    });
 
-describe('Float UI Initialization', function() {
+    describe('Float UI Initialization', function() {
 
-  beforeEach(function(done) {
-    this.timeout(5000);
-    fixture.setBase('unit_tests/fixtures');
-    fixture.load('singleInput.html');
+      beforeEach(function(done) {
+        this.timeout(5000);
+        fixture.setBase('unit_tests/fixtures');
+        fixture.load('singleInput.html');
 
-    setupKMW('float');
+        setupKMW('float');
 
-    initTimer(done);
-  });
-  
-  afterEach(function() {
-    fixture.cleanup();
-    teardownKMW();
-  });
+        initTimer(done);
+      });
+      
+      afterEach(function() {
+        fixture.cleanup();
+        teardownKMW();
+      });
 
-  it('The Float UI initializes correctly.', function() {
-    assert(keyman.ui.initialized, 'Initialization flag is set to false!');
-    
-    assert.isNotNull(keyman.ui.outerDiv, 'Failed to create the floating controller element!');
+      it('The Float UI initializes correctly.', function() {
+        assert(keyman.ui.initialized, 'Initialization flag is set to false!');
+        
+        assert.isNotNull(keyman.ui.outerDiv, 'Failed to create the floating controller element!');
 
-    var divs = document.getElementsByTagName("div");
-    var match = false;
+        var divs = document.getElementsByTagName("div");
+        var match = false;
 
-    for(var i=0; i < divs.length; i++) {
-      if(divs[i] == keyman.ui.outerDiv) {
-        match = true;
-      }
-    }
+        for(var i=0; i < divs.length; i++) {
+          if(divs[i] == keyman.ui.outerDiv) {
+            match = true;
+          }
+        }
 
-    assert(match, 'Floating controller element has not been added to the page!');
-  })
-});
+        assert(match, 'Floating controller element has not been added to the page!');
+      })
+    });
 
-describe('Toolbar UI Initialization', function() {
+    describe('Toolbar UI Initialization', function() {
 
-  beforeEach(function(done) {
-    this.timeout(5000);
-    fixture.setBase('unit_tests/fixtures');
-    fixture.load('singleInput.html');
+      beforeEach(function(done) {
+        this.timeout(5000);
+        fixture.setBase('unit_tests/fixtures');
+        fixture.load('singleInput.html');
 
-    setupKMW('toolbar');
+        setupKMW('toolbar');
 
-    initTimer(done);
-  });
-  
-  afterEach(function() {
-    fixture.cleanup();
-    teardownKMW();
-  });
+        initTimer(done);
+      });
+      
+      afterEach(function() {
+        fixture.cleanup();
+        teardownKMW();
+      });
 
-  it('The Toolbar UI initializes correctly.', function() {
-    assert(keyman.ui.init, 'Initialization flag is set to false!');
-    
-    var kwc = document.getElementById('KeymanWebControl');
-    assert.isNotNull(kwc, 'Toolbar DIV was not added to the page!');
+      it('The Toolbar UI initializes correctly.', function() {
+        assert(keyman.ui.init, 'Initialization flag is set to false!');
+        
+        var kwc = document.getElementById('KeymanWebControl');
+        assert.isNotNull(kwc, 'Toolbar DIV was not added to the page!');
 
-    var toolbar = document.getElementById('kmw_controls');
-    assert.isNotNull(toolbar, 'The main toolbar element was not added to the page!');
-  })
+        var toolbar = document.getElementById('kmw_controls');
+        assert.isNotNull(toolbar, 'The main toolbar element was not added to the page!');
+      })
+    });
+  }
 });

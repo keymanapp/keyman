@@ -45,7 +45,9 @@ while [[ $# -gt 0 ]] ; do
     shift # past argument
 done
 
+npm run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
 npm run karma start unit_tests/$CONFIG
+
 CODE=$?
 
 exit $CODE
