@@ -2,11 +2,7 @@
 
 ## Mac Tools Requirements/Setup
 Install Xcode 8.3.3 or later (it might also work to use an older version)
-[Carthage](https://github.com/Carthage/Carthage/blob/master/README.md) *see Homebrew note below
-
-You should manually run the command "carthage update" in the keyman/mac folder. This will
-pull down the correct version of the OCMocks framework. Homebrew will probably prompt you to
-allow it access to your github credentials, but there is no need for this - just click Deny.
+Install [Carthage](https://github.com/Carthage/Carthage/blob/master/README.md) *see Homebrew note below
 
 ## Keyman for macOS Development
 Keyman for macOS can be built from a command line (preferred) or Xcode.
@@ -18,6 +14,8 @@ To build Keyman for macOS, do the following:
 3. Build using `./build.sh -no-codesign`. Run `./build.sh -help` to see all options.
     * If you have signing credentials from the core development team, you can build a signed version by omitting
   `-no-codesign`.
+  
+Note: If Carthage prompts you to allow it access to your github credentials, it's fine to click Deny.
 
 ### Running Keyman
 1. Deploy Keyman locally using `./build.sh -deploy local -deploy-only`.
