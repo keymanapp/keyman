@@ -730,14 +730,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return _oskWindow;
 }
 
-- (void)showConfigurationWindow {
-    if (_debugMode)
-        NSLog(@"Showing config window...");
-    [self.configWindow.window centerInParent];
-    [self.configWindow.window makeKeyAndOrderFront:nil];
-    [self.configWindow.window setLevel:NSFloatingWindowLevel];
-}
-
 - (void)showOSK {
     [[self.oskWindow window] makeKeyAndOrderFront:nil];
     [[self.oskWindow window] setLevel:NSStatusWindowLevel];
@@ -752,16 +744,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (NSWindowController *)aboutWindow_ {
     return _aboutWindow;
-}
-
-- (NSWindowController *)configWindow {
-    if (_configWindow.window == nil) {
-        if (_debugMode)
-            NSLog(@"Creating config window...");
-        _configWindow = [[KMConfigurationWindowController alloc] initWithWindowNibName:@"preferences"];
-    }
-
-    return _configWindow;
 }
 
 - (NSWindowController *)aboutWindow {

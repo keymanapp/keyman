@@ -39,10 +39,8 @@
 
 - (IBAction)configAction:(id)sender {
     // Using `showConfigurationWindow` instead of `showPreferences:` because `showPreferences:` is missing in
-    // High Sierra (10.13.1 - 10.13.3). See: https://bugreport.apple.com/web/?problemID=35422518
-    // TODO: This bug should be fixed in 10.13.4, so after that has been available for a few weeks, we
-    // can create a PR for branch mac-revert-high-sierra-showPreferences-workaround and merge it.
-    [self.AppDelegate showConfigurationWindow];
+    // High Sierra (confirmed missing up to 10.13.1). See: https://bugreport.apple.com/web/?problemID=35422518
+    [self.AppDelegate.inputController showPreferences:sender];
     [self close];
 }
 
