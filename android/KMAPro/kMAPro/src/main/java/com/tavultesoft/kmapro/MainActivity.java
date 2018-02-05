@@ -669,9 +669,12 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
           filename = cursor.getString(nameIndex);
           if (!filename.endsWith(".kmp")) {
+            Toast.makeText(getApplicationContext(),
+              filename + " is not a valid KMP.\nNo keyboards installed", Toast.LENGTH_LONG).show();
             break;
           }
 
+          // Copy KMP to app cache
           cacheKmpFile = new File(MainActivity.this.getCacheDir().toString(), filename);
           if (cacheKmpFile.exists()) {
             cacheKmpFile.delete();
@@ -684,16 +687,20 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         case "file":
           File kmpFile = new File(data.getPath());
           filename = kmpFile.getName();
-          if (data.toString().endsWith(".kmp")) {
-            // KMP already exists locally. Copy KMP to app cache and start PackageActivity
-            cacheKmpFile = new File(MainActivity.this.getCacheDir().toString(), kmpFile.getName());
-            if (cacheKmpFile.exists()) {
-              cacheKmpFile.delete();
-            }
-
-            Log.d(TAG, "Copying " + filename + " to app cache");
-            FileUtils.copy(new FileInputStream(kmpFile), new FileOutputStream(cacheKmpFile));
+          if (!data.toString().endsWith(".kmp")) {
+            Toast.makeText(getApplicationContext(),
+              filename + " is not a valid KMP.\nNo keyboards installed", Toast.LENGTH_LONG).show();
+            break;
           }
+
+          // Copy KMP to app cache
+          cacheKmpFile = new File(MainActivity.this.getCacheDir().toString(), kmpFile.getName());
+          if (cacheKmpFile.exists()) {
+            cacheKmpFile.delete();
+          }
+
+          Log.d(TAG, "Copying " + filename + " to app cache");
+          FileUtils.copy(new FileInputStream(kmpFile), new FileOutputStream(cacheKmpFile));
           break;
       }
     } catch (Exception e) {
