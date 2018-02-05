@@ -58,6 +58,7 @@
 		E28914D52024E3DF0048E71E /* KMInputMethodBrowserClientEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E24C79E91FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m */; };
 		E28914D62024E4010048E71E /* KMInputMethodEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */; };
 		E28914D72024E6220048E71E /* KeymanEngine4Mac.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 984C2B211A79DF1B0023F89D /* KeymanEngine4Mac.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E28914D92028A78C0048E71E /* OCMock.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E28914D82028A78C0048E71E /* OCMock.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E29F22F4201A59B1005EA234 /* KMInputMethodBrowserClientEventHandlerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E29F22F3201A59B1005EA234 /* KMInputMethodBrowserClientEventHandlerTests.m */; };
 /* End PBXBuildFile section */
 
@@ -89,6 +90,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				E28914D92028A78C0048E71E /* OCMock.framework in CopyFiles */,
 				E28914D72024E6220048E71E /* KeymanEngine4Mac.framework in CopyFiles */,
 				E27BA9D1202036E200D273E7 /* OCMock.framework.dSYM in CopyFiles */,
 			);
@@ -172,6 +174,7 @@
 		E27BA9CD2020322000D273E7 /* OCMock.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OCMock.framework; path = ../Carthage/Build/Mac/OCMock.framework; sourceTree = "<group>"; };
 		E27BA9D0202036E200D273E7 /* OCMock.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = OCMock.framework.dSYM; path = ../Carthage/Build/Mac/OCMock.framework.dSYM; sourceTree = "<group>"; };
 		E27BA9D22020D8BF00D273E7 /* SimpleTest.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleTest.kmx; sourceTree = "<group>"; };
+		E28914D82028A78C0048E71E /* OCMock.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OCMock.framework; path = ../Carthage/Build/Mac/OCMock.framework; sourceTree = "<group>"; };
 		E29F22F1201A59B1005EA234 /* KeymanTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeymanTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E29F22F3201A59B1005EA234 /* KMInputMethodBrowserClientEventHandlerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodBrowserClientEventHandlerTests.m; sourceTree = "<group>"; };
 		E29F22F5201A59B2005EA234 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -275,6 +278,7 @@
 		989C9BFF1A7876DE00A20425 = {
 			isa = PBXGroup;
 			children = (
+				E28914D82028A78C0048E71E /* OCMock.framework */,
 				E27BA9D0202036E200D273E7 /* OCMock.framework.dSYM */,
 				989C9C0A1A7876DE00A20425 /* Keyman4MacIM */,
 				E29F22F2201A59B1005EA234 /* KeymanTests */,
