@@ -1122,7 +1122,7 @@ class KeyboardManager {
    *  @param  {boolean?} byLanguage if true, context=languages, else context=keyboards 
    **/
   keymanCloudRequest(cmd: string, byLanguage?: boolean) {         
-    var URL='https://r.keymanweb.com/api/4.0/', tFlag, 
+    var URL='https://api.keyman.com/cloud/4.0/', tFlag, 
       Lscript = this.keymanweb.util._CreateElement('script');
     
     URL = URL + ((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards')
