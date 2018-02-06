@@ -51,12 +51,13 @@ public class PackageActivity extends Activity {
       kmpFile = new File(bundle.getString("kmpFile"));
     }
 
-    final String pkgId = PackageProcessor.getPackageName(kmpFile);
-    String version = PackageProcessor.getPackageVersion(kmpFile, false);
-    if (version == null || version.isEmpty()) {
+    final String pkgId = PackageProcessor.getPackageID(kmpFile);
+    String pkgVersion = PackageProcessor.getPackageVersion(kmpFile, false);
+    if (pkgVersion == null || pkgVersion.isEmpty()) {
       String message = "Invalid package version in " + kmpFile.getName();
       showErrorDialog(context, pkgId, message);
     }
+    String pkgName = PackageProcessor.getPackageName(kmpFile, false);
 
     try {
       tempPackagePath = PackageProcessor.unzipKMP(kmpFile);
@@ -77,8 +78,8 @@ public class PackageActivity extends Activity {
     packageActivityTitle.setGravity(Gravity.CENTER);
 
     String titleStr = "Install Keyboard Package";
-    if (version != null) {
-      titleStr += " " + version;
+    if (pkgVersion != null) {
+      titleStr += " " + pkgVersion;
     }
     packageActivityTitle.setText(titleStr);
     actionBar.setCustomView(packageActivityTitle);
@@ -139,7 +140,11 @@ public class PackageActivity extends Activity {
     if (files.length > 0 && files[0].exists() && files[0].length() > 0) {
       webView.loadUrl("file:///" + files[0].getAbsolutePath());
     } else {
-      String htmlString = "<div id='welcome'><H1>Package: " + pkgId + "</H1></div>";
+      // No welcome.htm so display minimal package information
+      String keyboardString = (pkgName.toLowerCase().endsWith("keyboard")) ? "" : " Keyboard ";
+      String htmlString = String.format(
+        "<body style=\"max-width:600px;\"><H1>The %s%s Package</H1></body>",
+        pkgName, keyboardString);
       webView.loadData(htmlString, "text/html; charset=utf-8", "UTF-8");
     }
 

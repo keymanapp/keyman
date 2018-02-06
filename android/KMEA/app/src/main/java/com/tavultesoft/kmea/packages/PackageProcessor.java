@@ -38,7 +38,7 @@ public class PackageProcessor {
     PackageProcessor.resourceRoot = resourceRoot;
   }
 
-  public static String getPackageName(File path) {
+  public static String getPackageID(File path) {
     String filename = path.getName();
     String kmpBaseName;
 
@@ -63,7 +63,7 @@ public class PackageProcessor {
   // and perm directory locations.  No need to relocate the downloaded .kmp file itself.
   @NonNull
   static File constructPath(File path, boolean temp) {
-    String kmpBaseName = getPackageName(path);
+    String kmpBaseName = getPackageID(path);
     // Feel free to change this as desired - simply ensure it is unique enough to never be used as
     // a legitimate package name.
     String kmpFolderName = temp ? "." + kmpBaseName + ".temp" : kmpBaseName;
@@ -158,6 +158,35 @@ public class PackageProcessor {
     }
 
     return null;
+  }
+
+  /**
+   * Simply extracts the package's name.
+   * @param json The metadata JSONOBject for the package.
+   * @return The package name (via String)
+   * @throws JSONException
+   */
+  public static String getPackageName(JSONObject json) throws JSONException {
+    if (json == null) {
+      return null;
+    } else {
+      return json.getJSONObject("info").getJSONObject("name").getString("description");
+    }
+  }
+
+  public static String getPackageName(File kmpPath, boolean installed) {
+    try {
+      if (installed) {
+        return getPackageName(loadPackageInfo(constructPath(kmpPath, false)));
+      } else {
+        File tempPath = unzipKMP(kmpPath);
+        String name = getPackageName(loadPackageInfo(tempPath));
+        FileUtils.deleteDirectory(tempPath);
+        return name;
+      }
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   /**
@@ -351,7 +380,7 @@ public class PackageProcessor {
   static List<Map<String, String>> processKMP(File path, boolean force, boolean preExtracted) throws IOException, JSONException {
     // Block reserved namespaces, like /cloud/.
     // TODO:  Consider throwing an exception instead?
-    if(KMManager.isReservedNamespace(getPackageName(path))) {
+    if(KMManager.isReservedNamespace(getPackageID(path))) {
       return new ArrayList<>();
     }
     File tempPath;
@@ -361,7 +390,7 @@ public class PackageProcessor {
       tempPath = constructPath(path, true);
     }
     JSONObject newInfoJSON = loadPackageInfo(tempPath);
-    String packageId = getPackageName(path);
+    String packageId = getPackageID(path);
 
     File permPath = constructPath(path, false);
     if(permPath.exists()) {

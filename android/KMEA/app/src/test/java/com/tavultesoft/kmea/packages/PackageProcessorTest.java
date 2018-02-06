@@ -36,6 +36,7 @@ public class PackageProcessorTest {
     File.separator + TEST_GFF_KMP_NAME_ALT);
 
   private static final int TEST_GFF_KBD_COUNT = 2;
+  private static final String TEST_GFF_PACKAGE_NAME = "GFF Amharic Keyboard";
   private static final String TEST_GFF_KBD_ID = "gff_amh_7";
 
   private static File tempPkg;
@@ -199,6 +200,20 @@ public class PackageProcessorTest {
     JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
 
     Assert.assertEquals("1.4", PackageProcessor.getKeyboardVersion(json, TEST_GFF_KBD_ID));
+  }
+
+  @Test
+  public void test_getPackageID() {
+    Assert.assertEquals(TEST_GFF_KMP_NAME, PackageProcessor.getPackageID(TEST_GFF_KMP_FILE));
+    Assert.assertNotEquals(TEST_GFF_KBD_ID, PackageProcessor.getPackageID(TEST_GFF_KMP_FILE));
+  }
+
+  @Test
+  public void test_getPackageName() throws Exception {
+    JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
+
+    Assert.assertEquals(TEST_GFF_PACKAGE_NAME, PackageProcessor.getPackageName(json));
+    Assert.assertNotEquals(TEST_GFF_KMP_NAME, PackageProcessor.getPackageName(json));
   }
 
   @Test
