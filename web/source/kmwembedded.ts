@@ -483,7 +483,7 @@
    *  @param  {number}  lstates lock state (0x0200=no caps 0x0400=num 0x0800=no num 0x1000=scroll 0x2000=no scroll locks)
    **/            
   keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0) {
-    if(!keymanweb.keyboards.activeKeyboard || code == 0) {
+    if(!keymanweb.keyboardManager.activeKeyboard || code == 0) {
       return false;
     }
 
