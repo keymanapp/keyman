@@ -56,6 +56,7 @@ extern NSString *const kWebSite;
 @property (nonatomic, strong) NSMutableArray *activeKeyboards;
 @property (nonatomic, strong) NSMutableString *contextBuffer;
 @property (nonatomic, assign) NSEventModifierFlags currentModifierFlags;
+@property (nonatomic, assign) BOOL contextChangingEventDetected;
 @property (nonatomic, strong) OSKWindowController *oskWindow;
 @property (nonatomic, strong) NSString *keyboardName;
 @property (nonatomic, strong) NSImage *keyboardIcon;

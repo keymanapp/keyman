@@ -73,20 +73,31 @@ typedef enum {
                                                          forEventClass:kInternetEventClass
                                                             andEventID:kAEGetURL];
         
-        CFMachPortRef eventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask, (CGEventTapCallBack)eventTapFunction, nil);
+        CFMachPortRef flagsChangedEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask, (CGEventTapCallBack)eventTapFunction, nil);
         
-        if (!eventTap)
+        if (!flagsChangedEventTap)
             NSLog(@"Can't tap into flags changed event!");
         else
-            CFRelease(eventTap);
+            CFRelease(flagsChangedEventTap);
                   
-        CFRunLoopSourceRef flagsChangedEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0);
-        if (flagsChangedEventSrc ) {
-
-            CFRunLoopRef runLoop = CFRunLoopGetCurrent();
-            if (runLoop) {
-                CFRunLoopAddSource(runLoop,  flagsChangedEventSrc, kCFRunLoopDefaultMode);
-            }
+        CFRunLoopSourceRef flagsChangedEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, flagsChangedEventTap, 0);
+        
+        CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+        
+        if (flagsChangedEventSrc && runLoop) {
+            CFRunLoopAddSource(runLoop,  flagsChangedEventSrc, kCFRunLoopDefaultMode);
+        }
+        
+        CFMachPortRef mouseUpDownEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSLeftMouseDown | NSLeftMouseUp | NSOtherMouseDown | NSOtherMouseUp, (CGEventTapCallBack)eventTapFunction, nil);
+        
+        if (!mouseUpDownEventTap)
+            NSLog(@"Can't tap into mouse up/down events!");
+        else
+            CFRelease(mouseUpDownEventTap);
+        
+        CFRunLoopSourceRef mouseUpDownEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, mouseUpDownEventTap, 0);
+        if (mouseUpDownEventSrc && runLoop) {
+            CFRunLoopAddSource(runLoop,  mouseUpDownEventSrc, kCFRunLoopDefaultMode);
         }
     }
 
@@ -159,12 +170,28 @@ typedef enum {
 }
 
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
-    if (type == kCGEventFlagsChanged) { // This should always be true; it's the only event type we're trying to tap
-        KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
-        if (appDelegate != nil) {
-            NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
+    KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
+    if (appDelegate != nil) {
+        NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
+        if (appDelegate.debugMode)
             NSLog(@"System Event: %@", sysEvent);
-            appDelegate.currentModifierFlags = sysEvent.modifierFlags;
+        
+        switch (type) {
+            case kCGEventFlagsChanged:
+                appDelegate.currentModifierFlags = sysEvent.modifierFlags;
+                break;
+                
+            case kCGEventLeftMouseUp:
+            case kCGEventLeftMouseDown:
+            case kCGEventOtherMouseUp:
+            case kCGEventOtherMouseDown:
+                {
+                    // TODO: set context-out-of-date flag
+                }
+                break;
+                
+            default:
+                break;
         }
     }
     return event;
