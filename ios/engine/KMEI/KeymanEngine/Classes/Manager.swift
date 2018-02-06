@@ -27,10 +27,8 @@ public enum KeyboardState {
 // Strings
 private let keyboardChangeHelpText = "Tap here to change keyboard"
 
-// URLs
-private let apiBaseURL = "https://r.keymanweb.com/api/4.0/"
-private let apiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url="
-private let keymanHostName = "r.keymanweb.com"
+// URLs - used for reachability test
+private let keymanHostName = "api.keyman.com"
 
 // UI In-App Keyboard Constants
 private let phonePortraitInAppKeyboardHeight: CGFloat = 183.0

@@ -15,7 +15,7 @@ public enum APIKeyboardFetchError: Error {
 }
 
 public class APIKeyboardRepository: KeyboardRepository {
-  private let languagesAPIURL = URLComponents(string: "https://r.keymanweb.com/api/4.0/languages")!
+  private let languagesAPIURL = URLComponents(string: "https://api.keyman.com/cloud/4.0/languages")!
 
   public weak var delegate: KeyboardRepositoryDelegate?
   public private(set) var languages: [String: Language]?
@@ -29,6 +29,7 @@ public class APIKeyboardRepository: KeyboardRepository {
       URLQueryItem(name: "dateformat", value: "seconds"),
       URLQueryItem(name: "device", value: deviceType)
     ]
+    log.info("Connecting to Keyman cloud: \(urlComponents.url!).")
     let task = URLSession.shared.dataTask(with: urlComponents.url!) { (data, response, error) in
       self.apiCompletionHandler(data: data, response: response, error: error,
                                 fetchCompletionHandler: completionHandler)

@@ -11,7 +11,7 @@ import UIKit
 import QuartzCore
 
 // Internal strings
-private let baseUri = "http://r.keymanweb.com/20/fonts/get_mobileconfig.php?id="
+private let baseUri = "https://r.keymanweb.com/20/fonts/get_mobileconfig.php?id="
 private let profileKey = "profile"
 private let checkedProfilesKey = "CheckedProfiles"
 
