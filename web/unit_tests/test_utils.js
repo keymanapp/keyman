@@ -50,13 +50,13 @@ var teardownKMW = function() {
 }
 
 // Make sure the main script loads...
-var initTimer = function(done) {
+var initTimer = function(done, timeout) {
   window.setTimeout(function() {
     if(window['keyman']) {
       // ... and then give KMW and the UI a bit more time to init and attach.
       window.setTimeout(function() {
         done();
-      }, 1000);
+      }, timeout ? timeout : 1000);
     } else {
       initTimer(done);
     }

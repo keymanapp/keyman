@@ -3,7 +3,7 @@ var assert = chai.assert;
 describe('KeymanWeb Initialization', function() {
 
   beforeEach(function(done) {
-    this.timeout(5000);
+    this.timeout(10000);
 
     fixture.setBase('unit_tests/fixtures');
     fixture.load("singleInput.html");
@@ -34,7 +34,7 @@ Modernizr.on('touchevents', function(result) {
     describe('Toggle UI Initialization', function() {
 
       beforeEach(function(done) {
-        this.timeout(5000);
+        this.timeout(10000);
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
@@ -69,7 +69,7 @@ Modernizr.on('touchevents', function(result) {
     describe('Button UI Initialization', function() {
 
       beforeEach(function(done) {
-        this.timeout(5000);
+        this.timeout(10000);
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
@@ -91,7 +91,7 @@ Modernizr.on('touchevents', function(result) {
     describe('Float UI Initialization', function() {
 
       beforeEach(function(done) {
-        this.timeout(5000);
+        this.timeout(10000);
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
@@ -126,13 +126,14 @@ Modernizr.on('touchevents', function(result) {
     describe('Toolbar UI Initialization', function() {
 
       beforeEach(function(done) {
-        this.timeout(5000);
+        this.timeout(10000);
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
         setupKMW('toolbar');
 
-        initTimer(done);
+        // The Toolbar UI has extra-special init to do... may as well feed it more time.
+        initTimer(done, 2500);
       });
       
       afterEach(function() {

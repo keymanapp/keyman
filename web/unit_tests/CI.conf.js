@@ -4,11 +4,173 @@
 // Super-useful!  http://www.bradoncode.com/blog/2015/02/27/karma-tutorial/#handling-html-fixtures
 
 module.exports = function(config) {
+
+  /*
+   * Definition of utility functions for managing our browser lists.
+   */
+  var mergeLaunchers = function() {
+    var mergedDefs = {};
+    var i;
+    for(i=0; i < arguments.length; i++) {
+      for(var name in arguments[i]) {
+        mergedDefs[name] = arguments[i][name];
+
+        // Necessary for Karma to process it properly.
+        mergedDefs[name].base = 'BrowserStack';
+      }
+    }
+
+    return mergedDefs;
+  }
+
+  var toBrowserList = function(mergedSet) {
+    var list = [];
+    for(var name in mergedSet) {
+      list.push(name);
+    }
+
+    return list;
+  }
+
+  /*
+   * Definition of browser sets possibly relevant for testing.
+   */
+  var CURRENT_MAC_LAUNCHERS = {
+    bs_firefox_mac: {
+      browser: 'firefox',
+      browser_version: '58',
+      os: 'OS X',
+      os_version: 'High Sierra'
+    },
+    bs_safari_mac: {
+      browser: 'safari',
+      browser_version: '11.0',
+      os: 'OS X',
+      os_version: 'High Sierra'
+    },
+    bs_chrome_mac: {
+      browser: 'chrome',
+      browser_version: '64.0',
+      os: 'OS X',
+      os_version: 'High Sierra'
+    }
+  };
+
+  
+  var CURRENT_IOS_LAUNCHERS = {
+    bs_iphoneX: {
+      device: 'iPhone X',
+      real_mobile: false,
+      os: 'ios',
+      os_version: '11.0'
+    },
+    bs_ipad5: {
+      device: 'iPad 5th',
+      real_mobile: false,
+      os: 'ios',
+      os_version: '11.0'
+    }
+  };
+
+  var CURRENT_WIN_LAUNCHERS = {
+    bs_firefox_win: {
+      os: 'Windows',
+      os_version: '10',
+      browser: 'firefox',
+      browser_version: '58.0'
+    },
+    bs_chrome_win: {
+      os: 'Windows',
+      os_version: '10',
+      browser: 'chrome',
+      browser_version: '64.0'
+    },
+    bs_ie_win: {
+      os: 'Windows',
+      os_version: '10',
+      browser: 'ie',
+      browser_version: '11.0'
+    },
+    bs_edge_win: {
+      os: 'Windows',
+      os_version: '10',
+      browser: 'edge',
+      browser_version: '16.0'
+    }
+  }
+
+  var CURRENT_ANDROID_LAUNCHERS = {
+    bs_native_android: {
+      os: 'android',
+      os_version: '7.1',
+      browser: 'android',
+      real_mobile: true,
+      device: 'Samsung Galaxy Note 8'
+    },
+    bs_chrome_android: {
+      os: 'android',
+      os_version: '7.1',
+      browser: 'chrome',
+      real_mobile: true,
+      device: 'Samsung Galaxy Note 8'
+    }
+  }
+
+  var LEGACY_MAC_LAUNCHERS = {
+    bs_firefox_legacy_mac: {
+      browser: 'firefox',
+      browser_version: '40.0',
+      os: 'OS X',
+      os_version: 'Mountain Lion'
+    },
+    bs_safari_legacy_mac: {
+      browser: 'safari',
+      browser_version: '6.2',
+      os: 'OS X',
+      os_version: 'Mountain Lion'
+    }
+  };
+
+  var LEGACY_IOS_LAUNCHERS = {
+    bs_iphone7: {
+      device: 'iPhone 7',
+      real_mobile: false,
+      os: 'ios',
+      os_version: '10.3'
+    }
+  };
+
+  // Sadly, legacy IE isn't very testable with Mocha.  One of its dependencies requires a feature that is IE11+.
+
+  /*
+   * Final selection of the sets to be used for BrowserStack testing.
+   */
+  var FINAL_LAUNCHER_DEFS = mergeLaunchers( CURRENT_MAC_LAUNCHERS,
+                                            CURRENT_IOS_LAUNCHERS,
+                                            CURRENT_WIN_LAUNCHERS,
+                                            CURRENT_ANDROID_LAUNCHERS,
+                                            LEGACY_MAC_LAUNCHERS,
+                                            LEGACY_IOS_LAUNCHERS);
+
+  var FINAL_BROWSER_LIST = toBrowserList(FINAL_LAUNCHER_DEFS);
+
+  /*
+   * Final definition of our BrowserStack testing Karma configuration.
+   */
+
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '..',
 
+    // BrowserStack configuration options
+    browserStack: {
+      video: false,
+      retryLimit: 1, // 0 is ignored.
+      startTunnel: true,
+    },
+
+    captureTimeout: 180000, // in milliseconds
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
@@ -72,39 +234,11 @@ module.exports = function(config) {
     singleRun: true,
 
     // Concurrency level
-    // how many browser should be started simultaneous
-    concurrency: Infinity,
+    // For CI, it really helps to keep a nice, clean set of output logs.
+    concurrency: 5,
 
-    browserStack: {
-      startTunnel: true,
-      retryLimit: 0,
-      video: false
-    },
+    customLaunchers: FINAL_LAUNCHER_DEFS,
 
-    customLaunchers: {
-      bs_firefox_mac: {
-        base: 'BrowserStack',
-        browser: 'firefox',
-        browser_version: '40.0',
-        os: 'OS X',
-        os_version: 'Mountain Lion'
-      },
-      bs_safari_mac: {
-        base: 'BrowserStack',
-        browser: 'safari',
-        browser_version: '6.2',
-        os: 'OS X',
-        os_version: 'Mountain Lion'
-      },
-      bs_iphone5: {
-        base: 'BrowserStack',
-        device: 'iPhone 7',
-        realMobile: 'true',
-        os: 'ios',
-        os_version: '10.3'
-      }
-    },
-
-    browsers: ['bs_firefox_mac', 'bs_safari_mac', 'bs_iphone5']
+    browsers: FINAL_BROWSER_LIST
   })
 }
