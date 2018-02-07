@@ -26,27 +26,38 @@ display_usage ( ) {
 
 # Designed to determine which set of browsers should be available for local testing,
 # based upon the current system OS.
-get_config_OS_id ( ) {
+get_OS ( ) {
   # Subject to change with future improvements.
   if [[ "${OSTYPE}" = "darwin"* ]]; then
-    config_os_id="mac"
+    os_id="mac"
   elif [[ "${OSTYPE}" = "msys" ]]; then
-    config_os_id="win"
+    os_id="win"
   elif [[ "${OSTYPE}" = "cygwin" ]]; then
-    config_os_id="win"
+    os_id="win"
   fi
   
   # We mostly care about platform-independent browser coverage with Linux;
   # this will look for just Chrome and Firefox.
   if [ -z $OSTYPE ]; then
-    config_os_id="linux"
+    os_id="linux"
   fi
 }
 
-# Defaults
-get_config_OS_id
+get_browser_set_for_OS ( ) {
+    if [ $os_id = "mac" ]; then
+        BROWSERS="--browsers Firefox,Chrome,Safari"
+    elif [ $os_id = "win" ]; then
+        BROWSERS="--browsers Firefox,Chrome,IE,Edge"
+    else
+        BROWSERS="--browsers Firefox,Chrome"
+    fi
+}
 
-CONFIG=manual.${config_os_id}.conf.js  # TODO - get/make OS-specific version
+# Defaults
+get_OS
+get_browser_set_for_OS
+
+CONFIG=manual.conf.js  # TODO - get/make OS-specific version
 DEBUG=false
 FLAGS=
 
@@ -84,8 +95,13 @@ if [ $DEBUG = true ] && [ $CONFIG = CI.conf.js ]; then
     exit 1
 fi
 
+if [ $CONFIG = CI.conf.js ]; then
+    # If doing a CI run, use the file's default browser selection.
+    BROWSERS=
+fi
+
 npm run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
-npm run karma -- start $FLAGS unit_tests/$CONFIG
+npm run karma -- start $FLAGS $BROWSERS unit_tests/$CONFIG
 
 CODE=$?
 
