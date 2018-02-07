@@ -116,30 +116,6 @@ module.exports = function(config) {
     }
   }
 
-  var LEGACY_MAC_LAUNCHERS = {
-    bs_firefox_legacy_mac: {
-      browser: 'firefox',
-      browser_version: '40.0',
-      os: 'OS X',
-      os_version: 'Mountain Lion'
-    },
-    bs_safari_legacy_mac: {
-      browser: 'safari',
-      browser_version: '6.2',
-      os: 'OS X',
-      os_version: 'Mountain Lion'
-    }
-  };
-
-  var LEGACY_IOS_LAUNCHERS = {
-    bs_iphone7: {
-      device: 'iPhone 7',
-      real_mobile: false,
-      os: 'ios',
-      os_version: '10.3'
-    }
-  };
-
   // Sadly, legacy IE isn't very testable with Mocha.  One of its dependencies requires a feature that is IE11+.
 
   /*
@@ -148,9 +124,7 @@ module.exports = function(config) {
   var FINAL_LAUNCHER_DEFS = mergeLaunchers( CURRENT_MAC_LAUNCHERS,
                                             CURRENT_IOS_LAUNCHERS,
                                             CURRENT_WIN_LAUNCHERS,
-                                            CURRENT_ANDROID_LAUNCHERS,
-                                            LEGACY_MAC_LAUNCHERS,
-                                            LEGACY_IOS_LAUNCHERS);
+                                            CURRENT_ANDROID_LAUNCHERS);
 
   var FINAL_BROWSER_LIST = toBrowserList(FINAL_LAUNCHER_DEFS);
 
