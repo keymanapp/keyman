@@ -161,10 +161,9 @@ NSRange _previousSelRange;
     }
     
     NSRange selRange = [sender selectedRange];
-    NSUInteger len;//[sender length];
+    NSUInteger len;
     if ([self.AppDelegate debugMode]) {
         NSLog(@"selRange.location: %lu", (unsigned long)selRange.location);
-    //    NSLog(@"sender length: %lu", len);
     }
     
     if (selRange.location == NSNotFound) {
@@ -528,9 +527,6 @@ NSRange _previousSelRange;
         else
             NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}");
         NSLog(@"kme.contextBuffer = \"%@\"", self.kme.contextBuffer.length?[self.kme.contextBuffer codeString]:@"{empty}");
-//        NSRange range = [sender markedRange];
-//        NSLog(@"sender.markedRange.location = %lu", range.location);
-//        NSLog(@"sender.markedRange.length = %lu", range.length);
         NSRange range = [sender selectedRange];
         NSLog(@"sender.selectedRange.location = %lu", range.location);
         if (_cannnotTrustSelectionLength)
