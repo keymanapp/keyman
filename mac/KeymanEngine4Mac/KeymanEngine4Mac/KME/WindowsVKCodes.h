@@ -6,6 +6,9 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+#ifndef WindowsVKCodes_h
+#define WindowsVKCodes_h
+
 #define VK_BACKSPACE        0x08
 #define VK_TAB              0x09
 #define VK_ENTER            0x0D
@@ -77,3 +80,5 @@
 #define VK_BACKSLASH        0xDC
 #define VK_RIGHT_BRACKET	0xDD
 #define VK_QUOTE            0xDE
+
+#endif /* WindowsVKCodes_h */

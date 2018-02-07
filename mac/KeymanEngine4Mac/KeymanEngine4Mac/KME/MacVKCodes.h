@@ -6,6 +6,9 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+#ifndef MacVKCodes_h
+#define MacVKCodes_h
+
 /* Modifier Key Masks */
 #define MK_LEFT_SHIFT_MASK  0x20002
 #define MK_RIGHT_SHIFT_MASK 0x20004
@@ -84,3 +87,5 @@
 
 /* Key Row 5 */
 #define MVK_SPACE           0x31
+
+#endif /* MacVKCodes_h */

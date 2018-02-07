@@ -6,11 +6,11 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import "KMInputMethodAppDelegate.h"
-
 #ifndef KMInputMethodEventHandler_h
 #define KMInputMethodEventHandler_h
+
+#import <Foundation/Foundation.h>
+#import "KMInputMethodAppDelegate.h"
 
 @interface KMInputMethodEventHandler : NSObject
 

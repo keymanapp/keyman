@@ -6,6 +6,9 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+#ifndef KeymanEngine4Mac_h
+#define KeymanEngine4Mac_h
+
 #import <Cocoa/Cocoa.h>
 
 //! Project version number for KeymanEngine4Mac.
@@ -25,3 +28,5 @@ FOUNDATION_EXPORT const unsigned char KeymanEngine4MacVersionString[];
 #import <KeymanEngine4Mac/NSString+XString.h>
 #import "OSKView.h"
 #import "TimerTarget.h"
+
+#endif /* KeymanEngine4Mac_h */

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "0920"
-   version = "1.7">
+   version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
@@ -14,24 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "989C9C071A7876DE00A20425"
-               BuildableName = "Keyman.app"
-               BlueprintName = "Keyman"
-               ReferencedContainer = "container:Keyman4MacIM.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E29F22F0201A59B1005EA234"
-               BuildableName = "KeymanTests.xctest"
-               BlueprintName = "KeymanTests"
-               ReferencedContainer = "container:Keyman4MacIM.xcodeproj">
+               BlueprintIdentifier = "9854389019DBB27000C7B036"
+               BuildableName = "Keyman4Mac.app"
+               BlueprintName = "Keyman4Mac"
+               ReferencedContainer = "container:Keyman4Mac.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -43,28 +29,14 @@
       language = ""
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E29F22F0201A59B1005EA234"
-               BuildableName = "KeymanTests.xctest"
-               BlueprintName = "KeymanTests"
-               ReferencedContainer = "container:Keyman4MacIM.xcodeproj">
-            </BuildableReference>
-            <LocationScenarioReference
-               identifier = "com.apple.dt.IDEFoundation.CurrentLocationScenarioIdentifier"
-               referenceType = "1">
-            </LocationScenarioReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "989C9C071A7876DE00A20425"
-            BuildableName = "Keyman.app"
-            BlueprintName = "Keyman"
-            ReferencedContainer = "container:Keyman4MacIM.xcodeproj">
+            BlueprintIdentifier = "9854389019DBB27000C7B036"
+            BuildableName = "Keyman4Mac.app"
+            BlueprintName = "Keyman4Mac"
+            ReferencedContainer = "container:Keyman4Mac.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -85,10 +57,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "989C9C071A7876DE00A20425"
-            BuildableName = "Keyman.app"
-            BlueprintName = "Keyman"
-            ReferencedContainer = "container:Keyman4MacIM.xcodeproj">
+            BlueprintIdentifier = "9854389019DBB27000C7B036"
+            BuildableName = "Keyman4Mac.app"
+            BlueprintName = "Keyman4Mac"
+            ReferencedContainer = "container:Keyman4Mac.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -104,10 +76,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "989C9C071A7876DE00A20425"
-            BuildableName = "Keyman.app"
-            BlueprintName = "Keyman"
-            ReferencedContainer = "container:Keyman4MacIM.xcodeproj">
+            BlueprintIdentifier = "9854389019DBB27000C7B036"
+            BuildableName = "Keyman4Mac.app"
+            BlueprintName = "Keyman4Mac"
+            ReferencedContainer = "container:Keyman4Mac.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
