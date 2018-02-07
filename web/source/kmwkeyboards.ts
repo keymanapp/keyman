@@ -607,7 +607,7 @@ class KeyboardManager {
             manager.keymanweb.domManager._SetTargDir(manager.keymanweb.domManager.getLastActiveElement());
           }
 
-          String.kmwEnableSupplementaryPlane(kbdStub && ((kbdStub['KS'] && (kbdStub['KS'] == 1)) || (kbd['KN'] == 'Hieroglyphic'))); // I3319 - SMP extension, I3363 (Build 301)
+          String.kmwEnableSupplementaryPlane(kbd && ((kbd['KS'] && kbd['KS'] == 1) || kbd['KN'] == 'Hieroglyphic')); // I3319 - SMP extension, I3363 (Build 301)
           manager.saveCurrentKeyboard(kbd['KI'], kbdStub['KLC']);
         
           // Prepare and show the OSK for this keyboard
