@@ -28,7 +28,7 @@ display_usage ( ) {
 # based upon the current system OS.
 get_OS ( ) {
   # Default value, since it's the most general case/configuration to detect.
-  OSTYPE="linux"
+  os_id="linux"
 
   # Subject to change with future improvements.
   if [[ "${OSTYPE}" = "darwin"* ]]; then
