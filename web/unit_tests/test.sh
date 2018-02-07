@@ -27,6 +27,9 @@ display_usage ( ) {
 # Designed to determine which set of browsers should be available for local testing,
 # based upon the current system OS.
 get_OS ( ) {
+  # Default value, since it's the most general case/configuration to detect.
+  OSTYPE="linux"
+
   # Subject to change with future improvements.
   if [[ "${OSTYPE}" = "darwin"* ]]; then
     os_id="mac"
@@ -34,12 +37,6 @@ get_OS ( ) {
     os_id="win"
   elif [[ "${OSTYPE}" = "cygwin" ]]; then
     os_id="win"
-  fi
-  
-  # We mostly care about platform-independent browser coverage with Linux;
-  # this will look for just Chrome and Firefox.
-  if [ -z $OSTYPE ]; then
-    os_id="linux"
   fi
 }
 
