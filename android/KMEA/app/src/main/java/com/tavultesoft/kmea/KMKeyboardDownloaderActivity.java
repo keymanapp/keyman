@@ -43,7 +43,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
   public static final String ARG_URL = "KMKeyboardActivity.url";
   public static final String ARG_FILENAME = "KMKeyboardActivity.filename";
 
-  public static final String kKeymanApiBaseURL = "https://r.keymanweb.com/api/3.0/";
+  public static final String kKeymanApiBaseURL = "https://api.keyman.com/cloud/3.0/";
   public static final String kKeymanApiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url=";
 
   // Keyman public keys
