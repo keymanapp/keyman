@@ -95,6 +95,8 @@ uses
   System.SysUtils,
   System.Zip,
 
+  Keyman.System.RegExGroupHelperRSP19902,
+
   JsonUtil,
   utilfiletypes;
 
@@ -383,7 +385,7 @@ begin
     with TRegEx.Match(FJsFileData, 'this\.KN="([^"]+)"') do
     begin
       if Success
-        then FName := Groups[1].Value
+        then FName := TGroupHelperRSP19902.Create(Groups[1], FJsFileData).FixedValue
         else Exit;
     end;
   end
@@ -668,7 +670,7 @@ begin
   else if FJsFileData <> '' then
   begin
     with TRegEx.Match(FJsFileData, 'this\.KBVER=([''"])([^''"]+)(\1)') do
-      if Success then FVersion := Groups[2].Value;
+      if Success then FVersion := TGroupHelperRSP19902.Create(Groups[2], FJsFileData).FixedValue;
   end;
 
   if FVersion = '' then
