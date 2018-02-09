@@ -8,7 +8,7 @@ describe('Engine', function() {
     fixture.setBase('unit_tests/fixtures');
     setupKMW();
 
-    // Pass the initTimer method ousr 'done' callback so it can handle our initialization delays for us.
+    // Pass the initTimer method our 'done' callback so it can handle our initialization delays for us.
     initTimer(done);
   });
 
@@ -72,7 +72,7 @@ describe('Engine', function() {
         event.getModifierState = function() {
           return false;
         };
-      } else {
+      } else { // Yeah, so IE can't use the above at all, and requires its own trick.
         event = document.createEvent("KeyboardEvent");
         event.initKeyboardEvent("keydown", false, true, null, String.fromCharCode(83), 0, 0, "", 0);
       }
