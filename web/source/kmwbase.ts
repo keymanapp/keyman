@@ -569,19 +569,5 @@ if(!window['keyman']['loaded']) {
     osk.optionKey = function(e,keyName,keyDown){}
     osk.showKeyTip = function(key,on){}  
     osk.waitForFonts = function(kfd,ofd){return true;}
-
-    /**
-    * Extend Array function by adding indexOf array member if undefined (IE < IE9)
-    */
-    if(!('indexOf' in Array)) {
-      Array.prototype.indexOf = function(obj, start) {
-        for(var i=(start || 0); i<this.length; i++) {
-          if(this[i] == obj) {
-            return i;
-          }
-        }
-        return -1;
-      }
-    }
   })();
 }

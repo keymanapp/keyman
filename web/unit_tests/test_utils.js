@@ -1,12 +1,28 @@
-var setupKMW = function(ui) {
+var setupKMW = function(kmwOptions) {
+  var ui;
+
+  if(typeof(kmwOptions) == 'string' || typeof(kmwOptions) == 'undefined') {
+    ui = kmwOptions;
+
+    var kmwOptions = {
+      attachType:'auto',
+      root:'source',
+      resources:'source'
+    };
+  
+    if(ui) {
+      kmwOptions.ui = ui;
+    }
+  }
+
   var kmw = setupScript('source/keymanweb.js');
   fixture.el.appendChild(kmw);
 
-  var kmwOptions = {
-    attachType:'auto',
-    root:'source',
-    resources:'source'
-  };
+  ui = kmwOptions.ui;
+
+  kmwOptions.attachType = kmwOptions.attachType ? kmwOptions.attachType : 'auto';
+  kmwOptions.root = 'source';
+  kmwOptions.resources = 'source';
 
   if(ui) {
     var ui = setupScript('source/kmwui' + ui + '.js');

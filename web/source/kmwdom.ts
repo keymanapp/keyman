@@ -497,7 +497,8 @@ class DOMManager {
   attachToControl(Pelem: HTMLElement) {
     var touchable = this.keyman.util.device.touchable;
 
-    if(this.isAttached(Pelem)) {
+    // Exception for IFrame elements, in case of async loading issues.  (Fixes fun iframe loading bug with Chrome.)
+    if(this.isAttached(Pelem) && !(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement)) {
       return; // We're already attached.
     }
 
@@ -593,7 +594,11 @@ class DOMManager {
   setupElementAttachment(x: HTMLElement) {
     // The `_kmwAttachment` property tag maintains all relevant KMW-maintained data regarding the element.
     // It is disgarded upon de-attachment.
-    x._kmwAttachment = new AttachmentInfo(null, this.keyman.util.device.touchable);
+    if(x._kmwAttachment) {
+      return;
+    } else {
+      x._kmwAttachment = new AttachmentInfo(null, this.keyman.util.device.touchable);
+    }
   }
 
   /**
@@ -1020,7 +1025,7 @@ class DOMManager {
       * problems.
       */
       if(Pelem.contentDocument.readyState == 'complete') {
-        attachFunctor();
+        window.setTimeout(attachFunctor, 1);
       }
     } else {
       this.attachToControl(Pelem);

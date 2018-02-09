@@ -165,7 +165,8 @@ module.exports = function(config) {
     ],
 
     proxies: {
-      "/source/": "/base/release/unminified/web/"
+      "/source/": "/base/release/unminified/web/",
+      "/resources/": "unit_tests/resources"
     },
 
 
@@ -177,7 +178,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-		'**/*.html'	: ['html2js']
+		  'unit_tests/fixtures/**/*.html'	: ['html2js']
     },
 
 
