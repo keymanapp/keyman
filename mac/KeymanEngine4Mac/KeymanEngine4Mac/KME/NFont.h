@@ -6,6 +6,9 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+#ifndef NFont_h
+#define NFont_h
+
 #import <Foundation/Foundation.h>
 #import "KMBinaryFileFormat.h"
 
@@ -16,3 +19,5 @@
 @property (assign, nonatomic) WORD color;
 
 @end
+
+#endif /* NFont_h */

@@ -251,14 +251,30 @@ begin
     Zip := TZipFile.Create;
     try
       Zip.Open(FKMPFile, zmRead);
-      FKMPInfTempFile := TTempFileManager.Get('.inf');
-      try
-        SaveMemberToFile('kmp.inf', FKMPInfTempFile.Name);
-        FKMPInfFile := TKMPInfFile.Create;
-        FKMPInfFile.FileName := FKMPInfTempFile.Name;
-        FKMPInfFile.LoadIni;
-      finally
-        FKMPInfTempFile.Free;
+
+      FKMPInfFile := TKMPInfFile.Create;
+
+      if Zip.IndexOf('kmp.json') >= 0 then
+      begin
+        FKMPInfTempFile := TTempFileManager.Get('.json');
+        try
+          FKMPInfFile.FileName := FKMPInfTempFile.Name;
+          SaveMemberToFile('kmp.json', FKMPInfTempFile.Name);
+          FKMPInfFile.LoadJson;
+        finally
+          FKMPInfTempFile.Free;
+        end;
+      end
+      else
+      begin
+        FKMPInfTempFile := TTempFileManager.Get('.inf');
+        try
+          FKMPInfFile.FileName := FKMPInfTempFile.Name;
+          SaveMemberToFile('kmp.inf', FKMPInfTempFile.Name);
+          FKMPInfFile.LoadIni;
+        finally
+          FKMPInfTempFile.Free;
+        end;
       end;
 
       FKMXTempFile := TTempFileManager.Get('.kmx');

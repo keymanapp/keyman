@@ -7,6 +7,7 @@ package com.tavultesoft.kmapro;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -658,9 +659,12 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
   private void useLocalKMP(Uri data) {
     String filename = "";
-    File cacheKmpFile = null;
+    String cacheKMPFilename = "";
+    File cacheKMPFile = null;
+    InputStream inputFile = null;
     Bundle bundle = new Bundle();
     try {
+      boolean fileEndsWithKMP = false;
       switch (data.getScheme().toLowerCase()) {
         case "content":
           // DownloadManager passes a path "/document/number" so we need to extract the .kmp filename
@@ -668,33 +672,33 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           cursor.moveToFirst();
           int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
           filename = cursor.getString(nameIndex);
-          if (!filename.endsWith(".kmp")) {
-            break;
-          }
-
-          cacheKmpFile = new File(MainActivity.this.getCacheDir().toString(), filename);
-          if (cacheKmpFile.exists()) {
-            cacheKmpFile.delete();
-          }
-
-          Log.d(TAG, "Copying " + filename + " from " + data.toString() + " to app cache");
-          FileUtils.copy(getContentResolver().openInputStream(data), new FileOutputStream(cacheKmpFile));
+          fileEndsWithKMP = filename.endsWith(".kmp");
+          cacheKMPFilename = filename;
+          inputFile = getContentResolver().openInputStream(data);
           break;
 
         case "file":
           File kmpFile = new File(data.getPath());
           filename = kmpFile.getName();
-          if (data.toString().endsWith(".kmp")) {
-            // KMP already exists locally. Copy KMP to app cache and start PackageActivity
-            cacheKmpFile = new File(MainActivity.this.getCacheDir().toString(), kmpFile.getName());
-            if (cacheKmpFile.exists()) {
-              cacheKmpFile.delete();
-            }
-
-            Log.d(TAG, "Copying " + filename + " to app cache");
-            FileUtils.copy(new FileInputStream(kmpFile), new FileOutputStream(cacheKmpFile));
-          }
+          fileEndsWithKMP = data.toString().endsWith(".kmp");
+          cacheKMPFilename = kmpFile.getName();
+          inputFile = new FileInputStream(kmpFile);
           break;
+      }
+
+      if (fileEndsWithKMP) {
+        // Copy KMP to app cache
+        cacheKMPFile = new File(MainActivity.this.getCacheDir().toString(), cacheKMPFilename);
+        if (cacheKMPFile.exists()) {
+          cacheKMPFile.delete();
+        }
+
+        Log.d(TAG, "Copying " + filename + " to app cache");
+        FileUtils.copy(inputFile, new FileOutputStream(cacheKMPFile));
+      } else {
+        String noKeyboardsInstalledMessage = " is not a valid keyboard package file.\nNo keyboards were installed.";
+        Toast.makeText(getApplicationContext(),
+          filename + noKeyboardsInstalledMessage, Toast.LENGTH_LONG).show();
       }
     } catch (Exception e) {
       String message = "Access denied to " + filename +
@@ -704,8 +708,8 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
       return;
     }
 
-    if (cacheKmpFile != null) {
-      bundle.putString("kmpFile", cacheKmpFile.getAbsolutePath());
+    if (cacheKMPFile != null) {
+      bundle.putString("kmpFile", cacheKMPFile.getAbsolutePath());
 
       Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
       packageIntent.putExtras(bundle);

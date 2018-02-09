@@ -6,6 +6,9 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+#ifndef KVKFile_h
+#define KVKFile_h
+
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 #import "KMBinaryFileFormat.h"
@@ -25,3 +28,5 @@
 - (id)initWithFilePath:(NSString *)path;
 
 @end
+
+#endif /* KVKFile_h */

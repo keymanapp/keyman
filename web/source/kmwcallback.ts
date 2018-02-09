@@ -128,7 +128,7 @@ class KeyboardInterface {
           && this.keymanweb.domManager._IsMozillaEditableIframe(Lelem, 0)) {
         Lelem = (<any>Lelem).documentElement;  // I3363 (Build 301)
       }
-
+      
       Lelem._KeymanWebSelectionStart=Ls;
       Lelem._KeymanWebSelectionEnd=Le;
       DOMEventHandlers.states._IgnoreNextSelChange = 0;
@@ -245,7 +245,7 @@ class KeyboardInterface {
     if(this.keymanweb.keyboardManager.activeKeyboard['KM']) {   // I1380 - support KIK for positional layouts
       return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
     } else {
-      return (<any>this.keymanweb)._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts
+      return this.keymanweb.keyMapManager._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts
     }
   }
   

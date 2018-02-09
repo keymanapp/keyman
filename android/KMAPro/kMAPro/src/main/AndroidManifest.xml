@@ -62,7 +62,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <!-- local kmp file -->
+                <!-- Android's implementation of PatternMatcher for pathPattern limits special characters to '.', '*', and '\\' -->
                 <data android:scheme="file" android:host="*" android:mimeType="application/octet-stream" android:pathPattern=".*\\.kmp" />
 
                 <!-- Android DownloadManager doesn't have ".kmp" in the names it passes to the intent -->

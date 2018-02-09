@@ -161,10 +161,9 @@ NSRange _previousSelRange;
     }
     
     NSRange selRange = [sender selectedRange];
-    NSUInteger len = [sender length];
+    NSUInteger len;
     if ([self.AppDelegate debugMode]) {
         NSLog(@"selRange.location: %lu", (unsigned long)selRange.location);
-        NSLog(@"sender length: %lu", len);
     }
     
     if (selRange.location == NSNotFound) {
@@ -172,6 +171,7 @@ NSRange _previousSelRange;
         // previous context we've built up is indeed current. This may be totally untrue, but if the client can't report
         // its location, there's no point trying to check to see if it changed unexpectedly.
         _clientSelectionCanChangeUnexpectedly = NO;
+        len = _previousSelRange.length;
     }
     else {
         len = selRange.location;
@@ -527,10 +527,7 @@ NSRange _previousSelRange;
         else
             NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}");
         NSLog(@"kme.contextBuffer = \"%@\"", self.kme.contextBuffer.length?[self.kme.contextBuffer codeString]:@"{empty}");
-        NSRange range = [sender markedRange];
-        NSLog(@"sender.markedRange.location = %lu", range.location);
-        NSLog(@"sender.markedRange.length = %lu", range.length);
-        range = [sender selectedRange];
+        NSRange range = [sender selectedRange];
         NSLog(@"sender.selectedRange.location = %lu", range.location);
         if (_cannnotTrustSelectionLength)
             NSLog(@"The following cannot be trusted and will be ignored:");

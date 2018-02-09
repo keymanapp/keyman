@@ -7,9 +7,7 @@
 		"kmwbase.ts",
 		"keymanweb.ts",
 		"kmwosk.ts", 
-		"kmwnative.ts", 
-		"kmwcallback.ts",
-		"kmwkeymaps.ts",
+		"kmwnative.ts",
 		"kmwlayout.ts",
 		"kmwinit.ts",
 		"kmwapi.ts"

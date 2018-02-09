@@ -1057,7 +1057,8 @@ if(!window['keyman']['initialized']) {
         // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
         if(typeof activeKeyboard['KM'] == 'undefined')
         {
-          Lkc.Lcode=keymanweb._USKeyCodeToCharCode(Lkc); Lkc.LisVirtualKey=false;
+          Lkc.Lcode=keymanweb.keyMapManager._USKeyCodeToCharCode(Lkc);
+          Lkc.LisVirtualKey=false;
         }
 
         // Pass this key code and state to the keyboard program
