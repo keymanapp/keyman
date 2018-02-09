@@ -87,7 +87,7 @@ describe('Engine', function() {
       assert.equal(inputElem.value, "ຫ");
     });
 
-    it('Simple OSK click', function(done) {
+    it('Simple OSK click', function() {
       var inputElem = document.getElementById('singleton');
 
       /* We hack KMW a little bit because the .focus method is insufficient;
@@ -96,35 +96,31 @@ describe('Engine', function() {
        */
       DOMEventHandlers.states.lastActiveElement = inputElem;
 
-      // Let the focus() method do its thing.
-      window.setTimeout(function() {
-        var osk_S = document.getElementById('default-K_S');
+      var osk_S = document.getElementById('default-K_S');
 
-        // Yep, not KeyboardEvent.  "keyCode" is nasty-bugged in Chrome and unusable if initializing through KeyboardEvent.
-        var downEvent;
-        var upEvent;
-        if(typeof Event == 'function') {
-          downEvent = new Event("mousedown", {"relatedTarget": osk_S});
-          upEvent = new Event("mouseup", {"relatedTarget": osk_S});
-        } else { // Yeah, so IE can't use the above at all, and requires its own trick.
-          downEvent = document.createEvent("MouseEvent");
-          downEvent.initMouseEvent("mousedown", false, true, null,
-            null, 0, 0, 0, 0,
-            false, false, false, false,
-            0, osk_S);
+      // Yep, not KeyboardEvent.  "keyCode" is nasty-bugged in Chrome and unusable if initializing through KeyboardEvent.
+      var downEvent;
+      var upEvent;
+      if(typeof Event == 'function') {
+        downEvent = new Event("mousedown", {"relatedTarget": osk_S});
+        upEvent = new Event("mouseup", {"relatedTarget": osk_S});
+      } else { // Yeah, so IE can't use the above at all, and requires its own trick.
+        downEvent = document.createEvent("MouseEvent");
+        downEvent.initMouseEvent("mousedown", false, true, null,
+          null, 0, 0, 0, 0,
+          false, false, false, false,
+          0, osk_S);
 
-          upEvent = document.createEvent("MouseEvent");
-          upEvent.initMouseEvent("mouseup", false, true, null,
-            null, 0, 0, 0, 0,
-            false, false, false, false,
-            0, osk_S);
-        }
-        osk_S.dispatchEvent(downEvent);
-        osk_S.dispatchEvent(upEvent);
+        upEvent = document.createEvent("MouseEvent");
+        upEvent.initMouseEvent("mouseup", false, true, null,
+          null, 0, 0, 0, 0,
+          false, false, false, false,
+          0, osk_S);
+      }
+      osk_S.dispatchEvent(downEvent);
+      osk_S.dispatchEvent(upEvent);
 
-        assert.equal(inputElem.value, "ຫ");
-        done();
-      }, 25);
+      assert.equal(inputElem.value, "ຫ");
     });
   })
 });
