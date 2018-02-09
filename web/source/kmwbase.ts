@@ -126,6 +126,15 @@ class KeymanBase {
   }
 
   /**
+   * Triggers a KeymanWeb engine shutdown to facilitate a full system reset.
+   * This function is designed for use with KMW unit-testing, which reloads KMW
+   * multiple times to test the different initialization paths.
+   */
+  ['shutdown']() {
+    this.domManager.shutdown();
+  }
+
+  /**
    * Expose font testing to allow checking that SpecialOSK or custom font has
    * been correctly loaded by browser
    * 

@@ -61,6 +61,7 @@ var setupScript = function(src) {
 }
 
 var teardownKMW = function() {
+  keyman['shutdown']();
   delete window.keyman;
   window["keyman"] = undefined;
 }

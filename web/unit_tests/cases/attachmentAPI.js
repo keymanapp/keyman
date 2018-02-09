@@ -120,28 +120,28 @@ Modernizr.on('touchevents', function(result) {
 					DynamicElements.assertAttached(ele, done);
 				});
 
-				// // We still have weird collateral issues with IE and Edge if this is enabled.
-				// it('<iframe>', function(done) {
-				// 	var ID = DynamicElements.addIFrame(function() {
-				// 		var ele = document.getElementById(ID);
-				// 		//console.log(ele);
+				// We still have weird collateral issues with IE and Edge if this is enabled.
+				it('<iframe>', function(done) {
+					var ID = DynamicElements.addIFrame(function() {
+						var ele = document.getElementById(ID);
+						//console.log(ele);
 
-				// 		// Give the iframe time to load...
-				// 		window.setTimeout(function() {
-				// 			var innerEle = ele.contentDocument.getElementById('iframe_input');
+						// Give the iframe time to load...
+						window.setTimeout(function() {
+							var innerEle = ele.contentDocument.getElementById('iframe_input');
 
-				// 			DynamicElements.assertAttached(ele, function() {
-				// 				DynamicElements.assertAttached(innerEle, function() {
-				// 					keyman.detachFromControl(ele);
+							DynamicElements.assertAttached(ele, function() {
+								DynamicElements.assertAttached(innerEle, function() {
+									keyman.detachFromControl(ele);
 
-				// 					window.setTimeout(function() {
-				// 						done();
-				// 					}, 50);
-				// 				});
-				// 			});
-				// 		}, 1000);
-				// 	});
-				// });
+									window.setTimeout(function() {
+										done();
+									}, 50);
+								});
+							});
+						}, 1000);
+					});
+				});
 
 				it('contentEditable=true', function(done) {
 					var ID = DynamicElements.addEditable();

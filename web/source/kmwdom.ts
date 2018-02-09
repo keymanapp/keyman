@@ -55,6 +55,15 @@ class DOMManager {
     this.nonTouchHandlers = new DOMEventHandlers(keyman);
   }
 
+  shutdown() {
+    if(this.enablementObserver) {
+      this.enablementObserver.disconnect();
+    }
+    if(this.attachmentObserver.disconnect) {
+      this.attachmentObserver.disconnect();
+    }
+  }
+
   /**
    * Function     getHandlers
    * Scope        Private
