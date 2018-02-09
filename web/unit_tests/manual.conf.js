@@ -25,6 +25,8 @@ module.exports = function(config) {
       {pattern: 'release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources
       {pattern: 'release/unminified/web/**/*.gif', watched: false, served: true, included: false}, // OSK resources
       {pattern: 'release/unminified/web/**/*.png', watched: false, served: true, included: false}, // OSK resources
+      {pattern: 'release/unminified/web/**/*.ttf', watched: false, served: true, included: false}, // OSK resources
+      {pattern: 'release/unminified/web/**/*.woff', watched: false, served: true, included: false}, // OSK resources
       {pattern: 'release/unminified/web/*.js', watched: true, served: true, included: false},  // The actual KMW code.
       {pattern: 'release/unminified/web/*.map', watched: true, served: true, included: false}, // + sourcemaps.
       {pattern: 'unit_tests/fixtures/**/*.html', watched: true} // HTML structures useful for testing.

@@ -12,8 +12,12 @@ describe('Engine', function() {
     initTimer(done);
   });
 
-  beforeEach(function() {
+  beforeEach(function(done) {
     fixture.load("singleInput.html");
+    
+    window.setTimeout(function() {
+      done()
+    }, 50);
   });
   
   after(function() {
@@ -24,17 +28,60 @@ describe('Engine', function() {
     fixture.cleanup();
   });
   
-  describe('Keyboards', function() {
-    it('Successfully loads a locally-stored keyboard.', function(done) {
+  describe('Keyboard Loading', function() {
+    it('Local', function(done) {
       var laoStub = fixture.load("/keyboards/lao_2008_basic.json", true);
 
       keyman.addKeyboards(laoStub);
       keyman.setActiveKeyboard("Keyboard_lao_2008_basic", "lao");
 
       window.setTimeout(function() {
-        assert.isTrue(keyman.getActiveKeyboard() == "Keyboard_lao_2008_basic");
+        assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic");
+
+        keyman.removeKeyboards('lao_2008_basic');
         done();
-      }, 1000);
+      }, 500);
     });
   });
+
+  describe('Processing', function() {
+    before(function(done){
+      var laoStub = fixture.load("/keyboards/lao_2008_basic.json", true);
+
+      keyman.addKeyboards(laoStub);
+      keyman.setActiveKeyboard("Keyboard_lao_2008_basic", "lao");
+
+      window.setTimeout(function() {
+        done();
+      }, 500);
+    });
+
+    after(function() {
+      keyman.removeKeyboards('lao_2008_basic');
+    })
+
+    it('Simple Key', function(done) {
+      var inputElem = document.getElementById('singleton');
+      inputElem.focus();
+
+      // Yep, not KeyboardEvent.  "keyCode" is nasty-bugged in Chrome and unusable if initializing through KeyboardEvent.
+      var event;
+      if(typeof Event == 'function') {
+        event = new Event("keydown", {"key":"s", "code":"KeyS", "keyCode":83, "which":83});
+        event.keyCode = 83;
+        event.getModifierState = function() {
+          return false;
+        };
+      } else {
+        event = document.createEvent("KeyboardEvent");
+        event.initKeyboardEvent("keydown", false, true, null, String.fromCharCode(83), 0, 0, "", 0);
+      }
+      inputElem.dispatchEvent(event);
+
+      window.setTimeout(function() {
+        assert.equal(inputElem.value, "ຫ");
+        done();
+      }, 50);
+    });
+  })
 });
