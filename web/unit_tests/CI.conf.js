@@ -167,7 +167,7 @@ module.exports = function(config) {
 
     proxies: {
       "/source/": "/base/release/unminified/web/",
-      "/resources/": "unit_tests/resources"
+      "/resources/": "/base/unit_tests/resources/"
     },
 
 

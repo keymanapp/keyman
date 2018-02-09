@@ -42,7 +42,7 @@ if(typeof(DynamicElements) == 'undefined') {
 		if(loadCallback) {
 			frame.addEventListener('load', function() {
 				// Give KMW's attachment events a chance to run first.
-				window.setTimeout(loadCallback, 50);
+				window.setTimeout(loadCallback, 100);
 			});
 		}
 		frame.setAttribute("src", "resources/html/iframe.html");
@@ -122,13 +122,13 @@ Modernizr.on('touchevents', function(result) {
 					DynamicElements.assertAttached(ele, done);
 				});
 
-				// We still have weird collateral issues with IE and Edge if this is enabled.
 				it('<iframe>', function(done) {
 					var ID = DynamicElements.addIFrame(function() {
 						var ele = document.getElementById(ID);
 						var innerEle = ele.contentDocument.getElementById('iframe_input');
 
 						assert.isFalse(keyman.isAttached(ele));
+						assert.isNotNull(innerEle);
 						assert.isFalse(keyman.isAttached(innerEle));
 
 						window.setTimeout(function() {
@@ -198,6 +198,7 @@ Modernizr.on('touchevents', function(result) {
 						var innerEle = ele.contentDocument.getElementById('iframe_input');
 
 						assert.isTrue(keyman.isAttached(ele));
+						assert.isNotNull(innerEle);
 						assert.isTrue(keyman.isAttached(innerEle));
 						keyman.detachFromControl(ele);
 
