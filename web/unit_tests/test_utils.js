@@ -7,7 +7,7 @@ var setupKMW = function(kmwOptions) {
     var kmwOptions = {
       attachType:'auto',
       root:'source',
-      resources:'source'
+      resources:'../../../../source'
     };
   
     if(ui) {
@@ -21,8 +21,14 @@ var setupKMW = function(kmwOptions) {
   ui = kmwOptions.ui;
 
   kmwOptions.attachType = kmwOptions.attachType ? kmwOptions.attachType : 'auto';
-  kmwOptions.root = 'source';
-  kmwOptions.resources = 'source';
+  
+  if(!kmwOptions.root) {
+    kmwOptions.root = 'source';
+  }
+
+  if(!kmwOptions.resources) {
+    kmwOptions.resources = '../../../../source';
+  }
 
   if(ui) {
     var ui = setupScript('source/kmwui' + ui + '.js');

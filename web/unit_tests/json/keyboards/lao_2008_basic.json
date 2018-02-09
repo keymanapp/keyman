@@ -1,0 +1,10 @@
+{
+  "id": "lao_2008_basic",
+  "name":"Lao Basic",
+  "languages":{
+    "id":"lao",
+    "name": "Lao",
+    "region": "Asia"
+  },
+  "filename":"resources/keyboards/lao_2008_basic.js"
+}

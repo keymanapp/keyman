@@ -20,6 +20,7 @@ module.exports = function(config) {
       'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
       'unit_tests/modernizr.js', // A dependency-managed utility script that helps with browser feature detection.
       'unit_tests/cases/**/*.js', // Where the tests actually reside.
+      'unit_tests/json/**/*.json', // Where pre-loaded JSON resides.
       {pattern: 'unit_tests/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
       {pattern: 'release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources
       {pattern: 'release/unminified/web/**/*.gif', watched: false, served: true, included: false}, // OSK resources
@@ -39,10 +40,16 @@ module.exports = function(config) {
     exclude: [
     ],
 
+    jsonFixturesPreprocessor: {
+      stripPrefix: 'unit_tests/json',
+      variableName: '__json__'
+    },
+
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-		  'unit_tests/fixtures/**/*.html'	: ['html2js']
+      'unit_tests/fixtures/**/*.html'	: ['html2js'],
+      'unit_tests/json/**/*.json' : ['json_fixtures']
     },
 
     // test results reporter to use

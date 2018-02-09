@@ -121,10 +121,10 @@ module.exports = function(config) {
   /*
    * Final selection of the sets to be used for BrowserStack testing.
    */
-  var FINAL_LAUNCHER_DEFS = mergeLaunchers( CURRENT_MAC_LAUNCHERS,
+  var FINAL_LAUNCHER_DEFS = mergeLaunchers( CURRENT_ANDROID_LAUNCHERS,
                                             CURRENT_IOS_LAUNCHERS,
                                             CURRENT_WIN_LAUNCHERS,
-                                            CURRENT_ANDROID_LAUNCHERS);
+                                            CURRENT_MAC_LAUNCHERS);
 
   var FINAL_BROWSER_LIST = toBrowserList(FINAL_LAUNCHER_DEFS);
 
@@ -146,6 +146,9 @@ module.exports = function(config) {
 
     captureTimeout: 180000, // in milliseconds
 
+    // Avoids generating a 'fail' exit code if one of our selected browsers on BrowserStack goes poof.
+    failOnEmptyTestSuite: false,
+
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['mocha', 'chai', 'fixture'],
@@ -156,6 +159,7 @@ module.exports = function(config) {
       'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
       'unit_tests/modernizr.js', // A dependency-managed utility script that helps with browser feature detection.
       'unit_tests/cases/**/*.js', // Where the tests actually reside.
+      'unit_tests/json/**/*.json', // Where pre-loaded JSON resides.
       {pattern: 'unit_tests/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
       {pattern: 'release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources
       {pattern: 'release/unminified/web/**/*.gif', watched: false, served: true, included: false}, // OSK resources
@@ -176,10 +180,16 @@ module.exports = function(config) {
     ],
 
 
+    jsonFixturesPreprocessor: {
+      stripPrefix: 'unit_tests/json',
+      variableName: '__json__'
+    },
+
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-		  'unit_tests/fixtures/**/*.html'	: ['html2js']
+      'unit_tests/fixtures/**/*.html'	: ['html2js'],
+      'unit_tests/json/**/*.json' : ['json_fixtures']
     },
 
 
