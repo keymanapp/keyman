@@ -40,7 +40,10 @@ if(typeof(DynamicElements) == 'undefined') {
 	  frame.height = "100";
 		frame.id = 'iframe' + i;
 		if(loadCallback) {
-			frame.addEventListener('load', loadCallback);
+			frame.addEventListener('load', function() {
+				// Give KMW's attachment events a chance to run first.
+				window.setTimeout(loadCallback, 50);
+			});
 		}
 		frame.setAttribute("src", "resources/html/iframe.html");
 			
@@ -75,8 +78,7 @@ if(typeof(DynamicElements) == 'undefined') {
 
 Modernizr.on('touchevents', function(result) {
 	if(result) {
-	} else {
-		describe('Attachment API (Desktop, \'auto\')', function() {
+		describe('Attachment (Touch, \'auto\')', function() {
 
 			this.timeout(5000);
 
@@ -105,7 +107,7 @@ Modernizr.on('touchevents', function(result) {
 				}, 500);
 			})
 			
-			describe('Attachment', function() {
+			describe('Element Type', function() {
 				it('<input>', function(done) {
 					var ID = DynamicElements.addInput();
 					var ele = document.getElementById(ID);
@@ -124,22 +126,84 @@ Modernizr.on('touchevents', function(result) {
 				it('<iframe>', function(done) {
 					var ID = DynamicElements.addIFrame(function() {
 						var ele = document.getElementById(ID);
-						//console.log(ele);
+						var innerEle = ele.contentDocument.getElementById('iframe_input');
 
-						// Give the iframe time to load...
+						assert.isFalse(keyman.isAttached(ele));
+						assert.isFalse(keyman.isAttached(innerEle));
+
 						window.setTimeout(function() {
-							var innerEle = ele.contentDocument.getElementById('iframe_input');
+							done();
+						}, 50);
+					});
+				});
 
-							DynamicElements.assertAttached(ele, function() {
-								DynamicElements.assertAttached(innerEle, function() {
-									keyman.detachFromControl(ele);
+				it('contentEditable=true', function(done) {
+					var ID = DynamicElements.addEditable();
+					var ele = document.getElementById(ID);
 
-									window.setTimeout(function() {
-										done();
-									}, 50);
-								});
-							});
-						}, 1000);
+					assert.isFalse(keyman.isAttached(ele));
+					done();
+				});
+			});
+		});
+	} else {
+		describe('Attachment (Desktop, \'auto\')', function() {
+
+			this.timeout(5000);
+
+			before(function(done) {
+				this.timeout(10000);
+
+				fixture.setBase('unit_tests/fixtures');
+				setupKMW({ attachType:'auto' });
+
+				// Pass the initTimer method our 'done' callback so it can handle our initialization delays for us.
+				initTimer(done);
+			});
+			
+			beforeEach(function() {
+				fixture.load("robustAttachment.html");
+			});
+			
+			after(function() {
+				teardownKMW();
+			});
+			
+			afterEach(function(done) {
+				fixture.cleanup();
+				window.setTimeout(function(){
+					done();
+				}, 500);
+			})
+			
+			describe('Element Type', function() {
+				it('<input>', function(done) {
+					var ID = DynamicElements.addInput();
+					var ele = document.getElementById(ID);
+
+					DynamicElements.assertAttached(ele, done);
+				});
+
+				it('<textarea>', function(done) {
+					var ID = DynamicElements.addText();
+					var ele = document.getElementById(ID);
+
+					DynamicElements.assertAttached(ele, done);
+				});
+
+				// We still have weird collateral issues with IE and Edge if this is enabled.
+				it('<iframe>', function(done) {
+					var ID = DynamicElements.addIFrame(function() {
+						var ele = document.getElementById(ID);
+						var innerEle = ele.contentDocument.getElementById('iframe_input');
+
+						assert.isTrue(keyman.isAttached(ele));
+						assert.isTrue(keyman.isAttached(innerEle));
+						keyman.detachFromControl(ele);
+
+						window.setTimeout(function() {
+							done();
+						}, 50);
 					});
 				});
 
