@@ -156,6 +156,7 @@ module.exports = function(config) {
       'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
       'unit_tests/modernizr.js', // A dependency-managed utility script that helps with browser feature detection.
       'unit_tests/cases/**/*.js', // Where the tests actually reside.
+      {pattern: 'unit_tests/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
       {pattern: 'release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources
       {pattern: 'release/unminified/web/**/*.gif', watched: false, served: true, included: false}, // OSK resources
       {pattern: 'release/unminified/web/**/*.png', watched: false, served: true, included: false}, // OSK resources
