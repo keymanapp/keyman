@@ -495,7 +495,7 @@ class KeyboardManager {
                 util.wait(false);
                 util.alert(altString || msg, function() {
                   this.keymanweb['setActiveKeyboard'](''); // The API call!
-                });
+                }.bind(this));
               }
 
               switch(msgType) { // in case we extend this later.
@@ -512,7 +512,7 @@ class KeyboardManager {
                 var Ps = this.keyboardStubs[0];
                 this._SetActiveKeyboard(Ps['KI'], Ps['KLC'], true);
               }
-            }
+            }.bind(this);
 
             loadingStub.asyncLoader.timer = window.setTimeout(loadingStub.asyncLoader.callback, 10000);
 

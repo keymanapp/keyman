@@ -20,14 +20,18 @@ sudo apt-get install nodejs
 
 The following folders contain the distribution for KeymanWeb:
 
-	source				         Source code
-	intermediate    	         Intermediate compiled code; TypeScript source is compiled here before it is minified.
-	release/web	                 Fully-compiled KeymanWeb modules
-	release/embedded	         Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
+	source				Source code
+	unit_tests      	Automated testing resources
+  
+	intermediate    	Intermediate compiled code; TypeScript source is compiled here before it is minified.
+	release/web			Fully-compiled KeymanWeb modules for testing
+	release/embedded	Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
 	release/unminified/web       Fully-compiled but non-minified KeymanWeb modules
 	release/unminified/embedded  Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
-	samples				         Sample pages demonstrating ways to link with KeymanWeb
-	testing     		         Test-case web-pages for various aspects of KeymanWeb functionality
+  
+	samples				Sample pages demonstrating ways to link with KeymanWeb
+	testing     		Test-case web-pages for various aspects of KeymanWeb functionality
+	unit_tests			A Node-driven test suite for automated testing of KeymanWeb
 
 ## Usage
 Open **index.html** or **samples/index.html** in your browser. Be sure to compile KeymanWeb before viewing the pages.
@@ -57,3 +61,9 @@ To view pages using compiled KeymanWeb,
     - to erase pre-existing build products before the build.
 	
 If more than one target is specified, the last one will take precedence.
+
+### Unit Testing ###
+
+Before running unit tests on KeymanWeb, first run `./build.sh` according to the instructions above.
+
+Once the build is complete, running `npm test` will run the unit testing suite on your local machine in-browser.  Alternatively, see `unit_tests/test.sh`, which the former command executes.

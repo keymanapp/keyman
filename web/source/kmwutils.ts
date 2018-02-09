@@ -142,7 +142,7 @@ class Util {
 
   // Consider refactoring keymanweb.options to within Util.
 
-  private keyman: any; // Closure doesn't like relying on the global object from within a class def.
+  private keyman: KeymanBase; // Closure doesn't like relying on the global object from within a class def.
 
   constructor(keyman: any) {
     this.initDevices();
@@ -1071,11 +1071,11 @@ class Util {
    * @param     {function()=}   fn      function to call when alert dismissed
    */       
   alert(s: string, fn?: () => void): void {
-    var bg = this.keyman.waiting, nn=bg.firstChild.childNodes;
-    nn[0].style.display='block';
-    nn[1].className='kmw-alert-text'; 
-    nn[1].innerHTML=s;
-    nn[2].style.display='none';
+    var bg = this.waiting, nn=bg.firstChild.childNodes;
+    (nn[0] as HTMLElement).style.display='block';
+    (nn[1] as HTMLElement).className='kmw-alert-text'; 
+    (nn[1] as HTMLElement).innerHTML=s;
+    (nn[2] as HTMLElement).style.display='none';
     bg.style.display='block';
     if(arguments.length > 1) {
       bg.dismiss=fn;
