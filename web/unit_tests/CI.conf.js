@@ -132,11 +132,15 @@ module.exports = function(config) {
     // BrowserStack configuration options
     browserStack: {
       video: false,
+      browserDisconnectTimeout: 3e5,
       retryLimit: 1, // 0 is ignored.
       startTunnel: true,
     },
 
-    captureTimeout: 180000, // in milliseconds
+    captureTimeout: 6e5, // in milliseconds
+    browserNoActivityTimeout: 3e5,
+    browserDisconnectTimeout: 3e5,
+    browserDisconnectTolerance: 3,
 
     // Avoids generating a 'fail' exit code if one of our selected browsers on BrowserStack goes poof.
     failOnEmptyTestSuite: false,
