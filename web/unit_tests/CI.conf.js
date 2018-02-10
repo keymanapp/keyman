@@ -1,9 +1,5 @@
-// Karma configuration
-// Generated on Mon Jan 29 2018 11:58:53 GMT+0700 (SE Asia Standard Time)
-
-// Super-useful!  http://www.bradoncode.com/blog/2015/02/27/karma-tutorial/#handling-html-fixtures
-
 module.exports = function(config) {
+  var base = require("./base.conf.js");
 
   /*
    * Definition of utility functions for managing our browser lists.
@@ -132,11 +128,7 @@ module.exports = function(config) {
    * Final definition of our BrowserStack testing Karma configuration.
    */
 
-  config.set({
-
-    // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '..',
-
+  var specifics = {
     // BrowserStack configuration options
     browserStack: {
       video: false,
@@ -146,66 +138,17 @@ module.exports = function(config) {
 
     captureTimeout: 180000, // in milliseconds
 
-    // frameworks to use
-    // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha', 'chai', 'fixture'],
-
-
-    // list of files / patterns to load in the browser
-    files: [
-      'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
-      'unit_tests/modernizr.js', // A dependency-managed utility script that helps with browser feature detection.
-      'unit_tests/cases/**/*.js', // Where the tests actually reside.
-      {pattern: 'release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources
-      {pattern: 'release/unminified/web/**/*.gif', watched: false, served: true, included: false}, // OSK resources
-      {pattern: 'release/unminified/web/**/*.png', watched: false, served: true, included: false}, // OSK resources
-      {pattern: 'release/unminified/web/*.js', watched: true, served: true, included: false},  // The actual KMW code.
-      {pattern: 'release/unminified/web/*.map', watched: true, served: true, included: false}, // + sourcemaps.
-      {pattern: 'unit_tests/fixtures/**/*.html', watched: true} // HTML structures useful for testing.
-    ],
-
-    proxies: {
-      "/source/": "/base/release/unminified/web/"
-    },
-
-
-    // list of files / patterns to exclude
-    exclude: [
-    ],
-
-
-    // preprocess matching files before serving them to the browser
-    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
-		'**/*.html'	: ['html2js']
-    },
-
+    // Avoids generating a 'fail' exit code if one of our selected browsers on BrowserStack goes poof.
+    failOnEmptyTestSuite: false,
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: ['teamcity'],
 
-    // web server port
-    port: 9876,
-
-
-    // enable / disable colors in the output (reporters and logs)
-    colors: true,
-
-
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_INFO,
-
-
-    // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
-
-    // Continuous Integration mode
-    // if true, Karma captures browsers, runs the tests and exits
-	  // if false, it generates the pages and acts as a persistent server.
-    singleRun: true,
 
     // Concurrency level
     // For CI, it really helps to keep a nice, clean set of output logs.
@@ -214,5 +157,7 @@ module.exports = function(config) {
     customLaunchers: FINAL_LAUNCHER_DEFS,
 
     browsers: FINAL_BROWSER_LIST
-  })
+  };
+
+  config.set(Object.assign(specifics, base));
 }
