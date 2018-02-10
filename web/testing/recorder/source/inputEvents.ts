@@ -159,6 +159,21 @@ namespace KMWRecorder {
     }
   }
 
+  var resetElement = function(ele: HTMLElement):void {
+    if(ele instanceof HTMLInputElement || ele instanceof HTMLTextAreaElement) {
+      window['keyman'].resetContext();
+      ele.value = "";
+    } else {
+      window['keyman'].resetContext();
+      if(ele['base']) {
+        // Gotta be extra-careful with the simulated touch fields!
+        window['keyman'].touchAliasing.setText(ele, "", 0);
+      } else {
+        ele.textContent = "";
+      }
+    }
+  }
+
   export class InputTestSequence {
     inputs: InputEvent[];
     output: string;
@@ -194,13 +209,7 @@ namespace KMWRecorder {
     }
 
     simulateSequenceOn(ele: HTMLElement, assertCallback: (s1: any, s2: any, msg?: string) => void): boolean {
-      if(ele instanceof HTMLInputElement || ele instanceof HTMLTextAreaElement) {
-        window['keyman'].resetContext();
-        ele.value = "";
-      } else {
-        window['keyman'].resetContext();
-        ele.textContent = "";
-      }
+      resetElement(ele);
 
       for(var i=0; i < this.inputs.length; i++) {
         this.inputs[i].simulateEventOn(ele);
