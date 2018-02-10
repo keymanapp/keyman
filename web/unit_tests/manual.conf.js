@@ -7,13 +7,6 @@ module.exports = function(config) {
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: ['mocha'],
 
-    customLaunchers: {
-      ChromeAndroidNoShutdown: {
-        base: 'ChromeAndroid',
-        shutdownEmulator: false
-      }  
-    },
-
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: ['Firefox', 'IE', 'Chrome', 'Edge'], // Can be specified at run-time instead!
