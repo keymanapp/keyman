@@ -108,8 +108,10 @@ namespace KMWRecorder {
 
   export class OSKInputEvent implements InputEvent {
     static readonly eventClass: string = "MouseEvent";
-    static readonly downEventType: string = "mousedown";
-    static readonly upEventType: string = "mouseup";
+    static readonly downMouseType: string = "mousedown";
+    static readonly upMouseType: string = "mouseup";
+    static readonly downTouchType: string = "touchstart";
+    static readonly upTouchType: string = "touchend";
 
     type: string = "osk";
     keyID: string;
@@ -130,19 +132,28 @@ namespace KMWRecorder {
       var downEvent;
       var upEvent;
       if(typeof Event == 'function') {
-        downEvent = new Event(OSKInputEvent.downEventType);
-        upEvent = new Event(OSKInputEvent.upEventType);
-        downEvent['relatedTarget'] = target;
-        upEvent['relatedTarget'] = target;
+        if(target['base'] && target instanceof HTMLDivElement) {
+          downEvent = new Event(OSKInputEvent.downTouchType);
+          upEvent = new Event(OSKInputEvent.upTouchType);
+          downEvent['touches'] = [{"target": oskKeyElement}];
+          upEvent['touches'] = [{"target": oskKeyElement}];
+          downEvent['changedTouches'] = [{"target": oskKeyElement}];
+          upEvent['changedTouches'] = [{"target": oskKeyElement}];
+        } else {
+          downEvent = new Event(OSKInputEvent.downMouseType);
+          upEvent = new Event(OSKInputEvent.upMouseType);
+          downEvent['relatedTarget'] = target;
+          upEvent['relatedTarget'] = target;
+        }
       } else { // Yeah, so IE can't use the above at all, and requires its own trick.
         downEvent = document.createEvent(OSKInputEvent.eventClass);
-        downEvent.initMouseEvent(OSKInputEvent.downEventType, false, true, null,
+        downEvent.initMouseEvent(OSKInputEvent.downMouseType, false, true, null,
           null, 0, 0, 0, 0,
           false, false, false, false,
           0, oskKeyElement);
 
         upEvent = document.createEvent(OSKInputEvent.eventClass);
-        upEvent.initMouseEvent(OSKInputEvent.upEventType, false, true, null,
+        upEvent.initMouseEvent(OSKInputEvent.upMouseType, false, true, null,
           null, 0, 0, 0, 0,
           false, false, false, false,
           0, oskKeyElement);
