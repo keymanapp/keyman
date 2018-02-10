@@ -68,21 +68,11 @@ describe('Engine', function() {
 
     it('Simple Keypress', function() {
       var inputElem = document.getElementById('singleton');
-      inputElem.focus();
 
-      // Yep, not KeyboardEvent.  "keyCode" is nasty-bugged in Chrome and unusable if initializing through KeyboardEvent.
-      var event;
-      if(typeof Event == 'function') {
-        event = new Event("keydown", {"key":"s", "code":"KeyS", "keyCode":83, "which":83});
-        event.keyCode = 83;
-        event.getModifierState = function() {
-          return false;
-        };
-      } else { // Yeah, so IE can't use the above at all, and requires its own trick.
-        event = document.createEvent("KeyboardEvent");
-        event.initKeyboardEvent("keydown", false, true, null, String.fromCharCode(83), 0, 0, "", 0);
-      }
-      inputElem.dispatchEvent(event);
+      var lao_s_key_json = {"key":"s", "code":"KeyS","keyCode":83,"modifierSet":0,"location":0};
+      var lao_s_event = new KMWRecorder.PhysicalInputEvent(lao_s_key_json);
+
+      lao_s_event.simulateEvent(inputElem);
 
       assert.equal(inputElem.value, "ຫ");
     });
@@ -90,37 +80,12 @@ describe('Engine', function() {
     it('Simple OSK click', function() {
       var inputElem = document.getElementById('singleton');
 
-      /* We hack KMW a little bit because the .focus method is insufficient;
-       * it won't trigger if the tested browser doesn't have focus.
-       * Only one can have focus when testing locally.
-       */
-      DOMEventHandlers.states.lastActiveElement = inputElem;
+      var lao_s_osk_json = {"keyID": 'shift-K_S'};
+      var lao_s_event = new KMWRecorder.OSKInputEvent(lao_s_osk_json);
 
-      var osk_S = document.getElementById('default-K_S');
+      lao_s_event.simulateEvent(inputElem);
 
-      // Yep, not KeyboardEvent.  "keyCode" is nasty-bugged in Chrome and unusable if initializing through KeyboardEvent.
-      var downEvent;
-      var upEvent;
-      if(typeof Event == 'function') {
-        downEvent = new Event("mousedown", {"relatedTarget": osk_S});
-        upEvent = new Event("mouseup", {"relatedTarget": osk_S});
-      } else { // Yeah, so IE can't use the above at all, and requires its own trick.
-        downEvent = document.createEvent("MouseEvent");
-        downEvent.initMouseEvent("mousedown", false, true, null,
-          null, 0, 0, 0, 0,
-          false, false, false, false,
-          0, osk_S);
-
-        upEvent = document.createEvent("MouseEvent");
-        upEvent.initMouseEvent("mouseup", false, true, null,
-          null, 0, 0, 0, 0,
-          false, false, false, false,
-          0, osk_S);
-      }
-      osk_S.dispatchEvent(downEvent);
-      osk_S.dispatchEvent(upEvent);
-
-      assert.equal(inputElem.value, "ຫ");
+      assert.equal(inputElem.value, ";");
     });
   })
 });
