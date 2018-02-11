@@ -219,6 +219,11 @@ namespace KMWRecorder {
       }
     }
 
+    addInput(event: InputEvent, output: string) {
+      this.inputs.push(event);
+      this.output = output;
+    }
+
     simulateSequenceOn(ele: HTMLElement, assertCallback: (s1: any, s2: any, msg?: string) => void): boolean {
       resetElement(ele);
 

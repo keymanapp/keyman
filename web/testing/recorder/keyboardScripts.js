@@ -102,6 +102,10 @@
         sKbd=document.getElementById('kbd_id3').value;
         kmw.addKeyboardsForLanguage(sKbd);
         break;
+      case 4:
+        sKbd=document.getElementById('kbd_stub_add').value;
+        kmw.addKeyboards(JSON.parse(sKbd));
+        break;
     }
   }
   

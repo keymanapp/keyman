@@ -79,21 +79,67 @@
   </script>
 
   <script>
-    // Time for the magic.  Yay, JavaScript method extension strategies...
+    var inputJSON = new KMWRecorder.InputTestSequence();
+
+    var ta_inputJSON;
+    var in_output;
+
+    addInputRecord = function(json) {
+      inputJSON.addInput(json, in_output.value);
+      ta_inputJSON.value = JSON.stringify(inputJSON);
+    }
+
+    resetInputRecord = function() {
+      ta_inputJSON.value = "";
+      in_output.value = "";
+
+      inputJSON = new KMWRecorder.InputTestSequence();
+    }
+
+    copyInputRecord = function() {
+      try {
+        ta_inputJSON.select();
+        var res = document.execCommand('copy');
+        if(res) {
+          in_output.focus();
+          return;
+        }
+      } catch (err) { }
+      alert("Unable to copy successfully.");
+    }
+
+    setInputRecord = function() {
+      inputJSON = new KMWRecorder.InputTestSequence(JSON.parse(ta_inputJSON.value));
+      in_output.value = inputJSON.output;
+    }
+
+    // Time for the 'magic'.  Yay, JavaScript method extension strategies...
     var _kd = keyman.touchAliasing._KeyDown.bind(keyman.touchAliasing);
     keyman.touchAliasing._KeyDown = function(e) {
+      if(DOMEventHandlers.states.activeElement != in_output) {
+        return _kd(e);
+      }
+
       var event = new KMWRecorder.PhysicalInputEvent(e);
+      var retVal = _kd(e);
+
       // Record the keystroke as part of a test sequence!
-      console.log(JSON.stringify(event));
-      return _kd(e);
+      addInputRecord(event);
+      return retVal;
     }
 
     var _ock = keyman.osk.clickKey.bind(keyman.osk);
     keyman.osk.clickKey = function(e) {
+      if(DOMEventHandlers.states.activeElement != in_output) {
+        return _kd(e);
+      }
+
       var event = new KMWRecorder.OSKInputEvent(e);
+      var retVal = _ock(e);
+
       // Record the click/touch as part of a test sequence!
-      console.log(JSON.stringify(event));
-      return _ock(e);
+      addInputRecord(event);
+      return retVal;
     }
 
     var _sak = keyman.keyboardManager._SetActiveKeyboard.bind(keyman.keyboardManager);
@@ -101,10 +147,24 @@
       _sak(PInternalName, PLgCode, saveCookie);
 
       // What's the active stub immediately after our _SetActiveKeyboard call?
-      var kbdRecord = new KMWRecorder.KeyboardStub(keyman.keyboardManager.activeStub);
-      console.log(JSON.stringify(kbdRecord));
+      var internalStub = keyman.keyboardManager.activeStub;
+      if(internalStub && DOMEventHandlers.states.activeElement == in_output) {
+        var kbdRecord = new KMWRecorder.KeyboardStub(internalStub);
+        var ta_activeStub = document.getElementById('activeStub');
+        ta_activeStub.value = JSON.stringify(kbdRecord);
+
+        console.log(JSON.stringify(kbdRecord));
+      }
     }
 
+    window.addEventListener('load', function() {
+      ta_inputJSON = document.getElementById('inputRecord');
+      in_output = document.getElementById('receiver');
+
+      keyman.attachToControl(in_output);
+      keyman.setKeyboardForControl(in_output, '', '');
+      resetInputRecord();
+    });
   </script>
 </head>
 
@@ -115,10 +175,32 @@
   <p>This page is designed to record KeymanWeb input for use in testing.</p>
   <hr/>
   <div>
-    <input type='text' id='receiver'/>
+    <div id='recording'>
+      <p>Recorded output JSON:</p>
+      <textarea id='inputRecord' style="width:90%; height:100px"></textarea>
+      <p>You must click 'Set Sequence' to save any changes to a sequence before continuing input recording.</p>
+      <button id='btnReload' type="button" onclick="setInputRecord();">Set Sequence</button>
+      <button id='btnReload' type="button" onclick="copyInputRecord();">Copy Sequence</button>
+      <button id='btnReload' type="button" onclick="resetInputRecord();">Clear Sequence</button>
+    </div>
+    <hr>
+    <div id='recordSection'>
+      <p>Record input here:</p>
+      <input type='text' id='receiver'/>
+    </div>
+    <hr>
+    <div id='kbdSection'>
+      <p>Currently active stub (for use with addKeyboards):</p>
+      <textarea id='activeStub' style="width:90%; height:50px" readonly></textarea>
+    </div>
   </div>
   <hr/>
+
   <!--  The following elements show how the language menu can be dynamically extended at any time -->
+  <h3>Add a keyboard by keyboard stub (to addKeyboards):</h3>
+  <input type='textarea'  style="width:90%; height:100px" id='kbd_stub_add' class='kmw-disabled' onkeypress="clickOnEnter(event,4);"/><br>
+  <input type='button' id='btn4' onclick='addKeyboard(4);' style="width:90%" value='Add' />
+
   <h3>Add a keyboard by keyboard name:</h3>
   <input type='input' id='kbd_id1' class='kmw-disabled' onkeypress="clickOnEnter(event,1);"/>
   <input type='button' id='btn1' onclick='addKeyboard(1);' value='Add' />
