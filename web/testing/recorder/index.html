@@ -96,6 +96,15 @@
       return _ock(e);
     }
 
+    var _sak = keyman.keyboardManager._SetActiveKeyboard.bind(keyman.keyboardManager);
+    keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, saveCookie) {
+      _sak(PInternalName, PLgCode, saveCookie);
+
+      // What's the active stub immediately after our _SetActiveKeyboard call?
+      var kbdRecord = new KMWRecorder.KeyboardStub(keyman.keyboardManager.activeStub);
+      console.log(JSON.stringify(kbdRecord));
+    }
+
   </script>
 </head>
 

@@ -64,7 +64,7 @@
     // Add a fully-specified, locally-sourced, keyboard with custom font  
     kmw.addKeyboards({id:'lao_2008_basic',name:'Lao Basic',
       languages:{
-        id:'lao',name:'Lao',region:'Asia'
+        id:'lao',name:'Lao',region:'Asia',
         },
       filename:'../lao_2008_basic.js'
       });   

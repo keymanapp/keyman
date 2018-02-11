@@ -240,4 +240,64 @@ namespace KMWRecorder {
       return result == this.output;
     }
   }
+
+  class FontStubForLanguage {
+    family: string;
+    source: string[];
+
+    constructor(activeStubEntry: any) {
+      this.family = activeStubEntry.family;
+
+      var src = activeStubEntry.files;
+      if(!(src instanceof Array)) {
+        src = [ src ];
+      }
+
+      this.source = [];
+      for(var i=0; i < src.length; i++) {
+        this.source.push(activeStubEntry.path + src[i]);
+      }
+    }
+  }
+
+  class LanguageStubForKeyboard {
+    id: string;
+    name: string;
+    region: string;
+    font?: FontStubForLanguage;
+    oskFont?: FontStubForLanguage;
+
+    constructor(activeStub: any) {
+      this.id = activeStub.KLC;
+      this.name = activeStub.KL;
+      this.region = activeStub.KR;
+
+      // Fonts.
+      if(activeStub.KFont) {
+        this.font = new FontStubForLanguage(activeStub.KFont);
+      }
+      if(activeStub.KOskFont) {
+        this.oskFont = new FontStubForLanguage(activeStub.KOskFont);
+      }
+    }
+  }
+
+  export class KeyboardStub {
+    id: string;
+    name: string;
+    filename: string;
+    languages: LanguageStubForKeyboard[];
+
+    // Constructs a stub usable with KeymanWeb's addKeyboards() API function from
+    // the internally-tracked ActiveStub value for that keyboard.
+    constructor(activeStub: any) {
+      this.id = activeStub.KI;
+      this.id = this.id.replace('Keyboard_', '');
+
+      this.name = activeStub.KN;
+      this.filename = activeStub.KF;
+
+      this.languages = [new LanguageStubForKeyboard(activeStub)];
+    }
+  }
 }
