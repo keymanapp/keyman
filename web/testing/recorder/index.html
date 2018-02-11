@@ -84,39 +84,55 @@
     var ta_inputJSON;
     var in_output;
 
+    setElementText = function(ele, text) {
+      ele.value = text;
+      if(ele['kmw_ip']) {
+        keyman.touchAliasing.setTextBeforeCaret(ele['kmw_ip'], ele.value);
+      }
+    }
+
     addInputRecord = function(json) {
       inputJSON.addInput(json, in_output.value);
-      ta_inputJSON.value = JSON.stringify(inputJSON);
+      setElementText(ta_inputJSON, JSON.stringify(inputJSON));
     }
 
     resetInputRecord = function() {
-      ta_inputJSON.value = "";
-      in_output.value = "";
+      setElementText(ta_inputJSON, "");
+      setElementText(in_output, "");
 
       inputJSON = new KMWRecorder.InputTestSequence();
     }
 
     copyInputRecord = function() {
       try {
-        ta_inputJSON.select();
+        if(!ta_inputJSON['kmw_ip']) {
+          ta_inputJSON.select();
+        } else {
+          var range = document.createRange();
+          range.selectNode(ta_inputJSON['kmw_ip']);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+        }
+        
         var res = document.execCommand('copy');
         if(res) {
           in_output.focus();
           return;
         }
-      } catch (err) { }
+      } catch (err) { console.log(err) }
       alert("Unable to copy successfully.");
     }
 
     setInputRecord = function() {
       inputJSON = new KMWRecorder.InputTestSequence(JSON.parse(ta_inputJSON.value));
-      in_output.value = inputJSON.output;
+      setElementText(in_output, inputJSON.output)
     }
 
     // Time for the 'magic'.  Yay, JavaScript method extension strategies...
     var _kd = keyman.touchAliasing._KeyDown.bind(keyman.touchAliasing);
     keyman.touchAliasing._KeyDown = function(e) {
-      if(DOMEventHandlers.states.activeElement != in_output) {
+      if(DOMEventHandlers.states.activeElement != in_output &&
+        DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
         return _kd(e);
       }
 
@@ -130,8 +146,9 @@
 
     var _ock = keyman.osk.clickKey.bind(keyman.osk);
     keyman.osk.clickKey = function(e) {
-      if(DOMEventHandlers.states.activeElement != in_output) {
-        return _kd(e);
+      if(DOMEventHandlers.states.activeElement != in_output &&
+        DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
+        return _ock(e);
       }
 
       var event = new KMWRecorder.OSKInputEvent(e);
@@ -148,22 +165,24 @@
 
       // What's the active stub immediately after our _SetActiveKeyboard call?
       var internalStub = keyman.keyboardManager.activeStub;
-      if(internalStub && DOMEventHandlers.states.activeElement == in_output) {
+      if(internalStub && (DOMEventHandlers.states.activeElement == in_output 
+        || DOMEventHandlers.states.activeElement == in_output['kmw_ip'])) {
         var kbdRecord = new KMWRecorder.KeyboardStub(internalStub);
         var ta_activeStub = document.getElementById('activeStub');
         ta_activeStub.value = JSON.stringify(kbdRecord);
-
-        console.log(JSON.stringify(kbdRecord));
       }
     }
 
     window.addEventListener('load', function() {
       ta_inputJSON = document.getElementById('inputRecord');
       in_output = document.getElementById('receiver');
+      p_layout = document.getElementById('layout');
 
       keyman.attachToControl(in_output);
       keyman.setKeyboardForControl(in_output, '', '');
       resetInputRecord();
+
+      p_layout.textContent += keyman.util.device.formFactor;
     });
   </script>
 </head>
@@ -176,6 +195,7 @@
   <hr/>
   <div>
     <div id='recording'>
+      <p id='layout'>Current layout: </p>
       <p>Recorded output JSON:</p>
       <textarea id='inputRecord' style="width:90%; height:100px"></textarea>
       <p>You must click 'Set Sequence' to save any changes to a sequence before continuing input recording.</p>
