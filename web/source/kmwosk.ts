@@ -956,9 +956,12 @@ if(!window['keyman']['initialized']) {
         keymanweb.domManager.initActiveElement(Lelem);
 
         // Exclude menu and OSK hide keys from normal click processing
-        if(keyName == 'K_LOPT' || keyName == 'K_ROPT')
-        {
-            osk.optionKey(e,keyName,true); return true;
+        if(keyName == 'K_LOPT' || keyName == 'K_ROPT') {
+          osk.optionKey(e,keyName,true);
+          return true;
+        } else if(keyName == 'K_BKSP') {
+          kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
+          return true;
         }
 
         // Turn off key highlighting (or preview)
@@ -2484,7 +2487,10 @@ if(!window['keyman']['initialized']) {
       }
       // Also backspace, to allow delete to repeat while key held
       else if(keyName == 'K_BKSP') {
-        kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
+        // While we could inline the execution of the delete key here, we lose the ability to
+        // record the backspace key if we do so.
+        osk.clickKey(key);
+        osk.deleteKey = key;
         osk.deleting = window.setTimeout(osk.repeatDelete,500);
         osk.keyPending = null;
       } else {
@@ -2791,7 +2797,7 @@ if(!window['keyman']['initialized']) {
      **/
     osk.repeatDelete = function() {
       if(osk.deleting) {
-        kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
+        osk.clickKey(osk.deleteKey);
         osk.deleting = window.setTimeout(osk.repeatDelete,100);
       }
     }
