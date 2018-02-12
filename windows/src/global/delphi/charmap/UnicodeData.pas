@@ -590,7 +590,12 @@ var
   line, str: TStringList;
   i: Integer;
 begin
+  // Handles typical distribution layout
   FUnicodeSourceFile := FUnicodeSourcePath + 'ethnologue.txt';
+  if not FileExists(FUnicodeSourceFile) then
+    // Handles source layout
+    FUnicodeSourceFile := FUnicodeSourcePath + '..\ethnologue\ethnologue.txt';
+
   str := TStringList.Create;
   line := TStringList.Create;
   try
