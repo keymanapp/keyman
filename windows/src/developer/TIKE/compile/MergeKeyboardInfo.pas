@@ -24,7 +24,7 @@
   # encodings -- from .kmx (existence of .js implies unicode)
   # packageIncludes -- from kmp.inf?
   # version -- from kmp.inf, js
-  # minKeymanDesktopVersion -- from kmp.inf, kmx
+  # minKeymanVersion -- from kmp.inf, kmx, js
   # platformSupport -- deduce from whether kmp exists, js exists
 }
 unit MergeKeyboardInfo;
@@ -70,7 +70,7 @@ type
     procedure CheckOrAddID;
     procedure CheckOrAddJsFilename;
     procedure AddLastModifiedDate;
-    procedure CheckOrAddMinKeymanDesktopVersion;
+    procedure CheckOrAddMinKeymanVersion;
     procedure AddName;
     procedure CheckOrAddPackageFilename;
     procedure AddPackageIncludes;
@@ -98,7 +98,8 @@ uses
   Keyman.System.RegExGroupHelperRSP19902,
 
   JsonUtil,
-  utilfiletypes;
+  utilfiletypes,
+  VersionInfo;
 
 type
   EInvalidKeyboardInfo = class(Exception)
@@ -179,7 +180,7 @@ begin
     CheckOrAddEncodings;
     CheckOrAddFileSizes;
     AddPackageIncludes;
-    CheckOrAddMinKeymanDesktopVersion;
+    CheckOrAddMinKeymanVersion;
     AddPlatformSupport;
 
     if not SaveJsonFile then
@@ -687,37 +688,42 @@ begin
 end;
 
 //
-//  minKeymanDesktopVersion -- from kmp.inf, kmx
+//  minKeymanVersion -- from kmp.inf, kmx, js
 //
-procedure TMergeKeyboardInfo.CheckOrAddMinKeymanDesktopVersion;
+procedure TMergeKeyboardInfo.CheckOrAddMinKeymanVersion;
 var
   i: Integer;
   MinVersion: Cardinal;
   MinVersionString: string;
+  FJSMinVersionString: string;
   v: TJSONValue;
 begin
   MinVersion := $0500;
-  // For each .kmx, get encodings and add to the result
+  // For each .kmx, get minimum version and add to the result
   for i := 0 to High(FKMXFiles) do
     if FKMXFiles[i].Info.FileVersion > MinVersion then
       MinVersion := FKMXFiles[i].Info.FileVersion;
 
-  MinVersionString := Format('%d.0', [MinVersion shr 8]);
+  FJSMinVersionString := '';
+  if FJsFileData <> '' then
+  begin
+    with TRegEx.Match(FJsFileData, 'this\.KMINVER=([''"])([^''"]+)(\1)') do
+      if Success then FJSMinVersionString := TGroupHelperRSP19902.Create(Groups[2], FJsFileData).FixedValue;
+  end;
 
-  v := json.GetValue('minKeymanDesktopVersion');
+  MinVersionString := Format('%d.%d', [(MinVersion and VERSION_MASK_MAJOR) shr 8, (MinVersion and VERSION_MASK_MINOR)]);
+  if FJSMinVersionString <> '' then
+    if CompareVersions(MinVersionString, FJSMinVersionString) > 0 then
+      MinVersionString := FJSMinVersionString;
+
+  v := json.GetValue('minKeymanVersion');
   if v <> nil then
   begin
-    if Length(FKMXFiles) = 0 then
-      raise EInvalidKeyboardInfo.Create('minKeymanDesktopVersion field should not be present');
-
     if v.Value <> MinVersionString then
-      raise EInvalidKeyboardInfo.CreateFmt('minKeymanDesktopVersion field is "%s" but should be "%s"', [v.Value, MinVersionString]);
+      raise EInvalidKeyboardInfo.CreateFmt('minKeymanVersion field is "%s" but should be "%s"', [v.Value, MinVersionString]);
   end
   else
-  begin
-    if Length(FKMXFiles) = 0 then Exit;
-    json.AddPair('minKeymanDesktopVersion', MinVersionString);
-  end;
+    json.AddPair('minKeymanVersion', MinVersionString);
 end;
 
 //
