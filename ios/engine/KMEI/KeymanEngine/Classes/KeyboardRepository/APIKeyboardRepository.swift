@@ -24,10 +24,12 @@ public class APIKeyboardRepository: KeyboardRepository {
 
   public func fetch(completionHandler: CompletionHandler?) {
     let deviceType = UIDevice.current.userInterfaceIdiom == .phone ? "iphone" : "ipad"
+    let keymanVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     var urlComponents = languagesAPIURL
     urlComponents.queryItems = [
       URLQueryItem(name: "dateformat", value: "seconds"),
-      URLQueryItem(name: "device", value: deviceType)
+      URLQueryItem(name: "device", value: deviceType),
+      URLQueryItem(name: "version", value: keymanVersion)
     ]
     log.info("Connecting to Keyman cloud: \(urlComponents.url!).")
     let task = URLSession.shared.dataTask(with: urlComponents.url!) { (data, response, error) in
