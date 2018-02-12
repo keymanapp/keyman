@@ -1,6 +1,24 @@
 /// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
 
+class OSKKeySpec {
+  id: string;
+  text?: string;
+  sp?: string;
+  width: string;
+  nextlayer?: string;
+  pad?: string;
+
+  constructor(id: string, text?: string, width?: string, sp?: string, nextlayer?: string, pad?: string) {
+    this.id = id;
+    this.text = text;
+    this.width = width ? width : "50";
+    this.sp = sp;
+    this.nextlayer = nextlayer;
+    this.pad = pad;
+  }
+}
+
 /***
    KeymanWeb 10.0
    Copyright 2017 SIL International
@@ -133,6 +151,24 @@ if(!window['keyman']['initialized']) {
       '*RAltShift*':      0x68,
       '*LCtrlShift*':     0x69,
       '*RCtrlShift*':     0x70
+    };
+   
+    osk.modifierSpecials = {
+      'leftalt': '*LAlt*',
+      'rightalt': '*RAlt*',
+      'leftctrl': '*LCtrl*',
+      'rightctrl': '*RCtrl*',
+      'leftctrl-leftalt': '*LAltCtrl*',
+      'rightctrl-rightalt': '*RAltCtrl*',
+      'leftctrl-leftalt-shift': '*LAltCtrlShift*',
+      'rightctrl-rightalt-shift': '*RAltCtrlShift*',
+      'shift-alt': '*AltShift*',
+      'shift-ctrl': '*CtrlShift*',
+      'shift-ctrl-alt': '*AltCtrlShift*',
+      'leftalt-shift': '*LAltShift*',
+      'rightalt-shift': '*RAltShift*',
+      'leftctrl-shift': '*LCtrlShift*',
+      'rightctrl-shift': '*RCtrlShift*'
     };
 
     var codesUS=[['0123456789',';=,-./`','[\\]\''],[')!@#$%^&*(',':+<_>?~','{|}"']];
@@ -3050,7 +3086,8 @@ if(!window['keyman']['initialized']) {
       var i, j, k, m, row, rows, key, keys;
       var chiral = (kbdBitmask & osk.modifierBitmasks.IS_CHIRAL);
 
-      if(typeof keyLabels == 'undefined' || !keyLabels) {
+      var kmw10Plus = !(typeof keyLabels == 'undefined' || !keyLabels);
+      if(!kmw10Plus) {
         keyLabels = osk.processLegacyDefinitions(PVK['BK']);
       }
 
@@ -3083,6 +3120,41 @@ if(!window['keyman']['initialized']) {
       }
 
       var idList = validIdList.concat(invalidIdList);
+
+      if(kmw10Plus && formFactor != 'desktop') { // KLS exists, so we know the exact layer set.
+        // Find the SHIFT key...
+        var shiftKey = null;
+
+        rows = layers[0]['row'];
+        for(var r=0; r < rows.length; r++) {
+          keys = rows[r]['key'];
+          for(var c=0; c < keys.length; c++) {
+            key = keys[c];
+            if(key['id'] == 'K_SHIFT') {
+              shiftKey = key;
+            }
+          }
+        }
+
+        if(shiftKey) {
+          // Erase the legacy shifted subkey array.
+          shiftKey['sk'] = [];
+
+          for(var layerID in keyLabels) {            
+            if(layerID == 'default' || layerID == 'shift') {
+              // These two are accessible from the layer without subkeys.
+              continue;
+            }
+
+            // Create a new subkey for the specified layer so that it will be accessible via OSK.
+            var specialChar = osk.modifierSpecials[layerID];
+            shiftKey['sk'].push(new OSKKeySpec("K_" + specialChar, specialChar, null, "1", layerID));
+          }
+        } else {
+          // Seriously, this should never happen.  It's here for the debugging log only.
+          console.warn("Error in default layout - cannot find default Shift key!");
+        }
+      }
 
       for(n=0; n<idList.length; n++) {
         // Populate non-default (shifted) keygroups
@@ -3179,15 +3251,7 @@ if(!window['keyman']['initialized']) {
           if(n > 0 && shiftKey != null) {
             shiftKey['sp']=osk.buttonClasses['SHIFT-ON'];
             shiftKey['sk']=null;
-            // TODO:  May need extending/modification for chirality modes!
-            switch(layers[n].id) {
-              case 'ctrl':
-                shiftKey['text']='*Ctrl*'; break;
-              case 'alt':
-                shiftKey['text']='*Alt*'; break;
-              case 'ctrl-alt':
-                shiftKey['text']='*AltGr*'; break;
-            };
+            shiftKey['text'] = osk.modifierSpecials[layers[n].id];
           }
         }
       }
