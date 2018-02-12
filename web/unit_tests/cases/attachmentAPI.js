@@ -86,10 +86,7 @@ Modernizr.on('touchevents', function(result) {
 				this.timeout(10000);
 
 				fixture.setBase('unit_tests/fixtures');
-				setupKMW({ attachType:'auto' });
-
-				// Pass the initTimer method our 'done' callback so it can handle our initialization delays for us.
-				initTimer(done);
+				setupKMW({ attachType:'auto' }, done, 10000);
 			});
 			
 			beforeEach(function() {
@@ -155,10 +152,7 @@ Modernizr.on('touchevents', function(result) {
 				this.timeout(10000);
 
 				fixture.setBase('unit_tests/fixtures');
-				setupKMW({ attachType:'auto' });
-
-				// Pass the initTimer method our 'done' callback so it can handle our initialization delays for us.
-				initTimer(done);
+				setupKMW({ attachType:'auto' }, done, 10000);
 			});
 			
 			beforeEach(function() {

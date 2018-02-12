@@ -7,10 +7,7 @@ describe('Basic KeymanWeb', function() {
 
     fixture.setBase('unit_tests/fixtures');
     fixture.load("singleInput.html");
-    setupKMW();
-
-    // Pass the initTimer method our 'done' callback so it can handle our initialization delays for us.
-    initTimer(done);
+    setupKMW(null, done, 10000);
   });
   
   afterEach(function() {
@@ -38,9 +35,7 @@ Modernizr.on('touchevents', function(result) {
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('toggle');
-
-        initTimer(done);
+        setupKMW('toggle', done, 10000, function() { return keyman.ui.initialized; });
       });
       
       afterEach(function() {
@@ -73,9 +68,7 @@ Modernizr.on('touchevents', function(result) {
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('button');
-
-        initTimer(done);
+        setupKMW('button', done, 10000, function() { return keyman.ui.init; });
       });
       
       afterEach(function() {
@@ -95,9 +88,7 @@ Modernizr.on('touchevents', function(result) {
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('float');
-
-        initTimer(done);
+        setupKMW('float', done, 10000, function() { return keyman.ui.initialized; });
       });
       
       afterEach(function() {
@@ -130,10 +121,7 @@ Modernizr.on('touchevents', function(result) {
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('toolbar');
-
-        // The Toolbar UI has extra-special init to do... may as well feed it more time.
-        initTimer(done, 2500);
+        setupKMW('toolbar', done, 10000, function() { return keyman.ui.init; });
       });
       
       afterEach(function() {

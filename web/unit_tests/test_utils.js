@@ -1,7 +1,7 @@
-var setupKMW = function(kmwOptions) {
+var setupKMW = function(kmwOptions, done, timeout, uiInitCheck) {
   var ui;
 
-  if(typeof(kmwOptions) == 'string' || typeof(kmwOptions) == 'undefined') {
+  if(typeof(kmwOptions) == 'string' || typeof(kmwOptions) == 'undefined' || kmwOptions == null) {
     ui = kmwOptions;
 
     var kmwOptions = {
@@ -15,7 +15,7 @@ var setupKMW = function(kmwOptions) {
     }
   }
 
-  var kmw = setupScript('source/keymanweb.js');
+  var kmw = setupScript('source/keymanweb.js', done, timeout, uiInitCheck);
   fixture.el.appendChild(kmw);
 
   ui = kmwOptions.ui;
@@ -46,14 +46,17 @@ var setupKMW = function(kmwOptions) {
    */
   window.setTimeout(function() {
     initFunc();
-  }, 5);
+  }, 8);
 }
 
-var setupScript = function(src) {
+var setupScript = function(src, done, timeout, uiInitCheck) {
   var Lscript = document.createElement('script');
   Lscript.charset="UTF-8";        // KMEW-89
   Lscript.type = 'text/javascript';
   Lscript.async = false;
+  if(done) {
+    Lscript.onload = initTimer(done, timeout, uiInitCheck);
+  }
 
   Lscript.src = src;
 
@@ -67,15 +70,49 @@ var teardownKMW = function() {
 }
 
 // Make sure the main script loads...
-var initTimer = function(done, timeout) {
-  window.setTimeout(function() {
-    if(window['keyman']) {
-      // ... and then give KMW and the UI a bit more time to init and attach.
+var initTimer = function(done, timeout, uiInitCheck) {
+  var uiLoadDelay;
+  if(typeof(uiInitCheck) != 'function') {
+    uiInitCheck = function() { return true; };
+    uiLoadDelay = false;
+  } else {
+    uiLoadDelay = true;
+  }
+
+  // We need managed state for this.
+  var InitializationManager = function() {
+    this.killSwitch = false;
+
+    this.initCheckCallback = function() {
+      if(window['keyman'] && window['keyman'].initialized == 2 && uiInitCheck()) {
+        if(done) {
+          this.timer = window.setTimeout(function() { 
+            // There can be some odd cross-interference with the UI modules and their initialization.
+            // We use a significant delay here to avoid said problems.
+            done();
+          }, uiLoadDelay ? 2000 : 0);
+        }
+      } else if(!this.killSwitch) {
+        this.timer = window.setTimeout(this.initCheckCallback, 50);
+      }
+    }.bind(this);
+
+    if(timeout) {
       window.setTimeout(function() {
-        done();
-      }, timeout ? timeout : 1000);
-    } else {
-      initTimer(done);
+        this.killSwitch = true;
+
+        if(this.observer) {
+          this.observer.end();
+        }
+
+        if(this.timer) {
+          window.clearTimeout(this.timer);
+          this.timer = 0;
+        }
+      }.bind(this), timeout);
     }
-  }, 50);
+  }
+
+  var im = new InitializationManager();
+  return im.initCheckCallback;
 };
