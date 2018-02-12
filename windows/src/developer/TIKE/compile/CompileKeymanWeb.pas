@@ -1536,6 +1536,7 @@ begin
     '%s%s%s'+
     '%sthis.KI="%s";%s'+
     '%sthis.KN="%s";%s'+
+    '%sthis.KMINVER="%d.%d";%s'+
     '%sthis.KV=%s;%s'+
     '%sthis.KH=%s;%s'+
     '%sthis.KM=%d;%s'+
@@ -1551,6 +1552,7 @@ begin
     FTabStop, JavaScript_SetupDebug, nl,
     FTabStop, sName, nl,
     FTabStop, RequotedString(sFullName), nl,
+    FTabStop, (fk.version and VERSION_MASK_MAJOR) shr 8, fk.version and VERSION_MASK_MINOR, nl,
     FTabStop, sVisualKeyboard, nl,
     FTabStop, sHelp, nl,
     FTabStop, vMnemonic, nl,

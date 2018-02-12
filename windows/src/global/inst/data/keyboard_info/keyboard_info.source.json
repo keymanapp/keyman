@@ -28,7 +28,7 @@
         "encodings": { "type": "array", "items": { "type": "string", "enum": ["ansi", "unicode"] }, "additionalItems": false },
         "packageIncludes": { "type": "array", "items": { "type": "string", "enum": ["welcome", "documentation", "fonts", "visualKeyboard"] }, "additionalItems": false },
         "version": { "type": "string" },
-        "minKeymanDesktopVersion": { "type": "string", "pattern": "^\\d+\\.0$" },
+        "minKeymanVersion": { "type": "string", "pattern": "^\\d+\\.0$" },
         "platformSupport": { "$ref": "#/definitions/KeyboardPlatformInfo" },
         "legacyId": { "type": "number" },
         "sourcePath": { "type": "string", "pattern": "^(release|legacy|experimental)/.+/.+$" },
