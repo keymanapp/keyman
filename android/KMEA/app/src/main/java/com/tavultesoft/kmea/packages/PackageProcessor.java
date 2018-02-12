@@ -139,6 +139,13 @@ public class PackageProcessor {
 
         // For now, all KMP distributed keyboards are custom
         keyboards[i].put(KMManager.KMKey_CustomKeyboard, "Y");
+        if (welcomeExists(packageId)) {
+          File kmpFile = new File(packageId + ".kmp");
+          File packageDir = constructPath(kmpFile, false);
+          File welcomeFile = new File(packageDir, "welcome.htm");
+          // Only storing relative instead of absolute paths as a convenience for unit tests.
+          keyboards[i].put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
+        }
       }
       return keyboards;
     } else {
@@ -325,6 +332,29 @@ public class PackageProcessor {
       File kmpFile = new File(packageId + ".kmp");
       File packageDir = constructPath(kmpFile, false);
       File[] files = packageDir.listFiles(touchKeyboardFilter);
+      if (files.length > 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  static boolean welcomeExists(final String packageId) {
+    if (resourceRoot != null) {
+      FileFilter welcomeFilter = new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+          if (pathname.isFile() && pathname.getName().equals("welcome.htm")) {
+            return true;
+          }
+          return false;
+        }
+      };
+
+      File kmpFile = new File(packageId + ".kmp");
+      File packageDir = constructPath(kmpFile, false);
+      File[] files = packageDir.listFiles(welcomeFilter);
       if (files.length > 0) {
         return true;
       }
