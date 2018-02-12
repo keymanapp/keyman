@@ -23,7 +23,11 @@
     [super windowDidLoad];
     
     [self.webView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
-    [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://secure.tavultesoft.com/prog/macosx/10/downloadkeyboards/"]]];
+    
+    NSString *url;
+    url = [NSString stringWithFormat:@"https://keyman.com/go/macos/10.0//download-keyboards/?version=%@", [info objectForKey:@"HeaderTitle"]];    
+    NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+    NSString *build = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString *)kCFBundleVersionKey];
 }
 
 @end
