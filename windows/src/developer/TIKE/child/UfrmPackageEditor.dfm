@@ -174,7 +174,6 @@ inherited frmPackageEditor: TfrmPackageEditor
   KeyPreview = True
   OnKeyDown = FormKeyDown
   ExplicitWidth = 681
-  ExplicitHeight = 447
   PixelsPerInch = 96
   TextHeight = 13
   object pages: TLeftTabbedPageControl
@@ -182,7 +181,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 681
     Height = 447
-    ActivePage = pageFiles
+    ActivePage = pageDetails
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -550,7 +549,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           447)
         object lblKMPImageFile: TLabel
           Left = 15
-          Top = 303
+          Top = 327
           Width = 53
           Height = 13
           Caption = 'Image file:'
@@ -558,7 +557,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object lblKMPImageSize: TLabel
           Left = 108
-          Top = 324
+          Top = 348
           Width = 92
           Height = 13
           Caption = 'Image size: (w x h)'
@@ -587,28 +586,28 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object lblStep2d: TLabel
           Left = 15
-          Top = 179
+          Top = 203
           Width = 54
           Height = 13
           Caption = 'Copyright:'
         end
         object lblStep2e: TLabel
           Left = 15
-          Top = 211
+          Top = 235
           Width = 39
           Height = 13
           Caption = 'Author:'
         end
         object lblStep2f: TLabel
           Left = 15
-          Top = 235
+          Top = 259
           Width = 77
           Height = 13
           Caption = 'E-mail address:'
         end
         object lblStep2g: TLabel
           Left = 15
-          Top = 259
+          Top = 283
           Width = 49
           Height = 13
           Caption = 'Web Site:'
@@ -691,59 +690,59 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object editInfoCopyright: TEdit
           Left = 108
-          Top = 176
-          Width = 215
-          Height = 21
-          Anchors = [akLeft, akTop, akRight]
-          TabOrder = 3
-          Text = #169
-          OnChange = editInfoCopyrightChange
-        end
-        object editInfoAuthor: TEdit
-          Left = 108
-          Top = 208
+          Top = 200
           Width = 215
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 4
-          OnChange = editInfoAuthorChange
+          Text = #169
+          OnChange = editInfoCopyrightChange
         end
-        object editInfoEmail: TEdit
+        object editInfoAuthor: TEdit
           Left = 108
           Top = 232
           Width = 215
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 5
-          OnChange = editInfoEmailChange
+          OnChange = editInfoAuthorChange
         end
-        object editInfoWebSite: TEdit
+        object editInfoEmail: TEdit
           Left = 108
           Top = 256
           Width = 215
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 6
+          OnChange = editInfoEmailChange
+        end
+        object editInfoWebSite: TEdit
+          Left = 108
+          Top = 280
+          Width = 215
+          Height = 21
+          Anchors = [akLeft, akTop, akRight]
+          TabOrder = 7
           OnChange = editInfoWebSiteChange
         end
         object cmdInsertCopyright: TButton
           Left = 330
-          Top = 176
+          Top = 200
           Width = 49
           Height = 21
           Anchors = [akTop, akRight]
           Caption = '&Insert '#169
-          TabOrder = 7
+          TabOrder = 8
           OnClick = cmdInsertCopyrightClick
         end
         object cbKMPImageFile: TComboBox
           Left = 108
-          Top = 300
+          Top = 324
           Width = 215
           Height = 21
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
-          TabOrder = 8
+          TabOrder = 9
           OnClick = cbKMPImageFileClick
         end
         object panKMPImageSample: TPanel
@@ -753,13 +752,22 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 251
           Anchors = [akTop, akRight]
           BevelOuter = bvLowered
-          TabOrder = 9
+          TabOrder = 10
           object imgKMPSample: TImage
             Left = 1
             Top = 0
             Width = 140
             Height = 250
           end
+        end
+        object chkFollowKeyboardVersion: TCheckBox
+          Left = 108
+          Top = 178
+          Width = 237
+          Height = 17
+          Caption = 'Package version follows keyboard version'
+          TabOrder = 3
+          OnClick = chkFollowKeyboardVersionClick
         end
       end
     end
@@ -1075,22 +1083,22 @@ inherited frmPackageEditor: TfrmPackageEditor
     Filter = 'All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Add Files'
-    Left = 208
-    Top = 156
+    Left = 592
+    Top = 340
   end
   object dlgNewCustomisation: TSaveDialog
     DefaultExt = 'kct'
     Filter = 'Customisation file (*.kct)|*.kct|All files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
-    Left = 208
-    Top = 188
+    Left = 592
+    Top = 380
   end
   object dlgOpenProductInstaller: TOpenDialog
     DefaultExt = 'msi'
     Filter = 'Product Installer Files (*.msi)|*.msi|All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Select Product Installer'
-    Left = 208
-    Top = 120
+    Left = 592
+    Top = 304
   end
 end

@@ -273,7 +273,7 @@ begin
   str := TStringList.Create;
   with TRegistryErrorControlled.Create do // I2890
     try
-      if OpenKeyReadOnly(SRegKey_KeymanEngineDiag) then
+      if OpenKeyReadOnly(SRegKey_KeymanEngineDiag_CU) then
       begin
         GetValueNames(str);
         m := str.Count;
@@ -312,7 +312,7 @@ begin
 
   with TRegistryErrorControlled.Create do // I2890
     try
-      FHasKey := OpenKey(SRegKey_KeymanEngineDiag, False);
+      FHasKey := OpenKey(SRegKey_KeymanEngineDiag_CU, False);
 
       for i := 0 to FSIList.Files.Count - 1 do
       begin

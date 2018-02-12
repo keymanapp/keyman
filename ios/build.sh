@@ -123,13 +123,20 @@ update_bundle ( ) {
         base_dir="$(pwd)"
 
         cd $KMW_SOURCE
-        ./build.sh -embed
+
+        if [ "$CONFIG" == "Debug" ]; then
+          KMWFLAGS="-debug_embedded"
+        else
+          KMWFLAGS="-embed"
+        fi
+
+        ./build.sh $KMWFLAGS
         if [ $? -ne 0 ]; then
             fail "ERROR:  KeymanWeb's build.sh failed."
         fi
 
         #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
-        cd ../embedded
+        cd ../release/embedded
         cp resources/osk/kmwosk.css        "$base_dir/$BUNDLE_PATH/kmwosk.css"
         cp resources/osk/keymanweb-osk.ttf "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
         cp keyman.js                       "$base_dir/$BUNDLE_PATH/keymanios.js"

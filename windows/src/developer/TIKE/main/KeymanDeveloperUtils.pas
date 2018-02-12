@@ -199,7 +199,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_IDEOptions) then  // I2890
+    if OpenKeyReadOnly(SRegKey_IDEOptions_CU) then  // I2890
     try
       if not ValueExists(SRegValue_IDEOptShowStartupDialog) then Result := True
       else Result := ReadString(SRegValue_IDEOptShowStartupDialog) = '1';
@@ -221,7 +221,7 @@ var
 begin
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKeyReadOnly(SRegKey_IDEOptions) and ValueExists(SRegValue_IDEOptMultipleInstances)
+    if OpenKeyReadOnly(SRegKey_IDEOptions_CU) and ValueExists(SRegValue_IDEOptMultipleInstances)
       then FMultiInstance := ReadString(SRegValue_IDEOptMultipleInstances) = '1'
       else FMultiInstance := False;
   finally
@@ -243,7 +243,7 @@ begin
       with TRegistryErrorControlled.Create do  // I2890
       try
         RootKey := HKEY_CURRENT_USER;
-        if not OpenKey(SRegKey_IDEFiles, True) then  // I2890
+        if not OpenKey(SRegKey_IDEFiles_CU, True) then  // I2890
           RaiseLastRegistryError;
         for i := 1 to ParamCount do
         begin
@@ -423,7 +423,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeymanEngine) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) then
       if ValueExists(SRegValue_RootPath) then
         RootPath := ReadString(SRegValue_RootPath);
   finally
@@ -565,12 +565,12 @@ end;
 
 procedure RemoveOldestTikeEditFonts(FMaxLessOne: Boolean);
 begin
-  RemoveOldestTikeFonts(FMaxLessOne, SRegKey_IDEEditFonts);
+  RemoveOldestTikeFonts(FMaxLessOne, SRegKey_IDEEditFonts_CU);
 end;
 
 procedure RemoveOldestTikeTestFonts(FMaxLessOne: Boolean);
 begin
-  RemoveOldestTikeFonts(FMaxLessOne, SRegKey_IDETestFonts);
+  RemoveOldestTikeFonts(FMaxLessOne, SRegKey_IDETestFonts_CU);
 end;
 
 const  // I3283   // I3503

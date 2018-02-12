@@ -28,7 +28,7 @@ uses
 
 procedure TfrmCharacterMapDock.FormCreate(Sender: TObject);
 begin
-  frmCharacterMapNew := TfrmCharacterMapNew.Create(Self, SRegKey_IDECharacterMap);
+  frmCharacterMapNew := TfrmCharacterMapNew.Create(Self, SRegKey_IDECharacterMap_CU);
   frmCharacterMapNew.Align := alClient;
   frmCharacterMapNew.BorderStyle := bsNone;
   frmCharacterMapNew.Parent := Self;

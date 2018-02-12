@@ -104,7 +104,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeymanDesktop) and ValueExists(SRegValue_CharMapSourceData)
+    if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) and ValueExists(SRegValue_CharMapSourceData)
       then Result := IncludeTrailingPathDelimiter(ReadString(SRegValue_CharMapSourceData));
   finally
     Free;
@@ -178,7 +178,7 @@ begin
   s := GetUnicodeSourceRootPath;
   CreateUnicodeData(s, Self, s);
 
-  frmCharacterMapNew := TfrmCharacterMapNew.Create(Self, SRegKey_KeymanOSK_CharMap);
+  frmCharacterMapNew := TfrmCharacterMapNew.Create(Self, SRegKey_KeymanOSK_CharMap_CU);
   frmCharacterMapNew.BorderStyle := bsNone;
   frmCharacterMapNew.Align := alClient;
   frmCharacterMapNew.Parent := Self;

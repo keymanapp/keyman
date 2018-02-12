@@ -6,6 +6,9 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+#ifndef KMXFile_h
+#define KMXFile_h
+
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 #import "KMBinaryFileFormat.h"
@@ -38,9 +41,11 @@ extern NSString *const kKMVisualKeyboardKey;
 
 /*!
 * Provides an info dictionary from a KMX file which includes keyboard name, version, copyright information and keyboard icon.
-* \param path: KMX file path
+* \param path KMX file path
 * \returns NSDictionary with keyboard name, version, copyright & icon.
 */
 + (NSDictionary *)infoDictionaryFromFilePath:(NSString *)path;
 
 @end
+
+#endif /* KMXFile_h */

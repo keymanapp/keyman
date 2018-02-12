@@ -4,24 +4,15 @@
 
 package com.tavultesoft.kmea;
 
-import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,7 +24,6 @@ import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
@@ -53,9 +43,11 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
-import com.tavultesoft.kmea.util.Connection;
+import com.tavultesoft.kmea.packages.PackageProcessor;
+import com.tavultesoft.kmea.util.FileUtils;
+
+import org.json.JSONObject;
 
 public final class KMManager {
 
@@ -86,7 +78,6 @@ public final class KMManager {
   private static InputMethodService IMService;
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
-  private static ArrayList<OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
   private static boolean didCopyAssets = false;
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
@@ -100,9 +91,6 @@ public final class KMManager {
   protected static KMKeyboard InAppKeyboard = null;
   protected static KMKeyboard SystemKeyboard = null;
 
-  protected static final String kKeymanApiBaseURL = "https://r.keymanweb.com/api/3.0/";
-  private static final String kKeymanApiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url=";
-
   // Keyman public keys
   public static final String KMKey_ID = "id";
   public static final String KMKey_Name = "name";
@@ -112,18 +100,13 @@ public final class KMManager {
   public static final String KMKey_KeyboardID = "kbId";
   public static final String KMKey_KeyboardName = "kbName";
   public static final String KMKey_KeyboardVersion = "version";
-  public static final String KMKey_Keyboard = "keyboard";
-  public static final String KMKey_LanguageKeyboards = "keyboards";
   public static final String KMKey_KeyboardFileSize = "fileSize";
   public static final String KMKey_Font = "font";
   public static final String KMKey_OskFont = "oskFont";
+  public static final String KMKey_DisplayFont = "displayFont";
   public static final String KMKey_FontFamily = "family";
   public static final String KMKey_FontSource = "source";
   public static final String KMKey_FontFiles = "files";
-  public static final String KMKey_Options = "options";
-  public static final String KMKey_Language = "language";
-  public static final String KMKey_Languages = "languages";
-  public static final String KMKey_Filename = "filename";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
   public static final String KMKey_CustomKeyboard = "CustomKeyboard";
@@ -131,21 +114,18 @@ public final class KMManager {
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
 
   // Keyman internal keys
-  protected static final String KMKey_KeyboardBaseURI = "keyboardBaseUri";
-  protected static final String KMKey_FontBaseURI = "fontBaseUri";
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
 
   // Default Asset Paths
   // Previous keyboards installed from the cloud  went to /languages/ and /fonts/
-  // Keyboards now get installed into /packages/packageID.
-  // If a legacy keyboard has an undefined packageID, it will default to "cloud"
+  // Keyboards now get installed into /packages/packageID/
+  // Keyboards that have an undefined packageID are installed into /cloud/
   public static final String KMDefault_LegacyAssetLanguages = "languages";
   public static final String KMDefault_LegacyAssetFonts = "fonts";
-  public static final String KMDefault_LegacyPackageID = "cloud";
+  public static final String KMDefault_UndefinedPackageID = "cloud";
   public static final String KMDefault_AssetPackages = "packages";
 
   // Default Keyboard Info
-  public static final String KMDefault_PackageID = "european";
   public static final String KMDefault_KeyboardID = "european2";
   public static final String KMDefault_LanguageID = "eng";
   public static final String KMDefault_KeyboardName = "EuroLatin2 Keyboard";
@@ -166,6 +146,26 @@ public final class KMManager {
     return KMEngineVersion;
   }
 
+  protected static String getResourceRoot() {
+    return appContext.getDir("data", Context.MODE_PRIVATE).toString() + File.separator;
+  }
+
+  protected static String getPackagesDir() {
+    return getResourceRoot() + KMDefault_AssetPackages + File.separator;
+  }
+
+  protected static String getCloudDir() {
+    return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
+  }
+
+  // Check if a keyboard namespace is reserved
+  public static boolean isReservedNamespace(String packageID) {
+    if (packageID.equals(KMDefault_UndefinedPackageID)) {
+      return true;
+    }
+    return false;
+  }
+
   public static void initialize(Context context, KeyboardType keyboardType) {
     appContext = context.getApplicationContext();
 
@@ -183,10 +183,10 @@ public final class KMManager {
     } else {
       Log.w("KMManager", "Cannot initialize: Invalid keyboard type");
     }
-  }
 
-  public static File getResourceRoot() {
-    return new File(appContext.getDir("data", Context.MODE_PRIVATE) + File.separator);
+    // Initializes the PackageProcessor with the base resource directory, which is the parent directory
+    // for the final location corresponding to KMDefault_AssetPackages.
+    PackageProcessor.initialize(new File(getResourceRoot()));
   }
 
   public static void setInputMethodService(InputMethodService service) {
@@ -362,7 +362,6 @@ public final class KMManager {
   private static void copyAssets(Context context) {
     AssetManager assetManager = context.getAssets();
     try {
-      File file;
       // Copy main files
       copyAsset(context, KMFilename_KeyboardHtml, "", true);
       copyAsset(context, KMFilename_JSEngine, "", true);
@@ -370,23 +369,19 @@ public final class KMManager {
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
       copyAsset(context, KMFilename_Osk_Woff_Font, "", true);
 
-      // Copy default keyboard assets
-      String packagesDir = context.getDir("data", Context.MODE_PRIVATE) + File.separator + KMDefault_AssetPackages;
-      file = new File(packagesDir);
-      if (!file.exists()) {
-        file.mkdir();
+      File packagesDir = new File(getPackagesDir());
+      if (!packagesDir.exists()) {
+        packagesDir.mkdir();
       }
-      String[] packageIDs = assetManager.list(KMDefault_AssetPackages);
-      for (String packageID : packageIDs) {
-        file = new File(packagesDir + File.separator + packageID);
-        if (!file.exists()) {
-          file.mkdir();
-        }
-        String packageDir = KMDefault_AssetPackages + File.separator + packageID;
-        String[] languageFiles = assetManager.list(packageDir);
-        for (String filename : languageFiles) {
-          copyAsset(context, filename, packageDir, true);
-        }
+
+      // Copy default cloud keyboard
+      File cloudDir = new File(getCloudDir());
+      if (!cloudDir.exists()) {
+        cloudDir.mkdir();
+      }
+      String[] keyboardFiles = assetManager.list(KMDefault_UndefinedPackageID);
+      for (String keyboardFile : keyboardFiles) {
+        copyAsset(context, keyboardFile, KMDefault_UndefinedPackageID, true);
       }
     } catch (Exception e) {
       Log.e("Failed to copy assets", "Error: " + e);
@@ -405,107 +400,114 @@ public final class KMManager {
       String dirPath;
       if (directory.length() != 0) {
         directory = directory + File.separator;
-        dirPath = context.getDir("data", Context.MODE_PRIVATE) + File.separator + directory;
+        dirPath = getResourceRoot() + directory;
       } else {
-        dirPath = context.getDir("data", Context.MODE_PRIVATE).toString();
+        dirPath = getResourceRoot();
       }
 
       File file = new File(dirPath, filename);
       if (!file.exists() || overwrite) {
         InputStream inputStream = assetManager.open(directory + filename);
         FileOutputStream outputStream = new FileOutputStream(file);
-        copyFile(inputStream, outputStream);
+        FileUtils.copy(inputStream, outputStream);
 
         result = 1;
       } else {
         result = 0;
       }
     } catch (Exception e) {
-      Log.e("Failed to copy asset", "Error: " + e);
+      Log.e("KMManager", "Failed to copy asset. Error: " + e);
       result = -1;
     }
     return result;
   }
 
-  private static void copyFile(InputStream inputStream, OutputStream outputStream) throws IOException {
-    byte[] buffer = new byte[1024];
-    int read;
-    while ((read = inputStream.read(buffer)) != -1) {
-      outputStream.write(buffer, 0, read);
-    }
-  }
-
   /**
-   * Migrates legacy keyboards in the /languages/ directory so that:
+   * Migrates legacy keyboards in the /languages/ and /fonts/ directories so that:
    * 1) Default eurolatin2 or us.js keyboards are deleted
    * 2) Keyboards missing a version number are assigned "-1.0"
-   * 3) Remaining keyboards are moved to /packages/cloud (default packageID of "cloud")
+   * 3) Remaining keyboards are moved to /cloud/ (default packageID of "cloud")
+   * 4) Remove legacy /languages/ and /fonts/ directories
    *
-   * Fonts used in legacy keyboards are also migrated from /fonts/ to /packages/cloud
+   * Fonts used in legacy keyboards are also migrated from /fonts/ to /cloud/
    *
    * Assumption: No legacy keyboards exist in /packages/*.js
    * @param context
    */
   private static void migrateOldKeyboardFiles(Context context) {
-    String legacyLanguagesPath = context.getDir("data", Context.MODE_PRIVATE) + File.separator +
-      KMDefault_LegacyAssetLanguages + File.separator;
-    String legacyFontsPath = context.getDir("data", Context.MODE_PRIVATE) + File.separator +
-      KMDefault_LegacyAssetFonts + File.separator;
+    String legacyLanguagesPath = getResourceRoot() + KMDefault_LegacyAssetLanguages + File.separator;
+    String legacyFontsPath = getResourceRoot() + KMDefault_LegacyAssetFonts + File.separator;
     File legacyLanguagesDir = new File(legacyLanguagesPath);
     File legacyFontsDir = new File(legacyFontsPath);
     if (!legacyLanguagesDir.exists() && !legacyFontsDir.exists()) {
       return;
     }
 
-    String migratedPath = context.getDir("data", Context.MODE_PRIVATE) + File.separator +
-      KMDefault_AssetPackages + File.separator + KMDefault_LegacyPackageID;
-    File migratedDir = new File(migratedPath);
+    File migratedDir = new File(getCloudDir());
     if (!migratedDir.exists()) {
       migratedDir.mkdir();
     }
 
-    String[] files = legacyLanguagesDir.list();
-    for (String filename : files) {
-      // Handle keyboards missing version number
-      if (filename.lastIndexOf("-") < 0) {
-        if (filename.equals("us.js")) {
-          File kbFile = new File(legacyLanguagesPath, filename);
-          kbFile.delete();
-        } else if (filename.endsWith(".js")) {
-          // Append default version number to keyboard and move
-          String newFilename = filename.substring(0, filename.lastIndexOf(".js")) + "-1.0.js";
-          File kbFile = new File(legacyLanguagesPath, filename);
-          kbFile.renameTo(new File(migratedDir, newFilename));
-        }
-      // Handle keyboards with version number
-      } else {
-        // Remove legacy default keyboards
-        if (filename.startsWith(KMDefault_KeyboardID + "-")) {
-          File legacyKbFile = new File(legacyLanguagesDir, filename);
-          if (legacyKbFile.exists()) {
-            legacyKbFile.delete();
-            continue;
+    try {
+      if (legacyLanguagesDir.exists()) {
+        FileFilter keyboardFilter = new FileFilter() {
+          @Override
+          public boolean accept(File pathname) {
+            if (pathname.isFile() && pathname.getName().endsWith(".js")) {
+              return true;
+            }
+            return false;
           }
+        };
+
+        File[] files = legacyLanguagesDir.listFiles(keyboardFilter);
+        for (File file : files) {
+          String filename = file.getName();
+
+          // Keyboards can have filenames "keyboardID.js" or "keyboardID-version.js"
+          boolean versionNumberMissing = filename.lastIndexOf("-") < 0;
+          String keyboardID = (versionNumberMissing) ? filename.substring(0, filename.length() - 4) :
+            filename.substring(0, filename.indexOf("-"));
+
+          // Handle keyboards missing version number
+          if (versionNumberMissing) {
+            if (filename.equals("us.js")) {
+              file.delete();
+            } else {
+              // Append default version number to keyboard and move
+              filename = filename.substring(0, filename.lastIndexOf(".js")) + "-1.0.js";
+              File migratedFile = new File(migratedDir, filename);
+              if (!migratedFile.exists()) {
+                file.renameTo(new File(migratedDir, filename));
+              }
+            }
+            // Handle keyboards with version number
+          } else {
+            // Remove legacy default keyboards
+            if (filename.startsWith(KMDefault_KeyboardID + "-")) {
+              file.delete();
+              continue;
+            }
+
+            // Migrate /languages/*.js keyboards
+            File migratedFile = new File(migratedDir, filename);
+            if (!migratedFile.exists()) {
+              file.renameTo(new File(migratedDir, filename));
+            }
+          }
+
         }
 
-        // Migrate /languages/*.js keyboards
-        File kbFile = new File(legacyLanguagesPath, filename);
-        kbFile.renameTo(new File(migratedDir, filename));
+        FileUtils.deleteDirectory(legacyLanguagesDir);
       }
-    }
 
-    files = legacyFontsDir.list();
-    for (String filename : files) {
-      File fontFile = new File(legacyFontsPath, filename);
-      fontFile.renameTo(new File(migratedDir, filename));
-    }
-
-    // Cleanup empty directories
-    if (legacyLanguagesDir.list().length == 0) {
-      legacyLanguagesDir.delete();
-    }
-    if (legacyFontsDir.list().length == 0) {
-      legacyFontsDir.delete();
+      // Migrate legacy fonts
+      if (legacyFontsDir.exists()) {
+        FileUtils.copyDirectory(legacyFontsDir, migratedDir);
+        FileUtils.deleteDirectory(legacyFontsDir);
+      }
+    } catch (IOException e) {
+      Log.e("KMManager", "Failed to migrate assets. Error: " + e);
     }
   }
 
@@ -518,13 +520,14 @@ public final class KMManager {
       String kbID = kbInfo.get(KMKey_KeyboardID);
       if (kbID.equals("us")) {
         HashMap<String, String> newKbInfo = new HashMap<String, String>();
-        newKbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_PackageID);
+        newKbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
         newKbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
         newKbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
         newKbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
         newKbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
         newKbInfo.put(KMManager.KMKey_KeyboardVersion,
-          getLatestKeyboardFileVersion(context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID));
+          getLatestKeyboardFileVersion(context, KMManager.KMDefault_UndefinedPackageID,
+            KMManager.KMDefault_KeyboardID));
         newKbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
         newKbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
         kbList.set(0, newKbInfo);
@@ -540,11 +543,7 @@ public final class KMManager {
         kbID = kbInfo.get(KMKey_KeyboardID);
         String pkgID = kbInfo.get(KMKey_PackageID);
         if (pkgID == null || pkgID.isEmpty()) {
-          if (kbID.equals(KMDefault_KeyboardID)) {
-            pkgID = KMDefault_PackageID;
-          } else {
-            pkgID = KMDefault_LegacyPackageID;
-          }
+          pkgID = KMDefault_UndefinedPackageID;
           kbInfo.put(KMManager.KMKey_PackageID, pkgID);
           shouldUpdateList = true;
         }
@@ -615,12 +614,18 @@ public final class KMManager {
     return isCustom;
   }
 
+  /**
+   * Get the font typeface from a fully pathed font name
+   * @param context
+   * @param fontFilename String - full path to the font file
+   * @return Typeface
+   */
   public static Typeface getFontTypeface(Context context, String fontFilename) {
     Typeface font = null;
 
     if (fontFilename != null) {
       if (fontFilename.endsWith(".ttf") || fontFilename.endsWith(".otf")) {
-        File file = new File(context.getDir("data", Context.MODE_PRIVATE) + "/fonts/" + fontFilename);
+        File file = new File(fontFilename);
         if (file.exists()) {
           font = Typeface.createFromFile(file);
         } else {
@@ -634,783 +639,6 @@ public final class KMManager {
 
   public static ArrayList<HashMap<String, String>> getKeyboardsList(Context context) {
     return KeyboardPickerActivity.getKeyboardsList(context);
-  }
-
-  public static final class KMKeyboardDownloader {
-
-    public static void download(final Context context, final int languageIndex, final int keyboardIndex, final boolean showProgressDialog) {
-      new AsyncTask<Void, Integer, Integer>() {
-        private ProgressDialog progressDialog;
-        private String packageID = "";
-        private String languageID = "";
-        private String keyboardID = "";
-        private String languageName = "";
-        private String keyboardName = "";
-        private String kbVersion = "1.0";
-        private String isCustom = "N";
-        private String font = "";
-        private String oskFont = null;
-
-        @Override
-        protected void onPreExecute() {
-          super.onPreExecute();
-          if (showProgressDialog) {
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setMessage("Downloading keyboard...");
-            progressDialog.setCancelable(false);
-            if (!((Activity) context).isFinishing()) {
-              progressDialog.show();
-            } else {
-              cancel(true);
-              progressDialog = null;
-            }
-          }
-        }
-
-        @Override
-        protected Integer doInBackground(Void... voids) {
-          int ret = -1;
-          ArrayList<String> urls = new ArrayList<String>();
-
-          if (isCancelled())
-            return ret;
-
-          try {
-            JSONArray languages = LanguageListActivity.languages();
-            JSONObject options = LanguageListActivity.options();
-
-            if (languages == null || options == null) {
-              throw new Exception("Language list is empty");
-            }
-
-            JSONObject language = languages.getJSONObject(languageIndex);
-            JSONArray keyboards = language.getJSONArray(KMKey_LanguageKeyboards);
-            JSONObject keyboard = keyboards.getJSONObject(keyboardIndex);
-
-            if (keyboard.has(KMKey_PackageID)) {
-              packageID = keyboard.getString(KMKey_PackageID);
-            } else {
-              packageID = KMDefault_LegacyPackageID;
-            }
-            keyboardID = keyboard.getString(KMKey_ID);
-            languageID = language.getString(KMKey_ID);
-            keyboardName = keyboard.getString(KMKey_Name);
-            languageName = language.getString(KMKey_Name);
-            kbVersion = keyboard.optString(KMKey_KeyboardVersion, "1.0");
-            font = keyboard.optString(KMKey_Font, "");
-            oskFont = keyboard.optString(KMKey_OskFont, null);
-            String kbFilename = keyboard.optString(KMKey_Filename, "");
-
-            String kbUrl = options.getString(KMKey_KeyboardBaseURI) + kbFilename;
-            urls.add(kbUrl);
-            JSONObject jsonFont = keyboard.optJSONObject(KMKey_Font);
-            JSONObject jsonOskFont = keyboard.optJSONObject(KMKey_OskFont);
-            String fontBaseUri = options.getString(KMKey_FontBaseURI);
-            ArrayList<String> fontUrls = fontUrls(jsonFont, fontBaseUri, true);
-            ArrayList<String> oskFontUrls = fontUrls(jsonOskFont, fontBaseUri, true);
-            if (fontUrls != null)
-              urls.addAll(fontUrls);
-            if (oskFontUrls != null) {
-              for (String url : oskFontUrls) {
-                if (!urls.contains(url))
-                  urls.add(url);
-              }
-            }
-
-            // Notify listeners: onDownloadStarted
-            if (kbDownloadEventListeners != null) {
-              HashMap<String, String> keyboardInfo = new HashMap<String, String>();
-              keyboardInfo.put(KMKey_PackageID, packageID);
-              keyboardInfo.put(KMKey_KeyboardID, keyboardID);
-              keyboardInfo.put(KMKey_LanguageID, languageID);
-              keyboardInfo.put(KMKey_KeyboardName, keyboardName);
-              keyboardInfo.put(KMKey_LanguageName, languageName);
-              keyboardInfo.put(KMKey_KeyboardVersion, kbVersion);
-              keyboardInfo.put(KMKey_CustomKeyboard, isCustom);
-              keyboardInfo.put(KMKey_Font, font);
-              if (oskFont != null)
-                keyboardInfo.put(KMKey_OskFont, oskFont);
-              KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, EventType.KEYBOARD_DOWNLOAD_STARTED, keyboardInfo, 0);
-            }
-
-            ret = 1;
-            int result = 0;
-            for (String url : urls) {
-              String directory = KMDefault_AssetPackages + File.separator + packageID;
-              File dir = new File(directory);
-              String filename = "";
-              if (url.endsWith(".js")) {
-                int start = kbFilename.lastIndexOf("/");
-                if (start < 0) {
-                  start = 0;
-                } else {
-                  start++;
-                }
-                if (!kbFilename.contains("-")) {
-                  filename = kbFilename.substring(start, kbFilename.length() - 3) + "-" + kbVersion + ".js";
-                } else {
-                  filename = kbFilename.substring(start);
-                }
-              }
-
-              result = FileDownloader.download(context, url, directory, filename);
-              if (result < 0) {
-                ret = -1;
-                break;
-              }
-            }
-          } catch (Exception e) {
-            ret = -1;
-            Log.e("Keyboard download", "Error: " + e);
-          }
-
-          return ret;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... progress) {
-          // Do nothing
-        }
-
-        @Override
-        protected void onPostExecute(Integer result) {
-          if (showProgressDialog) {
-            if (progressDialog != null && progressDialog.isShowing()) {
-              try {
-                progressDialog.dismiss();
-                progressDialog = null;
-              } catch (Exception e) {
-                progressDialog = null;
-              }
-            }
-          }
-
-          // Notify listeners: onDownloadFinished
-          if (kbDownloadEventListeners != null) {
-            HashMap<String, String> keyboardInfo = new HashMap<String, String>();
-            keyboardInfo.put(KMKey_PackageID, packageID);
-            keyboardInfo.put(KMKey_KeyboardID, keyboardID);
-            keyboardInfo.put(KMKey_LanguageID, languageID);
-            keyboardInfo.put(KMKey_KeyboardName, keyboardName);
-            keyboardInfo.put(KMKey_LanguageName, languageName);
-            keyboardInfo.put(KMKey_KeyboardVersion, kbVersion);
-            keyboardInfo.put(KMKey_CustomKeyboard, isCustom);
-            keyboardInfo.put(KMKey_Font, font);
-            if (oskFont != null)
-              keyboardInfo.put(KMKey_OskFont, oskFont);
-            KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, EventType.KEYBOARD_DOWNLOAD_FINISHED, keyboardInfo, result);
-          }
-        }
-      }.execute();
-    }
-
-    public static void download(final Context context, final String packageID, final String keyboardID, final String languageID, final boolean showProgressDialog) {
-      new AsyncTask<Void, Integer, Integer>() {
-        private ProgressDialog progressDialog;
-        private String languageName = "";
-        private String keyboardName = "";
-        private String kbVersion = "1.0";
-        private String isCustom = "N";
-        private String font = "";
-        private String oskFont = "";
-
-        @Override
-        protected void onPreExecute() {
-          super.onPreExecute();
-          if (showProgressDialog) {
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setMessage("Downloading keyboard...");
-            progressDialog.setCancelable(false);
-            if (!((Activity) context).isFinishing()) {
-              progressDialog.show();
-            } else {
-              cancel(true);
-              progressDialog = null;
-            }
-          }
-        }
-
-        @Override
-        protected Integer doInBackground(Void... voids) {
-          int ret = -1;
-          ArrayList<String> urls = new ArrayList<String>();
-
-          if (isCancelled())
-            return ret;
-
-          try {
-            String exceptionStr = "Invalid keyboard";
-            if (packageID == null || packageID.trim().isEmpty() ||
-                languageID == null || languageID.trim().isEmpty() ||
-                keyboardID == null || keyboardID.trim().isEmpty())
-              throw new Exception(exceptionStr);
-
-            String deviceType = context.getResources().getString(R.string.device_type);
-            if (deviceType.equals("AndroidTablet")) {
-              deviceType = "androidtablet";
-            } else {
-              deviceType = "androidphone";
-            }
-
-            String jsonUrl = String.format("%slanguages/%s/%s?device=%s", kKeymanApiBaseURL, languageID, keyboardID, deviceType);
-            JSONParser jsonParser = new JSONParser();
-            JSONObject kbData = jsonParser.getJSONObjectFromUrl(jsonUrl);
-
-            exceptionStr = "Could not reach Keyman server";
-            if (kbData == null) {
-              throw new Exception(exceptionStr);
-            }
-
-            JSONObject options = kbData.optJSONObject(KMKey_Options);
-            JSONObject language = kbData.optJSONObject(KMKey_Language);
-            exceptionStr = "The keyboard could not be installed";
-            if (options == null || language == null) {
-              throw new Exception(exceptionStr);
-            }
-
-            JSONArray keyboards = language.getJSONArray(KMKey_LanguageKeyboards);
-            String kbBaseUri = options.optString(KMKey_KeyboardBaseURI, "");
-            String fontBaseUri = options.optString(KMKey_FontBaseURI, "");
-
-            if (keyboards == null || kbBaseUri.isEmpty())
-              throw new Exception(exceptionStr);
-
-            JSONObject keyboard = keyboards.getJSONObject(0);
-            if (keyboard == null)
-              throw new Exception(exceptionStr);
-
-            languageName = language.optString(KMKey_Name, "");
-            keyboardName = keyboard.optString(KMKey_Name, "");
-            kbVersion = keyboard.optString(KMKey_KeyboardVersion, "1.0");
-            font = keyboard.optString(KMKey_Font, "");
-            oskFont = keyboard.optString(KMKey_OskFont, null);
-            String kbFilename = keyboard.optString(KMKey_Filename, "");
-
-            if (keyboardName.isEmpty() || languageName.isEmpty() || kbFilename.isEmpty())
-              throw new Exception(exceptionStr);
-
-            String kbUrl = kbBaseUri + kbFilename;
-            urls.add(kbUrl);
-            JSONObject jsonFont = keyboard.optJSONObject(KMKey_Font);
-            JSONObject jsonOskFont = keyboard.optJSONObject(KMKey_OskFont);
-            ArrayList<String> fontUrls = fontUrls(jsonFont, fontBaseUri, true);
-            ArrayList<String> oskFontUrls = fontUrls(jsonOskFont, fontBaseUri, true);
-            if (fontUrls != null)
-              urls.addAll(fontUrls);
-            if (oskFontUrls != null) {
-              for (String url : oskFontUrls) {
-                if (!urls.contains(url))
-                  urls.add(url);
-              }
-            }
-
-            // Notify listeners: onDownloadStarted
-            if (kbDownloadEventListeners != null) {
-              HashMap<String, String> keyboardInfo = new HashMap<String, String>();
-              keyboardInfo.put(KMKey_PackageID, packageID);
-              keyboardInfo.put(KMKey_KeyboardID, keyboardID);
-              keyboardInfo.put(KMKey_LanguageID, languageID);
-              keyboardInfo.put(KMKey_KeyboardName, keyboardName);
-              keyboardInfo.put(KMKey_LanguageName, languageName);
-              keyboardInfo.put(KMKey_KeyboardVersion, kbVersion);
-              keyboardInfo.put(KMKey_CustomKeyboard, isCustom);
-              keyboardInfo.put(KMKey_Font, font);
-              if (oskFont != null)
-                keyboardInfo.put(KMKey_OskFont, oskFont);
-              KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, EventType.KEYBOARD_DOWNLOAD_STARTED, keyboardInfo, 0);
-            }
-
-            ret = 1;
-            int result = 0;
-            for (String url : urls) {
-              String directory = KMDefault_AssetPackages + File.separator + packageID;
-              File dir = new File(directory);
-              String filename = "";
-              if (url.endsWith(".js")) {
-
-                int start = kbFilename.lastIndexOf("/");
-                if (start < 0) {
-                  start = 0;
-                } else {
-                  start++;
-                }
-                if (!kbFilename.contains("-")) {
-                  filename = kbFilename.substring(start, kbFilename.length() - 3) + "-" + kbVersion + ".js";
-                } else {
-                  filename = kbFilename.substring(start);
-                }
-              }
-
-              result = FileDownloader.download(context, url, directory, filename);
-              if (result < 0) {
-                ret = -1;
-                break;
-              }
-            }
-          } catch (Exception e) {
-            ret = -1;
-            Log.e("Keyboard download", "Error: " + e);
-          }
-
-          return ret;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... progress) {
-          // Do nothing
-        }
-
-        @Override
-        protected void onPostExecute(Integer result) {
-          if (showProgressDialog) {
-            if (progressDialog != null && progressDialog.isShowing()) {
-              try {
-                progressDialog.dismiss();
-                progressDialog = null;
-              } catch (Exception e) {
-                progressDialog = null;
-              }
-            }
-          }
-
-          // Notify listeners: onDownloadFinished
-          if (kbDownloadEventListeners != null) {
-            HashMap<String, String> keyboardInfo = new HashMap<String, String>();
-            keyboardInfo.put(KMKey_KeyboardID, keyboardID);
-            keyboardInfo.put(KMKey_LanguageID, languageID);
-            keyboardInfo.put(KMKey_KeyboardName, keyboardName);
-            keyboardInfo.put(KMKey_LanguageName, languageName);
-            keyboardInfo.put(KMKey_KeyboardVersion, kbVersion);
-            keyboardInfo.put(KMKey_CustomKeyboard, isCustom);
-            keyboardInfo.put(KMKey_Font, font);
-            if (oskFont != null)
-              keyboardInfo.put(KMKey_OskFont, oskFont);
-            KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, EventType.KEYBOARD_DOWNLOAD_FINISHED, keyboardInfo, result);
-          }
-        }
-      }.execute();
-    }
-
-    private static ArrayList<String> fontUrls(JSONObject jsonFont, String baseUri, boolean isOskFont) {
-      if (jsonFont == null)
-        return null;
-
-      ArrayList<String> urls = new ArrayList<String>();
-      JSONArray fontSource = jsonFont.optJSONArray(KMKey_FontSource);
-      if (fontSource != null) {
-        int fcCount = fontSource.length();
-        for (int i = 0; i < fcCount; i++) {
-          String fontSourceString;
-          try {
-            fontSourceString = fontSource.getString(i);
-            if (fontSourceString.endsWith(".ttf") || fontSourceString.endsWith(".otf")) {
-              urls.add(baseUri + fontSourceString);
-            } else if (isOskFont && (fontSourceString.endsWith(".svg") || fontSourceString.endsWith(".woff"))) {
-              urls.add(baseUri + fontSourceString);
-            } else if (isOskFont && fontSourceString.contains(".svg#")) {
-              String fontFilename = fontSourceString.substring(0, fontSourceString.indexOf(".svg#") + 5);
-              urls.add(baseUri + fontFilename);
-            }
-          } catch (JSONException e) {
-            return null;
-          }
-        }
-      } else {
-        String fontSourceString;
-        try {
-          fontSourceString = jsonFont.getString(KMKey_FontSource);
-          if (fontSourceString.endsWith(".ttf") || fontSourceString.endsWith(".otf")) {
-            urls.add(baseUri + fontSourceString);
-          } else if (isOskFont && (fontSourceString.endsWith(".svg") || fontSourceString.endsWith(".woff"))) {
-            urls.add(baseUri + fontSourceString);
-          } else if (isOskFont && fontSourceString.contains(".svg#")) {
-            String fontFilename = fontSourceString.substring(0, fontSourceString.indexOf(".svg#") + 5);
-            urls.add(baseUri + fontFilename);
-          }
-        } catch (JSONException e) {
-          return null;
-        }
-      }
-
-      return urls;
-    }
-  }
-
-  public static final class KMCustomKeyboardDownloader {
-
-    public static void download(final Context context, final String jsonUrl, final boolean isDirect, final boolean showProgressDialog) {
-      new AsyncTask<Void, Integer, Integer>() {
-        private ProgressDialog progressDialog;
-        private String packageID = "";
-        private String keyboardID = "";
-        private String languageID = "";
-        private String keyboardName = "";
-        private String languageName = "";
-        private String kbVersion = "1.0";
-        private String isCustom = "Y";
-        private String font = "";
-        private String oskFont = "";
-
-        @Override
-        protected void onPreExecute() {
-          super.onPreExecute();
-          if (showProgressDialog) {
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setMessage("Downloading keyboard...");
-            progressDialog.setCancelable(false);
-            if (!((Activity) context).isFinishing()) {
-              progressDialog.show();
-            } else {
-              cancel(true);
-              progressDialog = null;
-            }
-          }
-        }
-
-        @Override
-        protected Integer doInBackground(Void... voids) {
-          int ret = -1;
-          ArrayList<String> urls = new ArrayList<String>();
-
-          if (isCancelled())
-            return ret;
-
-          try {
-            JSONParser jsonParser = new JSONParser();
-            JSONObject customKb = null;
-            if (isDirect) {
-              customKb = jsonParser.getJSONObjectFromUrl(jsonUrl);
-            } else {
-              String deviceType = context.getResources().getString(R.string.device_type);
-              if (deviceType.equals("AndroidTablet")) {
-                deviceType = "androidtablet";
-              } else {
-                deviceType = "androidphone";
-              }
-
-              String encodedUrl = URLEncoder.encode(jsonUrl, "utf-8");
-              String remoteUrl = String.format("%s%s&device=%s", kKeymanApiRemoteURL, encodedUrl, deviceType);
-              customKb = jsonParser.getJSONObjectFromUrl(remoteUrl);
-            }
-
-            String exceptionStr = "Failed to fetch JSON object from the URL";
-            if (customKb == null) {
-              throw new Exception(exceptionStr);
-            }
-
-            JSONObject options = customKb.optJSONObject(KMKey_Options);
-            exceptionStr = "The keyboard could not be installed";
-            if (options == null) {
-              throw new Exception(exceptionStr);
-            }
-
-            String kbBaseUri = options.optString(KMKey_KeyboardBaseURI, "");
-            String fontBaseUri = options.optString(KMKey_FontBaseURI, "");
-
-            JSONObject keyboard = customKb.getJSONObject(KMKey_Keyboard);
-
-            if (keyboard == null || kbBaseUri.isEmpty()) {
-              throw new Exception(exceptionStr);
-            }
-
-            JSONArray languages = keyboard.optJSONArray(KMKey_Languages);
-
-            packageID = keyboard.optString(KMKey_PackageID, "");
-            if (packageID == null || packageID.isEmpty()) {
-              packageID = KMDefault_LegacyPackageID;
-            }
-            keyboardID = keyboard.optString(KMKey_ID, "");
-            keyboardName = keyboard.optString(KMKey_Name, "");
-            kbVersion = keyboard.optString(KMKey_KeyboardVersion, "1.0");
-            font = keyboard.optString(KMKey_Font, "").replace("\"" + KMManager.KMKey_Filename + "\"", "\"" + KMManager.KMKey_FontSource + "\"");
-            oskFont = keyboard.optString(KMKey_OskFont, "").replace("\"" + KMManager.KMKey_Filename + "\"", "\"" + KMManager.KMKey_FontSource + "\"");
-            if (oskFont.isEmpty()) {
-              oskFont = null;
-            }
-            String kbFilename = keyboard.optString(KMKey_Filename, "");
-
-            if (packageID == null || packageID.isEmpty() ||
-                languages == null || keyboardID.isEmpty() ||
-                keyboardName.isEmpty() || kbFilename.isEmpty()) {
-              throw new Exception(exceptionStr);
-            }
-
-            String kbUrl = kbBaseUri + kbFilename;
-            urls.add(kbUrl);
-            JSONObject jsonFont = keyboard.optJSONObject(KMKey_Font);
-            JSONObject jsonOskFont = keyboard.optJSONObject(KMKey_OskFont);
-            ArrayList<String> fontUrls = fontUrls(jsonFont, fontBaseUri, true);
-            ArrayList<String> oskFontUrls = fontUrls(jsonOskFont, fontBaseUri, true);
-            if (fontUrls != null) {
-              urls.addAll(fontUrls);
-            }
-            if (oskFontUrls != null) {
-              for (String url : oskFontUrls) {
-                if (!urls.contains(url)) {
-                  urls.add(url);
-                }
-              }
-            }
-
-            languageID = "";
-            languageName = "";
-            int langCount = languages.length();
-            for (int i = 0; i < langCount; i++) {
-              languageID += languages.getJSONObject(i).getString(KMKey_ID);
-              languageName += languages.getJSONObject(i).getString(KMKey_Name);
-              if (i < langCount - 1) {
-                languageID += ";";
-                languageName += ";";
-              }
-            }
-
-            // Notify listeners: onDownloadStarted
-            if (kbDownloadEventListeners != null) {
-              HashMap<String, String> keyboardInfo = new HashMap<String, String>();
-              keyboardInfo.put(KMKey_PackageID, packageID);
-              keyboardInfo.put(KMKey_KeyboardID, keyboardID);
-              keyboardInfo.put(KMKey_LanguageID, languageID);
-              keyboardInfo.put(KMKey_KeyboardName, keyboardName);
-              keyboardInfo.put(KMKey_LanguageName, languageName);
-              keyboardInfo.put(KMKey_KeyboardVersion, kbVersion);
-              keyboardInfo.put(KMKey_CustomKeyboard, isCustom);
-              keyboardInfo.put(KMKey_Font, font);
-              if (oskFont != null) {
-                keyboardInfo.put(KMKey_OskFont, oskFont);
-              }
-              KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, EventType.KEYBOARD_DOWNLOAD_STARTED, keyboardInfo, 0);
-            }
-
-            ret = 1;
-            int result = 0;
-            for (String url : urls) {
-              String directory = KMDefault_AssetPackages + File.separator + packageID;
-              File dir = new File(directory);
-              String filename = "";
-              if (url.endsWith(".js")) {
-                int start = kbFilename.lastIndexOf("/");
-                if (start < 0) {
-                  start = 0;
-                } else {
-                  start++;
-                }
-                if (!kbFilename.contains("-")) {
-                  filename = kbFilename.substring(start, kbFilename.length() - 3) + "-" + kbVersion + ".js";
-                } else {
-                  filename = kbFilename.substring(start);
-                }
-              }
-
-              result = FileDownloader.download(context, url, directory, filename);
-              if (result < 0) {
-                ret = -1;
-                break;
-              }
-            }
-          } catch (Exception e) {
-            ret = -1;
-            Log.e("Keyboard download", "Error: " + e);
-            e.printStackTrace();
-          }
-
-          return ret;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... progress) {
-          // Do nothing
-        }
-
-        @Override
-        protected void onPostExecute(Integer result) {
-          if (showProgressDialog) {
-            if (progressDialog != null && progressDialog.isShowing()) {
-              try {
-                progressDialog.dismiss();
-                progressDialog = null;
-              } catch (Exception e) {
-                progressDialog = null;
-              }
-            }
-          }
-
-          // Notify listeners: onDownloadFinished
-          if (kbDownloadEventListeners != null) {
-            HashMap<String, String> keyboardInfo = new HashMap<String, String>();
-            keyboardInfo.put(KMKey_PackageID, packageID);
-            keyboardInfo.put(KMKey_KeyboardID, keyboardID);
-            keyboardInfo.put(KMKey_LanguageID, languageID);
-            keyboardInfo.put(KMKey_KeyboardName, keyboardName);
-            keyboardInfo.put(KMKey_LanguageName, languageName);
-            keyboardInfo.put(KMKey_KeyboardVersion, kbVersion);
-            keyboardInfo.put(KMKey_CustomKeyboard, isCustom);
-            keyboardInfo.put(KMKey_Font, font);
-            if (oskFont != null)
-              keyboardInfo.put(KMKey_OskFont, oskFont);
-            KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, EventType.KEYBOARD_DOWNLOAD_FINISHED, keyboardInfo, result);
-          }
-
-          if (result > 0) {
-            if (KMManager.InAppKeyboard != null) {
-              InAppKeyboard.loadKeyboard();
-            }
-            if ( KMManager.SystemKeyboard != null) {
-              SystemKeyboard.loadKeyboard();
-            }
-          }
-        }
-      }.execute();
-    }
-
-    private static ArrayList<String> fontUrls(JSONObject jsonFont, String baseUri, boolean isOskFont) {
-      if (jsonFont == null)
-        return null;
-
-      ArrayList<String> urls = new ArrayList<String>();
-      JSONArray fontSource = jsonFont.optJSONArray(KMKey_FontSource);
-      if (fontSource == null)
-        fontSource = jsonFont.optJSONArray(KMKey_Filename); // Font filename is deprecated
-
-      if (fontSource != null) {
-        int fcCount = fontSource.length();
-        for (int i = 0; i < fcCount; i++) {
-          String fontSourceString;
-          try {
-            fontSourceString = fontSource.getString(i);
-            if (fontSourceString.endsWith(".ttf") || fontSourceString.endsWith(".otf")) {
-              urls.add(baseUri + fontSourceString);
-            } else if (isOskFont && (fontSourceString.endsWith(".svg") || fontSourceString.endsWith(".woff"))) {
-              urls.add(baseUri + fontSourceString);
-            } else if (isOskFont && fontSourceString.contains(".svg#")) {
-              String fontFilename = fontSourceString.substring(0, fontSourceString.indexOf(".svg#") + 5);
-              urls.add(baseUri + fontFilename);
-            }
-          } catch (JSONException e) {
-            return null;
-          }
-        }
-      } else {
-        String fontSourceString;
-        try {
-          fontSourceString = jsonFont.optString(KMKey_FontSource, null);
-          if (fontSourceString == null)
-            fontSourceString = jsonFont.getString(KMKey_Filename); // Font filename is deprecated
-
-          if (fontSourceString.endsWith(".ttf") || fontSourceString.endsWith(".otf")) {
-            urls.add(baseUri + fontSourceString);
-          } else if (isOskFont && (fontSourceString.endsWith(".svg") || fontSourceString.endsWith(".woff"))) {
-            urls.add(baseUri + fontSourceString);
-          } else if (isOskFont && fontSourceString.contains(".svg#")) {
-            String fontFilename = fontSourceString.substring(0, fontSourceString.indexOf(".svg#") + 5);
-            urls.add(baseUri + fontFilename);
-          }
-        } catch (JSONException e) {
-          return null;
-        }
-      }
-
-      return urls;
-    }
-  }
-
-  private static final class FileDownloader {
-
-    /**
-     * Utility to download a file from urlStr and store it at directory/filename
-     * @param context
-     * @param urlStr URL of the file to download
-     * @param directory Path to store the file. If directory does not exist, it will be created
-     * @param filename Destination filename. If blank, it will use the filename from the URL
-     * @return
-     */
-    public static int download(Context context, String urlStr, String directory, String filename) {
-      int ret = -1;
-      String fileName = "";
-      String tmpFileName = "";
-      File tmpFile = null;
-      File file = null;
-
-      try {
-        if (directory == null) {
-          directory = "";
-        }
-        directory = directory.trim();
-
-        String dirPath;
-        if (directory.length() != 0) {
-          directory = directory + "/";
-          dirPath = context.getDir("data", Context.MODE_PRIVATE) + "/" + directory;
-        } else {
-          dirPath = context.getDir("data", Context.MODE_PRIVATE).toString();
-        }
-        File dir = new File(dirPath);
-        if (!dir.exists()) {
-          dir.mkdir();
-        }
-
-        if (Connection.initialize(urlStr)) {
-          InputStream binStream = new BufferedInputStream(Connection.getInputStream(), 4096);
-          byte[] buff = new byte[4096];
-
-          filename = filename.trim();
-          if (filename == null || filename.isEmpty()) {
-            fileName = Connection.getFile().substring(Connection.getFile().lastIndexOf('/') + 1);
-            if (fileName.lastIndexOf(".js") > 0 && !fileName.contains("-")) {
-              fileName = fileName.substring(0, filename.lastIndexOf(".js")) + "-1.0.js";
-            }
-          } else {
-            fileName = filename;
-          }
-          tmpFileName = String.format("%s.tmp", fileName);
-          file = new File(dirPath, fileName);
-          tmpFile = new File(dirPath, tmpFileName);
-          FileOutputStream fos = new FileOutputStream(tmpFile);
-
-          int len;
-          while ((len = binStream.read(buff)) != -1) {
-            fos.write(buff, 0, len);
-          }
-
-          fos.flush();
-          fos.close();
-          binStream.close();
-
-          ret = 1;
-        }
-      } catch (Exception e) {
-        ret = -1;
-        Log.e("FD: Download failed!", "Error: " + e);
-      } finally {
-        if (ret > 0) {
-          if (tmpFile.exists() && tmpFile.length() > 0) {
-            if (file.exists()) {
-              file.delete();
-            }
-            if (!tmpFile.renameTo(file)) {
-              ret = -1;
-            } else if (isDebugMode()) {
-              Log.d("FD: Download finished", "Filename = " + file.toString());
-            }
-          } else {
-            ret = -1;
-          }
-        } else {
-          if (file.exists()) {
-            file.delete();
-          }
-          if (tmpFile.exists()) {
-            tmpFile.delete();
-          }
-          if (isDebugMode()) {
-            Log.d("FD: Could not download", "Filename = " + file.toString());
-          }
-        }
-
-        Connection.disconnect();
-      }
-
-      return ret;
-    }
   }
 
   public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
@@ -1545,7 +773,7 @@ public final class KMManager {
           if (kbVersion != null && compareVersions(kbVersion, latestVersion) > 0)
             kbState = KeyboardState.KEYBOARD_STATE_NEEDS_UPDATE;
         } catch (Exception e) {
-          Log.e("getKeyboardState", "Error: " + e);
+          Log.e("KMManager", "getKeyboardState Error: " + e);
         }
       }
     }
@@ -1553,46 +781,90 @@ public final class KMManager {
     return kbState;
   }
 
-  public static String getLatestKeyboardFileVersion(Context context, String packageID, String keyboardID) {
+  /**
+   * Determine the latest version number for an installed keyboard.
+   * When packageID = "cloud", search through the JS keyboard files for the latest (greatest) version number.
+   * For other packageIDs, parse the kmp.json
+   * @param context
+   * @param packageID
+   * @param keyboardID
+   * @return kbFileVersion String. null if the keyboard doesn't exist
+   */
+  public static String getLatestKeyboardFileVersion(Context context, final String packageID, final String keyboardID) {
     String kbFileVersion = null;
-    String path = context.getDir("data", Context.MODE_PRIVATE) + File.separator + KMDefault_AssetPackages +
-      File.separator + packageID + File.separator;
-    File dir = new File(path);
-    String[] files = dir.list();
-    if (files == null)
-      return kbFileVersion;
+    String path;
+    if (packageID.equals(KMDefault_UndefinedPackageID)) {
+      path = getCloudDir();
 
-    for (String file : files) {
-      // Ensure keyboard file is JS and non-zero size
-      if (!file.endsWith(".js") || new File(path + file).length() == 0) {
-        continue;
+      File dir = new File(path);
+      FileFilter keyboardFilter = new FileFilter() {
+        @Override
+        /**
+         * Filter for JS keyboards that match keyboardID and have a non-zero size
+         */
+        public boolean accept(File pathname) {
+          String name = pathname.getName();
+          if (pathname.isFile() && name.startsWith(keyboardID) && name.endsWith(".js") && pathname.length() > 0) {
+            return true;
+          }
+          return false;
+        }
+      };
+
+      File[] files = dir.listFiles(keyboardFilter);
+      if (files.length == 0) {
+        return kbFileVersion;
       }
 
-      String base = String.format("%s-", keyboardID);
-      int index = file.indexOf(base);
-      if (index == 0) {
-        int firstIndex = base.length();
-        int lastIndex = file.lastIndexOf(".js");
-        String v = file.substring(firstIndex, lastIndex);
-        if (kbFileVersion != null) {
-          if (compareVersions(v, kbFileVersion) > 0) {
+      for (File file : files) {
+        String filename = file.getName();
+        String base = String.format("%s-", keyboardID);
+        int index = filename.indexOf(base);
+        if (index == 0) {
+          int firstIndex = base.length();
+          int lastIndex = filename.lastIndexOf(".js");
+          String v = filename.substring(firstIndex, lastIndex);
+          if (kbFileVersion != null) {
+            if (compareVersions(v, kbFileVersion) > 0) {
+              kbFileVersion = v;
+            }
+          } else if (compareVersions(v, v) == 0) {
             kbFileVersion = v;
           }
-        } else if (compareVersions(v, v) == 0) {
-          kbFileVersion = v;
         }
+      }
+    } else {
+      path = getPackagesDir() + packageID + File.separator + "kmp.json";
+
+      try {
+        File kmpJSONFile = new File(path);
+        if (!kmpJSONFile.exists()) {
+          return null;
+        }
+        JSONParser jsonParser = new JSONParser();
+        JSONObject kmpObject = jsonParser.getJSONObjectFromFile(kmpJSONFile);
+
+        return PackageProcessor.getKeyboardVersion(kmpObject, keyboardID);
+      } catch (Exception e) {
+        return null;
       }
     }
 
     return kbFileVersion;
   }
 
+  /**
+   * Compare two version strings
+   * @param v1 String
+   * @param v2 String
+   * @return int
+   *   -2 if v1 or v2 is invalid
+   *    0 if v1 = v2
+   *   -1 if v1 < v2
+   *    1 if v1 > v2
+   */
   public static int compareVersions(String v1, String v2) {
     // returns;
-    // -2 if v1 or v2 is invalid
-    // 0 if v1 = v2
-    // -1 if v1 < v2
-    // 1 if v1 > v2
 
     if (v1 == null || v2 == null) {
       return -2;
@@ -1731,22 +1003,6 @@ public final class KMManager {
     KMKeyboard.removeOnKeyboardEventListener(listener);
   }
 
-  public static void addKeyboardDownloadEventListener(OnKeyboardDownloadEventListener listener) {
-    if (kbDownloadEventListeners == null) {
-      kbDownloadEventListeners = new ArrayList<OnKeyboardDownloadEventListener>();
-    }
-
-    if (listener != null && !kbDownloadEventListeners.contains(listener)) {
-      kbDownloadEventListeners.add(listener);
-    }
-  }
-
-  public static void removeKeyboardDownloadEventListener(OnKeyboardDownloadEventListener listener) {
-    if (kbDownloadEventListeners != null) {
-      kbDownloadEventListeners.remove(listener);
-    }
-  }
-
   public static int getKeyboardHeight(Context context) {
     return (int) context.getResources().getDimension(R.dimen.keyboard_height);
   }
@@ -1762,7 +1018,8 @@ public final class KMManager {
   public static void setShouldAllowSetKeyboard(boolean value) {
     shouldAllowSetKeyboard = value;
     if (shouldAllowSetKeyboard == false) {
-      setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID, KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
+      setKeyboard(KMDefault_UndefinedPackageID, KMDefault_KeyboardID,
+        KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
     }
   }
 
@@ -2000,7 +1257,8 @@ public final class KMManager {
             String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
             InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
           } else {
-            InAppKeyboard.setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID, KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
+            InAppKeyboard.setKeyboard(KMDefault_UndefinedPackageID, KMDefault_KeyboardID,
+              KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
           }
         }
 
@@ -2177,7 +1435,8 @@ public final class KMManager {
             String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
             SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
           } else {
-            SystemKeyboard.setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID, KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
+            SystemKeyboard.setKeyboard(KMDefault_UndefinedPackageID, KMDefault_KeyboardID,
+              KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
           }
         }
 

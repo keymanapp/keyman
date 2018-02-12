@@ -91,14 +91,14 @@ end;
    // I4220
 procedure TKeymanLanguages.DoRefresh;
 var
-  i: Cardinal;
+  i: LongWord;
   pLangID: PWord;
-  ulCount: Cardinal;
+  ulCount: LongWord;
   FProfiles: ITfInputProcessorProfiles;
-  FProfileMgr: ITfInputProcessorProfileMgr;
-  profile: TF_INPUTPROCESSORPROFILE;
-  pcFetch: Cardinal;
-  ppEnum: IEnumTfInputProcessorProfiles;
+  FProfileMgr: keyman_msctf.ITfInputProcessorProfileMgr;
+  profile: keyman_msctf.TF_INPUTPROCESSORPROFILE;
+  pcFetch: LongWord;
+  ppEnum: keyman_msctf.IEnumTfInputProcessorProfiles;
   FCaption: WideString;
   FWin8Language: TWindows8Language;
   j: Integer;
@@ -111,7 +111,7 @@ begin
 
     FLanguages.Clear;
     FProfiles := CreateComObject(CLASS_TF_InputProcessorProfiles) as ITfInputProcessorProfiles;
-    FProfileMgr := FProfiles as ITfInputProcessorProfileMgr;
+    FProfileMgr := FProfiles as keyman_msctf.ITfInputProcessorProfileMgr;
 
     pLangIDRoot := nil; // I2870
     ulCount := 0; // I2870
@@ -196,7 +196,7 @@ begin
   try
     RootKey := HKEY_CURRENT_USER;
 
-    if OpenKey('\'+SRegKey_LanguageHotkeys, True) then
+    if OpenKey('\'+SRegKey_LanguageHotkeys_CU, True) then
     begin
       GetValueNames(str);
       for i := 0 to str.Count - 1 do DeleteValue(str[i]);

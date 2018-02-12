@@ -24,12 +24,18 @@
       }
 
       .test {
-          font-size: 1.5em; 
-          background-color: #ffffee; 
-          height:100px;
-          width:92%; 
-          min-height:30px; 
-          border: 1px solid gray;
+        font-size: 1.5em; 
+        background-color: #ffffee; 
+        height:100px;
+        width:92%; 
+        min-height:30px; 
+      }
+      
+      .desktop-device .test {
+        box-sizing: border-box;
+        padding: 4px;
+        margin: 0;
+        width:100%; 
       }
       
       #install_link { 
@@ -42,51 +48,54 @@
         font-family: Sans-serif;
         font-size: 10pt;
         font-weight: bold;
-        margin: 18px 0;
+        margin: 0;
         padding: 6px;
         text-decoration: none;
     }
       
-      /** Mobile **/
-      @media only screen and (max-width: 767px), only screen and (max-device-width: 767px) {
-          #install_link { display: inline-block; }
+      /** Mobile, Tablet **/
+      .touch-device #install_link { 
+        display: inline-block;
       }
-
-      /** Tablet **/
-      @media only screen and (min-width : 768px) and (max-width : 1024px) {
-          #install_link { display: inline-block; }
-      }
-
-      /** Tablet (landscape) **/
-      @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape) {
-          #install_link { display: inline-block; }
-      }
-
       
+      #top-toolbar {
+        background: #eeeeee;
+        min-height: 23px;
+        padding: 4px;
+      }
+      
+      .control {
+        float: left; 
+      }
+
+      #character-grid {
+        min-height: 49px;
+        margin: 8px 0;
+        border: solid 1px #cccccc;
+      }
+      
+      #character-grid > div {
+        display: inline-block;
+      }
+      
+      .char-char,
+      .char-code {
+        border: solid 1px #888888;
+      }
+      
+      .char-char {
+        font-size: 14pt;
+        text-align: center;
+      }
+      
+      .char-code {
+        font: 8pt Consolas,Courier;
+        padding: 4px;
+      }
     </style> 
-<!--
-    <script src="kmw-release.js" type="text/javascript"></script>
--->
 
-    <script src="resource/kmwreleasestub.js"></script>   
-    <script src="resource/kmwbase.js"></script>
-    <script src="resource/kmwstring.js"></script>
-    <script src="resource/keymanweb.js"></script>
-    <script src="resource/kmwkeymaps.js"></script>
-    <script src="resource/kmwcallback.js"></script>
-    <script src="resource/kmwlayout.js"></script> 
-    <script src="resource/kmwosk.js"></script>
-    <script src="resource/kmwnative.js"></script>
-    <!--<script src="resource/kmwdebug.js"></script>-->
-
-    <script src="resource/kmwuibutton.js"></script>
-
-  <!-- The following scripts should be inserted at the end of the page after visible elements but before the closing 'body' tag. -->
-  
-  <!-- If a custom user interface is used, its script should be inserted here, and will override any ui specified during initialization.  --> 
-  
-  <!-- <script src="kmwuibutton-release.js"></script>  
-  <script src="resource/kmwuibutton.js"></script> --> 
+  <script src="resource/keymanweb.js"></script>   
+  <script src="resource/kmwuibutton.js"></script>
     
   <!-- The following dynamic script will register each of the additional keyboards -->
     
@@ -114,9 +123,22 @@
 
     <div>
       <!-- The following DIV is only needed as a UI placeholder for the Button and Toolbar User Interfaces -->
-      <div id='KeymanWebControl'></div>
-      <textarea id='ta1' class='test'></textarea><br/>
-      <a href='' id='install_link'>Install Keyboard into native Keyman</a>
+      <div id='top-toolbar'>
+        <div class='control' id='keymanweb-control-host'>
+          <div id='KeymanWebControl'></div>
+        </div>
+        <div class='control' id='controls'>
+          <a href='' id='install_link'>Install keyboard into Keyman app</a>
+        </div>
+        <div style='clear:left'></div>
+      </div>
+      <div id='character-grid'>
+        <!-- contains the breakdown of characters from the input-area -->
+      </div>
+      <div id='input-area'>
+        <textarea id='ta1' class='test'></textarea><br/>
+      </div>
+      
     </div>
     <script> 
       keyman.init({
@@ -134,7 +156,69 @@
           document.getElementById('install_link').href='keyman://localhost/open?direct=true&url='+location.protocol+'//'+location.host+'/kbinstall/'+nm+'-'+debugKeyboards[nm].version+'.json';
         });
         
-      //keyman.addEventListener
+      var ta1 = document.getElementById('ta1');
+      var charGrid = document.getElementById('character-grid');
+      var lastContent = null;
+      
+      if(keyman.util.isTouchDevice()) {
+        document.body.className += ' touch-device';
+      } else {
+        document.body.className += ' desktop-device';
+      }
+      
+      function removeChildNodes(node) {
+        while (node.lastChild) {
+          node.removeChild(node.lastChild);
+        }
+      }
+      
+      function addCharElements(text, code) {
+        var ebox = document.createElement('div'), echar = document.createElement('div'), ecode = document.createElement('div');
+        echar.textContent = text;
+        echar.className = 'char-char keymanweb-font';
+        ecode.textContent = code;
+        ecode.className = 'char-code';
+        ebox.appendChild(echar);
+        ebox.appendChild(ecode);
+        charGrid.appendChild(ebox);
+      }
+      
+      function logContent() {
+        if(lastContent === ta1.value) return;
+        removeChildNodes(charGrid);
+        if(ta1.value.length == 0) {
+          addCharElements('-','empty');
+        } else {
+          for(var i = 0; i < ta1.value.length; i++) {
+            //
+            var code = ta1.value.charCodeAt(i);
+            var text = ta1.value.charAt(i);
+            var slice = 4;
+            // Test for SMP
+            if(code >= 0xD800 && code < 0xDC00) {
+              if(i < ta1.value.length) {
+                var code2 = ta1.value.charCodeAt(i+1);
+                if(code2 >= 0xDC00 && code < 0xE000) {
+                  code = (code - 0xD800) * 0x400 + (code2 - 0xDC00) + 0x10000;
+                  text += ta1.value.charAt(i+1);
+                  slice = 6;
+                  i++;
+                }
+              }
+            }
+            addCharElements(text, ('000000'+(code).toString(16)).slice(-slice));
+          }
+        }
+        console.log(ta1.value);
+        lastContent = ta1.value;
+      }
+
+      logContent();
+      window.setInterval(logContent, 100);
+        
+      /* TODO: once KeymanWeb supports oninput signalling
+      document.getElementById('ta1').addEventListener('input', logContent, false);
+      */
       
       window.onload = function() {
         window.setTimeout(

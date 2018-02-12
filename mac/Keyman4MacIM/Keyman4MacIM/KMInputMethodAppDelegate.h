@@ -6,6 +6,9 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+#ifndef KMInputMethodAppDelegate_h
+#define KMInputMethodAppDelegate_h
+
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
@@ -52,6 +55,7 @@ extern NSString *const kWebSite;
 @property (nonatomic, strong) NSString *selectedKeyboard;
 @property (nonatomic, strong) NSMutableArray *activeKeyboards;
 @property (nonatomic, strong) NSMutableString *contextBuffer;
+@property (nonatomic, assign) NSEventModifierFlags currentModifierFlags;
 @property (nonatomic, strong) OSKWindowController *oskWindow;
 @property (nonatomic, strong) NSString *keyboardName;
 @property (nonatomic, strong) NSImage *keyboardIcon;
@@ -92,3 +96,5 @@ extern NSString *const kWebSite;
 - (NSString *)oskWindowTitle;
 
 @end
+
+#endif /* KMInputMethodAppDelegate_h */

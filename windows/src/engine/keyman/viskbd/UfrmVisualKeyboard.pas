@@ -1253,7 +1253,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKey(SRegKey_KeymanOSK, True) then
+    if OpenKey(SRegKey_KeymanOSK_CU, True) then
     begin
       WriteBool(SRegValue_OSK_FadeVisualKeyboard, FFadeVisualKeyboard);
       WriteInteger(SRegValue_OSK_ActivePage, Ord(ActivePage));
@@ -1353,7 +1353,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_KeymanOSK) then
+    if OpenKeyReadOnly(SRegKey_KeymanOSK_CU) then
     begin
       if ValueExists(SRegValue_OSK_FadeVisualKeyboard) then FFadeVisualKeyboard := ReadBool(SRegValue_OSK_FadeVisualKeyboard);
 

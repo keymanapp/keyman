@@ -1,6 +1,7 @@
 package com.tavultesoft.kmea.packages;
 
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.util.ZipUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
@@ -17,59 +18,62 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 @RunWith(RobolectricTestRunner.class)
 public class PackageProcessorTest {
-  public static final File TEST_RESOURCE_ROOT = new File("test_resources");
-  public static final File TEST_EXTRACTION_ROOT = new File(TEST_RESOURCE_ROOT, "temp");
+  private static final File TEST_RESOURCE_ROOT = new File("test_resources");
+  private static final File TEST_EXTRACTION_ROOT = new File(TEST_RESOURCE_ROOT, "temp");
 
-  public static final String TEST_GFF_KMP_NAME = "gff_amh_7_test_json";
-  public static final File TEST_GFF_KMP_FILE = new File(TEST_RESOURCE_ROOT, TEST_GFF_KMP_NAME + ".kmp");
-  public static final File TEST_GFF_KMP_TARGET = new File(TEST_EXTRACTION_ROOT, "packages" +
+  private static final String TEST_GFF_KMP_NAME = "gff_amh_7_test_json";
+  private static final File TEST_GFF_KMP_FILE = new File(TEST_RESOURCE_ROOT, "v14" + File.separator + TEST_GFF_KMP_NAME + ".kmp");
+  private static final File TEST_GFF_KMP_TARGET = new File(TEST_EXTRACTION_ROOT, "packages" +
     File.separator + TEST_GFF_KMP_NAME);
 
-  public static final String TEST_GFF_KMP_NAME_ALT = "gff_amh_7_test_json_alt";
-  public static final File TEST_GFF_KMP_FILE_ALT = new File(TEST_RESOURCE_ROOT, TEST_GFF_KMP_NAME_ALT + ".kmp");
-  public static final File TEST_GFF_KMP_TARGET_ALT = new File(TEST_EXTRACTION_ROOT, "packages" +
+  private static final String TEST_GFF_KMP_NAME_ALT = TEST_GFF_KMP_NAME;
+  private static final File TEST_GFF_KMP_FILE_ALT = new File(TEST_RESOURCE_ROOT, "v15" + File.separator + TEST_GFF_KMP_NAME_ALT + ".kmp");
+  private static final File TEST_GFF_KMP_TARGET_ALT = new File(TEST_EXTRACTION_ROOT, "packages" +
     File.separator + TEST_GFF_KMP_NAME_ALT);
 
-  private static File tempPkg, tempPkgAlt;
+  private static final int TEST_GFF_KBD_COUNT = 2;
+  private static final String TEST_GFF_PACKAGE_NAME = "GFF Amharic Keyboard";
+  private static final String TEST_GFF_KBD_ID = "gff_amh_7";
 
-  /**
-   * Uses the existing sample KMP's kmp.info file as a base, constructing a second, altered KMP package
-   * for use in version tests between same-id packages.  Does not reconstruct the .zip for actual installation
-   * tests.
-   * @throws Exception
-   */
-  private static void createAlternateKMP() throws Exception {
-    FileUtils.copyFile(TEST_GFF_KMP_FILE, TEST_GFF_KMP_FILE_ALT);
-    try {
-      tempPkgAlt = PackageProcessor.unzipKMP(TEST_GFF_KMP_FILE_ALT);
-
-      JSONObject json = PackageProcessor.loadPackageInfo(tempPkgAlt);
-      json.getJSONObject("system").put("fileVersion", "8.0"); // Make it look newer!
-
-      // Write out the JSON file.
-      File jsonFile = new File(tempPkgAlt, "kmp.json");
-      BufferedWriter writer = new BufferedWriter(new FileWriter(jsonFile, false));
-      writer.write(json.toString(2));
-      writer.close();
-
-      // Write the JSON file.
-    } catch (IOException e) {
-      System.err.println(e);
-    }
-  }
+  private static File tempPkg;
+  private static File tempPkgAlt;
 
   // Each test gets a fresh version of the extracted package.
   @Before
-  public void extractTestPackages() {
+  public void extractBaseTestPackage() {
     PackageProcessor.initialize(TEST_EXTRACTION_ROOT);
     try {
       tempPkg = PackageProcessor.unzipKMP(TEST_GFF_KMP_FILE);
     } catch (IOException e) {
       System.err.println(e);
     }
+  }
+
+  // Some tests wish to utilize an alternate package..
+  public void extractAltTestPackage() {
+    PackageProcessor.initialize(TEST_EXTRACTION_ROOT);
+    try {
+      tempPkgAlt = PackageProcessor.unzipKMP(TEST_GFF_KMP_FILE_ALT);
+    } catch (IOException e) {
+      System.err.println(e);
+    }
+  }
+
+
+  /**
+   * Post-test cleanup.  While the temp/ directory is .gitignore'd, this provides an extra layer
+   * of safety from polluting the repo file path.
+   * @throws IOException
+   */
+  @After
+  public void eraseTestPackages() throws IOException {
+    FileUtils.deleteDirectory(tempPkg);
+    FileUtils.deleteQuietly(tempPkgAlt);
+    FileUtils.deleteDirectory(TEST_GFF_KMP_TARGET);
   }
 
   @Test
@@ -103,31 +107,34 @@ public class PackageProcessorTest {
   @Test
   public void test_load_GFF_KMP_keyboards() throws Exception {
     JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
+    FileUtils.moveDirectory(tempPkg, TEST_GFF_KMP_TARGET);
 
     Assert.assertNotNull(json);
 
-    Map<String, String>[] keyboards = PackageProcessor.processKeyboardsEntry(json.getJSONArray("keyboards").getJSONObject(0));
+    Map<String, String>[] keyboards = PackageProcessor.processKeyboardsEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json");
     Assert.assertEquals(2, keyboards.length);
 
     HashMap<String, String> amharic = new HashMap<String, String>();
+    amharic.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");
     amharic.put(KMManager.KMKey_KeyboardName, "Amharic");
     amharic.put(KMManager.KMKey_KeyboardID, "gff_amh_7");
     amharic.put(KMManager.KMKey_LanguageID, "am");
     amharic.put(KMManager.KMKey_LanguageName, "Amharic");
     amharic.put(KMManager.KMKey_KeyboardVersion, "1.4");
-    amharic.put(KMManager.KMKey_Font, "fantuwua.ttf");
-    amharic.put(KMManager.KMKey_OskFont, "wookianos.ttf");
+    amharic.put(KMManager.KMKey_CustomKeyboard, "Y");
+    amharic.put(KMManager.KMKey_CustomHelpLink, TEST_GFF_KMP_TARGET + File.separator + "welcome.htm");
 
     Assert.assertEquals(amharic, keyboards[0]);
 
     HashMap<String, String> geez = new HashMap<String, String>();
+    geez.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");
     geez.put(KMManager.KMKey_KeyboardName, "Amharic");
     geez.put(KMManager.KMKey_KeyboardID, "gff_amh_7");
     geez.put(KMManager.KMKey_LanguageID, "gez");
     geez.put(KMManager.KMKey_LanguageName, "Ge'ez");
     geez.put(KMManager.KMKey_KeyboardVersion, "1.4");
-    geez.put(KMManager.KMKey_Font, "fantuwua.ttf");
-    geez.put(KMManager.KMKey_OskFont, "wookianos.ttf");
+    geez.put(KMManager.KMKey_CustomKeyboard, "Y");
+    geez.put(KMManager.KMKey_CustomHelpLink, TEST_GFF_KMP_TARGET + File.separator + "welcome.htm");
 
     Assert.assertEquals(geez, keyboards[1]);
   }
@@ -140,41 +147,105 @@ public class PackageProcessorTest {
     Assert.assertNotEquals(new File(permPath), PackageProcessor.constructPath(TEST_GFF_KMP_FILE, true));
   }
 
-  /**
-   * Rather than actually attempt to maintain two identically-named package files, this white-box test
-   * simply relies upon an altered kmp.info to test the central version comparison logic used to
-   * determine if an old package version should be replaced.
-   * @throws Exception
-   */
-  @Test
-  public void test_versionCompare() throws Exception {
-    createAlternateKMP();
-
-    Assert.assertEquals(1, PackageProcessor.comparePackageDirectories(tempPkgAlt, tempPkg));
-    Assert.assertEquals(-1, PackageProcessor.comparePackageDirectories(tempPkg, tempPkgAlt));
-
-    // Test for when there is no pre-existing package.
-    FileUtils.deleteDirectory(tempPkgAlt);
-    Assert.assertEquals(1, PackageProcessor.comparePackageDirectories(tempPkg, tempPkgAlt));
-  }
-
   @Test
   public void test_installKMP() throws Exception {
-    PackageProcessor.processKMP(TEST_GFF_KMP_FILE);
+    List<Map<String, String>> installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE);
 
     Assert.assertTrue(TEST_GFF_KMP_TARGET.exists());
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
   }
 
-  /**
-   * Post-test cleanup.  While the temp/ directory is .gitignore'd, this provides an extra layer
-   * of safety from polluting the repo file path.
-   * @throws IOException
-   */
-  @After
-  public void eraseTestPackages() throws IOException {
-    FileUtils.deleteDirectory(tempPkg);
-    FileUtils.deleteDirectory(TEST_GFF_KMP_TARGET);
+  @Test
+  public void test_upgradeInstall() throws Exception {
+    File installedKMP = PackageProcessor.constructPath(TEST_GFF_KMP_FILE, false);
+    List<Map<String, String>> installedKbds;
+    String version;
 
-    FileUtils.deleteQuietly(TEST_GFF_KMP_FILE_ALT);
+    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE);
+    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
+    Assert.assertEquals("1.4", version);
+
+    extractAltTestPackage();
+    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT);
+    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
+    Assert.assertEquals("1.5", version);
+  }
+
+  @Test
+  public void test_downgradeInstall() throws Exception {
+    File installedKMP = PackageProcessor.constructPath(TEST_GFF_KMP_FILE, false);
+    List<Map<String, String>> installedKbds;
+    String version;
+
+    extractAltTestPackage();
+    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT, false);
+    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
+    Assert.assertEquals("1.5", version);
+
+    // Blocked downgrade attempt.
+    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE, false);
+    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    Assert.assertEquals(0, installedKbds.size());
+    Assert.assertEquals("1.5", version);
+
+    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE, true);
+    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
+    Assert.assertEquals("1.4", version);
+  }
+
+  @Test
+  public void test_keyboardVersion() throws Exception {
+    JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
+
+    Assert.assertEquals("1.4", PackageProcessor.getKeyboardVersion(json, TEST_GFF_KBD_ID));
+  }
+
+  @Test
+  public void test_getPackageID() {
+    Assert.assertEquals(TEST_GFF_KMP_NAME, PackageProcessor.getPackageID(TEST_GFF_KMP_FILE));
+    Assert.assertNotEquals(TEST_GFF_KBD_ID, PackageProcessor.getPackageID(TEST_GFF_KMP_FILE));
+  }
+
+  @Test
+  public void test_getPackageName() throws Exception {
+    JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
+
+    Assert.assertEquals(TEST_GFF_PACKAGE_NAME, PackageProcessor.getPackageName(json));
+    Assert.assertNotEquals(TEST_GFF_KMP_NAME, PackageProcessor.getPackageName(json));
+  }
+
+  @Test
+  public void test_versionChecks() throws Exception {
+    Assert.assertFalse(PackageProcessor.isDowngrade(TEST_GFF_KMP_FILE));
+    Assert.assertFalse(PackageProcessor.isSameVersion(TEST_GFF_KMP_FILE));
+
+    extractAltTestPackage();
+    PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT);
+
+    Assert.assertTrue(PackageProcessor.isDowngrade(TEST_GFF_KMP_FILE));
+    Assert.assertFalse(PackageProcessor.isSameVersion(TEST_GFF_KMP_FILE));
+
+    // Test 2 - when it's an equal version.
+    PackageProcessor.processKMP(TEST_GFF_KMP_FILE, true);
+    Assert.assertFalse(PackageProcessor.isDowngrade(TEST_GFF_KMP_FILE));
+    Assert.assertTrue(PackageProcessor.isSameVersion(TEST_GFF_KMP_FILE));
+
+    // Test 3 - when it's an upgrade.
+    extractAltTestPackage();
+    Assert.assertFalse(PackageProcessor.isDowngrade(TEST_GFF_KMP_FILE_ALT));
+    Assert.assertFalse(PackageProcessor.isSameVersion(TEST_GFF_KMP_FILE_ALT));
+  }
+
+  @Test
+  public void test_kmpVersionCheck() throws Exception {
+    extractAltTestPackage();
+    PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT);
+
+    Assert.assertEquals("1.5", PackageProcessor.getPackageVersion(TEST_GFF_KMP_FILE, true));
+    Assert.assertEquals("1.4", PackageProcessor.getPackageVersion(TEST_GFF_KMP_FILE, false));
   }
 }

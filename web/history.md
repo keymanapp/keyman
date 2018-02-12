@@ -21,6 +21,9 @@
 * New feature:  physical keyboard input now supported on touch-enabled inputs. (#237) (#311)
   * Note that hardware-based keyboard input will always follow 'hardware' and 'desktop' platform rules to ensure consistency.
 * Fixed behavior of longpress subkeys specifying (layer-default) modifier settings. (#161)
+* Converted KeymanWeb (largely) to TypeScript and streamlined the code to reflect new minimum requirements.
+* Fixed styling of "Special" keys on touch layouts
+* Added automated testing for KeymanWeb builds. (#350)
 
 ## 2017-07-10 2.0.473 stable
 * 2.0 stable release build.

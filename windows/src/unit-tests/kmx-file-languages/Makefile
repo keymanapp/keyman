@@ -10,7 +10,7 @@
 !include ..\..\Defines.mak
 
 test: build
-    Win32\Debug\kmxfilelanguagestestsuite.exe -b
+    $(WIN32_TARGET_PATH)\kmxfilelanguagestestsuite.exe -b
   
 build: 
     $(DELPHI_MSBUILD) /p:CI=CI kmxfilelanguagestestsuite.dproj

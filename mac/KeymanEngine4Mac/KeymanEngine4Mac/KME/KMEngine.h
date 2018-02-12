@@ -6,6 +6,9 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+#ifndef KMEngine_h
+#define KMEngine_h
+
 #import <Foundation/Foundation.h>
 #import "KMXFile.h"
 
@@ -29,3 +32,5 @@ extern DWORD VKMap[0x80];
 - (NSArray *)processEvent:(NSEvent *)event;
 
 @end
+
+#endif /* KMEngine_h */

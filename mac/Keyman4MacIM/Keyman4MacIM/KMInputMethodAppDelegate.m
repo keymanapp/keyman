@@ -63,11 +63,31 @@ typedef enum {
 - (id)init {
     self = [super init];
     if (self) {
-        _debugMode = YES; // Disable before release
+#ifdef DEBUG
+        _debugMode = YES;
+#else
+        _debugMode = NO;
+#endif
         [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
                                                            andSelector:@selector(handleURLEvent:withReplyEvent:)
                                                          forEventClass:kInternetEventClass
                                                             andEventID:kAEGetURL];
+        
+        CFMachPortRef eventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask, (CGEventTapCallBack)eventTapFunction, nil);
+        
+        if (!eventTap)
+            NSLog(@"Can't tap into flags changed event!");
+        else
+            CFRelease(eventTap);
+                  
+        CFRunLoopSourceRef flagsChangedEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0);
+        if (flagsChangedEventSrc ) {
+
+            CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+            if (runLoop) {
+                CFRunLoopAddSource(runLoop,  flagsChangedEventSrc, kCFRunLoopDefaultMode);
+            }
+        }
     }
 
     return self;
@@ -132,6 +152,22 @@ typedef enum {
             }
         }
     }
+}
+
++ (KMInputMethodAppDelegate *)AppDelegate {
+    return (KMInputMethodAppDelegate *)[NSApp delegate];
+}
+
+CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
+    if (type == kCGEventFlagsChanged) { // This should always be true; it's the only event type we're trying to tap
+        KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
+        if (appDelegate != nil) {
+            NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
+            NSLog(@"System Event: %@", sysEvent);
+            appDelegate.currentModifierFlags = sysEvent.modifierFlags;
+        }
+    }
+    return event;
 }
 
 - (NSMenu *)menu {

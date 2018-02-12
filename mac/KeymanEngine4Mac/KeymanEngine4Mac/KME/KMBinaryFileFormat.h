@@ -6,6 +6,9 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+#ifndef KMBinaryFileFormat_h
+#define KMBinaryFileFormat_h
+
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
 //typedef wchar_t* PWSTR;
@@ -217,3 +220,5 @@ PWSTR incxstr(PWSTR p) {
         default:                return p;
     }
 }*/
+
+#endif /* KMBinaryFileFormat_h */

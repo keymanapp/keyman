@@ -124,18 +124,19 @@ begin
     if FAdmin then  // I2361
     begin
       regRead.RootKey := HKEY_LOCAL_MACHINE;
-      regWrite.RootKey := HKEY_LOCAL_MACHINE;
+      // We use LM + CU here because we are sharing the LM and CU base paths in the backup
+      rootRead := SRegKey_UpgradeBackupPath_LM + SRegKey_KeymanEngine90_InstalledPackages_CU;  // I2642
     end
     else
     begin
       regRead.RootKey := HKEY_CURRENT_USER;
-      regWrite.RootKey := HKEY_LOCAL_MACHINE;
+      rootRead := SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine90_InstalledPackages_CU;  // I2642
     end;
 
-    { Copy Installed Keyboards }
+    regWrite.RootKey := HKEY_LOCAL_MACHINE;
+    rootWrite := '\'+SRegKey_InstalledPackages_LM; // '\Software\...\Keyman Engine\x.x\Installed Packages';
 
-    rootRead := SRegKey_UpgradeBackupPath + SRegKey_KeymanEngine90_InstalledPackages;  // I2642
-    rootWrite := '\'+SRegKey_InstalledPackages; // '\Software\...\Keyman Engine\x.x\Installed Packages';
+    { Copy Installed Keyboards }
 
     if FAdmin then
     begin
@@ -150,8 +151,8 @@ begin
         end;
       end;
 
-      rootRead := SRegKey_UpgradeBackupPath + SRegKey_KeymanEngine90_InstalledKeyboards;  // I2642
-      rootWrite := '\'+SRegKey_InstalledKeyboards;  // '\Software\...\Keyman Engine\x.x\Installed Keyboards';
+      rootRead := SRegKey_UpgradeBackupPath_LM + SRegKey_KeymanEngine90_InstalledKeyboards_CU;  // I2642
+      rootWrite := '\'+SRegKey_InstalledKeyboards_LM;  // '\Software\...\Keyman Engine\x.x\Installed Keyboards';
 
       if regRead.OpenKeyReadOnly(rootRead) then
       begin
@@ -169,8 +170,8 @@ begin
     if not FAdmin then  // I2361
     begin
       regWrite.RootKey := HKEY_CURRENT_USER;   // I4297
-      rootRead := SRegKey_UpgradeBackupPath + SRegKey_KeymanEngine90_ActiveKeyboards;  // I2642
-      rootWrite := '\'+SRegKey_ActiveKeyboards; //'\Software\...\Keyman Engine\x.x\Active Keyboards';
+      rootRead := SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine90_ActiveKeyboards_CU;  // I2642
+      rootWrite := '\'+SRegKey_ActiveKeyboards_CU; //'\Software\...\Keyman Engine\x.x\Active Keyboards';
 
       if regRead.OpenKeyReadOnly(rootRead) and regWrite.OpenKey(rootWrite, True) then
       begin
@@ -243,14 +244,14 @@ var
   //FProfileGUID: string;
 begin
     // Copy language profiles
-  if regRead.OpenKeyReadOnly(rootRead+'\'+keyboardname+'\'+SRegKey_LanguageProfiles) then
+  if regRead.OpenKeyReadOnly(rootRead+'\'+keyboardname+'\'+SRegSubKey_LanguageProfiles) then
   begin
     profilenames := TStringList.Create;
     try
       regRead.GetKeyNames(profilenames);
       for i := 0 to profilenames.Count - 1 do
       begin
-        if regRead.OpenKeyReadOnly(rootRead+'\'+keyboardname+'\'+SRegKey_LanguageProfiles+'\'+profilenames[i]) then
+        if regRead.OpenKeyReadOnly(rootRead+'\'+keyboardname+'\'+SRegSubKey_LanguageProfiles+'\'+profilenames[i]) then
         begin
           FLangID := regRead.ReadInteger(SRegValue_LanguageProfileLangID);
           FLocale := regRead.ReadString(SRegValue_LanguageProfileLocale);
@@ -278,7 +279,7 @@ var
   localRootWrite: string;
   localRegWrite: TRegistryErrorControlled;   // I4296
 begin
-  localRootWrite := TImportOlderKeyboardUtils.GetRegistryKeyboardInstallKey(AKeyboardName);
+  localRootWrite := TImportOlderKeyboardUtils.GetRegistryKeyboardInstallKey_LM(AKeyboardName);
 
   with TRegistryErrorControlled.Create do
   try
@@ -343,7 +344,7 @@ begin
     localRegWrite := TRegistryErrorControlled.Create;  // I2890   // I4296
     try
       localRegWrite.RootKey := HKEY_LOCAL_MACHINE;   // I4297
-      localRegWrite.OpenKey('\' + localRootWrite + '\' + SRegKey_LanguageProfiles + '\' + ALocale, True);   // I4296
+      localRegWrite.OpenKey('\' + localRootWrite + '\' + SRegSubKey_LanguageProfiles + '\' + ALocale, True);   // I4296
       localRegWrite.WriteInteger(SRegValue_LanguageProfileLangID, ALangID);
       localRegWrite.WriteString(SRegValue_LanguageProfileLocale, ALocale);
 

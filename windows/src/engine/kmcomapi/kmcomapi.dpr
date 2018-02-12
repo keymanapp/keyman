@@ -54,7 +54,6 @@ uses
   RegKeyboards in '..\..\global\delphi\general\RegKeyboards.pas',
   HotkeyUtils in '..\..\global\delphi\general\HotkeyUtils.pas',
   Glossary in '..\..\global\delphi\general\Glossary.pas',
-  olepro32 in 'util\olepro32.pas',
   kpbase in 'processes\kpbase.pas',
   kpinstallkeyboard in 'processes\keyboard\kpinstallkeyboard.pas',
   utilunicode in 'util\utilunicode.pas',
@@ -146,7 +145,10 @@ uses
   Windows8LanguageList in '..\..\global\delphi\general\Windows8LanguageList.pas',
   BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
   JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
-  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas';
+  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
+  Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
+  Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
+  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas';
 
 {$R *.TLB}
 

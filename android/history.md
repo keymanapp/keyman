@@ -9,6 +9,7 @@
 * Fix dual keyboards that appear when closing Keyman Browser (#220)
 * Fix KMEA http:// to https:// redirects for downloading keyboard resources (#370)
 * Change internal keyboard assets from languages/ and fonts/ folders to packages/
+* Add feature to install ad-hoc keyboards via .kmp packages
 
 ## 2017-08-10 2.8.300 stable
 * No changes, just published latest beta as stable

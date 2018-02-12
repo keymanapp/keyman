@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Build KMAPro
 
 display_usage ( ) {
@@ -10,6 +10,11 @@ display_usage ( ) {
 }
 
 echo Build KMAPro
+
+#
+# Prevents 'clear' on exit of mingw64 bash shell
+#
+SHLVL=0
 
 NO_DAEMON=false
 

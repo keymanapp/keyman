@@ -110,6 +110,8 @@ var
   FJsonExtract: Boolean;
   FParamDistribution: Boolean;
   FMergingValidateIds: Boolean;
+  FJsonSchemaPath: string;
+  FParamSourcePath: string;
 begin
   FSilent := False;
   FFullySilent := False;
@@ -131,6 +133,8 @@ begin
   FParamOutfile := '';
   FParamDebugfile := '';
   FParamTarget := '';   // I4699
+
+  FJsonSchemaPath := ExtractFilePath(ParamStr(0));
 
   i := 1;
   while i <= ParamCount do
@@ -167,6 +171,16 @@ begin
         FParamInfile2 := ParamStr(i);
       end;
     end
+    else if s = '-source-path' then
+    begin
+      Inc(i);
+      FParamSourcePath := ParamStr(i);
+    end
+    else if s = '-schema-path' then
+    begin
+      Inc(i);
+      FJsonSchemaPath := IncludeTrailingPathDelimiter(ParamStr(i));
+    end
     else if s = '-m-validate-id' then
       FMergingValidateIds := True
     else if s = '-extract-keyboard-info' then
@@ -197,7 +211,8 @@ begin
   if FError or (FParamInfile = '') then
   begin
     writeln('');
-    writeln('Usage: kmcomp [-s[s]] [-nologo] [-c] [-d] [-w] [-v] [-m] infile [-m infile] [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
+    writeln('Usage: kmcomp [-s[s]] [-nologo] [-c] [-d] [-w] [-v[s|d]] [-source-path path] [-schema-path path] ');
+    writeln('              [-m] infile [-m infile] [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
     writeln('              [-extract-keyboard-info field[,field...]]');
     writeln('          infile        can be a .kmn file (Keyboard Source, .kps file (Package Source), or .kpj (project)');   // I4699   // I4825
     writeln('                        if -v specified, can also be a .keyboard_info file');
@@ -217,8 +232,12 @@ begin
     writeln('          -v[s]    validate infile against source schema');
     writeln('          -vd      validate infile against distribution schema');
     writeln('          -m       merge information from infile (can be .kmp and .js) into .keyboard_info output file');
-    writeln('          -m-validate-id validate the id against the .js, .kmx and .kmp filenames when merging');
-    writeln('          -json-extract print json data .keyboard_info for build script integration');
+    writeln('          -m-validate-id  validate the id against the .js, .kmx and .kmp filenames when merging');
+    writeln('          -json-extract   print json data .keyboard_info for build script integration');
+    writeln('          -source-path    specify path to add to the sourcePath field in the .keyboard_info output file');
+    writeln('          -schema-path    specify path to the keyboard_info json schema definitions');
+    writeln('                          if not specified, then defaults to same folder as kmcomp.exe');
+
     Halt(2);
   end;
 
@@ -235,9 +254,9 @@ begin
       hOutfile := 0;
 
     if FMerging then
-      FError := not TMergeKeyboardInfo.Execute(FParamInfile, FParamInfile2, FParamOutfile, FMergingValidateIds, FSilent, @CompilerMessage)
+      FError := not TMergeKeyboardInfo.Execute(FParamSourcePath, FParamInfile, FParamInfile2, FParamOutfile, FMergingValidateIds, FSilent, @CompilerMessage)
     else if FValidating then
-      FError := not TValidateKeyboardInfo.Execute(FParamInfile, FParamDistribution, FSilent, @CompilerMessage)
+      FError := not TValidateKeyboardInfo.Execute(FParamInfile, FJsonSchemaPath, FParamDistribution, FSilent, @CompilerMessage)
     else if FJsonExtract then
       FError := not TJsonExtractKeyboardInfo.Execute(FParamInfile, FParamJsonFields, FSilent, @CompilerMessage)
     else if LowerCase(ExtractFileExt(FParamInfile)) = '.kpj' then   // I4699

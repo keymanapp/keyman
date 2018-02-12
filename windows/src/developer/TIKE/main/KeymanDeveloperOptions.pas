@@ -133,7 +133,7 @@ procedure TKeymanDeveloperOptions.OpenRegistry;
 begin
   reg := TRegistryErrorControlled.Create;  // I2890
   reg.RootKey := HKEY_CURRENT_USER;
-  reg.OpenKey(SRegKey_IDEOptions, True);
+  reg.OpenKey(SRegKey_IDEOptions_CU, True);
 end;
 
 procedure TKeymanDeveloperOptions.CloseRegistry;

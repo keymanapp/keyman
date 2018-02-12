@@ -233,14 +233,10 @@ type
     function VisualKeyboardFromFile(
       const FVisualKeyboardFileName: string): WideString;
     function WriteCompiledKeyboard: string;
-    function WriteCompiledKeyboardStub: string;
-    function WriteCompiledKeyboardJson: string;   // I4259
     procedure CheckStoreForInvalidFunctions(key: PFILE_KEY; store: PFILE_STORE);  // I1971
     function GetCodeName(code: Integer): string;  // I3438
     function HasSupplementaryPlaneChars: Boolean;   // I3317
     function ValidateLayoutFile(var sLayoutFile: string; const sVKDictionary: string): Boolean;   // I4139
-    function GetSystemStoreValue(Index: DWORD; const Default: string = ''): string;   // I4259
-    function ValidateJsonFile(const AJSONFilename: string): Boolean;
     function GetKeyboardModifierBitmask: string;
     function FormatModifierAsBitflags(FBitMask: Cardinal): string;
     function FormatKeyAsString(key: Integer): string;
@@ -253,11 +249,6 @@ type
     destructor Destroy; override;
   end;
 
-function GetKeymanWebCompiledName(const Name: WideString): WideString;
-function GetKeymanWebCompiledNameFromFileName(const FileName: WideString): WideString;
-function GetKeymanWebCompiledFileName(const FileName: WideString): WideString; overload;   // I4140
-function GetKeymanWebCompiledFileName(const FileName, Version: WideString): WideString; overload;   // I4140
-
 implementation
 
 uses
@@ -269,12 +260,11 @@ uses
   System.TypInfo,
 
   CompileErrorCodes,
-  JsonKeyboardInfo,
   JsonUtil,
   KeyboardParser,
+  Keyman.System.KeyboardUtils,
   KeymanWebKeyCodes,
   kmxfileutils,
-  TikeUnicodeData,
   TouchLayout,
   TouchLayoutUtils,
   Unicode,
@@ -310,11 +300,11 @@ end;
 
 function TCompileKeymanWeb.Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallback): Boolean;   // I3681   // I4140   // I4688   // I4866   // I4865
 var
-  f: TSearchRec;
   CompilerWarningsAsErrors, WarnDeprecatedCode: Boolean;
 begin
   FCallback := Callback;
   FInFile := InFile;
+  FOutFile := OutFile;   // I4140   // I4155   // I4154
   FDebug := Debug;   // I3681
   FError := False;  // I1971
 
@@ -349,47 +339,11 @@ begin
     begin
       with TStringStream.Create(WriteCompiledKeyboard, TEncoding.UTF8) do
       try
-        FOutFile := OutFile;   // I4140   // I4155   // I4154
         SaveToFile(OutFile);
       finally
         Free;
       end;
 
-      with TStringStream.Create(WriteCompiledKeyboardStub, TEncoding.UTF8) do
-      try
-        SaveToFile(ExtractFilePath(OutFile)+ChangeFileExt(ExtractFileName(OutFile), '')+'_load.js');
-      finally
-        Free;
-      end;
-
-      if not FileExists(ExtractFilePath(InFile)+ChangeFileExt(ExtractFileName(OutFile), '')+'.json') then   // I4505   // I4688
-      begin
-        with TStringStream.Create(WriteCompiledKeyboardJson, TEncoding.UTF8) do   // I4259
-        try
-          SaveToFile(ExtractFilePath(InFile)+ChangeFileExt(ExtractFileName(OutFile), '')+'.json');   // I4688
-        finally
-          Free;
-        end;
-      end;
-
-      // Copy all .json files to output   // I4688
-
-      if FindFirst(ChangeFileExt(InFile, '') + '-*.json', 0, f) = 0 then
-      begin
-        repeat
-          if not ValidateJsonFile(ExtractFilePath(InFile)+f.Name) then   // I4872
-            Continue;
-
-          if not SameFileName(ExtractFileDir(InFile), ExtractFileDir(OutFile)) then   // I4724
-          begin
-            if not CopyFile(PChar(ExtractFilePath(InFile)+f.Name), PChar(ExtractFilePath(OutFile)+f.Name), False) then
-              ReportError(0, CWARN_CouldNotCopyJsonFile, 'Could not copy file '+ExtractFilePath(InFile)+f.Name+' to '+
-                ExtractFilePath(OutFile)+f.Name+': '+SysErrorMessage(GetLastError));
-          end;
-        until FindNext(f) <> 0;
-        FindClose(f);
-      end;
-    
       Result := not FError;  // I1971
     end
     else
@@ -1211,43 +1165,6 @@ begin
   Delete(Result, 1, 2);
 end;
 
-function TCompileKeymanWeb.ValidateJsonFile(
-  const AJSONFilename: string): Boolean;   // I4872
-var
-  s: string;
-  i: Integer;
-begin
-  with TStringStream.Create('', TEncoding.UTF8) do
-  try
-    LoadFromFile(AJSONFileName);
-    s := DataString;
-  finally
-    Free;
-  end;
-
-  with TJSONKeyboardInfo.Create do
-  try
-    if not Read(s) then
-    begin
-      ReportError(0, CWARN_InvalidJSONMetadataFile, 'Invalid JSON metadata file '+ExtractFileName(AJSONFileName) + ': ' + ReadError);
-      Exit(False);
-    end;
-
-    if FTouchLayoutFont = '' then
-      Exit(True);
-
-    for i := 0 to OskFonts.Count - 1 do
-    begin
-      if not SameText(OskFonts[i].Family, FTouchLayoutFont) then
-        ReportError(0, CWARN_JSONMetadataOSKFontShouldMatchTouchFont, 'JSON metadata file '+ExtractFileName(AJSONFileName)+' should have an OSK Font name that matches the touch layout or OSK font name ('+FTouchLayoutFont+')');
-    end;
-  finally
-    Free;
-  end;
-
-  Result := True;
-end;
-
 function TCompileKeymanWeb.ValidateLayoutFile(var sLayoutFile: string; const sVKDictionary: string): Boolean;   // I4060   // I4139
 type
   TKeyIdType = (Key_Invalid, Key_Constant, Key_Touch, Key_Unicode);   // I4142
@@ -1498,7 +1415,7 @@ begin
     Inc(fsp);
   end;
 
-  sName := 'Keyboard_'+GetKeymanWebCompiledNameFromFileName(FInFile);
+  sName := 'Keyboard_'+TKeyboardUtils.GetKeymanWebCompiledNameFromFileName(FInFile);
 
   if sHelpFile <> '' then
   begin
@@ -1587,7 +1504,11 @@ begin
   if sVisualKeyboard <> '' then
   begin
     try
-      sVisualKeyboard := VisualKeyboardFromFile(ExtractFilePath(FInFile) + sVisualKeyboard);
+      // The Keyman .kmx compiler will change the value of this store from a
+      // .kvks to a .kvk during the build. Earlier in the build, the visual keyboard
+      // would have been compiled, so we need to account for that and use that file.
+
+      sVisualKeyboard := VisualKeyboardFromFile(ExtractFilePath(FOutFile) + sVisualKeyboard);
     except
       on E:EFOpenError do   // I3947
       begin
@@ -1800,80 +1721,6 @@ begin
   end;
 
   Result := Result + sEmbedJS + '}' + nl;   // I3681
-end;
-
-function TCompileKeymanWeb.WriteCompiledKeyboardJson: string;   // I4259
-var
-  JSON: TJSONObject;
-  jsonOptions: TJSONObject;
-  jsonKeyboard: TJSONObject;
-  jsonLanguages: TJSONArray;
-  jsonLanguage: TJSONObject;
-  languages, version: string;
-  id, name: string;
-  language: string;
-  FResult: TStringList;
-  ethlang: TEthnologueLanguage;
-begin
-  CreateTikeUnicodeData(nil);
-  try
-    id := GetKeymanWebCompiledNameFromFileName(FInFile);
-    name := GetSystemStoreValue(TSS_NAME, id);
-    version := GetSystemStoreValue(TSS_KEYBOARDVERSION, '1.0');
-
-    // Generate an install JSON
-
-    jsonOptions := TJSONObject.Create;
-    jsonOptions.AddPair('device', 'any');
-    jsonOptions.AddPair('keyboardBaseUri', 'http://your-host-here/keyboard-path/');
-    jsonOptions.AddPair('fontBaseUri', 'http://your-host-here/font-path/');
-
-    jsonLanguages := TJSONArray.Create;
-
-    languages := GetSystemStoreValue(TSS_ETHNOLOGUECODE);
-    language := StrToken(languages, ' ,;');
-    while language <> '' do
-    begin
-      jsonLanguage := TJSONObject.Create;
-      jsonLanguage.AddPair('id',language);
-
-      ethlang := FUnicodeData.FindLanguageByCode(language);
-      if ethlang.Name = '' then ethlang.Name := language;
-
-      jsonLanguage.AddPair('name',ethlang.Name);
-      jsonLanguages.Add(jsonLanguage);
-      language := StrToken(languages, ' ,;');
-    end;
-
-    jsonKeyboard := TJSONObject.Create;
-    jsonKeyboard.AddPair('id', id);
-    jsonKeyboard.AddPair('name', name);
-    jsonKeyboard.AddPair('filename', ExtractFileName(FOutFile));
-    jsonKeyboard.AddPair('version',version);
-    jsonKeyboard.AddPair('lastModified',
-      FormatDateTime('yyyy-mm-dd',Now)+'T'+
-      FormatDateTime('hh:mm:ss+00:00',Now));
-    jsonKeyboard.AddPair('languages', jsonLanguages);
-
-    json := TJSONObject.Create;
-    try
-      json.AddPair('options', jsonOptions);
-      json.AddPair('keyboard', jsonKeyboard);
-
-      FResult := TStringList.Create;
-      try
-        PrettyPrintJSON(json, FResult, 0);
-        Result := FResult.Text;
-      finally
-        FResult.Free;
-      end;
-  //    Result := JSONToString(json, True);
-    finally
-      json.Free; //Frees all member objects as well
-    end;
-  finally
-    FreeUnicodeData;
-  end;
 end;
 
 function TCompileKeymanWeb.GetCodeName(code: Integer): string;  // I1971
@@ -2094,42 +1941,6 @@ begin
     Result.ChrVal := GetSuppChar(pwsz);
 end;
 
-function TCompileKeymanWeb.WriteCompiledKeyboardStub: string;
-const
-  nl: WideString = #13#10;
-var
-  sName: string;
-  sFullName: WideString;
-begin
-  Result := '';  //UTF16SignatureW;  // + '// compiled by Keyman Developer'+nl; //I3474
-
-	{ Locate the name of the keyboard }
-  sName := 'Keyboard_'+GetKeymanWebCompiledNameFromFileName(FInFile);
-  sFullName := GetSystemStoreValue(TSS_NAME);   // I4259
-
-  Result := Result + Format('KeymanWeb.KRS(new Stub_%s()); function Stub_%s() {this.KF="%s";this.KI="%s";this.KN="%s";}', [sName, sName, ExtractFileName(FOutFile), sName, RequotedString(sFullName)]);
-end;
-
-function TCompileKeymanWeb.GetSystemStoreValue(Index: DWORD; const Default: string = ''): string;   // I4259
-var
-  i: DWORD;
-	fsp: PFILE_STORE;
-begin
-  if fk.cxStoreArray = 0 then
-    Exit(Default);
-
-  fsp := fk.dpStoreArray;
-
-	for i := 0 to fk.cxStoreArray - 1 do
-  begin
-    if fsp.dwSystemID = Index then
-      Exit(fsp.dpString);
-    Inc(fsp);
-  end;
-
-  Result := Default;
-end;
-
 function TCompileKeymanWeb.CallFunctionName(s: WideString): WideString;
 var
   n: Integer;
@@ -2137,56 +1948,6 @@ begin
   n := Pos(':', s);
   if n = 0 then Result := s
   else Result := Copy(s,n+1,Length(s));
-end;
-
-function GetKeymanWebCompiledName(const Name: WideString): WideString;
-var
-  i: Integer;
-const
-  ValidChars: WideString = 'abcdefghijklmnopqrstuvwxyz0123456789_';
-begin
-  Result := LowerCase(Name);
-  if Length(Result) = 0 then Exit;
-  if Pos(Result[1], '0123456789') > 0 then Result := '_'+Result; // Can't have a number as initial
-  for i := 1 to Length(Result) do
-    if Pos(Result[i], ValidChars) = 0 then Result[i] := '_';
-end;
-
-function GetKeymanWebCompiledNameFromFileName(const FileName: WideString): WideString;
-begin
-  Result := GetKeymanWebCompiledName(ChangeFileExt(ExtractFileName(FileName), ''));
-end;
-
-function GetKeymanWebCompiledFileName(const FileName, Version: WideString): WideString;   // I4140
-begin
-  Result :=
-    ExtractFilePath(FileName) +
-    GetKeymanWebCompiledNameFromFileName(FileName) + '-' +
-    Version +
-    '.js';
-end;
-
-function GetKeymanWebCompiledFileName(const FileName: WideString): WideString;   // I4140
-
-  function GetKeyboardVersionString(const AFileName: string): string;   // I4263
-  begin
-    if not FileExists(AFileName) then   // I4263
-      Exit('1.0');
-
-    // Load in keyboard parser
-    with TKeyboardParser.Create do
-    try
-      LoadFromFile(AFileName);   // I4263
-      Result := GetSystemStoreValue(ssKeyboardVersion);
-      if not IsValidKeyboardVersionString(Result) then
-        Result := '1.0';
-    finally
-      Free;
-    end;
-    if Result = '' then Result := '1.0';
-  end;
-begin
-  Result := GetKeymanWebCompiledFileName(FileName, GetKeyboardVersionString(FileName));
 end;
 
 ///
@@ -2326,19 +2087,25 @@ var
 begin
   FBitMask := 0;
   gp := fk.dpGroupArray;
-  for i := 0 to fk.cxGroupArray-1 do
+  if fk.cxGroupArray > 0 then
   begin
-    if gp.fUsingKeys then
+    for i := 0 to fk.cxGroupArray-1 do
     begin
-      kp := gp.dpKeyArray;
-      for j := 0 to gp.cxKeyArray-1 do
+      if gp.fUsingKeys then
       begin
-        if not RuleIsExcludedByPlatform(kp) then
-          FBitMask := FBitMask or JavaScript_Shift(kp, fMnemonic);
-        Inc(kp);
+        kp := gp.dpKeyArray;
+        if gp.cxKeyArray > 0 then
+        begin
+          for j := 0 to gp.cxKeyArray-1 do
+          begin
+            if not RuleIsExcludedByPlatform(kp) then
+              FBitMask := FBitMask or JavaScript_Shift(kp, fMnemonic);
+            Inc(kp);
+          end;
+        end;
       end;
+      Inc(gp);
     end;
-    Inc(gp);
   end;
 
   if ((FBitMask and KMX_MASK_MODIFIER_CHIRAL) <> 0) and

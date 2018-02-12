@@ -26,7 +26,7 @@ public extension KeyboardRepository {
     guard let keyboard = language.keyboards?.first(where: { $0.id == keyboardID }) else {
       return nil
     }
-    return InstallableKeyboard(keyboard: keyboard, language: language)
+    return InstallableKeyboard(keyboard: keyboard, language: language, isCustom: false)
   }
 
   public func fetch(completionHandler: CompletionHandler? = nil) {

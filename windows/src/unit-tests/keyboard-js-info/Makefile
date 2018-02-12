@@ -9,7 +9,7 @@
 !include ..\..\Defines.mak
 
 test: build
-    Win32\Debug\keyboardjsinfotestsuite.exe -b
+    $(WIN32_TARGET_PATH)\keyboardjsinfotestsuite.exe -b
   
 build: 
     $(DELPHI_MSBUILD) /p:CI=CI keyboardjsinfotestsuite.dproj

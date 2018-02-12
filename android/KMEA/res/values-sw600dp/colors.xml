@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="activated_bg">#ffcc8822</color>
-    <color name="popup_bg">#ffa4a4a4</color>
-    <color name="popup_bg2">#ff414040</color>
-    <color name="popup_border">#ff414040</color>
-</resources>

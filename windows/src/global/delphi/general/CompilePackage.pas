@@ -29,9 +29,6 @@ interface
 uses
   kpsfile, kmpinffile, PackageInfo, ProjectLog;
 
-type
-  TCompilePackageMessageEvent = procedure(Sender: TObject; msg: string; State: TProjectLogState) of object;
-
 function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent: Boolean; const AOutputFileName: string): Boolean;   // I4688
 
 implementation
@@ -67,6 +64,7 @@ type
 
     FOutputFileName: string;
     FTempFiles: TTempFiles;
+    FPackageVersion: string;
 
     procedure FatalMessage(const msg: string);
     procedure WriteMessage(AState: TProjectLogState; const msg: string);   // I4706
@@ -112,6 +110,7 @@ var
   buf: array[0..260] of Char;
   n: Integer;
   f: TSearchRec;
+  i: Integer;
 begin
   Result := False;
 
@@ -123,14 +122,36 @@ begin
 
   WriteMessage(plsInfo, 'Compiling package ' + ExtractFileName(pack.FileName) + '...');
 
-  if pack.Info.Desc['Name'] = '' then
+  if Trim(pack.Info.Desc[PackageInfo_Name]) = '' then
   begin
     FatalMessage('You need to fill in the package name before building.');
     Exit;
   end;
 
   CheckForDangerousFiles;
-  CheckKeyboardVersions;   // I4690
+  CheckKeyboardVersions;
+
+  if pack.KPSOptions.FollowKeyboardVersion then
+  begin
+    if pack.Keyboards.Count = 0 then
+    begin
+      FatalMessage('The option "Follow Keyboard Version" is set but there are no keyboards in the package.');
+      Exit;
+    end;
+
+    FPackageVersion := pack.Keyboards[0].Version;
+
+    for i := 1 to pack.Keyboards.Count - 1 do
+      if pack.Keyboards[i].Version <> FPackageVersion then
+      begin
+        FatalMessage(
+          'The option "Follow Keyboard Version" is set but the package contains more than one keyboard, '+
+          'and the keyboards have mismatching versions.');
+        Exit;
+      end;
+  end
+  else
+    FPackageVersion := pack.Info.Desc[PackageInfo_Version];
 
   GetTempPath(260, buf);
   FTempPath := buf;
@@ -173,6 +194,13 @@ begin
 
     kmpinf.Assign(pack);
 
+    //
+    // The package version has been checked earlier at the start of the
+    // build. So now copy it into the kmp.inf/kmp.json data
+    //
+
+    kmpinf.Info.Desc[PackageInfo_Version] := FPackageVersion;
+
     // Add keyboard information to the package 'for free'
     // Note: this does not get us very far for mobile keyboards as
     // they still require the .js to be added by the developer at this stage.
@@ -181,7 +209,12 @@ begin
 
     with TPackageInfoRefreshKeyboards.Create(kmpinf) do
     try
-      Execute;
+      OnError := Self.FOnMessage;
+      if not Execute then
+      begin
+        WriteMessage(plsError, 'The package build was not successful.');
+        Exit;
+      end;
     finally
       Free;
     end;
@@ -229,7 +262,7 @@ begin
         for i := 0 to pack.Files.Count - 1 do
         begin
           if not FileExists(pack.Files[i].FileName) then
-            WriteMessage(plsWarning, 'Warning: File '+pack.Files[i].FileName+' does not exist.')
+            WriteMessage(plsWarning, 'File '+pack.Files[i].FileName+' does not exist.')
           else
           begin
             // When compiling the package, save the kvk keyboard into binary for delivery
@@ -258,7 +291,7 @@ begin
               Add(pack.Files[i].FileName);
           end;
         end;
-        if FileCount < pack.Files.Count + 1 then
+        if FileCount < pack.Files.Count + 2 then
           WriteMessage(plsError, 'The build was not successful. Some files were skipped.')
         else
         begin
@@ -322,6 +355,12 @@ var
   ki: TKeyboardInfo;
 begin
   n := 0;
+
+  // The version information is checked separately if we use
+  // 'follow keyboard version'
+  if pack.KPSOptions.FollowKeyboardVersion then
+    Exit;
+
   for i := 0 to pack.Files.Count - 1 do
     if pack.Files[i].FileType = ftKeymanFile then Inc(n);
 

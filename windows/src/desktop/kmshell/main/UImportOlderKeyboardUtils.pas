@@ -35,7 +35,7 @@ type
     class function GetShortPackageName(const FileName: string): string;
     class function GetPackageInstallPath: string;
     class function GetKeyboardInstallPath: string;
-    class function GetRegistryKeyboardInstallKey(const FileName: string): string; static;   // I4185
+    class function GetRegistryKeyboardInstallKey_LM(const FileName: string): string; static;   // I4185
     class function GetKeyboardIconFileName(const KeyboardFileName: string): string; static;   // I4185
   end;
 
@@ -75,9 +75,9 @@ begin
   Result := TKeymanPaths.KeyboardsInstallPath;
 end;
 
-class function TImportOlderKeyboardUtils.GetRegistryKeyboardInstallKey(const FileName: string): string;   // I4185
+class function TImportOlderKeyboardUtils.GetRegistryKeyboardInstallKey_LM(const FileName: string): string;   // I4185
 begin
-  Result := SRegKey_InstalledKeyboards+'\'+GetShortKeyboardName(FileName);
+  Result := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(FileName);
 end;
 
 class function TImportOlderKeyboardUtils.GetKeyboardIconFileName(const KeyboardFileName: string): string;   // I4185

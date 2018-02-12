@@ -51,13 +51,13 @@ begin
   HintName := GetHintName(Hint);
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKeyReadOnly(SRegKey_KeymanEngine) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_CU) then
     begin
       if ValueExists(SRegValue_EnableHints) and not ReadBool(SRegValue_EnableHints)
         then Result := False // Hint is globally disabled
         else Result :=
-          not OpenKeyReadOnly('\'+SRegKey_KeymanDesktop) or
-          not OpenKeyReadOnly(SRegKey_Hints) or
+          not OpenKeyReadOnly('\'+SRegKey_KeymanDesktop_CU) or
+          not OpenKeyReadOnly(SRegSubKey_Hints) or
           not ValueExists(HintName) or
           ReadBool(HintName);
     end
@@ -75,7 +75,7 @@ begin
   HintName := GetHintName(Hint);
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKey(SRegKey_KeymanDesktop, True) and OpenKey(SRegKey_Hints, True) then
+    if OpenKey(SRegKey_KeymanDesktop_CU, True) and OpenKey(SRegSubKey_Hints, True) then
       WriteBool(HintName, False);
   finally
     Free;
@@ -89,7 +89,7 @@ begin
   HintName := GetHintName(Hint);
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKey(SRegKey_KeymanDesktop, True) and OpenKey(SRegKey_Hints, True) then
+    if OpenKey(SRegKey_KeymanDesktop_CU, True) and OpenKey(SRegSubKey_Hints, True) then
       WriteBool(HintName, True);
   finally
     Free;
@@ -100,7 +100,7 @@ procedure DisableAllHints;
 begin
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKey(SRegKey_KeymanDesktop, True) then
+    if OpenKey(SRegKey_KeymanDesktop_CU, True) then
       WriteBool(SRegValue_EnableHints, False);
   finally
     Free;
@@ -111,7 +111,7 @@ procedure EnableAllHints;
 begin
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKey(SRegKey_KeymanDesktop, True) then
+    if OpenKey(SRegKey_KeymanDesktop_CU, True) then
       WriteBool(SRegValue_EnableHints, True);
   finally
     Free;
@@ -122,8 +122,8 @@ procedure ResetAllHints;
 begin
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKey(SRegKey_KeymanDesktop, True) and KeyExists(SRegKey_Hints) then
-      DeleteKey(SRegKey_Hints);
+    if OpenKey(SRegKey_KeymanDesktop_CU, True) and KeyExists(SRegSubKey_Hints) then
+      DeleteKey(SRegSubKey_Hints);
   finally
     Free;
   end;

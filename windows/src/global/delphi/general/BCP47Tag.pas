@@ -21,6 +21,7 @@ type
     FRegion: string;
     FExtLang: string;
     FLangTag_PrivateUse: string;
+    FOriginalTag: string;
     procedure SetExtension(const Value: string);
     procedure SetExtLang(const Value: string);
     procedure SetGrandfathered(const Value: string);
@@ -40,6 +41,9 @@ type
     function IsValid: Boolean; overload;
     function IsValid(var msg: string): Boolean; overload;
 
+    function IsCanonical: Boolean; overload;
+    function IsCanonical(var msg: string): Boolean; overload;
+
     property Language: string read FLanguage write SetLanguage;
     property ExtLang: string read FExtLang write SetExtLang;
     property Script: string read FScript write SetScript;
@@ -51,13 +55,16 @@ type
     property PrivateUse: string read FPrivateUse write SetPrivateUse;
     property Grandfathered: string read FGrandfathered write SetGrandfathered;
 
+    property OriginalTag: string read FOriginalTag;
     property Tag: string read GetTag write SetTag;
   end;
 
 implementation
 
 uses
-  System.RegularExpressions;
+  System.RegularExpressions,
+
+  Keyman.System.LanguageCodeUtils;
 
 { TBCP47Tag }
 
@@ -104,16 +111,33 @@ begin
 end;
 
 function TBCP47Tag.IsValid(var msg: string): Boolean;
+var
+  NewTag: TBCP47Tag;
 begin
-  with TBCP47Tag.Create(Self.Tag) do
+  NewTag := TBCP47Tag.Create(Tag);
   try
-    Result := Self.Tag = Tag;
-    if not Result then
-    begin
-      msg := 'This is not a valid BCP 47 tag';
-    end;
+    // Test each component, because we want to clarify that a tag constructed with
+    // wrong components shouldn't be treated as valid, even though it might form
+    // a 'valid' string. e.g. if we set .Language to "LO" and .Script to "LA", that
+    // will construct to LO-LA, which is valid, but the component "LA" is actually
+    // only valid as a region, and not a script, resulting in incorrect assumptions.
+    Result :=
+      SameText(NewTag.Language, Language) and
+      SameText(NewTag.ExtLang, ExtLang) and
+      SameText(NewTag.Script, Script) and
+      SameText(NewTag.Region, Region) and
+      SameText(NewTag.Variant, Variant) and
+      SameText(NewTag.Extension, Extension) and
+      SameText(NewTag.PrivateUse, PrivateUse) and
+      SameText(NewTag.Grandfathered, Grandfathered) and
+      SameText(NewTag.LangTag_PrivateUse, LangTag_PrivateUse);
   finally
-    Free;
+    NewTag.Free;
+  end;
+
+  if not Result then
+  begin
+    msg := '''' + Tag + ''' is not a valid BCP 47 tag';
   end;
 end;
 
@@ -122,6 +146,28 @@ var
   msg: string;
 begin
   Result := IsValid(msg);
+end;
+
+function TBCP47Tag.IsCanonical(var msg: string): Boolean;
+var
+  c: string;
+begin
+  // Assumes that the tag is valid.
+
+  // Test language subtag for canonical value
+  c := TLanguageCodeUtils.TranslateISO6393ToBCP47(Language);
+  Result := SameText(c, Language);
+  if not Result then
+  begin
+    msg := '''' + OriginalTag + ''' is a valid tag but is not canonical: '''+Language+''' should be '''+c+'''';
+  end;
+end;
+
+function TBCP47Tag.IsCanonical: Boolean;
+var
+  msg: string;
+begin
+  Result := IsCanonical(msg);
 end;
 
 procedure TBCP47Tag.SetExtension(const Value: string);
@@ -196,6 +242,8 @@ var
   m: TMatch;
   s: TArray<string>;
 begin
+  FOriginalTag := Value;
+
   Clear;
 
   with TRegEx.Create(
