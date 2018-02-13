@@ -63,7 +63,7 @@
       <body>
         <div id="size"></div>
         <iframe id="contentframe" frameborder="0">
-          <xsl:attribute name="src">https://www.keyman.com/go/100/download-keyboards?version=<xsl:value-of select="/Keyman/Version" /></xsl:attribute>&#160;
+          <xsl:attribute name="src">https://keyman.com/go/100/download-keyboards?version=<xsl:value-of select="/Keyman/Version" /></xsl:attribute>&#160;
         </iframe>
         <div id="footerframe">
           <!--<div style="float:left; font-size: 13.3px;">

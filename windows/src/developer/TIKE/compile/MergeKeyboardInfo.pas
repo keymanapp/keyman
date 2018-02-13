@@ -45,6 +45,12 @@ type
     Info: TKeyboardInfo;
   end;
 
+  TJSKeyboardInfoMap = record
+    Filename: string;
+    Data: string;
+    Standalone: Boolean;
+  end;
+
   TMergeKeyboardInfo = class
   private
     json: TJSONObject;
@@ -54,7 +60,7 @@ type
     FMergingValidateIds: Boolean;
     FKMPInfFile: TKMPInfFile;
     FKMXFiles: array of TKeyboardInfoMap;
-    FJSFileData: string;
+    FJSFiles: array of TJSKeyboardInfoMap;
     FVersion: string;
     FSourcePath: string;
     function Failed(message: string): Boolean;
@@ -80,6 +86,7 @@ type
     procedure CheckKMXFilenames;
     procedure AddIsRTL;
     procedure AddSourcePath;
+    function AddJSFile(const Filename: string): Integer;
   public
     destructor Destroy; override;
     class function Execute(ASourcePath, AJsFile, AKmpFile, AJsonFile: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean; overload;
@@ -313,15 +320,23 @@ begin
   if FJsFile = '' then
     Exit(True);
 
+  FJSFiles[AddJSFile(FJsFile)].Standalone := True;
+  Result := True;
+end;
+
+function TMergeKeyboardInfo.AddJSFile(const Filename: string): Integer;
+begin
   with TStringStream.Create('', TEncoding.UTF8) do
   try
     LoadFromFile(FJsFile);
-    FJSFileData := DataString;
+    SetLength(FJSFiles, Length(FJSFiles)+1);
+    Result := High(FJSFiles);
+    FJSFiles[Result].Filename := Filename;
+    FJSFiles[Result].Data := DataString;
+    FJSFiles[Result].Standalone := False;
   finally
     Free;
   end;
-
-  Result := True;
 end;
 
 function TMergeKeyboardInfo.SaveJsonFile: Boolean;
@@ -381,12 +396,12 @@ begin
 
   if Assigned(FKMPInfFile) then
     FName := FKMPInfFile.Info.Desc[PackageInfo_Name]
-  else if FJSFileData <> '' then
+  else if Length(FJSFiles) > 0  then
   begin
-    with TRegEx.Match(FJsFileData, 'this\.KN="([^"]+)"') do
+    with TRegEx.Match(FJSFiles[0].Data, 'this\.KN="([^"]+)"') do
     begin
       if Success
-        then FName := TGroupHelperRSP19902.Create(Groups[1], FJsFileData).FixedValue
+        then FName := TGroupHelperRSP19902.Create(Groups[1], FJsFiles[0].Data).FixedValue
         else Exit;
     end;
   end
@@ -397,15 +412,15 @@ begin
 end;
 
 //
-// isRTL -- from js
+// isRTL -- from js; if more than one, just first one
 //
 procedure TMergeKeyboardInfo.AddIsRTL;
 begin
   if json.GetValue('isRTL') <> nil then Exit;
 
-  if FJSFileData <> '' then
+  if Length(FJSFiles) > 0 then
   begin
-    with TRegEx.Match(FJsFileData, 'this\.KRTL=1') do
+    with TRegEx.Match(FJsFiles[0].Data, 'this\.KRTL=1') do
     begin
       if not Success then Exit;
     end;
@@ -658,7 +673,7 @@ begin
 end;
 
 //
-//  version -- from kmp.inf, js
+//  version -- from kmp.inf, js (if more than 1, then just first)
 //
 procedure TMergeKeyboardInfo.CheckOrAddVersion;
 var
@@ -668,10 +683,10 @@ begin
   begin
     FVersion := FKMPInfFile.Info.Desc[PackageInfo_Version];
   end
-  else if FJsFileData <> '' then
+  else if Length(FJsFiles) > 0 then
   begin
-    with TRegEx.Match(FJsFileData, 'this\.KBVER=([''"])([^''"]+)(\1)') do
-      if Success then FVersion := TGroupHelperRSP19902.Create(Groups[2], FJsFileData).FixedValue;
+    with TRegEx.Match(FJsFiles[0].Data, 'this\.KBVER=([''"])([^''"]+)(\1)') do
+      if Success then FVersion := TGroupHelperRSP19902.Create(Groups[2], FJsFiles[0].Data).FixedValue;
   end;
 
   if FVersion = '' then
@@ -697,6 +712,7 @@ var
   MinVersionString: string;
   FJSMinVersionString: string;
   v: TJSONValue;
+  s: string;
 begin
   MinVersion := $0500;
   // For each .kmx, get minimum version and add to the result
@@ -705,10 +721,15 @@ begin
       MinVersion := FKMXFiles[i].Info.FileVersion;
 
   FJSMinVersionString := '';
-  if FJsFileData <> '' then
+  for i := Low(FJSFiles) to High(FJSFiles) do
   begin
-    with TRegEx.Match(FJsFileData, 'this\.KMINVER=([''"])([^''"]+)(\1)') do
-      if Success then FJSMinVersionString := TGroupHelperRSP19902.Create(Groups[2], FJsFileData).FixedValue;
+    with TRegEx.Match(FJsFiles[i].Data, 'this\.KMINVER=([''"])([^''"]+)(\1)') do
+      if Success then
+      begin
+        s := TGroupHelperRSP19902.Create(Groups[2], FJsFiles[i].Data).FixedValue;
+        if (FJSMinVersionString = '') or (CompareVersions(FJSMinVersionString, s) > 0) then
+          FJSMinVersionString := s;
+      end;
   end;
 
   MinVersionString := Format('%d.%d', [(MinVersion and VERSION_MASK_MAJOR) shr 8, (MinVersion and VERSION_MASK_MINOR)]);
