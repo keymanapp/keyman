@@ -596,6 +596,10 @@ class DOMEventHandlers {
    * Function     _KeyDown
    * Scope        Private
    * Description  Processes keydown event and passes data to keyboard. 
+   * 
+   * Note that the test-case oriented 'recorder' stubs this method to facilitate keystroke
+   * recording for use in test cases.  If changing this function, please ensure the recorder is
+   * not affected.
    */ 
   _KeyDown: (e: KeyboardEvent) => boolean = function(this: DOMEventHandlers, e: KeyboardEvent): boolean {
     var Ldv: Document, eClass='';

@@ -368,6 +368,10 @@ class KeyboardManager {
    *  Otherwise, insert a script to download and insert the keyboard from the repository
    *  or user-indicated file location. 
    * 
+   * Note that the test-case oriented 'recorder' stubs this method to provide active
+   * keyboard stub information.  If changing this function, please ensure the recorder is
+   * not affected.
+   * 
    * @param       {string}    PInternalName
    * @param       {string=}    PLgCode
    * @param       {boolean=}   saveCookie   

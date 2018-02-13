@@ -42,7 +42,7 @@
   </style>
 
   <!-- Insert uncompiled KeymanWeb source scripts -->
-  <script src="../../release/unminified/web/keymanweb.js" type="application/javascript"></script>
+  <script src="../release/unminified/web/keymanweb.js" type="application/javascript"></script>
 
   <!-- 
       For desktop browsers, a script for the user interface must be inserted here.
@@ -51,11 +51,11 @@
       The toolbar UI is best for any page designed to support keyboards for 
       a large number of languages.
     -->
-  <script src="../../release/unminified/web/kmwuitoggle.js"></script>
+  <script src="../release/unminified/web/kmwuitoggle.js"></script>
 
-  <script src="keyboardScripts.js" type="application/javascript"></script>
+  <script src="recorder_KeyboardScripts.js" type="application/javascript"></script>
 
-  <script src="build/inputEvents.js" type="application/javascript"></script>
+  <script src="../release/recorder/build/inputEvents.js" type="application/javascript"></script>
 
   <!-- Initialization: set paths to keyboards, resources and fonts as required -->
   <script>
@@ -191,14 +191,14 @@
 
 <body onload='loadKeyboards();'>
   <h2>KeymanWeb - Test Input Recorder</h2>
-  <p>This page is designed to record KeymanWeb input for use in testing.</p>
+  <p>This page is designed to record KeymanWeb input for use in test case development.</p>
   <hr/>
   <div>
     <div id='recording'>
       <p id='layout'>Current layout: </p>
       <p>Recorded output JSON:</p>
       <textarea id='inputRecord' style="width:90%; height:100px"></textarea>
-      <p>You must click 'Set Sequence' to save any changes to a sequence before continuing input recording.</p>
+      <p>You must click 'Set Sequence' to save any changes to an input sequence above before continuing input recording, or they will be lost upon new input.</p>
       <button id='btnReload' type="button" onclick="setInputRecord();">Set Sequence</button>
       <button id='btnReload' type="button" onclick="copyInputRecord();">Copy Sequence</button>
       <button id='btnReload' type="button" onclick="resetInputRecord();">Clear Sequence</button>

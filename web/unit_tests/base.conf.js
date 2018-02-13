@@ -15,7 +15,8 @@ module.exports = {
   files: [
     'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
     'unit_tests/modernizr.js', // A dependency-managed utility script that helps with browser feature detection.
-    'unit_tests/inputEvents.js', // The object definitions used to generate/replicate key events for engine tests.
+    'unit_tests/recorder_InputEvents.js', // The object definitions used to generate/replicate key events for engine tests.
+    'unit_tests/recorder_InputEvents.map', // The object definitions used to generate/replicate key events for engine tests.
     'unit_tests/cases/**/*.js', // Where the tests actually reside.
     'unit_tests/json/**/*.json', // Where pre-loaded JSON resides.
     {pattern: 'unit_tests/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.

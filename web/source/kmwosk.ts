@@ -927,10 +927,13 @@ if(!window['keyman']['initialized']) {
     /**
      * Simulate a keystroke according to the touched keyboard button element
      *
+     * Note that the test-case oriented 'recorder' stubs this method to facilitate OSK-based input
+     * recording for use in test cases.  If changing this function, please ensure the recorder is
+     * not affected.
+     * 
      * @param       {Object}      e      element touched (or clicked)
      */
-    osk.clickKey = function(e)
-    {
+    osk.clickKey = function(e) {
       var Lelem = keymanweb.domManager.getLastActiveElement(), Ls, Le, Lkc;
 
       var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;

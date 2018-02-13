@@ -29,9 +29,10 @@ if [ $? -ne 0 ]; then
 fi
 
 # Definition of global compile constants
-OUTPUT="build"
-NODE_SOURCE="testing/recorder/source"
-ENGINE_TEST_OUTPUT="../../unit_tests/"
+COMPILED_FILE="recorder_InputEvents.js"
+OUTPUT="../release/recorder"
+NODE_SOURCE="source"
+ENGINE_TEST_OUTPUT="../unit_tests/"
 
 readonly OUTPUT
 readonly NODE_SOURCE
@@ -44,9 +45,10 @@ PATH="../../node_modules/.bin:$PATH"
 compiler="npm run tsc --"
 compilecmd="$compiler"
 
-$compilecmd -p $NODE_SOURCE/tsconfig.json
+$compilecmd -p $NODE_SOURCE/tsconfig.recorder.json
 if [ $? -ne 0 ]; then
     fail "Typescript compilation failed."
 fi
 
-cp $OUTPUT/*.js $ENGINE_TEST_OUTPUT
+cp $OUTPUT/$COMPILED_FILE $ENGINE_TEST_OUTPUT
+cp $OUTPUT/$COMPILED_FILE.map $ENGINE_TEST_OUTPUT

@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+	"allowJs": true,
+	"module": "none",
+	"outFile": "../release/recorder/recorder_InputEvents.js",
+	"sourceMap": true,
+	"target": "es5"
+	},
+  "files": [
+		"recorder_InputEvents.ts"
+  ]
+}

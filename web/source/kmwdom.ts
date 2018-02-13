@@ -1249,7 +1249,7 @@ class DOMManager {
    *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123) 
    **/
   setActiveElement(e: string|HTMLElement, setFocus?: boolean) {
-    if(e instanceof String) {
+    if(typeof(e) == "string") { // Can't instanceof string, and String is a different type.
       e=document.getElementById(e);
     }
 
@@ -1337,7 +1337,7 @@ class DOMManager {
   moveToElement(e:string|HTMLElement) {
     var i;
     
-    if(e instanceof String) {
+    if(typeof(e) == "string") { // Can't instanceof string, and String is a different type.
       e=document.getElementById(e);
     }
     
