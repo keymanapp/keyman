@@ -173,6 +173,14 @@
       }
     }
 
+    var initDevice = function() {
+      // From KMW.
+      var device = new Device();
+      device.detect();
+
+      p_layout.textContent += JSON.stringify(device, ['formFactor', 'touchable', 'browser', 'OS']);
+    }
+
     window.addEventListener('load', function() {
       ta_inputJSON = document.getElementById('inputRecord');
       in_output = document.getElementById('receiver');
@@ -181,8 +189,7 @@
       keyman.attachToControl(in_output);
       keyman.setKeyboardForControl(in_output, '', '');
       resetInputRecord();
-
-      p_layout.textContent += keyman.util.device.formFactor;
+      initDevice();
     });
   </script>
 </head>
@@ -195,7 +202,7 @@
   <hr/>
   <div>
     <div id='recording'>
-      <p id='layout'>Current layout: </p>
+      <p id='layout'>Active device information: </p>
       <p>Recorded output JSON:</p>
       <textarea id='inputRecord' style="width:90%; height:150px"></textarea>
       <p>You must click 'Set Sequence' to save any changes to an input sequence above before continuing input recording, or they will be lost upon new input.</p>

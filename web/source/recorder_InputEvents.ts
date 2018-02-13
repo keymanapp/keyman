@@ -1,4 +1,10 @@
+// Includes KeymanWeb's Device class, as it's quite useful for ensuring that we target our tests correctly
+// to each device.
+/// <reference path="kmwdevice.ts" />
+
 namespace KMWRecorder {
+  type AssertCallback = (s1: any, s2: any, msg?: string) => void;
+
   export abstract class InputEvent {
     abstract simulateEventOn(ele: HTMLElement): void;
 
@@ -232,7 +238,7 @@ namespace KMWRecorder {
       this.output = output;
     }
 
-    simulateSequenceOn(ele: HTMLElement, assertCallback: (s1: any, s2: any, msg?: string) => void): boolean {
+    simulateSequenceOn(ele: HTMLElement, assertCallback?: AssertCallback): boolean {
       resetElement(ele);
 
       for(var i=0; i < this.inputs.length; i++) {
@@ -256,7 +262,6 @@ namespace KMWRecorder {
     toPrettyJSON(): string {
       var str = "{ \"output\": \"" + this.output + "\", \"inputs\": [\n";
       for(var i = 0; i < this.inputs.length; i++) {
-        console.log(this.inputs[i].toPrettyJSON());
         str += "  " + this.inputs[i].toPrettyJSON() + ((i == this.inputs.length-1) ? "\n" : ",\n");
       }
       str += "]}";
@@ -321,6 +326,189 @@ namespace KMWRecorder {
       this.filename = activeStub.KF;
 
       this.languages = [new LanguageStubForKeyboard(activeStub)];
+    }
+  }
+
+  type TARGET = 'hardware'|'desktop'|'phone'|'tablet';
+  type OS = 'windows'|'android'|'ios'|'macosx'|'linux';
+  type BROWSER = 'ie'|'chrome'|'firefox'|'safari'|'opera';  // ! no 'edge' detection in KMW!
+
+  class Constraint {
+    target: TARGET;
+    validOSList?: OS[];
+    validBrowsers?: BROWSER[];
+
+    constructor(target: TARGET|Constraint, validOSList?: OS[], validBrowsers?: BROWSER[]) {
+      if(typeof(target) == 'string') {
+        this.target = target;
+        this.validOSList = validOSList;
+        this.validBrowsers = validBrowsers;
+      } else {
+        var json = target;
+        this.target = json.target;
+        this.validOSList = json.validOSList;
+        this.validBrowsers = json.validBrowsers;
+      }
+    }
+
+    matchesClient(device: Device, usingOSK?: boolean) {
+      // #1:  Platform check.
+      if(usingOSK === true) {
+        if(this.target != device.formFactor) {
+          return false;
+        }
+      } else if(usingOSK === false) {
+        if(this.target != 'hardware') {
+          return false;
+        }
+      } else if(this.target != device.formFactor && this.target != 'hardware') {
+        return false;
+      }
+
+      if(this.validOSList) {
+        if(this.validOSList.indexOf(device.OS as OS) == -1) {
+          return false;
+        }
+      }
+
+      if(this.validBrowsers) {
+        if(this.validBrowsers.indexOf(device.browser as BROWSER) == -1) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    // Checks if another Constraint instance is functionally identical to this one.
+    equals(other: Constraint) {
+      if(this.target != other.target) {
+        return false;
+      }
+
+      var list1 = this.validOSList ? this.validOSList : ['any'];
+      var list2 = other.validOSList ? other.validOSList : ['any'];
+
+      if(list1.sort().join(',') != list2.sort().join(',')) {
+        return false;
+      }
+
+      list1 = this.validBrowsers ? this.validBrowsers : ['web'];
+      list2 = other.validBrowsers ? other.validBrowsers : ['web'];
+
+      if(list1.sort().join(',') != list2.sort().join(',')) {
+        return false;
+      }
+
+      return true;
+    }
+  }
+
+  class InputTestSet {
+    constraint: Constraint;
+    testSet: InputTestSequence[];
+
+    constructor(constraint: Constraint|InputTestSet) {
+      if("target" in constraint) {
+        this.constraint = constraint as Constraint;
+        this.testSet = [];
+      } else {
+        var json = constraint as InputTestSet;
+        this.constraint = new Constraint(json.constraint);
+        this.testSet = [];
+
+        // Clone each test sequence / reconstruct from methodless JSON object.
+        for(var i=0; i < json.testSet.length; i++) {
+          this.testSet.push(new InputTestSequence(json.testSet[i]));
+        }
+      }
+    }
+
+    addTest(seq: InputTestSequence) {
+      this.testSet.push(seq);
+    }
+
+    // Validity should be checked before calling this method.
+    run(ele: HTMLElement, assertCallback?: AssertCallback) {
+      for(var i=0; i < this.testSet.length; i++) {
+        var testSeq = this.testSet[i];
+        if(!testSeq.simulateSequenceOn(ele, assertCallback)) {
+          // Failed test!
+          // TODO:  Make a list of failures and store so that we can mass-report errors!
+          console.error("Failed test.  :(");
+        }
+      }
+    }
+
+    // Used to determine if the current InputTestSet is applicable to be run on a device.
+    isValidForCurrentClient(usingOSK?: boolean) {
+      var device: Device = new Device();
+      device.detect();
+
+      return this.constraint.matchesClient(device, usingOSK);
+    }
+  }
+
+  class KeyboardTest {
+    /**
+     * The stub information to be passed into keyman.addKeyboards() in order to run the test.
+     */
+    keyboard: KeyboardStub;
+
+    /**
+     * The master array of test sets, each of which specifies constraints a client must fulfill for
+     * the tests contained therein to be valid.
+     */
+    inputTestSets: InputTestSet[];
+
+    /**
+     * Reconstructs a KeyboardTest object from its JSON representation, restoring its methods. 
+     * @param fromJSON 
+     */
+    constructor(fromJSON: any) {
+      if(typeof(fromJSON) == 'string') {
+        fromJSON = JSON.parse(fromJSON);
+      }
+
+      this.keyboard = new KeyboardStub(fromJSON.keyboard);
+      this.inputTestSets = [];
+
+      for(var i=0; i < fromJSON.inputTestSets.length; i++) {
+        this.inputTestSets[i] = new InputTestSet(fromJSON.inputTestSets[i]);
+      }
+    }
+
+    addTest(constraint: Constraint, seq: InputTestSequence) {
+      for(var i=0; i < this.inputTestSets.length; i++) {
+        if(this.inputTestSets[i].constraint.equals(constraint)) {
+          this.inputTestSets[i].addTest(seq);
+          return;
+        }
+      }
+
+      var newSet = new InputTestSet(new Constraint(constraint));
+      this.inputTestSets.push(newSet);
+      newSet.addTest(seq);      
+    }
+
+    run(ele: HTMLElement, assertCallback?: AssertCallback) {
+      var setHasRun = false;
+
+      for(var i = 0; i < this.inputTestSets.length; i++) {
+        var testSet = this.inputTestSets[i];
+
+        if(testSet.isValidForCurrentClient()) {
+          // TODO:  Collect a set of failure results to report back upon at the end!
+          testSet.run(ele, assertCallback);
+          setHasRun = true;
+        }
+      }
+
+      // TODO:  Report back on the failures!
+      if(!setHasRun) {
+        // The sets CAN be empty, allowing silent failure if/when we actually want that.
+        console.warn("No test sets for this keyboard were applicable for this device!");
+      }
     }
   }
 }
