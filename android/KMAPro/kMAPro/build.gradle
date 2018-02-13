@@ -23,7 +23,7 @@ android {
             versionName "${project.ext['build.number']}"
         } else {
             versionCode 100
-            versionName '0.0-beta'
+            versionName '10.0.0.0'
         }
 
         playAccountConfig = playAccountConfigs.defaultAccountConfig
