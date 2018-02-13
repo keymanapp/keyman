@@ -181,7 +181,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 681
     Height = 447
-    ActivePage = pageDetails
+    ActivePage = pageKeyboards
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -387,7 +387,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object lblKeyboardFiles: TLabel
           Left = 15
-          Top = 365
+          Top = 341
           Width = 26
           Height = 13
           Anchors = [akLeft, akBottom]
@@ -395,7 +395,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object lblKeyboardDescription: TLabel
           Left = 15
-          Top = 338
+          Top = 314
           Width = 62
           Height = 13
           Anchors = [akLeft, akBottom]
@@ -403,7 +403,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object lblKeyboardVersion: TLabel
           Left = 15
-          Top = 417
+          Top = 393
           Width = 41
           Height = 13
           Anchors = [akLeft, akBottom]
@@ -430,20 +430,28 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 13
           Caption = 'Languages'
         end
+        object lblKeyboardRTL: TLabel
+          Left = 15
+          Top = 420
+          Width = 75
+          Height = 13
+          Anchors = [akLeft, akBottom]
+          Caption = 'Is right-to-left:'
+        end
         object lbKeyboards: TListBox
           Left = 15
           Top = 72
           Width = 229
-          Height = 249
+          Height = 233
           Anchors = [akLeft, akTop, akBottom]
           ItemHeight = 13
           TabOrder = 0
           OnClick = lbKeyboardsClick
         end
         object editKeyboardDescription: TEdit
-          Left = 87
-          Top = 335
-          Width = 157
+          Left = 96
+          Top = 311
+          Width = 148
           Height = 21
           TabStop = False
           Anchors = [akLeft, akBottom]
@@ -452,9 +460,9 @@ inherited frmPackageEditor: TfrmPackageEditor
           TabOrder = 1
         end
         object memoKeyboardFiles: TMemo
-          Left = 87
-          Top = 362
-          Width = 157
+          Left = 96
+          Top = 338
+          Width = 148
           Height = 46
           TabStop = False
           Anchors = [akLeft, akBottom]
@@ -463,9 +471,9 @@ inherited frmPackageEditor: TfrmPackageEditor
           TabOrder = 2
         end
         object editKeyboardVersion: TEdit
-          Left = 87
-          Top = 414
-          Width = 157
+          Left = 96
+          Top = 390
+          Width = 148
           Height = 21
           TabStop = False
           Anchors = [akLeft, akBottom]
@@ -479,7 +487,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 230
           Height = 21
           Style = csDropDownList
-          TabOrder = 4
+          TabOrder = 5
           OnClick = cbKeyboardOSKFontClick
         end
         object cbKeyboardDisplayFont: TComboBox
@@ -488,7 +496,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 230
           Height = 21
           Style = csDropDownList
-          TabOrder = 5
+          TabOrder = 6
           OnClick = cbKeyboardDisplayFontClick
         end
         object gridKeyboardLanguages: TStringGrid
@@ -502,7 +510,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           FixedCols = 0
           RowCount = 9
           Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goTabs]
-          TabOrder = 6
+          TabOrder = 7
           OnClick = gridKeyboardLanguagesClick
           OnSetEditText = gridKeyboardLanguagesSetEditText
           ColWidths = (
@@ -516,7 +524,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = '&Add...'
-          TabOrder = 7
+          TabOrder = 8
           OnClick = cmdKeyboardAddLanguageClick
         end
         object cmdKeyboardRemoveLanguage: TButton
@@ -526,8 +534,19 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = '&Remove'
-          TabOrder = 8
+          TabOrder = 9
           OnClick = cmdKeyboardRemoveLanguageClick
+        end
+        object editKeyboardRTL: TEdit
+          Left = 96
+          Top = 417
+          Width = 148
+          Height = 21
+          TabStop = False
+          Anchors = [akLeft, akBottom]
+          ParentColor = True
+          ReadOnly = True
+          TabOrder = 4
         end
       end
     end
