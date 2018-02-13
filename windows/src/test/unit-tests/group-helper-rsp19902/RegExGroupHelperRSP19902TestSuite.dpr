@@ -34,7 +34,7 @@ begin
     runner.UseRTTI := True;
     //tell the runner how we will log things
     //Log to the console window
-    logger := CreateDUnitXTeamCityOrConsoleLogger;
+    logger := TDUnitXConsoleLogger.Create(true);
     runner.AddLogger(logger);
     //Generate an NUnit compatible XML File
     nunitLogger := TDUnitXXMLNUnitFileLogger.Create(TDUnitX.Options.XMLOutputFile);
@@ -54,6 +54,8 @@ begin
       System.Readln;
     end;
     {$ENDIF}
+
+    DUnitX.Loggers.TeamCity.ReportToTeamCity;
   except
     on E: Exception do
       System.Writeln(E.ClassName, ': ', E.Message);
