@@ -272,8 +272,8 @@ var
 begin
   if GetEnvironmentVariable('TEAMCITY_VERSION') <> '' then
   begin
-    KeymanRoot := GetEnvironmentVariable('KEYMAN_ROOT');
-    ReportPath := 'keyman\'+ExtractRelativePath(KeymanRoot, ExtractFilePath(ParamStr(0)) + 'dunitx-results.xml');
+    KeymanRoot := ExcludeTrailingPathDelimiter(GetEnvironmentVariable('KEYMAN_ROOT'));
+    ReportPath := ExtractRelativePath(KeymanRoot, ExtractFilePath(ParamStr(0)) + 'dunitx-results.xml');
     writeln('##teamcity[importData type=''nunit'' path='''+ReportPath+''']');
   end;
 end;
