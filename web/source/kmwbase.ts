@@ -20,11 +20,6 @@
    Copyright 2017 SIL International
 ***/
 
-declare var keyman: KeymanBase;
-declare var KeymanWeb: KeyboardInterface;
-var keyman: KeymanBase = window['keyman'] || {};
-window['keyman'] = keyman; // To preserve the name _here_ in case of minification.
-
 class KeymanBase {
   _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
   _IE = 0;                   // browser version identification
@@ -127,6 +122,15 @@ class KeymanBase {
   delayedInit() {
     // Track the selected Event-handling object.
     this.touchAliasing = this.util.device.touchable ? this.domManager.touchHandlers : this.domManager.nonTouchHandlers;
+  }
+
+  /**
+   * Triggers a KeymanWeb engine shutdown to facilitate a full system reset.
+   * This function is designed for use with KMW unit-testing, which reloads KMW
+   * multiple times to test the different initialization paths.
+   */
+  ['shutdown']() {
+    this.domManager.shutdown();
   }
 
   /**
@@ -551,7 +555,7 @@ KeymanBase.__BUILD__ = 299;
  */  
 
 // If a copy of the script is already loaded, detect this and prevent re-initialization / data reset.
-if(!window['keyman']['loaded']) {
+if(!window['keyman'] || !window['keyman']['loaded']) {
 
   (function() {
     /* The base object call may need to be moved into a separate, later file eventually.
@@ -573,19 +577,5 @@ if(!window['keyman']['loaded']) {
     osk.optionKey = function(e,keyName,keyDown){}
     osk.showKeyTip = function(key,on){}  
     osk.waitForFonts = function(kfd,ofd){return true;}
-
-    /**
-    * Extend Array function by adding indexOf array member if undefined (IE < IE9)
-    */
-    if(!('indexOf' in Array)) {
-      Array.prototype.indexOf = function(obj, start) {
-        for(var i=(start || 0); i<this.length; i++) {
-          if(this[i] == obj) {
-            return i;
-          }
-        }
-        return -1;
-      }
-    }
   })();
 }

@@ -42,9 +42,9 @@ WEB_TARGET=( "keymanweb.js" )
 UI_TARGET=( "kmwuibutton.js" "kmwuifloat.js" "kmwuitoggle.js" "kmwuitoolbar.js" )
 EMBED_TARGET=( "keyman.js" )
 
-# Ensure the dependencies are downloaded.
+# Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
 echo "Node.js + dependencies check"
-npm install
+npm install --no-optional
 
 if [ $? -ne 0 ]; then
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
