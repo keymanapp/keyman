@@ -37,12 +37,6 @@ EXCLUDEPATHDEFINES=1
 !include Header.mak
 
 # ----------------------------------------------------------------------
-
-validate: test-releasebuildcheck
-    # test-releasebuildcheck builds devtools for us
-    $(PROGRAM)\buildtools\devtools -ri
-    cd $(ROOT)\src\unit-tests\keyboard-js-info
-    $(MAKE)
     
 cleanroot:
     -del tds.zip
