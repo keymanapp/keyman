@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{D450A640-6394-4474-BBBA-69C83A571086}</ProjectGuid>
-        <ProjectVersion>18.2</ProjectVersion>
+        <ProjectVersion>18.3</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <MainSource>PackageInfoTestSuite.dpr</MainSource>
         <Base>True</Base>
@@ -105,6 +105,7 @@
         <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
         <DCCReference Include="PackageInfoTest.pas"/>
         <DCCReference Include="..\..\global\delphi\general\JsonUtil.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

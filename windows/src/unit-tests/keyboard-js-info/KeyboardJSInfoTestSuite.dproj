@@ -92,6 +92,7 @@
         <DCCReference Include="Keyman.Test.System.KeyboardJSInfoTest.pas"/>
         <DCCReference Include="..\..\global\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -503,7 +504,6 @@
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <Platforms>
-                <Platform value="Linux64">False</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>

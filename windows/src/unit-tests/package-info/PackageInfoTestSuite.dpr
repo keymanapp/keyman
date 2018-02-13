@@ -26,7 +26,8 @@ uses
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
   PackageInfoTest in 'PackageInfoTest.pas',
-  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas';
+  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
+  DUnitX.Loggers.TeamCity in '..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas';
 
 var
   runner : ITestRunner;
@@ -47,7 +48,7 @@ begin
     runner.UseRTTI := True;
     //tell the runner how we will log things
     //Log to the console window
-    logger := TDUnitXConsoleLogger.Create(true);
+    logger := CreateDUnitXTeamCityOrConsoleLogger;
     runner.AddLogger(logger);
     //Generate an NUnit compatible XML File
     nunitLogger := TDUnitXXMLNUnitFileLogger.Create(TDUnitX.Options.XMLOutputFile);

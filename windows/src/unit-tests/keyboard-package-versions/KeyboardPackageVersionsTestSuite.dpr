@@ -86,7 +86,8 @@ uses
   utilhttp in '..\..\global\delphi\general\utilhttp.pas',
   UMD5Hash in '..\..\global\delphi\general\UMD5Hash.pas',
   Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
-  Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas';
+  Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
+  DUnitX.Loggers.TeamCity in '..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas';
 
 var
   runner : ITestRunner;
@@ -107,7 +108,7 @@ begin
     runner.UseRTTI := True;
     //tell the runner how we will log things
     //Log to the console window
-    logger := TDUnitXConsoleLogger.Create(false); //true);
+    logger := CreateDUnitXTeamCityOrConsoleLogger;
     runner.AddLogger(logger);
     //Generate an NUnit compatible XML File
     nunitLogger := TDUnitXXMLNUnitFileLogger.Create(TDUnitX.Options.XMLOutputFile);

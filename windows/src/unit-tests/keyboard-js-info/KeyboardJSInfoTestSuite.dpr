@@ -13,7 +13,8 @@ uses
   DUnitX.TestFramework,
   Keyman.Test.System.KeyboardJSInfoTest in 'Keyman.Test.System.KeyboardJSInfoTest.pas',
   Keyman.System.KeyboardJSInfo in '..\..\global\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas',
-  Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas';
+  Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
+  DUnitX.Loggers.TeamCity in '..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas';
 
 var
   runner : ITestRunner;
@@ -34,7 +35,7 @@ begin
     runner.UseRTTI := True;
     //tell the runner how we will log things
     //Log to the console window
-    logger := TDUnitXConsoleLogger.Create(true);
+    logger := CreateDUnitXTeamCityOrConsoleLogger;
     runner.AddLogger(logger);
     //Generate an NUnit compatible XML File
     nunitLogger := TDUnitXXMLNUnitFileLogger.Create(TDUnitX.Options.XMLOutputFile);
