@@ -13,7 +13,8 @@ uses
   DUnitX.TestFramework,
   Keyman.Test.System.KeyboardJSInfoTest in 'Keyman.Test.System.KeyboardJSInfoTest.pas',
   Keyman.System.KeyboardJSInfo in '..\..\global\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas',
-  Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas';
+  Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
+  DUnitX.Loggers.TeamCity in '..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas';
 
 var
   runner : ITestRunner;
@@ -54,6 +55,8 @@ begin
       System.Readln;
     end;
     {$ENDIF}
+
+    DUnitX.Loggers.TeamCity.ReportToTeamCity;
   except
     on E: Exception do
       System.Writeln(E.ClassName, ': ', E.Message);
