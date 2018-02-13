@@ -465,10 +465,16 @@ namespace KMWRecorder {
      * Reconstructs a KeyboardTest object from its JSON representation, restoring its methods. 
      * @param fromJSON 
      */
-    constructor(fromJSON: any) {
+    constructor(fromJSON: string|KeyboardStub|KeyboardTest) {
       if(typeof(fromJSON) == 'string') {
         fromJSON = JSON.parse(fromJSON);
+      } else if(fromJSON instanceof KeyboardStub) {
+        this.keyboard = fromJSON;
+        this.inputTestSets = [];
+        return;
       }
+
+      fromJSON = fromJSON as KeyboardTest;
 
       this.keyboard = new KeyboardStub(fromJSON.keyboard);
       this.inputTestSets = [];
