@@ -56,19 +56,7 @@ KMInputMethodEventHandler* _eventHandler;
     NSRunningApplication *currApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
     NSString *clientAppId = [currApp bundleIdentifier];
     if ([self.AppDelegate debugMode])
-        NSLog(@"New active BLAHHHH app %@", clientAppId);
-    
-    NSLog(@"About to try to deal with kmp files.");
-//    LSRegisterURL((__bridge CFURLRef)[[NSBundle mainBundle] bundleURL], NO);
-//    FSRef outAppRef;
-//    if (LSGetApplicationForInfo(kLSUnknownType, kLSUnknownCreator, CFStringCreateWithCString(NULL, "kmp", kCFStringEncodingMacRoman), kLSRolesEditor, &outAppRef, NULL) == kLSApplicationNotFoundErr)
-//    {
-//        NSLog(@"Couldn't find an app to open kmp files.");
-//    }
-//    else
-//    {
-//        NSLog(@"Let's see what app is set to open kmp files...");
-//    }
+        NSLog(@"New active app %@", clientAppId);
     
     // Most things in Safari work well using the normal way, but Google Docs doesn't.
     if ([clientAppId isEqual: @"com.apple.Safari"]) {

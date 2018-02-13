@@ -10,9 +10,9 @@
 #define KMPackage_h
 
 #import <Cocoa/Cocoa.h>
+#import "KMInputMethodAppDelegate.h"
 
 @interface KMPackage : NSDocument
-
 
 @end
 
