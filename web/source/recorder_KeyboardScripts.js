@@ -48,7 +48,7 @@
     // For faster loading, it may be best for the default keybaord to be 
     // locally sourced.
     kmw.addKeyboards({id:'us',name:'English',languages:{id:'eng',name:'English'},
-      filename:'../us-1.0.js'});
+      filename:'../testing/us-1.0.js'});
       
     // Add more keyboards to the language menu, by keyboard name,
     // keyboard name and language code, or just the ISO 639 language code.  
@@ -66,7 +66,7 @@
       languages:{
         id:'lao',name:'Lao',region:'Asia',
         },
-      filename:'../lao_2008_basic.js'
+      filename:'../testing/lao_2008_basic.js'
       });   
 
     // The following two optional calls should be delayed until language menus are fully loaded:

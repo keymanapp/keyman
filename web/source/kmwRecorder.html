@@ -55,7 +55,7 @@
 
   <script src="recorder_KeyboardScripts.js" type="application/javascript"></script>
 
-  <script src="../release/recorder/build/inputEvents.js" type="application/javascript"></script>
+  <script src="../release/recorder/recorder_InputEvents.js" type="application/javascript"></script>
 
   <!-- Initialization: set paths to keyboards, resources and fonts as required -->
   <script>
@@ -93,7 +93,7 @@
 
     addInputRecord = function(json) {
       inputJSON.addInput(json, in_output.value);
-      setElementText(ta_inputJSON, JSON.stringify(inputJSON));
+      setElementText(ta_inputJSON, inputJSON.toPrettyJSON());
     }
 
     resetInputRecord = function() {
@@ -197,7 +197,7 @@
     <div id='recording'>
       <p id='layout'>Current layout: </p>
       <p>Recorded output JSON:</p>
-      <textarea id='inputRecord' style="width:90%; height:100px"></textarea>
+      <textarea id='inputRecord' style="width:90%; height:150px"></textarea>
       <p>You must click 'Set Sequence' to save any changes to an input sequence above before continuing input recording, or they will be lost upon new input.</p>
       <button id='btnReload' type="button" onclick="setInputRecord();">Set Sequence</button>
       <button id='btnReload' type="button" onclick="copyInputRecord();">Copy Sequence</button>

@@ -13,9 +13,15 @@ namespace KMWRecorder {
         throw new SyntaxError("Error in JSON format corresponding to an InputEvent!");
       }
     }
+
+    toPrettyJSON(): string {
+      // We want the default, non-spaced JSON for this class, even when otherwise adding whitespace.
+      var str = JSON.stringify(this);
+      return str;
+    }
   }
 
-  export class PhysicalInputEvent implements InputEvent {
+  export class PhysicalInputEvent extends InputEvent {
     static readonly eventClass: string = "KeyboardEvent";
     static readonly eventType: string = "keydown";
 
@@ -38,6 +44,7 @@ namespace KMWRecorder {
     location: number;
 
     constructor(e: KeyboardEvent|PhysicalInputEvent) {
+      super();
       // We condition upon newly-generated events, as a PhysicalInputEvent from JSON
       // will lack its proper prototype, etc.
       if(e instanceof KeyboardEvent) {
@@ -106,7 +113,7 @@ namespace KMWRecorder {
     }
   }
 
-  export class OSKInputEvent implements InputEvent {
+  export class OSKInputEvent extends InputEvent {
     static readonly eventClass: string = "MouseEvent";
     static readonly downMouseType: string = "mousedown";
     static readonly upMouseType: string = "mouseup";
@@ -118,6 +125,7 @@ namespace KMWRecorder {
 
     // osk.clickKey receives the element clicked or touched in OSK interactions.
     constructor(ele: HTMLDivElement|OSKInputEvent) {
+      super();
       if(ele instanceof HTMLDivElement) {
         this.keyID = ele.id;
       } else {
@@ -243,6 +251,16 @@ namespace KMWRecorder {
       }
 
       return result == this.output;
+    }
+
+    toPrettyJSON(): string {
+      var str = "{ \"output\": \"" + this.output + "\", \"inputs\": [\n";
+      for(var i = 0; i < this.inputs.length; i++) {
+        console.log(this.inputs[i].toPrettyJSON());
+        str += "  " + this.inputs[i].toPrettyJSON() + ((i == this.inputs.length-1) ? "\n" : ",\n");
+      }
+      str += "]}";
+      return str;
     }
   }
 
