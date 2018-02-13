@@ -8,15 +8,32 @@
 
 import KeymanEngine
 import UIKit
+import WebKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
   private var _overlayWindow: UIWindow?
+  private var _adhocDirectory: URL?
 
   var window: UIWindow?
   var viewController: MainViewController!
   var navigationController: UINavigationController?
+
+  func application(_ app: UIApplication, open url: URL,
+                   options: [UIApplicationOpenURLOptionsKey: Any] = [:]) -> Bool {
+    var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    destinationUrl.appendPathComponent("\(url.lastPathComponent).zip")
+    do {
+      try FileManager.default.copyItem(at: url, to: destinationUrl)
+    } catch {
+      print ("coudn't copy file")
+    }
+
+    //print("options: \(options)")
+    installAdhocKeyboard(url: destinationUrl)
+    return true
+  }
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]? = nil) -> Bool {
@@ -45,6 +62,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     window!.rootViewController = navigationController
     window!.makeKeyAndVisible()
+
+    //TODO: look in documents directory for .zip / .kmp files
+    //TODO: OR browse documents Dir from new keyboard window
+    //self.installAdhocKeyboard(filePath: "")
+
     return true
   }
 
@@ -89,6 +111,74 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       }
     }
     return _overlayWindow!
+  }
+
+  public func installAdhocKeyboard(url: URL) {
+    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    var destination =  documentsDirectory
+    destination.appendPathComponent("temp/\(url.lastPathComponent)")
+
+    Manager.shared.unzipFile(fileUrl: url, destination: destination) {
+      self.promptAdHocInstall(destination)
+    }
+  }
+
+  public func promptAdHocInstall(_ folder: URL) {
+    _adhocDirectory = folder
+
+    var welcomePath = folder
+    welcomePath.appendPathComponent("Welcome.htm")
+
+    let vc = UIViewController()
+    vc.view.backgroundColor = .red
+    let wkWebView = WKWebView.init(frame: vc.view.frame)
+    wkWebView.backgroundColor = .blue
+    vc.view.addSubview(wkWebView)
+    let cancelBtn = UIBarButtonItem(title: "Cancel", style: .plain,
+                                    target: self,
+                                    action: #selector(cancelAdHocBtnHandler))
+    let installBtn = UIBarButtonItem(title: "Install", style: .plain,
+                                     target: self,
+                                     action: #selector(installAdHocBtnHandler))
+    vc.navigationItem.leftBarButtonItem = cancelBtn
+    vc.navigationItem.rightBarButtonItem = installBtn
+    let nvc = UINavigationController.init(rootViewController: vc)
+
+    self.window?.rootViewController?.present(nvc, animated: true, completion: {
+      if FileManager.default.fileExists(atPath: welcomePath.path) {
+        print("loading request: \(welcomePath)")
+        if let html = try? String(contentsOfFile: welcomePath.path, encoding: String.Encoding.utf8) {
+          wkWebView.loadHTMLString(html, baseURL: nil)
+        } else {
+           wkWebView.loadHTMLString("Keyboard Package", baseURL: nil)
+        }
+      } else {
+        wkWebView.loadHTMLString("Keyboard Package", baseURL: nil)
+      }
+    })
+  }
+
+  @objc func installAdHocBtnHandler() {
+    if let adhocDir = _adhocDirectory {
+      Manager.shared.parseKMP(adhocDir, complete: { count in
+        print("count: \(count)")
+        self.window?.rootViewController?.dismiss(animated: true, completion: {
+          let title = count == 0 ? "Error" : "Success"
+          let message = "\(count) keyboard(s) installed"
+          let alertController = UIAlertController(title: title, message:
+           message, preferredStyle: UIAlertControllerStyle.alert)
+          alertController.addAction(UIAlertAction(title: "OK",
+                                                  style: UIAlertActionStyle.default,
+                                                  handler: nil))
+
+           self.window?.rootViewController?.present(alertController, animated: true, completion: nil)
+        })
+      })
+    }
+  }
+
+  @objc func cancelAdHocBtnHandler() {
+    self.window?.rootViewController?.dismiss(animated: true, completion: nil)
   }
 
   @objc func registerCustomFonts() {

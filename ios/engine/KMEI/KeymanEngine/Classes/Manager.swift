@@ -361,6 +361,99 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
     return nil
   }
+    
+  // MARK: - Adhoc keyboards
+
+  
+  public func parseKMP(_ folder: URL, complete: @escaping (Int) -> Void) {
+    do {
+      var path = folder
+      path.appendPathComponent("kmp.json")
+      let data = try Data(contentsOf: path, options: .mappedIfSafe)
+      let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
+      if let jsonResult = jsonResult as? [String:AnyObject] {
+        if let keyboards = jsonResult["keyboards"] as? [[String:AnyObject]] {
+          for k in keyboards {
+            let name = k["name"] as! String
+            let keyboardID = k["id"] as! String
+            let version = k["version"] as! String
+            let osk = k["oskFont"] as! String
+            let font = k["displayFont"] as! String
+            let displayFont = Font(filename: font)
+            let oskFont = Font(filename: osk)
+
+            //TODO: handle errors if languages do not exist
+            var languageName = ""
+            var languageId = ""
+            
+            var installableKeyboards : [InstallableKeyboard] = []
+            if let langs = k["languages"] as? [[String:String]] {
+              for l in langs {
+                languageName = l["name"]!
+                languageId = l["id"]!
+                
+                installableKeyboards.append( InstallableKeyboard(id: keyboardID, name: name, languageID: languageId, languageName: languageName, version: version, isRTL: false, font: displayFont, oskFont: oskFont, isCustom: false))
+              }
+            }
+            
+            do {
+              try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboardID),
+                                                      withIntermediateDirectories: true)
+            } catch {
+              log.error("Could not create dir for download: \(error)")
+              return
+            }
+            
+            installableKeyboards.forEach({ (keyboard) in
+              let storedPath = Storage.active.keyboardURL(for: keyboard)
+              let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk)
+              let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font)
+              
+              var installableFiles: [[Any]] = [["\(keyboardID).js", storedPath],
+                                                [osk, oskPath],
+                                                [font, displayPath]]
+              installableFiles.forEach({ (item) in
+                var filePath = folder
+                filePath.appendPathComponent(item[0] as! String)
+                do {
+                  try FileManager.default.copyItem(at: filePath,
+                                                   to: item[1] as! URL)
+                } catch {
+                  log.error("Error saving the download: \(error)")
+                }
+              })
+              Manager.shared.addKeyboard(keyboard)
+            })
+            
+            complete( installableKeyboards.count )
+          }
+        }
+      }
+    } catch {
+      // handle error
+      print("error")
+      complete(0)
+    }
+  }
+  
+  public func unzipFile(fileUrl: URL, destination: URL, complete: @escaping () -> Void)
+  {
+    print("fileUrl:\(fileUrl)")
+    print("destination:\(destination)")
+    do {
+      try Zip.unzipFile(fileUrl, destination: destination, overwrite: true,
+                        password: nil,
+                        progress: { (progress) -> () in
+                          print(progress)
+                          //TODO: add timeout
+                          if(progress == 1.0) {
+                            complete()
+                          }
+                        })
+    } catch {
+      print("could not unzip file")
+    }
+  }
 
   // MARK: - Downloading keyboards
 
