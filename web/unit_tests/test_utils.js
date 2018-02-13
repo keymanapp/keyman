@@ -46,7 +46,7 @@ var setupKMW = function(kmwOptions, done, timeout, uiInitCheck) {
    */
   window.setTimeout(function() {
     initFunc();
-  }, 8);
+  }, 5);
 }
 
 var setupScript = function(src, done, timeout, uiInitCheck) {
