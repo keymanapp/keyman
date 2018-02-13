@@ -4,6 +4,7 @@
 
 package com.tavultesoft.kmea;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,9 +12,12 @@ import java.util.HashMap;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,13 +101,27 @@ public final class KeyboardInfoActivity extends Activity {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position == 1) {
+          Intent i = new Intent(Intent.ACTION_VIEW);
+
           if (customHelpLink != null) {
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(customHelpLink));
+            if (customHelpLink.endsWith("welcome.htm")) {
+              File customHelp = new File(new File(customHelpLink).getAbsolutePath());
+              i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+              // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
+              try {
+                Uri contentUri = FileProvider.getUriForFile(
+                  context, getApplication().getPackageName() + ".fileProvider", customHelp);
+                i.setDataAndType(contentUri, "text/html");
+              } catch (Exception e) {
+                Log.e("KeyboardInfoActivity", "Failed to access " + customHelp.toString());
+              }
+            }
+            else {
+              i.setData(Uri.parse(customHelpLink));
+            }
             startActivity(i);
           } else {
             String helpUrlStr = String.format("http://help.keyman.com/keyboard/%s/%s/", kbID, kbVersion);
-            Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(helpUrlStr));
             startActivity(i);
           }

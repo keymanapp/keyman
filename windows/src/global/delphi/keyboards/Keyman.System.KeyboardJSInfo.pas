@@ -28,7 +28,8 @@ type
 implementation
 
 uses
-  System.RegularExpressions;
+  System.RegularExpressions,
+  Keyman.System.RegExGroupHelperRSP19902;
 
 { TKeyboardJSInfo }
 
@@ -79,25 +80,25 @@ begin
   // Retrieve keyboard name from .js
   m := TRegEx.Match(data, 'this.KN\s*=\s*([''"])(.*?)\1');
   if m.Success
-    then FName := m.Groups[2].Value
+    then FName := TGroupHelperRSP19902.Create(m.Groups[2], data).FixedValue
     else FName := '';
 
   // Extract keyboard version
   m := TRegEx.Match(data, 'this.KBVER\s*=\s*([''"])(.*?)\1');
   if m.Success
-    then FVersion := m.Groups[2].Value
+    then FVersion := TGroupHelperRSP19902.Create(m.Groups[2], data).FixedValue
     else FVersion := '';
 
   // Extract RTL status
   m := TRegEx.Match(data, 'this.KRTL\s*=\s*(.*?)\s*;');
   if m.Success
-    then FRTL := StrToBoolDef(m.Groups[1].Value, False)
+    then FRTL := StrToBoolDef(TGroupHelperRSP19902.Create(m.Groups[1], data).FixedValue, False)
     else FRTL := False;
 
   // Extract mnemonic layout status
   m := TRegEx.Match(data, 'this.KM\s*=\s*(.*?)\s*;');
   if m.Success
-    then FMnemonic := StrToBoolDef(m.Groups[1].Value, False)
+    then FMnemonic := StrToBoolDef(TGroupHelperRSP19902.Create(m.Groups[1], data).FixedValue, False)
     else FMnemonic := False;
 end;
 

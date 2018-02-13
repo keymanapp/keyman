@@ -3,7 +3,7 @@
 
 build: buildunidata
   cd $(ROOT)\src\global\inst\data
-  $(ROOT)\bin\buildtools\buildunidata . .\UnicodeData.mdb
+  $(ROOT)\bin\buildtools\buildunidata $(ROOT)\..\resources\standards-data\unicode-character-database .\UnicodeData.mdb
 
 clean:
   cd $(ROOT)\src\global\inst

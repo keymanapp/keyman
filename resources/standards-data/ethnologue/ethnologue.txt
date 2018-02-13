@@ -1,0 +1,7384 @@
+EthnologueLanguageID,EthnologueCountryID,EthnologueLangStatusID,Name
+aaa,NG,L,Ghotuo
+aab,NG,L,Alumu-Tesu
+aac,PG,L,Ari
+aad,PG,L,Amal
+aae,IT,L,"Albanian, Arbëreshë"
+aaf,IN,L,Aranadan
+aai,PG,L,Arifama-Miniafia
+aak,PG,L,Ankave
+aal,NG,L,Afade
+aam,TZ,L,Aramanik
+aan,BR,N,Anambé
+aao,DZ,L,"Arabic, Algerian Saharan Spoken"
+aap,BR,L,"Arára, Pará"
+aaq,US,E,"Abnaki, Eastern"
+aar,ET,L,Afar
+aas,TZ,L,Aasáx
+aat,GR,L,"Albanian, Arvanitika"
+aau,PG,L,Abau
+aaw,PG,L,Solong
+aax,ID,L,Mandobo Atas
+aay,IN,L,Aariya
+aaz,ID,L,Amarasi
+aba,CI,L,Abé
+abb,CM,L,Bankon
+abc,PH,L,"Ayta, Ambala"
+abd,PH,L,"Agta, Camarines Norte"
+abe,CA,N,"Abnaki, Western"
+abf,MY,L,Abai Sungai
+abg,PG,N,Abaga
+abh,AF,L,"Arabic, Tajiki Spoken"
+abi,CI,L,Abidji
+abj,IN,E,Aka-Bea
+abk,GE,L,Abkhaz
+abl,ID,L,Abung
+abm,NG,L,Abanyom
+abn,NG,L,Abua
+abo,NG,L,Abon
+abp,PH,L,"Ayta, Abenlen"
+abq,RU,L,Abaza
+abr,GH,L,Abron
+abs,ID,L,"Malay, Ambonese"
+abt,PG,L,Ambulas
+abu,CI,L,Abure
+abv,BH,L,"Arabic, Baharna Spoken"
+abw,PG,L,Pal
+abx,PH,L,Inabaknon
+aby,PG,L,Aneme Wake
+abz,ID,L,Abui
+aca,CO,L,Achagua
+acb,NG,L,Áncá
+acc,GT,L,"Achi', Cubulco"
+acd,GH,L,Gikyode
+ace,ID,L,Aceh
+acf,LC,L,Saint Lucian Creole French
+ach,UG,L,Acholi
+aci,IN,E,Aka-Cari
+ack,IN,E,Aka-Kora
+acl,IN,E,Akar-Bale
+acm,IQ,L,"Arabic, Mesopotamian Spoken"
+acn,CN,L,Achang
+acp,NG,L,"Acipa, Eastern"
+acq,YE,L,"Arabic, Ta'izzi-Adeni Spoken"
+acr,GT,L,"Achi', Rabinal"
+acs,BR,E,Acroá
+act,NL,L,Achterhoeks
+acu,PE,L,Achuar-Shiwiar
+acv,US,N,Achumawi
+acw,SA,L,"Arabic, Hijazi Spoken"
+acx,OM,L,"Arabic, Omani Spoken"
+acy,CY,L,"Arabic, Cypriot Spoken"
+acz,SD,L,Acheron
+ada,GH,L,Dangme
+adb,TL,L,Adabe
+add,CM,L,Dzodinka
+ade,TG,L,Adele
+adf,OM,L,"Arabic, Dhofari Spoken"
+adg,AU,N,Andegerebinha
+adh,UG,L,Adhola
+adi,IN,L,Adi
+adj,CI,L,Adioukrou
+adl,IN,L,"Adi, Galo"
+adn,ID,L,Adang
+ado,PG,L,Abu
+adp,BT,L,Adap
+adq,GH,L,Adangbe
+adr,ID,L,Adonara
+ads,GH,L,Adamorobe Sign Language
+adt,AU,N,Adynyamathanha
+adu,NG,L,Aduge
+adw,BR,L,Amundava
+adx,CN,L,"Tibetan, Amdo"
+ady,RU,L,Adyghe
+aea,AU,N,Areba
+aeb,TN,L,"Arabic, Tunisian Spoken"
+aec,EG,L,"Arabic, Sa`idi Spoken"
+aed,AR,L,Argentine Sign Language
+aee,AF,L,"Pashayi, Northeast"
+aek,NC,N,Haeke
+ael,CM,L,Ambele
+aem,VN,N,Arem
+aen,AM,L,Armenian Sign Language
+aeq,PK,L,Aer
+aer,AU,L,"Arrernte, Eastern"
+aes,US,E,Alsea
+aew,PG,L,Ambakich
+aex,US,S,Amerax
+aey,PG,L,Amele
+afb,IQ,L,"Arabic, Gulf Spoken"
+afe,NG,L,Putukwam
+afi,PG,L,Akrukay
+afn,NG,L,Defaka
+afo,NG,L,Eloyi
+afr,ZA,L,Afrikaans
+afs,US,L,Afro-Seminole Creole
+aft,SD,L,Afitti
+afu,GH,L,Awutu
+afz,ID,L,Obokuitai
+aga,PE,E,Aguano
+agb,NG,L,Legbo
+agc,NG,L,Agatu
+agd,PG,L,Agarabi
+age,PG,L,Angal
+agf,ID,L,Arguni
+agg,PG,L,Angor
+agh,CD,L,Ngelima
+agi,IN,L,Agariya
+agj,ET,L,Argobba
+agk,PH,N,"Agta, Isarog"
+agl,PG,L,Fembe
+agm,PG,L,Angaatiha
+agn,PH,L,Agutaynen
+ago,PG,L,Tainae
+agp,PH,L,Paranan
+agq,CM,L,Aghem
+agr,PE,L,Aguaruna
+ags,CM,L,Esimbi
+agt,PH,L,"Agta, Central Cagayan"
+agu,GT,L,Awakateko
+agv,PH,L,"Agta, Remontado"
+agw,SB,L,Kahua
+agx,RU,L,Aghul
+agy,PH,L,"Alta, Southern"
+agz,PH,L,"Agta, Mt. Iriga"
+aha,GH,L,Ahanta
+ahb,VU,L,Axamb
+ahe,ID,L,Ahe
+ahg,ET,L,Qimant
+ahh,ID,L,Aghu
+ahi,CI,L,"Aizi, Tiagbamrin"
+ahk,MM,L,Akha
+ahl,TG,L,Igo
+ahm,CI,L,"Aizi, Mobumrin"
+ahn,NG,L,Àhàn
+aho,IN,E,Ahom
+ahp,CI,L,"Aizi, Aproumu"
+ahr,IN,L,Ahirani
+ahs,NG,L,Ashe
+aht,US,N,Ahtena
+aia,SB,L,Arosi
+aib,CN,L,Ainu
+aic,PG,L,Ainbai
+aid,AU,N,Alngith
+aie,PG,L,Amara
+aif,PG,L,Agi
+aig,AG,L,Antigua and Barbuda Creole English
+aih,CN,L,Ai-Cham
+aii,IQ,L,Assyrian Neo-Aramaic
+aij,IL,L,Lishanid Noshan
+aik,NG,L,Ake
+ail,PG,L,Aimele
+aim,IN,L,Aimol
+ain,JP,N,Ainu
+aio,IN,L,Aiton
+aip,ID,L,Burumakok
+aiq,AF,L,Aimaq
+air,ID,L,Airoran
+ais,TW,N,"Amis, Nataoran"
+ait,BR,E,Arikem
+aix,PG,L,Aigon
+aiy,CF,L,Ali
+aiz,ET,L,Aari
+aja,SD,L,Aja
+ajg,BJ,L,Aja
+aji,NC,L,Ajië
+ajp,JO,L,"Arabic, South Levantine Spoken"
+ajt,IL,L,"Arabic, Judeo-Tunisian"
+aju,IL,L,"Arabic, Judeo-Moroccan"
+ajw,NG,E,Ajawa
+ajz,IN,L,Amri
+aka,GH,L,Akan
+akb,ID,L,Batak Angkola
+akc,ID,L,Mpur
+akd,NG,L,Ukpet-Ehom
+ake,GY,L,Akawaio
+akf,NG,L,Akpa
+akg,ID,L,Anakalangu
+akh,PG,L,Angal Heneng
+aki,PG,L,Aiome
+akj,IN,E,Aka-Jeru
+akl,PH,L,Aklanon
+akm,IN,E,Aka-Bo
+akn,BR,L,Amikoana
+ako,SR,N,Akurio
+akp,GH,L,Siwu
+akq,PG,L,Ak
+akr,VU,N,Araki
+aks,TG,L,Akaselem
+akt,PG,L,Akolet
+aku,CM,L,Akum
+akv,RU,L,Akhvakh
+akw,CG,L,Akwa
+akx,IN,E,Aka-Kede
+aky,IN,E,Aka-Kol
+akz,US,L,Alabama
+ala,NG,L,Alago
+alc,CL,L,Qawasqar
+ald,CI,L,Alladian
+ale,US,L,Aleut
+alf,NG,L,Alege
+alh,AU,N,Alawa
+ali,PG,L,Amaimon
+alj,PH,L,Alangan
+alk,LA,L,Alak
+all,IN,L,Allar
+alm,VU,L,Amblong
+aln,CS,L,"Albanian, Gheg"
+alo,ID,L,Larike-Wakasihu
+alp,ID,L,Alune
+alq,CA,L,Algonquin
+alr,RU,L,Alutor
+als,AL,L,"Albanian, Tosk"
+alt,RU,L,"Altai, Southern"
+alu,SB,L,'Are'are
+alw,ET,L,Alaba
+alx,PG,L,Alatil
+aly,AU,L,Alyawarr
+alz,CD,L,Alur
+ama,BR,N,Amanayé
+amb,NG,L,Ambo
+amc,PE,L,Amahuaca
+amd,BR,L,Amapá Creole
+ame,PE,L,Yanesha'
+amf,ET,L,Hamer-Banna
+amg,AU,N,Amarag
+amh,ET,L,Amharic
+ami,TW,L,Amis
+amj,TD,L,Amdang
+amk,ID,L,Ambai
+aml,BD,L,War
+amm,PG,L,Ama
+amn,PG,L,Amanab
+amo,NG,L,Amo
+amp,PG,L,Alamblak
+amq,ID,N,Amahai
+amr,PE,L,Amarakaeri
+ams,JP,L,"Amami-Oshima, Southern"
+amt,PG,L,Amto
+amu,MX,L,"Amuzgo, Guerrero"
+amv,ID,L,Ambelau
+amw,SY,L,Western Neo-Aramaic
+amx,AU,L,Anmatyerre
+amy,AU,N,Ami
+amz,AU,N,Atampaya
+ana,CO,E,Andaqui
+anb,PE,E,Andoa
+anc,NG,L,Ngas
+and,ID,L,Ansus
+ane,NC,L,Xârâcùù
+anf,GH,L,Animere
+anh,PG,L,Nend
+ani,RU,L,Andi
+anj,PG,L,Anor
+ank,NG,L,Goemai
+anl,MM,L,Anu
+anm,IN,L,Anal
+ann,NG,L,Obolo
+ano,CO,L,Andoque
+anp,IN,L,Angika
+anq,IN,L,Jarawa
+anr,IN,L,Andh
+ans,CO,E,Anserma
+ant,AU,N,Antakarinya
+anu,SD,L,Anuak
+anv,CM,L,Denya
+anw,NG,L,Anaang
+anx,PG,L,Andra-Hus
+any,CI,L,Anyin
+anz,PG,L,Anem
+aoa,ST,L,Angolar
+aob,PG,N,Abom
+aoc,VE,L,Pemon
+aod,PG,L,Andarum
+aoe,PG,L,Angal Enen
+aof,PG,L,Bragat
+aog,PG,L,Angoram
+aoh,CO,E,Arma
+aoi,AU,L,Anindilyakwa
+aoj,PG,L,Mufian
+aok,NC,L,Arhö
+aol,ID,L,Alor
+aom,PG,L,Ömie
+aon,PG,L,"Arapesh, Bumbita"
+aor,VU,N,Aore
+aos,ID,L,Taikat
+aot,IN,L,A'tong
+aox,GY,L,Atorada
+aoz,ID,L,Uab Meto
+apb,SB,L,Sa'a
+apc,SY,L,"Arabic, North Levantine Spoken"
+apd,SD,L,"Arabic, Sudanese Spoken"
+ape,PG,L,Bukiyip
+apg,ID,L,Ampanang
+aph,NP,L,Athpariya
+api,BR,N,Apiacá
+apj,US,L,"Apache, Jicarilla"
+apk,US,N,"Apache, Kiowa"
+apl,US,N,"Apache, Lipan"
+apm,US,L,"Apache, Mescalero-Chiricahua"
+apn,BR,L,Apinayé
+apo,PG,L,Apalik
+app,VU,L,Apma
+apq,IN,N,A-Pucikwar
+apr,PG,L,Arop-Lukep
+aps,PG,L,Arop-Sissano
+apt,IN,L,Apatani
+apu,BR,L,Apurinã
+apw,US,L,"Apache, Western"
+apx,ID,L,Aputai
+apy,BR,L,Apalaí
+apz,PG,L,Safeyoka
+aqc,RU,L,Archi
+aqg,NG,L,Arigidi
+aqm,ID,L,Atohwaim
+aqn,PH,L,"Alta, Northern"
+aqp,US,E,Atakapa
+aqr,NC,N,Arhâ
+ara,SA,L,Arabic
+arb,SA,L,"Arabic, Standard"
+ard,AU,N,Arabana
+are,AU,L,"Arrarnta, Western"
+arf,PG,L,Arafundi
+arg,ES,L,Aragonese
+arh,CO,L,Arhuaco
+ari,US,N,Arikara
+arj,BR,L,Arapaso
+ark,BR,N,Arikapú
+arl,PE,L,Arabela
+arn,CL,L,Mapudungun
+aro,BO,L,Araona
+arp,US,L,Arapaho
+arq,DZ,L,"Arabic, Algerian Spoken"
+arr,BR,L,Karo
+ars,SA,L,"Arabic, Najdi Spoken"
+aru,BR,E,Arua
+arv,ET,L,Arbore
+arw,SR,L,Arawak
+arx,BR,N,Aruá
+ary,MA,L,"Arabic, Moroccan Spoken"
+arz,EG,L,"Arabic, Egyptian Spoken"
+asa,TZ,L,Asu
+asb,CA,L,Assiniboine
+asc,ID,L,"Asmat, Casuarina Coast"
+asd,PG,L,Asas
+ase,US,L,American Sign Language
+asf,AU,L,Australian Sign Language
+asg,NG,L,Cishingini
+ash,PE,E,Abishira
+asi,ID,L,Buruwai
+asj,CM,L,Nsari
+ask,AF,L,Ashkun
+asl,ID,L,Asilulu
+asm,IN,L,Assamese
+asn,BR,L,"Asuriní, Xingú"
+aso,PG,L,Dano
+asp,DZ,L,Algerian Sign Language
+asq,AT,L,Austrian Sign Language
+asr,IN,L,Asuri
+ass,CM,L,Ipulo
+ast,ES,L,Asturian
+asu,BR,L,Asuriní
+asv,CD,L,Asoa
+asw,AU,S,Australian Aborigines Sign Language
+asx,PG,L,Muratayak
+asy,ID,L,"Asmat, Yaosakor"
+asz,ID,L,As
+ata,PG,L,Pele-Ata
+atb,CN,L,Zaiwa
+atc,PE,E,Atsahuaca
+atd,PH,L,"Manobo, Ata"
+ate,PG,L,Atemble
+atf,CN,L,Atuence
+atg,NG,L,Ivbie North-Okpela-Arhe
+ati,CI,L,Attié
+atj,CA,L,Atikamekw
+atk,PH,L,Ati
+atl,PH,L,"Agta, Mt. Iraya"
+atm,PH,N,Ata
+atn,IR,L,Ashtiani
+ato,CM,L,Atong
+atp,PH,L,"Atta, Pudtol"
+atq,ID,L,Aralle-Tabulahan
+atr,BR,L,Atruahí
+ats,US,N,Gros Ventre
+att,PH,L,"Atta, Pamplona"
+atu,SD,L,Reel
+atv,RU,L,"Altai, Northern"
+atw,US,N,Atsugewi
+atx,BR,N,Arutani
+aty,VU,L,Aneityum
+atz,PH,L,Arta
+aua,SB,L,Asumboa
+auc,EC,L,Waorani
+aud,SB,L,Anuta
+aue,NA,L,=|Kx'au||'ein
+aug,BJ,L,Aguna
+auh,ZM,L,Aushi
+aui,PG,L,Anuki
+auj,LY,L,Awjilah
+auk,PG,L,Heyo
+aul,VU,L,Aulua
+aum,NG,L,Asu
+aun,PG,L,"One, Molmo"
+auo,NG,E,Auyokawa
+aup,PG,L,Makayam
+auq,ID,L,Anus
+aur,PG,L,Aruek
+aut,PF,L,Austral
+auu,ID,L,Auye
+auv,FR,L,Auvergnat
+auw,ID,L,Awyi
+aux,BR,N,Aurá
+auy,PG,L,Awiyaana
+auz,UZ,L,"Arabic, Uzbeki Spoken"
+ava,RU,L,Avar
+avb,PG,L,Avau
+avd,IR,L,Alviri-Vidari
+ave,IR,E,Avestan
+avi,CI,L,Avikam
+avl,EG,L,"Arabic, Eastern Egyptian Bedawi Spoken"
+avn,GH,L,Avatime
+avo,BR,L,Agavotaguerra
+avs,PE,E,Aushiri
+avt,PG,L,Au
+avu,SD,L,Avokaya
+avv,BR,L,Avá-Canoeiro
+awa,IN,L,Awadhi
+awb,PG,L,Awa
+awc,NG,L,"Acipa, Western"
+awe,BR,L,Awetí
+awh,ID,L,Awbono
+awi,PG,L,Aekyom
+awk,AU,E,Awabakal
+awm,PG,L,Arawum
+awn,ET,L,Awngi
+awo,NG,L,Awak
+awr,ID,L,Awera
+aws,ID,L,"Awyu, South"
+awt,BR,L,Araweté
+awu,ID,L,"Awyu, Central"
+awv,ID,L,"Awyu, Jair"
+aww,PG,L,Awun
+awx,PG,L,Awara
+awy,ID,L,"Awyu, Edera"
+axb,AR,E,Abipon
+axg,BR,E,"Arára, Mato Grosso"
+axk,CF,L,Yaka
+axx,NC,L,Xaragure
+aya,PG,L,Awar
+ayb,BJ,L,"Gbe, Ayizo"
+ayc,PE,L,"Aymara, Southern"
+ayd,AU,N,Ayabadhu
+aye,NG,L,Ayere
+ayg,TG,L,Ginyanga
+ayh,YE,L,"Arabic, Hadrami Spoken"
+ayi,NG,L,Leyigha
+ayk,NG,L,Akuku
+ayl,LY,L,"Arabic, Libyan Spoken"
+aym,BO,L,Aymara
+ayn,YE,L,"Arabic, Sanaani Spoken"
+ayo,PY,L,Ayoreo
+ayp,IQ,L,"Arabic, North Mesopotamian Spoken"
+ayq,PG,L,Ayi
+ayr,BO,L,"Aymara, Central"
+ays,PH,N,"Ayta, Sorsogon"
+ayt,PH,L,"Ayta, Bataan"
+ayu,NG,L,Ayu
+ayx,CN,L,Ayi
+ayy,PH,E,"Ayta, Tayabas"
+ayz,ID,L,Mai Brat
+azb,IR,L,"Azerbaijani, South"
+aze,IR,L,Azerbaijani
+azg,MX,L,"Amuzgo, San Pedro Amuzgos"
+azj,AZ,L,"Azerbaijani, North"
+azm,MX,L,"Amuzgo, Ipalapa"
+azo,CM,L,Awing
+azr,PG,L,Adzera
+azt,PH,L,"Atta, Faire"
+azz,MX,L,"Nahuatl, Highland Puebla"
+baa,SB,L,Babatana
+bab,GW,L,Bainouk-Gunyuño
+bac,ID,L,Badui
+bae,VE,E,Baré
+baf,CM,L,Nubaca
+bag,CM,L,Tuki
+bah,BS,L,Bahamas Creole English
+baj,ID,L,Barakai
+bak,RU,L,Bashkir
+bal,PK,L,Baluchi
+bam,ML,L,Bamanankan
+ban,ID,L,Bali
+bao,CO,L,Waimaha
+bap,NP,L,Bantawa
+bar,AT,L,Bavarian
+bas,CM,L,Basaa
+bau,NG,L,Bada
+bav,CM,L,Vengo
+baw,CM,L,Bambili-Bambui
+bax,CM,L,Bamun
+bay,ID,L,Batuley
+baz,CM,L,Tunen
+bba,BJ,L,Baatonum
+bbb,PG,L,Barai
+bbc,ID,L,Batak Toba
+bbd,PG,L,Bau
+bbe,CD,L,Bangba
+bbf,PG,L,Baibai
+bbg,GA,L,Barama
+bbh,CN,L,Bugan
+bbi,CM,L,Barombi
+bbj,CM,L,Ghomálá'
+bbk,CM,L,Babanki
+bbl,GE,L,Bats
+bbm,CD,L,Babango
+bbn,PG,L,Uneapa
+bbo,BF,L,"Bobo Madaré, Northern"
+bbp,CF,L,"Banda, West Central"
+bbq,CM,L,Bamali
+bbr,PG,L,Girawa
+bbs,NG,L,Bakpinka
+bbt,NG,L,Mburku
+bbu,NG,L,Kulung
+bbv,PG,L,Karnai
+bbw,CM,L,Baba
+bbx,CM,L,Bubia
+bby,CM,L,Befang
+bbz,TD,L,"Arabic, Babalia Creole"
+bca,CN,L,"Bai, Central"
+bcb,SN,L,Bainouk-Samik
+bcc,PK,L,"Balochi, Southern"
+bcd,ID,L,"Babar, North"
+bce,CM,L,Bamenyam
+bcf,PG,L,Bamu
+bcg,GN,L,Baga Binari
+bch,PG,L,Bariai
+bci,CI,L,Baoulé
+bcj,AU,N,Bardi
+bck,AU,L,Bunaba
+bcl,PH,L,"Bicolano, Central"
+bcm,PG,L,Bannoni
+bcn,NG,L,Bali
+bco,PG,L,Kaluli
+bcp,CD,L,Bali
+bcq,ET,L,Bench
+bcr,CA,L,Babine
+bcs,NG,L,Kohumono
+bct,CD,L,Bendi
+bcu,PG,L,Awad Bing
+bcv,NG,L,Shoo-Minda-Nye
+bcw,CM,L,Bana
+bcx,ID,L,Pamona
+bcy,NG,L,Bacama
+bcz,SN,L,Bainouk-Gunyaamolo
+bda,SN,L,Bayot
+bdb,ID,L,Basap
+bdc,CO,L,Emberá-Baudó
+bdd,PG,L,Bunama
+bde,NG,L,Bade
+bdg,MY,L,Bonggi
+bdh,SD,L,Baka
+bdi,SD,L,Burun
+bdj,SD,L,Bai
+bdk,AZ,L,Budukh
+bdl,ID,L,"Bajau, Indonesian"
+bdm,TD,L,Buduma
+bdn,CM,N,Baldemu
+bdo,TD,L,Bernde
+bdp,TZ,L,Bende
+bdq,VN,L,Bahnar
+bdr,MY,L,"Bajau, West Coast"
+bds,TZ,L,Burunge
+bdt,CF,L,Bokoto
+bdu,CM,L,Oroko
+bdv,IN,L,Bodo Parja
+bdw,ID,L,Baham
+bdx,ID,L,Budong-Budong
+bdy,AU,N,Bandjalang
+bdz,PK,L,Badeshi
+bea,CA,L,Beaver
+beb,CM,L,Bebele
+bec,CM,L,Iceve-Maci
+bed,ID,L,Bedoanas
+bee,IN,L,Byangsi
+bef,PG,L,Benabena
+beg,BN,L,Belait
+beh,BJ,L,Biali
+bei,ID,L,Bekati'
+bej,SD,L,Bedawi
+bek,PG,L,Bebeli
+bel,BY,L,Belarusan
+bem,ZM,L,Bemba
+ben,BD,L,Bengali
+beo,PG,L,Beami
+bep,ID,L,Besoa
+beq,CG,L,Beembe
+bes,TD,L,Besme
+bet,CI,L,"Béte, Guiberoua"
+beu,ID,L,Blagar
+bev,CI,L,"Bété, Daloa"
+bew,ID,L,Betawi
+bex,SD,L,Jur Modo
+bey,PG,L,Beli
+bez,TZ,L,Bena
+bfa,SD,L,Bari
+bfb,IN,L,"Bareli, Pauri"
+bfc,CN,L,"Bai, Northern"
+bfd,CM,L,Bafut
+bfe,ID,L,Betaf
+bff,CF,L,Bofi
+bfg,ID,L,"Kayan, Busang"
+bfh,PG,L,Blafe
+bfi,GB,L,British Sign Language
+bfj,CM,L,Bafanji
+bfk,TH,L,Ban Khor Sign Language
+bfl,CF,L,Banda-Ndélé
+bfm,CM,L,Mmen
+bfn,TL,L,Bunak
+bfo,BF,L,"Birifor, Malba"
+bfp,CM,L,Beba
+bfq,IN,L,Badaga
+bfr,IN,L,Bazigar
+bfs,CN,L,"Bai, Southern"
+bft,PK,L,Balti
+bfu,IN,L,Gahri
+bfw,IN,L,Bondo
+bfy,IN,L,Bagheli
+bfz,IN,L,"Pahari, Mahasu"
+bga,NG,L,Gwamhi-Wuri
+bgb,ID,L,Bobongko
+bgc,IN,L,Haryanvi
+bgd,IN,L,"Bareli, Rathwi"
+bge,IN,L,Bauria
+bgf,CM,L,Bangandu
+bgg,IN,L,Bugun
+bgh,CN,L,Bogan
+bgi,PH,L,Giangan
+bgj,CM,L,Bangolan
+bgk,LA,L,Bit
+bgl,LA,L,Bo
+bgm,GN,N,Baga Mboteni
+bgn,PK,L,"Balochi, Western"
+bgo,GN,N,Baga Koga
+bgp,PK,L,"Balochi, Eastern"
+bgq,IN,L,Bagri
+bgr,IN,L,"Chin, Bawm"
+bgs,PH,L,Tagabawa
+bgt,SB,L,Bughotu
+bgu,NG,L,Mbongno
+bgv,ID,L,Warkay-Bipim
+bgw,IN,L,Bhatri
+bgx,TR,L,Balkan Gagauz Turkish
+bgy,ID,L,Benggoi
+bgz,ID,L,Banggai
+bha,IN,L,Bharia
+bhb,IN,L,Bhili
+bhc,ID,L,Biga
+bhd,IN,L,Bhadrawahi
+bhe,PK,L,Bhaya
+bhf,PG,L,Odiai
+bhg,PG,L,Binandere
+bhh,IL,L,Bukharic
+bhi,IN,L,Bhilali
+bhj,NP,L,Bahing
+bhk,PH,L,"Bicolano, Albay"
+bhl,PG,L,Bimin
+bhm,YE,L,Bathari
+bhn,GE,L,Bohtan Neo-Aramaic
+bho,IN,L,Bhojpuri
+bhp,ID,L,Bima
+bhq,ID,L,Tukang Besi South
+bhr,MG,L,"Malagasy, Bara"
+bhs,CM,L,Buwal
+bht,IN,L,Bhattiyali
+bhu,IN,L,Bhunjia
+bhv,ID,L,Bahau
+bhw,ID,L,Biak
+bhx,IN,L,Bhalay
+bhy,CD,L,Bhele
+bhz,ID,L,Bada
+bia,AU,N,Badimaya
+bib,BF,L,Bissa
+bic,PG,L,Bikaru
+bid,TD,L,Bidiyo
+bie,PG,L,Bepour
+bif,GW,L,Biafada
+big,PG,L,Biangai
+bii,CN,L,Bisu
+bij,NG,L,Vaghat-Ya-Bijim-Legeri
+bik,PH,L,Bikol
+bil,NG,L,Bile
+bim,GH,L,Bimoba
+bin,NG,L,Edo
+bio,PG,L,Nai
+bip,CD,L,Bila
+biq,PG,L,Bipi
+bir,PG,L,Bisorio
+bis,VU,L,Bislama
+bit,PG,L,Berinomo
+biu,IN,L,Biete
+biv,GH,L,"Birifor, Southern"
+biw,CM,L,Kol
+bix,IN,L,Bijori
+biy,IN,L,Birhor
+biz,CD,L,Baloi
+bja,CD,L,Budza
+bjb,AU,E,Banggarla
+bjc,PG,L,Bariji
+bjd,AU,N,Bandjigali
+bje,CN,L,Biao-Jiao Mien
+bjf,IL,N,Barzani Jewish Neo-Aramaic
+bjg,GW,L,Bidyogo
+bjh,PG,L,Bahinemo
+bji,ET,L,Burji
+bjj,IN,L,Kanauji
+bjk,PG,L,Barok
+bjl,PG,L,Bulu
+bjm,IQ,L,Bajelani
+bjn,ID,L,Banjar
+bjo,CF,L,"Banda, Mid-Southern"
+bjq,MG,L,"Malagasy, Southern Betsimisaraka"
+bjr,PG,L,Binumarien
+bjs,BB,L,Bajan
+bjt,SN,L,Balanta-Ganja
+bju,CM,N,Busuu
+bjv,TD,L,Bedjond
+bjw,CI,L,Bakwé
+bjx,PH,L,"Itneg, Banao"
+bjy,AU,E,Bayali
+bjz,PG,L,Baruga
+bka,NG,L,Kyak
+bkb,PH,L,Finallig
+bkc,CM,L,Baka
+bkd,PH,L,Binukid
+bke,ID,L,Bengkulu
+bkf,CD,L,Beeke
+bkg,CF,L,Buraka
+bkh,CM,L,Bakoko
+bki,VU,L,Baki
+bkj,CF,L,Pande
+bkk,IN,L,Brokskat
+bkl,ID,L,Berik
+bkm,CM,L,Kom
+bkn,ID,L,Bukitan
+bko,CM,L,Kwa'
+bkp,CD,L,Boko
+bkq,BR,L,Bakairí
+bkr,ID,L,Bakumpai
+bks,PH,L,"Sorsogon, Masbate"
+bkt,CD,L,Boloki
+bku,PH,L,Buhid
+bkv,NG,L,Bekwarra
+bkw,CG,L,Bekwil
+bkx,TL,L,Baikeno
+bky,NG,L,Bokyi
+bkz,ID,L,Bungku
+bla,CA,L,Blackfoot
+blb,SB,L,Bilua
+blc,CA,L,Bella Coola
+bld,ID,L,Bolango
+ble,GW,L,Balanta-Kentohe
+blf,ID,L,Buol
+blg,MY,L,Balau
+blh,LR,L,Kuwaa
+bli,CD,L,Bolia
+blj,ID,L,Bolongan
+blk,MM,L,"Karen, Pa'o"
+bll,US,E,Biloxi
+blm,SD,L,Beli
+bln,PH,L,"Bicolano, Southern Catanduanes"
+blo,BJ,L,Anii
+blp,SB,L,Blablanga
+blq,PG,L,Baluan-Pam
+blr,CN,L,Blang
+bls,ID,L,Balaesang
+blt,VN,L,Tai Dam
+blu,CN,L,Hmong Njua
+blv,AO,L,Bolo
+blw,PH,L,Balangao
+blx,PH,L,"Ayta, Mag-Indi"
+bly,BJ,L,Notre
+blz,ID,L,Balantak
+bma,NG,L,Lame
+bmb,CD,L,Bembe
+bmc,PG,L,Biem
+bmd,GN,L,Baga Manduri
+bme,CF,L,Limassa
+bmf,SL,L,Bom
+bmg,CD,L,Bamwe
+bmh,PG,L,Kein
+bmi,TD,L,Bagirmi
+bmj,NP,L,Bote-Majhi
+bmk,PG,L,Ghayavi
+bml,CD,L,Bomboli
+bmm,MG,L,"Malagasy, Northern Betsimisaraka"
+bmn,PG,E,Bina
+bmo,CM,L,Bambalang
+bmp,PG,L,Bulgebi
+bmq,ML,L,Bomu
+bmr,CO,L,Muinane
+bms,NE,L,"Kanuri, Bilma"
+bmt,CN,L,Biao Mon
+bmu,PG,L,Burum-Mindik
+bmv,CM,L,Bum
+bmw,CG,L,Bomwali
+bmx,PG,L,Baimak
+bmy,CD,L,Bemba
+bmz,PG,L,Baramu
+bna,ID,L,Bonerate
+bnb,MY,L,Bookan
+bnc,PH,L,"Bontoc, Central"
+bnd,ID,L,Banda
+bne,ID,L,Bintauna
+bnf,ID,L,Masiwang
+bng,GQ,L,Benga
+bnh,BR,L,Banawá
+bni,CD,L,Bangi
+bnj,PH,L,"Tawbuid, Eastern"
+bnk,VU,L,Bierebo
+bnl,SO,N,Boon
+bnm,GQ,L,Batanga
+bnn,TW,L,Bunun
+bno,PH,L,Bantoanon
+bnp,PG,L,Bola
+bnq,ID,L,Bantik
+bnr,VU,L,Butmas-Tur
+bns,IN,L,Bundeli
+bnu,ID,L,Bentong
+bnv,ID,N,Bonerif
+bnw,PG,L,Bisis
+bnx,CD,L,Bangubangu
+bny,MY,L,Bintulu
+bnz,CM,L,Beezen
+boa,PE,L,Bora
+bob,KE,L,Boni
+boc,ID,L,"Kenyah, Bakung"
+bod,CN,L,"Tibetan, Central"
+boe,CM,L,Mundabli
+bof,BF,L,Bolon
+bog,ML,L,Bamako Sign Language
+boh,CD,L,Boma
+boi,US,E,Barbareño
+boj,PG,L,Anjam
+bok,CG,L,Bonjo
+bol,NG,L,Bole
+bom,NG,L,Berom
+bon,PG,L,Bine
+boo,ML,L,"Bozo, Tièma Cièwè"
+bop,PG,L,Bonkiman
+boq,PG,L,Bogaya
+bor,BR,L,Borôro
+bos,BA,L,Bosnian
+bot,SD,L,Bongo
+bou,TZ,L,Bondei
+bov,GH,L,Tuwuli
+bow,PG,E,Rema
+box,BF,L,Buamu
+boy,CF,N,Bodo
+boz,ML,L,"Bozo, Tiéyaxo"
+bpa,VU,L,Dakaka
+bpb,CO,E,Barbacoas
+bpd,CF,L,Banda-Banda
+bpg,ID,L,Bonggo
+bph,RU,L,Botlikh
+bpi,PG,L,Bagupi
+bpj,CD,L,Binji
+bpk,NC,L,Orowe
+bpl,AU,S,Broome Pearling Lugger Pidgin
+bpm,PG,L,Biyom
+bpn,CN,L,Dzao Min
+bpo,ID,L,Anasi
+bpp,ID,L,Kaure
+bpq,ID,L,"Malay, Banda"
+bpr,PH,L,"Blaan, Koronadal"
+bps,PH,L,"Blaan, Sarangani"
+bpt,AU,N,Barrow Point
+bpu,PG,L,Bongu
+bpv,ID,L,"Marind, Bian"
+bpw,PG,L,Bo
+bpx,IN,L,"Bareli, Palya"
+bpy,IN,L,Bishnupriya
+bpz,ID,L,Bilba
+bqa,BJ,L,Tchumbuli
+bqb,ID,L,Bagusa
+bqc,BJ,L,Boko
+bqd,CM,N,Bung
+bqe,FR,L,"Basque, Navarro-Labourdin"
+bqf,GN,E,Baga Kaloum
+bqg,TG,L,Bago-Kusuntu
+bqh,CN,L,Baima
+bqi,IR,L,Bakhtiari
+bqj,SN,L,Bandial
+bqk,CF,L,Banda-Mbrès
+bql,PG,N,Bilakura
+bqm,CM,L,Wumboko
+bqn,BG,L,Bulgarian Sign Language
+bqo,CM,L,Balo
+bqp,NG,L,Busa
+bqq,ID,L,Biritai
+bqr,ID,L,Burusu
+bqs,PG,L,Bosngun
+bqt,CM,L,Bamukumbit
+bqu,SD,L,Boguru
+bqv,NG,L,Begbere-Ejar
+bqw,NG,L,Buru
+bqx,NG,L,Baangi
+bqy,ID,L,Bali Sign Language
+bqz,CM,L,Bakaka
+bra,IN,L,Braj Bhasha
+brb,LA,L,Lave
+brc,GY,N,Berbice Creole Dutch
+brd,NP,L,Baraamu
+bre,FR,L,Breton
+brf,CD,L,Bera
+brg,BO,N,Baure
+brh,PK,L,Brahui
+bri,CM,L,Mokpwe
+brj,VU,L,Bieria
+brk,SD,E,Birked
+brl,BW,L,Birwa
+brm,CD,L,Barambu
+brn,CR,N,Boruca
+bro,BT,L,Brokkat
+brp,ID,L,Barapasi
+brq,PG,L,Breri
+brr,SB,L,Birao
+brs,ID,L,Baras
+brt,NG,L,Bitare
+bru,LA,L,"Bru, Eastern"
+brv,TH,L,"Bru, Western"
+brw,IN,L,Bellari
+brx,IN,L,Bodo
+bry,PG,L,Burui
+brz,PG,L,Bilbil
+bsa,ID,L,Abinomn
+bsb,BN,L,"Bisaya, Brunei"
+bsc,SN,L,Bassari
+bsd,MY,L,"Bisaya, Sarawak"
+bse,CM,L,Wushi
+bsf,NG,L,Bauchi
+bsg,IR,L,Bashkardi
+bsh,AF,L,Kati
+bsi,CM,L,Bassossi
+bsj,NG,L,Bangwinji
+bsk,PK,L,Burushaski
+bsl,NG,E,Basa-Gumna
+bsm,ID,L,Busami
+bsn,CO,L,Barasana
+bso,TD,N,Buso
+bsp,GN,L,Baga Sitemu
+bsq,LR,L,Bassa
+bsr,NG,N,Bassa-Kontagora
+bss,CM,L,Akoose
+bst,ET,L,Basketo
+bsu,ID,L,Bahonsuai
+bsv,GN,E,Baga Sobané
+bsw,ET,L,Baiso
+bsx,NG,L,Yangkam
+bsy,MY,L,"Bisaya, Sabah"
+bsz,FR,L,"Basque, Souletin"
+bta,NG,L,Bata
+btb,CM,L,Beti
+btc,CM,L,Bati
+btd,ID,L,Batak Dairi
+bte,NG,E,Gamo-Ningi
+btf,TD,L,Birgit
+btg,CI,L,"Bété, Gagnoa"
+bth,MY,L,Biatah
+bti,ID,L,Burate
+btj,ID,L,"Malay, Bacanese"
+btl,IN,L,Bhatola
+btm,ID,L,Batak Mandailing
+btn,PH,N,Ratagnon
+bto,PH,L,"Bicolano, Iriga"
+btp,PG,L,Budibud
+btq,MY,L,Batek
+btr,VU,L,Baetora
+bts,ID,L,Batak Simalungun
+btt,NG,L,Bete-Bendi
+btu,NG,L,Batu
+btv,PK,L,Bateri
+btw,PH,L,Butuanon
+btx,ID,L,Batak Karo
+bty,ID,L,Bobot
+btz,ID,L,Batak Alas-Kluet
+bua,RU,L,Buriat
+bub,TD,L,Bua
+buc,YT,L,Bushi
+bud,TG,L,Ntcham
+bue,CA,E,Beothuk
+buf,CD,L,Bushoong
+bug,ID,L,Bugis
+buh,CN,L,"Bunu, Younuo"
+bui,CG,L,Bongili
+buj,NG,L,Basa-Gurmana
+buk,PG,L,Bugawac
+bul,BG,L,Bulgarian
+bum,CM,L,Bulu
+bun,SL,L,Sherbro
+buo,PG,L,Terei
+bup,ID,L,Busoa
+buq,PG,L,Brem
+bus,NG,L,Bokobaru
+but,PG,L,Bungain
+buu,CD,L,Budu
+buv,PG,L,Bun
+buw,GA,L,Bubi
+bux,NG,L,Boghom
+buy,SL,L,Bullom So
+buz,NG,L,Bukwen
+bva,TD,L,Barein
+bvb,GQ,L,Bube
+bvc,SB,L,Baelelea
+bvd,SB,L,Baeggu
+bve,ID,L,"Malay, Berau"
+bvf,TD,L,Boor
+bvg,CM,L,Bonkeng
+bvh,NG,L,Bure
+bvi,SD,L,Belanda Viri
+bvj,NG,L,Baan
+bvk,ID,L,Bukat
+bvl,BO,L,Bolivian Sign Language
+bvm,CM,L,Bamunka
+bvn,PG,L,Buna
+bvo,TD,L,Bolgo
+bvq,CF,L,Birri
+bvr,AU,L,Burarra
+bvs,BE,L,Belgian Sign Language
+bvt,ID,L,Bati
+bvu,ID,L,"Malay, Bukit"
+bvv,VE,E,Baniva
+bvw,NG,L,Boga
+bvx,CG,L,Dibole
+bvz,ID,L,Bauzi
+bwa,NC,L,Bwatoo
+bwb,FJ,L,Namosi-Naitasiri-Serua
+bwc,ZM,L,Bwile
+bwd,PG,L,Bwaidoka
+bwe,MM,L,"Karen, Bwe"
+bwf,PG,L,Boselewa
+bwg,MZ,L,Barwe
+bwh,CM,N,Bishuo
+bwi,BR,L,Baniwa
+bwj,BF,L,"Bwamu, Láá Láá"
+bwk,PG,L,Bauwaki
+bwl,CD,L,Bwela
+bwm,PG,L,Biwat
+bwn,CN,L,"Bunu, Wunai"
+bwo,ET,L,Boro
+bwp,ID,L,Mandobo Bawah
+bwq,BF,L,"Bobo Madaré, Southern"
+bwr,NG,L,Bura-Pabir
+bws,CD,L,Bomboma
+bwt,CM,L,Bafaw-Balong
+bwu,GH,L,Buli
+bwv,ID,L,"Kenyah, Bahau River"
+bww,CD,L,Bwa
+bwx,CN,L,"Bunu, Bu-Nao"
+bwy,BF,L,"Bwamu, Cwi"
+bwz,CG,L,Bwisi
+bxa,SB,L,Bauro
+bxb,SD,L,Belanda Bor
+bxc,GQ,L,Molengue
+bxd,CN,L,Pela
+bxe,ET,N,Birale
+bxf,PG,L,Bilur
+bxg,CD,L,Bangala
+bxh,PG,L,Buhutu
+bxi,AU,E,Pirlatapa
+bxj,AU,N,Bayungu
+bxk,KE,L,Bukusu
+bxl,BF,L,Jalkunan
+bxm,MN,L,"Buriat, Mongolia"
+bxn,AU,N,Burduna
+bxo,NG,S,Barikanchi
+bxp,CM,L,Bebil
+bxq,NG,L,Beele
+bxr,RU,L,"Buriat, Russia"
+bxs,CM,L,Busam
+bxt,CN,L,Buxinhua
+bxu,CN,L,"Buriat, China"
+bxv,TD,N,Berakou
+bxw,ML,L,Bankagooma
+bxx,CD,L,Borna
+bxz,PG,L,Binahari
+bya,PH,L,Batak
+byb,CM,N,Bikya
+byc,NG,L,Ubaghara
+byd,ID,L,Benyadu'
+bye,PG,L,Pouye
+byf,NG,N,Bete
+byg,SD,E,Baygo
+byh,NP,L,Bujhyal
+byi,CD,L,Buyu
+byj,NG,L,Bina
+byk,CN,L,Biao
+byl,ID,L,Bayono
+bym,AU,N,Bidyara
+byn,ER,L,Bilen
+byo,CN,L,Biyo
+byp,NG,L,Bumaji
+byq,TW,E,Basay
+byr,PG,L,Baruya
+bys,NG,L,Burak
+byt,SD,E,Berti
+byu,CN,L,Buyang
+byv,CM,L,Medumba
+byw,NP,L,Belhariya
+byx,PG,L,Qaqet
+byy,CD,L,Buya
+byz,PG,L,Banaro
+bza,LR,L,Bandi
+bzb,ID,L,Andio
+bzd,CR,L,Bribri
+bze,ML,L,"Bozo, Jenaama"
+bzf,PG,L,Boikin
+bzg,TW,N,Babuza
+bzh,PG,L,"Buang, Mapos"
+bzj,BZ,L,Belize Kriol English
+bzk,NI,L,Nicaragua Creole English
+bzl,ID,L,Boano
+bzm,CD,L,Bolondo
+bzn,ID,L,Boano
+bzo,CD,L,Bozaba
+bzp,ID,L,Kemberano
+bzq,ID,L,Buli
+bzr,AU,E,Biri
+bzs,BR,L,Brazilian Sign Language
+bzu,ID,L,Burmeso
+bzv,CM,L,Bebe
+bzw,NG,L,Basa
+bzx,ML,L,"Bozo, Hainyaxo"
+bzy,NG,L,Obanliku
+bzz,NG,L,Evant
+caa,GT,L,Ch'orti'
+cab,HN,L,Garifuna
+cac,GT,L,"Chuj, San Sebastián Coatán"
+cad,US,N,Caddo
+cae,SN,L,Lehar
+caf,CA,L,"Carrier, Southern"
+cag,PY,L,Nivaclé
+cah,PE,N,Cahuarano
+caj,AR,E,Chané
+cak,GT,L,"Kaqchikel, Central"
+cal,MP,L,Carolinian
+cam,NC,L,Cemuhî
+can,PG,L,Chambri
+cao,BO,L,Chácobo
+cap,BO,L,Chipaya
+caq,IN,L,"Nicobarese, Car"
+car,VE,L,Carib
+cas,BO,L,Tsimané
+cat,ES,L,Catalan-Valencian-Balear
+cav,BO,L,Cavineña
+caw,BO,S,Callawalla
+cax,BO,L,Chiquitano
+cay,CA,L,Cayuga
+caz,BO,E,Canichana
+cbb,CO,N,Cabiyarí
+cbc,CO,L,Carapana
+cbd,CO,L,Carijona
+cbe,CO,E,Chipiajes
+cbg,CO,L,Chimila
+cbh,CO,E,Cagua
+cbi,EC,L,Chachi
+cbj,BJ,L,Ede Cabe
+cbk,PH,L,Chavacano
+cbl,MM,L,"Chin, Bualkhaw"
+cbm,GT,L,"Kaqchikel, Yepocapa Southwestern"
+cbn,TH,L,Nyahkur
+cbo,NG,L,Izora
+cbr,PE,L,Cashibo-Cacataibo
+cbs,PE,L,Cashinahua
+cbt,PE,L,Chayahuita
+cbu,PE,L,Candoshi-Shapra
+cbv,CO,L,Cacua
+cby,CO,L,Carabayo
+cca,CO,E,Cauca
+ccc,PE,N,Chamicuro
+ccd,BR,L,Cafundo Creole
+cce,MZ,L,Chopi
+ccg,NG,L,Samba Daka
+cch,NG,L,Atsam
+ccj,GW,L,Kasanga
+ccl,KE,L,Cutchi-Swahili
+ccm,MY,L,Malaccan Creole Malay
+cco,MX,L,"Chinantec, Comaltepec"
+ccp,BD,L,Chakma
+ccq,MM,L,Chaungtha
+ccr,SV,E,Cacaopera
+ccx,CN,L,"Zhuang, Northern"
+ccy,CN,L,"Zhuang, Southern"
+cda,CN,L,Choni
+cde,IN,L,Chenchu
+cdf,IN,L,Chiru
+cdg,IN,L,Chamari
+cdh,IN,L,Chambeali
+cdi,IN,L,Chodri
+cdj,IN,L,Churahi
+cdm,NP,L,Chepang
+cdn,IN,L,Chaudangsi
+cdo,CN,L,"Chinese, Min Dong"
+cdr,NG,L,Cinda-Regi-Tiyal
+cds,TD,L,Chadian Sign Language
+cdz,IN,L,Koda
+cea,US,E,"Chehalis, Lower"
+ceb,PH,L,Cebuano
+ceg,PY,L,Chamacoco
+ces,CZ,L,Czech
+cet,NG,L,Centúúm
+cfa,NG,L,Dijim-Bwilim
+cfd,NG,L,Cara
+cfg,NG,L,Como Karim
+cga,PG,L,Changriwa
+cgc,PH,L,Kagayanen
+cgg,UG,L,Chiga
+cgk,BT,L,Chocangacakha
+cha,GU,L,Chamorro
+chb,CO,E,Chibcha
+chc,US,E,Catawba
+chd,MX,L,"Chontal, Highland Oaxaca"
+che,RU,L,Chechen
+chf,MX,L,"Chontal, Tabasco"
+chg,TM,E,Chagatai
+chh,US,N,Chinook
+chj,MX,L,"Chinantec, Ojitlán"
+chk,FM,L,Chuukese
+chl,US,N,Cahuilla
+chm,RU,L,Mari (Russia)
+chn,CA,N,Chinook Wawa
+cho,US,L,Choctaw
+chp,CA,L,Chipewyan
+chq,MX,L,"Chinantec, Quiotepec"
+chr,US,L,Cherokee
+chs,US,E,Chumash
+cht,PE,E,Cholón
+chu,RU,E,"Slavonic, Old Church"
+chv,RU,L,Chuvash
+chw,MZ,L,Chuwabu
+chx,NP,L,Chantyal
+chy,US,L,Cheyenne
+chz,MX,L,"Chinantec, Ozumacín"
+cia,ID,L,Cia-Cia
+cib,BJ,L,"Gbe, Ci"
+cic,US,L,Chickasaw
+cid,US,E,Chimariko
+cie,NG,L,Cineni
+cih,IN,L,Chinali
+cik,IN,L,"Kinnauri, Chitkuli"
+cim,IT,L,Cimbrian
+cin,BR,L,Cinta Larga
+cip,MX,N,Chiapanec
+cir,NC,L,Tiri
+cit,BD,L,Chittagonian
+ciw,US,L,Chippewa
+ciy,VE,L,Chaima
+cja,KH,L,"Cham, Western"
+cje,VN,L,Chru
+cjh,US,E,"Chehalis, Upper"
+cji,RU,L,Chamalal
+cjk,CD,L,Chokwe
+cjm,VN,L,"Cham, Eastern"
+cjn,PG,L,Chenapian
+cjo,PE,L,Ashéninka Pajonal
+cjp,CR,L,Cabécar
+cjr,CR,E,Chorotega
+cjs,RU,L,Shor
+cjv,PG,L,Chuave
+cjy,CN,L,"Chinese, Jinyu"
+cka,MM,L,"Chin, Khumi Awa"
+ckb,IQ,L,"Kurdish, Central"
+ckc,GT,L,"Kaqchikel, Northern"
+ckd,GT,L,"Kaqchikel, South Central"
+cke,GT,L,"Kaqchikel, Eastern"
+ckf,GT,L,"Kaqchikel, Southern"
+ckh,MM,L,Chak
+cki,GT,L,"Kaqchikel, Santa María de Jesús"
+ckj,GT,L,"Kaqchikel, Santo Domingo Xenacoj"
+ckk,GT,L,"Kaqchikel, Akatenango Southwestern"
+ckl,NG,L,Cibak
+cko,GH,L,Anufo
+ckq,TD,L,Kajakse
+ckr,PG,L,Kairak
+cks,NC,L,Tayo
+ckt,RU,L,Chukot
+cku,US,L,Koasati
+ckv,TW,N,Kavalan
+ckw,GT,L,"Kaqchikel, Western"
+ckx,CM,L,Caka
+cky,NG,L,Cakfem-Mushere
+ckz,GT,L,Kaqchikel-K'iche' Mixed Language
+cla,NG,L,Ron
+clc,CA,L,Chilcotin
+cld,IQ,L,Chaldean Neo-Aramaic
+cle,MX,L,"Chinantec, Lealao"
+clh,PK,L,Chilisso
+cli,GH,L,Chakali
+clk,IN,L,Idu-Mishmi
+cll,GH,L,Chala
+clm,US,N,Clallam
+clo,MX,L,"Chontal, Lowland Oaxaca"
+clu,PH,L,Caluyanun
+clw,RU,L,Chulym
+cly,MX,L,"Chatino, Eastern Highland"
+cma,VN,L,Maa
+cme,BF,L,Cerma
+cmi,CO,L,Emberá-Chamí
+cmk,US,E,Chimakum
+cml,ID,L,Campalagian
+cmn,CN,L,"Chinese, Mandarin"
+cmo,VN,L,"Mnong, Central"
+cmr,MM,L,"Chin, Mro"
+cmt,ZA,S,Camtho
+cna,IN,L,Changthang
+cnb,MM,L,"Chin, Chinbon"
+cnc,VN,L,Côông
+cng,CN,L,"Qiang, Northern"
+cnh,MM,L,"Chin, Haka"
+cni,PE,L,Asháninka
+cnk,MM,L,"Chin, Khumi"
+cnl,MX,L,"Chinantec, Lalana"
+cnm,GT,L,"Chuj, Ixtatán"
+cno,LA,L,Con
+cns,ID,L,"Asmat, Central"
+cnt,MX,L,"Chinantec, Tepetotutla"
+cnu,DZ,L,Chenoua
+cnw,MM,L,"Chin, Ngawn"
+coa,MY,L,"Malay, Cocos Islands"
+cob,MX,E,Chicomuceltec
+coc,MX,L,Cocopa
+cod,PE,L,Cocama-Cocamilla
+coe,CO,L,Koreguaje
+cof,EC,L,Colorado
+cog,KH,L,Chong
+coh,KE,L,Chonyi
+coj,MX,E,Cochimi
+cok,MX,L,"Cora, Santa Teresa"
+col,US,L,Columbia-Wenatchi
+com,US,L,Comanche
+con,EC,L,Cofán
+coo,CA,L,Comox
+cop,EG,E,Coptic
+coq,US,E,Coquille
+cor,GB,L,Cornish
+cos,FR,L,Corsican
+cot,PE,L,Caquinte
+cou,SN,L,Wamey
+cov,CN,L,Cao Miao
+cow,US,E,Cowlitz
+cox,PE,L,Nanti
+coy,CO,E,Coyaima
+coz,MX,L,Chochotec
+cpa,MX,L,"Chinantec, Palantla"
+cpb,PE,L,"Ashéninka, Ucayali-Yurúa"
+cpc,PE,L,Ajyíninka Apurucayali
+cpg,GR,E,Cappadocian Greek
+cpi,NR,L,Chinese Pidgin English
+cpn,GH,L,Cherepon
+cps,PH,L,Capiznon
+cpu,PE,L,"Ashéninka, Pichis"
+cpx,CN,L,"Chinese, Pu-Xian"
+cpy,PE,L,"Ashéninka, South Ucayali"
+cqu,CL,L,"Quechua, Chilean"
+cra,ET,L,Chara
+crb,DM,E,"Carib, Island"
+crc,VU,L,Lonwolwol
+crd,US,N,Coeur d'Alene
+cre,CA,L,Cree
+crf,CO,E,Caramanta
+crg,US,L,Michif
+crh,UZ,L,Crimean Turkish
+cri,ST,L,Sãotomense
+crj,CA,L,"East Cree, Southern"
+crk,CA,L,"Cree, Plains"
+crl,CA,L,"East Cree, Northern"
+crm,CA,L,"Cree, Moose"
+crn,MX,L,"Cora, El Nayar"
+cro,US,L,Crow
+crq,AR,L,"Chorote, Iyo'wujwa"
+crr,US,E,Carolina Algonquian
+crs,SC,L,Seselwa Creole French
+crt,AR,L,"Chorote, Iyojwa'ja"
+cru,BR,L,Carútana
+crv,IN,L,Chaura
+crw,VN,L,Chrau
+crx,CA,L,Carrier
+cry,NG,L,Cori
+crz,US,E,Cruzeño
+csa,MX,L,"Chinantec, Chiltepec"
+csb,PL,L,Kashubian
+csc,ES,L,Catalonian Sign Language
+csd,TH,L,Chiangmai Sign Language
+cse,CZ,L,Czech Sign Language
+csf,CU,L,Cuba Sign Language
+csg,CL,L,Chilean Sign Language
+csh,MM,L,"Chin, Asho"
+csi,US,E,"Miwok, Coast"
+csk,SN,L,Jola-Kasa
+csl,CN,L,Chinese Sign Language
+csm,US,N,"Miwok, Central Sierra"
+csn,CO,L,Colombian Sign Language
+cso,MX,L,"Chinantec, Sochiapan"
+csq,HR,L,Croatia Sign Language
+csr,CR,L,Costa Rican Sign Language
+css,US,E,"Ohlone, Southern"
+cst,US,E,"Ohlone, Northern"
+csw,CA,L,"Cree, Swampy"
+csy,MM,L,"Chin, Siyin"
+csz,US,N,Coos
+cta,MX,L,"Chatino, Tataltepec"
+ctc,US,N,Chetco
+ctd,MM,L,"Chin, Tedim"
+cte,MX,L,"Chinantec, Tepinapa"
+cti,MX,L,"Chol, Tila"
+ctl,MX,L,"Chinantec, Tlacoatzintepec"
+ctm,US,E,Chitimacha
+ctn,NP,L,Chhintange
+cto,CO,L,Emberá-Catío
+ctp,MX,L,"Chatino, Western Highland"
+cts,PH,L,"Bicolano, Northern Catanduanes"
+ctu,MX,L,"Chol, Tumbalá"
+ctz,MX,L,"Chatino, Zacatepec"
+cua,VN,L,Cua
+cub,CO,L,Cubeo
+cuc,MX,L,"Chinantec, Usila"
+cug,CM,L,Cung
+cuh,KE,L,Chuka
+cui,CO,L,Cuiba
+cuj,PE,L,Mashco Piro
+cuk,PA,L,"Kuna, San Blas"
+cul,BR,L,Culina
+cum,CO,E,Cumeral
+cun,GT,L,"K'iche', Cunén"
+cuo,VE,E,Cumanagoto
+cup,US,E,Cupeño
+cuq,CN,L,Cun
+cur,NP,L,Chhulung
+cut,MX,L,"Cuicatec, Teutila"
+cuu,CN,L,Tai Ya
+cuv,CM,L,Cuvok
+cuw,NP,N,Chukwa
+cux,MX,L,"Cuicatec, Tepeuxila"
+cvn,MX,L,"Chinantec, Valle Nacional"
+cwa,TZ,L,Kabwa
+cwb,MZ,L,Maindo
+cwd,CA,L,"Cree, Woods"
+cwe,TZ,L,Kwere
+cwg,MY,L,Chewong
+cwt,SN,L,Kuwaataay
+cya,MX,L,"Chatino, Nopala"
+cyb,BO,E,Cayubaba
+cym,GB,L,Welsh
+cyo,PH,L,Cuyonon
+czh,CN,L,"Chinese, Huizhou"
+czk,CZ,E,Knaanic
+czn,MX,L,"Chatino, Zenzontepec"
+czo,CN,L,"Chinese, Min Zhong"
+czt,MM,L,"Chin, Zotung"
+daa,TD,L,Dangaléat
+dac,PG,L,Dambi
+dad,PG,L,Marik
+dae,CM,L,Duupa
+daf,CI,L,Dan
+dag,GH,L,Dagbani
+dah,PG,L,Gwahatike
+dai,TD,L,Day
+daj,SD,L,"Daju, Dar Fur"
+dak,US,L,Dakota
+dal,KE,L,Dahalo
+dan,DK,L,Danish
+dao,MM,L,"Chin, Daai"
+dap,IN,L,Nisi
+daq,IN,L,"Maria, Dandami"
+dar,RU,L,Dargwa
+das,CI,L,Daho-Doo
+dat,CN,L,Darang Deng
+dau,TD,L,"Daju, Dar Sila"
+dav,KE,L,Taita
+daw,PH,L,Davawenyo
+dax,AU,L,Dayi
+daz,ID,L,Dao
+dba,ML,L,"Dogon, Bangeri Me"
+dbb,NG,L,Deno
+dbd,NG,L,Dadiya
+dbe,ID,L,Dabe
+dbf,ID,L,Edopi
+dbg,ML,L,"Dogon, Dogul Dom"
+dbi,NG,L,Doka
+dbj,MY,L,Ida'an
+dbl,AU,N,Dyirbal
+dbm,NG,L,Duguri
+dbn,ID,N,Duriankere
+dbo,NG,L,Dulbu
+dbp,NG,L,Duwai
+dbq,CM,L,Daba
+dbr,SO,L,Dabarre
+dbu,ML,L,"Dogon, Bondum Dom"
+dbv,NG,L,Dungu
+dby,PG,L,Dibiyaso
+dcc,IN,L,Deccan
+dcr,VI,E,Negerhollands
+ddd,SD,L,Dongotono
+dde,CG,L,Doondo
+ddg,TL,L,Fataluku
+ddi,PG,L,Diodio
+ddj,AU,L,Jaru
+ddn,BJ,L,Dendi
+ddo,RU,L,Dido
+dds,ML,L,"Dogon, Donno So"
+ddw,ID,L,Dawera-Daweloor
+dec,SD,L,Dagik
+ded,PG,L,Dedua
+dee,LR,L,Dewoin
+def,IR,L,Dezfuli
+deg,NG,L,Degema
+deh,PK,L,Dehwari
+dei,ID,L,Demisa
+dek,CM,L,Dek
+del,US,L,Delaware
+dem,ID,L,Dem
+den,CA,L,Slave (Athapascan)
+dep,US,E,"Delaware, Pidgin"
+deq,CF,L,Dendi
+der,IN,L,Deori
+des,BR,L,Desano
+deu,DE,L,"German, Standard"
+dev,PG,L,Domung
+dez,CD,L,Dengese
+dga,GH,L,"Dagaare, Southern"
+dgc,PH,L,"Agta, Casiguran Dumagat"
+dgd,BF,L,Dagaari Dioula
+dge,PG,L,Degenan
+dgg,PG,L,Doga
+dgh,NG,L,Dghwede
+dgi,BF,L,"Dagara, Northern"
+dgk,CF,L,Dagba
+dgn,AU,E,Dagoman
+dgo,IN,L,Dogri
+dgr,CA,L,Dogrib
+dgs,BF,L,Dogoso
+dgu,IN,L,Degaru
+dgx,PG,L,Doghoro
+dgz,PG,L,Daga
+dha,IN,L,Dhanwar
+dhd,IN,L,Dhundari
+dhg,AU,L,Dhangu
+dhi,NP,L,Dhimal
+dhl,AU,N,Dhalandji
+dhm,AO,L,Zemba
+dhn,IN,L,Dhanki
+dho,IN,L,Dhodia
+dhr,AU,N,Dhargari
+dhs,TZ,L,Dhaiso
+dhu,AU,E,Dhurga
+dhv,NC,L,Dehu
+dhw,NP,L,Dhanwar
+dia,PG,L,Dia
+dib,SD,L,"Dinka, South Central"
+dic,CI,L,"Dida, Lakota"
+did,SD,L,Didinga
+dif,AU,E,Dieri
+dig,KE,L,Digo
+dih,MX,L,Kumiai
+dii,CM,L,Dimbong
+dij,ID,L,Dai
+dik,SD,L,"Dinka, Southwestern"
+dil,SD,L,Dilling
+dim,ET,L,Dime
+din,SD,L,Dinka
+dio,NG,L,Dibo
+dip,SD,L,"Dinka, Northeastern"
+diq,TR,L,Dimli
+dir,NG,L,Dirim
+dis,IN,L,Dimasa
+dit,AU,N,Dirari
+diu,NA,L,Diriku
+div,MV,L,Maldivian
+diw,SD,L,"Dinka, Northwestern"
+dix,VU,L,Dixon Reef
+diy,ID,L,Diuwe
+diz,CD,L,Ding
+djb,AU,L,Djinba
+djc,TD,L,"Daju, Dar Daju"
+djd,AU,N,Djamindjung
+dje,NE,L,Zarma
+djf,AU,N,Djangun
+dji,AU,L,Djinang
+djj,AU,L,Djeebbana
+djk,SR,L,Aukan
+djl,AU,N,Djiwarli
+djm,ML,L,"Dogon, Jamsay"
+djn,AU,L,Djauan
+djo,ID,L,Djongkang
+djr,AU,L,Djambarrpuyngu
+dju,PG,L,Kapriman
+djw,AU,N,Djawi
+dka,BT,L,Dakpakha
+dkk,ID,L,Dakka
+dkl,ML,L,"Dogon, Kolum So"
+dkr,MY,L,Kuijau
+dks,SD,L,"Dinka, Southeastern"
+dkx,CM,L,Mazagway
+dlc,SE,L,Dalecarlian
+dlg,RU,L,Dolgan
+dlm,HR,E,Dalmatian
+dln,BD,L,Darlong
+dma,GA,L,Duma
+dmc,PG,L,Dimir
+dme,CM,L,Dugwor
+dmg,MY,L,"Kinabatangan, Upper"
+dmk,PK,L,Domaaki
+dml,PK,L,Dameli
+dmm,CM,N,Dama
+dmo,CM,L,Kemezung
+dmr,ID,L,"Damar, East"
+dms,ID,L,Dampelas
+dmu,ID,L,Dubu
+dmv,MY,L,Dumpas
+dmx,MZ,L,Dema
+dmy,ID,L,Demta
+dna,ID,L,"Dani, Upper Grand Valley"
+dnd,PG,L,Daonda
+dne,TZ,L,Ndendeule
+dng,KG,L,Dungan
+dni,ID,L,"Dani, Lower Grand Valley"
+dnk,ID,L,Dengka
+dnn,BF,L,Dzùùngoo
+dnr,PG,L,Danaru
+dnt,ID,L,"Dani, Mid Grand Valley"
+dnu,MM,L,Danau
+dnw,ID,L,"Dani, Western"
+dny,BR,L,Dení
+doa,PG,L,Dom
+dob,PG,L,Dobu
+doc,CN,L,"Dong, Northern"
+doe,TZ,L,Doe
+dof,PG,L,Domu
+doh,NG,L,Dong
+doi,IN,L,Dogri (macrolanguage)
+dok,ID,L,Dondo
+dol,PG,L,Doso
+don,PG,L,Toura
+doo,CD,L,Dongo
+dop,BJ,L,Lukpa
+doq,DO,L,Dominican Sign Language
+dor,SB,L,Dori'o
+dos,BF,L,Dogosé
+dot,NG,L,Dass
+dov,ZW,L,Dombe
+dow,CM,L,Doyayo
+dox,ET,L,Bussa
+doy,GH,L,Dompo
+doz,ET,L,Dorze
+dpp,MY,L,Papar
+drb,SD,L,Dair
+drd,IN,L,Darmiya
+dre,NP,L,Dolpo
+drg,MY,L,Rungus
+drh,MN,L,Darkhat
+dri,NG,L,C'lela
+drl,AU,N,Darling
+drn,ID,L,"Damar, West"
+dro,MY,L,Daro-Matu
+drq,NP,E,Dura
+drr,SB,E,Dororo
+drs,ET,L,Gedeo
+drt,NL,L,Drents
+dru,TW,L,Rukai
+drw,AF,L,Darwazi
+dry,NP,L,Darai
+dsb,DE,L,"Sorbian, Lower"
+dse,NL,L,Dutch Sign Language
+dsh,ET,L,Daasanach
+dsi,TD,L,Disa
+dsl,DK,L,Danish Sign Language
+dsn,ID,N,Dusner
+dso,IN,L,"Oriya, Desiya"
+dsq,ML,L,Tadaksahak
+dta,CN,L,Daur
+dtb,MY,L,"Kadazan, Labuk-Kinabatangan"
+dtk,ML,L,"Dogon, Tene Kan"
+dtm,ML,L,"Dogon, Tomo Kan"
+dtp,MY,L,"Dusun, Central"
+dtr,MY,L,Lotud
+dts,ML,L,"Dogon, Toro So"
+dtt,ML,L,"Dogon, Toro Tegu"
+dua,CM,L,Duala
+dub,IN,L,Dubli
+duc,PG,L,Duna
+dud,NG,L,Hun-Saare
+due,PH,L,"Agta, Umiray Dumaget"
+duf,NC,L,Dumbea
+dug,KE,L,Duruma
+duh,IN,L,Dungra Bhil
+dui,PG,L,Dumun
+duj,AU,L,Dhuwal
+duk,PG,L,Duduela
+dul,PH,L,"Agta, Alabat Island"
+dun,ID,L,Dusun Deyah
+duo,PH,L,"Agta, Dupaninan"
+dup,MY,L,Duano'
+duq,ID,L,Dusun Malang
+dur,CM,L,Dii
+dus,NP,N,Dumi
+duu,CN,L,Drung
+duv,ID,L,Duvle
+duw,ID,L,Dusun Witu
+dux,ML,L,Duungooma
+duy,PH,E,"Agta, Dicamay"
+duz,CM,E,Duli
+dva,PG,L,Duau
+dwa,NG,L,Diri
+dww,PG,L,Dawawa
+dya,BF,L,Dyan
+dyb,AU,N,Dyaberdyaber
+dyd,AU,N,Dyugun
+dyg,PH,E,"Agta, Villa Viciosa"
+dyi,CI,L,"Senoufo, Djimini"
+dyk,ID,L,"Dayak, Land"
+dyn,AU,N,Dyangadi
+dyo,SN,L,Jola-Fonyi
+dyu,BF,L,Jula
+dyy,AU,N,Dyaabugay
+dza,NG,L,Duguza
+dzd,NG,L,Daza
+dzg,TD,L,Dazaga
+dzl,BT,L,Dzalakha
+dzn,CD,L,Dzando
+dzo,BT,L,Dzongkha
+ebg,NG,L,Ebughu
+ebo,CG,L,Teke-Eboo
+ebr,CI,L,Ebrié
+ebu,KE,L,Embu
+ecs,EC,L,Ecuadorian Sign Language
+eee,CN,L,E
+efa,NG,L,Efai
+efe,CD,L,Efe
+efi,NG,L,Efik
+ega,CI,L,Ega
+ego,NG,L,Eggon
+egy,EG,E,Egyptian (Ancient)
+ehu,NG,L,Ehueun
+eip,ID,L,Eipomek
+eit,PG,L,Eitiep
+eiv,PG,L,Askopan
+eja,GW,L,Ejamat
+eka,NG,L,Ekajuk
+eke,NG,L,Ekit
+ekg,ID,L,Ekari
+eki,NG,L,Eki
+ekm,CM,L,Elip
+eko,MZ,L,Koti
+ekp,NG,L,Ekpeye
+ekr,NG,L,Yace
+eky,MM,L,"Kayah, Eastern"
+ele,PG,L,Elepi
+elh,SD,L,El Hugeirat
+eli,SD,L,Nding
+elk,PG,L,Elkei
+ell,GR,L,Greek
+elm,NG,L,Eleme
+elo,KE,N,El Molo
+elp,ID,L,Elpaputih
+elu,PG,L,Elu
+ema,NG,L,Emai-Iuleha-Ora
+emb,ID,L,Embaloh
+eme,GF,L,Emerillon
+emg,NP,L,"Meohang, Eastern"
+emi,PG,L,Mussau-Emira
+emk,GN,L,"Maninkakan, Eastern"
+eml,IT,L,Emiliano-Romagnolo
+emn,CM,L,Eman
+emo,PY,E,Emok
+emp,PA,L,"Emberá, Northern"
+ems,US,L,"Yupik, Pacific Gulf"
+emu,IN,L,"Muria, Eastern"
+emw,ID,L,Emplawas
+ena,PG,L,Apali
+enb,KE,L,Endo
+enc,VN,L,En
+end,ID,L,Ende
+enf,RU,L,"Enets, Forest"
+eng,GB,L,English
+enh,RU,L,"Enets, Tundra"
+eni,ID,L,Enim
+enn,NG,L,Engenni
+eno,ID,L,Enggano
+enq,PG,L,Enga
+enr,ID,L,Emumu
+env,NG,L,Enwan
+enw,NG,L,Enwan
+eot,CI,L,Beti
+epi,NG,L,Epie
+epo,FR,L,Esperanto
+erg,VU,L,Sie
+erh,NG,L,Eruwa
+eri,PG,L,Ogea
+erk,VU,L,"Efate, South"
+ero,CN,L,Horpa
+err,AU,N,Erre
+ers,CN,L,Ersu
+ert,ID,L,Eritai
+erw,ID,L,Erokwanas
+ese,BO,L,Ese Ejja
+esh,IR,L,Eshtehardi
+esi,US,L,"Inupiatun, North Alaskan"
+esk,US,L,"Inupiatun, Northwest Alaska"
+esl,EG,L,Egypt Sign Language
+esm,CI,E,Esuma
+esn,SV,L,Salvadoran Sign Language
+eso,EE,L,Estonian Sign Language
+esq,US,E,Esselen
+ess,US,L,"Yupik, Central Siberian"
+est,EE,L,Estonian
+esu,US,L,"Yupik, Central"
+etb,NG,L,Etebi
+eth,ET,L,Ethiopian Sign Language
+etn,VU,L,Eton
+eto,CM,L,Eton
+etr,PG,L,Edolo
+ets,NG,L,Yekhee
+etu,NG,L,Ejagham
+etx,NG,L,Eten
+etz,ID,L,Semimi
+eur,BE,S,Europanto
+eus,ES,L,Basque
+eve,RU,L,Even
+evh,NG,L,Uvbie
+evn,CN,L,Evenki
+ewe,GH,L,Éwé
+ewo,CM,L,Ewondo
+ext,ES,L,Extremaduran
+eya,US,N,Eyak
+eze,NG,L,Uzekwe
+faa,PG,L,Fasu
+fab,GQ,L,Fa D'ambu
+fad,PG,L,Wagi
+faf,SB,L,Fagani
+fag,PG,L,Finongan
+fah,NG,N,Fali of Baissa
+fai,PG,L,Faiwol
+faj,PG,L,Faita
+fak,CM,L,Fang
+fal,CM,L,"Fali, South"
+fam,NG,L,Fam
+fan,GQ,L,Fang
+fao,FO,L,Faroese
+fap,SN,L,Palor
+far,SB,L,Fataleka
+fas,IR,L,Persian
+fau,ID,L,Fayu
+fax,ES,L,Fala
+fay,IR,L,"Fars, Southwestern"
+faz,IR,L,"Fars, Northwestern"
+fcs,CA,L,Quebec Sign Language
+fer,SD,L,Feroge
+ffm,ML,L,"Fulfulde, Maasina"
+fgr,TD,L,Fongoro
+fia,SD,L,Nobiin
+fie,NG,L,Fyer
+fij,FJ,L,Fijian
+fil,PH,L,Filipino
+fin,FI,L,Finnish
+fip,TZ,L,Fipa
+fir,NG,L,Firan
+fit,SE,L,"Finnish, Tornedalen"
+fiw,PG,L,Fiwaga
+fiz,NG,L,Izere
+fkv,NO,L,"Finnish, Kven"
+fla,US,L,Kalispel-Pend D'oreille
+flh,ID,L,Foau
+fli,NG,L,Fali
+fll,CM,L,"Fali, North"
+flm,MM,L,"Chin, Falam"
+fln,AU,N,Flinders Island
+flr,CD,L,Fuliiru
+fly,ZA,N,Tsotsitaal
+fmp,CM,L,Fe'fe'
+fmu,IN,L,"Muria, Far Western"
+fng,ZA,S,Fanagalo
+fni,TD,L,Fania
+fod,BJ,L,Foodo
+foi,PG,L,Foi
+fom,CD,L,Foma
+fon,BJ,L,Fon
+for,PG,L,Fore
+fos,TW,E,Siraya
+fpe,GQ,L,Fernando Po Creole English
+fqs,PG,L,Fas
+fra,FR,L,French
+frc,US,L,"French, Cajun"
+frd,ID,L,Fordata
+fri,NL,L,"Frisian, Western"
+frk,DE,E,Frankish
+frp,FR,L,Franco-Provençal
+frq,PG,L,Forak
+frr,DE,L,"Frisian, Northern"
+frs,DE,L,"Frisian, Eastern"
+frt,VU,L,Fortsenal
+fry,NL,L,"Frisian, Western"
+fse,FI,L,Finnish Sign Language
+fsl,FR,L,French Sign Language
+fss,FI,L,Finnish-Swedish Sign Language
+fub,CM,L,"Fulfulde, Adamawa"
+fuc,SN,L,Pulaar
+fud,WF,L,"Futuna, East"
+fue,BJ,L,"Fulfulde, Borgu"
+fuf,GN,L,Pular
+fuh,NE,L,"Fulfulde, Western Niger"
+fui,TD,L,"Fulfulde, Bagirmi"
+fuj,SD,L,Ko
+ful,SN,L,Fulah
+fum,NG,L,Fum
+fun,BR,L,Fulniô
+fuq,NE,L,"Fulfulde, Central-Eastern Niger"
+fur,IT,L,Friulian
+fut,VU,L,Futuna-Aniwa
+fuu,CD,L,Furu
+fuv,NG,L,"Fulfulde, Nigerian"
+fuy,PG,L,Fuyug
+fvr,SD,L,Fur
+fwa,NC,L,Fwâi
+fwe,NA,L,Fwe
+gaa,GH,L,Ga
+gab,TD,L,Gabri
+gad,PH,L,Gaddang
+gae,VE,L,Guarequena
+gaf,PG,L,Gende
+gag,MD,L,Gagauz
+gah,PG,L,Alekano
+gai,PG,L,Borei
+gaj,PG,L,Gadsup
+gak,ID,L,Gamkonora
+gal,TL,L,Galoli
+gam,PG,L,Kandawo
+gan,CN,L,"Chinese, Gan"
+gao,PG,L,Gants
+gap,PG,L,Gal
+gaq,IN,L,Gata'
+gar,PG,L,Galeya
+gas,IN,L,"Garasia, Adiwasi"
+gat,PG,L,Kenati
+gau,IN,L,"Gadaba, Mudhili"
+gav,PG,L,Gabutamon
+gaw,PG,L,Nobonob
+gax,ET,L,"Oromo, Borana-Arsi-Guji"
+gay,ID,L,Gayo
+gaz,ET,L,"Oromo, West Central"
+gba,CF,L,Gbaya (Central African Republic)
+gbb,AU,L,Kaytetye
+gbc,AU,L,Garawa
+gbd,AU,N,Karadjeri
+gbe,PG,L,Niksek
+gbf,PG,L,Gaikundi
+gbg,CF,L,Gbanziri
+gbh,BJ,L,"Gbe, Defi"
+gbi,ID,L,Galela
+gbj,IN,L,"Gadaba, Bodo"
+gbk,IN,L,Gaddi
+gbl,IN,L,Gamit
+gbm,IN,L,Garhwali
+gbn,SD,L,Mo'da
+gbo,LR,L,"Grebo, Northern"
+gbp,CF,L,Gbaya-Bossangoa
+gbq,CF,L,Gbaya-Bozoum
+gbr,NG,L,Gbagyi
+gbs,BJ,L,"Gbe, Gbesi"
+gbu,AU,N,Gagadu
+gbv,CF,L,Gbanu
+gbx,BJ,L,"Gbe, Eastern Xwla"
+gby,NG,L,Gbari
+gbz,IR,L,"Dari, Zoroastrian"
+gcc,PG,L,Mali
+gcd,AU,N,Ganggalida
+gce,US,E,Galice
+gcf,GP,L,Guadeloupean Creole French
+gcl,GD,L,Grenadian Creole English
+gcn,PG,L,Gaina
+gcr,GF,L,Guianese Creole French
+gct,VE,L,"German, Colonia Tovar"
+gda,IN,L,"Lohar, Gade"
+gdb,IN,L,"Gadaba, Pottangi Ollar"
+gdc,AU,N,Gugu Badhun
+gdd,PG,L,Gedaged
+gde,NG,L,Gude
+gdf,NG,L,Guduf-Gava
+gdg,PH,L,Ga'dang
+gdh,AU,N,Gadjerawang
+gdi,CF,L,Gundi
+gdj,AU,N,Gurdjar
+gdk,TD,L,Gadang
+gdl,ET,L,Dirasha
+gdm,TD,L,Laal
+gdn,PG,L,Umanakaina
+gdo,RU,L,Ghodoberi
+gdq,YE,L,Mehri
+gdr,PG,L,Wipi
+gdu,NG,L,Gudu
+gdx,IN,L,Godwari
+gea,NG,L,Geruma
+geb,PG,L,Kire
+gec,LR,L,"Grebo, Gboloo"
+ged,NG,L,Gade
+geg,NG,L,Gengle
+geh,CA,L,"German, Hutterite"
+gei,ID,L,Gebe
+gej,TG,L,Gen
+gek,NG,L,Yiwom
+gel,NG,L,Kag-Fer-Jiir-Koor-Ror-Us-Zuksun
+gen,CN,L,Geman Deng
+geq,CF,L,Geme
+ges,ID,L,Geser-Gorom
+gew,NG,L,Gera
+gex,SO,L,Garre
+gey,CD,L,Enya
+gez,ET,E,Geez
+gfk,PG,L,Patpatar
+gft,ET,E,Gafat
+gga,SB,L,Gao
+ggb,LR,L,Gbii
+ggd,AU,N,Gugadj
+gge,AU,N,Guragone
+ggg,PK,L,Gurgula
+ggh,KE,L,Garreh-Ajuran
+ggk,AU,E,Kungarakany
+ggl,PG,L,Ganglau
+ggn,NP,L,"Gurung, Eastern"
+ggo,IN,L,"Gondi, Southern"
+ggr,AU,E,Aghu Tharnggalu
+ggt,PG,L,Gitua
+ggu,CI,L,Gagu
+ggw,PG,L,Gogodala
+gha,LY,L,Ghadamès
+ghc,GB,E,"Gaelic, Hiberno-Scottish"
+ghe,NP,L,"Ghale, Southern"
+ghh,NP,L,"Ghale, Northern"
+ghk,MM,L,"Karen, Geko"
+ghl,SD,L,Ghulfan
+ghn,SB,L,Ghanongga
+gho,MA,E,Ghomara
+ghr,PK,L,Ghera
+ghs,PG,L,Guhu-Samane
+ght,NP,L,"Ghale, Kutang"
+gia,AU,L,Kitja
+gib,NG,S,Gibanawa
+gic,ZA,S,Gail
+gid,CM,L,Gidar
+gig,PK,L,Goaria
+gil,KI,L,Kiribati
+gim,PG,L,Gimi
+gin,RU,L,Hinukh
+gio,CN,L,Gelao
+gip,PG,L,Gimi
+giq,VN,L,"Gelao, Green"
+gir,VN,N,"Gelao, Red"
+gis,CM,L,"Giziga, North"
+git,CA,L,Gitxsan
+giw,VN,N,"Gelao, White"
+gix,CD,L,Gilima
+giy,AU,N,Giyug
+giz,CM,L,"Giziga, South"
+gji,NG,L,Geji
+gjk,PK,L,"Koli, Kachi"
+gjn,GH,L,Gonja
+gju,IN,L,Gujari
+gka,PG,L,Guya
+gke,CM,N,Ndai
+gkn,NG,L,Gokana
+gkp,GN,L,"Kpelle, Guinea"
+gla,GB,L,"Gaelic, Scottish"
+glc,TD,L,Bon Gula
+gld,RU,L,Nanai
+gle,IE,L,"Gaelic, Irish"
+glg,ES,L,Galician
+glh,AF,L,"Pashayi, Northwest"
+gli,SB,E,Guliguli
+glj,TD,L,Gula Iro
+glk,IR,L,Gilaki
+glo,NG,L,Galambu
+glr,LR,L,Glaro-Twabo
+glu,TD,L,Gula
+glv,GB,E,Manx
+glw,NG,L,Glavda
+gly,SD,E,Gule
+gma,AU,N,Gambera
+gmb,SB,L,Gula'alaa
+gmd,NG,L,Mághdì
+gmn,CM,L,Gimnime
+gmo,ET,L,Gamo-Gofa-Dawro
+gmu,PG,L,Gumalu
+gmx,TZ,L,Magoma
+gna,BF,L,Kaansa
+gnb,IN,L,Gangte
+gnc,ES,E,Guanche
+gnd,CM,L,Zulgo-Gemzek
+gng,TG,L,Ngangam
+gnh,NG,N,Lere
+gni,AU,N,Gooniyandi
+gnk,BW,L,||Gana
+gnl,AU,E,Gangulu
+gnm,PG,L,Ginuman
+gnn,AU,L,Gumatj
+gno,IN,L,"Gondi, Northern"
+gnq,MY,L,Gana
+gnr,AU,E,Gureng Gureng
+gnt,PG,L,Guntai
+gnu,PG,L,Gnau
+gnw,BO,L,"Guaraní, Western Bolivian"
+gnz,CF,L,Ganzi
+goa,CI,L,Guro
+gob,CO,L,Playero
+goc,PG,L,Gorakor
+god,CI,L,Godié
+goe,BT,L,Gongduk
+gog,TZ,L,Gogo
+goi,PG,L,Gobasi
+goj,IN,L,Gowlan
+gok,IN,L,Gowli
+gol,LR,L,Gola
+gom,IN,L,"Konkani, Goanese"
+gon,IN,L,Gondi
+goo,FJ,L,Gone Dau
+gop,ID,L,Yeretuar
+goq,ID,L,Gorap
+gor,ID,L,Gorontalo
+gos,NL,L,Gronings
+got,UA,E,Gothic
+gou,CM,L,Gavar
+gow,TZ,L,Gorowa
+gox,CD,L,Gobu
+goy,TD,N,Goundo
+goz,IR,L,Gozarkhani
+gpa,NG,L,Gupa-Abawa
+gpn,PG,L,Taiap
+gqa,NG,L,Ga'anda
+gqi,CN,L,Guiqiong
+gqn,BR,E,Guana
+gqr,TD,L,Gor
+gra,IN,L,"Garasia, Rajput"
+grb,LR,L,Grebo
+grc,GR,E,"Greek, Ancient"
+grd,NG,L,Guruntum-Mbaaru
+grg,PG,L,Madi
+grh,NG,L,Gbiri-Niragu
+gri,SB,L,Ghari
+grj,LR,L,"Grebo, Southern"
+grm,MY,L,Kota Marudu Talantang
+grn,PY,L,Guarani
+gro,CN,L,Groma
+grq,PG,N,Gorovu
+grr,DZ,L,Taznatit
+grs,ID,L,Gresi
+grt,IN,L,Garo
+gru,ET,L,Kistane
+grv,LR,L,"Grebo, Central"
+grw,PG,N,Gweda
+grx,PG,L,Guriaso
+gry,LR,L,"Grebo, Barclayville"
+grz,PG,N,Guramalum
+gsc,FR,L,Gascon
+gse,GH,L,Ghanaian Sign Language
+gsg,DE,L,German Sign Language
+gsl,SN,L,Gusilay
+gsm,GT,L,Guatemalan Sign Language
+gsn,PG,L,Gusan
+gsp,PG,L,Wasembo
+gss,GR,L,Greek Sign Language
+gsw,CH,L,Schwyzerdütsch
+gta,BR,L,Guató
+gti,CD,L,Gbati-ri
+gua,NG,L,Shiki
+gub,BR,L,Guajajára
+guc,CO,L,Wayuu
+gud,CI,L,"Dida, Yocoboué"
+gue,AU,L,Gurinji
+guf,AU,L,Gupapuyngu
+gug,PY,L,"Guaraní, Paraguayan"
+guh,CO,L,Guahibo
+gui,BO,L,"Guaraní, Eastern Bolivian"
+guj,IN,L,Gujarati
+guk,ET,L,Gumuz
+gul,US,L,Sea Island Creole English
+gum,CO,L,Guambiano
+gun,BR,L,"Guaraní, Mbyá"
+guo,CO,L,Guayabero
+gup,AU,L,Gunwinggu
+guq,PY,L,Aché
+gur,GH,L,Farefare
+gus,GN,L,Guinean Sign Language
+gut,CR,L,Maléku Jaíka
+guu,VE,L,Yanomamö
+guv,CM,E,Gey
+guw,BJ,L,Gun
+gux,BF,L,Gourmanchéma
+guz,KE,L,Gusii
+gva,PY,L,Guana
+gvc,BR,L,Guanano
+gve,PG,L,Duwet
+gvf,PG,L,Golin
+gvj,BR,L,Guajá
+gvl,TD,L,Gulay
+gvm,NG,L,Gurmana
+gvn,AU,L,Kuku-Yalanji
+gvo,BR,L,Gavião do Jiparaná
+gvp,BR,L,"Gavião, Pará"
+gvr,NP,L,"Gurung, Western"
+gvs,PG,L,Gumawana
+gvy,AU,E,Guyani
+gwa,CI,L,Mbato
+gwb,NG,L,Gwa
+gwc,PK,L,Kalami
+gwd,ET,L,Gawwada
+gwe,TZ,N,Gweno
+gwf,PK,L,Gowro
+gwg,NG,L,Moo
+gwi,CA,L,Gwich'in
+gwj,BW,L,|Gwi
+gwn,NG,L,Gwandara
+gwr,UG,L,Gwere
+gwt,AF,L,Gawar-Bati
+gwu,AU,N,Guwamu
+gww,AU,L,Kwini
+gwx,GH,L,Gua
+gxx,CI,L,Wè Southern
+gya,CF,L,"Gbaya, Northwest"
+gyb,PG,L,Garus
+gyd,AU,N,Kayardild
+gye,NG,L,Gyem
+gyf,AU,N,Gungabula
+gyg,CF,L,Gbayi
+gyi,CM,L,Gyele
+gym,PA,L,Ngäbere
+gyn,GY,L,Guyanese Creole English
+gyr,BO,L,Guarayu
+gyy,AU,N,Gunya
+gza,ET,L,Ganza
+gzi,IR,L,Gazi
+gzn,ID,L,Gane
+haa,US,N,Han
+hab,VN,L,Hanoi Sign Language
+hac,IQ,L,Gurani
+had,ID,L,Hatam
+hae,ET,L,"Oromo, Eastern"
+haf,VN,L,Haiphong Sign Language
+hag,GH,L,Hanga
+hah,PG,L,Hahon
+hai,CA,L,Haida
+haj,IN,L,Hajong
+hak,CN,L,"Chinese, Hakka"
+hal,VN,L,Halang
+ham,PG,L,Hewa
+han,TZ,L,Hangaza
+hao,PG,L,Hakö
+hap,ID,L,Hupla
+haq,TZ,L,Ha
+har,ET,L,Harari
+has,CA,L,Haisla
+hat,HT,L,Haitian Creole French
+hau,NG,L,Hausa
+hav,CD,L,Havu
+haw,US,L,Hawaiian
+hax,CA,N,"Haida, Southern"
+hay,TZ,L,Haya
+haz,AF,L,Hazaragi
+hba,CD,L,Hamba
+hbb,NG,L,Huba
+hbn,SD,L,Heiban
+hbo,IL,E,"Hebrew, Ancient"
+hbs,CS,L,Serbo-Croatian
+hbu,TL,L,Habu
+hca,IN,L,Andaman Creole Hindi
+hch,MX,L,Huichol
+hdn,CA,N,"Haida, Northern"
+hds,HN,L,Honduras Sign Language
+hdy,ET,L,Hadiyya
+hea,CN,L,"Hmong, Northern Qiandong"
+heb,IL,L,Hebrew
+hed,TD,L,Herdé
+heg,ID,L,Helong
+heh,TZ,L,Hehe
+hei,CA,L,Heiltsuk
+hem,CD,L,Hemba
+her,NA,L,Herero
+hgm,NA,L,Hai||om
+hgw,PG,L,Haigwai
+hhr,SN,L,Kerak
+hia,NG,L,Lamang
+hib,PE,E,Hibito
+hid,US,L,Hidatsa
+hif,FJ,L,"Hindustani, Fijian"
+hig,NG,L,Kamwe
+hih,PG,L,Pamosu
+hii,IN,L,Hinduri
+hij,CM,L,Hijuk
+hik,ID,L,Seit-Kaitetu
+hil,PH,L,Hiligaynon
+hin,IN,L,Hindi
+hio,BW,L,Tsoa
+hir,BR,L,Himarimã
+hiw,VU,L,Hiw
+hix,BR,L,Hixkaryána
+hka,TZ,L,Kahe
+hke,CD,L,Hunde
+hla,PG,L,Halia
+hlb,IN,L,Halbi
+hld,VN,L,Halang Doan
+hlt,MM,L,Nga La
+hma,CN,L,"Hmong, Southern Mashan"
+hmb,BF,L,Songhay
+hmc,CN,L,"Hmong, Central Huishui"
+hmd,CN,L,"Hmong, Northeastern Dian"
+hme,CN,L,"Hmong, Eastern Huishui"
+hmf,VN,L,Hmong Don
+hmg,CN,L,"Hmong, Southwestern Guiyang"
+hmh,CN,L,"Hmong, Southwestern Huishui"
+hmi,CN,L,"Hmong, Northern Huishui"
+hmj,CN,L,"Hmong, Chonganjiang"
+hml,CN,L,"Hmong, Luopohe"
+hmm,CN,L,"Hmong, Central Mashan"
+hmn,CN,L,Hmong
+hmo,PG,L,"Motu, Hiri"
+hmp,CN,L,"Hmong, Northern Mashan"
+hmq,CN,L,"Hmong, Eastern Qiandong"
+hmr,IN,L,Hmar
+hms,CN,L,"Hmong, Southern Qiandong"
+hmt,PG,L,Hamtai
+hmu,ID,L,Hamap
+hmv,VN,L,Hmong Dô
+hmw,CN,L,"Hmong, Western Mashan"
+hmy,CN,L,"Hmong, Southern Guiyang"
+hmz,VN,L,Hmong Shua
+hna,CM,L,Mina
+hnd,PK,L,"Hindko, Southern"
+hne,IN,L,Chhattisgarhi
+hnh,BW,L,||Ani
+hni,CN,L,Hani
+hnn,PH,L,Hanunoo
+hno,PK,L,"Hindko, Northern"
+hns,SR,L,"Hindustani, Caribbean"
+hnu,LA,L,Hung
+hoa,SB,L,Hoava
+hob,PG,L,Mari
+hoc,IN,L,Ho
+hod,NG,E,Holma
+hoe,NG,L,Horom
+hoh,OM,L,Hobyót
+hoi,US,N,Holikachuk
+hoj,IN,L,Harauti
+hol,AO,L,Holu
+hom,SD,E,Homa
+hoo,CD,L,Holoholo
+hop,US,L,Hopi
+hor,TD,E,Horo
+hos,VN,L,Ho Chi Minh City Sign Language
+hot,PG,L,Hote
+hov,ID,L,Hovongan
+how,CN,L,Honi
+hoy,IN,L,Holiya
+hoz,ET,L,Hozo
+hpo,MM,L,Hpon
+hps,US,N,Hawai'i Pidgin Sign Language
+hra,MM,L,Hrangkhol
+hre,VN,L,Hre
+hrk,ID,L,Haruku
+hro,VN,L,Haroi
+hrr,ID,L,Horuru
+hrt,TR,L,Hértevin
+hru,IN,L,Hruso
+hrv,HR,L,Croatian
+hrz,IR,L,Harzani
+hsb,DE,L,"Sorbian, Upper"
+hsf,MX,L,"Huastec, Southeastern"
+hsh,HU,L,Hungarian Sign Language
+hsl,NG,L,Hausa Sign Language
+hsn,CN,L,"Chinese, Xiang"
+hss,OM,L,Harsusi
+hti,ID,N,Hoti
+hto,CO,L,"Huitoto, Minica"
+hts,TZ,L,Hadza
+htu,ID,L,Hitu
+hub,PE,L,Huambisa
+huc,BW,L,=|Hua
+hud,ID,L,Huaulu
+hue,MX,L,"Huave, San Francisco del Mar"
+huf,PG,L,Humene
+hug,PE,L,Huachipaeri
+huh,CL,L,Huilliche
+hui,PG,L,Huli
+huj,CN,L,"Hmong, Northern Guiyang"
+huk,ID,N,Hulung
+hul,PG,L,Hula
+hum,CD,L,Hungana
+hun,HU,L,Hungarian
+huo,CN,L,Hu
+hup,US,N,Hupa
+huq,CN,L,Tsat
+hur,CA,L,Halkomelem
+hus,MX,L,"Huastec, Veracruz"
+hut,NP,L,Humla
+huu,PE,L,"Huitoto, Murui"
+huv,MX,L,"Huave, San Mateo del Mar"
+huw,ID,N,Hukumina
+hux,PE,L,"Huitoto, Nüpode"
+huy,IL,L,Hulaulá
+huz,RU,L,Hunzib
+hva,MX,L,"Huastec, San Luís Potosí"
+hvc,HT,S,Haitian Vodoun Culture Language
+hve,MX,L,"Huave, San Dionisio del Mar"
+hvk,NC,L,Haveke
+hvn,ID,L,Sabu
+hvv,MX,L,"Huave, Santa María del Mar"
+hwa,CI,L,Wané
+hwc,US,L,Hawai'i Creole English
+hwo,NG,L,Hwana
+hya,CM,L,Hya
+hye,AM,L,Armenian
+iai,NC,L,Iaai
+ian,PG,L,Iatmul
+iap,BR,L,Iapama
+iar,PG,L,Purari
+iba,MY,L,Iban
+ibb,NG,L,Ibibio
+ibd,AU,L,Iwaidja
+ibe,NG,L,Akpes
+ibg,PH,L,Ibanag
+ibi,NG,L,Ibilo
+ibl,PH,L,Ibaloi
+ibm,NG,L,Agoi
+ibn,NG,L,Ibino
+ibo,NG,L,Igbo
+ibr,NG,L,Ibuoro
+ibu,ID,N,Ibu
+iby,NG,L,Ibani
+ica,BJ,L,Ede Ica
+ich,NG,L,Etkywan
+icl,IS,L,Icelandic Sign Language
+icr,CO,L,Islander Creole English
+ida,KE,L,Idakho-Isukha-Tiriki
+idb,LK,L,Indo-Portuguese
+idc,NG,L,Idon
+idd,BJ,L,Ede Idaca
+ide,NG,L,Idere
+idi,PG,L,Idi
+idr,SD,L,Indri
+ids,NG,L,Idesa
+idt,TL,L,Idaté
+idu,NG,L,Idoma
+ifa,PH,L,"Ifugao, Amganad"
+ifb,PH,L,"Ifugao, Batad"
+ife,TG,L,Ifè
+iff,VU,E,Ifo
+ifk,PH,L,"Ifugao, Tuwali"
+ifm,CG,L,Teke-Fuumu
+ifu,PH,L,"Ifugao, Mayoyao"
+ify,PH,L,"Kallahan, Keley-I"
+igb,NG,L,Ebira
+ige,NG,L,Igede
+igg,PG,L,Igana
+igl,NG,L,Igala
+igm,PG,L,Kanggape
+ign,BO,L,Ignaciano
+igo,PG,L,Isebe
+igw,NG,L,Igwe
+ihb,ID,S,Iha Based Pidgin
+ihi,NG,L,Ihievbe
+ihp,ID,L,Iha
+iii,CN,L,"Yi, Sichuan"
+ijc,NG,L,Izon
+ije,NG,L,Biseni
+ijj,BJ,L,Ede Ije
+ijn,NG,L,Kalabari
+ijs,NG,L,"Ijo, Southeast"
+ike,CA,L,"Inuktitut, Eastern Canadian"
+iki,NG,L,Iko
+ikk,NG,L,Ika
+ikl,NG,L,Ikulu
+iko,NG,L,Olulumo-Ikom
+ikp,NG,L,Ikpeshi
+ikt,CA,L,"Inuktitut, Western Canadian"
+iku,CA,L,Inuktitut
+ikv,NG,L,Iku-Gora-Ankwa
+ikw,NG,L,Ikwere
+ikx,UG,L,Ik
+ikz,TZ,L,Ikizu
+ila,ID,L,Ile Ape
+ilb,ZM,L,Ila
+ilg,AU,N,Garig-Ilgar
+ili,CN,L,Ili Turki
+ilk,PH,L,Ilongot
+ill,MY,L,Iranun
+ilo,PH,L,Ilocano
+ilu,ID,L,Ili'uun
+ilv,NG,L,Ilue
+ilw,ID,L,Talur
+ime,MR,L,Imeraguen
+imi,PG,L,Anamgura
+imn,PG,L,Imonda
+imo,PG,L,Imbongu
+imr,ID,L,Imroing
+ina,FR,S,Interlingua
+inb,CO,L,Inga
+ind,ID,L,Indonesian
+ing,US,L,Degexit'an
+inh,RU,L,Ingush
+inj,CO,L,"Inga, Jungle"
+inl,ID,L,Indonesian Sign Language
+inn,PH,L,Isinai
+ino,PG,L,Inoke-Yate
+inp,PE,N,Iñapari
+ins,IN,L,Indian Sign Language
+int,MM,L,Intha
+inz,US,E,Ineseño
+ior,ET,L,Inor
+iou,PG,L,Tuma-Irumu
+iow,US,E,Iowa-Oto
+ipi,PG,L,Ipili
+ipk,US,L,Inupiaq
+ipo,PG,L,Ipiko
+iqu,PE,N,Iquito
+ire,ID,L,Iresim
+irh,ID,L,Irarutu
+iri,NG,L,Irigwe
+irk,TZ,L,Iraqw
+irn,BR,L,Irántxe
+irr,LA,L,Ir
+iru,IN,L,Irula
+irx,ID,L,Kamberau
+iry,PH,L,Iraya
+isa,PG,L,Isabi
+isc,PE,N,Isconahua
+isd,PH,L,Isnag
+ise,IT,L,Italian Sign Language
+isg,IE,L,Irish Sign Language
+ish,NG,L,Esan
+isi,NG,L,Nkem-Nkum
+isl,IS,L,Icelandic
+ism,ID,L,Masimasi
+isn,TZ,L,Isanzu
+iso,NG,L,Isoko
+isr,IL,L,Israeli Sign Language
+ist,HR,L,Istriot
+isu,CM,L,Isu
+ita,IT,L,Italian
+itb,PH,L,"Itneg, Binongan"
+ite,BO,E,Itene
+iti,PH,L,"Itneg, Inlaod"
+itk,IT,L,Judeo-Italian
+itl,RU,L,Itelmen
+itm,NG,L,Itu Mbon Uzo
+ito,BO,N,Itonama
+itr,PG,L,Iteri
+its,NG,L,Isekiri
+itt,PH,L,"Itneg, Maeng"
+itu,PG,L,Itutang
+itv,PH,L,Itawit
+itw,NG,L,Ito
+itx,ID,L,Itik
+ity,PH,L,"Itneg, Moyadan"
+itz,GT,N,Itza'
+ium,CN,L,Iu Mien
+ivb,PH,L,Ibatan
+ivv,PH,L,Ivatan
+iwk,PH,L,I-Wak
+iwm,PG,L,Iwam
+iwo,ID,L,Iwur
+iws,PG,L,"Iwam, Sepik"
+ixc,MX,L,Ixcatec
+ixi,GT,L,"Ixil, Nebaj"
+ixj,GT,L,"Ixil, Chajul"
+ixl,GT,L,"Ixil, San Juan Cotzal"
+iya,NG,L,Iyayu
+iyo,CM,L,Mesaka
+iyx,CG,L,Yaka
+izh,RU,L,Ingrian
+izi,NG,L,Izi-Ezaa-Ikwo-Mgbo
+jaa,BR,L,Jamamadí
+jab,NG,L,Hyam
+jac,GT,L,"Jakalteko, Eastern"
+jad,GN,L,Jahanka
+jae,PG,L,Yabem
+jaf,NG,L,Jara
+jah,MY,L,Jah Hut
+jai,GT,L,"Jakalteko, Western"
+jaj,SB,N,Zazao
+jak,MY,L,Jakun
+jal,ID,L,Yalahatan
+jam,JM,L,Jamaican Creole English
+jao,AU,L,Yanyuwa
+jap,BR,L,Jaruára
+jaq,ID,L,Yaqay
+jar,NG,L,Jarawa
+jas,NC,L,"Javanese, New Caledonian"
+jat,UA,L,Jakati
+jau,ID,L,Yaur
+jav,ID,L,Javanese
+jax,ID,L,"Malay, Jambi"
+jay,AU,N,Jarnango
+jaz,NC,L,Jawe
+jbe,IL,L,Judeo-Berber
+jbj,ID,L,Arandai
+jbn,LY,L,Nafusi
+jbt,BR,N,Jabutí
+jbu,CM,L,Jukun Takum
+jcs,JM,L,Jamaican Country Sign Language
+jct,UZ,N,Judeo-Crimean Tatar
+jda,IN,L,Jad
+jdg,PK,L,Jadgali
+jdt,IL,L,Judeo-Tat
+jeb,PE,N,Jebero
+jee,NP,L,Jerung
+jeg,LA,L,Jeng
+jeh,VN,L,Jeh
+jei,ID,L,Yei
+jek,CI,L,Jeri Kuo
+jel,ID,L,Yelmek
+jen,NG,L,Dza
+jer,NG,L,Jere
+jet,PG,L,Manem
+jeu,TD,L,Jonkor Bourmataguil
+jgb,CD,E,Ngbee
+jge,IL,L,Judeo-Georgian
+jgo,CM,L,Ngomba
+jhi,MY,L,Jehai
+jia,CM,L,Jina
+jib,NG,L,Jibu
+jic,HN,L,Tol
+jid,NG,L,Bu
+jie,NG,L,Jilbe
+jig,AU,N,Djingili
+jih,CN,L,Shangzhai
+jii,SO,L,Jiiddu
+jil,PG,L,Jilim
+jim,CM,L,Jimi
+jio,CN,L,Jiamao
+jiq,CN,L,Guanyinqiao
+jit,TZ,L,Jita
+jiu,CN,L,"Jinuo, Youle"
+jiv,EC,L,Shuar
+jiy,CN,L,"Jinuo, Buyuan"
+jko,PG,L,Kubo
+jku,NG,N,Labir
+jle,SD,L,Ngile
+jma,PG,L,Dima
+jmb,NG,L,Zumbun
+jmc,TZ,L,Machame
+jmd,ID,L,Yamdena
+jmi,NG,L,Jimi
+jmk,SE,L,Jamtska
+jml,NP,L,Jumli
+jmr,GH,L,Kamara
+jms,NG,L,Mashi
+jmx,MX,L,"Mixtec, Western Juxtlahuaca"
+jna,IN,L,Jangshung
+jnd,PK,L,Jandavra
+jng,AU,E,Yangman
+jni,NG,L,Janji
+jnj,ET,L,Yemsa
+jnl,NP,L,Rawat
+jns,IN,L,Jaunsari
+job,CD,L,Joba
+jod,CI,L,Wojenaka
+jor,BO,E,Jorá
+jos,JO,L,Jordanian Sign Language
+jow,ML,L,Jowulu
+jpn,JP,L,Japanese
+jpr,IL,L,Dzhidi
+jqr,PE,L,Jaqaru
+jra,VN,L,Jarai
+jrb,IL,L,Judeo-Arabic
+jrr,NG,L,Jiru
+jrt,NG,L,Jorto
+jru,VE,L,Japrería
+jsl,JP,L,Japanese Sign Language
+jua,BR,N,Júma
+jub,NG,L,Wannu
+juc,CN,E,Jurchen
+jud,CI,L,Worodougou
+juh,NG,L,Hõne
+juk,NG,L,Wapan
+jul,NP,L,Jirel
+jum,SD,L,Jumjum
+jun,IN,L,Juang
+juo,NG,L,Jiba
+jup,BR,L,Hupdë
+jur,BR,L,Jurúna
+jut,DK,L,Jutish
+juu,NG,L,Ju
+juw,NG,L,Wãpha
+juy,IN,L,Juray
+jvn,SR,L,"Javanese, Caribbean"
+jwi,GH,L,Jwira-Pepesa
+jya,CN,L,Jiarong
+jye,IL,L,"Arabic, Judeo-Yemeni"
+jyy,TD,L,Jaya
+kaa,UZ,L,Karakalpak
+kab,DZ,L,Kabyle
+kac,MM,L,Jingpho
+kad,NG,L,Kadara
+kae,TW,E,Ketangalan
+kag,MY,L,Kajaman
+kah,CF,L,Kara
+kai,NG,L,Karekare
+kaj,NG,L,Jju
+kak,PH,L,"Kallahan, Kayapa"
+kal,GL,L,"Inuktitut, Greenlandic"
+kam,KE,L,Kamba
+kan,IN,L,Kannada
+kao,ML,L,Xaasongaxango
+kap,RU,L,Bezhta
+kaq,PE,L,Capanahua
+kas,IN,L,Kashmiri
+kat,GE,L,Georgian
+kau,NG,L,Kanuri
+kav,BR,N,Katukína
+kax,ID,L,Kao
+kay,BR,L,Kamayurá
+kaz,KZ,L,Kazakh
+kba,AU,E,Kalarko
+kbb,BR,L,Kaxuiâna
+kbc,BR,L,Kadiwéu
+kbd,RU,L,Kabardian
+kbe,AU,N,Kanju
+kbf,CL,E,Kakauhua
+kbg,IN,L,Khamba
+kbh,CO,L,Camsá
+kbj,CD,L,Kari
+kbk,PG,L,"Koiari, Grass"
+kbl,TD,L,Kanembu
+kbm,PG,L,Iwal
+kbn,CF,L,Kare
+kbo,SD,L,Keliko
+kbp,TG,L,Kabiyé
+kbq,PG,L,Kamano
+kbr,ET,L,Kafa
+kbs,GA,L,Kande
+kbt,PG,L,Abadi
+kbu,PK,L,Kabutra
+kbv,ID,L,Dera
+kbw,PG,L,Kaiep
+kbx,PG,L,Ap Ma
+kby,NE,L,"Kanuri, Manga"
+kbz,NG,L,Duhwa
+kca,RU,L,Khanty
+kcb,PG,N,Kawacha
+kcc,NG,L,Lubila
+kcd,ID,L,"Kanum, Ngkâlmpw"
+kce,NG,L,Kaivi
+kcf,NG,L,Ukaan
+kcg,NG,L,Tyap
+kch,NG,L,Vono
+kci,NG,L,Kamantan
+kcj,GW,L,Kobiana
+kck,ZW,L,Kalanga
+kcl,PG,L,Kela
+kcm,CF,L,Gula
+kcn,UG,L,Nubi
+kco,PG,L,Kinalakna
+kcp,SD,L,Kanga
+kcq,NG,L,Kamo
+kcr,SD,L,Katla
+kcs,NG,L,Koenoem
+kct,PG,L,Kaian
+kcu,TZ,L,Kami
+kcv,CD,L,Kete
+kcw,CD,L,Kabwari
+kcx,ET,L,Kachama-Ganjule
+kcy,DZ,L,Korandje
+kcz,TZ,L,Konongo
+kda,AU,E,Worimi
+kdc,TZ,L,Kutu
+kdd,AU,L,Yankunytjatjara
+kde,TZ,L,Makonde
+kdf,PG,L,Mamusi
+kdg,CD,L,Seba
+kdh,TG,L,Tem
+kdi,UG,L,Kumam
+kdj,UG,L,Karamojong
+kdk,NC,L,Numee
+kdl,NG,L,Tsikimba
+kdm,NG,L,Kagoma
+kdn,ZW,L,Kunda
+kdp,NG,L,Kaningdon-Nindem
+kdq,IN,L,Koch
+kdr,LT,N,Karaim
+kds,LA,L,Lahu Shi
+kdt,TH,L,Kuy
+kdu,SD,L,Kadaru
+kdv,MM,L,Kado
+kdw,ID,L,Koneraw
+kdx,NG,L,Kam
+kdy,ID,L,Keder
+kdz,CM,L,Kwaja
+kea,CV,L,Kabuverdianu
+keb,GA,L,Kélé
+kec,SD,L,Keiga
+ked,TZ,L,Kerewe
+kee,US,L,"Keres, Eastern"
+kef,TG,L,Kpessi
+keg,SD,L,Tese
+kei,ID,L,Kei
+kej,IN,L,Kadar
+kek,GT,L,Q'eqchi'
+kel,CD,L,Kela
+kem,TL,L,Kemak
+ken,CM,L,Kenyang
+keo,UG,L,Kakwa
+kep,IN,L,Kaikadi
+keq,IN,L,Kamar
+ker,TD,L,Kera
+kes,NG,L,Kugbo
+ket,RU,L,Ket
+keu,TG,L,Akebu
+kev,IN,L,Kanikkaran
+kew,PG,L,"Kewa, West"
+kex,IN,L,Kukna
+key,IN,L,Kupia
+kez,NG,L,Kukele
+kfa,IN,L,Kodagu
+kfb,IN,L,"Kolami, Northwestern"
+kfc,IN,L,Konda-Dora
+kfd,IN,L,"Koraga, Korra"
+kfe,IN,L,Kota
+kff,IN,L,Koya
+kfg,IN,L,Kudiya
+kfh,IN,L,Kurichiya
+kfi,IN,L,Kurumba
+kfj,CN,L,Kemiehua
+kfk,IN,L,Kinnauri
+kfl,CM,L,Kung
+kfm,IR,L,Khunsari
+kfn,CM,L,Kuk
+kfo,CI,L,Koro
+kfp,IN,L,Korwa
+kfq,IN,L,Korku
+kfr,IN,L,Kachchi
+kfs,IN,L,Bilaspuri
+kft,IN,L,Kanjari
+kfu,IN,L,Katkari
+kfv,IN,L,Kurmukar
+kfw,IN,L,"Naga, Kharam"
+kfx,IN,L,"Pahari, Kullu"
+kfy,IN,L,Kumauni
+kfz,BF,L,Koromfé
+kga,CI,L,Koyaga
+kgb,ID,L,Kawe
+kgc,LA,L,Kasseng
+kgd,LA,L,Kataang
+kge,ID,L,Komering
+kgf,PG,L,Kube
+kgg,NP,E,Kusunda
+kgh,PH,L,"Kalinga, Upper Tanudan"
+kgi,MY,L,Selangor Sign Language
+kgj,NP,L,"Kham, Gamale"
+kgk,BR,L,Kaiwá
+kgl,AU,N,Kunggari
+kgm,BR,E,Karipúna
+kgn,IR,L,Karingani
+kgo,SD,L,Krongo
+kgp,BR,L,Kaingáng
+kgq,ID,L,Kamoro
+kgr,ID,L,Abun
+kgs,AU,N,Kumbainggar
+kgt,NG,N,Somyev
+kgu,PG,L,Kobol
+kgv,ID,L,Karas
+kgw,ID,L,Karon Dori
+kgx,ID,L,Kamaru
+kgy,NP,L,Kyerung
+kha,IN,L,Khasi
+khb,CN,L,Lü
+khc,ID,L,Tukang Besi North
+khd,ID,N,"Kanum, Bädi"
+khe,ID,L,Korowai
+khf,LA,L,Khuen
+khg,CN,L,"Tibetan, Khams"
+khh,ID,L,Kehu
+khj,NG,L,Kuturmi
+khk,MN,L,"Mongolian, Halh"
+khl,PG,L,Lusi
+khm,KH,L,"Khmer, Central"
+khn,IN,L,Khandesi
+khp,ID,L,Kapori
+khq,ML,L,"Songhay, Koyra Chiini"
+khr,IN,L,Kharia
+khs,PG,L,Kasua
+kht,MM,L,Khamti
+khu,AO,L,Nkhumbi
+khv,RU,L,Khvarshi
+khw,PK,L,Khowar
+khx,CD,L,Kanu
+khy,CD,L,Kele
+khz,PG,L,Keapara
+kia,TD,L,Kim
+kib,SD,L,Koalib
+kic,US,L,Kickapoo
+kid,CM,L,Koshin
+kie,TD,L,Kibet
+kif,NP,L,"Parbate, Eastern"
+kig,ID,L,Kimaama
+kih,PG,L,Kilmeri
+kii,US,E,Kitsai
+kij,PG,L,Kilivila
+kik,KE,L,Gikuyu
+kil,NG,L,Kariya
+kim,RU,L,Karagas
+kin,RW,L,Rwanda
+kio,US,L,Kiowa
+kip,NP,L,"Kham, Sheshi"
+kiq,ID,L,Kosadle
+kir,KG,L,Kirghiz
+kis,PG,L,Kis
+kit,PG,L,Agob
+kiu,TR,L,Kirmanjki
+kiv,TZ,L,Kimbu
+kiw,PG,L,"Kiwai, Northeast"
+kiy,ID,L,Kirikiri
+kiz,TZ,L,Kisi
+kja,ID,L,Mlap
+kjb,GT,L,"Q'anjob'al, Eastern"
+kjc,ID,L,"Konjo, Coastal"
+kjd,PG,L,"Kiwai, Southern"
+kje,ID,L,Kisar
+kjf,IR,L,Khalaj
+kjg,LA,L,Khmu
+kjh,RU,L,Khakas
+kji,SB,L,Zabana
+kjj,AZ,L,Khinalugh
+kjk,ID,L,"Konjo, Highland"
+kjl,NP,L,"Parbate, Western"
+kjm,VN,L,Kháng
+kjn,AU,L,Kunjen
+kjo,IN,L,"Kinnauri, Harijan"
+kjp,MM,L,"Karen, Pwo Eastern"
+kjq,US,L,"Keres, Western"
+kjr,ID,L,Kurudu
+kjs,PG,L,"Kewa, East"
+kjt,TH,L,"Karen, Phrae Pwo"
+kju,US,N,Kashaya
+kjx,PG,L,Ramopa
+kjy,PG,L,Erave
+kjz,BT,L,Bumthangkha
+kka,NG,L,Kakanda
+kkb,ID,N,Kwerisa
+kkc,PG,L,Odoodee
+kkd,NG,L,Kinuku
+kke,GN,L,Kakabe
+kkg,PH,L,"Kalinga, Mabaka Valley"
+kkh,MM,L,Khün
+kki,TZ,L,Kagulu
+kkj,CM,L,Kako
+kkk,SB,L,Kokota
+kkl,ID,L,"Yale, Kosarek"
+kkm,NG,N,Kiong
+kkn,CN,L,Kon Keu
+kko,SD,L,Karko
+kkp,AU,N,Gugubera
+kkq,CD,L,Kaiku
+kkr,NG,L,Kir-Balar
+kks,NG,L,Giiwo
+kkt,NP,L,Koi
+kku,NG,L,Tumi
+kkv,ID,L,Kangean
+kkw,CG,L,Teke-Kukuya
+kkx,ID,L,Kohin
+kky,AU,N,Guguyimidjir
+kkz,CA,L,Kaska
+kla,US,N,Klamath-Modoc
+klb,MX,N,Kiliwa
+klc,CM,L,Kolbila
+kld,AU,N,Gamilaraay
+kle,NP,L,Kulung
+klf,TD,L,Kendeje
+klg,PH,L,"Kalagan, Tagakaulu"
+klh,PG,L,Weliki
+kli,ID,L,Kalumpang
+klj,IR,L,"Khalaj, Turkic"
+klk,NG,L,Kono
+kll,PH,L,"Kalagan, Kagan"
+klm,PG,L,Kolom
+kln,KE,L,Kalenjin
+klo,NG,L,Kapya
+klp,PG,N,Kamasa
+klq,PG,L,Rumu
+klr,NP,L,Khaling
+kls,PK,L,Kalasha
+klt,PG,L,Nukna
+klu,LR,L,Klao
+klv,VU,L,Maskelynes
+klw,ID,L,Lindu
+klx,PG,L,Koluwawa
+kly,ID,L,Kalao
+klz,ID,L,Kabola
+kma,GH,L,Konni
+kmb,AO,L,Mbundu
+kmc,CN,L,"Dong, Southern"
+kmd,PH,L,"Kalinga, Madukayang"
+kme,CM,L,Bakole
+kmf,PG,L,Kare
+kmg,PG,L,Kâte
+kmh,PG,L,Kalam
+kmi,NG,L,Kami
+kmj,IN,L,Kumarbhag Paharia
+kmk,PH,L,"Kalinga, Limos"
+kml,PH,L,"Kalinga, Lower Tanudan"
+kmm,IN,L,Kom
+kmn,PG,L,Awtuw
+kmo,PG,L,Kwoma
+kmp,CM,L,Gimme
+kmq,ET,L,Kwama
+kmr,TR,L,"Kurdish, Northern"
+kms,PG,L,Kamasau
+kmt,ID,L,Kemtuik
+kmu,PG,L,Kanite
+kmv,BR,L,Karipúna Creole French
+kmw,CD,L,Komo
+kmx,PG,L,Waboda
+kmy,NG,L,Koma
+kmz,IR,L,Khorasani Turkish
+kna,NG,L,Dera
+knb,PH,L,"Kalinga, Lubuagan"
+knc,NG,L,"Kanuri, Central"
+knd,ID,L,Konda
+kne,PH,L,Kankanaey
+knf,GW,L,Mankanya
+kng,CD,L,Koongo
+knh,ID,L,"Kenyah, Kayan River"
+kni,NG,L,Kanufi
+knj,GT,L,Akateko
+knk,SL,L,Kuranko
+knl,ID,L,Keninjal
+knm,BR,L,Kanamarí
+knn,IN,L,Konkani
+kno,SL,L,Kono
+knp,CM,L,Kwanja
+knq,MY,L,Kintaq
+knr,PG,L,Kaningra
+kns,MY,L,Kensiu
+knt,BR,L,"Katukína, Panoan"
+knu,GN,L,Kono
+knv,PG,L,Tabo
+knw,NA,L,Kung-Ekoka
+knx,ID,L,Kendayan
+kny,CD,L,Kanyok
+knz,BF,L,Kalamsé
+koa,PG,L,Konomala
+kob,BR,L,Kohoroxitari
+koc,NG,E,Kpati
+kod,ID,L,Kodi
+koe,SD,L,Kacipo-Balesi
+kof,NG,E,Kubi
+kog,CO,L,Cogui
+koh,CG,L,Koyo
+koi,RU,L,Komi-Permyak
+koj,CF,L,Sara Dunjo
+kok,IN,L,Konkani (macrolanguage)
+kol,PG,L,Kol
+kom,RU,L,Komi
+kon,CD,L,Kongo
+koo,UG,L,Konjo
+kop,PG,L,Kwato
+koq,GA,L,Kota
+kor,KR,L,Korean
+kos,FM,L,Kosraean
+kot,CM,L,Lagwan
+kou,TD,L,Koke
+kov,NG,N,Kudu-Camo
+kow,NG,L,Kugama
+kox,CO,E,Coxima
+koy,US,L,Koyukon
+koz,PG,L,Korak
+kpa,NG,L,Kutto
+kpb,IN,L,"Kurumba, Mullu"
+kpc,CO,L,Curripaco
+kpd,ID,L,Koba
+kpe,LR,L,Kpelle
+kpf,PG,L,Komba
+kpg,FM,L,Kapingamarangi
+kph,GH,L,Kplang
+kpi,ID,L,Kofei
+kpj,BR,L,Karajá
+kpk,NG,L,Kpan
+kpl,CD,L,Kpala
+kpm,VN,L,Koho
+kpn,BR,E,Kepkiriwát
+kpo,TG,L,Ikposo
+kpp,MM,L,"Karen, Paku"
+kpq,ID,L,Korupun-Sela
+kpr,PG,L,Korafe
+kps,ID,L,Tehit
+kpt,RU,L,Karata
+kpu,ID,L,Kafoa
+kpv,RU,L,Komi-Zyrian
+kpw,PG,L,Kobon
+kpx,PG,L,"Koiali, Mountain"
+kpy,RU,L,Koryak
+kpz,UG,L,Kupsabiny
+kqa,PG,L,Mum
+kqb,PG,L,Kovai
+kqc,PG,L,Doromu
+kqd,IQ,L,Koy Sanjaq Surat
+kqe,PH,L,Kalagan
+kqf,PG,L,Kakabai
+kqg,BF,L,Khe
+kqh,TZ,L,Kisankasa
+kqi,PG,L,Koitabu
+kqj,PG,L,Koromira
+kqk,BJ,L,"Gbe, Kotafon"
+kql,PG,L,Kyenele
+kqm,CI,L,Khisa
+kqn,ZM,L,Kaonde
+kqo,LR,L,"Krahn, Eastern"
+kqp,TD,L,Kimré
+kqq,BR,L,Krenak
+kqr,MY,L,Kimaragang
+kqs,GN,L,"Kissi, Northern"
+kqt,MY,L,"Kadazan, Klias River"
+kqu,ZA,E,Seroa
+kqv,ID,L,Okolod
+kqw,PG,L,Kandas
+kqx,CM,L,Mser
+kqy,ET,L,Koorete
+kqz,ZA,E,Korana
+kra,NP,L,Kumhali
+krb,US,E,Karkin
+krc,RU,L,Karachay-Balkar
+krd,TL,L,Kairui-Midiki
+kre,BR,L,Kreen-Akarore
+krf,VU,L,Koro
+krg,ID,L,"Korowai, North"
+krh,NG,L,Kurama
+kri,SL,L,Krio
+krj,PH,L,Kinaray-A
+krk,RU,N,Kerek
+krl,RU,L,Karelian
+krm,SL,L,Krim
+krn,LR,L,Sapo
+krp,NG,L,Korop
+krq,ID,L,Krui
+krr,KH,L,Kru'ng 2
+krs,SD,L,Gbaya
+krt,NE,L,"Kanuri, Tumari"
+kru,IN,L,Kurux
+krv,KH,L,Kravet
+krw,LR,L,"Krahn, Western"
+krx,SN,L,Karon
+kry,AZ,L,Kryts
+krz,ID,L,"Kanum, Sota"
+ksa,NG,L,Shuwa-Zamani
+ksb,TZ,L,Shambala
+ksc,PH,L,"Kalinga, Southern"
+ksd,PG,L,Kuanua
+kse,PG,L,Kuni
+ksf,CM,L,Bafia
+ksg,SB,L,Kusaghe
+ksh,DE,L,Kölsch
+ksi,PG,L,Krisa
+ksj,PG,L,Uare
+ksk,US,N,Kansa
+ksl,PG,L,Kumalu
+ksm,NG,L,Kumba
+ksn,PH,L,Kasiguranin
+kso,NG,L,Kofa
+ksp,CF,L,Kaba
+ksq,NG,L,Kwaami
+ksr,PG,L,Borong
+kss,LR,L,"Kisi, Southern"
+kst,BF,L,Winyé
+ksu,IN,N,Khamyang
+ksv,CD,L,Kusu
+ksw,MM,L,"Karen, S'gaw"
+ksx,ID,L,Kedang
+ksy,IN,L,Kharia Thar
+ksz,IN,L,Koraku
+kta,VN,L,Katua
+ktb,ET,L,Kambaata
+ktc,NG,L,Kholok
+ktd,AU,N,Kokata
+kte,NP,L,Nubri
+ktf,CD,L,Kwami
+ktg,AU,E,Kalkutung
+kth,TD,L,Karanga
+kti,ID,L,"Muyu, North"
+ktj,CI,L,"Krumen, Plapo"
+ktk,PG,E,Kaniet
+ktl,IR,L,Koroshi
+ktm,PG,L,Kurti
+ktn,BR,L,Karitiâna
+kto,PG,L,Kuot
+ktp,LA,L,Kaduo
+ktq,PH,E,Katabaga
+ktr,MY,L,Kota Marudu Tinagas
+kts,ID,L,"Muyu, South"
+ktt,ID,L,Ketum
+ktu,CD,L,Kituba
+ktv,VN,L,"Katu, Eastern"
+ktw,US,E,Kato
+ktx,BR,L,Kaxararí
+kty,CD,L,Kango
+ktz,BW,L,Ju|'hoan
+kua,AO,L,Kwanyama
+kub,NG,L,Kutep
+kud,PG,L,'Auhelawa
+kue,PG,L,Kuman
+kuf,LA,L,"Katu, Western"
+kug,NG,L,Kupa
+kuh,NG,L,Kushi
+kui,BR,L,Kuikúro-Kalapálo
+kuj,TZ,L,Kuria
+kuk,ID,L,Kepo'
+kul,NG,L,Kulere
+kum,RU,L,Kumyk
+kun,ER,L,Kunama
+kuo,PG,L,Kumukio
+kup,PG,L,Kunimaipa
+kuq,BR,L,Karipuná
+kur,IQ,L,Kurdish
+kus,GH,L,Kusaal
+kut,CA,L,Kutenai
+kuu,US,L,"Kuskokwim, Upper"
+kuv,ID,L,Kur
+kuw,CF,L,Kpagua
+kux,AU,L,Kukatja
+kuy,AU,L,Kuuku-Ya'u
+kuz,CL,E,Kunza
+kva,RU,L,Bagvalal
+kvb,ID,L,Kubu
+kvc,PG,L,Kove
+kvd,ID,L,Kui
+kve,MY,L,Kalabakan
+kvf,TD,L,Kabalai
+kvg,PG,L,Kuni-Boazi
+kvh,ID,L,Komodo
+kvi,TD,L,Kwang
+kvj,CM,L,Psikye
+kvk,KR,L,Korean Sign Language
+kvl,MM,L,"Karen, Brek"
+kvm,CM,L,Kendem
+kvn,CO,L,"Kuna, Border"
+kvo,ID,L,Dobel
+kvp,ID,L,Kompane
+kvq,MM,L,"Karen, Geba"
+kvr,ID,L,Kerinci
+kvs,AU,N,Kunggara
+kvt,MM,L,"Karen, Lahta"
+kvu,MM,L,"Karen, Yinbaw"
+kvv,ID,L,Kola
+kvw,ID,L,Wersing
+kvx,PK,L,"Koli, Parkari"
+kvy,MM,L,"Karen, Yintale"
+kvz,ID,L,Tsakwambo
+kwa,BR,L,Dâw
+kwb,NG,L,Kwa
+kwc,CG,L,Likwala
+kwd,SB,L,Kwaio
+kwe,ID,L,Kwerba
+kwf,SB,L,Kwara'ae
+kwg,TD,L,Kaba Deme
+kwh,ID,L,Kowiai
+kwi,CO,L,Awa-Cuaiquer
+kwj,PG,L,Kwanga
+kwk,CA,L,Kwakiutl
+kwl,NG,L,Kofyar
+kwm,NA,L,Kwambi
+kwn,NA,L,Kwangali
+kwo,PG,L,Kwomtari
+kwp,CI,L,Kodia
+kwq,NG,L,Kwak
+kwr,ID,L,Kwer
+kws,CD,L,Kwese
+kwt,ID,L,Kwesten
+kwu,CM,L,Kwakum
+kwv,TD,L,Kaba Na
+kww,SR,L,Kwinti
+kwx,IN,L,Khirwar
+kwy,CD,L,"Kongo, San Salvador"
+kwz,AO,E,Kwadi
+kxa,PG,L,Kairiru
+kxb,CI,L,Krobu
+kxc,ET,L,Komso
+kxd,BN,L,Brunei
+kxe,NG,L,Kakihum
+kxf,MM,L,"Karen, Manumanaw"
+kxg,ID,L,Katingan
+kxh,ET,L,Karo
+kxi,MY,L,Keningau Murut
+kxj,TD,L,Kulfa
+kxk,MM,L,"Karen, Zayein"
+kxl,NP,L,"Kurux, Nepali"
+kxm,TH,L,"Khmer, Northern"
+kxn,MY,L,Kanowit
+kxo,BR,E,Kanoé
+kxp,IN,L,"Koli, Wadiyara"
+kxq,ID,L,"Kanum, Smärky"
+kxr,PG,L,Koro
+kxs,CN,L,Kangjia
+kxt,PG,L,Koiwat
+kxu,IN,L,Kui
+kxv,IN,L,Kuvi
+kxw,PG,L,Konai
+kxx,CG,L,Likuba
+kxy,VN,L,Kayong
+kxz,PG,L,Kerewo
+kya,TZ,L,Kwaya
+kyb,PH,L,"Kalinga, Butbut"
+kyc,PG,L,Kyaka
+kyd,ID,L,Karey
+kye,GH,L,Krache
+kyf,CI,L,Kouya
+kyg,PG,L,Keyagana
+kyh,US,L,Karok
+kyi,MY,L,Kiput
+kyj,PH,L,Karao
+kyk,PH,L,Kamayo
+kyl,US,N,Kalapuya
+kym,CF,L,Kpatili
+kyn,PH,L,Karolanos
+kyo,ID,L,Kelon
+kyp,LA,L,Kang
+kyq,TD,L,Kenga
+kyr,BR,L,Kuruáya
+kys,MY,L,"Kayan, Baram"
+kyt,ID,L,Kayagar
+kyu,MM,L,"Kayah, Western"
+kyv,NP,L,Kayort
+kyw,IN,L,Kudmali
+kyx,PG,L,Rapoisi
+kyy,PG,L,Kambaira
+kyz,BR,L,Kayabí
+kza,BF,L,"Karaboro, Western"
+kzb,ID,L,Kaibobo
+kzc,CI,L,"Kulango, Bondoukou"
+kzd,ID,L,Kadai
+kze,PG,L,Kosena
+kzf,ID,L,"Kaili, Da'a"
+kzg,JP,L,Kikai
+kzh,SD,L,Kenuzi-Dongola
+kzi,MY,L,Kelabit
+kzj,MY,L,"Kadazan, Coastal"
+kzk,SB,E,Kazukuru
+kzl,ID,N,Kayeli
+kzm,ID,L,Kais
+kzn,MW,L,Kokola
+kzo,GA,L,Kaningi
+kzp,ID,L,Kaidipang
+kzq,NP,L,Kaike
+kzr,CM,L,Karang
+kzs,MY,L,"Dusun, Sugut"
+kzt,MY,L,"Dusun, Tambunan"
+kzu,ID,L,Kayupulau
+kzv,ID,L,Komyandaret
+kzw,BR,E,Karirí-Xocó
+kzx,ID,N,Kamarian
+kzy,CD,L,Kango
+kzz,ID,L,Kalabra
+laa,PH,L,"Subanun, Lapuyan"
+lac,MX,L,Lacandon
+lad,IL,L,Ladino
+lae,IN,L,Pattani
+laf,SD,L,Lafofa
+lag,TZ,L,Langi
+lah,PK,L,Lahnda
+lai,MW,L,Lambya
+laj,UG,L,Lango
+lak,NG,L,Laka
+lal,CD,L,Lalia
+lam,ZM,L,Lamba
+lan,NG,L,Laru
+lao,LA,L,Lao
+lap,TD,L,Laka
+laq,VN,L,Qabiao
+lar,GH,L,Larteh
+las,TG,L,Lama
+lat,VA,S,Latin
+lau,ID,L,Laba
+lav,LV,L,Latvian
+law,ID,L,Lauje
+lax,IN,L,Tiwa
+lay,MM,L,Lama
+laz,PG,E,Aribwatsa
+lba,MM,L,Lui
+lbb,PG,L,Label
+lbc,CN,L,Lakkia
+lbe,RU,L,Lak
+lbf,IN,L,Tinani
+lbg,MM,L,Laopang
+lbi,CM,S,La'bi
+lbj,IN,L,Ladakhi
+lbm,IN,L,Lodhi
+lbn,LA,L,Lamet
+lbo,LA,L,Laven
+lbq,PG,L,Wampar
+lbr,NP,L,"Lorung, Northern"
+lbs,LY,L,Libyan Sign Language
+lbt,VN,L,Lachi
+lbu,PG,L,Labu
+lbv,PG,L,Lavatbura-Lamusong
+lbw,ID,L,Tolaki
+lbx,ID,L,Lawangan
+lby,AU,N,Lamu-Lamu
+lbz,AU,N,Lardil
+lcc,ID,L,Legenyem
+lcd,ID,L,Lola
+lce,ID,L,Loncong
+lcf,ID,L,Lubu
+lch,AO,L,Luchazi
+lcl,ID,L,Lisela
+lcm,PG,L,Tungag
+lcp,CN,L,"Lawa, Western"
+lcq,ID,L,Luhu
+lcs,ID,L,Lisabata-Nuniali
+ldb,NG,L,Idun
+ldd,NG,L,Luri
+ldg,NG,L,Lenyima
+ldh,NG,L,Lamja-Dengsa-Tola
+ldi,CG,L,Laari
+ldj,NG,L,Lemoro
+ldk,NG,L,Leelau
+ldl,NG,L,Kaan
+ldm,GN,L,Landoma
+ldo,NG,L,Loo
+ldp,NG,L,Tso
+ldq,NG,N,Lufu
+lea,CD,L,Lega-Shabunda
+leb,ZM,L,Lala-Bisa
+lec,BO,N,Leco
+led,CD,L,Lendu
+lee,BF,L,Lyélé
+lef,GH,L,Lelemi
+leg,PY,L,Lengua
+leh,ZM,L,Lenje
+lei,PG,L,Lemio
+lej,CD,L,Lengola
+lek,PG,L,Leipon
+lel,CD,L,Lele
+lem,CM,L,Nomaande
+len,HN,N,Lenca
+leo,CM,S,Leti
+lep,IN,L,Lepcha
+leq,PG,L,Lembena
+ler,PG,L,Lenkau
+les,CD,L,Lese
+let,PG,L,Lesing-Gelimi
+leu,PG,L,Kara
+lev,ID,L,Lamma
+lew,ID,L,"Kaili, Ledo"
+lex,ID,L,Luang
+ley,ID,L,Lemolang
+lez,RU,L,Lezgi
+lfa,CM,L,Lefa
+lga,SB,L,Lungga
+lgb,SB,N,Laghu
+lgg,UG,L,Lugbara
+lgh,VN,L,Laghuu
+lgi,ID,N,Lengilu
+lgk,VU,L,Lingarak
+lgl,SB,L,Wala
+lgm,CD,L,Lega-Mwenga
+lgn,ET,L,Opuuo
+lgq,GH,L,Logba
+lgr,SB,L,Lengo
+lgt,PG,L,Pahi
+lgu,SB,L,Longgu
+lgz,CD,L,Ligenza
+lha,VN,L,Laha
+lhh,ID,L,Laha
+lhl,IN,L,"Lohar, Lahul"
+lhm,NP,L,Lhomi
+lhn,MY,L,Lahanan
+lhp,BT,L,Lhokpu
+lhs,SY,E,Mlahsö
+lht,VU,L,Toga
+lhu,CN,L,Lahu
+lia,SL,L,"Limba, West-Central"
+lib,PG,L,Likum
+lic,CN,L,Hlai
+lid,PG,L,Nyindrou
+lie,CD,L,Likila
+lif,NP,L,Limbu
+lig,GH,L,Ligbi
+lih,PG,L,Lihir
+lii,NP,N,Lingkhim
+lij,IT,L,Ligurian
+lik,CD,L,Lika
+lil,CA,L,Lillooet
+lim,NL,L,Limburgisch
+lin,CD,L,Lingala
+lio,ID,L,Liki
+lip,GH,L,Sekpele
+liq,ET,L,Libido
+lir,LR,L,Liberian English
+lis,CN,L,Lisu
+lit,LT,L,Lithuanian
+liu,SD,L,Logorik
+liv,LV,L,Liv
+liw,ID,L,Lembak
+lix,ID,L,Liabuku
+liy,CF,L,Banda-Bambari
+liz,CD,L,Libinza
+lje,ID,L,Rampi
+lji,ID,L,Laiyolo
+ljl,ID,L,Li'o
+ljp,ID,L,Lampung
+lka,TL,L,Lakalei
+lke,UG,L,Kenyi
+lkh,BT,L,Lakha
+lki,IR,L,Laki
+lkj,MY,L,Remun
+lkl,PG,L,Laeko-Libuat
+lkn,VU,L,Lakona
+lkr,SD,L,Päri
+lkt,US,L,Lakota
+lky,SD,L,Lokoya
+lla,NG,L,Lala-Roba
+llb,MZ,L,Lolo
+llc,GN,L,Lele
+lld,IT,L,Ladin
+lle,PG,L,Lele
+llf,PG,E,Hermit
+llg,ID,L,Lole
+lli,CG,L,Teke-Laali
+llk,MY,L,Lelak
+lll,PG,L,Lilau
+llm,ID,L,Lasalimu
+lln,TD,L,Lele
+llo,LA,L,Khlor
+llp,VU,L,"Efate, North"
+llq,ID,L,Lolak
+lls,LT,L,Lithuanian Sign Language
+llu,SB,L,Lau
+llx,FJ,L,Lauan
+lma,GN,L,"Limba, East"
+lmb,VU,L,Merei
+lmc,AU,N,Limilngan
+lmd,SD,L,Lumun
+lme,TD,L,Pévé
+lmf,ID,L,"Lembata, South"
+lmg,PG,L,Lamogai
+lmh,NP,L,Lambichhong
+lmi,CD,L,Lombi
+lmj,ID,L,"Lembata, West"
+lmk,IN,L,Lamkang
+lml,VU,L,Hano
+lmm,KH,L,Lamam
+lmn,IN,L,Lambadi
+lmo,IT,L,Lombard
+lmp,CM,L,Limbum
+lmq,ID,L,Lamatuka
+lmr,ID,L,Lamalera
+lms,FR,L,Limousin
+lmt,ID,L,Lematang
+lmu,VU,L,Lamenu
+lmv,FJ,L,Lomaiviti
+lmw,US,N,"Miwok, Lake"
+lmx,CM,L,Laimbue
+lmy,ID,L,Lamboya
+lmz,US,E,Lumbee
+lna,CF,L,Langbashe
+lnb,NA,L,Mbalanhu
+lnc,FR,L,Languedocien
+lnd,ID,L,Lundayeh
+lnh,MY,L,Lanoh
+lni,PG,L,Lantanai
+lnj,AU,E,Leningitij
+lnl,CF,L,"Banda, South Central"
+lnm,PG,L,Langam
+lnn,VU,L,Lorediakarkar
+lno,SD,L,Lango
+lns,CM,L,Lamnso'
+lnt,ID,L,Lintang
+lnu,NG,L,Longuda
+lnz,CD,L,Lonzo
+loa,ID,L,Loloda
+lob,BF,L,Lobi
+loc,PH,L,Inonhan
+lod,MY,L,Berawan
+loe,ID,L,"Saluan, Coastal"
+lof,SD,L,Logol
+log,CD,L,Logo
+loh,SD,L,Narim
+loi,CI,L,Loma
+loj,PG,L,Lou
+lok,SL,L,Loko
+lol,CD,L,Mongo-Nkundu
+lom,LR,L,Loma
+lon,MW,L,"Lomwe, Malawi"
+loo,CD,L,Lombo
+lop,NG,L,Lopa
+loq,CD,L,Lobala
+lor,CI,L,Téén
+los,PG,L,Loniu
+lot,SD,L,Otuho
+lou,US,L,Louisiana Creole French
+lov,MM,L,Lopi
+low,MY,L,"Lobu, Tampias"
+lox,ID,N,Loun
+loy,NP,L,Lowa
+loz,ZM,L,Lozi
+lpa,VU,L,Lelepa
+lpe,ID,L,Lepki
+lpo,CN,L,Lipo
+lpx,SD,L,Lopit
+lra,MY,L,Lara'
+lrc,IR,L,"Luri, Northern"
+lre,CA,E,Laurentian
+lrg,AU,N,Laragia
+lrk,PK,L,Loarki
+lrl,IR,L,Lari
+lrn,ID,L,Lorang
+lro,SD,L,Laro
+lrr,NP,L,"Lorung, Southern"
+lrv,VU,L,Larevat
+lsa,IR,L,Lasgerdi
+lsd,IL,L,Lishana Deni
+lse,CD,L,Lusengo
+lsg,FR,L,Lyons Sign Language
+lsi,MM,L,Lashi
+lsl,LV,L,Latvian Sign Language
+lso,LA,L,Laos Sign Language
+lsr,PG,L,Aruop
+lss,PK,L,Lasi
+lti,ID,L,Leti
+ltu,ID,L,Latu
+ltz,LU,L,Luxembourgeois
+lua,CD,L,Luba-Kasai
+lub,CD,L,Luba-Katanga
+luc,UG,L,Aringa
+lud,RU,L,Ludian
+lue,ZM,L,Luvale
+luf,PG,N,Laua
+lug,UG,L,Ganda
+lui,US,L,Luiseño
+luj,CD,L,Luna
+luk,BT,L,Lunanakha
+lul,SD,L,Olu'bo
+lum,AO,L,Luimbi
+lun,ZM,L,Lunda
+luo,KE,L,Luo
+lup,GA,L,Lumbu
+luq,CU,S,Lucumi
+lur,ID,L,Laura
+lus,IN,L,Mizo
+lut,US,N,Lushootseed
+luu,NP,L,Lumba-Yakkha
+luv,OM,L,Luwati
+luw,CM,N,Luo
+luy,KE,L,Luyia
+luz,IR,L,"Luri, Southern"
+lva,TL,L,Maku'a
+lvk,SB,L,Lavukaleve
+lvu,ID,L,Levuka
+lwa,CD,L,Lwalu
+lwe,ID,L,Lewo Eleng
+lwh,VN,L,"Lachi, White"
+lwl,TH,L,"Lawa, Eastern"
+lwo,SD,L,Luwo
+lwt,ID,L,Lewotobi
+lww,VU,L,Lewo
+lya,BT,L,Layakha
+lyn,ZM,L,Luyana
+lzl,VU,L,Litzlitz
+lzz,TR,L,Laz
+maa,MX,L,"Mazatec, San Jerónimo Tecóatl"
+mab,MX,L,"Mixtec, Yutanduchi"
+mad,ID,L,Madura
+mae,NG,L,Bo-Rukul
+maf,CM,L,Mafa
+mag,IN,L,Magahi
+mah,MH,L,Marshallese
+mai,IN,L,Maithili
+maj,MX,L,"Mazatec, Jalapa de Díaz"
+mak,ID,L,Makasar
+mal,IN,L,Malayalam
+mam,GT,L,"Mam, Northern"
+man,GN,L,Mandingo
+maq,MX,L,"Mazatec, Chiquihuitlán"
+mar,IN,L,Marathi
+mas,KE,L,Maasai
+mat,MX,N,"Matlatzinca, San Francisco"
+mau,MX,L,"Mazatec, Huautla"
+mav,BR,L,Sateré-Mawé
+maw,GH,L,Mampruli
+max,ID,L,"Malay, North Moluccan"
+maz,MX,L,Mazahua Central
+mba,PH,L,Higaonon
+mbb,PH,L,"Manobo, Western Bukidnon"
+mbc,BR,L,Macushi
+mbd,PH,L,"Manobo, Dibabawon"
+mbe,US,E,Molale
+mbf,SG,L,"Malay, Baba"
+mbg,BR,L,"Nambikuára, Northern"
+mbh,PG,L,Mangseng
+mbi,PH,L,"Manobo, Ilianen"
+mbj,BR,L,Nadëb
+mbk,PG,L,Malol
+mbl,BR,L,Maxakalí
+mbm,CG,L,Ombamba
+mbn,CO,L,Macaguán
+mbo,CM,L,Mbo
+mbp,CO,L,Malayo
+mbq,PG,L,Maisin
+mbr,CO,L,Nukak Makú
+mbs,PH,L,"Manobo, Sarangani"
+mbt,PH,L,"Manobo, Matigsalug"
+mbu,NG,L,Mbula-Bwazza
+mbv,GN,L,Mbulungish
+mbw,PG,L,Maring
+mbx,PG,L,Mari
+mby,PK,L,Memoni
+mbz,MX,L,"Mixtec, Amoltepec"
+mca,PY,L,Maca
+mcb,PE,L,Machiguenga
+mcc,PG,L,Bitur
+mcd,PE,L,Sharanahua
+mce,MX,L,"Mixtec, Itundujia"
+mcf,PE,L,Matsés
+mcg,VE,N,Mapoyo
+mch,VE,L,Maquiritari
+mci,PG,L,Mese
+mcj,NG,L,Mvanip
+mck,ZM,L,Mbunda
+mcl,CO,E,Macaguaje
+mcm,MY,L,Malaccan Creole Portuguese
+mcn,TD,L,Masana
+mco,MX,L,"Mixe, Coatlán"
+mcp,CM,L,Makaa
+mcq,PG,L,Ese
+mcr,PG,L,Menya
+mcs,CM,L,Mambai
+mct,CM,L,Mengisa
+mcu,CM,L,"Mambila, Cameroon"
+mcv,PG,L,Minanibai
+mcw,TD,L,Mawa
+mcx,CF,L,Mpiemo
+mcy,PG,L,"Watut, South"
+mcz,PG,L,Mawan
+mda,NG,L,Mada
+mdb,PG,L,Morigi
+mdc,PG,L,Male
+mdd,CM,L,Mbum
+mde,TD,L,Maba
+mdf,RU,L,Moksha
+mdg,TD,N,Massalat
+mdh,PH,L,Maguindanao
+mdi,CD,L,Mamvu
+mdj,CD,L,Mangbetu
+mdk,CD,L,Mangbutu
+mdl,MT,L,Maltese Sign Language
+mdm,CD,L,Mayogo
+mdn,CF,L,Mbati
+mdo,CF,L,"Gbaya, Southwest"
+mdp,CD,L,Mbala
+mdq,CD,L,Mbole
+mdr,ID,L,Mandar
+mds,PG,L,Maria
+mdt,CG,L,Mbere
+mdu,CG,L,Mboko
+mdv,MX,L,"Mixtec, Santa Lucía Monteverde"
+mdw,CG,L,Mbosi
+mdx,ET,L,Dizi
+mdy,ET,L,Male
+mdz,BR,L,Suruí do Pará
+mea,CM,L,Menka
+meb,PG,L,Ikobi-Mena
+mec,AU,N,Mara
+med,PG,L,Melpa
+mee,PG,L,Mengen
+mef,BD,L,Megam
+meg,NC,L,Mea
+meh,MX,L,"Mixtec, Southwestern Tlaxiaco"
+mei,SD,L,Midob
+mej,ID,L,Meyah
+mek,PG,L,Mekeo
+mel,MY,L,Melanau
+mem,AU,E,Mangala
+men,SL,L,Mende
+meo,MY,L,"Malay, Kedah"
+mep,AU,N,Miriwung
+meq,CM,L,Merey
+mer,KE,L,Meru
+mes,TD,L,Masmaje
+met,PG,L,Mato
+meu,PG,L,Motu
+mev,LR,L,Mann
+mew,NG,L,Maaka
+mey,MR,L,Hassaniyya
+mez,US,N,Menominee
+mfa,TH,L,"Malay, Pattani"
+mfb,ID,N,Lom
+mfc,CD,L,Mba
+mfd,CM,L,Mendankwe-Nkwen
+mfe,MU,L,Morisyen
+mff,CM,L,Naki
+mfg,GN,L,Mixifore
+mfh,CM,L,Matal
+mfi,CM,L,Wandala
+mfj,CM,L,Mefele
+mfk,CM,L,"Mofu, North"
+mfl,NG,N,Putai
+mfm,NG,L,Marghi South
+mfn,NG,L,"Mbembe, Cross River"
+mfo,NG,L,Mbe
+mfp,ID,L,"Malay, Makassar"
+mfq,TG,L,Moba
+mfr,AU,N,Marithiel
+mfs,MX,L,Mexican Sign Language
+mft,PG,L,Mokerang
+mfu,AO,L,Mbwela
+mfv,GW,L,Mandjak
+mfw,PG,E,Mulaha
+mfx,ET,L,Melo
+mfy,MX,L,Mayo
+mfz,SD,L,Mabaan
+mgb,TD,L,Mararit
+mgc,SD,L,Morokodo
+mgd,SD,L,Moru
+mge,TD,L,Mango
+mgf,ID,L,Maklew
+mgg,CM,L,Mpongmpong
+mgh,MZ,L,Makhuwa-Meetto
+mgi,NG,L,Lijili
+mgj,NG,L,Abureni
+mgk,ID,L,Mawes
+mgl,PG,L,Maleu-Kilenge
+mgm,TL,L,Mambae
+mgn,CF,L,Mbangi
+mgo,CM,L,Meta'
+mgp,NP,L,"Magar, Eastern"
+mgq,TZ,L,Malila
+mgr,ZM,L,Mambwe-Lungu
+mgs,TZ,L,Manda
+mgt,PG,L,Mongol
+mgu,PG,L,Mailu
+mgv,TZ,L,Matengo
+mgw,TZ,L,Matumbi
+mgx,PG,L,Omati
+mgy,TZ,L,Mbunga
+mgz,TZ,L,Mbugwe
+mha,IN,L,Manda
+mhb,GA,L,Mahongwe
+mhc,MX,L,Mocho
+mhd,TZ,L,Mbugu
+mhe,MY,L,Besisi
+mhf,PG,L,Mamaa
+mhg,AU,N,Margu
+mhh,PY,S,Maskoy Pidgin
+mhi,UG,L,Ma'di
+mhj,AF,L,Mogholi
+mhk,CM,L,Mungaka
+mhl,PG,L,Mauwake
+mhm,MZ,L,Makhuwa-Moniga
+mhn,IT,L,Mócheno
+mho,ZM,L,Mashi
+mhp,ID,L,"Malay, Balinese"
+mhq,US,N,Mandan
+mhr,RU,L,"Mari, Eastern"
+mhs,ID,L,Buru
+mht,VE,L,Mandahuaca
+mhu,IN,L,Digaro-Mishmi
+mhv,MM,L,Arakanese
+mhw,NA,L,Mbukushu
+mhx,MM,L,Maru
+mhy,ID,L,Ma'anyan
+mhz,ID,L,Mor
+mia,US,E,Miami
+mib,MX,L,"Mixtec, Atatláhuca"
+mic,CA,L,Micmac
+mid,IR,L,Mandaic
+mie,MX,L,"Mixtec, Ocotepec"
+mif,CM,L,Mofu-Gudur
+mig,MX,L,"Mixtec, San Miguel el Grande"
+mih,MX,L,"Mixtec, Chayuco"
+mii,MX,L,"Mixtec, Chigmecatitlán"
+mij,CM,L,Abar
+mik,US,L,Mikasuki
+mil,MX,L,"Mixtec, Peñoles"
+mim,MX,L,"Mixtec, Alacatlatzala"
+min,ID,L,Minangkabau
+mio,MX,L,"Mixtec, Pinotepa Nacional"
+mip,MX,L,"Mixtec, Apasco-Apoala"
+miq,NI,L,Mískito
+mir,MX,L,"Mixe, Isthmus"
+mit,MX,L,"Mixtec, Southern Puebla"
+miu,MX,L,"Mixtec, Cacaloxtepec"
+miv,TD,L,Mimi
+miw,PG,L,Akoye
+mix,MX,L,"Mixtec, Mixtepec"
+miy,MX,L,"Mixtec, Ayutla"
+miz,MX,L,"Mixtec, Coatzospan"
+mja,MM,L,Mahei
+mjc,MX,L,"Mixtec, San Juan Colorado"
+mjd,US,N,"Maidu, Northwest"
+mje,TD,E,Muskum
+mjg,CN,L,Tu
+mjh,TZ,L,Mwera
+mji,CN,L,Kim Mun
+mjj,PG,L,Mawak
+mjk,PG,L,Matukar
+mjl,IN,L,Mandeali
+mjm,PG,L,Medebur
+mjn,PG,L,Ma
+mjo,IN,L,Malankuravan
+mjp,IN,L,Malapandaram
+mjq,IN,L,Malaryan
+mjr,IN,L,Malavedan
+mjs,NG,L,Miship
+mjt,IN,L,Sauria Paharia
+mju,IN,L,Manna-Dora
+mjv,IN,L,Mannan
+mjw,IN,L,Karbi
+mjx,IN,L,Mahali
+mjy,US,E,Mahican
+mjz,NP,L,Majhi
+mka,CI,L,Mbre
+mkb,IN,L,Mal Paharia
+mkc,PG,L,Siliput
+mkd,MK,L,Macedonian
+mke,IN,L,Mawchi
+mkf,NG,L,Miya
+mkg,CN,L,Mak
+mki,PK,L,Dhatki
+mkj,FM,L,Mokilese
+mkk,CM,L,Byep
+mkl,BJ,L,Mokole
+mkm,TH,L,Moklen
+mkn,ID,L,"Malay, Kupang"
+mko,NG,L,Mingang Doso
+mkp,PG,L,Moikodi
+mkq,US,E,"Miwok, Bay"
+mkr,PG,L,Malas
+mks,MX,L,"Mixtec, Silacayoapan"
+mkt,NC,L,Vamale
+mku,GN,L,"Maninka, Konyanka"
+mkv,VU,L,Mafea
+mkw,CG,L,Kituba
+mkx,PH,L,"Manobo, Cinamiguin"
+mky,ID,L,"Makian, East"
+mkz,TL,L,Makasae
+mla,VU,L,Malo
+mlb,CM,L,Mbule
+mlc,VN,L,Cao Lan
+mld,AF,L,Malakhel
+mle,PG,L,Manambu
+mlf,LA,L,Mal
+mlg,MG,L,Malagasy
+mlh,PG,L,Mape
+mli,ID,L,Malimpung
+mlj,TD,L,Miltu
+mlk,KE,L,Malakote
+mll,VU,L,Malua Bay
+mlm,CN,L,Mulam
+mln,SB,L,Malango
+mlo,SN,L,Mlomp
+mlp,PG,L,Bargam
+mlq,SN,L,"Maninkakan, Western"
+mlr,CM,L,Vame
+mls,SD,L,Masalit
+mlt,MT,L,Maltese
+mlu,SB,L,To'abaita
+mlv,VU,L,Motlav
+mlw,CM,L,Moloko
+mlx,VU,L,Malfaxal
+mly,MY,L,Malay
+mlz,PH,L,Malaynon
+mma,NG,L,Mama
+mmb,ID,L,Momina
+mmc,MX,L,"Mazahua, Michoacán"
+mmd,CN,L,Maonan
+mme,VU,L,Mae
+mmf,NG,L,Mundat
+mmg,VU,L,"Ambrym, North"
+mmh,BR,L,Mehináku
+mmi,PG,L,Musar
+mmj,IN,L,Majhwar
+mmk,IN,L,Mukha-Dora
+mml,CN,L,Man Met
+mmm,VU,L,Maii
+mmn,PH,L,Mamanwa
+mmo,PG,L,"Buang, Mangga"
+mmp,PG,L,Musan
+mmq,PG,L,Musak
+mmr,CN,L,"Hmong, Western Xiangxi"
+mms,GT,L,"Mam, Southern"
+mmt,PG,L,Malalamai
+mmu,CM,L,Mmaala
+mmv,BR,E,Miriti
+mmw,VU,L,Emae
+mmx,PG,L,Madak
+mmy,TD,L,Migaama
+mmz,CD,L,Mabaale
+mna,PG,L,Mbula
+mnb,ID,L,Muna
+mnc,CN,L,Manchu
+mnd,BR,N,Mondé
+mne,TD,L,Naba
+mnf,CM,L,Mundani
+mng,VN,L,"Mnong, Eastern"
+mnh,CD,L,Mono
+mni,IN,L,Meitei
+mnj,AF,L,Munji
+mnk,SN,L,Mandinka
+mnl,VU,L,Tiale
+mnm,PG,L,Mapena
+mnn,VN,L,"Mnong, Southern"
+mnp,CN,L,"Chinese, Min Bei"
+mnq,MY,L,Minriq
+mnr,US,N,Mono
+mns,RU,L,Mansi
+mnt,AU,E,Maykulan
+mnu,ID,L,Mer
+mnv,SB,L,Rennell-Belona
+mnw,MM,L,Mon
+mnx,ID,L,Manikion
+mny,MZ,L,Manyawa
+mnz,ID,L,Moni
+moa,CI,L,Mwan
+mob,IN,L,Moinba
+moc,AR,L,Mocoví
+mod,US,E,Mobilian
+moe,CA,L,Montagnais
+mof,US,E,Mohegan-Montauk-Narragansett
+mog,ID,L,Mongondow
+moh,CA,L,Mohawk
+moi,NG,L,Mboi
+moj,CG,L,Monzombo
+mok,ID,L,Morori
+mom,NI,E,Monimbo
+mon,MN,L,Mongolian
+moo,VN,L,Monom
+mop,BZ,L,"Maya, Mopán"
+moq,ID,N,Mor
+mor,SD,L,Moro
+mos,BF,L,Mòoré
+mot,CO,L,Barí
+mou,TD,L,Mogum
+mov,US,L,Mohave
+mow,CG,L,Moi
+mox,PG,L,Molima
+moy,ET,L,Shekkacho
+moz,TD,L,Mukulu
+mpa,TZ,L,Mpoto
+mpb,AU,N,Mullukmulluk
+mpc,AU,N,Mangarayi
+mpd,BR,L,Machinere
+mpe,ET,L,Majang
+mpf,GT,L,"Mam, Tajumulco"
+mpg,TD,L,Marba
+mph,AU,L,Maung
+mpi,CM,L,Mpade
+mpj,AU,L,Martu Wangka
+mpk,TD,L,Mbara
+mpl,PG,L,"Watut, Middle"
+mpm,MX,L,"Mixtec, Yosondúa"
+mpn,PG,L,Mindiri
+mpo,PG,L,Miu
+mpp,PG,L,Migabac
+mpq,BR,L,Matís
+mpr,SB,L,Vangunu
+mps,PG,L,Dadibi
+mpt,PG,L,Mian
+mpu,BR,L,Makuráp
+mpv,PG,L,Munkip
+mpw,BR,N,Mapidian
+mpx,PG,L,Misima-Paneati
+mpy,ID,N,Mapia
+mpz,TH,L,Mpi
+mqa,ID,L,Maba
+mqb,CM,L,Mbuko
+mqc,ID,L,Mangole
+mqd,MY,L,Madang
+mqe,PG,L,Matepi
+mqf,ID,L,Momuna
+mqg,ID,L,"Malay, Kota Bangun Kutai"
+mqh,MX,L,"Mixtec, Tlazoyaltepec"
+mqi,ID,L,Mariri
+mqj,ID,L,Mamasa
+mqk,PH,L,"Manobo, Rajah Kabunsuwan"
+mql,BJ,L,Mbelime
+mqm,PF,L,"Marquesan, South"
+mqn,ID,L,Moronene
+mqo,ID,L,Modole
+mqp,ID,L,Manipa
+mqq,MY,L,Minokok
+mqr,ID,N,Mander
+mqs,ID,L,"Makian, West"
+mqt,TH,N,Mok
+mqu,SD,L,Mandari
+mqv,PG,L,Mosimo
+mqw,PG,L,Murupi
+mqx,ID,L,Mamuju
+mqy,ID,L,Manggarai
+mqz,PG,L,Malasanga
+mra,TH,L,Mlabri
+mrb,VU,L,Marino
+mrc,US,L,Maricopa
+mrd,NP,L,"Magar, Western"
+mre,US,E,Martha's Vineyard Sign Language
+mrf,ID,L,Elseng
+mrg,IN,L,Miri
+mrh,IN,L,"Chin, Mara"
+mri,NZ,L,Maori
+mrj,RU,L,"Mari, Western"
+mrk,NC,L,Hmwaveke
+mrl,FM,L,Mortlockese
+mrm,VU,L,Merlav
+mrn,SB,L,Cheke Holo
+mro,BD,L,Mru
+mrp,VU,L,Morouas
+mrq,PF,L,"Marquesan, North"
+mrr,IN,L,Maria
+mrs,VU,N,Maragus
+mrt,NG,L,Marghi Central
+mru,CM,L,Mono
+mrv,PF,L,Mangareva
+mrw,PH,L,Maranao
+mrx,ID,L,Maremgi
+mry,PH,L,"Mandaya, Karaga"
+mrz,ID,L,Marind
+msa,MY,L,Malay (macrolanguage)
+msb,PH,L,Masbatenyo
+msc,GN,L,"Maninka, Sankaran"
+msd,MX,L,Yucatec Maya Sign Language
+mse,TD,L,Musey
+msf,ID,L,Mekwei
+msg,ID,L,Moraid
+msh,MG,L,"Malagasy, Masikoro"
+msi,MY,L,"Malay, Sabah"
+msj,CD,L,Ma
+msk,PH,L,Mansaka
+msl,ID,L,Molof
+msm,PH,L,"Manobo, Agusan"
+msn,VU,L,Mosina
+mso,ID,L,Mombum
+msp,BR,E,Maritsauá
+msq,NC,L,Caac
+msr,MN,L,Mongolian Sign Language
+mss,ID,L,"Masela, West"
+mst,PH,L,"Mandaya, Cataelano"
+msu,PG,L,Musom
+msv,CM,L,Maslam
+msw,GW,L,Mansoanka
+msx,PG,L,Moresada
+msy,PG,L,Aruamu
+msz,PG,L,Momare
+mta,PH,L,"Manobo, Cotabato"
+mtb,CI,L,Anyin Morofo
+mtc,PG,L,Munit
+mtd,ID,L,Mualang
+mte,SB,L,Mono
+mtf,PG,L,Murik
+mtg,ID,L,Una
+mth,ID,L,Munggui
+mti,PG,L,Maiwa
+mtj,ID,L,Moskona
+mtk,CM,L,Mbe'
+mtl,NG,L,Montol
+mtm,RU,E,Mator
+mtn,NI,E,Matagalpa
+mto,MX,L,"Mixe, Totontepec"
+mtp,BO,L,Wichí Lhamtés Nocten
+mtq,VN,L,Muong
+mtr,IN,L,Mewari
+mts,PE,L,Yora
+mtt,VU,L,Mota
+mtu,MX,L,"Mixtec, Tututepec"
+mtv,PG,L,Asaro'o
+mtw,PH,L,Magahat
+mtx,MX,L,"Mixtec, Tidaá"
+mty,PG,L,Nabi
+mtz,GT,L,Tacanec
+mua,TD,L,Mundang
+mub,TD,L,Mubi
+muc,CM,L,Mbu'
+mud,RU,N,"Aleut, Mednyj"
+mue,EC,L,Media Lengua
+mug,CM,L,Musgu
+muh,SD,L,Mündü
+mui,ID,L,Musi
+muj,TD,N,Mabire
+muk,NP,L,Mugom
+mum,PG,L,Maiwala
+muo,CM,L,Nyong
+mup,IN,L,Malvi
+muq,CN,L,"Hmong, Eastern Xiangxi"
+mur,SD,L,Murle
+mus,US,L,Muskogee
+mut,IN,L,"Muria, Western"
+muu,KE,N,Yaaku
+muv,IN,L,Muthuvan
+muw,IN,L,Mundari
+mux,PG,L,Mbo-Ung
+muy,CM,L,Muyang
+muz,ET,L,Mursi
+mva,PG,L,Manam
+mvb,US,E,Mattole
+mvc,GT,L,"Mam, Central"
+mvd,ID,L,Mamboru
+mve,PK,L,Marwari
+mvf,CN,L,"Mongolian, Peripheral"
+mvg,MX,L,"Mixtec, Yucuañe"
+mvh,TD,L,Mire
+mvi,JP,L,Miyako
+mvj,GT,L,"Mam, Todos Santos Cuchumatán"
+mvk,PG,L,Mekmek
+mvl,AU,E,Mbara
+mvm,CN,L,Muya
+mvn,PG,L,Minaveha
+mvo,SB,L,Marovo
+mvp,ID,L,Duri
+mvq,PG,L,Moere
+mvr,ID,L,Marau
+mvs,ID,L,Massep
+mvt,VU,L,Mpotovoro
+mvu,TD,L,Marfa
+mvv,MY,L,Tagal Murut
+mvw,TZ,L,Machinga
+mvx,ID,L,Meoswar
+mvy,PK,L,"Kohistani, Indus"
+mvz,ET,L,Mesqan
+mwa,PG,L,Mwatebu
+mwb,PG,L,Juwal
+mwc,PG,L,Are
+mwd,AU,N,Mudbura
+mwe,TZ,L,Mwera
+mwf,AU,L,Murrinh-Patha
+mwg,PG,L,Aiklep
+mwh,PG,L,Mouk-Aria
+mwi,VU,L,Labo
+mwj,AO,L,Maligo
+mwk,ML,L,"Maninkakan, Kita"
+mwl,PT,L,Miranda do Douro
+mwm,TD,L,Sar
+mwn,ZM,L,Nyamwanga
+mwo,VU,L,"Maewo, Central"
+mwp,AU,L,Kala Lagaw Ya
+mwq,MM,L,"Chin, Mün"
+mwr,IN,L,Marwari
+mws,KE,L,Mwimbi-Muthambi
+mwt,MM,L,Moken
+mwu,SD,E,Mittu
+mwv,ID,L,Mentawai
+mww,CN,L,Hmong Daw
+mwx,TZ,L,Mediak
+mwy,TZ,L,Mosiro
+mwz,CD,L,Moingi
+mxa,MX,L,"Mixtec, Northwest Oaxaca"
+mxb,MX,L,"Mixtec, Tezoatlán"
+mxc,ZW,L,Manyika
+mxd,ID,L,Modang
+mxe,VU,L,Mele-Fila
+mxf,CM,L,Malgbe
+mxg,AO,L,Mbangala
+mxh,CD,L,Mvuba
+mxi,ES,E,Mozarabic
+mxj,IN,L,Miju-Mishmi
+mxk,PG,L,Monumbo
+mxl,BJ,L,"Gbe, Maxi"
+mxm,PG,L,Meramera
+mxn,ID,L,Moi
+mxo,ZM,L,Mbowe
+mxp,MX,L,"Mixe, Tlahuitoltepec"
+mxq,MX,L,"Mixe, Juquila"
+mxr,MY,L,"Kayan, Murik"
+mxs,MX,L,"Mixtec, Huitepec"
+mxt,MX,L,"Mixtec, Jamiltepec"
+mxu,CM,L,Mada
+mxv,MX,L,"Mixtec, Metlatónoc"
+mxw,PG,L,Namo
+mxx,CI,L,Mahou
+mxy,MX,L,"Mixtec, Southeastern Nochixtlán"
+mxz,ID,L,"Masela, Central"
+mya,MM,L,Burmese
+myb,TD,L,Mbay
+myc,CD,L,Mayeka
+myd,PG,L,Maramba
+mye,GA,L,Myene
+myf,ET,L,Bambassi
+myg,CM,L,Manta
+myh,US,E,Makah
+myi,IN,L,Mina
+myj,SD,L,Mangayat
+myk,ML,L,"Senoufo, Mamara"
+myl,ID,L,Moma
+mym,ET,L,Me'en
+myo,ET,L,Anfillo
+myp,BR,L,Pirahã
+myq,CI,L,"Maninka, Forest"
+myr,PE,N,Muniche
+mys,ET,E,Mesmes
+myt,PH,L,"Mandaya, Sangab"
+myu,BR,L,Mundurukú
+myv,RU,L,Erzya
+myw,PG,L,Muyuw
+myx,UG,L,Masaba
+myy,CO,L,Macuna
+myz,IR,E,"Mandaic, Classical"
+mza,MX,L,"Mixtec, Santa María Zacatepec"
+mzb,DZ,L,Tumzabt
+mzc,MG,L,Madagascar Sign Language
+mzd,CM,L,Malimba
+mze,PG,L,Morawa
+mzf,PG,L,Aiku
+mzg,VA,S,Monastic Sign Language
+mzh,AR,L,Wichí Lhamtés Güisnay
+mzi,MX,L,"Mazatec, Ixcatlán"
+mzj,LR,L,Manya
+mzk,NG,L,"Mambila, Nigeria"
+mzl,MX,L,"Mixe, Mazatlán"
+mzm,NG,L,Mumuye
+mzn,IR,L,Mazanderani
+mzo,BR,L,Matipuhy
+mzp,BO,L,Movima
+mzq,ID,L,Mori Atas
+mzr,BR,L,Marúbo
+mzs,CN,L,Macanese
+mzt,MY,L,Mintil
+mzu,PG,L,Inapang
+mzv,CF,L,Manza
+mzw,GH,L,Deg
+mzx,GY,N,Mawayana
+mzy,MZ,L,Mozambican Sign Language
+mzz,PG,L,Maiadomu
+nab,BR,L,"Nambikuára, Southern"
+nac,PG,L,Narak
+nad,AU,N,Nijadali
+nae,ID,N,Naka'ela
+naf,PG,L,Nabak
+nag,IN,L,Naga Pidgin
+naj,GN,L,Nalu
+nak,PG,L,Nakanai
+nal,PG,L,Nalik
+nam,AU,L,Nangikurrunggurr
+nan,CN,L,"Chinese, Min Nan"
+nao,NP,L,Naaba
+nap,IT,L,Napoletano-Calabrese
+naq,NA,L,Nama
+nar,NG,L,Iguta
+nas,PG,L,Naasioi
+nat,NG,L,Hungworo
+nau,NR,L,Nauruan
+nav,US,L,Navajo
+naw,GH,L,Nawuri
+nax,PG,L,Nakwi
+nay,AU,E,Narrinyeri
+naz,MX,L,"Nahuatl, Coatepec"
+nba,AO,L,Nyemba
+nbb,NG,L,Ndoe
+nbc,IN,L,"Naga, Chang"
+nbd,CD,L,Ngbinda
+nbe,IN,L,"Naga, Konyak"
+nbf,CN,L,Naxi
+nbg,IN,L,Nagarchal
+nbh,NG,L,Ngamo
+nbi,IN,L,"Naga, Mao"
+nbj,AU,L,Ngarinman
+nbk,PG,L,Nake
+nbl,ZA,L,Ndebele
+nbm,CF,L,Ngbaka Ma'bo
+nbn,ID,L,Kuri
+nbo,NG,L,Nkukoli
+nbp,NG,L,Nnam
+nbq,ID,L,Nggem
+nbr,NG,L,Numana-Nunku-Gbantu-Numbu
+nbs,NA,L,Namibian Sign Language
+nbt,IN,L,Na
+nbu,IN,L,"Naga, Rongmei"
+nbv,CM,L,Ngamambo
+nbw,CD,L,"Ngbandi, Southern"
+nbx,AU,N,Ngura
+nby,PG,L,Ningera
+nca,PG,L,Iyo
+ncb,IN,L,"Nicobarese, Central"
+ncc,PG,L,Ponam
+ncd,NP,L,Nachering
+nce,PG,L,Yale
+ncf,PG,L,Notsi
+ncg,CA,L,Nisga'a
+nch,MX,L,"Nahuatl, Central Huasteca"
+nci,MX,E,"Nahuatl, Classical"
+ncj,MX,L,"Nahuatl, Northern Puebla"
+nck,AU,L,Nakara
+ncl,MX,L,"Nahuatl, Michoacán"
+ncm,PG,L,Nambo
+ncn,PG,L,Nauna
+nco,PG,L,Sibe
+ncp,CM,L,Ndaktup
+ncr,CM,L,Ncane
+ncs,NI,L,Nicaraguan Sign Language
+nct,IN,L,"Naga, Chothe"
+ncu,GH,L,Chumburung
+ncx,MX,L,"Nahuatl, Central Puebla"
+ncz,US,E,Natchez
+nda,CG,L,Ndasa
+ndb,CM,L,Kenswei Nsei
+ndc,MZ,L,Ndau
+ndd,NG,L,Nde-Nsele-Nta
+nde,ZW,L,Ndebele
+ndg,TZ,L,Ndengereko
+ndh,TZ,L,Ndali
+ndi,NG,L,Samba Leko
+ndj,TZ,L,Ndamba
+ndk,CD,L,Ndaka
+ndl,CD,L,Ndolo
+ndm,TD,L,Ndam
+ndn,CG,L,Ngundi
+ndo,NA,L,Ndonga
+ndp,UG,L,Ndo
+ndq,AO,L,Ndombe
+ndr,NG,L,Ndoola
+nds,DE,L,"Saxon, Low"
+ndt,CD,L,Ndunga
+ndu,CM,L,Dugun
+ndv,SN,L,Ndut
+ndw,CD,L,Ndobo
+ndx,ID,L,Nduga
+ndy,CF,L,Lutos
+ndz,SD,L,Ndogo
+nea,ID,L,"Ngad'a, Eastern"
+neb,CI,L,Toura
+nec,ID,L,Nedebang
+ned,NG,L,Nde-Gbite
+nee,NC,L,Kumak
+nef,IN,L,Nefamese
+neg,RU,L,Negidal
+neh,BT,L,Nyenkha
+nej,PG,L,Neko
+nek,NC,L,Neku
+nem,NC,L,Nemi
+nen,NC,L,Nengone
+neo,VN,L,Ná-Meo
+nep,NP,L,Nepali
+neq,MX,L,"Mixe, North Central"
+ner,ID,L,Yahadian
+nes,IN,L,"Kinnauri, Bhoti"
+net,PG,L,Nete
+nev,LA,L,Nyaheun
+new,NP,L,Newar
+nex,PG,L,Neme
+ney,CI,L,Neyo
+nez,US,L,Nez Perce
+nfa,ID,L,Dhao
+nfd,NG,L,Ndun
+nfg,NG,L,Nyeng
+nfk,NG,L,Shakara
+nfl,SB,L,Ayiwo
+nfr,GH,L,Nafaanra
+nfu,CM,L,Mfumte
+nga,CD,L,Ngbaka
+ngb,CD,L,"Ngbandi, Northern"
+ngc,CD,L,Ngombe
+ngd,CF,L,Ngando
+nge,CM,L,Ngemba
+ngg,CF,L,Ngbaka Manza
+ngh,ZA,N,N|u
+ngi,NG,L,Ngizim
+ngj,CM,L,Ngie
+ngk,AU,N,Ngalkbun
+ngl,MZ,L,Lomwe
+ngm,FM,L,Ngatik Men's Creole
+ngn,CM,L,Ngwo
+ngo,TZ,L,Ngoni
+ngp,TZ,L,Ngulu
+ngq,TZ,L,Ngurimi
+ngr,SB,L,Nanggu
+ngs,NG,L,Gvoko
+ngt,LA,L,Ngeq
+ngu,MX,L,"Nahuatl, Guerrero"
+ngv,CM,E,Nagumi
+ngw,NG,L,Ngwaba
+ngx,NG,L,Nggwahyi
+ngy,CM,L,Tibea
+ngz,CG,L,Ngungwel
+nhb,CI,L,Beng
+nhc,MX,E,"Nahuatl, Tabasco"
+nhd,PY,L,Chiripá
+nhe,MX,L,"Nahuatl, Eastern Huasteca"
+nhf,AU,N,Nhuwala
+nhg,MX,L,"Nahuatl, Tetelcingo"
+nhh,IN,L,Nahari
+nhi,MX,L,"Nahuatl, Tenango"
+nhj,MX,L,"Nahuatl, Tlalitzlipa"
+nhk,MX,L,"Nahuatl, Isthmus-Cosoleacaque"
+nhm,MX,L,"Nahuatl, Morelos"
+nhn,MX,L,"Nahuatl, Central"
+nho,PG,L,Takuu
+nhp,MX,L,"Nahuatl, Isthmus-Pajapan"
+nhq,MX,L,"Nahuatl, Huaxcaleca"
+nhr,BW,L,Naro
+nhs,MX,L,"Nahuatl, Southeastern Puebla"
+nht,MX,L,"Nahuatl, Ometepec"
+nhu,CM,L,Noone
+nhv,MX,L,"Nahuatl, Temascaltepec"
+nhw,MX,L,"Nahuatl, Western Huasteca"
+nhx,MX,L,"Nahuatl, Isthmus-Mecayapan"
+nhy,MX,L,"Nahuatl, Northern Oaxaca"
+nhz,MX,L,"Nahuatl, Santa María la Alta"
+nia,ID,L,Nias
+nib,PG,L,Nakama
+nid,AU,E,Ngandi
+nie,TD,L,Niellim
+nif,PG,L,Nek
+nig,AU,N,Ngalakan
+nih,TZ,L,Nyiha
+nii,PG,L,Nii
+nij,ID,L,Ngaju
+nik,IN,L,"Nicobarese, Southern"
+nil,ID,L,Nila
+nim,TZ,L,Nilamba
+nin,NG,L,Ninzo
+nio,RU,L,Nganasan
+nir,ID,L,Nimboran
+nis,PG,L,Nimi
+nit,IN,L,"Kolami, Southeastern"
+niu,NU,L,Niue
+niv,RU,L,Gilyak
+niw,PG,L,Nimo
+nix,CD,L,Hema
+niy,CD,L,Ngiti
+niz,PG,L,Ningil
+nja,NG,L,Nzanyi
+njb,IN,L,"Naga, Nocte"
+njd,TZ,L,Ndonde Hamba
+njh,IN,L,"Naga, Lotha"
+nji,AU,N,Gudanji
+njj,CM,L,Njen
+njl,SD,L,Njalgulgule
+njm,IN,L,"Naga, Angami"
+njn,IN,L,"Naga, Liangmai"
+njo,IN,L,"Naga, Ao"
+njr,NG,N,Njerep
+njs,ID,L,Nisa
+njt,SR,S,Ndyuka-Trio Pidgin
+nju,AU,N,Ngadjunmaya
+njx,CG,L,Kunyi
+njy,CM,L,Njyem
+nka,ZM,L,Nkoya
+nkb,IN,L,"Naga, Khoibu"
+nkc,CM,L,Nkongho
+nkd,IN,L,Koireng
+nke,SB,L,Duke
+nkf,IN,L,"Naga, Inpui"
+nkg,PG,L,Nekgini
+nkh,IN,L,"Naga, Khezha"
+nki,IN,L,"Naga, Thangal"
+nkj,ID,L,Nakai
+nkk,VU,L,Nokuku
+nkm,PG,L,Namat
+nkn,AO,L,Nkangala
+nko,GH,L,Nkonya
+nkp,TO,E,Niuatoputapu
+nkr,FM,L,Nukuoro
+nks,ID,L,"Asmat, North"
+nku,CI,L,"Kulango, Bouna"
+nkw,CD,L,Nkutu
+nkx,NG,L,Nkoroo
+nky,IN,L,"Naga, Khiamniungan"
+nkz,NG,L,Nkari
+nla,CM,L,Ngombale
+nlc,ID,L,Nalca
+nld,NL,L,Dutch
+nle,KE,L,"Nyala, East"
+nlg,SB,L,Gela
+nli,AF,L,Grangali
+nlj,CD,L,Nyali
+nlk,ID,L,"Yali, Ninia"
+nll,IN,L,Nihali
+nln,MX,L,"Nahuatl, Durango"
+nlo,CD,L,Ngul
+nlr,AU,N,Ngarla
+nlu,GH,L,Nchumbulu
+nlv,MX,L,"Nahuatl, Orizaba"
+nlx,IN,L,Nahali
+nly,AU,N,Nyamal
+nma,IN,L,"Naga, Maram"
+nmb,VU,L,"Nambas, Big"
+nmc,TD,L,Ngam
+nmd,GA,L,Ndumu
+nme,IN,L,"Naga, Mzieme"
+nmf,IN,L,"Naga, Tangkhul"
+nmg,CM,L,Ngumba
+nmh,IN,L,"Naga, Monsang"
+nmi,NG,L,Nyam
+nmj,CF,L,Ngombe
+nmk,VU,L,Namakura
+nml,CM,L,Ndemli
+nmm,NP,L,Manangba
+nmn,BW,L,!Xóõ
+nmo,IN,L,"Naga, Moyon"
+nmp,AU,N,Nimanbur
+nmq,ZW,L,Nambya
+nmr,CM,L,Nimbari
+nms,VU,L,Letemboi
+nmt,FM,L,Namonuito
+nmu,US,N,"Maidu, Northeast"
+nmv,AU,N,Ngamini
+nmw,PG,L,Nimoa
+nmx,PG,L,Nama
+nmy,CN,L,Namuyi
+nmz,TG,L,Nawdm
+nna,AU,L,Nyangumarta
+nnb,CD,L,Nande
+nnc,TD,L,Nancere
+nnd,VU,L,"Ambae, West"
+nne,AO,L,Ngandyera
+nnf,PG,L,Ngaing
+nng,IN,L,"Naga, Maring"
+nnh,CM,L,Ngiemboon
+nni,ID,L,"Nuaulu, North"
+nnj,ET,L,Nyangatom
+nnk,PG,L,Nankina
+nnl,IN,L,"Naga, Northern Rengma"
+nnm,PG,L,Namia
+nnn,TD,L,Ngete
+nno,NO,L,"Norwegian, Nynorsk"
+nnp,IN,L,"Naga, Wancho"
+nnq,TZ,L,Ngindo
+nnr,AU,E,Narungga
+nns,NG,L,Ningye
+nnt,US,E,Nanticoke
+nnu,GH,L,Dwang
+nnv,AU,E,Nugunu
+nnw,BF,L,"Nuni, Southern"
+nnx,CM,N,Ngong
+nny,AU,N,Nyangga
+nnz,CM,L,Nda'nda'
+noa,PA,L,Woun Meu
+nob,NO,L,"Norwegian, Bokmål"
+noc,PG,L,Nuk
+nod,TH,L,"Thai, Northern"
+noe,IN,L,Nimadi
+nof,PG,L,Nomane
+nog,RU,L,Nogai
+noh,PG,L,Nomu
+noi,IN,L,Noiri
+nok,US,E,Nooksack
+nom,PE,E,Nocamán
+noo,CA,L,Nootka
+nop,PG,L,Numanggang
+noq,CD,L,Ngongo
+nor,NO,L,Norwegian
+nos,CN,L,"Yi, Southern"
+not,PE,L,Nomatsiguenga
+nou,PG,L,Ewage-Notu
+now,TZ,L,Nyambo
+noy,TD,N,Noy
+noz,ET,L,Nayi
+npa,NP,L,Nar Phu
+npb,BT,L,Nupbikha
+nph,IN,L,"Naga, Phom"
+npn,PG,L,Mondropolon
+npo,IN,L,"Naga, Pochuri"
+nps,ID,L,Nipsan
+npu,IN,L,"Naga, Puimei"
+npy,ID,L,Napu
+nqg,BJ,L,Ede Nago
+nqk,BJ,L,"Ede Nago, Kura"
+nqm,ID,L,Ndom
+nqn,PG,L,Nen
+nqo,GN,L,N'Ko
+nra,GA,L,Ngom
+nrb,ER,L,Nara
+nre,IN,L,"Naga, Southern Rengma"
+nrg,VU,L,Narango
+nri,IN,L,"Naga, Chokri"
+nrl,AU,N,Ngarluma
+nrm,MY,L,Narom
+nrn,GB,E,Norn
+nrr,MM,L,Norra
+nrx,AU,N,Ngurmbur
+nrz,PG,L,Lala
+nsa,IN,L,"Naga, Sangtam"
+nsc,NG,L,Nshi
+nse,ZM,L,Nsenga
+nsg,TZ,L,Ngasa
+nsh,CM,L,Ngoshie
+nsi,NG,L,Nigerian Sign Language
+nsk,CA,L,Naskapi
+nsl,NO,L,Norwegian Sign Language
+nsm,IN,L,"Naga, Sumi"
+nsn,PG,L,Nehan
+nso,ZA,L,"Sotho, Northern"
+nsp,NP,L,Nepalese Sign Language
+nsq,US,N,"Miwok, Northern Sierra"
+nsr,CA,N,Maritime Sign Language
+nss,PG,L,Nali
+nst,MM,L,"Naga, Tase"
+nsw,VU,L,Navut
+nsx,AO,L,Nsongo
+nsz,US,N,Nisenan
+nte,MZ,L,Nathembo
+nti,BF,L,Natioro
+ntj,AU,L,Ngaanyatjarra
+ntk,TZ,L,Ikoma
+ntm,BJ,L,Nateni
+nto,CD,L,Ntomba
+ntp,MX,L,"Tepehuan, Northern"
+ntr,GH,L,Delo
+nts,CO,E,Natagaimas
+ntw,US,E,Nottoway
+nty,VN,L,Mantsi
+ntz,IR,L,Natanzi
+nua,NC,L,Yuaga
+nuc,BR,E,Nukuini
+nud,PG,L,Ngala
+nue,CD,L,Ngundu
+nuf,CN,L,Nusu
+nug,AU,N,Nungali
+nuh,NG,L,Ndunda
+nui,GQ,L,Ngumbi
+nuj,UG,L,Nyole
+nul,ID,N,Nusa Laut
+num,TO,L,Niuafo'ou
+nun,MM,L,Nung
+nuo,VN,L,Nguôn
+nup,NG,L,Nupe-Nupe-Tako
+nuq,PG,L,Nukumanu
+nur,PG,L,Nukuria
+nus,SD,L,Nuer
+nut,VN,L,Nung
+nuu,CD,L,Ngbundu
+nuv,BF,L,"Nuni, Northern"
+nuw,FM,N,Nguluwan
+nux,PG,L,Mehek
+nuy,AU,L,Nunggubuyu
+nuz,MX,L,"Nahuatl, Tlamacazapa"
+nvh,VU,N,Nasarian
+nvm,PG,L,Namiae
+nwa,US,E,Nawathinehena
+nwb,CI,L,Nyabwa
+nwe,CM,L,Ngwe
+nwi,VU,L,"Tanna, Southwest"
+nwm,SD,L,Nyamusa-Molo
+nwr,PG,L,Nawaru
+nxa,TL,L,Nauete
+nxd,CD,L,Ngando
+nxe,ID,L,Nage
+nxg,ID,L,Ngad'a
+nxi,TZ,L,Nindi
+nxj,ID,L,Nyadu
+nxl,ID,L,"Nuaulu, South"
+nxn,AU,N,Ngawun
+nxr,PG,L,Ninggerum
+nxu,ID,L,Narau
+nxx,ID,L,Nafri
+nya,MW,L,Nyanja
+nyb,GH,L,Nyangbo
+nyc,CD,L,Nyanga-li
+nyd,KE,L,Nyore
+nye,AO,L,Nyengo
+nyf,KE,L,Giryama
+nyg,CD,L,Nyindu
+nyh,AU,N,Nyigina
+nyi,SD,L,Ama
+nyj,CD,L,Nyanga
+nyk,AO,L,Nyaneka
+nyl,TH,L,Nyeu
+nym,TZ,L,Nyamwezi
+nyn,UG,L,Nyankore
+nyo,UG,L,Nyoro
+nyp,UG,E,Nyang'i
+nyq,IR,L,Nayini
+nys,AU,E,Nyunga
+nyt,AU,N,Nyawaygi
+nyu,MZ,L,Nyungwe
+nyv,AU,N,Nyulnyul
+nyw,TH,L,Nyaw
+nyx,AU,E,Nganyaywana
+nyy,TZ,L,Nyakyusa-Ngonde
+nza,CM,L,"Mbembe, Tigon"
+nzb,GA,L,Njebi
+nzi,GH,L,Nzema
+nzk,CF,L,Nzakara
+nzm,IN,L,"Naga, Zeme"
+nzs,NZ,L,New Zealand Sign Language
+nzu,CG,L,Teke-Nzikou
+nzy,TD,L,Nzakambay
+oaa,RU,L,Orok
+oac,RU,L,Oroch
+obi,US,E,Obispeño
+obl,CM,N,Oblo
+obo,PH,L,"Manobo, Obo"
+obu,NG,L,Obulom
+oca,PE,L,Ocaina
+oci,FR,L,Occitan
+ocu,MX,N,"Matlatzinca, Atzingo"
+oda,NG,N,Odut
+odk,PK,L,Od
+odu,NG,L,Odual
+ofo,US,E,Ofo
+ofu,NG,L,Efutop
+ogb,NG,L,Ogbia
+ogc,NG,L,Ogbah
+ogg,NG,L,Ogbogolo
+ogn,ID,L,Ogan
+ogo,NG,L,Khana
+ogu,NG,L,Ogbronuagum
+oia,ID,L,Oirata
+oin,PG,L,"One, Inebu"
+ojb,CA,L,"Ojibwa, Northwestern"
+ojc,CA,L,"Ojibwa, Central"
+ojg,CA,L,"Ojibwa, Eastern"
+oji,CA,L,Ojibwa
+ojs,CA,L,"Ojibwa, Severn"
+ojv,SB,L,Ontong Java
+ojw,CA,L,"Ojibwa, Western"
+oka,CA,L,Okanagan
+okb,NG,L,Okobo
+okd,NG,L,Okodia
+oke,NG,L,Okpe
+okh,IR,L,Koresh-e Rostam
+oki,KE,L,Okiek
+okj,IN,E,Oko-Juwoi
+okk,PG,L,"One, Kwamtim"
+okl,GB,E,Old Kentish Sign Language
+okn,JP,L,Oki-No-Erabu
+okr,NG,L,Kirike
+oks,NG,L,Oko-Eni-Osayen
+oku,CM,L,Oku
+okx,NG,L,Okpe
+ola,NP,L,Walungge
+old,TZ,L,Mochi
+ole,BT,L,Olekha
+olm,NG,L,Oloma
+olo,RU,L,Livvi
+oma,US,L,Omaha-Ponca
+omb,VU,L,"Ambae, East"
+ome,CO,E,Omejes
+omg,PE,N,Omagua
+omi,CD,L,Omi
+oml,CD,L,Ombo
+omo,PG,L,Utarmbung
+omt,KE,N,Omotik
+omu,PE,E,Omurano
+omw,PG,L,"Tairora, South"
+ona,AR,N,Ona
+onb,CN,L,Lingao
+one,CA,L,Oneida
+ong,PG,L,Olo
+oni,ID,L,Onin
+onj,PG,L,Onjob
+onk,PG,L,"One, Kabore"
+onn,PG,L,Onobasulu
+ono,CA,L,Onondaga
+onr,PG,L,"One, Northern"
+ons,PG,L,Ono
+ont,PG,L,Ontenu
+onu,VU,L,Unua
+onx,ID,S,Onin Based Pidgin
+ood,US,L,Tohono O'odham
+oog,LA,L,Ong
+oon,IN,L,Önge
+oor,ZA,L,Oorlams
+opa,NG,L,Okpamheri
+opk,ID,L,Kopkaka
+opm,PG,L,Oksapmin
+opo,PG,L,Opao
+opt,MX,N,Opata
+opy,BR,N,Ofayé
+ora,SB,L,Oroha
+orc,KE,L,Orma
+ore,PE,L,Orejón
+org,NG,L,Oring
+orh,CN,L,Oroqen
+ori,IN,L,Oriya
+ork,PG,L,Orokaiva
+orm,ET,L,Oromo
+orn,MY,L,Orang Kanaq
+oro,PG,L,Orokolo
+orr,NG,L,Oruma
+ors,MY,L,Orang Seletar
+ort,IN,L,"Oriya, Adivasi"
+oru,PK,L,Ormuri
+orw,BR,N,Oro Win
+orx,NG,L,Oro
+orz,ID,L,Ormu
+osa,US,N,Osage
+osi,ID,L,Osing
+oso,NG,L,Ososo
+oss,GE,L,Osetin
+ost,CM,L,Osatu
+osu,PG,L,"One, Southern"
+otd,ID,L,Dohoi
+ote,MX,L,"Otomi, Mezquital"
+oti,BR,E,Oti
+otl,MX,L,"Otomi, Tilapa"
+otm,MX,L,"Otomi, Eastern Highland"
+otn,MX,L,"Otomi, Tenango"
+otq,MX,L,"Otomi, Querétaro"
+otr,SD,L,Otoro
+ots,MX,L,"Otomi, Estado de México"
+ott,MX,L,"Otomi, Temoaya"
+otu,BR,E,Otuke
+otw,CA,L,Ottawa
+otx,MX,L,"Otomi, Texcatepec"
+otz,MX,L,"Otomi, Ixtenco"
+oua,DZ,L,Tagargrent
+oub,LR,L,Glio-Oubi
+oue,PG,L,Oune
+oum,PG,E,Ouma
+oun,AO,L,!O!ung
+owi,PG,L,Owiniga
+oyb,LA,L,Oy
+oyd,ET,L,Oyda
+oym,GF,L,Wayampi
+oyy,PG,L,Oya'oya
+ozm,CM,L,Koonzime
+pab,BR,L,Parecís
+pac,VN,L,Pacoh
+pad,BR,L,Paumarí
+pae,CD,L,Pagibete
+paf,BR,E,Paranawát
+pag,PH,L,Pangasinan
+pah,BR,L,Tenharim
+pai,NG,L,Pe
+paj,BR,L,Ipeka-Tapuia
+pak,BR,L,Parakanã
+pam,PH,L,Pampangan
+pan,IN,L,"Panjabi, Eastern"
+pao,US,L,"Paiute, Northern"
+pap,AN,L,Papiamentu
+paq,TJ,L,Parya
+par,US,N,Panamint
+pas,ID,L,Papasena
+pat,PG,L,Papitalai
+pau,PW,L,Palauan
+pav,BR,L,Pakaásnovos
+paw,US,N,Pawnee
+pax,BR,E,Pankararé
+pay,HN,L,Pech
+paz,BR,E,Pankararú
+pbb,CO,L,Páez
+pbc,GY,L,Patamona
+pbe,MX,L,"Popoloca, Mezontla"
+pbf,MX,L,"Popoloca, Coyotepec"
+pbg,VE,E,Paraujano
+pbh,VE,L,Eñepa
+pbi,CM,L,Parkwa
+pbl,NG,L,Mak
+pbn,NG,L,Kpasam
+pbo,GW,L,Papel
+pbp,GN,L,Badyara
+pbr,TZ,L,Pangwa
+pbs,MX,L,"Pame, Central"
+pbt,PK,L,"Pashto, Southern"
+pbu,PK,L,"Pashto, Northern"
+pbv,IN,L,Pnar
+pby,PG,L,Pyu
+pbz,MM,L,Palu
+pca,MX,L,"Popoloca, Santa Inés Ahuatempan"
+pcb,KH,L,Pear
+pcc,CN,L,Bouyei
+pcd,FR,L,Picard
+pce,MM,L,"Palaung, Pale"
+pcf,IN,L,Paliyan
+pcg,IN,L,Paniya
+pch,IN,L,Pardhan
+pci,IN,L,Duruwa
+pcj,IN,N,Parenga
+pck,IN,L,"Chin, Paite"
+pcl,IN,L,Pardhi
+pcm,NG,L,"Pidgin, Nigerian"
+pcn,NG,L,Piti
+pcp,BO,N,Pacahuara
+pcr,CN,L,Panang
+pcw,NG,L,Pyapun
+pda,PG,L,Anam
+pdc,US,L,"German, Pennsylvania"
+pdi,CN,L,Pa Di
+pdn,ID,L,Podena
+pdo,ID,L,Padoe
+pdt,CA,L,Plautdietsch
+pdu,MM,L,Kayan
+pea,ID,L,"Indonesian, Peranakan"
+peb,US,E,"Pomo, Eastern"
+pec,ID,L,"Pesisir, Southern"
+ped,PG,L,Mala
+pee,ID,L,Taje
+pef,US,E,"Pomo, Northeastern"
+peg,IN,L,Pengo
+peh,CN,L,Bonan
+pei,MX,L,Chichimeca-Jonaz
+pej,US,E,"Pomo, Northern"
+pek,PG,L,Penchal
+pel,ID,L,Pekal
+pem,CD,L,Phende
+pen,ID,L,Penesak
+pep,PG,L,Kunja
+peq,US,N,"Pomo, Southern"
+pes,IR,L,"Farsi, Western"
+pev,VE,N,Pémono
+pex,PG,L,Petats
+pey,ID,L,Petjo
+pez,MY,L,"Penan, Eastern"
+pfa,FM,L,Pááfang
+pfe,CM,L,Peere
+pfl,DE,L,Pfaelzisch
+pga,SD,L,"Arabic, Sudanese Creole"
+pgg,IN,L,Pangwali
+pgi,PG,L,Pagi
+pgk,VU,L,Rerep
+pgs,NG,L,Pangseng
+pgu,ID,L,Pagu
+pgy,NP,N,Pongyong
+pha,CN,L,Pa-Hng
+phd,IN,L,Phudagi
+phg,VN,L,Phuong
+phh,VN,L,Phula
+phk,IN,L,Phake
+phl,PK,L,Phalura
+phm,MZ,L,Phimbi
+pho,LA,L,Phunoi
+phq,LA,L,Phana'
+phr,PK,L,Pahari-Potwari
+pht,TH,L,Phu Thai
+phu,TH,L,Phuan
+phv,AF,L,Pahlavani
+phw,NP,L,Phangduwali
+pia,MX,L,Pima Bajo
+pib,PE,L,Yine
+pic,GA,L,Pinji
+pid,VE,L,Piaroa
+pie,US,E,Piro
+pif,FM,L,Pingelapese
+pig,PE,L,Pisabo
+pih,NF,S,Pitcairn-Norfolk
+pii,AU,N,Pini
+pij,CO,E,Pijao
+pil,BJ,L,Yom
+pim,US,E,Powhatan
+pin,PG,L,Piame
+pio,CO,L,Piapoco
+pip,NG,L,Pero
+pir,BR,L,Piratapuyo
+pis,SB,L,Pijin
+pit,AU,N,Pitta Pitta
+piu,AU,L,Pintupi-Luritja
+piv,SB,L,Pileni
+piw,TZ,L,Pimbwe
+pix,PG,L,Piu
+piy,NG,L,Piya-Kwonci
+piz,NC,L,Pije
+pjt,AU,L,Pitjantjatjara
+pkb,KE,L,"Pokomo, Upper"
+pkg,PG,L,Pak-Tong
+pkh,BD,L,Pankhu
+pkn,AU,N,Pakanha
+pko,KE,L,Pökoot
+pkp,CK,L,Pukapuka
+pks,PK,L,Pakistan Sign Language
+pkt,LA,L,Maleng
+pku,ID,L,Paku
+pla,PG,L,Miani
+plb,VU,L,Polonombauk
+plc,PH,L,"Palawano, Central"
+pld,GB,S,Polari
+ple,ID,L,Palu'e
+plg,AR,L,Pilagá
+plh,ID,N,Paulohi
+pli,IN,E,Pali
+plj,NG,L,Polci
+plk,PK,L,"Shina, Kohistani"
+pll,MM,L,"Palaung, Shwe"
+plm,ID,L,Palembang
+pln,CO,L,Palenquero
+plo,MX,L,"Popoluca, Oluta"
+plp,NP,L,Palpa
+plr,CI,L,"Senoufo, Palaka"
+pls,MX,L,"Popoloca, San Marcos Tlalcoyalco"
+plt,MG,L,"Malagasy, Plateau"
+plu,BR,L,Palikúr
+plv,PH,L,"Palawano, Southwest"
+plw,PH,L,"Palawano, Brooke's Point"
+ply,CN,L,Bolyu
+plz,MY,L,Paluan
+pma,VU,L,Paama
+pmb,CD,L,Pambia
+pmc,ID,E,Palumata
+pme,NC,L,Pwaamei
+pmi,CN,L,"Pumi, Northern"
+pmj,CN,L,"Pumi, Southern"
+pml,TN,E,Lingua Franca
+pmm,CM,L,Pol
+pmn,CM,N,Pam
+pmo,ID,L,Pom
+pmq,MX,L,"Pame, Northern"
+pmr,PG,L,Paynamar
+pms,IT,L,Piemontese
+pmt,PF,L,Tuamotuan
+pmu,IN,L,"Panjabi, Mirpur"
+pmw,US,N,"Miwok, Plains"
+pmx,IN,L,"Naga, Poumei"
+pmz,MX,E,"Pame, Southern"
+pna,MY,L,Punan Bah-Biau
+pnb,PK,L,"Panjabi, Western"
+pnc,ID,L,Pannei
+pne,MY,L,"Penan, Western"
+png,NG,L,Pongu
+pnh,CK,L,Penrhyn
+pni,ID,L,Aoheng
+pnm,MY,N,Punan Batu 1
+pnn,PG,L,Pinai-Hagahai
+pno,PE,E,Panobo
+pnp,ID,L,Pancana
+pnq,BF,L,Pana
+pnr,PG,L,Panim
+pns,ID,L,Ponosakan
+pnt,GR,L,Pontic
+pnu,CN,L,"Bunu, Jiongnai"
+pnv,AU,N,Pinigura
+pnw,AU,N,Panytyima
+pnx,LA,L,Phong-Kniang
+pny,CM,L,Pinyin
+pnz,CF,L,Pana
+poa,GT,L,"Poqomam, Eastern"
+pob,GT,L,"Poqomchi', Western"
+poc,GT,L,"Poqomam, Central"
+pod,CO,E,Ponares
+poe,MX,L,"Popoloca, San Juan Atzingo"
+pof,CD,L,Poke
+pog,BR,E,Potiguára
+poh,GT,L,"Poqomchi', Eastern"
+poi,MX,L,"Popoluca, Highland"
+poj,KE,L,"Pokomo, Lower"
+pok,BR,L,Pokangá
+pol,PL,L,Polish
+pom,US,N,"Pomo, Southeastern"
+pon,FM,L,Pohnpeian
+poo,US,N,"Pomo, Central"
+pop,NC,N,Pwapwa
+poq,MX,L,"Popoluca, Texistepec"
+por,PT,L,Portuguese
+pos,MX,L,"Popoluca, Sayula"
+pot,US,L,Potawatomi
+pou,GT,L,"Poqomam, Southern"
+pov,GW,L,"Crioulo, Upper Guinea"
+pow,MX,L,"Popoloca, San Felipe Otlaltepec"
+pox,DE,E,Polabian
+poy,TZ,L,Pogolo
+ppa,IN,L,Pao
+ppe,PG,L,Papi
+ppi,MX,L,Paipai
+ppk,ID,L,Uma
+ppl,SV,N,Pipil
+ppm,ID,L,Papuma
+ppn,PG,L,Papapana
+ppo,PG,L,Folopa
+ppp,CD,L,Pelende
+ppq,PG,L,Pei
+ppr,ID,N,Piru
+pps,MX,L,"Popoloca, San Luís Temalacayuca"
+ppt,PG,L,Pare
+ppu,TW,E,Papora-Hoanya
+ppv,BR,L,Papavô
+pqa,NG,L,Pa'a
+pqm,CA,L,Malecite-Passamaquoddy
+prb,TH,L,Lua'
+prc,AF,L,Parachi
+prd,IR,L,Parsi-Dari
+pre,ST,L,Principense
+prg,PL,E,Prussian
+prh,PH,L,Porohanon
+pri,NC,L,Paicî
+prk,MM,L,Parauk
+prl,PE,L,Peruvian Sign Language
+prm,PG,L,Kibiri
+prn,AF,L,Prasuni
+prp,IN,L,Parsi
+prq,PE,L,Ashéninka Perené
+prr,BR,E,Puri
+prs,AF,L,"Farsi, Eastern"
+prt,TH,L,Phai
+pru,ID,L,Puragi
+prv,FR,L,Provençal
+prw,PG,L,Parawen
+prx,IN,L,Purik
+pry,TH,L,Pray 3
+prz,CO,L,Providencia Sign Language
+psa,ID,L,"Awyu, Asue"
+psc,IR,L,Persian Sign Language
+psd,US,S,Plains Indian Sign Language
+pse,ID,L,Pasemah
+psg,MY,L,Penang Sign Language
+psh,AF,L,"Pashayi, Southwest"
+psi,AF,L,"Pashayi, Southeast"
+psl,PR,L,Puerto Rican Sign Language
+psm,BO,E,Pauserna
+psn,ID,L,Panasuan
+pso,PL,L,Polish Sign Language
+psp,PH,L,Philippine Sign Language
+psq,PG,L,Pasi
+psr,PT,L,Portuguese Sign Language
+pss,PG,L,Kaulong
+pst,PK,L,"Pashto, Central"
+psw,VU,L,Port Sandwich
+psy,US,E,Piscataway
+pta,PY,L,Pai Tavytera
+pth,BR,E,Pataxó-Hãhaãi
+pti,AU,L,Pintiini
+ptn,ID,L,Patani
+pto,BR,L,Zo'é
+ptp,PG,L,Patep
+ptr,VU,L,Piamatsina
+ptt,ID,L,Enrekang
+ptu,ID,L,Bambam
+ptv,VU,L,Port Vato
+ptw,CA,E,Pentlatch
+pua,MX,L,"Purepecha, Western Highland"
+pub,MM,L,Purum
+puc,ID,L,Punan Merap
+pud,ID,L,Punan Aput
+pue,AR,N,Puelche
+puf,ID,L,Punan Merah
+pug,BF,L,Phuie
+pui,CO,L,Puinave
+puj,ID,L,Punan Tubu
+puk,LA,L,Pu Ko
+pum,NP,L,Puma
+pun,ID,L,Pubian
+puo,VN,L,Puoc
+pup,PG,L,Pulabu
+puq,PE,E,Puquina
+pur,BR,N,Puruborá
+pus,PK,L,Pushto
+put,ID,L,Putoh
+puu,GA,L,Punu
+puw,FM,L,Puluwatese
+pux,PG,L,Puari
+puy,US,E,Purisimeño
+puz,IN,L,"Naga, Purum"
+pwa,PG,L,Pawaia
+pwg,PG,L,Gapapaiwa
+pwm,PH,L,Molbog
+pwn,TW,L,Paiwan
+pwo,MM,L,"Karen, Pwo Western"
+pwr,IN,L,Powari
+pww,TH,L,"Karen, Pwo Northern"
+pxm,MX,L,"Mixe, Quetzaltepec"
+pye,CI,L,"Krumen, Pye"
+pym,NG,L,Fyam
+pyn,BR,L,Poyanáwa
+pyu,TW,L,Puyuma
+pyy,MM,L,Pyen
+qaa,GB,I,Elvish
+qab,US,I,IPA
+qac,SE,E,Runic Languages
+qad,US,L,Miscellaneous
+qae,CA,L,French (Canada)
+qaf,US,L,English (US)
+qag,MX,L,Spanish (Central America)
+qah,BR,L,Portuguese (Brazil)
+qai,AR,L,Spanish (South America)
+qua,US,N,Quapaw
+qub,PE,L,"Quechua, Huallaga Huánuco"
+quc,GT,L,"K'iche', Central"
+qud,EC,L,"Quichua, Calderón Highland"
+que,PE,L,Quechua
+quf,PE,L,"Quechua, Lambayeque"
+qug,EC,L,"Quichua, Chimborazo Highland"
+quh,BO,L,"Quechua, South Bolivian"
+qui,US,N,Quileute
+quj,GT,L,"K'iche', Joyabaj"
+quk,PE,L,"Quechua, Chachapoyas"
+qul,BO,L,"Quechua, North Bolivian"
+qum,GT,L,Sipakapense
+qun,US,E,Quinault
+qup,PE,L,"Quechua, Southern Pastaza"
+quq,ES,L,Quinqui
+qur,PE,L,"Quechua, Yanahuanca Pasco"
+qus,AR,L,"Quichua, Santiago del Estero"
+qut,GT,L,"K'iche', West Central"
+quu,GT,L,"K'iche', Eastern"
+quv,GT,L,Sakapulteko
+quw,EC,L,"Quichua, Tena Lowland"
+qux,PE,L,"Quechua, Yauyos"
+quy,PE,L,"Quechua, Ayacucho"
+quz,PE,L,"Quechua, Cusco"
+qva,PE,L,"Quechua, Ambo-Pasco"
+qvc,PE,L,"Quechua, Cajamarca"
+qve,PE,L,"Quechua, Eastern Apurímac"
+qvh,PE,L,"Quechua, Huamalíes-Dos de Mayo Huánuco"
+qvi,EC,L,"Quichua, Imbabura Highland"
+qvj,EC,L,"Quichua, Loja Highland"
+qvl,PE,L,"Quechua, Cajatambo North Lima"
+qvm,PE,L,"Quechua, Margos-Yarowilca-Lauricocha"
+qvn,PE,L,"Quechua, North Junín"
+qvo,PE,L,"Quechua, Napo Lowland"
+qvp,PE,L,"Quechua, Pacaraos"
+qvs,PE,L,"Quechua, San Martín"
+qvw,PE,L,"Quechua, Huaylla Wanca"
+qvy,CN,L,Queyu
+qvz,EC,L,"Quichua, Northern Pastaza"
+qwa,PE,L,"Quechua, Corongo Ancash"
+qwc,PE,E,"Quechua, Classical"
+qwh,PE,L,"Quechua, Huaylas Ancash"
+qws,PE,L,"Quechua, Sihuas Ancash"
+qxa,PE,L,"Quechua, Chiquián Ancash"
+qxc,PE,L,"Quechua, Chincha"
+qxh,PE,L,"Quechua, Panao Huánuco"
+qxi,GT,L,"K'iche', San Andrés"
+qxl,EC,L,"Quichua, Salasaca Highland"
+qxn,PE,L,"Quechua, Northern Conchucos Ancash"
+qxo,PE,L,"Quechua, Southern Conchucos Ancash"
+qxp,PE,L,"Quechua, Puno"
+qxq,IR,L,Qashqa'i
+qxr,EC,L,"Quichua, Cañar Highland"
+qxs,CN,L,"Qiang, Southern"
+qxt,PE,L,"Quechua, Santa Ana de Tusi Pasco"
+qxu,PE,L,"Quechua, Arequipa-La Unión"
+qxw,PE,L,"Quechua, Jauja Wanca"
+raa,NP,L,Dungmali
+rab,NP,L,Camling
+rac,ID,L,Rasawa
+rad,VN,L,Rade
+rae,ID,L,Ranau
+raf,NP,L,"Meohang, Western"
+rag,KE,L,Logooli
+rah,IN,L,Rabha
+rai,PG,L,Ramoaaina
+raj,IN,L,Rajasthani
+rak,PG,L,Tulu-Bohuai
+ral,MM,L,Ralte
+ram,BR,L,Canela
+ran,ID,L,Riantana
+rao,PG,L,Rao
+rap,CL,L,Rapa Nui
+raq,NP,N,Saam
+rar,CK,L,Rarotongan
+ras,SD,L,Tegali
+rat,IR,L,Razajerdi
+rau,NP,L,Raute
+rav,NP,L,Sampang
+raw,MM,L,Rawang
+rax,NG,L,Rang
+ray,PF,L,Rapa
+raz,ID,L,Rahambuu
+rbb,MM,L,"Palaung, Rumai"
+rcf,RE,L,Réunion Creole French
+rdb,IR,L,Rudbari
+rea,PG,L,Rerau
+reb,ID,L,Rembong
+ree,MY,L,"Kayan, Rejang"
+reg,TZ,L,Kara
+rei,IN,L,Reli
+rej,ID,L,Rejang
+rel,KE,L,Rendille
+rem,PE,E,Remo
+ren,VN,L,Rengao
+rer,ET,E,Rer Bare
+res,NG,L,Reshe
+ret,ID,L,Retta
+rey,BO,N,Reyesano
+rga,VU,L,Roria
+rge,GR,L,Romano-Greek
+rgk,IN,E,Rangkas
+rgr,PE,N,Resígaro
+rgs,VN,L,"Roglai, Southern"
+rgu,ID,L,Ringgou
+rhp,PG,L,Yahang
+ria,IN,L,Riang
+rie,LA,L,Rien
+rif,MA,L,Tarifit
+ril,MM,L,Riang
+rim,TZ,L,Nyaturu
+rin,NG,L,Nungu
+rir,ID,L,Ribun
+rit,AU,L,Ritarungo
+riu,ID,L,Riung
+rjb,IN,L,Rajbanshi
+rjg,ID,L,Rajong
+rji,NP,L,Raji
+rka,KH,L,Kraol
+rkb,BR,L,Rikbaktsa
+rkh,CK,L,Rakahanga-Manihiki
+rkm,BF,L,Marka
+rma,NI,N,Rama
+rmb,AU,L,Rembarunga
+rmc,CZ,L,"Romani, Carpathian"
+rmd,DK,L,Traveller Danish
+rme,GB,L,Angloromani
+rmf,FI,L,"Romani, Kalo Finnish"
+rmg,NO,L,"Norwegian, Traveller"
+rmh,ID,L,Murkim
+rmi,AM,L,Lomavren
+rmk,PG,L,Romkun
+rml,PL,L,"Romani, Baltic"
+rmm,ID,L,Roma
+rmn,CS,L,"Romani, Balkan"
+rmo,CS,L,"Romani, Sinte"
+rmp,PG,L,Rempi
+rmr,ES,L,Caló
+rms,RO,L,Romanian Sign Language
+rmt,IR,L,Domari
+rmu,SE,L,"Romani, Tavringer"
+rmw,GB,L,"Romani, Welsh"
+rmx,VN,L,Romam
+rmy,RO,L,"Romani, Vlax"
+rna,CO,E,Runa
+rnd,CD,L,Ruund
+rng,MZ,L,Ronga
+rnn,ID,L,Roon
+rnp,IN,L,Rongpo
+rnw,TZ,L,Rungwa
+rob,ID,L,Tae'
+roc,VN,L,"Roglai, Cacgia"
+rod,NG,L,Rogo
+roe,PG,L,Ronji
+rof,TZ,L,Rombo
+rog,VN,L,"Roglai, Northern"
+roh,CH,L,Romansch
+rol,PH,L,Romblomanon
+rom,RO,L,Romany
+ron,RO,L,Romanian
+roo,PG,L,Rotokas
+rop,AU,L,Kriol
+ror,ID,L,Rongga
+rou,TD,L,Runga
+row,ID,L,Dela-Oenale
+rpn,VU,L,Repanbitip
+rpt,PG,L,Rapting
+rri,SB,L,Ririo
+rro,PG,L,Waima
+rsb,CS,L,Romano-Serbian
+rsi,SB,N,Rennellese Sign Language
+rsl,RU,L,Russian Sign Language
+rth,ID,L,Ratahan
+rtm,FJ,L,Rotuman
+rtw,IN,L,Rathawi
+rub,UG,L,Gungu
+ruc,UG,L,Ruli
+rue,UA,L,Rusyn
+ruf,TZ,L,Luguru
+rug,SB,L,Roviana
+ruh,IN,N,Ruga
+rui,TZ,L,Rufiji
+ruk,NG,L,Che
+run,BI,L,Rundi
+ruo,HR,L,"Romanian, Istro"
+rup,GR,L,"Romanian, Macedo"
+ruq,GR,L,"Romanian, Megleno"
+rus,RU,L,Russian
+rut,RU,L,Rutul
+ruu,MY,L,"Lobu, Lanas"
+ruy,NG,L,Mala
+ruz,NG,L,Ruma
+rwa,PG,L,Rawo
+rwk,TZ,L,Rwa
+rwm,UG,L,Amba
+rwo,PG,L,Rawa
+rwr,IN,L,Marwari
+rws,ID,L,Rawas
+ryn,JP,L,"Amami-Oshima, Northern"
+rys,JP,L,Yaeyama
+ryu,JP,L,"Okinawan, Central"
+saa,TD,L,Saba
+sab,PA,L,Buglere
+sac,US,L,Mesquakie
+sad,TZ,L,Sandawe
+sae,BR,L,Sabanês
+saf,GH,L,Safaliba
+sag,CF,L,Sango
+sah,RU,L,Yakut
+saj,ID,L,Sahu
+sak,GA,L,Sake
+sam,PS,E,Samaritan Aramaic
+san,IN,L,Sanskrit
+sao,ID,L,Sause
+sap,PY,L,Sanapaná
+saq,KE,L,Samburu
+sar,BO,E,Saraveca
+sas,ID,L,Sasak
+sat,IN,L,Santali
+sau,ID,L,Saleman
+sav,SN,L,Saafi-Saafi
+saw,ID,L,Sawi
+sax,VU,L,Sa
+say,NG,L,Saya
+saz,IN,L,Saurashtra
+sba,TD,L,Ngambay
+sbb,SB,L,Simbo
+sbc,PG,L,Kele
+sbd,BF,L,"Samo, Southern"
+sbe,PG,L,Saliba
+sbf,ET,L,Shabo
+sbg,ID,L,Seget
+sbh,PG,L,Sori-Harengan
+sbi,PG,L,Seti
+sbj,TD,L,Surbakhal
+sbk,TZ,L,Safwa
+sbl,PH,L,"Sambal, Botolan"
+sbm,TZ,L,Sagala
+sbn,PK,L,Sindhi Bhil
+sbo,MY,L,Sabüm
+sbp,TZ,L,Sangu
+sbq,PG,L,Sileibi
+sbr,MY,L,Sembakung Murut
+sbs,NA,L,Subiya
+sbt,ID,L,Kimki
+sbu,IN,L,Stod Bhoti
+sbw,GA,L,Simba
+sbx,ID,L,Seberuang
+sby,ZM,L,Soli
+sbz,CF,L,Sara Kaba
+sca,MM,L,Sansu
+scb,VN,L,Chut
+sce,CN,L,Dongxiang
+scf,PA,N,San Miguel Creole French
+scg,ID,L,Sanggau
+sch,IN,L,Sakechep
+sci,LK,L,Sri Lankan Creole Malay
+sck,IN,L,Sadri
+scl,PK,L,Shina
+scn,IT,L,Sicilian
+sco,GB,L,Scots
+scp,NP,L,Helambu Sherpa
+scq,KH,L,Sa'och
+scs,CA,L,"Slavey, North"
+scu,IN,L,Shumcho
+scv,NG,L,Sheni
+scw,NG,L,Sha
+scy,SE,L,Scanian
+sda,ID,L,Toraja-Sa'dan
+sdb,IQ,L,Shabak
+sdc,IT,L,"Sardinian, Sassarese"
+sdd,ID,L,Semendo
+sde,NG,L,Surubu
+sdf,IQ,L,Sarli
+sdg,AF,L,Savi
+sdh,IR,L,"Kurdish, Southern"
+sdi,ID,L,Sindang Kelingi
+sdj,CG,L,Suundi
+sdl,SA,L,Saudi Arabian Sign Language
+sdm,ID,L,Semandang
+sdn,IT,L,"Sardinian, Gallurese"
+sdo,MY,L,Bukar Sadong
+sdp,IN,L,Sherdukpen
+sdr,BD,L,"Sadri, Oraon"
+sds,TN,E,Sened
+sdt,FR,E,Shuadit
+sdu,ID,L,Sarudu
+sdx,MY,L,Sibu
+sdz,NL,L,Sallands
+sea,MY,L,Semai
+seb,CI,L,"Senoufo, Shempire"
+sec,CA,N,Sechelt
+sed,VN,L,Sedang
+see,US,L,Seneca
+sef,CI,L,"Senoufo, Cebaara"
+seg,TZ,L,Segeju
+seh,MZ,L,Sena
+sei,MX,L,Seri
+sej,PG,N,Sene
+sek,CA,L,Sekani
+sel,RU,L,Selkup
+sen,BF,L,"Sénoufo, Nanerigé"
+seo,PG,L,Suarmin
+sep,BF,L,"Sénoufo, Sìcìté"
+seq,BF,L,"Sénoufo, Senara"
+ser,US,N,Serrano
+ses,ML,L,"Songhay, Koyraboro Senni"
+set,ID,L,Sentani
+seu,ID,L,Serui-Laut
+sev,CI,L,"Senoufo, Nyarafolo"
+sew,PG,L,Sewa Bay
+sey,EC,L,Secoya
+sez,MM,L,"Chin, Senthang"
+sfs,ZA,L,South African Sign Language
+sfw,GH,L,Sehwi
+sgb,PH,L,"Ayta, Mag-Anchi"
+sge,ID,L,Segai
+sgg,CH,L,Swiss-German Sign Language
+sgh,TJ,L,Shughni
+sgi,CM,L,Suga
+sgl,AF,L,Sanglechi-Ishkashimi
+sgm,UG,E,Singa
+sgo,CD,L,Songa
+sgp,IN,L,Singpho
+sgr,IR,L,Sangisari
+sgt,BT,L,Brokpake
+sgu,ID,L,Salas
+sgw,ET,L,Sebat Bet Gurage
+sgx,SL,L,Sierra Leone Sign Language
+sgz,PG,L,Sursurunga
+sha,NG,L,Shall-Zwall
+shb,BR,L,Ninam
+shc,CD,L,Sonde
+she,ET,L,Sheko
+shg,BW,L,Shua
+shh,US,L,Shoshoni
+shi,MA,L,Tachelhit
+shj,SD,L,Shatt
+shk,SD,L,Shilluk
+shl,BD,L,Shendu
+shm,IR,L,Shahrudi
+shn,MM,L,Shan
+sho,NG,L,Shanga
+shp,PE,L,Shipibo-Conibo
+shq,ZM,L,Sala
+shr,CD,L,Shi
+shs,CA,L,Shuswap
+sht,US,E,Shasta
+shu,TD,L,"Arabic, Chadian Spoken"
+shv,OM,L,Shehri
+shw,SD,L,Shwai
+shx,CN,L,She
+shy,DZ,L,Tachawit
+shz,ML,L,"Senoufo, Syenara"
+sia,RU,N,"Saami, Akkala"
+sib,MY,L,"Kenyah, Sebob"
+sic,PG,L,Malinguat
+sid,ET,L,Sidamo
+sie,ZM,L,Simaa
+sif,BF,L,Siamou
+sig,GH,L,Paasaal
+sih,NC,N,Zire
+sii,IN,L,Shom Peng
+sij,PG,L,Numbami
+sik,BR,L,Sikiana
+sil,GH,L,"Sisaala, Tumulung"
+sim,PG,L,Mende
+sin,LK,L,Sinhala
+sip,IN,L,Sikkimese
+siq,PG,L,Sonia
+sir,NG,L,Siri
+sis,US,E,Siuslaw
+siu,PG,L,Sinagen
+siv,PG,L,Sumariup
+siw,PG,L,Siwai
+six,PG,L,Sumau
+siy,IR,L,Sivandi
+siz,EG,L,Siwi
+sja,CO,L,Epena
+sjb,ID,L,Sajau Basap
+sjd,RU,L,"Saami, Kildin"
+sje,SE,N,"Saami, Pite"
+sjg,TD,L,Assangori
+sjk,FI,E,"Saami, Kemi"
+sjl,IN,L,Sajalong
+sjm,PH,L,Mapun
+sjo,CN,L,Xibe
+sjp,IN,L,Surajpuri
+sjr,PG,L,Siar-Lak
+sjs,MA,E,Senhaja de Srair
+sjt,RU,N,"Saami, Ter"
+sju,SE,L,"Saami, Ume"
+sjw,US,L,Shawnee
+ska,US,L,Skagit
+skb,LA,L,Saek
+skc,PG,L,Sauk
+skd,US,N,"Miwok, Southern Sierra"
+ske,VU,L,Seke
+skf,BR,L,Sakirabiá
+skg,MG,L,"Malagasy, Sakalava"
+skh,ID,L,Sikule
+ski,ID,L,Sika
+skj,NP,L,Seke
+skk,LA,L,Sok
+skl,ID,L,Selako
+skm,PG,L,Sakam
+skn,PH,L,"Subanon, Kolibugan"
+sko,ID,L,Seko Tengah
+skp,MY,L,Sekapan
+skq,BF,L,Sininkere
+skr,PK,L,Seraiki
+sks,PG,L,Maia
+skt,CD,L,Sakata
+sku,VU,L,Sakao
+skv,ID,L,Skou
+skw,GY,E,Skepi Creole Dutch
+skx,ID,L,Seko Padang
+sky,SB,L,Sikaiana
+skz,ID,L,Sekar
+slb,ID,L,"Saluan, Kahumamahon"
+slc,CO,L,Sáliba
+sld,BF,L,Sissala
+sle,IN,L,Sholaga
+slf,CH,L,Swiss-Italian Sign Language
+slg,ID,L,Selungai Murut
+slh,US,L,"Salish, Southern Puget Sound"
+sli,PL,N,"Silesian, Lower"
+slj,BR,L,Salumá
+slk,SK,L,Slovak
+sll,PG,L,Salt-Yui
+slm,PH,L,"Sama, Pangutaran"
+sln,US,E,Salinan
+slp,ID,L,Lamaholot
+slq,IR,L,Salchuq
+slr,CN,L,Salar
+sls,SG,L,Singapore Sign Language
+slt,LA,L,Sila
+slu,ID,L,Selaru
+slv,SI,L,Slovenian
+slw,PG,L,Sialum
+slx,CD,L,Salampasu
+sly,ID,L,Selayar
+slz,ID,L,Ma'ya
+sma,SE,L,"Saami, South"
+smb,PG,L,Simbari
+smc,PG,L,Som
+smd,AO,L,Sama
+sme,NO,L,"Saami, North"
+smf,PG,L,Auwe
+smg,PG,L,Simbali
+smh,CN,L,Samei
+smj,SE,L,"Saami, Lule"
+smk,PH,L,Bolinao
+sml,PH,L,"Sama, Central"
+smm,NP,L,Musasa
+smn,FI,L,"Saami, Inari"
+smo,WS,L,Samoan
+smp,PS,E,Samaritan
+smq,PG,L,Samo
+smr,ID,L,Simeulue
+sms,FI,L,"Saami, Skolt"
+smt,IN,L,Simte
+smu,KH,L,Somray
+smv,IN,L,Samvedi
+smw,ID,L,Sumbawa
+smx,CD,L,Samba
+smy,IR,L,Semnani
+smz,PG,L,Simeku
+sna,ZW,L,Shona
+snb,MY,L,Sebuyau
+snc,PG,L,Sinaugoro
+snd,PK,L,Sindhi
+sne,MY,L,Jagoi
+snf,SN,L,Noon
+sng,CD,L,Sanga
+snh,BO,E,Shinabo
+sni,PE,E,Sensi
+snj,CF,L,"Sango, Riverain"
+snk,ML,L,Soninke
+snl,PH,L,Sangil
+snm,UG,L,"Ma'di, Southern"
+snn,CO,L,Siona
+sno,US,N,Snohomish
+snp,PG,L,Siane
+snq,GA,L,Sangu
+snr,PG,L,Sihan
+sns,VU,L,South West Bay
+snu,ID,L,Senggi
+snv,MY,L,Sa'ban
+snw,GH,L,Selee
+snx,PG,L,Sam
+sny,PG,L,Saniyo-Hiyewe
+snz,PG,L,Sinsauru
+soa,TH,L,Thai Song
+sob,ID,L,Sobei
+soc,CD,L,So
+sod,CD,L,Songoora
+soe,CD,L,Songomeno
+soh,SD,L,Aka
+soi,NP,L,Sonha
+soj,IR,L,Soi
+sok,TD,L,Sokoro
+sol,PG,L,Solos
+som,SO,L,Somali
+soo,CD,L,Songo
+sop,CD,L,Songe
+soq,PG,L,Kanasi
+sor,TD,L,Somrai
+sos,BF,L,Seeku
+sot,LS,L,"Sotho, Southern"
+sou,TH,L,"Thai, Southern"
+sov,PW,L,Sonsorol
+sow,PG,L,Sowanda
+sox,CM,L,So
+soy,BJ,L,Miyobe
+soz,TZ,L,Temi
+spa,ES,L,Spanish
+spb,ID,L,Sepa
+spc,VE,N,Sapé
+spd,PG,L,Saep
+spe,PG,L,Sepa
+spg,MY,L,Sian
+spi,ID,N,Saponi
+spk,PG,L,Sengo
+spl,PG,L,Selepet
+spm,PG,L,Sepen
+spo,US,L,Spokane
+spp,ML,L,"Senoufo, Supyire"
+spq,PE,L,"Spanish, Loreto-Ucayali"
+spr,ID,L,Saparua
+sps,PG,L,Saposa
+spt,IN,L,Spiti Bhoti
+spu,LA,L,Sapuan
+spy,KE,L,Sabaot
+sqa,NG,L,Shama-Sambuga
+sqh,NG,N,Shau
+sqi,AL,L,Albanian
+sqm,CF,L,Suma
+sqn,US,E,Susquehannock
+sqo,IR,L,Sorkhei
+sqq,LA,L,Sou
+sqs,LK,L,Sri Lankan Sign Language
+sqt,YE,L,Soqotri
+squ,CA,N,Squamish
+sra,PG,L,Saruga
+srb,IN,L,Sora
+src,IT,L,"Sardinian, Logudorese"
+srd,IT,L,Sardinian
+sre,ID,L,Sara
+srf,PG,L,Nafi
+srg,PH,L,Sulod
+srh,CN,L,Sarikoli
+sri,CO,L,Siriano
+srj,ID,L,Serawai
+srk,MY,L,Serudung Murut
+srl,ID,L,Isirawa
+srm,SR,L,Saramaccan
+srn,SR,L,Sranan
+sro,IT,L,"Sardinian, Campidanese"
+srp,CS,L,Serbian
+srq,BO,L,Sirionó
+srr,SN,L,Serer-Sine
+srs,CA,L,Sarsi
+srt,ID,L,Sauri
+sru,BR,L,Suruí
+srv,PH,L,"Sorsogon, Waray"
+srw,ID,L,Serua
+srx,IN,L,Sirmauri
+sry,PG,L,Sera
+srz,IR,L,Shahmirzadi
+ssb,PH,L,"Sama, Southern"
+ssd,PG,L,Siroi
+sse,PH,L,Balangingi
+ssf,TW,N,Thao
+ssg,PG,L,Seimat
+ssh,AE,L,"Arabic, Shihhi Spoken"
+ssi,IN,L,Sansi
+ssj,PG,L,Sausi
+ssk,IN,L,Sunam
+ssl,GH,L,"Sisaala, Western"
+ssm,MY,L,Semnam
+ssn,KE,L,Sanye
+sso,PG,L,Sissano
+ssp,ES,L,Spanish Sign Language
+ssq,ID,L,So'a
+ssr,CH,L,Swiss-French Sign Language
+sss,LA,L,Sô
+sst,PG,L,Sinasina
+ssu,PG,N,Susuami
+ssv,VU,L,Shark Bay
+ssw,SZ,L,Swati
+ssx,PG,L,Samberigi
+ssy,ER,L,Saho
+ssz,PG,L,Sengseng
+sta,ZM,S,Settla
+stb,PH,L,"Subanen, Northern"
+stc,SB,L,Santa Cruz
+std,IN,L,Sentinel
+ste,ID,L,Liana-Seti
+stf,PG,L,Seta
+stg,VN,L,Trieng
+sth,IE,L,Shelta
+sti,VN,L,"Stieng, Bulo"
+stj,BF,L,"Samo, Matya"
+stk,PG,L,Arammba
+stl,NL,L,Stellingwerfs
+stm,PG,L,Setaman
+stn,SB,L,Owa
+sto,CA,L,Stoney
+stp,MX,L,"Tepehuan, Southeastern"
+stq,DE,L,Saterfriesisch
+str,CA,L,"Salish, Straits"
+sts,AF,L,Shumashti
+stt,VN,L,"Stieng, Budeh"
+stu,MM,L,Samtao
+stw,FM,L,Satawalese
+sua,PG,L,Sulka
+sub,CD,L,Suku
+suc,PH,L,"Subanon, Western"
+sue,PG,L,Suena
+suf,ID,L,Tarpia
+sug,PG,L,Suganga
+suh,KE,L,Suba
+sui,PG,L,Suki
+suj,TZ,L,Shubi
+suk,TZ,L,Sukuma
+sul,PH,L,Surigaonon
+sum,NI,L,Sumo-Mayangna
+sun,ID,L,Sunda
+suq,ET,L,Suri
+sur,NG,L,Mwaghavul
+sus,GN,L,Susu
+sut,NI,E,Subtiaba
+suu,ID,L,Sungkai
+suv,IN,L,Sulung
+suw,TZ,L,Sumbwa
+suy,BR,L,Suyá
+suz,NP,L,Sunwar
+sva,GE,L,Svan
+svb,PG,L,Ulau-Suain
+svc,VC,L,Vincentian Creole English
+sve,ID,L,Serili
+svk,SK,L,Slovakian Sign Language
+svr,IN,L,Savara
+svs,SB,L,Savosavo
+swa,TZ,L,Swahili (macrolanguage)
+swb,KM,L,Comorian
+swc,CD,L,"Swahili, Congo"
+swe,SE,L,Swedish
+swf,CD,L,Sere
+swg,DE,L,Swabian
+swh,TZ,L,Swahili
+swi,CN,L,Sui
+swj,GA,L,Sira
+swk,MW,L,"Sena, Malawi"
+swl,SE,L,Swedish Sign Language
+swm,PG,L,Samosa
+swn,LY,L,Sawknah
+swp,PG,L,Suau
+swq,CM,L,Sharwa
+swr,ID,L,Saweru
+sws,ID,L,Seluwasan
+swt,ID,L,Sawila
+swu,ID,L,Suwawa
+swv,IN,L,Shekhawati
+sww,VU,N,Sowa
+swx,BR,L,Suruahá
+swy,TD,L,Sarua
+sxe,GA,L,Sighu
+sxg,CN,L,Shixing
+sxm,KH,L,Samre
+sxn,ID,L,Sangir
+sxr,TW,N,Saaroa
+sxs,NG,L,Sasaru
+sxu,DE,L,"Saxon, Upper"
+sxw,BJ,L,"Gbe, Saxwe"
+sya,ID,L,Siang
+syb,PH,L,"Subanen, Central"
+syc,TR,E,Syriac
+syi,GQ,L,Seki
+syk,NG,L,Sukur
+syl,BD,L,Sylheti
+sym,BF,L,"Samo, Maya"
+syn,IR,L,Senaya
+syo,KH,L,Suoy
+syr,IQ,L,Syriac
+sys,TD,L,Sinyar
+syw,NP,L,Kagate
+sza,MY,L,Semelai
+szb,ID,L,Ngalum
+szc,MY,L,Semaq Beri
+szd,MY,E,Seru
+sze,ET,L,Seze
+szg,CD,L,Sengele
+szk,TZ,L,Sizaki
+szl,PL,L,Silesian
+szn,ID,L,Sula
+szp,ID,L,Suabo
+szv,CM,L,Isu
+szw,ID,L,Sawai
+taa,US,L,"Tanana, Lower"
+tab,RU,L,Tabassaran
+tac,MX,L,"Tarahumara, Lowland"
+tad,ID,L,Tause
+tae,BR,N,Tariano
+taf,BR,L,Tapirapé
+tag,SD,L,Tagoi
+tah,PF,L,Tahitian
+taj,NP,L,"Tamang, Eastern"
+tak,NG,L,Tala
+tal,NG,L,Tal
+tam,IN,L,Tamil
+tan,NG,L,Tangale
+tao,TW,L,Yami
+tap,CD,L,Taabwa
+taq,ML,L,Tamasheq
+tar,MX,L,"Tarahumara, Central"
+tas,VN,E,Tay Boi
+tat,RU,L,Tatar
+tau,US,L,"Tanana, Upper"
+tav,CO,L,Tatuyo
+taw,PG,L,Tai
+tax,TD,L,Tamki
+tay,TW,L,Atayal
+taz,SD,L,Tocho
+tba,BR,L,Tubarão
+tbb,BR,E,Tapeba
+tbc,PG,L,Takia
+tbd,PG,L,Kaki Ae
+tbe,SB,L,Tanimbili
+tbf,PG,L,Mandara
+tbg,PG,L,"Tairora, North"
+tbh,AU,E,Thurawal
+tbi,SD,L,Gaam
+tbj,PG,L,Tiang
+tbk,PH,L,"Tagbanwa, Calamian"
+tbl,PH,L,Tboli
+tbm,CD,L,Tagbu
+tbn,CO,L,"Tunebo, Barro Negro"
+tbo,PG,L,Tawala
+tbp,ID,L,Taworta
+tbr,SD,L,Tumtum
+tbs,PG,L,Tanguat
+tbt,CD,L,Tembo
+tbu,MX,E,Tubar
+tbv,PG,L,Tobo
+tbw,PH,L,Tagbanwa
+tbx,PG,L,Kapin
+tby,ID,L,Tabaru
+tbz,BJ,L,Ditammari
+tca,BR,L,Ticuna
+tcb,US,L,Tanacross
+tcc,TZ,L,Datooga
+tcd,GH,L,Tafi
+tce,CA,L,"Tutchone, Southern"
+tcf,MX,L,"Tlapanec, Malinaltepec"
+tcg,ID,L,Tamagario
+tch,TC,L,Turks and Caicos Creole English
+tci,PG,L,Wára
+tck,GA,L,Tchitchege
+tcl,MM,L,Taman
+tcm,ID,L,Tanahmerah
+tcn,NP,L,Tichurong
+tco,MM,L,Taungyo
+tcp,MM,L,"Chin, Tawr"
+tcq,ID,L,Kaiy
+tcs,AU,L,Torres Strait Creole
+tct,CN,L,T'en
+tcu,MX,L,"Tarahumara, Southeastern"
+tcx,IN,L,Toda
+tcy,IN,L,Tulu
+tcz,IN,L,"Chin, Thado"
+tda,NE,L,Tagdal
+tdb,IN,L,Panchpargania
+tdc,CO,L,Emberá-Tadó
+tdd,CN,L,Tai Nüa
+tdf,LA,L,Talieng
+tdg,NP,L,"Tamang, Western"
+tdh,NP,L,Thulung
+tdi,ID,L,Tomadino
+tdj,ID,L,Tajio
+tdk,NG,L,Tambas
+tdl,NG,L,Sur
+tdn,ID,L,Tondano
+tdo,NG,L,Teme
+tdq,NG,L,Tita
+tdr,VN,L,Todrah
+tds,ID,L,Doutai
+tdt,TL,L,Tetun Dili
+tdu,MY,L,"Dusun, Tempasuk"
+tdv,NG,L,Toro
+tdx,MG,L,"Malagasy, Tandroy-Mahafaly"
+tdy,PH,L,Tadyawan
+tea,MY,L,Temiar
+teb,EC,E,Tetete
+ted,CI,L,"Krumen, Tepo"
+tee,MX,L,"Tepehua, Huehuetla"
+tef,IN,L,Teressa
+teg,CG,L,Teke-Tege
+teh,AR,N,Tehuelche
+tei,PG,L,Torricelli
+tek,CD,L,"Teke, Ibali"
+tel,IN,L,Telugu
+tem,SL,L,Themne
+ten,CO,E,Tama
+teo,UG,L,Teso
+tep,MX,E,Tepecano
+teq,SD,L,Temein
+ter,BR,L,Terêna
+tes,ID,L,Tengger
+tet,ID,L,Tetun
+teu,UG,L,Soo
+tev,ID,L,Teor
+tew,US,L,Tewa
+tex,SD,L,Tennet
+tey,SD,L,Tulishi
+tfi,BJ,L,"Gbe, Tofin"
+tfn,US,N,Tanaina
+tfo,ID,L,Tefaro
+tfr,PA,L,Teribe
+tft,ID,L,Ternate
+tga,KE,L,Sagalla
+tgb,MY,L,Tebilung
+tgc,PG,L,Tigak
+tgd,NG,L,Ciwogai
+tge,NP,L,"Tamang, Eastern Gorkha"
+tgf,BT,L,Chalikha
+tgg,PG,L,Tangga
+tgh,TT,L,Tobagonian Creole English
+tgi,PG,L,Lawunuia
+tgk,TJ,L,Tajiki
+tgl,PH,L,Tagalog
+tgo,PG,L,Sudest
+tgp,VU,L,Tangoa
+tgq,MY,L,Tring
+tgr,LA,L,Tareng
+tgs,VU,L,Nume
+tgt,PH,L,"Tagbanwa, Central"
+tgu,PG,L,Tanggu
+tgv,BR,E,Tingui-Boto
+tgw,CI,L,"Senoufo, Tagwana"
+tgx,CA,N,Tagish
+tgy,SD,E,Togoyo
+tha,TH,L,Thai
+thc,VN,L,Tai Hang Tong
+thd,AU,L,Thayore
+the,NP,L,"Tharu, Chitwania"
+thf,NP,L,Thangmi
+thh,MX,L,"Tarahumara, Northern"
+thi,LA,L,Tai Long
+thk,KE,L,Tharaka
+thl,NP,L,"Tharu, Dangaura"
+thm,TH,L,Aheu
+thp,CA,L,Thompson
+thq,NP,L,"Tharu, Kochila"
+thr,NP,L,"Tharu, Rana"
+ths,NP,L,Thakali
+tht,CA,N,Tahltan
+thu,SD,L,Thuri
+thv,DZ,L,"Tamahaq, Tahaggart"
+thw,NP,L,Thudam
+thx,LA,L,The
+thy,NG,L,Tha
+thz,NE,L,"Tamajeq, Tayart"
+tia,DZ,L,"Tamazight, Tidikelt"
+tic,SD,L,Tira
+tid,ID,L,Tidong
+tie,SD,L,Tingal
+tif,PG,L,Tifal
+tig,ER,L,Tigré
+tih,MY,L,Timugon Murut
+tii,CD,L,Tiene
+tij,NP,L,Tilung
+tik,CM,L,Tikar
+til,US,E,Tillamook
+tim,PG,L,Timbe
+tin,RU,L,Tindi
+tio,PG,L,Teop
+tip,ID,L,Trimuris
+tiq,BF,L,Tiéfo
+tir,ET,L,Tigrigna
+tis,PH,L,"Itneg, Masadiit"
+tit,CO,N,Tinigua
+tiu,PH,L,"Itneg, Adasen"
+tiv,NG,L,Tiv
+tiw,AU,L,Tiwi
+tix,US,L,"Tiwa, Southern"
+tiy,PH,L,Tiruray
+tiz,CN,L,Tai Hongjin
+tja,LR,L,Tajuasohn
+tjg,ID,L,Tunjung
+tji,CN,L,"Tujia, Northern"
+tjn,CI,E,Tonjon
+tjo,DZ,L,"Tamazight, Temacine"
+tjs,CN,L,"Tujia, Southern"
+tju,AU,E,Tjurruru
+tka,BR,E,Truká
+tkb,IN,L,Buksa
+tkd,TL,L,Tukudede
+tke,MZ,L,Takwane
+tkf,BR,E,Tukumanféd
+tkk,CN,L,Takpa
+tkl,TK,L,Tokelauan
+tkm,US,E,Takelma
+tkn,JP,L,Toku-No-Shima
+tkp,SB,L,Tikopia
+tkq,NG,L,Tee
+tkr,AZ,L,Tsakhur
+tks,IR,L,Takestani
+tkt,NP,L,"Tharu, Kathoriya"
+tkw,SB,L,Teanu
+tkx,ID,L,Tangko
+tkz,VN,L,Takua
+tla,MX,L,"Tepehuan, Southwestern"
+tlb,ID,L,Tobelo
+tlc,MX,L,"Totonac, Yecuatla"
+tld,ID,L,Talaud
+tle,KE,L,Talai
+tlf,PG,L,Telefol
+tlg,ID,L,Tofanma
+tli,US,L,Tlingit
+tlj,UG,L,Talinga-Bwisi
+tlk,ID,L,Taloki
+tll,CD,L,Tetela
+tlm,VU,L,Tolomako
+tln,ID,L,Talondo'
+tlo,SD,L,Talodi
+tlp,MX,L,"Totonac, Filomena Mata-Coahuitlán"
+tlq,MM,L,Tai Loi
+tlr,SB,L,Talise
+tls,VU,L,Tambotalo
+tlt,ID,L,Teluti
+tlu,ID,L,Tulehu
+tlv,ID,L,Taliabu
+tlw,ID,L,"Wemale, South"
+tlx,PG,L,Khehek
+tly,AZ,L,Talysh
+tlz,ID,L,Toala'
+tma,TD,L,Tama
+tmb,VU,L,Katbol
+tmc,TD,L,Tumak
+tmd,PG,L,Haruai
+tme,BR,N,Tremembé
+tmf,PY,L,Toba-Maskoy
+tmg,ID,E,Ternateño
+tmh,ML,L,Tamashek
+tmi,VU,L,Tutuba
+tmj,ID,L,Samarokena
+tmk,NP,L,"Tamang, Northwestern"
+tml,ID,L,"Citak, Tamnim"
+tmm,VN,L,Tai Thanh
+tmn,ID,L,Taman
+tmo,MY,L,Temoq
+tmp,LA,L,Tai Mène
+tmq,PG,L,Tumleo
+tmr,IQ,E,Jewish Babylonian Aramaic
+tms,SD,L,Tima
+tmt,VU,L,Tasmate
+tmu,ID,L,Iau
+tmv,CD,L,Tembo
+tmw,MY,L,Temuan
+tmx,NP,L,Tomyang
+tmy,PG,L,Tami
+tmz,VE,E,Tamanaku
+tna,BO,L,Tacana
+tnb,CO,L,"Tunebo, Western"
+tnc,CO,L,Tanimuca-Retuarã
+tnd,CO,N,"Tunebo, Angosturas"
+tne,PH,L,"Kallahan, Tinoc"
+tnf,AF,L,Tangshewi
+tng,TD,L,Tobanga
+tnh,PG,L,Maiani
+tni,ID,N,Tandia
+tnj,MY,L,Tanjong
+tnk,VU,L,Kwamera
+tnl,VU,L,Lenakel
+tnm,ID,L,Tabla
+tnn,VU,L,"Tanna, North"
+tno,BO,L,Toromono
+tnp,VU,L,Whitesands
+tnq,BS,E,Taino
+tnr,SN,L,Budik
+tns,PG,L,Tenis
+tnt,ID,L,Tontemboan
+tnu,LA,L,Tay Khang
+tnv,BD,L,Tangchangya
+tnw,ID,L,Tonsawang
+tnx,SB,N,Tanema
+tny,TZ,L,Tongwe
+tnz,TH,L,Tonga
+tob,AR,L,Toba
+toc,MX,L,"Totonac, Coyutla"
+tod,GN,L,Toma
+toe,CO,E,Tomedes
+tof,PG,L,Gizrra
+tog,MW,L,Tonga
+toh,MZ,L,Tonga
+toi,ZM,L,Tonga
+toj,MX,L,Tojolabal
+tol,US,N,Tolowa
+tom,ID,L,Tombulu
+ton,TO,L,Tongan
+too,MX,L,"Totonac, Xicotepec de Juárez"
+top,MX,L,"Totonac, Papantla"
+toq,SD,L,Toposa
+tor,CD,L,"Banda, Togbo-Vara"
+tos,MX,L,"Totonac, Highland"
+tot,MX,L,"Totonac, Patla-Chicontla"
+tou,VN,L,Tho
+tov,IR,L,"Taromi, Upper"
+tow,US,L,Jemez
+tox,PW,L,Tobian
+toy,ID,L,Topoiyo
+toz,CM,S,To
+tpa,PG,L,Taupota
+tpc,MX,L,"Tlapanec, Azoyú"
+tpe,BD,L,Tippera
+tpg,ID,L,Kula
+tpi,PG,L,Tok Pisin
+tpj,PY,L,Tapieté
+tpk,BR,E,Tupinikin
+tpl,MX,L,"Tlapanec, Tlacoapa"
+tpm,GH,L,Tampulma
+tpn,BR,E,Tupinambá
+tpo,LA,L,Tai Pao
+tpp,MX,L,"Tepehua, Pisaflores"
+tpq,IN,L,Tukpa
+tpr,BR,L,Tuparí
+tpt,MX,L,"Tepehua, Tlachichilco"
+tpu,KH,L,Tampuan
+tpv,MP,L,Tanapag
+tpw,BR,E,Tupí
+tpx,MX,L,"Tlapanec, Acatepec"
+tpy,BR,L,Trumaí
+tpz,PG,L,Tinputz
+tqb,BR,L,Tembé
+tql,VU,L,Lehali
+tqm,PG,N,Turumsa
+tqn,US,L,Tenino
+tqo,PG,L,Toaripi
+tqp,PG,L,Tomoip
+tqq,SO,L,Tunni
+tqr,SD,E,Torona
+tqt,MX,L,"Totonac, Ozumatlán"
+tqu,SB,L,Touo
+tqw,US,E,Tonkawa
+tra,AF,N,Tirahi
+trb,PG,L,Terebu
+trc,MX,L,"Triqui, Copala"
+trd,IN,L,Turi
+tre,ID,L,"Tarangan, East"
+trf,TT,L,Trinidadian Creole English
+trg,IL,L,Lishán Didán
+trh,PG,L,Turaka
+tri,SR,L,Trió
+trj,TD,L,Toram
+trl,GB,L,Traveller Scottish
+trm,AF,L,Tregami
+trn,BO,L,Trinitario
+tro,IN,L,"Naga, Tarao"
+trp,IN,L,Kok Borok
+trq,MX,L,"Triqui, San Martín Itunyoso"
+trr,PE,N,Taushiro
+trs,MX,L,"Triqui, Chicahuaxtla"
+trt,ID,L,Tunggare
+tru,TR,L,Turoyo
+trv,TW,L,Taroko
+trw,PK,L,Torwali
+trx,MY,L,Tringgus
+try,IN,E,Turung
+trz,BR,N,Torá
+tsa,CG,L,Tsaangi
+tsb,ET,L,Tsamai
+tsc,MZ,L,Tswa
+tsd,GR,L,Tsakonian
+tse,TN,L,Tunisian Sign Language
+tsf,NP,L,"Tamang, Southwestern"
+tsg,PH,L,Tausug
+tsh,CM,L,Tsuvan
+tsi,CA,L,Tsimshian
+tsj,BT,L,Tshangla
+tsk,CN,L,Tseku
+tsl,VN,L,Ts'ün-Lao
+tsm,TR,L,Turkish Sign Language
+tsn,BW,L,Tswana
+tso,ZA,L,Tsonga
+tsp,BF,L,"Toussian, Northern"
+tsq,TH,L,Thai Sign Language
+tsr,VU,L,Akei
+tss,TW,L,Taiwan Sign Language
+tsu,TW,L,Tsou
+tsv,GA,L,Tsogo
+tsw,NG,L,Tsishingini
+tsx,PG,L,Mubami
+tsz,MX,L,Purepecha
+tta,US,E,Tutelo
+ttb,NG,L,Gaa
+ttc,GT,L,Tektiteko
+ttd,PG,L,Tauade
+tte,PG,L,Bwanabwana
+ttf,CM,L,Tuotomb
+ttg,BN,L,Tutong 2
+tth,LA,L,"Ta'oih, Upper"
+tti,ID,L,Tobati
+ttj,UG,L,Tooro
+ttk,CO,N,Totoro
+ttl,ZM,L,Totela
+ttm,CA,L,"Tutchone, Northern"
+ttn,ID,L,Towei
+tto,LA,L,"Ta'oih, Lower"
+ttp,ID,L,Tombelala
+ttq,NE,L,"Tamajaq, Tawallammat"
+ttr,NG,L,Tera
+tts,TH,L,"Thai, Northeastern"
+ttt,AZ,L,"Tat, Muslim"
+ttu,PG,L,Torau
+ttv,PG,L,Titan
+ttw,MY,L,"Kenyah, Tutoh"
+ttx,BN,L,Tutong 1
+tty,ID,L,Sikaritai
+ttz,NP,L,Tsum
+tua,PG,L,Wiarumus
+tub,US,N,Tübatulabal
+tuc,PG,L,Mutu
+tud,BR,E,Tuxá
+tue,CO,L,Tuyuca
+tuf,CO,L,"Tunebo, Central"
+tug,TD,L,Tunia
+tuh,PG,L,Taulil
+tui,CM,L,Tupuri
+tuj,ID,L,Tugutil
+tuk,TM,L,Turkmen
+tul,NG,L,Tula
+tum,MW,L,Tumbuka
+tun,US,E,Tunica
+tuo,BR,L,Tucano
+tuq,TD,L,Tedaga
+tur,TR,L,Turkish
+tus,CA,N,Tuscarora
+tuu,US,N,Tututni
+tuv,KE,L,Turkana
+tux,BR,E,Tuxináwa
+tuy,KE,L,"Tugen, North"
+tuz,BF,L,Turka
+tva,SB,L,Vaghua
+tvd,NG,L,Tsuvadi
+tve,ID,L,Te'un
+tvk,VU,L,"Ambrym, Southeast"
+tvl,TV,L,Tuvaluan
+tvm,ID,L,Tela-Masbuar
+tvn,MM,L,Tavoyan
+tvo,ID,L,Tidore
+tvs,KE,L,Taveta
+tvt,IN,L,"Naga, Tutsa"
+tvw,ID,L,Sedoa
+tvy,TL,E,"Pidgin, Timor"
+twa,US,E,Twana
+twb,PH,L,"Tawbuid, Western"
+twc,NG,E,Teshenawa
+twd,NL,L,Twents
+twe,ID,L,Tewa
+twf,US,L,"Tiwa, Northern"
+twg,ID,L,Tereweng
+twh,VN,L,Tai Dón
+twl,MZ,L,Tawara
+twn,CM,N,Twendi
+two,BW,L,Tswapong
+twp,PG,L,Ere
+twq,NE,L,Tasawaq
+twr,MX,L,"Tarahumara, Southwestern"
+twt,BR,E,Turiwára
+twu,ID,L,Termanu
+tww,PG,L,Tuwari
+twx,MZ,L,Tewe
+twy,ID,L,Tawoyan
+txa,MY,L,Tombonuwo
+txc,CA,E,Tsetsaut
+txe,ID,L,Totoli
+txi,BR,L,Ikpeng
+txm,ID,L,Tomini
+txn,ID,L,"Tarangan, West"
+txo,IN,L,Toto
+txq,ID,L,Tii
+txs,ID,L,Tonsea
+txt,ID,L,Citak
+txu,BR,L,Kayapó
+txx,MY,L,Tatana
+txy,MG,L,"Malagasy, Tanosy"
+tya,PG,L,Tauya
+tye,NG,L,Kyenga
+tyh,VN,L,O'du
+tyi,CG,L,Teke-Tsaayi
+tyj,VN,L,Tai Do
+tyl,VN,L,Thu Lao
+tyn,ID,L,Kombai
+typ,AU,N,Thaypan
+tyr,VN,L,Tai Daeng
+tys,VN,L,Tày Sa Pa
+tyt,VN,L,Tày Tac
+tyu,BW,L,Kua
+tyv,RU,L,Tuvin
+tyx,CG,L,Teke-Tyee
+tyz,VN,L,Tày
+tza,TZ,L,Tanzanian Sign Language
+tzb,MX,L,"Tzeltal, Bachajón"
+tzc,MX,L,"Tzotzil, Chamula"
+tze,MX,L,"Tzotzil, Chenalhó"
+tzh,MX,L,"Tzeltal, Oxchuc"
+tzj,GT,L,"Tz'utujil, Eastern"
+tzm,MA,L,"Tamazight, Central Atlas"
+tzn,ID,L,Tugun
+tzo,MX,L,"Tzotzil, Venustiano Carranza"
+tzs,MX,L,"Tzotzil, San Andrés Larrainzar"
+tzt,GT,L,"Tz'utujil, Western"
+tzu,MX,L,"Tzotzil, Huixtán"
+tzx,PG,L,Tabriak
+tzz,MX,L,"Tzotzil, Zinacantán"
+uam,BR,E,Uamué
+uan,LA,L,Kuan
+uar,PG,L,Tairuma
+uba,NG,L,Ubang
+ubi,TD,L,Ubi
+ubm,MY,L,"Kenyah, Upper Baram"
+ubr,PG,L,Ubir
+ubu,PG,L,Umbu-Ungu
+uby,TR,E,Ubykh
+uda,NG,L,Uda
+ude,RU,N,Udihe
+udi,AZ,L,Udi
+udj,ID,L,Ujir
+udl,CM,L,Wuzlam
+udm,RU,L,Udmurt
+udu,ET,L,Uduk
+ues,ID,L,Kioko
+ufi,PG,L,Ufim
+ugb,AU,N,Kuku-Ugbanh
+uge,SB,L,Ughele
+ugn,UG,L,Ugandan Sign Language
+ugo,TH,L,Ugong
+ugy,UY,L,Uruguayan Sign Language
+uha,NG,L,Uhami
+uhn,ID,L,Damal
+uig,CN,L,Uyghur
+uis,PG,L,Uisai
+uiv,CM,L,Iyive
+uji,NG,L,Tanjijili
+uka,ID,L,Kaburi
+ukg,PG,L,Ukuriguma
+ukh,CF,L,Ukhwejo
+ukl,UA,L,Ukrainian Sign Language
+ukp,NG,L,Ukpe-Bayobiri
+ukq,NG,L,Ukwa
+ukr,UA,L,Ukrainian
+uks,BR,L,Urubú-Kaapor Sign Language
+uku,NG,L,Ukue
+ukw,NG,L,Ukwuani-Aboh-Ndoni
+ula,NG,L,Fungwa
+ulb,NG,L,Ulukwumi
+ulc,RU,L,Ulch
+ulf,ID,L,Usku
+uli,FM,L,Ulithian
+ulk,AU,L,Meriam
+ull,IN,L,Ullatan
+ulm,ID,L,Ulumanda'
+uln,PG,N,Unserdeutsch
+uma,US,L,Umatilla
+umb,AO,L,Umbundu
+umd,AU,N,Umbindhamu
+umg,AU,N,Umbuygamu
+umi,MY,L,Ukit
+umm,NG,L,Umon
+umo,BR,E,Umotína
+ump,AU,L,Umpila
+umr,AU,N,Umbugarla
+ums,ID,L,Pendau
+umu,CA,N,Munsee
+una,PG,L,"Watut, North"
+une,NG,L,Uneme
+ung,AU,L,Ngarinyin
+unk,BR,L,Enawené-Nawé
+unm,US,E,Unami
+unp,AU,N,Worora
+unz,ID,L,"Kaili, Unde"
+uok,NG,L,Uokha
+upi,PG,L,Umeda
+upv,VU,L,Uripiv-Wala-Rano-Atchin
+ura,PE,L,Urarina
+urb,BR,L,Urubú-Kaapor
+urc,AU,N,Urningangg
+urd,PK,L,Urdu
+ure,BO,N,Uru
+urf,AU,N,Uradhi
+urg,PG,L,Urigina
+urh,NG,L,Urhobo
+uri,PG,L,Urim
+urk,TH,L,Urak Lawoi'
+url,IN,L,Urali
+urm,PG,L,Urapmin
+urn,ID,L,Uruangnirin
+uro,PG,L,Ura
+urp,BR,L,Uru-Pa-In
+urr,VU,L,Lehalurup
+urt,PG,L,Urat
+uru,BR,E,Urumi
+urv,PG,E,Uruava
+urw,PG,L,Sop
+urx,PG,L,Urimo
+ury,ID,L,Orya
+urz,BR,L,Uru-Eu-Wau-Wau
+usa,PG,L,Usarufa
+ush,PK,L,Ushojo
+usi,BD,L,Usui
+usk,CM,L,Usaghade
+usp,GT,L,Uspanteko
+usu,PG,L,Uya
+uta,NG,L,Otank
+ute,US,L,Ute-Southern Paiute
+utp,SB,L,Amba
+utr,NG,L,Etulo
+utu,PG,L,Utu
+uum,GE,L,Urum
+uun,TW,N,Kulon-Pazeh
+uur,VU,N,Ura
+uuu,CN,L,U
+uve,NC,L,"Uvean, West"
+uvh,PG,L,Uri
+uvl,PG,L,Lote
+uwa,AU,L,Kuku-Uwanh
+uya,NG,L,Doko-Uyanga
+uzb,UZ,L,Uzbek
+uzn,UZ,L,"Uzbek, Northern"
+uzs,AF,L,"Uzbek, Southern"
+vaa,IN,L,Vaagri Booli
+vae,CF,L,Vale
+vaf,IR,L,Vafsi
+vag,GH,L,Vagla
+vah,IN,L,Varhadi-Nagpuri
+vai,LR,L,Vai
+vaj,NA,L,Vasekela Bushman
+val,PG,L,Vehes
+vam,PG,L,Vanimo
+van,PG,L,Valman
+vao,VU,L,Vao
+vap,IN,L,Vaiphei
+var,MX,L,Huarijio
+vas,IN,L,Vasavi
+vau,CD,L,Vanuma
+vav,IN,L,Varli
+vay,NP,L,Wayu
+vbb,ID,L,"Babar, Southeast"
+vec,IT,L,Venetian
+ved,LK,L,Veddah
+vel,NL,L,Veluws
+vem,NG,L,Vemgo-Mabas
+ven,ZA,L,Venda
+veo,US,E,Ventureño
+vep,RU,L,Veps
+ver,NG,L,Mom Jango
+vgr,PK,L,Vaghri
+vic,VI,L,Virgin Islands Creole English
+vid,TZ,L,Vidunda
+vie,VN,L,Vietnamese
+vif,CG,L,Vili
+vig,BF,L,Viemo
+vil,AR,N,Vilela
+vin,TZ,L,Vinza
+vis,IN,L,Vishavan
+vit,NG,L,Viti
+viv,PG,L,Iduna
+vka,AU,E,Kariyarra
+vki,NG,L,Ija-Zuba
+vkj,TD,L,Kujarge
+vkk,ID,L,Kaur
+vkl,ID,L,Kulisusu
+vkm,BR,E,Kamakan
+vko,ID,L,Kodeoha
+vkp,IN,L,Korlai Creole Portuguese
+vkt,ID,L,"Malay, Tenggarong Kutai"
+vku,AU,N,Kurrama
+vky,ID,L,Kayu Agung
+vlp,VU,L,Valpei
+vlr,VU,L,Vatrata
+vls,BE,L,Vlaams
+vma,AU,N,Martuyhunira
+vmb,AU,N,Mbabaram
+vmc,MX,L,"Mixtec, Juxtlahuaca"
+vmd,IN,L,"Koraga, Mudu"
+vme,ID,L,"Masela, East"
+vmf,DE,L,Mainfränkisch
+vmg,PG,L,Minigir
+vmh,IR,L,Maraghei
+vmi,AU,N,Miwa
+vmj,MX,L,"Mixtec, Ixtayutla"
+vmk,MZ,L,Makhuwa-Shirima
+vml,AU,E,Malgana
+vmm,MX,L,"Mixtec, Mitlatongo"
+vmo,ID,L,Muko-Muko
+vmp,MX,L,"Mazatec, Soyaltepec"
+vmq,MX,L,"Mixtec, Soyaltepec"
+vmr,MZ,L,Marenje
+vms,ID,E,Moksela
+vmu,AU,N,Muluridyi
+vmv,US,E,"Maidu, Valley"
+vmw,MZ,L,Makhuwa
+vmx,MX,L,"Mixtec, Tamazola"
+vmy,MX,L,"Mazatec, Ayautla"
+vmz,MX,L,"Mazatec, Mazatlán"
+vnk,SB,E,Vano
+vnm,VU,L,Vinmavis
+vnp,VU,L,Vunapu
+vor,NG,L,Voro
+vot,RU,N,Vod
+vrs,SB,L,Varisi
+vrt,VU,L,Burmbar
+vsi,MD,L,Moldova Sign Language
+vsl,VE,L,Venezuelan Sign Language
+vum,GA,L,Vumbu
+vun,TZ,L,Vunjo
+vut,CM,L,Vute
+waa,US,L,Walla Walla
+wab,PG,L,Wab
+wac,US,N,Wasco-Wishram
+wad,ID,L,Wandamen
+wae,CH,L,Walser
+waf,BR,E,Wakoná
+wag,PG,L,Wa'ema
+wah,ID,L,Watubela
+wai,ID,L,Wares
+waj,PG,L,Waffa
+wal,ET,L,Wolaytta
+wam,US,E,Wampanoag
+wan,CI,L,Wan
+wao,US,E,Wappo
+wap,GY,L,Wapishana
+waq,AU,N,Wageman
+war,PH,L,Waray-Waray
+was,US,N,Washo
+wat,PG,L,Kaninuwa
+wau,BR,L,Waurá
+wav,NG,L,Waka
+waw,BR,L,Waiwai
+wax,PG,L,Watam
+way,SR,L,Wayana
+waz,PG,L,Wampur
+wba,VE,L,Warao
+wbb,ID,L,Wabo
+wbe,ID,L,Waritai
+wbf,BF,L,Wara
+wbh,TZ,L,Wanda
+wbi,TZ,L,Wanji
+wbj,TZ,L,Alagwa
+wbk,AF,L,Waigali
+wbl,PK,L,Wakhi
+wbm,MM,L,Wa
+wbp,AU,L,Warlpiri
+wbq,IN,L,Waddar
+wbr,IN,L,Wagdi
+wbt,AU,N,Wanman
+wbv,AU,N,Wajarri
+wbw,ID,L,Woi
+wca,BR,L,Yanomámi
+wci,TG,L,"Gbe, Waci"
+wdd,GA,L,Wandji
+wdg,PG,L,Wadaginam
+wdj,AU,N,Wadjiginy
+wdu,AU,N,Wadjigu
+wea,MM,L,Wewaw
+wec,CI,L,Wè Western
+wed,PG,L,Wedau
+weh,CM,L,Weh
+wei,PG,L,Were
+wem,BJ,L,"Gbe, Weme"
+weo,ID,L,"Wemale, North"
+wep,DE,L,Westphalien
+wer,PG,L,Weri
+wes,CM,L,"Pidgin, Cameroon"
+wet,ID,L,Perai
+weu,MM,L,Welaung
+wew,ID,L,Wejewa
+wfg,ID,L,Yafi
+wga,AU,N,Wagaya
+wgg,AU,N,Wangganguru
+wgi,PG,L,Wahgi
+wgo,ID,L,Waigeo
+wgw,PG,L,Wagawaga
+wgy,AU,N,Warrgamay
+wha,ID,L,Manusela
+whg,PG,L,"Wahgi, North"
+whk,ID,L,"Kenyah, Wahau"
+whu,ID,L,"Kayan, Wahau"
+wib,BF,L,"Toussian, Southern"
+wic,US,N,Wichita
+wie,AU,N,Wik-Epa
+wif,AU,N,Wik-Keyangan
+wig,AU,L,Wik-Ngathana
+wih,AU,N,Wik-Me'anha
+wii,PG,L,Wiaki
+wij,AU,L,Wik-Iiyanh
+wik,AU,L,Wikalkan
+wil,AU,N,Wilawila
+wim,AU,L,Wik-Mungkan
+win,US,L,Ho-Chunk
+wir,BR,E,Wiraféd
+wit,US,N,Wintu
+wiu,PG,L,Wiru
+wiv,PG,L,Muduapa
+wiw,AU,N,Wirangu
+wiy,US,E,Wiyot
+wja,NG,L,Waja
+wji,NG,L,Warji
+wka,TZ,E,Kw'adza
+wkd,ID,L,Wakde
+wkw,AU,N,Wakawaka
+wla,PG,L,Walio
+wlc,KM,L,"Comorian, Mwali"
+wlg,AU,N,Kunbarlang
+wli,ID,L,Waioli
+wlk,US,E,Wailaki
+wll,SD,L,Wali
+wln,BE,L,Walloon
+wlo,ID,L,Wolio
+wlr,VU,L,Wailapa
+wls,WF,L,Wallisian
+wlu,AU,E,Wuliwuli
+wlv,AR,L,Wichí Lhamtés Vejoz
+wlw,ID,L,Walak
+wlx,GH,L,Wali
+wly,NP,E,Waling
+wma,NG,E,Mawa
+wmb,AU,N,Wambaya
+wmc,PG,L,Wamas
+wme,NP,L,Wambule
+wmh,TL,L,Waima'a
+wmi,AU,N,Wamin
+wmm,ID,L,Maiwa
+wmn,NC,E,Waamwang
+wmo,PG,L,Wom
+wms,ID,L,Wambon
+wmt,AU,L,Walmajarri
+wmw,MZ,L,Mwani
+wnb,PG,L,Wanambre
+wnc,PG,L,Wantoat
+wnd,AU,E,Wandarang
+wne,PK,L,Waneci
+wng,ID,L,Wanggom
+wni,KM,L,"Comorian, Ndzwani"
+wnk,ID,L,Wanukaka
+wnm,AU,N,Wanggamala
+wno,ID,L,Wano
+wnp,PG,L,Wanap
+wnu,PG,L,Usan
+woa,AU,N,Tyaraity
+wob,CI,L,Wè Northern
+woc,PG,L,Wogeo
+wod,ID,L,Wolani
+woe,FM,L,Woleaian
+wof,GM,L,"Wolof, Gambian"
+wog,PG,L,Wogamusin
+woi,ID,L,Kamang
+wok,CM,L,Longto
+wol,SN,L,Wolof
+wom,NG,L,Wom
+won,CD,L,Wongo
+woo,ID,L,Manombai
+wor,ID,N,Woria
+wos,PG,L,Hanga Hundi
+wow,ID,L,Wawonii
+woy,ET,E,Weyto
+wpc,VE,L,Maco
+wra,PG,L,Warapu
+wrb,AU,N,Warluwara
+wrd,AF,L,Warduji
+wre,TZ,L,Ware
+wrg,AU,N,Warungu
+wrh,AU,N,Wiradhuri
+wri,AU,E,Wariyangga
+wrl,AU,N,Warlmanpa
+wrm,AU,L,Warumungu
+wrn,SD,L,Warnang
+wrp,ID,L,Waropen
+wrr,AU,N,Wardaman
+wrs,PG,L,Waris
+wru,ID,L,Waru
+wrv,PG,L,Waruna
+wrw,AU,E,Gugu Warra
+wrx,ID,L,Wae Rana
+wry,IN,L,Merwari
+wrz,AU,N,Waray
+wsa,ID,L,Warembori
+wsi,VU,L,Wusi
+wsk,PG,L,Waskia
+wsr,PG,L,Owenia
+wss,GH,L,Wasa
+wsu,BR,E,Wasu
+wsv,AF,L,Wotapuri-Katarqalai
+wtf,PG,L,Dumpu
+wti,ET,L,Berta
+wtk,PG,L,Watakataui
+wtm,IN,L,Mewati
+wtw,ID,L,Wotu
+wua,AU,N,Wikngenchera
+wub,AU,N,Wunambal
+wud,TG,L,Wudu
+wuh,CN,L,Wutunhua
+wul,ID,L,Silimo
+wum,GA,L,Wumbvu
+wun,TZ,L,Bungu
+wur,AU,E,Wurrugu
+wut,PG,L,Wutung
+wuu,CN,L,"Chinese, Wu"
+wuv,PG,L,Wuvulu-Aua
+wux,AU,N,Wulna
+wuy,ID,L,Wauyai
+wwa,BJ,L,Waama
+wwo,VU,L,Wetamut
+wwr,AU,N,Warrwa
+www,CM,L,Wawa
+wxa,CN,L,Waxianghua
+wya,US,E,Wyandot
+wyb,AU,N,Wangaaybuwan-Ngiyambaa
+wym,PL,L,Wymysorys
+wyr,BR,L,Wayoró
+wyy,FJ,L,"Fijian, Western"
+xac,IN,L,Kachari
+xah,ID,L,Kahayan
+xai,BR,E,Kaimbé
+xal,RU,L,Kalmyk-Oirat
+xam,ZA,E,|Xam
+xan,ET,L,Xamtanga
+xao,VN,L,Khao
+xar,PG,E,Karami
+xas,RU,E,Kamas
+xat,BR,N,Katawixi
+xau,ID,L,Kauwera
+xav,BR,L,Xavánte
+xaw,US,N,Kawaiisu
+xay,ID,L,Kayan Mahakam
+xba,BR,E,Kamba
+xbi,PG,L,Kombio
+xbr,ID,L,Kambera
+xbw,BR,E,Kambiwá
+xbx,BR,L,Kabixí
+xdy,ID,L,Malayic Dayak
+xed,CM,L,Hdi
+xeg,ZA,E,||Xegwi
+xel,SD,L,Kelo
+xem,ID,L,Kembayan
+xer,BR,L,Xerénte
+xes,PG,L,Kesawai
+xet,BR,N,Xetá
+xeu,PG,L,Keuru
+xhe,PK,L,Khetrani
+xho,ZA,L,Xhosa
+xhv,VN,L,Khua
+xia,CN,L,Xiandao
+xii,ZA,N,Xiri
+xin,GT,E,Xinca
+xip,BR,E,Xipináwa
+xir,BR,L,Xiriâna
+xiy,BR,N,Xipaya
+xka,PK,L,Kalkoti
+xkb,BJ,L,"Ede Nago, Manigri-Kambolé"
+xkc,IR,L,Kho'ini
+xkd,ID,L,"Kayan, Mendalam"
+xke,ID,L,Kereho-Uheng
+xkf,BT,L,Khengkha
+xkg,ML,L,Kagoro
+xkh,BR,N,Karahawyana
+xki,KE,L,Kenyan Sign Language
+xkj,IR,L,Kajali
+xkk,KH,L,Kaco'
+xkl,ID,L,"Kenyah, Kelinyau"
+xkm,ID,L,"Kenyah, Mahakam"
+xkn,ID,L,"Kayan, Kayan River"
+xko,LA,L,Kiorr
+xkp,IR,L,Kabatei
+xkq,ID,L,Koroni
+xkr,BR,E,Xakriabá
+xks,ID,L,Kumbewaha
+xkt,GH,L,Kantosi
+xku,CG,L,Kaamba
+xkv,BW,L,Kgalagadi
+xkw,ID,N,Kembra
+xkx,PG,L,Karore
+xky,MY,L,"Kenyah, Western"
+xkz,BT,L,Kurtokha
+xla,PG,L,Kamula
+xma,SO,L,Mushungulu
+xmb,CM,L,Mbonga
+xmc,MZ,L,Makhuwa-Marrevone
+xmd,CM,L,Mbedam
+xmf,GE,L,Mingrelian
+xmg,CM,L,Mengaka
+xmh,AU,L,Kuku-Muminh
+xmi,BR,L,Miarrã
+xmj,CM,L,Majera
+xml,MY,L,Malaysian Sign Language
+xmm,ID,L,"Malay, Manado"
+xmo,BR,L,Morerebi
+xmp,AU,N,Kuku-Mu'inh
+xmq,AU,N,Kuku-Mangk
+xms,MA,L,Moroccan Sign Language
+xmt,ID,L,Matbat
+xmu,AU,N,Kamu
+xmv,MG,L,"Malagasy, Antankarana"
+xmw,MG,L,"Malagasy, Tsimihety"
+xmx,ID,L,Maden
+xmy,AU,N,Mayaguduna
+xmz,ID,L,Mori Bawah
+xnb,TW,N,Kanakanabu
+xnh,CN,L,Kuanhua
+xnn,PH,L,"Kankanay, Northern"
+xnr,IN,L,Kangri
+xns,IN,L,Kanashi
+xod,ID,L,Kokoda
+xog,UG,L,Soga
+xoi,PG,L,Kominimung
+xok,BR,L,Xokleng
+xom,SD,L,Komo
+xon,GH,L,Konkomba
+xoo,BR,E,Xukurú
+xop,PG,L,Kopar
+xor,BR,L,Korubo
+xow,PG,L,Kowaki
+xpe,LR,L,"Kpelle, Liberia"
+xpn,BR,E,Kapinawá
+xra,BR,L,Krahô
+xrb,BF,L,"Karaboro, Eastern"
+xre,BR,N,Kreye
+xri,BR,L,Krikati-Timbira
+xrw,PG,N,Karawa
+xsb,PH,L,"Sambal, Tinà"
+xse,ID,L,Sempan
+xsh,NG,L,Shamang
+xsi,PG,L,Sio
+xsj,TZ,L,Subi
+xsl,CA,L,"Slavey, South"
+xsm,BF,L,Kasem
+xsn,NG,L,Sanga
+xsp,PG,L,Silopi
+xsq,MZ,L,Makhuwa-Saka
+xsr,NP,L,Sherpa
+xst,ET,L,Silt'e
+xsu,VE,L,Sanumá
+xsy,TW,L,Saisiyat
+xta,MX,L,"Mixtec, Alcozauca"
+xtb,MX,L,"Mixtec, Chazumba"
+xtc,SD,L,Katcha-Kadugli-Miri
+xtd,MX,L,"Mixtec, Diuxi-Tilantongo"
+xte,ID,L,Ketengban
+xti,MX,L,"Mixtec, Sinicahua"
+xtj,MX,L,"Mixtec, San Juan Teita"
+xtl,MX,L,"Mixtec, Tijaltepec"
+xtm,MX,L,"Mixtec, Magdalena Peñasco"
+xtn,MX,L,"Mixtec, Northern Tlaxiaco"
+xtp,MX,L,"Mixtec, San Miguel Piedras"
+xts,MX,L,"Mixtec, Sindihui"
+xtt,MX,L,"Mixtec, Tacahua"
+xtu,MX,L,"Mixtec, Cuyamecalco"
+xty,MX,L,"Mixtec, Yoloxochitl"
+xua,IN,L,"Kurumba, Alu"
+xub,IN,L,"Kurumba, Betta"
+xuf,ET,L,Kunfal
+xug,JP,L,Kunigami
+xuj,IN,L,"Kurumba, Jennu"
+xuo,TD,L,Kuo
+xut,AU,N,Kuthant
+xuu,NA,L,Kxoe
+xvi,AF,L,Kamviri
+xwe,BJ,L,"Gbe, Xwela"
+xwg,ET,L,Kwegu
+xwl,BJ,L,"Gbe, Western Xwla"
+xwr,ID,L,Kwerba Mamberamo
+xxk,ID,L,Ke'o
+yaa,PE,L,Yaminahua
+yab,BR,L,Yuhup
+yac,ID,L,"Yali, Pass Valley"
+yad,PE,L,Yagua
+yae,VE,L,Pumé
+yaf,CD,L,Yaka
+yag,CL,N,Yámana
+yah,TJ,L,Yazgulyam
+yai,TJ,L,Yagnobi
+yaj,CF,L,Banda-Yangere
+yak,US,L,Yakima
+yal,GN,L,Yalunka
+yam,CM,L,Yamba
+yao,MW,L,Yao
+yap,FM,L,Yapese
+yaq,MX,L,Yaqui
+yar,VE,N,Yabarana
+yas,CM,L,Nugunu
+yat,CM,L,Yambeta
+yau,VE,L,Yuwana
+yav,CM,L,Yangben
+yaw,BR,E,Yawalapití
+yax,AO,L,Yauma
+yay,NG,L,Agwagwune
+yaz,NG,L,Lokaa
+yba,NG,L,Yala
+ybb,CM,L,Yemba
+ybd,MM,L,Yangbye
+ybe,CN,L,"Yugur, West"
+ybh,NP,L,Yakha
+ybi,NP,L,Yamphu
+ybj,NG,L,Hasha
+ybl,NG,L,Yukuben
+ybm,PG,L,Yaben
+ybn,BR,E,Yabaâna
+ybo,PG,L,Yabong
+ybx,PG,L,Yawiyo
+yby,PG,L,Yaweyuha
+ycl,CN,L,"Yi, Central"
+ycn,CO,L,Yucuna
+ydd,IL,L,"Yiddish, Eastern"
+ydg,PK,L,Yidgha
+ydk,PG,L,Yoidik
+yds,IL,L,Yiddish Sign Language
+yea,IN,L,Ravula
+yec,DE,L,Yeniche
+yee,PG,L,Yimas
+yei,CM,E,Yeni
+yej,IL,N,Yevanic
+yel,CD,L,Yela
+yen,NG,L,Yendang
+yer,NG,L,Tarok
+yes,NG,L,Yeskwa
+yet,ID,L,Yetfa
+yeu,IN,L,Yerukula
+yev,PG,L,Yapunda
+yey,BW,L,Yeyi
+ygm,PG,L,Yagomi
+ygr,PG,L,Yagaria
+ygw,PG,L,Yagwoia
+yhd,IL,L,"Arabic, Judeo-Iraqi"
+yia,AU,N,Yinggarda
+yib,US,S,Yinglish
+yid,IL,L,Yiddish
+yif,CN,L,"Yi, Ache"
+yig,CN,L,"Yi, Guizhou"
+yih,DE,L,"Yiddish, Western"
+yii,AU,N,Yidiny
+yij,AU,L,Yindjibarndi
+yik,CN,L,"Yi, Xishan Lalu"
+yil,AU,N,Yindjilandji
+yim,IN,L,"Naga, Yimchungru"
+yin,MM,L,Yinchia
+yio,CN,L,"Yi, Dayao"
+yip,CN,L,"Yi, Poluo"
+yiq,CN,L,"Yi, Miqie"
+yir,ID,L,"Awyu, North"
+yis,PG,L,Yis
+yit,CN,L,"Yi, Eastern Lalu"
+yiu,CN,L,"Yi, Awu"
+yiv,CN,L,"Yi, Eshan-Xinping"
+yix,CN,L,"Yi, Axi"
+yiy,AU,N,Yir Yoront
+yiz,CN,L,"Yi, Azhe"
+yka,PH,L,Yakan
+ykg,RU,L,"Yukaghir, Northern"
+yki,ID,L,Yoke
+ykk,PG,L,Yakaikeke
+ykm,PG,L,Yakamul
+yko,CM,L,Yasa
+ykr,PG,L,Yekora
+yky,CF,L,Yakoma
+yla,PG,L,Yaul
+yle,PG,L,Yele
+ylg,PG,L,Yelogu
+yli,ID,L,"Yali, Angguruk"
+yll,PG,L,Yil
+ylm,CN,L,"Yi, Limi"
+ylo,CN,L,"Yi, Naluo"
+ylr,AU,E,Yalarnnga
+ylu,PG,L,Aribwaung
+yly,NC,L,Nyâlayu
+yma,NP,L,Yamphe
+ymb,PG,L,Yambes
+yme,PE,E,Yameo
+ymg,CD,L,Yamongeri
+ymh,CN,L,"Yi, Mili"
+ymj,CN,L,"Yi, Muji"
+ymk,MZ,L,Makwe
+yml,PG,L,Iamalele
+ymm,SO,L,Maay
+ymn,ID,L,Yamna
+ymp,PG,L,Yamap
+ynd,AU,N,Yandruwandha
+yng,CD,L,Yango
+ynh,GA,L,Yangho
+ynk,RU,L,"Yupik, Naukan"
+ynl,PG,L,Yangulam
+ynn,US,E,Yana
+yno,TH,L,Yong
+yns,CD,L,Yansi
+ynu,CO,E,Yahuna
+yob,PG,E,Yoba
+yog,PH,L,Yogad
+yoi,JP,L,Yonaguni
+yok,US,N,Yokuts
+yom,CD,L,Yombe
+yon,PG,L,Yonggom
+yor,NG,L,Yoruba
+yos,MM,L,Yos
+yox,JP,L,Yoron
+yoy,TH,L,Yoy
+ypl,CN,L,"Yi, Pula"
+ypw,CN,L,"Yi, Puwa"
+yra,PG,L,Yerakai
+yrb,PG,L,Yareba
+yre,CI,L,Yaouré
+yri,CO,L,Yarí
+yrk,RU,L,Nenets
+yrl,BR,L,Nhengatu
+yrn,CN,L,Yerong
+yrs,ID,L,Yarsun
+yrw,PG,L,Yarawata
+ysl,CS,L,Yugoslavian Sign Language
+ysn,CN,L,"Yi, Sani"
+yso,CN,L,"Yi, Southeastern Lolo"
+ysp,CN,L,"Yi, Southern Lolopho"
+ysr,RU,E,"Yupik, Sirenik"
+yss,PG,L,Yessan-Mayo
+yua,MX,L,"Maya, Yucatán"
+yub,AU,E,Yugambal
+yuc,US,N,Yuchi
+yud,IL,L,"Arabic, Judeo-Tripolitanian"
+yue,CN,L,"Chinese, Yue"
+yuf,US,L,Havasupai-Walapai-Yavapai
+yui,CO,L,Yurutí
+yuj,PG,L,Karkar-Yuri
+yuk,US,E,Yuki
+yul,CF,L,Yulu
+yum,US,L,Quechan
+yun,NG,L,Bena
+yup,CO,L,Yukpa
+yuq,BO,L,Yuqui
+yur,US,N,Yurok
+yus,MX,L,"Maya, Chan Santa Cruz"
+yut,PG,L,Yopno
+yuu,RU,N,Yugh
+yuw,PG,L,Yau
+yux,RU,L,"Yukaghir, Southern"
+yuy,CN,L,"Yugur, East"
+yuz,BO,L,Yuracare
+yva,ID,L,Yawa
+yvt,VE,E,Yavitero
+ywa,PG,L,Kalou
+ywl,CN,L,"Yi, Western Lalu"
+ywm,CN,L,"Yi, Wumeng"
+ywn,BR,L,Yawanawa
+ywq,CN,L,"Yi, Wuding-Luquan"
+ywr,AU,N,Yawuru
+ywt,CN,L,"Yi, Western"
+ywu,CN,L,"Yi, Wusa"
+yww,AU,N,Yawarawarga
+yym,CN,L,"Yi, Yuanjiang-Mojiang"
+yyu,PG,L,Yau
+zaa,MX,L,"Zapotec, Sierra de Juárez"
+zab,MX,L,"Zapotec, San Juan Guelavía"
+zac,MX,L,"Zapotec, Ocotlán"
+zad,MX,L,"Zapotec, Cajonos"
+zae,MX,L,"Zapotec, Yareni"
+zaf,MX,L,"Zapotec, Ayoquesco"
+zag,SD,L,Zaghawa
+zah,NG,L,Zangwal
+zai,MX,L,"Zapotec, Isthmus"
+zaj,TZ,L,Zaramo
+zak,TZ,L,Zanaki
+zal,CN,L,Zauzou
+zam,MX,L,"Zapotec, Miahuatlán"
+zao,MX,L,"Zapotec, Ozolotepec"
+zap,MX,L,Zapotec
+zaq,MX,L,"Zapotec, Aloápam"
+zar,MX,L,"Zapotec, Rincón"
+zas,MX,L,"Zapotec, Santo Domingo Albarradas"
+zat,MX,L,"Zapotec, Tabaa"
+zau,IN,L,Zangskari
+zav,MX,L,"Zapotec, Yatzachi"
+zaw,MX,L,"Zapotec, Mitla"
+zax,MX,L,"Zapotec, Xadani"
+zay,ET,L,Zayse-Zergulla
+zaz,NG,L,Zari
+zca,MX,L,"Zapotec, Coatecas Altas"
+zch,CN,L,"Zhuang, Central Hongshuihe"
+zdj,KM,L,"Comorian, Ngazidja"
+zea,NL,L,Zeeuws
+zeg,PG,L,Zenag
+zeh,CN,L,"Zhuang, Eastern Hongshuihe"
+zen,MR,L,Zenaga
+zga,TZ,L,Kinga
+zgb,CN,L,"Zhuang, Guibei"
+zgm,CN,L,"Zhuang, Minz"
+zgn,CN,L,"Zhuang, Guibian"
+zgr,PG,N,Magori
+zha,CN,L,Zhuang
+zhb,CN,L,Zhaba
+zhd,CN,L,"Zhuang, Dai"
+zhi,NG,L,Zhire
+zhn,CN,L,"Zhuang, Nong"
+zho,CN,L,Chinese
+zhw,CM,L,Zhoa
+zia,PG,L,Zia
+zib,ZW,L,Zimbabwe Sign Language
+zik,PG,L,Zimakani
+zim,TD,L,Mesme
+zin,TZ,L,Zinza
+zir,NG,N,Ziriya
+ziw,TZ,L,Zigula
+ziz,CM,L,Zizilivakan
+zka,ID,L,Kaimbulawa
+zkp,BR,E,"Kaingáng, São Paulo"
+zkr,IN,L,Zakhring
+zlj,CN,L,"Zhuang, Liujiang"
+zln,CN,L,"Zhuang, Lianshan"
+zlq,CN,L,"Zhuang, Liuqian"
+zma,AU,N,Manda
+zmb,CD,L,Zimba
+zmc,AU,N,Margany
+zmd,AU,N,Maridan
+zme,AU,N,Mangerr
+zmf,CD,L,Mfinu
+zmg,AU,N,Marti Ke
+zmh,PG,N,Makolkol
+zmi,MY,L,Negeri Sembilan Malay
+zmj,AU,N,Maridjabin
+zmk,AU,N,Mandandanyi
+zml,AU,N,Madngele
+zmm,AU,N,Marimanindji
+zmn,GA,L,Mbangwe
+zmo,SD,L,Molo
+zmp,CD,L,Mpuono
+zmq,CD,L,Mituku
+zmr,AU,N,Maranunggu
+zms,CD,L,Mbesa
+zmt,AU,N,Maringarr
+zmu,AU,N,Muruwari
+zmv,AU,N,Mbariman-Gudhinma
+zmw,CD,L,Mbo
+zmx,CG,L,Bomitaba
+zmy,AU,N,Mariyedi
+zmz,CD,L,Mbandja
+zna,TD,L,Zan Gula
+zne,CD,L,Zande
+zng,VN,L,Mang
+znk,AU,E,Manangkari
+zns,NG,L,Mangas
+zoc,MX,L,"Zoque, Copainalá"
+zoh,MX,L,"Zoque, Chimalapa"
+zom,MM,L,Zome
+zoo,MX,N,"Zapotec, Asunción Mixtepec"
+zoq,MX,N,"Zoque, Tabasco"
+zor,MX,L,"Zoque, Rayón"
+zos,MX,L,"Zoque, Francisco León"
+zpa,MX,L,"Zapotec, Lachiguiri"
+zpb,MX,L,"Zapotec, Yautepec"
+zpc,MX,L,"Zapotec, Choapan"
+zpd,MX,L,"Zapotec, Southeastern Ixtlán"
+zpe,MX,L,"Zapotec, Petapa"
+zpf,MX,L,"Zapotec, San Pedro Quiatoni"
+zpg,MX,L,"Zapotec, Guevea de Humboldt"
+zph,MX,L,"Zapotec, Totomachapan"
+zpi,MX,L,"Zapotec, Santa María Quiegolani"
+zpj,MX,L,"Zapotec, Quiavicuzas"
+zpk,MX,L,"Zapotec, Tlacolulita"
+zpl,MX,L,"Zapotec, Lachixío"
+zpm,MX,L,"Zapotec, Mixtepec"
+zpn,MX,L,"Zapotec, Santa Inés Yatzechi"
+zpo,MX,L,"Zapotec, Amatlán"
+zpp,MX,L,"Zapotec, El Alto"
+zpq,MX,L,"Zapotec, Zoogocho"
+zpr,MX,L,"Zapotec, Santiago Xanica"
+zps,MX,L,"Zapotec, Coatlán"
+zpt,MX,L,"Zapotec, San Vicente Coatlán"
+zpu,MX,L,"Zapotec, Yalálag"
+zpv,MX,L,"Zapotec, Chichicapan"
+zpw,MX,L,"Zapotec, Zaniza"
+zpx,MX,L,"Zapotec, San Baltazar Loxicha"
+zpy,MX,L,"Zapotec, Mazaltepec"
+zpz,MX,L,"Zapotec, Texmelucan"
+zqe,CN,L,"Zhuang, Qiubei"
+zrg,IN,L,Mirgan
+zrn,TD,L,Zirenkel
+zro,EC,N,Záparo
+zrp,FR,E,Zarphatic
+zrs,ID,L,Mairasi
+zsl,ZM,L,Zambian Sign Language
+zsr,MX,L,"Zapotec, Southern Rincon"
+ztc,MX,L,"Zapotec, Lachirioag"
+zte,MX,L,"Zapotec, Elotepec"
+ztg,MX,L,"Zapotec, Xanaguía"
+ztl,MX,L,"Zapotec, Santiago Lapaguía"
+ztm,MX,N,"Zapotec, San Agustín Mixtepec"
+ztn,MX,L,"Zapotec, Santa Catarina Albarradas"
+ztp,MX,L,"Zapotec, Loxicha"
+ztq,MX,L,"Zapotec, Quioquitani-Quierí"
+zts,MX,L,"Zapotec, Tilquiapan"
+ztt,MX,L,"Zapotec, Tejalapan"
+ztu,MX,L,"Zapotec, Güilá"
+ztx,MX,L,"Zapotec, Zaachila"
+zty,MX,L,"Zapotec, Yatee"
+zua,NG,L,Zeem
+zuh,PG,L,Tokano
+zul,ZA,L,Zulu
+zum,OM,L,Kumzari
+zun,US,L,Zuni
+zuy,CM,N,Zumaya
+zwa,ET,L,Zay
+zyb,CN,L,"Zhuang, Yongbei"
+zyg,CN,L,"Zhuang, Yang"
+zyj,CN,L,"Zhuang, Youjiang"
+zyn,CN,L,"Zhuang, Yongnan"
+zyp,MM,L,Zyphe
+zza,TR,L,Zaza
