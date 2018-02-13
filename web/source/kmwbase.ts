@@ -20,11 +20,6 @@
    Copyright 2017 SIL International
 ***/
 
-declare var keyman: KeymanBase;
-declare var KeymanWeb: KeyboardInterface;
-var keyman: KeymanBase = window['keyman'] || {};
-window['keyman'] = keyman; // To preserve the name _here_ in case of minification.
-
 class KeymanBase {
   _TitleElement = null;      // I1972 - KeymanWeb Titlebar should not be a link
   _IE = 0;                   // browser version identification
@@ -560,7 +555,7 @@ KeymanBase.__BUILD__ = 299;
  */  
 
 // If a copy of the script is already loaded, detect this and prevent re-initialization / data reset.
-if(!window['keyman']['loaded']) {
+if(!window['keyman'] || !window['keyman']['loaded']) {
 
   (function() {
     /* The base object call may need to be moved into a separate, later file eventually.

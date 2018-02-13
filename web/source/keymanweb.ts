@@ -122,7 +122,7 @@ if(!window['keyman']['initialized']) {
     // Complete page initialization only after the page is fully loaded, including any embedded fonts
     // This avoids the need to use a timer to test for the fonts
     
-    util.attachDOMEvent(window, 'load', keyman.domManager._WindowLoad,false);
+    util.attachDOMEvent(window, 'load', keymanweb.domManager._WindowLoad,false);
     util.attachDOMEvent(window, 'unload', keymanweb.domManager._WindowUnload,false);  // added fourth argument (default value)       
     
     // *** I3319 Supplementary Plane modifications - end new code

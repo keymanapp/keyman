@@ -65,8 +65,10 @@ var setupScript = function(src, done, timeout, uiInitCheck) {
 
 var teardownKMW = function() {
   keyman['shutdown']();
-  delete window.keyman;
-  window["keyman"] = undefined;
+  var success = delete window["keyman"];
+  if(!success) {
+    window["keyman"] = undefined;
+  }
 }
 
 // Make sure the main script loads...
