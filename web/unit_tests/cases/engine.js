@@ -27,17 +27,16 @@ describe('Engine', function() {
   
   describe('Keyboard Loading', function() {
     it('Local', function(done) {
-      var laoStub = fixture.load("/keyboards/lao_2008_basic.json", true);
+      this.timeout(10000);
 
-      keyman.addKeyboards(laoStub);
-      keyman.setActiveKeyboard("Keyboard_lao_2008_basic", "lao");
-
-      window.setTimeout(function() {
-        assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic");
-
+      var test_callback = function() {
+        assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic", "Keyboard not set correctly!");
         keyman.removeKeyboards('lao_2008_basic');
+        assert.equal(keyman.getActiveKeyboard(), '', "Keyboard not removed correctly!");
         done();
-      }, 500);
+      }
+
+      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", test_callback, 10000);
     });
   });
 
@@ -45,14 +44,8 @@ describe('Engine', function() {
   // is based on correct assumptions about the code.
   describe('Processing', function() {
     before(function(done){
-      var laoStub = fixture.load("/keyboards/lao_2008_basic.json", true);
-
-      keyman.addKeyboards(laoStub);
-      keyman.setActiveKeyboard("Keyboard_lao_2008_basic", "lao");
-
-      window.setTimeout(function() {
-        done();
-      }, 500);
+      this.timeout = 10000;
+      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", done, 10000);
     });
 
     beforeEach(function() {
@@ -103,14 +96,8 @@ describe('Engine', function() {
 
   describe('Sequence Testing', function() {
     before(function(done){
-      var laoStub = fixture.load("/keyboards/lao_2008_basic.json", true);
-
-      keyman.addKeyboards(laoStub);
-      keyman.setActiveKeyboard("Keyboard_lao_2008_basic", "lao");
-
-      window.setTimeout(function() {
-        done();
-      }, 500);
+      this.timeout = 10000;
+      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", done, 10000);
     });
 
     after(function() {

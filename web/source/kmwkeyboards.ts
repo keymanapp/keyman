@@ -396,7 +396,10 @@ class KeyboardManager {
 
     // Mobile device addition: force selection of the first keyboard if none set
     if(util.device.touchable && (PInternalName == '' || PInternalName == null || n >= this.keyboardStubs.length)) {
-      PInternalName=this.keyboardStubs[0]['KI']; PLgCode=this.keyboardStubs[0]['KLC'];   
+      if(this.keyboardStubs.length != 0) {
+        PInternalName=this.keyboardStubs[0]['KI'];
+        PLgCode=this.keyboardStubs[0]['KLC'];   
+      }
     }
 
     // Save name of keyboard (with language code) as a cookie
@@ -1179,7 +1182,7 @@ class KeyboardManager {
 
     for(i=0; i<arguments.length; i++) {           
       for(j=this.keyboardStubs.length-1; j>=0; j--) {
-        if('Keyboard_'+arguments[i] == this.keyboardStubs[j]['KI'] && this.keyboardStubs.length > 1) {                 
+        if('Keyboard_'+arguments[i] == this.keyboardStubs[j]['KI']) {                 
           if('Keyboard_'+arguments[i] == this.getActiveKeyboardName()) {
             activeRemoved = true;
           }
@@ -1196,8 +1199,12 @@ class KeyboardManager {
     } 
 
     if(activeRemoved) {
+      if(this.keyboardStubs.length > 0) {
       // Always reset to the first remaining keyboard
-      this._SetActiveKeyboard(this.keyboardStubs[0]['KI'],this.keyboardStubs[0]['KLC'],true);
+        this._SetActiveKeyboard(this.keyboardStubs[0]['KI'],this.keyboardStubs[0]['KLC'],true);
+      } else {
+        this._SetActiveKeyboard('', '', false);
+      }
       // This is likely to be triggered by a UI call of some sort, and we need to treat
       // this call as such to properly maintain the globalKeyboard setting.
       this.keymanweb.uiManager.justActivated = true;

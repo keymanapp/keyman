@@ -109,10 +109,6 @@ var initTimer = function(done, timeout, uiInitCheck) {
       window.setTimeout(function() {
         this.killSwitch = true;
 
-        if(this.observer) {
-          this.observer.end();
-        }
-
         if(this.timer) {
           window.clearTimeout(this.timer);
           this.timer = 0;
@@ -124,3 +120,59 @@ var initTimer = function(done, timeout, uiInitCheck) {
   var im = new InitializationManager();
   return im.initCheckCallback;
 };
+
+// Make sure the main script loads...
+var onScriptLoad = function(scriptURL, callback, timeout) {
+  var ScriptLoadObserver = function() {
+    this.target = document.createElement('a');
+    this.target.href = scriptURL;
+
+    if(timeout) {
+      this.timer = window.setTimeout(function() {
+        if(this.mo) {
+          this.mo.disconnect();
+        }
+      }.bind(this), timeout);
+    }
+
+    var moCallback = function(mutations) {
+      for(var i=0; i < mutations.length; i++) {
+        var mutation = mutations[i];
+        for(var j=0; j < mutation.addedNodes.length; j++) {
+          var child = mutation.addedNodes[j];
+          if(child instanceof HTMLScriptElement) {
+            if(child.src == this.target.href) {
+              child.onload = callback;
+            }
+          }
+        }
+      }
+    }
+
+    this.observe = function() {
+      var config = { childList: true, subtree: true };
+      this.mo = new MutationObserver(moCallback.bind(this));
+      this.mo.observe(document, config);
+    }
+  }
+
+  var slo = new ScriptLoadObserver();
+  slo.observe();
+};
+
+var loadKeyboardFromJSON = function(jsonPath, callback, timeout) {
+  var stub = fixture.load(jsonPath, true);
+
+  var kbdName = "Keyboard_" + stub.id;
+
+  keyman.addKeyboards(stub);
+  keyman.setActiveKeyboard(kbdName, stub.languages.id);
+
+  if(keyman.getActiveKeyboard() != kbdName) {
+    onScriptLoad(stub.filename, function() {
+      callback();
+    }, timeout);
+  } else {
+    callback();
+  }
+}
