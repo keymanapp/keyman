@@ -85,7 +85,8 @@ uses
   CompilePackageInstaller in '..\..\global\delphi\general\CompilePackageInstaller.pas',
   utilhttp in '..\..\global\delphi\general\utilhttp.pas',
   UMD5Hash in '..\..\global\delphi\general\UMD5Hash.pas',
-  Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas';
+  Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
+  Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas';
 
 var
   runner : ITestRunner;

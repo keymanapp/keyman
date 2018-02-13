@@ -87,8 +87,8 @@
 
               <Component Id="Data" Guid="{04EB5A8F-7163-4575-97A8-460C2900B60E}" SharedDllRefCount="yes">
                 <File Id="file_unicodedata" Name="unicodedata.mdb" Source="..\..\global\inst\data\" KeyPath="yes" />
-                <File Id="unicodedata.txt" Name="unicodedata.txt" Source="..\..\global\inst\data\" />
-                <File Id="blocks.txt" Name="blocks.txt" Source="..\..\global\inst\data\" />
+                <File Id="unicodedata.txt" Name="unicodedata.txt" Source="..\..\..\..\resources\standards-data\unicode-character-database\" />
+                <File Id="blocks.txt" Name="blocks.txt" Source="..\..\..\..\resources\standards-data\unicode-character-database\" />
               </Component>
 
               <Directory Id='xml' Name='xml'>
