@@ -38,6 +38,12 @@ EXCLUDEPATHDEFINES=1
 
 # ----------------------------------------------------------------------
 
+validate: test-releasebuildcheck
+    # test-releasebuildcheck builds devtools for us
+    $(PROGRAM)\buildtools\devtools -ri
+    cd $(ROOT)\src\unit-tests\keyboard-js-info
+    $(MAKE)
+    
 cleanroot:
     -del tds.zip
     -del tds.exe

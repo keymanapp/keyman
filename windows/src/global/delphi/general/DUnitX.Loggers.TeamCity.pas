@@ -258,6 +258,7 @@ end;
 
 function CreateDUnitXTeamCityOrConsoleLogger: ITestLogger;
 begin
+  writeln('TEAMCITY_VERSION='+GetEnvironmentVariable('TEAMCITY_VERSION'));
   if GetEnvironmentVariable('TEAMCITY_VERSION') <> ''
     then Result := TDUnitXTeamCityLogger.Create
     else Result := TDUnitXConsoleLogger.Create(true);
