@@ -6,10 +6,7 @@ describe('Engine', function() {
     this.timeout(10000);
 
     fixture.setBase('unit_tests/fixtures');
-    setupKMW();
-
-    // Pass the initTimer method our 'done' callback so it can handle our initialization delays for us.
-    initTimer(done);
+    setupKMW(null, done, 10000);
   });
 
   beforeEach(function(done) {
