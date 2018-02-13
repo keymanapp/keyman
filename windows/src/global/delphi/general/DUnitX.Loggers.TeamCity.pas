@@ -55,6 +55,7 @@ type
   end;
 
 function CreateDUnitXTeamCityOrConsoleLogger: ITestLogger;
+procedure ReportToTeamCity;
 
 implementation
 
@@ -258,9 +259,26 @@ end;
 
 function CreateDUnitXTeamCityOrConsoleLogger: ITestLogger;
 begin
-  if GetEnvironmentVariable('TEAMCITY_VERSION') <> ''
-    then Result := TDUnitXTeamCityLogger.Create
-    else Result := TDUnitXConsoleLogger.Create(true);
+//  if GetEnvironmentVariable('TEAMCITY_VERSION') <> ''
+//    then Result := TDUnitXTeamCityLogger.Create
+//    else
+  Result := TDUnitXConsoleLogger.Create(true);
 end;
 
+procedure ReportToTeamCity;
+var
+  KeymanRoot: string;
+  ReportPath: string;
+begin
+  if GetEnvironmentVariable('TEAMCITY_VERSION') <> '' then
+  begin
+    KeymanRoot := GetEnvironmentVariable('KEYMAN_ROOT');
+    ReportPath := 'keyman\'+ExtractRelativePath(KeymanRoot, ExtractFilePath(ParamStr(0)) + 'dunitx-results.xml');
+    writeln('##teamcity[importData type=''nunit'' path='''+ReportPath+''']');
+  end;
+end;
+
+initialization
+finalization
+  ReportToTeamCity;
 end.

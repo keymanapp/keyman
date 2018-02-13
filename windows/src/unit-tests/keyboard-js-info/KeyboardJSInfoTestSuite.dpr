@@ -55,6 +55,7 @@ begin
       System.Readln;
     end;
     {$ENDIF}
+
   except
     on E: Exception do
       System.Writeln(E.ClassName, ': ', E.Message);
