@@ -202,6 +202,7 @@
 		165C8B8F1FD8221800D4A78D /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = ../../Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
 		1687ACD01FD8DE7600926D69 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = ../../Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
 		1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = ../../Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
+		16A9229D20325253003CC98E /* Keyman-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Keyman-Info.plist"; sourceTree = SOURCE_ROOT; };
 		9815725018E4F0930014DF0C /* 702-share.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "702-share.png"; path = "Keyman Icons/702-share.png"; sourceTree = "<group>"; };
 		9815725118E4F0930014DF0C /* 702-share@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "702-share@2x.png"; path = "Keyman Icons/702-share@2x.png"; sourceTree = "<group>"; };
 		9815725218E4F0930014DF0C /* 711-trash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "711-trash.png"; path = "Keyman Icons/711-trash.png"; sourceTree = "<group>"; };
@@ -217,7 +218,6 @@
 		98158A7518EE3681002E2517 /* textsize.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize.png; path = "Keyman Icons/textsize.png"; sourceTree = "<group>"; };
 		98158A7618EE3681002E2517 /* textsize@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize@2x.png"; path = "Keyman Icons/textsize@2x.png"; sourceTree = "<group>"; };
 		981AFAE119EF44DE006706BF /* Keyman.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Keyman.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		981AFAE219EF44DE006706BF /* Keyman-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Keyman-Info.plist"; path = "/Users/serkankurt/Desktop/KeymanTouch iOS/keyman/Keyman/Keyman-Info.plist"; sourceTree = "<absolute>"; };
 		9820CE501A144F0400EA909A /* navbar-Landscape-568h@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "navbar-Landscape-568h@3x.png"; path = "Keyman Navbar/navbar-Landscape-568h@3x.png"; sourceTree = "<group>"; };
 		9820CE511A144F0400EA909A /* navbar-Portrait@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "navbar-Portrait@3x.png"; path = "Keyman Navbar/navbar-Portrait@3x.png"; sourceTree = "<group>"; };
 		9822CB671A3A77D200D73CAA /* MainViewController_.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainViewController_.xib; sourceTree = "<group>"; };
@@ -618,12 +618,12 @@
 		98ABADBA176935E400B62590 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				16A9229D20325253003CC98E /* Keyman-Info.plist */,
 				9845A7D81A439AFB00544E2E /* WebPages */,
 				98ABADBC176935E400B62590 /* InfoPlist.strings */,
 				98AFAEDB17FE2ACF00178C0A /* Keyman Icons */,
 				98AFAEDC17FE2B6A00178C0A /* Keyman Navbar */,
 				98ABADBB176935E400B62590 /* Keyman-Free-Info.plist */,
-				981AFAE219EF44DE006706BF /* Keyman-Info.plist */,
 				98ABADC1176935E400B62590 /* Keyman-Prefix.pch */,
 			);
 			name = "Supporting Files";
