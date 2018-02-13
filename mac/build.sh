@@ -286,7 +286,7 @@ fi
 
 if $DO_KEYMANIM ; then
     updatePlist "$KM4MIM_BASE_PATH" "$IM_NAME"
-    execBuildCommand $IM_NAME "xcodebuild -project \"$KMIM_PROJECT_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $TEST_ACTION -scheme Keyman"
+    execBuildCommand $IM_NAME "xcodebuild -project \"$KMIM_PROJECT_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS $TEST_ACTION -scheme Keyman"
 fi
 
 if $DO_KEYMANTESTAPP ; then
