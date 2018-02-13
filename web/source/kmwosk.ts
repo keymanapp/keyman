@@ -1,6 +1,24 @@
 /// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
 
+class OSKKeySpec {
+  id: string;
+  text?: string;
+  sp?: string;
+  width: string;
+  nextlayer?: string;
+  pad?: string;
+
+  constructor(id: string, text?: string, width?: string, sp?: string, nextlayer?: string, pad?: string) {
+    this.id = id;
+    this.text = text;
+    this.width = width ? width : "50";
+    this.sp = sp;
+    this.nextlayer = nextlayer;
+    this.pad = pad;
+  }
+}
+
 /***
    KeymanWeb 10.0
    Copyright 2017 SIL International
@@ -97,6 +115,60 @@ if(!window['keyman']['initialized']) {
       'DEADKEY':'8',
       'BLANK':'9',
       'HIDDEN':'10'
+    };
+
+    // Defines the PUA code mapping for the various 'special' modifier/control keys on keyboards.
+    osk.specialCharacters = {
+      '*Shift*':    8,
+      '*Enter*':    5,
+      '*Tab*':      6,
+      '*BkSp*':     4,
+      '*Menu*':     11,
+      '*Hide*':     10,
+      '*Alt*':      25,
+      '*Ctrl*':     1,
+      '*Caps*':     3,
+      '*ABC*':      16,
+      '*abc*':      17,
+      '*123*':      19,
+      '*Symbol*':   21,
+      '*Currency*': 20,
+      '*Shifted*':  8, // set SHIFTED->9 for filled arrow icon
+      '*AltGr*':    2,
+      '*TabLeft*':  7,
+      '*LAlt*':     0x56,
+      '*RAlt*':     0x57,
+      '*LCtrl*':    0x58,
+      '*RCtrl*':    0x59,
+      '*LAltCtrl*':       0x60,
+      '*RAltCtrl*':       0x61,
+      '*LAltCtrlShift*':  0x62,
+      '*RAltCtrlShift*':  0x63,
+      '*AltShift*':       0x64,
+      '*CtrlShift*':      0x65,
+      '*AltCtrlShift*':   0x66,
+      '*LAltShift*':      0x67,
+      '*RAltShift*':      0x68,
+      '*LCtrlShift*':     0x69,
+      '*RCtrlShift*':     0x70
+    };
+   
+    osk.modifierSpecials = {
+      'leftalt': '*LAlt*',
+      'rightalt': '*RAlt*',
+      'leftctrl': '*LCtrl*',
+      'rightctrl': '*RCtrl*',
+      'leftctrl-leftalt': '*LAltCtrl*',
+      'rightctrl-rightalt': '*RAltCtrl*',
+      'leftctrl-leftalt-shift': '*LAltCtrlShift*',
+      'rightctrl-rightalt-shift': '*RAltCtrlShift*',
+      'shift-alt': '*AltShift*',
+      'shift-ctrl': '*CtrlShift*',
+      'shift-ctrl-alt': '*AltCtrlShift*',
+      'leftalt-shift': '*LAltShift*',
+      'rightalt-shift': '*RAltShift*',
+      'leftctrl-shift': '*LCtrlShift*',
+      'rightctrl-shift': '*RCtrlShift*'
     };
 
     var codesUS=[['0123456789',';=,-./`','[\\]\''],[')!@#$%^&*(',':+<_>?~','{|}"']];
@@ -2401,16 +2473,9 @@ if(!window['keyman']['initialized']) {
      *  @param    {string}  oldText
      *  @return {string}
      **/
-    osk.renameSpecialKey = function(oldText)
-    {
-      var specialText=['*Shift*','*Enter*','*Tab*','*BkSp*','*Menu*','*Hide*','*Alt*','*Ctrl*','*Caps*',
-        '*ABC*','*abc*','*123*','*Symbol*','*Currency*','*Shifted*','*AltGr*','*TabLeft*'];
-      var codePUA=[8,5,6,4,11,10,25,1,3,16,17,19,21,20,8,2,7]; // set SHIFTED->9 for filled arrow icon
-
-      //Note:  U+E000 *is* PUA but was not accepted by IE as a character in the EOT font, so Alt recoded as U+E019
-      for(var i=0; i<specialText.length; i++)
-        if(oldText == specialText[i]) return String.fromCharCode(0xE000+codePUA[i]);
-      return oldText;
+    osk.renameSpecialKey = function(oldText) {
+      // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
+      return osk.specialCharacters[oldText] ? String.fromCharCode(0XE000 + osk.specialCharacters[oldText]) : oldText;
     }
 
     osk.clearPopup = function()
@@ -3021,7 +3086,8 @@ if(!window['keyman']['initialized']) {
       var i, j, k, m, row, rows, key, keys;
       var chiral = (kbdBitmask & osk.modifierBitmasks.IS_CHIRAL);
 
-      if(typeof keyLabels == 'undefined' || !keyLabels) {
+      var kmw10Plus = !(typeof keyLabels == 'undefined' || !keyLabels);
+      if(!kmw10Plus) {
         keyLabels = osk.processLegacyDefinitions(PVK['BK']);
       }
 
@@ -3054,6 +3120,41 @@ if(!window['keyman']['initialized']) {
       }
 
       var idList = validIdList.concat(invalidIdList);
+
+      if(kmw10Plus && formFactor != 'desktop') { // KLS exists, so we know the exact layer set.
+        // Find the SHIFT key...
+        var shiftKey = null;
+
+        rows = layers[0]['row'];
+        for(var r=0; r < rows.length; r++) {
+          keys = rows[r]['key'];
+          for(var c=0; c < keys.length; c++) {
+            key = keys[c];
+            if(key['id'] == 'K_SHIFT') {
+              shiftKey = key;
+            }
+          }
+        }
+
+        if(shiftKey) {
+          // Erase the legacy shifted subkey array.
+          shiftKey['sk'] = [];
+
+          for(var layerID in keyLabels) {            
+            if(layerID == 'default' || layerID == 'shift') {
+              // These two are accessible from the layer without subkeys.
+              continue;
+            }
+
+            // Create a new subkey for the specified layer so that it will be accessible via OSK.
+            var specialChar = osk.modifierSpecials[layerID];
+            shiftKey['sk'].push(new OSKKeySpec("K_" + specialChar, specialChar, null, "1", layerID));
+          }
+        } else {
+          // Seriously, this should never happen.  It's here for the debugging log only.
+          console.warn("Error in default layout - cannot find default Shift key!");
+        }
+      }
 
       for(n=0; n<idList.length; n++) {
         // Populate non-default (shifted) keygroups
@@ -3150,15 +3251,7 @@ if(!window['keyman']['initialized']) {
           if(n > 0 && shiftKey != null) {
             shiftKey['sp']=osk.buttonClasses['SHIFT-ON'];
             shiftKey['sk']=null;
-            // TODO:  May need extending/modification for chirality modes!
-            switch(layers[n].id) {
-              case 'ctrl':
-                shiftKey['text']='*Ctrl*'; break;
-              case 'alt':
-                shiftKey['text']='*Alt*'; break;
-              case 'ctrl-alt':
-                shiftKey['text']='*AltGr*'; break;
-            };
+            shiftKey['text'] = osk.modifierSpecials[layers[n].id];
           }
         }
       }
