@@ -57,7 +57,6 @@ begin
     Assert.AreEqual('1.1', Version);
     Assert.AreEqual(True, RTL, 'RTL');
     Assert.AreEqual(False, Mnemonic, 'Mnemonic');
-    Assert.Fail('Testing failure case now...');
   finally
     Free;
   end;
