@@ -18,61 +18,53 @@ const NSInteger kUnexpectedFileAsscociationType = 42;
     return NO;
 }
 
-//- (NSString *)windowNibName {
-//    // Override returning the nib file name of the document
-//    // If you need to use a subclass of NSWindowController or if your document supports multiple NSWindowControllers, you should remove this method and override -makeWindowControllers instead.
-//
-//    return @"KMDownloadKBWindowController";
-//}
-
-
-//- (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
-//    // Insert code here to write your document to data of the specified type. If outError != NULL, ensure that you create and set an appropriate error when returning nil.
-//    // You can also choose to override -fileWrapperOfType:error:, -writeToURL:ofType:error:, or -writeToURL:ofType:forSaveOperation:originalContentsURL:error: instead.
-//    [NSException raise:@"UnimplementedMethod" format:@"%@ is unimplemented", NSStringFromSelector(_cmd)];
-//    return nil;
-//}
+- (void)makeWindowControllers {
+    if ([self.AppDelegate debugMode])
+        NSLog(@"Attempting to display configuration window...");
+    
+    [[self.AppDelegate configWindow] showWindow:nil];
+}
 
 - (KMInputMethodAppDelegate *)AppDelegate {
     return (KMInputMethodAppDelegate *)[NSApp delegate];
 }
 
-- (NSString *)pathForTemporaryFile
+- (NSString *)pathForTemporaryKmpFile:(NSString *)kmpFilename
 {
-    NSString *  result;
-    CFUUIDRef   uuid;
-    CFStringRef uuidStr;
-    
-    uuid = CFUUIDCreate(NULL);
-    assert(uuid != NULL);
-    
-    uuidStr = CFUUIDCreateString(NULL, uuid);
-    assert(uuidStr != NULL);
-    
-    result = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@-%@", @"kmp", uuidStr]];
+    NSString *  result = [NSTemporaryDirectory() stringByAppendingPathComponent:kmpFilename];
     assert(result != nil);
-    
-    CFRelease(uuidStr);
-    CFRelease(uuid);
-    
     return result;
 }
 
--(BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError * _Nullable __autoreleasing *)outError {
-
+-(BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError * _Nullable __autoreleasing *)outError {
+    
+    NSString *filename = [fileWrapper filename];
+    
+    if ([self.AppDelegate debugMode])
+        NSLog(@"readFromFileWrapper called with file: %@", filename);
+    
     if (![typeName isEqualToString: @"Keyman Package"]) {
         if (outError != NULL) {
             NSString *description = [@"Unexpected file association for type " stringByAppendingString:typeName];
-            NSDictionary *errorDictionary = @{ NSLocalizedDescriptionKey : description };
+            NSDictionary *errorDictionary = @{ NSLocalizedDescriptionKey : description,
+                                               NSFilePathErrorKey : filename
+                                               };
             *outError = [[NSError alloc] initWithDomain:@"Keyman" code:kUnexpectedFileAsscociationType userInfo:errorDictionary];
         }
         return NO;
     }
-
-    NSString *tempFile = [self pathForTemporaryFile];
-    if (![data writeToFile:tempFile options:NSDataWritingAtomic error:outError])
+    
+    if (![self userConfirmsInstallationOfPackageFile:filename]) {
+        if ([self.AppDelegate debugMode])
+            NSLog(@"Keyman Package file installation cancelled by user.");
+        return YES; // Returning NO causes the system to report a failure to the user.
+    }
+    
+    NSString *tempFile = [self pathForTemporaryKmpFile:filename];
+    NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:tempFile];
+    if (![fileWrapper writeToURL:fileURL options:NSFileWrapperWritingAtomic originalContentsURL:nil error:outError])
         return NO;
-
+    
     BOOL didUnzip = [self.AppDelegate unzipFile:tempFile];
     
     if (!didUnzip && outError != NULL) {
@@ -82,4 +74,51 @@ const NSInteger kUnexpectedFileAsscociationType = 42;
     [[NSFileManager defaultManager] removeItemAtPath:tempFile error:nil];
     return didUnzip;
 }
+
+-(BOOL)userConfirmsInstallationOfPackageFile:(NSString *)fileName {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert addButtonWithTitle:NSLocalizedString(@"Yes", @"Alert button")];
+    [alert addButtonWithTitle:NSLocalizedString(@"No", @"Alert button")];
+    [alert setMessageText:NSLocalizedString(@"Install Keyman Package?", @"Alert message text when user double-clicks a KMP file.")];
+    NSString *info = NSLocalizedString(@"Do you want the Keyman Input Method to install this Package?\rFile: %@", @"Alert informative text when user double-clicks a KMP file. Parameter is the name of the KMP file.");
+    info = [NSString localizedStringWithFormat:info, fileName];
+    [alert setInformativeText:info];
+    [alert setAlertStyle:NSInformationalAlertStyle];
+    
+    if ([self.AppDelegate debugMode])
+        NSLog(@"Asking user to confirm installation...");
+    
+    BOOL result = [alert runModal] == NSAlertFirstButtonReturn;
+    return result;
+}
+
+// This tells the system that we aren't reading the Keyman Package file lazily.
+-(BOOL) isEntireFileLoaded {
+    return YES;
+}
+
+//-(BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError * _Nullable __autoreleasing *)outError {
+//
+//    if (![typeName isEqualToString: @"Keyman Package"]) {
+//        if (outError != NULL) {
+//            NSString *description = [@"Unexpected file association for type " stringByAppendingString:typeName];
+//            NSDictionary *errorDictionary = @{ NSLocalizedDescriptionKey : description };
+//            *outError = [[NSError alloc] initWithDomain:@"Keyman" code:kUnexpectedFileAsscociationType userInfo:errorDictionary];
+//        }
+//        return NO;
+//    }
+//
+//    NSString *tempFile = [self pathForTemporaryFile];
+//    if (![data writeToFile:tempFile options:NSDataWritingAtomic error:outError])
+//        return NO;
+//
+//    BOOL didUnzip = [self.AppDelegate unzipFile:tempFile];
+//
+//    if (!didUnzip && outError != NULL) {
+//        NSDictionary *errorDictionary = @{ NSLocalizedDescriptionKey : @"Failed to unzip Keyman Package" };
+//        *outError = [[NSError alloc] initWithDomain:@"Keyman" code:kUnexpectedFileAsscociationType userInfo:errorDictionary];
+//    }
+//    [[NSFileManager defaultManager] removeItemAtPath:tempFile error:nil];
+//    return didUnzip;
+//}
 @end

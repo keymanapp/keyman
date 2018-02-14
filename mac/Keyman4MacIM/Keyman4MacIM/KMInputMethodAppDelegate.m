@@ -907,7 +907,13 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     NSString *folderName = [fileName stringByDeletingPathExtension];
     ZipArchive *za = [[ZipArchive alloc] init];
     if ([za UnzipOpenFile:filePath]) {
-        didUnzip = [za UnzipFileTo:[self.keyboardsPath stringByAppendingPathComponent:folderName] overWrite:YES];
+        NSString *destFolder = [self.keyboardsPath stringByAppendingPathComponent:folderName];
+        if (_debugMode) {
+            NSLog(@"Unzipping %@ to %@", filePath, destFolder);
+            if ([[NSFileManager defaultManager] fileExistsAtPath:destFolder])
+                NSLog(@"The destiination folder already exists. Overwriting...");
+        }
+        didUnzip = [za UnzipFileTo:destFolder overWrite:YES];
         [za UnzipCloseFile];
     }
     
