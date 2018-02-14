@@ -9,7 +9,17 @@ var justActivated = false;
 
 function focusReceiver() {
   var receiver = document.getElementById('receiver');
+  if(receiver['kmw_ip']) {
+    receiver = receiver['kmw_ip'];
+  }
   receiver.focus();
+  
+  if(keyman.util.device.touchable) {
+    // At present, touch doesn't 'focus' properly.
+    DOMEventHandlers.states.lastActiveElement = receiver;
+    DOMEventHandlers.states.activeElement = receiver;
+    keyman.osk.show(true);
+  }
 }
 
 setElementText = function(ele, text) {
@@ -172,6 +182,8 @@ window.addEventListener('load', function() {
   initDevice();
   setupKeyboardPicker();
   setTestDefinition();
+
+  DOMEventHandlers.states.lastActiveElement = in_output['kmw_ip'] ? in_output['kmw_ip'] : in_output;
 });
 
 //var p={'internalName':_internalName,'language':_language,'keyboardName':_keyboardName,'languageCode':_languageCode};
