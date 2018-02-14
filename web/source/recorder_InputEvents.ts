@@ -274,7 +274,7 @@ namespace KMWRecorder {
           return true;
         }
       }
-      
+
       return false;
     }
   }
@@ -553,14 +553,14 @@ namespace KMWRecorder {
       newSet.addTest(seq);      
     }
 
-    run(ele: HTMLElement, assertCallback?: AssertCallback) {
+    run(ele: HTMLElement, usingOSK?: boolean, assertCallback?: AssertCallback) {
       var setHasRun = false;
       var failures: TestFailure[] = [];
 
       for(var i = 0; i < this.inputTestSets.length; i++) {
         var testSet = this.inputTestSets[i];
 
-        if(testSet.isValidForCurrentClient()) {
+        if(testSet.isValidForCurrentClient(usingOSK)) {
           var testFailures = testSet.run(ele, assertCallback);
           if(testFailures) {
             failures = failures.concat(testFailures);

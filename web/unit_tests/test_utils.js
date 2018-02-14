@@ -160,9 +160,7 @@ var onScriptLoad = function(scriptURL, callback, timeout) {
   slo.observe();
 };
 
-var loadKeyboardFromJSON = function(jsonPath, callback, timeout) {
-  var stub = fixture.load(jsonPath, true);
-
+var loadKeyboardStub = function(stub, callback, timeout) {
   var kbdName = "Keyboard_" + stub.id;
 
   keyman.addKeyboards(stub);
@@ -175,4 +173,29 @@ var loadKeyboardFromJSON = function(jsonPath, callback, timeout) {
   } else {
     callback();
   }
+}
+
+var loadKeyboardFromJSON = function(jsonPath, callback, timeout) {
+  var stub = fixture.load(jsonPath, true);
+
+  loadKeyboardStub(stub, callback, timeout);
+}
+
+function runLoadedKeyboardTest(testDef, usingOSK, assertCallback) {
+  var inputElem = document.getElementById('singleton');
+    if(inputElem['kmw_ip']) {
+      inputElem = inputElem['kmw_ip'];
+    }
+
+    testDef.run(inputElem, usingOSK, assertCallback);
+}
+
+function runKeyboardTestFromJSON(jsonPath, usingOSK, callback, assertCallback, timeout) {
+  var testSpec = new KMWRecorder.KeyboardTest(fixture.load(jsonPath, true));
+
+  loadKeyboardStub(testSpec.keyboard, function() {
+    runLoadedKeyboardTest(testSpec, usingOSK, assertCallback);
+    keyman.removeKeyboards(testSpec.keyboard.id);
+    callback();
+  }, timeout);
 }
