@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.BuildConfig;
 
 import static com.tavultesoft.kmea.KMManager.KMDefault_AssetPackages;
 import static com.tavultesoft.kmea.KMManager.KMDefault_UndefinedPackageID;
@@ -190,7 +191,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
           remoteUrl = url;
         } else {
           // Keyman cloud
-          remoteUrl = String.format("%slanguages/%s/%s?device=%s", kKeymanApiBaseURL, langID, kbID, deviceType);
+          remoteUrl = String.format("%slanguages/%s/%s?version=%s&device=%s", kKeymanApiBaseURL, langID, kbID, BuildConfig.VERSION_NAME, deviceType);
         }
 
         ret = downloadNonKMPKeyboard(remoteUrl);

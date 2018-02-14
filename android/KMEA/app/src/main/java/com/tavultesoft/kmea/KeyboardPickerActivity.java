@@ -22,6 +22,7 @@ import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.BuildConfig;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -566,7 +567,7 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
               String languageID = keyboardsList.get(i).get(KMManager.KMKey_LanguageID);
               String keyboardID = keyboardsList.get(i).get(KMManager.KMKey_KeyboardID);
               String kbVersion = keyboardsList.get(i).get(KMManager.KMKey_KeyboardVersion);
-              String url = String.format("%slanguages/%s/%s?device=%s", KMKeyboardDownloaderActivity.kKeymanApiBaseURL, languageID, keyboardID, deviceType);
+              String url = String.format("%slanguages/%s/%s?version=%s&device=%s", KMKeyboardDownloaderActivity.kKeymanApiBaseURL, languageID, keyboardID,  BuildConfig.VERSION_NAME, deviceType);
               JSONObject kbData = jsonParser.getJSONObjectFromUrl(url);
               JSONObject language = kbData.optJSONObject(KMKeyboardDownloaderActivity.KMKey_Language);
               JSONArray keyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);

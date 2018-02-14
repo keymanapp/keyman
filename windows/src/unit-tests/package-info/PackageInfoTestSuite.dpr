@@ -26,7 +26,8 @@ uses
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
   PackageInfoTest in 'PackageInfoTest.pas',
-  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas';
+  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
+  DUnitX.Loggers.TeamCity in '..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas';
 
 var
   runner : ITestRunner;
@@ -67,6 +68,8 @@ begin
       System.Readln;
     end;
     {$ENDIF}
+
+    DUnitX.Loggers.TeamCity.ReportToTeamCity;
   except
     on E: Exception do
       System.Writeln(E.ClassName, ': ', E.Message);

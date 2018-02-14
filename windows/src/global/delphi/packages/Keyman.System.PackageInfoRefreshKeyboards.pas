@@ -26,6 +26,7 @@ type
   public
     type TPackageKeyboardInfo = record
       Name, ID, Version: string;
+      RTL: Boolean;
     end;
 
     class function FillKeyboardDetails(f: TPackageContentFile;
@@ -114,6 +115,7 @@ begin
         k.Name := pki.Name;
         k.ID := pki.ID;
         k.Version := pki.Version;
+        k.RTL := pki.RTL;
       end;
     end;
   end;
@@ -244,6 +246,7 @@ begin
       try
         pki.Name := Name;
         pki.Version := Version;
+        pki.RTL := RTL;
       finally
         Free;
       end;

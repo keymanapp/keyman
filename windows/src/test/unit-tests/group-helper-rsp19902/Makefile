@@ -5,7 +5,7 @@
 !include ..\..\..\Defines.mak
 
 test: build
-    $(WIN32_TARGET_PATH)\RegExGroupHelperRSP19902TestSuite.exe -b -exit:continue
+    -$(WIN32_TARGET_PATH)\RegExGroupHelperRSP19902TestSuite.exe -b -exit:continue
   
 build: 
     $(DELPHI_MSBUILD) RegExGroupHelperRSP19902TestSuite.dproj

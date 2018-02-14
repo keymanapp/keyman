@@ -286,7 +286,12 @@ fi
 
 if $DO_KEYMANIM ; then
     updatePlist "$KM4MIM_BASE_PATH" "$IM_NAME"
-    execBuildCommand $IM_NAME "xcodebuild -project \"$KMIM_PROJECT_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $TEST_ACTION -scheme Keyman"
+    execBuildCommand $IM_NAME "xcodebuild -project \"$KMIM_PROJECT_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS"
+    if [ "$TEST_ACTION" == "test" ]; then
+    	if [ "$CONFIG" == "Debug" ]; then
+    		execBuildCommand "$IM_NAME tests" "xcodebuild $TEST_ACTION -project \"$KMIM_PROJECT_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman"
+    	fi
+    fi
 fi
 
 if $DO_KEYMANTESTAPP ; then
@@ -296,8 +301,9 @@ fi
 
 # Deploy as requested
 if $LOCALDEPLOY ; then
-    displayInfo "" "Attempting local deployment..."
+    displayInfo "" "Attempting local deployment with command:"
     KM4MIM_APP_BASE_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
+    displayInfo "$KM4MIM_BASE_PATH/localdeploy.sh \"$KM4MIM_APP_BASE_PATH\"" 
     eval "$KM4MIM_BASE_PATH/localdeploy.sh" "$KM4MIM_APP_BASE_PATH"
     if [ $? == 0 ]; then
         displayInfo "Local deployment succeeded!" ""

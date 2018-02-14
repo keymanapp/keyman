@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.tavultesoft.kmea.BuildConfig;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -363,7 +364,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
             deviceType = "androidphone";
           }
 
-          jsonObj = jsonParser.getJSONObjectFromUrl(KMKeyboardDownloaderActivity.kKeymanApiBaseURL + "languages?device=" + deviceType);
+          jsonObj = jsonParser.getJSONObjectFromUrl(KMKeyboardDownloaderActivity.kKeymanApiBaseURL + "languages?version=" +  BuildConfig.VERSION_NAME + "&device=" + deviceType);
         } catch (Exception e) {
           jsonObj = null;
         }

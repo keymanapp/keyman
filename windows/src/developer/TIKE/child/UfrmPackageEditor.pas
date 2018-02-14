@@ -167,6 +167,8 @@ type
     cmdKeyboardAddLanguage: TButton;
     cmdKeyboardRemoveLanguage: TButton;
     chkFollowKeyboardVersion: TCheckBox;
+    lblKeyboardRTL: TLabel;
+    editKeyboardRTL: TEdit;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -1323,6 +1325,7 @@ begin
       editKeyboardDescription.Text := '';
       editKeyboardVersion.Text := '';
       memoKeyboardFiles.Text := '';
+      editKeyboardRTL.Text := '';
       cbKeyboardOSKFont.ItemIndex := -1;
       cbKeyboardDisplayFont.ItemIndex := -1;
       gridKeyboardLanguages.RowCount := 1;
@@ -1335,6 +1338,10 @@ begin
     memoKeyboardFiles.Text := '';
     editKeyboardDescription.Text := k.Name;
     editKeyboardVersion.Text := k.Version;
+
+    if k.RTL
+      then editKeyboardRTL.Text := 'True'
+      else editKeyboardRTL.Text := 'False (or not .js format)';
 
     for i := 0 to pack.Files.Count - 1 do
       if SameText(TKeyboardUtils.KeyboardFileNameToID(pack.Files[i].FileName), k.ID) then
