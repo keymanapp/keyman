@@ -39,157 +39,24 @@
       width: 50%;
       min-width: 600px;
     }
+
+    td {
+      vertical-align:top;
+      padding:15px;
+    }
   </style>
 
-  <!-- Insert uncompiled KeymanWeb source scripts -->
   <script src="../release/unminified/web/keymanweb.js" type="application/javascript"></script>
-
-  <!-- 
-      For desktop browsers, a script for the user interface must be inserted here.
-       
-      Standard UIs are toggle, button, float and toolbar.  
-      The toolbar UI is best for any page designed to support keyboards for 
-      a large number of languages.
-    -->
   <script src="../release/unminified/web/kmwuitoggle.js"></script>
-
   <script src="recorder_KeyboardScripts.js" type="application/javascript"></script>
-
   <script src="../release/recorder/recorder_InputEvents.js" type="application/javascript"></script>
+  <script src="recorder_ui_and_stubs.js" type="application/javascript"></script>
 
   <!-- Initialization: set paths to keyboards, resources and fonts as required -->
   <script>
-    // Thank you to https://stackoverflow.com/questions/22607150/getting-the-url-parameters-inside-the-html-page. 
-    var GetURLParameter = function (sParam) {
-      var sPageURL = window.location.search.substring(1);
-      var sURLVariables = sPageURL.split('&');
-      for (var i = 0; i < sURLVariables.length; i++) {
-        var sParameterName = sURLVariables[i].split('=');
-        if (sParameterName[0] == sParam) {
-          return sParameterName[1];
-        }
-      }
-    };
-
-
     var kmw = window.keyman;
     kmw.init({
       attachType: 'auto',
-    });
-  </script>
-
-  <script>
-    var inputJSON = new KMWRecorder.InputTestSequence();
-
-    var ta_inputJSON;
-    var in_output;
-
-    setElementText = function(ele, text) {
-      ele.value = text;
-      if(ele['kmw_ip']) {
-        keyman.touchAliasing.setTextBeforeCaret(ele['kmw_ip'], ele.value);
-      }
-    }
-
-    addInputRecord = function(json) {
-      inputJSON.addInput(json, in_output.value);
-      setElementText(ta_inputJSON, inputJSON.toPrettyJSON());
-    }
-
-    resetInputRecord = function() {
-      setElementText(ta_inputJSON, "");
-      setElementText(in_output, "");
-
-      inputJSON = new KMWRecorder.InputTestSequence();
-    }
-
-    copyInputRecord = function() {
-      try {
-        if(!ta_inputJSON['kmw_ip']) {
-          ta_inputJSON.select();
-        } else {
-          var range = document.createRange();
-          range.selectNode(ta_inputJSON['kmw_ip']);
-          window.getSelection().removeAllRanges();
-          window.getSelection().addRange(range);
-        }
-        
-        var res = document.execCommand('copy');
-        if(res) {
-          in_output.focus();
-          return;
-        }
-      } catch (err) { console.log(err) }
-      alert("Unable to copy successfully.");
-    }
-
-    setInputRecord = function() {
-      inputJSON = new KMWRecorder.InputTestSequence(JSON.parse(ta_inputJSON.value));
-      setElementText(in_output, inputJSON.output)
-    }
-
-    // Time for the 'magic'.  Yay, JavaScript method extension strategies...
-    var _kd = keyman.touchAliasing._KeyDown.bind(keyman.touchAliasing);
-    keyman.touchAliasing._KeyDown = function(e) {
-      if(DOMEventHandlers.states.activeElement != in_output &&
-        DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
-        return _kd(e);
-      }
-
-      var event = new KMWRecorder.PhysicalInputEvent(e);
-      var retVal = _kd(e);
-
-      // Record the keystroke as part of a test sequence!
-      addInputRecord(event);
-      return retVal;
-    }
-
-    var _ock = keyman.osk.clickKey.bind(keyman.osk);
-    keyman.osk.clickKey = function(e) {
-      if(DOMEventHandlers.states.activeElement != in_output &&
-        DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
-        return _ock(e);
-      }
-
-      var event = new KMWRecorder.OSKInputEvent(e);
-      var retVal = _ock(e);
-
-      // Record the click/touch as part of a test sequence!
-      addInputRecord(event);
-      return retVal;
-    }
-
-    var _sak = keyman.keyboardManager._SetActiveKeyboard.bind(keyman.keyboardManager);
-    keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, saveCookie) {
-      _sak(PInternalName, PLgCode, saveCookie);
-
-      // What's the active stub immediately after our _SetActiveKeyboard call?
-      var internalStub = keyman.keyboardManager.activeStub;
-      if(internalStub && (DOMEventHandlers.states.activeElement == in_output 
-        || DOMEventHandlers.states.activeElement == in_output['kmw_ip'])) {
-        var kbdRecord = new KMWRecorder.KeyboardStub(internalStub);
-        var ta_activeStub = document.getElementById('activeStub');
-        ta_activeStub.value = JSON.stringify(kbdRecord);
-      }
-    }
-
-    var initDevice = function() {
-      // From KMW.
-      var device = new Device();
-      device.detect();
-
-      p_layout.textContent += JSON.stringify(device, ['formFactor', 'touchable', 'browser', 'OS']);
-    }
-
-    window.addEventListener('load', function() {
-      ta_inputJSON = document.getElementById('inputRecord');
-      in_output = document.getElementById('receiver');
-      p_layout = document.getElementById('layout');
-
-      keyman.attachToControl(in_output);
-      keyman.setKeyboardForControl(in_output, '', '');
-      resetInputRecord();
-      initDevice();
     });
   </script>
 </head>
@@ -197,51 +64,120 @@
 <!-- Sample page HTML -->
 
 <body onload='loadKeyboards();'>
-  <h2>KeymanWeb - Test Input Recorder</h2>
-  <p>This page is designed to record KeymanWeb input for use in test case development.</p>
+  <table style="width:100%">
+    <tr>
+      <td colspan="2">
+        <h1>KeymanWeb - Test Input Recorder</h1>
+        <p>This page is designed to record KeymanWeb input for use in test case development.</p>
+      </td>
+    </tr>
+  </table>
   <hr/>
-  <div>
-    <div id='recording'>
-      <p id='layout'>Active device information: </p>
-      <p>Recorded output JSON:</p>
-      <textarea id='inputRecord' style="width:90%; height:150px"></textarea>
-      <p>You must click 'Set Sequence' to save any changes to an input sequence above before continuing input recording, or they will be lost upon new input.</p>
-      <button id='btnReload' type="button" onclick="setInputRecord();">Set Sequence</button>
-      <button id='btnReload' type="button" onclick="copyInputRecord();">Copy Sequence</button>
-      <button id='btnReload' type="button" onclick="resetInputRecord();">Clear Sequence</button>
-    </div>
-    <hr>
-    <div id='recordSection'>
-      <p>Record input here:</p>
-      <input type='text' id='receiver'/>
-    </div>
-    <hr>
-    <div id='kbdSection'>
-      <p>Currently active stub (for use with addKeyboards):</p>
-      <textarea id='activeStub' style="width:90%; height:50px" readonly></textarea>
-    </div>
-  </div>
+  <table width="100%">
+    <tr>
+      <td style="width:100%">
+        <h2>Load Existing JSON</h2>
+        <input type="file" id="existingFile" accept=".json" onchange="loadExistingTest(this.files);" />
+      </td>
+    </tr>
+  </table>
+  <hr>
+  <table width="100%">
+    <tr>
+      <td style="width:50%">
+        <h2>Load a Keyboard</h2>
+        <h3>Add a keyboard by keyboard stub (to addKeyboards):</h3>
+        <textarea style="width:90%; height:100px" id='kbd_stub_add' class='kmw-disabled' onkeypress="clickOnEnter(event,4);"></textarea><br>
+        <input type='button' id='btn4' onclick='addKeyboard(4);' style="width:90%" value='Add' />
+      </td>
+      <td style="vertical-align: bottom;">
+        <h3>Add a keyboard by keyboard name:</h3>
+        <input type='input' id='kbd_id1' class='kmw-disabled' onkeypress="clickOnEnter(event,1);"/>
+        <input type='button' id='btn1' onclick='addKeyboard(1);' value='Add' />
+      
+        <h3>Add a keyboard by ISO 639 or BCP-47 language code:</h3>
+        <input type='input' id='kbd_id2' class='kmw-disabled' onkeypress="clickOnEnter(event,2);"/>
+        <input type='button' id='btn2' onclick='addKeyboard(2);' value='Add' />
+      
+        <h3>Add a keyboard by language name:</h3>
+        <input type='input' id='kbd_id3' class='kmw-disabled' onkeypress="clickOnEnter(event,3);"/>
+        <input type='button' id='btn3' onclick='addKeyboard(3);' value='Add' />
+      </td>
+    </tr>
+  </table>
   <hr/>
-
-  <!--  The following elements show how the language menu can be dynamically extended at any time -->
-  <h3>Add a keyboard by keyboard stub (to addKeyboards):</h3>
-  <input type='textarea'  style="width:90%; height:100px" id='kbd_stub_add' class='kmw-disabled' onkeypress="clickOnEnter(event,4);"/><br>
-  <input type='button' id='btn4' onclick='addKeyboard(4);' style="width:90%" value='Add' />
-
-  <h3>Add a keyboard by keyboard name:</h3>
-  <input type='input' id='kbd_id1' class='kmw-disabled' onkeypress="clickOnEnter(event,1);"/>
-  <input type='button' id='btn1' onclick='addKeyboard(1);' value='Add' />
-
-  <h3>Add a keyboard by ISO 639 language code:</h3>
-  <input type='input' id='kbd_id2' class='kmw-disabled' onkeypress="clickOnEnter(event,2);"/>
-  <input type='button' id='btn2' onclick='addKeyboard(2);' value='Add' />
-
-  <h3>Add a keyboard by language name:</h3>
-  <input type='input' id='kbd_id3' class='kmw-disabled' onkeypress="clickOnEnter(event,3);"/>
-  <input type='button' id='btn3' onclick='addKeyboard(3);' value='Add' />   
-  <h3>
-    <a href="../index.html">Return to testing home page</a>
-  </h3>
+  <table style="width:100%">
+    <tr>
+      <td style="width:50%;" >
+        <h2>Keyboard Selection</h2>
+        <p>Each defined test set should utilize the same keyboard.</p>
+        <p>Select a keyboard: <select id='KMW_Keyboard' onchange='KMW_KeyboardChange()'><option value=''>-disabled-</option></select></p> 
+        <p>Please ensure a copy of this keyboard's *.js resides at the specified location within the <code>unit_tests/</code> folder.</p>
+      </td>
+      <td style="width:50%;">
+        <p>Currently active stub (for use with addKeyboards):</p>
+        <textarea id='activeStub' style="width:80%; height:100px" readonly></textarea>
+      </td>
+    </tr>
+  </table>  
+  <hr/>
+  <table style="width:100%">
+    <tr>
+      <td style="width:50%">
+        <h2>Constraint Selection</h2>
+        <p>Active form factor: <span style="font-weight: bold;" id="activeFormFactor"/></p>
+        <p>Touch availablility: <span style="font-weight: bold;" id="activeTouch"/></p>
+        <p>Current OS: <span style="font-weight: bold;" id="activeOS"/></p>
+        <p>Current browser: <span style="font-weight: bold;" id="activeBrowser"/></p>
+      </td>
+      <td style="width:50%">
+        <p style="font-weight: bold;">Valid OS:</p>
+        <nobr><input type="checkbox" id="platform_any" checked onclick="clearPlatforms();">Any</nobr>
+        <nobr><input type="checkbox" id="platform_windows" onclick="setPlatformAny();" value="windows">Windows</nobr>
+        <nobr><input type="checkbox" id="platform_macosx" onclick="setPlatformAny();" value="macosx">Mac OS X</nobr>
+        <nobr><input type="checkbox" id="platform_linux" onclick="setPlatformAny();" value="linux">Linux</nobr>
+        <nobr><input type="checkbox" id="platform_android" onclick="setPlatformAny();" value="android">Android</nobr>
+        <nobr><input type="checkbox" id="platform_ios" onclick="setPlatformAny();" value="ios">iOS</nobr>
+        <p style="font-weight: bold">Valid browser:</p>
+        <nobr><input type="checkbox" id="browser_any" checked onclick="clearBrowsers();">Any</nobr>
+        <nobr><input type="checkbox" id="browser_chrome" onclick="setBrowserAny();" value="chrome">Chrome</nobr>
+        <nobr><input type="checkbox" id="browser_firefox" onclick="setBrowserAny();" value="firefox">Firefox</nobr>
+        <nobr><input type="checkbox" id="browser_safari" onclick="setBrowserAny();" value="safari">Safari</nobr>
+        <nobr><input type="checkbox" id="browser_ie" onclick="setBrowserAny();" value="ie">IE</nobr>
+        <nobr><input type="checkbox" id="browser_opera" onclick="setBrowserAny();" value="opera">Opera</nobr>        
+      </td>
+    </tr>
+  </table>
+  <hr/>
+  <table style="width:100%">
+    <tr>
+      <td style="width:50%">
+        <h2>Input Recording</h2>
+          <p>Record input here:</p>
+          <input type='text' id='receiver'/>
+          <p>You must click 'Set Sequence' to save any changes to an input sequence above 
+            before continuing input recording, or they will be lost upon new input.</p>
+      </td>
+      <td style="width:50%">
+        <p>Current test sequence JSON:</p>
+        <textarea id='inputRecord' style="width:90%; height:180px"></textarea>
+        <button id='btnSave' type="button" onclick="saveInputRecord();">Save Test Sequence</button>
+        <button id='btnCopy' type="button" onclick="copyInputRecord();">Copy Sequence</button>
+        <button id='btnSet' type="button" onclick="reviseInputRecord();">Set Sequence</button>
+        <button id='btnClear' type="button" onclick="resetInputRecord();">Clear Sequence</button>
+        <!-- Add 'add to set' button -->
+      </td>
+    </tr>
+  </table>
+  <hr/>
+  <table style="width:100%">
+    <tr>
+      <td width="100%">
+        <h2>Test suite JSON:</h2>
+        <textarea id="masterJSON" class="kmw-disabled" style="width:100%; height:600px"></textarea>
+      </td>
+    </tr>
+  </table>
 </body>
 
 </html>

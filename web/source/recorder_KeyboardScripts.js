@@ -92,11 +92,7 @@
         break;
       case 2:
         sKbd=document.getElementById('kbd_id2').value.toLowerCase();
-        var rx=new RegExp(/^\w{3,3}$\$?/);    
-        if(rx.test(sKbd))
-          kmw.addKeyboards('@'+sKbd);
-        else        
-          alert('An ISO 639 language code must be exactly 3 letters long!');
+        kmw.addKeyboards('@'+sKbd);
         break;
       case 3:
         sKbd=document.getElementById('kbd_id3').value;

@@ -238,7 +238,7 @@ namespace KMWRecorder {
       this.output = output;
     }
 
-    simulateSequenceOn(ele: HTMLElement, assertCallback?: AssertCallback): boolean {
+    simulateSequenceOn(ele: HTMLElement, assertCallback?: AssertCallback): {success: boolean, result: string} {
       resetElement(ele);
 
       for(var i=0; i < this.inputs.length; i++) {
@@ -256,7 +256,7 @@ namespace KMWRecorder {
         assertCallback(result, this.output, this.msg);
       }
 
-      return result == this.output;
+      return {success: (result == this.output), result: result};
     }
 
     toPrettyJSON(): string {
@@ -266,6 +266,16 @@ namespace KMWRecorder {
       }
       str += "]}";
       return str;
+    }
+
+    hasOSKInteraction(): boolean {
+      for(var i=0; i < this.inputs.length; i++) {
+        if(this.inputs[i] instanceof OSKInputEvent) {
+          return true;
+        }
+      }
+      
+      return false;
     }
   }
 
@@ -296,16 +306,26 @@ namespace KMWRecorder {
     oskFont?: FontStubForLanguage;
 
     constructor(activeStub: any) {
-      this.id = activeStub.KLC;
-      this.name = activeStub.KL;
-      this.region = activeStub.KR;
+      if(activeStub.KLC) {
+        this.id = activeStub.KLC;
+        this.name = activeStub.KL;
+        this.region = activeStub.KR;
+  
+        // Fonts.
+        if(activeStub.KFont) {
+          this.font = new FontStubForLanguage(activeStub.KFont);
+        }
+        if(activeStub.KOskFont) {
+          this.oskFont = new FontStubForLanguage(activeStub.KOskFont);
+        }
+      } else {
+        this.id = activeStub.id;
+        this.name = activeStub.name;
+        this.region = activeStub.region;
 
-      // Fonts.
-      if(activeStub.KFont) {
-        this.font = new FontStubForLanguage(activeStub.KFont);
-      }
-      if(activeStub.KOskFont) {
-        this.oskFont = new FontStubForLanguage(activeStub.KOskFont);
+        // If we end up adding functionality to FontStubForLanguage, we'll need to properly reconstruct these.
+        this.font = activeStub.font;
+        this.oskFont = activeStub.oskFont;
       }
     }
   }
@@ -319,13 +339,29 @@ namespace KMWRecorder {
     // Constructs a stub usable with KeymanWeb's addKeyboards() API function from
     // the internally-tracked ActiveStub value for that keyboard.
     constructor(activeStub: any) {
-      this.id = activeStub.KI;
-      this.id = this.id.replace('Keyboard_', '');
+      if(activeStub.KI) {
+        this.id = activeStub.KI;
+        this.id = this.id.replace('Keyboard_', '');
+  
+        this.name = activeStub.KN;
+        this.filename = activeStub.KF;
+  
+        this.languages = [new LanguageStubForKeyboard(activeStub)];
+      } else {
+        this.id = activeStub.id;
+        this.name = activeStub.name;
+        this.filename = activeStub.filename;
+        this.languages = []
 
-      this.name = activeStub.KN;
-      this.filename = activeStub.KF;
+        for(var i=0; i < activeStub.languages.length; i++) {
+          this.languages.push(new LanguageStubForKeyboard(activeStub.languages[i]));
+        }
+      }
+    }
 
-      this.languages = [new LanguageStubForKeyboard(activeStub)];
+    setBasePath(filePath: string) {
+      var file = this.filename.substr(this.filename.lastIndexOf('/')+1);
+      this.filename = filePath + '/' + file;
     }
   }
 
@@ -333,7 +369,7 @@ namespace KMWRecorder {
   type OS = 'windows'|'android'|'ios'|'macosx'|'linux';
   type BROWSER = 'ie'|'chrome'|'firefox'|'safari'|'opera';  // ! no 'edge' detection in KMW!
 
-  class Constraint {
+  export class Constraint {
     target: TARGET;
     validOSList?: OS[];
     validBrowsers?: BROWSER[];
@@ -404,6 +440,18 @@ namespace KMWRecorder {
     }
   }
 
+  class TestFailure {
+    constraint: Constraint;
+    test: InputTestSequence;
+    result: string;
+
+    constructor(constraint: Constraint, test: InputTestSequence, output: string) {
+      this.constraint = constraint;
+      this.test = test;
+      this.result = output;
+    }
+  }
+
   class InputTestSet {
     constraint: Constraint;
     testSet: InputTestSequence[];
@@ -429,15 +477,19 @@ namespace KMWRecorder {
     }
 
     // Validity should be checked before calling this method.
-    run(ele: HTMLElement, assertCallback?: AssertCallback) {
+    run(ele: HTMLElement, assertCallback?: AssertCallback): TestFailure[] {
+      var failures: TestFailure[] = [];
+
       for(var i=0; i < this.testSet.length; i++) {
         var testSeq = this.testSet[i];
-        if(!testSeq.simulateSequenceOn(ele, assertCallback)) {
+        var simResult = testSeq.simulateSequenceOn(ele, assertCallback);
+        if(!simResult.success) {
           // Failed test!
-          // TODO:  Make a list of failures and store so that we can mass-report errors!
-          console.error("Failed test.  :(");
+          failures.push(new TestFailure(this.constraint, testSeq, simResult.result));
         }
       }
+
+      return failures.length > 0 ? failures : null;
     }
 
     // Used to determine if the current InputTestSet is applicable to be run on a device.
@@ -449,7 +501,7 @@ namespace KMWRecorder {
     }
   }
 
-  class KeyboardTest {
+  export class KeyboardTest {
     /**
      * The stub information to be passed into keyman.addKeyboards() in order to run the test.
      */
@@ -466,7 +518,11 @@ namespace KMWRecorder {
      * @param fromJSON 
      */
     constructor(fromJSON: string|KeyboardStub|KeyboardTest) {
-      if(typeof(fromJSON) == 'string') {
+      if(!fromJSON) {
+        this.keyboard = null;
+        this.inputTestSets = [];
+        return;
+      } else if(typeof(fromJSON) == 'string') {
         fromJSON = JSON.parse(fromJSON);
       } else if(fromJSON instanceof KeyboardStub) {
         this.keyboard = fromJSON;
@@ -499,22 +555,35 @@ namespace KMWRecorder {
 
     run(ele: HTMLElement, assertCallback?: AssertCallback) {
       var setHasRun = false;
+      var failures: TestFailure[] = [];
 
       for(var i = 0; i < this.inputTestSets.length; i++) {
         var testSet = this.inputTestSets[i];
 
         if(testSet.isValidForCurrentClient()) {
-          // TODO:  Collect a set of failure results to report back upon at the end!
-          testSet.run(ele, assertCallback);
+          var testFailures = testSet.run(ele, assertCallback);
+          if(testFailures) {
+            failures = failures.concat(testFailures);
+          }
           setHasRun = true;
         }
       }
 
-      // TODO:  Report back on the failures!
       if(!setHasRun) {
         // The sets CAN be empty, allowing silent failure if/when we actually want that.
         console.warn("No test sets for this keyboard were applicable for this device!");
       }
+
+      // Allow the method's caller to trigger a 'fail'.
+      if(failures.length > 0) {
+        return failures;
+      } else {
+        return null;
+      }
+    }
+
+    isEmpty() {
+      return this.inputTestSets.length == 0;
     }
   }
 }
