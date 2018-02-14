@@ -260,11 +260,19 @@ namespace KMWRecorder {
     }
 
     toPrettyJSON(): string {
-      var str = "{ \"output\": \"" + this.output + "\", \"inputs\": [\n";
+      var str = "{ ";
+      if(this.output) {
+        str += "\"output\": \"" + this.output + "\", ";
+      }
+      str += "\"inputs\": [\n";
       for(var i = 0; i < this.inputs.length; i++) {
         str += "  " + this.inputs[i].toPrettyJSON() + ((i == this.inputs.length-1) ? "\n" : ",\n");
       }
-      str += "]}";
+      if(this.msg) {
+        str += "], \"message\": \"" + this.msg + "\" }";
+      } else {
+        str += "]}";
+      }
       return str;
     }
 

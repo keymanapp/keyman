@@ -161,6 +161,17 @@ keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, sav
   justActivated = false;
 }
 
+function errorUpdate() {
+  var errorInput = document.getElementById('errorText');
+  if(errorInput.value) {
+    inputJSON.msg = errorInput.value;
+  } else {
+    delete inputJSON.msg;
+  }
+
+  setElementText(ta_inputJSON, inputJSON.toPrettyJSON());
+}
+
 var initDevice = function() {
   // From KMW.
   var device = new Device();
@@ -184,6 +195,18 @@ window.addEventListener('load', function() {
   setTestDefinition();
 
   DOMEventHandlers.states.lastActiveElement = in_output['kmw_ip'] ? in_output['kmw_ip'] : in_output;
+
+  var errorInput = document.getElementById('errorText');
+  if(errorInput['kmw_ip']) {
+    // Alias DIVs use subelements b/c caret simulation.
+    // Interestingly, 'childList' is the most important for noting textContent changes.
+    var config = { childList: true, subtree: true };
+    var observer = new MutationObserver(function(mutations) {
+      errorUpdate();
+    });
+
+    observer.observe(errorInput['kmw_ip'], config);
+  }
 });
 
 //var p={'internalName':_internalName,'language':_language,'keyboardName':_keyboardName,'languageCode':_languageCode};
