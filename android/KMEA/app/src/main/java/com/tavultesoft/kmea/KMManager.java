@@ -43,6 +43,9 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crash.FirebaseCrash;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
@@ -650,12 +653,19 @@ public final class KMManager {
   }
 
   public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
+    // Log Firebase analytic event
     Bundle params = new Bundle();
     params.putString("packageID", keyboardInfo.get(KMManager.KMKey_PackageID));
     params.putString("keyboardID", keyboardInfo.get(KMManager.KMKey_KeyboardID));
     params.putString("keyboardName", keyboardInfo.get(KMManager.KMKey_KeyboardName));
     params.putString("keyboardVersion", keyboardInfo.get(KMManager.KMKey_KeyboardVersion));
     mFirebaseAnalytics.logEvent("km_add_keyboard", params);
+
+    Answers.getInstance().logCustom(new CustomEvent("Add Keyboard")
+      .putCustomAttribute("packageID", keyboardInfo.get(KMManager.KMKey_PackageID))
+      .putCustomAttribute("keyboardID", keyboardInfo.get(KMManager.KMKey_KeyboardID))
+      .putCustomAttribute("keyboardName", keyboardInfo.get(KMManager.KMKey_KeyboardName))
+      .putCustomAttribute("keyboardVersion", keyboardInfo.get(KMManager.KMKey_KeyboardVersion)));
 
     return KeyboardPickerActivity.addKeyboard(context, keyboardInfo);
   }

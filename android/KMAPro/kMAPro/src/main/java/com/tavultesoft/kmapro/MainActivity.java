@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.core.CrashlyticsCore;
+import com.crashlytics.android.answers.Answers;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crash.FirebaseCrash;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -141,12 +141,10 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     actionBar.setDisplayShowTitleEnabled(false);
     actionBar.setBackgroundDrawable(getActionBarDrawable(this));
 
-    if (BuildConfig.DEBUG) {
-      KMManager.setDebugMode(true);
-    }
-
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+    Fabric.with(this, new Answers());
 
+    /*
     // TODO: uncomment this block to disable crashlytics for debug builds
     // Set up Crashlytics, disabled for debug builds
     Crashlytics crashlyticsKit = new Crashlytics.Builder()
@@ -156,6 +154,10 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     // Initialize Fabric with the debug-disabled crashlytics.
     Fabric.with(this, crashlyticsKit);
     /* */
+
+    if (BuildConfig.DEBUG) {
+      KMManager.setDebugMode(true);
+    }
 
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
     setContentView(R.layout.activity_main);
@@ -382,7 +384,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         return true;
       // action_crash is temporary for testing integration of Crashlytics, and will be removed
       case R.id.action_crash:
-        FirebaseCrash.report(new Exception("Dev: action crash"));
         Crashlytics.getInstance().crash(); // Force a crash
         return true;
       case R.id.action_share:

@@ -52,7 +52,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation "org.robolectric:robolectric:3.5.1"
 
-    /* We only want these firebase dependencies for KMEA */
+    /* We only want these Firebase Crashlytics dependencies for KMEA */
     implementation "com.google.firebase:firebase-analytics:$currentFirebaseVersion"
     implementation "com.google.firebase:firebase-crash:$currentFirebaseVersion"
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.0@aar') {
+        transitive = true;
+    }
 }
