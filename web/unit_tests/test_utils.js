@@ -190,11 +190,11 @@ function runLoadedKeyboardTest(testDef, usingOSK, assertCallback) {
     testDef.run(inputElem, usingOSK, assertCallback);
 }
 
-function runKeyboardTestFromJSON(jsonPath, usingOSK, callback, assertCallback, timeout) {
+function runKeyboardTestFromJSON(jsonPath, params, callback, assertCallback, timeout) {
   var testSpec = new KMWRecorder.KeyboardTest(fixture.load(jsonPath, true));
 
   loadKeyboardStub(testSpec.keyboard, function() {
-    runLoadedKeyboardTest(testSpec, usingOSK, assertCallback);
+    runLoadedKeyboardTest(testSpec, params.usingOSK, assertCallback);
     keyman.removeKeyboards(testSpec.keyboard.id);
     callback();
   }, timeout);

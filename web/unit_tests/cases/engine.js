@@ -98,11 +98,11 @@ describe('Engine', function() {
     this.timeout(10000);
 
     it('Keyboard simulation', function(done) {
-      runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', false, done, assert.equal, 10000);
+      runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: false}, done, assert.equal, 10000);
     });
 
     it('OSK simulation', function(done) {
-      runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', true, done, assert.equal, 10000);
+      runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: true}, done, assert.equal, 10000);
     })
   });
 });
