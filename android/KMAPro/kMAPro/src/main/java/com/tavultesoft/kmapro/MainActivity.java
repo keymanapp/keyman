@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.answers.Answers;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.crash.FirebaseCrash;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
@@ -76,8 +74,6 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.Toast;
-
-import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends Activity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
   ActivityCompat.OnRequestPermissionsResultCallback {
@@ -142,18 +138,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     actionBar.setBackgroundDrawable(getActionBarDrawable(this));
 
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-    Fabric.with(this, new Answers());
-
-    /*
-    // TODO: uncomment this block to disable crashlytics for debug builds
-    // Set up Crashlytics, disabled for debug builds
-    Crashlytics crashlyticsKit = new Crashlytics.Builder()
-      .core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
-      .build();
-
-    // Initialize Fabric with the debug-disabled crashlytics.
-    Fabric.with(this, crashlyticsKit);
-    /* */
 
     if (BuildConfig.DEBUG) {
       KMManager.setDebugMode(true);
