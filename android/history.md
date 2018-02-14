@@ -10,6 +10,7 @@
 * Fix KMEA http:// to https:// redirects for downloading keyboard resources (#370)
 * Change internal keyboard assets from languages/ and fonts/ folders to packages/
 * Add feature to install ad-hoc keyboards via .kmp packages
+* Add [Firebase Crashlytics](https://firebase.google.com/docs/crashlytics/) for generating crash reports
 
 ## 2017-08-10 2.8.300 stable
 * No changes, just published latest beta as stable

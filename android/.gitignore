@@ -26,3 +26,6 @@
 KMEA/app/src/main/assets/
 KMAPro/assets/keyman.js
 
+# Firebase configuration
+**/google-services.json
+

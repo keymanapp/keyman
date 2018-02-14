@@ -41,10 +41,18 @@ android {
     }
 }
 
+ext {
+    currentFirebaseVersion = "11.8.0"
+}
+
 dependencies {
     implementation 'com.android.support:support-v4:25.4.0'
     implementation 'commons-io:commons-io:2.6'
     implementation 'org.apache.commons:commons-text:1.2'
     testImplementation 'junit:junit:4.12'
     testImplementation "org.robolectric:robolectric:3.5.1"
+
+    /* We only want these firebase dependencies for KMEA */
+    implementation "com.google.firebase:firebase-analytics:$currentFirebaseVersion"
+    implementation "com.google.firebase:firebase-crash:$currentFirebaseVersion"
 }
