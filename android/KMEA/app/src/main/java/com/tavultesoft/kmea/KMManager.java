@@ -24,6 +24,7 @@ import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
@@ -42,6 +43,7 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.packages.PackageProcessor;
@@ -52,6 +54,9 @@ import org.json.JSONObject;
 public final class KMManager {
 
   private static final String KMEngineVersion = "2.4.3";
+  private static final String TAG = "KMManager";
+
+  private static FirebaseAnalytics mFirebaseAnalytics;
 
   // Keyboard types
   public enum KeyboardType {
@@ -169,6 +174,8 @@ public final class KMManager {
   public static void initialize(Context context, KeyboardType keyboardType) {
     appContext = context.getApplicationContext();
 
+    mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+
     if (!didCopyAssets) {
       copyAssets(appContext);
       migrateOldKeyboardFiles(appContext);
@@ -181,7 +188,7 @@ public final class KMManager {
     } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       initSystemKeyboard(appContext);
     } else {
-      Log.w("KMManager", "Cannot initialize: Invalid keyboard type");
+      Log.w(TAG, "Cannot initialize: Invalid keyboard type");
     }
 
     // Initializes the PackageProcessor with the base resource directory, which is the parent directory
@@ -219,7 +226,7 @@ public final class KMManager {
   private static void initInAppKeyboard(Context appContext) {
     if (InAppKeyboard == null) {
       if (isDebugMode())
-        Log.d("KMManager", "Initializing In-App Keyboard...");
+        Log.d(TAG, "Initializing In-App Keyboard...");
       int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
       RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
       params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
@@ -236,7 +243,7 @@ public final class KMManager {
   private static void initSystemKeyboard(Context appContext) {
     if (SystemKeyboard == null) {
       if (isDebugMode())
-        Log.d("KMManager", "Initializing System Keyboard...");
+        Log.d(TAG, "Initializing System Keyboard...");
       int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
       RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
       params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
@@ -384,7 +391,7 @@ public final class KMManager {
         copyAsset(context, keyboardFile, KMDefault_UndefinedPackageID, true);
       }
     } catch (Exception e) {
-      Log.e("Failed to copy assets", "Error: " + e);
+      Log.e(TAG, "Failed to copy assets. Error: " + e);
     }
   }
 
@@ -416,7 +423,7 @@ public final class KMManager {
         result = 0;
       }
     } catch (Exception e) {
-      Log.e("KMManager", "Failed to copy asset. Error: " + e);
+      Log.e(TAG, "Failed to copy asset. Error: " + e);
       result = -1;
     }
     return result;
@@ -507,7 +514,7 @@ public final class KMManager {
         FileUtils.deleteDirectory(legacyFontsDir);
       }
     } catch (IOException e) {
-      Log.e("KMManager", "Failed to migrate assets. Error: " + e);
+      Log.e(TAG, "Failed to migrate assets. Error: " + e);
     }
   }
 
@@ -642,6 +649,14 @@ public final class KMManager {
   }
 
   public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
+    // Log Firebase analytic event.
+    Bundle params = new Bundle();
+    params.putString("packageID", keyboardInfo.get(KMManager.KMKey_PackageID));
+    params.putString("keyboardID", keyboardInfo.get(KMManager.KMKey_KeyboardID));
+    params.putString("keyboardName", keyboardInfo.get(KMManager.KMKey_KeyboardName));
+    params.putString("keyboardVersion", keyboardInfo.get(KMManager.KMKey_KeyboardVersion));
+    mFirebaseAnalytics.logEvent("km_add_keyboard", params);
+
     return KeyboardPickerActivity.addKeyboard(context, keyboardInfo);
   }
 
