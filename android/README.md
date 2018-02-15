@@ -23,13 +23,15 @@ yes | ./sdkmanager.bat --licenses
 ## Keyman for Android Development
 Keyman for Android (formerly named KMAPro) can be built from a command line (preferred) or Android Studio.
 
+Firebase Crashlytics is used for crash reporting, and it depends on a configured google-services.json file. For this reason, only the Debug variant of KMAPro is intended to be built on a Developer machine. The analytics for Debug are associated with an application ID `com.tavultesoft.kmapro.debug`.
+
 ### Compiling From Command Line
 1. Launch a command prompt
 2. Change to one of these directories depending on what you want to compile:
     * For compiling KMEA and KMAPro, cd to the directory **keyman/android**
     * For compiling only KMAPro, cd to the directory **keyman/android/KMAPro**
-3. `./build.sh`
-4. The APK will be found in **KMAPro/kMAPro/build/outputs/apk/kMAPro-*.apk**
+3. `./build.sh -debug`
+4. The APK will be found in **KMAPro/kMAPro/build/outputs/apk/debug/kMAPro-debug.apk**
 
 ### Compiling From Android Studio
 1. Ensure that [Keyman Engine for Android](#how-to-build-keyman-engine-for-android) is built.

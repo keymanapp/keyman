@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.crashlytics.android.Crashlytics;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
@@ -27,10 +29,8 @@ import com.tavultesoft.kmea.util.DownloadIntentService;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -83,6 +83,8 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   Uri data;
 
   private static final String TAG = "MainActivity";
+  private FirebaseAnalytics mFirebaseAnalytics;
+
   private KMTextView textView;
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
@@ -135,9 +137,12 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     actionBar.setDisplayShowTitleEnabled(false);
     actionBar.setBackgroundDrawable(getActionBarDrawable(this));
 
+    mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
     if (BuildConfig.DEBUG) {
       KMManager.setDebugMode(true);
     }
+
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
     setContentView(R.layout.activity_main);
     textView = (KMTextView) findViewById(R.id.kmTextView);
@@ -360,6 +365,10 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     switch (item.getItemId()) {
       case R.id.action_info:
         showInfo();
+        return true;
+      // action_crash is temporary for testing integration of Crashlytics, and will be removed
+      case R.id.action_crash:
+        Crashlytics.getInstance().crash(); // Force a crash
         return true;
       case R.id.action_share:
         showShareDialog();

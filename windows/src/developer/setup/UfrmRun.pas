@@ -129,6 +129,7 @@ uses
   TntDialogHelp,
   types, upload_settings,
   httpuploader,
+  Keyman.System.UpdateCheckResponse,
   VersionInfo, GetOSVersion,
   SFX,
   bootstrapmain, jwawintype, jwamsi, ErrorControlledRegistry, RegistryKeys;
@@ -221,7 +222,7 @@ end;
 
 function TfrmRun.IsNewerVersionInstalled(const NewVersion: WideString): Boolean;
 begin
-  Result := (FInstalledVersion.Version <> '') and (NewVersion <= FInstalledVersion.Version);
+  Result := (FInstalledVersion.Version <> '') and (CompareVersions(NewVersion, FInstalledVersion.Version) >= 0);
 end;
 
 function TfrmRun.CheckDependencies: Boolean;
@@ -275,36 +276,34 @@ begin
 end;
 
 procedure TfrmRun.CheckNewVersion;
+var
+  ucr: TUpdateCheckResponse;
 begin
   with THTTPUploader.Create(nil) do
   try
-    // TODO: Eliminate Raw parameter and use 'setup' instead
-    Fields.Add('OnlineProductID', AnsiString(IntToStr(OnlineProductID_KeymanDeveloper_100)));  // I2856  // I3377
     if FInstalledVersion.Version = ''
       then Fields.Add('Version', AnsiString(FInstallInfo.Version))
       else Fields.Add('Version', AnsiString(FInstalledVersion.Version));
-    Fields.Add('Raw', '1');
 
     Request.HostName := API_Server;
     Request.Protocol := API_Protocol;
-    Request.UrlPath := API_Path_UpdateCheck;
+    Request.UrlPath := API_Path_UpdateCheck_Developer;
 
     Upload;
     if Response.StatusCode = 200 then
     begin
-      with TStringList.Create do
-      try
-        Text := string(Response.MessageBodyAsString);
-        if CompareVersions(Values['newversion'], FInstallInfo.Version) < 0 then  // I2856
+      if ucr.Parse(Response.MessageBodyAsString, 'developer', FInstallInfo.Version) then
+      begin
+        if ucr.Status = ucrsUpdateReady then
         begin
-          FNewVersion.Version := Values['newversion'];
-          FNewVersion.InstallURL := Values['installurl'];
-          FNewVersion.InstallSize := StrToIntDef(Values['installsize'], 0);  // I1917  // I2680
-          FNewVersion.Filename := ExtractFileName(StringReplace(FNewVersion.InstallURL, '/', '\', [rfReplaceAll]));  // I1917  // I2680
+          FNewVersion.Version := ucr.NewVersion;
+          FNewVersion.InstallURL := ucr.InstallURL;
+          FNewVersion.InstallSize := ucr.InstallSize;
+          FNewVersion.Filename := ExtractFileName(StringReplace(FNewVersion.InstallURL, '/', '\', [rfReplaceAll]));  // I1917
         end;
-      finally
-        Free;
-      end;
+      end
+      else
+        raise Exception.Create(ucr.ErrorMessage);
     end
     else
       raise Exception.Create('Error '+IntToStr(Response.StatusCode));
@@ -643,6 +642,11 @@ begin
   end;
 end;
 
+procedure DoOutputDebugString(s: string);
+begin
+  OutputDebugString(PWideChar('KEYMANDEVELOPER.SETUP.EXE: '+s+#13#10));
+end;
+
 function TfrmRun.InstallMSI: Boolean;
 var
   res: Cardinal;
@@ -651,12 +655,19 @@ var
 begin
   Result := True;
 
+  DoOutputDebugString('InstallMSI');
+  DoOutputDebugString('  NewVersion.Version=<'+FNewVersion.Version+'>');
+  DoOutputDebugString('  InstallInfo.Version=<'+FInstallInfo.Version+'>');
   { We need to check if the included installer or the patch available is a newer version than the currently installed version }
   if FNewVersion.Version <> '' then
   begin
+    DoOutputDebugString('NewVersion.Version <> ''''');
     if IsNewerVersionInstalled(FNewVersion.Version) then
-      { The patch is older than the installed version }
+    begin
+      DoOutputDebugString('  IsNewerVersionInstalled=True');
       Exit;
+      { The patch is older than the installed version }
+    end;
 
     if not InstallNewVersion then
     begin
@@ -666,8 +677,10 @@ begin
     end;
   end;
 
+  DoOutputDebugString('Testing IsNewerVersionInstalled('''+FInstallInfo.Version+''')');
   if not IsNewerVersionInstalled(FInstallInfo.Version) then
   begin
+    DoOutputDebugString('not IsNewerVersionInstalled');
     ReinstallMode := 'REBOOTPROMPT=S REBOOT=ReallySuppress'; // I2754 - Auto update is too silent  // I3355   // I3500
     if (FInstalledVersion.Version <> '') and (FInstalledVersion.ProductCode = FInstallerVersion.ProductCode)
       then ReinstallMode := ReinstallMode + ' REINSTALLMODE=vdmus REINSTALL=ALL';  // I3355   // I3500   // I4858

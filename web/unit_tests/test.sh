@@ -97,8 +97,13 @@ if [ $CONFIG = CI.conf.js ]; then
     BROWSERS=
 fi
 
-npm run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
-npm run karma -- start $FLAGS $BROWSERS unit_tests/$CONFIG
+BASE_PATH=`dirname $BASH_SOURCE`
+cd $BASE_PATH/../source
+
+./build_recorder.sh
+
+npm run modernizr --silent -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
+npm run karma --silent -- start $FLAGS $BROWSERS unit_tests/$CONFIG
 
 CODE=$?
 

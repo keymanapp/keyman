@@ -880,7 +880,7 @@ class KeyboardInterface {
    * Description  Get start of selection (with supplementary plane modifications)
    */   
   _SelPos(Pelem: HTMLElement) {
-    var Ldoc: Document, Ldv: Window, isMSIE=(this.keymanweb.util._GetIEVersion()<999); // I3363 (Build 301)
+    var Ldoc: Document, Ldv: Window, isMSIE=(Device._GetIEVersion()<999); // I3363 (Build 301)
 
     if((<any>this.keymanweb).isPositionSynthesized())
       return this.keymanweb.touchAliasing.getTextCaret(Pelem);

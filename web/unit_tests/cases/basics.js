@@ -31,11 +31,11 @@ Modernizr.on('touchevents', function(result) {
     describe('Basic Toggle UI', function() {
 
       beforeEach(function(done) {
-        this.timeout(10000);
+        this.timeout(20000);
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('toggle', done, 10000, function() { return keyman.ui.initialized; });
+        setupKMW('toggle', done, 20000, function() { return keyman.ui.initialized; });
       });
       
       afterEach(function() {
@@ -64,11 +64,11 @@ Modernizr.on('touchevents', function(result) {
     describe('Basic Button UI', function() {
 
       beforeEach(function(done) {
-        this.timeout(10000);
+        this.timeout(20000);
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('button', done, 10000, function() { return keyman.ui.init; });
+        setupKMW('button', done, 20000, function() { return keyman.ui.init; });
       });
       
       afterEach(function() {
@@ -84,11 +84,11 @@ Modernizr.on('touchevents', function(result) {
     describe('Basic Float UI', function() {
 
       beforeEach(function(done) {
-        this.timeout(10000);
+        this.timeout(20000);
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('float', done, 10000, function() { return keyman.ui.initialized; });
+        setupKMW('float', done, 20000, function() { return keyman.ui.initialized; });
       });
       
       afterEach(function() {
@@ -117,11 +117,11 @@ Modernizr.on('touchevents', function(result) {
     describe('Basic Toolbar UI', function() {
 
       beforeEach(function(done) {
-        this.timeout(10000);
+        this.timeout(20000);
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('toolbar', done, 10000, function() { return keyman.ui.init; });
+        setupKMW('toolbar', done, 20000, function() { return keyman.ui.init; });
       });
       
       afterEach(function() {

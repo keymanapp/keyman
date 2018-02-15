@@ -28,7 +28,8 @@ interface
 
 const
   // https://api.keyman.com/ - programmatic endpoints
-  API_Path_UpdateCheck = '/desktop/10.0/update';
+  API_Path_UpdateCheck_Desktop = '/desktop/10.0/update';
+  API_Path_UpdateCheck_Developer = '/developer/10.0/update';
   API_Path_DownloadLocale = '/desktop/10.0/locale';
   API_Path_Crash = '/desktop/10.0/exception'; // also used for Developer and Engine
   API_Path_SubmitDiag = '/desktop/10.0/submitdiag';
