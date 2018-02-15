@@ -666,13 +666,17 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (NSArray *)KMXFiles {
-    NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:self.keyboardsPath];
+    return [self KMXFilesAtPath:self.keyboardsPath];
+}
+
+- (NSArray *)KMXFilesAtPath:(NSString *)path {
+    NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:path];
     NSMutableArray *kmxFiles = [[NSMutableArray alloc] initWithCapacity:0];
     NSString *filePath;
     while (filePath = (NSString *)[dirEnum nextObject]) {
         NSString *extension = [[filePath pathExtension] lowercaseString];
         if ([extension isEqualToString:@"kmx"])
-            [kmxFiles addObject:[self.keyboardsPath stringByAppendingPathComponent:filePath]];
+            [kmxFiles addObject:[path stringByAppendingPathComponent:filePath]];
     }
     
     return kmxFiles;
@@ -918,10 +922,16 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     }
     
     if (didUnzip) {
-        if (_debugMode) {
+        if (_debugMode)
             NSLog(@"Unzipped file: %@", filePath);
+        NSString * keyboardFolderPath = [self.keyboardsPath stringByAppendingPathComponent:folderName];
+        [self installFontsAtPath:keyboardFolderPath];
+        for (NSString *kmxFile in [self KMXFilesAtPath:keyboardFolderPath]) {
+            if (_debugMode)
+                NSLog(@"Adding keyboard to list of active keyboards: %@", kmxFile);
+            [self.activeKeyboards addObject:kmxFile];
         }
-        [self installFontsAtPath:[self.keyboardsPath stringByAppendingPathComponent:folderName]];
+        [self saveActiveKeyboards];
     }
     else {
         if (_debugMode) {

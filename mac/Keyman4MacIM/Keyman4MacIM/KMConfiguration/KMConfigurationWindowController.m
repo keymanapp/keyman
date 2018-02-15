@@ -300,12 +300,15 @@
 
 - (void)checkBoxAction:(id)sender {
     NSButton *checkBox = (NSButton *)sender;
+    NSString *kmxFilePath = [self kmxFilePathAtIndex:checkBox.tag];
     if (checkBox.state == NSOnState) {
-        [self.activeKeyboards addObject:[self kmxFilePathAtIndex:checkBox.tag]];
+        if ([self.AppDelegate debugMode])
+            NSLog(@"Adding active keyboard: %@", kmxFilePath);
+        [self.activeKeyboards addObject:kmxFilePath];
         [self saveActiveKeyboards];
     }
     else if (checkBox.state == NSOffState) {
-        [self.activeKeyboards removeObject:[self kmxFilePathAtIndex:checkBox.tag]];
+        [self.activeKeyboards removeObject:kmxFilePath];
         [self saveActiveKeyboards];
     }
 }
