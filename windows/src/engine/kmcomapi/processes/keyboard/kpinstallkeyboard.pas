@@ -73,6 +73,7 @@ uses
   kprecompilemnemonickeyboard, KPInstallVisualKeyboard,
   utildir,
   KeymanPaths,
+  kmxfileconsts,
   utilicon,
   utilstr,
   keymanapi_TLB, Variants;

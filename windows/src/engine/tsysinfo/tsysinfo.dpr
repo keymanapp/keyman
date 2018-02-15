@@ -53,7 +53,8 @@ uses
   Glossary in '..\..\global\delphi\general\Glossary.pas',
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
   SHDocVw in '..\..\global\delphi\vcl\SHDocVw.pas',
-  StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas';
+  StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
+  kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas';
 
 {$R *.res}
 {$R manifest.res}

@@ -206,7 +206,7 @@ function GetVKLegalShiftStateIndex(Shift: Integer): Integer;
 implementation
 
 uses
-  kmxfile,
+  kmxfileconsts,
   VisualKeyboardLoaderBinary,
   VisualKeyboardLoaderXML,
   VisualKeyboardSaverBinary,

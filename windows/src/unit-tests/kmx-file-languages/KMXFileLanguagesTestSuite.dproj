@@ -106,6 +106,7 @@
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

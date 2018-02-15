@@ -115,6 +115,7 @@ uses
   compile,
   KeyboardParser,
   kmxfile,
+  kmxfileconsts,
   KeyboardFonts,
   KeymanDeveloperOptions,
   Keyman.System.KeyboardUtils,

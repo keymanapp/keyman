@@ -27,7 +27,8 @@ uses
   Keyman.Test.System.KMXFileLanguagesTest in 'Keyman.Test.System.KMXFileLanguagesTest.pas',
   Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
-  DUnitX.Loggers.TeamCity in '..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas';
+  DUnitX.Loggers.TeamCity in '..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas',
+  kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas';
 
 var
   runner : ITestRunner;

@@ -48,6 +48,7 @@ implementation
 
 uses
   kmxfile,
+  kmxfileconsts,
   UKeymanTargets;
 
 {$R *.dfm}

@@ -37,7 +37,8 @@ uses
   kmpinffile,
   packageinfo,
   TempFileManager,
-  kmxfile;
+  kmxfile,
+  kmxfileconsts;
 
 type
   TKeyboardInfoMap = record

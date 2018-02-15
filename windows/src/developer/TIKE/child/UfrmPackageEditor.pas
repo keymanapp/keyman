@@ -281,6 +281,7 @@ uses
   KeymanVersion,
   Keyman.System.PackageInfoRefreshKeyboards,
   Keyman.System.KeyboardUtils,
+  kmxfileconsts,
   Project,
   ProjectFileType,
   ShellApi,

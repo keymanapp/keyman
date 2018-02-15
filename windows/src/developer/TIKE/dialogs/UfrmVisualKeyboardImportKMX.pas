@@ -79,6 +79,7 @@ implementation
 uses
   keyman32_int,
   KeymanDeveloperUtils,
+  kmxfileconsts,
   debugging,
   VKeys;
 
