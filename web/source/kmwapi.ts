@@ -36,7 +36,7 @@ goog.exportSymbol("Util.prototype.getAbsoluteX", Util.prototype._GetAbsoluteX);
 goog.exportSymbol("Util.prototype.getAbsoluteY", Util.prototype._GetAbsoluteY);
 goog.exportSymbol("Util.prototype.getAbsolute", Util.prototype._GetAbsolute);
 goog.exportSymbol("Util.prototype.createElement", Util.prototype.createElement);
-goog.exportSymbol("Util.prototype.getIEVersion", Util.prototype._GetIEVersion);
+goog.exportSymbol("Util.prototype.getIEVersion", Util.prototype.getIEVersion);
 goog.exportSymbol("Util.prototype.isTouchDevice", Util.prototype.isTouchDevice);
 goog.exportSymbol("Util.prototype.createShim", Util.prototype.createShim);
 goog.exportSymbol("Util.prototype.showShim", Util.prototype.showShim);

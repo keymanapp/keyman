@@ -117,10 +117,10 @@ module.exports = function(config) {
   /*
    * Final selection of the sets to be used for BrowserStack testing.
    */
-  var FINAL_LAUNCHER_DEFS = mergeLaunchers( CURRENT_MAC_LAUNCHERS,
+  var FINAL_LAUNCHER_DEFS = mergeLaunchers( CURRENT_ANDROID_LAUNCHERS,
                                             CURRENT_IOS_LAUNCHERS,
                                             CURRENT_WIN_LAUNCHERS,
-                                            CURRENT_ANDROID_LAUNCHERS);
+                                            CURRENT_MAC_LAUNCHERS);
 
   var FINAL_BROWSER_LIST = toBrowserList(FINAL_LAUNCHER_DEFS);
 
@@ -136,6 +136,9 @@ module.exports = function(config) {
       retryLimit: 1, // 0 is ignored.
       startTunnel: true,
     },
+
+    // Attempts to avoid generating a 'fail' exit code if one of our selected browsers on BrowserStack goes poof.
+    failOnEmptyTestSuite: false,
 
     captureTimeout: 6e5, // in milliseconds
     browserNoActivityTimeout: 3e5,
