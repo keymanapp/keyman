@@ -56,7 +56,7 @@
     [self startTimer];
     
     [self.webView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
-    [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://help.keyman.com/products/macosx/"]]];
+    [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://help.keyman.com/products/macosx/"]]];
     if (self.AppDelegate.alwaysShowOSK)
         [self.alwaysShowOSKCheckBox setState:NSOnState];
     else
@@ -300,12 +300,15 @@
 
 - (void)checkBoxAction:(id)sender {
     NSButton *checkBox = (NSButton *)sender;
+    NSString *kmxFilePath = [self kmxFilePathAtIndex:checkBox.tag];
     if (checkBox.state == NSOnState) {
-        [self.activeKeyboards addObject:[self kmxFilePathAtIndex:checkBox.tag]];
+        if ([self.AppDelegate debugMode])
+            NSLog(@"Adding active keyboard: %@", kmxFilePath);
+        [self.activeKeyboards addObject:kmxFilePath];
         [self saveActiveKeyboards];
     }
     else if (checkBox.state == NSOffState) {
-        [self.activeKeyboards removeObject:[self kmxFilePathAtIndex:checkBox.tag]];
+        [self.activeKeyboards removeObject:kmxFilePath];
         [self saveActiveKeyboards];
     }
 }
