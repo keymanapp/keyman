@@ -96,29 +96,4 @@ const NSInteger kUnexpectedFileAsscociationType = 42;
 -(BOOL) isEntireFileLoaded {
     return YES;
 }
-
-//-(BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError * _Nullable __autoreleasing *)outError {
-//
-//    if (![typeName isEqualToString: @"Keyman Package"]) {
-//        if (outError != NULL) {
-//            NSString *description = [@"Unexpected file association for type " stringByAppendingString:typeName];
-//            NSDictionary *errorDictionary = @{ NSLocalizedDescriptionKey : description };
-//            *outError = [[NSError alloc] initWithDomain:@"Keyman" code:kUnexpectedFileAsscociationType userInfo:errorDictionary];
-//        }
-//        return NO;
-//    }
-//
-//    NSString *tempFile = [self pathForTemporaryFile];
-//    if (![data writeToFile:tempFile options:NSDataWritingAtomic error:outError])
-//        return NO;
-//
-//    BOOL didUnzip = [self.AppDelegate unzipFile:tempFile];
-//
-//    if (!didUnzip && outError != NULL) {
-//        NSDictionary *errorDictionary = @{ NSLocalizedDescriptionKey : @"Failed to unzip Keyman Package" };
-//        *outError = [[NSError alloc] initWithDomain:@"Keyman" code:kUnexpectedFileAsscociationType userInfo:errorDictionary];
-//    }
-//    [[NSFileManager defaultManager] removeItemAtPath:tempFile error:nil];
-//    return didUnzip;
-//}
 @end
