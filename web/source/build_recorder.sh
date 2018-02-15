@@ -1,6 +1,6 @@
 #! /bin/bash
 # 
-# Compile keymanweb and copy compiled javascript and resources to output/embedded folder
+# Compile the KeymanWeb Recorder module for use with developing/running engine tests.
 #
 
 # Fails the build if a specified file does not exist.

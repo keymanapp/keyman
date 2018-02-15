@@ -54,8 +54,7 @@
 
   <!-- Initialization: set paths to keyboards, resources and fonts as required -->
   <script>
-    var kmw = window.keyman;
-    kmw.init({
+    keyman.init({
       attachType: 'auto',
     });
   </script>
@@ -132,19 +131,31 @@
       </td>
       <td style="width:50%">
         <p style="font-weight: bold;">Valid OS:</p>
-        <nobr><input type="checkbox" id="platform_any" checked onclick="clearPlatforms();">Any</nobr>
-        <nobr><input type="checkbox" id="platform_windows" onclick="setPlatformAny();" value="windows">Windows</nobr>
-        <nobr><input type="checkbox" id="platform_macosx" onclick="setPlatformAny();" value="macosx">Mac OS X</nobr>
-        <nobr><input type="checkbox" id="platform_linux" onclick="setPlatformAny();" value="linux">Linux</nobr>
-        <nobr><input type="checkbox" id="platform_android" onclick="setPlatformAny();" value="android">Android</nobr>
-        <nobr><input type="checkbox" id="platform_ios" onclick="setPlatformAny();" value="ios">iOS</nobr>
+        <nobr><input type="checkbox" id="platform_any" checked onclick="clearPlatforms();">
+          <label for="platform_any">Any</label></nobr>
+        <nobr><input type="checkbox" id="platform_windows" onclick="setPlatformAny();" value="windows">
+          <label for="platform_windows">Windows</label></nobr>
+        <nobr><input type="checkbox" id="platform_macosx" onclick="setPlatformAny();" value="macosx">
+          <label for="platform_macosx">Mac OS X</label></nobr>
+        <nobr><input type="checkbox" id="platform_linux" onclick="setPlatformAny();" value="linux">
+          <label for="platform_linux">Linux</label></nobr>
+        <nobr><input type="checkbox" id="platform_android" onclick="setPlatformAny();" value="android">
+          <label for="platform_android">Android</label></nobr>
+        <nobr><input type="checkbox" id="platform_ios" onclick="setPlatformAny();" value="ios">
+          <label for="platform_ios">iOS</label></nobr>
         <p style="font-weight: bold">Valid browser:</p>
-        <nobr><input type="checkbox" id="browser_any" checked onclick="clearBrowsers();">Any</nobr>
-        <nobr><input type="checkbox" id="browser_chrome" onclick="setBrowserAny();" value="chrome">Chrome</nobr>
-        <nobr><input type="checkbox" id="browser_firefox" onclick="setBrowserAny();" value="firefox">Firefox</nobr>
-        <nobr><input type="checkbox" id="browser_safari" onclick="setBrowserAny();" value="safari">Safari</nobr>
-        <nobr><input type="checkbox" id="browser_ie" onclick="setBrowserAny();" value="ie">IE</nobr>
-        <nobr><input type="checkbox" id="browser_opera" onclick="setBrowserAny();" value="opera">Opera</nobr>        
+        <nobr><input type="checkbox" id="browser_any" checked onclick="clearBrowsers();">
+          <label for="browser_any">Any</label></nobr>
+        <nobr><input type="checkbox" id="browser_chrome" onclick="setBrowserAny();" value="chrome">
+          <label for="browser_chrome">Chrome</label></nobr>
+        <nobr><input type="checkbox" id="browser_firefox" onclick="setBrowserAny();" value="firefox">
+          <label for="browser_firefox">Firefox</label></nobr>
+        <nobr><input type="checkbox" id="browser_safari" onclick="setBrowserAny();" value="safari">
+          <label for="browser_safari">Safari</label></nobr>
+        <nobr><input type="checkbox" id="browser_ie" onclick="setBrowserAny();" value="ie">
+          <label for="browser_ie">IE</label></nobr>
+        <nobr><input type="checkbox" id="browser_opera" onclick="setBrowserAny();" value="opera">
+          <label for="browser_opera">Opera</label></nobr>        
       </td>
     </tr>
   </table>

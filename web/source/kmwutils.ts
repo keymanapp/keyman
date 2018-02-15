@@ -336,7 +336,7 @@ class Util {
    * Description  Return IE version number (or 999 if browser not IE)
    */       
   getIEVersion() {
-    Device._GetIEVersion();
+    return Device._GetIEVersion();
   }
 
   /**
