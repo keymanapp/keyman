@@ -123,6 +123,7 @@ implementation
 
 uses
   Vcl.Forms,
+  System.JSON,
 
   bootstrapmain,
   comobj,
@@ -321,14 +322,15 @@ begin
 end;
 
 procedure TRunTools.CheckNewVersion;
+var
+  doc: TJSONObject;
+  node: TJSONObject;
 begin
   with THTTPUploader.Create(nil) do
   try
-    Fields.Add('OnlineProductID', ansistring(IntToStr(OnlineProductID_KeymanDesktop_100)));
     if FInstalledVersion.Version = ''
       then Fields.Add('Version', ansistring(FInstallInfo.Version))
       else Fields.Add('Version', ansistring(FInstalledVersion.Version));
-    Fields.Add('Raw', '1');
 
     Request.HostName := API_Server;
     Request.Protocol := API_Protocol;
@@ -337,18 +339,20 @@ begin
     Upload;
     if Response.StatusCode = 200 then
     begin
-      with TStringList.Create do
-      try
-        Text := string(Response.MessageBodyAsString);
-        if Values['newversion'] > FInstallInfo.Version then
+      doc := TJSONObject.ParseJSONValue(UTF8String(Response.MessageBodyAsString)) as TJSONObject;
+      if doc = nil then
+        raise Exception.Create('Invalid response:'#13#10+string(Response.MessageBodyAsString));
+
+      if doc.Values['windows'] is TJSONObject then
+      begin
+        node := doc.Values['windows'] as TJSONObject;
+        if CompareVersions(node.Values['version'].Value, FInstallInfo.Version) < 0 then
         begin
-          FNewVersion.Version := Values['newversion'];
-          FNewVersion.InstallURL := Values['installurl'];
-          FNewVersion.InstallSize := StrToIntDef(Values['installsize'], 0);  // I1917
+          FNewVersion.Version := node.Values['version'].Value;
+          FNewVersion.InstallURL := node.Values['url'].Value;
+          FNewVersion.InstallSize := (node.Values['size'] as TJSONNumber).AsInt64;
           FNewVersion.Filename := ExtractFileName(StringReplace(FNewVersion.InstallURL, '/', '\', [rfReplaceAll]));  // I1917
         end;
-      finally
-        Free;
       end;
     end
     else

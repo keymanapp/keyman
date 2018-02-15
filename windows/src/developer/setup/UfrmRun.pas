@@ -123,6 +123,7 @@ implementation
 {R *.dfm}
 
 uses
+  System.JSON,
   Unicode, utilexecute,
   utilsystem, shlobj,
   OnlineConstants,
@@ -275,6 +276,9 @@ begin
 end;
 
 procedure TfrmRun.CheckNewVersion;
+var
+  doc: TJSONObject;
+  node: TJSONObject;
 begin
   with THTTPUploader.Create(nil) do
   try
@@ -292,18 +296,20 @@ begin
     Upload;
     if Response.StatusCode = 200 then
     begin
-      with TStringList.Create do
-      try
-        Text := string(Response.MessageBodyAsString);
-        if CompareVersions(Values['newversion'], FInstallInfo.Version) < 0 then  // I2856
+      doc := TJSONObject.ParseJSONValue(UTF8String(Response.MessageBodyAsString)) as TJSONObject;
+      if doc = nil then
+        raise Exception.Create('Invalid response:'#13#10+string(Response.MessageBodyAsString));
+
+      if doc.Values['windows'] is TJSONObject then
+      begin
+        node := doc.Values['windows'] as TJSONObject;
+        if CompareVersions(node.Values['version'].Value, FInstallInfo.Version) < 0 then
         begin
-          FNewVersion.Version := Values['newversion'];
-          FNewVersion.InstallURL := Values['installurl'];
-          FNewVersion.InstallSize := StrToIntDef(Values['installsize'], 0);  // I1917  // I2680
-          FNewVersion.Filename := ExtractFileName(StringReplace(FNewVersion.InstallURL, '/', '\', [rfReplaceAll]));  // I1917  // I2680
+          FNewVersion.Version := node.Values['version'].Value;
+          FNewVersion.InstallURL := node.Values['url'].Value;
+          FNewVersion.InstallSize := (node.Values['size'] as TJSONNumber).AsInt64;
+          FNewVersion.Filename := ExtractFileName(StringReplace(FNewVersion.InstallURL, '/', '\', [rfReplaceAll]));  // I1917
         end;
-      finally
-        Free;
       end;
     end
     else
