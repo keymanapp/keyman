@@ -36,7 +36,8 @@ uses
   Unicode in '..\..\global\delphi\general\Unicode.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
-  SFX in '..\..\global\delphi\setup\SFX.pas';
+  SFX in '..\..\global\delphi\setup\SFX.pas',
+  Keyman.System.UpdateCheckResponse in '..\..\global\delphi\general\Keyman.System.UpdateCheckResponse.pas';
 
 {$R icons.res}
 {$R version.res}

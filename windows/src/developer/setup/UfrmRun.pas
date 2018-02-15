@@ -129,6 +129,7 @@ uses
   TntDialogHelp,
   types, upload_settings,
   httpuploader,
+  Keyman.System.UpdateCheckResponse,
   VersionInfo, GetOSVersion,
   SFX,
   bootstrapmain, jwawintype, jwamsi, ErrorControlledRegistry, RegistryKeys;
@@ -275,36 +276,34 @@ begin
 end;
 
 procedure TfrmRun.CheckNewVersion;
+var
+  ucr: TUpdateCheckResponse;
 begin
   with THTTPUploader.Create(nil) do
   try
-    // TODO: Eliminate Raw parameter and use 'setup' instead
-    Fields.Add('OnlineProductID', AnsiString(IntToStr(OnlineProductID_KeymanDeveloper_100)));  // I2856  // I3377
     if FInstalledVersion.Version = ''
       then Fields.Add('Version', AnsiString(FInstallInfo.Version))
       else Fields.Add('Version', AnsiString(FInstalledVersion.Version));
-    Fields.Add('Raw', '1');
 
     Request.HostName := API_Server;
     Request.Protocol := API_Protocol;
-    Request.UrlPath := API_Path_UpdateCheck;
+    Request.UrlPath := API_Path_UpdateCheck_Developer;
 
     Upload;
     if Response.StatusCode = 200 then
     begin
-      with TStringList.Create do
-      try
-        Text := string(Response.MessageBodyAsString);
-        if CompareVersions(Values['newversion'], FInstallInfo.Version) < 0 then  // I2856
+      if ucr.Parse(Response.MessageBodyAsString, 'developer', FInstallInfo.Version) then
+      begin
+        if ucr.Status = ucrsUpdateReady then
         begin
-          FNewVersion.Version := Values['newversion'];
-          FNewVersion.InstallURL := Values['installurl'];
-          FNewVersion.InstallSize := StrToIntDef(Values['installsize'], 0);  // I1917  // I2680
-          FNewVersion.Filename := ExtractFileName(StringReplace(FNewVersion.InstallURL, '/', '\', [rfReplaceAll]));  // I1917  // I2680
+          FNewVersion.Version := ucr.NewVersion;
+          FNewVersion.InstallURL := ucr.InstallURL;
+          FNewVersion.InstallSize := ucr.InstallSize;
+          FNewVersion.Filename := ExtractFileName(StringReplace(FNewVersion.InstallURL, '/', '\', [rfReplaceAll]));  // I1917
         end;
-      finally
-        Free;
-      end;
+      end
+      else
+        raise Exception.Create(ucr.ErrorMessage);
     end
     else
       raise Exception.Create('Error '+IntToStr(Response.StatusCode));

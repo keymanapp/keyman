@@ -123,6 +123,7 @@ implementation
 
 uses
   Vcl.Forms,
+  Keyman.System.UpdateCheckResponse,
 
   bootstrapmain,
   comobj,
@@ -321,35 +322,34 @@ begin
 end;
 
 procedure TRunTools.CheckNewVersion;
+var
+  ucr: TUpdateCheckResponse;
 begin
   with THTTPUploader.Create(nil) do
   try
-    Fields.Add('OnlineProductID', ansistring(IntToStr(OnlineProductID_KeymanDesktop_100)));
     if FInstalledVersion.Version = ''
       then Fields.Add('Version', ansistring(FInstallInfo.Version))
       else Fields.Add('Version', ansistring(FInstalledVersion.Version));
-    Fields.Add('Raw', '1');
 
     Request.HostName := API_Server;
     Request.Protocol := API_Protocol;
-    Request.UrlPath := API_Path_UpdateCheck;
+    Request.UrlPath := API_Path_UpdateCheck_Desktop;
 
     Upload;
     if Response.StatusCode = 200 then
     begin
-      with TStringList.Create do
-      try
-        Text := string(Response.MessageBodyAsString);
-        if Values['newversion'] > FInstallInfo.Version then
+      if ucr.Parse(Response.MessageBodyAsString, 'windows', FInstallInfo.Version) then
+      begin
+        if ucr.Status = ucrsUpdateReady then
         begin
-          FNewVersion.Version := Values['newversion'];
-          FNewVersion.InstallURL := Values['installurl'];
-          FNewVersion.InstallSize := StrToIntDef(Values['installsize'], 0);  // I1917
+          FNewVersion.Version := ucr.NewVersion;
+          FNewVersion.InstallURL := ucr.InstallURL;
+          FNewVersion.InstallSize := ucr.InstallSize;
           FNewVersion.Filename := ExtractFileName(StringReplace(FNewVersion.InstallURL, '/', '\', [rfReplaceAll]));  // I1917
         end;
-      finally
-        Free;
-      end;
+      end
+      else
+        raise Exception.Create(ucr.ErrorMessage);
     end
     else
       raise Exception.Create('Error '+IntToStr(Response.StatusCode));
