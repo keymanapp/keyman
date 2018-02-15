@@ -342,7 +342,7 @@ namespace KMWRecorder {
     id: string;
     name: string;
     filename: string;
-    languages: LanguageStubForKeyboard[];
+    languages: LanguageStubForKeyboard | LanguageStubForKeyboard[];
 
     // Constructs a stub usable with KeymanWeb's addKeyboards() API function from
     // the internally-tracked ActiveStub value for that keyboard.
@@ -359,17 +359,30 @@ namespace KMWRecorder {
         this.id = activeStub.id;
         this.name = activeStub.name;
         this.filename = activeStub.filename;
-        this.languages = []
 
-        for(var i=0; i < activeStub.languages.length; i++) {
-          this.languages.push(new LanguageStubForKeyboard(activeStub.languages[i]));
+        if(activeStub.languages instanceof Object) {
+          this.languages = new LanguageStubForKeyboard(activeStub.languages);
+        } else {
+          this.languages = [];
+          for(var i=0; i < activeStub.languages.length; i++) {
+            this.languages.push(new LanguageStubForKeyboard(activeStub.languages[i]));
+          }
         }
       }
     }
 
-    setBasePath(filePath: string) {
-      var file = this.filename.substr(this.filename.lastIndexOf('/')+1);
-      this.filename = filePath + '/' + file;
+    setBasePath(filePath: string, force?: boolean) {
+      var linkParser = document.createElement<"a">("a");
+      linkParser.href = filePath;
+
+      if(force === undefined) {
+        force = true;
+      }
+
+      if(force || (this.filename.indexOf(linkParser.protocol) < 0 && this.filename.indexOf('/') != 0)) {
+        var file = this.filename.substr(this.filename.lastIndexOf('/')+1);
+        this.filename = filePath + '/' + file;
+      }
     }
   }
 

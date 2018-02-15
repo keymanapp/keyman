@@ -100,7 +100,9 @@
         break;
       case 4:
         sKbd=document.getElementById('kbd_stub_add').value;
-        kmw.addKeyboards(JSON.parse(sKbd));
+        var stub = new KMWRecorder.KeyboardStub(JSON.parse(sKbd));
+        stub.setBasePath("../unit_tests/resources/keyboards", false);
+        kmw.addKeyboards(stub);
         break;
     }
   }

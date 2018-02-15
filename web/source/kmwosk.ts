@@ -3065,7 +3065,10 @@ if(!window['keyman']['initialized']) {
      * @return  {boolean}
      */
     osk.emulatesAltGr = function(keyLabels) {
-      return !(keyLabels ? keyLabels : osk.layers)[osk.getLayerId(osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])];
+      var layers = keyLabels ? keyLabels : osk.layers;
+
+      return !(layers[osk.getLayerId(osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])] ||
+        layers[osk.getLayerId(osk.modifierCodes['SHIFT'] | osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])]);
     }
 
     /**

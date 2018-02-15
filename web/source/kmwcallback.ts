@@ -263,6 +263,8 @@ class KeyboardInterface {
     var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
     var bitmask = this.keymanweb.keyboardManager.getKeyboardModifierBitmask();
+    var modifierBitmask = bitmask & this.keymanweb.osk.modifierBitmasks["ALL"];
+    var stateBitmask = bitmask & this.keymanweb.osk.stateBitmasks["ALL"];
 
     if(e.vkCode > 255) {
       keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
@@ -270,7 +272,8 @@ class KeyboardInterface {
       
     if(e.LisVirtualKey || keyCode > 255) {
       if((Lruleshift & 0x4000) == 0x4000 || (keyCode > 255)) { // added keyCode test to support extended keys
-        retVal = ((Lrulekey == keyCode) && ((Lruleshift & bitmask) == e.Lmodifiers)); //I3318, I3555
+        retVal = ((Lrulekey == keyCode) && ((Lruleshift & modifierBitmask) == e.Lmodifiers)); //I3318, I3555
+        retVal = retVal && this.stateMatch(e, Lruleshift & stateBitmask);
       }
     } else if((Lruleshift & 0x4000) == 0) {
       retVal = (keyCode == Lrulekey); // I3318, I3555
