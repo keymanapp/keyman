@@ -41,7 +41,8 @@ uses
   Classes,
   httpuploader,
   SysUtils,
-  UfrmDownloadProgress;
+  UfrmDownloadProgress,
+  Keyman.System.UpdateCheckResponse;
 
 type
   EOnlineUpdateCheck = class(Exception);
@@ -121,9 +122,7 @@ implementation
 uses
   Vcl.Dialogs,
   Vcl.Forms,
-  xmlintf,
   GlobalProxySettings,
-  JsonUtil,
   KLog,
   keymanapi_TLB,
   kmint,
@@ -131,7 +130,6 @@ uses
   ErrorControlledRegistry,
   RegistryKeys,
   ShellApi,
-  System.JSON,
   Upload_Settings,
   utildir,
   utilexecute,
@@ -488,17 +486,11 @@ end;
 
 function TOnlineUpdateCheck.DoRun: TOnlineUpdateCheckResult;
 var
-  node, doc: TJSONObject;
-  {FProxyHost: string;
-  FProxyPort: Integer;}
   flags: DWord;
   i, n: Integer;
-  kbd0: IKeymanKeyboard;
-  pkg0: IKeymanPackageInstalled;
-  kbd: IKeymanKeyboardInstalled;
   pkg: IKeymanPackage;
   j: Integer;
-  nodes: TJSONObject;
+  ucr: TUpdateCheckResponse;
 begin
   {FProxyHost := '';
   FProxyPort := 0;}
@@ -547,6 +539,8 @@ begin
     end;
   end;
 
+  Result := oucNoUpdates;
+
   try
     with THTTPUploader.Create(nil) do
     try
@@ -571,71 +565,59 @@ begin
       Upload;
       if Response.StatusCode = 200 then
       begin
-        doc := TJSONObject.ParseJSONValue(UTF8String(Response.MessageBodyAsString)) as TJSONObject;
-        if doc = nil then
-          raise EOnlineUpdateCheck.Create('Invalid response:'#13#10+string(Response.MessageBodyAsString));
-
-        SetLength(FParams.Packages,0);
-        if doc.Values['keyboards'] is TJSONObject
-          then nodes := doc.Values['keyboards'] as TJSONObject
-          else nodes := nil;
-
-        if Assigned(nodes) then
+        if ucr.Parse(Response.MessageBodyAsString, 'windows', FCurrentVersion) then
         begin
-          for i := 0 to nodes.Count - 1 do
+          SetLength(FParams.Packages,0);
+          for i := Low(ucr.Packages) to High(ucr.Packages) do
           begin
-            node := nodes.Pairs[i].JsonValue as TJSONObject;
-            n := kmcom.Packages.IndexOf(nodes.Pairs[i].JsonString.Value);
+            n := kmcom.Packages.IndexOf(ucr.Packages[i].ID);
             if n >= 0 then
             begin
               pkg := kmcom.Packages[n];
               j := Length(FParams.Packages);
               SetLength(FParams.Packages, j+1);
-              FParams.Packages[j].NewID := node.Values['id'].Value;
-              FParams.Packages[j].ID := nodes.Pairs[i].JsonString.Value;
-              FParams.Packages[j].Description := node.Values['name'].Value;
+              FParams.Packages[j].NewID := ucr.Packages[i].NewID;
+              FParams.Packages[j].ID := ucr.Packages[i].ID;
+              FParams.Packages[j].Description := ucr.Packages[i].Name;
               FParams.Packages[j].OldVersion := pkg.Version;
-              FParams.Packages[j].NewVersion := node.Values['version'].Value;
-              FParams.Packages[j].DownloadSize := (node.Values['packageFileSize'] as TJSONNumber).AsInt64;
-              FParams.Packages[j].DownloadURL := node.Values['url'].Value;
+              FParams.Packages[j].NewVersion := ucr.Packages[i].NewVersion;
+              FParams.Packages[j].DownloadSize := ucr.Packages[i].DownloadSize;
+              FParams.Packages[j].DownloadURL := ucr.Packages[i].DownloadURL;
               pkg := nil;
             end
             else
-              FErrorMessage := 'Unable to find package '+node.Pairs[i].JsonString.Value;
+              FErrorMessage := 'Unable to find package '+ucr.Packages[i].ID;
           end;
-        end;
 
-        if doc.Values['windows'] is TJSONObject then
-        begin
-          node := doc.Values['windows'] as TJSONObject;
-          if CompareVersions(node.Values['version'].Value, FCurrentVersion) < 0 then
-          begin
-            FParams.Keyman.OldVersion := FCurrentVersion;
-            FParams.Keyman.NewVersion := node.Values['version'].Value;
-            FParams.Keyman.DownloadURL := node.Values['url'].Value;
-            FParams.Keyman.DownloadSize := (node.Values['size'] as TJSONNumber).AsInt64;
+          case ucr.Status of
+            ucrsNoUpdate:
+              begin
+                FErrorMessage := ucr.ErrorMessage;
+              end;
+            ucrsUpdateReady:
+              begin
+                FParams.Keyman.OldVersion := ucr.CurrentVersion;
+                FParams.Keyman.NewVersion := ucr.NewVersion;
+                FParams.Keyman.DownloadURL := ucr.InstallURL;
+                FParams.Keyman.DownloadSize := ucr.InstallSize;
+              end;
           end;
-        end;
 
-        if (Length(FParams.Packages) > 0) or (FParams.Keyman.DownloadURL <> '') then
-        begin
-          if not FSilent then
-            ShowUpdateForm
-          else
+          if (Length(FParams.Packages) > 0) or (FParams.Keyman.DownloadURL <> '') then
           begin
-            ShowUpdateIcon;
+            if not FSilent then
+              ShowUpdateForm
+            else
+            begin
+              ShowUpdateIcon;
+            end;
+            Result := FParams.Result;
           end;
-          Result := FParams.Result;
-        end
-        else if doc.Values['message'] <> nil then
-        begin
-          Result := oucFailure;
-          FErrorMessage := doc.Values['message'].Value;
         end
         else
         begin
-          FErrorMessage := 'No updates are currently available.';
-          Result := oucNoUpdates;
+          FErrorMessage := ucr.ErrorMessage;
+          Result := oucFailure;
         end;
       end
       else

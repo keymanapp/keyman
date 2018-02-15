@@ -168,9 +168,7 @@ begin
       Proxy.Username := FProxyUsername;
       Proxy.Password := FProxyPassword;
       Request.Agent := API_UserAgent;
-      //Request.Protocol := Upload_Protocol;
-      //Request.HostName := Upload_Server;
-      Request.SetURL(DownloadUpdate_URL);// UrlPath := URL;
+      Request.SetURL(DownloadUpdate_URL);
       Upload;
       if Response.StatusCode = 200 then
       begin
@@ -356,11 +354,6 @@ begin
                 FParams.InstallSize := ucr.InstallSize;
                 Synchronize(SyncShowUpdateForm);
                 Result := FParams.Result;
-              end;
-            ucrsError:
-              begin
-                FErrorMessage := ucr.ErrorMessage;
-                Result := oucFailure;
               end;
           end;
         end

@@ -123,7 +123,7 @@ implementation
 
 uses
   Vcl.Forms,
-  System.JSON,
+  Keyman.System.UpdateCheckResponse,
 
   bootstrapmain,
   comobj,
@@ -323,8 +323,7 @@ end;
 
 procedure TRunTools.CheckNewVersion;
 var
-  doc: TJSONObject;
-  node: TJSONObject;
+  ucr: TUpdateCheckResponse;
 begin
   with THTTPUploader.Create(nil) do
   try
@@ -334,26 +333,23 @@ begin
 
     Request.HostName := API_Server;
     Request.Protocol := API_Protocol;
-    Request.UrlPath := API_Path_UpdateCheck;
+    Request.UrlPath := API_Path_UpdateCheck_Desktop;
 
     Upload;
     if Response.StatusCode = 200 then
     begin
-      doc := TJSONObject.ParseJSONValue(UTF8String(Response.MessageBodyAsString)) as TJSONObject;
-      if doc = nil then
-        raise Exception.Create('Invalid response:'#13#10+string(Response.MessageBodyAsString));
-
-      if doc.Values['windows'] is TJSONObject then
+      if ucr.Parse(Response.MessageBodyAsString, 'windows', FInstallInfo.Version) then
       begin
-        node := doc.Values['windows'] as TJSONObject;
-        if CompareVersions(node.Values['version'].Value, FInstallInfo.Version) < 0 then
+        if ucr.Status = ucrsUpdateReady then
         begin
-          FNewVersion.Version := node.Values['version'].Value;
-          FNewVersion.InstallURL := node.Values['url'].Value;
-          FNewVersion.InstallSize := (node.Values['size'] as TJSONNumber).AsInt64;
+          FNewVersion.Version := ucr.NewVersion;
+          FNewVersion.InstallURL := ucr.InstallURL;
+          FNewVersion.InstallSize := ucr.InstallSize;
           FNewVersion.Filename := ExtractFileName(StringReplace(FNewVersion.InstallURL, '/', '\', [rfReplaceAll]));  // I1917
         end;
-      end;
+      end
+      else
+        raise Exception.Create(ucr.ErrorMessage);
     end
     else
       raise Exception.Create('Error '+IntToStr(Response.StatusCode));

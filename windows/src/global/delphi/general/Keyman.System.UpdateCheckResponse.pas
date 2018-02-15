@@ -3,12 +3,26 @@ unit Keyman.System.UpdateCheckResponse;
 interface
 
 uses
+  System.JSON,
   System.SysUtils;
 
 type
   EUpdateCheckResponse = class(Exception);
 
-  TUpdateCheckResponseStatus = (ucrsNoUpdate, ucrsUpdateReady, ucrsError);
+  TUpdateCheckResponseStatus = (ucrsNoUpdate, ucrsUpdateReady);
+
+  TUpdateCheckResponsePackage = record
+    ID: string;
+    NewID: string;
+    Name: string;
+    OldVersion, NewVersion: string;
+    DownloadURL: string;
+    SavePath: string;
+    DownloadSize: Integer;
+    Install: Boolean;
+  end;
+
+  TUpdateCheckResponsePackages = TArray<TUpdateCheckResponsePackage>;
 
   TUpdateCheckResponse = record
   private
@@ -18,6 +32,8 @@ type
     FStatus: TUpdateCheckResponseStatus;
     FErrorMessage: string;
     FCurrentVersion: string;
+    FPackages: TUpdateCheckResponsePackages;
+    function ParseKeyboards(nodes: TJSONObject): Boolean;
   public
     function Parse(const message: AnsiString; const app, currentVersion: string): Boolean;
 
@@ -27,13 +43,13 @@ type
     property InstallSize: Int64 read FInstallSize;
     property ErrorMessage: string read FErrorMessage;
     property Status: TUpdateCheckResponseStatus read FStatus;
+    property Packages: TUpdateCheckResponsePackages read FPackages;
   end;
 
 implementation
 
 uses
-  versioninfo,
-  System.JSON;
+  versioninfo;
 
 { TUpdateCheckResponse }
 
@@ -42,12 +58,12 @@ var
   node, doc: TJSONObject;
 begin
   FCurrentVersion := currentVersion;
+  FStatus := ucrsNoUpdate;
 
   // TODO: test with UTF8 characters in response
   doc := TJSONObject.ParseJSONValue(UTF8String(message)) as TJSONObject;
   if doc = nil then
   begin
-    FStatus := ucrsError;
     FErrorMessage := Format('Invalid response:'#13#10'%s', [string(message)]);
     Exit(False);
   end;
@@ -70,11 +86,32 @@ begin
   end
   else if doc.Values['message'] <> nil then
   begin
-    FStatus := ucrsError;
     FErrorMessage := doc.Values['message'].Value;
-  end
-  else
-    FStatus := ucrsNoUpdate;
+    Exit(False);
+  end;
+
+  if doc.Values['keyboards'] is TJSONObject
+    then Result := ParseKeyboards(doc.Values['keyboards'] as TJSONObject)
+    else Result := True;
+end;
+
+function TUpdateCheckResponse.ParseKeyboards(nodes: TJSONObject): Boolean;
+var
+  node: TJSONObject;
+  i: Integer;
+begin
+  SetLength(FPackages,nodes.Count);
+  for i := 0 to nodes.Count - 1 do
+  begin
+    node := nodes.Pairs[i].JsonValue as TJSONObject;
+    FPackages[i].NewID := node.Values['id'].Value;
+    FPackages[i].ID := nodes.Pairs[i].JsonString.Value;
+    FPackages[i].Name := node.Values['name'].Value;
+    //FPackages[j].OldVersion := pkg.Version;
+    FPackages[i].NewVersion := node.Values['version'].Value;
+    FPackages[i].DownloadSize := (node.Values['packageFileSize'] as TJSONNumber).AsInt64;
+    FPackages[i].DownloadURL := node.Values['url'].Value;
+  end;
 
   Result := True;
 end;
