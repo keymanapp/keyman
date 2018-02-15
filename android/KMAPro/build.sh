@@ -6,6 +6,7 @@ display_usage ( ) {
     echo
     echo "Build Keyman for Android"
     echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"
+    echo "  -debug                  Compile only Debug variant"
     exit 1
 }
 
@@ -17,6 +18,7 @@ echo Build KMAPro
 SHLVL=0
 
 NO_DAEMON=false
+ONLY_DEBUG=false
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -24,6 +26,9 @@ while [[ $# -gt 0 ]] ; do
     case $key in
         -no-daemon)
             NO_DAEMON=true
+            ;;
+        -debug)
+            ONLY_DEBUG=true
             ;;
         -h|-?)
             display_usage
@@ -34,6 +39,7 @@ done
 
 echo
 echo "NO_DAEMON: $NO_DAEMON"
+echo "ONLY_DEBUG: $ONLY_DEBUG"
 echo
 
 if [ "$NO_DAEMON" = true ]; then
@@ -42,4 +48,11 @@ else
   DAEMON_FLAG=
 fi
 
-./gradlew $DAEMON_FLAG clean build
+if [ "$ONLY_DEBUG" = true ]; then
+  BUILD_FLAG=assembleDebug
+else
+  BUILD_FLAG=build
+fi
+
+./gradlew $DAEMON_FLAG clean $BUILD_FLAG
+

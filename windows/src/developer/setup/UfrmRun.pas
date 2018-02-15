@@ -221,7 +221,7 @@ end;
 
 function TfrmRun.IsNewerVersionInstalled(const NewVersion: WideString): Boolean;
 begin
-  Result := (FInstalledVersion.Version <> '') and (NewVersion <= FInstalledVersion.Version);
+  Result := (FInstalledVersion.Version <> '') and (CompareVersions(NewVersion, FInstalledVersion.Version) >= 0);
 end;
 
 function TfrmRun.CheckDependencies: Boolean;
@@ -643,6 +643,11 @@ begin
   end;
 end;
 
+procedure DoOutputDebugString(s: string);
+begin
+  OutputDebugString(PWideChar('KEYMANDEVELOPER.SETUP.EXE: '+s+#13#10));
+end;
+
 function TfrmRun.InstallMSI: Boolean;
 var
   res: Cardinal;
@@ -651,12 +656,19 @@ var
 begin
   Result := True;
 
+  DoOutputDebugString('InstallMSI');
+  DoOutputDebugString('  NewVersion.Version=<'+FNewVersion.Version+'>');
+  DoOutputDebugString('  InstallInfo.Version=<'+FInstallInfo.Version+'>');
   { We need to check if the included installer or the patch available is a newer version than the currently installed version }
   if FNewVersion.Version <> '' then
   begin
+    DoOutputDebugString('NewVersion.Version <> ''''');
     if IsNewerVersionInstalled(FNewVersion.Version) then
-      { The patch is older than the installed version }
+    begin
+      DoOutputDebugString('  IsNewerVersionInstalled=True');
       Exit;
+      { The patch is older than the installed version }
+    end;
 
     if not InstallNewVersion then
     begin
@@ -666,8 +678,10 @@ begin
     end;
   end;
 
+  DoOutputDebugString('Testing IsNewerVersionInstalled('''+FInstallInfo.Version+''')');
   if not IsNewerVersionInstalled(FInstallInfo.Version) then
   begin
+    DoOutputDebugString('not IsNewerVersionInstalled');
     ReinstallMode := 'REBOOTPROMPT=S REBOOT=ReallySuppress'; // I2754 - Auto update is too silent  // I3355   // I3500
     if (FInstalledVersion.Version <> '') and (FInstalledVersion.ProductCode = FInstallerVersion.ProductCode)
       then ReinstallMode := ReinstallMode + ' REINSTALLMODE=vdmus REINSTALL=ALL';  // I3355   // I3500   // I4858
