@@ -56,7 +56,7 @@
     [self startTimer];
     
     [self.webView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
-    [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://help.keyman.com/products/macosx/"]]];
+    [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://help.keyman.com/products/macosx/"]]];
     if (self.AppDelegate.alwaysShowOSK)
         [self.alwaysShowOSKCheckBox setState:NSOnState];
     else
