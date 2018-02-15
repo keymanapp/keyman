@@ -248,7 +248,7 @@ function KMW_KeyboardChange() {
   var activeElement = document.activeElement;
   justActivated = true;
   focusReceiver();
-  kmw.setActiveKeyboard(name, languageCode);
+  keyman.setActiveKeyboard(name, languageCode);
   activeElement.focus();
 }
 

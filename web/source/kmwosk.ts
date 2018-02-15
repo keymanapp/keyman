@@ -1034,9 +1034,6 @@ if(!window['keyman']['initialized']) {
         if(keyName == 'K_LOPT' || keyName == 'K_ROPT') {
           osk.optionKey(e,keyName,true);
           return true;
-        } else if(keyName == 'K_BKSP') {
-          kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
-          return true;
         }
 
         // Turn off key highlighting (or preview)
