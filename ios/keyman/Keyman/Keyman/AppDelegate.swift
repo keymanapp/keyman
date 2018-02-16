@@ -118,16 +118,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var destination =  documentsDirectory
     destination.appendPathComponent("temp/\(url.lastPathComponent)")
 
-    Manager.shared.unzipFile(fileUrl: url, destination: destination) {
-      self.promptAdHocInstall(destination)
-    }
+    KeymanPackage.extract(fileUrl: url, destination: destination, complete: { kmp in
+      if let kmp = kmp {
+        self.promptAdHocInstall(kmp)
+      } else {
+        self.showKMPError()
+      }
+    })
   }
 
-  public func promptAdHocInstall(_ folder: URL) {
-    _adhocDirectory = folder
+  public func showKMPError() {
+  }
 
-    var welcomePath = folder
-    welcomePath.appendPathComponent("Welcome.htm")
+  public func promptAdHocInstall(_ kmp: KeymanPackage) {
+    _adhocDirectory = kmp.sourceFolder
 
     let vc = UIViewController()
     vc.view.backgroundColor = .red
@@ -145,16 +149,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let nvc = UINavigationController.init(rootViewController: vc)
 
     self.window?.rootViewController?.present(nvc, animated: true, completion: {
-      if FileManager.default.fileExists(atPath: welcomePath.path) {
-        print("loading request: \(welcomePath)")
-        if let html = try? String(contentsOfFile: welcomePath.path, encoding: String.Encoding.utf8) {
-          wkWebView.loadHTMLString(html, baseURL: nil)
-        } else {
-           wkWebView.loadHTMLString("Keyboard Package", baseURL: nil)
-        }
-      } else {
-        wkWebView.loadHTMLString("Keyboard Package", baseURL: nil)
-      }
+      wkWebView.loadHTMLString(kmp.infoHtml(), baseURL: nil)
     })
   }
 
