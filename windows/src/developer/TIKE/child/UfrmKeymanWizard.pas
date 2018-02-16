@@ -138,6 +138,7 @@ uses
 
 
   AppEvnts,
+  kmxfileconsts,
   kmnProjectFile,
   kmnProjectFileUI,
   UserMessages,
@@ -262,6 +263,9 @@ type
     panDebugStatusHost: TPanel;
     Splitter1: TSplitter;
     Splitter2: TSplitter;   // I4810
+    panLanguageKeyman10: TPanel;
+    lblLanguageKeyman10Note: TLabel;
+    lblLanguageKeyman10Title: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure editNameChange(Sender: TObject);
     procedure editCopyrightChange(Sender: TObject);
@@ -458,6 +462,8 @@ type
     function IsInParserMode: Boolean;
     procedure ShowKeyboardComplexDesignMessage;
     function GetIsDebugVisible: Boolean;   // I4557
+    function ShouldShowLanguageControls(field: TSystemStore): Boolean;
+    procedure OrderDetailsPanels;
 
   protected
 
@@ -553,7 +559,6 @@ uses
   KeymanVersion,
   KMDevResourceStrings,
   kmxfile,
-  kmxfileconsts,
   OnlineConstants,
   Project,
   RegExpr,
@@ -815,10 +820,61 @@ begin
     FTargets := AllKeymanTargets;
 
   // Control visibility based on targets
-  panWindowsLanguages.Visible := ktWindows in FTargets;
+  panWindowsLanguages.Visible := (ktWindows in FTargets) and ShouldShowLanguageControls(ssLanguage);
+  panISOLanguages.Visible := ShouldShowLanguageControls(ssEthnologueCode);
+  panLanguageKeyman10.Visible := ShouldShowLanguageControls(ssVersion);
   panWebHelp.Visible := FTargets * KMWKeymanTargets <> [];
   panBuildWindows.Visible := ktWindows in FTargets;
   panBuildKMW.Visible := FTargets * KMWKeymanTargets <> [];
+  OrderDetailsPanels;
+end;
+
+procedure TfrmKeymanWizard.OrderDetailsPanels;
+var
+  v: Integer;
+
+  procedure Order(p: TPanel);
+  begin
+    if p.Visible then
+    begin
+      p.Top := v;
+      Inc(v, p.Height);
+    end;
+  end;
+begin
+  v := 0;
+  Order(panName);
+  Order(panTargets);
+  Order(panLanguageKeyman10);
+  Order(panWindowsLanguages);
+  Order(panISOLanguages);
+  Order(panDetailsLeft);
+  Order(panComments);
+  Order(panFeatures);
+end;
+
+function TfrmKeymanWizard.ShouldShowLanguageControls(field: TSystemStore): Boolean;
+var
+  v: string;
+begin
+  // For older versions, we always show the language controls
+  // We use 'ssVersion' for the Version 10 note field. Abuse but hey that
+  // makes life more interesting for maintenance devs.
+  v := FKeyboardParser.GetSystemStoreValue(ssVersion);
+  if (v <> '') and (CompareVersions(v, SKeymanVersion100) > 0) then
+    Exit(field <> ssVersion);
+
+  // For newer versions, we show them only if there are values set for
+  // the fields
+  if field = ssVersion then
+    Exit(True);
+
+  if field = ssLanguage then
+    Result :=
+      (FKeyboardParser.GetSystemStoreValue(ssLanguage) <> '') or
+      (FKeyboardParser.GetSystemStoreValue(ssWindowsLanguages) <> '')
+  else
+    Exit(FKeyboardParser.GetSystemStoreValue(field) <> '');
 end;
 
 function TfrmKeymanWizard.GetTargetsFromListBox: TKeymanTargets;   // I4504
