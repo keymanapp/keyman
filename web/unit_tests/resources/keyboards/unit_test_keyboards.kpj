@@ -17,5 +17,16 @@
         <Copyright>© 2018 SIL International</Copyright>
       </Details>
     </File>
+    <File>
+      <ID>id_3231ed6d20c5d360f38e7d605c555ddd</ID>
+      <Filename>test_deadkeys.kmn</Filename>
+      <Filepath>test_deadkeys.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Keyman Deadkey Stress-Tester</Name>
+        <Copyright>© 2018 SIL International</Copyright>
+      </Details>
+    </File>
   </Files>
 </KeymanDeveloperProject>
