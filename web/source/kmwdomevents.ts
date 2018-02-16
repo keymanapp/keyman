@@ -510,19 +510,19 @@ class DOMEventHandlers {
      *     Bonus issue:  RAlt simulation may cause erasure of this location property, but it should ONLY be empty if pressed in this case.
      *     We default to the 'left' variants since they're more likely to exist and cause less issues with RAlt simulation handling.
      * 
-     * In either case, `e.ctrlKey` is set to true, but as a result does nothing to tell us which case is active.
+     * In either case, `e.getModifierState("Control")` is set to true, but as a result does nothing to tell us which case is active.
      * 
      * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
      */
 
-    curModState |= (e.shiftKey ? 0x10 : 0);      
+    curModState |= (e.getModifierState("Shift") ? 0x10 : 0);      
 
-    if(e.ctrlKey) {
+    if(e.getModifierState("Control")) {
       curModState |= ((e.location != 0 && ctrlEvent) ? 
         (e.location == 1 ? osk.modifierCodes['LCTRL'] : osk.modifierCodes['RCTRL']) : // Condition 1
         prevModState & 0x0003);                                                       // Condition 2
     }
-    if(e.altKey) {
+    if(e.getModifierState("Alt")) {
       curModState |= ((e.location != 0 && altEvent) ? 
         (e.location == 1 ? osk.modifierCodes['LALT'] : osk.modifierCodes['RALT']) :   // Condition 1
         prevModState & 0x000C);                                                       // Condition 2
@@ -580,7 +580,7 @@ class DOMEventHandlers {
     } else {
       // No need to sim AltGr here; we don't need chiral ALTs.
       s.Lmodifiers = 
-        (e.shiftKey ? 0x10 : 0) |
+        (e.getModifierState("Shift") ? 0x10 : 0) |
         ((curModState & (osk.modifierCodes['LCTRL'] | osk.modifierCodes['RCTRL'])) ? 0x20 : 0) | 
         ((curModState & (osk.modifierCodes['LALT'] | osk.modifierCodes['RALT']))   ? 0x40 : 0); 
     }
