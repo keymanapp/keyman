@@ -108,11 +108,17 @@ namespace KMWRecorder {
         event['keyCode'] = this.keyCode;
         event['location'] = this.location;
         event['getModifierState'] = this.getModifierState.bind(this);
+        event['ctrlKey'] = this.getModifierState("Control");
+        event['altKey'] = this.getModifierState("Alt");
+        event['shiftKey'] = this.getModifierState("Shift");
       } else { // Yeah, so IE can't use the above at all, and requires its own trick.
         event = document.createEvent(PhysicalInputEvent.eventClass);
         // An override to ensure that IE's method gets called.
         (<any>event).initKeyboardEvent(PhysicalInputEvent.eventType, false, true, null, this.key, this.code, this.location, 
           this.generateModifierString(), 0);
+        event['ctrlKey'] = this.getModifierState("Control");
+        event['altKey'] = this.getModifierState("Alt");
+        event['shiftKey'] = this.getModifierState("Shift");
       }
 
       ele.dispatchEvent(event);

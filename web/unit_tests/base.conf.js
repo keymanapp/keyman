@@ -33,7 +33,8 @@ module.exports = {
 
   proxies: {
     "/source/": "/base/release/unminified/web/",
-    "/resources/": "/base/unit_tests/resources/"
+    "/resources/": "/base/unit_tests/resources/",
+    "/source/recorder_InputEvents.js.map": "/base/unit_tests/recorder_InputEvents.js.map"
   },
 
 

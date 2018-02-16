@@ -131,6 +131,7 @@ class KeymanBase {
    */
   ['shutdown']() {
     this.domManager.shutdown();
+    this.osk.shutdown();
   }
 
   /**

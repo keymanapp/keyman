@@ -257,6 +257,15 @@ if(!window['keyman']['initialized']) {
     // Placeholder functions
     osk.addCallout = function(e){};
 
+    osk.shutdown = function() {
+      // Remove the OSK's elements from the document, allowing them to be properly cleaned up.
+      // Necessary for clean engine testing.
+      var _box = osk._Box as HTMLDivElement;
+      if(_box.parentElement) {
+        _box.parentElement.removeChild(_box);
+      }
+    }
+
     /**
      * Function     addEventListener
      * Scope        Public
