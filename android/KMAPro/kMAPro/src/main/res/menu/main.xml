@@ -42,12 +42,6 @@
                 android:title="@string/action_info"
                 android:icon="@drawable/ic_light_action_info" />
 
-            <!-- For testing Crashlytics. Not for release -->
-            <item
-                android:id="@+id/action_crash"
-                android:title="Crash"
-                android:icon="@drawable/ic_light_action_trash" />
-
             <item
                 android:id="@+id/action_get_started"
                 android:title="@string/get_started"
