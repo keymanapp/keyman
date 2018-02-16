@@ -22,6 +22,8 @@ type
     FExtLang: string;
     FLangTag_PrivateUse: string;
     FOriginalTag: string;
+    FIsValid: Boolean;
+    FIsValidated: Boolean;
     procedure SetExtension(const Value: string);
     procedure SetExtLang(const Value: string);
     procedure SetGrandfathered(const Value: string);
@@ -79,6 +81,8 @@ begin
   FPrivateUse := '';
   FGrandfathered := '';
   FLangTag_PrivateUse := '';
+  FIsValidated := True;
+  FIsValid := False;
 end;
 
 constructor TBCP47Tag.Create(tag: string);
@@ -114,6 +118,12 @@ function TBCP47Tag.IsValid(var msg: string): Boolean;
 var
   NewTag: TBCP47Tag;
 begin
+  if not FIsValid and FIsValidated then
+  begin
+    msg := '''' + OriginalTag + ''' is not a valid BCP 47 tag';
+    Exit(False);
+  end;
+
   NewTag := TBCP47Tag.Create(Tag);
   try
     // Test each component, because we want to clarify that a tag constructed with
@@ -173,12 +183,14 @@ end;
 procedure TBCP47Tag.SetExtension(const Value: string);
 begin
   FExtension := LowerCase(Value, TLocaleOptions.loInvariantLocale);
+  FIsValidated := False;
   FGrandfathered := '';
   FPrivateUse := '';
 end;
 
 procedure TBCP47Tag.SetExtLang(const Value: string);
 begin
+  FIsValidated := False;
   FExtLang := LowerCase(Value, TLocaleOptions.loInvariantLocale);
   FGrandfathered := '';
   FPrivateUse := '';
@@ -187,11 +199,13 @@ end;
 procedure TBCP47Tag.SetGrandfathered(const Value: string);
 begin
   Clear;
+  FIsValidated := False;
   FGrandfathered := LowerCase(Value, TLocaleOptions.loInvariantLocale);
 end;
 
 procedure TBCP47Tag.SetLangTag_PrivateUse(const Value: string);
 begin
+  FIsValidated := False;
   FLangTag_PrivateUse := LowerCase(Value, TLocaleOptions.loInvariantLocale);
   FGrandfathered := '';
   FPrivateUse := '';
@@ -199,6 +213,7 @@ end;
 
 procedure TBCP47Tag.SetLanguage(const Value: string);
 begin
+  FIsValidated := False;
   FLanguage := LowerCase(Value, TLocaleOptions.loInvariantLocale);
   FGrandfathered := '';
   FPrivateUse := '';
@@ -207,11 +222,13 @@ end;
 procedure TBCP47Tag.SetPrivateUse(const Value: string);
 begin
   Clear;
+  FIsValidated := False;
   FPrivateUse := LowerCase(Value, TLocaleOptions.loInvariantLocale);
 end;
 
 procedure TBCP47Tag.SetRegion(const Value: string);
 begin
+  FIsValidated := False;
   FRegion := UpperCase(Value, TLocaleOptions.loInvariantLocale);
   FGrandfathered := '';
   FPrivateUse := '';
@@ -219,6 +236,7 @@ end;
 
 procedure TBCP47Tag.SetScript(const Value: string);
 begin
+  FIsValidated := False;
   FScript :=
     UpperCase(Copy(Value, 1, 1), TLocaleOptions.loInvariantLocale)+
     LowerCase(Copy(Value, 2, 3), TLocaleOptions.loInvariantLocale);
@@ -253,6 +271,8 @@ begin
       '|\d[\da-z]{3}))*)?((?:-[\da-wy-z](?:-[\da-z]{2,8})+)*)?(-x(?:-[\da-z]{1,8})+)?$|^(x(?:-[\da-z]{1,8})+)$', [roIgnoreCase]) do
   begin
     m := Match(LowerCase(Value, TLocaleOptions.loInvariantLocale));
+
+    FIsValid := m.Success;
 
     if (m.Groups.Count > 3) and (m.Groups[3].Value <> '') then
     begin
@@ -290,10 +310,12 @@ begin
 
 //      raise EBCP47Tag.Create('Invalid tag');
   end;
+  FIsValidated := True;
 end;
 
 procedure TBCP47Tag.SetVariant(const Value: string);
 begin
+  FIsValidated := False;
   FVariant := LowerCase(Value, TLocaleOptions.loInvariantLocale);
   FGrandfathered := '';
   FPrivateUse := '';
