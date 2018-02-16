@@ -182,6 +182,8 @@
 #define CWARN_DontMixChiralAndNonChiralModifiers 0x000020A3
 #define CWARN_MixingLeftAndRightModifiers        0x000020A4
 
+#define CWARN_LanguageHeadersDeprecatedInKeyman10 0x00020A5
+
 #define CERR_BufferOverflow							0x000080C0
 #define CERR_Break									0x000080C1
 
