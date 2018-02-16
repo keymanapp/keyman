@@ -83,24 +83,29 @@
   // Script to allow a user to add any keyboard to the keyboard menu 
   function addKeyboard(n)
   { 
-    var sKbd,kmw=keyman;
+    var sKbd;
     switch(n)
     {
       case 1:
         sKbd=document.getElementById('kbd_id1').value;
-        kmw.addKeyboards(sKbd);
+        keyman.addKeyboards(sKbd);
         break;
       case 2:
         sKbd=document.getElementById('kbd_id2').value.toLowerCase();
-        kmw.addKeyboards('@'+sKbd);
+        keyman.addKeyboards('@'+sKbd);
         break;
       case 3:
         sKbd=document.getElementById('kbd_id3').value;
-        kmw.addKeyboardsForLanguage(sKbd);
+        keyman.addKeyboardsForLanguage(sKbd);
         break;
       case 4:
         sKbd=document.getElementById('kbd_stub_add').value;
-        kmw.addKeyboards(JSON.parse(sKbd));
+        var stub = new KMWRecorder.KeyboardStub(JSON.parse(sKbd));
+        stub.setBasePath("../unit_tests/resources/keyboards", false);
+        keyman.addKeyboards(stub);
+
+        // We actually know the exact details for this one easily, so set it as active!
+        doKeyboardChange("Keyboard_" + stub.id, stub.getFirstLanguage());
         break;
     }
   }

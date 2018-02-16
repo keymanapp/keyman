@@ -112,6 +112,21 @@ keyman.touchAliasing._KeyDown = function(e) {
   return retVal;
 }
 
+copyTestDefinition = function() {
+  var masterJSON = document.getElementById('masterJSON');
+
+  try {
+    masterJSON.select();
+    
+    var res = document.execCommand('copy');
+    if(res) {
+      in_output.focus();
+      return;
+    }
+  } catch (err) { console.log(err) }
+  alert("Unable to copy successfully.");
+}
+
 var _ock = keyman.osk.clickKey.bind(keyman.osk);
 keyman.osk.clickKey = function(e) {
   if(DOMEventHandlers.states.activeElement != in_output &&
@@ -135,7 +150,7 @@ keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, sav
   }
 
   var sameKbd = (testDefinition.keyboard && ("Keyboard_" + testDefinition.keyboard.id) == PInternalName)
-    && (testDefinition.keyboard.languages[0].id == PLgCode);
+    && (testDefinition.keyboard.getFirstLanguage() == PLgCode);
 
   if(!testDefinition.isEmpty() && !sameKbd && !justActivated) {
     if(!confirm("Changing the keyboard will clear the current test set.  Are you sure?")) {
@@ -238,6 +253,14 @@ function setupKeyboardPicker() {
   keyman.addEventListener('keyboardregistered', keyboardAdded);
 }
 
+function doKeyboardChange(name, languageCode) {
+  var activeElement = document.activeElement;
+  justActivated = true;
+  focusReceiver();
+  keyman.setActiveKeyboard(name, languageCode);
+  activeElement.focus();
+}
+
 /* Called when user selects an item in the KMW_Keyboard SELECT */
 function KMW_KeyboardChange() {
   var kbdControl = document.getElementById('KMW_Keyboard');
@@ -245,11 +268,7 @@ function KMW_KeyboardChange() {
   var name = kbdControl.value.substr(0, kbdControl.value.indexOf("$$"));
   var languageCode = kbdControl.value.substr(kbdControl.value.indexOf("$$")+2);
 
-  var activeElement = document.activeElement;
-  justActivated = true;
-  focusReceiver();
-  keyman.setActiveKeyboard(name, languageCode);
-  activeElement.focus();
+  doKeyboardChange(name, languageCode);
 }
 
 function loadExistingTest(files) {
@@ -266,11 +285,7 @@ function loadExistingTest(files) {
 
         keyman.addKeyboards(kbdStub);
 
-        var activeElement = document.activeElement;
-        justActivated = true;
-        focusReceiver();
-        keyman.setActiveKeyboard("Keyboard_" + kbdTest.keyboard.id, kbdTest.keyboard.languages[0].id);
-        activeElement.focus();
+        doKeyboardChange("Keyboard_" + kbdTest.keyboard.id, kbdTest.keyboard.getFirstLanguage());
       } catch (e) {
         alert("File does not contain a valid KeyboardTest definition.")
         console.error(e);

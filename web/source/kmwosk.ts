@@ -257,6 +257,15 @@ if(!window['keyman']['initialized']) {
     // Placeholder functions
     osk.addCallout = function(e){};
 
+    osk.shutdown = function() {
+      // Remove the OSK's elements from the document, allowing them to be properly cleaned up.
+      // Necessary for clean engine testing.
+      var _box = osk._Box as HTMLDivElement;
+      if(_box.parentElement) {
+        _box.parentElement.removeChild(_box);
+      }
+    }
+
     /**
      * Function     addEventListener
      * Scope        Public
@@ -3065,7 +3074,10 @@ if(!window['keyman']['initialized']) {
      * @return  {boolean}
      */
     osk.emulatesAltGr = function(keyLabels) {
-      return !(keyLabels ? keyLabels : osk.layers)[osk.getLayerId(osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])];
+      var layers = keyLabels ? keyLabels : osk.layers;
+
+      return !(layers[osk.getLayerId(osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])] ||
+        layers[osk.getLayerId(osk.modifierCodes['SHIFT'] | osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])]);
     }
 
     /**

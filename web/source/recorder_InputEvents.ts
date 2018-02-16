@@ -89,7 +89,7 @@ namespace KMWRecorder {
 
       for(var key in PhysicalInputEvent.modifierCodes) {
         if(this.getModifierState(key)) {
-          list += (key + list != "" ? " " : "");
+          list += ((list != "" ? " " : "") + key);
         }
       }
 
@@ -111,8 +111,9 @@ namespace KMWRecorder {
       } else { // Yeah, so IE can't use the above at all, and requires its own trick.
         event = document.createEvent(PhysicalInputEvent.eventClass);
         // An override to ensure that IE's method gets called.
-        (<any>event).initKeyboardEvent(PhysicalInputEvent.eventType, false, true, null, this.key, this.code, this.location, 
-          this.generateModifierString(), 0);
+        // Many thanks to https://gist.github.com/termi/4654819, line 142 at the time of writing this.
+        var success = (<any>event).initKeyboardEvent(PhysicalInputEvent.eventType, false, true, null, this.key, /*this.code,*/ this.location, 
+          this.generateModifierString(), 0, 0);
       }
 
       ele.dispatchEvent(event);
@@ -342,7 +343,7 @@ namespace KMWRecorder {
     id: string;
     name: string;
     filename: string;
-    languages: LanguageStubForKeyboard[];
+    languages: LanguageStubForKeyboard | LanguageStubForKeyboard[];
 
     // Constructs a stub usable with KeymanWeb's addKeyboards() API function from
     // the internally-tracked ActiveStub value for that keyboard.
@@ -359,17 +360,38 @@ namespace KMWRecorder {
         this.id = activeStub.id;
         this.name = activeStub.name;
         this.filename = activeStub.filename;
-        this.languages = []
 
-        for(var i=0; i < activeStub.languages.length; i++) {
-          this.languages.push(new LanguageStubForKeyboard(activeStub.languages[i]));
+        if(activeStub.languages instanceof Object) {
+          this.languages = new LanguageStubForKeyboard(activeStub.languages);
+        } else {
+          this.languages = [];
+          for(var i=0; i < activeStub.languages.length; i++) {
+            this.languages.push(new LanguageStubForKeyboard(activeStub.languages[i]));
+          }
         }
       }
     }
 
-    setBasePath(filePath: string) {
-      var file = this.filename.substr(this.filename.lastIndexOf('/')+1);
-      this.filename = filePath + '/' + file;
+    setBasePath(filePath: string, force?: boolean) {
+      var linkParser = document.createElement<"a">("a");
+      linkParser.href = filePath;
+
+      if(force === undefined) {
+        force = true;
+      }
+
+      if(force || (this.filename.indexOf(linkParser.protocol) < 0 && this.filename.indexOf('/') != 0)) {
+        var file = this.filename.substr(this.filename.lastIndexOf('/')+1);
+        this.filename = filePath + '/' + file;
+      }
+    }
+
+    getFirstLanguage() {
+      if(this.languages instanceof LanguageStubForKeyboard) {
+        return this.languages.id;
+      } else {
+        return this.languages[0].id;
+      }
     }
   }
 
