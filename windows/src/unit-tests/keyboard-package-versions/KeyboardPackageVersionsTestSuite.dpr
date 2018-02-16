@@ -87,7 +87,8 @@ uses
   UMD5Hash in '..\..\global\delphi\general\UMD5Hash.pas',
   Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
-  DUnitX.Loggers.TeamCity in '..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas';
+  DUnitX.Loggers.TeamCity in '..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas',
+  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas';
 
 var
   runner : ITestRunner;
