@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017 SIL International. All rights reserved.
+ * Copyright (C) 2018 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmapro;
@@ -365,10 +365,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     switch (item.getItemId()) {
       case R.id.action_info:
         showInfo();
-        return true;
-      // action_crash is temporary for testing integration of Crashlytics, and will be removed
-      case R.id.action_crash:
-        Crashlytics.getInstance().crash(); // Force a crash
         return true;
       case R.id.action_share:
         showShareDialog();
