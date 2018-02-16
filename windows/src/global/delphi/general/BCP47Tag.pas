@@ -1,5 +1,8 @@
 // Adapted from https://github.com/gagle/node-bcp47 [MIT]
-// TODO: BCP47: Does not do full canonicalization
+// TODO: BCP47: <NoAction> Does not do full canonicalization; however
+// the ISO639-3 -> ISO639-1 mapping is done, which is probably
+// sufficient for our needs at this time.
+// See https://tools.ietf.org/html/bcp47#section-4.5
 unit BCP47Tag;
 
 interface

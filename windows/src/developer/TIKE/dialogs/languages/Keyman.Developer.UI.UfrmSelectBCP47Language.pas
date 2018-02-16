@@ -88,7 +88,7 @@ end;
 
 function TfrmSelectBCP47Language.GetLanguageName: string;
 begin
-  // TODO: BCP47: per lookup with BCP-47 feature
+  // TODO: BCP47: <DeveloperBCP47LanguageLookup> per lookup with BCP-47 feature
   Result := tag.Tag;
 end;
 
@@ -101,7 +101,7 @@ end;
 procedure TfrmSelectBCP47Language.editLanguageTagChange(Sender: TObject);
 begin
   inherited;
-  // TODO: BCP47: search on language names instead of just taking a tag
+  // TODO: BCP47: <DeveloperBCP47LanguageLookup> search on language names instead of just taking a tag
   tag.Language := TKMXFileLanguages.TranslateISO6393ToBCP47(editLanguageTag.Text);
   RefreshPreview;
 end;
@@ -125,9 +125,9 @@ var
   msg: string;
 begin
   editBCP47Code.Text := tag.Tag;
-  lblLanguageName.Caption := tag.Language; // TODO: BCP47: Lookup language name
-  lblScriptName.Caption := tag.Script; // TODO: BCP47: Lookup script name
-  lblRegionName.Caption := tag.Region; // TODO: BCP47: Lookup region name
+  lblLanguageName.Caption := tag.Language; // TODO: BCP47: <DeveloperBCP47LanguageLookup> Lookup language name
+  lblScriptName.Caption := tag.Script; // TODO: BCP47: <DeveloperBCP47LanguageLookup> Lookup script name
+  lblRegionName.Caption := tag.Region; // TODO: BCP47: <DeveloperBCP47LanguageLookup> Lookup region name
   cmdOK.Enabled := tag.IsValid(msg);
   if not cmdOK.Enabled
     then lblValidateCode.Caption := msg
