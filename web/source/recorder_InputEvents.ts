@@ -89,7 +89,7 @@ namespace KMWRecorder {
 
       for(var key in PhysicalInputEvent.modifierCodes) {
         if(this.getModifierState(key)) {
-          list += (key + (list != "" ? " " : ""));
+          list += ((list != "" ? " " : "") + key);
         }
       }
 
