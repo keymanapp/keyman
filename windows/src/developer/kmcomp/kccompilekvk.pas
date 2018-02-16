@@ -12,6 +12,7 @@ uses
 
   KeyboardParser,
   kmxfile,
+  kmxfileconsts,
   main,
   utilsystem,
   VisualKeyboard;

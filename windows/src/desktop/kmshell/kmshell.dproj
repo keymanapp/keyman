@@ -292,9 +292,8 @@
         <DCCReference Include="..\..\global\delphi\general\JsonUtil.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas">
-            <Form>$R VERSION.RES</Form>
-        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.UpdateCheckResponse.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">

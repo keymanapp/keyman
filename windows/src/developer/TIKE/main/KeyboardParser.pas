@@ -43,6 +43,7 @@ uses
 
   ExtShiftState,
   kmxfile,
+  kmxfileconsts,
   UKeymanTargets;
 
 {$ASSERTIONS ON}

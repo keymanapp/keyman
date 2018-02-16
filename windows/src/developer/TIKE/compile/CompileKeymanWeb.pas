@@ -1022,17 +1022,18 @@ function TCompileKeymanWeb.VisualKeyboardFromFile(const FVisualKeyboardFileName:
   function VKShiftToLayerName(Shift: Integer): string;
   const
     masks: array[0..6] of string = (
-      'shift',
-      'ctrl',
-      'alt',
       'leftctrl',
       'rightctrl',
       'leftalt',
-      'rightalt'
+      'rightalt',
+      'shift',
+      'ctrl',
+      'alt'
     );
   var
     i: Integer;
   begin
+    shift := VkShiftStateToKmxShiftState(shift);
     if shift = 0 then
       Result := 'default'
     else

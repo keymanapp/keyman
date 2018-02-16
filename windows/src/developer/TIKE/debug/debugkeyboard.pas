@@ -79,7 +79,9 @@ type
 
 implementation
 
-uses kmxfile;
+uses
+  kmxfile,
+  kmxfileconsts;
 
 { TDebugGroupList }
 

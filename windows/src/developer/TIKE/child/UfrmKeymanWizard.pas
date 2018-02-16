@@ -553,6 +553,7 @@ uses
   KeymanVersion,
   KMDevResourceStrings,
   kmxfile,
+  kmxfileconsts,
   OnlineConstants,
   Project,
   RegExpr,

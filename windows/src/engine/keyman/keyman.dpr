@@ -134,7 +134,8 @@ uses
   BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
   Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
-  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas';
+  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
+  kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas';
 
 {$R ICONS.RES}
 {$R VERSION.RES}
