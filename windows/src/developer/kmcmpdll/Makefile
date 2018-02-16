@@ -10,6 +10,10 @@ build: version.res dirs
     $(COPY) kmcmpdll.dll $(PROGRAM)\developer
     $(COPY) kmcmpdll.lib $(OUTLIB)
     $(COPY) kmcmpdll.pdb $(DEBUGPATH)\developer
+    # for debugging purposes, it's useful to have a copy
+    # of kmcmpdll.dll in the TIKE project folder; it is
+    # .gitignored
+    $(COPY) kmcmpdll.dll ..\tike\kmcmpdll.dll
 
 clean: def-clean
     $(MSBUILD) kmcmpdll.sln $(MSBUILD_CLEAN)

@@ -736,7 +736,6 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
     }
 	case T_KEYTOKEY:			// A rule
 		if(fk->currentGroup == 0xFFFFFFFF) return CERR_CodeInvalidInThisSection;
-		if(fk->version == 0) return CERR_NoVersionLine;
 		if((msg = ProcessKeyLine(fk, p, IsUnicode)) != CERR_None) return msg;
 		break;
 
