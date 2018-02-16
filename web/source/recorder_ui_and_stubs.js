@@ -150,7 +150,7 @@ keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, sav
   }
 
   var sameKbd = (testDefinition.keyboard && ("Keyboard_" + testDefinition.keyboard.id) == PInternalName)
-    && (testDefinition.keyboard.languages[0].id == PLgCode);
+    && (testDefinition.keyboard.getFirstLanguage() == PLgCode);
 
   if(!testDefinition.isEmpty() && !sameKbd && !justActivated) {
     if(!confirm("Changing the keyboard will clear the current test set.  Are you sure?")) {
