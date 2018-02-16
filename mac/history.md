@@ -1,5 +1,11 @@
 # Keyman for macOS Version History
 
+## 10.0 alpha
+* New feature: install keyboard packages by double-clicking the kmp file (#511)
+* Added support for L/R Alt and Ctrl modifiers for keyboards (#178)
+* Display the version number in the download dialog
+* Added support for Keyman version 10.0 keyboards
+
 ## 2017-11-21 1.2.0 beta
 * Works around bug in macOS High Sierra so that Configuration dialog can be opened (#368)
 * Fix support for older versions of macOS below 10.9 (#393)
