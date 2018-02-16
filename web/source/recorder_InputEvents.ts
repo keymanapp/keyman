@@ -384,6 +384,14 @@ namespace KMWRecorder {
         this.filename = filePath + '/' + file;
       }
     }
+
+    getFirstLanguage() {
+      if(this.languages instanceof LanguageStubForKeyboard) {
+        return this.languages.id;
+      } else {
+        return this.languages[0].id;
+      }
+    }
   }
 
   type TARGET = 'hardware'|'desktop'|'phone'|'tablet';
