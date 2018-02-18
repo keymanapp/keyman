@@ -11,6 +11,7 @@
 * Change internal keyboard assets from languages/ and fonts/ folders to packages/
 * Add feature to install ad-hoc keyboards via .kmp packages
 * Add [Firebase Crashlytics](https://firebase.google.com/docs/crashlytics/) for generating crash reports
+* Add Material Design [icons](https://material.io/icons/)
 
 ## 2017-08-10 2.8.300 stable
 * No changes, just published latest beta as stable
