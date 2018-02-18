@@ -55,10 +55,12 @@ type
   TKPInstallKeyboardOptions = set of (ikPartOfPackage);
 
   TKPInstallKeyboard = class(TKPBase)
-    procedure Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; Force: Boolean);
+    procedure Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; const BCP47ID: string; Force: Boolean);
   private
-    procedure RegisterLanguageProfile(Langs: array of Integer;    // I3581   // I4607
-      const KeyboardName, KeyboardDescription, IconFileName: string);   // I3619   // I3707   // I3768
+    procedure RegisterLanguageProfile(Langs: array of Integer;
+      const KeyboardName, KeyboardDescription, IconFileName: string); overload;
+    procedure RegisterLanguageProfile(const BCP47Tag, KeyboardName,
+      KeyboardDescription, IconFileName: string); overload;
   end;
 
 implementation
@@ -77,10 +79,8 @@ uses
   utilicon,
   utilstr,
   keymanapi_TLB, Variants;
-//  util, Unicode, inffile, regist, RegistryKeys, GetOsVersion, uninstall, kmint, initprog,
-//  crc32, keymanprotectedstrings, formloader;
 
-procedure TKPInstallKeyboard.Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; Force: Boolean);
+procedure TKPInstallKeyboard.Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; const BCP47ID: string; Force: Boolean);
 var
   ki: TKeyboardInfo;
   FDestPath: string;
@@ -185,37 +185,48 @@ begin
         FDefaultHKL := GetDefaultHKL;   // I3619
 
         //
-        // Use keyboard-defined default profile first   // I4607
+        // Use BCP47ID from package metadata if it has been passed in
         //
-        if ki.KeyboardID <> 0 then
+        if BCP47ID <> '' then
         begin
-          SetLength(FLanguages, 1);
-          FLanguages[0] := ki.KeyboardID;
-        end;
-        //
-        // Then enumerate all defined languages to try next   // I4607
-        //
-        GetSystemStore(ki.MemoryDump.Memory, TSS_WINDOWSLANGUAGES, FAllLanguagesW);
-        // TODO: BCP47: <EngineMapWindowsLanguagesToBCP47> use Keyman.System.KMXFileLanguages
-        FAllLanguages := FAllLanguagesW;
-        while FAllLanguages <> '' do
+          RegisterLanguageProfile(BCP47ID, kbdname, ki.KeyboardName, FIconFileName);
+        end
+        else
         begin
-          FLanguage := StrToken(FAllLanguages, ' ');
-          Delete(FLanguage, 1, 1); // 'x'
-          if TryStrToInt('$'+FLanguage, FLanguageID) then
+          //
+          // Use keyboard-defined default profile first   // I4607
+          //
+          if ki.KeyboardID <> 0 then
           begin
-            SetLength(FLanguages, Length(FLanguages)+1);
-            FLanguages[High(FLanguages)] := FLanguageID;
+            SetLength(FLanguages, 1);
+            FLanguages[0] := ki.KeyboardID;
           end;
+
+          //
+          // Then enumerate all defined languages to try next   // I4607
+          //
+          GetSystemStore(ki.MemoryDump.Memory, TSS_WINDOWSLANGUAGES, FAllLanguagesW);
+
+          FAllLanguages := FAllLanguagesW;
+          while FAllLanguages <> '' do
+          begin
+            FLanguage := StrToken(FAllLanguages, ' ');
+            Delete(FLanguage, 1, 1); // 'x'
+            if TryStrToInt('$'+FLanguage, FLanguageID) then
+            begin
+              SetLength(FLanguages, Length(FLanguages)+1);
+              FLanguages[High(FLanguages)] := FLanguageID;
+            end;
+          end;
+
+          //
+          // Final fallback is to install against default language for system   // I4607
+          //
+          SetLength(FLanguages, Length(FLanguages)+1);
+          FLanguages[High(FLanguages)] := HKLToLanguageID(FDefaultHKL);
+
+          RegisterLanguageProfile(FLanguages, kbdname, ki.KeyboardName, FIconFileName);   // I3581   // I3707
         end;
-
-        //
-        // Final fallback is to install against default language for system   // I4607
-        //
-        SetLength(FLanguages, Length(FLanguages)+1);
-        FLanguages[High(FLanguages)] := HKLToLanguageID(FDefaultHKL);
-
-        RegisterLanguageProfile(FLanguages, kbdname, ki.KeyboardName, FIconFileName);   // I3581   // I3707
 
         CloseKey;
       finally
@@ -280,6 +291,16 @@ begin
   with TKPInstallKeyboardLanguageProfiles.Create(Context) do
   try
     Execute(KeyboardName, KeyboardDescription, Langs, IconFileName, True);   // I3707   // I3768   // I4607
+  finally
+    Free;
+  end;
+end;
+
+procedure TKPInstallKeyboard.RegisterLanguageProfile(const BCP47Tag, KeyboardName, KeyboardDescription, IconFileName: string);   // I3581   // I3619   // I3707   // I3768   // I4607
+begin
+  with TKPInstallKeyboardLanguageProfiles.Create(Context) do
+  try
+    Execute(KeyboardName, KeyboardDescription, BCP47Tag, IconFileName);   // I3707   // I3768   // I4607
   finally
     Free;
   end;

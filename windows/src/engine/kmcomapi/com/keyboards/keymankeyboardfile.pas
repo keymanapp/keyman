@@ -203,7 +203,7 @@ procedure TKeymanKeyboardFile.Install(Force: WordBool);
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FFileName, '', [], Force);
+    Execute(FFileName, '', [], '', Force);
   finally
     Free;
   end;
