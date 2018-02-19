@@ -4,24 +4,24 @@ var assert = chai.assert;
  *  Start definition of isolated rule tests for validity of `fullContextMatch` (KFCM) components.
  */
 var RULE_1_TEST = {
+  id: 1,
   // Match condition for rule
   in: ['a', {d: 0}, {d: 1}, 'b'],
   // Start of context relative to cursor
   n: 5,
+  ln: 4,
   // Resulting context map
   contextMap: [3, 2, 2, 2],
-  deadkeyMatchDefs: [{
-    sequence: { "output": "ab", "inputs": [
-      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
-      {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
-      {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
-      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
-      // The test has an extra character appended that's not part of the check.
-      {"type":"key","key":"c","code":"KeyC","keyCode":66,"modifierSet":0,"location":0}
-    ]},
-    result: true,
-    msg: "Rule 1:  basic application of rule failed."
-  }, {
+  contextCache: ['a', 0, 1, 'b'],
+  baseSequence: { "output": "ab", "inputs": [
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+    {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
+    {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    // The test has an extra character appended that's not part of the check.
+    {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0}
+  ]},
+  fullMatchDefs: [{
     sequence: { "output": "ab", "inputs": [
       {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
       // Should fail with inverted deadkey ordering at same KC_ position.
@@ -29,36 +29,33 @@ var RULE_1_TEST = {
       {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
       {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
       // The test has an extra character appended that's not part of the check.
-      {"type":"key","key":"c","code":"KeyC","keyCode":66,"modifierSet":0,"location":0}
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0}
     ]},
     result: false,
     msg: "Rule 1:  did not fail when deadkey ordering was inverted."
   }, {
     sequence: { "output": "ab", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":66,"modifierSet":0,"location":0},
       {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
       {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
       {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
       {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
       // The test has an extra character appended that's not part of the check.
-      {"type":"key","key":"c","code":"KeyC","keyCode":66,"modifierSet":0,"location":0},
-      // Should not fail with a deadkey out of context.
-      {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0}
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0}
     ]},
     result: true,
-    msg: "Rule 1:  out-of-context deadkey caused rule match failure."
+    msg: "Rule 1:  failed when extra character context exists in history."
   }, {
     sequence: { "output": "ab", "inputs": [
       {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
       {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
       {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
       {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
-      // Should fail with a deadkey appended to the rule's context.
-      {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
-      // The test has an extra character appended that's not part of the check.
-      {"type":"key","key":"c","code":"KeyC","keyCode":66,"modifierSet":0,"location":0}
+      // The test has an extra deadkey appended that's not part of the check.
+      {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0}
     ]},
-    result: false,
-    msg: "Rule 1:  in-context unmatched deadkey did not cause rule match failure."
+    result: true,
+    msg: "Rule 1:  out-of-context deadkey caused rule match failure."
   }, {
     sequence: { "output": "ab", "inputs": [
       // Should not fail with a deadkey prepended to the context.
@@ -68,7 +65,7 @@ var RULE_1_TEST = {
       {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
       {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
       // The test has an extra character appended that's not part of the check.
-      {"type":"key","key":"c","code":"KeyC","keyCode":66,"modifierSet":0,"location":0}
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0}
     ]},
     result: true,
     msg: "Rule 1:  prepended (out of context) deadkey caused rule match failure."
@@ -76,23 +73,23 @@ var RULE_1_TEST = {
 };
 
 var RULE_2_TEST = {
+  id: 2,
   // Match condition for rule
   in: [{d: 0}, 'a', {d: 0}, {d: 0}, 'b'],
   // Start of context relative to cursor
   n: 5,
+  ln: 5,
   // Resulting context map
   contextMap: [2, 2, 1, 1, 1],
-  deadkeyMatchDefs: [{
-    sequence: { "output": "ab", "inputs": [
-      {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
-      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
-      {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
-      {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
-      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
-    ]},
-    result: true,
-    msg: "Rule 2:  basic application of duplicate, same position deadkey rule match failed."
-  }, {
+  contextCache: [0, 'a', 0, 0, 'b'],
+  baseSequence: { "output": "ab", "inputs": [
+    {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+    {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
+    {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
+  ]},
+  fullMatchDefs: [{
     sequence: { "output": "ab", "inputs": [
       // Omission of the first deadkey should result in failure.
       //{"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
@@ -140,7 +137,7 @@ var RULE_2_TEST = {
   }, {
     sequence: { "output": "ab", "inputs": [
       // Should not fail with an unrelated deadkey prepended to the context before the required one.
-      {"type":"key","key":"2","code":"Digit2","keyCode":49,"modifierSet":0,"location":0},
+      {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
       {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
       {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
       {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
@@ -153,29 +150,84 @@ var RULE_2_TEST = {
     sequence: { "output": "ab", "inputs": [
       // Should not fail with a duplicate deadkey prepended to the context.
       {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
-      {"type":"key","key":"2","code":"Digit2","keyCode":49,"modifierSet":0,"location":0},
+      {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
       {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
       {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
       {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
       {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
     ]},
-    result: true,
+    result: false,
     msg: "Rule 2:  prepended deadkey after rule's required deadkey failed to prevent a rule match."
   }]
 };
 
 var RULE_3_TEST = {
+  id: 3,
   // Match condition for rule
   in: ['a', {d: 0}, {d: 0}, 'b', {d: 0}],
   // Start of context relative to cursor
   n: 6,
+  ln: 5,
   // Resulting context map
-  contextMap: [3, 2, 2, 2, 1]
-  
-  // No specialized deadkeyMatchDefs here, as any appended deadkeys are automatically 'in context' for rules.
+  contextMap: [3, 2, 2, 2, 1],
+  contextCache: ['a', 0, 0, 'b', 0],
+
+  baseSequence: { "output": "ab", "inputs": [
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+    {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
+    {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
+    // The test has an extra character appended that's not part of the check.
+    {"type":"key","key":"c","code":"KeyC","keyCode":66,"modifierSet":0,"location":0}
+  ]}
+  // No specialized fullMatchDefs here, as any appended deadkeys are automatically 'in context' for rules.
 };
 
-var RULE_SET = [ RULE_1_TEST, RULE_2_TEST, RULE_3_TEST ];
+var RULE_4_TEST = {
+  id: 4,
+  // Match condition for rule
+  in: ['a', 'b', 'b', 'a', 'c'],
+  // Start of context relative to cursor
+  n: 5,
+  ln: 4,
+  // Resulting context map
+  contextMap: [5, 4, 3, 2, 1],
+  contextCache: ['a', 'b', 'b', 'a'],
+
+  baseSequence: { "output": "ab", "inputs": [
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+    // The test has an extra character appended that's not part of the check.
+    {"type":"key","key":"c","code":"KeyC","keyCode":66,"modifierSet":0,"location":0}
+  ]}
+};
+
+var RULE_5_TEST = {
+  id: 5,
+  // Match condition for rule
+  in: [{d: 1}, {d: 2}, {d: 0}, {d: 1}, {d: 2}],
+  // Start of context relative to cursor
+  n: 5,
+  ln: 5,
+  // Resulting context map
+  contextMap: [0, 0, 0, 0, 0],
+  contextCache: [1, 2, 0, 1, 2],
+
+  baseSequence: { "output": "ab", "inputs": [
+    // Testing with an extra deadkey at the start.
+    {"type":"key","key":"0","code":"Digit0","keyCode":48,"modifierSet":0,"location":0},
+    {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
+    {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
+    {"type":"key","key":"0","code":"Digit0","keyCode":48,"modifierSet":0,"location":0},
+    {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
+    {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
+  ]}
+};
+
+var RULE_SET = [ RULE_1_TEST, RULE_2_TEST, RULE_3_TEST, RULE_4_TEST ];
 
 /*
  *  End definition of isolated rule testing.
@@ -241,16 +293,7 @@ describe('Engine', function() {
     });
 
     // Tests "stage 1" of fullContextMatch - ensuring that a proper context index map is built.
-    it('Context Index Mapping', function() {
-      for(var i = 0; i < RULE_SET.length; i++) {
-        var ruleDef = RULE_SET[i];
-        var res = keyman.interface._BuildContextIndexMap(ruleDef.n, ruleDef.in);
-        assert.sameMembers(res, ruleDef.contextMap);
-      }
-    });
-
-    // Tests "stage 2" of fullContextMatch - ensuring that all deadkey conditions are met.
-    it('Context Deadkey Matching', function() {
+    it('Extended Context Mapping', function() {
       var inputElem = document.getElementById('singleton');
       if(inputElem['kmw_ip']) {
         inputElem = inputElem['kmw_ip'];
@@ -258,18 +301,56 @@ describe('Engine', function() {
 
       for(var i = 0; i < RULE_SET.length; i++) {
         var ruleDef = RULE_SET[i];
-        if(!ruleDef.deadkeyMatchDefs) {
+
+        // Prepare the context!
+        var ruleSeq = new KMWRecorder.InputTestSequence(ruleDef.baseSequence);
+        ruleSeq.simulateSequenceOn(inputElem);
+
+        // Now for the real test!
+        var res = keyman.interface._BuildExtendedContext(ruleDef.n, ruleDef.ln, inputElem);
+
+        assert.sameOrderedMembers(res, ruleDef.contextCache);
+
+        // Cleanup the context!
+        window['keyman'].resetContext();
+      }
+    });
+
+    // Tests construction of index mapping, which translates extended indices to their original positions.
+    it('Context Index Mapping', function() {
+      for(var i = 0; i < RULE_SET.length; i++) {
+        var ruleDef = RULE_SET[i];
+        var res = keyman.interface._BuildContextIndexMap(ruleDef.n, ruleDef.in);
+        assert.sameOrderedMembers(res, ruleDef.contextMap);
+      }
+    });
+
+    // Tests "stage 3" of fullContextMatch - ensuring that all deadkey conditions are met.
+    it('Context Matching - Deadkeys and Plain Text only', function() {
+      var inputElem = document.getElementById('singleton');
+      if(inputElem['kmw_ip']) {
+        inputElem = inputElem['kmw_ip'];
+      }
+
+      for(var i = 0; i < RULE_SET.length; i++) {
+        var ruleDef = RULE_SET[i];
+        if(!ruleDef.fullMatchDefs) {
           continue;
         }
 
-        for(var j = 0; j < ruleDef.deadkeyMatchDefs.length; j++) {
+        var matchDefs = [{
+            sequence: ruleDef.baseSequence,
+            result: true,
+            msg: "Rule " + ruleDef.id + ":  basic application of rule failed."}].concat(ruleDef.fullMatchDefs);
+
+        for(var j = 0; j < matchDefs.length; j++) {
           // Prepare the context!
-          var matchTest = ruleDef.deadkeyMatchDefs[j];
+          var matchTest = matchDefs[j];
           var ruleSeq = new KMWRecorder.InputTestSequence(matchTest.sequence);
           ruleSeq.simulateSequenceOn(inputElem);
 
           // Now for the real test!
-          var res = keyman.interface._FullDeadkeyMatch(ruleDef.contextMap, inputElem, ruleDef.in);
+          var res = keyman.interface.fullContextMatch(ruleDef.n, inputElem, ruleDef.in);
 
           var msg = matchTest.msg;
           if(!msg) {
