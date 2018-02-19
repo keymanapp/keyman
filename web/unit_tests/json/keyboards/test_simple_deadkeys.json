@@ -1,0 +1,10 @@
+{
+  "id": "test_simple_deadkeys",
+  "name":"Simple Deadkeys",
+  "languages":{
+    "id":"en",
+    "name": "English",
+    "region": "World"
+  },
+  "filename":"resources/keyboards/test_simple_deadkeys.js"
+}

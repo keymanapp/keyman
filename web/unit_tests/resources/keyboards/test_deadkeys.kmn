@@ -127,4 +127,9 @@ dk(2) dk(1) > dk(1) dk(2)
 dk(3) dk(4) > dk(4) dk(3)
 
 'ab' dk(blank) > dk(B)
-'$abc$d' > 'ab' dk(C) 'd'
+'$abc$d' > 'ab' dk(C) 'd'    
+         
+c Since 'index' cannot function in the 'key' part of a rule, we place the
+c 'index in context' test within this group.
+c any(deadnums) index(deadnums, 1) > '(' index(livenums, 1) ')(' index(livenums, 1) ')'
+

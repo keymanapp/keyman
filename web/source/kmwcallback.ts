@@ -7,6 +7,58 @@
    Copyright 2017 SIL International
 ***/
 
+/*
+ * Type alias definitions to reflect the parameters of the fullContextMatch() callback (KMW 10+).
+ * No constructors or methods since keyboards will not utilize the same backing prototype, and
+ * property names are shorthanded to promote minification.
+ */
+
+type PlainKeyboardStore = string;
+
+// TODO:  Implement the new 'store object-orientation proposal.
+//type ComplexKeyboardStore = (string|{d: number})[]; 
+
+type KeyboardStore = PlainKeyboardStore; // | ComplexKeyboardStore;
+type RuleChar = string;
+
+class RuleDeadkey {
+  /**
+   * Existence of this property indicates the object is a deadkey.  
+   * 
+   * Value:  the deadkey's ID.
+   */
+  ['d']: number; // For 'd'eadkey; also reflects the Deadkey class's 'd' property.
+}
+
+class ContextAny {
+  /**
+   * Existence of this property indicates the object reflects an "any" statement.  
+   * 
+   * Value:  the store to search.
+   */
+  ['a']: KeyboardStore; // For 'a'ny statement.
+}
+
+class RuleIndex {
+  /**
+   * Existence of this property indicates the object reflects an "index" statement.  
+   * 
+   * Value:  {'s': the Store from which to output, 'o': the Offset into the current rule's context.}
+   */
+  ['i']: {'s': KeyboardStore, 'o': number}; // For 'i'ndex statement.
+}
+
+class ContextEx {
+  /**
+   * Existence of this property indicates that the object reflects a "context" Keyman language statement.
+   * 
+   * Value:  The offset into the current rule's context to be matched.
+   */
+  ['c']: number; // For 'c'ontext statement.
+}
+
+type ContextEntry = RuleChar | RuleDeadkey | ContextAny | RuleIndex | ContextEx;
+
 /**
  * Cache of context storing and retrieving return values from KC
  * Must be reset prior to each keystroke and after any text changes
@@ -41,16 +93,19 @@ class CachedContext {
 class Deadkey {
   p: number;  // Position of deadkey
   d: number;  // Numerical id of the deadkey
+  o: number;  // Ordinal value of the deadkey (resolves same-place conflicts)
   matched: number;
+
+  static ordinalSeed: number = 0;
 
   constructor(pos: number, id: number) {
     this.p = pos;
     this.d = id;
+    this.o = Deadkey.ordinalSeed++;
   }
 
   match(p: number, d: number): boolean {
     var result:boolean = (this.p == p && this.d == d);
-    this.matched = result ? 1 : 0;
 
     return result;
   }
@@ -61,6 +116,10 @@ class Deadkey {
 
   reset(): void {
     this.matched = 0;
+  }
+
+  before(other: Deadkey): boolean {
+    return this.o < other.o;
   }
 }
 
@@ -235,6 +294,138 @@ class KeyboardInterface {
   }
 
   /**
+   * Function       _BuildContextIndexMap
+   * Scope          Private
+   * @param         {number}    n       Number of characters to move back from caret
+   * @param         {Array}     val     The match parameter from `fullContextMatch`.
+   * @return        {Array}             An array mapping each entry of `val` to its index in `KC_`.
+   */
+  private _BuildContextIndexMap(n: number, val: ContextEntry[]): number[] {
+    // Stage 1:  build a context indexing map. (We must determine the internal position of our deadkeys.)
+    var contextMap = [];
+    var trackedIndex = 0;
+    var deadkeyCount = 0;
+
+    // Track each change in _KC index...
+    for(var i = 0; i < val.length; i++) {
+      contextMap[i] = trackedIndex;
+
+      if((typeof(val[i]) == 'string' || val[i]['d'] === undefined)) {
+        trackedIndex++;
+      } else {
+        deadkeyCount++;
+      }
+    }
+
+    var nAdj = n - deadkeyCount;
+
+    // And map each location to its target 'n' value.
+    for(var i = 0; i < val.length; i++) {
+      contextMap[i] = nAdj - contextMap[i];
+    }
+
+    return contextMap;
+  }
+
+  /**
+   * Function       _FullDeadkeyMatch
+   * Scope          Private
+   * @param         {number}    n       The context index map
+   * @param         {Object}    Ptarg   Focused element
+   * @param         {Array}     val     The match parameter from `fullContextMatch`.
+   * @return        {boolean}           True if all rule deadkeys match successfully and no unmatched deadkeys remain within range.
+   */
+  private _FullDeadkeyMatch(kc_map: number[], Ptarg: HTMLElement, val: ContextEntry[]): boolean {
+    // Stage 1 - match all rule-specified deadkeys.
+    var prevDeadkey: Deadkey = null;
+    var prevDeadkeyIndex: number = null;
+    var initialDeadkeys: Deadkey[] = [];
+
+    for(var di = 0; di < val.length; di++) {
+      var dk = (val[di] as RuleDeadkey)['d'];
+      if(dk !== undefined) {
+        var _DK: Deadkey = this._DeadkeyMatchInternal(kc_map[di], Ptarg, dk);
+        if(_DK === null) {
+          return false;
+        }
+
+        // Two deadkeys colocated?  Are they correctly ordered?
+        if(prevDeadkeyIndex === di - 1) {
+          // Disregard order if the deadkeys are identical.
+          if(!prevDeadkey.before(_DK) && prevDeadkey.d != _DK.d) {
+            this._DeadkeyResetMatched();
+            return false;
+          }
+        }
+
+        // Mark our current location as the deadkey.
+        prevDeadkeyIndex = di;
+        prevDeadkey = _DK;
+        
+        // Track rule-initial deadkey matches.
+        if(kc_map[di] == kc_map[0]) {
+          initialDeadkeys.push(_DK);
+        }
+      }
+    }
+
+    // Stage 2 - are there any unmatched deadkeys within range?
+    for(var i=0; i < this._DeadKeys.length; i++) {
+      var _DK = this._DeadKeys[i];
+      if(!_DK.matched) {
+        if(_DK.p == kc_map[0]) { // If it's in the rule-initial position...
+          for(var j=0; j < initialDeadkeys.length; j++) {
+            // If one of our rule-initial deadkeys is before an undetected deadkey, the match should fail.
+            var iDK = initialDeadkeys[j];
+            if(iDK.before(_DK)) {
+              if(iDK.d == _DK.d) {
+                // Edge case:  two identical deadkeys at the beginning of context, one matched, one not.
+                // Solution:   swap 'em so we match the one with highest ordinal.
+                iDK.reset();
+                _DK.set();
+                initialDeadkeys = initialDeadkeys.splice(j, 1);
+                initialDeadkeys.push(_DK);
+              } else {
+                return false;
+              }
+            }
+          }
+        } else if(_DK.p < kc_map[0] && _DK.p >= kc_map[kc_map.length - 1]) {
+          // We have an unmatched deadkey clearly within the rule's range/before its end-of-context.  Not okay.
+          this._DeadkeyResetMatched();
+          return false;
+        }
+      }
+    }
+
+    // Stage 3 - success!
+    return true;
+  }
+
+  /**
+   * Function       fullContextMatch    KFCM
+   * Scope          Private
+   * @param         {number}    n       Number of characters to move back from caret
+   * @param         {Object}    Ptarg   Focused element
+   * @param         {Array}     val     An array of ContextEntries to match.
+   * @return        {boolean}           True if the fully-specified rule context matches the current KMW state.
+   * 
+   * A KMW 10+ function designed to bring KMW closer to Keyman Desktop functionality,
+   * near-directly modeling (externally) the compiled form of Desktop rules' context section.
+   */
+  fullContextMatch(n: number, Ptarg: HTMLElement, val: ContextEntry[]): boolean {
+    // Stage one:  build the context index map.
+    var _KC_MAP = this._BuildContextIndexMap(n, val);
+
+    // Stage two:  match any deadkeys.
+    if(!this._FullDeadkeyMatch(_KC_MAP, Ptarg, val)) {
+      return false;
+    }
+
+    return false;
+  }
+
+  /**
    * Function     KIK      
    * Scope        Public
    * @param       {Object}  e   keystroke event
@@ -310,6 +501,37 @@ class KeyboardInterface {
     return ei;
   };
   
+    /**
+   * Function     _DeadkeyMatchInternal     
+   * Scope        Public
+   * @param       {number}      n       current cursor position
+   * @param       {Object}      Ptarg   target element
+   * @param       {number}      d       deadkey
+   * @return      {Object}              The matched internally-tracked Deadkey object
+   * Description  Matches deadkey at current cursor position
+   */  
+  _DeadkeyMatchInternal(n: number, Ptarg: HTMLElement, d: number): Deadkey {
+    if(this._DeadKeys.length == 0) {
+      return null; // I3318
+    }
+
+    var sp=this._SelPos(Ptarg);
+    n = sp - n;
+    for(var i = 0; i < this._DeadKeys.length; i++) {
+      // Don't re-match an already-matched deadkey.  It's possible to have two identical 
+      // entries, and they should be kept separately.
+      if(this._DeadKeys[i].match(n, d) && !this._DeadKeys[i].matched) {
+        this._DeadKeys[i].set();
+        // Assumption:  since we match the first possible entry in the array, we
+        // match the entry with the lower ordinal - the 'first' deadkey in the position.
+        return this._DeadKeys[i]; // I3318
+      }
+    }
+    this._DeadkeyResetMatched(); // I3318
+
+    return null;
+  }
+
   /**
    * Function     deadkeyMatch  KDM      
    * Scope        Public
@@ -320,21 +542,7 @@ class KeyboardInterface {
    * Description  Match deadkey at current cursor position
    */    
   deadkeyMatch(n: number, Ptarg: HTMLElement, d: number): boolean {
-    if(this._DeadKeys.length == 0) {
-      return false; // I3318
-    }
-
-    var sp=this._SelPos(Ptarg);
-    n = sp - n;
-    for(var i = 0; i < this._DeadKeys.length; i++) {
-      if(this._DeadKeys[i].match(n, d)) {
-        this._DeadKeys[i].set();
-        return true; // I3318
-      }
-    }
-    this._DeadkeyResetMatched(); // I3318
-
-    return false;
+    return this._DeadkeyMatchInternal(n, Ptarg, d) !== null;
   }
   
   /**
@@ -776,9 +984,9 @@ class KeyboardInterface {
    * Description  Clear all matched deadkey flags
    */       
   _DeadkeyResetMatched(): void {                   
-    var Li, _Dk = this._DeadKeys;
-    for(Li = 0; Li < _Dk.length; Li++) {
-      (<Deadkey>_Dk[Li]).reset();
+    var _Dk = this._DeadKeys;
+    for(var Li = 0; Li < _Dk.length; Li++) {
+      _Dk[Li].reset();
     }
   }
 
@@ -788,8 +996,8 @@ class KeyboardInterface {
    * Description  Delete matched deadkeys from context
    */       
   _DeadkeyDeleteMatched(): void {              
-    var Li, _Dk = this._DeadKeys;
-    for(Li = 0; Li < _Dk.length; Li++) {
+    var _Dk = this._DeadKeys;
+    for(var Li = 0; Li < _Dk.length; Li++) {
       if(_Dk[Li].matched) {
         _Dk.splice(Li,1);
       }
@@ -804,8 +1012,8 @@ class KeyboardInterface {
    * Description  Adjust saved positions of deadkeys in context
    */       
   _DeadkeyAdjustPos(Lstart: number, Ldelta: number): void {
-    var Li, _Dk = this._DeadKeys;
-    for(Li = 0; Li < _Dk.length; Li++) {
+    var _Dk = this._DeadKeys;
+    for(var Li = 0; Li < _Dk.length; Li++) {
       if(_Dk[Li].p > Lstart) {
         _Dk[Li].p += Ldelta;
       }

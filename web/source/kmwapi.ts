@@ -74,6 +74,7 @@ goog.exportSymbol("Util.prototype.alert", Util.prototype.alert);
   exportKBCallbackWithArgs('KC', 'context', KeyboardInterface.prototype.context);
   exportKBCallbackWithArgs('KN', 'nul', KeyboardInterface.prototype.nul);
   exportKBCallbackWithArgs('KCM', 'contextMatch', KeyboardInterface.prototype.contextMatch);
+  exportKBCallbackWithArgs('KFCM', 'fullContextMatch', KeyboardInterface.prototype.fullContextMatch);
   exportKBCallbackWithArgs('KIK', 'isKeypress', KeyboardInterface.prototype.isKeypress);
   exportKBCallbackWithArgs('KKM', 'keyMatch', KeyboardInterface.prototype.keyMatch);
   exportKBCallbackWithArgs('KSM', 'stateMatch', KeyboardInterface.prototype.stateMatch);
