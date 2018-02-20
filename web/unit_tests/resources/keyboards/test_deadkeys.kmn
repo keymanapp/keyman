@@ -25,6 +25,10 @@ c Matching a pattern with a deadkey vs same pattern, no deadkey.
 
 c Another simple one.
 deadkey(a) + 'c' > 'x'
+           
+c Ensuring needed keys have base output rules.
++ 'd' > 'd' 
++ 'f' > 'f'
 
 c More context edge case checks.
 deadkey(a) 'd' + 'e' > '(a)(d)(e)'

@@ -72,7 +72,6 @@ goog.exportSymbol("Util.prototype.alert", Util.prototype.alert);
   exportKBCallbackWithArgs('KR', 'registerKeyboard', KeyboardInterface.prototype.registerKeyboard);
   exportKBCallbackWithArgs('KRS', 'registerStub', KeyboardInterface.prototype.registerStub);
   exportKBCallbackWithArgs('KC', 'context', KeyboardInterface.prototype.context);
-  exportKBCallbackWithArgs('KFC', 'fullContext', KeyboardInterface.prototype.fullContext);
   exportKBCallbackWithArgs('KN', 'nul', KeyboardInterface.prototype.nul);
   exportKBCallbackWithArgs('KCM', 'contextMatch', KeyboardInterface.prototype.contextMatch);
   exportKBCallbackWithArgs('KFCM', 'fullContextMatch', KeyboardInterface.prototype.fullContextMatch);

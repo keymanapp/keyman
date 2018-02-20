@@ -283,27 +283,6 @@ class KeyboardInterface {
     this.cachedContext.set(n, ln, r);
     return r;
   }
-
-    /**
-   * Get *cached or uncached* keyboard context for a specified range, relative to caret
-   * 
-   * @param       {number}      n       Number of characters to move back from caret
-   * @param       {number}      ln      Number of characters to return
-   * @param       {Object}      Pelem   Element to work with (must be currently focused element)
-   * @return      {Array}               Context array of strings and numbers 
-   * 
-   * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
-   *             KC(2,1,Pelem) == "e"
-   *             KC(3,3,Pelem) == "def"
-   *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
-   */    
-  fullContext(n: number, ln:number, Pelem:HTMLElement): (string|number)[] {
-    // TODO:  Consider making this a 'full context output' instead.
-    var v = this._BuildExtendedContext(n, ln, Pelem);
-    if(v !== null) {
-      return v.valContext;
-    }
-  }
   
   /**
    * Function     nul           KN    
