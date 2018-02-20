@@ -391,76 +391,62 @@ class KeyboardInterface {
   }
 
   /**
-   * Function       _BuildContextIndexMap
-   * Scope          Private
-   * @param         {number}    n       Number of characters to move back from caret
-   * @param         {Array}     val     The match parameter from `fullContextMatch`.
-   * @return        {Array}             An array mapping each entry of `val` to its index in `KC_`.
-   */
-  private _BuildContextIndexMap(n: number, val: ContextEntry[]): number[] {
-    // Stage 1:  build a context indexing map. (We must determine the internal position of our deadkeys.)
-    var contextMap = [];
-    var trackedIndex = 0;
-    var deadkeyCount = 0;
-
-    // Track each change in _KC index...
-    for(var i = 0; i < val.length; i++) {
-      contextMap[i] = trackedIndex;
-
-      if((typeof(val[i]) == 'string' || val[i]['d'] === undefined)) {
-        trackedIndex++;
-      } else {
-        deadkeyCount++;
-      }
-    }
-
-    var nAdj = n - deadkeyCount;
-
-    // And map each location to its target 'n' value.
-    for(var i = 0; i < val.length; i++) {
-      contextMap[i] = nAdj - contextMap[i];
-    }
-
-    return contextMap;
-  }
-
-  /**
    * Function       fullContextMatch    KFCM
    * Scope          Private
    * @param         {number}    n       Number of characters to move back from caret
    * @param         {Object}    Ptarg   Focused element
-   * @param         {Array}     val     An array of ContextEntries to match.
+   * @param         {Array}     rule    An array of ContextEntries to match.
    * @return        {boolean}           True if the fully-specified rule context matches the current KMW state.
    * 
    * A KMW 10+ function designed to bring KMW closer to Keyman Desktop functionality,
    * near-directly modeling (externally) the compiled form of Desktop rules' context section.
    */
-  fullContextMatch(n: number, Ptarg: HTMLElement, val: ContextEntry[]): boolean {
-    // Stage one:  build the context index map.  It may be useful for any and index.
-    var _KC_MAP = this._BuildContextIndexMap(n, val);
-
-    // Stage two:  build the context index map.
-    var context = this._BuildExtendedContext(n, val.length, Ptarg);
+  fullContextMatch(n: number, Ptarg: HTMLElement, rule: ContextEntry[]): boolean {
+    // Stage one:  build the context index map.
+    var context = this._BuildExtendedContext(n, rule.length, Ptarg);
 
     var mismatch = false;
 
-    for(var i=0; i < val.length; i++) {
-      if(typeof(val[i]) == 'string') {
-        if(val[i] != context[i]) {
+    // Stage two:  time to match against the rule specified.
+    for(var i=0; i < rule.length; i++) {
+      if(typeof(rule[i]) == 'string') {
+        var str = rule[i] as string;
+        if(str != context[i]) {
           mismatch = true;
           break;
         }
-      } else if(val[i]['d'] !== undefined) {
+      } else if(rule[i]['d'] !== undefined) {
+        var deadSpec = rule[i] as RuleDeadkey;
         // No need to even set a flag, really.  The extended context does all the necessary tracking work for us.
-        if(val[i]['d'] != context[i]) {
+        if(deadSpec['d'] != context[i]) {
+          mismatch = true;
+        }
+      } else if(rule[i]['a'] !== undefined) {
+        var anySpec = rule[i] as ContextAny;
+        // TODO:  Remove the `string` requirement.
+        if(!this.any(i, context[i] as string, anySpec.a)) {
+          mismatch = true;
+        }
+      } else if(rule[i]['i'] !== undefined) {
+        var indexSpec = rule[i] as RuleIndex;
+        var ch = this._Index(indexSpec.i.s, indexSpec.i.o);
+
+        if(ch != context[i]) {
+          mismatch = true;
+        }
+      } else if(rule[i]['c'] !== undefined) {
+        var contextSpec = rule[i] as ContextEx;
+        
+        if(context[contextSpec.c - 1] != context[i]) {
           mismatch = true;
         }
       }
     }
 
-    // if(mismatch) {
-    //   this._DeadkeyResetMatched();
-    // }
+    if(mismatch) {
+      // Reset the matched 'any' indices, if any.
+      this._AnyIndices = [];
+    }
 
     return !mismatch;
   }
@@ -808,18 +794,37 @@ class KeyboardInterface {
   }
 
   /**
-   * Function     indexOutput   KIO      
-   * Scope        Public
-   * @param       {number}      Pdn     no of character to overwrite (delete) 
+   * Function     _Index
+   * Scope        Public 
    * @param       {string}      Ps      string
    * @param       {number}      Pn      index
-   * @param       {Object}      Pelem   element to output to 
+   * Description  Returns the character from a store string according to the offset in the index array
+   */
+  _Index(Ps: string, Pn: number): string {
+    if(this._AnyIndices[Pn] < Ps._kmwLength()) {   //I3319
+      return Ps._kmwCharAt(this._AnyIndices[Pn]);
+    } else {
+      /* Should this really be possible for a compiled keyboard?  
+       * Should we throw an error / output a console.error("")?
+       */
+      return "";
+    }
+  }
+
+  /**
+   * Function     indexOutput   KIO
+   * Scope        Public
+   * @param       {number}      Pdn     no of character to overwrite (delete)
+   * @param       {string}      Ps      string
+   * @param       {number}      Pn      index
+   * @param       {Object}      Pelem   element to output to
    * Description  Output a character selected from the string according to the offset in the index array
-   */    
+   */
   indexOutput(Pdn: number, Ps: string, Pn: number, Pelem: HTMLElement): void {
     this.resetContextCache();
-    if(this._AnyIndices[Pn-1] < Ps._kmwLength()) {                        //I3319
-      this.output(Pdn,Pelem,Ps._kmwCharAt(this._AnyIndices[Pn-1]));  //I3319
+    var indexChar = this._Index(Ps, Pn-1);
+    if(indexChar) {
+      this.output(Pdn,Pelem,indexChar);  //I3319
     }
   }
 

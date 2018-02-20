@@ -1,17 +1,54 @@
 var assert = chai.assert;
 
+function runEngineRuleSet(ruleSet, defaultNoun) {
+  var inputElem = document.getElementById('singleton');
+  if(inputElem['kmw_ip']) {
+    inputElem = inputElem['kmw_ip'];
+  }
+
+  defaultNoun = defaultNoun ? defaultNoun : "Rule";
+
+  for(var i = 0; i < ruleSet.length; i++) {
+    var ruleDef = ruleSet[i];
+
+    var matchDefs = [{
+        sequence: ruleDef.baseSequence,
+        result: true,
+        msg: "Rule " + ruleDef.id + ":  basic application of rule failed."}
+      ].concat(ruleDef.fullMatchDefs ? ruleDef.fullMatchDefs : []);
+
+    for(var j = 0; j < matchDefs.length; j++) {
+      // Prepare the context!
+      var matchTest = matchDefs[j];
+      var ruleSeq = new KMWRecorder.InputTestSequence(matchTest.sequence);
+      ruleSeq.simulateSequenceOn(inputElem);
+
+      // Now for the real test!
+      var res = keyman.interface.fullContextMatch(ruleDef.n, inputElem, ruleDef.rule);
+
+      var msg = matchTest.msg;
+      if(!msg) {
+        msg = defaultNoun + " incorrectly reported as " + (matchTest.result ? "unmatched!" : "matched!"); 
+      }
+      assert.equal(res, matchTest.result, msg);
+
+      // Cleanup the context!
+      window['keyman'].resetContext();
+    }
+  }
+}
+
 /*
  *  Start definition of isolated rule tests for validity of `fullContextMatch` (KFCM) components.
  */
-var RULE_1_TEST = {
+var DEADKEY_TEST_1 = {
   id: 1,
   // Match condition for rule
-  in: ['a', {d: 0}, {d: 1}, 'b'],
+  rule: ['a', {d: 0}, {d: 1}, 'b'],
   // Start of context relative to cursor
   n: 5,
   ln: 4,
   // Resulting context map
-  contextMap: [3, 2, 2, 2],
   contextCache: ['a', 0, 1, 'b'],
   baseSequence: { "output": "ab", "inputs": [
     {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
@@ -72,15 +109,14 @@ var RULE_1_TEST = {
   }]
 };
 
-var RULE_2_TEST = {
+var DEADKEY_TEST_2 = {
   id: 2,
   // Match condition for rule
-  in: [{d: 0}, 'a', {d: 0}, {d: 0}, 'b'],
+  rule: [{d: 0}, 'a', {d: 0}, {d: 0}, 'b'],
   // Start of context relative to cursor
   n: 5,
   ln: 5,
   // Resulting context map
-  contextMap: [2, 2, 1, 1, 1],
   contextCache: [0, 'a', 0, 0, 'b'],
   baseSequence: { "output": "ab", "inputs": [
     {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
@@ -161,15 +197,14 @@ var RULE_2_TEST = {
   }]
 };
 
-var RULE_3_TEST = {
+var DEADKEY_TEST_3 = {
   id: 3,
   // Match condition for rule
-  in: ['a', {d: 0}, {d: 0}, 'b', {d: 0}],
+  rule: ['a', {d: 0}, {d: 0}, 'b', {d: 0}],
   // Start of context relative to cursor
   n: 6,
   ln: 5,
   // Resulting context map
-  contextMap: [3, 2, 2, 2, 1],
   contextCache: ['a', 0, 0, 'b', 0],
 
   baseSequence: { "output": "ab", "inputs": [
@@ -184,15 +219,14 @@ var RULE_3_TEST = {
   // No specialized fullMatchDefs here, as any appended deadkeys are automatically 'in context' for rules.
 };
 
-var RULE_4_TEST = {
+var DEADKEY_TEST_4 = {
   id: 4,
   // Match condition for rule
-  in: ['a', 'b', 'b', 'a', 'c'],
+  rule: ['a', 'b', 'b', 'a'],
   // Start of context relative to cursor
   n: 5,
   ln: 4,
   // Resulting context map
-  contextMap: [5, 4, 3, 2, 1],
   contextCache: ['a', 'b', 'b', 'a'],
 
   baseSequence: { "output": "ab", "inputs": [
@@ -201,33 +235,306 @@ var RULE_4_TEST = {
     {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
     {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
     // The test has an extra character appended that's not part of the check.
-    {"type":"key","key":"c","code":"KeyC","keyCode":66,"modifierSet":0,"location":0}
+    {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0}
   ]}
 };
 
-var RULE_5_TEST = {
+var DEADKEY_TEST_5 = {
   id: 5,
   // Match condition for rule
-  in: [{d: 1}, {d: 2}, {d: 0}, {d: 1}, {d: 2}],
+  rule: [{d: 1}, {d: 2}, {d: 0}, {d: 1}, {d: 2}],
   // Start of context relative to cursor
   n: 5,
   ln: 5,
   // Resulting context map
-  contextMap: [0, 0, 0, 0, 0],
   contextCache: [1, 2, 0, 1, 2],
 
   baseSequence: { "output": "ab", "inputs": [
     // Testing with an extra deadkey at the start.
-    {"type":"key","key":"0","code":"Digit0","keyCode":48,"modifierSet":0,"location":0},
     {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
     {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
-    {"type":"key","key":"0","code":"Digit0","keyCode":48,"modifierSet":0,"location":0},
+    {"type":"key","key":"3","code":"Digit3","keyCode":51,"modifierSet":0,"location":0},
     {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
     {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
+    {"type":"key","key":"3","code":"Digit3","keyCode":51,"modifierSet":0,"location":0},
   ]}
 };
 
-var RULE_SET = [ RULE_1_TEST, RULE_2_TEST, RULE_3_TEST, RULE_4_TEST ];
+var ANY_CONTEXT_TEST_1 = {
+  id: 1,
+  // Match condition for rule
+  rule: ['c', "a", "b", {c:3}, {c:2}],
+  // Start of context relative to cursor
+  n: 5,
+  ln: 5,
+  // Resulting context map
+  contextCache: ['c', 'a', 'b', 'b', 'a'],
+
+  baseSequence: { "output": "cabba", "inputs": [
+    {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "cacca", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+    ]},
+    result: false,
+    msg: "Rule 1: Plain text mismatch with successful context() statements is matching the rule."
+  }, {
+    sequence: { "output": "cabaa", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+    ]},
+    result: false,
+    msg: "Rule 1: mismatched context() rule component is not failing the rule."
+  }]
+};
+
+var ANY_CONTEXT_TEST_2 = {
+  id: 2,
+  // Match condition for rule
+  rule: ['c', 'a', {a: "bc"}, {c:3}, 'a'],
+  // Start of context relative to cursor
+  n: 5,
+  ln: 5,
+  // Resulting context map
+  contextCache: ['c', 'a', 'b', 'b', 'a'],
+
+  baseSequence: { "output": "cabba", "inputs": [
+    {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "cacca", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+    ]},
+    result: true,
+    msg: "Rule 2: Alternate 'any' store character failed to match the rule."
+  }, {
+    sequence: { "output": "cabca", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+    ]},
+    result: false,
+    msg: "Rule 2: 'any' and 'context' correspond to mismatching characters, but matched the rule."
+  }]
+};
+
+var ANY_CONTEXT_TEST_3 = {
+  id: 3,
+  // Match condition for rule
+  rule: ['c', {a: "ac"}, {a: "bc"}, {c:3}, {c:2}],
+  // Start of context relative to cursor
+  n: 5,
+  ln: 5,
+  // Resulting context map
+  contextCache: ['c', 'a', 'b', 'b', 'a'],
+
+  baseSequence: { "output": "cabba", "inputs": [
+    {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "cacca", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+    ]},
+    result: true,
+    msg: "Rule 3: Alternate 'any' store character failed to match the rule."
+  }, {
+    sequence: { "output": "ccccc", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0}
+    ]},
+    result: true,
+    msg: "Rule 3: Alternate 'any' store character failed to match the rule."
+  }, {
+    sequence: { "output": "cabab", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
+    ]},
+    result: false,
+    msg: "Rule 3: context() rule component is matching the incorrect any() component."
+  }]
+};
+
+var ANY_INDEX_TEST_1 = {
+  id: 1,
+  // Match condition for rule
+  rule: ['c', 'a', {a: "bc"}, {i:{s:"bc", o:2}}, 'a'],
+  // Start of context relative to cursor
+  n: 5,
+  ln: 5,
+  // Resulting context map
+  contextCache: ['c', 'a', 'b', 'b', 'a'],
+
+  baseSequence: { "output": "cabba", "inputs": [
+    {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "cacca", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+    ]},
+    result: true,
+    msg: "Rule 1: Alternate 'any' store character failed to match the rule."
+  }, {
+    sequence: { "output": "cabca", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+    ]},
+    result: false,
+    msg: "Rule 1: 'any' and 'output' correspond to mismatching characters, but matched the rule."
+  }]
+};
+
+var ANY_INDEX_TEST_2 = {
+  id: 2,
+  // Match condition for rule
+  rule: ['c', {a:"ab"}, {i: {s:"bc", o:1}}, {i:{s:"bc", o:1}}, {i:{s:"ab", o:1}}],
+  // Start of context relative to cursor
+  n: 5,
+  ln: 5,
+  // Resulting context map
+  contextCache: ['c', 'a', 'b', 'b', 'a'],
+
+  baseSequence: { "output": "cabba", "inputs": [
+    {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "cacca", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+    ]},
+    result: false,
+    msg: "Rule 2: Mismatch with secondary output store did not fail the rule."
+  }, {
+    sequence: { "output": "cbccb", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
+    ]},
+    result: true,
+    msg: "Rule 2: Alternate 'any' store character failed to match the rule."
+  }]
+};
+
+var ANY_INDEX_TEST_3 = {
+  id: 3,
+  // Match condition for rule
+  rule: ['c', {a:"ab"}, {a:"bc"}, {i:{s:"bc", o:2}}, {i:{s:"ab", o:1}}],
+  // Start of context relative to cursor
+  n: 5,
+  ln: 5,
+  // Resulting context map
+  contextCache: ['c', 'a', 'b', 'b', 'a'],
+
+  baseSequence: { "output": "cabba", "inputs": [
+    {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "cacca", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+    ]},
+    result: true,
+    msg: "Rule 3a: Error with index() when a rule has multiple any() checks."
+  }, {
+    sequence: { "output": "cbccb", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
+    ]},
+    result: true,
+    msg: "Rule 3b: Error with index() when a rule has multiple any() checks."
+  }, {
+    sequence: { "output": "cbbbb", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
+    ]},
+    result: true,
+    msg: "Rule 3c: Error with index() when a rule has multiple any() checks."
+  }, {
+    sequence: { "output": "cbccc", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0}
+    ]},
+    result: false,
+    msg: "Rule 3: index() rule check matched the incorrect any()."
+  }]
+};
+
+var DEADKEY_RULE_SET = [ DEADKEY_TEST_1, DEADKEY_TEST_2, DEADKEY_TEST_3, DEADKEY_TEST_4, DEADKEY_TEST_5 ];
+var ANY_CONTEXT_RULE_SET = [ ANY_CONTEXT_TEST_1, ANY_CONTEXT_TEST_2, ANY_CONTEXT_TEST_3];
+var ANY_INDEX_RULE_SET = [ ANY_INDEX_TEST_1, ANY_INDEX_TEST_2, ANY_INDEX_TEST_3 ];
+
+var FULL_RULE_SET = [].concat(DEADKEY_RULE_SET, ANY_CONTEXT_RULE_SET, ANY_INDEX_RULE_SET);
 
 /*
  *  End definition of isolated rule testing.
@@ -299,8 +606,8 @@ describe('Engine', function() {
         inputElem = inputElem['kmw_ip'];
       }
 
-      for(var i = 0; i < RULE_SET.length; i++) {
-        var ruleDef = RULE_SET[i];
+      for(var i = 0; i < FULL_RULE_SET.length; i++) {
+        var ruleDef = FULL_RULE_SET[i];
 
         // Prepare the context!
         var ruleSeq = new KMWRecorder.InputTestSequence(ruleDef.baseSequence);
@@ -316,52 +623,19 @@ describe('Engine', function() {
       }
     });
 
-    // Tests construction of index mapping, which translates extended indices to their original positions.
-    it('Context Index Mapping', function() {
-      for(var i = 0; i < RULE_SET.length; i++) {
-        var ruleDef = RULE_SET[i];
-        var res = keyman.interface._BuildContextIndexMap(ruleDef.n, ruleDef.in);
-        assert.sameOrderedMembers(res, ruleDef.contextMap);
-      }
+    // Tests deadkey and plain key interactions for `fullContextMatch`.
+    it('Deadkey + Plain Text Rules', function() {
+      runEngineRuleSet(DEADKEY_RULE_SET, "Deadkeys");
     });
 
-    // Tests "stage 3" of fullContextMatch - ensuring that all deadkey conditions are met.
-    it('Context Matching - Deadkeys and Plain Text only', function() {
-      var inputElem = document.getElementById('singleton');
-      if(inputElem['kmw_ip']) {
-        inputElem = inputElem['kmw_ip'];
-      }
+    // Tests any(), context(), and plain key interactions for `fullContextMatch`.
+    it('Any + Context Rules', function() {
+      runEngineRuleSet(ANY_CONTEXT_RULE_SET);
+    });
 
-      for(var i = 0; i < RULE_SET.length; i++) {
-        var ruleDef = RULE_SET[i];
-        if(!ruleDef.fullMatchDefs) {
-          continue;
-        }
-
-        var matchDefs = [{
-            sequence: ruleDef.baseSequence,
-            result: true,
-            msg: "Rule " + ruleDef.id + ":  basic application of rule failed."}].concat(ruleDef.fullMatchDefs);
-
-        for(var j = 0; j < matchDefs.length; j++) {
-          // Prepare the context!
-          var matchTest = matchDefs[j];
-          var ruleSeq = new KMWRecorder.InputTestSequence(matchTest.sequence);
-          ruleSeq.simulateSequenceOn(inputElem);
-
-          // Now for the real test!
-          var res = keyman.interface.fullContextMatch(ruleDef.n, inputElem, ruleDef.in);
-
-          var msg = matchTest.msg;
-          if(!msg) {
-            msg = "Deadkeys incorrectly reported as " + (matchTest.result ? "unmatched!" : "matched!"); 
-          }
-          assert.equal(res, matchTest.result, msg);
-
-          // Cleanup the context!
-          window['keyman'].resetContext();
-        }
-      }
+    // Tests any(), index(), and plain key interactions for `fullContextMatch`.
+    it('Any + Index Rules', function() {
+      runEngineRuleSet(ANY_INDEX_RULE_SET);
     });
 
     // TODO:  add a 'resetContext' test!
@@ -420,7 +694,7 @@ describe('Engine', function() {
     });
   })
 
-  describe('Sequence Checks', function() {
+  describe('Sequence Simulation Checks', function() {
     this.timeout(10000);
 
     it('Keyboard simulation', function(done) {
