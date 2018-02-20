@@ -89,18 +89,19 @@ class CachedContext {
   }
 };
 
+type CachedExEntry = {valContext: (string|number)[], deadContext: Deadkey[]};
 /** 
  * An extended version of cached context storing designed to work with 
  * `fullContextMatch` and its helper functions.
  */
 class CachedContextEx {
-  _cache: (string|number)[][][];
+  _cache: CachedExEntry[][];
   
   reset(): void {
     this._cache = [];
   }
 
-  get(n: number, ln: number): (string|number)[] {
+  get(n: number, ln: number): CachedExEntry {
     // return null; // uncomment this line to disable context caching
     if(typeof this._cache[n] == 'undefined') {
       return null;
@@ -110,7 +111,7 @@ class CachedContextEx {
     return this._cache[n][ln];
   }
 
-  set(n: number, ln: number, val: (string|number)[]): void { 
+  set(n: number, ln: number, val: CachedExEntry): void { 
     if(typeof this._cache[n] == 'undefined') { 
       this._cache[n] = []; 
     } 
@@ -331,7 +332,7 @@ class KeyboardInterface {
    * @param       {Object}      Pelem   Element to work with (must be currently focused element)
    * @return      {Array}               Context array (of strings and numbers) 
    */
-  private _BuildExtendedContext(n: number, ln: number, Ptarg: HTMLElement): (string|number)[] {
+  private _BuildExtendedContext(n: number, ln: number, Ptarg: HTMLElement): { valContext: (string|number)[], deadContext: Deadkey[]} {
     var cache = this.cachedContextEx.get(n, ln); 
     if(cache !== null) {
       return cache;
@@ -354,34 +355,38 @@ class KeyboardInterface {
 
         // Time to build from scratch!
         var index = 0;
-        cache = [];
-        while(cache.length < n) {
+        cache = { valContext: [], deadContext: []};
+        while(cache.valContext.length < n) {
           // As adapted from `deadkeyMatch`.
           var sp=this._SelPos(Ptarg);
           var deadPos = sp - index;
           if(unmatchedDeadkeys.length > 0 && unmatchedDeadkeys[0].p == deadPos) {
             // Take the deadkey.
-            cache = [unmatchedDeadkeys[0].d].concat(cache);
+            cache.deadContext[n-cache.valContext.length-1] = unmatchedDeadkeys[0];
+            cache.valContext = [unmatchedDeadkeys[0].d].concat(cache.valContext);
             unmatchedDeadkeys.splice(0, 1);
           } else {
             // Take the character.  We get "\ufffe" if it doesn't exist.
             var kc = this.context(++index, 1, Ptarg);
-            cache = ([kc] as (string|number)[]).concat(cache);
+            cache.valContext = ([kc] as (string|number)[]).concat(cache.valContext);
           }
         }
         this.cachedContextEx.set(n, n, cache);
       }
 
       // Now that we have the cache...
-      var subCache = cache.slice(0, ln);
-      for(var i=0; i < subCache.length; i++) {
+      var subCache = cache;
+      subCache.valContext = subCache.valContext.slice(0, ln);
+      for(var i=0; i < subCache.valContext.length; i++) {
         if(subCache[i] == '\ufffe') {
-          subCache.splice(0, 1);
+          subCache.valContext.splice(0, 1);
+          subCache.deadContext.splice(0, 1);
         }
       }
 
-      if(subCache.length == 0) {
-        subCache = ['\ufffe'];
+      if(subCache.valContext.length == 0) {
+        subCache.valContext = ['\ufffe'];
+        subCache.deadContext = [];
       }
 
       this.cachedContextEx.set(n, ln, subCache);
@@ -403,7 +408,9 @@ class KeyboardInterface {
    */
   fullContextMatch(n: number, Ptarg: HTMLElement, rule: ContextEntry[]): boolean {
     // Stage one:  build the context index map.
-    var context = this._BuildExtendedContext(n, rule.length, Ptarg);
+    var fullContext = this._BuildExtendedContext(n, rule.length, Ptarg);
+    var context = fullContext.valContext;
+    var deadContext = fullContext.deadContext;
 
     var mismatch = false;
 
@@ -417,9 +424,11 @@ class KeyboardInterface {
         }
       } else if(rule[i]['d'] !== undefined) {
         var deadSpec = rule[i] as RuleDeadkey;
-        // No need to even set a flag, really.  The extended context does all the necessary tracking work for us.
+        // We still need to set a flag here; 
         if(deadSpec['d'] != context[i]) {
           mismatch = true;
+        } else {
+          deadContext[i].set();
         }
       } else if(rule[i]['a'] !== undefined) {
         var anySpec = rule[i] as ContextAny;
@@ -445,6 +454,7 @@ class KeyboardInterface {
 
     if(mismatch) {
       // Reset the matched 'any' indices, if any.
+      this._DeadkeyResetMatched();
       this._AnyIndices = [];
     }
 
@@ -791,6 +801,8 @@ class KeyboardInterface {
     // Aim to put the newest deadkeys first.
     this._DeadKeys=[Lc].concat(this._DeadKeys);      
     //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
+    // It's possible to have deadkey-only rules.
+    this._DeadkeyDeleteMatched();
   }
 
   /**

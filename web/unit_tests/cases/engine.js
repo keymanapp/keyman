@@ -44,6 +44,44 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
 var DEADKEY_TEST_1 = {
   id: 1,
   // Match condition for rule
+  rule: [{d: 1}],
+  // Start of context relative to cursor
+  n: 1,
+  ln: 1,
+  // Resulting context map
+  contextCache: [1],
+  baseSequence: { "output": "", "inputs": [
+    {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0}
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "", "inputs": [
+      // Does it fail with a different deadkey in the position?
+      {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0}
+    ]},
+    result: false,
+    msg: "Rule 1:  did not fail when incorrect deadkey was present."
+  }, {
+    sequence: { "output": "", "inputs": [
+      // Slightly out-of-context deadkey shouldn't affect the match.
+      {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
+      {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0}
+    ]},
+    result: true,
+    msg: "Rule 1:  failed when extra deadkey context exists in history."
+  }, {
+    sequence: { "output": "", "inputs": [
+      // Slightly out-of-context deadkey shouldn't affect the match.
+      {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
+      {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0}
+    ]},
+    result: false,
+    msg: "Rule 1:  did not fail upon incorrect deadkey ordering at top of context."
+  }]
+};
+
+var DEADKEY_TEST_2 = {
+  id: 2,
+  // Match condition for rule
   rule: ['a', {d: 0}, {d: 1}, 'b'],
   // Start of context relative to cursor
   n: 5,
@@ -69,7 +107,7 @@ var DEADKEY_TEST_1 = {
       {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0}
     ]},
     result: false,
-    msg: "Rule 1:  did not fail when deadkey ordering was inverted."
+    msg: "Rule 2:  did not fail when deadkey ordering was inverted."
   }, {
     sequence: { "output": "ab", "inputs": [
       {"type":"key","key":"c","code":"KeyC","keyCode":66,"modifierSet":0,"location":0},
@@ -81,7 +119,7 @@ var DEADKEY_TEST_1 = {
       {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0}
     ]},
     result: true,
-    msg: "Rule 1:  failed when extra character context exists in history."
+    msg: "Rule 2:  failed when extra character context exists in history."
   }, {
     sequence: { "output": "ab", "inputs": [
       {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0},
@@ -92,7 +130,7 @@ var DEADKEY_TEST_1 = {
       {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0}
     ]},
     result: true,
-    msg: "Rule 1:  out-of-context deadkey caused rule match failure."
+    msg: "Rule 2:  out-of-context deadkey caused rule match failure."
   }, {
     sequence: { "output": "ab", "inputs": [
       // Should not fail with a deadkey prepended to the context.
@@ -105,12 +143,12 @@ var DEADKEY_TEST_1 = {
       {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0}
     ]},
     result: true,
-    msg: "Rule 1:  prepended (out of context) deadkey caused rule match failure."
+    msg: "Rule 2:  prepended (out of context) deadkey caused rule match failure."
   }]
 };
 
-var DEADKEY_TEST_2 = {
-  id: 2,
+var DEADKEY_TEST_3 = {
+  id: 3,
   // Match condition for rule
   rule: [{d: 0}, 'a', {d: 0}, {d: 0}, 'b'],
   // Start of context relative to cursor
@@ -135,7 +173,7 @@ var DEADKEY_TEST_2 = {
       {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
     ]},
     result: false,
-    msg: "Rule 2:  required prepended deadkey omission did not prevent a rule match."
+    msg: "Rule 3:  required prepended deadkey omission did not prevent a rule match."
   }, {
     sequence: { "output": "ab", "inputs": [
       {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
@@ -145,7 +183,7 @@ var DEADKEY_TEST_2 = {
       {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
     ]},
     result: false,
-    msg: "Rule 2:  omitting one copy of a required duplicated deadkey did not prevent a rule match."
+    msg: "Rule 3:  omitting one copy of a required duplicated deadkey did not prevent a rule match."
   }, {
     sequence: { "output": "ab", "inputs": [
       {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
@@ -157,7 +195,7 @@ var DEADKEY_TEST_2 = {
       {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
     ]},
     result: false,
-    msg: "Rule 2:  triple matching deadkeys where only two required did not prevent a rule match."
+    msg: "Rule 3:  triple matching deadkeys where only two required did not prevent a rule match."
   }, {
     sequence: { "output": "ab", "inputs": [
       // Should not fail with a duplicate deadkey prepended to the context.
@@ -169,7 +207,7 @@ var DEADKEY_TEST_2 = {
       {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
     ]},
     result: true,
-    msg: "Rule 2:  duplicate prepended deadkey prevented a rule match when only one was required."
+    msg: "Rule 3:  duplicate prepended deadkey prevented a rule match when only one was required."
   }, {
     sequence: { "output": "ab", "inputs": [
       // Should not fail with an unrelated deadkey prepended to the context before the required one.
@@ -181,7 +219,7 @@ var DEADKEY_TEST_2 = {
       {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
     ]},
     result: true,
-    msg: "Rule 2:  prepended deadkey placed before rule's deadkey prevented a rule match."
+    msg: "Rule 3:  prepended deadkey placed before rule's deadkey prevented a rule match."
   }, {
     sequence: { "output": "ab", "inputs": [
       // Should not fail with a duplicate deadkey prepended to the context.
@@ -193,12 +231,12 @@ var DEADKEY_TEST_2 = {
       {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
     ]},
     result: false,
-    msg: "Rule 2:  prepended deadkey after rule's required deadkey failed to prevent a rule match."
+    msg: "Rule 3:  prepended deadkey after rule's required deadkey failed to prevent a rule match."
   }]
 };
 
-var DEADKEY_TEST_3 = {
-  id: 3,
+var DEADKEY_TEST_4 = {
+  id: 4,
   // Match condition for rule
   rule: ['a', {d: 0}, {d: 0}, 'b', {d: 0}],
   // Start of context relative to cursor
@@ -219,8 +257,8 @@ var DEADKEY_TEST_3 = {
   // No specialized fullMatchDefs here, as any appended deadkeys are automatically 'in context' for rules.
 };
 
-var DEADKEY_TEST_4 = {
-  id: 4,
+var DEADKEY_TEST_5 = {
+  id: 5,
   // Match condition for rule
   rule: ['a', 'b', 'b', 'a'],
   // Start of context relative to cursor
@@ -239,8 +277,8 @@ var DEADKEY_TEST_4 = {
   ]}
 };
 
-var DEADKEY_TEST_5 = {
-  id: 5,
+var DEADKEY_TEST_6 = {
+  id: 6,
   // Match condition for rule
   rule: [{d: 1}, {d: 2}, {d: 0}, {d: 1}, {d: 2}],
   // Start of context relative to cursor
@@ -530,7 +568,9 @@ var ANY_INDEX_TEST_3 = {
   }]
 };
 
-var DEADKEY_RULE_SET = [ DEADKEY_TEST_1, DEADKEY_TEST_2, DEADKEY_TEST_3, DEADKEY_TEST_4, DEADKEY_TEST_5 ];
+var DEADKEY_RULE_SET = [ DEADKEY_TEST_1, DEADKEY_TEST_2, DEADKEY_TEST_3, DEADKEY_TEST_4, 
+  DEADKEY_TEST_5, DEADKEY_TEST_6 
+];
 var ANY_CONTEXT_RULE_SET = [ ANY_CONTEXT_TEST_1, ANY_CONTEXT_TEST_2, ANY_CONTEXT_TEST_3];
 var ANY_INDEX_RULE_SET = [ ANY_INDEX_TEST_1, ANY_INDEX_TEST_2, ANY_INDEX_TEST_3 ];
 
@@ -616,7 +656,7 @@ describe('Engine', function() {
         // Now for the real test!
         var res = keyman.interface._BuildExtendedContext(ruleDef.n, ruleDef.ln, inputElem);
 
-        assert.sameOrderedMembers(res, ruleDef.contextCache);
+        assert.sameOrderedMembers(res.valContext, ruleDef.contextCache);
 
         // Cleanup the context!
         window['keyman'].resetContext();
