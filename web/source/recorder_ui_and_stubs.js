@@ -37,6 +37,7 @@ addInputRecord = function(json) {
 resetInputRecord = function() {
   setElementText(ta_inputJSON, "");
   setElementText(in_output, "");
+  keyman.resetContext();
 
   inputJSON = new KMWRecorder.InputTestSequence();
 }
