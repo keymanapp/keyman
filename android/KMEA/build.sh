@@ -84,6 +84,9 @@ fi
 
 PLATFORM=`uname -s`
 
+# Report JUnit test results to CI
+echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\TEST-com.tavultesoft.kmea.packages.PackageProcessorTest.xml']"
+
 if [ "$DO_BUILD" = true ]; then
     echo "Building keyman web engine"
     cd $KMW_SOURCE
