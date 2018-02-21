@@ -1,7 +1,7 @@
 // JavaScript Document samplehdr.js: Keyboard management for KeymanWeb demonstration pages
 
 /* 
-    The keyboard name and/or ISO language code must be specified for each keyboard that is to be available.  
+    The keyboard name and/or BCP-47 language code must be specified for each keyboard that is to be available.
     If the same keyboard is used for several languages, it must be listed for each
     language, but the keyboard itself will only be loaded once. 
     If two (or more) keyboards are to be available for a given language, both must be listed.
@@ -47,24 +47,24 @@
     // The first keyboard added will be the default keyboard for touch devices.
     // For faster loading, it may be best for the default keybaord to be 
     // locally sourced.
-    kmw.addKeyboards({id:'us',name:'English',languages:{id:'eng',name:'English'},
+    kmw.addKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'},
       filename:'./us-1.0.js'});
       
     // Add more keyboards to the language menu, by keyboard name,
-    // keyboard name and language code, or just the ISO 639 language code.  
+    // keyboard name and language code, or just the BCP-47 language code.
     // We use a different loading pattern here than in the samples version to provide a slightly different set of test cases.
-    kmw.addKeyboards('french','@heb');
-    kmw.addKeyboards({id:'european2', name:'EuroLatin2', languages: [{id:'nor'}, {id:'swe'}]}); // Loads from partial stub instead of the compact string.
+    kmw.addKeyboards('french','@he');
+    kmw.addKeyboards({id:'european2', name:'EuroLatin2', languages: [{id:'no'}, {id:'sv'}]}); // Loads from partial stub instead of the compact string.
   
     // Add a keyboard by language name.  Note that the name must be spelled
-    // correctly, or the keyboard will not be found.  (Using ISO codes is
+    // correctly, or the keyboard will not be found.  (Using BCP-47 codes is
     // usually easier.)
     kmw.addKeyboardsForLanguage('Dzongkha');
     
     // Add a fully-specified, locally-sourced, keyboard with custom font  
     kmw.addKeyboards({id:'lao_2008_basic',name:'Lao Basic',
       languages:{
-        id:'lao',name:'Lao',region:'Asia',
+        id:'lo',name:'Lao',region:'Asia',
         font:{family:'LaoWeb',source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']}
         },
       filename:'./lao_2008_basic.js'
@@ -93,11 +93,11 @@
         break;
       case 2:
         sKbd=document.getElementById('kbd_id2').value.toLowerCase();
-        var rx=new RegExp(/^\w{3,3}$\$?/);    
+        var rx=new RegExp(/^\w{2,3}$\$?/);
         if(rx.test(sKbd))
           kmw.addKeyboards('@'+sKbd);
         else        
-          alert('An ISO 639 language code must be exactly 3 letters long!');
+          alert('A BCP-47 language code must be exactly 2-3 letters long!');
         break;
       case 3:
         sKbd=document.getElementById('kbd_id3').value;

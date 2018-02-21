@@ -233,7 +233,7 @@ class KeymanBase {
    * @param {string|Object} x keyboard name string or keyboard metadata JSON object
    * 
    */  
-  ['addKeyboards'](x) {                       
+  ['addKeyboards'](x) {
     if(arguments.length == 0) {
       this.keyboardManager.keymanCloudRequest('',false);
     } else {
