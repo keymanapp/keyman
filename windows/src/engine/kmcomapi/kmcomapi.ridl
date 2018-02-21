@@ -6,7 +6,7 @@
 // However, when applying changes via the Editor this file will be regenerated
 // and comments or formatting changes will be lost.
 // ************************************************************************ //
-// File generated on 21/02/2018 1:52:06 PM (- $Rev: 12980 $, 701365859).
+// File generated on 21/02/2018 8:54:28 PM (- $Rev: 12980 $, 726708000).
 
 [
   uuid(F16E2A9A-DA46-4EA3-BFF3-BA46B480C961),
@@ -581,7 +581,7 @@ library keymanapi
     [id(0x00000100)]
     HRESULT _stdcall Install([in] VARIANT_BOOL Force);
     [propget, id(0x00000192)]
-    HRESULT _stdcall Languages([out, retval] IKeymanKeyboardLanguages** Value);
+    HRESULT _stdcall Languages([out, retval] IKeymanKeyboardLanguagesFile** Value);
   };
 
   [

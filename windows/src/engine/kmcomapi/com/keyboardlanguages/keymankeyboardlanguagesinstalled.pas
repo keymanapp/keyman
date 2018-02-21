@@ -86,19 +86,17 @@ begin
 end;
 
 procedure TKeymanKeyboardLanguagesInstalled.DoRefresh;
-var
-  FProfiles: TStringList;
-  i: Integer;
-  FKeyboardLanguage: TKeymanKeyboardLanguageInstalled;
-  RootPath: string;
-  FLangID: Integer;
-  FName, FLocale: string;
-  FGUID: TGUID;
-begin
-  KL.MethodEnter(Self, 'DoRefresh', []);
-  try
-    { Iterate through something somewhere and get the languages associated with this profile? }
 
+  procedure RefreshProfiles;
+  var
+    FProfiles: TStringList;
+    i: Integer;
+    FKeyboardLanguage: TKeymanKeyboardLanguageInstalled;
+    RootPath: string;
+    FLangID: Integer;
+    FName, FLocale: string;
+    FGUID: TGUID;
+  begin
     FProfiles := TStringList.Create;
     with TRegistryErrorControlled.Create do
     try
@@ -129,6 +127,55 @@ begin
       Free;
       FProfiles.Free;
     end;
+  end;
+
+  function HasLanguage(BCP47: string): Boolean;
+  var
+    i: Integer;
+  begin
+    for i := 0 to FLanguages.Count - 1 do
+      if SameText((FLanguages[i] as IKeymanKeyboardLanguage).BCP47Code, BCP47) then
+        Exit(True);
+    Result := False;
+  end;
+
+  procedure RefreshSuggestedLanguages;
+  var
+    RootPath: string;
+    FIDs: TStringList;
+    i: Integer;
+    FName: string;
+    FKeyboardLanguage: TKeymanKeyboardLanguageInstalled;
+  begin
+    FIDs := TStringList.Create;
+    with TRegistryErrorControlled.Create do
+    try
+      RootKey := HKEY_LOCAL_MACHINE;
+      RootPath := GetRegistryKeyboardInstallKey_LM(FOwner.ID) + '\' + SRegSubKey_SuggestedLanguages;
+      if OpenKeyReadOnly(RootPath) then
+      begin
+        GetValueNames(FIDs);
+        for i := 0 to FIDs.Count - 1 do
+        begin
+          if not HasLanguage(FIDs[i]) then
+          begin
+            FName := ReadString(FIDs[i]);
+            FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FIDs[i], 0, GUID_NULL, FName);
+            FLanguages.Add(FKeyboardLanguage);
+          end;
+        end;
+      end;
+    finally
+      Free;
+      FIDs.Free;
+    end;
+  end;
+
+begin
+  KL.MethodEnter(Self, 'DoRefresh', []);
+  try
+    RefreshProfiles;
+    RefreshSuggestedLanguages;
   finally
     KL.MethodExit(Self, 'DoRefresh');
   end;

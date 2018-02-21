@@ -215,6 +215,8 @@ const
 
   SRegValue_KeymanProfileGUID   = 'profile guid';                                   // LM CU   // I3581
 
+  SRegSubKey_SuggestedLanguages = 'Suggested Languages';                            // LM
+
   { Language Profiles }
 
   {$MESSAGE HINT 'Refactor this to use SRegKeyNode naming (no prefix \); fixup references'}

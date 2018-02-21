@@ -12,7 +12,7 @@ unit keymanapi_TLB;
 // ************************************************************************ //
 
 // $Rev: 52393 $
-// File generated on 21/02/2018 1:52:03 PM from Type Library described below.
+// File generated on 21/02/2018 8:54:26 PM from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: C:\Projects\keyman\open\windows\src\engine\kmcomapi\kmcomapi (1)
@@ -889,8 +889,8 @@ type
   IKeymanKeyboardFile = interface(IKeymanKeyboard)
     ['{80959B80-C7A9-4EB1-AB46-3762F8E5315B}']
     procedure Install(Force: WordBool); safecall;
-    function Get_Languages: IKeymanKeyboardLanguages; safecall;
-    property Languages: IKeymanKeyboardLanguages read Get_Languages;
+    function Get_Languages: IKeymanKeyboardLanguagesFile; safecall;
+    property Languages: IKeymanKeyboardLanguagesFile read Get_Languages;
   end;
 
 // *********************************************************************//
@@ -901,7 +901,7 @@ type
   IKeymanKeyboardFileDisp = dispinterface
     ['{80959B80-C7A9-4EB1-AB46-3762F8E5315B}']
     procedure Install(Force: WordBool); dispid 256;
-    property Languages: IKeymanKeyboardLanguages readonly dispid 402;
+    property Languages: IKeymanKeyboardLanguagesFile readonly dispid 402;
     property Bitmap: IPicture readonly dispid 1;
     property Copyright: WideString readonly dispid 2;
     property DefaultBCP47Languages: WideString readonly dispid 3;

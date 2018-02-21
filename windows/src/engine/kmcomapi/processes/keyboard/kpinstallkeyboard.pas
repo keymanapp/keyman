@@ -47,7 +47,7 @@ unit kpinstallkeyboard;  // I3306
 interface
 
 uses
-  Windows,
+  Winapi.Windows,
   PackageInfo,
   kpbase;
 
@@ -66,19 +66,38 @@ type
 implementation
 
 uses
-  SysUtils, Classes, Graphics,
-  ErrorControlledRegistry, kmxfile, keymanerror, utilkeyman, utilsystem,
-  isadmin, RegistryKeys, GetOsVersion, glossary,
+  System.SysUtils,
+  System.Classes,
+  System.Variants,
+  Vcl.Graphics,
+
+  Keyman.System.LanguageCodeUtils,
+
+  ErrorControlledRegistry,
+  kmxfile,
+  keymanerror,
+  utilkeyman,
+  utilsystem,
+  isadmin,
+  RegistryKeys,
+  GetOsVersion,
+  glossary,
   utilexecute,
-  keymanerrorcodes, keymancontext, kpinstallkeyboardlanguageprofiles,
-  OnlineConstants, KLog, custinterfaces, utilolepicture,
-  kprecompilemnemonickeyboard, KPInstallVisualKeyboard,
+  keymanerrorcodes,
+  keymancontext,
+  kpinstallkeyboardlanguageprofiles,
+  OnlineConstants,
+  KLog,
+  custinterfaces,
+  utilolepicture,
+  kprecompilemnemonickeyboard,
+  KPInstallVisualKeyboard,
   utildir,
   KeymanPaths,
   kmxfileconsts,
   utilicon,
   utilstr,
-  keymanapi_TLB, Variants;
+  keymanapi_TLB;
 
 procedure TKPInstallKeyboard.Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; Languages: TPackageKeyboardLanguageList; Force: Boolean);
 var
@@ -98,6 +117,37 @@ var
   FKVKName: WideString;
   FCreatedIcon: Boolean;
   FLanguageID: Integer;
+
+type
+  TWSLCallback = reference to procedure(r: TRegistryErrorControlled);
+  procedure WriteSuggestedLanguages(c: TWSLCallback);
+  var
+    r: TRegistryErrorControlled;
+  begin
+    r := TRegistryErrorControlled.Create;
+    try
+      r.RootKey := HKEY_LOCAL_MACHINE;
+      if not r.OpenKey('\'+GetRegistryKeyboardInstallKey_LM(FileName)+'\'+SRegSubKey_SuggestedLanguages, True) then
+        r.RaiseLastRegistryError;
+      c(r);
+    finally
+      r.Free;
+    end;
+  end;
+
+  procedure AddLanguage(FLanguageID: Integer);
+  var
+    i: Integer;
+  begin
+    for i := 0 to High(FLanguages) do
+      if FLanguages[i] = FLanguageID then
+        Exit;
+
+    SetLength(FLanguages, Length(FLanguages)+1);
+    FLanguages[High(FLanguages)] := FLanguageID;
+  end;
+
+
 begin
   KL.MethodEnter(Self, 'Execute', [FileName,PackageName,ikPartOfPackage in FInstallOptions ,Force]);
   try
@@ -195,7 +245,15 @@ begin
           RegisterLanguageProfile(Languages[0].ID, kbdname, ki.KeyboardName, FIconFileName, Languages[0].Name);
 
           // Save the list of preferred languages for the keyboard, to the registry, for future installation.
-          ////// TODO:BCP47: AddPreferredLanguagesToRegistry(
+          WriteSuggestedLanguages(
+            procedure(r: TRegistryErrorControlled)
+            var
+              i: Integer;
+            begin
+              for i := 0 to Languages.Count - 1 do
+                r.WriteString(Languages[i].ID, Languages[i].Name);
+            end
+          );
         end
         else
         begin
@@ -204,8 +262,7 @@ begin
           //
           if ki.KeyboardID <> 0 then
           begin
-            SetLength(FLanguages, 1);
-            FLanguages[0] := ki.KeyboardID;
+            AddLanguage(ki.KeyboardID);
           end;
 
           //
@@ -220,23 +277,30 @@ begin
             Delete(FLanguage, 1, 1); // 'x'
             if TryStrToInt('$'+FLanguage, FLanguageID) then
             begin
-              SetLength(FLanguages, Length(FLanguages)+1);
-              FLanguages[High(FLanguages)] := FLanguageID;
+              AddLanguage(FLanguageID);
             end;
           end;
 
           //
           // Final fallback is to install against default language for system   // I4607
           //
-          SetLength(FLanguages, Length(FLanguages)+1);
-          FLanguages[High(FLanguages)] := HKLToLanguageID(FDefaultHKL);
+          if Length(FLanguages) = 0 then
+            AddLanguage(HKLToLanguageID(FDefaultHKL));
 
           // Registers only the first language
           RegisterLanguageProfile(FLanguages, kbdname, ki.KeyboardName, FIconFileName);   // I3581   // I3707
 
           // Save the list of preferred languages for the keyboard, translated to BCP47 tags
           // to the registry, for future installation.
-          ////// TODO:BCP47: AddPreferredLanguagesToRegistry(
+          WriteSuggestedLanguages(
+            procedure(r: TRegistryErrorControlled)
+            var
+              i: Integer;
+            begin
+              for i := 0 to High(FLanguages) do
+                r.WriteString(TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(FLanguages[i]), '');
+            end
+          );
         end;
 
         CloseKey;

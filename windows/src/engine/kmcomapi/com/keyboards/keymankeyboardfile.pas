@@ -64,7 +64,7 @@ type
     function Get_DefaultWindowsLanguages: WideString; override; safecall;
     function Get_DefaultPrimaryLanguage: Integer; override; safecall;
     function Get_Version: WideString; override; safecall;
-    function Get_Languages: IKeymanKeyboardLanguages; safecall;
+    function Get_Languages: IKeymanKeyboardLanguagesFile; safecall;
   public
     constructor Create(AContext: TKeymanContext; const Filename: Widestring; pk: TPackageKeyboard);
     destructor Destroy; override;
@@ -173,7 +173,7 @@ begin
   Result := FKeyboardInfo.KeyboardVersion;
 end;
 
-function TKeymanKeyboardFile.Get_Languages: IKeymanKeyboardLanguages;
+function TKeymanKeyboardFile.Get_Languages: IKeymanKeyboardLanguagesFile;
 begin
   Result := FLanguages;
 end;
