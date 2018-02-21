@@ -48,14 +48,14 @@ interface
 
 uses
   Windows,
-
+  PackageInfo,
   kpbase;
 
 type
   TKPInstallKeyboardOptions = set of (ikPartOfPackage);
 
   TKPInstallKeyboard = class(TKPBase)
-    procedure Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; const BCP47ID, LanguageName: string; Force: Boolean);
+    procedure Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; Languages: TPackageKeyboardLanguageList; Force: Boolean);
   private
     procedure RegisterLanguageProfile(Langs: array of Integer;
       const KeyboardName, KeyboardDescription, IconFileName: string); overload;
@@ -80,7 +80,7 @@ uses
   utilstr,
   keymanapi_TLB, Variants;
 
-procedure TKPInstallKeyboard.Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; const BCP47ID, LanguageName: string; Force: Boolean);
+procedure TKPInstallKeyboard.Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; Languages: TPackageKeyboardLanguageList; Force: Boolean);
 var
   ki: TKeyboardInfo;
   FDestPath: string;
@@ -187,9 +187,15 @@ begin
         //
         // Use BCP47ID from package metadata if it has been passed in
         //
-        if BCP47ID <> '' then
+        if Assigned(Languages) and (Languages.Count > 0) then
         begin
-          RegisterLanguageProfile(BCP47ID, kbdname, ki.KeyboardName, FIconFileName, LanguageName);
+          // Use language data from package to install; we only install
+          // the first language now and add the rest to the registry for
+          // future addition by the user
+          RegisterLanguageProfile(Languages[0].ID, kbdname, ki.KeyboardName, FIconFileName, Languages[0].Name);
+
+          // Save the list of preferred languages for the keyboard, to the registry, for future installation.
+          ////// TODO:BCP47: AddPreferredLanguagesToRegistry(
         end
         else
         begin

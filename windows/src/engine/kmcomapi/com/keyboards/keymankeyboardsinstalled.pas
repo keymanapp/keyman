@@ -97,7 +97,7 @@ procedure TKeymanKeyboardsInstalled.Install(const Filename: WideString; Force: W
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FileName, '', [], '', '', Force);
+    Execute(FileName, '', [], nil, Force);
   finally
     Free;
   end;

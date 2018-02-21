@@ -214,7 +214,7 @@ procedure TKeymanKeyboardFile.Install(Force: WordBool);
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FFileName, '', [], '', '', Force);
+    Execute(FFileName, '', [], nil, Force);
   finally
     Free;
   end;

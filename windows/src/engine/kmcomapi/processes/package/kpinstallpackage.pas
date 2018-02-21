@@ -113,26 +113,19 @@ var
   procedure InstallKeyboard(FileName: string);
   var
     kbd: TPackageKeyboard;
-    FirstBCP47ID: string;
-    FirstLanguageName: string;
+    FLanguages: TPackageKeyboardLanguageList;
   begin
     kbd := inf.Keyboards.ItemByID(GetShortKeyboardName(FileName));
     if Assigned(kbd) and (kbd.Languages.Count > 0) then
     begin
-      // Use language data from package to install
-      FirstBCP47ID := kbd.Languages[0].ID;
-      FirstLanguageName := kbd.Languages[0].Name;
+      FLanguages := kbd.Languages;
     end
     else
-    begin
-      // Legacy method, use language data from keyboard layout to install
-      FirstBCP47ID := '';
-      FirstLanguageName := '';
-    end;
+      FLanguages := nil;
 
     with TKPInstallKeyboard.Create(Context) do
     try
-      Execute(FileName, PackageName, [ikPartOfPackage], FirstBCP47ID, FirstLanguageName, Force);
+      Execute(FileName, PackageName, [ikPartOfPackage], FLanguages, Force);
     finally
       Free;
     end;
