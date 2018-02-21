@@ -670,6 +670,12 @@ class KeyboardInterface {
       }
       
       this.keymanweb.touchAliasing.setTextBeforeCaret(Pelem,t);
+
+      // Adjust deadkey positions
+      this._DeadkeyDeleteMatched(); // I3318
+      if(dn >= 0) {        
+        this._DeadkeyAdjustPos(this._SelPos(Pelem), -dn + s._kmwLength()); // I3318,I3319
+      }
       return;
     }
   
@@ -801,8 +807,6 @@ class KeyboardInterface {
     // Aim to put the newest deadkeys first.
     this._DeadKeys=[Lc].concat(this._DeadKeys);      
     //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
-    // It's possible to have deadkey-only rules.
-    this._DeadkeyDeleteMatched();
   }
 
   /**
