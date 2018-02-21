@@ -24,6 +24,7 @@
 * Converted KeymanWeb (largely) to TypeScript and streamlined the code to reflect new minimum requirements.
 * Fixed styling of "Special" keys on touch layouts
 * Added automated testing for KeymanWeb builds. (#350)
+* Change from ISO 639-3 language codes to BCP-47 language codes
 
 ## 2017-07-10 2.0.473 stable
 * 2.0 stable release build.
