@@ -34,7 +34,7 @@ interface
 
 uses
   Windows, keymanautoobject, ActiveX, ComObj, regkeyboards, keymanapi_TLB, StdVcl, kmxfile,
-  keymankeyboard, keymancontext, Classes;
+  keymankeyboard, keymancontext, Classes, PackageInfo, keymankeyboardlanguagesfile;
 
 type
   TKeymanKeyboardFile = class(TKeymanKeyboard, IKeymanKeyboardFile)
@@ -42,6 +42,7 @@ type
     FFileName: WideString;
     FError: Boolean;
     FKeyboardInfo: TKeyboardInfo;
+    FLanguages: IKeymanKeyboardLanguagesFile;
   protected
     function Serialize(Flags: TOleEnum; const ImagePath: WideString; References: TStrings): WideString;
       override;
@@ -63,8 +64,9 @@ type
     function Get_DefaultWindowsLanguages: WideString; override; safecall;
     function Get_DefaultPrimaryLanguage: Integer; override; safecall;
     function Get_Version: WideString; override; safecall;
+    function Get_Languages: IKeymanKeyboardLanguages; safecall;
   public
-    constructor Create(AContext: TKeymanContext; const Filename: Widestring);
+    constructor Create(AContext: TKeymanContext; const Filename: Widestring; pk: TPackageKeyboard);
     destructor Destroy; override;
   end;
 
@@ -75,15 +77,17 @@ uses
   keymanerrorcodes,
   kmxfileusedchars,
   kpinstallkeyboard,
+  Keyman.System.LanguageCodeUtils,
   SysUtils,
   utilkeyman,
   utilolepicture,
+  utilstr,
   utilxml,
   Variants;
 
 { TKeymanKeyboardFile }
 
-constructor TKeymanKeyboardFile.Create(AContext: TKeymanContext; const Filename: Widestring);
+constructor TKeymanKeyboardFile.Create(AContext: TKeymanContext; const Filename: Widestring; pk: TPackageKeyboard);
 begin
   inherited Create(AContext, IKeymanKeyboardFile);
 
@@ -97,6 +101,9 @@ begin
       AContext.Errors.AddFmt(KMN_E_Install_InvalidFile, VarArrayOf([Filename, E.Message]), kesError);
     end;
   end;
+  if Assigned(pk)
+    then FLanguages := TKeymanKeyboardLanguagesFile.Create(AContext, Self, pk.Languages)
+    else FLanguages := TKeymanKeyboardLanguagesFile.Create(AContext, Self, nil);
 end;
 
 destructor TKeymanKeyboardFile.Destroy;
@@ -166,6 +173,11 @@ begin
   Result := FKeyboardInfo.KeyboardVersion;
 end;
 
+function TKeymanKeyboardFile.Get_Languages: IKeymanKeyboardLanguages;
+begin
+  Result := FLanguages;
+end;
+
 function TKeymanKeyboardFile.Get_LayoutType: KeymanKeyboardLayoutType;
 begin
   if FKeyboardInfo.MnemonicLayout
@@ -180,13 +192,12 @@ end;
 
 function TKeymanKeyboardFile.Get_ID: WideString;
 begin
-  Result := GetShortKeyboardName(FFileName); // ChangeFileExt(ExtractFileName(FFileName), '');
+  Result := GetShortKeyboardName(FFileName);
 end;
 
 function TKeymanKeyboardFile.Get_DefaultBCP47Languages: WideString;
 begin
-  // TODO: Support BCP47 Languages
-  Result := FKeyboardInfo.ISO6393Languages;
+  Result := TLanguageCodeUtils.TranslateMultipleISO6393ToBCP47(FKeyboardInfo.ISO6393Languages);
 end;
 
 function TKeymanKeyboardFile.Get_DefaultPrimaryLanguage: Integer;
@@ -203,7 +214,7 @@ procedure TKeymanKeyboardFile.Install(Force: WordBool);
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FFileName, '', [], '', Force);
+    Execute(FFileName, '', [], '', '', Force);
   finally
     Free;
   end;

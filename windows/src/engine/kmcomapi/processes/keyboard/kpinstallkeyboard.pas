@@ -55,12 +55,12 @@ type
   TKPInstallKeyboardOptions = set of (ikPartOfPackage);
 
   TKPInstallKeyboard = class(TKPBase)
-    procedure Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; const BCP47ID: string; Force: Boolean);
+    procedure Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; const BCP47ID, LanguageName: string; Force: Boolean);
   private
     procedure RegisterLanguageProfile(Langs: array of Integer;
       const KeyboardName, KeyboardDescription, IconFileName: string); overload;
     procedure RegisterLanguageProfile(const BCP47Tag, KeyboardName,
-      KeyboardDescription, IconFileName: string); overload;
+      KeyboardDescription, IconFileName, LanguageName: string); overload;
   end;
 
 implementation
@@ -80,7 +80,7 @@ uses
   utilstr,
   keymanapi_TLB, Variants;
 
-procedure TKPInstallKeyboard.Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; const BCP47ID: string; Force: Boolean);
+procedure TKPInstallKeyboard.Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; const BCP47ID, LanguageName: string; Force: Boolean);
 var
   ki: TKeyboardInfo;
   FDestPath: string;
@@ -189,7 +189,7 @@ begin
         //
         if BCP47ID <> '' then
         begin
-          RegisterLanguageProfile(BCP47ID, kbdname, ki.KeyboardName, FIconFileName);
+          RegisterLanguageProfile(BCP47ID, kbdname, ki.KeyboardName, FIconFileName, LanguageName);
         end
         else
         begin
@@ -225,7 +225,12 @@ begin
           SetLength(FLanguages, Length(FLanguages)+1);
           FLanguages[High(FLanguages)] := HKLToLanguageID(FDefaultHKL);
 
+          // Registers only the first language
           RegisterLanguageProfile(FLanguages, kbdname, ki.KeyboardName, FIconFileName);   // I3581   // I3707
+
+          // Save the list of preferred languages for the keyboard, translated to BCP47 tags
+          // to the registry, for future installation.
+          ////// TODO:BCP47: AddPreferredLanguagesToRegistry(
         end;
 
         CloseKey;
@@ -296,11 +301,11 @@ begin
   end;
 end;
 
-procedure TKPInstallKeyboard.RegisterLanguageProfile(const BCP47Tag, KeyboardName, KeyboardDescription, IconFileName: string);   // I3581   // I3619   // I3707   // I3768   // I4607
+procedure TKPInstallKeyboard.RegisterLanguageProfile(const BCP47Tag, KeyboardName, KeyboardDescription, IconFileName, LanguageName: string);   // I3581   // I3619   // I3707   // I3768   // I4607
 begin
   with TKPInstallKeyboardLanguageProfiles.Create(Context) do
   try
-    Execute(KeyboardName, KeyboardDescription, BCP47Tag, IconFileName);   // I3707   // I3768   // I4607
+    Execute(KeyboardName, KeyboardDescription, BCP47Tag, IconFileName, LanguageName);   // I3707   // I3768   // I4607
   finally
     Free;
   end;

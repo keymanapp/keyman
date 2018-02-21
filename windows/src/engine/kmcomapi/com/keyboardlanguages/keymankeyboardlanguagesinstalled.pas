@@ -22,8 +22,16 @@ unit keymankeyboardlanguagesinstalled;
 interface
 
 uses
-  Windows, ActiveX, ComObj, keymanapi_TLB, StdVcl, keymanautoobject, KeymanContext,
-  keymanerrorcodes, internalinterfaces;
+  System.Win.ComObj,
+  System.Win.StdVcl,
+  Winapi.ActiveX,
+  Winapi.Windows,
+
+  keymanapi_TLB,
+  keymanautoobject,
+  KeymanContext,
+  keymanerrorcodes,
+  internalinterfaces;
 
 type
   TKeymanKeyboardLanguageList = TAutoObjectList;
@@ -84,7 +92,7 @@ var
   FKeyboardLanguage: TKeymanKeyboardLanguageInstalled;
   RootPath: string;
   FLangID: Integer;
-  FLocale: string;
+  FName, FLocale: string;
   FGUID: TGUID;
 begin
   KL.MethodEnter(Self, 'DoRefresh', []);
@@ -109,7 +117,10 @@ begin
             FLangID := ReadInteger(SRegValue_LanguageProfileLangID);
             FLocale := ReadString(SRegValue_LanguageProfileLocale);
             FGUID := StringToGUID(ReadString(SRegValue_KeymanProfileGUID));
-            FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FLocale, FLangID, FGUID);
+            if ValueExists(SRegValue_LanguageProfileName)
+              then FName := ReadString(SRegValue_LanguageProfileName)
+              else FName := '';
+            FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FLocale, FLangID, FGUID, FName);
             FLanguages.Add(FKeyboardLanguage);
           end;
         end;
@@ -140,7 +151,7 @@ begin
     FIconFileName := GetKeyboardIconFileName(FOwner.Filename);
     if not FileExists(FIconFileName) then
       FIconFileName := '';
-    Execute(FOwner.ID, FOwner.Name, BCP47Code, FIconFileName);   // I3768   // I4607
+    Execute(FOwner.ID, FOwner.Name, BCP47Code, FIconFileName, '');   // I3768   // I4607
   finally
     Free;
   end;

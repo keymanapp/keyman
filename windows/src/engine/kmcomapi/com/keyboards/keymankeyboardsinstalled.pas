@@ -97,7 +97,7 @@ procedure TKeymanKeyboardsInstalled.Install(const Filename: WideString; Force: W
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FileName, '', [], '', Force);
+    Execute(FileName, '', [], '', '', Force);
   finally
     Free;
   end;
@@ -236,7 +236,7 @@ begin
   try
     if not FileExists(Filename) then
       raise Exception.Create('File does not exist.');
-    k := TKeymanKeyboardFile.Create(Context, Filename);
+    k := TKeymanKeyboardFile.Create(Context, Filename, nil);
   except
     on E:Exception do
       ErrorFmt(KMN_E_Install_InvalidFile, VarArrayOf([Filename, E.Message]));

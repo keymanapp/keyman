@@ -189,8 +189,8 @@ type
     property Blocks: TUnicodeBlockList read FBlocks;
     property FontName: WideString read FFontName write SetFontName;
 
-    function FindLanguageByCode(code: string): TEthnologueLanguage;   // I4257
-    function FindLanguagesByName(name: string): TEthnologueLanguages;   // I4257
+//    function FindLanguageByCode(code: string): TEthnologueLanguage;   // I4257
+//    function FindLanguagesByName(name: string): TEthnologueLanguages;   // I4257
 
     property UnicodeDataUIManager: IUnicodeDataUIManager read FUnicodeDataUIManager;
   end;
@@ -1192,7 +1192,7 @@ begin
   Result.Status := Copy(rec.Collect['Status'], 1, 1)[1];
 end;
 
-function TUnicodeData.FindLanguageByCode(code: string): TEthnologueLanguage;
+{function TUnicodeData.FindLanguageByCode(code: string): TEthnologueLanguage;
 var
   rec: ADODB_TLB.Recordset;
   vRecords: OleVariant;
@@ -1213,9 +1213,9 @@ begin
   finally
     rec := nil;
   end;
-end;
+end;}
 
-function TUnicodeData.FindLanguagesByName(name: string): TEthnologueLanguages;
+{function TUnicodeData.FindLanguagesByName(name: string): TEthnologueLanguages;
 var
   rec: ADODB_TLB.Recordset;
   vRecords: OleVariant;
@@ -1237,7 +1237,7 @@ begin
   finally
     rec := nil;
   end;
-end;
+end;}
 
 procedure TUnicodeData.CleanupFilter(var filter: WideString; FBlock: Boolean);
 var

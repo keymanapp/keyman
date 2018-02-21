@@ -54,10 +54,12 @@ type
     FCode: string;
   private
     FScript: string;
+    FIsSuggested: Boolean;
   public
-    constructor Create(const ACode, AScript: string);
+    constructor Create(AIsSuggested: Boolean; const ACode, AScript, AName: string);
     destructor Destroy; override;
     function Matches(const ASearchText: string): Boolean;
+    property IsSuggested: Boolean read FIsSuggested;
     property Name: string read FName;
     property LocalName: string read FLocalName;
     property Script: string read FScript;
@@ -191,7 +193,7 @@ var
       Scripts := ScriptsBuf;
       while Scripts <> '' do
       begin
-        FLanguage := TInstLanguage.Create(sLang, Copy(Scripts, 1, 4));
+        FLanguage := TInstLanguage.Create(False, sLang, Copy(Scripts, 1, 4), '');
         FLanguages.Add(FLanguage);
 
         if sLang <> lpLocaleString then
@@ -278,8 +280,16 @@ var
   FLanguage: TInstLanguage;
   FVariantComparer: TInstLanguageVariantComparer;
   FComparer: TInstLanguageComparer;
+  i: Integer;
 begin
   FKeyboard := Value;
+
+  { Add the keyboard-defined additional languages first }
+  for i := 0 to FKeyboard.Languages.Count - 1 do
+    if not FKeyboard.Languages[i].IsInstalled then
+    begin
+      FLanguages.Add(TInstLanguage.Create(True, FKeyboard.Languages[i].BCP47Code, FKeyboard.Languages[i].Name));
+    end;
 
   { Add keyboard default language options (that are not already installed) to the list }
   if not EnumSystemLocalesEx(SystemLocalesEnumProc, LOCALE_WINDOWS or LOCALE_SUPPLEMENTAL, LPARAM(Self), nil) then
@@ -463,25 +473,35 @@ const
   LOCALE_SLOCALIZEDCOUNTRYNAME = $00000006;
   LOCALE_SNATIVECOUNTRYNAME = $0000008;
 
-constructor TInstLanguage.Create(const ACode, AScript: string);
+constructor TInstLanguage.Create(AIsSuggested: Boolean; const ACode, AScript, AName: string);
 var
   LanguageBuf: array[0..MAX_PATH-1] of WideChar;
 begin
   inherited Create;
+
+  FIsSuggested := AIsSuggested;
 
   FVariants := TInstLanguageVariantList.Create;
 
   FCode := ACode;
   FScript := AScript;
 
-  if GetLocaleInfoEx(PWidechar(ACode), LOCALE_SLOCALIZEDLANGUAGENAME, LanguageBuf, MAX_PATH) = 0 then
-    RaiseLastOSError;
-  FName := LanguageBuf;
+  if FIsSuggested then
+  begin
+    FName := AName;
+    FLocalName := AName;
+  end
+  else
+  begin
+    if GetLocaleInfoEx(PWidechar(ACode), LOCALE_SLOCALIZEDLANGUAGENAME, LanguageBuf, MAX_PATH) = 0 then
+      RaiseLastOSError;
+    FName := LanguageBuf;
 
-  if GetLocaleInfoEx(PWidechar(ACode), LOCALE_SNATIVELANGUAGENAME, LanguageBuf, MAX_PATH) = 0 then
-    RaiseLastOSError;
+    if GetLocaleInfoEx(PWidechar(ACode), LOCALE_SNATIVELANGUAGENAME, LanguageBuf, MAX_PATH) = 0 then
+      RaiseLastOSError;
 
-  FLocalName := LanguageBuf;
+    FLocalName := LanguageBuf;
+  end;
 end;
 
 destructor TInstLanguage.Destroy;

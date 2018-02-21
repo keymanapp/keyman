@@ -221,6 +221,7 @@ const
   SRegSubKey_LanguageProfiles      = { SRegKey_InstalledKeyboards + '\<keyboard>' } '\Language Profiles';  // LM CU
   SRegValue_LanguageProfileLangID = 'LangID';
   SRegValue_LanguageProfileLocale = 'Locale';
+  SRegValue_LanguageProfileName = 'Name';
 
   { InstalledPackages }
 

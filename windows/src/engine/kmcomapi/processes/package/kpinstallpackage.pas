@@ -114,22 +114,25 @@ var
   var
     kbd: TPackageKeyboard;
     FirstBCP47ID: string;
+    FirstLanguageName: string;
   begin
     kbd := inf.Keyboards.ItemByID(GetShortKeyboardName(FileName));
     if Assigned(kbd) and (kbd.Languages.Count > 0) then
     begin
       // Use language data from package to install
       FirstBCP47ID := kbd.Languages[0].ID;
+      FirstLanguageName := kbd.Languages[0].Name;
     end
     else
     begin
       // Legacy method, use language data from keyboard layout to install
       FirstBCP47ID := '';
+      FirstLanguageName := '';
     end;
 
     with TKPInstallKeyboard.Create(Context) do
     try
-      Execute(FileName, PackageName, [ikPartOfPackage], FirstBCP47ID, Force);
+      Execute(FileName, PackageName, [ikPartOfPackage], FirstBCP47ID, FirstLanguageName, Force);
     finally
       Free;
     end;
