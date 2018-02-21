@@ -644,11 +644,11 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_A"
+              "keyID": "default-K_A"
             },
             {
               "type": "osk",
-              "keyID": "K_B"
+              "keyID": "default-K_B"
             }
           ],
           "output": "(a)(b)"
@@ -657,7 +657,7 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_B"
+              "keyID": "default-K_B"
             }
           ],
           "output": "(b)"
@@ -666,11 +666,11 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_B"
+              "keyID": "default-K_B"
             },
             {
               "type": "osk",
-              "keyID": "K_B"
+              "keyID": "default-K_B"
             }
           ],
           "output": "(b)+(b)"
@@ -679,15 +679,15 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_B"
+              "keyID": "default-K_B"
             },
             {
               "type": "osk",
-              "keyID": "K_A"
+              "keyID": "default-K_A"
             },
             {
               "type": "osk",
-              "keyID": "K_B"
+              "keyID": "default-K_B"
             }
           ],
           "output": "(b)+(a)+(b)"
@@ -696,11 +696,11 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_A"
+              "keyID": "default-K_A"
             },
             {
               "type": "osk",
-              "keyID": "K_C"
+              "keyID": "default-K_C"
             }
           ],
           "output": "x"
@@ -709,15 +709,15 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_A"
+              "keyID": "default-K_A"
             },
             {
               "type": "osk",
-              "keyID": "K_D"
+              "keyID": "default-K_D"
             },
             {
               "type": "osk",
-              "keyID": "K_E"
+              "keyID": "default-K_E"
             }
           ],
           "output": "(a)(d)(e)"
@@ -726,19 +726,19 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_F"
+              "keyID": "default-K_F"
             },
             {
               "type": "osk",
-              "keyID": "K_A"
+              "keyID": "default-K_A"
             },
             {
               "type": "osk",
-              "keyID": "K_D"
+              "keyID": "default-K_D"
             },
             {
               "type": "osk",
-              "keyID": "K_E"
+              "keyID": "default-K_E"
             }
           ],
           "output": "(f)-(a)-(d)-(e)"
@@ -747,15 +747,15 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_A"
+              "keyID": "default-K_A"
             },
             {
               "type": "osk",
-              "keyID": "K_S"
+              "keyID": "default-K_S"
             },
             {
               "type": "osk",
-              "keyID": "K_PERIOD"
+              "keyID": "default-K_PERIOD"
             }
           ],
           "output": "(a)-(s)"
@@ -764,15 +764,15 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_S"
+              "keyID": "default-K_S"
             },
             {
               "type": "osk",
-              "keyID": "K_A"
+              "keyID": "default-K_A"
             },
             {
               "type": "osk",
-              "keyID": "K_PERIOD"
+              "keyID": "default-K_PERIOD"
             }
           ],
           "output": "(s)+(a)"
@@ -781,11 +781,11 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_M"
+              "keyID": "default-K_M"
             },
             {
               "type": "osk",
-              "keyID": "K_PERIOD"
+              "keyID": "default-K_PERIOD"
             }
           ],
           "output": "dk(m)"
@@ -794,11 +794,11 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_N"
+              "keyID": "default-K_N"
             },
             {
               "type": "osk",
-              "keyID": "K_PERIOD"
+              "keyID": "default-K_PERIOD"
             }
           ],
           "output": "dk(n)"
@@ -807,11 +807,11 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_O"
+              "keyID": "default-K_O"
             },
             {
               "type": "osk",
-              "keyID": "K_PERIOD"
+              "keyID": "default-K_PERIOD"
             }
           ],
           "output": "dk(o)"
@@ -820,15 +820,15 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_P"
+              "keyID": "default-K_P"
             },
             {
               "type": "osk",
-              "keyID": "K_Q"
+              "keyID": "default-K_Q"
             },
             {
               "type": "osk",
-              "keyID": "K_R"
+              "keyID": "default-K_R"
             }
           ],
           "output": "(p)(q)(r)"
@@ -837,19 +837,19 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_SHIFT"
+              "keyID": "default-K_SHIFT"
             },
             {
               "type": "osk",
-              "keyID": "K_P"
+              "keyID": "shift-K_P"
             },
             {
               "type": "osk",
-              "keyID": "K_Q"
+              "keyID": "shift-K_Q"
             },
             {
               "type": "osk",
-              "keyID": "K_R"
+              "keyID": "shift-K_R"
             }
           ],
           "output": "(P)(Q)(R)"
@@ -867,11 +867,11 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_A"
+              "keyID": "default-K_A"
             },
             {
               "type": "osk",
-              "keyID": "K_B"
+              "keyID": "default-K_B"
             }
           ],
           "output": "(a)(b)"
@@ -880,7 +880,7 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_B"
+              "keyID": "default-K_B"
             }
           ],
           "output": "(b)"
@@ -889,11 +889,11 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_B"
+              "keyID": "default-K_B"
             },
             {
               "type": "osk",
-              "keyID": "K_B"
+              "keyID": "default-K_B"
             }
           ],
           "output": "(b)+(b)"
@@ -902,15 +902,15 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_B"
+              "keyID": "default-K_B"
             },
             {
               "type": "osk",
-              "keyID": "K_A"
+              "keyID": "default-K_A"
             },
             {
               "type": "osk",
-              "keyID": "K_B"
+              "keyID": "default-K_B"
             }
           ],
           "output": "(b)+(a)+(b)"
@@ -919,11 +919,11 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_A"
+              "keyID": "default-K_A"
             },
             {
               "type": "osk",
-              "keyID": "K_C"
+              "keyID": "default-K_C"
             }
           ],
           "output": "x"
@@ -932,15 +932,15 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_A"
+              "keyID": "default-K_A"
             },
             {
               "type": "osk",
-              "keyID": "K_D"
+              "keyID": "default-K_D"
             },
             {
               "type": "osk",
-              "keyID": "K_E"
+              "keyID": "default-K_E"
             }
           ],
           "output": "(a)(d)(e)"
@@ -949,19 +949,19 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_F"
+              "keyID": "default-K_F"
             },
             {
               "type": "osk",
-              "keyID": "K_A"
+              "keyID": "default-K_A"
             },
             {
               "type": "osk",
-              "keyID": "K_D"
+              "keyID": "default-K_D"
             },
             {
               "type": "osk",
-              "keyID": "K_E"
+              "keyID": "default-K_E"
             }
           ],
           "output": "(f)-(a)-(d)-(e)"
@@ -970,15 +970,15 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_A"
+              "keyID": "default-K_A"
             },
             {
               "type": "osk",
-              "keyID": "K_S"
+              "keyID": "default-K_S"
             },
             {
               "type": "osk",
-              "keyID": "K_PERIOD"
+              "keyID": "default-K_PERIOD"
             }
           ],
           "output": "(a)-(s)"
@@ -987,15 +987,15 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_S"
+              "keyID": "default-K_S"
             },
             {
               "type": "osk",
-              "keyID": "K_A"
+              "keyID": "default-K_A"
             },
             {
               "type": "osk",
-              "keyID": "K_PERIOD"
+              "keyID": "default-K_PERIOD"
             }
           ],
           "output": "(s)+(a)"
@@ -1004,11 +1004,11 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_M"
+              "keyID": "default-K_M"
             },
             {
               "type": "osk",
-              "keyID": "K_PERIOD"
+              "keyID": "default-K_PERIOD"
             }
           ],
           "output": "dk(m)"
@@ -1017,11 +1017,11 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_N"
+              "keyID": "default-K_N"
             },
             {
               "type": "osk",
-              "keyID": "K_PERIOD"
+              "keyID": "default-K_PERIOD"
             }
           ],
           "output": "dk(n)"
@@ -1030,11 +1030,11 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_O"
+              "keyID": "default-K_O"
             },
             {
               "type": "osk",
-              "keyID": "K_PERIOD"
+              "keyID": "default-K_PERIOD"
             }
           ],
           "output": "dk(o)"
@@ -1043,11 +1043,11 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_P"
+              "keyID": "default-K_P"
             },
             {
               "type": "osk",
-              "keyID": "K_Q"
+              "keyID": "default-K_Q"
             },
             {
               "type": "osk",
@@ -1060,19 +1060,19 @@
           "inputs": [
             {
               "type": "osk",
-              "keyID": "K_SHIFT"
+              "keyID": "default-K_SHIFT"
             },
             {
               "type": "osk",
-              "keyID": "K_P"
+              "keyID": "shift-K_P"
             },
             {
               "type": "osk",
-              "keyID": "K_Q"
+              "keyID": "shift-K_Q"
             },
             {
               "type": "osk",
-              "keyID": "K_R"
+              "keyID": "shift-K_R"
             }
           ],
           "output": "(P)(Q)(R)"
