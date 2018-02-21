@@ -683,8 +683,8 @@ class KeyboardInterface {
   _Index(Ps: KeyboardStore, Pn: number): KeyboardStoreElement {        
     Ps = this._ExplodeStore(Ps);
 
-    if(this._AnyIndices[Pn] < Ps.length) {   //I3319
-      return Ps[this._AnyIndices[Pn]];
+    if(this._AnyIndices[Pn-1] < Ps.length) {   //I3319
+      return Ps[this._AnyIndices[Pn-1]];
     } else {
       /* Should this really be possible for a compiled keyboard?  
        * Should we throw an error / output a console.error("")?
@@ -705,7 +705,7 @@ class KeyboardInterface {
   indexOutput(Pdn: number, Ps: KeyboardStore, Pn: number, Pelem: HTMLElement): void {
     this.resetContextCache();
 
-    var indexChar = this._Index(Ps, Pn-1);
+    var indexChar = this._Index(Ps, Pn);
     if(typeof(indexChar) == 'string' ) {
       this.output(Pdn,Pelem,indexChar);  //I3319
     } else {

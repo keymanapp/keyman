@@ -445,7 +445,7 @@ var ANY_CONTEXT_TEST_3 = {
 var ANY_INDEX_TEST_1 = {
   id: 1,
   // Match condition for rule
-  rule: ['c', 'a', {a: "bc"}, {i:{s:"bc", o:2}}, 'a'],
+  rule: ['c', 'a', {a: "bc"}, {i:{s:"bc", o:3}}, 'a'],
   // Start of context relative to cursor
   n: 5,
   ln: 5,
@@ -485,7 +485,7 @@ var ANY_INDEX_TEST_1 = {
 var ANY_INDEX_TEST_2 = {
   id: 2,
   // Match condition for rule
-  rule: ['c', {a:"ab"}, {i: {s:"bc", o:1}}, {i:{s:"bc", o:1}}, {i:{s:"ab", o:1}}],
+  rule: ['c', {a:"ab"}, {i: {s:"bc", o:2}}, {i:{s:"bc", o:2}}, {i:{s:"ab", o:2}}],
   // Start of context relative to cursor
   n: 5,
   ln: 5,
@@ -525,7 +525,7 @@ var ANY_INDEX_TEST_2 = {
 var ANY_INDEX_TEST_3 = {
   id: 3,
   // Match condition for rule
-  rule: ['c', {a:"ab"}, {a:"bc"}, {i:{s:"bc", o:2}}, {i:{s:"ab", o:1}}],
+  rule: ['c', {a:"ab"}, {a:"bc"}, {i:{s:"bc", o:3}}, {i:{s:"ab", o:2}}],
   // Start of context relative to cursor
   n: 5,
   ln: 5,
@@ -582,13 +582,158 @@ var ANY_INDEX_TEST_3 = {
   }]
 };
 
+var DEADKEY_STORE_TEST_1 = {
+  id: 1,
+  // Match condition for rule
+  rule: [{a:[{d:0},{d:1},{d:2}]}],
+  // Start of context relative to cursor
+  n: 1,
+  ln: 1,
+  // Resulting context map
+  contextCache: [0],
+
+  baseSequence: { "output": "", "inputs": [
+    {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0}
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "", "inputs": [
+      {"type":"key","key":"3","code":"Digit3","keyCode":51,"modifierSet":0,"location":0},
+    ]},
+    result: true,
+    msg: "Rule 1: Alternate 'any' store deadkey character failed to match the rule."
+  }, {
+    sequence: { "output": "", "inputs": [
+      {"type":"key","key":"c","code":"KeyC","keyCode":67,"modifierSet":0,"location":0},
+    ]},
+    result: false,
+    msg: "Rule 1: standard character mysteriously matched a deadkey from a store."
+  }]
+};
+
+var DEADKEY_STORE_TEST_2 = {
+  id: 2,
+  // Match condition for rule
+  rule: [{a:[{d:0},'b',{d:2}]}],
+  // Start of context relative to cursor
+  n: 1,
+  ln: 1,
+  // Resulting context map
+  contextCache: [0],
+
+  baseSequence: { "output": "", "inputs": [
+    {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0}
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "", "inputs": [
+      {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
+    ]},
+    result: false,
+    msg: "Rule 2: deadkey not in store mysteriously matched within an any(store) op."
+  }, {
+    sequence: { "output": "", "inputs": [
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    ]},
+    result: true,
+    msg: "Rule 2: standard character in store failed to match within an any(store) op."
+  }]
+};
+
+var DEADKEY_STORE_TEST_3 = {
+  id: 3,
+  // Match condition for rule
+  rule: [{a:[{d:0},{d:1},{d:2}]},{i:{s:"abc", o:1}}],
+  // Start of context relative to cursor
+  n: 2,
+  ln: 2,
+  // Resulting context map
+  contextCache: [0,'a'],
+
+  baseSequence: { "output": "", "inputs": [
+    {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0},
+    {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "", "inputs": [
+      {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
+      {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0}
+    ]},
+    result: false,
+    msg: "Rule 3a: index in deadkey store not properly tracked by indexOutput."
+  }, {
+    sequence: { "output": "", "inputs": [
+      {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
+    ]},
+    result: true,
+    msg: "Rule 3a: index in deadkey store not properly tracked by indexOutput."
+  }, {
+    sequence: { "output": "", "inputs": [
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+      {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0}
+    ]},
+    result: false,
+    msg: "Rule 3: incorrectly matched rule when deadkey and character were incorrectly ordered."
+  }, {
+    sequence: { "output": "", "inputs": [
+      {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0}
+    ]},
+    result: false,
+    msg: "Rule 3: triggered when rule is one regular character out of context."
+  }, {
+    sequence: { "output": "", "inputs": [
+      {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+      {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0}
+    ]},
+    result: false,
+    msg: "Rule 3: triggered when rule is one deadkey out of context."
+  }]
+};
+
+var DEADKEY_STORE_TEST_4 = {
+  id: 4,
+  // Match condition for rule
+  rule: [{a:[{d:0},{d:1},{d:2}]},{c:1}],
+  // Start of context relative to cursor
+  n: 2,
+  ln: 2,
+  // Resulting context map
+  contextCache: [1,1],
+
+  baseSequence: { "output": "", "inputs": [
+    {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
+    {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0}
+  ]},
+  fullMatchDefs: [{
+    sequence: { "output": "", "inputs": [
+      {"type":"key","key":"2","code":"Digit2","keyCode":50,"modifierSet":0,"location":0},
+      {"type":"key","key":"1","code":"Digit1","keyCode":49,"modifierSet":0,"location":0}
+    ]},
+    result: false,
+    msg: "Rule 4: context matched to alternate (not selected) any(store) option erroneously."
+  }, {
+    sequence: { "output": "", "inputs": [
+      {"type":"key","key":"3","code":"Digit3","keyCode":51,"modifierSet":0,"location":0},
+      {"type":"key","key":"3","code":"Digit3","keyCode":51,"modifierSet":0,"location":0},
+      {"type":"key","key":"b","code":"KeyB","keyCode":66,"modifierSet":0,"location":0},
+    ]},
+    result: false,
+    msg: "Rule 4: triggered when rule is slightly out of context."
+  }]
+};
+
 var DEADKEY_RULE_SET = [ DEADKEY_TEST_1, DEADKEY_TEST_2, DEADKEY_TEST_3, DEADKEY_TEST_4, 
   DEADKEY_TEST_5, DEADKEY_TEST_6 
 ];
-var ANY_CONTEXT_RULE_SET = [ ANY_CONTEXT_TEST_1, ANY_CONTEXT_TEST_2, ANY_CONTEXT_TEST_3];
+var ANY_CONTEXT_RULE_SET = [ ANY_CONTEXT_TEST_1, ANY_CONTEXT_TEST_2, ANY_CONTEXT_TEST_3 ];
 var ANY_INDEX_RULE_SET = [ ANY_INDEX_TEST_1, ANY_INDEX_TEST_2, ANY_INDEX_TEST_3 ];
+var DEADKEY_STORE_RULE_SET = [ DEADKEY_STORE_TEST_1, DEADKEY_STORE_TEST_2, DEADKEY_STORE_TEST_3,
+  DEADKEY_STORE_TEST_4 ];
 
-var FULL_RULE_SET = [].concat(DEADKEY_RULE_SET, ANY_CONTEXT_RULE_SET, ANY_INDEX_RULE_SET);
+var FULL_RULE_SET = [].concat(DEADKEY_RULE_SET, ANY_CONTEXT_RULE_SET, ANY_INDEX_RULE_SET,
+  DEADKEY_STORE_RULE_SET);
 
 /*
  *  End definition of isolated rule testing.
@@ -654,6 +799,7 @@ describe('Engine', function() {
     });
 
     it('Store \'Explosion\'', function() {
+      // Function defined at top of file; creates supplementary pairs for extended Unicode codepoints.
       var u = toSupplementaryPairString;
       
       var STORES = [
@@ -713,6 +859,11 @@ describe('Engine', function() {
     // Tests any(), index(), and plain key interactions for `fullContextMatch`.
     it('Any + Index Rules', function() {
       runEngineRuleSet(ANY_INDEX_RULE_SET);
+    });
+
+    // Tests the use of deadkeys IN store rules.
+    it('Deadkeys in Stores', function() {
+      runEngineRuleSet(DEADKEY_STORE_RULE_SET);
     });
 
     // TODO:  add a 'resetContext' test!
