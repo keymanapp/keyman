@@ -288,7 +288,8 @@ begin
   for i := 0 to FKeyboard.Languages.Count - 1 do
     if not FKeyboard.Languages[i].IsInstalled then
     begin
-      FLanguages.Add(TInstLanguage.Create(True, FKeyboard.Languages[i].BCP47Code, FKeyboard.Languages[i].Name));
+      //TODO:BCP47: split BCP-47 into language + script + region here.
+      FLanguages.Add(TInstLanguage.Create(True, FKeyboard.Languages[i].BCP47Code, '', FKeyboard.Languages[i].Name));
     end;
 
   { Add keyboard default language options (that are not already installed) to the list }
