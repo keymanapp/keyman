@@ -132,7 +132,7 @@ public final class KMManager {
 
   // Default Keyboard Info
   public static final String KMDefault_KeyboardID = "european2";
-  public static final String KMDefault_LanguageID = "eng";
+  public static final String KMDefault_LanguageID = "en";
   public static final String KMDefault_KeyboardName = "EuroLatin2 Keyboard";
   public static final String KMDefault_LanguageName = "English";
   public static final String KMDefault_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
