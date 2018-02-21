@@ -38,6 +38,20 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
   }
 }
 
+var toSupplementaryPairString = function(code){
+  var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
+  var L = (code - 0x10000) % 0x400 + 0xDC00;
+
+  return String.fromCharCode(H, L);
+}
+
+var toEscapedSupplementaryPairString = function(code){
+  var H = (Math.floor((code - 0x10000) / 0x400) + 0xD800).toString(16);
+  var L = ((code - 0x10000) % 0x400 + 0xDC00).toString(16);
+
+  return "\\u"+H+"\\u"+L;
+}
+
 /*
  *  Start definition of isolated rule tests for validity of `fullContextMatch` (KFCM) components.
  */
@@ -637,6 +651,29 @@ describe('Engine', function() {
     after(function() {
       keyman.removeKeyboards('test_simple_deadkeys');
       fixture.cleanup();
+    });
+
+    it('Store \'Explosion\'', function() {
+      var u = toSupplementaryPairString;
+      
+      var STORES = [
+        {smp: false, in: "apple", out: ['a','p','p','l','e']},
+        //In JS-escaped form:  "\\ud804\\udd12\\ud804\\udd0d\\ud804\\udd0f\\ud804\\udd10\\ud804\\udd0a\\ud804\\udd05"
+        //(Supplementary pairs, copied from the easy_chakma keyboard.)
+        {smp: true, in: "𑄒𑄍𑄏𑄐𑄊𑄅", out: ["𑄒","𑄍","𑄏","𑄐","𑄊","𑄅"]},
+        // Built in-line via function.  Looks functionally equivalent to "apple", but with SMP characters.
+        {smp: true, in: (u(0x1d5ba)+u(0x1d5c9)+u(0x1d5c9)+u(0x1d5c5)+u(0x1d5be)), 
+          out: [u(0x1d5ba), u(0x1d5c9), u(0x1d5c9), u(0x1d5c5), u(0x1d5be)]}
+      ];
+
+      for(var i=0; i < STORES.length; i++) {
+        var s = STORES[i];
+
+        String.kmwEnableSupplementaryPlane(s.smp);
+        var result = keyman.interface._ExplodeStore(s.in);
+        assert.sameOrderedMembers(result, s.out, "Failure exploding " + (s.smp ? "SMP" : "non-SMP") + " string value \"" + s.in + "\"");
+      }
+      String.kmwEnableSupplementaryPlane(false);
     });
 
     // Tests "stage 1" of fullContextMatch - ensuring that a proper context index map is built.

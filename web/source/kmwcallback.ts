@@ -16,9 +16,10 @@
 type PlainKeyboardStore = string;
 
 // TODO:  Implement the new 'store object-orientation proposal.
-//type ComplexKeyboardStore = (string|{d: number})[]; 
+type KeyboardStoreElement = (string|{d: number});
+type ComplexKeyboardStore = KeyboardStoreElement[]; 
 
-type KeyboardStore = PlainKeyboardStore; // | ComplexKeyboardStore;
+type KeyboardStore = PlainKeyboardStore | ComplexKeyboardStore;
 type RuleChar = string;
 
 class RuleDeadkey {
@@ -433,12 +434,12 @@ class KeyboardInterface {
       } else if(rule[i]['a'] !== undefined) {
         var anySpec = rule[i] as ContextAny;
         // TODO:  Remove the `string` requirement.
-        if(!this.any(i, context[i] as string, anySpec.a)) {
+        if(!this.any(i, context[i] as string, anySpec.a as string)) {
           mismatch = true;
         }
       } else if(rule[i]['i'] !== undefined) {
         var indexSpec = rule[i] as RuleIndex;
-        var ch = this._Index(indexSpec.i.s, indexSpec.i.o);
+        var ch = this._Index(indexSpec.i.s as string, indexSpec.i.o);
 
         if(ch != context[i]) {
           mismatch = true;
@@ -617,6 +618,15 @@ class KeyboardInterface {
       this._BeepTimeout = 1;
       window.setTimeout(this.beepReset.bind(this), 50);
     }
+  }
+
+  _ExplodeStore(store: PlainKeyboardStore): ComplexKeyboardStore {
+    var result: ComplexKeyboardStore = [];
+    for(var i=0; i < store._kmwLength(); i++) {
+      result.push(store._kmwCharAt(i));
+    }
+
+    return result;
   }
   
   /**
