@@ -16,7 +16,7 @@
 type PlainKeyboardStore = string;
 
 // TODO:  Implement the new 'store object-orientation proposal.
-type KeyboardStoreElement = (string|{d: number});
+type KeyboardStoreElement = (string|{'d': number});
 type ComplexKeyboardStore = KeyboardStoreElement[]; 
 
 type KeyboardStore = PlainKeyboardStore | ComplexKeyboardStore;
@@ -434,12 +434,13 @@ class KeyboardInterface {
       } else if(rule[i]['a'] !== undefined) {
         var anySpec = rule[i] as ContextAny;
         // TODO:  Remove the `string` requirement.
-        if(!this.any(i, context[i] as string, anySpec.a as string)) {
+        var lookup = (typeof(context[i]) == 'string' ? context[i] as string : {'d': context[i] as number});
+        if(!this.any(i, lookup, anySpec.a)) {
           mismatch = true;
         }
       } else if(rule[i]['i'] !== undefined) {
         var indexSpec = rule[i] as RuleIndex;
-        var ch = this._Index(indexSpec.i.s as string, indexSpec.i.o);
+        var ch = this._Index(indexSpec.i.s, indexSpec.i.o);
 
         if(ch != context[i]) {
           mismatch = true;
@@ -620,13 +621,27 @@ class KeyboardInterface {
     }
   }
 
-  _ExplodeStore(store: PlainKeyboardStore): ComplexKeyboardStore {
-    var result: ComplexKeyboardStore = [];
-    for(var i=0; i < store._kmwLength(); i++) {
-      result.push(store._kmwCharAt(i));
-    }
+  _ExplodeStore(store: KeyboardStore): ComplexKeyboardStore {
+    if(typeof(store) == 'string') {
+      var kbdTag = this.keymanweb.keyboardManager.getActiveKeyboardTag();
 
-    return result;
+      // Is the result cached?
+      if(kbdTag.stores[store]) {
+        return kbdTag.stores[store];
+      }
+
+      // Nope, so let's build its cache.
+      var result: ComplexKeyboardStore = [];
+      for(var i=0; i < store._kmwLength(); i++) {
+        result.push(store._kmwCharAt(i));
+      }
+
+      // Cache the result for later!
+      kbdTag.stores[store] = result;
+      return result;
+    } else {
+      return store;
+    }
   }
   
   /**
@@ -638,13 +653,64 @@ class KeyboardInterface {
    * @return      {boolean}           True if character found in 'any' string, sets index accordingly
    * Description  Test for character matching
    */    
-  any(n: number, ch: string, s:string): boolean {
+  any(n: number, ch: KeyboardStoreElement, s: KeyboardStore): boolean {
     if(ch == '') {
       return false;
     }
-    var Lix = s._kmwIndexOf(ch); //I3319
+    
+    s = this._ExplodeStore(s);
+    var Lix = -1;
+    for(var i=0; i < s.length; i++) {
+      if(typeof(s[i]) == 'string') {
+        if(s[i] == ch) {
+          Lix = i;
+        }
+      } else if(s[i]['d'] === ch['d']) {
+        Lix = i;
+      }
+    }
     this._AnyIndices[n] = Lix;
     return Lix >= 0;
+  }
+
+  /**
+   * Function     _Index
+   * Scope        Public 
+   * @param       {string}      Ps      string
+   * @param       {number}      Pn      index
+   * Description  Returns the character from a store string according to the offset in the index array
+   */
+  _Index(Ps: KeyboardStore, Pn: number): KeyboardStoreElement {        
+    Ps = this._ExplodeStore(Ps);
+
+    if(this._AnyIndices[Pn] < Ps.length) {   //I3319
+      return Ps[this._AnyIndices[Pn]];
+    } else {
+      /* Should this really be possible for a compiled keyboard?  
+       * Should we throw an error / output a console.error("")?
+       */
+      return "";
+    }
+  }
+
+  /**
+   * Function     indexOutput   KIO
+   * Scope        Public
+   * @param       {number}      Pdn     no of character to overwrite (delete)
+   * @param       {string}      Ps      string
+   * @param       {number}      Pn      index
+   * @param       {Object}      Pelem   element to output to
+   * Description  Output a character selected from the string according to the offset in the index array
+   */
+  indexOutput(Pdn: number, Ps: KeyboardStore, Pn: number, Pelem: HTMLElement): void {
+    this.resetContextCache();
+
+    var indexChar = this._Index(Ps, Pn-1);
+    if(typeof(indexChar) == 'string' ) {
+      this.output(Pdn,Pelem,indexChar);  //I3319
+    } else {
+      this.deadkeyOutput(Pdn, Pelem, indexChar['d']);
+    }
   }
   
   /**
@@ -817,41 +883,6 @@ class KeyboardInterface {
     // Aim to put the newest deadkeys first.
     this._DeadKeys=[Lc].concat(this._DeadKeys);      
     //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
-  }
-
-  /**
-   * Function     _Index
-   * Scope        Public 
-   * @param       {string}      Ps      string
-   * @param       {number}      Pn      index
-   * Description  Returns the character from a store string according to the offset in the index array
-   */
-  _Index(Ps: string, Pn: number): string {
-    if(this._AnyIndices[Pn] < Ps._kmwLength()) {   //I3319
-      return Ps._kmwCharAt(this._AnyIndices[Pn]);
-    } else {
-      /* Should this really be possible for a compiled keyboard?  
-       * Should we throw an error / output a console.error("")?
-       */
-      return "";
-    }
-  }
-
-  /**
-   * Function     indexOutput   KIO
-   * Scope        Public
-   * @param       {number}      Pdn     no of character to overwrite (delete)
-   * @param       {string}      Ps      string
-   * @param       {number}      Pn      index
-   * @param       {Object}      Pelem   element to output to
-   * Description  Output a character selected from the string according to the offset in the index array
-   */
-  indexOutput(Pdn: number, Ps: string, Pn: number, Pelem: HTMLElement): void {
-    this.resetContextCache();
-    var indexChar = this._Index(Ps, Pn-1);
-    if(indexChar) {
-      this.output(Pdn,Pelem,indexChar);  //I3319
-    }
   }
 
   /**

@@ -67,6 +67,10 @@ class KeyboardStub {
   }
 }
 
+class KeyboardTag {
+  stores: {[text: string]: ComplexKeyboardStore} = {};
+}
+
 class KeyboardManager {
   // Language regions as defined by cloud server
   static readonly regions = ['World','Africa','Asia','Europe','South America','North America','Oceania','Central America','Middle East'];
@@ -98,6 +102,10 @@ class KeyboardManager {
 
   getActiveKeyboardName(): string {
     return this.activeKeyboard ? this.activeKeyboard['KI'] : '';
+  }
+
+  getActiveKeyboardTag(): KeyboardTag {
+    return this.activeKeyboard ? this.activeKeyboard['_kmw'] : null;
   }
 
   getActiveLanguage(): string {
@@ -1229,6 +1237,13 @@ class KeyboardManager {
     if(!this.keymanweb.initialized) {
       this.deferredKR.push(Pk);
       return;
+    }
+
+    if(Pk['_kmw']) {
+      console.error("The keyboard _kmw property is a reserved field for engine use only; this keyboard is invalid.");
+      return;
+    } else {
+      Pk['_kmw'] = new KeyboardTag();
     }
     
     var Li,Lstub;
