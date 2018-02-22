@@ -716,124 +716,6 @@ class KeyboardInterface {
   }
   
   /**
-   * Function     deleteContext KDC
-   * Scope        Public
-   * @param       {number}      dn      length of context to overwrite (includes deadkeys)
-   * @param       {Object}      Pelem   element to output to
-   * Description  Clears out matched and unreplicated parts of a rule's context.
-   */
-  deleteContext(dn: number, Pelem): void {
-    // Do before returning from function!
-    // this.resetContextCache();
-    
-    // KeymanTouch for Android uses direct insertion of the character string
-    if('oninserttext' in this.keymanweb) {
-      this.keymanweb['oninserttext'](dn,'');
-    }
-
-    var Ldoc: Document;
-    if(Pelem.body) {
-      Ldoc=Pelem;
-    } else {
-      Ldoc=Pelem.ownerDocument;	// I1481 - integration with rich editors not working 100%
-    }
-    var Li, Ldv;
-  
-    if(Pelem.className.indexOf('keymanweb-input') >= 0) {
-      var t=this.keymanweb.touchAliasing.getTextBeforeCaret(Pelem);
-      if(dn > 0) {
-        t=t._kmwSubstr(0,t._kmwLength()-dn); 
-      }
-      
-      this.keymanweb.touchAliasing.setTextBeforeCaret(Pelem,t);
-      return;
-    }
-  
-    if (Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&  
-        (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')      
-      ) { // I2457 - support contentEditable elements in mozilla, webkit
-      /* Editable iframe and contentEditable elements for mozilla */
-      var _IsEditableIframe = Ldoc.designMode.toLowerCase() == 'on';
-      if(_IsEditableIframe) {
-        var _CacheableCommands = this._CacheCommands(Ldoc);
-      }
-    
-      var Lsel = Ldv.getSelection();
-      var LselectionStart = Lsel.focusNode.nodeValue ? Lsel.focusNode.substringData(0,Lsel.focusOffset)._kmwLength() : 0;  // I3319
-      
-      if(!Lsel.isCollapsed) {
-        Lsel.deleteFromDocument();  // I2134, I2192
-      }
-      //KeymanWeb._Debug('KO: focusOffset='+Lsel.focusOffset+', dn='+dn+', s='+s+' focusNode.type='+Lsel.focusNode.nodeType+', focusNode.parentNode.tagName='+(Lsel.focusNode.parentNode?Lsel.focusNode.parentNode.tagName:'NULL') );
-
-      var Lrange = Lsel.getRangeAt(0);
-      if(dn > 0) {
-        Lrange.setStart(Lsel.focusNode, Lsel.focusOffset - Lsel.focusNode.nodeValue.substr(0,Lsel.focusOffset)._kmwSubstr(-dn).length); // I3319
-        Lrange.deleteContents();
-      }
-
-      //KeymanWeb._Debug('KO: focusOffset='+Lsel.focusOffset+', dn='+dn+', s='+s+' focusNode.type='+Lsel.focusNode.nodeType+', focusNode.parentNode.tagName='+(Lsel.focusNode.parentNode?Lsel.focusNode.parentNode.tagName:'NULL') );
-
-      if(_IsEditableIframe) {
-        this._CacheCommandsReset(Ldoc, _CacheableCommands, null);// I2457 - support contentEditable elements in mozilla, webkit
-      }
-      
-      Lsel.collapseToEnd();
-
-      // Adjust deadkey positions 
-      if(dn >= 0) {
-        this._DeadkeyDeleteMatched();                                  // I3318
-        this._DeadkeyAdjustPos(LselectionStart, -dn); // I3318
-      } // Internet Explorer   (including IE9)   
-    } else if (Pelem.setSelectionRange) {                                        
-      var LselectionStart, LselectionEnd;
-            
-      if(Pelem._KeymanWebSelectionStart != null) {// changed to allow a value of 0
-        LselectionStart = Pelem._KeymanWebSelectionStart;
-        LselectionEnd = Pelem._KeymanWebSelectionEnd;
-      } else {
-        LselectionStart = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionStart);  // I3319
-        LselectionEnd = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionEnd);      // I3319
-      }
-      
-      var LscrollTop, LscrollLeft;
-      if(Pelem.type.toLowerCase() == 'textarea' && typeof(Pelem.scrollTop) != 'undefined') {
-        LscrollTop = Pelem.scrollTop; LscrollLeft = Pelem.scrollLeft;
-      }
-
-      if(dn < 0) {// Don't delete, leave context alone (dn = -1)
-        Pelem.value = Pelem.value._kmwSubstring(0,LselectionStart) + Pelem.value._kmwSubstring(LselectionEnd);    //I3319
-        dn = 0;
-      } else if(LselectionStart < dn) {
-        Pelem.value = Pelem.value._kmwSubstring(LselectionEnd); //I3319
-      } else {
-        Pelem.value = Pelem.value._kmwSubstring(0,LselectionStart-dn) + Pelem.value._kmwSubstring(LselectionEnd); //I3319
-      }
-
-      // Adjust deadkey positions 
-      if(dn >= 0) {
-        this._DeadkeyDeleteMatched(); // I3318
-        this._DeadkeyAdjustPos(LselectionStart, -dn); // I3318,I3319
-      }
-
-      if (typeof(LscrollTop) != 'undefined') {
-        Pelem.scrollTop = LscrollTop;
-        Pelem.scrollLeft = LscrollLeft;
-      } 
-      var caretPos=LselectionStart-dn;                   // I3319
-      var caretPosUnits=Pelem.value._kmwCodePointToCodeUnit(caretPos);  // I3319
-      
-      Pelem.setSelectionRange(caretPosUnits,caretPosUnits);             // I3319
-      Pelem._KeymanWebSelectionStart = null; Pelem._KeymanWebSelectionEnd = null;      
-    }
-
-    // Refresh element content after change (if needed)
-    if(typeof(this.keymanweb.refreshElementContent) == 'function') {
-      this.keymanweb.refreshElementContent(Pelem);
-    }
-  }
-
-  /**
    * Function     output        KO  
    * Scope        Public
    * @param       {number}      dn      number of characters to overwrite
@@ -842,8 +724,6 @@ class KeyboardInterface {
    * Description  Keyboard output
    */    
   output(dn: number, Pelem, s:string): void {
-    this.deleteContext(dn, Pelem);
-
     this.resetContextCache();
     
     // KeymanTouch for Android uses direct insertion of the character string
@@ -860,7 +740,13 @@ class KeyboardInterface {
     var Li, Ldv;
   
     if(Pelem.className.indexOf('keymanweb-input') >= 0) {
-      var t=this.keymanweb.touchAliasing.getTextBeforeCaret(Pelem) + s;
+      var t=this.keymanweb.touchAliasing.getTextBeforeCaret(Pelem);
+      if(dn > 0) {
+        t=t._kmwSubstr(0,t._kmwLength()-dn)+s; 
+      } else {
+        t=t+s;
+      }
+      
       this.keymanweb.touchAliasing.setTextBeforeCaret(Pelem,t);
 
       // Adjust deadkey positions
@@ -1202,16 +1088,13 @@ class KeyboardInterface {
    * Scope        Private
    * Description  Delete matched deadkeys from context
    */       
-  _DeadkeyDeleteMatched(): number {              
+  _DeadkeyDeleteMatched(): void {              
     var _Dk = this._DeadKeys;
-    var cnt = 0;
     for(var Li = 0; Li < _Dk.length; Li++) {
       if(_Dk[Li].matched) {
         _Dk.splice(Li,1);
-        cnt++;
       }
     }
-    return cnt;
   }
 
   /**
