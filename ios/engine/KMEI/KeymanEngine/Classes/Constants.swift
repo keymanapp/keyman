@@ -37,7 +37,7 @@ public enum Defaults {
   private static let font = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
   public static let keyboard = InstallableKeyboard(id: "european2",
                                                    name: "EuroLatin2 Keyboard",
-                                                   languageID: "eng",
+                                                   languageID: "en",
                                                    languageName: "English",
                                                    version: "1.6",
                                                    isRTL: false,

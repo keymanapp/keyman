@@ -18,7 +18,7 @@ class ViewController: UIViewController, TextViewDelegate {
 
     let kb = InstallableKeyboard(id: "tamil99m",
                                  name: "Tamil 99M",
-                                 languageID: "tam",
+                                 languageID: "ta",
                                  languageName: "Tamil",
                                  version: "1.1",
                                  isRTL: false,
