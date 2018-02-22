@@ -82,6 +82,7 @@ goog.exportSymbol("Util.prototype.alert", Util.prototype.alert);
   exportKBCallbackWithArgs('KDM', 'deadkeyMatch', KeyboardInterface.prototype.deadkeyMatch);
   exportKBCallbackWithArgs('KB', 'beep', KeyboardInterface.prototype.beep);
   exportKBCallbackWithArgs('KA', 'any', KeyboardInterface.prototype.any);
+  exportKBCallbackWithArgs('KDC', 'deleteContext', KeyboardInterface.prototype.deleteContext);
   exportKBCallbackWithArgs('KO', 'output', KeyboardInterface.prototype.output);
   exportKBCallbackWithArgs('KDO', 'deadkeyOutput', KeyboardInterface.prototype.deadkeyOutput);
   exportKBCallbackWithArgs('KIO', 'indexOutput', KeyboardInterface.prototype.indexOutput);

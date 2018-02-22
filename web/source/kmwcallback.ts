@@ -333,7 +333,7 @@ class KeyboardInterface {
    * @param       {Object}      Pelem   Element to work with (must be currently focused element)
    * @return      {Array}               Context array (of strings and numbers) 
    */
-  private _BuildExtendedContext(n: number, ln: number, Ptarg: HTMLElement): { valContext: (string|number)[], deadContext: Deadkey[]} {
+  private _BuildExtendedContext(n: number, ln: number, Ptarg: HTMLElement): CachedExEntry {
     var cache = this.cachedContextEx.get(n, ln); 
     if(cache !== null) {
       return cache;
@@ -437,6 +437,8 @@ class KeyboardInterface {
         var lookup = (typeof(context[i]) == 'string' ? context[i] as string : {'d': context[i] as number});
         if(!this.any(i, lookup, anySpec.a)) {
           mismatch = true;
+        } else if(deadContext[i] !== undefined) {
+          deadContext[i].set();
         }
       } else if(rule[i]['i'] !== undefined) {
         var indexSpec = rule[i] as RuleIndex;
@@ -444,12 +446,16 @@ class KeyboardInterface {
 
         if(ch !== undefined && (typeof(ch) == 'string' ? ch : ch.d) !== context[i]) {
           mismatch = true;
+        } else if(deadContext[i] !== undefined) {
+          deadContext[i].set();
         }
       } else if(rule[i]['c'] !== undefined) {
         var contextSpec = rule[i] as ContextEx;
         
         if(context[contextSpec.c - 1] !== context[i]) {
           mismatch = true;
+        } else if(deadContext[i] !== undefined) {
+          deadContext[i].set();
         }
       }
     }
@@ -715,6 +721,42 @@ class KeyboardInterface {
     }
   }
   
+  
+  /**
+   * Function     deleteContext KDC  
+   * Scope        Public
+   * @param       {number}      dn      number of context entries to overwrite
+   * @param       {Object}      Pelem   element to output to 
+   * @param       {string}      s       string to output   
+   * Description  Keyboard output
+   */
+  deleteContext(dn: number, Pelem): void {
+    var context: CachedExEntry;
+
+    // We want to control exactly which deadkeys get removed.
+    if(dn > 0) {
+      context = this._BuildExtendedContext(dn, dn, Pelem);
+      for(var i=0; i < context.deadContext.length; i++) {
+        var dk = context.deadContext[i];
+
+        if(dk) {
+          // Remove deadkey in context.
+          var index = this._DeadKeys.indexOf(dk);
+          this._DeadKeys.splice(index, 1);
+
+          // Reduce our reported context size.
+          dn--;
+        }
+      }
+    }
+
+    // If a matched deadkey hasn't been deleted, we don't WANT to delete it.
+    this._DeadkeyResetMatched();
+
+    // Why reinvent the wheel?  Delete the remaining characters by 'inserting a blank string'.
+    this.output(dn, Pelem, '');
+  }
+
   /**
    * Function     output        KO  
    * Scope        Public
@@ -722,7 +764,7 @@ class KeyboardInterface {
    * @param       {Object}      Pelem   element to output to 
    * @param       {string}      s       string to output   
    * Description  Keyboard output
-   */    
+   */
   output(dn: number, Pelem, s:string): void {
     this.resetContextCache();
     
@@ -1092,7 +1134,7 @@ class KeyboardInterface {
     var _Dk = this._DeadKeys;
     for(var Li = 0; Li < _Dk.length; Li++) {
       if(_Dk[Li].matched) {
-        _Dk.splice(Li,1);
+        _Dk.splice(Li--,1); // Don't forget to decrement!
       }
     }
   }
