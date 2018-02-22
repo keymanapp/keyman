@@ -123,8 +123,8 @@ nomatch > use(qwerty_out)
   '1.    > #1              deadkey matched by any' d13 \  
   'q!    > ?               same as above, with extra deadkey output.' d13 \
   'q!.   > (qq)            deadkey matched by context() in context' d13 \
+  '11    > (1)(1)          deadkey matched by index() within context.' d13 \
   d13
-
 group(dead_reorder)
       
 c What happens when reordering deadkeys?

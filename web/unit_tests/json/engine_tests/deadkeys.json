@@ -407,6 +407,85 @@
             }
           ],
           "output": "(P)(Q)(R)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "key": "3",
+              "code": "Digit3",
+              "keyCode": 51,
+              "modifierSet": 0,
+              "location": 0
+            },
+            {
+              "type": "key",
+              "key": ".",
+              "code": "Period",
+              "keyCode": 190,
+              "modifierSet": 0,
+              "location": 0
+            }
+          ],
+          "output": "#3"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "key": "q",
+              "code": "KeyQ",
+              "keyCode": 81,
+              "modifierSet": 0,
+              "location": 0
+            },
+            {
+              "type": "key",
+              "key": "Shift",
+              "code": "ShiftLeft",
+              "keyCode": 16,
+              "modifierSet": 1,
+              "location": 1
+            },
+            {
+              "type": "key",
+              "key": "!",
+              "code": "Digit1",
+              "keyCode": 49,
+              "modifierSet": 1,
+              "location": 0
+            },
+            {
+              "type": "key",
+              "key": ".",
+              "code": "Period",
+              "keyCode": 190,
+              "modifierSet": 0,
+              "location": 0
+            }
+          ],
+          "output": "(qq)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "key": "3",
+              "code": "Digit3",
+              "keyCode": 51,
+              "modifierSet": 0,
+              "location": 0
+            },
+            {
+              "type": "key",
+              "key": "3",
+              "code": "Digit3",
+              "keyCode": 51,
+              "modifierSet": 0,
+              "location": 0
+            }
+          ],
+          "output": "(3)(3)"
         }
       ]
     },
@@ -630,6 +709,57 @@
             }
           ],
           "output": "(P)(Q)(R)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "keyID": "default-K_3"
+            },
+            {
+              "type": "osk",
+              "keyID": "default-K_PERIOD"
+            }
+          ],
+          "output": "#3"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "keyID": "default-K_W"
+            },
+            {
+              "type": "osk",
+              "keyID": "default-K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "keyID": "shift-K_1"
+            },
+            {
+              "type": "osk",
+              "keyID": "shift-K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "keyID": "default-K_PERIOD"
+            }
+          ],
+          "output": "(ww)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "keyID": "default-K_4"
+            },
+            {
+              "type": "osk",
+              "keyID": "default-K_4"
+            }
+          ],
+          "output": "(4)(4)"
         }
       ]
     },
@@ -853,6 +983,57 @@
             }
           ],
           "output": "(P)(Q)(R)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "keyID": "default-K_7"
+            },
+            {
+              "type": "osk",
+              "keyID": "default-K_PERIOD"
+            }
+          ],
+          "output": "#7"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "keyID": "default-K_R"
+            },
+            {
+              "type": "osk",
+              "keyID": "default-K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "keyID": "shift-K_1"
+            },
+            {
+              "type": "osk",
+              "keyID": "shift-K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "keyID": "default-K_PERIOD"
+            }
+          ],
+          "output": "(rr)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "keyID": "default-K_0"
+            },
+            {
+              "type": "osk",
+              "keyID": "default-K_0"
+            }
+          ],
+          "output": "(0)(0)"
         }
       ]
     },
@@ -1076,6 +1257,57 @@
             }
           ],
           "output": "(P)(Q)(R)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "keyID": "default-K_7"
+            },
+            {
+              "type": "osk",
+              "keyID": "default-K_PERIOD"
+            }
+          ],
+          "output": "#7"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "keyID": "default-K_R"
+            },
+            {
+              "type": "osk",
+              "keyID": "default-K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "keyID": "shift-K_1"
+            },
+            {
+              "type": "osk",
+              "keyID": "shift-K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "keyID": "default-K_PERIOD"
+            }
+          ],
+          "output": "(rr)"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "keyID": "default-K_0"
+            },
+            {
+              "type": "osk",
+              "keyID": "default-K_0"
+            }
+          ],
+          "output": "(0)(0)"
         }
       ]
     }
