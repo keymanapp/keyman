@@ -1,7 +1,7 @@
 // JavaScript Document samplehdr.js: Keyboard management for KeymanWeb demonstration pages
 
 /* 
-    The keyboard name and/or ISO language code must be specified for each keyboard that is to be available.  
+    The keyboard name and/or BCP-47 language code must be specified for each keyboard that is to be available.
     If the same keyboard is used for several languages, it must be listed for each
     language, but the keyboard itself will only be loaded once. 
     If two (or more) keyboards are to be available for a given language, both must be listed.
@@ -11,12 +11,12 @@
   
     Each argument to addKeyboards() is a string, for example:
       european2         loads the current version of the Eurolatin 2 keyboard (for its default language)
-      european2@fra     loads the current version of the Eurolatin 2 keyboard for French
-      european2@fra@1.2 loads version 1.2 of the Eurolatin 2 keyboard for French
+      european2@fr      loads the current version of the Eurolatin 2 keyboard for French
+      european2@fr@1.2  loads version 1.2 of the Eurolatin 2 keyboard for French
       
     Argument syntax also supports the following extensions:
-      @fra              load the current version of the default keyboard for French
-      @fra$             load all available keyboards (current version) for French
+      @fr               load the current version of the default keyboard for French
+      @fr$              load all available keyboards (current version) for French
           
     Each call to addKeyboards() requires a single call to the remote server, 
     (unless all keyboards listed are local and fully specified) so it is better
@@ -45,34 +45,34 @@
     var kmw=keyman;
     
     // The first keyboard added will be the default keyboard for touch devices.
-    // For faster loading, it may be best for the default keybaord to be 
+    // For faster loading, it may be best for the default keyboard to be
     // locally sourced.
-    kmw.addKeyboards({id:'us',name:'English',languages:{id:'eng',name:'English'},
+    kmw.addKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'},
       filename:'../us-1.0.js'});
       
     // Add more keyboards to the language menu, by keyboard name,
-    // keyboard name and language code, or just the ISO 639 language code.  
-    kmw.addKeyboards('french','european2@swe','european2@nor','@heb');
+    // keyboard name and language code, or just the BCP-47 language code.
+    kmw.addKeyboards('french','european2@sv','european2@no','@he');
   
     // Add a keyboard by language name.  Note that the name must be spelled
-    // correctly, or the keyboard will not be found.  (Using ISO codes is
+    // correctly, or the keyboard will not be found.  (Using BCP-47 codes is
     // usually easier.)
     kmw.addKeyboardsForLanguage('Dzongkha');
     
     // Add a fully-specified, locally-sourced, keyboard with custom font  
     kmw.addKeyboards({id:'lao_2008_basic',name:'Lao Basic',
       languages:{
-        id:'lao',name:'Lao',region:'Asia',
+        id:'lo',name:'Lao',region:'Asia',
         font:{family:'LaoWeb',source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']}
         },
       filename:'../lao_2008_basic.js'
-      });   
+      });
 
     // The following two optional calls should be delayed until language menus are fully loaded:
     //  (a) a specific mapped input element input is focused, to ensure that the OSK appears
-    //  (b) a specific keyboard is loaded, rather than the keyboard last used.         
-  //window.setTimeout(function(){kmw.setActiveElement('ta1',true);},2500);
-  //window.setTimeout(function(){kmw.setActiveKeyboard('Keyboard_french','fra');},3000);
+    //  (b) a specific keyboard is loaded, rather than the keyboard last used.
+    //window.setTimeout(function(){kmw.setActiveElement('ta1',true);},2500);
+    //window.setTimeout(function(){kmw.setActiveKeyboard('Keyboard_french','fr');},3000);
   
     // Note that locally specified keyboards will be listed before keyboards 
     // requested from the remote server by user interfaces that do not order

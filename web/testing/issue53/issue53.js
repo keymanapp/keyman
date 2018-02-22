@@ -1,7 +1,7 @@
 // JavaScript Document samplehdr.js: Keyboard management for KeymanWeb demonstration pages
 
 /* 
-    The keyboard name and/or ISO language code must be specified for each keyboard that is to be available.  
+    The keyboard name and/or BCP-47 code must be specified for each keyboard that is to be available.
     If the same keyboard is used for several languages, it must be listed for each
     language, but the keyboard itself will only be loaded once. 
     If two (or more) keyboards are to be available for a given language, both must be listed.
@@ -11,12 +11,12 @@
   
     Each argument to addKeyboards() is a string, for example:
       european2         loads the current version of the Eurolatin 2 keyboard (for its default language)
-      european2@fra     loads the current version of the Eurolatin 2 keyboard for French
-      european2@fra@1.2 loads version 1.2 of the Eurolatin 2 keyboard for French
+      european2@fr     loads the current version of the Eurolatin 2 keyboard for French
+      european2@fr@1.2 loads version 1.2 of the Eurolatin 2 keyboard for French
       
     Argument syntax also supports the following extensions:
-      @fra              load the current version of the default keyboard for French
-      @fra$             load all available keyboards (current version) for French
+      @fr              load the current version of the default keyboard for French
+      @fr$             load all available keyboards (current version) for French
           
     Each call to addKeyboards() requires a single call to the remote server, 
     (unless all keyboards listed are local and fully specified) so it is better
@@ -65,11 +65,7 @@
         break;
       case 2:
         sKbd=document.getElementById('kbd_id2').value.toLowerCase();
-        var rx=new RegExp(/^\w{3,3}$\$?/);    
-        if(rx.test(sKbd))
-          kmw.addKeyboards('@'+sKbd);
-        else        
-          alert('An ISO 639 language code must be exactly 3 letters long!');
+        kmw.addKeyboards('@'+sKbd);
         break;
       case 3:
         sKbd=document.getElementById('kbd_id3').value;
@@ -86,7 +82,7 @@
   
   // Add keyboard on Enter (as well as pressing button)
   function clickOnEnter(e,id)
-  {                                       
+  {
     e = e || window.event;
     if(e.keyCode == 13) addKeyboard(id); 
   }

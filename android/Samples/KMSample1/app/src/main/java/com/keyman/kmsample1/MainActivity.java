@@ -36,7 +36,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     HashMap<String, String> kbInfo = new HashMap<String, String>();
     kbInfo.put(KMManager.KMKey_PackageID, "cloud");
     kbInfo.put(KMManager.KMKey_KeyboardID, "tamil99m");
-    kbInfo.put(KMManager.KMKey_LanguageID, "tam");
+    kbInfo.put(KMManager.KMKey_LanguageID, "ta");
     kbInfo.put(KMManager.KMKey_KeyboardName, "Tamil 99M");
     kbInfo.put(KMManager.KMKey_LanguageName, "Tamil");
     kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.1");
@@ -94,7 +94,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   public void onKeyboardLoaded(KeyboardType keyboardType) {
     // Handle Keyman keyboard loaded event here if needed
     // We can set our custom keyboard here
-    int kbIndex = KMManager.getKeyboardIndex(this, "tamil99m", "tam");
+    int kbIndex = KMManager.getKeyboardIndex(this, "tamil99m", "ta");
     KMManager.setKeyboard(this, kbIndex);
   }
 
