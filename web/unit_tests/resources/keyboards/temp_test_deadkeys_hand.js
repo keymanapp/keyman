@@ -29,10 +29,10 @@ function Keyboard_test_deadkeys()
   this.KM=0;
   this.KBVER="1.0";
   this.KMBM=0x0010;
-  this.s_deadnums="..........";
-  this.s_livenums="01234556789";
+  this.s_deadnums=[{d:0},{d:1},{d:2},{d:3},{d:4},{d:5},{d:6},{d:7},{d:8},{d:9}];
+  this.s_livenums="0123456789";
   this.s_liveQwerty="qwerty";
-  this.s_deadQwerty="......";
+  this.s_deadQwerty=[{d:10},{d:11},{d:12},{d:13},{d:14},{d:15}];
   this.KVER="10.0.1014.0";
   this.gs=function(t,e) {
     return this.g_main(t,e);
@@ -59,6 +59,29 @@ function Keyboard_test_deadkeys()
       r=m=1;
       k.KO(0,t,"(s)+(a)");
     }
+    // ---- START: Unsure where Developer would place these lines, which are fully handwritten. ---- //
+    else if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(3,t,['?',{a:this.s_deadQwerty},{c:2}])) { // Line 78
+      r=m=1;
+      // Hmm... we might need a rethink on how KO interacts with deadkeys.
+      // If s_deadQwerty were a mixed character + deadkey store, we wouldn't know
+      // KO's first argument!
+      k.KO(1,t,'(');
+      k.KIO(0,this.s_liveQwerty,2,t);
+      k.KIO(0,this.s_liveQwerty,2,t);
+      k.KO(0,t,')');
+    }
+    else if(k.KKM(e, 0x4010, 0x31)&&k.KFCM(1,t,[{a:this.s_liveQwerty}])) { // Line 77
+      r=m=1;
+      k.KO(1,t,'?');
+      k.KIO(0,this.s_deadQwerty,1,t);
+      k.KIO(0,this.s_deadQwerty,1,t);
+    }
+    else if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(1,t,[{a:this.s_deadnums}])) { // Line 76
+      r=m=1;
+      k.KO(0,t,'#');
+      k.KIO(0,this.s_livenums,1,t);
+    }
+    // ---- END: Unsure where Developer would place these lines, which are fully handwritten. ---- //
     else if(k.KKM(e, 0x4000, 0x30)) {   // Line 64
       r=m=1;
       k.KDO(0,t,0);
@@ -252,6 +275,10 @@ function Keyboard_test_deadkeys()
     
       r=this.g_dead_reorder(t,e);
     }
+    if(!m&&k.KIK(e)) {
+      r=1;
+      r=this.g_qwerty_out(t,e);
+    }
     return r;
   };
   this.g_dead_reorder=function(t,e) {
@@ -275,6 +302,42 @@ function Keyboard_test_deadkeys()
       m=1;
       k.KDO(0,t,4);
       k.KDO(-1,t,3);
+    }
+    else if(k.KFCM(2,t,[{a:this.s_deadnums},{i:{o:1,s:this.s_deadnums}}])) { // Line 138
+      m=1;
+      k.KO(0,t,'(');
+      k.KIO(0,this.s_livenums,1,t);
+      k.KO(0,t,')(');
+      k.KIO(0,this.s_livenums,1,t);
+      k.KO(0,t,')');
+    }
+    return r;
+  };
+  this.g_qwerty_out=function(t,e) {
+    var k=KeymanWeb,r=0,m=0;
+    if(k.KKM(e, 0x4000, 0x45)) {   // Line 145
+      r=m=1;
+      k.KO(0,t,"e");
+    }
+    else if(k.KKM(e, 0x4000, 0x51)) {   // Line 143
+      r=m=1;
+      k.KO(0,t,"q");
+    }
+    else if(k.KKM(e, 0x4000, 0x52)) {   // Line 146
+      r=m=1;
+      k.KO(0,t,"r");
+    }
+    else if(k.KKM(e, 0x4000, 0x54)) {   // Line 147
+      r=m=1;
+      k.KO(0,t,"t");
+    }
+    else if(k.KKM(e, 0x4000, 0x57)) {   // Line 144
+      r=m=1;
+      k.KO(0,t,"w");
+    }
+    else if(k.KKM(e, 0x4000, 0x59)) {   // Line 148
+      r=m=1;
+      k.KO(0,t,"y");
     }
     return r;
   };

@@ -1,15 +1,16 @@
-﻿store(&TARGETS) 'any windows'
+﻿store(&VERSION) "10.0"
+store(&TARGETS) 'any windows'
 store(&LANGUAGE) 'x0409'
 store(&WINDOWSLANGUAGES) 'x0409'
 store(&VISUALKEYBOARD) 'test_deadkeys.kvks'
 store(&NAME) 'Keyman Deadkey Stress-Tester'
-store(&COPYRIGHT) '© 2018 SIL International'
+store(&COPYRIGHT) '© 2018 SIL International'  
 begin Unicode > use(main)
 
 group(main) using keys
 
 store(deadnums) dk(0) dk(1) dk(2) dk(3) dk(4) dk(5) dk(6) dk(7) dk(8) dk(9)
-store(livenums) '01234556789'  
+store(livenums) '0123456789'  
                                                      
 store(liveQwerty) 'qwerty'
 store(deadQwerty) dk(q) dk(w) dk(e) dk(r) dk(t) dk(y)
@@ -70,7 +71,7 @@ c Basic digits > 'deadnums' - deadkey per number.
 + '6' > dk(6)
 + '7' > dk(7)
 + '8' > dk(8)
-+ '9' > dk(9)
++ '9' > dk(9)  
 
 c any/index with deadkeys in stores.
 c any(deadnums) + '.' > '#' index(livenums, 1)
@@ -97,7 +98,7 @@ dk(B) + 'C' > 'abc'
 'ab' dk(C) 'd' + 'E' > 'success'
 
 match > use(dead_reorder) 
-
+nomatch > use(qwerty_out)
 + '?' > \
   'ab    > (a)(b)          tests basic deadkey' d13 \
   'b     > (b)             only matches if "a" not pressed first' d13 \
@@ -137,3 +138,12 @@ c Since 'index' cannot function in the 'key' part of a rule, we place the
 c 'index in context' test within this group.
 c any(deadnums) index(deadnums, 1) > '(' index(livenums, 1) ')(' index(livenums, 1) ')'
 
+c Needed for KMW testing, as the characters will not be output on plain keystrokes otherwise.
+group(qwerty_out) using keys 
+
++ 'q' > 'q'
++ 'w' > 'w'
++ 'e' > 'e'
++ 'r' > 'r'
++ 't' > 't'
++ 'y' > 'y'
