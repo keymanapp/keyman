@@ -109,6 +109,28 @@ var
   PackageName, dest, prog, errmsg: string;
   FErrorValue: Cardinal;
   FSrcFileName: string;
+
+  procedure InstallKeyboard(FileName: string);
+  var
+    kbd: TPackageKeyboard;
+    FLanguages: TPackageKeyboardLanguageList;
+  begin
+    kbd := inf.Keyboards.ItemByID(GetShortKeyboardName(FileName));
+    if Assigned(kbd) and (kbd.Languages.Count > 0) then
+    begin
+      FLanguages := kbd.Languages;
+    end
+    else
+      FLanguages := nil;
+
+    with TKPInstallKeyboard.Create(Context) do
+    try
+      Execute(FileName, PackageName, [ikPartOfPackage], FLanguages, Force);
+    finally
+      Free;
+    end;
+  end;
+
 begin
   KL.MethodEnter(Self, 'Execute', [FileName, Force]);
   try
@@ -222,13 +244,8 @@ begin
                 end;
               end;
             ftKeymanFile:
-              // I1109: Don't install non-selected keyboards for Light
-              with TKPInstallKeyboard.Create(Context) do
-              try
-                Execute(dest + inf.Files[i].FileName, PackageName, [ikPartOfPackage], Force);
-              finally
-                Free;
-              end;
+              InstallKeyboard(dest + inf.Files[i].FileName);
+
             ftPackageFile:
               with TKPInstallPackage.Create(Context) do
               try

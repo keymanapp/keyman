@@ -155,7 +155,7 @@
                   <div class="list-languages">
                     <div class="list-languages-title"><xsl:value-of select="$locale/String[@Id='S_Caption_Languages']"/></div>
                     <div>
-                      <xsl:apply-templates select="KeymanKeyboardLanguagesInstalled/KeymanKeyboardLanguageInstalled" />
+                      <xsl:apply-templates select="KeymanKeyboardLanguagesInstalled/KeymanKeyboardLanguageInstalled[isinstalled]" />
                       <div class='list-languages-add'>
                         <xsl:call-template name="button">
                           <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Languages_Install']"/></xsl:with-param>

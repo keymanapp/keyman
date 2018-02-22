@@ -41,8 +41,21 @@ unit keymankeyboardinstalled;  // I3306
 interface
 
 uses
-  Windows, Classes, ActiveX, ComObj, keymanapi_TLB, StdVcl, keymanautoobject, RegKeyboards,
-  keymanvisualkeyboard, keymankeyboard, Graphics, keymancontext, msctf, internalinterfaces;
+  System.Classes,
+  System.Win.ComObj,
+  System.Win.StdVcl,
+  Vcl.Graphics,
+  Winapi.ActiveX,
+  Winapi.MsCTF,
+  Winapi.Windows,
+
+  keymanapi_TLB,
+  keymanautoobject,
+  RegKeyboards,
+  keymanvisualkeyboard,
+  keymankeyboard,
+  keymancontext,
+  internalinterfaces;
 
 type
   TKeymanKeyboardInstalled = class;
@@ -107,14 +120,25 @@ type
 implementation
 
 uses
-  ComServ, SysUtils, KPUninstallKeyboard, isadmin,
-  OnlineConstants, kmxfile,
-  ErrorControlledRegistry, RegistryKeys, custinterfaces,
+  System.SysUtils,
+  System.Variants,
+
+  Keyman.System.LanguageCodeUtils,
+
+  KPUninstallKeyboard,
+  isadmin,
+  OnlineConstants,
+  kmxfile,
+  ErrorControlledRegistry,
+  RegistryKeys,
+  custinterfaces,
   KPInstallVisualKeyboard,
   KPRecompileMnemonicKeyboard,
   keymanhotkey,
-  keymankeyboardlanguagesinstalled, keymankeyboardoptions,
-  keymanerrorcodes, Variants, utilxml;
+  keymankeyboardlanguagesinstalled,
+  keymankeyboardoptions,
+  keymanerrorcodes,
+  utilxml;
 
 procedure TKeymanKeyboardInstalled.Uninstall;
 begin
@@ -144,7 +168,7 @@ end;
 
 function TKeymanKeyboardInstalled.Get_DefaultBCP47Languages: WideString;
 begin
-  Result := FRegKeyboard.BC47Languages;
+  Result := TLanguageCodeUtils.TranslateMultipleISO6393ToBCP47(FRegKeyboard.ISO6393Languages);
 end;
 
 function TKeymanKeyboardInstalled.Get_DefaultHotkey: IKeymanHotkey;
@@ -215,7 +239,7 @@ begin
   if ((Flags and ksfExportImages) = ksfExportImages) and Assigned(FRegKeyboard.Icon) then
   begin
     FBitmap := XMLImageTempName(ImagePath, References);
-    with TBitmap.Create do
+    with Vcl.Graphics.TBitmap.Create do
     try
       Width := 16;
       Height := 16;

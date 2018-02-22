@@ -17,7 +17,11 @@ uses
   Winapi.ActiveX,
   Keyman.Test.Console.KeymanAPIHost in 'Keyman.Test.Console.KeymanAPIHost.pas',
   keymanapi_TLB in '..\..\..\engine\kmcomapi\keymanapi_TLB.pas',
-  KeymanOptionNames in '..\..\..\global\delphi\general\KeymanOptionNames.pas';
+  KeymanOptionNames in '..\..\..\global\delphi\general\KeymanOptionNames.pas',
+  Keyman.Test.Console.KeymanAPITest_BCP47 in 'Keyman.Test.Console.KeymanAPITest_BCP47.pas',
+  Keyman.Test.Console.KeymanAPITest_Base in 'Keyman.Test.Console.KeymanAPITest_Base.pas',
+  RegistryKeys in '..\..\..\global\delphi\general\RegistryKeys.pas',
+  KeymanVersion in '..\..\..\global\delphi\general\KeymanVersion.pas';
 
 var
   runner : ITestRunner;

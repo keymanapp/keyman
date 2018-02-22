@@ -57,6 +57,8 @@ implementation
 
 uses
   Windows,
+  utilkeyman,
+  PackageInfo,
   ComServ, SysUtils, keymanerrorcodes, keymankeyboardinstalled, keymankeyboardfile, utilfiletypes, Variants;
 
 { TKeymanPackageContentKeyboards }
@@ -130,12 +132,21 @@ end;
 constructor TKeymanPackageContentKeyboardsFile.Create(AContext: TKeymanContext; const ASourcePath: string; const kmpinf: TKMPInfFile);
 var
   i: Integer;
+
+  procedure AddKeyboard;
+  var
+    FPackageKeyboard: TPackageKeyboard;
+  begin
+    FPackageKeyboard := kmpinf.Keyboards.ItemByID(GetShortKeyboardName(kmpinf.Files[i].FileName));
+    FKeyboards.Add(TKeymanKeyboardFile.Create(AContext, ASourcePath + kmpinf.Files[i].FileName, FPackageKeyboard));
+  end;
+
 begin
   inherited Create(AContext, True);
 
   for i := 0 to kmpinf.Files.Count - 1 do
     if kmpinf.Files[i].FileType = ftKeymanFile then
-      FKeyboards.Add(TKeymanKeyboardFile.Create(AContext, ASourcePath + kmpinf.Files[i].FileName));
+      AddKeyboard;
 end;
 
 end.

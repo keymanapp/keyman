@@ -242,7 +242,6 @@ begin
 
       GetSystemStore(Memory, TSS_WINDOWSLANGUAGES, ki.WindowsLanguages);
       GetSystemStore(Memory, TSS_ETHNOLOGUECODE, ki.ISO6393Languages);
-      // TODO: BCP47: work belongs here for translation of language codes?
 
       if not GetSystemStore(Memory, TSS_KEYBOARDVERSION, ki.KeyboardVersion) then   // I4136
         ki.KeyboardVersion := '1.0';
