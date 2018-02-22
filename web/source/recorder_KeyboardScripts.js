@@ -92,11 +92,7 @@
         break;
       case 2:
         sKbd=document.getElementById('kbd_id2').value.toLowerCase();
-        var rx=new RegExp(/^\w{2,3}$\$?/);
-        if(rx.test(sKbd))
-            keyman.addKeyboards('@'+sKbd);
-        else
-            alert('A BCP-47 language code must be exactly 2-3 letters long!');
+        keyman.addKeyboards('@'+sKbd);
         break;
       case 3:
         sKbd=document.getElementById('kbd_id3').value;
