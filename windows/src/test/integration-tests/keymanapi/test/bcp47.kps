@@ -33,7 +33,7 @@
       <RTL>True</RTL>
       <Languages>
         <Language ID="tpi">Tok Pisin</Language>
-        <Language ID="abg">Abaga</Language>
+        <Language ID="abg-Latn">Abaga</Language>
       </Languages>
     </Keyboard>
   </Keyboards>

@@ -59,6 +59,7 @@ inherited frmInstallKeyboardLanguage: TfrmInstallKeyboardLanguage
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect, goThumbTracking]
     TabOrder = 1
     OnClick = gridLanguagesClick
+    OnDrawCell = gridLanguagesDrawCell
     ColWidths = (
       64
       64
