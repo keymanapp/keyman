@@ -48,7 +48,7 @@ public class KeymanPackage
   }
   
   public func infoHtml() -> String {
-    let welcomePath = self.sourceFolder.appendingPathComponent("Welcome.htm")
+    let welcomePath = self.sourceFolder.appendingPathComponent("welcome.htm")
     
     if FileManager.default.fileExists(atPath: welcomePath.path) {
       if let html = try? String(contentsOfFile: welcomePath.path, encoding: String.Encoding.utf8) {
