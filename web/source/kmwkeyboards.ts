@@ -1141,7 +1141,7 @@ class KeyboardManager {
       Lscript = this.keymanweb.util._CreateElement('script');
     
     URL = URL + ((arguments.length > 1) && byLanguage ? 'languages' : 'keyboards')
-      +'?jsonp=keyman.register&version='+this.keymanweb['version']+'.'+KeymanBase['__BUILD__'];
+      +'?jsonp=keyman.register&languageidtype=bcp47&version='+this.keymanweb['version']+'.'+KeymanBase['__BUILD__'];
 
     var kbdManager = this;
     

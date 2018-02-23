@@ -45,6 +45,7 @@ type
     fIsOption: BOOL;    // I2556
     fIsDebug: BOOL;     // I2556
     fIsCall: BOOL;      // I2556
+    line: Integer;
   end;
 
   PFILE_STORE = ^FILE_STORE;

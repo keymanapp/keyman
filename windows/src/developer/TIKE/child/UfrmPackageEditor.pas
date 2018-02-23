@@ -1457,7 +1457,7 @@ end;
 
 function TfrmPackageEditor.LookupLanguageName(bcp47id: string): string;
 begin
-  // TODO: BCP47: HERE GOETH THE MAGIC
+  // TODO: BCP47: <DeveloperBCP47LanguageLookup>
   Result := bcp47id;
 end;
 

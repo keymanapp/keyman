@@ -20,14 +20,19 @@ android {
 }
 
 repositories {
-    google()
     flatDir {
         dirs 'libs'
     }
+    google()
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:25.1.0'
+    implementation 'com.android.support:appcompat-v7:25.2.0'
+    implementation 'com.google.firebase:firebase-core:11.8.0'
+    implementation 'com.google.firebase:firebase-crash:11.8.0'
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.0@aar') {
+        transitive = true
+    }
     api (name:'keyman-engine', ext:'aar')
 }

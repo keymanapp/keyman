@@ -39,27 +39,27 @@ function Keyboard_test_deadkeys()
   };
   this.g_main=function(t,e) {
     var k=KeymanWeb,r=0,m=0;
-    if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(7,t,['(','o',')',{d:18},'(','o',')'])) {   // Line 51
+    if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(7,t,['(','o',')',{t:'d',d:18},'(','o',')'])) {   // Line 51
       r=m=1;
       k.KDC(7,t);
       k.KO(0,t,"dk(o)");
     }
-    else if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(4,t,[{d:18},'(','m',')'])) {   // Line 45
+    else if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(4,t,[{t:'d',d:18},'(','m',')'])) {   // Line 45
       r=m=1;
       k.KDC(4,t);
       k.KO(0,t,"dk(m)");
     }
-    else if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(4,t,['(','n',')',{d:18}])) {   // Line 48
+    else if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(4,t,['(','n',')',{t:'d',d:18}])) {   // Line 48
       r=m=1;
       k.KDC(4,t);
       k.KO(0,t,"dk(n)");
     }
-    else if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(2,t,[{d:16},{d:17}])) {   // Line 40
+    else if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(2,t,[{t:'d',d:16},{t:'d',d:17}])) {   // Line 40
       r=m=1;
       k.KDC(2,t);
       k.KO(0,t,"(a)-(s)");
     }
-    else if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(2,t,[{d:17},{d:16}])) {   // Line 41
+    else if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(2,t,[{t:'d',d:17},{t:'d',d:16}])) {   // Line 41
       r=m=1;
       k.KDC(2,t);
       k.KO(0,t,"(s)+(a)");
@@ -135,13 +135,13 @@ function Keyboard_test_deadkeys()
       r=m=1;
       k.KDO(0,t,16);
     }
-    else if(k.KKM(e, 0x4010, 0x42)&&k.KFCM(1, t, [{d:16}])) {   // Line 94
+    else if(k.KKM(e, 0x4010, 0x42)&&k.KFCM(1, t, [{t:'d',d:16}])) {   // Line 94
       r=m=1;
       k.KDC(1,t);
       k.KO(0,t,"ab");
       k.KDO(-1,t,21);
     }
-    else if(k.KKM(e, 0x4010, 0x43)&&k.KFCM(1, t, [{d:22}])) {   // Line 95
+    else if(k.KKM(e, 0x4010, 0x43)&&k.KFCM(1, t, [{t:'d',d:22}])) {   // Line 95
       r=m=1;
       k.KDC(1,t);
       k.KO(0,t,"abc");
@@ -151,7 +151,7 @@ function Keyboard_test_deadkeys()
       k.KDC(3,t);
       k.KO(0,t,"$abc$d");
     }
-    else if(k.KKM(e, 0x4010, 0x45)&&k.KFCM(4,t,['a','b',{d:23},'d'])) {   // Line 96
+    else if(k.KKM(e, 0x4010, 0x45)&&k.KFCM(4,t,['a','b',{t:'d',d:23},'d'])) {   // Line 96
       r=m=1;
       k.KDC(4,t);
       k.KO(0,t,"success");
@@ -162,17 +162,17 @@ function Keyboard_test_deadkeys()
       k.KDO(-1,t,20);
       k.KO(-1,t,"(P)");
     }
-    else if(k.KKM(e, 0x4010, 0x51)&&k.KFCM(4,t,[{d:20},'(','P',')'])) {   // Line 59
+    else if(k.KKM(e, 0x4010, 0x51)&&k.KFCM(4,t,[{t:'d',d:20},'(','P',')'])) {   // Line 59
       r=m=1;
       k.KDC(4,t);
       k.KO(0,t,"(P)(Q)");
     }
-    else if(k.KKM(e, 0x4010, 0x52)&&k.KFCM(8,t,[{d:20},{d:20},'(','P',')','(','Q',')'])) {   // Line 61
+    else if(k.KKM(e, 0x4010, 0x52)&&k.KFCM(8,t,[{t:'d',d:20},{t:'d',d:20},'(','P',')','(','Q',')'])) {   // Line 61
       r=m=1;
       k.KDC(8,t);
       k.KO(0,t,"ERROR");
     }
-    else if(k.KKM(e, 0x4010, 0x52)&&k.KFCM(7,t,[{d:20},'(','P',')','(','Q',')'])) {   // Line 60
+    else if(k.KKM(e, 0x4010, 0x52)&&k.KFCM(7,t,[{t:'d',d:20},'(','P',')','(','Q',')'])) {   // Line 60
       r=m=1;
       k.KDC(7,t);
       k.KO(0,t,"(P)(Q)(R)");
@@ -181,27 +181,27 @@ function Keyboard_test_deadkeys()
       r=m=1;
       k.KDO(0,t,16);
     }
-    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(6,t,[{d:2},'d','e','a','d','1'])) {   // Line 84
+    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(6,t,[{t:'d',d:2},'d','e','a','d','1'])) {   // Line 84
       r=m=1;
       k.KDC(6,t);
       k.KO(0,t,"ERROR");
     }
-    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(6,t,[{d:1},'d','e','a','d','2'])) {   // Line 85
+    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(6,t,[{t:'d',d:1},'d','e','a','d','2'])) {   // Line 85
       r=m=1;
       k.KDC(6,t);
       k.KO(0,t,"success");
     }
-    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(6,t,[{d:4},'d','e','a','d','3'])) {   // Line 89
+    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(6,t,[{t:'d',d:4},'d','e','a','d','3'])) {   // Line 89
       r=m=1;
       k.KDC(6,t);
       k.KO(0,t,"success");
     }
-    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(6,t,[{d:3},'d','e','a','d','4'])) {   // Line 90
+    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(6,t,[{t:'d',d:3},'d','e','a','d','4'])) {   // Line 90
       r=m=1;
       k.KDC(6,t);
       k.KO(0,t,"ERROR");
     }
-    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(4,t,['(','b',')',{d:16}])) {   // Line 24
+    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(4,t,['(','b',')',{t:'d',d:16}])) {   // Line 24
       r=m=1;
       k.KDC(4,t);
       k.KO(0,t,"(b)+(a)+(b)");
@@ -211,27 +211,27 @@ function Keyboard_test_deadkeys()
       k.KDC(3,t);
       k.KO(0,t,"(b)+(b)");
     }
-    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(1, t, [{d:16}])) {   // Line 19
+    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(1, t, [{t:'d',d:16}])) {   // Line 19
       r=m=1;
       k.KDC(1,t);
       k.KO(0,t,"(a)(b)");
     }
-    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(1, t, [{d:2}])) {   // Line 82
+    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(1, t, [{t:'d',d:2}])) {   // Line 82
       r=m=1;
       k.KDC(1,t);
       k.KO(0,t,"dead2");
     }
-    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(1, t, [{d:1}])) {   // Line 83
+    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(1, t, [{t:'d',d:1}])) {   // Line 83
       r=m=1;
       k.KDC(1,t);
       k.KO(0,t,"dead1");
     }
-    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(1, t, [{d:4}])) {   // Line 87
+    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(1, t, [{t:'d',d:4}])) {   // Line 87
       r=m=1;
       k.KDC(1,t);
       k.KO(0,t,"dead4");
     }
-    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(1, t, [{d:3}])) {   // Line 88
+    else if(k.KKM(e, 0x4000, 0x42)&&k.KFCM(1, t, [{t:'d',d:3}])) {   // Line 88
       r=m=1;
       k.KDC(1,t);
       k.KO(0,t,"dead3");
@@ -240,7 +240,7 @@ function Keyboard_test_deadkeys()
       r=m=1;
       k.KO(0,t,"(b)");
     }
-    else if(k.KKM(e, 0x4000, 0x43)&&k.KFCM(1, t, [{d:16}])) {   // Line 27
+    else if(k.KKM(e, 0x4000, 0x43)&&k.KFCM(1, t, [{t:'d',d:16}])) {   // Line 27
       r=m=1;
       k.KDC(1,t);
       k.KO(0,t,"x");
@@ -249,12 +249,12 @@ function Keyboard_test_deadkeys()
       r=m=1;
       k.KO(0,t,"d");
     }
-    else if(k.KKM(e, 0x4000, 0x45)&&k.KFCM(3,t,['f',{d:16},'d'])) {   // Line 35
+    else if(k.KKM(e, 0x4000, 0x45)&&k.KFCM(3,t,['f',{t:'d',d:16},'d'])) {   // Line 35
       r=m=1;
       k.KDC(3,t);
       k.KO(0,t,"(f)-(a)-(d)-(e)");
     }
-    else if(k.KKM(e, 0x4000, 0x45)&&k.KFCM(2,t,[{d:16},'d'])) {   // Line 34
+    else if(k.KKM(e, 0x4000, 0x45)&&k.KFCM(2,t,[{t:'d',d:16},'d'])) {   // Line 34
       r=m=1;
       k.KDC(2,t);
       k.KO(0,t,"(a)(d)(e)");
@@ -285,12 +285,12 @@ function Keyboard_test_deadkeys()
       k.KDO(-1,t,10);
       k.KO(-1,t,"(p)");
     }
-    else if(k.KKM(e, 0x4000, 0x51)&&k.KFCM(4,t,[{d:10},'(','p',')'])) {   // Line 55
+    else if(k.KKM(e, 0x4000, 0x51)&&k.KFCM(4,t,[{t:'d',d:10},'(','p',')'])) {   // Line 55
       r=m=1;
       k.KDC(4,t);
       k.KO(0,t,"(p)(q)");
     }
-    else if(k.KKM(e, 0x4000, 0x52)&&k.KFCM(7,t,[{d:19},'(','p',')','(','q',')'])) {   // Line 56
+    else if(k.KKM(e, 0x4000, 0x52)&&k.KFCM(7,t,[{t:'d',d:19},'(','p',')','(','q',')'])) {   // Line 56
       r=m=1;
       k.KDC(7,t);
       k.KO(0,t,"(p)(q)(r)");
@@ -318,18 +318,18 @@ function Keyboard_test_deadkeys()
       k.KDO(-1,t,23);
       k.KO(-1,t,"d");
     }
-    else if(k.KFCM(3,t,['a','b',{d:21}])) {   // Line 133
+    else if(k.KFCM(3,t,['a','b',{t:'d',d:21}])) {   // Line 133
       m=1;
       k.KDC(3,t);
       k.KDO(0,t,22);
     }
-    else if(k.KFCM(2,t,[{d:2},{d:1}])) {   // Line 130
+    else if(k.KFCM(2,t,[{t:'d',d:2},{t:'d',d:1}])) {   // Line 130
       m=1;
       k.KDC(2,t);
       k.KDO(0,t,1);
       k.KDO(-1,t,2);
     }
-    else if(k.KFCM(2,t,[{d:3},{d:4}])) {   // Line 131
+    else if(k.KFCM(2,t,[{t:'d',d:3},{t:'d',d:4}])) {   // Line 131
       m=1;
       k.KDC(2,t);
       k.KDO(0,t,4);

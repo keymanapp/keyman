@@ -11,9 +11,7 @@
 #include <compfile.h>
 #include <compiler.h>
 #include <comperr.h>
-
-BOOL AddCompileString(LPSTR buf);
-BOOL AddCompileMessage(DWORD msg);
+#include <kmcmpdll.h>
 
 BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
   char buf[128];

@@ -172,8 +172,10 @@
     <ClInclude Include="..\..\global\inc\ConvertUTF.h" />
     <ClInclude Include="..\..\global\inc\crc32.h" />
     <ClInclude Include="..\..\global\inc\debugstore.h" />
+    <ClInclude Include="DeprecationChecks.h" />
     <ClInclude Include="Edition.h" />
     <ClInclude Include="keyman64.h" />
+    <ClInclude Include="kmcmpdll.h" />
     <ClInclude Include="NamedCodeConstants.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="..\..\global\inc\unicode.h" />
@@ -199,6 +201,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="..\..\global\vc\crc32.cpp" />
+    <ClCompile Include="DeprecationChecks.cpp" />
     <ClCompile Include="Edition.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>

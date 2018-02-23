@@ -15,7 +15,7 @@
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         android:contentDescription="@string/image_button"
-        android:src="@android:drawable/ic_menu_add"
+        android:src="@drawable/ic_content_add"
         android:visibility="gone" />
     
     <LinearLayout

@@ -79,6 +79,7 @@ struct FILE_STORE {
   BOOL fIsOption;
   BOOL fIsDebug;
   BOOL fIsCall;
+  int line;
 	};
 
 typedef FILE_STORE *PFILE_STORE;

@@ -30,6 +30,6 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:contentDescription="@string/image_button"
-        android:src="@android:drawable/ic_menu_close_clear_cancel" />
+        android:src="@drawable/ic_action_close" />
     
 </RelativeLayout>

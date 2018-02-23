@@ -221,8 +221,6 @@ begin
 
     kmpinf.RemoveFilePaths;
 
-    // TODO: BCP47: Validate BCP-47 codes
-
     psf := TPackageContentFile.Create(kmpinf);
     psf.FileName := 'kmp.inf';
     psf.Description := 'Package information';

@@ -39,7 +39,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     HashMap<String, String> chiralityKBInfo = new HashMap<String, String>();
     chiralityKBInfo.put(KMManager.KMKey_PackageID, "cloud");
     chiralityKBInfo.put(KMManager.KMKey_KeyboardID, "chirality");
-    chiralityKBInfo.put(KMManager.KMKey_LanguageID, "eng");
+    chiralityKBInfo.put(KMManager.KMKey_LanguageID, "en");
     chiralityKBInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
     chiralityKBInfo.put(KMManager.KMKey_LanguageName, "English");
     chiralityKBInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
@@ -50,7 +50,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     HashMap<String, String> longpressKBbInfo = new HashMap<String, String>();
     longpressKBbInfo.put(KMManager.KMKey_PackageID, "cloud");
     longpressKBbInfo.put(KMManager.KMKey_KeyboardID, "longpress");
-    longpressKBbInfo.put(KMManager.KMKey_LanguageID, "eng");
+    longpressKBbInfo.put(KMManager.KMKey_LanguageID, "en");
     longpressKBbInfo.put(KMManager.KMKey_KeyboardName, "Longpress Keyboard");
     longpressKBbInfo.put(KMManager.KMKey_LanguageName, "English");
     longpressKBbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
