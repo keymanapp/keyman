@@ -165,16 +165,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   @objc func installAdHocBtnHandler() {
     if let adhocDir = _adhocDirectory {
-
-      let title = "Finished"
-      var message = "All keyboards installed successfully"
-
       self.window?.rootViewController?.dismiss(animated: true, completion: {
         do {
           try Manager.shared.parseKMP(adhocDir)
           self.showSimpleAlert(title: "Success", message: "All keyboards installed successfully.")
         } catch {
           self.showKMPError(error as! KMPError)
+        }
+        
+        //this can fail gracefully and not show errors to users
+        do {
+          try FileManager.default.removeItem(at: adhocDir)
+        } catch {
+          log.error("unable to delete temp files")
         }
       })
     }
