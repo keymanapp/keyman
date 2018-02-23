@@ -122,12 +122,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       if let kmp = kmp {
         self.promptAdHocInstall(kmp)
       } else {
-        self.showKMPError()
+        self.showKMPError(KMPError.invalidPackage)
       }
     })
   }
 
-  public func showKMPError() {
+  public func showKMPError(_ error: KMPError) {
+    showSimpleAlert(title: "Error", message: error.rawValue)
+  }
+
+  public func showSimpleAlert(title: String, message: String) {
+    let alertController = UIAlertController(title: title, message: message,
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertActionStyle.default,
+                                            handler: nil))
+
+    self.window?.rootViewController?.present(alertController, animated: true, completion: nil)
   }
 
   public func promptAdHocInstall(_ kmp: KeymanPackage) {
@@ -136,7 +147,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let vc = UIViewController()
     vc.view.backgroundColor = .red
     let wkWebView = WKWebView.init(frame: vc.view.frame)
-    wkWebView.backgroundColor = .blue
+    wkWebView.backgroundColor = .white
     vc.view.addSubview(wkWebView)
     let cancelBtn = UIBarButtonItem(title: "Cancel", style: .plain,
                                     target: self,
@@ -155,19 +166,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   @objc func installAdHocBtnHandler() {
     if let adhocDir = _adhocDirectory {
-      Manager.shared.parseKMP(adhocDir, complete: { count in
-        print("count: \(count)")
-        self.window?.rootViewController?.dismiss(animated: true, completion: {
-          let title = count == 0 ? "Error" : "Success"
-          let message = "\(count) keyboard(s) installed"
-          let alertController = UIAlertController(title: title, message:
-           message, preferredStyle: UIAlertControllerStyle.alert)
-          alertController.addAction(UIAlertAction(title: "OK",
-                                                  style: UIAlertActionStyle.default,
-                                                  handler: nil))
 
-           self.window?.rootViewController?.present(alertController, animated: true, completion: nil)
-        })
+      let title = "Finished"
+      var message = "All keyboards installed successfully"
+
+      self.window?.rootViewController?.dismiss(animated: true, completion: {
+        do {
+          try Manager.shared.parseKMP(adhocDir)
+          self.showSimpleAlert(title: "Success", message: "All keyboards installed successfully.")
+        } catch {
+          self.showKMPError(error as! KMPError)
+        }
       })
     }
   }
