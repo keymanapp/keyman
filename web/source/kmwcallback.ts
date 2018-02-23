@@ -49,8 +49,6 @@ class RuleIndex {
   ['t']: 'i';
   
   /**
-   * Existence of this property indicates the object reflects an "index" statement.  
-   * 
    * Value:  {'s': the Store from which to output, 'o': the Offset into the current rule's context.}
    */
   ['i']: {'s': KeyboardStore, 'o': number}; // For 'i'ndex statement.
@@ -62,8 +60,6 @@ class ContextEx {
   ['t']: 'c';
   
   /**
-   * Existence of this property indicates that the object reflects a "context" Keyman language statement.
-   * 
    * Value:  The offset into the current rule's context to be matched.
    */
   ['c']: number; // For 'c'ontext statement.
@@ -445,33 +441,28 @@ class KeyboardInterface {
         var r = rule[i] as ContextNonCharEntry;
         switch(r.t) {
           case 'd':
-            var deadSpec = r as RuleDeadkey;
             // We still need to set a flag here; 
-            if(deadSpec['d'] != context[i]) {
+            if(r['d'] != context[i]) {
               mismatch = true;
             } else {
               deadContext[i].set();
             }
             break;
           case 'a':
-            var anySpec = r as ContextAny;
             // TODO:  Remove the `string` requirement.
-            if(!this.any(i, context[i] as string, anySpec.a)) {
+            if(!this.any(i, context[i] as string, r.a)) {
               mismatch = true;
             }
             break;
           case 'i':
-            var indexSpec = r as RuleIndex;
-            var ch = this._Index(indexSpec.i.s, indexSpec.i.o);
+            var ch = this._Index(r.i.s, r.i.o);
 
             if(ch != context[i]) {
               mismatch = true;
             }
             break;
-          case 'c':
-            var contextSpec = r as ContextEx;
-            
-            if(context[contextSpec.c - 1] != context[i]) {
+          case 'c':            
+            if(context[r.c - 1] != context[i]) {
               mismatch = true;
             }
             break;
