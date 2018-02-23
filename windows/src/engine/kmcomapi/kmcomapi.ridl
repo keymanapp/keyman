@@ -879,6 +879,7 @@ library keymanapi
 
   [
     uuid(7DC22BC0-85BB-45C0-8EDB-A2F4BD1D500B),
+    helpstring("http://help.keyman.com/developer/engine/desktop/10.0/api/IKeymanKeyboardLanguagesInstalled"),
     dual,
     oleautomation
   ]
@@ -894,6 +895,7 @@ library keymanapi
 
   [
     uuid(5F90BCDA-F1C1-433A-8FD0-B498299D3C30),
+    helpstring("http://help.keyman.com/developer/engine/desktop/10.0/api/IKeymanKeyboardLanguagesFile"),
     dual,
     oleautomation
   ]
