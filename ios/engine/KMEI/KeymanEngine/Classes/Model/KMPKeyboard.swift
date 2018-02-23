@@ -44,13 +44,6 @@ public class KMPKeyboard
   }
   
   public var isValid: Bool {
-//    print("\(self.name != nil)")
-//    print("\(self.keyboardId != nil)")
-//    print("\(installableKeyboards.count > 0)")
-//    print("\(self.languages.count > 0)")
-//    print("\(kmp.sourceFolder.appendingPathComponent("\(keyboardId!).js").path)")
-//    print("\(FileManager.default.fileExists(atPath: kmp.sourceFolder.appendingPathComponent("\(keyboardId!).js").path))")
-//
     return self.name != nil
       && self.keyboardId != nil
       && installableKeyboards.count > 0

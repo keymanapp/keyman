@@ -73,7 +73,7 @@ public class KeymanPackage
         }
       }
     } catch {
-      print("error parsing kmp")
+      log.error("error parsing keyman package: \(error)")
     }
     
     return nil
@@ -81,8 +81,6 @@ public class KeymanPackage
   
   static public func extract(fileUrl: URL, destination: URL, complete: @escaping (KeymanPackage?) -> Void)
   {
-    print("fileUrl:\(fileUrl)")
-    print("destination:\(destination)")
     Manager.shared.unzipFile(fileUrl: fileUrl, destination: destination) {
       complete(KeymanPackage.parse(destination))
     }

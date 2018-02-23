@@ -26,12 +26,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     destinationUrl.appendPathComponent("\(url.lastPathComponent).zip")
     do {
       try FileManager.default.copyItem(at: url, to: destinationUrl)
+      installAdhocKeyboard(url: destinationUrl)
     } catch {
-      print ("coudn't copy file")
+      showKMPError(KMPError.copyFiles)
     }
-
-    //print("options: \(options)")
-    installAdhocKeyboard(url: destinationUrl)
+    
     return true
   }
 

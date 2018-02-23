@@ -428,28 +428,24 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         }
       }
     } catch {
-      // handle error
-      print("error")
+      log.error("error parsing kmp: \(error)")
       throw KMPError.invalidPackage
     }
   }
   
   public func unzipFile(fileUrl: URL, destination: URL, complete: @escaping () -> Void)
   {
-    print("fileUrl:\(fileUrl)")
-    print("destination:\(destination)")
     do {
       try Zip.unzipFile(fileUrl, destination: destination, overwrite: true,
                         password: nil,
                         progress: { (progress) -> () in
-                          print(progress)
                           //TODO: add timeout
                           if(progress == 1.0) {
                             complete()
                           }
                         })
     } catch {
-      print("could not unzip file")
+      log.error("error unzipping archive: \(error)")
     }
   }
 
