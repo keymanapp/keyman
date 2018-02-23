@@ -363,9 +363,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
     
   // MARK: - Adhoc keyboards
-
-  
-  public func parseKMP(_ folder: URL, complete: @escaping (Int) -> Void) {
+  public func parseKMP(_ folder: URL) throws -> Void {
     do {
       var path = folder
       path.appendPathComponent("kmp.json")
@@ -401,38 +399,38 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                                                       withIntermediateDirectories: true)
             } catch {
               log.error("Could not create dir for download: \(error)")
-              return
+              throw KMPError.fileSystem
             }
             
-            installableKeyboards.forEach({ (keyboard) in
+            for keyboard in installableKeyboards {
               let storedPath = Storage.active.keyboardURL(for: keyboard)
               let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk)
               let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font)
               
-              var installableFiles: [[Any]] = [["\(keyboardID).js", storedPath],
+              let installableFiles: [[Any]] = [["\(keyboardID).js", storedPath],
                                                 [osk, oskPath],
                                                 [font, displayPath]]
-              installableFiles.forEach({ (item) in
-                var filePath = folder
-                filePath.appendPathComponent(item[0] as! String)
-                do {
+              do {
+                for item in installableFiles {
+                  var filePath = folder
+                  filePath.appendPathComponent(item[0] as! String)
                   try FileManager.default.copyItem(at: filePath,
                                                    to: item[1] as! URL)
-                } catch {
-                  log.error("Error saving the download: \(error)")
+                  
                 }
-              })
+              } catch {
+                log.error("Error saving the download: \(error)")
+                throw KMPError.copyFiles
+              }
               Manager.shared.addKeyboard(keyboard)
-            })
-            
-            complete( installableKeyboards.count )
+            }
           }
         }
       }
     } catch {
       // handle error
       print("error")
-      complete(0)
+      throw KMPError.invalidPackage
     }
   }
   
