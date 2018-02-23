@@ -17,7 +17,8 @@ type
     class procedure BuildLCIDToBCP47; static;
   public
     class function TranslateISO6393ToBCP47(codes: TStringDynArray): TStringDynArray; overload; static;
-    class function TranslateISO6393ToBCP47(code: string): string; overload; static;
+    class function TranslateISO6393ToBCP47(code: string): string; overload; static; // single code
+    class function TranslateMultipleISO6393ToBCP47(codes: string): string; static; // multiple space/punct separated codes
 
     class function TranslateWindowsLanguagesToBCP47(codes: TIntegerDynArray): TStringDynArray; overload; static;
     class function TranslateWindowsLanguagesToBCP47(code: Integer): string; overload; static;
@@ -53,6 +54,21 @@ begin
 
   if not FISO6393ToBCP47.TryGetValue(code, Result) then
     Result := code;
+end;
+
+class function TLanguageCodeUtils.TranslateMultipleISO6393ToBCP47(codes: string): string;
+var
+  t: string;
+begin
+  Result := '';
+  t := StrToken(codes, ' ,.;:/');
+  while t <> '' do
+  begin
+    Result := Result + TLanguageCodeUtils.TranslateISO6393ToBCP47(t) + ' ';
+    t := StrToken(codes, ' ,.;:/');
+  end;
+  Result := Trim(Result);
+
 end;
 
 class function TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(codes: TIntegerDynArray): TStringDynArray;

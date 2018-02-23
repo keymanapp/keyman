@@ -7,7 +7,6 @@ inherited frmSelectBCP47Language: TfrmSelectBCP47Language
   ClientWidth = 436
   Position = poScreenCenter
   OnDestroy = FormDestroy
-  ExplicitWidth = 442
   ExplicitHeight = 215
   PixelsPerInch = 96
   TextHeight = 13

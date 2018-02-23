@@ -127,7 +127,7 @@ type
     property ProductID: Integer read FProductID;
     property MnemonicLayout: Boolean read FMnemonicLayout;
     property WindowsLanguages: WideString read FWindowsLanguages;
-    property BC47Languages: WideString read FISO6393Languages;
+    property ISO6393Languages: WideString read FISO6393Languages;
     property KeyboardLanguageID: Cardinal read FKeyboardLanguageID;
     property KeyboardVersion: string read FKeyboardVersion;   // I4136
 

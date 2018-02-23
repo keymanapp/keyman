@@ -44,7 +44,7 @@ type
   TKPInstallKeyboardLanguageProfiles = class(TKPBase)
     // Expects LANGIDs and LocaleNames in format 'en-US en 0409';
     procedure Execute(const KeyboardName, KeyboardDescription: string; LangIDs: array of Integer; IconFileName: string; InstallFirstOnly: Boolean); overload;  // I3707   // I3768   // I4607
-    procedure Execute(const KeyboardName, KeyboardDescription, BCP47Tag, IconFileName: string); overload;  // I3707   // I3768   // I4607
+    procedure Execute(const KeyboardName, KeyboardDescription, BCP47Tag, IconFileName, LanguageName: string); overload;  // I3707   // I3768   // I4607
     constructor Create(AContext: TKeymanContext);
     destructor Destroy; override;
   private
@@ -54,7 +54,7 @@ type
     RootPath: string;
     PIconFileName: PWideChar;
     FWin8Languages: TWindows8LanguageList;
-    function RegisterLocale(KeyboardName, BCP47Tag: string; LangID: Integer; IconFileName: string): Boolean;   // I3768
+    function RegisterLocale(KeyboardName, BCP47Tag: string; LangID: Integer; IconFileName, LanguageName: string): Boolean;   // I3768
     function ConvertLangIDToBCP47Tag(LangID: Integer; var Locale: string): Boolean;
     function ConvertBCP47TagToLangID(Locale: string; var LangID: Integer): Boolean;
     function InstallBCP47Language(const FLocaleName: string): Boolean;
@@ -154,7 +154,7 @@ begin
     if reg.OpenKey(RootPath, True) then
     begin
       for i := 0 to High(LangIDs) do
-        if RegisterLocale(KeyboardDescription, '', LangIDs[i], IconFileName) and InstallFirstOnly then   // I3707   // I3768   // I4607
+        if RegisterLocale(KeyboardDescription, '', LangIDs[i], IconFileName, '') and InstallFirstOnly then   // I3707   // I3768   // I4607
           Break;
     end;
   finally
@@ -164,7 +164,7 @@ begin
   Context.Control.AutoApplyKeyman;
 end;
 
-procedure TKPInstallKeyboardLanguageProfiles.Execute(const KeyboardName, KeyboardDescription, BCP47Tag, IconFileName: string);
+procedure TKPInstallKeyboardLanguageProfiles.Execute(const KeyboardName, KeyboardDescription, BCP47Tag, IconFileName, LanguageName: string);
 var
   FIsAdmin: Boolean;
 begin
@@ -188,7 +188,7 @@ begin
     end;
 
     if reg.OpenKey(RootPath, True) then
-      RegisterLocale(KeyboardDescription, BCP47Tag, 0, IconFileName);   // I3707   // I3768   // I4607
+      RegisterLocale(KeyboardDescription, BCP47Tag, 0, IconFileName, LanguageName);   // I3707   // I3768   // I4607
   finally
     reg.Free;
   end;
@@ -221,7 +221,8 @@ begin
   end;
 end;
 
-function TKPInstallKeyboardLanguageProfiles.RegisterLocale(KeyboardName, BCP47Tag: string; LangID: Integer; IconFileName: string): Boolean;   // I3768
+function TKPInstallKeyboardLanguageProfiles.RegisterLocale(KeyboardName, BCP47Tag: string; LangID: Integer;
+  IconFileName, LanguageName: string): Boolean;   // I3768
 var
   guid: TGUID;
   FLayoutInstallString: string;
@@ -274,6 +275,7 @@ begin
   reg.OpenKey('\' + RootPath + '\' + BCP47Tag, True);
   reg.WriteInteger(SRegValue_LanguageProfileLangID, LangID);
   reg.WriteString(SRegValue_LanguageProfileLocale, BCP47Tag);
+  reg.WriteString(SRegValue_LanguageProfileName, LanguageName);
 
   if not reg.ValueExists(SRegValue_KeymanProfileGUID) then
   begin

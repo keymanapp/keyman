@@ -217,3 +217,8 @@ BEGIN
     CWARN_DontMixChiralAndNonChiralModifiers "Don't mix the use of left/right modifiers with non-left/right modifiers in the same platform"
     CWARN_MixingLeftAndRightModifiers        "Left and right modifiers should not both be used in the same rule"
 END
+
+STRINGTABLE
+BEGIN
+    CWARN_LanguageHeadersDeprecatedInKeyman10 "This language header has been deprecated in Keyman 10. Instead, add language metadata in the package file"
+END

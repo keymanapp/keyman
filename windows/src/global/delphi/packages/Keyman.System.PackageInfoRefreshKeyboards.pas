@@ -23,6 +23,8 @@ type
     function DoesFileMatchKeyboardID(f: TPackageContentFile;
       const id: string): Boolean;
     function IsKeyboardFileByContent(f: TPackageContentFile): Boolean;
+    function CheckKeyboardLanguages: Boolean;
+    function CheckKeyboardTargetVersions: Boolean;
   public
     type TPackageKeyboardInfo = record
       Name, ID, Version: string;
@@ -47,6 +49,8 @@ uses
   System.RegularExpressions,
   System.SysUtils,
 
+  BCP47Tag,
+
   Keyman.System.KMXFileLanguages,
   Keyman.System.KeyboardJSInfo,
   Keyman.System.KeyboardUtils,
@@ -56,6 +60,9 @@ const
   SError_KeyboardVersionsDoNotMatch = 'Keyboard with ID ''%0:s'' is included with two differing versions: ''%1:s'', ''%2:s''. The keyboard versions must be consistent.';
   SError_TooManyTargetFilesForKeyboardID = 'Keyboard with ID ''%0:s'' is included too many times (%1:d) in the package. You should have at most 1 .kmx and 1 .js file';
   SError_CannotHaveSameKeyboardTwiceWithSameTarget = 'Keyboard with ID ''%0:s'' should have at most 1 .kmx and 1 .js file in the package';
+
+  SError_LanguageTagIsNotValid = 'Keyboard with ID ''%0:s'' has a BCP 47 error: %2:s.';
+  SWarning_LanguageTagIsNotCanonical = 'Keyboard with ID ''%0:s'' has a BCP 47 warning: %2:s.';
 
 constructor TPackageInfoRefreshKeyboards.Create(Apack: TPackage);
 begin
@@ -81,10 +88,7 @@ function TPackageInfoRefreshKeyboards.Execute: Boolean;
 var
   i: Integer;
   k: TPackageKeyboard;
-  ids: TIntegerDynArray;
   pki: TPackageKeyboardInfo;
-  j: Integer;
-  v: array[0..1] of TPackageKeyboardInfo;
 begin
   // Remove keyboards that do not have corresponding files
   for i := pack.Keyboards.Count - 1 downto 0 do
@@ -120,6 +124,16 @@ begin
     end;
   end;
 
+  Result := CheckKeyboardTargetVersions;
+  Result := CheckKeyboardLanguages and Result; // Always check all for comprehensive error messagess
+end;
+
+function TPackageInfoRefreshKeyboards.CheckKeyboardTargetVersions: Boolean;
+var
+  i, j: Integer;
+  v: array[0..1] of TPackageKeyboardInfo;
+  ids: TIntegerDynArray;
+begin
   // Test that each keyboard has at most one target file for each platform and
   // that the versions match
   for i := 0 to pack.Keyboards.Count - 1 do
@@ -155,6 +169,36 @@ begin
   end;
 
   Result := True;
+end;
+
+function TPackageInfoRefreshKeyboards.CheckKeyboardLanguages: Boolean;
+var
+  kbd: TPackageKeyboard;
+  lang: TPackageKeyboardLanguage;
+  msg: string;
+begin
+  Result := True;
+
+  for kbd in pack.Keyboards do
+  begin
+    for lang in kbd.Languages do
+    begin
+      with TBCP47Tag.Create(lang.ID) do
+      try
+        if not IsValid(msg) then
+        begin
+          DoError(Format(SError_LanguageTagIsNotValid, [kbd.ID, lang.ID, msg]), plsError);
+          Result := False;
+        end
+        else if not IsCanonical(msg) then
+        begin
+          DoError(Format(SWarning_LanguageTagIsNotCanonical, [kbd.ID, lang.ID, msg]), plsWarning);
+        end;
+      finally
+        Free;
+      end;
+    end;
+  end;
 end;
 
 function TPackageInfoRefreshKeyboards.IsKeyboardFileByContent(f: TPackageContentFile): Boolean;
@@ -206,7 +250,7 @@ begin
       begin
         lang := TPackageKeyboardLanguage.Create(f.Package);
         lang.ID := codes[i];
-        // TODO: BCP47: Lookup default names
+        // TODO: BCP47: <DeveloperBCP47LanguageLookup> Lookup default names
         lang.Name := codes[i];
         k.Languages.Add(lang);
       end;

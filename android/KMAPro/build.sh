@@ -2,7 +2,7 @@
 # Build KMAPro
 
 display_usage ( ) {
-    echo "build.sh [-no-daemon]"
+    echo "build.sh [-no-daemon] [-debug]"
     echo
     echo "Build Keyman for Android"
     echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"

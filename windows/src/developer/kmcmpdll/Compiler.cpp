@@ -79,6 +79,9 @@
 #include <comperr.h>
 #include <vkeys.h>
 #include <versioning.h>
+#include <kmcmpdll.h>
+#include <DeprecationChecks.h>
+
 #include "virtualcharkeys.h"
 
 #include "crc32.h"
@@ -288,10 +291,6 @@ BOOL AddCompileMessage(DWORD msg)
 
 	return FALSE;
 }
-
-#define SetError(err)       { if(AddCompileMessage(err)) return FALSE; }
-#define AddWarning(warn)    { if(AddCompileMessage(warn)) return FALSE; }
-
 	
 extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL ASaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
 {
@@ -560,7 +559,14 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
 
 	delete str;
 
-  return CheckKeyboardFinalVersion(fk);
+  if (!CheckKeyboardFinalVersion(fk)) {
+    return FALSE;
+  }
+
+  /* Flag presence of deprecated features */
+  CheckForDeprecatedFeatures(fk);
+
+  return TRUE;
 }
 
 DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
@@ -598,13 +604,6 @@ DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
 	return CERR_None;
 }
 
-DWORD WarnDeprecatedCode() {   // I4866
-  if(FWarnDeprecatedCode) {
-    AddWarning(CWARN_HeaderStatementIsDeprecated);
-  }
-  return CERR_None;
-}
-
 DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 {
 	PWSTR p, q, pp;
@@ -640,7 +639,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 		break;
 
 	case T_NAME:
-    WarnDeprecatedCode();   // I4866
+    WarnDeprecatedHeader();   // I4866
 		q = GetDelimitedString(&p, L"\"\"", 0);
 		if( !q ) return CERR_InvalidName;
 		
@@ -648,7 +647,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 		break;
 
 	case T_COPYRIGHT:
-    WarnDeprecatedCode();   // I4866
+    WarnDeprecatedHeader();   // I4866
 		q = GetDelimitedString(&p, L"\"\"", 0);
 		if(!q) return CERR_InvalidCopyright;
 
@@ -656,7 +655,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 		break;
 	
   case T_MESSAGE:
-    WarnDeprecatedCode();   // I4866
+    WarnDeprecatedHeader();   // I4866
 		q = GetDelimitedString(&p, L"\"\"", 0);
 		if(!q) return CERR_InvalidMessage;
 
@@ -664,7 +663,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 		break;
 
 	case T_LANGUAGENAME:
-    WarnDeprecatedCode();   // I4866
+    WarnDeprecatedHeader();   // I4866
 		q = GetDelimitedString(&p, L"\"\"", 0);
 		if(!q) return CERR_InvalidLanguageName;
 
@@ -673,7 +672,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 
 	case T_LANGUAGE:
     {
-      WarnDeprecatedCode();   // I4866
+      WarnDeprecatedHeader();   // I4866
       wchar_t *tokcontext = NULL;
 		  q = wcstok_s(p, L"\n", &tokcontext);  // I3481
 		  if((msg = AddStore(fk, TSS_LANGUAGE, q)) != CERR_None) return msg;
@@ -681,30 +680,30 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
     }
 	case T_LAYOUT:
     {
-      WarnDeprecatedCode();   // I4866
+      WarnDeprecatedHeader();   // I4866
       wchar_t *tokcontext = NULL;
   		q = wcstok_s(p, L"\n", &tokcontext);  // I3481
 	  	if((msg = AddStore(fk, TSS_LAYOUT, q)) != CERR_None) return msg;
 		  break;
     }
 	case T_CAPSOFF:
-    WarnDeprecatedCode();   // I4866
+    WarnDeprecatedHeader();   // I4866
 		if((msg = AddStore(fk, TSS_CAPSALWAYSOFF, L"1")) != CERR_None) return msg;
 		break;
 	
 	case T_CAPSON:
-    WarnDeprecatedCode();   // I4866
+    WarnDeprecatedHeader();   // I4866
 		if((msg = AddStore(fk, TSS_CAPSONONLY, L"1")) != CERR_None) return msg;
 		break;
 	
 	case T_SHIFT:
-    WarnDeprecatedCode();   // I4866
+    WarnDeprecatedHeader();   // I4866
 		if((msg = AddStore(fk, TSS_SHIFTFREESCAPS, L"1")) != CERR_None) return msg;
 		break;
 
 	case T_HOTKEY:
     {
-      WarnDeprecatedCode();   // I4866
+      WarnDeprecatedHeader();   // I4866
       wchar_t *tokcontext = NULL;
       if((q = wcstok_s(p, L"\n", &tokcontext)) == NULL) return CERR_CodeInvalidInThisSection;  // I3481
 	  	if((msg = AddStore(fk, TSS_HOTKEY, q)) != CERR_None) return msg;
@@ -712,7 +711,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
     }
 	case T_BITMAP:
     {
-      WarnDeprecatedCode();   // I4866
+      WarnDeprecatedHeader();   // I4866
       wchar_t *tokcontext = NULL;
   		if((q = wcstok_s(p, L"\n", &tokcontext)) == NULL) return CERR_InvalidBitmapLine;  // I3481
 
@@ -724,7 +723,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
     }
 	case T_BITMAPS:
     {
-      WarnDeprecatedCode();   // I4866
+      WarnDeprecatedHeader();   // I4866
       wchar_t *tokcontext = NULL;
   		AddWarning(CWARN_BitmapNotUsed);
 
@@ -736,7 +735,6 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
     }
 	case T_KEYTOKEY:			// A rule
 		if(fk->currentGroup == 0xFFFFFFFF) return CERR_CodeInvalidInThisSection;
-		if(fk->version == 0) return CERR_NoVersionLine;
 		if((msg = ProcessKeyLine(fk, p, IsUnicode)) != CERR_None) return msg;
 		break;
 
@@ -1004,6 +1002,7 @@ DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p)
 	fk->dpStoreArray = sp;
 	sp = &fk->dpStoreArray[fk->cxStoreArray];
 
+  sp->line = currentLine;
   sp->fIsOption = FALSE;
   sp->fIsReserved = FALSE;
   sp->fIsStore = FALSE;
@@ -1067,6 +1066,7 @@ DWORD AddStore(PFILE_KEYBOARD fk, DWORD SystemID, PWSTR str, DWORD *dwStoreID)
 	fk->dpStoreArray = sp;
 	sp = &fk->dpStoreArray[fk->cxStoreArray];
 
+  sp->line = currentLine;
   sp->fIsOption = FALSE;   // I3686
   sp->fIsReserved = (SystemID != TSS_NONE);
   sp->fIsStore = FALSE;
@@ -1110,7 +1110,7 @@ DWORD AddDebugStore(PFILE_KEYBOARD fk, PWSTR str)
 
 	sp->dpString = new WCHAR[wcslen(tstr)+1];
 	wcscpy_s(sp->dpString, wcslen(tstr)+1, tstr);  // I3481
-
+  sp->line = 0;
   sp->fIsOption = FALSE;
   sp->fIsReserved = TRUE;
   sp->fIsStore = FALSE;

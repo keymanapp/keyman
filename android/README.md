@@ -23,7 +23,7 @@ yes | ./sdkmanager.bat --licenses
 ## Keyman for Android Development
 Keyman for Android (formerly named KMAPro) can be built from a command line (preferred) or Android Studio.
 
-Firebase Crashlytics is used for crash reporting, and it depends on a configured google-services.json file. For this reason, only the Debug variant of KMAPro is intended to be built on a Developer machine. The analytics for Debug are associated with an application ID `com.tavultesoft.kmapro.debug`.
+Firebase Crashlytics is used for crash reporting, and it depends on a configured google-services.json file. For this reason, only the Debug variant of KMAPro is intended to be built on a Developer machine. The analytics for Debug are associated with a "Package name" `com.tavultesoft.kmapro.debug`.
 
 ### Compiling From Command Line
 1. Launch a command prompt
@@ -103,14 +103,25 @@ Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imp
     b. If you choose to use your own build of the Keyman Engine, get the library from **android/Samples/KMSample1/app/libs/keyman-engine.aar**
 2. Open your project in Android Studio.
 3. Open **build.gradle** (Module: app) in "Gradle Scripts".
-4. include `api (name:'keyman-engine', ext:'aar')` in dependencies.
-5. after dependencies, insert
+4. After the `android {}` object, include the following:
 ````gradle
-    repositories {
-        google()
-        flatDir {
-            dirs 'libs'
-        }
+repositories {
+    flatDir {
+        dirs 'libs'
     }
+    google()
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:25.2.0'
+    implementation 'com.google.firebase:firebase-core:11.8.0'
+    implementation 'com.google.firebase:firebase-crash:11.8.0'
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.0@aar') {
+        transitive = true
+    }
+    api (name:'keyman-engine', ext:'aar')
+}
+
 ````
-6. include `import com.tavultesoft.kmea.*;` to use Keyman Engine in a class.
+5. include `import com.tavultesoft.kmea.*;` to use Keyman Engine in a class.

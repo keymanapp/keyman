@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_40ba94fbf72e9d4b1e17ea3cbc6e4287</ID>
+      <Filename>test.kmn</Filename>
+      <Filepath>test.kmn</Filepath>
+      <FileVersion>1.2.3</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test Keyboard</Name>
+        <Copyright>(C) 2017 SIL International</Copyright>
+        <Message>Test Message</Message>
+      </Details>
+    </File>
+    <File>
+      <ID>id_43c2962a46c842a207e8feeac7444b9e</ID>
+      <Filename>test.kps</Filename>
+      <Filepath>test.kps</Filepath>
+      <FileVersion>1.2.3</FileVersion>
+      <FileType>.kps</FileType>
+      <Details>
+        <Name>Test Keyboard</Name>
+        <Copyright>(C) 2017 SIL International</Copyright>
+        <Version>1.2.3</Version>
+      </Details>
+    </File>
+    <File>
+      <ID>id_93662347dadf4f8457343f345e633233</ID>
+      <Filename>bcp47.kps</Filename>
+      <Filepath>bcp47.kps</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kps</FileType>
+      <Details>
+        <Name>BCP47 Test</Name>
+        <Version>1.0</Version>
+      </Details>
+    </File>
+    <File>
+      <ID>id_99c63a38148734593a9a8e3982e4aca5</ID>
+      <Filename>bcp47.kmn</Filename>
+      <Filepath>bcp47.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>BCP47 Test</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_5df400e6f9f0f1b01651c61d86ff8f23</ID>
+      <Filename>test.kvk</Filename>
+      <Filepath>test.kvk</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kvk</FileType>
+      <ParentFileID>id_43c2962a46c842a207e8feeac7444b9e</ParentFileID>
+    </File>
+    <File>
+      <ID>id_230d4faf67c42acd737cc6c82600abc2</ID>
+      <Filename>test.kmx</Filename>
+      <Filepath>test.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_43c2962a46c842a207e8feeac7444b9e</ParentFileID>
+    </File>
+    <File>
+      <ID>id_baf6639217cac055ff5e648f2b14832e</ID>
+      <Filename>keymanweb-osk.ttf</Filename>
+      <Filepath>keymanweb-osk.ttf</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.ttf</FileType>
+      <ParentFileID>id_43c2962a46c842a207e8feeac7444b9e</ParentFileID>
+    </File>
+    <File>
+      <ID>id_eb6b6c90251ab33cee784713c451e6d8</ID>
+      <Filename>readme.txt</Filename>
+      <Filepath>readme.txt</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.txt</FileType>
+      <ParentFileID>id_43c2962a46c842a207e8feeac7444b9e</ParentFileID>
+    </File>
+    <File>
+      <ID>id_9a2fbfc6076553fc8f8cae9f6ac5d05d</ID>
+      <Filename>welcome.htm</Filename>
+      <Filepath>welcome.htm</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.htm</FileType>
+      <ParentFileID>id_43c2962a46c842a207e8feeac7444b9e</ParentFileID>
+    </File>
+    <File>
+      <ID>id_585856c9c8411cde30e57ab4ab0714ab</ID>
+      <Filename>bcp47.kmx</Filename>
+      <Filepath>bcp47.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_93662347dadf4f8457343f345e633233</ParentFileID>
+    </File>
+  </Files>
+</KeymanDeveloperProject>
