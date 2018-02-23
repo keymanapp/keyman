@@ -12,7 +12,7 @@
           <Interface Id="{A2FB4733-30DE-4C7C-8ED5-F6CAFA09BB2F}" Name="IKeymanCollection" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
           <Interface Id="{6A05CFDD-2B7E-4CA5-BAE6-3D5DE193E9CB}" Name="IKeymanErrors" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
           <Interface Id="{5CB5DFC0-05EF-48F0-8249-7BC01AF404FF}" Name="IKeymanHotkeys" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
-          <Interface Id="{F5CFFF42-4294-44C7-8F97-67EB2E83BB1F}" Name="IKeymanKeyboardLanguagesInstalled" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+          <Interface Id="{F5CFFF42-4294-44C7-8F97-67EB2E83BB1F}" Name="IKeymanKeyboardLanguages" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
           <Interface Id="{29D0C83A-DBCE-4C54-80F0-B45ABF9FAB49}" Name="IKeymanKeyboardOptions" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
           <Interface Id="{4EF1F073-61C2-4579-AE34-058F17E56414}" Name="IKeymanKeyboards" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
           <Interface Id="{61406197-399A-41C3-9A1A-158327523FB0}" Name="IKeymanKeyboardsInstalled" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
@@ -41,6 +41,9 @@
           <Interface Id="{60AC9C46-167A-41A4-AD27-F2980C82C204}" Name="IKeymanSystemInfo" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
           <Interface Id="{774793A4-259E-47F1-9D71-F83DC6C0A159}" Name="IKeymanUserInterface" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
           <Interface Id="{CCA8112B-D72E-49FE-AC2C-CB18DC0D3EC7}" Name="IKeymanVisualKeyboard" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+          <Interface Id="{8D0B3363-E537-437D-AD89-A0B5103F5F64}" Name="IKeymanKeyboardLanguage" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+          <Interface Id="{7DC22BC0-85BB-45C0-8EDB-A2F4BD1D500B}" Name="IKeymanKeyboardLanguagesInstalled" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+          <Interface Id="{5F90BCDA-F1C1-433A-8FD0-B498299D3C30}" Name="IKeymanKeyboardLanguagesFile" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
       </TypeLib>
     </File>
   </Component>
@@ -58,7 +61,7 @@
           <Interface Id="{A2FB4733-30DE-4C7C-8ED5-F6CAFA09BB2F}" Name="IKeymanCollection" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
           <Interface Id="{6A05CFDD-2B7E-4CA5-BAE6-3D5DE193E9CB}" Name="IKeymanErrors" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
           <Interface Id="{5CB5DFC0-05EF-48F0-8249-7BC01AF404FF}" Name="IKeymanHotkeys" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
-          <Interface Id="{F5CFFF42-4294-44C7-8F97-67EB2E83BB1F}" Name="IKeymanKeyboardLanguagesInstalled" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+          <Interface Id="{F5CFFF42-4294-44C7-8F97-67EB2E83BB1F}" Name="IKeymanKeyboardLanguages" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
           <Interface Id="{29D0C83A-DBCE-4C54-80F0-B45ABF9FAB49}" Name="IKeymanKeyboardOptions" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
           <Interface Id="{4EF1F073-61C2-4579-AE34-058F17E56414}" Name="IKeymanKeyboards" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
           <Interface Id="{61406197-399A-41C3-9A1A-158327523FB0}" Name="IKeymanKeyboardsInstalled" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
@@ -87,6 +90,9 @@
           <Interface Id="{60AC9C46-167A-41A4-AD27-F2980C82C204}" Name="IKeymanSystemInfo" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
           <Interface Id="{774793A4-259E-47F1-9D71-F83DC6C0A159}" Name="IKeymanUserInterface" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
           <Interface Id="{CCA8112B-D72E-49FE-AC2C-CB18DC0D3EC7}" Name="IKeymanVisualKeyboard" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+          <Interface Id="{8D0B3363-E537-437D-AD89-A0B5103F5F64}" Name="IKeymanKeyboardLanguage" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+          <Interface Id="{7DC22BC0-85BB-45C0-8EDB-A2F4BD1D500B}" Name="IKeymanKeyboardLanguagesInstalled" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+          <Interface Id="{5F90BCDA-F1C1-433A-8FD0-B498299D3C30}" Name="IKeymanKeyboardLanguagesFile" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
       </TypeLib>
     </File>
   </Component>
