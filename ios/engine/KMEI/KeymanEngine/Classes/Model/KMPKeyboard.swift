@@ -102,10 +102,10 @@ public class KMPKeyboard
     }
   }
   
-  public func install() {
+  public func install() throws -> Void {
     if !isValid {
       log.error("can't install invalid keyboard")
-      return
+      throw KMPError.invalidPackage
     }
     
     do {
@@ -113,7 +113,7 @@ public class KMPKeyboard
                                               withIntermediateDirectories: true)
     } catch {
       log.error("Could not create dir for download: \(error)")
-      return
+      throw KMPError.fileSystem
     }
     
     for keyboard in installableKeyboards {
@@ -140,7 +140,7 @@ public class KMPKeyboard
                                            to: item[1] as! URL)
         } catch {
           log.error("Error saving the download: \(error)")
-          return
+          throw KMPError.copyFiles
         }
       }
       Manager.shared.addKeyboard(keyboard)
