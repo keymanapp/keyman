@@ -585,7 +585,7 @@ var ANY_INDEX_TEST_3 = {
 var DEADKEY_STORE_TEST_1 = {
   id: 1,
   // Match condition for rule
-  rule: [{a:[{d:0},{d:1},{d:2}]}],
+  rule: [{t:'a',a:[{d:0},{d:1},{d:2}]}],
   // Start of context relative to cursor
   n: 1,
   ln: 1,
@@ -613,7 +613,7 @@ var DEADKEY_STORE_TEST_1 = {
 var DEADKEY_STORE_TEST_2 = {
   id: 2,
   // Match condition for rule
-  rule: [{a:[{d:0},'b',{d:2}]}],
+  rule: [{t:'a',a:[{d:0},'b',{d:2}]}],
   // Start of context relative to cursor
   n: 1,
   ln: 1,
@@ -641,7 +641,7 @@ var DEADKEY_STORE_TEST_2 = {
 var DEADKEY_STORE_TEST_3 = {
   id: 3,
   // Match condition for rule
-  rule: [{a:[{d:0},{d:1},{d:2}]},{i:{s:"abc", o:1}}],
+  rule: [{t:'a',a:[{d:0},{d:1},{d:2}]},{t:'i',i:{s:"abc", o:1}}],
   // Start of context relative to cursor
   n: 2,
   ln: 2,
@@ -695,7 +695,7 @@ var DEADKEY_STORE_TEST_3 = {
 var DEADKEY_STORE_TEST_4 = {
   id: 4,
   // Match condition for rule
-  rule: [{a:[{d:0},{d:1},{d:2}]},{c:1}],
+  rule: [{t:'a',a:[{d:0},{d:1},{d:2}]},{t:'c',c:1}],
   // Start of context relative to cursor
   n: 2,
   ln: 2,

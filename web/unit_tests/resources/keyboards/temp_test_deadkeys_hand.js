@@ -65,7 +65,7 @@ function Keyboard_test_deadkeys()
       k.KO(0,t,"(s)+(a)");
     }
     // ---- START: Unsure where Developer would place these lines, which are fully handwritten. ---- //
-    else if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(3,t,['?',{a:this.s_deadQwerty},{c:2}])) { // Line 78
+    else if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(3,t,['?',{t:'a',a:this.s_deadQwerty},{t:'c',c:2}])) { // Line 78
       r=m=1;
       k.KDC(3,t);
       k.KO(0,t,'(');
@@ -73,14 +73,14 @@ function Keyboard_test_deadkeys()
       k.KIO(0,this.s_liveQwerty,2,t);
       k.KO(0,t,')');
     }
-    else if(k.KKM(e, 0x4010, 0x31)&&k.KFCM(1,t,[{a:this.s_liveQwerty}])) { // Line 77
+    else if(k.KKM(e, 0x4010, 0x31)&&k.KFCM(1,t,[{t:'a',a:this.s_liveQwerty}])) { // Line 77
       r=m=1;
       k.KDC(3,t);
       k.KO(0,t,'?');
       k.KIO(0,this.s_deadQwerty,1,t);
       k.KIO(0,this.s_deadQwerty,1,t);
     }
-    else if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(1,t,[{a:this.s_deadnums}])) { // Line 76
+    else if(k.KKM(e, 0x4000, 0xBE)&&k.KFCM(1,t,[{t:'a',a:this.s_deadnums}])) { // Line 76
       r=m=1;
       k.KDC(1,t);
       k.KO(0,t,'#');
@@ -335,7 +335,7 @@ function Keyboard_test_deadkeys()
       k.KDO(0,t,4);
       k.KDO(-1,t,3);
     }
-    else if(k.KFCM(2,t,[{a:this.s_deadnums},{i:{o:1,s:this.s_deadnums}}])) { // Line 138
+    else if(k.KFCM(2,t,[{t:'a',a:this.s_deadnums},{t:'i',i:{o:1,s:this.s_deadnums}}])) { // Line 138
       m=1;
       k.KDC(2,t);
       k.KO(0,t,'(');
