@@ -37,6 +37,7 @@ addInputRecord = function(json) {
 resetInputRecord = function() {
   setElementText(ta_inputJSON, "");
   setElementText(in_output, "");
+  keyman.resetContext();
 
   inputJSON = new KMWRecorder.InputTestSequence();
 }
@@ -145,8 +146,9 @@ keyman.osk.clickKey = function(e) {
 var _sak = keyman.keyboardManager._SetActiveKeyboard.bind(keyman.keyboardManager);
 keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, saveCookie) {
   // If it's not on our recording control, ignore the change and do nothing special.
-  if(document.activeElement != in_output) {
+  if(document.activeElement != in_output && document.activeElement != in_output['kmw_ip']) {
     _sak(PInternalName, PLgCode, saveCookie);
+    return;
   }
 
   var sameKbd = (testDefinition.keyboard && ("Keyboard_" + testDefinition.keyboard.id) == PInternalName)

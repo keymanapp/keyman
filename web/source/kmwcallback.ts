@@ -7,13 +7,74 @@
    Copyright 2017 SIL International
 ***/
 
+/*
+ * Type alias definitions to reflect the parameters of the fullContextMatch() callback (KMW 10+).
+ * No constructors or methods since keyboards will not utilize the same backing prototype, and
+ * property names are shorthanded to promote minification.
+ */
+
+type PlainKeyboardStore = string;
+
+// TODO:  Implement the new 'store object-orientation proposal.
+//type ComplexKeyboardStore = (string|{d: number})[]; 
+
+type KeyboardStore = PlainKeyboardStore; // | ComplexKeyboardStore;
+type RuleChar = string;
+
+class RuleDeadkey {
+  /** Discriminant field - 'd' for Deadkey.
+   */
+  ['t']: 'd';
+
+  /**
+   * Value:  the deadkey's ID.
+   */
+  ['d']: number; // For 'd'eadkey; also reflects the Deadkey class's 'd' property.
+}
+
+class ContextAny {
+  /** Discriminant field - 'a' for `any()`.
+   */
+  ['t']: 'a';
+
+  /**
+   * Value:  the store to search.
+   */
+  ['a']: KeyboardStore; // For 'a'ny statement.
+}
+
+class RuleIndex {
+  /** Discriminant field - 'i' for `index()`.
+   */
+  ['t']: 'i';
+  
+  /**
+   * Value:  {'s': the Store from which to output, 'o': the Offset into the current rule's context.}
+   */
+  ['i']: {'s': KeyboardStore, 'o': number}; // For 'i'ndex statement.
+}
+
+class ContextEx {
+  /** Discriminant field - 'c' for `context()`.
+   */
+  ['t']: 'c';
+  
+  /**
+   * Value:  The offset into the current rule's context to be matched.
+   */
+  ['c']: number; // For 'c'ontext statement.
+}
+
+type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx;
+type ContextEntry = RuleChar | ContextNonCharEntry;
+
 /**
  * Cache of context storing and retrieving return values from KC
  * Must be reset prior to each keystroke and after any text changes
  * MCD 3/1/14   
  **/         
 class CachedContext {
-  _cache: string[][] = [];
+  _cache: string[][];
   
   reset(): void { 
     this._cache = []; 
@@ -37,20 +98,53 @@ class CachedContext {
   }
 };
 
+type CachedExEntry = {valContext: (string|number)[], deadContext: Deadkey[]};
+/** 
+ * An extended version of cached context storing designed to work with 
+ * `fullContextMatch` and its helper functions.
+ */
+class CachedContextEx {
+  _cache: CachedExEntry[][];
+  
+  reset(): void {
+    this._cache = [];
+  }
+
+  get(n: number, ln: number): CachedExEntry {
+    // return null; // uncomment this line to disable context caching
+    if(typeof this._cache[n] == 'undefined') {
+      return null;
+    } else if(typeof this._cache[n][ln] == 'undefined') {
+      return null;
+    }
+    return this._cache[n][ln];
+  }
+
+  set(n: number, ln: number, val: CachedExEntry): void { 
+    if(typeof this._cache[n] == 'undefined') { 
+      this._cache[n] = []; 
+    } 
+    this._cache[n][ln] = val; 
+  }
+};
+
 // Defines the base Deadkey-tracking object.
 class Deadkey {
   p: number;  // Position of deadkey
   d: number;  // Numerical id of the deadkey
+  o: number;  // Ordinal value of the deadkey (resolves same-place conflicts)
   matched: number;
+
+  static ordinalSeed: number = 0;
 
   constructor(pos: number, id: number) {
     this.p = pos;
     this.d = id;
+    this.o = Deadkey.ordinalSeed++;
   }
 
   match(p: number, d: number): boolean {
     var result:boolean = (this.p == p && this.d == d);
-    this.matched = result ? 1 : 0;
 
     return result;
   }
@@ -61,6 +155,10 @@ class Deadkey {
 
   reset(): void {
     this.matched = 0;
+  }
+
+  before(other: Deadkey): boolean {
+    return this.o < other.o;
   }
 }
 
@@ -81,6 +179,7 @@ class BeepData {
 class KeyboardInterface {
   keymanweb: KeymanBase;
   cachedContext: CachedContext = new CachedContext();
+  cachedContextEx: CachedContextEx = new CachedContextEx();
 
   TSS_LAYER:    number = 33;
   TSS_PLATFORM: number = 31;
@@ -235,6 +334,154 @@ class KeyboardInterface {
   }
 
   /**
+   * Builds the *cached or uncached* keyboard context for a specified range, relative to caret
+   * 
+   * @param       {number}      n       Number of characters to move back from caret
+   * @param       {number}      ln      Number of characters to return
+   * @param       {Object}      Pelem   Element to work with (must be currently focused element)
+   * @return      {Array}               Context array (of strings and numbers) 
+   */
+  private _BuildExtendedContext(n: number, ln: number, Ptarg: HTMLElement): { valContext: (string|number)[], deadContext: Deadkey[]} {
+    var cache = this.cachedContextEx.get(n, ln); 
+    if(cache !== null) {
+      return cache;
+    } else {
+      // By far the easiest way to correctly build what we want is to start from the right and work to what we need.
+      // We may have done it for a similar cursor position before.
+      cache = this.cachedContextEx.get(n, n);
+      if(cache === null) {
+        // First, let's make sure we have a cloned, sorted copy of the deadkey array.
+        this._DeadKeys.sort(function(a: Deadkey, b: Deadkey) {
+          // We want descending order, so we want 'later' deadkeys first.
+          if(a.p != b.p) {
+            return b.p - a.p;
+          } else {
+            return b.o - a.o;
+          }
+        });
+
+        var unmatchedDeadkeys = [].concat(this._DeadKeys);
+
+        // Time to build from scratch!
+        var index = 0;
+        cache = { valContext: [], deadContext: []};
+        while(cache.valContext.length < n) {
+          // As adapted from `deadkeyMatch`.
+          var sp=this._SelPos(Ptarg);
+          var deadPos = sp - index;
+          if(unmatchedDeadkeys.length > 0 && unmatchedDeadkeys[0].p == deadPos) {
+            // Take the deadkey.
+            cache.deadContext[n-cache.valContext.length-1] = unmatchedDeadkeys[0];
+            cache.valContext = [unmatchedDeadkeys[0].d].concat(cache.valContext);
+            unmatchedDeadkeys.splice(0, 1);
+          } else {
+            // Take the character.  We get "\ufffe" if it doesn't exist.
+            var kc = this.context(++index, 1, Ptarg);
+            cache.valContext = ([kc] as (string|number)[]).concat(cache.valContext);
+          }
+        }
+        this.cachedContextEx.set(n, n, cache);
+      }
+
+      // Now that we have the cache...
+      var subCache = cache;
+      subCache.valContext = subCache.valContext.slice(0, ln);
+      for(var i=0; i < subCache.valContext.length; i++) {
+        if(subCache[i] == '\ufffe') {
+          subCache.valContext.splice(0, 1);
+          subCache.deadContext.splice(0, 1);
+        }
+      }
+
+      if(subCache.valContext.length == 0) {
+        subCache.valContext = ['\ufffe'];
+        subCache.deadContext = [];
+      }
+
+      this.cachedContextEx.set(n, ln, subCache);
+
+      return subCache;
+    }
+  }
+
+  /**
+   * Function       fullContextMatch    KFCM
+   * Scope          Private
+   * @param         {number}    n       Number of characters to move back from caret
+   * @param         {Object}    Ptarg   Focused element
+   * @param         {Array}     rule    An array of ContextEntries to match.
+   * @return        {boolean}           True if the fully-specified rule context matches the current KMW state.
+   * 
+   * A KMW 10+ function designed to bring KMW closer to Keyman Desktop functionality,
+   * near-directly modeling (externally) the compiled form of Desktop rules' context section.
+   */
+  fullContextMatch(n: number, Ptarg: HTMLElement, rule: ContextEntry[]): boolean {
+    // Stage one:  build the context index map.
+    var fullContext = this._BuildExtendedContext(n, rule.length, Ptarg);
+    var context = fullContext.valContext;
+    var deadContext = fullContext.deadContext;
+
+    var mismatch = false;
+
+    var assertNever = function(x: never): never {
+      // Could be accessed by improperly handwritten calls to `fullContextMatch`.
+      throw new Error("Unexpected object in fullContextMatch specification: " + x);
+    }
+
+    // Stage two:  time to match against the rule specified.
+    for(var i=0; i < rule.length; i++) {
+      if(typeof rule[i] == 'string') {
+        var str = rule[i] as string;
+        if(str != context[i]) {
+          mismatch = true;
+          break;
+        }
+      } else {
+        // TypeScript needs a cast to this intermediate type to do its discriminated union magic.
+        var r = rule[i] as ContextNonCharEntry;
+        switch(r.t) {
+          case 'd':
+            // We still need to set a flag here; 
+            if(r['d'] != context[i]) {
+              mismatch = true;
+            } else {
+              deadContext[i].set();
+            }
+            break;
+          case 'a':
+            // TODO:  Remove the `string` requirement.
+            if(!this.any(i, context[i] as string, r.a)) {
+              mismatch = true;
+            }
+            break;
+          case 'i':
+            var ch = this._Index(r.i.s, r.i.o);
+
+            if(ch != context[i]) {
+              mismatch = true;
+            }
+            break;
+          case 'c':            
+            if(context[r.c - 1] != context[i]) {
+              mismatch = true;
+            }
+            break;
+          default:
+            assertNever(r);
+        }
+      }
+    }
+
+    if(mismatch) {
+      // Reset the matched 'any' indices, if any.
+      this._DeadkeyResetMatched();
+      this._AnyIndices = [];
+    }
+
+    return !mismatch;
+  }
+
+  /**
    * Function     KIK      
    * Scope        Public
    * @param       {Object}  e   keystroke event
@@ -309,7 +556,7 @@ class KeyboardInterface {
     ei['modifiers'] = e.Lmodifiers;
     return ei;
   };
-  
+
   /**
    * Function     deadkeyMatch  KDM      
    * Scope        Public
@@ -327,8 +574,12 @@ class KeyboardInterface {
     var sp=this._SelPos(Ptarg);
     n = sp - n;
     for(var i = 0; i < this._DeadKeys.length; i++) {
-      if(this._DeadKeys[i].match(n, d)) {
+      // Don't re-match an already-matched deadkey.  It's possible to have two identical 
+      // entries, and they should be kept separately.
+      if(this._DeadKeys[i].match(n, d) && !this._DeadKeys[i].matched) {
         this._DeadKeys[i].set();
+        // Assumption:  since we match the first possible entry in the array, we
+        // match the entry with the lower ordinal - the 'first' deadkey in the position.
         return true; // I3318
       }
     }
@@ -439,6 +690,12 @@ class KeyboardInterface {
       }
       
       this.keymanweb.touchAliasing.setTextBeforeCaret(Pelem,t);
+
+      // Adjust deadkey positions
+      this._DeadkeyDeleteMatched(); // I3318
+      if(dn >= 0) {        
+        this._DeadkeyAdjustPos(this._SelPos(Pelem), -dn + s._kmwLength()); // I3318,I3319
+      }
       return;
     }
   
@@ -567,23 +824,49 @@ class KeyboardInterface {
 
     var Lc: Deadkey = new Deadkey(this._SelPos(Pelem as HTMLElement), Pd);
 
-    this._DeadKeys=this.keymanweb._push(this._DeadKeys,Lc);      
+    // Aim to put the newest deadkeys first.
+    this._DeadKeys=[Lc].concat(this._DeadKeys);      
     //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
   }
 
   /**
-   * Function     indexOutput   KIO      
-   * Scope        Public
-   * @param       {number}      Pdn     no of character to overwrite (delete) 
+   * Function     _Index
+   * Scope        Public 
    * @param       {string}      Ps      string
    * @param       {number}      Pn      index
-   * @param       {Object}      Pelem   element to output to 
+   * Description  Returns the character from a store string according to the offset in the index array
+   */
+  _Index(Ps: string, Pn: number): string {
+    if(this._AnyIndices[Pn] < Ps._kmwLength()) {   //I3319
+      return Ps._kmwCharAt(this._AnyIndices[Pn]);
+    } else {
+      /* Should not be possible for a compiled keyboard, but may arise 
+       * during the development of handwritten keyboards.
+       */
+      console.warn("Unmatched contextual index() statement detected in rule with index " + Pn + "!");
+      return "";
+    }
+  }
+
+  /**
+   * Function     indexOutput   KIO
+   * Scope        Public
+   * @param       {number}      Pdn     no of character to overwrite (delete)
+   * @param       {string}      Ps      string
+   * @param       {number}      Pn      index
+   * @param       {Object}      Pelem   element to output to
    * Description  Output a character selected from the string according to the offset in the index array
-   */    
+   */
   indexOutput(Pdn: number, Ps: string, Pn: number, Pelem: HTMLElement): void {
     this.resetContextCache();
-    if(this._AnyIndices[Pn-1] < Ps._kmwLength()) {                        //I3319
-      this.output(Pdn,Pelem,Ps._kmwCharAt(this._AnyIndices[Pn-1]));  //I3319
+    var indexChar = this._Index(Ps, Pn-1);
+    if(indexChar) {
+      this.output(Pdn,Pelem,indexChar);  //I3319
+    } else {
+      /* Should not be possible for a compiled keyboard, but may arise 
+       * during the development of handwritten keyboards.
+       */
+      console.warn("Unmatched output index() statement detected in rule with index " + Pn + "!");
     }
   }
 
@@ -767,6 +1050,7 @@ class KeyboardInterface {
 
   resetContextCache(): void {
     this.cachedContext.reset();
+    this.cachedContextEx.reset();
   }
   
   // I3318 - deadkey changes START
@@ -776,9 +1060,8 @@ class KeyboardInterface {
    * Description  Clear all matched deadkey flags
    */       
   _DeadkeyResetMatched(): void {                   
-    var Li, _Dk = this._DeadKeys;
-    for(Li = 0; Li < _Dk.length; Li++) {
-      (<Deadkey>_Dk[Li]).reset();
+    for(let dk of this._DeadKeys) {
+      dk.reset();
     }
   }
 
@@ -788,8 +1071,8 @@ class KeyboardInterface {
    * Description  Delete matched deadkeys from context
    */       
   _DeadkeyDeleteMatched(): void {              
-    var Li, _Dk = this._DeadKeys;
-    for(Li = 0; Li < _Dk.length; Li++) {
+    var _Dk = this._DeadKeys;
+    for(var Li = 0; Li < _Dk.length; Li++) {
       if(_Dk[Li].matched) {
         _Dk.splice(Li,1);
       }
@@ -804,10 +1087,9 @@ class KeyboardInterface {
    * Description  Adjust saved positions of deadkeys in context
    */       
   _DeadkeyAdjustPos(Lstart: number, Ldelta: number): void {
-    var Li, _Dk = this._DeadKeys;
-    for(Li = 0; Li < _Dk.length; Li++) {
-      if(_Dk[Li].p > Lstart) {
-        _Dk[Li].p += Ldelta;
+    for(let dk of this._DeadKeys) {
+      if(dk.p > Lstart) {
+        dk.p += Ldelta;
       }
     }
   }

@@ -180,6 +180,11 @@ namespace KMWRecorder {
        */
       window['DOMEventHandlers'].states.lastActiveElement = target;
 
+      if(!oskKeyElement) {
+        console.error('Could not find OSK key "' + this.keyID + '"!');
+        // The following lines will throw an appropriate-enough error.
+      }
+
       oskKeyElement.dispatchEvent(downEvent);
       oskKeyElement.dispatchEvent(upEvent);
     }

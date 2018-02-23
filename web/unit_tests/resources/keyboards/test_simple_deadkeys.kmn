@@ -1,0 +1,16 @@
+﻿store(&TARGETS) 'any windows web'
+store(&NAME) 'Simple Deadkeys'
+store(&COPYRIGHT) '© 2018 SIL International'
+begin Unicode > use(main)
+
+group(main) using keys
+
++ '1' > dk(0) c Because of the order of definition, these should be the true deadkey IDs as well.
++ '2' > dk(1) c If not, just hand-edit the compiled keyboard to make it so.
++ '3' > dk(2) c This keyboard is minimal to facilitate any such hand-edits.
+
+c The following helps the keyboard to simulate basic keystrokes without requiring a minor delay for
+c the default characters to be produced by the browser.
++ 'a' > 'a'
++ 'b' > 'b'
++ 'c' > 'c'
