@@ -8,6 +8,12 @@
 
 import Foundation
 
+public enum KMPError : String, Error {
+  case invalidPackage = "Invalid Keyman Package."
+  case fileSystem = "Unable to create directory structure in file system."
+  case copyFiles = "Unable to copy keyboard files to file system."
+}
+
 public class KeymanPackage
 {
   static private let kmpFile = "kmp.json"
@@ -31,16 +37,6 @@ public class KeymanPackage
         }
       }
     }
-  }
-  
-  public func install() -> Int {
-    var count = 0
-    for keyboard in self.keyboards {
-      count += keyboard.installableKeyboards.count
-      keyboard.install()
-    }
-    
-    return count
   }
   
   public func defaultInfoHtml() -> String {
