@@ -22,24 +22,32 @@ type KeyboardStore = PlainKeyboardStore; // | ComplexKeyboardStore;
 type RuleChar = string;
 
 class RuleDeadkey {
+  /** Discriminant field - 'd' for Deadkey.
+   */
+  ['t']: 'd';
+
   /**
-   * Existence of this property indicates the object is a deadkey.  
-   * 
    * Value:  the deadkey's ID.
    */
   ['d']: number; // For 'd'eadkey; also reflects the Deadkey class's 'd' property.
 }
 
 class ContextAny {
+  /** Discriminant field - 'a' for `any()`.
+   */
+  ['t']: 'a';
+
   /**
-   * Existence of this property indicates the object reflects an "any" statement.  
-   * 
    * Value:  the store to search.
    */
   ['a']: KeyboardStore; // For 'a'ny statement.
 }
 
 class RuleIndex {
+  /** Discriminant field - 'i' for `index()`.
+   */
+  ['t']: 'i';
+  
   /**
    * Existence of this property indicates the object reflects an "index" statement.  
    * 
@@ -49,6 +57,10 @@ class RuleIndex {
 }
 
 class ContextEx {
+  /** Discriminant field - 'c' for `context()`.
+   */
+  ['t']: 'c';
+  
   /**
    * Existence of this property indicates that the object reflects a "context" Keyman language statement.
    * 
@@ -57,7 +69,8 @@ class ContextEx {
   ['c']: number; // For 'c'ontext statement.
 }
 
-type ContextEntry = RuleChar | RuleDeadkey | ContextAny | RuleIndex | ContextEx;
+type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx;
+type ContextEntry = RuleChar | ContextNonCharEntry;
 
 /**
  * Cache of context storing and retrieving return values from KC
@@ -414,40 +427,56 @@ class KeyboardInterface {
 
     var mismatch = false;
 
+    var assertNever = function(x: never): never {
+      // Could be accessed by improperly handwritten calls to `fullContextMatch`.
+      throw new Error("Unexpected object in fullContextMatch specification: " + x);
+    }
+
     // Stage two:  time to match against the rule specified.
     for(var i=0; i < rule.length; i++) {
-      if(typeof(rule[i]) == 'string') {
+      if(typeof rule[i] == 'string') {
         var str = rule[i] as string;
         if(str != context[i]) {
           mismatch = true;
           break;
         }
-      } else if(rule[i]['d'] !== undefined) {
-        var deadSpec = rule[i] as RuleDeadkey;
-        // We still need to set a flag here; 
-        if(deadSpec['d'] != context[i]) {
-          mismatch = true;
-        } else {
-          deadContext[i].set();
-        }
-      } else if(rule[i]['a'] !== undefined) {
-        var anySpec = rule[i] as ContextAny;
-        // TODO:  Remove the `string` requirement.
-        if(!this.any(i, context[i] as string, anySpec.a)) {
-          mismatch = true;
-        }
-      } else if(rule[i]['i'] !== undefined) {
-        var indexSpec = rule[i] as RuleIndex;
-        var ch = this._Index(indexSpec.i.s, indexSpec.i.o);
+      } else {
+        // TypeScript needs a cast to this intermediate type to do its discriminated union magic.
+        var r = rule[i] as ContextNonCharEntry;
+        switch(r.t) {
+          case 'd':
+            var deadSpec = r as RuleDeadkey;
+            // We still need to set a flag here; 
+            if(deadSpec['d'] != context[i]) {
+              mismatch = true;
+            } else {
+              deadContext[i].set();
+            }
+            break;
+          case 'a':
+            var anySpec = r as ContextAny;
+            // TODO:  Remove the `string` requirement.
+            if(!this.any(i, context[i] as string, anySpec.a)) {
+              mismatch = true;
+            }
+            break;
+          case 'i':
+            var indexSpec = r as RuleIndex;
+            var ch = this._Index(indexSpec.i.s, indexSpec.i.o);
 
-        if(ch != context[i]) {
-          mismatch = true;
-        }
-      } else if(rule[i]['c'] !== undefined) {
-        var contextSpec = rule[i] as ContextEx;
-        
-        if(context[contextSpec.c - 1] != context[i]) {
-          mismatch = true;
+            if(ch != context[i]) {
+              mismatch = true;
+            }
+            break;
+          case 'c':
+            var contextSpec = r as ContextEx;
+            
+            if(context[contextSpec.c - 1] != context[i]) {
+              mismatch = true;
+            }
+            break;
+          default:
+            assertNever(r);
         }
       }
     }
@@ -820,9 +849,10 @@ class KeyboardInterface {
     if(this._AnyIndices[Pn] < Ps._kmwLength()) {   //I3319
       return Ps._kmwCharAt(this._AnyIndices[Pn]);
     } else {
-      /* Should this really be possible for a compiled keyboard?  
-       * Should we throw an error / output a console.error("")?
+      /* Should not be possible for a compiled keyboard, but may arise 
+       * during the development of handwritten keyboards.
        */
+      console.warn("Unmatched contextual index() statement detected in rule with index " + Pn + "!");
       return "";
     }
   }
@@ -841,6 +871,11 @@ class KeyboardInterface {
     var indexChar = this._Index(Ps, Pn-1);
     if(indexChar) {
       this.output(Pdn,Pelem,indexChar);  //I3319
+    } else {
+      /* Should not be possible for a compiled keyboard, but may arise 
+       * during the development of handwritten keyboards.
+       */
+      console.warn("Unmatched output index() statement detected in rule with index " + Pn + "!");
     }
   }
 
@@ -1034,9 +1069,8 @@ class KeyboardInterface {
    * Description  Clear all matched deadkey flags
    */       
   _DeadkeyResetMatched(): void {                   
-    var _Dk = this._DeadKeys;
-    for(var Li = 0; Li < _Dk.length; Li++) {
-      _Dk[Li].reset();
+    for(let dk of this._DeadKeys) {
+      dk.reset();
     }
   }
 
@@ -1062,10 +1096,9 @@ class KeyboardInterface {
    * Description  Adjust saved positions of deadkeys in context
    */       
   _DeadkeyAdjustPos(Lstart: number, Ldelta: number): void {
-    var _Dk = this._DeadKeys;
-    for(var Li = 0; Li < _Dk.length; Li++) {
-      if(_Dk[Li].p > Lstart) {
-        _Dk[Li].p += Ldelta;
+    for(let dk of this._DeadKeys) {
+      if(dk.p > Lstart) {
+        dk.p += Ldelta;
       }
     }
   }

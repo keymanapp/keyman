@@ -44,7 +44,7 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
 var DEADKEY_TEST_1 = {
   id: 1,
   // Match condition for rule
-  rule: [{d: 1}],
+  rule: [{t:'d', d: 1}],
   // Start of context relative to cursor
   n: 1,
   ln: 1,
@@ -82,7 +82,7 @@ var DEADKEY_TEST_1 = {
 var DEADKEY_TEST_2 = {
   id: 2,
   // Match condition for rule
-  rule: ['a', {d: 0}, {d: 1}, 'b'],
+  rule: ['a', {t:'d', d: 0}, {t:'d', d: 1}, 'b'],
   // Start of context relative to cursor
   n: 5,
   ln: 4,
@@ -150,7 +150,7 @@ var DEADKEY_TEST_2 = {
 var DEADKEY_TEST_3 = {
   id: 3,
   // Match condition for rule
-  rule: [{d: 0}, 'a', {d: 0}, {d: 0}, 'b'],
+  rule: [{t:'d', d: 0}, 'a', {t:'d', d: 0}, {t:'d', d: 0}, 'b'],
   // Start of context relative to cursor
   n: 5,
   ln: 5,
@@ -238,7 +238,7 @@ var DEADKEY_TEST_3 = {
 var DEADKEY_TEST_4 = {
   id: 4,
   // Match condition for rule
-  rule: ['a', {d: 0}, {d: 0}, 'b', {d: 0}],
+  rule: ['a', {t:'d', d: 0}, {t:'d', d: 0}, 'b', {t:'d', d: 0}],
   // Start of context relative to cursor
   n: 6,
   ln: 5,
@@ -280,7 +280,7 @@ var DEADKEY_TEST_5 = {
 var DEADKEY_TEST_6 = {
   id: 6,
   // Match condition for rule
-  rule: [{d: 1}, {d: 2}, {d: 0}, {d: 1}, {d: 2}],
+  rule: [{t:'d', d: 1}, {t:'d', d: 2}, {t:'d', d: 0}, {t:'d', d: 1}, {t:'d', d: 2}],
   // Start of context relative to cursor
   n: 5,
   ln: 5,
@@ -301,7 +301,7 @@ var DEADKEY_TEST_6 = {
 var ANY_CONTEXT_TEST_1 = {
   id: 1,
   // Match condition for rule
-  rule: ['c', "a", "b", {c:3}, {c:2}],
+  rule: ['c', "a", "b", {t:'c', c:3}, {t:'c', c:2}],
   // Start of context relative to cursor
   n: 5,
   ln: 5,
@@ -341,7 +341,7 @@ var ANY_CONTEXT_TEST_1 = {
 var ANY_CONTEXT_TEST_2 = {
   id: 2,
   // Match condition for rule
-  rule: ['c', 'a', {a: "bc"}, {c:3}, 'a'],
+  rule: ['c', 'a', {t:'a', a: "bc"}, {t:'c', c:3}, 'a'],
   // Start of context relative to cursor
   n: 5,
   ln: 5,
@@ -381,7 +381,7 @@ var ANY_CONTEXT_TEST_2 = {
 var ANY_CONTEXT_TEST_3 = {
   id: 3,
   // Match condition for rule
-  rule: ['c', {a: "ac"}, {a: "bc"}, {c:3}, {c:2}],
+  rule: ['c', {t:'a', a: "ac"}, {t:'a', a: "bc"}, {t:'c', c:3}, {t:'c', c:2}],
   // Start of context relative to cursor
   n: 5,
   ln: 5,
@@ -431,7 +431,7 @@ var ANY_CONTEXT_TEST_3 = {
 var ANY_INDEX_TEST_1 = {
   id: 1,
   // Match condition for rule
-  rule: ['c', 'a', {a: "bc"}, {i:{s:"bc", o:2}}, 'a'],
+  rule: ['c', 'a', {t:'a', a: "bc"}, {t:'i', i:{s:"bc", o:2}}, 'a'],
   // Start of context relative to cursor
   n: 5,
   ln: 5,
@@ -471,7 +471,7 @@ var ANY_INDEX_TEST_1 = {
 var ANY_INDEX_TEST_2 = {
   id: 2,
   // Match condition for rule
-  rule: ['c', {a:"ab"}, {i: {s:"bc", o:1}}, {i:{s:"bc", o:1}}, {i:{s:"ab", o:1}}],
+  rule: ['c', {t:'a', a:"ab"}, {t:'i', i: {s:"bc", o:1}}, {t:'i', i:{s:"bc", o:1}}, {t:'i', i:{s:"ab", o:1}}],
   // Start of context relative to cursor
   n: 5,
   ln: 5,
@@ -511,7 +511,7 @@ var ANY_INDEX_TEST_2 = {
 var ANY_INDEX_TEST_3 = {
   id: 3,
   // Match condition for rule
-  rule: ['c', {a:"ab"}, {a:"bc"}, {i:{s:"bc", o:2}}, {i:{s:"ab", o:1}}],
+  rule: ['c', {t:'a', a:"ab"}, {t:'a', a:"bc"}, {t:'i', i:{s:"bc", o:2}}, {t:'i', i:{s:"ab", o:1}}],
   // Start of context relative to cursor
   n: 5,
   ln: 5,
