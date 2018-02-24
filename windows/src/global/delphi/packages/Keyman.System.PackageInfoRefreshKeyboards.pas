@@ -271,6 +271,7 @@ var
 begin
   Result := True;
   pki.ID := TKeyboardUtils.KeyboardFileNameToID(f.FileName);
+  pki.RTL := False;
 
   if f.FileType = ftKeymanFile then
   begin
