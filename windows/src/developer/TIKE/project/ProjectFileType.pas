@@ -100,8 +100,6 @@ begin
     else if FRegisteredFileTypes[i].Extension = Ext then
     begin
       Result := FRegisteredFileTypes[i].ProjectFileClass.Create(FGlobalProject, AFileName, AParent);
-      if Assigned(FDoCreateProjectFileUI) then
-        FDoCreateProjectFileUI(Result);   // I4687
 
       if Assigned(AParent) then
       begin
