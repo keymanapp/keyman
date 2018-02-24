@@ -294,7 +294,6 @@ begin
         else
         begin
           Result := True;
-          WriteMessage(plsInfo, 'Build successfully completed.');
         end;
         Close;
       finally

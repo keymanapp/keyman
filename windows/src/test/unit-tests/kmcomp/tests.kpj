@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath>$SOURCEPATH</BuildPath>
+    <CompilerWarningsAsErrors>True</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_91615e8971cf32d015a3fcbb2019568b</ID>
+      <Filename>test_valid.kmn</Filename>
+      <Filepath>test_valid.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test Valid</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_ef48f2b413cc56985b071e0ee7b1327b</ID>
+      <Filename>test_invalid_kmx.kmn</Filename>
+      <Filepath>test_invalid_kmx.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test invalid kmx</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_0b170bc3637958509b65d8e1f8a44888</ID>
+      <Filename>test_invalid_js.kmn</Filename>
+      <Filepath>test_invalid_js.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test invalid js</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_03dbd77eff6b6b923de6983fab2bd9d0</ID>
+      <Filename>test_valid.kps</Filename>
+      <Filepath>test_valid.kps</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kps</FileType>
+      <Details>
+        <Name>Test Valid</Name>
+        <Version>1.0</Version>
+      </Details>
+    </File>
+    <File>
+      <ID>id_98467bd680620f99f9adeb5347541b6a</ID>
+      <Filename>test_invalid.kps</Filename>
+      <Filepath>test_invalid.kps</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kps</FileType>
+      <Details>
+        <Name>Test invalid kmx</Name>
+        <Version>1.0</Version>
+      </Details>
+    </File>
+    <File>
+      <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>
+      <Filename>test_valid.kmx</Filename>
+      <Filepath>test_valid.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_03dbd77eff6b6b923de6983fab2bd9d0</ParentFileID>
+    </File>
+    <File>
+      <ID>id_416e28ba6ecd3550e599b16a2c37e864</ID>
+      <Filename>test_invalid_kmx.kmx</Filename>
+      <Filepath>test_invalid_kmx.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
+    </File>
+    <File>
+      <ID>id_ee200303f52275647138898037a80e0e</ID>
+      <Filename>test.doc</Filename>
+      <Filepath>test.doc</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.doc</FileType>
+      <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

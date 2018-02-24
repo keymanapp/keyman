@@ -255,7 +255,9 @@ begin
 
         if Result then
           Result := ckw.Compile(OwnerProject, FileName, FOutFileName, FDebug, ProjectCompilerMessage);   // I3681   // I4140   // I4865   // I4866
-        if HasCompileWarning and WarnAsError then Result := False;   // I4706
+
+        if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then Result := False;   // I4706
+
         if Result then
         begin
           Log(plsInfo, '''' + FileName + ''' compiled successfully for Web, iOS, Android, WinPhone to '''+FOutFileName+'''.');   // I4140   // I4504

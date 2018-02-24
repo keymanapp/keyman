@@ -115,8 +115,12 @@ begin
   try
     try
       Result := DoCompilePackage(pack, SelfMessage, FSilent, TargetFilename);
-      if HasCompileWarning and WarnAsError then   // I4706
+      if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then   // I4706
         Result := False;
+
+      if Result
+        then Log(plsInfo, '''' + FileName + ''' compiled successfully.')
+        else Log(plsError, '''' + FileName + ''' was not compiled successfully.');
     except
       on E:Exception do
       begin
@@ -149,8 +153,12 @@ begin
   try
     try
       Result := DoCompilePackageInstaller(pack, SelfMessage, FSilent, '', TargetInstallerFilename, False);
-      if HasCompileWarning and WarnAsError then   // I4706
+      if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then   // I4706
         Result := False;
+
+      if Result
+        then Log(plsInfo, '''' + FileName + ''' compiled successfully.')
+        else Log(plsError, '''' + FileName + ''' was not compiled successfully.');
     except
       on E:Exception do
       begin
