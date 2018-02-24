@@ -174,7 +174,7 @@ type
     procedure SetFontName(const Value: WideString);
     procedure SetDBPathToAppData;
     procedure ImportEthnologue;   // I4257
-    function FillLanguageData(rec: ADODB_TLB.Recordset): TEthnologueLanguage;   // I4257
+//    function FillLanguageData(rec: ADODB_TLB.Recordset): TEthnologueLanguage;   // I4257
   public
     constructor Create(const SourcePath: WideString; AUnicodeDataUIManager: IUnicodeDataUIManager; const ADBPath: string = ''; AForceDBPathToAppDataOnBuild: Boolean = True); // I2845
     destructor Destroy; override;
@@ -1184,13 +1184,13 @@ begin
   end;
 end;
 
-function TUnicodeData.FillLanguageData(rec: ADODB_TLB.Recordset): TEthnologueLanguage; //rec: DaoRecordset): TUnicodeCharacter;   // I4257
+{function TUnicodeData.FillLanguageData(rec: ADODB_TLB.Recordset): TEthnologueLanguage; //rec: DaoRecordset): TUnicodeCharacter;   // I4257
 begin
   Result.Code := rec.Collect['LanguageCode'];
   Result.Name := rec.Collect['Name'];
   Result.Country := rec.Collect['Country'];
   Result.Status := Copy(rec.Collect['Status'], 1, 1)[1];
-end;
+end;}
 
 {function TUnicodeData.FindLanguageByCode(code: string): TEthnologueLanguage;
 var
