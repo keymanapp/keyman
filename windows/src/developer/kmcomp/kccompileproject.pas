@@ -110,8 +110,8 @@ begin
     Free;
   end;
 
-  if not Found and not ASilent then
-    writeln(ExtractFileName(AProjectFilename)+': Target not found (or project empty)');
+  if not Found then
+    writeln(ExtractFileName(AProjectFilename)+': Fatal: Target not found (or project empty)');
   Result := Found;
 end;
 

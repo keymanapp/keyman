@@ -1,0 +1,9 @@
+﻿c This file should generate a warning in the .js compile phase
+store(&version) '9.0' c required to raise the chiral warnings
+store(&NAME) 'Test invalid js'
+store(&TARGETS) 'web'
+begin Unicode > use(main)
+
+group(main) using keys
+
++ [LALT K_A] > 'Oooh no chiral modifiers in KMW 2.0'
