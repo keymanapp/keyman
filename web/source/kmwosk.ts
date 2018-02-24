@@ -750,13 +750,17 @@ if(!window['keyman']['initialized']) {
     {
       if(e && typeof(e.id) != 'undefined')
       {
-        var i, idx = e.id.split('-'), baseId = idx[idx.length-1], layer = (idx.length > 1 ? idx[0] : '');
+        var i, 
+          idx = e.id.split('-'), 
+          baseId = idx[idx.length-1], 
+          layer = e['key'] && e['key']['layer'] ? e['key']['layer'] : (idx.length > 1 ? idx[0] : '');
         if(typeof e.subKeys != 'undefined' && e.subKeys.length > 0 && (e.subKeys[0].id != baseId || e.subKeys[0].layer != layer))
         {
-          var eCopy={'id':baseId,'layer':''};
-          if(idx.length > 1) eCopy['layer'] = idx[0];
-          for(i = 0; i < e.childNodes.length; i++)
-          {
+          var eCopy={'id':baseId,'layer':'','key':undefined};
+          if(layer != '') {
+            eCopy['layer'] = layer;
+          }
+          for(i = 0; i < e.childNodes.length; i++) {
             if(osk.hasClass(e.childNodes[i],'kmw-key-text')) break;
           }
           if(i < e.childNodes.length) eCopy['text'] = e.childNodes[i].textContent;
