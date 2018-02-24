@@ -379,9 +379,6 @@ begin
       finally
         Free;
       end;
-
-      WriteMessage('Build successfully completed.');
-
     except
       on E:EOSError do
         FatalMessage(E.Message);
