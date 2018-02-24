@@ -496,6 +496,8 @@ begin
 
   FreeAndNil(FIDEState);
 
+  FreeAndNil(FUI);
+
   FNotifiers.Free;
   inherited Destroy;
 end;

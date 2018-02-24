@@ -70,7 +70,7 @@ type
     property Refreshing: Boolean read FRefreshing write FRefreshing;
   end;
 
-  TProjectFileUI = class(TInterfacedObject)
+  TProjectFileUI = class
   protected
     FOwner: TProjectFile;
     procedure OpenFile; virtual; abstract;
@@ -282,7 +282,6 @@ constructor TProjectFileUI.Create(AOwner: TProjectFile);
 begin
   inherited Create;
   FOwner := AOwner;
-  _AddRef;
 end;
 
 destructor TProjectFileUI.Destroy;
