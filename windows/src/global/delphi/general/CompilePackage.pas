@@ -190,8 +190,8 @@ begin
     end;
 
     //
-    // The package version has been checked earlier at the start of the
-    // build. So now copy it into the kmp.inf/kmp.json data
+    // Update the package version to the current compiled
+    // keyboard version.
     //
 
     if pack.KPSOptions.FollowKeyboardVersion then
@@ -214,10 +214,6 @@ begin
         end;
       kmpinf.Info.Desc[PackageInfo_Version] := FPackageVersion;;
     end;
-//    else
-//      FPackageVersion := kmpinf.Info.Desc[PackageInfo_Version];
-
-
 
     kmpinf.RemoveFilePaths;
 
