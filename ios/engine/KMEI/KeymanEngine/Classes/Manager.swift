@@ -359,6 +359,96 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
     return nil
   }
+    
+  // MARK: - Adhoc keyboards
+  public func parseKMP(_ folder: URL) throws -> Void {
+    do {
+      var path = folder
+      path.appendPathComponent("kmp.json")
+      let data = try Data(contentsOf: path, options: .mappedIfSafe)
+      let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
+      if let jsonResult = jsonResult as? [String:AnyObject] {
+        if let keyboards = jsonResult["keyboards"] as? [[String:AnyObject]] {
+          for k in keyboards {
+            let name = k["name"] as! String
+            let keyboardID = k["id"] as! String
+            let version = k["version"] as! String
+            let osk = k["oskFont"] as! String
+            let font = k["displayFont"] as! String
+            let displayFont = Font(filename: font)
+            let oskFont = Font(filename: osk)
+
+            //TODO: handle errors if languages do not exist
+            var languageName = ""
+            var languageId = ""
+            
+            var installableKeyboards : [InstallableKeyboard] = []
+            if let langs = k["languages"] as? [[String:String]] {
+              for l in langs {
+                languageName = l["name"]!
+                languageId = l["id"]!
+                
+                installableKeyboards.append( InstallableKeyboard(id: keyboardID, name: name, languageID: languageId, languageName: languageName, version: version, isRTL: false, font: displayFont, oskFont: oskFont, isCustom: false))
+              }
+            }
+            
+            do {
+              try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboardID),
+                                                      withIntermediateDirectories: true)
+            } catch {
+              log.error("Could not create dir for download: \(error)")
+              throw KMPError.fileSystem
+            }
+            
+            for keyboard in installableKeyboards {
+              let storedPath = Storage.active.keyboardURL(for: keyboard)
+              let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk)
+              let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font)
+              
+              let installableFiles: [[Any]] = [["\(keyboardID).js", storedPath],
+                                                [osk, oskPath],
+                                                [font, displayPath]]
+              do {
+                for item in installableFiles {
+                  var filePath = folder
+                  if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
+                    try FileManager.default.removeItem(at: item[1] as! URL)
+                  }
+                  filePath.appendPathComponent(item[0] as! String)
+                  try FileManager.default.copyItem(at: filePath,
+                                                   to: item[1] as! URL)
+                  
+                }
+              } catch {
+                log.error("Error saving the download: \(error)")
+                throw KMPError.copyFiles
+              }
+              Manager.shared.addKeyboard(keyboard)
+            }
+          }
+        }
+      }
+    } catch {
+      log.error("error parsing kmp: \(error)")
+      throw KMPError.invalidPackage
+    }
+  }
+  
+  public func unzipFile(fileUrl: URL, destination: URL, complete: @escaping () -> Void)
+  {
+    do {
+      try Zip.unzipFile(fileUrl, destination: destination, overwrite: true,
+                        password: nil,
+                        progress: { (progress) -> () in
+                          //TODO: add timeout
+                          if(progress == 1.0) {
+                            complete()
+                          }
+                        })
+    } catch {
+      log.error("error unzipping archive: \(error)")
+    }
+  }
 
   // MARK: - Downloading keyboards
 
