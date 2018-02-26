@@ -687,9 +687,20 @@ begin
 
   pwsz := pwszOutput;
 
-  if Assigned(fkp)
-    then len := xstrlen_printing(fkp.dpContext)
-    else len := -1;
+  if Assigned(fkp) then
+    begin
+      if IsKeyboardVersion10OrLater
+        then len := xstrlen(fkp.dpContext)
+        else len := xstrlen_printing(fkp.dpContext);
+    end
+  else
+    len := -1;
+
+  if IsKeyboardVersion10OrLater() and (pwsz^ <> #0) then
+    begin
+      Result := Result + nlt+Format('k.KDC(%d,t);', [ len ] );   // I3681
+      len := -1;
+    end;
 
 	while pwsz^ <> #0 do
   begin

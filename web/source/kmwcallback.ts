@@ -42,6 +42,11 @@ class ContextAny {
    * Value:  the store to search.
    */
   ['a']: KeyboardStore; // For 'a'ny statement.
+
+  /**
+   * If set to true, negates the 'any'.
+   */
+  ['n']: boolean|0|1;
 }
 
 class RuleIndex {
@@ -66,7 +71,13 @@ class ContextEx {
   ['c']: number; // For 'c'ontext statement.
 }
 
-type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx;
+class ContextNul {
+  /** Discriminant field - 'n' for `nul`
+   */
+  ['t']: 'n';
+}
+
+type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx | ContextNul;
 type ContextEntry = RuleChar | ContextNonCharEntry;
 
 /**
@@ -387,17 +398,6 @@ class KeyboardInterface {
       // Now that we have the cache...
       var subCache = cache;
       subCache.valContext = subCache.valContext.slice(0, ln);
-      for(var i=0; i < subCache.valContext.length; i++) {
-        if(subCache[i] == '\ufffe') {
-          subCache.valContext.splice(0, 1);
-          subCache.deadContext.splice(0, 1);
-        }
-      }
-
-      if(subCache.valContext.length == 0) {
-        subCache.valContext = ['\ufffe'];
-        subCache.deadContext = [];
-      }
 
       this.cachedContextEx.set(n, ln, subCache);
 
@@ -452,7 +452,8 @@ class KeyboardInterface {
           case 'a':
             // TODO:  Remove the `string` requirement.
             var lookup = (typeof(context[i]) == 'string' ? context[i] as string : {'d': context[i] as number});
-            if(!this.any(i, lookup, r.a)) {
+            var result = this.any(i, lookup, r.a);
+            if(r.n ? result && context[i] !== "\uFFFE" : !result) {  // 'n' for 'notany', flipping the result.
               mismatch = true;
             } else if(deadContext[i] !== undefined) {
               deadContext[i].set();
@@ -472,6 +473,11 @@ class KeyboardInterface {
               mismatch = true;
             } else if(deadContext[i] !== undefined) {
               deadContext[i].set();
+            }
+            break;
+          case 'n':
+            if(context[i] != "\uFFFE") {
+              mismatch = true;
             }
             break;
           default:
