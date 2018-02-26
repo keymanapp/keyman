@@ -10,7 +10,12 @@ describe('Event Management', function() {
     setupKMW(null, function() {
       // We use this keyboard since we only need minimal input functionality for these tests.
       // Smaller is better when dealing with net latency.
-      loadKeyboardFromJSON("/keyboards/test_simple_deadkeys.json", done, 10000);
+      loadKeyboardFromJSON("/keyboards/test_simple_deadkeys.json", function() {
+        // Interestingly, when auto-testing there's a Safari bug that prevents
+        // this from being preserved after the first forced blur command below.
+        keyman.globalKeyboard = "Keyboard_test_simple_deadkeys";
+        done();
+      }, 10000);
     }, 10000);
 
   });
