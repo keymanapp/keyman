@@ -98,8 +98,24 @@
           break;
       }
 
-      kbdInterface.registerStub({KN:keyboardName,KI:'Keyboard_'+internalName,KLC:langId,KL:languageName,
-        KF:kbdFile,KFont:font,KOskFont:oskFont,KP:package});
+      var k = {
+        KN:keyboardName,
+        KI:'Keyboard_'+internalName,
+        KLC:langId,
+        KL:languageName,
+        KF:kbdFile,
+        KP:package
+      };
+      if (font) {
+        k.KFont = font;
+        window.console.log('keyboard.html assigning k.KFont = ' + font);
+      }
+      if (oskFont) {
+        k.KOskFont = oskFont;
+        window.console.log('keyboard.html assigning k.KOskFont = ' + oskFont);
+      }
+      kbdInterface.registerStub(k);
+
       kmw['setActiveKeyboard'](package + '::Keyboard_'+internalName,langId);
       kmw['osk']['show'](true);
     }
