@@ -64,7 +64,6 @@ type
 
     FOutputFileName: string;
     FTempFiles: TTempFiles;
-    FPackageVersion: string;
 
     procedure FatalMessage(const msg: string);
     procedure WriteMessage(AState: TProjectLogState; const msg: string);   // I4706
@@ -110,7 +109,6 @@ var
   buf: array[0..260] of Char;
   n: Integer;
   f: TSearchRec;
-  i: Integer;
 begin
   Result := False;
 
@@ -130,28 +128,6 @@ begin
 
   CheckForDangerousFiles;
   CheckKeyboardVersions;
-
-  if pack.KPSOptions.FollowKeyboardVersion then
-  begin
-    if pack.Keyboards.Count = 0 then
-    begin
-      FatalMessage('The option "Follow Keyboard Version" is set but there are no keyboards in the package.');
-      Exit;
-    end;
-
-    FPackageVersion := pack.Keyboards[0].Version;
-
-    for i := 1 to pack.Keyboards.Count - 1 do
-      if pack.Keyboards[i].Version <> FPackageVersion then
-      begin
-        FatalMessage(
-          'The option "Follow Keyboard Version" is set but the package contains more than one keyboard, '+
-          'and the keyboards have mismatching versions.');
-        Exit;
-      end;
-  end
-  else
-    FPackageVersion := pack.Info.Desc[PackageInfo_Version];
 
   GetTempPath(260, buf);
   FTempPath := buf;
@@ -183,6 +159,7 @@ function TCompilePackage.BuildKMP: Boolean;
 var
   kmpinf: TKMPInfFile;
   psf: TPackageContentFile;
+  FPackageVersion: string;
   i: Integer;
   f: TTempFile;
 begin
@@ -193,13 +170,6 @@ begin
     { Create KMP.INF and KMP.JSON }
 
     kmpinf.Assign(pack);
-
-    //
-    // The package version has been checked earlier at the start of the
-    // build. So now copy it into the kmp.inf/kmp.json data
-    //
-
-    kmpinf.Info.Desc[PackageInfo_Version] := FPackageVersion;
 
     // Add keyboard information to the package 'for free'
     // Note: this does not get us very far for mobile keyboards as
@@ -218,6 +188,36 @@ begin
     finally
       Free;
     end;
+
+    //
+    // The package version has been checked earlier at the start of the
+    // build. So now copy it into the kmp.inf/kmp.json data
+    //
+
+    if pack.KPSOptions.FollowKeyboardVersion then
+    begin
+      if kmpinf.Keyboards.Count = 0 then
+      begin
+        FatalMessage('The option "Follow Keyboard Version" is set but there are no keyboards in the package.');
+        Exit;
+      end;
+
+      FPackageVersion := kmpinf.Keyboards[0].Version;
+
+      for i := 1 to kmpinf.Keyboards.Count - 1 do
+        if kmpinf.Keyboards[i].Version <> FPackageVersion then
+        begin
+          FatalMessage(
+            'The option "Follow Keyboard Version" is set but the package contains more than one keyboard, '+
+            'and the keyboards have mismatching versions.');
+          Exit;
+        end;
+      kmpinf.Info.Desc[PackageInfo_Version] := FPackageVersion;;
+    end;
+//    else
+//      FPackageVersion := kmpinf.Info.Desc[PackageInfo_Version];
+
+
 
     kmpinf.RemoveFilePaths;
 
