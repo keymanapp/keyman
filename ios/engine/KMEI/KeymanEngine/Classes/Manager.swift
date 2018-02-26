@@ -413,6 +413,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
               do {
                 for item in installableFiles {
                   var filePath = folder
+                  if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
+                    try FileManager.default.removeItem(at: item[1] as! URL)
+                  }
                   filePath.appendPathComponent(item[0] as! String)
                   try FileManager.default.copyItem(at: filePath,
                                                    to: item[1] as! URL)

@@ -129,6 +129,9 @@ public class KMPKeyboard
         var filePath = self.kmp.sourceFolder
         filePath.appendPathComponent(item[0] as! String)
         do {
+          if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
+            try FileManager.default.removeItem(at: item[1] as! URL)
+          }
           try FileManager.default.copyItem(at: filePath,
                                            to: item[1] as! URL)
         } catch {
