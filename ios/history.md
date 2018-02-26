@@ -11,6 +11,7 @@
 * Removed notifications for subkey displayed, subkey dismissed and debug log messages (#389, #415)
 * Removed migration from old app data directory structure (#418)
 * Implemented Carthage as a dependency manager and include 3rd party libraries for unzipping and logging (#475)
+* Support installing Keyman Packages (KMP) for ad-hoc distribution
 
 ## 2017-08-26 2.6.4 stable
 * Fixed bug with blank keyboard on some devices (#218)
