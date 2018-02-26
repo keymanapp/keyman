@@ -573,6 +573,15 @@ begin
             CheckStoreForInvalidFunctions(fkp, rec.Any.Store);  // I1520
             FullContext := FullContext + Format('{t:''a'',a:this.s%s,n:1}', [JavaScript_Name(rec.Any.StoreIndex, rec.Any.Store.szName)]);
           end;
+        CODE_CONTEXTEX:
+          begin
+            FullContext := FullContext + Format('{t:''c'',c:%d}', [rec.ContextEx.Index]);   // I4611
+          end;
+        CODE_INDEX:
+          begin
+            FullContext := FullContext + Format('{t:''i'',i:{s:this.s%s,o:%d}}',
+              [JavaScript_Name(rec.Index.StoreIndex, rec.Index.Store.szName), rec.Index.Index]);   // I4611
+          end;
         else
 
         begin
@@ -1951,7 +1960,8 @@ const
   wcsentinel: WideString = #$FFFF;
 begin
   n := Pos(wcsentinel, store.dpString);
-  if n > 0 then
+  // Disable the check with version 10+, since we now support deadkeys in stores.
+  if (n > 0) and not IsKeyboardVersion10OrLater then
   begin
     pwsz := PWideChar(store.dpString);
     Inc(pwsz, n-1);

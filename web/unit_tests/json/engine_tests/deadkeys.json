@@ -2,7 +2,7 @@
   "keyboard": {
     "id": "test_deadkeys",
     "name": "Keyman Deadkey Stress-Tester",
-    "filename": "resources/keyboards/temp_test_deadkeys_hand.js",
+    "filename": "resources/keyboards/test_deadkeys.js",
     "languages": {}
   },
   "inputTestSets": [
