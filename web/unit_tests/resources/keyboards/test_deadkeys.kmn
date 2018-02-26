@@ -1,7 +1,6 @@
 ﻿store(&VERSION) "10.0"
 store(&TARGETS) 'any windows'
 c Handwritten line numbers correspond to the now-omitted language lines.
-c 
 store(&VISUALKEYBOARD) 'test_deadkeys.kvks'
 store(&NAME) 'Keyman Deadkey Stress-Tester'
 store(&COPYRIGHT) '© 2018 SIL International'  

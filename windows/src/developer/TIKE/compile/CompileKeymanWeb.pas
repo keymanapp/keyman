@@ -227,7 +227,8 @@ type
     function JavaScript_ContextLength(Context: PWideChar): Integer;
     function JavaScript_OutputString(fkp: PFILE_KEY; pwszOutput: PWideChar; fgp: PFILE_GROUP): string;
     function JavaScript_ContextMatch(fkp: PFILE_KEY; context: PWideChar): string;
-    function JavaScript_ContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
+    function JavaScript_CompositeContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
+    function JavaScript_FullContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
     function RuleIsExcludedByPlatform(fkp: PFILE_KEY): Boolean;
     function RequotedString(s: WideString): string;
     function VisualKeyboardFromFile(
@@ -371,7 +372,8 @@ begin
   Result := xstrlen_printing(Context);
 end;
 
-function TCompileKeymanWeb.JavaScript_ContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
+// Used when targeting versions prior to 10.0, before the introduction of FullContextMatch/KFCM.
+function TCompileKeymanWeb.JavaScript_CompositeContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
 
   function IsRegExpSpecialChar(ch: WideChar): Boolean;
   begin
@@ -506,9 +508,106 @@ begin
     Result := Result + Format('",%d)', [Cur - StartQuotes]);
 end;
 
+// Used when targeting 10.0+, after the introduction of FullContextMatch/KFCM.
+function TCompileKeymanWeb.JavaScript_FullContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
+
+  function IsRegExpSpecialChar(ch: WideChar): Boolean;
+  begin
+    Result := Pos('"\^$*+?{}.()|[]/', ch) > 0;
+  end;
+
+var
+  Len: Integer;
+  rec: TSentinelRecord;
+  FullContext, Suffix: string;
+begin
+  Result := '';
+  FullContext := '';
+  Suffix := '';
+  Len := xstrlen(pwsz);
+
+	while pwsz^ <> #0 do
+  begin
+    if FullContext <> ''
+      then FullContext := FullContext + ',';
+
+    rec := ExpandSentinel(pwsz);
+    if rec.IsSentinel then
+    begin
+      case rec.Code of
+        CODE_ANY:
+          begin
+            CheckStoreForInvalidFunctions(fkp, rec.Any.Store);  // I1520
+            FullContext := FullContext + Format('{t:''a'',a:this.s%s}', [JavaScript_Name(rec.Any.StoreIndex, rec.Any.Store.szName)]);
+          end;
+        CODE_DEADKEY:
+          begin
+            FullContext := FullContext + Format('{t:''d'',d:%d}', [rec.Deadkey.Deadkey]);
+          end;
+        CODE_NUL:    // I2243
+          begin
+            FullContext := FullContext + '{t:''n''}';
+          end;
+        CODE_IFOPT:    // I3429
+          begin
+            Dec(Len);
+            if Suffix <> '' then Suffix := Suffix + '&&';
+            if FullContext = ',' then FullContext := '';
+            Suffix := Suffix + Format('this.s%s%sthis.s%s',
+              [JavaScript_Name(rec.IfOpt.StoreIndex1, rec.IfOpt.Store1.szName),
+              IfThen(rec.IfOpt.IsNot = 0, '!==', '==='),
+              JavaScript_Name(rec.IfOpt.StoreIndex2,rec.IfOpt.Store2.szName)]);  // I3429   // I3659   // I3681
+          end;
+        CODE_IFSYSTEMSTORE:     // I3430
+          begin
+            Dec(Len);
+            if Suffix <> '' then Suffix := Suffix + '&&';
+            if FullContext = ',' then FullContext := '';
+            Suffix := Suffix + Format('%sk.KIFS(%d,this.s%s,t)',
+              [IfThen(rec.IfSystemStore.IsNot = 0, '!', ''),
+              rec.IfSystemStore.dwSystemID,
+              JavaScript_Name(rec.IfSystemStore.StoreIndex,rec.IfSystemStore.Store.szName)]);  // I3430   // I3659   // I3681
+          end;
+        CODE_NOTANY:   // I3981
+          begin
+            CheckStoreForInvalidFunctions(fkp, rec.Any.Store);  // I1520
+            FullContext := FullContext + Format('{t:''a'',a:this.s%s,n:1}', [JavaScript_Name(rec.Any.StoreIndex, rec.Any.Store.szName)]);
+          end;
+        else
+
+        begin
+          ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, Format('Statement %s is not currently supported in context', [GetCodeName(rec.Code)]));  // I1971   // I4061
+          //CODE_NUL: ;     // todo: check if context is longer than that...
+          Result := Result + '/*.*/ 0 ';
+        end;
+      end;
+		end
+		else
+    begin // Simple context character.
+      FullContext := FullContext + '''';
+      if rec.ChrVal in [Ord('"'), Ord('\')]
+        then FullContext := FullContext + '\';
+      FullContext := FullContext + Javascript_String(rec.ChrVal) + '''';  // I2242
+		end;
+
+		pwsz := incxstr(pwsz);
+	end;
+
+  if FullContext <> ''
+    then Result := Format('k.KFCM(%d,t,[%s])', [Len, FullContext]);
+
+  if (Result <> '') and (Suffix <> '')
+    then Result := Result + '&&' + Suffix
+  else if Suffix <> '' then
+    Result := Suffix;
+
+end;
+
 function TCompileKeymanWeb.JavaScript_ContextMatch(fkp: PFILE_KEY; context: PWideChar): string;
 begin
-  Result := JavaScript_ContextValue(fkp, context);
+  if IsKeyboardVersion10OrLater
+    then Result := JavaScript_FullContextValue(fkp, context)
+    else Result := JavaScript_CompositeContextValue(fkp, context);
 end;
 
 const // I1585 - add space to conversion
@@ -920,24 +1019,65 @@ end;
 function TCompileKeymanWeb.JavaScript_Store(pwsz: PWideChar): string;
 var
   ch: DWord;
+  n: Integer;
+  rec: TSentinelRecord;
+const
+  wcsentinel: WideString = #$FFFF;
 begin
-  Result := '"';
-	while pwsz^ <> #0 do
-  begin
-		if PWord(pwsz)^ = UC_SENTINEL then
-    begin
-      Result := Result + '.'; {TODO: fill in .}
-    end
-    else
-    begin
-      ch := GetSuppChar(pwsz);
-      if ch in [Ord('"'), Ord('\')] then Result := Result + '\';
-      Result := Result + Javascript_String(ch);  // I2242
-    end;
+  n := Pos(wcsentinel, pwsz);
 
-    pwsz := incxstr(pwsz);
+  // Start:  plain text store.  Always use for 9.0-, conditionally for 10.0+.
+  if (n = 0) or not IsKeyboardVersion10OrLater then
+  begin
+    Result := '"';
+    while pwsz^ <> #0 do
+    begin
+      if PWord(pwsz)^ = UC_SENTINEL then
+      begin
+        Result := Result + '.'; {TODO: fill in .}
+      end
+      else
+      begin
+        ch := GetSuppChar(pwsz);
+        if ch in [Ord('"'), Ord('\')] then Result := Result + '\';
+        Result := Result + Javascript_String(ch);  // I2242
+      end;
+
+      pwsz := incxstr(pwsz);
+    end;
+    Result := Result + '"';
+  end
+  else
+  begin
+    Result := '[';
+    while pwsz^ <> #0 do
+    begin
+      if Result <> '[' then Result := Result + ',';
+
+      rec := ExpandSentinel(pwsz);
+      if rec.IsSentinel then
+      begin
+        if rec.Code = CODE_DEADKEY then
+        begin
+          Result := Result + Format('{d:%d}', [rec.Deadkey.DeadKey]);
+        end
+        else
+        begin
+          // How to report this error?  We should never see this.
+        end;
+      end
+      else
+      begin
+        ch := GetSuppChar(pwsz);
+        Result := Result + '"';
+        if ch in [Ord('"'), Ord('\')] then Result := Result + '\';
+        Result :=  Result + Javascript_String(ch) + '"';  // I2242
+      end;
+
+      pwsz := incxstr(pwsz);
+    end;
+    Result := Result + ']';
   end;
-  Result := Result + '"';
 end;
 
 function TCompileKeymanWeb.JavaScript_String(ch: DWord): string;  // I2242
