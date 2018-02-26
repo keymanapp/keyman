@@ -252,6 +252,9 @@ begin
     { Create output file }
 
     try
+
+      if FileExists(FOutputFilename) then DeleteFile(FOutputFilename);
+
       with TZipFile.Create do
       try
         Open(FOutputFilename, TZipMode.zmWrite);
