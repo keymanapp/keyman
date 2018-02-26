@@ -16,9 +16,10 @@
 type PlainKeyboardStore = string;
 
 // TODO:  Implement the new 'store object-orientation proposal.
-//type ComplexKeyboardStore = (string|{d: number})[]; 
+type KeyboardStoreElement = (string|{'d': number});
+type ComplexKeyboardStore = KeyboardStoreElement[]; 
 
-type KeyboardStore = PlainKeyboardStore; // | ComplexKeyboardStore;
+type KeyboardStore = PlainKeyboardStore | ComplexKeyboardStore;
 type RuleChar = string;
 
 class RuleDeadkey {
@@ -341,7 +342,7 @@ class KeyboardInterface {
    * @param       {Object}      Pelem   Element to work with (must be currently focused element)
    * @return      {Array}               Context array (of strings and numbers) 
    */
-  private _BuildExtendedContext(n: number, ln: number, Ptarg: HTMLElement): { valContext: (string|number)[], deadContext: Deadkey[]} {
+  private _BuildExtendedContext(n: number, ln: number, Ptarg: HTMLElement): CachedExEntry {
     var cache = this.cachedContextEx.get(n, ln); 
     if(cache !== null) {
       return cache;
@@ -450,25 +451,36 @@ class KeyboardInterface {
             break;
           case 'a':
             // TODO:  Remove the `string` requirement.
-            if(!this.any(i, context[i] as string, r.a)) {
+            var lookup = (typeof(context[i]) == 'string' ? context[i] as string : {'d': context[i] as number});
+            if(!this.any(i, lookup, r.a)) {
               mismatch = true;
+            } else if(deadContext[i] !== undefined) {
+              deadContext[i].set();
             }
             break;
           case 'i':
             var ch = this._Index(r.i.s, r.i.o);
 
-            if(ch != context[i]) {
+            if(ch !== undefined && (typeof(ch) == 'string' ? ch : ch.d) !== context[i]) {
               mismatch = true;
+            } else if(deadContext[i] !== undefined) {
+              deadContext[i].set();
             }
             break;
           case 'c':            
             if(context[r.c - 1] != context[i]) {
               mismatch = true;
+            } else if(deadContext[i] !== undefined) {
+              deadContext[i].set();
             }
             break;
           default:
             assertNever(r);
         }
+      }
+
+      if(mismatch) {
+        break;
       }
     }
 
@@ -638,6 +650,29 @@ class KeyboardInterface {
       window.setTimeout(this.beepReset.bind(this), 50);
     }
   }
+
+  _ExplodeStore(store: KeyboardStore): ComplexKeyboardStore {
+    if(typeof(store) == 'string') {
+      var kbdTag = this.keymanweb.keyboardManager.getActiveKeyboardTag();
+
+      // Is the result cached?
+      if(kbdTag.stores[store]) {
+        return kbdTag.stores[store];
+      }
+
+      // Nope, so let's build its cache.
+      var result: ComplexKeyboardStore = [];
+      for(var i=0; i < store._kmwLength(); i++) {
+        result.push(store._kmwCharAt(i));
+      }
+
+      // Cache the result for later!
+      kbdTag.stores[store] = result;
+      return result;
+    } else {
+      return store;
+    }
+  }
   
   /**
    * Function     any           KA      
@@ -648,15 +683,107 @@ class KeyboardInterface {
    * @return      {boolean}           True if character found in 'any' string, sets index accordingly
    * Description  Test for character matching
    */    
-  any(n: number, ch: string, s:string): boolean {
+  any(n: number, ch: KeyboardStoreElement, s: KeyboardStore): boolean {
     if(ch == '') {
       return false;
     }
-    var Lix = s._kmwIndexOf(ch); //I3319
+    
+    s = this._ExplodeStore(s);
+    var Lix = -1;
+    for(var i=0; i < s.length; i++) {
+      if(typeof(s[i]) == 'string') {
+        if(s[i] == ch) {
+          Lix = i;
+          break;
+        }
+      } else if(s[i]['d'] === ch['d']) {
+        Lix = i;
+        break;
+      }
+    }
     this._AnyIndices[n] = Lix;
     return Lix >= 0;
   }
+
+  /**
+   * Function     _Index
+   * Scope        Public 
+   * @param       {string}      Ps      string
+   * @param       {number}      Pn      index
+   * Description  Returns the character from a store string according to the offset in the index array
+   */
+  _Index(Ps: KeyboardStore, Pn: number): KeyboardStoreElement {        
+    Ps = this._ExplodeStore(Ps);
+
+    if(this._AnyIndices[Pn-1] < Ps.length) {   //I3319
+      return Ps[this._AnyIndices[Pn-1]];
+    } else {
+      /* Should not be possible for a compiled keyboard, but may arise 
+       * during the development of handwritten keyboards.
+       */
+      console.warn("Unmatched contextual index() statement detected in rule with index " + Pn + "!");
+      return "";
+    }
+  }
+
+  /**
+   * Function     indexOutput   KIO
+   * Scope        Public
+   * @param       {number}      Pdn     no of character to overwrite (delete)
+   * @param       {string}      Ps      string
+   * @param       {number}      Pn      index
+   * @param       {Object}      Pelem   element to output to
+   * Description  Output a character selected from the string according to the offset in the index array
+   */
+  indexOutput(Pdn: number, Ps: KeyboardStore, Pn: number, Pelem: HTMLElement): void {
+    this.resetContextCache();
+
+    var indexChar = this._Index(Ps, Pn);
+    if(indexChar !== "") {
+      if(typeof indexChar == 'string' ) {
+        this.output(Pdn,Pelem,indexChar);  //I3319
+      } else {
+        this.deadkeyOutput(Pdn, Pelem, indexChar['d']);
+      }
+    } 
+  }
   
+  
+  /**
+   * Function     deleteContext KDC  
+   * Scope        Public
+   * @param       {number}      dn      number of context entries to overwrite
+   * @param       {Object}      Pelem   element to output to 
+   * @param       {string}      s       string to output   
+   * Description  Keyboard output
+   */
+  deleteContext(dn: number, Pelem): void {
+    var context: CachedExEntry;
+
+    // We want to control exactly which deadkeys get removed.
+    if(dn > 0) {
+      context = this._BuildExtendedContext(dn, dn, Pelem);
+      for(var i=0; i < context.deadContext.length; i++) {
+        var dk = context.deadContext[i];
+
+        if(dk) {
+          // Remove deadkey in context.
+          var index = this._DeadKeys.indexOf(dk);
+          this._DeadKeys.splice(index, 1);
+
+          // Reduce our reported context size.
+          dn--;
+        }
+      }
+    }
+
+    // If a matched deadkey hasn't been deleted, we don't WANT to delete it.
+    this._DeadkeyResetMatched();
+
+    // Why reinvent the wheel?  Delete the remaining characters by 'inserting a blank string'.
+    this.output(dn, Pelem, '');
+  }
+
   /**
    * Function     output        KO  
    * Scope        Public
@@ -664,7 +791,7 @@ class KeyboardInterface {
    * @param       {Object}      Pelem   element to output to 
    * @param       {string}      s       string to output   
    * Description  Keyboard output
-   */    
+   */
   output(dn: number, Pelem, s:string): void {
     this.resetContextCache();
     
@@ -827,47 +954,6 @@ class KeyboardInterface {
     // Aim to put the newest deadkeys first.
     this._DeadKeys=[Lc].concat(this._DeadKeys);      
     //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
-  }
-
-  /**
-   * Function     _Index
-   * Scope        Public 
-   * @param       {string}      Ps      string
-   * @param       {number}      Pn      index
-   * Description  Returns the character from a store string according to the offset in the index array
-   */
-  _Index(Ps: string, Pn: number): string {
-    if(this._AnyIndices[Pn] < Ps._kmwLength()) {   //I3319
-      return Ps._kmwCharAt(this._AnyIndices[Pn]);
-    } else {
-      /* Should not be possible for a compiled keyboard, but may arise 
-       * during the development of handwritten keyboards.
-       */
-      console.warn("Unmatched contextual index() statement detected in rule with index " + Pn + "!");
-      return "";
-    }
-  }
-
-  /**
-   * Function     indexOutput   KIO
-   * Scope        Public
-   * @param       {number}      Pdn     no of character to overwrite (delete)
-   * @param       {string}      Ps      string
-   * @param       {number}      Pn      index
-   * @param       {Object}      Pelem   element to output to
-   * Description  Output a character selected from the string according to the offset in the index array
-   */
-  indexOutput(Pdn: number, Ps: string, Pn: number, Pelem: HTMLElement): void {
-    this.resetContextCache();
-    var indexChar = this._Index(Ps, Pn-1);
-    if(indexChar) {
-      this.output(Pdn,Pelem,indexChar);  //I3319
-    } else {
-      /* Should not be possible for a compiled keyboard, but may arise 
-       * during the development of handwritten keyboards.
-       */
-      console.warn("Unmatched output index() statement detected in rule with index " + Pn + "!");
-    }
   }
 
   /**
@@ -1074,7 +1160,7 @@ class KeyboardInterface {
     var _Dk = this._DeadKeys;
     for(var Li = 0; Li < _Dk.length; Li++) {
       if(_Dk[Li].matched) {
-        _Dk.splice(Li,1);
+        _Dk.splice(Li--,1); // Don't forget to decrement!
       }
     }
   }
