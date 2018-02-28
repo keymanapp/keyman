@@ -12,6 +12,7 @@
 @implementation KMInputMethodEventHandler
 
 const CGKeyCode kProcessPendingBuffer = 0xFF;
+const NSUInteger kMaxContext = 80;
 
 //_pendingBuffer contains text that is ready to be sent to the client when all delete-backs are finished.
 NSMutableString* _pendingBuffer;
@@ -177,7 +178,13 @@ NSRange _previousSelRange;
         len = selRange.location;
     }
     
-    NSString *preBuffer = [[sender attributedSubstringFromRange:NSMakeRange(0, len)] string];
+    NSUInteger start = 0;
+    if (len > kMaxContext) {
+        start = len - kMaxContext;
+        len = kMaxContext;
+    }
+    
+    NSString *preBuffer = [[sender attributedSubstringFromRange:NSMakeRange(start, len)] string];
     if ([self.AppDelegate debugMode]) {
         NSLog(@"preBuffer = \"%@\"", preBuffer);
         if (preBuffer.length)
