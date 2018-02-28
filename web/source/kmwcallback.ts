@@ -424,6 +424,9 @@ class KeyboardInterface {
 
     var mismatch = false;
 
+    // This symbol internally indicates lack of context in a position.  (See KC_)
+    const NUL_CONTEXT = "\uFFFE";
+
     var assertNever = function(x: never): never {
       // Could be accessed by improperly handwritten calls to `fullContextMatch`.
       throw new Error("Unexpected object in fullContextMatch specification: " + x);
@@ -453,10 +456,17 @@ class KeyboardInterface {
             // TODO:  Remove the `string` requirement.
             var lookup = (typeof(context[i]) == 'string' ? context[i] as string : {'d': context[i] as number});
             var result = this.any(i, lookup, r.a);
-            if(r.n ? result && context[i] !== "\uFFFE" : !result) {  // 'n' for 'notany', flipping the result.
+
+            if(!r.n) { // If it's a standard 'any'...
+              if(!result) {
+                mismatch = true;
+              } else if(deadContext[i] !== undefined) {
+                // It's a deadkey match, so indicate that.
+                deadContext[i].set();
+              }
+              // 'n' for 'notany'.  If we actually match or if we have nul context (\uFFFE), notany fails.
+            } else if(r.n && (result || context[i] !== NUL_CONTEXT)) {
               mismatch = true;
-            } else if(deadContext[i] !== undefined) {
-              deadContext[i].set();
             }
             break;
           case 'i':
@@ -476,7 +486,8 @@ class KeyboardInterface {
             }
             break;
           case 'n':
-            if(context[i] != "\uFFFE") {
+            // \uFFFE is the internal 'no context here sentinel'.
+            if(context[i] != NUL_CONTEXT) {
               mismatch = true;
             }
             break;
