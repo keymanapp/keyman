@@ -436,7 +436,7 @@ class KeyboardInterface {
     for(var i=0; i < rule.length; i++) {
       if(typeof rule[i] == 'string') {
         var str = rule[i] as string;
-        if(str != context[i]) {
+        if(str !== context[i]) {
           mismatch = true;
           break;
         }
@@ -446,7 +446,7 @@ class KeyboardInterface {
         switch(r.t) {
           case 'd':
             // We still need to set a flag here; 
-            if(r['d'] != context[i]) {
+            if(r['d'] !== context[i]) {
               mismatch = true;
             } else {
               deadContext[i].set();
@@ -479,7 +479,7 @@ class KeyboardInterface {
             }
             break;
           case 'c':            
-            if(context[r.c - 1] != context[i]) {
+            if(context[r.c - 1] !== context[i]) {
               mismatch = true;
             } else if(deadContext[i] !== undefined) {
               deadContext[i].set();
