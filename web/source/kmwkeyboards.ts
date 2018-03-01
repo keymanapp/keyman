@@ -232,10 +232,12 @@ class KeyboardManager {
    **/
   mergeStub(kp: any, lp: any, options) {
     var sp: KeyboardStub = this.findStub(kp['id'], lp['id']);
+    var isNew: boolean = false;
 
     if(sp == null) {
       sp= new KeyboardStub(kp['id'], lp['id']);
       this.keyboardStubs.push(sp);
+      isNew = true;
     }
 
     // Accept region as number (from Cloud server), code, or name
@@ -315,6 +317,12 @@ class KeyboardManager {
 
     // Update the UI 
     this.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC'],sp['KP']);
+
+    // If we have no activeStub because there were no stubs, set the new keyboard as active.
+    // Do not trigger on merges.
+    if(!this.activeStub && isNew && this.keyboardStubs.length == 1) {
+      this.setActiveKeyboard(sp['KI'], sp['KLC']);
+    }
   }
 
   /**
@@ -627,12 +635,13 @@ class KeyboardManager {
         
           // Prepare and show the OSK for this keyboard
           osk._Load();
+        } 
 
-          // Remove the wait message, if defined
-          if(!manager.keymanweb.isEmbedded) {
-            util.wait(false);
-          }
-        } // A handler portion for cases where the new <script> block loads, but fails to process.
+        // Remove the wait message, if defined
+        if(!manager.keymanweb.isEmbedded) {
+          util.wait(false);
+        }
+        // A handler portion for cases where the new <script> block loads, but fails to process.
       } else {  // Output error messages even when embedded - they're useful when debugging the apps and KMEA/KMEI engines.
           kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.', 'error');
       }
@@ -1347,6 +1356,12 @@ class KeyboardManager {
     // make any changes needed by UI for new keyboard stub
     // (Uncommented for Build 360)
     this.doKeyboardRegistered(Pstub['KI'],Pstub['KL'],Pstub['KN'],Pstub['KLC'],Pstub['KP']);
+
+    // If we have no activeStub because there were no stubs, set the new keyboard as active.
+    // Do not trigger on merges.
+    if(!this.activeStub && this.dfltStub == Pstub && this.keyboardStubs.length == 1) {
+      this.setActiveKeyboard(Pstub['KI'], Pstub['KLC']);
+    }
 
     return null;
   }
