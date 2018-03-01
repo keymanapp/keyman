@@ -747,7 +747,7 @@ class Util {
       var cx = this.loadCookie();
       for(var t in cx) {
         if(t == cn) {
-          var d = decodeURI(cx[t]).split(';');
+          var d = decodeURIComponent(cx[t]).split(';');
           for(var i=0; i<d.length; i++) {
             var xc = d[i].split('=');
             if(xc.length > 1) {
@@ -785,7 +785,7 @@ class Util {
     }
 
     var d = new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 30).toUTCString();
-    document.cookie = cn+'='+encodeURI(s)+'; path=/; expires='+d;//Fri, 31 Dec 2099 23:59:59 GMT;';
+    document.cookie = cn+'='+encodeURIComponent(s)+'; path=/; expires='+d;//Fri, 31 Dec 2099 23:59:59 GMT;';
   }
   
   /**
