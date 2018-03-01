@@ -248,37 +248,7 @@ NSRange _previousSelRange;
         _contextOutOfDate = YES;
         self.AppDelegate.contextChangingEventDetected = NO;
     }
-
-//    if ([self.AppDelegate debugMode]) {
-//        NSLog(@"_clientSelectionCanChangeUnexpectedly = %@", _clientSelectionCanChangeUnexpectedly ? @"YES" : @"NO");
-//    }
-//    // The following is needed because some clients (e.g. Chrome & Terminal) handle mouse down events and we
-//    // never get a crack at them:
-//    // At the start of the loop before asking the Engine to process the event, unless we still have
-//    // pending work to do based on posted deletes or the special kProcessPendingBuffer code, check to see if
-//    // the client still reports a selection that matches the position we would expect based on the length of
-//    // the context buffer. If not, then reset the context buffer.
-//    if (_clientSelectionCanChangeUnexpectedly && _numberOfPostedDeletesToExpect == 0 &&
-//        (_pendingBuffer == nil || _pendingBuffer.length == 0)) {
-//        NSRange currentSelRange = [client selectedRange];
-//
-//        if (currentSelRange.location == NSNotFound) {
-//            _clientSelectionCanChangeUnexpectedly = NO;
-//        }
-//        else if ((_previousSelRange.location != currentSelRange.location || _cannnotTrustSelectionLength || _previousSelRange.length != currentSelRange.length)) {
-//            if ([self.AppDelegate debugMode]) {
-//                NSLog(@"Client selection may have changed since context was set. Resetting context...");
-//                NSLog(@"  _previousSelRange.location = %lu", _previousSelRange.location);
-//                NSLog(@"  _previousSelRange.length = %lu", _previousSelRange.length);
-//                NSLog(@"  currentSelRange.location = %lu", currentSelRange.location);
-//                if (_cannnotTrustSelectionLength)
-//                    NSLog(@"The following cannot be trusted and will be ignored:");
-//                NSLog(@"  currentSelRange.length = %lu", currentSelRange.length);
-//            }
-//            [self updateContextBuffer:client];
-//        }
-//    }
-    
+  
     if (_contextOutOfDate)
         [self updateContextBuffer:client];
 }
