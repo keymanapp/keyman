@@ -242,6 +242,16 @@ final class KMKeyboard extends WebView {
     return keyboardRoot + oskFont;
   }
 
+  /**
+   * Return the full path to the special OSK font,
+   * which is with all the keyboard assets at the root app_data folder
+   * @param String filename
+   * @return String
+   */
+  public String specialOSKFontFilename(String filename) {
+    return context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator + filename;
+  }
+
   public boolean setKeyboard(String packageID, String keyboardID, String languageID) {
     if (packageID == null || keyboardID == null || languageID == null)
       return false;
@@ -635,7 +645,7 @@ final class KMKeyboard extends WebView {
       button.setText(title);
 
       if (!specialOskFont.isEmpty()) {
-        button.setTypeface(KMManager.getFontTypeface(context, specialOskFont));
+        button.setTypeface(KMManager.getFontTypeface(context, specialOSKFontFilename(specialOskFont)));
       } else {
         Typeface font = KMManager.getFontTypeface(context, (oskFont != null) ? oskFontFilename() : textFontFilename());
         if (font != null) {
