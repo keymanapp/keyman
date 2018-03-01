@@ -362,7 +362,7 @@ function Keyboard_test_deadkeys()
       k.KDO(-1,t,4);
       k.KDO(-1,t,3);
     }
-    else if(k.KFCM(2,t,[{t:'a',a:this.s_deadnums},{t:'i',i:{s:this.s_deadnums,o:1}}])) {   // Line 138
+    else if(k.KFCM(2,t,[{t:'a',a:this.s_deadnums},{t:'i',i:this.s_deadnums,o:1}])) {   // Line 138
       m=1;
       k.KDC(2,t);
       k.KO(-1,t,"(");
