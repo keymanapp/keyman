@@ -1108,7 +1108,7 @@ class KeyboardInterface {
     this.resetContextCache();
     var cName='KeymanWeb_'+kbdName+'_Option_'+storeName,cValue=this.keymanweb.util.loadCookie(cName);
     if(typeof cValue[storeName] != 'undefined') {
-      return decodeURI(cValue[storeName]);
+      return decodeURIComponent(cValue[storeName]);
     } else {
       return dfltValue;
     }
@@ -1128,7 +1128,7 @@ class KeyboardInterface {
       return false;
     }
     
-    var cName='KeymanWeb_'+kbd['KI']+'_Option_'+storeName, cValue=encodeURI(optValue);
+    var cName='KeymanWeb_'+kbd['KI']+'_Option_'+storeName, cValue=encodeURIComponent(optValue);
 
     this.keymanweb.util.saveCookie(cName,cValue);
     return true;
