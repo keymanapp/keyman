@@ -364,6 +364,11 @@ class KeyboardManager {
     //TODO: This does not make sense: the callbacks should be in _SetActiveKeyboard, not here,
     //      since this is always called FROM the UI, which should not need notification.
     //      If UI callbacks are needed at all, they should be within _SetActiveKeyboard  
+
+    if(PInternalName && PInternalName.indexOf("Keyboard_") != 0) {
+      PInternalName = "Keyboard_" + PInternalName;
+    }
+
     this.doBeforeKeyboardChange(PInternalName,PLgCode);     
     this._SetActiveKeyboard(PInternalName,PLgCode,true);    
     if(this.keymanweb.domManager.getLastActiveElement() != null) {
