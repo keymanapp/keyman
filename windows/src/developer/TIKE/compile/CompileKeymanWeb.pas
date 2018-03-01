@@ -580,7 +580,7 @@ begin
           end;
         CODE_INDEX:
           begin
-            FullContext := FullContext + Format('{t:''i'',i:{s:this.s%s,o:%d}}',
+            FullContext := FullContext + Format('{t:''i'',i:this.s%s,o:%d}',
               [JavaScript_Name(rec.Index.StoreIndex, rec.Index.Store.szName), rec.Index.Index]);   // I4611
           end;
         else

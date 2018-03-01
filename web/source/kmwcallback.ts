@@ -55,9 +55,14 @@ class RuleIndex {
   ['t']: 'i';
   
   /**
-   * Value:  {'s': the Store from which to output, 'o': the Offset into the current rule's context.}
+   * Value: the Store from which to output
    */
-  ['i']: {'s': KeyboardStore, 'o': number}; // For 'i'ndex statement.
+  ['i']: KeyboardStore;
+  
+  /**
+   * Offset: the offset in context for the corresponding `any()`.
+   */
+  ['o']: number;
 }
 
 class ContextEx {
@@ -453,7 +458,6 @@ class KeyboardInterface {
             }
             break;
           case 'a':
-            // TODO:  Remove the `string` requirement.
             var lookup = (typeof(context[i]) == 'string' ? context[i] as string : {'d': context[i] as number});
             var result = this.any(i, lookup, r.a);
 
@@ -470,7 +474,7 @@ class KeyboardInterface {
             }
             break;
           case 'i':
-            var ch = this._Index(r.i.s, r.i.o);
+            var ch = this._Index(r.i, r.o);
 
             if(ch !== undefined && (typeof(ch) == 'string' ? ch : ch.d) !== context[i]) {
               mismatch = true;
