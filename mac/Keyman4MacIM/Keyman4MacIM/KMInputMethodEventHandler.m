@@ -178,20 +178,8 @@ NSRange _previousSelRange;
         len = selRange.location;
     }
     
-    NSUInteger start = 0;
-    if (len > kMaxContext) {
-        start = len - kMaxContext;
-        len = kMaxContext;
-    }
-    
-    NSString *preBuffer = [[sender attributedSubstringFromRange:NSMakeRange(start, len)] string];
-    if ([self.AppDelegate debugMode]) {
-        NSLog(@"preBuffer = \"%@\"", preBuffer);
-        if (preBuffer.length)
-            NSLog(@"First character: '%x'", [preBuffer characterAtIndex:0]);
-        else
-            NSLog(@"preBuffer has a length of 0");
-    }
+    NSString *preBuffer = [self getLimitedContextFrom:sender at:len];
+
     // REVIEW: If there is ever a situation where preBuffer gets some text but the client reports its
     // selectedRange as not found, we probably can't reliably assume that the current location is really
     // at the end of the "preBuffer", so maybe we just need to assume no context.
@@ -202,6 +190,30 @@ NSRange _previousSelRange;
         NSLog(@"***");
     }
     _previousSelRange = selRange;
+}
+
+-(NSString *)getLimitedContextFrom:(id)sender at:(NSUInteger) len {
+    if (![sender respondsToSelector:@selector(attributedSubstringFromRange:)])
+        return nil;
+        
+    NSUInteger start = 0;
+    if (len > kMaxContext) {
+        if ([self.AppDelegate debugMode])
+            NSLog(@"Limiting context to %lu characters", kMaxContext);
+        start = len - kMaxContext;
+        len = kMaxContext;
+    }
+    
+    NSString *preBuffer = [[sender attributedSubstringFromRange:NSMakeRange(start, len)] string];
+    if ([self.AppDelegate debugMode]) {
+        NSLog(@"preBuffer = \"%@\"", preBuffer ? preBuffer : @"nil");
+        if (preBuffer.length)
+            NSLog(@"First character: '%x'", [preBuffer characterAtIndex:0]);
+        else
+            NSLog(@"preBuffer has a length of 0");
+    }
+    
+    return preBuffer;
 }
 
 // Return the pending buffer.  If it is NIL create it.
