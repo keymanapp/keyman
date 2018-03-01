@@ -73,32 +73,47 @@ typedef enum {
                                                          forEventClass:kInternetEventClass
                                                             andEventID:kAEGetURL];
         
-        CFMachPortRef flagsChangedEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask, (CGEventTapCallBack)eventTapFunction, nil);
+        CFMachPortRef lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask | NSLeftMouseDown | NSLeftMouseUp | NSOtherMouseDown | NSOtherMouseUp, (CGEventTapCallBack)eventTapFunction, nil);
         
-        if (!flagsChangedEventTap)
-            NSLog(@"Can't tap into flags changed event!");
+        if (!lowLevelEventTap)
+            NSLog(@"Can't tap into low level events!");
         else
-            CFRelease(flagsChangedEventTap);
-                  
-        CFRunLoopSourceRef flagsChangedEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, flagsChangedEventTap, 0);
+            CFRelease(lowLevelEventTap);
+        
+        CFRunLoopSourceRef runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, lowLevelEventTap, 0);
         
         CFRunLoopRef runLoop = CFRunLoopGetCurrent();
         
-        if (flagsChangedEventSrc && runLoop) {
-            CFRunLoopAddSource(runLoop,  flagsChangedEventSrc, kCFRunLoopDefaultMode);
+        if (runLoopEventSrc && runLoop) {
+            CFRunLoopAddSource(runLoop,  runLoopEventSrc, kCFRunLoopDefaultMode);
         }
         
-        CFMachPortRef mouseUpDownEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSLeftMouseDown | NSLeftMouseUp | NSOtherMouseDown | NSOtherMouseUp, (CGEventTapCallBack)eventTapFunction, nil);
-        
-        if (!mouseUpDownEventTap)
-            NSLog(@"Can't tap into mouse up/down events!");
-        else
-            CFRelease(mouseUpDownEventTap);
-        
-        CFRunLoopSourceRef mouseUpDownEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, mouseUpDownEventTap, 0);
-        if (mouseUpDownEventSrc && runLoop) {
-            CFRunLoopAddSource(runLoop,  mouseUpDownEventSrc, kCFRunLoopDefaultMode);
-        }
+//        CFMachPortRef flagsChangedEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask, (CGEventTapCallBack)eventTapFunction, nil);
+//
+//        if (!flagsChangedEventTap)
+//            NSLog(@"Can't tap into flags changed event!");
+//        else
+//            CFRelease(flagsChangedEventTap);
+//
+//        CFRunLoopSourceRef flagsChangedEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, flagsChangedEventTap, 0);
+//
+//        CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+//
+//        if (flagsChangedEventSrc && runLoop) {
+//            CFRunLoopAddSource(runLoop,  flagsChangedEventSrc, kCFRunLoopDefaultMode);
+//        }
+//
+//        CFMachPortRef mouseUpDownEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSLeftMouseDown | NSLeftMouseUp | NSOtherMouseDown | NSOtherMouseUp, (CGEventTapCallBack)eventTapFunction, nil);
+//
+//        if (!mouseUpDownEventTap)
+//            NSLog(@"Can't tap into mouse up/down events!");
+//        else
+//            CFRelease(mouseUpDownEventTap);
+//
+//        CFRunLoopSourceRef mouseUpDownEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, mouseUpDownEventTap, 0);
+//        if (mouseUpDownEventSrc && runLoop) {
+//            CFRunLoopAddSource(runLoop,  mouseUpDownEventSrc, kCFRunLoopDefaultMode);
+//        }
     }
 
     return self;
@@ -186,7 +201,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             case kCGEventOtherMouseUp:
             case kCGEventOtherMouseDown:
                 {
-                    // TODO: set context-out-of-date flag
+                    appDelegate.contextChangingEventDetected = YES;
                 }
                 break;
                 
