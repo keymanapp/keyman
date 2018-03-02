@@ -20,6 +20,8 @@
   focusing: boolean;
   focusTimer: number;
 
+  changed: boolean;         // Tracks if the element has been edited since gaining focus.
+
   /* ----------------------- Static event-related methods ------------------------ */
 
   setFocusTimer(): void {
@@ -323,8 +325,30 @@ class DOMEventHandlers {
       this.keyman.osk._Hide(false);
     }
 
+    this.doChangeEvent(Ltarg);
+
     return true;
   }.bind(this);
+
+  doChangeEvent(_target: HTMLElement|Document) {
+    if(DOMEventHandlers.states.changed) {
+      var event: Event;
+      if(typeof Event == 'function') {
+        event = new Event("change", {"bubbles": true, "cancelable": false});
+      } else { // IE path
+        event = document.createEvent("HTMLEvents");
+        event.initEvent("change", true, false);
+      }
+
+      // Ensure that touch-aliased elements fire as if from the aliased element.
+      if(_target['base'] && _target['base']['kmw_ip']) {
+        _target = _target['base'];
+      }
+      _target.dispatchEvent(event);
+    }
+
+    DOMEventHandlers.states.changed = false;
+  }
 
   /**
    * Function     doControlBlurred
@@ -1369,8 +1393,10 @@ class DOMTouchHandlers extends DOMEventHandlers {
     // This works OK for iOS, but may need something else for other platforms
     if(('relatedTarget' in e) && e.relatedTarget) {
       var elem: HTMLElement = e.relatedTarget as HTMLElement;
+      this.doChangeEvent(elem);
       if(elem.nodeName != 'DIV' || elem.className.indexOf('keymanweb-input') == -1) {
-        this.cancelInput(); return;
+        this.cancelInput(); 
+        return;
       }
     }
 

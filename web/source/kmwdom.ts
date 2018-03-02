@@ -62,6 +62,10 @@ class DOMManager {
     if(this.attachmentObserver.disconnect) {
       this.attachmentObserver.disconnect();
     }
+
+    for(let input of this.inputList) {
+      this.disableInputElement(input);
+    }
   }
 
   /**

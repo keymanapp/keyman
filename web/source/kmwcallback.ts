@@ -823,6 +823,11 @@ class KeyboardInterface {
       if(dn >= 0) {        
         this._DeadkeyAdjustPos(this._SelPos(Pelem), -dn + s._kmwLength()); // I3318,I3319
       }
+
+      if((dn >= 0 || s) && Pelem == DOMEventHandlers.states.activeElement) {
+        // Record that we've made an edit.
+        DOMEventHandlers.states.changed = true;
+      }
       return;
     }
   
@@ -931,6 +936,11 @@ class KeyboardInterface {
     // Refresh element content after change (if needed)
     if(typeof(this.keymanweb.refreshElementContent) == 'function') {
       this.keymanweb.refreshElementContent(Pelem);
+    }
+
+    if((dn >= 0 || s) && Pelem == DOMEventHandlers.states.activeElement) {
+      // Record that we've made an edit.
+      DOMEventHandlers.states.changed = true;
     }
   }
   
