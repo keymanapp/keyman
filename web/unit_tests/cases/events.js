@@ -27,6 +27,7 @@ describe('Event Management', function() {
     var aliasing = false;
 
     ele.onchange = function() {
+      ele.onchange = null;
       done();
     }
 
@@ -62,6 +63,7 @@ describe('Event Management', function() {
     var aliasing = false;
 
     ele.onchange = function() {
+      ele.onchange = null;
       done();
     }
 
@@ -87,5 +89,75 @@ describe('Event Management', function() {
 
     if(focusEvent)
       ele.dispatchEvent(focusEvent);
+  });
+
+  it('Keystroke-based onInput event generation', function(done) {
+    // Not all browsers support InputEvent.  Bypass the test for these.
+    if(typeof InputEvent != 'function') {
+      console.log("InputEvent not supported.");
+      done();
+    }
+
+    var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
+    var event = new KMWRecorder.PhysicalInputEvent(simple_A);
+
+    var ele = document.getElementById("input");
+    var aliasing = false;
+
+    var counterObj = {i:0};
+    var fin = 3;
+
+    if(typeof InputEvent == 'function') {
+      ele.addEventListener("input", function() {
+        counterObj.i++;
+        if(counterObj.i == fin) {
+          done();
+        }
+      });
+    }
+
+    if(ele['kmw_ip']) {
+      ele = ele['kmw_ip'];
+      aliasing = true;
+    }
+
+    event.simulateEventOn(ele);
+    event.simulateEventOn(ele);
+    event.simulateEventOn(ele);
+  });
+
+  it('OSK-based onInput event generation', function(done) {
+    // Not all browsers support InputEvent.  Bypass the test for these.
+    if(typeof InputEvent != 'function') {
+      console.log("InputEvent not supported.");
+      done();
+    }
+
+    var simple_A = {"type":"osk","keyID":"default-K_A"};
+    var event = new KMWRecorder.OSKInputEvent(simple_A);
+
+    var ele = document.getElementById("input");
+    var aliasing = false;
+
+    var counterObj = {i:0};
+    var fin = 3;
+
+    if(typeof InputEvent == 'function') {
+      ele.addEventListener("input", function() {
+        counterObj.i++;
+        if(counterObj.i == fin) {
+          done();
+        }
+      });
+    }
+
+    if(ele['kmw_ip']) {
+      ele = ele['kmw_ip'];
+      aliasing = true;
+    }
+
+    event.simulateEventOn(ele);
+    event.simulateEventOn(ele);
+    event.simulateEventOn(ele);
   });
 });

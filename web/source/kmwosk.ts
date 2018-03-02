@@ -915,7 +915,7 @@ if(!window['keyman']['initialized']) {
 
         switch(code) {
           case osk.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-            kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
+            this.keyman.interface.defaultBackspace();
             break;
           case osk.keyCodes['K_TAB']:
             keymanweb.domManager.moveToNext(keyShiftState);
@@ -973,7 +973,7 @@ if(!window['keyman']['initialized']) {
           //       // Failed to move right - there's nothing to delete.
           //       break;
           //     }
-          //     kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
+          //     this.keyman.interface.defaultBackspace();
           //   }
         }
       }

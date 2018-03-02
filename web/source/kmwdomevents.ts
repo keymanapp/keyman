@@ -334,10 +334,10 @@ class DOMEventHandlers {
     if(DOMEventHandlers.states.changed) {
       var event: Event;
       if(typeof Event == 'function') {
-        event = new Event("change", {"bubbles": true, "cancelable": false});
+        event = new Event('change', {"bubbles": true, "cancelable": false});
       } else { // IE path
         event = document.createEvent("HTMLEvents");
-        event.initEvent("change", true, false);
+        event.initEvent('change', true, false);
       }
 
       // Ensure that touch-aliased elements fire as if from the aliased element.
@@ -723,14 +723,14 @@ class DOMEventHandlers {
       
       // Support backspace in simulated input DIV from physical keyboard where not matched in rule  I3363 (Build 301)
       if(Levent.Lcode == 8 && !LeventMatched && Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
-        kbdInterface.output(1, DOMEventHandlers.states.lastActiveElement, "");
+        this.keyman.interface.defaultBackspace();
       }
     } else {
       // Mnemonic layout
       if(Levent.Lcode == 8) { // I1595 - Backspace for mnemonic
         DOMEventHandlers.states._KeyPressToSwallow = 1;
         if(!kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
-          kbdInterface.output(1, DOMEventHandlers.states.lastActiveElement, ""); // I3363 (Build 301)
+          this.keyman.interface.defaultBackspace();
         }
         return false;  //added 16/3/13 to fix double backspace on mnemonic layouts on desktop
       }
