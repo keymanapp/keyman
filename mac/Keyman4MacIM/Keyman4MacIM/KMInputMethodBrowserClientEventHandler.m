@@ -40,9 +40,7 @@ NSUInteger _failuresToRetrieveExpectedContext;
             if (location != NSNotFound && location > 0) {
                 if ([self AppDelegate].debugMode)
                     NSLog(@"Trying to get context up to location %lu", location);
-                NSString* clientContext = nil;
-                if ([client respondsToSelector:@selector(attributedSubstringFromRange:)])
-                    clientContext = [[client attributedSubstringFromRange:NSMakeRange(0, location)] string];
+                NSString* clientContext = [self getLimitedContextFrom:client at:location];
                 if (clientContext == nil)
                 {
                     // Client is failing to provide useful response to attributedSubstringFromRange.
