@@ -66,19 +66,133 @@ if(typeof(DynamicElements) == 'undefined') {
   }
 
   DynamicElements.assertAttached = function(ele, done) {
-    window.setTimeout(function() {
+    var assertion = function() {
       assert.isTrue(keyman.isAttached(ele), "Element tag '" + ele.tagName + "', id '" + ele.id + "' was not attached!");
-
-      if(done) {
+    }
+    if(done) {
+      window.setTimeout(function() {
+        assertion();
         done();
-      }
-    }, 50);
+      }, 50);
+    } else {
+      assertion();
+    }
   }
+
+  DynamicElements.assertDetached = function(ele, done) {
+    var assertion = function() {
+      assert.isFalse(keyman.isAttached(ele), "Element tag '" + ele.tagName + "', id '" + ele.id + "' was not detached!");
+    }
+    if(done) {
+      window.setTimeout(function() {
+        assertion();
+        done();
+      }, 50);
+    } else {
+      assertion();
+    }
+  }
+
+  DynamicElements.init = function() {
+    var lao_s_key_json = {"type": "key", "key":"s", "code":"KeyS","keyCode":83,"modifierSet":0,"location":0};
+    DynamicElements.keyCommand = new KMWRecorder.PhysicalInputEvent(lao_s_key_json);
+
+    DynamicElements.enabledOutput = "ຫ";
+    // Simulated JavaScript events do not produce text output.
+    DynamicElements.disabledOutput = "";
+  }
+
+  DynamicElements.init();
 }
+
+describe('Attachment API', function() {
+  this.timeout(5000);
+
+  before(function() {
+    fixture.setBase('unit_tests/fixtures');
+  });
+
+  describe("Enablement/Disablement", function() {
+    before(function(done) {
+      this.timeout(20000);
+      setupKMW({ attachType:'manual' }, function() {
+        loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", done, 10000);
+      }, 10000);
+    });
+
+    after(function() {
+      keyman.removeKeyboards('lao_2008_basic');
+      teardownKMW();
+    });
+
+    beforeEach(function() {
+      fixture.load("robustAttachment.html");
+    });
+    
+    afterEach(function(done) {
+      fixture.cleanup();
+      window.setTimeout(function(){
+        done();
+      }, 50);
+    });
+
+    it("Attach/Detach", function(done) {
+      // Since we're in 'manual', we start detached.
+      var ele = document.getElementById(DynamicElements.addInput());
+      window.setTimeout(function() {
+        // Ensure we didn't auto-attach.
+        DynamicElements.assertDetached(ele);
+        DynamicElements.keyCommand.simulateEventOn(ele);
+
+        var val = ele.value;
+        ele.value = "";
+        assert.equal(val, DynamicElements.disabledOutput, "'Detached' element performed keystroke processing!");
+
+        keyman.attachToControl(ele);
+        DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
+
+        DynamicElements.keyCommand.simulateEventOn(ele);
+
+        var val = ele.value;
+        ele.value = "";
+        assert.equal(val, DynamicElements.enabledOutput, "'Attached' element did not perform keystroke processing!");
+
+        done();
+      }, 5);
+    });
+
+    it("Enable/Disable", function(done) {
+      // Since we're in 'manual', we start detached.
+      var ele = document.getElementById(DynamicElements.addInput());
+      window.setTimeout(function() {
+        // Ensure we didn't auto-attach.
+        keyman.attachToControl(ele);
+        keyman.disableControl(ele);
+        DynamicElements.assertAttached(ele);
+        DynamicElements.keyCommand.simulateEventOn(ele);
+
+        var val = ele.value;
+        ele.value = "";
+        assert.equal(val, DynamicElements.disabledOutput, "'Disabled' element performed keystroke processing!");
+
+        keyman.enableControl(ele);
+        DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
+
+        DynamicElements.keyCommand.simulateEventOn(ele);
+
+        var val = ele.value;
+        ele.value = "";
+        assert.equal(val, DynamicElements.enabledOutput, "'Enabled' element did not perform keystroke processing!");
+
+        done();
+      }, 5);
+    });
+  });
+});
 
 Modernizr.on('touchevents', function(result) {
   if(result) {
-    describe('Attachment (Touch, \'auto\')', function() {
+    describe('Device-specific Attachment Checks (Touch, \'auto\')', function() {
 
       this.timeout(5000);
 
@@ -102,7 +216,7 @@ Modernizr.on('touchevents', function(result) {
         window.setTimeout(function(){
           done();
         }, 500);
-      })
+      });
       
       describe('Element Type', function() {
         it('<input>', function(done) {
@@ -144,7 +258,7 @@ Modernizr.on('touchevents', function(result) {
       });
     });
   } else {
-    describe('Attachment (Desktop, \'auto\')', function() {
+    describe('Device-specific Attachment Checks (Desktop, \'auto\')', function() {
 
       this.timeout(5000);
 

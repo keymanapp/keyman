@@ -59,7 +59,7 @@ class DOMManager {
     if(this.enablementObserver) {
       this.enablementObserver.disconnect();
     }
-    if(this.attachmentObserver.disconnect) {
+    if(this.attachmentObserver) {
       this.attachmentObserver.disconnect();
     }
   }
