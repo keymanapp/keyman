@@ -402,11 +402,6 @@ NSRange _previousSelRange;
      [self.AppDelegate handleKeyEvent:event];*/
     
     if (event.type == NSLeftMouseDown || event.type == NSLeftMouseUp ) {
-        //        if (_clientSelectionCanChangeUnexpectedly) {
-        //            if ([self.AppDelegate debugMode])
-        //                NSLog(@"WARNING: We are dealing with an app/context where we THINK we shouldn't be getting mouse events, but we just got one!");
-        //            _clientSelectionCanChangeUnexpectedly = NO;
-        //        }
         _contextOutOfDate = YES;
         return NO;
     }

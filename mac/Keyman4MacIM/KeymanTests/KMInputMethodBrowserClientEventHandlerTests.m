@@ -36,7 +36,7 @@ KMInputMethodBrowserClientEventHandler * _im;
     // If the expected context is empty, no attempt should be made to check for matching context from
     // client, so even though the client would also return an empty string, calling checkContextIn
     // repeatedly has no effect (i.e., it does not set clientSelectionCanChangeUnexpectedly to false).
-    // Therefore a subsequent key down event *should* reult in a call to the client to inquire about
+    // Therefore a subsequent key down event *should* result in a call to the client to inquire about
     // the current selection.
     id client = OCMStrictProtocolMock(@protocol(IMKTextInput));
     OCMStub([client selectedRange]).andReturn(NSMakeRange(0, 0));
