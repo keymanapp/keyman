@@ -1074,15 +1074,17 @@ begin
         begin
           Result := Result + Format('{d:%d}', [rec.Deadkey.DeadKey]);
         end
-        else if rec.Code = CODE_EXTENDED then
+        else //if rec.Code = CODE_EXTENDED then
         begin
-          // Could be converted to a {k:%d,m:%d} with keystroke info in future if we wanted.
-          Result := Result + '';
+          // At some point, we may wish to filter which codes are safe to stub out like this
+          // versus which ones should be an error.  The commented-out-code shows the way to
+          // handle such cases.
+          Result := Result + '''''';
         end
-        else
-        begin
-          ReportError(line, CERR_SomewhereIGotItWrong, 'Internal Error: unexpected sentinel character in store definition');
-        end;
+//        else
+//        begin
+//          //ReportError(line, CERR_SomewhereIGotItWrong, 'Internal Error: unexpected sentinel character in store definition');
+//        end;
       end
       else
       begin
