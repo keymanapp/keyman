@@ -1217,7 +1217,7 @@ class KeyboardInterface {
       Pelem = this.keymanweb.domManager.getLastActiveElement();
     }
 
-    this.output(1, this.keymanweb.domManager.getLastActiveElement(), "");
+    this.output(1, Pelem, "");
     this.doInputEvent(Pelem);
   }
 
