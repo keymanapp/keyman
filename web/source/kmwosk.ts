@@ -1,21 +1,23 @@
 /// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
 
-class OSKKeySpec {
-  id: string;
-  text?: string;
-  sp?: string;
-  width: string;
-  nextlayer?: string;
-  pad?: string;
+namespace com.keyman {
+  export class OSKKeySpec {
+    id: string;
+    text?: string;
+    sp?: string;
+    width: string;
+    nextlayer?: string;
+    pad?: string;
 
-  constructor(id: string, text?: string, width?: string, sp?: string, nextlayer?: string, pad?: string) {
-    this.id = id;
-    this.text = text;
-    this.width = width ? width : "50";
-    this.sp = sp;
-    this.nextlayer = nextlayer;
-    this.pad = pad;
+    constructor(id: string, text?: string, width?: string, sp?: string, nextlayer?: string, pad?: string) {
+      this.id = id;
+      this.text = text;
+      this.width = width ? width : "50";
+      this.sp = sp;
+      this.nextlayer = nextlayer;
+      this.pad = pad;
+    }
   }
 }
 
@@ -915,7 +917,7 @@ if(!window['keyman']['initialized']) {
 
         switch(code) {
           case osk.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-            kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
+            kbdInterface.defaultBackspace();
             break;
           case osk.keyCodes['K_TAB']:
             keymanweb.domManager.moveToNext(keyShiftState);
@@ -973,7 +975,7 @@ if(!window['keyman']['initialized']) {
           //       // Failed to move right - there's nothing to delete.
           //       break;
           //     }
-          //     kbdInterface.output(1, keymanweb.domManager.getLastActiveElement(), "");
+          //     kbdInterface.defaultBackspace();
           //   }
         }
       }
@@ -1069,12 +1071,12 @@ if(!window['keyman']['initialized']) {
         Ls=Lelem._KeymanWebSelectionStart;
         Le=Lelem._KeymanWebSelectionEnd;
         keymanweb.uiManager.setActivatingUI(true);
-        DOMEventHandlers.states._IgnoreNextSelChange = 100;
+        com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keymanweb.domManager.focusLastActiveElement();
         if(keymanweb.domManager._IsMozillaEditableIframe(Lelem,0)) Lelem = Lelem.documentElement;
         Lelem._KeymanWebSelectionStart=Ls;
         Lelem._KeymanWebSelectionEnd=Le;
-        DOMEventHandlers.states._IgnoreNextSelChange = 0;
+        com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 0;
         // ...end I3363 (Build 301)
         keymanweb._CachedSelectionStart = null; // I3319
         // Deadkey matching continues to be troublesome.
@@ -1798,7 +1800,7 @@ if(!window['keyman']['initialized']) {
         }
         else
         {
-          DOMEventHandlers.states.setFocusTimer();
+          com.keyman.DOMEventHandlers.states.setFocusTimer();
 
           osk.lgList.style.display='none'; //still allows blank menu momentarily on selection
           keymanweb.keyboardManager._SetActiveKeyboard(this.kn,this.kc,true);
@@ -1861,7 +1863,7 @@ if(!window['keyman']['initialized']) {
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
         if(keymanweb.keyboardManager.isChiral() && osk.emulatesAltGr() && 
-            ( DOMEventHandlers.states.modStateFlags & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
+            (com.keyman.DOMEventHandlers.states.modStateFlags & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
           keyShiftState |= osk.modifierBitmasks['ALT_GR_SIM'];
           keyShiftState &= ~osk.modifierCodes['RALT'];
         }
@@ -3171,7 +3173,7 @@ if(!window['keyman']['initialized']) {
 
             // Create a new subkey for the specified layer so that it will be accessible via OSK.
             var specialChar = osk.modifierSpecials[layerID];
-            shiftKey['sk'].push(new OSKKeySpec("K_" + specialChar, specialChar, null, "1", layerID));
+            shiftKey['sk'].push(new com.keyman.OSKKeySpec("K_" + specialChar, specialChar, null, "1", layerID));
           }
         } else {
           // Seriously, this should never happen.  It's here for the debugging log only.
@@ -4419,7 +4421,7 @@ if(!window['keyman']['initialized']) {
      **/
     osk.appendStyleSheet = function() {
       var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
-      var activeStub: KeyboardStub = keymanweb.keyboardManager.activeStub;
+      var activeStub: com.keyman.KeyboardStub = keymanweb.keyboardManager.activeStub;
 
       // Do not do anything if a null stub
       if(activeStub == null) {

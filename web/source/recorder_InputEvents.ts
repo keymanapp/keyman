@@ -3,6 +3,8 @@
 /// <reference path="kmwdevice.ts" />
 
 namespace KMWRecorder {
+  import Device = com.keyman.Device;
+  
   type AssertCallback = (s1: any, s2: any, msg?: string) => void;
 
   export abstract class InputEvent {
@@ -178,7 +180,7 @@ namespace KMWRecorder {
        * it won't trigger if the tested browser doesn't have focus.
        * Only one can have focus when testing locally.
        */
-      window['DOMEventHandlers'].states.lastActiveElement = target;
+      com.keyman['DOMEventHandlers'].states.lastActiveElement = target;
 
       if(!oskKeyElement) {
         console.error('Could not find OSK key "' + this.keyID + '"!');
