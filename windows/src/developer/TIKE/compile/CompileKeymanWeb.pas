@@ -509,7 +509,7 @@ begin
     Result := Result + Format('",%d)', [Cur - StartQuotes]);
 end;
 
-// Used when targeting 10.0+, after the introduction of FullContextMatch/KFCM.
+// Used when targeting versions >= 10.0, after the introduction of FullContextMatch/KFCM.
 function TCompileKeymanWeb.JavaScript_FullContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
   // Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
   function IsRegExpSpecialChar(ch: WideChar): Boolean;
@@ -799,9 +799,9 @@ begin
   if Assigned(fkp) then
   begin
     if IsKeyboardVersion10OrLater
-    // KMW 10+ use the full, sentinel-based length for context deletions.
+    // KMW >=10.0 use the full, sentinel-based length for context deletions.
     then len := xstrlen(fkp.dpContext)
-    // KMW 9- exclude all sentinel-based characters, including deadkeys, from direct context deletion.
+    // KMW < 10.0 exclude all sentinel-based characters, including deadkeys, from direct context deletion.
     // Deadkeys have alternative special handling.
     else len := xstrlen_printing(fkp.dpContext);
   end
@@ -1039,7 +1039,7 @@ const
 begin
   n := Pos(wcsentinel, pwsz);
 
-  // Start:  plain text store.  Always use for 9.0-, conditionally for 10.0+.
+  // Start:  plain text store.  Always use for < 10.0, conditionally for >= 10.0.
   if (n = 0) or not IsKeyboardVersion10OrLater then
   begin
     Result := '"';
@@ -1047,7 +1047,7 @@ begin
     begin
       if PWord(pwsz)^ = UC_SENTINEL then
       begin
-        Result := Result + '.'; // UC_SENTINEL values are not supported in stores for KMW 9-.
+        Result := Result + '.'; // UC_SENTINEL values are not supported in stores for KMW < 10.0.
       end
       else
       begin
@@ -1073,6 +1073,11 @@ begin
         if rec.Code = CODE_DEADKEY then
         begin
           Result := Result + Format('{d:%d}', [rec.Deadkey.DeadKey]);
+        end
+        else if rec.Code = CODE_EXTENDED then
+        begin
+          // Could be converted to a {k:%d,m:%d} with keystroke info in future if we wanted.
+          Result := Result + '';
         end
         else
         begin
@@ -1966,7 +1971,7 @@ const
   wcsentinel: WideString = #$FFFF;
 begin
   n := Pos(wcsentinel, store.dpString);
-  // Disable the check with version 10+, since we now support deadkeys in stores.
+  // Disable the check with versions >= 10.0, since we now support deadkeys in stores.
   if (n > 0) and not IsKeyboardVersion10OrLater then
   begin
     pwsz := PWideChar(store.dpString);
