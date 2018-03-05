@@ -101,6 +101,7 @@ describe('Event Management', function() {
     if(typeof InputEvent != 'function') {
       console.log("InputEvent not supported.");
       done();
+      return;
     }
 
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
@@ -112,14 +113,12 @@ describe('Event Management', function() {
     var counterObj = {i:0};
     var fin = 3;
 
-    if(typeof InputEvent == 'function') {
-      ele.addEventListener("input", function() {
-        counterObj.i++;
-        if(counterObj.i == fin) {
-          done();
-        }
-      });
-    }
+    ele.addEventListener("input", function() {
+      counterObj.i++;
+      if(counterObj.i == fin) {
+        done();
+      }
+    });
 
     if(ele['kmw_ip']) {
       ele = ele['kmw_ip'];
@@ -136,6 +135,7 @@ describe('Event Management', function() {
     if(typeof InputEvent != 'function') {
       console.log("InputEvent not supported.");
       done();
+      return;
     }
 
     var simple_A = {"type":"osk","keyID":"default-K_A"};
@@ -147,14 +147,12 @@ describe('Event Management', function() {
     var counterObj = {i:0};
     var fin = 3;
 
-    if(typeof InputEvent == 'function') {
-      ele.addEventListener("input", function() {
-        counterObj.i++;
-        if(counterObj.i == fin) {
-          done();
-        }
-      });
-    }
+    ele.addEventListener("input", function() {
+      counterObj.i++;
+      if(counterObj.i == fin) {
+        done();
+      }
+    });
 
     if(ele['kmw_ip']) {
       ele = ele['kmw_ip'];
