@@ -3,6 +3,8 @@
 /// <reference path="kmwdevice.ts" />
 
 namespace KMWRecorder {
+  import Device = com.keyman.Device;
+  
   type AssertCallback = (s1: any, s2: any, msg?: string) => void;
 
   export abstract class InputEvent {

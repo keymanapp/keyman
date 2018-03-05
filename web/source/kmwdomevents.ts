@@ -458,7 +458,7 @@ class DOMEventHandlers {
    *                LisVirtualKey     e.g. Virtual key or non-keypress event
    */    
   _GetKeyEventProperties(e: KeyboardEvent, keyState?: boolean) {
-    var s = new KeyEvent();
+    var s = new com.keyman.KeyEvent();
 
     e = this.keyman._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
     s.Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
@@ -683,7 +683,7 @@ class DOMEventHandlers {
       
       if(typeof(activeKeyboard['KM'])=='undefined'  &&  !(Levent.Lmodifiers & 0x60)) {
         // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-        var Levent2: LegacyKeyEvent = {
+        var Levent2: com.keyman.LegacyKeyEvent = {
           Lcode:this.keyman.keyMapManager._USKeyCodeToCharCode(Levent),
           Ltarg:Levent.Ltarg,
           Lmodifiers:0,

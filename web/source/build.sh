@@ -60,7 +60,10 @@ minifier="$CLOSURECOMPILERPATH/compiler.jar"
 # `checkTypes` is blocked b/c TypeScript can perform our type checking... and it causes an error
 # with TypeScript's `extend` implementation (it doesn't recognize a constructor without manual edits).
 # We also get a global `this` warning from the same.
-minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables --jscomp_off=globalThis --jscomp_off=checkTypes"
+#
+# `checkVars` is blocked b/c Closure will otherwise fail on TypeScript namespacing, as each original TS 
+# source file will redeclare the namespace variable, despite being merged into a single file post-compilation.
+minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables --jscomp_off=globalThis --jscomp_off=checkTypes --jscomp_off=checkVars"
 minifycmd="$JAVA -jar $minifier $minifier_warnings --generate_exports"
 
 if ! [ -f $minifier ];

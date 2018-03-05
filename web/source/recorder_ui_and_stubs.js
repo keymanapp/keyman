@@ -65,7 +65,7 @@ copyInputRecord = function() {
 function saveInputRecord() {
   var target;
   if(inputJSON.hasOSKInteraction()) {
-    var device = new Device();
+    var device = new com.keyman.Device();
     device.detect();
     target = device.formFactor;
   } else {
@@ -191,7 +191,7 @@ function errorUpdate() {
 
 var initDevice = function() {
   // From KMW.
-  var device = new Device();
+  var device = new com.keyman.Device();
   device.detect();
 
   document.getElementById("activeFormFactor").textContent = device.formFactor;

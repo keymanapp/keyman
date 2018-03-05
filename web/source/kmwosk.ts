@@ -1,21 +1,23 @@
 /// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
 
-class OSKKeySpec {
-  id: string;
-  text?: string;
-  sp?: string;
-  width: string;
-  nextlayer?: string;
-  pad?: string;
+namespace com.keyman {
+  export class OSKKeySpec {
+    id: string;
+    text?: string;
+    sp?: string;
+    width: string;
+    nextlayer?: string;
+    pad?: string;
 
-  constructor(id: string, text?: string, width?: string, sp?: string, nextlayer?: string, pad?: string) {
-    this.id = id;
-    this.text = text;
-    this.width = width ? width : "50";
-    this.sp = sp;
-    this.nextlayer = nextlayer;
-    this.pad = pad;
+    constructor(id: string, text?: string, width?: string, sp?: string, nextlayer?: string, pad?: string) {
+      this.id = id;
+      this.text = text;
+      this.width = width ? width : "50";
+      this.sp = sp;
+      this.nextlayer = nextlayer;
+      this.pad = pad;
+    }
   }
 }
 
@@ -3171,7 +3173,7 @@ if(!window['keyman']['initialized']) {
 
             // Create a new subkey for the specified layer so that it will be accessible via OSK.
             var specialChar = osk.modifierSpecials[layerID];
-            shiftKey['sk'].push(new OSKKeySpec("K_" + specialChar, specialChar, null, "1", layerID));
+            shiftKey['sk'].push(new com.keyman.OSKKeySpec("K_" + specialChar, specialChar, null, "1", layerID));
           }
         } else {
           // Seriously, this should never happen.  It's here for the debugging log only.
@@ -4419,7 +4421,7 @@ if(!window['keyman']['initialized']) {
      **/
     osk.appendStyleSheet = function() {
       var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
-      var activeStub: KeyboardStub = keymanweb.keyboardManager.activeStub;
+      var activeStub: com.keyman.KeyboardStub = keymanweb.keyboardManager.activeStub;
 
       // Do not do anything if a null stub
       if(activeStub == null) {
