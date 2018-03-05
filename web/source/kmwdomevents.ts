@@ -1088,7 +1088,7 @@ namespace com.keyman {
         return '';
       }
 
-      return (typeof(e.textContent) == 'string' ? e.textContent : e.innerText);
+      return e.textContent;
     } 
 
     setText(e: HTMLElement, t?: string, cp?: number): void {
@@ -1099,8 +1099,8 @@ namespace com.keyman {
           
           // Read current text if null passed (for caret positioning)
           if(t === null) {
-            t1=(typeof(s1.textContent) == 'string' ? s1.textContent : s1.innerText);
-            t2=(typeof(s2.textContent) == 'string' ? s2.textContent : s2.innerText);
+            t1=s1.textContent;
+            t2=s2.textContent;
             t=t1+t2;        
           }
 
@@ -1115,17 +1115,8 @@ namespace com.keyman {
           t1=t._kmwSubstr(0,cp);
           t2=t._kmwSubstr(cp);
                               
-          if(typeof(s1.textContent) == 'string') {
-            s1.textContent=t1;
-          } else {
-            s1.innerText=t1;
-          }
-
-          if(typeof(s2.textContent) == 'string') {
-            s2.textContent=t2;
-          } else {
-            s2.innerText=t2;
-          }  
+          s1.textContent=t1;
+          s2.textContent=t2;
         }
       }
 
@@ -1137,12 +1128,7 @@ namespace com.keyman {
         var d=e.firstChild;
         if(d.childNodes.length > 0) {
           var s1=<HTMLElement> d.childNodes[0];
-          if('textContent' in s1) {
-            return s1.textContent;
-          }
-          if('innerText' in s1) {
-            return s1.innerText;
-          }
+          return s1.textContent;
         }
       }
 
@@ -1155,13 +1141,13 @@ namespace com.keyman {
         if(d.childNodes.length > 1) {
           var s1=<HTMLElement> d.childNodes[0], s2=<HTMLElement> d.childNodes[2];
           // Collapse (trailing) whitespace to a single space for INPUT fields (also prevents wrapping)
-          if(e.base.nodeName != 'TEXTAREA') t=t.replace(/\s+$/,' ');
-          if('textContent' in s1) s1.textContent=t;
-          else if('innerText' in s1) s1.innerText=t; 
+          if(e.base.nodeName != 'TEXTAREA') {
+            t=t.replace(/\s+$/,' ');
+          }
+          s1.textContent=t;
           // Test total length in order to control base element visibility 
           tLen=t.length;
-          if('textContent' in s2) tLen=tLen+s2.textContent.length;
-          else if('innerText' in s2) tLen=tLen+s2.innerText.length;            
+          tLen=tLen+s2.textContent.length;           
         }
       }
       
