@@ -1071,12 +1071,12 @@ if(!window['keyman']['initialized']) {
         Ls=Lelem._KeymanWebSelectionStart;
         Le=Lelem._KeymanWebSelectionEnd;
         keymanweb.uiManager.setActivatingUI(true);
-        DOMEventHandlers.states._IgnoreNextSelChange = 100;
+        com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keymanweb.domManager.focusLastActiveElement();
         if(keymanweb.domManager._IsMozillaEditableIframe(Lelem,0)) Lelem = Lelem.documentElement;
         Lelem._KeymanWebSelectionStart=Ls;
         Lelem._KeymanWebSelectionEnd=Le;
-        DOMEventHandlers.states._IgnoreNextSelChange = 0;
+        com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 0;
         // ...end I3363 (Build 301)
         keymanweb._CachedSelectionStart = null; // I3319
         // Deadkey matching continues to be troublesome.
@@ -1800,7 +1800,7 @@ if(!window['keyman']['initialized']) {
         }
         else
         {
-          DOMEventHandlers.states.setFocusTimer();
+          com.keyman.DOMEventHandlers.states.setFocusTimer();
 
           osk.lgList.style.display='none'; //still allows blank menu momentarily on selection
           keymanweb.keyboardManager._SetActiveKeyboard(this.kn,this.kc,true);
@@ -1863,7 +1863,7 @@ if(!window['keyman']['initialized']) {
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
         if(keymanweb.keyboardManager.isChiral() && osk.emulatesAltGr() && 
-            ( DOMEventHandlers.states.modStateFlags & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
+            (com.keyman.DOMEventHandlers.states.modStateFlags & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
           keyShiftState |= osk.modifierBitmasks['ALT_GR_SIM'];
           keyShiftState &= ~osk.modifierCodes['RALT'];
         }
