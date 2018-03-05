@@ -68,6 +68,11 @@
         float: left; 
       }
 
+      .touch-device #character-grid {
+        white-space: nowrap;
+        overflow-x: scroll;
+      }
+      
       #character-grid {
         min-height: 49px;
         margin: 8px 0;
@@ -80,7 +85,26 @@
       
       .char-char,
       .char-code {
-        border: solid 1px #888888;
+        border-right: solid 1px #eeeeee;
+        margin-right: 2px;
+      }
+
+      .char-char {
+        border-bottom: solid 1px #eeeeee;
+      }
+      
+      .cursor > .char-char,
+      .cursor > .char-code {
+        border-right: solid 3px blue;
+        margin-right: 0;
+      }
+      
+      .cursor#character-grid {
+        border-left: solid 3px blue;
+      }
+      
+      .cursor-selected {
+        background: #e0e0ff;
       }
       
       .char-char {
@@ -184,7 +208,10 @@
       }
       
       function logContent() {
-        if(lastContent === ta1.value) return;
+        if(lastContent === ta1.value) {
+          updateLogCursor();
+          return;
+        }
         removeChildNodes(charGrid);
         if(ta1.value.length == 0) {
           addCharElements('-','empty');
@@ -209,8 +236,67 @@
             addCharElements(text, ('000000'+(code).toString(16)).slice(-slice));
           }
         }
-        console.log(ta1.value);
+        updateLogCursor();
         lastContent = ta1.value;
+      }
+      
+      var lastSelStart = -1;
+      
+      function calculateLengthByCodepoint(text, base, x)  {
+        var stop = base + x;
+        while(base < stop - 1) {
+          if(text.charCodeAt(base) >= 0xD800 && text.charCodeAt(base) < 0xDC00 && 
+             text.charCodeAt(base+1) >= 0xDC00 && text.charCodeAt(base+1) < 0xE000) {
+            // Decrement position by one for each surrogate pair
+            x--;
+          }
+          base++;
+        }
+        return x;
+      }
+      
+      function updateLogCursor() {
+        var i, selStart, selLength, selDirection;
+        
+        if(keyman.isPositionSynthesized()) { // this is an internal function
+          // For touch devices, we need to ask KMW
+          selStart = keyman.touchAliasing.getTextBeforeCaret(ta1.kmw_ip).length;
+          selLength = 0;
+          selDirection = 'forward';
+        } else {
+          // For desktop devices, we use the position reported by the textarea control
+          selStart = ta1.selectionStart;
+          selLength = ta1.selectionEnd - ta1.selectionStart;
+          selDirection = ta1.selectionDirection;
+        }
+        
+        selLength = calculateLengthByCodepoint(ta1.value, selStart, selLength);
+        selStart = calculateLengthByCodepoint(ta1.value, 0, selStart);
+        
+        //console.log('selStart='+selStart+', selLength='+selLength);
+        if(lastSelStart != selStart || lastSelLength != selLength) {
+          for(i = 0; i < charGrid.childNodes.length; i++) {
+            charGrid.childNodes[i].className = '';
+          }
+          
+          var x = selDirection == 'backward' ? selStart-1 : selStart+selLength - 1;
+
+          if(x < 0) {
+            charGrid.className = 'cursor';
+          } else {
+            charGrid.className = '';
+            if(x >= 0 && x < charGrid.childNodes.length) {
+              charGrid.childNodes[x].className = 'cursor';
+            }
+            charGrid.childNodes[x].scrollIntoView();
+          }
+
+          for(i = selStart; i < selStart+selLength; i++) {
+            charGrid.childNodes[i].className += ' cursor-selected';
+          }
+          lastSelStart = selStart;
+          lastSelLength = selLength;
+        }
       }
 
       logContent();

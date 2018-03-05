@@ -20,74 +20,70 @@
  *       It should be a method of the same object, however, due to how 'this' works in JS.
  */
 
-// kmwbase.ts
-goog.exportSymbol("KeymanBase.prototype.addEventListener", KeymanBase.prototype.addEventListener);
-goog.exportSymbol("KeymanBase.prototype.isFontAvailable", KeymanBase.prototype.isFontAvailable);
-
 // Util.ts
 
-goog.exportSymbol("Device", Device);
-goog.exportSymbol("Util", Util);
-goog.exportSymbol("Util.prototype.attachDOMEvent", Util.prototype.attachDOMEvent);
-goog.exportSymbol("Util.prototype.detachDOMEvent", Util.prototype.detachDOMEvent);
-goog.exportSymbol("Util.prototype.getOption", Util.prototype.getOption);
-goog.exportSymbol("Util.prototype.setOption", Util.prototype.setOption);
-goog.exportSymbol("Util.prototype.getAbsoluteX", Util.prototype._GetAbsoluteX);
-goog.exportSymbol("Util.prototype.getAbsoluteY", Util.prototype._GetAbsoluteY);
-goog.exportSymbol("Util.prototype.getAbsolute", Util.prototype._GetAbsolute);
-goog.exportSymbol("Util.prototype.createElement", Util.prototype.createElement);
-goog.exportSymbol("Util.prototype.getIEVersion", Util.prototype.getIEVersion);
-goog.exportSymbol("Util.prototype.isTouchDevice", Util.prototype.isTouchDevice);
-goog.exportSymbol("Util.prototype.createShim", Util.prototype.createShim);
-goog.exportSymbol("Util.prototype.showShim", Util.prototype.showShim);
-goog.exportSymbol("Util.prototype.hideShim", Util.prototype.hideShim);
-goog.exportSymbol("Util.prototype.rgba", Util.prototype.rgba);
-goog.exportSymbol("Util.prototype.addStyleSheet", Util.prototype.addStyleSheet);
-goog.exportSymbol("Util.prototype.removeStyleSheet", Util.prototype.removeStyleSheet);
-goog.exportSymbol("Util.prototype.linkStyleSheet", Util.prototype.linkStyleSheet);
-goog.exportSymbol("Util.prototype.addFontFaceStyleSheet", Util.prototype.addFontFaceStyleSheet);
-goog.exportSymbol("Util.prototype.loadCookie", Util.prototype.loadCookie);
-goog.exportSymbol("Util.prototype.saveCookie", Util.prototype.saveCookie);
-goog.exportSymbol("Util.prototype.toNumber", Util.prototype.toNumber);
-goog.exportSymbol("Util.prototype.toFloat", Util.prototype.toFloat);
-goog.exportSymbol("Util.prototype.toNzString", Util.prototype.nzString);
-goog.exportSymbol("Util.prototype.alert", Util.prototype.alert);
+// goog.exportSymbol("Device", Device);
+// goog.exportSymbol("Util", Util);
+goog.exportSymbol("com.keyman.Util.prototype.attachDOMEvent", com.keyman.Util.prototype.attachDOMEvent);
+goog.exportSymbol("com.keyman.Util.prototype.detachDOMEvent", com.keyman.Util.prototype.detachDOMEvent);
+goog.exportSymbol("com.keyman.Util.prototype.getOption", com.keyman.Util.prototype.getOption);
+goog.exportSymbol("com.keyman.Util.prototype.setOption", com.keyman.Util.prototype.setOption);
+goog.exportSymbol("com.keyman.Util.prototype.getAbsoluteX", com.keyman.Util.prototype._GetAbsoluteX);
+goog.exportSymbol("com.keyman.Util.prototype.getAbsoluteY", com.keyman.Util.prototype._GetAbsoluteY);
+goog.exportSymbol("com.keyman.Util.prototype.getAbsolute", com.keyman.Util.prototype._GetAbsolute);
+goog.exportSymbol("com.keyman.Util.prototype.createElement", com.keyman.Util.prototype.createElement);
+goog.exportSymbol("com.keyman.Util.prototype.getIEVersion", com.keyman.Util.prototype.getIEVersion);
+goog.exportSymbol("com.keyman.Util.prototype.isTouchDevice", com.keyman.Util.prototype.isTouchDevice);
+goog.exportSymbol("com.keyman.Util.prototype.createShim", com.keyman.Util.prototype.createShim);
+goog.exportSymbol("com.keyman.Util.prototype.showShim", com.keyman.Util.prototype.showShim);
+goog.exportSymbol("com.keyman.Util.prototype.hideShim", com.keyman.Util.prototype.hideShim);
+goog.exportSymbol("com.keyman.Util.prototype.rgba", com.keyman.Util.prototype.rgba);
+goog.exportSymbol("com.keyman.Util.prototype.addStyleSheet", com.keyman.Util.prototype.addStyleSheet);
+goog.exportSymbol("com.keyman.Util.prototype.removeStyleSheet", com.keyman.Util.prototype.removeStyleSheet);
+goog.exportSymbol("com.keyman.Util.prototype.linkStyleSheet", com.keyman.Util.prototype.linkStyleSheet);
+goog.exportSymbol("com.keyman.Util.prototype.addFontFaceStyleSheet", com.keyman.Util.prototype.addFontFaceStyleSheet);
+goog.exportSymbol("com.keyman.Util.prototype.loadCookie", com.keyman.Util.prototype.loadCookie);
+goog.exportSymbol("com.keyman.Util.prototype.saveCookie", com.keyman.Util.prototype.saveCookie);
+goog.exportSymbol("com.keyman.Util.prototype.toNumber", com.keyman.Util.prototype.toNumber);
+goog.exportSymbol("com.keyman.Util.prototype.toFloat", com.keyman.Util.prototype.toFloat);
+goog.exportSymbol("com.keyman.Util.prototype.toNzString", com.keyman.Util.prototype.nzString);
+goog.exportSymbol("com.keyman.Util.prototype.alert", com.keyman.Util.prototype.alert);
 
 // kmwcallback.ts
 (function() {
   var exportKBCallback = function(miniName: string, longName: string, func:() => any) {
-    goog.exportSymbol("KeyboardInterface.prototype." + longName, func);
-    goog.exportSymbol("KeyboardInterface.prototype." + miniName, func);
+    goog.exportSymbol("com.keyman.KeyboardInterface.prototype." + longName, func);
+    goog.exportSymbol("com.keyman.KeyboardInterface.prototype." + miniName, func);
   }
 
   var exportKBCallbackWithArgs = function(miniName: string, longName: string, func:(...args: any[]) => any) {
-    goog.exportSymbol("KeyboardInterface.prototype." + longName, func);
-    goog.exportSymbol("KeyboardInterface.prototype." + miniName, func);
+    goog.exportSymbol("com.keyman.KeyboardInterface.prototype." + longName, func);
+    goog.exportSymbol("com.keyman.KeyboardInterface.prototype." + miniName, func);
   }
 
-  exportKBCallback('KSF', 'saveFocus', KeyboardInterface.prototype.saveFocus);
-  exportKBCallback('KBR', 'beepReset', KeyboardInterface.prototype.beepReset);
+  exportKBCallback('KSF', 'saveFocus', com.keyman.KeyboardInterface.prototype.saveFocus);
+  exportKBCallback('KBR', 'beepReset', com.keyman.KeyboardInterface.prototype.beepReset);
 
-  exportKBCallbackWithArgs('KT', 'insertText', KeyboardInterface.prototype.insertText);
-  exportKBCallbackWithArgs('KR', 'registerKeyboard', KeyboardInterface.prototype.registerKeyboard);
-  exportKBCallbackWithArgs('KRS', 'registerStub', KeyboardInterface.prototype.registerStub);
-  exportKBCallbackWithArgs('KC', 'context', KeyboardInterface.prototype.context);
-  exportKBCallbackWithArgs('KN', 'nul', KeyboardInterface.prototype.nul);
-  exportKBCallbackWithArgs('KCM', 'contextMatch', KeyboardInterface.prototype.contextMatch);
-  exportKBCallbackWithArgs('KFCM', 'fullContextMatch', KeyboardInterface.prototype.fullContextMatch);
-  exportKBCallbackWithArgs('KIK', 'isKeypress', KeyboardInterface.prototype.isKeypress);
-  exportKBCallbackWithArgs('KKM', 'keyMatch', KeyboardInterface.prototype.keyMatch);
-  exportKBCallbackWithArgs('KSM', 'stateMatch', KeyboardInterface.prototype.stateMatch);
-  exportKBCallbackWithArgs('KKI', 'keyInformation', KeyboardInterface.prototype.keyInformation);
-  exportKBCallbackWithArgs('KDM', 'deadkeyMatch', KeyboardInterface.prototype.deadkeyMatch);
-  exportKBCallbackWithArgs('KB', 'beep', KeyboardInterface.prototype.beep);
-  exportKBCallbackWithArgs('KA', 'any', KeyboardInterface.prototype.any);
-  exportKBCallbackWithArgs('KDC', 'deleteContext', KeyboardInterface.prototype.deleteContext);
-  exportKBCallbackWithArgs('KO', 'output', KeyboardInterface.prototype.output);
-  exportKBCallbackWithArgs('KDO', 'deadkeyOutput', KeyboardInterface.prototype.deadkeyOutput);
-  exportKBCallbackWithArgs('KIO', 'indexOutput', KeyboardInterface.prototype.indexOutput);
-  exportKBCallbackWithArgs('KIFS', 'ifStore', KeyboardInterface.prototype.ifStore);
-  exportKBCallbackWithArgs('KSETS', 'setStore', KeyboardInterface.prototype.setStore);
-  exportKBCallbackWithArgs('KLOAD', 'loadStore', KeyboardInterface.prototype.loadStore);
-  exportKBCallbackWithArgs('KSAVE', 'saveStore', KeyboardInterface.prototype.saveStore);
+  exportKBCallbackWithArgs('KT', 'insertText', com.keyman.KeyboardInterface.prototype.insertText);
+  exportKBCallbackWithArgs('KR', 'registerKeyboard', com.keyman.KeyboardInterface.prototype.registerKeyboard);
+  exportKBCallbackWithArgs('KRS', 'registerStub', com.keyman.KeyboardInterface.prototype.registerStub);
+  exportKBCallbackWithArgs('KC', 'context', com.keyman.KeyboardInterface.prototype.context);
+  exportKBCallbackWithArgs('KN', 'nul', com.keyman.KeyboardInterface.prototype.nul);
+  exportKBCallbackWithArgs('KCM', 'contextMatch', com.keyman.KeyboardInterface.prototype.contextMatch);
+  exportKBCallbackWithArgs('KFCM', 'fullContextMatch', com.keyman.KeyboardInterface.prototype.fullContextMatch);
+  exportKBCallbackWithArgs('KIK', 'isKeypress', com.keyman.KeyboardInterface.prototype.isKeypress);
+  exportKBCallbackWithArgs('KKM', 'keyMatch', com.keyman.KeyboardInterface.prototype.keyMatch);
+  exportKBCallbackWithArgs('KSM', 'stateMatch', com.keyman.KeyboardInterface.prototype.stateMatch);
+  exportKBCallbackWithArgs('KKI', 'keyInformation', com.keyman.KeyboardInterface.prototype.keyInformation);
+  exportKBCallbackWithArgs('KDM', 'deadkeyMatch', com.keyman.KeyboardInterface.prototype.deadkeyMatch);
+  exportKBCallbackWithArgs('KB', 'beep', com.keyman.KeyboardInterface.prototype.beep);
+  exportKBCallbackWithArgs('KA', 'any', com.keyman.KeyboardInterface.prototype.any);
+  exportKBCallbackWithArgs('KDC', 'deleteContext', com.keyman.KeyboardInterface.prototype.deleteContext);
+  exportKBCallbackWithArgs('KO', 'output', com.keyman.KeyboardInterface.prototype.output);
+  exportKBCallbackWithArgs('KDO', 'deadkeyOutput', com.keyman.KeyboardInterface.prototype.deadkeyOutput);
+  exportKBCallbackWithArgs('KIO', 'indexOutput', com.keyman.KeyboardInterface.prototype.indexOutput);
+  exportKBCallbackWithArgs('KIFS', 'ifStore', com.keyman.KeyboardInterface.prototype.ifStore);
+  exportKBCallbackWithArgs('KSETS', 'setStore', com.keyman.KeyboardInterface.prototype.setStore);
+  exportKBCallbackWithArgs('KLOAD', 'loadStore', com.keyman.KeyboardInterface.prototype.loadStore);
+  exportKBCallbackWithArgs('KSAVE', 'saveStore', com.keyman.KeyboardInterface.prototype.saveStore);
 }());

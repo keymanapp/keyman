@@ -54,6 +54,7 @@ final class KMKeyboard extends WebView {
   private static String txtFont = "";
   private static String oskFont = null;
   private static String keyboardRoot = "";
+  private final String fontUndefined = "undefined";
   private GestureDetector gestureDetector;
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
   private boolean ShouldShowHelpBubble = false;
@@ -241,6 +242,16 @@ final class KMKeyboard extends WebView {
     return keyboardRoot + oskFont;
   }
 
+  /**
+   * Return the full path to the special OSK font,
+   * which is with all the keyboard assets at the root app_data folder
+   * @param String filename
+   * @return String
+   */
+  public String specialOSKFontFilename(String filename) {
+    return context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator + filename;
+  }
+
   public boolean setKeyboard(String packageID, String keyboardID, String languageID) {
     if (packageID == null || keyboardID == null || languageID == null)
       return false;
@@ -297,11 +308,16 @@ final class KMKeyboard extends WebView {
       return false;
     }
 
+    if (tFont.equals("''")) {
+      tFont = fontUndefined;
+    }
+    if (oFont.equals("''")) {
+      oFont = fontUndefined;
+    }
+
     // Escape single-quoted names for javascript call
     keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
-    Log.v("KMEA", "Unescaped language name: " + languageName);
     languageName = languageName.replaceAll("\'", "\\\\'");
-    Log.v("KMEA", "Escaped language name: " + languageName);
 
     String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
     String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
@@ -366,8 +382,9 @@ final class KMKeyboard extends WebView {
         tFont = String.format("{\"family\":\"font_family_%s\",\"files\":[\"%s%s\"]}", kFont.substring(0, kFont.length() - 4), keyboardRoot, kFont);
       } else {
         txtFont = getFontFilename(kFont);
-        if (!txtFont.isEmpty())
+        if (!txtFont.isEmpty()) {
           tFont = makeFontPaths(kFont);
+        }
       }
     }
 
@@ -391,11 +408,16 @@ final class KMKeyboard extends WebView {
       oFont = tFont;
     }
 
+    if (tFont.equals("''")) {
+      tFont = fontUndefined;
+    }
+    if (oFont.equals("''")) {
+      oFont = fontUndefined;
+    }
+
     // Escape single-quoted names for javascript call
     keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
-    Log.v("KMEA", "Unescaped language name: " + languageName);
     languageName = languageName.replaceAll("\'", "\\\\'");
-    Log.v("KMEA", "Escaped language name: " + languageName);
 
     String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
     String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
@@ -481,6 +503,12 @@ final class KMKeyboard extends WebView {
     editor.commit();
   }
 
+  /**
+   * getFontFilename
+   * Parse a Font JSON object and return the font filename (ending in .ttf or .otf)
+   * @param jsonString String - Font JSON object as a string
+   * @return String - Filename for the font. If font is invalid, return ""
+   */
   private String getFontFilename(String jsonString) {
     String font = "";
     try {
@@ -505,7 +533,7 @@ final class KMKeyboard extends WebView {
         }
       }
     } catch (JSONException e) {
-      font = "undefined";
+      font = "";
     }
 
     return font;
@@ -617,7 +645,7 @@ final class KMKeyboard extends WebView {
       button.setText(title);
 
       if (!specialOskFont.isEmpty()) {
-        button.setTypeface(KMManager.getFontTypeface(context, specialOskFont));
+        button.setTypeface(KMManager.getFontTypeface(context, specialOSKFontFilename(specialOskFont)));
       } else {
         Typeface font = KMManager.getFontTypeface(context, (oskFont != null) ? oskFontFilename() : textFontFilename());
         if (font != null) {
@@ -722,7 +750,7 @@ final class KMKeyboard extends WebView {
    * 2. Create full font paths for .ttf or
    * .svg for Android 4.2 or 4.3 OSK
    * @param font String font JSON object as a string
-   * @return String of modified font information with full paths. If font is invalid, return "undefined"
+   * @return String of modified font information with full paths. If font is invalid, return "''"
    */
   private String makeFontPaths(String font) {
     try {
@@ -756,7 +784,7 @@ final class KMKeyboard extends WebView {
         }
       }
     } catch (JSONException e) {
-      return "undefined";
+      return "''";
     }
 
     return font;

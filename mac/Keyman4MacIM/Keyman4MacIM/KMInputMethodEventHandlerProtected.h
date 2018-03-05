@@ -36,6 +36,7 @@
 - (void)insertPendingBufferTextIn:(id)client;
 - (KMInputMethodAppDelegate *)AppDelegate;
 - (NSMutableString *)contextBuffer;
+- (NSString *)getLimitedContextFrom:(id)sender at:(NSUInteger) len;
 // Return the pending buffer.  If it is NIL create it.
 -(NSMutableString*)pendingBuffer;
 -(void)setPendingBuffer:(NSString*)string;

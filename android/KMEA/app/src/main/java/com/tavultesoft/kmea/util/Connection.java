@@ -9,7 +9,7 @@ import java.net.URL;
 
 public final class Connection {
   private static final int MAX_REDIRECTS = 5;
-  private static final int TIMEOUT = 10 * 1000; // seconds
+  private static final int TIMEOUT = 20 * 1000; // seconds
 
   private static HttpURLConnection urlConnection;
 

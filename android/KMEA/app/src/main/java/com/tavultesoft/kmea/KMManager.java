@@ -1388,7 +1388,7 @@ public final class KMManager {
           end = url.length();
           InAppKeyboard.specialOskFont = "";
         } else {
-          InAppKeyboard.specialOskFont = "keymanweb-osk.ttf";
+          InAppKeyboard.specialOskFont = KMFilename_Osk_Ttf_Font;
         }
 
         String keys = url.substring(start, end);
@@ -1562,7 +1562,7 @@ public final class KMManager {
           end = url.length();
           SystemKeyboard.specialOskFont = "";
         } else {
-          SystemKeyboard.specialOskFont = "keymanweb-osk.ttf";
+          SystemKeyboard.specialOskFont = KMFilename_Osk_Ttf_Font;
         }
 
         String keys = url.substring(start, end);

@@ -19,7 +19,7 @@ interface Document {
 }
 
 interface Element {
-    _kmwAttachment: AttachmentInfo,     // Used to track each input element's attachment data.
+    _kmwAttachment: com.keyman.AttachmentInfo,     // Used to track each input element's attachment data.
     shim: HTMLElement,                  // Used in subkey elements for smooth fading.
 
     _KeymanWebSelectionStart: number,

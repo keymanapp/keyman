@@ -8,15 +8,31 @@
 
 import KeymanEngine
 import UIKit
+import WebKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
   private var _overlayWindow: UIWindow?
+  private var _adhocDirectory: URL?
 
   var window: UIWindow?
   var viewController: MainViewController!
   var navigationController: UINavigationController?
+
+  func application(_ app: UIApplication, open url: URL,
+                   options: [UIApplicationOpenURLOptionsKey: Any] = [:]) -> Bool {
+    var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    destinationUrl.appendPathComponent("\(url.lastPathComponent).zip")
+    do {
+      try FileManager.default.copyItem(at: url, to: destinationUrl)
+      installAdhocKeyboard(url: destinationUrl)
+    } catch {
+      showKMPError(KMPError.copyFiles)
+    }
+    
+    return true
+  }
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]? = nil) -> Bool {
@@ -45,6 +61,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     window!.rootViewController = navigationController
     window!.makeKeyAndVisible()
+
+    //TODO: look in documents directory for .zip / .kmp files
+    //TODO: OR browse documents Dir from new keyboard window
+    //self.installAdhocKeyboard(filePath: "")
+
     return true
   }
 
@@ -89,6 +110,81 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       }
     }
     return _overlayWindow!
+  }
+
+  public func installAdhocKeyboard(url: URL) {
+    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    var destination =  documentsDirectory
+    destination.appendPathComponent("temp/\(url.lastPathComponent)")
+
+    KeymanPackage.extract(fileUrl: url, destination: destination, complete: { kmp in
+      if let kmp = kmp {
+        self.promptAdHocInstall(kmp)
+      } else {
+        self.showKMPError(KMPError.invalidPackage)
+      }
+    })
+  }
+
+  public func showKMPError(_ error: KMPError) {
+    showSimpleAlert(title: "Error", message: error.rawValue)
+  }
+
+  public func showSimpleAlert(title: String, message: String) {
+    let alertController = UIAlertController(title: title, message: message,
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertActionStyle.default,
+                                            handler: nil))
+
+    self.window?.rootViewController?.present(alertController, animated: true, completion: nil)
+  }
+
+  public func promptAdHocInstall(_ kmp: KeymanPackage) {
+    _adhocDirectory = kmp.sourceFolder
+
+    let vc = UIViewController()
+    vc.view.backgroundColor = .red
+    let wkWebView = WKWebView.init(frame: vc.view.frame)
+    wkWebView.backgroundColor = .white
+    vc.view.addSubview(wkWebView)
+    let cancelBtn = UIBarButtonItem(title: "Cancel", style: .plain,
+                                    target: self,
+                                    action: #selector(cancelAdHocBtnHandler))
+    let installBtn = UIBarButtonItem(title: "Install", style: .plain,
+                                     target: self,
+                                     action: #selector(installAdHocBtnHandler))
+    vc.navigationItem.leftBarButtonItem = cancelBtn
+    vc.navigationItem.rightBarButtonItem = installBtn
+    let nvc = UINavigationController.init(rootViewController: vc)
+
+    self.window?.rootViewController?.present(nvc, animated: true, completion: {
+      wkWebView.loadHTMLString(kmp.infoHtml(), baseURL: nil)
+    })
+  }
+
+  @objc func installAdHocBtnHandler() {
+    if let adhocDir = _adhocDirectory {
+      self.window?.rootViewController?.dismiss(animated: true, completion: {
+        do {
+          try Manager.shared.parseKMP(adhocDir)
+          self.showSimpleAlert(title: "Success", message: "All keyboards installed successfully.")
+        } catch {
+          self.showKMPError(error as! KMPError)
+        }
+        
+        //this can fail gracefully and not show errors to users
+        do {
+          try FileManager.default.removeItem(at: adhocDir)
+        } catch {
+          log.error("unable to delete temp files")
+        }
+      })
+    }
+  }
+
+  @objc func cancelAdHocBtnHandler() {
+    self.window?.rootViewController?.dismiss(animated: true, completion: nil)
   }
 
   @objc func registerCustomFonts() {

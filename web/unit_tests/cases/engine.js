@@ -769,13 +769,14 @@ describe('Engine', function() {
       this.timeout(10000);
 
       var test_callback = function() {
-        assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic", "Keyboard not set correctly!");
+        assert.isNotNull(keyman.getKeyboard("lao_2008_basic", "lo"), "Keyboard stub was not registered!");
+        assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic", "Keyboard not set automatically!");
         keyman.removeKeyboards('lao_2008_basic');
         assert.equal(keyman.getActiveKeyboard(), '', "Keyboard not removed correctly!");
         done();
       }
 
-      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", test_callback, 10000);
+      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", test_callback, 10000, {passive: true});
     });
   });
 
