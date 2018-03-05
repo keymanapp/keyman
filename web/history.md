@@ -26,6 +26,7 @@
 * Added automated testing for KeymanWeb builds. (#350)
 * Fixed bugs in the handling of deadkeys. (#281)
 * Change from ISO 639-3 language codes to BCP-47 language codes
+* Now generates 'change' and 'input' events from keyboard and OSK input (#42) (#571)
 
 ## 2017-07-10 2.0.473 stable
 * 2.0 stable release build.

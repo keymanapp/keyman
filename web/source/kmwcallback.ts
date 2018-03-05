@@ -823,6 +823,11 @@ class KeyboardInterface {
       if(dn >= 0) {        
         this._DeadkeyAdjustPos(this._SelPos(Pelem), -dn + s._kmwLength()); // I3318,I3319
       }
+
+      if((dn >= 0 || s) && Pelem == DOMEventHandlers.states.activeElement) {
+        // Record that we've made an edit.
+        DOMEventHandlers.states.changed = true;
+      }
       return;
     }
   
@@ -931,6 +936,11 @@ class KeyboardInterface {
     // Refresh element content after change (if needed)
     if(typeof(this.keymanweb.refreshElementContent) == 'function') {
       this.keymanweb.refreshElementContent(Pelem);
+    }
+
+    if((dn >= 0 || s) && Pelem == DOMEventHandlers.states.activeElement) {
+      // Record that we've made an edit.
+      DOMEventHandlers.states.changed = true;
     }
   }
   
@@ -1185,6 +1195,32 @@ class KeyboardInterface {
   }
   // I3318 - deadkey changes END
 
+  doInputEvent(_target: HTMLElement|Document) {
+      var event: Event;
+      // TypeScript doesn't yet recognize InputEvent as a type!
+      if(typeof window['InputEvent'] == 'function') {
+        event = new window['InputEvent']('input', {"bubbles": true, "cancelable": false});
+      } // No else - there is no supported version in some browsers.
+
+      // Ensure that touch-aliased elements fire as if from the aliased element.
+      if(_target['base'] && _target['base']['kmw_ip']) {
+        _target = _target['base'];
+      }
+
+      if(_target && event) {
+        _target.dispatchEvent(event);
+      }
+  }
+
+  defaultBackspace(Pelem?: HTMLElement|Document) {
+    if(!Pelem) {
+      Pelem = this.keymanweb.domManager.getLastActiveElement();
+    }
+
+    this.output(1, Pelem, "");
+    this.doInputEvent(Pelem);
+  }
+
   /**
    * Function     processKeystroke
    * Scope        Private
@@ -1205,7 +1241,13 @@ class KeyboardInterface {
     this.keymanweb.util.activeDevice = device;
 
     // Calls the start-group of the active keyboard.
-    return this.keymanweb.keyboardManager.activeKeyboard['gs'](element, keystroke);
+    var matched = this.keymanweb.keyboardManager.activeKeyboard['gs'](element, keystroke);
+
+    if(matched) {
+      this.doInputEvent(element);
+    }
+
+    return matched;
   }
   
   /**
