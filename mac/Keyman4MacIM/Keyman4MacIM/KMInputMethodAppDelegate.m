@@ -73,20 +73,19 @@ typedef enum {
                                                          forEventClass:kInternetEventClass
                                                             andEventID:kAEGetURL];
         
-        CFMachPortRef eventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask, (CGEventTapCallBack)eventTapFunction, nil);
+        CFMachPortRef lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask | NSLeftMouseDown | NSLeftMouseUp/* | NSOtherMouseDown | NSOtherMouseUp*/, (CGEventTapCallBack)eventTapFunction, nil);
         
-        if (!eventTap)
-            NSLog(@"Can't tap into flags changed event!");
+        if (!lowLevelEventTap)
+            NSLog(@"Can't tap into low level events!");
         else
-            CFRelease(eventTap);
-                  
-        CFRunLoopSourceRef flagsChangedEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0);
-        if (flagsChangedEventSrc ) {
-
-            CFRunLoopRef runLoop = CFRunLoopGetCurrent();
-            if (runLoop) {
-                CFRunLoopAddSource(runLoop,  flagsChangedEventSrc, kCFRunLoopDefaultMode);
-            }
+            CFRelease(lowLevelEventTap);
+        
+        CFRunLoopSourceRef runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, lowLevelEventTap, 0);
+        
+        CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+        
+        if (runLoopEventSrc && runLoop) {
+            CFRunLoopAddSource(runLoop,  runLoopEventSrc, kCFRunLoopDefaultMode);
         }
     }
 
@@ -159,12 +158,28 @@ typedef enum {
 }
 
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
-    if (type == kCGEventFlagsChanged) { // This should always be true; it's the only event type we're trying to tap
-        KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
-        if (appDelegate != nil) {
-            NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
+    KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
+    if (appDelegate != nil) {
+        NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
+        if (appDelegate.debugMode)
             NSLog(@"System Event: %@", sysEvent);
-            appDelegate.currentModifierFlags = sysEvent.modifierFlags;
+        
+        switch (type) {
+            case kCGEventFlagsChanged:
+                appDelegate.currentModifierFlags = sysEvent.modifierFlags;
+                break;
+                
+            case kCGEventLeftMouseUp:
+            case kCGEventLeftMouseDown:
+            case kCGEventOtherMouseUp:
+            case kCGEventOtherMouseDown:
+                {
+                    appDelegate.contextChangingEventDetected = YES;
+                }
+                break;
+                
+            default:
+                break;
         }
     }
     return event;
