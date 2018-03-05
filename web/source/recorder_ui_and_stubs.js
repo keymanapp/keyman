@@ -16,8 +16,8 @@ function focusReceiver() {
   
   if(keyman.util.device.touchable) {
     // At present, touch doesn't 'focus' properly.
-    DOMEventHandlers.states.lastActiveElement = receiver;
-    DOMEventHandlers.states.activeElement = receiver;
+    com.keyman.DOMEventHandlers.states.lastActiveElement = receiver;
+    com.keyman.DOMEventHandlers.states.activeElement = receiver;
     keyman.osk.show(true);
   }
 }
@@ -96,8 +96,8 @@ setTestDefinition = function(testDef) {
 // Time for the 'magic'.  Yay, JavaScript method extension strategies...
 var _kd = keyman.touchAliasing._KeyDown.bind(keyman.touchAliasing);
 keyman.touchAliasing._KeyDown = function(e) {
-  if(DOMEventHandlers.states.activeElement != in_output &&
-    DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
+  if(com.keyman.DOMEventHandlers.states.activeElement != in_output &&
+    com.keyman.DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
     return _kd(e);
   }
 
@@ -130,8 +130,8 @@ copyTestDefinition = function() {
 
 var _ock = keyman.osk.clickKey.bind(keyman.osk);
 keyman.osk.clickKey = function(e) {
-  if(DOMEventHandlers.states.activeElement != in_output &&
-    DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
+  if(com.keyman.DOMEventHandlers.states.activeElement != in_output &&
+    com.keyman.DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
     return _ock(e);
   }
 
@@ -164,8 +164,8 @@ keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, sav
 
   // What's the active stub immediately after our _SetActiveKeyboard call?
   var internalStub = keyman.keyboardManager.activeStub;
-  if(internalStub && (DOMEventHandlers.states.activeElement == in_output 
-    || DOMEventHandlers.states.activeElement == in_output['kmw_ip'])) {
+  if(internalStub && (com.keyman.DOMEventHandlers.states.activeElement == in_output 
+    || com.keyman.DOMEventHandlers.states.activeElement == in_output['kmw_ip'])) {
     var kbdRecord = new KMWRecorder.KeyboardStub(internalStub);
     kbdRecord.setBasePath('resources/keyboards');
     var ta_activeStub = document.getElementById('activeStub');
@@ -211,7 +211,7 @@ window.addEventListener('load', function() {
   setupKeyboardPicker();
   setTestDefinition();
 
-  DOMEventHandlers.states.lastActiveElement = in_output['kmw_ip'] ? in_output['kmw_ip'] : in_output;
+  com.keyman.DOMEventHandlers.states.lastActiveElement = in_output['kmw_ip'] ? in_output['kmw_ip'] : in_output;
 
   var errorInput = document.getElementById('errorText');
   if(errorInput['kmw_ip']) {
