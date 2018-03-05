@@ -160,11 +160,13 @@ var onScriptLoad = function(scriptURL, callback, timeout) {
   slo.observe();
 };
 
-var loadKeyboardStub = function(stub, callback, timeout) {
+var loadKeyboardStub = function(stub, callback, timeout, params) {
   var kbdName = "Keyboard_" + stub.id;
 
   keyman.addKeyboards(stub);
-  keyman.setActiveKeyboard(kbdName, stub.languages.id);
+  if(!params || !params.passive) {
+    keyman.setActiveKeyboard(kbdName, stub.languages.id);
+  }
 
   if(keyman.getActiveKeyboard() != kbdName) {
     onScriptLoad(stub.filename, function() {

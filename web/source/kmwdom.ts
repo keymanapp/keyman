@@ -60,8 +60,12 @@ namespace com.keyman {
       if(this.enablementObserver) {
         this.enablementObserver.disconnect();
       }
-      if(this.attachmentObserver.disconnect) {
+      if(this.attachmentObserver) {
         this.attachmentObserver.disconnect();
+      }
+  
+      for(let input of this.inputList) {
+        this.disableInputElement(input);
       }
     }
 

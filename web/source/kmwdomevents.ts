@@ -21,6 +21,8 @@ namespace com.keyman {
     focusing: boolean;
     focusTimer: number;
 
+    changed: boolean;         // Tracks if the element has been edited since gaining focus.
+
     /* ----------------------- Static event-related methods ------------------------ */
 
     setFocusTimer(): void {
@@ -323,6 +325,8 @@ namespace com.keyman {
       if(this.keyman.osk.ready && !isActivating) {
         this.keyman.osk._Hide(false);
       }
+
+      this.doChangeEvent(Ltarg);
 
       return true;
     }.bind(this);
@@ -700,14 +704,14 @@ namespace com.keyman {
         
         // Support backspace in simulated input DIV from physical keyboard where not matched in rule  I3363 (Build 301)
         if(Levent.Lcode == 8 && !LeventMatched && Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
-          kbdInterface.output(1, DOMEventHandlers.states.lastActiveElement, "");
+          this.keyman.interface.defaultBackspace();
         }
       } else {
         // Mnemonic layout
         if(Levent.Lcode == 8) { // I1595 - Backspace for mnemonic
           DOMEventHandlers.states._KeyPressToSwallow = 1;
           if(!kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
-            kbdInterface.output(1, DOMEventHandlers.states.lastActiveElement, ""); // I3363 (Build 301)
+            this.keyman.interface.defaultBackspace(); // I3363 (Build 301)
           }
           return false;  //added 16/3/13 to fix double backspace on mnemonic layouts on desktop
         }
@@ -758,8 +762,29 @@ namespace com.keyman {
           return false;
         }
       }
+
       return true;
     }.bind(this);
+
+    doChangeEvent(_target: HTMLElement|Document) {
+      if(DOMEventHandlers.states.changed) {
+        var event: Event;
+        if(typeof Event == 'function') {
+          event = new Event('change', {"bubbles": true, "cancelable": false});
+        } else { // IE path
+          event = document.createEvent("HTMLEvents");
+          event.initEvent('change', true, false);
+        }
+
+        // Ensure that touch-aliased elements fire as if from the aliased element.
+        if(_target['base'] && _target['base']['kmw_ip']) {
+          _target = _target['base'];
+        }
+        _target.dispatchEvent(event);
+      }
+
+      DOMEventHandlers.states.changed = false;
+    }
 
     /**
      * Function     _KeyPress
@@ -1356,8 +1381,10 @@ namespace com.keyman {
       // This works OK for iOS, but may need something else for other platforms
       if(('relatedTarget' in e) && e.relatedTarget) {
         var elem: HTMLElement = e.relatedTarget as HTMLElement;
+        this.doChangeEvent(elem);
         if(elem.nodeName != 'DIV' || elem.className.indexOf('keymanweb-input') == -1) {
-          this.cancelInput(); return;
+          this.cancelInput(); 
+          return;
         }
       }
 

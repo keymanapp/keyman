@@ -233,10 +233,12 @@ namespace com.keyman {
      **/
     mergeStub(kp: any, lp: any, options) {
       var sp: KeyboardStub = this.findStub(kp['id'], lp['id']);
+      var isNew: boolean = false;
 
       if(sp == null) {
         sp= new KeyboardStub(kp['id'], lp['id']);
         this.keyboardStubs.push(sp);
+        isNew = true;
       }
 
       // Accept region as number (from Cloud server), code, or name
@@ -316,6 +318,12 @@ namespace com.keyman {
 
       // Update the UI 
       this.doKeyboardRegistered(sp['KI'],sp['KL'],sp['KN'],sp['KLC'],sp['KP']);
+
+      // If we have no activeStub because there were no stubs, set the new keyboard as active.
+      // Do not trigger on merges.
+      if(!this.activeStub && isNew && this.keyboardStubs.length == 1) {
+        this.setActiveKeyboard(sp['KI'], sp['KLC']);
+      }
     }
 
     /**
@@ -356,7 +364,12 @@ namespace com.keyman {
     setActiveKeyboard(PInternalName: string, PLgCode: string) {
       //TODO: This does not make sense: the callbacks should be in _SetActiveKeyboard, not here,
       //      since this is always called FROM the UI, which should not need notification.
-      //      If UI callbacks are needed at all, they should be within _SetActiveKeyboard  
+      //      If UI callbacks are needed at all, they should be within _SetActiveKeyboard 
+
+      if(PInternalName && PInternalName.indexOf("Keyboard_") != 0) {
+        PInternalName = "Keyboard_" + PInternalName;
+      }
+
       this.doBeforeKeyboardChange(PInternalName,PLgCode);     
       this._SetActiveKeyboard(PInternalName,PLgCode,true);    
       if(this.keymanweb.domManager.getLastActiveElement() != null) {
@@ -369,7 +382,7 @@ namespace com.keyman {
       // }
       this.doKeyboardChange(PInternalName, PLgCode);
     }
-
+    
     /**
      * Change active keyboard to keyboard selected by (internal) name and language code
      * 
@@ -628,14 +641,15 @@ namespace com.keyman {
           
             // Prepare and show the OSK for this keyboard
             osk._Load();
-
-            // Remove the wait message, if defined
-            if(!manager.keymanweb.isEmbedded) {
-              util.wait(false);
-            }
-          } // A handler portion for cases where the new <script> block loads, but fails to process.
+          } 
+  
+          // Remove the wait message, if defined
+          if(!manager.keymanweb.isEmbedded) {
+            util.wait(false);
+          }
+          // A handler portion for cases where the new <script> block loads, but fails to process.
         } else {  // Output error messages even when embedded - they're useful when debugging the apps and KMEA/KMEI engines.
-            kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.', 'error');
+          kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.', 'error');
         }
         kbdStub.asyncLoader = null; 
       }, false);
@@ -1348,6 +1362,12 @@ namespace com.keyman {
       // make any changes needed by UI for new keyboard stub
       // (Uncommented for Build 360)
       this.doKeyboardRegistered(Pstub['KI'],Pstub['KL'],Pstub['KN'],Pstub['KLC'],Pstub['KP']);
+
+      // If we have no activeStub because there were no stubs, set the new keyboard as active.
+      // Do not trigger on merges.
+      if(!this.activeStub && this.dfltStub == Pstub && this.keyboardStubs.length == 1) {
+        this.setActiveKeyboard(Pstub['KI'], Pstub['KLC']);
+      }
 
       return null;
     }
