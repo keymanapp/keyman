@@ -108,6 +108,14 @@ var teardownKMW = function() {
       window["keyman"] = undefined;
     }
   }
+
+  // Base TS definition namespace.
+  if(com) {
+    var success = delete com;
+    if(!success) {
+      window['com'] = undefined;
+    }
+  }
 }
 
 // Make sure the main script loads...

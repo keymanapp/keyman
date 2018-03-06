@@ -479,6 +479,14 @@ namespace com.keyman {
         baseElement.onkeydown = this.getHandlers(Pelem)._KeyDown;
         baseElement.onkeyup = this.getHandlers(Pelem)._KeyUp;  
       }
+
+      var lastElem = this.getLastActiveElement();
+      if(lastElem == Pelem || lastElem == Pelem['kmw_ip']) {
+        this.clearLastActiveElement();
+        this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
+        this.keyman.osk._Hide();
+      }
+      
       return;
     };
 
@@ -816,14 +824,7 @@ namespace com.keyman {
      * Description  Disable KMW control element 
      */    
     _DisableControl(Pelem: HTMLElement) {
-      if(this.isAttached(Pelem)) { // Only operate on attached elements!
-        var lastElem = this.getLastActiveElement();
-        if(lastElem == Pelem || lastElem == Pelem['kmw_ip']) {
-          this.clearLastActiveElement();
-          this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
-          this.keyman.osk._Hide();
-        }
-        
+      if(this.isAttached(Pelem)) { // Only operate on attached elements!        
         if(this.keyman.util.device.touchable) {
           this.disableTouchElement(Pelem);
           this.setupNonKMWTouchElement(Pelem);
@@ -1258,6 +1259,12 @@ namespace com.keyman {
     setActiveElement(e: string|HTMLElement, setFocus?: boolean) {
       if(typeof(e) == "string") { // Can't instanceof string, and String is a different type.
         e=document.getElementById(e);
+      }
+
+      // Non-attached elements cannot be set as active.
+      if(!this.isAttached(e)) {
+        console.warn("Cannot set an element KMW is not attached to as the active element.");
+        return;
       }
 
       // As this is an API function, someone may pass in the base of a touch element.

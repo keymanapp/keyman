@@ -564,7 +564,7 @@ namespace com.keyman {
           }
         }
         this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
-      } 
+      }
 
       var Pk=this.activeKeyboard;  // I3319
       if(Pk !== null)  // I3363 (Build 301)
@@ -678,6 +678,11 @@ namespace com.keyman {
     private saveCurrentKeyboard(PInternalName: string, PLgCode: string) {
       var s = "current="+PInternalName+":"+PLgCode;
       this.keymanweb.util.saveCookie('KeymanWeb_Keyboard',{'current':PInternalName+':'+PLgCode});
+
+      // Additionally, make sure we save the (upcoming) per-control keyboard settings.
+      // This allows us to ensure the keyboard is set correctly without waiting for focus event
+      // triggers - very helpful for automated testing.
+      this.keymanweb.touchAliasing._BlurKeyboardSettings(PInternalName, PLgCode);
     }
 
     /**

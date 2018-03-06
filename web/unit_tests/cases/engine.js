@@ -2,6 +2,8 @@ var assert = chai.assert;
 
 function runEngineRuleSet(ruleSet, defaultNoun) {
   var inputElem = document.getElementById('singleton');
+  keyman.setActiveElement(inputElem);
+  
   if(inputElem['kmw_ip']) {
     inputElem = inputElem['kmw_ip'];
   }
@@ -828,6 +830,7 @@ describe('Engine', function() {
     // Tests "stage 1" of fullContextMatch - ensuring that a proper context index map is built.
     it('Extended Context Mapping', function() {
       var inputElem = document.getElementById('singleton');
+      keyman.setActiveElement(inputElem);
       if(inputElem['kmw_ip']) {
         inputElem = inputElem['kmw_ip'];
       }
@@ -884,6 +887,7 @@ describe('Engine', function() {
 
     beforeEach(function() {
       var inputElem = document.getElementById('singleton');
+      keyman.setActiveElement(inputElem);
       inputElem.value = "";
     });
 

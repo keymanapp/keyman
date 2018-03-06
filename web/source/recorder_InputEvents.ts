@@ -145,6 +145,12 @@ namespace KMWRecorder {
     simulateEventOn(target: HTMLElement) {
       var oskKeyElement = document.getElementById(this.keyID);
 
+      if(!oskKeyElement) {
+        console.error('Could not find OSK key "' + this.keyID + '"!');
+        // The following lines will throw an appropriate-enough error.
+        return;
+      }
+
       // To be safe, we replicate the MouseEvent similarly to the keystroke event.
       var downEvent;
       var upEvent;
@@ -174,17 +180,6 @@ namespace KMWRecorder {
           null, 0, 0, 0, 0,
           false, false, false, false,
           0, oskKeyElement);
-      }
-
-      /* We hack KMW a little bit because the .focus method is insufficient;
-       * it won't trigger if the tested browser doesn't have focus.
-       * Only one can have focus when testing locally.
-       */
-      com.keyman['DOMEventHandlers'].states.lastActiveElement = target;
-
-      if(!oskKeyElement) {
-        console.error('Could not find OSK key "' + this.keyID + '"!');
-        // The following lines will throw an appropriate-enough error.
       }
 
       oskKeyElement.dispatchEvent(downEvent);
@@ -593,6 +588,8 @@ namespace KMWRecorder {
     run(ele: HTMLElement, usingOSK?: boolean, assertCallback?: AssertCallback) {
       var setHasRun = false;
       var failures: TestFailure[] = [];
+
+      window['keyman'].setActiveElement(ele['base'] ? ele['base'] : ele);
 
       for(var i = 0; i < this.inputTestSets.length; i++) {
         var testSet = this.inputTestSets[i];

@@ -119,12 +119,7 @@ describe('Attachment API', function() {
         // to signal completion with done().
 
         loadKeyboardFromJSON("/keyboards/khmer_angkor.json", function() {
-          // At present, keyboard settings are managed/saved on blur/focus events.
-          // Since we can't rely on those automatically happening in automated testing,
-          // we force-set the values here for now.
           keyman.setActiveKeyboard("lao_2008_basic");
-          keyman.globalKeyboard = "Keyboard_lao_2008_basic";
-          keyman.globalLanguageCode = "lo";
           done();
         }, kmwconfig.timeouts.scriptLoad);
       }, kmwconfig.timeouts.scriptLoad);

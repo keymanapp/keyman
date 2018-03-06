@@ -354,16 +354,22 @@ namespace com.keyman {
      * Description          Stores the last active element's keyboard settings.  Should be called
      *                      whenever a KMW-enabled page element loses control.
      */
-    _BlurKeyboardSettings() {
+    _BlurKeyboardSettings(PInternalName?: string, PLgCode?: string) {
       var keyboardID = this.keyman.keyboardManager.activeKeyboard ? this.keyman.keyboardManager.activeKeyboard['KI'] : '';
+      var langCode = this.keyman.keyboardManager.getActiveLanguage();
+      
+      if(PInternalName !== undefined && PLgCode !== undefined) {
+        keyboardID = PInternalName;
+        langCode = PLgCode;
+      }
       
       var lastElem = DOMEventHandlers.states.lastActiveElement;
       if(lastElem && lastElem._kmwAttachment.keyboard != null) {
         lastElem._kmwAttachment.keyboard = keyboardID;
-        lastElem._kmwAttachment.languageCode = this.keyman.keyboardManager.getActiveLanguage();
+        lastElem._kmwAttachment.languageCode = langCode;
       } else {
         this.keyman.globalKeyboard = keyboardID;
-        this.keyman.globalLanguageCode = this.keyman.keyboardManager.getActiveLanguage();
+        this.keyman.globalLanguageCode = langCode;
       }
     }
 
@@ -376,7 +382,7 @@ namespace com.keyman {
      */ 
     _FocusKeyboardSettings(blockGlobalChange: boolean) {
       var lastElem = DOMEventHandlers.states.lastActiveElement;
-      if(lastElem._kmwAttachment.keyboard != null) {      
+      if(lastElem && lastElem._kmwAttachment.keyboard != null) {      
         this.keyman.keyboardManager.setActiveKeyboard(lastElem._kmwAttachment.keyboard, 
           lastElem._kmwAttachment.languageCode); 
       } else if(!blockGlobalChange) { 

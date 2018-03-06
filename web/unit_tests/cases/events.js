@@ -14,7 +14,6 @@ describe('Event Management', function() {
       loadKeyboardFromJSON("/keyboards/test_simple_deadkeys.json", function() {
         // Interestingly, when auto-testing there's a Safari bug that prevents
         // this from being preserved after the first forced blur command below.
-        keyman.globalKeyboard = "Keyboard_test_simple_deadkeys";
         done();
       }, kmwconfig.timeouts.scriptLoad);
     }, kmwconfig.timeouts.scriptLoad);
