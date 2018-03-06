@@ -1089,7 +1089,7 @@ function TCompileKeymanWeb.VisualKeyboardFromFile(const FVisualKeyboardFileName:
 
     // Build the layer array
 
-    Result := nl+FTabStop+'this.KLS={'+nl;
+    Result := nl+FTabStop+'this.KV.KLS={'+nl;
 
     for i := 0 to High(layers) do
     begin
@@ -1126,7 +1126,7 @@ function TCompileKeymanWeb.VisualKeyboardFromFile(const FVisualKeyboardFileName:
     '    return result;'#13#10+
     '  }';
   begin
-    Result := nl+FTabStop+'this.KV.BK=('+IfThen(FDebug,func_debug,func)+')(this.KLS)';
+    Result := nl+FTabStop+'this.KV.BK=('+IfThen(FDebug,func_debug,func)+')(this.KV.KLS)';
   end;
 
 var
