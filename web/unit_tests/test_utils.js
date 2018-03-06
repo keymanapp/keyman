@@ -202,48 +202,6 @@ function runKeyboardTestFromJSON(jsonPath, params, callback, assertCallback, tim
   }, timeout);
 }
 
-function forceFocus(focused, blurred) {
-  var aliased = (!!focused['kmw_ip']);
-
-  if(aliased) {
-    Pelem = focused['kmw_ip'];
-
-    // We need to send a fake 'touchdown' event to the alias to trigger touch-based focus.
-    var touchdownEvent;
-    if(typeof Event == 'function') {
-      touchdownEvent = new Event("touchstart");
-      touchdownEvent['touches'] = [{"target": Pelem}];
-      touchdownEvent['changedTouches'] = [{"target": Pelem}];
-    } else { // The IE path.
-      touchdownEvent = document.createEvent("MouseEvent");
-      touchdownEvent.initMouseEvent("touchstart", false, true, null,
-        null, 0, 0, 0, 0,
-        false, false, false, false,
-        0, Pelem);
-    }
-
-    // Actually sends the newly-constructed event.
-    Pelem.dispatchEvent(touchdownEvent);
-  } else {
-    var blurEvent;
-    var focusEvent;
-    if(typeof Event == 'function') {
-      blurEvent = new FocusEvent("blur");
-      focusEvent = new FocusEvent("focus");
-    } else {
-      blurEvent = document.createEvent("FocusEvent");
-      blurEvent.initFocusEvent("blur", false, false, null, 0, null);
-      focusEvent = document.createEvent("FocusEvent");
-      focusEvent.initFocusEvent("focus", false, false, null, 0, null);
-    }
-
-    if(blurred) {
-      blurred.dispatchEvent(blurEvent);
-    } 
-    focused.dispatchEvent(focusEvent);
-  }
-}
-
 function retrieveAndReset(Pelem) {
   var alias = Pelem['kmw_ip'];
   var val = "";
