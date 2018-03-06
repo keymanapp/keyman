@@ -201,3 +201,17 @@ function runKeyboardTestFromJSON(jsonPath, params, callback, assertCallback, tim
     callback();
   }, timeout);
 }
+
+function retrieveAndReset(Pelem) {
+  var alias = Pelem['kmw_ip'];
+  var val = "";
+  if(alias) {
+    val = alias.textContent;
+    keyman.touchAliasing.setText(alias, "", 0);
+  } else {
+    val = Pelem.value;
+    Pelem.value = "";
+  }
+
+  return val;
+}

@@ -66,19 +66,223 @@ if(typeof(DynamicElements) == 'undefined') {
   }
 
   DynamicElements.assertAttached = function(ele, done) {
-    window.setTimeout(function() {
+    var assertion = function() {
       assert.isTrue(keyman.isAttached(ele), "Element tag '" + ele.tagName + "', id '" + ele.id + "' was not attached!");
-
-      if(done) {
+    }
+    if(done) {
+      window.setTimeout(function() {
+        assertion();
         done();
-      }
-    }, 50);
+      }, 50);
+    } else {
+      assertion();
+    }
   }
+
+  DynamicElements.assertDetached = function(ele, done) {
+    var assertion = function() {
+      assert.isFalse(keyman.isAttached(ele), "Element tag '" + ele.tagName + "', id '" + ele.id + "' was not detached!");
+    }
+    if(done) {
+      window.setTimeout(function() {
+        assertion();
+        done();
+      }, 50);
+    } else {
+      assertion();
+    }
+  }
+
+  DynamicElements.init = function() {
+    var s_key_json = {"type": "key", "key":"s", "code":"KeyS","keyCode":83,"modifierSet":0,"location":0};
+    DynamicElements.keyCommand = new KMWRecorder.PhysicalInputEvent(s_key_json);
+
+    DynamicElements.enabledLaoOutput = "ຫ";
+    DynamicElements.enabledKhmerOutput = "ស";
+    // Simulated JavaScript events do not produce text output.
+    DynamicElements.disabledOutput = "";
+  }
+
+  DynamicElements.init();
 }
+
+describe('Attachment API', function() {
+  this.timeout(5000);
+
+  before(function(done) {
+    fixture.setBase('unit_tests/fixtures');
+
+    this.timeout(30000);
+    setupKMW({ attachType:'manual' }, function() {
+      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", function() {
+        // Sequential so we don't have to worry about race conditions and such
+        // to signal completion with done().
+
+        loadKeyboardFromJSON("/keyboards/khmer_angkor.json", function() {
+          // At present, keyboard settings are managed/saved on blur/focus events.
+          // Since we can't rely on those automatically happening in automated testing,
+          // we force-set the values here for now.
+          keyman.setActiveKeyboard("lao_2008_basic");
+          keyman.globalKeyboard = "Keyboard_lao_2008_basic";
+          keyman.globalLanguageCode = "lo";
+          done();
+        });
+      }, 10000);
+    }, 10000);
+  });
+
+  after(function() {
+    keyman.removeKeyboards('lao_2008_basic');
+    teardownKMW();
+  });
+
+  beforeEach(function() {
+    fixture.load("robustAttachment.html");
+  });
+  
+  afterEach(function(done) {
+    fixture.cleanup();
+    window.setTimeout(function(){
+      done();
+    }, 50);
+  });
+
+  it("Attachment/Detachment", function(done) {
+    // Since we're in 'manual', we start detached.
+    var ele = document.getElementById(DynamicElements.addInput());
+    window.setTimeout(function() {
+
+      // Ensure we didn't auto-attach.
+      DynamicElements.assertDetached(ele);
+      DynamicElements.keyCommand.simulateEventOn(ele);
+
+      var val = ele.value;
+      ele.value = "";
+      assert.equal(val, DynamicElements.disabledOutput, "'Detached' element performed keystroke processing!");
+
+      keyman.attachToControl(ele);
+      DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
+
+      // A keystroke must target the input-receiving element.  For touch, that's the alias.
+      DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+
+      val = retrieveAndReset(ele);
+
+      assert.equal(val, DynamicElements.enabledLaoOutput, "'Attached' element did not perform keystroke processing!");
+
+      done();
+    }, 5);
+  });
+
+  it("Enablement/Disablement", function(done) {
+    // Since we're in 'manual', we start detached.
+    var ele = document.getElementById(DynamicElements.addInput());
+    window.setTimeout(function() {
+      // Ensure we didn't auto-attach.
+      keyman.attachToControl(ele);
+      // Disablement uses MutationObservers to function properly, so we need a minor timeout.
+      keyman.disableControl(ele);
+      window.setTimeout(function() {
+        DynamicElements.assertAttached(ele);
+        DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+        val = retrieveAndReset(ele);  
+        assert.equal(val, DynamicElements.disabledOutput, "'Disabled' element performed keystroke processing!");
+
+        keyman.enableControl(ele);
+        window.setTimeout(function() {
+          DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
+          DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+          val = retrieveAndReset(ele);
+          assert.equal(val, DynamicElements.enabledLaoOutput, "'Enabled' element did not perform keystroke processing!");
+  
+          done();
+        }, 5);
+      }, 5);
+    }, 5);
+  });
+
+  it("Keyboard Management (active control)", function(done) {
+    var input = document.getElementById(DynamicElements.addInput());
+    var textarea = document.getElementById(DynamicElements.addText());
+
+    keyman.attachToControl(input);
+    keyman.attachToControl(textarea);
+
+    keyman.setActiveElement(input);
+    // We assume from the other tests that running on the Lao keyboard will give proper output.
+    // It'd be a redundant check.
+
+    // Set control with independent keyboard.
+    keyman.setKeyboardForControl(input, "khmer_angkor", "km");
+    DynamicElements.keyCommand.simulateEventOn(input['kmw_ip'] ? input['kmw_ip'] : input);
+    val = retrieveAndReset(input);
+    assert.equal(val, DynamicElements.enabledKhmerOutput, "KMW did not use control's keyboard settings!");
+
+    // Swap to a global-linked control...
+    keyman.setActiveElement(textarea);
+    DynamicElements.keyCommand.simulateEventOn(textarea['kmw_ip'] ? textarea['kmw_ip'] : textarea);
+    val = retrieveAndReset(textarea);
+    assert.equal(val, DynamicElements.enabledLaoOutput, "KMW did not use manage keyboard settings correctly for global-linked control!");
+
+    // Swap back and check that the settings persist.
+    keyman.setActiveElement(input);
+    DynamicElements.keyCommand.simulateEventOn(input['kmw_ip'] ? input['kmw_ip'] : input);
+    val = retrieveAndReset(input);
+    assert.equal(val, DynamicElements.enabledKhmerOutput, "KMW forgot control's independent keyboard settings!");
+
+    // Finally, clear the independent setting.
+    keyman.setKeyboardForControl(input, null, null);
+    DynamicElements.keyCommand.simulateEventOn(input['kmw_ip'] ? input['kmw_ip'] : input);
+    val = retrieveAndReset(input);
+    assert.equal(val, DynamicElements.enabledLaoOutput, "KMW did not properly clear control's independent keyboard settings!");
+
+    done();
+  });
+
+  it("Keyboard Management (inactive control)", function(done) {
+    var input = document.getElementById(DynamicElements.addInput());
+    var textarea = document.getElementById(DynamicElements.addText());
+
+    keyman.attachToControl(input);
+    keyman.attachToControl(textarea);
+
+    keyman.setActiveElement(input);
+    // We assume from the other tests that running on the Lao keyboard will give proper output.
+    // It'd be a redundant check.
+
+    // Set control with independent keyboard.
+    keyman.setKeyboardForControl(textarea, "khmer_angkor", "km");
+    DynamicElements.keyCommand.simulateEventOn(input['kmw_ip'] ? input['kmw_ip'] : input);
+    val = retrieveAndReset(input);
+    assert.equal(val, DynamicElements.enabledLaoOutput, "KMW set independent keyboard for the incorrect control!");
+
+    // Swap to a global-linked control...
+    keyman.setActiveElement(textarea);
+    DynamicElements.keyCommand.simulateEventOn(textarea['kmw_ip'] ? textarea['kmw_ip'] : textarea);
+    val = retrieveAndReset(textarea);
+    assert.equal(val, DynamicElements.enabledKhmerOutput, "KMW did not properly store keyboard for the previously-inactive control!");
+
+    // Swap back and check that the settings persist.
+    keyman.setActiveElement(input);
+    keyman.setKeyboardForControl(textarea, null, null);
+
+    DynamicElements.keyCommand.simulateEventOn(input['kmw_ip'] ? input['kmw_ip'] : input);
+    val = retrieveAndReset(input);
+    assert.equal(val, DynamicElements.enabledLaoOutput, "KMW made a strange error when clearing an inactive control's keyboard setting!");
+
+    keyman.setActiveElement(textarea);
+    // Finally, clear the independent setting.
+    DynamicElements.keyCommand.simulateEventOn(input['kmw_ip'] ? input['kmw_ip'] : input);
+    val = retrieveAndReset(input);
+    assert.equal(val, DynamicElements.enabledLaoOutput, "KMW did not properly clear control's independent keyboard settings!");
+
+    done();
+  });
+});
 
 Modernizr.on('touchevents', function(result) {
   if(result) {
-    describe('Attachment (Touch, \'auto\')', function() {
+    describe('Device-specific Attachment Checks (Touch, \'auto\')', function() {
 
       this.timeout(5000);
 
@@ -102,7 +306,7 @@ Modernizr.on('touchevents', function(result) {
         window.setTimeout(function(){
           done();
         }, 500);
-      })
+      });
       
       describe('Element Type', function() {
         it('<input>', function(done) {
@@ -144,7 +348,7 @@ Modernizr.on('touchevents', function(result) {
       });
     });
   } else {
-    describe('Attachment (Desktop, \'auto\')', function() {
+    describe('Device-specific Attachment Checks (Desktop, \'auto\')', function() {
 
       this.timeout(5000);
 

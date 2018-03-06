@@ -835,8 +835,8 @@ namespace com.keyman {
             this.listInputs();
 
             for(var k = 0; k < this.sortedInputs.length; k++) {
-              if(DOMEventHandlers.states[k]['kmw_ip']) {
-                this.getHandlers(Pelem).updateInput(DOMEventHandlers.states[k]['kmw_ip']);
+              if(this.sortedInputs[k]['kmw_ip']) {
+                this.getHandlers(Pelem).updateInput(this.sortedInputs[k]['kmw_ip']);
               }
             }
           }.bind(this), 1);
@@ -871,7 +871,7 @@ namespace com.keyman {
                 this.getHandlers(Pelem).updateInput(this.sortedInputs[k]['kmw_ip']);
               }
             }
-          }, 1);
+          }.bind(this), 1);
         } else {
           this.enableInputElement(Pelem);
         }
@@ -1167,7 +1167,9 @@ namespace com.keyman {
 
           if(Pkbd != null && Plc != null) { // Second part necessary for Closure.
             this.keyman.keyboardManager.setActiveKeyboard(Pkbd, Plc);
-          } 
+          } else {
+            this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
+          }
         }
       }
     }
@@ -1258,7 +1260,14 @@ namespace com.keyman {
         e=document.getElementById(e);
       }
 
+      // As this is an API function, someone may pass in the base of a touch element.
+      // We need to respond appropriately.
+      e = e['kmw_ip'] ? e['kmw_ip'] : e;
+
+      // If we're changing controls, don't forget to properly manage the keyboard settings!
+      this.keyman.touchAliasing._BlurKeyboardSettings();
       DOMEventHandlers.states.activeElement = DOMEventHandlers.states.lastActiveElement=e;
+      this.keyman.touchAliasing._FocusKeyboardSettings(false);
 
       // Allow external focusing KMEW-123
       if(arguments.length > 1 && setFocus) {
