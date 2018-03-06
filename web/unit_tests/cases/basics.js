@@ -1,13 +1,14 @@
 var assert = chai.assert;
 
 describe('Basic KeymanWeb', function() {
+  this.timeout(kmwconfig.timeouts.standard);
 
   beforeEach(function(done) {
-    this.timeout(10000);
+    this.timeout(kmwconfig.timeouts.scriptLoad);
 
     fixture.setBase('unit_tests/fixtures');
     fixture.load("singleInput.html");
-    setupKMW(null, done, 10000);
+    setupKMW(null, done, kmwconfig.timeouts.scriptLoad);
   });
   
   afterEach(function() {
@@ -31,11 +32,12 @@ Modernizr.on('touchevents', function(result) {
     describe('Basic Toggle UI', function() {
 
       beforeEach(function(done) {
-        this.timeout(20000);
+        this.timeout(kmwconfig.timeouts.uiLoad);
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('toggle', done, 20000, function() { return keyman.ui.initialized; });
+        // Sequentially loads two scripts, so 2x timeout.
+        setupKMW('toggle', done, kmwconfig.timeouts.uiLoad, function() { return keyman.ui.initialized; });
       });
       
       afterEach(function() {
@@ -64,11 +66,12 @@ Modernizr.on('touchevents', function(result) {
     describe('Basic Button UI', function() {
 
       beforeEach(function(done) {
-        this.timeout(20000);
+        this.timeout(kmwconfig.timeouts.uiLoad);
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('button', done, 20000, function() { return keyman.ui.init; });
+        // Sequentially loads two scripts, so 2x timeout.
+        setupKMW('button', done, kmwconfig.timeouts.uiLoad, function() { return keyman.ui.init; });
       });
       
       afterEach(function() {
@@ -84,11 +87,12 @@ Modernizr.on('touchevents', function(result) {
     describe('Basic Float UI', function() {
 
       beforeEach(function(done) {
-        this.timeout(20000);
+        this.timeout(kmwconfig.timeouts.uiLoad);
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('float', done, 20000, function() { return keyman.ui.initialized; });
+        // Sequentially loads two scripts, so 2x timeout.
+        setupKMW('float', done, kmwconfig.timeouts.uiLoad, function() { return keyman.ui.initialized; });
       });
       
       afterEach(function() {
@@ -117,11 +121,11 @@ Modernizr.on('touchevents', function(result) {
     describe('Basic Toolbar UI', function() {
 
       beforeEach(function(done) {
-        this.timeout(20000);
+        this.timeout(kmwconfig.timeouts.uiLoad);
         fixture.setBase('unit_tests/fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('toolbar', done, 20000, function() { return keyman.ui.init; });
+        setupKMW('toolbar', done, kmwconfig.timeouts.uiLoad, function() { return keyman.ui.init; });
       });
       
       afterEach(function() {

@@ -6,11 +6,11 @@ var assert = chai.assert;
 //        See deadkeys.json, "filename" (line 5) for details.
 
 describe('Engine - Deadkeys', function() {
-  this.timeout(20000);
+  this.timeout(kmwconfig.timeouts.scriptLoad);
 
   before(function(done) {
     fixture.setBase('unit_tests/fixtures');
-    setupKMW(null, done, 10000);
+    setupKMW(null, done, kmwconfig.timeouts.scriptLoad);
   });
 
   beforeEach(function(done) {
@@ -30,10 +30,10 @@ describe('Engine - Deadkeys', function() {
   });
 
   it('Keyboard simulation', function(done) {
-    runKeyboardTestFromJSON('/engine_tests/deadkeys.json', {usingOSK: false}, done, assert.equal, 10000);
+    runKeyboardTestFromJSON('/engine_tests/deadkeys.json', {usingOSK: false}, done, assert.equal, kmwconfig.timeouts.scriptLoad);
   });
 
   it('OSK simulation', function(done) {
-    runKeyboardTestFromJSON('/engine_tests/deadkeys.json', {usingOSK: true}, done, assert.equal, 10000);
+    runKeyboardTestFromJSON('/engine_tests/deadkeys.json', {usingOSK: true}, done, assert.equal, kmwconfig.timeouts.scriptLoad);
   });
 });

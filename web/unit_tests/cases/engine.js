@@ -742,10 +742,10 @@ var FULL_RULE_SET = [].concat(DEADKEY_RULE_SET, ANY_CONTEXT_RULE_SET, ANY_INDEX_
 describe('Engine', function() {
 
   before(function(done) {
-    this.timeout(10000);
+    this.timeout(kmwconfig.timeouts.scriptLoad);
 
     fixture.setBase('unit_tests/fixtures');
-    setupKMW(null, done, 10000);
+    setupKMW(null, done, kmwconfig.timeouts.scriptLoad);
   });
 
   beforeEach(function(done) {
@@ -766,7 +766,7 @@ describe('Engine', function() {
   
   describe('Keyboard Loading', function() {
     it('Local', function(done) {
-      this.timeout(10000);
+      this.timeout(kmwconfig.timeouts.scriptLoad);
 
       var test_callback = function() {
         assert.isNotNull(keyman.getKeyboard("lao_2008_basic", "lo"), "Keyboard stub was not registered!");
@@ -776,17 +776,19 @@ describe('Engine', function() {
         done();
       }
 
-      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", test_callback, 10000, {passive: true});
+      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", test_callback, kmwconfig.timeouts.scriptLoad, {passive: true});
     });
   });
 
   // Performs basic processing system checks/tests to ensure the sequence testing
   // is based on correct assumptions about the code.
   describe('Processing', function() {
+    this.timeout(kmwconfig.timeouts.standard);
+
     before(function(done){
-      this.timeout = 10000;
+      this.timeout(kmwconfig.timeouts.scriptLoad);
       // We use this keyboard here because it defines a few deadkeys for us to work with.
-      loadKeyboardFromJSON("/keyboards/test_simple_deadkeys.json", done, 10000);
+      loadKeyboardFromJSON("/keyboards/test_simple_deadkeys.json", done, kmwconfig.timeouts.scriptLoad);
     });
 
     beforeEach(function() {
@@ -873,9 +875,11 @@ describe('Engine', function() {
   // Performs basic processing system checks/tests to ensure the sequence testing
   // is based on correct assumptions about the code.
   describe('Simulation Checks', function() {
+    this.timeout(kmwconfig.timeouts.standard);
+
     before(function(done){
-      this.timeout = 10000;
-      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", done, 10000);
+      this.timeout = kmwconfig.timeouts.scriptLoad;
+      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", done, kmwconfig.timeouts.scriptLoad);
     });
 
     beforeEach(function() {
@@ -924,14 +928,14 @@ describe('Engine', function() {
   })
 
   describe('Sequence Simulation Checks', function() {
-    this.timeout(10000);
+    this.timeout(kmwconfig.timeouts.scriptLoad);
 
     it('Keyboard simulation', function(done) {
-      runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: false}, done, assert.equal, 10000);
+      runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: false}, done, assert.equal, kmwconfig.timeouts.scriptLoad);
     });
 
     it('OSK simulation', function(done) {
-      runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: true}, done, assert.equal, 10000);
+      runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: true}, done, assert.equal, kmwconfig.timeouts.scriptLoad);
     })
   });
 });

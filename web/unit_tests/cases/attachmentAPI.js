@@ -107,12 +107,12 @@ if(typeof(DynamicElements) == 'undefined') {
 }
 
 describe('Attachment API', function() {
-  this.timeout(5000);
+  this.timeout(kmwconfig.timeouts.standard);
 
   before(function(done) {
     fixture.setBase('unit_tests/fixtures');
 
-    this.timeout(30000);
+    this.timeout(kmwconfig.timeouts.scriptLoad * 3);
     setupKMW({ attachType:'manual' }, function() {
       loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", function() {
         // Sequential so we don't have to worry about race conditions and such
@@ -126,9 +126,9 @@ describe('Attachment API', function() {
           keyman.globalKeyboard = "Keyboard_lao_2008_basic";
           keyman.globalLanguageCode = "lo";
           done();
-        });
-      }, 10000);
-    }, 10000);
+        }, kmwconfig.timeouts.scriptLoad);
+      }, kmwconfig.timeouts.scriptLoad);
+    }, kmwconfig.timeouts.scriptLoad);
   });
 
   after(function() {
@@ -202,6 +202,9 @@ describe('Attachment API', function() {
   });
 
   it("Keyboard Management (active control)", function(done) {
+    // It appears that event generation + inline event dispatching is a bit time-intensive on some browsers.
+    this.timeout(kmwconfig.timeouts.standard * 2);
+
     var input = document.getElementById(DynamicElements.addInput());
     var textarea = document.getElementById(DynamicElements.addText());
 
@@ -240,6 +243,9 @@ describe('Attachment API', function() {
   });
 
   it("Keyboard Management (inactive control)", function(done) {
+    // It appears that event generation + inline event dispatching is a bit time-intensive on some browsers.
+    this.timeout(kmwconfig.timeouts.standard * 2);
+
     var input = document.getElementById(DynamicElements.addInput());
     var textarea = document.getElementById(DynamicElements.addText());
 
@@ -284,13 +290,13 @@ Modernizr.on('touchevents', function(result) {
   if(result) {
     describe('Device-specific Attachment Checks (Touch, \'auto\')', function() {
 
-      this.timeout(5000);
+      this.timeout(kmwconfig.timeouts.standard);
 
       before(function(done) {
-        this.timeout(10000);
+        this.timeout(kmwconfig.timeouts.scriptLoad);
 
         fixture.setBase('unit_tests/fixtures');
-        setupKMW({ attachType:'auto' }, done, 10000);
+        setupKMW({ attachType:'auto' }, done, kmwconfig.timeouts.scriptLoad);
       });
       
       beforeEach(function() {
@@ -350,13 +356,13 @@ Modernizr.on('touchevents', function(result) {
   } else {
     describe('Device-specific Attachment Checks (Desktop, \'auto\')', function() {
 
-      this.timeout(5000);
+      this.timeout(kmwconfig.timeouts.standard);
 
       before(function(done) {
-        this.timeout(10000);
+        this.timeout(kmwconfig.timeouts.scriptLoad);
 
         fixture.setBase('unit_tests/fixtures');
-        setupKMW({ attachType:'auto' }, done, 10000);
+        setupKMW({ attachType:'auto' }, done, kmwconfig.timeouts.scriptLoad);
       });
       
       beforeEach(function() {

@@ -1,6 +1,17 @@
 module.exports = function(config) {
   var base = require("./base.conf.js");
 
+  var timeouts = base.client.args[0];
+  var browserStackModifier = 10;
+
+  for(key in timeouts) {
+    if(typeof timeouts[key] == 'number') {
+      timeouts[key] = timeouts[key] * browserStackModifier;
+    }
+  }
+
+  timeouts.mobileFactor = 2; // Extra timeout padding for running on a remote mobile device.
+
   /*
    * Definition of utility functions for managing our browser lists.
    */
