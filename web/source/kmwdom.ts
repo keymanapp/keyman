@@ -835,8 +835,8 @@ namespace com.keyman {
             this.listInputs();
 
             for(var k = 0; k < this.sortedInputs.length; k++) {
-              if(DOMEventHandlers.states[k]['kmw_ip']) {
-                this.getHandlers(Pelem).updateInput(DOMEventHandlers.states[k]['kmw_ip']);
+              if(this.sortedInputs[k]['kmw_ip']) {
+                this.getHandlers(Pelem).updateInput(this.sortedInputs[k]['kmw_ip']);
               }
             }
           }.bind(this), 1);
@@ -871,7 +871,7 @@ namespace com.keyman {
                 this.getHandlers(Pelem).updateInput(this.sortedInputs[k]['kmw_ip']);
               }
             }
-          }, 1);
+          }.bind(this), 1);
         } else {
           this.enableInputElement(Pelem);
         }

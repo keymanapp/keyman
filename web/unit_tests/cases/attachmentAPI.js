@@ -117,6 +117,12 @@ describe('Attachment API', function() {
       this.timeout(20000);
       setupKMW({ attachType:'manual' }, function() {
         loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", done, 10000);
+        
+        // At present, keyboard settings are managed/saved on blur/focus events.
+        // Since we can't rely on those automatically happening in automated testing,
+        // we force-set the values here for now.
+        keyman.globalKeyboard = "Keyboard_lao_2008_basic";
+        keyman.globalLanguageCode = "lo";
       }, 10000);
     });
 
@@ -140,6 +146,7 @@ describe('Attachment API', function() {
       // Since we're in 'manual', we start detached.
       var ele = document.getElementById(DynamicElements.addInput());
       window.setTimeout(function() {
+
         // Ensure we didn't auto-attach.
         DynamicElements.assertDetached(ele);
         DynamicElements.keyCommand.simulateEventOn(ele);
@@ -151,10 +158,11 @@ describe('Attachment API', function() {
         keyman.attachToControl(ele);
         DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
 
-        DynamicElements.keyCommand.simulateEventOn(ele);
+        // A keystroke must target the input-receiving element.  For touch, that's the alias.
+        DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
 
-        var val = ele.value;
-        ele.value = "";
+        val = retrieveAndReset(ele);
+
         assert.equal(val, DynamicElements.enabledOutput, "'Attached' element did not perform keystroke processing!");
 
         done();
@@ -167,24 +175,24 @@ describe('Attachment API', function() {
       window.setTimeout(function() {
         // Ensure we didn't auto-attach.
         keyman.attachToControl(ele);
+        // Disablement uses MutationObservers to function properly, so we need a minor timeout.
         keyman.disableControl(ele);
-        DynamicElements.assertAttached(ele);
-        DynamicElements.keyCommand.simulateEventOn(ele);
-
-        var val = ele.value;
-        ele.value = "";
-        assert.equal(val, DynamicElements.disabledOutput, "'Disabled' element performed keystroke processing!");
-
-        keyman.enableControl(ele);
-        DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
-
-        DynamicElements.keyCommand.simulateEventOn(ele);
-
-        var val = ele.value;
-        ele.value = "";
-        assert.equal(val, DynamicElements.enabledOutput, "'Enabled' element did not perform keystroke processing!");
-
-        done();
+        window.setTimeout(function() {
+          DynamicElements.assertAttached(ele);
+          DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+          val = retrieveAndReset(ele);  
+          assert.equal(val, DynamicElements.disabledOutput, "'Disabled' element performed keystroke processing!");
+  
+          keyman.enableControl(ele);
+          window.setTimeout(function() {
+            DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
+            DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+            val = retrieveAndReset(ele);
+            assert.equal(val, DynamicElements.enabledOutput, "'Enabled' element did not perform keystroke processing!");
+    
+            done();
+          }, 5);
+        }, 5);
       }, 5);
     });
   });
