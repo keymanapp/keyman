@@ -239,8 +239,8 @@ function forceFocus(focused, blurred) {
 
     if(blurred) {
       blurred.dispatchEvent(blurEvent);
-      focused.dispatchEvent(focusEvent);
-    }
+    } 
+    focused.dispatchEvent(focusEvent);
   }
 }
 
