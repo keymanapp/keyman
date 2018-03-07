@@ -6,7 +6,7 @@ namespace com.keyman {
   * 
   */
 
-  class CommonDOMStates {
+  export class CommonDOMStates {
     _KeyPressToSwallow: number;
     _DisableInput: boolean = false;         // Should input be disabled?
     _IgnoreNextSelChange: number = 0;       // when a visual keyboard key is mouse-down, ignore the next sel change because this stuffs up our history  
@@ -40,6 +40,9 @@ namespace com.keyman {
   export class DOMEventHandlers {
     // TODO:  resolve/refactor out!
     protected keyman: KeymanBase;
+
+    // This is only static within a given initialization of KeymanWeb.  Perhaps it would be best as an initialization 
+    // parameter and member field?
     static states: CommonDOMStates = new CommonDOMStates();
 
     constructor(keyman: KeymanBase) {

@@ -132,6 +132,8 @@ namespace com.keyman {
     ['shutdown']() {
       this.domManager.shutdown();
       this.osk.shutdown();
+
+      DOMEventHandlers.states = new CommonDOMStates();
     }
 
     /**

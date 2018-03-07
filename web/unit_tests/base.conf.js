@@ -17,7 +17,7 @@ module.exports = {
      */
     args: [{
       type: "timeouts", // This base is designed for local machine testing.
-      standard: 2000,
+      standard: 4000,
       scriptLoad: 6000,
       uiLoad: 24000, // Loads two scripts + includes internal setup/timeout time requirements.
                      // At this time of writing this, UI script loading is one of the longest checks.

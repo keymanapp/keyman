@@ -173,30 +173,24 @@ describe('Attachment API', function() {
     // Since we're in 'manual', we start detached.
     var ele = document.getElementById(DynamicElements.addInput());
     window.setTimeout(function() {
-      // Ensure we didn't auto-attach.
       keyman.attachToControl(ele);
-      // Disablement uses MutationObservers to function properly, so we need a minor timeout.
       keyman.disableControl(ele);
-      window.setTimeout(function() {
-        DynamicElements.assertAttached(ele);
-        DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
-        val = retrieveAndReset(ele);  
-        assert.equal(val, DynamicElements.disabledOutput, "'Disabled' element performed keystroke processing!");
+      DynamicElements.assertAttached(ele);
+      DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+      val = retrieveAndReset(ele);  
+      assert.equal(val, DynamicElements.disabledOutput, "'Disabled' element performed keystroke processing!");
 
-        keyman.enableControl(ele);
-        window.setTimeout(function() {
-          DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
-          DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
-          val = retrieveAndReset(ele);
-          assert.equal(val, DynamicElements.enabledLaoOutput, "'Enabled' element did not perform keystroke processing!");
-  
-          done();
-        }, 5);
-      }, 5);
+      keyman.enableControl(ele);
+      DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
+      DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+      val = retrieveAndReset(ele);
+      assert.equal(val, DynamicElements.enabledLaoOutput, "'Enabled' element did not perform keystroke processing!");
+
+      done();
     }, 5);
   });
 
-  it("Keyboard Management (active control)", function(done) {
+  it("Keyboard Management (active control)", function() {
     // It appears that event generation + inline event dispatching is a bit time-intensive on some browsers.
     this.timeout(kmwconfig.timeouts.standard * 2);
 
@@ -233,11 +227,9 @@ describe('Attachment API', function() {
     DynamicElements.keyCommand.simulateEventOn(input['kmw_ip'] ? input['kmw_ip'] : input);
     val = retrieveAndReset(input);
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW did not properly clear control's independent keyboard settings!");
-
-    done();
   });
 
-  it("Keyboard Management (inactive control)", function(done) {
+  it("Keyboard Management (inactive control)", function() {
     // It appears that event generation + inline event dispatching is a bit time-intensive on some browsers.
     this.timeout(kmwconfig.timeouts.standard * 2);
 
@@ -276,8 +268,6 @@ describe('Attachment API', function() {
     DynamicElements.keyCommand.simulateEventOn(input['kmw_ip'] ? input['kmw_ip'] : input);
     val = retrieveAndReset(input);
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW did not properly clear control's independent keyboard settings!");
-
-    done();
   });
 });
 
