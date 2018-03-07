@@ -38,7 +38,11 @@
                 kmw['hideKeyboard'] = hideKeyboard;
                 kmw['getOskHeight'] = getOskHeight;
                 kmw['getOskWidth'] = getOskWidth;
-                kmw['setActiveElement']('ta');
+                var ta = document.getElementById('ta');
+                // Ensure that the control is attached before setting it as active.
+                // Init can be asynchronous, but we need it attached pronto.
+                kmw['attachToControl'](ta);
+                kmw['setActiveElement'](ta);
             }
             
             function setDeviceType(deviceType) {
