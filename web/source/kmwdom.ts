@@ -1262,7 +1262,7 @@ namespace com.keyman {
       }
 
       // Non-attached elements cannot be set as active.
-      if(!this.isAttached(e)) {
+      if(!this.isAttached(e) && !this.keyman.isEmbedded) {
         console.warn("Cannot set an element KMW is not attached to as the active element.");
         return;
       }
