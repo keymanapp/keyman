@@ -800,7 +800,22 @@ begin
   begin
     if IsKeyboardVersion10OrLater
     // KMW >=10.0 use the full, sentinel-based length for context deletions.
-    then len := xstrlen(fkp.dpContext)
+    then
+    begin
+      len := xstrlen(fkp.dpContext);
+      n := len;
+      pwszContext := fkp.dpContext;
+
+      //CODE_IFOPT:    // I3429
+      //CODE_IFSYSTEMSTORE:     // I3430
+      for i := 1 to n do
+      begin
+        rec := ExpandSentinel(pwszContext);
+        if rec.IsSentinel and (rec.Code in [CODE_IFOPT, CODE_IFSYSTEMSTORE]) then
+          Dec(len);
+        pwszContext := incxstr(pwszContext);
+      end;
+    end
     // KMW < 10.0 exclude all sentinel-based characters, including deadkeys, from direct context deletion.
     // Deadkeys have alternative special handling.
     else len := xstrlen_printing(fkp.dpContext);
