@@ -54,15 +54,24 @@
 
   <!-- Initialization: set paths to keyboards, resources and fonts as required -->
   <script>
-    keyman.init({
-      attachType: 'auto',
+    // keyman.init({
+    //   attachType: 'auto',
+    // });
+
+    window.addEventListener("onload", function() {
+      keyman.init({
+        attachType: 'auto'
+      });
+
+      document.getElementById("body").focus();
     });
+    
   </script>
 </head>
 
 <!-- Sample page HTML -->
 
-<body onload='loadKeyboards();'>
+<body id="body" onload='loadKeyboards();'>
   <table style="width:100%">
     <tr>
       <td colspan="2">
@@ -76,7 +85,15 @@
     <tr>
       <td style="width:100%">
         <h2>Load Existing JSON</h2>
-        <input type="file" id="existingFile" accept=".json" onchange="loadExistingTest(this.files);" />
+        Please ensure that the keyboard(s) being loaded are stored within ../unit_tests/json/keyboards, if applicable.
+        <p>
+          Testing File:
+          <input type="file" id="existingFile" accept=".json" value="../unit_tests/json/engine_tests/" onchange="loadExistingTest(this.files);" />
+        </p>
+        <p>
+          Keyboard Stubs:
+          <input type="file" id="existingStubs" accept=".json" value="../unit_tests/json/keyboards/" onchange="loadExistingStubs(this.files);" multiple/>
+        </p>
       </td>
     </tr>
   </table>
