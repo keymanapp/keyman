@@ -1481,41 +1481,41 @@ function Keyboard_khmer_angkor()
   }
 }
 ;
-  this.s_c_key="...................................";
+  this.s_c_key=['','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''];
   this.s_c_out="កខគឃងចឆជឈញដឋឌឍណតថទធនបផពភមយរលវសហឡអឝឞ";
-  this.s_v_gen_key="................";
+  this.s_v_gen_key=['','','','','','','','','','','','','','','',''];
   this.s_v_gen="ាិីឹឺុូួើឿៀេែៃោៅ";
-  this.s_v_pseudo_key="...";
+  this.s_v_pseudo_key=['','',''];
   this.s_v_pseudo="ំះៈ";
-  this.s_v_key="...................";
+  this.s_v_key=['','','','','','','','','','','','','','','','','','',''];
   this.s_v_out="ាិីឹឺុូួើឿៀេែៃោៅំះៈ";
   this.s_v_any="ាិីឹឺុូួើឿៀេែៃោៅំះៈ";
   this.s_v_combo_R="េោុិីឹែ";
   this.s_v_combo_N="ាុ";
   this.s_v_combo="េោុិីឹែាុ";
-  this.s_ind_v_key="...............";
+  this.s_ind_v_key=['','','','','','','','','','','','','','',''];
   this.s_ind_v_out="ឥឦឧឨឩឪឫឬឭឮឯឰឱឲឳ";
-  this.s_diacritic_key="...........";
+  this.s_diacritic_key=['','','','','','','','','','',''];
   this.s_diacritic_out="់័៌៏៍ៈ៎៑៝ៜ្";
-  this.s_c_shifter_key="..";
+  this.s_c_shifter_key=['',''];
   this.s_c_shifter="៉៊";
-  this.s_punct_key="........";
+  this.s_punct_key=['','','','','','','',''];
   this.s_punct_out="។៕៖ៗ៘៙៚៓";
-  this.s_latin_punct_key="..................................";
+  this.s_latin_punct_key=['','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''];
   this.s_latin_punct_out="«»()!\"%=?{}\\@*,×./[]‍‌+-÷:≈‘’;<>#&";
-  this.s_spaces_key="...";
+  this.s_spaces_key=['','',''];
   this.s_spaces_out="​ ‍";
-  this.s_currency_key="...";
+  this.s_currency_key=['','',''];
   this.s_currency_out="៛$€";
-  this.s_digit_key="..........";
+  this.s_digit_key=['','','','','','','','','',''];
   this.s_digit_out="០១២៣៤៥៦៧៨៩";
-  this.s_lek_attak_key="..........";
+  this.s_lek_attak_key=['','','','','','','','','',''];
   this.s_lek_attak_out="៰៱៲៳៴៵៶៷៸៹";
-  this.s_lunar_date_key="................................";
+  this.s_lunar_date_key=['','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''];
   this.s_lunar_date_out="᧬᧻᧹᧮᧢᧯᧰᧱᧧᧲᧳᧴᧽᧼᧨᧩᧠᧣᧭᧤᧦᧺᧡᧸᧥᧷᧵᧾᧿᧪᧫᧶";
-  this.s_input_subcons="...................................";
+  this.s_input_subcons=['','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''];
   this.s_subcons="កខគឃងចឆជឈញដឋឌឍណតថទធនបផពភមយរលវឝឞសហឡអ";
-  this.s_arabic_digit_key="..........";
+  this.s_arabic_digit_key=['','','','','','','','','',''];
   this.s_arabic_digit_out="0123456789";
   this.s_v_above="ិីឹឺើ";
   this.s_shiftable_c_1st="សហអ";
@@ -1535,2244 +1535,2714 @@ function Keyboard_khmer_angkor()
   };
   this.g_main=function(t,e) {
     var k=KeymanWeb,r=0,m=0;
-    if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_BKSP /* 0x08 */)&&k.KIFS(31,this.s64,t)&&k.KCM(2,t,"្",1)&&k.KA(1,k.KC(1,1,t),this.s_c_out)) {   // Line 316
+    if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_BKSP /* 0x08 */)&&k.KFCM(2,t,['្',{t:'a',a:this.s_c_out}])&&k.KIFS(31,this.s64,t)) {   // Line 316
       r=m=1;
-      k.KO(2,t,"");
+      k.KDC(2,t);
     }
-    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_BKSP /* 0x08 */)&&k.KIFS(31,this.s65,t)&&k.KCM(2,t,"្",1)&&k.KA(1,k.KC(1,1,t),this.s_c_out)) {   // Line 317
+    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_BKSP /* 0x08 */)&&k.KFCM(2,t,['្',{t:'a',a:this.s_c_out}])&&k.KIFS(31,this.s65,t)) {   // Line 317
       r=m=1;
-      k.KO(2,t,"");
+      k.KDC(2,t);
     }
-    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_BKSP /* 0x08 */)&&k.KA(0,k.KC(2,1,t),this.s_v_combo_N)&&k.KCM(1,t,"ំ",1)) {   // Line 246
+    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_BKSP /* 0x08 */)&&k.KFCM(2,t,[{t:'a',a:this.s_v_combo_N},'ំ'])) {   // Line 246
       r=m=1;
-      k.KO(2,t,"");
+      k.KDC(2,t);
     }
-    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_BKSP /* 0x08 */)&&k.KA(0,k.KC(2,1,t),this.s_v_combo_R)&&k.KCM(1,t,"ះ",1)) {   // Line 247
+    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_BKSP /* 0x08 */)&&k.KFCM(2,t,[{t:'a',a:this.s_v_combo_R},'ះ'])) {   // Line 247
       r=m=1;
-      k.KO(2,t,"");
+      k.KDC(2,t);
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_K /* 0x4B */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ឝ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឝ");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_B /* 0x42 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ឞ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឞ");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_QUOTE /* 0xDE */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ៈ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ៈ");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_I /* 0x49 */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឦ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឦ");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_LBRKT /* 0xDB */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឩ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឩ");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_R /* 0x52 */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឫ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឫ");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_E /* 0x45 */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឯ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឯ");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_P /* 0x50 */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឰ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឰ");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_O /* 0x4F */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឱ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឱ");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_RBRKT /* 0xDD */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឳ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឳ");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_T /* 0x54 */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឨ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឨ");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_EQUAL /* 0xBB */)) {   // Line 212
       r=m=1;
-      k.KO(0,t,"៎");
+      k.KDC(0,t);
+      k.KO(-1,t,"៎");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_3 /* 0x33 */)) {   // Line 212
       r=m=1;
-      k.KO(0,t,"៑");
+      k.KDC(0,t);
+      k.KO(-1,t,"៑");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_W /* 0x57 */)) {   // Line 212
       r=m=1;
-      k.KO(0,t,"៝");
+      k.KDC(0,t);
+      k.KO(-1,t,"៝");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_Q /* 0x51 */)) {   // Line 212
       r=m=1;
-      k.KO(0,t,"ៜ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ៜ");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_QUOTE /* 0xDE */)) {   // Line 212
       r=m=1;
-      k.KO(0,t,"ៈ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ៈ");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_COLON /* 0xBA */)) {   // Line 214
       r=m=1;
-      k.KO(0,t,"៖");
+      k.KDC(0,t);
+      k.KO(-1,t,"៖");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_L /* 0x4C */)) {   // Line 214
       r=m=1;
-      k.KO(0,t,"៘");
+      k.KDC(0,t);
+      k.KO(-1,t,"៘");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_7 /* 0x37 */)) {   // Line 214
       r=m=1;
-      k.KO(0,t,"៚");
+      k.KDC(0,t);
+      k.KO(-1,t,"៚");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_M /* 0x4D */)) {   // Line 214
       r=m=1;
-      k.KO(0,t,"៓");
+      k.KDC(0,t);
+      k.KO(-1,t,"៓");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_6 /* 0x36 */)) {   // Line 214
       r=m=1;
-      k.KO(0,t,"៙");
+      k.KDC(0,t);
+      k.KO(-1,t,"៙");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_X /* 0x58 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,">");
+      k.KDC(0,t);
+      k.KO(-1,t,">");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_BKSLASH /* 0xDC */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"\\");
+      k.KDC(0,t);
+      k.KO(-1,t,"\\");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_S /* 0x53 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"-");
+      k.KDC(0,t);
+      k.KO(-1,t,"-");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_8 /* 0x38 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"*");
+      k.KDC(0,t);
+      k.KO(-1,t,"*");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_COMMA /* 0xBC */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,",");
+      k.KDC(0,t);
+      k.KO(-1,t,",");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_D /* 0x44 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"×");
+      k.KDC(0,t);
+      k.KO(-1,t,"×");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_A /* 0x41 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"+");
+      k.KDC(0,t);
+      k.KO(-1,t,"+");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_PERIOD /* 0xBE */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,".");
+      k.KDC(0,t);
+      k.KO(-1,t,".");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_C /* 0x43 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"#");
+      k.KDC(0,t);
+      k.KO(-1,t,"#");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_V /* 0x56 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"&");
+      k.KDC(0,t);
+      k.KO(-1,t,"&");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_SLASH /* 0xBF */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"/");
+      k.KDC(0,t);
+      k.KO(-1,t,"/");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_Y /* 0x59 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"[");
+      k.KDC(0,t);
+      k.KO(-1,t,"[");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_U /* 0x55 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"]");
+      k.KDC(0,t);
+      k.KO(-1,t,"]");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_BKQUOTE /* 0xC0 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"‍");
+      k.KDC(0,t);
+      k.KO(-1,t,"‍");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_1 /* 0x31 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"‌");
+      k.KDC(0,t);
+      k.KO(-1,t,"‌");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_9 /* 0x39 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"{");
+      k.KDC(0,t);
+      k.KO(-1,t,"{");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_F /* 0x46 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"÷");
+      k.KDC(0,t);
+      k.KO(-1,t,"÷");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_G /* 0x47 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,":");
+      k.KDC(0,t);
+      k.KO(-1,t,":");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_HYPHEN /* 0xBD */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"≈");
+      k.KDC(0,t);
+      k.KO(-1,t,"≈");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_H /* 0x48 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"‘");
+      k.KDC(0,t);
+      k.KO(-1,t,"‘");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_J /* 0x4A */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"’");
+      k.KDC(0,t);
+      k.KO(-1,t,"’");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_N /* 0x4E */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,";");
+      k.KDC(0,t);
+      k.KO(-1,t,";");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_0 /* 0x30 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"}");
+      k.KDC(0,t);
+      k.KO(-1,t,"}");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_Z /* 0x5A */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"<");
+      k.KDC(0,t);
+      k.KO(-1,t,"<");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_2 /* 0x32 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"@");
+      k.KDC(0,t);
+      k.KO(-1,t,"@");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_4 /* 0x34 */)) {   // Line 216
       r=m=1;
-      k.KO(0,t,"$");
+      k.KDC(0,t);
+      k.KO(-1,t,"$");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_5 /* 0x35 */)) {   // Line 216
       r=m=1;
-      k.KO(0,t,"€");
+      k.KDC(0,t);
+      k.KO(-1,t,"€");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_2 /* 0x32 */)) {   // Line 218
       r=m=1;
-      k.KO(0,t,"៲");
+      k.KDC(0,t);
+      k.KO(-1,t,"៲");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_1 /* 0x31 */)) {   // Line 218
       r=m=1;
-      k.KO(0,t,"៱");
+      k.KDC(0,t);
+      k.KO(-1,t,"៱");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_0 /* 0x30 */)) {   // Line 218
       r=m=1;
-      k.KO(0,t,"៰");
+      k.KDC(0,t);
+      k.KO(-1,t,"៰");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_3 /* 0x33 */)) {   // Line 218
       r=m=1;
-      k.KO(0,t,"៳");
+      k.KDC(0,t);
+      k.KO(-1,t,"៳");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_6 /* 0x36 */)) {   // Line 218
       r=m=1;
-      k.KO(0,t,"៶");
+      k.KDC(0,t);
+      k.KO(-1,t,"៶");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_7 /* 0x37 */)) {   // Line 218
       r=m=1;
-      k.KO(0,t,"៷");
+      k.KDC(0,t);
+      k.KO(-1,t,"៷");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_8 /* 0x38 */)) {   // Line 218
       r=m=1;
-      k.KO(0,t,"៸");
+      k.KDC(0,t);
+      k.KO(-1,t,"៸");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_9 /* 0x39 */)) {   // Line 218
       r=m=1;
-      k.KO(0,t,"៹");
+      k.KDC(0,t);
+      k.KO(-1,t,"៹");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_5 /* 0x35 */)) {   // Line 218
       r=m=1;
-      k.KO(0,t,"៵");
+      k.KDC(0,t);
+      k.KO(-1,t,"៵");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_4 /* 0x34 */)) {   // Line 218
       r=m=1;
-      k.KO(0,t,"៴");
+      k.KDC(0,t);
+      k.KO(-1,t,"៴");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_E /* 0x45 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧢");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧢");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_F /* 0x46 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧯");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧯");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_A /* 0x41 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧬");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧬");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_D /* 0x44 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧮");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧮");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_C /* 0x43 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧹");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧹");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_QUOTE /* 0xDE */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧶");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧶");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_G /* 0x47 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧰");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧰");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_RBRKT /* 0xDD */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧫");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧫");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_LBRKT /* 0xDB */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧪");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧪");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_H /* 0x48 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧱");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧱");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_PERIOD /* 0xBE */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧿");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧿");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_I /* 0x49 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧧");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧧");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_J /* 0x4A */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧲");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧲");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_K /* 0x4B */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧳");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧳");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_L /* 0x4C */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧴");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧴");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_COMMA /* 0xBC */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧾");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧾");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_M /* 0x4D */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧽");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧽");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_N /* 0x4E */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧼");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧼");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_COLON /* 0xBA */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧵");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧵");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_Z /* 0x5A */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧷");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧷");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_Y /* 0x59 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧥");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧥");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_X /* 0x58 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧸");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧸");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_O /* 0x4F */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧨");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧨");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_W /* 0x57 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧡");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧡");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_V /* 0x56 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧺");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧺");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_U /* 0x55 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧦");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧦");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_P /* 0x50 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧩");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧩");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_Q /* 0x51 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧠");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧠");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_R /* 0x52 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧣");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧣");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_S /* 0x53 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧭");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧭");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_T /* 0x54 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧤");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧤");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4018 */, keyCodes.K_B /* 0x42 */)) {   // Line 219
       r=m=1;
-      k.KO(0,t,"᧻");
+      k.KDC(0,t);
+      k.KO(-1,t,"᧻");
     }
     else if(k.KKM(e, modCodes.RALT | modCodes.VIRTUAL_KEY /* 0x4008 */, keyCodes.K_SPACE /* 0x20 */)) {   // Line 220
       r=m=1;
-      k.KO(0,t,"‍");
+      k.KDC(0,t);
+      k.KO(-1,t,"‍");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x10C)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ឌ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ឌ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x10D)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ឍ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ឍ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x10E)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ណ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ណ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x10F)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ត");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ត");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x10A)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ដ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ដ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x109)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ញ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ញ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x108)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ឈ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ឈ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x107)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ជ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ជ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x106)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ឆ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ឆ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x105)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ច");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ច");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x122)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្អ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្អ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x104)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ង");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ង");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x103)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ឃ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ឃ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x102)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្គ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្គ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x111)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ទ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ទ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x101)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ខ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ខ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x100)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ក");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ក");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x112)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ធ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ធ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x113)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ន");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ន");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x114)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ប");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ប");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x115)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ផ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ផ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x110)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ថ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ថ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x10B)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ឋ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ឋ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x116)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ព");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ព");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x121)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ឡ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ឡ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x117)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ភ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ភ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x120)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ហ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ហ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x11F)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ស");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ស");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x11E)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ឞ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ឞ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x11D)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ឝ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ឝ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x118)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ម");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ម");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x11C)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្វ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្វ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x119)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្យ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្យ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x11A)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្រ");
+      k.KDC(0,t);
+      k.KO(-1,t,"្រ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, 0x11B)) {   // Line 312
       r=m=1;
-      k.KO(0,t,"្ល");
+      k.KDC(0,t);
+      k.KO(-1,t,"្ល");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_SPACE /* 0x20 */)) {   // Line 220
       r=m=1;
-      k.KO(0,t," ");
+      k.KDC(0,t);
+      k.KO(-1,t," ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_SPACE /* 0x20 */)) {   // Line 220
       r=m=1;
-      k.KO(0,t,"​");
+      k.KDC(0,t);
+      k.KO(-1,t,"​");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_1 /* 0x31 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"!");
+      k.KDC(0,t);
+      k.KO(-1,t,"!");
     }
-    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KA(0,k.KC(3,1,t),this.s_c_combo_QA)&&k.KCM(2,t,"្អ",2)) {   // Line 261
+    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KFCM(3,t,[{t:'a',a:this.s_c_combo_QA},'្','អ'])) {   // Line 261
       r=m=1;
+      k.KDC(3,t);
+      k.KIO(-1,this.s_c_combo_QA,1,t);
+      k.KO(-1,t,"្អ៉");
+      k.KB(t);
+    }
+    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KFCM(3,t,['ល','្',{t:'a',a:this.s_c_1st_combo_LO}])) {   // Line 262
+      r=m=1;
+      k.KDC(3,t);
+      k.KO(-1,t,"ល្");
+      k.KIO(-1,this.s_c_1st_combo_LO,3,t);
       k.KO(-1,t,"៉");
       k.KB(t);
     }
-    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KCM(3,t,"ល្",2)&&k.KA(2,k.KC(1,1,t),this.s_c_1st_combo_LO)) {   // Line 262
+    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KFCM(3,t,['ម','្',{t:'a',a:this.s_c_1st_combo_MO}])) {   // Line 263
       r=m=1;
+      k.KDC(3,t);
+      k.KO(-1,t,"ម្");
+      k.KIO(-1,this.s_c_1st_combo_MO,3,t);
       k.KO(-1,t,"៉");
       k.KB(t);
     }
-    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KCM(3,t,"ម្",2)&&k.KA(2,k.KC(1,1,t),this.s_c_1st_combo_MO)) {   // Line 263
+    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KFCM(3,t,['ស','្',{t:'a',a:this.s_c_combo_SA}])) {   // Line 264
       r=m=1;
+      k.KDC(3,t);
+      k.KO(-1,t,"ស្");
+      k.KIO(-1,this.s_c_combo_SA,3,t);
       k.KO(-1,t,"៉");
       k.KB(t);
     }
-    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KCM(3,t,"ស្",2)&&k.KA(2,k.KC(1,1,t),this.s_c_combo_SA)) {   // Line 264
+    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KFCM(3,t,[{t:'a',a:this.s_c_combo_HA},'្','ហ'])) {   // Line 265
       r=m=1;
-      k.KO(-1,t,"៉");
+      k.KDC(3,t);
+      k.KIO(-1,this.s_c_combo_HA,1,t);
+      k.KO(-1,t,"្ហ៉");
       k.KB(t);
     }
-    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KA(0,k.KC(3,1,t),this.s_c_combo_HA)&&k.KCM(2,t,"្ហ",2)) {   // Line 265
+    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KFCM(3,t,['អ','្','ង'])) {   // Line 266
       r=m=1;
-      k.KO(-1,t,"៉");
+      k.KDC(3,t);
+      k.KO(-1,t,"អ្ង៉");
       k.KB(t);
     }
-    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KCM(3,t,"អ្ង",3)) {   // Line 266
+    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KFCM(3,t,['អ','្','វ'])) {   // Line 267
       r=m=1;
-      k.KO(-1,t,"៉");
+      k.KDC(3,t);
+      k.KO(-1,t,"អ្វ៉");
       k.KB(t);
     }
-    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KCM(3,t,"អ្វ",3)) {   // Line 267
+    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KFCM(1,t,[{t:'a',a:this.s_c_shifter}])) {   // Line 236
       r=m=1;
-      k.KO(-1,t,"៉");
+      k.KDC(1,t);
+      k.KIO(-1,this.s_c_shifter,1,t);
       k.KB(t);
     }
-    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KA(0,k.KC(1,1,t),this.s_c_shifter)) {   // Line 236
+    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KFCM(1,t,[{t:'a',a:this.s_shiftable_c_1st}])) {   // Line 256
       r=m=1;
-      k.KB(t);
-    }
-    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KA(0,k.KC(1,1,t),this.s_shiftable_c_1st)) {   // Line 256
-      r=m=1;
+      k.KDC(1,t);
+      k.KIO(-1,this.s_shiftable_c_1st,1,t);
       k.KO(-1,t,"៉");
       k.KB(t);
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_QUOTE /* 0xDE */)) {   // Line 213
       r=m=1;
-      k.KO(0,t,"៉");
+      k.KDC(0,t);
+      k.KO(-1,t,"៉");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_3 /* 0x33 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"\"");
+      k.KDC(0,t);
+      k.KO(-1,t,"\"");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_4 /* 0x34 */)) {   // Line 216
       r=m=1;
-      k.KO(0,t,"៛");
+      k.KDC(0,t);
+      k.KO(-1,t,"៛");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_5 /* 0x35 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"%");
+      k.KDC(0,t);
+      k.KO(-1,t,"%");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_7 /* 0x37 */)) {   // Line 212
       r=m=1;
-      k.KO(0,t,"័");
+      k.KDC(0,t);
+      k.KO(-1,t,"័");
     }
-    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KCM(2,t,"្",1)&&k.KA(1,k.KC(1,1,t),this.s_c_out)) {   // Line 235
+    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KFCM(2,t,['្',{t:'a',a:this.s_c_out}])) {   // Line 235
       r=m=1;
+      k.KDC(2,t);
+      k.KO(-1,t,"្");
+      k.KIO(-1,this.s_c_out,2,t);
       k.KB(t);
     }
-    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KA(0,k.KC(1,1,t),this.s_v_gen)) {   // Line 232
+    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KFCM(1,t,[{t:'a',a:this.s_v_gen}])) {   // Line 232
       r=m=1;
+      k.KDC(1,t);
+      k.KIO(-1,this.s_v_gen,1,t);
       k.KB(t);
     }
-    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KA(0,k.KC(1,1,t),this.s_v_pseudo)) {   // Line 233
+    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KFCM(1,t,[{t:'a',a:this.s_v_pseudo}])) {   // Line 233
       r=m=1;
+      k.KDC(1,t);
+      k.KIO(-1,this.s_v_pseudo,1,t);
       k.KB(t);
     }
-    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KA(0,k.KC(1,1,t),this.s_c_shifter)) {   // Line 234
+    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_QUOTE /* 0xDE */)&&k.KFCM(1,t,[{t:'a',a:this.s_c_shifter}])) {   // Line 234
       r=m=1;
+      k.KDC(1,t);
+      k.KIO(-1,this.s_c_shifter,1,t);
       k.KB(t);
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_QUOTE /* 0xDE */)) {   // Line 212
       r=m=1;
-      k.KO(0,t,"់");
+      k.KDC(0,t);
+      k.KO(-1,t,"់");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_9 /* 0x39 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"(");
+      k.KDC(0,t);
+      k.KO(-1,t,"(");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_0 /* 0x30 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,")");
+      k.KDC(0,t);
+      k.KO(-1,t,")");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_8 /* 0x38 */)) {   // Line 212
       r=m=1;
-      k.KO(0,t,"៏");
+      k.KDC(0,t);
+      k.KO(-1,t,"៏");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_EQUAL /* 0xBB */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"=");
+      k.KDC(0,t);
+      k.KO(-1,t,"=");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_COMMA /* 0xBC */)) {   // Line 227
       r=m=1;
-      k.KO(0,t,"ុំ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ុំ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_HYPHEN /* 0xBD */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឥ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឥ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_PERIOD /* 0xBE */)) {   // Line 214
       r=m=1;
-      k.KO(0,t,"។");
+      k.KDC(0,t);
+      k.KO(-1,t,"។");
     }
-    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_SLASH /* 0xBF */)&&k.KCM(3,t,"ល្",2)&&k.KA(2,k.KC(1,1,t),this.s_c_2nd_combo_LO)) {   // Line 271
+    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_SLASH /* 0xBF */)&&k.KFCM(3,t,['ល','្',{t:'a',a:this.s_c_2nd_combo_LO}])) {   // Line 271
       r=m=1;
+      k.KDC(3,t);
+      k.KO(-1,t,"ល្");
+      k.KIO(-1,this.s_c_2nd_combo_LO,3,t);
       k.KO(-1,t,"៊");
       k.KB(t);
     }
-    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_SLASH /* 0xBF */)&&k.KCM(3,t,"ម្",2)&&k.KA(2,k.KC(1,1,t),this.s_c_2nd_combo_MO)) {   // Line 272
+    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_SLASH /* 0xBF */)&&k.KFCM(3,t,['ម','្',{t:'a',a:this.s_c_2nd_combo_MO}])) {   // Line 272
       r=m=1;
+      k.KDC(3,t);
+      k.KO(-1,t,"ម្");
+      k.KIO(-1,this.s_c_2nd_combo_MO,3,t);
       k.KO(-1,t,"៊");
       k.KB(t);
     }
-    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_SLASH /* 0xBF */)&&k.KA(0,k.KC(1,1,t),this.s_c_shifter)) {   // Line 236
+    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_SLASH /* 0xBF */)&&k.KFCM(1,t,[{t:'a',a:this.s_c_shifter}])) {   // Line 236
       r=m=1;
+      k.KDC(1,t);
+      k.KIO(-1,this.s_c_shifter,1,t);
       k.KB(t);
     }
-    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_SLASH /* 0xBF */)&&k.KA(0,k.KC(1,1,t),this.s_shiftable_c_2nd)) {   // Line 257
+    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_SLASH /* 0xBF */)&&k.KFCM(1,t,[{t:'a',a:this.s_shiftable_c_2nd}])) {   // Line 257
       r=m=1;
+      k.KDC(1,t);
+      k.KIO(-1,this.s_shiftable_c_2nd,1,t);
       k.KO(-1,t,"៊");
       k.KB(t);
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_SLASH /* 0xBF */)) {   // Line 213
       r=m=1;
-      k.KO(0,t,"៊");
+      k.KDC(0,t);
+      k.KO(-1,t,"៊");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_0 /* 0x30 */)) {   // Line 217
       r=m=1;
-      k.KO(0,t,"០");
+      k.KDC(0,t);
+      k.KO(-1,t,"០");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_1 /* 0x31 */)) {   // Line 217
       r=m=1;
-      k.KO(0,t,"១");
+      k.KDC(0,t);
+      k.KO(-1,t,"១");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_2 /* 0x32 */)) {   // Line 217
       r=m=1;
-      k.KO(0,t,"២");
+      k.KDC(0,t);
+      k.KO(-1,t,"២");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_3 /* 0x33 */)) {   // Line 217
       r=m=1;
-      k.KO(0,t,"៣");
+      k.KDC(0,t);
+      k.KO(-1,t,"៣");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_4 /* 0x34 */)) {   // Line 217
       r=m=1;
-      k.KO(0,t,"៤");
+      k.KDC(0,t);
+      k.KO(-1,t,"៤");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_5 /* 0x35 */)) {   // Line 217
       r=m=1;
-      k.KO(0,t,"៥");
+      k.KDC(0,t);
+      k.KO(-1,t,"៥");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_6 /* 0x36 */)) {   // Line 217
       r=m=1;
-      k.KO(0,t,"៦");
+      k.KDC(0,t);
+      k.KO(-1,t,"៦");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_7 /* 0x37 */)) {   // Line 217
       r=m=1;
-      k.KO(0,t,"៧");
+      k.KDC(0,t);
+      k.KO(-1,t,"៧");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_8 /* 0x38 */)) {   // Line 217
       r=m=1;
-      k.KO(0,t,"៨");
+      k.KDC(0,t);
+      k.KO(-1,t,"៨");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_9 /* 0x39 */)) {   // Line 217
       r=m=1;
-      k.KO(0,t,"៩");
+      k.KDC(0,t);
+      k.KO(-1,t,"៩");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_COLON /* 0xBA */)) {   // Line 226
       r=m=1;
-      k.KO(0,t,"ោះ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ោះ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_COLON /* 0xBA */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ើ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ើ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_COMMA /* 0xBC */)) {   // Line 228
       r=m=1;
-      k.KO(0,t,"ុះ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ុះ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_EQUAL /* 0xBB */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឲ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឲ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_PERIOD /* 0xBE */)) {   // Line 214
       r=m=1;
-      k.KO(0,t,"៕");
+      k.KDC(0,t);
+      k.KO(-1,t,"៕");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_SLASH /* 0xBF */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"?");
+      k.KDC(0,t);
+      k.KO(-1,t,"?");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_2 /* 0x32 */)) {   // Line 214
       r=m=1;
-      k.KO(0,t,"ៗ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ៗ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_A /* 0x41 */)) {   // Line 224
       r=m=1;
-      k.KO(0,t,"ាំ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ាំ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_B /* 0x42 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ព");
+      k.KDC(0,t);
+      k.KO(-1,t,"ព");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_C /* 0x43 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ជ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ជ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_D /* 0x44 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ឌ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឌ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_E /* 0x45 */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ែ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ែ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_F /* 0x46 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ធ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ធ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_G /* 0x47 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"អ");
+      k.KDC(0,t);
+      k.KO(-1,t,"អ");
     }
-    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_H /* 0x48 */)&&k.KCM(1,t,"ះ",1)) {   // Line 240
+    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_H /* 0x48 */)&&k.KFCM(1,t,['ះ'])) {   // Line 240
       r=m=1;
-      k.KO(1,t,"ៈ");
+      k.KDC(1,t);
+      k.KO(-1,t,"ៈ");
     }
-    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_H /* 0x48 */)&&k.KCM(1,t,"ៈ",1)) {   // Line 241
+    else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_H /* 0x48 */)&&k.KFCM(1,t,['ៈ'])) {   // Line 241
       r=m=1;
-      k.KO(1,t,"ះ");
+      k.KDC(1,t);
+      k.KO(-1,t,"ះ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_H /* 0x48 */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ះ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ះ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_I /* 0x49 */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ី");
+      k.KDC(0,t);
+      k.KO(-1,t,"ី");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_J /* 0x4A */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ញ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ញ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_K /* 0x4B */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"គ");
+      k.KDC(0,t);
+      k.KO(-1,t,"គ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_L /* 0x4C */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ឡ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឡ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_M /* 0x4D */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ំ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ំ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_N /* 0x4E */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ណ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ណ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_O /* 0x4F */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ៅ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ៅ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_P /* 0x50 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ភ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ភ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_Q /* 0x51 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ឈ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឈ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_R /* 0x52 */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឬ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឬ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_S /* 0x53 */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ៃ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ៃ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_T /* 0x54 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ទ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ទ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_U /* 0x55 */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ូ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ូ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_V /* 0x56 */)) {   // Line 225
       r=m=1;
-      k.KO(0,t,"េះ");
+      k.KDC(0,t);
+      k.KO(-1,t,"េះ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_W /* 0x57 */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ឺ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឺ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_X /* 0x58 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ឃ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឃ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_Y /* 0x59 */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ួ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ួ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_Z /* 0x5A */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ឍ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឍ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_LBRKT /* 0xDB */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ៀ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ៀ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_BKSLASH /* 0xDC */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឮ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឮ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_RBRKT /* 0xDD */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឪ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឪ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_6 /* 0x36 */)) {   // Line 212
       r=m=1;
-      k.KO(0,t,"៍");
+      k.KDC(0,t);
+      k.KO(-1,t,"៍");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_HYPHEN /* 0xBD */)) {   // Line 212
       r=m=1;
-      k.KO(0,t,"៌");
+      k.KDC(0,t);
+      k.KO(-1,t,"៌");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_BKQUOTE /* 0xC0 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"«");
+      k.KDC(0,t);
+      k.KO(-1,t,"«");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_A /* 0x41 */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ា");
+      k.KDC(0,t);
+      k.KO(-1,t,"ា");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_B /* 0x42 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ប");
+      k.KDC(0,t);
+      k.KO(-1,t,"ប");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_C /* 0x43 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ច");
+      k.KDC(0,t);
+      k.KO(-1,t,"ច");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_D /* 0x44 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ដ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ដ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_E /* 0x45 */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"េ");
+      k.KDC(0,t);
+      k.KO(-1,t,"េ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_F /* 0x46 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ថ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ថ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_G /* 0x47 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ង");
+      k.KDC(0,t);
+      k.KO(-1,t,"ង");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_H /* 0x48 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ហ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ហ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_I /* 0x49 */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ិ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ិ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_J /* 0x4A */)) {   // Line 212
       r=m=1;
-      k.KO(0,t,"្");
+      k.KDC(0,t);
+      k.KO(-1,t,"្");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_K /* 0x4B */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ក");
+      k.KDC(0,t);
+      k.KO(-1,t,"ក");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_L /* 0x4C */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ល");
+      k.KDC(0,t);
+      k.KO(-1,t,"ល");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_M /* 0x4D */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ម");
+      k.KDC(0,t);
+      k.KO(-1,t,"ម");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_N /* 0x4E */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ន");
+      k.KDC(0,t);
+      k.KO(-1,t,"ន");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_O /* 0x4F */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ោ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ោ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_P /* 0x50 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ផ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ផ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_Q /* 0x51 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ឆ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឆ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_R /* 0x52 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"រ");
+      k.KDC(0,t);
+      k.KO(-1,t,"រ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_S /* 0x53 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ស");
+      k.KDC(0,t);
+      k.KO(-1,t,"ស");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_T /* 0x54 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ត");
+      k.KDC(0,t);
+      k.KO(-1,t,"ត");
     }
-    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_U /* 0x55 */)&&k.KA(0,k.KC(3,1,t),this.s_shiftable_c_1st)&&k.KCM(2,t,"ាំ",2)) {   // Line 251
+    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_U /* 0x55 */)&&k.KFCM(3,t,[{t:'a',a:this.s_shiftable_c_1st},'ា','ំ'])) {   // Line 251
       r=m=1;
-      k.KIO(3,this.s_shiftable_c_1st,1,t);
+      k.KDC(3,t);
+      k.KIO(-1,this.s_shiftable_c_1st,1,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_U /* 0x55 */)&&k.KA(0,k.KC(3,1,t),this.s_shiftable_c_2nd)&&k.KCM(2,t,"ាំ",2)) {   // Line 252
+    else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_U /* 0x55 */)&&k.KFCM(3,t,[{t:'a',a:this.s_shiftable_c_2nd},'ា','ំ'])) {   // Line 252
       r=m=1;
-      k.KIO(3,this.s_shiftable_c_2nd,1,t);
+      k.KDC(3,t);
+      k.KIO(-1,this.s_shiftable_c_2nd,1,t);
       k.KO(-1,t,"៉");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_U /* 0x55 */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ុ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ុ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_V /* 0x56 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"វ");
+      k.KDC(0,t);
+      k.KO(-1,t,"វ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_W /* 0x57 */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ឹ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឹ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_X /* 0x58 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ខ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ខ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_Y /* 0x59 */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"យ");
+      k.KDC(0,t);
+      k.KO(-1,t,"យ");
     }
     else if(k.KKM(e, modCodes.VIRTUAL_KEY /* 0x4000 */, keyCodes.K_Z /* 0x5A */)) {   // Line 209
       r=m=1;
-      k.KO(0,t,"ឋ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឋ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_LBRKT /* 0xDB */)) {   // Line 210
       r=m=1;
-      k.KO(0,t,"ឿ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឿ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_BKSLASH /* 0xDC */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឭ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឭ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_RBRKT /* 0xDD */)) {   // Line 211
       r=m=1;
-      k.KO(0,t,"ឧ");
+      k.KDC(0,t);
+      k.KO(-1,t,"ឧ");
     }
     else if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_BKQUOTE /* 0xC0 */)) {   // Line 215
       r=m=1;
-      k.KO(0,t,"»");
+      k.KDC(0,t);
+      k.KO(-1,t,"»");
     }
     if(m) {
     
+      k.KDC(-1,t);
       r=this.g_normalise(t,e);
     }
     return r;
   };
   this.g_normalise=function(t,e) {
     var k=KeymanWeb,r=1,m=0;
-    if(k.KA(0,k.KC(7,1,t),this.s_c_combo_QA)&&k.KCM(6,t,"្អុំាំ",6)) {   // Line 422
+    if(k.KFCM(7,t,[{t:'a',a:this.s_c_combo_QA},'្','អ','ុ','ំ','ា','ំ'])) {   // Line 422
       m=1;
-      k.KIO(7,this.s_c_combo_QA,1,t);
+      k.KDC(7,t);
+      k.KIO(-1,this.s_c_combo_QA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"អ៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(7,t,"ល្",2)&&k.KA(2,k.KC(5,1,t),this.s_c_1st_combo_LO)&&k.KCM(4,t,"ុំាំ",4)) {   // Line 427
+    else if(k.KFCM(7,t,['ល','្',{t:'a',a:this.s_c_1st_combo_LO},'ុ','ំ','ា','ំ'])) {   // Line 427
       m=1;
-      k.KO(7,t,"ល");
+      k.KDC(7,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_LO,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(7,t,"ម្",2)&&k.KA(2,k.KC(5,1,t),this.s_c_1st_combo_MO)&&k.KCM(4,t,"ុំាំ",4)) {   // Line 432
+    else if(k.KFCM(7,t,['ម','្',{t:'a',a:this.s_c_1st_combo_MO},'ុ','ំ','ា','ំ'])) {   // Line 432
       m=1;
-      k.KO(7,t,"ម");
+      k.KDC(7,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_MO,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(7,t,"ស្",2)&&k.KA(2,k.KC(5,1,t),this.s_c_combo_SA)&&k.KCM(4,t,"ុំាំ",4)) {   // Line 437
+    else if(k.KFCM(7,t,['ស','្',{t:'a',a:this.s_c_combo_SA},'ុ','ំ','ា','ំ'])) {   // Line 437
       m=1;
-      k.KO(7,t,"ស");
+      k.KDC(7,t);
+      k.KO(-1,t,"ស");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_combo_SA,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(7,1,t),this.s_c_combo_HA)&&k.KCM(6,t,"្ហុំាំ",6)) {   // Line 442
+    else if(k.KFCM(7,t,[{t:'a',a:this.s_c_combo_HA},'្','ហ','ុ','ំ','ា','ំ'])) {   // Line 442
       m=1;
-      k.KIO(7,this.s_c_combo_HA,1,t);
+      k.KDC(7,t);
+      k.KIO(-1,this.s_c_combo_HA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"ហ៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(7,t,"អ្ងុំាំ",7)) {   // Line 447
+    else if(k.KFCM(7,t,['អ','្','ង','ុ','ំ','ា','ំ'])) {   // Line 447
       m=1;
-      k.KO(7,t,"អ");
+      k.KDC(7,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"ង៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(7,t,"អ្វុំាំ",7)) {   // Line 452
+    else if(k.KFCM(7,t,['អ','្','វ','ុ','ំ','ា','ំ'])) {   // Line 452
       m=1;
-      k.KO(7,t,"អ");
+      k.KDC(7,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"វ៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(7,t,"ល្",2)&&k.KA(2,k.KC(5,1,t),this.s_c_2nd_combo_LO)&&k.KCM(4,t,"ុំាំ",4)) {   // Line 459
+    else if(k.KFCM(7,t,['ល','្',{t:'a',a:this.s_c_2nd_combo_LO},'ុ','ំ','ា','ំ'])) {   // Line 459
       m=1;
-      k.KO(7,t,"ល");
+      k.KDC(7,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_LO,3,t);
       k.KO(-1,t,"៉");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(7,t,"ម្",2)&&k.KA(2,k.KC(5,1,t),this.s_c_2nd_combo_MO)&&k.KCM(4,t,"ុំាំ",4)) {   // Line 464
+    else if(k.KFCM(7,t,['ម','្',{t:'a',a:this.s_c_2nd_combo_MO},'ុ','ំ','ា','ំ'])) {   // Line 464
       m=1;
-      k.KO(7,t,"ម");
+      k.KDC(7,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_MO,3,t);
       k.KO(-1,t,"៉");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"្ដ",2)&&k.KA(2,k.KC(4,1,t),this.s_v_combo_N)&&k.KCM(3,t,"ំ្រ",3)) {   // Line 393
+    else if(k.KFCM(6,t,['្','ដ',{t:'a',a:this.s_v_combo_N},'ំ','្','រ'])) {   // Line 393
       m=1;
-      k.KO(6,t,"្ត");
+      k.KDC(6,t);
+      k.KO(-1,t,"្ត");
       k.KO(-1,t,"្");
       k.KO(-1,t,"រ");
       k.KIO(-1,this.s_v_combo_N,3,t);
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"្ដ",2)&&k.KA(2,k.KC(4,1,t),this.s_v_combo_R)&&k.KCM(3,t,"ះ្រ",3)) {   // Line 394
+    else if(k.KFCM(6,t,['្','ដ',{t:'a',a:this.s_v_combo_R},'ះ','្','រ'])) {   // Line 394
       m=1;
-      k.KO(6,t,"្ត");
+      k.KDC(6,t);
+      k.KO(-1,t,"្ត");
       k.KO(-1,t,"្");
       k.KO(-1,t,"រ");
       k.KIO(-1,this.s_v_combo_R,3,t);
       k.KO(-1,t,"ះ");
     }
-    else if(k.KCM(6,t,"្រ",2)&&k.KA(2,k.KC(4,1,t),this.s_v_combo_N)&&k.KCM(3,t,"ំ្ដ",3)) {   // Line 397
+    else if(k.KFCM(6,t,['្','រ',{t:'a',a:this.s_v_combo_N},'ំ','្','ដ'])) {   // Line 397
       m=1;
-      k.KO(6,t,"្ត");
+      k.KDC(6,t);
+      k.KO(-1,t,"្ត");
       k.KO(-1,t,"្");
       k.KO(-1,t,"រ");
       k.KIO(-1,this.s_v_combo_N,3,t);
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"្រ",2)&&k.KA(2,k.KC(4,1,t),this.s_v_combo_R)&&k.KCM(3,t,"ះ្ដ",3)) {   // Line 398
+    else if(k.KFCM(6,t,['្','រ',{t:'a',a:this.s_v_combo_R},'ះ','្','ដ'])) {   // Line 398
       m=1;
-      k.KO(6,t,"្ត");
+      k.KDC(6,t);
+      k.KO(-1,t,"្ត");
       k.KO(-1,t,"្");
       k.KO(-1,t,"រ");
       k.KIO(-1,this.s_v_combo_R,3,t);
       k.KO(-1,t,"ះ");
     }
-    else if(k.KCM(6,t,"្រ",2)&&k.KA(2,k.KC(4,1,t),this.s_v_combo_N)&&k.KCM(3,t,"ំ្",2)&&k.KA(5,k.KC(1,1,t),this.s_subcons)) {   // Line 403
+    else if(k.KFCM(6,t,['្','រ',{t:'a',a:this.s_v_combo_N},'ំ','្',{t:'a',a:this.s_subcons}])) {   // Line 403
       m=1;
-      k.KO(6,t,"្");
+      k.KDC(6,t);
+      k.KO(-1,t,"្");
       k.KIO(-1,this.s_subcons,6,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"រ");
       k.KIO(-1,this.s_v_combo_N,3,t);
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"្រ",2)&&k.KA(2,k.KC(4,1,t),this.s_v_combo_R)&&k.KCM(3,t,"ះ្",2)&&k.KA(5,k.KC(1,1,t),this.s_subcons)) {   // Line 404
+    else if(k.KFCM(6,t,['្','រ',{t:'a',a:this.s_v_combo_R},'ះ','្',{t:'a',a:this.s_subcons}])) {   // Line 404
       m=1;
-      k.KO(6,t,"្");
+      k.KDC(6,t);
+      k.KO(-1,t,"្");
       k.KIO(-1,this.s_subcons,6,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"រ");
       k.KIO(-1,this.s_v_combo_R,3,t);
       k.KO(-1,t,"ះ");
     }
-    else if(k.KA(0,k.KC(6,1,t),this.s_c_combo_QA)&&k.KCM(5,t,"្អុាំ",5)) {   // Line 420
+    else if(k.KFCM(6,t,[{t:'a',a:this.s_c_combo_QA},'្','អ','ុ','ា','ំ'])) {   // Line 420
       m=1;
-      k.KIO(6,this.s_c_combo_QA,1,t);
+      k.KDC(6,t);
+      k.KIO(-1,this.s_c_combo_QA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"អ៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ល្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_1st_combo_LO)&&k.KCM(3,t,"ុាំ",3)) {   // Line 425
+    else if(k.KFCM(6,t,['ល','្',{t:'a',a:this.s_c_1st_combo_LO},'ុ','ា','ំ'])) {   // Line 425
       m=1;
-      k.KO(6,t,"ល");
+      k.KDC(6,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_LO,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ម្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_1st_combo_MO)&&k.KCM(3,t,"ុាំ",3)) {   // Line 430
+    else if(k.KFCM(6,t,['ម','្',{t:'a',a:this.s_c_1st_combo_MO},'ុ','ា','ំ'])) {   // Line 430
       m=1;
-      k.KO(6,t,"ម");
+      k.KDC(6,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_MO,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ស្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_combo_SA)&&k.KCM(3,t,"ុាំ",3)) {   // Line 435
+    else if(k.KFCM(6,t,['ស','្',{t:'a',a:this.s_c_combo_SA},'ុ','ា','ំ'])) {   // Line 435
       m=1;
-      k.KO(6,t,"ស");
+      k.KDC(6,t);
+      k.KO(-1,t,"ស");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_combo_SA,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(6,1,t),this.s_c_combo_HA)&&k.KCM(5,t,"្ហុាំ",5)) {   // Line 440
+    else if(k.KFCM(6,t,[{t:'a',a:this.s_c_combo_HA},'្','ហ','ុ','ា','ំ'])) {   // Line 440
       m=1;
-      k.KIO(6,this.s_c_combo_HA,1,t);
+      k.KDC(6,t);
+      k.KIO(-1,this.s_c_combo_HA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"ហ៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"អ្ងុាំ",6)) {   // Line 445
+    else if(k.KFCM(6,t,['អ','្','ង','ុ','ា','ំ'])) {   // Line 445
       m=1;
-      k.KO(6,t,"អ");
+      k.KDC(6,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"ង៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"អ្វុាំ",6)) {   // Line 450
+    else if(k.KFCM(6,t,['អ','្','វ','ុ','ា','ំ'])) {   // Line 450
       m=1;
-      k.KO(6,t,"អ");
+      k.KDC(6,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"វ៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ល្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_2nd_combo_LO)&&k.KCM(3,t,"ុាំ",3)) {   // Line 457
+    else if(k.KFCM(6,t,['ល','្',{t:'a',a:this.s_c_2nd_combo_LO},'ុ','ា','ំ'])) {   // Line 457
       m=1;
-      k.KO(6,t,"ល");
+      k.KDC(6,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_LO,3,t);
       k.KO(-1,t,"៉");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ម្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_2nd_combo_MO)&&k.KCM(3,t,"ុាំ",3)) {   // Line 462
+    else if(k.KFCM(6,t,['ម','្',{t:'a',a:this.s_c_2nd_combo_MO},'ុ','ា','ំ'])) {   // Line 462
       m=1;
-      k.KO(6,t,"ម");
+      k.KDC(6,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_MO,3,t);
       k.KO(-1,t,"៉");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ល្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_2nd_combo_LO)&&k.KCM(3,t,"៊",1)&&k.KA(4,k.KC(2,1,t),this.s_v_gen)&&k.KA(5,k.KC(1,1,t),this.s_v_pseudo)) {   // Line 484
+    else if(k.KFCM(6,t,['ល','្',{t:'a',a:this.s_c_2nd_combo_LO},'៊',{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_pseudo}])) {   // Line 484
       m=1;
-      k.KO(6,t,"ល");
+      k.KDC(6,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_LO,3,t);
       k.KO(-1,t,"៉");
       k.KIO(-1,this.s_v_gen,5,t);
       k.KIO(-1,this.s_v_pseudo,6,t);
     }
-    else if(k.KCM(6,t,"ម្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_2nd_combo_MO)&&k.KCM(3,t,"៊",1)&&k.KA(4,k.KC(2,1,t),this.s_v_gen)&&k.KA(5,k.KC(1,1,t),this.s_v_pseudo)) {   // Line 485
+    else if(k.KFCM(6,t,['ម','្',{t:'a',a:this.s_c_2nd_combo_MO},'៊',{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_pseudo}])) {   // Line 485
       m=1;
-      k.KO(6,t,"ម");
+      k.KDC(6,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_MO,3,t);
       k.KO(-1,t,"៉");
       k.KIO(-1,this.s_v_gen,5,t);
       k.KIO(-1,this.s_v_pseudo,6,t);
     }
-    else if(k.KA(0,k.KC(6,1,t),this.s_c_combo_QA)&&k.KCM(5,t,"្អ៉ាំ",5)) {   // Line 518
+    else if(k.KFCM(6,t,[{t:'a',a:this.s_c_combo_QA},'្','អ','៉','ា','ំ'])) {   // Line 518
       m=1;
-      k.KIO(6,this.s_c_combo_QA,1,t);
+      k.KDC(6,t);
+      k.KIO(-1,this.s_c_combo_QA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"អ៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ល្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_1st_combo_LO)&&k.KCM(3,t,"៉ាំ",3)) {   // Line 519
+    else if(k.KFCM(6,t,['ល','្',{t:'a',a:this.s_c_1st_combo_LO},'៉','ា','ំ'])) {   // Line 519
       m=1;
-      k.KO(6,t,"ល");
+      k.KDC(6,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_LO,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ម្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_1st_combo_MO)&&k.KCM(3,t,"៉ាំ",3)) {   // Line 520
+    else if(k.KFCM(6,t,['ម','្',{t:'a',a:this.s_c_1st_combo_MO},'៉','ា','ំ'])) {   // Line 520
       m=1;
-      k.KO(6,t,"ម");
+      k.KDC(6,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_MO,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ស្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_combo_SA)&&k.KCM(3,t,"៉ាំ",3)) {   // Line 521
+    else if(k.KFCM(6,t,['ស','្',{t:'a',a:this.s_c_combo_SA},'៉','ា','ំ'])) {   // Line 521
       m=1;
-      k.KO(6,t,"ស");
+      k.KDC(6,t);
+      k.KO(-1,t,"ស");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_combo_SA,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(6,1,t),this.s_c_combo_HA)&&k.KCM(5,t,"្ហ៉ាំ",5)) {   // Line 522
+    else if(k.KFCM(6,t,[{t:'a',a:this.s_c_combo_HA},'្','ហ','៉','ា','ំ'])) {   // Line 522
       m=1;
-      k.KIO(6,this.s_c_combo_HA,1,t);
+      k.KDC(6,t);
+      k.KIO(-1,this.s_c_combo_HA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"ហ៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"អ្ង៉ាំ",6)) {   // Line 523
+    else if(k.KFCM(6,t,['អ','្','ង','៉','ា','ំ'])) {   // Line 523
       m=1;
-      k.KO(6,t,"អ");
+      k.KDC(6,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"ង៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"អ្វ៉ាំ",6)) {   // Line 524
+    else if(k.KFCM(6,t,['អ','្','វ','៉','ា','ំ'])) {   // Line 524
       m=1;
-      k.KO(6,t,"អ");
+      k.KDC(6,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"វ៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(6,1,t),this.s_c_combo_QA)&&k.KCM(5,t,"្អាុំ",5)) {   // Line 531
+    else if(k.KFCM(6,t,[{t:'a',a:this.s_c_combo_QA},'្','អ','ា','ុ','ំ'])) {   // Line 531
       m=1;
-      k.KIO(6,this.s_c_combo_QA,1,t);
+      k.KDC(6,t);
+      k.KIO(-1,this.s_c_combo_QA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"អ៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(6,1,t),this.s_c_combo_QA)&&k.KCM(5,t,"្អុំា",5)) {   // Line 532
+    else if(k.KFCM(6,t,[{t:'a',a:this.s_c_combo_QA},'្','អ','ុ','ំ','ា'])) {   // Line 532
       m=1;
-      k.KIO(6,this.s_c_combo_QA,1,t);
+      k.KDC(6,t);
+      k.KIO(-1,this.s_c_combo_QA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"អ៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ល្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_1st_combo_LO)&&k.KCM(3,t,"ាុំ",3)) {   // Line 534
+    else if(k.KFCM(6,t,['ល','្',{t:'a',a:this.s_c_1st_combo_LO},'ា','ុ','ំ'])) {   // Line 534
       m=1;
-      k.KO(6,t,"ល");
+      k.KDC(6,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_LO,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ល្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_1st_combo_LO)&&k.KCM(3,t,"ុំា",3)) {   // Line 535
+    else if(k.KFCM(6,t,['ល','្',{t:'a',a:this.s_c_1st_combo_LO},'ុ','ំ','ា'])) {   // Line 535
       m=1;
-      k.KO(6,t,"ល");
+      k.KDC(6,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_LO,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ម្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_1st_combo_MO)&&k.KCM(3,t,"ាុំ",3)) {   // Line 537
+    else if(k.KFCM(6,t,['ម','្',{t:'a',a:this.s_c_1st_combo_MO},'ា','ុ','ំ'])) {   // Line 537
       m=1;
-      k.KO(6,t,"ម");
+      k.KDC(6,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_MO,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ម្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_1st_combo_MO)&&k.KCM(3,t,"ុំា",3)) {   // Line 538
+    else if(k.KFCM(6,t,['ម','្',{t:'a',a:this.s_c_1st_combo_MO},'ុ','ំ','ា'])) {   // Line 538
       m=1;
-      k.KO(6,t,"ម");
+      k.KDC(6,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_MO,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ស្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_combo_SA)&&k.KCM(3,t,"ាុំ",3)) {   // Line 540
+    else if(k.KFCM(6,t,['ស','្',{t:'a',a:this.s_c_combo_SA},'ា','ុ','ំ'])) {   // Line 540
       m=1;
-      k.KO(6,t,"ស");
+      k.KDC(6,t);
+      k.KO(-1,t,"ស");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_combo_SA,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ស្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_combo_SA)&&k.KCM(3,t,"ុំា",3)) {   // Line 541
+    else if(k.KFCM(6,t,['ស','្',{t:'a',a:this.s_c_combo_SA},'ុ','ំ','ា'])) {   // Line 541
       m=1;
-      k.KO(6,t,"ស");
+      k.KDC(6,t);
+      k.KO(-1,t,"ស");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_combo_SA,3,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(6,1,t),this.s_c_combo_HA)&&k.KCM(5,t,"្ហាុំ",5)) {   // Line 543
+    else if(k.KFCM(6,t,[{t:'a',a:this.s_c_combo_HA},'្','ហ','ា','ុ','ំ'])) {   // Line 543
       m=1;
-      k.KIO(6,this.s_c_combo_HA,1,t);
+      k.KDC(6,t);
+      k.KIO(-1,this.s_c_combo_HA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"ហ៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(6,1,t),this.s_c_combo_HA)&&k.KCM(5,t,"្ហុំា",5)) {   // Line 544
+    else if(k.KFCM(6,t,[{t:'a',a:this.s_c_combo_HA},'្','ហ','ុ','ំ','ា'])) {   // Line 544
       m=1;
-      k.KIO(6,this.s_c_combo_HA,1,t);
+      k.KDC(6,t);
+      k.KIO(-1,this.s_c_combo_HA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"ហ៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"អ្ងាុំ",6)) {   // Line 546
+    else if(k.KFCM(6,t,['អ','្','ង','ា','ុ','ំ'])) {   // Line 546
       m=1;
-      k.KO(6,t,"អ");
+      k.KDC(6,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"ង៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"អ្ងុំា",6)) {   // Line 547
+    else if(k.KFCM(6,t,['អ','្','ង','ុ','ំ','ា'])) {   // Line 547
       m=1;
-      k.KO(6,t,"អ");
+      k.KDC(6,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"ង៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"អ្វាុំ",6)) {   // Line 549
+    else if(k.KFCM(6,t,['អ','្','វ','ា','ុ','ំ'])) {   // Line 549
       m=1;
-      k.KO(6,t,"អ");
+      k.KDC(6,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"វ៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"អ្វុំា",6)) {   // Line 550
+    else if(k.KFCM(6,t,['អ','្','វ','ុ','ំ','ា'])) {   // Line 550
       m=1;
-      k.KO(6,t,"អ");
+      k.KDC(6,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"វ៊");
       k.KO(-1,t,"ុ");
       k.KO(-1,t,"ា");
     }
-    else if(k.KCM(6,t,"ល្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_2nd_combo_LO)&&k.KCM(3,t,"ាុំ",3)) {   // Line 557
+    else if(k.KFCM(6,t,['ល','្',{t:'a',a:this.s_c_2nd_combo_LO},'ា','ុ','ំ'])) {   // Line 557
       m=1;
-      k.KO(6,t,"ល");
+      k.KDC(6,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_LO,3,t);
       k.KO(-1,t,"៉");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ល្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_2nd_combo_LO)&&k.KCM(3,t,"ុំា",3)) {   // Line 558
+    else if(k.KFCM(6,t,['ល','្',{t:'a',a:this.s_c_2nd_combo_LO},'ុ','ំ','ា'])) {   // Line 558
       m=1;
-      k.KO(6,t,"ល");
+      k.KDC(6,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_LO,3,t);
       k.KO(-1,t,"៉");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ម្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_2nd_combo_MO)&&k.KCM(3,t,"ាុំ",3)) {   // Line 560
+    else if(k.KFCM(6,t,['ម','្',{t:'a',a:this.s_c_2nd_combo_MO},'ា','ុ','ំ'])) {   // Line 560
       m=1;
-      k.KO(6,t,"ម");
+      k.KDC(6,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_MO,3,t);
       k.KO(-1,t,"៉");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(6,t,"ម្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_2nd_combo_MO)&&k.KCM(3,t,"ុំា",3)) {   // Line 561
+    else if(k.KFCM(6,t,['ម','្',{t:'a',a:this.s_c_2nd_combo_MO},'ុ','ំ','ា'])) {   // Line 561
       m=1;
-      k.KO(6,t,"ម");
+      k.KDC(6,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_MO,3,t);
       k.KO(-1,t,"៉");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(6,1,t),this.s_c_combo_QA)&&k.KCM(5,t,"្អេុី",5)) {   // Line 569
+    else if(k.KFCM(6,t,[{t:'a',a:this.s_c_combo_QA},'្','អ','េ','ុ','ី'])) {   // Line 569
       m=1;
-      k.KIO(6,this.s_c_combo_QA,1,t);
+      k.KDC(6,t);
+      k.KIO(-1,this.s_c_combo_QA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"អ៊ើ");
     }
-    else if(k.KA(0,k.KC(6,1,t),this.s_c_combo_QA)&&k.KCM(5,t,"្អុេី",5)) {   // Line 570
+    else if(k.KFCM(6,t,[{t:'a',a:this.s_c_combo_QA},'្','អ','ុ','េ','ី'])) {   // Line 570
       m=1;
-      k.KIO(6,this.s_c_combo_QA,1,t);
+      k.KDC(6,t);
+      k.KIO(-1,this.s_c_combo_QA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"អ៊ើ");
     }
-    else if(k.KA(0,k.KC(6,1,t),this.s_c_combo_QA)&&k.KCM(5,t,"្អ៉េី",5)) {   // Line 571
+    else if(k.KFCM(6,t,[{t:'a',a:this.s_c_combo_QA},'្','អ','៉','េ','ី'])) {   // Line 571
       m=1;
-      k.KIO(6,this.s_c_combo_QA,1,t);
+      k.KDC(6,t);
+      k.KIO(-1,this.s_c_combo_QA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"អ៊ើ");
     }
-    else if(k.KCM(6,t,"ល្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_1st_combo_LO)&&k.KCM(3,t,"េុី",3)) {   // Line 573
+    else if(k.KFCM(6,t,['ល','្',{t:'a',a:this.s_c_1st_combo_LO},'េ','ុ','ី'])) {   // Line 573
       m=1;
-      k.KO(6,t,"ល");
+      k.KDC(6,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_LO,3,t);
       k.KO(-1,t,"៊ើ");
     }
-    else if(k.KCM(6,t,"ល្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_1st_combo_LO)&&k.KCM(3,t,"ុេី",3)) {   // Line 574
+    else if(k.KFCM(6,t,['ល','្',{t:'a',a:this.s_c_1st_combo_LO},'ុ','េ','ី'])) {   // Line 574
       m=1;
-      k.KO(6,t,"ល");
+      k.KDC(6,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_LO,3,t);
       k.KO(-1,t,"៊ើ");
     }
-    else if(k.KCM(6,t,"ល្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_1st_combo_LO)&&k.KCM(3,t,"៉េី",3)) {   // Line 575
+    else if(k.KFCM(6,t,['ល','្',{t:'a',a:this.s_c_1st_combo_LO},'៉','េ','ី'])) {   // Line 575
       m=1;
-      k.KO(6,t,"ល");
+      k.KDC(6,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_LO,3,t);
       k.KO(-1,t,"៊ើ");
     }
-    else if(k.KCM(6,t,"ម្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_1st_combo_MO)&&k.KCM(3,t,"េុី",3)) {   // Line 577
+    else if(k.KFCM(6,t,['ម','្',{t:'a',a:this.s_c_1st_combo_MO},'េ','ុ','ី'])) {   // Line 577
       m=1;
-      k.KO(6,t,"ម");
+      k.KDC(6,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_MO,3,t);
       k.KO(-1,t,"៊ើ");
     }
-    else if(k.KCM(6,t,"ម្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_1st_combo_MO)&&k.KCM(3,t,"ុេី",3)) {   // Line 578
+    else if(k.KFCM(6,t,['ម','្',{t:'a',a:this.s_c_1st_combo_MO},'ុ','េ','ី'])) {   // Line 578
       m=1;
-      k.KO(6,t,"ម");
+      k.KDC(6,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_MO,3,t);
       k.KO(-1,t,"៊ើ");
     }
-    else if(k.KCM(6,t,"ម្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_1st_combo_MO)&&k.KCM(3,t,"៉េី",3)) {   // Line 579
+    else if(k.KFCM(6,t,['ម','្',{t:'a',a:this.s_c_1st_combo_MO},'៉','េ','ី'])) {   // Line 579
       m=1;
-      k.KO(6,t,"ម");
+      k.KDC(6,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_MO,3,t);
       k.KO(-1,t,"៊ើ");
     }
-    else if(k.KCM(6,t,"ស្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_combo_SA)&&k.KCM(3,t,"េុី",3)) {   // Line 581
+    else if(k.KFCM(6,t,['ស','្',{t:'a',a:this.s_c_combo_SA},'េ','ុ','ី'])) {   // Line 581
       m=1;
-      k.KO(6,t,"ស");
+      k.KDC(6,t);
+      k.KO(-1,t,"ស");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_combo_SA,3,t);
       k.KO(-1,t,"៊ើ");
     }
-    else if(k.KCM(6,t,"ស្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_combo_SA)&&k.KCM(3,t,"ុេី",3)) {   // Line 582
+    else if(k.KFCM(6,t,['ស','្',{t:'a',a:this.s_c_combo_SA},'ុ','េ','ី'])) {   // Line 582
       m=1;
-      k.KO(6,t,"ស");
+      k.KDC(6,t);
+      k.KO(-1,t,"ស");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_combo_SA,3,t);
       k.KO(-1,t,"៊ើ");
     }
-    else if(k.KCM(6,t,"ស្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_combo_SA)&&k.KCM(3,t,"៉េី",3)) {   // Line 583
+    else if(k.KFCM(6,t,['ស','្',{t:'a',a:this.s_c_combo_SA},'៉','េ','ី'])) {   // Line 583
       m=1;
-      k.KO(6,t,"ស");
+      k.KDC(6,t);
+      k.KO(-1,t,"ស");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_combo_SA,3,t);
       k.KO(-1,t,"៊ើ");
     }
-    else if(k.KA(0,k.KC(6,1,t),this.s_c_combo_HA)&&k.KCM(5,t,"្ហេុី",5)) {   // Line 585
+    else if(k.KFCM(6,t,[{t:'a',a:this.s_c_combo_HA},'្','ហ','េ','ុ','ី'])) {   // Line 585
       m=1;
-      k.KIO(6,this.s_c_combo_HA,1,t);
+      k.KDC(6,t);
+      k.KIO(-1,this.s_c_combo_HA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"ហ៊ើ");
     }
-    else if(k.KA(0,k.KC(6,1,t),this.s_c_combo_HA)&&k.KCM(5,t,"្ហុេី",5)) {   // Line 586
+    else if(k.KFCM(6,t,[{t:'a',a:this.s_c_combo_HA},'្','ហ','ុ','េ','ី'])) {   // Line 586
       m=1;
-      k.KIO(6,this.s_c_combo_HA,1,t);
+      k.KDC(6,t);
+      k.KIO(-1,this.s_c_combo_HA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"ហ៊ើ");
     }
-    else if(k.KA(0,k.KC(6,1,t),this.s_c_combo_HA)&&k.KCM(5,t,"្ហ៉េី",5)) {   // Line 587
+    else if(k.KFCM(6,t,[{t:'a',a:this.s_c_combo_HA},'្','ហ','៉','េ','ី'])) {   // Line 587
       m=1;
-      k.KIO(6,this.s_c_combo_HA,1,t);
+      k.KDC(6,t);
+      k.KIO(-1,this.s_c_combo_HA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"ហ៊ើ");
     }
-    else if(k.KCM(6,t,"អ្ងេុី",6)) {   // Line 589
+    else if(k.KFCM(6,t,['អ','្','ង','េ','ុ','ី'])) {   // Line 589
       m=1;
-      k.KO(6,t,"អ");
+      k.KDC(6,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"ង៊ើ");
     }
-    else if(k.KCM(6,t,"អ្ងុេី",6)) {   // Line 590
+    else if(k.KFCM(6,t,['អ','្','ង','ុ','េ','ី'])) {   // Line 590
       m=1;
-      k.KO(6,t,"អ");
+      k.KDC(6,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"ង៊ើ");
     }
-    else if(k.KCM(6,t,"អ្ង៉េី",6)) {   // Line 591
+    else if(k.KFCM(6,t,['អ','្','ង','៉','េ','ី'])) {   // Line 591
       m=1;
-      k.KO(6,t,"អ");
+      k.KDC(6,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"ង៊ើ");
     }
-    else if(k.KCM(6,t,"អ្វេុី",6)) {   // Line 593
+    else if(k.KFCM(6,t,['អ','្','វ','េ','ុ','ី'])) {   // Line 593
       m=1;
-      k.KO(6,t,"អ");
+      k.KDC(6,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"វ៊ើ");
     }
-    else if(k.KCM(6,t,"អ្វុេី",6)) {   // Line 594
+    else if(k.KFCM(6,t,['អ','្','វ','ុ','េ','ី'])) {   // Line 594
       m=1;
-      k.KO(6,t,"អ");
+      k.KDC(6,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"វ៊ើ");
     }
-    else if(k.KCM(6,t,"អ្វ៉េី",6)) {   // Line 595
+    else if(k.KFCM(6,t,['អ','្','វ','៉','េ','ី'])) {   // Line 595
       m=1;
-      k.KO(6,t,"អ");
+      k.KDC(6,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"វ៊ើ");
     }
-    else if(k.KCM(6,t,"ល្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_2nd_combo_LO)&&k.KCM(3,t,"េុី",3)) {   // Line 603
+    else if(k.KFCM(6,t,['ល','្',{t:'a',a:this.s_c_2nd_combo_LO},'េ','ុ','ី'])) {   // Line 603
       m=1;
-      k.KO(6,t,"ល");
+      k.KDC(6,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_LO,3,t);
       k.KO(-1,t,"៉ើ");
     }
-    else if(k.KCM(6,t,"ល្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_2nd_combo_LO)&&k.KCM(3,t,"ុេី",3)) {   // Line 604
+    else if(k.KFCM(6,t,['ល','្',{t:'a',a:this.s_c_2nd_combo_LO},'ុ','េ','ី'])) {   // Line 604
       m=1;
-      k.KO(6,t,"ល");
+      k.KDC(6,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_LO,3,t);
       k.KO(-1,t,"៉ើ");
     }
-    else if(k.KCM(6,t,"ល្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_2nd_combo_LO)&&k.KCM(3,t,"៊េី",3)) {   // Line 605
+    else if(k.KFCM(6,t,['ល','្',{t:'a',a:this.s_c_2nd_combo_LO},'៊','េ','ី'])) {   // Line 605
       m=1;
-      k.KO(6,t,"ល");
+      k.KDC(6,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_LO,3,t);
       k.KO(-1,t,"៉ើ");
     }
-    else if(k.KCM(6,t,"ម្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_2nd_combo_MO)&&k.KCM(3,t,"េុី",3)) {   // Line 607
+    else if(k.KFCM(6,t,['ម','្',{t:'a',a:this.s_c_2nd_combo_MO},'េ','ុ','ី'])) {   // Line 607
       m=1;
-      k.KO(6,t,"ម");
+      k.KDC(6,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_MO,3,t);
       k.KO(-1,t,"៉ើ");
     }
-    else if(k.KCM(6,t,"ម្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_2nd_combo_MO)&&k.KCM(3,t,"ុេី",3)) {   // Line 608
+    else if(k.KFCM(6,t,['ម','្',{t:'a',a:this.s_c_2nd_combo_MO},'ុ','េ','ី'])) {   // Line 608
       m=1;
-      k.KO(6,t,"ម");
+      k.KDC(6,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_MO,3,t);
       k.KO(-1,t,"៉ើ");
     }
-    else if(k.KCM(6,t,"ម្",2)&&k.KA(2,k.KC(4,1,t),this.s_c_2nd_combo_MO)&&k.KCM(3,t,"៊េី",3)) {   // Line 609
+    else if(k.KFCM(6,t,['ម','្',{t:'a',a:this.s_c_2nd_combo_MO},'៊','េ','ី'])) {   // Line 609
       m=1;
-      k.KO(6,t,"ម");
+      k.KDC(6,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_MO,3,t);
       k.KO(-1,t,"៉ើ");
     }
-    else if(k.KA(0,k.KC(5,1,t),this.s_c_shifter)&&k.KA(1,k.KC(4,1,t),this.s_v_combo_N)&&k.KCM(3,t,"ំ្",2)&&k.KA(4,k.KC(1,1,t),this.s_subcons)) {   // Line 384
+    else if(k.KFCM(5,t,[{t:'a',a:this.s_c_shifter},{t:'a',a:this.s_v_combo_N},'ំ','្',{t:'a',a:this.s_subcons}])) {   // Line 384
       m=1;
-      k.KO(5,t,"្");
+      k.KDC(5,t);
+      k.KO(-1,t,"្");
       k.KIO(-1,this.s_subcons,5,t);
       k.KIO(-1,this.s_c_shifter,1,t);
       k.KIO(-1,this.s_v_combo_N,2,t);
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(5,1,t),this.s_c_shifter)&&k.KA(1,k.KC(4,1,t),this.s_v_combo_R)&&k.KCM(3,t,"ះ្",2)&&k.KA(4,k.KC(1,1,t),this.s_subcons)) {   // Line 385
+    else if(k.KFCM(5,t,[{t:'a',a:this.s_c_shifter},{t:'a',a:this.s_v_combo_R},'ះ','្',{t:'a',a:this.s_subcons}])) {   // Line 385
       m=1;
-      k.KO(5,t,"្");
+      k.KDC(5,t);
+      k.KO(-1,t,"្");
       k.KIO(-1,this.s_subcons,5,t);
       k.KIO(-1,this.s_c_shifter,1,t);
       k.KIO(-1,this.s_v_combo_R,2,t);
       k.KO(-1,t,"ះ");
     }
-    else if(k.KCM(5,t,"្ដ",2)&&k.KA(2,k.KC(3,1,t),this.s_v_any)&&k.KCM(2,t,"្រ",2)) {   // Line 392
+    else if(k.KFCM(5,t,['្','ដ',{t:'a',a:this.s_v_any},'្','រ'])) {   // Line 392
       m=1;
-      k.KO(5,t,"្ត");
+      k.KDC(5,t);
+      k.KO(-1,t,"្ត");
       k.KO(-1,t,"្");
       k.KO(-1,t,"រ");
       k.KIO(-1,this.s_v_any,3,t);
     }
-    else if(k.KCM(5,t,"្រ",2)&&k.KA(2,k.KC(3,1,t),this.s_v_any)&&k.KCM(2,t,"្ដ",2)) {   // Line 396
+    else if(k.KFCM(5,t,['្','រ',{t:'a',a:this.s_v_any},'្','ដ'])) {   // Line 396
       m=1;
-      k.KO(5,t,"្ត");
+      k.KDC(5,t);
+      k.KO(-1,t,"្ត");
       k.KO(-1,t,"្");
       k.KO(-1,t,"រ");
       k.KIO(-1,this.s_v_any,3,t);
     }
-    else if(k.KCM(5,t,"្រ",2)&&k.KA(2,k.KC(3,1,t),this.s_c_shifter)&&k.KCM(2,t,"្",1)&&k.KA(4,k.KC(1,1,t),this.s_subcons)) {   // Line 400
+    else if(k.KFCM(5,t,['្','រ',{t:'a',a:this.s_c_shifter},'្',{t:'a',a:this.s_subcons}])) {   // Line 400
       m=1;
-      k.KO(5,t,"្");
+      k.KDC(5,t);
+      k.KO(-1,t,"្");
       k.KIO(-1,this.s_subcons,5,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"រ");
       k.KIO(-1,this.s_c_shifter,3,t);
     }
-    else if(k.KCM(5,t,"្រ",2)&&k.KA(2,k.KC(3,1,t),this.s_v_any)&&k.KCM(2,t,"្",1)&&k.KA(4,k.KC(1,1,t),this.s_subcons)) {   // Line 402
+    else if(k.KFCM(5,t,['្','រ',{t:'a',a:this.s_v_any},'្',{t:'a',a:this.s_subcons}])) {   // Line 402
       m=1;
-      k.KO(5,t,"្");
+      k.KDC(5,t);
+      k.KO(-1,t,"្");
       k.KIO(-1,this.s_subcons,5,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"រ");
       k.KIO(-1,this.s_v_any,3,t);
     }
-    else if(k.KA(0,k.KC(5,1,t),this.s_c_combo_QA)&&k.KCM(4,t,"្អុ",3)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 419
+    else if(k.KFCM(5,t,[{t:'a',a:this.s_c_combo_QA},'្','អ','ុ',{t:'a',a:this.s_v_above}])) {   // Line 419
       m=1;
-      k.KIO(5,this.s_c_combo_QA,1,t);
+      k.KDC(5,t);
+      k.KIO(-1,this.s_c_combo_QA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"អ៊");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KA(0,k.KC(5,1,t),this.s_c_combo_QA)&&k.KCM(4,t,"្អ",2)&&k.KA(3,k.KC(2,1,t),this.s_v_above)&&k.KCM(1,t,"ុ",1)) {   // Line 421
+    else if(k.KFCM(5,t,[{t:'a',a:this.s_c_combo_QA},'្','អ',{t:'a',a:this.s_v_above},'ុ'])) {   // Line 421
       m=1;
-      k.KIO(5,this.s_c_combo_QA,1,t);
+      k.KDC(5,t);
+      k.KIO(-1,this.s_c_combo_QA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"អ៊");
       k.KIO(-1,this.s_v_above,4,t);
     }
-    else if(k.KCM(5,t,"ល្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_1st_combo_LO)&&k.KCM(2,t,"ុ",1)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 424
+    else if(k.KFCM(5,t,['ល','្',{t:'a',a:this.s_c_1st_combo_LO},'ុ',{t:'a',a:this.s_v_above}])) {   // Line 424
       m=1;
-      k.KO(5,t,"ល");
+      k.KDC(5,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_LO,3,t);
       k.KO(-1,t,"៊");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KCM(5,t,"ល្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_1st_combo_LO)&&k.KA(3,k.KC(2,1,t),this.s_v_above)&&k.KCM(1,t,"ុ",1)) {   // Line 426
+    else if(k.KFCM(5,t,['ល','្',{t:'a',a:this.s_c_1st_combo_LO},{t:'a',a:this.s_v_above},'ុ'])) {   // Line 426
       m=1;
-      k.KO(5,t,"ល");
+      k.KDC(5,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_LO,3,t);
       k.KO(-1,t,"៊");
       k.KIO(-1,this.s_v_above,4,t);
     }
-    else if(k.KCM(5,t,"ម្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_1st_combo_MO)&&k.KCM(2,t,"ុ",1)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 429
+    else if(k.KFCM(5,t,['ម','្',{t:'a',a:this.s_c_1st_combo_MO},'ុ',{t:'a',a:this.s_v_above}])) {   // Line 429
       m=1;
-      k.KO(5,t,"ម");
+      k.KDC(5,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_MO,3,t);
       k.KO(-1,t,"៊");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KCM(5,t,"ម្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_1st_combo_MO)&&k.KA(3,k.KC(2,1,t),this.s_v_above)&&k.KCM(1,t,"ុ",1)) {   // Line 431
+    else if(k.KFCM(5,t,['ម','្',{t:'a',a:this.s_c_1st_combo_MO},{t:'a',a:this.s_v_above},'ុ'])) {   // Line 431
       m=1;
-      k.KO(5,t,"ម");
+      k.KDC(5,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_MO,3,t);
       k.KO(-1,t,"៊");
       k.KIO(-1,this.s_v_above,4,t);
     }
-    else if(k.KCM(5,t,"ស្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_combo_SA)&&k.KCM(2,t,"ុ",1)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 434
+    else if(k.KFCM(5,t,['ស','្',{t:'a',a:this.s_c_combo_SA},'ុ',{t:'a',a:this.s_v_above}])) {   // Line 434
       m=1;
-      k.KO(5,t,"ស");
+      k.KDC(5,t);
+      k.KO(-1,t,"ស");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_combo_SA,3,t);
       k.KO(-1,t,"៊");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KCM(5,t,"ស្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_combo_SA)&&k.KA(3,k.KC(2,1,t),this.s_v_above)&&k.KCM(1,t,"ុ",1)) {   // Line 436
+    else if(k.KFCM(5,t,['ស','្',{t:'a',a:this.s_c_combo_SA},{t:'a',a:this.s_v_above},'ុ'])) {   // Line 436
       m=1;
-      k.KO(5,t,"ស");
+      k.KDC(5,t);
+      k.KO(-1,t,"ស");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_combo_SA,3,t);
       k.KO(-1,t,"៊");
       k.KIO(-1,this.s_v_above,4,t);
     }
-    else if(k.KA(0,k.KC(5,1,t),this.s_c_combo_HA)&&k.KCM(4,t,"្ហុ",3)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 439
+    else if(k.KFCM(5,t,[{t:'a',a:this.s_c_combo_HA},'្','ហ','ុ',{t:'a',a:this.s_v_above}])) {   // Line 439
       m=1;
-      k.KIO(5,this.s_c_combo_HA,1,t);
+      k.KDC(5,t);
+      k.KIO(-1,this.s_c_combo_HA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"ហ៊");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KA(0,k.KC(5,1,t),this.s_c_combo_HA)&&k.KCM(4,t,"្ហ",2)&&k.KA(3,k.KC(2,1,t),this.s_v_above)&&k.KCM(1,t,"ុ",1)) {   // Line 441
+    else if(k.KFCM(5,t,[{t:'a',a:this.s_c_combo_HA},'្','ហ',{t:'a',a:this.s_v_above},'ុ'])) {   // Line 441
       m=1;
-      k.KIO(5,this.s_c_combo_HA,1,t);
+      k.KDC(5,t);
+      k.KIO(-1,this.s_c_combo_HA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"ហ៊");
       k.KIO(-1,this.s_v_above,4,t);
     }
-    else if(k.KCM(5,t,"អ្ងុ",4)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 444
+    else if(k.KFCM(5,t,['អ','្','ង','ុ',{t:'a',a:this.s_v_above}])) {   // Line 444
       m=1;
-      k.KO(5,t,"អ");
+      k.KDC(5,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"ង៊");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KCM(5,t,"អ្ង",3)&&k.KA(3,k.KC(2,1,t),this.s_v_above)&&k.KCM(1,t,"ុ",1)) {   // Line 446
+    else if(k.KFCM(5,t,['អ','្','ង',{t:'a',a:this.s_v_above},'ុ'])) {   // Line 446
       m=1;
-      k.KO(5,t,"អ");
+      k.KDC(5,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"ង៊");
       k.KIO(-1,this.s_v_above,4,t);
     }
-    else if(k.KCM(5,t,"អ្វុ",4)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 449
+    else if(k.KFCM(5,t,['អ','្','វ','ុ',{t:'a',a:this.s_v_above}])) {   // Line 449
       m=1;
-      k.KO(5,t,"អ");
+      k.KDC(5,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"វ៊");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KCM(5,t,"អ្វ",3)&&k.KA(3,k.KC(2,1,t),this.s_v_above)&&k.KCM(1,t,"ុ",1)) {   // Line 451
+    else if(k.KFCM(5,t,['អ','្','វ',{t:'a',a:this.s_v_above},'ុ'])) {   // Line 451
       m=1;
-      k.KO(5,t,"អ");
+      k.KDC(5,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"វ៊");
       k.KIO(-1,this.s_v_above,4,t);
     }
-    else if(k.KCM(5,t,"ល្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_2nd_combo_LO)&&k.KCM(2,t,"ុ",1)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 456
+    else if(k.KFCM(5,t,['ល','្',{t:'a',a:this.s_c_2nd_combo_LO},'ុ',{t:'a',a:this.s_v_above}])) {   // Line 456
       m=1;
-      k.KO(5,t,"ល");
+      k.KDC(5,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_LO,3,t);
       k.KO(-1,t,"៉");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KCM(5,t,"ល្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_2nd_combo_LO)&&k.KA(3,k.KC(2,1,t),this.s_v_above)&&k.KCM(1,t,"ុ",1)) {   // Line 458
+    else if(k.KFCM(5,t,['ល','្',{t:'a',a:this.s_c_2nd_combo_LO},{t:'a',a:this.s_v_above},'ុ'])) {   // Line 458
       m=1;
-      k.KO(5,t,"ល");
+      k.KDC(5,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_LO,3,t);
       k.KO(-1,t,"៉");
       k.KIO(-1,this.s_v_above,4,t);
     }
-    else if(k.KCM(5,t,"ម្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_2nd_combo_MO)&&k.KCM(2,t,"ុ",1)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 461
+    else if(k.KFCM(5,t,['ម','្',{t:'a',a:this.s_c_2nd_combo_MO},'ុ',{t:'a',a:this.s_v_above}])) {   // Line 461
       m=1;
-      k.KO(5,t,"ម");
+      k.KDC(5,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_MO,3,t);
       k.KO(-1,t,"៉");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KCM(5,t,"ម្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_2nd_combo_MO)&&k.KA(3,k.KC(2,1,t),this.s_v_above)&&k.KCM(1,t,"ុ",1)) {   // Line 463
+    else if(k.KFCM(5,t,['ម','្',{t:'a',a:this.s_c_2nd_combo_MO},{t:'a',a:this.s_v_above},'ុ'])) {   // Line 463
       m=1;
-      k.KO(5,t,"ម");
+      k.KDC(5,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_MO,3,t);
       k.KO(-1,t,"៉");
       k.KIO(-1,this.s_v_above,4,t);
     }
-    else if(k.KA(0,k.KC(5,1,t),this.s_shiftable_c_1st)&&k.KCM(4,t,"ុំាំ",4)) {   // Line 471
+    else if(k.KFCM(5,t,[{t:'a',a:this.s_shiftable_c_1st},'ុ','ំ','ា','ំ'])) {   // Line 471
       m=1;
-      k.KIO(5,this.s_shiftable_c_1st,1,t);
+      k.KDC(5,t);
+      k.KIO(-1,this.s_shiftable_c_1st,1,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(5,1,t),this.s_shiftable_c_2nd)&&k.KCM(4,t,"ុំាំ",4)) {   // Line 478
+    else if(k.KFCM(5,t,[{t:'a',a:this.s_shiftable_c_2nd},'ុ','ំ','ា','ំ'])) {   // Line 478
       m=1;
-      k.KIO(5,this.s_shiftable_c_2nd,1,t);
+      k.KDC(5,t);
+      k.KIO(-1,this.s_shiftable_c_2nd,1,t);
       k.KO(-1,t,"៉");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KCM(5,t,"ល្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_2nd_combo_LO)&&k.KCM(2,t,"៊",1)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 482
+    else if(k.KFCM(5,t,['ល','្',{t:'a',a:this.s_c_2nd_combo_LO},'៊',{t:'a',a:this.s_v_above}])) {   // Line 482
       m=1;
-      k.KO(5,t,"ល");
+      k.KDC(5,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_LO,3,t);
       k.KO(-1,t,"៉");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KCM(5,t,"ម្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_2nd_combo_MO)&&k.KCM(2,t,"៊",1)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 483
+    else if(k.KFCM(5,t,['ម','្',{t:'a',a:this.s_c_2nd_combo_MO},'៊',{t:'a',a:this.s_v_above}])) {   // Line 483
       m=1;
-      k.KO(5,t,"ម");
+      k.KDC(5,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_2nd_combo_MO,3,t);
       k.KO(-1,t,"៉");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KCM(5,t,"្",1)&&k.KA(1,k.KC(4,1,t),this.s_shiftable_c_2nd)&&k.KCM(3,t,"៊",1)&&k.KA(3,k.KC(2,1,t),this.s_v_gen)&&k.KA(4,k.KC(1,1,t),this.s_v_pseudo)) {   // Line 493
+    else if(k.KFCM(5,t,['្',{t:'a',a:this.s_shiftable_c_2nd},'៊',{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_pseudo}])) {   // Line 493
       m=1;
+      k.KDC(5,t);
+      k.KO(-1,t,"្");
+      k.KIO(-1,this.s_shiftable_c_2nd,2,t);
+      k.KO(-1,t,"៊");
+      k.KIO(-1,this.s_v_gen,4,t);
+      k.KIO(-1,this.s_v_pseudo,5,t);
     }
-    else if(k.KA(0,k.KC(5,1,t),this.s_c_combo_QA)&&k.KCM(4,t,"្អ៉",3)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 511
+    else if(k.KFCM(5,t,[{t:'a',a:this.s_c_combo_QA},'្','អ','៉',{t:'a',a:this.s_v_above}])) {   // Line 511
       m=1;
-      k.KIO(5,this.s_c_combo_QA,1,t);
+      k.KDC(5,t);
+      k.KIO(-1,this.s_c_combo_QA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"អ៊");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KCM(5,t,"ល្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_1st_combo_LO)&&k.KCM(2,t,"៉",1)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 512
+    else if(k.KFCM(5,t,['ល','្',{t:'a',a:this.s_c_1st_combo_LO},'៉',{t:'a',a:this.s_v_above}])) {   // Line 512
       m=1;
-      k.KO(5,t,"ល");
+      k.KDC(5,t);
+      k.KO(-1,t,"ល");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_LO,3,t);
       k.KO(-1,t,"៊");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KCM(5,t,"ម្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_1st_combo_MO)&&k.KCM(2,t,"៉",1)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 513
+    else if(k.KFCM(5,t,['ម','្',{t:'a',a:this.s_c_1st_combo_MO},'៉',{t:'a',a:this.s_v_above}])) {   // Line 513
       m=1;
-      k.KO(5,t,"ម");
+      k.KDC(5,t);
+      k.KO(-1,t,"ម");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_1st_combo_MO,3,t);
       k.KO(-1,t,"៊");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KCM(5,t,"ស្",2)&&k.KA(2,k.KC(3,1,t),this.s_c_combo_SA)&&k.KCM(2,t,"៉",1)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 514
+    else if(k.KFCM(5,t,['ស','្',{t:'a',a:this.s_c_combo_SA},'៉',{t:'a',a:this.s_v_above}])) {   // Line 514
       m=1;
-      k.KO(5,t,"ស");
+      k.KDC(5,t);
+      k.KO(-1,t,"ស");
       k.KO(-1,t,"្");
       k.KIO(-1,this.s_c_combo_SA,3,t);
       k.KO(-1,t,"៊");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KA(0,k.KC(5,1,t),this.s_c_combo_HA)&&k.KCM(4,t,"្ហ៉",3)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 515
+    else if(k.KFCM(5,t,[{t:'a',a:this.s_c_combo_HA},'្','ហ','៉',{t:'a',a:this.s_v_above}])) {   // Line 515
       m=1;
-      k.KIO(5,this.s_c_combo_HA,1,t);
+      k.KDC(5,t);
+      k.KIO(-1,this.s_c_combo_HA,1,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"ហ៊");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KCM(5,t,"អ្ង៉",4)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 516
+    else if(k.KFCM(5,t,['អ','្','ង','៉',{t:'a',a:this.s_v_above}])) {   // Line 516
       m=1;
-      k.KO(5,t,"អ");
+      k.KDC(5,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"ង៊");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KCM(5,t,"អ្វ៉",4)&&k.KA(4,k.KC(1,1,t),this.s_v_above)) {   // Line 517
+    else if(k.KFCM(5,t,['អ','្','វ','៉',{t:'a',a:this.s_v_above}])) {   // Line 517
       m=1;
-      k.KO(5,t,"អ");
+      k.KDC(5,t);
+      k.KO(-1,t,"អ");
       k.KO(-1,t,"្");
       k.KO(-1,t,"វ៊");
       k.KIO(-1,this.s_v_above,5,t);
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_c_shifter)&&k.KA(1,k.KC(3,1,t),this.s_v_gen)&&k.KA(2,k.KC(2,1,t),this.s_v_pseudo)&&k.KA(3,k.KC(1,1,t),this.s_c_shifter)) {   // Line 353
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_c_shifter},{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_pseudo},{t:'a',a:this.s_c_shifter}])) {   // Line 353
       m=1;
-      k.KIO(4,this.s_v_gen,2,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_v_gen,2,t);
       k.KIO(-1,this.s_v_pseudo,3,t);
       k.KIO(-1,this.s_c_shifter,4,t);
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_v_gen)&&k.KA(1,k.KC(3,1,t),this.s_v_pseudo)&&k.KA(2,k.KC(2,1,t),this.s_v_gen)&&k.KA(3,k.KC(1,1,t),this.s_v_pseudo)) {   // Line 365
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_pseudo},{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_pseudo}])) {   // Line 365
       m=1;
-      k.KIO(4,this.s_v_gen,3,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_v_gen,3,t);
       k.KIO(-1,this.s_v_pseudo,4,t);
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_v_combo_N)&&k.KCM(3,t,"ំ្",2)&&k.KA(3,k.KC(1,1,t),this.s_subcons)) {   // Line 378
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_v_combo_N},'ំ','្',{t:'a',a:this.s_subcons}])) {   // Line 378
       m=1;
-      k.KO(4,t,"្");
+      k.KDC(4,t);
+      k.KO(-1,t,"្");
       k.KIO(-1,this.s_subcons,4,t);
       k.KIO(-1,this.s_v_combo_N,1,t);
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_v_combo_R)&&k.KCM(3,t,"ះ្",2)&&k.KA(3,k.KC(1,1,t),this.s_subcons)) {   // Line 379
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_v_combo_R},'ះ','្',{t:'a',a:this.s_subcons}])) {   // Line 379
       m=1;
-      k.KO(4,t,"្");
+      k.KDC(4,t);
+      k.KO(-1,t,"្");
       k.KIO(-1,this.s_subcons,4,t);
       k.KIO(-1,this.s_v_combo_R,1,t);
       k.KO(-1,t,"ះ");
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_c_shifter)&&k.KA(1,k.KC(3,1,t),this.s_v_any)&&k.KCM(2,t,"្",1)&&k.KA(3,k.KC(1,1,t),this.s_subcons)) {   // Line 383
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_c_shifter},{t:'a',a:this.s_v_any},'្',{t:'a',a:this.s_subcons}])) {   // Line 383
       m=1;
-      k.KO(4,t,"្");
+      k.KDC(4,t);
+      k.KO(-1,t,"្");
       k.KIO(-1,this.s_subcons,4,t);
       k.KIO(-1,this.s_c_shifter,1,t);
       k.KIO(-1,this.s_v_any,2,t);
     }
-    else if(k.KCM(4,t,"្ដ្រ",4)) {   // Line 389
+    else if(k.KFCM(4,t,['្','ដ','្','រ'])) {   // Line 389
       m=1;
-      k.KO(4,t,"្ត");
+      k.KDC(4,t);
+      k.KO(-1,t,"្ត");
       k.KO(-1,t,"្");
       k.KO(-1,t,"រ");
     }
-    else if(k.KCM(4,t,"្រ្ដ",4)) {   // Line 390
+    else if(k.KFCM(4,t,['្','រ','្','ដ'])) {   // Line 390
       m=1;
-      k.KO(4,t,"្ត");
+      k.KDC(4,t);
+      k.KO(-1,t,"្ត");
       k.KO(-1,t,"្");
       k.KO(-1,t,"រ");
     }
-    else if(k.KCM(4,t,"្រ្",3)&&k.KA(3,k.KC(1,1,t),this.s_subcons)) {   // Line 401
+    else if(k.KFCM(4,t,['្','រ','្',{t:'a',a:this.s_subcons}])) {   // Line 401
       m=1;
-      k.KO(4,t,"្");
+      k.KDC(4,t);
+      k.KO(-1,t,"្");
       k.KIO(-1,this.s_subcons,4,t);
       k.KO(-1,t,"្");
       k.KO(-1,t,"រ");
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_shiftable_c_1st)&&k.KCM(3,t,"ុាំ",3)) {   // Line 469
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_shiftable_c_1st},'ុ','ា','ំ'])) {   // Line 469
       m=1;
-      k.KIO(4,this.s_shiftable_c_1st,1,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_shiftable_c_1st,1,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_shiftable_c_2nd)&&k.KCM(3,t,"ុាំ",3)) {   // Line 476
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_shiftable_c_2nd},'ុ','ា','ំ'])) {   // Line 476
       m=1;
-      k.KIO(4,this.s_shiftable_c_2nd,1,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_shiftable_c_2nd,1,t);
       k.KO(-1,t,"៉");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_shiftable_c_2nd)&&k.KCM(3,t,"៊",1)&&k.KA(2,k.KC(2,1,t),this.s_v_gen)&&k.KA(3,k.KC(1,1,t),this.s_v_pseudo)) {   // Line 490
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_shiftable_c_2nd},'៊',{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_pseudo}])) {   // Line 490
       m=1;
-      k.KIO(4,this.s_shiftable_c_2nd,1,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_shiftable_c_2nd,1,t);
       k.KO(-1,t,"៉");
       k.KIO(-1,this.s_v_gen,3,t);
       k.KIO(-1,this.s_v_pseudo,4,t);
     }
-    else if(k.KCM(4,t,"្",1)&&k.KA(1,k.KC(3,1,t),this.s_shiftable_c_2nd)&&k.KCM(2,t,"៊",1)&&k.KA(3,k.KC(1,1,t),this.s_v_above)) {   // Line 492
+    else if(k.KFCM(4,t,['្',{t:'a',a:this.s_shiftable_c_2nd},'៊',{t:'a',a:this.s_v_above}])) {   // Line 492
       m=1;
+      k.KDC(4,t);
+      k.KO(-1,t,"្");
+      k.KIO(-1,this.s_shiftable_c_2nd,2,t);
+      k.KO(-1,t,"៊");
+      k.KIO(-1,this.s_v_above,4,t);
     }
-    else if(k.KCM(4,t,"ប្យ",3)&&k.KA(3,k.KC(1,1,t),this.s_c_shifter)) {   // Line 497
+    else if(k.KFCM(4,t,['ប','្','យ',{t:'a',a:this.s_c_shifter}])) {   // Line 497
       m=1;
+      k.KDC(4,t);
+      k.KO(-1,t,"ប្យ");
+      k.KIO(-1,this.s_c_shifter,4,t);
     }
-    else if(k.KCM(4,t,"ស្ប",3)&&k.KA(3,k.KC(1,1,t),this.s_c_shifter)) {   // Line 498
+    else if(k.KFCM(4,t,['ស','្','ប',{t:'a',a:this.s_c_shifter}])) {   // Line 498
       m=1;
+      k.KDC(4,t);
+      k.KO(-1,t,"ស្ប");
+      k.KIO(-1,this.s_c_shifter,4,t);
     }
-    else if(k.KCM(4,t,"ឆ្ប",3)&&k.KA(3,k.KC(1,1,t),this.s_c_shifter)) {   // Line 499
+    else if(k.KFCM(4,t,['ឆ','្','ប',{t:'a',a:this.s_c_shifter}])) {   // Line 499
       m=1;
+      k.KDC(4,t);
+      k.KO(-1,t,"ឆ្ប");
+      k.KIO(-1,this.s_c_shifter,4,t);
     }
-    else if(k.KCM(4,t,"ប្យ",3)&&k.KA(3,k.KC(1,1,t),this.s_c_shifter)) {   // Line 500
+    else if(k.KFCM(4,t,['ប','្','យ',{t:'a',a:this.s_c_shifter}])) {   // Line 500
       m=1;
+      k.KDC(4,t);
+      k.KO(-1,t,"ប្យ");
+      k.KIO(-1,this.s_c_shifter,4,t);
     }
-    else if(k.KCM(4,t,"ស្ប",3)&&k.KA(3,k.KC(1,1,t),this.s_c_shifter)) {   // Line 501
+    else if(k.KFCM(4,t,['ស','្','ប',{t:'a',a:this.s_c_shifter}])) {   // Line 501
       m=1;
+      k.KDC(4,t);
+      k.KO(-1,t,"ស្ប");
+      k.KIO(-1,this.s_c_shifter,4,t);
     }
-    else if(k.KCM(4,t,"ឆ្ប",3)&&k.KA(3,k.KC(1,1,t),this.s_c_shifter)) {   // Line 502
+    else if(k.KFCM(4,t,['ឆ','្','ប',{t:'a',a:this.s_c_shifter}])) {   // Line 502
       m=1;
+      k.KDC(4,t);
+      k.KO(-1,t,"ឆ្ប");
+      k.KIO(-1,this.s_c_shifter,4,t);
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_shiftable_c_1st)&&k.KCM(3,t,"៉",1)&&k.KA(2,k.KC(2,1,t),this.s_v_gen)&&k.KA(3,k.KC(1,1,t),this.s_v_pseudo)) {   // Line 507
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_shiftable_c_1st},'៉',{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_pseudo}])) {   // Line 507
       m=1;
-      k.KIO(4,this.s_shiftable_c_1st,1,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_shiftable_c_1st,1,t);
       k.KO(-1,t,"៊");
       k.KIO(-1,this.s_v_gen,3,t);
       k.KIO(-1,this.s_v_pseudo,4,t);
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_shiftable_c_1st)&&k.KCM(3,t,"ាុំ",3)) {   // Line 528
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_shiftable_c_1st},'ា','ុ','ំ'])) {   // Line 528
       m=1;
-      k.KIO(4,this.s_shiftable_c_1st,1,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_shiftable_c_1st,1,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_shiftable_c_1st)&&k.KCM(3,t,"ុំា",3)) {   // Line 529
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_shiftable_c_1st},'ុ','ំ','ា'])) {   // Line 529
       m=1;
-      k.KIO(4,this.s_shiftable_c_1st,1,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_shiftable_c_1st,1,t);
       k.KO(-1,t,"៊");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_shiftable_c_2nd)&&k.KCM(3,t,"ាុំ",3)) {   // Line 554
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_shiftable_c_2nd},'ា','ុ','ំ'])) {   // Line 554
       m=1;
-      k.KIO(4,this.s_shiftable_c_2nd,1,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_shiftable_c_2nd,1,t);
       k.KO(-1,t,"៉");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_shiftable_c_2nd)&&k.KCM(3,t,"ុំា",3)) {   // Line 555
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_shiftable_c_2nd},'ុ','ំ','ា'])) {   // Line 555
       m=1;
-      k.KIO(4,this.s_shiftable_c_2nd,1,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_shiftable_c_2nd,1,t);
       k.KO(-1,t,"៉");
       k.KO(-1,t,"ា");
       k.KO(-1,t,"ំ");
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_shiftable_c_1st)&&k.KCM(3,t,"េុី",3)) {   // Line 565
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_shiftable_c_1st},'េ','ុ','ី'])) {   // Line 565
       m=1;
-      k.KIO(4,this.s_shiftable_c_1st,1,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_shiftable_c_1st,1,t);
       k.KO(-1,t,"៊ើ");
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_shiftable_c_1st)&&k.KCM(3,t,"ុេី",3)) {   // Line 566
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_shiftable_c_1st},'ុ','េ','ី'])) {   // Line 566
       m=1;
-      k.KIO(4,this.s_shiftable_c_1st,1,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_shiftable_c_1st,1,t);
       k.KO(-1,t,"៊ើ");
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_shiftable_c_1st)&&k.KCM(3,t,"៉េី",3)) {   // Line 567
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_shiftable_c_1st},'៉','េ','ី'])) {   // Line 567
       m=1;
-      k.KIO(4,this.s_shiftable_c_1st,1,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_shiftable_c_1st,1,t);
       k.KO(-1,t,"៊ើ");
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_shiftable_c_2nd)&&k.KCM(3,t,"េុី",3)) {   // Line 599
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_shiftable_c_2nd},'េ','ុ','ី'])) {   // Line 599
       m=1;
-      k.KIO(4,this.s_shiftable_c_2nd,1,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_shiftable_c_2nd,1,t);
       k.KO(-1,t,"៉ើ");
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_shiftable_c_2nd)&&k.KCM(3,t,"ុេី",3)) {   // Line 600
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_shiftable_c_2nd},'ុ','េ','ី'])) {   // Line 600
       m=1;
-      k.KIO(4,this.s_shiftable_c_2nd,1,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_shiftable_c_2nd,1,t);
       k.KO(-1,t,"៉ើ");
     }
-    else if(k.KA(0,k.KC(4,1,t),this.s_shiftable_c_2nd)&&k.KCM(3,t,"៊េី",3)) {   // Line 601
+    else if(k.KFCM(4,t,[{t:'a',a:this.s_shiftable_c_2nd},'៊','េ','ី'])) {   // Line 601
       m=1;
-      k.KIO(4,this.s_shiftable_c_2nd,1,t);
+      k.KDC(4,t);
+      k.KIO(-1,this.s_shiftable_c_2nd,1,t);
       k.KO(-1,t,"៉ើ");
     }
-    else if(k.KA(0,k.KC(3,1,t),this.s_v_gen)&&k.KA(1,k.KC(2,1,t),this.s_v_pseudo)&&k.KA(2,k.KC(1,1,t),this.s_c_shifter)) {   // Line 351
+    else if(k.KFCM(3,t,[{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_pseudo},{t:'a',a:this.s_c_shifter}])) {   // Line 351
       m=1;
-      k.KIO(3,this.s_c_shifter,3,t);
+      k.KDC(3,t);
+      k.KIO(-1,this.s_c_shifter,3,t);
       k.KIO(-1,this.s_v_gen,1,t);
       k.KIO(-1,this.s_v_pseudo,2,t);
     }
-    else if(k.KA(0,k.KC(3,1,t),this.s_c_shifter)&&k.KA(1,k.KC(2,1,t),this.s_v_any)&&k.KA(2,k.KC(1,1,t),this.s_c_shifter)) {   // Line 352
+    else if(k.KFCM(3,t,[{t:'a',a:this.s_c_shifter},{t:'a',a:this.s_v_any},{t:'a',a:this.s_c_shifter}])) {   // Line 352
       m=1;
-      k.KIO(3,this.s_c_shifter,3,t);
+      k.KDC(3,t);
+      k.KIO(-1,this.s_c_shifter,3,t);
       k.KIO(-1,this.s_v_any,2,t);
     }
-    else if(k.KA(0,k.KC(3,1,t),this.s_v_gen)&&k.KA(1,k.KC(2,1,t),this.s_v_pseudo)&&k.KA(2,k.KC(1,1,t),this.s_v_gen)) {   // Line 361
+    else if(k.KFCM(3,t,[{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_pseudo},{t:'a',a:this.s_v_gen}])) {   // Line 361
       m=1;
-      k.KIO(3,this.s_v_gen,3,t);
+      k.KDC(3,t);
+      k.KIO(-1,this.s_v_gen,3,t);
     }
-    else if(k.KA(0,k.KC(3,1,t),this.s_v_gen)&&k.KA(1,k.KC(2,1,t),this.s_v_pseudo)&&k.KA(2,k.KC(1,1,t),this.s_v_pseudo)) {   // Line 362
+    else if(k.KFCM(3,t,[{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_pseudo},{t:'a',a:this.s_v_pseudo}])) {   // Line 362
       m=1;
-      k.KIO(3,this.s_v_pseudo,3,t);
-    }
-    else if(k.KA(0,k.KC(3,1,t),this.s_v_gen)&&k.KA(1,k.KC(2,1,t),this.s_v_gen)&&k.KA(2,k.KC(1,1,t),this.s_v_pseudo)) {   // Line 363
-      m=1;
-      k.KIO(3,this.s_v_gen,2,t);
+      k.KDC(3,t);
       k.KIO(-1,this.s_v_pseudo,3,t);
     }
-    else if(k.KA(0,k.KC(3,1,t),this.s_v_pseudo)&&k.KA(1,k.KC(2,1,t),this.s_v_gen)&&k.KA(2,k.KC(1,1,t),this.s_v_pseudo)) {   // Line 364
+    else if(k.KFCM(3,t,[{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_pseudo}])) {   // Line 363
       m=1;
-      k.KIO(3,this.s_v_gen,2,t);
+      k.KDC(3,t);
+      k.KIO(-1,this.s_v_gen,2,t);
       k.KIO(-1,this.s_v_pseudo,3,t);
     }
-    else if(k.KCM(3,t,"្",1)&&k.KA(1,k.KC(2,1,t),this.s_v_gen)&&k.KA(2,k.KC(1,1,t),this.s_v_pseudo)) {   // Line 373
+    else if(k.KFCM(3,t,[{t:'a',a:this.s_v_pseudo},{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_pseudo}])) {   // Line 364
       m=1;
-      k.KIO(3,this.s_v_gen,2,t);
+      k.KDC(3,t);
+      k.KIO(-1,this.s_v_gen,2,t);
       k.KIO(-1,this.s_v_pseudo,3,t);
     }
-    else if(k.KA(0,k.KC(3,1,t),this.s_v_any)&&k.KCM(2,t,"្",1)&&k.KA(2,k.KC(1,1,t),this.s_subcons)) {   // Line 377
+    else if(k.KFCM(3,t,['្',{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_pseudo}])) {   // Line 373
       m=1;
-      k.KO(3,t,"្");
+      k.KDC(3,t);
+      k.KIO(-1,this.s_v_gen,2,t);
+      k.KIO(-1,this.s_v_pseudo,3,t);
+    }
+    else if(k.KFCM(3,t,[{t:'a',a:this.s_v_any},'្',{t:'a',a:this.s_subcons}])) {   // Line 377
+      m=1;
+      k.KDC(3,t);
+      k.KO(-1,t,"្");
       k.KIO(-1,this.s_subcons,3,t);
       k.KIO(-1,this.s_v_any,1,t);
     }
-    else if(k.KA(0,k.KC(3,1,t),this.s_c_shifter)&&k.KCM(2,t,"្",1)&&k.KA(2,k.KC(1,1,t),this.s_subcons)) {   // Line 408
+    else if(k.KFCM(3,t,[{t:'a',a:this.s_c_shifter},'្',{t:'a',a:this.s_subcons}])) {   // Line 408
       m=1;
-      k.KO(3,t,"្");
+      k.KDC(3,t);
+      k.KO(-1,t,"្");
       k.KIO(-1,this.s_subcons,3,t);
       k.KIO(-1,this.s_c_shifter,1,t);
     }
-    else if(k.KA(0,k.KC(3,1,t),this.s_shiftable_c_1st)&&k.KCM(2,t,"ុ",1)&&k.KA(2,k.KC(1,1,t),this.s_v_above)) {   // Line 468
+    else if(k.KFCM(3,t,[{t:'a',a:this.s_shiftable_c_1st},'ុ',{t:'a',a:this.s_v_above}])) {   // Line 468
       m=1;
-      k.KIO(3,this.s_shiftable_c_1st,1,t);
+      k.KDC(3,t);
+      k.KIO(-1,this.s_shiftable_c_1st,1,t);
       k.KO(-1,t,"៊");
       k.KIO(-1,this.s_v_above,3,t);
     }
-    else if(k.KA(0,k.KC(3,1,t),this.s_shiftable_c_1st)&&k.KA(1,k.KC(2,1,t),this.s_v_above)&&k.KCM(1,t,"ុ",1)) {   // Line 470
+    else if(k.KFCM(3,t,[{t:'a',a:this.s_shiftable_c_1st},{t:'a',a:this.s_v_above},'ុ'])) {   // Line 470
       m=1;
-      k.KIO(3,this.s_shiftable_c_1st,1,t);
+      k.KDC(3,t);
+      k.KIO(-1,this.s_shiftable_c_1st,1,t);
       k.KO(-1,t,"៊");
       k.KIO(-1,this.s_v_above,2,t);
     }
-    else if(k.KA(0,k.KC(3,1,t),this.s_shiftable_c_2nd)&&k.KCM(2,t,"ុ",1)&&k.KA(2,k.KC(1,1,t),this.s_v_above)) {   // Line 475
+    else if(k.KFCM(3,t,[{t:'a',a:this.s_shiftable_c_2nd},'ុ',{t:'a',a:this.s_v_above}])) {   // Line 475
       m=1;
-      k.KIO(3,this.s_shiftable_c_2nd,1,t);
+      k.KDC(3,t);
+      k.KIO(-1,this.s_shiftable_c_2nd,1,t);
       k.KO(-1,t,"៉");
       k.KIO(-1,this.s_v_above,3,t);
     }
-    else if(k.KA(0,k.KC(3,1,t),this.s_shiftable_c_2nd)&&k.KA(1,k.KC(2,1,t),this.s_v_above)&&k.KCM(1,t,"ុ",1)) {   // Line 477
+    else if(k.KFCM(3,t,[{t:'a',a:this.s_shiftable_c_2nd},{t:'a',a:this.s_v_above},'ុ'])) {   // Line 477
       m=1;
-      k.KIO(3,this.s_shiftable_c_2nd,1,t);
+      k.KDC(3,t);
+      k.KIO(-1,this.s_shiftable_c_2nd,1,t);
       k.KO(-1,t,"៉");
       k.KIO(-1,this.s_v_above,2,t);
     }
-    else if(k.KA(0,k.KC(3,1,t),this.s_shiftable_c_2nd)&&k.KCM(2,t,"៊",1)&&k.KA(2,k.KC(1,1,t),this.s_v_above)) {   // Line 489
+    else if(k.KFCM(3,t,[{t:'a',a:this.s_shiftable_c_2nd},'៊',{t:'a',a:this.s_v_above}])) {   // Line 489
       m=1;
-      k.KIO(3,this.s_shiftable_c_2nd,1,t);
+      k.KDC(3,t);
+      k.KIO(-1,this.s_shiftable_c_2nd,1,t);
       k.KO(-1,t,"៉");
       k.KIO(-1,this.s_v_above,3,t);
     }
-    else if(k.KA(0,k.KC(3,1,t),this.s_shiftable_c_1st)&&k.KCM(2,t,"៉",1)&&k.KA(2,k.KC(1,1,t),this.s_v_above)) {   // Line 506
+    else if(k.KFCM(3,t,[{t:'a',a:this.s_shiftable_c_1st},'៉',{t:'a',a:this.s_v_above}])) {   // Line 506
       m=1;
-      k.KIO(3,this.s_shiftable_c_1st,1,t);
+      k.KDC(3,t);
+      k.KIO(-1,this.s_shiftable_c_1st,1,t);
       k.KO(-1,t,"៊");
       k.KIO(-1,this.s_v_above,3,t);
     }
-    else if(k.KCM(3,t,"ណ្ត",3)) {   // Line 613
+    else if(k.KFCM(3,t,['ណ','្','ត'])) {   // Line 613
       m=1;
-      k.KO(3,t,"ណ");
+      k.KDC(3,t);
+      k.KO(-1,t,"ណ");
       k.KO(-1,t,"្ដ");
     }
-    else if(k.KCM(3,t,"ន្ដ",3)) {   // Line 614
+    else if(k.KFCM(3,t,['ន','្','ដ'])) {   // Line 614
       m=1;
-      k.KO(3,t,"ន");
+      k.KDC(3,t);
+      k.KO(-1,t,"ន");
       k.KO(-1,t,"្ត");
     }
-    else if(k.KCM(3,t,"ទ្ប",3)) {   // Line 618
+    else if(k.KFCM(3,t,['ទ','្','ប'])) {   // Line 618
       m=1;
-      k.KO(3,t,"ឡ");
+      k.KDC(3,t);
+      k.KO(-1,t,"ឡ");
     }
-    else if(k.KCM(3,t,"ប្ញ",3)) {   // Line 620
+    else if(k.KFCM(3,t,['ប','្','ញ'])) {   // Line 620
       m=1;
-      k.KO(3,t,"ឫ");
+      k.KDC(3,t);
+      k.KO(-1,t,"ឫ");
     }
-    else if(k.KCM(3,t,"ព្ញ",3)) {   // Line 626
+    else if(k.KFCM(3,t,['ព','្','ញ'])) {   // Line 626
       m=1;
-      k.KO(3,t,"ឭ");
+      k.KDC(3,t);
+      k.KO(-1,t,"ឭ");
     }
-    else if(k.KCM(3,t,"ព្ឋ",3)) {   // Line 629
+    else if(k.KFCM(3,t,['ព','្','ឋ'])) {   // Line 629
       m=1;
-      k.KO(3,t,"ឰ");
+      k.KDC(3,t);
+      k.KO(-1,t,"ឰ");
     }
-    else if(k.KCM(3,t,"ដ្ធ",3)) {   // Line 637
+    else if(k.KFCM(3,t,['ដ','្','ធ'])) {   // Line 637
       m=1;
-      k.KO(3,t,"ដ្ឋ");
+      k.KDC(3,t);
+      k.KO(-1,t,"ដ្ឋ");
     }
-    else if(k.KCM(3,t,"ទ្ឋ",3)) {   // Line 638
+    else if(k.KFCM(3,t,['ទ','្','ឋ'])) {   // Line 638
       m=1;
-      k.KO(3,t,"ទ្ធ");
+      k.KDC(3,t);
+      k.KO(-1,t,"ទ្ធ");
     }
-    else if(k.KCM(2,t,"េា",2)) {   // Line 338
+    else if(k.KFCM(2,t,['េ','ា'])) {   // Line 338
       m=1;
-      k.KO(2,t,"ោ");
+      k.KDC(2,t);
+      k.KO(-1,t,"ោ");
     }
-    else if(k.KCM(2,t,"ាេ",2)) {   // Line 339
+    else if(k.KFCM(2,t,['ា','េ'])) {   // Line 339
       m=1;
-      k.KO(2,t,"ោ");
+      k.KDC(2,t);
+      k.KO(-1,t,"ោ");
     }
-    else if(k.KCM(2,t,"េី",2)) {   // Line 340
+    else if(k.KFCM(2,t,['េ','ី'])) {   // Line 340
       m=1;
-      k.KO(2,t,"ើ");
+      k.KDC(2,t);
+      k.KO(-1,t,"ើ");
     }
-    else if(k.KCM(2,t,"ីេ",2)) {   // Line 341
+    else if(k.KFCM(2,t,['ី','េ'])) {   // Line 341
       m=1;
-      k.KO(2,t,"ើ");
+      k.KDC(2,t);
+      k.KO(-1,t,"ើ");
     }
-    else if(k.KCM(2,t,"ំុ",2)) {   // Line 345
+    else if(k.KFCM(2,t,['ំ','ុ'])) {   // Line 345
       m=1;
-      k.KO(2,t,"ុំ");
+      k.KDC(2,t);
+      k.KO(-1,t,"ុំ");
     }
-    else if(k.KCM(2,t,"ំា",2)) {   // Line 346
+    else if(k.KFCM(2,t,['ំ','ា'])) {   // Line 346
       m=1;
-      k.KO(2,t,"ាំ");
+      k.KDC(2,t);
+      k.KO(-1,t,"ាំ");
     }
-    else if(k.KA(0,k.KC(2,1,t),this.s_v_any)&&k.KA(1,k.KC(1,1,t),this.s_c_shifter)) {   // Line 350
+    else if(k.KFCM(2,t,[{t:'a',a:this.s_v_any},{t:'a',a:this.s_c_shifter}])) {   // Line 350
       m=1;
-      k.KIO(2,this.s_c_shifter,2,t);
+      k.KDC(2,t);
+      k.KIO(-1,this.s_c_shifter,2,t);
       k.KIO(-1,this.s_v_any,1,t);
     }
-    else if(k.KA(0,k.KC(2,1,t),this.s_v_gen)&&k.KA(1,k.KC(1,1,t),this.s_v_gen)) {   // Line 357
+    else if(k.KFCM(2,t,[{t:'a',a:this.s_v_gen},{t:'a',a:this.s_v_gen}])) {   // Line 357
       m=1;
-      k.KIO(2,this.s_v_gen,2,t);
+      k.KDC(2,t);
+      k.KIO(-1,this.s_v_gen,2,t);
     }
-    else if(k.KA(0,k.KC(2,1,t),this.s_v_pseudo)&&k.KA(1,k.KC(1,1,t),this.s_v_pseudo)) {   // Line 366
+    else if(k.KFCM(2,t,[{t:'a',a:this.s_v_pseudo},{t:'a',a:this.s_v_pseudo}])) {   // Line 366
       m=1;
-      k.KIO(2,this.s_v_pseudo,2,t);
+      k.KDC(2,t);
+      k.KIO(-1,this.s_v_pseudo,2,t);
     }
-    else if(k.KCM(2,t,"្្",2)) {   // Line 371
+    else if(k.KFCM(2,t,['្','្'])) {   // Line 371
       m=1;
-      k.KO(2,t,"្");
+      k.KDC(2,t);
+      k.KO(-1,t,"្");
     }
-    else if(k.KCM(2,t,"្",1)&&k.KA(1,k.KC(1,1,t),this.s_v_any)) {   // Line 372
+    else if(k.KFCM(2,t,['្',{t:'a',a:this.s_v_any}])) {   // Line 372
       m=1;
-      k.KIO(2,this.s_v_any,2,t);
+      k.KDC(2,t);
+      k.KIO(-1,this.s_v_any,2,t);
     }
-    else if(k.KCM(2,t,"ឫុ",2)) {   // Line 621
+    else if(k.KFCM(2,t,['ឫ','ុ'])) {   // Line 621
       m=1;
-      k.KO(2,t,"ឬ");
+      k.KDC(2,t);
+      k.KO(-1,t,"ឬ");
     }
-    else if(k.KCM(2,t,"ឭា",2)) {   // Line 623
+    else if(k.KFCM(2,t,['ឭ','ា'])) {   // Line 623
       m=1;
-      k.KO(2,t,"ញ");
+      k.KDC(2,t);
+      k.KO(-1,t,"ញ");
     }
-    else if(k.KCM(2,t,"ឮា",2)) {   // Line 624
+    else if(k.KFCM(2,t,['ឮ','ា'])) {   // Line 624
       m=1;
-      k.KO(2,t,"ញ");
+      k.KDC(2,t);
+      k.KO(-1,t,"ញ");
     }
-    else if(k.KCM(2,t,"ឭុ",2)) {   // Line 627
+    else if(k.KFCM(2,t,['ឭ','ុ'])) {   // Line 627
       m=1;
-      k.KO(2,t,"ឮ");
+      k.KDC(2,t);
+      k.KO(-1,t,"ឮ");
     }
-    else if(k.KCM(2,t,"ឧិ",2)) {   // Line 631
+    else if(k.KFCM(2,t,['ឧ','ិ'])) {   // Line 631
       m=1;
-      k.KO(2,t,"ឱ");
+      k.KDC(2,t);
+      k.KO(-1,t,"ឱ");
     }
-    else if(k.KCM(2,t,"ឧ៌",2)) {   // Line 632
+    else if(k.KFCM(2,t,['ឧ','៌'])) {   // Line 632
       m=1;
-      k.KO(2,t,"ឱ");
+      k.KDC(2,t);
+      k.KO(-1,t,"ឱ");
     }
-    else if(k.KCM(2,t,"ឧ៍",2)) {   // Line 633
+    else if(k.KFCM(2,t,['ឧ','៍'])) {   // Line 633
       m=1;
-      k.KO(2,t,"ឱ");
+      k.KDC(2,t);
+      k.KO(-1,t,"ឱ");
     }
     return r;
   };

@@ -161,6 +161,20 @@ keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, sav
   }
   _sak(PInternalName, PLgCode, saveCookie);
 
+  // Set the current keyboard on our select element
+  var kbdSelect = document.getElementById("KMW_Keyboard");
+  if(PInternalName == '') {
+    kbdSelect.selectedIndex = 0;
+  } else {
+    for(var i=1; i < kbdSelect.length; i++) {
+      var tag = kbdSelect.item(i);
+      if(tag.value == PInternalName + "$$" + PLgCode) {
+        kbdSelect.selectedIndex = i;
+        break;
+      }
+    }
+  }
+
   // What's the active stub immediately after our _SetActiveKeyboard call?
   var internalStub = keyman.keyboardManager.activeStub;
   if(internalStub && (com.keyman.DOMEventHandlers.states.activeElement == in_output 
