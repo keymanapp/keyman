@@ -73,7 +73,7 @@ object frmScriptError: TfrmScriptError
   object chkTellKeymanSupport: TCheckBox
     Left = 16
     Top = 138
-    Width = 185
+    Width = 225
     Height = 17
     Caption = 'Tell Keyman Support about this error'
     Checked = True
