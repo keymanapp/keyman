@@ -1265,9 +1265,14 @@ namespace com.keyman {
       e = e['kmw_ip'] ? e['kmw_ip'] : e;
 
       // If we're changing controls, don't forget to properly manage the keyboard settings!
-      this.keyman.touchAliasing._BlurKeyboardSettings();
+      // It's only an issue on 'native' (non-embedded) code paths.
+      if(!this.keyman.isEmbedded) {
+        this.keyman.touchAliasing._BlurKeyboardSettings();
+      }
       DOMEventHandlers.states.activeElement = DOMEventHandlers.states.lastActiveElement=e;
-      this.keyman.touchAliasing._FocusKeyboardSettings(false);
+      if(!this.keyman.isEmbedded) {
+        this.keyman.touchAliasing._FocusKeyboardSettings(false);
+      }
 
       // Allow external focusing KMEW-123
       if(arguments.length > 1 && setFocus) {

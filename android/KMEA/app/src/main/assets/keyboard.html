@@ -27,9 +27,6 @@
       kmw['getOskHeight'] = getOskHeight;
       kmw['getOskWidth'] = getOskWidth;
       var ta = document.getElementById('ta');
-      // Ensure that the control is attached before setting it as active.
-      // Init can be asynchronous, but we need it attached pronto.
-      kmw['attachToControl'](ta);
       kmw['setActiveElement'](ta);
 
       ta.readOnly = false;
