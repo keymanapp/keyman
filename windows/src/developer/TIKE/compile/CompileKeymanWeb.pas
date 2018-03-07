@@ -91,6 +91,7 @@
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
                     
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
+                    28 Feb 2018 - jahorton - GH 281 - Changed the compilation targets for KMW 10 to better support deadkeys.
                     
 *)
 unit CompileKeymanWeb;  // I3306  // I3310
@@ -219,7 +220,7 @@ type
     function ExpandSentinel(pwsz: PWideChar): TSentinelRecord;
     function CallFunctionName(s: WideString): WideString;
     function JavaScript_Name(i: Integer; pwszName: PWideChar; UseNameForRelease: Boolean = False): string;   // I3659
-    function JavaScript_Store(pwsz: PWideChar): string;
+    function JavaScript_Store(line: Integer; pwsz: PWideChar): string;
     function JavaScript_Shift(fkp: PFILE_KEY; FMnemonic: Boolean): Integer;
     function JavaScript_ShiftAsString(fkp: PFILE_KEY; FMnemonic: Boolean): string;   // I4872
     function JavaScript_Key(fkp: PFILE_KEY; FMnemonic: Boolean): Integer;
@@ -227,7 +228,8 @@ type
     function JavaScript_ContextLength(Context: PWideChar): Integer;
     function JavaScript_OutputString(fkp: PFILE_KEY; pwszOutput: PWideChar; fgp: PFILE_GROUP): string;
     function JavaScript_ContextMatch(fkp: PFILE_KEY; context: PWideChar): string;
-    function JavaScript_ContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
+    function JavaScript_CompositeContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
+    function JavaScript_FullContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
     function RuleIsExcludedByPlatform(fkp: PFILE_KEY): Boolean;
     function RequotedString(s: WideString): string;
     function VisualKeyboardFromFile(
@@ -371,8 +373,9 @@ begin
   Result := xstrlen_printing(Context);
 end;
 
-function TCompileKeymanWeb.JavaScript_ContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
-
+// Used when targeting versions prior to 10.0, before the introduction of FullContextMatch/KFCM.
+function TCompileKeymanWeb.JavaScript_CompositeContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
+  // Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
   function IsRegExpSpecialChar(ch: WideChar): Boolean;
   begin
     Result := Pos('"\^$*+?{}.()|[]/', ch) > 0;
@@ -506,9 +509,115 @@ begin
     Result := Result + Format('",%d)', [Cur - StartQuotes]);
 end;
 
+// Used when targeting versions >= 10.0, after the introduction of FullContextMatch/KFCM.
+function TCompileKeymanWeb.JavaScript_FullContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
+  // Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+  function IsRegExpSpecialChar(ch: WideChar): Boolean;
+  begin
+    Result := Pos('"\^$*+?{}.()|[]/', ch) > 0;
+  end;
+
+var
+  Len: Integer;
+  rec: TSentinelRecord;
+  FullContext, Suffix: string;
+begin
+  Result := '';
+  FullContext := '';
+  Suffix := '';
+  Len := xstrlen(pwsz);
+
+  while pwsz^ <> #0 do
+  begin
+    if FullContext <> '' then
+      FullContext := FullContext + ',';
+
+    rec := ExpandSentinel(pwsz);
+    if rec.IsSentinel then
+    begin
+      case rec.Code of
+        CODE_ANY:
+          begin
+            CheckStoreForInvalidFunctions(fkp, rec.Any.Store);  // I1520
+            FullContext := FullContext + Format('{t:''a'',a:this.s%s}', [JavaScript_Name(rec.Any.StoreIndex, rec.Any.Store.szName)]);
+          end;
+        CODE_DEADKEY:
+          begin
+            FullContext := FullContext + Format('{t:''d'',d:%d}', [rec.Deadkey.Deadkey]);
+          end;
+        CODE_NUL:    // I2243
+          begin
+            FullContext := FullContext + '{t:''n''}';
+          end;
+        CODE_IFOPT:    // I3429
+          begin
+            Dec(Len);
+            if Suffix <> '' then Suffix := Suffix + '&&';
+            if FullContext = ',' then FullContext := '';
+            Suffix := Suffix + Format('this.s%s%sthis.s%s',
+              [JavaScript_Name(rec.IfOpt.StoreIndex1, rec.IfOpt.Store1.szName),
+              IfThen(rec.IfOpt.IsNot = 0, '!==', '==='),
+              JavaScript_Name(rec.IfOpt.StoreIndex2,rec.IfOpt.Store2.szName)]);  // I3429   // I3659   // I3681
+          end;
+        CODE_IFSYSTEMSTORE:     // I3430
+          begin
+            Dec(Len);
+            if Suffix <> '' then Suffix := Suffix + '&&';
+            if FullContext = ',' then FullContext := '';
+            Suffix := Suffix + Format('%sk.KIFS(%d,this.s%s,t)',
+              [IfThen(rec.IfSystemStore.IsNot = 0, '!', ''),
+              rec.IfSystemStore.dwSystemID,
+              JavaScript_Name(rec.IfSystemStore.StoreIndex,rec.IfSystemStore.Store.szName)]);  // I3430   // I3659   // I3681
+          end;
+        CODE_NOTANY:   // I3981
+          begin
+            CheckStoreForInvalidFunctions(fkp, rec.Any.Store);  // I1520
+            FullContext := FullContext + Format('{t:''a'',a:this.s%s,n:1}', [JavaScript_Name(rec.Any.StoreIndex, rec.Any.Store.szName)]);
+          end;
+        CODE_CONTEXTEX:
+          begin
+            FullContext := FullContext + Format('{t:''c'',c:%d}', [rec.ContextEx.Index]);   // I4611
+          end;
+        CODE_INDEX:
+          begin
+            FullContext := FullContext + Format('{t:''i'',i:this.s%s,o:%d}',
+              [JavaScript_Name(rec.Index.StoreIndex, rec.Index.Store.szName), rec.Index.Index]);   // I4611
+          end;
+        else
+
+        begin
+          ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, Format('Statement %s is not currently supported in context', [GetCodeName(rec.Code)]));  // I1971   // I4061
+          //CODE_NUL: ;     // todo: check if context is longer than that...
+          Result := Result + '/*.*/ 0 ';
+        end;
+      end;
+    end
+		else
+    begin // Simple context character.
+      FullContext := FullContext + '''';
+      if rec.ChrVal in [Ord('"'), Ord('\')] then
+        FullContext := FullContext + '\';
+      FullContext := FullContext + Javascript_String(rec.ChrVal) + '''';  // I2242
+    end;
+
+		pwsz := incxstr(pwsz);
+	end;
+
+  if FullContext <> '' then
+    Result := Format('k.KFCM(%d,t,[%s])', [Len, FullContext]);
+
+  if (Result <> '') and (Suffix <> '')
+    then Result := Result + '&&' + Suffix
+  else if Suffix <> '' then
+    Result := Suffix;
+
+end;
+
 function TCompileKeymanWeb.JavaScript_ContextMatch(fkp: PFILE_KEY; context: PWideChar): string;
 begin
-  Result := JavaScript_ContextValue(fkp, context);
+  if IsKeyboardVersion10OrLater
+    then Result := JavaScript_FullContextValue(fkp, context)
+    else Result := JavaScript_CompositeContextValue(fkp, context);
 end;
 
 const // I1585 - add space to conversion
@@ -687,9 +796,38 @@ begin
 
   pwsz := pwszOutput;
 
-  if Assigned(fkp)
-    then len := xstrlen_printing(fkp.dpContext)
-    else len := -1;
+  if Assigned(fkp) then
+  begin
+    if IsKeyboardVersion10OrLater
+    // KMW >=10.0 use the full, sentinel-based length for context deletions.
+    then
+    begin
+      len := xstrlen(fkp.dpContext);
+      n := len;
+      pwszContext := fkp.dpContext;
+
+      //CODE_IFOPT:    // I3429
+      //CODE_IFSYSTEMSTORE:     // I3430
+      for i := 1 to n do
+      begin
+        rec := ExpandSentinel(pwszContext);
+        if rec.IsSentinel and (rec.Code in [CODE_IFOPT, CODE_IFSYSTEMSTORE]) then
+          Dec(len);
+        pwszContext := incxstr(pwszContext);
+      end;
+    end
+    // KMW < 10.0 exclude all sentinel-based characters, including deadkeys, from direct context deletion.
+    // Deadkeys have alternative special handling.
+    else len := xstrlen_printing(fkp.dpContext);
+  end
+  else
+    len := -1;
+
+  if IsKeyboardVersion10OrLater() and (pwsz^ <> #0) then
+    begin
+      Result := Result + nlt+Format('k.KDC(%d,t);', [ len ] );   // I3681
+      len := -1;
+    end;
 
 	while pwsz^ <> #0 do
   begin
@@ -796,7 +934,7 @@ begin
             Result := Result + nlt+Format('this.s%s=k.KLOAD(this.KI,"%s",%s);',
               [JavaScript_Name(rec.ResetOpt.StoreIndex,rec.ResetOpt.Store.szName),
               JavaScript_Name(rec.ResetOpt.StoreIndex,rec.ResetOpt.Store.szName,True),
-              JavaScript_Store(rec.ResetOpt.Store.dpString)]);  // I3429   // I3681   // I3659
+              JavaScript_Store(fkp.Line, rec.ResetOpt.Store.dpString)]);  // I3429   // I3681   // I3659
             len := -1;
           end;
         CODE_SAVEOPT:  // I3429
@@ -906,27 +1044,77 @@ begin
     else Result := ' '+FormatModifierAsBitflags(JavaScript_Shift(fkp, FMnemonic));
 end;
 
-function TCompileKeymanWeb.JavaScript_Store(pwsz: PWideChar): string;
+function TCompileKeymanWeb.JavaScript_Store(line: Integer; pwsz: PWideChar): string;
 var
   ch: DWord;
+  n: Integer;
+  rec: TSentinelRecord;
+const
+  wcsentinel: WideString = #$FFFF;
 begin
-  Result := '"';
-	while pwsz^ <> #0 do
-  begin
-		if PWord(pwsz)^ = UC_SENTINEL then
-    begin
-      Result := Result + '.'; {TODO: fill in .}
-    end
-    else
-    begin
-      ch := GetSuppChar(pwsz);
-      if ch in [Ord('"'), Ord('\')] then Result := Result + '\';
-      Result := Result + Javascript_String(ch);  // I2242
-    end;
+  n := Pos(wcsentinel, pwsz);
 
-    pwsz := incxstr(pwsz);
+  // Start:  plain text store.  Always use for < 10.0, conditionally for >= 10.0.
+  if (n = 0) or not IsKeyboardVersion10OrLater then
+  begin
+    Result := '"';
+    while pwsz^ <> #0 do
+    begin
+      if PWord(pwsz)^ = UC_SENTINEL then
+      begin
+        Result := Result + '.'; // UC_SENTINEL values are not supported in stores for KMW < 10.0.
+      end
+      else
+      begin
+        ch := GetSuppChar(pwsz);
+        if ch in [Ord('"'), Ord('\')] then Result := Result + '\';
+        Result := Result + Javascript_String(ch);  // I2242
+      end;
+
+      pwsz := incxstr(pwsz);
+    end;
+    Result := Result + '"';
+  end
+  else
+  begin
+    Result := '[';
+    while pwsz^ <> #0 do
+    begin
+      if Result <> '[' then Result := Result + ',';
+
+      rec := ExpandSentinel(pwsz);
+      if rec.IsSentinel then
+      begin
+        if rec.Code = CODE_DEADKEY then
+        begin
+          Result := Result + Format('{d:%d}', [rec.Deadkey.DeadKey]);
+        end
+        else //if rec.Code = CODE_EXTENDED then
+        begin
+          // At some point, we may wish to filter which codes are safe to stub out like this
+          // versus which ones should be an error.  The commented-out-code shows the way to
+          // handle such cases.
+          Result := Result + '''''';
+        end
+//        else
+//        begin
+//          //ReportError(line, CERR_SomewhereIGotItWrong, 'Internal Error: unexpected sentinel character in store definition');
+//        end;
+      end
+      else
+      begin
+        ch := GetSuppChar(pwsz);
+        Result := Result + '"';
+        // TODO:  Refactor the section below into JavaScript_String, as it's
+        // quite common in our code base.
+        if ch in [Ord('"'), Ord('\')] then Result := Result + '\';
+        Result :=  Result + Javascript_String(ch) + '"';  // I2242
+      end;
+
+      pwsz := incxstr(pwsz);
+    end;
+    Result := Result + ']';
   end;
-  Result := Result + '"';
 end;
 
 function TCompileKeymanWeb.JavaScript_String(ch: DWord): string;  // I2242
@@ -1585,20 +1773,20 @@ begin
     if not fsp.fIsDebug then // and not (fsp.dwSystemID in [TSS_BITMAP, TSS_NAME, TSS_VERSION, TSS_CUSTOMKEYMANEDITION, TSS_CUSTOMKEYMANEDITIONNAME, TSS_KEYMANCOPYRIGHT]) then
     begin
       if fsp.dwSystemID = TSS_COMPARISON then
-        Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.dpString), nl])
+        Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.line, fsp.dpString), nl])
       else if fsp.dwSystemID = TSS_COMPILEDVERSION then
-        Result := Result + Format('%sthis.KVER=%s;%s', [FTabStop, JavaScript_Store(fsp.dpString), nl])
+        Result := Result + Format('%sthis.KVER=%s;%s', [FTabStop, JavaScript_Store(fsp.line, fsp.dpString), nl])
       //else if fsp.dwSystemID = TSS_VKDICTIONARY then // I3438, required for vkdictionary
-      //  Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.dpString), nl])
+      //  Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.line, fsp.dpString), nl])
       else if fsp.fIsOption and not fsp.fIsReserved then
         Result := Result + Format('%sthis.s%s=KeymanWeb.KLOAD(this.KI,"%s",%s);%s',
           [FTabstop,
           JavaScript_Name(i,fsp.szName),
           JavaScript_Name(i,fsp.szName,True),
-          JavaScript_Store(fsp.dpString),
+          JavaScript_Store(fsp.line, fsp.dpString),
           nl])  // I3429
       else if fsp.dwSystemID = TSS_NONE then
-        Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.dpString), nl]);   // I3681
+        Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.line, fsp.dpString), nl]);   // I3681
     end;
     Inc(fsp);
   end;
@@ -1800,7 +1988,8 @@ const
   wcsentinel: WideString = #$FFFF;
 begin
   n := Pos(wcsentinel, store.dpString);
-  if n > 0 then
+  // Disable the check with versions >= 10.0, since we now support deadkeys in stores.
+  if (n > 0) and not IsKeyboardVersion10OrLater then
   begin
     pwsz := PWideChar(store.dpString);
     Inc(pwsz, n-1);

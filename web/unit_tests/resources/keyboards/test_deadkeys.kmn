@@ -1,7 +1,6 @@
 ﻿store(&VERSION) "10.0"
 store(&TARGETS) 'any windows'
-store(&LANGUAGE) 'x0409'
-store(&WINDOWSLANGUAGES) 'x0409'
+c Handwritten line numbers correspond to the now-omitted language lines.
 store(&VISUALKEYBOARD) 'test_deadkeys.kvks'
 store(&NAME) 'Keyman Deadkey Stress-Tester'
 store(&COPYRIGHT) '© 2018 SIL International'  
@@ -74,9 +73,9 @@ c Basic digits > 'deadnums' - deadkey per number.
 + '9' > dk(9)  
 
 c any/index with deadkeys in stores.
-c any(deadnums) + '.' > '#' index(livenums, 1)
-c any(liveQwerty) + '!' > '?' index(deadQwerty, 1) index(deadQwerty, 1)
-c '?' any(deadQwerty) context(2) + '.' > '(' index(liveQwerty, 2) index(liveQwerty, 2) ')'
+any(deadnums) + '.' > '#' index(livenums, 1)
+any(liveQwerty) + '!' > '?' index(deadQwerty, 1) index(deadQwerty, 1)
+'?' any(deadQwerty) context(2) + '.' > '(' index(liveQwerty, 2) index(liveQwerty, 2) ')'
                 
 c Two different versions are here to help ensure we don't get a 'lucky fix' due
 c to Developer's rule orderings.  These two sets should end up with opposite orders.
@@ -136,7 +135,7 @@ dk(3) dk(4) > dk(4) dk(3)
          
 c Since 'index' cannot function in the 'key' part of a rule, we place the
 c 'index in context' test within this group.
-c any(deadnums) index(deadnums, 1) > '(' index(livenums, 1) ')(' index(livenums, 1) ')'
+any(deadnums) index(deadnums, 1) > '(' index(livenums, 1) ')(' index(livenums, 1) ')'
 
 c Needed for KMW testing, as the characters will not be output on plain keystrokes otherwise.
 group(qwerty_out) using keys 
