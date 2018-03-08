@@ -17,6 +17,8 @@ module.exports = {
      */
     args: [{
       type: "timeouts", // This base is designed for local machine testing.
+      eventDelay: 50, // Designed for small delays to allow time for event handling to occur before proceeding.
+                      // Make sure this stays under 1/4 of 'standard', as multiple eventDelays may occur within a test.
       standard: 4000,
       scriptLoad: 6000,
       uiLoad: 24000, // Loads two scripts + includes internal setup/timeout time requirements.

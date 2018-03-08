@@ -73,7 +73,7 @@ if(typeof(DynamicElements) == 'undefined') {
       window.setTimeout(function() {
         assertion();
         done();
-      }, 50);
+      }, kmwconfig.timeouts.eventDelay);
     } else {
       assertion();
     }
@@ -87,7 +87,7 @@ if(typeof(DynamicElements) == 'undefined') {
       window.setTimeout(function() {
         assertion();
         done();
-      }, 50);
+      }, kmwconfig.timeouts.eventDelay);
     } else {
       assertion();
     }
@@ -139,7 +139,7 @@ describe('Attachment API', function() {
     fixture.cleanup();
     window.setTimeout(function(){
       done();
-    }, 50);
+    }, kmwconfig.timeouts.eventDelay);
   });
 
   it("Attachment/Detachment", function(done) {
@@ -166,7 +166,7 @@ describe('Attachment API', function() {
       assert.equal(val, DynamicElements.enabledLaoOutput, "'Attached' element did not perform keystroke processing!");
 
       done();
-    }, 5);
+    }, kmwconfig.timeouts.eventDelay);
   });
 
   it("Enablement/Disablement", function(done) {
@@ -175,19 +175,25 @@ describe('Attachment API', function() {
     window.setTimeout(function() {
       keyman.attachToControl(ele);
       keyman.disableControl(ele);
-      DynamicElements.assertAttached(ele);
-      DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
-      val = retrieveAndReset(ele);  
-      assert.equal(val, DynamicElements.disabledOutput, "'Disabled' element performed keystroke processing!");
 
-      keyman.enableControl(ele);
-      DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
-      DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
-      val = retrieveAndReset(ele);
-      assert.equal(val, DynamicElements.enabledLaoOutput, "'Enabled' element did not perform keystroke processing!");
+      // It appears that mobile devices do not instantly trigger the MutationObserver, so we need a small timeout
+      // for the change to take effect.
+      window.setTimeout(function() {
+        DynamicElements.assertAttached(ele);
+        DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+        val = retrieveAndReset(ele);  
+        assert.equal(val, DynamicElements.disabledOutput, "'Disabled' element performed keystroke processing!");
 
-      done();
-    }, 5);
+        keyman.enableControl(ele);
+        window.setTimeout(function() {
+          DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
+          DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+          val = retrieveAndReset(ele);
+          assert.equal(val, DynamicElements.enabledLaoOutput, "'Enabled' element did not perform keystroke processing!");
+          done();
+        }, kmwconfig.timeouts.eventDelay);
+      }, kmwconfig.timeouts.eventDelay);
+    }, kmwconfig.timeouts.eventDelay);
   });
 
   it("Keyboard Management (active control)", function() {
@@ -296,7 +302,7 @@ Modernizr.on('touchevents', function(result) {
         fixture.cleanup();
         window.setTimeout(function(){
           done();
-        }, 500);
+        }, kmwconfig.timeouts.eventDelay);
       });
       
       describe('Element Type', function() {
@@ -325,7 +331,7 @@ Modernizr.on('touchevents', function(result) {
 
             window.setTimeout(function() {
               done();
-            }, 50);
+            }, kmwconfig.timeouts.eventDelay);
           });
         });
 
@@ -362,7 +368,7 @@ Modernizr.on('touchevents', function(result) {
         fixture.cleanup();
         window.setTimeout(function(){
           done();
-        }, 500);
+        }, kmwconfig.timeouts.eventDelay);
       })
       
       describe('Element Type', function() {
@@ -392,7 +398,7 @@ Modernizr.on('touchevents', function(result) {
 
             window.setTimeout(function() {
               done();
-            }, 50);
+            }, kmwconfig.timeouts.eventDelay);
           });
         });
 

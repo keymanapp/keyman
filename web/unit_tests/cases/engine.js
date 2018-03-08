@@ -755,7 +755,7 @@ describe('Engine', function() {
     
     window.setTimeout(function() {
       done()
-    }, 50);
+    }, kmwconfig.timeouts.eventDelay);
   });
   
   after(function() {
