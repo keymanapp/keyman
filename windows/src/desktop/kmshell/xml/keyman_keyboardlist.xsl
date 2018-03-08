@@ -35,7 +35,7 @@
                 <xsl:sort select="name" />
                 
                   <div class="item">
-                    <xsl:attribute name="id">package_<xsl:value-of select="id"/></xsl:attribute>
+                    <xsl:attribute name="id">package_<xsl:value-of select="id" /></xsl:attribute>
                       
                     <img class="list_icon">
                       <xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>package.gif</xsl:attribute>
@@ -71,19 +71,31 @@
 
   <xsl:template name="keyboard">
     <xsl:param name="singlekeyboardpackage" />
+    <xsl:variable name="id"><xsl:call-template name="replace-string">
+      <xsl:with-param name="text" select="id" />
+      <xsl:with-param name="replace" select='"&apos;"' />
+      <xsl:with-param name="with" select='"\&apos;"' />
+    </xsl:call-template></xsl:variable>
+
+    <xsl:variable name="package_id"><xsl:call-template name="replace-string">
+      <xsl:with-param name="text" select="../../id"/>
+      <xsl:with-param name="replace" select='"&apos;"' />
+      <xsl:with-param name="with" select='"\&apos;"' />
+    </xsl:call-template></xsl:variable>
+
     <div tabindex="1" tagType="listitem">
       <xsl:attribute name="class">list_item</xsl:attribute>
       <xsl:attribute name="id">list_keyboard_<xsl:value-of select="id"/></xsl:attribute>
       <xsl:attribute name="data-name"><xsl:value-of select="name"/></xsl:attribute>
 
-			<xsl:attribute name="onkeydown">return list_keydown(event,'keyboard_<xsl:value-of select="id"/>');</xsl:attribute>
-      <xsl:attribute name="onfocus">return list_focus(event,'keyboard_<xsl:value-of select="id"/>');</xsl:attribute>
-			<xsl:attribute name="onblur">return list_blur(event,'keyboard_<xsl:value-of select="id"/>');</xsl:attribute>
+			<xsl:attribute name="onkeydown">return list_keydown(event,'keyboard_<xsl:value-of select="$id"/>');</xsl:attribute>
+      <xsl:attribute name="onfocus">return list_focus(event,'keyboard_<xsl:value-of select="$id"/>');</xsl:attribute>
+			<xsl:attribute name="onblur">return list_blur(event,'keyboard_<xsl:value-of select="$id"/>');</xsl:attribute>
 			<xsl:attribute name="oncontextmenu">event.cancelBubble=true;event.returnValue=false;</xsl:attribute>
       
       <xsl:attribute name="style">left:0;top:0;width:99%</xsl:attribute>
       <div>
-        <xsl:attribute name="onmousedown">return list_detail(event,'keyboard_<xsl:value-of select="id"/>');</xsl:attribute>
+        <xsl:attribute name="onmousedown">return list_detail(event,'keyboard_<xsl:value-of select="$id"/>');</xsl:attribute>
         <xsl:attribute name="id">listtitle_keyboard_<xsl:value-of select="id"/></xsl:attribute>
         <xsl:attribute name='class'>
           list_title <xsl:choose><xsl:when test='loaded'>keyboard_loaded</xsl:when><xsl:otherwise>keyboard_unloaded</xsl:otherwise></xsl:choose>
@@ -92,7 +104,7 @@
           <input type='checkbox'>
             <xsl:attribute name="id">keyboardcheck_<xsl:value-of select="id"/></xsl:attribute>
             <xsl:attribute name='onmousedown'>event.stopPropagation();return false;</xsl:attribute>
-            <xsl:attribute name='onclick'>return keyboard_checkclick('<xsl:value-of select="id"/>');</xsl:attribute>
+            <xsl:attribute name='onclick'>return keyboard_checkclick('<xsl:value-of select="$id"/>');</xsl:attribute>
             <xsl:if test='loaded'><xsl:attribute name='checked'>checked</xsl:attribute></xsl:if>
           </input>
           <div class="list_icon">
@@ -124,22 +136,22 @@
         <div class="list_expand">
           <xsl:attribute name="id">list_expand_keyboard_<xsl:value-of select="id"/></xsl:attribute>
         </div>
-
+       
         <xsl:choose>
           <xsl:when test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
             <div class="list_close">
               <xsl:attribute name="id">list_close_keyboard_<xsl:value-of select="id"/></xsl:attribute>
-              <xsl:attribute name="onmousedown">location.href='keyman:package_uninstall?id=<xsl:value-of select="../../id"/>';event.cancelBubble=true;return false;</xsl:attribute>
+              <xsl:attribute name="onmousedown">location.href='keyman:package_uninstall?id=<xsl:value-of select="$package_id"/>';event.cancelBubble=true;return false;</xsl:attribute>
             </div>
             <div class="list_help">
               <xsl:attribute name="id">list_help_keyboard_<xsl:value-of select="id"/></xsl:attribute>
-              <xsl:attribute name="onmousedown">location.href='keyman:package_welcome?id=<xsl:value-of select="../../id" />';event.cancelBubble=true;return false;</xsl:attribute>
+              <xsl:attribute name="onmousedown">location.href='keyman:package_welcome?id=<xsl:value-of select="$package_id" />';event.cancelBubble=true;return false;</xsl:attribute>
             </div>
           </xsl:when>
           <xsl:otherwise>
             <div class="list_close">
               <xsl:attribute name="id">list_close_keyboard_<xsl:value-of select="id"/></xsl:attribute>
-              <xsl:attribute name="onmousedown">location.href='keyman:keyboard_uninstall?id=<xsl:value-of select="id"/>';event.cancelBubble=true;return false;</xsl:attribute>
+              <xsl:attribute name="onmousedown">location.href='keyman:keyboard_uninstall?id=<xsl:value-of select="$id"/>';event.cancelBubble=true;return false;</xsl:attribute>
             </div>
           </xsl:otherwise>
         </xsl:choose>

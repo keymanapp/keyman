@@ -18,6 +18,7 @@ inherited frmWebContainer: TfrmWebContainer
     Height = 286
     Align = alClient
     TabOrder = 0
+    Silent = False
     OnBeforeNavigate2 = webBeforeNavigate2
     OnDocumentComplete = webDocumentComplete
     OnNewWindow3 = webNewWindow3

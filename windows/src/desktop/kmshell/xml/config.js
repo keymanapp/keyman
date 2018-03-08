@@ -189,9 +189,9 @@ document.addEventListener("DOMContentLoaded", windowResize);
   }        
   
   function list_detail(event,n) {
-    var k = $('#list_'+n);
-    k.toggleClass('expanded');
-    document.getElementById('list_'+n).focus();
+    var k = document.getElementById('list_'+n);
+    $(k).toggleClass('expanded');
+    k.focus();
     save_state();
     return false;
   }
