@@ -133,6 +133,7 @@ if(!window['keyman']['ui']['name']) {
           e=document.createElement('DIV');
           e.id='KeymanWebControl';  
           document.body.insertBefore(e,document.body.firstChild);
+          ui._insertedElem = e;
         }
       }
       
@@ -282,7 +283,19 @@ if(!window['keyman']['ui']['name']) {
 
       // Restore focus
       keymanweb['focusLastActiveElement']();  
-    }   
+    }
+
+    ui.shutdown = function() {
+      var root = ui.toolbarNode;
+      if(root) {
+        root.parentNode.removeChild(root);
+      }
+
+      root = ui._insertedElem;
+      if(root) {
+        root.parentNode.removeChild(root);
+      }
+    }
 
     /**
      * Fill the map with available keyboards when the Keyboards selector is clicked

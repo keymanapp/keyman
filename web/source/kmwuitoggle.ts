@@ -443,6 +443,14 @@ if(!window['keyman']['ui']['name']) {
       
     }
 
+    ui.shutdown = function() {
+      var root = ui.controller;
+
+      if(root) {
+        root.parentNode.removeChild(root);
+      }
+    }
+
     /**
      * Function     updateKeyboardList
      * Scope        Private   

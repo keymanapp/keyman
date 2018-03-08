@@ -10,6 +10,8 @@ namespace com.keyman {
     activeDevice: Device;
     physicalDevice: Device;
 
+    linkedStylesheets: (HTMLLinkElement|HTMLStyleElement)[] = [];
+
     waiting: HTMLDivElement;                  // The element displayed for util.wait and util.alert.
 
     // An object mapping event names to individual event lists.  Maps strings to arrays.
@@ -556,6 +558,8 @@ namespace com.keyman {
         document.body.appendChild(_ElemStyle); // Won't work on Chrome, ah well
       }
 
+      this.linkedStylesheets.push(_ElemStyle);
+
       return _ElemStyle;
     }
 
@@ -594,6 +598,7 @@ namespace com.keyman {
         linkElement.type='text/css';
         linkElement.rel='stylesheet';
         linkElement.href=s;
+        this.linkedStylesheets.push(linkElement);
         headElements[0].appendChild(linkElement);
       }
     }
@@ -971,6 +976,18 @@ namespace com.keyman {
       bg.appendChild(lb);
       document.body.appendChild(bg);
       this.waiting=bg;    
+    }
+
+    shutdown() {
+      this.waiting.parentNode.removeChild(this.waiting);
+
+      for(let ss of this.linkedStylesheets) {
+        if(ss.remove) {
+          ss.remove();
+        } else if(ss.parentNode) {
+          ss.parentNode.removeChild(ss);
+        }
+      }
     }
 
     /**

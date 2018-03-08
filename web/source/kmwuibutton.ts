@@ -306,6 +306,7 @@ if(!window['keyman']['ui']['name']) {
         _elem=document.createElement('DIV');
         _elem.id='KeymanWebControl';  
         document.body.insertBefore(_elem,document.body.firstChild);
+        ui._insertedElem = _elem;
       }
     
     
@@ -385,6 +386,13 @@ if(!window['keyman']['ui']['name']) {
       util['attachDOMEvent'](_sfEl,'mouseup',ui._SelectorMouseUp);
       
       keymanweb['focusLastActiveElement']();  	//TODO: this needs to be extended - if no element is active, try and identify an enabled input element
+    }
+
+    ui.shutdown = function() {
+      var root = ui._insertedElem;
+      if(root) {
+        root.parentNode.removeChild(root);
+      }
     }
 
     /**

@@ -97,6 +97,8 @@ namespace com.keyman {
     languageList: any[] = null; // List of keyboard languages available for KeymanCloud
     languagesPending: any[] = [];     // Array of languages waiting to be registered
 
+    linkedScripts: HTMLScriptElement[] = [];
+
     constructor(kmw: KeymanBase) {
       this.keymanweb = kmw;
     }
@@ -659,7 +661,8 @@ namespace com.keyman {
       Lscript.src = this.keymanweb.getKeyboardPath(kbdFile);
 
       try {                                  
-        document.body.appendChild(Lscript);  
+        document.body.appendChild(Lscript);
+        this.linkedScripts.push(Lscript);
       }
       catch(ex) {                                                     
         document.getElementsByTagName('head')[0].appendChild(Lscript);
@@ -1475,6 +1478,16 @@ namespace com.keyman {
 
       if(activeKeyboard != null && typeof(activeKeyboard['KNS']) == 'function') {
         activeKeyboard['KNS'](_PCommand, _PTarget, _PData);
+      }
+    }
+
+    shutdown() {
+      for(let script of this.linkedScripts) {
+        if(script.remove) {
+          script.remove();
+        } else if(script.parentNode) {
+          script.parentNode.removeChild(script.parentNode);
+        }
       }
     }
   }
