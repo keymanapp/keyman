@@ -366,7 +366,8 @@ namespace com.keyman {
       //      since this is always called FROM the UI, which should not need notification.
       //      If UI callbacks are needed at all, they should be within _SetActiveKeyboard 
 
-      if(PInternalName && PInternalName.indexOf("Keyboard_") != 0) {
+      // Skip on embedded which namespaces packageID::Keyboard_keyboardID
+      if(!this.keymanweb.isEmbedded && PInternalName && PInternalName.indexOf("Keyboard_") != 0) {
         PInternalName = "Keyboard_" + PInternalName;
       }
 
