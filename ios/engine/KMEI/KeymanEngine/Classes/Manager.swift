@@ -373,11 +373,18 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
             let name = k["name"] as! String
             let keyboardID = k["id"] as! String
             let version = k["version"] as! String
-            let osk = k["oskFont"] as! String
-            let font = k["displayFont"] as! String
-            let displayFont = Font(filename: font)
-            let oskFont = Font(filename: osk)
-
+            
+            var oskFont: Font?
+            let osk = k["oskFont"] as? String
+            if let _ = osk {
+              oskFont = Font(filename: osk!)
+            }
+            var displayFont: Font?
+            let font = k["displayFont"] as? String
+            if let _ = font {
+              displayFont = Font(filename: font!)
+            }
+            
             //TODO: handle errors if languages do not exist
             var languageName = ""
             var languageId = ""
@@ -402,12 +409,19 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
             
             for keyboard in installableKeyboards {
               let storedPath = Storage.active.keyboardURL(for: keyboard)
-              let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk)
-              let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font)
               
-              let installableFiles: [[Any]] = [["\(keyboardID).js", storedPath],
-                                                [osk, oskPath],
-                                                [font, displayPath]]
+              
+              
+              var installableFiles: [[Any]] = [["\(keyboardID).js", storedPath]]
+              if let _ = osk {
+                let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk!)
+                installableFiles.append([osk, oskPath])
+              }
+              
+              if let _ = font {
+                let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font!)
+                installableFiles.append([font, displayPath])
+              }
               do {
                 for item in installableFiles {
                   var filePath = folder
