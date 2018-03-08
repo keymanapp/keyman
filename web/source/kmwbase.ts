@@ -132,11 +132,8 @@ namespace com.keyman {
     ['shutdown']() {
       this.domManager.shutdown();
       this.osk.shutdown();
-      if(this.util.getIEVersion() == 999) {
-        // These cause interesting errors in IE; it does NOT appreciate removing link, script, and style elements, it seems.
-        this.util.shutdown();
-        this.keyboardManager.shutdown();
-      }
+      this.util.shutdown();
+      this.keyboardManager.shutdown();
 
       if(this.ui && this.ui.shutdown) {
         this.ui.shutdown();

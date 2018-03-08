@@ -4,6 +4,25 @@
 /// <reference path="kmwdevice.ts" />
 
 namespace com.keyman {
+  class DOMEventTracking {
+    Pelem: HTMLElement|Document;
+    Peventname: string;
+    Phandler: (Object) => boolean;
+    PuseCapture?: boolean
+
+    constructor(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean) {
+      this.Pelem = Pelem;
+      this.Peventname = Peventname.toLowerCase();
+      this.Phandler = Phandler;
+      this.PuseCapture = PuseCapture;
+    }
+
+    equals(other: DOMEventTracking): boolean {
+      return this.Pelem == other.Pelem && this.Peventname == other.Peventname &&
+        this.Phandler == other.Phandler && this.PuseCapture == other.PuseCapture;
+    }
+  };
+
   export class Util {
     // Generalized component event registration
     device: Device;
@@ -17,6 +36,8 @@ namespace com.keyman {
     // An object mapping event names to individual event lists.  Maps strings to arrays.
     private events: { [name: string]: ((Object) => boolean)[];} = {};
     private currentEvents: string[] = [];  // The event messaging call stack.
+
+    private domEvents: DOMEventTracking[] = [];
 
     private embeddedFonts: any[] = [];     // Array of currently embedded font descriptor entries.  (Is it just a string?)
 
@@ -163,6 +184,10 @@ namespace com.keyman {
     attachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
       this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
       Pelem.addEventListener(Peventname, Phandler, PuseCapture?true:false);
+
+      // Since we're attaching to the DOM, these events should be tracked for detachment during shutdown.
+      var event = new DOMEventTracking(Pelem, Peventname, Phandler, PuseCapture);
+      this.domEvents.push(event);
     }
 
     /**
@@ -175,7 +200,16 @@ namespace com.keyman {
      * Description Detaches event handler from element [to prevent memory leaks]
      */  
     detachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
-        Pelem.removeEventListener(Peventname, Phandler, PuseCapture);      
+      Pelem.removeEventListener(Peventname, Phandler, PuseCapture);
+
+      // Since we're detaching, we should drop the tracking data from the old event.
+      var event = new DOMEventTracking(Pelem, Peventname, Phandler, PuseCapture);
+      for(var i = 0; i < this.domEvents.length; i++) {
+        if(this.domEvents[i].equals(event)) {
+          this.domEvents.splice(i, 1);
+          break;
+        }
+      }
     }    
 
     /**
@@ -979,6 +1013,17 @@ namespace com.keyman {
     }
 
     shutdown() {
+      // Remove all event-handler references rooted in KMW events.
+      this.events = {};
+
+      // Remove all events linking to elements of the original, unaltered page.
+      // This should sever any still-existing page ties to this instance of KMW,
+      // allowing browser GC to do its thing.
+      for(let event of this.domEvents) {
+        this.detachDOMEvent(event.Pelem, event.Peventname, event.Phandler, event.PuseCapture);
+      }
+
+      // Remove any KMW-added DOM element clutter.
       this.waiting.parentNode.removeChild(this.waiting);
 
       for(let ss of this.linkedStylesheets) {

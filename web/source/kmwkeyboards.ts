@@ -1486,7 +1486,7 @@ namespace com.keyman {
         if(script.remove) {
           script.remove();
         } else if(script.parentNode) {
-          script.parentNode.removeChild(script.parentNode);
+          script.parentNode.removeChild(script);
         }
       }
     }

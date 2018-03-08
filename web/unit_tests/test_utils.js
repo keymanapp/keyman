@@ -101,11 +101,27 @@ var setupScript = function(src, done, timeout, uiInitCheck) {
 }
 
 var teardownKMW = function() {
+  var error = null;
   if(keyman) { // If our setupKMW fails somehow, this guard prevents a second error report on teardown.
-    keyman['shutdown']();
-    var success = delete window["keyman"];
-    if(!success) {
-      window["keyman"] = undefined;
+
+    // We want to be SURE teardown works correctly, or we'll get lots of strange errors on other tests.
+    // Thus, error-handling on shutdown itself.  It HAS mattered.
+    try {
+      keyman['shutdown']();
+    } catch(err) {
+      error = err;
+    }
+
+    try {
+      var success = delete window["keyman"];
+      if(!success) {
+        window["keyman"] = undefined;
+      }
+    } finally {
+      if(error) {
+        console.log("Error during KMW shutdown!");
+        throw error;
+      }
     }
   }
 }

@@ -398,7 +398,7 @@ namespace com.keyman {
      * Description  Performs handling for the specified disabled input element on touch-based systems.
      */
     setupNonKMWTouchElement(x: HTMLElement) {
-      x.addEventListener('touchstart', this.nonKMWTouchHandler, false);
+      this.keyman.util.attachDOMEvent(x, 'touchstart', this.nonKMWTouchHandler, false);
 
       // Signify that touch isn't enabled on the control.
       if(this.isAttached(x)) {
@@ -1649,7 +1649,7 @@ namespace com.keyman {
             }          
             osk.hideNow(); 
           }        
-          document.body.addEventListener('touchstart', (<any>this.keyman).hideOskWhileScrolling, false);
+          this.keyman.util.attachDOMEvent(document.body, 'touchstart', (<any>this.keyman).hideOskWhileScrolling, false);
         } else {
           (<any>this.keyman).conditionallyHideOsk = function() {
             // Should not hide OSK if simply closing the language menu (30/4/15)
@@ -1665,9 +1665,9 @@ namespace com.keyman {
             if(y-y0 > 5 || y0-y < 5) (<any>keyman).hideOnRelease = false;
           };
 
-          document.body.addEventListener('touchstart',(<any>this.keyman).hideOskIfOnBody,false);      
-          document.body.addEventListener('touchmove',(<any>this.keyman).cancelHideIfScrolling,false);      
-          document.body.addEventListener('touchend',(<any>this.keyman).conditionallyHideOsk,false);      
+          this.keyman.util.attachDOMEvent(document.body, 'touchstart',(<any>this.keyman).hideOskIfOnBody,false);      
+          this.keyman.util.attachDOMEvent(document.body, 'touchmove',(<any>this.keyman).cancelHideIfScrolling,false);      
+          this.keyman.util.attachDOMEvent(document.body, 'touchend',(<any>this.keyman).conditionallyHideOsk,false);      
         } 
       }
 

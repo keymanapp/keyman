@@ -166,6 +166,10 @@ if(!window['keyman']['ui']['name']) {
       }
 
       ui._UnloadUserInterface();
+
+      if(window.removeEventListener) {
+        window.removeEventListener('resize', ui._Resize, false);
+      }
     }
   
     /**
