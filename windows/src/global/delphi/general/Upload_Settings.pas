@@ -36,17 +36,17 @@ const
   API_Path_IsOnline = '/desktop/10.0/isonline';
 
   // https://www.keyman.com/ - web pages
-  URLPath_KeymanLanguageLookup = '/go/100/language-lookup';
-  URLPath_CreateTranslation = '/go/100/create-locale';
-  URLPath_KeymanException = '/go/100/view-exception?id=%s';
-  URLPath_KeepInTouch = '/go/100/keep-in-touch';
-  URLPath_KeymanDeveloperDocumentation = '/go/100/keyman-developer-documentation';
+  URLPath_KeymanLanguageLookup = '/go/developer/10.0/language-lookup';
+  URLPath_CreateTranslation = '/go/desktop/10.0/create-locale';
+  URLPath_KeymanException = '/go/desktop/10.0/view-exception?id=%s';
+  URLPath_KeepInTouch = '/go/desktop/10.0/keep-in-touch';
+  URLPath_KeymanDeveloperDocumentation = '/go/developer/10.0/docs';
 
-  URLPath_KeymanDeveloperHome = '/go/100/keyman-developer-home';
-  URLPath_KeymanHome = '/go/100/keyman-desktop-home';
-  URLPath_ArchivedDownloads = '/go/100/archived-downloads';
-  URLPath_Support = '/go/100/support';
-  URLPath_Privacy = '/go/100/privacy';
+  URLPath_KeymanDeveloperHome = '/go/developer/10.0/home';
+  URLPath_KeymanHome = '/go/desktop/10.0/home';
+  URLPath_ArchivedDownloads = '/go/desktop/10.0/archived-downloads';
+  URLPath_Support = '/go/10.0/support';
+  URLPath_Privacy = '/go/10.0/privacy';
 
 function API_Protocol: string; // = 'https';
 function API_Server: string; // = 'api.keyman.com';

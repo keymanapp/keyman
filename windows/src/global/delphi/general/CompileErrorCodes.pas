@@ -18,6 +18,7 @@
                     19 Mar 2014 - mcdurdin - I4142 - V9.0 - Validate key ids are in an acceptable format
                     04 May 2015 - mcdurdin - I4688 - V9.0 - Add build path to project settings
                     24 Aug 2015 - mcdurdin - I4872 - OSK font and Touch Layout font should be the same in Developer
+                    28 Feb 2018 - jahorton - Imported the "SomewhereIGotItWrong" error code for use in KMW compilation
 *)
 unit CompileErrorCodes;
 
@@ -32,6 +33,7 @@ const
   CERR_InvalidTouchLayoutFile =                       $4059;
   CERR_TouchLayoutInvalidIdentifier =                 $405A;   // I4142
   CERR_InvalidKeyCode =                               $405B;   // I4142
+  CERR_SomewhereIGotItWrong =                         $8009;
 
   CWARN_TouchLayoutMissingLayer =         $2091;
   CWARN_TouchLayoutCustomKeyNotDefined =  $2092;

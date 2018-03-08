@@ -28,7 +28,7 @@
           <p><xsl:value-of select="$locale/String[@Id='S_Support_ContactInstructions_Free']"/></p>
           <xsl:call-template name="button">
             <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Button_CommunitySupport']"/></xsl:with-param>
-            <xsl:with-param name="command">keyman:link?url=https://www.keyman.com/go/100/forums</xsl:with-param>
+            <xsl:with-param name="command">keyman:link?url=https://keyman.com/go/desktop/10.0/forums</xsl:with-param>
             <xsl:with-param name="width">220px</xsl:with-param>
           </xsl:call-template>
         </div>
@@ -44,7 +44,7 @@
             <li><a href="keyman:support_diagnostics"><xsl:value-of select="$locale/String[@Id='S_Menu_Diagnostics_Diagnostics']"/></a></li>
             <li><a href="keyman:support_checklanguages"><xsl:value-of select="$locale/String[@Id='S_Menu_Diagnostics_CheckLanguages']"/></a></li>
             <li><a href="keyman:support_updatecheck"><xsl:value-of select="$locale/String[@Id='S_Button_CheckForUpdates']"/></a></li>
-            <li><a href="keyman:link?url=https://www.keyman.com/go/100/support"><xsl:value-of select="$locale/String[@Id='S_Button_OnlineSupport']"/></a></li>
+            <li><a href="keyman:link?url=https://keyman.com/go/desktop/10.0/support"><xsl:value-of select="$locale/String[@Id='S_Button_OnlineSupport']"/></a></li>
           </ul>
         </div>
       </div>

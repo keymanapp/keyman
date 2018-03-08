@@ -38,7 +38,7 @@
             </li>
           </ul>
           
-          <p>It's a good idea to read <a href='https://www.keyman.com/go/100/developer-help-keyboards'>Developing Open Source Keyboards</a> for guidelines
+          <p>It's a good idea to read <a href='https://keyman.com/go/developer/10.0/help-keyboards'>Developing Open Source Keyboards</a> for guidelines
           on preparing open source keyboards for sharing through the Keyman keyboard repositories. Also see the Distribution tab for more on
           distributing your completed keyboards.</p>
           

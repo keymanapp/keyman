@@ -43,6 +43,11 @@ namespace com.keyman {
      * Value:  the store to search.
      */
     ['a']: KeyboardStore; // For 'a'ny statement.
+
+    /**
+     * If set to true, negates the 'any'.
+     */
+    ['n']: boolean|0|1;
   }
 
   class RuleIndex {
@@ -51,9 +56,14 @@ namespace com.keyman {
     ['t']: 'i';
     
     /**
-     * Value:  {'s': the Store from which to output, 'o': the Offset into the current rule's context.}
+     * Value: the Store from which to output
      */
-    ['i']: {'s': KeyboardStore, 'o': number}; // For 'i'ndex statement.
+    ['i']: KeyboardStore;
+    
+    /**
+     * Offset: the offset in context for the corresponding `any()`.
+     */
+    ['o']: number;
   }
 
   class ContextEx {
@@ -67,7 +77,13 @@ namespace com.keyman {
     ['c']: number; // For 'c'ontext statement.
   }
 
-  type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx;
+  class ContextNul {
+    /** Discriminant field - 'n' for `nul`
+     */
+    ['t']: 'n';
+  }
+
+  type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx | ContextNul;
   type ContextEntry = RuleChar | ContextNonCharEntry;
 
   /**
@@ -425,6 +441,9 @@ namespace com.keyman {
 
       var mismatch = false;
 
+      // This symbol internally indicates lack of context in a position.  (See KC_)
+      const NUL_CONTEXT = "\uFFFE";
+
       var assertNever = function(x: never): never {
         // Could be accessed by improperly handwritten calls to `fullContextMatch`.
         throw new Error("Unexpected object in fullContextMatch specification: " + x);
@@ -434,7 +453,7 @@ namespace com.keyman {
       for(var i=0; i < rule.length; i++) {
         if(typeof rule[i] == 'string') {
           var str = rule[i] as string;
-          if(str != context[i]) {
+          if(str !== context[i]) {
             mismatch = true;
             break;
           }
@@ -444,23 +463,30 @@ namespace com.keyman {
           switch(r.t) {
             case 'd':
               // We still need to set a flag here; 
-              if(r['d'] != context[i]) {
+              if(r['d'] !== context[i]) {
                 mismatch = true;
               } else {
                 deadContext[i].set();
               }
               break;
             case 'a':
-              // TODO:  Remove the `string` requirement.
               var lookup = (typeof(context[i]) == 'string' ? context[i] as string : {'d': context[i] as number});
-              if(!this.any(i, lookup, r.a)) {
+              var result = this.any(i, lookup, r.a);
+
+              if(!r.n) { // If it's a standard 'any'...
+                if(!result) {
+                  mismatch = true;
+                } else if(deadContext[i] !== undefined) {
+                  // It's a deadkey match, so indicate that.
+                  deadContext[i].set();
+                }
+                // 'n' for 'notany'.  If we actually match or if we have nul context (\uFFFE), notany fails.
+              } else if(r.n && (result || context[i] !== NUL_CONTEXT)) {
                 mismatch = true;
-              } else if(deadContext[i] !== undefined) {
-                deadContext[i].set();
               }
               break;
             case 'i':
-              var ch = this._Index(r.i.s, r.i.o);
+              var ch = this._Index(r.i, r.o);
 
               if(ch !== undefined && (typeof(ch) == 'string' ? ch : ch.d) !== context[i]) {
                 mismatch = true;
@@ -469,19 +495,21 @@ namespace com.keyman {
               }
               break;
             case 'c':            
-              if(context[r.c - 1] != context[i]) {
+              if(context[r.c - 1] !== context[i]) {
                 mismatch = true;
               } else if(deadContext[i] !== undefined) {
                 deadContext[i].set();
               }
               break;
+            case 'n':
+              // \uFFFE is the internal 'no context here sentinel'.
+              if(context[i] != NUL_CONTEXT) {
+                mismatch = true;
+              }
+              break;
             default:
               assertNever(r);
           }
-        }
-
-        if(mismatch) {
-          break;
         }
       }
 

@@ -79,7 +79,8 @@ type
   private
     FDialogName: WideString;
     FXMLRenderers: TXMLRenderers;
-    FXMLFileName: TTempFile;   // I4181
+    FXMLFileName: TTempFile;
+    FNoMoreErrors: Boolean;   // I4181
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
@@ -390,9 +391,17 @@ var
   FAborting: Boolean;
 begin
   FAborting := False;
+
+  if FNoMoreErrors then
+  begin
+    ScriptErrorAction := eaContinue;
+    Exit;
+  end;
+
   case ShowScriptErrorDialog(Self, ErrorMessage, FTellKeymanSupport) of  // I2992   // I3544
     mrYes: ScriptErrorAction := eaContinue;
-    mrNo: ScriptErrorAction := eaCancel;
+    mrCancel: begin ScriptErrorAction := eaContinue; FNoMoreErrors := True; end;
+    mrNo:   ScriptErrorAction := eaCancel;
     mrAbort: begin ScriptErrorAction := eaCancel; FAborting := True; end;
   end;
 
