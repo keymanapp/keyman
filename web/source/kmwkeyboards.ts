@@ -686,7 +686,9 @@ namespace com.keyman {
       // Additionally, make sure we save the (upcoming) per-control keyboard settings.
       // This allows us to ensure the keyboard is set correctly without waiting for focus event
       // triggers - very helpful for automated testing.
-      this.keymanweb.touchAliasing._BlurKeyboardSettings(PInternalName, PLgCode);
+      if(!this.keymanweb.isEmbedded) {
+        this.keymanweb.touchAliasing._BlurKeyboardSettings(PInternalName, PLgCode);
+      }
     }
 
     /**
