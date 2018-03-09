@@ -1269,6 +1269,12 @@ namespace com.keyman {
       if(!this.keyman.isEmbedded) {
         this.keyman.touchAliasing._BlurKeyboardSettings();
       }
+
+      // No need to reset context if we stay within the same element.
+      if(DOMEventHandlers.states.activeElement != e) {
+        this.keyman.interface.resetContext();
+      }
+
       DOMEventHandlers.states.activeElement = DOMEventHandlers.states.lastActiveElement=e;
       if(!this.keyman.isEmbedded) {
         this.keyman.touchAliasing._FocusKeyboardSettings(false);

@@ -327,6 +327,7 @@ namespace com.keyman {
       }
 
       this.doChangeEvent(Ltarg);
+      this.keyman.interface.resetContext();
 
       return true;
     }.bind(this);
@@ -1379,6 +1380,9 @@ namespace com.keyman {
      */
     setBlur: (e: FocusEvent) => void = function(this: DOMTouchHandlers, e: FocusEvent) {
       // This works OK for iOS, but may need something else for other platforms
+
+      this.keyman.interface.resetContext();
+
       if(('relatedTarget' in e) && e.relatedTarget) {
         var elem: HTMLElement = e.relatedTarget as HTMLElement;
         this.doChangeEvent(elem);
