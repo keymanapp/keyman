@@ -42,7 +42,7 @@
 
   function loadKeyboards() 
   { 
-    var kmw=tavultesoft.keymanweb;
+    var kmw=keyman;
     
     // The first keyboard added will be the default keyboard for touch devices.
     // For faster loading, it may be best for the default keyboard to be
@@ -63,7 +63,7 @@
     
     // Add a fully-specified, locally-sourced, keyboard with custom font  
     kmw.addKeyboards({id:'lao_2008_basic',name:'Lao Basic',
-      language:{
+      languages:{
         id:'lo',name:'Lao',region:'Asia',
         font:{family:'LaoWeb',source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']}
         },
@@ -84,7 +84,7 @@
   // Script to allow a user to add any keyboard to the keyboard menu 
   function addKeyboard(n)
   { 
-    var sKbd,kmw=tavultesoft.keymanweb;
+    var sKbd,kmw=keyman;
     switch(n)
     {
       case 1:
