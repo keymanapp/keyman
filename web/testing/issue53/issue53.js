@@ -7,7 +7,7 @@ function loadKeyboards()
     languages:{
       id:'dbg',name:'Debug',region:'North America'
       },
-    filename:'./layered_debug_keyboard-1.0.js'
+    filename:'./layered_debug_keyboard.js'
     });
 }
 
