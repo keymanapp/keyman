@@ -7,15 +7,36 @@ module.exports = {
   // base path that will be used to resolve all patterns (eg. files, exclude)
   basePath: '..',
 
+  client: {
+    /* `client.args` here is passed to the test runner page as `__karma__.config.args`.  
+     *
+     * Karma doc type spec says "array", so we use an array.  It also gives us room to add alternate
+     * configuration details later if we need to, though on a CI vs local basis only.
+     * 
+     * Timeouts below are in milliseconds
+     */
+    args: [{
+      type: "timeouts", // This base is designed for local machine testing.
+      eventDelay: 50, // Designed for small delays to allow time for event handling to occur before proceeding.
+                      // Make sure this stays under 1/4 of 'standard', as multiple eventDelays may occur within a test.
+      standard: 4000,
+      scriptLoad: 6000,
+      uiLoad: 24000, // Loads two scripts + includes internal setup/timeout time requirements.
+                     // At this time of writing this, UI script loading is one of the longest checks.
+      mobileFactor: 1 // An extra timeout modifier to be applied when running on a mobile device.
+    }]
+  },
+
   // frameworks to use
   // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
   frameworks: ['mocha', 'chai', 'fixture'],
 
   // list of files / patterns to load in the browser
   files: [
-    'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
     'unit_tests/modernizr.js', // A dependency-managed utility script that helps with browser feature detection.
     'unit_tests/recorder_InputEvents.js', // The object definitions used to generate/replicate key events for engine tests.
+                                          // Includes KMW's Device class, which is used by test_utils below.
+    'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
     'unit_tests/cases/**/*.js', // Where the tests actually reside.
     'unit_tests/json/**/*.json', // Where pre-loaded JSON resides.
     {pattern: 'unit_tests/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.

@@ -398,7 +398,7 @@ namespace com.keyman {
      * Description  Performs handling for the specified disabled input element on touch-based systems.
      */
     setupNonKMWTouchElement(x: HTMLElement) {
-      x.addEventListener('touchstart', this.nonKMWTouchHandler, false);
+      this.keyman.util.attachDOMEvent(x, 'touchstart', this.nonKMWTouchHandler, false);
 
       // Signify that touch isn't enabled on the control.
       if(this.isAttached(x)) {
@@ -479,6 +479,14 @@ namespace com.keyman {
         baseElement.onkeydown = this.getHandlers(Pelem)._KeyDown;
         baseElement.onkeyup = this.getHandlers(Pelem)._KeyUp;  
       }
+
+      var lastElem = this.getLastActiveElement();
+      if(lastElem == Pelem || lastElem == Pelem['kmw_ip']) {
+        this.clearLastActiveElement();
+        this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
+        this.keyman.osk._Hide();
+      }
+      
       return;
     };
 
@@ -816,14 +824,7 @@ namespace com.keyman {
      * Description  Disable KMW control element 
      */    
     _DisableControl(Pelem: HTMLElement) {
-      if(this.isAttached(Pelem)) { // Only operate on attached elements!
-        var lastElem = this.getLastActiveElement();
-        if(lastElem == Pelem || lastElem == Pelem['kmw_ip']) {
-          this.clearLastActiveElement();
-          this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
-          this.keyman.osk._Hide();
-        }
-        
+      if(this.isAttached(Pelem)) { // Only operate on attached elements!        
         if(this.keyman.util.device.touchable) {
           this.disableTouchElement(Pelem);
           this.setupNonKMWTouchElement(Pelem);
@@ -1260,6 +1261,12 @@ namespace com.keyman {
         e=document.getElementById(e);
       }
 
+      // Non-attached elements cannot be set as active.
+      if(!this.isAttached(e) && !this.keyman.isEmbedded) {
+        console.warn("Cannot set an element KMW is not attached to as the active element.");
+        return;
+      }
+
       // As this is an API function, someone may pass in the base of a touch element.
       // We need to respond appropriately.
       e = e['kmw_ip'] ? e['kmw_ip'] : e;
@@ -1653,7 +1660,7 @@ namespace com.keyman {
             }          
             osk.hideNow(); 
           }        
-          document.body.addEventListener('touchstart', (<any>this.keyman).hideOskWhileScrolling, false);
+          this.keyman.util.attachDOMEvent(document.body, 'touchstart', (<any>this.keyman).hideOskWhileScrolling, false);
         } else {
           (<any>this.keyman).conditionallyHideOsk = function() {
             // Should not hide OSK if simply closing the language menu (30/4/15)
@@ -1669,9 +1676,9 @@ namespace com.keyman {
             if(y-y0 > 5 || y0-y < 5) (<any>keyman).hideOnRelease = false;
           };
 
-          document.body.addEventListener('touchstart',(<any>this.keyman).hideOskIfOnBody,false);      
-          document.body.addEventListener('touchmove',(<any>this.keyman).cancelHideIfScrolling,false);      
-          document.body.addEventListener('touchend',(<any>this.keyman).conditionallyHideOsk,false);      
+          this.keyman.util.attachDOMEvent(document.body, 'touchstart',(<any>this.keyman).hideOskIfOnBody,false);      
+          this.keyman.util.attachDOMEvent(document.body, 'touchmove',(<any>this.keyman).cancelHideIfScrolling,false);      
+          this.keyman.util.attachDOMEvent(document.body, 'touchend',(<any>this.keyman).conditionallyHideOsk,false);      
         } 
       }
 

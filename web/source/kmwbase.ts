@@ -132,6 +132,14 @@ namespace com.keyman {
     ['shutdown']() {
       this.domManager.shutdown();
       this.osk.shutdown();
+      this.util.shutdown();
+      this.keyboardManager.shutdown();
+
+      if(this.ui && this.ui.shutdown) {
+        this.ui.shutdown();
+      }
+
+      DOMEventHandlers.states = new CommonDOMStates();
     }
 
     /**

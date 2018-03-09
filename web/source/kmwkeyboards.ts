@@ -97,6 +97,8 @@ namespace com.keyman {
     languageList: any[] = null; // List of keyboard languages available for KeymanCloud
     languagesPending: any[] = [];     // Array of languages waiting to be registered
 
+    linkedScripts: HTMLScriptElement[] = [];
+
     constructor(kmw: KeymanBase) {
       this.keymanweb = kmw;
     }
@@ -565,7 +567,7 @@ namespace com.keyman {
           }
         }
         this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
-      } 
+      }
 
       var Pk=this.activeKeyboard;  // I3319
       if(Pk !== null)  // I3363 (Build 301)
@@ -660,7 +662,8 @@ namespace com.keyman {
       Lscript.src = this.keymanweb.getKeyboardPath(kbdFile);
 
       try {                                  
-        document.body.appendChild(Lscript);  
+        document.body.appendChild(Lscript);
+        this.linkedScripts.push(Lscript);
       }
       catch(ex) {                                                     
         document.getElementsByTagName('head')[0].appendChild(Lscript);
@@ -679,6 +682,13 @@ namespace com.keyman {
     private saveCurrentKeyboard(PInternalName: string, PLgCode: string) {
       var s = "current="+PInternalName+":"+PLgCode;
       this.keymanweb.util.saveCookie('KeymanWeb_Keyboard',{'current':PInternalName+':'+PLgCode});
+
+      // Additionally, make sure we save the (upcoming) per-control keyboard settings.
+      // This allows us to ensure the keyboard is set correctly without waiting for focus event
+      // triggers - very helpful for automated testing.
+      if(!this.keymanweb.isEmbedded) {
+        this.keymanweb.touchAliasing._BlurKeyboardSettings(PInternalName, PLgCode);
+      }
     }
 
     /**
@@ -1471,6 +1481,16 @@ namespace com.keyman {
 
       if(activeKeyboard != null && typeof(activeKeyboard['KNS']) == 'function') {
         activeKeyboard['KNS'](_PCommand, _PTarget, _PData);
+      }
+    }
+
+    shutdown() {
+      for(let script of this.linkedScripts) {
+        if(script.remove) {
+          script.remove();
+        } else if(script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
       }
     }
   }

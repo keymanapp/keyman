@@ -150,14 +150,27 @@ if(!window['keyman']['ui']['name']) {
       //may also want to initialize style sheet here ??
     }
 
+    ui._UnloadUserInterface = function() {
+      ui.KeyboardSelector = ui.innerDiv = ui.outerDiv = ui.kbdIcon = null; 
+    };
     /**
      * UI removal - resource cleanup
      */    
-    keymanweb['addEventListener']('unloaduserinterface',
-      function()
-      {
-        ui.KeyboardSelector = ui.innerDiv = ui.outerDiv = ui.kbdIcon = null; 
-      });
+    keymanweb['addEventListener']('unloaduserinterface', ui._UnloadUserInterface);
+        
+
+    ui.shutdown = function() {
+      var root = ui.outerDiv;
+      if(root) {
+        root.parentNode.removeChild(root);
+      }
+
+      ui._UnloadUserInterface();
+
+      if(window.removeEventListener) {
+        window.removeEventListener('resize', ui._Resize, false);
+      }
+    }
   
     /**
      * Update list of keyboards shown by UI

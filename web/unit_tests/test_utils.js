@@ -1,3 +1,34 @@
+// KeymanWeb test suite - processing of the Karma configuration's client.args parameter.
+
+(function() {
+  var device = new com.keyman.Device();
+  device.detect();
+  var mobile = (device.formFactor != 'desktop');
+
+  var kmwconfig = window['kmwconfig'] = {mobile: mobile};
+
+  var configArgs = window['__karma__'].config.args;  // Where Karma gives us our custom args.
+  for(var i = 0; i < configArgs.length; configArgs++) {
+    switch(configArgs[i].type) {
+      case 'timeouts':
+        var timeouts = JSON.parse(JSON.stringify(configArgs[i]));
+        delete timeouts.type;
+
+        if(mobile) {
+          for(var key in timeouts) {
+            if(key != 'mobileFactor') {
+              timeouts[key] = timeouts[key] * timeouts['mobileFactor'];
+            }
+          }
+        }
+        kmwconfig['timeouts'] = timeouts;
+        break;
+    }
+  }
+})();
+
+// Keyman test suite utility methods
+
 var setupKMW = function(kmwOptions, done, timeout, uiInitCheck) {
   var ui;
 
@@ -70,10 +101,28 @@ var setupScript = function(src, done, timeout, uiInitCheck) {
 }
 
 var teardownKMW = function() {
-  keyman['shutdown']();
-  var success = delete window["keyman"];
-  if(!success) {
-    window["keyman"] = undefined;
+  var error = null;
+  if(keyman) { // If our setupKMW fails somehow, this guard prevents a second error report on teardown.
+
+    // We want to be SURE teardown works correctly, or we'll get lots of strange errors on other tests.
+    // Thus, error-handling on shutdown itself.  It HAS mattered.
+    try {
+      keyman['shutdown']();
+    } catch(err) {
+      error = err;
+    }
+
+    try {
+      var success = delete window["keyman"];
+      if(!success) {
+        window["keyman"] = undefined;
+      }
+    } finally {
+      if(error) {
+        console.log("Error during KMW shutdown!");
+        throw error;
+      }
+    }
   }
 }
 

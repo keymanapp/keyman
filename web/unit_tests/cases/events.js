@@ -1,9 +1,10 @@
 var assert = chai.assert;
 
 describe('Event Management', function() {
+  this.timeout(kmwconfig.timeouts.standard);
 
   before(function(done) {
-    this.timeout(20000);
+    this.timeout(kmwconfig.timeouts.scriptLoad * 2);
     fixture.setBase('unit_tests/fixtures');
     fixture.load("eventTestConfig.html");
 
@@ -13,10 +14,9 @@ describe('Event Management', function() {
       loadKeyboardFromJSON("/keyboards/test_simple_deadkeys.json", function() {
         // Interestingly, when auto-testing there's a Safari bug that prevents
         // this from being preserved after the first forced blur command below.
-        keyman.globalKeyboard = "Keyboard_test_simple_deadkeys";
         done();
-      }, 10000);
-    }, 10000);
+      }, kmwconfig.timeouts.scriptLoad);
+    }, kmwconfig.timeouts.scriptLoad);
 
   });
   

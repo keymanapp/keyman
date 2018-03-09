@@ -16,8 +16,7 @@ function focusReceiver() {
   
   if(keyman.util.device.touchable) {
     // At present, touch doesn't 'focus' properly.
-    com.keyman.DOMEventHandlers.states.lastActiveElement = receiver;
-    com.keyman.DOMEventHandlers.states.activeElement = receiver;
+    keyman.setActiveElement(receiver);
     keyman.osk.show(true);
   }
 }
@@ -162,6 +161,20 @@ keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, sav
   }
   _sak(PInternalName, PLgCode, saveCookie);
 
+  // Set the current keyboard on our select element
+  var kbdSelect = document.getElementById("KMW_Keyboard");
+  if(PInternalName == '') {
+    kbdSelect.selectedIndex = 0;
+  } else {
+    for(var i=1; i < kbdSelect.length; i++) {
+      var tag = kbdSelect.item(i);
+      if(tag.value == PInternalName + "$$" + PLgCode) {
+        kbdSelect.selectedIndex = i;
+        break;
+      }
+    }
+  }
+
   // What's the active stub immediately after our _SetActiveKeyboard call?
   var internalStub = keyman.keyboardManager.activeStub;
   if(internalStub && (com.keyman.DOMEventHandlers.states.activeElement == in_output 
@@ -211,8 +224,6 @@ window.addEventListener('load', function() {
   setupKeyboardPicker();
   setTestDefinition();
 
-  com.keyman.DOMEventHandlers.states.lastActiveElement = in_output['kmw_ip'] ? in_output['kmw_ip'] : in_output;
-
   var errorInput = document.getElementById('errorText');
   if(errorInput['kmw_ip']) {
     // Alias DIVs use subelements b/c caret simulation.
@@ -257,6 +268,9 @@ function setupKeyboardPicker() {
 
 function doKeyboardChange(name, languageCode) {
   var activeElement = document.activeElement;
+  if(!activeElement) {
+    activeElement = in_output;
+  }
   justActivated = true;
   focusReceiver();
   keyman.setActiveKeyboard(name, languageCode);
@@ -294,6 +308,56 @@ function loadExistingTest(files) {
       }
     }
     reader.readAsText(files[0]);
+  }
+}
+
+function loadExistingStubs(files) {
+  
+  var processStub = function(json, file) {
+    try {
+      // Load the stub
+      var kbdStub = new KMWRecorder.KeyboardStub(JSON.parse(json));
+      kbdStub.filename = UNIT_TEST_FOLDER_RELATIVE_PATH + "/" + kbdStub.filename;
+
+      keyman.addKeyboards(kbdStub);
+
+      if(files.length == 1) {
+        doKeyboardChange("Keyboard_" + kbdStub.id, kbdStub.getFirstLanguage());
+      }
+    } catch (e) {
+      if(file instanceof File) {
+        alert("File " + file.name + " does not contain a valid KeyboardStub definition.")
+      } else {
+        alert("File " + file + " does not contain a valid KeyboardStub definition.");
+      }
+      console.error(e);
+    }
+  }
+
+  // We need this as a separate function for its closure behavior.
+  var readFile = function(index) {
+    var reader = new FileReader();
+    var file = files[index];
+    if(file instanceof File) {
+      reader.onload = function() {
+        processStub(reader.result, file);
+      }
+      reader.readAsText(file);
+    } else if(typeof file == "string") {
+      var reader = new XMLHttpRequest();
+      reader.open('GET', file);
+      reader.responseType = 'text';
+      
+      reader.onload = function() {
+        processStub(reader.response, file);
+      };
+
+      reader.send();
+    }
+  }
+
+  for(var i=0; i < files.length; i++) {
+    readFile(i);
   }
 }
 
