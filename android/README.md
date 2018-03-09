@@ -23,8 +23,18 @@ yes | ./sdkmanager.bat --licenses
 ## Keyman for Android Development
 Keyman for Android (formerly named KMAPro) can be built from a command line (preferred) or Android Studio.
 
+### Crashlytics
 Firebase Crashlytics is used for crash reporting, and it depends on a configured google-services.json file. For this reason, only the Debug variant of KMAPro is intended to be built on a Developer machine. The analytics for Debug are associated with a "Package name" `com.tavultesoft.kmapro.debug`.
 
+If you need to view near real-time analytics in the Firebase DebugView console, enable Debug mode on the emulator with the command:
+```
+ adb shell setprop debug.firebase.analytics.app com.tavultesoft.kmapro.debug
+```
+To disable Debug mode, use the command:
+```
+adb shell setprop debug.firebase.analytics.app .none.
+```
+ 
 ### Compiling From Command Line
 1. Launch a command prompt
 2. Change to one of these directories depending on what you want to compile:

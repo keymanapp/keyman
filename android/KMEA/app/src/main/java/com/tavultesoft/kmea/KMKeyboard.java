@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017 SIL International. All rights reserved.
+ * Copyright (C) 2017-2018 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmea;
@@ -12,6 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.crashlytics.android.Crashlytics;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -25,6 +27,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -50,6 +53,11 @@ import android.widget.Toast;
 final class KMKeyboard extends WebView {
   private final Context context;
   private KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
+  private String packageID;
+  private String keyboardID;
+  private String keyboardName;
+  private String keyboardVersion;
+
   private static String currentKeyboard = null;
   private static String txtFont = "";
   private static String oskFont = null;
@@ -59,6 +67,7 @@ final class KMKeyboard extends WebView {
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
   private boolean ShouldShowHelpBubble = false;
   private boolean isChiral = false;
+  private static FirebaseAnalytics mFirebaseAnalytics;
 
   protected boolean keyboardSet = false;
   protected boolean keyboardPickerEnabled = true;
@@ -88,6 +97,8 @@ final class KMKeyboard extends WebView {
   @SuppressWarnings("deprecation")
   @SuppressLint("SetJavaScriptEnabled")
   public void initKMKeyboard(final Context context) {
+    mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+
     setFocusable(false);
     clearCache(true);
     getSettings().setJavaScriptEnabled(true);
@@ -114,6 +125,19 @@ final class KMKeyboard extends WebView {
       public boolean onConsoleMessage(ConsoleMessage cm) {
         if (KMManager.isDebugMode()) {
           Log.d("KMEA", "Keyman JS Log: Line " + cm.lineNumber() + ", " + cm.sourceId() + ":" + cm.message());
+        }
+
+        // Send console errors to Firebase Analytics.
+        // (Ignoring spurious message "No keyboard stubs exist = ...")
+        // TODO: Analyze if this error warrants reverting to default keyboard
+        if ((cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) && (!cm.message().startsWith("No keyboard stubs exist"))) {
+          sendKMWError(cm.lineNumber(), cm.sourceId(), cm.message());
+          Toast.makeText(context, "Fatal Error with " + currentKeyboard +
+            ". Loading default keyboard", Toast.LENGTH_LONG).show();
+
+          setKeyboard(KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID,
+            KMManager.KMDefault_LanguageID, KMManager.KMDefault_KeyboardName,
+            KMManager.KMDefault_LanguageName, KMManager.KMDefault_KeyboardFont, null);
         }
         return true;
       }
@@ -326,6 +350,10 @@ final class KMKeyboard extends WebView {
       Log.d("KMKeyboard", jsString);
     }
 
+    this.packageID = packageID;
+    this.keyboardID = keyboardID;
+    this.keyboardName = keyboardName;
+    this.keyboardVersion = keyboardVersion;
     currentKeyboard = kbKey;
     keyboardSet = true;
     saveCurrentKeyboardIndex();
@@ -426,6 +454,10 @@ final class KMKeyboard extends WebView {
       Log.d("KMKeyboard", jsString);
     }
 
+    this.packageID = packageID;
+    this.keyboardID = keyboardID;
+    this.keyboardName = keyboardName;
+    this.keyboardVersion = keyboardVersion;
     currentKeyboard = kbKey;
     keyboardSet = true;
     saveCurrentKeyboardIndex();
@@ -477,6 +509,29 @@ final class KMKeyboard extends WebView {
       keyboardPath = getKeyboardRoot() + keyboardID + ".js";
     }
     return keyboardPath;
+  }
+
+  private void sendKMWError(int lineNumber, String sourceId, String message) {
+    Bundle params = new Bundle();
+    // Error info
+    params.putInt("cm.lineNumber", lineNumber);
+    params.putString("cm.sourceID", sourceId);
+    params.putString("cm.message", message);
+
+    // Keyboard info
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      params.putString("keyboardType", "INAPP");
+    } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      params.putString("keyboardType", "SYSTEM");
+    }  else {
+      params.putString("keyboardType", "UNDEFINED");
+    }
+    params.putString("packageID", this.packageID);
+    params.putString("keyboardID", this.keyboardID);
+    params.putString("keyboardName", this.keyboardName);
+    params.putString("keyboardVersion", this.keyboardVersion);
+
+    mFirebaseAnalytics.logEvent("kmw_console_error", params);
   }
 
   // Extract Unicode numbers (\\uxxxx) from a layer to character string.
