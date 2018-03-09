@@ -51,7 +51,7 @@ type
   PFILE_STORE = ^FILE_STORE;
 
   FILE_KEY = packed record
-    Key: WCHAR;            // WCHAR for consistency; only a byte used however
+    Key: WCHAR;            // WCHAR -- actually a WORD
     packing: WORD;
     Line: DWORD;
     ShiftFlags: DWORD;

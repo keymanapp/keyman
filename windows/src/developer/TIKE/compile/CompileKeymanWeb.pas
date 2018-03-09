@@ -844,47 +844,54 @@ end;
 
 function TCompileKeymanWeb.JavaScript_Shift(fkp: PFILE_KEY; FMnemonic: Boolean): Integer;
 begin
-  if not FMnemonic then
+  if FMnemonic then
   begin
-    if (fkp.ShiftFlags and KMX_ISVIRTUALKEY) = KMX_ISVIRTUALKEY then
+    if (fkp.ShiftFlags and KMX_VIRTUALCHARKEY) = KMX_VIRTUALCHARKEY then
     begin
-      if IsKeyboardVersion10OrLater then
-      begin
-        // Full chiral modifier and state key support starts with KeymanWeb 10.0
-        Result := fkp.ShiftFlags;
-      end
-      else
-      begin
-        // Non-chiral support only and no support for state keys
-        if (fkp.ShiftFlags and (
-          KMX_LCTRLFLAG or KMX_RCTRLFLAG or KMX_LALTFLAG or KMX_RALTFLAG)) <> 0 then   // I4118
-        begin
-          ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags LALT, RALT, LCTRL, RCTRL are not supported in KeymanWeb');
-        end;
+      ReportError(fkp.Line, CERR_VirtualCharacterKeysNotSupportedInKeymanWeb, 'Virtual character keys not currently supported in KeymanWeb');  // I1971   // I4061
+      Exit(0);
+    end;
 
-        if (fkp.ShiftFlags and (
-          KMX_CAPITALFLAG or KMX_NOTCAPITALFLAG or KMX_NUMLOCKFLAG or KMX_NOTNUMLOCKFLAG or KMX_SCROLLFLAG or KMX_NOTSCROLLFLAG)) <> 0 then   // I4118
-        begin
-          ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags CAPS and NCAPS are not supported in KeymanWeb');
-        end;
+    if ((fkp.ShiftFlags and KMX_ISVIRTUALKEY) = KMX_ISVIRTUALKEY) and (Ord(fkp.Key) <= 255) then
+    begin
+      // We prohibit K_ keys for mnemonic layouts. We don't block T_ and U_ keys.
+      // TODO: this doesn't resolve the issue of, e.g. SHIFT+K_SPACE
+      // https://github.com/keymanapp/keyman/issues/265
+      ReportError(fkp.Line, CERR_VirtualKeysNotValidForMnemonicLayouts, 'Virtual keys are not valid for mnemonic layouts');  // I1971   // I4061
+      Exit(0);
+    end;
+  end;
 
-        Result := KMX_ISVIRTUALKEY or (Integer(fkp.ShiftFlags) and (KMX_SHIFTFLAG or KMX_CTRLFLAG or KMX_ALTFLAG));
-      end;
+  if (fkp.ShiftFlags and KMX_ISVIRTUALKEY) = KMX_ISVIRTUALKEY then
+  begin
+    if IsKeyboardVersion10OrLater then
+    begin
+      // Full chiral modifier and state key support starts with KeymanWeb 10.0
+      Result := fkp.ShiftFlags;
     end
     else
     begin
-      Result := KMX_ISVIRTUALKEY;
-      if Pos(fkp.Key, USEnglishShift) > 0 then
-        Result := Result or KMX_SHIFTFLAG;
+      // Non-chiral support only and no support for state keys
+      if (fkp.ShiftFlags and (
+        KMX_LCTRLFLAG or KMX_RCTRLFLAG or KMX_LALTFLAG or KMX_RALTFLAG)) <> 0 then   // I4118
+      begin
+        ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags LALT, RALT, LCTRL, RCTRL are not supported in KeymanWeb');
+      end;
+
+      if (fkp.ShiftFlags and (
+        KMX_CAPITALFLAG or KMX_NOTCAPITALFLAG or KMX_NUMLOCKFLAG or KMX_NOTNUMLOCKFLAG or KMX_SCROLLFLAG or KMX_NOTSCROLLFLAG)) <> 0 then   // I4118
+      begin
+        ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags CAPS and NCAPS are not supported in KeymanWeb');
+      end;
+
+      Result := KMX_ISVIRTUALKEY or (Integer(fkp.ShiftFlags) and (KMX_SHIFTFLAG or KMX_CTRLFLAG or KMX_ALTFLAG));
     end;
   end
   else
   begin
-    if (fkp.ShiftFlags and KMX_VIRTUALCHARKEY) = KMX_VIRTUALCHARKEY then
-      ReportError(fkp.Line, CERR_VirtualCharacterKeysNotSupportedInKeymanWeb, 'Virtual character keys not currently supported in KeymanWeb');  // I1971   // I4061
-    if (fkp.ShiftFlags and KMX_ISVIRTUALKEY) = KMX_ISVIRTUALKEY then
-      ReportError(fkp.Line, CERR_VirtualKeysNotValidForMnemonicLayouts, 'Virtual keys are not valid for mnemonic layouts');  // I1971   // I4061
-    Result := 0;
+    Result := KMX_ISVIRTUALKEY;
+    if Pos(fkp.Key, USEnglishShift) > 0 then
+      Result := Result or KMX_SHIFTFLAG;
   end;
 end;
 

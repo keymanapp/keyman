@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_b06cb2ecda8e00ddb0942b87f2f3ad83</ID>
+      <Filename>mnemonic_layouts_on_web.kmn</Filename>
+      <Filepath>mnemonic_layouts_on_web.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Mnemonic Layout on Web</Name>
+      </Details>
+    </File>
+  </Files>
+</KeymanDeveloperProject>
