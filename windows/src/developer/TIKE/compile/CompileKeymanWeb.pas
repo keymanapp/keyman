@@ -209,6 +209,7 @@ type
     FDebug: Boolean;   // I3681
     FTabStop: string;   // I3681
     fMnemonic: Boolean;
+    FCompilerWarningsAsErrors: Boolean;
     FTouchLayoutFont: string;   // I4872
 
     function JavaScript_String(ch: DWord): string;  // I2242
@@ -300,13 +301,17 @@ end;
 
 function TCompileKeymanWeb.Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallback): Boolean;   // I3681   // I4140   // I4688   // I4866   // I4865
 var
-  CompilerWarningsAsErrors, WarnDeprecatedCode: Boolean;
+  WarnDeprecatedCode: Boolean;
+  Data: string;
 begin
   FCallback := Callback;
   FInFile := InFile;
   FOutFile := OutFile;   // I4140   // I4155   // I4154
   FDebug := Debug;   // I3681
   FError := False;  // I1971
+
+  if FileExists(OutFile) then
+    DeleteFile(OutFile);
 
   if FDebug then   // I3681
   begin
@@ -321,27 +326,36 @@ begin
 
   if Assigned(AOwnerProject) then   // I4865   // I4866
   begin
-    CompilerWarningsAsErrors := AOwnerProject.Options.CompilerWarningsAsErrors;
+    FCompilerWarningsAsErrors := AOwnerProject.Options.CompilerWarningsAsErrors;
     WarnDeprecatedCode := AOwnerProject.Options.WarnDeprecatedCode;
   end
   else
   begin
-    CompilerWarningsAsErrors := False;
+    FCompilerWarningsAsErrors := False;
     WarnDeprecatedCode := True;
   end;
 
   FCallFunctions := TStringList.Create;
   try
     if CompileKeyboardFileToBuffer(PChar(InFile), @fk,
-      CompilerWarningsAsErrors, WarnDeprecatedCode,
+      FCompilerWarningsAsErrors, WarnDeprecatedCode,
       Callback, CKF_KEYMANWEB) > 0 then  // I3482   // I4866   // I4865
       // TODO: Free fk
     begin
-      with TStringStream.Create(WriteCompiledKeyboard, TEncoding.UTF8) do
-      try
-        SaveToFile(OutFile);
-      finally
-        Free;
+      if AOwnerProject.CompilerMessageFile.HasCompileWarning and FCompilerWarningsAsErrors then
+        FError := True;
+
+      if not FError then
+      begin
+        Data := WriteCompiledKeyboard;
+
+        if not FError then
+          with TStringStream.Create(Data, TEncoding.UTF8) do
+          try
+            SaveToFile(OutFile);
+          finally
+            Free;
+          end;
       end;
 
       Result := not FError;  // I1971
@@ -945,8 +959,13 @@ begin
 end;
 
 procedure TCompileKeymanWeb.ReportError(line: Integer; msgcode: LongWord; const text: string);  // I1971
+var
+  flag: LongWord;
 begin
-  if (msgcode and $C000) <> 0 then FError := True;
+  flag := CERR_FLAG or CFATAL_FLAG;
+  if FCompilerWarningsAsErrors then
+    flag := flag or CWARN_FLAG;
+  if (msgcode and flag) <> 0 then FError := True;
   FCallback(line, msgcode, PAnsiChar(AnsiString(text)));  // I3310 /// TODO: K9: convert to Unicode
 end;
 

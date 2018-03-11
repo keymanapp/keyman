@@ -202,7 +202,6 @@ type
 
     procedure CleanFile(ATargetFilename: string; ADontCleanIfInSource: Boolean = False);   // I4692
 
-    property HasCompileWarning: Boolean read FHasWarning write FHasWarning;   // I4706
     property CheckedParameters: Boolean read FCheckedParameters write FCheckedParameters;   // I4710
   public
     constructor Create(AProject: TProject; AFileName: string; AParent: TProjectFile); virtual;
@@ -225,6 +224,7 @@ type
     //property Files: TProjectFileList read FFiles;
     property Modified: Boolean read FModified write SetModified;
     property RelativeOrder: Integer read GetRelativeOrder;
+    property HasCompileWarning: Boolean read FHasWarning write FHasWarning;   // I4706
 
     property Parent: TProjectFile read FParent write SetParent;
     property ParentFileID: string read FParentFileID write FParentFileID; // Used only in load
