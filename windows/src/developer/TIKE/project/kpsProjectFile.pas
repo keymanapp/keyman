@@ -118,9 +118,14 @@ begin
       if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then   // I4706
         Result := False;
 
-      if Result
-        then Log(plsInfo, '''' + FileName + ''' compiled successfully.')
-        else Log(plsError, '''' + FileName + ''' was not compiled successfully.');
+      if Result then
+        Log(plsInfo, '''' + FileName + ''' compiled successfully.')
+      else
+      begin
+        if FileExists(TargetFilename) then
+          System.SysUtils.DeleteFile(TargetFilename);
+        Log(plsError, '''' + FileName + ''' was not compiled successfully.');
+      end;
     except
       on E:Exception do
       begin
