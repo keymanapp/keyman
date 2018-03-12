@@ -344,7 +344,10 @@ begin
       Callback, CKF_KEYMANWEB) > 0 then  // I3482   // I4866   // I4865
       // TODO: Free fk
     begin
-      if AOwnerProject.CompilerMessageFile.HasCompileWarning and FCompilerWarningsAsErrors then
+      if Assigned(AOwnerProject) and
+          Assigned(AOwnerProject.CompilerMessageFile) and
+          AOwnerProject.CompilerMessageFile.HasCompileWarning and
+          FCompilerWarningsAsErrors then
         FError := True;
 
       if not FError then
