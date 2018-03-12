@@ -37,11 +37,15 @@ By default the version generated will be 10.0.700.0.
 ### Release build
 
 To perform a release build, you will need to obtain valid certificates. A release build is
-unnecessary for local development.
+unnecessary for local development. Release builds are currently run from a TeamCity CI
+environment.
 
 1. Start 'x64_x86 Cross Tools Command Prompt for VS 2017'.
 2. Run `make release` from the **windows/src** folder.
 3. Artifacts from a successful build will be placed in **windows/release** folder.
+4. **buildtools/help-keyman-com.sh** will push updated documentation to help.keyman.com.
+   Environment variable `HELP_KEYMAN_COM` needs to be set to the root of the local 
+   help.keyman.com git repository.
 
 Note: by default, the version generated will be 10.0.700.0. You will not be able to
 install it over a later version of Keyman, and will need to uninstall and reinstall.

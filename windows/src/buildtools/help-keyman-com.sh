@@ -120,4 +120,4 @@ function commit_and_push {
 #
 
 upload_keyman_desktop_help || exit 1
-# commit_and_push || exit 1
+commit_and_push || exit 1
