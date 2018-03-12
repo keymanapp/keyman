@@ -258,16 +258,9 @@ begin
 
         if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then Result := False;   // I4706
 
-        if Result then
-        begin
-          Log(plsInfo, '''' + FileName + ''' compiled successfully for Web, iOS, Android, WinPhone to '''+FOutFileName+'''.');   // I4140   // I4504
-          Result := True;
-        end
-        else
-        begin
-          Log(plsError, '''' + FileName + ''' was not compiled successfully for Web, iOS, Android, WinPhone.');   // I4140   // I4504
-          Result := False;
-        end;
+        if Result
+          then Log(plsInfo, '''' + FileName + ''' compiled successfully for Web, iOS, Android, WinPhone to '''+FOutFileName+'''.')   // I4140   // I4504
+          else Log(plsError, '''' + FileName + ''' was not compiled successfully for Web, iOS, Android, WinPhone.');   // I4140   // I4504
       finally
         ckw.Free;
       end;

@@ -25,6 +25,11 @@ unit CompileErrorCodes;
 interface
 
 const
+  CHINT_FLAG = $1000;
+  CWARN_FLAG = $2000;
+  CERR_FLAG = $4000;
+  CFATAL_FLAG = $8000;
+
   CERR_NotSupportedInKeymanWebContext =               $4054;
   CERR_NotSupportedInKeymanWebOutput =                $4055;
   CERR_NotSupportedInKeymanWebStore =                 $4056;
