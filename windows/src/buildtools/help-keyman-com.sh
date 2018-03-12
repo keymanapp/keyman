@@ -65,7 +65,7 @@ function upload_keyman_desktop_help {
   # version of the keyboard, to help.keyman.com/keyboard/<id>/<version>/
   #
   
-  local helppath=$KEYMANROOT/../bin/php/desktop
+  local helppath=$KEYMANROOT/../bin/help/php/desktop
   
   #
   # Look for help source folder.
@@ -92,7 +92,7 @@ function upload_keyman_desktop_help {
 #
 
 function commit_and_push {
-  echo "Committing and pushing updated keyboard documentation (if any)"
+  echo "Committing and pushing updated Keyman Desktop documentation"
   
   pushd $HELP_KEYMAN_COM
   git config user.name "Keyman Build Server"
