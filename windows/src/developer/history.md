@@ -2,14 +2,32 @@
 
 ## 10.0 alpha
 * Keyman Developer moved to open source (#121)
+* Keyman Developer now supports BCP 47 tags throughout (#543)
 * KeymanWeb is now continuously integrated with Developer, ensuring that each update uses the most current version possible (#122)
   - Additional KeymanWeb compatibility fixes (#349)
-* Keyman Developer compiler now generates keyboards that distinguish left and right ctrl/alt (#313)
-* Keyman Developer visual editors now supports keyboards that distinguish left and right ctrl/alt for web/mobile targets (#342)
-* The `&version` store is now optional and the compiler will determine and report on the minimum version required if it is not present (#334)
-* Add support for processing `.keyboard_info` files to command line compiler (#331)
+* Keyman Developer now connects only to *api.keyman.com* and *keyman.com* for online tools (#653)
+  
+### Compilers
+* Keyman Developer compiler now generates keyboards that distinguish left and right ctrl/alt for web (#313)
 * Packages can now include .js files for deployment to iOS and Android (#461)
 * The keyboard compiler now generates .js files that do not include version numbers in the filename (#528)
+* The keyboard compiler now supports treating warnings as errors for packages and web keyboards (#620, #662, #665)
+* Web keyboard compiler now fully supports all deadkey scenarios (#627)
+* Keyboard compiler now compiles .kvks to .kvk (#536)
+
+### Editors and debuggers
+* Keyman Developer visual editors now support keyboards that distinguish left and right ctrl/alt for web/mobile targets (#342)
+* Web debugger now shows character codes above the text editor (#573)
+* Visual keyboard files are now saved by default in .kvks XML format to make version control simpler (#536)
+
+### Language
+* The `&version` store is now optional and the compiler will determine and report on the minimum version required if it is not present (#334)
+* `T_` keys in mnemonic layouts are now better supported in touch keyboards (#660)
+
+### Tools
+* Added support for processing `.keyboard_info` files to command line compiler (#331)
+
+
 
 ## 9.0.523 stable
 * Fix: When a longpress popup is being edited, selecting another primary key can copy the details to that key's popup (additional scenario, I4926)
