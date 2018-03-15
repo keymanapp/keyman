@@ -136,9 +136,9 @@ BOOL CKMTipTextService::_KeymanProcessKeystroke(ITfContext *pContext, WPARAM wPa
 		}
     else {
       hr = pEditSession->GetResult();
-      if (!SUCCEEDED(hr)) {
-        Log(L"_KeymanProcessKeystroke: GetResult failed with %x", hr);
-      }
+      // GetResult will return E_FAIL when we don't process the keystroke
+      // but this actually isn't a failure (it should return S_FALSE, but
+      // that can be work for another day)
     }
 		pEditSession->Release();
 	}
