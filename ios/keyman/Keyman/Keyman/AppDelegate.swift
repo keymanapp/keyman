@@ -19,16 +19,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
   var viewController: MainViewController!
   var navigationController: UINavigationController?
-
+  
   func application(_ app: UIApplication, open url: URL,
                    options: [UIApplicationOpenURLOptionsKey: Any] = [:]) -> Bool {
-    var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    destinationUrl.appendPathComponent("\(url.lastPathComponent).zip")
-    do {
-      try FileManager.default.copyItem(at: url, to: destinationUrl)
-      installAdhocKeyboard(url: destinationUrl)
-    } catch {
-      showKMPError(KMPError.copyFiles)
+    if url.scheme == "keyman" {
+      // legacy ad-hoc keyboard install.
+      // Deprecated; remove in Keyman 11
+      // Extract parameter for .json file and pass to keyboard manager
+      log.info("installing "+url.absoluteString)
+      let queryItems = URLComponents(string: url.absoluteString)?.queryItems
+      let urlComponent: String? = queryItems?.filter({$0.name == "url"}).first?.value
+      let directUrl: URL? = URL.init(string: urlComponent!)
+      
+      Manager.shared.downloadKeyboard(from: directUrl!)
+    } else {
+      // .kmp package install, Keyman 10 onwards
+      var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+      destinationUrl.appendPathComponent("\(url.lastPathComponent).zip")
+      do {
+        try FileManager.default.copyItem(at: url, to: destinationUrl)
+        installAdhocKeyboard(url: destinationUrl)
+      } catch {
+        showKMPError(KMPError.copyFiles)
+      }
     }
     
     return true
