@@ -24,7 +24,7 @@
                     13 Oct 2014 - mcdurdin - I4449 - V9.0 - Font CSS responds as ISO-8859-1 instead of UTF-8
                     27 May 2015 - mcdurdin - I4304 - Keyman Developer fails to start if web debugger port is in use [CrashID:tike.exe_9.0.449.0_0060A38C_EIdSocketError]
                     03 Aug 2015 - mcdurdin - I4824 - Fonts don't always load correctly in KeymanWeb test page
-                    24 Aug 2015 - mcdurdin - I4876 - Default "eng" language should be added if missing during debug to JSON
+                    24 Aug 2015 - mcdurdin - I4876 - Default "en" language should be added if missing during debug to JSON
 *)
 unit UmodWebHttpServer;
 
@@ -344,7 +344,7 @@ var
           '    KN:"'+name+'",'#13#10+
           '    KI:"Keyboard_'+name+'",'#13#10+
           '    KL:"'+name+'",'#13#10+
-          '    KLC:"eng",'#13#10+
+          '    KLC:"en",'#13#10+
           '    KR:"Europe",'#13#10+
           '    KRC:"eu",'#13#10+
           '    KFont:{family:"'+value.FontName[kfontChar]+'"},'#13#10+   // I4063   // I4409
@@ -479,7 +479,7 @@ var
         jsonKeyboard.AddPair('languages', jsonLanguages);
 
         jsonLanguage := TJSONObject.Create;
-        jsonLanguage.AddPair('id', 'eng');
+        jsonLanguage.AddPair('id', 'en');
         jsonLanguage.AddPair('name', 'English');
         jsonLanguages.Add(jsonLanguage);
 
