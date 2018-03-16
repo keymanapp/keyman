@@ -24,7 +24,7 @@
                     13 Oct 2014 - mcdurdin - I4449 - V9.0 - Font CSS responds as ISO-8859-1 instead of UTF-8
                     27 May 2015 - mcdurdin - I4304 - Keyman Developer fails to start if web debugger port is in use [CrashID:tike.exe_9.0.449.0_0060A38C_EIdSocketError]
                     03 Aug 2015 - mcdurdin - I4824 - Fonts don't always load correctly in KeymanWeb test page
-                    24 Aug 2015 - mcdurdin - I4876 - Default "eng" language should be added if missing during debug to JSON
+                    24 Aug 2015 - mcdurdin - I4876 - Default "en" language should be added if missing during debug to JSON
 *)
 unit UmodWebHttpServer;
 
@@ -53,19 +53,27 @@ uses
 type
   TWebDebugKeyboardInfo = class   // I4063
   strict private
-    FFilename: string;
+    FID: string;
+    FPath: string;
+    FVersion: string;   // I4260
     FFontName: TKeyboardFontArray;   // I4409
     FFontData: array[TKeyboardFont] of TStream;   // I4409
     procedure LoadFontData(const AFontName: string; Data: TStream);
-  private
-    FJSONFilename: string;   // I4260
+    function GetStoredFilename: string;
+    function GetJSONFilename: string;   // I4409
     function GetFontData(Index: TKeyboardFont): TStream;   // I4409
-    function GetFontName(Index: TKeyboardFont): string;   // I4409
+    function GetFontName(Index: TKeyboardFont): string;
+    function GetWebFilename: string;
+    function GetName: string;
   public
-    constructor Create(const AFilename: string; AFonts: TKeyboardFontArray);   // I4409
+    constructor Create(const AFilename, AVersion: string; AFonts: TKeyboardFontArray);   // I4409
     destructor Destroy; override;
-    property Filename: string read FFilename;
-    property JSONFilename: string read FJSONFilename;   // I4260
+    property ID: string read FID;
+    property Name: string read GetName;
+    property StoredFilename: string read GetStoredFilename;
+    property WebFilename: string read GetWebFilename;
+    property Version: string read FVersion;
+    property JSONFilename: string read GetJSONFilename;   // I4260
     property FontName[Index: TKeyboardFont]: string read GetFontName;   // I4409
     property FontData[Index: TKeyboardFont]: TStream read GetFontData;   // I4409
   end;
@@ -79,9 +87,9 @@ type
   private
     FKeyboardsCS: TCriticalSection;   // I4036
     FKeyboards: TObjectDictionary<string,TWebDebugKeyboardInfo>;   // I4063
-    function GetKeyboardFileName(const Filename: string): string;
+    function GetKeyboardStoredFileName(const WebFilename: string): string;
   public
-    procedure RegisterKeyboard(const Filename: string; FontInfo: TKeyboardFontArray);   // I4063   // I4409
+    procedure RegisterKeyboard(const Filename, Version: string; FontInfo: TKeyboardFontArray);   // I4063   // I4409
     procedure UnregisterKeyboard(const Filename: string);
     function GetURL: string;
     procedure GetURLs(v: TStrings);
@@ -156,11 +164,11 @@ begin
   FreeAndNil(FKeyboardsCS);   // I4036
 end;
 
-function TmodWebHttpServer.GetKeyboardFileName(const Filename: string): string;
+function TmodWebHttpServer.GetKeyboardStoredFileName(const WebFilename: string): string;
 begin
   FKeyboardsCS.Enter;   // I4036
   try
-    if FKeyboards.ContainsKey(Filename) then Result := FKeyboards[Filename].Filename
+    if FKeyboards.ContainsKey(WebFilename) then Result := FKeyboards[WebFilename].StoredFilename
     else Result := '';
   finally
     FKeyboardsCS.Leave;
@@ -336,7 +344,7 @@ var
           '    KN:"'+name+'",'#13#10+
           '    KI:"Keyboard_'+name+'",'#13#10+
           '    KL:"'+name+'",'#13#10+
-          '    KLC:"eng",'#13#10+
+          '    KLC:"en",'#13#10+
           '    KR:"Europe",'#13#10+
           '    KRC:"eu",'#13#10+
           '    KFont:{family:"'+value.FontName[kfontChar]+'"},'#13#10+   // I4063   // I4409
@@ -413,13 +421,9 @@ var
     JSON: TJSONObject;
     jsonOptions: TJSONObject;
     value: TWebDebugKeyboardInfo;
-    FJSONText: string;
-    Offset: Integer;
-    jsonOptionsPair: TJSONPair;
     FKeyboardBaseUri: string;
     FFontBaseUri: string;
     jsonKeyboard: TJSONObject;
-    jsonPair, jsonKeyboardPair: TJSONPair;
     jsonLanguages: TJSONArray;
     jsonLanguage, jsonFont, jsonOskFont: TJSONObject;
   begin
@@ -437,92 +441,49 @@ var
       end;
 
       value := FKeyboards[filename];
-      if value.JSONFilename = '' then
-      begin
-        Respond404;
-        Exit;
-      end;
 
-      with TStringStream.Create('', TEncoding.UTF8) do
+      // Build the JSON response
+
+      json := TJSONObject.Create;
       try
-        LoadFromFile(value.JSONFilename);
-        FJSONText := DataString;
-      finally
-        Free;
-      end;
+        jsonOptions := TJSONObject.Create;
+        jsonKeyboard := TJSONObject.Create;
 
-      Offset := 0;
+        json.AddPair('options', jsonOptions)
+            .AddPair('keyboard', jsonKeyboard);
 
-      try
-        json := ParseJSONValue(TrimRight(FJSONText), Offset) as TJSONObject;
-        if not Assigned(json) then
-        begin
-          Respond404;
-          Exit;
-        end;
-      except
-        on E:EJSONException do
-        begin
-          Respond404;
-          Exit;
-        end;
-      end;
+        FKeyboardBaseUri := Format('http://%s/keyboard/',[ARequestInfo.Host]);
+        FFontBaseUri := Format('http://%s/font/',[ARequestInfo.Host]);
 
-      try
+        jsonOptions.AddPair('device', 'any');
+        jsonOptions.AddPair('keyboardBaseUri', FKeyboardBaseUri);
+        jsonOptions.AddPair('fontBaseUri', FFontBaseUri);
+
+        jsonFont := TJSONObject.Create;
+        jsonFont.AddPair('family', value.FontName[kfontChar]);   // I4409
+        jsonFont.AddPair('source', value.ID+'-'+value.Version+'-'+TestFontName[kfontChar]+'.ttf');   // I4409
+        jsonKeyboard.AddPair('font', jsonFont);
+
+        jsonOskFont := TJSONObject.Create;
+        jsonOskFont.AddPair('family', value.FontName[kfontOSK]);   // I4409
+        jsonOskFont.AddPair('source', value.ID+'-'+value.Version+'-'+TestFontName[kfontOSK]+'.ttf');   // I4409
+        jsonKeyboard.AddPair('oskFont', jsonOskFont);
+
+        jsonKeyboard.AddPair('id', value.ID);
+        jsonKeyboard.AddPair('name', value.Name);
+        jsonKeyboard.AddPair('filename', value.WebFilename);
+        jsonKeyboard.AddPair('version', value.Version);
+        jsonKeyboard.AddPair('lastModified', FormatDateTime('yyyy-mm-dd', Now));
+
+        jsonLanguages := TJSONArray.Create;
+        jsonKeyboard.AddPair('languages', jsonLanguages);
+
+        jsonLanguage := TJSONObject.Create;
+        jsonLanguage.AddPair('id', 'en');
+        jsonLanguage.AddPair('name', 'English');
+        jsonLanguages.Add(jsonLanguage);
+
         try
-          jsonOptionsPair := json.Get('options');
-          jsonKeyboardPair := json.Get('keyboard');
-          if (jsonOptionsPair = nil) or (jsonKeyboardPair = nil) then
-          begin
-            Respond404;
-            Exit;
-          end;
-
-          if not (jsonOptionsPair.JsonValue is TJSONObject) or
-             not (jsonKeyboardPair.JsonValue is TJSONObject) then
-          begin
-            Respond404;
-            Exit;
-          end;
-
-          jsonOptions := jsonOptionsPair.JsonValue as TJSONObject;
-          jsonKeyboard := jsonKeyboardPair.JsonValue as TJSONObject;
-
-          FKeyboardBaseUri := Format('http://%s/keyboard/',[ARequestInfo.Host]);
-          FFontBaseUri := Format('http://%s/font/',[ARequestInfo.Host]);
-
-          jsonOptions.RemovePair('keyboardBaseUri').Free;
-          jsonOptions.AddPair('keyboardBaseUri', FKeyboardBaseUri);
-
-          jsonOptions.RemovePair('fontBaseUri').Free;
-          jsonOptions.AddPair('fontBaseUri', FFontBaseUri);
-
-          jsonKeyboard.RemovePair('font').Free;
-          jsonFont := TJSONObject.Create;
-          jsonFont.AddPair('family', value.FontName[kfontChar]);   // I4409
-          jsonFont.AddPair('filename', ChangeFileExt(ExtractFileName(value.Filename),'')+'-'+TestFontName[kfontChar]+'.ttf');   // I4409
-          jsonKeyboard.AddPair('font', jsonFont);
-
-          jsonOskFont := TJSONObject.Create;
-          jsonOskFont.AddPair('family', value.FontName[kfontOSK]);   // I4409
-          jsonOskFont.AddPair('filename', ChangeFileExt(ExtractFileName(value.Filename),'')+'-'+TestFontName[kfontOSK]+'.ttf');   // I4409
-          jsonKeyboard.AddPair('oskFont', jsonOskFont);
-
-          jsonPair := jsonKeyboard.Get('languages');   // I4876
-          if Assigned(jsonPair)
-            then jsonLanguages := jsonPair.JsonValue as TJSONArray
-            else jsonLanguages := TJSONArray.Create;
-
-          if jsonLanguages.Count = 0 then   // I4876
-          begin
-            jsonLanguage := TJSONObject.Create;
-            jsonLanguage.AddPair('id', 'eng');
-            jsonLanguage.AddPair('name', 'English');
-            jsonLanguages.Add(jsonLanguage);
-            jsonKeyboard.RemovePair('languages');
-            jsonKeyboard.AddPair('languages', jsonLanguages);
-          end;
-
           AResponseInfo.CharSet := 'UTF-8';
           AResponseInfo.ContentType := 'application/javascript';
           AResponseInfo.ContentText := JSONToString(json, True);
@@ -625,7 +586,7 @@ begin
         Respond404;
         Exit;
       end;
-      doc := GetKeyboardFileName(doc);
+      doc := GetKeyboardStoredFileName(doc);
       if doc = '' then
       begin
         Respond404;
@@ -664,11 +625,14 @@ begin
   end;
 end;
 
-procedure TmodWebHttpServer.RegisterKeyboard(const Filename: string; FontInfo: TKeyboardFontArray);   // I4063   // I4409
+procedure TmodWebHttpServer.RegisterKeyboard(const Filename, Version: string; FontInfo: TKeyboardFontArray);   // I4063   // I4409
+var
+  k: TWebDebugKeyboardInfo;
 begin
+  k := TWebDebugKeyboardInfo.Create(Filename, Version, FontInfo);
   FKeyboardsCS.Enter;   // I4036
   try
-    FKeyboards.AddOrSetValue(ExtractFileName(Filename), TWebDebugKeyboardInfo.Create(Filename, FontInfo));   // I4063
+    FKeyboards.AddOrSetValue(k.WebFilename, k);   // I4063
   finally
     FKeyboardsCS.Leave;
   end;
@@ -686,12 +650,14 @@ end;
 
 { TWebDebugKeyboardInfo }
 
-constructor TWebDebugKeyboardInfo.Create(const AFilename: string; AFonts: TKeyboardFontArray);   // I4409
+constructor TWebDebugKeyboardInfo.Create(const AFilename, AVersion: string; AFonts: TKeyboardFontArray);   // I4409
 var
   I: TKeyboardFont;
 begin
   inherited Create;
-  FFilename := AFilename;
+  FID := ChangeFileExt(ExtractFileName(AFilename), '');
+  FVersion := AVersion;
+  FPath := ExtractFilePath(AFilename);
   for I := Low(TKeyboardFont) to High(TKeyboardFont) do
   begin
     FFontName[I] := AFonts[I];
@@ -703,10 +669,6 @@ begin
     else
       FFontData[i] := nil;
   end;
-  if FileExists(ChangeFileExt(FFilename, '.json')) then   // I4260
-  begin
-    FJSONFilename := ChangeFileExt(FFilename, '.json');
-  end;
 end;
 
 destructor TWebDebugKeyboardInfo.Destroy;   // I4063
@@ -716,6 +678,16 @@ begin
   for I := Low(TKeyboardFont) to High(TKeyboardFont) do   // I4409
     FreeAndNil(FFontData[I]);
   inherited Destroy;
+end;
+
+function TWebDebugKeyboardInfo.GetStoredFilename: string;
+begin
+  Result := FPath + FID + '.js';
+end;
+
+function TWebDebugKeyboardInfo.GetWebFilename: string;
+begin
+  Result := FID + '-' + FVersion + '.js';
 end;
 
 function TWebDebugKeyboardInfo.GetFontData(Index: TKeyboardFont): TStream;   // I4409
@@ -731,6 +703,16 @@ end;
 function TWebDebugKeyboardInfo.GetFontName(Index: TKeyboardFont): string;   // I4409
 begin
   Result := FFontName[Index];
+end;
+
+function TWebDebugKeyboardInfo.GetJSONFilename: string;
+begin
+  Result := FID + '-' + FVersion + '.json';
+end;
+
+function TWebDebugKeyboardInfo.GetName: string;
+begin
+  Result := FID;
 end;
 
 procedure TWebDebugKeyboardInfo.LoadFontData(const AFontName: string;

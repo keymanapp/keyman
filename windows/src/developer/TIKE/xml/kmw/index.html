@@ -38,7 +38,7 @@
         width:100%; 
       }
       
-      #install_link { 
+      .install-link { 
         background: none repeat scroll 0 0 #CCCCCC;
         border: 1px solid #444444;
         border-radius: 4px;
@@ -47,15 +47,32 @@
         display: none;
         font-family: Sans-serif;
         font-size: 10pt;
-        font-weight: bold;
         margin: 0;
         padding: 6px;
+        margin: 2px;
         text-decoration: none;
-    }
+      }
       
       /** Mobile, Tablet **/
-      .touch-device #install_link { 
+      
+      #install-link {
+        font-weight: bold;
+      }
+      
+      .install-link .ios,
+      .install-link .android {
+        display: none;
+      }
+
+      .touch-device #install-link,
+      .touch-device-ios #install-link-ios,
+      .touch-device-android #install-link-android {
         display: inline-block;
+      }
+
+      .touch-device-android .install-link .android,
+      .touch-device-ios .install-link .ios {
+        display: inline;
       }
       
       #top-toolbar {
@@ -152,7 +169,9 @@
           <div id='KeymanWebControl'></div>
         </div>
         <div class='control' id='controls'>
-          <a href='' id='install_link'>Install keyboard into Keyman app</a>
+          <a href='https://keyman.com/go/developer/10.0/ios-app' target='_blank' class='install-link' id='install-link-ios'>Install Keyman for iOS</a>
+          <a href='https://keyman.com/go/developer/10.0/android-app' target='_blank' class='install-link' id='install-link-android'>Install Keyman for Android</a>
+          <a href='' class='install-link' id='install-link'>Add keyboard to Keyman for <span class='android'>Android</span><span class='ios'>iOS</span></a>
         </div>
         <div style='clear:left'></div>
       </div>
@@ -177,7 +196,7 @@
         function (p) {
           //alert(p.internalName);
           var nm = p.internalName.substr('Keyboard_'.length);
-          document.getElementById('install_link').href='keyman://localhost/open?direct=true&url='+location.protocol+'//'+location.host+'/kbinstall/'+nm+'-'+debugKeyboards[nm].version+'.json';
+          document.getElementById('install-link').href='keyman://localhost/open?direct=true&url='+location.protocol+'//'+location.host+'/kbinstall/'+nm+'-'+debugKeyboards[nm].version+'.json';
         });
         
       var ta1 = document.getElementById('ta1');
@@ -186,6 +205,11 @@
       
       if(keyman.util.isTouchDevice()) {
         document.body.className += ' touch-device';
+        if(keyman.util.device.OS == 'iOS') {
+          document.body.className += ' touch-device-ios';
+        } else if(keyman.util.device.OS == 'Android') {
+          document.body.className += ' touch-device-android';
+        }
       } else {
         document.body.className += ' desktop-device';
       }
