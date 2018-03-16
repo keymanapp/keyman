@@ -78,9 +78,16 @@ URLSessionDataDelegate {
 
     // If a destination file for the download has already been specified, let's go ahead and copy it over.
     if let destFile = currentRequest.destinationFile {
+      let destFileUrl = URL(fileURLWithPath: destFile)
       do {
+
+        // Need to delete the file if it already exists (e.g. in case of a previous partial download)
+        if(FileManager.default.fileExists(atPath: destFileUrl.path)) {
+            try FileManager.default.removeItem(at: destFileUrl)
+        }
+
         try FileManager.default.copyItem(at: location,
-                                         to: URL(fileURLWithPath: destFile))
+                                         to: destFileUrl)
       } catch {
         log.error("Error saving the download: \(error)")
       }
