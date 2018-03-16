@@ -108,7 +108,9 @@ uses
   IdGlobalProtocols,
   IdStack,
 
+  System.DateUtils,
   System.JSON,
+  System.TimeSpan,
   System.TypInfo,
 
   Vcl.Dialogs,
@@ -416,6 +418,35 @@ var
     end;
   end;
 
+  //
+  // Modified from System.DateUtils.DateToISO8601
+  // This does ISO8601 Date+Time+TZ without msec, which
+  // is what Swift 4.0 demands...
+  //
+  function FormatFinnickyISO8601Date(const ADate: TDateTime; AInputIsUTC: Boolean = true): string;
+  const
+    SDateFormat: string = 'yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''Z'''; { Do not localize }
+    SOffsetFormat: string = '%s%s%.02d:%.02d'; { Do not localize }
+    Neg: array[Boolean] of string = ('+', '-'); { Do not localize }
+  var
+    Bias: Integer;
+    TimeZone: TTimeZone;
+  begin
+    Result := FormatDateTime(SDateFormat, ADate);
+    if not AInputIsUTC then
+    begin
+      TimeZone := TTimeZone.Local;
+      Bias := Trunc(TimeZone.GetUTCOffset(ADate).Negate.TotalMinutes);
+      if Bias <> 0 then
+      begin
+        // Remove the Z, in order to add the UTC_Offset to the string.
+        SetLength(Result, Result.Length - 1);
+        Result := Format(SOffsetFormat, [Result, Neg[Bias > 0], Abs(Bias) div MinsPerHour,
+          Abs(Bias) mod MinsPerHour]);
+      end
+    end;
+  end;
+
   procedure RespondKeyboardJson(filename: string);   // I4260
   var
     JSON: TJSONObject;
@@ -473,7 +504,7 @@ var
         jsonKeyboard.AddPair('name', value.Name);
         jsonKeyboard.AddPair('filename', value.WebFilename);
         jsonKeyboard.AddPair('version', value.Version);
-        jsonKeyboard.AddPair('lastModified', FormatDateTime('yyyy-mm-dd', Now));
+        jsonKeyboard.AddPair('lastModified', FormatFinnickyISO8601Date(Now, False));
 
         jsonLanguages := TJSONArray.Create;
         jsonKeyboard.AddPair('languages', jsonLanguages);
