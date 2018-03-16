@@ -514,9 +514,9 @@ final class KMKeyboard extends WebView {
   private void sendKMWError(int lineNumber, String sourceId, String message) {
     Bundle params = new Bundle();
     // Error info
-    params.putInt("cm.lineNumber", lineNumber);
-    params.putString("cm.sourceID", sourceId);
-    params.putString("cm.message", message);
+    params.putInt("cm_lineNumber", lineNumber);
+    params.putString("cm_sourceID", sourceId);
+    params.putString("cm_message", message);
 
     // Keyboard info
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
