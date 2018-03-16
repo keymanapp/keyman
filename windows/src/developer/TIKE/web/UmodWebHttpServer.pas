@@ -461,12 +461,12 @@ var
 
         jsonFont := TJSONObject.Create;
         jsonFont.AddPair('family', value.FontName[kfontChar]);   // I4409
-        jsonFont.AddPair('filename', value.ID+'-'+value.Version+'-'+TestFontName[kfontChar]+'.ttf');   // I4409
+        jsonFont.AddPair('source', value.ID+'-'+value.Version+'-'+TestFontName[kfontChar]+'.ttf');   // I4409
         jsonKeyboard.AddPair('font', jsonFont);
 
         jsonOskFont := TJSONObject.Create;
         jsonOskFont.AddPair('family', value.FontName[kfontOSK]);   // I4409
-        jsonOskFont.AddPair('filename', value.ID+'-'+value.Version+'-'+TestFontName[kfontOSK]+'.ttf');   // I4409
+        jsonOskFont.AddPair('source', value.ID+'-'+value.Version+'-'+TestFontName[kfontOSK]+'.ttf');   // I4409
         jsonKeyboard.AddPair('oskFont', jsonOskFont);
 
         jsonKeyboard.AddPair('id', value.ID);
