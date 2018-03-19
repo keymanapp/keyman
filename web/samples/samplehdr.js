@@ -62,8 +62,10 @@
     // Add a fully-specified, locally-sourced, keyboard with custom font  
     kmw.addKeyboards({id:'lao_2008_basic',name:'Lao Basic',
       languages:{
-        id:'lo',name:'Lao',region:'Asia',
-        font:{family:'LaoWeb',source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']}
+          id:'lo',name:'Lao',region:'Asia',
+          // A font can be specified here if its files are available.
+          // Example:
+          //font:{family:'LaoWeb',source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']}
         },
       filename:'./lao_2008_basic.js'
       });   
