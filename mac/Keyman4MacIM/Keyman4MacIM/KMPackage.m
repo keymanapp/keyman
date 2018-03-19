@@ -19,10 +19,14 @@ const NSInteger kUnexpectedFileAsscociationType = 42;
 }
 
 - (void)makeWindowControllers {
-    if ([self.AppDelegate debugMode])
-        NSLog(@"Attempting to display configuration window...");
-    
-    [[self.AppDelegate configWindow] showWindow:nil];
+    // This line is NOT just for debugging purposes. It actually ensures that
+    // the configWindow is created when needed. We used to show the window, but
+    // that was wrong, because it caused the config window to pop up the first
+    // time the user switched to Keyman (i.e., each time after the system restarts).
+    if ([self.AppDelegate configWindow] == nil) {
+        if ([self.AppDelegate debugMode])
+            NSLog(@"Failed to create configuration window!");
+    }
 }
 
 - (KMInputMethodAppDelegate *)AppDelegate {
@@ -57,13 +61,15 @@ const NSInteger kUnexpectedFileAsscociationType = 42;
     if (![self userConfirmsInstallationOfPackageFile:filename]) {
         if ([self.AppDelegate debugMode])
             NSLog(@"Keyman Package file installation cancelled by user.");
+        [self performSelector:@selector(closeAndReleasePresenter:) withObject:nil afterDelay:0.5];
         return YES; // Returning NO causes the system to report a failure to the user.
     }
     
     NSString *tempFile = [self pathForTemporaryKmpFile:filename];
     NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:tempFile];
-    if (![fileWrapper writeToURL:fileURL options:NSFileWrapperWritingAtomic originalContentsURL:nil error:outError])
+    if (![fileWrapper writeToURL:fileURL options:NSFileWrapperWritingAtomic originalContentsURL:nil error:outError]) {
         return NO;
+    }
     
     BOOL didUnzip = [self.AppDelegate unzipFile:tempFile];
     
@@ -88,6 +94,12 @@ const NSInteger kUnexpectedFileAsscociationType = 42;
     if ([self.AppDelegate debugMode])
         NSLog(@"Asking user to confirm installation...");
     
+    // Attempted the following (with and without the first line) to try to
+    // get Keyman to be active forground app so the alert message would not
+    // appear behind other window(s). Unfortunately, it doesn't work, probably
+    // because of Keyman being an input method.
+//    [[self.AppDelegate configWindow] showWindow:nil];
+//    [[NSRunningApplication currentApplication] activateWithOptions:0];
     BOOL result = [alert runModal] == NSAlertFirstButtonReturn;
     return result;
 }
@@ -95,5 +107,11 @@ const NSInteger kUnexpectedFileAsscociationType = 42;
 // This tells the system that we aren't reading the Keyman Package file lazily.
 -(BOOL) isEntireFileLoaded {
     return YES;
+}
+
+- (void)closeAndReleasePresenter:(id)unused {
+    if ([self.AppDelegate debugMode])
+        NSLog(@"Closing document to release presenter...");
+    [self close];
 }
 @end
