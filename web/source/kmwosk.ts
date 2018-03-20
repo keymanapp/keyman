@@ -3276,7 +3276,7 @@ if(!window['keyman']['initialized']) {
           if(n > 0 && shiftKey != null) {
             shiftKey['sp']=osk.buttonClasses['SHIFT-ON'];
             shiftKey['sk']=null;
-            shiftKey['text'] = osk.modifierSpecials[layers[n].id];
+            shiftKey['text'] = osk.modifierSpecials[layers[n].id] ? osk.modifierSpecials[layers[n].id] : "*Shift*";
           }
         }
       }
