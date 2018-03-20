@@ -5,6 +5,7 @@
 * iOS 8+
 * SwiftLint (`brew install swiftlint`)
 * Carthage (`brew install carthage`)
+* [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
 
 ## Keyman App
 
