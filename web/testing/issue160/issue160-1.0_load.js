@@ -1,1 +1,0 @@
-KeymanWeb.KRS(new Stub_Keyboard_issue160()); function Stub_Keyboard_issue160() {this.KF="issue160-1.0.js";this.KI="Keyboard_issue160";this.KN="#160 VKDictionary conflict(web/touch)";}

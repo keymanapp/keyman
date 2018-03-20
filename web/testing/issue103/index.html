@@ -12,7 +12,7 @@
     <!-- Enable IE9 Standards mode -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
       
-    <title>KeymanWeb Sample Page - Uncompiled Source</title>
+    <title>KeymanWeb Sample Page - Keyboard Stub + Registration Decoupling</title>
 
     <!-- Your page CSS --> 
     <style type='text/css'>   
@@ -23,15 +23,7 @@
     </style> 
  
     <!-- Insert uncompiled KeymanWeb source scripts -->              
-    <script src="../../source/kmwstring.js" type="application/javascript"></script>
-    <script src="../../source/kmwbase.js" type="application/javascript"></script>
-    <script src="../../source/keymanweb.js" type="application/javascript"></script>
-    <script src="../../source/kmwosk.js" type="application/javascript"></script>
-    <script src="../../source/kmwnative.js" type="application/javascript"></script>
-    <script src="../../source/kmwcallback.js" type="application/javascript"></script>
-    <script src="../../source/kmwkeymaps.js" type="application/javascript"></script>
-    <script src="../../source/kmwlayout.js" type="application/javascript"></script>
-    <script src="../../source/kmwinit.js" type="application/javascript"></script>             
+    <script src="../../release/unminified/web/keymanweb.js" type="application/javascript"></script>
 
     <!-- 
       For desktop browsers, a script for the user interface must be inserted here.
@@ -40,14 +32,14 @@
       The toolbar UI is best for any page designed to support keyboards for 
       a large number of languages.
     -->
-    <script src="../../source/kmwuitoggle.js"></script>                                                                                           
+    <script src="../../release/unminified/web/kmwuitoggle.js"></script>
  
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.tavultesoft.keymanweb;
+      var kmw=window.keyman;
       kmw.init({
         attachType:'auto',
-        resources:'resources'
+        resources:''
         });
     </script> 
     
@@ -58,7 +50,11 @@
 
 <!-- Sample page HTML -->  
   <body onload='loadKeyboards();'> 
-    <h2>KeymanWeb Sample Page - Uncompiled Source</h2>
+    <h2>KeymanWeb Sample Page - Keyboard Registration Check</h2>
+    <p>
+      This page is designed to test KeymanWeb's behavior when being told to load a keyboard multiple times, both via
+      stub and registration.  If this has been performed correctly, each entry should only be listed once by the UI element.
+    </p>
 
     <div>
     <!-- 
@@ -88,7 +84,7 @@
     <input type='button' id='btn3' onclick='addKeyboard(3);' value='Add' />   
 
 
-    <h3><a href="../samples/index.html">Return to testing home page</a></h3>
+    <h3><a href="../index.html">Return to testing home page</a></h3>
   </div>
 
   </body>
