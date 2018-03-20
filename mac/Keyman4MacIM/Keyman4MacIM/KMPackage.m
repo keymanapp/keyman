@@ -12,21 +12,32 @@
 @implementation KMPackage
 
 const NSInteger kUnexpectedFileAsscociationType = 42;
-BOOL _kmpInstallationCancelled = NO;
+BOOL _installingKmp = NO;
+NSString *filename = nil;
 
 + (BOOL)autosavesInPlace {
     return NO;
 }
 
+// This method gets called whenever a user double-clicks a KMP file, regardless of whether
+// they decide to install it or cancel the installation. It also gets called one time up-front
+// when Keyman first loads.
 - (void)makeWindowControllers {
-    if (_kmpInstallationCancelled) {
-        _kmpInstallationCancelled = NO;
-    }
-    else {
+    // The first part of this conditional ensures that the config window is created,
+    // even if we are not going to display it. If this doesn't happen, then when the
+    // user tries to open the config window manually via the menu, it won't work.
+    if ([self.AppDelegate configWindow] != nil && _installingKmp) {
         if ([self.AppDelegate debugMode])
             NSLog(@"Attempting to display configuration window...");
         
         [[self.AppDelegate configWindow] showWindow:nil];
+        _installingKmp = NO;
+    }
+    if (filename != nil) { // Should be true every time except maybe the very first time.
+        if ([self.AppDelegate debugMode])
+            NSLog(@"Closing document to release presenter...");
+        [self close];
+        filename = nil;
     }
 }
 
@@ -43,7 +54,7 @@ BOOL _kmpInstallationCancelled = NO;
 
 -(BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError * _Nullable __autoreleasing *)outError {
     
-    NSString *filename = [fileWrapper filename];
+    filename = [fileWrapper filename];
     
     if ([self.AppDelegate debugMode])
         NSLog(@"readFromFileWrapper called with file: %@", filename);
@@ -52,7 +63,7 @@ BOOL _kmpInstallationCancelled = NO;
     // we need to close this document so the controller doesn't hold onto it. Otherwise if the user
     // double-clicks the same KMP file a second time it will just assume we want to open the window
     // to display the already open document, rather than attempting to read it again.
-    [self performSelector:@selector(closeAndReleasePresenter:) withObject:nil afterDelay:0.5];
+   // [self performSelector:@selector(closeAndReleasePresenter:) withObject:nil afterDelay:0.5];
     
     if (![typeName isEqualToString: @"Keyman Package"]) {
         if (outError != NULL) {
@@ -68,9 +79,9 @@ BOOL _kmpInstallationCancelled = NO;
     if (![self userConfirmsInstallationOfPackageFile:filename]) {
         if ([self.AppDelegate debugMode])
             NSLog(@"Keyman Package file installation cancelled by user.");
-        _kmpInstallationCancelled = YES;
         return YES; // Returning NO causes the system to report a failure to the user.
     }
+    _installingKmp = YES;
     
     NSString *tempFile = [self pathForTemporaryKmpFile:filename];
     NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:tempFile];
@@ -114,12 +125,5 @@ BOOL _kmpInstallationCancelled = NO;
 // This tells the system that we aren't reading the Keyman Package file lazily.
 -(BOOL) isEntireFileLoaded {
     return YES;
-}
-
-- (void)closeAndReleasePresenter:(id)unused {
-    if ([self.AppDelegate debugMode])
-        NSLog(@"Closing document to release presenter...");
-    _kmpInstallationCancelled = NO; // Just to make sure we don't accidentally leave this set.
-    [self close];
 }
 @end
