@@ -324,7 +324,11 @@ namespace com.keyman {
       // If we have no activeStub because there were no stubs, set the new keyboard as active.
       // Do not trigger on merges.
       if(!this.activeStub && isNew && this.keyboardStubs.length == 1) {
-        this.setActiveKeyboard(sp['KI'], sp['KLC']);
+        // #676: We call _SetActiveKeyboard so we can avoid overwriting 
+        // cookies that determine our active keyboard at page load time
+        this.doBeforeKeyboardChange(sp['KI'], sp['KLC']);
+        this._SetActiveKeyboard(sp['KI'], sp['KLC'], false);
+        this.doKeyboardChange(sp['KI'], sp['KLC']);
       }
     }
 
