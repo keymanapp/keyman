@@ -9,23 +9,24 @@
 #import <Foundation/Foundation.h>
 #import "KMPackage.h"
 
-
 @implementation KMPackage
 
 const NSInteger kUnexpectedFileAsscociationType = 42;
+BOOL _kmpInstallationCancelled = NO;
 
 + (BOOL)autosavesInPlace {
     return NO;
 }
 
 - (void)makeWindowControllers {
-    // This line is NOT just for debugging purposes. It actually ensures that
-    // the configWindow is created when needed. We used to show the window, but
-    // that was wrong, because it caused the config window to pop up the first
-    // time the user switched to Keyman (i.e., each time after the system restarts).
-    if ([self.AppDelegate configWindow] == nil) {
+    if (_kmpInstallationCancelled) {
+        _kmpInstallationCancelled = NO;
+    }
+    else {
         if ([self.AppDelegate debugMode])
-            NSLog(@"Failed to create configuration window!");
+            NSLog(@"Attempting to display configuration window...");
+        
+        [[self.AppDelegate configWindow] showWindow:nil];
     }
 }
 
@@ -67,6 +68,7 @@ const NSInteger kUnexpectedFileAsscociationType = 42;
     if (![self userConfirmsInstallationOfPackageFile:filename]) {
         if ([self.AppDelegate debugMode])
             NSLog(@"Keyman Package file installation cancelled by user.");
+        _kmpInstallationCancelled = YES;
         return YES; // Returning NO causes the system to report a failure to the user.
     }
     
@@ -117,6 +119,7 @@ const NSInteger kUnexpectedFileAsscociationType = 42;
 - (void)closeAndReleasePresenter:(id)unused {
     if ([self.AppDelegate debugMode])
         NSLog(@"Closing document to release presenter...");
+    _kmpInstallationCancelled = NO; // Just to make sure we don't accidentally leave this set.
     [self close];
 }
 @end
