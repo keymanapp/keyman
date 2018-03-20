@@ -731,6 +731,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)showConfigurationWindow {
+    if (_debugMode)
+        NSLog(@"Showing config window...");
     [self.configWindow.window centerInParent];
     [self.configWindow.window makeKeyAndOrderFront:nil];
     [self.configWindow.window setLevel:NSFloatingWindowLevel];
@@ -754,6 +756,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (NSWindowController *)configWindow {
     if (_configWindow.window == nil) {
+        if (_debugMode)
+            NSLog(@"Creating config window...");
         _configWindow = [[KMConfigurationWindowController alloc] initWithWindowNibName:@"preferences"];
     }
 
