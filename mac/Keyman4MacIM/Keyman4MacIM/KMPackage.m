@@ -34,6 +34,10 @@ NSString *filename = nil;
         _installingKmp = NO;
     }
     if (filename != nil) { // Should be true every time except maybe the very first time.
+        // Since we aren't really opening this file as a document, after reading it (or deciding not to)
+        // we need to close this document so the controller doesn't hold onto it. Otherwise, if the user
+        // double-clicks the same KMP file a second time it will just assume we want to open the window
+        // to display the already open document, rather than attempting to read it again.
         if ([self.AppDelegate debugMode])
             NSLog(@"Closing document to release presenter...");
         [self close];
@@ -58,12 +62,6 @@ NSString *filename = nil;
     
     if ([self.AppDelegate debugMode])
         NSLog(@"readFromFileWrapper called with file: %@", filename);
-    
-    // Since we aren't really opening this file as a document, after reading it (or deciding not to)
-    // we need to close this document so the controller doesn't hold onto it. Otherwise if the user
-    // double-clicks the same KMP file a second time it will just assume we want to open the window
-    // to display the already open document, rather than attempting to read it again.
-   // [self performSelector:@selector(closeAndReleasePresenter:) withObject:nil afterDelay:0.5];
     
     if (![typeName isEqualToString: @"Keyman Package"]) {
         if (outError != NULL) {
