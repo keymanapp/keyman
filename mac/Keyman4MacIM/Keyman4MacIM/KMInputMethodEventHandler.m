@@ -161,16 +161,20 @@ NSRange _previousSelRange;
         NSLog(@"sender: %@", sender);
     }
     
-    NSRange selRange = [sender selectedRange];
+    NSRange selRange = ([sender respondsToSelector:@selector(selectedRange)]) ?
+        [sender selectedRange] :
+        NSMakeRange(NSNotFound, NSNotFound);
+    
     NSUInteger len;
     if ([self.AppDelegate debugMode]) {
         NSLog(@"selRange.location: %lu", (unsigned long)selRange.location);
     }
     
     if (selRange.location == NSNotFound) {
-        // REVIEW: For now, if the client always reports its selectedRange as "not found", we're stuck assuming that any
-        // previous context we've built up is indeed current. This may be totally untrue, but if the client can't report
-        // its location, there's no point trying to check to see if it changed unexpectedly.
+        // REVIEW: For now, if the client always reports its location as "not found", we're stuck assuming that we're
+        // still in the same location in the context. This may be totally untrue, but if the client can't report
+        // its location, we have nothing else to go on. (It won't matter anyway if the client also fails to report
+        // its context.)
         _clientSelectionCanChangeUnexpectedly = NO;
         len = _previousSelRange.length;
     }
@@ -577,7 +581,8 @@ NSRange _previousSelRange;
             NSRegularExpression *regexNonCombiningMark = [NSRegularExpression regularExpressionWithPattern:@"\\P{M}" options:NSRegularExpressionCaseInsensitive error:&error];
             
             for (nbrOfPreCharacters = 1; YES; nbrOfPreCharacters++, preCharPos--) {
-                preChar = [[client attributedSubstringFromRange:NSMakeRange(preCharPos, nbrOfPreCharacters)] string];
+                if ([client respondsToSelector:@selector(attributedSubstringFromRange:)])
+                    preChar = [[client attributedSubstringFromRange:NSMakeRange(preCharPos, nbrOfPreCharacters)] string];
                 if (!preChar) {
                     if ([self.AppDelegate debugMode]) {
                         NSLog(@"Client apparently doesn't implement attributedSubstringFromRange. Attempting to get preChar from context...");
