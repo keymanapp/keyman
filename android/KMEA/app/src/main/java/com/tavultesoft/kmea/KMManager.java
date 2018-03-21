@@ -56,7 +56,7 @@ public final class KMManager {
   private static final String KMEngineVersion = "2.4.3";
   private static final String TAG = "KMManager";
 
-  private static FirebaseAnalytics mFirebaseAnalytics;
+  static FirebaseAnalytics mFirebaseAnalytics;
 
   // Keyboard types
   public enum KeyboardType {
@@ -223,14 +223,14 @@ public final class KMManager {
     return false;
   }
 
-  private static void initInAppKeyboard(Context appContext) {
+  static void initInAppKeyboard(Context appContext) {
     if (InAppKeyboard == null) {
       if (isDebugMode())
         Log.d(TAG, "Initializing In-App Keyboard...");
       int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
       RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
       params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-      InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
+      InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP, mFirebaseAnalytics);
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.setVerticalScrollBarEnabled(false);
       InAppKeyboard.setHorizontalScrollBarEnabled(false);
@@ -240,14 +240,14 @@ public final class KMManager {
     }
   }
 
-  private static void initSystemKeyboard(Context appContext) {
+  static void initSystemKeyboard(Context appContext) {
     if (SystemKeyboard == null) {
       if (isDebugMode())
         Log.d(TAG, "Initializing System Keyboard...");
       int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
       RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
       params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-      SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM, mFirebaseAnalytics);
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.setVerticalScrollBarEnabled(false);
       SystemKeyboard.setHorizontalScrollBarEnabled(false);

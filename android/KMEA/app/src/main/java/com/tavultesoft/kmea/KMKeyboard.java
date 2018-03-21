@@ -81,24 +81,27 @@ final class KMKeyboard extends WebView {
   public String specialOskFont = "";
 
   public KMKeyboard(Context context) {
-    super(context);
-    this.context = context;
-    this.keyboardType = KeyboardType.KEYBOARD_TYPE_INAPP;
-    initKMKeyboard(context);
+    this(context, KeyboardType.KEYBOARD_TYPE_INAPP, FirebaseAnalytics.getInstance(context));
   }
 
   public KMKeyboard(Context context, KeyboardType keyboardType) {
+    this(context, keyboardType, FirebaseAnalytics.getInstance(context));
+  }
+
+  // Constructed for use in JUnit testing; this allows us to "mock" FirebaseAnalytics
+  // to prevent testing issues.
+  protected KMKeyboard(Context context, KeyboardType keyboardType, FirebaseAnalytics analytics) {
     super(context);
     this.context = context;
     this.keyboardType = keyboardType;
+    mFirebaseAnalytics = analytics;
+
     initKMKeyboard(context);
   }
 
   @SuppressWarnings("deprecation")
   @SuppressLint("SetJavaScriptEnabled")
   public void initKMKeyboard(final Context context) {
-    mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
-
     setFocusable(false);
     clearCache(true);
     getSettings().setJavaScriptEnabled(true);
