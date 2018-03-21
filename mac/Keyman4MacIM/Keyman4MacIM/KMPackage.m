@@ -33,7 +33,7 @@ NSString *filename = nil;
         [[self.AppDelegate configWindow] showWindow:nil];
         _installingKmp = NO;
     }
-    if (filename != nil) { // Should be true every time except maybe the very first time.
+    if (filename != nil) { // Should be true every time except maybe the very first time (when loading).
         // Since we aren't really opening this file as a document, after reading it (or deciding not to)
         // we need to close this document so the controller doesn't hold onto it. Otherwise, if the user
         // double-clicks the same KMP file a second time it will just assume we want to open the window
@@ -74,12 +74,16 @@ NSString *filename = nil;
         return NO;
     }
     
-    if (![self userConfirmsInstallationOfPackageFile:filename]) {
+    // If the following is set to NO, then it will prevent displaying the config window when
+    // makeWindowControllers gets called. (Unfortunately, something about the document infrastructure
+    // in macOS will cause it to be displayed if it has not yet been displayed, even if the user cancels
+    // the installation. This is a bug that should be fixed, but no solution is yet apparent.)
+    _installingKmp = [self userConfirmsInstallationOfPackageFile:filename];
+    if (!_installingKmp) {
         if ([self.AppDelegate debugMode])
             NSLog(@"Keyman Package file installation cancelled by user.");
         return YES; // Returning NO causes the system to report a failure to the user.
     }
-    _installingKmp = YES;
     
     NSString *tempFile = [self pathForTemporaryKmpFile:filename];
     NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:tempFile];
