@@ -14,7 +14,7 @@
           
             <ul>
               <li><a href="https://keyman.com/go/developer/10.0/help-keyboards">Share source and add to Keyman keyboard repositories</a></li>
-              <li><a href="https://keyman.com/go/developer/10.0/help-packages">Windows and Mac distribution</a></li>
+              <li><a href="https://keyman.com/go/developer/10.0/help-packages">Windows and macOS distribution</a></li>
               <li><a href="https://keyman.com/go/developer/10.0/help-mobile">iPhone, iPad and Android distribution</a></li>
               <li><a href="https://keyman.com/go/developer/10.0/keymanweb">Web soft keyboard</a></li>
               <li><a href="https://keyman.com/go/developer/10.0/keyman-engine-home">Keyman Engine</a></li>
@@ -33,9 +33,9 @@
           <ul>
             <li>Add your keyboard to the Keyman Keyboard Repositories. In order to do this, you must share the source code of your keyboard.
                 <b>Recommended option!</b> &#160; <a href='https://keyman.com/go/developer/10.0/help-keyboards'>Learn more</a></li>
-            <li>Share a package file yourself: just give a .kmp file to any Keyman Desktop or Keyman for Mac user and they can install it. Or put the .kmp file onto a website for users to download. 
+            <li>Share a package file yourself: just give a .kmp file to any Keyman user, on Windows, macOS, iOS or Android and they can install it. Or put the .kmp file onto a website for users to download.
                 <a href='https://keyman.com/go/developer/10.0/help-packages'>Learn more</a></li>
-            <li>Share a touch keyboard with any Keyman for Android or Keyman for iPhone and iPad user. 
+            <li>Sharing package files to mobile devices can be more complex. Learn about specific techniques for distribution to mobile devices.
                 <a href='https://keyman.com/go/developer/10.0/help-mobile'>Learn more</a></li>
             <li>Add your keyboard to a website using KeymanWeb
                 <a href='https://keyman.com/go/developer/10.0/keymanweb'>Learn more</a></li>
