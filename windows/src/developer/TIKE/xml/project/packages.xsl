@@ -22,10 +22,10 @@
         <div class="pagetext">
           <h2>Package keyboards with fonts and documentation</h2>
 
-          <p>After creating a keyboard, you should create a package to make it easier to install on Windows or Mac OS X.  A package can include multiple
+          <p>After creating a keyboard, you should create a package in order to distribute the keyboard to all Windows, macOS, iOS and Android. A package can include multiple
           keyboards, fonts, a welcome page, documentation and shortcuts.</p>
           
-          <p>A package can be installed into Keyman Desktop or Keyman for Mac OS X, and uploaded to the Keyman website to share with others.</p>
+          <p>A package can be installed into any of the end user Keyman apps, and uploaded to the Keyman website to share with others.</p>
           
           <p>Learn more about distributing your packages and keyboards on the Distribution tab.</p>
                     
