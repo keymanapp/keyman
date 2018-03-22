@@ -34,7 +34,7 @@ if [ -z ${MAJOR_VERSION+x} ]; then
   exit 1
 fi
 
-if [ ! -d "$HELP_KEYMAN_COM/products/desktop/$MAJOR_VERSION/docs" ]; then
+if [ ! -d "$HELP_KEYMAN_COM/products/desktop/" ]; then
   >&2 echo "HELP_KEYMAN_COM path ($HELP_KEYMAN_COM) does not appear to be valid."
   exit 1
 fi
@@ -83,11 +83,8 @@ function upload_keyman_desktop_help {
   fi
   
   local dstpath="$HELP_KEYMAN_COM/products/desktop/$MAJOR_VERSION/docs"
-
-  if [[ ! -d "$dstpath" ]]; then
-    echo "${t_yel}Warning: The destination path $dstpath does not exist${t_end}"
-    return 0
-  fi
+  
+  mkdir -p "$dstpath"
   
   rm -rf "$dstpath/*"
   cp -r "$helppath"/* "$dstpath/"
