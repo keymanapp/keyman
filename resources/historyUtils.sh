@@ -51,6 +51,7 @@ re_header="^###[^#](.*)"
 
 re_v_major="^([0-9]+)\.[0-9]+"
 re_v_alpha="^([0-9]+\.[0-9]+)"
+re_v_build="^[0-9]+\.[0-9]+\.([0-9]+)"
 
 ###                               Core Parsing                               ###
 
@@ -71,7 +72,7 @@ get_line_type() {
   elif [[ "$1" =~ $re_item ]]; then
     line_type="listitem"
   elif [[ "$1" =~ $re_blank ]]; then
-   line_type="whitespace"
+    line_type="whitespace"
   elif [[ "$1" =~ $re_header ]]; then
     line_type="header"
   fi
@@ -152,7 +153,7 @@ validate_history_file() {
 
 ###                           Version Changelog Extraction                            ###
 
-# $1 - a full version string (likely in major.minor.alpha form)
+# $1 - a full version string (likely in major.minor.build form)
 # Returns $v_alpha, containing only major.minor if it may be extracted.  Returns $1 if not.
 get_alpha_version() {
   [[ $1 =~ $re_v_alpha ]]
@@ -160,6 +161,18 @@ get_alpha_version() {
     v_alpha=${BASH_REMATCH[1]}
   else
     v_alpha=$1
+  fi
+}
+
+# $1 - a full version string
+# Returns $v_build, containing the final .build portion of a major.minor.build version number.
+# If missing, returns an empty string.
+get_build_number() {
+  [[ "$1" =~ $re_v_build ]]
+  if [ ! -z "${BASH_REMATCH[1]}" ]; then
+    v_build="${BASH_REMATCH[1]}"
+  else
+    v_build=
   fi
 }
 
@@ -197,12 +210,30 @@ get_version_helper() {
       t="${BASH_REMATCH[2]}"
     fi
 
-    if [[ "$v" = "$2" && "$t" = "$3" ]]; then
-      in_block=true
-      version_found=true
+    # Splits the version numbers into their components to facilitate finding
+    # 1) the FIRST version in history.md
+    # 2) with equal to or lesser version
+    # 3) of the same tier.
+    if [[ "$v" != "" && "$t" = "$3" && $version_found = false ]]; then
+      get_alpha_version "$v"
+      get_build_number "$v"
 
-      if [[ -n $d ]]; then
-        echo "Published on $d."
+      found_v="$v_alpha"
+      found_b="$v_build"
+
+      get_alpha_version "$2"
+      get_build_number "$2"
+
+      search_v="$v_alpha"
+      search_b="$v_build"
+
+      if [[ "$found_v" = "$search_v" && ( $found_b -le $search_b ) ]]; then
+        in_block=true
+        version_found=true
+
+        if [[ -n $d ]]; then
+          echo "Published on $d."
+        fi
       fi
     fi
   fi
