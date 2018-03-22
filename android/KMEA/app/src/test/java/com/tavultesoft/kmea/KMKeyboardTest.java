@@ -15,10 +15,12 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowApplication;
 import org.robolectric.shadows.ShadowLog;
+import org.robolectric.shadows.ShadowWebView;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
+import static org.robolectric.Shadows.shadowOf;
 
 /**
  * Created by jahorton on 3/21/2018.
@@ -47,11 +49,20 @@ public class KMKeyboardTest {
     // Loads the keyboard's HTML page, initializing KMW.
     SimpleFuture<Boolean> initSuccess = KMManager.initInAppKeyboard(context);
 
-    boolean result = initSuccess.get(1, TimeUnit.SECONDS);
-    assertTrue(result);
+    boolean result = false;
+    try {
+      result = initSuccess.get(1, TimeUnit.SECONDS);
+    } finally {
+      if (!result) {
+        KMKeyboard kbdInterface = KMManager.InAppKeyboard;
 
-    KMKeyboard keyboardInterface = KMManager.InAppKeyboard;
-    //keyboardInterface.e
+        // ... Robolectric's implementation is just a hollow shell.  *sigh*.
+        String url = shadowOf(kbdInterface).getLastLoadedUrl();
+        assertNotNull(url);
+      }
+
+      assertTrue(result);
+    }
   }
 
 //  @Test
