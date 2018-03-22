@@ -1,5 +1,8 @@
 # Keyman for iPhone and iPad Version History
 
+## 11.0 alpha
+* Move to 11.0
+
 ## 10.0 alpha
 * Updated versioning scheme for uniformity across all Keyman products.
 * Keyman app migrated to Swift 4.0 (#305)
