@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 2018-03-22 10.0.10000075 beta
+* No changes, just published latest 10.0 alpha as beta
+
 ## 10.0 alpha
 * Refactor how longpress keys on touch layout are processed in KMW engine. This prevents key text 
   from being processed as key codes, and fixes the app crash when longpress with K_SPACE.
