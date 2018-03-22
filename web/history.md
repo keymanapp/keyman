@@ -1,6 +1,6 @@
 # KeymanWeb Version History
 
-## 10.0 alpha
+## 2018-03-22 10.0.83 beta
 * Updated versioning scheme for uniformity across all Keyman products.
 * Reworked the KeymanWeb attachment model significantly to allow greater user control. (#98)
   * The 'kmw-disabled' flag may now be used to automatically enable and disable KMW for attached controls.
