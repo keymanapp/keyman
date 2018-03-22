@@ -48,6 +48,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.SimpleFuture;
 
 import org.json.JSONObject;
 
@@ -56,7 +57,7 @@ public final class KMManager {
   private static final String KMEngineVersion = "2.4.3";
   private static final String TAG = "KMManager";
 
-  static FirebaseAnalytics mFirebaseAnalytics;
+  private static FirebaseAnalytics mFirebaseAnalytics;
 
   // Keyboard types
   public enum KeyboardType {
@@ -196,6 +197,12 @@ public final class KMManager {
     PackageProcessor.initialize(new File(getResourceRoot()));
   }
 
+  public static void test_initialize(Context context, FirebaseAnalytics analytics) {
+    KMManager.mFirebaseAnalytics = analytics;
+    KMManager.appContext = context;
+    KMManager.copyAssets(context);
+  }
+
   public static void setInputMethodService(InputMethodService service) {
     IMService = service;
   }
@@ -223,7 +230,7 @@ public final class KMManager {
     return false;
   }
 
-  static void initInAppKeyboard(Context appContext) {
+  static SimpleFuture<Boolean> initInAppKeyboard(Context appContext) {
     if (InAppKeyboard == null) {
       if (isDebugMode())
         Log.d(TAG, "Initializing In-App Keyboard...");
@@ -236,11 +243,13 @@ public final class KMManager {
       InAppKeyboard.setHorizontalScrollBarEnabled(false);
       InAppKeyboard.setWebViewClient(new KMInAppKeyboardWebViewClient(appContext));
       InAppKeyboard.addJavascriptInterface(new KMInAppKeyboardJSHandler(appContext), "jsInterface");
-      InAppKeyboard.loadKeyboard();
+      return InAppKeyboard.loadKeyboard();
+    } else {
+      return new SimpleFuture<Boolean>(true);
     }
   }
 
-  static void initSystemKeyboard(Context appContext) {
+  static SimpleFuture<Boolean> initSystemKeyboard(Context appContext) {
     if (SystemKeyboard == null) {
       if (isDebugMode())
         Log.d(TAG, "Initializing System Keyboard...");
@@ -253,7 +262,9 @@ public final class KMManager {
       SystemKeyboard.setHorizontalScrollBarEnabled(false);
       SystemKeyboard.setWebViewClient(new KMSystemKeyboardWebViewClient(appContext));
       SystemKeyboard.addJavascriptInterface(new KMSystemKeyboardJSHandler(appContext), "jsInterface");
-      SystemKeyboard.loadKeyboard();
+      return SystemKeyboard.loadKeyboard();
+    } else {
+      return new SimpleFuture<Boolean>(true);
     }
   }
 
@@ -1591,6 +1602,16 @@ public final class KMManager {
 
     KMInAppKeyboardJSHandler(Context context) {
       this.context = context;
+    }
+
+    // This annotation is required in Jelly Bean and later:
+    @JavascriptInterface
+    public void initCallback(boolean success, String errMessage) {
+      if(!success) {
+        Log.e("KMManager", "The embedded KMW engine failed to initialize: " + errMessage);
+      }
+
+      InAppKeyboard.initFuture.put(success);
     }
 
     // This annotation is required in Jelly Bean and later:

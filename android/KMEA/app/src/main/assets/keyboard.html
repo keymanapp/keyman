@@ -19,6 +19,9 @@
       window.console.log('Device type = '+device);
       window.console.log('Keyboard height = '+oskHeight);
       var kmw=window['keyman'];
+
+      kmw.setInitCallback(jsInterface.initCallback);
+
       kmw.init({'app':device,'fonts':'packages/'});
       kmw['util']['setOption']('attachType','manual');
       kmw['oninserttext'] = insertText;

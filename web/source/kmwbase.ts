@@ -83,6 +83,7 @@ namespace com.keyman {
     alignInputs(b){}
     namespaceID(Pstub) {};
     preserveID(Pk) {};
+    initCallback: (success: boolean, err: string) => void;
 
     setInitialized(val: number) {
       this.initialized = this['initialized'] = val;

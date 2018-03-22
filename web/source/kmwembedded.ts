@@ -36,6 +36,10 @@
     if(device.app.indexOf('Tablet') >= 0) device.formFactor='tablet';
     device.browser='native';
   };
+
+  keymanweb.setInitCallback = function(callback: (success: boolean, err: string) => void) {
+    keymanweb.initCallback = callback;
+  }
   
   // Get default style sheet path
   keymanweb.getStyleSheetPath = function(ssName) {

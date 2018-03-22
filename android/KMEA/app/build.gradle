@@ -4,6 +4,16 @@ android {
     compileSdkVersion 25
     buildToolsVersion "26.0.2"
 
+    /*libraryVariants.all { variant ->
+        def productFlavor = ""
+        variant.productFlavors.each {
+            productFlavor += "${it.name.capitalize()}"
+        }
+
+        def buildType = "${variant.buildType.name.capitalize()}"
+        tasks["compile${productFlavor}${buildType}UnitTestSources"].dependsOn(tasks["merge${productFlavor}${buildType}Assets"])
+    }*/
+
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 25

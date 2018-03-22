@@ -1495,226 +1495,238 @@ namespace com.keyman {
 
         // Otherwise, assume relative to source path
         return this.keyman.srcPath+p;
-      }            
+      }
+
+      var success = true;
+      var error;
       
-      // Explicit (user-defined) parameter initialization       
-      opt=this.keyman.options;
-      if(typeof(arg) == 'object' && arg !== null)
-      {
-        for(p in opt)
-        { 
-          if(arg.hasOwnProperty(p)) opt[p] = arg[p];
+      try {
+        // Explicit (user-defined) parameter initialization       
+        opt=this.keyman.options;
+        if(typeof(arg) == 'object' && arg !== null)
+        {
+          for(p in opt)
+          { 
+            if(arg.hasOwnProperty(p)) opt[p] = arg[p];
+          }
         }
-      }
-    
-      // Get default paths and device options
-      if(opt['root'] != '') {
-        this.keyman.rootPath = fixPath(opt['root']); 
-      }
-
-      // Keyboards and fonts are located with respect to the server root by default          
-      //if(opt['keyboards'] == '') opt['keyboards'] = keymanweb.rootPath+'keyboard/';
-      //if(opt['fonts'] == '') opt['fonts'] = keymanweb.rootPath+'font/';
-    
-      // Resources are located with respect to the engine by default 
-      if(opt['resources'] == '') {
-        opt['resources'] = this.keyman.srcPath;
-      }
-    
-      // Convert resource, keyboard and font paths to absolute URLs
-      opt['resources'] = fixPath(opt['resources']);
-      opt['keyboards'] = fixPath(opt['keyboards']);
-      opt['fonts'] = fixPath(opt['fonts']);    
-
-      // Set element attachment type    
-      if(opt['attachType'] == '') {
-        opt['attachType'] = 'auto';
-      }
-
-      // Set default device options
-      this.keyman.setDefaultDeviceOptions(opt);   
       
-      // Only do remainder of initialization once!  
-      if(this.keyman.initialized) {
-        return;
-      }
-
-      var keyman: KeymanBase = this.keyman;
-      var domManager = this;
-
-      // Do not initialize until the document has been fully loaded
-      if(document.readyState !== 'complete')
-      {
-        window.setTimeout(function(){
-          domManager.init(arg);
-        }, 50);
-        return;
-      }
-
-      this.keyman._MasterDocument = window.document;
-
-      /**
-       * Initialization of touch devices and browser interfaces must be done 
-       * after all resources are loaded, during final stage of initialization
-       *        
-       */            
-      
-      // Treat Android devices as phones if either (reported) screen dimension is less than 4" 
-      if(device.OS == 'Android')
-      {
-        // Determine actual device characteristics  I3363 (Build 301)
-        // TODO: device.dpi may no longer be needed - if so, get rid of it.
-        var dpi = device.getDPI(); //TODO: this will not work when called from HEAD!!
-        device.formFactor=((screen.height < 4.0 * dpi) || (screen.width < 4.0 * dpi)) ? 'phone' : 'tablet';
-      }
-    
-      // Set exposed initialization flag member for UI (and other) code to use 
-      this.keyman.setInitialized(1);
-
-      // Finish keymanweb and OSK initialization once all necessary resources are available
-      osk.prepare();
-    
-      // Create and save the remote keyboard loading delay indicator
-      util.prepareWait();
-
-      // Register deferred keyboard stubs (addKeyboards() format)
-      this.keyman.keyboardManager.registerDeferredStubs();
-    
-      // Initialize the desktop UI
-      this.initializeUI();
-    
-      // Register deferred keyboards 
-      this.keyman.keyboardManager.registerDeferredKeyboards();
-    
-      // Exit initialization here if we're using an embedded code path.
-      if(this.keyman.isEmbedded) {
-        if(!this.keyman.keyboardManager.setDefaultKeyboard()) {
-          console.error("No keyboard stubs exist - cannot initialize keyboard!");
+        // Get default paths and device options
+        if(opt['root'] != '') {
+          this.keyman.rootPath = fixPath(opt['root']); 
         }
-        return;
-      }
 
-      // Determine the default font for mapped elements
-      this.keyman.appliedFont=this.keyman.baseFont=this.getBaseFont();
-
-      // Add orientationchange event handler to manage orientation changes on mobile devices
-      // Initialize touch-screen device interface  I3363 (Build 301)
-      if(device.touchable) {
-        this.keyman.handleRotationEvents();
-      }    
-      // Initialize browser interface
-
-      if(this.keyman.options['attachType'] != 'manual') {
-        this._SetupDocument(document.documentElement);
-      }
-
-      // Create an ordered list of all input and textarea fields
-      this.listInputs();
-    
-      // Initialize the OSK and set default OSK styles
-      // Note that this should *never* be called before the OSK has been initialized.
-      // However, it possibly may be called before the OSK has been fully defined with the current keyboard, need to check.    
-      //osk._Load(); 
+        // Keyboards and fonts are located with respect to the server root by default          
+        //if(opt['keyboards'] == '') opt['keyboards'] = keymanweb.rootPath+'keyboard/';
+        //if(opt['fonts'] == '') opt['fonts'] = keymanweb.rootPath+'font/';
       
-      //document.body.appendChild(osk._Box); 
-
-      //osk._Load(false);
+        // Resources are located with respect to the engine by default 
+        if(opt['resources'] == '') {
+          opt['resources'] = this.keyman.srcPath;
+        }
       
-      // I3363 (Build 301)
-      if(device.touchable) {
-        // Handle OSK touchend events (prevent propagation)
-        osk._Box.addEventListener('touchend',function(e){
-          e.stopPropagation();
-        }, false);
+        // Convert resource, keyboard and font paths to absolute URLs
+        opt['resources'] = fixPath(opt['resources']);
+        opt['keyboards'] = fixPath(opt['keyboards']);
+        opt['fonts'] = fixPath(opt['fonts']);    
 
-        // Add a blank DIV to the bottom of the page to allow the bottom of the page to be shown
-        dTrailer=document.createElement('DIV');
-        ds=dTrailer.style;
-        ds.width='100%';
-        ds.height=(screen.width/2)+'px';
-        document.body.appendChild(dTrailer);  
+        // Set element attachment type    
+        if(opt['attachType'] == '') {
+          opt['attachType'] = 'auto';
+        }
+
+        // Set default device options
+        this.keyman.setDefaultDeviceOptions(opt);   
         
-        // On Chrome, scrolling up or down causes the URL bar to be shown or hidden 
-        // according to whether or not the document is at the top of the screen.
-        // But when doing that, each OSK row top and height gets modified by Chrome
-        // looking very ugly.  Itwould be best to hide the OSK then show it again 
-        // when the user scroll finishes, but Chrome has no way to reliably report
-        // the touch end event after a move. c.f. http://code.google.com/p/chromium/issues/detail?id=152913
-        // The best compromise behaviour is simply to hide the OSK whenever any 
-        // non-input and non-OSK element is touched.
-        if(device.OS == 'Android' && navigator.userAgent.indexOf('Chrome') > 0) {
-          (<any>this.keyman).hideOskWhileScrolling=function(e) {           
-            if(typeof(osk._Box) == 'undefined') return;
-            if(typeof(osk._Box.style) == 'undefined') return;
-
-            // The following tests are needed to prevent the OSK from being hidden during normal input!
-            p=e.target.parentNode;
-            if(typeof(p) != 'undefined' && p != null) {
-              if(p.className.indexOf('keymanweb-input') >= 0) return; 
-              if(p.className.indexOf('kmw-key-') >= 0) return; 
-              if(typeof(p.parentNode) != 'undefined') {
-                p=p.parentNode;
-                if(p.className.indexOf('keymanweb-input') >= 0) return; 
-                if(p.className.indexOf('kmw-key-') >= 0) return; 
-              }
-            }          
-            osk.hideNow(); 
-          }        
-          this.keyman.util.attachDOMEvent(document.body, 'touchstart', (<any>this.keyman).hideOskWhileScrolling, false);
-        } else {
-          (<any>this.keyman).conditionallyHideOsk = function() {
-            // Should not hide OSK if simply closing the language menu (30/4/15)
-            if((<any>keyman).hideOnRelease && !osk.lgList) osk.hideNow();
-            (<any>keyman).hideOnRelease=false;
-          };
-          (<any>this.keyman).hideOskIfOnBody = function(e) {
-            (<any>keyman).touchY=e.touches[0].screenY;
-            (<any>keyman).hideOnRelease=true;
-          };
-          (<any>this.keyman).cancelHideIfScrolling = function(e) {
-            var y=e.touches[0].screenY,y0=(<any>keyman).touchY;    
-            if(y-y0 > 5 || y0-y < 5) (<any>keyman).hideOnRelease = false;
-          };
-
-          this.keyman.util.attachDOMEvent(document.body, 'touchstart',(<any>this.keyman).hideOskIfOnBody,false);      
-          this.keyman.util.attachDOMEvent(document.body, 'touchmove',(<any>this.keyman).cancelHideIfScrolling,false);      
-          this.keyman.util.attachDOMEvent(document.body, 'touchend',(<any>this.keyman).conditionallyHideOsk,false);      
-        } 
-      }
-
-      //document.body.appendChild(keymanweb._StyleBlock);
-    
-      // Restore and reload the currently selected keyboard, selecting a default keyboard if necessary.
-      this.keyman.keyboardManager.restoreCurrentKeyboard(); 
-
-      /* Setup of handlers for dynamically-added and (eventually) dynamically-removed elements.
-        * Reference: https://developer.mozilla.org/en/docs/Web/API/MutationObserver
-        * 
-        * We place it here so that it loads after most of the other UI loads, reducing the MutationObserver's overhead.
-        * Of course, we only want to dynamically add elements if the user hasn't enabled the manual attachment option.
-        */
-      
-      if(MutationObserver) {
-        var observationTarget = document.querySelector('body'), observationConfig: MutationObserverInit;
-        if(this.keyman.options['attachType'] != 'manual') { //I1961
-          observationConfig = { childList: true, subtree: true};
-          this.attachmentObserver = new MutationObserver(this._AutoAttachObserverCore);
-          this.attachmentObserver.observe(observationTarget, observationConfig);
+        // Only do remainder of initialization once!  
+        if(this.keyman.initialized) {
+          return;
         }
+
+        var keyman: KeymanBase = this.keyman;
+        var domManager = this;
+
+        // Do not initialize until the document has been fully loaded
+        if(document.readyState !== 'complete')
+        {
+          window.setTimeout(function(){
+            domManager.init(arg);
+          }, 50);
+          return;
+        }
+
+        this.keyman._MasterDocument = window.document;
 
         /**
-         * Setup of handlers for dynamic detection of the kmw-disabled class tag that controls enablement.
-         */
-        observationConfig = { subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'readonly']};
-        this.enablementObserver = new MutationObserver(this._EnablementMutationObserverCore);
-        this.enablementObserver.observe(observationTarget, observationConfig);
-      } else {
-        console.warn("Your browser is outdated and does not support MutationObservers, a web feature " + 
-          "needed by KeymanWeb to support dynamically-added elements.");
-      }
+         * Initialization of touch devices and browser interfaces must be done 
+         * after all resources are loaded, during final stage of initialization
+         *        
+         */            
+        
+        // Treat Android devices as phones if either (reported) screen dimension is less than 4" 
+        if(device.OS == 'Android')
+        {
+          // Determine actual device characteristics  I3363 (Build 301)
+          // TODO: device.dpi may no longer be needed - if so, get rid of it.
+          var dpi = device.getDPI(); //TODO: this will not work when called from HEAD!!
+          device.formFactor=((screen.height < 4.0 * dpi) || (screen.width < 4.0 * dpi)) ? 'phone' : 'tablet';
+        }
+      
+        // Set exposed initialization flag member for UI (and other) code to use 
+        this.keyman.setInitialized(1);
 
-      // Set exposed initialization flag to 2 to indicate deferred initialization also complete
-      this.keyman.setInitialized(2);
+        // Finish keymanweb and OSK initialization once all necessary resources are available
+        osk.prepare();
+      
+        // Create and save the remote keyboard loading delay indicator
+        util.prepareWait();
+
+        // Register deferred keyboard stubs (addKeyboards() format)
+        this.keyman.keyboardManager.registerDeferredStubs();
+      
+        // Initialize the desktop UI
+        this.initializeUI();
+      
+        // Register deferred keyboards 
+        this.keyman.keyboardManager.registerDeferredKeyboards();
+      
+        // Exit initialization here if we're using an embedded code path.
+        if(this.keyman.isEmbedded) {
+          if(!this.keyman.keyboardManager.setDefaultKeyboard()) {
+            console.error("No keyboard stubs exist - cannot initialize keyboard!");
+          }
+          return;
+        }
+
+        // Determine the default font for mapped elements
+        this.keyman.appliedFont=this.keyman.baseFont=this.getBaseFont();
+
+        // Add orientationchange event handler to manage orientation changes on mobile devices
+        // Initialize touch-screen device interface  I3363 (Build 301)
+        if(device.touchable) {
+          this.keyman.handleRotationEvents();
+        }    
+        // Initialize browser interface
+
+        if(this.keyman.options['attachType'] != 'manual') {
+          this._SetupDocument(document.documentElement);
+        }
+
+        // Create an ordered list of all input and textarea fields
+        this.listInputs();
+      
+        // Initialize the OSK and set default OSK styles
+        // Note that this should *never* be called before the OSK has been initialized.
+        // However, it possibly may be called before the OSK has been fully defined with the current keyboard, need to check.    
+        //osk._Load(); 
+        
+        //document.body.appendChild(osk._Box); 
+
+        //osk._Load(false);
+        
+        // I3363 (Build 301)
+        if(device.touchable) {
+          // Handle OSK touchend events (prevent propagation)
+          osk._Box.addEventListener('touchend',function(e){
+            e.stopPropagation();
+          }, false);
+
+          // Add a blank DIV to the bottom of the page to allow the bottom of the page to be shown
+          dTrailer=document.createElement('DIV');
+          ds=dTrailer.style;
+          ds.width='100%';
+          ds.height=(screen.width/2)+'px';
+          document.body.appendChild(dTrailer);  
+          
+          // On Chrome, scrolling up or down causes the URL bar to be shown or hidden 
+          // according to whether or not the document is at the top of the screen.
+          // But when doing that, each OSK row top and height gets modified by Chrome
+          // looking very ugly.  Itwould be best to hide the OSK then show it again 
+          // when the user scroll finishes, but Chrome has no way to reliably report
+          // the touch end event after a move. c.f. http://code.google.com/p/chromium/issues/detail?id=152913
+          // The best compromise behaviour is simply to hide the OSK whenever any 
+          // non-input and non-OSK element is touched.
+          if(device.OS == 'Android' && navigator.userAgent.indexOf('Chrome') > 0) {
+            (<any>this.keyman).hideOskWhileScrolling=function(e) {           
+              if(typeof(osk._Box) == 'undefined') return;
+              if(typeof(osk._Box.style) == 'undefined') return;
+
+              // The following tests are needed to prevent the OSK from being hidden during normal input!
+              p=e.target.parentNode;
+              if(typeof(p) != 'undefined' && p != null) {
+                if(p.className.indexOf('keymanweb-input') >= 0) return; 
+                if(p.className.indexOf('kmw-key-') >= 0) return; 
+                if(typeof(p.parentNode) != 'undefined') {
+                  p=p.parentNode;
+                  if(p.className.indexOf('keymanweb-input') >= 0) return; 
+                  if(p.className.indexOf('kmw-key-') >= 0) return; 
+                }
+              }          
+              osk.hideNow(); 
+            }        
+            this.keyman.util.attachDOMEvent(document.body, 'touchstart', (<any>this.keyman).hideOskWhileScrolling, false);
+          } else {
+            (<any>this.keyman).conditionallyHideOsk = function() {
+              // Should not hide OSK if simply closing the language menu (30/4/15)
+              if((<any>keyman).hideOnRelease && !osk.lgList) osk.hideNow();
+              (<any>keyman).hideOnRelease=false;
+            };
+            (<any>this.keyman).hideOskIfOnBody = function(e) {
+              (<any>keyman).touchY=e.touches[0].screenY;
+              (<any>keyman).hideOnRelease=true;
+            };
+            (<any>this.keyman).cancelHideIfScrolling = function(e) {
+              var y=e.touches[0].screenY,y0=(<any>keyman).touchY;    
+              if(y-y0 > 5 || y0-y < 5) (<any>keyman).hideOnRelease = false;
+            };
+
+            this.keyman.util.attachDOMEvent(document.body, 'touchstart',(<any>this.keyman).hideOskIfOnBody,false);      
+            this.keyman.util.attachDOMEvent(document.body, 'touchmove',(<any>this.keyman).cancelHideIfScrolling,false);      
+            this.keyman.util.attachDOMEvent(document.body, 'touchend',(<any>this.keyman).conditionallyHideOsk,false);      
+          } 
+        }
+
+        //document.body.appendChild(keymanweb._StyleBlock);
+      
+        // Restore and reload the currently selected keyboard, selecting a default keyboard if necessary.
+        this.keyman.keyboardManager.restoreCurrentKeyboard(); 
+
+        /* Setup of handlers for dynamically-added and (eventually) dynamically-removed elements.
+          * Reference: https://developer.mozilla.org/en/docs/Web/API/MutationObserver
+          * 
+          * We place it here so that it loads after most of the other UI loads, reducing the MutationObserver's overhead.
+          * Of course, we only want to dynamically add elements if the user hasn't enabled the manual attachment option.
+          */
+        
+        if(MutationObserver) {
+          var observationTarget = document.querySelector('body'), observationConfig: MutationObserverInit;
+          if(this.keyman.options['attachType'] != 'manual') { //I1961
+            observationConfig = { childList: true, subtree: true};
+            this.attachmentObserver = new MutationObserver(this._AutoAttachObserverCore);
+            this.attachmentObserver.observe(observationTarget, observationConfig);
+          }
+
+          /**
+           * Setup of handlers for dynamic detection of the kmw-disabled class tag that controls enablement.
+           */
+          observationConfig = { subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'readonly']};
+          this.enablementObserver = new MutationObserver(this._EnablementMutationObserverCore);
+          this.enablementObserver.observe(observationTarget, observationConfig);
+        } else {
+          console.warn("Your browser is outdated and does not support MutationObservers, a web feature " + 
+            "needed by KeymanWeb to support dynamically-added elements.");
+        }
+
+        // Set exposed initialization flag to 2 to indicate deferred initialization also complete
+        this.keyman.setInitialized(2);
+      } catch(err) {
+        error = err;
+        success = false;
+      } finally {
+        if(this.keyman.initCallback) {
+          this.keyman.initCallback(success, error.toString ? error.toString() : "" + error);
+        }
+      }
     }
 
     /**

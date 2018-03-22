@@ -17,6 +17,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.util.SimpleFuture;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -68,6 +69,8 @@ final class KMKeyboard extends WebView {
   private boolean ShouldShowHelpBubble = false;
   private boolean isChiral = false;
   private static FirebaseAnalytics mFirebaseAnalytics;
+
+  SimpleFuture<Boolean> initFuture;
 
   protected boolean keyboardSet = false;
   protected boolean keyboardPickerEnabled = true;
@@ -164,11 +167,14 @@ final class KMKeyboard extends WebView {
     });
   }
 
-  public void loadKeyboard() {
+  public SimpleFuture<Boolean> loadKeyboard() {
     keyboardSet = false;
+    initFuture = new SimpleFuture<Boolean>();
     String htmlPath = "file://" + getContext().getDir("data", Context.MODE_PRIVATE) + "/" + KMManager.KMFilename_KeyboardHtml;
     loadUrl(htmlPath);
     setBackgroundColor(0);
+
+    return initFuture;
   }
 
   public void executeHardwareKeystroke(int code, int shift, int lstates) {
