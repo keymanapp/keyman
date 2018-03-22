@@ -1,7 +1,7 @@
 # Keyman for Android
 
-## 2018-03-22 10.0.10000075 beta
-* No changes, just published latest 10.0 alpha as beta
+## 2018-03-22 10.0.373 beta
+* Initial beta release of Keyman for Android 10.0
 
 ## 10.0 alpha
 * Refactor how longpress keys on touch layout are processed in KMW engine. This prevents key text 
