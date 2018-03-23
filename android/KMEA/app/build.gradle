@@ -12,8 +12,9 @@ android {
             versionCode project.ext['build_counter'] as Integer // Because TeamCity does not bubble build.counter into system properties...
             versionName "${project.ext['build.number']}"
         } else {
+            String majorMinorVersion = file('$projectDir/../../../../resources/VERSION.md').text.trim()
             versionCode 100
-            versionName '10.0.0.0'
+            versionName majorMinorVersion + '.0.0'
         }
     }
 
