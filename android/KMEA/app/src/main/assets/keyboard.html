@@ -20,7 +20,7 @@
       window.console.log('Keyboard height = '+oskHeight);
       var kmw=window['keyman'];
 
-      kmw.setInitCallback(jsInterface.initCallback);
+      kmw.setInitCallback(jsInterface.initCallback.bind(jsInterface));
 
       kmw.init({'app':device,'fonts':'packages/'});
       kmw['util']['setOption']('attachType','manual');

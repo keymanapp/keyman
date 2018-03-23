@@ -1724,7 +1724,11 @@ namespace com.keyman {
         success = false;
       } finally {
         if(this.keyman.initCallback) {
-          this.keyman.initCallback(success, error.toString ? error.toString() : "" + error);
+          var errString: string = null;
+          if(error) {
+            errString = error.toString ? error.toString() : "" + error;
+          }
+          this.keyman.initCallback(success, errString);
         }
       }
     }

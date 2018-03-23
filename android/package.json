@@ -22,6 +22,7 @@
     "appium-doctor": "^1.4.3"
   },
   "scripts": {
+    "appium": "appium",
     "appium-doctor": "appium-doctor"
   }
 }

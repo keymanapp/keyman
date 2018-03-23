@@ -1609,6 +1609,8 @@ public final class KMManager {
     public void initCallback(boolean success, String errMessage) {
       if(!success) {
         Log.e("KMManager", "The embedded KMW engine failed to initialize: " + errMessage);
+      } else {
+        Log.v("KMManager", "The embedded KMW engine successfully initialized.");
       }
 
       InAppKeyboard.initFuture.put(success);
