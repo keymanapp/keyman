@@ -102,7 +102,7 @@ function generateDiagnosticDiv(elem) {
     setBtn.type     = 'button';
     setBtn.id       = 'set_' + elemId;
     setBtn.onclick = function() {
-      kmw.setKeyboardForControl(document.getElementById(elemId), 'dzongkha', 'dzo');
+      kmw.setKeyboardForControl(document.getElementById(elemId), 'dzongkha', 'dz');
 
       if(kmw.isAttached(elem)) {
         kbdLabel.textContent = " Using independently-tracked keyboard.";
