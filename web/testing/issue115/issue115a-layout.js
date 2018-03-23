@@ -271,8 +271,8 @@
             "key": [
               {
                 "id": "K_A",
-                "pad": 70,
-                "text": "A"
+                "text": "A",
+                "pad": 70
               },
               {
                 "id": "K_S",
@@ -307,8 +307,10 @@
                 "text": "L"
               },
               {
-                "sp": "10",
-                "width": "10"
+                "id": "T_new_54",
+                "text": "",
+                "width": "10",
+                "sp": "10"
               }
             ]
           },
@@ -317,10 +319,10 @@
             "key": [
               {
                 "id": "K_SHIFT",
+                "text": "*Shift*",
                 "width": "110",
                 "sp": "2",
-                "nextlayer": "default",
-                "text": ""
+                "nextlayer": "default"
               },
               {
                 "id": "K_Z",
@@ -352,6 +354,7 @@
               },
               {
                 "id": "K_PERIOD",
+                "text": ">",
                 "sk": [
                   {
                     "text": ",",
@@ -393,8 +396,7 @@
                     "id": "K_COLON",
                     "layer": "default"
                   }
-                ],
-                "text": ">"
+                ]
               },
               {
                 "id": "K_BKSP",
@@ -422,9 +424,9 @@
               },
               {
                 "id": "K_SPACE",
+                "text": "",
                 "width": "630",
-                "sp": "0",
-                "text": ""
+                "sp": "0"
               },
               {
                 "id": "K_ENTER",
@@ -933,8 +935,8 @@
             "key": [
               {
                 "id": "K_A",
-                "pad": "50",
-                "text": "A"
+                "text": "A",
+                "pad": "50"
               },
               {
                 "id": "K_S",
@@ -969,6 +971,7 @@
                 "text": "L"
               },
               {
+                "id": "T_new_190",
                 "text": "",
                 "width": "10",
                 "sp": "10"
@@ -980,9 +983,9 @@
             "key": [
               {
                 "id": "K_SHIFT",
+                "text": "*Shift*",
                 "sp": "2",
-                "nextlayer": "default",
-                "text": ""
+                "nextlayer": "default"
               },
               {
                 "id": "K_Z",
@@ -1014,6 +1017,7 @@
               },
               {
                 "id": "K_PERIOD",
+                "text": ">",
                 "sk": [
                   {
                     "text": ",",
@@ -1055,8 +1059,7 @@
                     "id": "K_COLON",
                     "layer": "default"
                   }
-                ],
-                "text": ">"
+                ]
               },
               {
                 "id": "K_BKSP",
@@ -1083,9 +1086,9 @@
               },
               {
                 "id": "K_SPACE",
+                "text": "",
                 "width": "610",
-                "sp": "0",
-                "text": ""
+                "sp": "0"
               },
               {
                 "id": "K_ENTER",

@@ -1,5 +1,10 @@
 # Keyman for Android & Keyman Engine for Android
 
+## Prerequisites
+* Android Studio 3.0.1+
+* Java
+* [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
+
 ## Minimum Android Requirements
 Keyman for Android has a minSdkVersion of 15 for [Android 4.0.3 Ice Cream Sandwich](https://developer.android.com/about/versions/android-4.0.3.html)
 
@@ -22,6 +27,8 @@ yes | ./sdkmanager.bat --licenses
 
 ## Keyman for Android Development
 Keyman for Android (formerly named KMAPro) can be built from a command line (preferred) or Android Studio.
+
+Building Keyman Web is a precursor for compiling KMEA, so verify your system has all the [Minimum Web Compilation Requirements](../web/README.md#minimum-web-compilation-requirements)
 
 ### Crashlytics
 Firebase Crashlytics is used for crash reporting, and it depends on a configured google-services.json file. For this reason, only the Debug variant of KMAPro is intended to be built on a Developer machine. The analytics for Debug are associated with a "Package name" `com.tavultesoft.kmapro.debug`.

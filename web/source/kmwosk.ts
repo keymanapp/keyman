@@ -158,12 +158,16 @@ if(!window['keyman']['initialized']) {
     osk.modifierSpecials = {
       'leftalt': '*LAlt*',
       'rightalt': '*RAlt*',
+      'alt': '*Alt*',
       'leftctrl': '*LCtrl*',
       'rightctrl': '*RCtrl*',
+      'ctrl': '*Ctrl*',
+      'ctrl-alt': '*AltGr*',
       'leftctrl-leftalt': '*LAltCtrl*',
       'rightctrl-rightalt': '*RAltCtrl*',
       'leftctrl-leftalt-shift': '*LAltCtrlShift*',
       'rightctrl-rightalt-shift': '*RAltCtrlShift*',
+      'shift': '*Shift*',
       'shift-alt': '*AltShift*',
       'shift-ctrl': '*CtrlShift*',
       'shift-ctrl-alt': '*AltCtrlShift*',
@@ -3276,7 +3280,7 @@ if(!window['keyman']['initialized']) {
           if(n > 0 && shiftKey != null) {
             shiftKey['sp']=osk.buttonClasses['SHIFT-ON'];
             shiftKey['sk']=null;
-            shiftKey['text'] = osk.modifierSpecials[layers[n].id];
+            shiftKey['text'] = osk.modifierSpecials[layers[n].id] ? osk.modifierSpecials[layers[n].id] : "*Shift*";
           }
         }
       }

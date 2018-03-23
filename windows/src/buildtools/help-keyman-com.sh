@@ -19,6 +19,7 @@ shopt -s nullglob
 # These are passed via environment:
 #
 # HELP_KEYMAN_COM = the home of the help.keyman.com repository
+# MAJOR_VERSION = 10.0, 11.0, etc
 #
 # That repo must have push to origin configured and logged in
 #
@@ -28,7 +29,12 @@ if [ -z ${HELP_KEYMAN_COM+x} ]; then
   exit 1
 fi
 
-if [ ! -d "$HELP_KEYMAN_COM/products/desktop/10.0/docs" ]; then
+if [ -z ${MAJOR_VERSION+x} ]; then
+  >&2 echo "Not uploading documentation: must set MAJOR_VERSION in environment."
+  exit 1
+fi
+
+if [ ! -d "$HELP_KEYMAN_COM/products/desktop/$MAJOR_VERSION/docs" ]; then
   >&2 echo "HELP_KEYMAN_COM path ($HELP_KEYMAN_COM) does not appear to be valid."
   exit 1
 fi
@@ -76,7 +82,7 @@ function upload_keyman_desktop_help {
     return 0
   fi
   
-  local dstpath="$HELP_KEYMAN_COM/products/desktop/10.0/docs"
+  local dstpath="$HELP_KEYMAN_COM/products/desktop/$MAJOR_VERSION/docs"
 
   if [[ ! -d "$dstpath" ]]; then
     echo "${t_yel}Warning: The destination path $dstpath does not exist${t_end}"
@@ -97,7 +103,7 @@ function commit_and_push {
   pushd $HELP_KEYMAN_COM
   git config user.name "Keyman Build Server"
   git config user.email "keyman-server@users.noreply.github.com"
-  git add products/desktop/10.0/docs || return 1
+  git add products/desktop/$MAJOR_VERSION/docs || return 1
   git diff --cached --no-ext-diff --quiet --exit-code && {
     # if no changes then don't do anything.
     echo "No changes to commit"

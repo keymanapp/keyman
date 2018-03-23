@@ -73,7 +73,7 @@ typedef enum {
                                                          forEventClass:kInternetEventClass
                                                             andEventID:kAEGetURL];
         
-        CFMachPortRef lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask | NSLeftMouseDown | NSLeftMouseUp/* | NSOtherMouseDown | NSOtherMouseUp*/, (CGEventTapCallBack)eventTapFunction, nil);
+        CFMachPortRef lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask | NSLeftMouseDown | NSLeftMouseUp, (CGEventTapCallBack)eventTapFunction, nil);
         
         if (!lowLevelEventTap)
             NSLog(@"Can't tap into low level events!");
@@ -167,17 +167,17 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         switch (type) {
             case kCGEventFlagsChanged:
                 appDelegate.currentModifierFlags = sysEvent.modifierFlags;
+                if (appDelegate.currentModifierFlags & NSEventModifierFlagCommand) {
+                    appDelegate.contextChangingEventDetected = YES;
+                }
                 break;
                 
             case kCGEventLeftMouseUp:
             case kCGEventLeftMouseDown:
             case kCGEventOtherMouseUp:
             case kCGEventOtherMouseDown:
-                {
-                    appDelegate.contextChangingEventDetected = YES;
-                }
+                appDelegate.contextChangingEventDetected = YES;
                 break;
-                
             default:
                 break;
         }
@@ -731,6 +731,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)showConfigurationWindow {
+    if (_debugMode)
+        NSLog(@"Showing config window...");
     [self.configWindow.window centerInParent];
     [self.configWindow.window makeKeyAndOrderFront:nil];
     [self.configWindow.window setLevel:NSFloatingWindowLevel];
@@ -754,6 +756,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (NSWindowController *)configWindow {
     if (_configWindow.window == nil) {
+        if (_debugMode)
+            NSLog(@"Creating config window...");
         _configWindow = [[KMConfigurationWindowController alloc] initWithWindowNibName:@"preferences"];
     }
 

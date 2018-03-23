@@ -1,5 +1,8 @@
 # Keyman for iPhone and iPad Version History
 
+## 2018-03-22 10.0.139 beta
+* Initial beta release of Keyman for iPhone and iPad 10
+
 ## 10.0 alpha
 * Updated versioning scheme for uniformity across all Keyman products.
 * Keyman app migrated to Swift 4.0 (#305)
