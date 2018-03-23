@@ -1,5 +1,8 @@
 # Keyman Desktop Version History
 
+## 2018-03-22 10.0.1054.0 beta
+Initial beta release of Keyman Desktop 10
+
 ## 10.0 alpha
 * Keyman Desktop moved to open source (#121)
 * Support for custom BCP 47 language codes: you can now associate a keyboard with any valid language code in Windows 8 and later
