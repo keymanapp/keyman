@@ -1,5 +1,8 @@
 # Keyman Developer Version History
 
+## 2018-03-22 10.0.1054.0 beta
+* Initial beta release of Keyman Developer 10 
+
 ## 10.0 alpha
 * Keyman Developer moved to open source (#121)
 * Keyman Developer now supports BCP 47 tags throughout (#543)
