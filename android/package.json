@@ -1,0 +1,27 @@
+{
+  "name": "keyman_android_app",
+  "version": "10.0.0",
+  "description": "Facilitates text input in any language.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "keywords": [
+    "input",
+    "languages",
+    "keyboards"
+  ],
+  "author": "SIL International",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "homepage": "https://github.com/keymanapp/keyman#readme",
+  "devDependencies": {
+    "appium": "^1.7.2",
+    "appium-doctor": "^1.4.3"
+  },
+  "scripts": {
+    "appium-doctor": "appium-doctor"
+  }
+}

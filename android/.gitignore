@@ -26,4 +26,7 @@
 KMEA/app/src/main/assets/
 KMAPro/assets/keyman.js
 
+# Node-managed folders
+node_modules
+
 
