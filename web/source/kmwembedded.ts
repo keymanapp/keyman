@@ -452,8 +452,6 @@
       // Process modifier key action
       if(osk.selectLayer(keyName, undefined)) {
         return true;      
-      } else {
-        osk.selectLayer(keyName, nextLayer);
       }
       
       // Check the virtual key 
@@ -478,7 +476,13 @@
 
       //if(!Lkc.Lcode) return false;  // Value is now zero if not known (Build 347)
       //Build 353: revert to prior test to try to fix lack of KMEI output, May 1, 2014      
-      if(isNaN(Lkc.Lcode) || !Lkc.Lcode) return false;
+      if(isNaN(Lkc.Lcode) || !Lkc.Lcode) { 
+        // Addresses modifier SHIFT keys.
+        if(nextLayer) {
+          osk.selectLayer(keyName, nextLayer);
+        }
+        return false;
+      }
 
       // Define modifiers value for sending to keyboard mapping function
       Lkc.Lmodifiers = keyShiftState;
@@ -495,9 +499,21 @@
       if(!keymanweb.keyboardManager.activeKeyboard ||  Lkc.Lcode == 0) return false;
       
       // If key is mapped, return true
-      if(kbdInterface.processKeystroke(util.device, Lelem, Lkc)) return true;
+      if(kbdInterface.processKeystroke(util.device, Lelem, Lkc)) {
+        // Make sure we don't affect the current layer until the keystroke has been processed!
+        if(nextLayer) {
+          osk.selectLayer(keyName, nextLayer);
+        }
+
+        return true;
+      }
 
       keymanweb.processDefaultMapping(Lkc.Lcode, keyShiftState, Lelem, keyName);
+
+      if(nextLayer) {
+        // Final nextLayer check.
+        osk.selectLayer(keyName, nextLayer);
+      }
 
       return true;
   };
