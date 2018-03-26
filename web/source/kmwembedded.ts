@@ -407,8 +407,8 @@
    *  
    *  @param  {string}  keyName   key identifier
    **/            
-  keymanweb['executePopupKey'] = function(keyName)
-  {              
+  keymanweb['executePopupKey'] = function(keyName: string) {
+      var origArg = keyName;
       if(!keymanweb.keyboardManager.activeKeyboard) return false;
 
       /* Clear any pending (non-popup) key */
@@ -424,9 +424,37 @@
       var Lelem=keymanweb.domManager.getLastActiveElement(),Lkc,keyShiftState=osk.getModifierState(layer);
       
       keymanweb.domManager.initActiveElement(Lelem);
+
+      var nextLayer: string;
+
+      // This should be set if we're within this method... but it's best to guard against nulls here, just in case.
+      if(osk.popupBaseKey && osk.popupBaseKey.key) {
+        // This is set with the base key of our current subkey elsewhere within the engine.
+        var baseKey = osk.popupBaseKey.key;
+        var found = false;
+
+        // Search for the specified base key so we can retrieve its useful properties.
+        for(let subKey of baseKey.sk) {
+          if(subKey.id == keyName) {
+            nextLayer = subKey.nextlayer;
+            found = true;
+            break;
+          }
+        }
+
+        if(!found) {
+          console.warn("Could not find subkey '" + origArg + "' under the current base key '" + baseKey.id + "'!");
+        }
+      } else {
+        console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
+      }
       
       // Process modifier key action
-      if(osk.selectLayer(keyName,null)) return true;      
+      if(osk.selectLayer(keyName, undefined)) {
+        return true;      
+      } else {
+        osk.selectLayer(keyName, nextLayer);
+      }
       
       // Check the virtual key 
       Lkc = {Ltarg:Lelem,Lmodifiers:0,Lstates:0,Lcode:osk.keyCodes[keyName],LisVirtualKey:true};
