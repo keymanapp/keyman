@@ -38,7 +38,7 @@ dependencies {
         transitive = true
     }
 
-    testCompile group: 'io.appium', name: 'java-client', version: '5.0.4'
+    testImplementation group: 'io.appium', name: 'java-client', version: '5.0.4'
     testImplementation 'junit:junit:4.12'
 
     api (name:'keyman-engine', ext:'aar')

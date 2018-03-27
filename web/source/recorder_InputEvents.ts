@@ -133,9 +133,11 @@ namespace KMWRecorder {
     keyID: string;
 
     // osk.clickKey receives the element clicked or touched in OSK interactions.
-    constructor(ele: HTMLDivElement|OSKInputEvent) {
+    constructor(ele: string|HTMLDivElement|OSKInputEvent) {
       super();
-      if(ele instanceof HTMLDivElement) {
+      if(typeof ele == 'string') {
+        this.keyID = ele;
+      } else if(ele instanceof HTMLDivElement) {
         this.keyID = ele.id;
       } else {
         this.keyID = ele.keyID;
@@ -155,7 +157,7 @@ namespace KMWRecorder {
       var downEvent;
       var upEvent;
       if(typeof Event == 'function') {
-        if(target['base'] && target instanceof HTMLDivElement) {
+        if(window['keyman'].isEmbedded || (target['base'] && target instanceof HTMLDivElement)) {
           downEvent = new Event(OSKInputEvent.downTouchType);
           upEvent = new Event(OSKInputEvent.upTouchType);
           downEvent['touches'] = [{"target": oskKeyElement}];

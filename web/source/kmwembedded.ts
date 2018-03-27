@@ -21,7 +21,7 @@
   keymanweb.mustReloadKeyboard = true;
   
   // Skip full page initialization - skips native-mode only code
-  keymanweb.isEmbedded = true;
+  keymanweb['isEmbedded'] = keymanweb.isEmbedded = true;
 
   osk.popupDelay = 400;  // Delay must be less than native touch-hold delay 
   

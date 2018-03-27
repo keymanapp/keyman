@@ -21,9 +21,17 @@ SHLVL=0
 echo Build KMEA first
 cd ../../KMEA
 ./build.sh
-cd ../Tests/KeyboardHarness
+cd ../../web/source
+echo Compile KMW\'s keyboard automation interface
+# Compiles the KMW recorder interface, which is very useful in test cases for automating the embedded keyboard.
+./build_recorder.sh
+cd ../../android/Tests/KeyboardHarness
 cp ../keyman-engine.aar app/libs/
 
+KMW_RECORDER_PATH=../../../web/release/recorder
+KMW_RECORDER_FILE=recorder_InputEvents.js
+
+ASSETS_PATH=app/src/main/assets
 
 NO_DAEMON=false
 ONLY_DEBUG=false
@@ -63,5 +71,6 @@ else
 fi
 
 echo Build KeyboardHarness
+cp $KMW_RECORDER_PATH/$KMW_RECORDER_FILE $ASSETS_PATH
 ./gradlew $DAEMON_FLAG clean $BUILD_FLAG
 

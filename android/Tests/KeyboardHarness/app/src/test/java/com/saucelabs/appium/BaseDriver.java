@@ -19,13 +19,20 @@ import java.net.URL;
 // In order to successfully run this test, you must use "Build APKs" before running it,
 // rather than the default Run/Debug Android Studio options.
 public class BaseDriver {
-  public AppiumDriver<WebElement> driver;
+  public AppiumDriver<MobileElement> driver;
   private static AppiumDriverLocalService service;
 
   @Before
   public void setUp() throws Exception {
     // We use a local copy of Appium's JS library, so we need to set its path properly.
+    // The path appears to vary between build.sh and runs in Android Studio; the following should handle both.
     File appiumJS = new File("../../node_modules/appium/build/lib/appium.js");
+    boolean fromShellScript = false;
+
+    if(!appiumJS.exists()) {
+      appiumJS = new File("../", appiumJS.toString());
+      fromShellScript = true;
+    }
     AppiumServiceBuilder serviceBuilder = new AppiumServiceBuilder();
     serviceBuilder.withAppiumJS(appiumJS);
 
@@ -33,7 +40,7 @@ public class BaseDriver {
     service.start();
 
     File classpathRoot = new File(System.getProperty("user.dir"));
-    File appDir = new File(classpathRoot, "app/build/outputs/apk/debug");
+    File appDir = new File(classpathRoot, (fromShellScript ? "" : "app/") + "build/outputs/apk/debug");
     File app = new File(appDir.getCanonicalPath(), "app-debug.apk");
     DesiredCapabilities capabilities = new DesiredCapabilities();
     capabilities.setCapability("deviceName","Android Emulator");

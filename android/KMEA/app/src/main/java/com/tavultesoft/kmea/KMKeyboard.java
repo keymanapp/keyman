@@ -51,7 +51,7 @@ import android.widget.PopupWindow.OnDismissListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-final class KMKeyboard extends WebView {
+final public class KMKeyboard extends WebView {
   private final Context context;
   private KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
   private String packageID;
