@@ -378,8 +378,17 @@ public class WebBrowserActivity extends Activity {
 
   @Override
   public void onBackPressed() {
-    finish();
-    overridePendingTransition(0, android.R.anim.fade_out);
+    if (webView != null && webView.canGoBack()) {
+      webView.goBack();
+    } else {
+      // Hide the current keyboard so when Keyman app returns, there aren't 2 keyboards visible
+      InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+      imm.hideSoftInputFromWindow(addressField.getWindowToken(), 0);
+
+      super.onBackPressed();
+      finish();
+      //overridePendingTransition(0, android.R.anim.fade_out);
+    }
   }
 
   private void loadFont() {
