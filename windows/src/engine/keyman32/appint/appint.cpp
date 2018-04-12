@@ -84,8 +84,11 @@ WCHAR *AppContext::BufMax(int n)  // Used only by IMX DLLs
 
 void AppContext::Delete()
 {
-	if(CharIsDeadkey())	pos -= 2;
-
+  if (CharIsDeadkey()) {
+    pos -= 2;
+  } else if (CharIsSurrogatePair()) {
+    pos--;
+  }
 	//SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext::Delete");
 
 	if(pos > 0) pos--;
@@ -142,6 +145,15 @@ BOOL AppContext::CharIsDeadkey()
 		return FALSE;
 	return CurContext[pos-3] == UC_SENTINEL && 
 		   CurContext[pos-2] == CODE_DEADKEY;
+}
+
+BOOL AppContext::CharIsSurrogatePair()
+{
+  if (pos < 2) // low_surrogate, high_surrogate
+    return FALSE;
+
+  return Uni_IsSurrogate1(CurContext[pos - 2]) &&
+    Uni_IsSurrogate2(CurContext[pos - 1]);
 }
 
 /* AppActionQueue */
