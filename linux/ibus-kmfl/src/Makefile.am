@@ -25,7 +25,7 @@ AM_CFLAGS = \
 
 AM_LDFLAGS = \
 	@IBUS_LIBS@ \
-	-lkmfl \
+	-lkmfl -lX11 \
 	$(NULL)
 
 check_PROGRAMS = \
@@ -61,7 +61,7 @@ ibus_engine_kmfl_CFLAGS = \
 
 ibus_engine_kmfl_LDFLAGS = \
 	@IBUS_LIBS@ \
-	-lkmfl \
+	-lkmfl -lX11 \
 	$(NULL)
 
 component_DATA = \
