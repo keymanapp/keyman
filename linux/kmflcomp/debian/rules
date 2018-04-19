@@ -4,6 +4,11 @@
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/autotools.mk
+include /usr/share/cdbs/1/rules/autoreconf.mk
 
 DEB_SHLIBDEPS_INCLUDE := debian/libkmflcomp/usr/lib/
 DEB_DH_INSTALL_SOURCEDIR := debian/tmp
+
+install/libkmflcomp-dev::
+	sed -i "/dependency_libs/ s/'.*'/''/" `find debian/ -name '*.la'`
+

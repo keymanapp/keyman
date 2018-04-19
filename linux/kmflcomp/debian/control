@@ -2,26 +2,38 @@ Source: kmflcomp
 Priority: optional
 Section: utils
 Maintainer: Doug Rintoul <doug_rintoul@sil.org>
-Uploaders: Daniel Glassey <wdg@debian.org>
-Build-Depends: cdbs (>= 0.4.27-1), debhelper (>= 4.1.0), libx11-dev
-Standards-Version: 3.6.2
+Uploaders: Torsten Werner <twerner@debian.org>
+Homepage: http://kmfl.sourceforge.net/
+Build-Depends: cdbs (>= 0.4.27), debhelper (>= 10), libx11-dev, autotools-dev
+Standards-Version: 3.9.8.0
 
 Package: libkmflcomp-dev
 Section: libdevel
-Depends: libkmflcomp0 (= ${Source-Version})
+Architecture: any
+Depends: libkmflcomp0 (= ${binary:Version}), ${misc:Depends}
 Description: Development files for libkmflcomp
+ The kmfl library is a multilingual text processing library that implements
+ the Keyman(C) text processing language.
+ .
  Development libraries and headers to use libkmflcomp in an application
 
 Package: kmflcomp
-Section: utils
-Depends: libkmflcomp0 (= ${Source-Version})
-Description: KMFL Compiler
- Compile Keyman-style keyboard layout files to a binary format for use by the 
- KMFL keystroke interpreter.
+Architecture: any
+Depends: libkmflcomp0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: KMFL (Keyboard Mapping for Linux) Compiler
+ The kmfl library is a multilingual text processing library that implements
+ the Keyman(C) text processing language.
+ .
+ Utility to compile Keyman-style keyboard layout files to a binary format for
+ use by the KMFL keystroke interpreter.
 
 Package: libkmflcomp0
 Section: libs
-Depends: ${shlibs:Depends}
-Description: KMFL compiler library
+Architecture: any
+Depends: ${shlibs:Depends},  ${misc:Depends}
+Description: KMFL (Keyboard Mapping for Linux) compiler library
+ The kmfl library is a multilingual text processing library that implements
+ the Keyman(C) text processing language.
+ .
  Library to compile Keyman layout files to a binary format for use by the 
  KMFL keystroke interpreter.

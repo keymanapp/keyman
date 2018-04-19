@@ -1,3 +1,63 @@
+kmflcomp (0.9.10-1) unstable; urgency=low
+
+  * new upstream release
+  * bring d/compat to level 10 (Closes: #817512)
+    - d/control: B-D on debhelper > 10
+  * update d/control: 
+    - change short description to be more informative (Closes: #493522)
+    - change extended description to be more informative
+    - remove redundant Section: util from kmfl binary package
+    - add homepage field to source section
+    - remove build depend on dh-autoreconfig (not needed for compat 10)
+    - remove version constraint on cdbs (fulfilled in oldstable)
+  * include update for newer architectures (using autotools-dev) 
+    from Wookey <wookey@debian.org> (Closes: #765228)
+  * empty dependency_libs in .la files to bring standards-version to 3.9.1.0
+  * change copyright to machine-readable copyright-format to bring 
+    standards-version to 3.9.3.0
+  * bring standards-version to 3.9.8.0 (no other changes required)
+  * switch to dpkg-source 3.0 (quilt) format
+  * add watch file to check for newer upstream version
+  * add d/libkmflcomp0.symbols (for lintian warning no-symbols-control-file)
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Mon, 23 Jan 2017 11:36:01 -0800
+
+kmflcomp (0.9.9-1) UNRELEASED; urgency=low
+
+  * new upsteam release
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Fri, 23 Jul 2010 09:49:20 -0700
+
+kmflcomp (0.9.8-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Update for newer architectures (using autotools-dev) (Closes: #765228) 
+
+ -- Wookey <wookey@debian.org>  Thu, 15 Oct 2015 20:51:15 +0000
+
+kmflcomp (0.9.8-1) unstable; urgency=low
+
+  * add Platform conditionals
+  * add support for Keyman 7
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Mon, 26 Jan 2009 12:54:38 -0800
+
+kmflcomp (0.9.7-1) unstable; urgency=low
+
+  * Add libx11 to link
+  * Add manpage for kmflcomp
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Thu, 20 Oct 2008 12:20:09 -0700
+
+
+kmflcomp (0.9.6-1) unstable; urgency=low
+
+  * add support for get_surrounding_text to provide context sensitive input
+    methods
+  * add the ability to reload keyboards on the fly
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Tue,  7 Nov 2006 14:57:53 -0800
+
 kmflcomp (0.9.3-1) unstable; urgency=low
 
   * Fix some packaging issues

@@ -4,7 +4,7 @@
 ## If you don't want it to overwrite it,
 ## 	Please disable it in the Anjuta project configuration
 
-INCLUDES =\
+AM_CPPFLAGS =\
     -I$(top_srcdir)/include
 
 libkmflcomp_la_CFLAGS =\
@@ -22,7 +22,7 @@ libkmflcomp_la_SOURCES = \
 
 EXTRA_DIST = compiler.h memman.h
 
-libkmflcomp_la_LDFLAGS = -lX11 -L/usr/X11R6/lib
+libkmflcomp_la_LDFLAGS = -lX11 -L/usr/X11R6/lib -Wl,--no-as-needed
 
 libkmflcomp_la_LIBADD = 
 

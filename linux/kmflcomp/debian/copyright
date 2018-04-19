@@ -1,13 +1,74 @@
-This package was debianized by Doug Rintoul <doug_rintoul@sil.org> on
-Mon,  6 Jun 2005 11:53:56 -0700.
+Format: http://anonscm.debian.org/viewvc/dep/web/deps/dep5.mdwn?view=markup&pathrev=174
+Upstream-Name: kmflcomp
+Upstream-Contact: Doug Rintoul <doug_rintoul@sil.org>
 
-It was downloaded from sourceforge.net/projects/kmfl
+Files: *
+Copyright: Copyright (C) 2005 SIL International and Tavultesoft Pty Ltd
+License: GPL-2+-KMFL-C
+ This file is part of the KMFL compiler.
+ .
+ The KMFL compiler is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ .
+ The KMFL compiler is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with the KMFL compiler; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ .
+ On Debian systems, the full text of the GNU General Public
+ License version 2 can be found in the file
+ `/usr/share/common-licenses/GPL-2'.
 
-Copyright: 2004-2006 by SIL Intl
+Files: src/utfconv.c
+       include/kmflutfconv.h
+Copyright: Copyright (C) 2006 SIL International
+License: GPL-2+-KMFL-L
+ This file is part of the KMFL library.
+ .
+ The KMFL library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+ .
+ The KMFL library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public
+ License along with the KMFL library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ .
+ On Debian systems, the full text of the GNU General Public
+ License version 2 can be found in the file
+ `/usr/share/common-licenses/GPL-2'.
 
-Upstream Authors: John M. Durdin <jmdurdin@tavultesoft.com> Doug Rintoul <doug_rintoul@sil.org>
+Files: src/yacc.c 
+       src/yacc.h
+Copyright: Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+License: GPL-2+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2, or (at your option)
+ any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ Boston, MA 02110-1301, USA.
+ .
+ On Debian systems, the full text of the GNU General Public
+ License version 2 can be found in the file
+ `/usr/share/common-licenses/GPL-2'.
 
-You are free to distribute this software under the terms of
-the GNU General Public License.
-On Debian systems, the complete text of the GNU General Public
-License can be found in the file `/usr/share/common-licenses/GPL'.

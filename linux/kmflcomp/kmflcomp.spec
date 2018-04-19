@@ -33,7 +33,7 @@
 
 Summary:         %{name}
 Name:            kmflcomp
-Version:         0.9.10
+Version:         0.9.9
 Release:         2%{disttag}%{distver}
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>
