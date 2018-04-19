@@ -37,7 +37,7 @@
 
 Summary:         %{name}
 Name:            libkmfl
-Version:         0.9.11
+Version:         0.9.12
 Release:         1%{disttag}%{distver}
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>

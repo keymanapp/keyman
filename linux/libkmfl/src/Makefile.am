@@ -4,7 +4,7 @@
 ## If you don't want it to overwrite it,
 ## 	Please disable it in the Anjuta project configuration
 
-INCLUDES =\
+AM_CPPFLAGS =\
 	 -I$(top_srcdir)/include 
 
 libkmfl_la_CFLAGS =\
