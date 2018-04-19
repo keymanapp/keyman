@@ -1,9 +1,14 @@
 #!/usr/bin/make -f
-# -*- mode: makefile; coding: utf-8 -*-
-# Copyright © 2005 Doug Rintoul <doug_rintoul@sil.org>
+#export DH_VERBOSE=1
 
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/autotools.mk
+%:
+	dh $@
 
-DEB_SHLIBDEPS_INCLUDE := debian/scim-kmfl-imengine/usr/lib/
-DEB_DH_INSTALL_SOURCEDIR := debian/tmp
+override_dh_auto_install:
+	dh_auto_install
+	# Clean up unnecessary static libraries for modules
+	rm debian/scim-kmfl-imengine/usr/lib/*/scim-1.0/*/*/*.a
+	rm debian/scim-kmfl-imengine/usr/lib/*/scim-1.0/*/*/*.la
+
+override_dh_auto_test:
+        # Disabled: Incompelete in po/

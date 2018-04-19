@@ -8,7 +8,6 @@
 %define is_mandrake %(test -e /etc/mandrake-release && echo 1 || echo 0)
 %define is_mandriva %(test -e /etc/mandriva-release && echo 1 || echo 0)
 %define is_suse %(test -e /etc/SuSE-release && echo 1 || echo 0)
-%define is_opensuse %(grep open /etc/SuSE-release 2> /dev/null 1>/dev/null && echo 1 || echo 0)
 %define is_fedora %(test -e /etc/fedora-release && echo 1 || echo 0)
 
 %if %is_mandrake
@@ -22,11 +21,6 @@
 %if %is_suse
 %define dist suse
 %define disttag suse
-%define kde_path /opt/kde3
-%endif
-%if %is_opensuse
-%define dist openSUSE
-%define disttag openSUSE
 %define kde_path /opt/kde3
 %endif
 %if %is_fedora
@@ -44,7 +38,7 @@
 
 Summary:         %{name}
 Name:            scim-kmfl-imengine
-Version:         0.9.8
+Version:         0.9.6
 Release:         1%{disttag}%{distver}
 Vendor:          SIL <doug_rintoul@sil.org>
 Packager:        Doug Rintoul <doug_rintoul@sil.org>
@@ -55,7 +49,7 @@ Source0:         %{name}-%{version}.tar.gz
 BuildRoot:       /var/tmp/scim_kmfl_imengine
 BuildArch:       i586
 Requires:        libkmfl scim >= 1.2.2
-Buildrequires:   libkmfl-devel scim-devel gtk2-devel
+Buildrequires:   libkmfl-devel scim-devel
 %if %{with_libstdc_preview}
 Buildrequires: libstdc++so7-devel
 %endif
@@ -124,7 +118,7 @@ make DESTDIR=${RPM_BUILD_ROOT} install-strip
 %defattr(-,root,root)
 %{_libdir}/scim-1.0/*/IMEngine/kmfl.so
 %{_libdir}/scim-1.0/*/SetupUI/kmfl_imengine_setup.so
-%{_datadir}/scim/kmfl/icons/default.png
+
 %doc AUTHORS COPYING ChangeLog README INSTALL NEWS TODO
 
 %files devel

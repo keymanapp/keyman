@@ -6,7 +6,6 @@
  * KMFL Input Method for SCIM (Smart Common Input Method)
  *
  * Copyright (C) 2005 SIL International
- * based on source from SCIM Copyright (c) 2004 James Su <suzhe@tsinghua.org.cn>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,6 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  *
  */
+
  
 #define Uses_SCIM_CONFIG_BASE
 
@@ -142,7 +142,6 @@ struct KeyboardPropertiesData {
     String icon;
     String locales;
     String copyright;
-    String message;
 };
 
 // Internal data declaration.
@@ -853,50 +852,26 @@ get_icon_name(XKEYBOARD * p_kbd)
 }
 
 static String
-find_real_icon_file(String icon_file_template)
-{
-    static String valid_extensions[3]= {"", ".bmp", ".png"};
-    String test_path;
-    struct stat filestat;
-    
-    for (int i=0; i < 3; i++)
-    {
-        test_path=icon_file_template+valid_extensions[i];
-        stat(test_path.c_str(), &filestat);
-
-        if (S_ISREG(filestat.st_mode))
-            return test_path;
-    }
-     
-    return String("");        
-}
-
-static String
 get_icon_file(String icon_name, bool user)
 {
     String icon_file;
 
     if (icon_name.length() == 0) {
-        return String(
-            SCIM_KMFL_SYSTEM_KEYBOARDS_DIR SCIM_PATH_DELIM_STRING
-            "icons" SCIM_PATH_DELIM_STRING "default.png");
+	icon_file =
+	    SCIM_KMFL_SYSTEM_KEYBOARDS_DIR SCIM_PATH_DELIM_STRING
+	    "icons" SCIM_PATH_DELIM_STRING "default.png";
     } else if (user) {
-        icon_file =
-            scim_get_home_dir() +
-            SCIM_KMFL_USER_KEYBOARDS_DIR SCIM_PATH_DELIM_STRING
-            "icons" SCIM_PATH_DELIM_STRING + icon_name;
+	icon_file =
+	    scim_get_home_dir() +
+	    SCIM_KMFL_USER_KEYBOARDS_DIR SCIM_PATH_DELIM_STRING
+	    "icons" SCIM_PATH_DELIM_STRING + icon_name;
     } else {
-        icon_file =
-            SCIM_KMFL_SYSTEM_KEYBOARDS_DIR SCIM_PATH_DELIM_STRING
-            "icons" SCIM_PATH_DELIM_STRING + icon_name;
+	icon_file =
+	    SCIM_KMFL_SYSTEM_KEYBOARDS_DIR SCIM_PATH_DELIM_STRING
+	    "icons" SCIM_PATH_DELIM_STRING + icon_name;
     }
+    
     return icon_file;
-}
-
-static String
-get_existing_icon_file(String icon_name, bool user)
-{
-    return find_real_icon_file(get_icon_file(icon_name, user));    
 }
 
 static void
@@ -913,8 +888,10 @@ add_keyboard_to_list(XKEYBOARD * keyboard, const String & dir,
     GdkPixbuf *pixbuf;
     gchar *name;
     
-    String icon_file=get_existing_icon_file(get_icon_name(keyboard), user);
+    String icon_file=get_icon_file(get_icon_name(keyboard), user);
     
+    fprintf(stderr, "DAR: loading icon file %s\n", icon_file.c_str());
+
     pixbuf = gdk_pixbuf_new_from_file(icon_file.c_str(), NULL);
 
     scale_pixbuf(&pixbuf, LIST_ICON_SIZE, LIST_ICON_SIZE);
@@ -1190,6 +1167,8 @@ on_keyboard_install_clicked(GtkButton * button, gpointer user_data)
 	return;
     }
 
+    fprintf(stderr, "DAR: Checking for %s\n", keyboard->name);
+
     // Find if there is a keyboard with same name was already installed.
     if (find_keyboard_in_list_by_xkeyboard(keyboard, &iter)) {
 	gchar *fn;
@@ -1278,57 +1257,39 @@ on_keyboard_install_clicked(GtkButton * button, gpointer user_data)
 				  (__widget_keyboard_list_model), &iter);
     }
 
-    if (!make_dir(path+SCIM_PATH_DELIM_STRING+"icons")) {
-        msg = gtk_message_dialog_new(0, GTK_DIALOG_MODAL,
-                         GTK_MESSAGE_ERROR,
-                         GTK_BUTTONS_CLOSE,
-                         _
-                         ("Failed to install the table to %s!"),
-                         new_file.c_str());
-        gtk_dialog_run(GTK_DIALOG(msg));
-        gtk_widget_destroy(msg);
+    if (!make_dir(path) && !make_dir(path+SCIM_PATH_DELIM_STRING+"icons")) {
+	msg = gtk_message_dialog_new(0, GTK_DIALOG_MODAL,
+				     GTK_MESSAGE_ERROR,
+				     GTK_BUTTONS_CLOSE,
+				     _
+				     ("Failed to install the table to %s!"),
+				     new_file.c_str());
+	gtk_dialog_run(GTK_DIALOG(msg));
+	gtk_widget_destroy(msg);
 
-        free(keyboard);
-        return;
+	free(keyboard);
+	return;
     }
 
     if (filecopy(file, new_file)) {
-        String full_icon_path;
-        String icon_name;       
-
         // let try for the icon file
-        icon_name = get_icon_name(keyboard);
-        full_icon_path=find_real_icon_file(get_dirname(file)+SCIM_PATH_DELIM_STRING+icon_name);
-
-        if (full_icon_path.length() == 0)
-        {
-            msg = gtk_message_dialog_new(0, GTK_DIALOG_MODAL,
-                             GTK_MESSAGE_WARNING,
-                             GTK_BUTTONS_CLOSE,
-                             _
-                             ("No icon file found for keyboard %s!"),
-                             file.c_str());
-            gtk_dialog_run(GTK_DIALOG(msg));
-            gtk_widget_destroy(msg);
-        } else {
-            String destdir = scim_get_home_dir() + SCIM_KMFL_USER_KEYBOARDS_DIR + SCIM_PATH_DELIM_STRING + "icons" + SCIM_PATH_DELIM_STRING;
-            String cmd = "cp " + full_icon_path + " " + destdir;
-            system(cmd.c_str());
-        }
-        add_keyboard_to_list(keyboard, path, new_file, user_keyboard);
+        String icon_name = get_icon_name(keyboard);
+        filecopy(get_dirname(file)+SCIM_PATH_DELIM_STRING+icon_name, 
+                 get_icon_file(icon_name, user_keyboard));
+	add_keyboard_to_list(keyboard, path, new_file, user_keyboard);
         restart_scim();
     } else {
-        msg = gtk_message_dialog_new(0, GTK_DIALOG_MODAL,
-                         GTK_MESSAGE_ERROR,
-                         GTK_BUTTONS_CLOSE,
-                         _
-                         ("Failed to install the keyboard %s!"),
-                         file.c_str());
-        gtk_dialog_run(GTK_DIALOG(msg));
-        gtk_widget_destroy(msg);
+	msg = gtk_message_dialog_new(0, GTK_DIALOG_MODAL,
+				     GTK_MESSAGE_ERROR,
+				     GTK_BUTTONS_CLOSE,
+				     _
+				     ("Failed to install the keyboard %s!"),
+				     file.c_str());
+	gtk_dialog_run(GTK_DIALOG(msg));
+	gtk_widget_destroy(msg);
 
-        free(keyboard);
-        return;
+	free(keyboard);
+	return;
     }
 }
 
@@ -1391,17 +1352,12 @@ on_keyboard_delete_clicked(GtkButton * button, gpointer user_data)
             XKEYBOARD * keyboard;
             gchar *type;
             bool user;
-            String icon_file;
-            
             gtk_tree_model_get(model, &iter, 
                                TABLE_COLUMN_KEYBOARD, &keyboard,
                                TABLE_COLUMN_TYPE, &type,             
                                TABLE_COLUMN_IS_USER, &user,-1);
-
-            icon_file=get_existing_icon_file(get_icon_name(keyboard), user);
-            
-            if (icon_file.length() != 0)
-                unlink(icon_file.c_str());
+            fprintf(stderr, "DAR got keyboard info\n");
+            unlink(get_icon_file(get_icon_name(keyboard), user).c_str());
             restart_scim();
         }
 
@@ -1428,7 +1384,6 @@ run_keyboard_properties_dialog(XKEYBOARD * keyboard,
     GtkWidget *entry_icon;
     GtkWidget *entry_locales;
     GtkWidget *entry_copyright;
-    GtkWidget *entry_message;
     GtkWidget *okbutton;
 
     gint result = GTK_RESPONSE_CANCEL;
@@ -1506,20 +1461,6 @@ run_keyboard_properties_dialog(XKEYBOARD * keyboard,
 			 (GtkAttachOptions) (0), 0, 0);
 	gtk_misc_set_alignment(GTK_MISC(entry_copyright), 0, 0.5);
 
-	label = gtk_label_new(_("Message:"));
-	gtk_widget_show(label);
-	gtk_table_attach(GTK_TABLE(table), label, 0, 1, 7, 8,
-			 (GtkAttachOptions) (GTK_FILL),
-			 (GtkAttachOptions) (0), 0, 0);
-	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
-
-	entry_message = gtk_label_new(data.message.c_str());
-	gtk_widget_show(entry_message);
-	gtk_table_attach(GTK_TABLE(table), entry_message, 1,
-			 2, 7, 8,
-			 (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-			 (GtkAttachOptions) (0), 0, 0);
-	gtk_misc_set_alignment(GTK_MISC(entry_message), 0, 0.5);
 
 	label = gtk_label_new(_("Icon File:"));
 	gtk_widget_show(label);
@@ -1615,9 +1556,8 @@ on_keyboard_properties_clicked(GtkButton * button, gpointer user_data)
 	data.locales = get_static_store(keyboard, SS_LANGUAGE);
 	if (data.locales.length() == 0)
 	    data.locales = String("None specified");
-	data.icon = get_existing_icon_file(get_icon_name(keyboard), user);
+	data.icon = get_icon_file(get_icon_name(keyboard), user);
 	data.copyright = get_static_store(keyboard, SS_COPYRIGHT);
-	data.message = get_static_store(keyboard, SS_MESSAGE);
 
 	olddata = data;
 

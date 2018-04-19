@@ -11,7 +11,7 @@
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 2 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -326,8 +326,7 @@ String KmflFactory::get_uuid() const
 String KmflFactory::get_icon_file() const
 {
     String icon_file = kmfl_icon_file(m_keyboard_number);
-    String valid_extensions[3]= {"", ".bmp", ".png"};
-    String test_path;
+
     if (icon_file.length() == 0) {
         return String(SCIM_KMFL_IMENGINE_MODULE_DATADIR
                       SCIM_PATH_DELIM_STRING "icons" SCIM_PATH_DELIM_STRING
@@ -339,16 +338,13 @@ String KmflFactory::get_icon_file() const
             icon_file;
         struct stat filestat;
 
-        for (int i=0; i < 3; i++)
-        {
-            test_path=full_path_to_icon_file+valid_extensions[i];
-            stat(test_path.c_str(), &filestat);
+        stat(full_path_to_icon_file.c_str(), &filestat);
 
-            if (S_ISREG(filestat.st_mode))
-                return test_path;
+        if (S_ISREG(filestat.st_mode)) {
+            return full_path_to_icon_file;
+        } else {
+            return String("");
         }
-         
-        return String("");        
     }
 }
 
@@ -607,6 +603,7 @@ void KmflInstance::erase_char()
 
     WideString text;
     int cursor;
+    bool result;
     
     DBGMSG(1, "DAR: kmfl - backspace\n");
 

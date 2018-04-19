@@ -1,8 +1,6 @@
-SUBDIRS = intl po src scim_kmfl_imengine_setup data
+SUBDIRS = po src scim_kmfl_imengine_setup data
 
-EXTRA_DIST = intltool-extract.in intltool-merge.in intltool-update.in
-DISTCLEANFILES = intltool-extract intltool-merge intltool-update
-
+ACLOCAL_AMFLAGS = -I m4
 
 # Copy all the spec files. Of cource, only one is actually used.
 dist-hook:
