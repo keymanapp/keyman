@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<anjuta_rpm_builder>
+  <head>
+    <property name="rbc-version">1.0</property>
+    <property name="projectname">kmflcomp</property>
+    <property name="projectversion">0.3</property>
+  </head>
+  <global>
+    <property name="Name">kmflcomp</property>
+    <property name="Version">0.3</property>
+    <property name="Release">1</property>
+    <property name="Vendor">User &lt;Email&gt;</property>
+    <property name="Packager">User &lt;Email&gt;</property>
+    <property name="License">GPL</property>
+    <property name="BuildArch">i386</property>
+    <property name="BuildRoot">/var/tmp/kmflcomp</property>
+    <property name="Prefix">/usr</property>
+    <Source>%{name}-%{version}.tar.gz</Source>
+    <Docs>AUTHORS
+COPYING
+ChangeLog
+README
+INSTALL
+NEWS
+TODO
+</Docs>
+    <script name="build">
+      <property name="by_user">False</property>
+    </script>
+    <script name="install">
+      <property name="by_user">False</property>
+    </script>
+    <script name="configure">
+      <property name="by_user">False</property>
+    </script>
+    <script name="setup">
+      <property name="by_user">False</property>
+    </script>
+    <changelog/>
+  </global>
+  <subpackage>
+    <property name="disabled">False</property>
+    <property name="conditional_building">False</property>
+    <property name="Name">%base%</property>
+    <property name="Group">Applications/System</property>
+    <property name="Summary">%{name}</property>
+    <property name="Requires">libkmfl</property>
+    <property name="Provides">kmflcomp</property>
+    <Description>%anjuta%</Description>
+    <Files>%{_bindir}/kmflcomp
+</Files>
+  </subpackage>
+</anjuta_rpm_builder>
