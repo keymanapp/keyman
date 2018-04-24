@@ -12,6 +12,7 @@
 Install packages required for building and developing KMFL
 `sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential dh-autoreconf flex bison libibus-1.0-dev`
 
+
 ### Compiling from Command Line
 
 #### Build script
@@ -20,6 +21,10 @@ Run `./build.sh` to build and install kmflcomp, libkmfl and ibus-kmfl to `/tmp/k
 
 set `$INSTALLDIR` to use a different install directory.
 e.g. `INSTALLDIR=/home/me/kmfl ./build.sh`
+
+The install of ibus-kmfl doesn't install everything to the correct location for it to be used - to be fixed
+
+Also describe how to get from compiling to having something that ibus will use.
 
 #### Manually
 
@@ -56,9 +61,55 @@ Tests to be created
 
 ### Running Keyman for Linux
 
- * Right-click on the ibus status icon and open `Preferences`.
+#### Setting up Ibus
+
+Ibus should be running on a default install of Ubuntu
+
+You may want to install extra packages to get other ibus input methods e.g ibus-unikey for VN
+
+#### Getting a Keyman keyboard
+
+TODO
+
+After installing a Keyman keyboard you need to run `ibus restart` so that ibus will look for it.
+
+#### Activating a Keyman keyboard
+
+##### GNOME3 (bionic default)
+
+ * Click the connection/sound/shutdown section in the top right. Then the tools icon for Settings.
+
+ * In `Language and Region` click `+` to add a keyboard.
+ * Click the 3 dots expander then search for "Other" and click it
+ * The Keyman keyboards should be listed here to choose
+
+ * Use `Win-space` to switch between keyboards.
+
+##### Unity (xenial default)
+
+ * Run `Text Entry`
+ * Click `+` to add a keyboard.
+ * In `Choose an input source` search for "Other" or the keyboard name, or "Ibus" to find Keyman keyboards.
+
+Check `Show current input source in the menu bar` to see what keyboard you are using and have a menu for keyboards.
+
+Use `Win-space` to switch between keyboards.
+
+##### Cinnamon (wasta xenial default)
+
+ * Open `Menu` and find `IBus Preferences`and run it
+ * Make sure `Show icon on system tray` is checked
  * Select the tab `Input Method`.
  * Click `Add` to add a keyman keyboard.
- * Click the 3 dots expander then `Other` which is at the bottom
- * The list of keyboards will include the Keyman ones
+ * Click the 3 dots expander then search for "Other" and click it
+ * The Keyman keyboards should be listed here to choose
+
+##### MATE (alternative)
+
+ * Open `System-> Preferences -> Other -> IBus Preferences`.
+ * Make sure `Show icon on system tray` is checked
+ * Select the tab `Input Method`.
+ * Click `Add` to add a keyman keyboard.
+ * Click the 3 dots expander then search for "Other" and click it
+ * The Keyman keyboards should be listed here to choose
   
