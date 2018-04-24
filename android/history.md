@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 2018-04-24 10.0.376 beta
+* Hide system OSK when resuming Keyman app (#711)
+
 ## 2018-03-22 10.0.373 beta
 * Initial beta release of Keyman for Android 10.0
 
