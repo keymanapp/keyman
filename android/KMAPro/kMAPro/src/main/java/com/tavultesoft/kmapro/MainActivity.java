@@ -152,6 +152,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     textView.setTextSize((float) textSize);
     textView.setSelection(textView.getText().length());
 
+
+
+
     boolean didCheckUserData = prefs.getBoolean(MainActivity.didCheckUserDataKey, false);
     if (!didCheckUserData && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)) {
       try {
@@ -227,6 +230,8 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   protected void onResume() {
     super.onResume();
     KMManager.onResume();
+    KMManager.hideSystemKeyboard();
+
     if (!KMManager.keyboardExists(this, KMManager.KMDefault_UndefinedPackageID,
       KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID)) {
       HashMap<String, String> kbInfo = new HashMap<String, String>();

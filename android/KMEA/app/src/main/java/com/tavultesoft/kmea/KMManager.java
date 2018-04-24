@@ -257,6 +257,12 @@ public final class KMManager {
     }
   }
 
+  public static void hideSystemKeyboard() {
+    if (SystemKeyboard != null) {
+      SystemKeyboard.hideKeyboard();
+    }
+  }
+
   @SuppressLint("InflateParams")
   public static View createInputView(InputMethodService inputMethodService) {
     //final Context context = appContext;
