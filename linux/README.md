@@ -9,7 +9,9 @@
 
 ## Linux Requirements/Setup
 
-Install packages required for building and developing KMFL
+- It is helpful to be using the [packages.sil.org](http://packages.sil.org)  repo
+
+- Install packages required for building and developing KMFL
 `sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential dh-autoreconf flex bison libibus-1.0-dev`
 
 
@@ -17,14 +19,27 @@ Install packages required for building and developing KMFL
 
 #### Build script
 
+##### Build only
+
 Run `./build.sh` to build and install kmflcomp, libkmfl and ibus-kmfl to `/tmp/kmfl`
 
 set `$INSTALLDIR` to use a different install directory.
 e.g. `INSTALLDIR=/home/me/kmfl ./build.sh`
 
-The install of ibus-kmfl doesn't install everything to the correct location for it to be used - to be fixed
+This is only for testing the build, not for running ibus-kmfl in ibus
 
-Also describe how to get from compiling to having something that ibus will use.
+##### Installing for ibus to use ibus-kmfl
+
+- Some of the files must be installed to `/usr/share/` so `make install` must be run as `sudo`. 
+
+ - To do this run `SUDOINSTALL="yes" ./build.sh`
+
+    * This will install to /usr/local
+        * and `/usr/share/ibus/component/kmfl.xml` and `/usr/share/kmfl/icons`
+
+    * If you already have the ibus-kmfl package installed then build.sh will move the file `/usr/share/ibus/component/kmfl.xml` to `/usr/share/doc/ibus-kmfl/`
+
+        * run `SUDOINSTALL="uninstall" ./build.sh` to put it back again
 
 #### Manually
 
@@ -57,7 +72,7 @@ Teamcity will run build.sh
 TBD, hopefully jenkins
 
 ### Testing
-Tests to be created
+Tests to be created as there are no current tests
 
 ### Running Keyman for Linux
 
@@ -67,11 +82,18 @@ Ibus should be running on a default install of Ubuntu
 
 You may want to install extra packages to get other ibus input methods e.g ibus-unikey for VN
 
+Run `ibus restart` after installing any of them
+
 #### Getting a Keyman keyboard
 
-TODO
+- There are some kmfl keyboards available on packages.sil.org. Search for "kmfl-keyboard". These will also install the ibus-kmfl package.
 
-After installing a Keyman keyboard you need to run `ibus restart` so that ibus will look for it.
+- You can find more `.kmn` source keyboards at the [Keyboards repo](https://github.com/keymanapp/keyboards). They may or may not currently work with KMFL.
+
+- The `.kmn` file should be put in `/usr/share/kmfl` or `~/.kmfl`, preferably `~/.kmfl`
+    * TODO: let ibus-kmfl find keyboards in `/usr/local/share/kmfl` as well
+
+- After installing a Keyman keyboard you need to run `ibus restart` so that ibus will look for it. (TODO: double check this)
 
 #### Activating a Keyman keyboard
 
