@@ -910,6 +910,8 @@ if(!window['keyman']['initialized']) {
       } else if (keyShiftState == osk.modifierCodes['SHIFT']) {
         checkCodes = true; 
         keyShiftState = 1; // It's used as an index.
+      } else {
+        console.warn("KMW only defines default key output for the 'default' and 'shift' layers!");
       }
 
       // If this was triggered by the OSK -or- if it was triggered within a touch-aliased DIV element.
@@ -1001,7 +1003,7 @@ if(!window['keyman']['initialized']) {
           ch=String.kmwFromCharCode(codePoint);
         }
         // Hereafter, we refer to keyCodes.
-      } else if(checkCodes) {
+      } else if(checkCodes) { // keyShiftState can only be '1' or '2'.
         try {
           if(n >= osk.keyCodes['K_0'] && n <= osk.keyCodes['K_9']) { // The number keys.
             ch = codesUS[keyShiftState][0][n-osk.keyCodes['K_0']];
