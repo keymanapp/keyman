@@ -1002,14 +1002,18 @@ if(!window['keyman']['initialized']) {
         }
         // Hereafter, we refer to keyCodes.
       } else if(checkCodes) {
-        if(n >= osk.keyCodes['K_0'] && n <= osk.keyCodes['K_9']) { // The number keys.
-          ch = codesUS[keyShiftState][0][n-osk.keyCodes['K_0']];
-        } else if(n >=osk.keyCodes['K_A'] && n <= osk.keyCodes['K_Z']) { // The base letter keys
-          ch = String.fromCharCode(n+(keyShiftState?0:32));  // 32 is the offset from uppercase to lowercase.
-        } else if(n >= osk.keyCodes['K_COLON'] && n <= osk.keyCodes['K_BKQUOTE']) {
-          ch = codesUS[keyShiftState][1][n-osk.keyCodes['K_COLON']];
-        } else if(n >= osk.keyCodes['K_LBRKT'] && n <= osk.keyCodes['K_QUOTE']) {
-          ch = codesUS[keyShiftState][2][n-osk.keyCodes['K_LBRKT']];
+        try {
+          if(n >= osk.keyCodes['K_0'] && n <= osk.keyCodes['K_9']) { // The number keys.
+            ch = codesUS[keyShiftState][0][n-osk.keyCodes['K_0']];
+          } else if(n >=osk.keyCodes['K_A'] && n <= osk.keyCodes['K_Z']) { // The base letter keys
+            ch = String.fromCharCode(n+(keyShiftState?0:32));  // 32 is the offset from uppercase to lowercase.
+          } else if(n >= osk.keyCodes['K_COLON'] && n <= osk.keyCodes['K_BKQUOTE']) {
+            ch = codesUS[keyShiftState][1][n-osk.keyCodes['K_COLON']];
+          } else if(n >= osk.keyCodes['K_LBRKT'] && n <= osk.keyCodes['K_QUOTE']) {
+            ch = codesUS[keyShiftState][2][n-osk.keyCodes['K_LBRKT']];
+          }
+        } catch (e) {
+          console.error("Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default'));
         }
       }
       return ch;
