@@ -13,10 +13,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:ems="10"
-        android:inputType="textMultiLine"
+        android:inputType="textMultiLine|textNoSuggestions"
         android:hint="@string/textview_hint"
         android:gravity="top"
-        android:scrollbars="vertical" >
+        android:scrollbars="vertical">
 
         <requestFocus />
     </com.tavultesoft.kmea.KMTextView>
