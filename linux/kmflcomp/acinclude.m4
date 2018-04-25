@@ -1,6 +1,6 @@
 AC_DEFUN([AM_GNU_GETTEXT_VERSION], [])
 
-AC_DEFUN(AC_YACC_EXPECT,[
+AC_DEFUN([AC_YACC_EXPECT],[
 AC_MSG_CHECKING([whether $YACC understands %expect])
 cat > ac_test.y <<_ACEOF
 %{
@@ -33,7 +33,7 @@ AC_SUBST(YACC_PREEXPECT)
 AC_SUBST(YACC_POSTEXPECT)
 ])
 
-AC_DEFUN(AC_YACC_ERROR,[
+AC_DEFUN([AC_YACC_ERROR],[
 AC_MSG_CHECKING([whether $YACC understands error])
 cat > ac_test.y <<_ACEOF
 %{

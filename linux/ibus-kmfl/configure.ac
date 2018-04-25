@@ -29,8 +29,8 @@ m4_define(ibus_maybe_datestamp,
 m4_define([ibus_version],
     ibus_major_version.ibus_minor_version.ibus_micro_version[]ibus_maybe_datestamp)
 
-AC_INIT([ibus-kmfl], [1.0.8], [http://code.google.com/p/ibus/issues/entry],[ibus-kmfl])
-AM_INIT_AUTOMAKE([1.10])
+AC_INIT([ibus-kmfl], [10.99.1], [http://code.google.com/p/ibus/issues/entry],[ibus-kmfl])
+AM_INIT_AUTOMAKE
 AC_GNU_SOURCE
 
 AC_CONFIG_HEADERS([config.h])
