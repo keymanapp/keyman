@@ -78,7 +78,21 @@ extension KeymanWebViewController {
 
   // FIXME: text is unused in the JS
   func executePopupKey(id: String, text: String) {
-    webView.evaluateJavaScript("executePopupKey('\(id)','\(text)');", completionHandler: nil)
+    //var escapedText: String;
+    // Text must be checked for ', ", and \ characters; they must be escaped properly!
+    do {
+      let encodingArray = [ text ];
+      let jsonString = try String(data: JSONSerialization.data(withJSONObject: encodingArray), encoding: .utf8)!
+      let start = jsonString.index(jsonString.startIndex, offsetBy: 2)
+      let end = jsonString.index(jsonString.endIndex, offsetBy: -2)
+      let escapedText = jsonString[start..<end]
+      
+      let cmd = "executePopupKey(\"\(id)\",\"\(escapedText)\");"
+      webView.evaluateJavaScript(cmd, completionHandler: nil)
+    } catch {
+      log.error(error)
+      return
+    }
   }
 
   func setOskWidth(_ width: Int) {
