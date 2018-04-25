@@ -1,7 +1,16 @@
 # Keyman Desktop Version History
 
+## 2018-04-12 10.0.1057.0 beta
+* Fix for backspace in legacy mode breaking SMP characters (#729)
+
+## 2018-03-31 10.0.1056.0 beta
+* No changes in Keyman Desktop
+
+## 2018-03-22 10.0.1055.0 beta
+* Offline help updates are synchronised with help.keyman.com in the correct version (#695)
+
 ## 2018-03-22 10.0.1054.0 beta
-Initial beta release of Keyman Desktop 10
+* Initial beta release of Keyman Desktop 10
 
 ## 10.0 alpha
 * Keyman Desktop moved to open source (#121)
