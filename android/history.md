@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 2018-04-26 10.0.379 beta
+* Fix OSK missing some keys on older Android configurations (#304)
+
 ## 2018-04-24 10.0.376 beta
 * Hide system OSK when resuming Keyman app. Disable text suggestions (#711)
 
