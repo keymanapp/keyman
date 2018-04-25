@@ -1,5 +1,8 @@
 # Keyman for iPhone and iPad Version History
 
+## 2018-04-25 10.0.140 beta
+* Fixed lack of output for certain punctuation longpress keys. (#702)
+
 ## 2018-03-22 10.0.139 beta
 * Initial beta release of Keyman for iPhone and iPad 10
 
