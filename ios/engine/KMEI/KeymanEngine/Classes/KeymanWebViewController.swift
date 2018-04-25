@@ -78,7 +78,6 @@ extension KeymanWebViewController {
 
   // FIXME: text is unused in the JS
   func executePopupKey(id: String, text: String) {
-    //var escapedText: String;
     // Text must be checked for ', ", and \ characters; they must be escaped properly!
     do {
       let encodingArray = [ text ];
