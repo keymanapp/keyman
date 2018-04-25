@@ -1,5 +1,5 @@
 Format: http://anonscm.debian.org/viewvc/dep/web/deps/dep5.mdwn?view=markup&pathrev=174
-Upstream-Name: kmflcomp
+Upstream-Name: ibus-kmfl
 Upstream-Contact: Doug Rintoul <doug_rintoul@sil.org>
 
 Files: *
