@@ -1,5 +1,14 @@
 # Keyman Developer Version History
 
+## 2018-04-12 10.0.1057.0 beta
+* No changes in Keyman Developer
+
+## 2018-03-31 10.0.1056.0 beta
+* Web compiler was not escaping quote character in v10.0 keyboards (#719)
+
+## 2018-03-22 10.0.1055.0 beta
+* No changes in Keyman Developer
+
 ## 2018-03-22 10.0.1054.0 beta
 * Initial beta release of Keyman Developer 10 
 
