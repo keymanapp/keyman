@@ -1,5 +1,8 @@
 # KeymanWeb Version History
 
+## 2018-04-25 10.0.86 beta
+* Fixes display of popup keys representing modifiers and other special characters. (#698)
+
 ## 2018-03-22 10.0.83 beta
 * Initial beta for KeymanWeb v 10.0.
 
