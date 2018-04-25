@@ -93,6 +93,8 @@ type
     procedure SaveFont;
     procedure FocusTestWindow;
     procedure ShowEditControl;
+  protected
+    function GetHelpTopic: string; override;
   public
     procedure Reload;
     property KeyboardName: string read FKeyboardName write SetKeyboardName;
@@ -102,6 +104,8 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   KeymanDeveloperUtils,
   kmxfile,
   UfrmMessages,
@@ -429,6 +433,11 @@ begin
   end;
 end;
 
+
+function TfrmTestKeyboard.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_TestKeyboard;
+end;
 
 { Debug menu }
 

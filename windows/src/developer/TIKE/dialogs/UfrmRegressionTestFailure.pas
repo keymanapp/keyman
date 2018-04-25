@@ -45,7 +45,8 @@ type
     procedure SetActualString(Value: WideString);
     procedure SetExpectedString(Value: WideString);
     procedure SetTestName(Value: string);
-    { Private declarations }
+  protected
+    function GetHelpTopic: string; override;
   public
     { Public declarations }
     property TestName: string read FTestName write SetTestName;
@@ -56,9 +57,17 @@ type
 
 implementation
 
+uses
+  Keyman.Developer.System.HelpTopics;
+
 {$R *.DFM}
 
 { TfrmRegressionTestFailure }
+
+function TfrmRegressionTestFailure.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_RegressionTestFailure;
+end;
 
 procedure TfrmRegressionTestFailure.SetActualString(Value: WideString);
 begin

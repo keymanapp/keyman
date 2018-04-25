@@ -60,6 +60,8 @@ type
     procedure SetDebugForm(const Value: TfrmDebug);
     procedure SetDisplayFont(const Value: TFont);
 
+  protected
+    function GetHelpTopic: string; override;
   public
     property DebugForm: TfrmDebug read FDebugForm write SetDebugForm;
 
@@ -72,12 +74,11 @@ type
     property RegTest: TfrmDebugStatus_RegTest read FRegTest;
   end;
 
-//var
-//  frmDebugStatus: TfrmDebugStatus;
-
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   UfrmMain;
 
 {$R *.dfm}
@@ -106,6 +107,11 @@ begin
   FRegTest := TfrmDebugStatus_RegTest.Create(Self);
   FRegTest.Parent := tabDebugRegressionTesting;
   FRegTest.Visible := True;
+end;
+
+function TfrmDebugStatus.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_DebugStatus;
 end;
 
 procedure TfrmDebugStatus.SetDebugForm(const Value: TfrmDebug);

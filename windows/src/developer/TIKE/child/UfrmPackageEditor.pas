@@ -251,6 +251,7 @@ type
       State: TProjectLogState);
 
   protected
+    function GetHelpTopic: string; override;
     function DoOpenFile: Boolean; override;
     function DoSaveFile: Boolean; override;
     function GetFileNameFilter: string; override;
@@ -273,6 +274,8 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   CharMapDropTool,
   CharMapInsertMode,
   CompilePackageInstaller,
@@ -460,6 +463,11 @@ end;
 function TfrmPackageEditor.GetFileNameFilter: string;
 begin
   Result := 'Package source files (*.kps)|*.kps|All files (*.*)|*.*';
+end;
+
+function TfrmPackageEditor.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_PackageEditor;
 end;
 
 function TfrmPackageEditor.DoOpenFile: Boolean;

@@ -52,7 +52,8 @@ type
     function GetLanguageID: string;
     function GetLanguageName: string;
     procedure RefreshPreview;
-    { Private declarations }
+  protected
+    function GetHelpTopic: string; override;
   public
     { Public declarations }
     property LanguageID: string read GetLanguageID;
@@ -62,6 +63,7 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
   Keyman.System.KMXFileLanguages,
   utilexecute;
 
@@ -79,6 +81,11 @@ procedure TfrmSelectBCP47Language.FormDestroy(Sender: TObject);
 begin
   inherited;
   FreeAndNil(tag);
+end;
+
+function TfrmSelectBCP47Language.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_SelectBCP47Language;
 end;
 
 function TfrmSelectBCP47Language.GetLanguageID: string;

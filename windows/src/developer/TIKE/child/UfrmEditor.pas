@@ -86,6 +86,7 @@ type
     function GetTextFileFormat: TTextFileFormat;
 
   protected
+    function GetHelpTopic: string; override;
     function DoSaveFile: Boolean; override;
     function DoOpenFile: Boolean; override;
     function GetFileNameFilter: string; override;
@@ -116,6 +117,8 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   CharacterDragObject,
   CharMapDropTool,
   ClipBrd,
@@ -326,6 +329,11 @@ end;
 function TfrmEditor.GetFileNameFilter: string;
 begin
   Result := 'Keyboard definitions (*.kmn)|*.kmn|HTML files (*.htm, *.html)|*.htm?|XML files (*.xml)|*.xml|Text files (*.txt)|*.txt|All files (*.*)|*.*';
+end;
+
+function TfrmEditor.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_Editor;
 end;
 
 function TfrmEditor.GetTextFileFormat: TTextFileFormat;

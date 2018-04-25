@@ -84,6 +84,7 @@ type
     procedure SetupModifierKeysForImportedLayout;
     { Private declarations }
   protected
+    function GetHelpTopic: string; override;
 
     procedure CopyToClipboard;
     procedure CutToClipboard;
@@ -125,6 +126,8 @@ uses
   mshtmcid,
   xmlintf,
   xmldoc,
+
+  Keyman.Developer.System.HelpTopics,
 
   KeymanDeveloperOptions,
   VKeys,
@@ -677,6 +680,11 @@ begin
   finally
     Free;
   end;
+end;
+
+function TframeTouchLayoutBuilder.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_TouchLayoutBuilder;
 end;
 
 function TframeTouchLayoutBuilder.GetLayoutJS: string;

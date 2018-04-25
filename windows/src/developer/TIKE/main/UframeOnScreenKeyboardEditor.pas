@@ -182,6 +182,8 @@ type
     function DoesKeyboardSupportXMLVisualKeyboard: Boolean;
     function TransferDesignToSource: Boolean;
     function TransferSourceToDesign(ASilent: Boolean): Boolean;   // I4057
+  protected
+    function GetHelpTopic: string; override;
   public
     procedure Load;
     procedure Save;
@@ -201,6 +203,8 @@ implementation
 
 uses
   Xml.Xmldom,
+
+  Keyman.Developer.System.HelpTopics,
 
   CharacterInfo,
   CharMapInsertMode,
@@ -1238,6 +1242,11 @@ begin
   finally
     Free;
   end;
+end;
+
+function TframeOnScreenKeyboardEditor.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_OnScreenKeyboardEditor;
 end;
 
 function TframeOnScreenKeyboardEditor.GetHTMLExportParams(FFileName: string;

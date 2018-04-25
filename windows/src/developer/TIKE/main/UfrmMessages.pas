@@ -33,7 +33,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, CaptionPanel, Menus, Contnrs, UfrmTikeDock, UfrmTike;
+  StdCtrls, ExtCtrls, CaptionPanel, Menus, Contnrs, UfrmTikeDock, UfrmTike,
+  JvComponentBase, JvDockControlForm;
 
 type
   TMessageItem = class
@@ -69,6 +70,7 @@ type
     function GetSelLine: Integer;
     procedure SetSelLine(Value: Integer);
   protected
+    function GetHelpTopic: string; override;
     property SelLine: Integer read GetSelLine write SetSelLine;
   public
     procedure RefreshOptions;
@@ -91,6 +93,8 @@ function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Int
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   UfrmMain,
   UfrmMDIEditor,
   dmActionsMain,
@@ -252,6 +256,11 @@ end;
 procedure TfrmMessages.RefreshOptions;
 begin
 
+end;
+
+function TfrmMessages.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_Messages;
 end;
 
 function TfrmMessages.GetSelLine: Integer;
