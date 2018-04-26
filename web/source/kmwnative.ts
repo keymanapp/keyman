@@ -482,18 +482,23 @@ if(!window['keyman']['initialized']) {
         // Hide OSK at start of rotation
         if('onmozorientationchange' in screen)
           util.attachDOMEvent(screen,'mozorientationchange',osk.hideNow);
-        else
+        else if(util.device.OS != "iOS")
           util.attachDOMEvent(window,'orientationchange',osk.hideNow);
 
         // Then align inputs and redisplay the OSK on resize event following rotation
-        util.attachDOMEvent(window,'resize',
-          function(){
-            keymanweb.alignInputs(true);
-            osk.hideLanguageList();
-            osk._Load();
-            if(osk.wasVisible)osk._Show();
-            }
-          );
+        var rotationHandler: () => void = function() {
+          keymanweb.alignInputs(true);
+          osk.hideLanguageList();
+          osk._Load();
+          if(osk.wasVisible) {
+            osk._Show();
+          }
+        };
+
+        util.attachDOMEvent(window, 'resize', rotationHandler);
+        if(util.device.OS == "iOS") {
+          util.attachDOMEvent(window, 'orientationchange', rotationHandler);
+        }
       } 
 
       //TODO: may be able to recognize start of rotation using accelerometer call...
