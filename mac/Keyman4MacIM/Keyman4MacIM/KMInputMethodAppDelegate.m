@@ -161,8 +161,10 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
     if (appDelegate != nil) {
         NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
-        if (appDelegate.debugMode)
-            NSLog(@"System Event: %@", sysEvent);
+        // Too many of these to be useful for most debugging sessions, but we'll keep this aound to be
+        // un-commented when needed.
+        //if (appDelegate.debugMode)
+        //    NSLog(@"System Event: %@", sysEvent);
         
         switch (type) {
             case kCGEventFlagsChanged:
