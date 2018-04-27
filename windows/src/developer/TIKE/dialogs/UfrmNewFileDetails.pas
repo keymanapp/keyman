@@ -55,6 +55,8 @@ type
     procedure EnableControls;
     function GetFileName: string;
     procedure SetBaseFileName(Value: string);
+  protected
+    function GetHelpTopic: string; override;
   public
     property FileName: string read GetFileName;
     property FileType: TKMFileType read FFileType write SetFileType;
@@ -65,6 +67,9 @@ implementation
 
 uses
   ShlObj,
+
+  Keyman.Developer.System.HelpTopics,
+
   utilsystem;
 
 {$R *.DFM}
@@ -148,6 +153,11 @@ begin
   Result := IncludeTrailingPathDelimiter(editFilePath.Text) + editFileName.Text;   // I4798
   if AnsiCompareText(ExtractFileExt(Result), FDefaultExt) <> 0 then
     Result := Result + FDefaultExt;
+end;
+
+function TfrmNewFileDetails.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_NewFileDetails;
 end;
 
 end.

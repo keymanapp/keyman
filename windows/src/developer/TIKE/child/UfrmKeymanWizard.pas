@@ -466,6 +466,7 @@ type
     procedure OrderDetailsPanels;
 
   protected
+    function GetHelpTopic: string; override;
 
     procedure FocusTab;
 
@@ -547,6 +548,8 @@ implementation
 uses
   System.Math,
   System.Win.ComObj,
+
+  Keyman.Developer.System.HelpTopics,
 
   CharacterDragObject,
   CharacterInfo,
@@ -1822,6 +1825,11 @@ begin
         end;
       end;
   end;
+end;
+
+function TfrmKeymanWizard.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_KeyboardEditor;
 end;
 
 function TfrmKeymanWizard.GetIsDebugVisible: Boolean;

@@ -64,6 +64,7 @@ type
     procedure webKeyDown(Sender: TObject; var Key: Word; ScanCode: Word;
       Shift: TShiftState);
   private
+    FRefreshQueued: Boolean;
     FHelpControl: TWinControl;
     FStandardTemplatePath: WideString;
     FDocumentLoaded: Boolean;
@@ -74,8 +75,11 @@ type
     procedure AddUnmatchedContext(FormName, ControlName: string);
     procedure DeleteMatchedContext(FormName, ControlName: string);
     procedure TransformXMLToHTML;
+  protected
+    function GetHelpTopic: string; override;
   public
     procedure LoadHelp(ControlName, FormName: string);
+    procedure QueueRefresh;
   end;
 
 var
@@ -86,6 +90,8 @@ implementation
 {$R *.dfm}
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   MSHTML_TLB,
   RedistFiles,
   RegistryKeys,
@@ -133,33 +139,48 @@ end;
 procedure TfrmHelp.actHelpContextRefreshUpdate(Sender: TObject);
 var
   FormName, ControlName: string;
+  o: TComponent;
 begin
   if not FDocumentLoaded then Exit;
 
-  FormName := '';
-  ControlName := '';
-  if Screen.ActiveControl <> FHelpControl then
-  begin
-    if Screen.ActiveControl = nil then
-    else
+  if (Screen.ActiveControl <> FHelpControl) or FRefreshQueued then
+  try
+    FormName := '';
+    ControlName := '';
+
+    if Screen.ActiveControl <> nil then
     begin
-      FHelpControl := Screen.ActiveControl;
-      if FHelpControl is TCustomForm then FormName := (FHelpControl as TCustomForm).ClassName
+      // Don't get help document focus
+      if (Screen.ActiveControl = Self) or (Screen.ActiveControl.Owner = Self) then
+      begin
+        if not FRefreshQueued then
+          Exit;
+      end
+      else
+        FHelpControl := Screen.ActiveControl;
+
+      if FHelpControl is TTIKEForm then
+        FormName := (FHelpControl as TTIKEForm).HelpTopic
+      else if FHelpControl is TCustomForm then
+        FormName := FHelpControl.ClassName
       else
       begin
-        if FHelpControl.Owner <> nil then
-          FormName := FHelpControl.Owner.ClassName;
-        ControlName := FHelpControl.Name;
-      end;
+        o := FHelpControl.Owner;
+        while not (o is TTIKEForm) and (o <> nil) do
+          o := o.Owner;
 
-      if (ControlName = 'memo') and (FormName = 'TframeTextEditor') then
-      begin
-        ControlName := (FHelpControl.Owner as TframeTextEditor).GetHelpToken;
-        FormName := 'KMN';
+        if o is TTIKEForm then
+          FormName := (o as TTIKEForm).HelpTopic
+        else if FHelpControl.Owner <> nil then
+          FormName := FHelpControl.Owner.ClassName;
+
+        ControlName := FHelpControl.Name;
       end;
     end;
 
     LoadHelp(ControlName, FormName);
+  finally
+    FRefreshQueued := False;
   end;
 end;
 
@@ -198,6 +219,11 @@ begin
   except
     ;
   end;
+end;
+
+procedure TfrmHelp.QueueRefresh;
+begin
+  FRefreshQueued := True;
 end;
 
 procedure TfrmHelp.FormCreate(Sender: TObject);
@@ -276,21 +302,28 @@ begin
   web.Navigate(FTempFile.Name); // + 'contexthelp.xml');
 end;
 
+function TfrmHelp.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_Help;
+end;
+
 procedure TfrmHelp.webBeforeNavigate2(ASender: TObject; const pDisp: IDispatch;
   var URL, Flags, TargetFrameName, PostData, Headers: OleVariant;
   var Cancel: WordBool);
 var
-  FormName: string;
+  frm: TTIKEForm;
 begin
   if Copy(URL, 1, 5) = 'help:' then
   begin
     Cancel := True;
-    if FHelpControl is TCustomForm then FormName := (FHelpControl as TCustomForm).ClassName
-    else if FHelpControl.Owner <> nil then FormName := FHelpControl.Owner.ClassName
-    else FormName := '';
-    if FormName = ''
-      then frmKeymanDeveloper.HelpTopic('index')
-      else frmKeymanDeveloper.HelpTopic('context_'+Copy(FormName,2,MAXINT));
+
+    if FHelpControl is TTikeForm then frm := FHelpControl as TTikeForm
+    else if FHelpControl.Owner is TTikeForm then frm := FHelpControl.Owner as TTikeForm
+    else frm := nil;
+
+    if frm <> nil
+      then frmKeymanDeveloper.HelpTopic(frm.HelpTopic)
+      else frmKeymanDeveloper.HelpTopic('index')
   end;
 end;
 
@@ -298,6 +331,7 @@ procedure TfrmHelp.webDocumentComplete(ASender: TObject; const pDisp: IDispatch;
   var URL: OleVariant);
 begin
   FDocumentLoaded := True;
+  QueueRefresh;
 end;
 
 procedure TfrmHelp.webGetDropTarget2(Sender: TCustomEmbeddedWB;

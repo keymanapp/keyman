@@ -33,6 +33,8 @@ type
     FVKey: Word;
     FShiftState: TExtShiftState;
     FDistinguishLeftRight: Boolean;
+  protected
+    function GetHelpTopic: string; override;
   public
     property VKey: Word read FVKey;
     property ShiftState: TExtShiftState read FShiftState;
@@ -40,6 +42,9 @@ type
   end;
 
 implementation
+
+uses
+  Keyman.Developer.System.HelpTopics;
 
 {$R *.DFM}
 
@@ -65,6 +70,11 @@ begin
 
   Key := 0;
   ModalResult := mrOk;
+end;
+
+function TfrmSelectKey.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_SelectKey;
 end;
 
 end.
