@@ -349,31 +349,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       navbarBackground.setOrientation(toInterfaceOrientation)
     }
 
-    /*
-    // TODO: Refactor
-    if UIDevice.current.userInterfaceIdiom == .phone {
-      let screenRect = UIScreen.main.bounds
-      let size = CGFloat.maximum(screenRect.width, screenRect.height)
-      if size > 568.0 {
-        // Navbar for iPhone 6 & 6 Plus
-        let image: UIImage
-        if UIInterfaceOrientationIsPortrait(orientation) {
-          image = #imageLiteral(resourceName: "navbar-Portrait.png")
-        } else {
-          image = #imageLiteral(resourceName: "navbar-Landscape-568h.png")
-        }
-        let bgImg = image.resizableImage(withCapInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0),
-                                         resizingMode: .stretch)
-        navigationController?.navigationBar.setBackgroundImage(bgImg, for: UIBarMetrics.default)
-      }
-    } else {
-      if UIInterfaceOrientationIsPortrait(orientation) {
-        navigationController?.navigationBar.setBackgroundImage(#imageLiteral(resourceName: "navbar-Portrait.png"), for: UIBarMetrics.default)
-      } else {
-        navigationController?.navigationBar.setBackgroundImage(#imageLiteral(resourceName: "navbar-Landscape.png"), for: UIBarMetrics.default)
-      }
-    }
-    */
     popover?.dismiss(animated: false)
     _ = dismissDropDownMenu()
   }
