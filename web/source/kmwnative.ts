@@ -469,65 +469,41 @@ if(!window['keyman']['initialized']) {
     /**
      * Use rotation events to adjust OSK and input element positions and scaling as necessary
      */     
-    keymanweb.handleRotationEvents=function() 
-    {
-      if(device.OS == 'iOS')
-        util.attachDOMEvent(window,'orientationchange',keymanweb.rotateDevice);
-      
-      // Also manage viewport rescaling after rotation on Android
-      if(device.OS == 'Android') 
-      {
-        osk.wasVisible=osk.isVisible;
-        
-        // Hide OSK at start of rotation
-        if('onmozorientationchange' in screen)
-          util.attachDOMEvent(screen,'mozorientationchange',osk.hideNow);
-        else if(util.device.OS != "iOS")
-          util.attachDOMEvent(window,'orientationchange',osk.hideNow);
+    keymanweb.handleRotationEvents=function() {
+      // General handler for rotation events.
+      var rotationHandler: () => void = function() {
+        osk.wasVisible = osk.isVisible();
+        osk.hideNow();
 
-        // Then align inputs and redisplay the OSK on resize event following rotation
-        var rotationHandler: () => void = function() {
+        // At least on simulators, it seems we can reach a minor race condition on screen-size updates without a timeout.
+        window.setTimeout(function() {
           keymanweb.alignInputs(true);
           osk.hideLanguageList();
           osk._Load();
           if(osk.wasVisible) {
             osk._Show();
           }
-        };
+        }, 500);
+      };
 
+      if(device.OS == 'iOS') {
+        util.attachDOMEvent(window, 'orientationchange', rotationHandler);
+      }
+      
+      // Also manage viewport rescaling after rotation on Android
+      if(device.OS == 'Android') {
+        //osk.wasVisible=osk.isVisible;
+        
+        // Hide OSK at start of rotation
+        if('onmozorientationchange' in screen)
+          util.attachDOMEvent(screen,'mozorientationchange',osk.hideNow);
+
+        // Then align inputs and redisplay the OSK on resize event following rotation
         util.attachDOMEvent(window, 'resize', rotationHandler);
-        if(util.device.OS == "iOS") {
-          util.attachDOMEvent(window, 'orientationchange', rotationHandler);
-        }
       } 
 
       //TODO: may be able to recognize start of rotation using accelerometer call...
       //util.attachDOMEvent(window,'devicemotion',keymanweb.testRotation);
-    }
-
-    /**
-     *  Hide the URL bar and resize the OSK after rotation (device dependent)
-     * 
-     *  @param       {Event}      e    event (not used directly)
-     * 
-     */       
-    keymanweb.rotateDevice = function(e)  // Rewritten for I3363 (Build 301)
-    {                    
-      osk.hideLanguageList();  
-      
-      if(!osk._Visible) return;
-      // Always re-adjust OSK rows for rounding to nearest pixel
-  //    if(osk.ready) 
-  //    {
-        //nLayer=osk.resetRowLengths();  // clear aligned flag for all layers     
-        //osk.adjustRowLengths(nLayer);  // adjust lengths in visible layer      
-  //    }
-            
-      osk.adjustHeights();       
-      
-      // Hide the URL bar on Android phones - offset is zero for iPhone, but should not be applied here 
-      if(device.formFactor == 'phone' && device.OS == 'Android') 
-        window.setTimeout(function(){window.scrollTo(0,1);},1000);      
     }
 
     /**
