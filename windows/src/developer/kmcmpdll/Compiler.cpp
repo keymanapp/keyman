@@ -604,6 +604,21 @@ DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
 	return CERR_None;
 }
 
+DWORD ValidateMatchNomatchOutput(PWSTR p) {
+  while (p) {
+    if (*p == UC_SENTINEL) {
+      switch (*(p + 1)) {
+      case CODE_CONTEXT:
+      case CODE_CONTEXTEX:
+      case CODE_INDEX:
+        return CERR_ContextAndIndexInvalidInMatchNomatch;
+      }
+    }
+    p = incxstr(p);
+  }
+  return CERR_None;
+}
+
 DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 {
 	PWSTR p, q, pp;
@@ -748,7 +763,12 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 		    return msg;
 		  }
 
-		  gp = &fk->dpGroupArray[fk->currentGroup];
+      if ((msg = ValidateMatchNomatchOutput(buf)) != CERR_None) {
+        delete buf;
+        return msg;
+      }
+      
+      gp = &fk->dpGroupArray[fk->currentGroup];
 		
 		  gp->dpMatch = new WCHAR[wcslen(buf) + 1];
 		  wcscpy_s(gp->dpMatch, wcslen(buf)+1, buf);  // I3481
@@ -781,6 +801,11 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
         return msg;
       }
 
+      if ((msg = ValidateMatchNomatchOutput(buf)) != CERR_None) {
+        delete buf;
+        return msg;
+      }
+
 		  gp = &fk->dpGroupArray[fk->currentGroup];
 		
 		  gp->dpNoMatch = new WCHAR[wcslen(buf) + 1];
@@ -806,7 +831,6 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 }
 
 //**********************************************************************************************************************
-
 
 DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p)
 {
