@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Install required dependencies for building WeSay
+# Install required dependencies for building Keyman on Linux
 # (copied from wesay/build/agent/install-deps)
 
 # get packages from config file listed in the variable $1
