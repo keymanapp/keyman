@@ -304,8 +304,15 @@ begin
 end;
 
 function TkmnProjectFile.GetTargetFilename: string;
+var
+  FTempFileVersion: string;
 begin
-  Result := OwnerProject.GetTargetFilename(OutputFileName, FileName, FileVersion);
+  // https://github.com/keymanapp/keyman/issues/631
+  // This appears to be a Delphi compiler bug (RSP-20457)
+  // Workaround is to make a copy of the parameter locally
+  // which fixes the reference counting.
+  FTempFileVersion := FileVersion;
+  Result := OwnerProject.GetTargetFilename(OutputFileName, FileName, FTempFileVersion);
 end;
 
 procedure TkmnProjectFile.GetFileParameters;
