@@ -170,10 +170,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
 
     // Setup NavigationBar
-    // TODO: refactor
-    if let nb = navigationController?.navigationBar {
+    if let navbar = navigationController?.navigationBar {
       navbarBackground = KMNavigationBarBackgroundView()
-      navbarBackground.addToNavbar(nb)
+      navbarBackground.addToNavbar(navbar)
       navbarBackground.setOrientation(UIApplication.shared.statusBarOrientation)
     }
 
