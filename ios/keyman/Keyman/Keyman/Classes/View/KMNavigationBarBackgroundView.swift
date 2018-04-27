@@ -12,6 +12,7 @@ import UIKit
 class KMNavigationBarBackgroundView: UIView {
 
     var imageLeadingConstraint: NSLayoutConstraint?
+    var logoImageView: UIImageView?
 
     required public init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -25,9 +26,15 @@ class KMNavigationBarBackgroundView: UIView {
 
     func commonInit() {
         self.backgroundColor = .clear
-
+        self.isUserInteractionEnabled = false
         setupLogo()
         setupUnderscore()
+    }
+    
+    func hideLogo() {
+        if let logoImageView = logoImageView {
+            logoImageView.alpha = 0
+        }
     }
 
     func setupUnderscore() {
@@ -55,6 +62,8 @@ class KMNavigationBarBackgroundView: UIView {
 
         imageLeadingConstraint = imageView.constrainEqually(to: self, attribute: .leading, constant: 10)
         imageLeadingConstraint?.isActive = true
+
+        logoImageView = imageView
     }
 
     func addToNavbar(_ navbar: UINavigationBar!) {
