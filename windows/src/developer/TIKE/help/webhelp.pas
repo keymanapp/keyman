@@ -37,6 +37,7 @@ type
 implementation
 
 uses
+  System.StrUtils,
   System.SysUtils,
 
   utilexecute;
@@ -45,6 +46,8 @@ constructor TWebHookHelpSystem.Create(aRootWebPath: string);
 begin
   inherited Create;
   FRootWebPath := aRootWebPath;
+  if (FRootWebPath <> '') and (FRootWebPath[Length(FRootWebPath)] <> '/') then
+    FRootWebPath := FRootWebPath + '/';
 end;
 
 function TWebHookHelpSystem.HelpContext(aContextId: DWord): Boolean;
@@ -64,7 +67,7 @@ begin
   begin
     for i := 1 to Length(aTopic) do if aTopic[i] = '\' then aTopic[i] := '/';
     if aTopic[1] = '/' then Delete(aTopic, 1, 1);
-    s := FRootWebPath + aTopic + '.php';
+    s := FRootWebPath + aTopic;
   end
   else
     s := FRootWebPath;

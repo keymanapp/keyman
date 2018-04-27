@@ -15,8 +15,7 @@
             <ul>
               <li><a href="keyman:checkforupdates">Check for Updates</a></li>
               <li><a href="help:index">Help Contents</a></li>
-              <li><a href="help:context_frmProject">Project Help</a></li>
-              <li><a href="keyman:upgrade">Purchase Additional Modules</a></li>
+              <li><a href="help:context/project">Project Help</a></li>
             </ul>
           </div>
         </div>

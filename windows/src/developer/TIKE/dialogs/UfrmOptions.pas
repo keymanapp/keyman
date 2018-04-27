@@ -156,6 +156,8 @@ type
     procedure RefreshColourPanels;
   {$ENDIF}
     { Private declarations }
+  protected
+    function GetHelpTopic: string; override;
   public
     { Public declarations }
   end;
@@ -165,6 +167,8 @@ implementation
 {$R *.DFM}
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   JvDockControlForm,
   OnlineConstants,
   RedistFiles,
@@ -316,6 +320,11 @@ begin
 {$ENDIF}
   FDefaultFont.Free;
   FQuotedFont.Free;
+end;
+
+function TfrmOptions.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_Options;
 end;
 
 procedure TfrmOptions.cmdOKClick(Sender: TObject);

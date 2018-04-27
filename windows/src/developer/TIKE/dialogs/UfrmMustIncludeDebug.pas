@@ -33,14 +33,18 @@ type
     chkAutoRecompile: TCheckBox;
     procedure cmdOKClick(Sender: TObject);
   private
-    { Private declarations }
+  protected
+    function GetHelpTopic: string; override;
   public
     { Public declarations }
   end;
 
 implementation
 
-uses KeymanDeveloperOptions;
+uses
+  Keyman.Developer.System.HelpTopics,
+
+  KeymanDeveloperOptions;
 
 {$R *.DFM}
 
@@ -54,6 +58,11 @@ begin
   end
   else
     ModalResult := mrYes;
+end;
+
+function TfrmMustIncludeDebug.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_MustIncludeDebug;
 end;
 
 end.

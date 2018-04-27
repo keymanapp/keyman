@@ -72,6 +72,8 @@ type
     function GetAddToProject: Boolean;
     function GetFileName: string;
     function GetDefaultExt: string;
+  protected
+    function GetHelpTopic: string; override;
   public
     property FileType: TKMFileType read GetFileType;
     property AddToProject: Boolean read GetAddToProject;
@@ -81,6 +83,8 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   Project,
   shlobj,
   utilsystem;
@@ -247,6 +251,11 @@ begin
     Result := ftHTMLFile
   else
     Result := ftOther;
+end;
+
+function TfrmNew.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_New;
 end;
 
 procedure TfrmNew.mnuShowIconsClick(Sender: TObject);

@@ -65,6 +65,7 @@ type
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FORMSHOWN;
     procedure AppMinimize(Sender: TObject);
   protected
+    function GetHelpTopic: string; override;
     procedure WndProc(var Message: TMessage); override;
   end;
 
@@ -80,6 +81,9 @@ implementation
 
 uses
   Dialogs,
+
+  Keyman.Developer.System.HelpTopics,
+
   OnlineConstants,
   UfrmMain,
   utilexecute,
@@ -188,6 +192,11 @@ end;
 procedure TfrmStartup.FormShow(Sender: TObject);
 begin
   PostMessage(Handle, WM_USER_FormShown, 0, 0);
+end;
+
+function TfrmStartup.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_Startup;
 end;
 
 procedure ForceShowStartup(Parent: TForm);

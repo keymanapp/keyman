@@ -132,18 +132,17 @@ type
     function GetCharFont: TFont;
     function GetCodeFont: TFont;
     procedure SetTextFileFormat(const Value: TTextFileFormat);
-    function UpdateHelp(token: WideString): Boolean;
+    function GetSelectedTokens(var token, prevtoken: WideString; var x, tx: Integer): Boolean;
+  protected
+    function GetHelpTopic: string; override;
   public
     { Public declarations }
-    procedure GetHelpTopic(var s: string); override;
     procedure UpdateParColour(par: Integer; LineType: TParColourLineType);
     procedure SetFocus; override;
 
     procedure FindError(ln: Integer);
     procedure FindErrorByOffset(offset: Integer);   // I4083
     function OffsetToLine(Offset: Integer): Integer;   // I4083
-
-    function GetHelpToken: WideString;
 
     procedure EditFind;
     procedure EditFindNext;
@@ -173,6 +172,9 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
+  dmActionsMain,
   dmActionsTextEditor,
   CharacterInfo,
   CharMapDropTool,
@@ -385,6 +387,7 @@ begin
     begin
       TextFileFormat := tffUTF8;
       memo.SetTextBuf('');
+      UpdateSelectedToken;
     end;
     memo.Modified := False;
   finally
@@ -451,6 +454,7 @@ begin
       TextFileFormat := tffUTF16
     else
       TextFileFormat := tffANSI;
+    UpdateSelectedToken;
     memo.Modified := False;
   finally
     FLoading := False;
@@ -658,6 +662,7 @@ begin
       memo.SelLine := SelLine;
       memo.SelCol := SelCol;
       memo.ScrollInView;
+      UpdateSelectedToken;
     finally
       FLoading := False;
     end;
@@ -843,56 +848,60 @@ begin
 {$ENDIF}
 end;
 
-function TframeTextEditor.GetHelpToken: WideString;
+
+function TframeTextEditor.GetHelpTopic: string;
 var
   x, tx: Integer;
-  prevtoken: WideString;
+  token, prevtoken: WideString;
 begin
-  x := memo.SelCol+1;
+  if FEditorFormat <> efKMN then
+    Exit(SHelpTopic_Context_TextEditor);
 
-  if EditorFormat = efKMN
-    then Result := GetTokenAtCursor(memo.LinesArray[memo.SelLine], x, tx, prevtoken)
-    else Result := '';
+  if not GetSelectedTokens(token, prevtoken, x, tx) then
+    Exit(SHelpTopic_Context_TextEditor);
 
-  if not IsValidHelpToken(Result) then
-  begin
-    Result := prevtoken;
-    if not IsValidHelpToken(Result) then Result := '';
-  end;
-end;
+  if not IsValidHelpToken(token, False) then
+    if IsValidHelpToken(prevtoken, False) then
+      token := prevtoken
+    else if not IsValidHelpToken(token, True) then
+      Exit(SHelpTopic_Context_TextEditor);
 
-procedure TframeTextEditor.GetHelpTopic(var s: string);
-begin
-  if FEditorFormat <> efKMN then Exit;
-
-  s := memo.SelText;
-  if s = '' then
-  begin
-{$IFDEF USE_PLUSMEMO}
-    memo.Delimiters := [#9, ' ', '.', ',', ';', ':', '=', '<', '>', '(', ')'];
-{$ENDIF}
-    s := memo.CurrentWord;
-  end;
-
-  s := kwhelp.HelpKeyword(s);
-end;
-
-function TframeTextEditor.UpdateHelp(token: WideString): Boolean;
-begin
-  Result := False;
-  if not IsValidHelpToken(token) then Exit;
-  if Assigned(frmHelp) and frmHelp.Showing then frmHelp.LoadHelp(token, 'KMN');
-  Result := True;
+  Result := token;
 end;
 
 procedure TframeTextEditor.tmrUpdateSelectedTokenTimer(Sender: TObject);
 var
   prevtoken, token: WideString;
   tx, x: Integer;
-  ch: WideString;
 begin
   tmrUpdateSelectedToken.Enabled := False;
 
+  if not GetSelectedTokens(token, prevtoken, x, tx) then Exit;
+
+  if (EditorFormat <> efKMN) and (memo.SelText = '') then
+    token := FormatUnicode(token);
+
+  UpdateCharacterMap(False, token, x, tx, memo.SelText <> '');   // I4807
+
+  if EditorFormat = efKMN then
+  begin
+    if not IsValidHelpToken(token, False) then
+      if IsValidHelpToken(prevtoken, False) then
+        token := prevtoken
+      else if not IsValidHelpToken(token, True) then
+        Exit;
+
+    HelpKeyword := token;
+
+    if Assigned(frmHelp) and frmHelp.Showing then
+      frmHelp.QueueRefresh;
+  end;
+end;
+
+function TframeTextEditor.GetSelectedTokens(var token, prevtoken: WideString; var x, tx: Integer): Boolean;
+var
+  ch: WideString;
+begin
   x := memo.SelCol+1;
 
   if EditorFormat = efKMN then   // I4807
@@ -922,19 +931,17 @@ begin
   else
   begin
     ch := memo.GetTextPart(memo.SelStart-1, memo.SelStart);
-    if ch = '' then Exit;
+    if ch = '' then Exit(False);
 
     if Uni_IsSurrogate2(ch[1]) then
       ch := memo.GetTextPart(memo.SelStart-2, memo.SelStart)
     else if Uni_IsSurrogate1(ch[1]) then
       ch := memo.GetTextPart(memo.SelStart-1, memo.SelStart+1);
 
-    token := FormatUnicode(ch);
+    token := ch; //FormatUnicode(ch);
   end;
 
-  UpdateCharacterMap(False, token, x, tx, memo.SelText <> '');   // I4807
-  if EditorFormat = efKMN then
-    if not UpdateHelp(token) then UpdateHelp(prevtoken);
+  Result := True;
 end;
 
 procedure TframeTextEditor.TntFormDestroy(Sender: TObject);

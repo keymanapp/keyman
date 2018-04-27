@@ -58,6 +58,7 @@ type
     FLastActiveControl: TWinControl;
     procedure WMKey(var Msg: TMsg);
   protected
+    function GetHelpTopic: string; override;
   public
     function ShowModal: Integer; override;
   end;
@@ -66,7 +67,10 @@ function FormatKeyName(Shift, Key: Integer):  string;
 
 implementation
 
-uses UfrmMain, KeyNames, UfrmMDIChild, CharMapInsertMode, CharMapDropTool;
+uses
+  Keyman.Developer.System.HelpTopics,
+
+UfrmMain, KeyNames, UfrmMDIChild, CharMapInsertMode, CharMapDropTool;
 
 {$R *.DFM}
 
@@ -364,6 +368,11 @@ begin
   Close;
   if Assigned(FLastActiveControl) then
     GetCharMapDropTool.InsertToControl(FLastActiveControl, FormatKeyName(FLastShift, FLastKey), cmimCode);
+end;
+
+function TfrmKeyTest.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_KeyTest;
 end;
 
 function TfrmKeyTest.ShowModal: Integer;
