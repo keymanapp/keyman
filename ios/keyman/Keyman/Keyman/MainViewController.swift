@@ -353,7 +353,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   override func didRotate(from fromInterfaceOrientation: UIInterfaceOrientation) {
-    let f  = navigationController?.navigationBar.frame
     if infoView?.view?.isHidden ?? true {
       setNavBarButtons()
     }
