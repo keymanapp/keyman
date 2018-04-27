@@ -325,7 +325,7 @@ namespace com.keyman {
         };
 
         xx.base.addEventListener('resize', xx._kmwResizeHandler, false);
-        xx.base.addEventListener('onorientationchange', xx._kmwResizeHandler, false);
+        xx.base.addEventListener('orientationchange', xx._kmwResizeHandler, false);
       })(x);
 
       var textValue: string;
