@@ -1,6 +1,9 @@
 # Keyman for Android
 
-## 2018-04-30 10.0.379 beta
+## 2018-04-30 10.0.380 beta
+* Fix OSK missing some keys on older Android configurations (#304)
+
+## 2018-04-27 10.0.379 beta
 * Fixed app crash when cancelling Keyboard download dialog (#786)
 
 ## 2018-04-24 10.0.376 beta
