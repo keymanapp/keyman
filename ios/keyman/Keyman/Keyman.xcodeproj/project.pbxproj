@@ -12,6 +12,8 @@
 		162E2C9B20926C9B00F40769 /* KMNavigationBarBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E2C9A20926C9B00F40769 /* KMNavigationBarBackgroundView.swift */; };
 		162E2C9D2092BFE400F40769 /* KMUnderscoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E2C9C2092BFE400F40769 /* KMUnderscoreView.swift */; };
 		162E2C9F2092D36800F40769 /* UIDevice+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E2C9E2092D36800F40769 /* UIDevice+Extensions.swift */; };
+		165EB39A2097165B00040A69 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3992097165B00040A69 /* UIColor+Extensions.swift */; };
+		165EB39C2097181D00040A69 /* KMView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB39B2097181D00040A69 /* KMView.swift */; };
 		1687ACCA1FD8269C00926D69 /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8F1FD8221800D4A78D /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1687ACD41FD8DE8000926D69 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */; };
 		1687ACD51FD8DE8000926D69 /* ObjcExceptionBridging.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -210,6 +212,8 @@
 		162E2C9C2092BFE400F40769 /* KMUnderscoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMUnderscoreView.swift; sourceTree = "<group>"; };
 		162E2C9E2092D36800F40769 /* UIDevice+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extensions.swift"; sourceTree = "<group>"; };
 		165C8B8F1FD8221800D4A78D /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = ../../Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
+		165EB3992097165B00040A69 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
+		165EB39B2097181D00040A69 /* KMView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMView.swift; sourceTree = "<group>"; };
 		1687ACD01FD8DE7600926D69 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = ../../Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
 		1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = ../../Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
 		16A9229D20325253003CC98E /* Keyman-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Keyman-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -421,6 +425,7 @@
 			children = (
 				162E2C9720926C8600F40769 /* UIView+Extensions.swift */,
 				162E2C9E2092D36800F40769 /* UIDevice+Extensions.swift */,
+				165EB3992097165B00040A69 /* UIColor+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -430,6 +435,7 @@
 			children = (
 				162E2C9A20926C9B00F40769 /* KMNavigationBarBackgroundView.swift */,
 				162E2C9C2092BFE400F40769 /* KMUnderscoreView.swift */,
+				165EB39B2097181D00040A69 /* KMView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1072,6 +1078,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				165EB39C2097181D00040A69 /* KMView.swift in Sources */,
 				C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */,
 				C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */,
 				C059FCC01FD927EF00BD1A64 /* Log.swift in Sources */,
@@ -1087,6 +1094,7 @@
 				C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */,
 				162E2C9F2092D36800F40769 /* UIDevice+Extensions.swift in Sources */,
 				C0A1A6311F5E4F4300EAF822 /* InfoViewController.swift in Sources */,
+				165EB39A2097165B00040A69 /* UIColor+Extensions.swift in Sources */,
 				C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
