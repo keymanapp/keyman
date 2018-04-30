@@ -3094,10 +3094,27 @@ if(!window['keyman']['initialized']) {
      * @return  {boolean}
      */
     osk.emulatesAltGr = function(keyLabels) {
-      var layers = keyLabels ? keyLabels : osk.layers;
+      var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
+      if(activeKeyboard == null || activeKeyboard['KV'] == null) {
+        return false;
+      }
 
-      return !(layers[osk.getLayerId(osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])] ||
-        layers[osk.getLayerId(osk.modifierCodes['SHIFT'] | osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])]);
+      var layers = keyLabels ? keyLabels : activeKeyboard['KV']['KLS'];
+
+      var unshiftedEmulationLayer = layers[osk.getLayerId(osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])];
+      var shiftedEmulationLayer = layers[osk.getLayerId(osk.modifierCodes['SHIFT'] | osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])];
+      
+      // buildDefaultLayout ensures that these are aliased to the original modifier set being emulated.
+      // As a result, we can directly test for reference equality.
+      if(unshiftedEmulationLayer != layers[osk.getLayerId(osk.modifierCodes['RALT'])]) {
+        return false;
+      }
+
+      if(shiftedEmulationLayer != layers[osk.getLayerId(osk.modifierCodes['RALT'] | osk.modifierCodes('SHIFT'))]) {
+        return false;
+      }
+
+      return true;
     }
 
     /**
@@ -3127,7 +3144,9 @@ if(!window['keyman']['initialized']) {
 
       var kmw10Plus = !(typeof keyLabels == 'undefined' || !keyLabels);
       if(!kmw10Plus) {
-        keyLabels = osk.processLegacyDefinitions(PVK['BK']);
+        // Save the processed key label information to the keyboard's general data.
+        // Makes things more efficient elsewhere and for reloading after keyboard swaps.
+        keyLabels = PVK['KLS'] = osk.processLegacyDefinitions(PVK['BK']);
       }
 
       // Identify key labels (e.g. *Shift*) that require the special OSK font
@@ -3143,7 +3162,9 @@ if(!window['keyman']['initialized']) {
       // Automatic AltGr emulation if the 'leftctrl-leftalt' layer is otherwise undefined.
       if(osk.emulatesAltGr(keyLabels) && validIdList.indexOf('rightalt') != -1) {
         validIdList.push('leftctrl-leftalt');
+        validIdList.push('leftctrl-leftalt-shift');
         keyLabels['leftctrl-leftalt'] = keyLabels['rightalt'];
+        keyLabels['leftctrl-leftalt-shift'] = keyLabels['rightalt-shift'];
       }
 
       // For desktop devices, we must create all layers, even if invalid.
@@ -3158,6 +3179,8 @@ if(!window['keyman']['initialized']) {
         }
       }
 
+      // This ensures all 'valid' layers are at the front of the layer array and managed by the main loop below.
+      // 'invalid' layers aren't handled by the loop and thus remain blank after it.
       var idList = validIdList.concat(invalidIdList);
 
       if(kmw10Plus && formFactor != 'desktop') { // KLS exists, so we know the exact layer set.
