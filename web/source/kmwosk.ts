@@ -3094,26 +3094,53 @@ if(!window['keyman']['initialized']) {
      * @return  {boolean}
      */
     osk.emulatesAltGr = function(keyLabels) {
-      var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
-      if(activeKeyboard == null || activeKeyboard['KV'] == null) {
+      var layers;
+
+      // If we're not chiral, we're not emulating.
+      if(!keymanweb.keyboardManager.isChiral()) {
         return false;
       }
 
-      var layers = keyLabels ? keyLabels : activeKeyboard['KV']['KLS'];
+      if(!keyLabels) {
+        var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
+        if(activeKeyboard == null || activeKeyboard['KV'] == null) {
+          return false;
+        }
+        
+        layers = activeKeyboard['KV']['KLS'];
+      } else {
+        layers = keyLabels;
+      }
 
-      var unshiftedEmulationLayer = layers[osk.getLayerId(osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])];
-      var shiftedEmulationLayer = layers[osk.getLayerId(osk.modifierCodes['SHIFT'] | osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'])];
+      var emulationMask = osk.modifierCodes['LCTRL'] | osk.modifierCodes['LALT'];
+
+      var unshiftedEmulationLayer = layers[osk.getLayerId(emulationMask)];
+      var shiftedEmulationLayer = layers[osk.getLayerId(osk.modifierCodes['SHIFT'] | emulationMask)];
       
       // buildDefaultLayout ensures that these are aliased to the original modifier set being emulated.
       // As a result, we can directly test for reference equality.
-      if(unshiftedEmulationLayer != layers[osk.getLayerId(osk.modifierCodes['RALT'])]) {
+      if(unshiftedEmulationLayer != null && 
+          unshiftedEmulationLayer != layers[osk.getLayerId(osk.modifierCodes['RALT'])]) {
         return false;
       }
 
-      if(shiftedEmulationLayer != layers[osk.getLayerId(osk.modifierCodes['RALT'] | osk.modifierCodes('SHIFT'))]) {
+      if(shiftedEmulationLayer != null && 
+          shiftedEmulationLayer != layers[osk.getLayerId(osk.modifierCodes['RALT'] | osk.modifierCodes['SHIFT'])]) {
         return false;
       }
 
+      // It's technically possible for the OSK to not specify anything while allowing chiral input.  A last-ditch catch:
+
+      var bitmask = keymanweb.keyboardManager.getKeyboardModifierBitmask();
+      if((bitmask & emulationMask) != emulationMask) {
+        // At least one of the emulation modifiers is never used by the keyboard!  We can confirm everything's safe.
+        return true;
+      }
+
+      if(unshiftedEmulationLayer == null && shiftedEmulationLayer == null) {
+        // We've run out of things to go on; we can't detect if chiral AltGr emulation is intended or not.
+        console.warn("Could not detect if AltGr emulation is safe, but defaulting to active emulation!")
+      }
       return true;
     }
 
@@ -3160,11 +3187,17 @@ if(!window['keyman']['initialized']) {
       validIdList = [ 'default' ].concat(validIdList);
 
       // Automatic AltGr emulation if the 'leftctrl-leftalt' layer is otherwise undefined.
-      if(osk.emulatesAltGr(keyLabels) && validIdList.indexOf('rightalt') != -1) {
-        validIdList.push('leftctrl-leftalt');
-        validIdList.push('leftctrl-leftalt-shift');
-        keyLabels['leftctrl-leftalt'] = keyLabels['rightalt'];
-        keyLabels['leftctrl-leftalt-shift'] = keyLabels['rightalt-shift'];
+      if(osk.emulatesAltGr(keyLabels)) {
+        // We insert only the layers that need to be emulated.
+        if((validIdList.indexOf('leftctrl-leftalt') == -1) && validIdList.indexOf('rightalt') != -1) {
+          validIdList.push('leftctrl-leftalt');
+          keyLabels['leftctrl-leftalt'] = keyLabels['rightalt'];
+        }
+
+        if((validIdList.indexOf('leftctrl-leftalt-shift') == -1) && validIdList.indexOf('rightalt-shift') != -1) {
+          validIdList.push('leftctrl-leftalt-shift');
+          keyLabels['leftctrl-leftalt-shift'] = keyLabels['rightalt-shift'];
+        }
       }
 
       // For desktop devices, we must create all layers, even if invalid.
