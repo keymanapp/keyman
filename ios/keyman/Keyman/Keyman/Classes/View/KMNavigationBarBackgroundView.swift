@@ -11,6 +11,12 @@ import UIKit
 
 class KMNavigationBarBackgroundView: UIView {
 
+    let defaultImageLeading: Int = 10
+    let iphonexImageLeading: Int = 25
+    let underscoreHeight: Int = 3
+    let logoImageWidth: Int = 100
+    let logoImageHeightDiff:Int  = -8
+
     var imageLeadingConstraint: NSLayoutConstraint?
     var logoImageView: UIImageView?
 
@@ -30,7 +36,7 @@ class KMNavigationBarBackgroundView: UIView {
         setupLogo()
         setupUnderscore()
     }
-    
+
     func hideLogo() {
         if let logoImageView = logoImageView {
             logoImageView.alpha = 0
@@ -45,7 +51,7 @@ class KMNavigationBarBackgroundView: UIView {
         v.constrainEqually(to: self, attribute: .bottom).isActive  = true
         v.constrainEqually(to: self, attribute: .leading).isActive  = true
         v.constrainEqually(to: self, attribute: .trailing).isActive  = true
-        v.constrainEqually(to: 3, attribute: .height).isActive  = true
+        v.constrainEqually(to: CGFloat(underscoreHeight), attribute: .height).isActive  = true
     }
 
     func setupLogo() {
@@ -57,10 +63,12 @@ class KMNavigationBarBackgroundView: UIView {
 
         imageView.constrainEqually(to: self, attribute: .centerY).isActive  = true
         imageView.constrainEqually(to: self, attribute: .centerY).isActive  = true
-        imageView.constrainEqually(to: self, attribute: .height, constant: -8).isActive  = true
-        imageView.constrainEqually(to: 100, attribute: .width).isActive  = true
+        imageView.constrainEqually(to: self, attribute: .height, constant: CGFloat(logoImageHeightDiff)).isActive  = true
+        imageView.constrainEqually(to: CGFloat(logoImageWidth), attribute: .width).isActive  = true
 
-        imageLeadingConstraint = imageView.constrainEqually(to: self, attribute: .leading, constant: 10)
+        imageLeadingConstraint = imageView.constrainEqually(to: self,
+                                                            attribute: .leading,
+                                                            constant: CGFloat(defaultImageLeading))
         imageLeadingConstraint?.isActive = true
 
         logoImageView = imageView
@@ -72,10 +80,10 @@ class KMNavigationBarBackgroundView: UIView {
     }
 
     func setOrientation(_ orientation: UIInterfaceOrientation) {
-        var constant: CGFloat = 10
+        var constant: CGFloat = CGFloat(defaultImageLeading)
         if let constraint = imageLeadingConstraint {
             if orientation.isLandscape && UIDevice.isIphoneX {
-                constant = 25
+                constant = CGFloat(iphonexImageLeading)
             }
             constraint.constant = constant
             self.setNeedsLayout()
