@@ -346,6 +346,8 @@ begin
       FVK.LoadFromStream(stream);
       VK_UpdateData;
       VK_UpdateKeyFont;
+      FVKCurrentKey := nil;
+      VK_SelectVKey;
     finally
       FVKLoading := False;
     end;
@@ -1391,9 +1393,10 @@ end;
 
 procedure TframeOnScreenKeyboardEditor.VK_FocusKey;
 begin
-  if rbKeyText.Checked
-    then editVKKeyText.SetFocus
-    else cmdBrowseKeyBitmap.SetFocus;
+  if editVKKeyText.CanFocus then
+    if rbKeyText.Checked
+      then editVKKeyText.SetFocus
+      else cmdBrowseKeyBitmap.SetFocus;
 end;
 
 { ---------------------------------------------------------------------------- }
