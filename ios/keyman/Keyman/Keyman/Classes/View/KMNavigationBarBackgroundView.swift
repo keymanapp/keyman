@@ -15,7 +15,7 @@ class KMNavigationBarBackgroundView: UIView {
     let iphonexImageLeading: Int = 25
     let underscoreHeight: Int = 3
     let logoImageWidth: Int = 100
-    let logoImageHeightDiff:Int  = -8
+    let logoImageHeightDiff: Int  = -8
 
     var imageLeadingConstraint: NSLayoutConstraint?
     var logoImageView: UIImageView?
@@ -63,7 +63,9 @@ class KMNavigationBarBackgroundView: UIView {
 
         imageView.constrainEqually(to: self, attribute: .centerY).isActive  = true
         imageView.constrainEqually(to: self, attribute: .centerY).isActive  = true
-        imageView.constrainEqually(to: self, attribute: .height, constant: CGFloat(logoImageHeightDiff)).isActive  = true
+        imageView.constrainEqually(to: self,
+                                   attribute: .height,
+                                   constant: CGFloat(logoImageHeightDiff)).isActive  = true
         imageView.constrainEqually(to: CGFloat(logoImageWidth), attribute: .width).isActive  = true
 
         imageLeadingConstraint = imageView.constrainEqually(to: self,
