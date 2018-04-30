@@ -1,8 +1,6 @@
 ﻿store(&TARGETS) 'any web desktop'
 store(&COPYRIGHT) '© 2018 SIL International'
 store(&VISUALKEYBOARD) 'test_chirality.kvks'
-store(&LANGUAGE) 'x0409'
-store(&WINDOWSLANGUAGES) 'x0409'
 store(&NAME) 'KeymanWeb Chirality Tester'
 begin Unicode > use(main)
 
