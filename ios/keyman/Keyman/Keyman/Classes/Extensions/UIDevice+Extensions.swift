@@ -14,6 +14,6 @@ extension UIDevice {
         let iphonexScreenHeight: Int = 812
         let screenRect = UIScreen.main.bounds
         let size = CGFloat.maximum(screenRect.width, screenRect.height)
-        return UIDevice.current.userInterfaceIdiom == .phone && size == iphonexScreenHeight
+        return UIDevice.current.userInterfaceIdiom == .phone && size == CGFloat(iphonexScreenHeight)
     }
 }
