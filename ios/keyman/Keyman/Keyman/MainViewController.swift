@@ -136,10 +136,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     automaticallyAdjustsScrollViewInsets = false
 
     let systemFonts = Set<String>(UIFont.familyNames)
-    //let screenRect = UIScreen.main.bounds
-    //let orientation = UIApplication.shared.statusBarOrientation
-    //screenWidth = screenRect.size.width
-    //screenHeight = screenRect.size.height
 
     // Setup Keyman Manager & fetch keyboards list
     Manager.shared.canRemoveDefaultKeyboard = true
