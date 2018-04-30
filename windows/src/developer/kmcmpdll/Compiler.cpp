@@ -605,7 +605,7 @@ DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
 }
 
 DWORD ValidateMatchNomatchOutput(PWSTR p) {
-  while (p) {
+  while (p && *p) {
     if (*p == UC_SENTINEL) {
       switch (*(p + 1)) {
       case CODE_CONTEXT:
