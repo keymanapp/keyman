@@ -1,5 +1,8 @@
 # Keyman Developer Version History
 
+## 2018-04-30 10.0.1067.0 beta
+* BCP 47 picker in package editor now does name lookups and constrains codes as required by target operating systems (#746, #766)
+
 ## 2018-04-12 10.0.1057.0 beta
 * No changes in Keyman Developer
 
