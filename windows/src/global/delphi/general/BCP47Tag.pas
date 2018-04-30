@@ -43,8 +43,8 @@ type
 
     procedure Clear;
 
-    function IsValid: Boolean; overload;
-    function IsValid(var msg: string): Boolean; overload;
+    function IsValid(Constrained: Boolean): Boolean; overload;
+    function IsValid(Constrained: Boolean; var msg: string): Boolean; overload;
 
     function IsCanonical: Boolean; overload;
     function IsCanonical(var msg: string): Boolean; overload;
@@ -117,7 +117,7 @@ begin
   end;
 end;
 
-function TBCP47Tag.IsValid(var msg: string): Boolean;
+function TBCP47Tag.IsValid(Constrained: Boolean; var msg: string): Boolean;
 var
   NewTag: TBCP47Tag;
 begin
@@ -152,13 +152,43 @@ begin
   begin
     msg := '''' + Tag + ''' is not a valid BCP 47 tag';
   end;
+
+  if Result and Constrained then
+  begin
+    NewTag := TBCP47Tag.Create(Tag);
+    try
+      // For our constrained use of tags, we allow only Language-Script-Region.
+      // We only allow 2 or 3 character IDs.
+      Result :=
+        SameText(NewTag.Language, Language) and
+        (NewTag.ExtLang = '') and
+        SameText(NewTag.Script, Script) and
+        SameText(NewTag.Region, Region) and
+        (NewTag.Variant = '') and
+        (NewTag.Extension = '') and
+        (NewTag.PrivateUse = '') and
+        (NewTag.Grandfathered = '') and
+        (NewTag.LangTag_PrivateUse = '');
+
+      if not Result then
+        msg := '''' + Tag + ''' must contain only Language-Script-Region'
+      else
+      begin
+        Result := Length(NewTag.Language) <= 3;
+        if not Result then
+          msg := '''' + Tag + ''' language component must be no longer than 3 letters';
+      end;
+    finally
+      NewTag.Free;
+    end;
+  end;
 end;
 
-function TBCP47Tag.IsValid: Boolean;
+function TBCP47Tag.IsValid(Constrained: Boolean): Boolean;
 var
   msg: string;
 begin
-  Result := IsValid(msg);
+  Result := IsValid(Constrained, msg);
 end;
 
 function TBCP47Tag.IsCanonical(var msg: string): Boolean;
