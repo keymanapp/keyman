@@ -20,7 +20,7 @@ Open Source
 ## Desktop Platforms ##
 [Windows](./windows/src/README.md)
 [macOS](./mac/README.md)
-[L](./linux/README.md)
+[Linux](./linux/README.md)
 
 ## Web & Mobile Platforms ##
 [Web](./web/README.md)
