@@ -179,8 +179,16 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   }
 
   @objc func loadAddress(_ sender: Any, event: UIEvent) {
-    guard let urlString = addressField?.text, var url = URL(string: urlString) else {
-      log.debug("Attempting to load invalid URL: \(addressField?.text ?? "nil")")
+    if let urlString = addressField?.text {
+      loadUrlString(urlString)
+    }
+  }
+  
+  func loadUrlString(_ urlString: String, allowSearchRedirect: Bool  = true) {
+    guard var url = URL(string: urlString) else {
+      if allowSearchRedirect {
+        loadSearchString(urlString)
+      }
       return
     }
     if url.scheme == nil {
@@ -188,6 +196,12 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     }
     let request = URLRequest(url: url)
     webView.loadRequest(request)
+  }
+  
+  func loadSearchString(_ searchString: String) {
+    if let query = searchString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+      loadUrlString("google.com/search?q=\(query)", allowSearchRedirect: false)
+    }
   }
 
   func updateAddress(_ request: URLRequest) {
