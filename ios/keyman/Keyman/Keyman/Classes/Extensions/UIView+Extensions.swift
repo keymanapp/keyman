@@ -14,6 +14,7 @@ extension UIView {
     func constrainEqually(to parent: UIView,
                           attribute: NSLayoutAttribute,
                           constant: CGFloat = 0) -> NSLayoutConstraint {
+
         let constraint = NSLayoutConstraint(item: self,
                            attribute: attribute,
                            relatedBy: .equal,
@@ -21,8 +22,6 @@ extension UIView {
                            attribute: attribute,
                            multiplier: 1,
                            constant: constant)
-
-        //constraint.isActive = true
         return constraint
     }
 
@@ -35,8 +34,6 @@ extension UIView {
             attribute: .notAnAttribute,
             multiplier: 1.0,
             constant: constant)
-
-        //constraint.isActive = true
         return constraint
     }
 
@@ -48,7 +45,7 @@ extension UIView {
                            toItem: parent,
                            attribute: .top,
                            multiplier: 1,
-                           constant: (options["top.constant"] ?? -20)).isActive = true
+                           constant: (options["top.constant"] ?? 0)).isActive = true
 
         NSLayoutConstraint(item: self,
                            attribute: .bottom,
@@ -64,7 +61,7 @@ extension UIView {
                            toItem: parent,
                            attribute: .leading,
                            multiplier: 1,
-                           constant: (options["bottom.constant"] ?? 0)).isActive = true
+                           constant: (options["leading.constant"] ?? 0)).isActive = true
 
         NSLayoutConstraint(item: self,
                            attribute: .trailing,
@@ -72,6 +69,6 @@ extension UIView {
                            toItem: parent,
                            attribute: .trailing,
                            multiplier: 1,
-                           constant: (options["bottom.constant"] ?? 0)).isActive = true
+                           constant: (options["trailing.constant"] ?? 0)).isActive = true
     }
 }
