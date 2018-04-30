@@ -476,18 +476,19 @@ if(!window['keyman']['initialized']) {
         osk.hideNow();
 
         // At least on simulators, it seems we can reach a minor race condition on screen-size updates without a timeout.
-        window.setTimeout(function() {
+        //window.setTimeout(function() {
           keymanweb.alignInputs(true);
           osk.hideLanguageList();
           osk._Load();
           if(osk.wasVisible) {
             osk._Show();
           }
-        }, 500);
+        //}, 500);
       };
 
       if(device.OS == 'iOS') {
         util.attachDOMEvent(window, 'orientationchange', rotationHandler);
+        util.attachDOMEvent(window, 'resize', rotationHandler);
       }
       
       // Also manage viewport rescaling after rotation on Android
