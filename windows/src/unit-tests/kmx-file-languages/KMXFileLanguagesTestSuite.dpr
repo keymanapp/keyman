@@ -28,7 +28,8 @@ uses
   Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   DUnitX.Loggers.TeamCity in '..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas',
-  kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas';
+  kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
+  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas';
 
 var
   runner : ITestRunner;
