@@ -412,16 +412,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
             for keyboard in installableKeyboards {
               let storedPath = Storage.active.keyboardURL(for: keyboard)
               
-              
-              
               var installableFiles: [[Any]] = [["\(keyboardID).js", storedPath]]
-              if let _ = osk {
-                let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk!)
+              if let osk = osk {
+                let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk)
                 installableFiles.append([osk, oskPath])
               }
               
-              if let _ = font {
-                let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font!)
+              if let font = font {
+                let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font)
                 installableFiles.append([font, displayPath])
               }
               do {
