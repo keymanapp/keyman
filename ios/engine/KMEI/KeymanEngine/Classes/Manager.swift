@@ -582,15 +582,24 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       downloadFailed(forKeyboards: [], error: error)
       return
     }
+    
+    decodeKeyboardData(data, decodingStrategy: .ios8601WithFallback)
+  }
 
+  private func decodeKeyboardData(_ data: Data, decodingStrategy : JSONDecoder.DateDecodingStrategy) {
     let decoder = JSONDecoder()
-    decoder.dateDecodingStrategy = .ios8601WithFallback
-    do {
-      let keyboard = try decoder.decode(KeyboardAPICall.self, from: data)
-      return downloadKeyboard(keyboard)
-    } catch {
-      downloadFailed(forKeyboards: [], error: error)
-      return
+    decoder.dateDecodingStrategy = decodingStrategy
+  
+    if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
+      downloadKeyboard(keyboard)
+    } else {
+      decoder.dateDecodingStrategy = .ios8601WithMilliseconds
+      do {
+        let keyboard = try decoder.decode(KeyboardAPICall.self, from: data)
+        downloadKeyboard(keyboard)
+      } catch {
+        downloadFailed(forKeyboards: [], error: error)
+      }
     }
   }
 
