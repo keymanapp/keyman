@@ -325,7 +325,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     guard let kb = tableList[index] as? InstallableKeyboard else {
       return
     }
-    if Manager.shared.setKeyboard(kb) {
+    if let _ = try? Manager.shared.setKeyboard(kb) {
       tableView?.reloadData()
     }
   }

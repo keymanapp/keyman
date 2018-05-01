@@ -232,7 +232,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       // Add keyboard.
       for keyboard in keyboards {
         Manager.shared.addKeyboard(keyboard)
-        Manager.shared.setKeyboard(keyboard)
+        try? Manager.shared.setKeyboard(keyboard)
       }
 
       navigationController?.popToRootViewController(animated: true)
@@ -263,7 +263,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
   private func switchKeyboard(_ index: Int) {
     // Switch keyboard and register to user defaults.
-    if Manager.shared.setKeyboard(userKeyboards[index]) {
+    if let _ = try? Manager.shared.setKeyboard(userKeyboards[index]) {
       tableView.reloadData()
     }
 
