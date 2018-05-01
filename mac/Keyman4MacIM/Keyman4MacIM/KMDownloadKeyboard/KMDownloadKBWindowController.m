@@ -26,6 +26,8 @@
     
     [self.webView setGroupName:@"KMDownloadKB"];
     [self.webView setPolicyDelegate:(id<WebPolicyDelegate>)self];
+   // [self.webView setUIDelegate:(id<WebUIDelegate>)self];
+    
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
     NSString *url = [NSString stringWithFormat:@"https://keyman.com/go/macos/10.0/download-keyboards/?version=%@", version];
     if (self.AppDelegate.debugMode)
@@ -37,16 +39,44 @@
     NSString* url = [[request URL] description];
     if (self.AppDelegate.debugMode)
         NSLog(@"decidePolicyForNavigationAction, navigating to %@", url);
-    if ([request.URL.absoluteString startsWith:@"keyman:link?url="])
-    {
-        [listener ignore];
-        url = [request.URL.absoluteString substringFromIndex:[@"keyman:link?url=" length]];
-        [[NSWorkspace sharedWorkspace] openURL: [[NSURL alloc] initWithString:url]];
+    
+    if ([request.URL.absoluteString startsWith:@"keyman:"]) {
+        if ([request.URL.absoluteString startsWith:@"keyman:link?url="])
+        {
+            [listener ignore];
+            url = [request.URL.absoluteString substringFromIndex:[@"keyman:link?url=" length]];
+            if (self.AppDelegate.debugMode)
+                NSLog(@"Opening URL in default browser: %@", url);
+            [[NSWorkspace sharedWorkspace] openURL: [[NSURL alloc] initWithString:url]];
+        }
+        else {
+            if (self.AppDelegate.debugMode)
+                NSLog(@"Farming out download to app delegate.");
+            [listener ignore];
+            [self.AppDelegate processURL:url];
+        }
     }
     else
     {
+        if (self.AppDelegate.debugMode)
+            NSLog(@"Normal navigation in webview.");
         [listener use];
     }
 }
 
+BOOL hand = false;
+
+//- (void)webView:(WebView *)sender mouseDidMoveOverElement:(NSDictionary *)elementInformation modifierFlags:(NSUInteger)modifierFlags {
+//    NSArray* keys = [elementInformation objectForKey:WebElementLinkURLKey];
+//    if (keys && !hand) {
+//        NSLog(@"CURSOR: Hand - keys = %@", keys);
+//        hand = YES;
+//        //[[NSCursor pointingHandCursor] push];
+//    }
+//    else if (hand) {
+//        NSLog(@"CURSOR: Arrow");
+//        hand = NO;
+//        //[NSCursor pop];
+//    }
+//}
 @end
