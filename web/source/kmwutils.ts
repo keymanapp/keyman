@@ -5,12 +5,12 @@
 
 namespace com.keyman {
   class DOMEventTracking {
-    Pelem: HTMLElement|Document;
+    Pelem: HTMLElement|Document|Window|Screen;
     Peventname: string;
     Phandler: (Object) => boolean;
     PuseCapture?: boolean
 
-    constructor(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean) {
+    constructor(Pelem: HTMLElement|Document|Window|Screen, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean) {
       this.Pelem = Pelem;
       this.Peventname = Peventname.toLowerCase();
       this.Phandler = Phandler;
@@ -181,7 +181,7 @@ namespace com.keyman {
      * @param       {boolean=}  PuseCapture True only if event to be handled on way to target element      
      * Description  Attaches event handler to element DOM event
      */  
-    attachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+    attachDOMEvent(Pelem: HTMLElement|Document|Window|Screen, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
       this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
       Pelem.addEventListener(Peventname, Phandler, PuseCapture?true:false);
 
@@ -199,7 +199,7 @@ namespace com.keyman {
      * @param       {boolean=}  PuseCapture True if event was being handled on way to target element      
      * Description Detaches event handler from element [to prevent memory leaks]
      */  
-    detachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+    detachDOMEvent(Pelem: HTMLElement|Document|Window|Screen, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
       Pelem.removeEventListener(Peventname, Phandler, PuseCapture);
 
       // Since we're detaching, we should drop the tracking data from the old event.

@@ -72,7 +72,7 @@
     
     e.value = e.value + event + ': w.iw='+window.innerWidth+' w.ih='+window.innerHeight+orientText+orient+'\n';
     
-    if(event == 'kmw.rh') {
+    if(event == 'kmw.ri' || event == 'kmw.rh' || event == 'kmw.re') {
       e.value = e.value + '  osk.w=' + keyman.osk.getWidth() + ' osk.h=' + keyman.osk.getHeight() + ' kmw.vs=' + keyman.util.getViewportScale() + '\n';
     }
     
@@ -89,11 +89,22 @@
   window.addEventListener('orientationchange', function() { doLog('orientationchange-b', false) }, false);
   window.addEventListener('orientationchange', function() { doLog('orientationchange-c', false) }, true);
   
-  var kmw_rh = keyman.rotationHandler;
-  
-  keyman.rotationHandler = function() {
+  var kmw_ri = com.keyman.RotationManager.prototype.initNewRotation;
+  com.keyman.RotationManager.prototype.initNewRotation = function() {
+    doLog('kmw.ri');
+    kmw_ri.call(this);
+  }
+
+  var kmw_rh = com.keyman.RotationManager.prototype.iOSEventHandler;
+  com.keyman.RotationManager.prototype.iOSEventHandler = function() {
     doLog('kmw.rh');
-    kmw_rh();
+    kmw_rh.call(this);
+  }
+
+  var kmw_irh = com.keyman.RotationManager.prototype.resolve;
+  com.keyman.RotationManager.prototype.resolve = function() {
+    doLog('kmw.re');
+    kmw_irh.call(this);
   }
 </script>
   <p><a href="../">Return to main index.</a>

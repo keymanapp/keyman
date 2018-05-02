@@ -1,4 +1,7 @@
-/// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
+// Includes KMW string extension declarations.
+/// <reference path="kmwstring.ts" />
+// Contains event management for mobile device rotation events.
+/// <reference path="kmwrotation.ts" />
 
 /***
    KeymanWeb 10.0
@@ -466,53 +469,13 @@ if(!window['keyman']['initialized']) {
       }                                            
     }
 
-    // Placing the rotation handler in two separate functions allows us to stub the functions for
-    // debugging/event-logging.
-    keymanweb.innerRotationHandler = function() {
-      keymanweb.alignInputs(true);
-      osk.hideLanguageList();
-      osk._Load();
-      if(osk.wasVisible) {
-        osk._Show();
-      }
-
-      // clear timeout variable, if it exists.
-    }
-
-    // A general handler for rotation events on touch-enabled devices.
-    keymanweb.rotationHandler = function() {
-      osk.wasVisible = osk.isVisible();
-      osk.hideNow();
-
-      // At least on simulators, it seems we can reach a minor race condition on screen-size updates without a timeout.
-      //window.setTimeout(function() {
-        keymanweb.innerRotationHandler();
-      //}, 500);
-    }
-                    
     /**
      * Use rotation events to adjust OSK and input element positions and scaling as necessary
      */     
     keymanweb.handleRotationEvents=function() {
-            if(device.OS == 'iOS') {
-        util.attachDOMEvent(window, 'orientationchange', keymanweb.rotationHandler);
-        util.attachDOMEvent(window, 'resize', keymanweb.rotationHandler);
-      }
-      
-      // Also manage viewport rescaling after rotation on Android
-      if(device.OS == 'Android') {
-        //osk.wasVisible=osk.isVisible;
-        
-        // Hide OSK at start of rotation
-        if('onmozorientationchange' in screen)
-          util.attachDOMEvent(screen,'mozorientationchange',osk.hideNow);
+      var rotationManager = new com.keyman.RotationManager(keymanweb);
 
-        // Then align inputs and redisplay the OSK on resize event following rotation
-        util.attachDOMEvent(window, 'resize', keymanweb.rotationHandler);
-      } 
-
-      //TODO: may be able to recognize start of rotation using accelerometer call...
-      //util.attachDOMEvent(window,'devicemotion',keymanweb.testRotation);
+      rotationManager.init();
     }
 
     /**
