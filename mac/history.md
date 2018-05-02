@@ -1,5 +1,10 @@
 # Keyman for macOS Version History
 
+## 2018-05-02 10.0.35 beta
+* Enabled searching for keyboards by language name.
+* Fixed configuration and download windows to enable typing (e.g., in search boxes)
+* Made hyperlinks in web-views in configuration and download windows work correctly.
+
 ## 2018-03-22 10.0.31 beta
 * Initial beta release of Keyman 10 for macOS
 

@@ -87,6 +87,7 @@ extern NSString *const kWebSite;
 - (NSWindowController *)aboutWindow_;
 - (NSWindowController *)infoWindow_;
 - (NSWindowController *)kbHelpWindow_;
+- (void)processURL:(NSString*)rawUrl;
 - (NSString *)kmxFilePathAtIndex:(NSUInteger)index;
 - (NSString *)packagePathAtIndex:(NSUInteger)index;
 - (NSInteger)indexForPackageFolder:(NSString *)packageFolder;

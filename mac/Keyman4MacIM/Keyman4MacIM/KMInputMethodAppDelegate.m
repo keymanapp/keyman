@@ -93,15 +93,23 @@ typedef enum {
 }
 
 - (void)handleURLEvent:(NSAppleEventDescriptor*)event withReplyEvent:(NSAppleEventDescriptor*)replyEvent {
-    NSMutableString *urlStr = [NSMutableString stringWithString:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
+    
+    [self processURL:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
+}
+
+- (void)processURL:(NSString*)rawUrl {
+    NSMutableString *urlStr = [NSMutableString stringWithString:rawUrl];
     [urlStr replaceOccurrencesOfString:@"keyman:" withString:@"keyman/" options:0 range:NSMakeRange(0, 7)];
     NSURL *url = [NSURL URLWithString:urlStr];
     if (_debugMode)
         NSLog(@"url = %@", url);
     
     if ([url.lastPathComponent isEqualToString:@"download"]) {
-        if (_connection != nil)
+        if (_connection != nil) {
+            if (_debugMode)
+                NSLog(@"Already downloading a keyboard.");
             return;
+        }
         
         NSURL *downloadUrl;
         NSArray *params = [[url query] componentsSeparatedByString:@"&"];
