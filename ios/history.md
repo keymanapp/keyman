@@ -2,6 +2,7 @@
 
 ## 2018-04-25 10.0.141 beta
 * Refactor navigation bar branding. (#802)
+* Fix alphabetical list to be case insensitive on new keyboard list
 
 ## 2018-04-25 10.0.140 beta
 * Fixed lack of output for certain punctuation longpress keys. (#702)
