@@ -2,6 +2,7 @@
 
 ## 2018-04-25 10.0.141 beta
 * Search google when an invalid URL is entered in the address bar. (#801)
+* Fix alphabetical list to be case insensitive on new keyboard list. (#722)
 
 ## 2018-04-25 10.0.140 beta
 * Fixed lack of output for certain punctuation longpress keys. (#702)
