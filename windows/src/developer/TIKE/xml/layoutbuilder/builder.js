@@ -663,8 +663,8 @@ $(function () {
     builder.selectPlatform();
     $('#selLayer').val(s.layer);
     builder.selectLayer();
-    builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === s.key; }));
-    if (s.subkey) builder.selectSubKey($('#sk .key').filter(function (index) { return $(this).data('id') === s.subkey; }));
+    builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === s.id; }).first());
+    if (s.subkey) builder.selectSubKey($('#sk .key').filter(function (index) { return $(this).data('id') === s.subkey; }).first());
   }
 
   this.saveUndo = function (saveToRedo) {
@@ -738,7 +738,7 @@ $(function () {
 
     return row;
   };
-
+  
   this.addKey = function (position, isSubKey, sp) {
     var key = document.createElement('div');
     var ktext = document.createElement('div');
@@ -749,7 +749,7 @@ $(function () {
     $(key).append(ktext);
     $(key).addClass('key');
     $(key).data('id', 'T_new_' + this.uniqId);
-    this.uniqId++;
+    builder.uniqId++;
     builder.updateKeyId(key);
 
     if (isSubKey) {
@@ -1170,7 +1170,7 @@ $(function () {
     var keyId = builder.selectedKey().data('id'); //$('#kbd .key')
     builder.prepareLayer();
     if (keyId !== null)
-      builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === keyId; }));
+      builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === keyId; }).first());
   }
 
   //
