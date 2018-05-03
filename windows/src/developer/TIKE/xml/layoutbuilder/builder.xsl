@@ -39,6 +39,7 @@
                         <button id='btnDelLayer'>Del</button>
                         <button id='btnEditLayer'>Edit</button>
                         Presentation: <select id='selPlatformPresentation'></select>
+                        <input type='checkbox' id='chkShowAllModifierOptions'/> <label for='chkShowAllModifierOptions'>Show all modifier options</label>
                     </div>
                     <br class='clear' />
                 </div>
@@ -52,7 +53,7 @@
                   <option value='9'>Blank</option>
                   <option value='10'>Spacer</option>
                 </select>
-                <label for='selKeyLayerOverride'>Shift:</label> <select id='selKeyLayerOverride'></select>
+                <label for='selKeyLayerOverride'>Modifier:</label> <select id='selKeyLayerOverride'></select>
                 <label for='inpKeyName'>Code:</label> <input id='inpKeyName' type='text' size='16' maxlength='64' />
                 <input id='inpKeyCap' type='text' size='8' maxlength='16' />
                 <label for='inpKeyPadding'>Padding Left:</label>
@@ -79,7 +80,7 @@
                         <option value='9'>Blank</option>
                         <option value='10'>Spacer</option>
                     </select>
-                    <label for='selSubKeyLayerOverride'>Shift:</label> <select id='selSubKeyLayerOverride'></select>
+                    <label for='selSubKeyLayerOverride'>Modifier:</label> <select id='selSubKeyLayerOverride'></select>
                     <label for='inpSubKeyName'>Code:</label> <input id='inpSubKeyName' type='text' size='16' maxlength='64' />
                     <input id='inpSubKeyCap' type='text' size='8' maxlength='16' />
                     <label for='selSubKeyNextLayer'>Next Layer:</label> <select id='selSubKeyNextLayer'></select>
@@ -96,7 +97,7 @@
                 <div id='addLayerDialog' title='Add layer'>
                     <form>
                         <fieldset>
-                            <label for='addLayerList'>Modifier-based layer:</label> <select id='addLayerList'><option>(custom)</option></select><br />
+                            <label for='addLayerList'>Modifier-based layer:</label> <select id='addLayerList'></select><br />
                         </fieldset>
                         <fieldset>
                             <label for='addLayerName'>Name:</label> <input type='text' id='addLayerName' size='16' maxlength='64' /><br/>
