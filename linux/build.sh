@@ -49,10 +49,14 @@ for proj in kmflcomp libkmfl ibus-kmfl; do
 	cd build-$proj
 	if [[ "${SUDOINSTALL}" == "yes" ]]
 	then
-		echo "would do sudo install of $proj"
-#		../$proj/configure CPPFLAGS="-I$/usr/local/include" LDFLAGS="-L/usr/local/lib" --libexecdir=/usr/local/lib/ibus --datadir=/usr/share && make && sudo make install
+		echo "doing sudo install of $proj"
+		../$proj/configure CPPFLAGS="-I$/usr/local/include" LDFLAGS="-L/usr/local/lib" --libexecdir=/usr/local/lib/ibus --datadir=/usr/share
+		make
+		sudo make install
 	else
-		../$proj/configure CPPFLAGS="-I${INSTALLDIR}/include" LDFLAGS="-L${INSTALLDIR}/lib" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus && make && make install
+		../$proj/configure CPPFLAGS="-I${INSTALLDIR}/include" LDFLAGS="-L${INSTALLDIR}/lib" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus
+		make
+		make install
 	fi
 	cd $BASEDIR
 done
