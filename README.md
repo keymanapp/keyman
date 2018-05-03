@@ -40,3 +40,5 @@ Each platform maintains multiple types of releases:
 Copyright (c) 2018 SIL International. All rights reserved.
 
 Licensed under the [MIT](./windows/src/LICENSE.md) License.
+[KMFL](./linux) is licensed under GNU General Public License as published by the Free Software Foundation; either [version 2](./linux/libkmfl/COPYING) of the License, or (at your option) any later version.
+
