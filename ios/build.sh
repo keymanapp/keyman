@@ -120,7 +120,7 @@ update_bundle ( ) {
     fi
 
     if [ $DO_KMW_BUILD = true ]; then
-        echo Building KeymanWeb 10.0 from $KMW_SOURCE
+        echo Building KeymanWeb from $KMW_SOURCE
         base_dir="$(pwd)"
 
         cd $KMW_SOURCE
