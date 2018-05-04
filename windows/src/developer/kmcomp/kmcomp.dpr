@@ -99,7 +99,8 @@ uses
   Keyman.System.KeyboardInfoFile in '..\..\global\delphi\keyboards\Keyman.System.KeyboardInfoFile.pas',
   BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
   Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
-  Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas';
+  Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
+  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas';
 
 {$R icons.RES}
 {$R version.res}

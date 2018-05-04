@@ -70,6 +70,8 @@ type
     function DoRun: TOnlineUpdateCheckResult;
     procedure SyncShowUpdateForm;
     procedure SyncShutDown;
+  private
+    class var FRunning: Boolean;
   public
 
   protected
@@ -79,6 +81,7 @@ type
     constructor Create(ARootKey: string; AOnlineProductID: Integer; AForce, ASilent, AThread: Boolean; AProxyServer: string; AProxyPort: Integer; AProxyUsername, AProxyPassword: string);
     destructor Destroy; override;
     function Run: TOnlineUpdateCheckResult;
+    class function Running: Boolean;
     property CurrentVersion: string read FCurrentVersion write FCurrentVersion;
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
   end;
@@ -108,6 +111,9 @@ uses
 
 constructor TOnlineUpdateCheck.Create(ARootKey: string; AOnlineProductID: Integer; AForce, ASilent, AThread: Boolean; AProxyServer: string; AProxyPort: Integer; AProxyUsername, AProxyPassword: string);
 begin
+  Assert(not FRunning);
+  FRunning := True;
+
   FShowErrors := True;
   FCurrentVersion := GetVersionString;
   FParams.Result := oucUnknown;
@@ -138,6 +144,8 @@ begin
   KL.Log('TOnlineUpdateCheck.Destroy: FErrorMessage = '+FErrorMessage);
   KL.Log('TOnlineUpdateCheck.Destroy: FParams.Result = '+IntToStr(Ord(FParams.Result)));
 
+  FRunning := False;
+
   inherited Destroy;
 end;
 
@@ -153,6 +161,11 @@ begin
     Result := DoRun;
     FParams.Result := Result;
   end;
+end;
+
+class function TOnlineUpdateCheck.Running: Boolean;
+begin
+  Result := FRunning;
 end;
 
 procedure TOnlineUpdateCheck.DoDownloadUpdate(AOwner: TfrmDownloadProgress; var Result: Boolean);

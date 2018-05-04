@@ -4,6 +4,8 @@
     <html>
       <head>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+        <meta charset="UTF-8" />
+        
         <title>Help</title>
         <style>
           .title { 
@@ -22,14 +24,23 @@
         <script type="text/javascript">
           
             var LastElem = null;
-            function ActivatePage(frm, ctrl)
-            {
-              var elem = document.getElementById(frm+'-'+ctrl);
-              if(!elem)
-              {
+            function ActivatePage(frm, ctrl) {
+              //frm = frm.replace(/[#/]/g, '_');
+              var id = frm.substr(0, 'language/'.length) == 'language/' ?
+                frm :
+                frm + '-' + ctrl;
+              
+              var elem = document.getElementById(id);
+              if(!elem) {
+                var wildcard_id = frm + '-*';
+                elem = document.getElementById(wildcard_id);
+              }
+              if(!elem) {
                 elem = document.getElementById('nohelp_name');
-                elem.innerHTML = frm+'-'+ctrl;
+                elem.innerHTML = id;
                 elem = document.getElementById('nohelp');
+                var e = document.getElementById('nohelp_link');
+                e.href='help:'+frm;
               }
               if(LastElem) LastElem.style.display = 'none';
               LastElem = elem;
@@ -41,8 +52,8 @@
         <xsl:apply-templates select="//Control" />
         <div class="control" id="nohelp">
           Context help is not available for <b><span id="nohelp_name"></span></b>.
+          <div class="morehelp"><a id='nohelp_link' href="help:">Look for online help for this screen...</a></div>
         </div>
-        <div class="morehelp"><a href="help:">More help...</a></div>
       </body>
     </html>
   </xsl:template>
@@ -56,6 +67,7 @@
       <xsl:attribute name="id"><xsl:value-of select="../@Name"/>-<xsl:value-of select="@Name"/></xsl:attribute>
       <div class="title"><xsl:value-of select="@Title"/></div>
       <xsl:copy-of select="." />
+      <div class="morehelp"><a><xsl:attribute name='href'>help:<xsl:value-of select='@Url'/></xsl:attribute>More help...</a></div>
     </div>
   </xsl:template>
 </xsl:stylesheet>

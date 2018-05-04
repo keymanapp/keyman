@@ -194,9 +194,6 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageFiles: TTabSheet
       Caption = 'Files'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel1: TPanel
         Left = 0
         Top = 0
@@ -353,9 +350,6 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageKeyboards: TTabSheet
       Caption = 'Keyboards'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel5: TPanel
         Left = 0
         Top = 0
@@ -515,10 +509,10 @@ inherited frmPackageEditor: TfrmPackageEditor
           DefaultRowHeight = 16
           FixedCols = 0
           RowCount = 9
-          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goTabs]
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
           TabOrder = 7
           OnClick = gridKeyboardLanguagesClick
-          OnSetEditText = gridKeyboardLanguagesSetEditText
+          OnDblClick = gridKeyboardLanguagesDblClick
           ColWidths = (
             78
             64)
@@ -534,7 +528,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           OnClick = cmdKeyboardAddLanguageClick
         end
         object cmdKeyboardRemoveLanguage: TButton
-          Left = 339
+          Left = 418
           Top = 412
           Width = 72
           Height = 25
@@ -554,14 +548,21 @@ inherited frmPackageEditor: TfrmPackageEditor
           ReadOnly = True
           TabOrder = 4
         end
+        object cmdKeyboardEditLanguage: TButton
+          Left = 339
+          Top = 412
+          Width = 73
+          Height = 25
+          Anchors = [akLeft, akBottom]
+          Caption = 'Ed&it...'
+          TabOrder = 10
+          OnClick = cmdKeyboardEditLanguageClick
+        end
       end
     end
     object pageDetails: TTabSheet
       Caption = 'Details'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel2: TPanel
         Left = 0
         Top = 0
@@ -802,9 +803,6 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageShortcuts: TTabSheet
       Caption = 'Shortcuts'
       ImageIndex = 8
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel3: TPanel
         Left = 0
         Top = 0
@@ -968,16 +966,10 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageSource: TTabSheet
       Caption = 'Source'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Compile'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel4: TPanel
         Left = 0
         Top = 0

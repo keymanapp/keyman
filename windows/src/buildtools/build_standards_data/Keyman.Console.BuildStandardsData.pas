@@ -30,6 +30,16 @@ begin
     writeln('Building '+ParamStr(3));
     with TBuildLanguageSubtagRegistry.Create(ParamStr(2)) do
     try
+      BuildSubtagRegistry(ParamStr(3));
+    finally
+      Free;
+    end;
+  end
+  else if ParamStr(1) = 'suppress' then
+  begin
+    writeln('Building '+ParamStr(3));
+    with TBuildLanguageSubtagRegistry.Create(ParamStr(2)) do
+    try
       BuildSuppressScriptRegistry(ParamStr(3));
     finally
       Free;

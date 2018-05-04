@@ -37,6 +37,8 @@ type
     function GetLanguageNames(Index: Integer): WideString;
     function GetLanguages(Index: Integer): Integer;
     { Private declarations }
+  protected
+    function GetHelpTopic: string; override;
   public
     { Public declarations }
     procedure RemoveLanguage(ID: Integer);
@@ -47,6 +49,9 @@ type
 
 implementation
 
+uses
+  Keyman.Developer.System.HelpTopics;
+
 {$R *.dfm}
 
 procedure TfrmSelectWindowsLanguages.FormCreate(Sender: TObject);
@@ -56,6 +61,11 @@ begin
   cmdOK.Enabled := False;
   for i := 0 to High(CWindowsLanguages) do
     lbLanguages.Items.AddObject(CWindowsLanguages[i].Name, Pointer(CWindowsLanguages[i].ID));
+end;
+
+function TfrmSelectWindowsLanguages.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_SelectWindowsLanguages;
 end;
 
 function TfrmSelectWindowsLanguages.GetLanguageCount: Integer;

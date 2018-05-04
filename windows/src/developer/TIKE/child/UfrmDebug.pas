@@ -199,6 +199,9 @@ type
     procedure WMUSERUpdateForceKeyboard(var Message: TMessage); message WM_USER_UpdateForceKeyboard;   // I4767
     procedure UpdateCharacterGrid;   // I4808
 
+  protected
+    function GetHelpTopic: string; override;
+
   public
     function CanChangeANSITest: Boolean;
     property ANSITest: Boolean read FANSITest write SetANSITest;
@@ -261,6 +264,8 @@ implementation
 {$R *.DFM}
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   ActiveX,
   dmActionsKeyboardEditor,
   dmActionsMain,
@@ -1302,6 +1307,11 @@ end;
 function TfrmDebug.GetDebugKeyboard: TDebugKeyboard;
 begin
   Result := debugkeyboard;
+end;
+
+function TfrmDebug.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_Debug;
 end;
 
 function TfrmDebug.GetStatusText: string;

@@ -3,6 +3,16 @@
 ## 11.0 alpha
 * Move to 11.0
 
+## 2018-05-04 10.0.144 beta
+* Refactor navigation bar branding. (#802)
+
+## 2018-04-25 10.0.141 beta
+* Search google when an invalid URL is entered in the address bar. (#801)
+* Fix alphabetical list to be case insensitive on new keyboard list. (#722)
+
+## 2018-04-25 10.0.140 beta
+* Fixed lack of output for certain punctuation longpress keys. (#702)
+
 ## 2018-03-22 10.0.139 beta
 * Initial beta release of Keyman for iPhone and iPad 10
 

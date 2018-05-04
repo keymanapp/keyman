@@ -351,7 +351,11 @@ end;
 procedure TKMDEditUndo.ExecuteTarget(Target: TObject);
 begin
   if Target is TCustomEdit then GetCustomEdit(Target).Undo
-  else if Target is TKeymanDeveloperMemo then GetPlusMemo(Target).Undo
+  else if Target is TKeymanDeveloperMemo then
+  begin
+    GetPlusMemo(Target).Undo;
+    GetPlusMemo(Target).ScrollInView;
+  end
   else GetInterface(Target).Undo;
 end;
 

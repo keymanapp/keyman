@@ -113,6 +113,8 @@ type
     procedure EditFileExternal(FileName: WideString);
     function DoNavigate(URL: WideString): Boolean;
     procedure ClearMessages;
+  protected
+    function GetHelpTopic: string; override;
   public
     procedure SetFocus; override;
     procedure SetGlobalProject;
@@ -123,6 +125,9 @@ implementation
 uses
   Winapi.ShellApi,
   ComObj,
+
+  Keyman.Developer.System.HelpTopics,
+
   dmActionsMain,
   KeymanDeveloperOptions,
   kmnProjectFile,
@@ -627,6 +632,11 @@ begin
     web.Go(bstrUrl);
 end;
 
+function TfrmProject.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_Project;
+end;
+
 function TfrmProject.GetIEVersionString: WideString;
 begin
   with TRegistryErrorControlled.Create do  // I2890
@@ -683,7 +693,7 @@ function TfrmProject.webShowHelpRequest(Sender: TObject; HWND: NativeUInt;
   pszHelpFile: PWideChar; uCommand, dwData: Integer; ptMouse: TPoint;
   var pDispatchObjectHit: IDispatch): HRESULT;
 begin
-  frmKeymanDeveloper.HelpTopic('context_frmProject');
+  frmKeymanDeveloper.HelpTopic(Self);
   Result := S_OK;
 end;
 
