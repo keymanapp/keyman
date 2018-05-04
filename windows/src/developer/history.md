@@ -1,5 +1,11 @@
 # Keyman Developer Version History
 
+
+## 2018-05-03 10.0.1072.0 beta
+* Special keys imported from a visual keyboard into a touch layout now display correctly (#812)
+* Touch layout editor no longer leaves broken JSON when deleting or modifying some keys (#811)
+* Checking for online update when it is already running in background can crash Developer (#813)
+
 ## 2018-04-30 10.0.1067.0 beta
 * BCP 47 picker in package editor now does name lookups and constrains codes as required by target operating systems (#746, #766)
 
