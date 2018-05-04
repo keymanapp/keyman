@@ -1,6 +1,6 @@
 # Keyman Developer Version History
 
-## 2018-05-03 10.0.1074.0 beta
+## 2018-05-03 10.0.1075.0 beta
 * Restrict modifier options to a small set by default in touch layout editor (#810)
 * Touch layout editor no longer leaves broken JSON when deleting or modifying some keys (#811)
 * Special keys imported from a visual keyboard into a touch layout now display correctly (#812)
