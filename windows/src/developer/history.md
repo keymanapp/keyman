@@ -7,6 +7,7 @@
 * Checking for online update when it is already running in background can crash Developer (#813)
 * Avoid crash if online update already running (#814)
 * Don't create a blank project on 'opening' a project, either on startup or via menu (#815)
+* Scroll text editor cursor into view after undo (#821)
 
 ## 2018-04-30 10.0.1067.0 beta
 * BCP 47 picker in package editor now does name lookups and constrains codes as required by target operating systems (#746, #766)
