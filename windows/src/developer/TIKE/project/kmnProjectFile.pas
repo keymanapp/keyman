@@ -179,6 +179,7 @@ begin
     end;
     if not SameFileName(AKVKSourceFile, AKVKTargetFile) then
       try
+        Header.AssociatedKeyboard := ChangeFileExt(ExtractFileName(Self.FileName), '');
         SaveToFile(AKVKTargetFile, kvksfBinary);
       except
         on E:Exception do
