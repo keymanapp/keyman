@@ -91,7 +91,8 @@ namespace com.keyman {
         this.formFactor='phone';
       }
 
-      if(this.formFactor == 'phone'  && Math.max(screen.width,screen.height) > 720) {
+      // Trust what iOS tells us for phone vs tablet.
+      if(this.formFactor == 'phone'  && Math.max(screen.width,screen.height) > 720 && this.OS != 'iOS') {
         this.formFactor='tablet';
       }
 
