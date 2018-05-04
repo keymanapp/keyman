@@ -28,7 +28,7 @@ NSRange _previousSelRange;
     if (self) {
         _previousSelRange = NSMakeRange(NSNotFound, NSNotFound);
         _clientSelectionCanChangeUnexpectedly = flagClientSelectionCanChangeUnexpectedly;
-        _cannnotTrustSelectionLength = NO;
+        _clientCanProvideSelectionInfo = Unknown;
         _legacyMode = NO;
         _contextOutOfDate = YES;
         if (legacy) {
@@ -46,7 +46,8 @@ NSRange _previousSelRange;
             [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
             [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
             [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
-            [clientAppId isEqual: @"com.microsoft.Word"]
+            [clientAppId isEqual: @"com.microsoft.Word"] ||
+            [clientAppId isEqual: @"org.openoffice.script"]
                /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */);
     
     // We used to default to NO, so these were the obvious exceptions. But then we realized that
@@ -155,33 +156,54 @@ NSRange _previousSelRange;
     return self.AppDelegate.contextBuffer;
 }
 
+- (NSRange)getSelectionRangefromClient:(id)client {
+    switch (_clientCanProvideSelectionInfo) {
+        case Unknown:
+            if ([client respondsToSelector:@selector(selectedRange)]) {
+                NSRange selRange = [client selectedRange];
+                if (selRange.location != NSNotFound || selRange.length != NSNotFound) {
+                    _clientCanProvideSelectionInfo = Yes;
+                    if ([self.AppDelegate debugMode]) {
+                        NSLog(@"Client can provide selection info.");
+                        NSLog(@"selRange.location: %lu", (unsigned long)selRange.location);
+                        NSLog(@"selRange.length: %lu", (unsigned long)selRange.length);
+                    }
+                    return selRange;
+                }
+            }
+            _clientCanProvideSelectionInfo = No;
+            // REVIEW: For now, if the client reports its location as "not found", we're stuck assuming that we're
+            // still in the same location in the context. This may be totally untrue, but if the client can't report
+            // its location, we have nothing else to go on.
+            _clientSelectionCanChangeUnexpectedly = NO;
+            if ([self.AppDelegate debugMode])
+                NSLog(@"Client can NOT provide selection info!");
+            // fall through
+        case No:
+            return NSMakeRange(NSNotFound, NSNotFound);
+        case Yes:
+        case Unreliable:
+        {
+            NSRange selRange = [client selectedRange];
+            if ([self.AppDelegate debugMode]) {
+                NSLog(@"selRange.location: %lu", (unsigned long)selRange.location);
+            }
+            return selRange;
+        }
+    }
+}
+
 - (void)updateContextBuffer:(id)sender {
     if ([self.AppDelegate debugMode]) {
         NSLog(@"*** updateContextBuffer ***");
         NSLog(@"sender: %@", sender);
     }
     
-    NSRange selRange = ([sender respondsToSelector:@selector(selectedRange)]) ?
-        [sender selectedRange] :
-        NSMakeRange(NSNotFound, NSNotFound);
+    NSRange selRange = [self getSelectionRangefromClient: sender];
     
-    NSUInteger len;
-    if ([self.AppDelegate debugMode]) {
-        NSLog(@"selRange.location: %lu", (unsigned long)selRange.location);
-    }
-    
-    if (selRange.location == NSNotFound) {
-        // REVIEW: For now, if the client always reports its location as "not found", we're stuck assuming that we're
-        // still in the same location in the context. This may be totally untrue, but if the client can't report
-        // its location, we have nothing else to go on. (It won't matter anyway if the client also fails to report
-        // its context.)
-        _clientSelectionCanChangeUnexpectedly = NO;
-        len = _previousSelRange.length;
-    }
-    else {
-        len = selRange.location;
-    }
-    
+    // Since client can't tell us the actual current position, we assume the previously known location in the context.
+    // (It won't matter anyway if the client also fails to report its context.)
+    NSUInteger len = (_clientCanProvideSelectionInfo != Yes) ? _previousSelRange.length : selRange.location;
     NSString *preBuffer = [self getLimitedContextFrom:sender at:len];
 
     // REVIEW: If there is ever a situation where preBuffer gets some text but the client reports its
@@ -296,8 +318,7 @@ NSRange _previousSelRange;
                 if (nc > 0) {
                     if ([self.AppDelegate debugMode])
                         NSLog(@"nc = %lu", nc);
-                    NSRange selRange = [sender selectedRange];
-                    NSUInteger pos = selRange.location;
+                    NSUInteger pos = [self getSelectionRangefromClient:sender].location;
                     if (pos >= nc && pos != NSNotFound) {
                         if ([self.AppDelegate debugMode]) {
                             NSLog(@"Replacement index = %lu", pos - nc);
@@ -438,7 +459,8 @@ NSRange _previousSelRange;
     
     if ([self.AppDelegate debugMode]) {
         NSLog(@"sender type = %@", NSStringFromClass([sender class]));
-        NSLog(@"sender selection range location = %lu", [sender selectedRange].location);
+        if (_clientCanProvideSelectionInfo == Yes)
+            NSLog(@"sender selection range location = %lu", [self getSelectionRangefromClient:sender].location);
     }
     
     BOOL handled = [self handleKeymanEngineActions:event in: sender];
@@ -524,25 +546,22 @@ NSRange _previousSelRange;
         else
             NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}");
         NSLog(@"kme.contextBuffer = \"%@\"", self.kme.contextBuffer.length?[self.kme.contextBuffer codeString]:@"{empty}");
-        NSRange range = [sender selectedRange];
-        NSLog(@"sender.selectedRange.location = %lu", range.location);
-        if (_cannnotTrustSelectionLength)
-            NSLog(@"The following cannot be trusted and will be ignored:");
-        NSLog(@"sender.selectedRange.length = %lu", range.length);
+        if (_clientCanProvideSelectionInfo == Yes) {
+            NSRange range = [self getSelectionRangefromClient:sender]; // This call (in debug) reports location to Console
+            NSLog(@"sender.selectedRange.length = %lu", range.length);
+        }
         NSLog(@"***");
     }
     
-    // Seems we can't do it this way because (at least for "legacy mode" apps) the selection range doesn't get
-    // updated until after we return from this method.
-    //    if (_legacyMode)
-    //        _previousSelRange = [sender selectedRange];
+    // Note: Although this would seem to be the obvious place to set _previousSelRange (in legacy mode), we can't
+    // because the selection range doesn't get updated until after we return from this method.
     return handled;
 }
 
 - (BOOL)deleteBack:(NSUInteger)n in:(id) client for:(NSEvent *) event {
     if ([self.AppDelegate debugMode])
         NSLog(@"Attempting to back-delete %li characters.", n);
-    NSRange selectedRange = [client selectedRange];
+    NSRange selectedRange = [self getSelectionRangefromClient:client];
     NSInteger pos = selectedRange.location;
     if (!_legacyMode)
         [self deleteBack:n at: pos in: client];
@@ -644,7 +663,7 @@ NSRange _previousSelRange;
         // n is now the number of delete-backs we need to post (plus one more if there is selected text)
         if ([self.AppDelegate debugMode]) {
             NSLog(@"Legacy mode: calling postDeleteBack");
-            if (_cannnotTrustSelectionLength)
+            if (_clientCanProvideSelectionInfo == No || _clientCanProvideSelectionInfo == Unreliable)
                 NSLog(@"Cannot trust client to report accurate selection length - assuming no selection.");
         }
         
@@ -658,7 +677,7 @@ NSRange _previousSelRange;
             @throw exception;
         }
         
-        if (!_cannnotTrustSelectionLength && selectedRange.length > 0)
+        if (_clientCanProvideSelectionInfo == Yes && selectedRange.length > 0)
             n++; // First delete-back will delete the existing selection.
         [self postDeleteBack:n for:event];
         
