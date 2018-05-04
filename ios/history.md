@@ -1,5 +1,8 @@
 # Keyman for iPhone and iPad Version History
 
+## 2018-05-04 10.0.144 beta
+* Refactor navigation bar branding. (#802)
+
 ## 2018-04-25 10.0.141 beta
 * Search google when an invalid URL is entered in the address bar. (#801)
 * Fix alphabetical list to be case insensitive on new keyboard list. (#722)
