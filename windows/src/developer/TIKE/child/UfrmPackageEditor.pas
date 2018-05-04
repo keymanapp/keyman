@@ -1276,7 +1276,7 @@ begin
   try
     OnError := Self.HandlePackageRefreshError;
     if not Execute then
-      frmMessages.Show;
+      frmMessages.DoShowForm;
   finally
     Free;
   end;

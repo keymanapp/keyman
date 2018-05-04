@@ -2923,7 +2923,7 @@ begin
   frmMessages.Clear;
   if CompileKeyboardFile(PChar(KMNFileName.Name), PChar(KMXFileName2), False, False, False, CompilerMessage) <= 0 then   // I4181   // I4865   // I4866
   begin
-    frmMessages.Show;
+    frmMessages.DoShowForm;
     ShowMessage('There were errors compiling the keyboard to convert to the On Screen Keyboard.');
     FreeAndNil(KMXFileName);   // I4181
   end;
