@@ -493,6 +493,12 @@ end;
 
 procedure TmodActionsMain.OpenProject(FileName: WideString);
 begin
+  if (FileName <> '') and not FileExists(FileName) then
+  begin
+    ShowMessage('The project '+FileName+' does not exist.');
+    Exit;
+  end;
+
   FGlobalProject.Save;
   FreeAndNil(FGlobalProject);
   FGlobalProject := TProjectUI.Create(FileName);   // I4687

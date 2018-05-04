@@ -502,6 +502,8 @@ begin
   RemoveOldestTikeEditFonts(False);
   RemoveOldestTikeTestFonts(False);
 
+  if (FActiveProject <> '') and not FileExists(FActiveProject) then
+    FActiveProject := '';
   TProjectUI.Create(FActiveProject, True);   // I4687
 
 
