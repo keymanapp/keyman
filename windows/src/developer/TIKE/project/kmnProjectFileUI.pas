@@ -150,7 +150,7 @@ begin
   end;
 
   if not FSilent then
-    frmMessages.Show;
+    frmMessages.DoShowForm;
 
   Result := ProjectFile.CompileKeyboard;
 end;
