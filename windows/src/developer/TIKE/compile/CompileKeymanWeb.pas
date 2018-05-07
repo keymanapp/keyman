@@ -612,7 +612,7 @@ begin
 		else
     begin // Simple context character.
       FullContext := FullContext + '''';
-      if rec.ChrVal in [Ord('"'), Ord('\')] then
+      if rec.ChrVal in [Ord('"'), Ord('\'), Ord('''')] then
         FullContext := FullContext + '\';
       FullContext := FullContext + Javascript_String(rec.ChrVal) + '''';  // I2242
     end;

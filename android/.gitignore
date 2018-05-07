@@ -15,6 +15,7 @@
 
 # Gradle generated files
 **/.gradle/
+build_file_checksums.ser
 
 # OS-specific files
 **/.DS_Store

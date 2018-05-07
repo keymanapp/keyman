@@ -34,6 +34,9 @@ type
     function SetEditorCursorLine(ALine: Integer): Boolean;
     { Call stack functions }
 
+  protected
+    function GetHelpTopic: string; override;
+
   public
     { Public declarations }
     procedure CallStackPush(rule: TDebugEventRuleData);
@@ -44,6 +47,8 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   UKeyBitmap;
 
 {$R *.dfm}
@@ -86,6 +91,11 @@ begin
     QID_NOMATCH_ENTER:
       lbCallStack.Items.AddObject('nomatch rule', rule);
   end;
+end;
+
+function TfrmDebugStatus_CallStack.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_DebugStatus_CallStack;
 end;
 
 procedure TfrmDebugStatus_CallStack.lbCallStackDblClick(Sender: TObject);

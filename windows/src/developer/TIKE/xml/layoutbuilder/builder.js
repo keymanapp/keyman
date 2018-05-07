@@ -350,6 +350,15 @@ $(function () {
     this.modifierCodes.SHIFT | this.modifierCodes.CTRL | this.modifierCodes.ALT
   ];
   
+  this.minimalModifierCombinations = [
+    0,
+    this.modifierCodes.RALT,
+    this.modifierCodes.SHIFT,
+    this.modifierCodes.RALT | this.modifierCodes.SHIFT
+  ];
+  
+  this.showAllModifierCombinations = false;
+  
   // Add CAPS and NO_CAPS variants for all of the above
   (function(c, codes) {
     var i, n = c.length;
@@ -398,6 +407,12 @@ $(function () {
     builder.selectKey(null, false);
     builder.selectSubKey(null);
     builder.prepareLayer();
+  });
+  
+  $('#chkShowAllModifierOptions').click(function () {
+    builder.showAllModifierCombinations = $('#chkShowAllModifierOptions')[0].checked;
+    builder.fillModifierSelect();
+    builder.prepareKey();
   });
 
   this.preparePlatforms = function () {
@@ -454,12 +469,15 @@ $(function () {
   }
 
   this.prepareLayers = function () {
+    this.fillLayerSelect();
+    this.fillModifierSelect();
+  };
+  
+  this.fillLayerSelect = function() {
     $('#selLayer option').remove();
     $('#selKeyNextLayer option').remove();
     $('#selSubKeyNextLayer option').remove();
-    $('#selKeyLayerOverride option').remove();
-    $('#selSubKeyLayerOverride option').remove();
-
+    
     opt = document.createElement('option');
     $(opt).attr('value', '').text('(none)');
     $('#selKeyNextLayer').append(opt);
@@ -467,14 +485,6 @@ $(function () {
     opt = document.createElement('option');
     $(opt).attr('value', '').text('(none)');
     $('#selSubKeyNextLayer').append(opt);
-
-    opt = document.createElement('option');
-    $(opt).attr('value', '').text('(layer default)');
-    $('#selKeyLayerOverride').append(opt);
-
-    opt = document.createElement('option');
-    $(opt).attr('value', '').text('(layer default)');
-    $('#selSubKeyLayerOverride').append(opt);
 
     for (var layer in KVKL[builder.lastPlatform].layer) {
       var opt = document.createElement('option');
@@ -490,21 +500,86 @@ $(function () {
       $(opt).append(KVKL[builder.lastPlatform].layer[layer].id);
       $('#selSubKeyNextLayer').append(opt);
     }
-    for (var modifier = 0; modifier < this.validModifierCombinations.length; modifier++) {
-      var name = this.getModifierCombinationName(this.validModifierCombinations[modifier]);
-      opt = document.createElement('option');
-      $(opt).append(name);
-      $('#selKeyLayerOverride').append(opt);
-
-      opt = document.createElement('option');
-      $(opt).append(name);
-      $('#selSubKeyLayerOverride').append(opt);
+  };
+  
+  this.fillModifierSelect = function() {
+    var modifiers = this.showAllModifierCombinations ? this.validModifierCombinations : this.minimalModifierCombinations;
+    
+    var
+      $selKeyLayerOverride = $('#selKeyLayerOverride'),
+      $selSubKeyLayerOverride = $('#selSubKeyLayerOverride'),
+      $addLayerList = $('#addLayerList');
       
-      opt = document.createElement('option');
-      $(opt).append(name);
-      $('#addLayerList').append(opt);
+    var add = function(e, val, text) {
+      var opt = document.createElement('option');
+      if(typeof text != 'undefined') {
+        $(opt).attr('value', val);
+        $(opt).text(text);
+      } else {
+        $(opt).text(val);
+      }
+      e.append(opt);
+    };
+    
+    $('#selKeyLayerOverride option').remove();
+    $('#selSubKeyLayerOverride option').remove();
+    $('#addLayerList option').remove();
+
+    add($selKeyLayerOverride, '', '(layer default)');
+    add($selSubKeyLayerOverride, '', '(layer default)');
+    add($addLayerList, '', '(custom)');
+    
+        
+    for (var modifier = 0; modifier < modifiers.length; modifier++) {
+      var name = this.getModifierCombinationName(modifiers[modifier]);
+      
+      add($selKeyLayerOverride, name);
+      add($selSubKeyLayerOverride, name);
+      add($addLayerList, name);
     }
-  }
+    
+    var alreadyAdded = function(modifier) {
+      return builder.minimalModifierCombinations.indexOf(modifier) >= 0;
+    };
+
+    
+    // check all keys for modifier usage
+    var modifierNames = [];
+    
+    for(var i = 0; i < KVKL[builder.lastPlatform].layer.length; i++) {
+      var layer = KVKL[builder.lastPlatform].layer[i];
+      for(var j = 0; j < layer.row.length; j++) {
+        var row = layer.row[j];
+        for(var k = 0; k < row.key.length; k++) {
+          if(typeof row.key[k].layer != 'undefined' && modifierNames.indexOf(row.key[k].layer) < 0) {
+            modifierNames.push(row.key[k].layer);
+          }
+          if(typeof row.key[k].sk != 'undefined') {
+            for(var l = 0; l < row.key[k].sk.length; l++) {
+              if(typeof row.key[k].sk[l].layer != 'undefined' && modifierNames.indexOf(row.key[k].sk[l].layer) < 0) {
+                modifierNames.push(row.key[k].sk[l].layer);
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    var isUsed = function(modifierName) {
+      return modifierNames.indexOf(modifierName) >= 0;
+    };
+    
+    if(!this.showAllModifierCombinations) {
+      // Add any layer names that are already referenced
+      for(modifier = 0; modifier < this.validModifierCombinations.length; modifier++) {
+        var name = this.getModifierCombinationName(this.validModifierCombinations[modifier]);
+        if(!alreadyAdded(this.validModifierCombinations[modifier]) && isUsed(name)) {
+          add($selKeyLayerOverride, name);
+          add($selSubKeyLayerOverride, name);
+        }
+      }
+    }
+  };
 
   this.prepareLayer = function () {
     var layer = KVKL[builder.lastPlatform].layer[builder.lastLayerIndex];
@@ -663,8 +738,8 @@ $(function () {
     builder.selectPlatform();
     $('#selLayer').val(s.layer);
     builder.selectLayer();
-    builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === s.key; }));
-    if (s.subkey) builder.selectSubKey($('#sk .key').filter(function (index) { return $(this).data('id') === s.subkey; }));
+    builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === s.id; }).first());
+    if (s.subkey) builder.selectSubKey($('#sk .key').filter(function (index) { return $(this).data('id') === s.subkey; }).first());
   }
 
   this.saveUndo = function (saveToRedo) {
@@ -738,7 +813,7 @@ $(function () {
 
     return row;
   };
-
+  
   this.addKey = function (position, isSubKey, sp) {
     var key = document.createElement('div');
     var ktext = document.createElement('div');
@@ -749,7 +824,7 @@ $(function () {
     $(key).append(ktext);
     $(key).addClass('key');
     $(key).data('id', 'T_new_' + this.uniqId);
-    this.uniqId++;
+    builder.uniqId++;
     builder.updateKeyId(key);
 
     if (isSubKey) {
@@ -1170,7 +1245,7 @@ $(function () {
     var keyId = builder.selectedKey().data('id'); //$('#kbd .key')
     builder.prepareLayer();
     if (keyId !== null)
-      builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === keyId; }));
+      builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === keyId; }).first());
   }
 
   //

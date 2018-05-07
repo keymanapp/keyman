@@ -185,7 +185,7 @@ begin
     begin
       with TBCP47Tag.Create(lang.ID) do
       try
-        if not IsValid(msg) then
+        if not IsValid(True, msg) then
         begin
           DoError(Format(SError_LanguageTagIsNotValid, [kbd.ID, lang.ID, msg]), plsError);
           Result := False;

@@ -50,6 +50,8 @@ type
     procedure imgKeymanClick(Sender: TObject);
   private
     FOnIconClick: TNotifyEvent;
+  protected
+    function GetHelpTopic: string; override;
   public
     property OnIconClick: TNotifyEvent read FOnIconClick write FOnIconClick;
   end;
@@ -58,6 +60,8 @@ implementation
 
 uses
   VCL.Themes,
+
+  Keyman.Developer.System.HelpTopics,
 
   KeymanVersion,
   onlineconstants,
@@ -82,6 +86,11 @@ end;
 procedure TfrmAboutTike.lblWebsiteClick(Sender: TObject);
 begin
   TUtilExecute.URL(lblWebsite.Caption);  // I3349
+end;
+
+function TfrmAboutTike.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_About;
 end;
 
 procedure TfrmAboutTike.imgKeymanClick(Sender: TObject);

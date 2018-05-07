@@ -177,6 +177,11 @@ final public class KMKeyboard extends WebView {
     return initFuture;
   }
 
+  public void hideKeyboard() {
+    String jsString = "javascript:hideKeyboard()";
+    loadUrl(jsString);
+  }
+
   public void executeHardwareKeystroke(int code, int shift, int lstates) {
     String jsFormat = "javascript:executeHardwareKeystroke(%d,%d, %d)";
     String jsString = String.format(jsFormat, code, shift, lstates);

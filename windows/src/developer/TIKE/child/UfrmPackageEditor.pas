@@ -169,6 +169,7 @@ type
     chkFollowKeyboardVersion: TCheckBox;
     lblKeyboardRTL: TLabel;
     editKeyboardRTL: TEdit;
+    cmdKeyboardEditLanguage: TButton;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -211,11 +212,11 @@ type
     procedure cbKeyboardOSKFontClick(Sender: TObject);
     procedure cbKeyboardDisplayFontClick(Sender: TObject);
     procedure gridKeyboardLanguagesClick(Sender: TObject);
-    procedure gridKeyboardLanguagesSetEditText(Sender: TObject; ACol,
-      ARow: Integer; const Value: string);
     procedure cmdKeyboardRemoveLanguageClick(Sender: TObject);
     procedure cmdKeyboardAddLanguageClick(Sender: TObject);
     procedure chkFollowKeyboardVersionClick(Sender: TObject);
+    procedure gridKeyboardLanguagesDblClick(Sender: TObject);
+    procedure cmdKeyboardEditLanguageClick(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -245,12 +246,12 @@ type
     function SelectedKeyboard: TPackageKeyboard;
     procedure EnableKeyboardTabControls;
     function SelectedKeyboardLanguage: TPackageKeyboardLanguage;
-    function LookupLanguageName(bcp47id: string): string;
     procedure RefreshKeyboardLanguageList(k: TPackageKeyboard);
     procedure HandlePackageRefreshError(Sender: TObject; msg: string;
       State: TProjectLogState);
 
   protected
+    function GetHelpTopic: string; override;
     function DoOpenFile: Boolean; override;
     function DoSaveFile: Boolean; override;
     function GetFileNameFilter: string; override;
@@ -273,6 +274,8 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   CharMapDropTool,
   CharMapInsertMode,
   CompilePackageInstaller,
@@ -460,6 +463,11 @@ end;
 function TfrmPackageEditor.GetFileNameFilter: string;
 begin
   Result := 'Package source files (*.kps)|*.kps|All files (*.*)|*.*';
+end;
+
+function TfrmPackageEditor.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_PackageEditor;
 end;
 
 function TfrmPackageEditor.DoOpenFile: Boolean;
@@ -1268,7 +1276,7 @@ begin
   try
     OnError := Self.HandlePackageRefreshError;
     if not Execute then
-      frmMessages.Show;
+      frmMessages.DoShowForm;
   finally
     Free;
   end;
@@ -1448,6 +1456,7 @@ begin
   e := e and (gridKeyboardLanguages.Row > 0);
   gridKeyboardLanguages.Enabled := e;
   cmdKeyboardRemoveLanguage.Enabled := e;
+  cmdKeyboardEditLanguage.Enabled := e;
 end;
 
 procedure TfrmPackageEditor.gridKeyboardLanguagesClick(Sender: TObject);
@@ -1455,37 +1464,10 @@ begin
   EnableKeyboardTabControls;
 end;
 
-function TfrmPackageEditor.LookupLanguageName(bcp47id: string): string;
+procedure TfrmPackageEditor.gridKeyboardLanguagesDblClick(Sender: TObject);
 begin
-  // TODO: BCP47: <DeveloperBCP47LanguageLookup>
-  Result := bcp47id;
-end;
-
-procedure TfrmPackageEditor.gridKeyboardLanguagesSetEditText(Sender: TObject;
-  ACol, ARow: Integer; const Value: string);
-var
-  lang: TPackageKeyboardLanguage;
-begin
-  if FSetup > 0 then Exit;
-
-  lang := SelectedKeyboardLanguage;
-  Assert(Assigned(lang));
-
-  if ACol = 0 then
-  begin
-    lang.ID := Value;
-    if lang.Name='' then
-    begin
-      lang.Name := LookupLanguageName(lang.ID);
-      gridKeyboardLanguages.Cells[1, ARow] := lang.Name;
-    end;
-  end
-  else if ACol = 1 then
-  begin
-    lang.Name := Value;
-  end;
-
-  Modified := True;
+  if SelectedKeyboardLanguage <> nil then
+    cmdKeyboardEditLanguage.Click;
 end;
 
 procedure TfrmPackageEditor.cmdKeyboardAddLanguageClick(Sender: TObject);
@@ -1508,6 +1490,34 @@ begin
       RefreshKeyboardLanguageList(k);
       gridKeyboardLanguages.Row := gridKeyboardLanguages.RowCount - 1;
       gridKeyboardLanguagesClick(gridKeyboardLanguages);
+      Modified := True;
+    end;
+  finally
+    frm.Free;
+  end;
+end;
+
+procedure TfrmPackageEditor.cmdKeyboardEditLanguageClick(Sender: TObject);
+var
+  k: TPackageKeyboard;
+  lang: TPackageKeyboardLanguage;
+  frm: TfrmSelectBCP47Language;
+begin
+  k := SelectedKeyboard;
+  Assert(Assigned(k));
+
+  lang := SelectedKeyboardLanguage;
+  Assert(Assigned(lang));
+
+  frm := TfrmSelectBCP47Language.Create(Application.MainForm);
+  try
+    frm.LanguageID := lang.ID;
+    frm.LanguageName := lang.Name;
+    if frm.ShowModal = mrOk then
+    begin
+      lang.ID := frm.LanguageID;
+      lang.Name := frm.LanguageName;
+      RefreshKeyboardLanguageList(k);
       Modified := True;
     end;
   finally

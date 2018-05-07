@@ -1,5 +1,14 @@
 # Keyman for Android
 
+## 2018-04-30 10.0.380 beta
+* Fix OSK missing some keys on older Android configurations (#304)
+
+## 2018-04-27 10.0.379 beta
+* Fixed app crash when cancelling Keyboard download dialog (#786)
+
+## 2018-04-24 10.0.376 beta
+* Hide system OSK when resuming Keyman app. Disable text suggestions (#711)
+
 ## 2018-03-22 10.0.373 beta
 * Initial beta release of Keyman for Android 10.0
 

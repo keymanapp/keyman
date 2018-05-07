@@ -39,27 +39,21 @@ type
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FormShown;   // I4873
   protected
     procedure FormShown; virtual;   // I4873
+    function GetHelpTopic: string; virtual;
   public
     { Public declarations }
-    procedure GetHelpTopic(var s: string); virtual;
+    property HelpTopic: string read GetHelpTopic;
   end;
 
 implementation
 
 {$R *.dfm}
 
-type
-  TFormHelper = class helper for Forms.TCustomForm   // I4822
-  private
-    procedure RestoreDesignClientSize;
-  end;
-
 procedure TTikeForm.FormCreate(Sender: TObject);
 begin
-  RestoreDesignClientSize;   // I4822
   inherited;
   HelpContext := 0;
-  HelpKeyword := 'context_'+Copy(ClassName, 2, MAXINT);   // I4677   // I4841
+  HelpKeyword := HelpTopic; // 'context/'+Copy(ClassName, 2, MAXINT);   // I4677   // I4841
 end;
 
 procedure TTikeForm.FormShow(Sender: TObject);   // I4873
@@ -71,26 +65,14 @@ procedure TTikeForm.FormShown;   // I4873
 begin
 end;
 
-procedure TTikeForm.GetHelpTopic(var s: string);
+function TTikeForm.GetHelpTopic: string;
 begin
+  Result := '';
 end;
 
 procedure TTikeForm.WMUserFormShown(var Message: TMessage);   // I4873
 begin
   FormShown;
-end;
-
-
-
-{ TFormHelper }
-
-procedure TFormHelper.RestoreDesignClientSize;   // I4822
-begin
-(*  if BorderStyle in [bsSingle, bsDialog] then
-  begin
-    if Self.FClientWidth > 0 then ClientWidth := Self.FClientWidth;
-    if Self.FClientHeight > 0 then ClientHeight := Self.FClientHeight;
-  end;  *)
 end;
 
 end.

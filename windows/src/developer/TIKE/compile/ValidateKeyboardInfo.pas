@@ -82,7 +82,7 @@ begin
     for i := 0 to alangs.Count - 1 do
       with TBCP47Tag.Create(alangs.Items[i].Value) do
       try
-        if not IsValid(msg) then
+        if not IsValid(False, msg) then
           Result := Failed(msg);
 
         if not IsCanonical(msg) then
@@ -97,7 +97,7 @@ begin
     for i := 0 to olangs.Count - 1 do
       with TBCP47Tag.Create(olangs.Pairs[i].JsonString.Value) do
       try
-        if not IsValid(msg) then
+        if not IsValid(False, msg) then
           Result := Failed(msg);
 
         if not IsCanonical(msg) then
