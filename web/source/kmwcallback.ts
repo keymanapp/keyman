@@ -13,14 +13,14 @@ namespace com.keyman {
   * No constructors or methods since keyboards will not utilize the same backing prototype, and
   * property names are shorthanded to promote minification.
   */
+ type PlainKeyboardStore = string;
 
-  type PlainKeyboardStore = string;
+ // TODO:  Implement the new 'store object-orientation proposal.
+ export type KeyboardStoreElement = (string|StoreNonCharEntry);
+ export type ComplexKeyboardStore = KeyboardStoreElement[]; 
 
-  // TODO:  Implement the new 'store object-orientation proposal.
-  export type KeyboardStoreElement = (string|{'d': number});
-  export type ComplexKeyboardStore = KeyboardStoreElement[]; 
+ type KeyboardStore = PlainKeyboardStore | ComplexKeyboardStore;
 
-  type KeyboardStore = PlainKeyboardStore | ComplexKeyboardStore;
   type RuleChar = string;
 
   class RuleDeadkey {
@@ -478,7 +478,14 @@ namespace com.keyman {
               }
               break;
             case 'a':
-              var lookup = (typeof(context[i]) == 'string' ? context[i] as string : {'d': context[i] as number});
+              var lookup: KeyboardStoreElement;
+
+              if(typeof context[i] == 'string') {
+                lookup = context[i] as string;
+              } else {
+                lookup = {'t': 'd', 'd': context[i] as number};
+              }
+
               var result = this.any(i, lookup, r.a);
 
               if(!r.n) { // If it's a standard 'any'...
@@ -494,7 +501,8 @@ namespace com.keyman {
               }
               break;
             case 'i':
-              var ch = this._Index(r.i, r.o);
+              // The context will never hold a 'beep.'
+              var ch = this._Index(r.i, r.o) as string | RuleDeadkey;
 
               if(ch !== undefined && (typeof(ch) == 'string' ? ch : ch.d) !== context[i]) {
                 mismatch = true;
