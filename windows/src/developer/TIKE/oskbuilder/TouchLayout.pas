@@ -692,12 +692,12 @@ begin
   AddJSONValue(JSON, 'nextlayer', FNextLayer);
   AddJSONValue(JSON, 'fontsize', FFontSize);
   AddJSONValue(JSON, 'layer', FLayer);
-  AddJSONValue(JSON, 'width', FWidth);
+  if FWidth <> 0 then AddJSONValue(JSON, 'width', IntToStr(FWidth));
   AddJSONValue(JSON, 'dk', FDk);
   AddJSONValue(JSON, 'font', FFont);
   AddJSONValue(JSON, 'id', FId);
-  AddJSONValue(JSON, 'pad', FPad);
-  AddJSONValue(JSON, 'sp', FSp);
+  if FPad <> 0 then AddJSONValue(JSON, 'pad', IntToStr(FPad));
+  if FSp <> 0 then AddJSONValue(JSON, 'sp', IntToStr(FSp));
   AddJSONValue(JSON, 'text', FText);
 end;
 
@@ -841,12 +841,12 @@ begin
   AddJSONValue(JSON, 'nextlayer', FNextLayer);
   AddJSONValue(JSON, 'fontsize', FFontSize);
   AddJSONValue(JSON, 'layer', FLayer);
-  AddJSONValue(JSON, 'width', FWidth);
+  if FWidth <> 0 then AddJSONValue(JSON, 'width', IntToStr(FWidth));
   AddJSONValue(JSON, 'dk', FDk);
   AddJSONValue(JSON, 'font', FFont);
   AddJSONValue(JSON, 'id', FId);
-  AddJSONValue(JSON, 'pad', FPad);
-  AddJSONValue(JSON, 'sp', FSp);
+  if FPad <> 0 then AddJSONValue(JSON, 'pad', IntToStr(FPad));
+  if FSp <> 0 then AddJSONValue(JSON, 'sp', IntToStr(FSp));
   AddJSONValue(JSON, 'text', FText);
 
   if FSk.Count > 0 then

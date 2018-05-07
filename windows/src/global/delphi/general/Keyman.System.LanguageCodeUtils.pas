@@ -12,9 +12,16 @@ type
     class var
     FISO6393ToBCP47: TDictionary<string,string>;
     FLCIDToBCP47: TDictionary<Integer,string>;
+    FBCP47Languages: TDictionary<string,string>;
+    FBCP47Scripts: TDictionary<string,string>;
+    FBCP47Regions: TDictionary<string,string>;
 
-    class procedure BuildISO6393ToBCP47;
+    class procedure BuildISO6393ToBCP47; static;
     class procedure BuildLCIDToBCP47; static;
+    class procedure BuildSubtagRegistry; static;
+    class function GetBCP47Languages: TDictionary<string, string>; static;
+    class function GetBCP47Regions: TDictionary<string, string>; static;
+    class function GetBCP47Scripts: TDictionary<string, string>; static;
   public
     class function TranslateISO6393ToBCP47(codes: TStringDynArray): TStringDynArray; overload; static;
     class function TranslateISO6393ToBCP47(code: string): string; overload; static; // single code
@@ -25,12 +32,19 @@ type
 
     class function EthnologueCodeListToArray(codes: string): TStringDynArray; static;
     class function WindowsLanguageListToArray(codes: string): TIntegerDynArray; static;
+
+    class function LanguageName(const LanguageName, ScriptName, RegionName: string): string;
+
+    class property BCP47Languages: TDictionary<string,string> read GetBCP47Languages;
+    class property BCP47Scripts: TDictionary<string,string> read GetBCP47Scripts;
+    class property BCP47Regions: TDictionary<string,string> read GetBCP47Regions;
   end;
 
 implementation
 
 uses
   System.SysUtils,
+  Keyman.System.Standards.BCP47SubtagRegistry,
   Keyman.System.Standards.ISO6393ToBCP47Registry,
   Keyman.System.Standards.LCIDToBCP47Registry,
 
@@ -101,6 +115,21 @@ begin
   TLCIDToBCP47Map.Fill(FLCIDToBCP47);
 end;
 
+class procedure TLanguageCodeUtils.BuildSubtagRegistry;
+begin
+  if not Assigned(FBCP47Languages) then
+  begin
+    FBCP47Languages := TDictionary<string,string>.Create;
+    TBCP47SubtagRegistry.FillLanguages(FBCP47Languages);
+
+    FBCP47Scripts := TDictionary<string,string>.Create;
+    TBCP47SubtagRegistry.FillScripts(FBCP47Scripts);
+
+    FBCP47Regions := TDictionary<string,string>.Create;
+    TBCP47SubtagRegistry.FillRegions(FBCP47Regions);
+  end;
+end;
+
 class function TLanguageCodeUtils.EthnologueCodeListToArray(codes: string): TStringDynArray;
 var
   code: string;
@@ -114,6 +143,38 @@ begin
     Result[High(Result)] := code;
     codes := Trim(codes);
   end;
+end;
+
+class function TLanguageCodeUtils.GetBCP47Languages: TDictionary<string, string>;
+begin
+  BuildSubtagRegistry;
+  Result := FBCP47Languages;
+end;
+
+class function TLanguageCodeUtils.GetBCP47Scripts: TDictionary<string, string>;
+begin
+  BuildSubtagRegistry;
+  Result := FBCP47Scripts;
+end;
+
+class function TLanguageCodeUtils.LanguageName(const LanguageName, ScriptName, RegionName: string): string;
+begin
+  Result := LanguageName;
+  if ScriptName <> '' then
+  begin
+    Result := Result + ' ('+ScriptName;
+    if RegionName <> '' then
+      Result := Result + ', '+RegionName;
+    Result := Result + ')';
+  end
+  else if RegionName <> '' then
+    Result := Result + ' ('+RegionName+')';
+end;
+
+class function TLanguageCodeUtils.GetBCP47Regions: TDictionary<string, string>;
+begin
+  BuildSubtagRegistry;
+  Result := FBCP47Regions;
 end;
 
 class function TLanguageCodeUtils.WindowsLanguageListToArray(codes: string): TIntegerDynArray;
@@ -140,5 +201,8 @@ initialization
 finalization
   FreeAndNil(TLanguageCodeUtils.FISO6393ToBCP47);
   FreeAndNil(TLanguageCodeUtils.FLCIDToBCP47);
+  FreeAndNil(TLanguageCodeUtils.FBCP47Languages);
+  FreeAndNil(TLanguageCodeUtils.FBCP47Regions);
+  FreeAndNil(TLanguageCodeUtils.FBCP47Scripts);
 end.
 

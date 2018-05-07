@@ -151,7 +151,8 @@ uses
   Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   keymankeyboardlanguage in 'com\keyboardlanguages\keymankeyboardlanguage.pas',
   keymankeyboardlanguagesfile in 'com\keyboardlanguages\keymankeyboardlanguagesfile.pas',
-  keymankeyboardlanguagefile in 'com\keyboardlanguages\keymankeyboardlanguagefile.pas';
+  keymankeyboardlanguagefile in 'com\keyboardlanguages\keymankeyboardlanguagefile.pas',
+  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas';
 
 {$R *.TLB}
 

@@ -77,6 +77,7 @@ type
     procedure BatchRegTest;
 
   protected
+    function GetHelpTopic: string; override;
     procedure DebugKeyboardChanged; override;
 
   public
@@ -94,6 +95,8 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   debugDeadkeys,
   KeyNames,
   TextFileFormat,
@@ -386,6 +389,11 @@ procedure TfrmDebugStatus_RegTest.FormDestroy(Sender: TObject);
 begin
   inherited;
   FreeAndNil(FRegTest);
+end;
+
+function TfrmDebugStatus_RegTest.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_DebugStatus_RegTest;
 end;
 
 end.

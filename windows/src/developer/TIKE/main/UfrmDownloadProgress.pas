@@ -40,6 +40,8 @@ type
     FCallback: TDownloadProgressCallback;
     FCancel: Boolean;
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FormShown;
+  protected
+    function GetHelpTopic: string; override;
   public
 
     procedure HTTPCheckCancel(Sender: THTTPUploader; var Cancel: Boolean);
@@ -51,12 +53,20 @@ type
 
 implementation
 
+uses
+  Keyman.Developer.System.HelpTopics;
+
 {$R *.dfm}
 
 procedure TfrmDownloadProgress.cmdCancelClick(Sender: TObject);
 begin
   inherited;
   FCancel := True;
+end;
+
+function TfrmDownloadProgress.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_DownloadProgress;
 end;
 
 procedure TfrmDownloadProgress.HTTPCheckCancel(Sender: THTTPUploader; var Cancel: Boolean);

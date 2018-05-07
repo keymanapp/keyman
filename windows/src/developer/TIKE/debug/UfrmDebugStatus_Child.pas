@@ -52,7 +52,8 @@ type
 
 implementation
 
-uses UfrmDebugStatus;
+uses
+  UfrmDebugStatus;
 
 {$R *.dfm}
 

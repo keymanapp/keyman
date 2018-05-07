@@ -182,6 +182,8 @@ type
     function DoesKeyboardSupportXMLVisualKeyboard: Boolean;
     function TransferDesignToSource: Boolean;
     function TransferSourceToDesign(ASilent: Boolean): Boolean;   // I4057
+  protected
+    function GetHelpTopic: string; override;
   public
     procedure Load;
     procedure Save;
@@ -201,6 +203,8 @@ implementation
 
 uses
   Xml.Xmldom,
+
+  Keyman.Developer.System.HelpTopics,
 
   CharacterInfo,
   CharMapInsertMode,
@@ -342,6 +346,8 @@ begin
       FVK.LoadFromStream(stream);
       VK_UpdateData;
       VK_UpdateKeyFont;
+      FVKCurrentKey := nil;
+      VK_SelectVKey;
     finally
       FVKLoading := False;
     end;
@@ -1240,6 +1246,11 @@ begin
   end;
 end;
 
+function TframeOnScreenKeyboardEditor.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_OnScreenKeyboardEditor;
+end;
+
 function TframeOnScreenKeyboardEditor.GetHTMLExportParams(FFileName: string;
   var FFolders, FGraphical: Boolean): Boolean;
 begin
@@ -1382,9 +1393,10 @@ end;
 
 procedure TframeOnScreenKeyboardEditor.VK_FocusKey;
 begin
-  if rbKeyText.Checked
-    then editVKKeyText.SetFocus
-    else cmdBrowseKeyBitmap.SetFocus;
+  if editVKKeyText.CanFocus then
+    if rbKeyText.Checked
+      then editVKKeyText.SetFocus
+      else cmdBrowseKeyBitmap.SetFocus;
 end;
 
 { ---------------------------------------------------------------------------- }

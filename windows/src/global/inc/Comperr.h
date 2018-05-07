@@ -136,6 +136,7 @@
 #define CERR_ContextExHasInvalidOffset                     0x0000405F
 #define CERR_90FeatureOnlyEmbedCSS                         0x00004060
 #define CERR_90FeatureOnlyTargets                          0x00004061
+#define CERR_ContextAndIndexInvalidInMatchNomatch          0x00004062
 
 #define CWARN_TooManyWarnings						0x00002080
 #define CWARN_OldVersion							0x00002081

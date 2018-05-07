@@ -232,7 +232,7 @@
     <xsl:param name="icontype">gif</xsl:param>
     <xsl:param name="title" />
     <td><a>
-      <xsl:attribute name="href">help:filetype_<xsl:value-of select="$type" /></xsl:attribute>
+      <xsl:attribute name="href">help:reference/file-types/<xsl:value-of select="$type" /></xsl:attribute>
       <xsl:attribute name="title"><xsl:value-of select="$title"/></xsl:attribute>
       <img>
         <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>icon32_<xsl:value-of select="$type" />.<xsl:value-of select="$icontype" /></xsl:attribute>
