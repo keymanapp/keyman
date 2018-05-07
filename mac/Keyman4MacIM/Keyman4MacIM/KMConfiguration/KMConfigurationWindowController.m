@@ -13,6 +13,8 @@
 @property (nonatomic, weak) IBOutlet NSTableView *tableView;
 @property (nonatomic, weak) IBOutlet WebView *webView;
 @property (nonatomic, weak) IBOutlet NSButton *alwaysShowOSKCheckBox;
+@property (nonatomic, weak) IBOutlet NSButton *useVerboseLoggingCheckBox;
+@property (nonatomic, weak) IBOutlet NSTextField *verboseLoggingInfo;
 @property (nonatomic, strong) NSMutableArray *tableContents;
 @property (nonatomic, strong) NSTimer *reloadTimer;
 @property (nonatomic, strong) NSDate *lastReloadDate;
@@ -57,10 +59,9 @@
     
     [self.webView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
     [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://help.keyman.com/products/macosx/"]]];
-    if (self.AppDelegate.alwaysShowOSK)
-        [self.alwaysShowOSKCheckBox setState:NSOnState];
-    else
-        [self.alwaysShowOSKCheckBox setState:NSOffState];
+
+    [self.alwaysShowOSKCheckBox setState:(self.AppDelegate.alwaysShowOSK ? NSOnState : NSOffState)];
+    [self.useVerboseLoggingCheckBox setState:(self.AppDelegate.useVerboseLogging ? NSOnState : NSOffState)];
 }
 
 - (void)setTableView:(NSTableView *)tableView {
@@ -371,10 +372,14 @@
 
 - (IBAction)alwaysShowOSKCheckBoxAction:(id)sender {
     NSButton *checkBox = (NSButton *)sender;
-    if (checkBox.state == NSOnState)
-        [self.AppDelegate setAlwaysShowOSK:YES];
-    else if (checkBox.state == NSOffState)
-        [self.AppDelegate setAlwaysShowOSK:NO];
+    [self.AppDelegate setAlwaysShowOSK:(checkBox.state == NSOnState)];
+}
+
+- (IBAction)useVerboseLoggingCheckBoxAction:(id)sender {
+    NSButton *checkBox = (NSButton *)sender;
+    BOOL verboseLoggingOn = checkBox.state == NSOnState;
+    [self.AppDelegate setUseVerboseLogging:verboseLoggingOn];
+    [self.verboseLoggingInfo setHidden:!verboseLoggingOn];
 }
 
 - (void)startTimer {

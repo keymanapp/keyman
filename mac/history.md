@@ -1,5 +1,11 @@
 # Keyman for macOS Version History
 
+## 2018-05-08 10.0.37 beta
+* Added option to use verbose Console logging to facilitate debugging by Keyman Support.
+
+## 2018-05-04 10.0.36 beta
+* Improved compatibility with Open Office.
+
 ## 2018-05-02 10.0.35 beta
 * Enabled searching for keyboards by language name.
 * Fixed configuration and download windows to enable typing (e.g., in search boxes)

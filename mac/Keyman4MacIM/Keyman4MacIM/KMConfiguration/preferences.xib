@@ -11,6 +11,8 @@
             <connections>
                 <outlet property="alwaysShowOSKCheckBox" destination="k5c-KF-717" id="EYm-1F-c71"/>
                 <outlet property="tableView" destination="epz-Md-JOY" id="fHy-6f-hXN"/>
+                <outlet property="useVerboseLoggingCheckBox" destination="uWx-3J-U0D" id="deO-CV-6KJ"/>
+                <outlet property="verboseLoggingInfo" destination="PiJ-pY-UY7" id="o0X-ZY-NKX"/>
                 <outlet property="webView" destination="gTQ-rF-m9S" id="u7r-Sf-QKb"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
@@ -220,6 +222,27 @@
                                                 <action selector="alwaysShowOSKCheckBoxAction:" target="-2" id="TbQ-5n-ODK"/>
                                             </connections>
                                         </button>
+                                        <button toolTip="Turn this on if you are having problems with a specific keyboard or with Keyman in general." verticalHuggingPriority="750" misplaced="YES" id="uWx-3J-U0D">
+                                            <rect key="frame" x="15" y="483" width="200" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Use verbose Console logging" bezelStyle="regularSquare" imagePosition="left" inset="2" id="7J6-zy-R20">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="useVerboseLoggingCheckBoxAction:" target="-2" id="DGX-fy-5qP"/>
+                                            </connections>
+                                        </button>
+                                        <textField hidden="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" id="PiJ-pY-UY7">
+                                            <rect key="frame" x="34" y="414" width="705" height="63"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="MrI-GM-7d6">
+                                                <font key="font" metaFont="system"/>
+                                                <string key="title">When the verbose logging option is on, Keyman will log actions that might help Keyman Support diagnose a problem. The Console program can be used to see a log of messages from Keyman. In Console, filter to show all messages from the "Keyman" process. This log can be exported and sent to Keyman support if needed.</string>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>
