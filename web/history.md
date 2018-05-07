@@ -1,5 +1,8 @@
 # KeymanWeb Version History
 
+## 2018-05-07 10.0.89 beta
+* Fixes an issue with case sensitivite virtual keys used by some Keyman keyboards. (#162)
+
 ## 2018-04-25 10.0.86 beta
 * Fixes display of popup keys representing modifiers and other special characters. (#698)
 
