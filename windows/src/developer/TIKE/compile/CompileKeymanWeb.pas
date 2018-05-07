@@ -1111,7 +1111,11 @@ begin
       begin
         if rec.Code = CODE_DEADKEY then
         begin
-          Result := Result + Format('{d:%d}', [rec.Deadkey.DeadKey]);
+          Result := Result + Format('{t:''d'',d:%d}', [rec.Deadkey.DeadKey]);
+        end
+        else if rec.Code = CODE_BEEP then
+        begin
+          Result := Result + '{t:''b''}'
         end
         else //if rec.Code = CODE_EXTENDED then
         begin

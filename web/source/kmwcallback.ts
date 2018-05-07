@@ -83,14 +83,16 @@ namespace com.keyman {
     ['t']: 'n';
   }
 
-  class ContextBeep {
+  class StoreBeep {
     /** Discriminant field - 'b' for `beep`
      */
     ['t']: 'b';
   }
 
-  type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx | ContextNul | ContextBeep ;
+  type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx | ContextNul ;
   type ContextEntry = RuleChar | ContextNonCharEntry;
+
+  type StoreNonCharEntry = RuleDeadkey | StoreBeep;
 
   /**
    * Cache of context storing and retrieving return values from KC
@@ -513,9 +515,6 @@ namespace com.keyman {
                 mismatch = true;
               }
               break;
-            case 'b':
-              this.beep(Ptarg);
-              break;
             default:
               assertNever(r);
           }
@@ -776,11 +775,29 @@ namespace com.keyman {
     indexOutput(Pdn: number, Ps: KeyboardStore, Pn: number, Pelem: HTMLElement): void {
       this.resetContextCache();
 
+      var assertNever = function(x: never): never {
+        // Could be accessed by improperly handwritten calls to `fullContextMatch`.
+        throw new Error("Unexpected object in fullContextMatch specification: " + x);
+      }
+
       var indexChar = this._Index(Ps, Pn);
       if(indexChar !== "") {
         if(typeof indexChar == 'string' ) {
           this.output(Pdn,Pelem,indexChar);  //I3319
-        } else {
+        } else if(indexChar['t']) {
+          var storeEntry = indexChar as StoreNonCharEntry;
+
+          switch(storeEntry.t) {
+            case 'b': // Beep commands may appear within stores.
+              this.beep(Pelem);
+              break;
+            case 'd':
+              this.deadkeyOutput(Pdn, Pelem, indexChar['d']);
+              break;
+            default:
+              assertNever(storeEntry);
+          }
+        } else { // For keyboards developed during 10.0's alpha phase - t:'d' was assumed.
           this.deadkeyOutput(Pdn, Pelem, indexChar['d']);
         }
       } 
