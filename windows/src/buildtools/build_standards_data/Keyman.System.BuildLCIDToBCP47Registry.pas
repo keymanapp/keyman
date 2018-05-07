@@ -26,7 +26,7 @@ var
 begin
   with TStringList.Create do
   try
-    LoadFromFile(MapFile);
+    LoadFromFile(MapFile, TEncoding.UTF8);
 
     FResult := TStringList.Create;
     try
@@ -69,7 +69,7 @@ begin
       FResult.Add('');
       FResult.Add('end.');
 
-      FResult.SaveToFile(DestinationFile);
+      FResult.SaveToFile(DestinationFile, TEncoding.UTF8);
     finally
       FResult.Free;
     end;
