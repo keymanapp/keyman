@@ -795,24 +795,24 @@ if(!window['keyman']['initialized']) {
      * @param       {string}      keyName   custom virtual key code to lookup in the dictionary
      * @return      {number}                key code > 255 on success, or 0 if not found
      */
-    osk.getVKDictionaryCode = function(keyName)
-    {
+    osk.getVKDictionaryCode = function(keyName) {
       var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
-      if(!activeKeyboard['VKDictionary'])
-      {
+      if(!activeKeyboard['VKDictionary']) {
         var a=[];
-        if(typeof activeKeyboard['KVKD'] == 'string')
-        {
+        if(typeof activeKeyboard['KVKD'] == 'string') {
           // Build the VK dictionary
-          // TODO: Move the dictionary build into the compiler -- so compiler generates code such as following.  Makes the VKDictionary member unnecessary
+          // TODO: Move the dictionary build into the compiler -- so compiler generates code such as following.  
+          // Makes the VKDictionary member unnecessary.
           //       this.KVKD={"K_ABC":256,"K_DEF":257,...};
           var s=activeKeyboard['KVKD'].split(' ');
-          for(var i=0; i<s.length; i++) a[s[i]]=i+256;
+          for(var i=0; i<s.length; i++) {
+            a[s[i].toUpperCase()]=i+256; // We force upper-case since virtual keys should be case-insensitive.
+          }
         }
         activeKeyboard['VKDictionary']=a;
       }
 
-      var res=activeKeyboard['VKDictionary'][keyName];
+      var res=activeKeyboard['VKDictionary'][keyName.toUpperCase()];
       return res ? res : 0;
     }
     /**

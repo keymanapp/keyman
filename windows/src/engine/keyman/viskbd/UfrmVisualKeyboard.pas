@@ -1134,16 +1134,20 @@ procedure TfrmVisualKeyboard.UpdateKeyboardIcon;   // I3962
   end;
 var
   kbd: TLangSwitchKeyboard;
+  kbdId: string;
   i: Integer;
   btn: TKeymanToolButton;
 begin
   kbd := frmKeyman7Main.LangSwitchManager.ActiveKeyboard;
+  if Assigned(kbd)
+    then kbdId := kbd.ID
+    else kbdId := '';
 
   for i := 0 to tbKeyboards.ControlCount - 1 do
     if (tbKeyboards.Controls[i] is TToolButton) then
     begin
       btn := tbKeyboards.Controls[i] as TKeymanToolButton;
-      btn.Down := btn.KeyboardName = kbd.ID;
+      btn.Down := btn.KeyboardName = kbdId;
       btn.Marked := btn.Down;
     end;
 
