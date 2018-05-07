@@ -83,7 +83,13 @@ namespace com.keyman {
     ['t']: 'n';
   }
 
-  type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx | ContextNul;
+  class ContextBeep {
+    /** Discriminant field - 'b' for `beep`
+     */
+    ['t']: 'b';
+  }
+
+  type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx | ContextNul | ContextBeep ;
   type ContextEntry = RuleChar | ContextNonCharEntry;
 
   /**
@@ -506,6 +512,9 @@ namespace com.keyman {
               if(context[i] != NUL_CONTEXT) {
                 mismatch = true;
               }
+              break;
+            case 'b':
+              this.beep(Ptarg);
               break;
             default:
               assertNever(r);
