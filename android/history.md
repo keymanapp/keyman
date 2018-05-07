@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 2018-05-08 10.0.386 beta
+* Fix crashes from invalid package name/version (#819)
+
 ## 2018-04-30 10.0.380 beta
 * Fix OSK missing some keys on older Android configurations (#304)
 
