@@ -188,7 +188,7 @@ public final class KMManager {
     } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       initSystemKeyboard(appContext);
     } else {
-      Log.w(TAG, "Cannot initialize: Invalid keyboard type");
+      Log.e(TAG, "Cannot initialize: Invalid keyboard type");
     }
 
     // Initializes the PackageProcessor with the base resource directory, which is the parent directory
@@ -225,8 +225,6 @@ public final class KMManager {
 
   private static void initInAppKeyboard(Context appContext) {
     if (InAppKeyboard == null) {
-      if (isDebugMode())
-        Log.d(TAG, "Initializing In-App Keyboard...");
       int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
       RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
       params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
@@ -242,8 +240,6 @@ public final class KMManager {
 
   private static void initSystemKeyboard(Context appContext) {
     if (SystemKeyboard == null) {
-      if (isDebugMode())
-        Log.d(TAG, "Initializing System Keyboard...");
       int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
       RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
       params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
@@ -743,7 +739,7 @@ public final class KMManager {
       return SystemKeyboard;
     } else {
       // What should we do if KeyboardType.KEYBOARD_TYPE_UNDEFINED?
-      Log.w("KMManager", "Invalid keyboard");
+      Log.e("KMManager", "Invalid keyboard");
       return null;
     }
   }
@@ -1257,9 +1253,6 @@ public final class KMManager {
     public void onPageFinished(WebView view, String url) {
       if (url.endsWith(KMFilename_KeyboardHtml)) {
         InAppKeyboardLoaded = true;
-        if (isDebugMode()) {
-          Log.d("KMManager", "In-App Keyboard loaded.");
-        }
 
         if (!InAppKeyboard.keyboardSet) {
           SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
@@ -1435,10 +1428,6 @@ public final class KMManager {
     public void onPageFinished(WebView view, String url) {
       if (url.endsWith(KMFilename_KeyboardHtml)) {
         SystemKeyboardLoaded = true;
-        if (isDebugMode()) {
-          Log.d("KMManager", "System Keyboard loaded.");
-        }
-
         if (!SystemKeyboard.keyboardSet) {
           SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
           int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
@@ -1624,9 +1613,6 @@ public final class KMManager {
     // Store the current keyboard chirality status from KMW in InAppKeyboard
     @JavascriptInterface
     public void setIsChiral(boolean isChiral) {
-      if (isDebugMode()) {
-        Log.d("KMManager", "InAppKeyboard chirality: " + String.valueOf(isChiral));
-      }
       InAppKeyboard.setChirality(isChiral);
     }
 
@@ -1637,8 +1623,9 @@ public final class KMManager {
       mainLoop.post(new Runnable() {
         public void run() {
           if (InAppKeyboard.subKeysWindow != null || KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class) {
-            if (KMTextView.activeView == null)
+            if ((KMTextView.activeView == null) && isDebugMode()) {
               Log.w("IAK: JS Handler", "insertText failed: activeView is null");
+            }
             return;
           }
 
@@ -1738,9 +1725,6 @@ public final class KMManager {
     // Store the current keyboard chirality status from KMW in SystemKeyboard
     @JavascriptInterface
     public void setIsChiral(boolean isChiral) {
-      if (isDebugMode()) {
-        Log.d("KMManager", "SystemKeyboard chirality: " + String.valueOf(isChiral));
-      }
       SystemKeyboard.setChirality(isChiral);
     }
 
@@ -1755,7 +1739,7 @@ public final class KMManager {
           }
 
           InputConnection ic = IMService.getCurrentInputConnection();
-          if (ic == null) {
+          if ((ic == null) && isDebugMode()) {
             Log.w("SWK: JS Handler", "insertText failed: InputConnection is null");
             return;
           }

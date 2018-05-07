@@ -351,9 +351,6 @@ final class KMKeyboard extends WebView {
     String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
     String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
     loadUrl(jsString);
-    if (KMManager.isDebugMode()) {
-      Log.d("KMKeyboard", jsString);
-    }
 
     this.packageID = packageID;
     this.keyboardID = keyboardID;
@@ -455,9 +452,6 @@ final class KMKeyboard extends WebView {
     String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
     String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
     loadUrl(jsString);
-    if (KMManager.isDebugMode()) {
-      Log.d("KMKeyboard", jsString);
-    }
 
     this.packageID = packageID;
     this.keyboardID = keyboardID;
