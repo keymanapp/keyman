@@ -286,7 +286,7 @@ var
 begin
   SaveState;
 
-  s := '<state>'+FState+'</state>';
+  s := '<state>'+XMLEncode(FState)+'</state>';
   s := s + '<basekeyboard id="'+IntToHex(kmcom.Options[KeymanOptionName(koBaseLayout)].Value,8)+'">'+
     XMLEncode(TBaseKeyboards.GetName(kmcom.Options[KeymanOptionName(koBaseLayout)].Value))+
     '</basekeyboard>';   // I4169
