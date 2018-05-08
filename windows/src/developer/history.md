@@ -1,5 +1,8 @@
 # Keyman Developer Version History
 
+## 2018-05-08 10.0.1082.0 beta
+* Fixes support for 'beep' statements in keyboard stores when compiling for web or mobile targets (#733)
+
 ## 2018-05-03 10.0.1076.0 beta
 * Restrict modifier options to a small set by default in touch layout editor (#810)
 * Touch layout editor no longer leaves broken JSON when deleting or modifying some keys (#811)
