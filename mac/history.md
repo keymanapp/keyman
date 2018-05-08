@@ -1,15 +1,21 @@
 # Keyman for macOS Version History
 
+## 2018-05-08 10.0.37 beta
+* Added option to use verbose logging to facilitate debugging by Keyman Support (#768)
+
+## 2018-05-04 10.0.36 beta
+* Improved compatibility with Open Office (#175 - incomplete)
+
 ## 2018-05-02 10.0.35 beta
-* Enabled searching for keyboards by language name.
-* Fixed configuration and download windows to enable typing (e.g., in search boxes)
-* Made hyperlinks in web-views in configuration and download windows work correctly.
+* Enabled searching for keyboards by language name (#705)
+* Fixed configuration and download windows to enable typing (e.g., in search boxes) (#791)
+* Made hyperlinks in web-views in configuration and download windows work correctly (#709)
 
 ## 2018-03-22 10.0.31 beta
 * Initial beta release of Keyman 10 for macOS
 
 ## 10.0.29 alpha
-* Detection of context changes due to mouse clicks and command keys in "legacy" apps
+* Detection of context changes due to mouse clicks and command keys in "legacy" apps (#394)
 
 ## 10.0 alpha
 * New feature: install keyboard packages by double-clicking the kmp file (#511)

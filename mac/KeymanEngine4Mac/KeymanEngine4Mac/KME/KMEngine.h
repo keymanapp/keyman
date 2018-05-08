@@ -30,6 +30,7 @@ extern DWORD VKMap[0x80];
 - (void)setContextBuffer:(NSString *)ctxBuf;
 - (NSString *)contextBuffer;
 - (NSArray *)processEvent:(NSEvent *)event;
+- (void)setUseVerboseLogging:(BOOL)useVerboseLogging;
 
 @end
 

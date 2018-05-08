@@ -73,6 +73,7 @@ extern NSString *const kWebSite;
 @property (nonatomic, strong) NSMutableData *receivedData;
 @property (nonatomic, assign) NSUInteger expectedBytes;
 @property (nonatomic, assign) BOOL alwaysShowOSK;
+@property (nonatomic, assign) BOOL useVerboseLogging;
 @property (nonatomic, assign) BOOL useNullChar;
 @property (nonatomic, assign) BOOL debugMode;
 
