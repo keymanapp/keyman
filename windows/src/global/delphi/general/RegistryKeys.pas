@@ -206,7 +206,6 @@ const
 
   SRegValue_KeymanFile_MnemonicOverride = 'keyman file mnemonic override';          // LM   // I4169
   SRegValue_KeymanFile_MnemonicOverride_Deadkey = 'keyman file mnemonic override deadkey';          // LM   // I4552
-  SRegValue_KeymanDefaultHotkey = 'keyman default hotkey';                          // LM CU
   SRegValue_KeymanFile          = 'keyman file';                                    // LM CU
   SRegValue_Legacy_KeymanKeyboardID    = 'keyman keyboard id';                             // LM CU   // I3613
   SRegValue_PackageName         = 'package name';                                   // LM CU

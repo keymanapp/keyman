@@ -227,7 +227,6 @@ begin
 
         WriteString(SRegValue_Legacy_DefaultLanguageID, IntToHex(ki.KeyboardID, 8));   // I4220
 
-        WriteString(SRegValue_KeymanDefaultHotkey, IntToStr(ki.DefaultHotkey));
         if ikPartOfPackage in FInstallOptions
           then WriteString(SRegValue_PackageName, GetShortPackageName(PackageName))
           else if ValueExists(SRegValue_PackageName) then DeleteValue(SRegValue_PackageName);

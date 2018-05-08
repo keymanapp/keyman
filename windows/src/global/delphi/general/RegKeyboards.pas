@@ -331,7 +331,6 @@ begin
 
     if OpenKeyReadOnly(GetRegistryKeyboardInstallKey_LM(FName)) then
     begin
-      FDefaultHotkey := StrToIntDef(ReadString(SRegValue_KeymanDefaultHotkey), 0);
       FKeymanFile := ReadString(SRegValue_KeymanFile);
       Legacy_FKeyboardID := StrToIntDef('$'+ReadString(SRegValue_Legacy_KeymanKeyboardID), 0);   // I3613
       FPackageName := ReadString(SRegValue_PackageName);
@@ -411,6 +410,7 @@ begin
     FWindowsLanguages := ki.WindowsLanguages;
     FISO6393Languages := ki.ISO6393Languages;
     FKeyboardLanguageID := ki.KeyboardID;
+    FDefaultHotkey := ki.DefaultHotkey;
     FKeyboardVersion := ki.KeyboardVersion;   // I4136
 
     if ki.Icon <> nil then
