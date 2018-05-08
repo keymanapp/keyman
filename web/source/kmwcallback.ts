@@ -13,13 +13,12 @@ namespace com.keyman {
   * No constructors or methods since keyboards will not utilize the same backing prototype, and
   * property names are shorthanded to promote minification.
   */
- type PlainKeyboardStore = string;
+  type PlainKeyboardStore = string;
 
- // TODO:  Implement the new 'store object-orientation proposal.
- export type KeyboardStoreElement = (string|StoreNonCharEntry);
- export type ComplexKeyboardStore = KeyboardStoreElement[]; 
+  export type KeyboardStoreElement = (string|StoreNonCharEntry);
+  export type ComplexKeyboardStore = KeyboardStoreElement[]; 
 
- type KeyboardStore = PlainKeyboardStore | ComplexKeyboardStore;
+  type KeyboardStore = PlainKeyboardStore | ComplexKeyboardStore;
 
   type RuleChar = string;
 
@@ -89,7 +88,7 @@ namespace com.keyman {
     ['t']: 'b';
   }
 
-  type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx | ContextNul ;
+  type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx | ContextNul;
   type ContextEntry = RuleChar | ContextNonCharEntry;
 
   type StoreNonCharEntry = RuleDeadkey | StoreBeep;
