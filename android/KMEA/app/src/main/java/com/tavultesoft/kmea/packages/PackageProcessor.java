@@ -33,6 +33,7 @@ import org.json.JSONObject;
  */
 public class PackageProcessor {
   private static File resourceRoot = null;
+  public static final String PPDefault_Version = "1.0";
 
   public static void initialize(File resourceRoot) {
     PackageProcessor.resourceRoot = resourceRoot;
@@ -192,21 +193,22 @@ public class PackageProcessor {
         return name;
       }
     } catch (Exception e) {
-      return null;
+      // Developer will never allow package name to be undefined, but just in case, reuse package ID
+      return getPackageID(kmpPath);
     }
   }
 
   /**
    * Simply extracts the package's version number.
+   * If undefined, return default version "1.0"
    * @param json The metadata JSONObject for the package.
    * @return The version number (via String)
-   * @throws JSONException
    */
-  public static String getPackageVersion(JSONObject json) throws JSONException {
-    if(json == null) {
-      return null;
-    } else {
+  public static String getPackageVersion(JSONObject json) {
+    try {
       return json.getJSONObject("info").getJSONObject("version").getString("description");
+    } catch (JSONException e) {
+      return PPDefault_Version;
     }
   }
 
@@ -221,7 +223,7 @@ public class PackageProcessor {
         return version;
       }
     } catch (Exception e) {
-      return null;
+      return PPDefault_Version;
     }
   }
 
