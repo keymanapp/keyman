@@ -504,6 +504,10 @@ namespace com.keyman {
             // Apply an uppercase effect to the key, since K_A etc are based on the upper-case character codes.
             s.Lcode -= 32;
           }
+
+          if(s.Lcode == 160) {
+            s.Lcode = 0;
+          }
         } else {
           return null;
         }

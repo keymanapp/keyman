@@ -1141,22 +1141,28 @@ if(!window['keyman']['initialized']) {
         }
 
         // Include *limited* support for mnemonic keyboards (Sept 2012)
-        if(activeKeyboard && (activeKeyboard['KM']))
-        {
-          var keyText=e.firstChild.firstChild.wholeText;
-          Lkc.LisVirtualKey=false; Lkc.LisVirtualKeyCode=false;
-          Lkc.vkCode=Lkc.Lcode;
-          if(Lkc.Lcode != osk.keyCodes['K_SPACE']) // exception required, March 2013
-          {
-            if(typeof keyText == 'string' && keyText != '')
-              Lkc.Lcode=keyText.charCodeAt(0);
-            else
-              Lkc.Lcode=0;
-            if(Lkc.Lcode == 160) Lkc.Lcode = 0;
+        // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
+        if(activeKeyboard && activeKeyboard['KM'] && !(activeKeyboard['KVKL'] && device.formFactor != 'desktop')) {
+          if(Lkc.Lcode != osk.keyCodes['K_SPACE']) { // exception required, March 2013
+            // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
+            // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
+            var mappedChar: string = osk.defaultKeyOutput('K_xxxx', Lkc.Lcode, (layer.indexOf('shift') != -1 ? 0x10 : 0), false, null);
+            if(mappedChar) {
+              Lkc.Lcode = mappedChar.charCodeAt(0);
+              if(Lkc.Lcode >= 'a'.charCodeAt(0) && Lkc.Lcode <= 'z'.charCodeAt(0)) {
+                // Apply an uppercase effect to the key, since K_A etc are based on the upper-case character codes.
+                Lkc.Lcode -= 32;
+              }
+            } // No 'else' - avoid remapping control + modifier keys!
+
+            if(Lkc.Lcode == 160) {
+              Lkc.Lcode = 0;
+            }
+            Lkc.vkCode = Lkc.Lcode;
           }
-          Lkc.Lmodifiers=0;
+        } else {
+          Lkc.vkCode=Lkc.Lcode;
         }
-        else Lkc.vkCode=Lkc.Lcode;
 
         // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
         if(typeof activeKeyboard['KM'] == 'undefined')
