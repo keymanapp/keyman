@@ -88,14 +88,11 @@ public final class Connection {
           urlValid = true;
           ret = true;
         } else {
-          Log.d("util.Connection", "HttpURLConnection response code: " + status);
-
           // Handle HTTP Status Codes 3xx
           if (HttpURLConnection.HTTP_MULT_CHOICE <= status &&
               status <= HttpURLConnection.HTTP_USE_PROXY &&
               status != HttpURLConnection.HTTP_NOT_MODIFIED) {
             urlStr = urlConnection.getHeaderField("Location");
-            Log.d("util.Connection", "Redirecting from " + url + " to " + urlStr);
           } else {
             // Abort for all other Status Codes
             break;

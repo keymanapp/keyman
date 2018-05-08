@@ -321,7 +321,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           }
           break;
         default :
-          Log.d(TAG, "Unrecognized protocol " + data.getScheme());
+          Log.e(TAG, "Unrecognized protocol " + data.getScheme());
       }
     }
     intent.setData(null);
@@ -614,15 +614,12 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
     if (requestCode == PERMISSION_REQUEST_STORAGE) {
       // Request for storage permission
-      Log.d(TAG, "Received response for Storage permission request");
       if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         // Permission has been granted. Resume task needing this permission
-        Log.d(TAG, "Permission: " + permissions[0] + " was " + grantResults[0]);
         useLocalKMP(data);
       } else {
         // Permission request denied
         String message = "Storage permission request was denied. Unable to install keyboard package";
-        Log.d(TAG, message);
         Toast.makeText(getApplicationContext(), message,
           Toast.LENGTH_SHORT).show();
       }
@@ -634,16 +631,13 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) ==
         PackageManager.PERMISSION_GRANTED) {
-        Log.d(TAG, "Read external storage permission granted");
         useLocalKMP(data);
       } else {
-        Log.d(TAG, "Read external storage permission denied");
         // Permission is missing and must be requested
         requestStoragePermission();
       }
     } else {
       // Permission automatically granted on older Android versions
-      Log.d(TAG, "Read external storage permission granted");
       useLocalKMP(data);
     }
   }
@@ -703,7 +697,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           cacheKMPFile.delete();
         }
 
-        Log.d(TAG, "Copying " + filename + " to app cache");
         FileUtils.copy(inputFile, new FileOutputStream(cacheKMPFile));
       } else {
         String noKeyboardsInstalledMessage = " is not a valid keyboard package file.\nNo keyboards were installed.";

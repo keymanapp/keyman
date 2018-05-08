@@ -96,8 +96,6 @@ public final class FileUtils {
           }
           if (!tmpFile.renameTo(file)) {
             ret = DOWNLOAD_ERROR;
-          } else if (KMManager.isDebugMode()) {
-            Log.d("FileUtils", "Download finished for filename " + file.toString());
           }
         } else {
           ret = DOWNLOAD_ERROR;
@@ -109,9 +107,7 @@ public final class FileUtils {
         if (tmpFile.exists()) {
           tmpFile.delete();
         }
-        if (KMManager.isDebugMode()) {
-          Log.d("FileUtils", "Could not download filename " + file.toString());
-        }
+        Log.e("FileUtils", "Could not download filename " + file.toString());
       }
 
       Connection.disconnect();

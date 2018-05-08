@@ -71,7 +71,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
    */
   @Override
   public View onCreateInputView() {
-    //Log.i("SystemKeyboard", "onCreateInputView");
     if (inputView == null) {
       inputView = KMManager.createInputView(this);
     }
@@ -105,7 +104,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.onStartInput(attribute, restarting);
     KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
-    //Log.i("SystemKeyboard", "onStartInput");
     InputConnection ic = getCurrentInputConnection();
     if (ic != null) {
       ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
@@ -123,13 +121,11 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onStartInputView(EditorInfo attribute, boolean restarting) {
     super.onStartInputView(attribute, restarting);
-    //Log.i("SystemKeyboard", "onStartInputView");
   }
 
   @Override
   public void onUpdateExtractingVisibility(EditorInfo ei) {
     super.onUpdateExtractingVisibility(ei);
-    //Log.i("SystemKeyboard", "onUpdateExtractingVisibility");
   }
 
   @Override
