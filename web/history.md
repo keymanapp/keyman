@@ -1,5 +1,8 @@
 # KeymanWeb Version History
 
+## 2018-05-08 10.0.90 beta
+* Fixes support for Keyman-language 'beep' statements as part of keyboard stores. (#733)
+
 ## 2018-05-07 10.0.89 beta
 * Fixes an issue with case sensitive virtual keys used by some Keyman keyboards. (#162)
 
