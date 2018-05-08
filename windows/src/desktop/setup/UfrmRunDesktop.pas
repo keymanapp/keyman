@@ -135,11 +135,14 @@ end;
 
 procedure TfrmRunDesktop.cmdExitClick(Sender: TObject);
 begin
-  if MessageDlg('Are you sure you want to cancel the '+
-    'installation of Keyman Desktop?', mtConfirmation, mbOkCancel, 0) = mrCancel then Exit;
-  if cmdExit.Caption = 'Cancel'  // I2644
-    then g_bCancelInstall := True
-    else ModalResult := mrCancel;
+  if cmdExit.Caption = 'Cancel' then // I2644
+  begin
+    if MessageDlg('Are you sure you want to cancel the '+
+      'installation of Keyman Desktop?', mtConfirmation, mbOkCancel, 0) = mrCancel then Exit;
+    g_bCancelInstall := True;
+  end
+  else
+    ModalResult := mrCancel;
 end;
 
 procedure TfrmRunDesktop.cmdInstallClick(Sender: TObject);

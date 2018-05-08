@@ -182,7 +182,7 @@ end;
 function TRunTools.DoInstall(Handle: THandle; PackagesOnly, CheckForUpdatesInstall, StartAfterInstall, StartWithWindows, CheckForUpdates: Boolean): Boolean;
 begin
   Result := False;
-  
+
   if PackagesOnly
     then StatusMax := FInstallInfo.Packages.Count
     else StatusMax := 6 + FInstallInfo.Packages.Count;
@@ -723,13 +723,14 @@ begin
 
   if res = ERROR_SUCCESS_REBOOT_REQUIRED then
   begin
-    if GetRunTools.PromptForReboot and (MessageDlgW(FInstallInfo.Text(ssQueryRestart), mtConfirmation, mbOkCancel, 0) = mrOk) then  // I3355   // I3500
+    if GetRunTools.PromptForReboot and
+      (MessageDlgW(FInstallInfo.Text(ssQueryRestart), mtConfirmation, [mbYes,mbNo], 0) = mrYes) then
     begin
       if not RestartWindows then
         GetRunTools.LogError(FInstallInfo.Text(ssErrorUnableToAutomaticallyRestart));
     end
     else
-      GetRunTools.LogError(FInstallInfo.Text(ssMustRestart), False);
+      GetRunTools.LogError(FInstallInfo.Text(ssMustRestart));
   end;
 end;
 
@@ -794,7 +795,7 @@ begin
   FAdjustTokenPrivileges(hToken, False, tkp, 0, nil, retlen);
   if GetLastError() <> ERROR_SUCCESS then Exit;
 
-  ExitWindowsEx(EWX_REBOOT, SHTDN_REASON_MAJOR_APPLICATION or SHTDN_REASON_MINOR_INSTALLATION or SHTDN_REASON_FLAG_PLANNED);
+  Result := ExitWindowsEx(EWX_REBOOT, SHTDN_REASON_MAJOR_APPLICATION or SHTDN_REASON_MINOR_INSTALLATION or SHTDN_REASON_FLAG_PLANNED);
 end;
 
 procedure TRunTools.RunVersion6Upgrade(const kmshellpath: WideString);
