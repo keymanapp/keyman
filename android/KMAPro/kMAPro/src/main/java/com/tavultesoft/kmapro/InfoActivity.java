@@ -83,7 +83,7 @@ public class InfoActivity extends Activity {
       installedKbs = currentKbID;
 
     kmUrl = String.format("%s?active=%s&installed=%s", kmBaseUrl, currentKbID, installedKbs);
-    WebView webView = (WebView) findViewById(R.id.webView);
+    WebView webView = (WebView) findViewById(R.id.infoWebView);
     webView.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
     webView.getSettings().setJavaScriptEnabled(true);
     webView.getSettings().setUseWideViewPort(true);

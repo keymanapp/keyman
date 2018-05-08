@@ -7,7 +7,7 @@
     tools:context=".PackageActivity" >
 
     <WebView
-        android:id="@+id/webView"
+        android:id="@+id/packageWebView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/buttonBar"/>
