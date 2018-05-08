@@ -92,6 +92,7 @@
         <DCCReference Include="Keyman.System.BuildISO6393Registry.pas"/>
         <DCCReference Include="Keyman.Console.BuildStandardsData.pas"/>
         <DCCReference Include="Keyman.System.BuildLCIDToBCP47Registry.pas"/>
+        <DCCReference Include="Keyman.System.BuildLibPalasoAllTags.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -557,7 +558,6 @@
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <Platforms>
-                <Platform value="Linux64">False</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>
