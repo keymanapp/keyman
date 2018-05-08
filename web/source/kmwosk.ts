@@ -1144,6 +1144,7 @@ if(!window['keyman']['initialized']) {
         // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
         if(activeKeyboard && activeKeyboard['KM'] && !(activeKeyboard['KVKL'] && device.formFactor != 'desktop')) {
           if(Lkc.Lcode != osk.keyCodes['K_SPACE']) { // exception required, March 2013
+            Lkc.vkCode = Lkc.Lcode;
             // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
             // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
             var mappedChar: string = osk.defaultKeyOutput('K_xxxx', Lkc.Lcode, (layer.indexOf('shift') != -1 ? 0x10 : 0), false, null);
@@ -1158,7 +1159,6 @@ if(!window['keyman']['initialized']) {
             if(Lkc.Lcode == 160) {
               Lkc.Lcode = 0;
             }
-            Lkc.vkCode = Lkc.Lcode;
           }
         } else {
           Lkc.vkCode=Lkc.Lcode;
