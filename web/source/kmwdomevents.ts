@@ -492,6 +492,22 @@ namespace com.keyman {
       if (s.Lcode == null) {
         return null;
       }
+
+      var activeKeyboard = this.keyman.keyboardManager.activeKeyboard;
+      if(activeKeyboard && activeKeyboard['KM']) {
+        // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
+        // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
+        var mappedChar: string = this.keyman.osk.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
+        if(mappedChar) {
+          s.Lcode = mappedChar.charCodeAt(0);
+          if(s.Lcode >= 'a'.charCodeAt(0) && s.Lcode <= 'z'.charCodeAt(0)) {
+            // Apply an uppercase effect to the key, since K_A etc are based on the upper-case character codes.
+            s.Lcode -= 32;
+          }
+        } else {
+          return null;
+        }
+      }
       
       // Stage 1 - track the true state of the keyboard's modifiers.
       var osk = this.keyman.osk, prevModState = DOMEventHandlers.states.modStateFlags, curModState = 0x0000;
@@ -727,6 +743,7 @@ namespace com.keyman {
         }
         else {
           DOMEventHandlers.states._KeyPressToSwallow = 0;
+          LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent);
         }
       }
 
