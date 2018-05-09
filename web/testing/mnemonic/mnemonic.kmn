@@ -1,0 +1,22 @@
+﻿c This keyboard tests each base key on US English layout to ensure that mnemonic rules are applied correctly
+store(&NAME) 'Mnemonic Tests'
+store(&TARGETS) 'web'
+store(&mnemoniclayout) '1'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(base-keys) '`1234567890-=' \
+                 'qwertyuiop[]\' \
+                 'asdfghjkl;' "'" \
+                 'zxcvbnm,./' \
+                 ' '
+                 
+store(shift-keys) '~!@#$%^&*()_+' \
+                  'QWERTYUIOP{}|' \
+                  'ASDFGHJKL:"' \
+                  'ZXCVBNM<>?'
+                  
++ any(base-keys) > '<' index(base-keys, 1) '>'
++ any(shift-keys) > '[' index(shift-keys, 1) ']'
