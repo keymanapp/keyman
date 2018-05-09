@@ -8,6 +8,7 @@
 #import "KMInputMethodEventHandler.h"
 #import "KMInputMethodEventHandlerProtected.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
+#import <Crashlytics/Crashlytics.h>
 
 @implementation KMInputMethodEventHandler
 
@@ -19,6 +20,8 @@ NSMutableString* _pendingBuffer;
 NSUInteger _numberOfPostedDeletesToExpect = 0;
 CGKeyCode _keyCodeOfOriginalEvent;
 CGEventSourceRef _sourceFromOriginalEvent = nil;
+NSMutableString* _easterEggForCrashlytics = nil;
+const NSString* kEasterEggText = @"Crashlytics force now";
 
 NSRange _previousSelRange;
 
@@ -59,6 +62,12 @@ NSRange _previousSelRange;
     //        [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
     //        _clientSelectionCanChangeUnexpectedly = YES;
     //    }
+    
+    // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is the current keyboard and you type "Crashlytics force now", it will force a simulated crash to test reporting to fabric.io.
+    if ([self.AppDelegate debugMode])
+        NSLog(@"Crashlytics - Preparing to detect Easter egg.");
+    _easterEggForCrashlytics = ([clientAppId isEqual: @"com.apple.dt.Xcode"]) ?
+        [[NSMutableString alloc] init] : nil;
     
     // For the Atom editor, this isn't really true (the context CAN change unexpectedly), but we can't get
     // the context, so we pretend/hope it won't.
@@ -285,8 +294,30 @@ NSRange _previousSelRange;
     if (![self willDeleteNullChar]) {
         NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.AppDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
         actions = [self.kme processEvent:eventWithOriginalModifierFlags];
-        if (actions.count == 0)
+        if (actions.count == 0) {
+            if (_easterEggForCrashlytics != nil) {
+                NSString * kmxName = [[self.kme.kmx filePath] lastPathComponent];
+                NSLog(@"Crashlytics - KMX name: %@", kmxName);
+                if ([kmxName isEqualToString:@"EnglishSpanish.kmx"]) {
+                    NSUInteger len = [_easterEggForCrashlytics length];
+                    NSLog(@"Crashlytics - Processing character(s): %@", [event characters]);
+                    if ([[event characters] characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
+                        NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
+                        NSLog(@"Crashlytics - Adding character to Easter Egg code string: %@", characterToAdd);
+                        [_easterEggForCrashlytics appendString:characterToAdd];
+                        if ([_easterEggForCrashlytics isEqualToString:kEasterEggText]) {
+                            NSLog(@"Crashlytics - Forcing crash now!");
+                            [[Crashlytics sharedInstance] crash];
+                        }
+                    }
+                    else if (len > 0) {
+                        NSLog(@"Crashlytics - Clearing Easter Egg code string.");
+                        [_easterEggForCrashlytics setString:@""];
+                    }
+                }
+            }
             return NO;
+        }
     }
     else
         return NO;

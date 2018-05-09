@@ -1,5 +1,11 @@
 # Keyman for macOS Version History
 
+## 2018-05-?? 10.0.39 beta
+* Added automatic error reporting when exceptions occur (#769)
+
+## 2018-05-09 10.0.38 beta
+* Hide the on-screen keyboard when Keyman is no longer the active input method (#770)
+
 ## 2018-05-08 10.0.37 beta
 * Added option to use verbose logging to facilitate debugging by Keyman Support (#768)
 
