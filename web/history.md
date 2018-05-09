@@ -1,5 +1,9 @@
 # KeymanWeb Version History
 
+## 2018-05-09 10.0.91 beta
+* Fixes basic support for mnemonic keyboards.  (#517)
+  * At this time, all mnemonic keyboards will assume a US keyboard layout within KeymanWeb.
+
 ## 2018-05-08 10.0.90 beta
 * Fixes support for Keyman-language 'beep' statements as part of keyboard stores. (#733)
 
