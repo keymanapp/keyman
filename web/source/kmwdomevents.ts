@@ -493,20 +493,24 @@ namespace com.keyman {
         return null;
       }
 
-      var activeKeyboard = this.keyman.keyboardManager.activeKeyboard;
+      var osk = this.keyman.osk, activeKeyboard = this.keyman.keyboardManager.activeKeyboard;
+
       if(activeKeyboard && activeKeyboard['KM']) {
-        // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
-        // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
-        var mappedChar: string = this.keyman.osk.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
-        if(mappedChar) {
-          s.Lcode = mappedChar.charCodeAt(0);
-        } else {
-          return null;
+        // K_SPACE is not handled by defaultKeyOutput for physical keystrokes unless using touch-aliased elements.
+        if(s.Lcode != osk.keyCodes['K_SPACE']) {
+          // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
+          // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
+          var mappedChar: string = osk.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
+          if(mappedChar) {
+            s.Lcode = mappedChar.charCodeAt(0);
+          } else {
+            return null;
+          }
         }
       }
-      
+
       // Stage 1 - track the true state of the keyboard's modifiers.
-      var osk = this.keyman.osk, prevModState = DOMEventHandlers.states.modStateFlags, curModState = 0x0000;
+      var prevModState = DOMEventHandlers.states.modStateFlags, curModState = 0x0000;
       var ctrlEvent = false, altEvent = false;
       
       switch(s.Lcode) {
