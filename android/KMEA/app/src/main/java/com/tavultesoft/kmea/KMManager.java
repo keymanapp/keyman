@@ -324,11 +324,15 @@ public final class KMManager {
   public static void onPause() {
     if (InAppKeyboard != null) {
       InAppKeyboard.onPause();
-      InAppKeyboard.pauseTimers();
+      if (InAppKeyboardLoaded) {
+        InAppKeyboard.pauseTimers();
+      }
     }
     if (SystemKeyboard != null) {
       SystemKeyboard.onPause();
-      SystemKeyboard.pauseTimers();
+      if (SystemKeyboardLoaded) {
+        SystemKeyboard.pauseTimers();
+      }
     }
   }
 
