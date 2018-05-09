@@ -2,6 +2,7 @@
 
 ## 11.0 alpha
 * Move to 11.0
+* Update compile and target Android SDK version to 27
 
 ## 2018-04-30 10.0.380 beta
 * Fix OSK missing some keys on older Android configurations (#304)
