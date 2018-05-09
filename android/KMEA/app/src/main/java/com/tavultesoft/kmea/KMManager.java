@@ -312,9 +312,11 @@ public final class KMManager {
 
   public static void onResume() {
     if (InAppKeyboard != null) {
+      InAppKeyboard.resumeTimers();
       InAppKeyboard.onResume();
     }
     if (SystemKeyboard != null) {
+      SystemKeyboard.resumeTimers();
       SystemKeyboard.onResume();
     }
   }
@@ -322,9 +324,11 @@ public final class KMManager {
   public static void onPause() {
     if (InAppKeyboard != null) {
       InAppKeyboard.onPause();
+      InAppKeyboard.pauseTimers();
     }
     if (SystemKeyboard != null) {
       SystemKeyboard.onPause();
+      SystemKeyboard.pauseTimers();
     }
   }
 

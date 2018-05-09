@@ -260,7 +260,7 @@ final class KMKeyboard extends WebView {
    * @return String
    */
   public static String textFontFilename() {
-    return keyboardRoot + txtFont;
+    return txtFont.isEmpty() ? "" : keyboardRoot + txtFont;
   }
 
   /**
