@@ -1151,6 +1151,13 @@ if(!window['keyman']['initialized']) {
             if(mappedChar) {
               Lkc.Lcode = mappedChar.charCodeAt(0);
             } // No 'else' - avoid remapping control + modifier keys!
+
+            if(osk._stateKeys['K_CAPS']) {
+              if((Lkc.Lcode >= 65 && Lkc.Lcode <= 90) /* 'A' - 'Z' */ || (Lkc.Lcode >= 97 && Lkc.Lcode <= 122) /* 'a' - 'z' */) {
+                Lkc.Lmodifiers ^= 0x10; // Flip the 'shift' bit.
+                Lkc.Lcode ^= 0x20; // Flips the 'upper' vs 'lower' bit for the base 'a'-'z' ASCII alphabetics.
+              }
+            }
           }
         } else {
           Lkc.vkCode=Lkc.Lcode;

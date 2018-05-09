@@ -503,9 +503,7 @@ namespace com.keyman {
           var mappedChar: string = osk.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
           if(mappedChar) {
             s.Lcode = mappedChar.charCodeAt(0);
-          } else {
-            return null;
-          }
+          } // No 'else' - avoid blocking modifier keys, etc.
         }
       }
 
@@ -546,7 +544,7 @@ namespace com.keyman {
        * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
        */
 
-      curModState |= (e.getModifierState("Shift") ? 0x10 : 0);      
+      curModState |= (e.getModifierState("Shift") ? 0x10 : 0);
 
       if(e.getModifierState("Control")) {
         curModState |= ((e.location != 0 && ctrlEvent) ? 
@@ -587,6 +585,15 @@ namespace com.keyman {
       s.LmodifierChange = DOMEventHandlers.states.modStateFlags != curModState;
       DOMEventHandlers.states.modStateFlags = curModState;
 
+      // Flip the shift bit if Caps Lock is active on mnemonic keyboards.
+      // Avoid signaling a change in the shift key's modifier state.  (The reason for this block's positioning.)
+      if(activeKeyboard && activeKeyboard['KM'] && e.getModifierState("CapsLock")) {
+        if((s.Lcode >= 65 && s.Lcode <= 90) /* 'A' - 'Z' */ || (s.Lcode >= 97 && s.Lcode <= 122) /* 'a' - 'z' */) {
+          curModState ^= 0x10; // Flip the 'shift' bit.
+          s.Lcode ^= 0x20; // Flips the 'upper' vs 'lower' bit for the base 'a'-'z' ASCII alphabetics.
+        }
+      }
+
       // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
       var altGrMask = osk.modifierCodes['RALT'] | osk.modifierCodes['LCTRL'];
       if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
@@ -611,7 +618,7 @@ namespace com.keyman {
       } else {
         // No need to sim AltGr here; we don't need chiral ALTs.
         s.Lmodifiers = 
-          (e.getModifierState("Shift") ? 0x10 : 0) |
+          (curModState & 0x10) | // SHIFT
           ((curModState & (osk.modifierCodes['LCTRL'] | osk.modifierCodes['RCTRL'])) ? 0x20 : 0) | 
           ((curModState & (osk.modifierCodes['LALT'] | osk.modifierCodes['RALT']))   ? 0x40 : 0); 
       }
