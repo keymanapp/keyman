@@ -1150,15 +1150,7 @@ if(!window['keyman']['initialized']) {
             var mappedChar: string = osk.defaultKeyOutput('K_xxxx', Lkc.Lcode, (layer.indexOf('shift') != -1 ? 0x10 : 0), false, null);
             if(mappedChar) {
               Lkc.Lcode = mappedChar.charCodeAt(0);
-              if(Lkc.Lcode >= 'a'.charCodeAt(0) && Lkc.Lcode <= 'z'.charCodeAt(0)) {
-                // Apply an uppercase effect to the key, since K_A etc are based on the upper-case character codes.
-                Lkc.Lcode -= 32;
-              }
             } // No 'else' - avoid remapping control + modifier keys!
-
-            if(Lkc.Lcode == 160) {
-              Lkc.Lcode = 0;
-            }
           }
         } else {
           Lkc.vkCode=Lkc.Lcode;

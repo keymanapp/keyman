@@ -500,14 +500,6 @@ namespace com.keyman {
         var mappedChar: string = this.keyman.osk.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
         if(mappedChar) {
           s.Lcode = mappedChar.charCodeAt(0);
-          if(s.Lcode >= 'a'.charCodeAt(0) && s.Lcode <= 'z'.charCodeAt(0)) {
-            // Apply an uppercase effect to the key, since K_A etc are based on the upper-case character codes.
-            s.Lcode -= 32;
-          }
-
-          if(s.Lcode == 160) {
-            s.Lcode = 0;
-          }
         } else {
           return null;
         }
@@ -751,7 +743,7 @@ namespace com.keyman {
         }
       }
 
-      if(!LeventMatched  &&  Levent.Lcode >= 96  &&  Levent.Lcode <= 111) {
+      if(!LeventMatched  &&  Levent.Lcode >= 96  &&  Levent.Lcode <= 111 && !activeKeyboard['KM']) {
         // Number pad, numlock on
         //      _Debug('KeyPress NumPad code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
 
