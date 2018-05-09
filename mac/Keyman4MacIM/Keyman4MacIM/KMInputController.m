@@ -15,6 +15,7 @@
 @implementation KMInputController
 
 KMInputMethodEventHandler* _eventHandler;
+NSMutableArray *servers;
 
 - (KMInputMethodAppDelegate *)AppDelegate {
     return (KMInputMethodAppDelegate *)[NSApp delegate];
@@ -22,8 +23,12 @@ KMInputMethodEventHandler* _eventHandler;
 
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)inputClient
 {
+    if ([self.AppDelegate debugMode])
+        NSLog(@"Initializing Keyman Input Method with server: %@", server);
+    
     self = [super initWithServer:server delegate:delegate client:inputClient];
     if (self) {
+        servers = [[NSMutableArray alloc] initWithCapacity:2];
         self.AppDelegate.inputController = self;
         if (self.AppDelegate.kvk != nil && self.AppDelegate.alwaysShowOSK)
             [self.AppDelegate showOSK];
@@ -49,14 +54,18 @@ KMInputMethodEventHandler* _eventHandler;
 - (void)activateServer:(id)sender {
     [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
     
+    [servers addObject:sender];
+    
     if (_eventHandler != nil) {
         [_eventHandler deactivate];
     }
     
     NSRunningApplication *currApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
     NSString *clientAppId = [currApp bundleIdentifier];
-    if ([self.AppDelegate debugMode])
+    if ([self.AppDelegate debugMode]) {
         NSLog(@"New active app %@", clientAppId);
+        NSLog(@"sender %@", sender);
+    }
     
     // Most things in Safari work well using the normal way, but Google Docs doesn't.
     if ([clientAppId isEqual: @"com.apple.Safari"]) {
@@ -76,6 +85,18 @@ KMInputMethodEventHandler* _eventHandler;
         NSLog(@"sender: %@", sender);
         NSLog(@"***");
     }
+    for (int i = 0; i < servers.count; i++) {
+        if (servers[i] == sender) {
+            [servers removeObjectAtIndex:i];
+            break;
+        }
+    }
+    if (servers.count == 0 && [self.AppDelegate.oskWindow.window isVisible]) {
+        if ([self.AppDelegate debugMode])
+            NSLog(@"No known active server for Keyman IM. Starting countdown to hide OSK...");
+        [self performSelector:@selector(timerAction:) withObject:nil afterDelay:0.7];
+    }
+        
     // Seems like we ought to do this, but it appears there is a timing issue that
     // sometimes causes the deactivate to happen AFTER the new activateServer event,
     // thereby clobbering the newly created event handler.
@@ -83,6 +104,14 @@ KMInputMethodEventHandler* _eventHandler;
 //        [_eventHandler deactivate];
 //        _eventHandler = nil;
 //    }
+}
+
+- (void)timerAction:(NSTimer *)timer {
+    if (servers.count == 0 && [self.AppDelegate.oskWindow.window isVisible]) {
+        if ([self.AppDelegate debugMode])
+            NSLog(@"Keyman no longer active IM. Hiding OSK.");
+        [self.AppDelegate.oskWindow.window setIsVisible:NO];
+    }
 }
 
 /*
