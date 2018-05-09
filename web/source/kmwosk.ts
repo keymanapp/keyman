@@ -3144,7 +3144,11 @@ if(!window['keyman']['initialized']) {
 
       if(unshiftedEmulationLayer == null && shiftedEmulationLayer == null) {
         // We've run out of things to go on; we can't detect if chiral AltGr emulation is intended or not.
-        console.warn("Could not detect if AltGr emulation is safe, but defaulting to active emulation!")
+        if(!osk.altGrWarning) {
+          console.warn("Could not detect if AltGr emulation is safe, but defaulting to active emulation!")
+          // Avoid spamming the console with warnings on every call of the method.
+          osk.altGrWarning = true;
+        }
       }
       return true;
     }
