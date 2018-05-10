@@ -82,7 +82,7 @@ public class PackageActivity extends Activity {
     final Button installButton = (Button) findViewById(R.id.installButton);
     final Button cancelButton = (Button) findViewById(R.id.cancelButton);
 
-    webView = (WebView) findViewById(R.id.webView);
+    webView = (WebView) findViewById(R.id.packageWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
     webView.getSettings().setJavaScriptEnabled(true);
     webView.getSettings().setUseWideViewPort(true);

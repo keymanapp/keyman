@@ -6,7 +6,7 @@
     tools:context=".WebBrowserActivity" >
 
     <WebView
-        android:id="@+id/webView"
+        android:id="@+id/infoWebView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
