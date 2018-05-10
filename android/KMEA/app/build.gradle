@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "26.0.2"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 27
 
         if (project.hasProperty("build.number")) {
             versionCode project.ext['build_counter'] as Integer // Because TeamCity does not bubble build.counter into system properties...
@@ -42,20 +42,20 @@ android {
 }
 
 ext {
-    currentFirebaseVersion = "11.8.0"
+    currentFirebaseVersion = "15.0.2"
 }
 
 dependencies {
-    implementation 'com.android.support:support-v4:25.4.0'
+    implementation 'com.android.support:support-v4:27.1.1'
     implementation 'commons-io:commons-io:2.6'
     implementation 'org.apache.commons:commons-text:1.2'
     testImplementation 'junit:junit:4.12'
-    testImplementation "org.robolectric:robolectric:3.5.1"
+    testImplementation "org.robolectric:robolectric:3.8"
 
     /* We only want these Firebase Crashlytics dependencies for KMEA */
     implementation "com.google.firebase:firebase-analytics:$currentFirebaseVersion"
     implementation "com.google.firebase:firebase-crash:$currentFirebaseVersion"
-    implementation('com.crashlytics.sdk.android:crashlytics:2.9.0@aar') {
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.2@aar') {
         transitive = true;
     }
 }
