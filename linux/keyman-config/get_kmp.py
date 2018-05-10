@@ -11,10 +11,12 @@ import requests_cache
 import os
 #from tqdm import tqdm
 
-def get_keyboard_data(keyboardid):
-	print("Getting data for keyboard", keyboardid)
+def get_keyboard_data(keyboardid, verbose=False):
+	if verbose:
+		print("Getting data for keyboard", keyboardid)
 	api_url = "https://api.keyman.com/keyboard/" + keyboardid
-	print("At URL", api_url)
+	if verbose:
+		print("At URL", api_url)
 	cache_dir = "~/.local/share/keyman"
 	current_dir = os.getcwd()
 	expire_after = datetime.timedelta(days=1)
@@ -24,7 +26,8 @@ def get_keyboard_data(keyboardid):
 	requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
 	now = time.ctime(int(time.time()))
 	response = requests.get(api_url)
-	print("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
+	if verbose:
+		print("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
 	os.chdir(current_dir)
 	requests_cache.core.uninstall_cache()
 	if response.status_code == 200:
@@ -37,7 +40,7 @@ def get_download_folder():
 	home = os.path.expanduser("~")
 	return os.path.join(home, "Downloads")
 
-def get_kmp_file(kbdata):
+def get_kmp_file(kbdata, verbose=False):
 	if 'packageFilename' not in kbdata:
 		print("get_kmp.py: Keyboard does not have a kmp file available")
 		return None
@@ -45,13 +48,13 @@ def get_kmp_file(kbdata):
 #	print("version:", kbdata['version'])
 
 	kmp_url = "https://downloads.keyman.com/keyboards/" + kbdata['id'] + "/" + kbdata['version'] + "/" + kbdata['packageFilename']
-	print("Download URL:", kmp_url)
+	if verbose:
+		print("Download URL:", kmp_url)
 	response = requests.get(kmp_url) #, stream=True)
 	downloadfile = os.path.join(get_download_folder(), kbdata['packageFilename'])
 	#with open(downloadfile , "wb") as handle:
 	#	for data in tqdm(response.iter_content()):
 	#		handle.write(data)
-	print(len(response.content))
 	with open(downloadfile, 'wb') as f:
 		f.write(response.content)
 	return downloadfile

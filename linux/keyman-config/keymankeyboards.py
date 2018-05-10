@@ -22,7 +22,7 @@ import requests
 import requests_cache
 import os
 
-def get_api_keyboards():
+def get_api_keyboards(verbose=False):
 	api_url = "https://api.keyman.com/cloud/4.0/keyboards"
 	headers = {'Content-Type': 'application/json',
 		'Accept-Encoding': 'gzip, deflate, br'}
@@ -35,7 +35,8 @@ def get_api_keyboards():
 	requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
 	now = time.ctime(int(time.time()))
 	response = requests.get(api_url, headers=headers)
-	print("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
+	if verbose:
+		print("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
 	os.chdir(current_dir)
 	if response.status_code == 200:
 #		return json.loads(response.content.decode('utf-8'))
