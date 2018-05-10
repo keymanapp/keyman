@@ -1,19 +1,14 @@
 #!/usr/bin/python3
 
-# Read in local keyboards json file
+# Read in local languages json file
 
 # Later check if online
 # If so then get it from web api
 # Is there a way to check if has changed from cached version and only download if it has?
 
-# Smaller than languages file (~60% of size) so more network efficent
-# but needs a little more processing
-# using gzip makes network transfer much less
+# Sort languages into regions
 
-# for each keyboard
-# for each language in keyboard
-# add language to a region if it doesn't already exist
-# add keyboard to that language if it isn't already on it
+# For later restrict to Keyman version 11.0+ and device linux
 
 import datetime
 import time
@@ -22,8 +17,8 @@ import requests
 import requests_cache
 import os
 
-def get_api_keyboards():
-	api_url = "https://api.keyman.com/cloud/4.0/keyboards"
+def get_api_languages(forceRefresh=False):
+	api_url = "https://api.keyman.com/cloud/4.0/languages"
 	headers = {'Content-Type': 'application/json',
 		'Accept-Encoding': 'gzip, deflate, br'}
 	cache_dir = "~/.local/share/keyman"
@@ -38,42 +33,33 @@ def get_api_keyboards():
 	print("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
 	os.chdir(current_dir)
 	if response.status_code == 200:
-#		return json.loads(response.content.decode('utf-8'))
+	#	return json.loads(response.content.decode('utf-8'))
 		return response.json()
 	else:
 		return None
 
-def parse_keyboard(data, verbose=False):
+def parse_languages(data, verbose=False):
 	regions = { 1 : {"name" : "Undefined", "languages" : {} }, 2 : {"name" : "Africa", "languages" : {} }, 3 : {"name" : "Asia", "languages" : {} }, 4 :  {"name" : "Europe", "languages" : {} }, 5 :  {"name" : "Unused", "languages" : {} }, 6 :  {"name" : "Americas", "languages" : {} }, 7 : {"name" : "Asia Pacific", "languages" : {} } }
 	options = data['options']
-	for kb in data['keyboard']:
-		#print(kb['id'])
-		for lang in kb['languages']:
-			#print(" ", lang['id'], lang['region'], regions[lang['region']]['name'])
-			if not lang['name'] in regions[lang['region']]['languages']:
-				regions[lang['region']]['languages'][lang['name']] = lang
-			if not 'keyboards' in regions[lang['region']]['languages'][lang['name']]:
-				regions[lang['region']]['languages'][lang['name']]['keyboards'] = {}
-			if not kb['id'] in regions[lang['region']]['languages'][lang['name']]['keyboards']:
-				regions[lang['region']]['languages'][lang['name']]['keyboards'][kb['id']] = kb
+	for lang in data['languages']['languages']:
+		regions[lang['region']]['languages'][lang['name']] = lang
 	if verbose:
 		for region in regions:
 			print("--- Region", str(region), regions[region]['name'], "---")
 			for langname in sorted(regions[region]['languages']):
 				print(langname)
-				for kbname in sorted(regions[region]['languages'][langname]['keyboards']):
-					print("  Keyboard:", regions[region]['languages'][langname]['keyboards'][kbname]['name'])
+				for kb in regions[region]['languages'][langname]['keyboards']:
+					print("  Keyboard:", kb['name'])
 
 def main():
-	data = get_api_keyboards()
+	data = get_api_languages()
 	if data:
-		parse_keyboard(data)
+		parse_languages(data, True)
 	else:
 		print("Failed to get data, using local file")
-		with open("keyboards", "r") as read_file:
+		with open("languages", "r") as read_file:
 			localdata = json.load(read_file)
-			parse_keyboard(localdata)
-
+			parse_languages(localdata)
 
 if __name__ == "__main__":
 	main()
