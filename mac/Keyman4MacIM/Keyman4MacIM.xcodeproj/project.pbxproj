@@ -48,6 +48,8 @@
 		98FE105E1B4DE8F400525F54 /* NSWindow+SuppMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 98FE105D1B4DE8F400525F54 /* NSWindow+SuppMethods.m */; };
 		98FE10631B4DEE5600525F54 /* KMInfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98FE10611B4DEE5600525F54 /* KMInfoWindowController.m */; };
 		98FE10641B4DEE5600525F54 /* KMInfoWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98FE10621B4DEE5600525F54 /* KMInfoWindowController.xib */; };
+		E21291A920A4DD680049790C /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291A820A4DD680049790C /* Crashlytics.framework */; };
+		E21291AB20A4DDE70049790C /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291AA20A4DDE70049790C /* Fabric.framework */; };
 		E21799051FC5B7BC00F2D66A /* KMInputMethodEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */; };
 		E22020F6200506F300B74FAC /* KMInputMethodSafariClientEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E22020F5200506F300B74FAC /* KMInputMethodSafariClientEventHandler.m */; };
 		E240F599202DED740000067D /* KMPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = E240F598202DED740000067D /* KMPackage.m */; };
@@ -164,6 +166,8 @@
 		98FE10601B4DEE5600525F54 /* KMInfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KMInfoWindowController.h; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.h; sourceTree = "<group>"; };
 		98FE10611B4DEE5600525F54 /* KMInfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMInfoWindowController.m; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.m; sourceTree = "<group>"; };
 		98FE10621B4DEE5600525F54 /* KMInfoWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = KMInfoWindowController.xib; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.xib; sourceTree = "<group>"; };
+		E21291A820A4DD680049790C /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Crashlytics.framework; path = ../../Carthage/Build/Mac/Crashlytics.framework; sourceTree = "<group>"; };
+		E21291AA20A4DDE70049790C /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Fabric.framework; path = ../../Carthage/Build/Mac/Fabric.framework; sourceTree = "<group>"; };
 		E21799031FC5B74D00F2D66A /* KMInputMethodEventHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodEventHandler.h; sourceTree = "<group>"; };
 		E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodEventHandler.m; sourceTree = "<group>"; };
 		E22020F3200505EF00B74FAC /* KMInputMethodSafariClientEventHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodSafariClientEventHandler.h; sourceTree = "<group>"; };
@@ -189,6 +193,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				98D6DA7B1A799F0B00B09822 /* InputMethodKit.framework in Frameworks */,
+				E21291AB20A4DDE70049790C /* Fabric.framework in Frameworks */,
+				E21291A920A4DD680049790C /* Crashlytics.framework in Frameworks */,
 				984C2B221A79DF1B0023F89D /* KeymanEngine4Mac.framework in Frameworks */,
 				9803C9D81B0EFB3B0082A6F9 /* WebKit.framework in Frameworks */,
 			);
@@ -367,6 +373,8 @@
 		98D6DA791A799EE700B09822 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E21291AA20A4DDE70049790C /* Fabric.framework */,
+				E21291A820A4DD680049790C /* Crashlytics.framework */,
 				98D6DA7A1A799F0B00B09822 /* InputMethodKit.framework */,
 				984C2B211A79DF1B0023F89D /* KeymanEngine4Mac.framework */,
 				9803C9D71B0EFB3B0082A6F9 /* WebKit.framework */,
@@ -437,6 +445,7 @@
 				989C9C051A7876DE00A20425 /* Frameworks */,
 				989C9C061A7876DE00A20425 /* Resources */,
 				983247261A9EA1DD0010B90C /* Copy Files */,
+				E21291A120A33CA50049790C /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -546,6 +555,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		E21291A120A33CA50049790C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"${CONFIGURATION}\" = \"Release\" ]; then\n   if [ \"${FABRIC_API_KEY_KEYMAN4MACIM}\" != \"\" ]; then\n      ../Carthage/Build/Mac/Fabric.framework/run ${FABRIC_API_KEY_KEYMAN4MACIM} ${FABRIC_BUILD_SECRET_KEYMAN4MACIM}\n   fi\nelse\n    ../Carthage/Build/Mac/Fabric.framework/run 68056571ada44ad2d93864380272808ada308b24 23863472894073dc672f5027ecdd239df93ebe58830ee9c7bb383e9abaeabee7\nfi\n";
+		};
 		E2588F2E1F2644850061C9C4 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -728,13 +750,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
 				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Keyman4MacIM/Frameworks",
+					"$(PROJECT_DIR)/../Carthage/Build/Mac/**",
 				);
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../Carthage/Build/Mac/**";
 				INFOPLIST_FILE = Keyman4MacIM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
@@ -756,8 +780,9 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Keyman4MacIM/Frameworks",
+					"$(PROJECT_DIR)/../Carthage/Build/Mac/**",
 				);
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../Carthage/Build/Mac/**";
 				INFOPLIST_FILE = Keyman4MacIM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
