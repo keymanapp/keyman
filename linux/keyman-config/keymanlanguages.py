@@ -50,16 +50,20 @@ def parse_languages(data, verbose=False):
 				print(langname)
 				for kb in regions[region]['languages'][langname]['keyboards']:
 					print("  Keyboard:", kb['name'])
+	return regions
 
-def main():
+def get_regions(verbose=False):
 	data = get_api_languages()
 	if data:
-		parse_languages(data, True)
+		return parse_languages(data, verbose)
 	else:
 		print("Failed to get data, using local file")
 		with open("languages", "r") as read_file:
 			localdata = json.load(read_file)
-			parse_languages(localdata)
+			return parse_languages(localdata, verbose)
+
+def main():
+	get_regions()
 
 if __name__ == "__main__":
 	main()
