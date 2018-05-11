@@ -402,6 +402,8 @@
       <ComponentRef Id="xml_icon32_plus.gif"/>
       <ComponentRef Id="xml_project.js"/>
       <ComponentRef Id="xml_project.css"/>
+      <ComponentRef Id="xml_icon32_kvks.png"/>
+      <ComponentRef Id="xml_icon_kvks.png"/>
 
       <ComponentRef Id='xml_kmw_resource_keymanweb.js'/>
       <ComponentRef Id='xml_kmw_resource_kmwuibutton.js'/>
