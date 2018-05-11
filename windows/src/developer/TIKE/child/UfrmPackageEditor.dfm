@@ -181,7 +181,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 681
     Height = 447
-    ActivePage = pageKeyboards
+    ActivePage = pageFiles
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -235,8 +235,8 @@ inherited frmPackageEditor: TfrmPackageEditor
           AutoSize = False
           Caption = 
             'A typical package will need keyboards, fonts, and documentation.' +
-            ' You can also add other .kmp packages.  Don'#39't add any standard K' +
-            'eyman files (such as keyman.exe) here.'
+            ' You shouldn'#39't typically add source files. Also, don'#39't add any s' +
+            'tandard Keyman files (such as keyman.exe) here.'
           WordWrap = True
         end
         object lblFileDetails: TLabel
