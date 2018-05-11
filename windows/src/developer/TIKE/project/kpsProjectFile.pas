@@ -119,7 +119,7 @@ begin
         Result := False;
 
       if Result then
-        Log(plsInfo, '''' + FileName + ''' compiled successfully.')
+        Log(plsInfo, '''' + FileName + ''' compiled successfully to '''+TargetFileName+'''.')
       else
       begin
         if FileExists(TargetFilename) then
