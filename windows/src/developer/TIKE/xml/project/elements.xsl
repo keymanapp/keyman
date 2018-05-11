@@ -169,12 +169,18 @@
     </xsl:call-template>
   </xsl:template>
 
+  <xsl:template name="filetype_kvks">
+    <xsl:call-template name="filetype"> 
+      <xsl:with-param name="icontype">png</xsl:with-param> <xsl:with-param name="type">kvks</xsl:with-param> <xsl:with-param name="title">Keyman On Screen Keyboard Source File</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
   <xsl:template name="filetype_kvk">
     <xsl:call-template name="filetype"> 
       <xsl:with-param name="icontype">png</xsl:with-param> <xsl:with-param name="type">kvk</xsl:with-param> <xsl:with-param name="title">Keyman On Screen Keyboard File</xsl:with-param>
     </xsl:call-template>
   </xsl:template>
-
+  
   <xsl:template name="filetype_kps">
     <xsl:call-template name="filetype"> 
       <xsl:with-param name="icontype">png</xsl:with-param> <xsl:with-param name="type">kps</xsl:with-param> <xsl:with-param name="title">Keyman Package Source File</xsl:with-param>
