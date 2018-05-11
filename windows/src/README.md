@@ -26,6 +26,9 @@ For local development you do not need to perform a release build so these are op
 2. Run `make build` from the **windows/src** folder.
 3. Artifacts from a successful build will be placed in **windows/bin** folder.
 
+*Note*: running `make build` will currently reset the packages and path settings in your Delphi environment. If you use Delphi for other projects, 
+you should consider building Keyman under a login user dedicated to it, or in a VM.
+
 Type `make` to see build targets. Common build targets are:
 
   `make build` <-- builds Keyman Desktop and Keyman Developer
