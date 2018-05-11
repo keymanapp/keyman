@@ -51,12 +51,14 @@ def get_kmp_file(kbdata, verbose=False):
 	if verbose:
 		print("Download URL:", kmp_url)
 	response = requests.get(kmp_url) #, stream=True)
-	downloadfile = os.path.join(get_download_folder(), kbdata['packageFilename'])
+	downloadfile = None
 	#with open(downloadfile , "wb") as handle:
 	#	for data in tqdm(response.iter_content()):
 	#		handle.write(data)
-	with open(downloadfile, 'wb') as f:
-		f.write(response.content)
+	if response.status_code == 200:
+		downloadfile = os.path.join(get_download_folder(), kbdata['packageFilename'])
+		with open(downloadfile, 'wb') as f:
+			f.write(response.content)
 	return downloadfile
 
 def get_kmp(keyboardid):
