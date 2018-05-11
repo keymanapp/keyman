@@ -83,9 +83,10 @@
             var fragmentToggle = 0;
             function insertText(dn, s) {
                 fragmentToggle = (fragmentToggle + 1) % 100;
-                window.location.hash = 'insertText-'+ fragmentToggle + '+dn=' + dn + '+s=' + toHex(s);
+                var insertHash = 'insertText-'+ fragmentToggle + '+dn=' + dn + '+s=' + toHex(s);
+                //window.location.hash = 'insertText-'+ fragmentToggle + '+dn=' + dn + '+s=' + toHex(s);
                 if (typeof(window.webkit) != 'undefined')
-                    window.webkit.messageHandlers.keyman.postMessage(window.location.hash);
+                    window.webkit.messageHandlers.keyman.postMessage('#' + insertHash);
             }
         
             function oskCreateKeyPreview(x,y,w,h,t)
@@ -94,17 +95,19 @@
                 var div = document.createElement('div');
                 div.innerHTML = t;
                 var dt = div.firstChild.nodeValue;
-                window.location.hash = 'showKeyPreview-'+fragmentToggle+'+x='+x+'+y='+y+'+w='+w+'+h='+h+'+t='+toHex(dt);
+                var previewHash = 'showKeyPreview-'+fragmentToggle+'+x='+x+'+y='+y+'+w='+w+'+h='+h+'+t='+toHex(dt);
+                //window.location.hash = 'showKeyPreview-'+fragmentToggle+'+x='+x+'+y='+y+'+w='+w+'+h='+h+'+t='+toHex(dt);
                 if (typeof(window.webkit) != 'undefined')
-                    window.webkit.messageHandlers.keyman.postMessage(window.location.hash);
+                    window.webkit.messageHandlers.keyman.postMessage('#' + previewHash);
             }
         
             function oskClearKeyPreview()
             {
                 fragmentToggle = (fragmentToggle + 1) % 100;
-                window.location.hash = 'dismissKeyPreview-'+fragmentToggle;
+                var dismissHash = 'dismissKeyPreview-'+fragmentToggle;
+                //window.location.hash = 'dismissKeyPreview-'+fragmentToggle;
                 if (typeof(window.webkit) != 'undefined')
-                    window.webkit.messageHandlers.keyman.postMessage(window.location.hash);
+                    window.webkit.messageHandlers.keyman.postMessage('#' + dismissHash);
             }
         
             oskCreatePopup = function(obj,x,y,w,h)
@@ -126,32 +129,35 @@
                     if(shift) {
                         hash = hash + '+font=' + 'SpecialOSK';
                     }
-                    window.location.hash = hash;
+                    //window.location.hash = hash;
                     if (typeof(window.webkit) != 'undefined')
-                        window.webkit.messageHandlers.keyman.postMessage(window.location.hash);
+                        window.webkit.messageHandlers.keyman.postMessage('#' + hash);
                 }
             }
         
             function menuKeyDown() {
                 fragmentToggle = (fragmentToggle + 1) % 100;
-                window.location.hash = 'menuKeyDown-' + fragmentToggle;
+                var keyDownHash = 'menuKeyDown-' + fragmentToggle;
+                //window.location.hash = 'menuKeyDown-' + fragmentToggle;
                 if (typeof(window.webkit) != 'undefined')
-                    window.webkit.messageHandlers.keyman.postMessage(window.location.hash);
+                    window.webkit.messageHandlers.keyman.postMessage('#' + keyDownHash);
             }
         
             function menuKeyUp()
             {
                 fragmentToggle = (fragmentToggle + 1) % 100;
-                window.location.hash = 'menuKeyUp-'+fragmentToggle;
+                var keyUpHash = 'menuKeyUp-'+fragmentToggle;
+                //window.location.hash = 'menuKeyUp-'+fragmentToggle;
                 if (typeof(window.webkit) != 'undefined')
-                    window.webkit.messageHandlers.keyman.postMessage(window.location.hash);
+                    window.webkit.messageHandlers.keyman.postMessage('#' + keyUpHash);
             }
         
             function hideKeyboard() {
                 fragmentToggle = (fragmentToggle + 1) % 100;
-                window.location.hash = 'hideKeyboard-' + fragmentToggle;
+                var hideHash = 'hideKeyboard-' + fragmentToggle;
+                //window.location.hash = 'hideKeyboard-' + fragmentToggle;
                 if (typeof(window.webkit) != 'undefined')
-                    window.webkit.messageHandlers.keyman.postMessage(window.location.hash);
+                    window.webkit.messageHandlers.keyman.postMessage('#' + hideHash);
             }
         
             function langMenuPos() {
