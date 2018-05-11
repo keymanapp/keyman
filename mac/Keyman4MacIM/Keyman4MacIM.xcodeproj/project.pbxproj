@@ -51,6 +51,8 @@
 		E21291A920A4DD680049790C /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291A820A4DD680049790C /* Crashlytics.framework */; };
 		E21291AB20A4DDE70049790C /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291AA20A4DDE70049790C /* Fabric.framework */; };
 		E21799051FC5B7BC00F2D66A /* KMInputMethodEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */; };
+		E218402F20A539E20035AADB /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291A820A4DD680049790C /* Crashlytics.framework */; };
+		E218403020A53A010035AADB /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291AA20A4DDE70049790C /* Fabric.framework */; };
 		E22020F6200506F300B74FAC /* KMInputMethodSafariClientEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E22020F5200506F300B74FAC /* KMInputMethodSafariClientEventHandler.m */; };
 		E240F599202DED740000067D /* KMPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = E240F598202DED740000067D /* KMPackage.m */; };
 		E24C79EA1FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E24C79E91FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m */; };
@@ -204,6 +206,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E218403020A53A010035AADB /* Fabric.framework in Frameworks */,
+				E218402F20A539E20035AADB /* Crashlytics.framework in Frameworks */,
 				E28914D32024D1B80048E71E /* KeymanEngine4Mac.framework in Frameworks */,
 				E27BA9CE2020322000D273E7 /* OCMock.framework in Frameworks */,
 			);
