@@ -275,8 +275,9 @@ updatePlist() {
 			/usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $KM_VERSION" "$KM_PLIST"
 			if [ "$CONFIG" == "Release" ]; then
 				echo "Setting Fabric APIKey for release build in $KM_PLIST"
-				if [ "$FABRIC_API_KEY_KEYMAN4MACIM" == "" ]
+				if [ "$FABRIC_API_KEY_KEYMAN4MACIM" == "" ]; then
 				    fail "FABRIC_API_KEY_KEYMAN4MACIM environment variable not set!"
+				fi
 				/usr/libexec/Plistbuddy -c "Set Fabric:APIKey $FABRIC_API_KEY_KEYMAN4MACIM" "$KM_PLIST"
 			fi
 		else
