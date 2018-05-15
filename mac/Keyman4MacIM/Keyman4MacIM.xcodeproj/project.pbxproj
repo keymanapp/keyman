@@ -571,6 +571,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ \"${CONFIGURATION}\" = \"Release\" ]; then\n   if [ \"${FABRIC_API_KEY_KEYMAN4MACIM}\" != \"\" ]; then\n      ../Carthage/Build/Mac/Fabric.framework/run ${FABRIC_API_KEY_KEYMAN4MACIM} ${FABRIC_BUILD_SECRET_KEYMAN4MACIM}\n   fi\nelse\n    ../Carthage/Build/Mac/Fabric.framework/run 68056571ada44ad2d93864380272808ada308b24 23863472894073dc672f5027ecdd239df93ebe58830ee9c7bb383e9abaeabee7\nfi\n";
+			showEnvVarsInLog = 0;
 		};
 		E2588F2E1F2644850061C9C4 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

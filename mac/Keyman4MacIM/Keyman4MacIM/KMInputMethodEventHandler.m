@@ -309,7 +309,7 @@ NSRange _previousSelRange;
                         NSLog(@"Crashlytics - Adding character to Easter Egg code string: %@", characterToAdd);
                         [_easterEggForCrashlytics appendString:characterToAdd];
                         if ([_easterEggForCrashlytics isEqualToString:kEasterEggText]) {
-                            NSLog(@"Crashlytics - Forcing crash now!");
+                            NSLog(@"Crashlytics - Forcing crash now with API Key: %@", [[Crashlytics sharedInstance] APIKey]);
                             [[Crashlytics sharedInstance] crash];
                         }
                     }
