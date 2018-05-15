@@ -86,7 +86,7 @@ def print_files(files, extracted_dir):
 	except Exception:
 		pass
 
-def parsemetadata(jsonfile, verbose):
+def parsemetadata(jsonfile, verbose=False):
 	info = system = keyboards = files = options = nonexistent = None
 	extracted_dir = os.path.dirname(jsonfile)
 

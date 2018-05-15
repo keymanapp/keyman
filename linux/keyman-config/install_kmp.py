@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import argparse
+import json
 import tempfile
 import zipfile
 import sys
@@ -8,6 +9,8 @@ import os.path
 import requests
 from kmpmetadata import parsemetadata, determine_filetype
 from get_kmp import get_kmp, get_keyboard_data
+from list_installed_kmp import kmp_version
+from uninstall_kmp import uninstall_kmp
 from os import listdir, makedirs
 from shutil import copy2
  
@@ -53,21 +56,29 @@ def install_kmp(inputfile, withkmn=False):
 #				if 'lastModifiedDate' in kbdata:
 #					lastModifiedDate = datetime(kbdata['lastModifiedDate'])
 #					print("Last Modified Date:", lastModifiedDate)
-				if 'sourcePath' in kbdata:
-					base_url = "https://raw.github.com/keymanapp/keyboards/master/" + kbdata['sourcePath']
-					kmn_url = base_url + "/source/" + kbid + ".kmn"
-					response = requests.get(kmn_url)
-					if response.status_code == 200:
-						downloadfile = os.path.join(tmpdirname, kbid + ".kmn")
-						with open(downloadfile, 'wb') as f:
-							f.write(response.content)
-						print("Installing", kbid + ".kmn", "as keyman file, mininum version:", kbdata['minKeymanVersion'])
-						if not os.path.isdir(kbdir):
+				if kbdata:
+					if 'sourcePath' in kbdata:
+						base_url = "https://raw.github.com/keymanapp/keyboards/master/" + kbdata['sourcePath']
+						kmn_url = base_url + "/source/" + kbid + ".kmn"
+						response = requests.get(kmn_url)
+						if response.status_code == 200:
+							downloadfile = os.path.join(tmpdirname, kbid + ".kmn")
+							with open(downloadfile, 'wb') as f:
+								f.write(response.content)
+							print("Installing", kbid + ".kmn", "as keyman file, mininum version:", kbdata['minKeymanVersion'])
+							if not os.path.isdir(kbdir):
+								os.makedirs(kbdir)
+							copy2(downloadfile, kbdir)
+						else:
+							print("install_kmp.py: error: no kmn source file so not installing")
+							exit(4)
+					if not os.path.isdir(kbdir):
 							os.makedirs(kbdir)
-						copy2(downloadfile, kbdir)
-					else:
-						print("no kmn source file so not installing")
-						exit(4)
+					with open(os.path.join(kbdir, kbid + '.json'), 'w') as outfile:
+						json.dump(kbdata, outfile)
+						print("Installing api data file", kbid + ".json", "as keyman file")
+				else:
+					print("install_kmp.py: error: cannot download keyboard data so not installing.")
 
 			for f in files:
 				fpath = os.path.join(tmpdirname, f['name'])
@@ -88,7 +99,7 @@ def install_kmp(inputfile, withkmn=False):
 						os.makedirs(kbdir)
 					copy2(fpath, kbdir)
 		else:
-			print("No kmp.json found in", inputfile)
+			print("install_kmp.py: error: No kmp.json found in", inputfile)
 
 
 def main():
@@ -104,17 +115,31 @@ def main():
 	if args.f:
 		name, ext = os.path.splitext(args.f)
 		if ext != ".kmp":
-			print("install_kmp.py Input file", args.f, "is not a kmp file")
+			print("install_kmp.py Input file", args.f, "is not a kmp file.")
 			print("install_kmp.py -f <kmpfile>")
 			sys.exit(2)
 
 		if not os.path.isfile(args.f):
-			print("install_kmp.py Keyman kmp file", args.f, "not found")
+			print("install_kmp.py Keyman kmp file", args.f, "not found.")
 			print("install_kmp.py -f <kmpfile>")
 			sys.exit(2)
 
 		install_kmp(args.f)
 	elif args.k:
+		installed_kmp_ver = kmp_version(args.k)
+		kbdata = get_keyboard_data(args.k)
+		if not kbdata:
+			print("install_kmp.py: error: Could not download keyboard data for", args.k)
+		if installed_kmp_ver:
+#			print("Found installed version", installed_kmp_ver)
+#			print("Api knows about version", kbdata['version'])
+			if kbdata['version'] == installed_kmp_ver:
+				print("install_kmp.py The %s version of the %s keyboard is already installed." % (installed_kmp_ver, args.k))
+				sys.exit(0)
+			elif float(kbdata['version']) > float(installed_kmp_ver):
+				print("install_kmp.py A newer version of %s keyboard is available. Uninstalling old version %s then downloading and installing new version %s." % (args.k, installed_kmp_ver, kbdata['version']))
+				uninstall_kmp(args.k)
+
 		kmpfile = get_kmp(args.k)
 		if kmpfile:
 			install_kmp(kmpfile, True)
