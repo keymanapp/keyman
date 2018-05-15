@@ -1,6 +1,6 @@
 # Keyman for macOS Version History
 
-## 2018-05-?? 10.0.39 beta
+## 2018-05-15 10.0.39 beta
 * Added automatic error reporting when exceptions occur (#769)
 
 ## 2018-05-09 10.0.38 beta
