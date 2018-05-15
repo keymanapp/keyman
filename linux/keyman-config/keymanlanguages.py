@@ -29,6 +29,7 @@ def get_api_languages(forceRefresh=False):
 	os.chdir(cache_dir)
 	requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
 	now = time.ctime(int(time.time()))
+	print("getting languages api")
 	response = requests.get(api_url, headers=headers)
 	print("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
 	os.chdir(current_dir)
@@ -40,9 +41,12 @@ def get_api_languages(forceRefresh=False):
 
 def parse_languages(data, verbose=False):
 	regions = { 1 : {"name" : "Undefined", "languages" : {} }, 2 : {"name" : "Africa", "languages" : {} }, 3 : {"name" : "Asia", "languages" : {} }, 4 :  {"name" : "Europe", "languages" : {} }, 5 :  {"name" : "Unused", "languages" : {} }, 6 :  {"name" : "Americas", "languages" : {} }, 7 : {"name" : "Asia Pacific", "languages" : {} } }
-	options = data['options']
+	#options = data['options']
+	numlang = 0
 	for lang in data['languages']['languages']:
 		regions[lang['region']]['languages'][lang['name']] = lang
+		numlang = numlang + 1
+	print(numlang)
 	if verbose:
 		for region in regions:
 			print("--- Region", str(region), regions[region]['name'], "---")

@@ -30,19 +30,29 @@ THE SOFTWARE.
   <!-- interface-name keyman-config -->
   <!-- interface-description Configuration of Keyman for Linux -->
   <!-- interface-copyright SIL International 2018 -->
-  <object class="GtkListStore" id="liststore1">
+  <object class="GtkListStore" id="keyboards_store">
+    <columns>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+      <!-- column-name gchararray1 -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="languages_store">
+    <columns>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+      <!-- column-name id -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="regions_store">
     <columns>
       <!-- column-name name -->
       <column type="gchararray"/>
       <!-- column-name number -->
       <column type="gint"/>
     </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">All</col>
-        <col id="1">0</col>
-      </row>
-    </data>
   </object>
   <object class="GtkApplicationWindow" id="window1">
     <property name="can_focus">False</property>
@@ -54,23 +64,6 @@ THE SOFTWARE.
       <object class="GtkGrid">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <child>
-          <object class="GtkComboBoxText" id="language_box">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="active">0</property>
-            <property name="active_id">all</property>
-            <items>
-              <item id="all" translatable="yes">All</item>
-              <item id="eng" translatable="yes">English</item>
-              <item id="tha" translatable="yes">Thai</item>
-            </items>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">3</property>
-          </packing>
-        </child>
         <child>
           <object class="GtkLabel">
             <property name="visible">True</property>
@@ -118,22 +111,11 @@ THE SOFTWARE.
             <property name="can_focus">False</property>
             <property name="margin_top">11</property>
             <property name="margin_bottom">9</property>
-            <property name="label" translatable="yes">Number of keyboards:</property>
+            <property name="label" translatable="yes">Keyboard:</property>
             <property name="justify">right</property>
           </object>
           <packing>
             <property name="left_attach">0</property>
-            <property name="top_attach">5</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">0</property>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
             <property name="top_attach">5</property>
           </packing>
         </child>
@@ -152,7 +134,7 @@ THE SOFTWARE.
           <object class="GtkComboBox" id="region_box">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="model">liststore1</property>
+            <property name="model">regions_store</property>
             <signal name="changed" handler="on_region_combo_changed" swapped="no"/>
           </object>
           <packing>
@@ -161,7 +143,40 @@ THE SOFTWARE.
           </packing>
         </child>
         <child>
-          <placeholder/>
+          <object class="GtkComboBox" id="language_box">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="model">languages_store</property>
+            <signal name="changed" handler="on_language_combo_changed" swapped="no"/>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="top_attach">3</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBox" id="keyboard_box">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="model">keyboards_store</property>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="top_attach">5</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="install">
+            <property name="label" translatable="yes">Install</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="onInstallPressed" swapped="no"/>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">7</property>
+          </packing>
         </child>
         <child>
           <placeholder/>
