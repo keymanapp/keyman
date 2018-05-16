@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import os
-#import configparser
 import json
 from kmpmetadata import parsemetadata
 from get_kmp import get_keyboard_data
@@ -37,7 +36,7 @@ def get_installed_kmp():
     return installed_keyboards    
 
 
-def kmp_version(keyboardid):
+def get_kmp_version(keyboardid):
     installed_kmp = get_installed_kmp()
     if keyboardid in installed_kmp:
         return installed_kmp[keyboardid]['version']

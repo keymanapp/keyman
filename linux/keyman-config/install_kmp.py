@@ -7,9 +7,9 @@ import zipfile
 import sys
 import os.path
 import requests
-from kmpmetadata import parsemetadata, determine_filetype
+from kmpmetadata import parsemetadata, parseinfdata, determine_filetype
 from get_kmp import get_kmp, get_keyboard_data
-from list_installed_kmp import kmp_version
+from list_installed_kmp import get_kmp_version
 from uninstall_kmp import uninstall_kmp
 from os import listdir, makedirs
 from shutil import copy2
@@ -29,11 +29,22 @@ def get_metadata(inputfile, tmpdirname):
 		else:
 			return None, None, None, None, None
 
+def get_infdata(inputfile, tmpdirname):
+	with zipfile.ZipFile(inputfile,"r") as zip_ref:
+		zip_ref.extractall(tmpdirname)
+		kmpinf = os.path.join(tmpdirname, "kmp.inf")
+		if os.path.isfile(kmpinf):
+			return parseinfdata(kmpinf, False)
+		else:
+			return None, None, None, None, None
+
 def install_kmp(inputfile, withkmn=False):
 	# create a temporary directory using the context manager
 	with tempfile.TemporaryDirectory() as tmpdirname:
 		print('created temporary directory', tmpdirname)
 		info, system, options, keyboards, files = get_metadata(inputfile, tmpdirname)
+		if not keyboards:
+			info, system, options, keyboards, files = get_infdata(inputfile, tmpdirname)
 		if keyboards:
 			kbid = keyboards[0]['id']
 			print("Installing", info['name']['description'])
@@ -126,7 +137,7 @@ def main():
 
 		install_kmp(args.f)
 	elif args.k:
-		installed_kmp_ver = kmp_version(args.k)
+		installed_kmp_ver = get_kmp_version(args.k)
 		kbdata = get_keyboard_data(args.k)
 		if not kbdata:
 			print("install_kmp.py: error: Could not download keyboard data for", args.k)

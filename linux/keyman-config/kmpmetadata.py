@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import json
+import configparser
 import sys
 import os.path
 import magic
@@ -86,6 +87,16 @@ def print_files(files, extracted_dir):
 	except Exception:
 		pass
 
+def parseinfdata(inffile, verbose=False):
+	info = system = keyboards = files = options = nonexistent = None
+	extracted_dir = os.path.dirname(inffile)
+
+	config = configparser.ConfigParser()
+	config.read(inffile)
+	print(config.sections())
+
+	return info, system, options, keyboards, files
+
 def parsemetadata(jsonfile, verbose=False):
 	info = system = keyboards = files = options = nonexistent = None
 	extracted_dir = os.path.dirname(jsonfile)
@@ -119,17 +130,24 @@ def parsemetadata(jsonfile, verbose=False):
 
 def main(argv):
 	if len(sys.argv) != 2:
-		print("kmpmetadata.py <jsonfile>")
+		print("kmpmetadata.py <kmp.json> or <kmp.inf>")
 		sys.exit(2)
 	inputfile = sys.argv[1]
 	
 	if not os.path.isfile(inputfile):
-		print("kmpmetadata.py Input file ", inputfile, " not found")
-		print("kmpmetadata.py <jsonfile>")
+		print("kmpmetadata.py Input file ", inputfile, " not found.")
+		print("kmpmetadata.py <kmp.json> or <kmp.inf>")
 		sys.exit(2)
 	
-	parsemetadata(inputfile, True)
-
+	name, ext = os.path.splitext(inputfile)
+	if ext == ".json":
+		parsemetadata(inputfile, True)
+	elif ext == ".inf":
+		parseinfdata(inputfile, True)
+	else:
+		print("kmpmetadata.py Input file must be json or inf.")
+		print("kmpmetadata.py <kmp.json> or <kmp.inf>")
+		sys.exit(2)
 
 if __name__ == "__main__":
         main(sys.argv[1:])
