@@ -44,21 +44,20 @@ def get_kmp_file(kbdata, verbose=False):
 	if 'packageFilename' not in kbdata:
 		print("get_kmp.py: Keyboard does not have a kmp file available")
 		return None
-#	print("kmpfile:", kbdata['packageFilename'])
-#	print("version:", kbdata['version'])
 
 	kmp_url = "https://downloads.keyman.com/keyboards/" + kbdata['id'] + "/" + kbdata['version'] + "/" + kbdata['packageFilename']
+	downloadfile = os.path.join(get_download_folder(), kbdata['packageFilename'])
+	return download_kmp_file(kmp_url, downloadfile, verbose)
+
+def download_kmp_file(url, kmpfile, verbose=False):
 	if verbose:
-		print("Download URL:", kmp_url)
-	response = requests.get(kmp_url) #, stream=True)
+		print("Download URL:", url)
 	downloadfile = None
-	#with open(downloadfile , "wb") as handle:
-	#	for data in tqdm(response.iter_content()):
-	#		handle.write(data)
+	response = requests.get(url) #, stream=True)
 	if response.status_code == 200:
-		downloadfile = os.path.join(get_download_folder(), kbdata['packageFilename'])
-		with open(downloadfile, 'wb') as f:
+		with open(kmpfile, 'wb') as f:
 			f.write(response.content)
+			downloadfile = kmpfile
 	return downloadfile
 
 def get_kmp(keyboardid):
