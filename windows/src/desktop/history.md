@@ -1,5 +1,8 @@
 # Keyman Desktop Version History
 
+## 2018-04-16 10.0.1091.0 beta
+* Fixes Ctrl+Alt simulation regression (#835)
+
 ## 2018-04-12 10.0.1057.0 beta
 * Fix for backspace in legacy mode breaking SMP characters (#729)
 
