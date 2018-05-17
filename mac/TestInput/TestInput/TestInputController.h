@@ -52,6 +52,8 @@
 
 @interface TestInputController : IMKInputController {
     
+    IBOutlet NSMenu*                    _menu;
+    
     //_composedBuffer contains text that the input method has converted
     NSMutableString*				_composedBuffer;
     //_original buffer contains the text has it was received from user input.

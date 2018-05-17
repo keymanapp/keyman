@@ -47,7 +47,8 @@ NSRange _previousSelRange;
             [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
             [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
             [clientAppId isEqual: @"com.microsoft.Word"] ||
-            [clientAppId isEqual: @"org.openoffice.script"]
+            [clientAppId isEqual: @"org.openoffice.script"] ||
+            [clientAppId isEqual: @"com.adobe.InDesign"]
                /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */);
     
     // We used to default to NO, so these were the obvious exceptions. But then we realized that

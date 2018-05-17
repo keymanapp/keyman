@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
     //find the bundle identifier and then initialize the input method server
     identifier = [[NSBundle mainBundle] bundleIdentifier];
     server = [[IMKServer alloc] initWithName:(NSString*)kConnectionName bundleIdentifier:[[NSBundle mainBundle] bundleIdentifier]];
+    [NSBundle loadNibNamed:@"MainMenu" owner:[NSApplication sharedApplication]];
     
     //finally run everything
     [[NSApplication sharedApplication] run];

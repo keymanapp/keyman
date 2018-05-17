@@ -166,7 +166,7 @@
     
     if ([[event characters] isEqual: @"$"])
     {
-        NSLog(@"Attempting to delete the previous character by replacing it and the prior character with just the prior one.");
+        NSLog(@"Attempting to delete the previous character by replacing it and the prior character with just the prior one. location = %lu", location);
         
         if (location < 2 || location == NSNotFound)
         {
@@ -177,6 +177,7 @@
         // This works in TextEdit, but not in TextWrangler. In Chrome, it just tacks the prior character on
         // at the current insertion point.
         NSString *preChar = [[inputClient attributedSubstringFromRange:NSMakeRange(location - 2, 1)] string];
+        NSLog(@"Previous character retrieved = %@", preChar);
         [inputClient insertText:preChar replacementRange:NSMakeRange(location - 2, 2)];
         
         return YES;
@@ -594,9 +595,52 @@ CGKeyCode keyCodeForChar(const char c)
     return selRange.location;
 }
 
+NSMenu* _menu = nil;
+
 - (void)activateServer:(id)sender {
+    NSLog(@"*** activateServer ***");
+    NSLog(@"sender: %@", sender);
+    
     [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
+    if (!_menu) {
+        _menu = [[NSApplication sharedApplication] mainMenu];
+        if (!_menu)
+            NSLog(@"No main menu!");
+        NSMenuItem *staticMenuItem1 = [_menu itemWithTag:1];
+        if (staticMenuItem1)
+            [staticMenuItem1 setAction:@selector(menuAction:)];
+        
+        NSMenuItem* staticDropdownMenuItem = [_menu itemWithTag:2];
+        if (staticDropdownMenuItem) {
+            NSMenu* dropDownMenu = [staticDropdownMenuItem submenu];
+            if (dropDownMenu) {
+                NSMenuItem* staticSubMenu = [dropDownMenu itemWithTag:10];
+                if ( staticSubMenu ) {
+                    NSLog(@"Setting action for static submenu item");
+                    [staticSubMenu setAction:@selector(menuAction:)];
+                }
+            }
+        }
+        
+        NSMenuItem* dynamicDropdownMenuItem = [_menu itemWithTag:3];
+        if (dynamicDropdownMenuItem) {
+            NSMenu* dropDownMenu = [staticDropdownMenuItem submenu];
+            if (dropDownMenu) {
+                NSMenuItem *dynamicSubMenuItem = [[NSMenuItem alloc] initWithTitle:@"Submenu One" action:@selector(menuAction:) keyEquivalent:@""];
+                [dynamicSubMenuItem setTag:100];
+                NSLog(@"Adding dynamic submenu item");
+                [dropDownMenu addItem:dynamicSubMenuItem];
+            }
+        }
+    }
     [self performSelector:@selector(logContext:) withObject:sender afterDelay:0.25];
+}
+
+- (void)menuAction:(id)sender {
+    NSMenuItem *mItem = [sender objectForKey:kIMKCommandMenuItemName];
+    NSInteger itag = mItem.tag;
+    NSLog(@"Menu clicked - tag: %lu", itag);
+    [[NSSound soundNamed:(itag < 100 ? (itag < 10 ? @"Hero" : @"Glass") : @"Frog")] play];
 }
 
 - (void)deactivateServer:(id)sender {
