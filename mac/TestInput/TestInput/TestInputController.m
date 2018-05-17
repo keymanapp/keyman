@@ -10,6 +10,7 @@
  
  */
 #import "TestInputController.h"
+#import "TestInputMethodAppDelegate.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants, and TIS functions. */
 
 @implementation TestInputController
@@ -78,13 +79,10 @@
 //        return NO;
 //    }
     
-    id inputClient;
-    inputClient = [self client];
+    id inputClient = [self client];
     
     if (![inputClient supportsUnicode])
         return NO;
-    
-//    [self setComposedBuffer:@""];
     
     NSUInteger location = [self logContext:inputClient];
     
@@ -164,6 +162,15 @@
         return YES;
     }
     
+    if ([[event characters] isEqual: @"~"])
+    {
+        NSLog(@"Attempting to insert characters 'tilde' using insertText with undefined (default) replacement range.");
+        
+        [inputClient insertText:@"tilde" replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
+        
+        return YES;
+    }
+    
     if ([[event characters] isEqual: @"$"])
     {
         NSLog(@"Attempting to delete the previous character by replacing it and the prior character with just the prior one. location = %lu", location);
@@ -176,8 +183,29 @@
         
         // This works in TextEdit, but not in TextWrangler. In Chrome, it just tacks the prior character on
         // at the current insertion point.
-        NSString *preChar = [[inputClient attributedSubstringFromRange:NSMakeRange(location - 2, 1)] string];
-        NSLog(@"Previous character retrieved = %@", preChar);
+        NSString *preChar = @"=";
+        if ([inputClient respondsToSelector:@selector(attributedSubstringFromRange:)]) {
+            preChar = [[inputClient attributedSubstringFromRange:NSMakeRange(location - 2, 1)] string];
+            if (!preChar || [preChar isEqualToString:@""]) {
+                NSLog(@"attributedSubstringFromRange did not return a previous character. Trying attributedSubstringForProposedRange...");
+                if ([inputClient respondsToSelector:@selector(attributedSubstringForProposedRange:actualRange:)]) {
+                    NSRange returnedRange;
+                    preChar = [[inputClient attributedSubstringForProposedRange:NSMakeRange(location - 2, 1) actualRange:&returnedRange] string];
+                    if (!preChar || [preChar isEqualToString:@""]) {
+                        NSLog(@"Previous character could NOT be retrieved using attributedSubstringFromRange or attributedSubstringForProposedRange. Using '&' instead");
+                        preChar = @"&";
+                    }
+                }
+                else {
+                    NSLog(@"Client does not respond to attributedSubstringForProposedRange:actualRange:. Using '#' instead");
+                    preChar = @"#";
+                }
+            }
+            else
+                NSLog(@"Previous character retrieved = %@", preChar);
+        }
+        else
+            NSLog(@"Client does not respond to attributedSubstringFromRange:. Using '=' instead");
         [inputClient insertText:preChar replacementRange:NSMakeRange(location - 2, 2)];
         
         return YES;
@@ -493,38 +521,6 @@ CGKeyCode keyCodeForChar(const char c)
     [buffer setString:string];
 }
 
-/*!
- @method
- @abstract   Called when a user action was taken that ends an input session.   Typically triggered by the user selecting a new input method or keyboard layout.
- @discussion When this method is called your controller should send the current input buffer to the client via a call to insertText:replacementRange:.  Additionally, this is the time to clean up if that is necessary.
- */
-
-//-(void)commitComposition:(id)sender
-//{
-//    NSString*        text = [self composedBuffer];
-//
-//    if ( text != nil && [text length] == 0 ) {
-//        [sender insertText: text replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
-//        [self setComposedBuffer:@""];
-//    }
-//}
-
-//// Return the composed buffer.  If it is NIL create it.
-//-(NSMutableString*)composedBuffer;
-//{
-//    if ( _composedBuffer == nil ) {
-//        _composedBuffer = [[NSMutableString alloc] init];
-//    }
-//    return _composedBuffer;
-//}
-//
-//// Change the composed buffer.
-//-(void)setComposedBuffer:(NSString*)string
-//{
-//    NSMutableString*		buffer = [self composedBuffer];
-//    [buffer setString:string];
-//}
-
 // Get the original buffer.
 -(NSMutableString*)originalBuffer
 {
@@ -595,45 +591,21 @@ CGKeyCode keyCodeForChar(const char c)
     return selRange.location;
 }
 
-NSMenu* _menu = nil;
-
 - (void)activateServer:(id)sender {
     NSLog(@"*** activateServer ***");
     NSLog(@"sender: %@", sender);
     
     [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
-    if (!_menu) {
-        _menu = [[NSApplication sharedApplication] mainMenu];
-        if (!_menu)
-            NSLog(@"No main menu!");
-        NSMenuItem *staticMenuItem1 = [_menu itemWithTag:1];
-        if (staticMenuItem1)
-            [staticMenuItem1 setAction:@selector(menuAction:)];
-        
-        NSMenuItem* staticDropdownMenuItem = [_menu itemWithTag:2];
-        if (staticDropdownMenuItem) {
-            NSMenu* dropDownMenu = [staticDropdownMenuItem submenu];
-            if (dropDownMenu) {
-                NSMenuItem* staticSubMenu = [dropDownMenu itemWithTag:10];
-                if ( staticSubMenu ) {
-                    NSLog(@"Setting action for static submenu item");
-                    [staticSubMenu setAction:@selector(menuAction:)];
-                }
-            }
-        }
-        
-        NSMenuItem* dynamicDropdownMenuItem = [_menu itemWithTag:3];
-        if (dynamicDropdownMenuItem) {
-            NSMenu* dropDownMenu = [staticDropdownMenuItem submenu];
-            if (dropDownMenu) {
-                NSMenuItem *dynamicSubMenuItem = [[NSMenuItem alloc] initWithTitle:@"Submenu One" action:@selector(menuAction:) keyEquivalent:@""];
-                [dynamicSubMenuItem setTag:100];
-                NSLog(@"Adding dynamic submenu item");
-                [dropDownMenu addItem:dynamicSubMenuItem];
-            }
-        }
-    }
     [self performSelector:@selector(logContext:) withObject:sender afterDelay:0.25];
+}
+
+- (TestInputMethodAppDelegate *)AppDelegate {
+    return (TestInputMethodAppDelegate *)[NSApp delegate];
+}
+
+-(NSMenu*)menu
+{
+    return [self.AppDelegate menu];
 }
 
 - (void)menuAction:(id)sender {

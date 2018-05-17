@@ -52,8 +52,6 @@
 
 @interface TestInputController : IMKInputController {
     
-    IBOutlet NSMenu*                    _menu;
-    
     //_composedBuffer contains text that the input method has converted
     NSMutableString*				_composedBuffer;
     //_original buffer contains the text has it was received from user input.
@@ -61,6 +59,9 @@
     //used to remember where text is being inserted in the _composedBuffer
     NSInteger						_originalIndex;
     NSUInteger _numberOfDeletesExpected;
+
 }
+
+- (void)menuAction:(id)sender;
 
 @end
