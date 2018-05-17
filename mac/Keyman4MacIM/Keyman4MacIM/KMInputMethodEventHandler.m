@@ -22,6 +22,7 @@ CGKeyCode _keyCodeOfOriginalEvent;
 CGEventSourceRef _sourceFromOriginalEvent = nil;
 NSMutableString* _easterEggForCrashlytics = nil;
 const NSString* kEasterEggText = @"Crashlytics force now";
+const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 NSRange _previousSelRange;
 
@@ -301,7 +302,7 @@ NSRange _previousSelRange;
             if (_easterEggForCrashlytics != nil) {
                 NSString * kmxName = [[self.kme.kmx filePath] lastPathComponent];
                 NSLog(@"Crashlytics - KMX name: %@", kmxName);
-                if ([kmxName isEqualToString:@"EnglishSpanish.kmx"]) {
+                if ([kmxName isEqualToString:kEasterEggKmxName]) {
                     NSUInteger len = [_easterEggForCrashlytics length];
                     NSLog(@"Crashlytics - Processing character(s): %@", [event characters]);
                     if ([[event characters] characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
