@@ -1,3 +1,10 @@
+libkmfl (10.99.1)
+
+  * Change license to MIT as it is being moved into Keyman 11
+  * Keyman is now owned by SIL
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Thu, 17 May 2018 11:43:22 +0700
+
 libkmfl (0.9.12)
 
   * fix debug messages
