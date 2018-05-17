@@ -1,3 +1,10 @@
+kmflcomp (10.99.1-1) UNRELEASED; urgency=medium
+
+  * Change license to MIT as kmflcomp is being moved into Keyman 11
+  * Keyman is now owned by SIL
+
+ -- Daniel Glassey <wdg@debian.org>  Thu, 17 May 2018 11:39:04 +0700
+
 kmflcomp (0.9.10-1) unstable; urgency=low
 
   * new upstream release
