@@ -7,7 +7,7 @@ We have prepared a small sample app that easily illustrates the problem.
 
 # Installation and Setup of TestInput sample app
 
-1. Unzip the **TestInput.zip** file
+1. Unzip the **PowerPoint IM Incompatibilities Test.zip** file
 2. Copy TestInput.app into **~/Library/Input Methods**
 3. Open **System Preferences**.
 4. Open **Keyboard**.

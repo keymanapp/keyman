@@ -17,7 +17,7 @@ For each of the four problems, follow the testing steps described below to see t
 
 # Installation and Setup of TestInput sample app
 
-1. Unzip the **TestInput.zip** file
+1. Unzip the **InDesign IM Incompatibilities Test.zip** file
 2. Copy TestInput.app into **~/Library/Input Methods**
 3. Open **System Preferences**.
 4. Open **Keyboard**.
