@@ -19,7 +19,7 @@
 		9836B3741AE5F11D00780482 /* ZipArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9836B36F1AE5F11D00780482 /* ZipArchive.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		984B8F441AF1C3D900E096A8 /* OSKWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 984B8F421AF1C3D900E096A8 /* OSKWindowController.m */; };
 		984B8F451AF1C3D900E096A8 /* OSKWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 984B8F431AF1C3D900E096A8 /* OSKWindowController.xib */; };
-		984C2B221A79DF1B0023F89D /* KeymanEngine4Mac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C2B211A79DF1B0023F89D /* KeymanEngine4Mac.framework */; };
+		984C2B221A79DF1B0023F89D /* KeymanEngine4Mac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C2B211A79DF1B0023F89D /* KeymanEngine4Mac.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		9874C3211B536847000BB543 /* info.png in Resources */ = {isa = PBXBuildFile; fileRef = 9874C31E1B536847000BB543 /* info.png */; };
 		9874C3221B536847000BB543 /* keyman.png in Resources */ = {isa = PBXBuildFile; fileRef = 9874C31F1B536847000BB543 /* keyman.png */; };
 		9874C3231B536847000BB543 /* SideImage.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 9874C3201B536847000BB543 /* SideImage.bmp */; };
