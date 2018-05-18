@@ -3,6 +3,78 @@
 ## 2018-04-16 10.0.1091.0 beta
 * Fixes Ctrl+Alt simulation regression (#835)
 
+## 2018-05-11 10.0.1090.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-11 10.0.1087.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-09 10.0.1086.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-08 10.0.1085.0 beta
+* Clarified restart requirements and UI in Setup (#840)
+
+## 2018-05-08 10.0.1084.0 beta
+* Added implementation for IKeymanKeyboardFile.DefaultHotkey (#839)
+
+## 2018-05-08 10.0.1083.0 beta
+* Fixes a crash in Keyman Configuration (#838)
+
+## 2018-05-08 10.0.1082.0 beta
+* Adds script lookup to Add Keyboard Language dialog (#827)
+
+## 2018-05-07 10.0.1081.0 beta
+* Fixes crash in Keyman Developer when keyboard name contains an ampersand (#831)
+
+## 2018-05-07 10.0.1080.0 beta
+* Fixes crash starting Keyman Developer when using certain base keyboards (#832)
+
+## 2018-05-07 10.0.1079.0 beta
+* Fixes crash in updating active keyboard icon in On Screen Keyboard (#828)
+
+## 2018-05-04 10.0.1078.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-04 10.0.1077.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-04 10.0.1076.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-04 10.0.1075.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-03 10.0.1074.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-03 10.0.1073.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-03 10.0.1072.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-03 10.0.1071.0 beta
+* No changes in Keyman Desktop
+
+## 2018-04-30 10.0.1070.0 beta
+* No changes in Keyman Desktop
+
+## 2018-04-30 10.0.1066.0 beta
+* No changes in Keyman Desktop
+
+## 2018-04-27 10.0.1061.0 beta
+* No changes in Keyman Desktop
+
+## 2018-04-25 10.0.1060.0 beta
+* No changes in Keyman Desktop
+
+## 2018-04-25 10.0.1059.0 beta
+* No changes in Keyman Desktop
+
+## 2018-04-25 10.0.1058.0 beta
+* No changes in Keyman Desktop
+
 ## 2018-04-12 10.0.1057.0 beta
 * Fix for backspace in legacy mode breaking SMP characters (#729)
 
