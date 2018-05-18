@@ -1,6 +1,7 @@
 There are four [problems we have identified in InDesign](https://github.com/keymanapp/keyman/issues/782) that negatively affect its
 compatibility with input methods that use Apple's standard approach using InputMethodKit.
-This is of particular concern to us because we have developed Keyman, a very popular and
+
+This is of particular concern to us because we have developed [Keyman](keyman.com), a very popular and
 widely used input method that supports custom keyboards in hundreds of languages,
 including many major languages whose complex scripts are best served by the powerful
 options in Keyman as well as minority languages whose only viable option for text input
