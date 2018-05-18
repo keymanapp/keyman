@@ -1,18 +1,18 @@
 (*
   Name:             keymankeyboardfile
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    29 Mar 2010
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     14 Sep 2006 - mcdurdin - Pass graphics as icons instead of bitmaps
                     04 Dec 2006 - mcdurdin - Add Get_LayoutType, Serialize functions
@@ -43,6 +43,8 @@ type
     FError: Boolean;
     FKeyboardInfo: TKeyboardInfo;
     FLanguages: IKeymanKeyboardLanguagesFile;
+    FDefaultHotkey: IKeymanHotkey;
+    procedure CreateDefaultHotkey;
   protected
     function Serialize(Flags: TOleEnum; const ImagePath: WideString; References: TStrings): WideString;
       override;
@@ -65,6 +67,8 @@ type
     function Get_DefaultPrimaryLanguage: Integer; override; safecall;
     function Get_Version: WideString; override; safecall;
     function Get_Languages: IKeymanKeyboardLanguagesFile; safecall;
+    function Get_DefaultHotkey: IKeymanHotkey; override; safecall;
+
   public
     constructor Create(AContext: TKeymanContext; const Filename: Widestring; pk: TPackageKeyboard);
     destructor Destroy; override;
@@ -75,6 +79,7 @@ implementation
 uses
   Graphics,
   keymanerrorcodes,
+  keymanhotkey,
   kmxfileusedchars,
   kpinstallkeyboard,
   Keyman.System.LanguageCodeUtils,
@@ -104,6 +109,13 @@ begin
   if Assigned(pk)
     then FLanguages := TKeymanKeyboardLanguagesFile.Create(AContext, Self, pk.Languages)
     else FLanguages := TKeymanKeyboardLanguagesFile.Create(AContext, Self, nil);
+end;
+
+procedure TKeymanKeyboardFile.CreateDefaultHotkey;
+begin
+  if Assigned(FDefaultHotkey) then
+    Exit;
+  FDefaultHotkey := TKeymanHotkey.Create(Context, FKeyboardInfo.DefaultHotkey, khKeyboard);
 end;
 
 destructor TKeymanKeyboardFile.Destroy;
@@ -198,6 +210,12 @@ end;
 function TKeymanKeyboardFile.Get_DefaultBCP47Languages: WideString;
 begin
   Result := TLanguageCodeUtils.TranslateMultipleISO6393ToBCP47(FKeyboardInfo.ISO6393Languages);
+end;
+
+function TKeymanKeyboardFile.Get_DefaultHotkey: IKeymanHotkey;
+begin
+  CreateDefaultHotkey;
+  Result := FDefaultHotkey;
 end;
 
 function TKeymanKeyboardFile.Get_DefaultPrimaryLanguage: Integer;

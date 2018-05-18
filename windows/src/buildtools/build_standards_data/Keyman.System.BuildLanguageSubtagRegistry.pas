@@ -133,7 +133,7 @@ begin
     FResult.Add('');
     FResult.Add('end.');
 
-    FResult.SaveToFile(DestinationFile);
+    FResult.SaveToFile(DestinationFile, TEncoding.UTF8);
   finally
     FResult.Free;
     FLanguages.Free;
@@ -187,7 +187,7 @@ begin
     FResult.Add('');
     FResult.Add('end.');
 
-    FResult.SaveToFile(DestinationFile);
+    FResult.SaveToFile(DestinationFile, TEncoding.UTF8);
   finally
     FResult.Free;
   end;
@@ -196,7 +196,7 @@ end;
 constructor TBuildLanguageSubtagRegistry.Create(ASubtagRegistryFile: string);
 begin
   FSubtagRegistry := TStringList.Create;
-  FSubtagRegistry.LoadFromFile(ASubtagRegistryFile);
+  FSubtagRegistry.LoadFromFile(ASubtagRegistryFile, TEncoding.UTF8);
   FSubtagRegistry.Add('%%');  // Force final entry to be processed
 end;
 

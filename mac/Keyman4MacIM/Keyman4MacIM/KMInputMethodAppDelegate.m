@@ -19,10 +19,13 @@
 #import "KMConfigurationWindowController.h"
 #import "KMDownloadKBWindowController.h"
 #import "ZipArchive.h"
+#import <Fabric/Fabric.h>
+#import <Crashlytics/Crashlytics.h>
 
 NSString *const kKMSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kKMActiveKeyboardsKey = @"KMActiveKeyboardsKey";
 NSString *const kKMAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
+NSString *const kKMUseVerboseLogging = @"KMUseVerboseLogging";
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
 NSString *const kPackage = @"[Package]";
@@ -64,9 +67,12 @@ typedef enum {
     self = [super init];
     if (self) {
 #ifdef DEBUG
+        // If debugging, we'll turn it on by default, regardless of setting. If developer
+        // really wants it off, they can either change this line of code temporarily or
+        // go to the config screen and turn it off explicitly.
         _debugMode = YES;
 #else
-        _debugMode = NO;
+        _debugMode = self.useVerboseLogging;
 #endif
         [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
                                                            andSelector:@selector(handleURLEvent:withReplyEvent:)
@@ -92,6 +98,11 @@ typedef enum {
     return self;
 }
 
+-(void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"NSApplicationCrashOnExceptions": @YES }];
+    [Fabric with:@[[Crashlytics class]]];
+}
+
 - (void)handleURLEvent:(NSAppleEventDescriptor*)event withReplyEvent:(NSAppleEventDescriptor*)replyEvent {
     
     [self processURL:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
@@ -101,12 +112,12 @@ typedef enum {
     NSMutableString *urlStr = [NSMutableString stringWithString:rawUrl];
     [urlStr replaceOccurrencesOfString:@"keyman:" withString:@"keyman/" options:0 range:NSMakeRange(0, 7)];
     NSURL *url = [NSURL URLWithString:urlStr];
-    if (_debugMode)
+    if (self.debugMode)
         NSLog(@"url = %@", url);
     
     if ([url.lastPathComponent isEqualToString:@"download"]) {
         if (_connection != nil) {
-            if (_debugMode)
+            if (self.debugMode)
                 NSLog(@"Already downloading a keyboard.");
             return;
         }
@@ -202,6 +213,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (KMEngine *)kme {
     if (_kme == nil) {
         _kme = [[KMEngine alloc] initWithKMX:nil contextBuffer:self.contextBuffer];
+        [_kme setDebugMode:self.debugMode];
     }
     
     return _kme;
@@ -238,10 +250,25 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [userData synchronize];
 }
 
+- (void)setUseVerboseLogging:(BOOL)useVerboseLogging {
+    NSLog(@"Turning verbose logging %@", useVerboseLogging ? @"on." : @"off.");
+    _debugMode = useVerboseLogging;
+    if (_kme != nil)
+        [_kme setUseVerboseLogging:useVerboseLogging];
+    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+    [userData setBool:useVerboseLogging forKey:kKMUseVerboseLogging];
+    [userData synchronize];
+}
+
 - (BOOL)alwaysShowOSK {
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
     _alwaysShowOSK = [userData boolForKey:kKMAlwaysShowOSKKey];
     return _alwaysShowOSK;
+}
+
+- (BOOL)useVerboseLogging {
+    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+    return [userData boolForKey:kKMUseVerboseLogging];
 }
 
 - (NSString *)keyboardsPath {
@@ -741,7 +768,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)showConfigurationWindow {
-    if (_debugMode)
+    if (self.debugMode)
         NSLog(@"Showing config window...");
     [self.configWindow.window centerInParent];
     [self.configWindow.window makeKeyAndOrderFront:nil];
@@ -766,7 +793,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (NSWindowController *)configWindow {
     if (_configWindow.window == nil) {
-        if (_debugMode)
+        if (self.debugMode)
             NSLog(@"Creating config window...");
         _configWindow = [[KMConfigurationWindowController alloc] initWithWindowNibName:@"preferences"];
     }
@@ -941,7 +968,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     ZipArchive *za = [[ZipArchive alloc] init];
     if ([za UnzipOpenFile:filePath]) {
         NSString *destFolder = [self.keyboardsPath stringByAppendingPathComponent:folderName];
-        if (_debugMode) {
+        if (self.debugMode) {
             NSLog(@"Unzipping %@ to %@", filePath, destFolder);
             if ([[NSFileManager defaultManager] fileExistsAtPath:destFolder])
                 NSLog(@"The destiination folder already exists. Overwriting...");
@@ -951,19 +978,19 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     }
     
     if (didUnzip) {
-        if (_debugMode)
+        if (self.debugMode)
             NSLog(@"Unzipped file: %@", filePath);
         NSString * keyboardFolderPath = [self.keyboardsPath stringByAppendingPathComponent:folderName];
         [self installFontsAtPath:keyboardFolderPath];
         for (NSString *kmxFile in [self KMXFilesAtPath:keyboardFolderPath]) {
-            if (_debugMode)
+            if (self.debugMode)
                 NSLog(@"Adding keyboard to list of active keyboards: %@", kmxFile);
             [self.activeKeyboards addObject:kmxFile];
         }
         [self saveActiveKeyboards];
     }
     else {
-        if (_debugMode) {
+        if (self.debugMode) {
             NSLog(@"Failed to unzip file: %@", filePath);
         }
     }

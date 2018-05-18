@@ -21,12 +21,16 @@ SUPPRESS_PAS=$(STANDARDS_OUT_PATH)\Keyman.System.Standards.BCP47SuppressScriptRe
 LCID_DATA=$(STANDARDS_DATA_PATH)\windows-lcid-to-bcp-47\map_clean_win.txt
 LCID_PAS=$(STANDARDS_OUT_PATH)\Keyman.System.Standards.LCIDToBCP47Registry.pas
 
+ALLTAGS_DATA=$(STANDARDS_DATA_PATH)\alltags\alltags.txt
+ALLTAGS_PAS=$(STANDARDS_OUT_PATH)\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas
+
 build: 
     $(DELPHI_MSBUILD) build_standards_data.dproj
     $(WIN32_TARGET_PATH)\build_standards_data.exe iso6393 $(ISO6393_DATA) $(ISO6393_PAS)
     $(WIN32_TARGET_PATH)\build_standards_data.exe suppress $(SUPPRESS_DATA) $(SUPPRESS_PAS)
     $(WIN32_TARGET_PATH)\build_standards_data.exe subtag $(SUBTAG_DATA) $(SUBTAG_PAS)
     $(WIN32_TARGET_PATH)\build_standards_data.exe lcid $(LCID_DATA) $(LCID_PAS)
+    $(WIN32_TARGET_PATH)\build_standards_data.exe alltags $(ALLTAGS_DATA) $(ALLTAGS_PAS)
 
 clean: def-clean
     -rd /s/q Win32

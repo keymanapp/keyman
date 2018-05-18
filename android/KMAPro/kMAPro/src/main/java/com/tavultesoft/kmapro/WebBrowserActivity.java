@@ -72,7 +72,7 @@ public class WebBrowserActivity extends Activity {
     actionBar.setCustomView(webBarLayout);
     setContentView(R.layout.activity_web_browser);
 
-    webView = (WebView) findViewById(R.id.webView);
+    webView = (WebView) findViewById(R.id.browserWebView);
     addressField = (EditText) findViewById(R.id.address_field);
     clearButton = (ImageButton) findViewById(R.id.clear_button);
     stopButton = (ImageButton) findViewById(R.id.stop_button);

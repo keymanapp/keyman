@@ -100,7 +100,6 @@
         <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
-        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
         <DCCReference Include="Keyman.Test.System.KMXFileLanguagesTest.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
@@ -108,6 +107,8 @@
         <DCCReference Include="..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

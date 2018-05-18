@@ -52,6 +52,10 @@ DWORD VKMap[0x80];
     return self;
 }
 
+- (void)setUseVerboseLogging:(BOOL)useVerboseLogging {
+    self.debugMode = useVerboseLogging;
+}
+
 - (void)setContextBuffer:(NSString *)ctxBuf {
     _tmpCtxBuf = [[NSMutableString alloc] initWithString:ctxBuf];
     [_tmpCtxBuf removeAllNullChars];

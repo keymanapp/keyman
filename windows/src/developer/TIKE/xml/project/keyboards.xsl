@@ -46,7 +46,7 @@
             <tr><th colspan="3">Source Files</th><th>&#160;</th><th colspan="2">Outputs</th></tr>
             <tr>
               <xsl:call-template name="filetype_kmn" />
-              <xsl:call-template name="filetype_kvk" />
+              <xsl:call-template name="filetype_kvks" />
               <xsl:call-template name="filetype_ico" />
               <xsl:call-template name="filetype__arrow" />
               <xsl:call-template name="filetype_kmx" />

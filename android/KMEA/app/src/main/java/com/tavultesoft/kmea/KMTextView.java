@@ -102,8 +102,6 @@ public final class KMTextView extends EditText {
       @Override
       public void onFocusChange(View v, boolean hasFocus) {
         if (hasFocus) {
-          if (KMManager.isDebugMode())
-            Log.d("OnFocusChange", "gotFocus: " + v.toString());
           activeView = v;
           if (KMManager.InAppKeyboardLoaded) {
             KMTextView textView = (KMTextView) activeView;
@@ -115,8 +113,6 @@ public final class KMTextView extends EditText {
           }
           showKeyboard();
         } else {
-          if (KMManager.isDebugMode())
-            Log.d("OnFocusChange", "lostFocus: " + v.toString());
           activeView = null;
           dismissKeyboard();
         }
@@ -166,8 +162,6 @@ public final class KMTextView extends EditText {
     Activity activity = (Activity) context;
     Window mainWindow = activity.getWindow();
     if (hasWindowFocus) {
-      if (KMManager.isDebugMode())
-        Log.d("onWindowFocusChanged", "gotFocus:" + mainWindow.toString());
       KMManager.KMInAppKeyboardWebViewClient.context = context;
       activeView = mainWindow.getCurrentFocus();
 
@@ -179,9 +173,6 @@ public final class KMTextView extends EditText {
       }
 
       if (activeView != null && activeView.equals(this)) {
-        if (KMManager.isDebugMode()) {
-          Log.d("onWindowFocusChanged", "activeView = " + activeView.toString());
-        }
         if (KMManager.InAppKeyboardLoaded) {
           KMTextView textView = (KMTextView) activeView;
           int selStart = textView.getSelectionStart();
@@ -193,10 +184,6 @@ public final class KMTextView extends EditText {
         if (keyboardVisible) {
           showKeyboard();
         }
-      }
-    } else {
-      if (KMManager.isDebugMode()) {
-        Log.d("onWindowFocusChanged", "lostFocus:" + mainWindow.toString());
       }
     }
   }
@@ -291,8 +278,6 @@ public final class KMTextView extends EditText {
     mainLayout.requestLayout();
     mainLayout.invalidate();
 
-    if (KMManager.isDebugMode())
-      Log.d("showKeyboard()", "Keyboard shown");
     KeyboardEventHandler.notifyListeners(kbEventListeners, KeyboardType.KEYBOARD_TYPE_INAPP, EventType.KEYBOARD_SHOWN, null);
   }
 
@@ -308,8 +293,6 @@ public final class KMTextView extends EditText {
     keyboardLayout.setEnabled(false);
     keyboardVisible = false;
 
-    if (KMManager.isDebugMode())
-      Log.d("dismissKeyboard()", "Keyboard dismissed");
     KeyboardEventHandler.notifyListeners(kbEventListeners, KeyboardType.KEYBOARD_TYPE_INAPP, EventType.KEYBOARD_DISMISSED, null);
   }
 

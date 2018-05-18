@@ -144,6 +144,8 @@
                     <Component><File Id="xml_icon32_plus.gif" Name="icon32_plus.gif" KeyPath="yes" /></Component>
                     <Component><File Id="xml_project.js" Name="project.js"  KeyPath="yes" /></Component>
                     <Component><File Id="xml_project.css" Name="project.css"  KeyPath="yes" /></Component>
+                    <Component><File Id="xml_icon32_kvks.png" Name="icon32_kvks.png"  KeyPath="yes" /></Component>
+                    <Component><File Id="xml_icon_kvks.png" Name="icon_kvks.png"  KeyPath="yes" /></Component>
 
                 </Directory>
 
@@ -400,6 +402,8 @@
       <ComponentRef Id="xml_icon32_plus.gif"/>
       <ComponentRef Id="xml_project.js"/>
       <ComponentRef Id="xml_project.css"/>
+      <ComponentRef Id="xml_icon32_kvks.png"/>
+      <ComponentRef Id="xml_icon_kvks.png"/>
 
       <ComponentRef Id='xml_kmw_resource_keymanweb.js'/>
       <ComponentRef Id='xml_kmw_resource_kmwuibutton.js'/>
