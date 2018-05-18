@@ -28,7 +28,7 @@ Note: _If you need to type anything (e.g., to take notes) during the testing pro
 
 1. Activate PowerPoint.
 2. Ensure that your system volume is turned up load enough for you to be able to hear system sounds.
-3. _Optionally_, start Console and filter to show all messages from the **TestUInput** process.
+3. _Optionally_, start Console and filter to show all messages from the **TestInput** process.
 4. With **TestInput** selected as the active input source, drop down the input menu.
 5. Select **Static Top-level Menu**. Nothing happens. _The expected result is that the "Hero" sound should be played and **Menu clicked - tag: 1** should be output to the Console log._
 6. Drop down the input menu again, point to **Static Drop-down Menu**, and then click **Static Submenu**. Nothing happens. _The expected result is that the "Glass" sound should be played and **Menu clicked - tag: 10** should be output to the Console log._

@@ -43,7 +43,7 @@ Steps to reproduce:
 1. Activate InDesign.
 2. For this test, it doesn't seem to matter what the context is in InDesign. We have tested on a blank page, in a text box, the **Get Started** welcome screen, and with the insertion point in a text box on the formatting toolbar.
 3. Ensure that your system volume is turned up load enough for you to be able to hear system sounds.
-4. _Optionally_, start Console and filter to show all messages from the **TestUInput** process.
+4. _Optionally_, start Console and filter to show all messages from the **TestInput** process.
 5. With **TestInput** selected as the active input source, drop down the input menu.
 6. Select **Static Top-level Menu**. You should hear the _"Hero"_ sound. In the Console log, **Menu clicked - tag: 1** should appear.
 7. Drop down the input menu again, point to **Static Drop-down Menu**, and then click **Static Submenu**. Nothing happens. _The expected result is that the "Glass" sound should be played and **Menu clicked - tag: 10** should be output to the Console log._
@@ -55,7 +55,7 @@ Steps to reproduce:
 Steps to reproduce:
 
 1. Activate InDesign.
-2. _Optionally_, in Console filter to show all messages from the **TestUInput** process and containing the text _Attempting_.
+2. _Optionally_, in Console filter to show all messages from the **TestInput** process and containing the text _Attempting_.
 3. In a text box, press the **~** key on the keyboard. A _t_ will be inserted. In the Console log, **Attempting to insert characters 'tilde' using insertText with undefined (default) replacement range.** should appear. _The expected result is that the entire word **tilde** should be inserted._
 4. For reference, perform step 3 in another program or even in the Font Name control on the formatting toolbar in InDesign to observe the expected behavior.
 
@@ -70,7 +70,7 @@ Note that although IMKTextInput is not properly documented on developer.apple.co
 Steps to reproduce:
 
 1. Activate InDesign.
-2. _Optionally_, in Console filter to show all messages from the **TestUInput** process.
+2. _Optionally_, in Console filter to show all messages from the **TestInput** process.
 3. In a text box, type **abc**
 4. Press the **$** key on the keyboard. A _#_ will be appended to the existing text, giving **abc#**. _The expected result is that the final **c** should be deleted, leaving **ab**._
 5. For reference, perform steps 2-3 in another program or even in the Font Name control on the formatting toolbar in InDesign to observe the expected behavior.
@@ -100,7 +100,7 @@ Keyman has a "legacy" mode it can use when working with some programs that fail 
 Steps to reproduce:
 
 1. Activate InDesign.
-2. _Optionally_, in Console filter to show all messages from the **TestUInput** process.
+2. _Optionally_, in Console filter to show all messages from the **TestInput** process.
 3. In a text box, type **abc**
 4. Press the **9** key on the keyboard. The _bc_ will be deleted, leaving just **a**. _The expected result is that the **bc** should be replaced with **xyz*, leaving **axyz**._
 5. For reference, perform steps 2-3 in another program or even in the Font Name control on the formatting toolbar in InDesign to observe the expected behavior.
