@@ -113,7 +113,7 @@ bightml_images: dirs
 
 install:
   if not exist $(KEYMAN_SITE_ROOT)\help.keyman.com\products\desktop exit 1
-  -rd /s/q $(KEYMAN_SITE_ROOT)\help.keyman.com\products\desktop\10.0\docs
-  xcopy /s/q/y $(ROOT)\bin\help\php\desktop\* $(KEYMAN_SITE_ROOT)\help.keyman.com\products\desktop\10.0\docs\ #
+  -rd /s/q $(KEYMAN_SITE_ROOT)\help.keyman.com\products\desktop\$(KEYMAN_VERSION)\docs
+  xcopy /s/q/y $(ROOT)\bin\help\php\desktop\* $(KEYMAN_SITE_ROOT)\help.keyman.com\products\desktop\$(KEYMAN_VERSION)\docs\ #
 
 !include ..\..\Target.mak

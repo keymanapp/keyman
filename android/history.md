@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 11.0 alpha
+* Move to 11.0
+
 ## 2018-05-11 10.0.392 beta
 * Fix globe button when exiting in-app browser (#231)
 
