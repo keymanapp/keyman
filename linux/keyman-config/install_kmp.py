@@ -110,7 +110,7 @@ def install_kmp(inputfile, withkmn=False):
 						os.makedirs(kbdir)
 					copy2(fpath, kbdir)
 		else:
-			print("install_kmp.py: error: No kmp.json found in", inputfile)
+			print("install_kmp.py: error: No kmp.json or kmp.inf found in", inputfile)
 
 
 def main():
