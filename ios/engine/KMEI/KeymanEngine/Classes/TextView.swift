@@ -219,7 +219,7 @@ extension TextView: KeymanWebDelegate {
     if let viewController = viewController {
       Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
     } else {
-      Manager.shared.switchToNextKeyboard()
+      _ = Manager.shared.switchToNextKeyboard()
     }
   }
 }
