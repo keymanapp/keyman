@@ -50,6 +50,23 @@ def print_keyboards(keyboards):
 		pass
 
 def determine_filetype(filename):
+	"""
+	Determine file type of a filename in a kmp from the extension
+
+	Args:
+		filename (str): File name
+
+	Returns:
+		str: Description of file type
+			Keyboard icon
+			Keyboard source
+			Compiled keyboard
+			Compiled on screen keyboard
+			Font
+			Documentation
+			Metadata
+			Image
+	"""
 	name, ext = os.path.splitext(filename)
 	if ext == ".ico":
 		return "Keyboard icon"
@@ -92,6 +109,43 @@ def print_files(files, extracted_dir):
 		pass
 
 def parseinfdata(inffile, verbose=False):
+	"""
+	Parse the metadata in a kmp.inf file.
+
+	Args:
+		jsonfile (str): Path to kmp.inf
+		verbose (bool, default False): verbose output
+
+	Returns:
+		list[5]: info, system, options, keyboards, files
+			info (dict):
+				name (dict):
+					description (str): KMP name
+				copyright (dict):
+					description (str): KMP copyright
+				version (dict):
+					description (str): KMP version
+				author (dict):
+					description (str): KMP author
+					url (str): contact url for the author
+			system (dict): System info
+				fileVersion (str): Keyman file format version
+				keymanDeveloperVersion (str): Keyman Developer version that compiled keyboard
+			options (dict): Keyboard options
+				readmeFile (str) : README for the keyboard
+			keyboards (list): Keyboards in the kmp
+				name (str): Keyboard name
+				id (str): Keyboard ID
+				version (str): Keyboard version
+				oskFont (str, optional): Recommended on screen keyboard font
+				displayFont (str, optional): Recommended display font
+				languages (list): Languages the keyboard is used for
+					name (str): Language name
+					id (str): Language ID
+			files (list): Files in the kmp
+				name (str): File name
+				description (str): File description
+	"""
 	info = system = keyboards = files = options = nonexistent = None
 	extracted_dir = os.path.dirname(inffile)
 
@@ -172,6 +226,43 @@ def parseinfdata(inffile, verbose=False):
 	return info, system, options, keyboards, files
 
 def parsemetadata(jsonfile, verbose=False):
+	"""
+	Parse the metadata in a kmp.json file.
+
+	Args:
+		jsonfile (str): Path to kmp.json
+		verbose (bool, default False): verbose output
+
+	Returns:
+		list[5]: info, system, options, keyboards, files
+			info (dict):
+				name (dict):
+					description (str): KMP name
+				copyright (dict):
+					description (str): KMP copyright
+				version (dict):
+					description (str): KMP version
+				author (dict):
+					description (str): KMP author
+					url (str): contact url for the author
+			system (dict): System info
+				fileVersion (str): Keyman file format version
+				keymanDeveloperVersion (str): Keyman Developer version that compiled keyboard
+			options (dict): Keyboard options
+				readmeFile (str) : README for the keyboard
+			keyboards (list): Keyboards in the kmp
+				name (str): Keyboard name
+				id (str): Keyboard ID
+				version (str): Keyboard version
+				oskFont (str, optional): Recommended on screen keyboard font
+				displayFont (str, optional): Recommended display font
+				languages (list): Languages the keyboard is used for
+					name (str): Language name
+					id (str): Language ID
+			files (list): Files in the kmp
+				name (str): File name
+				description (str): File description
+	"""
 	info = system = keyboards = files = options = nonexistent = None
 	extracted_dir = os.path.dirname(jsonfile)
 

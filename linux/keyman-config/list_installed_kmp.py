@@ -6,6 +6,20 @@ from kmpmetadata import parsemetadata
 from get_kmp import get_keyboard_data
 
 def get_installed_kmp():
+    """
+    Get list of installed keyboards.
+
+    Returns:
+        list: Installed keyboards
+            dict: Keyboard
+                id (str): Keyboard ID
+                name (str): Keyboard name
+                kmpname (str): Keyboard name in local 
+                version (str): Keyboard version
+                kmpversion (str):
+                path (str): base path where keyboard is installed
+                description (str): Keyboard description
+    """
     installed_keyboards = {}
     check_paths = [ "/usr/share/keyman", "/usr/local/share/keyman" ]
     for keymanpath in check_paths:
@@ -37,6 +51,15 @@ def get_installed_kmp():
 
 
 def get_kmp_version(keyboardid):
+    """
+    Get version of the kmp for a keyboard ID.
+
+    Args:
+        keyboardid (dict): Keyboard ID
+    Returns:
+        str: kmp version if keyboard ID is installed
+        None: if not found
+    """
     installed_kmp = get_installed_kmp()
     if keyboardid in installed_kmp:
         return installed_kmp[keyboardid]['version']

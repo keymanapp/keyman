@@ -5,6 +5,12 @@ import os.path
 from shutil import rmtree
 
 def uninstall_kmp(keyboardid):
+	"""
+	Uninstall a kmp from /usr/local/share/keyman
+
+	Args:
+		keyboardid (str): Keyboard ID
+	"""
 	kbdir = os.path.join('/usr/local/share/keyman', keyboardid)
 	if not os.path.isdir(kbdir):
 		print("Keyboard directory for", keyboardid, "does not exist. Aborting")
