@@ -44,7 +44,13 @@ def install_kmp(inputfile, withkmn=False):
 		print('created temporary directory', tmpdirname)
 		info, system, options, keyboards, files = get_metadata(inputfile, tmpdirname)
 		if not keyboards:
+			# no json file so trying inf file
 			info, system, options, keyboards, files = get_infdata(inputfile, tmpdirname)
+		if files and not keyboards:
+			#inf file may not have keyboards so generate it if needed
+			keyboards = [ { 'name' : info['name']['description'],
+				'id' : os.path.basename(os.path.splitext(inputfile)[0]),
+				'version' : info['version']['description'] } ]
 		if keyboards:
 			kbid = keyboards[0]['id']
 			print("Installing", info['name']['description'])
@@ -111,6 +117,9 @@ def install_kmp(inputfile, withkmn=False):
 					copy2(fpath, kbdir)
 		else:
 			print("install_kmp.py: error: No kmp.json or kmp.inf found in", inputfile)
+			print("Contents of", inputfile+":")
+			for o in os.listdir(tmpdirname):
+				print(o)
 
 
 def main():
