@@ -2,7 +2,7 @@
 
 import os
 import json
-from kmpmetadata import parsemetadata
+from kmpmetadata import parsemetadata, parseinfdata
 from get_kmp import get_keyboard_data
 
 def get_installed_kmp():
@@ -25,8 +25,10 @@ def get_installed_kmp():
     for keymanpath in check_paths:
         for o in os.listdir(keymanpath):
             if os.path.isdir(os.path.join(keymanpath,o)):
-                metadata = parsemetadata(os.path.join(keymanpath, o, "kmp.json"))
                 name = md_name = version = md_version = description = kbdata = None
+                metadata = parsemetadata(os.path.join(keymanpath, o, "kmp.json"))
+                if not metadata[0]:
+                    metadata = parseinfdata(os.path.join(keymanpath, o, "kmp.inf"))
                 kbjson = os.path.join(keymanpath, o, o + ".json")
                 if os.path.isfile(kbjson):
                     with open(kbjson, "r") as read_file:
@@ -38,7 +40,7 @@ def get_installed_kmp():
                         description = kbdata['description']
                     version = kbdata['version']
                     name = kbdata['name']
-                if metadata:
+                if metadata[0]:
                     info = metadata[0]
                     md_version = info['version']['description']
                     md_name = info['name']['description']

@@ -3,12 +3,17 @@
 import tempfile
 from keymankeyboards import get_api_keyboards
 from get_kmp import get_keyboard_data, get_kmp_file
-from install_kmp import get_metadata
+from install_kmp import get_metadata, get_infdata
 
 def main():
 	keyboarddata = get_api_keyboards()
 	if keyboarddata:
-		with open('./nokmp.txt', 'wt') as nokmp, open('./nojson.txt', 'wt') as nojson, open('./nodata.txt', 'wt') as nodata, open('./goodkmp.txt', 'wt') as goodkmp:
+		with open('./nokmp.txt', 'wt') as nokmp, \
+			open('./infnokeyboard.txt', 'wt') as infnokeyboard, \
+			open('./brokeninf.txt', 'wt') as brokeninf, \
+			open('./nodata.txt', 'wt') as nodata, \
+			open('./goodjsonkmp.txt', 'wt') as goodjsonkmp, \
+			open('./goodinfkmp.txt', 'wt') as goodinfkmp:
 			for kb in keyboarddata['keyboard']:
 				kbdata = get_keyboard_data(kb['id'])
 				print(kb['id'])
@@ -18,9 +23,15 @@ def main():
 						with tempfile.TemporaryDirectory() as tmpdirname:
 							info, system, options, keyboards, files = get_metadata(kmpfile, tmpdirname)
 							if keyboards:
-								print("Keyboard:", kb['id'], "has kmp", kbdata['packageFilename'], "with kmp.json", file=goodkmp)
+								print("Keyboard:", kb['id'], "has kmp", kbdata['packageFilename'], "with kmp.json", file=goodjsonkmp)
 							else:
-								print("Keyboard:", kb['id'], "has kmp", kbdata['packageFilename'], "but no kmp.json", file=nojson)
+								info, system, options, keyboards, files = get_infdata(kmpfile, tmpdirname)
+								if keyboards:
+									print("Keyboard:", kb['id'], "has kmp", kbdata['packageFilename'], "with kmp.inf", file=goodinfkmp)
+								elif files:
+									print("Keyboard:", kb['id'], "has kmp", kbdata['packageFilename'], "with kmp.inf but it has no Keyboard", file=infnokeyboard)
+								else:
+									print("Keyboard:", kb['id'], "has kmp", kbdata['packageFilename'], "but no kmp.json and no or broken kmp.inf", file=brokeninf)
 					else:
 						print("Keyboard:", kb['id'], "does not have kmp", file=nokmp)
 				else:

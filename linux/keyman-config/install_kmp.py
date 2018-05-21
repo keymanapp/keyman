@@ -18,6 +18,17 @@ def list_files(directory, extension):
 	return (f for f in listdir(directory) if f.endswith('.' + extension))
 
 def get_metadata(inputfile, tmpdirname):
+	"""
+	Get metadata from kmp.json if it exists.
+
+	Args:
+		inputfile (str): path to kmp file
+		tmpdirname(str): temp directory to extract kmp
+
+	Returns:
+		list[5]: info, system, options, keyboards, files
+			see kmpmetadata.parsemetadata for details
+	"""
 	with zipfile.ZipFile(inputfile,"r") as zip_ref:
 		zip_ref.extractall(tmpdirname)
 #		jsonfiles = list_files(tmpdirname, "json")
@@ -30,6 +41,17 @@ def get_metadata(inputfile, tmpdirname):
 			return None, None, None, None, None
 
 def get_infdata(inputfile, tmpdirname):
+	"""
+	Get metadata from kmp.inf if it exists.
+
+	Args:
+		inputfile (str): path to kmp file
+		tmpdirname(str): temp directory to extract kmp
+
+	Returns:
+		list[5]: info, system, options, keyboards, files
+			see kmpmetadata.parseinfdata for details
+	"""
 	with zipfile.ZipFile(inputfile,"r") as zip_ref:
 		zip_ref.extractall(tmpdirname)
 		kmpinf = os.path.join(tmpdirname, "kmp.inf")
@@ -39,6 +61,13 @@ def get_infdata(inputfile, tmpdirname):
 			return None, None, None, None, None
 
 def install_kmp(inputfile, withkmn=False):
+	"""
+	Install a kmp file to /usr/local/share/keyman
+
+	Args:
+		inputfile (str): path to kmp file
+		withkmn(bool, default=False): whether to attempt to get a source kmn for the keyboard
+	"""
 	# create a temporary directory using the context manager
 	with tempfile.TemporaryDirectory() as tmpdirname:
 		print('created temporary directory', tmpdirname)
@@ -87,8 +116,7 @@ def install_kmp(inputfile, withkmn=False):
 								os.makedirs(kbdir)
 							copy2(downloadfile, kbdir)
 						else:
-							print("install_kmp.py: error: no kmn source file so not installing")
-							exit(4)
+							print("install_kmp.py: warning: no kmn source file for", kbid)
 					if not os.path.isdir(kbdir):
 							os.makedirs(kbdir)
 					with open(os.path.join(kbdir, kbid + '.json'), 'w') as outfile:
@@ -110,7 +138,7 @@ def install_kmp(inputfile, withkmn=False):
 					if not os.path.isdir(kbfontdir):
 						os.makedirs(kbfontdir)
 					copy2(fpath, kbfontdir)
-				elif ftype == "Metadata" or ftype == "Image" or ftype == "Keyboard icon"  or ftype == "Keyboard icon" or ftype == "Compiled keyboard" or ftype == "Compiled on screen keyboard":
+				elif ftype == "Metadata" or ftype == "Image" or ftype == "Keyboard icon"  or ftype == "Keyboard source" or ftype == "Keyboard icon" or ftype == "Compiled keyboard" or ftype == "Compiled on screen keyboard":
 					print("Installing", f['name'], "as keyman file")
 					if not os.path.isdir(kbdir):
 						os.makedirs(kbdir)

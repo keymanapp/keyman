@@ -23,6 +23,15 @@ import requests_cache
 import os
 
 def get_api_keyboards(verbose=False):
+	"""
+	Get Keyboards data from web api.
+
+	Args:
+		verbose(bool, default False): verbose output
+	Returns:
+		dict: Keyboard data
+		None: if http request not successful
+	"""
 	api_url = "https://api.keyman.com/cloud/4.0/keyboards"
 	headers = {'Content-Type': 'application/json',
 		'Accept-Encoding': 'gzip, deflate, br'}

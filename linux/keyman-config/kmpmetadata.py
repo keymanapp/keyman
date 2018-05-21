@@ -149,79 +149,106 @@ def parseinfdata(inffile, verbose=False):
 	info = system = keyboards = files = options = nonexistent = None
 	extracted_dir = os.path.dirname(inffile)
 
-	config = configparser.ConfigParser()
-	config.optionxform = str
-	print("reading file", inffile, "dir:", extracted_dir)
+	if os.path.isfile(inffile):
+		config = configparser.ConfigParser()
+		config.optionxform = str
+		if verbose:
+			print("reading file", inffile, "dir:", extracted_dir)
 
-	with open(inffile, 'r', encoding='latin_1') as f:
-		config.read_file(f)
+		with open(inffile, 'r', encoding='latin_1') as f:
+			config.read_file(f)
 
-	for section in config.sections():
-		if section == 'Info':
-			info = {}
-			for item in config.items('Info'):
-				if item[0] == 'Name':
-					info['name'] = { 'description' : item[1].split("\"")[1] }
-				elif item[0] == 'Copyright':
-					info['copyright'] = { 'description' : item[1].split("\"")[1] }
-				elif item[0] == 'Version':
-					info['version'] = { 'description' : item[1].split("\"")[1] }
-				elif item[0] == 'Author':
-					info['author'] = { 'description' : item[1].split("\"")[1], 'url' : item[1].split("\"")[3] }
-				else:
-					print("Unknown item in Info:", item[0])
-		elif section == 'Package':
-			system = {}
-			options = {}
-			for item in config.items('Package'):
-				if item[0] == 'Version':
-					system['fileVersion'] = item[1]
-				elif item[0] == 'ReadMeFile':
-					options['readmeFile'] = item[1]
-				else:
-					print("Unknown item in Package:", item[0])
-			system['keymanDeveloperVersion'] = ""
-		elif "Keyboard" in section:
-			keyboards = []
-			keyboard = {}
-			languages = []
-			for item in config.items(section):
-				if item[0] == 'Name':
-					keyboard['name'] = item[1]
-				elif item[0] == 'ID':
-					keyboard['id'] = item[1]
-				elif item[0] == 'Version':
-					keyboard['version'] = item[1]
-				elif item[0] == 'OSKFont':
-					keyboard['oskFont'] = item[1]
-				elif item[0] == 'DisplayFont':
-					keyboard['displayFont'] = item[1]
-				elif "Language" in item[0]:
-					langname, langid = item[1].split(",")
-					languages.append({ 'name' : langname, 'id' : langid })
-				else:
-					print("Unknown item in keyboard:", item[0])
-			keyboard['languages'] = languages
-			keyboards.append(keyboard)
-		elif section == "Files":
-			files = []
-			for item in config.items(section):
-				splititem = item[1].split("\"")
-				kbfile = { 'name' : splititem[3], 'description' : splititem[1] }
-				files.append(kbfile)
+		for section in config.sections():
+			if section == 'Info':
+				info = {}
+				for item in config.items('Info'):
+					if item[0] == 'Name' or item[0] == 'name':
+						info['name'] = { 'description' : item[1].split("\"")[1] }
+					elif item[0] == 'Copyright' or item[0] == 'copyright':
+						info['copyright'] = { 'description' : item[1].split("\"")[1] }
+					elif item[0] == 'Version':
+						info['version'] = { 'description' : item[1].split("\"")[1] }
+					elif item[0] == 'Author':
+						info['author'] = { 'description' : item[1].split("\"")[1], 'url' : item[1].split("\"")[3] }
+					elif item[0] == "WebSite":
+						pass
+					else:
+						print("Unknown item in Info:", item[0])
+			if section == 'PackageInfo':
+				info = {}
+				info['version'] = { 'description' : "1.0" }
+				for item in config.items('PackageInfo'):
+					if item[0] == 'Name' or item[0] == 'name':
+						info['name'] = { 'description' : item[1].split("\"")[1] }
+					elif item[0] == 'Copyright' or item[0] == 'copyright':
+						info['copyright'] = { 'description' : item[1].split("\"")[1] }
+					elif item[0] == 'Version':
+						info['version'] = { 'description' : item[1].split("\"")[1] }
+					elif item[0] == 'Author':
+						info['author'] = { 'description' : item[1].split("\"")[1], 'url' : item[1].split("\"")[3] }
+					elif item[0] == "WebSite":
+						pass
+					else:
+						print("Unknown item in Info:", item[0])
+			elif section == 'Package':
+				system = {}
+				options = {}
+				for item in config.items('Package'):
+					if item[0] == 'Version':
+						system['fileVersion'] = item[1]
+					elif item[0] == 'ReadMeFile':
+						options['readmeFile'] = item[1]
+					elif item[0] == 'ExecuteProgram':
+						pass
+					else:
+						print("Unknown item in Package:", item[0])
+				system['keymanDeveloperVersion'] = ""
+			elif "Keyboard" in section:
+				keyboards = []
+				keyboard = {}
+				languages = []
+				for item in config.items(section):
+					if item[0] == 'Name':
+						keyboard['name'] = item[1]
+					elif item[0] == 'ID':
+						keyboard['id'] = item[1]
+					elif item[0] == 'Version':
+						keyboard['version'] = item[1]
+					elif item[0] == 'OSKFont':
+						keyboard['oskFont'] = item[1]
+					elif item[0] == 'DisplayFont':
+						keyboard['displayFont'] = item[1]
+					elif "Language" in item[0]:
+						langname, langid = item[1].split(",")
+						languages.append({ 'name' : langname, 'id' : langid })
+					else:
+						print("Unknown item in keyboard:", item[0])
+				keyboard['languages'] = languages
+				keyboards.append(keyboard)
+			elif section == "Files":
+				files = []
+				for item in config.items(section):
+					splititem = item[1].split("\"")
+					kbfile = { 'name' : splititem[3], 'description' : splititem[1] }
+					files.append(kbfile)
+			elif section == "InstallFiles":
+				files = []
+				for item in config.items(section):
+					kbfile = { 'name' : item[0], 'description' : item[1] }
+					files.append(kbfile)
 
-	if verbose:
-		# print(config.sections())
-		# print(config.items('Info'))
-		# print(config.items('Keyboard0'))
-		# print(config.items('Files'))
-		# print(config.items('Package'))
-		# print(config.items('StartMenu'))
-		print_info(info)
-		print_system(system)
-		print_options(options)
-		print_keyboards(keyboards)
-		print_files(files, extracted_dir)
+		if verbose:
+			# print(config.sections())
+			# print(config.items('Info'))
+			# print(config.items('Keyboard0'))
+			# print(config.items('Files'))
+			# print(config.items('Package'))
+			# print(config.items('StartMenu'))
+			print_info(info)
+			print_system(system)
+			print_options(options)
+			print_keyboards(keyboards)
+			print_files(files, extracted_dir)
 
 	return info, system, options, keyboards, files
 
@@ -266,32 +293,33 @@ def parsemetadata(jsonfile, verbose=False):
 	info = system = keyboards = files = options = nonexistent = None
 	extracted_dir = os.path.dirname(jsonfile)
 
-	with open(jsonfile, "r") as read_file:
-		data = json.load(read_file)
-		for x in data:
-#			print("%s: %s" % (x, data[x]))
-			if x == 'info':
-				info = data[x]
-			elif x == 'system':
-				system = data[x]
-			elif x == 'keyboards':
-				keyboards = data[x]
-			elif x == 'files':
-				files = data[x]
-			elif x == 'options':
-				options = data[x]
-			elif x == 'nonexistent':
-				nonexistent = data[x]
-		if nonexistent != None:
-			print("This should not happen")
-		if verbose:
-			print_info(info)
-			print_system(system)
-			if options:
-				print_options(options)
-			print_keyboards(keyboards)
-			print_files(files, extracted_dir)
-		return info, system, options, keyboards, files
+	if os.path.isfile(jsonfile):
+		with open(jsonfile, "r") as read_file:
+			data = json.load(read_file)
+			for x in data:
+	#			print("%s: %s" % (x, data[x]))
+				if x == 'info':
+					info = data[x]
+				elif x == 'system':
+					system = data[x]
+				elif x == 'keyboards':
+					keyboards = data[x]
+				elif x == 'files':
+					files = data[x]
+				elif x == 'options':
+					options = data[x]
+				elif x == 'nonexistent':
+					nonexistent = data[x]
+			if nonexistent != None:
+				print("This should not happen")
+			if verbose:
+				print_info(info)
+				print_system(system)
+				if options:
+					print_options(options)
+				print_keyboards(keyboards)
+				print_files(files, extracted_dir)
+	return info, system, options, keyboards, files
 
 def main(argv):
 	if len(sys.argv) != 2:
