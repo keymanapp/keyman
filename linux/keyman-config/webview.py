@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import os
+import webbrowser
 import urllib.parse
 import pathlib
 import gi
@@ -26,25 +27,19 @@ def process_kmp(view, url, downloadfile, verbose=False):
     return False
 
 def check(view, frame, req, nav, policy):
-    #print("navigation policy check")
     uri = req.get_uri()
-    #print("requested uri:", uri)
     parsed = urllib.parse.urlparse(uri)
-    #print(parsed)
     if parsed.scheme == "keyman":
-        #print("Keyman scheme")
-        #print(parsed)
-        #print(policy)
         if parsed.path == "download":
-            #print("downloading kmp")
             qs = urllib.parse.parse_qs(parsed.query)
-            #qs['url']
             downloadfile = os.path.join(get_download_folder(), qs['filename'][0])
-            #print(qs)
             if process_kmp(view, qs['url'][0], downloadfile, True):
                 policy.ignore()
                 return True
-    #view.get_uri()
+        elif parsed.path == "link":
+            qs = urllib.parse.parse_qs(parsed.query)
+            webbrowser.open(qs['url'][0])
+            return True
     return False
 
 
