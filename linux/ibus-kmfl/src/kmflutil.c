@@ -5,19 +5,23 @@
  *
  * Copyright (C) 2009 SIL International
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  *
  */
 
@@ -278,6 +282,94 @@ void kinput_close_im(KInputMethod * im)
     kmfl_free_keyboard_info(im);
     kmfl_unload_keyboard(im->keyboard_number);
     g_free(im);
+}
+
+void output_string(void *contrack, char *ptr) {
+    KInputContext * ic = (KInputContext *)contrack;
+    g_debug("DAR: output_string - ic->cmds=%p", ic->cmds);
+    if (ptr) {
+        Cmd * cmd = g_new(Cmd, 1);
+        cmd->opcode=OUTPUT_STRING;
+        cmd->cmdarg=g_strdup(ptr);
+        ic->cmds = g_list_append(ic->cmds, cmd);
+    }
+}
+
+void erase_char(void *contrack) {
+    KInputContext * ic = (KInputContext *)contrack;
+    g_debug("DAR: erase_char - ic->cmds=%p", ic->cmds);
+    Cmd * cmd = g_new(Cmd, 1);
+    cmd->opcode = ERASE_CHAR;
+    cmd->cmdarg=NULL;
+    ic->cmds = g_list_append(ic->cmds, cmd);
+}
+
+void output_char(void *contrack, unsigned char byte) {
+    if (byte == 8) {
+        erase_char(contrack);
+    } else {
+        char s[2];
+        s[0] = byte;
+        s[1] = '\0';
+        output_string(contrack, s);
+    }
+}
+
+void forward_keyevent(void *contrack, unsigned int key, unsigned int state)
+{
+
+}
+
+void output_beep(void *contrack) {
+    KInputContext * ic = (KInputContext *)contrack;
+    Cmd * cmd = g_new(Cmd, 1);
+    cmd->opcode = OUTPUT_BEEP;
+    cmd->cmdarg=NULL;
+    ic->cmds = g_list_append(ic->cmds, cmd);    
+}
+
+
+/*
+ * Create an input context
+ */
+KInputContext *
+kmfl_create_ic(KInputMethod *im)
+{
+    KInputContext * ic;
+    g_debug("DAR: kmfl_create_ic");
+    ic = g_new(KInputContext, 1);
+    ic->cmds = NULL;
+    ic->p_kmsi=kmfl_make_keyboard_instance(ic);
+    kmfl_attach_keyboard(ic->p_kmsi, im->keyboard_number);
+
+    return ic;
+}
+
+
+/*
+ * Destroy an input context
+ */
+void
+kmfl_destroy_ic(KInputContext *ic)
+{
+    GList * p;
+    g_debug("DAR: kmfl_destroy_ic");
+    kmfl_detach_keyboard(ic->p_kmsi);
+    kmfl_delete_keyboard_instance(ic->p_kmsi);
+    
+    if (ic->cmds) {
+        for (p=ic->cmds; p != NULL; p = p->next) {
+            Cmd * cmd = (Cmd *)p->data;
+            if (cmd) {
+                if (cmd->cmdarg)
+                    g_free(cmd->cmdarg);
+                g_free(cmd);
+            }
+        }
+        g_list_free(ic->cmds);
+        ic->cmds=NULL;
+    }
+    
 }
 
 #ifdef DEBUG
