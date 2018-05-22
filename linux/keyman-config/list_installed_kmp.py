@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import argparse
 import os
 import json
 from kmpmetadata import parsemetadata, parseinfdata
@@ -14,7 +15,7 @@ def get_installed_kmp():
             dict: Keyboard
                 id (str): Keyboard ID
                 name (str): Keyboard name
-                kmpname (str): Keyboard name in local 
+                kmpname (str): Keyboard name in local
                 version (str): Keyboard version
                 kmpversion (str):
                 path (str): base path where keyboard is installed
@@ -49,7 +50,7 @@ def get_installed_kmp():
                     name = md_name
 
                 installed_keyboards[o] = { "id" : o, "name" : name, "kmpname" : md_name, "version" : version, "kmpversion" : md_version, "path" : keymanpath, "description" : description}
-    return installed_keyboards    
+    return installed_keyboards
 
 
 def get_kmp_version(keyboardid):
@@ -70,22 +71,28 @@ def get_kmp_version(keyboardid):
 
 
 def main():
+    parser = argparse.ArgumentParser(description='Show installed keyman keyboards.')
+    parser.add_argument('-s', "--short", help='short format', action="store_true")
+
+    args = parser.parse_args()
+
     installed_kmp = get_installed_kmp()
 #    print(installed_kmp)
 #    print(sorted(installed_kmp))
     print("--- Installed keyboards ---")
     for kmp in sorted(installed_kmp):
         print(installed_kmp[kmp]['name'] + ", version:", installed_kmp[kmp]['version'] + ", id:", kmp)
-        if installed_kmp[kmp]['version'] != installed_kmp[kmp]['kmpversion']:
-            print("Version mismatch. Installed keyboard is %s. Website says it is %s." % (installed_kmp[kmp]['kmpversion'], installed_kmp[kmp]['version']))
-        if installed_kmp[kmp]['name'] != installed_kmp[kmp]['kmpname']:
-            print("Name mismatch. Installed keyboard is %s. Website says it is %s." % (installed_kmp[kmp]['name'], installed_kmp[kmp]['kmpname']))
+        if not args.short:
+            if installed_kmp[kmp]['version'] != installed_kmp[kmp]['kmpversion']:
+                print("Version mismatch. Installed keyboard is %s. Website says it is %s." % (installed_kmp[kmp]['kmpversion'], installed_kmp[kmp]['version']))
+            if installed_kmp[kmp]['name'] != installed_kmp[kmp]['kmpname']:
+                print("Name mismatch. Installed keyboard is %s. Website says it is %s." % (installed_kmp[kmp]['name'], installed_kmp[kmp]['kmpname']))
 
-        if installed_kmp[kmp]['description']:
-            print(installed_kmp[kmp]['description'])
-        else:
-            print("No description")
-        print(os.linesep)
+            if installed_kmp[kmp]['description']:
+                print(installed_kmp[kmp]['description'])
+            else:
+                print("No description")
+            print(os.linesep)
 
 
 if __name__ == "__main__":
