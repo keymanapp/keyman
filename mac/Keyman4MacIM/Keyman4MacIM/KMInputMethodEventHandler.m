@@ -279,6 +279,11 @@ NSRange _previousSelRange;
 }
 
 - (void)updateContextBufferIfNeeded:(id)client {
+    // REVIEW: if self.AppDelegate.lowLevelEventTap == nil under what circumstances might we be able to safely
+    // re-get the context? (Probably clientCanProvideSelectionInfo would need to be true, and it would only
+    // actually be useful if client respondsToSelector:@selector(attributedSubstringFromRange:), but even then
+    // we'd only want to do it if we have actually moved from our previous location. Otherwise, we wouldn't be
+    // able to handle dead keys correctly.)
     if (self.AppDelegate.contextChangingEventDetected)
     {
         if (!_contextOutOfDate && [self.AppDelegate debugMode]) {
@@ -296,8 +301,12 @@ NSRange _previousSelRange;
     BOOL deleteBackPosted = NO;
     NSArray *actions = nil;
     if (![self willDeleteNullChar]) {
-        NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.AppDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
-        actions = [self.kme processEvent:eventWithOriginalModifierFlags];
+        if (self.AppDelegate.lowLevelEventTap != nil) {
+            NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.AppDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
+            actions = [self.kme processEvent:eventWithOriginalModifierFlags];
+        }
+        else // this probably isn't going to work so well, but as a fallback it's hopefully better than nothing.
+            actions = [self.kme processEvent:event];
         if (actions.count == 0) {
             if (_easterEggForCrashlytics != nil) {
                 NSString * kmxName = [[self.kme.kmx filePath] lastPathComponent];

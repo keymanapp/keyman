@@ -79,14 +79,15 @@ typedef enum {
                                                          forEventClass:kInternetEventClass
                                                             andEventID:kAEGetURL];
         
-        CFMachPortRef lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask | NSLeftMouseDown | NSLeftMouseUp, (CGEventTapCallBack)eventTapFunction, nil);
+        self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask | NSLeftMouseDown | NSLeftMouseUp, (CGEventTapCallBack)eventTapFunction, nil);
         
-        if (!lowLevelEventTap)
+        if (!self.lowLevelEventTap) {
             NSLog(@"Can't tap into low level events!");
+        }
         else
-            CFRelease(lowLevelEventTap);
+            CFRelease(self.lowLevelEventTap);
         
-        CFRunLoopSourceRef runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, lowLevelEventTap, 0);
+        CFRunLoopSourceRef runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, self.lowLevelEventTap, 0);
         
         CFRunLoopRef runLoop = CFRunLoopGetCurrent();
         
@@ -179,8 +180,18 @@ typedef enum {
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
     KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
     if (appDelegate != nil) {
+        if (type == kCGEventTapDisabledByTimeout || type == kCGEventTapDisabledByUserInput) {
+            // REVIEW: Not sure how *user* can disable the event tap, but in that case, should we *not* try to restart it?
+            // Unfortunately, I can't find any information about how a uer can disable it.
+            NSLog(@"Event tap disabled by %@! Attempting to restart...", (type == kCGEventTapDisabledByTimeout ? @"timeout" : @"user"));
+            CGEventTapEnable(appDelegate.lowLevelEventTap, YES);
+            if (!CGEventTapIsEnabled(appDelegate.lowLevelEventTap))
+                appDelegate.lowLevelEventTap = nil;
+            return event;
+        }
+        
         NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
-        // Too many of these to be useful for most debugging sessions, but we'll keep this aound to be
+        // Too many of these to be useful for most debugging sessions, but we'll keep this around to be
         // un-commented when needed.
         //if (appDelegate.debugMode)
         //    NSLog(@"System Event: %@", sysEvent);
