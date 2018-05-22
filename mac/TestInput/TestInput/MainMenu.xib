@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
+            <connections>
+                <outlet property="delegate" destination="IUD-Tp-QJo" id="wQc-tj-K9I"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customObject id="IUD-Tp-QJo" customClass="TestInputMethodAppDelegate">
+            <connections>
+                <outlet property="_menu" destination="Jl6-bW-tTD" id="vDr-Bx-FO2"/>
+            </connections>
+        </customObject>
+        <menu id="Jl6-bW-tTD">
+            <items>
+                <menuItem title="Static Top-level Menu" tag="1" id="Gdy-IA-8vc">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem title="Static Drop-down Menu" tag="2" id="HHH-Xo-CtE">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Static Drop-down Menu" id="3ut-fD-GmX">
+                        <items>
+                            <menuItem title="Static Submenu" tag="10" id="Dn9-pk-8qJ">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Dynamic Drop-down Menu" tag="3" id="eiu-rP-9rh">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Dynamic Drop-down Menu" id="YHn-go-Woa"/>
+                </menuItem>
+            </items>
+        </menu>
+    </objects>
+</document>

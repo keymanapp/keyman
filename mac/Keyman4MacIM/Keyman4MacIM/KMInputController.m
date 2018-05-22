@@ -164,6 +164,8 @@ NSMutableArray *servers;
 - (void)menuAction:(id)sender {
     NSMenuItem *mItem = [sender objectForKey:kIMKCommandMenuItemName];
     NSInteger itag = mItem.tag;
+    if ([self.AppDelegate debugMode])
+        NSLog(@"Keyman menu clicked - tag: %lu", itag);
     if (itag == 2) {
         // Using `showConfigurationWindow` instead of `showPreferences:` because `showPreferences:` is missing in
         // High Sierra (10.13.1 - 10.13.3). See: https://bugreport.apple.com/web/?problemID=35422518
@@ -198,7 +200,10 @@ NSMutableArray *servers;
                 kvk = [[KVKFile alloc] initWithFilePath:kvkFilePath];
         }
         [self.AppDelegate setKvk:kvk];
-        [self.AppDelegate setKeyboardName:[kmxInfo objectForKey:kKMKeyboardNameKey]];
+        NSString *keyboardName = [kmxInfo objectForKey:kKMKeyboardNameKey];
+        if ([self.AppDelegate debugMode])
+            NSLog(@"Selected keyboard from menu: %@", keyboardName);
+        [self.AppDelegate setKeyboardName:keyboardName];
         [self.AppDelegate setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
         [self.AppDelegate setContextBuffer:nil];
         [self.AppDelegate setSelectedKeyboard:path];
