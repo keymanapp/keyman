@@ -1,11 +1,19 @@
 # Keyman for iPhone and iPad Version History
 
+## 2018-05-17 10.0.145 beta
+* Fixes occasional repeated characters when typing rapidly (#865)
+
 ## 2018-05-04 10.0.144 beta
 * Refactor navigation bar branding. (#802)
 
-## 2018-04-25 10.0.141 beta
+## 2018-05-04 10.0.143 beta
 * Search google when an invalid URL is entered in the address bar. (#801)
-* Fix alphabetical list to be case insensitive on new keyboard list. (#722)
+
+## 2018-05-03 10.0.142 beta
+* Supports loading of keyboard .json files which include milliseconds in date formats (#804)
+
+## 2018-05-02 10.0.141 beta
+* Fix alphabetical list to be case insensitive on new keyboard list. (#803)
 
 ## 2018-04-25 10.0.140 beta
 * Fixed lack of output for certain punctuation longpress keys. (#702)

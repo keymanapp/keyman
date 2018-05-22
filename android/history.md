@@ -10,14 +10,41 @@
 * Fix crashes from invalid package name/version (#819)
 * Clean up console log (#748)
 
+## 2018-04-30 10.0.385 beta
+* No changes to Keyman for Android (updated Keyman Web Engine, #834)
+
+## 2018-04-30 10.0.384 beta
+* No changes to Keyman for Android.
+
+## 2018-05-03 10.0.383 beta
+* No changes to Keyman for Android.
+
+## 2018-04-30 10.0.382 beta
+* No changes to Keyman for Android (updated Keyman Web Engine, #797)
+
+## 2018-04-30 10.0.381 beta
+* Fix OSK missing some keys on older Android configurations (#781)
+
 ## 2018-04-30 10.0.380 beta
-* Fix OSK missing some keys on older Android configurations (#304)
+* No changes to Keyman for Android.
 
 ## 2018-04-27 10.0.379 beta
 * Fixed app crash when cancelling Keyboard download dialog (#786)
 
+## 2018-04-25 10.0.378 beta
+* No changes to Keyman for Android (updated Keyman Web Engine, #772).
+
+## 2018-04-25 10.0.377 beta
+* No changes to Keyman for Android (updated Keyman Web Engine, #773).
+
 ## 2018-04-24 10.0.376 beta
 * Hide system OSK when resuming Keyman app. Disable text suggestions (#711)
+
+## 2018-04-12 10.0.375 beta
+* No changes to Keyman for Android.
+
+## 2018-04-12 10.0.374 beta
+* Fixes for back button in web browser (#737)
 
 ## 2018-03-22 10.0.373 beta
 * Initial beta release of Keyman for Android 10.0

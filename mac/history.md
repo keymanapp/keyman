@@ -17,6 +17,15 @@
 * Fixed configuration and download windows to enable typing (e.g., in search boxes) (#791)
 * Made hyperlinks in web-views in configuration and download windows work correctly (#709)
 
+## 2018-03-22 10.0.34 beta
+* No changes to Keyman for macOS.
+
+## 2018-03-22 10.0.33 beta
+* No changes to Keyman for macOS.
+
+## 2018-03-22 10.0.32 beta
+* No changes to Keyman for macOS.
+
 ## 2018-03-22 10.0.31 beta
 * Initial beta release of Keyman 10 for macOS
 
