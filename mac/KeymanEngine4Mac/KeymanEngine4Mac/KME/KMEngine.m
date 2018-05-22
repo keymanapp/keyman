@@ -33,6 +33,10 @@ DWORD VKMap[0x80];
 
 @implementation KMEngine
 
+NSMutableString* _easterEggForCrashlytics = nil;
+const NSString* kEasterEggText = @"Cr@shlyt!cs crash#KME";
+const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
+
 - (id)initWithKMX:(KMXFile *)kmx contextBuffer:(NSString *)ctxBuf {
     self = [super init];
     if (self) {
@@ -54,6 +58,21 @@ DWORD VKMap[0x80];
 
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging {
     self.debugMode = useVerboseLogging;
+    
+    if (useVerboseLogging) {
+        NSLog(@"KME - Turning verbose logging on");
+        // In Keyman Engine if "debugMode" is turned on (explicitly) with "English plus Spanish" as the current keyboard and you type "Cr@shlyt!cs crash#KME", it will force a simulated crash to test reporting to fabric.io.
+        NSString * kmxName = [[_kmx filePath] lastPathComponent];
+        NSLog(@"Crashlytics - KME: _kmx name = %@", kmxName);
+        if ([kmxName isEqualToString:kEasterEggKmxName]) {
+            NSLog(@"Crashlytics - KME: Preparing to detect Easter egg.");
+            _easterEggForCrashlytics = [[NSMutableString alloc] init];
+        }
+        else
+            _easterEggForCrashlytics = nil;
+    }
+    else
+        NSLog(@"KME - Turning verbose logging off");
 }
 
 - (void)setContextBuffer:(NSString *)ctxBuf {
@@ -89,6 +108,27 @@ DWORD VKMap[0x80];
     
     KMCompGroup *gp = [self.kmx.group objectAtIndex:startIndex];
     actions = [self processGroup:gp event:event];
+    
+    if (actions.count == 0 && _easterEggForCrashlytics != nil) {
+        NSUInteger len = [_easterEggForCrashlytics length];
+        NSLog(@"Crashlytics - KME: Processing character(s): %@", [event characters]);
+        if ([[event characters] characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
+            NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
+            NSLog(@"Crashlytics - KME: Adding character to Easter Egg code string: %@", characterToAdd);
+            [_easterEggForCrashlytics appendString:characterToAdd];
+            if ([_easterEggForCrashlytics isEqualToString:kEasterEggText]) {
+                NSLog(@"Crashlytics - KME: Forcing crash now!");
+                NSDecimalNumber *i = [NSDecimalNumber decimalNumberWithDecimal:[@(1) decimalValue]];
+                NSDecimalNumber *o = [NSDecimalNumber decimalNumberWithDecimal:[@(0) decimalValue]];
+                // Divide by 0 to throw an exception
+                NSDecimalNumber *x = [i decimalNumberByDividingBy:o];
+            }
+        }
+        else if (len > 0) {
+            NSLog(@"Crashlytics - KME: Clearing Easter Egg code string.");
+            [_easterEggForCrashlytics setString:@""];
+        }
+    }
     
     return [[actions mutableCopy] optimise];
 }
