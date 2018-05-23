@@ -122,6 +122,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                 NSDecimalNumber *o = [NSDecimalNumber decimalNumberWithDecimal:[@(0) decimalValue]];
                 // Divide by 0 to throw an exception
                 NSDecimalNumber *x = [i decimalNumberByDividingBy:o];
+                NSLog(@"Crashlytics - KME: You should not be seeing this line!");
             }
         }
         else if (len > 0) {
