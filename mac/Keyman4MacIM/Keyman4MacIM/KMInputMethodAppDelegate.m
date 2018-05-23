@@ -84,15 +84,16 @@ typedef enum {
         if (!self.lowLevelEventTap) {
             NSLog(@"Can't tap into low level events!");
         }
-        else
+        else {
             CFRelease(self.lowLevelEventTap);
+        }
         
-        CFRunLoopSourceRef runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, self.lowLevelEventTap, 0);
+        self.runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, self.lowLevelEventTap, 0);
         
         CFRunLoopRef runLoop = CFRunLoopGetCurrent();
         
-        if (runLoopEventSrc && runLoop) {
-            CFRunLoopAddSource(runLoop,  runLoopEventSrc, kCFRunLoopDefaultMode);
+        if (self.runLoopEventSrc && runLoop) {
+            CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
         }
     }
 
@@ -101,6 +102,7 @@ typedef enum {
 
 -(void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"NSApplicationCrashOnExceptions": @YES }];
+    [[Fabric sharedSDK] setDebug: self.debugMode];
     [Fabric with:@[[Crashlytics class]]];
 }
 
@@ -177,16 +179,57 @@ typedef enum {
     return (KMInputMethodAppDelegate *)[NSApp delegate];
 }
 
+-(void) sleep {
+    if ([self debugMode]) {
+        NSLog(@"Keyman no longer active IM.");
+    }
+    self.sleeping = YES;
+    if ([self.oskWindow.window isVisible]) {
+        if ([self debugMode]) {
+            NSLog(@"Hiding OSK.");
+        }
+        [self.oskWindow.window setIsVisible:NO];
+    }
+    if (self.lowLevelEventTap) {
+        if ([self debugMode]) {
+            NSLog(@"Disabling event tap...");
+        }
+        CGEventTapEnable(self.lowLevelEventTap, NO);
+    }
+}
+
+-(void) wakeUp {
+    self.sleeping = NO;
+    if (self.lowLevelEventTap && !CGEventTapIsEnabled(self.lowLevelEventTap)) {
+        if ([self debugMode]) {
+            NSLog(@"Keyman is now the active IM. Re-enabling event tap...");
+        }
+        CGEventTapEnable(self.lowLevelEventTap, YES);
+    }
+}
+
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
     KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
     if (appDelegate != nil) {
         if (type == kCGEventTapDisabledByTimeout || type == kCGEventTapDisabledByUserInput) {
-            // REVIEW: Not sure how *user* can disable the event tap, but in that case, should we *not* try to restart it?
-            // Unfortunately, I can't find any information about how a uer can disable it.
-            NSLog(@"Event tap disabled by %@! Attempting to restart...", (type == kCGEventTapDisabledByTimeout ? @"timeout" : @"user"));
-            CGEventTapEnable(appDelegate.lowLevelEventTap, YES);
-            if (!CGEventTapIsEnabled(appDelegate.lowLevelEventTap))
-                appDelegate.lowLevelEventTap = nil;
+            // kCGEventTapDisabledByUserInput most likely means we're "sleeping", in which case we want it to stay
+            // diabled until we get the wake-up call.
+            if (!appDelegate.sleeping) {
+                // REVIEW: We might need to consider putting in some kind of counter/flag to ensure that the very next
+                // event is not another disable so we don't end up in an endless cycle.
+                NSLog(@"Event tap disabled by %@! Attempting to restart...", (type == kCGEventTapDisabledByTimeout ? @"timeout" : @"user"));
+                CGEventTapEnable(appDelegate.lowLevelEventTap, YES);
+                if (!CGEventTapIsEnabled(appDelegate.lowLevelEventTap)) {
+                    if (appDelegate.runLoopEventSrc) { // This should always be true
+                        CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+                        if (runLoop) {
+                            CFRunLoopRemoveSource(runLoop, appDelegate.runLoopEventSrc, kCFRunLoopDefaultMode);
+                        }
+                        appDelegate.runLoopEventSrc = nil;
+                    }
+                    appDelegate.lowLevelEventTap = nil;
+                }
+            }
             return event;
         }
         

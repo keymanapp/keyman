@@ -305,8 +305,12 @@ NSRange _previousSelRange;
             NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.AppDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
             actions = [self.kme processEvent:eventWithOriginalModifierFlags];
         }
-        else // this probably isn't going to work so well, but as a fallback it's hopefully better than nothing.
+        else {
+            // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.
+            // Keyboards that depend on chirality support will not work. And command-key actions that change the
+            // context might go undetected in some apps, resulting in errant behavior for subsequent typing.
             actions = [self.kme processEvent:event];
+        }
         if (actions.count == 0) {
             if (_easterEggForCrashlytics != nil) {
                 NSString * kmxName = [[self.kme.kmx filePath] lastPathComponent];
