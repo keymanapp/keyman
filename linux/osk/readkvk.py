@@ -10,6 +10,10 @@ import sys
 # Magic   4 bytes 'KVKF'
 # Version 4 bytes 0x600
 # Flags   1 byte bitmask: [102key?, DisplayUnderlying?, UseUnderlying?, AltGr?]
+kvkk102key =              b'\x01'
+kvkkDisplayUnderlying =   b'\x02'
+kvkkUseUnderlying =       b'\x04'
+kvkkAltGr =               b'\x08'
 # AssociatedKeyboard NSTRING
 # AnsiFont NFONT
 # UnicodeFont NFONT
@@ -181,10 +185,19 @@ def get_nbitmap(file, fileContent, offset):
         #sys.exit(5)
     return bitmap, offset + struct.calcsize("<I") + bitmaplength[0]
 
-def print_kvk(kvkData):
+def print_kvk(kvkData, allkeys=False):
     print("keyboard:", kvkData.AssociatedKeyboard)
     print("version", kvkData.version)
     print("flags:", kvkData.flags)
+    if kvkData.key102:
+        print("  keyboard has 102 keys?")
+    if kvkData.DisplayUnderlying:
+        print("  keyboard displays underlying?")
+    if kvkData.UseUnderlying:
+        print("  keyboard uses underlying?")
+    if kvkData.AltGr:
+        print("  keyboard uses AltGr?")
+
     print("AnsiFont:", kvkData.AnsiFont.name)
     print("  size:", kvkData.AnsiFont.size)
     print("  colour: r:%d g:%d b:%d a:%d" % (kvkData.AnsiFont.red, kvkData.AnsiFont.green, kvkData.AnsiFont.blue, kvkData.AnsiFont.resv))
@@ -192,32 +205,33 @@ def print_kvk(kvkData):
     print("  size:", kvkData.UnicodeFont.size)
     print("  colour: r:%d g:%d b:%d a:%d" % (kvkData.UnicodeFont.red, kvkData.UnicodeFont.green, kvkData.UnicodeFont.blue, kvkData.UnicodeFont.resv))
     print("numkeys:", kvkData.KeyCount)
-    for key in kvkData.Keys:
-        print("number:", key.number)
-        #print("  flags:", key.flags)
-        if key.hasBitmap:
-            print("  key has bitmap")
-        if key.hasUnicode:
-            print("  key has unicode text")
-        #print("  shift:", key.shiftflags)
-        if key.Normal:
-            print("  normal key")
-        if key.Shift:
-            print("  shift key")
-        if key.Ctrl:
-            print("  ctrl key")
-        if key.Alt:
-            print("  alt key")
-        if key.LCtrl:
-            print("  left ctrl key")
-        if key.RCtrl:
-            print("  right ctrl key")
-        if key.LAlt:
-            print("  left alt key")
-        if key.RAlt:
-            print("  right alt key")
-        print("  vkey:", key.VKey)
-        print("  text:", key.text)
+    if allkeys:
+        for key in kvkData.Keys:
+            print("number:", key.number)
+            #print("  flags:", key.flags)
+            if key.hasBitmap:
+                print("  key has bitmap")
+            if key.hasUnicode:
+                print("  key has unicode text")
+            #print("  shift:", key.shiftflags)
+            if key.Normal:
+                print("  normal key")
+            if key.Shift:
+                print("  shift key")
+            if key.Ctrl:
+                print("  ctrl key")
+            if key.Alt:
+                print("  alt key")
+            if key.LCtrl:
+                print("  left ctrl key")
+            if key.RCtrl:
+                print("  right ctrl key")
+            if key.LAlt:
+                print("  left alt key")
+            if key.RAlt:
+                print("  right alt key")
+            print("  vkey:", key.VKey)
+            print("  text:", key.text)
 
 
 def main(argv):
@@ -249,6 +263,10 @@ def main(argv):
 #        print(kvkstart)
         kvkData.version = (kvkstart[1], kvkstart[2], kvkstart[3], kvkstart[4])
         kvkData.flags = kvkstart[5]
+        kvkData.key102 = bytecheck(kvkData.flags[0], kvkk102key)
+        kvkData.DisplayUnderlying = bytecheck(kvkData.flags[0], kvkkDisplayUnderlying)
+        kvkData.UseUnderlying = bytecheck(kvkData.flags[0], kvkkUseUnderlying)
+        kvkData.AltGr = bytecheck(kvkData.flags[0], kvkkAltGr)
         #print("version:", version)
         #print("flags:", flags)
         #print(kvk[6])
