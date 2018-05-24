@@ -10,7 +10,7 @@ If not already installed it needs python3, python3-gi
 
 ### webview.py
 
-./webview.py
+`./webview.py`
 
 This uses the keyman.com website to install kmps.
 
@@ -43,3 +43,10 @@ Command line uninstaller for kmp
 `./list_installed_kmp.py` shows name, version, id, description of each installed keyboard
 
 `./list_installed_kmp.py -s` shows name, version, id of each installed keyboard
+
+### keyman-config.py
+
+`./keyman-config.py`
+
+Prototype installer using the web api to get available languages and keyboards
+Allows you to filter available keyboards by region and language
