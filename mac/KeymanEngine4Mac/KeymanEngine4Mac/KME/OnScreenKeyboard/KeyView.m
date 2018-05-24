@@ -99,11 +99,11 @@ CGFloat r = 7.0;
     CGFloat gradientLocations[] = {0, 1};
     NSArray *gradientColors = [NSArray arrayWithObjects:(id)bgColor.CGColor, bgColor.CGColor, nil];
     CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)gradientColors, gradientLocations);
+    CGColorSpaceRelease(colorSpace);
     CGPoint startPoint = CGPointMake(CGRectGetMidX(rect), CGRectGetMinY(rect));
     CGPoint endPoint = CGPointMake(CGRectGetMidX(rect), CGRectGetMaxY(rect));
     CGContextDrawLinearGradient(context, gradient, startPoint, endPoint, 0);
     CGGradientRelease(gradient);
-    CGColorSpaceRelease(colorSpace);
 }
 
 - (BOOL)isFlipped {
@@ -143,6 +143,13 @@ CGFloat r = 7.0;
     }
 }
 
+- (void)resetLabelAndBitmap {
+    NSLog(@"DEBUG #894 - in resetLabelAndBitmap: %@", self.key.caption);
+    [self setLabelText:self.key.caption];
+    [self setBitmap:nil];
+    [self setNeedsDisplay:YES];
+}
+
 - (void)setCaptionText:(NSString *)text {
     if (_caption == nil)
         [self setHasKeyCaption:YES];
@@ -163,7 +170,7 @@ CGFloat r = 7.0;
 }
 
 - (void)setBitmap:(NSImage *)bitmap {
-    // Bitmap is disabled;
+    // Bitmap is disabled; REVIEW: Why???
     _bitmap = nil;
     /*
     _bitmap = bitmap;

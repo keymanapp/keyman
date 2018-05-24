@@ -60,11 +60,11 @@
     NSArray *gradientColors = [NSArray arrayWithObjects:(id)bgColor.CGColor, bgColor2.CGColor, nil];
     CGFloat gradientLocations[] = {0, 1};
     CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)gradientColors, gradientLocations);
+    CGColorSpaceRelease(colorSpace);
     CGPoint startPoint = CGPointMake(CGRectGetMidX(rect), CGRectGetMinY(rect));
     CGPoint endPoint = CGPointMake(CGRectGetMidX(rect), CGRectGetMaxY(rect));
     CGContextDrawLinearGradient(context, gradient, startPoint, endPoint, 0);
     CGGradientRelease(gradient);
-    CGColorSpaceRelease(colorSpace);
 }
 
 - (BOOL)isFlipped {
@@ -77,6 +77,8 @@
 }
 
 - (void)initOSKKeys {
+    if ([self subviews] && [self subviews].count)
+        NSLog(@"DEBUG #894 - initOSKKeys called with OSK that already has %lu subviews", [self subviews].count);
     CGFloat viewWidth = self.frame.size.width;
     CGFloat viewHeight = self.frame.size.height;
     CGFloat margin = 2.0;
@@ -87,6 +89,7 @@
     for (NSArray *row in self.oskLayout) {
         px = margin;
         NSUInteger len = [row count];
+        NSLog(@"DEBUG #894 - Adding row with %lu keys to OSK", len);
         for (int i = 0; i < len; i++) {
             OSKKey *key = (OSKKey *)[row objectAtIndex:i];
             CGFloat width = keyWidth * key.scale;
@@ -348,11 +351,15 @@
 - (void)resetOSK {
     [self setOskShiftState:NO];
     [self setOskAltState:NO];
-    [self.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    [self initOSKKeys];
+    [self resetAllOSKKeys];
 }
 
 - (void)resizeOSKLayout {
+    [self resetAllOSKKeys];
+}
+
+- (void)resetAllOSKKeys {
+    NSLog(@"DEBUG #894 - in resetAllOSKKeys");
     [self.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
     [self initOSKKeys];
 }
@@ -480,14 +487,17 @@
 }
 
 - (void)resetKeyLabels {
+    NSLog(@"DEBUG #894 - In resetKeyLabels");
     NSArray *views = [self subviews];
     for (NSView *view in views) {
         if (![view isKindOfClass:[KeyView class]])
             continue;
-        
-        [(KeyView *)view setKey:[(KeyView *)view key]];
-        [(KeyView *)view setBitmap:nil];
-        [(KeyView *)view setNeedsDisplay:YES];
+        KeyView * keyView = (KeyView *)view;
+        // NOTE: We used to do this: [keyView setKey:[keyView key]], which was really weird (getting the
+        // key from the view and then setting it). All we really wanted was the side-effect of setting
+        // the label back to the default (unshifted) one for the key. Now this (as well as resetting the
+        // bitmap and making sure painting happens) is handled claenly by resetLabelandBitmap.
+        [keyView resetLabelAndBitmap];
     }
 }
 
@@ -496,16 +506,9 @@
         _shiftState = shiftState;
         KeyView *shiftKeyL = (KeyView *)[self viewWithTag:MVK_LEFT_SHIFT|0x1000];
         KeyView *shiftKeyR = (KeyView *)[self viewWithTag:MVK_RIGHT_SHIFT|0x1000];
-        if (shiftState) {
-            [self setKeyLabels:YES alt:self.oskAltState ctrl:self.oskCtrlState];
-            [shiftKeyL setKeyPressed:YES];
-            [shiftKeyR setKeyPressed:YES];
-        }
-        else {
-            [self setKeyLabels:NO alt:self.oskAltState ctrl:self.oskCtrlState];
-            [shiftKeyL setKeyPressed:NO];
-            [shiftKeyR setKeyPressed:NO];
-        }
+        [self setKeyLabels:shiftState alt:self.oskAltState ctrl:self.oskCtrlState];
+        [shiftKeyL setKeyPressed:shiftState];
+        [shiftKeyR setKeyPressed:shiftState];
     }
 }
 
@@ -514,16 +517,9 @@
         _oskShiftState = oskShiftState;
         KeyView *shiftKeyL = (KeyView *)[self viewWithTag:MVK_LEFT_SHIFT|0x1000];
         KeyView *shiftKeyR = (KeyView *)[self viewWithTag:MVK_RIGHT_SHIFT|0x1000];
-        if (oskShiftState) {
-            [self setKeyLabels:YES alt:self.oskAltState ctrl:self.oskCtrlState];
-            [shiftKeyL setKeyPressed:YES];
-            [shiftKeyR setKeyPressed:YES];
-        }
-        else if (!self.shiftState) {
-            [self setKeyLabels:NO alt:self.oskAltState ctrl:self.oskCtrlState];
-            [shiftKeyL setKeyPressed:NO];
-            [shiftKeyR setKeyPressed:NO];
-        }
+        [self setKeyLabels:oskShiftState alt:self.oskAltState ctrl:self.oskCtrlState];
+        [shiftKeyL setKeyPressed:oskShiftState];
+        [shiftKeyR setKeyPressed:oskShiftState];
     }
 }
 
@@ -532,16 +528,9 @@
         _altState = altState;
         KeyView *altKeyL = (KeyView *)[self viewWithTag:MVK_LEFT_ALT|0x1000];
         KeyView *altKeyR = (KeyView *)[self viewWithTag:MVK_RIGHT_ALT|0x1000];
-        if (altState) {
-            [self setKeyLabels:self.oskShiftState alt:YES ctrl:self.oskCtrlState];
-            [altKeyL setKeyPressed:YES];
-            [altKeyR setKeyPressed:YES];
-        }
-        else {
-            [self setKeyLabels:self.oskShiftState alt:NO ctrl:self.oskCtrlState];
-            [altKeyL setKeyPressed:NO];
-            [altKeyR setKeyPressed:NO];
-        }
+        [self setKeyLabels:self.oskShiftState alt:altState ctrl:self.oskCtrlState];
+        [altKeyL setKeyPressed:altState];
+        [altKeyR setKeyPressed:altState];
     }
 }
 
@@ -550,16 +539,9 @@
         _oskAltState = oskAltState;
         KeyView *altKeyL = (KeyView *)[self viewWithTag:MVK_LEFT_ALT|0x1000];
         KeyView *altKeyR = (KeyView *)[self viewWithTag:MVK_RIGHT_ALT|0x1000];
-        if (oskAltState) {
-            [self setKeyLabels:self.oskShiftState alt:YES ctrl:self.oskCtrlState];
-            [altKeyL setKeyPressed:YES];
-            [altKeyR setKeyPressed:YES];
-        }
-        else if (!self.altState) {
-            [self setKeyLabels:self.oskShiftState alt:NO ctrl:self.oskCtrlState];
-            [altKeyL setKeyPressed:NO];
-            [altKeyR setKeyPressed:NO];
-        }
+        [self setKeyLabels:self.oskShiftState alt:oskAltState ctrl:self.oskCtrlState];
+        [altKeyL setKeyPressed:oskAltState];
+        [altKeyR setKeyPressed:oskAltState];
     }
 }
 
@@ -568,16 +550,9 @@
         _ctrlState = ctrlState;
         KeyView *ctrlKeyL = (KeyView *)[self viewWithTag:MVK_LEFT_CTRL|0x1000];
         KeyView *ctrlKeyR = (KeyView *)[self viewWithTag:MVK_RIGHT_CTRL|0x1000];
-        if (ctrlState) {
-            [self setKeyLabels:self.oskShiftState alt:self.oskAltState ctrl:YES];
-            [ctrlKeyL setKeyPressed:YES];
-            [ctrlKeyR setKeyPressed:YES];
-        }
-        else {
-            [self setKeyLabels:self.oskShiftState alt:self.oskAltState ctrl:NO];
-            [ctrlKeyL setKeyPressed:NO];
-            [ctrlKeyR setKeyPressed:NO];
-        }
+        [self setKeyLabels:self.oskShiftState alt:self.oskAltState ctrl:ctrlState];
+        [ctrlKeyL setKeyPressed:ctrlState];
+        [ctrlKeyR setKeyPressed:ctrlState];
     }
 }
 

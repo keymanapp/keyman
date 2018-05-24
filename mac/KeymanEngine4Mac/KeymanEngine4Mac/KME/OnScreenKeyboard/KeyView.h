@@ -21,5 +21,5 @@
 - (void)setLabelFont:(NSString *)fontName;
 - (void)setCaptionText:(NSString *)text;
 - (void)setCaptionFont:(NSString *)fontName;
-
+- (void)resetLabelAndBitmap;
 @end
