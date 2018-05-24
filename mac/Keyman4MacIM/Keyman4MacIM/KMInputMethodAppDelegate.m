@@ -100,7 +100,15 @@ typedef enum {
 
 -(void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"NSApplicationCrashOnExceptions": @YES }];
+    [[Fabric sharedSDK] setDebug: self.debugMode];
     [Fabric with:@[[Crashlytics class]]];
+}
+
+- (BOOL)alertShowHelp:(NSAlert *)alert {
+    NSLog(@"Crashlytics - KME: Got call to force crash from engine");
+    [[Crashlytics sharedInstance] crash];
+    NSLog(@"Crashlytics - KME: should not have gotten this far!");
+    return NO;
 }
 
 - (void)handleURLEvent:(NSAppleEventDescriptor*)event withReplyEvent:(NSAppleEventDescriptor*)replyEvent {

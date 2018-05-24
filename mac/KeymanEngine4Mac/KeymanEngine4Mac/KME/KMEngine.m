@@ -110,28 +110,46 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     actions = [self processGroup:gp event:event];
     
     if (actions.count == 0 && _easterEggForCrashlytics != nil) {
-        NSUInteger len = [_easterEggForCrashlytics length];
-        NSLog(@"Crashlytics - KME: Processing character(s): %@", [event characters]);
-        if ([[event characters] characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
-            NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
-            NSLog(@"Crashlytics - KME: Adding character to Easter Egg code string: %@", characterToAdd);
-            [_easterEggForCrashlytics appendString:characterToAdd];
-            if ([_easterEggForCrashlytics isEqualToString:kEasterEggText]) {
-                NSLog(@"Crashlytics - KME: Forcing crash now!");
-                NSDecimalNumber *i = [NSDecimalNumber decimalNumberWithDecimal:[@(1) decimalValue]];
-                NSDecimalNumber *o = [NSDecimalNumber decimalNumberWithDecimal:[@(0) decimalValue]];
-                // Divide by 0 to throw an exception
-                NSDecimalNumber *x = [i decimalNumberByDividingBy:o];
-                NSLog(@"Crashlytics - KME: You should not be seeing this line!");
-            }
-        }
-        else if (len > 0) {
-            NSLog(@"Crashlytics - KME: Clearing Easter Egg code string.");
-            [_easterEggForCrashlytics setString:@""];
-        }
+        [self processPossibleEasterEggCharacterFrom:[event characters]];
     }
     
     return [[actions mutableCopy] optimise];
+}
+
+- (void) processPossibleEasterEggCharacterFrom:(NSString *)characters {
+    NSUInteger len = [_easterEggForCrashlytics length];
+    NSLog(@"Crashlytics - KME: Processing character(s): %@", characters);
+    if ([characters length] == 1 && [characters characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
+        NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
+        NSLog(@"Crashlytics - KME: Adding character to Easter Egg code string: %@", characterToAdd);
+        [_easterEggForCrashlytics appendString:characterToAdd];
+        if ([_easterEggForCrashlytics isEqualToString:kEasterEggText]) {
+            NSLog(@"Crashlytics - KME: Forcing crash now!");
+            // Both of the following approaches do throw an exception that causes control to exit this method,
+            // but at least in my debug builds locally, neither one seems to get picked up by Crashlytics in a
+            // way that results in a new report on Fabric.io
+            
+            //#1
+            //@throw ([NSException exceptionWithName:@"CrashlyticsForce" reason:@"Easter egg hit" userInfo:nil]);
+            
+            //#2
+            //    NSDecimalNumber *i = [NSDecimalNumber decimalNumberWithDecimal:[@(1) decimalValue]];
+            //    NSDecimalNumber *o = [NSDecimalNumber decimalNumberWithDecimal:[@(0) decimalValue]];
+            //    // Divide by 0 to throw an exception
+            //    NSDecimalNumber *x = [i decimalNumberByDividingBy:o];
+            
+            //#3 The following DOES work, but it's really lame because the crash actually gets forced in the IM
+            // via this bogus call to a a protocol method implemented in the IM's App Delegate just for the
+            // purpose of enabling the englis to force a crash.
+            [(NSObject <NSAlertDelegate> *)[NSApp delegate] alertShowHelp:[NSAlert alertWithMessageText:@"Forcing an error" defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@"Forcing an Easter egg error from KME!"]];
+            
+            NSLog(@"Crashlytics - KME: You should not be seeing this line!");
+        }
+    }
+    else if (len > 0) {
+        NSLog(@"Crashlytics - KME: Clearing Easter Egg code string.");
+        [_easterEggForCrashlytics setString:@""];
+    }
 }
 
 - (NSArray *)processGroup:(KMCompGroup *)gp event:(NSEvent *)event {

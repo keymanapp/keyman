@@ -42,7 +42,7 @@ extern NSString *const kReadMeFile;
 extern NSString *const kVersion;
 extern NSString *const kWebSite;
 
-@interface KMInputMethodAppDelegate : NSObject {
+@interface KMInputMethodAppDelegate : NSObject <NSAlertDelegate> {
     IBOutlet NSMenu *_menu;
 }
 
