@@ -34,8 +34,8 @@ def get_installed_kmp():
                 if os.path.isfile(kbjson):
                     with open(kbjson, "r") as read_file:
                         kbdata = json.load(read_file)
-                else:
-                    kbdata = get_keyboard_data(o)
+#                else:
+#                    kbdata = get_keyboard_data(o)
                 if kbdata:
                     if 'description' in kbdata:
                         description = kbdata['description']

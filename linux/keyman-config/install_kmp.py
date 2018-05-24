@@ -124,6 +124,7 @@ def install_kmp(inputfile, withkmn=False):
 						print("Installing api data file", kbid + ".json", "as keyman file")
 				else:
 					print("install_kmp.py: error: cannot download keyboard data so not installing.")
+					sys.exit(5)
 
 			for f in files:
 				fpath = os.path.join(tmpdirname, f['name'])

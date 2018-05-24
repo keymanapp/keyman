@@ -17,7 +17,7 @@ def process_kmp(view, url, downloadfile, verbose=False):
     if download_kmp_file(url, downloadfile, True):
         if verbose:
             print("File downloaded")
-        install_kmp(downloadfile)
+        install_kmp(downloadfile, True)
         keyboardid = os.path.basename(os.path.splitext(downloadfile)[0])
         welcome_file = os.path.join("/usr/local/share/doc/keyman", keyboardid, "welcome.htm")
         if os.path.isfile(welcome_file):
