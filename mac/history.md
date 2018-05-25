@@ -1,7 +1,11 @@
 # Keyman for macOS Version History
 
+## 2018-05-28 10.0.40 beta
+* Prevented crashes and performance problems with "event tap" (#883)
+* Error-reporting improvements (settings modified to upload symbols for Engine (#884)
+
 ## 2018-05-17 10.0.39 beta
-* Added automatic error reporting when exceptions occur (#769)
+* Added automatic error reporting when exceptions occur (#851)
 
 ## 2018-05-09 10.0.38 beta
 * Hide the on-screen keyboard when Keyman is no longer the active input method (#770)
