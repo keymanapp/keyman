@@ -139,8 +139,8 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
             //    NSDecimalNumber *x = [i decimalNumberByDividingBy:o];
             
             //#3 The following DOES work, but it's really lame because the crash actually gets forced in the IM
-            // via this bogus call to a a protocol method implemented in the IM's App Delegate just for the
-            // purpose of enabling the englis to force a crash.
+            // via this bogus call to a protocol method implemented in the IM's App Delegate just for the
+            // purpose of enabling the engine to force a crash.
             [(NSObject <NSAlertDelegate> *)[NSApp delegate] alertShowHelp:[NSAlert alertWithMessageText:@"Forcing an error" defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@"Forcing an Easter egg error from KME!"]];
             
             NSLog(@"Crashlytics - KME: You should not be seeing this line!");
