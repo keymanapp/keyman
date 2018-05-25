@@ -280,6 +280,11 @@ NSRange _previousSelRange;
 }
 
 - (void)updateContextBufferIfNeeded:(id)client {
+    // REVIEW: if self.AppDelegate.lowLevelEventTap == nil under what circumstances might we be able to safely
+    // re-get the context? (Probably clientCanProvideSelectionInfo would need to be true, and it would only
+    // actually be useful if client respondsToSelector:@selector(attributedSubstringFromRange:), but even then
+    // we'd only want to do it if we have actually moved from our previous location. Otherwise, we wouldn't be
+    // able to handle dead keys correctly.)
     if (self.AppDelegate.contextChangingEventDetected)
     {
         if (!_contextOutOfDate && [self.AppDelegate debugMode]) {
@@ -297,8 +302,16 @@ NSRange _previousSelRange;
     BOOL deleteBackPosted = NO;
     NSArray *actions = nil;
     if (![self willDeleteNullChar]) {
-        NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.AppDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
-        actions = [self.kme processEvent:eventWithOriginalModifierFlags];
+        if (self.AppDelegate.lowLevelEventTap != nil) {
+            NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.AppDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
+            actions = [self.kme processEvent:eventWithOriginalModifierFlags];
+        }
+        else {
+            // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.
+            // Keyboards that depend on chirality support will not work. And command-key actions that change the
+            // context might go undetected in some apps, resulting in errant behavior for subsequent typing.
+            actions = [self.kme processEvent:event];
+        }
         if (actions.count == 0) {
             if (_easterEggForCrashlytics != nil) {
                 NSString * kmxName = [[self.kme.kmx filePath] lastPathComponent];
