@@ -129,8 +129,9 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
             // but at least in my debug builds locally, neither one seems to get picked up by Crashlytics in a
             // way that results in a new report on Fabric.io
             
+#ifndef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
             //#1
-            //@throw ([NSException exceptionWithName:@"CrashlyticsForce" reason:@"Easter egg hit" userInfo:nil]);
+            @throw ([NSException exceptionWithName:@"CrashlyticsForce" reason:@"Easter egg hit" userInfo:nil]);
             
             //#2
             //    NSDecimalNumber *i = [NSDecimalNumber decimalNumberWithDecimal:[@(1) decimalValue]];
@@ -138,10 +139,12 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
             //    // Divide by 0 to throw an exception
             //    NSDecimalNumber *x = [i decimalNumberByDividingBy:o];
             
+#else
             //#3 The following DOES work, but it's really lame because the crash actually gets forced in the IM
             // via this bogus call to a protocol method implemented in the IM's App Delegate just for the
             // purpose of enabling the engine to force a crash.
             [(NSObject <NSAlertDelegate> *)[NSApp delegate] alertShowHelp:[NSAlert alertWithMessageText:@"Forcing an error" defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@"Forcing an Easter egg error from KME!"]];
+#endif
             
             NSLog(@"Crashlytics - KME: You should not be seeing this line!");
         }
