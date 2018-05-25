@@ -44,7 +44,8 @@ uses
   ExtShiftState,
   kmxfile,
   kmxfileconsts,
-  UKeymanTargets;
+  UKeymanTargets,
+  utilfiletypes;
 
 {$ASSERTIONS ON}
 
@@ -317,7 +318,7 @@ const
     ssBitmap, ssVisualKeyboard, ssLayoutFile,
     ssKMW_EmbedJS, ssKMW_EmbedCSS, ssKMW_HelpFile, ssIncludeCodes);   // I4369
   KeyboardFeatureFilename: array[TKeyboardParser_FeatureID] of string = (
-    '%s.ico', '%s.kvks', '%s-layout.js',
+    '%s.ico', '%s'+Ext_VisualKeyboardSource, '%s'+Ext_KeymanTouchLayout,
     '%s-code.js', '%s.css', '%s-help.htm', '%s-codes.txt');   // I4369
   KeyboardFeatureTargets: array[TKeyboardParser_FeatureID] of TKeymanTargets = (   // I4504
     // Due to Delphi compiler limitation, need to copy the target values, can't

@@ -221,9 +221,9 @@
                     <Component><File Id='xml_file_layoutbuilder_platform.js' Name='platform.js' KeyPath="yes" /></Component>
                     <Component><File Id='xml_file_layoutbuilder_skflag.png' Name='skflag.png' KeyPath="yes" /></Component>
                     <Component><File Id='xml_file_layoutbuilder_skflags.png' Name='skflags.png' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_template_basic.js' Name='template-basic.js' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_template_latin.js' Name='template-latin.js' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_template_traditional.js' Name='template-traditional.js' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_file_layoutbuilder_template_basic.keymantouchlayout' Name='template-basic.keyman-touch-layout' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_file_layoutbuilder_template_latin.keymantouchlayout' Name='template-latin.keyman-touch-layout' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_file_layoutbuilder_template_traditional.keymantouchlayout' Name='template-traditional.keyman-touch-layout' KeyPath="yes" /></Component>
                     <Component><File Id='xml_file_layoutbuilder_phone_iphone5_landscape.png' Name='phone-iphone5-landscape.png' KeyPath="yes" /></Component>
                     <Component><File Id='xml_file_layoutbuilder_phone_iphone5_portrait.png' Name='phone-iphone5-portrait.png' KeyPath="yes" /></Component>
                     <Component><File Id='xml_file_layoutbuilder_tablet_ipad_landscape.png' Name='tablet-ipad-landscape.png' KeyPath="yes" /></Component>
@@ -450,9 +450,9 @@
       <ComponentRef Id='xml_file_layoutbuilder_platform.js'/>
       <ComponentRef Id='xml_file_layoutbuilder_skflag.png'/>
       <ComponentRef Id='xml_file_layoutbuilder_skflags.png'/>
-      <ComponentRef Id='xml_file_layoutbuilder_template_basic.js'/>
-      <ComponentRef Id='xml_file_layoutbuilder_template_latin.js'/>
-      <ComponentRef Id='xml_file_layoutbuilder_template_traditional.js'/>
+      <ComponentRef Id='xml_file_layoutbuilder_template_basic.keymantouchlayout'/>
+      <ComponentRef Id='xml_file_layoutbuilder_template_latin.keymantouchlayout'/>
+      <ComponentRef Id='xml_file_layoutbuilder_template_traditional.keymantouchlayout'/>
       <ComponentRef Id='xml_file_layoutbuilder_phone_iphone5_landscape.png'/>
       <ComponentRef Id='xml_file_layoutbuilder_phone_iphone5_portrait.png'/>
       <ComponentRef Id='xml_file_layoutbuilder_tablet_ipad_landscape.png'/>
