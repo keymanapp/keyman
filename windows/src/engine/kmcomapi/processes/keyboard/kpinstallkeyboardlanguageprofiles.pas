@@ -247,9 +247,9 @@ begin
 
     BCP47Tag := ExtractBaseBCP47Tag(BCP47Tag);
 
-    if not InstallBCP47Language(BCP47Tag) then
+    if (BCP47Tag = '') or not InstallBCP47Language(BCP47Tag) then
     begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['Could not install BCP47 language']));
+      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['Could not install BCP47 language '+BCP47Tag]));
       Exit;
     end;
 
