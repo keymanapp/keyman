@@ -163,7 +163,10 @@ CGFloat r = 7.0;
 }
 
 - (void)setBitmap:(NSImage *)bitmap {
-    // Bitmap is disabled;
+    // Bitmap is disabled: Per Marc, this is super low priority. Bitmaps are ugly and scale badly. We
+    // supported them a long time ago in Windows but you'd need to add support for Windows' BMP format
+    // to show them. I think we'd be better off not supporting them for now (just document as a platform
+    // difference).
     _bitmap = nil;
     /*
     _bitmap = bitmap;
