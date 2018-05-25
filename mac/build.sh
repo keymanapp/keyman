@@ -246,9 +246,7 @@ if $CLEAN ; then
     do_clean
 fi
 
-if [ "$TEST_ACTION" == "test" ]; then
-	carthage bootstrap
-fi
+carthage bootstrap
 
 execBuildCommand() {
     typeset component="$1"
@@ -270,9 +268,16 @@ updatePlist() {
 	    KM_COMPONENT_NAME="$2"
 		KM_PLIST="$KM_COMPONENT_BASE_PATH/$KM_COMPONENT_NAME/Info.plist"
 		if [ -f "$KM_PLIST" ]; then 
-			echo "Setting $KM_COMPONENT_NAME version to $KM_VERSION"
+			echo "Setting $KM_COMPONENT_NAME version to $KM_VERSION in $KM_PLIST"
 			/usr/libexec/Plistbuddy -c "Set CFBundleVersion $KM_VERSION" "$KM_PLIST"
 			/usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $KM_VERSION" "$KM_PLIST"
+			if [[ "$CONFIG" == "Release" && "$KM_COMPONENT_NAME" == "$IM_NAME" ]]; then
+				echo "Setting Fabric APIKey for release build in $KM_PLIST"
+				if [ "$FABRIC_API_KEY_KEYMAN4MACIM" == "" ]; then
+				    fail "FABRIC_API_KEY_KEYMAN4MACIM environment variable not set!"
+				fi
+				/usr/libexec/Plistbuddy -c "Set Fabric:APIKey $FABRIC_API_KEY_KEYMAN4MACIM" "$KM_PLIST"
+			fi
 		else
 			fail "File not found: $KM_PLIST"
 		fi

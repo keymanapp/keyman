@@ -30,9 +30,9 @@ type
     lblLanguageTag: TLabel;
     lblScriptTag: TLabel;
     lblRegionTag: TLabel;
-    editLanguageTag: TEdit;
-    editScriptTag: TEdit;
-    editRegionTag: TEdit;
+    cbLanguageTag: TComboBox;
+    cbScriptTag: TComboBox;
+    cbRegionTag: TComboBox;
     lblBCP47Code: TLabel;
     editBCP47Code: TEdit;
     lblValidateCode: TLabel;
@@ -40,45 +40,82 @@ type
     lblScriptName: TLabel;
     lblRegionName: TLabel;
     lblLinkToW3C: TLinkLabel;
-    procedure editLanguageTagChange(Sender: TObject);
+    Label1: TLabel;
+    editLanguageName: TEdit;
+    cmdResetLanguageName: TButton;
+    procedure cbLanguageTagChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure editScriptTagChange(Sender: TObject);
-    procedure editRegionTagChange(Sender: TObject);
+    procedure cbScriptTagChange(Sender: TObject);
+    procedure cbRegionTagChange(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lblLinkToW3CLinkClick(Sender: TObject; const Link: string;
       LinkType: TSysLinkType);
+    procedure cmdResetLanguageNameClick(Sender: TObject);
+    procedure editLanguageNameChange(Sender: TObject);
   private
     tag: TBCP47Tag;
+    FCustomLanguageName: Boolean;
     function GetLanguageID: string;
     function GetLanguageName: string;
-    procedure RefreshPreview;
-    { Private declarations }
+    procedure RefreshLanguageName;
+    procedure SetLanguageID(const Value: string);
+    procedure SetLanguageName(const Value: string);
+    function LookupLanguageName: string;
+  protected
+    function GetHelpTopic: string; override;
   public
     { Public declarations }
-    property LanguageID: string read GetLanguageID;
-    property LanguageName: string read GetLanguageName;
+    property LanguageID: string read GetLanguageID write SetLanguageID;
+    property LanguageName: string read GetLanguageName write SetLanguageName;
   end;
 
 implementation
 
 uses
+  System.Generics.Collections,
+
+  Keyman.Developer.System.HelpTopics,
   Keyman.System.KMXFileLanguages,
+  Keyman.System.LanguageCodeUtils,
   utilexecute;
 
 {$R *.dfm}
 
 { TfrmSelectBCP47Language }
 
+
 procedure TfrmSelectBCP47Language.FormCreate(Sender: TObject);
+  procedure PopulateComboBoxFromDict(cb: TComboBox; dict: TDictionary<string, string>);
+  var
+    i: Integer;
+    a: TArray<TPair<string,string>>;
+  begin
+    cb.Items.BeginUpdate;
+    try
+      a := dict.ToArray;
+      for i := 0 to Length(a) - 1 do
+        cb.Items.Add(a[i].Key);
+    finally
+      cb.Items.EndUpdate;
+    end;
+  end;
 begin
   inherited;
   tag := TBCP47Tag.Create('');
+  PopulateComboBoxFromDict(cbLanguageTag, TLanguageCodeUtils.BCP47Languages);
+  PopulateComboBoxFromDict(cbScriptTag, TLanguageCodeUtils.BCP47Scripts);
+  PopulateComboBoxFromDict(cbRegionTag, TLanguageCodeUtils.BCP47Regions);
 end;
 
 procedure TfrmSelectBCP47Language.FormDestroy(Sender: TObject);
 begin
   inherited;
   FreeAndNil(tag);
+end;
+
+function TfrmSelectBCP47Language.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_SelectBCP47Language;
 end;
 
 function TfrmSelectBCP47Language.GetLanguageID: string;
@@ -88,8 +125,7 @@ end;
 
 function TfrmSelectBCP47Language.GetLanguageName: string;
 begin
-  // TODO: BCP47: <DeveloperBCP47LanguageLookup> per lookup with BCP-47 feature
-  Result := tag.Tag;
+  Result := editLanguageName.Text;
 end;
 
 procedure TfrmSelectBCP47Language.lblLinkToW3CLinkClick(Sender: TObject;
@@ -98,40 +134,86 @@ begin
   TUtilExecute.URL(Link);
 end;
 
-procedure TfrmSelectBCP47Language.editLanguageTagChange(Sender: TObject);
+function TfrmSelectBCP47Language.LookupLanguageName: string;
 begin
-  inherited;
-  // TODO: BCP47: <DeveloperBCP47LanguageLookup> search on language names instead of just taking a tag
-  tag.Language := TKMXFileLanguages.TranslateISO6393ToBCP47(editLanguageTag.Text);
-  RefreshPreview;
+  Result := TLanguageCodeUtils.LanguageName(lblLanguageName.Caption, lblScriptName.Caption, lblRegionName.Caption);
 end;
 
-procedure TfrmSelectBCP47Language.editRegionTagChange(Sender: TObject);
+procedure TfrmSelectBCP47Language.cmdResetLanguageNameClick(Sender: TObject);
 begin
-  inherited;
-  tag.Region := editRegionTag.Text;
-  RefreshPreview;
+  editLanguageName.Text := LookupLanguageName;
+  FCustomLanguageName := False;
 end;
 
-procedure TfrmSelectBCP47Language.editScriptTagChange(Sender: TObject);
+procedure TfrmSelectBCP47Language.editLanguageNameChange(Sender: TObject);
 begin
-  inherited;
-  tag.Script := editScriptTag.Text;
-  RefreshPreview;
+  FCustomLanguageName := True;
 end;
 
-procedure TfrmSelectBCP47Language.RefreshPreview;
+procedure TfrmSelectBCP47Language.cbLanguageTagChange(Sender: TObject);
+begin
+  inherited;
+  tag.Language := TKMXFileLanguages.TranslateISO6393ToBCP47(cbLanguageTag.Text);
+  RefreshLanguageName;
+end;
+
+procedure TfrmSelectBCP47Language.cbRegionTagChange(Sender: TObject);
+begin
+  inherited;
+  tag.Region := cbRegionTag.Text;
+  RefreshLanguageName;
+end;
+
+procedure TfrmSelectBCP47Language.cbScriptTagChange(Sender: TObject);
+begin
+  inherited;
+  tag.Script := cbScriptTag.Text;
+  RefreshLanguageName;
+end;
+
+procedure TfrmSelectBCP47Language.RefreshLanguageName;
 var
   msg: string;
+
+  function GetDictEntry(subtag: string; dict: TDictionary<string,string>): string;
+  begin
+    if subtag = '' then
+      Result := ''
+    else if not dict.TryGetValue(subtag, Result) then
+      Result := subtag;
+  end;
+
+
 begin
   editBCP47Code.Text := tag.Tag;
-  lblLanguageName.Caption := tag.Language; // TODO: BCP47: <DeveloperBCP47LanguageLookup> Lookup language name
-  lblScriptName.Caption := tag.Script; // TODO: BCP47: <DeveloperBCP47LanguageLookup> Lookup script name
-  lblRegionName.Caption := tag.Region; // TODO: BCP47: <DeveloperBCP47LanguageLookup> Lookup region name
-  cmdOK.Enabled := tag.IsValid(msg);
+  lblLanguageName.Caption := GetDictEntry(tag.Language, TLanguageCodeUtils.BCP47Languages);
+  lblScriptName.Caption := GetDictEntry(tag.Script, TLanguageCodeUtils.BCP47Scripts);
+  lblRegionName.Caption := GetDictEntry(tag.Region, TLanguageCodeUtils.BCP47Regions);
+  if not FCustomLanguageName then
+  begin
+    editLanguageName.Text := LookupLanguageName;
+    FCustomLanguageName := False;
+  end;
+  cmdOK.Enabled := tag.IsValid(True, msg);
   if not cmdOK.Enabled
     then lblValidateCode.Caption := msg
     else lblValidateCode.Caption := 'This is a valid BCP 47 tag';
+end;
+
+procedure TfrmSelectBCP47Language.SetLanguageID(const Value: string);
+begin
+  tag.Tag := Value;
+  cbLanguageTag.Text := tag.Language;
+  cbRegionTag.Text := tag.Region;
+  cbScriptTag.Text := tag.Script;
+  RefreshLanguageName;
+  FCustomLanguageName := editLanguageName.Text <> LookupLanguageName;
+end;
+
+procedure TfrmSelectBCP47Language.SetLanguageName(const Value: string);
+begin
+  editLanguageName.Text := Value;
+  FCustomLanguageName := editLanguageName.Text <> LookupLanguageName;
 end;
 
 end.

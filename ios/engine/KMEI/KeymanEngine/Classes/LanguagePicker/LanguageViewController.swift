@@ -115,7 +115,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     sectionIndexTitles = []
     indices = []
     for (index, language) in languages.enumerated() {
-      let firstLetter = String(language.name.prefix(1))
+      let firstLetter = String(language.name.prefix(1)).uppercased()
       if !sectionIndexTitles.contains(firstLetter) {
         sectionIndexTitles.append(firstLetter)
         indices.append(index)

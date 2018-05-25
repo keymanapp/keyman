@@ -9,6 +9,13 @@
 #ifndef KMInputMethodEventHandlerProtected_h
 #define KMInputMethodEventHandlerProtected_h
 
+typedef NS_ENUM(NSInteger, ClientCapability) {
+    Unknown,
+    Yes,
+    No,
+    Unreliable
+};
+
 @interface KMInputMethodEventHandler ()
 //@property (nonatomic) NSMutableDictionary *kbData;
 //@property (nonatomic) NSDictionary *kmModes;
@@ -25,7 +32,7 @@
 // checking at the start of the event processing to see if we're probably still in the same place where we
 // left off previously.
 @property (assign) BOOL clientSelectionCanChangeUnexpectedly; // REVIEW: Maybe we can get notification from these clients by handling mouseDownOnCharacterIndex.
-@property (assign) BOOL cannnotTrustSelectionLength;
+@property (assign) ClientCapability clientCanProvideSelectionInfo;
 
 - (instancetype)initWithLegacyMode:(BOOL)legacy clientSelectionCanChangeUnexpectedly:(BOOL) flagClientSelectionCanChangeUnexpectedly;
 - (void)handleCommand:(NSEvent *)event;

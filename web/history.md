@@ -1,10 +1,32 @@
 # KeymanWeb Version History
 
-## 2018-04-27 10.0.88 beta
-* Fixes keyboard layout issues after mobile device rotations. (#248)
+## 2018-05-25 10.0.92 beta
+* Fixes keyboard layout issues after mobile device rotations. (#789)
+
+## 2018-05-09 10.0.91 beta
+* Fixes basic support for mnemonic keyboards.  (#517)
+  * At this time, all mnemonic keyboards will assume a US keyboard layout within KeymanWeb.
+
+## 2018-05-08 10.0.90 beta
+* Fixes support for Keyman-language 'beep' statements as part of keyboard stores. (#733)
+
+## 2018-05-07 10.0.89 beta
+* Fixes an issue with case sensitive virtual keys used by some Keyman keyboards. (#162)
+
+## 2018-04-30 10.0.88 beta
+* Fixes some left/right modifier issues (#797)
+
+## 2018-04-25 10.0.87 beta
+* Fixes some issues with default key output (#772)
 
 ## 2018-04-25 10.0.86 beta
 * Fixes display of popup keys representing modifiers and other special characters. (#698)
+
+## 2018-03-26 10.0.85 beta
+* No substantial changes.
+
+## 2018-03-23 10.0.84 beta
+* Fixed a single test case (#703).
 
 ## 2018-03-22 10.0.83 beta
 * Initial beta for KeymanWeb v 10.0.

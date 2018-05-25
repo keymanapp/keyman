@@ -54,7 +54,8 @@ type
     function GetSystemKeyboardName: string;
     procedure SetSystemKeyboardName(Value: string);
     procedure InvalidateCell(ACol, ARow: Integer);
-    { Private declarations }
+  protected
+    function GetHelpTopic: string; override;
   public
     { Public declarations }
     property SystemKeyboardName: string read GetSystemKeyboardName write SetSystemKeyboardName;
@@ -71,6 +72,8 @@ function GetSystemKeyboardIndex(keyboardlist: TStrings; id: string): Integer;
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   ErrorControlledRegistry, 
   RegistryKeys,
   utilstr;
@@ -153,6 +156,11 @@ begin
     str.Free;
     Free;
   end;
+end;
+
+function TfrmSelectSystemKeyboard.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_SelectSystemKeyboard;
 end;
 
 function TfrmSelectSystemKeyboard.GetSystemKeyboardName: string;

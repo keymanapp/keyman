@@ -492,9 +492,23 @@ namespace com.keyman {
       if (s.Lcode == null) {
         return null;
       }
-      
+
+      var osk = this.keyman.osk, activeKeyboard = this.keyman.keyboardManager.activeKeyboard;
+
+      if(activeKeyboard && activeKeyboard['KM']) {
+        // K_SPACE is not handled by defaultKeyOutput for physical keystrokes unless using touch-aliased elements.
+        if(s.Lcode != osk.keyCodes['K_SPACE']) {
+          // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
+          // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
+          var mappedChar: string = osk.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
+          if(mappedChar) {
+            s.Lcode = mappedChar.charCodeAt(0);
+          } // No 'else' - avoid blocking modifier keys, etc.
+        }
+      }
+
       // Stage 1 - track the true state of the keyboard's modifiers.
-      var osk = this.keyman.osk, prevModState = DOMEventHandlers.states.modStateFlags, curModState = 0x0000;
+      var prevModState = DOMEventHandlers.states.modStateFlags, curModState = 0x0000;
       var ctrlEvent = false, altEvent = false;
       
       switch(s.Lcode) {
@@ -530,7 +544,7 @@ namespace com.keyman {
        * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
        */
 
-      curModState |= (e.getModifierState("Shift") ? 0x10 : 0);      
+      curModState |= (e.getModifierState("Shift") ? 0x10 : 0);
 
       if(e.getModifierState("Control")) {
         curModState |= ((e.location != 0 && ctrlEvent) ? 
@@ -571,6 +585,15 @@ namespace com.keyman {
       s.LmodifierChange = DOMEventHandlers.states.modStateFlags != curModState;
       DOMEventHandlers.states.modStateFlags = curModState;
 
+      // Flip the shift bit if Caps Lock is active on mnemonic keyboards.
+      // Avoid signaling a change in the shift key's modifier state.  (The reason for this block's positioning.)
+      if(activeKeyboard && activeKeyboard['KM'] && e.getModifierState("CapsLock")) {
+        if((s.Lcode >= 65 && s.Lcode <= 90) /* 'A' - 'Z' */ || (s.Lcode >= 97 && s.Lcode <= 122) /* 'a' - 'z' */) {
+          curModState ^= 0x10; // Flip the 'shift' bit.
+          s.Lcode ^= 0x20; // Flips the 'upper' vs 'lower' bit for the base 'a'-'z' ASCII alphabetics.
+        }
+      }
+
       // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
       var altGrMask = osk.modifierCodes['RALT'] | osk.modifierCodes['LCTRL'];
       if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
@@ -595,7 +618,7 @@ namespace com.keyman {
       } else {
         // No need to sim AltGr here; we don't need chiral ALTs.
         s.Lmodifiers = 
-          (e.getModifierState("Shift") ? 0x10 : 0) |
+          (curModState & 0x10) | // SHIFT
           ((curModState & (osk.modifierCodes['LCTRL'] | osk.modifierCodes['RCTRL'])) ? 0x20 : 0) | 
           ((curModState & (osk.modifierCodes['LALT'] | osk.modifierCodes['RALT']))   ? 0x40 : 0); 
       }
@@ -727,10 +750,11 @@ namespace com.keyman {
         }
         else {
           DOMEventHandlers.states._KeyPressToSwallow = 0;
+          LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent);
         }
       }
 
-      if(!LeventMatched  &&  Levent.Lcode >= 96  &&  Levent.Lcode <= 111) {
+      if(!LeventMatched  &&  Levent.Lcode >= 96  &&  Levent.Lcode <= 111 && !activeKeyboard['KM']) {
         // Number pad, numlock on
         //      _Debug('KeyPress NumPad code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
 

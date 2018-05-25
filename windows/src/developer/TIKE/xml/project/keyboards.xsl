@@ -13,8 +13,8 @@
             <h3>Quick Links</h3>
           
             <ul>
-              <li><a href="help:tutorial_keyboard">Keyboard Tutorial</a></li>
-              <li><a href="help:reference">Keyman Keyboard Language Reference</a></li>
+              <li><a href="help:guides/develop/tutorial">Keyboard Tutorial</a></li>
+              <li><a href="help:language/">Keyman Keyboard Language Reference</a></li>
             </ul>
           </div>
         </div>
@@ -26,14 +26,14 @@
 
           <ul>
             <li>
-              The <a href="help:context_frmKeymanWizard_Layout">Layout page</a> in the Keyboard Editor lets you quickly create 
+              The <a href="help:context/keyboard-editor#toc-layout-tab">Layout page</a> in the Keyboard Editor lets you quickly create 
               a keyboard using a visual representation of a computer keyboard. You can drag and drop characters from the 
-              <a href="help:context_frmCharacterMapNew">Character Map</a> to create Unicode keyboard layouts.
+              <a href="help:context/character-map">Character Map</a> to create Unicode keyboard layouts.
             </li>
             <li>
-              The <a href="help:context_frmKeymanWizard_Source">Source tab</a> of the layout page shows the keyboard's design in the 
+              The <a href="help:context/keyboard-editor#toc-layout-tab">Source tab</a> of the layout page shows the keyboard's design in the 
               <a href="help:reference">Keyman Keyboard Language</a>.  From here, you can enhance keyboards with input management features
-              such as constraints, dead keys, character reordering, and more.  Read the <a href="help:tutorial_keyboard">Tutorial</a>
+              such as constraints, dead keys, character reordering, and more.  Read the <a href="help:guides/develop/tutorial">Tutorial</a>
               for an introduction to these features.
             </li>
           </ul>
@@ -46,7 +46,7 @@
             <tr><th colspan="3">Source Files</th><th>&#160;</th><th colspan="2">Outputs</th></tr>
             <tr>
               <xsl:call-template name="filetype_kmn" />
-              <xsl:call-template name="filetype_kvk" />
+              <xsl:call-template name="filetype_kvks" />
               <xsl:call-template name="filetype_ico" />
               <xsl:call-template name="filetype__arrow" />
               <xsl:call-template name="filetype_kmx" />

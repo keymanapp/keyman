@@ -9,7 +9,8 @@ implementation
 uses
   Keyman.System.BuildISO6393Registry,
   Keyman.System.BuildLanguageSubtagRegistry,
-  Keyman.System.BuildLCIDToBCP47Registry;
+  Keyman.System.BuildLCIDToBCP47Registry,
+  Keyman.System.BuildLibPalasoAllTags;
 
 procedure Run;
 begin
@@ -30,6 +31,16 @@ begin
     writeln('Building '+ParamStr(3));
     with TBuildLanguageSubtagRegistry.Create(ParamStr(2)) do
     try
+      BuildSubtagRegistry(ParamStr(3));
+    finally
+      Free;
+    end;
+  end
+  else if ParamStr(1) = 'suppress' then
+  begin
+    writeln('Building '+ParamStr(3));
+    with TBuildLanguageSubtagRegistry.Create(ParamStr(2)) do
+    try
       BuildSuppressScriptRegistry(ParamStr(3));
     finally
       Free;
@@ -39,6 +50,11 @@ begin
   begin
     writeln('Building '+ParamStr(3));
     TBuildLCIDToBCP47Registry.Build(ParamStr(2), ParamStr(3));
+  end
+  else if ParamStr(1) = 'alltags' then
+  begin
+    writeln('Building '+ParamStr(3));
+    TBuildLibPalasoAllTags.Build(ParamStr(2), ParamStr(3));
   end
   else
   begin

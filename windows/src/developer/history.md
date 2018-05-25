@@ -1,5 +1,82 @@
 # Keyman Developer Version History
 
+## 2018-05-17 10.0.1091.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-11 10.0.1090.0 beta
+* Fixed missing icons in project view (#864)
+
+## 2018-05-11 10.0.1087.0 beta
+* Opening an editor by double-clicking a message in message window can crash Developer (#857)
+
+## 2018-05-09 10.0.1086.0 beta
+* No changes to Keyman Developer (KeymanWeb updated)
+
+## 2018-05-08 10.0.1085.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-08 10.0.1084.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-08 10.0.1083.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-08 10.0.1082.0 beta
+* Fixes support for 'beep' statements in keyboard stores when compiling for web or mobile targets (#733)
+
+## 2018-05-07 10.0.1081.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-07 10.0.1080.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-07 10.0.1079.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-04 10.0.1078.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-04 10.0.1077.0 beta
+* Correctly show the messages window after a compile (#822)
+
+## 2018-05-04 10.0.1076.0 beta
+* Don't create a blank project on 'opening' a project, either on startup or via menu (#815)
+* Scroll text editor cursor into view after undo (#821)
+
+## 2018-05-04 10.0.1075.0 beta
+* Ensure that compiled visual keyboard associates with correct base keyboard (#817)
+
+## 2018-05-03 10.0.1074.0 beta
+* Restrict modifier options to a small set by default in touch layout editor (#810)
+
+## 2018-05-03 10.0.1073.0 beta
+* Checking for online update when it is already running in background can crash Developer (#813)
+* Avoid crash if online update already running (#814)
+
+## 2018-05-03 10.0.1072.0 beta
+* Touch layout editor no longer leaves broken JSON when deleting or modifying some keys (#811)
+
+## 2018-05-03 10.0.1071.0 beta
+* Special keys imported from a visual keyboard into a touch layout now display correctly (#812)
+
+## 2018-04-30 10.0.1070.0 beta
+* BCP 47 picker in package editor now does name lookups and constrains codes as required by target operating systems (#746, #766)
+
+## 2018-04-30 10.0.1066.0 beta
+* Fixed broken test for valid match/nomatch output (#793)
+
+## 2018-04-27 10.0.1061.0 beta
+* Fixed broken context help (#779)
+
+## 2018-04-25 10.0.1060.0 beta
+* No changes in Keyman Developer (updated KeymanWeb)
+
+## 2018-04-25 10.0.1059.0 beta
+* No changes in Keyman Developer (updated KeymanWeb)
+
+## 2018-04-25 10.0.1058.0 beta
+* No changes in Keyman Developer
+
 ## 2018-04-12 10.0.1057.0 beta
 * No changes in Keyman Developer
 

@@ -35,8 +35,8 @@ type
     procedure FormCreate(Sender: TObject);
   private
     procedure FrameModified(Sender: TObject);
-
   protected
+    function GetHelpTopic: string; override;
     function DoOpenFile: Boolean; override;
     function DoSaveFile: Boolean; override;
     function GetFileNameFilter: string; override;
@@ -48,7 +48,13 @@ type
 
 implementation
 
-uses Clipbrd, UfrmMain, UfrmMessages;
+uses
+  Clipbrd,
+
+  Keyman.Developer.System.HelpTopics,
+
+  UfrmMain,
+  UfrmMessages;
 
 {$R *.DFM}
 
@@ -76,6 +82,11 @@ end;
 function TfrmBitmapEditor.GetFileNameFilter: string;
 begin
   Result := 'Bitmap files (*.bmp)|*.bmp|All files (*.*)|*.*';
+end;
+
+function TfrmBitmapEditor.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_BitmapEditor;
 end;
 
 function TfrmBitmapEditor.DoOpenFile: Boolean;

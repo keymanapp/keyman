@@ -101,7 +101,7 @@ NSUInteger _failuresToRetrieveExpectedContext;
     _failuresToRetrieveExpectedContext = NSUIntegerMax;
     
     if (self.clientSelectionCanChangeUnexpectedly) {
-        self.cannnotTrustSelectionLength = YES;
+        self.clientCanProvideSelectionInfo = Unreliable;
         self.clientSelectionCanChangeUnexpectedly = NO; // This isn't true (it can change unexpectedly), but we can't get the context, so we pretend/hope it won't.
     }
 }

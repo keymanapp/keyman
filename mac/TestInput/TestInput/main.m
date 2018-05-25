@@ -57,16 +57,38 @@ const NSString* kConnectionName = @"TestInput_2_Connection";
 //let this be a global so our application controller delegate can access it easily
 IMKServer*       server;
 
-int main(int argc, char *argv[])
-{
-    NSString* identifier;
-    
-    //find the bundle identifier and then initialize the input method server
-    identifier = [[NSBundle mainBundle] bundleIdentifier];
-    server = [[IMKServer alloc] initWithName:(NSString*)kConnectionName bundleIdentifier:[[NSBundle mainBundle] bundleIdentifier]];
-    
-    //finally run everything
-    [[NSApplication sharedApplication] run];
-    
+int main(int argc, const char * argv[]) {
+    NSString *identifier;
+    @autoreleasepool {
+        identifier = [[NSBundle mainBundle] bundleIdentifier];
+        server = [[IMKServer alloc] initWithName:(NSString *)kConnectionName bundleIdentifier:identifier];
+        [NSBundle loadNibNamed:@"MainMenu" owner:[NSApplication sharedApplication]];
+        [[NSApplication sharedApplication] run];
+    }
     return 0;
 }
+
+//int main(int argc, char *argv[])
+//{
+//    NSString* identifier;
+//
+//    //find the bundle identifier and then initialize the input method server
+//    identifier = [[NSBundle mainBundle] bundleIdentifier];
+//    server = [[IMKServer alloc] initWithName:(NSString*)kConnectionName bundleIdentifier:[[NSBundle mainBundle] bundleIdentifier]];
+//    NSLog(@"About to load MainMenu...");
+//    @try {
+//        [NSBundle loadNibNamed:@"MainMenu" owner:[NSApplication sharedApplication]];
+//        if ([[NSApplication sharedApplication] mainMenu])
+//            NSLog(@"Finished loading MainMenu!");
+//        else
+//            NSLog(@"MainMenu not set!!!");
+//    }
+//    @catch (NSException *e) {
+//        NSLog(@"Error loading MainMenu: %@", e.description);
+//    }
+//
+//    //finally run everything
+//    [[NSApplication sharedApplication] run];
+//
+//    return 0;
+//}

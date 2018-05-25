@@ -11,6 +11,8 @@ type
   TfrmCharacterMapDock = class(TTikeDockForm)
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+  protected
+    function GetHelpTopic: string; override;
   public
     procedure RefreshOptions;
   end;
@@ -23,6 +25,8 @@ implementation
 {$R *.dfm}
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   RegistryKeys,
   UfrmMain;
 
@@ -33,6 +37,7 @@ begin
   frmCharacterMapNew.BorderStyle := bsNone;
   frmCharacterMapNew.Parent := Self;
   frmCharacterMapNew.Visible := True;
+  frmCharacterMapNew.HelpKeyword := SHelpTopic_Context_CharacterMap;
 
   frmCharacterMapNew.OnCancelFocus := frmKeymanDeveloper.CharMapCancelFocus;
   frmCharacterMapNew.OnInsertCode := frmKeymanDeveloper.CharMapInsertCode;
@@ -44,6 +49,11 @@ procedure TfrmCharacterMapDock.FormDestroy(Sender: TObject);
 begin
   inherited;
   FreeAndNil(frmCharacterMapNew);
+end;
+
+function TfrmCharacterMapDock.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_CharacterMap;
 end;
 
 procedure TfrmCharacterMapDock.RefreshOptions;

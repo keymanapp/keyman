@@ -466,6 +466,7 @@ type
     procedure OrderDetailsPanels;
 
   protected
+    function GetHelpTopic: string; override;
 
     procedure FocusTab;
 
@@ -547,6 +548,8 @@ implementation
 uses
   System.Math,
   System.Win.ComObj,
+
+  Keyman.Developer.System.HelpTopics,
 
   CharacterDragObject,
   CharacterInfo,
@@ -1824,6 +1827,11 @@ begin
   end;
 end;
 
+function TfrmKeymanWizard.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_KeyboardEditor;
+end;
+
 function TfrmKeymanWizard.GetIsDebugVisible: Boolean;
 begin
   Result := panDebugHost.Visible;
@@ -2915,7 +2923,7 @@ begin
   frmMessages.Clear;
   if CompileKeyboardFile(PChar(KMNFileName.Name), PChar(KMXFileName2), False, False, False, CompilerMessage) <= 0 then   // I4181   // I4865   // I4866
   begin
-    frmMessages.Show;
+    frmMessages.DoShowForm;
     ShowMessage('There were errors compiling the keyboard to convert to the On Screen Keyboard.');
     FreeAndNil(KMXFileName);   // I4181
   end;

@@ -423,6 +423,12 @@ end;
 
 procedure TmodActionsMain.actHelpCheckForUpdatesExecute(Sender: TObject);
 begin
+  if TOnlineUpdateCheck.Running then
+  begin
+    ShowMessage('An online update check is already running.');
+    Exit;
+  end;
+
   with TOnlineUpdateCheck.Create(SRegKey_KeymanDeveloper_CU, OnlineProductID_KeymanDeveloper_100, True, False, False, GetProxySettings.Server, GetProxySettings.Port, GetProxySettings.Username, GetProxySettings.Password) do  // I3377
   try
     if Run = oucShutDown then
@@ -487,6 +493,12 @@ end;
 
 procedure TmodActionsMain.OpenProject(FileName: WideString);
 begin
+  if (FileName <> '') and not FileExists(FileName) then
+  begin
+    ShowMessage('The project '+FileName+' does not exist.');
+    Exit;
+  end;
+
   FGlobalProject.Save;
   FreeAndNil(FGlobalProject);
   FGlobalProject := TProjectUI.Create(FileName);   // I4687

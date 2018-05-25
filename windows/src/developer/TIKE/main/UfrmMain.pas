@@ -377,7 +377,8 @@ type
     function OpenTestWindow(FFileName: string): TfrmTikeChild;
     function OpenFile(FFileName: string; FCloseNewFile: Boolean): TfrmTikeChild;
 
-    procedure HelpTopic(s: string);
+    procedure HelpTopic(s: string); overload;
+    procedure HelpTopic(Sender: TTIKEForm); overload;
 
     property ChildWindows: TChildWindowList read FChildWindows;
     property CharMapSettings: TCharMapSettings read FCharMapSettings;
@@ -501,6 +502,8 @@ begin
   RemoveOldestTikeEditFonts(False);
   RemoveOldestTikeTestFonts(False);
 
+  if (FActiveProject <> '') and not FileExists(FActiveProject) then
+    FActiveProject := '';
   TProjectUI.Create(FActiveProject, True);   // I4687
 
 
@@ -760,9 +763,12 @@ begin
       FInOnHelp := True;
       try
         s := PChar(Data);
-        frm := GetParentForm(Screen.ActiveControl, False);
-        if frm is TTikeForm then
-          (frm as TTikeForm).GetHelpTopic(s);
+        if s = '' then
+        begin
+          frm := GetParentForm(Screen.ActiveControl, False);
+          if frm is TTikeForm then
+            s := (frm as TTikeForm).HelpTopic;
+        end;
         if s <> '' then
           mHHelp.HelpTopic(s);
       finally
@@ -1030,6 +1036,11 @@ begin
     not DoForm(frmHelp) and
     not DoForm(frmCharacterMapDock) then
     DoForm(frmCharacterIdentifier);   // I4807
+end;
+
+procedure TfrmKeymanDeveloper.HelpTopic(Sender: TTIKEForm);
+begin
+  HelpTopic(Sender.HelpTopic);
 end;
 
 function TfrmKeymanDeveloper.OpenTestWindow(FFileName: string): TfrmTikeChild;

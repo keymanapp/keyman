@@ -2,7 +2,12 @@ unit KeymanPaths;
 
 interface
 
+uses
+  System.SysUtils;
+
 type
+  EKeymanPath = class(Exception);
+
   TKeymanPaths = class
   public
     const S_KMShell = 'kmshell.exe';
@@ -28,7 +33,6 @@ uses
   Winapi.Windows,
   Winapi.ActiveX,
   Winapi.ShlObj,
-  System.SysUtils,
   System.Win.Registry,
 
   DebugPaths,
@@ -90,7 +94,7 @@ begin
   Result := GetDebugPath('KeymanDesktop', Result);
 
   if Result = '' then
-    raise Exception.Create('Unable to find the Keyman Desktop directory.  You should reinstall the product.');
+    raise EKeymanPath.Create('Unable to find the Keyman Desktop directory.  You should reinstall the product.');
 
   Result := IncludeTrailingPathDelimiter(Result) + filename;
 end;
@@ -114,7 +118,7 @@ begin
   Result := GetDebugPath('KeymanEngine', Result);
 
   if Result = '' then
-    raise Exception.Create('Unable to find the Keyman Engine directory.  You should reinstall the product.');
+    raise EKeymanPath.Create('Unable to find the Keyman Engine directory.  You should reinstall the product.');
 
   Result := IncludeTrailingPathDelimiter(Result) + filename;
 end;
@@ -147,7 +151,7 @@ begin
 
   Result := GetDebugPath('Keyboards', Result, True);
   if Result = '' then
-    raise Exception.Create('Unable to find the Keyboards directory.  You should reinstall the product.');
+    raise EKeymanPath.Create('Unable to find the Keyboards directory.  You should reinstall the product.');
 
   Result := Result + Filename;
 end;

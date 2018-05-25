@@ -13,8 +13,8 @@
             <h3>Quick Links</h3>
           
             <ul>
-              <li><a href="help:tutorial_package">Package Tutorial</a></li>
-              <li><a href="help:context_frmPackageEditor">Package Editor Help</a></li>
+              <li><a href="help:guides/distribute/tutorial">Package Tutorial</a></li>
+              <li><a href="help:context/package-editor">Package Editor Help</a></li>
             </ul>
           </div>
         </div>

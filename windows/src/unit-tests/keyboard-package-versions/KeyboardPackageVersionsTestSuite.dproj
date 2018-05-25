@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{7A8E88E4-B407-442B-9A53-DE6F43F1C0F1}</ProjectGuid>
-        <ProjectVersion>18.3</ProjectVersion>
+        <ProjectVersion>18.4</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <MainSource>KeyboardPackageVersionsTestSuite.dpr</MainSource>
         <Base>True</Base>
@@ -176,6 +176,9 @@
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas"/>
         <DCCReference Include="..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
         <DCCReference Include="..\..\global\delphi\general\BCP47Tag.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

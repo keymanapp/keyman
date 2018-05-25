@@ -43,6 +43,8 @@ type
     procedure SetFileName(const Value: string);
     function GetFolders: Boolean;
     function GetGraphical: Boolean;
+  protected
+    function GetHelpTopic: string; override;
   public
     property FileName: string write SetFileName;
     property Folders: Boolean read GetFolders;
@@ -54,6 +56,8 @@ implementation
 {$R *.DFM}
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   messageidentifiers;
 
 { TfrmVisualKeyboardExportHTMLParams }
@@ -71,6 +75,11 @@ end;
 function TfrmVisualKeyboardExportHTMLParams.GetGraphical: Boolean;
 begin
   Result := chkGraphical.Checked;
+end;
+
+function TfrmVisualKeyboardExportHTMLParams.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_VisualKeyboardExportHtmlParams;
 end;
 
 procedure TfrmVisualKeyboardExportHTMLParams.cmdOKClick(Sender: TObject);

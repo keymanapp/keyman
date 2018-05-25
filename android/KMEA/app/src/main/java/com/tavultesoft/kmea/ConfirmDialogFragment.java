@@ -37,7 +37,7 @@ public class ConfirmDialogFragment extends DialogFragment {
        public void onClick(DialogInterface dialog, int which) {
          // Cancel
          dialog.dismiss();
-         ((Activity)getContext()).finish();
+         getActivity().finish();
        }
       })
       .create();

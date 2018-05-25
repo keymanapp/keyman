@@ -340,7 +340,12 @@ end;
 
 function IsKeymanDesktopInstalled: Boolean;
 begin
-  Result := FileExists(TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell));
+  try
+    Result := FileExists(TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell));
+  except
+    on E:EKeymanPath do
+      Result := False;
+  end;
 end;
 
 procedure InstallPackage(const nm: string; FCanInstallUnreg: Boolean);
@@ -356,7 +361,16 @@ begin
     Exit;
   end;
 
-  kmshell := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+  try
+    kmshell := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+  except
+    on E:EKeymanPath do
+    begin
+      ShowMessage('Keyman Desktop is not installed.  You must install Keyman Desktop to install this keyboard.');
+      Exit;
+    end;
+  end;
+
   if TUtilExecute.WaitForProcess('"'+kmshell+'" -i "'+nm+'"', ExtractFilePath(nm)) = False then  // I3475
     ShowMessage('Failed to install package: '+errmsg);
 
@@ -615,7 +629,12 @@ end;
 
 function GetKMShellPath(var ps: string): Boolean;   // I3655
 begin
-  ps := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+  try
+    ps := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+  except
+    on E:EKeymanPath do
+      Exit(False);
+  end;
   Result := FileExists(ps);
 end;
 
