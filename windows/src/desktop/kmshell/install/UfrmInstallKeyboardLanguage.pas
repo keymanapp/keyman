@@ -190,6 +190,7 @@ var
       with TBCP47Tag.Create(lpLocaleString) do
       try
         Script := Lang.Script;
+        Canonicalize;
         for i := 0 to Lang.Variants.Count - 1 do
           if SameText(Lang.Variants[i].Code, Tag) then
             Exit;
@@ -307,6 +308,7 @@ begin
       //TODO:BCP47: split BCP-47 into language + script + region here.
       with TBCP47Tag.Create(FKeyboard.Languages[i].BCP47Code) do
       try
+        Canonicalize;
         if Tag <> '' then
         begin
           FLanguage := TInstLanguage.Create(True, Language, Script, FKeyboard.Languages[i].Name);

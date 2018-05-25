@@ -71,8 +71,6 @@ uses
   System.Win.ComObj,
   Winapi.ActiveX,
 
-  Keyman.System.Standards.BCP47SuppressScriptRegistry,
-
   input_installlayoutortip,
   isadmin,
   keymanerrorcodes,
@@ -249,9 +247,9 @@ begin
 
     BCP47Tag := ExtractBaseBCP47Tag(BCP47Tag);
 
-    if not InstallBCP47Language(BCP47Tag) then
+    if (BCP47Tag = '') or not InstallBCP47Language(BCP47Tag) then
     begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['Could not install BCP47 language']));
+      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['Could not install BCP47 language '+BCP47Tag]));
       Exit;
     end;
 
@@ -340,22 +338,15 @@ end;
 
 function TKPInstallKeyboardLanguageProfiles.ExtractBaseBCP47Tag(BCP47Tag: string): string;
 var
-  FScripts: TStringList;
   FTag: TBCP47Tag;
 begin
   Result := BCP47Tag;
 
-  FScripts := TStringList.Create;
   FTag := TBCP47Tag.Create(BCP47Tag);
   try
-    FScripts.Text := SuppressScriptSubtagRegistry;
-    if SameText(FTag.Script, FScripts.Values[FTag.Language]) then
-    begin
-      FTag.Script := '';
-      Result := FTag.Tag;
-    end;
+    FTag.Canonicalize;
+    Result := FTag.Tag;
   finally
-    FScripts.Free;
     FTag.Free;
   end;
 end;
