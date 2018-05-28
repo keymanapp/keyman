@@ -79,7 +79,12 @@ var
   node, root: IXMLNode;
   pf: TProjectFile;
 begin
-  doc := LoadXMLDocument(FFileName);
+  try
+    doc := LoadXMLDocument(FFileName);
+  except
+    on E:Exception do
+      raise EProjectLoader.Create('Error loading project file: '+E.Message);
+  end;
 
   root := doc.DocumentElement;
   if root.NodeName <> 'KeymanDeveloperProject' then
