@@ -3120,7 +3120,9 @@ begin
   begin
     if (FFeature[kfTouchLayout].FileName = '') then   // I3909
     begin
-      FFeature[kfTouchLayout].FileName := ChangeFileExt(FileName, '') + '-layout.js';
+      FFeature[kfTouchLayout].FileName :=
+        // See also TKeyboardParser_Features.GetDefaultFeatureFilename
+        Format(KeyboardFeatureFilename[kfTouchLayout], [ChangeFileExt(ExtractFileName(FileName), '')]);
     end;
 
     if pagesTouchLayout.ActivePage = pageTouchLayoutDesign   // I4034
