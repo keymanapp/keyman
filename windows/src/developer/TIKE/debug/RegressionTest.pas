@@ -427,7 +427,7 @@ end;
 
 procedure TRegressionTest.SetCurrentEvent(const Value: Integer);
 begin
-  if (FCurrentEvent <> 0) and ((FCurrentEvent < 0) or (FCurrentEvent >= FEvents.Count)) then
+  if (Value <> 0) and ((Value < 0) or (Value >= FEvents.Count)) then
     raise ERegressionTest.Create(ERTCurrentEventOutOfBounds); // 0 is okay if there are no events in the list
   FCurrentEvent := Value;
 end;
