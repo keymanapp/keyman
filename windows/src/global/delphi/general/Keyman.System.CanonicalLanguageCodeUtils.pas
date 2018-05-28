@@ -57,7 +57,7 @@ begin
       Exit('');
     if TLanguageCodeUtils.SuppressScripts.TryGetValue(t.Language, script) then
     begin
-      if SameText(t.Script, script) then
+      if SameText(t.Script, script) or (t.Script = '') then
       begin
         // The script should be suppressed because it is known to Windows (**really?)
         // We won't do a region check because this is not really required.
