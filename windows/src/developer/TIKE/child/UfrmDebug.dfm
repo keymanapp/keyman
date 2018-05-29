@@ -22,21 +22,10 @@ inherited frmDebug: TfrmDebug
     Width = 755
     Height = 73
     Cursor = crIBeam
-    Align = alClient
+    Alignment = taLeftJustify
     BorderStyle = bsNone
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Arial'
-    Font.Style = []
-    ParentFont = False
-    PopupMenu = mnuPopup
     ScrollBars = ssVertical
-    TabOrder = 0
     OnChange = memoChange
-    OnClick = memoClick
-    OnEnter = memoGotFocus
-    OnExit = memoLostFocus
     AltFont.Charset = DEFAULT_CHARSET
     AltFont.Color = clWindowText
     AltFont.Height = -11
@@ -65,6 +54,19 @@ inherited frmDebug: TfrmDebug
     UpdateMode = umImmediate
     Version = 'v7.1  Professional ed.'
     OnSelMove = memoSelMove
+    Align = alClient
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Arial'
+    Font.Style = []
+    ParentFont = False
+    PopupMenu = mnuPopup
+    TabOrder = 0
+    TabStop = True
+    OnClick = memoClick
+    OnEnter = memoGotFocus
+    OnExit = memoLostFocus
     OnMessage = memoMessage
   end
   object sgChars: TStringGrid
