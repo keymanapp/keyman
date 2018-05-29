@@ -154,6 +154,8 @@
                     <File Id='xml_kmw_index.html' Name='index.html' />
                   </Component>
 
+                  <Component><File Id='xml_kmw_packages.html' Name='packages.html' KeyPath='yes' /></Component>
+
                   <Directory Id='xmlkmwresource' Name='resource' DiskId='1'>
                     <Component><File Id='xml_kmw_resource_keymanweb.js' Name='keymanweb.js' KeyPath="yes" /></Component>
                     <Component><File Id='xml_kmw_resource_kmwuibutton.js' Name='kmwuibutton.js' KeyPath="yes" /></Component>
@@ -351,7 +353,7 @@
       <ComponentRef Id="AppDataRemovals" />
       <ComponentRef Id='oskFonts' />
       <ComponentRef Id="componentxmlkmw2" />
-
+      <ComponentRef Id='xml_kmw_packages.html' />
      
       <ComponentRef Id="xml_file7"/>
       <ComponentRef Id="xml_file8"/>

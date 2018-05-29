@@ -35,6 +35,7 @@ type
     procedure MenuEventTest(Sender: TObject);
 
     function TestPackage: Boolean;
+    function TestPackageOnline: Boolean;
     function InstallPackage: Boolean;
     function UninstallPackage: Boolean;
     function CompilePackage(FSilent: Boolean): Boolean;
@@ -64,6 +65,7 @@ uses
   UfrmMessages,
   UfrmMDIEditor,
   UfrmPackageEditor,
+  UmodWebHttpServer,
   utilexecute,
   Variants,
   ShellApi,
@@ -114,6 +116,7 @@ begin
     pfaUninstall: Result := UninstallPackage;
     pfaCompileInstaller: Result := CompilePackageInstaller(FSilent);
     pfaClean: Result := ProjectFile.Clean;
+    pfaTestKeymanWeb: Result := TestPackageOnline;
   else
     Result := False;
   end;
@@ -175,6 +178,28 @@ begin
     if not Assigned(MDIChild) then
       pack.Free;
   end;
+
+  Result := True;
+end;
+
+function TkpsProjectFileUI.TestPackageOnline: Boolean;
+var
+  FCompiledName: string;
+  editor: TfrmTikeEditor;
+  packageEditor: TfrmPackageEditor;
+begin
+  editor := frmKeymanDeveloper.FindEditorByFileName(ProjectFile.FileName);   // I4021
+  if not Assigned(editor) or not (editor is TfrmPackageEditor) then
+    Exit(False);
+  packageEditor := editor as TfrmPackageEditor;
+
+  FCompiledName := ProjectFile.TargetFilename;
+  if not FileExists(FCompiledName) then
+    Exit(False);
+
+  modWebHttpServer.RegisterPackage(FCompiledName, FCompiledName); // TODO: Show package 'name' in future
+
+  packageEditor.NotifyStartedWebDebug;   // I4021
 
   Result := True;
 end;
