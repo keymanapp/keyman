@@ -59,6 +59,8 @@ uses
   Windows,
   Classes,
   System.Zip,
+  System.Win.ComObj,
+
   custinterfaces,
   Unicode,
   SysUtils,
@@ -261,12 +263,19 @@ begin
         for i := 0 to inf.Files.Count - 1 do
         begin
           if inf.Files[i].FileType = ftVisualKeyboard then
-            with TKPInstallVisualKeyboard.Create(Context) do
+          begin
             try
-              Execute(FTempOutPath + inf.Files[i].FileName, '');
-            finally
-              Free;
+              with TKPInstallVisualKeyboard.Create(Context) do
+              try
+                Execute(FTempOutPath + inf.Files[i].FileName, '');
+              finally
+                Free;
+              end;
+            except
+              on E:EOleException do
+                WarnFmt(KMN_W_InstallPackage_KVK_Error, VarArrayOf([PackageName, inf.Files[i].FileName, E.Message]));
             end;
+          end;
         end;
 
         { Install start menu items }
