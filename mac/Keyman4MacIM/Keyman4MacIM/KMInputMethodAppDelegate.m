@@ -106,6 +106,15 @@ typedef enum {
     [Fabric with:@[[Crashlytics class]]];
 }
 
+#ifdef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
+- (BOOL)alertShowHelp:(NSAlert *)alert {
+    NSLog(@"Crashlytics - KME: Got call to force crash from engine");
+    [[Crashlytics sharedInstance] crash];
+    NSLog(@"Crashlytics - KME: should not have gotten this far!");
+    return NO;
+}
+#endif
+
 - (void)handleURLEvent:(NSAppleEventDescriptor*)event withReplyEvent:(NSAppleEventDescriptor*)replyEvent {
     
     [self processURL:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];

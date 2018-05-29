@@ -19,7 +19,7 @@
 		9836B3741AE5F11D00780482 /* ZipArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9836B36F1AE5F11D00780482 /* ZipArchive.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		984B8F441AF1C3D900E096A8 /* OSKWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 984B8F421AF1C3D900E096A8 /* OSKWindowController.m */; };
 		984B8F451AF1C3D900E096A8 /* OSKWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 984B8F431AF1C3D900E096A8 /* OSKWindowController.xib */; };
-		984C2B221A79DF1B0023F89D /* KeymanEngine4Mac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C2B211A79DF1B0023F89D /* KeymanEngine4Mac.framework */; };
+		984C2B221A79DF1B0023F89D /* KeymanEngine4Mac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C2B211A79DF1B0023F89D /* KeymanEngine4Mac.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		9874C3211B536847000BB543 /* info.png in Resources */ = {isa = PBXBuildFile; fileRef = 9874C31E1B536847000BB543 /* info.png */; };
 		9874C3221B536847000BB543 /* keyman.png in Resources */ = {isa = PBXBuildFile; fileRef = 9874C31F1B536847000BB543 /* keyman.png */; };
 		9874C3231B536847000BB543 /* SideImage.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 9874C3201B536847000BB543 /* SideImage.bmp */; };
@@ -48,6 +48,7 @@
 		98FE105E1B4DE8F400525F54 /* NSWindow+SuppMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 98FE105D1B4DE8F400525F54 /* NSWindow+SuppMethods.m */; };
 		98FE10631B4DEE5600525F54 /* KMInfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98FE10611B4DEE5600525F54 /* KMInfoWindowController.m */; };
 		98FE10641B4DEE5600525F54 /* KMInfoWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98FE10621B4DEE5600525F54 /* KMInfoWindowController.xib */; };
+		E211CCF620B600A500505C36 /* KeymanEngine4Mac.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = E211CCF520B600A500505C36 /* KeymanEngine4Mac.framework.dSYM */; };
 		E21291A920A4DD680049790C /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291A820A4DD680049790C /* Crashlytics.framework */; };
 		E21291AB20A4DDE70049790C /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291AA20A4DDE70049790C /* Fabric.framework */; };
 		E21799051FC5B7BC00F2D66A /* KMInputMethodEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */; };
@@ -87,6 +88,16 @@
 				983247281A9EA28F0010B90C /* KeymanEngine4Mac.framework in Copy Files */,
 			);
 			name = "Copy Files";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E211CCF420B5FE7A00505C36 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				E211CCF620B600A500505C36 /* KeymanEngine4Mac.framework.dSYM in CopyFiles */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		E27BA9CF202036BA00D273E7 /* CopyFiles */ = {
@@ -168,6 +179,7 @@
 		98FE10601B4DEE5600525F54 /* KMInfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KMInfoWindowController.h; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.h; sourceTree = "<group>"; };
 		98FE10611B4DEE5600525F54 /* KMInfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMInfoWindowController.m; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.m; sourceTree = "<group>"; };
 		98FE10621B4DEE5600525F54 /* KMInfoWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = KMInfoWindowController.xib; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.xib; sourceTree = "<group>"; };
+		E211CCF520B600A500505C36 /* KeymanEngine4Mac.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = KeymanEngine4Mac.framework.dSYM; path = Keyman4MacIM/Frameworks/KeymanEngine4Mac.framework.dSYM; sourceTree = "<group>"; };
 		E21291A820A4DD680049790C /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Crashlytics.framework; path = ../../Carthage/Build/Mac/Crashlytics.framework; sourceTree = "<group>"; };
 		E21291AA20A4DDE70049790C /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Fabric.framework; path = ../../Carthage/Build/Mac/Fabric.framework; sourceTree = "<group>"; };
 		E21799031FC5B74D00F2D66A /* KMInputMethodEventHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodEventHandler.h; sourceTree = "<group>"; };
@@ -187,6 +199,7 @@
 		E29F22F1201A59B1005EA234 /* KeymanTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeymanTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E29F22F3201A59B1005EA234 /* KMInputMethodBrowserClientEventHandlerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodBrowserClientEventHandlerTests.m; sourceTree = "<group>"; };
 		E29F22F5201A59B2005EA234 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E2C92D4720B46CEA00742A7D /* KeymanEngine4Mac.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = KeymanEngine4Mac.framework.dSYM; path = Keyman4MacIM/Frameworks/KeymanEngine4Mac.framework.dSYM; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -291,6 +304,8 @@
 		989C9BFF1A7876DE00A20425 = {
 			isa = PBXGroup;
 			children = (
+				E2C92D4720B46CEA00742A7D /* KeymanEngine4Mac.framework.dSYM */,
+				E211CCF520B600A500505C36 /* KeymanEngine4Mac.framework.dSYM */,
 				E28914D82028A78C0048E71E /* OCMock.framework */,
 				E27BA9D0202036E200D273E7 /* OCMock.framework.dSYM */,
 				989C9C0A1A7876DE00A20425 /* Keyman4MacIM */,
@@ -449,6 +464,7 @@
 				989C9C051A7876DE00A20425 /* Frameworks */,
 				989C9C061A7876DE00A20425 /* Resources */,
 				983247261A9EA1DD0010B90C /* Copy Files */,
+				E211CCF420B5FE7A00505C36 /* CopyFiles */,
 				E21291A120A33CA50049790C /* ShellScript */,
 			);
 			buildRules = (
@@ -584,7 +600,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "SRC_DIR=\"${PROJECT_DIR}/../KeymanEngine4Mac/build/${CONFIGURATION}\"\nDEST_DIR=\"${PROJECT_DIR}/Keyman4MacIM/Frameworks\"\nFRAMEWORK_NAME=\"KeymanEngine4Mac.framework\"\nSRC_FRAMEWORK_PATH=\"${SRC_DIR}/KeymanEngine4Mac.framework\"\nDEST_FRAMEWORK_PATH=\"${DEST_DIR}/${FRAMEWORK_NAME}\"\nif [[ \"${SRC_DIR}\" == \"${DEST_DIR}\" ]]; then\n    exit 0\nfi\n\necho \"Source: ${SRC_FRAMEWORK_PATH}\"\necho \"Dest: ${DEST_FRAMEWORK_PATH}\"\n\nif [ ! -d \"${SRC_FRAMEWORK_PATH}\" ]; then\n    if [ ! -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n        echo \"Keyman engine framework must be built first!\"\n        exit 1\n    fi\n    exit 0\nfi\n\necho \"Copying Keyman Engine framework from ${SRC_DIR} to ${DEST_DIR}...\"\n\nif [ ! -d \"${DEST_DIR}\" ]; then\n    if [ -e \"${DEST_DIR}\" ]; then\n        echo \"${DEST_DIR} exists, but it is not a directory!\"\n        exit 1\n    else\n        mkdir -p \"$DEST_DIR\"\n    fi\nelif [ -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n    rm -rf \"${DEST_FRAMEWORK_PATH}\"\nfi\n\ncp -Rf \"${SRC_FRAMEWORK_PATH}\" \"${DEST_FRAMEWORK_PATH}\"";
+			shellScript = "SRC_DIR=\"${PROJECT_DIR}/../KeymanEngine4Mac/build/${CONFIGURATION}\"\nDEST_DIR=\"${PROJECT_DIR}/Keyman4MacIM/Frameworks\"\nFRAMEWORK_NAME=\"KeymanEngine4Mac.framework\"\nSRC_FRAMEWORK_PATH=\"${SRC_DIR}/${FRAMEWORK_NAME}\"\nDEST_FRAMEWORK_PATH=\"${DEST_DIR}/${FRAMEWORK_NAME}\"\nif [[ \"${SRC_DIR}\" == \"${DEST_DIR}\" ]]; then\n    exit 0\nfi\n\necho \"Source: ${SRC_FRAMEWORK_PATH}\"\necho \"Dest: ${DEST_FRAMEWORK_PATH}\"\n\nif [ ! -d \"${SRC_FRAMEWORK_PATH}\" ]; then\n    if [ ! -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n        echo \"Keyman engine framework must be built first!\"\n        exit 1\n    fi\n    exit 0\nfi\n\necho \"Copying Keyman Engine framework from ${SRC_DIR} to ${DEST_DIR}...\"\n\nif [ ! -d \"${DEST_DIR}\" ]; then\n    if [ -e \"${DEST_DIR}\" ]; then\n        echo \"${DEST_DIR} exists, but it is not a directory!\"\n        exit 1\n    else\n        mkdir -p \"$DEST_DIR\"\n    fi\nelif [ -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n    rm -rf \"${DEST_FRAMEWORK_PATH}\"\nfi\n\ncp -Rf \"${SRC_FRAMEWORK_PATH}\" \"${DEST_FRAMEWORK_PATH}\"\nif [ -e \"${SRC_FRAMEWORK_PATH}.dSYM\" ]; then\n    cp -Rf \"${SRC_FRAMEWORK_PATH}.dSYM\" \"${DEST_DIR}\"\nfi";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -731,7 +747,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
-				COPY_PHASE_STRIP = YES;
+				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -755,6 +771,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
 				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
@@ -771,6 +788,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Debug;
 		};
@@ -780,6 +798,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
 				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -795,6 +814,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;
 		};

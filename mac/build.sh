@@ -164,7 +164,13 @@ while [[ $# -gt 0 ]] ; do
                 if $PREPRELEASE && [[ "$2" != "Release" ]]; then
                     echo "Deployment option 'preprelease' supersedes $2 configuration."
                 else
-                    CONFIG="$2"
+                	if [[ "$2" == "r" || "$2" == "R" ]]; then
+                    	CONFIG="Release"
+                    elif [[ "$2" == "d" || "$2" == "D" ]]; then
+                    	CONFIG="Debug"
+                    else
+                    	CONFIG="$2"
+                    fi
                 fi
                 shift # past argument
             fi
@@ -287,6 +293,7 @@ updatePlist() {
 if $DO_KEYMANENGINE ; then
     updatePlist "$KME4M_BASE_PATH" "$ENGINE_NAME"
     execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS $TEST_ACTION -scheme $ENGINE_NAME"
+    execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
 fi
 
 if $DO_KEYMANIM ; then

@@ -66,10 +66,9 @@ NSRange _previousSelRange;
     //    }
     
     // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is the current keyboard and you type "Crashlytics force now", it will force a simulated crash to test reporting to fabric.io.
-    if ([self.AppDelegate debugMode]) {
+    if ([self.AppDelegate debugMode] && [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
         NSLog(@"Crashlytics - Preparing to detect Easter egg.");
-        _easterEggForCrashlytics = ([clientAppId isEqual: @"com.apple.dt.Xcode"]) ?
-            [[NSMutableString alloc] init] : nil;
+        _easterEggForCrashlytics = [[NSMutableString alloc] init];
     }
     else
         _easterEggForCrashlytics = nil;
