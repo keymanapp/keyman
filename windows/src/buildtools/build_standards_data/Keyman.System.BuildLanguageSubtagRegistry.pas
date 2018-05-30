@@ -39,6 +39,8 @@ var
     FID: string;
     FDescription: string;
   begin
+    FDescription := '';
+
     for i := 0 to FSubtagRegistry.Count-1 do
     begin
       line := Trim(FSubtagRegistry[i]);
@@ -54,6 +56,7 @@ var
             FRegions.Add(FID + '=' + FDescription);
         end;
         FType := '';
+        FDescription := '';
         Continue;
       end;
 
@@ -68,7 +71,7 @@ var
         FType := value
       else if code = 'Subtag' then
         FID := value
-      else if code = 'Description' then
+      else if (code = 'Description') and (FDescription = '') then
         FDescription := value;
     end;
   end;
