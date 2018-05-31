@@ -44,7 +44,9 @@ NSRange _previousSelRange;
 
 // This is the public initializer.
 - (instancetype)initWithClient:(NSString *)clientAppId {
-    BOOL legacy = ([clientAppId isEqual: @"com.github.atom"] ||
+    BOOL legacy = ([clientAppId isEqual: @"com.apple.iWork.Pages"] ||
+            [clientAppId isEqual: @"com.apple.iWork.Keynote"] ||
+            [clientAppId isEqual: @"com.github.atom"] ||
             [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
             [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
             [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
