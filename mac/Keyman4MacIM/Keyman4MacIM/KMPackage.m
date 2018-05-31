@@ -8,12 +8,22 @@
 
 #import <Foundation/Foundation.h>
 #import "KMPackage.h"
+#import "KMConfigurationWindowController.h"
 
 @implementation KMPackage
 
 const NSInteger kUnexpectedFileAsscociationType = 42;
-BOOL _installingKmp = NO;
-NSString *filename = nil;
+NSString *filenameTempKMP = nil;
+NSString *filename = nil; // This is the filename from the FileWrapper (if any)
+
+
+-(NSString *) getOrigKmpFilename {
+    return filename;
+}
+
+-(NSString *) getTempKmpFilename {
+    return filenameTempKMP;
+}
 
 + (BOOL)autosavesInPlace {
     return NO;
@@ -23,37 +33,28 @@ NSString *filename = nil;
 // they decide to install it or cancel the installation. It also gets called one time up-front
 // when Keyman first loads.
 - (void)makeWindowControllers {
-    // The first part of this conditional ensures that the config window is created,
-    // even if we are not going to display it. If this doesn't happen, then when the
-    // user tries to open the config window manually via the menu, it won't work.
-    if ([self.AppDelegate configWindow] != nil && _installingKmp) {
-        if ([self.AppDelegate debugMode])
-            NSLog(@"Attempting to display configuration window...");
-        
-        [[self.AppDelegate configWindow] showWindow:nil];
-        _installingKmp = NO;
-    }
+    if ([self.AppDelegate debugMode])
+        NSLog(@"KMP - in KMPackage.makeWindowControllers");
+
     if (filename != nil) { // Should be true every time except maybe the very first time (when loading).
-        // Since we aren't really opening this file as a document, after reading it (or deciding not to)
-        // we need to close this document so the controller doesn't hold onto it. Otherwise, if the user
-        // double-clicks the same KMP file a second time it will just assume we want to open the window
-        // to display the already open document, rather than attempting to read it again.
-        if ([self.AppDelegate debugMode])
-            NSLog(@"Closing document to release presenter...");
-        [self close];
         filename = nil;
+        [self closeIfFilesAreReleased];
     }
+}
+
+-(void) closeIfFilesAreReleased {
+    // Since we aren't really opening this file as a document, after reading it (or deciding not to)
+    // we need to close this document so the controller doesn't hold onto it. Otherwise, if the user
+    // double-clicks the same KMP file a second time it will just assume we want to open the window
+    // to display the already open document, rather than attempting to read it again.
+    if ([self.AppDelegate debugMode])
+        NSLog(@"Closing document to release presenter...");
+    if (filename == nil && filenameTempKMP == nil)
+        [self close];
 }
 
 - (KMInputMethodAppDelegate *)AppDelegate {
     return (KMInputMethodAppDelegate *)[NSApp delegate];
-}
-
-- (NSString *)pathForTemporaryKmpFile:(NSString *)kmpFilename
-{
-    NSString *  result = [NSTemporaryDirectory() stringByAppendingPathComponent:kmpFilename];
-    assert(result != nil);
-    return result;
 }
 
 -(BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError * _Nullable __autoreleasing *)outError {
@@ -74,54 +75,25 @@ NSString *filename = nil;
         return NO;
     }
     
-    // If the following is set to NO, then it will prevent displaying the config window when
-    // makeWindowControllers gets called. (Unfortunately, something about the document infrastructure
-    // in macOS will cause it to be displayed if it has not yet been displayed, even if the user cancels
-    // the installation. This is a bug that should be fixed, but no solution is yet apparent.)
-    _installingKmp = [self userConfirmsInstallationOfPackageFile:filename];
-    if (!_installingKmp) {
-        if ([self.AppDelegate debugMode])
-            NSLog(@"Keyman Package file installation cancelled by user.");
-        return YES; // Returning NO causes the system to report a failure to the user.
-    }
-    
-    NSString *tempFile = [self pathForTemporaryKmpFile:filename];
-    NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:tempFile];
+    filenameTempKMP = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
+    assert(filenameTempKMP != nil);
+    NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:filenameTempKMP];
     if (![fileWrapper writeToURL:fileURL options:NSFileWrapperWritingAtomic originalContentsURL:nil error:outError]) {
+        filenameTempKMP = nil;
         return NO;
     }
-    
-    BOOL didUnzip = [self.AppDelegate unzipFile:tempFile];
-    
-    if (!didUnzip && outError != NULL) {
-        NSDictionary *errorDictionary = @{ NSLocalizedDescriptionKey : @"Failed to unzip Keyman Package" };
-        *outError = [[NSError alloc] initWithDomain:@"Keyman" code:kUnexpectedFileAsscociationType userInfo:errorDictionary];
-    }
-    [[NSFileManager defaultManager] removeItemAtPath:tempFile error:nil];
-    return didUnzip;
+
+    KMConfigurationWindowController *configWindowController = (KMConfigurationWindowController *)[self.AppDelegate configWindow];
+    [configWindowController handleRequestToInstallPackage:self];
+
+    return YES; // Even if the user decides not to, we need to return Yes to prevent displaying an error message.
 }
 
--(BOOL)userConfirmsInstallationOfPackageFile:(NSString *)fileName {
-    NSAlert *alert = [[NSAlert alloc] init];
-    [alert addButtonWithTitle:NSLocalizedString(@"Yes", @"Alert button")];
-    [alert addButtonWithTitle:NSLocalizedString(@"No", @"Alert button")];
-    [alert setMessageText:NSLocalizedString(@"Install Keyman Package?", @"Alert message text when user double-clicks a KMP file.")];
-    NSString *info = NSLocalizedString(@"Do you want the Keyman Input Method to install this Package?\rFile: %@", @"Alert informative text when user double-clicks a KMP file. Parameter is the name of the KMP file.");
-    info = [NSString localizedStringWithFormat:info, fileName];
-    [alert setInformativeText:info];
-    [alert setAlertStyle:NSInformationalAlertStyle];
-    
-    if ([self.AppDelegate debugMode])
-        NSLog(@"Asking user to confirm installation...");
-    
-    // Attempted the following (with and without the first line) to try to
-    // get Keyman to be active foreground app so the alert message would not
-    // appear behind other window(s). Unfortunately, it doesn't work, probably
-    // because of Keyman being an input method.
-//    [[self.AppDelegate configWindow] showWindow:nil];
-//    [[NSRunningApplication currentApplication] activateWithOptions:0];
-    BOOL result = [alert runModal] == NSAlertFirstButtonReturn;
-    return result;
+-(void) releaseTempKMPFile {
+    assert(filenameTempKMP != nil);
+    [[NSFileManager defaultManager] removeItemAtPath:filenameTempKMP error:nil];
+    filenameTempKMP = nil;
+    [self closeIfFilesAreReleased];
 }
 
 // This tells the system that we aren't reading the Keyman Package file lazily.
