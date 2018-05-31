@@ -1287,13 +1287,16 @@ begin
     UpdateDebugStatusForm;   // I4809
     if FOldUIStatus = duiTest then
     begin
+      frmDebugStatus.Parent.Visible := True;
       if memo.Focused then
       begin
         GetParentForm(memo).ActiveControl := nil;
         //ActiveControl := memo;
         memo.SetFocus;
       end;
-    end;
+    end
+    else if FUIStatus = duiTest then
+      frmDebugStatus.Parent.Visible := False;
   end;
 end;
 

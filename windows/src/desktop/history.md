@@ -1,6 +1,35 @@
 # Keyman Desktop Version History
 
-## 2018-04-16 10.0.1091.0 beta
+## 2018-06-01 10.0.1100.0 beta
+* Fixes email link in Keyman help
+
+## 2018-05-31 10.0.1099.0 beta
+* Fixes a problem where "Castilian" was shown instead of "Spanish" in language configuration (#918)
+* Fixes a crash when the Keyboard Options dialog is closed (#916)
+
+## 2018-05-30 10.0.1098.0 beta
+* Prevents a crash if an invalid .kvk file is found in a package (#915)
+
+## 2018-05-29 10.0.1097.0 beta
+* Fixes incorrect icons in the Hotkeys tab in Keyman Configuration (#906)
+* Ensure language tags are correct when installing a keyboard (#892)
+
+## 2018-05-28 10.0.1096.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-28 10.0.1095.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-26 10.0.1094.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-25 10.0.1093.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-22 10.0.1092.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-17 10.0.1091.0 beta
 * Fixes Ctrl+Alt simulation regression (#835)
 
 ## 2018-05-11 10.0.1090.0 beta

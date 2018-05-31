@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_6ac85112227ea04def463c5eac1270ef</ID>
+      <Filename>bcp47completion.kmn</Filename>
+      <Filepath>bcp47completion.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>BCP 47 Completion</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_b2280d2c8050cfcd128606c79502d53a</ID>
+      <Filename>bcp47completion.kps</Filename>
+      <Filepath>bcp47completion.kps</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kps</FileType>
+      <Details>
+        <Name>BCP 47 Completion Test</Name>
+        <Version>1.0</Version>
+      </Details>
+    </File>
+    <File>
+      <ID>id_e5de69da6291013c2ff64248275f7384</ID>
+      <Filename>bcp47completion.kmx</Filename>
+      <Filepath>bcp47completion.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_b2280d2c8050cfcd128606c79502d53a</ParentFileID>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

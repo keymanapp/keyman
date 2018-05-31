@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E22804F320ACC3BE00085FCB /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = E22804F220ACC3BE00085FCB /* MainMenu.xib */; };
+		E22804F820ADBFC400085FCB /* TestInputMethodAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E22804F720ADBFC400085FCB /* TestInputMethodAppDelegate.m */; };
 		E237EE721F6982E000DFBADF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E237EE711F6982E000DFBADF /* main.m */; };
 		E237EE771F6982E000DFBADF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E237EE761F6982E000DFBADF /* Assets.xcassets */; };
 		E237EE831F69849A00DFBADF /* TestInputController.m in Sources */ = {isa = PBXBuildFile; fileRef = E237EE821F69849A00DFBADF /* TestInputController.m */; };
@@ -14,6 +16,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E22804F220ACC3BE00085FCB /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
+		E22804F620ADBFC400085FCB /* TestInputMethodAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestInputMethodAppDelegate.h; sourceTree = "<group>"; };
+		E22804F720ADBFC400085FCB /* TestInputMethodAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestInputMethodAppDelegate.m; sourceTree = "<group>"; };
 		E237EE6A1F6982E000DFBADF /* TestInput.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestInput.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E237EE711F6982E000DFBADF /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E237EE761F6982E000DFBADF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -53,12 +58,15 @@
 		E237EE6C1F6982E000DFBADF /* TestInput */ = {
 			isa = PBXGroup;
 			children = (
+				E22804F620ADBFC400085FCB /* TestInputMethodAppDelegate.h */,
+				E22804F720ADBFC400085FCB /* TestInputMethodAppDelegate.m */,
 				E237EE841F6A2AC600DFBADF /* test.tiff */,
 				E237EE711F6982E000DFBADF /* main.m */,
 				E237EE761F6982E000DFBADF /* Assets.xcassets */,
 				E237EE7B1F6982E000DFBADF /* Info.plist */,
 				E237EE811F69842800DFBADF /* TestInputController.h */,
 				E237EE821F69849A00DFBADF /* TestInputController.m */,
+				E22804F220ACC3BE00085FCB /* MainMenu.xib */,
 			);
 			path = TestInput;
 			sourceTree = "<group>";
@@ -125,6 +133,7 @@
 			files = (
 				E237EE851F6A2AC600DFBADF /* test.tiff in Resources */,
 				E237EE771F6982E000DFBADF /* Assets.xcassets in Resources */,
+				E22804F320ACC3BE00085FCB /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,6 +146,7 @@
 			files = (
 				E237EE831F69849A00DFBADF /* TestInputController.m in Sources */,
 				E237EE721F6982E000DFBADF /* main.m in Sources */,
+				E22804F820ADBFC400085FCB /* TestInputMethodAppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,6 +291,7 @@
 				E237EE801F6982E000DFBADF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

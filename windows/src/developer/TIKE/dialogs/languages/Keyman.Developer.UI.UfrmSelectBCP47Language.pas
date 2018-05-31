@@ -75,6 +75,7 @@ uses
   System.Generics.Collections,
 
   Keyman.Developer.System.HelpTopics,
+  Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.KMXFileLanguages,
   Keyman.System.LanguageCodeUtils,
   utilexecute;
@@ -151,9 +152,28 @@ begin
 end;
 
 procedure TfrmSelectBCP47Language.cbLanguageTagChange(Sender: TObject);
+var
+  t: string;
 begin
   inherited;
   tag.Language := TKMXFileLanguages.TranslateISO6393ToBCP47(cbLanguageTag.Text);
+  t := TCanonicalLanguageCodeUtils.FindBestTag(Tag.Tag);
+  if t <> '' then
+  begin
+    with TBCP47Tag.Create(t) do
+    try
+      cbScriptTag.Text := Script;
+      Self.tag.Script := Script;
+    finally
+      Free;
+    end;
+  end
+  else
+  begin
+    cbScriptTag.Text := '';
+    tag.Script := '';
+  end;
+  FCustomLanguageName := False; // Always reset when entering a language tag.
   RefreshLanguageName;
 end;
 

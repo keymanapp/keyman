@@ -3,6 +3,21 @@
 ## 11.0 alpha
 * Move to 11.0
 
+## 2018-05-27 10.0.397 beta
+* Improve intent-filter for *.kmp extensions (902)
+
+## 2018-05-22 10.0.396 beta
+* No changes to Keyman for Android.
+
+## 2018-05-22 10.0.395 beta
+* No changes to Keyman for Android.
+
+## 2018-05-18 10.0.394 beta
+* No changes to Keyman for Android.
+
+## 2018-05-17 10.0.393 beta
+* No changes to Keyman for Android.
+
 ## 2018-05-11 10.0.392 beta
 * Fix globe button when exiting in-app browser (#231)
 

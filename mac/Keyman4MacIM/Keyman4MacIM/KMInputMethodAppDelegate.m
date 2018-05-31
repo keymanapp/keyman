@@ -79,19 +79,21 @@ typedef enum {
                                                          forEventClass:kInternetEventClass
                                                             andEventID:kAEGetURL];
         
-        CFMachPortRef lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask | NSLeftMouseDown | NSLeftMouseUp, (CGEventTapCallBack)eventTapFunction, nil);
+        self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask | NSLeftMouseDown | NSLeftMouseUp, (CGEventTapCallBack)eventTapFunction, nil);
         
-        if (!lowLevelEventTap)
+        if (!self.lowLevelEventTap) {
             NSLog(@"Can't tap into low level events!");
-        else
-            CFRelease(lowLevelEventTap);
+        }
+        else {
+            CFRelease(self.lowLevelEventTap);
+        }
         
-        CFRunLoopSourceRef runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, lowLevelEventTap, 0);
+        self.runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, self.lowLevelEventTap, 0);
         
         CFRunLoopRef runLoop = CFRunLoopGetCurrent();
         
-        if (runLoopEventSrc && runLoop) {
-            CFRunLoopAddSource(runLoop,  runLoopEventSrc, kCFRunLoopDefaultMode);
+        if (self.runLoopEventSrc && runLoop) {
+            CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
         }
     }
 
@@ -100,8 +102,18 @@ typedef enum {
 
 -(void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"NSApplicationCrashOnExceptions": @YES }];
+    [[Fabric sharedSDK] setDebug: self.debugMode];
     [Fabric with:@[[Crashlytics class]]];
 }
+
+#ifdef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
+- (BOOL)alertShowHelp:(NSAlert *)alert {
+    NSLog(@"Crashlytics - KME: Got call to force crash from engine");
+    [[Crashlytics sharedInstance] crash];
+    NSLog(@"Crashlytics - KME: should not have gotten this far!");
+    return NO;
+}
+#endif
 
 - (void)handleURLEvent:(NSAppleEventDescriptor*)event withReplyEvent:(NSAppleEventDescriptor*)replyEvent {
     
@@ -176,11 +188,62 @@ typedef enum {
     return (KMInputMethodAppDelegate *)[NSApp delegate];
 }
 
+-(void) sleep {
+    if ([self debugMode]) {
+        NSLog(@"Keyman no longer active IM.");
+    }
+    self.sleeping = YES;
+    if ([self.oskWindow.window isVisible]) {
+        if ([self debugMode]) {
+            NSLog(@"Hiding OSK.");
+        }
+        [self.oskWindow.window setIsVisible:NO];
+    }
+    if (self.lowLevelEventTap) {
+        if ([self debugMode]) {
+            NSLog(@"Disabling event tap...");
+        }
+        CGEventTapEnable(self.lowLevelEventTap, NO);
+    }
+}
+
+-(void) wakeUp {
+    self.sleeping = NO;
+    if (self.lowLevelEventTap && !CGEventTapIsEnabled(self.lowLevelEventTap)) {
+        if ([self debugMode]) {
+            NSLog(@"Keyman is now the active IM. Re-enabling event tap...");
+        }
+        CGEventTapEnable(self.lowLevelEventTap, YES);
+    }
+}
+
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
     KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
     if (appDelegate != nil) {
+        if (type == kCGEventTapDisabledByTimeout || type == kCGEventTapDisabledByUserInput) {
+            // kCGEventTapDisabledByUserInput most likely means we're "sleeping", in which case we want it to stay
+            // diabled until we get the wake-up call.
+            if (!appDelegate.sleeping) {
+                // REVIEW: We might need to consider putting in some kind of counter/flag to ensure that the very next
+                // event is not another disable so we don't end up in an endless cycle.
+                NSLog(@"Event tap disabled by %@! Attempting to restart...", (type == kCGEventTapDisabledByTimeout ? @"timeout" : @"user"));
+                CGEventTapEnable(appDelegate.lowLevelEventTap, YES);
+                if (!CGEventTapIsEnabled(appDelegate.lowLevelEventTap)) {
+                    if (appDelegate.runLoopEventSrc) { // This should always be true
+                        CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+                        if (runLoop) {
+                            CFRunLoopRemoveSource(runLoop, appDelegate.runLoopEventSrc, kCFRunLoopDefaultMode);
+                        }
+                        appDelegate.runLoopEventSrc = nil;
+                    }
+                    appDelegate.lowLevelEventTap = nil;
+                }
+            }
+            return event;
+        }
+        
         NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
-        // Too many of these to be useful for most debugging sessions, but we'll keep this aound to be
+        // Too many of these to be useful for most debugging sessions, but we'll keep this around to be
         // un-commented when needed.
         //if (appDelegate.debugMode)
         //    NSLog(@"System Event: %@", sysEvent);

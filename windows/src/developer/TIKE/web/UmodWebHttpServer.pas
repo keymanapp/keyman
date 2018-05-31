@@ -78,6 +78,16 @@ type
     property FontData[Index: TKeyboardFont]: TStream read GetFontData;   // I4409
   end;
 
+  TWebDebugPackageInfo = class
+  strict private
+    FFilename: string;
+    FName: string;
+  public
+    constructor Create(const AFilename, AName: string);
+    property Filename: string read FFilename;
+    property Name: string read FName;
+  end;
+
   TmodWebHttpServer = class(TDataModule)
     http: TIdHTTPServer;
     procedure httpCommandGet(AContext: TIdContext;
@@ -85,12 +95,16 @@ type
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
   private
-    FKeyboardsCS: TCriticalSection;   // I4036
+    FKeyboardsCS, FPackagesCS: TCriticalSection;   // I4036
     FKeyboards: TObjectDictionary<string,TWebDebugKeyboardInfo>;   // I4063
+    FPackages: TObjectDictionary<string,TWebDebugPackageInfo>;
     function GetKeyboardStoredFileName(const WebFilename: string): string;
+    function GetPackageStoredFileName(const WebFilename: string): string;
   public
     procedure RegisterKeyboard(const Filename, Version: string; FontInfo: TKeyboardFontArray);   // I4063   // I4409
     procedure UnregisterKeyboard(const Filename: string);
+    procedure RegisterPackage(const Filename, Name: string);
+    procedure UnregisterPackage(const Filename: string);
     function GetURL: string;
     procedure GetURLs(v: TStrings);
   end;
@@ -132,6 +146,9 @@ begin
   FKeyboardsCS := TCriticalSection.Create;   // I4036
   FKeyboards := TObjectDictionary<string,TWebDebugKeyboardInfo>.Create;   // I4063
 
+  FPackagesCS := TCriticalSection.Create;
+  FPackages := TObjectDictionary<string,TWebDebugPackageInfo>.Create;   // I4063
+
   http.DefaultPort := FKeymanDeveloperOptions.WebHostDefaultPort;
 
   try
@@ -164,6 +181,20 @@ begin
 
   FreeAndNil(FKeyboards);
   FreeAndNil(FKeyboardsCS);   // I4036
+
+  FreeAndNil(FPackages);
+  FreeAndNil(FPackagesCS);   // I4036
+end;
+
+function TmodWebHttpServer.GetPackageStoredFileName(const WebFilename: string): string;
+begin
+  FPackagesCS.Enter;   // I4036
+  try
+    if FPackages.ContainsKey(WebFilename) then Result := FPackages[WebFilename].Filename
+    else Result := '';
+  finally
+    FPackagesCS.Leave;
+  end;
 end;
 
 function TmodWebHttpServer.GetKeyboardStoredFileName(const WebFilename: string): string;
@@ -374,6 +405,55 @@ var
     AResponseInfo.LastModified := Now;   // I4037
   end;
 
+  procedure RespondPackagesJSON;
+  var
+    json: TJSONObject;
+    jsonArray: TJSONArray;
+    jsonPackage: TJSONObject;
+    key: string;
+  begin
+    // Get dynamic keyboard registration
+    FPackagesCS.Enter;   // I4036
+    try
+
+      json := TJSONObject.Create;
+      jsonArray := TJSONArray.Create;
+      try
+        try
+          for key in FPackages.Keys do
+          begin
+            jsonPackage := TJSONObject.Create;
+            jsonPackage.AddPair('id', key);
+            jsonPackage.AddPair('filename', FPackages[key].Filename);
+            jsonPackage.AddPair('name', FPackages[key].Name);
+            jsonArray.Add(jsonPackage);
+          end;
+
+          json.AddPair('packages', jsonArray);
+
+          AResponseInfo.CharSet := 'UTF-8';
+          AResponseInfo.ContentType := 'application/json';
+          AResponseInfo.ContentText := JSONToString(json, True);
+
+          // Keyboard JSON always expire immediately
+          AResponseInfo.Expires := EncodeDate(1990, 1, 1);
+          AResponseInfo.CacheControl := 'no-cache, no-store';
+          AResponseInfo.LastModified := Now;
+        finally
+          json.Free;
+        end;
+      except
+        on E:Exception do
+        begin
+          Respond404;
+          Exit;
+        end;
+      end;
+    finally
+      FPackagesCS.Leave;
+    end;
+  end;
+
   procedure RespondFont(const src: string);   // I4063
   var
     name, key: string;
@@ -562,6 +642,12 @@ begin
     Exit;
   end;
 
+  if doc = 'inc/packages.json' then
+  begin
+    RespondPackagesJSON;
+    Exit;
+  end;
+
   FFileRegExp := TRegExpr.Create;   // I4036
   FResourceFileRegExp := TRegExpr.Create;   // I4036
   try
@@ -603,6 +689,30 @@ begin
       end;
       RespondKeyboardJson(doc);
       Exit;
+    end
+    else if Copy(doc, 1, 8) = 'package/' then
+    begin
+      Delete(doc, 1, 8);
+
+      // Packages always expire immediately
+      AResponseInfo.Expires := EncodeDate(1990, 1, 1);   // I4037
+      AResponseInfo.CacheControl := 'no-cache, no-store';   // I4037
+      AResponseInfo.LastModified := Now;   // I4037
+
+      if not FFileRegExp.Exec(doc) then
+      begin
+        // We don't allow files with invalid names to be sent to
+        // Android and iOS. TODO: We should probably consider giving
+        // a friendly error :)
+        Respond404;
+        Exit;
+      end;
+      doc := GetPackageStoredFileName(doc);
+      if doc = '' then
+      begin
+        Respond404;
+        Exit;
+      end;
     end
     else if Copy(doc, 1, 9) = 'keyboard/' then
     begin
@@ -669,6 +779,19 @@ begin
   end;
 end;
 
+procedure TmodWebHttpServer.RegisterPackage(const Filename, Name: string);
+var
+  p: TWebDebugPackageInfo;
+begin
+  p := TWebDebugPackageInfo.Create(Filename, Name);
+  FPackagesCS.Enter;
+  try
+    FPackages.AddOrSetValue(ExtractFileName(Filename), p);
+  finally
+    FPackagesCS.Leave;
+  end;
+end;
+
 procedure TmodWebHttpServer.UnregisterKeyboard(const Filename: string);
 begin
   FKeyboardsCS.Enter;   // I4036
@@ -676,6 +799,16 @@ begin
     FKeyboards.Remove(ExtractFileName(Filename));
   finally
     FKeyboardsCS.Leave;
+  end;
+end;
+
+procedure TmodWebHttpServer.UnregisterPackage(const Filename: string);
+begin
+  FPackagesCS.Enter;   // I4036
+  try
+    FPackages.Remove(ExtractFileName(Filename));
+  finally
+    FPackagesCS.Leave;
   end;
 end;
 
@@ -784,6 +917,14 @@ begin
   finally
     Canvas.Free;
   end;
+end;
+
+{ TWebDebugPackageInfo }
+
+constructor TWebDebugPackageInfo.Create(const AFilename, AName: string);
+begin
+  FFilename := AFilename;
+  FName := AName;
 end;
 
 end.

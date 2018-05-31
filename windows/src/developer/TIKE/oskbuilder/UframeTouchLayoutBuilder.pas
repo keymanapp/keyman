@@ -143,6 +143,7 @@ uses
   UfrmMain,
   Unicode,
   utildir,
+  utilfiletypes,
   utilhttp,
   VisualKeyboard;
 
@@ -184,7 +185,7 @@ procedure TframeTouchLayoutBuilder.FormCreate(Sender: TObject);
 begin
   inherited;
   FDisplayScriptErrors := True;   // I4047
-  FTemplateFileName := GetLayoutBuilderPath + 'template-basic.js';   // I4226
+  FTemplateFileName := GetLayoutBuilderPath + 'template-basic' + Ext_KeymanTouchLayout;   // I4226
 end;
 
 procedure TframeTouchLayoutBuilder.FormDestroy(Sender: TObject);

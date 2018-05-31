@@ -134,12 +134,12 @@ BOOL IntLoadKeyboardOptions(LPCSTR key, LPINTKEYBOARDINFO kp)
   RegistryReadOnly r(HKEY_CURRENT_USER);
   if(r.OpenKeyReadOnly(REGSZ_KeymanActiveKeyboards) && r.OpenKeyReadOnly(kp->Name) && r.OpenKeyReadOnly(key))
   {
-    WCHAR buf[255];
+    WCHAR buf[256];
     int n = 0;
     while(r.GetValueNames(buf, sizeof(buf) / sizeof(buf[0]), n))
     {
       buf[255] = 0;
-      WCHAR val[255];
+      WCHAR val[256];
       if(r.ReadString(buf, val, sizeof(val) / sizeof(val[0])) && val[0])
       {
         val[255] = 0;

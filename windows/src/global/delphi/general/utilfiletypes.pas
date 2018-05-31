@@ -25,18 +25,14 @@ type
   TKMFileType = (ftKeymanSource, ftPackageSource, ftKeymanFile, ftPackageFile,
     ftFont, ftReadme, ftTextFile,
     ftKeymanWizard, ftOther, ftBitmap,
-    ftVisualKeyboard, ftXMLFile, ftHTMLFile, ftJavascript);
+    ftVisualKeyboard, ftXMLFile, ftHTMLFile, ftJavascript,
+    ftTouchLayout, ftVisualKeyboardSource);
 const
-  {FileTypes: array[TKMFileType] of string = ('ftKeymanSource', 'ftPackageSource',
-    'ftKeymanFile', 'ftPackageFile', 'ftFont', 'ftReadme', 'ftTextFile',
-    'ftKeymanWizard', 'ftOther', 'ftBitmap',
-    'ftVirtualKeyboard', 'ftAddinFile', 'ftInstallerSource', 'ftBrandingSource',
-    'ftEncryptedKeymanFile', 'ftEncryptedBranding');}
-
   FileTypeNames: array[TKMFileType] of string = ('Keyman Source File', 'Package Source File',
     'Keyman Keyboard File', 'Keyman Package File', 'Font', 'Readme File', 'Text File',
     'Keyman Wizard File', 'Other File', 'Bitmap File',
-    'Keyman Visual Keyboard File', 'XML File', 'HTML File', 'Javascript File');
+    'Keyman Visual Keyboard File', 'XML File', 'HTML File', 'Javascript File',
+    'Keyman Touch Layout Source File', 'Keyman Visual Keyboard Source File');
 
 
 type
@@ -48,18 +44,24 @@ type
 const
   Ext_KeymanFile = '.kmx';
   Ext_PackageFile = '.kmp';
+  Ext_KeymanTouchLayout = '.keyman-touch-layout';
+  Ext_VisualKeyboard = '.kvk';
+  Ext_VisualKeyboardSource = '.kvks';
 
-const ExtFileTypes: array[0..10] of TKMFileTypeInfo = (
+
+const ExtFileTypes: array[0..12] of TKMFileTypeInfo = (
   (Ext: '.kmn'; FileType: ftKeymanSource),
   (Ext: '.kps'; FileType: ftPackageSource),
-  (Ext: '.kmx'; FileType: ftKeymanFile),
-  (Ext: '.kmp'; FileType: ftPackageFile),
+  (Ext: Ext_KeymanFile; FileType: ftKeymanFile),
+  (Ext: Ext_PackageFile; FileType: ftPackageFile),
   (Ext: '.ttf'; FileType: ftFont),
   (Ext: '.otf'; FileType: ftFont),
   (Ext: '.fon'; FileType: ftFont),
   (Ext: '.ttc'; FileType: ftFont),
-  (Ext: '.kvk'; FileType: ftVisualKeyboard),
+  (Ext: Ext_VisualKeyboard; FileType: ftVisualKeyboard),
+  (Ext: Ext_VisualKeyboardSource; FileType: ftVisualKeyboardSource),
   (Ext: '.js'; FileType: ftJavascript),
+  (Ext: Ext_KeymanTouchLayout; FileType: ftTouchLayout),
   (Ext: ''; FileType: ftOther));
 
 function GetFileTypeFromFileName(const FileName: string): TKMFileType;

@@ -564,6 +564,7 @@ uses
   kmxfile,
   OnlineConstants,
   Project,
+  ProjectFileUI,
   RegExpr,
   ErrorControlledRegistry,
   RedistFiles,
@@ -989,6 +990,9 @@ procedure TfrmKeymanWizard.StartDebugging(FStartTest: Boolean);
     ki: TKeyboardInfo;
     buf: WideString;
   begin
+    if not FileExists((ProjectFile as TkmnProjectFile).TargetFilename) then
+      Exit(False);
+
     try
       GetKeyboardInfo((ProjectFile as TkmnProjectFile).TargetFilename, True, ki);   // I4695
       try
@@ -1038,7 +1042,20 @@ begin
       FDebugForm.CanDebug := True;
       FDebugForm.UIStatus := duiReadyForInput;
       (ProjectFileUI as TkmnProjectFileUI).Debug := True;   // I4687
-      modActionsKeyboardEditor.actKeyboardCompile.Execute;
+
+      frmMessages.Clear;   // I4686
+
+      if not (ProjectFileUI as TkmnProjectFileUI).DoAction(pfaCompile, False) then
+      begin
+        ShowMessage(SKErrorsInCompile);
+        Exit;
+      end;
+
+      if not FileExists((ProjectFile as TkmnProjectFile).TargetFilename) then
+      begin
+        ShowMessage(SKKeyboardKMXDoesNotExist);
+        Exit;
+      end;
 
       if not KeyboardContainsDebugInformation then
       begin
@@ -3103,7 +3120,9 @@ begin
   begin
     if (FFeature[kfTouchLayout].FileName = '') then   // I3909
     begin
-      FFeature[kfTouchLayout].FileName := ChangeFileExt(FileName, '') + '-layout.js';
+      FFeature[kfTouchLayout].FileName :=
+        // See also TKeyboardParser_Features.GetDefaultFeatureFilename
+        Format(KeyboardFeatureFilename[kfTouchLayout], [ChangeFileExt(ExtractFileName(FileName), '')]);
     end;
 
     if pagesTouchLayout.ActivePage = pageTouchLayoutDesign   // I4034

@@ -191,20 +191,23 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - SeeAlso:
   ///   - addKeyboard()
   /// - Returns: Whether the keyboard was set successfully
+  //TODO: this method appears unused, should we remove it?
   public func setKeyboard(withFullID fullID: FullKeyboardID) -> Bool {
     if let keyboard = Storage.active.userDefaults.userKeyboard(withFullID: fullID) {
-      return setKeyboard(keyboard)
+        return setKeyboard(keyboard)
     }
     return false
   }
+  
 
   /// Set the current keyboard.
   ///
-  /// - Returns: Whether the keyboard was set successfully
+  /// - Throws: error if the keyboard was unchanged
   public func setKeyboard(_ kb: InstallableKeyboard) -> Bool {
     if kb.fullID == currentKeyboardID {
       log.info("Keyboard unchanged: \(kb.fullID)")
       return false
+     // throw KeyboardError.unchanged
     }
 
     log.info("Setting language: \(kb.fullID)")
@@ -234,6 +237,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     NotificationCenter.default.post(name: Notifications.keyboardChanged,
                                     object: self,
                                     value: kb)
+    
     return true
   }
 
@@ -297,7 +301,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     // Set a new keyboard if deleting the current one
     if kb.fullID == currentKeyboardID {
-      setKeyboard(userKeyboards[0])
+      _ = setKeyboard(userKeyboards[0])
     }
 
     if !userKeyboards.contains(where: { $0.id == kb.id }) {
@@ -332,7 +336,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return nil
     }
     let newIndex = (index + 1) % userKeyboards.count
-    setKeyboard(userKeyboards[newIndex])
+    _ = setKeyboard(userKeyboards[newIndex])
     return newIndex
   }
 
@@ -410,16 +414,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
             for keyboard in installableKeyboards {
               let storedPath = Storage.active.keyboardURL(for: keyboard)
               
-              
-              
               var installableFiles: [[Any]] = [["\(keyboardID).js", storedPath]]
-              if let _ = osk {
-                let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk!)
+              if let osk = osk {
+                let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk)
                 installableFiles.append([osk, oskPath])
               }
               
-              if let _ = font {
-                let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font!)
+              if let font = font {
+                let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font)
                 installableFiles.append([font, displayPath])
               }
               do {
@@ -1004,11 +1006,11 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     currentKeyboardID = nil
 
     if let keyboard = keyboard {
-      setKeyboard(keyboard)
+      _ = setKeyboard(keyboard)
     } else if let keyboard = Storage.active.userDefaults.userKeyboards?[safe: 0] {
-      setKeyboard(keyboard)
+      _ = setKeyboard(keyboard)
     } else {
-      setKeyboard(Defaults.keyboard)
+      _ = setKeyboard(Defaults.keyboard)
     }
   }
 
@@ -1154,7 +1156,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       } else if let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
         newKb = userKbs[0]
       }
-      setKeyboard(newKb)
+      _ = setKeyboard(newKb)
     }
 
     NotificationCenter.default.post(name: Notifications.keyboardLoaded, object: self, value: newKb)

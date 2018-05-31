@@ -40,6 +40,7 @@ uses
   System.IniFiles,
   System.Zip,
 
+  BCP47Tag,
   OnlineConstants,
   VisualKeyboard,
   utilfiletypes,
@@ -48,6 +49,7 @@ uses
   kmxfile,
   KeymanDeveloperOptions,
 
+  Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.PackageInfoRefreshKeyboards,
 
   RedistFiles,
@@ -75,6 +77,7 @@ type
     function Compile: Boolean;
     procedure CheckForDangerousFiles;
     procedure CheckKeyboardVersions;
+    procedure CheckKeyboardLanguages;
   end;
 
 function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent: Boolean; const AOutputFileName: string): Boolean;   // I4688
@@ -128,6 +131,7 @@ begin
 
   CheckForDangerousFiles;
   CheckKeyboardVersions;
+  CheckKeyboardLanguages;
 
   GetTempPath(260, buf);
   FTempPath := buf;
@@ -375,6 +379,45 @@ begin
       WriteMessage(plsWarning, Format(SKKeyboardPackageVersionMismatch,
         [ExtractFileName(pack.Files[i].FileName), ki.KeyboardVersion, pack.Info.Desc[PackageInfo_Version]]));
     ki.MemoryDump.Free;
+  end;
+end;
+
+const
+  SKKeyboardPackageLanguageNonCanonical = 'The keyboard %0:s has a non-canonical language ID "%1:s" (%2:s), should be "%3:s".';
+
+procedure TCompilePackage.CheckKeyboardLanguages;
+var
+  k: TPackageKeyboard;
+  l: TPackageKeyboardLanguage;
+  NewID: string;
+  Tag, NewTag: TBCP47Tag;
+begin
+  for k in pack.Keyboards do
+  begin
+    for l in k.Languages do
+    begin
+      Tag := TBCP47Tag.Create(l.ID);
+      NewID := TCanonicalLanguageCodeUtils.FindBestTag(l.ID);
+      if NewID = '' then
+      begin
+        // We don't have enough data to validate this tag
+        Continue;
+      end;
+
+      NewTag := TBCP47Tag.Create(NewID);
+      try
+        if (Tag.Script = '') and (NewTag.Script <> '') then
+        begin
+          // Only give non-canonical warning if the script tag is missing but should
+          // be present.
+          NewTag.Region := Tag.Region; // We don't care about region, don't give unhelpful info to developer
+          WriteMessage(plsWarning, Format(SKKeyboardPackageLanguageNonCanonical, [k.ID, l.ID, l.Name, NewTag.Tag]));
+        end;
+      finally
+        NewTag.Free;
+        Tag.Free;
+      end;
+    end;
   end;
 end;
 

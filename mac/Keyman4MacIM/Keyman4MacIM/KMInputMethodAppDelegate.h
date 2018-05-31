@@ -42,7 +42,11 @@ extern NSString *const kReadMeFile;
 extern NSString *const kVersion;
 extern NSString *const kWebSite;
 
-@interface KMInputMethodAppDelegate : NSObject {
+@interface KMInputMethodAppDelegate : NSObject
+#ifdef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
+    <NSAlertDelegate>
+#endif
+{
     IBOutlet NSMenu *_menu;
 }
 
@@ -56,6 +60,9 @@ extern NSString *const kWebSite;
 @property (nonatomic, strong) NSMutableArray *activeKeyboards;
 @property (nonatomic, strong) NSMutableString *contextBuffer;
 @property (nonatomic, assign) NSEventModifierFlags currentModifierFlags;
+@property (nonatomic, assign) CFMachPortRef lowLevelEventTap;
+@property (nonatomic, assign) CFRunLoopSourceRef runLoopEventSrc;
+@property (nonatomic, assign) BOOL sleeping;
 @property (nonatomic, assign) BOOL contextChangingEventDetected;
 @property (nonatomic, strong) OSKWindowController *oskWindow;
 @property (nonatomic, strong) NSString *keyboardName;
@@ -82,6 +89,8 @@ extern NSString *const kWebSite;
 - (void)showAboutWindow;
 - (void)showOSK;
 - (void)showConfigurationWindow;
+- (void)sleep;
+- (void)wakeUp;
 - (void)handleKeyEvent:(NSEvent *)event;
 - (BOOL)unzipFile:(NSString *)filePath;
 - (NSWindowController *)downloadKBWindow_;
