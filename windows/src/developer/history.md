@@ -1,5 +1,34 @@
 # Keyman Developer Version History
 
+## 2018-06-01 10.0.1100.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-31 10.0.1099.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-30 10.0.1098.0 beta
+* Validate and lookup language names automatically in package editor (#911)
+* Feature: add .kmp download links from debug web server (#910)
+
+## 2018-05-29 10.0.1097.0 beta
+* Prevent a crash when attempting to load an invalid project file (#909)
+* Hide debug status panel in Test Mode (#908)
+
+## 2018-05-28 10.0.1096.0 beta
+* Fix for crash in regression testing restart (#907)
+
+## 2018-05-28 10.0.1095.0 beta
+* Renames touch layout extension from -layout.js to .keyman-touch-layout (#897)
+
+## 2018-05-26 10.0.1094.0 beta
+* Check that build succeeded before attempting to start debugger (#900)
+
+## 2018-05-25 10.0.1093.0 beta
+* Make longpress slash darker in touch layout editor (#898)
+
+## 2018-05-22 10.0.1092.0 beta
+* No changes to Keyman Developer
+
 ## 2018-05-17 10.0.1091.0 beta
 * No changes to Keyman Developer
 
