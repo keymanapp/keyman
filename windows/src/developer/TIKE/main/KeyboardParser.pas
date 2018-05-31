@@ -750,7 +750,7 @@ procedure TKeyboardParser_Comment.InitLine(ALine: WideString);
 begin
   inherited InitLine(ALine);
   Assert(WideSameText(GetTag(ALine), 'c'));
-  Value := Trim(ALine);
+  FValue := Trim(ALine);
 end;
 
 constructor TKeyboardParser_Comment.CreateNew(AValue: WideString; ANew: Boolean);
