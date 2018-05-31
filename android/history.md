@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 11.0 alpha
+* Move to 11.0
+
 ## 2018-05-27 10.0.397 beta
 * Improve intent-filter for *.kmp extensions (902)
 
