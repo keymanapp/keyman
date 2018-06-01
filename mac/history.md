@@ -1,5 +1,8 @@
 # Keyman for macOS Version History
 
+## 2018-06-01 10.0.44 beta
+* Improved double-clicking KMP (#929)
+
 ## 2018-05-28 10.0.43 beta
 * Error-reporting improvements (settings modified to upload symbols for Engine (#884)
 
