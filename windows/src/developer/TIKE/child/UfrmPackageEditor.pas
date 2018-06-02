@@ -986,7 +986,7 @@ end;
 
 procedure TfrmPackageEditor.cmdOpenDebugHostClick(Sender: TObject);
 begin
-  TUtilExecute.URL(lbDebugHosts.Items[lbDebugHosts.ItemIndex] + 'packages.html');
+  TUtilExecute.URL(lbDebugHosts.Items[lbDebugHosts.ItemIndex] + '/packages.html');
 end;
 
 procedure TfrmPackageEditor.cmdOpenFileClick(Sender: TObject);   // I4687

@@ -1152,9 +1152,9 @@ inherited frmPackageEditor: TfrmPackageEditor
           object cmdOpenDebugHost: TButton
             Left = 12
             Top = 198
-            Width = 189
+            Width = 221
             Height = 25
-            Caption = 'Open &debugger in local browser'
+            Caption = 'Open packages page in local &browser'
             TabOrder = 2
             OnClick = cmdOpenDebugHostClick
           end
