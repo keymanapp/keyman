@@ -1,3 +1,1 @@
-binary "https://raw.githubusercontent.com/Building42/Specs/master/Carthage/macOS/Crashlytics.json" "3.10.1"
-binary "https://raw.githubusercontent.com/Building42/Specs/master/Carthage/macOS/Fabric.json" "1.7.6"
 github "erikdoe/ocmock" "v3.4.1"
