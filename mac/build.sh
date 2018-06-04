@@ -299,6 +299,9 @@ if $DO_KEYMANENGINE ; then
 fi
 
 if $DO_KEYMANIM ; then
+	cd "$KM4MIM_BASE_PATH"
+	pod install
+	cd "$KEYMAN_MAC_BASE_PATH"
     updatePlist "$KM4MIM_BASE_PATH" "$IM_NAME"
     execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman"
     if [ "$TEST_ACTION" == "test" ]; then

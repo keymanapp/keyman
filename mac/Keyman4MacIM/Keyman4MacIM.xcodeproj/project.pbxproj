@@ -847,7 +847,7 @@
 					"$(PROJECT_DIR)/Keyman4MacIM/Frameworks",
 					"$(PROJECT_DIR)/../Carthage/Build/Mac/**",
 				);
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Keyman4MacIM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
@@ -874,7 +874,7 @@
 					"$(PROJECT_DIR)/Keyman4MacIM/Frameworks",
 					"$(PROJECT_DIR)/../Carthage/Build/Mac/**",
 				);
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Keyman4MacIM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
@@ -908,7 +908,10 @@
 					"$(PROJECT_DIR)/../Carthage/Build/Mac/**",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../Carthage/Build/Mac/**";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../Carthage/Build/Mac/**",
+					"$(inherited)",
+				);
 				INFOPLIST_FILE = KeymanTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
