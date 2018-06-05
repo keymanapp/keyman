@@ -1,6 +1,6 @@
 # Keyman for macOS Version History
 
-## 2018-06-05 10.0.46 beta
+## 2018-06-06 10.0.46 beta
 * Fixed crash caused by accessing disposed KeyView from timer event (#938, #941)
 
 ## 2018-06-05 10.0.45 beta
