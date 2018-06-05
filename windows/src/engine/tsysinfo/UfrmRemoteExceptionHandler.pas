@@ -386,7 +386,6 @@ begin
       Free;
     end;
     FTempFileName := TSIFileName;
-    DeleteFile(FLogFile);
   end
   else
     FTempFileName := FLogFile;
@@ -409,6 +408,9 @@ end;
 
 procedure TfrmExceptionHandler.FormDestroy(Sender: TObject);
 begin
+  if FileExists(FLogFile) then
+    DeleteFile(FLogFile);
+
   Application.UnhookMainWindow(AppMessage);
 end;
 
