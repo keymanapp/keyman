@@ -1,7 +1,11 @@
 # Keyman for Android
 
+## 2018-06-05 10.0.398 beta
+* Fix globe button for system keyboard (#940)
+
 ## 2018-05-27 10.0.397 beta
-* Improve intent-filter for *.kmp extensions (902)
+
+* Improve intent-filter for *.kmp extensions (#902)
 
 ## 2018-05-22 10.0.396 beta
 * No changes to Keyman for Android.
@@ -16,7 +20,7 @@
 * No changes to Keyman for Android.
 
 ## 2018-05-11 10.0.392 beta
-* Fix globe button when exiting in-app browser (#231)
+* Fix globe button when exiting in-app browser (#848)
 
 ## 2018-05-11 10.0.391 beta
 * Update compile and target Android SDK version to 27 (#750)
