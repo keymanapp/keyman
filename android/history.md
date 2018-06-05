@@ -1,7 +1,7 @@
 # Keyman for Android
 
 ## 2018-06-05 10.0.398 beta
-* Fix globe button for system keyboard (#940)
+* Fix globe button for system keyboard (#942)
 
 ## 2018-05-27 10.0.397 beta
 
