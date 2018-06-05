@@ -44,7 +44,7 @@ type
   TKPInstallKeyboardLanguageProfiles = class(TKPBase)
     // Expects LANGIDs and LocaleNames in format 'en-US en 0409';
     procedure Execute(const KeyboardName, KeyboardDescription: string; LangIDs: array of Integer; IconFileName: string; InstallFirstOnly: Boolean); overload;  // I3707   // I3768   // I4607
-    procedure Execute(const KeyboardName, KeyboardDescription, BCP47Tag, IconFileName, LanguageName: string); overload;  // I3707   // I3768   // I4607
+    function Execute(const KeyboardName, KeyboardDescription, BCP47Tag, IconFileName, LanguageName: string): Boolean; overload;  // I3707   // I3768   // I4607
     constructor Create(AContext: TKeymanContext);
     destructor Destroy; override;
   private
@@ -162,7 +162,7 @@ begin
   Context.Control.AutoApplyKeyman;
 end;
 
-procedure TKPInstallKeyboardLanguageProfiles.Execute(const KeyboardName, KeyboardDescription, BCP47Tag, IconFileName, LanguageName: string);
+function TKPInstallKeyboardLanguageProfiles.Execute(const KeyboardName, KeyboardDescription, BCP47Tag, IconFileName, LanguageName: string): Boolean;
 var
   FIsAdmin: Boolean;
 begin
@@ -185,8 +185,9 @@ begin
       RootPath := GetRegistryKeyboardInstallKey_CU(KeyboardName) + SRegSubKey_LanguageProfiles;
     end;
 
-    if reg.OpenKey(RootPath, True) then
-      RegisterLocale(KeyboardDescription, BCP47Tag, 0, IconFileName, LanguageName);   // I3707   // I3768   // I4607
+    if reg.OpenKey(RootPath, True)
+      then Result := RegisterLocale(KeyboardDescription, BCP47Tag, 0, IconFileName, LanguageName)   // I3707   // I3768   // I4607
+      else Result := False;
   finally
     reg.Free;
   end;
@@ -236,8 +237,15 @@ begin
     if not ConvertLangIDToBCP47Tag(LangID, BCP47Tag) then
       Exit;
   end
-  else if not ConvertBCP47TagToLangID(BCP47Tag, LangID) and FWin8Languages.IsSupported then
+  else if not ConvertBCP47TagToLangID(BCP47Tag, LangID) then
   begin
+    //
+    // Installing a custom language only supported with Win8 and later
+    //
+
+    if not FWin8Languages.IsSupported then
+      Exit;
+
     //
     // Install user language with Powershell if it isn't present
     //
