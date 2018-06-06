@@ -1,5 +1,12 @@
 # Keyman Developer Version History
 
+## 2018-06-05 10.0.1102.0 beta
+* Improved crash reporting stability (#940)
+
+## 2018-06-03 10.0.1101.0 beta
+* Open Packages Page now opens the browser in Package Editor (#926)
+* Source editor no longer left-trims comments (#925)
+
 ## 2018-06-01 10.0.1100.0 beta
 * No changes to Keyman Developer
 
