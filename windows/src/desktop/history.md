@@ -1,5 +1,11 @@
 # Keyman Desktop Version History
 
+## 2018-06-05 10.0.1102.0 beta
+* Improved crash reporting stability (#940)
+
+## 2018-06-03 10.0.1101.0 beta
+* No changes in Keyman Desktop
+
 ## 2018-06-01 10.0.1100.0 beta
 * Fixes email link in Keyman help
 
@@ -54,10 +60,10 @@
 * Adds script lookup to Add Keyboard Language dialog (#827)
 
 ## 2018-05-07 10.0.1081.0 beta
-* Fixes crash in Keyman Developer when keyboard name contains an ampersand (#831)
+* Fixes crash in Keyman Desktop when keyboard name contains an ampersand (#831)
 
 ## 2018-05-07 10.0.1080.0 beta
-* Fixes crash starting Keyman Developer when using certain base keyboards (#832)
+* Fixes crash starting Keyman Desktop when using certain base keyboards (#832)
 
 ## 2018-05-07 10.0.1079.0 beta
 * Fixes crash in updating active keyboard icon in On Screen Keyboard (#828)
