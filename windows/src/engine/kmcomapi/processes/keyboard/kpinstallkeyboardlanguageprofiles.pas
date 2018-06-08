@@ -208,6 +208,18 @@ begin
       LangID := Win8Lang.LangID;
       Exit(True);
     end;
+  end
+  else
+  begin
+    // Assuming that the tag is a Language-Script-Region triplet at most.
+    // If you use -Variant or -Extension then YMMV.
+    with TBCP47Tag.Create(Locale) do
+    try
+      Script := '';
+      Locale := Tag;
+    finally
+      Free;
+    end;
   end;
 
   LangID := LocaleNameToLCID(PWideChar(Locale), 0);
