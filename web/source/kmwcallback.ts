@@ -1109,12 +1109,16 @@ namespace com.keyman {
                 result=false;
               }
           }
-
+          
           switch(constraint) {
+            case 'macos':
+            case 'mac':
+              constraint = 'macosx';
+              // fall through
+            case 'macosx':
             case 'windows':
             case 'android':
             case 'ios':
-            case 'macosx':
             case 'linux':
               if(this.keymanweb.util.activeDevice.OS.toLowerCase() != constraint) {
                 result=false;
