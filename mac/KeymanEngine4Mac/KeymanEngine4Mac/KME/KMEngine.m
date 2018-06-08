@@ -869,31 +869,32 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 - (BOOL)checkPlatform:(NSString *)platform {
     NSArray *values = [platform componentsSeparatedByString:@" "];
     for (NSString *value in values) {
-        if ([value isEqualToString:@"touch"])
+        NSString *lcValue = [value lowercaseString];
+        if ([lcValue isEqualToString:@"touch"])
             return NO;
-        else if ([value isEqualToString:@"windows"])
+        else if ([lcValue isEqualToString:@"windows"])
             return NO;
-        else if ([value isEqualToString:@"android"])
+        else if ([lcValue isEqualToString:@"android"])
             return NO;
-        else if ([value isEqualToString:@"ios"])
+        else if ([lcValue isEqualToString:@"ios"])
             return NO;
-        else if ([value isEqualToString:@"linux"])
+        else if ([lcValue isEqualToString:@"linux"])
             return NO;
-        else if ([value isEqualToString:@"tablet"])
+        else if ([lcValue isEqualToString:@"tablet"])
             return NO;
-        else if ([value isEqualToString:@"phone"])
+        else if ([lcValue isEqualToString:@"phone"])
             return NO;
-        else if ([value isEqualToString:@"web"])
+        else if ([lcValue isEqualToString:@"web"])
             return NO;
-        else if ([value isEqualToString:@"ie"])
+        else if ([lcValue isEqualToString:@"ie"])
             return NO;
-        else if ([value isEqualToString:@"chrome"])
+        else if ([lcValue isEqualToString:@"chrome"])
             return NO;
-        else if ([value isEqualToString:@"firefox"])
+        else if ([lcValue isEqualToString:@"firefox"])
             return NO;
-        else if ([value isEqualToString:@"safari"])
+        else if ([lcValue isEqualToString:@"safari"])
             return NO;
-        else if ([value isEqualToString:@"opera"])
+        else if ([lcValue isEqualToString:@"opera"])
             return NO;
     }
     
