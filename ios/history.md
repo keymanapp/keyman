@@ -1,5 +1,14 @@
 # Keyman for iPhone and iPad Version History
 
+## 2018-06-7 10.0.154 beta
+* Fixed API call to fetch BCP-47 language ids and make keyboard updates more robust (#961)
+
+## 2018-06-6 10.0.147-10.0.153 beta
+* No actual code changes affecting iOS (#873)
+
+## 2018-05-18 10.0.146 beta
+* Code cleanup to remove warnings, etc. (#805)
+
 ## 2018-05-17 10.0.145 beta
 * Fixes occasional repeated characters when typing rapidly (#865)
 
