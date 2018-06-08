@@ -25,7 +25,15 @@ public extension KeyboardRepository {
       return nil
     }
     
-    let language = keyboard.languages?.first(where: {$0.id == languageID}) ?? keyboard.languages?.first ?? languages?[languageID] ?? Language(name: languageID, id: languageID, keyboards: [keyboard], font: nil, oskFont: nil)
+    // If the Keyboard (still) supports the requested language, use that one.
+    guard let language = keyboard.languages?.first(where: {$0.id == languageID}) ??
+        // Otherwise, just use the first language listed for the keyboard.
+        keyboard.languages?.first ??
+        // In cases where the keyboard fails to specify any language, use the requested one if it's in the collection.
+        languages?[languageID]
+    else {
+        return nil
+    }
     
     return InstallableKeyboard(keyboard: keyboard, language: language, isCustom: false)
   }
