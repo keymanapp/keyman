@@ -584,12 +584,15 @@ BOOL IsMatchingPlatformString(PWCHAR platform)  // I3432
 {
   if(_wcsicmp(platform, L"windows") == 0 ||
      _wcsicmp(platform, L"desktop") == 0 ||
+     _wcsicmp(platform, L"hardware") == 0 ||
      _wcsicmp(platform, L"native") == 0) return TRUE;
 
   PWCHAR t = wcschr(platform, 0) - 1;
   BOOL OrNewer = (t > platform && *t == L'+');
   if(OrNewer) *t = 0;
 
+  // Note: these version number checks are not officially supported
+  // and won't work with recent versions of Windows anyway...
   WORD version;
   if(_wcsicmp(platform, L"xp") == 0) version = 0x0105;
   else if(_wcsicmp(platform, L"vista") == 0) version = 0x0006;
