@@ -1125,14 +1125,14 @@ namespace com.keyman {
             case 'tablet':
             case 'phone':
             case 'desktop':
-              if(this.keymanweb.util.activeDevice.formFactor != constraint) {
+              if(this.keymanweb.util.device.formFactor != constraint) {
                 result=false;
               }
           }
 
           switch(constraint) {
             case 'web':
-              if(this.keymanweb.util.activeDevice.browser == 'native') {
+              if(this.keymanweb.util.device.browser == 'native') {
                 result=false; // web matches anything other than 'native'
               }
               break;
@@ -1142,7 +1142,7 @@ namespace com.keyman {
             case 'firefox':
             case 'safari':
             case 'opera':
-              if(this.keymanweb.util.activeDevice.browser != constraint) {
+              if(this.keymanweb.util.device.browser != constraint) {
                 result=false;
               }
           }
