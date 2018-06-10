@@ -1,7 +1,7 @@
 # Keyman for Android
 
-## 2018-06-12 10.0.399 beta
-* Consolidate Info view (#967)
+## 2018-06-11 10.0.399 beta
+* Consolidate Info view (#972)
  
 ## 2018-06-05 10.0.398 beta
 * Fix globe button for system keyboard (#942)
