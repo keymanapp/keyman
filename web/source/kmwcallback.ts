@@ -1144,6 +1144,7 @@ namespace com.keyman {
             case 'chrome':
             case 'firefox':
             case 'safari':
+            case 'edge':
             case 'opera':
               if(this.keymanweb.util.device.browser != constraint) {
                 result=false;

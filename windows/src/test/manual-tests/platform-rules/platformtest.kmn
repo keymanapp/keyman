@@ -42,7 +42,8 @@ match > use(browser)
 group(browser) c Test browser (should only return value on web)
 
 platform('ie')      > ' ie'
-platform('chrome')  > ' chrome'
+platform('chrome')  > ' chrome' 
+platform('edge')    > ' edge'
 platform('firefox') > ' firefox'
 platform('safari')  > ' safari'
 platform('opera')   > ' opera'
@@ -87,6 +88,7 @@ c O: Operating system
 
 platform('windows') + [K_O] > ' Windows'
 platform('android') + [K_O] > ' Android'
+platform('edge') + [K_O] > ' Edge'
 platform('ios') + [K_O] > ' iOS'
 platform('macosx') + [K_O] > ' OSX'
 platform('linux') + [K_O] > ' Linux'
