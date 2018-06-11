@@ -77,6 +77,8 @@ def download_kmp_file(url, kmpfile, verbose=False):
 	Args:
 		url (str): URL to download the kmp file from.
 		kmpfile (str): Where to save the kmp file.
+			currently it does no checks on this location
+			assumes that is in users Downloads dir
 		verbose (bool, default False): verbose output
 	Returns:
 		str: path where kmp file has been downloaded

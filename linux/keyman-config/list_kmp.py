@@ -3,7 +3,7 @@
 import tempfile
 from keymankeyboards import get_api_keyboards
 from get_kmp import get_keyboard_data, get_kmp_file
-from install_kmp import get_metadata, get_infdata
+from install_kmp import get_metadata, get_infdata, extract_kmp
 
 def main():
 	keyboarddata = get_api_keyboards()
@@ -21,11 +21,12 @@ def main():
 					if 'packageFilename' in kbdata:
 						kmpfile = get_kmp_file(kbdata)
 						with tempfile.TemporaryDirectory() as tmpdirname:
-							info, system, options, keyboards, files = get_metadata(kmpfile, tmpdirname)
+							extract_kmp(kmpfile, tmpdirname)
+							info, system, options, keyboards, files = get_metadata(tmpdirname)
 							if keyboards:
 								print("Keyboard:", kb['id'], "has kmp", kbdata['packageFilename'], "with kmp.json", file=goodjsonkmp)
 							else:
-								info, system, options, keyboards, files = get_infdata(kmpfile, tmpdirname)
+								info, system, options, keyboards, files = get_infdata(tmpdirname)
 								if keyboards:
 									print("Keyboard:", kb['id'], "has kmp", kbdata['packageFilename'], "with kmp.inf", file=goodinfkmp)
 								elif files:

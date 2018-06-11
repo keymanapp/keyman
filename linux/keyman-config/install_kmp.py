@@ -2,22 +2,29 @@
 
 import argparse
 import json
+import os.path
+import sys
 import tempfile
 import zipfile
-import sys
-import os.path
-import requests
-from kmpmetadata import parsemetadata, parseinfdata, determine_filetype
-from get_kmp import get_kmp, get_keyboard_data
-from list_installed_kmp import get_kmp_version
-from uninstall_kmp import uninstall_kmp
 from os import listdir, makedirs
 from shutil import copy2
- 
+
+import requests
+
+from get_kmp import get_keyboard_data, get_kmp
+from kmpmetadata import determine_filetype, parseinfdata, parsemetadata
+from list_installed_kmp import get_kmp_version
+from uninstall_kmp import uninstall_kmp
+
+
 def list_files(directory, extension):
 	return (f for f in listdir(directory) if f.endswith('.' + extension))
 
-def get_metadata(inputfile, tmpdirname):
+def extract_kmp(kmpfile, directory):
+	with zipfile.ZipFile(kmpfile,"r") as zip_ref:
+		zip_ref.extractall(directory)
+
+def get_metadata(tmpdirname):
 	"""
 	Get metadata from kmp.json if it exists.
 
@@ -29,18 +36,13 @@ def get_metadata(inputfile, tmpdirname):
 		list[5]: info, system, options, keyboards, files
 			see kmpmetadata.parsemetadata for details
 	"""
-	with zipfile.ZipFile(inputfile,"r") as zip_ref:
-		zip_ref.extractall(tmpdirname)
-#		jsonfiles = list_files(tmpdirname, "json")
-#		for f in jsonfiles:
-#			print(f)
-		kmpjson = os.path.join(tmpdirname, "kmp.json")
-		if os.path.isfile(kmpjson):
-			return parsemetadata(kmpjson, False)
-		else:
-			return None, None, None, None, None
+	kmpjson = os.path.join(tmpdirname, "kmp.json")
+	if os.path.isfile(kmpjson):
+		return parsemetadata(kmpjson, False)
+	else:
+		return None, None, None, None, None
 
-def get_infdata(inputfile, tmpdirname):
+def get_infdata(tmpdirname):
 	"""
 	Get metadata from kmp.inf if it exists.
 
@@ -52,13 +54,11 @@ def get_infdata(inputfile, tmpdirname):
 		list[5]: info, system, options, keyboards, files
 			see kmpmetadata.parseinfdata for details
 	"""
-	with zipfile.ZipFile(inputfile,"r") as zip_ref:
-		zip_ref.extractall(tmpdirname)
-		kmpinf = os.path.join(tmpdirname, "kmp.inf")
-		if os.path.isfile(kmpinf):
-			return parseinfdata(kmpinf, False)
-		else:
-			return None, None, None, None, None
+	kmpinf = os.path.join(tmpdirname, "kmp.inf")
+	if os.path.isfile(kmpinf):
+		return parseinfdata(kmpinf, False)
+	else:
+		return None, None, None, None, None
 
 def install_kmp(inputfile, withkmn=False):
 	"""
@@ -71,10 +71,11 @@ def install_kmp(inputfile, withkmn=False):
 	# create a temporary directory using the context manager
 	with tempfile.TemporaryDirectory() as tmpdirname:
 		print('created temporary directory', tmpdirname)
-		info, system, options, keyboards, files = get_metadata(inputfile, tmpdirname)
+		extract_kmp(inputfile, tmpdirname)
+		info, system, options, keyboards, files = get_metadata(tmpdirname)
 		if not keyboards:
 			# no json file so trying inf file
-			info, system, options, keyboards, files = get_infdata(inputfile, tmpdirname)
+			info, system, options, keyboards, files = get_infdata(tmpdirname)
 		if files and not keyboards:
 			#inf file may not have keyboards so generate it if needed
 			keyboards = [ { 'name' : info['name']['description'],
@@ -129,7 +130,7 @@ def install_kmp(inputfile, withkmn=False):
 			for f in files:
 				fpath = os.path.join(tmpdirname, f['name'])
 				ftype = determine_filetype(f['name'])
-				if ftype == "Documentation":
+				if ftype == "Documentation" or ftype == "Image":
 					print("Installing", f['name'], "as documentation")
 					if not os.path.isdir(kbdocdir):
 						os.makedirs(kbdocdir)
@@ -139,7 +140,7 @@ def install_kmp(inputfile, withkmn=False):
 					if not os.path.isdir(kbfontdir):
 						os.makedirs(kbfontdir)
 					copy2(fpath, kbfontdir)
-				elif ftype == "Metadata" or ftype == "Image" or ftype == "Keyboard icon"  or ftype == "Keyboard source" or ftype == "Keyboard icon" or ftype == "Compiled keyboard" or ftype == "Compiled on screen keyboard":
+				elif ftype == "Metadata" or ftype == "Keyboard icon"  or ftype == "Keyboard source" or ftype == "Keyboard icon" or ftype == "Compiled keyboard" or ftype == "Compiled on screen keyboard":
 					print("Installing", f['name'], "as keyman file")
 					if not os.path.isdir(kbdir):
 						os.makedirs(kbdir)
