@@ -36,7 +36,9 @@
       <Name>PlatformTest</Name>
       <ID>platformtest</ID>
       <Version>1.0</Version>
-      <Languages/>
+      <Languages>
+        <Language ID="en">English</Language>
+      </Languages>
     </Keyboard>
   </Keyboards>
   <Strings/>
