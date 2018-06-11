@@ -54,15 +54,11 @@ namespace com.keyman {
           this.OS='iOS';
           this.formFactor='tablet';
           this.dyPortrait=this.dyLandscape=0;
-        }
-
-        if(agent.indexOf('iPhone') >= 0) { 
+        } else if(agent.indexOf('iPhone') >= 0) { 
           this.OS='iOS';
           this.formFactor='phone';
           this.dyPortrait=this.dyLandscape=25;
-        }
-
-        if(agent.indexOf('Android') >= 0) {
+        } else if(agent.indexOf('Android') >= 0) {
           this.OS='Android';
           this.formFactor='phone';    // form factor may be redefined on initialization
           this.dyPortrait=75;
@@ -71,8 +67,11 @@ namespace com.keyman {
             var rx=new RegExp("(?:Android\\s+)(\\d+\\.\\d+\\.\\d+)");
             this.version=agent.match(rx)[1];
           } catch(ex) {}
-        }
-        if(agent.indexOf('Windows NT') >= 0) {
+        } else if(agent.indexOf('Linux') >= 0) {
+          this.OS='Linux';
+        } else if(agent.indexOf('Macintosh') >= 0) {
+          this.OS='MacOSX';
+        } else if(agent.indexOf('Windows NT') >= 0) {
           this.OS='Windows';
           if(agent.indexOf('Touch') >= 0) {
             this.formFactor='phone';   // will be redefined as tablet if resolution high enough
@@ -110,14 +109,23 @@ namespace com.keyman {
           this.browser='safari';
         }
 
-        var bMatch=/Firefox|Chrome|OPR/;
+        var bMatch=/Firefox|Chrome|OPR|Safari|Edge/;
         if(bMatch.test(navigator.userAgent)) {
           if((navigator.userAgent.indexOf('Firefox') >= 0) && ('onmozorientationchange' in screen)) {
             this.browser='firefox';
           } else if(navigator.userAgent.indexOf('OPR') >= 0) {
             this.browser='opera';
+          } else if(navigator.userAgent.indexOf(' Edge/') >= 0) {
+            // Edge is too common a word, so test for Edge/ :)
+            // Must come before Chrome and Safari test because
+            // Edge pretends to be both
+            this.browser='edge';
           } else if(navigator.userAgent.indexOf('Chrome') >= 0) {
+            // This test must come before Safari test because on macOS,
+            // Chrome also reports "Safari"
             this.browser='chrome';
+          } else if(navigator.userAgent.indexOf('Safari') >= 0) {
+            this.browser='safari';
           }
         } 
       }
