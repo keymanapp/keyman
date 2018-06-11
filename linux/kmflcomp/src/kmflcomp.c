@@ -1,5 +1,5 @@
 /* kmflcomp.c
- * Copyright (C) 2005  SIL International and Tavultesoft Pty Ltd
+ * Copyright (C) 2005  SIL International
  *
  */
 
