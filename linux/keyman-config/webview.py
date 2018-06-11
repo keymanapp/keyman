@@ -4,24 +4,22 @@ import os
 import webbrowser
 import urllib.parse
 import pathlib
+import tempfile
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit', '3.0')
 from gi.repository import Gtk, WebKit
 from get_kmp import get_download_folder, download_kmp_file
-from install_kmp import install_kmp
+from install_kmp import install_kmp, extract_kmp
 from list_installed_kmp import get_kmp_version
 
 def process_kmp(view, url, downloadfile, verbose=False):
     if verbose:
         print("Downloading file to", downloadfile)
     if download_kmp_file(url, downloadfile, True):
-        keyboardid = os.path.basename(os.path.splitext(downloadfile)[0])
-        installed_kmp_ver = get_kmp_version(keyboardid)
         if verbose:
             print("File downloaded")
-        if installed_kmp_ver:
-            pass
+
         w = InstallKmpWindow(downloadfile)
         w.show_all()
         #install_kmp(downloadfile, True)
@@ -54,26 +52,81 @@ class InstallKmpWindow(Gtk.Window):
     def __init__(self, kmpfile):
         print("kmpfile:", kmpfile)
         keyboardid = os.path.basename(os.path.splitext(kmpfile)[0])
-        windowtitle = "Installing" + keyboardid
+        installed_kmp_ver = get_kmp_version(keyboardid)
+        windowtitle = "Installing keyboard/package " + keyboardid
         Gtk.Window.__init__(self, title=windowtitle)
 
         self.set_border_width(3)
 
-        self.notebook = Gtk.Notebook()
-        self.add(self.notebook)
-
         self.page1 = Gtk.Box()
         self.page1.set_border_width(10)
-        self.page1.add(Gtk.Label('Details'))
-        self.notebook.append_page(self.page1, Gtk.Label('Details'))
+
+        hbox = Gtk.Box(spacing=10)
+        vbox_left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        vbox_left.set_homogeneous(False)
+        vbox_right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        vbox_right.set_homogeneous(False)
+        hbox.pack_start(vbox_left, True, True, 0)
+        hbox.pack_start(vbox_right, True, True, 0)
+
+        label = Gtk.Label()
+        label.set_text("Keyboard layouts:")
+        label.set_justify(Gtk.Justification.RIGHT)
+        vbox_left.pack_start(label, True, True, 0)
+        label = Gtk.Label()
+        # Fonts is optional
+        label.set_text("Fonts:")
+        label.set_justify(Gtk.Justification.RIGHT)
+        vbox_left.pack_start(label, True, True, 0)
+        label = Gtk.Label()
+        label.set_text("Package version:")
+        label.set_justify(Gtk.Justification.RIGHT)
+        vbox_left.pack_start(label, True, True, 0)
+        label = Gtk.Label()
+        label.set_text("Author:")
+        label.set_justify(Gtk.Justification.RIGHT)
+        vbox_left.pack_start(label, True, True, 0)
+        label = Gtk.Label()
+        # Website is optional
+        label.set_text("Website:")
+        label.set_justify(Gtk.Justification.RIGHT)
+        vbox_left.pack_start(label, True, True, 0)
+        label = Gtk.Label()
+        label.set_text("Copyright:")
+        label.set_justify(Gtk.Justification.RIGHT)
+        vbox_left.pack_start(label, True, True, 0)
+        label = Gtk.Label()
+
+        self.page1.add(hbox)
+
+        #self.page1.add(Gtk.Label('Details'))
 
         self.page2 = Gtk.Box()
         self.page2.set_border_width(10)
-        self.page2.add(Gtk.Label('README'))
-        self.notebook.append_page(
-            self.page2,
-            Gtk.Label('README')
+        s = Gtk.ScrolledWindow()
+        webview = WebKit.WebView()
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            extract_kmp(kmpfile, tmpdirname)
+            readme_file = os.path.join(tmpdirname, "readme.htm")
+            if os.path.isfile(readme_file):
+                readme_uri = pathlib.Path(readme_file).as_uri()
+                webview.load_uri(readme_uri)
+                s.add(webview)
+                self.page2.pack_start(s, True, True, 10)
+
+                self.notebook = Gtk.Notebook()
+                self.notebook.set_tab_pos(Gtk.PositionType.BOTTOM)
+                self.add(self.notebook)
+                self.notebook.append_page(
+                    self.page1,
+                    Gtk.Label('Details'))
+                self.notebook.append_page(
+                    self.page2,
+                    Gtk.Label('README')
         )
+            else:
+                self.add(self.page1)
+        self.resize(640, 480)
 
 
 class DownloadKmpWindow(Gtk.Window):
