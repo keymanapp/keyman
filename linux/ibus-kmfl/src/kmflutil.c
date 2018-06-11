@@ -3,7 +3,13 @@
 /*
  * KMFL Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2009 SIL International
+ * Copyright (C) 2009-2018 SIL International
+ *
+ * kmflutil is dual licensed under the MIT or GPL licenses as described below.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * MIT license
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +29,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * OR
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ *
  */
+
+
 
 #include <stdlib.h>
 #include <dirent.h>
