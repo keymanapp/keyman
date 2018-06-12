@@ -1,3 +1,10 @@
+libkmfl (10.99.1-1) UNRELEASED; urgency=medium
+
+  * Change license to MIT as libkmfl is being moved into Keyman 11
+  * Keyman is now owned by SIL
+
+ -- Daniel Glassey <wdg@debian.org>  Thu, 17 May 2018 11:39:04 +0700
+
 libkmfl (0.9.12-1) unstable; urgency=low
 
   * fix debug messages

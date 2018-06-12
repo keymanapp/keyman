@@ -7,8 +7,8 @@
 
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
-#define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 34
+#define YY_FLEX_MINOR_VERSION 6
+#define YY_FLEX_SUBMINOR_VERSION 0
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -53,7 +53,6 @@ typedef int flex_int32_t;
 typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
-#endif /* ! C99 */
 
 /* Limits of integral types. */
 #ifndef INT8_MIN
@@ -83,6 +82,8 @@ typedef unsigned int flex_uint32_t;
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
 #endif
+
+#endif /* ! C99 */
 
 #endif /* ! FLEXINT_H */
 
@@ -140,7 +141,15 @@ typedef unsigned int flex_uint32_t;
 
 /* Size of default input buffer. */
 #ifndef YY_BUF_SIZE
+#ifdef __ia64__
+/* On IA-64, the buffer size is 16k, not 8k.
+ * Moreover, YY_BUF_SIZE is 2*YY_READ_BUF_SIZE in the general case.
+ * Ditto for the __ia64__ case accordingly.
+ */
+#define YY_BUF_SIZE 32768
+#else
 #define YY_BUF_SIZE 16384
+#endif /* __ia64__ */
 #endif
 
 /* The state buf must be large enough to hold one state per character in the main buffer.
@@ -152,7 +161,12 @@ typedef unsigned int flex_uint32_t;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #endif
 
-extern int yyleng;
+#ifndef YY_TYPEDEF_YY_SIZE_T
+#define YY_TYPEDEF_YY_SIZE_T
+typedef size_t yy_size_t;
+#endif
+
+extern yy_size_t yyleng;
 
 extern FILE *yyin, *yyout;
 
@@ -161,6 +175,7 @@ extern FILE *yyin, *yyout;
 #define EOB_ACT_LAST_MATCH 2
 
     #define YY_LESS_LINENO(n)
+    #define YY_LINENO_REWIND_TO(ptr)
     
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -177,18 +192,6 @@ extern FILE *yyin, *yyout;
 	while ( 0 )
 
 #define unput(c) yyunput( c, (yytext_ptr)  )
-
-/* The following is because we cannot portably get our hands on size_t
- * (without autoconf's help, which isn't available because we want
- * flex-generated scanners to compile on their own).
- * Given that the standard has decreed that size_t exists since 1989,
- * I guess we can afford to depend on it. Manoj.
- */
-
-#ifndef YY_TYPEDEF_YY_SIZE_T
-#define YY_TYPEDEF_YY_SIZE_T
-typedef size_t yy_size_t;
-#endif
 
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
@@ -278,7 +281,7 @@ static YY_BUFFER_STATE * yy_buffer_stack = 0; /**< Stack as an array. */
 /* yy_hold_char holds the character lost when yytext is formed. */
 static char yy_hold_char;
 static int yy_n_chars;		/* number of characters read into yy_ch_buf */
-int yyleng;
+yy_size_t yyleng;
 
 /* Points to current character in buffer. */
 static char *yy_c_buf_p = (char *) 0;
@@ -306,7 +309,7 @@ static void yy_init_buffer (YY_BUFFER_STATE b,FILE *file  );
 
 YY_BUFFER_STATE yy_scan_buffer (char *base,yy_size_t size  );
 YY_BUFFER_STATE yy_scan_string (yyconst char *yy_str  );
-YY_BUFFER_STATE yy_scan_bytes (yyconst char *bytes,int len  );
+YY_BUFFER_STATE yy_scan_bytes (yyconst char *bytes,yy_size_t len  );
 
 void *yyalloc (yy_size_t  );
 void *yyrealloc (void *,yy_size_t  );
@@ -336,7 +339,7 @@ void yyfree (void *  );
 
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 
-#define yywrap(n) 1
+#define yywrap() (/*CONSTCOND*/1)
 #define YY_SKIP_YYWRAP
 
 typedef unsigned char YY_CHAR;
@@ -350,11 +353,17 @@ extern int yylineno;
 int yylineno = 1;
 
 extern char *yytext;
+#ifdef yytext_ptr
+#undef yytext_ptr
+#endif
 #define yytext_ptr yytext
 
 static yy_state_type yy_get_previous_state (void );
 static yy_state_type yy_try_NUL_trans (yy_state_type current_state  );
 static int yy_get_next_buffer (void );
+#if defined(__GNUC__) && __GNUC__ >= 3
+__attribute__((__noreturn__))
+#endif
 static void yy_fatal_error (yyconst char msg[]  );
 
 /* Done after the current pattern has been matched and before the
@@ -461,7 +470,7 @@ static yyconst flex_int16_t yy_accept[738] =
        14,    0,   11,   15,   14,   11,    0
     } ;
 
-static yyconst flex_int32_t yy_ec[256] =
+static yyconst YY_CHAR yy_ec[256] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    1,    4,    1,    1,    1,    1,    1,    1,    1,
@@ -493,7 +502,7 @@ static yyconst flex_int32_t yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst flex_int32_t yy_meta[82] =
+static yyconst YY_CHAR yy_meta[82] =
     {   0,
         1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    3,    3,    3,    3,    3,    3,    3,
@@ -506,7 +515,7 @@ static yyconst flex_int32_t yy_meta[82] =
         5
     } ;
 
-static yyconst flex_int16_t yy_base[766] =
+static yyconst flex_uint16_t yy_base[766] =
     {   0,
         0,   77,  135,    0,  215,  219,  223,  227,  279,  357,
       236,  247,  435,  492,  258,  289,  549,    0,  322,  336,
@@ -682,7 +691,7 @@ static yyconst flex_int16_t yy_def[766] =
       737,  737,  737,  737,  737
     } ;
 
-static yyconst flex_int16_t yy_nxt[2035] =
+static yyconst flex_uint16_t yy_nxt[2035] =
     {   0,
        24,   25,   26,   27,   25,   28,   29,   30,   31,   32,
        33,   24,   24,   34,   34,   34,   34,   34,   34,   34,
@@ -1152,8 +1161,8 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "lex.l"
-#line 2 "lex.l"
+#line 1 "../../kmflcomp/src/lex.l"
+#line 2 "../../kmflcomp/src/lex.l"
 /* lex.l: Lex parser for Keyman keyboard source files for kmflcomp compiler */
 
 /* Derived from version written by David Gardner for k_tty */
@@ -1199,7 +1208,7 @@ int yyterminate(void)
 
 
 
-#line 1203 "lex.c"
+#line 1212 "lex.c"
 
 #define INITIAL 0
 #define STOR 1
@@ -1227,6 +1236,35 @@ int yyterminate(void)
 
 static int yy_init_globals (void );
 
+/* Accessor methods to globals.
+   These are made visible to non-reentrant scanners for convenience. */
+
+int yylex_destroy (void );
+
+int yyget_debug (void );
+
+void yyset_debug (int debug_flag  );
+
+YY_EXTRA_TYPE yyget_extra (void );
+
+void yyset_extra (YY_EXTRA_TYPE user_defined  );
+
+FILE *yyget_in (void );
+
+void yyset_in  (FILE * _in_str  );
+
+FILE *yyget_out (void );
+
+void yyset_out  (FILE * _out_str  );
+
+yy_size_t yyget_leng (void );
+
+char *yyget_text (void );
+
+int yyget_lineno (void );
+
+void yyset_lineno (int _line_number  );
+
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
  */
@@ -1239,8 +1277,12 @@ extern int yywrap (void );
 #endif
 #endif
 
+#ifndef YY_NO_UNPUT
+    
     static void yyunput (int c,char *buf_ptr  );
     
+#endif
+
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char *,yyconst char *,int );
 #endif
@@ -1261,7 +1303,12 @@ static int input (void );
 
 /* Amount of stuff to slurp up with each read. */
 #ifndef YY_READ_BUF_SIZE
+#ifdef __ia64__
+/* On IA-64, the buffer size is 16k, not 8k */
+#define YY_READ_BUF_SIZE 16384
+#else
 #define YY_READ_BUF_SIZE 8192
+#endif /* __ia64__ */
 #endif
 
 /* Copy whatever the last rule matched to the standard output. */
@@ -1269,7 +1316,7 @@ static int input (void );
 /* This used to be an fputs(), but since the string might contain NUL's,
  * we now use fwrite().
  */
-#define ECHO fwrite( yytext, yyleng, 1, yyout )
+#define ECHO do { if (fwrite( yytext, yyleng, 1, yyout )) {} } while (0)
 #endif
 
 /* Gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
@@ -1280,7 +1327,7 @@ static int input (void );
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
 		int c = '*'; \
-		int n; \
+		size_t n; \
 		for ( n = 0; n < max_size && \
 			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
@@ -1348,7 +1395,7 @@ extern int yylex (void);
 
 /* Code executed at the end of each rule. */
 #ifndef YY_BREAK
-#define YY_BREAK break;
+#define YY_BREAK /*LINTED*/break;
 #endif
 
 #define YY_RULE_SETUP \
@@ -1361,15 +1408,10 @@ extern int yylex (void);
  */
 YY_DECL
 {
-	register yy_state_type yy_current_state;
-	register char *yy_cp, *yy_bp;
-	register int yy_act;
+	yy_state_type yy_current_state;
+	char *yy_cp, *yy_bp;
+	int yy_act;
     
-#line 53 "lex.l"
-
-
-#line 1372 "lex.c"
-
 	if ( !(yy_init) )
 		{
 		(yy_init) = 1;
@@ -1396,7 +1438,13 @@ YY_DECL
 		yy_load_buffer_state( );
 		}
 
-	while ( 1 )		/* loops until end-of-file is reached */
+	{
+#line 53 "../../kmflcomp/src/lex.l"
+
+
+#line 1446 "lex.c"
+
+	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
 		yy_cp = (yy_c_buf_p);
 
@@ -1413,7 +1461,7 @@ YY_DECL
 yy_match:
 		do
 			{
-			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)];
+			YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)] ;
 			if ( yy_accept[yy_current_state] )
 				{
 				(yy_last_accepting_state) = yy_current_state;
@@ -1455,12 +1503,12 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 55 "lex.l"
+#line 55 "../../kmflcomp/src/lex.l"
 {lineno++;caller=INITIAL;BEGIN(INITIAL);return(TOK_NL);}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 56 "lex.l"
+#line 56 "../../kmflcomp/src/lex.l"
 {/* just ignore carriage returns */};
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
@@ -1474,7 +1522,7 @@ case YY_STATE_EOF(BITMAP):
 case YY_STATE_EOF(LNGCODE):
 case YY_STATE_EOF(SKIP):
 case YY_STATE_EOF(NAME):
-#line 58 "lex.l"
+#line 58 "../../kmflcomp/src/lex.l"
 {
 				if(done){yyterminate();}
 				else    {done=1;lineno++;caller=INITIAL;BEGIN(INITIAL);return(TOK_NL);}
@@ -1482,187 +1530,187 @@ case YY_STATE_EOF(NAME):
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 63 "lex.l"
+#line 63 "../../kmflcomp/src/lex.l"
 {return TOK_NAME;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 64 "lex.l"
+#line 64 "../../kmflcomp/src/lex.l"
 {BEGIN(BITMAP);return TOK_BITMAP;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 65 "lex.l"
+#line 65 "../../kmflcomp/src/lex.l"
 {caller=STOR;BEGIN(STOR);return TOK_HOTKEY;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 66 "lex.l"
+#line 66 "../../kmflcomp/src/lex.l"
 {BEGIN(KBDVER);return TOK_VERSION;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 67 "lex.l"
+#line 67 "../../kmflcomp/src/lex.l"
 {BEGIN(LNGCODE);return TOK_LANGUAGE;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 68 "lex.l"
+#line 68 "../../kmflcomp/src/lex.l"
 {return TOK_LAYOUT;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 69 "lex.l"
+#line 69 "../../kmflcomp/src/lex.l"
 {return TOK_CAPSOFF;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 70 "lex.l"
+#line 70 "../../kmflcomp/src/lex.l"
 {return TOK_CAPSON;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 71 "lex.l"
+#line 71 "../../kmflcomp/src/lex.l"
 {return TOK_CAPSFREE;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 72 "lex.l"
+#line 72 "../../kmflcomp/src/lex.l"
 {return TOK_COPYRIGHT;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 73 "lex.l"
+#line 73 "../../kmflcomp/src/lex.l"
 {return TOK_MESSAGE;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 74 "lex.l"
+#line 74 "../../kmflcomp/src/lex.l"
 {return TOK_MNEMONIC;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 75 "lex.l"
+#line 75 "../../kmflcomp/src/lex.l"
 {return TOK_ETHNOLOGUE;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 76 "lex.l"
+#line 76 "../../kmflcomp/src/lex.l"
 {return TOK_AUTHOR;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 77 "lex.l"
+#line 77 "../../kmflcomp/src/lex.l"
 {return TOK_ANSI;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 78 "lex.l"
+#line 78 "../../kmflcomp/src/lex.l"
 {return TOK_UNICODE;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 79 "lex.l"
+#line 79 "../../kmflcomp/src/lex.l"
 {return TOK_ANSI;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 80 "lex.l"
+#line 80 "../../kmflcomp/src/lex.l"
 {caller=STOR;BEGIN(STOR);return TOK_STORE;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 81 "lex.l"
+#line 81 "../../kmflcomp/src/lex.l"
 {return TOK_OUTS;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 82 "lex.l"
+#line 82 "../../kmflcomp/src/lex.l"
 {return TOK_GROUP;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 83 "lex.l"
+#line 83 "../../kmflcomp/src/lex.l"
 {return TOK_USINGKEYS;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 84 "lex.l"
+#line 84 "../../kmflcomp/src/lex.l"
 {return TOK_USE;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 85 "lex.l"
+#line 85 "../../kmflcomp/src/lex.l"
 {return TOK_CONTEXT;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 86 "lex.l"
+#line 86 "../../kmflcomp/src/lex.l"
 {return TOK_ANY;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 87 "lex.l"
+#line 87 "../../kmflcomp/src/lex.l"
 {return TOK_NOTANY;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 88 "lex.l"
+#line 88 "../../kmflcomp/src/lex.l"
 {return TOK_BEEP;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 89 "lex.l"
+#line 89 "../../kmflcomp/src/lex.l"
 {BEGIN(PLIST);return TOK_INDEX;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 90 "lex.l"
+#line 90 "../../kmflcomp/src/lex.l"
 {return TOK_NOMATCH;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 91 "lex.l"
+#line 91 "../../kmflcomp/src/lex.l"
 {return TOK_MATCH;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 92 "lex.l"
+#line 92 "../../kmflcomp/src/lex.l"
 {return TOK_NUL;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 93 "lex.l"
+#line 93 "../../kmflcomp/src/lex.l"
 {return TOK_DEADKEY;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 94 "lex.l"
+#line 94 "../../kmflcomp/src/lex.l"
 {return TOK_DEADKEY;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 95 "lex.l"
+#line 95 "../../kmflcomp/src/lex.l"
 {return TOK_RTN;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 96 "lex.l"
+#line 96 "../../kmflcomp/src/lex.l"
 {return TOK_CALL;  /* not implemented */}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 97 "lex.l"
+#line 97 "../../kmflcomp/src/lex.l"
 {return TOK_SWITCH;/*  (obsolete) */}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 98 "lex.l"
+#line 98 "../../kmflcomp/src/lex.l"
 {return TOK_GT;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 99 "lex.l"
+#line 99 "../../kmflcomp/src/lex.l"
 {return TOK_PLUS;}
 	YY_BREAK
 case 40:
@@ -1670,18 +1718,18 @@ case 40:
 (yy_c_buf_p) = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 100 "lex.l"
+#line 100 "../../kmflcomp/src/lex.l"
 {BEGIN(NAME);return TOK_DOLLAR;}
 	YY_BREAK
 
 case 41:
 YY_RULE_SETUP
-#line 103 "lex.l"
+#line 103 "../../kmflcomp/src/lex.l"
 {/* ignore spaces */} 
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 104 "lex.l"
+#line 104 "../../kmflcomp/src/lex.l"
 {BEGIN(SKIP);}
 	YY_BREAK
 case 43:
@@ -1689,7 +1737,7 @@ case 43:
 (yy_c_buf_p) = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 105 "lex.l"
+#line 105 "../../kmflcomp/src/lex.l"
 {BEGIN(PARENS);return(TOK_BRKT);}
 	YY_BREAK
 case 44:
@@ -1697,7 +1745,7 @@ case 44:
 (yy_c_buf_p) = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 106 "lex.l"
+#line 106 "../../kmflcomp/src/lex.l"
 {qchar='\'';BEGIN(QUOTE);return(TOK_QM);}
 	YY_BREAK
 case 45:
@@ -1705,71 +1753,71 @@ case 45:
 (yy_c_buf_p) = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 107 "lex.l"
+#line 107 "../../kmflcomp/src/lex.l"
 {qchar='"';BEGIN(QUOTE);return(TOK_QM);}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 108 "lex.l"
+#line 108 "../../kmflcomp/src/lex.l"
 {yylval.number=strtol(yytext,NULL,8);return(TOK_NUMBER);}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 109 "lex.l"
+#line 109 "../../kmflcomp/src/lex.l"
 {yylval.number=atoi(yytext+1);return(TOK_NUMBER);}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 110 "lex.l"
+#line 110 "../../kmflcomp/src/lex.l"
 {yylval.number=strtol(yytext+1,NULL,16);return(TOK_NUMBER);}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 111 "lex.l"
+#line 111 "../../kmflcomp/src/lex.l"
 {yylval.number=strtol(yytext+2,NULL,16);return(TOK_NUMBER);}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 112 "lex.l"
+#line 112 "../../kmflcomp/src/lex.l"
 {BEGIN(KEYNAME);return(TOK_SB);}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 113 "lex.l"
+#line 113 "../../kmflcomp/src/lex.l"
 {return(TOK_BEEP);}
 	YY_BREAK
 
 
 case 52:
 YY_RULE_SETUP
-#line 117 "lex.l"
+#line 117 "../../kmflcomp/src/lex.l"
 {return(TOK_DEADKEY);}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 118 "lex.l"
+#line 118 "../../kmflcomp/src/lex.l"
 {return(TOK_DEADKEY);}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 119 "lex.l"
+#line 119 "../../kmflcomp/src/lex.l"
 {return(TOK_OUTS);}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 120 "lex.l"
+#line 120 "../../kmflcomp/src/lex.l"
 {return(TOK_NUL);}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 121 "lex.l"
+#line 121 "../../kmflcomp/src/lex.l"
 {return(TOK_ERROR);}
 	YY_BREAK
 
 
 case 57:
 YY_RULE_SETUP
-#line 125 "lex.l"
+#line 125 "../../kmflcomp/src/lex.l"
 {/* ignore spaces */}
 	YY_BREAK
 case 58:
@@ -1777,36 +1825,37 @@ case 58:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 126 "lex.l"
+#line 126 "../../kmflcomp/src/lex.l"
 {/* ignore comments */}
 	YY_BREAK
 case 59:
 /* rule 59 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_cp - 1);
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 127 "lex.l"
+#line 127 "../../kmflcomp/src/lex.l"
 {/* before either EOL */}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 128 "lex.l"
+#line 128 "../../kmflcomp/src/lex.l"
 {return TOK_QM;}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 129 "lex.l"
+#line 129 "../../kmflcomp/src/lex.l"
 {yylval.number=*yytext;return TOK_CHAR;}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 130 "lex.l"
+#line 130 "../../kmflcomp/src/lex.l"
 {yylval.number=*yytext;return TOK_CHAR;}
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 131 "lex.l"
+#line 131 "../../kmflcomp/src/lex.l"
 {BEGIN(SKIP);}
 	YY_BREAK
 
@@ -1816,16 +1865,17 @@ case 64:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 135 "lex.l"
+#line 135 "../../kmflcomp/src/lex.l"
 {/* ignore anything after a space */}
 	YY_BREAK
 case 65:
 /* rule 65 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_cp - 1);
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 136 "lex.l"
+#line 136 "../../kmflcomp/src/lex.l"
 {/* including comments */}
 	YY_BREAK
 case 66:
@@ -1833,7 +1883,7 @@ case 66:
 (yy_c_buf_p) = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 137 "lex.l"
+#line 137 "../../kmflcomp/src/lex.l"
 {qchar='\'';BEGIN(QUOTE);return(TOK_QM);}
 	YY_BREAK
 case 67:
@@ -1841,12 +1891,12 @@ case 67:
 (yy_c_buf_p) = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 138 "lex.l"
+#line 138 "../../kmflcomp/src/lex.l"
 {qchar='"';BEGIN(QUOTE);return(TOK_QM);}
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 139 "lex.l"
+#line 139 "../../kmflcomp/src/lex.l"
 {yylval.number=*yytext;return TOK_CHAR;}
 	YY_BREAK
 case 69:
@@ -1854,23 +1904,24 @@ case 69:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 140 "lex.l"
+#line 140 "../../kmflcomp/src/lex.l"
 {/* also ignore anything after a comma */}
 	YY_BREAK
 case 70:
 /* rule 70 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_cp - 1);
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 141 "lex.l"
+#line 141 "../../kmflcomp/src/lex.l"
 {/* before either EOL */}
 	YY_BREAK
 
 
 case 71:
 YY_RULE_SETUP
-#line 145 "lex.l"
+#line 145 "../../kmflcomp/src/lex.l"
 {/* ignore spaces */}
 	YY_BREAK
 case 72:
@@ -1878,43 +1929,44 @@ case 72:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 146 "lex.l"
+#line 146 "../../kmflcomp/src/lex.l"
 {/* ignore comments */}
 	YY_BREAK
 case 73:
 /* rule 73 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_cp - 1);
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 147 "lex.l"
+#line 147 "../../kmflcomp/src/lex.l"
 {/* before either EOL */}
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 148 "lex.l"
+#line 148 "../../kmflcomp/src/lex.l"
 {yylval.number=strtoul(yytext,NULL,8);return(TOK_NUMBER);}
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 149 "lex.l"
+#line 149 "../../kmflcomp/src/lex.l"
 {yylval.number=strtoul(yytext+1,NULL,10);return(TOK_NUMBER);}
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 150 "lex.l"
+#line 150 "../../kmflcomp/src/lex.l"
 {yylval.number=strtoul(yytext+1,NULL,16);return(TOK_NUMBER);}
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 151 "lex.l"
+#line 151 "../../kmflcomp/src/lex.l"
 {/* ignore comma separator */}
 	YY_BREAK
 
 
 case 78:
 YY_RULE_SETUP
-#line 155 "lex.l"
+#line 155 "../../kmflcomp/src/lex.l"
 {if (*yytext==qchar) 
 					{BEGIN(caller);return(TOK_QM);} 
 				else 
@@ -1925,688 +1977,688 @@ YY_RULE_SETUP
 
 case 79:
 YY_RULE_SETUP
-#line 163 "lex.l"
+#line 163 "../../kmflcomp/src/lex.l"
 
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 164 "lex.l"
+#line 164 "../../kmflcomp/src/lex.l"
 {BEGIN(caller);return(TOK_BRKT);} 
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 165 "lex.l"
+#line 165 "../../kmflcomp/src/lex.l"
 {yylval.number=*yytext;return(TOK_CHAR);}
 	YY_BREAK
 
 
 case 82:
 YY_RULE_SETUP
-#line 169 "lex.l"
+#line 169 "../../kmflcomp/src/lex.l"
 {/* ignore */}
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 170 "lex.l"
+#line 170 "../../kmflcomp/src/lex.l"
 { return(TOK_COMMA);}
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 171 "lex.l"
+#line 171 "../../kmflcomp/src/lex.l"
 { return(TOK_BRKT);}
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 172 "lex.l"
+#line 172 "../../kmflcomp/src/lex.l"
 {BEGIN(caller);return(TOK_BRKT);}
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 173 "lex.l"
+#line 173 "../../kmflcomp/src/lex.l"
 {yylval.number=*yytext;return(TOK_CHAR);}
 	YY_BREAK
 
 
 case 87:
 YY_RULE_SETUP
-#line 177 "lex.l"
+#line 177 "../../kmflcomp/src/lex.l"
 {yylval.number=*yytext;return(TOK_CHAR);}
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 178 "lex.l"
+#line 178 "../../kmflcomp/src/lex.l"
 {BEGIN(caller);}
 	YY_BREAK
 
 
 case 89:
 YY_RULE_SETUP
-#line 182 "lex.l"
+#line 182 "../../kmflcomp/src/lex.l"
 {/* ignore */}
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 183 "lex.l"
+#line 183 "../../kmflcomp/src/lex.l"
 {yylval.number=KS_LSHIFT;return(TOK_SHIFT);}
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 184 "lex.l"
+#line 184 "../../kmflcomp/src/lex.l"
 {yylval.number=KS_CAPS;return(TOK_SHIFT);}
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 185 "lex.l"
+#line 185 "../../kmflcomp/src/lex.l"
 {yylval.number=KS_LCTRL;return(TOK_SHIFT);}
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 186 "lex.l"
+#line 186 "../../kmflcomp/src/lex.l"
 {yylval.number=KS_LALT;return(TOK_SHIFT);}
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 187 "lex.l"
+#line 187 "../../kmflcomp/src/lex.l"
 {yylval.number=KS_RSHIFT;return(TOK_SHIFT);}
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 188 "lex.l"
+#line 188 "../../kmflcomp/src/lex.l"
 {yylval.number=KS_NCAPS;return(TOK_SHIFT);}
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 189 "lex.l"
+#line 189 "../../kmflcomp/src/lex.l"
 {yylval.number=KS_RCTRL;return(TOK_SHIFT);}
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 190 "lex.l"
+#line 190 "../../kmflcomp/src/lex.l"
 {yylval.number=KS_RALT;return(TOK_SHIFT);}
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 191 "lex.l"
+#line 191 "../../kmflcomp/src/lex.l"
 {yylval.number=KS_SHIFT;return(TOK_SHIFT);}
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 192 "lex.l"
+#line 192 "../../kmflcomp/src/lex.l"
 {yylval.number=KS_CTRL;return(TOK_SHIFT);}
 	YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 193 "lex.l"
+#line 193 "../../kmflcomp/src/lex.l"
 {yylval.number=KS_ALT;return(TOK_SHIFT);}
 	YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 195 "lex.l"
+#line 195 "../../kmflcomp/src/lex.l"
 {yylval.number=0x20;return(TOK_RAWKEY);}
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 196 "lex.l"
+#line 196 "../../kmflcomp/src/lex.l"
 {yylval.number=0x27;return(TOK_RAWKEY);}
 	YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 197 "lex.l"
+#line 197 "../../kmflcomp/src/lex.l"
 {yylval.number=0x30;return(TOK_RAWKEY);}
 	YY_BREAK
 case 104:
 YY_RULE_SETUP
-#line 198 "lex.l"
+#line 198 "../../kmflcomp/src/lex.l"
 {yylval.number=0x31;return(TOK_RAWKEY);}
 	YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 199 "lex.l"
+#line 199 "../../kmflcomp/src/lex.l"
 {yylval.number=0x32;return(TOK_RAWKEY);}
 	YY_BREAK
 case 106:
 YY_RULE_SETUP
-#line 200 "lex.l"
+#line 200 "../../kmflcomp/src/lex.l"
 {yylval.number=0x33;return(TOK_RAWKEY);}
 	YY_BREAK
 case 107:
 YY_RULE_SETUP
-#line 201 "lex.l"
+#line 201 "../../kmflcomp/src/lex.l"
 {yylval.number=0x34;return(TOK_RAWKEY);}
 	YY_BREAK
 case 108:
 YY_RULE_SETUP
-#line 202 "lex.l"
+#line 202 "../../kmflcomp/src/lex.l"
 {yylval.number=0x35;return(TOK_RAWKEY);}
 	YY_BREAK
 case 109:
 YY_RULE_SETUP
-#line 203 "lex.l"
+#line 203 "../../kmflcomp/src/lex.l"
 {yylval.number=0x36;return(TOK_RAWKEY);}
 	YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 204 "lex.l"
+#line 204 "../../kmflcomp/src/lex.l"
 {yylval.number=0x37;return(TOK_RAWKEY);}
 	YY_BREAK
 case 111:
 YY_RULE_SETUP
-#line 205 "lex.l"
+#line 205 "../../kmflcomp/src/lex.l"
 {yylval.number=0x38;return(TOK_RAWKEY);}
 	YY_BREAK
 case 112:
 YY_RULE_SETUP
-#line 206 "lex.l"
+#line 206 "../../kmflcomp/src/lex.l"
 {yylval.number=0x39;return(TOK_RAWKEY);}
 	YY_BREAK
 case 113:
 YY_RULE_SETUP
-#line 207 "lex.l"
+#line 207 "../../kmflcomp/src/lex.l"
 {yylval.number=0x41;return(TOK_RAWKEY);}
 	YY_BREAK
 case 114:
 YY_RULE_SETUP
-#line 208 "lex.l"
+#line 208 "../../kmflcomp/src/lex.l"
 {yylval.number=0x42;return(TOK_RAWKEY);}
 	YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 209 "lex.l"
+#line 209 "../../kmflcomp/src/lex.l"
 {yylval.number=0x43;return(TOK_RAWKEY);}
 	YY_BREAK
 case 116:
 YY_RULE_SETUP
-#line 210 "lex.l"
+#line 210 "../../kmflcomp/src/lex.l"
 {yylval.number=0x44;return(TOK_RAWKEY);}
 	YY_BREAK
 case 117:
 YY_RULE_SETUP
-#line 211 "lex.l"
+#line 211 "../../kmflcomp/src/lex.l"
 {yylval.number=0x45;return(TOK_RAWKEY);}
 	YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 212 "lex.l"
+#line 212 "../../kmflcomp/src/lex.l"
 {yylval.number=0x46;return(TOK_RAWKEY);}
 	YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 213 "lex.l"
+#line 213 "../../kmflcomp/src/lex.l"
 {yylval.number=0x47;return(TOK_RAWKEY);}
 	YY_BREAK
 case 120:
 YY_RULE_SETUP
-#line 214 "lex.l"
+#line 214 "../../kmflcomp/src/lex.l"
 {yylval.number=0x48;return(TOK_RAWKEY);}
 	YY_BREAK
 case 121:
 YY_RULE_SETUP
-#line 215 "lex.l"
+#line 215 "../../kmflcomp/src/lex.l"
 {yylval.number=0x49;return(TOK_RAWKEY);}
 	YY_BREAK
 case 122:
 YY_RULE_SETUP
-#line 216 "lex.l"
+#line 216 "../../kmflcomp/src/lex.l"
 {yylval.number=0x4a;return(TOK_RAWKEY);}
 	YY_BREAK
 case 123:
 YY_RULE_SETUP
-#line 217 "lex.l"
+#line 217 "../../kmflcomp/src/lex.l"
 {yylval.number=0x4b;return(TOK_RAWKEY);}
 	YY_BREAK
 case 124:
 YY_RULE_SETUP
-#line 218 "lex.l"
+#line 218 "../../kmflcomp/src/lex.l"
 {yylval.number=0x4c;return(TOK_RAWKEY);}
 	YY_BREAK
 case 125:
 YY_RULE_SETUP
-#line 219 "lex.l"
+#line 219 "../../kmflcomp/src/lex.l"
 {yylval.number=0x4d;return(TOK_RAWKEY);}
 	YY_BREAK
 case 126:
 YY_RULE_SETUP
-#line 220 "lex.l"
+#line 220 "../../kmflcomp/src/lex.l"
 {yylval.number=0x4e;return(TOK_RAWKEY);}
 	YY_BREAK
 case 127:
 YY_RULE_SETUP
-#line 221 "lex.l"
+#line 221 "../../kmflcomp/src/lex.l"
 {yylval.number=0x4f;return(TOK_RAWKEY);}
 	YY_BREAK
 case 128:
 YY_RULE_SETUP
-#line 222 "lex.l"
+#line 222 "../../kmflcomp/src/lex.l"
 {yylval.number=0x50;return(TOK_RAWKEY);}
 	YY_BREAK
 case 129:
 YY_RULE_SETUP
-#line 223 "lex.l"
+#line 223 "../../kmflcomp/src/lex.l"
 {yylval.number=0x51;return(TOK_RAWKEY);}
 	YY_BREAK
 case 130:
 YY_RULE_SETUP
-#line 224 "lex.l"
+#line 224 "../../kmflcomp/src/lex.l"
 {yylval.number=0x52;return(TOK_RAWKEY);}
 	YY_BREAK
 case 131:
 YY_RULE_SETUP
-#line 225 "lex.l"
+#line 225 "../../kmflcomp/src/lex.l"
 {yylval.number=0x53;return(TOK_RAWKEY);}
 	YY_BREAK
 case 132:
 YY_RULE_SETUP
-#line 226 "lex.l"
+#line 226 "../../kmflcomp/src/lex.l"
 {yylval.number=0x54;return(TOK_RAWKEY);}
 	YY_BREAK
 case 133:
 YY_RULE_SETUP
-#line 227 "lex.l"
+#line 227 "../../kmflcomp/src/lex.l"
 {yylval.number=0x55;return(TOK_RAWKEY);}
 	YY_BREAK
 case 134:
 YY_RULE_SETUP
-#line 228 "lex.l"
+#line 228 "../../kmflcomp/src/lex.l"
 {yylval.number=0x56;return(TOK_RAWKEY);}
 	YY_BREAK
 case 135:
 YY_RULE_SETUP
-#line 229 "lex.l"
+#line 229 "../../kmflcomp/src/lex.l"
 {yylval.number=0x57;return(TOK_RAWKEY);}
 	YY_BREAK
 case 136:
 YY_RULE_SETUP
-#line 230 "lex.l"
+#line 230 "../../kmflcomp/src/lex.l"
 {yylval.number=0x58;return(TOK_RAWKEY);}
 	YY_BREAK
 case 137:
 YY_RULE_SETUP
-#line 231 "lex.l"
+#line 231 "../../kmflcomp/src/lex.l"
 {yylval.number=0x59;return(TOK_RAWKEY);}
 	YY_BREAK
 case 138:
 YY_RULE_SETUP
-#line 232 "lex.l"
+#line 232 "../../kmflcomp/src/lex.l"
 {yylval.number=0x5a;return(TOK_RAWKEY);}
 	YY_BREAK
 case 139:
 YY_RULE_SETUP
-#line 233 "lex.l"
+#line 233 "../../kmflcomp/src/lex.l"
 {yylval.number=0x60;return(TOK_RAWKEY);}
 	YY_BREAK
 case 140:
 YY_RULE_SETUP
-#line 234 "lex.l"
+#line 234 "../../kmflcomp/src/lex.l"
 {yylval.number=0x2c;return(TOK_RAWKEY);}
 	YY_BREAK
 case 141:
 YY_RULE_SETUP
-#line 235 "lex.l"
+#line 235 "../../kmflcomp/src/lex.l"
 {yylval.number=0x2d;return(TOK_RAWKEY);}
 	YY_BREAK
 case 142:
 YY_RULE_SETUP
-#line 236 "lex.l"
+#line 236 "../../kmflcomp/src/lex.l"
 {yylval.number=0x2e;return(TOK_RAWKEY);}
 	YY_BREAK
 case 143:
 YY_RULE_SETUP
-#line 237 "lex.l"
+#line 237 "../../kmflcomp/src/lex.l"
 {yylval.number=0x2f;return(TOK_RAWKEY);}
 	YY_BREAK
 case 144:
 YY_RULE_SETUP
-#line 238 "lex.l"
+#line 238 "../../kmflcomp/src/lex.l"
 {yylval.number=0x3a;return(TOK_RAWKEY);}
 	YY_BREAK
 case 145:
 YY_RULE_SETUP
-#line 239 "lex.l"
+#line 239 "../../kmflcomp/src/lex.l"
 {yylval.number=0x3d;return(TOK_RAWKEY);}
 	YY_BREAK
 case 146:
 YY_RULE_SETUP
-#line 240 "lex.l"
+#line 240 "../../kmflcomp/src/lex.l"
 {yylval.number=0x5b;return(TOK_RAWKEY);}
 	YY_BREAK
 case 147:
 YY_RULE_SETUP
-#line 241 "lex.l"
+#line 241 "../../kmflcomp/src/lex.l"
 {yylval.number=0x5c;return(TOK_RAWKEY);}
 	YY_BREAK
 case 148:
 YY_RULE_SETUP
-#line 242 "lex.l"
+#line 242 "../../kmflcomp/src/lex.l"
 {yylval.number=0x5d;return(TOK_RAWKEY);}
 	YY_BREAK
 case 149:
 YY_RULE_SETUP
-#line 243 "lex.l"
+#line 243 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff08;return(TOK_RAWKEY);}
 	YY_BREAK
 case 150:
 YY_RULE_SETUP
-#line 244 "lex.l"
+#line 244 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff09;return(TOK_RAWKEY);}
 	YY_BREAK
 case 151:
 YY_RULE_SETUP
-#line 245 "lex.l"
+#line 245 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff0d;return(TOK_RAWKEY);}
 	YY_BREAK
 case 152:
 YY_RULE_SETUP
-#line 246 "lex.l"
+#line 246 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff13;return(TOK_RAWKEY);}
 	YY_BREAK
 case 153:
 YY_RULE_SETUP
-#line 247 "lex.l"
+#line 247 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff14;return(TOK_RAWKEY);}
 	YY_BREAK
 case 154:
 YY_RULE_SETUP
-#line 248 "lex.l"
+#line 248 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff1b;return(TOK_RAWKEY);}
 	YY_BREAK
 case 155:
 YY_RULE_SETUP
-#line 249 "lex.l"
+#line 249 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff50;return(TOK_RAWKEY);}
 	YY_BREAK
 case 156:
 YY_RULE_SETUP
-#line 250 "lex.l"
+#line 250 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff51;return(TOK_RAWKEY);}
 	YY_BREAK
 case 157:
 YY_RULE_SETUP
-#line 251 "lex.l"
+#line 251 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff52;return(TOK_RAWKEY);}
 	YY_BREAK
 case 158:
 YY_RULE_SETUP
-#line 252 "lex.l"
+#line 252 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff53;return(TOK_RAWKEY);}
 	YY_BREAK
 case 159:
 YY_RULE_SETUP
-#line 253 "lex.l"
+#line 253 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff54;return(TOK_RAWKEY);}
 	YY_BREAK
 case 160:
 YY_RULE_SETUP
-#line 254 "lex.l"
+#line 254 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff55;return(TOK_RAWKEY);}
 	YY_BREAK
 case 161:
 YY_RULE_SETUP
-#line 255 "lex.l"
+#line 255 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff56;return(TOK_RAWKEY);}
 	YY_BREAK
 case 162:
 YY_RULE_SETUP
-#line 256 "lex.l"
+#line 256 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff57;return(TOK_RAWKEY);}
 	YY_BREAK
 case 163:
 YY_RULE_SETUP
-#line 257 "lex.l"
+#line 257 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff63;return(TOK_RAWKEY);}
 	YY_BREAK
 case 164:
 YY_RULE_SETUP
-#line 258 "lex.l"
+#line 258 "../../kmflcomp/src/lex.l"
 {yylval.number=0xff7f;return(TOK_RAWKEY);}
 	YY_BREAK
 case 165:
 YY_RULE_SETUP
-#line 259 "lex.l"
+#line 259 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffaa;return(TOK_RAWKEY);}
 	YY_BREAK
 case 166:
 YY_RULE_SETUP
-#line 260 "lex.l"
+#line 260 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffab;return(TOK_RAWKEY);}
 	YY_BREAK
 case 167:
 YY_RULE_SETUP
-#line 261 "lex.l"
+#line 261 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffad;return(TOK_RAWKEY);}
 	YY_BREAK
 case 168:
 YY_RULE_SETUP
-#line 262 "lex.l"
+#line 262 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffae;return(TOK_RAWKEY);}
 	YY_BREAK
 case 169:
 YY_RULE_SETUP
-#line 263 "lex.l"
+#line 263 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffaf;return(TOK_RAWKEY);}
 	YY_BREAK
 case 170:
 YY_RULE_SETUP
-#line 264 "lex.l"
+#line 264 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffb0;return(TOK_RAWKEY);}
 	YY_BREAK
 case 171:
 YY_RULE_SETUP
-#line 265 "lex.l"
+#line 265 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffb1;return(TOK_RAWKEY);}
 	YY_BREAK
 case 172:
 YY_RULE_SETUP
-#line 266 "lex.l"
+#line 266 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffb2;return(TOK_RAWKEY);}
 	YY_BREAK
 case 173:
 YY_RULE_SETUP
-#line 267 "lex.l"
+#line 267 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffb3;return(TOK_RAWKEY);}
 	YY_BREAK
 case 174:
 YY_RULE_SETUP
-#line 268 "lex.l"
+#line 268 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffb4;return(TOK_RAWKEY);}
 	YY_BREAK
 case 175:
 YY_RULE_SETUP
-#line 269 "lex.l"
+#line 269 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffb5;return(TOK_RAWKEY);}
 	YY_BREAK
 case 176:
 YY_RULE_SETUP
-#line 270 "lex.l"
+#line 270 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffb6;return(TOK_RAWKEY);}
 	YY_BREAK
 case 177:
 YY_RULE_SETUP
-#line 271 "lex.l"
+#line 271 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffb7;return(TOK_RAWKEY);}
 	YY_BREAK
 case 178:
 YY_RULE_SETUP
-#line 272 "lex.l"
+#line 272 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffb8;return(TOK_RAWKEY);}
 	YY_BREAK
 case 179:
 YY_RULE_SETUP
-#line 273 "lex.l"
+#line 273 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffb9;return(TOK_RAWKEY);}
 	YY_BREAK
 case 180:
 YY_RULE_SETUP
-#line 274 "lex.l"
+#line 274 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffbe;return(TOK_RAWKEY);}
 	YY_BREAK
 case 181:
 YY_RULE_SETUP
-#line 275 "lex.l"
+#line 275 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffbf;return(TOK_RAWKEY);}
 	YY_BREAK
 case 182:
 YY_RULE_SETUP
-#line 276 "lex.l"
+#line 276 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffc0;return(TOK_RAWKEY);}
 	YY_BREAK
 case 183:
 YY_RULE_SETUP
-#line 277 "lex.l"
+#line 277 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffc1;return(TOK_RAWKEY);}
 	YY_BREAK
 case 184:
 YY_RULE_SETUP
-#line 278 "lex.l"
+#line 278 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffc2;return(TOK_RAWKEY);}
 	YY_BREAK
 case 185:
 YY_RULE_SETUP
-#line 279 "lex.l"
+#line 279 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffc3;return(TOK_RAWKEY);}
 	YY_BREAK
 case 186:
 YY_RULE_SETUP
-#line 280 "lex.l"
+#line 280 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffc4;return(TOK_RAWKEY);}
 	YY_BREAK
 case 187:
 YY_RULE_SETUP
-#line 281 "lex.l"
+#line 281 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffc5;return(TOK_RAWKEY);}
 	YY_BREAK
 case 188:
 YY_RULE_SETUP
-#line 282 "lex.l"
+#line 282 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffc6;return(TOK_RAWKEY);}
 	YY_BREAK
 case 189:
 YY_RULE_SETUP
-#line 283 "lex.l"
+#line 283 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffc7;return(TOK_RAWKEY);}
 	YY_BREAK
 case 190:
 YY_RULE_SETUP
-#line 284 "lex.l"
+#line 284 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffc8;return(TOK_RAWKEY);}
 	YY_BREAK
 case 191:
 YY_RULE_SETUP
-#line 285 "lex.l"
+#line 285 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffc9;return(TOK_RAWKEY);}
 	YY_BREAK
 case 192:
 YY_RULE_SETUP
-#line 286 "lex.l"
+#line 286 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffca;return(TOK_RAWKEY);}
 	YY_BREAK
 case 193:
 YY_RULE_SETUP
-#line 287 "lex.l"
+#line 287 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffcb;return(TOK_RAWKEY);}
 	YY_BREAK
 case 194:
 YY_RULE_SETUP
-#line 288 "lex.l"
+#line 288 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffcc;return(TOK_RAWKEY);}
 	YY_BREAK
 case 195:
 YY_RULE_SETUP
-#line 289 "lex.l"
+#line 289 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffcd;return(TOK_RAWKEY);}
 	YY_BREAK
 case 196:
 YY_RULE_SETUP
-#line 290 "lex.l"
+#line 290 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffce;return(TOK_RAWKEY);}
 	YY_BREAK
 case 197:
 YY_RULE_SETUP
-#line 291 "lex.l"
+#line 291 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffcf;return(TOK_RAWKEY);}
 	YY_BREAK
 case 198:
 YY_RULE_SETUP
-#line 292 "lex.l"
+#line 292 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffd0;return(TOK_RAWKEY);}
 	YY_BREAK
 case 199:
 YY_RULE_SETUP
-#line 293 "lex.l"
+#line 293 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffd1;return(TOK_RAWKEY);}
 	YY_BREAK
 case 200:
 YY_RULE_SETUP
-#line 294 "lex.l"
+#line 294 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffd2;return(TOK_RAWKEY);}
 	YY_BREAK
 case 201:
 YY_RULE_SETUP
-#line 295 "lex.l"
+#line 295 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffd3;return(TOK_RAWKEY);}
 	YY_BREAK
 case 202:
 YY_RULE_SETUP
-#line 296 "lex.l"
+#line 296 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffd4;return(TOK_RAWKEY);}
 	YY_BREAK
 case 203:
 YY_RULE_SETUP
-#line 297 "lex.l"
+#line 297 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffd5;return(TOK_RAWKEY);}
 	YY_BREAK
 case 204:
 YY_RULE_SETUP
-#line 298 "lex.l"
+#line 298 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffe1;return(TOK_RAWKEY);}
 	YY_BREAK
 case 205:
 YY_RULE_SETUP
-#line 299 "lex.l"
+#line 299 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffe3;return(TOK_RAWKEY);}
 	YY_BREAK
 case 206:
 YY_RULE_SETUP
-#line 300 "lex.l"
+#line 300 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffe5;return(TOK_RAWKEY);}
 	YY_BREAK
 case 207:
 YY_RULE_SETUP
-#line 301 "lex.l"
+#line 301 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffe9;return(TOK_RAWKEY);}
 	YY_BREAK
 case 208:
 YY_RULE_SETUP
-#line 302 "lex.l"
+#line 302 "../../kmflcomp/src/lex.l"
 {yylval.number=0xffff;return(TOK_RAWKEY);}
 	YY_BREAK
 case 209:
 YY_RULE_SETUP
-#line 303 "lex.l"
+#line 303 "../../kmflcomp/src/lex.l"
 {yylval.number=0x3c;return(TOK_RAWKEY); /* on German kbds only!*/}
 	YY_BREAK
 case 210:
 YY_RULE_SETUP
-#line 305 "lex.l"
+#line 305 "../../kmflcomp/src/lex.l"
 {yylval.number=text_to_keysym(yytext); if (yylval.number == -1) yyerror("unrecognised raw key"); else return(TOK_XKEYSYM);}
 	YY_BREAK
 case 211:
 YY_RULE_SETUP
-#line 306 "lex.l"
+#line 306 "../../kmflcomp/src/lex.l"
 { yyerror("unrecognised raw key");} 
 	YY_BREAK
 case 212:
 YY_RULE_SETUP
-#line 307 "lex.l"
+#line 307 "../../kmflcomp/src/lex.l"
 {caller0=caller;caller=KEYNAME;qchar='\'';BEGIN(QUOTE);return(TOK_QM);}
 	YY_BREAK
 case 213:
 YY_RULE_SETUP
-#line 308 "lex.l"
+#line 308 "../../kmflcomp/src/lex.l"
 {caller0=caller;caller=KEYNAME;qchar='\"';BEGIN(QUOTE);return(TOK_QM);}
 	YY_BREAK
 case 214:
 YY_RULE_SETUP
-#line 310 "lex.l"
+#line 310 "../../kmflcomp/src/lex.l"
 {
 					if(caller==KEYNAME) caller=caller0;
 					BEGIN(caller);return(TOK_SB);
@@ -2616,25 +2668,25 @@ YY_RULE_SETUP
 case 215:
 /* rule 215 can match eol */
 YY_RULE_SETUP
-#line 316 "lex.l"
+#line 316 "../../kmflcomp/src/lex.l"
 {lineno++;	/* Join lines */}
 	YY_BREAK
 case 216:
 /* rule 216 can match eol */
 YY_RULE_SETUP
-#line 317 "lex.l"
+#line 317 "../../kmflcomp/src/lex.l"
 {lineno++;	/* Join lines */}
 	YY_BREAK
 case 217:
 /* rule 217 can match eol */
 YY_RULE_SETUP
-#line 318 "lex.l"
+#line 318 "../../kmflcomp/src/lex.l"
 {lineno++;	/* Join lines */}
 	YY_BREAK
 case 218:
 /* rule 218 can match eol */
 YY_RULE_SETUP
-#line 319 "lex.l"
+#line 319 "../../kmflcomp/src/lex.l"
 {lineno++;	/* Join lines */}
 	YY_BREAK
 case 219:
@@ -2642,16 +2694,17 @@ case 219:
 (yy_c_buf_p) = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 321 "lex.l"
+#line 321 "../../kmflcomp/src/lex.l"
 {/* ignore, use both /\r and /\n, not to work $ */}
 	YY_BREAK
 case 220:
 /* rule 220 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 1);
 (yy_c_buf_p) = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 322 "lex.l"
+#line 322 "../../kmflcomp/src/lex.l"
 {/*   with either CR or CR/LF line ending */}
 	YY_BREAK
 case 221:
@@ -2659,16 +2712,17 @@ case 221:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 323 "lex.l"
+#line 323 "../../kmflcomp/src/lex.l"
 {/* ignore */}
 	YY_BREAK
 case 222:
 /* rule 222 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_cp - 1);
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 324 "lex.l"
+#line 324 "../../kmflcomp/src/lex.l"
 {/* ignore */}
 	YY_BREAK
 case 223:
@@ -2676,68 +2730,69 @@ case 223:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 325 "lex.l"
+#line 325 "../../kmflcomp/src/lex.l"
 {/* ignore */}
 	YY_BREAK
 case 224:
 /* rule 224 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_cp - 1);
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 326 "lex.l"
+#line 326 "../../kmflcomp/src/lex.l"
 {/* ignore */}
 	YY_BREAK
 case 225:
 YY_RULE_SETUP
-#line 328 "lex.l"
+#line 328 "../../kmflcomp/src/lex.l"
 {BEGIN(SKIP);}
 	YY_BREAK
 case 226:
 YY_RULE_SETUP
-#line 330 "lex.l"
+#line 330 "../../kmflcomp/src/lex.l"
 {/* Keyman platform conditional - just drop marker */}
 	YY_BREAK
 case 227:
 YY_RULE_SETUP
-#line 331 "lex.l"
+#line 331 "../../kmflcomp/src/lex.l"
 {/* Kmfl platform conditional - just drop marker */}
 	YY_BREAK
 case 228:
 YY_RULE_SETUP
-#line 332 "lex.l"
+#line 332 "../../kmflcomp/src/lex.l"
 {BEGIN(SKIP);} /* Platform Conditional */
 	YY_BREAK
 
 case 229:
 YY_RULE_SETUP
-#line 335 "lex.l"
+#line 335 "../../kmflcomp/src/lex.l"
 {/* ignore everything until nl or EOF */}
 	YY_BREAK
 
 case 230:
 YY_RULE_SETUP
-#line 338 "lex.l"
+#line 338 "../../kmflcomp/src/lex.l"
 {fprintf(stderr,"Line %d: Unmatched closing parenthesis\n",lineno);return(TOK_BRKT);}
 	YY_BREAK
 case 231:
 YY_RULE_SETUP
-#line 339 "lex.l"
+#line 339 "../../kmflcomp/src/lex.l"
 {yylval.number=yytext[0];fprintf(stderr,"Line %d: Unrecognized keyword '%s'\n", 
 					(int)lineno, yytext);errcount++;return(TOK_ERROR);}
 	YY_BREAK
 case 232:
 YY_RULE_SETUP
-#line 341 "lex.l"
+#line 341 "../../kmflcomp/src/lex.l"
 {yylval.number=yytext[0];fprintf(stderr,"Line %d: Unexpected char (%d) `%c'\n", 
 					(int)lineno, (int) yytext[0],(char) yytext[0]);errcount++;return(TOK_CHAR);}
 	YY_BREAK
 case 233:
 YY_RULE_SETUP
-#line 343 "lex.l"
+#line 343 "../../kmflcomp/src/lex.l"
 ECHO;
 	YY_BREAK
-#line 2741 "lex.c"
+#line 2796 "lex.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2866,6 +2921,7 @@ ECHO;
 			"fatal flex scanner internal error--no action found" );
 	} /* end of action switch */
 		} /* end of scanning one token */
+	} /* end of user's declarations */
 } /* end of yylex */
 
 /* yy_get_next_buffer - try to read in a new buffer
@@ -2877,9 +2933,9 @@ ECHO;
  */
 static int yy_get_next_buffer (void)
 {
-    	register char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
-	register char *source = (yytext_ptr);
-	register int number_to_move, i;
+    	char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
+	char *source = (yytext_ptr);
+	yy_size_t number_to_move, i;
 	int ret_val;
 
 	if ( (yy_c_buf_p) > &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[(yy_n_chars) + 1] )
@@ -2908,7 +2964,7 @@ static int yy_get_next_buffer (void)
 	/* Try to read more data. */
 
 	/* First move last chars to start of buffer. */
-	number_to_move = (int) ((yy_c_buf_p) - (yytext_ptr)) - 1;
+	number_to_move = (yy_size_t) ((yy_c_buf_p) - (yytext_ptr)) - 1;
 
 	for ( i = 0; i < number_to_move; ++i )
 		*(dest++) = *(source++);
@@ -2921,21 +2977,21 @@ static int yy_get_next_buffer (void)
 
 	else
 		{
-			int num_to_read =
+			yy_size_t num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
 			{ /* Not enough room in the buffer - grow it. */
 
 			/* just a shorter name for the current buffer */
-			YY_BUFFER_STATE b = YY_CURRENT_BUFFER;
+			YY_BUFFER_STATE b = YY_CURRENT_BUFFER_LVALUE;
 
 			int yy_c_buf_p_offset =
 				(int) ((yy_c_buf_p) - b->yy_ch_buf);
 
 			if ( b->yy_is_our_buffer )
 				{
-				int new_size = b->yy_buf_size * 2;
+				yy_size_t new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -2966,7 +3022,7 @@ static int yy_get_next_buffer (void)
 
 		/* Read in more data. */
 		YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-			(yy_n_chars), (size_t) num_to_read );
+			(yy_n_chars), num_to_read );
 
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = (yy_n_chars);
 		}
@@ -2990,9 +3046,9 @@ static int yy_get_next_buffer (void)
 	else
 		ret_val = EOB_ACT_CONTINUE_SCAN;
 
-	if ((yy_size_t) ((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
+	if ((int) ((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
 		/* Extend the array by 50%, plus the number we really need. */
-		yy_size_t new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
+		int new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
 		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) yyrealloc((void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf,new_size  );
 		if ( ! YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
 			YY_FATAL_ERROR( "out of dynamic memory in yy_get_next_buffer()" );
@@ -3011,15 +3067,15 @@ static int yy_get_next_buffer (void)
 
     static yy_state_type yy_get_previous_state (void)
 {
-	register yy_state_type yy_current_state;
-	register char *yy_cp;
+	yy_state_type yy_current_state;
+	char *yy_cp;
     
 	yy_current_state = (yy_start);
 	yy_current_state += YY_AT_BOL();
 
 	for ( yy_cp = (yytext_ptr) + YY_MORE_ADJ; yy_cp < (yy_c_buf_p); ++yy_cp )
 		{
-		register YY_CHAR yy_c = (*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 1);
+		YY_CHAR yy_c = (*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 1);
 		if ( yy_accept[yy_current_state] )
 			{
 			(yy_last_accepting_state) = yy_current_state;
@@ -3044,10 +3100,10 @@ static int yy_get_next_buffer (void)
  */
     static yy_state_type yy_try_NUL_trans  (yy_state_type yy_current_state )
 {
-	register int yy_is_jam;
-    	register char *yy_cp = (yy_c_buf_p);
+	int yy_is_jam;
+    	char *yy_cp = (yy_c_buf_p);
 
-	register YY_CHAR yy_c = 1;
+	YY_CHAR yy_c = 1;
 	if ( yy_accept[yy_current_state] )
 		{
 		(yy_last_accepting_state) = yy_current_state;
@@ -3062,12 +3118,14 @@ static int yy_get_next_buffer (void)
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 	yy_is_jam = (yy_current_state == 737);
 
-	return yy_is_jam ? 0 : yy_current_state;
+		return yy_is_jam ? 0 : yy_current_state;
 }
 
-    static void yyunput (int c, register char * yy_bp )
+#ifndef YY_NO_UNPUT
+
+    static void yyunput (int c, char * yy_bp )
 {
-	register char *yy_cp;
+	char *yy_cp;
     
     yy_cp = (yy_c_buf_p);
 
@@ -3077,10 +3135,10 @@ static int yy_get_next_buffer (void)
 	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
 		{ /* need to shift things up to make room */
 		/* +2 for EOB chars. */
-		register int number_to_move = (yy_n_chars) + 2;
-		register char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
+		yy_size_t number_to_move = (yy_n_chars) + 2;
+		char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
 					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
-		register char *source =
+		char *source =
 				&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move];
 
 		while ( source > YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
@@ -3101,6 +3159,8 @@ static int yy_get_next_buffer (void)
 	(yy_hold_char) = *yy_cp;
 	(yy_c_buf_p) = yy_cp;
 }
+
+#endif
 
 #ifndef YY_NO_INPUT
 #ifdef __cplusplus
@@ -3126,7 +3186,7 @@ static int yy_get_next_buffer (void)
 
 		else
 			{ /* need more input */
-			int offset = (yy_c_buf_p) - (yytext_ptr);
+			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -3253,7 +3313,7 @@ static void yy_load_buffer_state  (void)
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
 
-	b->yy_buf_size = size;
+	b->yy_buf_size = (yy_size_t)size;
 
 	/* yy_ch_buf has to be 2 characters longer than the size given because
 	 * we need to put in 2 end-of-buffer characters.
@@ -3288,10 +3348,6 @@ static void yy_load_buffer_state  (void)
 	yyfree((void *) b  );
 }
 
-#ifndef __cplusplus
-extern int isatty (int );
-#endif /* __cplusplus */
-    
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
  * such as during a yyrestart() or at EOF.
@@ -3404,7 +3460,7 @@ void yypop_buffer_state (void)
  */
 static void yyensure_buffer_stack (void)
 {
-	int num_to_alloc;
+	yy_size_t num_to_alloc;
     
 	if (!(yy_buffer_stack)) {
 
@@ -3412,7 +3468,7 @@ static void yyensure_buffer_stack (void)
 		 * scanner will even need a stack. We use 2 instead of 1 to avoid an
 		 * immediate realloc on the next call.
          */
-		num_to_alloc = 1;
+		num_to_alloc = 1; /* After all that talk, this was set to 1 anyways... */
 		(yy_buffer_stack) = (struct yy_buffer_state**)yyalloc
 								(num_to_alloc * sizeof(struct yy_buffer_state*)
 								);
@@ -3429,7 +3485,7 @@ static void yyensure_buffer_stack (void)
 	if ((yy_buffer_stack_top) >= ((yy_buffer_stack_max)) - 1){
 
 		/* Increase the buffer to prepare for a possible push. */
-		int grow_size = 8 /* arbitrary grow size */;
+		yy_size_t grow_size = 8 /* arbitrary grow size */;
 
 		num_to_alloc = (yy_buffer_stack_max) + grow_size;
 		(yy_buffer_stack) = (struct yy_buffer_state**)yyrealloc
@@ -3496,17 +3552,17 @@ YY_BUFFER_STATE yy_scan_string (yyconst char * yystr )
 
 /** Setup the input buffer state to scan the given bytes. The next call to yylex() will
  * scan from a @e copy of @a bytes.
- * @param bytes the byte buffer to scan
- * @param len the number of bytes in the buffer pointed to by @a bytes.
+ * @param yybytes the byte buffer to scan
+ * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
  * 
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
+YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
 	yy_size_t n;
-	int i;
+	yy_size_t i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
@@ -3537,7 +3593,7 @@ YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
 
 static void yy_fatal_error (yyconst char* msg )
 {
-    	(void) fprintf( stderr, "%s\n", msg );
+			(void) fprintf( stderr, "%s\n", msg );
 	exit( YY_EXIT_FAILURE );
 }
 
@@ -3588,7 +3644,7 @@ FILE *yyget_out  (void)
 /** Get the length of the current token.
  * 
  */
-int yyget_leng  (void)
+yy_size_t yyget_leng  (void)
 {
         return yyleng;
 }
@@ -3603,29 +3659,29 @@ char *yyget_text  (void)
 }
 
 /** Set the current line number.
- * @param line_number
+ * @param _line_number line number
  * 
  */
-void yyset_lineno (int  line_number )
+void yyset_lineno (int  _line_number )
 {
     
-    yylineno = line_number;
+    yylineno = _line_number;
 }
 
 /** Set the input stream. This does not discard the current
  * input buffer.
- * @param in_str A readable stream.
+ * @param _in_str A readable stream.
  * 
  * @see yy_switch_to_buffer
  */
-void yyset_in (FILE *  in_str )
+void yyset_in (FILE *  _in_str )
 {
-        yyin = in_str ;
+        yyin = _in_str ;
 }
 
-void yyset_out (FILE *  out_str )
+void yyset_out (FILE *  _out_str )
 {
-        yyout = out_str ;
+        yyout = _out_str ;
 }
 
 int yyget_debug  (void)
@@ -3633,9 +3689,9 @@ int yyget_debug  (void)
         return yy_flex_debug;
 }
 
-void yyset_debug (int  bdebug )
+void yyset_debug (int  _bdebug )
 {
-        yy_flex_debug = bdebug ;
+        yy_flex_debug = _bdebug ;
 }
 
 static int yy_init_globals (void)
@@ -3695,7 +3751,8 @@ int yylex_destroy  (void)
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char* s1, yyconst char * s2, int n )
 {
-	register int i;
+		
+	int i;
 	for ( i = 0; i < n; ++i )
 		s1[i] = s2[i];
 }
@@ -3704,7 +3761,7 @@ static void yy_flex_strncpy (char* s1, yyconst char * s2, int n )
 #ifdef YY_NEED_STRLEN
 static int yy_flex_strlen (yyconst char * s )
 {
-	register int n;
+	int n;
 	for ( n = 0; s[n]; ++n )
 		;
 
@@ -3714,11 +3771,12 @@ static int yy_flex_strlen (yyconst char * s )
 
 void *yyalloc (yy_size_t  size )
 {
-	return (void *) malloc( size );
+			return (void *) malloc( size );
 }
 
 void *yyrealloc  (void * ptr, yy_size_t  size )
 {
+		
 	/* The cast to (char *) in the following accommodates both
 	 * implementations that use char* generic pointers, and those
 	 * that use void* generic pointers.  It works with the latter
@@ -3731,9 +3789,9 @@ void *yyrealloc  (void * ptr, yy_size_t  size )
 
 void yyfree (void * ptr )
 {
-	free( (char *) ptr );	/* see yyrealloc() for (char *) cast */
+			free( (char *) ptr );	/* see yyrealloc() for (char *) cast */
 }
 
 #define YYTABLES_NAME "yytables"
 
-#line 343 "lex.l"
+#line 343 "../../kmflcomp/src/lex.l"
