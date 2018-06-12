@@ -1,5 +1,14 @@
 # Keyman Developer Version History
 
+## 2018-06-11 10.0.1105.0 beta
+* No changes to Keyman Developer
+
+## 2018-06-09 10.0.1104.0 beta
+* No changes to Keyman Developer
+
+## 2018-06-07 10.0.1103.0 beta
+* No changes to Keyman Developer
+
 ## 2018-06-05 10.0.1102.0 beta
 * Improved crash reporting stability (#940)
 

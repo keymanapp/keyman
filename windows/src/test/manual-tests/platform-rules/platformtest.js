@@ -64,7 +64,7 @@ function Keyboard_platformtest()
   this.s81="iOS";
   this.s82="macOSX";
   this.s83="LINUX";
-  this.KVER="10.0.700.0";
+  this.KVER="10.0.1105.0";
   this.gs=function(t,e) {
     return this.g_main(t,e);
   };
