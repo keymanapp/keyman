@@ -27,6 +27,7 @@ def extract_kmp(kmpfile, directory):
 def get_metadata(tmpdirname):
 	"""
 	Get metadata from kmp.json if it exists.
+	If it does not exist then will return get_infdata
 
 	Args:
 		inputfile (str): path to kmp file
@@ -40,7 +41,7 @@ def get_metadata(tmpdirname):
 	if os.path.isfile(kmpjson):
 		return parsemetadata(kmpjson, False)
 	else:
-		return None, None, None, None, None
+		return get_infdata(tmpdirname)
 
 def get_infdata(tmpdirname):
 	"""
@@ -56,7 +57,17 @@ def get_infdata(tmpdirname):
 	"""
 	kmpinf = os.path.join(tmpdirname, "kmp.inf")
 	if os.path.isfile(kmpinf):
-		return parseinfdata(kmpinf, False)
+		info, system, options, keyboards, files =  parseinfdata(kmpinf, False)
+		if files and not keyboards:
+			id = "unknown"
+			for kbfile in files:
+				if determine_filetype(kbfile['name']) == "Compiled keyboard":
+					id = os.path.basename(os.path.splitext(kbfile['name'])[0])
+			#inf file may not have keyboards so generate it if needed
+			keyboards = [ { 'name' : info['name']['description'],
+				'id' : id,
+				'version' : info['version']['description'] } ]
+		return info, system, options, keyboards, files
 	else:
 		return None, None, None, None, None
 
@@ -73,14 +84,7 @@ def install_kmp(inputfile, withkmn=False):
 		print('created temporary directory', tmpdirname)
 		extract_kmp(inputfile, tmpdirname)
 		info, system, options, keyboards, files = get_metadata(tmpdirname)
-		if not keyboards:
-			# no json file so trying inf file
-			info, system, options, keyboards, files = get_infdata(tmpdirname)
-		if files and not keyboards:
-			#inf file may not have keyboards so generate it if needed
-			keyboards = [ { 'name' : info['name']['description'],
-				'id' : os.path.basename(os.path.splitext(inputfile)[0]),
-				'version' : info['version']['description'] } ]
+
 		if keyboards:
 			kbid = keyboards[0]['id']
 			print("Installing", info['name']['description'])

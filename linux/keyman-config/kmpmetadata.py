@@ -108,6 +108,13 @@ def print_files(files, extracted_dir):
 	except Exception:
 		pass
 
+def get_fonts(files):
+	fonts = []
+	for kbfile in files:
+		if determine_filetype(kbfile['name']) == "Font":
+			fonts.append(kbfile)
+	return fonts
+
 def parseinfdata(inffile, verbose=False):
 	"""
 	Parse the metadata in a kmp.inf file.
@@ -198,6 +205,8 @@ def parseinfdata(inffile, verbose=False):
 						system['fileVersion'] = item[1]
 					elif item[0] == 'ReadMeFile':
 						options['readmeFile'] = item[1]
+					elif item[0] == 'GraphicFile':
+						options['graphicFile'] = item[1]
 					elif item[0] == 'ExecuteProgram':
 						pass
 					else:

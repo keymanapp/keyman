@@ -10,8 +10,9 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit', '3.0')
 from gi.repository import Gtk, WebKit
 from get_kmp import get_download_folder, download_kmp_file
-from install_kmp import install_kmp, extract_kmp
+from install_kmp import install_kmp, extract_kmp, get_metadata
 from list_installed_kmp import get_kmp_version
+from kmpmetadata import get_fonts
 
 def process_kmp(view, url, downloadfile, verbose=False):
     if verbose:
@@ -52,62 +53,104 @@ class InstallKmpWindow(Gtk.Window):
     def __init__(self, kmpfile):
         print("kmpfile:", kmpfile)
         keyboardid = os.path.basename(os.path.splitext(kmpfile)[0])
-        installed_kmp_ver = get_kmp_version(keyboardid)
+        #installed_kmp_ver = get_kmp_version(keyboardid)
         windowtitle = "Installing keyboard/package " + keyboardid
         Gtk.Window.__init__(self, title=windowtitle)
 
         self.set_border_width(3)
 
-        self.page1 = Gtk.Box()
-        self.page1.set_border_width(10)
-
-        hbox = Gtk.Box(spacing=10)
-        vbox_left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        vbox_left.set_homogeneous(False)
-        vbox_right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        vbox_right.set_homogeneous(False)
-        hbox.pack_start(vbox_left, True, True, 0)
-        hbox.pack_start(vbox_right, True, True, 0)
-
-        label = Gtk.Label()
-        label.set_text("Keyboard layouts:")
-        label.set_justify(Gtk.Justification.RIGHT)
-        vbox_left.pack_start(label, True, True, 0)
-        label = Gtk.Label()
-        # Fonts is optional
-        label.set_text("Fonts:")
-        label.set_justify(Gtk.Justification.RIGHT)
-        vbox_left.pack_start(label, True, True, 0)
-        label = Gtk.Label()
-        label.set_text("Package version:")
-        label.set_justify(Gtk.Justification.RIGHT)
-        vbox_left.pack_start(label, True, True, 0)
-        label = Gtk.Label()
-        label.set_text("Author:")
-        label.set_justify(Gtk.Justification.RIGHT)
-        vbox_left.pack_start(label, True, True, 0)
-        label = Gtk.Label()
-        # Website is optional
-        label.set_text("Website:")
-        label.set_justify(Gtk.Justification.RIGHT)
-        vbox_left.pack_start(label, True, True, 0)
-        label = Gtk.Label()
-        label.set_text("Copyright:")
-        label.set_justify(Gtk.Justification.RIGHT)
-        vbox_left.pack_start(label, True, True, 0)
-        label = Gtk.Label()
-
-        self.page1.add(hbox)
-
-        #self.page1.add(Gtk.Label('Details'))
-
-        self.page2 = Gtk.Box()
-        self.page2.set_border_width(10)
-        s = Gtk.ScrolledWindow()
-        webview = WebKit.WebView()
         with tempfile.TemporaryDirectory() as tmpdirname:
             extract_kmp(kmpfile, tmpdirname)
-            readme_file = os.path.join(tmpdirname, "readme.htm")
+            info, system, options, keyboards, files = get_metadata(tmpdirname)
+            self.page1 = Gtk.Box()
+            self.page1.set_border_width(10)
+
+            grid = Gtk.Grid()
+            self.page1.add(grid)
+
+            label1 = Gtk.Label()
+            label1.set_text("Keyboard layouts:   ")
+            label1.set_halign(Gtk.Align.END)
+            grid.add(label1)
+            label = Gtk.Label()
+            keyboardlayout = ""
+            for kb in keyboards:
+                if keyboardlayout != "":
+                    keyboardlayout = keyboardlayout + "\n"
+                keyboardlayout = keyboardlayout + kb['name']
+            label.set_text(keyboardlayout)
+            label.set_halign(Gtk.Align.START)
+            grid.attach_next_to(label, label1, Gtk.PositionType.RIGHT, 1, 1)
+
+            fonts = get_fonts(files)
+            if fonts:
+                label2 = Gtk.Label()
+                # Fonts are optional
+                label2.set_text("Fonts:   ")
+                label2.set_halign(Gtk.Align.END)
+                grid.attach_next_to(label2, label1, Gtk.PositionType.BOTTOM, 1, 1)
+                label = Gtk.Label()
+                fontlist = ""
+                for font in fonts:
+                    if fontlist != "":
+                        fontlist = fontlist + "\n"
+                    if font['description'][:5] == "Font ":
+                        fontdesc = font['description'][5:]
+                    else:
+                        fontdesc = font['description']
+                    fontlist = fontlist + fontdesc
+                label.set_text(fontlist)
+                label.set_halign(Gtk.Align.START)
+                grid.attach_next_to(label, label2, Gtk.PositionType.RIGHT, 1, 1)
+            else:
+                label2 = None
+
+            label3 = Gtk.Label()
+            label3.set_text("Package version:   ")
+            label3.set_halign(Gtk.Align.END)
+            if label2:
+                grid.attach_next_to(label3, label2, Gtk.PositionType.BOTTOM, 1, 1)
+            else:
+                grid.attach_next_to(label3, label1, Gtk.PositionType.BOTTOM, 1, 1)
+            label = Gtk.Label()
+            label.set_text(info['version']['description'])
+            label.set_halign(Gtk.Align.START)
+            grid.attach_next_to(label, label3, Gtk.PositionType.RIGHT, 1, 1)
+
+
+            label4 = Gtk.Label()
+            label4.set_text("Author:   ")
+            label4.set_halign(Gtk.Align.END)
+            grid.attach_next_to(label4, label3, Gtk.PositionType.BOTTOM, 1, 1)
+            label = Gtk.Label()
+            label.set_text(info['author']['description'])
+            label.set_halign(Gtk.Align.START)
+            grid.attach_next_to(label, label4, Gtk.PositionType.RIGHT, 1, 1)
+
+            label5 = Gtk.Label()
+            # Website is optional and may be a mailto for the author
+            label5.set_text("Website:   ")
+            label5.set_halign(Gtk.Align.END)
+            grid.attach_next_to(label5, label4, Gtk.PositionType.BOTTOM, 1, 1)
+
+            label6 = Gtk.Label()
+            label6.set_text("Copyright:   ")
+            label6.set_halign(Gtk.Align.END)
+            grid.attach_next_to(label6, label5, Gtk.PositionType.BOTTOM, 1, 1)
+            label = Gtk.Label()
+            label.set_text(info['copyright']['description'])
+            label.set_halign(Gtk.Align.START)
+            grid.attach_next_to(label, label6, Gtk.PositionType.RIGHT, 1, 1)
+
+            self.page2 = Gtk.Box()
+            self.page2.set_border_width(10)
+            s = Gtk.ScrolledWindow()
+            webview = WebKit.WebView()
+
+            if "readmeFile" in options:
+                readme_file = os.path.join(tmpdirname, options['readmeFile'])
+            else:
+                readme_file = os.path.join(tmpdirname, "readme.htm")
             if os.path.isfile(readme_file):
                 readme_uri = pathlib.Path(readme_file).as_uri()
                 webview.load_uri(readme_uri)
