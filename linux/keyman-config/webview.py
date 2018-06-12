@@ -10,10 +10,12 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit', '3.0')
 from gi.repository import Gtk, WebKit
+from distutils.version import StrictVersion
 from get_kmp import get_download_folder, download_kmp_file
 from install_kmp import install_kmp, extract_kmp, get_metadata
 from list_installed_kmp import get_kmp_version
 from kmpmetadata import get_fonts
+
 
 def process_kmp(view, url, downloadfile, verbose=False):
     if verbose:
@@ -23,7 +25,8 @@ def process_kmp(view, url, downloadfile, verbose=False):
             print("File downloaded")
 
         w = InstallKmpWindow(downloadfile)
-        w.show_all()
+        if w.checkcontinue:
+            w.show_all()
         #install_kmp(downloadfile, True)
         #keyboardid = os.path.basename(os.path.splitext(downloadfile)[0])
         #welcome_file = os.path.join("/usr/local/share/doc/keyman", keyboardid, "welcome.htm")
@@ -68,7 +71,10 @@ class InstallKmpWindow(Gtk.Window):
         print("kmpfile:", kmpfile)
         self.kmpfile = kmpfile
         keyboardid = os.path.basename(os.path.splitext(kmpfile)[0])
-        #installed_kmp_ver = get_kmp_version(keyboardid)
+        installed_kmp_ver = get_kmp_version(keyboardid)
+        if installed_kmp_ver:
+            print("installed kmp version", installed_kmp_ver)
+
         windowtitle = "Installing keyboard/package " + keyboardid
         Gtk.Window.__init__(self, title=windowtitle)
 
@@ -81,6 +87,43 @@ class InstallKmpWindow(Gtk.Window):
         with tempfile.TemporaryDirectory() as tmpdirname:
             extract_kmp(kmpfile, tmpdirname)
             info, system, options, keyboards, files = get_metadata(tmpdirname)
+            self.kbname = keyboards[0]['name']
+            self.checkcontinue = True
+
+            if installed_kmp_ver:
+                if info['version']['description'] == installed_kmp_ver:
+                    dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.QUESTION,
+                        Gtk.ButtonsType.YES_NO, "Keyboard is installed already")
+                    dialog.format_secondary_text(
+                        "The " + self.kbname + " keyboard is already installed at version " + installed_kmp_ver +
+                            ". Do you want to continue?")
+                    response = dialog.run()
+                    dialog.destroy()
+                    if response == Gtk.ResponseType.YES:
+                        print("QUESTION dialog closed by clicking YES button")
+                    elif response == Gtk.ResponseType.NO:
+                        print("QUESTION dialog closed by clicking NO button")
+                        self.checkcontinue = False
+                else:
+                    try:
+                        print("package version", info['version']['description'])
+                        print("installed kmp version", installed_kmp_ver)
+                        if StrictVersion(info['version']['description']) <= StrictVersion(installed_kmp_ver):
+                            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.QUESTION,
+                                Gtk.ButtonsType.YES_NO, "Keyboard is installed already")
+                            dialog.format_secondary_text(
+                                "The " + self.kbname + " keyboard is already installed with a newer version " + installed_kmp_ver +
+                                    ". Do you want to uninstall it and install the older version" + info['version']['description'] + "?")
+                            response = dialog.run()
+                            dialog.destroy()
+                            if response == Gtk.ResponseType.YES:
+                                print("QUESTION dialog closed by clicking YES button")
+                            elif response == Gtk.ResponseType.NO:
+                                print("QUESTION dialog closed by clicking NO button")
+                                self.checkcontinue = False
+                    except:
+                        print("exception")
+                        pass
 
             image = Gtk.Image()
             if options and "graphicFile" in options:
@@ -107,7 +150,6 @@ class InstallKmpWindow(Gtk.Window):
                 if keyboardlayout != "":
                     keyboardlayout = keyboardlayout + "\n"
                 keyboardlayout = keyboardlayout + kb['name']
-            self.kbname = keyboards[0]['name']
             label.set_text(keyboardlayout)
             label.set_halign(Gtk.Align.START)
             grid.attach_next_to(label, label1, Gtk.PositionType.RIGHT, 1, 1)
