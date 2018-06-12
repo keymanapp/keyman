@@ -29,6 +29,7 @@ def print_options(options):
 	try:
 		print("---- Options ----")
 		print("Readme File: ", options['readmeFile'])
+		print("Graphic File: ", options['graphicFile'])
 	except Exception:
 		pass
 

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import os
+import subprocess
 import webbrowser
 import urllib.parse
 import pathlib
@@ -48,10 +49,24 @@ def check(view, frame, req, nav, policy):
             return True
     return False
 
+def check_mime_type(webview, frame, request, mimetype, policy_decision):
+    """Handle downloads and PDF files."""
+    if mimetype == 'application/pdf':
+        print("Download and run ", request.get_uri())
+        parse_url = urllib.parse.urlparse(request.get_uri())
+        if parse_url.scheme == "file":
+            subprocess.call(['xdg-open', parse_url.path])
+        else:
+            webbrowser.open(request.get_uri())
+        policy_decision.ignore()
+        return True
+    return False
+
 class InstallKmpWindow(Gtk.Window):
 
     def __init__(self, kmpfile):
         print("kmpfile:", kmpfile)
+        self.kmpfile = kmpfile
         keyboardid = os.path.basename(os.path.splitext(kmpfile)[0])
         #installed_kmp_ver = get_kmp_version(keyboardid)
         windowtitle = "Installing keyboard/package " + keyboardid
@@ -59,9 +74,22 @@ class InstallKmpWindow(Gtk.Window):
 
         self.set_border_width(3)
 
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+
+        mainhbox = Gtk.Box()
+
         with tempfile.TemporaryDirectory() as tmpdirname:
             extract_kmp(kmpfile, tmpdirname)
             info, system, options, keyboards, files = get_metadata(tmpdirname)
+
+            image = Gtk.Image()
+            if "graphicFile" in options:
+                image.set_from_file(os.path.join(tmpdirname, options['graphicFile']))
+            else:
+                image.set_from_file("defaultpackage.gif")
+
+            mainhbox.pack_start(image, False, False, 0)
+
             self.page1 = Gtk.Box()
             self.page1.set_border_width(10)
 
@@ -78,6 +106,7 @@ class InstallKmpWindow(Gtk.Window):
                 if keyboardlayout != "":
                     keyboardlayout = keyboardlayout + "\n"
                 keyboardlayout = keyboardlayout + kb['name']
+            self.kbname = keyboards[0]['name']
             label.set_text(keyboardlayout)
             label.set_halign(Gtk.Align.START)
             grid.attach_next_to(label, label1, Gtk.PositionType.RIGHT, 1, 1)
@@ -143,9 +172,10 @@ class InstallKmpWindow(Gtk.Window):
             grid.attach_next_to(label, label6, Gtk.PositionType.RIGHT, 1, 1)
 
             self.page2 = Gtk.Box()
-            self.page2.set_border_width(10)
+            #self.page2.set_border_width(10)
             s = Gtk.ScrolledWindow()
             webview = WebKit.WebView()
+            webview.connect("mime-type-policy-decision-requested", check_mime_type)
 
             if "readmeFile" in options:
                 readme_file = os.path.join(tmpdirname, options['readmeFile'])
@@ -155,11 +185,11 @@ class InstallKmpWindow(Gtk.Window):
                 readme_uri = pathlib.Path(readme_file).as_uri()
                 webview.load_uri(readme_uri)
                 s.add(webview)
-                self.page2.pack_start(s, True, True, 10)
+                self.page2.pack_start(s, True, True, 0)
 
                 self.notebook = Gtk.Notebook()
                 self.notebook.set_tab_pos(Gtk.PositionType.BOTTOM)
-                self.add(self.notebook)
+                mainhbox.pack_start(self.notebook, True, True, 0)
                 self.notebook.append_page(
                     self.page1,
                     Gtk.Label('Details'))
@@ -168,8 +198,93 @@ class InstallKmpWindow(Gtk.Window):
                     Gtk.Label('README')
         )
             else:
-                self.add(self.page1)
-        self.resize(640, 480)
+                mainhbox.pack_start(self.page1, True, True, 0)
+        vbox.pack_start(mainhbox, True, True, 0)
+
+        hbox = Gtk.Box(spacing=6)
+        #hbox.set_halign(Gtk.Align.FILL)
+        vbox.pack_start(hbox, False, False, 0)
+
+        button = Gtk.Button.new_with_mnemonic("_Install")
+        button.connect("clicked", self.on_install_clicked)
+        hbox.pack_start(button, False, False, 0)
+
+        button = Gtk.Button.new_with_mnemonic("_Cancel")
+        button.connect("clicked", self.on_cancel_clicked)
+        hbox.pack_end(button, False, False, 0)
+
+        self.add(vbox)
+        self.resize(635, 270)
+
+    def on_install_clicked(self, button):
+        print("Installing keyboard")
+        install_kmp(self.kmpfile, True)
+        keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])
+        welcome_file = os.path.join("/usr/local/share/doc/keyman", keyboardid, "welcome.htm")
+        if os.path.isfile(welcome_file):
+            uri_path = pathlib.Path(welcome_file).as_uri()
+            print(uri_path)
+            w = WelcomeView(uri_path, self.kbname)
+            w.resize(800, 600)
+            w.show_all()
+        #    view.load_uri(uri_path)
+        self.close()
+
+    def on_cancel_clicked(self, button):
+        print("Cancel install keyboard")
+        self.close()
+
+class WelcomeView(Gtk.Window):
+
+    def __init__(self, welcomeurl, keyboardname):
+        kbtitle = keyboardname + " installed"
+        Gtk.Window.__init__(self, title=kbtitle)
+
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+
+        s = Gtk.ScrolledWindow()
+        #user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36"
+        #user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36"
+        webview = WebKit.WebView()
+        #settings = WebKit.WebSettings()
+        #settings.set_property('user-agent', user_agent)
+        #webview.set_settings(settings)
+        webview.connect("navigation-policy-decision-requested", check)
+        webview.connect("mime-type-policy-decision-requested", check_mime_type)
+        webview.load_uri(welcomeurl)
+        #webview.load_uri("https://keyman.com/keyboards?embed=windows&version=10.0")
+        #webview.load_uri("https://keyman.com/keyboards?embed=linux&version=11")
+        s.add(webview)
+        vbox.pack_start(s, True, True, 0)
+
+        hbox = Gtk.Box(spacing=6)
+        #hbox.set_halign(Gtk.Align.FILL)
+        vbox.pack_start(hbox, False, False, 0)
+
+        #button = Gtk.Button.new_with_label("Click Me")
+        #button.connect("clicked", self.on_click_me_clicked)
+        #hbox.pack_start(button, False, False, 0)
+
+        button = Gtk.Button.new_with_mnemonic("_Print")
+        button.connect("clicked", self.on_print_clicked)
+        hbox.pack_start(button, False, False, 0)
+
+        button = Gtk.Button.new_with_mnemonic("_OK")
+        button.connect("clicked", self.on_ok_clicked)
+        hbox.pack_end(button, False, False, 0)
+
+        self.add(vbox)
+
+
+    #def on_click_me_clicked(self, button):
+    #    print("\"Click me\" button was clicked")
+
+    def on_print_clicked(self, button):
+        print("\"Print\" button was clicked")
+
+    def on_ok_clicked(self, button):
+        print("Closing welcome window")
+        self.close()
 
 
 class DownloadKmpWindow(Gtk.Window):
@@ -187,6 +302,7 @@ class DownloadKmpWindow(Gtk.Window):
         settings.set_property('user-agent', user_agent)
         webview.set_settings(settings)
         webview.connect("navigation-policy-decision-requested", check)
+        webview.connect("mime-type-policy-decision-requested", check_mime_type)
         webview.load_uri("https://keyman.com/keyboards?embed=macos&version=10")
         #webview.load_uri("https://keyman.com/keyboards?embed=windows&version=10.0")
         #webview.load_uri("https://keyman.com/keyboards?embed=linux&version=11")
