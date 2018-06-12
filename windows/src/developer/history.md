@@ -1,5 +1,8 @@
 # Keyman Developer Version History
 
+## 2018-06-12 10.0.1106.0 beta
+* Add Unicode 11.0 characters
+* 
 ## 2018-06-11 10.0.1105.0 beta
 * No changes to Keyman Developer
 
