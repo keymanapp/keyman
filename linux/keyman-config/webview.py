@@ -83,7 +83,7 @@ class InstallKmpWindow(Gtk.Window):
             info, system, options, keyboards, files = get_metadata(tmpdirname)
 
             image = Gtk.Image()
-            if "graphicFile" in options:
+            if options and "graphicFile" in options:
                 image.set_from_file(os.path.join(tmpdirname, options['graphicFile']))
             else:
                 image.set_from_file("defaultpackage.gif")
@@ -100,6 +100,7 @@ class InstallKmpWindow(Gtk.Window):
             label1.set_text("Keyboard layouts:   ")
             label1.set_halign(Gtk.Align.END)
             grid.add(label1)
+            prevlabel = label1
             label = Gtk.Label()
             keyboardlayout = ""
             for kb in keyboards:
@@ -117,7 +118,8 @@ class InstallKmpWindow(Gtk.Window):
                 # Fonts are optional
                 label2.set_text("Fonts:   ")
                 label2.set_halign(Gtk.Align.END)
-                grid.attach_next_to(label2, label1, Gtk.PositionType.BOTTOM, 1, 1)
+                grid.attach_next_to(label2, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+                prevlabel = label2
                 label = Gtk.Label()
                 fontlist = ""
                 for font in fonts:
@@ -131,45 +133,50 @@ class InstallKmpWindow(Gtk.Window):
                 label.set_text(fontlist)
                 label.set_halign(Gtk.Align.START)
                 grid.attach_next_to(label, label2, Gtk.PositionType.RIGHT, 1, 1)
-            else:
-                label2 = None
 
             label3 = Gtk.Label()
             label3.set_text("Package version:   ")
             label3.set_halign(Gtk.Align.END)
-            if label2:
-                grid.attach_next_to(label3, label2, Gtk.PositionType.BOTTOM, 1, 1)
-            else:
-                grid.attach_next_to(label3, label1, Gtk.PositionType.BOTTOM, 1, 1)
+            grid.attach_next_to(label3, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+            prevlabel = label3
             label = Gtk.Label()
             label.set_text(info['version']['description'])
             label.set_halign(Gtk.Align.START)
             grid.attach_next_to(label, label3, Gtk.PositionType.RIGHT, 1, 1)
 
+            if info and 'author' in info:
+                label4 = Gtk.Label()
+                label4.set_text("Author:   ")
+                label4.set_halign(Gtk.Align.END)
+                grid.attach_next_to(label4, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+                prevlabel = label4
+                label = Gtk.Label()
+                label.set_text(info['author']['description'])
+                label.set_halign(Gtk.Align.START)
+                grid.attach_next_to(label, label4, Gtk.PositionType.RIGHT, 1, 1)
 
-            label4 = Gtk.Label()
-            label4.set_text("Author:   ")
-            label4.set_halign(Gtk.Align.END)
-            grid.attach_next_to(label4, label3, Gtk.PositionType.BOTTOM, 1, 1)
-            label = Gtk.Label()
-            label.set_text(info['author']['description'])
-            label.set_halign(Gtk.Align.START)
-            grid.attach_next_to(label, label4, Gtk.PositionType.RIGHT, 1, 1)
 
-            label5 = Gtk.Label()
-            # Website is optional and may be a mailto for the author
-            label5.set_text("Website:   ")
-            label5.set_halign(Gtk.Align.END)
-            grid.attach_next_to(label5, label4, Gtk.PositionType.BOTTOM, 1, 1)
+            if info and 'website' in info:
+                label5 = Gtk.Label()
+                # Website is optional and may be a mailto for the author
+                label5.set_text("Website:   ")
+                label5.set_halign(Gtk.Align.END)
+                grid.attach_next_to(label5, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+                prevlabel = label5
+                label = Gtk.Label()
+                label.set_text(info['website']['description'])
+                label.set_halign(Gtk.Align.START)
+                grid.attach_next_to(label, label5, Gtk.PositionType.RIGHT, 1, 1)
 
-            label6 = Gtk.Label()
-            label6.set_text("Copyright:   ")
-            label6.set_halign(Gtk.Align.END)
-            grid.attach_next_to(label6, label5, Gtk.PositionType.BOTTOM, 1, 1)
-            label = Gtk.Label()
-            label.set_text(info['copyright']['description'])
-            label.set_halign(Gtk.Align.START)
-            grid.attach_next_to(label, label6, Gtk.PositionType.RIGHT, 1, 1)
+            if info and 'copyright' in info:
+                label6 = Gtk.Label()
+                label6.set_text("Copyright:   ")
+                label6.set_halign(Gtk.Align.END)
+                grid.attach_next_to(label6, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+                label = Gtk.Label()
+                label.set_text(info['copyright']['description'])
+                label.set_halign(Gtk.Align.START)
+                grid.attach_next_to(label, label6, Gtk.PositionType.RIGHT, 1, 1)
 
             self.page2 = Gtk.Box()
             #self.page2.set_border_width(10)
@@ -177,7 +184,7 @@ class InstallKmpWindow(Gtk.Window):
             webview = WebKit.WebView()
             webview.connect("mime-type-policy-decision-requested", check_mime_type)
 
-            if "readmeFile" in options:
+            if options and "readmeFile" in options:
                 readme_file = os.path.join(tmpdirname, options['readmeFile'])
             else:
                 readme_file = os.path.join(tmpdirname, "readme.htm")
@@ -228,6 +235,14 @@ class InstallKmpWindow(Gtk.Window):
             w.resize(800, 600)
             w.show_all()
         #    view.load_uri(uri_path)
+        else:
+            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
+                Gtk.ButtonsType.OK, "Keyboard " + self.kbname + " installed")
+            #dialog.format_secondary_text(
+            #    "And this is the secondary text that explains things.")
+            dialog.run()
+            print("INFO dialog closed")
+            dialog.destroy()
         self.close()
 
     def on_cancel_clicked(self, button):

@@ -13,7 +13,8 @@ def print_info(info):
 		print("Copyright: ", info['copyright']['description'])
 		print("Version: ", info['version']['description'])
 		print("Author: ", info['author']['description'])
-		print("URL: ", info['author']['url'])
+		print("Author URL: ", info['author']['url'])
+		print("Website: ", info['website']['description'])
 	except Exception:
 		pass
 
@@ -166,9 +167,11 @@ def parseinfdata(inffile, verbose=False):
 		with open(inffile, 'r', encoding='latin_1') as f:
 			config.read_file(f)
 
+		info = None
 		for section in config.sections():
 			if section == 'Info':
-				info = {}
+				if not info:
+					info = {}
 				for item in config.items('Info'):
 					if item[0] == 'Name' or item[0] == 'name':
 						info['name'] = { 'description' : item[1].split("\"")[1] }
@@ -179,28 +182,39 @@ def parseinfdata(inffile, verbose=False):
 					elif item[0] == 'Author':
 						info['author'] = { 'description' : item[1].split("\"")[1], 'url' : item[1].split("\"")[3] }
 					elif item[0] == "WebSite":
-						pass
+						info['website'] = { 'description' : item[1].split("\"")[1] }
 					else:
 						print("Unknown item in Info:", item[0])
 			if section == 'PackageInfo':
-				info = {}
+				if not info:
+					info = {}
 				info['version'] = { 'description' : "1.0" }
 				for item in config.items('PackageInfo'):
 					if item[0] == 'Name' or item[0] == 'name':
-						info['name'] = { 'description' : item[1].split("\"")[1] }
+						if item[1].split("\"")[1]:
+							info['name'] = { 'description' : item[1].split("\"")[1] }
+						else:
+							info['name'] = { 'description' : item[1].split("\"")[2] }
 					elif item[0] == 'Copyright' or item[0] == 'copyright':
-						info['copyright'] = { 'description' : item[1].split("\"")[1] }
+						if item[1].split("\"")[1]:
+							info['copyright'] = { 'description' : item[1].split("\"")[1] }
+						else:
+							info['copyright'] = { 'description' : item[1].split("\"")[2] }
 					elif item[0] == 'Version':
 						info['version'] = { 'description' : item[1].split("\"")[1] }
 					elif item[0] == 'Author':
 						info['author'] = { 'description' : item[1].split("\"")[1], 'url' : item[1].split("\"")[3] }
 					elif item[0] == "WebSite":
-						pass
+						if item[1].split("\"")[1]:
+							info['website'] = { 'description' : item[1].split("\"")[1] }
+						else:
+							info['website'] = { 'description' : item[1].split("\"")[2] }
 					else:
 						print("Unknown item in Info:", item[0])
 			elif section == 'Package':
 				system = {}
-				options = {}
+				if not options:
+					options = {}
 				for item in config.items('Package'):
 					if item[0] == 'Version':
 						system['fileVersion'] = item[1]
@@ -246,6 +260,12 @@ def parseinfdata(inffile, verbose=False):
 				for item in config.items(section):
 					kbfile = { 'name' : item[0], 'description' : item[1] }
 					files.append(kbfile)
+			elif section == 'Install':
+				if not options:
+					options = {}
+				for item in config.items('Install'):
+					if item[0] == 'ReadmeFile':
+						options['readmeFile'] = item[1]
 
 		if verbose:
 			# print(config.sections())
