@@ -8,6 +8,7 @@ import tempfile
 import zipfile
 from os import listdir, makedirs
 from shutil import copy2
+from PIL import Image
 
 import requests
 
@@ -144,11 +145,17 @@ def install_kmp(inputfile, withkmn=False):
 					if not os.path.isdir(kbfontdir):
 						os.makedirs(kbfontdir)
 					copy2(fpath, kbfontdir)
-				elif ftype == "Metadata" or ftype == "Keyboard icon"  or ftype == "Keyboard source" or ftype == "Keyboard icon" or ftype == "Compiled keyboard" or ftype == "Compiled on screen keyboard":
+				elif ftype == "Metadata" or ftype == "Keyboard source" or ftype == "Compiled keyboard" or ftype == "Compiled on screen keyboard":
 					print("Installing", f['name'], "as keyman file")
 					if not os.path.isdir(kbdir):
 						os.makedirs(kbdir)
 					copy2(fpath, kbdir)
+				elif ftype == "Keyboard icon":
+					print("Converting", f['name'], "to JPEG and installing both as keyman files")
+					if not os.path.isdir(kbdir):
+						os.makedirs(kbdir)
+					copy2(fpath, kbdir)
+					Image.open(fpath).save(os.path.join(kbdir, f['name']+".jpg"))
 		else:
 			print("install_kmp.py: error: No kmp.json or kmp.inf found in", inputfile)
 			print("Contents of", inputfile+":")
