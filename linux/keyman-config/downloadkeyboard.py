@@ -15,6 +15,8 @@ from get_kmp import get_download_folder, download_kmp_file
 from install_kmp import install_kmp, extract_kmp, get_metadata
 from list_installed_kmp import get_kmp_version
 from kmpmetadata import get_fonts
+from welcome import WelcomeView
+from uninstall_kmp import uninstall_kmp
 
 
 def process_kmp(view, url, downloadfile, verbose=False):
@@ -96,11 +98,12 @@ class InstallKmpWindow(Gtk.Window):
                         Gtk.ButtonsType.YES_NO, "Keyboard is installed already")
                     dialog.format_secondary_text(
                         "The " + self.kbname + " keyboard is already installed at version " + installed_kmp_ver +
-                            ". Do you want to continue?")
+                            ". Do you want to uninstall then reinstall it?")
                     response = dialog.run()
                     dialog.destroy()
                     if response == Gtk.ResponseType.YES:
                         print("QUESTION dialog closed by clicking YES button")
+                        uninstall_kmp(keyboardid)
                     elif response == Gtk.ResponseType.NO:
                         print("QUESTION dialog closed by clicking NO button")
                         self.checkcontinue = False
@@ -118,6 +121,7 @@ class InstallKmpWindow(Gtk.Window):
                             dialog.destroy()
                             if response == Gtk.ResponseType.YES:
                                 print("QUESTION dialog closed by clicking YES button")
+                                uninstall_kmp(keyboardid)
                             elif response == Gtk.ResponseType.NO:
                                 print("QUESTION dialog closed by clicking NO button")
                                 self.checkcontinue = False
@@ -290,59 +294,6 @@ class InstallKmpWindow(Gtk.Window):
     def on_cancel_clicked(self, button):
         print("Cancel install keyboard")
         self.close()
-
-class WelcomeView(Gtk.Window):
-
-    def __init__(self, welcomeurl, keyboardname):
-        kbtitle = keyboardname + " installed"
-        Gtk.Window.__init__(self, title=kbtitle)
-
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
-
-        s = Gtk.ScrolledWindow()
-        #user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36"
-        #user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36"
-        webview = WebKit.WebView()
-        #settings = WebKit.WebSettings()
-        #settings.set_property('user-agent', user_agent)
-        #webview.set_settings(settings)
-        webview.connect("navigation-policy-decision-requested", check)
-        webview.connect("mime-type-policy-decision-requested", check_mime_type)
-        webview.load_uri(welcomeurl)
-        #webview.load_uri("https://keyman.com/keyboards?embed=windows&version=10.0")
-        #webview.load_uri("https://keyman.com/keyboards?embed=linux&version=11")
-        s.add(webview)
-        vbox.pack_start(s, True, True, 0)
-
-        hbox = Gtk.Box(spacing=6)
-        #hbox.set_halign(Gtk.Align.FILL)
-        vbox.pack_start(hbox, False, False, 0)
-
-        #button = Gtk.Button.new_with_label("Click Me")
-        #button.connect("clicked", self.on_click_me_clicked)
-        #hbox.pack_start(button, False, False, 0)
-
-        button = Gtk.Button.new_with_mnemonic("_Print")
-        button.connect("clicked", self.on_print_clicked)
-        hbox.pack_start(button, False, False, 0)
-
-        button = Gtk.Button.new_with_mnemonic("_OK")
-        button.connect("clicked", self.on_ok_clicked)
-        hbox.pack_end(button, False, False, 0)
-
-        self.add(vbox)
-
-
-    #def on_click_me_clicked(self, button):
-    #    print("\"Click me\" button was clicked")
-
-    def on_print_clicked(self, button):
-        print("\"Print\" button was clicked")
-
-    def on_ok_clicked(self, button):
-        print("Closing welcome window")
-        self.close()
-
 
 class DownloadKmpWindow(Gtk.Window):
 
