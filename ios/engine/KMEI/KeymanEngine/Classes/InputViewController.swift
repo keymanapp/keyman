@@ -275,7 +275,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     view.addConstraints(barVerticalPositionConstraints)
     view.addConstraints(barHorizontalPositionConstraints)
 
-    // note this appears to relate to the rotation fix bug; may not work on iPads as 1000 is not enough
     containerHeightConstraints = NSLayoutConstraint.constraints(
       withVisualFormat: "V:[container(\(Manager.shared.keyboardHeight))]",
       metrics: nil, views: viewsDict)
