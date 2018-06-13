@@ -45,6 +45,7 @@ class KeymanWebViewController: UIViewController {
 
     webView = WKWebView(frame: frame ?? .zero, configuration: config)
     webView.isOpaque = false
+    webView.translatesAutoresizingMaskIntoConstraints = false
     webView.backgroundColor = UIColor.clear
     webView.navigationDelegate = self
     webView.scrollView.isScrollEnabled = false

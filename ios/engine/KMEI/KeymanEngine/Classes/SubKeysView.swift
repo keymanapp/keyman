@@ -23,7 +23,7 @@ class SubKeysView: UIView {
   let containerView: UIView
 
   init(keyFrame frame: CGRect, subKeys: [UIButton]) {
-    let isSystemKeyboard = Util.isSystemKeyboard
+    let isSystemKeyboard = Manager.shared.isSystemKeyboard
     var isPortrait = true
     if isSystemKeyboard {
       isPortrait = InputViewController.isPortrait
