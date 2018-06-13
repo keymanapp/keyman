@@ -595,12 +595,17 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
       downloadKeyboard(keyboard)
     } else {
-      decoder.dateDecodingStrategy = .ios8601WithMilliseconds
-      do {
-        let keyboard = try decoder.decode(KeyboardAPICall.self, from: data)
+      decoder.dateDecodingStrategy = .iso8601WithoutTimezone
+      if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
         downloadKeyboard(keyboard)
-      } catch {
-        downloadFailed(forKeyboards: [], error: error)
+      } else {
+        decoder.dateDecodingStrategy = .ios8601WithMilliseconds
+        do {
+          let keyboard = try decoder.decode(KeyboardAPICall.self, from: data)
+          downloadKeyboard(keyboard)
+        } catch {
+          downloadFailed(forKeyboards: [], error: error)
+        }
       }
     }
   }
