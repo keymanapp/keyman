@@ -1,0 +1,130 @@
+# Anjuta Version 1.2.1 
+Compatibility Level: 1 
+
+<PROJECT_DESCRIPTION_START>
+Anjuta is a versatile Integrated Development Environment 
+(IDE) for C and C++. It has been written for GTK+/GNOME, and features 
+a number of advanced programming facilities.<PROJECT_DESCRIPTION_END>
+<CONFIG_PROGS_START>
+<CONFIG_PROGS_END>
+<CONFIG_LIBS_START>
+<CONFIG_LIBS_END>
+<CONFIG_HEADERS_START>
+<CONFIG_HEADERS_END>
+<CONFIG_CHARACTERISTICS_START>
+<CONFIG_CHARACTERISTICS_END>
+<CONFIG_LIB_FUNCS_START>
+<CONFIG_LIB_FUNCS_END>
+<CONFIG_ADDITIONAL_START>
+dnl Subst SCIM VERSION INFO
+SCIM_MAJOR=`pkg-config --modversion scim | \
+           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
+AC_SUBST(SCIM_MAJOR)
+
+SCIM_MINOR=`pkg-config --modversion scim | \
+           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
+AC_SUBST(SCIM_MINOR)
+
+SCIM_BINARY_VERSION=${SCIM_MAJOR}.${SCIM_MINOR}.0
+AC_SUBST(SCIM_BINARY_VERSION)
+<CONFIG_ADDITIONAL_END>
+<CONFIG_FILES_START>
+<CONFIG_FILES_END>
+<MAKEFILE_AM_START>
+<MAKEFILE_AM_END>
+
+props.file.type=project
+
+anjuta.version=1.2.1
+anjuta.compatibility.level=1
+
+project.name=scim_kmfl_imengine
+project.type=GENERIC
+project.target.type=DYNAMIC_LIB
+project.version=0.6
+project.author=User
+project.source.target=libkmfl
+project.has.gettext=1
+project.gui.command=
+project.programming.language=C_C++
+project.excluded.modules=intl
+
+project.config.extra.modules.before=
+project.config.extra.modules.after=scim_kmfl_imengine_setup im-xim-kmfl
+project.config.blocked=0
+project.config.disable.overwriting=0 0 1 0 0 0 0 0 0 
+
+project.menu.entry=scim_kmfl_imengine Version CVS
+project.menu.group=Applications
+project.menu.comment=scim_kmfl_imengine Version 0.6
+project.menu.icon=
+project.menu.need.terminal=0
+
+project.configure.options=--prefix=/usr --sysconfdir=/etc
+anjuta.program.arguments=
+preferences.build.option.jobs=0
+preferences.build.option.silent=0
+preferences.build.option.autosave=1
+preferences.anjuta.make.options=-k
+preferences.make=make
+preferences.build.option.keep.going=1
+preferences.build.option.warn.undef=0
+preferences.autoformat.custom.style= -i4 -sc -bli0 -bl0 -cbi0 -ss
+preferences.indent.opening=0
+preferences.autoformat.disable=0
+preferences.indent.automatic=1
+preferences.use.tabs=0
+preferences.indent.size=4
+preferences.tabsize=8
+preferences.indent.closing=0
+
+module.include.name=include
+module.include.type=
+module.include.files=
+
+module.source.name=src
+module.source.type=
+module.source.files=\
+	scim_kmfl_imengine.cpp\
+	scim_kmfl_imengine.h\
+	xkbmap.h\
+	xkbmap.cpp\
+	stringtok.h
+
+module.pixmap.name=pixmaps
+module.pixmap.type=
+module.pixmap.files=
+
+module.data.name=data
+module.data.type=
+module.data.files=
+
+module.help.name=help
+module.help.type=
+module.help.files=
+
+module.doc.name=doc
+module.doc.type=
+module.doc.files=
+
+module.po.files=
+
+compiler.options.supports=
+compiler.options.include.paths=\
+	/usr/include/scim-1.0\
+	/usr/local/include/libkmfl\
+	/usr/lib/glib-2.0
+compiler.options.library.paths=
+compiler.options.libraries=\
+	kmfl
+compiler.options.libraries.selected=1 
+compiler.options.defines=
+compiler.options.defines.selected=1 
+compiler.options.warning.buttons=0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 
+compiler.options.optimize.buttons=0 1 0 0 
+compiler.options.other.buttons=1 0 
+compiler.options.other.c.flags=-DSCIM_ICONDIR=\"$(datadir)/scim/icons\"
+compiler.options.other.l.flags=-avoid-version -rpath $(libdir)/scim-1.0/0.8.0/IMEngine  -module
+compiler.options.other.l.libs=
+
+project.src.paths=
