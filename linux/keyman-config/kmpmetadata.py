@@ -70,21 +70,21 @@ def determine_filetype(filename):
 			Image
 	"""
 	name, ext = os.path.splitext(filename)
-	if ext == ".ico":
+	if ext.lower() == ".ico":
 		return "Keyboard icon"
-	elif ext == ".kmn":
+	elif ext.lower() == ".kmn":
 		return "Keyboard source"
-	elif ext == ".kmx":
+	elif ext.lower() == ".kmx":
 		return "Compiled keyboard"
-	elif ext == ".kvk":
+	elif ext.lower() == ".kvk":
 		return "Compiled on screen keyboard"
-	elif ext == ".ttf" or ext == ".otf":
+	elif ext.lower() == ".ttf" or ext.lower() == ".otf":
 		return "Font"
-	elif ext == ".txt" or ext == ".pdf" or ext == ".htm" or ext == ".html":
+	elif ext.lower() == ".txt" or ext.lower() == ".pdf" or ext.lower() == ".htm" or ext.lower() == ".html":
 		return "Documentation"
-	elif ext == ".inf" or ext == ".json":
+	elif ext.lower() == ".inf" or ext.lower() == ".json":
 		return "Metadata"
-	elif ext == ".png" or ext == ".jpeg" or ext == ".jpg":
+	elif ext.lower() == ".png" or ext.lower() == ".jpeg" or ext.lower() == ".jpg" or ext.lower() == ".gif":
 		return "Image"
 	else:
 		return "Unknown type"

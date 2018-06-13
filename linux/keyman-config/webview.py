@@ -399,6 +399,6 @@ if __name__ == '__main__':
     w = DownloadKmpWindow()
     #w.set_title("Keyman keyboard")
     w.connect("destroy", Gtk.main_quit)
-    w.resize(800, 800)
+    w.resize(800, 450)
     w.show_all()
 Gtk.main()
