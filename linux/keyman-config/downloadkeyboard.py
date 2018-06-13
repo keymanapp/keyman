@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import os.path
 import urllib.parse
 import pathlib
 import subprocess
@@ -10,6 +11,7 @@ gi.require_version('WebKit', '3.0')
 from gi.repository import Gtk, WebKit
 from get_kmp import get_download_folder, download_kmp_file
 from install_window import InstallKmpWindow
+from check_mime_type import check_mime_type
 
 
 def process_kmp(view, url, downloadfile, verbose=False):
@@ -45,19 +47,6 @@ def check(view, frame, req, nav, policy):
             qs = urllib.parse.parse_qs(parsed.query)
             webbrowser.open(qs['url'][0])
             return True
-    return False
-
-def check_mime_type(webview, frame, request, mimetype, policy_decision):
-    """Handle downloads and PDF files."""
-    if mimetype == 'application/pdf':
-        print("Download and run ", request.get_uri())
-        parse_url = urllib.parse.urlparse(request.get_uri())
-        if parse_url.scheme == "file":
-            subprocess.call(['xdg-open', parse_url.path])
-        else:
-            webbrowser.open(request.get_uri())
-        policy_decision.ignore()
-        return True
     return False
 
 class DownloadKmpWindow(Gtk.Window):

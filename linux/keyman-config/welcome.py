@@ -8,6 +8,7 @@ import urllib.parse
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit', '3.0')
 from gi.repository import Gtk, WebKit
+from check_mime_type import check_mime_type
 
 class WelcomeView(Gtk.Window):
 
@@ -25,7 +26,7 @@ class WelcomeView(Gtk.Window):
         #settings.set_property('user-agent', user_agent)
         #webview.set_settings(settings)
         #webview.connect("navigation-policy-decision-requested", check)
-        webview.connect("mime-type-policy-decision-requested", self.check_mime_type)
+        webview.connect("mime-type-policy-decision-requested", check_mime_type)
         webview.load_uri(welcomeurl)
         #webview.load_uri("https://keyman.com/keyboards?embed=windows&version=10.0")
         #webview.load_uri("https://keyman.com/keyboards?embed=linux&version=11")
@@ -49,19 +50,6 @@ class WelcomeView(Gtk.Window):
         hbox.pack_end(button, False, False, 0)
 
         self.add(vbox)
-
-    def check_mime_type(self, webview, frame, request, mimetype, policy_decision):
-        """Handle downloads and PDF files."""
-        if mimetype == 'application/pdf':
-            print("Download and run ", request.get_uri())
-            parse_url = urllib.parse.urlparse(request.get_uri())
-            if parse_url.scheme == "file":
-                subprocess.call(['xdg-open', parse_url.path])
-            else:
-                webbrowser.open(request.get_uri())
-            policy_decision.ignore()
-            return True
-        return False
 
     #def on_click_me_clicked(self, button):
     #    print("\"Click me\" button was clicked")

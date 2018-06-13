@@ -18,6 +18,7 @@ from kmpmetadata import get_fonts
 from welcome import WelcomeView
 from uninstall_kmp import uninstall_kmp
 from get_kmp import get_download_folder
+from check_mime_type import check_mime_type
 
 class InstallKmpWindow(Gtk.Window):
 
