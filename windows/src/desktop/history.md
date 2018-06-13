@@ -1,5 +1,11 @@
 # Keyman Desktop Version History
 
+## 2018-06-13 10.0.1107.0 beta
+* Add Unicode 11.0 characters
+
+## 2018-06-12 10.0.1106.0 beta
+* No changes in Keyman Desktop
+
 ## 2018-06-11 10.0.1105.0 beta
 * Platform tests (in keyboards) are now consistent across all platforms (#969)
 
