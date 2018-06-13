@@ -9,6 +9,7 @@ gi.require_version('WebKit', '3.0')
 from gi.repository import Gtk, Gdk, WebKit
 from list_installed_kmp import get_installed_kmp
 from welcome import WelcomeView
+from keyboard_details import KeyboardDetailsView
 from uninstall_kmp import uninstall_kmp
 
 class KeyboardBox(Gtk.Box):
@@ -34,6 +35,7 @@ class KeyboardBox(Gtk.Box):
         self.expandimage = Gtk.Image.new_from_file("expand20.png")
         self.expandbutton.set_image(self.expandimage)
         #grid.attach_next_to(expandbutton, helpbutton, Gtk.PositionType.RIGHT, 1, 1)
+        self.expandbutton.connect("clicked", self.on_expand_clicked)
         self.pack_end(self.expandbutton, False, False, 0)
 
         self.uninstallbutton = Gtk.Button()
@@ -76,6 +78,12 @@ class KeyboardBox(Gtk.Box):
             self.parent.refresh_installed_kmp()
         elif response == Gtk.ResponseType.NO:
             print("Not uninstalling keyboard", self.kmp["name"])
+
+    def on_expand_clicked(self, button):
+        print("Show keyboard details of", self.kmp["name"])
+        w = KeyboardDetailsView(self.kmp)
+        w.resize(800, 450)
+        w.show_all()
 
 class KmpGrid(Gtk.Grid):
     def __init__(self):
