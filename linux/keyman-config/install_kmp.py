@@ -109,6 +109,8 @@ def install_kmp(inputfile, withkmn=False):
 #					lastModifiedDate = datetime(kbdata['lastModifiedDate'])
 #					print("Last Modified Date:", lastModifiedDate)
 				if kbdata:
+					if not os.path.isdir(kbdir):
+						os.makedirs(kbdir)
 					if 'sourcePath' in kbdata:
 						base_url = "https://raw.github.com/keymanapp/keyboards/master/" + kbdata['sourcePath']
 						kmn_url = base_url + "/source/" + kbid + ".kmn"
@@ -117,14 +119,22 @@ def install_kmp(inputfile, withkmn=False):
 							downloadfile = os.path.join(tmpdirname, kbid + ".kmn")
 							with open(downloadfile, 'wb') as f:
 								f.write(response.content)
-							print("Installing", kbid + ".kmn", "as keyman file, mininum version:", kbdata['minKeymanVersion'])
-							if not os.path.isdir(kbdir):
-								os.makedirs(kbdir)
+							print("Installing", kbid + ".kmn", "as keyman file, minimum version:", kbdata['minKeymanVersion'])
 							copy2(downloadfile, kbdir)
 						else:
 							print("install_kmp.py: warning: no kmn source file for", kbid)
-					if not os.path.isdir(kbdir):
-							os.makedirs(kbdir)
+						downloadfile = os.path.join(tmpdirname, kbid + ".ico")
+						if not os.path.isfile(downloadfile):
+							ico_url = base_url + "/source/" + kbid + ".ico"
+							response = requests.get(ico_url)
+							if response.status_code == 200:
+								with open(downloadfile, 'wb') as f:
+									f.write(response.content)
+								print("Installing", kbid + ".ico", "as keyman file")
+								copy2(downloadfile, kbdir)
+								Image.open(downloadfile).save(os.path.join(kbdir, kbid +".ico.jpg"))
+							else:
+								print("install_kmp.py: warning: no ico source file for", kbid)
 					with open(os.path.join(kbdir, kbid + '.json'), 'w') as outfile:
 						json.dump(kbdata, outfile)
 						print("Installing api data file", kbid + ".json", "as keyman file")
@@ -155,7 +165,7 @@ def install_kmp(inputfile, withkmn=False):
 					if not os.path.isdir(kbdir):
 						os.makedirs(kbdir)
 					copy2(fpath, kbdir)
-					Image.open(fpath).save(os.path.join(kbdir, f['name']+".jpg"))
+					Image.open(fpath).save(os.path.join(kbdir, kbid +".ico.jpg"))
 		else:
 			print("install_kmp.py: error: No kmp.json or kmp.inf found in", inputfile)
 			print("Contents of", inputfile+":")

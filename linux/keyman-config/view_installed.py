@@ -19,7 +19,10 @@ class KeyboardBox(Gtk.Box):
 
         print(kmp)
         self.kmp = kmp
-        self.image = Gtk.Image.new_from_file("test.jpg")
+        icofile = os.path.join("/usr/local/share/keyman", self.kmp["id"], self.kmp["id"] + ".ico.jpg")
+        if not os.path.isfile(icofile):
+            icofile = "icon_kmp.png"
+        self.image = Gtk.Image.new_from_file(icofile)
         #image.set_from_pixbuf(pics[0])
         #grid.add(image)
         self.pack_start(self.image, False, False, 10)
@@ -34,6 +37,7 @@ class KeyboardBox(Gtk.Box):
         self.expandbutton = Gtk.Button()
         self.expandimage = Gtk.Image.new_from_file("expand20.png")
         self.expandbutton.set_image(self.expandimage)
+        self.expandbutton.set_tooltip_text("More information about " + kmp["name"])
         #grid.attach_next_to(expandbutton, helpbutton, Gtk.PositionType.RIGHT, 1, 1)
         self.expandbutton.connect("clicked", self.on_expand_clicked)
         self.pack_end(self.expandbutton, False, False, 0)
@@ -41,6 +45,7 @@ class KeyboardBox(Gtk.Box):
         self.uninstallbutton = Gtk.Button()
         self.uninstallimage = Gtk.Image.new_from_file("cross20.png")
         self.uninstallbutton.set_image(self.uninstallimage)
+        self.uninstallbutton.set_tooltip_text("Uninstall " + kmp["name"])
         #grid.attach_next_to(uninstallbutton, expandbutton, Gtk.PositionType.RIGHT, 1, 1)
         self.uninstallbutton.connect("clicked", self.on_uninstall_clicked)
         self.pack_end(self.uninstallbutton, False, False, 0)
@@ -48,6 +53,7 @@ class KeyboardBox(Gtk.Box):
         self.helpbutton = Gtk.Button()
         self.helpimage = Gtk.Image.new_from_file("help20.png")
         self.helpbutton.set_image(self.helpimage)
+        self.helpbutton.set_tooltip_text("Help for " + kmp["name"])
         #grid.attach_next_to(helpbutton, label1, Gtk.PositionType.RIGHT, 1, 1)
         self.helpbutton.connect("clicked", self.on_help_clicked)
         self.pack_end(self.helpbutton, False, False, 0)
