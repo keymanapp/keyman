@@ -1,7 +1,20 @@
 # Keyman for macOS Version History
 
+## 2018-06-07 10.0.47 beta
+* Change to build script to use correct build location (#950)
+
+## 2018-06-06 10.0.46 beta
+* Fixed crash caused by accessing disposed KeyView from timer event (#938, #941)
+
+## 2018-06-05 10.0.45 beta
+* Error-reporting improvements (better method to ensure upload of symbols for Engine) (#935)
+
+## 2018-06-01 10.0.44 beta
+* Improved double-clicking KMP (#929)
+
 ## 2018-05-28 10.0.43 beta
-* Error-reporting improvements (settings modified to upload symbols for Engine (#884)
+* Error-reporting improvements (settings modified to upload symbols for Engine) (#884)
+* Solved problem of losing font/style information in Pages and Keynote (#930)
 
 ## 2018-05-25 10.0.42 beta
 * Prevented crashes and performance problems with "event tap" (#883)

@@ -56,6 +56,10 @@ CGFloat r = 7.0;
     return self;
 }
 
+- (void) finalize {
+    [self stopTimer];
+}
+
 - (void)drawRect:(NSRect)rect {
     [[NSColor colorWithRed:241.0/255.0 green:242.0/255.0 blue:242.0/255.0 alpha:1.0] setFill];
     NSRectFillUsingOperation(rect, NSCompositeSourceOver);
@@ -221,29 +225,41 @@ CGFloat r = 7.0;
 }
 
 - (void)startTimerWithTimeInterval:(NSTimeInterval)interval {
-    if (_keyEventTimer == nil) {
-        TimerTarget *timerTarget = [[TimerTarget alloc] init];
-        timerTarget.target = self;
-        _keyEventTimer = [NSTimer scheduledTimerWithTimeInterval:interval
-                                                          target:timerTarget
-                                                        selector:@selector(timerAction:)
-                                                        userInfo:nil
-                                                         repeats:YES];
+    @synchronized(self) {
+        NSLog(@"KeyView TIMER - starting");
+        if (_keyEventTimer == nil) {
+            // The TimerTarget class and the following two lines allow the timer to hold a *weak*
+            // reference to this KeyView object, so it can be disposed even if there is a timer waiting
+            // to fire that refers to it.
+            TimerTarget *timerTarget = [[TimerTarget alloc] init];
+            timerTarget.target = self;
+            _keyEventTimer = [NSTimer scheduledTimerWithTimeInterval:interval
+                                                              target:timerTarget
+                                                            selector:@selector(timerAction:)
+                                                            userInfo:nil
+                                                             repeats:YES];
+        }
     }
 }
 
 - (void)stopTimer {
-    if (_keyEventTimer != nil) {
-        [_keyEventTimer invalidate];
-        _keyEventTimer = nil;
+    @synchronized(self) {
+        NSLog(@"KeyView TIMER - stopping");
+        if (_keyEventTimer != nil) {
+            [_keyEventTimer invalidate];
+            _keyEventTimer = nil;
+        }
     }
 }
 
 - (void)timerAction:(NSTimer *)timer {
-    ((void (*)(id, SEL))[self.target methodForSelector:self.action])(self.target, self.action);
-    if ([_keyEventTimer timeInterval] == 0.5f) {
-        [self stopTimer];
-        [self startTimerWithTimeInterval:0.05f];
+    @synchronized(self) {
+        NSLog(@"KeyView TIMER - Fired");
+        ((void (*)(id, SEL))[self.target methodForSelector:self.action])(self.target, self.action);
+        if ([_keyEventTimer timeInterval] == 0.5f) {
+            [self stopTimer];
+            [self startTimerWithTimeInterval:0.05f];
+        }
     }
 }
 

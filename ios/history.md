@@ -3,6 +3,24 @@
 ## 11.0 alpha
 * Move to 11.0
 
+## 2018-06-13 10.0.157 beta
+* Improvements to device rotation (#981)
+
+## 2018-06-12 10.0.156 beta
+* No changes affecting iOS
+
+## 2018-06-11 10.0.155 beta
+* Platform tests (in keyboards) are now consistent across all platforms (#969)
+
+## 2018-06-07 10.0.154 beta
+* Fixed API call to fetch BCP-47 language ids and make keyboard updates more robust (#961)
+
+## 2018-06-06 10.0.147-10.0.153 beta
+* No actual code changes affecting iOS (#873)
+
+## 2018-05-18 10.0.146 beta
+* Code cleanup to remove warnings, etc. (#805)
+
 ## 2018-05-17 10.0.145 beta
 * Fixes occasional repeated characters when typing rapidly (#865)
 

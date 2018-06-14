@@ -79,7 +79,7 @@ KM4MIM_BASE_PATH="$KEYMAN_MAC_BASE_PATH/$IM_NAME"
 
 KME4M_PROJECT_PATH="$KME4M_BASE_PATH/$ENGINE_NAME$XCODE_PROJ_EXT"
 KMTESTAPP_PROJECT_PATH="$KMTESTAPP_BASE_PATH/$TESTAPP_NAME$XCODE_PROJ_EXT"
-KMIM_PROJECT_PATH="$KM4MIM_BASE_PATH/$IM_NAME$XCODE_PROJ_EXT"
+KMIM_WORKSPACE_PATH="$KM4MIM_BASE_PATH/$IM_NAME.xcworkspace"
 
 # KME4M_BUILD_PATH=engine/KME4M/build
 # APP_RESOURCES=keyman/Keyman/Keyman/libKeyman
@@ -252,8 +252,10 @@ if $CLEAN ; then
     do_clean
 fi
 
-carthage bootstrap
-
+if [ "$TEST_ACTION" == "test" ]; then
+	carthage bootstrap		
+fi
+ 
 execBuildCommand() {
     typeset component="$1"
     shift
@@ -297,11 +299,14 @@ if $DO_KEYMANENGINE ; then
 fi
 
 if $DO_KEYMANIM ; then
+	cd "$KM4MIM_BASE_PATH"
+	pod install
+	cd "$KEYMAN_MAC_BASE_PATH"
     updatePlist "$KM4MIM_BASE_PATH" "$IM_NAME"
-    execBuildCommand $IM_NAME "xcodebuild -project \"$KMIM_PROJECT_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS"
+    execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
     if [ "$TEST_ACTION" == "test" ]; then
     	if [ "$CONFIG" == "Debug" ]; then
-    		execBuildCommand "$IM_NAME tests" "xcodebuild $TEST_ACTION -project \"$KMIM_PROJECT_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman"
+    		execBuildCommand "$IM_NAME tests" "xcodebuild $TEST_ACTION -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
     	fi
     fi
 fi

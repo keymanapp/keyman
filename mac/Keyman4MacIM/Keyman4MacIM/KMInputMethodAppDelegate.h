@@ -43,6 +43,7 @@ extern NSString *const kVersion;
 extern NSString *const kWebSite;
 
 @interface KMInputMethodAppDelegate : NSObject
+#define USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE 1
 #ifdef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
     <NSAlertDelegate>
 #endif

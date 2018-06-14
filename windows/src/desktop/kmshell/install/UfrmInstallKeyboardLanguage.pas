@@ -312,7 +312,17 @@ begin
         if Tag <> '' then
         begin
           FLanguage := TInstLanguage.Create(True, Language, Script, FKeyboard.Languages[i].Name);
-          FLanguage.Variants.Add(TInstLanguageVariant.Create(Language, Tag, Script, FKeyboard.Languages[i].Name));
+          try
+            FLanguage.Variants.Add(TInstLanguageVariant.Create(Language, Tag, Script, FKeyboard.Languages[i].Name));
+          except
+            on E:EOSError do
+            begin
+              // The language tag is not supported on this OS - probably Win7
+              // Don't offer it as an option
+              FLanguage.Free;
+              Continue;
+            end;
+          end;
           FLanguages.Add(FLanguage);
         end;
       finally

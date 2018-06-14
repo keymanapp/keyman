@@ -1,5 +1,14 @@
 # KeymanWeb Version History
 
+## 2018-06-13 10.0.94 beta
+* No substantial changes.
+
+## 2018-06-11 10.0.93 beta
+* Platform tests (in keyboards) are now consistent across all platforms (#969)
+
+## 2018-05-22 10.0.92 beta
+* (Embedded) Fixes out-of-order key events in Keyman for iOS (does not affect web hosted keyboard) (#865)
+
 ## 2018-05-09 10.0.91 beta
 * Fixes basic support for mnemonic keyboards.  (#517)
   * At this time, all mnemonic keyboards will assume a US keyboard layout within KeymanWeb.

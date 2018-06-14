@@ -13,7 +13,10 @@
 #import "KMInputMethodAppDelegate.h"
 
 @interface KMPackage : NSDocument
+-(NSString *) getOrigKmpFilename;
+-(NSString *) getTempKmpFilename;
 
+-(void) releaseTempKMPFile;
 @end
 
 #endif /* KMPackage_h */

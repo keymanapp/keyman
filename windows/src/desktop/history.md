@@ -1,5 +1,27 @@
 # Keyman Desktop Version History
 
+## 2018-06-13 10.0.1107.0 beta
+* Add Unicode 11.0 characters
+
+## 2018-06-12 10.0.1106.0 beta
+* No changes in Keyman Desktop
+
+## 2018-06-11 10.0.1105.0 beta
+* Platform tests (in keyboards) are now consistent across all platforms (#969)
+
+## 2018-06-09 10.0.1104.0 beta
+* Keyboards that have script subtags will now install on Windows 7 (#964)
+
+## 2018-06-07 10.0.1103.0 beta
+* Keyman Configuration will now show keyboards that have no name with their filename (#955)
+* Keyboard packages with BCP 47 language subtags unrecognised by Windows will now install on Windows 7 (#948)
+
+## 2018-06-05 10.0.1102.0 beta
+* Improved crash reporting stability (#940)
+
+## 2018-06-03 10.0.1101.0 beta
+* No changes in Keyman Desktop
+
 ## 2018-06-01 10.0.1100.0 beta
 * Fixes email link in Keyman help
 
@@ -54,10 +76,10 @@
 * Adds script lookup to Add Keyboard Language dialog (#827)
 
 ## 2018-05-07 10.0.1081.0 beta
-* Fixes crash in Keyman Developer when keyboard name contains an ampersand (#831)
+* Fixes crash in Keyman Desktop when keyboard name contains an ampersand (#831)
 
 ## 2018-05-07 10.0.1080.0 beta
-* Fixes crash starting Keyman Developer when using certain base keyboards (#832)
+* Fixes crash starting Keyman Desktop when using certain base keyboards (#832)
 
 ## 2018-05-07 10.0.1079.0 beta
 * Fixes crash in updating active keyboard icon in On Screen Keyboard (#828)

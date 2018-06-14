@@ -59,8 +59,8 @@ type
   private
     procedure RegisterLanguageProfile(Langs: array of Integer;
       const KeyboardName, KeyboardDescription, IconFileName: string); overload;
-    procedure RegisterLanguageProfile(const BCP47Tag, KeyboardName,
-      KeyboardDescription, IconFileName, LanguageName: string); overload;
+    function RegisterLanguageProfile(const BCP47Tag, KeyboardName,
+      KeyboardDescription, IconFileName, LanguageName: string): Boolean; overload;
   end;
 
 implementation
@@ -115,8 +115,9 @@ var
   FLanguages: array of Integer;
   FExitCode: Integer;
   FKVKName: WideString;
-  FCreatedIcon: Boolean;
+  FLanguageInstalled, FCreatedIcon: Boolean;
   FLanguageID: Integer;
+  i: Integer;
 
 type
   TWSLCallback = reference to procedure(r: TRegistryErrorControlled);
@@ -241,7 +242,23 @@ begin
           // Use language data from package to install; we only install
           // the first language now and add the rest to the registry for
           // future addition by the user
-          RegisterLanguageProfile(Languages[0].ID, kbdname, ki.KeyboardName, FIconFileName, Languages[0].Name);
+
+          FLanguageInstalled := False;
+          for i := 0 to Languages.Count - 1 do
+          begin
+            FLanguageInstalled := RegisterLanguageProfile(Languages[i].ID, kbdname, ki.KeyboardName, FIconFileName, Languages[i].Name);
+            if FLanguageInstalled then
+              Break;
+          end;
+
+          if not FLanguageInstalled then
+          begin
+            // All languages failed to install, so add to the default language.
+            // This is most likely to happen on Win7 where custom BCP 47 tags
+            // are not allowed
+            AddLanguage(HKLToLanguageID(FDefaultHKL));
+            RegisterLanguageProfile(FLanguages, kbdname, ki.KeyboardName, FIconFileName);   // I3581   // I3707
+          end;
 
           // Save the list of preferred languages for the keyboard, to the registry, for future installation.
           WriteSuggestedLanguages(
@@ -370,11 +387,11 @@ begin
   end;
 end;
 
-procedure TKPInstallKeyboard.RegisterLanguageProfile(const BCP47Tag, KeyboardName, KeyboardDescription, IconFileName, LanguageName: string);   // I3581   // I3619   // I3707   // I3768   // I4607
+function TKPInstallKeyboard.RegisterLanguageProfile(const BCP47Tag, KeyboardName, KeyboardDescription, IconFileName, LanguageName: string): Boolean;   // I3581   // I3619   // I3707   // I3768   // I4607
 begin
   with TKPInstallKeyboardLanguageProfiles.Create(Context) do
   try
-    Execute(KeyboardName, KeyboardDescription, BCP47Tag, IconFileName, LanguageName);   // I3707   // I3768   // I4607
+    Result := Execute(KeyboardName, KeyboardDescription, BCP47Tag, IconFileName, LanguageName);   // I3707   // I3768   // I4607
   finally
     Free;
   end;

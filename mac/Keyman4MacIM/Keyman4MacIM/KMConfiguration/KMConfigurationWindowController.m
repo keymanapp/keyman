@@ -19,6 +19,7 @@
 @property (nonatomic, strong) NSTimer *reloadTimer;
 @property (nonatomic, strong) NSDate *lastReloadDate;
 @property (nonatomic, strong) NSAlert *deleteAlertView;
+@property (nonatomic, strong) NSAlert *confirmKmpInstallAlertView;
 @end
 
 @implementation KMConfigurationWindowController
@@ -382,6 +383,46 @@
     [self.verboseLoggingInfo setHidden:!verboseLoggingOn];
 }
 
+- (void)handleRequestToInstallPackage:(KMPackage *) package {
+    NSString *infoFmt = NSLocalizedString(@"Do you want the Keyman Input Method to install this Package?\rFile: %@", @"Alert informative text when user double-clicks a KMP file. Parameter is the name of the KMP file.");
+    [self.confirmKmpInstallAlertView setInformativeText:[NSString localizedStringWithFormat:infoFmt, package.getOrigKmpFilename]];
+    
+    if ([self.AppDelegate debugMode]) {
+        NSLog(@"Asking user to confirm installation of %@...", package.getOrigKmpFilename);
+        NSLog(@"KMP - temp file name: %@", package.getTempKmpFilename);
+    }
+    
+    [self.confirmKmpInstallAlertView beginSheetModalForWindow:self.window
+                                                modalDelegate:self
+                                               didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
+                                                  contextInfo:(__bridge void *)(package)];
+}
+
+- (void)installPackageFile:(NSString *)kmpFile {
+    // kmpFile could be a temp file (in fact, it always is!), so don't display the name.
+    
+    if ([self.AppDelegate debugMode]) {
+        NSLog(@"KMP - Ready to unzip/install Package File: %@", kmpFile);
+    }
+    
+    BOOL didUnzip = [self.AppDelegate unzipFile:kmpFile];
+    
+    if (!didUnzip) {
+        NSAlert *failure = [[NSAlert alloc] init];
+        [failure addButtonWithTitle:NSLocalizedString(@"OK", @"Alert button")];
+        [failure setMessageText:NSLocalizedString(@"Failed to unzip Keyman Package!", @"Alert message when user double-clicks a KMP file that cannot be unzipped.")];
+        [failure setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
+        [failure setAlertStyle:NSWarningAlertStyle];
+        [failure beginSheetModalForWindow:self.window
+                            modalDelegate:self
+                           didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
+                              contextInfo:nil];
+    }
+    else if ([self.AppDelegate debugMode]) {
+        NSLog(@"Completed installation of KMP file.");
+    }
+}
+
 - (void)startTimer {
     if (_reloadTimer == nil) {
         TimerTarget *timerTarget = [[TimerTarget alloc] init];
@@ -436,37 +477,67 @@
         [_deleteAlertView addButtonWithTitle:@"OK"];
         [_deleteAlertView addButtonWithTitle:@"Cancel"];
         [_deleteAlertView setAlertStyle:NSWarningAlertStyle];
+        [_deleteAlertView setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
     }
     
     return _deleteAlertView;
 }
 
-- (void)alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo {
-    if (returnCode == NSAlertFirstButtonReturn) {
-        // OK
-        NSNumber *n = (__bridge NSNumber *)contextInfo;
-        NSInteger index = [n integerValue];
-        NSString *path2Remove = nil;
-        NSString *kmxFilePath = [self kmxFilePathAtIndex:index];
-        if (kmxFilePath == nil) {
-            kmxFilePath = [self kmxFilePathAtIndex:index+1];
-            path2Remove = [[self keyboardsPath] stringByAppendingPathComponent:[self packageFolderFromPath:kmxFilePath]];
-        }
-        else {
-            path2Remove = kmxFilePath;
-        }
-        
-        NSError *error;
-        [[NSFileManager defaultManager] removeItemAtPath:path2Remove error:&error];
-        if (error == nil) {
-            [self performSelector:@selector(timerAction:) withObject:nil afterDelay:1.0];
-        }
-    }
-    else if (returnCode == NSAlertSecondButtonReturn) {
-        // Cancel
+- (NSAlert *)confirmKmpInstallAlertView {
+    if (_confirmKmpInstallAlertView == nil) {
+        _confirmKmpInstallAlertView = [[NSAlert alloc] init];
+        [_confirmKmpInstallAlertView addButtonWithTitle:NSLocalizedString(@"Yes", @"Alert button")];
+        [_confirmKmpInstallAlertView addButtonWithTitle:NSLocalizedString(@"No", @"Alert button")];
+        [_confirmKmpInstallAlertView setMessageText:NSLocalizedString(@"Install Keyman Package?", @"Alert message text when user double-clicks a KMP file.")];
+        [_confirmKmpInstallAlertView setAlertStyle:NSInformationalAlertStyle];
+        [_confirmKmpInstallAlertView setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
     }
     
-    _deleteAlertView = nil;
+    return _confirmKmpInstallAlertView;
 }
 
+- (void)alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo {
+    if ([self.AppDelegate debugMode]) {
+        NSLog(@"User responded to NSAlert");
+    }
+    if (alert == _deleteAlertView) {
+        if (returnCode == NSAlertFirstButtonReturn) { // OK
+            [self deleteFileAtIndex:(__bridge NSNumber *)contextInfo];
+        }
+        
+        _deleteAlertView = nil;
+    }
+    else if (alert == _confirmKmpInstallAlertView) {
+        KMPackage *package = (__bridge KMPackage *)contextInfo;
+        if ([self.AppDelegate debugMode]) {
+            NSLog(@"KMP - Temp file: %@", package.getTempKmpFilename);
+        }
+        if (returnCode == NSAlertFirstButtonReturn) { // Yes
+            [self installPackageFile: package.getTempKmpFilename];
+        }
+        
+        [package releaseTempKMPFile];
+        _confirmKmpInstallAlertView = nil;
+    }
+    // else, just a message - nothing to do.
+}
+
+- (void)deleteFileAtIndex:(NSNumber *) n {
+    NSInteger index = [n integerValue];
+    NSString *path2Remove = nil;
+    NSString *kmxFilePath = [self kmxFilePathAtIndex:index];
+    if (kmxFilePath == nil) {
+        kmxFilePath = [self kmxFilePathAtIndex:index+1];
+        path2Remove = [[self keyboardsPath] stringByAppendingPathComponent:[self packageFolderFromPath:kmxFilePath]];
+    }
+    else {
+        path2Remove = kmxFilePath;
+    }
+    
+    NSError *error;
+    [[NSFileManager defaultManager] removeItemAtPath:path2Remove error:&error];
+    if (error == nil) {
+        [self performSelector:@selector(timerAction:) withObject:nil afterDelay:1.0];
+    }
+}
 @end
