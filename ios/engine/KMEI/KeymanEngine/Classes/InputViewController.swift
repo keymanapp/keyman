@@ -116,7 +116,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     let bgColor = UIColor(red: 210.0 / 255.0, green: 214.0 / 255.0, blue: 220.0 / 255.0, alpha: 1.0)
     view.backgroundColor = bgColor
 
-    view.translatesAutoresizingMaskIntoConstraints = false
+    // TODO: If the following line is enabled, the WKWebView does not respond to touch events
+    // Can figure out why one day maybe
+    //view.translatesAutoresizingMaskIntoConstraints = false
 
     Manager.shared.inputViewDidLoad()
     Manager.shared.keymanWebDelegate = self
