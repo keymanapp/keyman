@@ -109,6 +109,7 @@ class InstallKmpWindow(Gtk.Window):
                 keyboardlayout = keyboardlayout + kb['name']
             label.set_text(keyboardlayout)
             label.set_halign(Gtk.Align.START)
+            label.set_selectable(True)
             grid.attach_next_to(label, label1, Gtk.PositionType.RIGHT, 1, 1)
 
             fonts = get_fonts(files)
@@ -131,6 +132,7 @@ class InstallKmpWindow(Gtk.Window):
                     fontlist = fontlist + fontdesc
                 label.set_text(fontlist)
                 label.set_halign(Gtk.Align.START)
+                label.set_selectable()
                 grid.attach_next_to(label, label2, Gtk.PositionType.RIGHT, 1, 1)
 
             label3 = Gtk.Label()
@@ -141,6 +143,7 @@ class InstallKmpWindow(Gtk.Window):
             label = Gtk.Label()
             label.set_text(info['version']['description'])
             label.set_halign(Gtk.Align.START)
+            label.set_selectable()
             grid.attach_next_to(label, label3, Gtk.PositionType.RIGHT, 1, 1)
 
             if info and 'author' in info:
@@ -150,8 +153,9 @@ class InstallKmpWindow(Gtk.Window):
                 grid.attach_next_to(label4, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 prevlabel = label4
                 label = Gtk.Label()
-                label.set_text(info['author']['description'])
+                label.set_markup("<a href=\"" + info['author']['url'] + "\">" + info['author']['description'] + "</a>")
                 label.set_halign(Gtk.Align.START)
+                label.set_selectable()
                 grid.attach_next_to(label, label4, Gtk.PositionType.RIGHT, 1, 1)
 
 
@@ -163,8 +167,9 @@ class InstallKmpWindow(Gtk.Window):
                 grid.attach_next_to(label5, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 prevlabel = label5
                 label = Gtk.Label()
-                label.set_text(info['website']['description'])
+                label.set_markup("<a href=\"" + info['website']['description'] + "\">" + info['website']['description'] + "</a>")
                 label.set_halign(Gtk.Align.START)
+                label.set_selectable()
                 grid.attach_next_to(label, label5, Gtk.PositionType.RIGHT, 1, 1)
 
             if info and 'copyright' in info:
@@ -175,6 +180,7 @@ class InstallKmpWindow(Gtk.Window):
                 label = Gtk.Label()
                 label.set_text(info['copyright']['description'])
                 label.set_halign(Gtk.Align.START)
+                label.set_selectable()
                 grid.attach_next_to(label, label6, Gtk.PositionType.RIGHT, 1, 1)
 
             self.page2 = Gtk.Box()

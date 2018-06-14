@@ -17,9 +17,9 @@ class KeyboardBox(Gtk.Box):
         Gtk.Box.__init__(self)
         self.parent = window
 
-        print(kmp)
+        #print(kmp)
         self.kmp = kmp
-        icofile = os.path.join("/usr/local/share/keyman", self.kmp["id"], self.kmp["id"] + ".ico.jpg")
+        icofile = os.path.join("/usr/local/share/keyman", self.kmp["id"], self.kmp["id"] + ".ico.bmp")
         if not os.path.isfile(icofile):
             icofile = "icon_kmp.png"
         self.image = Gtk.Image.new_from_file(icofile)
@@ -45,18 +45,20 @@ class KeyboardBox(Gtk.Box):
         self.uninstallbutton = Gtk.Button()
         self.uninstallimage = Gtk.Image.new_from_file("cross20.png")
         self.uninstallbutton.set_image(self.uninstallimage)
-        self.uninstallbutton.set_tooltip_text("Uninstall " + kmp["name"])
+        self.uninstallbutton.set_tooltip_text("Uninstall " + kmp["name"] + " (" + kmp["id"] + ")")
         #grid.attach_next_to(uninstallbutton, expandbutton, Gtk.PositionType.RIGHT, 1, 1)
         self.uninstallbutton.connect("clicked", self.on_uninstall_clicked)
         self.pack_end(self.uninstallbutton, False, False, 0)
 
-        self.helpbutton = Gtk.Button()
-        self.helpimage = Gtk.Image.new_from_file("help20.png")
-        self.helpbutton.set_image(self.helpimage)
-        self.helpbutton.set_tooltip_text("Help for " + kmp["name"])
-        #grid.attach_next_to(helpbutton, label1, Gtk.PositionType.RIGHT, 1, 1)
-        self.helpbutton.connect("clicked", self.on_help_clicked)
-        self.pack_end(self.helpbutton, False, False, 0)
+        welcome_file = os.path.join("/usr/local/share/doc/keyman", self.kmp["id"], "welcome.htm")
+        if os.path.isfile(welcome_file):
+            self.helpbutton = Gtk.Button()
+            self.helpimage = Gtk.Image.new_from_file("help20.png")
+            self.helpbutton.set_image(self.helpimage)
+            self.helpbutton.set_tooltip_text("Help for " + kmp["name"])
+            #grid.attach_next_to(helpbutton, label1, Gtk.PositionType.RIGHT, 1, 1)
+            self.helpbutton.connect("clicked", self.on_help_clicked)
+            self.pack_end(self.helpbutton, False, False, 0)
 
     def on_help_clicked(self, button):
         print("Open welcome.htm for", self.kmp["name"], "if available")
@@ -81,6 +83,7 @@ class KeyboardBox(Gtk.Box):
         if response == Gtk.ResponseType.YES:
             print("Uninstalling keyboard", self.kmp["name"])
             uninstall_kmp(self.kmp["id"])
+            print("need to refresh window after uninstalling a keyboard")
             self.parent.refresh_installed_kmp()
         elif response == Gtk.ResponseType.NO:
             print("Not uninstalling keyboard", self.kmp["name"])
@@ -92,7 +95,7 @@ class KeyboardBox(Gtk.Box):
         w.show_all()
 
 class KmpGrid(Gtk.Grid):
-    def __init__(self):
+    def __init__(self, window):
         Gtk.Grid.__init__(self)
         installed_kmp = get_installed_kmp()
         self.set_column_homogeneous(True)
@@ -100,8 +103,8 @@ class KmpGrid(Gtk.Grid):
         prevbox = None
         shade = False
         for kmp in sorted(installed_kmp):
-            print(kmp)
-            kbbox = KeyboardBox(installed_kmp[kmp], self)
+            #print(kmp)
+            kbbox = KeyboardBox(installed_kmp[kmp], window)
             if shade:
                 kbbox.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.8,.8,.8,.5))
                 shade = False
@@ -127,16 +130,16 @@ class ViewInstalledWindow(Gtk.Window):
         #hbox.set_halign(Gtk.Align.FILL)
         vbox.pack_start(hbox, False, False, 0)
 
-        self.grid = KmpGrid()
+        self.grid = KmpGrid(self)
         self.s.add(self.grid)
 
         #button = Gtk.Button.new_with_label("Click Me")
         #button.connect("clicked", self.on_click_me_clicked)
         #hbox.pack_start(button, False, False, 0)
 
-        #button = Gtk.Button.new_with_mnemonic("_Open")
-        #button.connect("clicked", self.on_open_clicked)
-        #hbox.pack_start(button, False, False, 0)
+        button = Gtk.Button.new_with_mnemonic("_Refresh")
+        button.connect("clicked", self.on_refresh_clicked)
+        hbox.pack_start(button, False, False, 0)
 
         button = Gtk.Button.new_with_mnemonic("_Close")
         button.connect("clicked", self.on_close_clicked)
@@ -145,10 +148,11 @@ class ViewInstalledWindow(Gtk.Window):
         self.add(vbox)
 
     def refresh_installed_kmp(self):
-        print("need to refresh window after uninstalling a keyboard")
-        self.grid.destroy()
-        self.grid = KmpGrid()
-        self.s.add(self.grid)
+        print("Refreshing grid")
+        self.s.remove(self.s.get_child())
+        self.grid = KmpGrid(self)
+        self.s.add_with_viewport(self.grid)
+        self.s.show_all()
 
 
     #def on_click_me_clicked(self, button):
@@ -161,9 +165,12 @@ class ViewInstalledWindow(Gtk.Window):
         print("Closing application")
         Gtk.main_quit()
 
+    def on_refresh_clicked(self, button):
+        print("Refreshing application")
+        self.refresh_installed_kmp()
+
 if __name__ == '__main__':
     w = ViewInstalledWindow()
-    #w.set_title("Keyman keyboard")
     w.connect("destroy", Gtk.main_quit)
     w.resize(800, 450)
     w.show_all()

@@ -8,7 +8,6 @@ import tempfile
 import zipfile
 from os import listdir, makedirs
 from shutil import copy2
-from PIL import Image
 
 import requests
 
@@ -16,7 +15,7 @@ from get_kmp import get_keyboard_data, get_kmp
 from kmpmetadata import determine_filetype, parseinfdata, parsemetadata
 from list_installed_kmp import get_kmp_version
 from uninstall_kmp import uninstall_kmp
-
+from convertico import checkandsaveico
 
 def list_files(directory, extension):
 	return (f for f in listdir(directory) if f.endswith('.' + extension))
@@ -72,13 +71,13 @@ def get_infdata(tmpdirname):
 	else:
 		return None, None, None, None, None
 
-def install_kmp(inputfile, withkmn=False):
+def install_kmp(inputfile, online=False):
 	"""
 	Install a kmp file to /usr/local/share/keyman
 
 	Args:
 		inputfile (str): path to kmp file
-		withkmn(bool, default=False): whether to attempt to get a source kmn for the keyboard
+		online(bool, default=False): whether to attempt to get a source kmn and ico for the keyboard
 	"""
 	# create a temporary directory using the context manager
 	with tempfile.TemporaryDirectory() as tmpdirname:
@@ -102,7 +101,7 @@ def install_kmp(inputfile, withkmn=False):
 				exit(3)
 			kbfontdir = os.path.join('/usr/local/share/fonts/keyman', kbid)
 
-			if withkmn:
+			if online:
 				kbdata = get_keyboard_data(kbid)
 				# just get latest version of kmn unless there turns out to be a way to get the version of a file at a date
 #				if 'lastModifiedDate' in kbdata:
@@ -132,7 +131,8 @@ def install_kmp(inputfile, withkmn=False):
 									f.write(response.content)
 								print("Installing", kbid + ".ico", "as keyman file")
 								copy2(downloadfile, kbdir)
-								Image.open(downloadfile).save(os.path.join(kbdir, kbid +".ico.jpg"))
+								checkandsaveico(downloadfile)
+								copy2(downloadfile+".bmp", kbdir)
 							else:
 								print("install_kmp.py: warning: no ico source file for", kbid)
 					with open(os.path.join(kbdir, kbid + '.json'), 'w') as outfile:
@@ -140,7 +140,7 @@ def install_kmp(inputfile, withkmn=False):
 						print("Installing api data file", kbid + ".json", "as keyman file")
 				else:
 					print("install_kmp.py: error: cannot download keyboard data so not installing.")
-					sys.exit(5)
+					#sys.exit(5)
 
 			for f in files:
 				fpath = os.path.join(tmpdirname, f['name'])
@@ -161,11 +161,12 @@ def install_kmp(inputfile, withkmn=False):
 						os.makedirs(kbdir)
 					copy2(fpath, kbdir)
 				elif ftype == "Keyboard icon":
-					print("Converting", f['name'], "to JPEG and installing both as keyman files")
+					print("Converting", f['name'], "to BMP and installing both as keyman files")
 					if not os.path.isdir(kbdir):
 						os.makedirs(kbdir)
 					copy2(fpath, kbdir)
-					Image.open(fpath).save(os.path.join(kbdir, kbid +".ico.jpg"))
+					checkandsaveico(fpath)
+					copy2(fpath+".bmp", kbdir)
 		else:
 			print("install_kmp.py: error: No kmp.json or kmp.inf found in", inputfile)
 			print("Contents of", inputfile+":")
