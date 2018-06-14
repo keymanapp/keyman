@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 11.0 alpha
+* Move to 11.0
+
 ## 2018-06-13 10.0.400 beta
 * No changes to Keyman for Android
 

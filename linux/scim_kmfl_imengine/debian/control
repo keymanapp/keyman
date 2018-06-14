@@ -1,0 +1,18 @@
+Source: scim-kmfl-imengine
+Priority: optional
+Section: utils
+Maintainer: Doug Rintoul <doug_rintoul@sil.org>
+Uploaders: Torsten Werner <twerner@debian.org>
+Homepage: http://kmfl.sourceforge.net
+Build-Depends: debhelper (>= 10), autotools-dev, pkg-config, libkmflcomp-dev, libkmfl-dev, libscim-dev (>=1.4.4), libxkbfile-dev
+Standards-Version: 3.9.8.0
+
+Package: scim-kmfl-imengine
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libkmflcomp0, libkmfl0, scim (>=1.4.4)
+Description: KMFL (Keyboard Mapping for Linux) IM engine for the SCIM platform
+ SCIM (Smart Common Input Method) is an input method (IM) platform for Linux.
+ .
+ This package provides the KMFL (Keyboard Mapping for Linux) IM engine for 
+ SCIM. With this module, you can use keyboards designed for Tavultesoft Keyman 
+ for Windows under the SCIM platform.

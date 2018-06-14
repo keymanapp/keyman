@@ -1,5 +1,8 @@
 # Keyman for iPhone and iPad Version History
 
+## 11.0 alpha
+* Move to 11.0
+
 ## 2018-06-13 10.0.157 beta
 * Improvements to device rotation (#981)
 
