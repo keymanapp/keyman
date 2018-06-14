@@ -1,5 +1,8 @@
 # KeymanWeb Version History
 
+## 2018-06-13 10.0.94 beta
+* No substantial changes.
+
 ## 2018-06-11 10.0.93 beta
 * Platform tests (in keyboards) are now consistent across all platforms (#969)
 
