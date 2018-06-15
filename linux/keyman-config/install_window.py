@@ -5,6 +5,7 @@
 import os.path
 import pathlib
 import subprocess
+import sys
 import webbrowser
 import tempfile
 import gi
@@ -22,9 +23,12 @@ from check_mime_type import check_mime_type
 
 class InstallKmpWindow(Gtk.Window):
 
-    def __init__(self, kmpfile):
+    def __init__(self, kmpfile, online=False, viewkmp=None):
         print("kmpfile:", kmpfile)
         self.kmpfile = kmpfile
+        self.online = online
+        self.endonclose = False
+        self.viewwindow = viewkmp
         keyboardid = os.path.basename(os.path.splitext(kmpfile)[0])
         installed_kmp_ver = get_kmp_version(keyboardid)
         if installed_kmp_ver:
@@ -132,7 +136,7 @@ class InstallKmpWindow(Gtk.Window):
                     fontlist = fontlist + fontdesc
                 label.set_text(fontlist)
                 label.set_halign(Gtk.Align.START)
-                label.set_selectable()
+                label.set_selectable(True)
                 grid.attach_next_to(label, label2, Gtk.PositionType.RIGHT, 1, 1)
 
             label3 = Gtk.Label()
@@ -143,7 +147,7 @@ class InstallKmpWindow(Gtk.Window):
             label = Gtk.Label()
             label.set_text(info['version']['description'])
             label.set_halign(Gtk.Align.START)
-            label.set_selectable()
+            label.set_selectable(True)
             grid.attach_next_to(label, label3, Gtk.PositionType.RIGHT, 1, 1)
 
             if info and 'author' in info:
@@ -153,9 +157,12 @@ class InstallKmpWindow(Gtk.Window):
                 grid.attach_next_to(label4, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 prevlabel = label4
                 label = Gtk.Label()
-                label.set_markup("<a href=\"" + info['author']['url'] + "\">" + info['author']['description'] + "</a>")
+                if 'url' in info['author']:
+                    label.set_markup("<a href=\"" + info['author']['url'] + "\">" + info['author']['description'] + "</a>")
+                else:
+                    label.set_text(info['author']['description'])
                 label.set_halign(Gtk.Align.START)
-                label.set_selectable()
+                label.set_selectable(True)
                 grid.attach_next_to(label, label4, Gtk.PositionType.RIGHT, 1, 1)
 
 
@@ -169,7 +176,7 @@ class InstallKmpWindow(Gtk.Window):
                 label = Gtk.Label()
                 label.set_markup("<a href=\"" + info['website']['description'] + "\">" + info['website']['description'] + "</a>")
                 label.set_halign(Gtk.Align.START)
-                label.set_selectable()
+                label.set_selectable(True)
                 grid.attach_next_to(label, label5, Gtk.PositionType.RIGHT, 1, 1)
 
             if info and 'copyright' in info:
@@ -180,7 +187,7 @@ class InstallKmpWindow(Gtk.Window):
                 label = Gtk.Label()
                 label.set_text(info['copyright']['description'])
                 label.set_halign(Gtk.Align.START)
-                label.set_selectable()
+                label.set_selectable(True)
                 grid.attach_next_to(label, label6, Gtk.PositionType.RIGHT, 1, 1)
 
             self.page2 = Gtk.Box()
@@ -230,7 +237,9 @@ class InstallKmpWindow(Gtk.Window):
 
     def on_install_clicked(self, button):
         print("Installing keyboard")
-        install_kmp(self.kmpfile, True)
+        install_kmp(self.kmpfile, self.online)
+        if self.viewwindow:
+            self.viewwindow.refresh_installed_kmp()
         keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])
         welcome_file = os.path.join("/usr/local/share/doc/keyman", keyboardid, "welcome.htm")
         if os.path.isfile(welcome_file):
@@ -248,8 +257,43 @@ class InstallKmpWindow(Gtk.Window):
             dialog.run()
             print("INFO dialog closed")
             dialog.destroy()
-        self.close()
+        if not self.endonclose:
+            self.close()
 
     def on_cancel_clicked(self, button):
         print("Cancel install keyboard")
-        self.close()
+        if self.endonclose:
+            Gtk.main_quit()
+        else:
+            self.close()
+
+    def connectdestroy(self):
+        self.connect("destroy", Gtk.main_quit)
+        self.endonclose = True
+
+
+def main(argv):
+    if len(sys.argv) != 2:
+        print("install_window.py <kmpfile>")
+        sys.exit(2)
+
+    name, ext = os.path.splitext(sys.argv[1])
+    if ext != ".kmp":
+        print("install_window.py Input file", sys.argv[1], "is not a kmp file.")
+        print("install_window.py <kmpfile>")
+        sys.exit(2)
+
+    if not os.path.isfile(sys.argv[1]):
+        print("install_window.py Keyman kmp file", sys.argv[1], "not found.")
+        print("install_window.py <kmpfile>")
+        sys.exit(2)
+
+    w = InstallKmpWindow(sys.argv[1])
+    w.connectdestroy()
+    w.resize(800, 450)
+    if w.checkcontinue:
+        w.show_all()
+        Gtk.main()
+
+if __name__ == "__main__":
+	main(sys.argv[1:])

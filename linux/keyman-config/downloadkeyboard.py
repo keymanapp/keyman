@@ -13,46 +13,12 @@ from get_kmp import get_download_folder, download_kmp_file
 from install_window import InstallKmpWindow
 from check_mime_type import check_mime_type
 
-
-def process_kmp(view, url, downloadfile, verbose=False):
-    if verbose:
-        print("Downloading file to", downloadfile)
-    if download_kmp_file(url, downloadfile, True):
-        if verbose:
-            print("File downloaded")
-
-        w = InstallKmpWindow(downloadfile)
-        if w.checkcontinue:
-            w.show_all()
-        #install_kmp(downloadfile, True)
-        #keyboardid = os.path.basename(os.path.splitext(downloadfile)[0])
-        #welcome_file = os.path.join("/usr/local/share/doc/keyman", keyboardid, "welcome.htm")
-        #if os.path.isfile(welcome_file):
-        #    uri_path = pathlib.Path(welcome_file).as_uri()
-        #    view.load_uri(uri_path)
-        return True
-    return False
-
-def check(view, frame, req, nav, policy):
-    uri = req.get_uri()
-    parsed = urllib.parse.urlparse(uri)
-    if parsed.scheme == "keyman":
-        if parsed.path == "download":
-            qs = urllib.parse.parse_qs(parsed.query)
-            downloadfile = os.path.join(get_download_folder(), qs['filename'][0])
-            if process_kmp(view, qs['url'][0], downloadfile, True):
-                policy.ignore()
-                return True
-        elif parsed.path == "link":
-            qs = urllib.parse.parse_qs(parsed.query)
-            webbrowser.open(qs['url'][0])
-            return True
-    return False
-
 class DownloadKmpWindow(Gtk.Window):
 
-    def __init__(self):
+    def __init__(self, view=None):
         Gtk.Window.__init__(self, title="Keyman keyboard")
+        self.endonclose = False
+        self.viewwindow = view
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 
@@ -63,7 +29,7 @@ class DownloadKmpWindow(Gtk.Window):
         settings = WebKit.WebSettings()
         settings.set_property('user-agent', user_agent)
         webview.set_settings(settings)
-        webview.connect("navigation-policy-decision-requested", check)
+        webview.connect("navigation-policy-decision-requested", self.check)
         webview.connect("mime-type-policy-decision-requested", check_mime_type)
         webview.load_uri("https://keyman.com/keyboards?embed=macos&version=10")
         #webview.load_uri("https://keyman.com/keyboards?embed=windows&version=10.0")
@@ -89,6 +55,41 @@ class DownloadKmpWindow(Gtk.Window):
 
         self.add(vbox)
 
+    def process_kmp(self, view, url, downloadfile, verbose=False):
+        if verbose:
+            print("Downloading file to", downloadfile)
+        if download_kmp_file(url, downloadfile, True):
+            if verbose:
+                print("File downloaded")
+
+            w = InstallKmpWindow(downloadfile, online=True, viewkmp=self.viewwindow)
+            if w.checkcontinue:
+                w.show_all()
+            #install_kmp(downloadfile, True)
+            #keyboardid = os.path.basename(os.path.splitext(downloadfile)[0])
+            #welcome_file = os.path.join("/usr/local/share/doc/keyman", keyboardid, "welcome.htm")
+            #if os.path.isfile(welcome_file):
+            #    uri_path = pathlib.Path(welcome_file).as_uri()
+            #    view.load_uri(uri_path)
+            return True
+        return False
+
+    def check(self, view, frame, req, nav, policy):
+        uri = req.get_uri()
+        parsed = urllib.parse.urlparse(uri)
+        if parsed.scheme == "keyman":
+            if parsed.path == "download":
+                qs = urllib.parse.parse_qs(parsed.query)
+                downloadfile = os.path.join(get_download_folder(), qs['filename'][0])
+                if self.process_kmp(view, qs['url'][0], downloadfile, True):
+                    policy.ignore()
+                    return True
+            elif parsed.path == "link":
+                qs = urllib.parse.parse_qs(parsed.query)
+                webbrowser.open(qs['url'][0])
+                return True
+        return False
+
 
     #def on_click_me_clicked(self, button):
     #    print("\"Click me\" button was clicked")
@@ -97,13 +98,19 @@ class DownloadKmpWindow(Gtk.Window):
     #    print("\"Open\" button was clicked")
 
     def on_close_clicked(self, button):
-        print("Closing application")
-        Gtk.main_quit()
+        print("Closing download window")
+        if self.endonclose:
+            Gtk.main_quit()
+        else:
+            self.close()
+
+    def connectdestroy(self):
+        self.connect("destroy", Gtk.main_quit)
+        self.endonclose = True
 
 if __name__ == '__main__':
     w = DownloadKmpWindow()
-    #w.set_title("Keyman keyboard")
-    w.connect("destroy", Gtk.main_quit)
+    w.connectdestroy()
     w.resize(800, 450)
     w.show_all()
-Gtk.main()
+    Gtk.main()

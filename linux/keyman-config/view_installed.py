@@ -10,6 +10,8 @@ from gi.repository import Gtk, Gdk, WebKit
 from list_installed_kmp import get_installed_kmp
 from welcome import WelcomeView
 from keyboard_details import KeyboardDetailsView
+from downloadkeyboard import DownloadKmpWindow
+from install_window import InstallKmpWindow
 from uninstall_kmp import uninstall_kmp
 
 class KeyboardBox(Gtk.Box):
@@ -77,7 +79,7 @@ class KeyboardBox(Gtk.Box):
         dialog = Gtk.MessageDialog(self.parent, 0, Gtk.MessageType.QUESTION,
             Gtk.ButtonsType.YES_NO, "Uninstall keyboard?")
         dialog.format_secondary_text(
-            "Are you sure that you want to uninstall the" + self.kmp["name"] + "keyboard")
+            "Are you sure that you want to uninstall the " + self.kmp["name"] + " keyboard")
         response = dialog.run()
         dialog.destroy()
         if response == Gtk.ResponseType.YES:
@@ -137,8 +139,12 @@ class ViewInstalledWindow(Gtk.Window):
         #button.connect("clicked", self.on_click_me_clicked)
         #hbox.pack_start(button, False, False, 0)
 
-        button = Gtk.Button.new_with_mnemonic("_Refresh")
-        button.connect("clicked", self.on_refresh_clicked)
+        button = Gtk.Button.new_with_mnemonic("_Download keyboard...")
+        button.connect("clicked", self.on_download_clicked)
+        hbox.pack_start(button, False, False, 0)
+
+        button = Gtk.Button.new_with_mnemonic("_Install keyboard...")
+        button.connect("clicked", self.on_installfile_clicked)
         hbox.pack_start(button, False, False, 0)
 
         button = Gtk.Button.new_with_mnemonic("_Close")
@@ -169,9 +175,34 @@ class ViewInstalledWindow(Gtk.Window):
         print("Refreshing application")
         self.refresh_installed_kmp()
 
+    def on_download_clicked(self, button):
+        print("Download")
+        w = DownloadKmpWindow(self)
+        w.resize(800, 450)
+        w.show_all()
+
+    def on_installfile_clicked(self, button):
+        print("Install from file")
+        dlg = Gtk.FileChooserDialog("Choose a kmp file..", self, Gtk.FileChooserAction.OPEN,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+        filter_text = Gtk.FileFilter()
+        filter_text.set_name("KMP files")
+        filter_text.add_pattern("*.kmp")
+        dlg.add_filter(filter_text)
+        response = dlg.run()
+        if response == Gtk.ResponseType.OK:
+            kmpfile = dlg.get_filename()
+            w = InstallKmpWindow(kmpfile, viewkmp=self)
+            w.resize(800, 450)
+            if w.checkcontinue:
+                w.show_all()
+            else:
+                w.destroy()
+        dlg.destroy()
+
 if __name__ == '__main__':
     w = ViewInstalledWindow()
     w.connect("destroy", Gtk.main_quit)
     w.resize(800, 450)
     w.show_all()
-Gtk.main()
+    Gtk.main()
