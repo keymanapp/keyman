@@ -194,12 +194,14 @@ class InstallKmpWindow(Gtk.Window):
             #self.page2.set_border_width(10)
             s = Gtk.ScrolledWindow()
             webview = WebKit.WebView()
+            webview.connect("navigation-policy-decision-requested", self.check)
             webview.connect("mime-type-policy-decision-requested", check_mime_type)
 
             if options and "readmeFile" in options:
-                readme_file = os.path.join(tmpdirname, options['readmeFile'])
+                self.readme = options['readmeFile']
             else:
-                readme_file = os.path.join(tmpdirname, "readme.htm")
+                self.readme = "readme.htm"
+            readme_file = os.path.join(tmpdirname, self.readme)
             if os.path.isfile(readme_file):
                 readme_uri = pathlib.Path(readme_file).as_uri()
                 webview.load_uri(readme_uri)
@@ -234,6 +236,14 @@ class InstallKmpWindow(Gtk.Window):
 
         self.add(vbox)
         self.resize(635, 270)
+
+    def check(self, view, frame, req, nav, policy):
+        uri = req.get_uri()
+        if not self.readme in uri:
+            webbrowser.open(uri)
+            policy.ignore()
+            return True
+        return False
 
     def on_install_clicked(self, button):
         print("Installing keyboard")

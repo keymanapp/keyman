@@ -5,8 +5,7 @@ import pathlib
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
-gi.require_version('WebKit', '3.0')
-from gi.repository import Gtk, Gdk, WebKit
+from gi.repository import Gtk, Gdk
 from list_installed_kmp import get_installed_kmp
 from welcome import WelcomeView
 from keyboard_details import KeyboardDetailsView
