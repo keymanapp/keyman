@@ -122,7 +122,7 @@ class KmpGrid(Gtk.Grid):
 class ViewInstalledWindow(Gtk.Window):
     def __init__(self):
         self.accelerators = None
-        Gtk.Window.__init__(self, title="Keyman keyboard")
+        Gtk.Window.__init__(self, title="Keyman keyboard packages")
         init_accel(self)
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)

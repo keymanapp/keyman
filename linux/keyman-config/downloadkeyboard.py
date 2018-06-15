@@ -18,7 +18,7 @@ class DownloadKmpWindow(Gtk.Window):
 
     def __init__(self, view=None):
         self.accelerators = None
-        Gtk.Window.__init__(self, title="Keyman keyboard")
+        Gtk.Window.__init__(self, title="Download Keyman keyboards")
         self.endonclose = False
         self.viewwindow = view
         init_accel(self)
@@ -52,9 +52,6 @@ class DownloadKmpWindow(Gtk.Window):
         #button.connect("clicked", self.on_open_clicked)
         #hbox.pack_start(button, False, False, 0)
 
-        self.statuslabel = Gtk.Label()
-        hbox.pack_start(self.statuslabel, False, False, 0)
-
         button = Gtk.Button.new_with_mnemonic("_Close")
         button.connect("clicked", self.on_close_clicked)
         hbox.pack_end(button, False, False, 0)
@@ -62,23 +59,15 @@ class DownloadKmpWindow(Gtk.Window):
 
         self.add(vbox)
 
-    def process_kmp(self, view, url, downloadfile, verbose=False):
+    def process_kmp(self, url, downloadfile, verbose=False):
         if verbose:
             print("Downloading file to", downloadfile)
         if download_kmp_file(url, downloadfile, True):
             if verbose:
                 print("File downloaded")
-            #self.statuslabel.set_text("Package downloaded to " + downloadfile)
-
             w = InstallKmpWindow(downloadfile, online=True, viewkmp=self.viewwindow)
             if w.checkcontinue:
                 w.show_all()
-            #install_kmp(downloadfile, True)
-            #keyboardid = os.path.basename(os.path.splitext(downloadfile)[0])
-            #welcome_file = os.path.join("/usr/local/share/doc/keyman", keyboardid, "welcome.htm")
-            #if os.path.isfile(welcome_file):
-            #    uri_path = pathlib.Path(welcome_file).as_uri()
-            #    view.load_uri(uri_path)
             return True
         return False
 
@@ -89,9 +78,7 @@ class DownloadKmpWindow(Gtk.Window):
             if parsed.path == "download":
                 qs = urllib.parse.parse_qs(parsed.query)
                 downloadfile = os.path.join(get_download_folder(), qs['filename'][0])
-                #self.statuslabel.set_text("Downloading package to " + downloadfile)
-                #self.show_all()
-                if self.process_kmp(view, qs['url'][0], downloadfile, True):
+                if self.process_kmp(qs['url'][0], downloadfile, True):
                     policy.ignore()
                     return True
             elif parsed.path == "link":
