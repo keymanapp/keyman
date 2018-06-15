@@ -10,13 +10,16 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit', '3.0')
 from gi.repository import Gtk, WebKit
 from check_mime_type import check_mime_type
+from accelerators import bind_accelerator, init_accel
 
 class WelcomeView(Gtk.Window):
 
     def __init__(self, welcomeurl, keyboardname):
+        self.accelerators = None
         kbtitle = keyboardname + " installed"
         self.welcomeurl = welcomeurl
         Gtk.Window.__init__(self, title=kbtitle)
+        init_accel(self)
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 
@@ -51,6 +54,7 @@ class WelcomeView(Gtk.Window):
         button = Gtk.Button.new_with_mnemonic("_OK")
         button.connect("clicked", self.on_ok_clicked)
         hbox.pack_end(button, False, False, 0)
+        bind_accelerator(self.accelerators, button, '<Control>w')
 
         self.add(vbox)
 

@@ -12,6 +12,7 @@ from keyboard_details import KeyboardDetailsView
 from downloadkeyboard import DownloadKmpWindow
 from install_window import InstallKmpWindow
 from uninstall_kmp import uninstall_kmp
+from accelerators import bind_accelerator, init_accel
 
 class KeyboardBox(Gtk.Box):
     def __init__(self, kmp, window):
@@ -120,7 +121,9 @@ class KmpGrid(Gtk.Grid):
 
 class ViewInstalledWindow(Gtk.Window):
     def __init__(self):
+        self.accelerators = None
         Gtk.Window.__init__(self, title="Keyman keyboard")
+        init_accel(self)
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 
@@ -149,6 +152,8 @@ class ViewInstalledWindow(Gtk.Window):
         button = Gtk.Button.new_with_mnemonic("_Close")
         button.connect("clicked", self.on_close_clicked)
         hbox.pack_end(button, False, False, 0)
+        bind_accelerator(self.accelerators, button, '<Control>q')
+        bind_accelerator(self.accelerators, button, '<Control>w')
 
         self.add(vbox)
 

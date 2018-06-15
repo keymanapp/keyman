@@ -20,6 +20,7 @@ from welcome import WelcomeView
 from uninstall_kmp import uninstall_kmp
 from get_kmp import get_download_folder
 from check_mime_type import check_mime_type
+from accelerators import bind_accelerator, init_accel
 
 class InstallKmpWindow(Gtk.Window):
 
@@ -29,6 +30,7 @@ class InstallKmpWindow(Gtk.Window):
         self.online = online
         self.endonclose = False
         self.viewwindow = viewkmp
+        self.accelerators = None
         keyboardid = os.path.basename(os.path.splitext(kmpfile)[0])
         installed_kmp_ver = get_kmp_version(keyboardid)
         if installed_kmp_ver:
@@ -36,6 +38,7 @@ class InstallKmpWindow(Gtk.Window):
 
         windowtitle = "Installing keyboard/package " + keyboardid
         Gtk.Window.__init__(self, title=windowtitle)
+        init_accel(self)
 
         self.set_border_width(3)
 
@@ -158,7 +161,7 @@ class InstallKmpWindow(Gtk.Window):
                 prevlabel = label4
                 label = Gtk.Label()
                 if 'url' in info['author']:
-                    label.set_markup("<a href=\"" + info['author']['url'] + "\">" + info['author']['description'] + "</a>")
+                    label.set_markup("<a href=\"" + info['author']['url'] + "\" title=\"" + info['author']['url'] + "\">" + info['author']['description'] + "</a>")
                 else:
                     label.set_text(info['author']['description'])
                 label.set_halign(Gtk.Align.START)
@@ -233,6 +236,7 @@ class InstallKmpWindow(Gtk.Window):
         button = Gtk.Button.new_with_mnemonic("_Cancel")
         button.connect("clicked", self.on_cancel_clicked)
         hbox.pack_end(button, False, False, 0)
+        bind_accelerator(self.accelerators, button, '<Control>w')
 
         self.add(vbox)
         self.resize(635, 270)

@@ -12,13 +12,16 @@ from gi.repository import Gtk, WebKit
 from get_kmp import get_download_folder, download_kmp_file
 from install_window import InstallKmpWindow
 from check_mime_type import check_mime_type
+from accelerators import bind_accelerator, init_accel
 
 class DownloadKmpWindow(Gtk.Window):
 
     def __init__(self, view=None):
+        self.accelerators = None
         Gtk.Window.__init__(self, title="Keyman keyboard")
         self.endonclose = False
         self.viewwindow = view
+        init_accel(self)
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 
@@ -49,9 +52,13 @@ class DownloadKmpWindow(Gtk.Window):
         #button.connect("clicked", self.on_open_clicked)
         #hbox.pack_start(button, False, False, 0)
 
+        self.statuslabel = Gtk.Label()
+        hbox.pack_start(self.statuslabel, False, False, 0)
+
         button = Gtk.Button.new_with_mnemonic("_Close")
         button.connect("clicked", self.on_close_clicked)
         hbox.pack_end(button, False, False, 0)
+        bind_accelerator(self.accelerators, button, '<Control>w')
 
         self.add(vbox)
 
@@ -61,6 +68,7 @@ class DownloadKmpWindow(Gtk.Window):
         if download_kmp_file(url, downloadfile, True):
             if verbose:
                 print("File downloaded")
+            #self.statuslabel.set_text("Package downloaded to " + downloadfile)
 
             w = InstallKmpWindow(downloadfile, online=True, viewkmp=self.viewwindow)
             if w.checkcontinue:
@@ -81,6 +89,8 @@ class DownloadKmpWindow(Gtk.Window):
             if parsed.path == "download":
                 qs = urllib.parse.parse_qs(parsed.query)
                 downloadfile = os.path.join(get_download_folder(), qs['filename'][0])
+                #self.statuslabel.set_text("Downloading package to " + downloadfile)
+                #self.show_all()
                 if self.process_kmp(view, qs['url'][0], downloadfile, True):
                     policy.ignore()
                     return True
