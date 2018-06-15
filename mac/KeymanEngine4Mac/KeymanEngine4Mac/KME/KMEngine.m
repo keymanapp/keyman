@@ -27,11 +27,20 @@ NSString *const Q_RETURN = @"Q_RETURN";
 DWORD VKMap[0x80];
 
 @interface KMEngine ()
++ (NSRegularExpression *)regexPlatform;
 @property (strong, nonatomic) NSMutableString *tmpCtxBuf;
 @property (strong, nonatomic) NSMutableArray *indexStack;
 @end
 
 @implementation KMEngine
+
++ (NSRegularExpression *)regexPlatform {
+    static NSRegularExpression *regex = nil;
+    if (regex == nil) {
+        regex = [NSRegularExpression regularExpressionWithPattern:@"(\\b(((mac(os)?)x?)|(native)|(hardware)|(desktop)) *)*" options:NSRegularExpressionCaseInsensitive error:nil];
+    }
+    return regex;
+}
 
 NSMutableString* _easterEggForCrashlytics = nil;
 const NSString* kEasterEggText = @"Cr@shlyt!cs crash#KME";
@@ -867,25 +876,9 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 }
 
 - (BOOL)checkPlatform:(NSString *)platform {
-    NSArray *values = [[platform lowercaseString] componentsSeparatedByString:@" "];
-    for (NSString *value in values) {
-        if ([value isEqualToString:@"hardware"])
-            continue;
-        else if ([value isEqualToString:@"macosx"])
-            continue;
-        else if ([value isEqualToString:@"mac"])
-            continue;
-        else if ([value isEqualToString:@"macos"])
-            continue;
-        else if ([value isEqualToString:@"desktop"])
-            continue;
-        else if ([value isEqualToString:@"native"])
-            continue;
-        else
-            return NO;
-    }
-    
-    return YES;
+    NSRange wholeString = NSMakeRange(0, [platform length]);
+    NSRange firstMatchRange = [[KMEngine regexPlatform] rangeOfFirstMatchInString:platform options:NSMatchingAnchored range:wholeString];
+    return (firstMatchRange.length == wholeString.length);
 }
 
 // Creates a VK map to convert Mac VK codes to Windows VK codes
