@@ -45,6 +45,7 @@
 		984C2B161A79CA4F0023F89D /* KVKFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 984C2B021A79CA4F0023F89D /* KVKFile.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		984C2B171A79CA4F0023F89D /* KVKFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 984C2B031A79CA4F0023F89D /* KVKFile.m */; };
 		984C2B191A79CB020023F89D /* WindowsVKCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 984C2B181A79CB020023F89D /* WindowsVKCodes.h */; };
+		E224323F20D37E97006940A1 /* PlatformTest.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E224323E20D37E97006940A1 /* PlatformTest.kmx */; };
 		E22A5A1120113DC100233965 /* KMEngineTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E22A5A1020113DC100233965 /* KMEngineTests.m */; };
 		E22A5A142011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = E22A5A132011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m */; };
 		E2537D9A201641DA0069FEA6 /* TestMacEngine.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E2537D99201641DA0069FEA6 /* TestMacEngine.kmx */; };
@@ -102,6 +103,7 @@
 		984C2B021A79CA4F0023F89D /* KVKFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KVKFile.h; sourceTree = "<group>"; };
 		984C2B031A79CA4F0023F89D /* KVKFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KVKFile.m; sourceTree = "<group>"; };
 		984C2B181A79CB020023F89D /* WindowsVKCodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowsVKCodes.h; sourceTree = "<group>"; };
+		E224323E20D37E97006940A1 /* PlatformTest.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlatformTest.kmx; sourceTree = "<group>"; };
 		E22A5A1020113DC100233965 /* KMEngineTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMEngineTests.m; sourceTree = "<group>"; };
 		E22A5A1220113F8100233965 /* KeymanEngineTestsStaticHelperMethods.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeymanEngineTestsStaticHelperMethods.h; sourceTree = "<group>"; };
 		E22A5A132011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeymanEngineTestsStaticHelperMethods.m; sourceTree = "<group>"; };
@@ -197,6 +199,7 @@
 		984C2AE21A79C98D0023F89D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				E224323E20D37E97006940A1 /* PlatformTest.kmx */,
 				E2537D99201641DA0069FEA6 /* TestMacEngine.kmx */,
 				984C2AE31A79C98D0023F89D /* Info.plist */,
 			);
@@ -361,6 +364,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E2537D9A201641DA0069FEA6 /* TestMacEngine.kmx in Resources */,
+				E224323F20D37E97006940A1 /* PlatformTest.kmx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
