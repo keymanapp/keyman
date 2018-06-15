@@ -11,6 +11,7 @@ from gi.repository import Gtk, WebKit
 # basics: keyboard name, package version, description
 # other things: filename (of kmx), , 
 #    OSK availability, documentation availability, package copyright
+# also: supported languages, fonts
 # from kmx?: keyboard version, encoding, layout type
 
 # there is data in kmp.inf/kmp.json
@@ -34,7 +35,10 @@ class KeyboardDetailsView(Gtk.Window):
 
         # kbdatapath = os.path.join("/usr/local/share/keyman", kmp["id"], kmp["id"] + ".json")
 
+        # show the icon somewhere
+
         label1 = Gtk.Label()
+        # where is the info about the kmx file?
         label1.set_text("Filename:   ")
         label1.set_halign(Gtk.Align.END)
         grid.add(label1)
@@ -86,7 +90,7 @@ class KeyboardDetailsView(Gtk.Window):
         grid.attach_next_to(label5, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
         prevlabel = label5
         label = Gtk.Label()
-        label.set_text("Unicode")
+        label.set_text("Unicode") # assumed for now!
         label.set_halign(Gtk.Align.START)
         label.set_selectable(True)
         grid.attach_next_to(label, label5, Gtk.PositionType.RIGHT, 1, 1)
@@ -137,13 +141,14 @@ class KeyboardDetailsView(Gtk.Window):
         prevlabel = label9
         label = Gtk.Label()
         label.set_line_wrap(True)
-        # label.set_text("This SIL keyboard is distributed under the MIT license (MIT) as described somewhere")
+        label.set_text("This keyboard is distributed under the MIT license (MIT) as described somewhere")
         #label.set_text(kmp["description"])
         label.set_halign(Gtk.Align.START)
         label.set_selectable(True)
         grid.attach_next_to(label, label9, Gtk.PositionType.RIGHT, 1, 1)
 
         label10 = Gtk.Label()
+        # where is the copyright in the data, or get it from kmx?
         label10.set_text("Copyright:   ")
         label10.set_halign(Gtk.Align.END)
         grid.attach_next_to(label10, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
