@@ -474,6 +474,22 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return packageName;
 }
 
+- (NSArray *)keyboardNamesFromFolder:(NSString *)packageFolder {
+    NSMutableArray *kbNames = [[NSMutableArray alloc] initWithCapacity:0];;
+    for (NSString *kmxFile in [self KMXFilesAtPath:packageFolder]) {
+        NSDictionary * infoDict = [KMXFile infoDictionaryFromFilePath:kmxFile];
+        if (infoDict != nil) {
+            NSString *name = [infoDict objectForKey:kKMKeyboardNameKey];
+            if (name != nil && [name length]) {
+                if (self.debugMode)
+                    NSLog(@"Adding keyboard name: %@", name);
+                [kbNames addObject:name];
+            }
+        }
+    }
+    return kbNames;
+}
+
 - (NSDictionary *)infoDictionaryFromFile:(NSString *)infoFile {
     NSMutableDictionary *infoDict = [NSMutableDictionary dictionaryWithCapacity:0];
     NSMutableArray *files = [NSMutableArray arrayWithCapacity:0];

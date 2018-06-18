@@ -1,5 +1,8 @@
 # Keyman for macOS Version History
 
+## 2018-06-19 10.0.49 beta
+* Added suport for displaying keyboard names in native script in information window (#999)
+
 ## 2018-06-18 10.0.48 beta
 * Made other version(s) of LibreOffice use "legacy" mode for character replacements (#990)
 * Corrected the way Keyman responds evaluates tokens in **platform** statement (#971)
