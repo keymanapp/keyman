@@ -1,5 +1,9 @@
 # Keyman for macOS Version History
 
+## 2018-06-18 10.0.48 beta
+* Made other version(s) of LibreOffice use "legacy" mode for character replacements (#990)
+* Corrected the way Keyman responds evaluates tokens in **platform** statement (#971)
+
 ## 2018-06-07 10.0.47 beta
 * Change to build script to use correct build location (#950)
 
