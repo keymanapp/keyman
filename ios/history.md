@@ -1,5 +1,8 @@
 # Keyman for iPhone and iPad Version History
 
+## 2018-06-19 10.0.162 beta
+* Replaced deprecated calls to UIAlertView and cleaned up extraneous blank buttons (#1002)
+
 ## 2018-06-13 10.0.157 beta
 * Improvements to device rotation (#981)
 
