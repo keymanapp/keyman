@@ -344,4 +344,24 @@ NSString * names[nCombinations];
     NSString *output = [self checkPlatform_getOutputForKeystroke:@"m" modifierFlags:0 keyCode:kVK_ANSI_M];
     XCTAssert([output isEqualToString:@" macOS native desktop hardware"], @"Expected checkPlatform to return YES for macOS native desktop hardware.");
 }
+
+- (void)testContextMatch_InvertedPlatformLogic_NotTouch {
+    NSString *output = [self checkPlatform_getOutputForKeystroke:@"x" modifierFlags:0 keyCode:kVK_ANSI_X];
+    XCTAssert([output isEqualToString:@" !Touch"], @"Expected !touch to be true.");
+}
+
+// This allows for easy debugging of the "manual" platformtest keyboard developed for filling in the test spreadsheet.
+//- (void)testCheckPlatform_temp_UnknownPlatformX {
+//    KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:@"/Users/tom/Documents/keymanapp/keyman/windows/src/test/manual-tests/platform-rules/platformtest.kmx"];
+//
+//    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
+//    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"a" charactersIgnoringModifiers:@"a" isARepeat:NO keyCode:kVK_ANSI_A];
+//    NSArray *actions = [engine processEvent:event];
+//    XCTAssert(actions.count == 1, @"Expected 1 action");
+//    NSDictionary *action = actions[0];
+//    NSString *actionType = [[action allKeys] objectAtIndex:0];
+//    XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
+//    NSString *output = [action objectForKey:actionType];
+//    XCTAssert([output isEqualToString:@"hardware macosx desktop native undefined !touch undefined macosx"], @"Expected !touch.");
+//}
 @end
