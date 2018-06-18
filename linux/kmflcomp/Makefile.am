@@ -5,7 +5,7 @@
 
 SUBDIRS = include src kmfl_compiler
 
-kmflcompdocdir = ${prefix}/doc/kmflcomp
+kmflcompdocdir = ${docdir}
 kmflcompdoc_DATA = \
 	README\
 	COPYING\
