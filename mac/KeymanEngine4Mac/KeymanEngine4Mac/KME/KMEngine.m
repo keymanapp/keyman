@@ -797,14 +797,19 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     DWORD x2 = [keyCtx characterAtIndex:i+3]-1;
                     DWORD x3 = [keyCtx characterAtIndex:i+4]-1;
                     KMCompStore *store = [self.kmx.store objectAtIndex:x3];
-                    if (x1 == TSS_PLATFORM && x2 == EQUAL) {
-                        if ([self checkPlatform:store.string])
+                    if (x1 == TSS_PLATFORM) {
+                        BOOL platformMatches = [self checkPlatform:store.string];
+                        if ((platformMatches && (x2 == EQUAL)) ||
+                            (!platformMatches && (x2 == NOT_EQUAL))) {
                             checkPlatform = YES;
-                        else
+                        }
+                        else {
                             return 0;
+                        }
                     }
-                    else
+                    else {
                         return 0; // CODE_IFSYSTEMSTORE is not supported except TSS_PLATFORM
+                    }
                     
                     i+=5;
                     break;
