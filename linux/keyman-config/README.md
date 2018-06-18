@@ -8,9 +8,22 @@ If not already installed it needs python3, python3-gi
 
 ## Things to run
 
-### webview.py
+### view_installed.py
 
-`./webview.py`
+`./view_installed.py`
+
+This shows a list of installed kmps.
+For each one it has buttons to `show the welcome page`, `show more information` and `uninstall`.
+
+##### Buttons
+
+* `Refresh` - useful if you install or uninstall on the commandline while running view_installed.
+* `Download keyboard...` - runs `DownloadKmpWindow` (see below)
+* `Install keyboard...` - opens a file choose dialog to choose a kmp file to install and bring up the `InstallKmpWindow` for more details and to confirm installing.
+
+### downloadkeyboard.py
+
+`./downloadkeyboard.py` runs `DownloadKmpWindow`
 
 This uses the keyman.com website to install kmps.
 
@@ -20,9 +33,10 @@ pretending to be a mac for now.
 Search for a language or keyboard in the search box
 Select a keyboard from the list
 In 'Downloads for your device' there will be a 'Install keyboard' button for the keyboard for macOS
-Click it to install the keyboard
+Click it to download the keyboard and bring up the `InstallKmpWindow` for more details and to confirm installing.
 
 Secondary-click gives you a menu including 'Back' to go back a page.
+
 
 ### install_kmp.py
 
@@ -44,9 +58,15 @@ Command line uninstaller for kmp
 
 `./list_installed_kmp.py -s` shows name, version, id of each installed keyboard
 
-### keyman-config.py
+### list_kmp.py
 
-`./keyman-config.py`
+`./list_kmp.py`
 
-Prototype installer using the web api to get available languages and keyboards
-Allows you to filter available keyboards by region and language
+Find all known keyboard packages in the api and sort the ids into files according to:
+
+* goodjsonkmp.txt - kmp with kmp.json
+* goodinfkmp.txt - kmp with kmp.inf but no kmp.json
+* brokeninf.txt - kmp with kmp.inf but can't process it
+* infnokeyboard.txt - kmp with kmp.info but no [Keyboard]
+* nokmp.txt - no kmp
+* nodata.txt - no data in the api for the keyboard
