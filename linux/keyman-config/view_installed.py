@@ -137,9 +137,9 @@ class ViewInstalledWindow(Gtk.Window):
         self.grid = KmpGrid(self)
         self.s.add(self.grid)
 
-        #button = Gtk.Button.new_with_label("Click Me")
-        #button.connect("clicked", self.on_click_me_clicked)
-        #hbox.pack_start(button, False, False, 0)
+        button = Gtk.Button.new_with_mnemonic("_Refresh")
+        button.connect("clicked", self.on_refresh_clicked)
+        hbox.pack_start(button, False, False, 0)
 
         button = Gtk.Button.new_with_mnemonic("_Download keyboard...")
         button.connect("clicked", self.on_download_clicked)
