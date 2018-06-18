@@ -322,20 +322,6 @@ begin
 
   PIconFileName := PWideChar(IconFileName);
 
-  OleCheck(pInputProcessorProfileMgr.RegisterProfile(   // I3743
-    c_clsidKMTipTextService,
-    LangID,
-    guid,
-    PWideChar(KeyboardName),
-    Length(KeyboardName),
-    PWideChar(IconFileName),
-    Length(IconFileName),
-    IconIndex,
-    0,
-    0,
-    1,
-    0));
-
   FLayoutInstallString := Format('%04.4x:%s%s', [LangID, GuidToString(c_clsidKMTipTextService),   // I4244
     GuidToString(guid)]);
 
@@ -358,6 +344,22 @@ begin
       WarnFmt(KMN_W_TSF_COMError, VarArrayOf([E.Message]));
     end;
   end;
+
+  { Register the keyboard profile }
+
+  OleCheck(pInputProcessorProfileMgr.RegisterProfile(   // I3743
+    c_clsidKMTipTextService,
+    LangID,
+    guid,
+    PWideChar(KeyboardName),
+    Length(KeyboardName),
+    PWideChar(IconFileName),
+    Length(IconFileName),
+    IconIndex,
+    0,
+    0,
+    1,
+    0));
 
   if UserLanguageInstalled then
   begin

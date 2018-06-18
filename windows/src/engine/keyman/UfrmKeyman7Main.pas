@@ -890,6 +890,13 @@ procedure TfrmKeyman7Main.ShowLanguageSwitchForm;
 var
   Keyboard: TLangSwitchKeyboard;
 begin
+  FLangSwitchManager.Refresh;   // ?? is this really needed. It seems in some situations that the refresh
+                                // occurs too soon after keyboard installation and background processing
+                                // has not completed, so this makes sure it's all okay. Long term, if we
+                                // keep this pattern, we should not have a global FLangSwitchManager but
+                                // instead always build an instance of the lang switch manager when the
+                                // form is shown. Performance may be a concern.
+
   if not Assigned(frmLanguageSwitch) then
   begin
     frmLanguageSwitch := TfrmLanguageSwitch.Create(Self);
