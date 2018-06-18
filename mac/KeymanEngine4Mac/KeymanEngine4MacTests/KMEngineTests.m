@@ -269,4 +269,99 @@ NSString * names[nCombinations];
         }
     }
 }
+
+// The following checkPlatform tests all use the PlatformTest KMX file based on PlatformTest.kmn
+// (not included in the project itself, but available in the source repo for reference. This
+// keyboard has been craefully crafted to check for all the "wrong" values first, for which checkPlatform
+// should return NO, so while these tests are ostensibly testing for YES for the platform components that
+// should match on a Mac, they are also testing for NO for all the other non-matching values.
+
+- (NSString *)checkPlatform_getOutputForKeystroke: (NSString*) character modifierFlags: (NSEventModifierFlags) flag keyCode:(unsigned short)code {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForPlatformTest];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
+    NSString *lcChar = [character lowercaseString];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:flag timestamp:0 windowNumber:0 context:nil characters:character charactersIgnoringModifiers:lcChar isARepeat:NO keyCode:code];
+    NSArray *actions = [engine processEvent:event];
+    XCTAssert(actions.count == 1, @"Expected 1 action");
+    NSDictionary *action = actions[0];
+    NSString *actionType = [[action allKeys] objectAtIndex:0];
+    XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
+    NSString *output = [action objectForKey:actionType];
+    return output;
+}
+
+- (void)testCheckPlatform_native_ReturnsYes {
+    NSString *output = [self checkPlatform_getOutputForKeystroke:@"u" modifierFlags:0 keyCode:kVK_ANSI_U];
+    XCTAssert([output isEqualToString:@" Native"], @"Expected checkPlatform to return YES for native.");
+}
+
+- (void)testCheckPlatform_NATIVE_ReturnsYes {
+    NSString *output = [self checkPlatform_getOutputForKeystroke:@"U" modifierFlags:NSEventModifierFlagShift keyCode:kVK_ANSI_U];
+    XCTAssert([output isEqualToString:@" Native"], @"Expected checkPlatform to return YES for NATIVE.");
+}
+
+- (void)testCheckPlatform_hardware_ReturnsYes {
+    NSString *output = [self checkPlatform_getOutputForKeystroke:@"p" modifierFlags:0 keyCode:kVK_ANSI_P];
+    XCTAssert([output isEqualToString:@" Hardware"], @"Expected checkPlatform to return YES for hardware.");
+}
+
+- (void)testCheckPlatform_HARDWARE_ReturnsYes {
+    NSString *output = [self checkPlatform_getOutputForKeystroke:@"P" modifierFlags:NSEventModifierFlagShift keyCode:kVK_ANSI_P];
+    XCTAssert([output isEqualToString:@" Hardware"], @"Expected checkPlatform to return YES for HARDWARE.");
+}
+
+- (void)testCheckPlatform_desktop_ReturnsYes {
+    NSString *output = [self checkPlatform_getOutputForKeystroke:@"I" modifierFlags:0 keyCode:kVK_ANSI_I];
+    XCTAssert([output isEqualToString:@" Desktop"], @"Expected checkPlatform to return YES for desktop.");
+}
+
+- (void)testCheckPlatform_Desktop_ReturnsYes {
+    NSString *output = [self checkPlatform_getOutputForKeystroke:@"I" modifierFlags:NSEventModifierFlagShift keyCode:kVK_ANSI_I];
+    XCTAssert([output isEqualToString:@" Desktop"], @"Expected checkPlatform to return YES for Desktop.");
+}
+
+- (void)testCheckPlatform_macosx_ReturnsYes {
+    NSString *output = [self checkPlatform_getOutputForKeystroke:@"o" modifierFlags:0 keyCode:kVK_ANSI_O];
+    XCTAssert([output isEqualToString:@" macOS"], @"Expected checkPlatform to return YES for macosx.");
+}
+
+- (void)testCheckPlatform_MacOS_ReturnsYes {
+    NSString *output = [self checkPlatform_getOutputForKeystroke:@"K" modifierFlags:NSEventModifierFlagShift keyCode:kVK_ANSI_K];
+    XCTAssert([output isEqualToString:@" macOS"], @"Expected checkPlatform to return YES for MacOS.");
+}
+
+- (void)testCheckPlatform_MAC_ReturnsYes {
+    NSString *output = [self checkPlatform_getOutputForKeystroke:@"L" modifierFlags:NSEventModifierFlagShift keyCode:kVK_ANSI_L];
+    XCTAssert([output isEqualToString:@" mac"], @"Expected checkPlatform to return YES for MAC.");
+}
+
+- (void)testCheckPlatform_Browsers_ReturnsNo {
+    NSString *output = [self checkPlatform_getOutputForKeystroke:@"y" modifierFlags:0 keyCode:kVK_ANSI_Y];
+    XCTAssert([output isEqualToString:@" [Browser Undefined]"], @"Expected checkPlatform to return NO for all browsers (ie, chrome, firefox, safari, opera).");
+}
+
+- (void)testCheckPlatform_multipleTokens_MatchesCorrectOneForMac {
+    NSString *output = [self checkPlatform_getOutputForKeystroke:@"m" modifierFlags:0 keyCode:kVK_ANSI_M];
+    XCTAssert([output isEqualToString:@" macOS native desktop hardware"], @"Expected checkPlatform to return YES for macOS native desktop hardware.");
+}
+
+- (void)testContextMatch_InvertedPlatformLogic_NotTouch {
+    NSString *output = [self checkPlatform_getOutputForKeystroke:@"x" modifierFlags:0 keyCode:kVK_ANSI_X];
+    XCTAssert([output isEqualToString:@" !Touch"], @"Expected !touch to be true.");
+}
+
+// This allows for easy debugging of the "manual" platformtest keyboard developed for filling in the test spreadsheet.
+//- (void)testCheckPlatform_temp_UnknownPlatformX {
+//    KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:@"/Users/tom/Documents/keymanapp/keyman/windows/src/test/manual-tests/platform-rules/platformtest.kmx"];
+//
+//    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
+//    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"a" charactersIgnoringModifiers:@"a" isARepeat:NO keyCode:kVK_ANSI_A];
+//    NSArray *actions = [engine processEvent:event];
+//    XCTAssert(actions.count == 1, @"Expected 1 action");
+//    NSDictionary *action = actions[0];
+//    NSString *actionType = [[action allKeys] objectAtIndex:0];
+//    XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
+//    NSString *output = [action objectForKey:actionType];
+//    XCTAssert([output isEqualToString:@"hardware macosx desktop native undefined !touch undefined macosx"], @"Expected !touch.");
+//}
 @end

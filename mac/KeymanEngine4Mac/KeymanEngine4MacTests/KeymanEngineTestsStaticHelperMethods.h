@@ -21,6 +21,7 @@
 
 @interface KeymanEngineTestsStaticHelperMethods : NSObject
 + (KMXFile *)getKmxFileTestMacEngine;
++ (KMXFile *)getKmxFileForPlatformTest;
 @end
 
 #endif /* KeymanEngineTestsStaticHelperMethods_h */
