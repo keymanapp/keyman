@@ -1108,44 +1108,53 @@ namespace com.keyman {
               if(this.keymanweb.util.activeDevice.touchable != (constraint == 'touch')) {
                 result=false;
               }
-          }
+              break;
 
-          switch(constraint) {
+            case 'macos':
+            case 'mac':
+              constraint = 'macosx';
+              // fall through
+            case 'macosx':
             case 'windows':
             case 'android':
             case 'ios':
-            case 'macosx':
             case 'linux':
               if(this.keymanweb.util.activeDevice.OS.toLowerCase() != constraint) {
                 result=false;
               }
-          }
-
-          switch(constraint) {
+              break;
+          
             case 'tablet':
             case 'phone':
             case 'desktop':
-              if(this.keymanweb.util.activeDevice.formFactor != constraint) {
+              if(this.keymanweb.util.device.formFactor != constraint) {
                 result=false;
               }
-          }
+              break;
 
-          switch(constraint) {
             case 'web':
-              if(this.keymanweb.util.activeDevice.browser == 'native') {
+              if(this.keymanweb.util.device.browser == 'native') {
                 result=false; // web matches anything other than 'native'
               }
               break;
+              
             case 'native':
+              // This will return true for embedded KeymanWeb
             case 'ie':
             case 'chrome':
             case 'firefox':
             case 'safari':
+            case 'edge':
             case 'opera':
-              if(this.keymanweb.util.activeDevice.browser != constraint) {
+              if(this.keymanweb.util.device.browser != constraint) {
                 result=false;
               }
+              break;
+              
+            default:
+              result=false;
           }
+          
         }
       }
       return result; //Moved from previous line, now supports layer selection, Build 350 

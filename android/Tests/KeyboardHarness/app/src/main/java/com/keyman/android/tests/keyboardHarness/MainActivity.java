@@ -56,6 +56,17 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     longpressKBbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
     longpressKBbInfo.put(KMManager.KMKey_Font, "code2001.ttf");
     KMManager.addKeyboard(this, longpressKBbInfo);
+
+    // Platform test keyboard
+    HashMap<String, String> platformtestKBbInfo = new HashMap<String, String>();
+    platformtestKBbInfo.put(KMManager.KMKey_PackageID, "cloud");
+    platformtestKBbInfo.put(KMManager.KMKey_KeyboardID, "platformtest");
+    platformtestKBbInfo.put(KMManager.KMKey_LanguageID, "en");
+    platformtestKBbInfo.put(KMManager.KMKey_KeyboardName, "platformtest Keyboard");
+    platformtestKBbInfo.put(KMManager.KMKey_LanguageName, "English");
+    platformtestKBbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
+    platformtestKBbInfo.put(KMManager.KMKey_Font, KeyboardFont);
+    KMManager.addKeyboard(this, platformtestKBbInfo);
   }
 
   @Override

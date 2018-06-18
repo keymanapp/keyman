@@ -1,10 +1,16 @@
 # Keyman for Android
 
+## 2018-06-13 10.0.400 beta
+* No changes to Keyman for Android
+
+## 2018-06-11 10.0.399 beta
+* Consolidate Info view (#972)
+* Platform tests (in keyboards) are now consistent across all platforms (#969)
+ 
 ## 2018-06-05 10.0.398 beta
 * Fix globe button for system keyboard (#942)
 
 ## 2018-05-27 10.0.397 beta
-
 * Improve intent-filter for *.kmp extensions (#902)
 
 ## 2018-05-22 10.0.396 beta

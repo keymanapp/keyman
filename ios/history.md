@@ -1,9 +1,18 @@
 # Keyman for iPhone and iPad Version History
 
-## 2018-06-7 10.0.154 beta
+## 2018-06-13 10.0.157 beta
+* Improvements to device rotation (#981)
+
+## 2018-06-12 10.0.156 beta
+* No changes affecting iOS
+
+## 2018-06-11 10.0.155 beta
+* Platform tests (in keyboards) are now consistent across all platforms (#969)
+
+## 2018-06-07 10.0.154 beta
 * Fixed API call to fetch BCP-47 language ids and make keyboard updates more robust (#961)
 
-## 2018-06-6 10.0.147-10.0.153 beta
+## 2018-06-06 10.0.147-10.0.153 beta
 * No actual code changes affecting iOS (#873)
 
 ## 2018-05-18 10.0.146 beta

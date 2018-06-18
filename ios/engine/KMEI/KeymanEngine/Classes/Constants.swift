@@ -58,7 +58,12 @@ public enum Resources {
 }
 
 public enum Util {
-  /// Is the process of a custom keyboard extension.
+  /// Is the process of a custom keyboard extension. Avoid using this
+  /// in most situations as Manager.shared.isSystemKeyboard is more
+  /// reliable in situations where in-app and system keyboard can
+  /// be used in the same app, for example using the Web Browser in
+  /// the Keyman app. However, in initialization scenarios this test
+  /// makes sense.
   public static let isSystemKeyboard: Bool = {
     let infoDict = Bundle.main.infoDictionary
     let extensionInfo = infoDict?["NSExtension"] as? [AnyHashable: Any]

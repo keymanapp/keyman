@@ -579,41 +579,14 @@ BOOL IsMatchingBaseLayout(PWCHAR layoutName)  // I3432
   return bEqual;
 }
 
-#pragma warning(disable: 4996)
 BOOL IsMatchingPlatformString(PWCHAR platform)  // I3432
 {
-  if(_wcsicmp(platform, L"windows") == 0 ||
-     _wcsicmp(platform, L"desktop") == 0 ||
-     _wcsicmp(platform, L"native") == 0) return TRUE;
-
-  PWCHAR t = wcschr(platform, 0) - 1;
-  BOOL OrNewer = (t > platform && *t == L'+');
-  if(OrNewer) *t = 0;
-
-  WORD version;
-  if(_wcsicmp(platform, L"xp") == 0) version = 0x0105;
-  else if(_wcsicmp(platform, L"vista") == 0) version = 0x0006;
-  else if(_wcsicmp(platform, L"seven") == 0) version = 0x0106;
-  else if(_wcsicmp(platform, L"eight") == 0) version = 0x0206;
-  else if(_wcsicmp(platform, L"2000") == 0) version = 0x0005;
-  else if(_wcsicmp(platform, L"2003") == 0) version = 0x0205;
-  else if(_wcsicmp(platform, L"2008") == 0) version = 0x0006;
-  else if(_wcsicmp(platform, L"2008r2") == 0) version = 0x0106;
-  else if(_wcsicmp(platform, L"2012") == 0) version = 0x0206;
-
-  else if(_wcsicmp(platform, L"5.0") == 0) version = 0x0005;
-  else if(_wcsicmp(platform, L"5.1") == 0) version = 0x0105;
-  else if(_wcsicmp(platform, L"5.2") == 0) version = 0x0205;
-  else if(_wcsicmp(platform, L"6.0") == 0) version = 0x0006;
-  else if(_wcsicmp(platform, L"6.1") == 0) version = 0x0106;
-  else if(_wcsicmp(platform, L"6.2") == 0) version = 0x0206;
-
-  else return FALSE;
-
-  return 
-    OrNewer ? LOWORD(GetVersion()) >= version : LOWORD(GetVersion()) == version;
+  return
+    _wcsicmp(platform, L"windows") == 0 ||
+    _wcsicmp(platform, L"desktop") == 0 ||
+    _wcsicmp(platform, L"hardware") == 0 ||
+    _wcsicmp(platform, L"native") == 0;
 }
-#pragma warning(default: 4996)
 
 BOOL IsMatchingPlatform(LPSTORE s)  // I3432
 {
