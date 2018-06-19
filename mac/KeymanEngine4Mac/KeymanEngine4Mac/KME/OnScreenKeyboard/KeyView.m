@@ -13,6 +13,8 @@
 
 CGFloat lw = 1.0;
 CGFloat r = 7.0;
+const NSTimeInterval delayBeforeRepeating = 0.5f;
+const NSTimeInterval repeatInterval = 0.05f;
 
 @interface KeyView ()
 @property (nonatomic, assign) NSUInteger keyCode;
@@ -54,10 +56,6 @@ CGFloat r = 7.0;
     }
     
     return self;
-}
-
-- (void) finalize {
-    [self stopTimer];
 }
 
 - (void)drawRect:(NSRect)rect {
@@ -211,21 +209,34 @@ CGFloat r = 7.0;
 }
 
 - (void)mouseDown:(NSEvent *)theEvent {
-    if (!self.isModifierKey)
-        [self setKeyPressed:YES];
-    [self timerAction:nil];
-    if (!self.isModifierKey)
-        [self startTimerWithTimeInterval:0.5f];
+    @synchronized(self.target) {
+        if (!self.isModifierKey) {
+            // All KeyViews are about to get blown away and recreated, so we don't want the timer to fire
+            // again until some other key gets pressed.
+            [self stopTimer];
+        }
+        else {
+            [self setKeyPressed:YES];
+        }
+        [self processKeyClick];
+        if (!self.isModifierKey)
+            [self startTimerWithTimeInterval:delayBeforeRepeating];
+    }
 }
 
 - (void)mouseUp:(NSEvent *)theEvent {
-    if (!self.isModifierKey)
+    if (!self.isModifierKey) {
         [self setKeyPressed:NO];
-    [self stopTimer];
+        [self stopTimer];
+    }
+}
+
+-(void)processKeyClick {
+    ((void (*)(id, SEL))[self.target methodForSelector:self.action])(self.target, self.action);
 }
 
 - (void)startTimerWithTimeInterval:(NSTimeInterval)interval {
-    @synchronized(self) {
+    @synchronized(self.target) {
         NSLog(@"KeyView TIMER - starting");
         if (_keyEventTimer == nil) {
             // The TimerTarget class and the following two lines allow the timer to hold a *weak*
@@ -243,7 +254,7 @@ CGFloat r = 7.0;
 }
 
 - (void)stopTimer {
-    @synchronized(self) {
+    @synchronized(self.target) {
         NSLog(@"KeyView TIMER - stopping");
         if (_keyEventTimer != nil) {
             [_keyEventTimer invalidate];
@@ -253,12 +264,16 @@ CGFloat r = 7.0;
 }
 
 - (void)timerAction:(NSTimer *)timer {
-    @synchronized(self) {
+    @synchronized(self.target) {
         NSLog(@"KeyView TIMER - Fired");
-        ((void (*)(id, SEL))[self.target methodForSelector:self.action])(self.target, self.action);
-        if ([_keyEventTimer timeInterval] == 0.5f) {
+        [self processKeyClick];
+        
+        if ([timer timeInterval] == delayBeforeRepeating) {
+            // Fired following a normal (non-modifier key press). As long as user continues to hold
+            // down that key, it will now begin to repeat every 0.05 seconds. All we really want to
+            // do is change the time interval, but NSTimer doesn't support that.
             [self stopTimer];
-            [self startTimerWithTimeInterval:0.05f];
+            [self startTimerWithTimeInterval:repeatInterval];
         }
     }
 }
