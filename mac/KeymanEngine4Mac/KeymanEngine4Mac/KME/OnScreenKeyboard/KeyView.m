@@ -237,7 +237,7 @@ const NSTimeInterval repeatInterval = 0.05f;
 
 - (void)startTimerWithTimeInterval:(NSTimeInterval)interval {
     @synchronized(self.target) {
-        NSLog(@"KeyView TIMER - starting");
+        //NSLog(@"KeyView TIMER - starting");
         if (_keyEventTimer == nil) {
             // The TimerTarget class and the following two lines allow the timer to hold a *weak*
             // reference to this KeyView object, so it can be disposed even if there is a timer waiting
@@ -255,7 +255,7 @@ const NSTimeInterval repeatInterval = 0.05f;
 
 - (void)stopTimer {
     @synchronized(self.target) {
-        NSLog(@"KeyView TIMER - stopping");
+        //NSLog(@"KeyView TIMER - stopping");
         if (_keyEventTimer != nil) {
             [_keyEventTimer invalidate];
             _keyEventTimer = nil;
@@ -265,7 +265,7 @@ const NSTimeInterval repeatInterval = 0.05f;
 
 - (void)timerAction:(NSTimer *)timer {
     @synchronized(self.target) {
-        NSLog(@"KeyView TIMER - Fired");
+        //NSLog(@"KeyView TIMER - Fired");
         [self processKeyClick];
         
         if ([timer timeInterval] == delayBeforeRepeating) {
