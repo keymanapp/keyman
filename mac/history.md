@@ -1,5 +1,8 @@
 # Keyman for macOS Version History
 
+## 2018-06-20 10.0.50 beta
+* Fixed problems with OSK timer that caused crashes, e.g., when Shift was pressed (#1013)
+
 ## 2018-06-19 10.0.49 beta
 * Enabled displaying keyboard names in native script in information window (#1001)
 
