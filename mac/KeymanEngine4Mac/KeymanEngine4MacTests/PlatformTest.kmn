@@ -1,0 +1,84 @@
+﻿store(&TARGETS) 'any'
+store(&NAME) 'PlatformTest'
+begin Unicode > use(main)
+
+group(main) using keys 
+
+platform('touch') + [K_P] > ' Touch'
+platform('hardware') + [K_P] > ' Hardware'
++ [K_P] > ' [UI Undefined]'
+
+platform('TOUCH') + [SHIFT K_P] > ' Touch'
+platform('HARDWARE') + [SHIFT K_P] > ' Hardware'
++ [SHIFT K_P] > ' [UI Undefined]'
+
+platform('windows') + [K_O] > ' Windows'
+platform('android') + [K_O] > ' Android'
+platform('iOS') + [K_O] > ' iOS'
+platform('linux') + [K_O] > ' Linux'
+platform('macosx') + [K_O] > ' macOS'
++ [K_O] > ' [OS Undefined]'
+
+platform('WINDOWS') + [SHIFT K_O] > ' Windows'
+platform('ANDROID') + [SHIFT K_O] > ' Android'
+platform('IOS') + [SHIFT K_O] > ' iOS'
+platform('LINUX') + [SHIFT K_O] > ' Linux'
+platform('MacOSX') + [SHIFT K_O] > ' macOS'
++ [SHIFT K_O] > ' [OS Undefined]'
+
+platform('mac') + [K_L] > ' mac'
++ [K_L] > ' [Not a mac]'
+platform('MAC') + [SHIFT K_L] > ' mac'
++ [SHIFT K_L] > ' [Not a mac]'
+platform('macos') + [K_K] > ' macOS'
++ [K_K] > ' [Not macos]'
+platform('MacOS') + [SHIFT K_K] > ' macOS'
++ [SHIFT K_K] > ' [Not macos]'
+
+platform('tablet') + [K_I] > ' Tablet'
+platform('phone') + [K_I] > ' Phone'
+platform('desktop') + [K_I] > ' Desktop'
++ [K_I] > ' [FF Undefined]'
+
+platform('TABLET') + [SHIFT K_I] > ' Tablet'
+platform('Phone') + [SHIFT K_I] > ' Phone'
+platform('DeskTop') + [SHIFT K_I] > ' Desktop'
++ [SHIFT K_I] > ' [FF Undefined]'
+
+platform('web') + [K_U] > ' Web'
+platform('native') + [K_U] > ' Native'
++ [K_U] > ' [Nativeness Undefined]'
+
+platform('Web') + [SHIFT K_U] > ' Web'
+platform('NATIVE') + [SHIFT K_U] > ' Native'
++ [SHIFT K_U] > ' [Nativeness Undefined]'
+
+platform('ie') + [K_Y] > ' IE'
+platform('chrome') + [K_Y] > ' Chrome'
+platform('firefox') + [K_Y] > ' Firefox'
+platform('safari') + [K_Y] > ' Safari'
+platform('opera') + [K_Y] > ' Opera'
++ [K_Y] > ' [Browser Undefined]'
+
+platform('IE') + [SHIFT K_Y] > ' IE'
+platform('Chrome') + [SHIFT K_Y] > ' Chrome'
+platform('FireFox') + [SHIFT K_Y] > ' Firefox'
+platform('Safari') + [SHIFT K_Y] > ' Safari'
+platform('OPERA') + [SHIFT K_Y] > ' Opera'
++ [SHIFT K_Y] > ' [Browser Undefined]'
+
+platform('tablet') + [K_T] > ' Mobile'
+platform('phone') + [K_T] > ' Mobile'
++ [K_T] > ' [Mobile Undefined]'
+
+if(&platform != 'hardware') + [K_X] > ' !Hardware'
+if(&platform != 'touch') + [K_X] > ' !Touch'
++ [K_X] > ' [Inverted rule Failed]'
+
+platform('tablet ie web') + [K_M] > ' tablet ie web'
+platform('touch phone safari web') + [K_M] > ' phone safari web'
+platform('Windows desktop native hardware') + [K_M] > ' Windows desktop native hardware'
+platform('Linux desktop native') + [K_M] > ' Linux desktop native'
+platform('macOS native desktop hardware Safari') + [K_M] > ' macOS native hardware Safari'
+platform('macOS native desktop hardware') + [K_M] > ' macOS native desktop hardware'
++ [K_M] > ' [No match]'
