@@ -11,6 +11,7 @@ implementation
 
 uses
   System.Classes,
+  System.Generics.Collections,
   System.StrUtils,
   System.SysUtils;
 
@@ -25,6 +26,10 @@ var
   s: string;
   items: TArray<string>;
   t: string;
+  dict: TStringList; //not a TDictionary because we want sorted keys
+  n: Integer;
+  lang: string;
+  vi: TStringList;
 begin
   FAllTags := TStringList.Create;
   try
@@ -56,22 +61,65 @@ begin
       FResult.Add('class procedure TLibPalasoAllTagsMap.Fill(dict: TDictionary<string,TArray<string>>);');
       FResult.Add('begin');
 
-      for i := 0 to FAllTags.Count - 1 do
-      begin
-        // Line format: ignore '*'
-        s := FAllTags[i];
-        items := s.Split([' ','=','*'], TStringSplitOptions.ExcludeEmpty);
-        if Length(items) = 0 then
-          Continue;
-        t := Format('  dict.Add(''%s'', [', [items[0]]);
-        for j := 1 to High(items) do
+      dict := TStringList.Create; //' TArray<string,TArray<string>>.Create;
+      try
+        for i := 0 to FAllTags.Count - 1 do
         begin
-          if j > 1 then
-            t := t + ', ';
-          t := t + Format('''%s''', [items[j]]);
+          // Line format: ignore '*'
+          s := FAllTags[i];
+          items := s.Split([' ','=','*'], TStringSplitOptions.ExcludeEmpty);
+          if Length(items) = 0 then
+            Continue;
+
+          n := items[0].IndexOf('-');
+          if n >= 0 then
+          begin
+            // This is a lang-script tag. So we will
+            // strip the basic
+            lang := items[0].Substring(0, n);
+          end
+          else
+          begin
+            lang := items[0];
+            items := Copy(items, 1, Length(items)-1);
+          end;
+
+          n := dict.IndexOf(lang);
+          if n < 0 then
+          begin
+            vi := TStringList.Create;
+            vi.AddStrings(items);
+            dict.AddObject(lang, vi);
+          end
+          else
+          begin
+            vi := dict.Objects[n] as TStringList;
+            vi.AddStrings(items);
+          end;
         end;
-        t := t + ']);';
-        FResult.Add(t);
+
+        for i := 0 to dict.Count - 1 do
+        begin
+          t := Format('  dict.Add(''%s'', [', [dict[i]]);
+
+          vi := dict.Objects[i] as TStringList;
+          for j := 0 to vi.Count - 1 do
+          begin
+            if j > 0 then
+            begin
+              t := t + ', ';
+              if (j mod 8) = 0 then
+                t := t + #13#10;
+            end;
+            t := t + Format('''%s''', [vi[j]]);
+          end;
+          vi.Free;
+
+          t := t + ']);';
+          FResult.Add(t);
+        end;
+      finally
+        dict.Free;
       end;
 
       FResult.Add('end;');
