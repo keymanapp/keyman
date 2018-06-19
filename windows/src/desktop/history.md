@@ -1,5 +1,15 @@
 # Keyman Desktop Version History
 
+## 2018-06-20 10.0.1110.0 beta
+* Removes obsolete "Getting Started" links (#1004)
+
+## 2018-06-19 10.0.1109.0 beta
+* Fixes api IKeymanControl::OpenConfiguration (#995)
+* Fixes some side effects when installing a keyboard (#997)
+
+## 2018-06-15 10.0.1108.0 beta
+* No changes in Keyman Desktop
+
 ## 2018-06-13 10.0.1107.0 beta
 * Add Unicode 11.0 characters
 
