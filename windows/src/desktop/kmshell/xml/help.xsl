@@ -158,11 +158,6 @@
 					</div>
 
 					<div id="help">
-						<div>
-							<a href="javascript:location.href='keyman:opentutorial'">
-								<xsl:value-of select="$locale/String[@Id='S_Help_Tutorial']" />
-							</a>
-						</div>
 						<xsl:if test="/Keyman/Keyboard">
 							<div>
 								<a href="javascript:location.href='keyman:openkeyboardhelp'">
