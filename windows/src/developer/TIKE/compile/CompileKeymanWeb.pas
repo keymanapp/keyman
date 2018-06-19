@@ -756,8 +756,17 @@ var
     for I := 1 to Index-1 do
     begin
       recContext := ExpandSentinel(pwszContext);
-      if recContext.IsSentinel and (recContext.Code in [CODE_DEADKEY, CODE_NUL, CODE_IFOPT, CODE_IFSYSTEMSTORE]) then
-        Dec(Result);
+
+      if IsKeyboardVersion10OrLater then
+      begin
+        if recContext.IsSentinel and (recContext.Code in [CODE_NUL, CODE_IFOPT, CODE_IFSYSTEMSTORE]) then
+          Dec(Result);
+      end
+      else
+      begin
+        if recContext.IsSentinel and (recContext.Code in [CODE_DEADKEY, CODE_NUL, CODE_IFOPT, CODE_IFSYSTEMSTORE]) then
+          Dec(Result);
+      end;
       pwszContext := incxstr(pwszContext);
     end;
   end;

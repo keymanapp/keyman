@@ -1,7 +1,8 @@
 # Keyman Developer Version History
 
 ## 2018-06-20 10.0.1110.0 beta
-* No changes to Keyman Developer
+* Script subtags are now appended for more scripts in the Keyboard languages dialog (#1006)
+* KeymanWeb 10.0 compiler now computes indexes correctly when deadkey and any used in a secondary group (#1008)
 
 ## 2018-06-19 10.0.1109.0 beta
 * No changes to Keyman Developer
