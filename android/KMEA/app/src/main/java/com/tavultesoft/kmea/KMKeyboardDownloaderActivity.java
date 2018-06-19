@@ -44,7 +44,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
   public static final String ARG_URL = "KMKeyboardActivity.url";
   public static final String ARG_FILENAME = "KMKeyboardActivity.filename";
 
-  public static final String kKeymanApiBaseURL = "https://api.keyman.com/cloud/3.0/";
+  public static final String kKeymanApiBaseURL = "https://api.keyman.com/cloud/3.0/languages";
   public static final String kKeymanApiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url=";
 
   // Keyman public keys
@@ -191,7 +191,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
           remoteUrl = url;
         } else {
           // Keyman cloud
-          remoteUrl = String.format("%slanguages/%s/%s?version=%s&device=%s", kKeymanApiBaseURL, langID, kbID, BuildConfig.VERSION_NAME, deviceType);
+          remoteUrl = String.format("%s/%s/%s?version=%s&device=%s&languageidtype=bcp47", kKeymanApiBaseURL, langID, kbID, BuildConfig.VERSION_NAME, deviceType);
         }
 
         ret = downloadNonKMPKeyboard(remoteUrl);

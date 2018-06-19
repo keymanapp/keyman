@@ -363,8 +363,9 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
           } else {
             deviceType = "androidphone";
           }
-
-          jsonObj = jsonParser.getJSONObjectFromUrl(KMKeyboardDownloaderActivity.kKeymanApiBaseURL + "languages?version=" +  BuildConfig.VERSION_NAME + "&device=" + deviceType);
+          String remoteUrl = String.format("%s?version=%s&device=%s&languageidtype=bcp47",
+            KMKeyboardDownloaderActivity.kKeymanApiBaseURL, BuildConfig.VERSION_NAME, deviceType);
+          jsonObj = jsonParser.getJSONObjectFromUrl(remoteUrl);
         } catch (Exception e) {
           jsonObj = null;
         }
