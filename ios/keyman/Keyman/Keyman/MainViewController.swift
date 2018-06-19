@@ -795,7 +795,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if let urlString = params["url"] {
       // Download and set custom keyboard
       guard let url = URL(string: urlString) else {
-        appDelegate.showSimpleAlert(title: "Custom Keyboard", message: "The keyboard could not be installed: Invalid Url")
+        appDelegate.showSimpleAlert(title: "Custom Keyboard",
+                                    message: "The keyboard could not be installed: Invalid Url")
         launchUrl = nil
         return
       }
@@ -906,28 +907,28 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: keyboard.languageID, isUpdate: false)
     }
   }
-  
+
   private func handleUserDecisionAboutInstallingProfile(withAction action: UIAlertAction) {
     if let profileName = profileName {
       checkedProfiles.append(profileName)
       let userData = AppDelegate.activeUserDefaults()
       userData.set(checkedProfiles, forKey: checkedProfilesKey)
       userData.synchronize()
-      
-      if (action.style == .default) {
+
+      if action.style == .default {
         UIApplication.shared.openURL(URL(string: "\(baseUri)\(profileName)")!)
       }
       self.profileName = nil
     }
   }
-  
+
   private func proceedWithCustomKeyboardDownload(withAction action: UIAlertAction) {
     if let url = customKeyboardToDownload {
       Manager.shared.downloadKeyboard(from: url)
     }
     showGetStartedIfNeeded(withAction: action)
   }
-  
+
   private func showGetStartedIfNeeded(withAction action: UIAlertAction) {
     if shouldShowGetStarted {
       showGetStartedView(nil)
