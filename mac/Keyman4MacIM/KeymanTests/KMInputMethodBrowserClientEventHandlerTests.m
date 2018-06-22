@@ -1,5 +1,5 @@
 //
-//  KeymanTests.m
+//  KMInputMethodBrowserClientEventHandlerTests.m
 //  KeymanTests
 //
 //  Created by tom on 1/25/18.
@@ -7,6 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import "TestAppDelegate.h"
 #import "KMInputMethodBrowserClientEventHandler.h"
 #import "KMInputMethodEventHandlerProtected.h"
 #import <OCMock/OCMock.h>
@@ -20,10 +21,12 @@ KMInputMethodBrowserClientEventHandler * _im;
 
 - (void)setUp {
     [super setUp];
+    TestAppDelegate *delegate = [[TestAppDelegate alloc] init];
+    [[NSApplication sharedApplication] setDelegate:delegate];
     // Put setup code here. This method is called before the invocation of each test method in the class.
     NSString *path = [[NSBundle bundleForClass:[KeymanTests class]] pathForResource:@"SimpleTest.kmx" ofType:nil];
     KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
-    [((KMInputMethodAppDelegate *)[NSApp delegate]) setKmx:kmxFile];
+    [delegate setKmx:kmxFile];
     _im = [[KMInputMethodBrowserClientEventHandler alloc] init];
 }
 
@@ -49,6 +52,7 @@ KMInputMethodBrowserClientEventHandler * _im;
     }
     NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSZeroPoint modifierFlags:0 timestamp:NSTimeIntervalSince1970 windowNumber:0 context:nil characters:@"a" charactersIgnoringModifiers:@"a" isARepeat:NO keyCode:0];
     [_im handleEvent:event client:client];
+    [client verify];
 }
 
 @end

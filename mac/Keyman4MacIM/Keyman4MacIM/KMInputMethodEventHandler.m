@@ -102,6 +102,8 @@ NSRange _previousSelRange;
             NSLog(@"  _keyCodeOfOriginalEvent = %hu", _keyCodeOfOriginalEvent);
         }
         _numberOfPostedDeletesToExpect = 0;
+        // If _sourceFromOriginalEvent != nil, we should probably attempt to release and clear it.
+        // [self dealloc]
         _pendingBuffer = nil;
         _keyCodeOfOriginalEvent = 0;
     }
