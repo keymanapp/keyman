@@ -1,4 +1,4 @@
-//
+a//
 //  KMInputMethodEventHandler.m
 //  Keyman4MacIM
 //
@@ -527,10 +527,10 @@ NSRange _previousSelRange;
             if ([self.AppDelegate debugMode])
                 NSLog(@"Deleted %li null characters from context buffer", nc);
             // This can presumably only happen if a previous event resulted in a chain of
-            // actions that had a Q_BACK not followed by a Q_STR (assuming that can happen).
+            // actions that had a Q_BACK not followed by a Q_STR.
             // REVIEW: Need to test this scenario in Atom and Googe Docs in Safari
             self.willDeleteNullChar = YES;
-            [self postDeleteBack:nc for:event];
+            [self postDeleteBacks:nc for:event];
             _keyCodeOfOriginalEvent = event.keyCode;
             
             return YES;
@@ -718,7 +718,7 @@ NSRange _previousSelRange;
     if (pos >= n) {
         // n is now the number of delete-backs we need to post (plus one more if there is selected text)
         if ([self.AppDelegate debugMode]) {
-            NSLog(@"Legacy mode: calling postDeleteBack");
+            NSLog(@"Legacy mode: calling postDeleteBacks");
             if (_clientCanProvideSelectionInfo == No || _clientCanProvideSelectionInfo == Unreliable)
                 NSLog(@"Cannot trust client to report accurate selection length - assuming no selection.");
         }
@@ -735,7 +735,7 @@ NSRange _previousSelRange;
         
         if (_clientCanProvideSelectionInfo == Yes && selectedRange.length > 0)
             n++; // First delete-back will delete the existing selection.
-        [self postDeleteBack:n for:event];
+        [self postDeleteBacks:n for:event];
         
         CFRelease(_sourceFromOriginalEvent);
         _sourceFromOriginalEvent = nil;
@@ -760,22 +760,14 @@ NSRange _previousSelRange;
     CFRelease(keyUpEvent);
 }
 
-- (void)postDeleteBack:(NSUInteger)count for:(NSEvent *) event {
+- (void)postDeleteBacks:(NSUInteger)count for:(NSEvent *) event {
     _numberOfPostedDeletesToExpect = count;
-    CGEventRef ev;
+    
     _sourceFromOriginalEvent = CGEventCreateSourceFromEvent([event CGEvent]);
     
     for (int db = 0; db < count; db++)
     {
-        if ([self.AppDelegate debugMode])
-            NSLog(@"Posting a delete (down/up) at kCGHIDEventTap.");
-        
-        ev = CGEventCreateKeyboardEvent (_sourceFromOriginalEvent, kVK_Delete, true);//delete-back down
-        CGEventPost(kCGHIDEventTap, ev);
-        CFRelease(ev);
-        ev = CGEventCreateKeyboardEvent (_sourceFromOriginalEvent, kVK_Delete, false); //delete-back up
-        CGEventPost(kCGHIDEventTap, ev);
-        CFRelease(ev);
+        [self.AppDelegate postKeyboardEventWithSource:_sourceFromOriginalEvent code:kVK_Delete];
     }
 }
 

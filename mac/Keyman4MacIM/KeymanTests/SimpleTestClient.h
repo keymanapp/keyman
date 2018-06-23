@@ -15,6 +15,7 @@
 - (instancetype)init;
 - (instancetype)initWithString:(NSString *)contents;
 - (void)handeEventIfNotHandledBy: (KMInputMethodEventHandler *) im event:(NSEvent *)event;
+- (NSString *) getResult;
 @end
 
 #endif /* SimpleTestClient_h */

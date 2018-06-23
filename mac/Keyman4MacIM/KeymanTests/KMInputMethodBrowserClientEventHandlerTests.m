@@ -13,7 +13,7 @@
 #import <OCMock/OCMock.h>
 
 @interface KeymanTests : XCTestCase
-
+@property (nonatomic, strong) TestAppDelegate * delegate;
 @end
 
 @implementation KeymanTests
@@ -21,12 +21,12 @@ KMInputMethodBrowserClientEventHandler * _im;
 
 - (void)setUp {
     [super setUp];
-    TestAppDelegate *delegate = [[TestAppDelegate alloc] init];
-    [[NSApplication sharedApplication] setDelegate:delegate];
+    _delegate = [[TestAppDelegate alloc] init];
+    [[NSApplication sharedApplication] setDelegate:_delegate];
     // Put setup code here. This method is called before the invocation of each test method in the class.
     NSString *path = [[NSBundle bundleForClass:[KeymanTests class]] pathForResource:@"SimpleTest.kmx" ofType:nil];
     KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
-    [delegate setKmx:kmxFile];
+    [_delegate setKmx:kmxFile];
     _im = [[KMInputMethodBrowserClientEventHandler alloc] init];
 }
 
@@ -50,7 +50,7 @@ KMInputMethodBrowserClientEventHandler * _im;
     {
         [_im checkContextIn:client];
     }
-    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSZeroPoint modifierFlags:0 timestamp:NSTimeIntervalSince1970 windowNumber:0 context:nil characters:@"a" charactersIgnoringModifiers:@"a" isARepeat:NO keyCode:0];
+    NSEvent *event = [_delegate keyStrokeEventForCharacter: @"a"];
     [_im handleEvent:event client:client];
     [client verify];
 }

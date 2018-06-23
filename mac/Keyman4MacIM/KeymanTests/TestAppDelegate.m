@@ -47,4 +47,11 @@
     return YES;
 }
 
+-(NSEvent *)keyStrokeEventForCharacter:(NSString *)character {
+    return [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSZeroPoint modifierFlags:0 timestamp:NSTimeIntervalSince1970 windowNumber:0 context:nil characters:character charactersIgnoringModifiers:character isARepeat:NO keyCode:0];
+}
+
+- (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey{
+    _virtualKeyPosted = virtualKey;
+}
 @end

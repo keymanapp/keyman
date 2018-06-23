@@ -108,6 +108,7 @@ extern NSString *const kWebSite;
 - (NSDictionary *)infoDictionaryFromFile:(NSString *)infoFile;
 - (NSString *)kvkFilePathFromFilename:(NSString *)kvkFilename;
 - (NSString *)oskWindowTitle;
+- (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey;
 
 @end
 

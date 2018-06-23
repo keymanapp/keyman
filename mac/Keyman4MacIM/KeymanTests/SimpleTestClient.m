@@ -51,4 +51,8 @@ NSMutableString * _contents;
 - (NSInteger)length {
     return (NSInteger)_contents.length;
 }
+
+- (NSString *) getResult {
+    return _contents;
+}
 @end
