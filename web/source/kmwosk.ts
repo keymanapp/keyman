@@ -2863,8 +2863,8 @@ if(!window['keyman']['initialized']) {
       for(k = 0; k < t.childNodes.length; k++)
       {
         if(t.childNodes[k].firstChild.className.indexOf('key-hidden') >= 0) continue;
-        x1 = t.childNodes[k].firstChild.offsetLeft;
-        x2 = x1 + t.childNodes[k].firstChild.offsetWidth;
+        x1 = t.childNodes[k].offsetLeft;
+        x2 = x1 + t.childNodes[k].offsetWidth;
         dx =x1 - x;
         if(dx >= 0 && dx < dxMin)
         {
@@ -2878,7 +2878,7 @@ if(!window['keyman']['initialized']) {
       }
       if(dxMin < 100000)
       {
-        t = t.childNodes[k0].firstChild;
+        t = t.childNodes[k0];
         x1 = t.offsetLeft;
         x2 = x1 + t.offsetWidth;
 
@@ -2886,7 +2886,7 @@ if(!window['keyman']['initialized']) {
         if(t.offsetWidth > 40) dxMax = 0.6 * t.offsetWidth;
         if(((x1 - x) >= 0 && (x1 - x) < dxMax) ||
             ((x - x2) >= 0 && (x - x2) < dxMax))
-          return t;
+          return t.firstChild;
       }
       return null;
     }
