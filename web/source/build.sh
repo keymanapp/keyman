@@ -253,6 +253,7 @@ while [[ $# -gt 0 ]] ; do
             BUILD_COREWEB=false
             BUILD_FULLWEB=false
             BUILD_DEBUG_EMBED=true
+            DO_MINIFY=false
             ;;
         -h|-?)
             display_usage
@@ -280,7 +281,7 @@ if [ $FULL_BUILD = true ]; then
 fi
 
 
-if [ $BUILD_EMBED = true ]; then
+if [ $BUILD_EMBED = true ] || [ $BUILD_DEBUG_EMBED = true ]; then
     echo Compile KMEI/KMEA build $BUILD
 
     $compilecmd -p $NODE_SOURCE/tsconfig.embedded.json
@@ -390,6 +391,7 @@ fi
 
 if [ $BUILD_DEBUG_EMBED = true ]; then
     # Copy the sourcemap.
+    cp $INTERMEDIATE/keyman.js $EMBED_OUTPUT/keyman.js
     cp $INTERMEDIATE/keyman.js.map $EMBED_OUTPUT/keyman.js.map
-    echo Uncompiled embedded application saved as keyman.js
+    echo Uncompiled embedded application saved as $EMBED_OUTPUT/keyman.js
 fi

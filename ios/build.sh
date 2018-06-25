@@ -141,7 +141,9 @@ update_bundle ( ) {
         cp resources/osk/kmwosk.css        "$base_dir/$BUNDLE_PATH/kmwosk.css"
         cp resources/osk/keymanweb-osk.ttf "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
         cp keyman.js                       "$base_dir/$BUNDLE_PATH/keymanios.js"
-
+        if [ "$CONFIG" == "Debug" ]; then
+          cp keyman.js.map "$base_dir/$BUNDLE_PATH/keyman.js.map"
+        fi
         cd $base_dir
     fi
 }
