@@ -112,15 +112,26 @@
         "</html>";
         
         NSString *pBodyFormat = @"<p class='body'>%@</p><br>";
-        NSArray *kbs = [self.infoDict objectForKey:kKeyboard];
         NSMutableString *kbsStr = [NSMutableString stringWithString:@""];
+        NSArray *kbs = [[self AppDelegate] keyboardNamesFromFolder:self.packagePath];
         if (kbs != nil && kbs.count) {
-            for (NSArray *kb in kbs) {
-                [kbsStr appendString:[NSString stringWithFormat:pBodyFormat, [kb objectAtIndex:0]]];
+            for (NSArray *kbName in kbs) {
+                [kbsStr appendString:[NSString stringWithFormat:pBodyFormat, kbName]];
             }
         }
         else {
-            kbsStr = [NSMutableString stringWithString:@"<p class='body'><none></p><br>"];
+            // This was the old logic (prior to fixing issue #994). Keeping as fallback, though
+            // it's unlikely to be useful/needed.
+            kbs = [self.infoDict objectForKey:kKeyboard];
+        
+            if (kbs != nil && kbs.count) {
+                for (NSArray *kb in kbs) {
+                    [kbsStr appendString:[NSString stringWithFormat:pBodyFormat, [kb objectAtIndex:0]]];
+                }
+            }
+            else {
+                kbsStr = [NSMutableString stringWithString:@"<p class='body'><none></p><br>"];
+            }
         }
         
         NSArray *fonts = [self.infoDict objectForKey:kFont];

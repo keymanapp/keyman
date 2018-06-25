@@ -27,11 +27,20 @@ NSString *const Q_RETURN = @"Q_RETURN";
 DWORD VKMap[0x80];
 
 @interface KMEngine ()
++ (NSRegularExpression *)regexPlatform;
 @property (strong, nonatomic) NSMutableString *tmpCtxBuf;
 @property (strong, nonatomic) NSMutableArray *indexStack;
 @end
 
 @implementation KMEngine
+
++ (NSRegularExpression *)regexPlatform {
+    static NSRegularExpression *regex = nil;
+    if (regex == nil) {
+        regex = [NSRegularExpression regularExpressionWithPattern:@"(\\b(((mac(os)?)x?)|(native)|(hardware)|(desktop)) *)*" options:NSRegularExpressionCaseInsensitive error:nil];
+    }
+    return regex;
+}
 
 NSMutableString* _easterEggForCrashlytics = nil;
 const NSString* kEasterEggText = @"Cr@shlyt!cs crash#KME";
@@ -788,14 +797,19 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     DWORD x2 = [keyCtx characterAtIndex:i+3]-1;
                     DWORD x3 = [keyCtx characterAtIndex:i+4]-1;
                     KMCompStore *store = [self.kmx.store objectAtIndex:x3];
-                    if (x1 == TSS_PLATFORM && x2 == EQUAL) {
-                        if ([self checkPlatform:store.string])
+                    if (x1 == TSS_PLATFORM) {
+                        BOOL platformMatches = [self checkPlatform:store.string];
+                        if ((platformMatches && (x2 == EQUAL)) ||
+                            (!platformMatches && (x2 == NOT_EQUAL))) {
                             checkPlatform = YES;
-                        else
+                        }
+                        else {
                             return 0;
+                        }
                     }
-                    else
+                    else {
                         return 0; // CODE_IFSYSTEMSTORE is not supported except TSS_PLATFORM
+                    }
                     
                     i+=5;
                     break;
@@ -867,37 +881,9 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 }
 
 - (BOOL)checkPlatform:(NSString *)platform {
-    NSArray *values = [platform componentsSeparatedByString:@" "];
-    for (NSString *value in values) {
-        if ([value isEqualToString:@"touch"])
-            return NO;
-        else if ([value isEqualToString:@"windows"])
-            return NO;
-        else if ([value isEqualToString:@"android"])
-            return NO;
-        else if ([value isEqualToString:@"ios"])
-            return NO;
-        else if ([value isEqualToString:@"linux"])
-            return NO;
-        else if ([value isEqualToString:@"tablet"])
-            return NO;
-        else if ([value isEqualToString:@"phone"])
-            return NO;
-        else if ([value isEqualToString:@"web"])
-            return NO;
-        else if ([value isEqualToString:@"ie"])
-            return NO;
-        else if ([value isEqualToString:@"chrome"])
-            return NO;
-        else if ([value isEqualToString:@"firefox"])
-            return NO;
-        else if ([value isEqualToString:@"safari"])
-            return NO;
-        else if ([value isEqualToString:@"opera"])
-            return NO;
-    }
-    
-    return YES;
+    NSRange wholeString = NSMakeRange(0, [platform length]);
+    NSRange firstMatchRange = [[KMEngine regexPlatform] rangeOfFirstMatchInString:platform options:NSMatchingAnchored range:wholeString];
+    return (firstMatchRange.length == wholeString.length);
 }
 
 // Creates a VK map to convert Mac VK codes to Windows VK codes

@@ -388,7 +388,7 @@ end;
 
 procedure TKeymanControl.OpenConfiguration;
 begin
-  RunKeymanConfiguration('');
+  RunKeymanConfiguration('-c');
 end;
 
 procedure TKeymanControl.OpenDiagnostics;

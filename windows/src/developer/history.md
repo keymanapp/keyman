@@ -1,5 +1,15 @@
 # Keyman Developer Version History
 
+## 2018-06-20 10.0.1110.0 beta
+* Script subtags are now appended for more scripts in the Keyboard languages dialog (#1006)
+* KeymanWeb 10.0 compiler now computes indexes correctly when deadkey and any used in a secondary group (#1008)
+
+## 2018-06-19 10.0.1109.0 beta
+* No changes to Keyman Developer
+
+## 2018-06-15 10.0.1108.0 beta
+* No changes to Keyman Developer
+
 ## 2018-06-13 10.0.1107.0 beta
 * Add Unicode 11.0 characters
 

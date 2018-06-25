@@ -4335,10 +4335,22 @@ if(!window['keyman']['initialized']) {
         // TODO: are these needed, or do they interfere with other OSK event handling ????
         if(device.touchable) // I3363 (Build 301)
         {
-          util.attachDOMEvent(osk._Box,'touchstart',function(e){keymanweb.uiManager.setActivatingUI(true); e.preventDefault();e.stopPropagation();});
-          util.attachDOMEvent(osk._Box,'touchend',function(e){e.preventDefault(); e.stopPropagation();});
-          util.attachDOMEvent(osk._Box,'touchmove',function(e){e.preventDefault();e.stopPropagation();});
-          util.attachDOMEvent(osk._Box,'touchcancel',function(e){e.preventDefault();e.stopPropagation();});
+          var cancelEventFunc = function(e) {
+            if(e.cancelable) {
+              e.preventDefault();
+            }
+            e.stopPropagation();
+            return false;
+          };
+          
+          util.attachDOMEvent(osk._Box, 'touchstart', function(e) {
+            keymanweb.uiManager.setActivatingUI(true); 
+            return cancelEventFunc(e);
+          });
+          
+          util.attachDOMEvent(osk._Box, 'touchend', cancelEventFunc);
+          util.attachDOMEvent(osk._Box, 'touchmove', cancelEventFunc);
+          util.attachDOMEvent(osk._Box, 'touchcancel', cancelEventFunc);
 
           // Can only get (initial) viewport scale factor after page is fully loaded!
           osk.vpScale=util.getViewportScale();

@@ -104,6 +104,7 @@ extern NSString *const kWebSite;
 - (NSInteger)indexForPackageFolder:(NSString *)packageFolder;
 - (NSString *)packageFolderFromPath:(NSString *)path;
 - (NSString *)packageNameFromFolder:(NSString *)packageFolder;
+- (NSArray *)keyboardNamesFromFolder:(NSString *)packageFolder;
 - (NSDictionary *)infoDictionaryFromFile:(NSString *)infoFile;
 - (NSString *)kvkFilePathFromFilename:(NSString *)kvkFilename;
 - (NSString *)oskWindowTitle;

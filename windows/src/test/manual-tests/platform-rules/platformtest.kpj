@@ -20,11 +20,10 @@
       <ID>id_18e336f9ad890bf821ff56e1a7764478</ID>
       <Filename>platformtest.kps</Filename>
       <Filepath>platformtest.kps</Filepath>
-      <FileVersion>1.0</FileVersion>
+      <FileVersion></FileVersion>
       <FileType>.kps</FileType>
       <Details>
         <Name>PlatformTest</Name>
-        <Version>1.0</Version>
       </Details>
     </File>
     <File>

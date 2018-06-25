@@ -171,6 +171,7 @@ begin
   if root.NodeName <> 'KeymanDeveloperProjectUser' then
     raise EProjectLoader.Create('Not a Keyman Developer project .user file');
 
+  // TODO: refactor with similar code in ProjectFileUI.TProjectUI.Render
   FStandardTemplatePath := ConvertPathToFileURL(FProject.StandardTemplatePath);
   FStringsTemplatePath := ConvertPathToFileURL(FProject.StringsTemplatePath);
   if (root.ChildValues['templatepath'] <> FStandardTemplatePath) or (root.ChildValues['stringspath'] <> FStringsTemplatePath) then

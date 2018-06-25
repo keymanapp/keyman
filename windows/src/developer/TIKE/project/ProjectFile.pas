@@ -142,8 +142,8 @@ type
     function Load: Boolean; virtual;   // I4694
     function Save: Boolean; virtual;   // I4694
 
-    function StandardTemplatePath: string;
-    function StringsTemplatePath: string;
+    class function StandardTemplatePath: string;
+    class function StringsTemplatePath: string;
 
     function GetTargetFilename(ATargetFile, ASourceFile, AVersion: string): string;   // I4688
 
@@ -918,12 +918,12 @@ begin
   Result := Result + ExtractFileName(ATargetFile);
 end;
 
-function TProject.StandardTemplatePath: string; //(const FileName: string): string;
+class function TProject.StandardTemplatePath: string; //(const FileName: string): string;
 begin
   Result := StringsTemplatePath; // GetXMLTemplatePath + 'project\';
 end;
 
-function TProject.StringsTemplatePath: string;
+class function TProject.StringsTemplatePath: string;
 begin
   Result := ExtractFilePath(ParamStr(0)) + 'locale\' + 'en';  // I2595
   if FileExists(Result + '\xml\project\project.xsl') then

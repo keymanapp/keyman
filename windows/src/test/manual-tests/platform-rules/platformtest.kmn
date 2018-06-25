@@ -88,7 +88,6 @@ c O: Operating system
 
 platform('windows') + [K_O] > ' Windows'
 platform('android') + [K_O] > ' Android'
-platform('edge') + [K_O] > ' Edge'
 platform('ios') + [K_O] > ' iOS'
 platform('macosx') + [K_O] > ' OSX'
 platform('linux') + [K_O] > ' Linux'
@@ -111,6 +110,7 @@ c Y: Test browser (should only return value on web)
 
 platform('ie') + [K_Y] > ' IE'
 platform('chrome') + [K_Y] > ' Chrome'
+platform('edge') + [K_Y] > ' Edge'
 platform('firefox') + [K_Y] > ' Firefox'
 platform('safari') + [K_Y] > ' Safari'
 platform('opera') + [K_Y] > ' Opera'

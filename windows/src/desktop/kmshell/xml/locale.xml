@@ -56,7 +56,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   <headerheight>40</headerheight>
 </Dialog>
 
-<String Group="Configuration Dialog" Type="PlainText" Id="S_Caption_GettingStarted" Version="7.0.239.0" Description="Configuration dialog link to Getting Started">Getting Started</String>
 <String Group="Configuration Dialog" Type="PlainText" Id="S_Caption_Help" Version="7.0.239.0" Description="Configuration dialog link to Help">Help</String>
 
 <!-- Tab names and shortcut keys -->  
@@ -406,7 +405,6 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 
 <Dialog Id="Help" Width="450" Height="300"></Dialog>
 <String Group="Help Dialog" Type="PlainText" Id="S_HelpTitle" Version="7.0.230.0" Description="Help - product name help">&Name; Help</String>
-<String Group="Help Dialog" Type="PlainText" Id="S_Help_Tutorial" Version="7.0.230.0" Description="Help - getting started tutorial name">Get Started</String>
 <String Group="Help Dialog" Type="PlainText" Id="S_Help_Product" Version="7.0.230.0" Description="Help - help contents link title">Help Contents</String>
 
 <String Group="Help Dialog" Type="PlainText" Id="S_Help_Keyboard_Prefix" Version="7.0.230.0" Description="Help - text preceding keyboard name">Help on "</String>
@@ -451,7 +449,6 @@ keyboard layout for your language.</String>
 
 <String Group="Usage Page" Type="PlainText" Id="S_Usage_Welcome" Version="7.0.244.0" Description="Usage page - keyboard help button">Keyboard Help</String>
 <String Group="Usage Page" Type="PlainText" Id="S_Usage_OSK" Version="7.0.244.0" Description="Usage page - On Screen Keyboard button">On Screen Keyboard</String>
-<String Group="Usage Page" Type="PlainText" Id="S_Usage_Tutorial" Version="7.0.244.0" Description="Usage page - Getting Started button">Get Started</String>
 <String Group="Usage Page" Type="PlainText" Id="S_Usage_Help" Version="7.0.244.0" Description="Usage page - Product Help button">&Name; Help</String>
 <String Group="Usage Page" Type="PlainText" Id="S_Usage_Config" Version="7.0.244.0" Description="Usage page - Product Configuration button">&Name; Configuration</String>
 <String Group="Usage Page" Type="HTML" Id="S_Usage_KeyboardNoDocumentation" Version="7.1.261.0" Description="Usage page - Text shown when keyboard has no documentation">This keyboard layout has no Getting Started or Usage documentation. Please check the Start Menu or contact the keyboard developer for more information on how to use this keyboard layout.</String>
