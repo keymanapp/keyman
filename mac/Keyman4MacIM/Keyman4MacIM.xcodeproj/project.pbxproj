@@ -49,6 +49,8 @@
 		98FE105E1B4DE8F400525F54 /* NSWindow+SuppMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 98FE105D1B4DE8F400525F54 /* NSWindow+SuppMethods.m */; };
 		98FE10631B4DEE5600525F54 /* KMInfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98FE10611B4DEE5600525F54 /* KMInfoWindowController.m */; };
 		98FE10641B4DEE5600525F54 /* KMInfoWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98FE10621B4DEE5600525F54 /* KMInfoWindowController.xib */; };
+		E211769D20E182DD00F8065D /* NoContextTestClient.m in Sources */ = {isa = PBXBuildFile; fileRef = E211769C20E182DD00F8065D /* NoContextTestClient.m */; };
+		E21176A020E18C5200F8065D /* AppleCompliantTestClient.m in Sources */ = {isa = PBXBuildFile; fileRef = E211769F20E18C5200F8065D /* AppleCompliantTestClient.m */; };
 		E211CCF620B600A500505C36 /* KeymanEngine4Mac.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = E211CCF520B600A500505C36 /* KeymanEngine4Mac.framework.dSYM */; };
 		E21291A920A4DD680049790C /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291A820A4DD680049790C /* Crashlytics.framework */; };
 		E21291AB20A4DDE70049790C /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291AA20A4DDE70049790C /* Fabric.framework */; };
@@ -71,7 +73,7 @@
 		E28914D72024E6220048E71E /* KeymanEngine4Mac.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 984C2B211A79DF1B0023F89D /* KeymanEngine4Mac.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E28914D92028A78C0048E71E /* OCMock.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E28914D82028A78C0048E71E /* OCMock.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E29F22F4201A59B1005EA234 /* KMInputMethodBrowserClientEventHandlerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E29F22F3201A59B1005EA234 /* KMInputMethodBrowserClientEventHandlerTests.m */; };
-		E2D5529D20DD8E0200D77CFB /* SimpleTestClient.m in Sources */ = {isa = PBXBuildFile; fileRef = E2D5529C20DD8E0200D77CFB /* SimpleTestClient.m */; };
+		E2D5529D20DD8E0200D77CFB /* LegacyTestClient.m in Sources */ = {isa = PBXBuildFile; fileRef = E2D5529C20DD8E0200D77CFB /* LegacyTestClient.m */; };
 		E61216E78B7F03FE755687F1 /* libPods-KeymanTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E7FB3417C46A01721AD32D0 /* libPods-KeymanTests.a */; };
 /* End PBXBuildFile section */
 
@@ -191,6 +193,10 @@
 		98FE10611B4DEE5600525F54 /* KMInfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMInfoWindowController.m; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.m; sourceTree = "<group>"; };
 		98FE10621B4DEE5600525F54 /* KMInfoWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = KMInfoWindowController.xib; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.xib; sourceTree = "<group>"; };
 		9E7FB3417C46A01721AD32D0 /* libPods-KeymanTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KeymanTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E211769B20E1826800F8065D /* NoContextTestClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NoContextTestClient.h; sourceTree = "<group>"; };
+		E211769C20E182DD00F8065D /* NoContextTestClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NoContextTestClient.m; sourceTree = "<group>"; };
+		E211769E20E18C0B00F8065D /* AppleCompliantTestClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleCompliantTestClient.h; sourceTree = "<group>"; };
+		E211769F20E18C5200F8065D /* AppleCompliantTestClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleCompliantTestClient.m; sourceTree = "<group>"; };
 		E211CCF520B600A500505C36 /* KeymanEngine4Mac.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = KeymanEngine4Mac.framework.dSYM; path = Keyman4MacIM/Frameworks/KeymanEngine4Mac.framework.dSYM; sourceTree = "<group>"; };
 		E21291A820A4DD680049790C /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Crashlytics.framework; path = ../../Carthage/Build/Mac/Crashlytics.framework; sourceTree = "<group>"; };
 		E21291AA20A4DDE70049790C /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Fabric.framework; path = ../../Carthage/Build/Mac/Fabric.framework; sourceTree = "<group>"; };
@@ -217,8 +223,8 @@
 		E29F22F3201A59B1005EA234 /* KMInputMethodBrowserClientEventHandlerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodBrowserClientEventHandlerTests.m; sourceTree = "<group>"; };
 		E29F22F5201A59B2005EA234 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E2C92D4720B46CEA00742A7D /* KeymanEngine4Mac.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = KeymanEngine4Mac.framework.dSYM; path = Keyman4MacIM/Frameworks/KeymanEngine4Mac.framework.dSYM; sourceTree = "<group>"; };
-		E2D5529B20DD8D6100D77CFB /* SimpleTestClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimpleTestClient.h; sourceTree = "<group>"; };
-		E2D5529C20DD8E0200D77CFB /* SimpleTestClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SimpleTestClient.m; sourceTree = "<group>"; };
+		E2D5529B20DD8D6100D77CFB /* LegacyTestClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LegacyTestClient.h; sourceTree = "<group>"; };
+		E2D5529C20DD8E0200D77CFB /* LegacyTestClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LegacyTestClient.m; sourceTree = "<group>"; };
 		FA67C64E3D2743D2BCF46ED1 /* Pods-KeymanTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KeymanTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-KeymanTests/Pods-KeymanTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -489,8 +495,12 @@
 				E29F22F5201A59B2005EA234 /* Info.plist */,
 				E2585A8220DD7D3F00CBB994 /* TestAppDelegate.h */,
 				E2585A8020DD7CF100CBB994 /* TestAppDelegate.m */,
-				E2D5529B20DD8D6100D77CFB /* SimpleTestClient.h */,
-				E2D5529C20DD8E0200D77CFB /* SimpleTestClient.m */,
+				E2D5529B20DD8D6100D77CFB /* LegacyTestClient.h */,
+				E2D5529C20DD8E0200D77CFB /* LegacyTestClient.m */,
+				E211769B20E1826800F8065D /* NoContextTestClient.h */,
+				E211769C20E182DD00F8065D /* NoContextTestClient.m */,
+				E211769E20E18C0B00F8065D /* AppleCompliantTestClient.h */,
+				E211769F20E18C5200F8065D /* AppleCompliantTestClient.m */,
 			);
 			path = KeymanTests;
 			sourceTree = "<group>";
@@ -725,10 +735,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E2D5529D20DD8E0200D77CFB /* SimpleTestClient.m in Sources */,
+				E211769D20E182DD00F8065D /* NoContextTestClient.m in Sources */,
+				E2D5529D20DD8E0200D77CFB /* LegacyTestClient.m in Sources */,
 				E29F22F4201A59B1005EA234 /* KMInputMethodBrowserClientEventHandlerTests.m in Sources */,
 				E28914D52024E3DF0048E71E /* KMInputMethodBrowserClientEventHandler.m in Sources */,
 				E2585A7D20DD68BA00CBB994 /* KMInputMethodEventHandlerTests.m in Sources */,
+				E21176A020E18C5200F8065D /* AppleCompliantTestClient.m in Sources */,
 				E2585A8120DD7CF100CBB994 /* TestAppDelegate.m in Sources */,
 				E28914D62024E4010048E71E /* KMInputMethodEventHandler.m in Sources */,
 			);

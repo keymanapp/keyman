@@ -50,7 +50,7 @@ KMInputMethodBrowserClientEventHandler * _im;
     {
         [_im checkContextIn:client];
     }
-    NSEvent *event = [_delegate keyStrokeEventForCharacter: @"a"];
+    NSEvent *event = [_delegate keyStrokeEventForCharacter: @"a" keyCode:kVK_ANSI_A];
     [_im handleEvent:event client:client];
     [client verify];
 }

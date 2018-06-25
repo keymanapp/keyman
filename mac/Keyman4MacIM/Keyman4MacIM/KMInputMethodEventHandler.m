@@ -1,4 +1,4 @@
-a//
+//
 //  KMInputMethodEventHandler.m
 //  Keyman4MacIM
 //
@@ -21,8 +21,8 @@ NSUInteger _numberOfPostedDeletesToExpect = 0;
 CGKeyCode _keyCodeOfOriginalEvent;
 CGEventSourceRef _sourceFromOriginalEvent = nil;
 NSMutableString* _easterEggForCrashlytics = nil;
-const NSString* kEasterEggText = @"Crashlytics force now";
-const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
+NSString* const kEasterEggText = @"Crashlytics force now";
+NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 NSRange _previousSelRange;
 
@@ -455,19 +455,26 @@ NSRange _previousSelRange;
                 NSLog(@"Processing final posted delete-back...");
             
             self.willDeleteNullChar = NO;
-            if (_legacyMode && _pendingBuffer != nil && _pendingBuffer.length > 0) {
-                if ([self.AppDelegate debugMode])
-                    NSLog(@"Posting special code to tell IM to insert characters from pending buffer.");
-                [self performSelector:@selector(initiatePendingBufferProcessing:) withObject:client afterDelay:0.1];
+            if (_legacyMode) {
+                if (_pendingBuffer != nil && _pendingBuffer.length > 0) {
+                    if ([self.AppDelegate debugMode])
+                        NSLog(@"Posting special code to tell IM to insert characters from pending buffer.");
+                    [self performSelector:@selector(initiatePendingBufferProcessing:) withObject:client afterDelay:0.1];
+                }
             }
             else {
-                if ([self.AppDelegate debugMode]) {
-                    NSLog(@"Re-posting original (unhandled) code: %d", (int)_keyCodeOfOriginalEvent);
+                if (!_sourceFromOriginalEvent) {
+                    NSLog(@"----- If not legacy mode, _sourceFromOriginalEvent should be retained until original code is posted -----");
                 }
-                [self postKeyPressToFrontProcess:_keyCodeOfOriginalEvent from:_sourceFromOriginalEvent];
-                _keyCodeOfOriginalEvent = 0;
-                CFRelease(_sourceFromOriginalEvent);
-                _sourceFromOriginalEvent = nil;
+                else {
+                    if ([self.AppDelegate debugMode]) {
+                        NSLog(@"Re-posting original (unhandled) code: %d", (int)_keyCodeOfOriginalEvent);
+                    }
+                    [self postKeyPressToFrontProcess:_keyCodeOfOriginalEvent from:_sourceFromOriginalEvent];
+                    _keyCodeOfOriginalEvent = 0;
+                    CFRelease(_sourceFromOriginalEvent);
+                    _sourceFromOriginalEvent = nil;
+                }
             }
             *updateEngineContext = NO;
         }
@@ -767,7 +774,12 @@ NSRange _previousSelRange;
     
     for (int db = 0; db < count; db++)
     {
-        [self.AppDelegate postKeyboardEventWithSource:_sourceFromOriginalEvent code:kVK_Delete];
+        if ([self.AppDelegate debugMode]) {
+            NSLog(@"Posting a delete (down/up) at kCGHIDEventTap.");
+        }
+        [self.AppDelegate postKeyboardEventWithSource:_sourceFromOriginalEvent code:kVK_Delete postCallback:^(CGEventRef eventToPost) {
+            CGEventPost(kCGHIDEventTap, eventToPost);
+        }];
     }
 }
 
@@ -779,15 +791,18 @@ NSRange _previousSelRange;
     ProcessSerialNumber psn;
     GetFrontProcess(&psn);
     
-    CGEventRef event = CGEventCreateKeyboardEvent(source, code, true);
-    CGEventPostToPSN(&psn, event);
-    CFRelease(event);
-    
-    if (code != kProcessPendingBuffer) { // special 0xFF code is not a real key-press, so no "up" is needed
-        event = CGEventCreateKeyboardEvent(source, code, false);
-        CGEventPostToPSN(&psn, event);
-        CFRelease(event);
+    if ([self.AppDelegate debugMode]) {
+        if (code == kProcessPendingBuffer) {
+            NSLog(@"Posting code to tell Keyman to process characters in pending buffer.");
+        }
+        else {
+            NSLog(@"Posting a keypress (down/up) to the 'front process' for the %hu key.", code);
+        }
     }
+    
+    [self.AppDelegate postKeyboardEventWithSource:source code:code postCallback:^(CGEventRef eventToPost) {
+        CGEventPostToPSN((ProcessSerialNumberPtr)&psn, eventToPost);
+    }];
 }
 
 @end

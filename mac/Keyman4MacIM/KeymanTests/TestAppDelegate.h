@@ -12,6 +12,8 @@
 #import <AppKit/AppKit.h>
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
 
+typedef void(^PostEventCallback)(CGEventRef eventToPost);
+
 @interface TestAppDelegate : NSObject<NSApplicationDelegate>
 
 @property (nonatomic, strong) KMEngine *kme;
@@ -24,10 +26,10 @@
 @property (nonatomic, assign) CGKeyCode virtualKeyPosted;
 
 // Helper method
--(NSEvent *)keyStrokeEventForCharacter:(NSString *)character;
+-(NSEvent *)keyStrokeEventForCharacter:(NSString *)character keyCode:(unsigned short) keyCode;
 
 // Override of "normal" production processing
-- (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey;
+- (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent;
 @end
 
 
