@@ -433,13 +433,18 @@
         var baseKey = osk.popupBaseKey.key;
         var found = false;
 
-        // Search for the specified subkey so we can retrieve its useful properties.
-        // It should be within the popupBaseKey's subkey list.
-        for(let subKey of baseKey.sk) {
-          if(subKey.id == keyName) {
-            nextLayer = subKey.nextlayer;
-            found = true;
-            break;
+        if(baseKey.id == keyName) {
+          nextLayer = baseKey.nextlayer;
+          found = true;
+        } else {
+          // Search for the specified subkey so we can retrieve its useful properties.
+          // It should be within the popupBaseKey's subkey list.
+          for(let subKey of baseKey.sk) {
+            if(subKey.id == keyName) {
+              nextLayer = subKey.nextlayer;
+              found = true;
+              break;
+            }
           }
         }
 
