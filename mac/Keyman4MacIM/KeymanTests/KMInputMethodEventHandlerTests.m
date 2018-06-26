@@ -152,8 +152,9 @@
     [client handleEventIfNotHandledBy:im event:event];
     [client handleEventIfNotHandledBy:im event:[_delegate keyStrokeEventForCharacter: @"b" keyCode:kVK_ANSI_B]];
     [self helperVerifyAndProcessPendingDelete:client inputMethodEventHandler:im];
-    assert([client length] == 1);
-    assert([[client getResult] isEqualToString:@"b"]);
+    assert(_delegate.virtualKeyPosted == kVK_ANSI_B); // In real life, this key would now be posted and would come through as the next event.
+    assert([client length] == 0);
+    assert([[client getResult] isEqualToString:@""]);
 }
 
 // ***** Helper methods *****
