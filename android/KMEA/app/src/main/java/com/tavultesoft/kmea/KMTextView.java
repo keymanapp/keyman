@@ -107,8 +107,8 @@ public final class KMTextView extends EditText {
             KMTextView textView = (KMTextView) activeView;
             int selStart = textView.getSelectionStart();
             int selEnd = textView.getSelectionEnd();
-            KMManager.InAppKeyboard.loadUrl(String.format("javascript:updateKMText('%s')", textView.getText().toString()));
-            KMManager.InAppKeyboard.loadUrl(String.format("javascript:updateKMSelectionRange(%d,%d)", selStart, selEnd));
+            KMManager.updateText(KeyboardType.KEYBOARD_TYPE_INAPP, textView.getText().toString());
+            KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd);
             KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_INAPP);
           }
           showKeyboard();
@@ -177,8 +177,8 @@ public final class KMTextView extends EditText {
           KMTextView textView = (KMTextView) activeView;
           int selStart = textView.getSelectionStart();
           int selEnd = textView.getSelectionEnd();
-          KMManager.InAppKeyboard.loadUrl(String.format("javascript:updateKMText('%s')", textView.getText().toString()));
-          KMManager.InAppKeyboard.loadUrl(String.format("javascript:updateKMSelectionRange(%d,%d)", selStart, selEnd));
+          KMManager.updateText(KeyboardType.KEYBOARD_TYPE_INAPP, textView.getText().toString());
+          KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd);
         }
 
         if (keyboardVisible) {

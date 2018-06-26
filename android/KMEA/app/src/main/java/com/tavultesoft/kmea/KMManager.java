@@ -1071,12 +1071,13 @@ public final class KMManager {
 
   public static boolean updateText(KeyboardType kbType, String text) {
     boolean result = false;
+    String kmText = "";
+    if (text != null) {
+      kmText = text.toString().replace("\\", "\\u005C").replace("'", "\\u0027").replace("\n", "\\n");
+    }
+
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
-        String kmText = "";
-        if (text != null) {
-          kmText = text.toString().replace("\\", "\\u005C").replace("'", "\\u0027").replace("\n", "\\n");
-        }
         InAppKeyboard.loadUrl(String.format("javascript:updateKMText('%s')", kmText));
         result = true;
       }
@@ -1084,10 +1085,6 @@ public final class KMManager {
       InAppKeyboardShouldIgnoreTextChange = false;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
-        String kmText = "";
-        if (text != null) {
-          kmText = text.toString().replace("\\", "\\u005C").replace("'", "\\u0027").replace("\n", "\\n");
-        }
         SystemKeyboard.loadUrl(String.format("javascript:updateKMText('%s')", kmText));
         result = true;
       }
