@@ -756,11 +756,13 @@ if(!window['keyman']['initialized']) {
     {
       if(e && typeof(e.id) != 'undefined')
       {
+        //TODO: refactor this, it's pretty messy...
         var i, 
           idx = e.id.split('-'), 
           baseId = idx[idx.length-1], 
           layer = e['key'] && e['key']['layer'] ? e['key']['layer'] : (idx.length > 1 ? idx[0] : ''),
-          sp = e['key'] && e['key']['sp'];
+          sp = e['key'] && e['key']['sp'],
+          nextlayer = e['key'] && e['key']['nextlayer'] ? e['key']['nextlayer'] : null;
         if(typeof e.subKeys != 'undefined' && e.subKeys.length > 0 && (e.subKeys[0].id != baseId || e.subKeys[0].layer != layer))
         {
           var eCopy={'id':baseId,'layer':'','key':undefined};
@@ -769,6 +771,9 @@ if(!window['keyman']['initialized']) {
           }
           if(sp) {
             eCopy['sp'] = sp;
+          }
+          if(nextlayer) {
+            eCopy['nextlayer'] = nextlayer;
           }
           for(i = 0; i < e.childNodes.length; i++) {
             if(osk.hasClass(e.childNodes[i],'kmw-key-text')) break;
