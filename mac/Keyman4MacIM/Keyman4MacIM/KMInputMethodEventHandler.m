@@ -51,7 +51,8 @@ NSRange _previousSelRange;
     BOOL legacy = ([clientAppId isEqual: @"com.apple.iWork.Pages"] ||
             [clientAppId isEqual: @"com.apple.iWork.Keynote"] ||
             [clientAppId isEqual: @"com.github.atom"] ||
-            [clientAppId containsString: @"libreoffice"] ||
+            [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
+            [clientAppId isEqual: @"org.libreoffice.script"] ||
             [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
             [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
             [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
