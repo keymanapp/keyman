@@ -1,0 +1,9 @@
+﻿c Contains test scenarios for functionality in 
+c KMMethodEventHandler class
+store(&TARGETS) 'macosx'
+store(&NAME) 'KMMethodEventHandlerTests'
+store(&COPYRIGHT) 'SIL Intl'
+begin Unicode > use(main)
+
+group(main) using keys
+"q" + "q" > nul

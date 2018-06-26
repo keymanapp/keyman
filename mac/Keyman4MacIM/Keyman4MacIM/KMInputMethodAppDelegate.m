@@ -1040,6 +1040,25 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [_oskWindow.oskView handleKeyEvent:event];
 }
 
+extern const CGKeyCode kProcessPendingBuffer;
+
+// This could more easily and logically be done in the input method, but this
+// allows us to override the norma behavior for unit testing, where there is no
+// active event loop to post to.
+- (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent{
+    
+    CGEventRef ev = CGEventCreateKeyboardEvent (source, virtualKey, true); //down
+    if (postEvent)
+        postEvent(ev);
+    CFRelease(ev);
+    if (virtualKey != kProcessPendingBuffer) { // special 0xFF code is not a real key-press, so no "up" is needed 
+        ev = CGEventCreateKeyboardEvent (source, virtualKey, false); //up
+        if (postEvent)
+            postEvent(ev);
+        CFRelease(ev);
+    }
+}
+
 - (BOOL)unzipFile:(NSString *)filePath {
     BOOL didUnzip = NO;
     NSString *fileName = filePath.lastPathComponent;

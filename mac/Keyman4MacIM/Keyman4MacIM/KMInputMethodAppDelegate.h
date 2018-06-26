@@ -20,6 +20,8 @@
 #import "NSWindow+SuppMethods.h"
 #import "NSString+SuppMethods.h"
 
+typedef void(^PostEventCallback)(CGEventRef eventToPost);
+
 extern NSString *const kKMSelectedKeyboardKey;
 extern NSString *const kKMActiveKeyboardsKey;
 extern NSString *const kKeymanKeyboardDownloadCompletedNotification;
@@ -108,6 +110,7 @@ extern NSString *const kWebSite;
 - (NSDictionary *)infoDictionaryFromFile:(NSString *)infoFile;
 - (NSString *)kvkFilePathFromFilename:(NSString *)kvkFilename;
 - (NSString *)oskWindowTitle;
+- (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent;
 
 @end
 
