@@ -1046,9 +1046,6 @@ extern const CGKeyCode kProcessPendingBuffer;
 // allows us to override the norma behavior for unit testing, where there is no
 // active event loop to post to.
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent{
-  
-// REVIEW: Is this needed?
-//    [postEvent copy];
     
     CGEventRef ev = CGEventCreateKeyboardEvent (source, virtualKey, true); //down
     if (postEvent)

@@ -1,5 +1,8 @@
 # Keyman for macOS Version History
 
+## 2018-06-26 10.0.51 beta
+* Prevented calling CFRelease() with a NULL argument (#1019)
+
 ## 2018-06-20 10.0.50 beta
 * Fixed problems with OSK timer that caused crashes, e.g., when Shift was pressed (#1013)
 
