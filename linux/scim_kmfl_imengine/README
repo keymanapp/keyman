@@ -1,0 +1,5 @@
+This package provides the KMFL IM engine for SCIM (Smart Common Input Method). 
+With this module, you can use keyboards designed for Tavultesoft Keyman for Windows 
+under the SCIM platform.
+
+See kmfl.sourceforge.net for more information.

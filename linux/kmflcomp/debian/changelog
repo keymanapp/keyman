@@ -1,0 +1,105 @@
+kmflcomp (10.99.1-1) UNRELEASED; urgency=medium
+
+  * Change license to MIT as kmflcomp is being moved into Keyman 11
+  * Keyman is now owned by SIL
+
+ -- Daniel Glassey <wdg@debian.org>  Thu, 17 May 2018 11:39:04 +0700
+
+kmflcomp (0.9.10-1) unstable; urgency=low
+
+  * new upstream release
+  * bring d/compat to level 10 (Closes: #817512)
+    - d/control: B-D on debhelper > 10
+  * update d/control: 
+    - change short description to be more informative (Closes: #493522)
+    - change extended description to be more informative
+    - remove redundant Section: util from kmfl binary package
+    - add homepage field to source section
+    - remove build depend on dh-autoreconfig (not needed for compat 10)
+    - remove version constraint on cdbs (fulfilled in oldstable)
+  * include update for newer architectures (using autotools-dev) 
+    from Wookey <wookey@debian.org> (Closes: #765228)
+  * empty dependency_libs in .la files to bring standards-version to 3.9.1.0
+  * change copyright to machine-readable copyright-format to bring 
+    standards-version to 3.9.3.0
+  * bring standards-version to 3.9.8.0 (no other changes required)
+  * switch to dpkg-source 3.0 (quilt) format
+  * add watch file to check for newer upstream version
+  * add d/libkmflcomp0.symbols (for lintian warning no-symbols-control-file)
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Mon, 23 Jan 2017 11:36:01 -0800
+
+kmflcomp (0.9.9-1) UNRELEASED; urgency=low
+
+  * new upsteam release
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Fri, 23 Jul 2010 09:49:20 -0700
+
+kmflcomp (0.9.8-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Update for newer architectures (using autotools-dev) (Closes: #765228) 
+
+ -- Wookey <wookey@debian.org>  Thu, 15 Oct 2015 20:51:15 +0000
+
+kmflcomp (0.9.8-1) unstable; urgency=low
+
+  * add Platform conditionals
+  * add support for Keyman 7
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Mon, 26 Jan 2009 12:54:38 -0800
+
+kmflcomp (0.9.7-1) unstable; urgency=low
+
+  * Add libx11 to link
+  * Add manpage for kmflcomp
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Thu, 20 Oct 2008 12:20:09 -0700
+
+
+kmflcomp (0.9.6-1) unstable; urgency=low
+
+  * add support for get_surrounding_text to provide context sensitive input
+    methods
+  * add the ability to reload keyboards on the fly
+
+ -- Doug Rintoul <doug_rintoul@sil.org>  Tue,  7 Nov 2006 14:57:53 -0800
+
+kmflcomp (0.9.3-1) unstable; urgency=low
+
+  * Fix some packaging issues
+
+ -- Daniel Glassey <wdg@debian.org>  Sat,  4 Mar 2006 10:28:51 +0000
+
+kmflcomp (0.9.2-1) unstable; urgency=low
+
+  * Replace UTF Conversion library with a GPLed implementation
+  * add version and usage message to kmflcomp
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Thu, 02 Mar 2006 11:10:00 +0800
+
+kmflcomp (0.9.1-1) unstable; urgency=low
+
+  * fix headers for C++ inclusion
+  * fix bug when compile a keyboard with Non UTF upper ANSI characters
+  * AMD64 fixes
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Tue, 02 Feb 2006 11:40:00 +0800
+
+kmflcomp (0.9-1) unstable; urgency=low
+
+  * fix shift key problem
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Tue, 30 Aug 2005 11:20:00 +0800
+
+kmflcomp (0.8-1) unstable; urgency=low
+
+  * Add full virtual key support
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Mon, 04 Jul 2005 11:20:00 +0800
+
+kmflcomp (0.7-1) unstable; urgency=low
+
+  * first debian release
+
+ -- Doug Rintoul <doug_rintoulsil.org>  Mon, 21 Jun 2005 19:57:17 +0800
