@@ -359,14 +359,7 @@
 
 - (void)keyAction:(id)sender {
     KeyView *keyView = (KeyView *)sender;
-    NSUInteger keyCode;
-    @try {
-        keyCode = [keyView.key keyCode];
-    }
-    @catch (NSException *exception) {
-        NSLog(@"Exception in keyAction:sender - %@", exception);
-        return;
-    }
+    NSUInteger keyCode = [keyView.key keyCode];
     if (keyCode < 0x100) {
         ProcessSerialNumber psn;
         GetFrontProcess(&psn);
