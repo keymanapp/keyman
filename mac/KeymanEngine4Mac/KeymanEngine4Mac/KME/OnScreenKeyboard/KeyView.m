@@ -232,17 +232,14 @@ const NSTimeInterval repeatInterval = 0.05f;
 }
 
 -(void)processKeyClick {
-    ((void (*)(id, SEL))[self.target methodForSelector:self.action])(self.target, self.action);
+    SEL selector = self.action;
+    IMP imp = [self.target methodForSelector:selector];
+    void (*func)(id, SEL, id) = (void *)imp;
+    func(self.target, selector, (NSObject *)self);
 }
 
 - (void)startTimerWithTimeInterval:(NSTimeInterval)interval {
     @synchronized(self.target) {
-//        @try {
-//            NSLog(@"KeyView TIMER - starting for key %lu", [self keyCode]);
-//        }
-//        @catch (NSException *exception) {
-//            NSLog(@"KeyView TIMER - crash getting keyCode.");
-//        }
         if (_keyEventTimer == nil) {
             // The TimerTarget class and the following two lines allow the timer to hold a *weak*
             // reference to this KeyView object, so it can be disposed even if there is a timer waiting
