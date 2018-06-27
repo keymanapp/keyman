@@ -63,6 +63,8 @@ typedef enum {
 @synthesize contextBuffer = _contextBuffer;
 @synthesize alwaysShowOSK = _alwaysShowOSK;
 
+id _lastServerWithOSKShowing = nil;
+
 - (id)init {
     self = [super init];
     if (self) {
@@ -188,7 +190,7 @@ typedef enum {
     return (KMInputMethodAppDelegate *)[NSApp delegate];
 }
 
--(void) sleep {
+-(void) sleepFollowingDeactivationOfServer:(id)lastServer {
     if ([self debugMode]) {
         NSLog(@"Keyman no longer active IM.");
     }
@@ -197,6 +199,9 @@ typedef enum {
         if ([self debugMode]) {
             NSLog(@"Hiding OSK.");
         }
+        // Storing this ensures that if the deactivation is temporary, resulting from dropping down a menu,
+        // the OSK will re-display when that client application re-activates.
+        _lastServerWithOSKShowing = lastServer;
         [self.oskWindow.window setIsVisible:NO];
     }
     if (self.lowLevelEventTap) {
@@ -207,13 +212,17 @@ typedef enum {
     }
 }
 
--(void) wakeUp {
+-(void) wakeUpWith:(id)newServer {
     self.sleeping = NO;
     if (self.lowLevelEventTap && !CGEventTapIsEnabled(self.lowLevelEventTap)) {
         if ([self debugMode]) {
             NSLog(@"Keyman is now the active IM. Re-enabling event tap...");
         }
         CGEventTapEnable(self.lowLevelEventTap, YES);
+    }
+    // See note in sleepFollowingDeactivationOfServer.
+    if (_kvk != nil && (_alwaysShowOSK || _lastServerWithOSKShowing == newServer)) {
+        [self showOSK];
     }
 }
 
