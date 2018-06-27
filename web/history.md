@@ -1,5 +1,20 @@
 # KeymanWeb Version History
 
+## 2018-06-27 10.0.99 beta
+* Fixes issue where next layer was not correctly selected when the first longpress key pressed (#1027)
+
+## 2018-06-26 10.0.98 beta
+* Fixes miskey when pressing between two keys on iOS (#1020)
+
+## 2018-06-21 10.0.97 beta
+* Fixes an issue where cancelling a touch event could cause the keyboard to throw an error on Android (#1014)
+
+## 2018-06-20 10.0.96 beta
+* Fixes edge case issue with deadkeys in complex keyboards with multiple groups (#1008)
+
+## 2018-06-15 10.0.95 beta
+* No substantial changes.
+
 ## 2018-06-13 10.0.94 beta
 * No substantial changes.
 

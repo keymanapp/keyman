@@ -1,5 +1,14 @@
 # Keyman Developer Version History
 
+## 2018-06-27 10.0.1113.0 beta
+* No changes to Keyman Developer (update to KeymanWeb)
+
+## 2018-06-26 10.0.1112.0 beta
+* Keyman Developer no longer crashes if a .kpj.user file is deleted while in use (#1017)
+
+## 2018-06-21 10.0.1111.0 beta
+* No changes to Keyman Developer (update to KeymanWeb)
+
 ## 2018-06-20 10.0.1110.0 beta
 * Script subtags are now appended for more scripts in the Keyboard languages dialog (#1006)
 * KeymanWeb 10.0 compiler now computes indexes correctly when deadkey and any used in a secondary group (#1008)
