@@ -53,7 +53,6 @@ import org.json.JSONObject;
 
 public final class KMManager {
 
-  private static final String KMEngineVersion = "2.4.3";
   private static final String TAG = "KMManager";
 
   private static FirebaseAnalytics mFirebaseAnalytics;
@@ -146,10 +145,6 @@ public final class KMManager {
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
 
   private static Context appContext;
-
-  public static String getVersion() {
-    return KMEngineVersion;
-  }
 
   protected static String getResourceRoot() {
     return appContext.getDir("data", Context.MODE_PRIVATE).toString() + File.separator;
