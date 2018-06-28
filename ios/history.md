@@ -3,6 +3,24 @@
 ## 11.0 alpha
 * Move to 11.0
 
+## 2018-06-27 10.0.163 beta
+* Fixes issue where next layer was not correctly selected when the first longpress key pressed (#1027)
+
+## 2018-06-26 10.0.162 beta
+* Fixes miskey when pressing between two keys (#1020)
+
+## 2018-06-14 10.0.161 beta
+* Fixes keyboard not responding to touch from #981 (#988)
+
+## 2018-06-13 10.0.160 beta
+* No changes affecting iOS
+
+## 2018-06-13 10.0.159 beta
+* No changes affecting iOS
+
+## 2018-06-13 10.0.158 beta
+* Bug fix installing a keyboard with missing metadata (#982)
+
 ## 2018-06-13 10.0.157 beta
 * Improvements to device rotation (#981)
 

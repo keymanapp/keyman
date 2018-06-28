@@ -1,0 +1,7 @@
+﻿c This is a simple keyboard that just passes an 'a' when the 'a' key is pressed. Used for testing the IM on Mac.
+store(&TARGETS) 'macosx'
+store(&NAME) 'SimpleTest'
+begin Unicode > use(main)
+
+group(main) using keys
++ [K_A] > 'a'

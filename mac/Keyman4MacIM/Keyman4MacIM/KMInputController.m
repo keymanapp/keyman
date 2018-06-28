@@ -57,7 +57,7 @@ NSMutableArray *servers;
     @synchronized(servers) {
         [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
         
-        [self.AppDelegate wakeUp];
+        [self.AppDelegate wakeUpWith:sender];
         [servers addObject:sender];
         
         if (_eventHandler != nil) {
@@ -102,19 +102,19 @@ NSMutableArray *servers;
             if ([self.AppDelegate debugMode]) {
                 NSLog(@"No known active server for Keyman IM. Starting countdown to sleep...");
             }
-            [self performSelector:@selector(timerAction:) withObject:nil afterDelay:0.7];
+            [self performSelector:@selector(timerAction:) withObject:sender afterDelay:0.7];
         }
     }
 }
 
-- (void)timerAction:(NSTimer *)timer {
+- (void)timerAction:(id)lastServer {
     @synchronized(servers) {
         if (servers.count == 0) {
             if (_eventHandler != nil) {
                 [_eventHandler deactivate];
                 _eventHandler = nil;
             }
-            [self.AppDelegate sleep];
+            [self.AppDelegate sleepFollowingDeactivationOfServer:lastServer];
         }
     }
 }

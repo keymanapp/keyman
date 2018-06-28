@@ -3,6 +3,22 @@
 ## 11.0 alpha
 * Move to 11.0
 
+## 2018-06-27 10.0.405 beta
+* Fixes issue where next layer was not correctly selected when the first longpress key pressed (#1027)
+* Fixes issue where a quote character in some contexts could cause the keyboard to fail (#1028)
+
+## 2018-06-26 10.0.404 beta
+* Add documentation for version 10.0 (#1023)
+
+## 2018-06-21 10.0.403 beta
+* Fixes an issue where opening a menu could cause the keyboard to unload (#1014)
+
+## 2018-06-20 10.0.402 beta
+* Support script subtags for keyboard languages supplied from cloud (#1012)
+
+## 2018-06-15 10.0.401 beta
+* No changes to Keyman for Android
+
 ## 2018-06-13 10.0.400 beta
 * No changes to Keyman for Android
 
