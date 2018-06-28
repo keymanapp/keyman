@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 11.0 alpha
+* Move to 11.0
+
 ## 2018-06-28 10.0.500 stable
 * 10.0 stable release
 
