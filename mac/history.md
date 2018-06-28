@@ -1,5 +1,8 @@
 # Keyman for macOS Version History
 
+## 2018-06-28 10.0.53 beta
+* Made key-press on OSK work instead of crash (#1038)
+
 ## 2018-06-27 10.0.52 beta
 * Prevented permanently hiding OSK when a menu is dropped down (#1031)
 
