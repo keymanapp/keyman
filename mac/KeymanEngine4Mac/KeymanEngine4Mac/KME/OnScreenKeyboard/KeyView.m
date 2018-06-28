@@ -232,17 +232,20 @@ const NSTimeInterval repeatInterval = 0.05f;
 }
 
 -(void)processKeyClick {
-    ((void (*)(id, SEL))[self.target methodForSelector:self.action])(self.target, self.action);
+    // This code was previously incorrectly implemented because the function call failed to pass "self" as the
+    // final parameter. This page describes the fix, as implemented here:
+    // https://stackoverflow.com/questions/27626617/how-to-solve-performselector-may-cause-leak-because-its-selector-is-unknown?noredirect=1&lq=1
+    // This is almost certainly not the *best* way to implement this, but we're up against our release deadline,
+    // so it should be revisted soon to come up with a more readable and reliable approach, and maybe even a
+    // unit-testable one.
+    SEL selector = self.action;
+    IMP imp = [self.target methodForSelector:selector];
+    void (*func)(id, SEL, id) = (void *)imp;
+    func(self.target, selector, (NSObject *)self);
 }
 
 - (void)startTimerWithTimeInterval:(NSTimeInterval)interval {
     @synchronized(self.target) {
-//        @try {
-//            NSLog(@"KeyView TIMER - starting for key %lu", [self keyCode]);
-//        }
-//        @catch (NSException *exception) {
-//            NSLog(@"KeyView TIMER - crash getting keyCode.");
-//        }
         if (_keyEventTimer == nil) {
             // The TimerTarget class and the following two lines allow the timer to hold a *weak*
             // reference to this KeyView object, so it can be disposed even if there is a timer waiting

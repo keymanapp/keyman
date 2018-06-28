@@ -13,7 +13,7 @@
 
 @property (nonatomic, strong) OSKKey *key;
 @property (nonatomic, assign) SEL action;
-@property (nonatomic, strong) id target;
+@property (nonatomic, strong) id target; // This has to be an OSKView *
 @property (nonatomic, strong) NSImage *bitmap;
 @property (nonatomic, assign) BOOL keyPressed;
 
