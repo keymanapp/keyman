@@ -1,5 +1,14 @@
 # Keyman Desktop Version History
 
+## 2018-06-27 10.0.1113.0 beta
+* No changes to Keyman Desktop
+
+## 2018-06-26 10.0.1112.0 beta
+* No changes to Keyman Desktop
+
+## 2018-06-21 10.0.1111.0 beta
+* No changes to Keyman Desktop
+
 ## 2018-06-20 10.0.1110.0 beta
 * Removes obsolete "Getting Started" links (#1004)
 
