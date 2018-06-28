@@ -1,5 +1,8 @@
 # Keyman for iPhone and iPad Version History
 
+## 11.0 alpha
+* Move to 11.0
+
 ## 2018-06-27 10.0.163 beta
 * Fixes issue where next layer was not correctly selected when the first longpress key pressed (#1027)
 

@@ -1,0 +1,27 @@
+Source: libkmfl
+Priority: optional
+Section: libs
+Maintainer: Doug Rintoul <doug_rintoul@sil.org>
+Homepage: http://kmfl.sourceforge.net/
+Build-Depends: cdbs (>= 0.4.27), debhelper (>= 9), dh-autoreconf, libkmflcomp-dev
+Standards-Version: 3.9.8.0
+
+Package: libkmfl-dev
+Section: libdevel
+Architecture: any
+Depends: libkmfl0 (= ${binary:Version}), ${misc:Depends}
+Description: This package provides Keyman(C) services to Linux - development
+ The kmfl library is a multilingual text processing library that implements
+ the Keyman(C) text processing language.
+ .
+ This package contains the header and development files needed to build
+ programs and packages using libkmfl.
+
+Package: libkmfl0
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: This package provides Keyman(C) services to Linux - runtime
+ The kmfl library is a multilingual text processing library that implements
+ the Keyman(C) text processing language.
+ .
+ This package contains the runtime part of libkmfl.
