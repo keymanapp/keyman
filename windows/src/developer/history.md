@@ -1,5 +1,8 @@
 # Keyman Developer Version History
 
+## 2018-06-28 10.0.1200 stable
+* 10.0 stable release
+
 ## 2018-06-27 10.0.1113.0 beta
 * No changes to Keyman Developer (update to KeymanWeb)
 
