@@ -44,13 +44,12 @@ NSRange _previousSelRange;
 
 // This is the public initializer.
 - (instancetype)initWithClient:(NSString *)clientAppId {
-    // Note: Pages and Keynote (and possibly lots of other undiscovered apps that are otherwise compliant
-    // with Apple's IM faramework) need to be treated as "legacy" because if the user selects a different
-    // font (or other formatting) and then types a sequence that causes characters to be added to the document
-    // and then subsequently replaced, the replacement causes the formatting decision to be forgotten.
-    BOOL legacy = ([clientAppId isEqual: @"com.apple.iWork.Pages"] ||
-            [clientAppId isEqual: @"com.apple.iWork.Keynote"] ||
-            [clientAppId isEqual: @"com.github.atom"] ||
+    // TODO: Pages and Keynote (and possibly lots of other undiscovered apps that are otherwise compliant
+    // with Apple's IM faramework) have a problem in that if the user selects a different font (or other
+    // formatting) and then types a sequence that causes characters to be added to the document and then
+    // subsequently replaced, the replacement causes the formatting decision to be forgotten. This can be
+    // "fixed" by treating them as legacy apps, but it causes other problems.
+    BOOL legacy = ([clientAppId isEqual: @"com.github.atom"] ||
             [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
             [clientAppId isEqual: @"org.libreoffice.script"] ||
             [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
