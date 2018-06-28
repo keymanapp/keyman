@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 2018-06-28 10.0.500 stable
+* 10.0 stable release
+
 ## 2018-06-27 10.0.405 beta
 * Fixes issue where next layer was not correctly selected when the first longpress key pressed (#1027)
 * Fixes issue where a quote character in some contexts could cause the keyboard to fail (#1028)
