@@ -8,7 +8,6 @@
 import QuartzCore
 import UIKit
 
-private let errorAlertTag = -1
 private let activityViewTag = -2
 private let toolbarButtonTag = 100
 private let toolbarLabelTag = 101
@@ -170,16 +169,21 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     }
 
     let language = languages[indexPath.section]
-    let keyboard = language.keyboards![0]
+    let keyboardIndex = 0;
+    let keyboard = language.keyboards![keyboardIndex]
 
     let state = Manager.shared.stateForKeyboard(withID: keyboard.id)
     if state != .downloading {
       isUpdate = state != .needsDownload
-      let alert = UIAlertView(title: "\(language.name): \(keyboard.name)",
-        message: "Would you like to download this keyboard?", delegate: self,
-        cancelButtonTitle: "Cancel", otherButtonTitles: "Download")
-      alert.tag = 0
-      alert.show()
+      let alertController = UIAlertController(title: "\(language.name): \(keyboard.name)",
+        message: "Would you like to download this keyboard?",
+            preferredStyle: UIAlertControllerStyle.alert)
+      alertController.addAction(UIAlertAction(title: "Cancel",
+                                              style: UIAlertActionStyle.cancel,
+                                              handler: nil))
+      alertController.addAction(UIAlertAction(title: "Download",
+                                                style: UIAlertActionStyle.default,
+                                                handler: {_ in self.downloadHandler(keyboardIndex)} ))
     }
   }
 
@@ -194,19 +198,16 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     navigationController?.pushViewController(langDetailView, animated: true)
   }
 
-  func alertView(_ alertView: UIAlertView, clickedButtonAt buttonIndex: Int) {
-    if alertView.tag == errorAlertTag {
-      if !languages.isEmpty {
+  func errorAcknowledgmentHandler(withAction action: UIAlertAction) {
+    if !languages.isEmpty {
         navigationController?.popToRootViewController(animated: true)
-      }
-    } else {
-      // Keyboard download confirmation alert (tag is used for keyboard index).
-      if buttonIndex != alertView.cancelButtonIndex {
-        let language = languages[selectedSection]
-        let keyboard = language.keyboards![alertView.tag]
-        Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: isUpdate)
-      }
     }
+  }
+    
+  func downloadHandler(_ keyboardIndex: Int) {
+    let language = languages[selectedSection]
+    let keyboard = language.keyboards![keyboardIndex]
+                Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: isUpdate)
   }
 
   private func keyboardDownloadStarted() {
@@ -294,11 +295,14 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
 
   private func showConnectionErrorAlert() {
     dismissActivityView()
-    let alert = UIAlertView(title: "Connection Error",
-                            message: "Could not reach Keyman server. Please try again later.",
-                            delegate: self, cancelButtonTitle: "OK", otherButtonTitles: "")
-    alert.tag = errorAlertTag
-    alert.show()
+    let alertController = UIAlertController(title: "Connection Error",
+                                            message: "Could not reach Keyman server. Please try again later.",
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertActionStyle.default,
+                                            handler: errorAcknowledgmentHandler))
+    
+    self.present(alertController, animated: true, completion: nil)
   }
 }
 
