@@ -5,7 +5,9 @@
 !include ..\..\Defines.mak
 
 build: dirs
-    $(DCC32DPK) packages\CEF4Delphi.dpk
+    cd packages
+    $(DCC32DPK) CEF4Delphi.dpk
+    cd ..
     $(MAKE) install
 
 install:
