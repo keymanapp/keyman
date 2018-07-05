@@ -14,7 +14,7 @@ ENCUMBERED_TARGETS=plusmemo
 ENCUMBERED_TARGETS=
 !ENDIF
 
-TARGETS=$(ENCUMBERED_TARGETS) dcpcrypt embeddedwb jedi mbcolor regexpr scfontcombobox
+TARGETS=$(ENCUMBERED_TARGETS) dcpcrypt embeddedwb jedi mbcolor regexpr scfontcombobox cef4delphi
 
 # jedi, regexpr have no packages
 
@@ -24,6 +24,10 @@ CLEANS=
 
 # ----------------------------------------------------------------------
 
+cef4delphi:
+    cd $(ROOT)\src\ext\cef4delphi
+    $(MAKE) $(TARGET)
+    
 dcpcrypt:
     cd $(ROOT)\src\ext\dcpcrypt
     $(MAKE) $(TARGET)
