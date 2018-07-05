@@ -2,7 +2,17 @@
     var mouseisdown = null;
     var tabselected = -1;
     var state = null;
+    var showHelp = true;
+    
+    function updateBodyClass() {
+      document.body.className = 'tab-'+tabselected+(showHelp ? ' show-help' : '');
+    }
+    
     function selecttabb(n) {
+      tabselected = n;
+      updateBodyClass();
+      
+      /*
       document.getElementById('tabb0').className = 'tabb'+(n==0?' tabbselected':'');
       document.getElementById('Welcome').style.display = (n==0?'block':'none');
       document.getElementById('tabb1').className = 'tabb'+(n==1?' tabbselected':'');
@@ -12,20 +22,22 @@
       document.getElementById('tabb3').className = 'tabb'+(n==3?' tabbselected':'');
       document.getElementById('Distribution').style.display = (n==3?'block':'none');
       tabselected = n;
+      */
       
+      var title='';
       switch (n) {
-        case 0: x = 'Welcome'; break;
-        case 1: x = 'Keyboards'; break;
-        case 2: x = 'Packaging'; break;
-        case 3: x = 'Distribution'; break;
+        case 0: title = 'Welcome'; break;
+        case 1: title = 'Keyboards'; break;
+        case 2: title = 'Packaging'; break;
+        case 3: title = 'Distribution'; break;
         default: alert(n); return;
       }
 
-      document.getElementById('currentpage').innerHTML = 'Project - '+x;
-      var q = document.getElementById('uppertext'+n).style.display;
+      document.getElementById('currentpage').innerHTML = 'Project - '+title;
+      //var q = document.getElementById('uppertext'+n).style.display;
       //document.getElementById('upperexpand').className = (q=='block'?'checkbox checked':'checkbox');      
-      //document.getElementById('upperexpand').innerHTML = 'Show ' + x + ' help';
-      q = document.getElementById(x).getElementsByTagName('span');
+      //document.getElementById('upperexpand').innerHTML = 'Show ' + title + ' help';
+      q = document.getElementById('page-'+n).getElementsByTagName('span');
       for(var i = 0; i < q.length; i++)
         if(q[i].className=='file')
         {
@@ -34,6 +46,7 @@
         }
       savestate();
     }
+    
     function pageload() {
       for(var i = 0; i<document.all.length; i++)
         document.all[i].unselectable = 'on';
@@ -78,7 +91,7 @@
       loadstate();
       savestate();
     }
-    document.attachEvent('onmouseup', function() { mouseisdown = null; return true; });
+    document.addEventListener('mouseup', function() { mouseisdown = null; return true; }, false);
     function showfiledetails(x) {
       var n = document.getElementById('fileplus'+x).className;
       document.getElementById('fileplus'+x).className = (n=='fileexpand'?'fileexpand filecontract':'fileexpand');
@@ -147,7 +160,7 @@
           menudiv.style.width='150px';
           menudiv.style.zIndex=10;
           menudiv.style.visibility='visible';
-          menudiv.setCapture(false);
+          //menudiv.setCapture(false);
         }
       }
       event.cancelBubble = true;
@@ -253,6 +266,8 @@
     
     function savestate()
     {
+      return;
+/*
       var dom = new ActiveXObject("Msxml2.DOMDocument.3.0");
       dom.async = false;
       dom.validateOnParse = false;
@@ -297,21 +312,18 @@
       
       state.innerText = dom.xml;
       node = null; files = null; root = null; dom = null;
+*/      
     }
     function loadstate()
     {
+/*
       var s = state.innerText;
-      /*var searchload = /state=(.*)(\&|$)/;
-      var ss = window.location.search.match(searchload);
-      alert(window.location.search + ' ss = '+ss);*/
-      if(s != '') //ss != null)
+      if(s != '')
       {
-        /* state format is value=value */
-        //var ls = unescape(ss[1]);
-        //alert(ls);
+        // state format is value=value
         var xml = new ActiveXObject("Msxml2.DOMDocument.3.0");
         xml.async = false;
-        xml.loadXML(s); //unescape(ss[1]));
+        xml.loadXML(s); 
         if(xml.parseError.errorCode == 0)
         {
           // Select active tab
@@ -349,6 +361,7 @@
       }
       ss = null; nodes = null; nodeID = null; nodeExpansion = null; xml = null;
       if(tabselected == -1) selecttabb(0);
+*/      
     }
 
 var menudiv=null;
@@ -378,7 +391,7 @@ function ShowMenu(name,align)
   if(align=='right') menudiv.style.left = pb.x+button.offsetWidth-menudiv.offsetWidth;
   else menudiv.style.left = pb.x; 
   menudiv.style.top = pb.y+button.offsetHeight;
-  menudiv.setCapture(false);
+  //menudiv.setCapture(false);
 }
 
 function HideMenu()
@@ -387,27 +400,15 @@ function HideMenu()
   {
     menudiv.style.visibility='hidden';
     //button.className='';
-    document.releaseCapture();
+    //document.releaseCapture();
   }
 }
 
-function menuitemover()
-{
-  var e = event.srcElement; while(e && e.tagName != 'menuitem') e=e.parentElement;
-  if(e) e.className="hover";
-}
-function menuitemout()
-{
-  var e = event.srcElement; while(e && e.tagName != 'menuitem') e=e.parentElement;
-  if(e) e.className="";
-}
 function menuitemdown()
 {
-  var e = event.srcElement; while(e && e.tagName != 'menuitem') e=e.parentElement;
-  if(e)
-  {
-    location.href=e.command;
-    e.className="";
+  var e = event.srcElement; while(e && e.tagName.toLowerCase() != 'k:menuitem') e=e.parentElement;
+  if(e) {
+    location.href=e.attributes['command'].value;
   }
 }
 
@@ -415,7 +416,7 @@ function menusetup()
 {
   menudiv = document.createElement('DIV');
   menudiv.className='menu';
-  menudiv.attachEvent('onmousedown', HideMenu);
+  menudiv.addEventListener('mousedown', HideMenu, false);
   document.body.appendChild(menudiv);
 }
-window.attachEvent('onload', menusetup);
+window.addEventListener('load', menusetup, false);
