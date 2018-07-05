@@ -3,8 +3,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:k="http://www.tavultesoft.com/xml/70">
 
   <xsl:template name="page_keyboard">
-    <div class="page" id="Keyboards">
-      <div id="uppertext1" style="clear: all; display: block;" >
+    <div class="page" id="page-1">
+      <div class="help-container" id="uppertext1">
         <div class="headerimage">
           <p><img alt="Keyboards">
               <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>header_keyboard.png</xsl:attribute>

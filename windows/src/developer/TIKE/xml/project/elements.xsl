@@ -128,8 +128,6 @@
     <xsl:param name="caption" />
     <xsl:param name="command" />
     <k:menuitem>
-      <xsl:attribute name="onmouseover">javascript:menuitemover();</xsl:attribute>
-      <xsl:attribute name="onmouseout">javascript:menuitemout();</xsl:attribute>
       <xsl:attribute name="onmousedown">javascript:menuitemdown();</xsl:attribute>
       <xsl:attribute name="command">
         <xsl:value-of select="$command" />

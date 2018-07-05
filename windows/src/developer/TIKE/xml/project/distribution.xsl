@@ -3,8 +3,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:k="http://www.tavultesoft.com/xml/70">
 
   <xsl:template name="page_distribution">
-    <div class="page" id="Distribution">
-      <div id="uppertext3" style="clear: all; display: block;">
+    <div class="page" id="page-3">
+      <div class="help-container" id="uppertext3">
         <div class="headerimage">
           <p><img alt="Distribution">
             <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>header_distrib.png</xsl:attribute>
