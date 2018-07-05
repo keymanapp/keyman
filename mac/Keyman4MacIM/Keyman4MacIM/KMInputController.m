@@ -40,7 +40,7 @@ NSMutableArray *servers;
 }
 
 - (NSUInteger)recognizedEvents:(id)sender {
-    return (NSKeyDownMask | NSLeftMouseDownMask | NSLeftMouseUpMask);
+    return (NSEventMaskKeyDown);
 }
 
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {

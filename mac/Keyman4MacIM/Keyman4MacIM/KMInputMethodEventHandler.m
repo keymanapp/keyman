@@ -489,13 +489,7 @@ NSRange _previousSelRange;
     /*if (event.type == NSKeyDown)
      [self.AppDelegate handleKeyEvent:event];*/
     
-    if (event.type == NSLeftMouseDown || event.type == NSLeftMouseUp ) {
-        _contextOutOfDate = YES;
-        return NO;
-    }
-    else if (event.type != NSKeyDown)
-        return NO; // We ignore NSLeftMouseDragged events (because we'll eventually get a mouse-up).
-    else if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
+    if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
         [self handleCommand:event];
         return NO; // We let the client app handle all Command-key events.
     }
