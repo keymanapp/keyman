@@ -691,6 +691,10 @@ begin
       Result := True;
       frmKeymanDeveloper.HelpTopic(Self);
     end
+    else if event.windows_key_code = VK_F12 then
+    begin
+      cef.ChromiumBrowser.ShowDevTools(Point(Low(Integer),Low(Integer)), nil);
+    end
     else if SendMessage(Application.Handle, CM_APPKEYDOWN, event.windows_key_code, 0) = 1 then
     begin
       isKeyboardShortcut := True;

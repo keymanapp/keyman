@@ -21,10 +21,6 @@ inherited frmProject: TfrmProject
     OnClose = cefClose
     OnBeforeClose = cefBeforeClose
     OnAfterCreated = cefAfterCreated
-    ExplicitLeft = 8
-    ExplicitTop = 8
-    ExplicitWidth = 457
-    ExplicitHeight = 505
   end
   object dlgOpenFile: TOpenDialog
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
