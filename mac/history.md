@@ -1,5 +1,8 @@
 # Keyman for macOS Version History
 
+## 2018-07-?? 10.0.10? alpha
+* Refactored target-action call from keyView
+
 ## 2018-06-28 10.0.100 stable
 * 10.0 stable release
 
