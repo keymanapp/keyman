@@ -284,7 +284,7 @@ begin
 
   for i := Low(TKeyboardFont) to High(TKeyboardFont) do
     FontNames[i] := Wizard.FontInfo[i].Name;
-  modWebHttpServer.RegisterKeyboard(FCompiledName, ProjectFile.FileVersion, FontNames);
+  modWebHttpServer.Debugger.RegisterKeyboard(FCompiledName, ProjectFile.FileVersion, FontNames);
 
   wizard.NotifyStartedWebDebug;   // I4021
 
