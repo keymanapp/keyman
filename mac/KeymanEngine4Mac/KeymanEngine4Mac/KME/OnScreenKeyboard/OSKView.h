@@ -6,10 +6,13 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
-#import "KVKFile.h"
+#ifndef OSKView_h
+#define OSKView_h
 
-@interface OSKView : NSView
+#import "KVKFile.h"
+#import "KMkeyViewProtocol.h"
+
+@interface OSKView : NSView <KMkeyView>
 
 @property (weak, nonatomic) KVKFile *kvk;
 
@@ -24,3 +27,5 @@
 - (void)resizeOSKLayout;
 
 @end
+
+#endif /* OSKView_h */

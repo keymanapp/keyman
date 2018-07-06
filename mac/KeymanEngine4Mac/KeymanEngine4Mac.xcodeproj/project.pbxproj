@@ -49,6 +49,7 @@
 		E22A5A1120113DC100233965 /* KMEngineTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E22A5A1020113DC100233965 /* KMEngineTests.m */; };
 		E22A5A142011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = E22A5A132011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m */; };
 		E2537D9A201641DA0069FEA6 /* TestMacEngine.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E2537D99201641DA0069FEA6 /* TestMacEngine.kmx */; };
+		E28C71E520EBBA2D002D959D /* KMkeyViewProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = E28C71E420EBBA2C002D959D /* KMkeyViewProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -108,6 +109,7 @@
 		E22A5A1220113F8100233965 /* KeymanEngineTestsStaticHelperMethods.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeymanEngineTestsStaticHelperMethods.h; sourceTree = "<group>"; };
 		E22A5A132011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeymanEngineTestsStaticHelperMethods.m; sourceTree = "<group>"; };
 		E2537D99201641DA0069FEA6 /* TestMacEngine.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestMacEngine.kmx; sourceTree = "<group>"; };
+		E28C71E420EBBA2C002D959D /* KMkeyViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMkeyViewProtocol.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +134,7 @@
 		981880641BC1EA5800A1FBA5 /* OnScreenKeyboard */ = {
 			isa = PBXGroup;
 			children = (
+				E28C71E420EBBA2C002D959D /* KMkeyViewProtocol.h */,
 				981880651BC1EA5800A1FBA5 /* KeyLabel.h */,
 				981880661BC1EA5800A1FBA5 /* KeyLabel.m */,
 				981880671BC1EA5800A1FBA5 /* KeyLabelCell.h */,
@@ -262,6 +265,7 @@
 				984C2B041A79CA4F0023F89D /* NSArray+Action.h in Headers */,
 				980053351B37C9B50088DDDD /* NFont.h in Headers */,
 				9818807B1BC1EE9700A1FBA5 /* TimerTarget.h in Headers */,
+				E28C71E520EBBA2D002D959D /* KMkeyViewProtocol.h in Headers */,
 				984C2B191A79CB020023F89D /* WindowsVKCodes.h in Headers */,
 				984C2B0C1A79CA4F0023F89D /* KMCompGroup.h in Headers */,
 				984C2B101A79CA4F0023F89D /* KMCompStore.h in Headers */,

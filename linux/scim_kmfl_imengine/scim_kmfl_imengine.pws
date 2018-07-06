@@ -1,0 +1,67 @@
+
+[filenumbers]
+0=541
+1=441
+2=133
+3=617
+4=12
+5=49
+6=517
+7=358
+8=35
+9=33
+
+[filemarkers]
+0=
+1=
+2=
+3=
+4=
+5=
+6=
+7=
+8=
+9=
+
+[File View]
+filter.file.unmatch=*.so *.o *.a *.la
+filter.file.ignore.hidden=0
+filter.dir.ignore.hidden=0
+
+[executer]
+RunInTerminal=true
+
+[Project State]
+clean before build=false
+
+[replace_text]
+0=m_chars_to_delete
+1=m_string_to_commit
+2=kmfl
+3=Kmfl
+4=KMFL
+
+[find_text]
+0=valid
+1=SCIM_KMFL_IMENGINE_MODULE_DATADIR
+2=ICONDIR
+3=mbs
+4=0_8_0
+
+[filelist]
+0=/home/doug/Projects/kmflcvs/scim_kmfl_imengine-working/src/scim_kmfl_imengine.cpp
+
+[Project Tree]
+0=0
+1=0:0
+
+[Symbol Tree]
+0=1
+1=1:2
+2=4
+3=5
+
+[File Tree]
+0=0
+1=0:5
+2=0:6

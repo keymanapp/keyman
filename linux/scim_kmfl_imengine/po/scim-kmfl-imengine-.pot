@@ -1,0 +1,42 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Huang Peng <shawn.p.huang@gmail.com>
+# This file is distributed under the same license as the scim-kmfl-imengine- package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: scim-kmfl-imengine- 0.9.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-12-07 15:29-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/scim_kmfl_imengine.cpp:78
+msgid ""
+"en_US.UTF-8,en_AU.UTF-8,en_CA.UTF-8,en_GB.UTF-8,my_MM.UTF-8,zh_CN.UTF-8,"
+"zh_CN.GB18030,zh_CN.GBK,zh_CN.GB2312,zh_CN,zh_TW.UTF-8,zh_TW.Big5,zh_TW,"
+"zh_HK.UTF-8,zh_HK,ja_JP.UTF-8,ja_JP.eucJP,ja_JP.ujis,ja_JP,ja,ko_KR.UTF-8,"
+"ko_KR.eucKR,ko_KR"
+msgstr ""
+
+#: src/scim_kmfl_imengine.cpp:311
+msgid ""
+"Hot Keys:\n"
+"\n"
+"  Esc:\n"
+"  reset the input method.\n"
+msgstr ""
+
+#: src/scim_kmfl_imengine.cpp:580
+msgid "En"
+msgstr ""
+
+#: src/scim_kmfl_imengine.cpp:582
+msgid "Unicode"
+msgstr ""
