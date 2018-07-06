@@ -46,27 +46,37 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
   }
 
   @IBAction func addBookmark(_ sender: Any) {
-    let alert = UIAlertView(title: "Add Bookmark", message: "", delegate: self,
-        cancelButtonTitle: "Cancel", otherButtonTitles: "Add")
-    alert.alertViewStyle = .loginAndPasswordInput
-    if let textField = alert.textField(at: 0) {
+    var inputTitleField: UITextField?
+    var inputUrlField: UITextField?
+    let alertController = UIAlertController(title: "Add Bookmark", message: "",
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addTextField(configurationHandler: { (textField) in
       textField.placeholder = "Title"
-      textField.text = webBrowser?.webView?.stringByEvaluatingJavaScript(from: "document.title")
+      textField.text = self.webBrowser?.webView?.stringByEvaluatingJavaScript(from: "document.title")
       textField.autocapitalizationType = .sentences
       textField.font = UIFont.systemFont(ofSize: 17)
       textField.keyboardType = .default
       textField.clearButtonMode = .whileEditing
-    }
-    if let textField = alert.textField(at: 1) {
-      textField.placeholder = "Url"
-      textField.text = webBrowser?.webView?.request?.mainDocumentURL?.absoluteString
+      inputTitleField = textField
+    })
+    alertController.addTextField(configurationHandler: { (textField) in
+      textField.placeholder = "URL"
+      textField.text = self.webBrowser?.webView?.request?.mainDocumentURL?.absoluteString
       textField.autocapitalizationType = .none
       textField.font = UIFont.systemFont(ofSize: 17)
       textField.keyboardType = UIKeyboardType.URL
       textField.clearButtonMode = .whileEditing
-      textField.isSecureTextEntry = false
-    }
-    alert.show()
+      inputUrlField = textField
+    })
+    alertController.addAction(UIAlertAction(title: "Cancel",
+                                            style: UIAlertActionStyle.cancel,
+                                            handler: nil))
+    alertController.addAction(UIAlertAction(title: "Add",
+                                            style: UIAlertActionStyle.default,
+                                            handler: {_ in self.addBookmarkHandler(withTitleField: inputTitleField, withUrlField: inputUrlField)
+      }))
+    
+    self.present(alertController, animated: true, completion: nil)
   }
 
   private func checkIfEmpty() {
@@ -162,20 +172,13 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     dismiss(animated: true, completion: nil)
   }
 
-  func alertView(_ alertView: UIAlertView, clickedButtonAt buttonIndex: Int) {
-    if buttonIndex == alertView.cancelButtonIndex {
+  func addBookmarkHandler(withTitleField titleField: UITextField?, withUrlField urlField: UITextField?) {
+    guard let title = titleField?.text, !title.isEmpty else {
+      displayError(title: "Invalid Bookmark Title", message: "Please enter a valid title")
       return
     }
-    guard let title = alertView.textField(at: 0)?.text, !title.isEmpty else {
-      let alert = UIAlertView(title: "Invalid Bookmark Title", message: "Please enter a valid title",
-          delegate: self, cancelButtonTitle: "OK", otherButtonTitles: "")
-      alert.show()
-      return
-    }
-    guard var urlString = alertView.textField(at: 1)?.text, let url = URL(string: urlString) else {
-      let alert = UIAlertView(title: "Invalid Bookmark Url", message: "Please enter a valid Url",
-          delegate: self, cancelButtonTitle: "OK", otherButtonTitles: "")
-      alert.show()
+    guard var urlString = urlField?.text, let url = URL(string: urlString) else {
+      displayError(title: "Invalid Bookmark URL", message: "Please enter a valid URL")
       return
     }
     if url.scheme == nil {
@@ -186,5 +189,16 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     bookmarks.append(bookmark)
     saveBookmarks()
     tableView.reloadData()
+  }
+  
+  func displayError(title: String, message: String) {
+    let alertController = UIAlertController(title: title,
+                                            message: message,
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertActionStyle.cancel,
+                                            handler: nil))
+    
+    self.present(alertController, animated: true, completion: nil)
   }
 }
