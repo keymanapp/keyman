@@ -232,16 +232,7 @@ const NSTimeInterval repeatInterval = 0.05f;
 }
 
 -(void)processKeyClick {
-    // This code was previously incorrectly implemented because the function call failed to pass "self" as the
-    // final parameter. This page describes the fix, as implemented here:
-    // https://stackoverflow.com/questions/27626617/how-to-solve-performselector-may-cause-leak-because-its-selector-is-unknown?noredirect=1&lq=1
-    // This is almost certainly not the *best* way to implement this, but we're up against our release deadline,
-    // so it should be revisted soon to come up with a more readable and reliable approach, and maybe even a
-    // unit-testable one.
-    SEL selector = self.action;
-    IMP imp = [self.target methodForSelector:selector];
-    void (*func)(id, SEL, id) = (void *)imp;
-    func(self.target, selector, (NSObject *)self);
+    [self.target keyAction:self];
 }
 
 - (void)startTimerWithTimeInterval:(NSTimeInterval)interval {
