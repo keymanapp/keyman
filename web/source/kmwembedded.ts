@@ -232,6 +232,8 @@
  
     for(nLayer=0;nLayer<layers.length; nLayer++)
     {
+      // Check the heights of each row, in case different layers have different row counts.
+      nRows=layers[nLayer].childNodes.length;
       layers[nLayer].style.height=(oskHeight+3)+'px';       
       for(nRow=0; nRow<nRows; nRow++)
       {                                  
