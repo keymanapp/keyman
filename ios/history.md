@@ -1,6 +1,6 @@
 # Keyman for iPhone and iPad Version History
 
-## 2018-07-09 11.0.??? alpha
+## 2018-07-09 11.0.16 alpha
 * Replaced deprecated calls to UIAlertView and cleaned up extraneous blank buttons (#1002)
 
 ## 11.0 alpha

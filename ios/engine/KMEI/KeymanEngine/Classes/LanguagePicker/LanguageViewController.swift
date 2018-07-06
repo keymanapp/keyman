@@ -184,6 +184,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
       alertController.addAction(UIAlertAction(title: "Download",
                                                 style: UIAlertActionStyle.default,
                                                 handler: {_ in self.downloadHandler(keyboardIndex)} ))
+      self.present(alertController, animated: true, completion: nil)
     }
   }
 
