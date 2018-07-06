@@ -103,7 +103,7 @@ cd $BASE_PATH/../source
 ./build_recorder.sh
 
 npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
-npm --no-color run karma -- start --log-level debug $FLAGS $BROWSERS unit_tests/$CONFIG
+npm --no-color run karma -- start --log-level=debug $FLAGS $BROWSERS unit_tests/$CONFIG
 
 CODE=$?
 
