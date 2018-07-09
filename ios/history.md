@@ -1,7 +1,7 @@
 # Keyman for iPhone and iPad Version History
 
 ## 2018-07-06 10.0.203 stable
-* Fixes issue for embedded Android, iOS apps where a keyboard with varying row counts in different layers could crash (#1055)
+* Fixes issue for Keyman for iPhone and iPad where a keyboard with varying row counts in different layers could crash (#1055)
 
 ## 2018-06-28 10.0.200 stable
 * 10.0 stable release
