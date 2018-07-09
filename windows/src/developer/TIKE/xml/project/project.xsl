@@ -27,30 +27,22 @@
           <div class="tabbspacer"></div>
 
           <div id="tabb0" class="tabb" onmousedown="javascript:selecttabb(0);">
-            <img alt="Welcome">
-              <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>tab_welcome.gif</xsl:attribute>
-            </img>
+            <img alt="Welcome" src='res/tab_welcome.gif' />
             Welcome
           </div>
           
           <div id="tabb1" class="tabb" onmousedown="javascript:selecttabb(1);">
-            <img alt="Keyboards">
-              <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>tab_keyboard.png</xsl:attribute>
-            </img>
+            <img alt="Keyboards" src='res/tab_keyboard.png' />
             Keyboards
           </div>
 
           <div id="tabb2" class="tabb" onmousedown="javascript:selecttabb(2);">
-            <img alt="Packaging">
-              <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>tab_package.png</xsl:attribute>
-            </img>
+            <img alt="Packaging" src='res/tab_package.png' />
             Packaging
           </div>
 
           <div id="tabb3" class="tabb" onmousedown="javascript:selecttabb(3);">
-            <img alt="Distribution">
-              <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>tab_distrib.png</xsl:attribute>
-            </img>
+            <img alt="Distribution" src='res/tab_distrib.png' />
             Distribution
           </div>
         </div>

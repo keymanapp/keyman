@@ -6,9 +6,7 @@
     <div class="page" id="page-2">
       <div class="help-container" id="uppertext2">
         <div class="headerimage">
-          <p><img>
-            <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>header_package.png</xsl:attribute>
-          </img></p>
+          <p><img src='res/header_package.png' /></p>
           <div class='quicklinks'>
             <h3>Quick Links</h3>
           

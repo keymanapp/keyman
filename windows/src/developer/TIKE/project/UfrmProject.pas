@@ -127,7 +127,7 @@ type
     procedure RefreshHTML(RefreshState: Boolean);
     procedure WMUserWebCommand(var Message: TMessage); message WM_USER_WEBCOMMAND;
     procedure EditFileExternal(FileName: WideString);
-    function DoNavigate(URL: WideString): Boolean;
+    function DoNavigate(URL: string): Boolean;
     procedure ClearMessages;
     procedure CreateBrowser;
   protected
@@ -140,9 +140,11 @@ type
 implementation
 
 uses
+  System.StrUtils,
   Winapi.ShellApi,
 
   Keyman.Developer.System.HelpTopics,
+
 
   dmActionsMain,
   KeymanDeveloperOptions,
@@ -165,7 +167,7 @@ uses
   utilexecute,
   utilxml,
   mrulist,
-  //UmodWebHttpServer,
+  UmodWebHttpServer,
   uCEFApplication;
 
 {$R *.DFM}
@@ -257,9 +259,9 @@ begin
     tmrRefresh.Enabled := True
   else
   begin
-    GetGlobalProjectUI.Refreshing := True;   // I4687
+//    GetGlobalProjectUI.Refreshing := True;   // I4687
     if RefreshState then SaveCurrentTab;
-    cef.LoadURL(GetGlobalProjectUI.Render);
+    cef.LoadURL(modWebHttpServer.GetLocalhostURL + '/app/project/?path='+URLEncode(GetGlobalProjectUI.FileName));
   end;
   RefreshCaption;
 end;
@@ -399,7 +401,7 @@ begin
   frmMessages.Clear;
 end;
 
-function TfrmProject.DoNavigate(URL: WideString): Boolean;
+function TfrmProject.DoNavigate(URL: string): Boolean;
 var
   n: Integer;
   s, command: WideString;
@@ -432,7 +434,7 @@ begin
     FNextCommand := LowerCase(s);
     PostMessage(Handle, WM_USER_WebCommand, WC_HELP, 0);
   end
-  else if Copy(URL, 1, 4) = 'http' then
+  else if not URL.StartsWith(modWebHttpServer.GetLocalhostURL) and (Copy(URL, 1, 4) = 'http') then
   begin
     Result := True;
     FNextCommand := URL;
@@ -490,7 +492,7 @@ begin
 
       if ShowModal = mrOk then
       begin
-        pf := CreateProjectFile(FileName, nil);
+        pf := CreateProjectFile(FGlobalProject, FileName, nil);
       end;
     finally
       Free;
@@ -507,7 +509,7 @@ begin
     dlgOpenFile.DefaultExt := FDefaultExtension;
     if dlgOpenFile.Execute then
     begin
-      CreateProjectFile(dlgOpenFile.FileName, nil);
+      CreateProjectFile(FGlobalProject, dlgOpenFile.FileName, nil);
     end;
   end
   else if (Command = 'editfile') or (Command = 'openfile') then
