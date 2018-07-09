@@ -3,6 +3,9 @@
 ## 11.0 alpha
 * Move to 11.0
 
+## 2018-07-06 10.0.203 stable
+* Fixes an issue where a keyboard with varying row counts in different layers could crash (#1055)
+
 ## 2018-06-28 10.0.200 stable
 * 10.0 stable release
 
