@@ -79,8 +79,6 @@ type
     FShouldRefresh: Boolean;
     FNextCommand: WideString;
     FNextCommandParams: TStringList;
-    FCefClosing: Boolean;
-    FCefCanClose: Boolean;
 
     // CEF: You have to handle this two messages to call NotifyMoveOrResizeStarted or some page elements will be misaligned.
     procedure WMMove(var aMessage : TWMMove); message WM_MOVE;
@@ -135,6 +133,7 @@ type
   public
     procedure SetFocus; override;
     procedure SetGlobalProject;
+    procedure StartClose; override;
   end;
 
 implementation
@@ -207,21 +206,15 @@ end;
 
 procedure TfrmProject.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
-  if not FCefCanClose then
-    inherited;
-
-  if FCefCanClose or CanClose then
-  begin
+  inherited;
+  if CanClose then
     SaveCurrentTab;
+end;
 
-    if not FCefClosing then
-    begin
-      CanClose := False;
-      FCefClosing := True;
-      Visible  := False;
-      cef.CloseBrowser(True);
-    end;
-  end;
+procedure TfrmProject.StartClose;
+begin
+  Visible := False;
+  cef.CloseBrowser(True);
 end;
 
 procedure TfrmProject.FormCreate(Sender: TObject);
@@ -351,20 +344,17 @@ end;
 
 procedure TfrmProject.cefBeforeClose(Sender: TObject);
 begin
-  FCefCanClose := True;
   Close;
 end;
 
 
 procedure TfrmProject.cefClose(Sender: TObject);
 begin
-  //TODO: Update mainform to request-close all tabs before shutting down
   // DestroyChildWindow will destroy the child window created by CEF at the top of the Z order.
-  if not(cef.DestroyChildWindow) then
-    begin
-      FCefCanClose := True;
-      Close;
-    end;
+  if not cef.DestroyChildWindow then
+  begin
+    Close;
+  end;
 end;
 
 procedure TfrmProject.cefConsoleMessage(Sender: TObject;
