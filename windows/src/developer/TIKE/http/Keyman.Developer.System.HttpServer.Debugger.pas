@@ -12,6 +12,8 @@ uses
   IdCustomHTTPServer,
   IdHTTPServer,
 
+  Keyman.Developer.System.HttpServer.Base,
+
   KeyboardFonts;
 
 type
@@ -52,7 +54,7 @@ type
     property Name: string read FName;
   end;
 
-  TDebuggerHttpServer = class
+  TDebuggerHttpResponder = class(TBaseHttpResponder)
   private
     FKeyboardsCS, FPackagesCS: TCriticalSection;   // I4036
     FKeyboards: TObjectDictionary<string,TWebDebugKeyboardInfo>;   // I4063
@@ -105,7 +107,7 @@ end;
 
 { TDebuggerHttpServer }
 
-constructor TDebuggerHttpServer.Create;
+constructor TDebuggerHttpResponder.Create;
 begin
   FKeyboardsCS := TCriticalSection.Create;   // I4036
   FKeyboards := TObjectDictionary<string,TWebDebugKeyboardInfo>.Create;   // I4063
@@ -114,7 +116,7 @@ begin
   FPackages := TObjectDictionary<string,TWebDebugPackageInfo>.Create;   // I4063
 end;
 
-destructor TDebuggerHttpServer.Destroy;
+destructor TDebuggerHttpResponder.Destroy;
 begin
   FreeAndNil(FKeyboards);
   FreeAndNil(FKeyboardsCS);   // I4036
@@ -125,7 +127,7 @@ begin
   inherited Destroy;
 end;
 
-function TDebuggerHttpServer.GetKeyboardStoredFileName(
+function TDebuggerHttpResponder.GetKeyboardStoredFileName(
   const WebFilename: string): string;
 begin
   FKeyboardsCS.Enter;   // I4036
@@ -137,7 +139,7 @@ begin
   end;
 end;
 
-function TDebuggerHttpServer.GetPackageStoredFileName(
+function TDebuggerHttpResponder.GetPackageStoredFileName(
   const WebFilename: string): string;
 begin
   FPackagesCS.Enter;   // I4036
@@ -149,7 +151,7 @@ begin
   end;
 end;
 
-procedure TDebuggerHttpServer.ProcessRequest(AContext: TIdContext;
+procedure TDebuggerHttpResponder.ProcessRequest(AContext: TIdContext;
   ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
 
   procedure Respond404;
@@ -491,17 +493,13 @@ var
   FFileRegExp: TRegExpr;
   FResourceFileRegExp: TRegExpr;
 begin
+  //    /keyboard/###.js -> looks up the list of currently testing keyboards
+  //    everything else retrieved from xml/kmw/
   doc := ARequestInfo.Document;
   Delete(doc, 1, 1);
 
   if doc = '' then
     doc := 'index.html';
-
-  if Copy(doc, 1, 8) = 'project/' then
-  begin
-    RespondProject;
-    Exit;
-  end;
 
   if doc = 'inc/keyboards.js' then
   begin
@@ -639,7 +637,7 @@ begin
   end;
 end;
 
-procedure TDebuggerHttpServer.RegisterKeyboard(const Filename, Version: string; FontInfo: TKeyboardFontArray);   // I4063   // I4409
+procedure TDebuggerHttpResponder.RegisterKeyboard(const Filename, Version: string; FontInfo: TKeyboardFontArray);   // I4063   // I4409
 var
   k: TWebDebugKeyboardInfo;
 begin
@@ -652,7 +650,7 @@ begin
   end;
 end;
 
-procedure TDebuggerHttpServer.RegisterPackage(const Filename, Name: string);
+procedure TDebuggerHttpResponder.RegisterPackage(const Filename, Name: string);
 var
   p: TWebDebugPackageInfo;
 begin
@@ -665,7 +663,7 @@ begin
   end;
 end;
 
-procedure TDebuggerHttpServer.UnregisterKeyboard(const Filename: string);
+procedure TDebuggerHttpResponder.UnregisterKeyboard(const Filename: string);
 begin
   FKeyboardsCS.Enter;   // I4036
   try
@@ -675,7 +673,7 @@ begin
   end;
 end;
 
-procedure TDebuggerHttpServer.UnregisterPackage(const Filename: string);
+procedure TDebuggerHttpResponder.UnregisterPackage(const Filename: string);
 begin
   FPackagesCS.Enter;   // I4036
   try

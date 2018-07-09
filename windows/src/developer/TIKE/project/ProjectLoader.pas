@@ -117,7 +117,7 @@ begin
       if not VarIsNull(node.ChildValues['Filepath']) then
       begin
         // I1152 - Avoid crashes when .kpj file is invalid
-        pf := CreateProjectFile(ExpandFileNameClean(FFileName, node.ChildValues['Filepath']), nil);
+        pf := CreateProjectFile(FProject, ExpandFileNameClean(FFileName, node.ChildValues['Filepath']), nil);
         pf.Load(node, True);
       end;
     end;
@@ -134,7 +134,7 @@ begin
     begin
       n := FProject.Files.IndexOfID(node.ChildValues['ParentFileID']);
       if n < 0 then Continue;
-      pf := CreateProjectFile(ExpandFileNameClean(FFileName, node.ChildValues['Filepath']), FProject.Files[n]);
+      pf := CreateProjectFile(FProject, ExpandFileNameClean(FFileName, node.ChildValues['Filepath']), FProject.Files[n]);
       pf.Load(node, True);
     end;
   end;

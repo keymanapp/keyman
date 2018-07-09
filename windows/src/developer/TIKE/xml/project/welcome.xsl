@@ -6,9 +6,7 @@
     <div class="page" id="page-0">
       <div class="help-container" id="uppertext0" >
         <div class="headerimage">
-          <p><img alt="Welcome">
-              <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>header_welcome.gif</xsl:attribute>
-          </img></p>
+          <p><img alt="Welcome" src='res/header_welcome.gif' /></p>
           <div class='quicklinks'>
             <h3>Quick Links</h3>
           

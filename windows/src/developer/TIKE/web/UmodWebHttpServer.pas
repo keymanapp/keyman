@@ -55,16 +55,17 @@ type
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
   private
-    FApp: TAppHttpServer;
-    FDebugger: TDebuggerHttpServer;
-    function GetApp: TAppHttpServer;
-    function GetDebugger: TDebuggerHttpServer;
+    FApp: TAppHttpResponder;
+    FDebugger: TDebuggerHttpResponder;
+    function GetApp: TAppHttpResponder;
+    function GetDebugger: TDebuggerHttpResponder;
   public
     function GetURL: string;
+    function GetLocalhostURL: string;
     procedure GetURLs(v: TStrings);
 
-    property Debugger: TDebuggerHttpServer read GetDebugger;
-    property App: TAppHttpServer read GetApp;
+    property Debugger: TDebuggerHttpResponder read GetDebugger;
+    property App: TAppHttpResponder read GetApp;
   end;
 
 var
@@ -128,18 +129,23 @@ begin
   http.Active := False;   // I4036
 end;
 
-function TmodWebHttpServer.GetApp: TAppHttpServer;
+function TmodWebHttpServer.GetApp: TAppHttpResponder;
 begin
   if not Assigned(FApp) then
-    FApp := TAppHttpServer.Create;
+    FApp := TAppHttpResponder.Create;
   Result := FApp;
 end;
 
-function TmodWebHttpServer.GetDebugger: TDebuggerHttpServer;
+function TmodWebHttpServer.GetDebugger: TDebuggerHttpResponder;
 begin
   if not Assigned(FDebugger) then
-    FDebugger := TDebuggerHttpServer.Create;
+    FDebugger := TDebuggerHttpResponder.Create;
   Result := FDebugger;
+end;
+
+function TmodWebHttpServer.GetLocalhostURL: string;
+begin
+  Result := 'http://127.0.0.1:'+IntToStr(http.DefaultPort);
 end;
 
 function TmodWebHttpServer.GetURL: string;
@@ -214,8 +220,6 @@ procedure TmodWebHttpServer.httpCommandGet(AContext: TIdContext;
 var
   doc: string;
 begin
-  //    /keyboard/###.js -> looks up the list of currently testing keyboards
-  //    everything else retrieved from xml/kmw/
   doc := ARequestInfo.Document;
   Delete(doc, 1, 1);
 
@@ -227,6 +231,5 @@ begin
 
   FDebugger.ProcessRequest(AContext, ARequestInfo, AResponseInfo);
 end;
-
 
 end.

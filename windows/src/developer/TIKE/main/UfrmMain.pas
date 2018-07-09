@@ -412,6 +412,7 @@ uses
   OnlineUpdateCheck,
   GlobalProxySettings,
   ProjectFileUI,
+  ProjectUI,
   TextFileFormat,
   RedistFiles,
   ErrorControlledRegistry,
@@ -504,8 +505,8 @@ begin
 
   if (FActiveProject <> '') and not FileExists(FActiveProject) then
     FActiveProject := '';
-  TProjectUI.Create(FActiveProject, True);   // I4687
 
+  LoadGlobalProjectUI(FActiveProject, True);
 
   InitDock;
 
@@ -627,7 +628,7 @@ begin
   FreeAndNil(FCharMapSettings);
   Application.OnActivate := nil;
 
-  FreeAndNil(FGlobalProject);
+  FreeGlobalProjectUI;
   FreeAndNil(FChildWindows);
   FreeAndNil(FProjectMRU);
 

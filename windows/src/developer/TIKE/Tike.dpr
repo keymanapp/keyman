@@ -271,7 +271,8 @@ uses
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   Keyman.Developer.System.InitializeCEF in 'main\Keyman.Developer.System.InitializeCEF.pas',
   Keyman.Developer.System.HttpServer.Debugger in 'http\Keyman.Developer.System.HttpServer.Debugger.pas',
-  Keyman.Developer.System.HttpServer.App in 'Keyman.Developer.System.HttpServer.App.pas';
+  Keyman.Developer.System.HttpServer.App in 'Keyman.Developer.System.HttpServer.App.pas',
+  Keyman.Developer.System.HttpServer.Base in 'http\Keyman.Developer.System.HttpServer.Base.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

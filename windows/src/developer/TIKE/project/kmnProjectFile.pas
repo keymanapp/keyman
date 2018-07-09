@@ -364,7 +364,7 @@ begin
             if Project.Files[j].Parent = Self then
               Project.Files.Delete(j);
 
-          CreateProjectFile(value, Self);
+          CreateProjectFile(Project, value, Self);
         end
       end
       else
