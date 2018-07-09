@@ -72,10 +72,9 @@ static gchar * get_dirname(const gchar * path)
     }
 }
 
-GList * kmfl_get_keyboard_list( const gchar * path)
+GList * kmfl_get_keyboard_fromdir( GList *keyboard_list, const gchar * path)
 {
-    GList * keyboard_list=NULL;
-
+//    g_message("KMFL: getting from dir: %s", path);
     DIR *dir = opendir(path);
 
     if (dir != NULL) {
@@ -85,19 +84,36 @@ GList * kmfl_get_keyboard_list( const gchar * path)
             gchar * absfn = g_strdup_printf("%s/%s", path, file->d_name);
             stat(absfn, &filestat);
 
+            if (S_ISDIR(filestat.st_mode))
+            {
+                if(strcmp(file->d_name, ".") != 0 && strcmp(file->d_name, "..") != 0)
+                    keyboard_list = kmfl_get_keyboard_fromdir(keyboard_list, absfn);
+                g_free(absfn);
+            }
 
             // Only .kmfl and .kmn extensions are valid keyboard files
-            if (S_ISREG(filestat.st_mode)
+            else if (S_ISREG(filestat.st_mode)
                 && ((g_str_has_suffix(absfn, ".kmfl") && kmfl_check_keyboard(absfn) == 0) 
                 || g_str_has_suffix(absfn, ".kmn"))) {
 
                 keyboard_list=g_list_append(keyboard_list, absfn);
+            }
+            else
+            {
+                g_free(absfn);
             }
 
             file = readdir(dir);
         }
         closedir(dir);
     }
+    return keyboard_list;
+}
+
+GList * kmfl_get_keyboard_list( const gchar * path)
+{
+    GList * keyboard_list=NULL;
+    keyboard_list = kmfl_get_keyboard_fromdir(keyboard_list, path);
     return keyboard_list;
 }
 
@@ -242,21 +258,29 @@ ibus_kmfl_list_engines (void)
     gchar *local_keyboard_path;
 
     keyboard_list = kmfl_get_keyboard_list("/usr/share/kmfl");
-
     engines = ibus_kmfl_add_engines(engines, keyboard_list);
+    g_list_free(keyboard_list);
 
+    keyboard_list = kmfl_get_keyboard_list("/usr/share/keyman");
+    engines = ibus_kmfl_add_engines(engines, keyboard_list);
+    g_list_free(keyboard_list);
+
+    keyboard_list = kmfl_get_keyboard_list("/usr/local/share/keyman");
+    engines = ibus_kmfl_add_engines(engines, keyboard_list);
     g_list_free(keyboard_list);
 
     local_keyboard_path= g_strdup_printf("%s/.kmfl", getenv("HOME"));
-
     keyboard_list = kmfl_get_keyboard_list(local_keyboard_path);
-
     engines = ibus_kmfl_add_engines(engines, keyboard_list);
-
     g_free(local_keyboard_path);
-
     g_list_free(keyboard_list);
-    
+
+    local_keyboard_path= g_strdup_printf("%s/.local/share/keyman", getenv("HOME"));
+    keyboard_list = kmfl_get_keyboard_list(local_keyboard_path);
+    engines = ibus_kmfl_add_engines(engines, keyboard_list);
+    g_free(local_keyboard_path);
+    g_list_free(keyboard_list);
+
     return engines;
 }
 
