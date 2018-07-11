@@ -45,21 +45,23 @@ const NSTimeInterval repeatInterval = 0.05f;
         [_label setBordered:NO];
         [_label setDrawsBackground:NO];
         [_label setAlignment:NSCenterTextAlignment];
-        [_label setLineBreakMode:NSLineBreakByClipping];
+        if ([_caption respondsToSelector:@selector(setLineBreakMode:)]) {
+            [_label setLineBreakMode:NSLineBreakByClipping];
+        } // There might be some problem not calling this, but it seems to be okay as far as I can tell
         [_label setFont:[NSFont systemFontOfSize:fontSize]];
         [_label setTextColor:[NSColor blackColor]];
         [_label setStringValue:@""];
         [self addSubview:_label];
         
-        bgColor1 = [NSColor colorWithRed:209.0/255.0 green:211.0/255.0 blue:212.0/255.0 alpha:1.0];
-        bgColor2 = [NSColor colorWithRed:166.0/255.0 green:169.0/255.0 blue:172.0/255.0 alpha:1.0];
+        bgColor1 = [self getOpaqueColorWithRed:209 green:211 blue:212];
+        bgColor2 = [self getOpaqueColorWithRed:166 green:169 blue:172];
     }
     
     return self;
 }
 
 - (void)drawRect:(NSRect)rect {
-    [[NSColor colorWithRed:241.0/255.0 green:242.0/255.0 blue:242.0/255.0 alpha:1.0] setFill];
+    [[self getOpaqueColorWithRed:241 green:242 blue:242] setFill];
     NSRectFillUsingOperation(rect, NSCompositeSourceOver);
     
     // Drawing code here.
@@ -196,7 +198,9 @@ const NSTimeInterval repeatInterval = 0.05f;
         [_caption setDrawsBackground:NO];
         //[_caption setBackgroundColor:[NSColor yellowColor]];
         [_caption setAlignment:NSLeftTextAlignment];
-        [_caption setLineBreakMode:NSLineBreakByClipping];
+        if ([_caption respondsToSelector:@selector(setLineBreakMode:)]) {
+            [_caption setLineBreakMode:NSLineBreakByClipping];
+        } // There might be some problem not calling this, but it seems to be okay as far as I can tell
         [_caption setFont:[NSFont systemFontOfSize:fontSize]];
         [_caption setTextColor:[NSColor darkGrayColor]];
         [_caption setStringValue:@""];
@@ -289,15 +293,26 @@ const NSTimeInterval repeatInterval = 0.05f;
 - (void)setKeyPressed:(BOOL)keyPressed {
     _keyPressed = keyPressed;
     if (keyPressed) {
-        bgColor1 = [NSColor colorWithRed:109.0/255.0 green:111.0/255.0 blue:112.0/255.0 alpha:1.0];
-        bgColor2 = [NSColor colorWithRed:236.0/255.0 green:239.0/255.0 blue:242.0/255.0 alpha:1.0];
+        bgColor1 = [self getOpaqueColorWithRed:109 green:111 blue:112];
+        bgColor2 = [self getOpaqueColorWithRed:236 green:239 blue:242];
         [self setNeedsDisplay:YES];
     }
     else {
-        bgColor1 = [NSColor colorWithRed:209.0/255.0 green:211.0/255.0 blue:212.0/255.0 alpha:1.0];
-        bgColor2 = [NSColor colorWithRed:166.0/255.0 green:169.0/255.0 blue:172.0/255.0 alpha:1.0];
+        bgColor1 = [self getOpaqueColorWithRed:209 green:211 blue:212];
+        bgColor2 = [self getOpaqueColorWithRed:166 green:169 blue:172];
         [self setNeedsDisplay:YES];
     }
 }
 
+- (NSColor *)getOpaqueColorWithRed:(NSUInteger) red green: (NSUInteger) green blue: (NSUInteger) blue {
+    // RGB is what was in the code originally I can't tell any difference between that and SRGB for the
+    // colors we're using in the OSK, but at the risk of causing an unintended change, I'm leaving it as
+    // it was for versions of macOS that support colorWithRed:green:blue:
+    if ([NSColor respondsToSelector:@selector(colorWithRed:green:blue:alpha:)]) {
+        return [NSColor colorWithRed:red/255.0 green:green/255.0 blue:blue/255.0 alpha:1.0];
+    }
+    else {
+        return [NSColor colorWithSRGBRed:red/255.0 green:green/255.0 blue:blue/255.0 alpha:1.0];
+    }
+}
 @end
