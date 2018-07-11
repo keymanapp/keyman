@@ -1,10 +1,7 @@
 # Keyman for iPhone and iPad Version History
 
-## 2018-07-09 11.0.16 alpha
-* Replaced deprecated calls to UIAlertView and cleaned up extraneous blank buttons (#1002)
-
 ## 11.0 alpha
-* Move to 11.0
+* Replaced deprecated calls to UIAlertView and cleaned up extraneous blank buttons (#1002)
 
 ## 2018-07-06 10.0.203 stable
 * Fixes an issue where a keyboard with varying row counts in different layers could crash (#1055)
