@@ -1,7 +1,11 @@
 # Keyman for Android
 
+
 ## 11.0 alpha
 * Move to 11.0
+
+## 2018-07-06 10.0.502 stable
+* Fixes issue for embedded Android, iOS apps where a keyboard with varying row counts in different layers could crash (#1055)
 
 ## 2018-06-28 10.0.500 stable
 * 10.0 stable release

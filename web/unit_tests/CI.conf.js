@@ -67,13 +67,13 @@ module.exports = function(config) {
   var CURRENT_IOS_LAUNCHERS = {
     bs_iphoneX: {
       device: 'iPhone 8 Plus', // Ideally, we'd use 'iPhone X', but BrowserStack's version is being problematic lately.
-      real_mobile: false,
+      real_mobile: true,
       os: 'ios',
       os_version: '11.0'
     },
     bs_ipad5: {
       device: 'iPad 5th',
-      real_mobile: false,
+      real_mobile: true,
       os: 'ios',
       os_version: '11.0'
     }

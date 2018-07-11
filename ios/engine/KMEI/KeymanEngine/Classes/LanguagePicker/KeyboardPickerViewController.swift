@@ -8,7 +8,6 @@
 
 import UIKit
 
-private let errorAlertTag = -1
 private let toolbarButtonTag = 100
 private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
@@ -254,11 +253,14 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       title = "Keyboard Download Error"
     }
     navigationController?.setToolbarHidden(true, animated: true)
-
-    let alert = UIAlertView(title: title, message: notification.error.localizedDescription,
-                            delegate: self, cancelButtonTitle: "OK", otherButtonTitles: "")
-    alert.tag = errorAlertTag
-    alert.show()
+    
+    let alertController = UIAlertController(title: title, message: notification.error.localizedDescription,
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertActionStyle.cancel,
+                                            handler: nil))
+    
+    self.present(alertController, animated: true, completion: nil)
   }
 
   private func switchKeyboard(_ index: Int) {

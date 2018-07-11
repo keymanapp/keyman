@@ -90,7 +90,8 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.cellForRow(at: indexPath)?.isSelected = false
-    let keyboard = language.keyboards![indexPath.section]
+    let keyboardIndex = indexPath.section
+    let keyboard = language.keyboards![keyboardIndex]
 
     let state = Manager.shared.stateForKeyboard(withID: keyboard.id)
     if state != .downloading {
@@ -99,23 +100,24 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
       } else {
         isUpdate = true
       }
-
-      let alert = UIAlertView(title: "\(language.name): \(keyboard.name)",
-                              message: "Would you like to download this keyboard?",
-                              delegate: self,
-                              cancelButtonTitle: "Cancel",
-                              otherButtonTitles: "Download")
-      alert.tag = indexPath.section
-      alert.show()
+    
+        let alertController = UIAlertController(title: "\(language.name): \(keyboard.name)",
+                                                message: "Would you like to download this keyboard?",
+                                                preferredStyle: UIAlertControllerStyle.alert)
+        alertController.addAction(UIAlertAction(title: "Cancel",
+                                                style: UIAlertActionStyle.cancel,
+                                                handler: nil))
+        alertController.addAction(UIAlertAction(title: "Download",
+                                                style: UIAlertActionStyle.default,
+                                                handler: {_ in self.downloadHandler(keyboardIndex)} ))
+        
+        self.present(alertController, animated: true, completion: nil)
     }
   }
 
-  func alertView(_ alertView: UIAlertView, clickedButtonAt buttonIndex: Int) {
-    // Keyboard download confirmation alert (tag is used for keyboard index).
-    if buttonIndex != alertView.cancelButtonIndex {
-      Manager.shared.downloadKeyboard(withID: language.keyboards![alertView.tag].id,
+  func downloadHandler(_ keyboardIndex: Int) {
+    Manager.shared.downloadKeyboard(withID: language.keyboards![keyboardIndex].id,
                                       languageID: language.id, isUpdate: isUpdate)
-    }
   }
 
   private func keyboardDownloadStarted() {
