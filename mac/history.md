@@ -1,5 +1,8 @@
 # Keyman for macOS Version History
 
+## 2018-07-12 10.0.101 stable
+* Fix crashing bug in OSK for older versions of OS (#1066)
+
 ## 2018-06-28 10.0.100 stable
 * 10.0 stable release
 
