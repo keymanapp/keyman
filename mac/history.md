@@ -3,6 +3,9 @@
 ## 2018-07-?? 10.0.10? alpha
 * Refactored target-action call from keyView
 
+## 2018-07-12 10.0.101 stable
+* Fix crashing bug in OSK for older versions of OS (#1065)
+
 ## 2018-06-28 10.0.100 stable
 * 10.0 stable release
 
