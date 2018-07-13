@@ -489,13 +489,7 @@ NSRange _previousSelRange;
     /*if (event.type == NSKeyDown)
      [self.AppDelegate handleKeyEvent:event];*/
     
-    if (event.type == NSLeftMouseDown || event.type == NSLeftMouseUp ) {
-        _contextOutOfDate = YES;
-        return NO;
-    }
-    else if (event.type != NSKeyDown)
-        return NO; // We ignore NSLeftMouseDragged events (because we'll eventually get a mouse-up).
-    else if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
+    if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
         [self handleCommand:event];
         return NO; // We let the client app handle all Command-key events.
     }
@@ -535,7 +529,6 @@ NSRange _previousSelRange;
                 NSLog(@"Deleted %li null characters from context buffer", nc);
             // This can presumably only happen if a previous event resulted in a chain of
             // actions that had a Q_BACK not followed by a Q_STR.
-            // REVIEW: Need to test this scenario in Atom and Googe Docs in Safari
             self.willDeleteNullChar = YES;
             [self postDeleteBacks:nc for:event];
             _keyCodeOfOriginalEvent = event.keyCode;
@@ -573,18 +566,18 @@ NSRange _previousSelRange;
                 break;
                 
             default:
-            {
-                // NOTE: Although ch is usually the same as keyCode, when the option key is depressed (and
-                // perhaps in some other cases) it may not be (keyCode can be 0). Likewise, the option key
-                // can generate more than one character in event.characters.
-                unichar ch = [event.characters characterAtIndex:0];
-                if (keyCode < 0x33 || (ch >= 0x2A && ch <= 0x39)) { // Main keys, Numpad char range, normal punctuation
-                    charactersToAppend = event.characters;
+                {
+                    // NOTE: Although ch is usually the same as keyCode, when the option key is depressed (and
+                    // perhaps in some other cases) it may not be (keyCode can be 0). Likewise, the option key
+                    // can generate more than one character in event.characters.
+                    unichar ch = [event.characters characterAtIndex:0];
+                    if (keyCode < 0x33 || (ch >= 0x2A && ch <= 0x39)) { // Main keys, Numpad char range, normal punctuation
+                        charactersToAppend = event.characters;
+                    }
+                    else {
+                        // Other keys
+                    }
                 }
-                else {
-                    // Other keys
-                }
-            }
                 break;
         }
         if (charactersToAppend != nil) {
