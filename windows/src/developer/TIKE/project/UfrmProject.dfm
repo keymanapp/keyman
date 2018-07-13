@@ -6,7 +6,6 @@ inherited frmProject: TfrmProject
   ClientHeight = 606
   ClientWidth = 862
   OldCreateOrder = True
-  OnCloseQuery = FormCloseQuery
   ExplicitWidth = 862
   ExplicitHeight = 606
   PixelsPerInch = 96

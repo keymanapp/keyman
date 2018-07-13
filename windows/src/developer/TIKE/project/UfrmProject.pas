@@ -70,7 +70,6 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure tmrRefreshTimer(Sender: TObject);
     procedure FormActivate(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure tmrCreateBrowserTimer(Sender: TObject);
     procedure cefClose(Sender: TObject);
     procedure cefBeforeClose(Sender: TObject);
@@ -121,8 +120,7 @@ type
     procedure ProjectRefreshCaption(Sender: TObject);
     procedure RefreshCaption;
     procedure WebCommand(Command: WideString; Params: TStringList);
-    procedure SaveCurrentTab;
-    procedure RefreshHTML(RefreshState: Boolean);
+    procedure RefreshHTML;
     procedure WMUserWebCommand(var Message: TMessage); message WM_USER_WEBCOMMAND;
     procedure EditFileExternal(FileName: WideString);
     function DoNavigate(URL: string): Boolean;
@@ -200,15 +198,10 @@ end;
 procedure TfrmProject.FormActivate(Sender: TObject);
 begin
   inherited;
-  if FShouldRefresh then RefreshHTML(True);
-  FShouldRefresh := False;
-end;
 
-procedure TfrmProject.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-begin
-  inherited;
-  if CanClose then
-    SaveCurrentTab;
+  if FShouldRefresh then
+    RefreshHTML;
+  FShouldRefresh := False;
 end;
 
 procedure TfrmProject.StartClose;
@@ -239,7 +232,7 @@ begin
   tmrCreateBrowser.Enabled := not cef.CreateBrowser;
 end;
 
-procedure TfrmProject.RefreshHTML(RefreshState: Boolean);
+procedure TfrmProject.RefreshHTML;
 begin
   if not cef.Initialized then
   begin
@@ -253,7 +246,6 @@ begin
   else
   begin
 //    GetGlobalProjectUI.Refreshing := True;   // I4687
-    if RefreshState then SaveCurrentTab;
     cef.LoadURL(modWebHttpServer.GetLocalhostURL + '/app/project/?path='+URLEncode(GetGlobalProjectUI.FileName));
   end;
   RefreshCaption;
@@ -263,7 +255,7 @@ procedure TfrmProject.ProjectRefresh(Sender: TObject);
 begin
   if frmKeymanDeveloper.ActiveChild <> Self
     then FShouldRefresh := True
-    else RefreshHTML(True);
+    else RefreshHTML;
 end;
 
 procedure TfrmProject.ProjectRefreshCaption(Sender: TObject);
@@ -278,26 +270,6 @@ begin
   Hint := FGlobalProject.FileName;
   s := GetGlobalProjectUI.DisplayFileName;   // I4687
   Caption := s;
-end;
-
-procedure TfrmProject.SaveCurrentTab;
-(*var
-  elem: IHTMLElement;
-begin
-  try
-  //TODO use http server backend
-    if Assigned(web.Document) then
-    begin
-      elem:= (web.Document as IHTMLDocument3).getElementById('state');
-      if elem <> nil then
-        FGlobalProject.DisplayState := elem.innerText;
-      elem := nil;
-    end;
-  except
-    FGlobalProject.DisplayState := '';
-  end;
-  FGlobalProject.Save;*)
-begin
 end;
 
 procedure TfrmProject.SetFocus;
@@ -331,7 +303,7 @@ end;
 
 procedure TfrmProject.cefAfterCreated(Sender: TObject);
 begin
-  RefreshHTML(False);
+  RefreshHTML;
 end;
 
 procedure TfrmProject.cefBeforeBrowse(Sender: TObject;
@@ -663,6 +635,8 @@ end;
 procedure TfrmProject.cefLoadEnd(Sender: TObject; const browser: ICefBrowser;
   const frame: ICefFrame; httpStatusCode: Integer);
 begin
+  if csDestroying in ComponentState then
+    Exit;
   if Assigned(FGlobalProject) then GetGlobalProjectUI.Refreshing := False;   // I4687
   if (frmKeymanDeveloper.ActiveChild = Self) and (Screen.ActiveForm = frmKeymanDeveloper) then
   begin

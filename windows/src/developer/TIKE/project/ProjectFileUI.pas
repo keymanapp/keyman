@@ -228,29 +228,6 @@ begin
         end;
       end;
 
-      //
-      // Remove existing path references from the saved .user file and append the
-      // correct ones for this computer
-      //
-
-      // TODO: refactor with similar code in ProjectLoader.LoadUser and ProjectSaver.SaveUser
-      nodes := doc.documentElement.getElementsByTagName('templatepath');
-      for i := 0 to nodes.length - 1 do
-        doc.documentElement.removeChild(nodes[i]);
-
-      nodes := doc.documentElement.getElementsByTagName('stringspath');
-      for i := 0 to nodes.length - 1 do
-        doc.documentElement.removeChild(nodes[i]);
-
-      node := doc.createElement('templatepath');
-      node.appendChild(doc.createTextNode(ConvertPathToFileURL(TProject.StandardTemplatePath)));
-      doc.documentElement.appendChild(node);
-
-      node := doc.createElement('stringspath');
-      node.appendChild(doc.createTextNode(ConvertPathToFileURL(TProject.StringsTemplatePath)));
-      doc.documentElement.appendChild(node);
-      // end TODO
-
       xsl := MSXMLDOMDocumentFactory.CreateDOMDocument;
       try
         xsl.async := False;
@@ -267,6 +244,7 @@ begin
   finally
     SetCurrentDir(FLastDir);
   end;
+
   with TStringList.Create do
   try
     Text := output;

@@ -22,9 +22,13 @@ type
 implementation
 
 uses
+  System.Classes,
   System.SysUtils,
+  Xml.XMLDoc,
+  Xml.XMLIntf,
 
-  ProjectFile;
+  ProjectFile,
+  ProjectSaver;
 
 { TAppHttpServer }
 
@@ -94,6 +98,56 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
       Respond404(AContext, ARequestInfo, AResponseInfo);
     RespondFile(TProject.StandardTemplatePath + '/' + doc, AContext, ARequestInfo, AResponseInfo);
   end;
+
+  procedure RespondState;
+  var
+    displayState, path: string;
+    xmldoc: IXMLDocument;
+    FProject: TProject;
+  begin
+    with TStringStream.Create('', TEncoding.UTF8) do
+    try
+      CopyFrom(ARequestInfo.PostStream, 0);
+      displayState := DataString;
+    finally
+      Free;
+    end;
+
+    try
+      xmldoc := LoadXMLData(displayState);
+    except
+      on E:Exception do
+      begin
+        Respond404(AContext, ARequestInfo, AResponseInfo);
+        Exit;
+      end;
+    end;
+
+    path := xmldoc.DocumentElement.ChildValues['path'];
+
+    // Saving state
+
+    if not FileExists(path) or not SameText(ExtractFileExt(path), '.kpj') then
+    begin
+      AResponseInfo.ResponseNo := 400;
+      AResponseInfo.ResponseText := 'Project file '+path+' does not exist.';
+      Exit;
+    end;
+
+    FProject := TProject.Create(path, False);
+    try
+      FProject.DisplayState := displayState;
+      //TODO: file in-use conflicts
+      with TProjectSaver.Create(FProject, path) do
+      try
+        SaveUser;
+      finally
+        Free;
+      end;
+    finally
+      FProject.Free;
+    end;
+  end;
 begin
   //
   // http://localhost:8008/app/project/(index)?path=<fqp-to-.kpj>
@@ -105,7 +159,9 @@ begin
   else if doc = 'ico' then
     RespondIco
   else if Copy(doc, 1, 4) = 'res/' then
-    RespondResource;
+    RespondResource
+  else if doc = 'state' then
+    RespondState;
 end;
 
 procedure TAppHttpResponder.ProcessRequest(AContext: TIdContext;

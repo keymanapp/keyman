@@ -136,49 +136,40 @@
 
   <xsl:template mode="options_menu" match="/KeymanDeveloperProject/Files/File[FileType='.kmn']" >
     <div class="menu">
-      <xsl:attribute name="id">
-        menu_options_<xsl:value-of select="ID"/>
-      </xsl:attribute>
+      <xsl:attribute name="id">menu_options_<xsl:value-of select="ID"/></xsl:attribute>
       <xsl:call-template name="menuitem">
         <xsl:with-param name="caption">Open</xsl:with-param>
-        <xsl:with-param name="command">
-          keyman:openfile?id=<xsl:value-of select="ID" />
+        <xsl:with-param name="command">keyman:openfile?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
       <xsl:call-template name="menuitem">
         <xsl:with-param name="caption">Build</xsl:with-param>
-        <xsl:with-param name="command">
-          keyman:compilefile?id=<xsl:value-of select="ID" />
+        <xsl:with-param name="command">keyman:compilefile?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
       <xsl:call-template name="menuitem">
         <xsl:with-param name="caption">Clean</xsl:with-param>
-        <xsl:with-param name="command">
-          keyman:cleanfile?id=<xsl:value-of select="ID" />
+        <xsl:with-param name="command">keyman:cleanfile?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
       <xsl:call-template name="menuitem">
         <xsl:with-param name="caption">View Source</xsl:with-param>
-        <xsl:with-param name="command">
-          keyman:viewfilesource?id=<xsl:value-of select="ID" />
+        <xsl:with-param name="command">keyman:viewfilesource?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
       <xsl:call-template name="menuitem">
         <xsl:with-param name="caption">Open in External Editor</xsl:with-param>
-        <xsl:with-param name="command">
-          keyman:editfileexternal?id=<xsl:value-of select="ID" />
+        <xsl:with-param name="command">keyman:editfileexternal?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
       <xsl:call-template name="menuitem">
         <xsl:with-param name="caption">Open Containing Folder</xsl:with-param>
-        <xsl:with-param name="command">
-          keyman:opencontainingfolder?id=<xsl:value-of select="ID" />
+        <xsl:with-param name="command">keyman:opencontainingfolder?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
       <xsl:call-template name="menuitem">
         <xsl:with-param name="caption">Remove from Project</xsl:with-param>
-        <xsl:with-param name="command">
-          keyman:removefile?id=<xsl:value-of select="ID" />
+        <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
     </div>
@@ -229,19 +220,13 @@
       <th>Bitmap:</th>
       <td>
         <img style="vertical-align: middle; width: 16px; height: 16px;">
-          <xsl:attribute name="src">
-            <xsl:value-of select="'ico?path='+$FileState/FullPath"/>
-          </xsl:attribute>
+          <xsl:attribute name="src"><xsl:value-of select="'ico?path='+$FileState/FullPath"/></xsl:attribute>
         </img>
         <xsl:text> </xsl:text>
         <span tabindex="1">
-          <xsl:attribute name="id">
-            kbdbitmap<xsl:value-of select="ID"/>
-          </xsl:attribute>
+          <xsl:attribute name="id">kbdbitmap<xsl:value-of select="ID"/></xsl:attribute>
           <a>
-            <xsl:attribute name="href">
-              keyman:editfile?id=<xsl:value-of select="ID"/>
-            </xsl:attribute>
+            <xsl:attribute name="href">keyman:editfile?id=<xsl:value-of select="ID"/></xsl:attribute>
             <xsl:value-of select="Filename" />
           </a>
         </span>

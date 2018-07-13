@@ -89,6 +89,8 @@ uses
   System.SysUtils,
 
   Vcl.Dialogs,
+  Winapi.ActiveX,
+  System.Win.ComObj,
 //  Vcl.Graphics,
 
   KeymanDeveloperOptions;
@@ -220,16 +222,21 @@ procedure TmodWebHttpServer.httpCommandGet(AContext: TIdContext;
 var
   doc: string;
 begin
-  doc := ARequestInfo.Document;
-  Delete(doc, 1, 1);
+  CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
+  try
+    doc := ARequestInfo.Document;
+    Delete(doc, 1, 1);
 
-  if Copy(doc, 1, 4) = 'app/' then
-  begin
-    FApp.ProcessRequest(AContext, ARequestInfo, AResponseInfo);
-    Exit;
+    if Copy(doc, 1, 4) = 'app/' then
+    begin
+      FApp.ProcessRequest(AContext, ARequestInfo, AResponseInfo);
+      Exit;
+    end;
+
+    FDebugger.ProcessRequest(AContext, ARequestInfo, AResponseInfo);
+  finally
+    CoUninitialize;
   end;
-
-  FDebugger.ProcessRequest(AContext, ARequestInfo, AResponseInfo);
 end;
 
 end.
