@@ -115,14 +115,6 @@
   - Popup menu implementation
   -
   -->
-
-  <!-- xsl:template name="menu_style">
-    /* Popup menu styles */
-        .menu { position: absolute; display: block; background: white; visibility: hidden; border: solid 1px #ACA899; font: 8pt Tahoma; padding: 0px; background-image: url("menugrey.gif"); background-repeat: repeat-y; background-position: 0 0; }
-        k\:menuitem { width: 100%; padding: 4 4 4 28; margin: 1px; }
-        k\:menuitem.hover { color: #000000; background: #FFE3DB; border: solid 1px #DB704F; padding: 3 3 3 27; }
-        k\:menuitem.down { background: #DB704F; }
-  </xsl:template -->
   
   <xsl:template name="menuitem">
     <xsl:param name="caption" />

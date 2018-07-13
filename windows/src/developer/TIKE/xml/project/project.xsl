@@ -12,7 +12,8 @@
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:k="http://www.tavultesoft.com/xml/70">
       <xsl:call-template name="head" />
       <body onload="pageload()">
-        <div id="state"><xsl:value-of select="/KeymanDeveloperProject/state" /></div>
+        <div id="state"><xsl:copy-of select="/KeymanDeveloperProject/ViewState" /></div>
+        <div id="menubackground" onmousedown="HideMenu()"></div>
         <div id="pageheader">
           <div id="upperexpand" class="checkbox checked" onmousedown="javascript:showhideupper();">Show help</div>
           <div id="currentpage">Project - Welcome </div>
