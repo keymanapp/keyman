@@ -12,7 +12,10 @@ uses
 type
   TAppHttpResponder = class(TBaseHttpResponder)
   private
+    FStandardTemplatePath: string;
     procedure RespondProject(doc: string; AContext: TIdContext;
+      ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+    procedure RespondHelp(doc: string; AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
   public
     procedure ProcessRequest(AContext: TIdContext;
@@ -28,9 +31,57 @@ uses
   Xml.XMLIntf,
 
   ProjectFile,
-  ProjectSaver;
+  ProjectSaver,
+  RedistFiles;
 
 { TAppHttpServer }
+
+procedure TAppHttpResponder.RespondHelp(doc: string; AContext: TIdContext;
+  ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+var
+  path: string;
+  xml, xsl: IXMLDocument;
+  s: WideString;
+begin
+
+  if FStandardTemplatePath = '' then
+  begin
+    FStandardTemplatePath := ExtractFilePath(ParamStr(0)) + 'locale\' + 'en';
+    // I2595
+
+    if FileExists(FStandardTemplatePath + '\xml\help\contexthelp.xml') then
+      FStandardTemplatePath := FStandardTemplatePath + '\xml\help\'
+    else
+    begin
+      FStandardTemplatePath := ExtractFilePath(ParamStr(0)) + 'locale\' + 'en';
+      // I2595
+      if FileExists(FStandardTemplatePath + '\xml\help\contexthelp.xml') then
+        FStandardTemplatePath := FStandardTemplatePath + '\xml\help\'
+      else
+        FStandardTemplatePath := GetXMLTemplatePath + 'help\';
+    end;
+  end;
+
+  if (doc <> 'help/') and (doc <> 'help/index') then
+  begin
+    Respond404(AContext, ARequestInfo, AResponseInfo);
+    Exit;
+  end;
+
+  xml := TXMLDocument.Create(nil);
+  xml.ParseOptions := [poResolveExternals];
+  // I902 - resolve externals when loading XML files so locale.xml parses
+  xml.LoadFromFile(FStandardTemplatePath + 'contexthelp.xml');
+
+  xsl := TXMLDocument.Create(nil);
+  // xml.ParseOptions := [poResolveExternals];  // I902 - resolve externals when loading XML files so locale.xml parses
+
+  xsl.LoadFromFile(FStandardTemplatePath + 'help.xsl');
+  xml.Node.transformNode(xsl.Node, s);
+
+  AResponseInfo.ContentType := 'text/html; charset=UTF-8';
+  AResponseInfo.ContentText := s;
+end;
 
 procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
   ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
@@ -186,6 +237,11 @@ begin
   if Copy(doc, 1, 8) = 'project/' then
   begin
     RespondProject(doc, AContext, ARequestInfo, AResponseInfo);
+    Exit;
+  end
+  else if Copy(doc, 1, 5) = 'help/' then
+  begin
+    RespondHelp(doc, AContext, ARequestInfo, AResponseInfo);
     Exit;
   end;
 

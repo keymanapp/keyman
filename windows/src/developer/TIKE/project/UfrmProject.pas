@@ -246,7 +246,7 @@ begin
   else
   begin
 //    GetGlobalProjectUI.Refreshing := True;   // I4687
-    cef.LoadURL(modWebHttpServer.GetLocalhostURL + '/app/project/?path='+URLEncode(GetGlobalProjectUI.FileName));
+    cef.LoadURL(modWebHttpServer.GetAppURL('project/?path='+URLEncode(GetGlobalProjectUI.FileName)));
   end;
   RefreshCaption;
 end;

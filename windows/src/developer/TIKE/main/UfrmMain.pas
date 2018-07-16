@@ -624,7 +624,11 @@ begin
     for i := 0 to FChildWindows.Count - 1 do
       FChildWindows[i].StartClose;
 
+    frmHelp.StartClose;
+
     SaveDockLayout;
+
+    // TODO: complete exit after StartClose is successful
   end;
 
   CanClose := True;

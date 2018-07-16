@@ -62,6 +62,7 @@ type
   public
     function GetURL: string;
     function GetLocalhostURL: string;
+    function GetAppURL(s: string): string;
     procedure GetURLs(v: TStrings);
 
     property Debugger: TDebuggerHttpResponder read GetDebugger;
@@ -136,6 +137,11 @@ begin
   if not Assigned(FApp) then
     FApp := TAppHttpResponder.Create;
   Result := FApp;
+end;
+
+function TmodWebHttpServer.GetAppURL(s: string): string;
+begin
+  Result := GetLocalhostURL + '/app/' + s;
 end;
 
 function TmodWebHttpServer.GetDebugger: TDebuggerHttpResponder;
@@ -229,7 +235,7 @@ begin
 
     if Copy(doc, 1, 4) = 'app/' then
     begin
-      FApp.ProcessRequest(AContext, ARequestInfo, AResponseInfo);
+      App.ProcessRequest(AContext, ARequestInfo, AResponseInfo);
       Exit;
     end;
 
