@@ -39,7 +39,6 @@ uses
 procedure TAppHttpResponder.RespondHelp(doc: string; AContext: TIdContext;
   ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
 var
-  path: string;
   xml, xsl: IXMLDocument;
   s: WideString;
 begin

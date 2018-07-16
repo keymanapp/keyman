@@ -36,8 +36,8 @@ type
     FHelpFileName: string;
     FHMFRoot: IXMLNode;
     FTempFile: TTempFile;
-    procedure AddUnmatchedContext(FormName, ControlName: string);
-    procedure DeleteMatchedContext(FormName, ControlName: string);
+//    procedure AddUnmatchedContext(FormName, ControlName: string);
+//    procedure DeleteMatchedContext(FormName, ControlName: string);
     procedure cefLoadEnd(Sender: TObject; const browser: ICefBrowser;
       const frame: ICefFrame; httpStatusCode: Integer);
     procedure cefPreKeyEvent(Sender: TObject; const browser: ICefBrowser;
@@ -81,6 +81,7 @@ implementation
 {$R *.dfm}
 
 uses
+  System.Types,
   Winapi.ShlObj,
 
   Keyman.Developer.System.HelpTopics,
@@ -93,7 +94,7 @@ uses
   UmodWebHTTPServer,
   utilsystem;
 
-procedure TfrmHelp.AddUnmatchedContext(FormName, ControlName: string);
+(*procedure TfrmHelp.AddUnmatchedContext(FormName, ControlName: string);
 var
   i: Integer;
   n: IXMLNode;
@@ -129,7 +130,7 @@ begin
       FHMFRoot.ChildNodes.Delete(i);
       Exit;
     end;
-end;
+end;*)
 
 procedure TfrmHelp.actHelpContextRefreshUpdate(Sender: TObject);
 var
@@ -186,7 +187,7 @@ begin
   if FormName = 'TfrmHelp' then
     Exit; // I2823
 
-  // Call into the web brwoser control.
+  // Call into the web browser control.
   try
     // TODO: record unmatched context
     cef.ChromiumBrowser.ExecuteJavaScript('ActivatePage("' + FormName + '", "' +
