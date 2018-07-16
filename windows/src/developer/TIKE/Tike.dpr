@@ -299,8 +299,8 @@ begin
       if TikeActive then Exit;
       InitClasses;
       Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-  ShowStartup;
+      Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+      ShowStartup;
       Application.Run;
     end;
   finally
