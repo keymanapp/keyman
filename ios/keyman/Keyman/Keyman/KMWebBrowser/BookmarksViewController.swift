@@ -21,6 +21,10 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
   // TODO: Create struct for bookmarks
   private var bookmarks = [[String: String]]()
 
+  weak var inputTitleField: UITextField?
+  weak var inputUrlField: UITextField?
+  weak var addAction: UIAlertAction?
+
   convenience init() {
     self.init(nibName: "BookmarksViewController", bundle: nil)
   }
@@ -46,36 +50,47 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
   }
 
   @IBAction func addBookmark(_ sender: Any) {
-    var inputTitleField: UITextField?
-    var inputUrlField: UITextField?
     let alertController = UIAlertController(title: "Add Bookmark", message: "",
                                             preferredStyle: UIAlertControllerStyle.alert)
     alertController.addTextField(configurationHandler: { (textField) in
+      //listen for changes
+      NotificationCenter.default.addObserver(self,
+        selector: #selector(BookmarksViewController.handleTextFieldTextChangedNotification(notification:)),
+        name: NSNotification.Name.UITextFieldTextDidChange, object: textField)
       textField.placeholder = "Title"
       textField.text = self.webBrowser?.webView?.stringByEvaluatingJavaScript(from: "document.title")
       textField.autocapitalizationType = .sentences
       textField.font = UIFont.systemFont(ofSize: 17)
       textField.keyboardType = .default
       textField.clearButtonMode = .whileEditing
-      inputTitleField = textField
+      self.inputTitleField = textField
     })
     alertController.addTextField(configurationHandler: { (textField) in
+      //listen for changes
+      NotificationCenter.default.addObserver(self,
+          selector: #selector(BookmarksViewController.handleTextFieldTextChangedNotification(notification:)),
+          name: NSNotification.Name.UITextFieldTextDidChange, object: textField)
       textField.placeholder = "URL"
       textField.text = self.webBrowser?.webView?.request?.mainDocumentURL?.absoluteString
       textField.autocapitalizationType = .none
       textField.font = UIFont.systemFont(ofSize: 17)
       textField.keyboardType = UIKeyboardType.URL
       textField.clearButtonMode = .whileEditing
-      inputUrlField = textField
+      self.inputUrlField = textField
     })
     alertController.addAction(UIAlertAction(title: "Cancel",
                                             style: UIAlertActionStyle.cancel,
                                             handler: nil))
-    alertController.addAction(UIAlertAction(title: "Add",
-                                            style: UIAlertActionStyle.default,
-                                            handler: {_ in self.addBookmarkHandler(withTitleField: inputTitleField, withUrlField: inputUrlField)
-      }))
-    
+
+    let addAlertAction = UIAlertAction(title: "Add",
+                                  style: UIAlertActionStyle.default,
+                                  handler: {_ in self.addBookmarkHandler()
+    })
+    alertController.addAction(addAlertAction)
+    // save add action to toggle the enabled/disabled state when the text changes.
+    addAction = addAlertAction
+    updateAddButtonEnableState()
+
     self.present(alertController, animated: true, completion: nil)
   }
 
@@ -172,16 +187,13 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     dismiss(animated: true, completion: nil)
   }
 
-  func addBookmarkHandler(withTitleField titleField: UITextField?, withUrlField urlField: UITextField?) {
-    guard let title = titleField?.text, !title.isEmpty else {
-      displayError(title: "Invalid Bookmark Title", message: "Please enter a valid title")
+  func addBookmarkHandler() {
+    guard let title = inputTitleField?.text, var urlString = inputUrlField?.text else {
+      // This should be impossible.
       return
     }
-    guard var urlString = urlField?.text, let url = URL(string: urlString) else {
-      displayError(title: "Invalid Bookmark URL", message: "Please enter a valid URL")
-      return
-    }
-    if url.scheme == nil {
+    let url = URL(string: urlString)
+    if url?.scheme == nil {
       let url = URL(string: "http://\(urlString)")
       urlString = url?.absoluteString ?? urlString
     }
@@ -190,15 +202,19 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     saveBookmarks()
     tableView.reloadData()
   }
-  
-  func displayError(title: String, message: String) {
-    let alertController = UIAlertController(title: title,
-                                            message: message,
-                                            preferredStyle: UIAlertControllerStyle.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertActionStyle.cancel,
-                                            handler: nil))
-    
-    self.present(alertController, animated: true, completion: nil)
+
+  //handler
+  @objc func handleTextFieldTextChangedNotification(notification: NSNotification) {
+    updateAddButtonEnableState()
+  }
+
+  func updateAddButtonEnableState() {
+    guard let title = inputTitleField?.text, let url = inputUrlField?.text else {
+      addAction!.isEnabled = false
+      return
+    }
+
+    // Enforce a minimum length of >= 1 for both the title and url text fields.
+    addAction!.isEnabled = title.count > 0 && url.count > 0
   }
 }
