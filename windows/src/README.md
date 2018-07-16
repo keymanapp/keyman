@@ -11,6 +11,9 @@
 7. Set environment variables per [notes below](#environment-variables): `KEYMAN_ROOT`, `DELPHI_STARTER`, `USERDEFINES`, 
    `GIT_BASH_FOR_KEYMAN`, (`USE_PLUSMEMO`, `KEYMAN_ENCUMBERED_ROOT`).
 8. Add the **windows/lib** folder in the Keyman repository to your `PATH` environment variable (required for packages in Delphi).
+9. In order to run Keyman Developer in the development build, you need to specify where the 
+   https://github.com/keymanapp/CEF4Delphi_binary repo is on your system, with the registry setting `HKCU\Software\Keyman\Debug`, 
+   `Debug_CEFPath`.
 
 ### Release build prerequisites
 
@@ -19,6 +22,7 @@ For local development you do not need to perform a release build so these are op
 1. Install [7-Zip](http://www.7-zip.org/) 64-bit (or 32-bit on x86 Windows). 7-Zip is used for archiving build files -- may be eliminated in future.
 2. Install [HTML Help Workshop](https://www.microsoft.com/en-us/download/details.aspx?id=21138).
 4. Install [WiX](https://wix.codeplex.com/releases/view/60102) to **C:\Program Files (x86)\Windows Installer XML v3.5**.
+5. Add the environment variable `KEYMAN_CEF4DELPHI_ROOT`.
 
 ## Building Keyman Desktop and Keyman Developer
 
@@ -158,6 +162,16 @@ executables when you build a release.
 
 To include UserDefines.mak in the build, use the command line parameter `-DUSERDEFINES`. You
 can also set an environment variable `USERDEFINES=1` to get the same result.
+
+### KEYMAN_CEF4DELPHI_ROOT - Chromium Embedded Framework in Keyman Developer
+
+Keyman Developer uses Chromium Embedded Framework. The source repo is at
+https://github.com/keymanapp/CEF4Delphi. In order to build the installers, we need to
+source the binary files from the https://github.com/keymanapp/CEF4Delphi_binary repo.
+The `KEYMAN_CEF4DELPHI_ROOT` environment variable should be set to the root of this
+repo on your local machine.
+
+Keyman Desktop does not depend on this component.
 
 ### KEYMAN_ENCUMBERED_ROOT and USE_PLUSMEMO - Encumbered components
 
