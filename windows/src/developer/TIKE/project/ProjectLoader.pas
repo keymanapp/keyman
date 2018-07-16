@@ -161,7 +161,6 @@ var
   node, root: IXMLNode;
   fsroot: IXMLNode;
   n: Integer;
-  FStandardTemplatePath, FStringsTemplatePath: string;
   state: IXMLDocument;
   viewState: IXMLNode;
 begin

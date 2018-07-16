@@ -197,8 +197,6 @@ var
   output: WideString;
   FLastDir: string;
   i: Integer;
-  node: IXMLDOMElement;
-  nodes: IXMLDOMNodeList;
 begin
   if not FileExists(SavedFileName) then Save;
 
