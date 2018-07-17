@@ -76,7 +76,7 @@ uses
   MessageIdentifiers in 'main\MessageIdentifiers.pas',
   exceptionw in '..\..\global\delphi\general\exceptionw.pas',
   kpsfile in '..\..\global\delphi\general\kpsfile.pas',
-  UfrmProject in 'project\UfrmProject.pas' {frmProject},
+  Keyman.Developer.UI.UfrmCEFHost in 'main\Keyman.Developer.UI.UfrmCEFHost.pas' {frmCEFHost},
   UnitDrawArrow in '..\..\global\delphi\general\UnitDrawArrow.pas',
   StockObjects in 'kct\StockObjects.pas',
   CustomisationStorage in '..\..\global\delphi\cust\CustomisationStorage.pas',
@@ -272,7 +272,8 @@ uses
   Keyman.Developer.System.InitializeCEF in 'main\Keyman.Developer.System.InitializeCEF.pas',
   Keyman.Developer.System.HttpServer.Debugger in 'http\Keyman.Developer.System.HttpServer.Debugger.pas',
   Keyman.Developer.System.HttpServer.App in 'Keyman.Developer.System.HttpServer.App.pas',
-  Keyman.Developer.System.HttpServer.Base in 'http\Keyman.Developer.System.HttpServer.Base.pas';
+  Keyman.Developer.System.HttpServer.Base in 'http\Keyman.Developer.System.HttpServer.Base.pas',
+  UfrmProject in 'project\UfrmProject.pas' {frmProject};
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -299,8 +300,8 @@ begin
       if TikeActive then Exit;
       InitClasses;
       Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-      Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-      ShowStartup;
+  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+  ShowStartup;
       Application.Run;
     end;
   finally
