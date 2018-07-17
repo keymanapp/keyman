@@ -17,6 +17,7 @@ uses
   Winapi.Messages,
   Winapi.Windows,
 
+  Keyman.Developer.System.InitializeCEF,
   KeymanDeveloperUtils,
   UserMessages,
   UfrmTIKE,
@@ -28,19 +29,25 @@ uses
 type
   TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url: string; out Result: Boolean) of object;
 
-  TframeCEFHost = class(TTikeForm)
+  TframeCEFHost = class(TTikeForm, IKeymanCEFHost)
     tmrRefresh: TTimer;
     cef: TChromiumWindow;
     tmrCreateBrowser: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure tmrCreateBrowserTimer(Sender: TObject);
     procedure cefClose(Sender: TObject);
-    procedure cefBeforeClose(Sender: TObject);
-    procedure cefAfterCreated(Sender: TObject);   // I2986
+    procedure cefAfterCreated(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);   // I2986
   private
     FNextURL: string;
     FOnLoadEnd: TNotifyEvent;
     FOnBeforeBrowse: TCEFHostBeforeBrowseEvent;
+    FOnAfterCreated: TNotifyEvent;
+    FShutdownCompletionHandler: TShutdownCompletionHandlerEvent;
+    FIsClosing: Boolean;
+    // IKeymanCEFHost
+    procedure StartShutdown(CompletionHandler: TShutdownCompletionHandlerEvent);
 
     // CEF: You have to handle this two messages to call NotifyMoveOrResizeStarted or some page elements will be misaligned.
     procedure WMMove(var aMessage : TWMMove); message WM_MOVE;
@@ -85,6 +92,7 @@ type
     procedure SetFocus; override;
     procedure StartClose;
     procedure Navigate(const url: string); overload;
+    property OnAfterCreated: TNotifyEvent read FOnAfterCreated write FOnAfterCreated;
     property OnBeforeBrowse: TCEFHostBeforeBrowseEvent read FOnBeforeBrowse write FOnBeforeBrowse;
     property OnLoadEnd: TNotifyEvent read FOnLoadEnd write FOnLoadEnd;
   end;
@@ -115,6 +123,14 @@ uses
 procedure TframeCEFHost.StartClose;
 begin
   Visible := False;
+  FIsClosing := True;
+  cef.CloseBrowser(True);
+end;
+
+procedure TframeCEFHost.StartShutdown(CompletionHandler: TShutdownCompletionHandlerEvent);
+begin
+  FIsClosing := True;
+  FShutdownCompletionHandler := CompletionHandler;
   cef.CloseBrowser(True);
 end;
 
@@ -127,6 +143,20 @@ begin
   cef.ChromiumBrowser.OnConsoleMessage := cefConsoleMessage;
   cef.ChromiumBrowser.OnRunContextMenu := cefRunContextMenu;
   cef.ChromiumBrowser.OnBeforePopup := cefBeforePopup;
+
+  FInitializeCEF.RegisterWindow(Self);
+//  CreateBrowser;
+end;
+
+procedure TframeCEFHost.FormDestroy(Sender: TObject);
+begin
+  inherited;
+  FInitializeCEF.UnregisterWindow(Self);
+end;
+
+procedure TframeCEFHost.FormShow(Sender: TObject);
+begin
+  inherited;
   CreateBrowser;
 end;
 
@@ -159,7 +189,8 @@ end;
 procedure TframeCEFHost.SetFocus;
 begin
   inherited;
-  cef.SetFocus;
+  if not FIsClosing and cef.CanFocus then
+    cef.SetFocus;
 end;
 
 procedure TframeCEFHost.cefAfterCreated(Sender: TObject);
@@ -174,20 +205,17 @@ procedure TframeCEFHost.cefBeforeBrowse(Sender: TObject;
 begin
   if Assigned(FOnBeforeBrowse) then
     FOnBeforeBrowse(Self, request.Url, Result);
-//  Result := DoNavigate(request.Url);
-end;
-
-procedure TframeCEFHost.cefBeforeClose(Sender: TObject);
-begin
-  Close;
 end;
 
 procedure TframeCEFHost.cefClose(Sender: TObject);
 begin
   // DestroyChildWindow will destroy the child window created by CEF at the top of the Z order.
-  if not cef.DestroyChildWindow then
+  cef.DestroyChildWindow;
+
+  if Assigned(FShutdownCompletionHandler) then
   begin
-    Close;
+    FShutdownCompletionHandler(Self);
+    FShutdownCompletionHandler := nil;
   end;
 end;
 

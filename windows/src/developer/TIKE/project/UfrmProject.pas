@@ -58,63 +58,25 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ExtCtrls, Menus, UfrmMDIEditor, UfrmMDIChild, ProjectFile,
   KeymanDeveloperUtils, UserMessages,
+  Keyman.Developer.UI.UframeCEFHost,
   uCEFInterfaces, uCEFWindowParent, uCEFChromiumWindow, uCEFTypes;
 
 type
   TfrmProject = class(TfrmTikeChild)  // I2721
     dlgOpenFile: TOpenDialog;
     tmrRefresh: TTimer;
-    cef: TChromiumWindow;
-    tmrCreateBrowser: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tmrRefreshTimer(Sender: TObject);
     procedure FormActivate(Sender: TObject);
-    procedure tmrCreateBrowserTimer(Sender: TObject);
-    procedure cefClose(Sender: TObject);
-    procedure cefBeforeClose(Sender: TObject);
-    procedure cefAfterCreated(Sender: TObject);   // I2986
   private
     FShouldRefresh: Boolean;
     FNextCommand: WideString;
     FNextCommandParams: TStringList;
+    cef: TframeCEFHost;
 
-    // CEF: You have to handle this two messages to call NotifyMoveOrResizeStarted or some page elements will be misaligned.
-    procedure WMMove(var aMessage : TWMMove); message WM_MOVE;
-    procedure WMMoving(var aMessage : TMessage); message WM_MOVING;
-    // CEF: You also have to handle these two messages to set GlobalCEFApp.OsmodalLoop
-    procedure WMEnterMenuLoop(var aMessage: TMessage); message WM_ENTERMENULOOP;
-    procedure WMExitMenuLoop(var aMessage: TMessage); message WM_EXITMENULOOP;
-
-    procedure cefLoadEnd(Sender: TObject; const browser: ICefBrowser;
-                         const frame: ICefFrame; httpStatusCode: Integer);
-    procedure cefBeforeBrowse(Sender: TObject; const browser: ICefBrowser;
-                              const frame: ICefFrame; const request: ICefRequest; user_gesture,
-                              isRedirect: Boolean; out Result: Boolean);
-    procedure cefPreKeyEvent(Sender: TObject; const browser: ICefBrowser;
-                             const event: PCefKeyEvent; osEvent: TCefEventHandle;
-                             out isKeyboardShortcut: Boolean; out Result: Boolean);
-    procedure cefConsoleMessage(Sender: TObject; const browser: ICefBrowser;
-                                level: TCefLogSeverity; const message, source: ustring;
-                                line: Integer; out Result: Boolean);
-    procedure cefRunContextMenu(Sender: TObject; const browser: ICefBrowser;
-                                const frame: ICefFrame; const params: ICefContextMenuParams;
-                                const model: ICefMenuModel;
-                                const callback: ICefRunContextMenuCallback;
-                                var aResult : Boolean);
-    procedure cefBeforePopup(Sender: TObject;
-                             const browser: ICefBrowser;
-                             const frame: ICefFrame;
-                             const targetUrl,
-                             targetFrameName: ustring;
-                             targetDisposition: TCefWindowOpenDisposition;
-                             userGesture: Boolean;
-                             const popupFeatures: TCefPopupFeatures;
-                             var windowInfo: TCefWindowInfo;
-                             var client: ICefClient;
-                             var settings: TCefBrowserSettings;
-                             var noJavascriptAccess: Boolean;
-                             var Result: Boolean);
+    procedure cefLoadEnd(Sender: TObject);
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
 
     procedure ProjectRefresh(Sender: TObject);
     procedure ProjectRefreshCaption(Sender: TObject);
@@ -125,7 +87,6 @@ type
     procedure EditFileExternal(FileName: WideString);
     function DoNavigate(URL: string): Boolean;
     procedure ClearMessages;
-    procedure CreateBrowser;
   protected
     function GetHelpTopic: string; override;
   public
@@ -207,7 +168,7 @@ end;
 procedure TfrmProject.StartClose;
 begin
   Visible := False;
-  cef.CloseBrowser(True);
+  cef.StartClose;
 end;
 
 procedure TfrmProject.FormCreate(Sender: TObject);
@@ -218,35 +179,21 @@ begin
   GetGlobalProjectUI.OnRefresh := ProjectRefresh;   // I4687
   GetGlobalProjectUI.OnRefreshCaption := ProjectRefreshCaption;   // I4687
 
-  cef.ChromiumBrowser.OnLoadEnd := cefLoadEnd;
-  cef.ChromiumBrowser.OnBeforeBrowse := cefBeforeBrowse;
-  cef.ChromiumBrowser.OnPreKeyEvent := cefPreKeyEvent;
-  cef.ChromiumBrowser.OnConsoleMessage := cefConsoleMessage;
-  cef.ChromiumBrowser.OnRunContextMenu := cefRunContextMenu;
-  cef.ChromiumBrowser.OnBeforePopup := cefBeforePopup;
-  CreateBrowser;
-end;
-
-procedure TfrmProject.CreateBrowser;
-begin
-  tmrCreateBrowser.Enabled := not cef.CreateBrowser;
+  cef := TframeCEFHost.Create(Self);
+  cef.Parent := Self;
+  cef.Visible := True;
+  cef.OnBeforeBrowse := cefBeforeBrowse;
+  cef.OnLoadEnd := cefLoadEnd;
+  RefreshHTML;
 end;
 
 procedure TfrmProject.RefreshHTML;
 begin
-  if not cef.Initialized then
-  begin
-    // After initialization, refresh will happen
-    // See cefAfterCreated
-    Exit;
-  end;
-
   if GetGlobalProjectUI.Refreshing then   // I4687
     tmrRefresh.Enabled := True
   else
   begin
-//    GetGlobalProjectUI.Refreshing := True;   // I4687
-    cef.LoadURL(modWebHttpServer.GetAppURL('project/?path='+URLEncode(GetGlobalProjectUI.FileName)));
+    cef.Navigate(modWebHttpServer.GetAppURL('project/?path='+URLEncode(GetGlobalProjectUI.FileName)));
   end;
   RefreshCaption;
 end;
@@ -301,61 +248,10 @@ begin
   FreeAndNil(FNextCommandParams);
 end;
 
-procedure TfrmProject.cefAfterCreated(Sender: TObject);
-begin
-  RefreshHTML;
-end;
-
 procedure TfrmProject.cefBeforeBrowse(Sender: TObject;
-  const browser: ICefBrowser; const frame: ICefFrame;
-  const request: ICefRequest; user_gesture, isRedirect: Boolean;
-  out Result: Boolean);
+  const Url: string; out Result: Boolean);
 begin
-  Result := DoNavigate(request.Url);
-end;
-
-procedure TfrmProject.cefBeforeClose(Sender: TObject);
-begin
-  Close;
-end;
-
-
-procedure TfrmProject.cefClose(Sender: TObject);
-begin
-  // DestroyChildWindow will destroy the child window created by CEF at the top of the Z order.
-  if not cef.DestroyChildWindow then
-  begin
-    Close;
-  end;
-end;
-
-procedure TfrmProject.cefConsoleMessage(Sender: TObject;
-  const browser: ICefBrowser; level: TCefLogSeverity; const message,
-  source: ustring; line: Integer; out Result: Boolean);
-begin
-  try
-    with TStringList.Create do
-    try
-      LoadFromFile(GetGlobalProjectUI.RenderFileName);  // prolog determines encoding   // I4687
-
-      LogExceptionToExternalHandler(
-        'script_'+Self.ClassName+'_ScriptError',
-        'Error occurred at line '+IntToStr(line)+' of '+source,
-        message,
-        'CEF'#13#10#13#10'<pre>'+XMLEncode(Text)+'</pre>');
-    finally
-      Free;
-    end;
-  except
-    on E:Exception do
-      LogExceptionToExternalHandler(
-        'script_'+Self.ClassName+'_ScriptError',
-        'Error occurred at line '+IntToStr(line)+' of '+source,
-        message,
-        'Exception '+E.Message+' trying to load '+GetGlobalProjectUI.RenderFileName+' for review');   // I4687
-  end;
-
-  Result := True;
+  Result := DoNavigate(Url);
 end;
 
 procedure TfrmProject.ClearMessages;
@@ -620,20 +516,13 @@ begin
   ProjectRefresh(nil);
 end;}
 
-procedure TfrmProject.tmrCreateBrowserTimer(Sender: TObject);
-begin
-  tmrCreateBrowser.Enabled := False;
-  CreateBrowser;
-end;
-
 procedure TfrmProject.tmrRefreshTimer(Sender: TObject);
 begin
   tmrRefresh.Enabled := False;
   ProjectRefresh(nil);
 end;
 
-procedure TfrmProject.cefLoadEnd(Sender: TObject; const browser: ICefBrowser;
-  const frame: ICefFrame; httpStatusCode: Integer);
+procedure TfrmProject.cefLoadEnd(Sender: TObject);
 begin
   if csDestroying in ComponentState then
     Exit;
@@ -644,81 +533,12 @@ begin
   end;
 end;
 
-procedure TfrmProject.cefPreKeyEvent(Sender: TObject;
-  const browser: ICefBrowser; const event: PCefKeyEvent;
-  osEvent: TCefEventHandle; out isKeyboardShortcut, Result: Boolean);
-begin
-  Result := False;
-  if (event.windows_key_code <> VK_CONTROL) and (event.kind in [TCefKeyEventType.KEYEVENT_KEYDOWN, TCefKeyEventType.KEYEVENT_RAWKEYDOWN]) then
-  begin
-    if event.windows_key_code = VK_F1 then
-    begin
-      isKeyboardShortcut := True;
-      Result := True;
-      frmKeymanDeveloper.HelpTopic(Self);
-    end
-    else if event.windows_key_code = VK_F12 then
-    begin
-      cef.ChromiumBrowser.ShowDevTools(Point(Low(Integer),Low(Integer)), nil);
-    end
-    else if SendMessage(Application.Handle, CM_APPKEYDOWN, event.windows_key_code, 0) = 1 then
-    begin
-      isKeyboardShortcut := True;
-      Result := True;
-    end;
-  end;
-end;
-
 //TODO: support dropping files
 //  DropTarget := frmKeymanDeveloper.DropTargetIntf;
-
-procedure TfrmProject.cefBeforePopup(Sender: TObject;
-  const browser: ICefBrowser; const frame: ICefFrame; const targetUrl,
-  targetFrameName: ustring; targetDisposition: TCefWindowOpenDisposition;
-  userGesture: Boolean; const popupFeatures: TCefPopupFeatures;
-  var windowInfo: TCefWindowInfo; var client: ICefClient;
-  var settings: TCefBrowserSettings; var noJavascriptAccess, Result: Boolean);
-begin
-  Result := True;
-  if not DoNavigate(targetUrl) then
-    cef.LoadURL(targetUrl);
-end;
 
 function TfrmProject.GetHelpTopic: string;
 begin
   Result := SHelpTopic_Context_Project;
-end;
-
-procedure TfrmProject.cefRunContextMenu(Sender: TObject;
-  const browser: ICefBrowser; const frame: ICefFrame;
-  const params: ICefContextMenuParams; const model: ICefMenuModel;
-  const callback: ICefRunContextMenuCallback; var aResult: Boolean);
-begin
-  aResult := GetKeyState(VK_SHIFT) >= 0;
-end;
-
-procedure TfrmProject.WMEnterMenuLoop(var aMessage: TMessage);
-begin
-  inherited;
-  if (aMessage.wParam = 0) and (GlobalCEFApp <> nil) then GlobalCEFApp.OsmodalLoop := True;
-end;
-
-procedure TfrmProject.WMExitMenuLoop(var aMessage: TMessage);
-begin
-  inherited;
-  if (aMessage.wParam = 0) and (GlobalCEFApp <> nil) then GlobalCEFApp.OsmodalLoop := False;
-end;
-
-procedure TfrmProject.WMMove(var aMessage: TWMMove);
-begin
-  inherited;
-  if cef <> nil then cef.NotifyMoveOrResizeStarted;
-end;
-
-procedure TfrmProject.WMMoving(var aMessage: TMessage);
-begin
-  inherited;
-  if cef <> nil then cef.NotifyMoveOrResizeStarted;
 end;
 
 procedure TfrmProject.WMUserWebCommand(var Message: TMessage);

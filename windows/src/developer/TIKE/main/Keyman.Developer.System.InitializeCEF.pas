@@ -3,6 +3,8 @@ unit Keyman.Developer.System.InitializeCEF;
 interface
 
 uses
+  System.Classes,
+  System.Generics.Collections,
   uCEFApplication;
 
 //
@@ -11,19 +13,37 @@ uses
 // cleaner
 //
 type
-  TInitializeCEF = class
+  IKeymanCEFHost = interface;
+
+  TShutdownCompletionHandlerEvent = procedure(Sender: IKeymanCEFHost) of object;
+
+  IKeymanCEFHost = interface
+    ['{DFABC8BF-803E-45E6-B7DC-522C7FEB08EB}']
+    procedure StartShutdown(CompletionHandler: TShutdownCompletionHandlerEvent);
+  end;
+
+  TCEFManager = class
+  private
+    FWindows: TList<IKeymanCEFHost>;
+    FShutdownCompletionHandler: TNotifyEvent;
+    procedure CompletionHandler(Sender: IKeymanCEFHost);
   public
     constructor Create;
     destructor Destroy; override;
     function Start: Boolean;
+
+    procedure RegisterWindow(cef: IKeymanCEFHost);
+    procedure UnregisterWindow(cef: IKeymanCEFHost);
+    function StartShutdown(CompletionHandler: TNotifyEvent): Boolean;
   end;
 
 var
-  FInitializeCEF: TInitializeCEF = nil;
+  FInitializeCEF: TCEFManager = nil;
 
 implementation
 
 uses
+  System.SysUtils,
   Winapi.ShlObj,
 
   KeymanDeveloperUtils,
@@ -33,8 +53,20 @@ uses
 
 { TInitializeCEF }
 
-constructor TInitializeCEF.Create;
+procedure TCEFManager.CompletionHandler(Sender: IKeymanCEFHost);
 begin
+  FWindows.Remove(Sender);
+  if FWindows.Count = 0 then
+  begin
+    Assert(@FShutdownCompletionHandler <> nil);
+    FShutdownCompletionHandler(Self);
+    FShutdownCompletionHandler := nil;
+  end;
+end;
+
+constructor TCEFManager.Create;
+begin
+  FWindows := TList<IKeymanCEFHost>.Create;
   // You *MUST* call GlobalCEFApp.StartMainProcess in a if..then clause
   // with the Application initialization inside the begin..end.
   // Read this https://www.briskbard.com/index.php?lang=en&pageid=cef
@@ -55,16 +87,40 @@ begin
   GlobalCEFApp.UserDataPath         := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\browser\userdata';
 end;
 
-destructor TInitializeCEF.Destroy;
+destructor TCEFManager.Destroy;
 begin
+  Assert(FWindows.Count = 0);
+  FreeAndNil(FWindows);
   GlobalCEFApp.Free;
   GlobalCEFApp := nil;
   inherited Destroy;
 end;
 
-function TInitializeCEF.Start: Boolean;
+procedure TCEFManager.RegisterWindow(cef: IKeymanCEFHost);
+begin
+  FWindows.Add(cef);
+end;
+
+function TCEFManager.Start: Boolean;
 begin
   Result := GlobalCEFApp.StartMainProcess;
+end;
+
+function TCEFManager.StartShutdown(CompletionHandler: TNotifyEvent): Boolean;
+var
+  i: Integer;
+begin
+  if FWindows.Count = 0 then
+    Exit(True); // Can shutdown immediately
+  FShutdownCompletionHandler := CompletionHandler;
+  for i := 0 to FWindows.Count - 1 do
+    FWindows[i].StartShutdown(Self.CompletionHandler);
+  Result := False; // wait for completion handler
+end;
+
+procedure TCEFManager.UnregisterWindow(cef: IKeymanCEFHost);
+begin
+  FWindows.Remove(cef);
 end;
 
 end.

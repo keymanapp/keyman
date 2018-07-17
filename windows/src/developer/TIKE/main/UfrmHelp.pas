@@ -287,7 +287,7 @@ end;
 procedure TfrmHelp.FormShow(Sender: TObject);
 begin
   inherited;
-  CreateBrowser;
+//  CreateBrowser;
 end;
 
 procedure TfrmHelp.cefAfterCreated(Sender: TObject);

@@ -1,7 +1,6 @@
 inherited frmProject: TfrmProject
   Left = 193
   Top = 131
-  ActiveControl = cef
   Caption = 'frmProject'
   ClientHeight = 606
   ClientWidth = 862
@@ -10,17 +9,6 @@ inherited frmProject: TfrmProject
   ExplicitHeight = 606
   PixelsPerInch = 96
   TextHeight = 13
-  object cef: TChromiumWindow
-    Left = 0
-    Top = 0
-    Width = 862
-    Height = 606
-    Align = alClient
-    TabOrder = 0
-    OnClose = cefClose
-    OnBeforeClose = cefBeforeClose
-    OnAfterCreated = cefAfterCreated
-  end
   object dlgOpenFile: TOpenDialog
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Add File to Project'
@@ -32,12 +20,5 @@ inherited frmProject: TfrmProject
     OnTimer = tmrRefreshTimer
     Left = 604
     Top = 48
-  end
-  object tmrCreateBrowser: TTimer
-    Enabled = False
-    Interval = 300
-    OnTimer = tmrCreateBrowserTimer
-    Left = 620
-    Top = 208
   end
 end

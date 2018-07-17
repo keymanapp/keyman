@@ -287,7 +287,7 @@ uses
 begin
   CoInitFlags := COINIT_APARTMENTTHREADED;
 
-  FInitializeCEF := TInitializeCEF.Create;
+  FInitializeCEF := TCEFManager.Create;
   try
     if FInitializeCEF.Start then
     begin

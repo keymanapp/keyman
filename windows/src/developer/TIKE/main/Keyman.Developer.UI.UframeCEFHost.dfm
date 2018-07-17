@@ -2,12 +2,14 @@ inherited frameCEFHost: TframeCEFHost
   Left = 193
   Top = 131
   ActiveControl = cef
+  Align = alClient
   BorderIcons = []
   BorderStyle = bsNone
   Caption = ''
   ClientHeight = 645
   ClientWidth = 878
   OldCreateOrder = True
+  OnDestroy = FormDestroy
   ExplicitWidth = 878
   ExplicitHeight = 645
   PixelsPerInch = 96
@@ -20,10 +22,7 @@ inherited frameCEFHost: TframeCEFHost
     Align = alClient
     TabOrder = 0
     OnClose = cefClose
-    OnBeforeClose = cefBeforeClose
     OnAfterCreated = cefAfterCreated
-    ExplicitWidth = 862
-    ExplicitHeight = 606
   end
   object tmrRefresh: TTimer
     Enabled = False

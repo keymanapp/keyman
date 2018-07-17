@@ -333,6 +333,7 @@ type
     procedure InitDock;
     procedure LoadDockLayout;
     procedure SaveDockLayout;
+    procedure CEFShutdownComplete(Sender: TObject);
 
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -403,6 +404,8 @@ uses
   Winapi.UxTheme,
   System.Win.ComObj,
   Vcl.Themes,
+
+  Keyman.Developer.System.InitializeCEF,
 
   CharMapDropTool,
   DebugManager,
@@ -606,32 +609,29 @@ begin
   if not FIsClosing then
   begin
     // I944 - Fix crash when FChildWindows is nil on closing Keyman Developer
-    if not Assigned(FChildWindows) then
+    if Assigned(FChildWindows) then
     begin
-      CanClose := True;
-      Exit;
+      for i := 0 to FChildWindows.Count - 1 do
+        if not FChildWindows[i].CloseQuery then
+        begin
+          CanClose := False;
+          Exit;
+        end;
     end;
 
-    for i := 0 to FChildWindows.Count - 1 do
-      if not FChildWindows[i].CloseQuery then
-      begin
-        CanClose := False;
-        Exit;
-      end;
-
     FIsClosing := True;
-
-    for i := 0 to FChildWindows.Count - 1 do
-      FChildWindows[i].StartClose;
-
-    frmHelp.StartClose;
-
     SaveDockLayout;
 
+    CanClose := FInitializeCEF.StartShutdown(CEFShutdownComplete);
     // TODO: complete exit after StartClose is successful
-  end;
+  end
+  else
+    CanClose := True;
+end;
 
-  CanClose := True;
+procedure TfrmKeymanDeveloper.CEFShutdownComplete(Sender: TObject);
+begin
+  Close;
 end;
 
 procedure TfrmKeymanDeveloper.FormDestroy(Sender: TObject);

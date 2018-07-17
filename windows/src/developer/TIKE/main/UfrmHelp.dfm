@@ -15,10 +15,6 @@ inherited frmHelp: TfrmHelp
     OnClose = cefClose
     OnBeforeClose = cefBeforeClose
     OnAfterCreated = cefAfterCreated
-    ExplicitLeft = 8
-    ExplicitTop = 8
-    ExplicitWidth = 100
-    ExplicitHeight = 41
   end
   object ActionList1: TActionList
     Left = 244
