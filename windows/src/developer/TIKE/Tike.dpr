@@ -76,7 +76,7 @@ uses
   MessageIdentifiers in 'main\MessageIdentifiers.pas',
   exceptionw in '..\..\global\delphi\general\exceptionw.pas',
   kpsfile in '..\..\global\delphi\general\kpsfile.pas',
-  Keyman.Developer.UI.UfrmCEFHost in 'main\Keyman.Developer.UI.UfrmCEFHost.pas' {frmCEFHost},
+  Keyman.Developer.UI.UframeCEFHost in 'main\Keyman.Developer.UI.UframeCEFHost.pas' {frameCEFHost},
   UnitDrawArrow in '..\..\global\delphi\general\UnitDrawArrow.pas',
   StockObjects in 'kct\StockObjects.pas',
   CustomisationStorage in '..\..\global\delphi\cust\CustomisationStorage.pas',

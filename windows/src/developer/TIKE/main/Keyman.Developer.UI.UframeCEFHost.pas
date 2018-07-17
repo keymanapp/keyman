@@ -1,4 +1,4 @@
-unit Keyman.Developer.UI.UfrmCEFHost;
+unit Keyman.Developer.UI.UframeCEFHost;
 
 interface
 
@@ -28,7 +28,7 @@ uses
 type
   TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url: string; out Result: Boolean) of object;
 
-  TfrmCEFHost = class(TTikeForm)
+  TframeCEFHost = class(TTikeForm)
     tmrRefresh: TTimer;
     cef: TChromiumWindow;
     tmrCreateBrowser: TTimer;
@@ -112,13 +112,13 @@ uses
 // 2. The TChromiumWindow.OnClose event calls TChromiumWindow.DestroyChildWindow which triggers the TChromiumWindow.OnBeforeClose event.
 // 3. TChromiumWindow.OnBeforeClose sets FCanClose to True and closes the form.
 
-procedure TfrmCEFHost.StartClose;
+procedure TframeCEFHost.StartClose;
 begin
   Visible := False;
   cef.CloseBrowser(True);
 end;
 
-procedure TfrmCEFHost.FormCreate(Sender: TObject);
+procedure TframeCEFHost.FormCreate(Sender: TObject);
 begin
   inherited;
   cef.ChromiumBrowser.OnLoadEnd := cefLoadEnd;
@@ -130,18 +130,18 @@ begin
   CreateBrowser;
 end;
 
-procedure TfrmCEFHost.CreateBrowser;
+procedure TframeCEFHost.CreateBrowser;
 begin
   tmrCreateBrowser.Enabled := not cef.CreateBrowser;
 end;
 
-procedure TfrmCEFHost.Navigate(const url: string);
+procedure TframeCEFHost.Navigate(const url: string);
 begin
   FNextURL := url;
   Navigate;
 end;
 
-procedure TfrmCEFHost.Navigate;
+procedure TframeCEFHost.Navigate;
 begin
   if FNextURL = '' then
     Exit;
@@ -156,18 +156,18 @@ begin
   cef.LoadURL(FNextURL);
 end;
 
-procedure TfrmCEFHost.SetFocus;
+procedure TframeCEFHost.SetFocus;
 begin
   inherited;
   cef.SetFocus;
 end;
 
-procedure TfrmCEFHost.cefAfterCreated(Sender: TObject);
+procedure TframeCEFHost.cefAfterCreated(Sender: TObject);
 begin
   Navigate;
 end;
 
-procedure TfrmCEFHost.cefBeforeBrowse(Sender: TObject;
+procedure TframeCEFHost.cefBeforeBrowse(Sender: TObject;
   const browser: ICefBrowser; const frame: ICefFrame;
   const request: ICefRequest; user_gesture, isRedirect: Boolean;
   out Result: Boolean);
@@ -177,12 +177,12 @@ begin
 //  Result := DoNavigate(request.Url);
 end;
 
-procedure TfrmCEFHost.cefBeforeClose(Sender: TObject);
+procedure TframeCEFHost.cefBeforeClose(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TfrmCEFHost.cefClose(Sender: TObject);
+procedure TframeCEFHost.cefClose(Sender: TObject);
 begin
   // DestroyChildWindow will destroy the child window created by CEF at the top of the Z order.
   if not cef.DestroyChildWindow then
@@ -191,7 +191,7 @@ begin
   end;
 end;
 
-procedure TfrmCEFHost.cefConsoleMessage(Sender: TObject;
+procedure TframeCEFHost.cefConsoleMessage(Sender: TObject;
   const browser: ICefBrowser; level: TCefLogSeverity; const message,
   source: ustring; line: Integer; out Result: Boolean);
 begin
@@ -219,13 +219,13 @@ begin
   Result := True;
 end;
 
-procedure TfrmCEFHost.tmrCreateBrowserTimer(Sender: TObject);
+procedure TframeCEFHost.tmrCreateBrowserTimer(Sender: TObject);
 begin
   tmrCreateBrowser.Enabled := False;
   CreateBrowser;
 end;
 
-procedure TfrmCEFHost.cefLoadEnd(Sender: TObject; const browser: ICefBrowser;
+procedure TframeCEFHost.cefLoadEnd(Sender: TObject; const browser: ICefBrowser;
   const frame: ICefFrame; httpStatusCode: Integer);
 begin
   if csDestroying in ComponentState then
@@ -234,7 +234,7 @@ begin
     FOnLoadEnd(Self);
 end;
 
-procedure TfrmCEFHost.cefPreKeyEvent(Sender: TObject;
+procedure TframeCEFHost.cefPreKeyEvent(Sender: TObject;
   const browser: ICefBrowser; const event: PCefKeyEvent;
   osEvent: TCefEventHandle; out isKeyboardShortcut, Result: Boolean);
 begin
@@ -259,7 +259,7 @@ begin
   end;
 end;
 
-procedure TfrmCEFHost.cefBeforePopup(Sender: TObject;
+procedure TframeCEFHost.cefBeforePopup(Sender: TObject;
   const browser: ICefBrowser; const frame: ICefFrame; const targetUrl,
   targetFrameName: ustring; targetDisposition: TCefWindowOpenDisposition;
   userGesture: Boolean; const popupFeatures: TCefPopupFeatures;
@@ -278,7 +278,7 @@ begin
   end;
 end;
 
-procedure TfrmCEFHost.cefRunContextMenu(Sender: TObject;
+procedure TframeCEFHost.cefRunContextMenu(Sender: TObject;
   const browser: ICefBrowser; const frame: ICefFrame;
   const params: ICefContextMenuParams; const model: ICefMenuModel;
   const callback: ICefRunContextMenuCallback; var aResult: Boolean);
@@ -286,25 +286,25 @@ begin
   aResult := GetKeyState(VK_SHIFT) >= 0;
 end;
 
-procedure TfrmCEFHost.WMEnterMenuLoop(var aMessage: TMessage);
+procedure TframeCEFHost.WMEnterMenuLoop(var aMessage: TMessage);
 begin
   inherited;
   if (aMessage.wParam = 0) and (GlobalCEFApp <> nil) then GlobalCEFApp.OsmodalLoop := True;
 end;
 
-procedure TfrmCEFHost.WMExitMenuLoop(var aMessage: TMessage);
+procedure TframeCEFHost.WMExitMenuLoop(var aMessage: TMessage);
 begin
   inherited;
   if (aMessage.wParam = 0) and (GlobalCEFApp <> nil) then GlobalCEFApp.OsmodalLoop := False;
 end;
 
-procedure TfrmCEFHost.WMMove(var aMessage: TWMMove);
+procedure TframeCEFHost.WMMove(var aMessage: TWMMove);
 begin
   inherited;
   if cef <> nil then cef.NotifyMoveOrResizeStarted;
 end;
 
-procedure TfrmCEFHost.WMMoving(var aMessage: TMessage);
+procedure TframeCEFHost.WMMoving(var aMessage: TMessage);
 begin
   inherited;
   if cef <> nil then cef.NotifyMoveOrResizeStarted;

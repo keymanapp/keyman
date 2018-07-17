@@ -213,8 +213,8 @@
         <DCCReference Include="main\MessageIdentifiers.pas"/>
         <DCCReference Include="..\..\global\delphi\general\exceptionw.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kpsfile.pas"/>
-        <DCCReference Include="main\Keyman.Developer.UI.UfrmCEFHost.pas">
-            <Form>frmCEFHost</Form>
+        <DCCReference Include="main\Keyman.Developer.UI.UframeCEFHost.pas">
+            <Form>frameCEFHost</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\UnitDrawArrow.pas"/>
         <DCCReference Include="kct\StockObjects.pas"/>

@@ -1,10 +1,12 @@
-inherited frmCEFHost: TfrmCEFHost
+inherited frameCEFHost: TframeCEFHost
   Left = 193
   Top = 131
   ActiveControl = cef
-  Caption = 'frmCEFHost'
-  ClientHeight = 606
-  ClientWidth = 862
+  BorderIcons = []
+  BorderStyle = bsNone
+  Caption = ''
+  ClientHeight = 645
+  ClientWidth = 878
   OldCreateOrder = True
   ExplicitWidth = 878
   ExplicitHeight = 645
@@ -13,13 +15,15 @@ inherited frmCEFHost: TfrmCEFHost
   object cef: TChromiumWindow
     Left = 0
     Top = 0
-    Width = 862
-    Height = 606
+    Width = 878
+    Height = 645
     Align = alClient
     TabOrder = 0
     OnClose = cefClose
     OnBeforeClose = cefBeforeClose
     OnAfterCreated = cefAfterCreated
+    ExplicitWidth = 862
+    ExplicitHeight = 606
   end
   object tmrRefresh: TTimer
     Enabled = False
