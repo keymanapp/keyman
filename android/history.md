@@ -3,6 +3,7 @@
 
 ## 11.0 alpha
 * Move to 11.0
+* Add round launcher icons
 
 ## 2018-07-06 10.0.502 stable
 * Fixes issue for embedded Android, iOS apps where a keyboard with varying row counts in different layers could crash (#1055)
