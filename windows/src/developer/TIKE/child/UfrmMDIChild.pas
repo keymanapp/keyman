@@ -69,6 +69,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
+    procedure StartClose; virtual;
+
     procedure TextFileFormatClick; virtual;
     function CanTextFileFormatClick: Boolean; virtual;
 
@@ -237,6 +239,11 @@ begin
   FProjectFile := Value;
   if Assigned(FProjectFile) then
     FProjectFile.AddFreeNotification(Self);
+end;
+
+procedure TfrmTikeChild.StartClose;
+begin
+  // Called to close down chromium windows
 end;
 
 {-------------------------------------------------------------------------------

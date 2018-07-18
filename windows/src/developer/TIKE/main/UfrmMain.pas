@@ -299,6 +299,7 @@ type
     FInOnHelp: Boolean;
     mHHelp: TWebHookHelpSystem;   // I4677
     FFirstShow: Boolean;
+    FIsClosing: Boolean;
 
     //procedure ChildWindowsChange(Sender: TObject);
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FORMSHOWN;
@@ -412,6 +413,7 @@ uses
   OnlineUpdateCheck,
   GlobalProxySettings,
   ProjectFileUI,
+  ProjectUI,
   TextFileFormat,
   RedistFiles,
   ErrorControlledRegistry,
@@ -504,8 +506,8 @@ begin
 
   if (FActiveProject <> '') and not FileExists(FActiveProject) then
     FActiveProject := '';
-  TProjectUI.Create(FActiveProject, True);   // I4687
 
+  LoadGlobalProjectUI(FActiveProject, True);
 
   InitDock;
 
@@ -564,8 +566,6 @@ procedure TfrmKeymanDeveloper.FormClose(Sender: TObject; var Action: TCloseActio
 var
   i: Integer;
 begin
-  SaveDockLayout;
-
   for i := FChildWindows.Count - 1 downto 0 do
   begin
     FChildWindows[i].Visible := False;
@@ -603,19 +603,29 @@ procedure TfrmKeymanDeveloper.FormCloseQuery(Sender: TObject;
 var
   i: Integer;
 begin
-  // I944 - Fix crash when FChildWindows is nil on closing Keyman Developer
-  if not Assigned(FChildWindows) then
+  if not FIsClosing then
   begin
-    CanClose := True;
-    Exit;
-  end;
-
-  for i := 0 to FChildWindows.Count - 1 do
-    if not FChildWindows[i].CloseQuery then
+    // I944 - Fix crash when FChildWindows is nil on closing Keyman Developer
+    if not Assigned(FChildWindows) then
     begin
-      CanClose := False;
+      CanClose := True;
       Exit;
     end;
+
+    for i := 0 to FChildWindows.Count - 1 do
+      if not FChildWindows[i].CloseQuery then
+      begin
+        CanClose := False;
+        Exit;
+      end;
+
+    FIsClosing := True;
+
+    for i := 0 to FChildWindows.Count - 1 do
+      FChildWindows[i].StartClose;
+
+    SaveDockLayout;
+  end;
 
   CanClose := True;
 end;
@@ -627,7 +637,7 @@ begin
   FreeAndNil(FCharMapSettings);
   Application.OnActivate := nil;
 
-  FreeAndNil(FGlobalProject);
+  FreeGlobalProjectUI;
   FreeAndNil(FChildWindows);
   FreeAndNil(FProjectMRU);
 
@@ -1285,6 +1295,12 @@ begin
             Window.Parent := nil;
             pages.Pages[i].Free;
             FocusActiveChild;
+
+            if FIsClosing then
+              if pages.PageCount = 0 then
+              begin
+                Close;
+              end;
             Exit;
           end;
       end;

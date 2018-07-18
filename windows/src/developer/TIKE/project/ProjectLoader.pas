@@ -117,7 +117,7 @@ begin
       if not VarIsNull(node.ChildValues['Filepath']) then
       begin
         // I1152 - Avoid crashes when .kpj file is invalid
-        pf := CreateProjectFile(ExpandFileNameClean(FFileName, node.ChildValues['Filepath']), nil);
+        pf := CreateProjectFile(FProject, ExpandFileNameClean(FFileName, node.ChildValues['Filepath']), nil);
         pf.Load(node, True);
       end;
     end;
@@ -134,7 +134,7 @@ begin
     begin
       n := FProject.Files.IndexOfID(node.ChildValues['ParentFileID']);
       if n < 0 then Continue;
-      pf := CreateProjectFile(ExpandFileNameClean(FFileName, node.ChildValues['Filepath']), FProject.Files[n]);
+      pf := CreateProjectFile(FProject, ExpandFileNameClean(FFileName, node.ChildValues['Filepath']), FProject.Files[n]);
       pf.Load(node, True);
     end;
   end;
@@ -161,7 +161,8 @@ var
   node, root: IXMLNode;
   fsroot: IXMLNode;
   n: Integer;
-  FStandardTemplatePath, FStringsTemplatePath: string;
+  state: IXMLDocument;
+  viewState: IXMLNode;
 begin
   if not FileExists(FFileName + '.user') then Exit;
 
@@ -171,13 +172,16 @@ begin
   if root.NodeName <> 'KeymanDeveloperProjectUser' then
     raise EProjectLoader.Create('Not a Keyman Developer project .user file');
 
-  // TODO: refactor with similar code in ProjectFileUI.TProjectUI.Render
-  FStandardTemplatePath := ConvertPathToFileURL(FProject.StandardTemplatePath);
-  FStringsTemplatePath := ConvertPathToFileURL(FProject.StringsTemplatePath);
-  if (root.ChildValues['templatepath'] <> FStandardTemplatePath) or (root.ChildValues['stringspath'] <> FStringsTemplatePath) then
+  { Convert 9.0-era <state> node to <ViewState> }
+
+  fsroot := root.ChildNodes.FindNode('state');
+  if Assigned(fsroot) and (root.ChildNodes.FindNode('ViewState') = nil) then
   begin
-    root.ChildValues['templatepath'] := FStandardTemplatePath;
-    root.ChildValues['stringspath'] := FStringsTemplatePath;
+    state := LoadXMLData(fsroot.NodeValue);
+    viewState := root.AddChild('ViewState');
+    for i := 0 to state.DocumentElement.ChildNodes.Count - 1 do
+      viewState.ChildNodes.Add(state.DocumentElement.ChildNodes[i].CloneNode(True));
+
     try
       doc.SaveToFile(FFileName + '.user');
     except

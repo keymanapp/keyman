@@ -197,7 +197,7 @@ begin
   if not FileExists(FCompiledName) then
     Exit(False);
 
-  modWebHttpServer.RegisterPackage(FCompiledName, FCompiledName); // TODO: Show package 'name' in future
+  modWebHttpServer.Debugger.RegisterPackage(FCompiledName, FCompiledName); // TODO: Show package 'name' in future
 
   packageEditor.NotifyStartedWebDebug;   // I4021
 

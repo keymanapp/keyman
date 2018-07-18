@@ -90,6 +90,8 @@
                 <File Id="unicodedata.txt" Name="unicodedata.txt" Source="..\..\..\..\resources\standards-data\unicode-character-database\" />
                 <File Id="blocks.txt" Name="blocks.txt" Source="..\..\..\..\resources\standards-data\unicode-character-database\" />
               </Component>
+              
+              <?include cef.wxi ?>
 
               <Directory Id='xml' Name='xml'>
                 <Directory Id='xmlcommon' Name='common' />
@@ -349,6 +351,9 @@
       <ComponentRef Id="KeymanDevApp" />
 
       <ComponentRef Id="Data" />
+      <ComponentRef Id="cef" />
+      <ComponentRef Id="cef_locales" />
+      <ComponentRef Id="cef_swiftshader" />
       <ComponentRef Id="Reg_RootPath" />
       <ComponentRef Id="AppDataRemovals" />
       <ComponentRef Id='oskFonts' />

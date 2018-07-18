@@ -68,6 +68,7 @@ function GetUnicodeDataSourcePath(DefaultPath: string = ''): string;  // I3463
 function GetXMLTemplatePath: string;
 function GetDeveloperRootPath: string;
 function GetLayoutBuilderPath: string;   // I3885
+function GetCEFPath: string;  // Chromium Embedded Framework
 
 implementation
 
@@ -135,6 +136,11 @@ end;
 function GetXMLTemplatePath: string;
 begin
   Result := GetDebugPath('Debug_XMLTemplatePath', ExtractFilePath(ParamStr(0))+'xml\');
+end;
+
+function GetCEFPath: string;
+begin
+  Result := GetDebugPath('Debug_CEFPath', ExtractFilePath(ParamStr(0))+'cef\');
 end;
 
 function GetLayoutBuilderPath: string;   // I3885
