@@ -508,7 +508,7 @@
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
-        <DCCReference Include="main\Keyman.Developer.System.InitializeCEF.pas"/>
+        <DCCReference Include="main\Keyman.Developer.System.CEFManager.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.Debugger.pas"/>
         <DCCReference Include="Keyman.Developer.System.HttpServer.App.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.Base.pas"/>

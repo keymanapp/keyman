@@ -17,7 +17,7 @@ uses
   Winapi.Messages,
   Winapi.Windows,
 
-  Keyman.Developer.System.InitializeCEF,
+  Keyman.Developer.System.CEFManager,
   KeymanDeveloperUtils,
   UserMessages,
   UfrmTIKE,

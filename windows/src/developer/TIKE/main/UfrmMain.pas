@@ -406,7 +406,7 @@ uses
   System.Win.ComObj,
   Vcl.Themes,
 
-  Keyman.Developer.System.InitializeCEF,
+  Keyman.Developer.System.CEFManager,
 
   CharMapDropTool,
   DebugManager,

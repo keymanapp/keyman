@@ -269,7 +269,7 @@ uses
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.Standards.LibPalasoAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
-  Keyman.Developer.System.InitializeCEF in 'main\Keyman.Developer.System.InitializeCEF.pas',
+  Keyman.Developer.System.CEFManager in 'main\Keyman.Developer.System.CEFManager.pas',
   Keyman.Developer.System.HttpServer.Debugger in 'http\Keyman.Developer.System.HttpServer.Debugger.pas',
   Keyman.Developer.System.HttpServer.App in 'Keyman.Developer.System.HttpServer.App.pas',
   Keyman.Developer.System.HttpServer.Base in 'http\Keyman.Developer.System.HttpServer.Base.pas',

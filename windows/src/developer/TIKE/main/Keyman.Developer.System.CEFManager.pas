@@ -1,4 +1,4 @@
-unit Keyman.Developer.System.InitializeCEF;
+unit Keyman.Developer.System.CEFManager;
 
 interface
 
