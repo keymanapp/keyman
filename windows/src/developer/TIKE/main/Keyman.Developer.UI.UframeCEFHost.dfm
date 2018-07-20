@@ -1,7 +1,6 @@
 inherited frameCEFHost: TframeCEFHost
   Left = 193
   Top = 131
-  ActiveControl = cef
   Align = alClient
   BorderIcons = []
   BorderStyle = bsNone
@@ -14,15 +13,17 @@ inherited frameCEFHost: TframeCEFHost
   ExplicitHeight = 645
   PixelsPerInch = 96
   TextHeight = 13
-  object cef: TChromiumWindow
+  object cefwp: TCEFWindowParent
     Left = 0
     Top = 0
     Width = 878
     Height = 645
     Align = alClient
     TabOrder = 0
-    OnClose = cefClose
-    OnAfterCreated = cefAfterCreated
+    ExplicitLeft = 440
+    ExplicitTop = 320
+    ExplicitWidth = 100
+    ExplicitHeight = 40
   end
   object tmrRefresh: TTimer
     Enabled = False
@@ -35,5 +36,18 @@ inherited frameCEFHost: TframeCEFHost
     OnTimer = tmrCreateBrowserTimer
     Left = 620
     Top = 208
+  end
+  object cef: TChromium
+    OnLoadEnd = cefLoadEnd
+    OnRunContextMenu = cefRunContextMenu
+    OnPreKeyEvent = cefPreKeyEvent
+    OnConsoleMessage = cefConsoleMessage
+    OnBeforePopup = cefBeforePopup
+    OnAfterCreated = cefAfterCreated
+    OnBeforeClose = cefBeforeClose
+    OnClose = cefClose
+    OnBeforeBrowse = cefBeforeBrowse
+    Left = 424
+    Top = 312
   end
 end

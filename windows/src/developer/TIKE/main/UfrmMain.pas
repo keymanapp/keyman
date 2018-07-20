@@ -300,6 +300,7 @@ type
     mHHelp: TWebHookHelpSystem;   // I4677
     FFirstShow: Boolean;
     FIsClosing: Boolean;
+    FCanClose: Boolean;
 
     //procedure ChildWindowsChange(Sender: TObject);
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FORMSHOWN;
@@ -606,6 +607,7 @@ procedure TfrmKeymanDeveloper.FormCloseQuery(Sender: TObject;
 var
   i: Integer;
 begin
+//  OutputDebugString(PChar('TfrmKeymanDeveloper.FormCloseQuery: FIsClosing='+BoolToStr(FIsClosing)+' FCanClose='+BoolToStr(FCanClose)));
   if not FIsClosing then
   begin
     // I944 - Fix crash when FChildWindows is nil on closing Keyman Developer
@@ -626,16 +628,19 @@ begin
     // TODO: complete exit after StartClose is successful
   end
   else
-    CanClose := True;
+    CanClose := FCanClose;
 end;
 
 procedure TfrmKeymanDeveloper.CEFShutdownComplete(Sender: TObject);
 begin
+//  OutputDebugString(PChar('TfrmKeymanDeveloper.CEFShutdownComplete'));
+  FCanClose := True;
   Close;
 end;
 
 procedure TfrmKeymanDeveloper.FormDestroy(Sender: TObject);
 begin
+//  OutputDebugString(PChar('TfrmKeymanDeveloper.FormDestroy'));
   UnhookWindowsHookEx(hInputLangChangeHook);
 
   FreeAndNil(FCharMapSettings);

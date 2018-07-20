@@ -24,49 +24,40 @@ uses
   uCEFInterfaces,
   uCEFWindowParent,
   uCEFChromiumWindow,
-  uCEFTypes;
+  uCEFTypes, uCEFChromium;
+
+const
+  CEF_DESTROY = WM_USER + 300;
+  CEF_AFTERDESTROY = WM_USER + 301;
+  CEF_AFTERCREATE = WM_USER + 302;
 
 type
   TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url: string; out Result: Boolean) of object;
 
   TframeCEFHost = class(TTikeForm, IKeymanCEFHost)
     tmrRefresh: TTimer;
-    cef: TChromiumWindow;
     tmrCreateBrowser: TTimer;
+    cefwp: TCEFWindowParent;
+    cef: TChromium;
     procedure FormCreate(Sender: TObject);
     procedure tmrCreateBrowserTimer(Sender: TObject);
-    procedure cefClose(Sender: TObject);
-    procedure cefAfterCreated(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);   // I2986
-  private
-    FNextURL: string;
-    FOnLoadEnd: TNotifyEvent;
-    FOnBeforeBrowse: TCEFHostBeforeBrowseEvent;
-    FOnAfterCreated: TNotifyEvent;
-    FShutdownCompletionHandler: TShutdownCompletionHandlerEvent;
-    FIsClosing: Boolean;
-    // IKeymanCEFHost
-    procedure StartShutdown(CompletionHandler: TShutdownCompletionHandlerEvent);
-
-    // CEF: You have to handle this two messages to call NotifyMoveOrResizeStarted or some page elements will be misaligned.
-    procedure WMMove(var aMessage : TWMMove); message WM_MOVE;
-    procedure WMMoving(var aMessage : TMessage); message WM_MOVING;
-    // CEF: You also have to handle these two messages to set GlobalCEFApp.OsmodalLoop
-    procedure WMEnterMenuLoop(var aMessage: TMessage); message WM_ENTERMENULOOP;
-    procedure WMExitMenuLoop(var aMessage: TMessage); message WM_EXITMENULOOP;
-
+    procedure FormDestroy(Sender: TObject);
+    procedure cefAfterCreated(Sender: TObject; const browser: ICefBrowser);
+    procedure cefBeforeClose(Sender: TObject; const browser: ICefBrowser);
+    procedure cefClose(Sender: TObject; const browser: ICefBrowser;
+      out Result: Boolean);
+    procedure cefPreKeyEvent(Sender: TObject; const browser: ICefBrowser;
+      const event: PCefKeyEvent; osEvent: PMsg; out isKeyboardShortcut,
+      Result: Boolean);
+    procedure cefConsoleMessage(Sender: TObject; const browser: ICefBrowser;
+      level: Cardinal; const message, source: ustring; line: Integer;
+      out Result: Boolean);   // I2986
     procedure cefLoadEnd(Sender: TObject; const browser: ICefBrowser;
                          const frame: ICefFrame; httpStatusCode: Integer);
     procedure cefBeforeBrowse(Sender: TObject; const browser: ICefBrowser;
                               const frame: ICefFrame; const request: ICefRequest; user_gesture,
                               isRedirect: Boolean; out Result: Boolean);
-    procedure cefPreKeyEvent(Sender: TObject; const browser: ICefBrowser;
-                             const event: PCefKeyEvent; osEvent: TCefEventHandle;
-                             out isKeyboardShortcut: Boolean; out Result: Boolean);
-    procedure cefConsoleMessage(Sender: TObject; const browser: ICefBrowser;
-                                level: TCefLogSeverity; const message, source: ustring;
-                                line: Integer; out Result: Boolean);
     procedure cefRunContextMenu(Sender: TObject; const browser: ICefBrowser;
                                 const frame: ICefFrame; const params: ICefContextMenuParams;
                                 const model: ICefMenuModel;
@@ -85,6 +76,26 @@ type
                              var settings: TCefBrowserSettings;
                              var noJavascriptAccess: Boolean;
                              var Result: Boolean);
+  private
+    FNextURL: string;
+    FOnLoadEnd: TNotifyEvent;
+    FOnBeforeBrowse: TCEFHostBeforeBrowseEvent;
+    FOnAfterCreated: TNotifyEvent;
+    FShutdownCompletionHandler: TShutdownCompletionHandlerEvent;
+    FIsClosing: Boolean;
+    // IKeymanCEFHost
+    procedure StartShutdown(CompletionHandler: TShutdownCompletionHandlerEvent);
+
+    procedure CEFDestroy(var Message: TMessage); message CEF_DESTROY;
+    procedure CEFAfterDestroy(var Message: TMessage); message CEF_AFTERDESTROY;
+    procedure CEFAfterCreate(var Message: TMessage); message CEF_AFTERCREATE;
+
+    // CEF: You have to handle this two messages to call NotifyMoveOrResizeStarted or some page elements will be misaligned.
+    procedure WMMove(var aMessage : TWMMove); message WM_MOVE;
+    procedure WMMoving(var aMessage : TMessage); message WM_MOVING;
+    // CEF: You also have to handle these two messages to set GlobalCEFApp.OsmodalLoop
+    procedure WMEnterMenuLoop(var aMessage: TMessage); message WM_ENTERMENULOOP;
+    procedure WMExitMenuLoop(var aMessage: TMessage); message WM_EXITMENULOOP;
 
     procedure CreateBrowser;
     procedure Navigate; overload;
@@ -129,27 +140,22 @@ end;
 
 procedure TframeCEFHost.StartShutdown(CompletionHandler: TShutdownCompletionHandlerEvent);
 begin
+  OutputDebugString(PChar('TframeCEFHost.StartShutdown'));
   FIsClosing := True;
   FShutdownCompletionHandler := CompletionHandler;
-  cef.CloseBrowser(True);
+  cef.CloseBrowser(False);
 end;
 
 procedure TframeCEFHost.FormCreate(Sender: TObject);
 begin
   inherited;
-  cef.ChromiumBrowser.OnLoadEnd := cefLoadEnd;
-  cef.ChromiumBrowser.OnBeforeBrowse := cefBeforeBrowse;
-  cef.ChromiumBrowser.OnPreKeyEvent := cefPreKeyEvent;
-  cef.ChromiumBrowser.OnConsoleMessage := cefConsoleMessage;
-  cef.ChromiumBrowser.OnRunContextMenu := cefRunContextMenu;
-  cef.ChromiumBrowser.OnBeforePopup := cefBeforePopup;
-
   FInitializeCEF.RegisterWindow(Self);
 //  CreateBrowser;
 end;
 
 procedure TframeCEFHost.FormDestroy(Sender: TObject);
 begin
+//  OutputDebugString(PChar('TframeCEFHost.FormDestroy'));
   inherited;
   FInitializeCEF.UnregisterWindow(Self);
 end;
@@ -162,7 +168,7 @@ end;
 
 procedure TframeCEFHost.CreateBrowser;
 begin
-  tmrCreateBrowser.Enabled := not cef.CreateBrowser;
+  tmrCreateBrowser.Enabled := not cef.CreateBrowser(cefwp);
 end;
 
 procedure TframeCEFHost.Navigate(const url: string);
@@ -189,13 +195,28 @@ end;
 procedure TframeCEFHost.SetFocus;
 begin
   inherited;
-  if not FIsClosing and cef.CanFocus then
-    cef.SetFocus;
+  if not FIsClosing and cefwp.CanFocus then
+    cefwp.SetFocus;
 end;
 
-procedure TframeCEFHost.cefAfterCreated(Sender: TObject);
+procedure TframeCEFHost.CEFAfterCreate(var Message: TMessage);
 begin
   Navigate;
+end;
+
+procedure TframeCEFHost.cefAfterCreated(Sender: TObject;
+  const browser: ICefBrowser);
+begin
+  PostMessage(Handle, CEF_AFTERCREATE, 0, 0);
+end;
+
+procedure TframeCEFHost.CEFAfterDestroy(var Message: TMessage);
+begin
+  if Assigned(FShutdownCompletionHandler) then
+  begin
+    FShutdownCompletionHandler(Self);
+    FShutdownCompletionHandler := nil;
+  end;
 end;
 
 procedure TframeCEFHost.cefBeforeBrowse(Sender: TObject;
@@ -207,21 +228,26 @@ begin
     FOnBeforeBrowse(Self, request.Url, Result);
 end;
 
-procedure TframeCEFHost.cefClose(Sender: TObject);
+procedure TframeCEFHost.cefBeforeClose(Sender: TObject;
+  const browser: ICefBrowser);
 begin
-  // DestroyChildWindow will destroy the child window created by CEF at the top of the Z order.
-  cef.DestroyChildWindow;
+//  OutputDebugString(PChar('TframeCEFHost.cefBeforeClose'));
+  PostMessage(Handle, CEF_AFTERDESTROY, 0, 0);
+end;
 
-  if Assigned(FShutdownCompletionHandler) then
-  begin
-    FShutdownCompletionHandler(Self);
-    FShutdownCompletionHandler := nil;
-  end;
+procedure TframeCEFHost.cefClose(Sender: TObject; const browser: ICefBrowser;
+  out Result: Boolean);
+begin
+  PostMessage(Handle, CEF_DESTROY, 0, 0);
+  Result := True;
+//  OutputDebugString(PChar('TframeCEFHost.cefClose'));
+  // DestroyChildWindow will destroy the child window created by CEF at the top of the Z order.
+  cefwp.DestroyChildWindow;
 end;
 
 procedure TframeCEFHost.cefConsoleMessage(Sender: TObject;
-  const browser: ICefBrowser; level: TCefLogSeverity; const message,
-  source: ustring; line: Integer; out Result: Boolean);
+  const browser: ICefBrowser; level: Cardinal; const message, source: ustring;
+  line: Integer; out Result: Boolean);
 begin
   try
     with TStringList.Create do
@@ -247,6 +273,11 @@ begin
   Result := True;
 end;
 
+procedure TframeCEFHost.CEFDestroy(var Message: TMessage);
+begin
+  FreeAndNil(cefwp);
+end;
+
 procedure TframeCEFHost.tmrCreateBrowserTimer(Sender: TObject);
 begin
   tmrCreateBrowser.Enabled := False;
@@ -263,8 +294,8 @@ begin
 end;
 
 procedure TframeCEFHost.cefPreKeyEvent(Sender: TObject;
-  const browser: ICefBrowser; const event: PCefKeyEvent;
-  osEvent: TCefEventHandle; out isKeyboardShortcut, Result: Boolean);
+  const browser: ICefBrowser; const event: PCefKeyEvent; osEvent: PMsg;
+  out isKeyboardShortcut, Result: Boolean);
 begin
   Result := False;
   if (event.windows_key_code <> VK_CONTROL) and (event.kind in [TCefKeyEventType.KEYEVENT_KEYDOWN, TCefKeyEventType.KEYEVENT_RAWKEYDOWN]) then
@@ -277,7 +308,7 @@ begin
     end
     else if event.windows_key_code = VK_F12 then
     begin
-      cef.ChromiumBrowser.ShowDevTools(Point(Low(Integer),Low(Integer)), nil);
+      cef.ShowDevTools(Point(Low(Integer),Low(Integer)), nil);
     end
     else if SendMessage(Application.Handle, CM_APPKEYDOWN, event.windows_key_code, 0) = 1 then
     begin

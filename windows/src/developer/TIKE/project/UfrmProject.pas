@@ -58,8 +58,7 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ExtCtrls, Menus, UfrmMDIEditor, UfrmMDIChild, ProjectFile,
   KeymanDeveloperUtils, UserMessages,
-  Keyman.Developer.UI.UframeCEFHost,
-  uCEFInterfaces, uCEFWindowParent, uCEFChromiumWindow, uCEFTypes;
+  Keyman.Developer.UI.UframeCEFHost;
 
 type
   TfrmProject = class(TfrmTikeChild)  // I2721
@@ -103,7 +102,6 @@ uses
 
   Keyman.Developer.System.HelpTopics,
 
-
   dmActionsMain,
   KeymanDeveloperOptions,
   kmnProjectFile,
@@ -125,8 +123,7 @@ uses
   utilexecute,
   utilxml,
   mrulist,
-  UmodWebHttpServer,
-  uCEFApplication;
+  UmodWebHttpServer;
 
 {$R *.DFM}
 

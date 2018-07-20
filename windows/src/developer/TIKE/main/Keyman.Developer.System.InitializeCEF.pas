@@ -45,6 +45,7 @@ implementation
 uses
   System.SysUtils,
   Winapi.ShlObj,
+  Winapi.Windows,
 
   KeymanDeveloperUtils,
   RedistFiles,
@@ -55,6 +56,7 @@ uses
 
 procedure TCEFManager.CompletionHandler(Sender: IKeymanCEFHost);
 begin
+//  OutputDebugString(PChar('TCEFManager.CompletionHandler'));
   FWindows.Remove(Sender);
   if FWindows.Count = 0 then
   begin
@@ -93,6 +95,7 @@ begin
   FreeAndNil(FWindows);
   GlobalCEFApp.Free;
   GlobalCEFApp := nil;
+  FInitializeCEF := nil;
   inherited Destroy;
 end;
 
@@ -110,6 +113,7 @@ function TCEFManager.StartShutdown(CompletionHandler: TNotifyEvent): Boolean;
 var
   i: Integer;
 begin
+//  OutputDebugString(PChar('TCEFManager.StartShutdown'));
   if FWindows.Count = 0 then
     Exit(True); // Can shutdown immediately
   FShutdownCompletionHandler := CompletionHandler;
@@ -120,6 +124,7 @@ end;
 
 procedure TCEFManager.UnregisterWindow(cef: IKeymanCEFHost);
 begin
+//  OutputDebugString(PChar('TCEFManager.UnregisterWindow'));
   FWindows.Remove(cef);
 end;
 

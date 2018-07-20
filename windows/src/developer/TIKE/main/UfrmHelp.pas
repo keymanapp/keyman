@@ -9,6 +9,7 @@ uses
   Xml.XMLDoc,
   Xml.XMLIntf,
 
+  Keyman.Developer.UI.UframeCEFHost,
   TempFileManager, UfrmTikeDock,
   System.Actions, JvComponentBase, JvDockControlForm, uCEFWindowParent,
   uCEFInterfaces, uCEFTypes,
@@ -18,16 +19,10 @@ type
   TfrmHelp = class(TTIKEDockForm) // I2721
     ActionList1: TActionList;
     actHelpContextRefresh: TAction;
-    cef: TChromiumWindow;
-    tmrCreateBrowser: TTimer;
     procedure actHelpContextRefreshUpdate(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure tmrCreateBrowserTimer(Sender: TObject);
-    procedure cefAfterCreated(Sender: TObject);
-    procedure cefBeforeClose(Sender: TObject);
-    procedure cefClose(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     FRefreshQueued: Boolean;
     FHelpControl: TWinControl;
@@ -36,40 +31,15 @@ type
     FHelpFileName: string;
     FHMFRoot: IXMLNode;
     FTempFile: TTempFile;
+    cef: TframeCEFHost;
 //    procedure AddUnmatchedContext(FormName, ControlName: string);
 //    procedure DeleteMatchedContext(FormName, ControlName: string);
-    procedure cefLoadEnd(Sender: TObject; const browser: ICefBrowser;
-      const frame: ICefFrame; httpStatusCode: Integer);
-    procedure cefPreKeyEvent(Sender: TObject; const browser: ICefBrowser;
-      const event: PCefKeyEvent; osEvent: TCefEventHandle;
-      out isKeyboardShortcut, Result: Boolean);
-    procedure cefBeforePopup(Sender: TObject; const browser: ICefBrowser;
-      const frame: ICefFrame; const targetUrl, targetFrameName: ustring;
-      targetDisposition: TCefWindowOpenDisposition; userGesture: Boolean;
-      const popupFeatures: TCefPopupFeatures; var windowInfo: TCefWindowInfo;
-      var client: ICefClient; var settings: TCefBrowserSettings;
-      var noJavascriptAccess, Result: Boolean);
-    procedure cefBeforeBrowse(Sender: TObject; const browser: ICefBrowser;
-      const frame: ICefFrame; const request: ICefRequest;
-      user_gesture, isRedirect: Boolean; out Result: Boolean);
-    procedure cefRunContextMenu(Sender: TObject; const browser: ICefBrowser;
-      const frame: ICefFrame; const params: ICefContextMenuParams;
-      const model: ICefMenuModel; const callback: ICefRunContextMenuCallback;
-      var aResult: Boolean);
-
-    procedure CreateBrowser;
-
-    // CEF: You have to handle this two messages to call NotifyMoveOrResizeStarted or some page elements will be misaligned.
-    procedure WMMove(var aMessage: TWMMove); message WM_MOVE;
-    procedure WMMoving(var aMessage: TMessage); message WM_MOVING;
-    // CEF: You also have to handle these two messages to set GlobalCEFApp.OsmodalLoop
-    procedure WMEnterMenuLoop(var aMessage: TMessage); message WM_ENTERMENULOOP;
-    procedure WMExitMenuLoop(var aMessage: TMessage); message WM_EXITMENULOOP;
+    procedure cefLoadEnd(Sender: TObject);
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
   protected
     function GetHelpTopic: string; override;
   public
     procedure LoadHelp(ControlName, FormName: string);
-    procedure StartClose;
     procedure QueueRefresh;
   end;
 
@@ -187,10 +157,14 @@ begin
   if FormName = 'TfrmHelp' then
     Exit; // I2823
 
+  if not FDocumentLoaded then
+    Exit;
+
   // Call into the web browser control.
   try
     // TODO: record unmatched context
-    cef.ChromiumBrowser.ExecuteJavaScript('ActivatePage("' + FormName + '", "' +
+    // Check that the page is correct
+    cef.cef.ExecuteJavaScript('ActivatePage("' + FormName + '", "' +
       ControlName + '")', '');
     {
       elem := doc3.getElementById(FormName+'-'+ControlName);
@@ -206,18 +180,6 @@ end;
 procedure TfrmHelp.QueueRefresh;
 begin
   FRefreshQueued := True;
-end;
-
-procedure TfrmHelp.StartClose;
-begin
-  cef.Visible := False;
-  cef.CloseBrowser(True);
-end;
-
-procedure TfrmHelp.tmrCreateBrowserTimer(Sender: TObject);
-begin
-  tmrCreateBrowser.Enabled := False;
-  CreateBrowser;
 end;
 
 procedure TfrmHelp.FormCreate(Sender: TObject);
@@ -237,17 +199,6 @@ begin
     FHelpMissingFile := NewXMLDocument;
     FHMFRoot := FHelpMissingFile.AddChild('MissingTopics');
   end;
-
-  cef.ChromiumBrowser.OnBeforeBrowse := cefBeforeBrowse;
-  cef.ChromiumBrowser.OnBeforePopup := cefBeforePopup;
-  cef.ChromiumBrowser.OnRunContextMenu := cefRunContextMenu;
-  cef.ChromiumBrowser.OnLoadEnd := cefLoadEnd;
-  cef.ChromiumBrowser.OnPreKeyEvent := cefPreKeyEvent;
-end;
-
-procedure TfrmHelp.CreateBrowser;
-begin
-  tmrCreateBrowser.Enabled := not cef.CreateBrowser;
 end;
 
 procedure TfrmHelp.FormDestroy(Sender: TObject);
@@ -256,44 +207,16 @@ begin
   FreeAndNil(FTempFile);
 end;
 
-procedure TfrmHelp.WMEnterMenuLoop(var aMessage: TMessage);
-begin
-  inherited;
-  if (aMessage.wParam = 0) and (GlobalCEFApp <> nil) then
-    GlobalCEFApp.OsmodalLoop := True;
-end;
-
-procedure TfrmHelp.WMExitMenuLoop(var aMessage: TMessage);
-begin
-  inherited;
-  if (aMessage.wParam = 0) and (GlobalCEFApp <> nil) then
-    GlobalCEFApp.OsmodalLoop := False;
-end;
-
-procedure TfrmHelp.WMMove(var aMessage: TWMMove);
-begin
-  inherited;
-  if cef <> nil then
-    cef.NotifyMoveOrResizeStarted;
-end;
-
-procedure TfrmHelp.WMMoving(var aMessage: TMessage);
-begin
-  inherited;
-  if cef <> nil then
-    cef.NotifyMoveOrResizeStarted;
-end;
-
 procedure TfrmHelp.FormShow(Sender: TObject);
 begin
   inherited;
-//  CreateBrowser;
-end;
-
-procedure TfrmHelp.cefAfterCreated(Sender: TObject);
-begin
-  FDocumentLoaded := False;
-  cef.LoadURL(modWebHttpServer.GetAppURL('help/'));
+  cef := TframeCEFHost.Create(Self);
+  cef.cef.DefaultUrl := modWebHttpServer.GetAppURL('help/');
+  cef.Parent := Self;
+  cef.Visible := True;
+  cef.OnBeforeBrowse := cefBeforeBrowse;
+  cef.OnLoadEnd := cefLoadEnd;
+//  cef.Navigate(modWebHttpServer.GetAppURL('help/'));
 end;
 
 function TfrmHelp.GetHelpTopic: string;
@@ -301,28 +224,12 @@ begin
   Result := SHelpTopic_Context_Help;
 end;
 
-procedure TfrmHelp.cefBeforeClose(Sender: TObject);
-begin
-  Close;
-end;
-
-procedure TfrmHelp.cefClose(Sender: TObject);
-begin
-  // DestroyChildWindow will destroy the child window created by CEF at the top of the Z order.
-  if not cef.DestroyChildWindow then
-  begin
-    Close;
-  end;
-end;
-
-procedure TfrmHelp.cefBeforeBrowse(Sender: TObject; const browser: ICefBrowser;
-  const frame: ICefFrame; const request: ICefRequest;
-  user_gesture, isRedirect: Boolean; out Result: Boolean);
+procedure TfrmHelp.cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
 var
   frm: TTIKEForm;
 begin
   Result := False;
-  if Copy(request.Url, 1, 5) = 'help:' then
+  if Copy(Url, 1, 5) = 'help:' then
   begin
     Result := True;
     if FHelpControl is TTIKEForm then
@@ -339,76 +246,14 @@ begin
   end;
 end;
 
-procedure TfrmHelp.cefLoadEnd(Sender: TObject; const browser: ICefBrowser;
-  const frame: ICefFrame; httpStatusCode: Integer);
+procedure TfrmHelp.cefLoadEnd(Sender: TObject);
 begin
   if csDestroying in ComponentState then
     Exit;
+//  if cef.cef.ChromiumBrowser. then
+
   FDocumentLoaded := True;
   QueueRefresh;
-end;
-
-procedure TfrmHelp.cefPreKeyEvent(Sender: TObject; const browser: ICefBrowser;
-  const event: PCefKeyEvent; osEvent: TCefEventHandle;
-  out isKeyboardShortcut, Result: Boolean);
-begin
-  Result := False;
-  if (event.windows_key_code <> VK_CONTROL) and
-    (event.kind in [TCefKeyEventType.KEYEVENT_KEYDOWN,
-    TCefKeyEventType.KEYEVENT_RAWKEYDOWN]) then
-  begin
-    if event.windows_key_code = VK_F1 then
-    begin
-      isKeyboardShortcut := True;
-      Result := True;
-      frmKeymanDeveloper.HelpTopic(Self);
-    end
-    else if event.windows_key_code = VK_F12 then
-    begin
-      cef.ChromiumBrowser.ShowDevTools(Point(Low(Integer), Low(Integer)), nil);
-    end
-    else if SendMessage(Application.Handle, CM_APPKEYDOWN,
-      event.windows_key_code, 0) = 1 then
-    begin
-      isKeyboardShortcut := True;
-      Result := True;
-    end;
-  end;
-end;
-
-procedure TfrmHelp.cefBeforePopup(Sender: TObject; const browser: ICefBrowser;
-  const frame: ICefFrame; const targetUrl, targetFrameName: ustring;
-  targetDisposition: TCefWindowOpenDisposition; userGesture: Boolean;
-  const popupFeatures: TCefPopupFeatures; var windowInfo: TCefWindowInfo;
-  var client: ICefClient; var settings: TCefBrowserSettings;
-  var noJavascriptAccess, Result: Boolean);
-var
-  FormName: string;
-begin
-  Result := True;
-  if Copy(targetUrl, 1, 5) = 'help:' then
-  begin
-    if FHelpControl is TCustomForm then
-      FormName := (FHelpControl as TCustomForm).ClassName
-    else if FHelpControl.Owner <> nil then
-      FormName := FHelpControl.Owner.ClassName
-    else
-      FormName := '';
-    if FormName = '' then
-      frmKeymanDeveloper.HelpTopic('index')
-    else
-      frmKeymanDeveloper.HelpTopic('context_' + Copy(FormName, 2, MAXINT));
-  end
-  else
-    cef.LoadURL(targetUrl);
-end;
-
-procedure TfrmHelp.cefRunContextMenu(Sender: TObject;
-  const browser: ICefBrowser; const frame: ICefFrame;
-  const params: ICefContextMenuParams; const model: ICefMenuModel;
-  const callback: ICefRunContextMenuCallback; var aResult: Boolean);
-begin
-  aResult := GetKeyState(VK_SHIFT) >= 0;
 end;
 
 end.
