@@ -3,6 +3,9 @@
 ## 11.0 alpha
 * Refactored target-action call from keyView
 
+## 2018-07-12 10.0.102 stable
+* Removed help button from OSK for versions of macOS < 10.10 to prevent crash (#1080, #1081)
+
 ## 2018-07-12 10.0.101 stable
 * Fixed crashing bug in OSK for older versions of OS (#1066)
 
