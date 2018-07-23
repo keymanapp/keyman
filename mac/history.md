@@ -1,5 +1,8 @@
 # Keyman for macOS Version History
 
+## 2018-07-12 10.0.102 stable
+* Removed help button from OSK for versions of macOS < 10.10 to prevent crash (#1080)
+
 ## 2018-07-12 10.0.101 stable
 * Fix crashing bug in OSK for older versions of OS (#1066)
 
