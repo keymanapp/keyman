@@ -104,6 +104,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   weak var keymanWebDelegate: KeymanWebDelegate?
   var currentRequest: HTTPDownloadRequest?
   var shouldReloadKeyboard = false
+  //var dismissingPicker = false
   var keymanWeb: KeymanWebViewController! = nil
 
   private var downloadQueue: HTTPDownloader?
@@ -891,18 +892,23 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   func keyboardHeight(isPortrait: Bool) -> CGFloat {
-    let parentHeight: CGFloat = keymanWeb.parent != nil ? keymanWeb.parent!.view.frame.height : CGFloat(100.0)
+  /*  let viewController: UIViewController? = keymanWeb.parent != nil ? keymanWeb.parent : keymanWeb.presentingViewController
+    if (viewController == nil) {
+        log.debug("dude")
+    }
+    let parentHeight: CGFloat = viewController != nil ? viewController!.view.frame.height : CGFloat(100.0) */
+    let parentHeight: CGFloat = keymanWeb.parent != nil ? keymanWeb.parent!.view.frame.height : CGFloat(0.0)
     if UIDevice.current.userInterfaceIdiom == .pad {
       if isPortrait {
-        return isSystemKeyboard ? padPortraitSystemKeyboardHeight : parentHeight
+        return isSystemKeyboard || parentHeight == 0.0 ? padPortraitSystemKeyboardHeight : parentHeight
       } else {
-        return isSystemKeyboard ? padLandscapeSystemKeyboardHeight : parentHeight
+        return isSystemKeyboard || parentHeight == 0.0 ? padLandscapeSystemKeyboardHeight : parentHeight
       }
     } else {
       if isPortrait {
-        return isSystemKeyboard ? phonePortraitSystemKeyboardHeight : parentHeight
+        return isSystemKeyboard || parentHeight == 0.0 ? phonePortraitSystemKeyboardHeight : parentHeight
       } else {
-        return isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : parentHeight
+        return isSystemKeyboard || parentHeight == 0.0 ? phoneLandscapeSystemKeyboardHeight : parentHeight
       }
     }
   }
@@ -966,6 +972,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - SeeAlso:
   /// TextView/TextField to enable/disable the keyboard picker
   public func showKeyboardPicker(in viewController: UIViewController, shouldAddKeyboard: Bool) {
+    //keymanWeb.removeFromParentViewController()
     let vc = KeyboardPickerViewController()
     let nc = UINavigationController(rootViewController: vc)
     nc.modalTransitionStyle = .coverVertical
@@ -983,8 +990,15 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   public func dismissKeyboardPicker(_ viewController: UIViewController) {
-    viewController.dismiss(animated: true)
-    if shouldReloadKeyboard {
+    //dismissingPicker = true
+    // Setting animated to false "fixes" the display problems and prevents the crash (on iPad 10.5"
+    // and 12.9"), but it makes the transition less smooth (obviously) and probably isn't the "right"
+    // way to fix the problem. Presumably there is some kind of underlying plumbing issue that is the
+    // true source of the problems.
+    viewController.dismiss(animated: false)
+    //dismissingPicker = false
+    //resizeKeyboard()
+    if (shouldReloadKeyboard/* || keymanWeb.parent == nil*/) {
       reloadKeyboard(in: keymanWeb)
     }
     NotificationCenter.default.post(name: Notifications.keyboardPickerDismissed, object: self, value: ())
@@ -1126,8 +1140,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   @objc func keyboardWillShow(_ notification: Notification) {
     dismissSubKeys()
     dismissKeyPreview()
-    resizeKeyboard()
-
+    //if (!dismissingPicker) {
+        resizeKeyboard()
+    //}
+    
     if isKeymanHelpOn {
       helpBubbleView?.removeFromSuperview()
       let showHelpBubble = #selector(self.showHelpBubble as () -> Void)
