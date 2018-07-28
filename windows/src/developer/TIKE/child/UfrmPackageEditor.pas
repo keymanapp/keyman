@@ -1004,7 +1004,7 @@ begin
   end
   else
   begin
-    f := CreateProjectFile(s, ProjectFile);
+    f := CreateProjectFile(FGlobalProject, s, ProjectFile);
     try
       fui := f.UI as TProjectFileUI;
       fui.DefaultEvent(Self);

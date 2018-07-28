@@ -130,7 +130,7 @@ type
     property State: TProjectState read FState;
 
   public
-    procedure Log(AState: TProjectLogState; Filename, Msg: string); virtual; abstract;   // I4706
+    procedure Log(AState: TProjectLogState; Filename, Msg: string); virtual;
 
     constructor Create(AFileName: string; ALoadPersistedUntitledProject: Boolean = False); virtual;
     destructor Destroy; override;
@@ -138,6 +138,8 @@ type
     procedure Refresh;
 
     procedure PersistUntitledProject;
+
+    function Render: WideString;
 
     function Load: Boolean; virtual;   // I4694
     function Save: Boolean; virtual;   // I4694
@@ -317,6 +319,7 @@ uses
   UMD5Hash,
   Unicode,
   utildir,
+  utilhttp,
   utilsystem;
 
 { TProjectFileList }
@@ -671,7 +674,6 @@ var
 begin
   FOptions := TProjectOptions.Create;   // I4688
   FState := psCreating;
-  FGlobalProject := Self;
   inherited Create;
   FMRU := TMRUList.Create('');
   FMRU.OnChange := MRUChange;
@@ -790,6 +792,11 @@ begin
   end;
 end;
 
+procedure TProject.Log(AState: TProjectLogState; Filename, Msg: string);
+begin
+  // Do nothing
+end;
+
 procedure TProject.PersistUntitledProject;
 var
   path: string;
@@ -809,6 +816,58 @@ end;
 procedure TProject.Refresh;   // I4687
 begin
   DoRefresh;
+end;
+
+function TProject.Render: WideString;
+var
+  doc, userdoc, xsl: IXMLDomDocument;
+  FLastDir: string;
+  i: Integer;
+begin
+  if not FileExists(SavedFileName) then Save;
+
+  Result := '';
+  FLastDir := GetCurrentDir;
+  SetCurrentDir(StringsTemplatePath);
+  try
+    doc := MSXMLDOMDocumentFactory.CreateDOMDocument;
+    try
+      doc.async := False;
+      doc.load(SavedFileName);
+
+      //
+      // Inject the user settings to the loaded file
+      //
+
+      if FileExists(SavedFileName + '.user') then   // I4698
+      begin
+        userdoc := MSXMLDOMDocumentFactory.CreateDOMDocument;
+        try
+          userdoc.async := False;
+          userdoc.load(SavedFileName + '.user');
+          for i := 0 to userdoc.documentElement.childNodes.length - 1 do
+            doc.documentElement.appendChild(userdoc.documentElement.childNodes.item[i].cloneNode(true));
+        finally
+          userdoc := nil;
+        end;
+      end;
+
+      xsl := MSXMLDOMDocumentFactory.CreateDOMDocument;
+      try
+        xsl.async := False;
+        xsl.resolveExternals := True;
+        xsl.validateOnParse := False;
+        xsl.load(StringsTemplatePath + 'project.xsl');
+        Result := doc.transformNode(xsl);
+      finally
+        xsl := nil;
+      end;
+    finally
+      doc := nil;
+    end;
+  finally
+    SetCurrentDir(FLastDir);
+  end;
 end;
 
 // I1010: Persist untitled project - end
@@ -866,7 +925,7 @@ begin
 
     ReadSection('Files', s);
     for i := 0 to s.Count - 1 do
-      CreateProjectFile(ExpandMemberFileName(FileName, s[i]), nil);
+      CreateProjectFile(Self, ExpandMemberFileName(FileName, s[i]), nil);
 
     ReadSection('MRU', s);
     for i := 0 to s.Count - 1 do

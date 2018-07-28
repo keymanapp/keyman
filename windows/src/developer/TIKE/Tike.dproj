@@ -213,8 +213,8 @@
         <DCCReference Include="main\MessageIdentifiers.pas"/>
         <DCCReference Include="..\..\global\delphi\general\exceptionw.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kpsfile.pas"/>
-        <DCCReference Include="project\UfrmProject.pas">
-            <Form>frmProject</Form>
+        <DCCReference Include="main\Keyman.Developer.UI.UframeCEFHost.pas">
+            <Form>frameCEFHost</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\UnitDrawArrow.pas"/>
         <DCCReference Include="kct\StockObjects.pas"/>
@@ -508,6 +508,14 @@
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
+        <DCCReference Include="main\Keyman.Developer.System.CEFManager.pas"/>
+        <DCCReference Include="http\Keyman.Developer.System.HttpServer.Debugger.pas"/>
+        <DCCReference Include="Keyman.Developer.System.HttpServer.App.pas"/>
+        <DCCReference Include="http\Keyman.Developer.System.HttpServer.Base.pas"/>
+        <DCCReference Include="project\UfrmProject.pas">
+            <Form>frmProject</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

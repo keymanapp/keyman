@@ -193,11 +193,10 @@ inherited frmPackageEditor: TfrmPackageEditor
     TabWidth = 60
     OnChange = pagesChange
     OnChanging = pagesChanging
-    ExplicitWidth = 681
-    ExplicitHeight = 447
     object pageFiles: TTabSheet
       Caption = 'Files'
       ImageIndex = 3
+      ExplicitLeft = 0
       ExplicitWidth = 588
       ExplicitHeight = 447
       object Panel1: TPanel
@@ -280,7 +279,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           ItemHeight = 13
           TabOrder = 0
           OnClick = lbFilesClick
-          ExplicitHeight = 329
         end
         object cmdAddFile: TButton
           Left = 14
@@ -364,6 +362,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageKeyboards: TTabSheet
       Caption = 'Keyboards'
       ImageIndex = 5
+      ExplicitLeft = 0
       ExplicitWidth = 588
       ExplicitHeight = 447
       object Panel5: TPanel
@@ -469,7 +468,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           ItemHeight = 13
           TabOrder = 0
           OnClick = lbKeyboardsClick
-          ExplicitHeight = 233
         end
         object editKeyboardDescription: TEdit
           Left = 96
@@ -593,6 +591,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageDetails: TTabSheet
       Caption = 'Details'
       ImageIndex = 2
+      ExplicitLeft = 0
       ExplicitWidth = 588
       ExplicitHeight = 447
       object Panel2: TPanel
@@ -732,7 +731,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 0
           OnClick = cbReadMeClick
-          ExplicitWidth = 215
         end
         object editInfoName: TEdit
           Left = 108
@@ -815,7 +813,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 9
           OnClick = cbKMPImageFileClick
-          ExplicitWidth = 215
         end
         object panKMPImageSample: TPanel
           Left = 694
@@ -847,6 +844,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageShortcuts: TTabSheet
       Caption = 'Shortcuts'
       ImageIndex = 8
+      ExplicitLeft = 0
       ExplicitWidth = 588
       ExplicitHeight = 447
       object Panel3: TPanel
@@ -963,7 +961,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           ItemHeight = 13
           TabOrder = 3
           OnClick = lbStartMenuEntriesClick
-          ExplicitHeight = 254
         end
         object cmdNewStartMenuEntry: TButton
           Left = 14
@@ -1017,12 +1014,14 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageSource: TTabSheet
       Caption = 'Source'
       ImageIndex = 9
+      ExplicitLeft = 0
       ExplicitWidth = 588
       ExplicitHeight = 447
     end
     object pageCompile: TTabSheet
       Caption = 'Compile'
       ImageIndex = 1
+      ExplicitLeft = 0
       ExplicitWidth = 588
       ExplicitHeight = 447
       object Panel4: TPanel

@@ -24,15 +24,31 @@ uses
   ProjectFileUI;
 
 function GetGlobalProjectUI: TProjectUI;
+function LoadGlobalProjectUI(AFilename: string; ALoadPersistedUntitledProject: Boolean = False): TProjectUI;
+procedure FreeGlobalProjectUI;
 
 implementation
 
 uses
+  System.SysUtils,
+
   Project;
 
 function GetGlobalProjectUI: TProjectUI;
 begin
   Result := FGlobalProject as TProjectUI;
+end;
+
+procedure FreeGlobalProjectUI;
+begin
+  FreeAndNil(FGlobalProject);
+end;
+
+function LoadGlobalProjectUI(AFilename: string; ALoadPersistedUntitledProject: Boolean = False): TProjectUI;
+begin
+  Assert(not Assigned(FGlobalProject));
+  Result := TProjectUI.Create(AFilename, ALoadPersistedUntitledProject);   // I4687
+  FGlobalProject := Result;
 end;
 
 end.

@@ -76,7 +76,7 @@ uses
   MessageIdentifiers in 'main\MessageIdentifiers.pas',
   exceptionw in '..\..\global\delphi\general\exceptionw.pas',
   kpsfile in '..\..\global\delphi\general\kpsfile.pas',
-  UfrmProject in 'project\UfrmProject.pas' {frmProject},
+  Keyman.Developer.UI.UframeCEFHost in 'main\Keyman.Developer.UI.UframeCEFHost.pas' {frameCEFHost},
   UnitDrawArrow in '..\..\global\delphi\general\UnitDrawArrow.pas',
   StockObjects in 'kct\StockObjects.pas',
   CustomisationStorage in '..\..\global\delphi\cust\CustomisationStorage.pas',
@@ -268,26 +268,43 @@ uses
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.Standards.LibPalasoAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas',
-  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas';
+  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
+  Keyman.Developer.System.CEFManager in 'main\Keyman.Developer.System.CEFManager.pas',
+  Keyman.Developer.System.HttpServer.Debugger in 'http\Keyman.Developer.System.HttpServer.Debugger.pas',
+  Keyman.Developer.System.HttpServer.App in 'Keyman.Developer.System.HttpServer.App.pas',
+  Keyman.Developer.System.HttpServer.Base in 'http\Keyman.Developer.System.HttpServer.Base.pas',
+  UfrmProject in 'project\UfrmProject.pas' {frmProject};
 
 {$R *.RES}
 {$R ICONS.RES}
 {$R VERSION.RES}
 {$R MANIFEST.RES}
 
+// CEF3 needs to set the LARGEADDRESSAWARE flag which allows 32-bit processes to use up to 3GB of RAM.
+// If you don't add this flag the rederer process will crash when you try to load large images.
+{$SetPEFlags IMAGE_FILE_LARGE_ADDRESS_AWARE}
+
 begin
   CoInitFlags := COINIT_APARTMENTTHREADED;
 
-  InitThemeLibrary;
-  SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
-  Application.Initialize;
-//  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
-  Application.Title := 'Keyman Developer';
-  //TBX.TBXSetTheme('OfficeXP2');
-  if TikeActive then Exit;
-  InitClasses;
-  Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
+  FInitializeCEF := TCEFManager.Create;
+  try
+    if FInitializeCEF.Start then
+    begin
+      InitThemeLibrary;
+      SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
+      Application.Initialize;
+    //  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
+      Application.Title := 'Keyman Developer';
+      //TBX.TBXSetTheme('OfficeXP2');
+      if TikeActive then Exit;
+      InitClasses;
+      Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
   Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
   ShowStartup;
-  Application.Run;
+      Application.Run;
+    end;
+  finally
+    FInitializeCEF.Free;
+  end;
 end.

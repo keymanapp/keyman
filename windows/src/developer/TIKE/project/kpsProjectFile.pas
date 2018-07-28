@@ -203,7 +203,7 @@ begin
       pack.LoadXML;
       for i := 0 to pack.Files.Count - 1 do
         if Project.Files.IndexOfFileName(pack.Files[i].FileName) < 0 then
-          CreateProjectFile(pack.Files[i].FileName, Self);
+          CreateProjectFile(Project, pack.Files[i].FileName, Self);
       FHeader_Name := pack.Info.Desc[PackageInfo_Name];
       FHeader_Copyright := pack.Info.Desc[PackageInfo_Copyright];
       FHeader_Version := pack.Info.Desc[PackageInfo_Version];
