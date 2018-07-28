@@ -271,9 +271,10 @@ uses
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   Keyman.Developer.System.CEFManager in 'main\Keyman.Developer.System.CEFManager.pas',
   Keyman.Developer.System.HttpServer.Debugger in 'http\Keyman.Developer.System.HttpServer.Debugger.pas',
-  Keyman.Developer.System.HttpServer.App in 'Keyman.Developer.System.HttpServer.App.pas',
+  Keyman.Developer.System.HttpServer.App in 'http\Keyman.Developer.System.HttpServer.App.pas',
   Keyman.Developer.System.HttpServer.Base in 'http\Keyman.Developer.System.HttpServer.Base.pas',
-  UfrmProject in 'project\UfrmProject.pas' {frmProject};
+  UfrmProject in 'project\UfrmProject.pas' {frmProject},
+  Keyman.Developer.System.HttpServer.AppSource in 'http\Keyman.Developer.System.HttpServer.AppSource.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

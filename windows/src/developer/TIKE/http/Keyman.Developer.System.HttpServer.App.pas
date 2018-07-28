@@ -9,6 +9,8 @@ uses
 
   Keyman.Developer.System.HttpServer.Base;
 
+// /app
+
 type
   TAppHttpResponder = class(TBaseHttpResponder)
   private
@@ -145,8 +147,9 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
   begin
     Delete(doc, 1, 4);
     if (Pos('/', doc) > 0) or (Pos('\', doc) > 0) then
-      Respond404(AContext, ARequestInfo, AResponseInfo);
-    RespondFile(TProject.StandardTemplatePath + '/' + doc, AContext, ARequestInfo, AResponseInfo);
+      Respond404(AContext, ARequestInfo, AResponseInfo)
+    else
+      RespondFile(TProject.StandardTemplatePath + '/' + doc, AContext, ARequestInfo, AResponseInfo);
   end;
 
   procedure RespondState;

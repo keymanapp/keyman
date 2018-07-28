@@ -48,6 +48,7 @@ uses
   Winapi.Windows,
 
   KeymanDeveloperUtils,
+  KeymanVersion,
   RedistFiles,
   RegistryKeys,
   UTikeDebugMode;
@@ -87,6 +88,7 @@ begin
   GlobalCEFApp.cache                := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\browser\cache';  //TODO: refactor into KeymanPaths.pas
   GlobalCEFApp.cookies              := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\browser\cookies';
   GlobalCEFApp.UserDataPath         := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\browser\userdata';
+  GlobalCEFApp.UserAgent            := 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.79 Safari/537.36 (TIKE/'+SKeymanVersion+')';
 end;
 
 destructor TCEFManager.Destroy;
