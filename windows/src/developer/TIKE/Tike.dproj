@@ -241,7 +241,6 @@
         <DCCReference Include="compile\CompileKeymanWeb.pas"/>
         <DCCReference Include="compile\KeymanWebKeyCodes.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="..\..\global\delphi\tlb\MSHTML_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\productactivation\OnlineConstants.pas"/>
         <DCCReference Include="..\..\global\delphi\tlb\ADOX_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\tlb\ADODB_TLB.pas"/>
@@ -264,7 +263,6 @@
         <DCCReference Include="..\..\global\delphi\comp\OnScreenKeyboard.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\ExtShiftState.pas"/>
         <DCCReference Include="..\..\global\delphi\general\CleartypeDrawCharacter.pas"/>
-        <DCCReference Include="..\..\global\delphi\comp\webbrowserfocusmonitor.pas"/>
         <DCCReference Include="main\CharMapDropTool.pas"/>
         <DCCReference Include="main\CharMapDropTool_PlusMemoU.pas"/>
         <DCCReference Include="main\CharMapDropTool_EmbeddedWB.pas"/>
@@ -359,7 +357,6 @@
         <DCCReference Include="..\..\global\delphi\general\usp10.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilmsxml.pas"/>
-        <DCCReference Include="..\..\global\delphi\comp\KeymanEmbeddedWB.pas"/>
         <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="main\UframeBitmapEditor.pas">
             <Form>frameBitmapEditor</Form>
