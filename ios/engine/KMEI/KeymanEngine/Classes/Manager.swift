@@ -983,7 +983,11 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   public func dismissKeyboardPicker(_ viewController: UIViewController) {
-    viewController.dismiss(animated: true)
+    // #1045 - Setting animated to false "fixes" the display problems and prevents the crash (on iPad 10.5"
+    // and 12.9"), but it makes the transition less smooth (obviously) and probably isn't the "right"
+    // way to fix the problem. Presumably there is some kind of underlying plumbing issue that is the
+    // true source of the problems.
+    viewController.dismiss(animated: false)
     if shouldReloadKeyboard {
       reloadKeyboard(in: keymanWeb)
     }
