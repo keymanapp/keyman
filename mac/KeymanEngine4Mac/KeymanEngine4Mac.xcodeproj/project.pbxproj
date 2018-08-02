@@ -48,6 +48,7 @@
 		E224323F20D37E97006940A1 /* PlatformTest.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E224323E20D37E97006940A1 /* PlatformTest.kmx */; };
 		E22A5A1120113DC100233965 /* KMEngineTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E22A5A1020113DC100233965 /* KMEngineTests.m */; };
 		E22A5A142011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = E22A5A132011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m */; };
+		E23380F12112C01500B90591 /* CipherMusicUnicode.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E23380F02112C01500B90591 /* CipherMusicUnicode.kmx */; };
 		E2537D9A201641DA0069FEA6 /* TestMacEngine.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E2537D99201641DA0069FEA6 /* TestMacEngine.kmx */; };
 		E28C71E520EBBA2D002D959D /* KMkeyViewProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = E28C71E420EBBA2C002D959D /* KMkeyViewProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
@@ -108,6 +109,7 @@
 		E22A5A1020113DC100233965 /* KMEngineTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMEngineTests.m; sourceTree = "<group>"; };
 		E22A5A1220113F8100233965 /* KeymanEngineTestsStaticHelperMethods.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeymanEngineTestsStaticHelperMethods.h; sourceTree = "<group>"; };
 		E22A5A132011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeymanEngineTestsStaticHelperMethods.m; sourceTree = "<group>"; };
+		E23380F02112C01500B90591 /* CipherMusicUnicode.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = CipherMusicUnicode.kmx; sourceTree = "<group>"; };
 		E2537D99201641DA0069FEA6 /* TestMacEngine.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestMacEngine.kmx; sourceTree = "<group>"; };
 		E28C71E420EBBA2C002D959D /* KMkeyViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMkeyViewProtocol.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -202,6 +204,7 @@
 		984C2AE21A79C98D0023F89D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				E23380F02112C01500B90591 /* CipherMusicUnicode.kmx */,
 				E224323E20D37E97006940A1 /* PlatformTest.kmx */,
 				E2537D99201641DA0069FEA6 /* TestMacEngine.kmx */,
 				984C2AE31A79C98D0023F89D /* Info.plist */,
@@ -368,6 +371,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E2537D9A201641DA0069FEA6 /* TestMacEngine.kmx in Resources */,
+				E23380F12112C01500B90591 /* CipherMusicUnicode.kmx in Resources */,
 				E224323F20D37E97006940A1 /* PlatformTest.kmx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

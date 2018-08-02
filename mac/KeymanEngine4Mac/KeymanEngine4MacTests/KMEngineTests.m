@@ -94,6 +94,45 @@ NSString * names[nCombinations];
     XCTAssert([output isEqualToString:@"\u00C7"], @"Expected capital C cedille (U+00C7)");
 }
 
+- (void)testprocessEvent_eventFor1WithCipherMusicKmx_ReturnsQstrActionCorrectUnicodeSurrogatePair {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:NSEventModifierFlagShift|NSEventModifierFlagControl timestamp:0 windowNumber:0 context:nil characters:@"1" charactersIgnoringModifiers:@"1" isARepeat:NO keyCode:kVK_ANSI_1];
+    NSArray *actions = [engine processEvent:event];
+    XCTAssert(actions.count == 1, @"Expected 1 action");
+    NSDictionary *action = actions[0];
+    NSString *actionType = [[action allKeys] objectAtIndex:0];
+    XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
+    NSString *output = [action objectForKey:actionType];
+    XCTAssert([output isEqualToString:@"𝄀"], @"Expected surrogate pair for Unicode point 1D100");
+}
+
+- (void)testprocessEvent_eventFor2WithCipherMusicKmx_ReturnsQstrActionCorrectUnicodeSurrogatePair {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:NSEventModifierFlagShift|NSEventModifierFlagControl timestamp:0 windowNumber:0 context:nil characters:@"2" charactersIgnoringModifiers:@"2" isARepeat:NO keyCode:kVK_ANSI_2];
+    NSArray *actions = [engine processEvent:event];
+    XCTAssert(actions.count == 1, @"Expected 1 action");
+    NSDictionary *action = actions[0];
+    NSString *actionType = [[action allKeys] objectAtIndex:0];
+    XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
+    NSString *output = [action objectForKey:actionType];
+    XCTAssert([output isEqualToString:@"𝄁"], @"Expected surrogate pair for Unicode point 1D101");
+}
+
+- (void)testprocessEvent_eventFor6WithCipherMusicKmx_ReturnsQstrActionCorrectUnicodeSurrogatePair {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:NSEventModifierFlagShift|NSEventModifierFlagControl timestamp:0 windowNumber:0 context:nil characters:@"6" charactersIgnoringModifiers:@"6" isARepeat:NO keyCode:kVK_ANSI_6];
+    NSArray *actions = [engine processEvent:event];
+    XCTAssert(actions.count == 1, @"Expected 1 action");
+    NSDictionary *action = actions[0];
+    NSString *actionType = [[action allKeys] objectAtIndex:0];
+    XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
+    NSString *output = [action objectForKey:actionType];
+    XCTAssert([output isEqualToString:@"𝄇"], @"Expected surrogate pair for Unicode point 1D107");
+}
+
 + (void)fillInNamesAndModifiersForAllChiralCombinations {
     int i = 0;
     modifiers[i] = LEFT_CTRL_FLAG;
