@@ -313,7 +313,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                 //NSLog(@"No shift flags!");
                 if (!key.context.length) {
                     mKey = key;
-                    break;
+                   // break;
                 }
                 else if ([self contextMatch:key]) {
                     mKey = key;
