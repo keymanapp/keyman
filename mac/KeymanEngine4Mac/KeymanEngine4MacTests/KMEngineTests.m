@@ -94,43 +94,116 @@ NSString * names[nCombinations];
     XCTAssert([output isEqualToString:@"\u00C7"], @"Expected capital C cedille (U+00C7)");
 }
 
-- (void)testprocessEvent_eventFor1WithCipherMusicKmx_ReturnsQstrActionCorrectUnicodeSurrogatePair {
+- (void)testprocessEvent_eventForCtrlShiftNumeralWithCipherMusicKmx_ReturnsQstrActionForCorrectUnicodeSurrogatePair {
     KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
     KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
-    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:NSEventModifierFlagShift|NSEventModifierFlagControl timestamp:0 windowNumber:0 context:nil characters:@"1" charactersIgnoringModifiers:@"1" isARepeat:NO keyCode:kVK_ANSI_1];
-    NSArray *actions = [engine processEvent:event];
-    XCTAssert(actions.count == 1, @"Expected 1 action");
-    NSDictionary *action = actions[0];
-    NSString *actionType = [[action allKeys] objectAtIndex:0];
-    XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
-    NSString *output = [action objectForKey:actionType];
-    XCTAssert([output isEqualToString:@"𝄀"], @"Expected surrogate pair for Unicode point 1D100");
+    for (int i = 1; i <= 6; i++)
+    {
+        unsigned short ansiCode = kVK_ANSI_1 + i - 1;
+        NSString * chars = [NSString stringWithFormat:@"%d", i];
+        UTF32Char expectedUtf32Char;
+        switch (i) {
+            case 1: expectedUtf32Char = 0x1D100; break;
+            case 2: expectedUtf32Char = 0x1D101; break;
+            case 3: expectedUtf32Char = 0x1D103; break;
+            case 4: expectedUtf32Char = 0x1D102; break;
+            case 5:
+                expectedUtf32Char = 0x1D106;
+                ansiCode = kVK_ANSI_5; // 5 and 6 have codes swapped so they are not in sequential order
+                break;
+            case 6:
+                expectedUtf32Char = 0x1D107;
+                ansiCode = kVK_ANSI_6;
+                break;
+        }
+        NSString * expectedOutput = [[NSString alloc] initWithBytes:&expectedUtf32Char length:4 encoding:NSUTF32LittleEndianStringEncoding];
+        NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:NSEventModifierFlagShift|NSEventModifierFlagControl timestamp:0 windowNumber:0 context:nil characters:chars charactersIgnoringModifiers:chars isARepeat:NO keyCode:ansiCode];
+        NSArray *actions = [engine processEvent:event];
+        XCTAssert(actions.count == 1, @"Expected 1 action");
+        NSDictionary *action = actions[0];
+        NSString *actionType = [[action allKeys] objectAtIndex:0];
+        XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
+        NSString *output = [action objectForKey:actionType];
+        XCTAssert([output isEqualToString:expectedOutput], @"Output incorrect");
+        [engine setContextBuffer:@""];
+    }
 }
 
-- (void)testprocessEvent_eventFor2WithCipherMusicKmx_ReturnsQstrActionCorrectUnicodeSurrogatePair {
+- (void)testprocessEvent_eventForUnshiftedNumeralWithCipherMusicKmx_ReturnsQstrActionToInsertNumeral {
     KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
     KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
-    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:NSEventModifierFlagShift|NSEventModifierFlagControl timestamp:0 windowNumber:0 context:nil characters:@"2" charactersIgnoringModifiers:@"2" isARepeat:NO keyCode:kVK_ANSI_2];
-    NSArray *actions = [engine processEvent:event];
-    XCTAssert(actions.count == 1, @"Expected 1 action");
-    NSDictionary *action = actions[0];
-    NSString *actionType = [[action allKeys] objectAtIndex:0];
-    XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
-    NSString *output = [action objectForKey:actionType];
-    XCTAssert([output isEqualToString:@"𝄁"], @"Expected surrogate pair for Unicode point 1D101");
+    for (int i = 1; i <= 9; i++)
+    {
+        unsigned short ansiCode = kVK_ANSI_1 + i - 1;
+        NSString * numeral = [NSString stringWithFormat:@"%d", i];
+        NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:numeral charactersIgnoringModifiers:numeral isARepeat:NO keyCode:ansiCode];
+        NSArray *actions = [engine processEvent:event];
+        XCTAssert(actions.count == 1, @"Expected 1 action");
+        NSDictionary *action = actions[0];
+        NSString *actionType = [[action allKeys] objectAtIndex:0];
+        XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
+        NSString *output = [action objectForKey:actionType];
+        XCTAssert([output isEqualToString:numeral], @"Output incorrect");
+        [engine setContextBuffer:@""];
+    }
 }
 
-- (void)testprocessEvent_eventFor6WithCipherMusicKmx_ReturnsQstrActionCorrectUnicodeSurrogatePair {
+- (void)testprocessEvent_eventForShiftNumeralsWithoutRulesInCipherMusicKmx_ReturnsNoAction {
     KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
     KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
-    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:NSEventModifierFlagShift|NSEventModifierFlagControl timestamp:0 windowNumber:0 context:nil characters:@"6" charactersIgnoringModifiers:@"6" isARepeat:NO keyCode:kVK_ANSI_6];
+    for (int i = 0; i <= 9; i++)
+    {
+        if (i == 6)
+            continue; // There is a rule in the keyboard for '^' (which is a SHIFT+6).
+        unsigned short ansiCode = kVK_ANSI_1 + i - 1; // This works for 1-4
+        NSString * unmodifiedChars = [NSString stringWithFormat:@"%d", i];
+        NSString * chars;
+        switch (i) {
+            case 0:
+                chars = @")";
+                ansiCode = kVK_ANSI_0;
+                break;
+            case 1: chars = @"!"; break;
+            case 2: chars = @"@"; break;
+            case 3: chars = @"#"; break;
+            case 4: chars = @"$"; break;
+            case 5:
+                chars = @"%";
+                ansiCode = kVK_ANSI_5;
+                break;
+            case 7:
+                chars = @"&";
+                ansiCode = kVK_ANSI_7;
+                break;
+            case 8:
+                chars = @"*";
+                ansiCode = kVK_ANSI_8;
+                break;
+            case 9:
+                chars = @"(%)";
+                ansiCode = kVK_ANSI_9;
+                break;
+        }
+        NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:NSEventModifierFlagShift timestamp:0 windowNumber:0 context:nil characters:chars charactersIgnoringModifiers:unmodifiedChars isARepeat:NO keyCode:ansiCode];
+        NSArray *actions = [engine processEvent:event];
+        XCTAssert(actions.count == 0, @"Expected no matching action in keyboard");
+    }
+}
+
+- (void)testprocessEvent_eventForPeriodWithCipherMusicKmx_ReturnsNoAction {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"." charactersIgnoringModifiers:@"." isARepeat:NO keyCode:kVK_ANSI_Period];
     NSArray *actions = [engine processEvent:event];
-    XCTAssert(actions.count == 1, @"Expected 1 action");
-    NSDictionary *action = actions[0];
-    NSString *actionType = [[action allKeys] objectAtIndex:0];
-    XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
-    NSString *output = [action objectForKey:actionType];
-    XCTAssert([output isEqualToString:@"𝄇"], @"Expected surrogate pair for Unicode point 1D107");
+    XCTAssert(actions.count == 0, @"Expected no actions");
+}
+
+- (void)testprocessEvent_eventForCtrl8WithCipherMusicKmx_ReturnsNoAction {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:NSEventModifierFlagControl timestamp:0 windowNumber:0 context:nil characters:@"8" charactersIgnoringModifiers:@"8" isARepeat:NO keyCode:kVK_ANSI_8];
+    NSArray *actions = [engine processEvent:event];
+    XCTAssert(actions.count == 0, @"Expected no actions");
 }
 
 + (void)fillInNamesAndModifiersForAllChiralCombinations {
