@@ -1,6 +1,9 @@
 # Keyman for iPhone and iPad Version History
 
-## 2018-08-02 10.0.208 stable 
+## 2018-08-06 10.0.209 stable 
+* Removed unnecessary UIFileSharingEnabled flag (#1087)
+
+## 2018-08-03 10.0.208 stable 
 * Fixed OSK layout problems (and possible crash) on iOS 11 on certain hardware (#1089) 
 
 ## 2018-07-06 10.0.203 stable
