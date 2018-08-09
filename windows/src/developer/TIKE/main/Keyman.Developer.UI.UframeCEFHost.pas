@@ -145,7 +145,12 @@ begin
   OutputDebugString(PChar('TframeCEFHost.StartShutdown'));
   FIsClosing := True;
   FShutdownCompletionHandler := CompletionHandler;
-  cef.CloseBrowser(False);
+
+  // If the browser has not been initialized, we'll not get the close signal, so we
+  // post it to occur on next idle.
+  if cef.Initialized
+    then cef.CloseBrowser(False)
+    else PostMessage(Handle, CEF_AFTERDESTROY, 0, 0);
 end;
 
 procedure TframeCEFHost.FormCreate(Sender: TObject);

@@ -10,7 +10,6 @@ uses
 
 {$IFDEF USE_PLUSMEMO}
   SyntaxHighlight,
-  PlusGutter,
   ExtHilit,
   HtmlHighlight,
   pmprint,
@@ -57,7 +56,6 @@ type
     class var FInitialFilenameIndex: Integer;
   private
 {$IFDEF USE_PLUSMEMO}
-    gutter: TPlusGutter;
     SyntaxHighlighter: TSyntaxHighlighter;
     pmPrinter: TPlusMemoPrinter;
     highlighter: TExtHighlighter;
@@ -274,44 +272,6 @@ begin
   end;
 
   memo.Highlighter := highlighter;
-
-  gutter := TPlusGutter.Create(Self);
-  gutter.Align := alLeft;
-  gutter.IgnoreLastLineIfEmpty := False;
-  gutter.PlusMemo := memo;
-  gutter.Parent := Self;
-
-  pmPrinter := TPlusMemoPrinter.Create(Self);
-  with pmPrinter do
-  begin
-    MemoToPrint := memo;
-    GutterWidth := 0.500000000000000000;
-    MarginLeft := 0.750000000000000000;
-    MarginRight := 0.500000000000000000;
-    MarginTop := 0.750000000000000000;
-    MarginBottom := 0.750000000000000000;
-    LineSpacing := -1.200000047683716000;
-    Footer := 'Page {p} of {P}';
-    HeaderYPos := 0.400000005960464400;
-    FooterYPos := 0.400000005960464400;
-    HeaderFont.Charset := ANSI_CHARSET;
-    HeaderFont.Color := clWindowText;
-    HeaderFont.Height := -13;
-    HeaderFont.Name := 'Arial';
-    HeaderFont.Style := [];
-    FooterFont.Charset := ANSI_CHARSET;
-    FooterFont.Color := clWindowText;
-    FooterFont.Height := -13;
-    FooterFont.Name := 'Arial';
-    FooterFont.Style := [];
-    NumbersFont.Charset := DEFAULT_CHARSET;
-    NumbersFont.Color := clWindowText;
-    NumbersFont.Height := -11;
-    NumbersFont.Name := 'Tahoma';
-    NumbersFont.Style := [];
-    PreviewTitle := 'Print preview';
-    PrintTitle := '{application}';
-  end;
 
   SyntaxHighlighter := TSyntaxHighlighter.Create(Self);
   SyntaxHighlighter.Apply(memo, highlighter);
