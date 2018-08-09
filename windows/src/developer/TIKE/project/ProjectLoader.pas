@@ -175,7 +175,7 @@ begin
   { Convert 9.0-era <state> node to <ViewState> }
 
   fsroot := root.ChildNodes.FindNode('state');
-  if Assigned(fsroot) and (root.ChildNodes.FindNode('ViewState') = nil) then
+  if Assigned(fsroot) and not VarIsNull(fsroot.NodeValue) and (root.ChildNodes.FindNode('ViewState') = nil) then
   begin
     state := LoadXMLData(fsroot.NodeValue);
     viewState := root.AddChild('ViewState');

@@ -11,29 +11,17 @@ inherited frameTextEditor: TframeTextEditor
   PixelsPerInch = 96
   TextHeight = 13
   object memo: TKeymanDeveloperMemo
-    Left = 0
-    Top = 0
-    Width = 751
-    Height = 610
+    Left = 456
+    Top = 112
+    Width = 263
+    Height = 362
     Cursor = crIBeam
-    Align = alClient
+    Alignment = taLeftJustify
     BorderStyle = bsNone
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Courier New'
-    Font.Style = []
     HideSelection = False
-    ParentFont = False
     ScrollBars = ssBoth
-    TabOrder = 0
     WordWrap = False
     OnChange = memoChange
-    OnEnter = memoEnter
-    OnExit = memoExit
-    OnKeyDown = memoKeyDown
-    OnMouseDown = memoMouseDown
-    OnMouseUp = memoMouseUp
     AltFont.Charset = ANSI_CHARSET
     AltFont.Color = clWindowText
     AltFont.Height = -11
@@ -62,6 +50,19 @@ inherited frameTextEditor: TframeTextEditor
     Version = 'v7.1  Professional ed.'
     OnSelMove = memoSelMove
     OnBeforeChange = memoBeforeChange
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Courier New'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 0
+    TabStop = True
+    OnEnter = memoEnter
+    OnExit = memoExit
+    OnKeyDown = memoKeyDown
+    OnMouseDown = memoMouseDown
+    OnMouseUp = memoMouseUp
   end
   object lstImages: TMenuImgList
     BkColor = clSilver
@@ -70,7 +71,7 @@ inherited frameTextEditor: TframeTextEditor
     Left = 394
     Top = 58
     Bitmap = {
-      494C010106000900700010001000C0C0C000FE00FFFFFFFFFFFFFFFF424D3600
+      494C010106000900780010001000C0C0C000FE00FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       000000000000000000000000000000000000C6C6C600C6C6C600C6C6C600C6C6
       C600C6C6C600C6C6C600C6C6C600C6C6C600C6C6C600C6C6C600C6C6C600C6C6
@@ -359,7 +360,7 @@ inherited frameTextEditor: TframeTextEditor
     Left = 506
     Top = 58
     Bitmap = {
-      494C010106000900700010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010106000900780010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

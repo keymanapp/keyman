@@ -1,54 +1,3 @@
-(*
-  Name:             UframeTextEditor
-  Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
-  Create Date:      23 Aug 2006
-
-  Modified Date:    23 Feb 2016
-  Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          23 Aug 2006 - mcdurdin - Initial version
-                    14 Sep 2006 - mcdurdin - Add find and replace dialogs
-                    14 Sep 2006 - mcdurdin - Add LoadFromStream and SaveToStream
-                    14 Sep 2006 - mcdurdin - Add ConvertCharacter and GetWideCodes functions
-                    28 Sep 2006 - mcdurdin - Add context help and character map lookup
-                    06 Oct 2006 - mcdurdin - Only update help if form is visible
-                    04 Dec 2006 - mcdurdin - Update help only when help form visible
-                    12 Dec 2006 - mcdurdin - Add Print, Print Preview
-                    04 Jan 2007 - mcdurdin - Add help support
-                    25 Jan 2007 - mcdurdin - Delete dlgSave unused component
-                    19 Mar 2007 - mcdurdin - I712 - Fix character map should follow selected character
-                    30 May 2007 - mcdurdin - I781 - Search and Replace dialogs now support Unicode
-                    19 Nov 2007 - mcdurdin - I1157 - const string parameters
-                    14 Jun 2008 - mcdurdin - I1426 - Fixup script tag font
-                    18 Mar 2011 - mcdurdin - I2794 - Fix memory leak
-                    08 Jul 2011 - mcdurdin - I2971 - Branding Pack locale.xml not editing as UTF-8
-                    18 May 2012 - mcdurdin - I3323 - V9.0 - Change from Plus-MemoU to Plus-Memo
-                    08 Jun 2012 - mcdurdin - I3337 - V9.0 - Review of input/output for Unicode
-                    06 Feb 2012 - mcdurdin - I3082 - Reload text file with specific encoding support, not marking as unmodified after reload
-                    03 Nov 2012 - mcdurdin - I3502 - V9.0 - Merge of I3082 - Reload text file with specific encoding support
-                    13 Dec 2012 - mcdurdin - I3637 - V9.0 - I3502 Fail - Reload as Format button is disabled in some contexts
-                    01 Jan 2013 - mcdurdin - I3636 - V9.0 - File format dropdown shows wrong value
-                    10 Jan 2014 - mcdurdin - I4021 - V9.0 - Redesign Keyboard Wizard to integrate V9 features
-                    07 Feb 2014 - mcdurdin - I4034 - V9.0 - Restructure keyboard wizard for source views and features
-                    27 Feb 2014 - mcdurdin - I4083 - V9.0 - When errors encountered in JSON layout file, locate the error in the source view
-                    27 May 2015 - mcdurdin - I4616 - Developer crashes when saving or switching views due to locked files [CrashID:tike.exe_9.0.481.0_004587D3_EFOpenError]
-                    27 May 2015 - mcdurdin - I4721 - V9.0 - Developer crashes if a file is in use and a reload is attempted
-                    27 May 2015 - mcdurdin - I4499 - Developer crashes switching to source tab when line number is too high [CrashID:tike.exe_9.0.466.0_00698269_ERangeError]
-                    27 May 2015 - mcdurdin - I4655 - Developer crashes when changing font settings and in code view for touch layout if not on first line [CrashID:tike.exe_9.0.487.0_0069BE51_ERangeError]
-                    22 Jun 2015 - mcdurdin - I4765 - Double-click on message does not find source line since build 500
-                    24 Jul 2015 - mcdurdin - I4797 - Convert to characters tool is inconsistent
-                    03 Aug 2015 - mcdurdin - I4807 - Add Character Identifier to Keyman Developer
-                    24 Aug 2015 - mcdurdin - I4870 - Editor does not always refresh immediately with new theming
-                    06 Nov 2015 - mcdurdin - I4918 - Text editor is not refreshing correctly with new theme
-                    23 Feb 2016 - mcdurdin - I4962 - Redraw not reliably working in text editor
-*)
 unit UframeTextEditor;  // I3323   // I4797
 
 interface
@@ -61,7 +10,6 @@ uses
 
 {$IFDEF USE_PLUSMEMO}
   SyntaxHighlight,
-  PlusMemo,
   PlusGutter,
   ExtHilit,
   HtmlHighlight,
@@ -69,9 +17,11 @@ uses
   PMSupport,
 {$ENDIF}
 
+  UserMessages,
+  Keyman.Developer.UI.UframeCEFHost,
   TextFileFormat, UfrmTike,
   System.ImageList, KeymanDeveloperMemo,
-  Vcl.StdCtrls;
+  Vcl.StdCtrls, PlusMemo;
 
 type
   TParColourLineType = (pcltNone, pcltBreakpoint, pcltExecutionPoint, pcltError);
@@ -104,6 +54,8 @@ type
     procedure tmrUpdateSelectedTokenTimer(Sender: TObject);
     procedure TntFormDestroy(Sender: TObject);
   private
+    class var FInitialFilenameIndex: Integer;
+  private
 {$IFDEF USE_PLUSMEMO}
     gutter: TPlusGutter;
     SyntaxHighlighter: TSyntaxHighlighter;
@@ -118,6 +70,10 @@ type
     FErrorPar: Integer;
     FTextFileFormat: TTextFileFormat;
     FindFound: Boolean;
+
+    cef: TframeCEFHost;
+    FFilename: string;
+
     procedure RefreshOptions;
     function GetText: WideString;
     procedure SetText(Value: WideString);
@@ -133,8 +89,16 @@ type
     function GetCodeFont: TFont;
     procedure SetTextFileFormat(const Value: TTextFileFormat);
     function GetSelectedTokens(var token, prevtoken: WideString; var x, tx: Integer): Boolean;
+
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
+    procedure cefLoadEnd(Sender: TObject);
+    procedure LoadFileInBrowser;
+    procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
+    procedure FireCommand(const commands: TStringList);
   protected
     function GetHelpTopic: string; override;
+
+    procedure SaveToStream(AStream: TStream);
   public
     { Public declarations }
     procedure UpdateParColour(par: Integer; LineType: TParColourLineType);
@@ -154,11 +118,10 @@ type
     function PrintPreview(Header: WideString = ''): Boolean;
 
     procedure LoadFromFile(AFileName: WideString); overload;   // I4034
-    procedure LoadFromFile(AFileName: WideString; ATextFileFormat: TTextFileFormat); overload;   // I4034
-    procedure SaveToFile(AFileName: WideString);
-    procedure LoadFromStream(AStream: TStream; ATextFileFormat: TTextFileFormat); overload;  // I2964
     procedure LoadFromStream(AStream: TStream); overload;  // I2964
-    procedure SaveToStream(AStream: TStream);
+    procedure SaveToFile(AFileName: WideString);
+    procedure LoadFromFile(AFileName: WideString; ATextFileFormat: TTextFileFormat); overload;   // I4034
+    procedure LoadFromStream(AStream: TStream; ATextFileFormat: TTextFileFormat); overload;  // I2964
 
     property EditorText: WideString read GetText write SetText;
     property EditorFormat: TEditorFormat read FEditorFormat write SetEditorFormat;
@@ -181,11 +144,13 @@ uses
   keyboardparser,
   KeymanDeveloperOptions,
   kwhelp,
-  ErrorControlledRegistry, 
+  ErrorControlledRegistry,
   RegistryKeys,
   UfrmHelp,
   UfrmMain,
+  UmodWebHTTPServer,
   Unicode,
+  utilhttp,
   utilstr;
   
 {$R *.dfm}
@@ -194,12 +159,36 @@ uses
 
 procedure TframeTextEditor.RefreshOptions;
 begin
-  memo.TabStops   := FKeymanDeveloperOptions.IndentSize;
+  //TODO: memo.TabStops   := FKeymanDeveloperOptions.IndentSize;
+end;
+
+procedure TframeTextEditor.cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
+var
+  params: TStringList;
+begin
+  Result := False;
+
+  if csDestroying in ComponentState then   // I3983
+  begin
+    Result := True;
+    Exit;
+  end;
+
+  if GetParamsFromURL(URL, params) then
+  begin
+    PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
+    Result := True;
+  end;
+end;
+
+procedure TframeTextEditor.cefLoadEnd(Sender: TObject);
+begin
+  //
 end;
 
 procedure TframeTextEditor.Changed;
 begin
-  memo.Update; // required due to bug in Delphi's TStyleHook which causes invalidated areas to be lost because   // I4962
+  //memo.Update; // required due to bug in Delphi's TStyleHook which causes invalidated areas to be lost because   // I4962
     // WM_SETREDRAW is set on the window when the caption is changed, due to the {*} character being added
     // to the caption.   I4870   // I4918 undoes memo.Update for more performant painting
   if Assigned(FOnChanged) then FOnChanged(Self);
@@ -209,6 +198,13 @@ end;
 procedure TframeTextEditor.FormCreate(Sender: TObject);
 begin
   inherited;
+
+  cef := TframeCEFHost.Create(Self);
+  cef.Parent := Self;
+  cef.Visible := True;
+  cef.OnBeforeBrowse := cefBeforeBrowse;
+//  cef.OnLoadEnd := cefLoadEnd;
+
 {$IFDEF USE_PLUSMEMO}
   highlighter := TExtHighlighter.Create(Self);
   highlighterHTML := THtmlHighlighter.Create(Self);
@@ -365,7 +361,7 @@ end;
 
 function TframeTextEditor.GetText: WideString;
 begin
-  Result := memo.Text;
+  Result := modWebHttpServer.AppSource.GetSource(FFileName);
 end;
 
 procedure TframeTextEditor.LoadFromFile(AFileName: WideString);
@@ -374,6 +370,7 @@ var
 begin
   FLoading := True;
   try
+    FFileName := AFileName;
     if FileExists(AFileName) then
     begin
       fs := TFileStream.Create(AFileName, fmOpenRead);
@@ -387,6 +384,7 @@ begin
     begin
       TextFileFormat := tffUTF8;
       memo.SetTextBuf('');
+      LoadFileInBrowser;
       UpdateSelectedToken;
     end;
     memo.Modified := False;
@@ -403,9 +401,24 @@ begin
 
     memo.Lines.LoadFromStream(AStream, TextFileFormatToEncoding(TextFileFormat));   // I3637
     memo.Modified := False;  // I3082   // I3502
+
+    LoadFileInBrowser;
   finally
     FLoading := False;
   end;
+end;
+
+procedure TframeTextEditor.LoadFileInBrowser;
+  function GenerateNewFilename: string;
+  begin
+    Inc(FInitialFilenameIndex);
+    Result := '*texteditor*'+IntToStr(FInitialFilenameIndex);
+  end;
+begin
+  if FFilename = '' then
+    FFilename := GenerateNewFilename;
+  modWebHTTPServer.AppSource.RegisterSource(FFilename, memo.Lines.Text, True);
+  cef.Navigate(modWebHttpServer.GetLocalhostURL + '/app/editor/?'+URLEncode(FFilename));   // I4195
 end;
 
 procedure TframeTextEditor.LoadFromFile(AFileName: WideString;
@@ -415,6 +428,7 @@ var
 begin
   FLoading := True;
   try
+    FFileName := AFileName;
     if FileExists(AFileName) then
     begin
       try
@@ -436,6 +450,7 @@ begin
     begin
       TextFileFormat := ATextFileFormat;
       memo.SetTextBuf('');
+      LoadFileInBrowser;
     end;
     memo.Modified := False;
   finally
@@ -456,6 +471,8 @@ begin
       TextFileFormat := tffANSI;
     UpdateSelectedToken;
     memo.Modified := False;
+
+    LoadFileInBrowser;
   finally
     FLoading := False;
   end;
@@ -477,11 +494,21 @@ end;
 
 
 procedure TframeTextEditor.SaveToStream(AStream: TStream);
+var
+  FSource: string;
+  ss: TStringStream;
 begin
+  FSource := modWebHttpServer.AppSource.GetSource(FFileName);
   case FTextFileFormat of
-    tffANSI:  memo.Lines.SaveToStream(AStream, TEncoding.Default);  // I3337
-    tffUTF8:  memo.Lines.SaveToStream(AStream, TEncoding.UTF8);
-    tffUTF16: memo.Lines.SaveToStream(AStream, TEncoding.Unicode);
+    tffANSI:  ss := TStringStream.Create(FSource, TEncoding.Default);
+    tffUTF8:  ss := TStringStream.Create(FSource, TEncoding.UTF8);
+    tffUTF16: ss := TStringStream.Create(FSource, TEncoding.Unicode);
+    else raise EAssertionFailed.Create('Unsupported file format');
+  end;
+  try
+    AStream.CopyFrom(ss, 0);
+  finally
+    ss.Free;
   end;
   memo.Modified := False;
 end;
@@ -493,7 +520,8 @@ end;
 
 procedure TframeTextEditor.memoChange(Sender: TObject);
 begin
-  if not FLoading then Changed;
+  if not FLoading then
+  Changed;
 end;
 (*
   with Source as TCharacterDragObject do
@@ -663,6 +691,8 @@ begin
       memo.SelCol := SelCol;
       memo.ScrollInView;
       UpdateSelectedToken;
+
+      LoadFileInBrowser;
     finally
       FLoading := False;
     end;
@@ -695,6 +725,19 @@ begin
   if memo.Focused then
     UpdateSelectedToken;
   //UpdateToolbarState;
+end;
+
+procedure TframeTextEditor.WMUser_FireCommand(var Message: TMessage);
+var
+  params: TStringList;
+begin
+  params := TStringList(Message.LParam);
+  if (params.Count > 0) and (params[0] = 'command') then
+  begin
+    params.Delete(0);
+    FireCommand(params);
+  end;
+  params.Free;
 end;
 
 {-------------------------------------------------------------------------------
@@ -824,6 +867,30 @@ begin
   UpdateParColour(FErrorPar, pcltError);
 end;
 
+procedure TframeTextEditor.FireCommand(const commands: TStringList);
+var
+  i: Integer;
+  command: string;
+begin
+  i := 0;
+  while i < commands.Count do
+  begin
+    command := commands[i];
+    if command = 'modified' then Changed   // I3948
+//    else if command = 'undo-disable' then FCanUndo := False
+//    else if command = 'undo-enable' then FCanUndo := True
+//    else if command = 'redo-disable' then FCanRedo := False
+//    else if command = 'redo-enable' then FCanRedo := True
+    else if command.StartsWith('selected-char,') then
+    begin
+      Inc(i);
+//      UpdateCharacterMap(command.Substring('selected-char,'.Length));   // I4046
+    end
+    else ShowMessage('keyman:'+commands.Text);
+    Inc(i);
+  end;
+end;
+
 procedure TframeTextEditor.UpdateParColour(par: Integer; LineType: TParColourLineType);
 {$IFDEF USE_PLUSMEMO}
 var
@@ -950,6 +1017,8 @@ begin
 {$IFDEF USE_PLUSMEMO}
   FreeAndNil(SyntaxHighlighter);  // I2794
 {$ENDIF}
+  if FFileName <> '' then
+    modWebHttpServer.AppSource.UnregisterSource(FFileName);
 end;
 
 procedure TframeTextEditor.UpdateSelectedToken;

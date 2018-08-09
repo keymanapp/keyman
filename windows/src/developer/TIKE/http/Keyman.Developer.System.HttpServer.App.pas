@@ -14,12 +14,14 @@ uses
 type
   TAppHttpResponder = class(TBaseHttpResponder)
   private
+    FAppRoot: string;
     FStandardTemplatePath: string;
     procedure RespondProject(doc: string; AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
     procedure RespondHelp(doc: string; AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
   public
+    constructor Create;
     procedure ProcessRequest(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
   end;
@@ -217,6 +219,11 @@ begin
     RespondState;
 end;
 
+constructor TAppHttpResponder.Create;
+begin
+  FAppRoot := ExtractFilePath(ParamStr(0)) + 'xml\app\';
+end;
+
 procedure TAppHttpResponder.ProcessRequest(AContext: TIdContext;
   ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
 var
@@ -245,6 +252,16 @@ begin
   begin
     RespondHelp(doc, AContext, ARequestInfo, AResponseInfo);
     Exit;
+  end
+  else
+  begin
+    if Pos('..', doc) > 0 then
+    begin
+      // TODO: This is a naive security check. Need to expand
+      Respond404(AContext, ARequestInfo, AResponseInfo);
+    end
+    else
+      RespondFile(FAppRoot + doc, AContext, ARequestInfo, AResponseInfo);
   end;
 
   Respond404(AContext, ARequestInfo, AResponseInfo);

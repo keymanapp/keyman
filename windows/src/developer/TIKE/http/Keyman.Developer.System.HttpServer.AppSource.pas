@@ -40,7 +40,7 @@ type
     procedure ProcessRequest(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
 
-    procedure RegisterSource(const Filename, Data: string);
+    procedure RegisterSource(const Filename, Data: string; Update: Boolean = False);
     procedure UnregisterSource(const Filename: string);
     function GetSource(const Filename: string): string;
     procedure SetSource(const Filename, Data: string);
@@ -249,7 +249,7 @@ begin
     'TAppSourceHttpResponder.GetSource was asked for a file that was not registered: '+Filename);
 end;
 
-procedure TAppSourceHttpResponder.RegisterSource(const Filename, Data: string);
+procedure TAppSourceHttpResponder.RegisterSource(const Filename, Data: string; Update: Boolean);
 var
   i: Integer;
   T: TList<TAppSource>;
@@ -257,12 +257,19 @@ var
 begin
   T := FSources.LockList;
   try
-    for i := 0 to T.Count - 1 do
-      if T[i].Filename = Filename then
-        Assert(False, 'TAppSourceHttpResponder.RegisterSource was called for a file that is already registered: '+Filename);
-
     S.Filename := Filename;
     S.Data := Data;
+
+    for i := 0 to T.Count - 1 do
+      if T[i].Filename = Filename then
+      begin
+        if Update then
+          T[i] := S
+        else
+          Assert(False, 'TAppSourceHttpResponder.RegisterSource was called for a file that is already registered: '+Filename);
+        Exit;
+      end;
+
     T.Add(S);
   finally
     FSources.UnlockList;
