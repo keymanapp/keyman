@@ -1,6 +1,6 @@
 # Keyman for macOS Version History
 
-## 2018-08-10 10.0.105 stable
+## 2018-08-10 10.0.109 stable
 * Fixed bug in engine that caused incorrect rule to be used (#1091)
 
 ## 2018-07-12 10.0.104 stable
