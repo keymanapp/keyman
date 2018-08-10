@@ -1,0 +1,117 @@
+﻿c 
+c Cipher Music Unicode Keyboard
+c 
+
+VERSION 9.0
+NAME "Cipher Music Unicode"
+store(&TARGETS) 'windows macosx'
+
+begin Unicode > use(Umain)
+store(numbers1-7) '1234567'
+store(diacritic1) U+0307
+store(diacritic2) U+0323
+store(diacritic3) U+0338
+store(diacritic4) U+0338 U+0307
+store(diacritic5) U+0338 U+0323
+
+store(eight1) U+266D
+store(eight2) U+266F
+store(eight3) U+266E
+store(eight4) U+1D1B1
+store(eight5) U+1D1B2
+
+store(nine1) U+00E1
+store(nine2) U+00F3
+store(nine3) U+00FA
+store(nine4) U+00E9
+store(nine5) U+00ED
+
+store(circumflex1) U+0352
+
+store(dash1) U+0305
+store(dash2) U+0332
+
+store(equal1) U+033F
+store(equal2) U+0333
+
+store(lt1) U+201C
+store(lt2) U+2018
+
+store(gt1) U+201D
+store(gt2) U+2019
+
+store(leftcurlybracket) U+1D177
+store(rightcurlybracket) U+1D178
+
+store(overdot) U+0307
+store(underdot) U+0323
+store(middledot) U+00B7
+
+group (Umain) using keys
++ any(numbers1-7) > index(numbers1-7, 1) use(rota)
+
++ '8' >  '8'
+'8' + '8' > outs(eight1)
+outs(eight1) + '8'> outs(eight2)
+outs(eight2) + '8'> outs(eight3)
+outs(eight3) + '8'> outs(eight4)
+outs(eight4) + '8'> outs(eight5)
+outs(eight5) + '8'> '8'
+
++ '9' >  '9'
+'9' + '9' > outs(nine1)
+outs(nine1) + '9'> outs(nine2)
+outs(nine2) + '9'> outs(nine3)
+outs(nine3) + '9'> outs(nine4)
+outs(nine4) + '9'> outs(nine5)
+outs(nine5) + '9'> '9'
+
++ '^' > outs(circumflex1)
+outs(circumflex1) + '^' > '^'
+'^' + '^' > outs(circumflex1)
+
++ '-' > '-'
+'-' + '-' > outs(dash1)
+outs(dash1) + '-' > outs(dash2)
+outs(dash2) + '-' > '-'
+
++ '=' > '='
+'=' + '=' > outs(equal1)
+outs(equal1) + '=' > outs(equal2)
+outs(equal2) + '=' > '='
+
++ '<' > outs(lt1)
+outs(lt1) + '<' > outs(lt2)
+outs(lt2) + '<' > '<'
+'<' + '<' > outs(lt1)
+
++ '>' > outs(gt1)
+outs(gt1) + '>' > outs(gt2)
+outs(gt2) + '>' > '>'
+'>' + '>' > outs(gt1)
+
++ '{' > outs(leftcurlybracket)
++ '}' > outs(rightcurlybracket)
+
++ [CTRL SHIFT K_LBRKT] > '{'
++ [CTRL SHIFT K_RBRKT] > '}'
+
++ [CTRL SHIFT K_PERIOD] > outs(underdot)
++ [CTRL SHIFT K_COMMA] > outs(overdot)
++ [CTRL K_PERIOD] > outs(middledot)
+
++ [CTRL SHIFT K_1] > U+1D100
++ [CTRL SHIFT K_2] > U+1D101
++ [CTRL SHIFT K_3] > U+1D103
++ [CTRL SHIFT K_4] > U+1D102
++ [CTRL SHIFT K_5] > U+1D106
++ [CTRL SHIFT K_6] > U+1D107
+
+group(rota)
+
+any(numbers1-7) context(1) > context(1) outs(diacritic1)
+any(numbers1-7) outs(diacritic1) context(1) >  context(1) outs(diacritic2)
+any(numbers1-7) outs(diacritic2) context(1) >  context(1) outs(diacritic3)
+any(numbers1-7) outs(diacritic3) context(1) >  context(1) outs(diacritic4)
+any(numbers1-7) outs(diacritic4) context(1) >  context(1) outs(diacritic5)
+any(numbers1-7) outs(diacritic5) context(1) >  context(1)

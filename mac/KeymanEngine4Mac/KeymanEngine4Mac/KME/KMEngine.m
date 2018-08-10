@@ -308,7 +308,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     }
                 }
             }
-            else {
+            else if (!(mask & K_MODIFIERFLAG)) {
                 //if (self.debugMode)
                 //NSLog(@"No shift flags!");
                 if (!key.context.length) {
