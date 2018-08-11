@@ -57,6 +57,15 @@ type
     function IsEditorExpanded: Boolean;
   end;
 
+  IKMDSearchActions = interface //(IKMDEditActions)
+    ['{5268F7B2-A28E-4471-A708-41BFC968696F}']
+    procedure EditFind;
+    procedure EditFindNext;
+    procedure EditReplace;
+    function CanEditFind: Boolean;
+    function CanEditFindNext: Boolean;
+  end;
+
 implementation
 
 end.

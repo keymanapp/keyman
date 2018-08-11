@@ -48,7 +48,6 @@ inherited frameTextEditor: TframeTextEditor
     UndoMaxSpace = 65536
     UpdateMode = umOnNeed
     Version = 'v7.1  Professional ed.'
-    OnSelMove = memoSelMove
     OnBeforeChange = memoBeforeChange
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
@@ -60,9 +59,6 @@ inherited frameTextEditor: TframeTextEditor
     TabStop = True
     OnEnter = memoEnter
     OnExit = memoExit
-    OnKeyDown = memoKeyDown
-    OnMouseDown = memoMouseDown
-    OnMouseUp = memoMouseUp
   end
   object lstImages: TMenuImgList
     BkColor = clSilver
@@ -71,7 +67,7 @@ inherited frameTextEditor: TframeTextEditor
     Left = 394
     Top = 58
     Bitmap = {
-      494C010106000900780010001000C0C0C000FE00FFFFFFFFFFFFFFFF424D3600
+      494C010106000900800010001000C0C0C000FE00FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       000000000000000000000000000000000000C6C6C600C6C6C600C6C6C600C6C6
       C600C6C6C600C6C6C600C6C6C600C6C6C600C6C6C600C6C6C600C6C6C600C6C6
@@ -342,25 +338,14 @@ inherited frameTextEditor: TframeTextEditor
     Top = 30
   end
   object dlgPrintSetup: TPrinterSetupDialog
-    Left = 478
-    Top = 30
-  end
-  object dlgFind: TFindDialog
-    OnFind = dlgFindFind
-    Left = 478
-    Top = 58
-  end
-  object dlgReplace: TReplaceDialog
-    OnFind = dlgReplaceFind
-    OnReplace = dlgReplaceReplace
-    Left = 506
+    Left = 526
     Top = 30
   end
   object lstImagesDisabled: TImageList
-    Left = 506
-    Top = 58
+    Left = 618
+    Top = 26
     Bitmap = {
-      494C010106000900780010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010106000900800010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

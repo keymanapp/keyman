@@ -105,6 +105,7 @@ type
     procedure SetFocus; override;
     procedure StartClose;
     procedure Navigate(const url: string); overload;
+    function HasFocus: Boolean;
     property OnAfterCreated: TNotifyEvent read FOnAfterCreated write FOnAfterCreated;
     property OnBeforeBrowse: TCEFHostBeforeBrowseEvent read FOnBeforeBrowse write FOnBeforeBrowse;
     property OnLoadEnd: TNotifyEvent read FOnLoadEnd write FOnLoadEnd;
@@ -171,6 +172,11 @@ procedure TframeCEFHost.FormShow(Sender: TObject);
 begin
   inherited;
   PostMessage(Handle, CEF_SHOW, 0, 0);
+end;
+
+function TframeCEFHost.HasFocus: Boolean;
+begin
+  Result := cefwp.HandleAllocated and IsChild(cefwp.Handle, GetFocus);
 end;
 
 procedure TframeCEFHost.CEFShow(var message: TMessage);
@@ -242,9 +248,13 @@ end;
 
 procedure TframeCEFHost.cefBeforeClose(Sender: TObject;
   const browser: ICefBrowser);
+var
+  m: TMessage;
 begin
 //  OutputDebugString(PChar('TframeCEFHost.cefBeforeClose'));
-  PostMessage(Handle, CEF_AFTERDESTROY, 0, 0);
+  if HandleAllocated
+    then PostMessage(Handle, CEF_AFTERDESTROY, 0, 0)
+    else CEFAfterDestroy(m);
 end;
 
 procedure TframeCEFHost.cefClose(Sender: TObject; const browser: ICefBrowser;

@@ -116,6 +116,7 @@ type
     FFindFirst: Boolean;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function GetDialogClass: TCommonDialogClass; virtual;
+    procedure ExecuteTargetInterface(Target: IKMDSearchActions); virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -134,6 +135,7 @@ type
     function GetFindDialog: TFindDialog;
   protected
     function GetDialogClass: TCommonDialogClass; override;
+    procedure ExecuteTargetInterface(Target: IKMDSearchActions); override;
   published
     property Caption;
     property Dialog: TFindDialog read GetFindDialog;
@@ -160,6 +162,7 @@ type
     procedure Replace(Sender: TObject);
   protected
     function GetDialogClass: TCommonDialogClass; override;
+    procedure ExecuteTargetInterface(Target: IKMDSearchActions); override;
   public
     procedure ExecuteTarget(Target: TObject); override;
   published
@@ -184,6 +187,8 @@ type
   TKMDSearchFindNext = class(TCustomAction)
   private
     FSearchFind: TKMDSearchFind;
+  protected
+    procedure ExecuteTargetInterface(Target: IKMDSearchActions);
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
@@ -216,6 +221,28 @@ uses
   SysUtils,
   Windows;
 
+{ TframeTextEditor interactions }
+
+function IsTextEditor(control: TObject): Boolean;
+begin
+  Result :=
+    Assigned(control) and
+    (control is TWinControl) and
+    Assigned(TControl(control).Owner) and
+    (TControl(control).Owner.ClassName = 'TframeCEFHost') and
+    Assigned(TControl(control).Owner.Owner) and
+    Supports(TControl(control).Owner.Owner, IKMDEditActions) and
+    Supports(TControl(control).Owner.Owner, IKMDSearchActions);
+end;
+
+function GetTextEditorController(control: TObject): IKMDSearchActions;
+begin
+  if not IsTextEditor(control) then
+    Exit(nil);
+
+  Result := TControl(control).Owner.Owner as IKMDSearchActions;
+end;
+
 { TKMDEditAction }
 
 destructor TKMDEditAction.Destroy;
@@ -234,7 +261,9 @@ end;
 
 function TKMDEditAction.GetInterface(Target: TObject): IKMDEditActions;
 begin
-  if not Supports(TWinControl(Target), IKMDEditActions, Result) then
+  if IsTextEditor(Target) then
+    Result := TControl(Target).Owner.Owner as IKMDEditActions
+  else if not Supports(TWinControl(Target), IKMDEditActions, Result) then
     if not Supports(TWinControl(Target).Owner, IKMDEditActions, Result) then
       raise Exception.Create('Unable to get interface for edit actions');
 end;
@@ -250,6 +279,8 @@ function TKMDEditAction.HandlesTarget(Target: TObject): Boolean;
 begin
   if (Control <> nil) and (Target = Control) then
     Result := True
+  else if IsTextEditor(Target) then
+    Result := True
   else if (Control = nil) and (Target is TWinControl) and TWinControl(Target).Focused then
   begin
     if (Target is TCustomEdit) or (Target is TKeymanDeveloperMemo) then Result := True
@@ -257,13 +288,6 @@ begin
   end
   else
     Result := False;
-{
-  beg
-  Result :=
-    ((Control <> nil) and (Target = Control)) or
-    ((Control = nil) and
-     ((Target is TCustomEdit) or (Target is TPlusMemoU))) and TWinControl(Target).Focused;
-}
 end;
 
 procedure TKMDEditAction.Notification(AComponent: TComponent; Operation: TOperation);
@@ -499,10 +523,26 @@ begin
   if Assigned(FOnCancel) then FOnCancel(Self);
 end;
 
+procedure TKMDSearchAction.ExecuteTargetInterface(Target: IKMDSearchActions);
+begin
+  // No Action
+end;
+
 procedure TKMDSearchAction.ExecuteTarget(Target: TObject);
 var
   FCancel: Boolean;
+  x: IKMDSearchActions;
 begin
+  if Target is TWinControl then
+  begin
+    x := GetTextEditorController(Target as TWinControl);
+    if Assigned(x) then
+    begin
+      Self.ExecuteTargetInterface(x);
+      Exit;
+    end;
+  end;
+
   if (Target is TKeymanDeveloperMemo) or (Target is TCustomEdit) then
   begin
     FControl := TWinControl(Target);
@@ -543,6 +583,7 @@ end;
 function TKMDSearchAction.HandlesTarget(Target: TObject): Boolean;
 begin
   Result :=
+    IsTextEditor(Screen.ActiveControl) or
     (Screen.ActiveControl is TKeymanDeveloperMemo) or
     (Screen.ActiveControl is TCustomEdit) or
     ((Screen.ActiveControl <> nil) and (Screen.ActiveControl.Owner.ClassName = 'TfrmCharacterMapNew'));
@@ -597,7 +638,9 @@ end;
 
 procedure TKMDSearchAction.UpdateTarget(Target: TObject);
 begin
-  if Target is TKeymanDeveloperMemo then
+  if IsTextEditor(Target) then
+    Enabled := GetTextEditorController(Target).CanEditFind
+  else if Target is TKeymanDeveloperMemo then
     Enabled := TKeymanDeveloperMemo(Target).GetTextLen > 0
   else if Target is TCustomEdit then
     Enabled := TCustomEdit(Target).GetTextLen > 0
@@ -606,6 +649,11 @@ begin
 end;
 
 { TKMDSearchFind }
+
+procedure TKMDSearchFind.ExecuteTargetInterface(Target: IKMDSearchActions);
+begin
+  Target.EditFind;
+end;
 
 function TKMDSearchFind.GetDialogClass: TCommonDialogClass;
 begin
@@ -623,6 +671,11 @@ procedure TKMDSearchReplace.ExecuteTarget(Target: TObject);
 begin
   inherited ExecuteTarget(Target);
   TReplaceDialog(FDialog).OnReplace := Replace;
+end;
+
+procedure TKMDSearchReplace.ExecuteTargetInterface(Target: IKMDSearchActions);
+begin
+  Target.EditReplace;
 end;
 
 function TKMDSearchReplace.GetDialogClass: TCommonDialogClass;
@@ -705,21 +758,35 @@ end;
 
 procedure TKMDSearchFindNext.ExecuteTarget(Target: TObject);
 begin
-  if not Assigned(SearchFind) then Exit;
-  SearchFind.FControl := TWinControl(Target);
-  SearchFind.Search(Target);
+  if IsTextEditor(Target) then
+    ExecuteTargetInterface(GetTextEditorController(Target))
+  else
+  begin
+    if not Assigned(SearchFind) then Exit;
+    SearchFind.FControl := TWinControl(Target);
+    SearchFind.Search(Target);
+  end;
+end;
+
+procedure TKMDSearchFindNext.ExecuteTargetInterface(Target: IKMDSearchActions);
+begin
+  Target.EditFindNext;
 end;
 
 function TKMDSearchFindNext.HandlesTarget(Target: TObject): Boolean;
 begin
-  Result := Assigned(FSearchFind) and FSearchFind.Enabled and
-    (Length(FSearchFind.Dialog.FindText) <> 0);
+  Result :=
+    IsTextEditor(Target) or
+    (Assigned(FSearchFind) and FSearchFind.Enabled and
+    (Length(FSearchFind.Dialog.FindText) <> 0));
   Enabled := Result;
 end;
 
 procedure TKMDSearchFindNext.UpdateTarget(Target: TObject);
 begin
-  if Assigned(FSearchFind) then
+  if IsTextEditor(Target) then
+    Enabled := GetTextEditorController(Target).CanEditFindNext
+  else if Assigned(FSearchFind) then
     Enabled := FSearchFind.Enabled and (Length(FSearchFind.Dialog.FindText) <> 0)
   else
     Enabled := False;

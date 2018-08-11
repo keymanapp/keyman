@@ -87,3 +87,27 @@ oop.inherits(KeymanHighlightRules, TextHighlightRules);
 exports.KeymanHighlightRules = KeymanHighlightRules;
 });
 
+define("ace/mode/keyman",["require","exports","module","ace/lib/oop","ace/lib/lang","ace/mode/text","ace/mode/keyman_highlight_rules"], function(require, exports, module) {
+"use strict";
+
+var oop = require("../lib/oop");
+var lang = require("../lib/lang");
+var TextMode = require("./text").Mode;
+var KeymanHighlightRules = require("./keyman_highlight_rules").KeymanHighlightRules;
+
+var Mode = function() {
+   this.HighlightRules = KeymanHighlightRules;
+};
+
+oop.inherits(Mode, TextMode);
+
+exports.Mode = Mode;
+});
+
+                (function() {
+                    window.require(["ace/mode/keyman"], function(m) {
+                        if (typeof module == "object" && typeof exports == "object" && module) {
+                            module.exports = m;
+                        }
+                    });
+                })();
