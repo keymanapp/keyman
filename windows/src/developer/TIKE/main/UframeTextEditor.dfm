@@ -10,56 +10,6 @@ inherited frameTextEditor: TframeTextEditor
   ExplicitHeight = 610
   PixelsPerInch = 96
   TextHeight = 13
-  object memo: TKeymanDeveloperMemo
-    Left = 456
-    Top = 112
-    Width = 263
-    Height = 362
-    Cursor = crIBeam
-    Alignment = taLeftJustify
-    BorderStyle = bsNone
-    HideSelection = False
-    ScrollBars = ssBoth
-    WordWrap = False
-    OnChange = memoChange
-    AltFont.Charset = ANSI_CHARSET
-    AltFont.Color = clWindowText
-    AltFont.Height = -11
-    AltFont.Name = 'Lucida Console'
-    AltFont.Style = []
-    ApplyStartStopKeys = False
-    CaretWidth = 1
-    ColumnWrap = 0
-    DisplayOnly = False
-    EnableHotKeys = False
-    EndOfTextMark.Color = clRed
-    Justified = False
-    LineHeight = 0
-    Options = [pmoKeepColumnPos, pmoPutExtraSpaces, pmoInsertKeyActive, pmoWideOverwriteCaret, pmoAutoScrollBars, pmoAutoIndent, pmoWindowsSelColors, pmoFullLineSelect, pmoBlockSelection, pmoKeepParBackgnd]
-    Overwrite = False
-    RightLinePen.Color = clGray
-    RightLinePen.Style = psDot
-    SelBackColor = clHighlight
-    SelTextColor = clHighlightText
-    Separators = #9#10#13' $%&(),./:;<=>'
-    ShowEndParSelected = False
-    SpecUnderline.Color = clRed
-    TabStops = 4
-    UndoMaxSpace = 65536
-    UpdateMode = umOnNeed
-    Version = 'v7.1  Professional ed.'
-    OnBeforeChange = memoBeforeChange
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Courier New'
-    Font.Style = []
-    ParentFont = False
-    TabOrder = 0
-    TabStop = True
-    OnEnter = memoEnter
-    OnExit = memoExit
-  end
   object lstImages: TMenuImgList
     BkColor = clSilver
     DrawingStyle = dsTransparent
@@ -615,12 +565,5 @@ inherited frameTextEditor: TframeTextEditor
       FC1F24070001DC83F91F080F0241FF07F99F38FF0083FFFFF99F01FF8007FFFF
       FBBF03FFF87FFFFFFFFFFFFFFFFFFFFF00000000000000000000000000000000
       000000000000}
-  end
-  object tmrUpdateSelectedToken: TTimer
-    Enabled = False
-    Interval = 100
-    OnTimer = tmrUpdateSelectedTokenTimer
-    Left = 456
-    Top = 108
   end
 end

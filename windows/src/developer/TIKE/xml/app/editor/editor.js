@@ -89,7 +89,31 @@ window.editorGlobalContext = {
     command(editor.session.getUndoManager().hasRedo() ? 'redo-enable' : 'redo-disable');
     let c = editor.selection.getCursor();
     command('location,Line '+(c.row+1)+', Col '+(c.column+1));
+    command('insert-mode,'+(editor.session.getOption('overwrite') ? 'Overwrite' : 'Insert'));
 //    command(editor.session.getUndoManager().isClean() ? 'modified' : 'not-modified');
+    var s = getTokenAtCursor();
+    if(s) {
+      command('token,'+s.column+','+encodeURIComponent(s.text));
+    }
+  };
+  
+  var getTokenAtCursor = function() {
+    var txt = editor.getSelectedText();
+    if(txt != '') {
+      // We'll always return the first 100 characters of the selection and not 
+      // do any manipulation here.
+      return {column:null,text:txt.substr(0, 99)};
+    }
+    
+    if(mode == 'keyman') {
+      // Get the token under the cursor
+      var c = editor.session.selection.getCursor();
+      var line = editor.session.getLine(c.row);
+      return {column:c.column, text:line};
+    } else {
+      // Get the character under the cursor
+      return null;
+    }
   };
   
   /**
@@ -99,13 +123,9 @@ window.editorGlobalContext = {
     editor = ace.edit("editor");
     editor.setTheme("ace/theme/xcode");
     
-    editor.session.selection.on('changeCursor', function(e) {
-      updateState();
-    });
-    
-    editor.session.selection.on('changeSelection', function(e) {
-      updateState();
-    });
+    editor.session.selection.on('changeCursor', updateState);    
+    editor.session.on('changeOverwrite', updateState);
+    editor.session.selection.on('changeSelection', updateState);
     
     editor.session.on('change', function(delta) {
       if(!context.loading) {
@@ -114,6 +134,7 @@ window.editorGlobalContext = {
           Data: editor.session.getValue()
           // delta.start, delta.end, delta.lines, delta.action
         });
+        context.highlightError();//clear the selected error
         command('modified');
         updateState();
       }

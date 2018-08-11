@@ -63,12 +63,12 @@ uses
   HintLabel, debugdeadkeys, UserMessages,
   UframeTextEditor,
 {$IFDEF USE_PLUSMEMO}
-  PlusMemo, PMSupport,
+  PMSupport,
 {$ENDIF}
   Vcl.AppEvnts,
   DebugUtils,
   keymanapi_TLB, msctf, UfrmTike, KeymanDeveloperMemo,
-  KeymanDeveloperDebuggerMemo;
+  KeymanDeveloperDebuggerMemo, PlusMemo;
 
 type
   TUpdateParColourEvent = procedure(Sender: TObject; ALine: Integer; ALineType: TParColourLineType) of object;
@@ -80,7 +80,7 @@ type
 
   TDebugBreakpoint = class
   strict private
-    FOwner: TKeymanDeveloperMemo;
+    FOwner: TframeTextEditor;
   private
   {$IFDEF USE_PLUSMEMO}
     FNav: TPlusNavigator;
@@ -90,7 +90,7 @@ type
     function GetTrueLineNumber: Integer;
     procedure SetTrueLineNumber(const Value: Integer);
   public
-    constructor Create(AOwner: TKeymanDeveloperMemo);
+    constructor Create(AOwner: TframeTextEditor);
     property TrueLineNumber: Integer read GetTrueLineNumber write SetTrueLineNumber;
   end;
 
@@ -145,7 +145,7 @@ type
     FLastActiveProfile: TDebugUtilProfile;   // I4331
 
     { Editor integration functions }
-    //function EditorMemo: TPlusMemoU;
+//    function EditorMemo: TPlusMemoU;
 
     { Keyman32 integration functions }
     function frmDebugStatus: TForm;
@@ -179,7 +179,7 @@ type
   { ANSI Test}
   private
     FANSITest: Boolean;
-    FEditorMemo: TKeymanDeveloperMemo;
+    FEditorMemo: TframeTextEditor;
     FOnUpdateParColour: TUpdateParColourEvent;
     FDebugFileName: WideString;
     FSingleStepMode: Boolean;
@@ -240,7 +240,7 @@ type
     property DebugFileName: WideString read FDebugFileName write FDebugFileName;
     property CompiledFileName: string read FFileName write FFileName;   // I4695
     //property Editor: TfrmTikeEditor read FEditor write FEditor;
-    property EditorMemo: TKeymanDeveloperMemo read FEditorMemo write FEditorMemo;
+    property EditorMemo: TframeTextEditor read FEditorMemo write FEditorMemo;
 
     property ExecutionPointLine: Integer read FExecutionPointLine write SetExecutionPointLine;
 
@@ -1084,7 +1084,7 @@ var
   oldline: Integer;
 begin
   oldline := FExecutionPointLine;
-  if ALine >= EditorMemo.LineCount then ALine := -1;
+//TODO:  if ALine >= EditorMemo.LineCount then ALine := -1;
   FExecutionPointLine := ALine;
   if IsBreakPointLine(oldline)
     then UpdateParColour(oldline, pcltBreakpoint)
@@ -1094,9 +1094,9 @@ begin
 
   if FExecutionPointLine >= 0 then
   begin
-    EditorMemo.SelLine := FExecutionPointLine;
-    EditorMemo.SelCol := 0;
-    EditorMemo.ScrollInView;
+    //TODO:EditorMemo.SelLine := FExecutionPointLine;
+    //TODO:EditorMemo.SelCol := 0;
+    //TODO:EditorMemo.ScrollInView;
   end;
 end;
 
@@ -1174,7 +1174,8 @@ begin
   if FFont = nil then
   begin
     FDefaultFont := True;
-    FFont := EditorMemo.AltFont;
+    //TODO:FFont := EditorMemo.AltFont;
+    FFont := Font;  //TODO scrap this
   end
   else
     FDefaultFont := False;
@@ -1732,7 +1733,7 @@ end;
 
 { TDebugBreakpoint }
 
-constructor TDebugBreakpoint.Create(AOwner: TKeymanDeveloperMemo);
+constructor TDebugBreakpoint.Create(AOwner: TframeTextEditor);
 begin
   inherited Create;
   FOwner := AOwner;

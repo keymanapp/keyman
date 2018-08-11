@@ -168,7 +168,7 @@ begin
   FEditorFrame.OnChanged := EditorChanged;
   FEditorFrame.TextFileFormat := tffUTF8;
 
-  GetCharMapDropTool.Handle(FEditorFrame.memo, cmimDefault);    // I1422 - insert character map chars
+//  TODO: GetCharMapDropTool.Handle(FEditorFrame.memo, cmimDefault);    // I1422 - insert character map chars
 
   ActiveControl := FEditorFrame;
 
@@ -186,7 +186,7 @@ end;
 
 procedure TfrmEditor.SetEditorText(s: WideString);
 begin
-  FEditorFrame.memo.SetTextBuf(PWideChar(s));
+  FEditorFrame.SetTextBuf(PWideChar(s));
 end;
 
 procedure TfrmEditor.SetFocus;

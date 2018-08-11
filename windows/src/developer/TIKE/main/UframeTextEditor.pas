@@ -12,26 +12,19 @@ uses
   UserMessages,
   Keyman.Developer.UI.UframeCEFHost,
   TextFileFormat, UfrmTike,
-  System.ImageList, KeymanDeveloperMemo,
-  Vcl.StdCtrls, PlusMemo, KMDActionInterfaces;
+  System.ImageList,
+  Vcl.StdCtrls, KMDActionInterfaces;
 
 type
   TParColourLineType = (pcltNone, pcltBreakpoint, pcltExecutionPoint, pcltError);
 
   TframeTextEditor = class(TTIKEForm, IKMDSearchActions, IKMDEditActions)
-    memo: TKeymanDeveloperMemo;
     lstImages: TMenuImgList;
     dlgFonts: TFontDialog;
     dlgPrintSetup: TPrinterSetupDialog;
     lstImagesDisabled: TImageList;
-    tmrUpdateSelectedToken: TTimer;
     procedure FormCreate(Sender: TObject);
-    procedure memoBeforeChange(Sender: TObject; var Txt: PWideChar);
-    procedure memoEnter(Sender: TObject);
-    procedure memoExit(Sender: TObject);
-    procedure memoChange(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure tmrUpdateSelectedTokenTimer(Sender: TObject);
     procedure TntFormDestroy(Sender: TObject);
   private
     class var FInitialFilenameIndex: Integer;
@@ -55,21 +48,20 @@ type
     procedure Changed;
     procedure UpdateState(const ALocation: string);
     procedure ClearError;
-    procedure UpdateSelectedToken;
     procedure SetCharFont(const Value: TFont);
     procedure SetCodeFont(const Value: TFont);
     function GetCharFont: TFont;
     function GetCodeFont: TFont;
     procedure SetTextFileFormat(const Value: TTextFileFormat);
-    function GetSelectedTokens(var token, prevtoken: WideString; var x, tx: Integer): Boolean;
 
     procedure cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
     procedure cefLoadEnd(Sender: TObject);
     procedure LoadFileInBrowser(const AData: string);
     procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
     procedure FireCommand(const commands: TStringList);
-    procedure UpdateInsertState;
+    procedure UpdateInsertState(const AMode: string);
     procedure ExecuteCommand(const command: string; const parameters: TJSONValue = nil);
+    procedure UpdateToken(command: string);
   protected
     function GetHelpTopic: string; override;
 
@@ -225,16 +217,18 @@ end;
 
 function TframeTextEditor.GetCharFont: TFont;
 begin
-  if FEditorFormat = efHTML
-    then Result := memo.Font   // I1426 - script tags should be 'code' font
-    else Result := Memo.AltFont;
+Result := Font;
+//  if FEditorFormat = efHTML
+//    then Result := memo.Font   // I1426 - script tags should be 'code' font
+//    else Result := Memo.AltFont;
 end;
 
 function TframeTextEditor.GetCodeFont: TFont;
 begin
-  if FEditorFormat = efHTML
-    then Result := Memo.AltFont  // I1426 - script tags should be 'code' font
-    else Result := Memo.Font;
+  Result := Font;
+//  if FEditorFormat = efHTML
+//    then Result := Memo.AltFont  // I1426 - script tags should be 'code' font
+//    else Result := Memo.Font;
 end;
 
 function TframeTextEditor.GetText: WideString;
@@ -262,7 +256,6 @@ begin
     begin
       TextFileFormat := tffUTF8;
       LoadFileInBrowser('');
-      UpdateSelectedToken;
     end;
   finally
     FLoading := False;
@@ -362,7 +355,6 @@ begin
       s.Free;
     end;
 
-    UpdateSelectedToken;
   finally
     FLoading := False;
   end;
@@ -401,16 +393,6 @@ begin
   end;
 end;
 
-procedure TframeTextEditor.memoBeforeChange(Sender: TObject; var Txt: PWideChar);
-begin
-  ClearError;
-end;
-
-procedure TframeTextEditor.memoChange(Sender: TObject);
-begin
-  if not FLoading then
-  Changed;
-end;
 (*
   with Source as TCharacterDragObject do
     s := Text[cmimText];
@@ -428,21 +410,10 @@ end;
     memo.SetCaretFromMouse(X - 16, Y - 16);
   end;
  *)
-procedure TframeTextEditor.memoEnter(Sender: TObject);
-begin
-  //frmKeymanDeveloper.RegisterToolbarClient(Self);
-end;
 
-procedure TframeTextEditor.memoExit(Sender: TObject);
+procedure TframeTextEditor.UpdateInsertState(const AMode: string);
 begin
-  //frmKeymanDeveloper.UnregisterToolbarClient(Self);
-end;
-
-procedure TframeTextEditor.UpdateInsertState;
-begin
-//    if memo.Overwrite
-//      then frmKeymanDeveloper.barStatus.Panels[1].Text := 'Overwrite'
-//      else frmKeymanDeveloper.barStatus.Panels[1].Text := 'Insert';
+  frmKeymanDeveloper.barStatus.Panels[1].Text := AMode;
 end;
 
 { TODO: Cancelling errors with escape key
@@ -505,7 +476,6 @@ begin
   try
     RefreshOptions;
     LoadFileInBrowser(Value);
-    UpdateSelectedToken;
   finally
     FLoading := False;
   end;
@@ -540,7 +510,6 @@ begin
     begin
       frmKeymanDeveloper.barStatus.Panels[0].Text := ALocation;
     end;
-    UpdateSelectedToken;
   end;
 end;
 
@@ -700,8 +669,8 @@ end;
 function TframeTextEditor.OffsetToLine(Offset: Integer): Integer;   // I4083
 begin
   Result := 0;
-  while (Result < memo.ParagraphCount) and (Offset > memo.PargrphOffset[Result]) do
-    Inc(Result);
+//  while (Result < memo.ParagraphCount) and (Offset > memo.PargrphOffset[Result]) do
+//    Inc(Result);
 end;
 
 procedure TframeTextEditor.FindErrorByOffset(offset: Integer);   // I4083
@@ -735,18 +704,77 @@ begin
     else if command = 'redo-enable' then FCanRedo := True
     else if command = 'has-selection' then FHasSelection := True
     else if command = 'no-selection' then FHasSelection := False
-
+    else if command.StartsWith('insert-mode,') then
+    begin
+      UpdateInsertState(command.Substring('insert-mode,'.Length));
+    end
     else if command.StartsWith('location,') then
     begin
       UpdateState(command.Substring('location,'.Length));
     end
-    else if command.StartsWith('selected-char,') then
+    else if command.StartsWith('token,') then
     begin
-      Inc(i);
-//      UpdateCharacterMap(command.Substring('selected-char,'.Length));   // I4046
+      UpdateToken(command.Substring('token,'.Length));
     end
     else ShowMessage('keyman:'+commands.Text);
     Inc(i);
+  end;
+end;
+
+procedure TframeTextEditor.UpdateToken(command: string);
+var
+  n, col: Integer;
+  line: string;
+  x, tx: Integer;
+  k, token, prevtoken: WideString;
+  FHelpTopic, FPrevHelpTopic: WideString;
+begin
+  n := command.IndexOf(',');
+  if n < 0 then
+    Exit;
+  if not TryStrToInt(command.Substring(0, n), col) then
+    Exit;
+  line := command.Substring(n+1);
+
+  x := col+1;
+
+  token := GetTokenAtCursor(line, x, tx, prevtoken);
+  if (FHasSelection) and (token <> '') then
+  begin
+    prevtoken := line;
+    if (x > tx) and CharInSet(token[1], ['"', '''']) then
+      prevtoken := token[1] + prevtoken + token[1];
+
+    if not TKeyboardParser_Line.GetXStr(prevtoken, token) then
+      token := line;
+
+    x := 1;
+    tx := 1;
+  end
+  else
+    token := GetTokenAtCursor(line, x, tx, prevtoken);
+
+  UpdateCharacterMap(False, token, x, tx, FHasSelection);
+
+  FHelpTopic := token;
+  FPrevHelpTopic := prevtoken;
+
+  if EditorFormat = efKMN then
+  begin
+    if not IsValidHelpToken(FHelpTopic, False) then
+    begin
+      if not IsValidHelpToken(FPrevHelpTopic, False)
+        then FHelpTopic := ''
+        else FHelpTopic := FPrevHelpTopic;
+    end;
+
+    if FHelpTopic <> '' then
+    begin
+      HelpKeyword := FHelpTopic;
+
+      if Assigned(frmHelp) and frmHelp.Showing then
+        frmHelp.QueueRefresh;
+    end;
   end;
 end;
 
@@ -768,98 +796,11 @@ end;
 
 
 function TframeTextEditor.GetHelpTopic: string;
-var
-  x, tx: Integer;
-  token, prevtoken: WideString;
 begin
   if FEditorFormat <> efKMN then
     Exit(SHelpTopic_Context_TextEditor);
 
-  if not GetSelectedTokens(token, prevtoken, x, tx) then
-    Exit(SHelpTopic_Context_TextEditor);
-
-  if not IsValidHelpToken(token, False) then
-    if IsValidHelpToken(prevtoken, False) then
-      token := prevtoken
-    else if not IsValidHelpToken(token, True) then
-      Exit(SHelpTopic_Context_TextEditor);
-
-  Result := token;
-end;
-
-procedure TframeTextEditor.tmrUpdateSelectedTokenTimer(Sender: TObject);
-var
-  prevtoken, token: WideString;
-  tx, x: Integer;
-begin
-  tmrUpdateSelectedToken.Enabled := False;
-
-  if not GetSelectedTokens(token, prevtoken, x, tx) then Exit;
-
-  if (EditorFormat <> efKMN) and (memo.SelText = '') then
-    token := FormatUnicode(token);
-
-  UpdateCharacterMap(False, token, x, tx, memo.SelText <> '');   // I4807
-
-  if EditorFormat = efKMN then
-  begin
-    if not IsValidHelpToken(token, False) then
-      if IsValidHelpToken(prevtoken, False) then
-        token := prevtoken
-      else if not IsValidHelpToken(token, True) then
-        Exit;
-
-    HelpKeyword := token;
-
-    if Assigned(frmHelp) and frmHelp.Showing then
-      frmHelp.QueueRefresh;
-  end;
-end;
-
-function TframeTextEditor.GetSelectedTokens(var token, prevtoken: WideString; var x, tx: Integer): Boolean;
-var
-  ch: WideString;
-begin
-  x := memo.SelCol+1;
-
-  if EditorFormat = efKMN then   // I4807
-  begin
-    if memo.SelLength < 0 then
-      Inc(x, memo.SelLength);
-    token := GetTokenAtCursor(memo.LinesArray[memo.SelLine], x, tx, prevtoken);
-    if (memo.SelText <> '') and (token <> '') then
-    begin
-      prevtoken := memo.SelText;
-      if (x > tx) and CharInSet(token[1], ['"', '''']) then
-        prevtoken := token[1] + prevtoken + token[1];
-
-      if not TKeyboardParser_Line.GetXStr(prevtoken, token) then
-        token := memo.SelText;
-
-      x := 1;
-      tx := 1;
-    end
-    else
-      token := GetTokenAtCursor(memo.LinesArray[memo.SelLine], x, tx, prevtoken);
-  end
-  else if memo.SelText <> '' then
-  begin
-    token := memo.SelText;
-  end
-  else
-  begin
-    ch := memo.GetTextPart(memo.SelStart-1, memo.SelStart);
-    if ch = '' then Exit(False);
-
-    if Uni_IsSurrogate2(ch[1]) then
-      ch := memo.GetTextPart(memo.SelStart-2, memo.SelStart)
-    else if Uni_IsSurrogate1(ch[1]) then
-      ch := memo.GetTextPart(memo.SelStart-1, memo.SelStart+1);
-
-    token := ch; //FormatUnicode(ch);
-  end;
-
-  Result := True;
+  Result := HelpKeyword;
 end;
 
 procedure TframeTextEditor.TntFormDestroy(Sender: TObject);
@@ -867,12 +808,6 @@ begin
   inherited;
   if FFileName <> '' then
     modWebHttpServer.AppSource.UnregisterSource(FFileName);
-end;
-
-procedure TframeTextEditor.UpdateSelectedToken;
-begin
-  tmrUpdateSelectedToken.Enabled := False;
-  tmrUpdateSelectedToken.Enabled := True;
 end;
 
 end.
