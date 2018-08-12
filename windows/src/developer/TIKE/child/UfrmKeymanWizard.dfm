@@ -198,9 +198,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageDetails: TTabSheet
       Caption = 'Details'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object sbDetails: TScrollBox
         Left = 0
         Top = 0
@@ -746,10 +743,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object panLayoutSimple: TPanel
             Left = 0
             Top = 0
@@ -1630,9 +1623,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageCompile: TTabSheet
       Caption = 'Build'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel1: TPanel
         Left = 0
         Top = 0

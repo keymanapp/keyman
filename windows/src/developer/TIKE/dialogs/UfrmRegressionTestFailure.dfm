@@ -65,36 +65,12 @@ inherited frmRegressionTestFailure: TfrmRegressionTestFailure
     Width = 3
     Height = 13
   end
-  object memoExpected: TKeymanDeveloperMemo
+  object memoExpected: TMemo
     Left = 100
     Top = 68
     Width = 277
     Height = 73
     Cursor = crIBeam
-    Alignment = taLeftJustify
-    ScrollBars = ssNone
-    AltFont.Charset = DEFAULT_CHARSET
-    AltFont.Color = clWindowText
-    AltFont.Height = -11
-    AltFont.Name = 'MS Sans Serif'
-    AltFont.Style = []
-    CaretWidth = 1
-    ColumnWrap = 0
-    DisplayOnly = False
-    EndOfTextMark.Color = clRed
-    EndOfTextMark.Style = psClear
-    Justified = False
-    LineHeight = 0
-    Options = [pmoWrapCaret, pmoInsertKeyActive, pmoWideOverwriteCaret, pmoAutoScrollBars, pmoBlockSelection]
-    Overwrite = False
-    RightLinePen.Color = clGray
-    RightLinePen.Style = psDot
-    SelBackColor = clHighlight
-    SelTextColor = clHighlightText
-    Separators = #9#10#13' $%&,./:;<=>'
-    SpecUnderline.Color = clRed
-    UndoMaxSpace = 65536
-    Version = 'v7.1  Professional ed.'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -102,38 +78,13 @@ inherited frmRegressionTestFailure: TfrmRegressionTestFailure
     Font.Style = []
     ParentFont = False
     TabOrder = 0
-    TabStop = True
   end
-  object memoActual: TKeymanDeveloperMemo
+  object memoActual: TMemo
     Left = 100
     Top = 148
     Width = 277
     Height = 73
     Cursor = crIBeam
-    Alignment = taLeftJustify
-    ScrollBars = ssNone
-    AltFont.Charset = DEFAULT_CHARSET
-    AltFont.Color = clWindowText
-    AltFont.Height = -11
-    AltFont.Name = 'MS Sans Serif'
-    AltFont.Style = []
-    CaretWidth = 1
-    ColumnWrap = 0
-    DisplayOnly = False
-    EndOfTextMark.Color = clRed
-    EndOfTextMark.Style = psClear
-    Justified = False
-    LineHeight = 0
-    Options = [pmoWrapCaret, pmoInsertKeyActive, pmoWideOverwriteCaret, pmoAutoScrollBars, pmoBlockSelection]
-    Overwrite = False
-    RightLinePen.Color = clGray
-    RightLinePen.Style = psDot
-    SelBackColor = clHighlight
-    SelTextColor = clHighlightText
-    Separators = #9#10#13' $%&,./:;<=>'
-    SpecUnderline.Color = clRed
-    UndoMaxSpace = 65536
-    Version = 'v7.1  Professional ed.'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -141,7 +92,6 @@ inherited frmRegressionTestFailure: TfrmRegressionTestFailure
     Font.Style = []
     ParentFont = False
     TabOrder = 1
-    TabStop = True
   end
   object cmdOk: TButton
     Left = 304

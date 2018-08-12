@@ -109,6 +109,9 @@ type
     procedure LoadFromFile(AFileName: WideString; ATextFileFormat: TTextFileFormat); overload;   // I4034
     procedure LoadFromStream(AStream: TStream; ATextFileFormat: TTextFileFormat); overload;  // I2964
 
+    procedure SetSelectedRow(ARow: Integer);
+    function GetSelectedRow: Integer;
+
     property EditorText: WideString read GetText write SetText;
     property EditorFormat: TEditorFormat read FEditorFormat write SetEditorFormat;
     property OnChanged: TNotifyEvent read FOnChanged write FonChanged;
@@ -470,6 +473,23 @@ begin
   cef.SetFocus;
 end;
 
+procedure TframeTextEditor.SetSelectedRow(ARow: Integer);
+begin
+{TODO:
+  if (ALine >= EditorMemo.LineCount) or (ALine < 0) then Exit;
+  EditorMemo.SelLine := ALine;
+  EditorMemo.SelCol := 0;
+  EditorMemo.SelLength := Length(EditorMemo.LinesArray[ALine]);
+  EditorMemo.ScrollInView;
+}
+end;
+
+function TframeTextEditor.GetSelectedRow: Integer;
+begin
+  // TODO
+  Result := 0;
+end;
+
 procedure TframeTextEditor.SetText(Value: WideString);
 begin
   FLoading := True;
@@ -638,8 +658,6 @@ begin
 end;
 
 procedure TframeTextEditor.ExecuteCommand(const command: string; const parameters: TJSONValue);
-var
-  i: Integer;
 begin
   if Assigned(parameters) then
   begin
@@ -726,7 +744,7 @@ var
   n, col: Integer;
   line: string;
   x, tx: Integer;
-  k, token, prevtoken: WideString;
+  token, prevtoken: WideString;
   FHelpTopic, FPrevHelpTopic: WideString;
 begin
   n := command.IndexOf(',');

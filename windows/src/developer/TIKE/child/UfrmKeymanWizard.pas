@@ -2534,9 +2534,9 @@ var
 begin
   FCurrentRule := nil;
   FKeyboardParser.AddRequiredLines;
-// TODO: FLine := frameSource.memo.SelLine;
+  FLine := frameSource.GetSelectedRow;
   frameSource.EditorText := FKeyboardParser.KeyboardText;
-// TODO: frameSource.memo.SelLine := Min(FLine, frameSource.memo.LineCount - 1);
+  frameSource.SetSelectedRow(FLine);
 
 //  FreeAndNil(FKeyboardParser);
 end;

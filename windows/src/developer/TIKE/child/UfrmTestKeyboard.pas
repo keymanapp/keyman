@@ -30,7 +30,7 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, StdCtrls, ComCtrls, Buttons, int_kmdebug, Menus, ErrorControlledRegistry, 
   RegistryKeys, UfrmMDIChild, KeymanDeveloperDebuggerMemo, 
-  KeymanDeveloperMemo;
+  KeymanDeveloperMemo, PlusMemo;
 
 type
   TfrmTestKeyboard = class(TfrmTikeChild)
