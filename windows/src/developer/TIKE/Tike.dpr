@@ -30,9 +30,6 @@ uses
   unicodepanel in '..\..\global\delphi\comp\unicodepanel.pas',
   ttinfo in '..\..\global\delphi\general\ttinfo.pas',
   KeyNames in '..\..\global\delphi\general\KeyNames.pas',
-  {$IFDEF USE_PLUSMEMO}
-  SyntaxHighlight in 'main\SyntaxHighlight.pas',
-  {$ENDIF }
   PaintPanel in '..\..\global\delphi\comp\PaintPanel.pas',
   UfrmMDIEditor in 'child\UfrmMDIEditor.pas' {frmTikeEditor},
   ProjectFile in 'project\ProjectFile.pas',
@@ -121,7 +118,6 @@ uses
   ExtShiftState in '..\..\global\delphi\comp\ExtShiftState.pas',
   CleartypeDrawCharacter in '..\..\global\delphi\general\CleartypeDrawCharacter.pas',
   CharMapDropTool in 'main\CharMapDropTool.pas',
-  CharMapDropTool_PlusMemoU in 'main\CharMapDropTool_PlusMemoU.pas',
   CharMapDropTool_EmbeddedWB in 'main\CharMapDropTool_EmbeddedWB.pas',
   UfrmBitmapEditorText in 'dialogs\UfrmBitmapEditorText.pas' {frmBitmapEditorText},
   UFixFontDialogBold in '..\..\global\delphi\general\UFixFontDialogBold.pas',
@@ -248,7 +244,6 @@ uses
   DropTarget in '..\..\global\delphi\general\DropTarget.pas',
   CloseButtonPageControl in '..\..\global\delphi\comp\CloseButtonPageControl.pas',
   UfrmTIKEDock in 'dockforms\UfrmTIKEDock.pas' {TIKEDockForm},
-  KeymanDeveloperMemo in '..\..\global\delphi\comp\KeymanDeveloperMemo.pas',
   KeymanDeveloperDebuggerMemo in '..\..\global\delphi\comp\KeymanDeveloperDebuggerMemo.pas',
   UfrmCharacterMapDock in 'dockforms\UfrmCharacterMapDock.pas' {frmCharacterMapDock},
   Keyman.System.PackageInfoRefreshKeyboards in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas',

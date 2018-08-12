@@ -33,11 +33,13 @@ uses
   Classes,
   Controls,
   Dialogs,
-  KeymanDeveloperMemo,
   StdCtrls,
   StrUtils,
   WideStrUtils,
   KMDActionInterfaces;
+
+function IsTextEditor(control: TObject): Boolean;
+function GetTextEditorController(control: TObject): IKMDTextEditorActions;
 
 type
   TKMDEditAction = class(TAction)
@@ -46,7 +48,6 @@ type
     procedure SetControl(Value: TWinControl);
   protected
     function GetCustomEdit(Target: TObject): TCustomEdit; virtual;
-    function GetPlusMemo(Target: TObject): TKeymanDeveloperMemo; virtual;
     function GetInterface(Target: TObject): IKMDEditActions; virtual;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -231,16 +232,15 @@ begin
     Assigned(TControl(control).Owner) and
     (TControl(control).Owner.ClassName = 'TframeCEFHost') and
     Assigned(TControl(control).Owner.Owner) and
-    Supports(TControl(control).Owner.Owner, IKMDEditActions) and
-    Supports(TControl(control).Owner.Owner, IKMDSearchActions);
+    Supports(TControl(control).Owner.Owner, IKMDTextEditorActions);
 end;
 
-function GetTextEditorController(control: TObject): IKMDSearchActions;
+function GetTextEditorController(control: TObject): IKMDTextEditorActions;
 begin
   if not IsTextEditor(control) then
     Exit(nil);
 
-  Result := TControl(control).Owner.Owner as IKMDSearchActions;
+  Result := TControl(control).Owner.Owner as IKMDTextEditorActions;
 end;
 
 { TKMDEditAction }
@@ -268,13 +268,6 @@ begin
       raise Exception.Create('Unable to get interface for edit actions');
 end;
 
-function TKMDEditAction.GetPlusMemo(Target: TObject): TKeymanDeveloperMemo;
-begin
-  { We could hard cast Target as a TWinControl since HandlesTarget "should" be
-    called before ExecuteTarget and UpdateTarget, however, we're being safe. }
-  Result := Target as TKeymanDeveloperMemo;
-end;
-
 function TKMDEditAction.HandlesTarget(Target: TObject): Boolean;
 begin
   if (Control <> nil) and (Target = Control) then
@@ -283,7 +276,7 @@ begin
     Result := True
   else if (Control = nil) and (Target is TWinControl) and TWinControl(Target).Focused then
   begin
-    if (Target is TCustomEdit) or (Target is TKeymanDeveloperMemo) then Result := True
+    if (Target is TCustomEdit) then Result := True
     else Result := Supports(TWinControl(Target), IKMDEditActions) or Supports(TWinControl(Target).Owner, IKMDEditActions);
   end
   else
@@ -311,14 +304,12 @@ end;
 procedure TKMDEditCut.ExecuteTarget(Target: TObject);
 begin
   if Target is TCustomEdit then GetCustomEdit(Target).CutToClipboard
-  else if Target is TKeymanDeveloperMemo then GetPlusMemo(Target).CutToClipboard
   else GetInterface(Target).CutToClipboard;
 end;
 
 procedure TKMDEditCut.UpdateTarget(Target: TObject);
 begin
   if Target is TCustomEdit then Enabled := (GetCustomEdit(Target).SelLength > 0) and not GetCustomEdit(Target).ReadOnly
-  else if Target is TKeymanDeveloperMemo then Enabled := (GetPlusMemo(Target).SelLength <> 0) and not GetPlusMemo(Target).ReadOnly
   else Enabled := GetInterface(Target).CanCut;
 end;
 
@@ -327,14 +318,12 @@ end;
 procedure TKMDEditCopy.ExecuteTarget(Target: TObject);
 begin
   if Target is TCustomEdit then GetCustomEdit(Target).CopyToClipboard
-  else if Target is TKeymanDeveloperMemo then GetPlusMemo(Target).CopyToClipboard
   else GetInterface(Target).CopyToClipboard;
 end;
 
 procedure TKMDEditCopy.UpdateTarget(Target: TObject);
 begin
   if Target is TCustomEdit then Enabled := GetCustomEdit(Target).SelLength > 0
-  else if Target is TKeymanDeveloperMemo then Enabled := GetPlusMemo(Target).SelLength <> 0
   else Enabled := GetInterface(Target).CanCopy;
 end;
 
@@ -343,14 +332,12 @@ end;
 procedure TKMDEditPaste.ExecuteTarget(Target: TObject);
 begin
   if Target is TCustomEdit then GetCustomEdit(Target).PasteFromClipboard
-  else if Target is TKeymanDeveloperMemo then GetPlusMemo(Target).PasteFromClipboard
   else GetInterface(Target).PasteFromClipboard;
 end;
 
 procedure TKMDEditPaste.UpdateTarget(Target: TObject);
 begin
   if Target is TCustomEdit then Enabled := Clipboard.HasFormat(CF_TEXT) and not GetCustomEdit(Target).ReadOnly
-  else if Target is TKeymanDeveloperMemo then Enabled := Clipboard.HasFormat(CF_TEXT) and not GetPlusMemo(Target).ReadOnly
   else Enabled := GetInterface(Target).CanPaste;
 end;
 
@@ -359,14 +346,12 @@ end;
 procedure TKMDEditSelectAll.ExecuteTarget(Target: TObject);
 begin
   if Target is TCustomEdit then GetCustomEdit(Target).SelectAll
-  else if Target is TKeymanDeveloperMemo then GetPlusMemo(Target).SelectAll
   else GetInterface(Target).SelectAll;
 end;
 
 procedure TKMDEditSelectAll.UpdateTarget(Target: TObject);
 begin
   if Target is TCustomEdit then Enabled := Length(GetCustomEdit(Target).Text) > 0
-  else if Target is TKeymanDeveloperMemo then Enabled := GetPlusMemo(Target).GetTextLen > 0
   else Enabled := GetInterface(Target).CanSelectAll;
 end;
 
@@ -375,18 +360,12 @@ end;
 procedure TKMDEditUndo.ExecuteTarget(Target: TObject);
 begin
   if Target is TCustomEdit then GetCustomEdit(Target).Undo
-  else if Target is TKeymanDeveloperMemo then
-  begin
-    GetPlusMemo(Target).Undo;
-    GetPlusMemo(Target).ScrollInView;
-  end
   else GetInterface(Target).Undo;
 end;
 
 procedure TKMDEditUndo.UpdateTarget(Target: TObject);
 begin
   if Target is TCustomEdit then Enabled := GetCustomEdit(Target).CanUndo
-  else if Target is TKeymanDeveloperMemo then Enabled := GetPlusMemo(Target).CanUndo
   else Enabled := GetInterface(Target).CanUndo;
 end;
 
@@ -394,14 +373,12 @@ end;
 
 procedure TKMDEditRedo.ExecuteTarget(Target: TObject);
 begin
-  if Target is TKeymanDeveloperMemo then GetPlusMemo(Target).Redo   // I4032
-  else GetInterface(Target).Redo;   // I4032
+  GetInterface(Target).Redo;   // I4032
 end;
 
 procedure TKMDEditRedo.UpdateTarget(Target: TObject);
 begin
   if Target is TCustomEdit then Enabled := False   // I4032
-  else if Target is TKeymanDeveloperMemo then Enabled := GetPlusMemo(Target).CanRedo   // I4032
   else Enabled := GetInterface(Target).CanRedo;   // I4032
 end;
 
@@ -410,14 +387,12 @@ end;
 procedure TKMDEditDelete.ExecuteTarget(Target: TObject);
 begin
   if Target is TCustomEdit then GetCustomEdit(Target).ClearSelection
-  else if Target is TKeymanDeveloperMemo then GetPlusMemo(Target).ClearSelection
   else GetInterface(Target).ClearSelection;
 end;
 
 procedure TKMDEditDelete.UpdateTarget(Target: TObject);
 begin
   if Target is TCustomEdit then Enabled := (GetCustomEdit(Target).SelLength <> 0) and not GetCustomEdit(Target).ReadOnly
-  else if Target is TKeymanDeveloperMemo then Enabled := (GetPlusMemo(Target).SelLength <> 0) and not GetPlusMemo(Target).ReadOnly
   else Enabled := GetInterface(Target).CanClearSelection;
 end;
 
@@ -427,14 +402,6 @@ begin
 end;
 
 { TKMDSearchAction }
-
-function SearchPlusMemo(FControl: TKeymanDeveloperMemo; SearchString: WideString;
-  Options: TFindOptions; FindFirst: Boolean = False): Boolean;
-begin
-  Result := FControl.FindTxt(SearchString, frDown in Options,
-      frMatchCase in Options, frWholeWord in Options, FindFirst);
-  if Result then FControl.ScrollInView;
-end;
 
 function WideSearchEdit(EditControl: TCustomEdit; SearchString: string;
   Options: TFindOptions; FindFirst: Boolean = False): Boolean;
@@ -543,7 +510,7 @@ begin
     end;
   end;
 
-  if (Target is TKeymanDeveloperMemo) or (Target is TCustomEdit) then
+  if Target is TCustomEdit then
   begin
     FControl := TWinControl(Target);
     if Assigned(FControl) then
@@ -584,7 +551,6 @@ function TKMDSearchAction.HandlesTarget(Target: TObject): Boolean;
 begin
   Result :=
     IsTextEditor(Screen.ActiveControl) or
-    (Screen.ActiveControl is TKeymanDeveloperMemo) or
     (Screen.ActiveControl is TCustomEdit) or
     ((Screen.ActiveControl <> nil) and (Screen.ActiveControl.Owner.ClassName = 'TfrmCharacterMapNew'));
   if not Result then
@@ -623,16 +589,9 @@ procedure TKMDSearchAction.Search(Sender: TObject);
 begin
   if Assigned(FControl) then
   begin
-    if FControl is TKeymanDeveloperMemo then
-    begin
-      if not SearchPlusMemo(TKeymanDeveloperMemo(FControl), TFindDialog(FDialog).FindText,
-         TFindDialog(FDialog).Options, FFindFirst) then
-        ShowMessage(WideFormat(STextNotFound, [TFindDialog(FDialog).FindText]));
-    end
-    else
-      if not WideSearchEdit(TCustomEdit(FControl), TFindDialog(FDialog).FindText,
-         TFindDialog(FDialog).Options, FFindFirst) then
-        ShowMessage(WideFormat(STextNotFound, [TFindDialog(FDialog).FindText]));
+    if not WideSearchEdit(TCustomEdit(FControl), TFindDialog(FDialog).FindText,
+       TFindDialog(FDialog).Options, FFindFirst) then
+      ShowMessage(WideFormat(STextNotFound, [TFindDialog(FDialog).FindText]));
   end;
 end;
 
@@ -640,8 +599,6 @@ procedure TKMDSearchAction.UpdateTarget(Target: TObject);
 begin
   if IsTextEditor(Target) then
     Enabled := GetTextEditorController(Target).CanEditFind
-  else if Target is TKeymanDeveloperMemo then
-    Enabled := TKeymanDeveloperMemo(Target).GetTextLen > 0
   else if Target is TCustomEdit then
     Enabled := TCustomEdit(Target).GetTextLen > 0
   else
@@ -697,30 +654,7 @@ begin
   Found := False;
   FoundCount := 0;
   if Assigned(FControl) then
-    if FControl is TKeymanDeveloperMemo then
-    begin
-      with Sender as TReplaceDialog do
-      begin
-        if (Length(TKeymanDeveloperMemo(FControl).SelText) > 0) and
-           (not (frReplaceAll in Dialog.Options) and
-           (AnsiCompareText(TKeymanDeveloperMemo(FControl).SelText, FindText) = 0) or
-           (frReplaceAll in Dialog.Options) and (TKeymanDeveloperMemo(FControl).SelText = FindText)) then
-        begin
-          TKeymanDeveloperMemo(FControl).SelText := ReplaceText;
-          SearchPlusMemo(TKeymanDeveloperMemo(FControl), Dialog.FindText, Dialog.Options, FFindFirst);
-          if not (frReplaceAll in Dialog.Options) then exit;
-        end;
-        repeat
-          Found := SearchPlusMemo(TKeymanDeveloperMemo(FControl), Dialog.FindText, Dialog.Options, FFindFirst);
-          if Found then
-          begin
-            TKeymanDeveloperMemo(FControl).SelText := ReplaceText;
-            Inc(FoundCount);
-          end;
-        until not Found or not (frReplaceAll in Dialog.Options);
-      end;
-    end
-    else if FControl is TCustomEdit then
+    if FControl is TCustomEdit then
     begin
       with Sender as TReplaceDialog do
       begin

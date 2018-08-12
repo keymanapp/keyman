@@ -62,13 +62,10 @@ uses
   StdCtrls, debugging, debugkeyboard, UfrmMDIEditor, PaintPanel, Menus,
   HintLabel, debugdeadkeys, UserMessages,
   UframeTextEditor,
-{$IFDEF USE_PLUSMEMO}
-  PMSupport,
-{$ENDIF}
   Vcl.AppEvnts,
   DebugUtils,
-  keymanapi_TLB, msctf, UfrmTike, KeymanDeveloperMemo,
-  KeymanDeveloperDebuggerMemo, PlusMemo;
+  keymanapi_TLB, msctf, UfrmTike,
+  KeymanDeveloperDebuggerMemo;
 
 type
   TUpdateParColourEvent = procedure(Sender: TObject; ALine: Integer; ALineType: TParColourLineType) of object;
@@ -82,11 +79,7 @@ type
   strict private
     FOwner: TframeTextEditor;
   private
-  {$IFDEF USE_PLUSMEMO}
-    FNav: TPlusNavigator;
-  {$ELSE}
     FTrueLineNumber: Integer;
-  {$ENDIF}
     function GetTrueLineNumber: Integer;
     procedure SetTrueLineNumber(const Value: Integer);
   public
@@ -331,9 +324,6 @@ begin
   FDefaultFont := True;
   memo.Align := alClient;
 
-{$IFDEF USE_PLUSMEMO}
-  memo.Keywords.AddKeyWord(#$FFFC, [], [], 0, crDefault, clWhite, clBlue);
-{$ENDIF}
   //InitSystemKeyboard;
   UIStatus := duiReadyForInput;
   InitDeadKeys;
@@ -1470,7 +1460,7 @@ procedure TfrmDebug.ClearDeadkeyStyle;
 begin
   if Assigned(FSelectedDeadkey) then
   begin
-{$IFDEF USE_PLUSMEMO}
+{$IFDEF TODO_USE_PLUSMEMO}
     memo.ClearStyleRange(FSelectedDeadkey.Position,FSelectedDeadkey.Position+1);
 {$ENDIF}
     FSelectedDeadkey := nil;
@@ -1482,7 +1472,7 @@ begin
   ClearDeadkeyStyle;
   if not Assigned(DeadKey) then Exit;
   FSelectedDeadkey := DeadKey; //lbDeadkeys.Items.Objects[lbDeadkeys.ItemIndex] as TDeadKeyInfo;
-{$IFDEF USE_PLUSMEMO}
+{$IFDEF TODO_USE_PLUSMEMO}
   memo.SetDynStyle(FSelectedDeadkey.Position, FSelectedDeadkey.Position+1, [fsBold], False,
       0, crDefault, clYellow, clBlue, False);
 {$ENDIF}
@@ -1600,7 +1590,7 @@ begin
   begin
     frmKeymanDeveloper.barStatus.Panels[0].Text := 'Debugger Active';
     if memo.SelText = ''
-      then ch := memo.GetTextPart(memo.SelStart-1, memo.SelStart)
+      then ch := Copy(memo.Text, memo.SelStart-1, 1) //TODO: supplementary pair support
       else ch := Copy(memo.SelText, 1, 16);
 
     if ch = ''
@@ -1737,27 +1727,16 @@ constructor TDebugBreakpoint.Create(AOwner: TframeTextEditor);
 begin
   inherited Create;
   FOwner := AOwner;
-{$IFDEF USE_PLUSMEMO}
-  FNav := TPlusNavigator.Create(FOwner);
-{$ENDIF}
 end;
 
 function TDebugBreakpoint.GetTrueLineNumber: Integer;
 begin
-{$IFDEF USE_PLUSMEMO}
-  Result := FNav.TrueLineNumber;
-{$ELSE}
   Result := FTrueLineNumber;
-{$ENDIF}
 end;
 
 procedure TDebugBreakpoint.SetTrueLineNumber(const Value: Integer);
 begin
-{$IFDEF USE_PLUSMEMO}
-  FNav.TrueLineNumber := Value;
-{$ELSE}
   FTrueLineNumber := Value;
-{$ENDIF}
 end;
 
 end.

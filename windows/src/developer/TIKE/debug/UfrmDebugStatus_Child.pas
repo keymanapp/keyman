@@ -22,8 +22,20 @@ unit UfrmDebugStatus_Child;  // I3323
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, debugkeyboard, KeymanDeveloperMemo, UfrmTike, UfrmDebug,
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls,
+  KeymanDeveloperDebuggerMemo,
+  debugkeyboard,
+  UfrmTike,
+  UfrmDebug,
   UframeTextEditor;
 
 type
@@ -39,7 +51,7 @@ type
     property debugkeyboard: TDebugKeyboard read FDebugKeyboard;
     property DisplayFont: TFont read FDisplayFont;
 
-    function memoDebug: TKeymanDeveloperMemo;
+    function memoDebug: TKeymanDeveloperDebuggerMemo;
     function frmDebugStatus: TForm;
     function DebugForm: TfrmDebug;
 
@@ -92,7 +104,7 @@ begin
   Result := Owner as TForm;
 end;
 
-function TfrmDebugStatus_Child.memoDebug: TKeymanDeveloperMemo;
+function TfrmDebugStatus_Child.memoDebug: TKeymanDeveloperDebuggerMemo;
 begin
   if DebugForm <> nil then   // I4809
     Result := DebugForm.memo

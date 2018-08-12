@@ -21,6 +21,9 @@ unit KMDActionInterfaces;
 
 interface
 
+uses
+  TextFileFormat;
+
 type
   IKMDEditActions = interface
     ['{271C7917-7BA5-4F19-B78B-C16A81DFE53B}']
@@ -57,13 +60,21 @@ type
     function IsEditorExpanded: Boolean;
   end;
 
-  IKMDSearchActions = interface //(IKMDEditActions)
+  IKMDSearchActions = interface(IKMDEditActions)
     ['{5268F7B2-A28E-4471-A708-41BFC968696F}']
     procedure EditFind;
     procedure EditFindNext;
     procedure EditReplace;
     function CanEditFind: Boolean;
     function CanEditFindNext: Boolean;
+  end;
+
+  IKMDTextEditorActions = interface(IKMDSearchActions)
+    ['{118B5CF5-7FED-4669-9A51-7DC58BF571D4}']
+    function GetSelectedRow: Integer;
+    function GetEditorFormat: TEditorFormat;
+    property EditorFormat: TEditorFormat read GetEditorFormat;
+    property SelectedRow: Integer read GetSelectedRow;
   end;
 
 implementation

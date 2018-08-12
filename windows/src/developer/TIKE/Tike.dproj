@@ -157,7 +157,6 @@
         <DCCReference Include="..\..\global\delphi\comp\unicodepanel.pas"/>
         <DCCReference Include="..\..\global\delphi\general\ttinfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeyNames.pas"/>
-        <DCCReference Include="main\SyntaxHighlight.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\PaintPanel.pas"/>
         <DCCReference Include="child\UfrmMDIEditor.pas">
             <Form>frmTikeEditor</Form>
@@ -264,7 +263,6 @@
         <DCCReference Include="..\..\global\delphi\comp\ExtShiftState.pas"/>
         <DCCReference Include="..\..\global\delphi\general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="main\CharMapDropTool.pas"/>
-        <DCCReference Include="main\CharMapDropTool_PlusMemoU.pas"/>
         <DCCReference Include="main\CharMapDropTool_EmbeddedWB.pas"/>
         <DCCReference Include="dialogs\UfrmBitmapEditorText.pas">
             <Form>frmBitmapEditorText</Form>
@@ -485,7 +483,6 @@
         <DCCReference Include="dockforms\UfrmTIKEDock.pas">
             <Form>TIKEDockForm</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\comp\KeymanDeveloperMemo.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\KeymanDeveloperDebuggerMemo.pas"/>
         <DCCReference Include="dockforms\UfrmCharacterMapDock.pas">
             <Form>frmCharacterMapDock</Form>

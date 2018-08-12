@@ -31,7 +31,13 @@ unit dmActionsTextEditor;  // I3306  // I3323
 interface
 
 uses
-  SysUtils, Classes, Menus, ActnList, dmActionsMain, System.Actions;
+  System.Actions,
+  System.Classes,
+  System.SysUtils,
+  Vcl.ActnList,
+  Vcl.Menus,
+
+  dmActionsMain;
 
 type
   TmodActionsTextEditor = class(TDataModule)
@@ -65,24 +71,33 @@ var
 implementation
 
 uses
+  Vcl.Forms,
+
+  KMDActionInterfaces,
+  KMDActions,
   KeyboardParser,
-  UfrmMain, Unicode,
-  UframeTextEditor, TextFileFormat, Forms, xmldoc, KeymanDeveloperMemo, utilstr;
+  TextFileFormat,
+  UframeTextEditor,
+  UfrmMain,
+  Unicode,
+  utilstr,
+  xmldoc;
 
 {$R *.dfm}
 
 procedure TmodActionsTextEditor.actTextEditor_ConvertToCharactersExecute(Sender: TObject);
-var
+{var
   ws: WideString;
   x, len: Integer;
-  memo: TKeymanDeveloperMemo;
+  memo: TframeTextEditor;
   line, seltext: WideString;
   i: Integer;
   FToCodes: Boolean;
   FError: Boolean;
   res: string;
-  FInQuotes: Boolean;
+  FInQuotes: Boolean;}
 begin
+{TODO: reimplement in JS probably better
   memo := Screen.ActiveControl as TKeymanDeveloperMemo;
   line := memo.LinesArray[memo.SelLine];
   seltext := memo.SelText;
@@ -154,31 +169,32 @@ begin
 
   memo.SelText := res;
   memo.SelStart := memo.SelStart - Length(res);
-  memo.SelLength := Length(res);
+  memo.SelLength := Length(res);}
 end;
 
 procedure TmodActionsTextEditor.actTextEditor_ConvertToCharactersUpdate(Sender: TObject);
 begin
-  actTextEditor_ConvertToCharacters.Enabled := Screen.ActiveControl is TKeymanDeveloperMemo;
+  actTextEditor_ConvertToCharacters.Enabled := KMDActions.IsTextEditor(Sender);
 end;
 
 procedure TmodActionsTextEditor.actTextEditor_ReformatXMLExecute(Sender: TObject);
 begin
-  with Screen.ActiveControl as TKeymanDeveloperMemo do
-    SetTextBuf(PWideChar(FormatXMLData(Text)));
+{TODO:  with Screen.ActiveControl as TKeymanDeveloperMemo do
+    SetTextBuf(PWideChar(FormatXMLData(Text)));}
 end;
 
 procedure TmodActionsTextEditor.actTextEditor_ReformatXMLUpdate(
   Sender: TObject);
+var
+  a: IKMDTextEditorActions;
 begin
-  actTextEditor_ReformatXML.Enabled := (Screen.ActiveControl is TKeymanDeveloperMemo) and
-    (Screen.ActiveControl.Parent is TframeTextEditor) and
-    ((Screen.ActiveControl.Parent as TframeTextEditor).EditorFormat = efXML);
+  a := KMDActions.GetTextEditorController(Screen.ActiveControl);
+  actTextEditor_ReformatXML.Enabled := Assigned(a) and (a.EditorFormat = efXML);
 end;
 
 procedure TmodActionsTextEditor.actTextEditor_ShowCharacterExecute(Sender: TObject);
 begin
-  if Screen.ActiveControl is TKeymanDeveloperMemo then
+  if KMDActions.IsTextEditor(Screen.ActiveControl) then
   begin
 
   end;
@@ -186,7 +202,7 @@ end;
 
 procedure TmodActionsTextEditor.actTextEditor_ShowCharacterUpdate(Sender: TObject);
 begin
-  actTextEditor_ConvertToCharacters.Enabled := Screen.ActiveControl is TKeymanDeveloperMemo;
+  actTextEditor_ConvertToCharacters.Enabled := KMDActions.IsTextEditor(Screen.ActiveControl);
 end;
 
 end.

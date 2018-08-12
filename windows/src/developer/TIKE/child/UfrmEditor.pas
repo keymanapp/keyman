@@ -43,11 +43,7 @@ uses
   StdCtrls, ExtCtrls, Menus, ToolWin, ComCtrls, ImgList, ErrorControlledRegistry, 
   RegistryKeys, UfrmMDIChild, MenuImgList, Printers,
   UfrmKeyTest,
-{$IFDEF USE_PLUSMEMO}
-  SyntaxHighlight,
-  HtmlHighlight,
-  pmprint,
-{$ENDIF}
+
   ProjectFile, UfrmMDIEditor,
   CaptionPanel, Grids,
   CharMapInsertMode,

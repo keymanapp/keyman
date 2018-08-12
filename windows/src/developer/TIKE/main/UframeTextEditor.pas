@@ -18,7 +18,7 @@ uses
 type
   TParColourLineType = (pcltNone, pcltBreakpoint, pcltExecutionPoint, pcltError);
 
-  TframeTextEditor = class(TTIKEForm, IKMDSearchActions, IKMDEditActions)
+  TframeTextEditor = class(TTIKEForm, IKMDSearchActions, IKMDEditActions, IKMDTextEditorActions)
     lstImages: TMenuImgList;
     dlgFonts: TFontDialog;
     dlgPrintSetup: TPrinterSetupDialog;
@@ -89,6 +89,11 @@ type
     function CanRedo: Boolean;   // I4032
     function CanSelectAll: Boolean;
     function CanClearSelection: Boolean;
+
+    { IKMDTextEditorActions }
+    function GetEditorFormat: TEditorFormat;
+    function GetSelectedRow: Integer;
+
   public
     { Public declarations }
     procedure UpdateParColour(par: Integer; LineType: TParColourLineType);
@@ -110,10 +115,9 @@ type
     procedure LoadFromStream(AStream: TStream; ATextFileFormat: TTextFileFormat); overload;  // I2964
 
     procedure SetSelectedRow(ARow: Integer);
-    function GetSelectedRow: Integer;
 
     property EditorText: WideString read GetText write SetText;
-    property EditorFormat: TEditorFormat read FEditorFormat write SetEditorFormat;
+    property EditorFormat: TEditorFormat read GetEditorFormat write SetEditorFormat;
     property OnChanged: TNotifyEvent read FOnChanged write FonChanged;
 
     property CodeFont: TFont read GetCodeFont write SetCodeFont;
@@ -232,6 +236,11 @@ begin
 //  if FEditorFormat = efHTML
 //    then Result := Memo.AltFont  // I1426 - script tags should be 'code' font
 //    else Result := Memo.Font;
+end;
+
+function TframeTextEditor.GetEditorFormat: TEditorFormat;
+begin
+  Result := FEditorFormat;
 end;
 
 function TframeTextEditor.GetText: WideString;

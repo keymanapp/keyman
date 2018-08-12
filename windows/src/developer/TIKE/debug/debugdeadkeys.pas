@@ -19,7 +19,7 @@ unit debugdeadkeys;
 
 interface
 
-uses Classes, debugkeyboard, SysUtils, KeymanDeveloperMemo
+uses Classes, debugkeyboard, SysUtils, KeymanDeveloperDebuggerMemo
 {$IFDEF USE_PLUSMEMO}
   ,
   PMSupport
@@ -38,7 +38,7 @@ type
     function GetPos2: Integer;
   public
     //Position: Integer;
-    memo: TKeymanDeveloperMemo;  // I3323
+    memo: TKeymanDeveloperDebuggerMemo;  // I3323
     Deadkey: TDebugDeadkey;
     destructor Destroy; override;
     property Position: Integer read GetPosition write SetPosition;
