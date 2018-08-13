@@ -129,6 +129,21 @@ NSString * names[nCombinations];
     }
 }
 
+- (void)testprocessEvent_eventsForOpenCurlyBraceWithCipherMusicKmx_ReturnsQstrActionForStartSlide {
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
+    UTF32Char expectedUtf32Char = 0x1D177;
+    NSString * expectedStartSlideSurrogatePair = [[NSString alloc] initWithBytes:&expectedUtf32Char length:4 encoding:NSUTF32LittleEndianStringEncoding];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:NSEventModifierFlagShift timestamp:0 windowNumber:0 context:nil characters:@"{" charactersIgnoringModifiers:@"[" isARepeat:NO keyCode:kVK_ANSI_LeftBracket];
+    NSArray *actions = [engine processEvent:event];
+    XCTAssert(actions.count == 1, @"Expected 1 action");
+    NSDictionary *action = actions[0];
+    NSString *actionType = [[action allKeys] objectAtIndex:0];
+    XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
+    NSString *output = [action objectForKey:actionType];
+    XCTAssert([output isEqualToString:expectedStartSlideSurrogatePair], @"Output incorrect");
+}
+
 - (void)testprocessEvent_eventForUnshiftedNumeralWithCipherMusicKmx_ReturnsQstrActionToInsertNumeral {
     KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
     KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];

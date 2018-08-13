@@ -1,7 +1,7 @@
 # Keyman for macOS Version History
 
-## 2018-08-10 10.0.105 stable
-* Fixed bug in engine that caused incorrect rule to be used (#1091)
+## 2018-08-10 10.0.111 stable
+* Fixed bug in engine that caused incorrect rules to be used (#1091, 1098)
 
 ## 2018-07-12 10.0.104 stable
 * Removed help button from OSK for versions of macOS < 10.10 to prevent crash (#1080)
