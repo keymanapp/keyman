@@ -21,7 +21,7 @@ For local development you do not need to perform a release build so these are op
 
 1. Install [7-Zip](http://www.7-zip.org/) 64-bit (or 32-bit on x86 Windows). 7-Zip is used for archiving build files -- may be eliminated in future.
 2. Install [HTML Help Workshop](https://www.microsoft.com/en-us/download/details.aspx?id=21138).
-4. Install [WiX](https://wix.codeplex.com/releases/view/60102) to **C:\Program Files (x86)\Windows Installer XML v3.5**.
+4. Install [WiX 3.11.1](https://github.com/wixtoolset/wix3/releases/tag/wix3111rtm) to **C:\Program Files (x86)\WiX Toolset v3.11**.
 5. Add the environment variable `KEYMAN_CEF4DELPHI_ROOT`.
 
 ## Building Keyman Desktop and Keyman Developer
