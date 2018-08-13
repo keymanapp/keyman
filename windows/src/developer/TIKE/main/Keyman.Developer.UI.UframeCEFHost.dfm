@@ -20,10 +20,6 @@ inherited frameCEFHost: TframeCEFHost
     Height = 645
     Align = alClient
     TabOrder = 0
-    ExplicitLeft = 440
-    ExplicitTop = 320
-    ExplicitWidth = 100
-    ExplicitHeight = 40
   end
   object tmrRefresh: TTimer
     Enabled = False

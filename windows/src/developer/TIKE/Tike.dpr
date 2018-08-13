@@ -100,7 +100,6 @@ uses
   CompileKeymanWeb in 'compile\CompileKeymanWeb.pas',
   KeymanWebKeyCodes in 'compile\KeymanWebKeyCodes.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
-  MSHTML_TLB in '..\..\global\delphi\tlb\MSHTML_TLB.pas',
   OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
   ADOX_TLB in '..\..\global\delphi\tlb\ADOX_TLB.pas',
   ADODB_TLB in '..\..\global\delphi\tlb\ADODB_TLB.pas',
@@ -121,7 +120,6 @@ uses
   OnScreenKeyboard in '..\..\global\delphi\comp\OnScreenKeyboard.pas',
   ExtShiftState in '..\..\global\delphi\comp\ExtShiftState.pas',
   CleartypeDrawCharacter in '..\..\global\delphi\general\CleartypeDrawCharacter.pas',
-  webbrowserfocusmonitor in '..\..\global\delphi\comp\webbrowserfocusmonitor.pas',
   CharMapDropTool in 'main\CharMapDropTool.pas',
   CharMapDropTool_PlusMemoU in 'main\CharMapDropTool_PlusMemoU.pas',
   CharMapDropTool_EmbeddedWB in 'main\CharMapDropTool_EmbeddedWB.pas',
@@ -176,7 +174,6 @@ uses
   usp10 in '..\..\global\delphi\general\usp10.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   utilmsxml in '..\..\global\delphi\general\utilmsxml.pas',
-  KeymanEmbeddedWB in '..\..\global\delphi\comp\KeymanEmbeddedWB.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   UframeBitmapEditor in 'main\UframeBitmapEditor.pas' {frameBitmapEditor: TFrame},
   UfrmMessages in 'main\UfrmMessages.pas' {frmMessages},
@@ -271,9 +268,10 @@ uses
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   Keyman.Developer.System.CEFManager in 'main\Keyman.Developer.System.CEFManager.pas',
   Keyman.Developer.System.HttpServer.Debugger in 'http\Keyman.Developer.System.HttpServer.Debugger.pas',
-  Keyman.Developer.System.HttpServer.App in 'Keyman.Developer.System.HttpServer.App.pas',
+  Keyman.Developer.System.HttpServer.App in 'http\Keyman.Developer.System.HttpServer.App.pas',
   Keyman.Developer.System.HttpServer.Base in 'http\Keyman.Developer.System.HttpServer.Base.pas',
-  UfrmProject in 'project\UfrmProject.pas' {frmProject};
+  UfrmProject in 'project\UfrmProject.pas' {frmProject},
+  Keyman.Developer.System.HttpServer.AppSource in 'http\Keyman.Developer.System.HttpServer.AppSource.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

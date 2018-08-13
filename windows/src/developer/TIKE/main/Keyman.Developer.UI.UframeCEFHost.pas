@@ -30,6 +30,7 @@ const
   CEF_DESTROY = WM_USER + 300;
   CEF_AFTERDESTROY = WM_USER + 301;
   CEF_AFTERCREATE = WM_USER + 302;
+  CEF_SHOW = WM_USER + 303;
 
 type
   TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url: string; out Result: Boolean) of object;
@@ -99,6 +100,7 @@ type
 
     procedure CreateBrowser;
     procedure Navigate; overload;
+    procedure CEFShow(var message: TMessage); message CEF_SHOW;
   public
     procedure SetFocus; override;
     procedure StartClose;
@@ -163,6 +165,11 @@ end;
 procedure TframeCEFHost.FormShow(Sender: TObject);
 begin
   inherited;
+  PostMessage(Handle, CEF_SHOW, 0, 0);
+end;
+
+procedure TframeCEFHost.CEFShow(var message: TMessage);
+begin
   CreateBrowser;
 end;
 

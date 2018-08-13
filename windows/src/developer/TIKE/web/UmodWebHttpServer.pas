@@ -44,6 +44,7 @@ uses
   IdHTTPServer,
 
   Keyman.Developer.System.HttpServer.App,
+  Keyman.Developer.System.HttpServer.AppSource,
   Keyman.Developer.System.HttpServer.Debugger;
 
 type
@@ -56,9 +57,11 @@ type
     procedure DataModuleDestroy(Sender: TObject);
   private
     FApp: TAppHttpResponder;
+    FAppSource: TAppSourceHttpResponder;
     FDebugger: TDebuggerHttpResponder;
     function GetApp: TAppHttpResponder;
     function GetDebugger: TDebuggerHttpResponder;
+    function GetAppSource: TAppSourceHttpResponder;
   public
     function GetURL: string;
     function GetLocalhostURL: string;
@@ -67,6 +70,7 @@ type
 
     property Debugger: TDebuggerHttpResponder read GetDebugger;
     property App: TAppHttpResponder read GetApp;
+    property AppSource: TAppSourceHttpResponder read GetAppSource;
   end;
 
 var
@@ -130,6 +134,10 @@ end;
 procedure TmodWebHttpServer.DataModuleDestroy(Sender: TObject);
 begin
   http.Active := False;   // I4036
+
+  FreeAndNil(FApp);
+  FreeAndNil(FAppSource);
+  FreeAndNil(FDebugger);
 end;
 
 function TmodWebHttpServer.GetApp: TAppHttpResponder;
@@ -137,6 +145,13 @@ begin
   if not Assigned(FApp) then
     FApp := TAppHttpResponder.Create;
   Result := FApp;
+end;
+
+function TmodWebHttpServer.GetAppSource: TAppSourceHttpResponder;
+begin
+  if not Assigned(FAppSource) then
+    FAppSource := TAppSourceHttpResponder.Create;
+  Result := FAppSource;
 end;
 
 function TmodWebHttpServer.GetAppURL(s: string): string;
@@ -232,6 +247,12 @@ begin
   try
     doc := ARequestInfo.Document;
     Delete(doc, 1, 1);
+
+    if Copy(doc, 1, 11) = 'app/source/' then
+    begin
+      AppSource.ProcessRequest(AContext, ARequestInfo, AResponseInfo);
+      Exit;
+    end;
 
     if Copy(doc, 1, 4) = 'app/' then
     begin
