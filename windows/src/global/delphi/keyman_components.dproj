@@ -79,7 +79,7 @@
         <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <DCC_Define>$(USE_PLUSMEMO);$(DCC_Define)</DCC_Define>
+        <DCC_Define>$(DCC_Define)</DCC_Define>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -88,7 +88,7 @@
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <DCC_Define>$(USE_PLUSMEMO);$(DCC_Define)</DCC_Define>
+        <DCC_Define>$(DCC_Define)</DCC_Define>
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
         <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
         <VerInfo_Locale>1033</VerInfo_Locale>

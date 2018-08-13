@@ -1460,9 +1460,7 @@ procedure TfrmDebug.ClearDeadkeyStyle;
 begin
   if Assigned(FSelectedDeadkey) then
   begin
-{$IFDEF TODO_USE_PLUSMEMO}
-    memo.ClearStyleRange(FSelectedDeadkey.Position,FSelectedDeadkey.Position+1);
-{$ENDIF}
+    // TODO: clear the style from the debug memo?? -- how do we do this (RTF?)?
     FSelectedDeadkey := nil;
   end;
 end;
@@ -1472,10 +1470,7 @@ begin
   ClearDeadkeyStyle;
   if not Assigned(DeadKey) then Exit;
   FSelectedDeadkey := DeadKey; //lbDeadkeys.Items.Objects[lbDeadkeys.ItemIndex] as TDeadKeyInfo;
-{$IFDEF TODO_USE_PLUSMEMO}
-  memo.SetDynStyle(FSelectedDeadkey.Position, FSelectedDeadkey.Position+1, [fsBold], False,
-      0, crDefault, clYellow, clBlue, False);
-{$ENDIF}
+// TODO: set the style in the debug memo?? -- how do we do this (RTF?)?
 end;
 
 procedure TfrmDebug.memoChange(Sender: TObject);
