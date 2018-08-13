@@ -158,7 +158,7 @@ HHC=\progra~1\htmlhe~1\hhc
 NMAKE=nmake.exe
 CL=cl.exe 
 MSBUILD=msbuild.exe /maxcpucount
-MT="C:\Program Files (x86)\Windows Kits\8.0\bin\x86\mt.exe"
+MT="C:\Program Files (x86)\Windows Kits\8.1\bin\x86\mt.exe"
 VCBUILD=error
 
 !IFDEF DEBUG
@@ -194,7 +194,7 @@ TDS2DBG=$(ROOT)\bin\buildtools\tds2dbg
 
 MAKEJCLDBG=$(ROOT)\bin\buildtools\makejcldbg.exe -E
 
-WIXPATH="c:\program files (x86)\windows installer xml v3.5\bin"
+WIXPATH="c:\program files (x86)\WiX Toolset v3.11\bin"
 WIXCANDLE=$(WIXPATH)\candle.exe -wx
 
 !IFDEF LINT

@@ -182,7 +182,7 @@ void UninitDebugging()
 
 const TSDMState DebugState[] = {sdmInternat, sdmAIDefault, sdmMessage, sdmKeyboard, sdmGlobal, sdmMenu, sdmDebug, sdmLoad, sdmOther};
 
-inline BOOL ShouldDebug_1() //TSDMState state)
+BOOL ShouldDebug_1() //TSDMState state)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
