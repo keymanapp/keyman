@@ -3,8 +3,8 @@
 ## 11.0 alpha
 * Refactored target-action call from keyView
 
-## 2018-08-10 10.0.109 stable 
-* Fixed bug in engine that caused incorrect rule to be used (#1091, #1095)
+## 2018-08-13 10.0.111 stable 
+* Fixed bug in engine that caused incorrect rule to be used (#1091, #1095, #1099)
 
 ## 2018-07-12 10.0.104 stable
 * Removed help button from OSK for versions of macOS < 10.10 to prevent crash (#1080, #1081)
