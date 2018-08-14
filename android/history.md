@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 2018-08-16 10.0.503 stable
+* Fixes crash for release configurations when InputConfiguration is null (#1103)
+
 ## 2018-07-06 10.0.502 stable
 * Fixes issue for embedded Android, iOS apps where a keyboard with varying row counts in different layers could crash (#1055)
 
