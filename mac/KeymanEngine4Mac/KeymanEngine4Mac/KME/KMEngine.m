@@ -175,7 +175,8 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
         return nil; // Engine should NEVER attempt to process characters when the Command key is pressed.
     
     // REVIEW: Might need to use charactersIgnoringModifiers instead of characters to avoid
-    // getting Mac predefined subsitutions for Option + ??? keystrokes
+    // getting Mac predefined subsitutions for Option + ??? keystrokes. But at least for the normal
+    // case of shifted characters, what we have is what we want.
     NSString *characters = [event characters];
     //NSString *characters = [event charactersIgnoringModifiers];
     if (self.debugMode) {
@@ -308,7 +309,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     }
                 }
             }
-            else {
+            else if (!(mask & K_MODIFIERFLAG) || mask == K_SHIFTFLAG) {
                 //if (self.debugMode)
                 //NSLog(@"No shift flags!");
                 if (!key.context.length) {

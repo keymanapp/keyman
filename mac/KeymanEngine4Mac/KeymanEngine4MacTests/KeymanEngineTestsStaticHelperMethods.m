@@ -22,4 +22,10 @@
     KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
     return kmxFile;
 }
+
++ (KMXFile *)getKmxFileForCipherMusicTests {
+    NSString *path = [[NSBundle bundleForClass:[KeymanEngineTestsStaticHelperMethods class]] pathForResource:@"CipherMusicUnicode.kmx" ofType:nil];
+    KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
+    return kmxFile;
+}
 @end
