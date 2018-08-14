@@ -8,7 +8,7 @@
 4. Follow steps in /web/README.md to install prerequisites for building KeymanWeb (included in Keyman Developer)
 5. Add the Keyman root folder to antivirus exclusions for performance and file lock reasons (optional - but highly recommended).
 6. Start Delphi 10.2 IDE once after installation to create default environment files and ensure registration is complete.
-7. Set environment variables per [notes below](#environment-variables): `KEYMAN_ROOT`, `DELPHI_STARTER`, `USERDEFINES`, 
+7. Set environment variables per [notes below](#environment-variables): `KEYMAN_ROOT`, `USERDEFINES`, 
    `GIT_BASH_FOR_KEYMAN`.
 8. Add the **windows/lib** folder in the Keyman repository to your `PATH` environment variable (required for packages in Delphi).
 9. In order to run Keyman Developer in the development build, you need to specify where the 
@@ -93,13 +93,12 @@ Configure Visual Studio to use two-space tab stops:
 
 ### Delphi setup requirements
 
-Delphi Starter Edition is free and can be downloaded [here](https://www.embarcadero.com/products/delphi/starter).
-Some features of Keyman are [limited](#delphi_starter---building-with-delphi-starter-edition) when built using
-the Starter Edition. You must set the `DELPHI_STARTER` environment variable when using the Starter Edition.
+Delphi Community Edition is free and can be downloaded [here](https://www.embarcadero.com/products/delphi/????).
 
 Install Delphi using the following options:
-* Windows 32 and 64 bit (note: Delphi Starter only has 32 bit)
-* No 3rd party components required
+* Windows 32 and 64 bit
+* DUnit components
+* No other 3rd party components required
 * No Interbase components required
 
 ## Environment Variables
@@ -128,28 +127,6 @@ SET GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Prog
 ```
 
 You should verify the install location of Git on your computer as it may vary.
-
-### DELPHI_STARTER - Building with Delphi Starter Edition
-
-Keyman can be built from the command line with Delphi Starter Edition. You will need
-to set the environment variable `DELPHI_STARTER` to enable a command line build with
-Delphi Starter Edition.
-
-However, there are three limitations:
-
-1. As the command line compiler is not included in Delphi Starter Edition, the build 
-   launches an instance of the IDE to run the build. This means that while you are doing
-   a build, the Delphi IDE will be continually starting and stopping; it is also 
-   significantly slower than the command line compiler.  After you complete an initial
-   full build from the command line, you should be able to build individual projects 
-   within the IDE.
-   
-2. Delphi Starter Edition does not include the x64 compiler, impacting tsysinfo and
-   kmcomapi. tsysinfox64 will be copied from a binary already in the repository. 
-   The x64 version of kmcomapi.dll will not be skipped.
-
-3. You cannot make a release build with Delphi Starter due to the missing x64 
-   components.
 
 ### USERDEFINES - User Defines
 

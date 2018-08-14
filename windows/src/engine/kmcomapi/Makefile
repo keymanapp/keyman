@@ -13,7 +13,6 @@ build: version.res manifest.res kbd_noicon.res dirs
     $(COPY) $(WIN32_TARGET_PATH)\kmcomapi.dll $(PROGRAM)\engine
     if exist $(WIN32_TARGET_PATH)\kmcomapi.dbg $(COPY) $(WIN32_TARGET_PATH)\kmcomapi.dbg $(DEBUGPATH)\engine
 
-!IFNDEF DELPHI_STARTER
     $(DELPHI_MSBUILD) kmcomapi.dproj /p:Platform=Win64
 
     if exist $(WIN64_TARGET_PATH)\kmcomapi.x64.dll del $(WIN64_TARGET_PATH)\kmcomapi.x64.dll
@@ -22,7 +21,6 @@ build: version.res manifest.res kbd_noicon.res dirs
     ren $(WIN64_TARGET_PATH)\kmcomapi.dll kmcomapi.x64.dll
     $(COPY) $(WIN64_TARGET_PATH)\kmcomapi.x64.dll $(PROGRAM)\engine\kmcomapi.x64.dll
     if exist $(WIN64_TARGET_PATH)\kmcomapi.dbg $(COPY) $(WIN64_TARGET_PATH)\kmcomapi.dbg $(DEBUGPATH)\engine\kmcomapi.x64.dbg
-!ENDIF
 
 kbd_noicon.res: kbd_noicon.rc
     rc $?
@@ -35,20 +33,16 @@ clean: def-clean
 
 signcode:
     $(SIGNCODE) /d "Keyman Engine" $(PROGRAM)\engine\kmcomapi.dll
-!IFNDEF DELPHI_STARTER
     $(SIGNCODE) /d "Keyman Engine" $(PROGRAM)\engine\kmcomapi.x64.dll
-!ENDIF
 
 install:
     cmd /c regsvr32 /s /u "$(INSTALLPATH_KEYMANENGINE)\kmcomapi.dll"
     $(COPY) $(PROGRAM)\engine\kmcomapi.dll "$(INSTALLPATH_KEYMANENGINE)"
     cmd /c regsvr32 /s "$(INSTALLPATH_KEYMANENGINE)\kmcomapi.dll"
 
-!IFNDEF DELPHI_STARTER
     cmd /c regsvr32 /s /u "$(INSTALLPATH_KEYMANENGINE)\kmcomapi.x64.dll"
     $(COPY) $(PROGRAM)\engine\kmcomapi.x64.dll "$(INSTALLPATH_KEYMANENGINE)"
     cmd /c regsvr32 /s "$(INSTALLPATH_KEYMANENGINE)\kmcomapi.x64.dll"
-!ENDIF
     
 backup:
     $(WZZIP) $(BUILD)\engine\kmcomapi.zip  $(BACKUPDEFAULTS) $(WIN32_TARGET_PATH)\kmcomapi.dll $(WIN64_TARGET_PATH)\kmcomapi.x64.dll $(WIN32_TARGET_PATH)\kmcomapi.dbg
