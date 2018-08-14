@@ -5,6 +5,7 @@ window.editorGlobalContext = {
 (function(context) {
   var editor = null;
   var errorRange = null;
+  var ranges = [];
   let params = (new URL(location)).searchParams;
   let filename = params.get('filename');
   let mode = params.get('mode');
@@ -40,8 +41,34 @@ window.editorGlobalContext = {
   context.editSelectAll = function() {
     editor.selectAll();
   };
+
+  /* Row selection */
+
+  context.moveCursor = function (o) {
+    editor.moveCursorTo(o.row, o.column);
+    editor.renderer.scrollCursorIntoView();
+  };
   
   /* Error highlighting */
+  
+  context.setRowColor = function(o) {
+    if (o.style) {
+      var r = new ace.Range(o.row, 0, o.row, Infinity);
+      r.row = o.row;
+      r.id = editor.session.addMarker(r, 'km_'+o.style, "fullLine", false);
+      ranges.push(r);
+    } else {
+      ranges = ranges.filter(function (v) {
+        if (v.row !== o.row) {
+          return true;
+        }
+        editor.session.removeMarker(v.id);
+        return false;
+      });
+    }
+    editor.moveCursorTo(o.row, 0);
+    editor.renderer.scrollCursorIntoView();
+  };
   
   context.highlightError = function(row) {
     if(errorRange) {
@@ -88,7 +115,7 @@ window.editorGlobalContext = {
     command(editor.session.getUndoManager().hasUndo() ? 'undo-enable' : 'undo-disable');
     command(editor.session.getUndoManager().hasRedo() ? 'redo-enable' : 'redo-disable');
     let c = editor.selection.getCursor();
-    command('location,Line '+(c.row+1)+', Col '+(c.column+1));
+    command('location,'+c.row+','+c.column);
     command('insert-mode,'+(editor.session.getOption('overwrite') ? 'Overwrite' : 'Insert'));
 //    command(editor.session.getUndoManager().isClean() ? 'modified' : 'not-modified');
     var s = getTokenAtCursor();

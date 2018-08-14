@@ -4,6 +4,7 @@
     <Directory Id='xml_app_editor' Name='editor'  FileSource='..\..\developer\tike\xml\app\editor\'>
       <Component Id="xml_app_editor" Guid="{BB720CC6-F410-42EE-A391-C5F573B52842}" Location="local" DiskId="1">
         <File Name="editor.js" KeyPath="yes" />
+        <File Name="editor.css" />
         <File Name="index.html" />
       </Component>
     </Directory>

@@ -1,0 +1,37 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+#editor { 
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.ace_marker-layer .km_error,
+.ace_marker-layer .km_pcltBreakpoint,
+.ace_marker-layer .km_pcltExecutionPoint,
+.ace_marker-layer .km_pcltError {
+    position: absolute;
+    z-index: 3;
+}
+
+/*.ace-chrome*/ .ace_marker-layer .km_error {
+  background: rgb(255, 128, 128);
+}
+
+/*.ace-chrome*/ .ace_marker-layer .km_pcltBreakpoint {
+  background-color: forestgreen;
+}
+
+/*.ace-chrome*/ .ace_marker-layer .km_pcltExecutionPoint {
+    background-color: deepskyblue;
+}
+
+/*.ace-chrome*/ .ace_marker-layer .km_pcltError {
+    background: rgb(255, 128, 128);
+}
+                

@@ -1074,20 +1074,13 @@ var
   oldline: Integer;
 begin
   oldline := FExecutionPointLine;
-//TODO:  if ALine >= EditorMemo.LineCount then ALine := -1;
   FExecutionPointLine := ALine;
   if IsBreakPointLine(oldline)
     then UpdateParColour(oldline, pcltBreakpoint)
     else UpdateParColour(oldline, pcltNone);
   if FRunning then Exit;
-  UpdateParColour(FExecutionPointLine, pcltExecutionPoint);
-
   if FExecutionPointLine >= 0 then
-  begin
-    //TODO:EditorMemo.SelLine := FExecutionPointLine;
-    //TODO:EditorMemo.SelCol := 0;
-    //TODO:EditorMemo.ScrollInView;
-  end;
+    UpdateParColour(FExecutionPointLine, pcltExecutionPoint);
 end;
 
 procedure TfrmDebug.ListBreakpoints;
