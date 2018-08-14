@@ -3,7 +3,10 @@
 ## 2018-08-14 10.0.111 stable
 * CORRECLTY fixed bug in engine that caused incorrect rules to be used (#1099)
 
-## 2018-08-10 10.0.105 stable
+## 2018-08-10 10.0.110 stable
+* No change
+
+## 2018-08-10 10.0.109 stable
 * DO NOT USE - Faulty attempt at bug fix in engine (#1091)
 
 ## 2018-07-12 10.0.104 stable
