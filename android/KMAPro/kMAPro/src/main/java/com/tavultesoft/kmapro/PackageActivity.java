@@ -134,7 +134,7 @@ public class PackageActivity extends Activity {
       webView.loadUrl("file:///" + files[0].getAbsolutePath());
     } else {
       // No welcome.htm so display minimal package information
-      String keyboardString = (pkgName.toLowerCase().endsWith("keyboard")) ? "" : " Keyboard ";
+      String keyboardString = (pkgName != null && pkgName.toLowerCase().endsWith("keyboard")) ? "" : " Keyboard ";
       String htmlString = String.format(
         "<body style=\"max-width:600px;\"><H1>The %s%s Package</H1></body>",
         pkgName, keyboardString);
