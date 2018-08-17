@@ -264,8 +264,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         case "file":
           checkStoragePermission(data);
           break;
-        // Intending to deprecate keyman:// protocol in https://github.com/keymanapp/keyman/issues/538
-        case "keyman" :
         case "http" :
         case "https" :
           Intent downloadIntent;
