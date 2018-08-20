@@ -130,9 +130,9 @@ public final class KMManager {
   public static final String KMDefault_AssetPackages = "packages";
 
   // Default Keyboard Info
-  public static final String KMDefault_KeyboardID = "european2";
+  public static final String KMDefault_KeyboardID = "sil_euro_latin";
   public static final String KMDefault_LanguageID = "en";
-  public static final String KMDefault_KeyboardName = "EuroLatin2 Keyboard";
+  public static final String KMDefault_KeyboardName = "EuroLatin (SIL) Keyboard";
   public static final String KMDefault_LanguageName = "English";
   public static final String KMDefault_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
 
@@ -524,7 +524,7 @@ public final class KMManager {
       boolean shouldClearCache = false;
       HashMap<String, String> kbInfo = kbList.get(0);
       String kbID = kbInfo.get(KMKey_KeyboardID);
-      if (kbID.equals("us")) {
+      if (kbID.equals("us") || (kbID.equals("european2"))) {
         HashMap<String, String> newKbInfo = new HashMap<String, String>();
         newKbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
         newKbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
