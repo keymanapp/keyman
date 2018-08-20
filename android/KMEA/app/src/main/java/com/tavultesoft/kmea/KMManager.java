@@ -1733,8 +1733,10 @@ public final class KMManager {
           }
 
           InputConnection ic = IMService.getCurrentInputConnection();
-          if ((ic == null) && isDebugMode()) {
-            Log.w("SWK: JS Handler", "insertText failed: InputConnection is null");
+          if (ic == null) {
+            if (isDebugMode()) {
+              Log.w("SWK: JS Handler", "insertText failed: InputConnection is null");
+            }
             return;
           }
 
