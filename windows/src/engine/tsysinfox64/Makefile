@@ -4,18 +4,10 @@
 
 !include ..\..\Defines.mak
 
-!ifdef DELPHI_STARTER
-build: dirs
-    # Delphi Starter does not support x64 compilation
-    # so we will just copy a version we have prepared
-    # earlier.
-    $(COPY) tsysinfox64.bin $(PROGRAM)\engine\tsysinfox64.exe
-!else
 build: version.res manifest.res dirs
     -md x64
     $(DCC64) tsysinfox64.dpr
     $(COPY) x64\tsysinfox64.exe $(PROGRAM)\engine
-!endif
 
 clean: def-clean
 

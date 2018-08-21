@@ -32,10 +32,6 @@ INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine $(KEYMAN
   DELPHI_MSBUILD_FLAG_DEBUG=/p:Config=Release
 !ENDIF
 
-!IFDEF DELPHI_STARTER
-  MAKEFLAG_DELPHI_STARTER=-DDELPHI_STARTER
-!ENDIF
-
 !IFDEF USERDEFINES
   MAKEFLAG_USERDEFINES=-DUSERDEFINES
 !ENDIF
@@ -68,7 +64,7 @@ INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine $(KEYMAN
 !ENDIF
 !ENDIF
 
-MAKE=$(MAKE) -l $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET) $(MAKEFLAG_DELPHI_STARTER)
+MAKE=$(MAKE) -l $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET)
 
 #
 # Delphi build commands
@@ -87,10 +83,6 @@ DELPHIDPRPARAMS=-Q -B -GD -H -VT -$C+ -$D+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(D
 DELPHIDPRPARAMS64=-Q -B -GD -H -VT -$C+ -$D+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win
 DELPHIDPKPARAMS=-Q -B -GD -VT -$C+ -$D+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -LE$(OUTLIB) -LN$(OUTLIB) -NSData
 
-!IFDEF DELPHI_STARTER
-DCC32=@$(DEVTOOLS) -dccx
-DCC32DPK=@$(DEVTOOLS) -dccx
-!ELSE
 !IFDEF NOUI
 DCC32=dcc32.exe $(DELPHIDPRPARAMS)
 DCC32DPK=dcc32.exe $(DELPHIDPKPARAMS)
@@ -103,7 +95,6 @@ DCC32=@$(DEVTOOLS) -dcc $(DELPHIDPRPARAMS)
 DCC32DPK=@$(DEVTOOLS) -dcc $(DELPHIDPKPARAMS)
 !ENDIF
 !ENDIF
-!ENDIF
 
 DCC64=dcc64.exe $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 
@@ -111,20 +102,12 @@ DCC64=dcc64.exe $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 # Delphi MSBuild related commands and macros
 #
 
-!IFDEF DELPHI_STARTER
-DELPHI_MSBUILD=@$(DEVTOOLS) -dccx
-!ELSE
 DELPHI_MSBUILD=$(ROOT)\src\buildtools\msbuild-wrapper.bat $(DELPHI_MSBUILD_FLAG_DEBUG)
-!ENDIF
 
 !IFDEF DEBUG
 TARGET_PATH=Debug
 !ELSE
-! IFDEF DELPHI_STARTER
-TARGET_PATH=Debug
-! ELSE
 TARGET_PATH=Release
-! ENDIF
 !ENDIF
 
 WIN32_TARGET_PATH=Win32\$(TARGET_PATH)
@@ -166,16 +149,7 @@ XSLTPROC=$(ROOT)\src\ext\libxslt\xsltproc.exe
 # TDSPACK=error! $(ROOT)\src\buildtools\tdspack\tdspack -e
 # TDSPACKCOMPRESS=error! $(ROOT)\src\buildtools\tdspack\tdspack -o
 
-!IFDEF DELPHI_STARTER
-#
-# The Delphi Starter build does not generate .tds files for projects
-# by default so we just ignore this. We don't really need to have
-# the .dbg files for most developers anyway, just for release builds
-#
-TDS2DBG=rem
-!ELSE
 TDS2DBG=$(ROOT)\bin\buildtools\tds2dbg
-!ENDIF
 
 MAKEJCLDBG=$(ROOT)\bin\buildtools\makejcldbg.exe -E
 
