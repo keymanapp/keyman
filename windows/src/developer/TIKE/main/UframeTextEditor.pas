@@ -30,6 +30,8 @@ type
     class var FInitialFilenameIndex: Integer;
   private
 
+    FSelectedRow: Integer;
+    FSelectedCol: Integer;
     FCanUndo: Boolean;
     FCanRedo: Boolean;
     FHasSelection: Boolean;
@@ -46,7 +48,7 @@ type
     procedure SetText(Value: WideString);
     procedure SetEditorFormat(const Value: TEditorFormat);
     procedure Changed;
-    procedure UpdateState(const ALocation: string);
+    procedure UpdateState(ALocation: string);
     procedure ClearError;
     procedure SetCharFont(const Value: TFont);
     procedure SetCodeFont(const Value: TFont);
@@ -62,6 +64,7 @@ type
     procedure UpdateInsertState(const AMode: string);
     procedure ExecuteCommand(const command: string; const parameters: TJSONValue = nil);
     procedure UpdateToken(command: string);
+    procedure SetCursorPosition(AColumn, ARow: Integer);
   protected
     function GetHelpTopic: string; override;
 
@@ -128,6 +131,7 @@ type
 implementation
 
 uses
+  System.TypInfo,
   Vcl.Clipbrd,
   Keyman.Developer.System.HelpTopics,
 
@@ -484,6 +488,21 @@ end;
 
 procedure TframeTextEditor.SetSelectedRow(ARow: Integer);
 begin
+  SetCursorPosition(0, ARow);
+end;
+
+procedure TframeTextEditor.SetCursorPosition(AColumn, ARow: Integer);
+var
+  j: TJSONObject;
+begin
+  j := TJSONObject.Create;
+  try
+    j.AddPair('row', TJSONNumber.Create(ARow));
+    j.AddPair('column', TJSONNumber.Create(AColumn));
+    ExecuteCommand('moveCursor', j);
+  finally
+    j.Free;
+  end;
 {TODO:
   if (ALine >= EditorMemo.LineCount) or (ALine < 0) then Exit;
   EditorMemo.SelLine := ALine;
@@ -495,8 +514,7 @@ end;
 
 function TframeTextEditor.GetSelectedRow: Integer;
 begin
-  // TODO
-  Result := 0;
+  Result := FSelectedRow;
 end;
 
 procedure TframeTextEditor.SetText(Value: WideString);
@@ -531,13 +549,15 @@ begin
   // TODO: syntax colouring
 end;
 
-procedure TframeTextEditor.UpdateState(const ALocation: string);
+procedure TframeTextEditor.UpdateState(ALocation: string);
 begin
   if cef.HasFocus then
   begin
     if ALocation <> '' then
     begin
-      frmKeymanDeveloper.barStatus.Panels[0].Text := ALocation;
+      FSelectedRow := StrToIntDef(StrToken(ALocation, ','),0);
+      FSelectedCol := StrToIntDef(ALocation,0);
+      frmKeymanDeveloper.barStatus.Panels[0].Text := Format('Line %d, Col %d', [FSelectedRow+1,FSelectedCol+1]);
     end;
   end;
 end;
@@ -807,18 +827,18 @@ end;
 
 procedure TframeTextEditor.UpdateParColour(par: Integer; LineType: TParColourLineType);
 var
-  FGColor, BGColor: TColor;
+  j: TJSONObject;
 begin
   if par < 0 then Exit;
-  case LineType of
-    pcltNone: begin FGColor := -1; BGColor := -1; end;
-    pcltBreakpoint: begin FGColor := clWhite; BGColor := clRed; end;
-    pcltExecutionPoint: begin FGColor := clWhite; BGColor := clBlue; end;
-    pcltError: begin FGColor := clWhite; BGColor := clMaroon; end;
-    else Exit;
+  j := TJSONObject.Create;
+  try
+    j.AddPair('row', TJSONNumber.Create(par));
+    if LineType <> pcltNone then
+      j.AddPair('style', TJSONString.Create(GetEnumName(TypeInfo(TParColourLineType), Ord(LineType))));
+    ExecuteCommand('setRowColor', j);
+  finally
+    j.Free;
   end;
-
-  // TODO: set paragraph colour
 end;
 
 

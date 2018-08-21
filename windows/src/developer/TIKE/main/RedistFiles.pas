@@ -140,7 +140,14 @@ end;
 
 function GetCEFPath: string;
 begin
-  Result := GetDebugPath('Debug_CEFPath', ExtractFilePath(ParamStr(0))+'cef\');
+  Result := GetDebugPath('Debug_CEFPath', '');
+  if Result = '' then
+  begin
+    Result := GetEnvironmentVariable('KEYMAN_CEF4DELPHI_ROOT');
+    if Result = ''
+      then Result := ExtractFilePath(ParamStr(0))+'cef\'
+      else Result := IncludeTrailingPathDelimiter(Result);
+  end;
 end;
 
 function GetLayoutBuilderPath: string;   // I3885
