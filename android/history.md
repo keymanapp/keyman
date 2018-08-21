@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 2018-08-23 10.0.504 stable
+* Validate keyboard ID when downloading keyboard from Keyman cloud (#1121)
+
 ## 2018-08-16 10.0.503 stable
 * Fixes crashes for release configurations when InputConfiguration or package name is null (#1103)
 
