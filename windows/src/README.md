@@ -93,7 +93,7 @@ Configure Visual Studio to use two-space tab stops:
 
 ### Delphi setup requirements
 
-Delphi Community Edition is free and can be downloaded [here](https://www.embarcadero.com/products/delphi/????).
+Delphi Community Edition is free and can be downloaded [here](https://www.embarcadero.com/products/delphi/starter/free-download).
 
 Install Delphi using the following options:
 * Windows 32 and 64 bit
