@@ -3,8 +3,8 @@
 
 ## 11.0 alpha
 * Move to 11.0
-* Add round launcher icons
-* Breaking change - Remove ad-hoc distribution of keyboards via `keyman://` protocol
+* Add round launcher icons (#1077)
+* Breaking change - Remove ad-hoc distribution of keyboards via `keyman://` protocol (#1109)
 
 ## 2018-07-06 10.0.502 stable
 * Fixes issue for embedded Android, iOS apps where a keyboard with varying row counts in different layers could crash (#1055)
