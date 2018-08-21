@@ -94,6 +94,8 @@
               <?include cef.wxi ?>
 
               <Directory Id='xml' Name='xml'>
+                <?include app.wxi ?>
+                
                 <Directory Id='xmlcommon' Name='common' />
                 <Directory Id='xmlproject' Name='project' FileSource='..\..\developer\tike\xml\project\'>
                   
@@ -465,6 +467,11 @@
       <ComponentRef Id='xml_file_layoutbuilder_tablet_ipad_landscape.png'/>
       <ComponentRef Id='xml_file_layoutbuilder_tablet_ipad_portrait.png'/>
       <ComponentRef Id='xml_file_layoutbuilder_keymanweb_osk2.ttf'/>
+      
+      <ComponentRef Id="xml_app_editor" />
+      <ComponentRef Id="xml_app_lib_ace" />
+      <ComponentRef Id="xml_app_lib_ace_snippets" />
+      <ComponentRef Id="xml_app_lib_jquery" />
       
       <MergeRef Id='keymanengine' />
     </Feature>

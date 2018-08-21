@@ -10,7 +10,7 @@ uses
 type
   TBaseHttpResponder = class
   protected
-    procedure RespondFile(const AFileName: string; AContext: TIdContext;
+    procedure RespondFile(AFileName: string; AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
     procedure Respond404(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
@@ -33,11 +33,16 @@ begin
   AResponseInfo.ResponseText := 'File not found';
 end;
 
-procedure TBaseHttpResponder.RespondFile(const AFileName: string;
+procedure TBaseHttpResponder.RespondFile(AFileName: string;
   AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo;
   AResponseInfo: TIdHTTPResponseInfo);
 begin
   // Serve the file
+
+  if DirectoryExists(AFileName) then
+  begin
+    AFileName := IncludeTrailingPathDelimiter(AFileName) + 'index.html';
+  end;
 
   if not FileExists(AFileName) then
   begin

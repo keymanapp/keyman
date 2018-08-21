@@ -22,7 +22,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, UfrmTike, KeymanDeveloperMemo;
+  StdCtrls, UfrmTike;
 
 type
   TfrmRegressionTestFailure = class(TTIKEForm)
@@ -31,8 +31,8 @@ type
     lblEvent: TLabel;
     Label4: TLabel;
     Label5: TLabel;
-    memoExpected: TKeymanDeveloperMemo;
-    memoActual: TKeymanDeveloperMemo;
+    memoExpected: TMemo;
+    memoActual: TMemo;
     cmdOk: TButton;
     Label3: TLabel;
     lblTestName: TLabel;

@@ -96,7 +96,7 @@
         <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <DCC_Define>$(USE_PLUSMEMO);$(DCC_Define)</DCC_Define>
+        <DCC_Define>$(DCC_Define)</DCC_Define>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
@@ -104,7 +104,7 @@
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <DCC_Define>$(USE_PLUSMEMO);$(DCC_Define)</DCC_Define>
+        <DCC_Define>$(DCC_Define)</DCC_Define>
         <DCC_UnitSearchPath>C:\keyman\10.0\src\ext\jcl\jcl\source\common;C:\keyman\10.0\src\ext\jcl\jcl\source\vcl;C:\keyman\10.0\src\ext\jcl\jcl\source\windows;C:\keyman\10.0\src\ext\jcl\jvcl\run;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <Icon_MainIcon>KeymanDeveloper90.ico</Icon_MainIcon>
@@ -157,7 +157,6 @@
         <DCCReference Include="..\..\global\delphi\comp\unicodepanel.pas"/>
         <DCCReference Include="..\..\global\delphi\general\ttinfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeyNames.pas"/>
-        <DCCReference Include="main\SyntaxHighlight.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\PaintPanel.pas"/>
         <DCCReference Include="child\UfrmMDIEditor.pas">
             <Form>frmTikeEditor</Form>
@@ -264,7 +263,6 @@
         <DCCReference Include="..\..\global\delphi\comp\ExtShiftState.pas"/>
         <DCCReference Include="..\..\global\delphi\general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="main\CharMapDropTool.pas"/>
-        <DCCReference Include="main\CharMapDropTool_PlusMemoU.pas"/>
         <DCCReference Include="main\CharMapDropTool_EmbeddedWB.pas"/>
         <DCCReference Include="dialogs\UfrmBitmapEditorText.pas">
             <Form>frmBitmapEditorText</Form>
@@ -485,7 +483,6 @@
         <DCCReference Include="dockforms\UfrmTIKEDock.pas">
             <Form>TIKEDockForm</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\comp\KeymanDeveloperMemo.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\KeymanDeveloperDebuggerMemo.pas"/>
         <DCCReference Include="dockforms\UfrmCharacterMapDock.pas">
             <Form>frmCharacterMapDock</Form>

@@ -22,8 +22,21 @@ unit UfrmDebugStatus_Child;  // I3323
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, debugkeyboard, KeymanDeveloperMemo, UfrmTike, UfrmDebug;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls,
+  KeymanDeveloperDebuggerMemo,
+  debugkeyboard,
+  UfrmTike,
+  UfrmDebug,
+  UframeTextEditor;
 
 type
   TfrmDebugStatus_Child = class(TTIKEForm)
@@ -32,13 +45,13 @@ type
   private
     FDebugKeyboard: TDebugKeyboard;
     FDisplayFont: TFont;
-    FEditorMemo: TKeymanDeveloperMemo;
+    FEditorMemo: TframeTextEditor;
   protected
-    property EditorMemo: TKeymanDeveloperMemo read FEditorMemo;
+    property EditorMemo: TframeTextEditor read FEditorMemo;
     property debugkeyboard: TDebugKeyboard read FDebugKeyboard;
     property DisplayFont: TFont read FDisplayFont;
 
-    function memoDebug: TKeymanDeveloperMemo;
+    function memoDebug: TKeymanDeveloperDebuggerMemo;
     function frmDebugStatus: TForm;
     function DebugForm: TfrmDebug;
 
@@ -47,7 +60,7 @@ type
   public
     procedure SetDisplayFont(Value: TFont);
     procedure SetDebugKeyboard(const Value: TDebugKeyboard);
-    procedure SetEditorMemo(Value: TKeymanDeveloperMemo);
+    procedure SetEditorMemo(Value: TframeTextEditor);
   end;
 
 implementation
@@ -91,7 +104,7 @@ begin
   Result := Owner as TForm;
 end;
 
-function TfrmDebugStatus_Child.memoDebug: TKeymanDeveloperMemo;
+function TfrmDebugStatus_Child.memoDebug: TKeymanDeveloperDebuggerMemo;
 begin
   if DebugForm <> nil then   // I4809
     Result := DebugForm.memo
@@ -111,7 +124,7 @@ begin
   DisplayFontChanged;
 end;
 
-procedure TfrmDebugStatus_Child.SetEditorMemo(Value: TKeymanDeveloperMemo);
+procedure TfrmDebugStatus_Child.SetEditorMemo(Value: TframeTextEditor);
 begin
   FEditorMemo := Value;
 end;

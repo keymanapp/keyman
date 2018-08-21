@@ -234,6 +234,7 @@ uses
   TextFileFormat,
   UFixFontDialogBold,
   UfrmAboutTike,
+  UframeTextEditor,
   UfrmBitmapEditor,
   UfrmCharacterIdentifier,
   UfrmCharacterMapDock,

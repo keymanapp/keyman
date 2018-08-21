@@ -134,7 +134,7 @@ begin
         else
         begin
           o := FHelpControl.Owner;
-          while not(o is TTIKEForm) and (o <> nil) do
+          while ((o is TframeCEFHost) or not(o is TTIKEForm)) and (o <> nil) do
             o := o.Owner;
 
           if o is TTIKEForm then
