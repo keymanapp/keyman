@@ -6,5 +6,6 @@
     -->
     <dimen name="version_label_width">100dp</dimen>
     <dimen name="version_label_textsize">6.75sp</dimen>
-    
+    <dimen name="product_logo_bottom">56dp</dimen>
+
 </resources>

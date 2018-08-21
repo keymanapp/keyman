@@ -17,7 +17,9 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
-    <style name="AppTheme.BrandedLaunch" parent="android:Theme.Light.NoTitleBar.Fullscreen">
+    <style name="AppTheme.BrandedLaunch" parent="AppBaseTheme">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@drawable/branded_logo</item>
     </style>
 </resources>

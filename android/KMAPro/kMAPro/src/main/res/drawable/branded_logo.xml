@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <color android:color="@color/sil_blue"/>
-    </item>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque">
+
+    <!-- background color -->
+    <item android:drawable="@color/keyman_orange" />
+
     <item>
         <bitmap
-            android:src="@drawable/sil_logo_blue_2017_1"
-            android:tileMode="disabled"
+            android:src="@drawable/keyman_logo"
             android:gravity="center" />
     </item>
+
+    <!-- product logo -->
+    <item android:bottom="@dimen/product_logo_bottom">
+        <bitmap
+            android:src="@drawable/sil_logo_blue_2017_1"
+            android:gravity="bottom" />
+    </item>
+
 </layer-list>
