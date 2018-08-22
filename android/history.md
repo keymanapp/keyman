@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 2018-08-17 10.0.504 stable
+* Add SIL logo as splash screen (#1102)
+
 ## 2018-08-16 10.0.503 stable
 * Fixes crashes for release configurations when InputConfiguration or package name is null (#1103)
 

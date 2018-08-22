@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque">
+
+    <!-- background color -->
+    <item android:drawable="@android:color/white" />
+
+    <!-- product logos -->
+    <item>
+        <bitmap
+            android:src="@drawable/splash_logo"
+            android:gravity="center" />
+    </item>
+
+    <item android:bottom="@dimen/product_logo_bottom">
+        <bitmap
+            android:src="@drawable/keyman_by_sil"
+            android:gravity="bottom" />
+    </item>
+
+</layer-list>

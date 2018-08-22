@@ -130,6 +130,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
     resultReceiver = new DownloadResultReceiver(new Handler());
     final ActionBar actionBar = getActionBar();
