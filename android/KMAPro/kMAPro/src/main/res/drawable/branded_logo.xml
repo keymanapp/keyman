@@ -14,7 +14,7 @@
 
     <item android:bottom="@dimen/product_logo_bottom">
         <bitmap
-            android:src="@drawable/sil_logo_blue_2017_1"
+            android:src="@drawable/keyman_by_sil"
             android:gravity="bottom" />
     </item>
 
