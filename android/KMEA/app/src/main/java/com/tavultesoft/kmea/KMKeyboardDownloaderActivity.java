@@ -271,7 +271,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
         int index = 0;
         while (index < keyboards.length()) {
           keyboard = keyboards.getJSONObject(index);
-          if (keyboard != null && (kbID == keyboard.getString(KMManager.KMKey_ID))) {
+          if (keyboard != null && (kbID.equals(keyboard.getString(KMManager.KMKey_ID)))) {
             break;
           }
           index++;
