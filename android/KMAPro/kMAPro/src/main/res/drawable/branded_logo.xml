@@ -5,16 +5,16 @@
     <!-- background color -->
     <item android:drawable="@color/keyman_orange" />
 
+    <!-- product logos -->
     <item>
         <bitmap
-            android:src="@drawable/keyman_logo"
+            android:src="@drawable/sil_logo_blue_2017_1"
             android:gravity="center" />
     </item>
 
-    <!-- product logo -->
     <item android:bottom="@dimen/product_logo_bottom">
         <bitmap
-            android:src="@drawable/sil_logo_blue_2017_1"
+            android:src="@drawable/keyman_logo"
             android:gravity="bottom" />
     </item>
 
