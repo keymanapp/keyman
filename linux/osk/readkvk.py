@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import argparse
 import os.path
 import struct
 import sys
@@ -96,19 +97,12 @@ KVKS_RALT=                b'\x40'
 
 def bytecheck(value, check):
     if bytes([value & check[0]]) == check:
-        #print("value:", value)
-        #print("check:", check[0])
-        #print("test:", bytes([value & check[0]]))
         return True
     else:
-        #print("value:", value)
-        #print("check:", check[0])
-        #print("test:", bytes([value & check[0]]))
         return False
 
 def get_nkey(file, fileContent, offset):
     nkey = NKey()
-    #print("offset", offset)
     data = struct.unpack_from("<B2H", fileContent, offset)
 
     nkey.flags = data[0]
@@ -128,42 +122,26 @@ def get_nkey(file, fileContent, offset):
 
     nkey.VKey = data[2]
 
-    #print(data)
     nkey.text, newoffset = get_nstring(file, fileContent, offset + struct.calcsize("<B2H"))
-    #print("newoffset", newoffset)
     nkey.bitmap, newoffset = get_nbitmap(file, fileContent, newoffset)
-    #print("newoffset", newoffset)
 
-    #a, b = b'\x12', b'\x34'
-    #print("anding:", bytes([a[0] & b[0]]).replace("\\", "\\\\"))
-    #print( ("oring:", (bytes([a[0] | b[0]]) )).replace("\\", "\\\\") ) 
-    #flag = byte(data[0][0])
-    #nkey = (data[0], data[1], data[2], Text)
-    #flagone = bytes(data[0][1] | b'\x01')
-    #print("flagone:", flagone)
-    #print(type(data[0]))
     return nkey, newoffset
 
 
 def get_nfont(file, fileContent, offset):
     nfont = NFont()
     nfont.name, curoffset = get_nstring(file, fileContent, offset)
-    #print(Name)
     data = struct.unpack_from("<L4B", fileContent, curoffset)
     nfont.resv = data[4]
     nfont.blue = data[1]
     nfont.green = data[2]
     nfont.red = data[3]
     nfont.size = data[0]
-    #print(data)
-    #print(curoffset+8)
-    #font = (Name, data[0], (red, green, blue))
     return nfont, curoffset + struct.calcsize("<L4B")
 
 def get_nstring(file, fileContent, offset):
     stringlength = struct.unpack_from("<H", fileContent, offset)
     file.seek(offset+2)
-    #print("string length", stringlength[0])
     if stringlength[0] > 256:
         print("error: suspiciously long string. ABORT.")
         sys.exit(5)
@@ -178,11 +156,7 @@ def get_nbitmap(file, fileContent, offset):
     bitmap = None
     bitmaplength = struct.unpack_from("<I", fileContent, offset)
     file.seek(offset + struct.calcsize("<I"))
-    #print("bitmap length", bitmaplength[0])
     bitmap = file.read(bitmaplength[0])
-        #print("newoffset", offset + struct.calcsize("<I"))
-        #print("error: can't handle bitmaps.")
-        #sys.exit(5)
     return bitmap, offset + struct.calcsize("<I") + bitmaplength[0]
 
 def print_kvk(kvkData, allkeys=False):
@@ -208,12 +182,10 @@ def print_kvk(kvkData, allkeys=False):
     if allkeys:
         for key in kvkData.Keys:
             print("number:", key.number)
-            #print("  flags:", key.flags)
             if key.hasBitmap:
                 print("  key has bitmap")
             if key.hasUnicode:
                 print("  key has unicode text")
-            #print("  shift:", key.shiftflags)
             if key.Normal:
                 print("  normal key")
             if key.Shift:
@@ -235,106 +207,48 @@ def print_kvk(kvkData, allkeys=False):
 
 
 def main(argv):
-    if len(sys.argv) != 2:
-        print("readkvk.py: error, no kvk file supplied.")
-        print("arguments:", sys.argv)
-        print("readkvk.py <kvk file>")
-        sys.exit(2)
-    kvkfile = sys.argv[1]
+    parser = argparse.ArgumentParser(description='Read and parse kvk on-screen keyboard file.')
+    parser.add_argument('-k', "--keys", help='print all keys', action="store_true")
+    parser.add_argument('kvkfile', help='kvk file')
 
-    name, ext = os.path.splitext(kvkfile)
+    args = parser.parse_args()
+
+    name, ext = os.path.splitext(args.kvkfile)
     if ext != ".kvk":
-        print("readkvk.py: error, input file %s is not a kvk file." % (kvkfile))
-        print("readkvk.py <kvk file>")
+        print("readkvk.py: error, input file %s is not a kvk file." % (args.kvkfile))
+        print("readkvk.py [-h] [-k] <kvk file>")
         sys.exit(2)
 
-    if not os.path.isfile(kvkfile):
-        print("readkvk.py: error, input file %s does not exist." % (kvkfile))
-        print("readkvk.py <kvk file>")
+    if not os.path.isfile(args.kvkfile):
+        print("readkvk.py: error, input file %s does not exist." % (args.kvkfile))
+        print("readkvk.py [-h] [-k] <kvk file>")
         sys.exit(2)
 
-    with open(kvkfile, mode='rb') as file: # b is important -> binary
+    with open(args.kvkfile, mode='rb') as file: # b is important -> binary
         fileContent = file.read()
 
         kvkData = KVKData()
 
         kvkstart = struct.unpack_from("<4s4cc", fileContent, 0)
-#        print(struct.calcsize("<4s4cc"))
-#        print(kvkstart)
         kvkData.version = (kvkstart[1], kvkstart[2], kvkstart[3], kvkstart[4])
         kvkData.flags = kvkstart[5]
         kvkData.key102 = bytecheck(kvkData.flags[0], kvkk102key)
         kvkData.DisplayUnderlying = bytecheck(kvkData.flags[0], kvkkDisplayUnderlying)
         kvkData.UseUnderlying = bytecheck(kvkData.flags[0], kvkkUseUnderlying)
         kvkData.AltGr = bytecheck(kvkData.flags[0], kvkkAltGr)
-        #print("version:", version)
-        #print("flags:", flags)
-        #print(kvk[6])
-        #file.seek(struct.calcsize("<4s4cc"))
-        #asskbd = file.read(kvk[6]*2)
-        #AssociatedKeyboard = asskbd.decode('utf-16')
+
         kvkData.AssociatedKeyboard, newoffset = get_nstring(file, fileContent, struct.calcsize("<4s4cc"))
-        #print("newoffset assockeybd:", newoffset)
         kvkData.AnsiFont, newoffset = get_nfont(file, fileContent, newoffset)
-        #print("newoffset ansifont:", newoffset)
         kvkData.UnicodeFont, newoffset = get_nfont(file, fileContent, newoffset)
-        #print("newoffset unifont:", newoffset)
         numkeys = struct.unpack_from("I", fileContent, newoffset)
         kvkData.KeyCount = numkeys[0]
         newoffset = newoffset + struct.calcsize("I")
-        #print("numkeys:", numkeys[0])
-#        print(one)
-#        print(two)
-#        print(bytes([one[0] & one[0]]))
-#        print(ord(one))
-#        print(ord(two))
-#        if numkeys[0] > 0:
+
         for num in range(numkeys[0]):
-            #print("key:", num)
-            #nkey, newoffset = get_nkey(file, fileContent, newoffset)
-            #hasBitmap = hasUnicode = False
             nkey, newoffset = get_nkey(file, fileContent, newoffset)
             nkey.number = num
             kvkData.Keys.append(nkey)
-            # print("key:", nkey)
-            # print("  flags:{0:b}".format(nkey[0]))
-            # #print(bytes([nkey[0][0] & kvkkBitmap[0]]))
-            # #if bytes([nkey[0][0] & kvkkBitmap[0]]) == kvkkBitmap:
-            # if bytecheck(nkey[0], kvkkBitmap):
-            #     hasBitmap = True
-            #     print("    has bitmap on key")
-            #     #sys.exit(99)
-            # #print(bytes([nkey[0][0] & kvkkUnicode[0]]))
-            # #if bytes([nkey[0][0] & kvkkUnicode[0]]) == kvkkUnicode:
-            # if bytecheck(nkey[0], kvkkUnicode):
-            #     hasUnicode = True
-            #     print("    has unicode text on key")
-            # #print(type(nkey[0]))
-            # #print(type(b'\x01'))
-            # #print("  flagcheck:", nkey[0] | b'\x02')
-            # #print("  shift:", nkey[1])
-            # #print("  shiftbin:{0:b}".format(nkey[1]))
-            # #print("  normalbin:{0:b}".format(KVKS_NORMAL[0]))
-            # if nkey[1] == 0:
-            #     print("    normal key")
-            # if bytecheck(nkey[1], KVKS_SHIFT):
-            #     print("    shift key")
-            # if bytecheck(nkey[1], KVKS_CTRL):
-            #     print("    ctrl key")
-            # if bytecheck(nkey[1], KVKS_ALT):
-            #     print("    alt key")
-            # if bytecheck(nkey[1], KVKS_LCTRL):
-            #     print("    left ctrl key")
-            # if bytecheck(nkey[1], KVKS_RCTRL):
-            #     print("    right ctrl key")
-            # if bytecheck(nkey[1], KVKS_LALT):
-            #     print("    left alt key")
-            # if bytecheck(nkey[1], KVKS_RALT):
-            #     print("    right alt key")
-            # print("  vkey:", nkey[2])
-            # print("  Text:", nkey[3])
-    print_kvk(kvkData)
+    print_kvk(kvkData, args.keys)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-
