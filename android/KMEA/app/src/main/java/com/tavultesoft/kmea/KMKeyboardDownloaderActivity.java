@@ -268,13 +268,11 @@ public class KMKeyboardDownloaderActivity extends Activity {
         }
 
         // In case keyboards array contains multiple keyboards, get the one with matching keyboard ID
-        int index = 0;
-        while (index < keyboards.length()) {
+        for (int index = 0; index < keyboards.length(); index++) {
           keyboard = keyboards.getJSONObject(index);
           if (keyboard != null && (kbID.equals(keyboard.getString(KMManager.KMKey_ID)))) {
             break;
           }
-          index++;
         }
         if (keyboard == null) {
           throw new Exception(exceptionStr);
