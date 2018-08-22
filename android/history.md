@@ -4,6 +4,7 @@
 ## 11.0 alpha
 * Move to 11.0
 * Add round launcher icons
+* Change default keyboard from `european` to `sil_euro_latin` (#1112)
 
 ## 2018-08-16 10.0.503 stable
 * Fixes crashes for release configurations when InputConfiguration or package name is null (#1103)
