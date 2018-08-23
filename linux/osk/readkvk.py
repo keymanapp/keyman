@@ -4,6 +4,7 @@ import argparse
 import os.path
 import struct
 import sys
+from lxml import etree
 
 # .kvk file format
 # KVK files are variable length files with variable sized structures.
@@ -94,6 +95,60 @@ KVKS_LCTRL =              b'\x08'
 KVKS_RCTRL =              b'\x10'
 KVKS_LALT =               b'\x20'
 KVKS_RALT=                b'\x40'
+
+
+# from web/source/kmwosk.ts
+VKey_to_Iso = {
+    90 : "B01", # Z
+    88 : "B02", # X
+    67 : "B03", # C
+    86 : "B04", # V
+    66 : "B05", # B
+    78 : "B06", # N
+    77 : "B07", # M
+    188 : "B08", # ,
+    190 : "B09", # .
+    191 : "B10", # /
+    65 : "C01", # A
+    83 : "C02", # S
+    68 : "C03", # D
+    70 : "C04", # F
+    71 : "C05", # G
+    72 : "C06", # H
+    74 : "C07", # J
+    75 : "C08", # K
+    76 : "C09", # L
+    186 : "C10", # ;
+    222 : "C11", # '
+    81 : "D01", # Q
+    87 : "D02", # W
+    69 : "D03", # E
+    82 : "D04", # R
+    84 : "D05", # T
+    89 : "D06", # Y
+    85 : "D07", # U
+    73 : "D08", # I
+    79 : "D09", # O
+    80 : "D10", # P
+    219 : "D11", # [
+    221: "D12", # ]
+    49 : "E01", # 1
+    50 : "E02", # 2
+    51 : "E03", # 3
+    52 : "E04", # 4
+    53 : "E05", # 5
+    54 : "E06", # 6
+    55 : "E07", # 7
+    56 : "E08", # 8
+    57 : "E09", # 9
+    48 : "E10", # 0
+    189 : "E11", # -
+    187 : "E12", # =
+    192 : "E00", # `
+    220 : "B00", # \
+    226 : "C12" # extra key on european keyboards
+}
+
 
 def bytecheck(value, check):
     if bytes([value & check[0]]) == check:
@@ -205,23 +260,91 @@ def print_kvk(kvkData, allkeys=False):
             print("  vkey:", key.VKey)
             print("  text:", key.text)
 
+def plus_join(modifier, name):
+    if modifier:
+        modifier = modifier + "+"
+    modifier = modifier + name
+    return modifier
+
+def get_modifer(key):
+    plus = "+"
+    modifier = ""
+    if key.Normal:
+        return "None"
+    if key.Shift:
+        modifier = plus_join(modifier, "shift")
+    if key.Ctrl:
+        modifier = plus_join(modifier, "ctrl")
+    if key.Alt:
+        modifier = plus_join(modifier, "alt")
+    if key.LCtrl:
+        modifier = plus_join(modifier, "ctrlL")
+    if key.RCtrl:
+        modifier = plus_join(modifier, "ctrlR")
+    if key.LAlt:
+        modifier = plus_join(modifier, "altL")
+    if key.RAlt:
+        modifier = plus_join(modifier, "altR")
+    return modifier
+
+def convert_ldml(kvkData):
+    keymaps = {}
+
+    for key in kvkData.Keys:
+        #print(key.VKey)
+        #print(key.text)
+        modifier = get_modifer(key)
+        #print(modifier)
+        if modifier in keymaps:
+            keymaps[modifier] = keymaps[modifier] + (key,)
+        else:
+            keymaps[modifier] = (key,)
+
+    ldml = etree.Element("keyboard", locale = "zzz-keyman")
+    etree.SubElement(ldml, "version", platform = "10")
+    #ldml.append( etree.Element("version", platform = "10") )
+    names = etree.SubElement(ldml, "names")
+    #names = ldml.append( etree.Element("names") )
+    print(etree.tostring(ldml, pretty_print=True))
+    names.append( etree.Element("name", value = "ZZZ") )
+    print(etree.tostring(ldml, pretty_print=True))
+
+    for modifier in keymaps:
+        if modifier == "None":
+            keymap = etree.SubElement(ldml, "keyMap")
+        else:
+            keymap = etree.SubElement(ldml, "keyMap", modifiers = modifier)
+        for key in keymaps[modifier]:
+            if key.VKey in VKey_to_Iso:
+                iso_key = VKey_to_Iso[key.VKey]
+                keymap.append( etree.Element("map", iso = iso_key, to = key.text) )
+            else:
+                print("Unknown vkey:", key.VKey)
+    return ldml
+
+def output_ldml(ldmlfile, ldml):
+    etree.ElementTree(ldml).write(ldmlfile, pretty_print=True)
 
 def main(argv):
     parser = argparse.ArgumentParser(description='Read and parse kvk on-screen keyboard file.')
     parser.add_argument('-k', "--keys", help='print all keys', action="store_true")
+    parser.add_argument('-p', "--print", help='print kvk details', action="store_true")
     parser.add_argument('kvkfile', help='kvk file')
+    parser.add_argument('-o', metavar='LDMLFILE', help='output LDML file')
 
     args = parser.parse_args()
 
     name, ext = os.path.splitext(args.kvkfile)
+    # Check if input file extension is kvk
     if ext != ".kvk":
         print("readkvk.py: error, input file %s is not a kvk file." % (args.kvkfile))
-        print("readkvk.py [-h] [-k] <kvk file>")
+        print("readkvk.py [-h] [-k] [-p] [-o <ldml file>] <kvk file>")
         sys.exit(2)
 
+    # Check if input kvk file exists
     if not os.path.isfile(args.kvkfile):
         print("readkvk.py: error, input file %s does not exist." % (args.kvkfile))
-        print("readkvk.py [-h] [-k] <kvk file>")
+        print("readkvk.py [-h] [-k] [-p] [-o <ldml file>] <kvk file>")
         sys.exit(2)
 
     with open(args.kvkfile, mode='rb') as file: # b is important -> binary
@@ -248,7 +371,14 @@ def main(argv):
             nkey, newoffset = get_nkey(file, fileContent, newoffset)
             nkey.number = num
             kvkData.Keys.append(nkey)
-    print_kvk(kvkData, args.keys)
+
+    if args.print:
+        print_kvk(kvkData, args.keys)
+
+    if args.o:
+        with open(args.o, 'wb') as ldmlfile:
+            ldml = convert_ldml(kvkData)
+            output_ldml(ldmlfile, ldml)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
