@@ -326,6 +326,36 @@ def convert_ldml(kvkData):
 def output_ldml(ldmlfile, ldml):
     etree.ElementTree(ldml).write(ldmlfile, pretty_print=True)
 
+def parse_kvk_file(kvkfile):
+    kvkData = KVKData()
+    with open(kvkfile, mode='rb') as file: # b is important -> binary
+        fileContent = file.read()
+
+        kvkstart = struct.unpack_from("<4s4cc", fileContent, 0)
+        kvkData.version = (kvkstart[1], kvkstart[2], kvkstart[3], kvkstart[4])
+        kvkData.flags = kvkstart[5]
+        kvkData.key102 = bytecheck(kvkData.flags[0], kvkk102key)
+        kvkData.DisplayUnderlying = bytecheck(kvkData.flags[0], kvkkDisplayUnderlying)
+        kvkData.UseUnderlying = bytecheck(kvkData.flags[0], kvkkUseUnderlying)
+        kvkData.AltGr = bytecheck(kvkData.flags[0], kvkkAltGr)
+
+        kvkData.AssociatedKeyboard, newoffset = get_nstring(file, fileContent, struct.calcsize("<4s4cc"))
+        kvkData.AnsiFont, newoffset = get_nfont(file, fileContent, newoffset)
+        kvkData.UnicodeFont, newoffset = get_nfont(file, fileContent, newoffset)
+        numkeys = struct.unpack_from("I", fileContent, newoffset)
+        kvkData.KeyCount = numkeys[0]
+        newoffset = newoffset + struct.calcsize("I")
+
+        for num in range(numkeys[0]):
+            nkey, newoffset = get_nkey(file, fileContent, newoffset)
+            nkey.number = num
+            kvkData.Keys.append(nkey)
+    return kvkData
+
+def convert_kvk_to_ldml(kvkfile):
+    kvkData = parse_kvk_file(kvkfile)
+    return convert_ldml(kvkData)
+
 def main(argv):
     parser = argparse.ArgumentParser(description='Read and parse kvk on-screen keyboard file.')
     parser.add_argument('-k', "--keys", help='print all keys', action="store_true")
@@ -348,30 +378,7 @@ def main(argv):
         print("kvk2ldml.py [-h] [-k] [-p] [-o <ldml file>] <kvk file>")
         sys.exit(2)
 
-    with open(args.kvkfile, mode='rb') as file: # b is important -> binary
-        fileContent = file.read()
-
-        kvkData = KVKData()
-
-        kvkstart = struct.unpack_from("<4s4cc", fileContent, 0)
-        kvkData.version = (kvkstart[1], kvkstart[2], kvkstart[3], kvkstart[4])
-        kvkData.flags = kvkstart[5]
-        kvkData.key102 = bytecheck(kvkData.flags[0], kvkk102key)
-        kvkData.DisplayUnderlying = bytecheck(kvkData.flags[0], kvkkDisplayUnderlying)
-        kvkData.UseUnderlying = bytecheck(kvkData.flags[0], kvkkUseUnderlying)
-        kvkData.AltGr = bytecheck(kvkData.flags[0], kvkkAltGr)
-
-        kvkData.AssociatedKeyboard, newoffset = get_nstring(file, fileContent, struct.calcsize("<4s4cc"))
-        kvkData.AnsiFont, newoffset = get_nfont(file, fileContent, newoffset)
-        kvkData.UnicodeFont, newoffset = get_nfont(file, fileContent, newoffset)
-        numkeys = struct.unpack_from("I", fileContent, newoffset)
-        kvkData.KeyCount = numkeys[0]
-        newoffset = newoffset + struct.calcsize("I")
-
-        for num in range(numkeys[0]):
-            nkey, newoffset = get_nkey(file, fileContent, newoffset)
-            nkey.number = num
-            kvkData.Keys.append(nkey)
+    kvkData = parse_kvk_file(args.kvkfile)
 
     if args.print:
         print_kvk(kvkData, args.keys)

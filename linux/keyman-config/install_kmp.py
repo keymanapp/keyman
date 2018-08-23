@@ -16,6 +16,7 @@ from kmpmetadata import determine_filetype, parseinfdata, parsemetadata
 from list_installed_kmp import get_kmp_version
 from uninstall_kmp import uninstall_kmp
 from convertico import checkandsaveico
+from kvk2ldml import convert_kvk_to_ldml, output_ldml
 
 def list_files(directory, extension):
 	return (f for f in listdir(directory) if f.endswith('.' + extension))
@@ -155,11 +156,20 @@ def install_kmp(inputfile, online=False):
 					if not os.path.isdir(kbfontdir):
 						os.makedirs(kbfontdir)
 					copy2(fpath, kbfontdir)
-				elif ftype == "Metadata" or ftype == "Keyboard source" or ftype == "Compiled keyboard" or ftype == "Compiled on screen keyboard":
+				elif ftype == "Metadata" or ftype == "Keyboard source" or ftype == "Compiled keyboard":
 					print("Installing", f['name'], "as keyman file")
 					if not os.path.isdir(kbdir):
 						os.makedirs(kbdir)
 					copy2(fpath, kbdir)
+				elif ftype == "Compiled on screen keyboard":
+					print("Converting", f['name'], "to LDML and installing both as as keyman file")
+					if not os.path.isdir(kbdir):
+						os.makedirs(kbdir)
+					copy2(fpath, kbdir)
+					ldml = convert_kvk_to_ldml(fpath)
+					name, ext = os.path.splitext(f['name'])
+					ldmlfile = os.path.join(kbdir, name+".ldml")
+					output_ldml(ldmlfile, ldml)
 				elif ftype == "Keyboard icon":
 					print("Converting", f['name'], "to BMP and installing both as keyman files")
 					if not os.path.isdir(kbdir):
