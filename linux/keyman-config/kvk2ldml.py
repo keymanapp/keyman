@@ -337,14 +337,14 @@ def main(argv):
     name, ext = os.path.splitext(args.kvkfile)
     # Check if input file extension is kvk
     if ext != ".kvk":
-        print("readkvk.py: error, input file %s is not a kvk file." % (args.kvkfile))
-        print("readkvk.py [-h] [-k] [-p] [-o <ldml file>] <kvk file>")
+        print("kvk2ldml.py: error, input file %s is not a kvk file." % (args.kvkfile))
+        print("kvk2ldml.py [-h] [-k] [-p] [-o <ldml file>] <kvk file>")
         sys.exit(2)
 
     # Check if input kvk file exists
     if not os.path.isfile(args.kvkfile):
-        print("readkvk.py: error, input file %s does not exist." % (args.kvkfile))
-        print("readkvk.py [-h] [-k] [-p] [-o <ldml file>] <kvk file>")
+        print("kvk2ldml.py: error, input file %s does not exist." % (args.kvkfile))
+        print("kvk2ldml.py [-h] [-k] [-p] [-o <ldml file>] <kvk file>")
         sys.exit(2)
 
     with open(args.kvkfile, mode='rb') as file: # b is important -> binary
