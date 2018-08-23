@@ -6,6 +6,9 @@
 * Add round launcher icons
 * Change default keyboard from `european` to `sil_euro_latin` (#1112)
 
+## 2018-08-23 10.0.505 stable
+* Validate keyboard ID when downloading keyboard from keman cloud (#1121)
+
 ## 2018-08-22 10.0.504 stable
 * Fixes crash when installed keyboards list is invalid (#1119)
 
