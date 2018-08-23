@@ -146,7 +146,8 @@ VKey_to_Iso = {
     187 : "E12", # =
     192 : "E00", # `
     220 : "B00", # \
-    226 : "C12" # extra key on european keyboards
+    226 : "C12", # extra key on european keyboards
+    32 : "A03" # space
 }
 
 
