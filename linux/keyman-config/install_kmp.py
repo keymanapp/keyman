@@ -3,6 +3,7 @@
 import argparse
 import json
 import os.path
+import subprocess
 import sys
 import tempfile
 import zipfile
@@ -116,24 +117,35 @@ def install_kmp(inputfile, online=False):
 						kmn_url = base_url + "/source/" + kbid + ".kmn"
 						response = requests.get(kmn_url)
 						if response.status_code == 200:
-							downloadfile = os.path.join(tmpdirname, kbid + ".kmn")
-							with open(downloadfile, 'wb') as f:
+							kmndownloadfile = os.path.join(tmpdirname, kbid + ".kmn")
+							with open(kmndownloadfile, 'wb') as f:
 								f.write(response.content)
 							print("Installing", kbid + ".kmn", "as keyman file, minimum version:", kbdata['minKeymanVersion'])
-							copy2(downloadfile, kbdir)
+							copy2(kmndownloadfile, kbdir)
+							kmn_file = os.path.join(kbdir, kbid + ".kmn")
+							print("Compiling kmn file")
+							subprocess.run(["kmflcomp", kmn_file], stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
+							kmfl_file = os.path.join(kbdir, kbid + ".kmfl")
+							if not os.path.isfile(kmfl_file):
+								print("Could not compile", kmn_file, "to", kmfl_file, "so not installing keyboard.")
+								os.remove(kmn_file)
+								os.rmdir(kbdir)
+								return
 						else:
-							print("install_kmp.py: warning: no kmn source file for", kbid)
-						downloadfile = os.path.join(tmpdirname, kbid + ".ico")
-						if not os.path.isfile(downloadfile):
+							print("install_kmp.py: warning: no kmn source file for", kbid, "so not installing keyboard.")
+							os.rmdir(kbdir)
+							return
+						icodownloadfile = os.path.join(tmpdirname, kbid + ".ico")
+						if not os.path.isfile(icodownloadfile):
 							ico_url = base_url + "/source/" + kbid + ".ico"
 							response = requests.get(ico_url)
 							if response.status_code == 200:
-								with open(downloadfile, 'wb') as f:
+								with open(icodownloadfile, 'wb') as f:
 									f.write(response.content)
 								print("Installing", kbid + ".ico", "as keyman file")
-								copy2(downloadfile, kbdir)
-								checkandsaveico(downloadfile)
-								copy2(downloadfile+".bmp", kbdir)
+								copy2(icodownloadfile, kbdir)
+								checkandsaveico(icodownloadfile)
+								copy2(icodownloadfile+".bmp", kbdir)
 							else:
 								print("install_kmp.py: warning: no ico source file for", kbid)
 					with open(os.path.join(kbdir, kbid + '.json'), 'w') as outfile:
@@ -141,7 +153,7 @@ def install_kmp(inputfile, online=False):
 						print("Installing api data file", kbid + ".json", "as keyman file")
 				else:
 					print("install_kmp.py: error: cannot download keyboard data so not installing.")
-					#sys.exit(5)
+					return
 
 			for f in files:
 				fpath = os.path.join(tmpdirname, f['name'])
