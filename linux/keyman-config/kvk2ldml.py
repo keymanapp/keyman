@@ -306,9 +306,9 @@ def convert_ldml(kvkData):
     #ldml.append( etree.Element("version", platform = "10") )
     names = etree.SubElement(ldml, "names")
     #names = ldml.append( etree.Element("names") )
-    print(etree.tostring(ldml, pretty_print=True))
+    #print(etree.tostring(ldml, pretty_print=True))
     names.append( etree.Element("name", value = "ZZZ") )
-    print(etree.tostring(ldml, pretty_print=True))
+    #print(etree.tostring(ldml, pretty_print=True))
 
     for modifier in keymaps:
         if modifier == "None":

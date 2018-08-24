@@ -198,13 +198,7 @@ def install_kmp(inputfile, online=False):
 				    stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
 				if (dconfread.returncode == 0):
 					preload_engines = literal_eval(dconfread.stdout)
-					#print(preload_engines)
-					#print("new kmn:", sys.argv[1])
 					preload_engines.append(kmn_file)
-					#preload_engines = preload_engines + sys.argv[1]
-					#print(preload_engines)
-					#new_preload_engines = str(preload_engines)
-					#print("writing:", new_preload_engines)
 					dconfwrite = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
 						stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
 		else:
