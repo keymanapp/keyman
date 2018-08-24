@@ -1,8 +1,25 @@
 #!/usr/bin/python3
 
+import ast
+import subprocess
 import sys
 import os.path
 from shutil import rmtree
+
+def uninstall_from_ibus(keyboardid):
+	kbdir = os.path.join('/usr/local/share/keyman', keyboardid)
+	kmnfile = os.path.join(kbdir, keyboardid+".kmn")
+	print("Uninstalling", kmnfile, "from IBus")
+	result = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],
+		stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
+	if (result.returncode == 0):
+		preload_engines = ast.literal_eval(result.stdout)
+		if kmnfile not in preload_engines:
+			print(kmnfile, "is not installed in IBus")
+			return
+		preload_engines.remove(kmnfile)
+		result2 = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
+			stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
 
 def uninstall_kmp(keyboardid):
 	"""
@@ -39,6 +56,7 @@ def uninstall_kmp(keyboardid):
 		print("Removed font directory:", kbfontdir)
 	else:
 		print("No font directory")
+	uninstall_from_ibus(keyboardid)
 	rmtree(kbdir)
 	print("Removed keyman directory:", kbdir)
 	print("Finished uninstalling keyboard:", keyboardid)

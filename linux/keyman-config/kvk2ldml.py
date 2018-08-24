@@ -356,7 +356,7 @@ def convert_kvk_to_ldml(kvkfile):
     kvkData = parse_kvk_file(kvkfile)
     return convert_ldml(kvkData)
 
-def main(argv):
+def main():
     parser = argparse.ArgumentParser(description='Read and parse kvk on-screen keyboard file.')
     parser.add_argument('-k', "--keys", help='print all keys', action="store_true")
     parser.add_argument('-p', "--print", help='print kvk details', action="store_true")
@@ -389,4 +389,4 @@ def main(argv):
             output_ldml(ldmlfile, ldml)
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
