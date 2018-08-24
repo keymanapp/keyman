@@ -1114,7 +1114,13 @@ char *items_to_string(ITEM *p)
 char *special_stores[] = {
 	"&name","&version","&hotkey","&language","&layout","&copyright","&message",
 	"&bitmap","&mnemoniclayout","&ethnologuecode",
-	"&capsalwaysoff","&capsononly","&shiftfreescaps","&author"};
+	"&capsalwaysoff","&capsononly","&shiftfreescaps","&author","&targets"};
+
+// stores new from keyman 7.0 onwards that can safely be ignored for kmfl 11 for now
+char *ignored_stores[] = {
+	"&visualkeyboard","&layoutfile","&kmw_helpfile","&kmw_embedjs",
+	"&windowslanguages","&kmw_rtl","&keyboardversion",
+	"&kmw_embedcss","&kmw_helptext","&includecodes"};
 
 // Initialize special stores (create dummy entries)
 void initialize_special_stores(void)
@@ -1129,7 +1135,7 @@ void initialize_special_stores(void)
 // Copy special store contents to keyboard header as required
 void process_special_store(char *name, STORE *sp, int line)
 {
-	int n, kbver;
+	int n, p, kbver;
 	
 	// Identify store by name
 	for(n=0; n<sizeof(special_stores)/sizeof(char *); n++)
@@ -1164,6 +1170,11 @@ void process_special_store(char *name, STORE *sp, int line)
 	case SS_BITMAP:
 		check_bitmap_file(sp,line);
 		break;
+	case SS_TARGETS:
+		if (!check_linux_target(sp,line))
+			fail(1, "Line %d: No valid linux target in %s", line, items_to_string(sp->items));
+			//kmflcomp_warn(line, "No valid linux target.");
+		break;
 	case SS_COPYRIGHT:
 	case SS_MESSAGE:
 	case SS_LAYOUT:
@@ -1172,7 +1183,12 @@ void process_special_store(char *name, STORE *sp, int line)
 	case SS_ETHNOLOGUE:
 		break;
 	default:
-		kmflcomp_warn(line-1,"unrecognized special store '&%s'",name);		
+		for(p=0; p<sizeof(ignored_stores)/sizeof(char *); p++)
+		{
+			if(strcasecmp(name,ignored_stores[p]) == 0 ) break;
+		}
+		if (p==sizeof(ignored_stores)/sizeof(char *))
+			kmflcomp_warn(line-1,"unrecognized special store '&%s'",name);
 		return;
 	}		
 }
@@ -1402,6 +1418,36 @@ char *find_first_match(char *path)
 	}
 }
 #endif
+
+// valid targets that should compile for linux
+char *valid_targets[] = {
+	"any","linux","desktop","windows","macosx"};
+int check_linux_target(STORE *sp, int line)
+{
+	char *p, *ptr, tname[128];
+	char delim[] = " ";
+	UTF32 *p1;
+	UTF8 *p2;
+	int n;
+
+	p1 = (UTF32*)sp->items;
+	p2 = (UTF8*)tname;
+	IConvertUTF32toUTF8((const UTF32 **)&p1,(const UTF32 *)(sp->items+sp->len),&p2,(UTF8 *)(tname+127));
+	*p2 = 0;
+	p = (char *)tname;
+	ptr = strtok(p, delim);
+	while(ptr != NULL)
+	{
+		for(n=0; n<sizeof(valid_targets)/sizeof(char *); n++)
+		{
+			if(strcasecmp(ptr,valid_targets[n]) == 0 ) {
+				return 1;
+			}
+		}
+		ptr = strtok(NULL, delim);
+	}
+	return 0;
+}
 
 // Check that the bitmap file exists as specified, or else that a file with an accepted variation
 // of the name exists (different case, .bmp or .png suffixes)

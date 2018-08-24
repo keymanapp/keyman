@@ -90,6 +90,7 @@ GROUP *gp = NULL;			/* Temporary group pointer */
 %token <simple> TOK_STORE
 %token <simple> TOK_STOREINSTORE
 %token <simple> TOK_SWITCH
+%token <simple> TOK_TARGETS
 %token <simple> TOK_UNICODE
 %token <simple> TOK_USE
 %token <simple> TOK_USINGKEYS
@@ -203,6 +204,10 @@ T_HEADLINE :
 	| TOK_AUTHOR T_STRING TOK_NL
 	{ 
 		new_store_from_string("&author",$2,lineno);
+	}
+	| TOK_TARGETS T_STRING TOK_NL
+	{ 
+		new_store_from_string("&targets",$2,lineno);	
 	}
 	| TOK_MNEMONIC T_STRING TOK_NL
 	{ 
