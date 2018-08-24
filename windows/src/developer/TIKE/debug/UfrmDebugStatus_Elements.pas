@@ -53,9 +53,8 @@ type
     function GetStoreDisplayWidth(Element: TXStringElement): Integer;
     procedure ResizeStoreGrid;
 
-//    procedure RefreshOptions;
-
   protected
+    function GetHelpTopic: string; override;
     procedure DisplayFontChanged; override;
   public
     procedure UpdateStores(Event: TDebugEvent);
@@ -65,6 +64,8 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   KeymanDeveloperOptions,
   UfrmDebugStatus;
 
@@ -320,6 +321,11 @@ procedure TfrmDebugStatus_Elements.FormResize(Sender: TObject);
 begin
   ResizeStoreGrid;
   lvElements.Repaint;
+end;
+
+function TfrmDebugStatus_Elements.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_DebugStatus_Elements;
 end;
 
 function TfrmDebugStatus_Elements.GetStoreDisplayWidth(Element: TXStringElement): Integer;

@@ -3,18 +3,16 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:k="http://www.tavultesoft.com/xml/70">
 
   <xsl:template name="page_packaging">
-    <div class="page" id="Packaging">
-      <div id="uppertext2" style="clear: all; display: block;">
+    <div class="page" id="page-2">
+      <div class="help-container" id="uppertext2">
         <div class="headerimage">
-          <p><img>
-            <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>header_package.png</xsl:attribute>
-          </img></p>
+          <p><img src='res/header_package.png' /></p>
           <div class='quicklinks'>
             <h3>Quick Links</h3>
           
             <ul>
-              <li><a href="help:tutorial_package">Package Tutorial</a></li>
-              <li><a href="help:context_frmPackageEditor">Package Editor Help</a></li>
+              <li><a href="help:guides/distribute/tutorial">Package Tutorial</a></li>
+              <li><a href="help:context/package-editor">Package Editor Help</a></li>
             </ul>
           </div>
         </div>

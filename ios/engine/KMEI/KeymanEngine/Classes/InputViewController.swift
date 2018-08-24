@@ -33,9 +33,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
   open var topBarImageView: UIImageView?
   var barHeightConstraints: [NSLayoutConstraint] = []
-
+  var barWidthConstraints: [NSLayoutConstraint] = []
   var containerView: UIView?
   var containerHeightConstraints: [NSLayoutConstraint] = []
+  var containerWidthConstraints: [NSLayoutConstraint] = []
   var heightConstraint: NSLayoutConstraint!
   var isTopBarEnabled: Bool
 
@@ -59,7 +60,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   private var expandedHeight: CGFloat {
-    return CGFloat(Int(kmInputView.frame.height) % 1000) +
+    return Manager.shared.keyboardHeight +
       (isTopBarEnabled ? CGFloat(InputViewController.topBarHeight) : 0)
   }
 
@@ -73,35 +74,39 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open override func updateViewConstraints() {
-    if view.frame.width == 0 || view.frame.height == 0 {
-      super.updateViewConstraints()
-      return
+    func addConstraints(_ constraints: [NSLayoutConstraint]) {
+      for constraint in constraints {
+        if !view.constraints.contains(constraint) {
+          view.addConstraint(constraint)
+        }
+      }
     }
 
     Manager.shared.updateViewConstraints()
 
     let topBarHeight = isTopBarEnabled ? CGFloat(InputViewController.topBarHeight) : 0
     barHeightConstraints[0].constant = topBarHeight
+    addConstraints(barHeightConstraints)
 
-    for constraint in barHeightConstraints {
-      if !view.constraints.contains(constraint) {
-        view.addConstraint(constraint)
-      }
-    }
+    barWidthConstraints[0].constant = Manager.shared.keyboardWidth
+    addConstraints(barWidthConstraints)
 
-    containerHeightConstraints[0].constant = CGFloat(Int(kmInputView.frame.height) % 1000)
-    for constraint in containerHeightConstraints {
-      if !view.constraints.contains(constraint) {
-        view.addConstraint(constraint)
-      }
-    }
+    containerHeightConstraints[0].constant = Manager.shared.keyboardHeight
+    addConstraints(containerHeightConstraints)
 
+    containerWidthConstraints[0].constant = Manager.shared.keyboardWidth
+    addConstraints(containerWidthConstraints)
+
+    heightConstraint.constant = expandedHeight
     if !view.constraints.contains(heightConstraint) {
-      heightConstraint.constant = expandedHeight
       view.addConstraint(heightConstraint)
-    } else if heightConstraint.constant != expandedHeight {
-      heightConstraint.constant = expandedHeight
     }
+
+    // After superview is resized, tell the
+    // manager to resize the keyboard view again
+    // because it loses its size?
+    Manager.shared.updateViewConstraints()
+
     super.updateViewConstraints()
   }
 
@@ -110,6 +115,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     let bgColor = UIColor(red: 210.0 / 255.0, green: 214.0 / 255.0, blue: 220.0 / 255.0, alpha: 1.0)
     view.backgroundColor = bgColor
+
+    // TODO: If the following line is enabled, the WKWebView does not respond to touch events
+    // Can figure out why one day maybe
+    //view.translatesAutoresizingMaskIntoConstraints = false
 
     Manager.shared.inputViewDidLoad()
     Manager.shared.keymanWebDelegate = self
@@ -130,6 +139,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open override func viewDidAppear(_ animated: Bool) {
+    Manager.shared.isSystemKeyboard = true
     super.viewDidAppear(animated)
     setConstraints()
     inputView?.setNeedsUpdateConstraints()
@@ -143,8 +153,22 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
   }
 
+  open override func viewWillDisappear(_ animated: Bool) {
+    Manager.shared.isSystemKeyboard = false
+    super.viewWillDisappear(animated)
+  }
+
   open override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
     Manager.shared.inputViewWillRotate(to: toInterfaceOrientation, duration: duration)
+    super.willRotate(to: toInterfaceOrientation, duration: duration)
+  }
+
+  open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    super.viewWillTransition(to: size, with: coordinator)
+    coordinator.animateAlongsideTransition(in: nil, animation: nil, completion: {
+      _ in
+      self.updateViewConstraints()
+    })
   }
 
   open override func textDidChange(_ textInput: UITextInput?) {
@@ -236,12 +260,13 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   private func setConstraints() {
     let topBarHeight = isTopBarEnabled ? InputViewController.topBarHeight : 0
     let viewsDict = ["bar": topBarImageView!, "container": containerView!]
+    let screenWidth = UIScreen.main.bounds.width
+
     barHeightConstraints = NSLayoutConstraint.constraints(
       withVisualFormat: "V:[bar(\(topBarHeight))]", metrics: nil, views: viewsDict)
+    barWidthConstraints = NSLayoutConstraint.constraints(
+      withVisualFormat: "H:[bar(\(Int(screenWidth)))]", metrics: nil, views: viewsDict)
 
-    let screenWidth = UIScreen.main.bounds.width
-    let barWidthConstraints = NSLayoutConstraint.constraints(
-      withVisualFormat: "H:[bar(>=\(Int(screenWidth)))]", metrics: nil, views: viewsDict)
     let barVerticalPositionConstraints = NSLayoutConstraint.constraints(
       withVisualFormat: "V:|-0-[bar]", metrics: nil, views: viewsDict)
     let barHorizontalPositionConstraints = NSLayoutConstraint.constraints(
@@ -252,13 +277,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     view.addConstraints(barVerticalPositionConstraints)
     view.addConstraints(barHorizontalPositionConstraints)
 
-    // note this appears to relate to the rotation fix bug; may not work on iPads as 1000 is not enough
     containerHeightConstraints = NSLayoutConstraint.constraints(
-      withVisualFormat: "V:[container(\(Int(kmInputView.frame.height) % 1000))]",
+      withVisualFormat: "V:[container(\(Manager.shared.keyboardHeight))]",
       metrics: nil, views: viewsDict)
 
-    let containerWidthConstraints = NSLayoutConstraint.constraints(
-      withVisualFormat: "H:[container(>=\(UInt(screenWidth)))]", metrics: nil, views: viewsDict)
+    containerWidthConstraints = NSLayoutConstraint.constraints(
+      withVisualFormat: "H:[container(\(UInt(screenWidth)))]", metrics: nil, views: viewsDict)
     let containerVericalPositionConstraints = NSLayoutConstraint.constraints(
       withVisualFormat: "V:[container]-0-|", metrics: nil, views: viewsDict)
     let containerHorizontalPositionConstraints = NSLayoutConstraint.constraints(

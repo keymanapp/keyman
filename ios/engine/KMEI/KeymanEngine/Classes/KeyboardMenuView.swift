@@ -57,7 +57,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
   init(keyFrame frame: CGRect, inputViewController: InputViewController, closeButtonTitle: String?) {
     let isPortrait: Bool
-    if Util.isSystemKeyboard {
+    if Manager.shared.isSystemKeyboard {
       isPortrait = InputViewController.isPortrait
     } else {
       isPortrait = UIDevice.current.orientation.isPortrait

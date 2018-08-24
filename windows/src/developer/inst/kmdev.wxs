@@ -61,7 +61,7 @@
                 <File Id="kmcmpdll.dll" Name="kmcmpdll.dll" />
                 <File Id="debughost.kmx" Name="debughost.kmx" Source="..\..\developer\tike\redist\debughost.kmx" />
                 <RemoveFile Id="excmagic.log" On="uninstall" Name="excmagic.log" />
-                <RegistryKey Action="createAndRemoveOnUninstall" Root="HKLM" Key="Software\Keyman\Keyman Developer\10.0" />
+                <RegistryKey ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Developer\10.0" />
                 <Environment Id="environmentKeymanDeveloperPath" Action="set" Name="KeymanDeveloperPath" System="yes" Value="[INSTALLDIR]" />
 
                 <RemoveFile Id="CachedInstallDirFiles" Property="CachedInstallDir" On="uninstall" Name="*" />
@@ -90,8 +90,12 @@
                 <File Id="unicodedata.txt" Name="unicodedata.txt" Source="..\..\..\..\resources\standards-data\unicode-character-database\" />
                 <File Id="blocks.txt" Name="blocks.txt" Source="..\..\..\..\resources\standards-data\unicode-character-database\" />
               </Component>
+              
+              <?include cef.wxi ?>
 
               <Directory Id='xml' Name='xml'>
+                <?include app.wxi ?>
+                
                 <Directory Id='xmlcommon' Name='common' />
                 <Directory Id='xmlproject' Name='project' FileSource='..\..\developer\tike\xml\project\'>
                   
@@ -144,6 +148,8 @@
                     <Component><File Id="xml_icon32_plus.gif" Name="icon32_plus.gif" KeyPath="yes" /></Component>
                     <Component><File Id="xml_project.js" Name="project.js"  KeyPath="yes" /></Component>
                     <Component><File Id="xml_project.css" Name="project.css"  KeyPath="yes" /></Component>
+                    <Component><File Id="xml_icon32_kvks.png" Name="icon32_kvks.png"  KeyPath="yes" /></Component>
+                    <Component><File Id="xml_icon_kvks.png" Name="icon_kvks.png"  KeyPath="yes" /></Component>
 
                 </Directory>
 
@@ -151,6 +157,8 @@
                   <Component Id='componentxmlkmw2' Guid='*' Location='local' DiskId='1'>
                     <File Id='xml_kmw_index.html' Name='index.html' />
                   </Component>
+
+                  <Component><File Id='xml_kmw_packages.html' Name='packages.html' KeyPath='yes' /></Component>
 
                   <Directory Id='xmlkmwresource' Name='resource' DiskId='1'>
                     <Component><File Id='xml_kmw_resource_keymanweb.js' Name='keymanweb.js' KeyPath="yes" /></Component>
@@ -219,9 +227,9 @@
                     <Component><File Id='xml_file_layoutbuilder_platform.js' Name='platform.js' KeyPath="yes" /></Component>
                     <Component><File Id='xml_file_layoutbuilder_skflag.png' Name='skflag.png' KeyPath="yes" /></Component>
                     <Component><File Id='xml_file_layoutbuilder_skflags.png' Name='skflags.png' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_template_basic.js' Name='template-basic.js' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_template_latin.js' Name='template-latin.js' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_template_traditional.js' Name='template-traditional.js' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_file_layoutbuilder_template_basic.keymantouchlayout' Name='template-basic.keyman-touch-layout' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_file_layoutbuilder_template_latin.keymantouchlayout' Name='template-latin.keyman-touch-layout' KeyPath="yes" /></Component>
+                    <Component><File Id='xml_file_layoutbuilder_template_traditional.keymantouchlayout' Name='template-traditional.keyman-touch-layout' KeyPath="yes" /></Component>
                     <Component><File Id='xml_file_layoutbuilder_phone_iphone5_landscape.png' Name='phone-iphone5-landscape.png' KeyPath="yes" /></Component>
                     <Component><File Id='xml_file_layoutbuilder_phone_iphone5_portrait.png' Name='phone-iphone5-portrait.png' KeyPath="yes" /></Component>
                     <Component><File Id='xml_file_layoutbuilder_tablet_ipad_landscape.png' Name='tablet-ipad-landscape.png' KeyPath="yes" /></Component>
@@ -263,7 +271,7 @@
           </Directory>
           <Component Id="AppDataRemovals" Guid="{780C99E9-E97E-4EB0-BBF5-D4591EEABA7C}">
             <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\10.0" Name="root path" Type="string" Value="[INSTALLDIR]" />
-            <RegistryKey Action="createAndRemoveOnUninstall" Root="HKCU" Key="Software\Keyman\Keyman Developer\10.0" />
+            <RegistryKey ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\10.0" />
             <RemoveFolder Id="AD_ts_Uninstall" On="uninstall" />
             <RemoveFolder Id="AD_ts_KeymanDev_Uninstall" On="uninstall" Directory="App_TS_KeymanDev" />
             <RemoveFolder Id="AD_ts_KeymanDev_Databases_Uninstall" On="uninstall" Directory="App_TS_KeymanDev_Databases" />
@@ -345,11 +353,14 @@
       <ComponentRef Id="KeymanDevApp" />
 
       <ComponentRef Id="Data" />
+      <ComponentRef Id="cef" />
+      <ComponentRef Id="cef_locales" />
+      <ComponentRef Id="cef_swiftshader" />
       <ComponentRef Id="Reg_RootPath" />
       <ComponentRef Id="AppDataRemovals" />
       <ComponentRef Id='oskFonts' />
       <ComponentRef Id="componentxmlkmw2" />
-
+      <ComponentRef Id='xml_kmw_packages.html' />
      
       <ComponentRef Id="xml_file7"/>
       <ComponentRef Id="xml_file8"/>
@@ -400,6 +411,8 @@
       <ComponentRef Id="xml_icon32_plus.gif"/>
       <ComponentRef Id="xml_project.js"/>
       <ComponentRef Id="xml_project.css"/>
+      <ComponentRef Id="xml_icon32_kvks.png"/>
+      <ComponentRef Id="xml_icon_kvks.png"/>
 
       <ComponentRef Id='xml_kmw_resource_keymanweb.js'/>
       <ComponentRef Id='xml_kmw_resource_kmwuibutton.js'/>
@@ -446,14 +459,19 @@
       <ComponentRef Id='xml_file_layoutbuilder_platform.js'/>
       <ComponentRef Id='xml_file_layoutbuilder_skflag.png'/>
       <ComponentRef Id='xml_file_layoutbuilder_skflags.png'/>
-      <ComponentRef Id='xml_file_layoutbuilder_template_basic.js'/>
-      <ComponentRef Id='xml_file_layoutbuilder_template_latin.js'/>
-      <ComponentRef Id='xml_file_layoutbuilder_template_traditional.js'/>
+      <ComponentRef Id='xml_file_layoutbuilder_template_basic.keymantouchlayout'/>
+      <ComponentRef Id='xml_file_layoutbuilder_template_latin.keymantouchlayout'/>
+      <ComponentRef Id='xml_file_layoutbuilder_template_traditional.keymantouchlayout'/>
       <ComponentRef Id='xml_file_layoutbuilder_phone_iphone5_landscape.png'/>
       <ComponentRef Id='xml_file_layoutbuilder_phone_iphone5_portrait.png'/>
       <ComponentRef Id='xml_file_layoutbuilder_tablet_ipad_landscape.png'/>
       <ComponentRef Id='xml_file_layoutbuilder_tablet_ipad_portrait.png'/>
       <ComponentRef Id='xml_file_layoutbuilder_keymanweb_osk2.ttf'/>
+      
+      <ComponentRef Id="xml_app_editor" />
+      <ComponentRef Id="xml_app_lib_ace" />
+      <ComponentRef Id="xml_app_lib_ace_snippets" />
+      <ComponentRef Id="xml_app_lib_jquery" />
       
       <MergeRef Id='keymanengine' />
     </Feature>

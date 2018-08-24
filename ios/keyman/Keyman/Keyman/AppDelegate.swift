@@ -180,7 +180,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {
           self.showKMPError(error as! KMPError)
         }
-        
+
         //this can fail gracefully and not show errors to users
         do {
           try FileManager.default.removeItem(at: adhocDir)

@@ -53,10 +53,6 @@ public class PackageActivity extends Activity {
 
     final String pkgId = PackageProcessor.getPackageID(kmpFile);
     String pkgVersion = PackageProcessor.getPackageVersion(kmpFile, false);
-    if (pkgVersion == null || pkgVersion.isEmpty()) {
-      String message = "Invalid package version in " + kmpFile.getName();
-      showErrorDialog(context, pkgId, message);
-    }
     String pkgName = PackageProcessor.getPackageName(kmpFile, false);
 
     try {
@@ -77,10 +73,7 @@ public class PackageActivity extends Activity {
     packageActivityTitle.setTextSize(getResources().getDimension(R.dimen.package_label_textsize));
     packageActivityTitle.setGravity(Gravity.CENTER);
 
-    String titleStr = "Install Keyboard Package";
-    if (pkgVersion != null) {
-      titleStr += " " + pkgVersion;
-    }
+    String titleStr = "Install Keyboard Package " + pkgVersion;
     packageActivityTitle.setText(titleStr);
     actionBar.setCustomView(packageActivityTitle);
 
@@ -89,7 +82,7 @@ public class PackageActivity extends Activity {
     final Button installButton = (Button) findViewById(R.id.installButton);
     final Button cancelButton = (Button) findViewById(R.id.cancelButton);
 
-    webView = (WebView) findViewById(R.id.webView);
+    webView = (WebView) findViewById(R.id.packageWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
     webView.getSettings().setJavaScriptEnabled(true);
     webView.getSettings().setUseWideViewPort(true);
@@ -110,7 +103,7 @@ public class PackageActivity extends Activity {
 
       @Override
       public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        if (!url.toLowerCase().equals("about:blank"))
+        if (url != null && !url.toLowerCase().equals("about:blank"))
           view.loadUrl(url);
 
         return true;
@@ -141,7 +134,7 @@ public class PackageActivity extends Activity {
       webView.loadUrl("file:///" + files[0].getAbsolutePath());
     } else {
       // No welcome.htm so display minimal package information
-      String keyboardString = (pkgName.toLowerCase().endsWith("keyboard")) ? "" : " Keyboard ";
+      String keyboardString = (pkgName != null && pkgName.toLowerCase().endsWith("keyboard")) ? "" : " Keyboard ";
       String htmlString = String.format(
         "<body style=\"max-width:600px;\"><H1>The %s%s Package</H1></body>",
         pkgName, keyboardString);

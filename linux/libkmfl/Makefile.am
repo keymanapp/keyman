@@ -2,7 +2,7 @@
 
 SUBDIRS = include src
 ACLOCAL_AMFLAGS = -I m4
-libkmfldocdir = ${prefix}/doc/libkmfl
+libkmfldocdir = ${docdir}
 libkmfldoc_DATA = \
 	README\
 	COPYING\

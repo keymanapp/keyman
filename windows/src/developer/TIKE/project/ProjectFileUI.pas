@@ -101,6 +101,8 @@ uses
 
   System.SysUtils,
 
+  utilhttp,
+
   ProjectLoader,
   UfrmMessages;
 
@@ -202,13 +204,15 @@ begin
   FLastDir := GetCurrentDir;
   SetCurrentDir(StringsTemplatePath);
   try
-    //doc :=  LoadXMLDocument(SavedFileName); //TXMLDocument.Create(nil);
     doc := MSXMLDOMDocumentFactory.CreateDOMDocument;
     try
       doc.async := False;
       doc.load(SavedFileName);
 
+      //
       // Inject the user settings to the loaded file
+      //
+
       if FileExists(SavedFileName + '.user') then   // I4698
       begin
         userdoc := MSXMLDOMDocumentFactory.CreateDOMDocument;
@@ -227,8 +231,8 @@ begin
         xsl.async := False;
         xsl.resolveExternals := True;
         xsl.validateOnParse := False;
-        xsl.load(StringsTemplatePath + 'project.xsl'); // StandardTemplatePath + 'project.xsl');
-        output := doc.transformNode(xsl); //,  Node.TransformNode(xsl.DocumentElement, output);
+        xsl.load(StringsTemplatePath + 'project.xsl');
+        output := doc.transformNode(xsl);
       finally
         xsl := nil;
       end;
@@ -238,6 +242,7 @@ begin
   finally
     SetCurrentDir(FLastDir);
   end;
+
   with TStringList.Create do
   try
     Text := output;

@@ -24,21 +24,24 @@ unit kwhelp;
 
 interface
 
-function HelpKeyword(txt: string): string;
-function IsValidHelpToken(var token: WideString): Boolean;
+function IsValidHelpToken(var token: WideString; HelpOnSyntacticElements: Boolean): Boolean;
 
 implementation
 
-uses SysUtils;
+uses
+  System.SysUtils,
+
+  Keyman.Developer.System.HelpTopics;
 
 type
   THelpArray = record
     Word: string;
-    Topic: string;  // if not specified, then will default to "reference/<word>.html"
+    Topic: string;  // if not specified, then will default to "[guide|reference]/<word>"
+    Guide: Boolean; // if true, uses SLanguageGuide else SLanguageReference
   end;
 
 const
-  HelpArray: array[0..68] of THelpArray = (   // I4840
+  HelpArray: array[0..73] of THelpArray = (   // I4840
     (Word: 'BITMAP' ),
     (Word: 'begin' ),
     (Word: 'COPYRIGHT' ),
@@ -115,27 +118,16 @@ const
     (Word: 'shift'; Topic: 'caps' ),
 {32}(Word: 'frees'; Topic: 'caps' ),
 
-{1} (Word: 'c'; Topic: '_struct_comments' )
+{1} (Word: 'c'; Topic: 'comments'; Guide: True ),
+
+{3} (Word: '*virtual-key'; Topic: 'virtual-keys'; Guide: True ),
+    (Word: '*character'; Topic: 'strings'; Guide: True ),
+    (Word: '*string'; Topic: 'strings'; Guide: True ),
+    (Word: '*constant'; Topic: 'constants'; Guide: True ),
+    (Word: '*compile-target'; Topic: 'compile-targets'; Guide: True )
   );
 
-function HelpKeyword(txt: string): string;
-var
-  i: Integer;
-begin
-  for i := 0 to High(HelpArray) do
-  begin
-    if SameText(txt, HelpArray[i].Word) then
-    begin
-      if HelpArray[i].Topic = '' then txt := 'reference_'+LowerCase(HelpArray[i].Word) else txt := 'reference_'+LowerCase(HelpArray[i].Topic);   // I4677   // I4841
-      Result := txt;
-      Exit;
-    end;
-  end;
-
-  Result := 'reference__keywordsbytype';   // I4677   // I4841
-end;
-
-function IsValidHelpToken(var token: WideString): Boolean;
+function IsValidHelpToken(var token: WideString; HelpOnSyntacticElements: Boolean): Boolean;
 var
   i: Integer;
 begin
@@ -149,16 +141,41 @@ begin
   if (Length(token) > 2) and ((token[1] = 'c') or (token[1] = 'C')) and ((token[2] < #33) or (token[2] = #160)) then
   begin
     token := 'c';
+  end
+  else if HelpOnSyntacticElements then
+  begin
+    if Copy(token, 1, 1) = '[' then
+    begin
+      token := '*virtual-key';
+    end
+    else if SameText(Copy(token, 1, 2), 'U+') or SameText(Copy(token, 1, 1), 'd') or SameText(Copy(token, 1, 1), 'x') then
+    begin
+      token := '*character';
+    end
+    else if (token <> '') and CharInSet(token[1], ['''', '"']) then
+    begin
+      token := '*string';
+    end
+    else if Copy(token, 1, 1) = '$' then
+    begin
+      if SameText(token, '$keyman:') or SameText(token, '$keymanonly:') or SameText(token, '$keyman:') or
+          SameText(token, '$kmfl:') or SameText(token, '$weaver:')
+        then token := '*compile-target'
+        else token := '*constant';
+    end;
   end;
 
   for i := 0 to High(HelpArray) do
   begin
     if WideSameText(HelpArray[i].Word, token) then
     begin
-      if HelpArray[i].Topic <> '' then token := LowerCase(HelpArray[i].Topic)
-      else token := LowerCase(HelpArray[i].Word);
-      Result := True;
-      Exit;
+      if HelpArray[i].Topic <> ''
+        then token := LowerCase(HelpArray[i].Topic)
+        else token := LowerCase(HelpArray[i].Word);
+      if HelpArray[i].Guide
+        then token := SHelpTopic_LanguageGuide_Prefix + token
+        else token := SHelpTopic_LanguageReference_Prefix + token;
+      Exit(True);
     end;
   end;
 

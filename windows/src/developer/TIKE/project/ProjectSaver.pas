@@ -112,6 +112,8 @@ var
   i: Integer;
   doc: IXMLDocument;
   node, root: IXMLNode;
+  viewState: IXMLNode;
+  state: IXMLDocument;
 begin
   // Save user options
 
@@ -122,9 +124,13 @@ begin
   root := doc.CreateElement('KeymanDeveloperProjectUser', '');
   doc.DocumentElement := root;
 
-  root.AddChild('templatepath').NodeValue := ConvertPathToFileURL(FProject.StandardTemplatePath);
-  root.AddChild('stringspath').NodeValue := ConvertPathToFileURL(FProject.StringsTemplatePath);
-  root.AddChild('state').NodeValue := FProject.DisplayState;
+  if FProject.DisplayState <> '' then
+  begin
+    state := LoadXMLData(FProject.DisplayState);
+    viewState := root.AddChild('ViewState');
+    for i := 0 to state.DocumentElement.ChildNodes.Count - 1 do
+      viewState.ChildNodes.Add(state.DocumentElement.ChildNodes[i].CloneNode(True));
+  end;
 
   // file states
 

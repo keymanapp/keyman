@@ -23,20 +23,14 @@ uses
   System.Classes,
   Winapi.Messages,
   Winapi.Windows,
-  KeymanDeveloperMemo
-{$IFDEF USE_PLUSMEMO}
-  ,
-  PlusMemo,
-  PMSupport
-{$ENDIF}
-  ;
+  Vcl.StdCtrls;
 
 type
-  TPlusMemoDebuggerMessageEvent = procedure(Sender: TObject; var Message: TMessage; var Handled: Boolean) of object;
+  TKeymanDeveloperDebuggerMessageEvent = procedure(Sender: TObject; var Message: TMessage; var Handled: Boolean) of object;
 
-  TKeymanDeveloperDebuggerMemo = class(TKeymanDeveloperMemo)
+  TKeymanDeveloperDebuggerMemo = class(TMemo)
   private
-    FOnMessage: TPlusMemoDebuggerMessageEvent;
+    FOnMessage: TKeymanDeveloperDebuggerMessageEvent;
     FAllowUnicodeInput: Boolean;
     procedure SetAllowUnicode(const Value: Boolean);
   protected
@@ -46,14 +40,14 @@ type
     constructor Create(AOwner: TComponent); override;
   published
     property AllowUnicode: Boolean read FAllowUnicodeInput write SetAllowUnicode default True;
-    property OnMessage: TPlusMemoDebuggerMessageEvent read FOnMessage write FOnMessage;
+    property OnMessage: TKeymanDeveloperDebuggerMessageEvent read FOnMessage write FOnMessage;
   end;
 
 procedure Register;
 
 implementation
 
-{ TPlusMemoDebugger }
+{ TKeymanDeveloperDebuggerMemo }
 
 constructor TKeymanDeveloperDebuggerMemo.Create(AOwner: TComponent);
 begin

@@ -31,6 +31,7 @@ type
     frameOSK: TframeOnScreenKeyboardEditor;
     procedure OSKModified(Sender: TObject);
   protected
+    function GetHelpTopic: string; override;
     function GetFileNameFilter: string; override;
     function GetDefaultExt: string; override;
 
@@ -43,6 +44,9 @@ type
   end;
 
 implementation
+
+uses
+  Keyman.Developer.System.HelpTopics;
 
 {$R *.dfm}
 
@@ -89,6 +93,11 @@ end;
 function TfrmOSKEditor.GetFileNameFilter: string;
 begin
   Result := 'On Screen Keyboard Files (*.kvk)|*.kvk';
+end;
+
+function TfrmOSKEditor.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_OSKEditor;
 end;
 
 end.

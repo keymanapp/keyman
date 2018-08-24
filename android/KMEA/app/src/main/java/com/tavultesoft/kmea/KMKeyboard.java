@@ -130,6 +130,7 @@ final class KMKeyboard extends WebView {
         // Send console errors to Firebase Analytics.
         // (Ignoring spurious message "No keyboard stubs exist = ...")
         // TODO: Analyze if this error warrants reverting to default keyboard
+        // TODO: Fix base error rather than trying to ignore it "No keyboard stubs exist"
         if ((cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) && (!cm.message().startsWith("No keyboard stubs exist"))) {
           sendKMWError(cm.lineNumber(), cm.sourceId(), cm.message());
           Toast.makeText(context, "Fatal Error with " + currentKeyboard +
@@ -166,6 +167,11 @@ final class KMKeyboard extends WebView {
     String htmlPath = "file://" + getContext().getDir("data", Context.MODE_PRIVATE) + "/" + KMManager.KMFilename_KeyboardHtml;
     loadUrl(htmlPath);
     setBackgroundColor(0);
+  }
+
+  public void hideKeyboard() {
+    String jsString = "javascript:hideKeyboard()";
+    loadUrl(jsString);
   }
 
   public void executeHardwareKeystroke(int code, int shift, int lstates) {
@@ -255,7 +261,7 @@ final class KMKeyboard extends WebView {
    * @return String
    */
   public static String textFontFilename() {
-    return keyboardRoot + txtFont;
+    return txtFont.isEmpty() ? "" : keyboardRoot + txtFont;
   }
 
   /**
@@ -346,9 +352,6 @@ final class KMKeyboard extends WebView {
     String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
     String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
     loadUrl(jsString);
-    if (KMManager.isDebugMode()) {
-      Log.d("KMKeyboard", jsString);
-    }
 
     this.packageID = packageID;
     this.keyboardID = keyboardID;
@@ -450,9 +453,6 @@ final class KMKeyboard extends WebView {
     String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
     String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
     loadUrl(jsString);
-    if (KMManager.isDebugMode()) {
-      Log.d("KMKeyboard", jsString);
-    }
 
     this.packageID = packageID;
     this.keyboardID = keyboardID;

@@ -305,7 +305,6 @@ begin
       regWrite.WriteString(SRegValue_KeymanFile, pathname + ExtractFileName(filename));
 
       CopyValue(SRegValue_Legacy_DefaultLanguageID);   // I4220
-      CopyValue(SRegValue_KeymanDefaultHotkey);
 
       CopyValue(SRegValue_PackageName);
 

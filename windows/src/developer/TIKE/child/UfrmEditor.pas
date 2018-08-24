@@ -43,11 +43,7 @@ uses
   StdCtrls, ExtCtrls, Menus, ToolWin, ComCtrls, ImgList, ErrorControlledRegistry, 
   RegistryKeys, UfrmMDIChild, MenuImgList, Printers,
   UfrmKeyTest,
-{$IFDEF USE_PLUSMEMO}
-  SyntaxHighlight,
-  HtmlHighlight,
-  pmprint,
-{$ENDIF}
+
   ProjectFile, UfrmMDIEditor,
   CaptionPanel, Grids,
   CharMapInsertMode,
@@ -86,6 +82,7 @@ type
     function GetTextFileFormat: TTextFileFormat;
 
   protected
+    function GetHelpTopic: string; override;
     function DoSaveFile: Boolean; override;
     function DoOpenFile: Boolean; override;
     function GetFileNameFilter: string; override;
@@ -116,6 +113,8 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   CharacterDragObject,
   CharMapDropTool,
   ClipBrd,
@@ -165,7 +164,7 @@ begin
   FEditorFrame.OnChanged := EditorChanged;
   FEditorFrame.TextFileFormat := tffUTF8;
 
-  GetCharMapDropTool.Handle(FEditorFrame.memo, cmimDefault);    // I1422 - insert character map chars
+//  TODO: GetCharMapDropTool.Handle(FEditorFrame.memo, cmimDefault);    // I1422 - insert character map chars
 
   ActiveControl := FEditorFrame;
 
@@ -183,7 +182,7 @@ end;
 
 procedure TfrmEditor.SetEditorText(s: WideString);
 begin
-  FEditorFrame.memo.SetTextBuf(PWideChar(s));
+  FEditorFrame.SetTextBuf(PWideChar(s));
 end;
 
 procedure TfrmEditor.SetFocus;
@@ -326,6 +325,11 @@ end;
 function TfrmEditor.GetFileNameFilter: string;
 begin
   Result := 'Keyboard definitions (*.kmn)|*.kmn|HTML files (*.htm, *.html)|*.htm?|XML files (*.xml)|*.xml|Text files (*.txt)|*.txt|All files (*.*)|*.*';
+end;
+
+function TfrmEditor.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_Editor;
 end;
 
 function TfrmEditor.GetTextFileFormat: TTextFileFormat;

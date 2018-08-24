@@ -3,6 +3,7 @@
 ## Mac Tools Requirements/Setup
 Install Xcode 8.3.3 or later (it might also work to use an older version)
 Install [Carthage](https://github.com/Carthage/Carthage/blob/master/README.md) *see Homebrew note below
+Install cocoapods (sudo gem install cocoapods) if not already installed.
 
 ## Keyman for macOS Development
 Keyman for macOS can be built from a command line (preferred) or Xcode.
@@ -24,7 +25,7 @@ Note: If Carthage prompts you to allow it access to your github credentials, it'
 [Installing Keyman for Mac OS X](https://help.keyman.com/products/mac/1.0/docs/start_download-install_keyman.php).
 
 ### Compiling from Xcode
-To build using Xcode, you will need to build KeymanEngine4Mac first and then build Keyman4MacIM.
+To build using Xcode, you will need to build KeymanEngine4Mac first and then build Keyman4MacIM. The very _first_ time after getting the source code (and any time the Podfile is edited; e.g., to install new pods), you need to go to **keyman/mac/Keyman4MacIM and run "pod install" in Terminal.
 
 1. Launch Xcode
 2. Open **keyman/mac/KeymanEngine4Mac/KeymanEngine4Mac.xcodeproj**

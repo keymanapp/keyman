@@ -20,6 +20,8 @@
 #import "NSWindow+SuppMethods.h"
 #import "NSString+SuppMethods.h"
 
+typedef void(^PostEventCallback)(CGEventRef eventToPost);
+
 extern NSString *const kKMSelectedKeyboardKey;
 extern NSString *const kKMActiveKeyboardsKey;
 extern NSString *const kKeymanKeyboardDownloadCompletedNotification;
@@ -42,7 +44,12 @@ extern NSString *const kReadMeFile;
 extern NSString *const kVersion;
 extern NSString *const kWebSite;
 
-@interface KMInputMethodAppDelegate : NSObject {
+@interface KMInputMethodAppDelegate : NSObject
+#define USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE 1
+#ifdef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
+    <NSAlertDelegate>
+#endif
+{
     IBOutlet NSMenu *_menu;
 }
 
@@ -56,6 +63,9 @@ extern NSString *const kWebSite;
 @property (nonatomic, strong) NSMutableArray *activeKeyboards;
 @property (nonatomic, strong) NSMutableString *contextBuffer;
 @property (nonatomic, assign) NSEventModifierFlags currentModifierFlags;
+@property (nonatomic, assign) CFMachPortRef lowLevelEventTap;
+@property (nonatomic, assign) CFRunLoopSourceRef runLoopEventSrc;
+@property (nonatomic, assign) BOOL sleeping;
 @property (nonatomic, assign) BOOL contextChangingEventDetected;
 @property (nonatomic, strong) OSKWindowController *oskWindow;
 @property (nonatomic, strong) NSString *keyboardName;
@@ -73,6 +83,7 @@ extern NSString *const kWebSite;
 @property (nonatomic, strong) NSMutableData *receivedData;
 @property (nonatomic, assign) NSUInteger expectedBytes;
 @property (nonatomic, assign) BOOL alwaysShowOSK;
+@property (nonatomic, assign) BOOL useVerboseLogging;
 @property (nonatomic, assign) BOOL useNullChar;
 @property (nonatomic, assign) BOOL debugMode;
 
@@ -81,20 +92,25 @@ extern NSString *const kWebSite;
 - (void)showAboutWindow;
 - (void)showOSK;
 - (void)showConfigurationWindow;
+- (void)sleepFollowingDeactivationOfServer:(id)lastServer;
+- (void)wakeUpWith:(id)newServer;
 - (void)handleKeyEvent:(NSEvent *)event;
 - (BOOL)unzipFile:(NSString *)filePath;
 - (NSWindowController *)downloadKBWindow_;
 - (NSWindowController *)aboutWindow_;
 - (NSWindowController *)infoWindow_;
 - (NSWindowController *)kbHelpWindow_;
+- (void)processURL:(NSString*)rawUrl;
 - (NSString *)kmxFilePathAtIndex:(NSUInteger)index;
 - (NSString *)packagePathAtIndex:(NSUInteger)index;
 - (NSInteger)indexForPackageFolder:(NSString *)packageFolder;
 - (NSString *)packageFolderFromPath:(NSString *)path;
 - (NSString *)packageNameFromFolder:(NSString *)packageFolder;
+- (NSArray *)keyboardNamesFromFolder:(NSString *)packageFolder;
 - (NSDictionary *)infoDictionaryFromFile:(NSString *)infoFile;
 - (NSString *)kvkFilePathFromFilename:(NSString *)kvkFilename;
 - (NSString *)oskWindowTitle;
+- (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent;
 
 @end
 

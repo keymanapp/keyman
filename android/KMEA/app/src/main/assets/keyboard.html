@@ -1,6 +1,6 @@
 <html>
 <!--
- Copyright (C) 2017 SIL International. All rights reserved.
+ Copyright (C) 2017-2018 SIL International. All rights reserved.
 -->
 
 <head>
@@ -16,8 +16,8 @@
 
     function init() {
       //document.body.style.backgroundColor="transparent";
-      window.console.log('Device type = '+device);
-      window.console.log('Keyboard height = '+oskHeight);
+      //window.console.log('Device type = '+device);
+      //window.console.log('Keyboard height = '+oskHeight);
       var kmw=window['keyman'];
       kmw.init({'app':device,'fonts':'packages/'});
       kmw['util']['setOption']('attachType','manual');
@@ -57,7 +57,7 @@
       if(oskWidth <= 0) {
         oskWidth = window.jsInterface.getKeyboardWidth();
       }
-      window.console.log('Keyboard width = '+oskWidth);
+      //window.console.log('Keyboard width = '+oskWidth);
       return oskWidth;
     }
 
@@ -66,16 +66,12 @@
       var name = typeof(keyboardProperties.internalName) == 'undefined' ? keyboardProperties.keyboardName : keyboardProperties.internalName;
       var kmw=window['keyman'];
       var isChiral = kmw.isChiral(name);
-      window.console.log('For keyboard "' + name + '"');
-      window.console.log('setIsChiral = ' + isChiral);
 
       window.jsInterface.setIsChiral(isChiral);
       return true;
     }
 
     function setKeymanLanguage(keyboardName, internalName, languageName, langId, kbdFile, font, oskFont, package) {
-      //oskFont.files = ['NotoSansSyriacWestern-Regular.svg#NotoSansSyriacWesternRegular'];
-      //window.console.log('oskFonts = '+JSON.stringify(oskFont));
       var kmw=window['keyman'];
       var kbdInterface=kmw['interface'];
 
@@ -108,11 +104,11 @@
       };
       if (font) {
         k.KFont = font;
-        window.console.log('keyboard.html assigning k.KFont = ' + font);
+        //window.console.log('keyboard.html assigning k.KFont = ' + font);
       }
       if (oskFont) {
         k.KOskFont = oskFont;
-        window.console.log('keyboard.html assigning k.KOskFont = ' + oskFont);
+        //window.console.log('keyboard.html assigning k.KOskFont = ' + oskFont);
       }
       kbdInterface.registerStub(k);
 
@@ -121,7 +117,7 @@
     }
 
     function insertText(dn, s) {
-      window.console.log('insertText('+ dn +', ' + s +');');
+      //window.console.log('insertText('+ dn +', ' + s +');');
       window.jsInterface.insertText(dn, s);
     }
 
@@ -198,7 +194,6 @@
       fragmentToggle = (fragmentToggle + 1) % 100;
       var kmw = window['keyman'];
       var pos = kmw['touchMenuPos']();
-      window.console.log('showHelpBubble ' + pos);
       window.location.hash = 'showHelpBubble-' + fragmentToggle + '+keyPos=' + pos;
     }
 
@@ -206,18 +201,18 @@
       var kmw=window['keyman'];
       
       // KMW only needs keyID to process the popup key. keyText merely logged to console
-      window.console.log('executePopupKey('+keyID+'); keyText: ' + keyText);
+      //window.console.log('executePopupKey('+keyID+'); keyText: ' + keyText);
       kmw['executePopupKey'](keyID);
     }
 
     function executeHardwareKeystroke(code, shift, lstates) {
       var kmw=window['keyman'];
-      window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ', ' + lstates + ');');
+      //window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ', ' + lstates + ');');
       try {
         var r = kmw['executeHardwareKeystroke'](code, shift, lstates);
-        window.console.log('executeHardwareKeystroke completed with '+r);
+        //window.console.log('executeHardwareKeystroke completed with '+r);
       } catch(e) {
-        window.console.log('oops: '+e);
+        window.console.log('executeHardwareKeystroke exception: '+e);
       }
     }
 
@@ -241,8 +236,7 @@
 
   </script>
   <style type="text/css">
-      body {background-color:#000000; min-width:2500px;}
-     
+      body {background-color:#000000;}
   </style>
 </head>
 <body class="kmw-embedded keyman-app">

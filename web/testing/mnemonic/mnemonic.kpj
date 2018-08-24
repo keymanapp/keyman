@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_96c0a7bc7aad5d4fb95b3bb7ab9cd2be</ID>
+      <Filename>mnemonic.kmn</Filename>
+      <Filepath>mnemonic.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Mnemonic Tests</Name>
+      </Details>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

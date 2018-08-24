@@ -45,7 +45,8 @@ implementation
 
 uses
   RedistFiles,
-  TouchLayoutUtils;
+  TouchLayoutUtils,
+  utilfiletypes;
 
 {$R *.dfm}
 
@@ -69,7 +70,7 @@ var
   Error, Root: string;
 begin
   Root := GetLayoutBuilderPath;
-  if FindFirst(Root + '*.js', 0, f) = 0 then
+  if FindFirst(Root + '*'+Ext_KeymanTouchLayout, 0, f) = 0 then
   begin
     repeat
       if IsValidTouchLayoutFile(Root + f.Name, Error) then

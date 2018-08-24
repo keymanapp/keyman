@@ -41,7 +41,10 @@
                       <xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>package.gif</xsl:attribute>
                     </img>
                     <div class="packagetitle">
-                      <xsl:value-of select="name"/>
+                      <xsl:choose>
+                        <xsl:when test="name"><xsl:value-of select="name"/></xsl:when>
+                        <xsl:otherwise><xsl:value-of select="id"/>.kmp</xsl:otherwise>
+                      </xsl:choose>
                     </div>
                     <br style="clear:left" />
                   </div>
@@ -127,7 +130,10 @@
           <xsl:text> </xsl:text>
           <div class="keyboard_header" style="display: inline">
             <xsl:attribute name="id">keyboard_name_<xsl:value-of select="id"/></xsl:attribute>
-            <xsl:if test="name"><xsl:value-of select="name"/></xsl:if>
+            <xsl:choose>
+              <xsl:when test="name"><xsl:value-of select="name"/></xsl:when>
+              <xsl:otherwise><xsl:value-of select="id"/>.kmx</xsl:otherwise>
+            </xsl:choose>
             <xsl:text> </xsl:text>
           </div>
         </div>
@@ -185,7 +191,7 @@
                   </div>
                   <div class="keyboard_table">
                     <table style="font-size: 11px;">
-                      <xsl:if test="name">
+                      <xsl:if test="id">
                         <tr><td class="table_header"><xsl:value-of select="$locale/String[@Id='S_Caption_Filename']"/></td>
                           <td>
                           <span><xsl:value-of select="id"/>.kmx</span>

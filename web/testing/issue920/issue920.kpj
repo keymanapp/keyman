@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath></BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_a97e3628345ffa68f6949f115ea48c12</ID>
+      <Filename>multigroup.kmn</Filename>
+      <Filepath>multigroup.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Secondary group any mismatch #920</Name>
+      </Details>
+    </File>
+    <File>
+      <ID>id_6c3f403d7af7bb4c840eaddb321dbaf4</ID>
+      <Filename>multigroup90.kmn</Filename>
+      <Filepath>multigroup90.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Secondary group any mismatch #920</Name>
+      </Details>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

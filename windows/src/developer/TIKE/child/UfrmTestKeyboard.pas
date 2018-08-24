@@ -29,8 +29,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, StdCtrls, ComCtrls, Buttons, int_kmdebug, Menus, ErrorControlledRegistry, 
-  RegistryKeys, UfrmMDIChild, KeymanDeveloperDebuggerMemo, 
-  KeymanDeveloperMemo;
+  RegistryKeys, UfrmMDIChild, KeymanDeveloperDebuggerMemo;
 
 type
   TfrmTestKeyboard = class(TfrmTikeChild)
@@ -93,6 +92,8 @@ type
     procedure SaveFont;
     procedure FocusTestWindow;
     procedure ShowEditControl;
+  protected
+    function GetHelpTopic: string; override;
   public
     procedure Reload;
     property KeyboardName: string read FKeyboardName write SetKeyboardName;
@@ -102,6 +103,8 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   KeymanDeveloperUtils,
   kmxfile,
   UfrmMessages,
@@ -405,7 +408,7 @@ var
   ch: WideString;
 begin
   if memo.SelText = '' then
-    ch := memo.GetTextPart(memo.SelStart-1, memo.SelStart)
+    ch := Copy(memo.Text, memo.SelStart-1, 1) //TODO: Supplementary pairs
   else
     ch := Copy(memo.SelText, 1, 16);
 
@@ -429,6 +432,11 @@ begin
   end;
 end;
 
+
+function TfrmTestKeyboard.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_TestKeyboard;
+end;
 
 { Debug menu }
 

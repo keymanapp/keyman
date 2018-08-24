@@ -91,10 +91,8 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
     setContentView(R.layout.list_layout);
     listView = (ListView) findViewById(R.id.listView);
 
-    File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), KMManager.KMFilename_KeyboardsList);
-    if (file.exists()) {
-      keyboardsList = getKeyboardsList(context);
-    } else {
+    keyboardsList = getKeyboardsList(context);
+    if (keyboardsList == null) {
       keyboardsList = new ArrayList<HashMap<String, String>>();
       HashMap<String, String> kbInfo = new HashMap<String, String>();
       kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
@@ -107,7 +105,12 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
       kbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
       kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
       keyboardsList.add(kbInfo);
-      saveKeyboardsList(context);
+
+      // We'd prefer not to overwrite a file if it exists
+      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), KMManager.KMFilename_KeyboardsList);
+      if (!file.exists()) {
+        saveKeyboardsList(context);
+      }
     }
 
     String[] from = new String[]{KMManager.KMKey_LanguageName, KMManager.KMKey_KeyboardName};
@@ -567,7 +570,8 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
               String languageID = keyboardsList.get(i).get(KMManager.KMKey_LanguageID);
               String keyboardID = keyboardsList.get(i).get(KMManager.KMKey_KeyboardID);
               String kbVersion = keyboardsList.get(i).get(KMManager.KMKey_KeyboardVersion);
-              String url = String.format("%slanguages/%s/%s?version=%s&device=%s", KMKeyboardDownloaderActivity.kKeymanApiBaseURL, languageID, keyboardID,  BuildConfig.VERSION_NAME, deviceType);
+              String url = String.format("%s/%s/%s?version=%s&device=%s&languageidtype=bcp47",
+                KMKeyboardDownloaderActivity.kKeymanApiBaseURL, languageID, keyboardID,  BuildConfig.VERSION_NAME, deviceType);
               JSONObject kbData = jsonParser.getJSONObjectFromUrl(url);
               JSONObject language = kbData.optJSONObject(KMKeyboardDownloaderActivity.KMKey_Language);
               JSONArray keyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);

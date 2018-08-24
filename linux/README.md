@@ -2,10 +2,12 @@
 
 ## Projects
 
- * kmflcomp - KMFL keyboard compiler
- * libkmfl - core library
- * ibus-kmfl - IBUS integration to use KMFL
+ * [kmflcomp](./kmflcomp) - KMFL keyboard compiler
+ * [libkmfl](./libkmfl) - core library
+ * [ibus-kmfl](./ibus-kmfl) - IBUS integration to use KMFL
  * scim\_kmfl\_imengine - deprecated SCIM engine to use KMFL
+
+ See [license information](./LICENSE.md) about licensing.
 
 ## Linux Requirements/Setup
 

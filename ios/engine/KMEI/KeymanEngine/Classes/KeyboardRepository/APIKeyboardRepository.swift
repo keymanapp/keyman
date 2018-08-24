@@ -29,7 +29,8 @@ public class APIKeyboardRepository: KeyboardRepository {
     urlComponents.queryItems = [
       URLQueryItem(name: "dateformat", value: "seconds"),
       URLQueryItem(name: "device", value: deviceType),
-      URLQueryItem(name: "version", value: keymanVersion)
+      URLQueryItem(name: "version", value: keymanVersion),
+      URLQueryItem(name: "languageidtype", value: "bcp47")
     ]
     log.info("Connecting to Keyman cloud: \(urlComponents.url!).")
     let task = URLSession.shared.dataTask(with: urlComponents.url!) { (data, response, error) in

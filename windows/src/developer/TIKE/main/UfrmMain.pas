@@ -299,6 +299,8 @@ type
     FInOnHelp: Boolean;
     mHHelp: TWebHookHelpSystem;   // I4677
     FFirstShow: Boolean;
+    FIsClosing: Boolean;
+    FCanClose: Boolean;
 
     //procedure ChildWindowsChange(Sender: TObject);
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FORMSHOWN;
@@ -332,6 +334,7 @@ type
     procedure InitDock;
     procedure LoadDockLayout;
     procedure SaveDockLayout;
+    procedure CEFShutdownComplete(Sender: TObject);
 
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -377,7 +380,8 @@ type
     function OpenTestWindow(FFileName: string): TfrmTikeChild;
     function OpenFile(FFileName: string; FCloseNewFile: Boolean): TfrmTikeChild;
 
-    procedure HelpTopic(s: string);
+    procedure HelpTopic(s: string); overload;
+    procedure HelpTopic(Sender: TTIKEForm); overload;
 
     property ChildWindows: TChildWindowList read FChildWindows;
     property CharMapSettings: TCharMapSettings read FCharMapSettings;
@@ -402,6 +406,8 @@ uses
   System.Win.ComObj,
   Vcl.Themes,
 
+  Keyman.Developer.System.CEFManager,
+
   CharMapDropTool,
   DebugManager,
   HTMLHelpViewer,
@@ -411,6 +417,7 @@ uses
   OnlineUpdateCheck,
   GlobalProxySettings,
   ProjectFileUI,
+  ProjectUI,
   TextFileFormat,
   RedistFiles,
   ErrorControlledRegistry,
@@ -501,8 +508,10 @@ begin
   RemoveOldestTikeEditFonts(False);
   RemoveOldestTikeTestFonts(False);
 
-  TProjectUI.Create(FActiveProject, True);   // I4687
+  if (FActiveProject <> '') and not FileExists(FActiveProject) then
+    FActiveProject := '';
 
+  LoadGlobalProjectUI(FActiveProject, True);
 
   InitDock;
 
@@ -561,8 +570,6 @@ procedure TfrmKeymanDeveloper.FormClose(Sender: TObject; var Action: TCloseActio
 var
   i: Integer;
 begin
-  SaveDockLayout;
-
   for i := FChildWindows.Count - 1 downto 0 do
   begin
     FChildWindows[i].Visible := False;
@@ -600,31 +607,46 @@ procedure TfrmKeymanDeveloper.FormCloseQuery(Sender: TObject;
 var
   i: Integer;
 begin
-  // I944 - Fix crash when FChildWindows is nil on closing Keyman Developer
-  if not Assigned(FChildWindows) then
+//  OutputDebugString(PChar('TfrmKeymanDeveloper.FormCloseQuery: FIsClosing='+BoolToStr(FIsClosing)+' FCanClose='+BoolToStr(FCanClose)));
+  if not FIsClosing then
   begin
-    CanClose := True;
-    Exit;
-  end;
-
-  for i := 0 to FChildWindows.Count - 1 do
-    if not FChildWindows[i].CloseQuery then
+    // I944 - Fix crash when FChildWindows is nil on closing Keyman Developer
+    if Assigned(FChildWindows) then
     begin
-      CanClose := False;
-      Exit;
+      for i := 0 to FChildWindows.Count - 1 do
+        if not FChildWindows[i].CloseQuery then
+        begin
+          CanClose := False;
+          Exit;
+        end;
     end;
 
-  CanClose := True;
+    FIsClosing := True;
+    SaveDockLayout;
+
+    CanClose := FInitializeCEF.StartShutdown(CEFShutdownComplete);
+    // TODO: complete exit after StartClose is successful
+  end
+  else
+    CanClose := FCanClose;
+end;
+
+procedure TfrmKeymanDeveloper.CEFShutdownComplete(Sender: TObject);
+begin
+//  OutputDebugString(PChar('TfrmKeymanDeveloper.CEFShutdownComplete'));
+  FCanClose := True;
+  Close;
 end;
 
 procedure TfrmKeymanDeveloper.FormDestroy(Sender: TObject);
 begin
+//  OutputDebugString(PChar('TfrmKeymanDeveloper.FormDestroy'));
   UnhookWindowsHookEx(hInputLangChangeHook);
 
   FreeAndNil(FCharMapSettings);
   Application.OnActivate := nil;
 
-  FreeAndNil(FGlobalProject);
+  FreeGlobalProjectUI;
   FreeAndNil(FChildWindows);
   FreeAndNil(FProjectMRU);
 
@@ -760,9 +782,12 @@ begin
       FInOnHelp := True;
       try
         s := PChar(Data);
-        frm := GetParentForm(Screen.ActiveControl, False);
-        if frm is TTikeForm then
-          (frm as TTikeForm).GetHelpTopic(s);
+        if s = '' then
+        begin
+          frm := GetParentForm(Screen.ActiveControl, False);
+          if frm is TTikeForm then
+            s := (frm as TTikeForm).HelpTopic;
+        end;
         if s <> '' then
           mHHelp.HelpTopic(s);
       finally
@@ -1032,6 +1057,11 @@ begin
     DoForm(frmCharacterIdentifier);   // I4807
 end;
 
+procedure TfrmKeymanDeveloper.HelpTopic(Sender: TTIKEForm);
+begin
+  HelpTopic(Sender.HelpTopic);
+end;
+
 function TfrmKeymanDeveloper.OpenTestWindow(FFileName: string): TfrmTikeChild;
 var
   i: Integer;
@@ -1274,6 +1304,12 @@ begin
             Window.Parent := nil;
             pages.Pages[i].Free;
             FocusActiveChild;
+
+            if FIsClosing then
+              if pages.PageCount = 0 then
+              begin
+                Close;
+              end;
             Exit;
           end;
       end;

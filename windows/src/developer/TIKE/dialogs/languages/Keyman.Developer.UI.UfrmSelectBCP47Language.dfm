@@ -1,13 +1,13 @@
 inherited frmSelectBCP47Language: TfrmSelectBCP47Language
-  ActiveControl = editLanguageTag
+  ActiveControl = cbLanguageTag
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Select BCP 47 Tag'
-  ClientHeight = 186
+  ClientHeight = 216
   ClientWidth = 436
   Position = poScreenCenter
   OnDestroy = FormDestroy
-  ExplicitHeight = 215
+  ExplicitHeight = 245
   PixelsPerInch = 96
   TextHeight = 13
   object lblLanguageTag: TLabel
@@ -16,7 +16,7 @@ inherited frmSelectBCP47Language: TfrmSelectBCP47Language
     Width = 70
     Height = 13
     Caption = '&Language tag:'
-    FocusControl = editLanguageTag
+    FocusControl = cbLanguageTag
   end
   object lblScriptTag: TLabel
     Left = 8
@@ -24,7 +24,7 @@ inherited frmSelectBCP47Language: TfrmSelectBCP47Language
     Width = 50
     Height = 13
     Caption = '&Script tag:'
-    FocusControl = editScriptTag
+    FocusControl = cbScriptTag
   end
   object lblRegionTag: TLabel
     Left = 8
@@ -32,7 +32,7 @@ inherited frmSelectBCP47Language: TfrmSelectBCP47Language
     Width = 56
     Height = 13
     Caption = '&Region tag:'
-    FocusControl = editRegionTag
+    FocusControl = cbRegionTag
   end
   object lblBCP47Code: TLabel
     Left = 8
@@ -50,86 +50,100 @@ inherited frmSelectBCP47Language: TfrmSelectBCP47Language
     AutoSize = False
   end
   object lblLanguageName: TLabel
-    Left = 224
+    Left = 234
     Top = 11
     Width = 74
     Height = 13
     Caption = 'language-name'
-    FocusControl = editLanguageTag
+    FocusControl = cbLanguageTag
   end
   object lblScriptName: TLabel
-    Left = 224
+    Left = 234
     Top = 38
     Width = 56
     Height = 13
     Caption = 'script-name'
-    FocusControl = editLanguageTag
+    FocusControl = cbLanguageTag
   end
   object lblRegionName: TLabel
-    Left = 224
+    Left = 234
     Top = 65
     Width = 60
     Height = 13
     Caption = 'region-name'
-    FocusControl = editLanguageTag
+    FocusControl = cbLanguageTag
+  end
+  object Label1: TLabel
+    Left = 8
+    Top = 153
+    Width = 80
+    Height = 13
+    Caption = 'Language &name:'
+    FocusControl = editLanguageName
   end
   object cmdOK: TButton
     Left = 272
-    Top = 151
+    Top = 183
     Width = 75
     Height = 25
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 0
+    TabOrder = 7
   end
   object cmdCancel: TButton
     Left = 353
-    Top = 151
+    Top = 183
     Width = 75
     Height = 25
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 1
+    TabOrder = 8
   end
-  object editLanguageTag: TEdit
-    Left = 84
+  object cbLanguageTag: TComboBox
+    Left = 94
     Top = 8
     Width = 121
     Height = 21
-    TabOrder = 2
-    OnChange = editLanguageTagChange
+    MaxLength = 3
+    Sorted = True
+    TabOrder = 0
+    OnChange = cbLanguageTagChange
   end
-  object editScriptTag: TEdit
-    Left = 84
+  object cbScriptTag: TComboBox
+    Left = 94
     Top = 35
     Width = 121
     Height = 21
-    TabOrder = 3
-    OnChange = editScriptTagChange
+    MaxLength = 4
+    Sorted = True
+    TabOrder = 1
+    OnChange = cbScriptTagChange
   end
-  object editRegionTag: TEdit
-    Left = 84
+  object cbRegionTag: TComboBox
+    Left = 94
     Top = 62
     Width = 121
     Height = 21
-    TabOrder = 4
-    OnChange = editRegionTagChange
+    MaxLength = 3
+    Sorted = True
+    TabOrder = 2
+    OnChange = cbRegionTagChange
   end
   object editBCP47Code: TEdit
-    Left = 84
+    Left = 94
     Top = 89
     Width = 229
     Height = 21
     TabStop = False
     ParentColor = True
     ReadOnly = True
-    TabOrder = 5
+    TabOrder = 3
   end
   object lblLinkToW3C: TLinkLabel
     Left = 8
-    Top = 159
+    Top = 191
     Width = 194
     Height = 17
     Caption = 
@@ -137,5 +151,22 @@ inherited frmSelectBCP47Language: TfrmSelectBCP47Language
       'language-tags">Learn about how to select a BCP 47 tag</a>'
     TabOrder = 6
     OnLinkClick = lblLinkToW3CLinkClick
+  end
+  object editLanguageName: TEdit
+    Left = 94
+    Top = 150
+    Width = 186
+    Height = 21
+    TabOrder = 4
+    OnChange = editLanguageNameChange
+  end
+  object cmdResetLanguageName: TButton
+    Left = 286
+    Top = 149
+    Width = 75
+    Height = 23
+    Caption = 'R&eset'
+    TabOrder = 5
+    OnClick = cmdResetLanguageNameClick
   end
 end

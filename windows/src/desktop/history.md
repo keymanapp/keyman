@@ -1,7 +1,164 @@
 # Keyman Desktop Version History
 
+## 2018-06-28 10.0.1200 stable
+* 10.0 stable release
+
+## 2018-06-27 10.0.1113.0 beta
+* No changes to Keyman Desktop
+
+## 2018-06-26 10.0.1112.0 beta
+* No changes to Keyman Desktop
+
+## 2018-06-21 10.0.1111.0 beta
+* No changes to Keyman Desktop
+
+## 2018-06-20 10.0.1110.0 beta
+* Removes obsolete "Getting Started" links (#1004)
+
+## 2018-06-19 10.0.1109.0 beta
+* Fixes api IKeymanControl::OpenConfiguration (#995)
+* Fixes some side effects when installing a keyboard (#997)
+
+## 2018-06-15 10.0.1108.0 beta
+* No changes in Keyman Desktop
+
+## 2018-06-13 10.0.1107.0 beta
+* Add Unicode 11.0 characters
+
+## 2018-06-12 10.0.1106.0 beta
+* No changes in Keyman Desktop
+
+## 2018-06-11 10.0.1105.0 beta
+* Platform tests (in keyboards) are now consistent across all platforms (#969)
+
+## 2018-06-09 10.0.1104.0 beta
+* Keyboards that have script subtags will now install on Windows 7 (#964)
+
+## 2018-06-07 10.0.1103.0 beta
+* Keyman Configuration will now show keyboards that have no name with their filename (#955)
+* Keyboard packages with BCP 47 language subtags unrecognised by Windows will now install on Windows 7 (#948)
+
+## 2018-06-05 10.0.1102.0 beta
+* Improved crash reporting stability (#940)
+
+## 2018-06-03 10.0.1101.0 beta
+* No changes in Keyman Desktop
+
+## 2018-06-01 10.0.1100.0 beta
+* Fixes email link in Keyman help
+
+## 2018-05-31 10.0.1099.0 beta
+* Fixes a problem where "Castilian" was shown instead of "Spanish" in language configuration (#918)
+* Fixes a crash when the Keyboard Options dialog is closed (#916)
+
+## 2018-05-30 10.0.1098.0 beta
+* Prevents a crash if an invalid .kvk file is found in a package (#915)
+
+## 2018-05-29 10.0.1097.0 beta
+* Fixes incorrect icons in the Hotkeys tab in Keyman Configuration (#906)
+* Ensure language tags are correct when installing a keyboard (#892)
+
+## 2018-05-28 10.0.1096.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-28 10.0.1095.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-26 10.0.1094.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-25 10.0.1093.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-22 10.0.1092.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-17 10.0.1091.0 beta
+* Fixes Ctrl+Alt simulation regression (#835)
+
+## 2018-05-11 10.0.1090.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-11 10.0.1087.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-09 10.0.1086.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-08 10.0.1085.0 beta
+* Clarified restart requirements and UI in Setup (#840)
+
+## 2018-05-08 10.0.1084.0 beta
+* Added implementation for IKeymanKeyboardFile.DefaultHotkey (#839)
+
+## 2018-05-08 10.0.1083.0 beta
+* Fixes a crash in Keyman Configuration (#838)
+
+## 2018-05-08 10.0.1082.0 beta
+* Adds script lookup to Add Keyboard Language dialog (#827)
+
+## 2018-05-07 10.0.1081.0 beta
+* Fixes crash in Keyman Desktop when keyboard name contains an ampersand (#831)
+
+## 2018-05-07 10.0.1080.0 beta
+* Fixes crash starting Keyman Desktop when using certain base keyboards (#832)
+
+## 2018-05-07 10.0.1079.0 beta
+* Fixes crash in updating active keyboard icon in On Screen Keyboard (#828)
+
+## 2018-05-04 10.0.1078.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-04 10.0.1077.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-04 10.0.1076.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-04 10.0.1075.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-03 10.0.1074.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-03 10.0.1073.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-03 10.0.1072.0 beta
+* No changes in Keyman Desktop
+
+## 2018-05-03 10.0.1071.0 beta
+* No changes in Keyman Desktop
+
+## 2018-04-30 10.0.1070.0 beta
+* No changes in Keyman Desktop
+
+## 2018-04-30 10.0.1066.0 beta
+* No changes in Keyman Desktop
+
+## 2018-04-27 10.0.1061.0 beta
+* No changes in Keyman Desktop
+
+## 2018-04-25 10.0.1060.0 beta
+* No changes in Keyman Desktop
+
+## 2018-04-25 10.0.1059.0 beta
+* No changes in Keyman Desktop
+
+## 2018-04-25 10.0.1058.0 beta
+* No changes in Keyman Desktop
+
+## 2018-04-12 10.0.1057.0 beta
+* Fix for backspace in legacy mode breaking SMP characters (#729)
+
+## 2018-03-31 10.0.1056.0 beta
+* No changes in Keyman Desktop
+
+## 2018-03-22 10.0.1055.0 beta
+* Offline help updates are synchronised with help.keyman.com in the correct version (#695)
+
 ## 2018-03-22 10.0.1054.0 beta
-Initial beta release of Keyman Desktop 10
+* Initial beta release of Keyman Desktop 10
 
 ## 10.0 alpha
 * Keyman Desktop moved to open source (#121)

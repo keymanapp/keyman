@@ -37,32 +37,23 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UfrmTike, Vcl.OleCtrls, SHDocVw_EWB,
-  EwbCore, EmbeddedWB, KeymanEmbeddedWB, UserMessages, KMDActionInterfaces,
-  KeyboardFonts, TempFileManager;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UfrmTike, UserMessages, KMDActionInterfaces,
+  KeyboardFonts, TempFileManager, Keyman.Developer.UI.UframeCEFHost;
 
 type
-  TframeTouchLayoutBuilder = class(TTikeForm, IKMDEditActions)   // I4034
-    web: TKeymanEmbeddedWB;
-    procedure FormDestroy(Sender: TObject);
+  TframeTouchLayoutBuilder = class(TTikeForm, IKMDEditActions)
     procedure FormCreate(Sender: TObject);
-    procedure webBeforeNavigate2(ASender: TObject; const pDisp: IDispatch;
-      var URL, Flags, TargetFrameName, PostData, Headers: OleVariant;
-      var Cancel: WordBool);
-    procedure webTranslateAccelerator(Sender: TCustomEmbeddedWB;
-      const lpMsg: PMsg; const pguidCmdGroup: PGUID; const nCmdID: Cardinal;
-      var Done: Boolean);
-    procedure webScriptError(Sender: TObject; ErrorLine, ErrorCharacter,
-      ErrorCode, ErrorMessage, ErrorUrl: string;
-      var ScriptErrorAction: TScriptErrorAction);
-    procedure webDocumentComplete(ASender: TObject; const pDisp: IDispatch;
-      var URL: OleVariant);   // I4057
+    procedure FormDestroy(Sender: TObject);   // I4057
   private
+    class var FInitialFilenameIndex: Integer;
+
+  private
+    cef: TframeCEFHost;
+
     FLoading: Boolean;   // I4057
     FTemplateFileName: string;
     FOnModified: TNotifyEvent;
     FSavedLayoutJS: string;
-    FHTMLTempFilename: TTempFile;   // I4195
     FOnImportFromOSKCommand: TNotifyEvent;
     FOnSelectTemplateCommand: TNotifyEvent;
     FCanUndo: Boolean;
@@ -70,11 +61,12 @@ type
     FDisplayScriptErrors: Boolean;
     FLastError: string;   // I4083
     FLastErrorOffset: Integer;   // I4083
+    FFilename: string;
     function GetLayoutJS: string;
     procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
     procedure DoModified;
     procedure DoLoad;
-    procedure FireCommand(const command: WideString; params: TStringList); virtual;
+    procedure FireCommand(const commands: TStringList); virtual;
     procedure DoSelectTemplate;
     procedure DoImportFromOSK;
     function BuilderCommand(const cmd: string): Boolean;
@@ -82,8 +74,12 @@ type
     function GetFontInfo(Index: TKeyboardFont): TKeyboardFontInfo;   // I4057
     procedure SetFontInfo(Index: TKeyboardFont; const Value: TKeyboardFontInfo);   // I4057
     procedure SetupModifierKeysForImportedLayout;
-    { Private declarations }
+
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string;
+      out Result: Boolean);
+    procedure cefLoadEnd(Sender: TObject);
   protected
+    function GetHelpTopic: string; override;
 
     procedure CopyToClipboard;
     procedure CutToClipboard;
@@ -113,7 +109,7 @@ type
     property OnImportFromOSKCommand: TNotifyEvent read FOnImportFromOSKCommand write FOnImportFromOSKCommand;
     property OnSelectTemplateCommand: TNotifyEvent read FOnSelectTemplateCommand write FOnSelectTemplateCommand;
     property LastError: string read FLastError;   // I4083
-    property LastErrorOffset: Integer read FLastErrorOffset;   // I4083
+    property LastErrorOffset: Integer read FLastErrorOffset;
   end;
 
 implementation
@@ -121,10 +117,10 @@ implementation
 uses
   System.JSON,
 
-  mshtml_ewb,
-  mshtmcid,
   xmlintf,
   xmldoc,
+
+  Keyman.Developer.System.HelpTopics,
 
   KeymanDeveloperOptions,
   VKeys,
@@ -138,8 +134,10 @@ uses
   UfrmCharacterMapDock,
   UfrmCharacterMapNew,
   UfrmMain,
+  UmodWebHTTPServer,
   Unicode,
   utildir,
+  utilfiletypes,
   utilhttp,
   VisualKeyboard;
 
@@ -147,18 +145,30 @@ uses
 
 { TframeTouchLayoutBuilder }
 
-procedure TframeTouchLayoutBuilder.FireCommand(const command: WideString;
-  params: TStringList);
+procedure TframeTouchLayoutBuilder.FireCommand(const commands: TStringList);
+var
+  i: Integer;
+  command: string;
 begin
-  if command = 'modified' then DoModified   // I3948
-  else if command = 'import' then DoImportFromOSK
-  else if command = 'template' then DoSelectTemplate
-  else if command = 'undo-disable' then FCanUndo := False
-  else if command = 'undo-enable' then FCanUndo := True
-  else if command = 'redo-disable' then FCanRedo := False
-  else if command = 'redo-enable' then FCanRedo := True
-  else if command = 'selected-char' then UpdateCharacterMap(params.Values['code'])   // I4046
-  else ShowMessage(command + '?' + params.Text);
+  i := 0;
+  while i < commands.Count do
+  begin
+    command := commands[i];
+    if command = 'modified' then DoModified   // I3948
+    else if command = 'import' then DoImportFromOSK
+    else if command = 'template' then DoSelectTemplate
+    else if command = 'undo-disable' then FCanUndo := False
+    else if command = 'undo-enable' then FCanUndo := True
+    else if command = 'redo-disable' then FCanRedo := False
+    else if command = 'redo-enable' then FCanRedo := True
+    else if command.StartsWith('selected-char,') then
+    begin
+      Inc(i);
+      UpdateCharacterMap(command.Substring('selected-char,'.Length));   // I4046
+    end
+    else ShowMessage('keyman:'+commands.Text);
+    Inc(i);
+  end;
 end;
 
 procedure TframeTouchLayoutBuilder.UpdateCharacterMap(code: string);   // I4046
@@ -181,13 +191,19 @@ procedure TframeTouchLayoutBuilder.FormCreate(Sender: TObject);
 begin
   inherited;
   FDisplayScriptErrors := True;   // I4047
-  FTemplateFileName := GetLayoutBuilderPath + 'template-basic.js';   // I4226
+  FTemplateFileName := GetLayoutBuilderPath + 'template-basic' + Ext_KeymanTouchLayout;   // I4226
+
+  cef := TframeCEFHost.Create(Self);
+  cef.Parent := Self;
+  cef.Visible := True;
+  cef.OnBeforeBrowse := cefBeforeBrowse;
+  cef.OnLoadEnd := cefLoadEnd;
 end;
 
 procedure TframeTouchLayoutBuilder.FormDestroy(Sender: TObject);
 begin
   inherited;
-  FreeAndNil(FHTMLTempFilename);   // I4023   // I4195
+  modWebHttpServer.AppSource.UnregisterSource(FFilename);
 end;
 
 procedure TframeTouchLayoutBuilder.ImportFromKVK(const KVKFileName: string);   // I3945
@@ -544,20 +560,35 @@ var
   FNewLayoutJS: string;
   FTouchLayout: TTouchLayout;
   FOldLayout: TTouchLayout;
+  function GetNextFilename: string;
+  begin
+    Inc(FInitialFilenameIndex);
+    Result := '*'+IntToStr(FInitialFilenameIndex);
+  end;
 begin
   FLastErrorOffset := -1;
   FLastError := '';
 
-  FreeAndNil(FHTMLTempFilename);   // I4195
-  FHTMLTempFilename := TTempFileManager.Get('.html');   // I4195
+//  FreeAndNil(FHTMLTempFilename);   // I4195
+//  FHTMLTempFilename := TTempFileManager.Get('.html');   // I4195
 
   if ALoadFromString then
-    FNewLayoutJS := AFilename
+  begin
+    FNewLayoutJS := AFilename;
+    FFilename := GetNextFilename;
+  end
   else
   begin
-    if ALoadFromTemplate or (AFileName = '') or not FileExists(AFileName)
-      then FBaseFileName := FTemplateFileName
-      else FBaseFileName := AFileName;
+    if ALoadFromTemplate or (AFileName = '') or not FileExists(AFileName) then
+    begin
+      FBaseFileName := FTemplateFileName;
+      FFilename := GetNextFilename;
+    end
+    else
+    begin
+      FBaseFileName := AFileName;
+      FFilename := AFileName;
+    end;
 
     with TStringList.Create do
     try
@@ -597,6 +628,8 @@ begin
     FTouchLayout.Free;
   end;
 
+  modWebHttpServer.AppSource.RegisterSource(FFilename, FSavedLayoutJS);
+
   try
     DoLoad;
   except
@@ -610,30 +643,9 @@ begin
 end;
 
 procedure TframeTouchLayoutBuilder.DoLoad;   // I3642
-var
-  FStyleSheet: IXMLDocument;
-  root: IXMLNode;
-  output: WideString;
 begin
   FLoading := True;   // I4057
-
-  with NewXMLDocument do
-  begin
-    root := AddChild('TouchLayoutBuilder');
-    //root.AddChild('FileName').NodeValue := FBaseFileName;
-    root.AddChild('LibPath').NodeValue := ConvertPathToFileURL(GetLayoutBuilderPath);
-    root.AddChild('LayoutJS').NodeValue := FSavedLayoutJS;
-    FStyleSheet := LoadXMLDocument(GetLayoutBuilderPath + 'builder.xsl');
-    root.TransformNode(FStyleSheet.DocumentElement, output);
-  end;
-
-  with TStringStream.Create(output, TEncoding.UTF8) do
-  try
-    SaveToFile(FHTMLTempFilename.Name);   // I4195
-  finally
-    Free;
-  end;
-  web.Navigate(FHTMLTempFilename.Name);   // I4195
+  cef.Navigate(modWebHttpServer.GetLocalhostURL + '/app/source/toucheditor?Filename='+URLEncode(FFilename));   // I4195
 end;
 
 function TframeTouchLayoutBuilder.GetFontInfo(Index: TKeyboardFont): TKeyboardFontInfo;   // I4057
@@ -679,19 +691,15 @@ begin
   end;
 end;
 
-function TframeTouchLayoutBuilder.GetLayoutJS: string;
-var
-  doc: IHTMLDocument2;
-  data: IHTMLElement;
+function TframeTouchLayoutBuilder.GetHelpTopic: string;
 begin
-  Result := FSavedLayoutJS;   // I4057
-  if not BuilderCommand('generate') then
-    Exit;
-  doc := web.GetDocument;
-  if not Assigned(doc) then Exit;
-  data := (doc as IHTMLDocument3).getElementById('data');
-  if not Assigned(data) then Exit;
-  Result := (data as IHTMLTextAreaElement).value;
+  Result := SHelpTopic_Context_TouchLayoutBuilder;
+end;
+
+function TframeTouchLayoutBuilder.GetLayoutJS: string;
+begin
+  // TODO: layout builder needs to call Generate whenever it makes a change
+  Result := modWebHttpServer.AppSource.GetSource(FFilename);
 end;
 
 procedure TframeTouchLayoutBuilder.Save(const AFilename: string);
@@ -733,97 +741,50 @@ begin
   if Assigned(FOnImportFromOSKCommand) then FOnImportFromOSKCommand(Self);
 end;
 
-procedure TframeTouchLayoutBuilder.webBeforeNavigate2(ASender: TObject;
-  const pDisp: IDispatch; var URL, Flags, TargetFrameName, PostData,
-  Headers: OleVariant; var Cancel: WordBool);
+procedure TframeTouchLayoutBuilder.cefBeforeBrowse(Sender: TObject;
+  const Url: string; out Result: Boolean);
 var
   params: TStringList;
 begin
   if csDestroying in ComponentState then   // I3983
   begin
-    Cancel := True;
+    Result := True;
     Exit;
   end;
 
   if GetParamsFromURL(URL, params) then
   begin
     PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
-    Cancel := True;
+    Result := True;
   end;
 end;
 
-procedure TframeTouchLayoutBuilder.webDocumentComplete(ASender: TObject;
-  const pDisp: IDispatch; var URL: OleVariant);   // I4057
+procedure TframeTouchLayoutBuilder.cefLoadEnd(Sender: TObject);
 begin
   FLoading := False;
 end;
 
-procedure TframeTouchLayoutBuilder.webScriptError(Sender: TObject; ErrorLine,
-  ErrorCharacter, ErrorCode, ErrorMessage, ErrorUrl: string;
-  var ScriptErrorAction: TScriptErrorAction);
-begin
-  if FDisplayScriptErrors then   // I4047
-    ShowMessage(ErrorMessage + ' ['+ErrorUrl+':'+ErrorLine+','+ErrorCharacter+']');
-  ScriptErrorAction := TScriptErrorAction.eaContinue;
-end;
-
-procedure TframeTouchLayoutBuilder.webTranslateAccelerator(
-  Sender: TCustomEmbeddedWB; const lpMsg: PMsg; const pguidCmdGroup: PGUID;
-  const nCmdID: Cardinal; var Done: Boolean);   // I3895
-begin
-  Done := False;
-  if (lpMsg <> nil) then
-  begin
-    if (lpMsg.message = WM_SYSKEYDOWN) then
-    begin
-      Done := False;
-    end
-    else if (lpMsg.message = WM_SYSCHAR) then
-    begin
-      SendMessage(Handle, WM_SYSCOMMAND, SC_KEYMENU, lpMsg.wParam);
-      Done := True;
-    end
-    else if (lpMsg.message = WM_KEYDOWN) then
-    begin
-      if SendMessage(Application.Handle, CM_APPKEYDOWN, lpMsg.wParam, lpMsg.lParam) = 1 then
-      begin
-        Done := True;
-      end;
-    end;
-  end;
-end;
-
 procedure TframeTouchLayoutBuilder.WMUser_FireCommand(var Message: TMessage);
 var
-  command: WideString;
   params: TStringList;
 begin
   params := TStringList(Message.LParam);
-  command := params[0];
-  params.Delete(0);
-  FireCommand(command, params);
+  if (params.Count > 0) and (params[0] = 'command') then
+  begin
+    params.Delete(0);
+    FireCommand(params);
+  end;
   params.Free;
 end;
 
 function TframeTouchLayoutBuilder.BuilderCommand(const cmd: string): Boolean;
-var
-  Doc: IHTMLDocument2; // current HTML document
-  HTMLWin: IHTMLWindow2; // parent window of current HTML document
 begin
   Result := False;
   if FLoading then Exit;   // I4057
   FDisplayScriptErrors := False;   // I4047
   try
     try
-      if web.DocumentLoaded(Doc) then
-      begin
-        HTMLWin := Doc.parentWindow;
-        if Assigned(HTMLWin) then
-        begin
-          HTMLWin.execScript('builder.'+cmd+'();', 'JScript');   // I4047
-          Result := True;
-        end;
-      end;
+      cef.cef.ExecuteJavaScript('builder.'+cmd+'();', '');
     except
       // Ignore errors
     end;
@@ -836,22 +797,22 @@ end;
 
 function TframeTouchLayoutBuilder.CanClearSelection: Boolean;
 begin
-  Result := web.IsCommandEnabled('Delete');
+  Result := True; //web.IsCommandEnabled('Delete');
 end;
 
 function TframeTouchLayoutBuilder.CanCopy: Boolean;
 begin
-  Result := web.IsCommandEnabled('Copy');
+  Result := True; //web.IsCommandEnabled('Copy');
 end;
 
 function TframeTouchLayoutBuilder.CanCut: Boolean;
 begin
-  Result := web.IsCommandEnabled('Cut');
+  Result := True; //web.IsCommandEnabled('Cut');
 end;
 
 function TframeTouchLayoutBuilder.CanPaste: Boolean;
 begin
-  Result := web.IsCommandEnabled('Paste');
+  Result := True; //web.IsCommandEnabled('Paste');
 end;
 
 function TframeTouchLayoutBuilder.CanRedo: Boolean;
@@ -861,7 +822,7 @@ end;
 
 function TframeTouchLayoutBuilder.CanSelectAll: Boolean;
 begin
-  Result := web.IsCommandEnabled('SelectAll');
+  Result := True; //web.IsCommandEnabled('SelectAll');
 end;
 
 function TframeTouchLayoutBuilder.CanUndo: Boolean;
@@ -871,22 +832,22 @@ end;
 
 procedure TframeTouchLayoutBuilder.ClearSelection;
 begin
-  web.Delete;
+  cef.cef.ClipboardDel;
 end;
 
 procedure TframeTouchLayoutBuilder.CopyToClipboard;
 begin
-  web.Copy;
+  cef.cef.ClipboardCopy;
 end;
 
 procedure TframeTouchLayoutBuilder.CutToClipboard;
 begin
-  web.Cut;
+  cef.cef.ClipboardCut;
 end;
 
 procedure TframeTouchLayoutBuilder.SelectAll;
 begin
-  web.SelectAll;
+  cef.cef.SelectAll;
 end;
 
 procedure TframeTouchLayoutBuilder.SetFontInfo(Index: TKeyboardFont; const Value: TKeyboardFontInfo);   // I4057
@@ -900,10 +861,7 @@ begin
   if not UpdateTouchLayoutFont(s, Index, Value.Name, Value.Size) then
     Exit;
 
-  FSavedLayoutJS := s;
-
-  FreeAndNil(FHTMLTempFilename);   // I4023   // I4195
-  FHTMLTempFilename := TTempFileManager.Get('.html');   // I4195
+  modWebHTTPServer.AppSource.SetSource(FFilename, s);
 
   try
     DoLoad;
@@ -925,7 +883,7 @@ end;
 
 procedure TframeTouchLayoutBuilder.PasteFromClipboard;
 begin
-  web.Paste;
+  cef.cef.ClipboardPaste;
 end;
 
 procedure TframeTouchLayoutBuilder.Redo;

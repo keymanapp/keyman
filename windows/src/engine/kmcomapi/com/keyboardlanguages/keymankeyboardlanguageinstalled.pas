@@ -78,6 +78,9 @@ procedure TKeymanKeyboardLanguageInstalled.ApplyEnabled(
 var
   AEnabledInt: Integer;
 begin
+  if not Get_IsInstalled then
+    Exit;
+
   if AEnabled then AEnabledInt := 1 else AEnabledInt := 0;
   try   // I4494
     OleCheck(pInputProcessorProfiles.EnableLanguageProfile(c_clsidKMTipTextService,

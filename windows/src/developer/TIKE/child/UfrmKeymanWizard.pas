@@ -133,7 +133,7 @@ uses
   ImgList, MenuImgList,
   KeyboardParser, TextFileFormat, dmActionsKeyboardEditor,
   VisualKeyboard, UframeOnScreenKeyboardEditor,
-  KeymanDeveloperUtils, KeymanDeveloperMemo,
+  KeymanDeveloperUtils,
   OnScreenKeyboard, KMDActionInterfaces,
 
 
@@ -420,7 +420,6 @@ type
     procedure LoadOSK;   // I4034
     procedure SaveOSK;
 
-    function GetEditorMemo: TKeymanDeveloperMemo;
     procedure BitmapEnableControls;
     procedure OSKModified(Sender: TObject);
     procedure OSKImportKMX(Sender: TObject; var KMXFileName: TTempFile);   // I4181
@@ -466,6 +465,7 @@ type
     procedure OrderDetailsPanels;
 
   protected
+    function GetHelpTopic: string; override;
 
     procedure FocusTab;
 
@@ -521,7 +521,6 @@ type
     property DebugStatusForm: TfrmDebugStatus read FDebugStatusForm;
     property IsDebugVisible: Boolean read GetIsDebugVisible;
 
-    property EditorMemo: TKeymanDeveloperMemo read GetEditorMemo;
     property Parser: TKeyboardParser read FKeyboardParser;   // I4505
     property CompileTargets: TKeymanTargets read GetCompileTargets;   // I4504
     property FontInfo[Index: TKeyboardFont]: TKeyboardFontInfo read GetFontInfo write SetFontInfo; // I4057
@@ -548,6 +547,8 @@ uses
   System.Math,
   System.Win.ComObj,
 
+  Keyman.Developer.System.HelpTopics,
+
   CharacterDragObject,
   CharacterInfo,
   CharMapDropTool,
@@ -561,6 +562,7 @@ uses
   kmxfile,
   OnlineConstants,
   Project,
+  ProjectFileUI,
   RegExpr,
   ErrorControlledRegistry,
   RedistFiles,
@@ -642,7 +644,7 @@ begin
   SetupDebugForm;
 
   GetCharMapDropTool.Handle(Self, cmimText);
-  GetCharMapDropTool.Handle(frameSource.memo, cmimDefault);
+//TODO:  GetCharMapDropTool.Handle(frameSource.memo, cmimDefault);
   GetCharMapDropTool.Handle(editKeyOutputCode, cmimCode);
 
   FillFeatureGrid;
@@ -986,6 +988,9 @@ procedure TfrmKeymanWizard.StartDebugging(FStartTest: Boolean);
     ki: TKeyboardInfo;
     buf: WideString;
   begin
+    if not FileExists((ProjectFile as TkmnProjectFile).TargetFilename) then
+      Exit(False);
+
     try
       GetKeyboardInfo((ProjectFile as TkmnProjectFile).TargetFilename, True, ki);   // I4695
       try
@@ -1035,7 +1040,20 @@ begin
       FDebugForm.CanDebug := True;
       FDebugForm.UIStatus := duiReadyForInput;
       (ProjectFileUI as TkmnProjectFileUI).Debug := True;   // I4687
-      modActionsKeyboardEditor.actKeyboardCompile.Execute;
+
+      frmMessages.Clear;   // I4686
+
+      if not (ProjectFileUI as TkmnProjectFileUI).DoAction(pfaCompile, False) then
+      begin
+        ShowMessage(SKErrorsInCompile);
+        Exit;
+      end;
+
+      if not FileExists((ProjectFile as TkmnProjectFile).TargetFilename) then
+      begin
+        ShowMessage(SKKeyboardKMXDoesNotExist);
+        Exit;
+      end;
 
       if not KeyboardContainsDebugInformation then
       begin
@@ -1542,11 +1560,6 @@ begin
   Result := 'kmn';
 end;
 
-function TfrmKeymanWizard.GetEditorMemo: TKeymanDeveloperMemo;
-begin
-  Result := frameSource.memo;
-end;
-
 {-----------------------------------------------------------------------------}
 { Bitmap Page                                                                 }
 {-----------------------------------------------------------------------------}
@@ -1822,6 +1835,11 @@ begin
         end;
       end;
   end;
+end;
+
+function TfrmKeymanWizard.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_KeyboardEditor;
 end;
 
 function TfrmKeymanWizard.GetIsDebugVisible: Boolean;
@@ -2509,9 +2527,9 @@ var
 begin
   FCurrentRule := nil;
   FKeyboardParser.AddRequiredLines;
-  FLine := frameSource.memo.SelLine;
+  FLine := (frameSource as IKMDTextEditorActions).SelectedRow;
   frameSource.EditorText := FKeyboardParser.KeyboardText;
-  frameSource.memo.SelLine := Min(FLine, frameSource.memo.LineCount - 1);
+  frameSource.SetSelectedRow(FLine);
 
 //  FreeAndNil(FKeyboardParser);
 end;
@@ -2825,7 +2843,8 @@ begin
   FDebugForm.OnUpdateParColour := UpdateParColour;
   FDebugForm.Visible := True;
 
-  FDebugForm.EditorMemo := frameSource.memo;
+
+// TODO:  FDebugForm.EditorMemo := frameSource.memo;
 
   FDebugStatusForm := TfrmDebugStatus.Create(Self);
   FDebugStatusForm.BorderStyle := bsNone;
@@ -2915,7 +2934,7 @@ begin
   frmMessages.Clear;
   if CompileKeyboardFile(PChar(KMNFileName.Name), PChar(KMXFileName2), False, False, False, CompilerMessage) <= 0 then   // I4181   // I4865   // I4866
   begin
-    frmMessages.Show;
+    frmMessages.DoShowForm;
     ShowMessage('There were errors compiling the keyboard to convert to the On Screen Keyboard.');
     FreeAndNil(KMXFileName);   // I4181
   end;
@@ -3095,7 +3114,9 @@ begin
   begin
     if (FFeature[kfTouchLayout].FileName = '') then   // I3909
     begin
-      FFeature[kfTouchLayout].FileName := ChangeFileExt(FileName, '') + '-layout.js';
+      FFeature[kfTouchLayout].FileName :=
+        // See also TKeyboardParser_Features.GetDefaultFeatureFilename
+        Format(KeyboardFeatureFilename[kfTouchLayout], [ChangeFileExt(ExtractFileName(FileName), '')]);
     end;
 
     if pagesTouchLayout.ActivePage = pageTouchLayoutDesign   // I4034

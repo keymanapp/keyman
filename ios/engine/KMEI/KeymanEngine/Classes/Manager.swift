@@ -31,16 +31,25 @@ private let keyboardChangeHelpText = "Tap here to change keyboard"
 private let keymanHostName = "api.keyman.com"
 
 // UI In-App Keyboard Constants
-private let phonePortraitInAppKeyboardHeight: CGFloat = 183.0
+/*
+These values are currently determined by the default keyboard size
+ provided by iOS. TODO: In the future, we may want to allow a custom size
+to cater for larger keyboard layouts. This can be achieved by
+implementing allowsSelfSizing:
+https://stackoverflow.com/questions/33261686/how-can-i-set-height-of-custom-inputview
+
+private let phonePortraitInAppKeyboardHeight: CGFloat = 253.0
 private let phoneLandscapeInAppKeyboardHeight: CGFloat = 183.0
 private let padPortraitInAppKeyboardHeight: CGFloat = 385.0
 private let padLandscapeInAppKeyboardHeight: CGFloat = 385.0
+*/
 
 // UI System Keyboard Constants
 private let phonePortraitSystemKeyboardHeight: CGFloat = 216.0
 private let phoneLandscapeSystemKeyboardHeight: CGFloat = 162.0
 private let padPortraitSystemKeyboardHeight: CGFloat = 264.0
 private let padLandscapeSystemKeyboardHeight: CGFloat = 352.0
+
 
 public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegate, KeymanWebDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
@@ -50,6 +59,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   /// Display the help bubble on first use.
   public var isKeymanHelpOn = true
+
+  public var isSystemKeyboard = false
 
   // TODO: Change API to not disable removing as well
   /// Allow users to add new keyboards in the keyboard picker.
@@ -100,7 +111,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   private var reachability: Reachability!
   private var didSynchronize = false
   private var didResizeToOrientation = false
-  private var lastKeyboardSize: CGSize = .zero
   private var useSpecialFontForSubkeys = false
 
   private let subKeyColor = #colorLiteral(red: 244.0 / 255.0, green: 244.0 / 255.0, blue: 244.0 / 255.0, alpha: 1.0)
@@ -191,20 +201,23 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - SeeAlso:
   ///   - addKeyboard()
   /// - Returns: Whether the keyboard was set successfully
+  //TODO: this method appears unused, should we remove it?
   public func setKeyboard(withFullID fullID: FullKeyboardID) -> Bool {
     if let keyboard = Storage.active.userDefaults.userKeyboard(withFullID: fullID) {
-      return setKeyboard(keyboard)
+        return setKeyboard(keyboard)
     }
     return false
   }
+  
 
   /// Set the current keyboard.
   ///
-  /// - Returns: Whether the keyboard was set successfully
+  /// - Throws: error if the keyboard was unchanged
   public func setKeyboard(_ kb: InstallableKeyboard) -> Bool {
     if kb.fullID == currentKeyboardID {
       log.info("Keyboard unchanged: \(kb.fullID)")
       return false
+     // throw KeyboardError.unchanged
     }
 
     log.info("Setting language: \(kb.fullID)")
@@ -234,6 +247,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     NotificationCenter.default.post(name: Notifications.keyboardChanged,
                                     object: self,
                                     value: kb)
+    
     return true
   }
 
@@ -297,7 +311,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     // Set a new keyboard if deleting the current one
     if kb.fullID == currentKeyboardID {
-      setKeyboard(userKeyboards[0])
+      _ = setKeyboard(userKeyboards[0])
     }
 
     if !userKeyboards.contains(where: { $0.id == kb.id }) {
@@ -332,7 +346,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return nil
     }
     let newIndex = (index + 1) % userKeyboards.count
-    setKeyboard(userKeyboards[newIndex])
+    _ = setKeyboard(userKeyboards[newIndex])
     return newIndex
   }
 
@@ -395,7 +409,16 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                 languageName = l["name"]!
                 languageId = l["id"]!
                 
-                installableKeyboards.append( InstallableKeyboard(id: keyboardID, name: name, languageID: languageId, languageName: languageName, version: version, isRTL: false, font: displayFont, oskFont: oskFont, isCustom: false))
+                installableKeyboards.append( InstallableKeyboard(
+                  id: keyboardID,
+                  name: name,
+                  languageID: languageId,
+                  languageName: languageName,
+                  version: version,
+                  isRTL: false,
+                  font: displayFont,
+                  oskFont: oskFont,
+                  isCustom: false))
               }
             }
             
@@ -410,16 +433,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
             for keyboard in installableKeyboards {
               let storedPath = Storage.active.keyboardURL(for: keyboard)
               
-              
-              
               var installableFiles: [[Any]] = [["\(keyboardID).js", storedPath]]
-              if let _ = osk {
-                let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk!)
+              if let osk = osk {
+                let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk)
                 installableFiles.append([osk, oskPath])
               }
               
-              if let _ = font {
-                let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font!)
+              if let font = font {
+                let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font)
                 installableFiles.append([font, displayPath])
               }
               do {
@@ -582,15 +603,29 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       downloadFailed(forKeyboards: [], error: error)
       return
     }
+    
+    decodeKeyboardData(data, decodingStrategy: .ios8601WithFallback)
+  }
 
+  private func decodeKeyboardData(_ data: Data, decodingStrategy : JSONDecoder.DateDecodingStrategy) {
     let decoder = JSONDecoder()
-    decoder.dateDecodingStrategy = .ios8601WithFallback
-    do {
-      let keyboard = try decoder.decode(KeyboardAPICall.self, from: data)
-      return downloadKeyboard(keyboard)
-    } catch {
-      downloadFailed(forKeyboards: [], error: error)
-      return
+    decoder.dateDecodingStrategy = decodingStrategy
+  
+    if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
+      downloadKeyboard(keyboard)
+    } else {
+      decoder.dateDecodingStrategy = .iso8601WithoutTimezone
+      if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
+        downloadKeyboard(keyboard)
+      } else {
+        decoder.dateDecodingStrategy = .ios8601WithMilliseconds
+        do {
+          let keyboard = try decoder.decode(KeyboardAPICall.self, from: data)
+          downloadKeyboard(keyboard)
+        } catch {
+          downloadFailed(forKeyboards: [], error: error)
+        }
+      }
     }
   }
 
@@ -844,7 +879,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   // MARK: - View management
 
   public var keyboardHeight: CGFloat {
-    if Util.isSystemKeyboard {
+    if isSystemKeyboard {
       return keyboardHeight(isPortrait: InputViewController.isPortrait)
     } else {
       return keyboardHeight(isPortrait: UIDevice.current.orientation.isPortrait)
@@ -856,17 +891,18 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   func keyboardHeight(isPortrait: Bool) -> CGFloat {
+    let parentHeight: CGFloat = keymanWeb.parent != nil ? keymanWeb.parent!.view.frame.height : CGFloat(100.0)
     if UIDevice.current.userInterfaceIdiom == .pad {
       if isPortrait {
-        return Util.isSystemKeyboard ? padPortraitSystemKeyboardHeight : padPortraitInAppKeyboardHeight
+        return isSystemKeyboard ? padPortraitSystemKeyboardHeight : parentHeight
       } else {
-        return Util.isSystemKeyboard ? padLandscapeSystemKeyboardHeight : padLandscapeInAppKeyboardHeight
+        return isSystemKeyboard ? padLandscapeSystemKeyboardHeight : parentHeight
       }
     } else {
       if isPortrait {
-        return Util.isSystemKeyboard ? phonePortraitSystemKeyboardHeight : phonePortraitInAppKeyboardHeight
+        return isSystemKeyboard ? phonePortraitSystemKeyboardHeight : parentHeight
       } else {
-        return Util.isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : phoneLandscapeInAppKeyboardHeight
+        return isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : parentHeight
       }
     }
   }
@@ -877,30 +913,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   var keyboardSize: CGSize {
     return CGSize(width: keyboardWidth, height: keyboardHeight)
-  }
-
-  // Keyman interaction
-  private func resizeKeyboard() {
-    let newSize = keyboardSize
-    if didResizeToOrientation && Util.isSystemKeyboard && lastKeyboardSize == newSize {
-      didResizeToOrientation = false
-      return
-    }
-    lastKeyboardSize = newSize
-
-    keymanWeb.frame = CGRect(origin: .zero, size: newSize)
-
-    // Workaround for WKWebView bug with landscape orientation
-    // TODO: Check if still necessary and if there's a better solution
-    if Util.isSystemKeyboard {
-      perform(#selector(self.resizeDelay), with: self, afterDelay: 1.0)
-    }
-
-    var oskHeight = Int(newSize.height)
-    oskHeight -= oskHeight % (Util.isSystemKeyboard ? 10 : 20)
-
-    keymanWeb.setOskWidth(Int(newSize.width))
-    keymanWeb.setOskHeight(oskHeight)
   }
 
   private var keymanScrollView: UIScrollView {
@@ -995,17 +1007,17 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     currentKeyboardID = nil
 
     if let keyboard = keyboard {
-      setKeyboard(keyboard)
+      _ = setKeyboard(keyboard)
     } else if let keyboard = Storage.active.userDefaults.userKeyboards?[safe: 0] {
-      setKeyboard(keyboard)
+      _ = setKeyboard(keyboard)
     } else {
-      setKeyboard(Defaults.keyboard)
+      _ = setKeyboard(Defaults.keyboard)
     }
   }
 
   @objc func showHelpBubble() {
     // Help bubble is always disabled for system-wide keyboard
-    if Util.isSystemKeyboard || keyboardMenuView != nil {
+    if Manager.shared.isSystemKeyboard || keyboardMenuView != nil {
       return
     }
 
@@ -1066,12 +1078,18 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   func resizeKeyboardIfNeeded() {
-    // TODO: Check if necessary since resizeKeyboard() checks old size
+    // TODO: Eliminate this function; performance cost of resizing is
+    //       probably minimal if no resizing actually happens
+    resizeKeyboard()
+  }
+
+  // Keyman interaction
+  private func resizeKeyboard() {
     let newSize = keyboardSize
-    if newSize != lastKeyboardSize {
-      resizeKeyboard()
-      lastKeyboardSize = newSize
-    }
+
+    keymanWeb.frame = CGRect(origin: .zero, size: newSize)
+    keymanWeb.setOskWidth(Int(newSize.width))
+    keymanWeb.setOskHeight(Int(newSize.height))
   }
 
   func resizeKeyboard(with orientation: UIInterfaceOrientation) {
@@ -1081,11 +1099,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     let kbHeight = keyboardHeight(with: orientation)
     keymanWeb.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
 
-    var oskHeight = Int(kbHeight)
-    oskHeight -= oskHeight % (Util.isSystemKeyboard ? 10 : 20)
-
     keymanWeb.setOskWidth(Int(kbWidth))
-    keymanWeb.setOskHeight(oskHeight)
+    keymanWeb.setOskHeight(Int(kbHeight))
   }
 
   // MARK: - Text
@@ -1137,7 +1152,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     var newKb = Defaults.keyboard
     if currentKeyboardID == nil && !shouldReloadKeyboard {
-      let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
+      let userData = Manager.shared.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
       if let id = userData.currentKeyboardID {
         if let kb = Storage.active.userDefaults.userKeyboard(withFullID: id) {
           newKb = kb
@@ -1145,7 +1160,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       } else if let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
         newKb = userKbs[0]
       }
-      setKeyboard(newKb)
+      _ = setKeyboard(newKb)
     }
 
     NotificationCenter.default.post(name: Notifications.keyboardLoaded, object: self, value: newKb)
@@ -1167,7 +1182,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     keymanWebDelegate?.showKeyPreview(keymanWeb, keyFrame: keyFrame, preview: preview)
 
     if UIDevice.current.userInterfaceIdiom == .pad
-      || (Util.isSystemKeyboard && !isSystemKeyboardTopBarEnabled)
+      || (Manager.shared.isSystemKeyboard && !isSystemKeyboardTopBarEnabled)
       || subKeysView != nil {
       return
     }
@@ -1228,7 +1243,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     dismissHelpBubble()
     isKeymanHelpOn = false
-    if Util.isSystemKeyboard {
+    if Manager.shared.isSystemKeyboard {
       let userData = UserDefaults.standard
       userData.set(true, forKey: Key.keyboardPickerDisplayed)
       userData.synchronize()

@@ -57,12 +57,6 @@
   
   <xsl:template name="header_helplinks">
     <div class="helplinks">
-      <a href="keyman:welcome" onmouseover="this.style.cursor='hand';" style="padding-right: 12px">
-        <img onmouseover="this.style.cursor='hand';" style='width: 24px; height: 24px; border: none; vertical-align: middle; margin: 0 4px 0 0;'>
-          <xsl:attribute name='src'><xsl:value-of select='/Keyman/templatepath'/>info24.png</xsl:attribute>
-        </img>
-        <xsl:value-of select="$locale/String[@Id='S_Caption_GettingStarted']" />
-      </a>
       <a href="keyman:help" onmouseover="this.style.cursor='hand';" >
         <img onmouseover="this.style.cursor='hand';" style='width: 24px; height: 24px; border: none; vertical-align: middle; margin: 0 4px 0 4px;'>
           <xsl:attribute name='src'><xsl:value-of select='/Keyman/templatepath'/>help24.png</xsl:attribute>

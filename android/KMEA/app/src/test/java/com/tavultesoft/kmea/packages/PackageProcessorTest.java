@@ -35,12 +35,18 @@ public class PackageProcessorTest {
   private static final File TEST_GFF_KMP_TARGET_ALT = new File(TEST_EXTRACTION_ROOT, "packages" +
     File.separator + TEST_GFF_KMP_NAME_ALT);
 
+  private static final String TEST_GFF_KMP_NAME_UNDEFINED_VER = TEST_GFF_KMP_NAME;
+  private static final File TEST_GFF_KMP_FILE_UNDEFINED_VER = new File(TEST_RESOURCE_ROOT, "v" + File.separator + TEST_GFF_KMP_NAME_UNDEFINED_VER + ".kmp");
+  private static final File TEST_GFF_KMP_TARGET_UNDEFINED_VER = new File(TEST_EXTRACTION_ROOT, "packages" +
+    File.separator + TEST_GFF_KMP_NAME_UNDEFINED_VER);
+
   private static final int TEST_GFF_KBD_COUNT = 2;
   private static final String TEST_GFF_PACKAGE_NAME = "GFF Amharic Keyboard";
   private static final String TEST_GFF_KBD_ID = "gff_amh_7";
 
   private static File tempPkg;
   private static File tempPkgAlt;
+  private static File tempPkgUndefinedVer;
 
   // Each test gets a fresh version of the extracted package.
   @Before
@@ -63,6 +69,15 @@ public class PackageProcessorTest {
     }
   }
 
+  // Some tests wish to utilize package with undefined version...
+  public void extractUndefinedVerTestPackage() {
+    PackageProcessor.initialize(TEST_EXTRACTION_ROOT);
+    try {
+      tempPkgUndefinedVer = PackageProcessor.unzipKMP(TEST_GFF_KMP_FILE_UNDEFINED_VER);
+    } catch (IOException e) {
+      System.err.println(e);
+    }
+  }
 
   /**
    * Post-test cleanup.  While the temp/ directory is .gitignore'd, this provides an extra layer
@@ -73,6 +88,7 @@ public class PackageProcessorTest {
   public void eraseTestPackages() throws IOException {
     FileUtils.deleteDirectory(tempPkg);
     FileUtils.deleteQuietly(tempPkgAlt);
+    FileUtils.deleteQuietly(tempPkgUndefinedVer);
     FileUtils.deleteDirectory(TEST_GFF_KMP_TARGET);
   }
 
@@ -216,6 +232,14 @@ public class PackageProcessorTest {
 
     Assert.assertEquals(TEST_GFF_PACKAGE_NAME, PackageProcessor.getPackageName(json));
     Assert.assertNotEquals(TEST_GFF_KMP_NAME, PackageProcessor.getPackageName(json));
+  }
+
+  @Test
+  public void test_getPackageVersion() throws Exception {
+    extractUndefinedVerTestPackage();
+    JSONObject json = PackageProcessor.loadPackageInfo(tempPkgUndefinedVer);
+
+    Assert.assertEquals(PackageProcessor.PPDefault_Version, PackageProcessor.getPackageVersion(json));
   }
 
   @Test

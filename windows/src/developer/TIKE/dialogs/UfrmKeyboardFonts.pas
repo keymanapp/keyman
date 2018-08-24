@@ -72,12 +72,17 @@ type
     FControls: array[TKeyboardFont] of TKeyboardFontControl;
     function GetFontInfo(Index: TKeyboardFont): TKeyboardFontInfo;
     procedure SetFontInfo(Index: TKeyboardFont; const Value: TKeyboardFontInfo);
+  protected
+    function GetHelpTopic: string; override;
   public
     { Public declarations }
     property FontInfo[Index: TKeyboardFont]: TKeyboardFontInfo read GetFontInfo write SetFontInfo;
   end;
 
 implementation
+
+uses
+  Keyman.Developer.System.HelpTopics;
 
 {$R *.dfm}
 
@@ -123,6 +128,11 @@ begin
   Result.Size := FControls[Index].SizeEdit.Text;
   Result.Enabled := FControls[Index].NameCombo.Enabled;
   //Result.Filename := IncludeTrailingPathDelimiter(FControls[Index].PathEdit.Text) + FControls[Index].FilenameEdit.Text;
+end;
+
+function TfrmKeyboardFonts.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_KeyboardFonts;
 end;
 
 procedure TfrmKeyboardFonts.SetFontInfo(Index: TKeyboardFont; const Value: TKeyboardFontInfo);

@@ -85,31 +85,6 @@ inherited frmTestKeyboard: TfrmTestKeyboard
     Width = 638
     Height = 341
     Cursor = crIBeam
-    Alignment = taLeftJustify
-    ScrollBars = ssVertical
-    AltFont.Charset = DEFAULT_CHARSET
-    AltFont.Color = clWindowText
-    AltFont.Height = -11
-    AltFont.Name = 'MS Sans Serif'
-    AltFont.Style = []
-    CaretWidth = 1
-    ColumnWrap = 0
-    DisplayOnly = False
-    EndOfTextMark.Color = clRed
-    EndOfTextMark.Style = psClear
-    Justified = False
-    LineHeight = 0
-    Options = [pmoWrapCaret, pmoInsertKeyActive, pmoWideOverwriteCaret, pmoAutoScrollBars, pmoBlockSelection]
-    Overwrite = False
-    RightLinePen.Color = clGray
-    RightLinePen.Style = psDot
-    SelBackColor = clHighlight
-    SelTextColor = clHighlightText
-    Separators = #9#10#13' $%&,./:;<=>'
-    SpecUnderline.Color = clRed
-    UndoMaxSpace = 65536
-    Version = 'v7.1  Professional ed.'
-    OnSelMove = memoSelMove
     Align = alClient
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
@@ -117,8 +92,8 @@ inherited frmTestKeyboard: TfrmTestKeyboard
     Font.Name = 'Arial Unicode MS'
     Font.Style = []
     ParentFont = False
+    ScrollBars = ssVertical
     TabOrder = 2
-    TabStop = True
     OnEnter = memoGotFocus
     OnExit = memoLostFocus
   end

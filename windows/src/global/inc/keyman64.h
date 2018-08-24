@@ -310,7 +310,7 @@ BOOL DebugSignalPause(BOOL fIsUp);
 char *Debug_VirtualKey(WORD vk);
 char *Debug_UnicodeString(PWSTR s, int x = 0);
 
-inline BOOL ShouldDebug_1(); // TSDMState state);
+BOOL ShouldDebug_1(); // TSDMState state);
 
 #endif
 

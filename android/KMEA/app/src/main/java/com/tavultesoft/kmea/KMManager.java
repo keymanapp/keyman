@@ -130,9 +130,9 @@ public final class KMManager {
   public static final String KMDefault_AssetPackages = "packages";
 
   // Default Keyboard Info
-  public static final String KMDefault_KeyboardID = "european2";
+  public static final String KMDefault_KeyboardID = "sil_euro_latin";
   public static final String KMDefault_LanguageID = "en";
-  public static final String KMDefault_KeyboardName = "EuroLatin2 Keyboard";
+  public static final String KMDefault_KeyboardName = "EuroLatin (SIL) Keyboard";
   public static final String KMDefault_LanguageName = "English";
   public static final String KMDefault_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
 
@@ -183,7 +183,7 @@ public final class KMManager {
     } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       initSystemKeyboard(appContext);
     } else {
-      Log.w(TAG, "Cannot initialize: Invalid keyboard type");
+      Log.e(TAG, "Cannot initialize: Invalid keyboard type");
     }
 
     // Initializes the PackageProcessor with the base resource directory, which is the parent directory
@@ -220,8 +220,6 @@ public final class KMManager {
 
   private static void initInAppKeyboard(Context appContext) {
     if (InAppKeyboard == null) {
-      if (isDebugMode())
-        Log.d(TAG, "Initializing In-App Keyboard...");
       int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
       RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
       params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
@@ -237,8 +235,6 @@ public final class KMManager {
 
   private static void initSystemKeyboard(Context appContext) {
     if (SystemKeyboard == null) {
-      if (isDebugMode())
-        Log.d(TAG, "Initializing System Keyboard...");
       int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
       RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
       params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
@@ -249,6 +245,12 @@ public final class KMManager {
       SystemKeyboard.setWebViewClient(new KMSystemKeyboardWebViewClient(appContext));
       SystemKeyboard.addJavascriptInterface(new KMSystemKeyboardJSHandler(appContext), "jsInterface");
       SystemKeyboard.loadKeyboard();
+    }
+  }
+
+  public static void hideSystemKeyboard() {
+    if (SystemKeyboard != null) {
+      SystemKeyboard.hideKeyboard();
     }
   }
 
@@ -305,9 +307,11 @@ public final class KMManager {
 
   public static void onResume() {
     if (InAppKeyboard != null) {
+      InAppKeyboard.resumeTimers();
       InAppKeyboard.onResume();
     }
     if (SystemKeyboard != null) {
+      SystemKeyboard.resumeTimers();
       SystemKeyboard.onResume();
     }
   }
@@ -520,7 +524,7 @@ public final class KMManager {
       boolean shouldClearCache = false;
       HashMap<String, String> kbInfo = kbList.get(0);
       String kbID = kbInfo.get(KMKey_KeyboardID);
-      if (kbID.equals("us")) {
+      if (kbID.equals("us") || (kbID.equals("european2"))) {
         HashMap<String, String> newKbInfo = new HashMap<String, String>();
         newKbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
         newKbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
@@ -732,7 +736,7 @@ public final class KMManager {
       return SystemKeyboard;
     } else {
       // What should we do if KeyboardType.KEYBOARD_TYPE_UNDEFINED?
-      Log.w("KMManager", "Invalid keyboard");
+      Log.e("KMManager", "Invalid keyboard");
       return null;
     }
   }
@@ -1062,12 +1066,13 @@ public final class KMManager {
 
   public static boolean updateText(KeyboardType kbType, String text) {
     boolean result = false;
+    String kmText = "";
+    if (text != null) {
+      kmText = text.toString().replace("\\", "\\u005C").replace("'", "\\u0027").replace("\n", "\\n");
+    }
+
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
-        String kmText = "";
-        if (text != null) {
-          kmText = text.toString().replace("\\", "\\u005C").replace("'", "\\u0027").replace("\n", "\\n");
-        }
         InAppKeyboard.loadUrl(String.format("javascript:updateKMText('%s')", kmText));
         result = true;
       }
@@ -1075,10 +1080,6 @@ public final class KMManager {
       InAppKeyboardShouldIgnoreTextChange = false;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
-        String kmText = "";
-        if (text != null) {
-          kmText = text.toString().replace("\\", "\\u005C").replace("'", "\\u0027").replace("\n", "\\n");
-        }
         SystemKeyboard.loadUrl(String.format("javascript:updateKMText('%s')", kmText));
         result = true;
       }
@@ -1246,9 +1247,6 @@ public final class KMManager {
     public void onPageFinished(WebView view, String url) {
       if (url.endsWith(KMFilename_KeyboardHtml)) {
         InAppKeyboardLoaded = true;
-        if (isDebugMode()) {
-          Log.d("KMManager", "In-App Keyboard loaded.");
-        }
 
         if (!InAppKeyboard.keyboardSet) {
           SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
@@ -1424,10 +1422,6 @@ public final class KMManager {
     public void onPageFinished(WebView view, String url) {
       if (url.endsWith(KMFilename_KeyboardHtml)) {
         SystemKeyboardLoaded = true;
-        if (isDebugMode()) {
-          Log.d("KMManager", "System Keyboard loaded.");
-        }
-
         if (!SystemKeyboard.keyboardSet) {
           SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
           int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
@@ -1613,9 +1607,6 @@ public final class KMManager {
     // Store the current keyboard chirality status from KMW in InAppKeyboard
     @JavascriptInterface
     public void setIsChiral(boolean isChiral) {
-      if (isDebugMode()) {
-        Log.d("KMManager", "InAppKeyboard chirality: " + String.valueOf(isChiral));
-      }
       InAppKeyboard.setChirality(isChiral);
     }
 
@@ -1626,8 +1617,9 @@ public final class KMManager {
       mainLoop.post(new Runnable() {
         public void run() {
           if (InAppKeyboard.subKeysWindow != null || KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class) {
-            if (KMTextView.activeView == null)
+            if ((KMTextView.activeView == null) && isDebugMode()) {
               Log.w("IAK: JS Handler", "insertText failed: activeView is null");
+            }
             return;
           }
 
@@ -1727,9 +1719,6 @@ public final class KMManager {
     // Store the current keyboard chirality status from KMW in SystemKeyboard
     @JavascriptInterface
     public void setIsChiral(boolean isChiral) {
-      if (isDebugMode()) {
-        Log.d("KMManager", "SystemKeyboard chirality: " + String.valueOf(isChiral));
-      }
       SystemKeyboard.setChirality(isChiral);
     }
 
@@ -1745,7 +1734,9 @@ public final class KMManager {
 
           InputConnection ic = IMService.getCurrentInputConnection();
           if (ic == null) {
-            Log.w("SWK: JS Handler", "insertText failed: InputConnection is null");
+            if (isDebugMode()) {
+              Log.w("SWK: JS Handler", "insertText failed: InputConnection is null");
+            }
             return;
           }
 

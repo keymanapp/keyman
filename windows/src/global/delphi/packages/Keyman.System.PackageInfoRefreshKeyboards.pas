@@ -51,9 +51,11 @@ uses
 
   BCP47Tag,
 
+  Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.KMXFileLanguages,
   Keyman.System.KeyboardJSInfo,
   Keyman.System.KeyboardUtils,
+  Keyman.System.LanguageCodeUtils,
   kmxfile;
 
 const
@@ -185,7 +187,7 @@ begin
     begin
       with TBCP47Tag.Create(lang.ID) do
       try
-        if not IsValid(msg) then
+        if not IsValid(True, msg) then
         begin
           DoError(Format(SError_LanguageTagIsNotValid, [kbd.ID, lang.ID, msg]), plsError);
           Result := False;
@@ -239,6 +241,7 @@ var
   codes: TStringDynArray;
   lang: TPackageKeyboardLanguage;
   i: Integer;
+  s, t: string;
 begin
   //
   k.Languages.Clear;
@@ -248,10 +251,32 @@ begin
       codes := TKMXFileLanguages.GetKMXFileBCP47Codes(f.FileName);
       for i := 0 to High(codes) do
       begin
+        t := TCanonicalLanguageCodeUtils.FindBestTag(codes[i]);
+        if t = '' then
+          // We won't add codes that are unrecognised
+          Continue;
+
         lang := TPackageKeyboardLanguage.Create(f.Package);
-        lang.ID := codes[i];
-        // TODO: BCP47: <DeveloperBCP47LanguageLookup> Lookup default names
-        lang.Name := codes[i];
+
+        with TBCP47Tag.Create(t) do
+        try
+          Region := '';
+          lang.ID := Tag;
+
+          if not TLanguageCodeUtils.BCP47Languages.TryGetValue(Language, lang.Name) then
+          begin
+            lang.Name := Language;
+          end;
+
+          if Script <> '' then
+          begin
+            if TLanguageCodeUtils.BCP47Languages.TryGetValue(Script, s) then
+              lang.Name := lang.Name + ' ('+s+')';
+          end;
+        finally
+          Free;
+        end;
+
         k.Languages.Add(lang);
       end;
     except

@@ -50,7 +50,7 @@ type
     function Add(Item: TProjectFileType): Integer;
   end;
 
-function CreateProjectFile(AFileName: string; AParent: TProjectFile): TProjectFile;
+function CreateProjectFile(AProject: TProject; AFileName: string; AParent: TProjectFile): TProjectFile;
 procedure RegisterProjectFileType(AExtension: string; AProjectFileClass: TProjectFileClass);
 
 type
@@ -69,14 +69,14 @@ var
   FRegisteredFileTypes: TProjectFileTypeList = nil;
   FInit: Boolean = True;
 
-function CreateProjectFile(AFileName: string; AParent: TProjectFile): TProjectFile;
+function CreateProjectFile(AProject: TProject; AFileName: string; AParent: TProjectFile): TProjectFile;
 var
   Ext: string;
   ni, i: Integer;
 begin
   if not FInit then
   begin
-    Result := TShellProjectFile.Create(FGlobalProject, AFileName, AParent);
+    Result := TShellProjectFile.Create(AProject, AFileName, AParent);
     if Assigned(FDoCreateProjectFileUI) then
       FDoCreateProjectFileUI(Result);   // I4687
     Exit;
@@ -86,10 +86,10 @@ begin
   { Do not allow top-level files to be added more than once }
   if not Assigned(AParent) then
   begin
-    i := FGlobalProject.Files.IndexOfFileNameAndParent(AFileName, nil);
+    i := AProject.Files.IndexOfFileNameAndParent(AFileName, nil);
     if i >= 0 then
     begin
-      Result := FGlobalProject.Files[i];
+      Result := AProject.Files[i];
       Exit;
     end;
   end;
@@ -99,7 +99,7 @@ begin
     if FRegisteredFileTypes[i].Extension = '*' then ni := i
     else if FRegisteredFileTypes[i].Extension = Ext then
     begin
-      Result := FRegisteredFileTypes[i].ProjectFileClass.Create(FGlobalProject, AFileName, AParent);
+      Result := FRegisteredFileTypes[i].ProjectFileClass.Create(AProject, AFileName, AParent);
 
       if Assigned(AParent) then
       begin
@@ -107,14 +107,14 @@ begin
           AParent.Project.Files.Add(Result);
       end
       else
-        FGlobalProject.Files.Add(Result);
+        AProject.Files.Add(Result);
 
       Exit;
     end;
 
   if ni = -1 then
     raise Exception.Create('Could not find appropriate TProjectFile for file '''+AFileName+'''.');
-  Result := FRegisteredFileTypes[ni].ProjectFileClass.Create(FGlobalProject, AFileName, AParent);
+  Result := FRegisteredFileTypes[ni].ProjectFileClass.Create(AProject, AFileName, AParent);
 
   if Assigned(AParent) then
   begin
@@ -122,7 +122,7 @@ begin
       AParent.Project.Files.Add(Result);
   end
   else
-    FGlobalProject.Files.Add(Result);
+    AProject.Files.Add(Result);
 end;
 
 procedure RegisterProjectFileType(AExtension: string; AProjectFileClass: TProjectFileClass);

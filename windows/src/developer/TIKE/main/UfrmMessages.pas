@@ -33,7 +33,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, CaptionPanel, Menus, Contnrs, UfrmTikeDock, UfrmTike;
+  StdCtrls, ExtCtrls, CaptionPanel, Menus, Contnrs, UfrmTikeDock, UfrmTike,
+  JvComponentBase, JvDockControlForm;
 
 type
   TMessageItem = class
@@ -69,6 +70,7 @@ type
     function GetSelLine: Integer;
     procedure SetSelLine(Value: Integer);
   protected
+    function GetHelpTopic: string; override;
     property SelLine: Integer read GetSelLine write SetSelLine;
   public
     procedure RefreshOptions;
@@ -91,6 +93,8 @@ function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Int
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   UfrmMain,
   UfrmMDIEditor,
   dmActionsMain,
@@ -141,6 +145,7 @@ var
   frm: TForm;
   pf: TProjectFile;
   mi: TMessageItem;
+  FFilename: string;
   line: Integer;
 begin
   line := SelLine; if line < 0 then Exit;
@@ -148,13 +153,15 @@ begin
   SelLine := line;
 
   mi := FMessageItems[line] as TMessageItem;
-  frm := frmKeymanDeveloper.FindEditorByFileName(mi.FileName);
+  FFilename := mi.FileName;
+
+  frm := frmKeymanDeveloper.FindEditorByFileName(FFileName);
   if not Assigned(frm) then
   begin
-    pf := FGlobalProject.FindFile(mi.FileName);
+    pf := FGlobalProject.FindFile(FFileName);
     if Assigned(pf) then (pf.UI as TProjectFileUI).DefaultEvent(Self)   // I4687
-    else frmKeymanDeveloper.OpenFile(mi.FileName, False);
-    frm := frmKeymanDeveloper.FindEditorByFileName(mi.FileName);
+    else frmKeymanDeveloper.OpenFile(FFileName, False);
+    frm := frmKeymanDeveloper.FindEditorByFileName(FFileName);
     if not Assigned(frm) then
     begin
       ShowMessage('Could not find source file editor.');
@@ -252,6 +259,11 @@ end;
 procedure TfrmMessages.RefreshOptions;
 begin
 
+end;
+
+function TfrmMessages.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_Messages;
 end;
 
 function TfrmMessages.GetSelLine: Integer;

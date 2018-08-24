@@ -145,13 +145,16 @@ uses
   Windows8LanguageList in '..\..\global\delphi\general\Windows8LanguageList.pas',
   BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
   JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
-  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
   Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   keymankeyboardlanguage in 'com\keyboardlanguages\keymankeyboardlanguage.pas',
   keymankeyboardlanguagesfile in 'com\keyboardlanguages\keymankeyboardlanguagesfile.pas',
-  keymankeyboardlanguagefile in 'com\keyboardlanguages\keymankeyboardlanguagefile.pas';
+  keymankeyboardlanguagefile in 'com\keyboardlanguages\keymankeyboardlanguagefile.pas',
+  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
+  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
+  Keyman.System.Standards.LibPalasoAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas',
+  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas';
 
 {$R *.TLB}
 

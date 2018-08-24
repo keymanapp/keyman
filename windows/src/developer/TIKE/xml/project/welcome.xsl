@@ -3,20 +3,17 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:k="http://www.tavultesoft.com/xml/70">
   
   <xsl:template name="page_welcome">
-    <div class="page" id="Welcome">
-      <div id="uppertext0" style="clear: all; display: block;" >
+    <div class="page" id="page-0">
+      <div class="help-container" id="uppertext0" >
         <div class="headerimage">
-          <p><img alt="Welcome">
-              <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>header_welcome.gif</xsl:attribute>
-          </img></p>
+          <p><img alt="Welcome" src='res/header_welcome.gif' /></p>
           <div class='quicklinks'>
             <h3>Quick Links</h3>
           
             <ul>
               <li><a href="keyman:checkforupdates">Check for Updates</a></li>
               <li><a href="help:index">Help Contents</a></li>
-              <li><a href="help:context_frmProject">Project Help</a></li>
-              <li><a href="keyman:upgrade">Purchase Additional Modules</a></li>
+              <li><a href="help:context/project">Project Help</a></li>
             </ul>
           </div>
         </div>

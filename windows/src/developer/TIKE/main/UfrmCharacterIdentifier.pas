@@ -68,6 +68,8 @@ type
     procedure FontSizeChanged(Sender: TObject);
     procedure UpdateFont;
     procedure CancelFocus;
+  protected
+    function GetHelpTopic: string; override;
   public
     property Chars: string read FChars write SetChars;
     property OnCancelFocus: TNotifyEvent read FOnCancelFocus write FOnCancelFocus;
@@ -79,6 +81,8 @@ var
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   UfrmCharacterMapNew,
   Unicode;
 
@@ -291,6 +295,7 @@ end;
 
 procedure TfrmCharacterIdentifier.FormActivate(Sender: TObject);
 begin
+  inherited;
   RefreshFonts;
 end;
 
@@ -302,6 +307,8 @@ end;
 
 procedure TfrmCharacterIdentifier.FormCreate(Sender: TObject);
 begin
+  inherited;
+
   FDrawChar := TCleartypeDrawCharacter.Create;
   FFontName := frmCharacterMapNew.CharMapFontName;
   frmCharacterMapNew.OnFontSizeChanged := FontSizeChanged;
@@ -314,6 +321,7 @@ end;
 
 procedure TfrmCharacterIdentifier.FormDestroy(Sender: TObject);
 begin
+  inherited;
   if Assigned(frmCharacterMapNew) then
     frmCharacterMapNew.OnFontSizeChanged := nil;
   FreeAndNil(FDrawChar);
@@ -321,7 +329,13 @@ end;
 
 procedure TfrmCharacterIdentifier.FormResize(Sender: TObject);
 begin
+  inherited;
   AdjustPanes;
+end;
+
+function TfrmCharacterIdentifier.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_CharacterIdentifier;
 end;
 
 procedure TfrmCharacterIdentifier.AdjustPanes;

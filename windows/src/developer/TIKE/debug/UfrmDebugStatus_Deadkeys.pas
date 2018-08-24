@@ -32,6 +32,10 @@ type
   private
     { Deadkey functions }
     procedure ClearDeadKeys;
+
+  protected
+    function GetHelpTopic: string; override;
+
   public
     procedure UpdateDeadkeyDisplay(deadkeys: TList);
     procedure DeselectDeadkeys;
@@ -39,7 +43,10 @@ type
 
 implementation
 
-uses UfrmDebugStatus;
+uses
+  Keyman.Developer.System.HelpTopics,
+
+  UfrmDebugStatus;
 
 {$R *.dfm}
 
@@ -52,6 +59,11 @@ procedure TfrmDebugStatus_DeadKeys.DeselectDeadkeys;
 begin
   lbDeadkeys.ItemIndex := -1;
   lbDeadkeysClick(lbDeadkeys);
+end;
+
+function TfrmDebugStatus_DeadKeys.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_DebugStatus_DeadKeys;
 end;
 
 procedure TfrmDebugStatus_DeadKeys.lbDeadkeysClick(Sender: TObject);

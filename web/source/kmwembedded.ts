@@ -232,6 +232,8 @@
  
     for(nLayer=0;nLayer<layers.length; nLayer++)
     {
+      // Check the heights of each row, in case different layers have different row counts.
+      nRows=layers[nLayer].childNodes.length;
       layers[nLayer].style.height=(oskHeight+3)+'px';       
       for(nRow=0; nRow<nRows; nRow++)
       {                                  
@@ -433,13 +435,18 @@
         var baseKey = osk.popupBaseKey.key;
         var found = false;
 
-        // Search for the specified subkey so we can retrieve its useful properties.
-        // It should be within the popupBaseKey's subkey list.
-        for(let subKey of baseKey.sk) {
-          if(subKey.id == keyName) {
-            nextLayer = subKey.nextlayer;
-            found = true;
-            break;
+        if(baseKey.id == keyName) {
+          nextLayer = baseKey.nextlayer;
+          found = true;
+        } else {
+          // Search for the specified subkey so we can retrieve its useful properties.
+          // It should be within the popupBaseKey's subkey list.
+          for(let subKey of baseKey.sk) {
+            if(subKey.id == keyName) {
+              nextLayer = subKey.nextlayer;
+              found = true;
+              break;
+            }
           }
         }
 

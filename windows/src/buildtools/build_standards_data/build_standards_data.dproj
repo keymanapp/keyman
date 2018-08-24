@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{1AD91C23-D720-4EB6-8A90-1C60FFB2FAAD}</ProjectGuid>
-        <ProjectVersion>18.2</ProjectVersion>
+        <ProjectVersion>18.4</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <MainSource>build_standards_data.dpr</MainSource>
         <Base>True</Base>
@@ -92,6 +92,7 @@
         <DCCReference Include="Keyman.System.BuildISO6393Registry.pas"/>
         <DCCReference Include="Keyman.Console.BuildStandardsData.pas"/>
         <DCCReference Include="Keyman.System.BuildLCIDToBCP47Registry.pas"/>
+        <DCCReference Include="Keyman.System.BuildLibPalasoAllTags.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -557,7 +558,6 @@
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <Platforms>
-                <Platform value="Linux64">False</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>

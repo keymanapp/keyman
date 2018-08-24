@@ -30,9 +30,6 @@ uses
   unicodepanel in '..\..\global\delphi\comp\unicodepanel.pas',
   ttinfo in '..\..\global\delphi\general\ttinfo.pas',
   KeyNames in '..\..\global\delphi\general\KeyNames.pas',
-  {$IFDEF USE_PLUSMEMO}
-  SyntaxHighlight in 'main\SyntaxHighlight.pas',
-  {$ENDIF }
   PaintPanel in '..\..\global\delphi\comp\PaintPanel.pas',
   UfrmMDIEditor in 'child\UfrmMDIEditor.pas' {frmTikeEditor},
   ProjectFile in 'project\ProjectFile.pas',
@@ -76,7 +73,7 @@ uses
   MessageIdentifiers in 'main\MessageIdentifiers.pas',
   exceptionw in '..\..\global\delphi\general\exceptionw.pas',
   kpsfile in '..\..\global\delphi\general\kpsfile.pas',
-  UfrmProject in 'project\UfrmProject.pas' {frmProject},
+  Keyman.Developer.UI.UframeCEFHost in 'main\Keyman.Developer.UI.UframeCEFHost.pas' {frameCEFHost},
   UnitDrawArrow in '..\..\global\delphi\general\UnitDrawArrow.pas',
   StockObjects in 'kct\StockObjects.pas',
   CustomisationStorage in '..\..\global\delphi\cust\CustomisationStorage.pas',
@@ -100,7 +97,6 @@ uses
   CompileKeymanWeb in 'compile\CompileKeymanWeb.pas',
   KeymanWebKeyCodes in 'compile\KeymanWebKeyCodes.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
-  MSHTML_TLB in '..\..\global\delphi\tlb\MSHTML_TLB.pas',
   OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
   ADOX_TLB in '..\..\global\delphi\tlb\ADOX_TLB.pas',
   ADODB_TLB in '..\..\global\delphi\tlb\ADODB_TLB.pas',
@@ -121,9 +117,7 @@ uses
   OnScreenKeyboard in '..\..\global\delphi\comp\OnScreenKeyboard.pas',
   ExtShiftState in '..\..\global\delphi\comp\ExtShiftState.pas',
   CleartypeDrawCharacter in '..\..\global\delphi\general\CleartypeDrawCharacter.pas',
-  webbrowserfocusmonitor in '..\..\global\delphi\comp\webbrowserfocusmonitor.pas',
   CharMapDropTool in 'main\CharMapDropTool.pas',
-  CharMapDropTool_PlusMemoU in 'main\CharMapDropTool_PlusMemoU.pas',
   CharMapDropTool_EmbeddedWB in 'main\CharMapDropTool_EmbeddedWB.pas',
   UfrmBitmapEditorText in 'dialogs\UfrmBitmapEditorText.pas' {frmBitmapEditorText},
   UFixFontDialogBold in '..\..\global\delphi\general\UFixFontDialogBold.pas',
@@ -176,7 +170,6 @@ uses
   usp10 in '..\..\global\delphi\general\usp10.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   utilmsxml in '..\..\global\delphi\general\utilmsxml.pas',
-  KeymanEmbeddedWB in '..\..\global\delphi\comp\KeymanEmbeddedWB.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   UframeBitmapEditor in 'main\UframeBitmapEditor.pas' {frameBitmapEditor: TFrame},
   UfrmMessages in 'main\UfrmMessages.pas' {frmMessages},
@@ -251,7 +244,6 @@ uses
   DropTarget in '..\..\global\delphi\general\DropTarget.pas',
   CloseButtonPageControl in '..\..\global\delphi\comp\CloseButtonPageControl.pas',
   UfrmTIKEDock in 'dockforms\UfrmTIKEDock.pas' {TIKEDockForm},
-  KeymanDeveloperMemo in '..\..\global\delphi\comp\KeymanDeveloperMemo.pas',
   KeymanDeveloperDebuggerMemo in '..\..\global\delphi\comp\KeymanDeveloperDebuggerMemo.pas',
   UfrmCharacterMapDock in 'dockforms\UfrmCharacterMapDock.pas' {frmCharacterMapDock},
   Keyman.System.PackageInfoRefreshKeyboards in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas',
@@ -263,26 +255,49 @@ uses
   Keyman.System.KMXFileLanguages in '..\..\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas',
   Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
-  Keyman.System.UpdateCheckResponse in '..\..\global\delphi\general\Keyman.System.UpdateCheckResponse.pas';
+  Keyman.System.UpdateCheckResponse in '..\..\global\delphi\general\Keyman.System.UpdateCheckResponse.pas',
+  Keyman.Developer.System.HelpTopics in 'help\Keyman.Developer.System.HelpTopics.pas',
+  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
+  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
+  Keyman.System.Standards.LibPalasoAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas',
+  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
+  Keyman.Developer.System.CEFManager in 'main\Keyman.Developer.System.CEFManager.pas',
+  Keyman.Developer.System.HttpServer.Debugger in 'http\Keyman.Developer.System.HttpServer.Debugger.pas',
+  Keyman.Developer.System.HttpServer.App in 'http\Keyman.Developer.System.HttpServer.App.pas',
+  Keyman.Developer.System.HttpServer.Base in 'http\Keyman.Developer.System.HttpServer.Base.pas',
+  UfrmProject in 'project\UfrmProject.pas' {frmProject},
+  Keyman.Developer.System.HttpServer.AppSource in 'http\Keyman.Developer.System.HttpServer.AppSource.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
 {$R VERSION.RES}
 {$R MANIFEST.RES}
 
+// CEF3 needs to set the LARGEADDRESSAWARE flag which allows 32-bit processes to use up to 3GB of RAM.
+// If you don't add this flag the rederer process will crash when you try to load large images.
+{$SetPEFlags IMAGE_FILE_LARGE_ADDRESS_AWARE}
+
 begin
   CoInitFlags := COINIT_APARTMENTTHREADED;
 
-  InitThemeLibrary;
-  SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
-  Application.Initialize;
-//  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
-  Application.Title := 'Keyman Developer';
-  //TBX.TBXSetTheme('OfficeXP2');
-  if TikeActive then Exit;
-  InitClasses;
-  Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
+  FInitializeCEF := TCEFManager.Create;
+  try
+    if FInitializeCEF.Start then
+    begin
+      InitThemeLibrary;
+      SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
+      Application.Initialize;
+    //  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
+      Application.Title := 'Keyman Developer';
+      //TBX.TBXSetTheme('OfficeXP2');
+      if TikeActive then Exit;
+      InitClasses;
+      Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
   Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
   ShowStartup;
-  Application.Run;
+      Application.Run;
+    end;
+  finally
+    FInitializeCEF.Free;
+  end;
 end.

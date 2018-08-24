@@ -42,7 +42,7 @@ var
 begin
   FISO6393 := TStringList.Create;
   try
-    FISO6393.LoadfromFile(ISO6393File);
+    FISO6393.LoadfromFile(ISO6393File, TEncoding.UTF8);
     FResult := TStringList.Create;
     try
 
@@ -86,7 +86,7 @@ begin
       FResult.Add('');
       FResult.Add('end.');
 
-      FResult.SaveToFile(DestinationFile);
+      FResult.SaveToFile(DestinationFile, TEncoding.UTF8);
     finally
       FResult.Free;
     end;

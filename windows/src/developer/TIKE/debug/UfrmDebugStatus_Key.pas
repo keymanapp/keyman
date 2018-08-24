@@ -47,6 +47,8 @@ type
     FRegTest: TRegressionTest;   // I4809
     FUIStatus: TDebugUIStatus;   // I4809
     procedure SetUIStatus(const Value: TDebugUIStatus);   // I4809
+  protected
+    function GetHelpTopic: string; override;
   public
     procedure ClearLog;   // I4809
     procedure ShowKey(key: PAIDebugKeyInfo);
@@ -56,6 +58,8 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   KeyNames,
   UKeyBitmap;
 
@@ -78,6 +82,11 @@ procedure TfrmDebugStatus_Key.FormDestroy(Sender: TObject);
 begin
   inherited;
   FRegTest.Free;   // I4809
+end;
+
+function TfrmDebugStatus_Key.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_DebugStatus_Key
 end;
 
 procedure TfrmDebugStatus_Key.panKeyPaint(Sender: TObject);
