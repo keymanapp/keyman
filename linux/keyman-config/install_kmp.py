@@ -9,6 +9,7 @@ import tempfile
 import zipfile
 from os import listdir, makedirs
 from shutil import copy2
+from ast import literal_eval
 
 import requests
 
@@ -81,6 +82,7 @@ def install_kmp(inputfile, online=False):
 		inputfile (str): path to kmp file
 		online(bool, default=False): whether to attempt to get a source kmn and ico for the keyboard
 	"""
+	install_to_ibus = False
 	# create a temporary directory using the context manager
 	with tempfile.TemporaryDirectory() as tmpdirname:
 		print('created temporary directory', tmpdirname)
@@ -131,6 +133,7 @@ def install_kmp(inputfile, online=False):
 								os.remove(kmn_file)
 								os.rmdir(kbdir)
 								return
+							install_to_ibus = True
 						else:
 							print("install_kmp.py: warning: no kmn source file for", kbid, "so not installing keyboard.")
 							os.rmdir(kbdir)
@@ -189,6 +192,21 @@ def install_kmp(inputfile, online=False):
 					copy2(fpath, kbdir)
 					checkandsaveico(fpath)
 					copy2(fpath+".bmp", kbdir)
+			if install_to_ibus:
+				print("Installing", kbid, "into IBus")
+				dconfread = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],
+				    stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
+				if (dconfread.returncode == 0):
+					preload_engines = literal_eval(dconfread.stdout)
+					#print(preload_engines)
+					#print("new kmn:", sys.argv[1])
+					preload_engines.append(kmn_file)
+					#preload_engines = preload_engines + sys.argv[1]
+					#print(preload_engines)
+					#new_preload_engines = str(preload_engines)
+					#print("writing:", new_preload_engines)
+					dconfwrite = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
+						stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
 		else:
 			print("install_kmp.py: error: No kmp.json or kmp.inf found in", inputfile)
 			print("Contents of", inputfile+":")
