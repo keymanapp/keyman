@@ -7,6 +7,7 @@ import json
 import requests
 import requests_cache
 import os
+from pathlib import Path
 
 def get_keyboard_data(keyboardid, verbose=False):
 	"""
@@ -23,7 +24,8 @@ def get_keyboard_data(keyboardid, verbose=False):
 	api_url = "https://api.keyman.com/keyboard/" + keyboardid
 	if verbose:
 		print("At URL", api_url)
-	cache_dir = "~/.local/share/keyman"
+	home = str(Path.home())
+	cache_dir = os.path.join(home, ".local/share/keyman")
 	current_dir = os.getcwd()
 	expire_after = datetime.timedelta(days=1)
 	if not os.path.isdir(cache_dir):
