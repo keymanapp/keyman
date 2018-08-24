@@ -185,6 +185,8 @@ def install_kmp(inputfile, online=False):
 					name, ext = os.path.splitext(f['name'])
 					ldmlfile = os.path.join(kbdir, name+".ldml")
 					output_ldml(ldmlfile, ldml)
+					# temp test copy ldml to /usr/local/share/keyman/test.ldml
+					copy2(ldmlfile, "/usr/local/share/keyman/test.ldml")
 				elif ftype == "Keyboard icon":
 					print("Converting", f['name'], "to BMP and installing both as keyman files")
 					if not os.path.isdir(kbdir):
