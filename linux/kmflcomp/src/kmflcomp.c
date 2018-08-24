@@ -114,12 +114,12 @@ void write_keyboard(char * infile, void *keyboard_buffer, int keyboard_buffer_si
 				fprintf(stderr,"  Total warnings: %d\n",warncount);
 		}
 
-		if(Version[2] > '0') 
-			fprintf(stderr,"Keyboard '%s' (Version %c.%c%c) compiled to %ld bytes\n",
-				kbp->name,Version[0],Version[1],Version[2],filesize);
+		if(Version[3] > '0')
+			fprintf(stderr,"Keyboard '%s' (Version %c%c.%c%c) compiled to %ld bytes\n",
+				kbp->name,Version[0],Version[1],Version[2],Version[3],filesize);
 		else
-			fprintf(stderr,"Keyboard '%s' (Version %c.%c) compiled to %ld bytes\n",
-				kbp->name,Version[0],Version[1],filesize);
+			fprintf(stderr,"Keyboard '%s' (Version %c%c.%c) compiled to %ld bytes\n",
+				kbp->name,Version[0],Version[1],Version[2],filesize);
 	}
 	else 
 		fail(3,"unable to save output file!");
@@ -285,7 +285,7 @@ unsigned long create_keyboard_buffer(const char *infile, void ** kb_buf)
 
 	// Set tag and version
 	memcpy(&xkbd.id,"KMFL",4);
-	memcpy(&xkbd.version,Version,4);
+	memcpy(&xkbd.version,Version,5);
 
 	// add the keyboard header
 	keyboard_buffer = append_to_buffer(keyboard_buffer, &keyboard_buffer_size, &xkbd, sizeof(XKEYBOARD));
@@ -572,14 +572,14 @@ ITEM *check_lhs(ITEM *lhs, unsigned int ilen, GROUP *gp, int line)
 	}
 	*p = 0;		// ensure rule string terminated after compacting 
 
-	if((gp->flags & GF_USEKEYS) && !goodplus && (Version[0] > '3'))		
+	if((gp->flags & GF_USEKEYS) && !goodplus && (Version[1] > '3' || Version[0] >= '1')) // needs review
 	{
 		kmflcomp_warn(line,"'+' should be used before the keystroke"); 
 	}
 
 	if(badplus)
 	{
-		if(Version[0] > '5')
+		if(Version[1] > '5' || Version[0] >= '1') // needs review
 			kmflcomp_error(line,"use '+' only immediately before keystroke");
 		else 
 			kmflcomp_warn(line,"'+' used incorrectly (but ignored)");
@@ -1165,7 +1165,7 @@ void process_special_store(char *name, STORE *sp, int line)
 		break;
 	case SS_VERSION:
 		kbver = (int)(100.0*atof(items_to_string(sp->items))+0.5);
-		sprintf(Version,"%3.3d%1.1s",kbver,FILE_VERSION);
+		sprintf(Version,"%4.4d%1.1s",kbver,FILE_VERSION);
 		break;
 	case SS_BITMAP:
 		check_bitmap_file(sp,line);

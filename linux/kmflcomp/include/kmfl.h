@@ -37,8 +37,8 @@ extern "C" {
 #include <sys/types.h>
 
 #define FILE_VERSION	"1"
-#define BASE_VERSION	"320"
-#define LAST_VERSION	"700"
+#define BASE_VERSION	"0320"
+#define LAST_VERSION	"1000"
 
 // Undefine some Windows constants so we can use them (even on Windows)
 #ifdef UNDEFINED
@@ -147,7 +147,7 @@ typedef struct _xgroup XGROUP;
 // Compiled keyboard structure
 struct _xkeyboard {
 	char id[4]; 						// always KMFL
-	char version[4];				// keyboard version(3) and file version(1)
+	char version[5];				// keyboard version(4) and file version(1)
 	char name[NAMELEN+1];			// utf8 version of keyboard name
 	UINT mode:1;			// Keyboard Flags:	Unicode (0) or ANSI (1)
 	UINT layout:1; 		//					positional(0) or mnemonic(1)
