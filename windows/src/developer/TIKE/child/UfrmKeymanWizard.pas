@@ -3142,6 +3142,7 @@ begin
   if pagesTouchLayout.ActivePage = pageTouchLayoutCode then
   begin
     frameTouchLayoutSource.EditorText := frameTouchLayout.SaveToString;
+    DoFocus(frameTouchLayout);
   end;
   FLoading := False;
 end;

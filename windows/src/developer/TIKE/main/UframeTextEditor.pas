@@ -18,7 +18,7 @@ uses
 type
   TParColourLineType = (pcltNone, pcltBreakpoint, pcltExecutionPoint, pcltError);
 
-  TframeTextEditor = class(TTIKEForm, IKMDSearchActions, IKMDEditActions, IKMDTextEditorActions)
+  TframeTextEditor = class(TTIKEForm, IKMDEditActions, IKMDSearchActions, IKMDTextEditorActions)
     lstImages: TMenuImgList;
     dlgFonts: TFontDialog;
     dlgPrintSetup: TPrinterSetupDialog;
@@ -65,6 +65,7 @@ type
     procedure ExecuteCommand(const command: string; const parameters: TJSONValue = nil);
     procedure UpdateToken(command: string);
     procedure SetCursorPosition(AColumn, ARow: Integer);
+
   protected
     function GetHelpTopic: string; override;
 
@@ -78,6 +79,10 @@ type
     function CanEditFindNext: Boolean;
 
     { IKMDEditActions }
+    function IKMDTextEditorActions_GetText: string;
+    procedure IKMDTextEditorActions_SetText(const Value: string);
+    function IKMDTextEditorActions.GetText = IKMDTextEditorActions_GetText;
+    procedure IKMDTextEditorActions.SetText = IKMDTextEditorActions_SetText;
     procedure CutToClipboard;
     procedure CopyToClipboard;
     procedure PasteFromClipboard;
@@ -250,6 +255,16 @@ end;
 function TframeTextEditor.GetText: WideString;
 begin
   Result := modWebHttpServer.AppSource.GetSource(FFileName);
+end;
+
+function TframeTextEditor.IKMDTextEditorActions_GetText: string;
+begin
+  Result := GetText;
+end;
+
+procedure TframeTextEditor.IKMDTextEditorActions_SetText(const Value: string);
+begin
+  SetText(Value);
 end;
 
 procedure TframeTextEditor.LoadFromFile(AFileName: WideString);
@@ -483,6 +498,7 @@ end;
 
 procedure TframeTextEditor.SetFocus;
 begin
+  inherited;
   cef.SetFocus;
 end;
 

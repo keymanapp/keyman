@@ -178,9 +178,11 @@ begin
 end;
 
 procedure TmodActionsTextEditor.actTextEditor_ReformatXMLExecute(Sender: TObject);
+var
+  a: IKMDTextEditorActions;
 begin
-{TODO:  with Screen.ActiveControl as TKeymanDeveloperMemo do
-    SetTextBuf(PWideChar(FormatXMLData(Text)));}
+  a := KMDActions.GetTextEditorController(Screen.ActiveControl);
+  a.Text := FormatXMLData(a.Text);
 end;
 
 procedure TmodActionsTextEditor.actTextEditor_ReformatXMLUpdate(
