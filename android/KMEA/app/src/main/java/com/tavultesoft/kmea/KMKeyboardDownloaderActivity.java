@@ -48,7 +48,6 @@ public class KMKeyboardDownloaderActivity extends Activity {
   public static final String kKeymanApiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url=";
 
   // Keyman public keys
-  public static final String KMKey_Direct = "direct";
   public static final String KMKey_URL = "url";
   public static final String KMKey_Keyboard = "keyboard";
   public static final String KMKey_LanguageKeyboards = "keyboards";

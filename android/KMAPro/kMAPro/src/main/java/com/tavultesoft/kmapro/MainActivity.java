@@ -281,6 +281,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
               filename = url.substring(index);
             }
 
+            // Only handle ad-hoc kmp packages
             if (url.endsWith(".kmp")) {
               try {
                 // Download the KMP to app cache
@@ -303,18 +304,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
                 break;
               }
             } else {
-              // Legacy ad-hoc keyboard (JSON) distribution
-              downloadIntent = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
-              Bundle bundle = new Bundle();
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_KEYBOARD,
-                data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Keyboard));
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_LANGUAGE,
-                data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Language));
-              bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom);
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_URL, url);
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_FILENAME, filename);
-              downloadIntent.putExtras(bundle);
-              startActivity(downloadIntent);
+              String message = "Download failed. Not a .kmp keyboard package.";
+              Toast.makeText(getApplicationContext(), message,
+                Toast.LENGTH_SHORT).show();
             }
           }
           break;
