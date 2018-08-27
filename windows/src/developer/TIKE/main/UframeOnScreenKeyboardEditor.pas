@@ -326,7 +326,6 @@ end;
 
 procedure TframeOnScreenKeyboardEditor.pagesChange(Sender: TObject);
 begin
-  inherited;
   if pages.ActivePage = pageCode then
     frameSource.SetFocus;
 end;
