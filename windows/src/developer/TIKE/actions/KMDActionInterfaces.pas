@@ -71,10 +71,13 @@ type
 
   IKMDTextEditorActions = interface(IKMDSearchActions)
     ['{118B5CF5-7FED-4669-9A51-7DC58BF571D4}']
+    function GetText: string;
+    procedure SetText(const Value: string);
     function GetSelectedRow: Integer;
     function GetEditorFormat: TEditorFormat;
     property EditorFormat: TEditorFormat read GetEditorFormat;
     property SelectedRow: Integer read GetSelectedRow;
+    property Text: string read GetText write SetText;
   end;
 
 implementation
