@@ -3,8 +3,9 @@
 
 ## 11.0 alpha
 * Move to 11.0
-* Add round launcher icons
+* Add round launcher icons (#1077)
 * Change default keyboard from `european` to `sil_euro_latin` (#1112)
+* Remove deprecated ad-hoc distribution of keyboards via `keyman://` protocol (#1109)
 
 ## 2018-08-23 10.0.505 stable
 * Validate keyboard ID when downloading keyboard from keman cloud (#1121)

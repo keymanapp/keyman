@@ -48,7 +48,6 @@ public class KMKeyboardDownloaderActivity extends Activity {
   public static final String kKeymanApiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url=";
 
   // Keyman public keys
-  public static final String KMKey_Direct = "direct";
   public static final String KMKey_URL = "url";
   public static final String KMKey_Keyboard = "keyboard";
   public static final String KMKey_LanguageKeyboards = "keyboards";
@@ -226,8 +225,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
     }
 
     /**
-     * Download a non-KMP Keyman keyboard.
-     * This will either be from Keyman cloud or legacy ad-hoc distribution via JSON
+     * Download a non-KMP Keyman keyboard from Keyman cloud via JSON
      * @param remoteUrl String
      * @return ret int -1 for fail
      * @throws Exception
@@ -238,6 +236,11 @@ public class KMKeyboardDownloaderActivity extends Activity {
       JSONObject kbData = jsonParser.getJSONObjectFromUrl(remoteUrl);
       String exceptionStr = "Could not reach server";
       if (kbData == null) {
+        throw new Exception(exceptionStr);
+      }
+
+      if (isCustom) {
+        exceptionStr = "Cannot download custom non-KMP keyboard";
         throw new Exception(exceptionStr);
       }
 
@@ -253,54 +256,29 @@ public class KMKeyboardDownloaderActivity extends Activity {
 
       String fontBaseUri = options.optString(KMKey_FontBaseURI, "");
       JSONObject language, keyboard = null;
-      if (!isCustom) {
-        // Keyman cloud keyboard distribution via JSON
-        language = kbData.optJSONObject(KMKey_Language);
-        if (language == null) {
-          throw new Exception(exceptionStr);
-        }
 
-        langName = language.optString(KMManager.KMKey_Name, "");
+      // Keyman cloud keyboard distribution via JSON
+      language = kbData.optJSONObject(KMKey_Language);
+      if (language == null) {
+        throw new Exception(exceptionStr);
+      }
 
-        JSONArray keyboards = language.getJSONArray(KMKey_LanguageKeyboards);
-        if (keyboards == null) {
-          throw new Exception(exceptionStr);
-        }
+      langName = language.optString(KMManager.KMKey_Name, "");
 
-        // In case keyboards array contains multiple keyboards, get the one with matching keyboard ID
-        for (int index = 0; index < keyboards.length(); index++) {
-          keyboard = keyboards.getJSONObject(index);
-          if (keyboard != null && (kbID.equals(keyboard.getString(KMManager.KMKey_ID)))) {
-            break;
-          }
-        }
-        if (keyboard == null) {
-          throw new Exception(exceptionStr);
-        }
-      } else {
-        // Legacy method of ad-hoc keyboard distribution via JSON
-        keyboard = kbData.optJSONObject(KMKey_Keyboard);
-        if (keyboard == null) {
-          throw new Exception(exceptionStr);
-        }
+      JSONArray keyboards = language.getJSONArray(KMKey_LanguageKeyboards);
+      if (keyboards == null) {
+        throw new Exception(exceptionStr);
+      }
 
-        JSONArray languages = keyboard.optJSONArray(KMKey_Languages);
-        if (languages == null) {
-          throw new Exception(exceptionStr);
+      // In case keyboards array contains multiple keyboards, get the one with matching keyboard ID
+      for (int index = 0; index < keyboards.length(); index++) {
+        keyboard = keyboards.getJSONObject(index);
+        if (keyboard != null && (kbID.equals(keyboard.getString(KMManager.KMKey_ID)))) {
+          break;
         }
-
-        // Concatenate langID and langName
-        langID = "";
-        langName = "";
-        int langCount = languages.length();
-        for (int i = 0; i < langCount; i++) {
-          langID += languages.getJSONObject(i).getString(KMManager.KMKey_ID);
-          langName += languages.getJSONObject(i).getString(KMManager.KMKey_Name);
-          if (i < langCount - 1) {
-            langID += ";";
-            langName += ";";
-          }
-        }
+      }
+      if (keyboard == null) {
+        throw new Exception(exceptionStr);
       }
 
       kbID = keyboard.getString(KMManager.KMKey_ID);

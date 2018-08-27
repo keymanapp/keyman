@@ -49,15 +49,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <!-- Intending to deprecate keyman:// protocol in https://github.com/keymanapp/keyman/issues/538 -->
-                <data android:scheme="keyman" android:host="localhost" android:path="/open" />
-            </intent-filter>
-
             <!-- See http://stackoverflow.com/questions/1733195/android-intent-filter-for-a-particular-file-extension/2062112#2062112 -->
 
             <!--
