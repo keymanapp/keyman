@@ -133,7 +133,7 @@ uses
   ImgList, MenuImgList,
   KeyboardParser, TextFileFormat, dmActionsKeyboardEditor,
   VisualKeyboard, UframeOnScreenKeyboardEditor,
-  KeymanDeveloperUtils, KeymanDeveloperMemo,
+  KeymanDeveloperUtils,
   OnScreenKeyboard, KMDActionInterfaces,
 
 
@@ -420,7 +420,6 @@ type
     procedure LoadOSK;   // I4034
     procedure SaveOSK;
 
-    function GetEditorMemo: TKeymanDeveloperMemo;
     procedure BitmapEnableControls;
     procedure OSKModified(Sender: TObject);
     procedure OSKImportKMX(Sender: TObject; var KMXFileName: TTempFile);   // I4181
@@ -522,7 +521,6 @@ type
     property DebugStatusForm: TfrmDebugStatus read FDebugStatusForm;
     property IsDebugVisible: Boolean read GetIsDebugVisible;
 
-    property EditorMemo: TKeymanDeveloperMemo read GetEditorMemo;
     property Parser: TKeyboardParser read FKeyboardParser;   // I4505
     property CompileTargets: TKeymanTargets read GetCompileTargets;   // I4504
     property FontInfo[Index: TKeyboardFont]: TKeyboardFontInfo read GetFontInfo write SetFontInfo; // I4057
@@ -646,7 +644,7 @@ begin
   SetupDebugForm;
 
   GetCharMapDropTool.Handle(Self, cmimText);
-  GetCharMapDropTool.Handle(frameSource.memo, cmimDefault);
+//TODO:  GetCharMapDropTool.Handle(frameSource.memo, cmimDefault);
   GetCharMapDropTool.Handle(editKeyOutputCode, cmimCode);
 
   FillFeatureGrid;
@@ -1560,11 +1558,6 @@ end;
 function TfrmKeymanWizard.GetDefaultExt: string;
 begin
   Result := 'kmn';
-end;
-
-function TfrmKeymanWizard.GetEditorMemo: TKeymanDeveloperMemo;
-begin
-  Result := frameSource.memo;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -2534,9 +2527,9 @@ var
 begin
   FCurrentRule := nil;
   FKeyboardParser.AddRequiredLines;
-  FLine := frameSource.memo.SelLine;
+  FLine := (frameSource as IKMDTextEditorActions).SelectedRow;
   frameSource.EditorText := FKeyboardParser.KeyboardText;
-  frameSource.memo.SelLine := Min(FLine, frameSource.memo.LineCount - 1);
+  frameSource.SetSelectedRow(FLine);
 
 //  FreeAndNil(FKeyboardParser);
 end;
@@ -2850,7 +2843,8 @@ begin
   FDebugForm.OnUpdateParColour := UpdateParColour;
   FDebugForm.Visible := True;
 
-  FDebugForm.EditorMemo := frameSource.memo;
+
+// TODO:  FDebugForm.EditorMemo := frameSource.memo;
 
   FDebugStatusForm := TfrmDebugStatus.Create(Self);
   FDebugStatusForm.BorderStyle := bsNone;

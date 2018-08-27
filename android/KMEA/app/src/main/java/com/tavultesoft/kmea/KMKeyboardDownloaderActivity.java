@@ -256,7 +256,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
       }
 
       String fontBaseUri = options.optString(KMKey_FontBaseURI, "");
-      JSONObject language, keyboard;
+      JSONObject language, keyboard = null;
 
       // Keyman cloud keyboard distribution via JSON
       language = kbData.optJSONObject(KMKey_Language);
@@ -271,7 +271,13 @@ public class KMKeyboardDownloaderActivity extends Activity {
         throw new Exception(exceptionStr);
       }
 
-      keyboard = keyboards.getJSONObject(0);
+      // In case keyboards array contains multiple keyboards, get the one with matching keyboard ID
+      for (int index = 0; index < keyboards.length(); index++) {
+        keyboard = keyboards.getJSONObject(index);
+        if (keyboard != null && (kbID.equals(keyboard.getString(KMManager.KMKey_ID)))) {
+          break;
+        }
+      }
       if (keyboard == null) {
         throw new Exception(exceptionStr);
       }

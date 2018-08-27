@@ -8,12 +8,6 @@ ROOT=$(KEYMAN_ROOT)\windows
 ROOT=c:\keyman\windows
 !ENDIF
 
-!IFDEF KEYMAN_ENCUMBERED_ROOT
-ENCUMBERED_EXT=$(KEYMAN_ENCUMBERED_ROOT)\src\ext
-!ELSE
-ENCUMBERED_EXT=c:\keyman_extra\windows\encumbered_src\ext
-!ENDIF
-
 EXT=$(ROOT)\src\ext
 
 INCLUDE=$(ROOT)\src\global\inc;$(INCLUDE)
@@ -36,19 +30,6 @@ INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine $(KEYMAN
   DELPHI_MSBUILD_FLAG_DEBUG=/p:Config=Debug
 !ELSE
   DELPHI_MSBUILD_FLAG_DEBUG=/p:Config=Release
-!ENDIF
-
-!IFDEF USE_PLUSMEMO
-  MAKEFLAG_USE_PLUSMEMO=-DUSE_PLUSMEMO
-  DELPHI_MSBUILD_FLAG_USE_PLUSMEMO=/p:USE_PLUSMEMO=USE_PLUSMEMO
-!ENDIF
-
-!IFDEF DELPHI_STARTER
-!IFDEF USE_PLUSMEMO
-!ERROR DELPHI_STARTER and USE_PLUSMEMO cannot be used together
-!ENDIF
-
-  MAKEFLAG_DELPHI_STARTER=-DDELPHI_STARTER
 !ENDIF
 
 !IFDEF USERDEFINES
@@ -83,7 +64,7 @@ INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine $(KEYMAN
 !ENDIF
 !ENDIF
 
-MAKE=$(MAKE) -l $(MAKEFLAG_USE_PLUSMEMO) $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET) $(MAKEFLAG_DELPHI_STARTER)
+MAKE=$(MAKE) -l $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET)
 
 #
 # Delphi build commands
@@ -102,21 +83,16 @@ DELPHIDPRPARAMS=-Q -B -GD -H -VT -$C+ -$D+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(D
 DELPHIDPRPARAMS64=-Q -B -GD -H -VT -$C+ -$D+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win
 DELPHIDPKPARAMS=-Q -B -GD -VT -$C+ -$D+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -LE$(OUTLIB) -LN$(OUTLIB) -NSData
 
-!IFDEF DELPHI_STARTER
-DCC32=@$(DEVTOOLS) -dccx
-DCC32DPK=@$(DEVTOOLS) -dccx
-!ELSE
 !IFDEF NOUI
-DCC32=dcc32.exe $(DELPHIDPRPARAMS) $(MAKEFLAG_USE_PLUSMEMO)
-DCC32DPK=dcc32.exe $(DELPHIDPKPARAMS) $(MAKEFLAG_USE_PLUSMEMO)
+DCC32=dcc32.exe $(DELPHIDPRPARAMS)
+DCC32DPK=dcc32.exe $(DELPHIDPKPARAMS)
 !ELSE
 !IFDEF QUIET
-DCC32=@$(DEVTOOLS) -dccq  $(DELPHIDPRPARAMS) $(MAKEFLAG_USE_PLUSMEMO)
-DCC32DPK=@$(DEVTOOLS) -dccq $(DELPHIDPKPARAMS) $(MAKEFLAG_USE_PLUSMEMO)
+DCC32=@$(DEVTOOLS) -dccq  $(DELPHIDPRPARAMS)
+DCC32DPK=@$(DEVTOOLS) -dccq $(DELPHIDPKPARAMS)
 !ELSE
-DCC32=@$(DEVTOOLS) -dcc $(DELPHIDPRPARAMS) $(MAKEFLAG_USE_PLUSMEMO)
-DCC32DPK=@$(DEVTOOLS) -dcc $(DELPHIDPKPARAMS) $(MAKEFLAG_USE_PLUSMEMO)
-!ENDIF
+DCC32=@$(DEVTOOLS) -dcc $(DELPHIDPRPARAMS)
+DCC32DPK=@$(DEVTOOLS) -dcc $(DELPHIDPKPARAMS)
 !ENDIF
 !ENDIF
 
@@ -126,20 +102,12 @@ DCC64=dcc64.exe $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 # Delphi MSBuild related commands and macros
 #
 
-!IFDEF DELPHI_STARTER
-DELPHI_MSBUILD=@$(DEVTOOLS) -dccx
-!ELSE
-DELPHI_MSBUILD=$(ROOT)\src\buildtools\msbuild-wrapper.bat $(DELPHI_MSBUILD_FLAG_USE_PLUSMEMO) $(DELPHI_MSBUILD_FLAG_DEBUG)
-!ENDIF
+DELPHI_MSBUILD=$(ROOT)\src\buildtools\msbuild-wrapper.bat $(DELPHI_MSBUILD_FLAG_DEBUG)
 
 !IFDEF DEBUG
 TARGET_PATH=Debug
 !ELSE
-! IFDEF DELPHI_STARTER
-TARGET_PATH=Debug
-! ELSE
 TARGET_PATH=Release
-! ENDIF
 !ENDIF
 
 WIN32_TARGET_PATH=Win32\$(TARGET_PATH)
@@ -181,16 +149,7 @@ XSLTPROC=$(ROOT)\src\ext\libxslt\xsltproc.exe
 # TDSPACK=error! $(ROOT)\src\buildtools\tdspack\tdspack -e
 # TDSPACKCOMPRESS=error! $(ROOT)\src\buildtools\tdspack\tdspack -o
 
-!IFDEF DELPHI_STARTER
-#
-# The Delphi Starter build does not generate .tds files for projects
-# by default so we just ignore this. We don't really need to have
-# the .dbg files for most developers anyway, just for release builds
-#
-TDS2DBG=rem
-!ELSE
 TDS2DBG=$(ROOT)\bin\buildtools\tds2dbg
-!ENDIF
 
 MAKEJCLDBG=$(ROOT)\bin\buildtools\makejcldbg.exe -E
 
@@ -226,7 +185,7 @@ MAKE=$(MAKE)
 # To get a .pfx from a .spc and .pvk, run pvk2pfx.exe
 #
 
-SC_URL="http://www.keyman.com/"
+SC_URL="https://keyman.com/"
 SC_PFX_SHA256="$(ROOT)\src\buildtools\certificates\keymantest-sha256.pfx"
 SC_PFX_SHA1="$(ROOT)\src\buildtools\certificates\keymantest-sha1.pfx"
 SC_PWD=""

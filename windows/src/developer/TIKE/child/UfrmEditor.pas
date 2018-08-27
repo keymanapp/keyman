@@ -43,11 +43,7 @@ uses
   StdCtrls, ExtCtrls, Menus, ToolWin, ComCtrls, ImgList, ErrorControlledRegistry, 
   RegistryKeys, UfrmMDIChild, MenuImgList, Printers,
   UfrmKeyTest,
-{$IFDEF USE_PLUSMEMO}
-  SyntaxHighlight,
-  HtmlHighlight,
-  pmprint,
-{$ENDIF}
+
   ProjectFile, UfrmMDIEditor,
   CaptionPanel, Grids,
   CharMapInsertMode,
@@ -168,7 +164,7 @@ begin
   FEditorFrame.OnChanged := EditorChanged;
   FEditorFrame.TextFileFormat := tffUTF8;
 
-  GetCharMapDropTool.Handle(FEditorFrame.memo, cmimDefault);    // I1422 - insert character map chars
+//  TODO: GetCharMapDropTool.Handle(FEditorFrame.memo, cmimDefault);    // I1422 - insert character map chars
 
   ActiveControl := FEditorFrame;
 
@@ -186,7 +182,7 @@ end;
 
 procedure TfrmEditor.SetEditorText(s: WideString);
 begin
-  FEditorFrame.memo.SetTextBuf(PWideChar(s));
+  FEditorFrame.SetTextBuf(PWideChar(s));
 end;
 
 procedure TfrmEditor.SetFocus;

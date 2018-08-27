@@ -4,17 +4,7 @@
 
 NOTARGET_SIGNCODE=yes
 
-#
-# tb2k plusmemo - encumbered, see encumbered_src
-#
-
-!ifdef USE_PLUSMEMO
-ENCUMBERED_TARGETS=plusmemo
-!ELSE
-ENCUMBERED_TARGETS=
-!ENDIF
-
-TARGETS=$(ENCUMBERED_TARGETS) dcpcrypt embeddedwb jedi mbcolor regexpr scfontcombobox cef4delphi
+TARGETS=dcpcrypt embeddedwb jedi mbcolor regexpr scfontcombobox cef4delphi
 
 # jedi, regexpr have no packages
 
@@ -56,14 +46,6 @@ scfontcombobox:
     cd $(ROOT)\src\ext\scfontcombobox
     $(MAKE) $(TARGET)
     
-#
-# Encumbered 3rd party packages
-#
-
-plusmemo: regexpr
-    cd $(ENCUMBERED_EXT)\plusmemo
-    $(MAKE) $(TARGET)
-
 #
 #
 #

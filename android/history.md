@@ -4,7 +4,17 @@
 ## 11.0 alpha
 * Move to 11.0
 * Add round launcher icons (#1077)
-* Breaking change - Remove ad-hoc distribution of keyboards via `keyman://` protocol (#1109)
+* Change default keyboard from `european` to `sil_euro_latin` (#1112)
+* Remove deprecated ad-hoc distribution of keyboards via `keyman://` protocol (#1109)
+
+## 2018-08-23 10.0.505 stable
+* Validate keyboard ID when downloading keyboard from keman cloud (#1121)
+
+## 2018-08-22 10.0.504 stable
+* Fixes crash when installed keyboards list is invalid (#1119)
+
+## 2018-08-16 10.0.503 stable
+* Fixes crashes for release configurations when InputConfiguration or package name is null (#1103)
 
 ## 2018-07-06 10.0.502 stable
 * Fixes issue for embedded Android, iOS apps where a keyboard with varying row counts in different layers could crash (#1055)

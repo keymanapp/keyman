@@ -2,7 +2,7 @@ inherited frmOptions: TfrmOptions
   Left = 336
   Top = 191
   HelpContext = 1241
-  ActiveControl = chkShowStartupDialog
+  ActiveControl = lbColours
   BorderIcons = [biSystemMenu, biHelp]
   BorderStyle = bsDialog
   Caption = 'Options'
@@ -20,11 +20,15 @@ inherited frmOptions: TfrmOptions
     Top = 8
     Width = 425
     Height = 392
-    ActivePage = tabGeneral
+    ActivePage = tabColours
     TabOrder = 0
     object tabGeneral: TTabSheet
       Caption = 'General'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object gbStartup: TGroupBox
         Left = 8
         Top = 8
@@ -185,10 +189,6 @@ inherited frmOptions: TfrmOptions
     object tabColours: TTabSheet
       Caption = 'Colours'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object panCol1: TPaintPanel
         Left = 176
         Top = 8
@@ -206,7 +206,6 @@ inherited frmOptions: TfrmOptions
         ParentCtl3D = False
         ParentFont = False
         TabOrder = 0
-        OnMouseDown = panCol1MouseDown
       end
       object lbColours: TListBox
         Left = 4
@@ -215,7 +214,6 @@ inherited frmOptions: TfrmOptions
         Height = 145
         ItemHeight = 13
         TabOrder = 1
-        OnClick = lbColoursClick
       end
       object panCol2: TPaintPanel
         Tag = 1
@@ -235,7 +233,6 @@ inherited frmOptions: TfrmOptions
         ParentCtl3D = False
         ParentFont = False
         TabOrder = 2
-        OnMouseDown = panCol1MouseDown
       end
       object panCol3: TPaintPanel
         Tag = 2
@@ -255,7 +252,6 @@ inherited frmOptions: TfrmOptions
         ParentCtl3D = False
         ParentFont = False
         TabOrder = 3
-        OnMouseDown = panCol1MouseDown
       end
       object panCol4: TPaintPanel
         Tag = 3
@@ -275,7 +271,6 @@ inherited frmOptions: TfrmOptions
         ParentCtl3D = False
         ParentFont = False
         TabOrder = 4
-        OnMouseDown = panCol1MouseDown
       end
       object panCol5: TPaintPanel
         Tag = 4
@@ -295,7 +290,6 @@ inherited frmOptions: TfrmOptions
         ParentCtl3D = False
         ParentFont = False
         TabOrder = 5
-        OnMouseDown = panCol1MouseDown
       end
       object panCol6: TPaintPanel
         Tag = 5
@@ -315,7 +309,6 @@ inherited frmOptions: TfrmOptions
         ParentCtl3D = False
         ParentFont = False
         TabOrder = 6
-        OnMouseDown = panCol1MouseDown
       end
       object panCol7: TPaintPanel
         Tag = 6
@@ -335,7 +328,6 @@ inherited frmOptions: TfrmOptions
         ParentCtl3D = False
         ParentFont = False
         TabOrder = 7
-        OnMouseDown = panCol1MouseDown
       end
       object panCol8: TPaintPanel
         Tag = 7
@@ -355,7 +347,6 @@ inherited frmOptions: TfrmOptions
         ParentCtl3D = False
         ParentFont = False
         TabOrder = 8
-        OnMouseDown = panCol1MouseDown
       end
       object panCol9: TPaintPanel
         Tag = 8
@@ -369,7 +360,6 @@ inherited frmOptions: TfrmOptions
         Ctl3D = False
         ParentCtl3D = False
         TabOrder = 9
-        OnMouseDown = panCol1MouseDown
       end
       object panCol10: TPaintPanel
         Tag = 9
@@ -389,7 +379,6 @@ inherited frmOptions: TfrmOptions
         ParentCtl3D = False
         ParentFont = False
         TabOrder = 10
-        OnMouseDown = panCol1MouseDown
       end
       object panCol11: TPaintPanel
         Tag = 10
@@ -403,7 +392,6 @@ inherited frmOptions: TfrmOptions
         Ctl3D = False
         ParentCtl3D = False
         TabOrder = 11
-        OnMouseDown = panCol1MouseDown
       end
       object panCol12: TPaintPanel
         Tag = 11
@@ -417,7 +405,6 @@ inherited frmOptions: TfrmOptions
         Ctl3D = False
         ParentCtl3D = False
         TabOrder = 12
-        OnMouseDown = panCol1MouseDown
       end
       object panCol13: TPaintPanel
         Tag = 12
@@ -437,7 +424,6 @@ inherited frmOptions: TfrmOptions
         ParentCtl3D = False
         ParentFont = False
         TabOrder = 13
-        OnMouseDown = panCol1MouseDown
       end
       object panCol14: TPaintPanel
         Tag = 13
@@ -451,7 +437,6 @@ inherited frmOptions: TfrmOptions
         Ctl3D = False
         ParentCtl3D = False
         TabOrder = 14
-        OnMouseDown = panCol1MouseDown
       end
       object panCol15: TPaintPanel
         Tag = 14
@@ -465,7 +450,6 @@ inherited frmOptions: TfrmOptions
         Ctl3D = False
         ParentCtl3D = False
         TabOrder = 15
-        OnMouseDown = panCol1MouseDown
       end
       object panCol16: TPaintPanel
         Tag = 15
@@ -479,7 +463,6 @@ inherited frmOptions: TfrmOptions
         Ctl3D = False
         ParentCtl3D = False
         TabOrder = 16
-        OnMouseDown = panCol1MouseDown
       end
       object cmdResetSelected: TButton
         Left = 4
@@ -488,7 +471,6 @@ inherited frmOptions: TfrmOptions
         Height = 25
         Caption = '&Reset selected'
         TabOrder = 17
-        OnClick = cmdResetSelectedClick
       end
       object cmdResetAll: TButton
         Left = 4
@@ -497,7 +479,6 @@ inherited frmOptions: TfrmOptions
         Height = 25
         Caption = 'Reset &all'
         TabOrder = 18
-        OnClick = cmdResetAllClick
       end
       object gbColourStyle: TGroupBox
         Left = 296
@@ -513,7 +494,6 @@ inherited frmOptions: TfrmOptions
           Height = 17
           Caption = '&Bold'
           TabOrder = 0
-          OnClick = chkColoursBoldClick
         end
         object chkColoursItalic: TCheckBox
           Left = 8
@@ -522,7 +502,6 @@ inherited frmOptions: TfrmOptions
           Height = 17
           Caption = '&Italic'
           TabOrder = 1
-          OnClick = chkColoursItalicClick
         end
         object chkColoursUnderline: TCheckBox
           Left = 8
@@ -531,16 +510,19 @@ inherited frmOptions: TfrmOptions
           Height = 17
           Caption = '&Underline'
           TabOrder = 2
-          OnClick = chkColoursUnderlineClick
         end
       end
-      object pmSyntaxExample: TKeymanDeveloperMemo
+      object pmSyntaxExample: TMemo
         Left = 132
         Top = 124
         Width = 277
         Height = 113
         Cursor = crIBeam
-        Alignment = taLeftJustify
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Courier New'
+        Font.Style = []
         Lines.Strings = (
           'c Syntax Highlighting'
           'NAME "Syntax Highlight"'
@@ -549,44 +531,10 @@ inherited frmOptions: TfrmOptions
           ''
           'U+00FC + '#39'A'#39' > U+1124'
           'd225 + '#39'B'#39' > beep')
-        ScrollBars = ssVertical
-        AltFont.Charset = DEFAULT_CHARSET
-        AltFont.Color = clWindowText
-        AltFont.Height = -11
-        AltFont.Name = 'MS Sans Serif'
-        AltFont.Style = []
-        ApplyStartStopKeys = False
-        CaretWidth = 1
-        ColumnWrap = 0
-        DisplayOnly = True
-        EnableHotKeys = False
-        EndOfTextMark.Color = clRed
-        EndOfTextMark.Style = psClear
-        EndOfTextMark.Width = 0
-        Justified = False
-        LineHeight = 0
-        Options = [pmoWrapCaret, pmoInsertKeyActive, pmoWideOverwriteCaret, pmoAutoScrollBars, pmoBlockSelection]
-        Overwrite = False
-        ReadOnly = True
-        RightLinePen.Color = clGray
-        RightLinePen.Style = psDot
-        SelBackColor = clHighlight
-        SelTextColor = clHighlightText
-        Separators = #9#10#13' $%&,./:;<=>'
-        ShowEndParSelected = False
-        SpecUnderline.Color = clRed
-        TabStops = 4
-        UndoMaxSpace = 65536
-        UpdateMode = umImmediate
-        Version = 'v7.1  Professional ed.'
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Courier New'
-        Font.Style = []
         ParentFont = False
+        ReadOnly = True
+        ScrollBars = ssVertical
         TabOrder = 20
-        TabStop = True
       end
       object chkUseSyntaxHighlighting: TCheckBox
         Left = 4
@@ -597,7 +545,6 @@ inherited frmOptions: TfrmOptions
         Checked = True
         State = cbChecked
         TabOrder = 21
-        OnClick = chkUseSyntaxHighlightingClick
       end
       object chkPlainBG: TCheckBox
         Left = 296
@@ -606,7 +553,6 @@ inherited frmOptions: TfrmOptions
         Height = 17
         Caption = '&Plain background'
         TabOrder = 22
-        OnClick = chkPlainBGClick
       end
       object chkPlainFG: TCheckBox
         Left = 296
@@ -615,7 +561,6 @@ inherited frmOptions: TfrmOptions
         Height = 17
         Caption = 'Plain &foreground'
         TabOrder = 23
-        OnClick = chkPlainFGClick
       end
     end
     object tabDebugger: TTabSheet

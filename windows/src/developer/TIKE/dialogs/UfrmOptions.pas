@@ -41,14 +41,7 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
 //  Themes,
   StdCtrls, ComCtrls, ExtCtrls,
-{$IFDEF USE_PLUSMEMO}
-  SyntaxHighlight,
-  PMSupport,
-  ExtHilit,
-  PlusMemo,
-{$ENDIF}
-  UfrmTike, UserMessages, PaintPanel,
-  KeymanDeveloperMemo;
+  UfrmTike, UserMessages, PaintPanel;
 
 type
   TfrmOptions = class(TTikeForm)
@@ -93,7 +86,7 @@ type
     panQuotedFontSample: TPanel;
     chkLinkFontSizes: TCheckBox;
     tabGeneral: TTabSheet;
-    pmSyntaxExample: TKeymanDeveloperMemo;
+    pmSyntaxExample: TMemo;
     gbStartup: TGroupBox;
     chkShowStartupDialog: TCheckBox;
     tabDebugger: TTabSheet;
@@ -126,19 +119,8 @@ type
     cmdResetToolWindows: TButton;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
-    procedure panCol1MouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
     procedure cmdDefaultFontClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure lbColoursClick(Sender: TObject);
-    procedure chkColoursBoldClick(Sender: TObject);
-    procedure chkColoursItalicClick(Sender: TObject);
-    procedure chkColoursUnderlineClick(Sender: TObject);
-    procedure chkPlainBGClick(Sender: TObject);
-    procedure chkPlainFGClick(Sender: TObject);
-    procedure cmdResetSelectedClick(Sender: TObject);
-    procedure cmdResetAllClick(Sender: TObject);
-    procedure chkUseSyntaxHighlightingClick(Sender: TObject);
     procedure cmdQuotedFontClick(Sender: TObject);
     procedure cmdCharMapRebuildDatabaseClick(Sender: TObject);
     procedure cmdProxySettingsClick(Sender: TObject);
@@ -147,14 +129,7 @@ type
     procedure cmdResetToolWindowsClick(Sender: TObject);
   private
     FDefaultFont, FQuotedFont: TFont;
-  {$IFDEF USE_PLUSMEMO}
-    plusHighlighter: TExtHighlighter;
-    SyntaxHighlighter: TSyntaxHighlighter;
-    CurrentSyntax: PSyntaxTypeInfo;
     panCol: array[1..16] of TPaintPanel;
-    procedure RefreshColours;
-    procedure RefreshColourPanels;
-  {$ENDIF}
     { Private declarations }
   protected
     function GetHelpTopic: string; override;
@@ -187,18 +162,11 @@ uses
 
 procedure TfrmOptions.FormCreate(Sender: TObject);
 var
-{$IFDEF USE_PLUSMEMO}
-  i: TSyntaxType;
-{$ENDIF}
   deffont, altfont: string;
 begin
   inherited;
 
   pages.ActivePage := tabGeneral;
-
-{$IFDEF USE_PLUSMEMO}
-  plusHighlighter := TExtHighlighter.Create(Self);
-  pmSyntaxExample.Highlighter := plusHighlighter;
 
   { Initialise Colours tab }
   panCol[1] := panCol1;
@@ -218,22 +186,10 @@ begin
   panCol[15] := panCol15;
   panCol[16] := panCol16;
 
-  SyntaxHighlighter := TSyntaxHighlighter.Create(Self);
-  SyntaxHighlighter.Apply(pmSyntaxExample, plusHighlighter);
-
-  for i := Low(TSyntaxType) to High(TSyntaxType) do
-    if SyntaxHighlighter.SyntaxTypeInfo[i].Name = ''
-      then Break
-      else lbColours.Items.Add(SyntaxHighlighter.SyntaxTypeInfo[i].Name);
-
   lbColours.ItemIndex := 0;
-  lbColoursClick(lbColours);
 
-  chkUseSyntaxHighlighting.Checked := SyntaxHighlighter.UseSyntaxHighlighting;
-{$ELSE}
   chkUseSyntaxHighlighting.Checked := False;
   chkUseSyntaxHighlighting.Enabled := False;
-{$ENDIF}
 
   { Initialise Editor tab }
 
@@ -315,9 +271,6 @@ end;
 
 procedure TfrmOptions.FormDestroy(Sender: TObject);
 begin
-{$IFDEF USE_PLUSMEMO}
-  SyntaxHighlighter.Free;
-{$ENDIF}
   FDefaultFont.Free;
   FQuotedFont.Free;
 end;
@@ -369,10 +322,6 @@ begin
     Free;
   end;
 
-{$IFDEF USE_PLUSMEMO}
-  SyntaxHighlighter.Save;
-{$ENDIF}
-
   for i := 0 to frmKeymanDeveloper.MDIChildCount - 1 do
     PostMessage(frmKeymanDeveloper.MDIChildren[i].Handle, WM_USER_SYNTAXCOLOURCHANGE, 0, 0);
 
@@ -392,24 +341,6 @@ end;
 { Options page }
 
 { Colours page }
-
-procedure TfrmOptions.panCol1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-{$IFDEF USE_PLUSMEMO}
-  if Button = mbLeft then
-  begin
-    if CurrentSyntax.PlainFG then begin CurrentSyntax.PlainFG := False; chkPlainFG.Checked := False; end;
-    CurrentSyntax.FGColor := (Sender as TPaintPanel).Color;   // I4796
-  end
-  else if Button = mbRight then
-  begin
-    if CurrentSyntax.PlainBG then begin CurrentSyntax.PlainBG := False; chkPlainBG.Checked := False; end;
-    CurrentSyntax.BGColor := (Sender as TPaintPanel).Color;   // I4796
-  end;
-  RefreshColourPanels;
-  RefreshColours;
-{$ENDIF}
-end;
 
 procedure TfrmOptions.cmdDefaultFontClick(Sender: TObject);
 begin
@@ -433,121 +364,10 @@ begin
   end;
 end;
 
-procedure TfrmOptions.lbColoursClick(Sender: TObject);
-begin
-{$IFDEF USE_PLUSMEMO}
-  CurrentSyntax := SyntaxHighlighter.SyntaxTypeInfo[TSyntaxType(lbColours.ItemIndex)];
-
-  chkColoursBold.Checked := fsBold in CurrentSyntax.Style;
-  chkColoursItalic.Checked := fsItalic in CurrentSyntax.Style;
-  chkColoursUnderline.Checked := fsUnderline in CurrentSyntax.Style;
-
-  if lbColours.ItemIndex = 0 then
-  begin
-    CurrentSyntax.PlainBG := False;
-    CurrentSyntax.PlainFG := False;
-    chkPlainBG.Enabled := False;
-    chkPlainFG.Enabled := False;
-  end
-  else
-  begin
-    chkPlainBG.Enabled := True;
-    chkPlainFG.Enabled := True;
-  end;
-
-  chkPlainBG.Checked := CurrentSyntax.PlainBG;
-  chkPlainFG.Checked := CurrentSyntax.PlainFG;
-
-  RefreshColourPanels;
-{$ENDIF}
-end;
-
-{$IFDEF USE_PLUSMEMO}
-procedure TfrmOptions.RefreshColourPanels;
-var
-  i: Integer;
-  FG, BG: Boolean;
-begin
-  for i := 1 to 16 do
-  begin
-    FG := False; BG := False;
-    if (ColorToRGB(panCol[i].Color) = ColorToRGB(CurrentSyntax.BGColor)) and not CurrentSyntax.PlainBG then BG := True;
-    if (ColorToRGB(panCol[i].Color) = ColorToRGB(CurrentSyntax.FGColor)) and not CurrentSyntax.PlainFG then FG := True;
-    if FG and BG then panCol[i].Caption := 'FB'
-    else if BG then panCol[i].Caption := 'BG'
-    else if FG then panCol[i].Caption := 'FG'
-    else panCol[i].Caption := '';
-  end;
-end;
-
-procedure TfrmOptions.RefreshColours;
-begin
-  SyntaxHighlighter.Apply(pmSyntaxExample, plusHighlighter);
-  pmSyntaxExample.ReApplyKeywords;
-end;
-{$ENDIF}
-
 procedure TfrmOptions.cmdResetToolWindowsClick(Sender: TObject);
 begin
   frmKeymanDeveloper.DefaultDockLayout;
   Self.BringToFront;
-end;
-
-procedure TfrmOptions.chkColoursBoldClick(Sender: TObject);
-begin
-{$IFDEF USE_PLUSMEMO}
-  if chkColoursBold.Checked
-    then Include(CurrentSyntax.Style, fsBold)
-    else Exclude(CurrentSyntax.Style, fsBold);
-  RefreshColours;
-{$ENDIF}
-end;
-
-procedure TfrmOptions.chkColoursItalicClick(Sender: TObject);
-begin
-{$IFDEF USE_PLUSMEMO}
-  if chkColoursItalic.Checked
-    then Include(CurrentSyntax.Style, fsItalic)
-    else Exclude(CurrentSyntax.Style, fsItalic);
-  RefreshColours;
-{$ENDIF}
-end;
-
-procedure TfrmOptions.chkColoursUnderlineClick(Sender: TObject);
-begin
-{$IFDEF USE_PLUSMEMO}
-  if chkColoursUnderline.Checked
-    then Include(CurrentSyntax.Style, fsUnderline)
-    else Exclude(CurrentSyntax.Style, fsUnderline);
-  RefreshColours;
-{$ENDIF}
-end;
-
-procedure TfrmOptions.chkPlainBGClick(Sender: TObject);
-begin
-{$IFDEF USE_PLUSMEMO}
-  CurrentSyntax.PlainBG := chkPlainBG.Checked;
-  RefreshColourPanels;
-  RefreshColours;
-{$ENDIF}
-end;
-
-procedure TfrmOptions.chkPlainFGClick(Sender: TObject);
-begin
-{$IFDEF USE_PLUSMEMO}
-  CurrentSyntax.PlainFG := chkPlainFG.Checked;
-  RefreshColourPanels;
-  RefreshColours;
-{$ENDIF}
-end;
-
-procedure TfrmOptions.cmdResetSelectedClick(Sender: TObject);
-begin
-{$IFDEF USE_PLUSMEMO}
-  SyntaxHighlighter.ResetColour(TSyntaxType(lbColours.ItemIndex));
-  RefreshColourPanels;
-  RefreshColours;
-{$ENDIF}
 end;
 
 procedure TfrmOptions.cmdSMTPSettingsClick(Sender: TObject);   // I4506
@@ -568,45 +388,6 @@ begin
     Key := #0;
   end;
 end;
-
-procedure TfrmOptions.cmdResetAllClick(Sender: TObject);
-begin
-{$IFDEF USE_PLUSMEMO}
-  SyntaxHighlighter.ResetAll;
-  RefreshColourPanels;
-  RefreshColours;
-{$ENDIF}
-end;
-
-procedure TfrmOptions.chkUseSyntaxHighlightingClick(Sender: TObject);
-{$IFDEF USE_PLUSMEMO}
-var
-  e: Boolean;
-  i: Integer;
-begin
-  e := chkUseSyntaxHighlighting.Checked;
-
-  SyntaxHighlighter.UseSyntaxHighlighting := e;
-
-  RefreshColourPanels;
-  RefreshColours;
-
-  lbColours.Enabled := e;
-  cmdResetSelected.Enabled := e;
-  cmdResetAll.Enabled := e;
-  pmSyntaxExample.Enabled := e;
-  chkPlainFG.Enabled := e;
-  chkPlainBG.Enabled := e;
-  gbColourStyle.Enabled := e;
-  chkColoursBold.Enabled := e;
-  chkColoursItalic.Enabled := e;
-  chkColoursUnderline.Enabled := e;
-  for i := 1 to 16 do panCol[i].Enabled := e;
-{$ELSE}
-begin
-{$ENDIF}
-end;
-
 
 procedure TfrmOptions.cmdCharMapRebuildDatabaseClick(Sender: TObject);
 var

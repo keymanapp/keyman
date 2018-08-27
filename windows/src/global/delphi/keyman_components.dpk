@@ -24,7 +24,6 @@ package keyman_components;
 {$WRITEABLECONST ON}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DEFINE $(USE_PLUSMEMO)}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
 {$IMPLICITBUILD ON}
@@ -41,12 +40,7 @@ requires
   dclact,
   dclstd,
   xmlrtl,
-  EmbeddedWebBrowser_XE
-{$IFDEF USE_PLUSMEMO}
-  ,
-  PMemo6DXE2
-{$ENDIF}
-  ;
+  EmbeddedWebBrowser_XE;
 
 contains
   extshiftstate in 'comp\extshiftstate.pas',
@@ -85,7 +79,7 @@ contains
   RegistryKeys in 'general\RegistryKeys.pas',
   KeymanVersion in 'general\KeymanVersion.pas',
   CloseButtonPageControl in 'comp\CloseButtonPageControl.pas',
-  KeymanDeveloperMemo in 'comp\KeymanDeveloperMemo.pas',
-  KeymanDeveloperDebuggerMemo in 'comp\KeymanDeveloperDebuggerMemo.pas';
+  KeymanDeveloperDebuggerMemo in 'comp\KeymanDeveloperDebuggerMemo.pas',
+  TextFileFormat in '..\..\developer\TIKE\main\TextFileFormat.pas';
 
 end.
