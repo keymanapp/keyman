@@ -84,6 +84,7 @@ type
     FOnAfterCreated: TNotifyEvent;
     FShutdownCompletionHandler: TShutdownCompletionHandlerEvent;
     FIsClosing: Boolean;
+    FShouldShowContextMenu: Boolean;
     // IKeymanCEFHost
     procedure StartShutdown(CompletionHandler: TShutdownCompletionHandlerEvent);
 
@@ -106,6 +107,7 @@ type
     procedure StartClose;
     procedure Navigate(const url: string); overload;
     function HasFocus: Boolean;
+    property ShouldShowContextMenu: Boolean read FShouldShowContextMenu write FShouldShowContextMenu;
     property OnAfterCreated: TNotifyEvent read FOnAfterCreated write FOnAfterCreated;
     property OnBeforeBrowse: TCEFHostBeforeBrowseEvent read FOnBeforeBrowse write FOnBeforeBrowse;
     property OnLoadEnd: TNotifyEvent read FOnLoadEnd write FOnLoadEnd;
@@ -364,7 +366,8 @@ procedure TframeCEFHost.cefRunContextMenu(Sender: TObject;
   const params: ICefContextMenuParams; const model: ICefMenuModel;
   const callback: ICefRunContextMenuCallback; var aResult: Boolean);
 begin
-  aResult := GetKeyState(VK_SHIFT) >= 0;
+  // Return FALSE to show default context menu
+  aResult := not FShouldShowContextMenu and (GetKeyState(VK_SHIFT) >= 0);
 end;
 
 procedure TframeCEFHost.WMEnterMenuLoop(var aMessage: TMessage);

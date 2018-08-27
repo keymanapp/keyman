@@ -3,17 +3,32 @@ unit UframeTextEditor;  // I3323   // I4797
 interface
 
 uses
-  System.Types,
-  System.JSON,
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Menus, ImgList,
-  MenuImgList, ExtCtrls,
-
-  UserMessages,
-  Keyman.Developer.UI.UframeCEFHost,
-  TextFileFormat, UfrmTike,
+  System.Classes,
   System.ImageList,
-  Vcl.StdCtrls, KMDActionInterfaces;
+  System.JSON,
+  System.SysUtils,
+  System.Types,
+  System.Variants,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Vcl.ImgList,
+  Vcl.Menus,
+  Vcl.StdCtrls,
+  Winapi.Messages,
+  Winapi.Windows,
+
+  uCEFConstants,
+  uCEFInterfaces,
+
+  Keyman.Developer.UI.UframeCEFHost,
+  KMDActionInterfaces,
+  MenuImgList,
+  TextFileFormat,
+  UfrmTike,
+  UserMessages;
 
 type
   TParColourLineType = (pcltNone, pcltBreakpoint, pcltExecutionPoint, pcltError);
@@ -57,7 +72,15 @@ type
     procedure SetTextFileFormat(const Value: TTextFileFormat);
 
     procedure cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
-    procedure cefLoadEnd(Sender: TObject);
+    procedure cefBeforeContextMenu(Sender: TObject;
+      const browser: ICefBrowser; const frame: ICefFrame;
+      const params: ICefContextMenuParams; const model: ICefMenuModel);
+    procedure cefContextMenuCommand(Sender: TObject;
+      const browser: ICefBrowser; const frame: ICefFrame;
+      const params: ICefContextMenuParams; commandId: Integer;
+      eventFlags: Cardinal; out Result: Boolean);
+    procedure WMUser_TextEditor_Command(var Message: TMessage); message WM_USER_TextEditor_Command;
+
     procedure LoadFileInBrowser(const AData: string);
     procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
     procedure FireCommand(const commands: TStringList);
@@ -184,9 +207,37 @@ begin
   end;
 end;
 
-procedure TframeTextEditor.cefLoadEnd(Sender: TObject);
+const
+  TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER       = MENU_ID_USER_FIRST + 1;  //actTextEditor_ShowCharacter
+  TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS = MENU_ID_USER_FIRST + 2;  //actTextEditor_ConvertToCharacters
+
+procedure TframeTextEditor.cefBeforeContextMenu(Sender: TObject;
+  const browser: ICefBrowser; const frame: ICefFrame;
+  const params: ICefContextMenuParams; const model: ICefMenuModel);
 begin
-  //
+  if not cef.cef.IsSameBrowser(browser) then exit;
+
+  model.AddSeparator;
+  model.AddItem(TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER,        'S&how Character');
+  model.SetEnabled(TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER, modActionsTextEditor.actTextEditor_ShowCharacter.Enabled);
+  model.AddItem(TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS,  'C&onvert to Characters');
+  model.SetEnabled(TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS, modActionsTextEditor.actTextEditor_ConvertToCharacters.Enabled);
+end;
+
+procedure TframeTextEditor.cefContextMenuCommand(Sender: TObject;
+  const browser: ICefBrowser; const frame: ICefFrame;
+  const params: ICefContextMenuParams; commandId: Integer; eventFlags: Cardinal;
+  out Result: Boolean);
+begin
+  Result := False;
+
+  if not cef.cef.IsSameBrowser(browser) then exit;
+
+  case commandId of
+    TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER,
+    TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS:
+      PostMessage(Handle, WM_USER_TextEditor_Command, commandId, 0);
+  end;
 end;
 
 procedure TframeTextEditor.Changed;
@@ -199,10 +250,11 @@ begin
   inherited;
 
   cef := TframeCEFHost.Create(Self);
+  cef.ShouldShowContextMenu := True;
   cef.Parent := Self;
   cef.Visible := True;
   cef.OnBeforeBrowse := cefBeforeBrowse;
-//  cef.OnLoadEnd := cefLoadEnd;
+  cef.cef.OnBeforeContextMenu := cefBeforeContextMenu;
 end;
 
 type
@@ -589,6 +641,16 @@ begin
     FireCommand(params);
   end;
   params.Free;
+end;
+
+procedure TframeTextEditor.WMUser_TextEditor_Command(var Message: TMessage);
+begin
+  case Message.wParam of
+    TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER:
+      modActionsTextEditor.actTextEditor_ShowCharacter.Execute;
+    TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS:
+      modActionsTextEditor.actTextEditor_ConvertToCharacters.Execute;
+  end;
 end;
 
 {-------------------------------------------------------------------------------
