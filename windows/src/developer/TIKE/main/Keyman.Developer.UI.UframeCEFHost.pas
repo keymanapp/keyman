@@ -80,6 +80,7 @@ type
                              var settings: TCefBrowserSettings;
                              var noJavascriptAccess: Boolean;
                              var Result: Boolean);
+    procedure cefWidgetCompMsg(var aMessage: TMessage; var aHandled: Boolean);
   private
     FNextURL: string;
     FOnLoadEnd: TNotifyEvent;
@@ -190,6 +191,14 @@ end;
 procedure TframeCEFHost.CEFShow(var message: TMessage);
 begin
   CreateBrowser;
+end;
+
+procedure TframeCEFHost.cefWidgetCompMsg(var aMessage: TMessage;
+  var aHandled: Boolean);
+begin
+  if aMessage.Msg = WM_SETFOCUS then
+    if cefwp.Visible and cefwp.CanFocus then
+      GetParentForm(cefwp).ActiveControl := cefwp;
 end;
 
 procedure TframeCEFHost.CreateBrowser;

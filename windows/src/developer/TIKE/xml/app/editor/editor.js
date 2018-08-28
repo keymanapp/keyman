@@ -67,6 +67,7 @@ window.editorGlobalContext = {
       });
     }
     editor.moveCursorTo(o.row, 0);
+    editor.selection.clearSelection();
     editor.renderer.scrollCursorIntoView();
   };
   
