@@ -122,12 +122,12 @@ gchar * kmfl_get_icon_file(KInputMethod * im)
     const char * icon_file = kmfl_icon_file(im->keyboard_number);
     gchar * full_path_to_icon_file=NULL;
     struct stat filestat;
-    char * valid_extensions[]= {"", ".png", ".bmp", ".jpg", ".ico", NULL};
+    char * valid_extensions[]= {"", ".png", ".bmp", ".jpg", NULL};
     int valid_extension_index;
             
     if (strlen(icon_file) > 0) {
         for (valid_extension_index=0; valid_extensions[valid_extension_index] != NULL; valid_extension_index++) {
-            full_path_to_icon_file=g_strdup_printf("%s/icons/%s%s", get_dirname(im->keyboard_filename), icon_file, valid_extensions[valid_extension_index]);
+            full_path_to_icon_file=g_strdup_printf("%s/%s%s", get_dirname(im->keyboard_filename), icon_file, valid_extensions[valid_extension_index]);
 
             stat(full_path_to_icon_file, &filestat);
 

@@ -1045,8 +1045,8 @@ char *items_to_string(ITEM *p)
 	static char temp[256];
 
 	char *sp, *sp1;
-	int n;
-	n = count_items(p);
+	//int n;
+	//n = count_items(p);
 	
 	for(sp=temp,sp1=temp+240,*sp=0; (*p) && (sp<sp1); p++) 
 	{
@@ -1453,7 +1453,7 @@ int check_linux_target(STORE *sp, int line)
 // of the name exists (different case, .bmp or .png suffixes)
 int check_bitmap_file(STORE *sp, int line)
 {
-	char *p,*bmp_path=NULL,tname[64];
+	char *p,*bmp_path=NULL,*icons_path=NULL,tname[256];
 	struct stat fstat;
 	UINT i;
 	UTF32 *p1,*titems=NULL;
@@ -1461,23 +1461,27 @@ int check_bitmap_file(STORE *sp, int line)
 
 	p1 = (UTF32*)sp->items; 
 	p2 = (UTF8*)tname;
-	IConvertUTF32toUTF8((const UTF32 **)&p1,(const UTF32 *)(sp->items+sp->len),&p2,(UTF8 *)(tname+63));
+	IConvertUTF32toUTF8((const UTF32 **)&p1,(const UTF32 *)(sp->items+sp->len),&p2,(UTF8 *)(tname+255));
 	*p2 = 0;
 
 	if((p=rindex(fname,DIRDELIM)) != NULL) 
 	{
-		bmp_path = (char *)checked_alloc((p-fname+1)+strlen(tname)+6,1);
+		bmp_path = (char *)checked_alloc((p-fname+1)+strlen(tname)+10,1);
 		strncpy(bmp_path,fname,p-fname+1); 
 		strcpy(bmp_path+(p-fname+1),tname);
 	}
 	else
 	{
-		bmp_path = (char *)checked_alloc(strlen(tname)+6,1);
+		bmp_path = (char *)checked_alloc(strlen(tname)+10,1);
 		strcpy(bmp_path,tname);
 	}
 
+	if (strncmp(bmp_path+strlen(bmp_path)-4, ".ico", 4) == 0)
+	{
+		strcat(bmp_path,".bmp");
+	}
 	// First test if the file exists exactly as in BITMAP statement
-	if(stat(bmp_path,&fstat) == 0)
+	else if(stat(bmp_path,&fstat) == 0)
 	{
 		mem_free(bmp_path);	// file exists
 		return 0;
@@ -1486,18 +1490,61 @@ int check_bitmap_file(STORE *sp, int line)
 	// Search for a case-variation (irrelevant for Windows)
 	p = find_first_match(bmp_path);
 
+	// Search in icons dir
+	if(p == NULL)
+	{
+		icons_path = (char *)checked_alloc(strlen(bmp_path)+12,1);
+		if((p=rindex(fname,DIRDELIM)) != NULL)
+		{
+			strncpy(icons_path,fname,p-fname+1);
+			strcpy(icons_path+(p-fname+1),"icons/");
+			strcpy(icons_path+(p-fname+1+6),tname);
+		}
+		else
+		{
+			strcpy(icons_path,"icons/");
+			strcat(icons_path, bmp_path);
+		}
+		p = find_first_match(icons_path);
+	}
+
 	// If no extension specified, search next for files with extensions .bmp and .png
 	if((p == NULL) && (strchr(tname,'.') == NULL))
 	{
 		// Add .bmp 
 		strcat(bmp_path,".bmp");
 		p = find_first_match(bmp_path);
+		if ((p == NULL) && icons_path)
+		{
+			// Add .bmp in icons dir
+			strcat(icons_path,".bmp");
+			p = find_first_match(icons_path);
+		}
 		if(p == NULL)
 		{
 			// Add .png
 			strcpy(bmp_path+strlen(bmp_path)-4,".png");
 			p = find_first_match(bmp_path);
 		}
+		if ((p == NULL) && icons_path)
+		{
+			// Add .png in icons dir
+			strcpy(icons_path+strlen(icons_path)-4,".png");
+			p = find_first_match(icons_path);
+		}
+		if(p == NULL)
+		{
+			// Add .ico.bmp (ico converted to bmp)
+			strcpy(bmp_path+strlen(bmp_path)-4,".ico.bmp");
+			p = find_first_match(bmp_path);
+		}
+	}
+
+	// If there is an extension but not found, try .bmp added (converted from .ico)
+	if(p == NULL)
+	{
+		strcat(bmp_path, ".bmp");
+		p = find_first_match(bmp_path);
 	}
 
 	// Issue appropriate warnings and replace file name in store
@@ -1505,11 +1552,13 @@ int check_bitmap_file(STORE *sp, int line)
 	{
 		kmflcomp_warn(line,"The bitmap file '%s' was not found. Create a suitable bitmap of that name "
 			"and copy it with the compiled keyboard",tname);
-
-		
 	}
 	else
 	{
+		if (icons_path)
+		{
+			p = p - 6; // include 'icons/' in name
+		}
 		kmflcomp_warn(line,"A bitmap named '%s' was found and will be referred to in the compiled keyboard "
 			"instead of '%s'",p,tname);
 		
@@ -1525,6 +1574,7 @@ int check_bitmap_file(STORE *sp, int line)
 	}
 	
 	if(bmp_path) mem_free(bmp_path);
+	if(icons_path) mem_free(icons_path);
 	return 1;
 }
 

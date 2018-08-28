@@ -226,6 +226,10 @@
 
 # /test/wm_unichar/
 
+# linux
+autom4te.cache
+*.orig
+
 .DS_Store
 
 *.kpj.user

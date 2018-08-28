@@ -160,7 +160,7 @@ T_HEADLINE :
 	{ 
 		new_store_from_string("&message",$2,lineno);
 	}
-	| TOK_LANGUAGE T_ITEMS TOK_NL
+	| TOK_LANGUAGE T_STRING TOK_NL
 	{ 
 		new_store_from_string("&language",$2,lineno);
 	}
