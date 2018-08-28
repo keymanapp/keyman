@@ -45,18 +45,6 @@ type
     actTextEditor_ShowCharacter: TAction;
     actTextEditor_ConvertToCharacters: TAction;
     actTextEditor_ReformatXML: TAction;
-    mnuTextEditor: TPopupMenu;
-    ShowCharacter1: TMenuItem;
-    ConverttoCharacters1: TMenuItem;
-    N1: TMenuItem;
-    Undo1: TMenuItem;
-    Redo1: TMenuItem;
-    N2: TMenuItem;
-    Cut1: TMenuItem;
-    Copy1: TMenuItem;
-    Paste1: TMenuItem;
-    N3: TMenuItem;
-    SelectAll1: TMenuItem;
     procedure actTextEditor_ConvertToCharactersExecute(Sender: TObject);
     procedure actTextEditor_ShowCharacterExecute(Sender: TObject);
     procedure actTextEditor_ShowCharacterUpdate(Sender: TObject);
@@ -198,7 +186,7 @@ procedure TmodActionsTextEditor.actTextEditor_ShowCharacterExecute(Sender: TObje
 begin
   if KMDActions.IsTextEditor(Screen.ActiveControl) then
   begin
-
+    //TODO
   end;
 end;
 
