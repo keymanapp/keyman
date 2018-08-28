@@ -787,6 +787,7 @@ begin
   v := TJSONNumber.Create(ln);
   try
     ExecuteCommand('highlightError', v);
+    SetSelectedRow(ln);
   finally
     v.Free;
   end;
