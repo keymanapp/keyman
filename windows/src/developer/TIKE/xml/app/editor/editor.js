@@ -80,6 +80,32 @@ window.editorGlobalContext = {
       errorRange.id = editor.session.addMarker(errorRange, 'km_error', "fullLine", false);
     }
   };
+
+  /* Printing */
+
+  context.print = function () {
+    require("ace/config").loadModule("ace/ext/static_highlight", function (m) {
+      var result = m.renderSync(
+        editor.getValue(), editor.session.getMode(), editor.renderer.theme
+      );
+      var iframe = document.createElement('iframe');
+      iframe.onload = function () {
+        iframe.contentWindow.document.open();
+        iframe.contentWindow.document.write(result.html);
+        iframe.contentWindow.document.close();
+        var s = iframe.contentWindow.document.createElement('style');
+        s.type = 'text/css';
+        s.appendChild(iframe.contentWindow.document.createTextNode(result.css));
+        iframe.contentWindow.document.head.appendChild(s);
+        // TODO: Add page setup -- paper size, margins
+        window.setTimeout(function () {
+          iframe.contentWindow.print();
+          document.body.removeChild(iframe);
+        }, 10);
+      };
+      document.body.appendChild(iframe);
+    });
+  };
       
   /**
     Notifies the host application of an event or command from the
