@@ -200,6 +200,9 @@ begin
   else if Pos('htm', s) > 0 then EditorFormat := efHTML
   else if Copy(s,1,4) = '.php' then EditorFormat := efHTML
   else if Pos('xml', s) > 0 then EditorFormat := efXML
+  else if s = '.json' then EditorFormat := efJSON
+  else if s = '.js' then EditorFormat := efJS
+  else if s = '.css' then EditorFormat := efCSS
   else EditorFormat := efText;
 end;
 

@@ -391,7 +391,7 @@ procedure TframeTextEditor.LoadFileInBrowser(const AData: string);
   end;
 const
   mode: array[TEditorFormat] of string = (
-    'keyman', 'xml', 'text', 'html'
+    'keyman', 'xml', 'text', 'html', 'json', 'javascript', 'css'
   );
 begin
   if FFilename = '' then
