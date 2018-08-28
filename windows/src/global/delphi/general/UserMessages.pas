@@ -75,6 +75,10 @@ const
   WM_USER_ResetWebFocus = WM_USER + 160;
 
 const
+  // UframeTextEditor
+  WM_USER_TextEditor_Command = WM_USER + 170;
+
+const
   // UfrmDebug
   WM_USER_DebugEnd = WM_USER + 200;
   WM_USER_UpdateForceKeyboard = WM_USER + 201;   // I4767
