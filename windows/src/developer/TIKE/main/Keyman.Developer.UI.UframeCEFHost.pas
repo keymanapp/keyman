@@ -17,14 +17,17 @@ uses
   Winapi.Messages,
   Winapi.Windows,
 
+  uCEFChromium,
+  uCEFChromiumEvents,
+  uCEFChromiumWindow,
+  uCEFInterfaces,
+  uCEFTypes,
+  uCEFWindowParent,
+
   Keyman.Developer.System.CEFManager,
   KeymanDeveloperUtils,
   UserMessages,
-  UfrmTIKE,
-  uCEFInterfaces,
-  uCEFWindowParent,
-  uCEFChromiumWindow,
-  uCEFTypes, uCEFChromium;
+  UfrmTIKE;
 
 const
   CEF_DESTROY = WM_USER + 300;
@@ -85,6 +88,8 @@ type
     FShutdownCompletionHandler: TShutdownCompletionHandlerEvent;
     FIsClosing: Boolean;
     FShouldShowContextMenu: Boolean;
+    FOnPreKeyEvent: TOnPreKeyEvent;
+
     // IKeymanCEFHost
     procedure StartShutdown(CompletionHandler: TShutdownCompletionHandlerEvent);
 
@@ -111,6 +116,7 @@ type
     property OnAfterCreated: TNotifyEvent read FOnAfterCreated write FOnAfterCreated;
     property OnBeforeBrowse: TCEFHostBeforeBrowseEvent read FOnBeforeBrowse write FOnBeforeBrowse;
     property OnLoadEnd: TNotifyEvent read FOnLoadEnd write FOnLoadEnd;
+    property OnPreKeyEvent: TOnPreKeyEvent read FOnPreKeyEvent write FOnPreKeyEvent;
   end;
 
 implementation
@@ -322,6 +328,15 @@ procedure TframeCEFHost.cefPreKeyEvent(Sender: TObject;
   out isKeyboardShortcut, Result: Boolean);
 begin
   Result := False;
+
+  if Assigned(FOnPreKeyEvent) and
+    (event.kind in [TCefKeyEventType.KEYEVENT_KEYDOWN, TCefKeyEventType.KEYEVENT_RAWKEYDOWN]) then
+  begin
+    FOnPreKeyEvent(Self, browser, event, osEvent, isKeyboardShortcut, Result);
+    if Result then
+      Exit;
+  end;
+
   if (event.windows_key_code <> VK_CONTROL) and (event.kind in [TCefKeyEventType.KEYEVENT_KEYDOWN, TCefKeyEventType.KEYEVENT_RAWKEYDOWN]) then
   begin
     if event.windows_key_code = VK_F1 then
