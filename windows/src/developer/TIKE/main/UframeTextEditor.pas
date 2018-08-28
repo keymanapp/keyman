@@ -270,6 +270,7 @@ begin
   cef.Visible := True;
   cef.OnBeforeBrowse := cefBeforeBrowse;
   cef.cef.OnBeforeContextMenu := cefBeforeContextMenu;
+  cef.cef.OnContextMenuCommand := cefContextMenuCommand;
   cef.OnPreKeyEvent := cefPreKeyEvent;
 end;
 
