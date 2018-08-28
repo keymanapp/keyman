@@ -210,6 +210,7 @@ void kmfl_free_keyboard_info(KInputMethod * im)
     g_free(im->keyboard_license);
     g_free(im->keyboard_visualkeyboard);
     g_free(im->keyboard_keyboardversion);
+    g_free(im->keyboard_ldmlfile);
 }
 
 
