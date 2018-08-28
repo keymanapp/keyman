@@ -1114,12 +1114,13 @@ char *items_to_string(ITEM *p)
 char *special_stores[] = {
 	"&name","&version","&hotkey","&language","&layout","&copyright","&message",
 	"&bitmap","&mnemoniclayout","&ethnologuecode",
-	"&capsalwaysoff","&capsononly","&shiftfreescaps","&author","&targets"};
+	"&capsalwaysoff","&capsononly","&shiftfreescaps","&author",
+	"&targets","&visualkeyboard","&keyboardversion"};
 
 // stores new from keyman 7.0 onwards that can safely be ignored for kmfl 11 for now
 char *ignored_stores[] = {
-	"&visualkeyboard","&layoutfile","&kmw_helpfile","&kmw_embedjs",
-	"&windowslanguages","&kmw_rtl","&keyboardversion",
+	"&layoutfile","&kmw_helpfile","&kmw_embedjs",
+	"&windowslanguages","&kmw_rtl",
 	"&kmw_embedcss","&kmw_helptext","&includecodes"};
 
 // Initialize special stores (create dummy entries)
@@ -1181,6 +1182,8 @@ void process_special_store(char *name, STORE *sp, int line)
 	case SS_AUTHOR:
 	case SS_LANGUAGE:
 	case SS_ETHNOLOGUE:
+	case SS_KEYBOARDVERSION:
+	case SS_VISUALKEYBOARD:
 		break;
 	default:
 		for(p=0; p<sizeof(ignored_stores)/sizeof(char *); p++)

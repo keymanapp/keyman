@@ -75,6 +75,8 @@ MNEMONIC[ ]*LAYOUT		{return TOK_MNEMONIC;}
 ETHNOLOGUE[ ]*CODE		{return TOK_ETHNOLOGUE;}
 AUTHOR					{return TOK_AUTHOR;}
 TARGETS					{return TOK_TARGETS;}
+VISUALKEYBOARD			{return TOK_VISUALKEYBOARD;}
+KEYBOARDVERSION			{BEGIN(KBDVER);return TOK_KEYBOARDVERSION;}
 begin[ ]+ansi			{return TOK_ANSI;}
 begin[ ]+unicode		{return TOK_UNICODE;}
 begin 					{return TOK_ANSI;}

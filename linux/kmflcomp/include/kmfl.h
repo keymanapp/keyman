@@ -108,7 +108,7 @@ enum {ITEM_CHAR=0,ITEM_KEYSYM,ITEM_ANY,ITEM_INDEX,ITEM_OUTS,ITEM_DEADKEY,ITEM_CO
 // Enumerate special stores with reserved names (prefixed by &)
 enum TAG_SS {SS_UNDEFINED=-1,SS_NAME,SS_VERSION,SS_HOTKEY,SS_LANGUAGE,SS_LAYOUT,SS_COPYRIGHT,
 	SS_MESSAGE,SS_BITMAP,SS_MNEMONIC,SS_ETHNOLOGUE,SS_CAPSOFF,SS_CAPSON,SS_CAPSFREE,SS_AUTHOR,
-	SS_TARGETS};
+	SS_TARGETS,SS_VISUALKEYBOARD,SS_KEYBOARDVERSION};
 	
 //	The following compiled keyboard structures and types are used by both the compiler 
 //  and the interpreter

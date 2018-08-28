@@ -71,6 +71,7 @@ GROUP *gp = NULL;			/* Temporary group pointer */
 %token <simple> TOK_INDEX
 %token <simple> TOK_LANGUAGE
 %token <simple> TOK_LAYOUT
+%token <simple> TOK_KEYBOARDVERSION
 %token <simple> TOK_MATCH
 %token <simple> TOK_MESSAGE
 %token <simple> TOK_MNEMONIC
@@ -96,6 +97,7 @@ GROUP *gp = NULL;			/* Temporary group pointer */
 %token <simple> TOK_USINGKEYS
 %token <number> TOK_UTF
 %token <simple> TOK_VERSION
+%token <simple> TOK_VISUALKEYBOARD
 %token <number> TOK_XKEYSYM
 
 %%
@@ -139,6 +141,10 @@ T_HEADLINE :
 	| TOK_VERSION T_BYTES TOK_NL
 	{
 		new_store_from_string("&version",$2,lineno);
+	}
+	| TOK_KEYBOARDVERSION T_BYTES TOK_NL
+	{
+		new_store_from_string("&keyboardversion",$2,lineno);
 	}
 	| TOK_VERSION T_STRING TOK_NL
 	{
@@ -208,6 +214,10 @@ T_HEADLINE :
 	| TOK_TARGETS T_STRING TOK_NL
 	{ 
 		new_store_from_string("&targets",$2,lineno);	
+	}
+	| TOK_VISUALKEYBOARD T_STRING TOK_NL
+	{
+		new_store_from_string("&visualkeyboard",$2,lineno);
 	}
 	| TOK_MNEMONIC T_STRING TOK_NL
 	{ 
