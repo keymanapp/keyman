@@ -148,6 +148,16 @@ window.editorGlobalContext = {
   */
   $(function initialize() {
     editor = ace.edit("editor");
+
+    // Remove Alt+ key bindings which may conflict with environment shortcuts, e.g. Alt+E, function keys
+
+    var reAltKeyBindings = /(^alt-[a-z0-9]|f[0-9]+)$/;
+    for (var key in editor.keyBinding.$defaultHandler.commandKeyBinding) {
+      if (key.match(reAltKeyBindings)) {
+        delete editor.keyBinding.$defaultHandler.commandKeyBinding[key];
+      }
+    }
+
     editor.setTheme("ace/theme/xcode");
     
     editor.session.selection.on('changeCursor', updateState);    
