@@ -407,16 +407,18 @@ ibus_kmfl_engine_enable (IBusEngine *engine)
 {
     const gchar *engine_name;
     IBusKMFLEngine *kmfl = (IBusKMFLEngine *) engine;
+    KInputMethod *im;
 
     engine_name = ibus_engine_get_name (engine);
     g_assert (engine_name);
     g_message("WDG: ibus_kmfl_engine_enable %s", engine_name);
+    im = (KInputMethod *) g_hash_table_lookup (im_table, engine_name);
     // own dbus name com.Keyman
     // expose properties LDMLFile and Name
     KeymanService *service = km_service_get_default();
     //const gchar *ldmlfile = "";
-    km_service_set_ldmlfile (service, engine_name);
-    km_service_set_name (service, engine_name);
+    km_service_set_ldmlfile (service, im->keyboard_ldmlfile);
+    km_service_set_name (service, im->keyboard_name);
     parent_class->enable (engine);
 }
 

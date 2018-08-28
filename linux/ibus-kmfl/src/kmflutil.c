@@ -171,6 +171,14 @@ void kmfl_get_keyboard_info(KInputMethod * im)
     kmfl_get_header(p_kmsi,SS_MESSAGE,buf,sizeof(buf) - 1);
     im->keyboard_description=g_strdup(buf);
 
+    *buf='\0';
+    kmfl_get_header(p_kmsi,SS_VISUALKEYBOARD,buf,sizeof(buf) - 1);
+    im->keyboard_visualkeyboard=g_strdup(buf);
+
+    *buf='\0';
+    kmfl_get_header(p_kmsi,SS_KEYBOARDVERSION,buf,sizeof(buf) - 1);
+    im->keyboard_keyboardversion=g_strdup(buf);
+
     if (g_strrstr(buf, "license") ||  g_strrstr(buf, "License") || g_strrstr(buf, "LICENSE"))
         im->keyboard_license=g_strdup(buf);
     else
@@ -200,6 +208,8 @@ void kmfl_free_keyboard_info(KInputMethod * im)
     g_free(im->keyboard_icon_filename);
     g_free(im->keyboard_layout);
     g_free(im->keyboard_license);
+    g_free(im->keyboard_visualkeyboard);
+    g_free(im->keyboard_keyboardversion);
 }
 
 
