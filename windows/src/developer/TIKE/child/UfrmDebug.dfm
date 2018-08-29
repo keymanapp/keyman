@@ -37,6 +37,7 @@ inherited frmDebug: TfrmDebug
     OnClick = memoClick
     OnEnter = memoGotFocus
     OnExit = memoLostFocus
+    OnKeyUp = memoKeyUp
     OnMessage = memoMessage
   end
   object sgChars: TStringGrid
