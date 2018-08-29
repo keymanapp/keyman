@@ -888,12 +888,13 @@ var
   token, prevtoken: WideString;
   FHelpTopic, FPrevHelpTopic: WideString;
 begin
-  n := command.IndexOf(',');
-  if n < 0 then
+  token := StrToken(command, ',');
+  if token = 'null' then
+    col := 0
+  else if not TryStrToInt(token, col) then
     Exit;
-  if not TryStrToInt(command.Substring(0, n), col) then
-    Exit;
-  line := command.Substring(n+1);
+
+  line := command;
 
   x := col+1;
 
