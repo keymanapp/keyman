@@ -88,12 +88,12 @@ object modActionsMain: TmodActionsMain
       Dialog.PageHeight = 29700
       OnUpdate = actFilePageSetupUpdate
     end
-    object actFilePrint: TPrintDlg
+    object actFilePrint: TAction
       Category = 'File'
       Caption = '&Print...'
       ImageIndex = 20
       ShortCut = 16464
-      OnAccept = actFilePrintAccept
+      OnExecute = actFilePrintExecute
       OnUpdate = actFilePrintUpdate
     end
     object actFilePrintPreview: TAction

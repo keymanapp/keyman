@@ -64,7 +64,7 @@ type
     actFileSaveCopyAs: TAction;
     actFileRevert: TAction;
     actFilePageSetup: TFilePageSetup;
-    actFilePrint: TPrintDlg;
+    actFilePrint: TAction;
     actFilePrintPreview: TAction;
     actFileExit: TFileExit;
     actEditCut: TKMDEditCut;
@@ -125,7 +125,7 @@ type
     procedure actFileSaveCopyAsExecute(Sender: TObject);
     procedure actFileRevertExecute(Sender: TObject);
     procedure actFilePrintPreviewExecute(Sender: TObject);
-    procedure actFilePrintAccept(Sender: TObject);
+    procedure actFilePrintExecute(Sender: TObject);
     procedure actFilePrintPreviewUpdate(Sender: TObject);
     procedure actFilePrintUpdate(Sender: TObject);
     procedure actFileSaveAsAccept(Sender: TObject);
@@ -301,7 +301,7 @@ begin
     actFilePageSetup.Enabled := Assigned(ActiveChild) and Supports(ActiveChild, IKMDPrintActions) and (Printer.Printers.Count > 0);
 end;
 
-procedure TmodActionsMain.actFilePrintAccept(Sender: TObject);
+procedure TmodActionsMain.actFilePrintExecute(Sender: TObject);
 begin
   (frmKeymanDeveloper.ActiveChild as IKMDPrintActions).PrintFile;
 end;

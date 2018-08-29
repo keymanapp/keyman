@@ -518,8 +518,8 @@ end;
 
 function TframeTextEditor.PrintFile(Header: WideString): Boolean;
 begin
-  Result := False;
-  // TODO: print
+  ExecuteCommand('print');
+  Result := True;
 end;
 
 function TframeTextEditor.PrintPreview(Header: WideString): Boolean;
