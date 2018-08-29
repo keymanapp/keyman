@@ -69,32 +69,34 @@ extern int yydebug;
     TOK_INDEX = 279,
     TOK_LANGUAGE = 280,
     TOK_LAYOUT = 281,
-    TOK_MATCH = 282,
-    TOK_MESSAGE = 283,
-    TOK_MNEMONIC = 284,
-    TOK_NOMATCH = 285,
-    TOK_NAME = 286,
-    TOK_NOTANY = 287,
-    TOK_NUL = 288,
-    TOK_NUMBER = 289,
-    TOK_NL = 290,
-    TOK_OUTS = 291,
-    TOK_RAWKEY = 292,
-    TOK_PLUS = 293,
-    TOK_QM = 294,
-    TOK_RTN = 295,
-    TOK_SB = 296,
-    TOK_SHIFT = 297,
-    TOK_STORE = 298,
-    TOK_STOREINSTORE = 299,
-    TOK_SWITCH = 300,
-    TOK_TARGETS = 301,
-    TOK_UNICODE = 302,
-    TOK_USE = 303,
-    TOK_USINGKEYS = 304,
-    TOK_UTF = 305,
-    TOK_VERSION = 306,
-    TOK_XKEYSYM = 307
+    TOK_KEYBOARDVERSION = 282,
+    TOK_MATCH = 283,
+    TOK_MESSAGE = 284,
+    TOK_MNEMONIC = 285,
+    TOK_NOMATCH = 286,
+    TOK_NAME = 287,
+    TOK_NOTANY = 288,
+    TOK_NUL = 289,
+    TOK_NUMBER = 290,
+    TOK_NL = 291,
+    TOK_OUTS = 292,
+    TOK_RAWKEY = 293,
+    TOK_PLUS = 294,
+    TOK_QM = 295,
+    TOK_RTN = 296,
+    TOK_SB = 297,
+    TOK_SHIFT = 298,
+    TOK_STORE = 299,
+    TOK_STOREINSTORE = 300,
+    TOK_SWITCH = 301,
+    TOK_TARGETS = 302,
+    TOK_UNICODE = 303,
+    TOK_USE = 304,
+    TOK_USINGKEYS = 305,
+    TOK_UTF = 306,
+    TOK_VERSION = 307,
+    TOK_VISUALKEYBOARD = 308,
+    TOK_XKEYSYM = 309
   };
 #endif
 /* Tokens.  */
@@ -122,32 +124,34 @@ extern int yydebug;
 #define TOK_INDEX 279
 #define TOK_LANGUAGE 280
 #define TOK_LAYOUT 281
-#define TOK_MATCH 282
-#define TOK_MESSAGE 283
-#define TOK_MNEMONIC 284
-#define TOK_NOMATCH 285
-#define TOK_NAME 286
-#define TOK_NOTANY 287
-#define TOK_NUL 288
-#define TOK_NUMBER 289
-#define TOK_NL 290
-#define TOK_OUTS 291
-#define TOK_RAWKEY 292
-#define TOK_PLUS 293
-#define TOK_QM 294
-#define TOK_RTN 295
-#define TOK_SB 296
-#define TOK_SHIFT 297
-#define TOK_STORE 298
-#define TOK_STOREINSTORE 299
-#define TOK_SWITCH 300
-#define TOK_TARGETS 301
-#define TOK_UNICODE 302
-#define TOK_USE 303
-#define TOK_USINGKEYS 304
-#define TOK_UTF 305
-#define TOK_VERSION 306
-#define TOK_XKEYSYM 307
+#define TOK_KEYBOARDVERSION 282
+#define TOK_MATCH 283
+#define TOK_MESSAGE 284
+#define TOK_MNEMONIC 285
+#define TOK_NOMATCH 286
+#define TOK_NAME 287
+#define TOK_NOTANY 288
+#define TOK_NUL 289
+#define TOK_NUMBER 290
+#define TOK_NL 291
+#define TOK_OUTS 292
+#define TOK_RAWKEY 293
+#define TOK_PLUS 294
+#define TOK_QM 295
+#define TOK_RTN 296
+#define TOK_SB 297
+#define TOK_SHIFT 298
+#define TOK_STORE 299
+#define TOK_STOREINSTORE 300
+#define TOK_SWITCH 301
+#define TOK_TARGETS 302
+#define TOK_UNICODE 303
+#define TOK_USE 304
+#define TOK_USINGKEYS 305
+#define TOK_UTF 306
+#define TOK_VERSION 307
+#define TOK_VISUALKEYBOARD 308
+#define TOK_XKEYSYM 309
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -164,7 +168,7 @@ union YYSTYPE
 	GROUP *group;
 	
 
-#line 168 "yacc.h" /* yacc.c:1909  */
+#line 172 "yacc.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
