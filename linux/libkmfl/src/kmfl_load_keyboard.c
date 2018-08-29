@@ -461,7 +461,7 @@ const char *kmfl_icon_file(int keyboard_number)
 		if(stores[SS_BITMAP].len >= 0) 
 		{
 			p32 = strings + stores[SS_BITMAP].items;
-			p8 = icon_name;
+			p8 = (UTF8 *)icon_name;
 			IConvertUTF32toUTF8((const UTF32**)&p32,p32+stores[SS_BITMAP].len,&p8,p8+255);
 			*p8 = 0;
 		}
