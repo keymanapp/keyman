@@ -31,6 +31,7 @@ implementation
 uses
   System.Classes,
   System.SysUtils,
+  System.Variants,
   Xml.XMLDoc,
   Xml.XMLIntf,
 
@@ -178,7 +179,13 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
       end;
     end;
 
-    path := xmldoc.DocumentElement.ChildValues['path'];
+    try
+      if (xmldoc.DocumentElement.ChildNodes.IndexOf('path') >= 0) and not
+        VarIsNull(xmldoc.DocumentElement.ChildValues['path']) then
+        path := xmldoc.DocumentElement.ChildValues['path'];
+    except
+      path := '';
+    end;
 
     // Saving state
 

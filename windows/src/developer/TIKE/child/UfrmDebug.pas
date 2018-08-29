@@ -111,6 +111,7 @@ type
     procedure sgCharsDrawCell(Sender: TObject; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState);   // I4808
     procedure memoClick(Sender: TObject);   // I4808
+    procedure memoKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
 
     FDebugVisible: Boolean;
@@ -425,6 +426,12 @@ begin
   memoSelMove(memo);
 end;
 
+procedure TfrmDebug.memoKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  UpdateCharacterGrid;   // I4808
+end;
+
 procedure TfrmDebug.memoLostFocus(Sender: TObject);
 begin
   case UIStatus of
@@ -619,7 +626,7 @@ end;
 procedure TfrmDebug.ExecuteEventAction(n: Integer);
   procedure Backspace(BackspaceType: Integer);
   var
-    m, n: Integer;
+    i, m, n: Integer;
   const
     BK_BACKSPACE = 2;
   begin
@@ -631,6 +638,11 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
         if (n > 1) and Uni_IsSurrogate2(memo.Text[n]) then
           Dec(m);
     end;
+
+    for i := 0 to deadkeys.Count-1 do
+      if (TDeadKeyInfo(deadkeys[i]).Position >= m-1) and
+        (TDeadKeyInfo(deadkeys[i]).Position < n-1) then
+        TDeadKeyInfo(deadkeys[i]).Delete;
 
     memo.Text := Copy(memo.Text, 1, m) + Copy(memo.Text, n+1, MaxInt);
     // memo.Text.Substring(0, m)+memo.Text.Substring(n);
@@ -1453,7 +1465,6 @@ procedure TfrmDebug.ClearDeadkeyStyle;
 begin
   if Assigned(FSelectedDeadkey) then
   begin
-    // TODO: clear the style from the debug memo?? -- how do we do this (RTF?)?
     FSelectedDeadkey := nil;
   end;
 end;
@@ -1462,8 +1473,10 @@ procedure TfrmDebug.SelectDeadKey(DeadKey: TDeadKeyInfo);
 begin
   ClearDeadkeyStyle;
   if not Assigned(DeadKey) then Exit;
-  FSelectedDeadkey := DeadKey; //lbDeadkeys.Items.Objects[lbDeadkeys.ItemIndex] as TDeadKeyInfo;
-// TODO: set the style in the debug memo?? -- how do we do this (RTF?)?
+  FSelectedDeadkey := DeadKey;
+  memo.SelStart := FSelectedDeadkey.Position;
+  memo.SelLength := 1;
+  memo.SetFocus;
 end;
 
 procedure TfrmDebug.memoChange(Sender: TObject);
