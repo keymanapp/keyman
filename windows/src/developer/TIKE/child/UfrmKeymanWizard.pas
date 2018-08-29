@@ -1700,6 +1700,7 @@ begin
   if Assigned(c) and not Assigned(FFeature[ID].Frame) then
   begin
     FFeature[ID].Frame := TframeTextEditor.Create(Self);
+    FFeature[ID].Frame.EditorFormat := KeyboardFeatureEditorFormat[ID];
     FFeature[ID].Frame.TextFileFormat := tffUTF8;
     FFeature[ID].Frame.Parent := c;
     FFeature[ID].Frame.Align := alClient;
@@ -3080,6 +3081,7 @@ begin
   frameTouchLayout.Visible := True;
 
   frameTouchLayoutSource := TframeTextEditor.Create(Self);   // I4034
+  frameTouchLayoutSource.EditorFormat := efJSON;
   frameTouchLayoutSource.TextFileFormat := tffUTF8;
   frameTouchLayoutSource.Parent := pageTouchLayoutCode;
   frameTouchLayoutSource.Align := alClient;

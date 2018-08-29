@@ -197,7 +197,7 @@ procedure TframeCEFHost.cefWidgetCompMsg(var aMessage: TMessage;
   var aHandled: Boolean);
 begin
   if aMessage.Msg = WM_SETFOCUS then
-    if cefwp.Visible and cefwp.CanFocus then
+    if Assigned(cefwp) and cefwp.Visible and cefwp.CanFocus then
       GetParentForm(cefwp).ActiveControl := cefwp;
 end;
 
