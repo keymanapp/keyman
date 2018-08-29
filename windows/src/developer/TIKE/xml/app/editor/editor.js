@@ -46,6 +46,7 @@ window.editorGlobalContext = {
 
   context.moveCursor = function (o) {
     editor.moveCursorTo(o.row, o.column);
+    editor.selection.clearSelection();
     editor.renderer.scrollCursorIntoView();
   };
   
