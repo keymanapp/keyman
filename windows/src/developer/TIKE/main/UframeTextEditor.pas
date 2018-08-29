@@ -48,6 +48,7 @@ type
 
     FSelectedRange: TRect;
     FSelectedRangeIsBackwards: Boolean;
+    FHasBeenLoaded: Boolean;
     FCanUndo: Boolean;
     FCanRedo: Boolean;
     FHasSelection: Boolean;
@@ -92,6 +93,7 @@ type
     procedure ExecuteCommand(const command: string; const parameters: TJSONValue = nil);
     procedure UpdateToken(command: string);
     procedure SetCursorPosition(AColumn, ARow: Integer);
+    procedure cefLoadEnd(Sender: TObject);
 
   protected
     function GetHelpTopic: string; override;
@@ -291,9 +293,15 @@ begin
   cef.Parent := Self;
   cef.Visible := True;
   cef.OnBeforeBrowse := cefBeforeBrowse;
+  cef.OnLoadEnd := cefLoadEnd;
   cef.cef.OnBeforeContextMenu := cefBeforeContextMenu;
   cef.cef.OnContextMenuCommand := cefContextMenuCommand;
   cef.OnPreKeyEvent := cefPreKeyEvent;
+end;
+
+procedure TframeTextEditor.cefLoadEnd(Sender: TObject);
+begin
+  FHasBeenLoaded := True;
 end;
 
 type
@@ -616,13 +624,28 @@ begin
 end;
 
 procedure TframeTextEditor.SetText(Value: WideString);
+var
+  v: TJSONString;
 begin
-  FLoading := True;
-  try
-    RefreshOptions;
-    LoadFileInBrowser(Value);
-  finally
-    FLoading := False;
+  RefreshOptions;
+
+  if FHasBeenLoaded then
+  begin
+    v := TJSONString.Create(Value);
+    try
+      ExecuteCommand('setText', v);
+    finally
+      v.Free;
+    end;
+  end
+  else
+  begin
+    FLoading := True;
+    try
+      LoadFileInBrowser(Value);
+    finally
+      FLoading := False;
+    end;
   end;
 end;
 
