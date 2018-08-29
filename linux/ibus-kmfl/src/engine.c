@@ -417,7 +417,7 @@ ibus_kmfl_engine_enable (IBusEngine *engine)
     // expose properties LDMLFile and Name
     KeymanService *service = km_service_get_default();
     //const gchar *ldmlfile = "";
-    km_service_set_ldmlfile (service, im->keyboard_visualkeyboard);
+    km_service_set_ldmlfile (service, im->keyboard_ldmlfile);
     km_service_set_name (service, im->keyboard_name);
     parent_class->enable (engine);
 }

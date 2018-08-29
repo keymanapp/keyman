@@ -738,7 +738,7 @@ int kmfl_get_header(KMSI *p_kmsi,int hdrID,char *buf,int buflen)
 
 	if(!p_kmsi) return -1;
 
-	if(hdrID < 0 || hdrID > SS_AUTHOR) return -2;
+	if(hdrID < 0 || hdrID > SS_KEYBOARDVERSION) return -2;
 
 	p32 = (UTF32 *)store_content(p_kmsi,hdrID);
 	p8 = (UTF8 *)buf;

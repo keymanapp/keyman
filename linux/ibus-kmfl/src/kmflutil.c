@@ -146,11 +146,41 @@ gchar * kmfl_get_icon_file(KInputMethod * im)
     return full_path_to_icon_file;
 }
 
+gchar * kmfl_get_ldml_file(KInputMethod * im)
+{
+    gchar * full_path_to_ldml_file=NULL, *p, *filename;
+    struct stat filestat;
+
+    p=rindex(im->keyboard_visualkeyboard,'.');
+    if(g_strcmp0(im->keyboard_visualkeyboard, "") == 0)
+    {
+        g_debug("WDG: no kvk(s) so no ldml file");
+        return g_strdup("");
+    }
+    if (p==NULL)
+    {
+        g_debug("WDG: couldn't find . in vk filename %s", im->keyboard_visualkeyboard);
+        return g_strdup("");
+    }
+    filename = g_strndup(im->keyboard_visualkeyboard, p-(im->keyboard_visualkeyboard));
+    full_path_to_ldml_file=g_strdup_printf("%s/%s.ldml", get_dirname(im->keyboard_filename), filename);
+    g_free(filename);
+    // don't forget to stat for the file before returning
+    stat(full_path_to_ldml_file, &filestat);
+
+    if (!S_ISREG(filestat.st_mode)) {
+        g_debug("WDG: couldn't find ldml file %s", full_path_to_ldml_file);
+        g_free(full_path_to_ldml_file);
+        full_path_to_ldml_file=g_strdup("");
+    }
+    return full_path_to_ldml_file;
+}
+
 void kmfl_get_keyboard_info(KInputMethod * im) 
 {
     char buf[1024];
     KMSI * p_kmsi;
-    
+
     im->keyboard_name = g_strdup(kmfl_keyboard_name(im->keyboard_number));
     p_kmsi = kmfl_make_keyboard_instance(NULL);
     kmfl_attach_keyboard(p_kmsi, im->keyboard_number);
@@ -171,6 +201,11 @@ void kmfl_get_keyboard_info(KInputMethod * im)
     kmfl_get_header(p_kmsi,SS_MESSAGE,buf,sizeof(buf) - 1);
     im->keyboard_description=g_strdup(buf);
 
+    if (g_strrstr(buf, "license") ||  g_strrstr(buf, "License") || g_strrstr(buf, "LICENSE"))
+        im->keyboard_license=g_strdup(buf);
+    else
+        im->keyboard_license=g_strdup("");
+
     *buf='\0';
     kmfl_get_header(p_kmsi,SS_VISUALKEYBOARD,buf,sizeof(buf) - 1);
     im->keyboard_visualkeyboard=g_strdup(buf);
@@ -179,21 +214,17 @@ void kmfl_get_keyboard_info(KInputMethod * im)
     kmfl_get_header(p_kmsi,SS_KEYBOARDVERSION,buf,sizeof(buf) - 1);
     im->keyboard_keyboardversion=g_strdup(buf);
 
-    if (g_strrstr(buf, "license") ||  g_strrstr(buf, "License") || g_strrstr(buf, "LICENSE"))
-        im->keyboard_license=g_strdup(buf);
-    else
-        im->keyboard_license=g_strdup("");
-
     *buf='\0';
     kmfl_get_header(p_kmsi,SS_LAYOUT,buf,sizeof(buf) - 1);
     if (*buf != '\0')    
         im->keyboard_layout=g_strdup(buf);
     else
         im->keyboard_layout=g_strdup("us");
-        
+
     kmfl_detach_keyboard(p_kmsi);
     kmfl_delete_keyboard_instance(p_kmsi);
     im->keyboard_icon_filename = kmfl_get_icon_file(im);
+    im->keyboard_ldmlfile = kmfl_get_ldml_file(im);
 }
 
 void kmfl_free_keyboard_info(KInputMethod * im)
