@@ -132,6 +132,7 @@ void initialize_special_stores(void);
 void process_special_store(char *name, STORE *sp, int line);
 void check_keyboard(KEYBOARD *kbp);
 int check_bitmap_file(STORE *sp, int line);
+int check_linux_target(STORE *sp, int line);
 
 void *checked_alloc(size_t n, size_t sz);
 void sort_rules(GROUP *gp);

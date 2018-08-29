@@ -142,13 +142,17 @@ T_HEADLINE :
 	{
 		new_store_from_string("&version",$2,lineno);
 	}
+	| TOK_VERSION T_STRING TOK_NL
+	{
+		new_store_from_string("&version",$2,lineno);
+	}
 	| TOK_KEYBOARDVERSION T_BYTES TOK_NL
 	{
 		new_store_from_string("&keyboardversion",$2,lineno);
 	}
-	| TOK_VERSION T_STRING TOK_NL
+	| TOK_KEYBOARDVERSION T_STRING TOK_NL
 	{
-		new_store_from_string("&version",$2,lineno);
+		new_store_from_string("&keyboardversion",$2,lineno);
 	}
 	| TOK_BITMAP T_BYTES TOK_NL
 	{ 
