@@ -226,6 +226,16 @@
 
 # /test/wm_unichar/
 
+# linux
+autom4te.cache
+*.orig
+config.h
+Makefile
+build-kmflcomp
+build-libkmfl
+build-ibus-kmfl
+__pycache__
+
 # VS Code
 .vscode
 
