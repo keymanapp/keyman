@@ -22,6 +22,8 @@ unit KMDActionInterfaces;
 interface
 
 uses
+  System.Types,
+
   TextFileFormat;
 
 type
@@ -74,9 +76,15 @@ type
     function GetText: string;
     procedure SetText(const Value: string);
     function GetSelectedRow: Integer;
+    function GetSelectedCol: Integer;
+    function GetSelectedRange: TRect;
     function GetEditorFormat: TEditorFormat;
+    procedure ReplaceSelection(ARange: TRect; const ANewText: string);
+
     property EditorFormat: TEditorFormat read GetEditorFormat;
     property SelectedRow: Integer read GetSelectedRow;
+    property SelectedCol: Integer read GetSelectedCol;
+    property SelectedRange: TRect read GetSelectedRange;
     property Text: string read GetText write SetText;
   end;
 
