@@ -1,18 +1,18 @@
 (*
   Name:             dmActionsTextEditor
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      23 Aug 2006
 
   Modified Date:    24 Jul 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          23 Aug 2006 - mcdurdin - Initial version
                     30 Aug 2006 - mcdurdin - Add Reformat XML action
                     04 Dec 2006 - mcdurdin - Localize
@@ -32,8 +32,10 @@ interface
 
 uses
   System.Actions,
+  System.Character,
   System.Classes,
   System.SysUtils,
+  System.Types,
   Vcl.ActnList,
   Vcl.Menus,
 
@@ -45,18 +47,6 @@ type
     actTextEditor_ShowCharacter: TAction;
     actTextEditor_ConvertToCharacters: TAction;
     actTextEditor_ReformatXML: TAction;
-    mnuTextEditor: TPopupMenu;
-    ShowCharacter1: TMenuItem;
-    ConverttoCharacters1: TMenuItem;
-    N1: TMenuItem;
-    Undo1: TMenuItem;
-    Redo1: TMenuItem;
-    N2: TMenuItem;
-    Cut1: TMenuItem;
-    Copy1: TMenuItem;
-    Paste1: TMenuItem;
-    N3: TMenuItem;
-    SelectAll1: TMenuItem;
     procedure actTextEditor_ConvertToCharactersExecute(Sender: TObject);
     procedure actTextEditor_ShowCharacterExecute(Sender: TObject);
     procedure actTextEditor_ShowCharacterUpdate(Sender: TObject);
@@ -86,57 +76,51 @@ uses
 {$R *.dfm}
 
 procedure TmodActionsTextEditor.actTextEditor_ConvertToCharactersExecute(Sender: TObject);
-{var
-  ws: WideString;
-  x, len: Integer;
-  memo: TframeTextEditor;
-  line, seltext: WideString;
-  i: Integer;
-  FToCodes: Boolean;
-  FError: Boolean;
-  res: string;
-  FInQuotes: Boolean;}
+var
+  a: IKMDTextEditorActions;
+  FRange: TRect;
+  i, len: Integer;
+  res, ws, FText, newtext, seltext: string;
+  FError, FInQuotes, FToCodes: Boolean;
 begin
-{TODO: reimplement in JS probably better
-  memo := Screen.ActiveControl as TKeymanDeveloperMemo;
-  line := memo.LinesArray[memo.SelLine];
-  seltext := memo.SelText;
-  x := memo.SelCol+1;
-  len := 0;
+  a := KMDActions.GetTextEditorController(Screen.ActiveControl);
 
-  if memo.SelLength = 0 then   // I4797
-  begin
-    // Select the token under the cursor
-    seltext := GetTokenFromCaret(line, x, len);
-    memo.SelCol := x-1;
-    memo.SelLength := len;
-  end;
+  FText := a.Text;
+  FRange := a.SelectedRange;
 
-  if memo.SelLength < 0 then   // I4797
-  begin
-    len := -memo.SelLength;
-    memo.SelStart := memo.SelStart - len;
-    memo.SelLength := len;
-  end;
+  with TStringList.Create do
+  try
+    Text := FText;
+    if (FRange.Left = FRange.Right) and (FRange.Bottom = FRange.Top) then
+    begin
+      // No selection
+      Inc(FRange.Left); // 1-offset instead of 0-offset
+      seltext := GetTokenFromCaret(Strings[FRange.Top], FRange.Left, len);
+      FRange.Right := FRange.Left + len;
+    end
+    else if FRange.Top = FRange.Bottom then
+    begin
+      // Single line selection
+      seltext := Copy(Strings[FRange.Top], FRange.Left + 1, FRange.Right - FRange.Left);
 
-  while (seltext <> '') and (Copy(seltext, 1, 1) = ' ') do
-  begin
-    memo.SelStart := memo.SelStart + 1;
-    memo.SelLength := Length(seltext);
-    Delete(seltext, 1, 1);
-  end;
-
-  while (seltext <> '') and (Copy(seltext, Length(seltext), 1) = ' ') do
-  begin
-    memo.SelLength := memo.SelLength - 1;
-    Delete(seltext, Length(seltext), 1);
+      // Adjust selection to remove whitespace
+      newtext := seltext.TrimLeft;
+      Inc(FRange.Left, seltext.Length - newtext.Length);
+      seltext := newtext.TrimRight;
+      Dec(FRange.Right, newtext.Length - seltext.Length);
+     end
+    else
+      // Cannot convert multi-line selections at this time
+      Exit;
+  finally
+    Free;
   end;
 
   if seltext = '' then
     Exit;
 
   ws := ExtStringToString(seltext, FError);
-  if FError then 
+  if FError then
     Exit;
 
   FToCodes := (Pos('"', seltext) > 0) or (Pos('''', seltext) > 0);
@@ -167,20 +151,20 @@ begin
     res := Trim(res);
   end;
 
-  memo.SelText := res;
-  memo.SelStart := memo.SelStart - Length(res);
-  memo.SelLength := Length(res);}
+  a.ReplaceSelection(FRange, res);
 end;
 
 procedure TmodActionsTextEditor.actTextEditor_ConvertToCharactersUpdate(Sender: TObject);
 begin
-  actTextEditor_ConvertToCharacters.Enabled := KMDActions.IsTextEditor(Sender);
+  actTextEditor_ConvertToCharacters.Enabled := KMDActions.IsTextEditor(Screen.ActiveControl);
 end;
 
 procedure TmodActionsTextEditor.actTextEditor_ReformatXMLExecute(Sender: TObject);
+var
+  a: IKMDTextEditorActions;
 begin
-{TODO:  with Screen.ActiveControl as TKeymanDeveloperMemo do
-    SetTextBuf(PWideChar(FormatXMLData(Text)));}
+  a := KMDActions.GetTextEditorController(Screen.ActiveControl);
+  a.Text := FormatXMLData(a.Text);
 end;
 
 procedure TmodActionsTextEditor.actTextEditor_ReformatXMLUpdate(
@@ -196,7 +180,7 @@ procedure TmodActionsTextEditor.actTextEditor_ShowCharacterExecute(Sender: TObje
 begin
   if KMDActions.IsTextEditor(Screen.ActiveControl) then
   begin
-
+    //TODO
   end;
 end;
 

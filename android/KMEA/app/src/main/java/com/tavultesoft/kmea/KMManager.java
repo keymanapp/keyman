@@ -104,11 +104,8 @@ public final class KMManager {
   public static final String KMKey_KeyboardID = "kbId";
   public static final String KMKey_KeyboardName = "kbName";
   public static final String KMKey_KeyboardVersion = "version";
-  public static final String KMKey_KeyboardFileSize = "fileSize";
   public static final String KMKey_Font = "font";
   public static final String KMKey_OskFont = "oskFont";
-  public static final String KMKey_DisplayFont = "displayFont";
-  public static final String KMKey_FontFamily = "family";
   public static final String KMKey_FontSource = "source";
   public static final String KMKey_FontFiles = "files";
   public static final String KMKey_KeyboardModified = "lastModified";

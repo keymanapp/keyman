@@ -71,6 +71,7 @@ GROUP *gp = NULL;			/* Temporary group pointer */
 %token <simple> TOK_INDEX
 %token <simple> TOK_LANGUAGE
 %token <simple> TOK_LAYOUT
+%token <simple> TOK_KEYBOARDVERSION
 %token <simple> TOK_MATCH
 %token <simple> TOK_MESSAGE
 %token <simple> TOK_MNEMONIC
@@ -90,11 +91,13 @@ GROUP *gp = NULL;			/* Temporary group pointer */
 %token <simple> TOK_STORE
 %token <simple> TOK_STOREINSTORE
 %token <simple> TOK_SWITCH
+%token <simple> TOK_TARGETS
 %token <simple> TOK_UNICODE
 %token <simple> TOK_USE
 %token <simple> TOK_USINGKEYS
 %token <number> TOK_UTF
 %token <simple> TOK_VERSION
+%token <simple> TOK_VISUALKEYBOARD
 %token <number> TOK_XKEYSYM
 
 %%
@@ -143,6 +146,14 @@ T_HEADLINE :
 	{
 		new_store_from_string("&version",$2,lineno);
 	}
+	| TOK_KEYBOARDVERSION T_BYTES TOK_NL
+	{
+		new_store_from_string("&keyboardversion",$2,lineno);
+	}
+	| TOK_KEYBOARDVERSION T_STRING TOK_NL
+	{
+		new_store_from_string("&keyboardversion",$2,lineno);
+	}
 	| TOK_BITMAP T_BYTES TOK_NL
 	{ 
 		new_store_from_string("&bitmap",$2,lineno);
@@ -159,7 +170,7 @@ T_HEADLINE :
 	{ 
 		new_store_from_string("&message",$2,lineno);
 	}
-	| TOK_LANGUAGE T_ITEMS TOK_NL
+	| TOK_LANGUAGE T_STRING TOK_NL
 	{ 
 		new_store_from_string("&language",$2,lineno);
 	}
@@ -203,6 +214,14 @@ T_HEADLINE :
 	| TOK_AUTHOR T_STRING TOK_NL
 	{ 
 		new_store_from_string("&author",$2,lineno);
+	}
+	| TOK_TARGETS T_STRING TOK_NL
+	{ 
+		new_store_from_string("&targets",$2,lineno);	
+	}
+	| TOK_VISUALKEYBOARD T_STRING TOK_NL
+	{
+		new_store_from_string("&visualkeyboard",$2,lineno);
 	}
 	| TOK_MNEMONIC T_STRING TOK_NL
 	{ 

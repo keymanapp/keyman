@@ -1,8 +1,8 @@
 (*
   Name:             KeyboardParser
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      23 Aug 2006
 
   Modified Date:    23 Feb 2016
@@ -44,6 +44,7 @@ uses
   ExtShiftState,
   kmxfile,
   kmxfileconsts,
+  TextFileFormat,
   UKeymanTargets,
   utilfiletypes;
 
@@ -320,6 +321,10 @@ const
   KeyboardFeatureFilename: array[TKeyboardParser_FeatureID] of string = (
     '%s.ico', '%s'+Ext_VisualKeyboardSource, '%s'+Ext_KeymanTouchLayout,
     '%s-code.js', '%s.css', '%s-help.htm', '%s-codes.txt');   // I4369
+  KeyboardFeatureEditorFormat: array[TKeyboardParser_FeatureID] of TEditorFormat = (
+    efText, efXML, efJSON,
+    efJS, efCSS, efHTML, efText
+  );
   KeyboardFeatureTargets: array[TKeyboardParser_FeatureID] of TKeymanTargets = (   // I4504
     // Due to Delphi compiler limitation, need to copy the target values, can't
     // use the defined constants.

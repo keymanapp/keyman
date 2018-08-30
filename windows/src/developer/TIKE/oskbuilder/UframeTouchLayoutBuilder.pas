@@ -203,7 +203,8 @@ end;
 procedure TframeTouchLayoutBuilder.FormDestroy(Sender: TObject);
 begin
   inherited;
-  modWebHttpServer.AppSource.UnregisterSource(FFilename);
+  if FFilename <> '' then
+    modWebHttpServer.AppSource.UnregisterSource(FFilename);
 end;
 
 procedure TframeTouchLayoutBuilder.ImportFromKVK(const KVKFileName: string);   // I3945

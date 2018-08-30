@@ -158,7 +158,7 @@ type
     Filename: string;
   end;
 
-  TfrmKeymanWizard = class(TfrmTikeEditor, IKMDPrintActions, IKMDPrintPreviewActions)
+  TfrmKeymanWizard = class(TfrmTikeEditor, IKMDPrintActions {TODO:, IKMDPrintPreviewActions})
     dlgBrowseBitmap: TOpenPictureDialog;
     dlgSaveExport: TSaveDialog;
     dlgSaveBitmap: TSavePictureDialog;
@@ -506,7 +506,7 @@ type
     { IKMDPrintActions }
     function PrintFile: Boolean;
     { IKMDPrintPreviewActions }
-    function PrintPreview: Boolean;
+    //TODO: function PrintPreview: Boolean;
 
     function CanReloadAsTextFileFormatClick: Boolean; override;   // I3637
     procedure ReloadAsTextFileFormatClick(TextFileFormat: TTextFileFormat);   // I3637
@@ -1513,10 +1513,10 @@ begin
   Result := frameSource.PrintFile(FileName);
 end;
 
-function TfrmKeymanWizard.PrintPreview: Boolean;
+{TODO: function TfrmKeymanWizard.PrintPreview: Boolean;
 begin
   Result := frameSource.PrintPreview(FileName);
-end;
+end;}
 
 function TfrmKeymanWizard.GetCurrentRule: TKeyboardParser_LayoutRule;
 var
@@ -1700,6 +1700,7 @@ begin
   if Assigned(c) and not Assigned(FFeature[ID].Frame) then
   begin
     FFeature[ID].Frame := TframeTextEditor.Create(Self);
+    FFeature[ID].Frame.EditorFormat := KeyboardFeatureEditorFormat[ID];
     FFeature[ID].Frame.TextFileFormat := tffUTF8;
     FFeature[ID].Frame.Parent := c;
     FFeature[ID].Frame.Align := alClient;
@@ -3080,6 +3081,7 @@ begin
   frameTouchLayout.Visible := True;
 
   frameTouchLayoutSource := TframeTextEditor.Create(Self);   // I4034
+  frameTouchLayoutSource.EditorFormat := efJSON;
   frameTouchLayoutSource.TextFileFormat := tffUTF8;
   frameTouchLayoutSource.Parent := pageTouchLayoutCode;
   frameTouchLayoutSource.Align := alClient;
@@ -3142,6 +3144,7 @@ begin
   if pagesTouchLayout.ActivePage = pageTouchLayoutCode then
   begin
     frameTouchLayoutSource.EditorText := frameTouchLayout.SaveToString;
+    DoFocus(frameTouchLayout);
   end;
   FLoading := False;
 end;

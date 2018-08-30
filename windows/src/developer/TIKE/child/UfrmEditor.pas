@@ -54,7 +54,7 @@ type
   TUPCOptions = set of (upcSetError, upcClearError, upcSetBreakPoint, upcClearBreakPoint,
     upcSetExecutionPoint, upcClearExecutionPoint);
 
-  TfrmEditor = class(TfrmTikeEditor, IKMDPrintActions, IKMDPrintPreviewActions)
+  TfrmEditor = class(TfrmTikeEditor, IKMDPrintActions {TODO:, IKMDPrintPreviewActions})
     lstImages: TMenuImgList;
     dlgFonts: TFontDialog;
     dlgPrint: TPrintDialog;
@@ -76,7 +76,7 @@ type
     { IKMDPrintActions }
     function PrintFile: Boolean;
     { IKMDPrintPreviewActions }
-    function PrintPreview: Boolean;
+    //TODO: function PrintPreview: Boolean;
     procedure EditorChanged(Sender: TObject);
     function GetEditorFormat: TEditorFormat;
     function GetTextFileFormat: TTextFileFormat;
@@ -200,6 +200,9 @@ begin
   else if Pos('htm', s) > 0 then EditorFormat := efHTML
   else if Copy(s,1,4) = '.php' then EditorFormat := efHTML
   else if Pos('xml', s) > 0 then EditorFormat := efXML
+  else if s = '.json' then EditorFormat := efJSON
+  else if s = '.js' then EditorFormat := efJS
+  else if s = '.css' then EditorFormat := efCSS
   else EditorFormat := efText;
 end;
 
@@ -262,10 +265,10 @@ end;
 
 {-------------------------------------------------------------------------------}
 
-function TfrmEditor.PrintPreview: Boolean;
+{TODO: function TfrmEditor.PrintPreview: Boolean;
 begin
   Result := FEditorFrame.PrintPreview(FileName);
-end;
+end;}
 
 procedure TfrmEditor.RefreshOptions;
 begin

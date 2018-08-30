@@ -22,6 +22,8 @@ unit KMDActionInterfaces;
 interface
 
 uses
+  System.Types,
+
   TextFileFormat;
 
 type
@@ -71,10 +73,19 @@ type
 
   IKMDTextEditorActions = interface(IKMDSearchActions)
     ['{118B5CF5-7FED-4669-9A51-7DC58BF571D4}']
+    function GetText: string;
+    procedure SetText(const Value: string);
     function GetSelectedRow: Integer;
+    function GetSelectedCol: Integer;
+    function GetSelectedRange: TRect;
     function GetEditorFormat: TEditorFormat;
+    procedure ReplaceSelection(ARange: TRect; const ANewText: string);
+
     property EditorFormat: TEditorFormat read GetEditorFormat;
     property SelectedRow: Integer read GetSelectedRow;
+    property SelectedCol: Integer read GetSelectedCol;
+    property SelectedRange: TRect read GetSelectedRange;
+    property Text: string read GetText write SetText;
   end;
 
 implementation

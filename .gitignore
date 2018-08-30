@@ -229,6 +229,10 @@
 # VS Code
 .vscode
 
+# linux
+autom4te.cache
+*.orig
+
 .DS_Store
 
 *.kpj.user

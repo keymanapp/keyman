@@ -4,7 +4,7 @@ Section: utils
 Maintainer: Doug Rintoul <doug_rintoul@sil.org>
 Uploaders: Torsten Werner <twerner@debian.org>
 Homepage: http://kmfl.sourceforge.net/
-Build-Depends: cdbs (>= 0.4.27), debhelper (>= 10), libx11-dev, autotools-dev
+Build-Depends: cdbs (>= 0.4.27), debhelper (>= 10), libx11-dev
 Standards-Version: 3.9.8.0
 
 Package: libkmflcomp-dev

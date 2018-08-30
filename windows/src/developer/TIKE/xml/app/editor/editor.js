@@ -46,6 +46,7 @@ window.editorGlobalContext = {
 
   context.moveCursor = function (o) {
     editor.moveCursorTo(o.row, o.column);
+    editor.selection.clearSelection();
     editor.renderer.scrollCursorIntoView();
   };
   
@@ -67,6 +68,7 @@ window.editorGlobalContext = {
       });
     }
     editor.moveCursorTo(o.row, 0);
+    editor.selection.clearSelection();
     editor.renderer.scrollCursorIntoView();
   };
   
@@ -78,6 +80,40 @@ window.editorGlobalContext = {
       errorRange = new ace.Range(row, 0, row, Infinity);
       errorRange.id = editor.session.addMarker(errorRange, 'km_error', "fullLine", false);
     }
+  };
+
+  context.replaceSelection = function (o) {
+    let originalRange = new ace.Range(o.top, o.left, o.bottom, o.right);
+    let end = editor.session.doc.replace(originalRange, o.newText);
+
+    let newRange = new ace.Range(o.top, o.left, end.row, end.column);
+    editor.selection.setSelectionRange(newRange, false);
+  };
+
+  /* Printing */
+
+  context.print = function () {
+    require("ace/config").loadModule("ace/ext/static_highlight", function (m) {
+      var result = m.renderSync(
+        editor.getValue(), editor.session.getMode(), editor.renderer.theme
+      );
+      var iframe = document.createElement('iframe');
+      iframe.onload = function () {
+        iframe.contentWindow.document.open();
+        iframe.contentWindow.document.write(result.html);
+        iframe.contentWindow.document.close();
+        var s = iframe.contentWindow.document.createElement('style');
+        s.type = 'text/css';
+        s.appendChild(iframe.contentWindow.document.createTextNode(result.css));
+        iframe.contentWindow.document.head.appendChild(s);
+        // TODO: Add page setup -- paper size, margins
+        window.setTimeout(function () {
+          iframe.contentWindow.print();
+          document.body.removeChild(iframe);
+        }, 10);
+      };
+      document.body.appendChild(iframe);
+    });
   };
       
   /**
@@ -114,9 +150,11 @@ window.editorGlobalContext = {
     command(editor.getSelectedText() == '' ? 'no-selection' : 'has-selection');
     command(editor.session.getUndoManager().hasUndo() ? 'undo-enable' : 'undo-disable');
     command(editor.session.getUndoManager().hasRedo() ? 'redo-enable' : 'redo-disable');
-    let c = editor.selection.getCursor();
-    command('location,'+c.row+','+c.column);
-    command('insert-mode,'+(editor.session.getOption('overwrite') ? 'Overwrite' : 'Insert'));
+    let r = editor.selection.getRange();
+    var n = editor.session.doc.getTextRange(editor.selection.getRange()).length;
+    if (!editor.selection.isBackwards()) n = -n;
+    command('location,' + r.start.row + ',' + r.start.column + ',' + r.end.row + ',' + r.end.column + ',' + n);
+    command('insert-mode,' + (editor.session.getOption('overwrite') ? 'Overwrite' : 'Insert'));
 //    command(editor.session.getUndoManager().isClean() ? 'modified' : 'not-modified');
     var s = getTokenAtCursor();
     if(s) {
@@ -148,6 +186,16 @@ window.editorGlobalContext = {
   */
   $(function initialize() {
     editor = ace.edit("editor");
+
+    // Remove Alt+ key bindings which may conflict with environment shortcuts, e.g. Alt+E, function keys
+
+    var reAltKeyBindings = /(^alt-[a-z0-9]|f[0-9]+)$/;
+    for (var key in editor.keyBinding.$defaultHandler.commandKeyBinding) {
+      if (key.match(reAltKeyBindings)) {
+        delete editor.keyBinding.$defaultHandler.commandKeyBinding[key];
+      }
+    }
+
     editor.setTheme("ace/theme/xcode");
     
     editor.session.selection.on('changeCursor', updateState);    

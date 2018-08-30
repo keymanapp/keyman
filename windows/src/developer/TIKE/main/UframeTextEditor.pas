@@ -3,22 +3,38 @@ unit UframeTextEditor;  // I3323   // I4797
 interface
 
 uses
-  System.Types,
-  System.JSON,
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Menus, ImgList,
-  MenuImgList, ExtCtrls,
-
-  UserMessages,
-  Keyman.Developer.UI.UframeCEFHost,
-  TextFileFormat, UfrmTike,
+  System.Classes,
   System.ImageList,
-  Vcl.StdCtrls, KMDActionInterfaces;
+  System.JSON,
+  System.SysUtils,
+  System.Types,
+  System.Variants,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Vcl.ImgList,
+  Vcl.Menus,
+  Vcl.StdCtrls,
+  Winapi.Messages,
+  Winapi.Windows,
+
+  uCEFConstants,
+  uCEFInterfaces,
+  uCEFTypes,
+
+  Keyman.Developer.UI.UframeCEFHost,
+  KMDActionInterfaces,
+  MenuImgList,
+  TextFileFormat,
+  UfrmTike,
+  UserMessages;
 
 type
   TParColourLineType = (pcltNone, pcltBreakpoint, pcltExecutionPoint, pcltError);
 
-  TframeTextEditor = class(TTIKEForm, IKMDSearchActions, IKMDEditActions, IKMDTextEditorActions)
+  TframeTextEditor = class(TTIKEForm, IKMDEditActions, IKMDSearchActions, IKMDTextEditorActions)
     lstImages: TMenuImgList;
     dlgFonts: TFontDialog;
     dlgPrintSetup: TPrinterSetupDialog;
@@ -30,8 +46,8 @@ type
     class var FInitialFilenameIndex: Integer;
   private
 
-    FSelectedRow: Integer;
-    FSelectedCol: Integer;
+    FSelectedRange: TRect;
+    FSelectedRangeIsBackwards: Boolean;
     FCanUndo: Boolean;
     FCanRedo: Boolean;
     FHasSelection: Boolean;
@@ -57,14 +73,26 @@ type
     procedure SetTextFileFormat(const Value: TTextFileFormat);
 
     procedure cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
-    procedure cefLoadEnd(Sender: TObject);
-    procedure LoadFileInBrowser(const AData: string);
+    procedure cefBeforeContextMenu(Sender: TObject;
+      const browser: ICefBrowser; const frame: ICefFrame;
+      const params: ICefContextMenuParams; const model: ICefMenuModel);
+    procedure cefContextMenuCommand(Sender: TObject;
+      const browser: ICefBrowser; const frame: ICefFrame;
+      const params: ICefContextMenuParams; commandId: Integer;
+      eventFlags: Cardinal; out Result: Boolean);
+    procedure cefPreKeyEvent(Sender: TObject; const browser: ICefBrowser;
+      const event: PCefKeyEvent; osEvent: PMsg; out isKeyboardShortcut,
+      Result: Boolean);
+
+    procedure WMUser_TextEditor_Command(var Message: TMessage); message WM_USER_TextEditor_Command;
     procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
     procedure FireCommand(const commands: TStringList);
+    procedure LoadFileInBrowser(const AData: string);
     procedure UpdateInsertState(const AMode: string);
     procedure ExecuteCommand(const command: string; const parameters: TJSONValue = nil);
     procedure UpdateToken(command: string);
     procedure SetCursorPosition(AColumn, ARow: Integer);
+
   protected
     function GetHelpTopic: string; override;
 
@@ -78,6 +106,10 @@ type
     function CanEditFindNext: Boolean;
 
     { IKMDEditActions }
+    function IKMDTextEditorActions_GetText: string;
+    procedure IKMDTextEditorActions_SetText(const Value: string);
+    function IKMDTextEditorActions.GetText = IKMDTextEditorActions_GetText;
+    procedure IKMDTextEditorActions.SetText = IKMDTextEditorActions_SetText;
     procedure CutToClipboard;
     procedure CopyToClipboard;
     procedure PasteFromClipboard;
@@ -96,6 +128,9 @@ type
     { IKMDTextEditorActions }
     function GetEditorFormat: TEditorFormat;
     function GetSelectedRow: Integer;
+    function GetSelectedCol: Integer;
+    function GetSelectedRange: TRect;
+    procedure ReplaceSelection(ARange: TRect; const ANewText: string);
 
   public
     { Public declarations }
@@ -160,6 +195,24 @@ begin
   //TODO: memo.TabStops   := FKeymanDeveloperOptions.IndentSize;
 end;
 
+procedure TframeTextEditor.ReplaceSelection(ARange: TRect;
+  const ANewText: string);
+var
+  j: TJSONObject;
+begin
+  j := TJSONObject.Create;
+  try
+    j.AddPair('top', TJSONNumber.Create(ARange.Top));
+    j.AddPair('left', TJSONNumber.Create(ARange.Left));
+    j.AddPair('bottom', TJSONNumber.Create(ARange.Bottom));
+    j.AddPair('right', TJSONNumber.Create(ARange.Right));
+    j.AddPair('newText', ANewText);
+    ExecuteCommand('replaceSelection', j);
+  finally
+    j.Free;
+  end;
+end;
+
 procedure TframeTextEditor.cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
 var
   params: TStringList;
@@ -179,9 +232,49 @@ begin
   end;
 end;
 
-procedure TframeTextEditor.cefLoadEnd(Sender: TObject);
+const
+  TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER       = MENU_ID_USER_FIRST + 1;  //actTextEditor_ShowCharacter
+  TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS = MENU_ID_USER_FIRST + 2;  //actTextEditor_ConvertToCharacters
+
+procedure TframeTextEditor.cefBeforeContextMenu(Sender: TObject;
+  const browser: ICefBrowser; const frame: ICefFrame;
+  const params: ICefContextMenuParams; const model: ICefMenuModel);
 begin
-  //
+  if not cef.cef.IsSameBrowser(browser) then exit;
+
+  model.AddSeparator;
+  model.AddItem(TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER,        'S&how Character');
+  model.SetEnabled(TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER, modActionsTextEditor.actTextEditor_ShowCharacter.Enabled);
+  model.AddItem(TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS,  'C&onvert to Characters');
+  model.SetAccelerator(TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS, Ord('U'), True, True, False);
+  model.SetEnabled(TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS, modActionsTextEditor.actTextEditor_ConvertToCharacters.Enabled);
+end;
+
+procedure TframeTextEditor.cefContextMenuCommand(Sender: TObject;
+  const browser: ICefBrowser; const frame: ICefFrame;
+  const params: ICefContextMenuParams; commandId: Integer; eventFlags: Cardinal;
+  out Result: Boolean);
+begin
+  Result := False;
+
+  if not cef.cef.IsSameBrowser(browser) then exit;
+
+  case commandId of
+    TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER,
+    TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS:
+      PostMessage(Handle, WM_USER_TextEditor_Command, commandId, 0);
+  end;
+end;
+
+procedure TframeTextEditor.cefPreKeyEvent(Sender: TObject;
+  const browser: ICefBrowser; const event: PCefKeyEvent; osEvent: PMsg;
+  out isKeyboardShortcut, Result: Boolean);
+begin
+  if event.windows_key_code = VK_ESCAPE then
+  begin
+    ClearError;
+    Result := True;
+  end;
 end;
 
 procedure TframeTextEditor.Changed;
@@ -194,10 +287,13 @@ begin
   inherited;
 
   cef := TframeCEFHost.Create(Self);
+  cef.ShouldShowContextMenu := True;
   cef.Parent := Self;
   cef.Visible := True;
   cef.OnBeforeBrowse := cefBeforeBrowse;
-//  cef.OnLoadEnd := cefLoadEnd;
+  cef.cef.OnBeforeContextMenu := cefBeforeContextMenu;
+  cef.cef.OnContextMenuCommand := cefContextMenuCommand;
+  cef.OnPreKeyEvent := cefPreKeyEvent;
 end;
 
 type
@@ -250,6 +346,16 @@ end;
 function TframeTextEditor.GetText: WideString;
 begin
   Result := modWebHttpServer.AppSource.GetSource(FFileName);
+end;
+
+function TframeTextEditor.IKMDTextEditorActions_GetText: string;
+begin
+  Result := GetText;
+end;
+
+procedure TframeTextEditor.IKMDTextEditorActions_SetText(const Value: string);
+begin
+  SetText(Value);
 end;
 
 procedure TframeTextEditor.LoadFromFile(AFileName: WideString);
@@ -307,7 +413,7 @@ procedure TframeTextEditor.LoadFileInBrowser(const AData: string);
   end;
 const
   mode: array[TEditorFormat] of string = (
-    'keyman', 'xml', 'text', 'html'
+    'keyman', 'xml', 'text', 'html', 'json', 'javascript', 'css'
   );
 begin
   if FFilename = '' then
@@ -432,26 +538,10 @@ begin
   frmKeymanDeveloper.barStatus.Panels[1].Text := AMode;
 end;
 
-{ TODO: Cancelling errors with escape key
-  if (Key=VK_ESCAPE) and (Shift = []) then
-  begin
-    ClearError;
-  end;
-
-  TODO: right-mouse
-  if Button = mbRight then
-  begin
-    pt := memo.ClientToScreen(Point(X,Y));
-    modActionsTextEditor.mnuTextEditor.Popup(pt.X, pt.Y);
-  end;
-
-  TODO: caret position change, update state
-}
-
 function TframeTextEditor.PrintFile(Header: WideString): Boolean;
 begin
-  Result := False;
-  // TODO: print
+  ExecuteCommand('print');
+  Result := True;
 end;
 
 function TframeTextEditor.PrintPreview(Header: WideString): Boolean;
@@ -483,6 +573,7 @@ end;
 
 procedure TframeTextEditor.SetFocus;
 begin
+  inherited;
   cef.SetFocus;
 end;
 
@@ -503,18 +594,25 @@ begin
   finally
     j.Free;
   end;
-{TODO:
-  if (ALine >= EditorMemo.LineCount) or (ALine < 0) then Exit;
-  EditorMemo.SelLine := ALine;
-  EditorMemo.SelCol := 0;
-  EditorMemo.SelLength := Length(EditorMemo.LinesArray[ALine]);
-  EditorMemo.ScrollInView;
-}
+end;
+
+function TframeTextEditor.GetSelectedCol: Integer;
+begin
+  if FSelectedRangeIsBackwards
+    then Result := FSelectedRange.Left
+    else Result := FSelectedRange.Right;
+end;
+
+function TframeTextEditor.GetSelectedRange: TRect;
+begin
+  Result := FSelectedRange;
 end;
 
 function TframeTextEditor.GetSelectedRow: Integer;
 begin
-  Result := FSelectedRow;
+  if FSelectedRangeIsBackwards
+    then Result := FSelectedRange.Top
+    else Result := FSelectedRange.Bottom;
 end;
 
 procedure TframeTextEditor.SetText(Value: WideString);
@@ -555,9 +653,12 @@ begin
   begin
     if ALocation <> '' then
     begin
-      FSelectedRow := StrToIntDef(StrToken(ALocation, ','),0);
-      FSelectedCol := StrToIntDef(ALocation,0);
-      frmKeymanDeveloper.barStatus.Panels[0].Text := Format('Line %d, Col %d', [FSelectedRow+1,FSelectedCol+1]);
+      FSelectedRange.Top   := StrToIntDef(StrToken(ALocation, ','),0);
+      FSelectedRange.Left    := StrToIntDef(StrToken(ALocation, ','),0);
+      FSelectedRange.Bottom  := StrToIntDef(StrToken(ALocation, ','),0);
+      FSelectedRange.Right := StrToIntDef(StrToken(ALocation, ','),0);
+      FSelectedRangeIsBackwards := StrToIntDef(StrToken(ALocation, ','),0) > 0;
+      frmKeymanDeveloper.barStatus.Panels[0].Text := Format('Line %d, Col %d', [FSelectedRange.Top+1,FSelectedRange.Left+1]);
     end;
   end;
 end;
@@ -573,6 +674,16 @@ begin
     FireCommand(params);
   end;
   params.Free;
+end;
+
+procedure TframeTextEditor.WMUser_TextEditor_Command(var Message: TMessage);
+begin
+  case Message.wParam of
+    TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER:
+      modActionsTextEditor.actTextEditor_ShowCharacter.Execute;
+    TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS:
+      modActionsTextEditor.actTextEditor_ConvertToCharacters.Execute;
+  end;
 end;
 
 {-------------------------------------------------------------------------------
@@ -708,6 +819,7 @@ begin
   v := TJSONNumber.Create(ln);
   try
     ExecuteCommand('highlightError', v);
+    SetSelectedRow(ln);
   finally
     v.Free;
   end;
@@ -776,12 +888,13 @@ var
   token, prevtoken: WideString;
   FHelpTopic, FPrevHelpTopic: WideString;
 begin
-  n := command.IndexOf(',');
-  if n < 0 then
+  token := StrToken(command, ',');
+  if token = 'null' then
+    col := 0
+  else if not TryStrToInt(token, col) then
     Exit;
-  if not TryStrToInt(command.Substring(0, n), col) then
-    Exit;
-  line := command.Substring(n+1);
+
+  line := command;
 
   x := col+1;
 

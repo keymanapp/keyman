@@ -24,50 +24,24 @@ uses Classes, debugkeyboard, SysUtils, KeymanDeveloperDebuggerMemo;
 type
   TDeadKeyInfo = class // Kept as a list of active deadkeys
   private
-    function GetPosition: Integer;
-    procedure SetPosition(const Value: Integer);
-    function GetDeleted: Boolean;
-    function GetPos2: Integer;
+    FDeleted: Boolean;
+    FPosition: Integer;
   public
     //Position: Integer;
     memo: TKeymanDeveloperDebuggerMemo;  // I3323
     Deadkey: TDebugDeadkey;
-    destructor Destroy; override;
-    property Position: Integer read GetPosition write SetPosition;
-    property Pos2: Integer read GetPos2;
-    property Deleted: Boolean read GetDeleted;
+    procedure Delete;
+    property Position: Integer read FPosition write FPosition;
+    property Deleted: Boolean read FDeleted;
   end;
 
 implementation
 
 { TDeadKeyInfo }
 
-destructor TDeadKeyInfo.Destroy;
+procedure TDeadKeyInfo.Delete;
 begin
-  inherited;
-end;
-
-function TDeadKeyInfo.GetDeleted: Boolean;
-begin
-  // TODO
-  Result := False;
-end;
-
-function TDeadKeyInfo.GetPosition: Integer;
-begin
-  // TODO
-  Result := 0;
-end;
-
-function TDeadKeyInfo.GetPos2: Integer;
-begin
-  // TODO
-  Result := 0;
-end;
-
-procedure TDeadKeyInfo.SetPosition(const Value: Integer);
-begin
-  // TODO
+  FDeleted := True;
 end;
 
 end.

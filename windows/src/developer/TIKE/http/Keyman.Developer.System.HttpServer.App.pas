@@ -31,6 +31,7 @@ implementation
 uses
   System.Classes,
   System.SysUtils,
+  System.Variants,
   Xml.XMLDoc,
   Xml.XMLIntf,
 
@@ -102,9 +103,9 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
 
     path := ARequestInfo.Params.Values['path'];
 
-    if not FileExists(path) or not SameText(ExtractFileExt(path), '.kpj') then
+    if (Path <> '') and (not FileExists(path) or not SameText(ExtractFileExt(path), '.kpj')) then
     begin
-      AResponseInfo.ResponseNo := 400;
+      AResponseInfo.ResponseNo := 404;
       AResponseInfo.ResponseText := 'Project file '+path+' does not exist.';
       Exit;
     end;
@@ -137,7 +138,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
       not SameText(ExtractFileExt(path), '.bmp')
       ) then
     begin
-      AResponseInfo.ResponseNo := 400;
+      AResponseInfo.ResponseNo := 404;
       AResponseInfo.ResponseText := 'Image file '+path+' does not exist.';
       Exit;
     end;
@@ -178,13 +179,19 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
       end;
     end;
 
-    path := xmldoc.DocumentElement.ChildValues['path'];
+    try
+      if (xmldoc.DocumentElement.ChildNodes.IndexOf('path') >= 0) and not
+        VarIsNull(xmldoc.DocumentElement.ChildValues['path']) then
+        path := xmldoc.DocumentElement.ChildValues['path'];
+    except
+      path := '';
+    end;
 
     // Saving state
 
-    if not FileExists(path) or not SameText(ExtractFileExt(path), '.kpj') then
+    if (Path <> '') and (not FileExists(path) or not SameText(ExtractFileExt(path), '.kpj')) then
     begin
-      AResponseInfo.ResponseNo := 400;
+      AResponseInfo.ResponseNo := 404;
       AResponseInfo.ResponseText := 'Project file '+path+' does not exist.';
       Exit;
     end;
