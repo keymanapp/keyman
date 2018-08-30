@@ -8,9 +8,9 @@ If not already installed it needs python3, python3-gi
 
 ## Things to run
 
-### view_installed.py
+### keyman-config
 
-`./view_installed.py`
+`./keyman-config`
 
 This shows a list of installed kmps.
 For each one it has buttons to `show the welcome page`, `show more information` and `uninstall`.
@@ -21,9 +21,7 @@ For each one it has buttons to `show the welcome page`, `show more information` 
 * `Download keyboard...` - runs `DownloadKmpWindow` (see below)
 * `Install keyboard...` - opens a file choose dialog to choose a kmp file to install and bring up the `InstallKmpWindow` for more details and to confirm installing.
 
-### downloadkeyboard.py
-
-`./downloadkeyboard.py` runs `DownloadKmpWindow`
+##### Download window
 
 This uses the keyman.com website to install kmps.
 
@@ -38,22 +36,22 @@ Click it to download the keyboard and bring up the `InstallKmpWindow` for more d
 Secondary-click gives you a menu including 'Back' to go back a page.
 
 
-### install_kmp.py
+### install_kmp
 
 Command line installer for kmp
 
-`./install_kmp.py -k <keyboard id>`
+`install_kmp -k <keyboard id>`
 or
-`./install_kmp.py -f <kmp file>`
+`install_kmp -f <kmp file>`
 
-### uninstall_kmp.py
+### uninstall_kmp
 
 Command line uninstaller for kmp
 
-`./uninstall_kmp.py <keyboard id>`
+`.uninstall_kmp <keyboard id>`
 
-### list_installed_kmp.py
+### list_installed_kmp
 
-`./list_installed_kmp.py` shows name, version, id, description of each installed keyboard
+`list_installed_kmp` shows name, version, id, description of each installed keyboard
 
-`./list_installed_kmp.py -s` shows name, version, id of each installed keyboard
+`list_installed_kmp.py` shows name, version, id of each installed keyboard

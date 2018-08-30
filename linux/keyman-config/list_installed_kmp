@@ -1,0 +1,32 @@
+#!/usr/bin/python3
+
+import argparse
+from keyman.list_installed_kmp import get_installed_kmp
+
+def main():
+    parser = argparse.ArgumentParser(description='Show installed keyman keyboards.')
+    parser.add_argument('-s', "--short", help='short format', action="store_true")
+
+    args = parser.parse_args()
+
+    installed_kmp = get_installed_kmp()
+#    print(installed_kmp)
+#    print(sorted(installed_kmp))
+    print("--- Installed keyboards ---")
+    for kmp in sorted(installed_kmp):
+        print(installed_kmp[kmp]['name'] + ", version:", installed_kmp[kmp]['version'] + ", id:", kmp)
+        if not args.short:
+            if installed_kmp[kmp]['version'] != installed_kmp[kmp]['kmpversion']:
+                print("Version mismatch. Installed keyboard is %s. Website says it is %s." % (installed_kmp[kmp]['kmpversion'], installed_kmp[kmp]['version']))
+            if installed_kmp[kmp]['name'] != installed_kmp[kmp]['kmpname']:
+                print("Name mismatch. Installed keyboard is %s. Website says it is %s." % (installed_kmp[kmp]['name'], installed_kmp[kmp]['kmpname']))
+
+            if installed_kmp[kmp]['description']:
+                print(installed_kmp[kmp]['description'])
+            else:
+                print("No description")
+            print(os.linesep)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,13 @@
+#!/usr/bin/python3
+
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from keyman.view_installed import ViewInstalledWindow
+
+if __name__ == '__main__':
+    w = ViewInstalledWindow()
+    w.connect("destroy", Gtk.main_quit)
+    w.resize(800, 450)
+    w.show_all()
+    Gtk.main()

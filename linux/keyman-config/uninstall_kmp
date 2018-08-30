@@ -1,0 +1,14 @@
+#!/usr/bin/python3
+
+import sys
+from keyman.uninstall_kmp import uninstall_kmp
+
+def main(argv):
+	if len(sys.argv) != 2:
+		print("uninstall_kmp.py <keyboard id>")
+		sys.exit(2)
+	keyboardid = sys.argv[1]
+	uninstall_kmp(keyboardid)
+
+if __name__ == "__main__":
+	main(sys.argv[1:])

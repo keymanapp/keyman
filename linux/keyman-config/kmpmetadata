@@ -1,0 +1,30 @@
+#!/usr/bin/python3
+
+import sys
+import os.path
+from keyman.kmpmetadata import parseinfdata, parsemetadata
+
+def main(argv):
+	if len(sys.argv) != 2:
+		print("kmpmetadata.py <kmp.json> or <kmp.inf>")
+		sys.exit(2)
+	inputfile = sys.argv[1]
+	
+	if not os.path.isfile(inputfile):
+		print("kmpmetadata.py Input file ", inputfile, " not found.")
+		print("kmpmetadata.py <kmp.json> or <kmp.inf>")
+		sys.exit(2)
+	
+	name, ext = os.path.splitext(inputfile)
+	if ext == ".json":
+		parsemetadata(inputfile, True)
+	elif ext == ".inf":
+		parseinfdata(inputfile, True)
+	else:
+		print("kmpmetadata.py Input file must be json or inf.")
+		print("kmpmetadata.py <kmp.json> or <kmp.inf>")
+		sys.exit(2)
+
+if __name__ == "__main__":
+        main(sys.argv[1:])
+
