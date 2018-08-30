@@ -2,17 +2,16 @@
 
 from setuptools import setup, find_packages
 setup(
-    name="Keyman",
+    name="keyman-config",
     version="10.99.1",
     packages=find_packages(),
     scripts=['keyman-config', 'get_kmp',
              'install_kmp', 'kvk2ldml',
-             'uninstall_kmp',
+             'uninstall_kmp', 'kmpmetadata',
              'list_installed_kmp', ],
 
     install_requires=[
-          'lxml', 'gi', 'numpy', 'PIL', 'requests', 'requests_cached',
-          'webbrowser',  'json', 'distutils', 'configparser',
+        'lxml', 'numpy', 'PIL', 'requests', 'requests-cache',
     ],
 
 # metadata to display on PyPI
@@ -20,7 +19,7 @@ setup(
     author_email="wdg@debian.org",
     description="Keyman for Linux configuration",
     license="MIT",
-    keywords="keyman",
+    keywords="keyman, keyman-config, keyboard",
     url="http://www.keyman.com/",   # project home page, if any
     project_urls={
         "Bug Tracker": "https://github.com/keymanapp/issues",
