@@ -46,8 +46,8 @@ type
     class var FInitialFilenameIndex: Integer;
   private
 
-    FSelectedRow: Integer;
-    FSelectedCol: Integer;
+    FSelectedRange: TRect;
+    FSelectedRangeIsBackwards: Boolean;
     FCanUndo: Boolean;
     FCanRedo: Boolean;
     FHasSelection: Boolean;
@@ -128,6 +128,9 @@ type
     { IKMDTextEditorActions }
     function GetEditorFormat: TEditorFormat;
     function GetSelectedRow: Integer;
+    function GetSelectedCol: Integer;
+    function GetSelectedRange: TRect;
+    procedure ReplaceSelection(ARange: TRect; const ANewText: string);
 
   public
     { Public declarations }
@@ -192,6 +195,24 @@ begin
   //TODO: memo.TabStops   := FKeymanDeveloperOptions.IndentSize;
 end;
 
+procedure TframeTextEditor.ReplaceSelection(ARange: TRect;
+  const ANewText: string);
+var
+  j: TJSONObject;
+begin
+  j := TJSONObject.Create;
+  try
+    j.AddPair('top', TJSONNumber.Create(ARange.Top));
+    j.AddPair('left', TJSONNumber.Create(ARange.Left));
+    j.AddPair('bottom', TJSONNumber.Create(ARange.Bottom));
+    j.AddPair('right', TJSONNumber.Create(ARange.Right));
+    j.AddPair('newText', ANewText);
+    ExecuteCommand('replaceSelection', j);
+  finally
+    j.Free;
+  end;
+end;
+
 procedure TframeTextEditor.cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
 var
   params: TStringList;
@@ -225,6 +246,7 @@ begin
   model.AddItem(TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER,        'S&how Character');
   model.SetEnabled(TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER, modActionsTextEditor.actTextEditor_ShowCharacter.Enabled);
   model.AddItem(TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS,  'C&onvert to Characters');
+  model.SetAccelerator(TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS, Ord('U'), True, True, False);
   model.SetEnabled(TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS, modActionsTextEditor.actTextEditor_ConvertToCharacters.Enabled);
 end;
 
@@ -572,18 +594,25 @@ begin
   finally
     j.Free;
   end;
-{TODO:
-  if (ALine >= EditorMemo.LineCount) or (ALine < 0) then Exit;
-  EditorMemo.SelLine := ALine;
-  EditorMemo.SelCol := 0;
-  EditorMemo.SelLength := Length(EditorMemo.LinesArray[ALine]);
-  EditorMemo.ScrollInView;
-}
+end;
+
+function TframeTextEditor.GetSelectedCol: Integer;
+begin
+  if FSelectedRangeIsBackwards
+    then Result := FSelectedRange.Left
+    else Result := FSelectedRange.Right;
+end;
+
+function TframeTextEditor.GetSelectedRange: TRect;
+begin
+  Result := FSelectedRange;
 end;
 
 function TframeTextEditor.GetSelectedRow: Integer;
 begin
-  Result := FSelectedRow;
+  if FSelectedRangeIsBackwards
+    then Result := FSelectedRange.Top
+    else Result := FSelectedRange.Bottom;
 end;
 
 procedure TframeTextEditor.SetText(Value: WideString);
@@ -624,9 +653,12 @@ begin
   begin
     if ALocation <> '' then
     begin
-      FSelectedRow := StrToIntDef(StrToken(ALocation, ','),0);
-      FSelectedCol := StrToIntDef(ALocation,0);
-      frmKeymanDeveloper.barStatus.Panels[0].Text := Format('Line %d, Col %d', [FSelectedRow+1,FSelectedCol+1]);
+      FSelectedRange.Top   := StrToIntDef(StrToken(ALocation, ','),0);
+      FSelectedRange.Left    := StrToIntDef(StrToken(ALocation, ','),0);
+      FSelectedRange.Bottom  := StrToIntDef(StrToken(ALocation, ','),0);
+      FSelectedRange.Right := StrToIntDef(StrToken(ALocation, ','),0);
+      FSelectedRangeIsBackwards := StrToIntDef(StrToken(ALocation, ','),0) > 0;
+      frmKeymanDeveloper.barStatus.Panels[0].Text := Format('Line %d, Col %d', [FSelectedRange.Top+1,FSelectedRange.Left+1]);
     end;
   end;
 end;

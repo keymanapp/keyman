@@ -82,6 +82,14 @@ window.editorGlobalContext = {
     }
   };
 
+  context.replaceSelection = function (o) {
+    let originalRange = new ace.Range(o.top, o.left, o.bottom, o.right);
+    let end = editor.session.doc.replace(originalRange, o.newText);
+
+    let newRange = new ace.Range(o.top, o.left, end.row, end.column);
+    editor.selection.setSelectionRange(newRange, false);
+  };
+
   /* Printing */
 
   context.print = function () {
@@ -142,9 +150,11 @@ window.editorGlobalContext = {
     command(editor.getSelectedText() == '' ? 'no-selection' : 'has-selection');
     command(editor.session.getUndoManager().hasUndo() ? 'undo-enable' : 'undo-disable');
     command(editor.session.getUndoManager().hasRedo() ? 'redo-enable' : 'redo-disable');
-    let c = editor.selection.getCursor();
-    command('location,'+c.row+','+c.column);
-    command('insert-mode,'+(editor.session.getOption('overwrite') ? 'Overwrite' : 'Insert'));
+    let r = editor.selection.getRange();
+    var n = editor.session.doc.getTextRange(editor.selection.getRange()).length;
+    if (!editor.selection.isBackwards()) n = -n;
+    command('location,' + r.start.row + ',' + r.start.column + ',' + r.end.row + ',' + r.end.column + ',' + n);
+    command('insert-mode,' + (editor.session.getOption('overwrite') ? 'Overwrite' : 'Insert'));
 //    command(editor.session.getUndoManager().isClean() ? 'modified' : 'not-modified');
     var s = getTokenAtCursor();
     if(s) {
