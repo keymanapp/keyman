@@ -191,7 +191,7 @@ XKEYBOARD * kmfl_load_keyboard_from_file(const char *filename)
         if (errcode == 0)
         {       
             compile_keyboard_to_buffer(filename, (void *) &p_kbd);
-    		memcpy(version_string,p_kbd->version,3); // Copy to ensure terminated
+    		memcpy(version_string,p_kbd->version,4); // Copy to ensure terminated
     		kbver = (unsigned)atoi(version_string);
         } 
         else
@@ -219,17 +219,17 @@ XKEYBOARD * kmfl_load_keyboard_from_file(const char *filename)
 	    		return NULL;
 	    	}
     		fclose(fp);
-    		memcpy(version_string,p_kbd->version,3); // Copy to ensure terminated
+    		memcpy(version_string,p_kbd->version,4); // Copy to ensure terminated
     		kbver = (unsigned)atoi(version_string);
     	}
     }
 	// Check the loaded file is valid and has the correct version
 	if((memcmp(p_kbd->id,"KMFL",4) != 0) 
-		|| (p_kbd->version[3] != *FILE_VERSION)
+		|| (p_kbd->version[4] != *FILE_VERSION)
 		|| (kbver < (unsigned)atoi(BASE_VERSION))
 		|| (kbver > (unsigned)atoi(LAST_VERSION)))
 	{
-		DBGMSG(1, "Invalid version\n");
+		DBGMSG(1, "Invalid version %s\n", version_string);
 		free(p_kbd); 
 		return NULL;
 	}

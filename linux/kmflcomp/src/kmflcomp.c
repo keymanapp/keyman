@@ -114,12 +114,12 @@ void write_keyboard(char * infile, void *keyboard_buffer, int keyboard_buffer_si
 				fprintf(stderr,"  Total warnings: %d\n",warncount);
 		}
 
-		if(Version[2] > '0') 
-			fprintf(stderr,"Keyboard '%s' (Version %c.%c%c) compiled to %ld bytes\n",
-				kbp->name,Version[0],Version[1],Version[2],filesize);
+		if(Version[3] > '0')
+			fprintf(stderr,"Keyboard '%s' (Version %c%c.%c%c) compiled to %ld bytes\n",
+				kbp->name,Version[0],Version[1],Version[2],Version[3],filesize);
 		else
-			fprintf(stderr,"Keyboard '%s' (Version %c.%c) compiled to %ld bytes\n",
-				kbp->name,Version[0],Version[1],filesize);
+			fprintf(stderr,"Keyboard '%s' (Version %c%c.%c) compiled to %ld bytes\n",
+				kbp->name,Version[0],Version[1],Version[2],filesize);
 	}
 	else 
 		fail(3,"unable to save output file!");
@@ -285,7 +285,7 @@ unsigned long create_keyboard_buffer(const char *infile, void ** kb_buf)
 
 	// Set tag and version
 	memcpy(&xkbd.id,"KMFL",4);
-	memcpy(&xkbd.version,Version,4);
+	memcpy(&xkbd.version,Version,5);
 
 	// add the keyboard header
 	keyboard_buffer = append_to_buffer(keyboard_buffer, &keyboard_buffer_size, &xkbd, sizeof(XKEYBOARD));
@@ -572,14 +572,14 @@ ITEM *check_lhs(ITEM *lhs, unsigned int ilen, GROUP *gp, int line)
 	}
 	*p = 0;		// ensure rule string terminated after compacting 
 
-	if((gp->flags & GF_USEKEYS) && !goodplus && (Version[0] > '3'))		
+	if((gp->flags & GF_USEKEYS) && !goodplus && (Version[1] > '3' || Version[0] >= '1')) // needs review
 	{
 		kmflcomp_warn(line,"'+' should be used before the keystroke"); 
 	}
 
 	if(badplus)
 	{
-		if(Version[0] > '5')
+		if(Version[1] > '5' || Version[0] >= '1') // needs review
 			kmflcomp_error(line,"use '+' only immediately before keystroke");
 		else 
 			kmflcomp_warn(line,"'+' used incorrectly (but ignored)");
@@ -1045,8 +1045,8 @@ char *items_to_string(ITEM *p)
 	static char temp[256];
 
 	char *sp, *sp1;
-	int n;
-	n = count_items(p);
+	//int n;
+	//n = count_items(p);
 	
 	for(sp=temp,sp1=temp+240,*sp=0; (*p) && (sp<sp1); p++) 
 	{
@@ -1114,7 +1114,14 @@ char *items_to_string(ITEM *p)
 char *special_stores[] = {
 	"&name","&version","&hotkey","&language","&layout","&copyright","&message",
 	"&bitmap","&mnemoniclayout","&ethnologuecode",
-	"&capsalwaysoff","&capsononly","&shiftfreescaps","&author"};
+	"&capsalwaysoff","&capsononly","&shiftfreescaps","&author",
+	"&targets","&visualkeyboard","&keyboardversion"};
+
+// stores new from keyman 7.0 onwards that can safely be ignored for kmfl 11 for now
+char *ignored_stores[] = {
+	"&layoutfile","&kmw_helpfile","&kmw_embedjs",
+	"&windowslanguages","&kmw_rtl",
+	"&kmw_embedcss","&kmw_helptext","&includecodes"};
 
 // Initialize special stores (create dummy entries)
 void initialize_special_stores(void)
@@ -1129,7 +1136,7 @@ void initialize_special_stores(void)
 // Copy special store contents to keyboard header as required
 void process_special_store(char *name, STORE *sp, int line)
 {
-	int n, kbver;
+	int n, p, kbver;
 	
 	// Identify store by name
 	for(n=0; n<sizeof(special_stores)/sizeof(char *); n++)
@@ -1159,10 +1166,15 @@ void process_special_store(char *name, STORE *sp, int line)
 		break;
 	case SS_VERSION:
 		kbver = (int)(100.0*atof(items_to_string(sp->items))+0.5);
-		sprintf(Version,"%3.3d%1.1s",kbver,FILE_VERSION);
+		sprintf(Version,"%4.4d%1.1s",kbver,FILE_VERSION);
 		break;
 	case SS_BITMAP:
 		check_bitmap_file(sp,line);
+		break;
+	case SS_TARGETS:
+		if (!check_linux_target(sp,line))
+			fail(1, "Line %d: No valid linux target in %s", line, items_to_string(sp->items));
+			//kmflcomp_warn(line, "No valid linux target.");
 		break;
 	case SS_COPYRIGHT:
 	case SS_MESSAGE:
@@ -1170,9 +1182,16 @@ void process_special_store(char *name, STORE *sp, int line)
 	case SS_AUTHOR:
 	case SS_LANGUAGE:
 	case SS_ETHNOLOGUE:
+	case SS_KEYBOARDVERSION:
+	case SS_VISUALKEYBOARD:
 		break;
 	default:
-		kmflcomp_warn(line-1,"unrecognized special store '&%s'",name);		
+		for(p=0; p<sizeof(ignored_stores)/sizeof(char *); p++)
+		{
+			if(strcasecmp(name,ignored_stores[p]) == 0 ) break;
+		}
+		if (p==sizeof(ignored_stores)/sizeof(char *))
+			kmflcomp_warn(line-1,"unrecognized special store '&%s'",name);
 		return;
 	}		
 }
@@ -1403,11 +1422,41 @@ char *find_first_match(char *path)
 }
 #endif
 
+// valid targets that should compile for linux
+char *valid_targets[] = {
+	"any","linux","desktop","windows","macosx"};
+int check_linux_target(STORE *sp, int line)
+{
+	char *p, *ptr, tname[128];
+	char delim[] = " ";
+	UTF32 *p1;
+	UTF8 *p2;
+	int n;
+
+	p1 = (UTF32*)sp->items;
+	p2 = (UTF8*)tname;
+	IConvertUTF32toUTF8((const UTF32 **)&p1,(const UTF32 *)(sp->items+sp->len),&p2,(UTF8 *)(tname+127));
+	*p2 = 0;
+	p = (char *)tname;
+	ptr = strtok(p, delim);
+	while(ptr != NULL)
+	{
+		for(n=0; n<sizeof(valid_targets)/sizeof(char *); n++)
+		{
+			if(strcasecmp(ptr,valid_targets[n]) == 0 ) {
+				return 1;
+			}
+		}
+		ptr = strtok(NULL, delim);
+	}
+	return 0;
+}
+
 // Check that the bitmap file exists as specified, or else that a file with an accepted variation
 // of the name exists (different case, .bmp or .png suffixes)
 int check_bitmap_file(STORE *sp, int line)
 {
-	char *p,*bmp_path=NULL,tname[64];
+	char *p,*bmp_path=NULL,*icons_path=NULL,tname[256];
 	struct stat fstat;
 	UINT i;
 	UTF32 *p1,*titems=NULL;
@@ -1415,23 +1464,27 @@ int check_bitmap_file(STORE *sp, int line)
 
 	p1 = (UTF32*)sp->items; 
 	p2 = (UTF8*)tname;
-	IConvertUTF32toUTF8((const UTF32 **)&p1,(const UTF32 *)(sp->items+sp->len),&p2,(UTF8 *)(tname+63));
+	IConvertUTF32toUTF8((const UTF32 **)&p1,(const UTF32 *)(sp->items+sp->len),&p2,(UTF8 *)(tname+255));
 	*p2 = 0;
 
 	if((p=rindex(fname,DIRDELIM)) != NULL) 
 	{
-		bmp_path = (char *)checked_alloc((p-fname+1)+strlen(tname)+6,1);
+		bmp_path = (char *)checked_alloc((p-fname+1)+strlen(tname)+10,1);
 		strncpy(bmp_path,fname,p-fname+1); 
 		strcpy(bmp_path+(p-fname+1),tname);
 	}
 	else
 	{
-		bmp_path = (char *)checked_alloc(strlen(tname)+6,1);
+		bmp_path = (char *)checked_alloc(strlen(tname)+10,1);
 		strcpy(bmp_path,tname);
 	}
 
+	if (strncmp(bmp_path+strlen(bmp_path)-4, ".ico", 4) == 0)
+	{
+		strcat(bmp_path,".bmp");
+	}
 	// First test if the file exists exactly as in BITMAP statement
-	if(stat(bmp_path,&fstat) == 0)
+	else if(stat(bmp_path,&fstat) == 0)
 	{
 		mem_free(bmp_path);	// file exists
 		return 0;
@@ -1440,18 +1493,61 @@ int check_bitmap_file(STORE *sp, int line)
 	// Search for a case-variation (irrelevant for Windows)
 	p = find_first_match(bmp_path);
 
+	// Search in icons dir
+	if(p == NULL)
+	{
+		icons_path = (char *)checked_alloc(strlen(bmp_path)+12,1);
+		if((p=rindex(fname,DIRDELIM)) != NULL)
+		{
+			strncpy(icons_path,fname,p-fname+1);
+			strcpy(icons_path+(p-fname+1),"icons/");
+			strcpy(icons_path+(p-fname+1+6),tname);
+		}
+		else
+		{
+			strcpy(icons_path,"icons/");
+			strcat(icons_path, bmp_path);
+		}
+		p = find_first_match(icons_path);
+	}
+
 	// If no extension specified, search next for files with extensions .bmp and .png
 	if((p == NULL) && (strchr(tname,'.') == NULL))
 	{
 		// Add .bmp 
 		strcat(bmp_path,".bmp");
 		p = find_first_match(bmp_path);
+		if ((p == NULL) && icons_path)
+		{
+			// Add .bmp in icons dir
+			strcat(icons_path,".bmp");
+			p = find_first_match(icons_path);
+		}
 		if(p == NULL)
 		{
 			// Add .png
 			strcpy(bmp_path+strlen(bmp_path)-4,".png");
 			p = find_first_match(bmp_path);
 		}
+		if ((p == NULL) && icons_path)
+		{
+			// Add .png in icons dir
+			strcpy(icons_path+strlen(icons_path)-4,".png");
+			p = find_first_match(icons_path);
+		}
+		if(p == NULL)
+		{
+			// Add .ico.bmp (ico converted to bmp)
+			strcpy(bmp_path+strlen(bmp_path)-4,".ico.bmp");
+			p = find_first_match(bmp_path);
+		}
+	}
+
+	// If there is an extension but not found, try .bmp added (converted from .ico)
+	if(p == NULL)
+	{
+		strcat(bmp_path, ".bmp");
+		p = find_first_match(bmp_path);
 	}
 
 	// Issue appropriate warnings and replace file name in store
@@ -1459,11 +1555,13 @@ int check_bitmap_file(STORE *sp, int line)
 	{
 		kmflcomp_warn(line,"The bitmap file '%s' was not found. Create a suitable bitmap of that name "
 			"and copy it with the compiled keyboard",tname);
-
-		
 	}
 	else
 	{
+		if (icons_path)
+		{
+			p = p - 6; // include 'icons/' in name
+		}
 		kmflcomp_warn(line,"A bitmap named '%s' was found and will be referred to in the compiled keyboard "
 			"instead of '%s'",p,tname);
 		
@@ -1479,6 +1577,7 @@ int check_bitmap_file(STORE *sp, int line)
 	}
 	
 	if(bmp_path) mem_free(bmp_path);
+	if(icons_path) mem_free(icons_path);
 	return 1;
 }
 

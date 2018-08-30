@@ -65,7 +65,7 @@ typedef struct _group GROUP;
 // Keyboard structure
 struct _keyboard {
 	char id[4]; 					// always KMFL
-	char version[4];			// initially 1000
+	char version[5];			// initially 1000
 	char name[NAMELEN+1];		// utf8 version of keyboard name
 	UINT mode:1;		// Keyboard Flags:	Unicode (0) or ANSI (1)
 	UINT layout:1; 	//					positional(0) or mnemonic(1)
@@ -132,6 +132,7 @@ void initialize_special_stores(void);
 void process_special_store(char *name, STORE *sp, int line);
 void check_keyboard(KEYBOARD *kbp);
 int check_bitmap_file(STORE *sp, int line);
+int check_linux_target(STORE *sp, int line);
 
 void *checked_alloc(size_t n, size_t sz);
 void sort_rules(GROUP *gp);

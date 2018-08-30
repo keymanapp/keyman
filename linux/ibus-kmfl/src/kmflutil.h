@@ -75,6 +75,7 @@ typedef struct
     int keyboard_number;
     gchar * keyboard_filename;
     gchar * keyboard_icon_filename;
+    gchar * keyboard_id;
     gchar * keyboard_name;
     gchar * keyboard_language;
     gchar * keyboard_author;

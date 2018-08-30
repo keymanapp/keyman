@@ -17,6 +17,7 @@ libkmflcomp.so.0 libkmflcomp0 #MINVER#
  caller@Base 0.9.10
  check_bitmap_file@Base 0.9.10
  check_keyboard@Base 0.9.10
+ check_linux_target@Base 10.99.1
  check_lhs@Base 0.9.10
  check_rhs@Base 0.9.10
  check_rule@Base 0.9.10
@@ -44,6 +45,7 @@ libkmflcomp.so.0 libkmflcomp0 #MINVER#
  find_store@Base 0.9.10
  gp@Base 0.9.10
  group_number@Base 0.9.10
+ ignored_stores@Base 10.99.1
  initialize_special_stores@Base 0.9.10
  items_from_string@Base 0.9.10
  items_to_string@Base 0.9.10
@@ -83,6 +85,7 @@ libkmflcomp.so.0 libkmflcomp0 #MINVER#
  store_number@Base 0.9.10
  string_to_keysym@Base 0.9.10
  text_to_keysym@Base 0.9.10
+ valid_targets@Base 10.99.1
  warncount@Base 0.9.10
  warnlimit@Base 0.9.10
  write_keyboard@Base 0.9.10
