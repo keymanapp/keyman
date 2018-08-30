@@ -98,6 +98,14 @@ window.editorGlobalContext = {
     context.loading = false;
   };
 
+  context.setText = function (text) {
+    let range = editor.session.selection.getRange();
+    context.loading = true;
+    editor.session.setValue(text);
+    editor.session.selection.setSelectionRange(range);
+    context.loading = false;
+  };
+
   /* Printing */
 
   context.print = function () {

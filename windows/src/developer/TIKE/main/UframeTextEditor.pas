@@ -849,24 +849,31 @@ begin
 end;
 
 function TframeTextEditor.OffsetToLine(Offset: Integer): Integer;   // I4083
+var
+  line: Integer;
 begin
   Result := 0;
-//  while (Result < memo.ParagraphCount) and (Offset > memo.PargrphOffset[Result]) do
-//    Inc(Result);
+
+  with TStringList.Create do
+  try
+    Text := Self.GetText;
+    line := 0;
+    while offset > 0 do
+    begin
+      Dec(offset, Strings[line].Length + 2);
+      Inc(line);
+    end;
+  finally
+    Free;
+  end;
+
+  Result := line;
 end;
 
 procedure TframeTextEditor.FindErrorByOffset(offset: Integer);   // I4083
 begin
   ClearError;
-
-  {TODO: if offset <= 0 then Exit;
-
-  memo.SelStart := offset;
-  memo.SelCol := 0;
-  memo.ScrollInView;
-  FErrorPar := memo.SelLine;
-
-  UpdateParColour(FErrorPar, pcltError);}
+  FindError(OffsetToLine(offset));
 end;
 
 procedure TframeTextEditor.FireCommand(const commands: TStringList);
