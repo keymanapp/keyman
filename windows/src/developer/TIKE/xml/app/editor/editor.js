@@ -89,6 +89,14 @@ window.editorGlobalContext = {
     let newRange = new ace.Range(o.top, o.left, end.row, end.column);
     editor.selection.setSelectionRange(newRange, false);
   };
+  
+  context.setText = function (text) {
+    let range = editor.session.selection.getRange();
+    context.loading = true;
+    editor.session.setValue(text);
+    editor.session.selection.setSelectionRange(range);
+    context.loading = false;
+  };
 
   /* Printing */
 
@@ -202,14 +210,15 @@ window.editorGlobalContext = {
     editor.session.on('changeOverwrite', updateState);
     editor.session.selection.on('changeSelection', updateState);
     
-    editor.session.on('change', function(delta) {
-      if(!context.loading) {
-        $.post("/app/source/file", {
-          Filename: filename,
-          Data: editor.session.getValue()
-          // delta.start, delta.end, delta.lines, delta.action
-        });
-        context.highlightError();//clear the selected error
+    editor.session.on('change', function (delta) {
+      // Even when loading, we post back the data to the backend so we have an original version
+      $.post("/app/source/file", {
+        Filename: filename,
+        Data: editor.session.getValue()
+        // delta.start, delta.end, delta.lines, delta.action
+      });
+      if (!context.loading) {
+        context.highlightError(); // clear the selected error
         command('modified');
         updateState();
       }

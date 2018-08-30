@@ -2523,16 +2523,10 @@ begin
 end;
 
 procedure TfrmKeymanWizard.MoveParserToSource;   // I4557
-var
-  FLine: Integer;
 begin
   FCurrentRule := nil;
   FKeyboardParser.AddRequiredLines;
-  FLine := (frameSource as IKMDTextEditorActions).SelectedRow;
   frameSource.EditorText := FKeyboardParser.KeyboardText;
-  frameSource.SetSelectedRow(FLine);
-
-//  FreeAndNil(FKeyboardParser);
 end;
 
 procedure TfrmKeymanWizard.MoveSourceToParser(UpdateLRShift, FixupShiftStates: Boolean);   // I4137
