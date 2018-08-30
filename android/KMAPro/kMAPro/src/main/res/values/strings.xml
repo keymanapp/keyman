@@ -2,6 +2,8 @@
 <resources>
 
     <string name="app_name" translatable="false">Keyman</string>
+    <string name="splash_version" translatable="false">Version</string>
+    <string name="splash_copyright" translatable="false">Copyright &#169; 1992-</string>
     <string name="action_settings" translatable="false">Settings</string>
     <string name="action_share" translatable="false">Share</string>
     <string name="action_web" translatable="false">Web Browser</string>

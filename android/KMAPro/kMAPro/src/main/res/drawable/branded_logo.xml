@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque">
+
+    <!-- background color -->
+    <item android:drawable="@android:color/white" />
+
+    <!-- product logos -->
+    <item
+        android:bottom="@dimen/product_logo_bottom">
+        <bitmap
+            android:src="@drawable/keyman_logo_splash"
+            android:gravity="center"/>
+    </item>
+
+    <item>
+        <bitmap
+            android:src="@drawable/sil_logo_blue_2017_1"
+            android:gravity="center"/>
+    </item>
+
+    <!-- Text will be overlayed by SplashScreenActivity -->
+
+</layer-list>
