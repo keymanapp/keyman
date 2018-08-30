@@ -3,8 +3,8 @@
 import argparse
 import os
 import json
-from keyman.kmpmetadata import parsemetadata, parseinfdata
-from keyman.get_kmp import get_keyboard_data
+from keymanconfig.kmpmetadata import parsemetadata, parseinfdata
+from keymanconfig.get_kmp import get_keyboard_data
 
 def get_installed_kmp():
     """

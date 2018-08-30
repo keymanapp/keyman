@@ -2,9 +2,9 @@
 
 import argparse
 import sys
-from keyman.install_kmp import install_kmp
-from keyman.list_installed_kmp import get_kmp_version
-from keyman.get_kmp import get_keyboard_data, get_kmp
+from keymanconfig.install_kmp import install_kmp
+from keymanconfig.list_installed_kmp import get_kmp_version
+from keymanconfig.get_kmp import get_keyboard_data, get_kmp
 
 def main():
 	parser = argparse.ArgumentParser(description='Install a Keyman keyboard, either a local .kmp file or specify a keyboard id to download and install')

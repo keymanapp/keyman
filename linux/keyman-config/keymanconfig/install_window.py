@@ -13,14 +13,14 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit', '3.0')
 from gi.repository import Gtk, WebKit
 from distutils.version import StrictVersion
-from keyman.install_kmp import install_kmp, extract_kmp, get_metadata
-from keyman.list_installed_kmp import get_kmp_version
-from keyman.kmpmetadata import get_fonts
-from keyman.welcome import WelcomeView
-from keyman.uninstall_kmp import uninstall_kmp
-from keyman.get_kmp import get_download_folder
-from keyman.check_mime_type import check_mime_type
-from keyman.accelerators import bind_accelerator, init_accel
+from keymanconfig.install_kmp import install_kmp, extract_kmp, get_metadata
+from keymanconfig.list_installed_kmp import get_kmp_version
+from keymanconfig.kmpmetadata import get_fonts
+from keymanconfig.welcome import WelcomeView
+from keymanconfig.uninstall_kmp import uninstall_kmp
+from keymanconfig.get_kmp import get_download_folder
+from keymanconfig.check_mime_type import check_mime_type
+from keymanconfig.accelerators import bind_accelerator, init_accel
 
 class InstallKmpWindow(Gtk.Window):
 
@@ -95,7 +95,7 @@ class InstallKmpWindow(Gtk.Window):
             else:
                 img_default = "/usr/share/keyman/icons/defaultpackage.gif"
                 if not os.path.isfile(img_default):
-                    img_default = "keyman/icons/defaultpackage.gif"
+                    img_default = "keymanconfig/icons/defaultpackage.gif"
                 if not os.path.isfile(img_default):
                     img_default = "defaultpackage.gif"
                 if not os.path.isfile(img_default):

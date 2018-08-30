@@ -3,7 +3,7 @@
 import argparse
 import os.path
 import sys
-from keyman.kvk2ldml import parse_kvk_file, print_kvk, convert_ldml, output_ldml
+from keymanconfig.kvk2ldml import parse_kvk_file, print_kvk, convert_ldml, output_ldml
 
 
 # import struct

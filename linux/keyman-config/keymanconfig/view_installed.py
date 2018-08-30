@@ -6,13 +6,13 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk, Gdk
-from keyman.list_installed_kmp import get_installed_kmp
-from keyman.welcome import WelcomeView
-from keyman.keyboard_details import KeyboardDetailsView
-from keyman.downloadkeyboard import DownloadKmpWindow
-from keyman.install_window import InstallKmpWindow
-from keyman.uninstall_kmp import uninstall_kmp
-from keyman.accelerators import bind_accelerator, init_accel
+from keymanconfig.list_installed_kmp import get_installed_kmp
+from keymanconfig.welcome import WelcomeView
+from keymanconfig.keyboard_details import KeyboardDetailsView
+from keymanconfig.downloadkeyboard import DownloadKmpWindow
+from keymanconfig.install_window import InstallKmpWindow
+from keymanconfig.uninstall_kmp import uninstall_kmp
+from keymanconfig.accelerators import bind_accelerator, init_accel
 
 class KeyboardBox(Gtk.Box):
     def __init__(self, kmp, window):
@@ -25,7 +25,7 @@ class KeyboardBox(Gtk.Box):
         if not os.path.isfile(icofile):
             icofile = "/usr/share/keyman/icons/icon_kmp.png"
         if not os.path.isfile(icofile):
-            icofile = "keyman/icons/icon_kmp.png"
+            icofile = "keymanconfig/icons/icon_kmp.png"
         if not os.path.isfile(icofile):
             icofile = "icon_kmp.png"
         if not os.path.isfile(icofile):
@@ -44,7 +44,7 @@ class KeyboardBox(Gtk.Box):
 
         img_expand = "/usr/share/keyman/icons/expand20.png"
         if not os.path.isfile(img_expand):
-            img_expand = "keyman/icons/expand20.png"
+            img_expand = "keymanconfig/icons/expand20.png"
         if not os.path.isfile(img_expand):
             img_expand = "expand20.png"
         if not os.path.isfile(img_expand):
@@ -59,7 +59,7 @@ class KeyboardBox(Gtk.Box):
 
         img_cross = "/usr/share/keyman/icons/cross20.png"
         if not os.path.isfile(img_cross):
-            img_cross = "keyman/icons/cross20.png"
+            img_cross = "keymanconfig/icons/cross20.png"
         if not os.path.isfile(img_cross):
             img_cross = "cross20.png"
         if not os.path.isfile(img_cross):
@@ -76,7 +76,7 @@ class KeyboardBox(Gtk.Box):
         if os.path.isfile(welcome_file):
             img_help = "/usr/share/keyman/icons/help20.png"
             if not os.path.isfile(img_help):
-                img_help = "keyman/icons/help20.png"
+                img_help = "keymanconfig/icons/help20.png"
             if not os.path.isfile(img_help):
                 img_help = "help20.png"
             if not os.path.isfile(img_help):
