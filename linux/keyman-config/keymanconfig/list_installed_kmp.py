@@ -25,7 +25,7 @@ def get_installed_kmp():
     check_paths = [ "/usr/share/keyman", "/usr/local/share/keyman" ]
     for keymanpath in check_paths:
         for o in os.listdir(keymanpath):
-            if os.path.isdir(os.path.join(keymanpath,o)):
+            if os.path.isdir(os.path.join(keymanpath,o)) and o != "icons":
                 name = md_name = version = md_version = description = kbdata = None
                 metadata = parsemetadata(os.path.join(keymanpath, o, "kmp.json"))
                 if not metadata[0]:

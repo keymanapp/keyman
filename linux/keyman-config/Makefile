@@ -2,12 +2,13 @@
 
 VERSION=10.99.1
 
-dist:
-	-rm -rf dist
+clean:
+	-rm -rf dist dist_deb build
+
+dist: clean
 	python3 setup.py sdist
 
-deb: dist
-	-rm -rf dist_deb
+deb: clean dist
 	-mkdir dist_deb
 	cd dist_deb && tar xf ../dist/keyman_config-$(VERSION).tar.gz && \
 		mv keyman_config-$(VERSION) keyman-config-$(VERSION) && \
