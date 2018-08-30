@@ -12,7 +12,8 @@ import java.util.Calendar;
 
 public class SplashScreenActivity extends Activity {
 
-  private static int SPLASH_TIME_OUT = 1000; // msec
+  // For now, disable this Activity so app is not delayed showing version/copyright text
+  private static int SPLASH_TIME_OUT = 0; // msec
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
