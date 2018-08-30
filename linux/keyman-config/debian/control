@@ -15,7 +15,7 @@ Description: Keyman for Linux configuration
 
 Package: keyman-config
 Architecture: all
-Depends: python3-keyman-config
+Depends: ${misc:Depends}, python3-keyman-config
 Description: Keyman for Linux configuration
  Install, uninstall and view information about Keyman keyboard
  packages.

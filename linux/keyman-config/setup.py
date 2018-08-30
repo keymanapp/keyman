@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 setup(
-    name="keyman-config",
+    name="keyman_config",
     version="10.99.1",
     packages=find_packages(),
     scripts=['keyman-config', 'get_kmp',
@@ -25,5 +25,5 @@ setup(
         "Bug Tracker": "https://github.com/keymanapp/issues",
         "Source Code": "https://github.com/keymanapp/keyman/linux/tree/master/linux/keyman-config",
     },
-    include_package_data=True,
+    # include_package_data=True,
 )
