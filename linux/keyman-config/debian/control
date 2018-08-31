@@ -8,7 +8,8 @@ Homepage: http://www.keyman.com/
 
 Package: python3-keyman-config
 Architecture: all
-Depends: ${misc:Depends}, ${python3:Depends}, kmflcomp, dconf-cli
+Depends: ${misc:Depends}, ${python3:Depends}, python3-gi, gir1.2-webkit-3.0,
+ kmflcomp, dconf-cli
 Description: Keyman for Linux configuration
  Install, uninstall and view information about Keyman keyboard
  packages.

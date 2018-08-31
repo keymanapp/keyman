@@ -12,6 +12,7 @@ setup(
 
     install_requires=[
         'lxml', 'numpy', 'PIL', 'requests', 'requests-cache',
+        'python-magic',
     ],
 
 # metadata to display on PyPI
