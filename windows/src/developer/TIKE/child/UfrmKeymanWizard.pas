@@ -552,6 +552,7 @@ uses
   System.Win.ComObj,
 
   Keyman.Developer.System.HelpTopics,
+  Keyman.UI.FontUtils,
 
   CharacterDragObject,
   CharacterInfo,
@@ -801,8 +802,6 @@ end;
 procedure TfrmKeymanWizard.CodeFontChanged;
 begin
   inherited;
-  if CodeFont.Size <> CharFont.Size then
-    CharFont.Size := CodeFont.Size;
   frameSource.CodeFont := CodeFont;
 end;
 
@@ -1787,27 +1786,6 @@ begin
   Result := 'Keyboard definitions (*.kmn)|*.kmn';
 end;
 
-function FontSizeToStr(const name: string; sz: Integer): string;   // I4872
-var
-  tm: TTextMetric;
-begin
-  if sz < 0 then
-  begin
-    with TBitmap.Create do
-    try
-      Canvas.Font.Name := name;
-      Canvas.Font.Size := sz;
-      Canvas.TextExtent('A');
-      GetTextMetrics(Canvas.Handle, tm);
-      Result := IntToStr((Canvas.Font.Height - tm.tmInternalLeading) * 72 div GetDeviceCaps(Canvas.Handle, LOGPIXELSY));
-    finally
-      Free;
-    end;
-  end
-  else
-    Result := IntToStr(sz);
-end;
-
 function TfrmKeymanWizard.GetFontInfo(Index: TKeyboardFont): TKeyboardFontInfo;   // I4057
 begin
   case Index of
@@ -1815,13 +1793,13 @@ begin
       begin
         Result.Enabled := True;
         Result.Name := CodeFont.Name;
-        Result.Size := FontSizeToStr(CodeFont.Name, CodeFont.Size);   // I4872
+        Result.Size := IntToStr(TFontUtils.FontSizeInPoints(CodeFont.Name, CodeFont.Size));   // I4872
       end;
     kfontChar:
       begin
         Result.Enabled := True;
         Result.Name := CharFont.Name;
-        Result.Size := FontSizeToStr(CharFont.Name, CharFont.Size);   // I4872
+        Result.Size := IntToStr(TFontUtils.FontSizeInPoints(CharFont.Name, CharFont.Size));   // I4872
       end;
     kfontOSK:
       begin
@@ -1829,7 +1807,7 @@ begin
         if Result.Enabled then
         begin
           Result.Name := frameOSK.KeyFont.Name;
-          Result.Size := FontSizeToStr(frameOSK.KeyFont.Name, frameOSK.KeyFont.Size);   // I4872
+          Result.Size := IntToStr(TFontUtils.FontSizeInPoints(frameOSK.KeyFont.Name, frameOSK.KeyFont.Size));   // I4872
         end;
       end;
     kfontTouchLayoutPhone, kfontTouchLayoutTablet, kfontTouchLayoutDesktop:
@@ -2470,9 +2448,6 @@ end;
 procedure TfrmKeymanWizard.CharFontChanged;
 begin
   inherited;
-  if CodeFont.Size <> CharFont.Size then
-    CodeFont.Size := CharFont.Size;
-
   UpdateKeyFont;
   //VK_UpdateKeyFont;
   frameSource.CharFont := CharFont;

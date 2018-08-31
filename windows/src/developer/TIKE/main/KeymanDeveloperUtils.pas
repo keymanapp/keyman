@@ -281,10 +281,10 @@ var
 begin
   if s = '' then
   begin
-    // We set to Courier New, 12pt
-    f.Name := 'Courier New';
-    f.Charset := ANSI_CHARSET;    // 02/02/2003 MCD: Added, charset not set when resetting to default font 
-    f.Size := 12;
+    // We set to Consolas, 12px as default
+    f.Name := 'Consolas';
+    f.Charset := ANSI_CHARSET;    // 02/02/2003 MCD: Added, charset not set when resetting to default font
+    f.Height := 12;
     f.Style := [];
     f.Color := clWindowText;
     Exit;

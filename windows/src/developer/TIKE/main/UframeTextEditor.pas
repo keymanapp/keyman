@@ -45,7 +45,7 @@ type
   private
     class var FInitialFilenameIndex: Integer;
   private
-
+    FCharFont, FCodeFont: TFont;
     FSelectedRange: TRect;
     FSelectedRangeIsBackwards: Boolean;
     FHasBeenLoaded: Boolean;
@@ -97,6 +97,7 @@ type
     procedure SetCursorPosition(AColumn, ARow: Integer);
     procedure cefLoadEnd(Sender: TObject);
     procedure DoBreakpointClicked(const line: string);
+    procedure UpdateEditorFonts;
 
   protected
     function GetHelpTopic: string; override;
@@ -179,6 +180,7 @@ uses
   Vcl.Clipbrd,
 
   Keyman.Developer.System.HelpTopics,
+  Keyman.UI.FontUtils,
 
   dmActionsMain,
   dmActionsTextEditor,
@@ -296,6 +298,9 @@ procedure TframeTextEditor.FormCreate(Sender: TObject);
 begin
   inherited;
 
+  FCharFont := TFont.Create;
+  FCodeFont := TFont.Create;
+
   cef := TframeCEFHost.Create(Self);
   cef.ShouldShowContextMenu := True;
   cef.Parent := Self;
@@ -340,18 +345,12 @@ end;
 
 function TframeTextEditor.GetCharFont: TFont;
 begin
-Result := Font;
-//  if FEditorFormat = efHTML
-//    then Result := memo.Font   // I1426 - script tags should be 'code' font
-//    else Result := Memo.AltFont;
+  Result := FCharFont;
 end;
 
 function TframeTextEditor.GetCodeFont: TFont;
 begin
-  Result := Font;
-//  if FEditorFormat = efHTML
-//    then Result := Memo.AltFont  // I1426 - script tags should be 'code' font
-//    else Result := Memo.Font;
+  Result := FCodeFont;
 end;
 
 function TframeTextEditor.GetEditorFormat: TEditorFormat;
@@ -427,6 +426,10 @@ procedure TframeTextEditor.LoadFileInBrowser(const AData: string);
     Inc(FInitialFilenameIndex);
     Result := '*texteditor*'+IntToStr(FInitialFilenameIndex);
   end;
+  function EncodeFont(const prefix: string; f: TFont): string;
+  begin
+    Result := Format('&%sName=%s&%sSize=%dpt', [prefix, URLEncode(f.Name), prefix, TFontUtils.FontSizeInPoints(f)]);
+  end;
 const
   mode: array[TEditorFormat] of string = (
     'keyman', 'xml', 'text', 'html', 'json', 'javascript', 'css'
@@ -435,7 +438,12 @@ begin
   if FFilename = '' then
     FFilename := GenerateNewFilename;
   modWebHTTPServer.AppSource.RegisterSource(FFilename, AData, True);
-  cef.Navigate(modWebHttpServer.GetLocalhostURL + '/app/editor/?mode='+mode[FEditorFormat]+'&filename='+URLEncode(FFilename));   // I4195
+  cef.Navigate(
+    modWebHttpServer.GetLocalhostURL + '/app/editor/'+
+    '?mode='+mode[FEditorFormat]+
+    '&filename='+URLEncode(FFilename)+
+    EncodeFont('charFont', FCharFont)+
+    EncodeFont('codeFont', FCodeFont));
 end;
 
 procedure TframeTextEditor.LoadFromFile(AFileName: WideString;
@@ -568,18 +576,37 @@ end;
 
 procedure TframeTextEditor.SetCharFont(const Value: TFont);
 begin
-// TODO: fonts
-//  if FEditorFormat = efHTML
-//    then memo.Font := Value  // I1426 - script tags should be 'code' font
-//    else memo.AltFont := Value;
+  FCharFont.Assign(Value);
+  UpdateEditorFonts;
 end;
 
 procedure TframeTextEditor.SetCodeFont(const Value: TFont);
 begin
-// TODO: fonts
-//  if FEditorFormat = efHTML
-//    then memo.AltFont := Value  // I1426 - script tags should be 'code' font
-//    else memo.Font := Value;
+  FCodeFont.Assign(Value);
+  UpdateEditorFonts;
+end;
+
+procedure TframeTextEditor.UpdateEditorFonts;
+  function FontToJSON(f: TFont): TJSONObject;
+  begin
+    Result := TJSONObject.Create;
+    Result.AddPair('name', f.Name);
+    Result.AddPair('size', IntToStr(TFontUtils.FontSizeInPoints(f))+'pt');
+  end;
+var
+  j: TJSONObject;
+begin
+  if not FHasBeenLoaded then
+    Exit;
+
+  j := TJSONObject.Create;
+  try
+    j.AddPair('codeFont', FontToJSON(FCodeFont));
+    j.AddPair('charFont', FontToJSON(FCharFont));
+    ExecuteCommand('setFonts', j);
+  finally
+    j.Free;
+  end;
 end;
 
 procedure TframeTextEditor.SetEditorFormat(const Value: TEditorFormat);
@@ -1017,6 +1044,9 @@ begin
   inherited;
   if FFileName <> '' then
     modWebHttpServer.AppSource.UnregisterSource(FFileName);
+
+  FreeAndNil(FCharFont);
+  FreeAndNil(FCodeFont);
 end;
 
 end.

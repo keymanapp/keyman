@@ -15,10 +15,11 @@ window.editorGlobalContext = {
   var errorRange = null;
   var executionPoint = [];
   var breakpoints = [];
+  var fontCss = null;
   let params = (new URL(location)).searchParams;
   let filename = params.get('filename');
   let mode = params.get('mode');
-  
+
   if(!mode) {
     mode = 'keyman';
   }
@@ -187,6 +188,25 @@ window.editorGlobalContext = {
     editor.setValue(text);
     editor.setSelection(range);
     context.loading = false;
+  };
+
+  //
+  // Set character and code fonts
+  //
+
+  context.setFonts = function (fonts) {
+    if (fonts == null) {
+      return false;
+    }
+
+    if (!fontCss) {
+      fontCss = document.createElement('style');
+      document.head.appendChild(fontCss);
+    }
+
+    fontCss.innerHTML =
+      ".monaco-editor .view-lines { font-size: " + fonts.codeFont.size + "; font-family: \"" + fonts.codeFont.name + "\"; }" +
+      ".mtk20, .mtk8 { font-size: " + fonts.charFont.size + "; font-family: \"" + fonts.charFont.name + "\"; }";
   };
 
   //

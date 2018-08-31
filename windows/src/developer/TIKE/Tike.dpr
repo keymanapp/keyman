@@ -266,7 +266,8 @@ uses
   Keyman.Developer.System.HttpServer.App in 'http\Keyman.Developer.System.HttpServer.App.pas',
   Keyman.Developer.System.HttpServer.Base in 'http\Keyman.Developer.System.HttpServer.Base.pas',
   UfrmProject in 'project\UfrmProject.pas' {frmProject},
-  Keyman.Developer.System.HttpServer.AppSource in 'http\Keyman.Developer.System.HttpServer.AppSource.pas';
+  Keyman.Developer.System.HttpServer.AppSource in 'http\Keyman.Developer.System.HttpServer.AppSource.pas',
+  Keyman.UI.FontUtils in '..\..\global\delphi\general\Keyman.UI.FontUtils.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
