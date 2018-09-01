@@ -17,9 +17,9 @@ deb: clean dist
 	cd make_deb/keyman-config-$(VERSION) && debuild -us -uc
 
 man:
-	help2man -N ./get_kmp -o debian/man/get_kmp.1
-	help2man -N ./install_kmp -o debian/man/install_kmp.1
-	help2man -N ./kvk2ldml -o debian/man/kvk2ldml.1
-	help2man -N ./list_installed_kmp -o debian/man/list_installed_kmp.1
-	help2man -N ./uninstall_kmp -o debian/man/uninstall_kmp.1
+	help2man -N ./get_kmp -o debian/man/get_kmp.1 -n "Download a Keyman keyboard package"
+	help2man -N ./install_kmp -o debian/man/install_kmp.1 -n "Install a Keyman keyboard package"
+	help2man -N ./kvk2ldml -o debian/man/kvk2ldml.1 -n "Convert a Keyman on-screen keyboard file to LDML"
+	help2man -N ./list_installed_kmp -o debian/man/list_installed_kmp.1 -n "List installed Keyman keyboard packages"
+	help2man -N ./uninstall_kmp -o debian/man/uninstall_kmp.1 -n "Uninstall a Keyman keyboard package"
 

@@ -8,7 +8,7 @@ from keyman_config import __version__
 from keyman_config.kvk2ldml import parse_kvk_file, print_kvk, convert_ldml, output_ldml
 
 def main():
-    parser = argparse.ArgumentParser(description='Convert a Keyman kvk on-screen keyboard file to an LDML file')
+    parser = argparse.ArgumentParser(description='Convert a Keyman kvk on-screen keyboard file to an LDML file. Optionally print the details of the kvk file.')
     parser.add_argument('-p', "--print", help='print kvk details', action="store_true")
     parser.add_argument('-k', "--keys", help='if printing also print all keys', action="store_true")
     parser.add_argument('kvkfile', help='kvk file')
