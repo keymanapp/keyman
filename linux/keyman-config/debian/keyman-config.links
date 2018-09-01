@@ -1,0 +1,7 @@
+/usr/share/keyman-config/get_kmp /usr/bin/get_kmp
+/usr/share/keyman-config/install_kmp /usr/bin/install_kmp
+/usr/share/keyman-config/keyman-config /usr/bin/keyman-config
+/usr/share/keyman-config/kmpmetadata /usr/bin/kmpmetadata
+/usr/share/keyman-config/kvk2ldml /usr/bin/kvk2ldml
+/usr/share/keyman-config/list_installed_kmp /usr/bin/list_installed_kmp
+/usr/share/keyman-config/uninstall_kmp /usr/bin/uninstall_kmp

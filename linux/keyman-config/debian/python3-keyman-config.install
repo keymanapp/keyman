@@ -1,1 +1,1 @@
-debian/python3-keymanconfig/usr/lib/* /usr/lib/
+#debian/python3-keyman-config/usr/lib/* /usr/lib

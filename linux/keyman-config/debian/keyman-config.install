@@ -1,3 +1,2 @@
-debian/python3-keymanconfig/usr/bin/* /usr/bin
-./keymanconfig/icons/* /usr/share/keyman/icons/
+./keyman_config/icons/* /usr/share/keyman/icons/
 

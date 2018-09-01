@@ -1,2 +1,2 @@
-recursive-include keymanconfig/icons *
+recursive-include keyman_config/icons *
 recursive-include fontconfig *
