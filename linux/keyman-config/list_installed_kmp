@@ -2,7 +2,7 @@
 
 import argparse
 import os
-from keymanconfig.list_installed_kmp import get_installed_kmp
+from keyman_config.list_installed_kmp import get_installed_kmp
 
 def main():
     parser = argparse.ArgumentParser(description='Show installed keyman keyboards.')

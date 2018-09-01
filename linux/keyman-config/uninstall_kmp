@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import sys
-from keymanconfig.uninstall_kmp import uninstall_kmp
+from keyman_config.uninstall_kmp import uninstall_kmp
 
 def main(argv):
 	if len(sys.argv) != 2:

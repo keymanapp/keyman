@@ -3,7 +3,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from keymanconfig.view_installed import ViewInstalledWindow
+from keyman_config.view_installed import ViewInstalledWindow
 
 if __name__ == '__main__':
     w = ViewInstalledWindow()

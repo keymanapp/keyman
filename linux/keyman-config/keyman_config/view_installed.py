@@ -6,13 +6,13 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk, Gdk
-from keymanconfig.list_installed_kmp import get_installed_kmp
-from keymanconfig.welcome import WelcomeView
-from keymanconfig.keyboard_details import KeyboardDetailsView
-from keymanconfig.downloadkeyboard import DownloadKmpWindow
-from keymanconfig.install_window import InstallKmpWindow
-from keymanconfig.uninstall_kmp import uninstall_kmp
-from keymanconfig.accelerators import bind_accelerator, init_accel
+from keyman_config.list_installed_kmp import get_installed_kmp
+from keyman_config.welcome import WelcomeView
+from keyman_config.keyboard_details import KeyboardDetailsView
+from keyman_config.downloadkeyboard import DownloadKmpWindow
+from keyman_config.install_window import InstallKmpWindow
+from keyman_config.uninstall_kmp import uninstall_kmp
+from keyman_config.accelerators import bind_accelerator, init_accel
 
 class KeyboardBox(Gtk.Box):
     def __init__(self, kmp, window):

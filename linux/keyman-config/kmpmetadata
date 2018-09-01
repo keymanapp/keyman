@@ -2,7 +2,7 @@
 
 import sys
 import os.path
-from keymanconfig.kmpmetadata import parseinfdata, parsemetadata
+from keyman_config.kmpmetadata import parseinfdata, parsemetadata
 
 def main(argv):
 	if len(sys.argv) != 2:

@@ -13,11 +13,11 @@ from ast import literal_eval
 
 import requests
 
-from keymanconfig.get_kmp import get_keyboard_data, get_kmp
-from keymanconfig.kmpmetadata import determine_filetype, parseinfdata, parsemetadata
-from keymanconfig.uninstall_kmp import uninstall_kmp
-from keymanconfig.convertico import checkandsaveico
-from keymanconfig.kvk2ldml import convert_kvk_to_ldml, output_ldml
+from keyman_config.get_kmp import get_keyboard_data, get_kmp
+from keyman_config.kmpmetadata import determine_filetype, parseinfdata, parsemetadata
+from keyman_config.uninstall_kmp import uninstall_kmp
+from keyman_config.convertico import checkandsaveico
+from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
 
 def list_files(directory, extension):
 	return (f for f in listdir(directory) if f.endswith('.' + extension))

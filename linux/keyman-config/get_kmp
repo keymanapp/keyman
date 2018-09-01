@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import sys
-from keymanconfig.get_kmp import get_kmp
+from keyman_config.get_kmp import get_kmp
 
 def main(argv):
 	if len(sys.argv) != 2:

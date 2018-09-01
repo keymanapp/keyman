@@ -9,10 +9,10 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit', '3.0')
 from gi.repository import Gtk, WebKit
-from keymanconfig.get_kmp import get_download_folder, download_kmp_file
-from keymanconfig.install_window import InstallKmpWindow
-from keymanconfig.check_mime_type import check_mime_type
-from keymanconfig.accelerators import bind_accelerator, init_accel
+from keyman_config.get_kmp import get_download_folder, download_kmp_file
+from keyman_config.install_window import InstallKmpWindow
+from keyman_config.check_mime_type import check_mime_type
+from keyman_config.accelerators import bind_accelerator, init_accel
 
 class DownloadKmpWindow(Gtk.Window):
 

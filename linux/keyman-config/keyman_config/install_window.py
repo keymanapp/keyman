@@ -13,14 +13,14 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit', '3.0')
 from gi.repository import Gtk, WebKit
 from distutils.version import StrictVersion
-from keymanconfig.install_kmp import install_kmp, extract_kmp, get_metadata
-from keymanconfig.list_installed_kmp import get_kmp_version
-from keymanconfig.kmpmetadata import get_fonts
-from keymanconfig.welcome import WelcomeView
-from keymanconfig.uninstall_kmp import uninstall_kmp
-from keymanconfig.get_kmp import get_download_folder
-from keymanconfig.check_mime_type import check_mime_type
-from keymanconfig.accelerators import bind_accelerator, init_accel
+from keyman_config.install_kmp import install_kmp, extract_kmp, get_metadata
+from keyman_config.list_installed_kmp import get_kmp_version
+from keyman_config.kmpmetadata import get_fonts
+from keyman_config.welcome import WelcomeView
+from keyman_config.uninstall_kmp import uninstall_kmp
+from keyman_config.get_kmp import get_download_folder
+from keyman_config.check_mime_type import check_mime_type
+from keyman_config.accelerators import bind_accelerator, init_accel
 
 class InstallKmpWindow(Gtk.Window):
 
