@@ -10,16 +10,27 @@ def uninstall_from_ibus(keyboardid):
 	kbdir = os.path.join('/usr/local/share/keyman', keyboardid)
 	kmnfile = os.path.join(kbdir, keyboardid+".kmn")
 	print("Uninstalling", kmnfile, "from IBus")
-	result = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],
-		stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
+	if sys.version_info.major == 3 and sys.version_info.minor < 6:
+		result = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],
+			stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
+		print(result.stdout.decode("utf-8", "strict"))
+		dconfread = result.stdout.decode("utf-8", "strict")
+	else:
+		result = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],
+			stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
+		dconfread = result.stdout
 	if (result.returncode == 0):
-		preload_engines = ast.literal_eval(result.stdout)
+		preload_engines = ast.literal_eval(dconfread)
 		if kmnfile not in preload_engines:
 			print(kmnfile, "is not installed in IBus")
 			return
 		preload_engines.remove(kmnfile)
-		result2 = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
-			stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
+		if sys.version_info.major == 3 and sys.version_info.minor < 6:
+			result2 = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
+				stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
+		else:
+			result2 = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
+				stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
 
 def uninstall_kmp(keyboardid):
 	"""

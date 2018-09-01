@@ -195,13 +195,24 @@ def install_kmp(inputfile, online=False):
 					copy2(fpath+".bmp", kbdir)
 			if install_to_ibus:
 				print("Installing", kbid, "into IBus")
-				dconfread = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],
-				    stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
-				if (dconfread.returncode == 0):
-					preload_engines = literal_eval(dconfread.stdout)
-					preload_engines.append(kmn_file)
-					dconfwrite = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
+				if sys.version_info.major == 3 and sys.version_info.minor < 6:
+					dconfreadresult = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],
+						stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
+					dconfread = dconfreadresult.stdout.decode("utf-8", "strict")
+				else:
+					dconfreadresult = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],
 						stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
+					dconfread = dconfreadresult.stdout
+				if (dconfreadresult.returncode == 0):
+					preload_engines = literal_eval(dconfread)
+					preload_engines.append(kmn_file)
+					if sys.version_info.major == 3 and sys.version_info.minor < 6:
+						dconfwriteresult = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
+							stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
+					else:
+						dconfwriteresult = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
+							stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
+
 		else:
 			print("install_kmp.py: error: No kmp.json or kmp.inf found in", inputfile)
 			print("Contents of", inputfile+":")
