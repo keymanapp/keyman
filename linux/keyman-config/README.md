@@ -2,9 +2,16 @@
 
 ## Preparing to run
 
-Requires python3-requests and python3-requests-cache packages
+If you are running from the repo or installing keyman-config manually rather than from a package
+then you will need to
 
-If not already installed it needs python3, python3-gi
+`sudo apt install python3-lxml python3-magic python3-numpy python3-pil python3-requests 
+python3-requests-cache python3 python3-gi gir1.2-webkit-3.0 dconf-cli`
+
+You will also need kmflcomp either from a package or built and installed locally.
+
+run the script `./createkeymandirs.sh` to create the directories for these programs to
+install the packages to
 
 ## Things to run
 
@@ -55,3 +62,11 @@ Command line uninstaller for kmp
 `list_installed_kmp` shows name, version, id, description of each installed keyboard
 
 `list_installed_kmp.py` shows name, version, id of each installed keyboard
+
+## Building the Debian package
+
+You will need the build dependencies
+
+`sudo apt install dh-python python3-setuptools python3-all debhelper`
+
+Run `make deb`. This will build the Debian package in the make_deb directory.
