@@ -15,3 +15,11 @@ deb: clean dist
 		tar cfz keyman-config_$(VERSION).orig.tar.gz keyman-config-$(VERSION) && \
 		cd keyman-config-$(VERSION) && cp -a ../../debian .
 	cd make_deb/keyman-config-$(VERSION) && debuild -us -uc
+
+man:
+	help2man -N ./get_kmp -o debian/man/get_kmp.1
+	help2man -N ./install_kmp -o debian/man/install_kmp.1
+	help2man -N ./kvk2ldml -o debian/man/kvk2ldml.1
+	help2man -N ./list_installed_kmp -o debian/man/list_installed_kmp.1
+	help2man -N ./uninstall_kmp -o debian/man/uninstall_kmp.1
+

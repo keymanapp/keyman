@@ -10,7 +10,7 @@ setup(
     packages=find_packages(),
     scripts=['keyman-config', 'get_kmp',
              'install_kmp', 'kvk2ldml',
-             'uninstall_kmp', 'kmpmetadata',
+             'uninstall_kmp',
              'list_installed_kmp', ],
 
     install_requires=[
