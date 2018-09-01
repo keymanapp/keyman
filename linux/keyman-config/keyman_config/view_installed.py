@@ -25,7 +25,7 @@ class KeyboardBox(Gtk.Box):
         if not os.path.isfile(icofile):
             icofile = "/usr/share/keyman/icons/icon_kmp.png"
         if not os.path.isfile(icofile):
-            icofile = "keymanconfig/icons/icon_kmp.png"
+            icofile = "keyman_config/icons/icon_kmp.png"
         if not os.path.isfile(icofile):
             icofile = "icon_kmp.png"
         if not os.path.isfile(icofile):
@@ -44,7 +44,7 @@ class KeyboardBox(Gtk.Box):
 
         img_expand = "/usr/share/keyman/icons/expand20.png"
         if not os.path.isfile(img_expand):
-            img_expand = "keymanconfig/icons/expand20.png"
+            img_expand = "keyman_config/icons/expand20.png"
         if not os.path.isfile(img_expand):
             img_expand = "expand20.png"
         if not os.path.isfile(img_expand):
@@ -59,7 +59,7 @@ class KeyboardBox(Gtk.Box):
 
         img_cross = "/usr/share/keyman/icons/cross20.png"
         if not os.path.isfile(img_cross):
-            img_cross = "keymanconfig/icons/cross20.png"
+            img_cross = "keyman_config/icons/cross20.png"
         if not os.path.isfile(img_cross):
             img_cross = "cross20.png"
         if not os.path.isfile(img_cross):
@@ -76,7 +76,7 @@ class KeyboardBox(Gtk.Box):
         if os.path.isfile(welcome_file):
             img_help = "/usr/share/keyman/icons/help20.png"
             if not os.path.isfile(img_help):
-                img_help = "keymanconfig/icons/help20.png"
+                img_help = "keyman_config/icons/help20.png"
             if not os.path.isfile(img_help):
                 img_help = "help20.png"
             if not os.path.isfile(img_help):
