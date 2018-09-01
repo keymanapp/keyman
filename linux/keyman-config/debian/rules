@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 #export DH_VERBOSE=1
-export PYBUILD_NAME=keyman_config
+export PYBUILD_NAME=keyman-config
 export PYBUILD_INSTALL_ARGS=--install-scripts=/usr/share/keyman-config/
 
 %:
