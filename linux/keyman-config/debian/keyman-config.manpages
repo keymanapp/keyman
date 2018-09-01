@@ -1,6 +1,6 @@
 debian/man/get_kmp.1
 debian/man/install_kmp.1
-#debian/man/keyman-config.1
+debian/man/keyman-config.1
 debian/man/kvk2ldml.1
 debian/man/list_installed_kmp.1
 debian/man/uninstall_kmp.1

@@ -1,11 +1,19 @@
 #!/usr/bin/python3
 
+import argparse
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+
+from keyman_config import __version__
 from keyman_config.view_installed import ViewInstalledWindow
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Keyman keyboards installation and information')
+    parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
+
+    args = parser.parse_args()
+
     w = ViewInstalledWindow()
     w.connect("destroy", Gtk.main_quit)
     w.resize(800, 450)
