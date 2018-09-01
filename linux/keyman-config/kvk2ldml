@@ -3,20 +3,17 @@
 import argparse
 import os.path
 import sys
+
+from keyman_config import __version__
 from keyman_config.kvk2ldml import parse_kvk_file, print_kvk, convert_ldml, output_ldml
 
-
-# import struct
-# from lxml import etree
-
-
-
 def main():
-    parser = argparse.ArgumentParser(description='Read and parse kvk on-screen keyboard file.')
-    parser.add_argument('-k', "--keys", help='print all keys', action="store_true")
+    parser = argparse.ArgumentParser(description='Convert a Keyman kvk on-screen keyboard file to an LDML file')
     parser.add_argument('-p', "--print", help='print kvk details', action="store_true")
+    parser.add_argument('-k', "--keys", help='if printing also print all keys', action="store_true")
     parser.add_argument('kvkfile', help='kvk file')
-    parser.add_argument('-o', metavar='LDMLFILE', help='output LDML file')
+    parser.add_argument('-o', metavar='LDMLFILE', help='output LDML file location')
+    parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
 
     args = parser.parse_args()
 
@@ -39,9 +36,13 @@ def main():
         print_kvk(kvkData, args.keys)
 
     if args.o:
-        with open(args.o, 'wb') as ldmlfile:
-            ldml = convert_ldml(kvkData)
-            output_ldml(ldmlfile, ldml)
+        outputfile = args.o
+    else:
+        outputfile = name + ".ldml"
+
+    with open(outputfile, 'wb') as ldmlfile:
+        ldml = convert_ldml(kvkData)
+        output_ldml(ldmlfile, ldml)
 
 if __name__ == "__main__":
     main()

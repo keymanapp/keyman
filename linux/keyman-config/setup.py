@@ -1,9 +1,12 @@
 #!/usr/bin/python3
 
 from setuptools import setup, find_packages
+
+exec(open('keyman_config/version.py').read())
+
 setup(
     name="keyman_config",
-    version="10.99.1",
+    version=__version__,
     packages=find_packages(),
     scripts=['keyman-config', 'get_kmp',
              'install_kmp', 'kvk2ldml',

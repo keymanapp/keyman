@@ -2,11 +2,13 @@
 
 import argparse
 import os
+from keyman_config import __version__
 from keyman_config.list_installed_kmp import get_installed_kmp
 
 def main():
-    parser = argparse.ArgumentParser(description='Show installed keyman keyboards.')
-    parser.add_argument('-s', "--short", help='short format', action="store_true")
+    parser = argparse.ArgumentParser(description='Show installed Keyman keyboards with name, version, id and description.')
+    parser.add_argument('-s', "--short", help='short format of name, version, id', action="store_true")
+    parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
 
     args = parser.parse_args()
 

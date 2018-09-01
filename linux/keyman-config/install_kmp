@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+from keyman_config import __version__
 from keyman_config.install_kmp import install_kmp
 from keyman_config.list_installed_kmp import get_kmp_version
 from keyman_config.get_kmp import get_keyboard_data, get_kmp
@@ -10,6 +11,7 @@ def main():
 	parser = argparse.ArgumentParser(description='Install a Keyman keyboard, either a local .kmp file or specify a keyboard id to download and install')
 	parser.add_argument('-f', metavar='<kmpfile>', help='Keyman kmp file')
 	parser.add_argument('-k', metavar='<keyboardid>', help='Keyman keyboard id')
+	parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
 
 	args = parser.parse_args()
 	if args.k and args.f:

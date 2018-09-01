@@ -1,30 +1,35 @@
 #!/usr/bin/python3
 
+import argparse
 import sys
 import os.path
+
+from keyman_config import __version__
 from keyman_config.kmpmetadata import parseinfdata, parsemetadata
 
-def main(argv):
-	if len(sys.argv) != 2:
+def main():
+	parser = argparse.ArgumentParser(description='Parse Keymap package data kmp.json or kmp.inf')
+	parser.add_argument('file', help='Either a kmp.json or kmp.inf')
+	parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
+
+	args = parser.parse_args()
+
+
+	if not os.path.isfile(args.file):
+		print("kmpmetadata.py Input file ", args.file, " not found.")
 		print("kmpmetadata.py <kmp.json> or <kmp.inf>")
 		sys.exit(2)
-	inputfile = sys.argv[1]
 	
-	if not os.path.isfile(inputfile):
-		print("kmpmetadata.py Input file ", inputfile, " not found.")
-		print("kmpmetadata.py <kmp.json> or <kmp.inf>")
-		sys.exit(2)
-	
-	name, ext = os.path.splitext(inputfile)
+	name, ext = os.path.splitext(args.file)
 	if ext == ".json":
-		parsemetadata(inputfile, True)
+		parsemetadata(args.file, True)
 	elif ext == ".inf":
-		parseinfdata(inputfile, True)
+		parseinfdata(args.file, True)
 	else:
 		print("kmpmetadata.py Input file must be json or inf.")
 		print("kmpmetadata.py <kmp.json> or <kmp.inf>")
 		sys.exit(2)
 
 if __name__ == "__main__":
-        main(sys.argv[1:])
+        main()
 

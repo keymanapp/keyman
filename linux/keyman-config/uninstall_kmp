@@ -1,14 +1,19 @@
 #!/usr/bin/python3
 
+import argparse
 import sys
+
+from keyman_config import __version__
 from keyman_config.uninstall_kmp import uninstall_kmp
 
-def main(argv):
-	if len(sys.argv) != 2:
-		print("uninstall_kmp.py <keyboard id>")
-		sys.exit(2)
-	keyboardid = sys.argv[1]
-	uninstall_kmp(keyboardid)
+def main():
+	parser = argparse.ArgumentParser(description='Uninstall Keyman keyboard package.')
+	parser.add_argument('id', help='Keyman keyboard id')
+	parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
+
+	args = parser.parse_args()
+
+	uninstall_kmp(args.id)
 
 if __name__ == "__main__":
-	main(sys.argv[1:])
+	main()
