@@ -11,7 +11,7 @@ libkmfldoc_DATA = \
 	INSTALL\
 	NEWS
 
-EXTRA_DIST = $(libkmfldoc_DATA)
+EXTRA_DIST = $(libkmfldoc_DATA) VERSION
 
 # Copy all the spec files. Of cource, only one is actually used.
 dist-hook:

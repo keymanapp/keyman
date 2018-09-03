@@ -2,8 +2,8 @@ Source: libkmfl
 Priority: optional
 Section: libs
 Maintainer: Doug Rintoul <doug_rintoul@sil.org>
-Homepage: http://kmfl.sourceforge.net/
-Build-Depends: cdbs (>= 0.4.27), debhelper (>= 9), dh-autoreconf, libkmflcomp-dev
+Homepage: http://www.keyman.com/
+Build-Depends: cdbs (>= 0.4.27), debhelper (>= 9), dh-autoreconf, libkmflcomp-dev (>=10.99.0)
 Standards-Version: 3.9.8.0
 
 Package: libkmfl-dev

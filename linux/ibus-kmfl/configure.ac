@@ -29,7 +29,12 @@ m4_define(ibus_maybe_datestamp,
 m4_define([ibus_version],
     ibus_major_version.ibus_minor_version.ibus_micro_version[]ibus_maybe_datestamp)
 
-AC_INIT([ibus-kmfl], [10.99.1], [http://code.google.com/p/ibus/issues/entry],[ibus-kmfl])
+# dev version
+AC_INIT([ibus-kmfl], m4_esyscmd_s([vers=`cat VERSION`; echo "$vers.`date -u +"%Y%m%d%H%M%S"`"]), [https://github.com/ibus/ibus/issues/new])
+
+# release version
+# AC_INIT([ibus-kmfl], m4_esyscmd_s([cat VERSION]), [https://github.com/ibus/ibus/issues/new])
+
 AM_INIT_AUTOMAKE
 AC_GNU_SOURCE
 

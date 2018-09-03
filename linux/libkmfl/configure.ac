@@ -3,7 +3,12 @@ dnl Created by Anjuta - will be overwritten
 dnl If you don't want it to overwrite it,
 dnl 	Please disable it in the Anjuta project configuration
 
-AC_INIT(libkmfl, 10.99.1)
+# dev version
+AC_INIT(libkmfl, m4_esyscmd_s([vers=`cat VERSION`; echo "$vers.`date -u +"%Y%m%d%H%M%S"`"]))
+
+# release version
+# AC_INIT(libkmfl, m4_esyscmd_s([cat VERSION]))
+
 AM_INIT_AUTOMAKE
 
 AM_CONFIG_HEADER(config.h)
